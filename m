@@ -1,52 +1,62 @@
-Return-Path: <netdev+bounces-254341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDQMONQ6emlN4wEAu9opvQ
-	(envelope-from <netdev+bounces-254341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:35:32 +0100
+	id sBs7K4E8emlB4wEAu9opvQ
+	(envelope-from <netdev+bounces-254342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:42:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC12A5D9E
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:35:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0CEA6074
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 76D9B300EDE3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:35:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 25C03302C30D
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBF3314B6F;
-	Wed, 28 Jan 2026 16:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6932F314D0D;
+	Wed, 28 Jan 2026 16:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WH8LPlZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D13D25A2B4;
-	Wed, 28 Jan 2026 16:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463DF225390
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 16:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769618117; cv=none; b=MPQFg+q9PehQDR0Rc2lhtBo3CAahPtm3eH5h0xvLD3bHuuHBMesa8Faa0tNb4bPRnMsSUbDNjcQCy0Z2FCxIX46U/5hmxrzH/8+/vbKqBo6Tbj+F1mDGF6qZn/FsacYJZDy2daiU2mD14NjF4aeEyWcL6n+x1E8MWY0u5SCE6ts=
+	t=1769618310; cv=none; b=HdXjDLqSTPXeWl3M0Ls90nmiFQijj901Ulz0uBP8RMHco0+L4NOIjHlvb55/FFRwc6WcDNVThtK1Fs52BG4dxXxOrxSztxFKUK/hsQTzMqtvtaqFn/o4Nk9hY8eWsG6dGlTj9YGGbfsDK/e279YX0doaHXGZU4hqGEJomi8n+vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769618117; c=relaxed/simple;
-	bh=lEAPg8/1O1kCKjKzRe0arMgCCKsZXsXwj7sG/uTzP4c=;
+	s=arc-20240116; t=1769618310; c=relaxed/simple;
+	bh=xiGBXufOFrdkSaxEbKSjiKZybVgf4AR4sTOwz0krnc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aC2ZDEpL8Fg4xjYI5wvWUA3Vi37bakvKZFIPbkZB+uHSSLqc+Yn9iDOx6Mtr2GsFp+OZynyEb0EE9x399zSzyRdD48ULsyhbtqoeZrjG4u5PhhR7fmxU5//OwBqegZk5Diw5F5PfrnH+yuysOOvKocgG1c8Zw3J0fn+vv9de6BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id B085D60625; Wed, 28 Jan 2026 17:35:11 +0100 (CET)
-Date: Wed, 28 Jan 2026 17:35:12 +0100
-From: Florian Westphal <fw@strlen.de>
-To: syzbot <syzbot+d417922a3e7935517ef6@syzkaller.appspotmail.com>
-Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com, pablo@netfilter.org, phil@nwl.cc,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [netfilter?] KASAN: slab-use-after-free Read in
- nft_array_get_cmp
-Message-ID: <aXo6wL1ziBe1vKEN@strlen.de>
-References: <6979fc44.050a0220.c9109.003b.GAE@google.com>
- <aXoRvAottF2YRD3a@strlen.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SvAUYdvxQehksv8Hb/lYJTEi+WJCc7LGs1uEzrZRz4Q5l53N+dkNb6/QqQ9ZyEAaoWVKlh0NIJkUiQWAcNsXR8kaGdG0QFp4McwYmxCyP/K/pYdpxBV8eqpIHN902KzXA7uxwKesBY+3ZTnoARC7lTDwss1ZKXI+ksAux5ige4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WH8LPlZc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D43DC4CEF1;
+	Wed, 28 Jan 2026 16:38:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769618309;
+	bh=xiGBXufOFrdkSaxEbKSjiKZybVgf4AR4sTOwz0krnc8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WH8LPlZckK09re/S67PA52zhWxVbmK2yXkpiWSUYXIS6RSuJ/eqTtq7o6lDYcSpDf
+	 /jtVGNUgcqEsP53Ly2JTthfD3RBmYQC9dA/LFEcqY1/MjAhLK7Cu9gDVpL2dqfoKH0
+	 oDPwNIAVvyunLF81O4NiQxWb8GfEXAtoX6wh/sjFJswjkK+k4IdK9SaZ6avyWEwJxg
+	 aiImXEDa2ELxjYRtZWO/q0SxAC6VhbQZAu839zDLtIsQUdGXAEdsWxLyZqUrEI4jdP
+	 0QDS3znSoDTGcIuEABR2k2Bz4L2+Iwwte9M0O4RQKci6RAcRKCF5z2Xp2m+SyOfkf6
+	 a51yqKbw57n8g==
+Date: Wed, 28 Jan 2026 16:38:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jkarrenpalo@gmail.com,
+	tglx@linutronix.de, mingo@kernel.org, allison.henderson@oracle.com,
+	petrm@nvidia.com, antonio@openvpn.net, bigeasy@linutronix.de,
+	Steffen Lindner <steffen.lindner@de.abb.com>
+Subject: Re: [PATCH net-next v2 4/9] hsr: Implement more robust duplicate
+ discard for PRP
+Message-ID: <20260128163824.GB172540@kernel.org>
+References: <cover.1769093335.git.fmaurer@redhat.com>
+ <fe1dbc483482e98fbc286290a2a3e88f555894d4.1769093335.git.fmaurer@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,78 +65,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXoRvAottF2YRD3a@strlen.de>
+In-Reply-To: <fe1dbc483482e98fbc286290a2a3e88f555894d4.1769093335.git.fmaurer@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254341-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,de.abb.com];
+	TAGGED_FROM(0.00)[bounces-254342-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,d417922a3e7935517ef6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7AC12A5D9E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1D0CEA6074
 X-Rspamd-Action: no action
 
-Florian Westphal <fw@strlen.de> wrote:
-> >  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
-> >  print_address_description mm/kasan/report.c:378 [inline]
-> >  print_report+0xba/0x230 mm/kasan/report.c:482
-> >  kasan_report+0x117/0x150 mm/kasan/report.c:595
-> >  nft_set_ext include/net/netfilter/nf_tables.h:795 [inline]
-> >  nft_set_ext_key include/net/netfilter/nf_tables.h:800 [inline]
-> >  nft_array_get_cmp+0x1f6/0x2a0 net/netfilter/nft_set_rbtree.c:133
-> >  __inline_bsearch include/linux/bsearch.h:15 [inline]
-> >  bsearch+0x50/0xc0 lib/bsearch.c:33
-> >  nft_rbtree_get+0x16b/0x400 net/netfilter/nft_set_rbtree.c:169
-> 
-> Use after free, its possible for rbtree insert to evict elements
-> due to expiry, but still return -EEXIST.
-> 
-> We can thus end up with removed elements but without a call to
-> ->commit(), hence we have a stale binary blob referencing free'd
-> elements.
+On Thu, Jan 22, 2026 at 03:56:59PM +0100, Felix Maurer wrote:
 
-So far I found 3 related issues, bsearch blob gets out of sync with the
-rbtree.  Prerequisite: set has a timed-out entry.  In all cases
-the bsearch blob isn't refreshed and holds pointers to free'd elements.
+...
 
-1. add new element, transaction is later aborted.
-Fix: refresh the bsearch blob from abort callback.
+> diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
 
-2. re-add an existing element, transaction passes.
-In this case, the commit hook isn't called because we don't have
-any changes to the set from transaction point of view.
+...
 
-3. create (F_EXCL) an existing element.  This also
-aborts the transaction, but the abort callback isn't run
-as no change to the set was made.
+> +/* Get the currently active sequence number block. If there is no block yet, or
+> + * the existing one is expired, a new block is created. The idea is to maintain
+> + * a "sparse bitmap" where a bitmap for the whole sequence number space is
+> + * split into blocks and not all blocks exist all the time. The blocks can
+> + * expire after time (in low traffic situations) or when they are replaced in
+> + * the backing fixed size buffer (in high traffic situations).
+> + */
+> +static struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node,
+> +					       u16 block_idx)
+> +{
+> +	struct hsr_seq_block *block, *res;
+> +
+> +	block = xa_load(&node->seq_blocks, block_idx);
+> +
+> +	if (block && hsr_seq_block_is_old(block)) {
+> +		hsr_forget_seq_block(node, block);
+> +		block = NULL;
+> +	}
+> +
+> +	if (!block) {
+> +		block = &node->block_buf[node->next_block];
+> +		hsr_forget_seq_block(node, block);
+> +
+> +		memset(block, 0, sizeof(*block));
+> +		block->time = jiffies;
+> +		block->block_idx = block_idx;
+> +
+> +		res = xa_store(&node->seq_blocks, block_idx, block, GFP_ATOMIC);
+> +		if (xa_is_err(res))
 
-I'm not yet sure how to fix 2 and 3.
+Hi Felix,
 
-I'll see about moving set_update_list to the nft pernet
-structure, so it can be populated from
-nft_trans_gc_queue_sync_done().
+I ran Claude Code over this with review-prompts [1] and it flags
+that in the error path above, the following is needed so that the
+block can be re-used.
 
-Pipapo set backend should be fine with it, it won't act
-when called with the 'private clone' being NULL.
+			block->time = 0;
+
+[1] https://github.com/masoncl/review-prompts/
+
+> +			return NULL;
+> +
+> +		node->next_block =
+> +			(node->next_block + 1) & (HSR_MAX_SEQ_BLOCKS - 1);
+> +	}
+> +
+> +	return block;
+> +}
+> +
+
+...
 
