@@ -1,315 +1,140 @@
-Return-Path: <netdev+bounces-254471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254472-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oB21GZuCemnx7AEAu9opvQ
-	(envelope-from <netdev+bounces-254471-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:41:47 +0100
+	id QP9QJKGDemnx7AEAu9opvQ
+	(envelope-from <netdev+bounces-254472-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:46:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03117A92B3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:41:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF73EA932D
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:46:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4468530065F5
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:41:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D5533030B21
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0768337689;
-	Wed, 28 Jan 2026 21:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958F281341;
+	Wed, 28 Jan 2026 21:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="JLCusINL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XP29vZNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FFF32FA37;
-	Wed, 28 Jan 2026 21:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7B31A267;
+	Wed, 28 Jan 2026 21:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769636504; cv=none; b=gKxmsZn2eyNWPo66jhXtCfkrBGmhg/T162IJ0C5TvXfn5tbF2y2a57a1+kLkEq70QKDqd6kSoCfDHMU7/H3SwVOmH6eNpwsXGh1R8wnVcoblVheVGv1eqbo0nSExJ17BrZquPUVc4KTJ95mPMkdRiDE7Zwj3iRTIwFnW2BObR9Y=
+	t=1769636746; cv=none; b=JgW3NNajiOyyOU9mozf40PZ/6wKjYiiKDtyLkDm1NRAMfPNyGKhr6XGY9hLk/NcsEV6d/IbGIFqsTD5FYSUME5562A0rkcDBTw46COQJKXBt8VVxDLffUV5n2sk91cisA82w+UF/GwceeNj4PU4rxd3DBlhoixwKTziOo9kV1r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769636504; c=relaxed/simple;
-	bh=hoImD/dtQZQ1KTNyWAO0c7LqLNeONtsEuNoErTU7X+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l/WXel754ydH423ZWIMvRYVwMqEwMp8TJLFiDUUfkO6DcWfgDqJWa6BzgGeEoj6S5OKT/ft38tqPXGefGBcbsm4jNjZbymweFfMUGiys5KOMGOswISyuEa0vyN75WeRNKnqJbINsOryxk2lw6HH+yoJ7YDvciJDQ3+lyyKbCscA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=JLCusINL; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4f1bM53WPdz9tcL;
-	Wed, 28 Jan 2026 22:41:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1769636497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cDIB0vB7AhOs2BLhO1BR5gGspK/qucCwKMUy1zrKhRM=;
-	b=JLCusINLF0xMJU0r42tPdKk3vsQCkFdrzletJCjCw88aVglZm7fCelyDbJNyWwSXm0xmiU
-	N7vtrt+wh7EV1bAGip9RrOtpBdUNXHmya3efrhFTZnGAPq92HUOOD4mM4m+J+LdF3WaYb+
-	NwlNoYrsTArjSvA9IqjoETarX9+XIixExQsxfJ9UMrCHckrs1h4i/8BhSvUxyvu/7C/b7v
-	734N5c4nm6ZexUE0JXKjKzPwL7TS4TwMGk7XTZ8BTTmf3RETmpf027xO+Jm8aR6J2KcOJr
-	7OnXoa+72psSiZ2mEroGSjuCxAI/eJDooclLpOehAj5jIqYfmmQeD6UGeZ6u0g==
-Date: Wed, 28 Jan 2026 22:41:25 +0100
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: festevam@gmail.com, linux-arm-kernel@lists.infradead.org,
- s.hauer@pengutronix.de, kernel@pengutronix.de, horms@kernel.org,
- shawnguo@kernel.org, imx@lists.linux.dev, linux-kernel@vger.kernel.org,
- conor+dt@kernel.org, devicetree@vger.kernel.org, wahrenst@gmx.net,
- pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org,
- richardcochran@gmail.com, edumazet@google.com, andrew+netdev@lunn.ch,
- robh@kernel.org, krzk+dt@kernel.org, andrew@lunn.ch
-Subject: Re: [net-next,v20,2/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20260128224125.246bcf41@wsk>
-In-Reply-To: <20260128022549.4151341-1-kuba@kernel.org>
-References: <20260126103400.1683125-3-lukasz.majewski@mailbox.org>
-	<20260128022549.4151341-1-kuba@kernel.org>
-Organization: mailbox.org
+	s=arc-20240116; t=1769636746; c=relaxed/simple;
+	bh=G9jVy6IaUc8xwMRV/EbT+4BkwQyONvaIh3LQYR1VmTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oa7jAryXEuLAiAufxgFOD2e8S5acM1RT+vgHfTf1uwdUkju+3wJI8DDGTSh4YoPHhs9w3zLeY7uXAtZbViHm1HEgravsuqikAL8Bls5zP+6MQYnBNDsngwIX9b7g4LuZNWBYdeHavMrcdMAm0mWqtTxnLYxNYdOwOZPlKbKWCiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XP29vZNe; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=eRNNdhYMgq20mFtzfNKVPJV8CTtJi4n1za6OfLaID3I=; b=XP
+	29vZNeUQvObmsRmKvt+rydwfC83L4Nm6jZrcu81PBpcq8blxbg56qMKD7jGRpIaL7zjMxveGTfQMb
+	0iz02paHH98KDGme7Gduf00e74FSttphUTpJQdE9hKSYnmUd6t8tYoX51oZTRb9my85NAj6Hd6/r9
+	d7IQc4yGlsV4n14=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vlDLw-005HSL-L1; Wed, 28 Jan 2026 22:45:32 +0100
+Date: Wed, 28 Jan 2026 22:45:32 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
+Cc: Marco Felsch <m.felsch@pengutronix.de>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into
+ phy_init_hw
+Message-ID: <9f6b520c-203d-48cc-8bef-18959672052c@lunn.ch>
+References: <20260128094644.302313-1-michael@amarulasolutions.com>
+ <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch>
+ <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
+ <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
+ <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
+ <fe9385a5-170f-474c-af8d-24bbfa5eb3ab@lunn.ch>
+ <CAOf5uwkr0Rmb_x0U88JAfozCQpkOoFOZ-V7BNteVZfcnNQF-Lw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: aaf4d6ce372ae19696f
-X-MBO-RS-META: obpg57tttc6kknksryg9wmtuwgikhh91
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOf5uwkr0Rmb_x0U88JAfozCQpkOoFOZ-V7BNteVZfcnNQF-Lw@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254471-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,lists.infradead.org,pengutronix.de,kernel.org,lists.linux.dev,vger.kernel.org,gmx.net,redhat.com,davemloft.net,google.com,lunn.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254472-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[pengutronix.de,armlinux.org.uk,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 03117A92B3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF73EA932D
 X-Rspamd-Action: no action
 
-Hi Jakub,
+On Wed, Jan 28, 2026 at 10:04:03PM +0100, Michael Nazzareno Trimarchi wrote:
+> Hi
+> 
+> On Wed, Jan 28, 2026 at 9:51 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > The issue was with the out-of-band reset coming from the FEC driver
+> > > which doesn't honor the phy state-machine.
+> >
+> > Could you explain this is more details. Is the FEC doing something
+> > wrong?
+> 
+> The fact that the phy should be reset when the clk is provided to it, is not
+> connected at all with the fec. I think that fec_main does not register itself
+> as clock provider, You "should" define the phy to have a clock if this is needed
+> during the restoration and we should not give any "magic" at controller level.
 
-> This is an AI-generated review
+Do we know which clock the PHY is consuming?
 
-AI is going to take the "Maintainer's" job :D
+The FEC has code for the clock "enet_out" which it enables and
+disables. If the PHY is also consuming this clock, we could also make
+it a consumer. The CCF reference counts enables/disables of clocks, so
+if the PHY enables it, the MAC won't be able to disable it.
 
-> of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see
-> https://netdev-ai.bots.linux.dev/ai-local.html ---
-> net: mtip: The L2 switch driver for imx287
->=20
-> This patch adds support for the More Than IP L2 switch embedded in the
-> imx287 SoC. It creates a two-port switch driver that can be used
-> interchangeably with the FEC driver.
->=20
-> > diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c new file mode
-> > 100644 index 000000000000..03c5163d6508
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c =20
->=20
-> [ ... ]
->=20
-> > +static void mtip_netif_stop_queues(struct switch_enet_private *fep)
-> > +{
-> > +	for (int i =3D 0; i < SWITCH_EPORT_NUMBER; i++)
-> > +		netif_stop_queue(fep->ndev[0]); =20
->                                       ^^^
->=20
-> Should this be fep->ndev[i] instead of fep->ndev[0]? The loop iterates
-> with variable i but always uses index 0, so port 1's queue is never
-> stopped.
-
-Ech.... I will fix it.
-
->=20
-> > +}
-> > +
-> > +static void mtip_netif_wake_queues(struct switch_enet_private *fep)
-> > +{
-> > +	for (int i =3D 0; i < SWITCH_EPORT_NUMBER; i++)
-> > +		netif_wake_queue(fep->ndev[0]); =20
->                                       ^^^
->=20
-> Same here - should this be fep->ndev[i]?
->=20
-
-The same here.
-
-> > +} =20
->=20
-> [ ... ]
->=20
-> > +static int mtip_mii_probe(struct net_device *dev)
-> > +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	struct phy_device *phy_dev =3D NULL;
-> > +	int port_idx =3D priv->portnum - 1;
-> > +
-> > +	if (fep->phy_np[port_idx]) {
-> > +		phy_dev =3D of_phy_connect(dev,
-> > fep->phy_np[port_idx],
-> > +					 &mtip_adjust_link, 0,
-> > +
-> > fep->phy_interface[port_idx]);
-> > +		if (!phy_dev) {
-> > +			netdev_err(dev, "Unable to connect to
-> > phy\n");
-> > +			return -ENODEV;
-> > +		}
-> > +	}
-> > +
-> > +	phy_set_max_speed(phy_dev, 100); =20
->                           ^^^^^^^
->=20
-> If fep->phy_np[port_idx] is NULL (no phy-handle in DT for this port),
-> the if block is skipped and phy_dev remains NULL. Can this cause a
-> NULL pointer dereference in phy_set_max_speed()?
-
-No. The mtip_mii_probe() is only called in mtip_open(), which is called
-only when netdevice's DT node is correctly parsed in the
-mtip_sw_probe().
-
->=20
-> > +	fep->phy_dev[port_idx] =3D phy_dev; =20
->=20
-> [ ... ]
->=20
-> > +static int mtip_parse_of(struct switch_enet_private *fep,
-> > +			 struct device_node *np)
-> > +{
-> > +	struct device_node *p;
-> > +	unsigned int port_num;
-> > +	int ret =3D 0;
-> > +
-> > +	p =3D of_get_child_by_name(np, "ethernet-ports");
-> > +
-> > +	for_each_available_child_of_node_scoped(p, port) {
-> > +		if (of_property_read_u32(port, "reg", &port_num))
-> > +			continue;
-> > +
-> > +		if (port_num > SWITCH_EPORT_NUMBER) { =20
->                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->=20
-> This only validates the upper bound. If the device tree contains
-> reg =3D <0>, would fep->mac[port_num - 1] access fep->mac[-1]? Perhaps
-> the check should also verify port_num is at least 1?
->=20
-
-In the:
-./Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
-
-one can have only ethernet-ports set to [12].
-
-In the current tree - some switches start numbering from 0, other from
-1.
-
-I would opt for keeping things as they are now...
-
-> > +			dev_err(&fep->pdev->dev,
-> > +				"%s: The switch supports up to %d
-> > ports!\n",
-> > +				__func__, SWITCH_EPORT_NUMBER);
-> > +			goto of_get_err;
-> > +		}
-> > +
-> > +		fep->n_ports =3D port_num;
-> > +		ret =3D of_get_mac_address(port, &fep->mac[port_num
-> > - 1][0]); =20
->=20
-> [ ... ]
->=20
-> > +	ret =3D mtip_mii_init(fep, pdev);
-> > +	if (ret) {
-> > +		dev_err(&pdev->dev, "%s: Cannot init phy bus
-> > (%d)!\n", __func__,
-> > +			ret);
-> > +		goto dma_free_coherent_memory;
-> > +	}
-> > +
-> > +	ret =3D mtip_ndev_init(fep, pdev);
-> > +	if (ret) {
-> > +		dev_err(&pdev->dev, "%s: Failed to create virtual
-> > ndev (%d)\n",
-> > +			__func__, ret);
-> > +		goto mdiobus_free_memory;
-> > +	} =20
->=20
-> [ ... ]
->=20
-> > + mdiobus_free_memory:
-> > +	mdiobus_free(fep->mii_bus); =20
->=20
-> mtip_mii_init() calls of_mdiobus_register() which registers the bus.
-> Should mdiobus_unregister() be called here before mdiobus_free()?
-> Compare with mtip_mii_remove() which does call mdiobus_unregister().
->=20
-
-+1
-
-The mdiobus_unregister() is missing.
-
-I will add it.
-
-> > + dma_free_coherent_memory:
-> > +	dma_free_coherent(&fep->pdev->dev, PAGE_SIZE,
-> > fep->rx_bd_base,
-> > +			  fep->bd_dma);
-> > +	fep->rx_bd_base =3D NULL;
-> > +	fep->tx_bd_base =3D NULL;
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static void mtip_sw_remove(struct platform_device *pdev)
-> > +{
-> > +	struct switch_enet_private *fep =3D
-> > platform_get_drvdata(pdev); +
-> > +	mtip_ndev_cleanup(fep);
-> > +
-> > +	mtip_mii_remove(fep);
-> > +
-> > +	timer_delete_sync(&fep->timer_mgnt);
-> > +	platform_set_drvdata(pdev, NULL);
-> > +} =20
->=20
-> mtip_sw_probe() allocates DMA memory with dma_alloc_coherent() in
-> mtip_switch_dma_init(), but mtip_sw_remove() does not appear to free
-> it. Is this a memory leak on driver removal?
-
-Yes. The dma_free_coherent() is missing.
-
-I will add it for v21.
-
---=20
-Best regards,
-
-=C5=81ukasz Majewski
+    Andrew
 
