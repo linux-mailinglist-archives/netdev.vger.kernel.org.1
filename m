@@ -1,216 +1,162 @@
-Return-Path: <netdev+bounces-254473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MODMHVuEemnx7AEAu9opvQ
-	(envelope-from <netdev+bounces-254473-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:49:15 +0100
+	id OK8yIh6Femnx7AEAu9opvQ
+	(envelope-from <netdev+bounces-254474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:52:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E802AA93A6
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:49:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E548DA9437
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E180C3018588
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:49:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B5C13019815
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6826933B6F9;
-	Wed, 28 Jan 2026 21:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E4B33B6CE;
+	Wed, 28 Jan 2026 21:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="aIGJEdcP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AInrgvGL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEFB2F5A22;
-	Wed, 28 Jan 2026 21:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECB6326958
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 21:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769636953; cv=none; b=SYNM28DEo3p1Oy11R3HnuWd3TCMCVycmpGA/VWiSAvWI8fg/EN42f7qZhlqgd8QUzu2Yz8J5V+z5TBkszd0nXkgy2Vbe8rTp/Ms0N2Ub8WF27IFK7wwA+BGwXTIE757d8Z9YehmhBboM2AfWtRZeag5ORmjcHGQcp6IY5Hi+O2E=
+	t=1769637135; cv=none; b=T0BcTl8W30GSP1cGa7YHWnkC8Xpo1ameTx3NGEJJ+dnqTEtEJw2vxQ705IOZIQJ1Suqcn2YRha67CKIOmsKAzomL0QrB4KzK2h+Q6eggmX782sOi18NVlDgcIrUB/XQMn6/Tyz1mL+tE7D5/kNSI7w5lirjalRoThittas1Vpt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769636953; c=relaxed/simple;
-	bh=WrvAyanbpwZ6MTEpVe5ifEBlgTpCvqg1qgTjOkpLaBY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t5UHVc9YQu4XlMEq7o2HRT5hJoJx5rIyc0UmTLvJY1wyO5qe+mwrwH740LKMVvgKORApBQc8H3KLRlYPPcf7+fh/1manWHQ544wxlVjiCm1dCLjIXYymgGW39YCWgXS4iQ/Vs3QX/0DYxNoUAo0AKzT4OGx4FCR9azlfgjXguKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=aIGJEdcP; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4f1bWc4D8zz9v9k;
-	Wed, 28 Jan 2026 22:49:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1769636940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ruAirXc8ptlR96ve5/9BugE40WCJ6xsmkWJx5Uj7rfU=;
-	b=aIGJEdcPUTNpCRPoxieT4ns0YAjlCS1SCWknUwnMSvmg9qMSU20pliO7EHJ/YKehTef8X4
-	OfTEP83Ov9GJqRBfQnmvxyTZcUkhN3Isu8Z69m16GysXboDZgypVf6Kj9EW9o5rDTKZsMY
-	NIcdir18IPW6rSkamg/khyUXsG3gehroa1KRAizet4EDWTmH8218TSM2mJHy+ejCWT3X0R
-	RlbV1knLwiHUkLPAQpjKDcSOf9gjVgsxYEH1P6cGBrYcHW7AVeKncHeNW5OdTfn2+5JM62
-	sRj7wXkwpjWQSCUAdP5w3MdePLt7m5N1DeC244DsjJqF2Be7TWLIy2uh2IH44A==
-Date: Wed, 28 Jan 2026 22:48:52 +0100
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: festevam@gmail.com, linux-arm-kernel@lists.infradead.org,
- s.hauer@pengutronix.de, kernel@pengutronix.de, horms@kernel.org,
- shawnguo@kernel.org, imx@lists.linux.dev, linux-kernel@vger.kernel.org,
- conor+dt@kernel.org, devicetree@vger.kernel.org, wahrenst@gmx.net,
- pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org,
- richardcochran@gmail.com, edumazet@google.com, andrew+netdev@lunn.ch,
- robh@kernel.org, krzk+dt@kernel.org, andrew@lunn.ch
-Subject: Re: [net-next,v20,3/7] net: mtip: Add buffers management functions
- to the L2 switch driver
-Message-ID: <20260128224852.62b16788@wsk>
-In-Reply-To: <20260128022554.4151421-1-kuba@kernel.org>
-References: <20260126103400.1683125-4-lukasz.majewski@mailbox.org>
-	<20260128022554.4151421-1-kuba@kernel.org>
-Organization: mailbox.org
+	s=arc-20240116; t=1769637135; c=relaxed/simple;
+	bh=Yd6Ch+v4GZViDs5TkULydV2wlpCqS/XMlsbQ3DO50EM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YFinO2R3Zut6Joy7n2eR7Tztn+N2LE12iuwMxprZc9OtCdYTGiUnn7O/maFz//g2g1tXYOHakjQrMe6Fx0jrhYv2qAi+vDydsUMj+BJnMj1JreBNBJVllg2hRO9XC4ZqjG1UX59rXo+nWNsha6ISFPyxnhB0JmcLVsOLsH4UCwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AInrgvGL; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a79ded11a2so1631235ad.3
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 13:52:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769637134; x=1770241934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zUHdprwswdWIcMlOfLpGdDZqB9fyK1LwozCf/2fGtLc=;
+        b=AInrgvGL41Hv+4VTfZ52ikOsIujN5UK7a+wtNY5rgRd/l+FuQb9ibqBx5FTUzBqMtK
+         uF3sV602UodL5/vfo2YyfvshPIfCWBg4lakA6vNAhwqMlcX0bvYg3CqwiCyCVZtr12iY
+         CFcpr+4j71oaqNkL6qZG667+lc8zzksZau+tvwDvDQ6kUNfqyaVdB72RPoacUO35fqWW
+         Coqh64H5xQYVdDfQSRL0HkJwB/v3g7zKWNicI8/6b1LIHidqb3zA8esmbiAb9/QOjjH/
+         eYnfcXGpPKIUdZw4uCUefMBbKjyUhfJ1OYbLPXs8/V/Fe49d9BMvMXxnweuTN/jWu4sh
+         chwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769637134; x=1770241934;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zUHdprwswdWIcMlOfLpGdDZqB9fyK1LwozCf/2fGtLc=;
+        b=qoOkJGMMVSr+mnI2ujaSLpRaapZNwx9vX/XZQ6WMn8O3Q85PEeM+qdcz3kBURsiS1c
+         XL/g+UXW3lWV4n233ikcBwsmyIhk6RZ1F1ng42/7Eqywf0VwfZJuk5A2qlxalbwEr/Fi
+         M0pBoW0o1iBX4MWpxjaitRYLRguuHVu37bb2qZ/h81n2RqUgwv6jvePBzSOXsP34tu1d
+         rQT+sYDAODcH75XEZySAU3xW+PtcQYkQni+dXSNjZ8lK7SDyuTekzLvbb5yTw5RgdtIS
+         umZd/ctlsbZ8GF3tqKwVW/qvFuEzpQNGBjPu1jKUpRjWp8uWONsSi92ipgLtp4jENCZJ
+         hylA==
+X-Gm-Message-State: AOJu0YxfQ1h8oYE/K0i5lfBNaRzmswH+FYZl+bLzmDqPU9L+5su3dAnd
+	MSqFpV6wTfQZZXiJqkTqv8/yUbLQCdzLTgO4DOikuzGCbqWdQlqNUA9xi7Q0gyhV
+X-Gm-Gg: AZuq6aKb1XOI4NGh/H37GoSsTRo5W0JuNIwBoWU8jQJQiYb1GMokt0S4ETm9wZ5SbHE
+	y4I6T/IDXQkOQTSeOK8qMdSJbudsGMi095NPbkMxPkpciV3Wf4dXYrV5tQ0xouDNxV3UFZlCNDt
+	NwqLe9nkjZCzYXFBrOJMM2VA7WmPV8IbR8u4QdfH5nioq1pB4DsZuKaXo8Sk/knsRDQy+MqtQwb
+	mM3n8BGKjRutaEriNpJTzDNHPSBNaNMnwr+IXFRm0fD1nkLK1tCuqmNwQ37hzkWGN65Ma6sZZF5
+	hgjKUD8bMLihmXji3CfllHPsf5mICM8I5FInOCq7R6RTf3Cnz/QmQkPeRIKaqEZ2sHuhtb91aYE
+	9Cty5no/vIn3peYugCUJKcSJlJh5rg1VbZK4Vd9mu5JZPenDxX9NgKmg7KXuKMW2icyIjysRL+I
+	+KVsMTYcJYJ9aww34lqf6Lonr0NiN1C3qhZps=
+X-Received: by 2002:a17:903:906:b0:297:d764:9874 with SMTP id d9443c01a7336-2a870d5a24amr58301685ad.21.1769637133859;
+        Wed, 28 Jan 2026 13:52:13 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([2a09:bac1:7680:d30::4:384])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b6e4317sm31576155ad.85.2026.01.28.13.52.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 13:52:13 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 0/4] net: dsa: yt921x: Add DCB/QoS support
+Date: Thu, 29 Jan 2026 05:51:52 +0800
+Message-ID: <20260128215202.2244266-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: 0a70d41f27b7b89e913
-X-MBO-RS-META: p4u7ozw7pi4bkkx54cikgzroe65njg1g
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254473-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-254474-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,lists.infradead.org,pengutronix.de,kernel.org,lists.linux.dev,vger.kernel.org,gmx.net,redhat.com,davemloft.net,google.com,lunn.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:dkim]
-X-Rspamd-Queue-Id: E802AA93A6
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E548DA9437
 X-Rspamd-Action: no action
 
-Hi Jakub,
+This series add DCB/QoS support to the driver.
 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see
-> https://netdev-ai.bots.linux.dev/ai-local.html ---
-> net: mtip: Add buffers management functions to the L2 switch driver
->=20
-> This patch adds buffer management functions for the MTIP L2 switch
-> driver, implementing mtip_free_buffers(), mtip_create_page_pool(), and
-> mtip_alloc_buffers() for RX page pool and TX bounce buffer handling.
->=20
-> > diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c index
-> > 03c5163d6508..9c21a3d29c1c 100644 ---
-> > a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c +++
-> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c @@ -888,11
-> > +888,96 @@ static void mtip_get_drvinfo(struct net_device *dev,
-> >
-> >  static void mtip_free_buffers(struct net_device *dev)
-> >  {
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	int i;
-> > +
-> > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
-> > +		page_pool_put_full_page(fep->page_pool,
-> > +					fep->page[i], false); =20
->=20
-> Can fep->page[i] be NULL here?  When mtip_alloc_buffers() fails
-> partway through the RX allocation loop, it calls mtip_free_buffers()
-> via the error path.  At that point, only some fep->page[] entries
-> have been allocated - the rest remain NULL from the kzalloc
-> initialization.
->=20
-> The call chain page_pool_put_full_page()->page_pool_put_netmem()->
-> page_pool_unref_and_test()->page_pool_unref_netmem()->
-> netmem_get_pp_ref_count_ref() will attempt to access
-> &NULL->pp_ref_count when passed a NULL page, causing a NULL pointer
-> dereference.
->=20
-> Should there be a NULL check before calling page_pool_put_full_page()?
->=20
+v4: https://lore.kernel.org/r/20260127020847.1482724-1-mmyangfl@gmail.com
+  - change the color for DEI bit and add a comment for it
+v3: https://lore.kernel.org/r/20260125001328.3784006-1-mmyangfl@gmail.com
+  - fix port_del_dscp_prio()
+  - split yt921x_chip_setup()
+v2: https://lore.kernel.org/r/20260122194233.2777550-1-mmyangfl@gmail.com
+  - make DCB support optional
+  - refine with enum yt921x_app_selector
+  - add missing dscp_prio_mapping_is_global
+  - fix pcp support
+v1: https://lore.kernel.org/r/20260119185935.2072685-1-mmyangfl@gmail.com
+  - rebase
 
-Yes, such check shall be added.
+David Yang (4):
+  net: dsa: tag_yt921x: fix priority support
+  net: dsa: yt921x: Refactor VLAN awareness setting
+  net: dsa: yt921x: Refactor yt921x_chip_setup()
+  net: dsa: yt921x: Add DCB/QoS support
 
-> > +		fep->page[i] =3D NULL;
-> > +	}
-> > +
-> > +	page_pool_destroy(fep->page_pool);
-> > +	fep->page_pool =3D NULL;
-> > +
-> > +	for (i =3D 0; i < TX_RING_SIZE; i++)
-> > +		kfree(fep->tx_bounce[i]);
-> >  } =20
->=20
-> [ ... ]
->=20
-> > +static int mtip_alloc_buffers(struct net_device *dev)
-> > +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	struct cbd_t *bdp;
-> > +	struct page *page;
-> > +	int i, ret;
-> > +
-> > +	ret =3D mtip_create_page_pool(fep, RX_RING_SIZE);
-> > +	if (ret < 0) {
-> > +		dev_err(&fep->pdev->dev, "Failed to create page
-> > pool\n");
-> > +		return ret;
-> > +	}
-> > +
-> > +	bdp =3D fep->rx_bd_base;
-> > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
-> > +		page =3D page_pool_dev_alloc_pages(fep->page_pool);
-> > +		if (!page) {
-> > +			dev_err(&fep->pdev->dev,
-> > +				"Failed to allocate page for rx
-> > buffer\n");
-> > +			goto err;
-> > +		} =20
->=20
-> [ ... ]
->=20
-> > + err:
-> > +	mtip_free_buffers(dev); =20
->=20
-> When this error path is taken, fep->page[] may contain NULL entries
-> for pages that were never allocated.
->=20
-> > +	return -ENOMEM;
-> >  } =20
+ drivers/net/dsa/Kconfig  |   1 +
+ drivers/net/dsa/yt921x.c | 310 ++++++++++++++++++++++++++++++++++++---
+ drivers/net/dsa/yt921x.h |  55 +++++--
+ net/dsa/tag_yt921x.c     |   8 +-
+ 4 files changed, 341 insertions(+), 33 deletions(-)
 
-I will add proper fix for v21.
+-- 
+2.51.0
 
---=20
-Best regards,
-
-=C5=81ukasz Majewski
 
