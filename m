@@ -1,189 +1,122 @@
-Return-Path: <netdev+bounces-254159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254161-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0P36Du7ReWlCzwEAu9opvQ
-	(envelope-from <netdev+bounces-254159-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:07:58 +0100
+	id 4ClVLeTTeWlCzwEAu9opvQ
+	(envelope-from <netdev+bounces-254161-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:16:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46DCC9EA2F
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:07:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F40DE9EB49
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1CF4300A8D3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:07:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2686300C931
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C4128A1D5;
-	Wed, 28 Jan 2026 09:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97364341AC7;
+	Wed, 28 Jan 2026 09:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbtuW43N"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790DA33DEE0
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 09:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728114502A;
+	Wed, 28 Jan 2026 09:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769591244; cv=none; b=fgCuq168eSfFZN9B66on7gWf78gE/tZw5sa/BjU81Z2YoXOPVVmHzPOSeljscxtuFaDB4T3wDsOOmtpY+QIBK4iD6hC6JNZbJlvDvQAlShsOEG9ypvVkpczW7NLCZI7V2NLDMgCRxbbOoh9OCv8n1O7zHX9P5PzK0NUly7ZBA7c=
+	t=1769591772; cv=none; b=HJq0Hd6MiBL1YnX0DKEVRVAfVS+oV5+/b91f8qntmkN1jzpqFX9WbE8elmagpv3195BZiGE5r0V++AQf4CFXACn6LItEqs3JEqWcEPfLSr24zipu1uQu9EkxEQ/951RA88eqikgVeZuV3zmgnriyF+YEVSR2wWX35cpHXaIQQFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769591244; c=relaxed/simple;
-	bh=q20nxD76+Q+wL9SPZdlE5mMCzD15ljcJ64PXAESkvD0=;
+	s=arc-20240116; t=1769591772; c=relaxed/simple;
+	bh=g2RmX6bqLfvTJKb1XBSuNHFWcL34fxltXzbmfoDuBFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ILB3L93jeqcIxCy3Z4AmM5qQ1Iz7GvO1Mi7iijaBTIsH5KQ1CCGcmmlxZM/70bC28If9dYJd0P2NAuXRWyQivAOIISLjMMzNrKfwz7dtn0ZDQ1Czw0yQ/UGGIeMAJccrXi+CMEa1eDKvsQ8b4O9p/w5dxEe2JJuzLlpAONFeb80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vl1W6-0005SR-Ez; Wed, 28 Jan 2026 10:07:14 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vl1W6-002tBa-2d;
-	Wed, 28 Jan 2026 10:07:14 +0100
-Received: from pengutronix.de (p54b15bf8.dip0.t-ipconnect.de [84.177.91.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id D0BC14D9FDC;
-	Wed, 28 Jan 2026 09:07:13 +0000 (UTC)
-Date: Wed, 28 Jan 2026 10:07:13 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	linux-can@vger.kernel.org
-Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
-Message-ID: <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <20260125201601.5018-1-socketcan@hartkopp.net>
- <20260127174937.4c5fc226@kernel.org>
- <67cb17f4-2f72-4847-aa04-3633f3d8df33@hartkopp.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dFJvvyeFSkyyI/nuMl3YJsKbAlNbijlSCa8/OMx1DPUkzpkvvFJlGAdHJPvPkvj9haucVc/bOwnyQSTv0s/r8IUN2dbGr5owBwks+mPNG9aaUsFsll8HCLIPAlfqPtdKmNWRcje/WcFUMCinWVJ2axNmeemvUMwBDqtlbsFakhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbtuW43N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A4FAC4CEF1;
+	Wed, 28 Jan 2026 09:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769591772;
+	bh=g2RmX6bqLfvTJKb1XBSuNHFWcL34fxltXzbmfoDuBFk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fbtuW43NBiVucn6TftPq9S2xEQt5TSdheliJ73/4a3UA9t6rMcPi9C1PJssAWjrPm
+	 qbZKcFCcIk7k/snSCaKmHopenA2C7NJfowuAgqLbHeErTxVO3/Ne0FJM0DkdGVXFLZ
+	 1/GN38pz/K6itRaY523SNNW9td6fm+dS1EhCOaJihPrAiyIshoq5wEephaPJ+UPK4T
+	 dRzUQWEEE79vpf/wvtaTBY+rIh/U3IHO86boj7Md05hMWHihhZwLZgk36kYGsDTD/F
+	 GRkpr0Kpx82/bTvgF/iT1s0ZOlTHEb803agX5B2ZO4f6GEgE/ogPZsHiyq/R0Fv6yQ
+	 KHDGROz8FVDiQ==
+Date: Wed, 28 Jan 2026 09:16:06 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "illusion.wang" <illusion.wang@nebula-matrix.com>,
+	dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
+	sam.chen@nebula-matrix.com, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, corbet@lwn.net, linux-doc@vger.kernel.org,
+	lorenzo@kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev,
+	lukas.bulwahn@redhat.com, hawk@kernel.org, ast@kernel.org,
+	bpf@vger.kernel.org, sdf@fomichev.me, daniel@iogearbox.net,
+	john.fastabend@gmail.com, edumazet@google.com,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 net-next 00/15] nbl driver for Nebulamatrix NICs
+Message-ID: <aXnT1juyBbMkiykg@horms.kernel.org>
+References: <20260123011804.31263-1-illusion.wang@nebula-matrix.com>
+ <aXj-uam1HodC0851@horms.kernel.org>
+ <20260127105304.21279cc2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oecpvtn4tbaqv6yo"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67cb17f4-2f72-4847-aa04-3633f3d8df33@hartkopp.net>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20260127105304.21279cc2@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.56 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254159-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TAGGED_FROM(0.00)[bounces-254161-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,fomichev.me,iogearbox.net,gmail.com,google.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:url,pengutronix.de:mid,strato-hosting.co.uk:url]
-X-Rspamd-Queue-Id: 46DCC9EA2F
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: F40DE9EB49
 X-Rspamd-Action: no action
 
+On Tue, Jan 27, 2026 at 10:53:04AM -0800, Jakub Kicinski wrote:
+> On Tue, 27 Jan 2026 18:06:49 +0000 Simon Horman wrote:
+> > As per Jakub's advice in his review of v1 [*],
+> > Please try to create a minimal driver in the order of ~5kLoC.
+> 
+> Perhaps other maintainers will disagree, but for ease of review
+> and to avoid the huge reposts perhaps we should consider merging
+> something like patches 1 and 3* first, as the initial series.
+> And then you can build up the driver from there in reasonable,
+> 5kLoC-at-a-time series?
+> 
+>  * patch 3 currently includes things which do not seem machine
+>    generated / like register descriptors like structs added to
+>    nbl_def_channel.h and nbl_include.h
 
---oecpvtn4tbaqv6yo
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
-MIME-Version: 1.0
-
-On 28.01.2026 09:42:14, Oliver Hartkopp wrote:
-> On 28.01.26 02:49, Jakub Kicinski wrote:
-> > On Sun, 25 Jan 2026 21:15:55 +0100 Oliver Hartkopp wrote:
-> > > CAN bus related skbuffs (ETH_P_CAN/ETH_P_CANFD/ETH_P_CANXL) simply co=
-ntain
-> > > CAN frame structs for CAN CC/FD/XL of skb->len length at skb->data.
-> > > Those CAN skbs do not have network/mac/transport headers nor other su=
-ch
-> > > references for encapsulated protocols like ethernet/IP protocols.
-> > >
-> > > To store data for CAN specific use-cases all CAN bus related skbuffs =
-are
-> > > created with a 16 byte private skb headroom (struct can_skb_priv).
-> > > Using the skb headroom and accessing skb->head for this private data
-> > > led to several problems in the past likely due to "The struct can_skb=
-_priv
-> > > business is highly unconventional for the networking stack." [1]
-> > >
-> > > This patch set aims to remove the unconventional skb headroom usage f=
-or
-> > > CAN bus related skbuffs and use the common skb extensions instead.
-> >
-> > This is fine. Wish we could make md_dst work, since skb_ext still burns
-> > a bit in the skb (last extension bit in fact, next user will have to
-> > bump the filed size). And you very much do not route these frames,
-> > so dst would work perfectly fine. But whatever.
-> >
-> > lore never received patch 6, tho, you'll need to repost.
->
-> Thanks for looking at it.
->
-> In fact patch 6 stuck in my providers mail system which responded this to
-> (only) patch 6 =C2=AF\_(=E3=83=84)_/=C2=AF
->
-> 5.7.1 Refused by local policy. No SPAM please! (B-EX
-> 155302::1769588601-AC38E895-223F95BA/10/71040183929) see https://www.stra=
-to-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered
-> [MSG0011]
->
-> As this could not been solved since Sunday I'll kindly ask Marc to send t=
-he
-> attached v2 patchset (including your __u32 remark) to the mailing list, so
-> that also the AI bot can take a look at it.
-
-I'll do. In the mean time, please have a look at b4, it has support for
-sending patches via a web hook.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---oecpvtn4tbaqv6yo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAml50b0ACgkQDHRl3/mQ
-kZygZgf/VWTJ2JkoEt/40+QxwYk9FrPmBoGP/kAPdwGnUlTbInH9pGSHi3xYgl/H
-pFASJ2WVslfXsb2I7pNAMbAzgWu8G3ze1ZHU1hPFBFNElKRrKtu4GvJZItrb7cgK
-vXkCrvdefN3F3EpcE4vnRPo2+rY0zz662VUN1NMVYNY3Sy42DaR4qNqC/a+PVSzf
-M/rip52cYRhohIZr0YdR8tphKKi3vHx22EveK7e74oEW53UbpWjLnaCGUe6vCOKN
-Mx9g/T6cKMEw3mfG1DvsXiUvd9QzuXcvJpmf8Vf9KLi2ty7AawoTWJ2ZbNj3yUZ+
-gWIrxF+LOXQ3FCta5qJEFFeSUTtLmw==
-=y1V3
------END PGP SIGNATURE-----
-
---oecpvtn4tbaqv6yo--
+Without having looked into the details: yes, I think some
+sort of staged approached could help here.
 
