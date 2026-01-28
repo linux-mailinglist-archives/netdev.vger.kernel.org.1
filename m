@@ -1,200 +1,225 @@
-Return-Path: <netdev+bounces-254100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EEOmKXGjeWlMyQEAu9opvQ
-	(envelope-from <netdev+bounces-254100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 06:49:37 +0100
+	id kBQbHcyjeWlYyQEAu9opvQ
+	(envelope-from <netdev+bounces-254101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 06:51:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD519D3CA
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 06:49:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5AD9D3EF
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 06:51:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65921300EABE
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 05:49:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C90183016832
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 05:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA26279DB1;
-	Wed, 28 Jan 2026 05:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94EB2E229F;
+	Wed, 28 Jan 2026 05:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mgF8Y8YM"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C23136351;
-	Wed, 28 Jan 2026 05:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2758013DDAE;
+	Wed, 28 Jan 2026 05:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769579373; cv=none; b=L/EnI3fzEE0FFevtJe8UiEXrKF3wQXMzLKjcSwNmqQ8iqZvYsV3mnMcph6577jATACJrFxfTHt9Govo1o7jZgzM9vCDJfqU/Ecubc1gE2UrDYzosBTz2cqsfX1RH9qXW6tUJLYa6uaCa2TdDJMIR9zcy3J8gLLhJhy4oA1L8vYY=
+	t=1769579464; cv=none; b=WDapdUSF+FoTpfyHyhT6plQNyofbkpbHkX4dcbEW2RZZXiayU7PaHl8jk05lBkBzgstXEtpu8TFbu+Ea6M2gpNAlnzk9qB3jLAtgrdIgIZwvXakwD+f0iLChq0e/BUZmgzGjxy7PnUiSXMCefROPn6+VOUFBXl2qErB+hyZsHEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769579373; c=relaxed/simple;
-	bh=QXG0L22qXs1DF+kKrTmU2+1euU1VrkVIwRndNbthQ5k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=QZMObpKt8f/+bTSPZO2Tn7T5EKr9n5Nww7nzmjfMv4HGIodrpHUbVSGPQg9YNEl3NIBxd/KIF3BPgYQFZeZmyWCB/u1xZ5DXbBLPgU5jLn3GERAoB19DCNDbkigBqg6t5H+DJV7+KkZV56GwPZ/G2OEsB5z7oyQ4wHY2dmkx1r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from linmin$eswincomputing.com ( [10.10.96.205] ) by
- ajax-webmail-app2 (Coremail) ; Wed, 28 Jan 2026 13:48:59 +0800 (GMT+08:00)
-Date: Wed, 28 Jan 2026 13:48:59 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Min Lin" <linmin@eswincomputing.com>
-To: "Bo Gan" <ganboing@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	"Andrew Lunn" <andrew@lunn.ch>,
-	"Krzysztof Kozlowski" <krzk@kernel.org>,
-	=?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>,
-	devicetree@vger.kernel.org, andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1769579464; c=relaxed/simple;
+	bh=FhT0sreghDj+d0LxXk8sXRji0kjrOQMZRJ1PiSNOFfs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PoAiVJzGmJ49wc1KHPZNyHZeNOHVelqc3NWnL/WPFR3QgAdJom8FA4mW+YC+2t/iz/1797X25Mpt9f/DXbAK0fmxmjrTG5MUmX+H4/+Z2raLvWrHacAHXc2yD9h6XWqTW9ZwhmXetLOdIAP4c/NXHju0pmqGDI3fy0MJ5n0eSUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mgF8Y8YM; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1769579452; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=r0I1m9aox/+7j1DKu8FLnEKyMKUy6DK9Kd7tUiqZJGQ=;
+	b=mgF8Y8YMfe7G9oIagDem/wUpcS4hONxmv4DK3pjK4YL3u6pq8hKDiVz8/XIe7R7aRJSvJlOZW6iACJp1+g/Me9rVPo5t+l03ntvN4xmSl3EdaOlnK0My7LV0m9Me5OU5SxsomdmRRwc/O8zzdyjiNCKIEM+bAsNjUZA+CQHYtNI=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wy2KYj-_1769579451 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 28 Jan 2026 13:50:52 +0800
+Date: Wed, 28 Jan 2026 13:50:51 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Leon Romanovsky <leon@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Liu Jian <liujian56@huawei.com>,
+	dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	ningyu@eswincomputing.com, pinkesh.vaghela@einfochips.com,
-	weishangjuan@eswincomputing.com
-Subject: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock
- sampling control
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <973f2b4b-bf8d-4a77-a27a-47495bc21ff8@gmail.com>
-References: <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
- <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
- <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
- <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
- <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
- <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
- <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
- <bd202cfa-d6eb-4d0e-982d-b49795dd25f7@lunn.ch>
- <009aefc4-fbc9-4f91-9230-23d18c281bf3@gmail.com>
- <73ea5619.2b71.19bf847c80d.Coremail.linmin@eswincomputing.com>
- <aXeydXuWEMDz-yVM@shell.armlinux.org.uk>
- <32a1f814.2c79.19bfe173225.Coremail.linmin@eswincomputing.com>
- <973f2b4b-bf8d-4a77-a27a-47495bc21ff8@gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	pabeni@redhat.com, horms@kernel.org,
+	guangguan.wang@linux.alibaba.com, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
+ smc_ib_is_sg_need_sync()
+Message-ID: <20260128055051.GA79132@j66a10360.sqa.eu95>
+References: <20250828124117.2622624-1-liujian56@huawei.com>
+ <20250909094532.GD341237@unreal>
+ <20260126044501.GA18724@j66a10360.sqa.eu95>
+ <20260127120004.GT13967@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <5c835fe9.2d60.19c0325df03.Coremail.linmin@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TQJkCgBXoa1Lo3lphmAAAA--.141W
-X-CM-SenderInfo: 5olqzx3q6h245lqf0zpsxwx03jof0z/1tbiAgEBCWl46QEQVgABs1
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260127120004.GT13967@unreal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[eswincomputing.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-254100-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,kernel.org,eswincomputing.com,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st-md-mailman.stormreply.com,lists.infradead.org,einfochips.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linmin@eswincomputing.com,netdev@vger.kernel.org];
-	HAS_X_PRIO_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	R_DKIM_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email,davemloft.net:email]
-X-Rspamd-Queue-Id: ACD519D3CA
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254101-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:email];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+]
+X-Rspamd-Queue-Id: CF5AD9D3EF
 X-Rspamd-Action: no action
 
-SGkgQm8gR2FuLAoKCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlcy0tLS0tCj4gRnJvbTogIkJvIEdh
-biIgPGdhbmJvaW5nQGdtYWlsLmNvbT4KPiBTZW5kIHRpbWU6V2VkbmVzZGF5LCAyOC8wMS8yMDI2
-IDEwOjM4OjI4Cj4gVG86ICJNaW4gTGluIiA8bGlubWluQGVzd2luY29tcHV0aW5nLmNvbT4sICJS
-dXNzZWxsIEtpbmcgKE9yYWNsZSkiIDxsaW51eEBhcm1saW51eC5vcmcudWs+Cj4gQ2M6ICJBbmRy
-ZXcgTHVubiIgPGFuZHJld0BsdW5uLmNoPiwgIktyenlzenRvZiBLb3psb3dza2kiIDxrcnprQGtl
-cm5lbC5vcmc+LCDmnY7lv5cgPGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20+LCBkZXZpY2V0cmVl
-QHZnZXIua2VybmVsLm9yZywgYW5kcmV3K25ldGRldkBsdW5uLmNoLCBkYXZlbUBkYXZlbWxvZnQu
-bmV0LCBlZHVtYXpldEBnb29nbGUuY29tLCBrdWJhQGtlcm5lbC5vcmcsIHJvYmhAa2VybmVsLm9y
-Zywga3J6aytkdEBrZXJuZWwub3JnLCBjb25vcitkdEBrZXJuZWwub3JnLCBuZXRkZXZAdmdlci5r
-ZXJuZWwub3JnLCBwYWJlbmlAcmVkaGF0LmNvbSwgbWNvcXVlbGluLnN0bTMyQGdtYWlsLmNvbSwg
-YWxleGFuZHJlLnRvcmd1ZUBmb3NzLnN0LmNvbSwgbGludXgtc3RtMzJAc3QtbWQtbWFpbG1hbi5z
-dG9ybXJlcGx5LmNvbSwgbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnLCBsaW51
-eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBuaW5neXVAZXN3aW5jb21wdXRpbmcuY29tLCBwaW5r
-ZXNoLnZhZ2hlbGFAZWluZm9jaGlwcy5jb20sIHdlaXNoYW5nanVhbkBlc3dpbmNvbXB1dGluZy5j
-b20KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxIDEvMl0gZHQtYmluZGluZ3M6IGV0aGVybmV0OiBl
-c3dpbjogYWRkIGNsb2NrIHNhbXBsaW5nIGNvbnRyb2wKPiAKPiBIaSBNaW4sIFJ1c3NlbGwsIEty
-enlzenRvZiwKPiAKPiBPbiAxLzI2LzI2IDIyOjE0LCBNaW4gTGluIHdyb3RlOgo+ID4gSGkgUnVz
-c2VsbCwKPiA+IAo+ID4gCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlcy0tLS0tCj4gPj4gRnJv
-bTogIlJ1c3NlbGwgS2luZyAoT3JhY2xlKSIgPGxpbnV4QGFybWxpbnV4Lm9yZy51az4KPiA+PiBT
-ZW5kIHRpbWU6VHVlc2RheSwgMjcvMDEvMjAyNiAwMjoyOTowOQo+ID4+IFRvOiAiTWluIExpbiIg
-PGxpbm1pbkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gPj4gQ2M6ICJCbyBHYW4iIDxnYW5ib2luZ0Bn
-bWFpbC5jb20+LCAiQW5kcmV3IEx1bm4iIDxhbmRyZXdAbHVubi5jaD4sICJLcnp5c3p0b2YgS296
-bG93c2tpIiA8a3J6a0BrZXJuZWwub3JnPiwg5p2O5b+XIDxsaXpoaTJAZXN3aW5jb21wdXRpbmcu
-Y29tPiwgZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5vcmcsIGFuZHJldytuZXRkZXZAbHVubi5jaCwg
-ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldCwgZWR1bWF6ZXRAZ29vZ2xlLmNvbSwga3ViYUBrZXJuZWwub3Jn
-LCByb2JoQGtlcm5lbC5vcmcsIGtyemsrZHRAa2VybmVsLm9yZywgY29ub3IrZHRAa2VybmVsLm9y
-ZywgbmV0ZGV2QHZnZXIua2VybmVsLm9yZywgcGFiZW5pQHJlZGhhdC5jb20sIG1jb3F1ZWxpbi5z
-dG0zMkBnbWFpbC5jb20sIGFsZXhhbmRyZS50b3JndWVAZm9zcy5zdC5jb20sIGxpbnV4LXN0bTMy
-QHN0LW1kLW1haWxtYW4uc3Rvcm1yZXBseS5jb20sIGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5m
-cmFkZWFkLm9yZywgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZywgbmluZ3l1QGVzd2luY29t
-cHV0aW5nLmNvbSwgcGlua2VzaC52YWdoZWxhQGVpbmZvY2hpcHMuY29tLCB3ZWlzaGFuZ2p1YW5A
-ZXN3aW5jb21wdXRpbmcuY29tCj4gPj4gU3ViamVjdDogUmU6IFJlOiBbUEFUQ0ggdjEgMS8yXSBk
-dC1iaW5kaW5nczogZXRoZXJuZXQ6IGVzd2luOiBhZGQgY2xvY2sgc2FtcGxpbmcgY29udHJvbAo+
-ID4+Cj4gPj4gT24gTW9uLCBKYW4gMjYsIDIwMjYgYXQgMTE6MTA6MTJBTSArMDgwMCwgTWluIExp
-biB3cm90ZToKPiA+Pj4gRHVlIHRvIGNoaXAgYmFja2VuZCByZWFzb25zLCB0aGVyZSBpcyBhbHJl
-YWR5IGEgfjQtNW5zIHNrZXcgYmV0d2VlbiB0aGUgUlgKPiA+Pj4gY2xvY2sgYW5kIGRhdGEgb2Yg
-dGhlIGV0aDEgTUFDIGNvbnRyb2xsZXIgaW5zaWRlIHRoZSBzaWxpY29uLgo+ID4+Cj4gPj4gTGV0
-J3MgYW5hbHlzZSB0aGlzLgo+ID4+Cj4gPj4gCVRYQyAvIFJYQwlUWEMgLyBSWEMKPiA+PiBTcGVl
-ZAlDbG9jayByYXRlCUNsb2NrIHBlcmlvZAo+ID4+IDFHCTEyNU1IegkJOG5zCj4gPj4gMTAwTQky
-NU1IegkJNDBucwo+ID4+IDEwTQkyLjVNSHoJCTQwMG5zCj4gPj4KPiA+PiBUaGUgcmVxdWlyZWQg
-c2tldyBmb3IgVFhDIGFuZCBSWEMgYXQgdGhlIHJlY2VpdmVyIGlzIHNwZWNpZmllZCB0byBiZQo+
-ID4+IGJldHdlZW4gMSBhbmQgMi42bnMgaXJyZXNwZWN0aXZlIG9mIHRoZSBzcGVlZC4gVGhlIGVk
-Z2Ugb2YgdGhlIGNsb2NrCj4gPj4gaXMgYWxzbyBpbXBvcnRhbnQ6IHRoZSByaXNpbmcgZWRnZSBp
-bmRpY2F0ZXMgdGhlIGxvd2VyIDQgYml0cywgYW5kCj4gPj4gdGhlIGZhbGxpbmcgZWRnZSBpbmRp
-Y2F0ZXMgdGhlIHVwcGVyIDQgYml0cy4KPiA+Pgo+ID4+IEF0IDFHIHNwZWVkLCB3aXRoIGEgIjQg
-dG8gNW5zIiBza2V3IGluIHRoZSBjaGlwLiBJZiB0aGlzIGlzIGFjY3VyYXRlLAo+ID4+IHRoZW4g
-aW52ZXJ0aW5nIHRoZSBjbG9jayBhbmQgYWRkaW5nIDFucyBvZiBhZGRpdGlvbmFsIHNrZXcgYnkg
-c29tZQo+ID4+IG1lYW5zIChQQ0IgdHJhY2UsIG9yIGF0IHRoZSBNQUMgb3IgUEhZKSB3aWxsIGdp
-dmUgdGhlIHJlcXVpcmVkIGNsb2NrCj4gPj4gYXQgdGhlIHJlY2VpdmVyLgo+ID4+Cj4gPiAKPiA+
-IFllcywgdGhhdCdzIGV4YWN0bHkgdGhlIGNhc2UuCj4gPiAKPiA+PiBUaGUgdGltaW5nIHRhYmxl
-IGluIHRoZSBSR01JSSBzdGFuZGFyZCAoMy4zKSBhbGxvd3MgZm9yIFRjeWMgKHRoZQo+ID4+IGNs
-b2NrIHJhdGUpIHRvIGJlIHNjYWxlZCwgYnV0IHRoZXJlIGlzIG5vIGFsbG93YW5jZSBmb3Igc2Nh
-bGluZwo+ID4+IFRza2V3UiAodGhlIHJlcXVpcmVkIDEgdG8gMi42bnMgc2tldy4pIFRoaXMgc2tl
-dyBwYXJhbWV0ZXIgaXMKPiA+PiBmaXhlZC4KPiA+Pgo+ID4+IFNvLCBhdCB0aGUgb3RoZXIgc3Bl
-ZWRzLCB5b3UgYXJlIGNvbXBsZXRlbHkgdW5hYmxlIHRvIG1lZXQgdGhlIHRpbWluZwo+ID4+IHNw
-ZWNpZmljYXRpb24sIHdoZXRoZXIgaXJyZXNwZWN0aXZlIG9mIHRoZSBjbG9jayBpbnZlcnNpb24u
-IEluIGVmZmVjdCwKPiA+PiB0aGUgb25seSBzcGVlZCB0aGF0IHlvdSBjYW4gbWVldCB0aGUgc3Bl
-Y2lmaWNhdGlvbiBpcyAxRy4KPiA+Pgo+ID4gCj4gPiBUaGUgdGltaW5nIHRhYmxlIGluIHRoZSBS
-R01JSSBzdGFuZGFyZCgzLjMpIHNheXMgdGhlIG1heCB2YWx1ZSBvZiBUc2tldwo+ID4gZm9yIDEw
-LzEwMCBpcyB1bnNwZWNpZmllZC4KPiA+IFF1b3RhdGlvbjoibm90ZTE6IC4uLixGb3IgMTAvMTAw
-IHRoZSBNYXggdmFsdWUgaXMgdW5zcGVjaWZpZWQuIgo+ID4gCj4gPiBJIHRoaW5rIGZvciAxMC8x
-MDAsIHRoZSAiNCB0byA1bnMiIHNrZXcgaW4gdGhlIGNoaXAgZG9lc24ndCBicmVhayB0aGUKPiA+
-IHN0YW5kYXJkLiBBdCAxMC8xMDAgc3BlZWRzLCBpdCBtZWV0cyB0aGUgdGltaW5nIHNwZWNpZmlj
-YXRpb24gd2l0aG91dAo+ID4gaGF2aW5nIHRvIHRvIGFkZCBjbG9jayBpbnZlcnNpb24uCj4gPiBJ
-biBwcmFjdGljZSwgaXQgd29ya3MgYXQgMTAvMTAwIHNwZWVkcyBpbiB0aGUgcmdtaWktaWQgcGh5
-IG1vZGUuCj4gPiAKPiA+PiBUaHVzLCBJIHRoaW5rIHRoaXMgaXMgc29tZXRoaW5nIHRoYXQgbmVl
-ZHMgYSBsb3QgbW9yZSB0aGFuIGp1c3QgImRvCj4gPj4gd2UgbmVlZCB0byBpbnZlcnQgdGhlIGNs
-b2NrIi4gWW91IGFsc28gbmVlZCB0byBwcmV2ZW50IDEwTSBhbmQgMTAwTQo+ID4+IGJlaW5nIHN1
-cHBvcnRlZCBJTUhPLgo+ID4+Cgo+IAo+IEkgaGFkIGFuIG9mZmxpbmUgZGlzY3Vzc2lvbiB3aXRo
-IFlhbyBaaSBhbmQgb3RoZXJzIHJlZ2FyZGluZyB0aGlzLiBXZSBmZWVsCj4gbGlrZSB0aGUgcHJv
-cGVyIHdheSBmb3IgRVNXSU4gdG8gZGVhbCB3aXRoIHRoaXMgYnJva2VuIGV0aDEgaXMgdG8gaGF2
-ZSBhCj4gZGlmZmVyZW50IGNvbXBhdGlibGUgc3RyaW5nIGp1c3QgZm9yIGV0aDEsIHdoZXJlIGl0
-IGNhbiBiZSBhc3NvY2lhdGVkIHdpdGgKPiBwbGF0Zm9ybSBkYXRhIHdpdGggcXVpcmtzIHRvIGRv
-IGVzd2luLHJ4LWNsay1pbnZlcnQgYXQgMUcuIFRoZSBwcm9wZXJ0eSBpcwo+IHRoZXJlZm9yZSBu
-b3QgcmVxdWlyZWQgdG8gYmUgZXhwb3NlZCBpbiBEVC4gKFByZXRlbmQgaXQgY29uZm9ybXMgdG8g
-c3BlYwo+IGZvciAxRykuIE5lZWQgY29uZmlybWF0aW9uIGZvciAxME0vMTAwTSwgdGhvdWdoLiBJ
-IGRvdWJsZSBjaGVja2VkIExpbiBNaW4ncwo+IGNsYWltLCBhbmQgaW5kZWVkIHRoZSBzcGVjIHNh
-eXMgIkZvciAxMC8xMDAgdGhlIE1heCB2YWx1ZSBpcyB1bnNwZWNpZmllZCI6Cj4gaHR0cHM6Ly9j
-b21tdW5pdHkubnhwLmNvbS9wd214eTg3NjU0L2F0dGFjaG1lbnRzL3B3bXh5ODc2NTQvaW14LXBy
-b2Nlc3NvcnMvMjA2NTUvMS9SR01JSXYyXzBfZmluYWxfaHAucGRmCj4gCj4gVGhvdWdodHM/CgpJ
-IGFncmVlIHdpdGggeW91ciBhcHByb2FjaC4KClJlZ2FyZHMsCkxpbiBNaW4KCg==
+On Tue, Jan 27, 2026 at 02:00:04PM +0200, Leon Romanovsky wrote:
+> On Mon, Jan 26, 2026 at 12:45:01PM +0800, D. Wythe wrote:
+> > On Tue, Sep 09, 2025 at 12:45:32PM +0300, Leon Romanovsky wrote:
+> > > On Thu, Aug 28, 2025 at 08:41:17PM +0800, Liu Jian wrote:
+> > > > BUG: kernel NULL pointer dereference, address: 00000000000002ec
+> > > > PGD 0 P4D 0
+> > > > Oops: Oops: 0000 [#1] SMP PTI
+> > > > CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
+> > > > Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> > > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+> > > > Workqueue: smc_hs_wq smc_listen_work [smc]
+> > > > RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
+> > > > ...
+> > > > Call Trace:
+> > > >  <TASK>
+> > > >  smcr_buf_map_link+0x211/0x2a0 [smc]
+> > > >  __smc_buf_create+0x522/0x970 [smc]
+> > > >  smc_buf_create+0x3a/0x110 [smc]
+> > > >  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
+> > > >  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
+> > > >  smc_listen_find_device+0x1dd/0x2b0 [smc]
+> > > >  smc_listen_work+0x30f/0x580 [smc]
+> > > >  process_one_work+0x18c/0x340
+> > > >  worker_thread+0x242/0x360
+> > > >  kthread+0xe7/0x220
+> > > >  ret_from_fork+0x13a/0x160
+> > > >  ret_from_fork_asm+0x1a/0x30
+> > > >  </TASK>
+> > > > 
+> > > > If the software RoCE device is used, ibdev->dma_device is a null pointer.
+> > > > As a result, the problem occurs. Null pointer detection is added to
+> > > > prevent problems.
+> > > > 
+> > > > Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
+> > > > Signed-off-by: Liu Jian <liujian56@huawei.com>
+> > > > ---
+> > > > v1->v2:
+> > > > move the check outside of loop.
+> > > >  net/smc/smc_ib.c | 3 +++
+> > > >  1 file changed, 3 insertions(+)
+> > > > 
+> > > > diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+> > > > index 53828833a3f7..a42ef3f77b96 100644
+> > > > --- a/net/smc/smc_ib.c
+> > > > +++ b/net/smc/smc_ib.c
+> > > > @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
+> > > >  	unsigned int i;
+> > > >  	bool ret = false;
+> > > >  
+> > > > +	if (!lnk->smcibdev->ibdev->dma_device)
+> > > > +		return ret;
+> > > 
+> > > Please use ib_uses_virt_dma() function for that.
+> > > 
+> > > It is clearly stated in the code:
+> > >   2784 struct ib_device {
+> > >   2785         /* Do not access @dma_device directly from ULP nor from HW drivers. */
+> > >   2786         struct device                *dma_device;     
+> > > 
+> > > Thanks
+> > > 
+> > >
+> > 
+> > Hi Leon,
+> > 
+> > Sorry for the late reply, I just noticed this and thank you for your review.
+> > I agree completely with your feedback: we should not be accessing ibdev->dma_device
+> > directly. Following your advice, replacing the
+> > 
+> > 	if (!lnk->smcibdev->ibdev->dma_device)
+> > 
+> > check with ib_uses_virt_dma() is straightforward and absolutely the correct
+> > thing to do for that part of the logic.
+> > 
+> > However, this has led me to a further challenge. The main purpose of the
+> > smc_ib_is_sg_need_sync() function is to get the result of dma_need_sync().
+> > This means that even after correctly using ib_uses_virt_dma(), the function
+> > still needs to call dma_need_sync(ibdev->dma_device, ...), which forces us
+> > right back into the direct access pattern we are trying to eliminate.
+> 
+> I would like to challenge the use of dma_need_sync() in smc_ib.c. From
+> what I see, it is used to avoid calls to dma_sync_single_*_device()
+> which will be NOP anyway in that case.
+> 
+> Why did you copy that logic from XSK?
+> 
+
+You are right. I just noticed that the DMA has already introduced a
+similar optimization.
+
+The check in SMC was added back in 2022, while the DMA introduced
+the internal "skip redundant sync" mechanism in 2024 (commit f406c8e4b770).
+
+Given this, it might be better to simply remove this redundant check
+from SMC now, which would also eliminate the need for direct access to
+ibdev->dma_device. I need to perform some tests to confirm this.
+
+Thanks for your feedback.
+
+D. Wythe
+
+> > 
+> > Since the RDMA doesn't currently offer a helper for this "check" functionality,
+> > I'd like to propose adding one. What are your thoughts on a new helper like
+> > the one below, which would allow us to solve this cleanly?
+> > 
+> > /* ib_verbs.h */
+> > static inline bool ib_dma_need_sync(struct ib_device *dev, dma_addr_t dma_addr) {
+> > 	return !ib_uses_virt_dma(dev) && dma_need_sync(dev->dma_device, dma_addr);
+> > }
+> 
+> If we're discussing wrappers, it's likely better to provide a wrapper around
+> dma_sync_sg_for_cpu() for use in ib_dma_sync_sg_for_cpu(), rather than
+> open‑coding the logic.
+> 
+> Thanks
+> 
+> > 
+> > Best wishes,
+> > D. Wythe
+> > 
+> > 
 
