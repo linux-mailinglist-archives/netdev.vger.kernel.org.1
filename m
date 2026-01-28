@@ -1,137 +1,130 @@
-Return-Path: <netdev+bounces-254331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAvRM9Uzeml+4gEAu9opvQ
-	(envelope-from <netdev+bounces-254331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:05:41 +0100
+	id uKIRNH03eml+4gEAu9opvQ
+	(envelope-from <netdev+bounces-254332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:21:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29807A50EA
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:05:41 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5260BA5764
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 786113053292
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:54:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D23ED30EE2BB
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95DE30274D;
-	Wed, 28 Jan 2026 15:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N6ccxv5Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110A73033F4;
+	Wed, 28 Jan 2026 15:54:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88CD288C22
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 15:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFED304968;
+	Wed, 28 Jan 2026 15:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769615673; cv=none; b=ufFbnJQrDZ1Azm3LHR8s0lvwovGQ2VnVz8HS/q9wn+Iw06E9LR5Uyx7fQZ/NhBV9SBnqJ48Y1Qz3EXtJFFEaORxNUPCSRLZS6kH1WIl5MxPu65hQCdJRGOvLQ1wbKAz+nODnwBsUFuyb/J/6wbTxsGKeJzyVolxfeIxuhJggl1o=
+	t=1769615684; cv=none; b=h3WFLCFfIaEJ2+8OPqNCfmAOqwkXLhA+R5Pp1RZjoKn/JufK/rJvQaZs6PGnHw+RIN8ckQTH8xLCTsVYdlP5W3yeiAKSZaYqKZCTa6wn1zkBRV/slyON49YsKdK6i8k5b3w+nXxnexrmFFwilqwZn4EWXtwkgz2OnmIQp4qhVLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769615673; c=relaxed/simple;
-	bh=7zFQMAueteEBXuRscGq9SmKOgiZk6KkfanUBpMe78R8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MuVSoZpYNhcazHgvAtUF40NbheizHYvNVXALn5ZOgLgC7yN/Gj4jTLFlH5eABddGpZ9DqBRIciUDmNyNNp0IHdk0+RbrSBJt/1QpUbH+T2Jt0AFogXJ+PJceIVMaBk4kyv7zEeVPUumaM7ey1/t3ciYBSflO7QBbCyELQbWESns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N6ccxv5Z; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 6C2B31A2AC1;
-	Wed, 28 Jan 2026 15:54:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2F7E96071F;
-	Wed, 28 Jan 2026 15:54:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BA028119A8812;
-	Wed, 28 Jan 2026 16:54:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769615668; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=7zFQMAueteEBXuRscGq9SmKOgiZk6KkfanUBpMe78R8=;
-	b=N6ccxv5Z2zGUP8k1Pn45ZSolsdl2Nhh55xvinqSLIfwyGr9erLQmW4AJ9KvZGOD1QmcH8B
-	B9nZVeC7Y4BnXrXtmB2O3pl49otpfd0s3ldb+Wv2KBPQEpJ04oi/NAi8OO9xpwlWjrA7aT
-	6ODSD03TwfpyaWcG9Oy9NXz1y+ru2hKZTl+/JOUrONiNeDYryRshA3ggi5b1tF3uBpun+R
-	mTgCAKli74i3k7reJ1QrA1laDX8DVB3/jHJbg/+P+YBIhAZDjFcb++sjNK5hAT1SJfpUyY
-	LJD/aCxDFvEMwWaBvLFW0E86SVp4hQNR0+Hmc21+7JJTQUn5Y+pyLBXWomN9rw==
-Date: Wed, 28 Jan 2026 16:54:23 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org, jianhao.xu@seu.edu.cn,
- marco.crivellari@suse.com, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net v4 0/3] net: liquidio: Fix memory leaks in
- setup_nic_devices()
-Message-ID: <20260128165423.0e1b0cab@kmaincent-XPS-13-7390>
-In-Reply-To: <20260128154440.278369-1-zilin@seu.edu.cn>
-References: <20260128154440.278369-1-zilin@seu.edu.cn>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1769615684; c=relaxed/simple;
+	bh=qUS9d/ckayBRL8ZTvLaQC3nCL6OtpqBjZM0ezsHILbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i/WaOP0i25omY7b/w5nMDsGa4krjUeCDXgIjvLk+6xlss/X8uouBFTngVYeUtj7IlC6ap+e2cOFsU2oTabAoLzZRAwAo0X36+sDLC75ev4k6p14DjlVsvh/yPCLyRhLVoxJD6OzfnoaF+Gg34n7OzOrrIUhg0pOanKpQepzGt9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 8D994605E7; Wed, 28 Jan 2026 16:54:40 +0100 (CET)
+Date: Wed, 28 Jan 2026 16:54:41 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	bridge@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Phil Sutter <phil@nwl.cc>, Ido Schimmel <idosch@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Subject: Re: [PATCH v17 nf-next 0/4] conntrack: bridge: add double vlan,
+ pppoe and pppoe-in-q
+Message-ID: <aXoxQbd_7mzTSBZO@strlen.de>
+References: <20251109192427.617142-1-ericwouds@gmail.com>
+ <6d77bdc4-a385-43bf-a8a5-6787f99d2b7d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d77bdc4-a385-43bf-a8a5-6787f99d2b7d@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-254331-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254332-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	RSPAMD_EMAILBL_FAIL(0.00)[ericwouds.gmail.com:query timed out];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:url,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 29807A50EA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5260BA5764
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 15:44:37 +0000
-Zilin Guan <zilin@seu.edu.cn> wrote:
+Eric Woudstra <ericwouds@gmail.com> wrote:
+> >  include/net/netfilter/nf_tables_ipv4.h     | 21 +++--
+> >  include/net/netfilter/nf_tables_ipv6.h     | 21 +++--
+> >  net/bridge/netfilter/nf_conntrack_bridge.c | 92 ++++++++++++++++++----
+> >  net/netfilter/nft_chain_filter.c           | 59 ++++++++++++--
+> >  net/netfilter/utils.c                      | 28 +++++--
+> >  5 files changed, 176 insertions(+), 45 deletions(-)
+> > 
+> 
+> Can I kindly ask, what is the status of this patch-set?
 
-> This series fixes memory leaks in the initialization paths of the=20
-> NIC devices.
->=20
-> Patch 1 moves the initialization of oct->props[i].netdev before queue=20
-> setup calls. This ensures that if queue setup fails, the cleanup function=
-=20
-> can find and free the allocated netdev. It also initializes lio->oct_dev=
-=20
-> early to prevent a crash in the cleanup path.
->=20
-> Patch 2 fixes an off-by-one error in the PF cleanup loop. It ensures
-> the current device index is cleaned up and correctly handles the=20
-> post-loop devlink_alloc failure case.
->=20
-> Patch 3 fixes the same off-by-one error in the VF cleanup loop.
+Rotting, sorry.
 
-For the series:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+At this time most of the patchwork queue management is done
+by me, there are several other patchsets also vying for attention
+and syzbot just reported UaF regression in rbtree, so I will be
+busy with that for a while.
 
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+I decided to defer this:
+1. There were no other 'Please lets apply this' reviews so far
+2. We are close to a new kernel release, hence time window
+   to accept features as opposed to fixes is shrinking.
+3. You patchset changes how packets get processed both by
+   conntrack and nf_tables bridge family.  Yes, its done as-advertised
+   but still, this has known impact.  Hence I would prefer to
+   apply this early in the cycle not at the last minute.
+
+   Futhermore its a change that, if it causes issues down the road,
+   might back us into a corner where we can neither fix things in a
+   backwards compatible way without breaking the new feature.
+
+In case there is no further feedback by the time the next development
+cycle starts I will apply this series as-is (or ask for a rebase
+in case its no longer applicable).
+
+I apologize for the inconvenience.
 
