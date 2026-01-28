@@ -1,319 +1,219 @@
-Return-Path: <netdev+bounces-254136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254137-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iC5zNcG4eWl8ygEAu9opvQ
-	(envelope-from <netdev+bounces-254136-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:20:33 +0100
+	id qFPAEfC3eWl5ygEAu9opvQ
+	(envelope-from <netdev+bounces-254137-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:17:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537129DB46
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:20:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E524C9DA7E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 98FCB304F224
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:14:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 92FC230312D4
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E816333EAE7;
-	Wed, 28 Jan 2026 07:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C88328247;
+	Wed, 28 Jan 2026 07:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SAVrKCOZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UT6cLG9s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE4033F375;
-	Wed, 28 Jan 2026 07:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C312325782D
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 07:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769584432; cv=none; b=Vh5yP/DQYiJDdB+w/LLZ2/qHUJBonUOm+OPiTfpH9BNsrz4w9qsAhXIJSloaorGi1ornf+we58yhYvWUBTX8jlVFL1DUeUIDLD2qS+bHSbPtuFxDnGCOQwDlnvyJZBDfh0u2W9VklknnuwIQiReST4F0AfJkNqg91rFufzM+omE=
+	t=1769584501; cv=none; b=NkeOirKHVFsh56J9V4N+If7HwcqonVM2smf0Jik5WWIjbHKpbMFxJWbGw/cterj/m8crElsW/dsqYwytc2korEE+d/lDeU4XnnYq0eyY49yKov0KiLL71BQuVoXxNUSVWoPNHfAkeCJ8j/+EaYd/iEiT7y7JNiRPqDkdn4YgFD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769584432; c=relaxed/simple;
-	bh=IXl2kAgehTYowxAWroz5Z1oWZiO8b1Em1YjHX1gh4qY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DQWXHdp94KOTuyWjwXKod+QH0ctqEaZqaX+puU8Bgqm2l7GB9e3DHh/zqQCBmxpMzhIaYkB/fLhIOsGwHzl7LOHl5uP/cbbsNDZh25kupjVB7P1juCD9ArFf211RbgskSrkU+bJjiHFMxIUkQQ54qyFnSaQMsWMhuC2BfnNxyz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SAVrKCOZ; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60S4a2YT3054212;
-	Tue, 27 Jan 2026 23:13:41 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=c
-	Mo1d8loG0zy0tjyPOE4eEwhzt1vHGc5WFJ47GiBJZk=; b=SAVrKCOZWCcYwrzYd
-	gPfgUYyxA0u++xzac5DNAK6EpV7LqYKknz2MCoKgpPJQ5TEn43qlUuqXsbueMaav
-	4mCUupZ0MXK5E6pKWmYUKZuVxgk8IsRCanmNQdnyiQ1TgVG9pcyN//iUiYDtQZnb
-	hCaFifOgGHMVWSCgL4+0k9Ror6lNkCaGmz+qn0NItF5MVuaxDp2maA1OkZLFh7eb
-	DrYjow5fJ63n693emkEqmefPrh088xysQ1Gq5EJ5g/l4ODytwJL3AlbCBE+0C5wm
-	ZBqYAg/no1Bem7moPfa7hw7O6d92LYh9bXu+GZmxQK3uyD2qWP9xBIViJzCRafSr
-	EJTVA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bvxfjqwyp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jan 2026 23:13:41 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 27 Jan 2026 23:13:40 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 27 Jan 2026 23:13:40 -0800
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id C8A2B3F7108;
-	Tue, 27 Jan 2026 23:13:37 -0800 (PST)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next v6 13/13] octeontx2-af: npc: Use common structures
-Date: Wed, 28 Jan 2026 12:42:35 +0530
-Message-ID: <20260128071235.3577206-14-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260128071235.3577206-1-rkannoth@marvell.com>
-References: <20260128071235.3577206-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1769584501; c=relaxed/simple;
+	bh=V02HxfQ9RsspwOQYXSjiv9STuyAvNPhJsf92qGNWRO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XVPPE9AFhDR/IzsQDcsZDwLMjAOjr9XJCF6lJ/8R6a+86R56j9DF127fyGMYidjhpwMZ74TvNGCbK01XN0p4+6lraFINElBReCWdM9Dd8H9ws2KQ5y9gQgV+ZVVkf+VUpllhaG2tpCJhrlJX4b2kupJWVPManB0+xLeHwGz2ERM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UT6cLG9s; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47ff94b46afso4578995e9.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 23:14:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769584498; x=1770189298; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d4mHnmREA3ivtce+rHh5XeeKRw0SRT5qe2A7xs9am0M=;
+        b=UT6cLG9sayoG2B72rocJ2Vho62g0ZnQwAzV/ivmMSRR11QxtGXwU8VI9FxY/gEFxLv
+         hFTD/I19i/ccCn1hpbkzrFbMhPD/268Iut+AtLHEMeEM29IZc3iC9NDyOJTnmqUt+mcq
+         jdMBaRgk1fLTMAJ0mFaIdm8irDQWV4eYIEJ/fklnjOpVdYgivWh+CTV7Cp0/kf1JVbjx
+         fQSZsLOZrgV5YsdHw7po6t3Nl96erC04yDFTi3ksCzvvxqbxwL+HGaDxmJiALTV7/Px2
+         5fCPPtawYGu7svSEVqn2rzDBOmSgBGPAlH5A4YsjNwa4HKi9/eFDObG6jvv2XOJV9ial
+         QFdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769584498; x=1770189298;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d4mHnmREA3ivtce+rHh5XeeKRw0SRT5qe2A7xs9am0M=;
+        b=qUDf028OW69Rm/Rkq6tFlzKsPp6q0RGa+fKF0X7gPe9t4B8Zz5ZFehzmdlhZ1NxBS2
+         dw/F/Za9NT9mzAdoosjOnZl72XYzuyO2LdXYljs/TbMD4hf5Yf0XDdm1aSSXhcBNQ1zC
+         W1MP2n0NTbzIwhOCzUaQgr5Vb4x3nD804wALjyuXYvHM2/Iz86l6r2plleUXV0X3gn1m
+         4djffclKML71iJgVLk+YTnVMxlxQae/XnZhCKuwOpYXqQ1dNQD9U5VYupLdLDQVsCKSV
+         dSrdUbdBBI51vP9Gr5XF8NeEEBiD1/sVeIjM6i0qYggT5AI7t/+D/8qCtCnSCchgyZmk
+         w+1w==
+X-Gm-Message-State: AOJu0YzUyqJg83D89fqqLNQDhMYlHhq18N9riocWfn1OoP7BFj9ZHuQA
+	Pgc9mfPXYP4lj4A1OyGJX/0A/cHcEo826oHYAUqgMgtBRkvRjFp8LS81
+X-Gm-Gg: AZuq6aJ5tR30d15IYAa8MI5JqtuYm0L0kd+nNK3SpJ8eaJIbM28Pc249SvhRs2kI0Bt
+	B6uD6mJi/6WEVleqvlsxuEV6qFjuY0l51SGkVQG3+t46KiTWPtFgcZtPWljlXRZVaqeTwSByaMY
+	d/f0imB4ckbT4d+fAPr3xH+MJ5zeOZknlF3R2hK3SXXAn/KQnVGYqrnNvF3u/haDkhYGaaJHJqv
+	gsdkz9NvCVbXpQKKpyW240i+7lQC+/Pg1rhbKo+0minWgMpTLe+84yTXxCW7XfxNJo7P82CnUu3
+	GXueoZojsMwXkTnRRHP90eTPXDwStDAX6v5FOvaxdpLH3TzwMpWKA1AmI2NbviQTyiLwzNGDQwb
+	2dyIgZdezvNR/V5X3G1MwOabsvrY/cunRDvGNUsw+O3i2JCY9iP9vraFsUpxb1Zw5B4m27y99Gv
+	CWwOHIKpgqHWmmjkPJ+/bGcK2sTsGF
+X-Received: by 2002:a05:600c:620b:b0:47e:e981:78b4 with SMTP id 5b1f17b1804b1-48069e79968mr50923575e9.12.1769584497835;
+        Tue, 27 Jan 2026 23:14:57 -0800 (PST)
+Received: from [10.80.1.200] ([72.25.96.16])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806d255d2fsm19375925e9.1.2026.01.27.23.14.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jan 2026 23:14:57 -0800 (PST)
+Message-ID: <ba9b732c-7c83-4837-9310-02b6a133169f@gmail.com>
+Date: Wed, 28 Jan 2026 09:14:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: o8dZDCGNine3I1baBheTBkPniQSeU-92
-X-Proofpoint-ORIG-GUID: o8dZDCGNine3I1baBheTBkPniQSeU-92
-X-Authority-Analysis: v=2.4 cv=S9LUAYsP c=1 sm=1 tr=0 ts=6979b725 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=bNx57pydN-Y4TXDtlhsA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDA1NyBTYWx0ZWRfXywpXIhmeGC8e
- PlKlZWJ/+43b7JAlk9rKQMtfbzsrdRVynldhnZxtadMLylpuKGbnKCxPPbvarVpU7rTuUodFFHb
- ZbFPzXNkHq8GK01yl4k91Vh9jgb77Pa3+T7GJ+bnFI5WFJuI7lWfkHKqUVAzVXyrcsLXQ+aDtUn
- CRXXmlL1jL+1bthjfJlUB+TVWvkJ2uUSZjy2/aymIJItq56d8090zayrppshRjpklEavltWxFJs
- 3eoYAmD/fFyrPVcU8fcDks8G/KeN9TJrxseCBFNUDQoH5QcN2ZlK+CAasFfUDs+qmo8XWp4HXlz
- aLMpFxSoZnU4KfXgMtFptQOwApp76wYCfRfw6oqY92bUKnpKzDqXyvbwb1gbO4TasRAMlz5HAlY
- MMrnbR+/33Lg7HtgMYOizGD37hjLKFrYxZxBmdZ/iRb4eVhwvPjAng8FVN1flePRxbvOq5R7Cva
- LbHHM8jjuhn2WujEH+Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-28_01,2026-01-27_03,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC mlx5-next 0/1] net/mlx5e: Expose physical received
+ bits counters to ethtool
+To: Kenta Akagi <k@mgml.me>, saeedm@nvidia.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, leon@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <0106019bb70737d5-06bcc3e0-d534-4e42-b8a3-71dc3b53f318-000000@ap-northeast-1.amazonses.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <0106019bb70737d5-06bcc3e0-d534-4e42-b8a3-71dc3b53f318-000000@ap-northeast-1.amazonses.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254136-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-254137-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,marvell.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 537129DB46
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E524C9DA7E
 X-Rspamd-Action: no action
 
-CN20K and legacy silicon differ in the size of key words used
-in NPC MCAM. However, SoC-specific structures are not required
-for low-level functions. Remove the SoC-specific structures
-and rename the macros to improve readability.
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 11 ++++---
- .../net/ethernet/marvell/octeontx2/af/mbox.h  | 16 ++++++----
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |  2 +-
- .../marvell/octeontx2/af/rvu_npc_fs.c         | 31 ++++++++-----------
- 4 files changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 8322427c8390..703d08dd14ff 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -3945,10 +3945,10 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
- 				     struct npc_get_num_kws_req *req,
- 				     struct npc_get_num_kws_rsp *rsp)
- {
-+	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
-+	u64 kw[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
- 	struct rvu_npc_mcam_rule dummy = { 0 };
--	struct cn20k_mcam_entry cn20k_entry = { 0 };
- 	struct mcam_entry_mdata mdata = { };
--	struct mcam_entry entry = { 0 };
- 	struct npc_install_flow_req *fl;
- 	int i, cnt = 0, blkaddr;
- 
-@@ -3965,7 +3965,8 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
- 		return NPC_MCAM_INVALID_REQ;
- 	}
- 
--	npc_populate_mcam_mdata(rvu, &mdata, &cn20k_entry, &entry);
-+	mdata.kw = kw;
-+	mdata.kw_mask = kw_mask;
- 
- 	npc_update_flow(rvu, &mdata, fl->features, &fl->packet,
- 			&fl->mask, &dummy, fl->intf, blkaddr);
-@@ -3973,8 +3974,8 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
- 	/* Find the most significant word valid. Traverse from
- 	 * MSB to LSB, check if cam0 or cam1 is set
- 	 */
--	for (i = NPC_CN20K_MAX_KWS_IN_KEY - 1; i >= 0; i--) {
--		if (cn20k_entry.kw[i] || cn20k_entry.kw_mask[i]) {
-+	for (i = NPC_KWS_IN_KEY_SZ_MAX - 1; i >= 0; i--) {
-+		if (kw[i] || kw_mask[i]) {
- 			cnt = i + 1;
- 			break;
- 		}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 2d9f6cb4820f..dc42c81c0942 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1593,18 +1593,22 @@ struct mcam_entry_mdata {
- 	u8 max_kw;
- };
- 
-+enum npc_kws_in_key_sz {
-+	NPC_KWS_IN_KEY_SZ_7 = 7,
-+	NPC_KWS_IN_KEY_SZ_8 = 8,
-+	NPC_KWS_IN_KEY_SZ_MAX,
-+};
-+
- struct mcam_entry {
--#define NPC_MAX_KWS_IN_KEY	7 /* Number of keywords in max keywidth */
--	u64	kw[NPC_MAX_KWS_IN_KEY];
--	u64	kw_mask[NPC_MAX_KWS_IN_KEY];
-+	u64	kw[NPC_KWS_IN_KEY_SZ_7];
-+	u64	kw_mask[NPC_KWS_IN_KEY_SZ_7];
- 	u64	action;
- 	u64	vtag_action;
- };
- 
- struct cn20k_mcam_entry {
--#define NPC_CN20K_MAX_KWS_IN_KEY	8
--	u64	kw[NPC_CN20K_MAX_KWS_IN_KEY];
--	u64	kw_mask[NPC_CN20K_MAX_KWS_IN_KEY];
-+	u64	kw[NPC_KWS_IN_KEY_SZ_8];
-+	u64	kw_mask[NPC_KWS_IN_KEY_SZ_8];
- 	u64	action;
- 	u64	vtag_action;
- 	u64	action2;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index f811d6b5c545..a466181cf908 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -197,7 +197,7 @@ struct npc_key_field {
- 	/* Masks where all set bits indicate position
- 	 * of a field in the key
- 	 */
--	u64 kw_mask[NPC_CN20K_MAX_KWS_IN_KEY];
-+	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX];
- 	/* Number of words in the key a field spans. If a field is
- 	 * of 16 bytes and key offset is 4 then the field will use
- 	 * 4 bytes in KW0, 8 bytes in KW1 and 4 bytes in KW2 and
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index 7a48ba1db5e9..53737953a225 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -227,7 +227,7 @@ static bool npc_check_overlap(struct rvu *rvu, int blkaddr,
- 		input = &mcam->tx_key_fields[type];
- 	}
- 
--	kws = NPC_MAX_KWS_IN_KEY;
-+	kws = NPC_KWS_IN_KEY_SZ_7;
- 
- 	if (is_cn20k(rvu->pdev))
- 		goto skip_cn10k_config;
-@@ -289,7 +289,7 @@ static bool npc_check_overlap(struct rvu *rvu, int blkaddr,
- 			 * field bits
- 			 */
- 			if (npc_check_overlap_fields(dummy, input,
--						     NPC_CN20K_MAX_KWS_IN_KEY))
-+						     NPC_KWS_IN_KEY_SZ_8))
- 				return true;
- 		}
- 	}
-@@ -460,9 +460,9 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
- 	u8 start_lid;
- 
- 	if (is_cn20k(rvu->pdev))
--		max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
-+		max_kw = NPC_KWS_IN_KEY_SZ_8;
- 	else
--		max_kw = NPC_MAX_KWS_IN_KEY;
-+		max_kw = NPC_KWS_IN_KEY_SZ_7;
- 
- 	key_fields = mcam->rx_key_fields;
- 	features = &mcam->rx_features;
-@@ -906,12 +906,12 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
- 		      struct mcam_entry_mdata *mdata, u64 val_lo,
- 		      u64 val_hi, u64 mask_lo, u64 mask_hi, u8 intf)
- {
--	struct cn20k_mcam_entry cn20k_dummy = { {0} };
-+	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
-+	u64 kw[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
--	struct mcam_entry dummy = { {0} };
--	u64 *kw, *kw_mask, *val, *mask;
- 	struct npc_key_field *field;
- 	u64 kw1, kw2, kw3;
-+	u64 *val, *mask;
- 	int i, max_kw;
- 	u8 shift;
- 
-@@ -922,15 +922,10 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
- 	if (!field->nr_kws)
- 		return;
- 
--	if (is_cn20k(rvu->pdev)) {
--		max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
--		kw = cn20k_dummy.kw;
--		kw_mask = cn20k_dummy.kw_mask;
--	} else {
--		max_kw = NPC_MAX_KWS_IN_KEY;
--		kw = dummy.kw;
--		kw_mask = dummy.kw_mask;
--	}
-+	if (is_cn20k(rvu->pdev))
-+		max_kw = NPC_KWS_IN_KEY_SZ_8;
-+	else
-+		max_kw = NPC_KWS_IN_KEY_SZ_7;
- 
- 	for (i = 0; i < max_kw; i++) {
- 		if (!field->kw_mask[i])
-@@ -1315,14 +1310,14 @@ npc_populate_mcam_mdata(struct rvu *rvu,
- 		mdata->kw_mask = cn20k_entry->kw_mask;
- 		mdata->action = &cn20k_entry->action;
- 		mdata->vtag_action = &cn20k_entry->vtag_action;
--		mdata->max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
-+		mdata->max_kw = NPC_KWS_IN_KEY_SZ_8;
- 		return;
- 	}
- 	mdata->kw = entry->kw;
- 	mdata->kw_mask = entry->kw_mask;
- 	mdata->action = &entry->action;
- 	mdata->vtag_action = &entry->vtag_action;
--	mdata->max_kw = NPC_MAX_KWS_IN_KEY;
-+	mdata->max_kw = NPC_KWS_IN_KEY_SZ_7;
- }
- 
- static int npc_update_rx_entry(struct rvu *rvu, struct rvu_pfvf *pfvf,
--- 
-2.43.0
+On 13/01/2026 13:04, Kenta Akagi wrote:
+> On 2026/01/13 15:43, Tariq Toukan wrote:
+>>
+>>
+>> On 13/01/2026 8:31, Tariq Toukan wrote:
+>>>
+>>>
+>>> On 12/01/2026 9:03, Kenta Akagi wrote:
+>>>> Hi,
+>>>>
+>>>> I would like to measure the cable BER on ConnectX.
+>>>>
+>>>> According to the documentation[1][2], there are counters that can be used
+>>>> for this purpose: rx_corrected_bits_phy, rx_pcs_symbol_err_phy and
+>>>> rx_bits_phy. However, rx_bits_phy does not show up in ethtool
+>>>> statistics.
+>>>>
+>>>> This patch exposes the PPCNT phy_received_bits as rx_bits_phy.
+>>>>
+>>>>
+>>>> On a ConnectX-5 with 25Gbase connection, it works as expected.
+>>>>
+>>>> On the other hand, although I have not verified it, in an 800Gbps
+>>>> environment rx_bits_phy would likely overflow after about 124 days.
+>>>> Since I cannot judge whether this is acceptable, I am posting this as an
+>>>> RFC first.
+>>>>
+>>>
+>>> Hi,
+>>>
+>>> This is a 64-bits counter so no overflow is expected.
+>>>
+>>
+>> Sorry, ignore my comment, your numbers make sense.
+>> Maybe it's ~248 days, but same idea.
+>>
+> 
+> Hi, thank you for checking.
+> 
+> Ah, it seems I didn't realize it was unsigned, and I also forgot to
+> include the expression. Sorry about that.
+> Yes - at 800 Gbps, 0xFFFFFFFFFFFFFFFF / (800 * (2^30) * 86400) = 248.55 days,
+> so it will overflow.
+> 
+> In practice, is it possible to expose this as a statistic via ethtool?
+> Or is there some other value that could be exposed for BER calculation - e.g.,
+> a register that indicates the elapsed seconds since link-up?
+> 
+> Thanks.
+> 
 
+Hi Kenta,
+
+You will find "FEC histogram" feature useful.
+It splits the errors into ranges (bins), and plots a counter for each bin.
+There's also a bin for 0-errors, which is what you're looking for.
+
+Example output:
+
+# ./tools/net/ynl/pyynl/cli.py --spec 
+Documentation/netlink/specs/ethtool.yaml --do fec-get --json 
+'{"header":{"dev-index": 5, "flags": 4}}'
+{'active': 50,
+'auto': 1,
+'header': {'dev-index': 5, 'dev-name': 'eth3'},
+'modes': {'bits': {}, 'nomask': True, 'size': 125},
+'stats': {'corr-bits': [2810],
+            'corrected': [2123],
+            'hist': [{'bin-high': 0, 'bin-low': 0, 'bin-val': 235826196705},
+                     {'bin-high': 1, 'bin-low': 1, 'bin-val': 1436},
+                     {'bin-high': 2, 'bin-low': 2, 'bin-val': 687},
+                     {'bin-high': 3, 'bin-low': 3, 'bin-val': 0},
+                     {'bin-high': 4, 'bin-low': 4, 'bin-val': 0},
+                     {'bin-high': 5, 'bin-low': 5, 'bin-val': 0},
+                     {'bin-high': 6, 'bin-low': 6, 'bin-val': 0},
+                     {'bin-high': 7, 'bin-low': 7, 'bin-val': 0},
+                     {'bin-high': 8, 'bin-low': 8, 'bin-val': 0},
+                     {'bin-high': 9, 'bin-low': 9, 'bin-val': 0},
+                     {'bin-high': 10, 'bin-low': 10, 'bin-val': 0},
+                     {'bin-high': 11, 'bin-low': 11, 'bin-val': 0},
+                     {'bin-high': 12, 'bin-low': 12, 'bin-val': 0},
+                     {'bin-high': 13, 'bin-low': 13, 'bin-val': 0},
+                     {'bin-high': 14, 'bin-low': 14, 'bin-val': 0},
+                     {'bin-high': 15, 'bin-low': 15, 'bin-val': 0}],
+            'uncorr': [0]}}
 
