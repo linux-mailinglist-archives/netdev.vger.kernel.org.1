@@ -1,216 +1,233 @@
-Return-Path: <netdev+bounces-254242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254243-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mF8wMoIDemlE1gEAu9opvQ
-	(envelope-from <netdev+bounces-254242-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:39:30 +0100
+	id 6JSiHBIDemku1gEAu9opvQ
+	(envelope-from <netdev+bounces-254243-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:37:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BDECA15B3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:39:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B132A156F
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:37:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 141E83034E2D
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:36:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 731CC3004F25
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E2734F465;
-	Wed, 28 Jan 2026 12:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5928034EEEF;
+	Wed, 28 Jan 2026 12:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ECP9Uwd9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qrozRyPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DA734EF1E
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 12:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD832EFDBF
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 12:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769603778; cv=pass; b=gJPl7Mf2Ggs/ON5UpngmKHczfdWkscs8eQ4sxcRyA8Yb5AU3gqDL2c8Je7qEbyMFYetWmoe32wtmirZW2yAQZkv27GLDdaEB+xZvCMsxrorS1LqJKndvQhER3HcUODOuud2NFuQaVI+r4lDboNT0lBONg0r7phY2EnY+rY1MjKk=
+	t=1769603856; cv=pass; b=sNV7eNsjXrmdRtfRM+ESAqdTfFhn6KMLrI5+ucVt6w8fCWNJErFU3uI4Vfktcv4z013F0A3heBeC8RGLE6descJNPACKKca3eroKyloKrecE8XNq/J9KPwkmNU94Ty/B5IyvJQIy+kGTwg76rTONvPhItp3zCwffBa0LA+anFgc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769603778; c=relaxed/simple;
-	bh=0m5E8IA1paqB7ISR5kKm0HGcgn7kq/aAqBYoPMGhVig=;
+	s=arc-20240116; t=1769603856; c=relaxed/simple;
+	bh=Ir4mKiYqztmOr3S2cJBvK/FDCPhPU58yNx72le/W9GU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DED4mP8dGvHjaMM7DMUOEYM/Mcuy34NYIAjmZNEYvoA3VlHbhtC519XzvY52p3wVPk9FoZIm5szOw5dldBE1YCj71nzOe90Yw1jqYGC0Iu8QffX52HeOdDkWYDG/LOX7thaUc0U7NARpEx0F6vgvrLlmj1EX+tVEmcyQzaLdQP4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ECP9Uwd9; arc=pass smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43246af170aso582825f8f.0
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 04:36:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769603775; cv=none;
+	 To:Cc:Content-Type; b=Rqc+aeEte8mTuZC6b0D31iOnADpJLP/eI3WPfBStWI5SSyn7agKmWb4NkOb19WuOfHK8Qf98Pq0aPSsCrfYFdYzmL2b74Mhp8DRun6WAW8CKUQ9MTSNLxxPVOrtAtLDsYby5j+FkmdjRRU7RiT+KP5aCsPmPufq15urZWD+umRM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qrozRyPw; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50143fe869fso71398291cf.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 04:37:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769603853; cv=none;
         d=google.com; s=arc-20240605;
-        b=devPHxlElxnlzhoLlm1Pfs5RG67tbPWSiDDGmfr03ggjSPFYszlwsWwrytf5HXm/VH
-         lIT1uEV+oG0uD1zIpHTJ3vs0qW6kSd7cijOBUy6hLklg50pC5PvXO7l8BQd1Jb6y/is8
-         X4jVdw6KABzghntjG5qoX03Ikn8MJblJmU0W8CaJLU32PJXPxGnBZCU8uyNdJAnKgZkm
-         YjIpXRPTQpVcWaXYe2U6GhJg6ZbgbuHvdS2BJnFaL+xwxPrnwm/gagg7c1uMz/VWPTwA
-         6GfTmxiS4clcrzseCtf8PsHlr6C0f0wWZ2V+buCBsJfU9Mt6aSIgzpmLALlLiNayfiQ3
-         b0Iw==
+        b=LOLFsTPlASgFmGqrzt4G+mUCanqYYoEvJhBCB8MjdkBQDzGev3yMf/WeOZnBPeTvnV
+         oIvWVMQqrYKZQUBAYUSbT/AOmCUdd+ECODw138V4NJHx+x35FOuxq6OBHrj1eRbgF9Ps
+         E2JAh3CKx60wK418AUZQr3Cmne9KEpDcswyhQmwk6e6EzNjWm3C6OSdFOJ9v0YLJsdRu
+         5Bj0wE2XO+OP4/hkORPrJ3r+lnXacCIpmkSB/brJx8P9g+PR57dlgHUnQwN2vme0+0Tc
+         DM6gtd7/lsliKrVjqI+mHv4u+f9M0aKlQgHWiRm2aEu6tOhZO1sbebYyiGtrSM7+9+q+
+         THSA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=crs0Vju6vr7yYnAWVTgMbD9mwNnywM1py8zBU7RR7yQ=;
-        fh=AZQs93mumlq/NH09SLFEfiu63PPOd5RXOp1OtF1pTxY=;
-        b=QuviB7o7ZpCgWgA1QuOoH2YJzx3STaijpLogXMQFpy/4mcoettqTPL/HcBosBiQlp6
-         E6VJ4WLvkE3DgpZdWJuxLJB1rA/8LXlc8jecIhAwnJ/FR6QWZl1EXEQ6aYuPm75d17Pp
-         pCJppjb0olqt9IDlyeQXxjv8Ph6GQJjzpGy7p4KffEhqSW0y19nEUMbwEaIc+5O9td4J
-         iCV3ea2+7/5Dfq37vW0ULzqw5FBKD+XLjls96l92csmNKthTnvh4cGViYcpn5j0eb4RO
-         YCyPirMFzdVKJdsKOLva8+M8aUbOyGYk6u+LUTN9OTBwe1oZMZ5pFJybwOPmCJBD6p4O
-         9rSQ==;
+        bh=4DnhuV0tZSBEyDRalqNqq5c0t7++LRumvCgBdxsbHqI=;
+        fh=hejTrwsSVkB3ADvtaaSMSpD6gBrmYQoNo2YdC40kTJM=;
+        b=NppT0utGyBRsJWXfRcOvJe4VmGs6QHq61yafwTP/U16p+b6QEYO30mVnfjYtm0RX8g
+         sofFph1vPGxsXQQxUA+yH1jI0tdvyOlCJUVuVqVrXw8ATHJfWa7e6BqCxSuo9v/AbfIQ
+         HzOBHSUzUXoBHhiUEaORn31fH9vrTatNJgkCBy5su93hTIXgcC2mIIjEsIBbjEiCR7uQ
+         lnREpDG4lojWS0OquCzU9JM8zJ4e+WAjWp+gPN+iJPfXYBy3VLLJzRDNh9V4xPkn6Udo
+         q6CgZkYx5RVNA2umKugBHR6iPz2vg2jpDdCpWAx8v0Rowpyjar0zh3GiayJzD9ktYQTO
+         dvjQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769603775; x=1770208575; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769603853; x=1770208653; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=crs0Vju6vr7yYnAWVTgMbD9mwNnywM1py8zBU7RR7yQ=;
-        b=ECP9Uwd9ruxwdmiZXEX+cN49YgWATHnbSG4fx9LESqIrs5r3zrfX5HYrBeFtiL6oqG
-         4Hoegcuo5/FE3qET60UFU4/tU/qC+fV8b3D9nX7n85zSQTU8oaE/5oMjyoIOQI8j1hrS
-         9DWj/rHqFyfnyWqUa6FPtvJHsSnT4dpui2GHGeo7sk00FJ80Ke7I4NhixMJQ482gcIO2
-         kiYoiurWyU2ErMSVCv0tahB6EsM9LlqWopBPhJOnZZjwkj67o3EUXK5puSjmxP1VxdcG
-         tdyWrAkSMaxlsnq5+/+zoXl7r0/ISSUOF1eOVkIKGtGuRFhqSnf8C6mCm/jSnLkdCqPV
-         Kknw==
+        bh=4DnhuV0tZSBEyDRalqNqq5c0t7++LRumvCgBdxsbHqI=;
+        b=qrozRyPw9ddZKBIAUxhm/H+2ZXMBFZaBc5KAEQS747cgOQe/3f2oVshUdcdPUQuKmq
+         UvTDGap+mV8R+C5vO8tY8nOVqv6GTa4hi4OoBg19RXEJqXJ/CDTVPGzzrR8t3aNJs35J
+         /JO9ICGiLxPm70xCXyvkOJ3CS4mwYbcXtl2Msnxvix9US5Sj8vPUNNI44PeEgAwxAlUE
+         ru4boV6k0hzENkjZYSnwDeYRU5iQvVYIjeap1q82fIzDz22rdhO/8ekM0r3bwAitK0Ni
+         beRFnFvV3zIqwMJG4ET3Bm6bd7YUnKGdDQnhRbGUF5MwXbI70dL4KjDZ+3p5XXm4Z++v
+         l5hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769603775; x=1770208575;
+        d=1e100.net; s=20230601; t=1769603853; x=1770208653;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=crs0Vju6vr7yYnAWVTgMbD9mwNnywM1py8zBU7RR7yQ=;
-        b=wEmAp3bbLJ9dRP2XV1utlvfs28qZpyeDtp6lX4dh0a+I2CQa/+NnMzPk0Cag1gJZjz
-         N3qH2vFICWHxJtSFbGNn//swZM4ottn+6kQMAsPM22LjrgS0JC/VKnAt3o3UCzNdGYjO
-         dgs8DjyozvFRUWATAje6OApDfvgLh1P/lEOVluJDOO0g3rDFXztFBv6gf6DSGz9POQlU
-         MqReYrs0/mx58TGAqkohX7QdwWTC8GayoqepxhJXLADosX2gMZjOozVVSJCO3AkqWi5m
-         4NUo1vyrgSWfr210DWldexVz4WQSQPZ9GBqqr87SdI5yIn1cuE8+Z5oG9h53v9qD834e
-         T7ug==
-X-Forwarded-Encrypted: i=1; AJvYcCW6GxiUQW4pjEa/DF/yJ6L+SSo9k1Fjt739L4SFsDN7Jt7cbYm2ravDE04wKwaXe2ltQh1xAGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWepOd9Qjf+O1RxoCNgLRI9ralGHK0IWdsmLnEpsrO69yPlQrE
-	Pnp8Kjvplo4+r2oozqBcN04Orz5ylw82ZDMF3hcqPkconrYLqJOMiIHu/AgflOedEYGeGyE9lq5
-	rtiueFlST5e9k/agNP1FCd2coe/v8ruk=
-X-Gm-Gg: AZuq6aIQj22oM6cApz+eItmCRbaOEvEp1EytuJqRWXbVCLzzBmHB6REVljR0iCr4eF/
-	Y7W/6H93peu4D3jYKMUXLKWovKTJeCS9XYoCiF8wcvnd3NvykfhBPZW9vFzpDrIBUpzK1dPrROU
-	T9OvLqFa8SAV6QKkPIrG1BwEm3uqOLW9ERTXTdJUT5KHHw1PK3kiggpIpYxY8Hy8hH+LafvXivW
-	L6tV6bhAwrdpifQ97bD5qqtuG6h8opNmHx7XHr+nxyhXX/8dRHA2Nys8vET9b6Bb3Erz1l1SNon
-	R71zyNuSLUl2RMHH30ZwQFlTqwqdkCu6AleGxmca
-X-Received: by 2002:a05:6000:1acc:b0:435:9538:939b with SMTP id
- ffacd0b85a97d-435dd0bdf07mr7389967f8f.8.1769603774762; Wed, 28 Jan 2026
- 04:36:14 -0800 (PST)
+        bh=4DnhuV0tZSBEyDRalqNqq5c0t7++LRumvCgBdxsbHqI=;
+        b=b3xsyT8DZtKdC2YTAWI3I24oNy+T8xUzyYpC+Vt39C9Zjdduxu+k2ahKk6bjs2aiM2
+         vziWWn75MpKMh0EKbeHwJ68Vi9SoSxP71DWxE0KjTPs3GLiRX4E8d7o+Op16jwsc3m0Y
+         97EdKgJA7F7M44KVCLZhMKBZTZPc1C/qDuXbn/AwmrHkWoxrdkQ1Y0NGxmpAP5ZsVvaf
+         t3y5DcarS4xM4rFnSXafNbLEBxz5hNephQu+uL4WtBNZ1D9LyI7IAIem4Tz+OF+pbJrX
+         fuqAwE7jrdld0Xwfy7k2tUpDxZjShJDPNC7mGzJSFYS7+QnVNS4u0kqxVASQHbuJ73Fp
+         PO4A==
+X-Gm-Message-State: AOJu0Yy4DIaXTjgBkGbO3synTNuN1c2z2Wld3DX0Yb0MTN/DOBo3ub0l
+	d+bpi9EcLtJLqfmD4I7XODHNqp4VsdGufEFnOawiAJzVl0acVLpvMVITJhJui8ZyPGZGEW0Ocp7
+	+4f0DvHVILO6OO29leaqoVjOFv2KADSnf2Y/yD+PX5glZRo83FRT4Z82Ee6c=
+X-Gm-Gg: AZuq6aJZJdXY/65CtJeVVNIUJb2G8Q0JWhydoS7VpYHCmXsXflREp76gqWFzJn0pyFH
+	WnA34C6wytUBqU1ogVBo4FjRASYeicq/GfLjyFyrcCCfUCIg0AxwlfqgTiatjBgDT9zV/idqJDN
+	lQXJnT1WlL5KsYln/YAFK1nM03A99Eb8cbvaPQ/tYkKYFinSYOsJcNncveYEhAkFGcGZ2OMEeJm
+	6t5L6CM8v9yIc0h8i0dDGPPhVFsNvg4DlgBGrv5/nhhhTcjDkHa5kT1AdyBh2gEBP40zi2ztRBc
+	VNui
+X-Received: by 2002:ac8:7d15:0:b0:501:4a4a:c24e with SMTP id
+ d75a77b69052e-5032f7659demr55490051cf.25.1769603853160; Wed, 28 Jan 2026
+ 04:37:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOf3c5fDit7nvfWUGf+f5Ctmfr9ebg6KqiwZhZYusHyFaeE5CQ@mail.gmail.com>
- <2026012758-dedicate-desecrate-358a@gregkh> <CAOf3c5eJp7432wRk1E0cDTWMccO_m9fWYDKU25-qJ7Owk8mVQA@mail.gmail.com>
- <2026012720-outmatch-worry-b92d@gregkh> <CAOf3c5dCsN2rDURv_Ct_K2agiFRe1zEjrQi1AM8LjTCfUYnLVw@mail.gmail.com>
- <2026012811-sepia-aeration-0238@gregkh>
-In-Reply-To: <2026012811-sepia-aeration-0238@gregkh>
-From: Ivan <kernvirt@gmail.com>
-Date: Wed, 28 Jan 2026 15:36:02 +0300
-X-Gm-Features: AZwV_QhV-QUZ03xLcrLR9WYrlRvPQvrZerzkyXKOuy8J1ws6BMYgtD1xwGPsGEM
-Message-ID: <CAOf3c5fO33EYtpAY0qOCgJhTKH+MYUB+4CKNR_R1fmEi0cxKEg@mail.gmail.com>
-Subject: Re: [BUG] r8152: Tx timeout and xHCI setup device timeout. RTL8153 31.00
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org
+References: <20260128070311.48892-1-mahdifrmx@gmail.com> <CANn89iKwmhmAOConHjNP7XxVLghaJJgU4gDSH+To8Q1V67Jv0Q@mail.gmail.com>
+ <CA+KdSGPvcGrUGeMiguBZ_RcHQjXeik+DgqetWaGNW8aGK3LUZg@mail.gmail.com>
+In-Reply-To: <CA+KdSGPvcGrUGeMiguBZ_RcHQjXeik+DgqetWaGNW8aGK3LUZg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 28 Jan 2026 13:37:22 +0100
+X-Gm-Features: AZwV_QhvYgN91T1aet-BjUOmr1F62n76BJxc5TiKwzLIOBiihGjmjHSaQFcXkQ0
+Message-ID: <CANn89i+k+dB_9G+gvCpv+_8wWSxp71LxQTdbOZVm7LSugRK5+A@mail.gmail.com>
+Subject: Re: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
+To: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, kshitiz.bartariya@zohomail.in
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254242-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254243-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,kernel.org,redhat.com,zohomail.in];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kernvirt@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,linuxfoundation.org:email,wikipedia.org:url,daringfireball.net:url]
-X-Rspamd-Queue-Id: 3BDECA15B3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 1B132A156F
 X-Rspamd-Action: no action
 
-=D1=81=D1=80, 28 =D1=8F=D0=BD=D0=B2. 2026=E2=80=AF=D0=B3. =D0=B2 09:11, Gre=
-g KH <gregkh@linuxfoundation.org>:
+On Wed, Jan 28, 2026 at 1:27=E2=80=AFPM Mahdi Faramarzpour <mahdifrmx@gmail=
+.com> wrote:
 >
->
-> A: http://en.wikipedia.org/wiki/Top_post
-> Q: Were do I find info about this thing called top-posting?
-> A: Because it messes up the order in which people normally read text.
-> Q: Why is top-posting such a bad thing?
-> A: Top-posting.
-> Q: What is the most annoying thing in e-mail?
->
-> A: No.
-> Q: Should I include quotations after my reply?
->
-> http://daringfireball.net/2007/07/on_top
->
-> On Tue, Jan 27, 2026 at 07:02:46PM +0300, Ivan wrote:
-> > Yes, the log is correct; during the time since boot, I had just
-> > finished downloading those 900MB of packages. In this specific case,
-> > the interface disappeared just before or during the reboot. After the
-> > reboot, the interface did not reappear because the hub remained
-> > powered, and a physical reconnect was required to initialize it again.
-> > The previous log was short because it contained only kernel messages.
-> > This time, I am attaching the full output of journalctl -b for more
-> > context.
->
-> Thanks, but it looks identical to the previous log, the device, at boot,
-> didn't want to talk to the USB host (i.e. your computer), and so
-> disconnected itself.  It must have gotten "confused" and so a physical
-> disconnect from power fixed it.
->
-> That's a lot different from "it was working and then it stopped", so it
-> might be a firmware bug in the device?  I don't know, sorry.
->
-> If you plug it in, after the system has been booted, does it always work
-> properly then?
->
-> thanks,
->
-> greg k-h
+> On Wed, Jan 28, 2026 at 3:14=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Wed, Jan 28, 2026 at 8:03=E2=80=AFAM Mahdi Faramarzpour <mahdifrmx@g=
+mail.com> wrote:
+> > >
+> > > This commit adds SNMP drop count increment for the packets in
+> > > per NUMA queues which were introduced in commit b650bf0977d3
+> > > ("udp: remove busylock and add per NUMA queues"). note that SNMP
+> > > counters are incremented currently by the caller for skb. And
+> > > that these skbs on the intermediate queue cannot be counted
+> > > there so need similar logic in their error path.
+> > >
+> > > Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+> > > ---
+> > > v6:
+> > >   - increasing a single counter based on socket family
+> > > v5: https://lore.kernel.org/netdev/20260122185357.50922-1-mahdifrmx@g=
+mail.com/
+> > >   - check if drop counts are non-zero before increasing countrers
+> > > v4: https://lore.kernel.org/netdev/20260108102950.49417-1-mahdifrmx@g=
+mail.com/
+> > >   - move all changes to unlikely(to_drop) branch
+> > > v3: https://lore.kernel.org/netdev/20260105114732.140719-1-mahdifrmx@=
+gmail.com/
+> > >   - remove the unreachable UDP_MIB_RCVBUFERRORS code
+> > > v2: https://lore.kernel.org/netdev/20260105071218.10785-1-mahdifrmx@g=
+mail.com/
+> > >   - change ENOMEM to ENOBUFS
+> > > v1: https://lore.kernel.org/netdev/20260104105732.427691-1-mahdifrmx@=
+gmail.com/
+> > > ---
+> > >  net/ipv4/udp.c | 5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > index ffe074cb5..dd302f5fb 100644
+> > > --- a/net/ipv4/udp.c
+> > > +++ b/net/ipv4/udp.c
+> > > @@ -1797,10 +1797,13 @@ int __udp_enqueue_schedule_skb(struct sock *s=
+k, struct sk_buff *skb)
+> > >                         skb =3D to_drop;
+> > >                         to_drop =3D skb->next;
+> > >                         skb_mark_not_on_list(skb);
+> > > -                       /* TODO: update SNMP values. */
+> > >                         sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_P=
+ROTO_MEM);
+> > >                 }
+> > >                 numa_drop_add(&udp_sk(sk)->drop_counters, nb);
+> > > +               SNMP_ADD_STATS(__UDPX_MIB(sk, (sk->sk_family =3D=3D P=
+F_INET)),
+> > > +                              UDP_MIB_MEMERRORS, nb);
+> > > +               SNMP_ADD_STATS(__UDPX_MIB(sk, (sk->sk_family =3D=3D P=
+F_INET)),
+> > > +                              UDP_MIB_INERRORS, nb);
+> > >         }
+> >
+> > Hmm.. I have not followed your prior attempts, sorry for coming late.
+> >
+> > Note that an UDP AF_INET6 socket for which ipv6_only_sock(sk) is false
+> > can receive
+> > IPv4 and IPv6 UDP packets, if bound to any addresses.
+> >
+> > The to_drop list could contain a mix of IPv4 and IPv6 packets.
+> >
+> > Ideally we should track SNMP values in the proper space (Ipv4 , IPv6).
+> >
+> > See IPV6_V6ONLY and /proc/sys/net/ipv6/bindv6only for reference.
+> This is the exact discussion I had with Willem de Bruijn:
+> https://lore.kernel.org/netdev/willemdebruijn.kernel.17f36003699cb@gmail.=
+com/
 
-The situation is as follows:
-I boot into the OS with a USB hub pre-connected. The system has
-internet access, and I start downloading packages. After they are
-successfully downloaded, I perform a reboot. In this specific case,
-the Ethernet interface disappeared from the system during the reboot.
-Out of the 4 crashes I=E2=80=99ve encountered, two occurred during a reboot=
-,
-and two happened out of nowhere while downloading packages - the
-Ethernet interface just dropped, and the download failed accordingly.
-ip link shows:
-1. lo
-3. wlp*
-This means the second interface, which is the Ethernet adapter, has
-completely disappeared from the system; it is also missing from lsusb.
-In the log I attached, I did not disconnect the hub manually - it
-simply vanished from the system on its own and did not reappear after
-the reboot, as it remained powered and was never turned off during the
-restart. To make it appear in the system again, I have to either
-reconnect the hub manually or completely power the laptop off and then
-on.
-I don't know if it's a coincidence or not, but all 4 crashes happened
-specifically in tty. As I mentioned before, I cannot catch this crash
-in a DE; perhaps it is just a coincidence. I also conducted a 2-hour
-test in DE: I received packets from the router over the local network
-via iperf using 15 streams at 1 Gbps without any issues. However, in
-my log, as you can notice, I caught the crash after only 7 minutes of
-downloading packages in the package manager.
+I think Willem was wrong :)
 
-thanks
+__udp_enqueue_schedule_skb() is called either from
+__udp_queue_rcv_skb() for IPv4 packets,
+or __udpv6_queue_rcv_skb() for IPv6 packets, and they both can feed
+packets to a single and shared UDP socket.
+
+An IPv4 packet will not go through __udpv6_queue_rcv_skb().
+
+It would be deceptive to increment IPV6 UDP counters if a host only
+receives IPv4 UDP packets.
 
