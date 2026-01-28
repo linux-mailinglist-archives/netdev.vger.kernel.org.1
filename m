@@ -1,144 +1,215 @@
-Return-Path: <netdev+bounces-254338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254340-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id rKBRMyFAemm14wEAu9opvQ
-	(envelope-from <netdev+bounces-254338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:58:09 +0100
+	id kGX6AKtAemmr4wEAu9opvQ
+	(envelope-from <netdev+bounces-254340-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:00:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03056A668A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:58:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C24A674E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:00:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5304430260A8
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:23:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6F9430C6029
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E33C30F924;
-	Wed, 28 Jan 2026 16:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38380313534;
+	Wed, 28 Jan 2026 16:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4YeAKvJ"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Wg0I/iMU";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="smAO8uqi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4CF1D5CC9
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 16:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769617416; cv=none; b=dPqqcj6hEfbHBlHREJKbNP4cKEnEGlHFPF2gODZ2Pj5DUuG4bgtmSrHKxsWfEWLC810RWYhRmXu6yM7ZgP+5vt0IxfQW07Gyn2cI70x6gbACUhoUAjFovfzib8MCSImNpZe1IEdGcVVSGZVr/FWtD9v9zBcNVJi53G10TXGQahU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769617416; c=relaxed/simple;
-	bh=D2EVtZ3Bdu41Pl2Ma9t3PpB00ixzoM6dRSpGiADfFr8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gONwtreP3UMJ2h1m0zuHa+BcJXHt4qbZheSep/+ADrTeamxHKQyRxGkDS3jwJE6l6q8dgXvTkLX1Gaa19dGdtgWuscXKK8XDCvNuvsw2a0XPWHjXmDez+M0S/m43NAYQ6ReUubuQGHPpozwdvbvtw5XhI32hLMSO4rSwU8YBBSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4YeAKvJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD0AAC2BC87
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 16:23:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769617415;
-	bh=D2EVtZ3Bdu41Pl2Ma9t3PpB00ixzoM6dRSpGiADfFr8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=p4YeAKvJ4CZPDV0CsW0tDcLM3yF13+bVmuMOKrOUdHxL/dAc9E1ENqMe/DfaNGZ/a
-	 GbrOCgII7DSINitopjirki2BpP4rvUcFtluq+uCWyB2TmvlT2UVhf74mLBOEN6QaL5
-	 3RgM1b2CEYOnNgF4Te+C7jNxS931uJ+Oo4/CDSdQdHMf2YJvjFdRFYmw14kwr3KtGB
-	 tSyUt7wkBg8WYTY20X+0bRYKs1UXdPexCrG9pWp1NO1hmwoZ/NZO85DUMjY4AB52Gq
-	 1HkofEsz5iL58XThDLBHRvejF7V3ika6W7z4WNKFquhecCKCKOOaYL7QPUkqejByhs
-	 QDC3X27Y+pbyA==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-65819e75691so77370a12.3
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 08:23:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVFqS+K2sPDlgedT+5YAhbNuPJpK25wpbcj0DZwLKGwyVqZUpKHbMuv6m2ZZRGEMURyzmNgANQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYpMZcyrAAuv+KcL7oJN9yVYPXOKJPhpb6V559T9VHi1Nd/mJj
-	St95c1Z8xDe5sQ6YAC8Q4PUa+WXUWukC5TOXf+8RpBTWq8EBvcDKGQkedjUbdIpdsxaJ+W2kcaT
-	crnTQ33DRGLOKUQqS2cnBqGLfu9aQbg==
-X-Received: by 2002:a17:907:7f89:b0:b87:65c5:602f with SMTP id
- a640c23a62f3a-b8dab3304eemr370934466b.34.1769617414310; Wed, 28 Jan 2026
- 08:23:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED1728C2BF;
+	Wed, 28 Jan 2026 16:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769617680; cv=pass; b=FYtZRd8ADbH7OcOfoDFmPlGQOlCqAN/nQtrTyZ2gqBTRAStx3hCUFsy9icYhSoqVr4zlSRlS9TntA+gVgpeZ6ZlX6MWKAgYQUrREqVj/U8+n/JRDWKCJpG2noDyHTTInPFeJObdHdrfkU/kQWXbYhQx4vCs4DHTgbz8PLG5oX8s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769617680; c=relaxed/simple;
+	bh=9NQhKrM07UxdnY6Nk+xaohP6SDmIBNYkltqED26I0vM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j9IxY6tLjDqX2TSvnHSiCHg3YKU/11xlnITUTBvjVwWW9H8b/+Zjgt18i78OVRTFtITilez4EwH/sgPRSlCRav020olOa+zANNOfeUG7uvr2yUJzFM7U4O7CPqxlKOhMv4ZPxt+WdKXEOkIyz/TCkJ+39GnuRT6TWxhsbaetiqI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Wg0I/iMU; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=smAO8uqi; arc=pass smtp.client-ip=85.215.255.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1769617493; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=hNnujXp5Zx0p13EUNj3NnFTQcKUhNWCI/4EePvSaqKh48NjfhiSD4w+49T2f2IZOKE
+    Xpvsvxi1aJYQCcQ2D6O4+TXKXSKwS+JPpM9xHejQR+bw2zhqGSgffJ4PUgOr5jmusDRc
+    d9OmRSoAtVZkeaoY9hs5BRFqmZUZkRoi/3a0K6tSaM2xp6ae63QFaCaLwWY2mA4f4h28
+    tknpowzq06xetEugYBwx/Mft/xutrIlTYjc/uQXG8DE0f13A63WUNrRU8YWTHAf2glR9
+    mvesO3cKGWC2xqkQ6TlJrAQuyKe8a/KPfLbeaNCa+8fJ7BPYVdtr+DDn6KGVC5oioxJQ
+    ZnAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1769617493;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=ola9VCkQpAE85q7pA6oJgli7ByxYQZNZDz9woeMQWng=;
+    b=VVCZLclPSEZkD7Uz4EbFWaLONvUr0qHaDszj9SX4FWet7u6jQ4cd6QjPeV5muViL1V
+    GZqX20W6IPShlpvs7iH6xPJxKNaR6ytlzhPJJGDFGI1JLco9ZW7+jLWoxCb697VwjQa2
+    Pjqireugk1ZR6jCnCCykLZcNmtMgV0hM3ISbOvXDA0rXdpNsaFII+XSmf8NPlZvZeOW0
+    AQjnGG788zkb9Pn2LG92AKGsAH5swyiMv8D9kr5xGY92wRK7fYicVYtpAT0Frd86boka
+    CUHfmohmGHliWO2Qa4LtDkKTXJ0elnvMWF/jsMkKlqXS/wnAEvnpGDWyybLUPFmU7Qlz
+    5C+w==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1769617493;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=ola9VCkQpAE85q7pA6oJgli7ByxYQZNZDz9woeMQWng=;
+    b=Wg0I/iMUdpXqxSg5CpVtb+029QQKvCKf51cVR8MAaiKOApmJ2xvyOWSPpzJqfQ1xVf
+    uTCIY33cQX4kg8aiBTBzKguibucvRcvIdy09U7eaHGud7nmKFu7SngRSRTRBVq8tYAXI
+    J3G/+q3PB1of8Cii7R0raodAp+qYUD2yP7COqOeRH1caQQP9uMBH4S2b/H1Nu4FPHgXL
+    n9On0AUYXr5OGjw3Jue1k8f8bYb7TELTWCgf1SMSwlG40y7Lp+sbRkWp4YEq+2okpB9W
+    QJbZpZTR4roW/z8x+mmeCr35P8QMPoye8AoT0JHR2L9uYY4f1UNF/Mr7DgzuCshSXj3F
+    Vl6g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1769617493;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=ola9VCkQpAE85q7pA6oJgli7ByxYQZNZDz9woeMQWng=;
+    b=smAO8uqifriuz6fKjTa1agjdRS75RWYVt1U2LHu3ytmtfisxXwSxuSqCfCClTAQa7/
+    sm48qv1s5Dr2j1nR96Cw==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8YjX10Q=="
+Received: from [IPV6:2a00:6020:4a38:6810::76e]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b20SGOro7V
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 28 Jan 2026 17:24:53 +0100 (CET)
+Message-ID: <4ae24c74-0f72-4565-9468-6fa43fa872a3@hartkopp.net>
+Date: Wed, 28 Jan 2026 17:24:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260128140222.1627203-1-robh@kernel.org> <1fca424a-6215-4303-a0cd-623063945ce6@kernel.org>
-In-Reply-To: <1fca424a-6215-4303-a0cd-623063945ce6@kernel.org>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 28 Jan 2026 10:23:22 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLAREg7ZNK55fsLFcPkj7L4o5nRRvDCHiBu_UfRgEuJvA@mail.gmail.com>
-X-Gm-Features: AZwV_Qhwv8z718O3HYAh8VI3E2MSxN46iPZvhgrJUI-6gJD0GIquFnIPc1OVxUU
-Message-ID: <CAL_JsqLAREg7ZNK55fsLFcPkj7L4o5nRRvDCHiBu_UfRgEuJvA@mail.gmail.com>
-Subject: Re: [PATCH] powerpc: dts: fsl: Drop unused .dtsi files
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Richard Cochran <richardcochran@gmail.com>, devicetree@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [can-next,v2,6/6] can: gw: use can_gw_hops instead of
+ sk_buff::csum_start
+To: Jakub Kicinski <kuba@kernel.org>, mkl@pengutronix.de
+Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, kernel@pengutronix.de, mailhol@kernel.org,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, robin@protonic.nl, o.rempel@pengutronix.de
+References: <20260128-can-skb-ext-v2-6-fe64aa152c8a@pengutronix.de>
+ <20260128161248.40799-1-kuba@kernel.org>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20260128161248.40799-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,linux.ibm.com,ellerman.id.au,gmail.com,vger.kernel.org,lists.ozlabs.org];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-254338-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254340-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[hartkopp.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 03056A668A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,hartkopp.net:mid,hartkopp.net:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 62C24A674E
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 9:43=E2=80=AFAM Christophe Leroy (CS GROUP)
-<chleroy@kernel.org> wrote:
->
->
->
-> Le 28/01/2026 =C3=A0 15:02, Rob Herring (Arm) a =C3=A9crit :
-> > These files are not included by anything and therefore don't get built =
-or
-> > tested.
-> >
-> > There's also no upstream driver for the interlaken-lac stuff.
-> >
-> > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> > ---
-> >   .../boot/dts/fsl/interlaken-lac-portals.dtsi  | 156 -----------------=
--
-> >   arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi |  45 -----
->
-> Those two files were added by commit 8c43d2b0ca10 ("powerpc: Add T4 LAC
-> device tree binding & defs") together with
-> Documentation/devicetree/bindings/powerpc/fsl/interlaken-lac.txt
->
-> Should the Documentation file be removed as well ?
 
-Yes, once there is no user, I will remove the binding.
 
->
-> Regardless,
->
-> Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+On 28.01.26 17:12, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> 
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> can: gw: use can_gw_hops instead of sk_buff::csum_start
+> 
+> This patch moves the hop counter storage from skb->csum_start to the CAN
+> skb extension field can_skb_ext::can_gw_hops.
+> 
+>> diff --git a/net/can/gw.c b/net/can/gw.c
+>> index ad89a1913b34..2c134c9e5159 100644
+>> --- a/net/can/gw.c
+>> +++ b/net/can/gw.c
+> 
+> [ ... ]
+> 
+>> @@ -480,19 +480,8 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
+>>   	/* Do not handle CAN frames routed more than 'max_hops' times.
+>>   	 * In general we should never catch this delimiter which is intended
+>>   	 * to cover a misconfiguration protection (e.g. circular CAN routes).
+>> -	 *
+>> -	 * The Controller Area Network controllers only accept CAN frames with
+>> -	 * correct CRCs - which are not visible in the controller registers.
+>> -	 * According to skbuff.h documentation the csum_start element for IP
+>> -	 * checksums is undefined/unused when ip_summed == CHECKSUM_UNNECESSARY.
+>> -	 * Only CAN skbs can be processed here which already have this property.
+>>   	 */
+>> -
+>> -#define cgw_hops(skb) ((skb)->csum_start)
+>> -
+>> -	BUG_ON(skb->ip_summed != CHECKSUM_UNNECESSARY);
+>> -
+>> -	if (cgw_hops(skb) >= max_hops) {
+>> +	if (csx->can_gw_hops >= max_hops) {
+>              ^^^^^^^^^^^^^^^^
+> Is csx->can_gw_hops initialized to zero for fresh CAN frames?
+> 
+> The old code used skb->csum_start which was zeroed by skbuff_clear() during
+> skb allocation. The new code reads from can_skb_ext::can_gw_hops, but looking
+> at alloc_can_skb() in drivers/net/can/dev/skb.c, only can_iif is initialized:
+> 
+>      csx = can_skb_ext_add(skb);
+>      ...
+>      csx->can_iif = dev->ifindex;
+> 
+> The skb extension memory comes from kmem_cache_alloc() without __GFP_ZERO in
+> __skb_ext_alloc(), so can_gw_hops will contain garbage from the slab.
 
-Thanks!
+Correct. It is not only a leftover of using csum_start but also of my 
+first implementation attempt using another space in struct sk_buff which 
+was also zero-initialized.
 
-Rob
+I'll add some initialization in can_skb_ext_add() for the next respin.
+
+Excellent feedback!
+
+Many thanks,
+Oliver
+
+> 
+> With default max_hops=1, if the garbage value is >= 1 (probability ~99.6%),
+> the frame will be dropped at this check before any routing occurs.
+> 
+> Should alloc_can_skb(), alloc_canfd_skb(), and alloc_canxl_skb() initialize
+> csx->can_gw_hops = 0?
+> 
+>>   		/* indicate deleted frames due to misconfiguration */
+>>   		gwj->deleted_frames++;
+>>   		return;
+> 
+> [ ... ]
+
 
