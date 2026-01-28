@@ -1,142 +1,184 @@
-Return-Path: <netdev+bounces-254489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKWOGqSQemn77wEAu9opvQ
-	(envelope-from <netdev+bounces-254489-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:41:40 +0100
+	id kLXTJzORemmz7wEAu9opvQ
+	(envelope-from <netdev+bounces-254490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:44:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1597A9B37
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:41:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19148A9B5E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB385307C334
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:39:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 85F0A3014699
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1D2346768;
-	Wed, 28 Jan 2026 22:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC733446D8;
+	Wed, 28 Jan 2026 22:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njODM7S/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5C2343D64
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 22:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFE628642D;
+	Wed, 28 Jan 2026 22:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769639979; cv=none; b=SWZsWMOtoVD9lD8oKU4PF5B5wAtmGC694au3oL6ubzp8oKAlVGkJ5XFZWhzvZow60vzld9hx9QD6RdLSki+7hnfwEWhsyORAPz/2z6TkZ0NEEmvPx1L/LN8Sdq2tr6CLLc1tqLZ8/xg7woTF0dSfSvG+nSIACMp/wwRgxzaBnzs=
+	t=1769640239; cv=none; b=NVKr6NrGoEkgoTveV2u81wwTEfp9eUL2zLY9g/Ya1/Z9HvLSwvw5PhWoV+cEFC/FlUSEyKCZcpSq+heYlyzczXPbHJNn9XMwdM/WEW6Cn7KP2ar8FB0WN5eUK8dEaPl8bbvoSBdleU67dbcr1NuliAniYbnHUUiONfLeKjp5SyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769639979; c=relaxed/simple;
-	bh=L7LMowbbFe74UE736M0mXofgeYBJ75YSZFR7RyVsQPk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CTEtQhyyUxxevjTYCfXbT8ZA/BkpjqpMb2mzezLMIH3BV8SX/jo7k6Vj1BPKoXak3FpuXJUj7pY/uVbUh5RDK1WheJ/pLH98KeNNxO2cwOmWqDkJzrPNo3E9cpMUay2tkl99eyl2nUDxTwAPH/JJc7kvipZPuc9JACBnFAUZRtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-65f30d38617so1066345eaf.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 14:39:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769639977; x=1770244777;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eHLvlDBwy9U71exMZeCWgguqy+MJQInJDJn0tuli10E=;
-        b=PVcZhaucsq0Av68ePQVsS3zZlacd1izhUU/QdGXs76QxuasCbRJzapS4qezJ3Uefwp
-         uWraJy9hhXPnTlH4AkKDxht16PYXgdc18NnIyHl1dg02ppQX7dI21k2tuz2iovb5dYjt
-         ymq2sn9WdIvlhNV0TyScSxi8qdKMa1ZHq9cs04erBo26E6yroyKCYIq1a5x8uwRjeFfR
-         RuyotLOoEACZSz21qBkUBVXbgJeMMg8TfK+Q8AQ+c/W4RJNU7oYdQ7ow7qhrqUqYfM4M
-         /sajS8asBiKQtLNfWzjUBPKRdcUbRiz9d88PtOwoFPPJlJv8MnVIeO/JJ/1nz+3IGzLG
-         nMFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDoNKi0IOStCjrCUWclLkohb3F+OzG7PF7LOOxx1FD2yOT6UJ0oU8Xx4VQlDO022ng47KwjX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxhz/IY4SIA1Jv9qcq4RmkBVCgWTvxfmPJLU4hCuJsUHMUSrOPr
-	jEGTk7qE4c/FflhH9C2iQJVQlTOXmNOlKvkj7TeUFpgY7qOKO5kodUKXhKbrUw60IH58RA2rxl2
-	pPhAbwfK8D24ziFHe3sFx6BCGv08pSlBwjLvQcQBVk/5DP6bg7juF39MCi/c=
+	s=arc-20240116; t=1769640239; c=relaxed/simple;
+	bh=f0b7C3R7nIS4pAEHba0gtxCqsmxcULxVtR793d7XUko=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=T01rr6YPJMWLJU8BBHZU7z8d2U1bgsPtNuwdUeAvbnkl5NC/ATkrb+nY7HsiTtyJeJykpfyP2aThYfvLKKa0CgNf8Ke+/jZ1sdGecMUMJJGZaokZjeojK89TQYW6caQAUB39sQYkwRo/8AzNxPbydLGxP0G9lj6vkMes3nrjsHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=njODM7S/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6A50C4CEF1;
+	Wed, 28 Jan 2026 22:43:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769640238;
+	bh=f0b7C3R7nIS4pAEHba0gtxCqsmxcULxVtR793d7XUko=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=njODM7S/9Z52Dj0TlAenl9WhrheFJ8hTHZy+6Nn8ASINVudFRDxl3rsZNnlM+ppJM
+	 aK/pMpjvibV8Pm8Ov+pEIVezoVE369rhc39+ToRoQmNmuhmRcNHk8c/P8GJiVI7DXv
+	 efNaUWtAK7jmvUvdBb9mOaSCy15CjMR1wSYj+9PUL21fGitYhzyhJSJwT06JXt1nzH
+	 o8E/AJg0eINtG9BzwBcB/ugMchWnfroEGPzHoevZhW1AmsKXGsymrJKEzcrPBAgGyx
+	 XxXiJfxQ6KrAWALBImCIjGQ/Piyq5vFeTuIjEcGWNqfiz+3mgi5vLGInXidG5oFrXy
+	 BSGWYn3uGxwDQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9A4D46C01;
+	Wed, 28 Jan 2026 22:43:58 +0000 (UTC)
+From: Oliver Hartkopp via B4 Relay <devnull+socketcan.hartkopp.net@kernel.org>
+Subject: [PATCH net-next v4 0/6] move CAN skb headroom content to skb
+ extensions
+Date: Wed, 28 Jan 2026 23:43:39 +0100
+Message-Id: <20260128-can_skb_ext-v1-0-330f60fd5d7e@hartkopp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4888:b0:65f:70b5:1a89 with SMTP id
- 006d021491bc7-662f20b3034mr3350391eaf.49.1769639976817; Wed, 28 Jan 2026
- 14:39:36 -0800 (PST)
-Date: Wed, 28 Jan 2026 14:39:36 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <697a9028.a70a0220.9914.000e.GAE@google.com>
-Subject: [syzbot] Monthly wireless report (Jan 2026)
-From: syzbot <syzbot+list6aea27ca2eabd5fa9140@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABuRemkC/x2MQQqEMBAEvxLmbCAJomYfshcRidrqIMwuiYgg/
+ t3gsaCqLkqIjEQfdVHEwYl/ksEWisY1yALNU2ZyxlXGukaPQfq0DT3OXRvUwXtM1jcl5eIfMfP
+ 53loS7Fqypb4ldff9AMJsovBqAAAA
+X-Change-ID: 20260128-can_skb_ext-0e7a99ed1984
+To: netdev@vger.kernel.org, linux-can@vger.kernel.org
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
+ Marc Kleine-Budde <mkl@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1769640237; l=3309;
+ i=socketcan@hartkopp.net; s=20260128; h=from:subject:message-id;
+ bh=f0b7C3R7nIS4pAEHba0gtxCqsmxcULxVtR793d7XUko=;
+ b=ygKcs41SccF0rhpQpv0gVvUagf9crxEDNmSOk8rkEC1RG1zjSJU+mkQSosRH+E9NNGBZegnFp
+ qNbMiyrG1u5Aj41T1MaO1RuU+k4Fr7gr5iZBBEYB4jpw7Z9gmfcrThk
+X-Developer-Key: i=socketcan@hartkopp.net; a=ed25519;
+ pk=/gU/7/wBqak3kTsTeFbCCqUi9dnh+1i6ITEkfPj/BvU=
+X-Endpoint-Received: by B4 Relay for socketcan@hartkopp.net/20260128 with
+ auth_id=620
+X-Original-From: Oliver Hartkopp <socketcan@hartkopp.net>
+Reply-To: socketcan@hartkopp.net
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_RCPT(0.00)[netdev];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254489-lists,netdev=lfdr.de,list6aea27ca2eabd5fa9140];
-	RCPT_COUNT_THREE(0.00)[4]
-X-Rspamd-Queue-Id: C1597A9B37
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254490-lists,netdev=lfdr.de,socketcan.hartkopp.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	HAS_REPLYTO(0.00)[socketcan@hartkopp.net]
+X-Rspamd-Queue-Id: 19148A9B5E
 X-Rspamd-Action: no action
 
-Hello wireless maintainers/developers,
+CAN bus related skbuffs (ETH_P_CAN/ETH_P_CANFD/ETH_P_CANXL) simply contain
+CAN frame structs for CAN CC/FD/XL of skb->len length at skb->data. Those
+CAN skbs do not have network/mac/transport headers nor other such
+references for encapsulated protocols like ethernet/IP protocols.
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+To store data for CAN specific use-cases all CAN bus related skbuffs are
+created with a 16 byte private skb headroom (struct can_skb_priv). Using
+the skb headroom and accessing skb->head for this private data led to
+several problems in the past likely due to "The struct can_skb_priv
+business is highly unconventional for the networking stack." [1]
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 56 issues are still open and 171 have already been fixed.
+This patch set aims to remove the unconventional skb headroom usage for CAN
+bus related skbuffs and use the common skb extensions instead.
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  25396   Yes   WARNING in rate_control_rate_init (3)
-                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-<2>  10510   Yes   WARNING in __rate_control_send_low (3)
-                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
-<3>  7244    No    WARNING in kcov_remote_start (6)
-                   https://syzkaller.appspot.com/bug?extid=3f51ad7ac3ae57a6fdcc
-<4>  6921    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<5>  2111    Yes   WARNING in __alloc_workqueue
-                   https://syzkaller.appspot.com/bug?extid=392a2c3f461094707435
-<6>  1226    Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<7>  1026    Yes   INFO: task hung in reg_process_self_managed_hints
-                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
-<8>  842     Yes   INFO: task hung in reg_check_chans_work (7)
-                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
-<9>  750     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
-                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
-<10> 648     No    WARNING in ieee80211_tx_h_rate_ctrl
-                   https://syzkaller.appspot.com/bug?extid=0d516b33238bd97ee864
+[1] https://lore.kernel.org/linux-can/20260104074222.29e660ac@kernel.org/
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v2:
+- Patch#1: use u32 instead of __u32 for "struct uniqframe::hash"
+- Patch#3: use u{8,16} instead of __u{8,16} for "struct can_skb_ext"
+- Patch#6: add missing patch
+- Link to v1: https://patch.msgid.link/20260125201601.5018-1-socketcan@hartkopp.net
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Changes in v3:
+- Patch#2: new patch: rename dev_put() in CAN subsystem suggested by Checkpatch
+- Patch#3: use netdev_put() instead of dev_put() suggested by Checkpatch
+- Patch#3: initialize can_gw_hops in can_skb_ext_add() suggested by AI-bot
+- Patch#6: add linebreak in sock_alloc_send_skb() to fit the 80 columns (Checkpatch)
+- Link to v2: https://lore.kernel.org/linux-can/20260128-can-skb-ext-v2-0-fe64aa152c8a@pengutronix.de/
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Changes in v4:
+Solve the netdev_put() / dev_put() suggestion from Checkpatch in a separate
+patch set. Therefore these changes are based on V2 again. 
+- Patch#2: initialize can_gw_hops in can_skb_ext_add() suggested by AI-bot
+- Patch#5: add linebreak in sock_alloc_send_skb() to fit the 80 columns
+- Link to v2: https://lore.kernel.org/linux-can/20260128-can-skb-ext-v2-0-fe64aa152c8a@pengutronix.de/
 
-You may send multiple commands in a single email message.
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+
+---
+Oliver Hartkopp (6):
+      can: use skb hash instead of private variable in headroom
+      can: add CAN skb extension infrastructure
+      can: move ifindex to CAN skb extensions
+      can: move frame_len to CAN skb extensions
+      can: remove private CAN skb headroom infrastructure
+      can: gw: use can_gw_hops instead of sk_buff::csum_start
+
+ MAINTAINERS               |   1 +
+ drivers/net/can/dev/skb.c | 123 +++++++++++++++++++++++++++++-----------------
+ include/linux/can/core.h  |   1 +
+ include/linux/can/skb.h   |  38 +++++---------
+ include/linux/skbuff.h    |   3 ++
+ include/net/can.h         |  28 +++++++++++
+ net/can/Kconfig           |   1 +
+ net/can/af_can.c          |  23 ++++++---
+ net/can/bcm.c             |  26 +++++++---
+ net/can/gw.c              |  38 +++++++-------
+ net/can/isotp.c           |  45 +++++++++++------
+ net/can/j1939/socket.c    |  15 ++++--
+ net/can/j1939/transport.c |  28 +++++++----
+ net/can/raw.c             |  22 ++++++---
+ net/core/skbuff.c         |   4 ++
+ 15 files changed, 255 insertions(+), 141 deletions(-)
+---
+base-commit: 239f09e258b906deced5c2a7c1ac8aed301b558b
+change-id: 20260128-can_skb_ext-0e7a99ed1984
+
+Best regards,
+-- 
+Oliver Hartkopp <socketcan@hartkopp.net>
+
+
 
