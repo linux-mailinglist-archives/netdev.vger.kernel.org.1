@@ -1,183 +1,174 @@
-Return-Path: <netdev+bounces-254182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254183-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFEHC2jfeWnI0QEAu9opvQ
-	(envelope-from <netdev+bounces-254182-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:05:28 +0100
+	id aJNsC2fgeWm50gEAu9opvQ
+	(envelope-from <netdev+bounces-254183-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:09:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B727E9F35B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:05:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8CDE9F436
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 59DD7300FB7E
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:03:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8CE833046052
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BA82D0622;
-	Wed, 28 Jan 2026 10:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="P3LLbll6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D65F2D0C92;
+	Wed, 28 Jan 2026 10:04:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9892C2C3257
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108962C11E9
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769594628; cv=none; b=Fz2c7TWUWUzxgX+DVwMaryLZTzR4urePPu20ArIn6zrAS8CRPrhnzFPze52eP+Oohd89OGnNA1BPIhmV+lnQmqq79fZEZMiRLsFuE7eUotm4UAflKsQayg2St7h7rYgPqNy/MV96q/BTtw5ONjKaOrVOgOXUqG5IIK1X65Xu9VM=
+	t=1769594671; cv=none; b=bHYaWwzI8arcQjjuCEfm0HHUmMYvfbJdjpIMjB3D2/KVuc/3zobC2fTAS5l2BFhaYq8zGx0RCPtJxFYwpoaBR7cXfnMOVv830GlHq/+r/ta0Ci0sVggOgFGYcrGGaNoxnrrhdRQIn9mAvgiVY0ivCX74WAA0Br2lsgHjJOn6RAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769594628; c=relaxed/simple;
-	bh=wHf/q6POZNSNARHurPBSCBRt+/FARjYt64rvsdOIcvo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FgU9L9kM7SMATwjfCTJrcJmqmfa2xpB+6RYjczrEjxv0a1kYK/ko3OcnYEZZxnKhQ6zXN/GcTXNc8c/jvECBCfUFDCN7rBbEQRhVuIbqSSk4VApsMJbyQpvh/XY7cpW/JhmvNzi+yjQoZdDf2UdiaY1ragtwA+jbUm4jONoDlvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=P3LLbll6; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 3F3591A2ABB;
-	Wed, 28 Jan 2026 10:03:45 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0EE236071A;
-	Wed, 28 Jan 2026 10:03:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9CE1119A8695;
-	Wed, 28 Jan 2026 11:03:41 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769594624; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=fW1rz+jrI+rToURQhzvWdjua5v+hNnJ7D6YuU7kHAB8=;
-	b=P3LLbll6pvr6IJdtWr85zlavVdk4hgUKknA4DPbZO34RvxJAQ6r4dk1GTdCT5Gjn2xtS+J
-	biG0/biR7JOhq4yU4GTVuH8rXeS0I4ABXdo4p4oloydL64MecjeisD+ruDC/HXU1DYV4Jz
-	aqsXzkw/F6ZTzPjbxELxCu0V2uTYIZAZwkYvkT0hO95YXDPzUOn9TDyeH9MqbgAhnag3EB
-	LjUFzYGotmlxMF7+lgMUJESfvAymmY+xiWDZJbxS0NIA++Dmpj71BEN0G6r6YQiv0XjxgZ
-	V4u/LLopQGciyelNTkcZm/gq25bVYMZvQCWmf1jzydzXyhKwxffFsK7/YNYhaA==
-Message-ID: <a84cb1e7-0782-49a0-9d61-f4b693788e6b@bootlin.com>
-Date: Wed, 28 Jan 2026 11:03:41 +0100
+	s=arc-20240116; t=1769594671; c=relaxed/simple;
+	bh=cWXOogrWK0vb/sM5Gb08cOEf3p8t+pakkcmTytY6enE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z203aPfHH0EjxIXo4VLek5XTwCkcCaA1o1f8QKPNhpx6LcfLG8rE2FNurZgywshIII5bXpMz9H4B7YqKcSNiHg0qxAjnGPQL9LbWNl4/GUtSy4vP1uTNqOZSe89FsECdtliwxyBPWbqdD2nRbFjdAGPcjjyX8jDtTwSEy4M07jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vl2PQ-00049x-BJ; Wed, 28 Jan 2026 11:04:24 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vl2PQ-002tnW-2Q;
+	Wed, 28 Jan 2026 11:04:24 +0100
+Received: from pengutronix.de (p54b15bf8.dip0.t-ipconnect.de [84.177.91.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C04494DA0C6;
+	Wed, 28 Jan 2026 10:04:23 +0000 (UTC)
+Date: Wed, 28 Jan 2026 11:04:23 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	linux-can@vger.kernel.org
+Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
+Message-ID: <20260128-keen-owl-of-emphasis-ca7f18-mkl@pengutronix.de>
+X-AI: stop_reason: "refusal"
+References: <20260125201601.5018-1-socketcan@hartkopp.net>
+ <20260127174937.4c5fc226@kernel.org>
+ <67cb17f4-2f72-4847-aa04-3633f3d8df33@hartkopp.net>
+ <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: phy: micrel: fix clk warning when removing the
- driver
-To: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, florian.fainelli@broadcom.com
-Cc: imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260126081544.983517-1-wei.fang@nxp.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260126081544.983517-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="oysvqpl4c7f3mvsl"
+Content-Disposition: inline
+In-Reply-To: <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.56 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254182-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-254183-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[pengutronix.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,nxp.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B727E9F35B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strato-hosting.co.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:url,pengutronix.de:mid]
+X-Rspamd-Queue-Id: A8CDE9F436
 X-Rspamd-Action: no action
 
-Hi,
 
-On 26/01/2026 09:15, Wei Fang wrote:
-> Since the commit 25c6a5ab151f ("net: phy: micrel: Dynamically control
-> external clock of KSZ PHY"), the clock of Micrel PHY has been enabled
-> by phy_driver::resume() and disabled by phy_driver::suspend(). However,
-> devm_clk_get_optional_enabled() is used in kszphy_probe(), so the clock
-> will automatically be disabled when the device is unbound from the bus.
-> Therefore, this could cause the clock to be disabled twice, resulting
-> in clk driver warnings.
-> 
-> For example, this issue can be reproduced on i.MX6ULL platform, and we
-> can see the following logs when removing the FEC MAC drivers.
-> 
-> $ echo 2188000.ethernet > /sys/bus/platform/drivers/fec/unbind
-> $ echo 20b4000.ethernet > /sys/bus/platform/drivers/fec/unbind
-> [  109.758207] ------------[ cut here ]------------
-> [  109.758240] WARNING: drivers/clk/clk.c:1188 at clk_core_disable+0xb4/0xd0, CPU#0: sh/639
-> [  109.771011] enet2_ref already disabled
-> [  109.793359] Call trace:
-> [  109.822006]  clk_core_disable from clk_disable+0x28/0x34
-> [  109.827340]  clk_disable from clk_disable_unprepare+0xc/0x18
-> [  109.833029]  clk_disable_unprepare from devm_clk_release+0x1c/0x28
-> [  109.839241]  devm_clk_release from devres_release_all+0x98/0x100
-> [  109.845278]  devres_release_all from device_unbind_cleanup+0xc/0x70
-> [  109.851571]  device_unbind_cleanup from device_release_driver_internal+0x1a4/0x1f4
-> [  109.859170]  device_release_driver_internal from bus_remove_device+0xbc/0xe4
-> [  109.866243]  bus_remove_device from device_del+0x140/0x458
-> [  109.871757]  device_del from phy_mdio_device_remove+0xc/0x24
-> [  109.877452]  phy_mdio_device_remove from mdiobus_unregister+0x40/0xac
-> [  109.883918]  mdiobus_unregister from fec_enet_mii_remove+0x40/0x78
-> [  109.890125]  fec_enet_mii_remove from fec_drv_remove+0x4c/0x158
-> [  109.896076]  fec_drv_remove from device_release_driver_internal+0x17c/0x1f4
-> [  109.962748] WARNING: drivers/clk/clk.c:1047 at clk_core_unprepare+0xfc/0x13c, CPU#0: sh/639
-> [  109.975805] enet2_ref already unprepared
-> [  110.002866] Call trace:
-> [  110.031758]  clk_core_unprepare from clk_unprepare+0x24/0x2c
-> [  110.037440]  clk_unprepare from devm_clk_release+0x1c/0x28
-> [  110.042957]  devm_clk_release from devres_release_all+0x98/0x100
-> [  110.048989]  devres_release_all from device_unbind_cleanup+0xc/0x70
-> [  110.055280]  device_unbind_cleanup from device_release_driver_internal+0x1a4/0x1f4
-> [  110.062877]  device_release_driver_internal from bus_remove_device+0xbc/0xe4
-> [  110.069950]  bus_remove_device from device_del+0x140/0x458
-> [  110.075469]  device_del from phy_mdio_device_remove+0xc/0x24
-> [  110.081165]  phy_mdio_device_remove from mdiobus_unregister+0x40/0xac
-> [  110.087632]  mdiobus_unregister from fec_enet_mii_remove+0x40/0x78
-> [  110.093836]  fec_enet_mii_remove from fec_drv_remove+0x4c/0x158
-> [  110.099782]  fec_drv_remove from device_release_driver_internal+0x17c/0x1f4
-> 
-> After analyzing the process of removing the FEC driver, as shown below,
-> it can be seen that the clock was disabled twice by the PHY driver.
-> 
-> fec_drv_remove()
->   --> fec_enet_close()
->     --> phy_stop()
->       --> phy_suspend()
->         --> kszphy_suspend() #1 The clock is disabled
->   --> fec_enet_mii_remove()
->     --> mdiobus_unregister()
->       --> phy_mdio_device_remove()
->         --> device_del()
->           --> devm_clk_release() #2 The clock is disabled again
-> 
-> Therefore, devm_clk_get_optional() is used to fix the above issue. And
-> to avoid the issue mentioned by the commit 985329462723 ("net: phy:
-> micrel: use devm_clk_get_optional_enabled for the rmii-ref clock"), the
-> clock is enabled by clk_prepare_enable() to get the correct clock rate.
-> 
-> Fixes: 25c6a5ab151f ("net: phy: micrel: Dynamically control external clock of KSZ PHY")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+--oysvqpl4c7f3mvsl
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
+MIME-Version: 1.0
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+On 28.01.2026 10:07:13, Marc Kleine-Budde wrote:
+> > In fact patch 6 stuck in my providers mail system which responded this =
+to
+> > (only) patch 6 =C2=AF\_(=E3=83=84)_/=C2=AF
+> >
+> > 5.7.1 Refused by local policy. No SPAM please! (B-EX
+> > 155302::1769588601-AC38E895-223F95BA/10/71040183929) see https://www.st=
+rato-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered
+> > [MSG0011]
+> >
+> > As this could not been solved since Sunday I'll kindly ask Marc to send=
+ the
+> > attached v2 patchset (including your __u32 remark) to the mailing list,=
+ so
+> > that also the AI bot can take a look at it.
+>
+> I'll do. In the mean time, please have a look at b4, it has support for
+> sending patches via a web hook.
 
-Maxime
+Your ISP's mailserver also classified Patch#6 as spam when I was sending
+it :/
 
+| Reporting-MTA: dns; metis.whiteo.stw.pengutronix.de
+|
+| Action: failed
+| Final-Recipient: rfc822;socketcan@hartkopp.net
+| Status: 5.0.0
+| Remote-MTA: dns; smtpin.rzone.de
+| Diagnostic-Code: smtp; 550 5.7.1 Refused by local policy. No SPAM please!=
+ (B-EX 149500::1769594129-F202EB70-729865BA/10/71040183929) see https://www=
+=2Estrato-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered [=
+MSG0011]
 
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--oysvqpl4c7f3mvsl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAml53yMACgkQDHRl3/mQ
+kZy/fwf/VFWWOTWronZ0zENTA9JycJ+ktnG02/TfSrqONArP2/3Ed5YZhggvg3/w
+QZ10DJTRlFHu7MA/tbE0KgBn7qgSxe29MAvzqN6DuFRt8tJtWfj26tr9iDLCxoT1
+dgBbjY21hkITzANUpK/Jvonl1zrrTUcrOs0o+yQcnm6spgnGxwf/3hFmXZ4aGEIR
+cIp+QPi8/Z/wGx4fjqFJgrOUr5YPLqXCqbsMdvAFsI1auYyWtVGYzLyNGWcBiQt3
+CmWuTEIx+c+M8KmmmFm/ZqV2vPENjOB6d61c8HydTSZVbqshpI7zq0fDGBP+rB1w
+bAB1yt51jBeii/1ZQqpeZaivVPqyEQ==
+=7gJi
+-----END PGP SIGNATURE-----
+
+--oysvqpl4c7f3mvsl--
 
