@@ -1,170 +1,267 @@
-Return-Path: <netdev+bounces-254068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDNdIIhzeWkHxQEAu9opvQ
-	(envelope-from <netdev+bounces-254068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:25:12 +0100
+	id IL1IJbVzeWkHxQEAu9opvQ
+	(envelope-from <netdev+bounces-254069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:25:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A289C36F
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:25:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC249C380
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:25:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C1CF1300FB78
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:25:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 80E333006512
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92992298987;
-	Wed, 28 Jan 2026 02:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED8F296BB8;
+	Wed, 28 Jan 2026 02:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="L85p+LhG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9o+jUi4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF030262FC0;
-	Wed, 28 Jan 2026 02:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8994928C864;
+	Wed, 28 Jan 2026 02:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769567108; cv=none; b=DX6Zvsim5iYQ3T0kgwNWu9P84mpB8pVfcDolICARgYQZCkLuwG1O4FbBibzRwEN4P8WSha6BqM20uThog5nUtXDPG/PBuzgedyvCo2wnCtikMpMd/StBlOjUzWMeTCnAjIaOwKpEZv6H76v/aFb+LfIMk5r4mKDHrp8zF0/N200=
+	t=1769567154; cv=none; b=DI7wvRAxF4n6t97MS4nHPtcHYt4A6I5Tv+aD0lztoNvN1yiICtkqkaHHOzAJtYZNV/3R8wDiXqEo2dUDBxEniHMgY1YE+LlBOY7OTHrxAKwOcQ2kJf9/5QnE40mb4yOvXZjOBGknwvqotSs8YplWkR4ZQqBPlx23pdw7z7tONDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769567108; c=relaxed/simple;
-	bh=eM9ZN/OKZai+oZtqZCWSJ4uxxH+rHCAu/kuqcq/vPVo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oQtOi0jdDxEYQTA9HLwbYt8jFsFXgJCr2wOOyTjROo7HqrOCtwfnHAzQ9hqnTakmh6JTbWQuZZLmv5MsEE16lPtERD8Z3Lp6PdpgSoZe/E7E3ZczhxPZnYFvhYkkUqCu3qlFhueiuVqYXSoCYuiw/HOOzxP/oWCJTbqH1dFZwhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=L85p+LhG; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60RGPxYD1390280;
-	Tue, 27 Jan 2026 18:24:54 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=n8RuJ7EhcsLCxD3pC16aojCyLiwzb1MnjUwxPSvVLT0=; b=L85
-	p+LhGLB/68gsVNbyrPE9MPBhxJmq3KIhuiA+E5nSuvH4FBRrUJGNLjJW9uwoGjtG
-	Ba5Y/zn7okv14E/zKevoTffnN7WpFD5Cwa6/mdFjEcuTypZwOvjBMnLor1kEOOyT
-	SA60xZELasZ722aj2scLoGADZ3Td9QulTfgZu/aPxX85Xa0N/WTIDoOyrvD2rRt8
-	2VJh34f19tN/uzfryJHYMmLzUWTMgjOrPdrBNDLw1qhCFxRM+T9KKdFv/3BAJpFV
-	GwjW+E7pcdMBZYIp3fOp5JhXyX46MMBBHW+KC8iu65sAvdk3UCBNTzgUDlA75OuD
-	T4MdNmwKXvM58M8F5ww==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bx0qswdsu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jan 2026 18:24:54 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 27 Jan 2026 18:24:53 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 27 Jan 2026 18:24:53 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 172D43F70D1;
-	Tue, 27 Jan 2026 18:24:49 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH v2] octeontx2-pf: cn10k/cn20k: Update count_eot in NPA_LF_AURA_BATCH_FREE0
-Date: Wed, 28 Jan 2026 07:54:48 +0530
-Message-ID: <20260128022448.4402-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1769567154; c=relaxed/simple;
+	bh=Mk9opi2AbVbBe/HXNJ/y7O89/iCTOme85Hdg19/TiCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oLakOS5qogD3qUQ6KUOOhFJDnGSFLgp+fankuGHx64XE4nmzqQqkDPeT+FfFG17DVLzq3H3LKhsQjkyLiA49pnubucfqkTUxtj0S/dbVXzuoTVf7Sof1np95wBwSPZuFlcnOVFCs2RKdOIPUrvYJ/+Qgv8oqnXbkMLY6WxLJOBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9o+jUi4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34568C116C6;
+	Wed, 28 Jan 2026 02:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769567154;
+	bh=Mk9opi2AbVbBe/HXNJ/y7O89/iCTOme85Hdg19/TiCE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=G9o+jUi408eCNacnUmeDFNf/xEWzoBKRpV1QdqJIXBucZXBfPXgHnmbrnld7N2S+z
+	 2cA0cXhxrD4M8IZf89k+rndSotQUAPzsCXrOr2PjpXDhl7RvuL+aoqd/39cbtSGFm3
+	 oxg9Olnmo+Rvxn6VffmjYcOl9P3i3xL1hwUYJv6LnznKT4tWzdZc/K8RKjy42rOXfh
+	 q/97s6dI6PaiEmJmn5uC5N2DuQ5KwbnkK9DTv7SI8EK4t2Z4XuaEs03RH4sPtM9HBl
+	 BujDDi5NU/qLb1KrT6Fcl04UD7eXGM+QjOXRqpNbjBPg6ARqWeH74Rp6tFli6loO8B
+	 Ykd7K6HZBEAEQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: lukasz.majewski@mailbox.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	festevam@gmail.com,
+	linux-arm-kernel@lists.infradead.org,
+	s.hauer@pengutronix.de,
+	kernel@pengutronix.de,
+	horms@kernel.org,
+	shawnguo@kernel.org,
+	imx@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	wahrenst@gmx.net,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	andrew@lunn.ch
+Subject: Re: [net-next,v20,2/7] net: mtip: The L2 switch driver for imx287
+Date: Tue, 27 Jan 2026 18:25:49 -0800
+Message-ID: <20260128022549.4151341-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260126103400.1683125-3-lukasz.majewski@mailbox.org>
+References: <20260126103400.1683125-3-lukasz.majewski@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDAxNiBTYWx0ZWRfX67vlnxd4Awb0
- TfnyYAe8vQjzJ31WE9dXe87jv7zcnrlfKdA4ZIRx6VHK4IcSlXao4jW75eLNz1odI9hBOTXRjC8
- 0/UCGo41bVqlDJoeAL/ECuGcnIuTB5lKmNW7dmtXcFwiFh0N3F7QBU0fRaHETFVwXj5orzRP4zY
- Xb3gVg1b+vlTSGaPXGBfAHKAhVdCqiEqqxjkG7fY2gSbhEo+zSjX61Rk8rAYIVUnvVlaMVOElk2
- j8mCDrlFwOaVpP97/mPQqCYRgp7Y+M+Pxd/BAmUB5QouzeklRbOIlnJltbbxmb/V68q4dkIokZv
- fwWbIy/JuFYlW2nGZxHdyBEw+ei5fDAsdoKuqs69rODV7bVH//jpaABMytS7+Tni4p+pJz6DakG
- NlU/NtQVY2h6lc/LMowcpTGiDhMYNGW9b4TMTYspHs34ZYd041DIncn1pAT5ZudMAxXz2fZRV+4
- j6aEKuOPuhgsSRly7XQ==
-X-Authority-Analysis: v=2.4 cv=P9E3RyAu c=1 sm=1 tr=0 ts=69797376 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=gZj3l8r3B47-ThncwAQA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: dslz7DZFJYUqVIasm8TvRP8Z8KDe1KIO
-X-Proofpoint-GUID: dslz7DZFJYUqVIasm8TvRP8Z8KDe1KIO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-27_05,2026-01-27_03,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	TAGGED_FROM(0.00)[bounces-254068-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lists.infradead.org,pengutronix.de,lists.linux.dev,vger.kernel.org,gmx.net,redhat.com,davemloft.net,google.com,lunn.ch];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-254069-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,marvell.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[gakula@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: E0A289C36F
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0FC249C380
 X-Rspamd-Action: no action
 
-This patch updates the count_eot calculation for CN20K devices. 
-Where the count_eot feild extended to 2 bits, while maintaining
-CN10K compatibility where only bit 0 is used.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-v1-v2: Fix size value based on count_eot
+net: mtip: The L2 switch driver for imx287
 
- .../ethernet/marvell/octeontx2/nic/otx2_common.h    | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+This patch adds support for the More Than IP L2 switch embedded in the
+imx287 SoC. It creates a two-port switch driver that can be used
+interchangeably with the FEC driver.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 8cdfc36d79d2..255c7e2633bb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -789,8 +789,15 @@ static inline void __cn10k_aura_freeptr(struct otx2_nic *pfvf, u64 aura,
- 	tar_addr = (__force u64)otx2_get_regaddr(pfvf, NPA_LF_AURA_BATCH_FREE0);
- 	/* LMTID is same as AURA Id */
- 	val = (lmt_info->lmt_id & 0x7FF) | BIT_ULL(63);
--	/* Set if [127:64] of last 128bit word has a valid pointer */
--	count_eot = (num_ptrs % 2) ? 0ULL : 1ULL;
-+	/* Meaning of count_eot
-+	 * CN10K: count_eot = 0 if the number of pointers to free is even,
-+	 *	  count_eot = 1 if the number of pointers to free is odd.
-+	 *
-+	 * CN20K: count_eot represents the least significant 2 bits of the
-+	 *	  total number of valid pointers to free.
-+	 *        Example: if 7 pointers are freed (0b111), count_eot = 0b11.
-+	 */
-+	count_eot = (num_ptrs - 1) & 0x3ULL;
- 	/* Set AURA ID to free pointer */
- 	ptrs[0] = (count_eot << 32) | (aura & 0xFFFFF);
- 	/* Target address for LMTST flush tells HW how many 128bit
-@@ -800,7 +807,7 @@ static inline void __cn10k_aura_freeptr(struct otx2_nic *pfvf, u64 aura,
- 	 */
- 	if (num_ptrs > 2) {
- 		size = (sizeof(u64) * num_ptrs) / 16;
--		if (!count_eot)
-+		if (!(count_eot & 1))
- 			size++;
- 		tar_addr |=  ((size - 1) & 0x7) << 4;
- 	}
+> diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+> new file mode 100644
+> index 000000000000..03c5163d6508
+> --- /dev/null
+> +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+
+[ ... ]
+
+> +static void mtip_netif_stop_queues(struct switch_enet_private *fep)
+> +{
+> +	for (int i = 0; i < SWITCH_EPORT_NUMBER; i++)
+> +		netif_stop_queue(fep->ndev[0]);
+                                      ^^^
+
+Should this be fep->ndev[i] instead of fep->ndev[0]? The loop iterates
+with variable i but always uses index 0, so port 1's queue is never
+stopped.
+
+> +}
+> +
+> +static void mtip_netif_wake_queues(struct switch_enet_private *fep)
+> +{
+> +	for (int i = 0; i < SWITCH_EPORT_NUMBER; i++)
+> +		netif_wake_queue(fep->ndev[0]);
+                                      ^^^
+
+Same here - should this be fep->ndev[i]?
+
+> +}
+
+[ ... ]
+
+> +static int mtip_mii_probe(struct net_device *dev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	struct phy_device *phy_dev = NULL;
+> +	int port_idx = priv->portnum - 1;
+> +
+> +	if (fep->phy_np[port_idx]) {
+> +		phy_dev = of_phy_connect(dev, fep->phy_np[port_idx],
+> +					 &mtip_adjust_link, 0,
+> +					 fep->phy_interface[port_idx]);
+> +		if (!phy_dev) {
+> +			netdev_err(dev, "Unable to connect to phy\n");
+> +			return -ENODEV;
+> +		}
+> +	}
+> +
+> +	phy_set_max_speed(phy_dev, 100);
+                          ^^^^^^^
+
+If fep->phy_np[port_idx] is NULL (no phy-handle in DT for this port),
+the if block is skipped and phy_dev remains NULL. Can this cause a NULL
+pointer dereference in phy_set_max_speed()?
+
+> +	fep->phy_dev[port_idx] = phy_dev;
+
+[ ... ]
+
+> +static int mtip_parse_of(struct switch_enet_private *fep,
+> +			 struct device_node *np)
+> +{
+> +	struct device_node *p;
+> +	unsigned int port_num;
+> +	int ret = 0;
+> +
+> +	p = of_get_child_by_name(np, "ethernet-ports");
+> +
+> +	for_each_available_child_of_node_scoped(p, port) {
+> +		if (of_property_read_u32(port, "reg", &port_num))
+> +			continue;
+> +
+> +		if (port_num > SWITCH_EPORT_NUMBER) {
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This only validates the upper bound. If the device tree contains
+reg = <0>, would fep->mac[port_num - 1] access fep->mac[-1]? Perhaps
+the check should also verify port_num is at least 1?
+
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: The switch supports up to %d ports!\n",
+> +				__func__, SWITCH_EPORT_NUMBER);
+> +			goto of_get_err;
+> +		}
+> +
+> +		fep->n_ports = port_num;
+> +		ret = of_get_mac_address(port, &fep->mac[port_num - 1][0]);
+
+[ ... ]
+
+> +	ret = mtip_mii_init(fep, pdev);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "%s: Cannot init phy bus (%d)!\n", __func__,
+> +			ret);
+> +		goto dma_free_coherent_memory;
+> +	}
+> +
+> +	ret = mtip_ndev_init(fep, pdev);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "%s: Failed to create virtual ndev (%d)\n",
+> +			__func__, ret);
+> +		goto mdiobus_free_memory;
+> +	}
+
+[ ... ]
+
+> + mdiobus_free_memory:
+> +	mdiobus_free(fep->mii_bus);
+
+mtip_mii_init() calls of_mdiobus_register() which registers the bus.
+Should mdiobus_unregister() be called here before mdiobus_free()?
+Compare with mtip_mii_remove() which does call mdiobus_unregister().
+
+> + dma_free_coherent_memory:
+> +	dma_free_coherent(&fep->pdev->dev, PAGE_SIZE, fep->rx_bd_base,
+> +			  fep->bd_dma);
+> +	fep->rx_bd_base = NULL;
+> +	fep->tx_bd_base = NULL;
+> +
+> +	return ret;
+> +}
+> +
+> +static void mtip_sw_remove(struct platform_device *pdev)
+> +{
+> +	struct switch_enet_private *fep = platform_get_drvdata(pdev);
+> +
+> +	mtip_ndev_cleanup(fep);
+> +
+> +	mtip_mii_remove(fep);
+> +
+> +	timer_delete_sync(&fep->timer_mgnt);
+> +	platform_set_drvdata(pdev, NULL);
+> +}
+
+mtip_sw_probe() allocates DMA memory with dma_alloc_coherent() in
+mtip_switch_dma_init(), but mtip_sw_remove() does not appear to free it.
+Is this a memory leak on driver removal?
 -- 
-2.25.1
-
+pw-bot: cr
 
