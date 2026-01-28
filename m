@@ -1,221 +1,133 @@
-Return-Path: <netdev+bounces-254311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFijF0glemlk3QEAu9opvQ
-	(envelope-from <netdev+bounces-254311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:03:36 +0100
+	id uCS8G0Mlemlk3QEAu9opvQ
+	(envelope-from <netdev+bounces-254310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:03:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CF0A378B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:03:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 422D5A376A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:03:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A25003012407
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:03:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 23E57300AC8B
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5B2369965;
-	Wed, 28 Jan 2026 15:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E8C369220;
+	Wed, 28 Jan 2026 15:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CD01nf6J"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FexlDwVc";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="03BL+UsU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE43369993;
-	Wed, 28 Jan 2026 15:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174BA36921A;
+	Wed, 28 Jan 2026 15:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769612601; cv=none; b=Ypo4pi5lojDj1p/EbXNdq/+N1oHHB+MwMmmpIUL8UMI6u3SmmuB0puV72rS0/eSDd/Fi+G69LoFL1tBo66pc2kQOluu1cdQrHsHKlUD72G2UlodZeoj7P9J15YKMEnF3L2eWTygMMhHCvs7rqd/G50iOsAFccfwyGTwDzSC8h24=
+	t=1769612595; cv=none; b=I+b/jqYbe5rvAU+78aWXZBeh2+0w25+z8SYiz2GJqa1U0Ke1VILUe+8RR4iuPFih4aMx73hd5WVXhqlHXpLLjesRc9FYKgT62FMkNDs//yLXERbHU1+Jk4pDxDDpTCEg6sPXhkDvLRjBVIdKNm90I+aLstopiWQzHGldy9A4qHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769612601; c=relaxed/simple;
-	bh=QuVKlB6eN8V1XIu3FelRKHG398FLmSIM21NyvBg5vYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ifskQdz8KThZ85ju/0NaAlqwCcZHQLk1oK3Q4FFn4Qazxi+KsbFiNmJjFh3xgXN3wVIfWTii7A4Wdrsz+MWiJqP3vqcEgJYUQFu1NDVYUtXcFqsJkFxvqT5CiJOxLyO/EVWE+mwhWFIgk5e8iyy3POGKamqfb4LLDfYKjjGCkX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CD01nf6J; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769612589; x=1801148589;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=QuVKlB6eN8V1XIu3FelRKHG398FLmSIM21NyvBg5vYw=;
-  b=CD01nf6JTQVAD9bFhFLWeRNHKeCOZO6BSr9+7pCPHSM7no5XgXmr8CI5
-   mgiBNb+y1MMrN4gREdlwGTf+Wx+GaB7jwKnb/nTy83nbP7pzCyrtEJJcy
-   SSqCjyfuieV/BKa9H22zWC+elht02Qx87Hs/Sz7Yo2XEzlvs4U1DeVhu4
-   JmaAT/+hUua+Xv8XQp81JsLkfFy4P1ArKZ9fZoTswN4fs2Ck7jFGf3WMR
-   hb6dEP7sInVj2XkgbxI7biQa9svhIHnujA47bgIR5arv8nX/jGOV1AG39
-   hKMwW7T/jI7LllyHbwOQc9JzEferB9hcZ9+yXhM+j4iTxzLdWv7eiKIDo
-   w==;
-X-CSE-ConnectionGUID: kL2vQfAcSE2FRgj1XF6Anw==
-X-CSE-MsgGUID: 1YXmMBvjQ1ytE+Pm4Bc50w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11684"; a="96287143"
-X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="96287143"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 07:02:53 -0800
-X-CSE-ConnectionGUID: 36iywvRTRNGbF61rZgnJXQ==
-X-CSE-MsgGUID: RmydpcKVS8Cigw5XJGfpMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="213259839"
-Received: from mdroper-mobl2.amr.corp.intel.com (HELO kuha) ([10.124.220.19])
-  by orviesa005.jf.intel.com with SMTP; 28 Jan 2026 07:02:50 -0800
-Received: by kuha (sSMTP sendmail emulation); Wed, 28 Jan 2026 17:02:22 +0200
-Date: Wed, 28 Jan 2026 17:02:22 +0200
-From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
-Message-ID: <aXokxtlFTeZK8lP8@kuha>
-References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
- <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
- <aXdyll4KVOF6SWni@kuha>
- <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
- <aXjDENOsmWe5_VqS@kuha>
- <189d4a03f32ace3fd995596e8b5415ced6ae9c3a.camel@codeconstruct.com.au>
+	s=arc-20240116; t=1769612595; c=relaxed/simple;
+	bh=xRpDRDrCxNCkObRzzrBSD0I2Gthk1cFdrvbOvHKojPQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Ut5CA56T08K24rEql4u8c3/Dr4NGRBBG0gBEEyTJe3FQ56UYsv5wtEnJlgsmDJnFhfvYI7TFufBip8dWr8/6s+3+5WW/iRBB6LGXi+b37CUJVAd8eKI8DUBk5ybiqor0/4NkyfSWwLtE+bE1+VgB8XfI4sGODYLLRdPyQ+LXV4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FexlDwVc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=03BL+UsU; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: John Ogness <john.ogness@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1769612588;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xRpDRDrCxNCkObRzzrBSD0I2Gthk1cFdrvbOvHKojPQ=;
+	b=FexlDwVc0Fr+a940MD4BIoWOPtJfgWY4sjMYrBdP30oZGPDkOJWueJ22dhqPgyHhlGgkYQ
+	b90aSKqtimrqjxaoWPoLVvmOpLfNrvZcTW6GBMsp7k3RgAk1wvvceqCVGfNv6d5jNG4tR/
+	6L5fVuyOXMCsIxo4kPYPVEmSGi2hhmfiIDqpPTGj1c7gZJbtRjDW6loOlr+0qiCuHf92Uu
+	CgnlYRv14+0HYcq18IpQpZtc4q0xJ6Q5/usEW0D0j9OKem7I8C1b/grClXqcudBb83RUAr
+	+dtQNzPOsttMC4XlHrW9yhgkcbUhv1kIqdApz/fd4QI77z2UwwW86jVRmb3VlA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1769612588;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xRpDRDrCxNCkObRzzrBSD0I2Gthk1cFdrvbOvHKojPQ=;
+	b=03BL+UsU9msPWGNGeqI27WB7SKIcntI1A6e7M3TDMUzzp8IlxgOmOXEVVDbu60tK8jJQPt
+	Kf1oftIjUstpY0BQ==
+To: Breno Leitao <leitao@debian.org>, Breno Leitao <leitao@debian.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+ gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+ mpdesouza@suse.com, kernel-team@meta.com
+Subject: Re: [PATCH net-next v5 4/4] netconsole: Use printk context for CPU
+ and task information
+In-Reply-To: <20260128-nbcon-v5-4-93b4ddbc181a@debian.org>
+References: <20260128-nbcon-v5-0-93b4ddbc181a@debian.org>
+ <20260128-nbcon-v5-4-93b4ddbc181a@debian.org>
+Date: Wed, 28 Jan 2026 16:09:07 +0106
+Message-ID: <87a4xxlqz8.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <189d4a03f32ace3fd995596e8b5415ced6ae9c3a.camel@codeconstruct.com.au>
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254311-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254310-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	ASN_FAIL(0.00)[74.135.232.172.asn.rspamd.com:query timed out];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[john.ogness@linutronix.de,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[heikki.krogerus@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim]
-X-Rspamd-Queue-Id: 01CF0A378B
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[jogness.linutronix.de:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 422D5A376A
 X-Rspamd-Action: no action
 
-Hi Jeremy,
+On 2026-01-28, Breno Leitao <leitao@debian.org> wrote:
+> Use the CPU and task name captured at printk() time from
+> nbcon_write_context instead of querying the current execution context.
+> This provides accurate information about where the message originated,
+> rather than where netconsole happens to be running.
+>
+> For CPU, use wctxt->cpu instead of raw_smp_processor_id().
+>
+> For taskname, use wctxt->comm directly which contains the task
+> name captured at printk time.
+>
+> This change ensures netconsole outputs reflect the actual context that
+> generated the log message, which is especially important when the
+> console driver runs asynchronously in a dedicated thread.
+>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-There seems to be another a bit more severe issue with ARP and
-i2c-dev. Right now it seems that anything that can access the i2c
-character devices can silently (without the kernel having any idea
-what's going on) assign a conflicting address to a dynamically
-addressed ARP-device. Perhaps more importantly, the user space can
-remove access to an ARP-device by silently assigning a new address to
-it or simply by resetting its state with Prepare to ARP.
-
-That can happen accidentally, but it can also be done intentionally.
-
-Unless I've missed something, this really is a major threat that we
-have to solve. Right now the only idea that I have is that we simply
-prevent the i2c-dev from using the SMBus Default Address.
-
-Wed, Jan 28, 2026 at 06:28:24PM +0800, Jeremy Kerr wrote:
-> > Uh, no. You should only use interfaces like new_device with the
-> > devices that really can't be detected in kernel, which isn't the case
-> > here.
-> 
-> Who is deciding this "you should only" case? If the facility works, it's
-> suitable. You raise some good points that may mean it is not a suitable
-> approach for an ARP implementation, but we should still make sure we're
-> taking the right approach.
-> 
-> [You seem pretty defensive here? I'm not saying no to the kernel
-> implementation, just doing our homework before agreeing to it]
-
-I'm sorry if I sounded arrogant, it was not my intention. We don't
-control the user space, so we can not rely on it to enumerate devices
-like this. We will not be always even able to wait for user space with
-them. The kernel will also still need to be in full control of the
-device, also with the ARP protocol, in order to deal with things like
-conflicts. So consider for example hotplugged devices that are not
-ARP-capable. If the device has a conflicting address with a
-dynamically addressed ARP-device, then kernel really has to be able to
-assign new address to the ARP-device completely independently.
-
-> > So why would you want involve the user space at all since it would
-> > just add complexity and limitations without any benefits?
-> 
-> Because we have fewer risks implementing this in userspace.
-> 
-> As an example, you currently seem to have a stack information leak in
-> the proposed Get UDID implementation, which would be much less of an
-> issue for the equivalent protocol handling implemented in userspace.
-
-If there are bugs in the code then we need to fix them. Can you please
-comment to the patch that has the problem?
-
-> > - You still need to deliver the UDID to the kernel because of things
-> >   like the PEC flag, and the drivers will also need information from
-> >   it.
-> 
-> That seems like the main reason for requiring a kernel approach, in that
-> we need more information than just the assigned address. It's not
-> possible (at present) to specify the PEC flag through existing
-> interfaces, right?
-> 
-> For me, this would be the deciding factor to go for a kernel approach,
-> in that we otherwise cannot properly describe ARPed devices to the i2c
-> subsystem. We *could* push a new_device with a UDID, but I'm not sure
-> that's a great idea.
-> 
-> > - With the static (not hotplugged) devices you need to assign the
-> >   correct ACPI node (or what ever fwnode) to the ARP-device.
-> 
-> Is that possible at present? how are you planning to represent ARPed
-> devices in the DT - or more importantly, correlate DT (or other fwnode)
-> nodes to discovered devices?
-
-I don't know about DT, but with ACPI the devices are expected to
-either be fixed address devices or just use target address that
-matches to the address in the I2C Serial Bus Connection Resource
-Descriptor. The mapping is not yet done, but the idea is to just
-assign the detected UDID to the i2c-client that was already created
-from the fwnode.
-
-> > - When the device is hotplugged, you would need new ABI, like I think
-> >   you already noticed, but this really does not make any sense. We
-> >   simply don't need it, because the kernel can process this
-> >   information on its own very simply.
-> 
-> Even this "very simple" implementation may have bugs.
-> 
-> Assuming we go with a kernel approach: For the MCTP case, for full ARP
-> support of MCTP endpoints, we would still need to consume a hotplug
-> event that indicates that the device is available at its new address
-> - there is no kernel driver bound for the remote MCTP endpoints. This
-> event would be consumed by the (existing) MCTP infrastructure in order
-> to start MCTP enumeration. Is this something you have looked at
-> already? If so, if you can send an example of an actual event, I will
-> look at the mctpd part of this.
-
-We will have the address attribute file that the user space can use.
-If the address changes uevent will be send it.
-
-thanks,
-
--- 
-heikki
+Reviewed-by: John Ogness <john.ogness@linutronix.de>
 
