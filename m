@@ -1,81 +1,103 @@
-Return-Path: <netdev+bounces-254209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sCP+LRLweWnT1AEAu9opvQ
-	(envelope-from <netdev+bounces-254209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:16:34 +0100
+	id 8AH2AwnzeWnT1AEAu9opvQ
+	(envelope-from <netdev+bounces-254216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:29:13 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2604CA027B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:16:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24799A06A1
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:29:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B3AF83004CBE
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:16:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 622A5300BE8C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7CF2FE591;
-	Wed, 28 Jan 2026 11:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECEF34E776;
+	Wed, 28 Jan 2026 11:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="z+NB5rwR";
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="z+NB5rwR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DYCHvir0"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010040.outbound.protection.outlook.com [40.93.198.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE78227CB04;
-	Wed, 28 Jan 2026 11:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769598983; cv=none; b=pU5OAtQCk6pt1RHrdWenrX3nYj537+2cKCmY2/B4Y2Zj8+Y8yFf6cOTpOAgg09w/WJeMOfdt1YUZ09fiDZe2YEWgy37QTAF83CSr2H8xT3lXFroABzYbb+zzFSeABgLsuiZrZHb7qQHUadA4UINDkMRWzdGoeGJApqfx3sRLPio=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769598983; c=relaxed/simple;
-	bh=zmT41P/PEUmTJaTpMuvIsgHatzDSDnhYuLokfcqBJh4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jTPzbTBLFCfEIWt5XzR0c1YTmi6XRtA7OtwgBW6JFyinyKWKtbkLj/xnhPKyHS1CEmtGZ765Kmy27FpqWnlAWrc99I4rXSq8zaX0ZY4NKc9XZc0sD/1g28efZo0dVjv5JVK8v/+J+xFxTeZr4v0Ds/rFFWEHvW7YY7aAB95flIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=z+NB5rwR; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=z+NB5rwR; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=VPCF7oe3aSRZOrTu6fR7Jfgi4D8KmzGxI2cvCpAp8Do=;
-	b=z+NB5rwRt3Z7QKn8wj3ZEvYzDPP7tVfxoXHeBXmFDjHYmeyrkj90ccIHS/tOxjMlhK32oLOEz
-	k6HbUtRtE1gq8UgIZc2mFJhucMJfot9BEdjCExvwWVdL1uCZDnCh6z73D2aVc5g9QlNEKp6DH0t
-	gfI/tOsjG7eOb0N6DYuPHIA=
-Received: from canpmsgout11.his.huawei.com (unknown [172.19.92.148])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4f1KSw0xvQz1BFnl;
-	Wed, 28 Jan 2026 19:15:44 +0800 (CST)
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=VPCF7oe3aSRZOrTu6fR7Jfgi4D8KmzGxI2cvCpAp8Do=;
-	b=z+NB5rwRt3Z7QKn8wj3ZEvYzDPP7tVfxoXHeBXmFDjHYmeyrkj90ccIHS/tOxjMlhK32oLOEz
-	k6HbUtRtE1gq8UgIZc2mFJhucMJfot9BEdjCExvwWVdL1uCZDnCh6z73D2aVc5g9QlNEKp6DH0t
-	gfI/tOsjG7eOb0N6DYuPHIA=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4f1KPR6WZLzKm4b;
-	Wed, 28 Jan 2026 19:12:43 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9EE8440562;
-	Wed, 28 Jan 2026 19:16:12 +0800 (CST)
-Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 28 Jan 2026 19:16:12 +0800
-Received: from localhost.localdomain (10.50.85.175) by
- kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 28 Jan 2026 19:16:11 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <andrew+netdev@lunn.ch>,
-	<sdf@fomichev.me>, <kuniyu@google.com>, <skhawaja@google.com>,
-	<ahmed.zaki@intel.com>, <willemb@google.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<zhangchangzhong@huawei.com>, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: [BUG Report] BUG: soft lockup in ptype seq_file traversal
-Date: Wed, 28 Jan 2026 19:23:48 +0800
-Message-ID: <20260128112348.3950437-1-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF96221DB5;
+	Wed, 28 Jan 2026 11:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769599667; cv=fail; b=kBqkuZdPEEMnFy6j2Qt3cWo1zitNAgcCn6SMe31ODJSRhC5kzxwycdvIsu/3Ykva3bRA/js+PzTrITie4E/0gF8t3fxwvym7eXPMx/dSrMGxvDC4mhSfB392H2aA7hikR86N+mDR/jiQ/v+t9qoxsQKVzSwK0iM3m8b8RHTE600=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769599667; c=relaxed/simple;
+	bh=tqtxwkcgdOO9oPYo3qxVIErS5pN3t1jUljPH9CoKqd8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AGhoEAYXOrJs9rTQknNmWf3/RjDjqUt4+NMHKbqdBqfBNtEsRxIx20NB58yFUYAPt3eMCF/g+nqlIZiJSJJ+ul8qx8R0e1dWItDLE3Df+y88G9t2takZhrApVrB1JeUwWjVYofe8SRf3A9NFIQ/6ch3u+L2HR9sJuypFhi+aBP8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DYCHvir0; arc=fail smtp.client-ip=40.93.198.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XSkuyLKn0vX752ToiLab9ARju6QFFI7UtDFOFi7PvkWZojdpC5K/7KkDwdIpVmF4Q/kRxma34dS04eAKUlYOs43Xyh8Oe3/TeZ+l0FUpqswn+7XHI1PCflmmxRBE9gKtoEd8gNgZkg1IrbOnuVhvxlr/4h1cYuyJbl7ETt3YxxBThTvSptj2+kt+kKmAhwzvh/+edoOs/MPlXRAu1VEtVlNxa1PvTV9oHxAMPxg3UdXLvxHwrPAAqSTd0jpzi9FOD7wvhntoITCrlY+eQ1VWopJPyIzRNhBdvfE9zLutuRJ0CeS0DcQifLzV85u9kUyW943yH4+rYr1a7WUWyUEWLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FM2wI9zxQTLmuj8vb0eiP2ZMQh9x+hYZqZ4ojv8MAmQ=;
+ b=Rwl64jN0FOuDjKs9XekewLMmLcx2j2zlG5Wig/JKrrO1Q/a/H047AerWljc8qHudkEMFEeRHCOF/GmMbmfBYgWYIg5D56LNdn3aFFIWQOYpGLmFFaqrg+4ANsVmPt+vmbyclnUNme9EByjXV/kPEBTm1u9KiKZH+R9QDW4BPzg9e1bo+lhJA6l9kgjbpLQPYvtcV4nKjZAnKGKiGzk6EzesUbp33pBJAXUyvJHo4svrB+IPGjoJL8hZxSx0hU8gIkG4eVDR9hDzxGp/PeT7oMkprV1Uc6ssXzex9YolDCEb6Ld+371s5ScZG7zdNJZNL4yiUixP6rY6GXxq24vY8jA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FM2wI9zxQTLmuj8vb0eiP2ZMQh9x+hYZqZ4ojv8MAmQ=;
+ b=DYCHvir0xj/hHqKpgc6Y1bxRmB/SLamUQZYc84Gr1GE7hiYwpnCOTEFwAHwy5NUyBvOmyI36p2YRtORAfjp0tAxne1x3L3+02oimLgUwGx9QcNuwwO2nqmm+TTNbeISJURMSVlAZCEVgWX1pE6u/UsUhmNU+EFYF4zJEogZHDbjeEMCoSDaSNaKRHhqnw8EpQEEH9mELkjXvW9V6vTs+mpl4YLoyQmjvBu8mxBMtOSGJI9s9zcbtF4jFWxDrei9k0l5I05RI+YwvMDe9R30u9kj5VHv7b+fcvReAjjBCWykXEQvvMZ2k1IzhUaQUmWqOLAos/ky4/eNeanWUJaMlVg==
+Received: from SN7PR04CA0031.namprd04.prod.outlook.com (2603:10b6:806:120::6)
+ by CH3PR12MB9249.namprd12.prod.outlook.com (2603:10b6:610:1bc::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Wed, 28 Jan
+ 2026 11:27:38 +0000
+Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
+ (2603:10b6:806:120:cafe::9) by SN7PR04CA0031.outlook.office365.com
+ (2603:10b6:806:120::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.8 via Frontend Transport; Wed,
+ 28 Jan 2026 11:27:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9564.3 via Frontend Transport; Wed, 28 Jan 2026 11:27:37 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 28 Jan
+ 2026 03:27:25 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 28 Jan
+ 2026 03:27:23 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Wed, 28
+ Jan 2026 03:27:17 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
+	<moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
+	<cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Randy Dunlap
+	<rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, Krzysztof Kozlowski
+	<krzk@kernel.org>
+Subject: [PATCH net-next V7 00/14] devlink and mlx5: Support cross-function rate scheduling
+Date: Wed, 28 Jan 2026 13:25:30 +0200
+Message-ID: <20260128112544.1661250-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,189 +106,245 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemq200002.china.huawei.com (7.202.195.90)
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|CH3PR12MB9249:EE_
+X-MS-Office365-Filtering-Correlation-Id: ad8967d6-243f-41a1-d2f0-08de5e603dc4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014|7416014|30052699003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?TR0BvwKeI2sUeXzkTKsG3PjmOBqVIeIF+RAVVKVJacuQ2lH0UkaT0tP34B8o?=
+ =?us-ascii?Q?OYRLJpbEkA/Y9kIJTHYvd7ijclOgOuODpQcigqNPVTrBqA5yU2+LfAE4BwhS?=
+ =?us-ascii?Q?Gxcu/piBHD2PfjQQj06qmjKXw4/4oD/FI5e4HPNRa9gW6i0dvnhiGDQGXb4e?=
+ =?us-ascii?Q?XpXtwwDoziX68kpTXGa/kh714TXtNczbN7fGBUtkXQ8EKAnlzPj/SQ4874m1?=
+ =?us-ascii?Q?bzcDa3+1JRTpp8Le/gkhJGX0S6+zuMme/O/KPX67C/e7UcjsWADL+SI6tsnb?=
+ =?us-ascii?Q?DTrZO3Rw660TUI84+VIrE/AviJ6zMhIj0WjeM61MC75a7T0De1oDg1xO8JX1?=
+ =?us-ascii?Q?wPWBesY7r8TtBaiPO6vGsinY4o+UMT3PaALAB1dEQBJa/8W4aI+EQbGJpDos?=
+ =?us-ascii?Q?LCZnr771FZy3MlQu7N3/nYrEVaUmw3RPvmtmXg6XQi3x35JSMjzOkkviQ7Kg?=
+ =?us-ascii?Q?s1jPFS1Xx8C93OKxtIod0bYNxs5Gvz+ZGB7usAYNAGDajUOX5O2AMqtwh3MW?=
+ =?us-ascii?Q?kBGe+UDogCFsxSW3UzZqG3a0ZNblzfEItbKXH0mYxXuiROavWFwGaJS6GnWO?=
+ =?us-ascii?Q?5upAkiyg2xSNUITUXpi9aKkc0tt+IZbhliIQGaYo5dmgtUHfIlEwXjrGXnTO?=
+ =?us-ascii?Q?Zq72GKO0FNvi1zdMNgUy9NNMWklsJiNpoaw/oLMyt5Un4xH+aZEIgAKpc8sE?=
+ =?us-ascii?Q?tfC7gdXda1Tg8fbfdOnQV+eL14Xi+BdsK9Ut5Oi18OB6SJLjtejVmVLXxmFJ?=
+ =?us-ascii?Q?3R9bfFNP3eqRQmvotVdZgfzSQcGo9N3IBiMDA8P3mYS2+mUdnG3a+FkZSHcp?=
+ =?us-ascii?Q?Ei1Dx3urtrqvQ6KOP/5DObvXhMna7l76PzdhmdO5B4/cO3+jOzdt4741gI6S?=
+ =?us-ascii?Q?g93V3nJdp/3gQQCNa93bTmxtM7tqJG6p6176j+a0uYvyFjfDuv85ow4U3GIo?=
+ =?us-ascii?Q?xKipdQeKMJfeA1La8XuGYIQsfZuaMFIoUr67hlZUB4ZtSCJ0uyEe3jcK/EcV?=
+ =?us-ascii?Q?Xcp1Lx37DbSywmWqDluDgFjxDr7HI0iAYlj7/JX0DBzqT1w1cg5hIrAx8rMT?=
+ =?us-ascii?Q?ZEZU+vyI4sxnAJuro45BrirfolT/EXUIX3lBf79ofsPQ7YVmqyEseU5Qktz5?=
+ =?us-ascii?Q?7rdk5xepGdrmqUDP+w0BQ+4udlpeoAy1T33Nnt2JhJchqm4UuH/c6HkqkPAU?=
+ =?us-ascii?Q?vzzETKSnmNAly9vYBpBolny/whzfMpAeWwFKCPE6k4OODBq1j1MHIHgcJm5c?=
+ =?us-ascii?Q?4PniyLxx8TUsI442hu6GFllDBzzss93LDkgGjeM5TsxeIJLAfqHiM/tgRpEt?=
+ =?us-ascii?Q?tnChBHfLijJfwu8EDqJ+8zaqadhuY8p2At7GxI/S4NP6UM8T4iF+s+/70vRO?=
+ =?us-ascii?Q?U1793aYQ7pcEgbmOkZTaqusRR2819hgYcsfzucn+PQn8MotgcLuS9PRjiDNh?=
+ =?us-ascii?Q?B9ESu8doIDrCZWzfh1GQNPsFVjZd8hf+x/1vj6U1GCJ7oQ5ItdJKBt4U94HO?=
+ =?us-ascii?Q?prV5Xz3DH4TPT68BlxAXigIX7sbPMGztBIC4gB/Mh2dL7/6rpjHZEVIrLQm/?=
+ =?us-ascii?Q?mHEfjmP3lAXbDbESJ5WT/ACb/LDY9YwmvKWgZHAwxQRmHJE4wWLvb5eVAoQj?=
+ =?us-ascii?Q?A8ahh0qb3bNUvpc23pG+KjxhAjQtWVFZthSieGf6M6OjJhqAFByLEhSgcODg?=
+ =?us-ascii?Q?n3bC0A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014)(7416014)(30052699003)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 11:27:37.8047
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad8967d6-243f-41a1-d2f0-08de5e603dc4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA50.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9249
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-254209-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254216-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,lwn.net,nvidia.com,kernel.org,vger.kernel.org,infradead.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dongchenchen2@huawei.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	NEURAL_HAM(-0.00)[-0.998];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 2604CA027B
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 24799A06A1
 X-Rspamd-Action: no action
 
-Hello,
+Hi,
 
-syzkaller found a data race during concurrent traversal and modification
-of packet_type list that can lead to soft lockups.
+This series by Cosmin and Jiri adds support for cross-function rate
+scheduling in devlink and mlx5.
+See detailed explanation by Cosmin below [1].
 
-call trace as below:
+Regards,
+Tariq
 
-watchdog: BUG: soft lockup - CPU#3 stuck for 35819s! [test:611]
-Modules linked in:
-CPU: 3 UID: 0 PID: 611 Comm: test Tainted: G -
-L      6.19.0-rc4-00013-g7f98ab9da046 #2 NONE
-Tainted: [L]=SOFTLOCKUP
-Hardware name: linux,dummy-virt (DT)
-pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : __asan_load8+0x4c/0xc0
-lr : ptype_seq_next+0x3c/0x280
-Call trace:
- __asan_load8+0x4c/0xc0 (P)
- ptype_seq_next+0x3c/0x280
- traverse.part.0+0xe8/0x250
- seq_read_iter+0x49c/0x780
- seq_read+0x190/0x210
- proc_reg_read+0x110/0x180
- do_loop_readv_writev.part.0+0x184/0x208
- vfs_readv+0x290/0x300
- __arm64_sys_preadv+0x15c/0x1c8
- invoke_syscall+0x68/0x190
- el0_svc_common.constprop.0+0x11c/0x150
- do_el0_svc+0x3c/0x58
- el0_svc+0x40/0xf8
- el0t_64_sync_handler+0xa0/0xe8
- el0t_64_sync+0x1ac/0x1b0
 
-Root cause analysis:
-The ptype_head maintains two lists: net->ptype_all and dev->ptype_all.
-It determines whether the current pt belongs to the net->ptype_all or
-dev->ptype_all list by examining the value of pt->dev. When pt->dev does
-not correspond to the list that pt is currently in, the list head detection
-will no longer work correctly.
+[1]
+devlink objects support rate management for TX scheduling, which
+involves maintaining a tree of rate nodes that corresponds to TX
+schedulers in hardware. 'man devlink-rate' has the full details.
 
-The race condition occurs when ptype_seq_next() is traversing the list
-while another thread concurrently modifies the list by removing/readding
-packet_type entries.
+The tree of rate nodes is maintained per devlink object, protected by
+the devlink lock.
 
-CPU1				CPU2
-ptype_seq_next
-    nxt = pt->list.next;
-    //nxt = ptype_head(pt) = dev->ptype_all
-				packet_release/packet_notifier
-				    unregister_prot_hook(sk, false);
-				    //no sync wait, pt->list.next not change
-				    po->prot_hook.dev = NULL;
-    if (pt->dev) //check fail 
-        if (nxt != &pt->dev->ptype_all)
-            goto found;
-    if (nxt != &ptype_all) //check success
-        goto found;
-found:
-    return list_entry(nxt, struct packet_type, list);
-    //return list head to seq traversal
+There exists hardware capable of instantiating TX scheduling trees
+spanning multiple functions of the same physical device (and thus
+devlink objects) and therefore the current API and locking scheme is
+insufficient.
 
-reproduce flow:
-fd=socket(AF_PACKET)
-packet_bind(fd, dev)
-			cat /proc/net/ptype //can add delay to ptype_seq_next
-close(fd)
+This patch series changes the devlink rate implementation and API to
+allow supporting such hardware and managing TX scheduling trees across
+multiple functions of a physical device.
 
-I have a preliminary fix as bellow[1], but the ptype file traversal may
-block the psock release and dev unregister.
-Does anyone have a good idea to solve this problem?
+Modeling this requires having devlink rate nodes with parents in other
+devlink objects. A naive approach that relies on the current
+one-lock-per-devlink model is impossible, as it would require in some
+cases acquiring multiple devlink locks in the correct order.
 
------
-Best Regards,
-Dong Chenchen
+The solution proposed in this patch series consists of two parts:
 
-[1] 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 5870a9e514a5..ff92b8e8fc46 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2947,6 +2947,8 @@ struct packet_type {
-        struct list_head        list;
- };
- 
-+extern rwlock_t ptype_lock;
-+
- struct offload_callbacks {
-        struct sk_buff          *(*gso_segment)(struct sk_buff *skb,
-                                                netdev_features_t features);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 36dc5199037e..240702ac247e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -168,7 +168,9 @@
- #include "devmem.h"
- #include "net-sysfs.h"
- 
--static DEFINE_SPINLOCK(ptype_lock);
-+DEFINE_RWLOCK(ptype_lock);
-+EXPORT_SYMBOL(ptype_lock);
-+
- struct list_head ptype_base[PTYPE_HASH_SIZE] __read_mostly;
- 
- static int netif_rx_internal(struct sk_buff *skb);
-@@ -609,9 +611,9 @@ void dev_add_pack(struct packet_type *pt)
-        if (WARN_ON_ONCE(!head))
-                return;
- 
--       spin_lock(&ptype_lock);
-+       write_lock(&ptype_lock);
-        list_add_rcu(&pt->list, head);
--       spin_unlock(&ptype_lock);
-+       write_unlock(&ptype_lock);
- }
- EXPORT_SYMBOL(dev_add_pack);
- 
-@@ -636,7 +638,7 @@ void __dev_remove_pack(struct packet_type *pt)
-        if (!head)
-                return;
- 
--       spin_lock(&ptype_lock);
-+       write_lock(&ptype_lock);
- 
-        list_for_each_entry(pt1, head, list) {
-                if (pt == pt1) {
-@@ -647,7 +649,7 @@ void __dev_remove_pack(struct packet_type *pt)
- 
-        pr_warn("dev_remove_pack: %p not found\n", pt);
- out:
--       spin_unlock(&ptype_lock);
-+       write_unlock(&ptype_lock);
- }
- EXPORT_SYMBOL(__dev_remove_pack);
- 
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index 70e0e9a3b650..e6234f8e243f 100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -213,6 +213,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
-        __acquires(RCU)
- {
-        rcu_read_lock();
-+       read_lock(&ptype_lock);
-        return *pos ? ptype_get_idx(seq, *pos - 1) : SEQ_START_TOKEN;
- }
- 
-@@ -274,6 +275,7 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- static void ptype_seq_stop(struct seq_file *seq, void *v)
-        __releases(RCU)
- {
-+       read_unlock(&ptype_lock);
-        rcu_read_unlock();
- }
+1. Representing the underlying physical NIC as a shared devlink object
+   on the faux bus and nesting all its PF devlink instances in it.
+
+2. Changing the devlink rate implementation to store rates in this
+   shared devlink object, if it exists, and use its lock to protect
+   against concurrent changes of the scheduling tree.
+
+With these in place, cross-esw scheduling support is added to mlx5.
+The neat part about this approach is that it works for SFs as well,
+which are already nested in their parent PF instances. So with this
+series, complex scheduling trees spanning multiple SFs across multiple
+PFs of the same NIC can now be supported.
+
+V1 of this patch series was sent a long time ago [2], using a different
+approach of storing rates in a shared rate domain with special locking
+rules. This new approach uses standard devlink instances and nesting.
+
+Patches:
+
+devlink rate changes for cross-device TX scheduling:
+devlink: Reverse locking order for nested instances
+documentation: networking: add shared devlink documentation
+devlink: Add helpers to lock nested-in instances
+devlink: Refactor devlink_rate_nodes_check
+devlink: Decouple rate storage from associated devlink object
+devlink: Add parent dev to devlink API
+devlink: Allow parent dev for rate-set and rate-new
+devlink: Allow rate node parents from other devlinks
+devlink: introduce shared devlink instance for PFs on same chip
+
+mlx5 support for cross-device TX scheduling:
+net/mlx5: Add a shared devlink instance for PFs on same chip
+net/mlx5: Expose a function to clear a vport's parent
+net/mlx5: Store QoS sched nodes in the sh_devlink
+net/mlx5: qos: Support cross-device tx scheduling
+net/mlx5: Document devlink rates
+
+[2] https://lore.kernel.org/netdev/20250213180134.323929-1-tariqt@nvidia.com/
+
+v7:
+- Fix file truncate issue (AI-agent).
+- Moved new handlers and parent dev policy to next patch (Simon Horman).
+- Link to V6: https://lore.kernel.org/netdev/1769340723-14199-1-git-send-email-tariqt@nvidia.com/T/#u
+
+V6:
+- Really stopped using __free (Krzysztof Kozlowski).
+- Fixed incorrect state->idx usage in rate dump (AI tool).
+- Merged patches V5.12 and V5.14 to close a bisect bug (AI tool).
+- Link to V5: https://lore.kernel.org/all/1768895878-1637182-1-git-send-email-tariqt@nvidia.com/
+
+V5:
+- Made parts of shd generic devlink infra (Jakub).
+- Stopped using __free (Krzysztof Kozlowski).
+- Moved some generated netlink in the correct patch (Simon Horman).
+- Addressed cleanup bug (Jakub).
+- Clarified uses of shared devlink in documentation.
+
+V4:
+- Fix typo in documentation (Randy Dunlap).
+
+V3:
+- Remove mistakenly repeated devlink interface in docs (Jakub).
+- Add Jiri's review tags on ML.
+
+V2:
+- Rebase.
+- Add Jiri's review tags on ML.
+
+Cosmin Ratiu (11):
+  devlink: Reverse locking order for nested instances
+  devlink: Add helpers to lock nested-in instances
+  devlink: Refactor devlink_rate_nodes_check
+  devlink: Decouple rate storage from associated devlink object
+  devlink: Add parent dev to devlink API
+  devlink: Allow parent dev for rate-set and rate-new
+  devlink: Allow rate node parents from other devlinks
+  net/mlx5: Expose a function to clear a vport's parent
+  net/mlx5: Store QoS sched nodes in the sh_devlink
+  net/mlx5: qos: Support cross-device tx scheduling
+  net/mlx5: Document devlink rates
+
+Jiri Pirko (3):
+  documentation: networking: add shared devlink documentation
+  devlink: introduce shared devlink instance for PFs on same chip
+  net/mlx5: Add a shared devlink instance for PFs on same chip
+
+ Documentation/netlink/specs/devlink.yaml      |  22 +-
+ .../networking/devlink/devlink-port.rst       |   2 +
+ .../networking/devlink/devlink-shared.rst     |  95 +++++
+ Documentation/networking/devlink/index.rst    |   1 +
+ Documentation/networking/devlink/mlx5.rst     |  33 ++
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |   1 +
+ .../mellanox/mlx5/core/esw/devlink_port.c     |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 332 ++++++++----------
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.h |   3 -
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/main.c    |  17 +
+ .../ethernet/mellanox/mlx5/core/sh_devlink.c  |  99 ++++++
+ .../ethernet/mellanox/mlx5/core/sh_devlink.h  |  14 +
+ include/linux/mlx5/driver.h                   |   1 +
+ include/net/devlink.h                         |  13 +
+ include/uapi/linux/devlink.h                  |   2 +
+ net/devlink/Makefile                          |   2 +-
+ net/devlink/core.c                            |  48 ++-
+ net/devlink/dev.c                             |   7 +-
+ net/devlink/devl_internal.h                   |  11 +-
+ net/devlink/netlink.c                         |  67 +++-
+ net/devlink/netlink_gen.c                     |  23 +-
+ net/devlink/netlink_gen.h                     |   8 +
+ net/devlink/rate.c                            | 290 +++++++++++----
+ net/devlink/sh_dev.c                          | 163 +++++++++
+ 27 files changed, 985 insertions(+), 299 deletions(-)
+ create mode 100644 Documentation/networking/devlink/devlink-shared.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
+ create mode 100644 net/devlink/sh_dev.c
+
+
+base-commit: 239f09e258b906deced5c2a7c1ac8aed301b558b
+-- 
+2.44.0
+
 
