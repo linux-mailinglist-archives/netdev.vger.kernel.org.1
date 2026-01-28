@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-254441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIxoFDl2emmE6wEAu9opvQ
-	(envelope-from <netdev+bounces-254441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:48:57 +0100
+	id uMefA6R2emmE6wEAu9opvQ
+	(envelope-from <netdev+bounces-254443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:50:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04D3A8D14
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:48:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 867CFA8D39
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:50:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA23E3091961
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:45:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2F9430BB324
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2EA37647B;
-	Wed, 28 Jan 2026 20:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3306D376468;
+	Wed, 28 Jan 2026 20:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jrnG0/8S"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oY6cfJn1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E331228CA9
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28C3376493;
+	Wed, 28 Jan 2026 20:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769633154; cv=none; b=dtE1OsaaqJ9vtX6oI+FhX92p/Q+TvDTfEUXwJS8kJ/zZXcpsRzPXUIp/S7oPDmI5ECZ4Q1UiiT73M2gdev8QSSdh99FcFEf6bFWMnI5V8srsP7uwlrNm7ONd7w0EjFZ9QIaYISVaFWKvNq7e4aKgF0sAxfzWYn/9p6IzuGQZB7U=
+	t=1769633161; cv=none; b=IsO+2QeSB/IQ8aG5WCmt9kysMrzM+aKIAfJqha5QknRj+LJPVWo9Z+7J4KMwwATtNEOg5hLbMBX1ZVsEQB6VMf0bjGf2QoQyLoTbqI+PPQOSHyOta7uAnCkavG6tvH4foCuIjufdQHh750lItTEPfSC9zd4MvrqxJpU3tvvBbG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769633154; c=relaxed/simple;
-	bh=OxrKQGgl7jwc6cMbSQSoC3uDdqvUZmwAerGyXvmUbEc=;
+	s=arc-20240116; t=1769633161; c=relaxed/simple;
+	bh=LIOzkeb8MmRc7Gcgsk5W2lA3KQk1ZvuYPSWHZdB8sG8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C6KgHmhNXUxY0wbHHK2FcX0TYnoscZtILr9hHBcJZuM3JbQck3XEt24HJjGtU4P4LYkAeptgobgWGWKzjsbBPQXUXM5sg1yhPouMXaBzeyZd7UNzyA76XzPvPrtOLMpLqocqqNBFBcOsucZDXi2PXSYNdDeejrWPMbiXMzzrAXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jrnG0/8S; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version; b=QXO0koQKA3hl3+4UF6fbMZlGO/4ah9kS+oR0u5Vw+QfZhpTEGifig33jaHCRGQ4hiFU0dYZrSDv3C/40UMDRYs9n7NDJdYKDHpZPldISYVbmaBJTwpitodGnnfTGYY+pcYwNCe6RbW0JbZlX67gMgYe2FiKED6vsChWYY8TPO2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oY6cfJn1; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id D4FC81A2AD4;
-	Wed, 28 Jan 2026 20:45:51 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 305CC1A2AD7;
+	Wed, 28 Jan 2026 20:45:54 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9F6456071F;
-	Wed, 28 Jan 2026 20:45:51 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6FCC6119A8838;
-	Wed, 28 Jan 2026 21:45:48 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 052556071F;
+	Wed, 28 Jan 2026 20:45:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C03AF119A882A;
+	Wed, 28 Jan 2026 21:45:50 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769633150; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1769633152; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=ilIZ+rjhaF0/E9ISqt8iyKSvoUti0FNYVSjKP6RBlgI=;
-	b=jrnG0/8SQy9RU+SRidXD0essJhZRkFEqPNZhMltH+NKycvwcacgiqVjO6ywcK5peFWQ8vU
-	8qDUnT51LJagJxyObEsj7AZy08YEy/WZr9Hcg/oD4epDK31mx51G7IM32BMZT9zhRLyeaV
-	6j9S2drgg/BpmFyoMdJvbOGdZB4lsAL0Y3+lLXdVtY2xzVDhpSaHksvxws6Q0WDoJDEWkF
-	/ux7byRvTLgmR1T3HG07RZT6XN1sQVYz3uec/PNQ9VoEWAKZGjwp5kN2X9neg3qAhYhFBo
-	MBdmxdY8iL9aV0EEEqz/ua7ev/ml7e8WxROGoFqrFdD6OJ/XjqWOvU4O2sPcDw==
+	bh=kXnbfwlkpR6I07iWNxCuRlXJndeAV79de3SlIqZ50qc=;
+	b=oY6cfJn19CeOZ+pFwhqBv6wBZvznvX/Ievdgz+e9QBfM+UjiHVdMOEHhzIlRQGk4W/tnPH
+	QD/MjzSOgNnTUmxgbtDtS7qloJ0KqkLd9iaQAGYvRBd0v6D/hIDUnTs1TMKNOh/ZBuGT4k
+	wKb5rFn8o9n4Xg5Sl/7n1ZKQ3eku9Kd0NdaCpj6fNXq4+E8CbBepFYL6x/J7XaxbexIniG
+	PHf0Hoj9ZYZ1P/SYUatsp565znNnTo4v/h/lfl3EShdsAn2A3oqyNae7Q3UIn+ldVWh9Vv
+	vehNIGPonyEwDzM9n0JWgC+7kN83njuBWKQwK+4Uv5iMpYnVvHym6XAp4gtF0g==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -76,9 +76,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next v2 05/12] net: phy: Create SFP phy_port before registering usptream
-Date: Wed, 28 Jan 2026 21:45:18 +0100
-Message-ID: <20260128204526.170927-6-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v2 06/12] net: sfp: Add a sfp-bus ops when connecting a module without PHY
+Date: Wed, 28 Jan 2026 21:45:19 +0100
+Message-ID: <20260128204526.170927-7-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20260128204526.170927-1-maxime.chevallier@bootlin.com>
 References: <20260128204526.170927-1-maxime.chevallier@bootlin.com>
@@ -98,13 +98,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-254441-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254443-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
@@ -119,104 +119,141 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E04D3A8D14
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 867CFA8D39
 X-Rspamd-Action: no action
 
-When dealing with PHY-driver SFP, we create a phy_port representing the
-SFP bus when we know we have such a bus.
+The SFP bus infrastructure notifies its upstream when a PHY device was
+discovered on the module. However, we don't have any indication when a
+module with no PHY was inserted, except for the .insert() and .start()
+notifications.
 
-We can move the port creation before registering the sfp upstream ops,
-as long as we know the SFP bus is there. This will allow passing the
-phy_port along with the upstream information to the SFP bus.
+We want to keep track of the SFP module's capabilities using phy_port.
+When the module contains an embedded PHY, the PHY driver will expose a
+phy_port for it. However when there's no PHY, we have no hook to
+populate the phy_port, so let's introduce one. It is called when we
+have parsed the module's caps, applied the fixups, tried and failed to
+probe for a PHY.
+
+This will allow the bus' upstream to create the corresponding port, and
+register it to the topology.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy_device.c | 42 ++++++++++++++++++++++++------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
+ drivers/net/phy/sfp-bus.c | 20 ++++++++++++++++++++
+ drivers/net/phy/sfp.c     | 14 ++++++++++++++
+ drivers/net/phy/sfp.h     |  2 ++
+ include/linux/sfp.h       |  5 +++++
+ 4 files changed, 41 insertions(+)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 8a3eb1839a3d..49696b1a2f13 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1665,13 +1665,13 @@ static void phy_del_port(struct phy_device *phydev, struct phy_port *port)
- 	phydev->n_ports--;
+diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
+index b945d75966d5..a3d9e28badd0 100644
+--- a/drivers/net/phy/sfp-bus.c
++++ b/drivers/net/phy/sfp-bus.c
+@@ -753,6 +753,26 @@ void sfp_remove_phy(struct sfp_bus *bus)
  }
+ EXPORT_SYMBOL_GPL(sfp_remove_phy);
  
--static int phy_setup_sfp_port(struct phy_device *phydev)
-+static struct phy_port *phy_setup_sfp_port(struct phy_device *phydev)
- {
- 	struct phy_port *port = phy_port_alloc();
- 	int ret;
- 
- 	if (!port)
--		return -ENOMEM;
-+		return ERR_PTR(-ENOMEM);
- 
- 	port->parent_type = PHY_PORT_PHY;
- 	port->phy = phydev;
-@@ -1686,10 +1686,12 @@ static int phy_setup_sfp_port(struct phy_device *phydev)
- 	 * when attaching the port to the phydev.
- 	 */
- 	ret = phy_add_port(phydev, port);
--	if (ret)
-+	if (ret) {
- 		phy_port_destroy(port);
-+		return ERR_PTR(ret);
-+	}
- 
--	return ret;
-+	return port;
- }
- 
- /**
-@@ -1698,22 +1700,34 @@ static int phy_setup_sfp_port(struct phy_device *phydev)
-  */
- static int phy_sfp_probe(struct phy_device *phydev)
- {
-+	struct phy_port *port;
- 	struct sfp_bus *bus;
--	int ret = 0;
-+	int ret;
- 
--	if (phydev->mdio.dev.fwnode) {
--		bus = sfp_bus_find_fwnode(phydev->mdio.dev.fwnode);
--		if (IS_ERR(bus))
--			return PTR_ERR(bus);
-+	if (!phydev->mdio.dev.fwnode)
-+		return 0;
++int sfp_module_connect_nophy(struct sfp_bus *bus)
++{
++	const struct sfp_upstream_ops *ops = sfp_get_upstream_ops(bus);
 +
-+	bus = sfp_bus_find_fwnode(phydev->mdio.dev.fwnode);
-+	if (IS_ERR(bus))
-+		return PTR_ERR(bus);
++	if (ops && ops->connect_nophy)
++		return ops->connect_nophy(bus->upstream);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(sfp_module_connect_nophy);
++
++void sfp_module_disconnect_nophy(struct sfp_bus *bus)
++{
++	const struct sfp_upstream_ops *ops = sfp_get_upstream_ops(bus);
++
++	if (ops && ops->disconnect_nophy)
++		ops->disconnect_nophy(bus->upstream);
++}
++EXPORT_SYMBOL_GPL(sfp_module_disconnect_nophy);
++
+ void sfp_link_up(struct sfp_bus *bus)
+ {
+ 	const struct sfp_upstream_ops *ops = sfp_get_upstream_ops(bus);
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 47f095bd91ce..050952bc7bce 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -1918,6 +1918,11 @@ static int sfp_sm_probe_phy(struct sfp *sfp, int addr, bool is_c45)
+ 	return 0;
+ }
  
--		phydev->sfp_bus = bus;
-+	phydev->sfp_bus = bus;
- 
--		ret = sfp_bus_add_upstream(bus, phydev, &sfp_phydev_ops);
--		sfp_bus_put(bus);
-+	if (bus) {
-+		port = phy_setup_sfp_port(phydev);
-+		if (IS_ERR(port)) {
-+			sfp_bus_put(bus);
-+			return PTR_ERR(port);
++static int sfp_sm_connect_nophy(struct sfp *sfp)
++{
++	return sfp_module_connect_nophy(sfp->sfp_bus);
++}
++
+ static void sfp_sm_link_up(struct sfp *sfp)
+ {
+ 	sfp_link_up(sfp->sfp_bus);
+@@ -2646,6 +2651,8 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 			sfp_module_stop(sfp->sfp_bus);
+ 		if (sfp->mod_phy)
+ 			sfp_sm_phy_detach(sfp);
++		else
++			sfp_module_disconnect_nophy(sfp->sfp_bus);
+ 		if (sfp->i2c_mii)
+ 			sfp_i2c_mdiobus_destroy(sfp);
+ 		sfp_module_tx_disable(sfp);
+@@ -2749,6 +2756,13 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 			sfp_sm_next(sfp, SFP_S_FAIL, 0);
+ 			break;
+ 		}
++		if (!sfp->mod_phy) {
++			ret = sfp_sm_connect_nophy(sfp);
++			if (ret) {
++				sfp_sm_next(sfp, SFP_S_FAIL, 0);
++				break;
++			}
 +		}
- 	}
+ 		if (sfp_module_start(sfp->sfp_bus)) {
+ 			sfp_sm_next(sfp, SFP_S_FAIL, 0);
+ 			break;
+diff --git a/drivers/net/phy/sfp.h b/drivers/net/phy/sfp.h
+index 879dff7afe6a..02f3814aac84 100644
+--- a/drivers/net/phy/sfp.h
++++ b/drivers/net/phy/sfp.h
+@@ -37,6 +37,8 @@ int sfp_module_insert(struct sfp_bus *bus, const struct sfp_eeprom_id *id,
+ void sfp_module_remove(struct sfp_bus *bus);
+ int sfp_module_start(struct sfp_bus *bus);
+ void sfp_module_stop(struct sfp_bus *bus);
++int sfp_module_connect_nophy(struct sfp_bus *bus);
++void sfp_module_disconnect_nophy(struct sfp_bus *bus);
+ struct sfp_bus *sfp_register_socket(struct device *dev, struct sfp *sfp,
+ 				    const struct sfp_socket_ops *ops);
+ void sfp_unregister_socket(struct sfp_bus *bus);
+diff --git a/include/linux/sfp.h b/include/linux/sfp.h
+index 5c71945a5e4d..1c18de1eb268 100644
+--- a/include/linux/sfp.h
++++ b/include/linux/sfp.h
+@@ -561,6 +561,9 @@ struct sfp_module_caps {
+  *   on the module.
+  * @disconnect_phy: called when a module with an I2C accessible PHY has
+  *   been removed.
++ * @connect_nophy: called when it was established that the connected module
++ *		   doesn't have an I2C PHY accessible.
++ * @disconnect_nophy: called when the PHY-less module has been removed.
+  */
+ struct sfp_upstream_ops {
+ 	void (*attach)(void *priv, struct sfp_bus *bus);
+@@ -573,6 +576,8 @@ struct sfp_upstream_ops {
+ 	void (*link_up)(void *priv);
+ 	int (*connect_phy)(void *priv, struct phy_device *);
+ 	void (*disconnect_phy)(void *priv, struct phy_device *);
++	int (*connect_nophy)(void *priv);
++	void (*disconnect_nophy)(void *priv);
+ };
  
--	if (!ret && phydev->sfp_bus)
--		ret = phy_setup_sfp_port(phydev);
-+	ret = sfp_bus_add_upstream(bus, phydev, &sfp_phydev_ops);
-+	sfp_bus_put(bus);
-+
-+	if (ret && port) {
-+		phy_del_port(phydev, port);
-+		phy_port_destroy(port);
-+	}
- 
- 	return ret;
- }
+ #if IS_ENABLED(CONFIG_SFP)
 -- 
 2.49.0
 
