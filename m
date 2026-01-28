@@ -1,59 +1,74 @@
-Return-Path: <netdev+bounces-254122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGPbJhW1eWk0ygEAu9opvQ
-	(envelope-from <netdev+bounces-254122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:04:53 +0100
+	id 2Lq8GRO3eWlHygEAu9opvQ
+	(envelope-from <netdev+bounces-254123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:13:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24339D93F
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:04:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCDAD9D9A3
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:13:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E1FF30107DF
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:04:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 25B143003367
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AAC29A30E;
-	Wed, 28 Jan 2026 07:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAF1325714;
+	Wed, 28 Jan 2026 07:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="hJfrQG84"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="N41nvVV1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645C2126BF7;
-	Wed, 28 Jan 2026 07:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A770A302176;
+	Wed, 28 Jan 2026 07:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769583846; cv=none; b=saNIzsjSnz/cIafcmp4RHaQdlXg8r5ZjD84B9/lk+EbVVHH7OiN1ALMnIQI1YKjQWaWPu24kzLtwD/6rCgaOhwIkPDOKieg5sRfgsLeG1z3hpGCFJzKHy/hZey+ghn2CeVDURP+WaUoBp3eNbWRPDAGAgHfbOGzQXGTmoBRAi+o=
+	t=1769584399; cv=none; b=l9VyBLSlDlQpJjFvOM782kQXbWAVr2TRjMad6y2A8bzwStrzEcadfa5JS4m/iRJsm7S6Ri6ObGjVuJHEXbtGCQO2NmVb5XKMwWWK2XBotd+56R04HmlCORsZNUHndI0Mo1JSQXPDSzXlxR0OpMCDJqp2FtH01DXC5oVuX1aN/nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769583846; c=relaxed/simple;
-	bh=S7YYmuNjsRxMp9VgLETUX1LGfykzsX4LVW6Agk9A1Wo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bjvfgm+/rnL85EWBy7jg8C7nmAMNRDMATjvjGVVErvvvEiwsEBFmTxe7WYSPR8E1EdgFMZZqACF2OwjhHyV6ENuc6/gMyOTazUDczZTYbRY8lXq7Q3zg2FXlB6zpqUZh44dqeDpXQJRMu1LKzXEvo1NTRYZwUNREfDdHK7Kq0Qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=hJfrQG84; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769583841; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=+ODM/O7PFYYeg5W3jxjQDZCsYy5qNj5gMWZpfw+2/2k=;
-	b=hJfrQG847pkNxSa9NUJ4lPMS71L1ISkyEkVfO9K1K+sSYMqtUvKwa55VeMHAYGmqHZYj79YdLQS3HjocvdQ+1Q44jl3ba7R/WlwbI/Eu2rbNoilX05hvedtjGrvs5LfPT160D1n6bEqL6prEtw+f6Rjsw4mZ17AvmASIBdUjMDI=
-Received: from localhost(mailfrom:fengwei_yin@linux.alibaba.com fp:SMTPD_---0Wy2Y7Bk_1769583840 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 28 Jan 2026 15:04:01 +0800
-From: fengwei_yin@linux.alibaba.com
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: fengwei_yin@linux.alibaba.com
-Subject: [PATCH] net: procfs: Fix RCU stall and soft lockup in ptype_seq_next()
-Date: Wed, 28 Jan 2026 15:03:59 +0800
-Message-ID: <20260128070359.6762-1-fengwei_yin@linux.alibaba.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1769584399; c=relaxed/simple;
+	bh=1HO+VYJPgXVP389jTvzxn3k+rd+JHVBxbBDQg0ClN5c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QvEXR9TiIlFDk7The3OlaA8FpLTuMi5CrC5cyAzd1a7UetPXPNUmbFx3xVTTlzouRLsWxlzar4Xd9AKBQ39tSNBq4TTENhr/B/xFq7Q7Y8V2nFIjpk4p6GGv4DWI/NPfEzlGSAcxHDP8gqaTmpnAUf+wk36BMAjU0RA4Tp39E6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=N41nvVV1; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60RJ2jpm1821718;
+	Tue, 27 Jan 2026 23:12:55 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=VlbJJvK6IpboRpYz4UH4gsQ
+	2zDfM4VZO4JDYTauWRrw=; b=N41nvVV113C98nf2X+EOXIcqepfXcWS9dYuUTdY
+	SmF5nZs4n+zYUhGuW2r/4U2TJ3vMy1NnMDq5x7kG49z206/1G6JYa19bkHEmdfnP
+	tMvKV2pPcWxcOhcCAy15nSoepeWOzsnOBpvp7zidf7aBfw9MS1Ly71tSJP5fchfv
+	ScELRAVFR0w/9OGp09C6BYzXLtAVw6vLSIsfLWZV+PTzpn3985u7+bYEwy/V0GhA
+	4fzW5Gnv2F+xMZbtmBALcFDyCgZTqVMmcyjJEPAXDv8aAB8RBIQQZNXFEnEvboey
+	uGZBB9qFH6lWgsKkj8/mR/xJ29REu9p4T22GgiDzyoL32Yg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bvxfjqwvu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 Jan 2026 23:12:55 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 27 Jan 2026 23:12:54 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 27 Jan 2026 23:12:54 -0800
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 7F6CB3F7106;
+	Tue, 27 Jan 2026 23:12:51 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net-next v6 00/13] NPC HW block support for cn20k
+Date: Wed, 28 Jan 2026 12:42:22 +0530
+Message-ID: <20260128071235.3577206-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,128 +76,179 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: yQu6gin4Z-nuGsddx9ncq-xoMFkLH0jn
+X-Proofpoint-ORIG-GUID: yQu6gin4Z-nuGsddx9ncq-xoMFkLH0jn
+X-Authority-Analysis: v=2.4 cv=S9LUAYsP c=1 sm=1 tr=0 ts=6979b6f7 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=A1wDlwXRn1NGPBHeO_kA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDA1NyBTYWx0ZWRfX9NQZGTWiBee8
+ o3D7T2kUtvurpfkj4R8RM+UhySlWik59CMSsGOtPPxvakea6n2jgEoxsn1h2Jy3Aa7j4HrieaFT
+ BldC/57T5x/eW01WUPKjEbjWBgPXee5DMko+yf7uoLVDdUdJe3u5CDucbYIHpcXhGGRMxH2SmA/
+ /B/bXr5VmbjEjppTHmbKt6tdiZ7XNdCBqKxata/dHPuAwfVXuH8NDa/pN6g3LQ9UjYtMF7dkbUb
+ 3SHehbSOkjTSLlv6jx8u1yy9UnR3bbl5Pa4zF/y+9IV1mk7no2kLr7yQFA/upU/T9cVpNmONhrZ
+ E5j6YJJqO9ZrttTcJrStZMZmKNulV2fwSgr2GjZNdwJ1uCJT+MBkkDA8n+7bGV2bAZYRuvLCbQs
+ eTvU06nxmmmD6UGKvzN2G990o9cZ9bCEtW8/ZZsSGq72TrBUkrzhioJb3NyFiAgzLvj30MHTMUV
+ DSTF99iyMx4a43ZABpw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-28_01,2026-01-27_03,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[fengwei_yin@linux.alibaba.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254122-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254123-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	FROM_NO_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: F24339D93F
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	RCVD_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:mid,marvell.com:dkim]
+X-Rspamd-Queue-Id: DCDAD9D9A3
 X-Rspamd-Action: no action
 
-From: Yin Fengwei <fengwei_yin@linux.alibaba.com>
+This patchset adds comprehensive support for the CN20K NPC
+architecture. CN20K introduces significant changes in MCAM layout,
+parser design, KPM/KPU mapping, index management, virtual index handling,
+and dynamic rule installation. The patches update the AF, PF/VF, and
+common layers to correctly support these new capabilities while
+preserving compatibility with previous silicon variants.
 
-On an arm64 server platform, fuzz testing can trigger an RCU stall
-followed by a soft lockup in ptype_seq_show(). The backtrace shows
-the stall occurs in traverse.part.0(), which is called from
-seq_read_iter() during /proc/net/ptype access:
+MCAM on CN20K differs from older designs: the hardware now contains
+two vertical banks of depth 8192, and thirty-two horizontal subbanks of
+depth 256. Each subbank can be configured as x2 or x4, enabling
+256-bit or 512-bit key storage. Several allocation models are added to
+support this layout, including contiguous and non-contiguous allocation
+with or without reference ranges and priorities.
 
-[  295.799369] rcu: INFO: rcu_preempt self-detected stall on CPU
-[  295.799937] rcu:     1-....: (60005 ticks this GP) idle=0f94/1/0x4000000000000000 softirq=5198/5199 fqs=29992
-[  295.800708] rcu:     (t=60008 jiffies g=11197 q=1553 ncpus=2)
-[  295.801152] CPU: 1 UID: 0 PID: 2695 Comm: test2 Tainted: G		L      6.19.0-rc7+ #19 PREEMPT(voluntary)
-[  295.801961] Tainted: [L]=SOFTLOCKUP
-[  295.802245] Hardware name: linux,dummy-virt (DT)
-[  295.802616] pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-[  295.803171] pc : traverse.part.0+0x80/0x190
-[  295.803511] lr : traverse.part.0+0x4c/0x190
-[  295.803850] sp : ffff800082dabb20
-[  295.804117] x29: ffff800082dabb20 x28: ffff000004571280 x27: 0000000000000000
-[  295.804680] x26: 0000000000000000 x25: ffff00000471fee0 x24: ffff00000471fed0
-[  295.805245] x23: 00000000000080db x22: 0000000000000033 x21: 0000000000000000
-[  295.805814] x20: ffff000003719160 x19: ffff00000471fea8 x18: 0000000000000000
-[  295.806378] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-[  295.806941] x14: 0000000000000000 x13: 0a6e6f6974636e75 x12: 4620202020202065
-[  295.807507] x11: 0000000000000000 x10: 0000000000000001 x9 : ffffc27ab28f881c
-[  295.808081] x8 : 000000000000000a x7 : ffffc27ab3a8db42 x6 : 000000000000000a
-[  295.808652] x5 : 0000000000000000 x4 : 0000000000001000 x3 : ffffc27ab328a7f8
-[  295.809219] x2 : ffff00000471fed0 x1 : ffff000003719160 x0 : ffff00000471fea8
-[  295.809785] Call trace:
-[  295.809983]  traverse.part.0+0x80/0x190 (P)
-[  295.810322]  seq_read_iter+0x2f8/0x4f8
-[  295.810625]  seq_read+0xe4/0x120
-[  295.810890]  proc_reg_read+0x9c/0xf8
-[  295.811185]  do_loop_readv_writev.part.0+0xbc/0x118
-[  295.811574]  vfs_readv+0x174/0x1d8
-[  295.811848]  do_preadv+0x90/0xf8
-[  295.812110]  __arm64_sys_preadv+0x24/0x38
-[  295.812435]  invoke_syscall+0x4c/0x110
-[  295.812737]  el0_svc_common.constprop.0+0x44/0xe8
-[  295.813113]  do_el0_svc+0x20/0x30
-[  295.813382]  el0_svc+0x38/0x178
-[  295.813636]  el0t_64_sync_handler+0x98/0xe0
-[  295.813969]  el0t_64_sync+0x184/0x188
+Parser and extraction logic are also enhanced. CN20K introduces a new
+profile model where up to twenty-four extractors may be configured for
+each parsing profile. A new KPM profile scheme is added, grouping
+sixteen KPUs into eight KPM profiles, each formed by two KPUs.
 
-The root cause is in ptype_seq_next(): when iterating over packet
-types, it's possible that a packet type entry (pt) has been removed,
-its dev set to NULL, and pt->af_packet_net is not initialized.
-In that case, the function may return the same 'nxt' pointer indefinitely.
-This results in an infinite loop under RCU read-side critical section,
-causing an RCU stall and eventually a soft lockup.
+Support is added for default index allocation for CN20K-specific
+MCAM entry structures, virtual index allocation, improved defragmentation,
+and TC rule installation by allowing the AF driver to determine
+required x2/x4 rule width during flow install.
 
-Fix the issue by properly handling the case where 'nxt' points to
-an empty list, ensuring forward progress in the iterator.
+Ratheesh Kannoth (7):
+  octeontx2-af: npc: cn20k: Index management
+  Add CN20K MCAM allocation support. Implements contiguous and
+  non-contiguous allocation models with ref, limit, contig,
+  priority, and count support.
 
-Signed-off-by: Yin Fengwei <fengwei_yin@linux.alibaba.com>
----
- net/core/net-procfs.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+  octeontx2-af: npc: cn20k: Allocate default MCAM indexes
+  Allocate default MCAM entries dynamically in descending index
+  order during NIX LF attach, reducing MCAM wastage
 
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index 70e0e9a3b650..eb8c34bb1f0a 100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -231,7 +231,7 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 	pt = v;
- 	nxt = pt->list.next;
- 	if (pt->dev) {
--		if (nxt != &pt->dev->ptype_all)
-+		if (!list_empty(nxt) && nxt != &pt->dev->ptype_all)
- 			goto found;
- 
- 		dev = pt->dev;
-@@ -247,7 +247,7 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 
- 	if (pt->af_packet_net) {
- net_ptype_all:
--		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
-+		if (!list_empty(nxt) && nxt != &net->ptype_all && nxt != &net->ptype_specific)
- 			goto found;
- 
- 		if (nxt == &net->ptype_all) {
-@@ -267,6 +267,9 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 			return NULL;
- 		nxt = ptype_base[hash].next;
- 	}
-+
-+	if (list_empty(nxt))
-+		return NULL;
- found:
- 	return list_entry(nxt, struct packet_type, list);
- }
--- 
-2.43.5
+  octeontx2-af: npc: cn20k: Prepare for new SoC
+  Introduce MCAM metadata structure so low-level functions no
+  longer receive SoC-specific structures directly.
 
+  octeontx2-af: npc: cn20k: virtual index support
+  Add virtual MCAM index allocation and improve CN20K MCAM
+  defragmentation handling. Track virtual indexes and restore
+  statistics correctly.
+
+  octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
+  Extend install_flow mailbox so AF can determine rule width and
+  complete allocation and installation in a single exchange.
+
+  octeontx2-af: npc: cn20k: add debugfs support
+  Debugfs entries to show mcam layout and default mcam entry allocations
+  Legacy debugfs entries are modified to show hardware priority on cn20k
+  SoC.
+
+  octeontx-af: npc: Use common structures
+  Low level functions should use maximum mcam size array and modify cam0
+  and cam1. This is a cleanup patch.
+
+Subbaraya Sundeep (1):
+  octeontx2-pf: cn20k: Add TC rules support
+  Add full TC dynamic rule support for CN20K. Handle x2/x4 rule
+  widths, dynamic allocation, and shifting restrictions when
+  mixed rule sizes exist.
+
+Suman Ghosh (5):
+  octeontx2-af: npc: cn20k: KPM profile changes
+  Add support for CN20K KPM profiles. Sixteen KPUs are grouped
+  into eight KPM configurations to improve resource usage
+
+  octeontx2-af: npc: cn20k: Add default profile
+  Update mkex profile for CN20K and mark unused objects with
+  may_be_unused to silence compiler warnings.
+
+  ocetontx2-af: npc: cn20k: MKEX profile support
+  Add support for the new CN20K parser profile. Introduces the
+  extractor-based model with up to twenty-four extractors per
+  profile.
+
+  octeontx2-af: npc: cn20k: Use common APIs
+  Update common MCAM APIs for CN20K. Add new register handling,
+  new access algorithms, and CN20K-specific index management.
+
+  octeontx2-af: npc: cn20k: Add new mailboxes for CN20K silicon
+  Add CN20K-specific MCAM mailbox messages for updated mcam_entry
+  layout and avoid breaking backward compatibility.
+
+ .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+ .../marvell/octeontx2/af/cn20k/debugfs.c      |  273 +
+ .../marvell/octeontx2/af/cn20k/debugfs.h      |    3 +
+ .../marvell/octeontx2/af/cn20k/mbox_init.c    |   17 +
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 4421 +++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  340 ++
+ .../ethernet/marvell/octeontx2/af/cn20k/reg.h |   65 +
+ .../ethernet/marvell/octeontx2/af/common.h    |    4 -
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  172 +-
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |    2 +
+ .../marvell/octeontx2/af/npc_profile.h        |   84 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |   94 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   18 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |   76 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |   90 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |    1 -
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  580 ++-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.h   |   21 +
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  693 ++-
+ .../marvell/octeontx2/af/rvu_npc_fs.h         |   14 +-
+ .../marvell/octeontx2/af/rvu_npc_hash.c       |  128 +-
+ .../marvell/octeontx2/af/rvu_npc_hash.h       |    2 +-
+ .../ethernet/marvell/octeontx2/nic/cn20k.c    |  265 +
+ .../ethernet/marvell/octeontx2/nic/cn20k.h    |   13 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   35 +
+ .../marvell/octeontx2/nic/otx2_flows.c        |  267 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  |   77 +-
+ 27 files changed, 7286 insertions(+), 471 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.h
+
+--
+v1 -> v2: Addressed comments
+v2 -> v3: Resolved build errors, addressed comments
+v3 -> v4: Address comments from Jakub
+	 https://lore.kernel.org/netdev/20260109054828.1822307-12-rkannoth@marvell.com/T/#t
+v4 -> v5: Addressed comments from Jakub
+	https://lore.kernel.org/netdev/20260113101658.4144610-6-rkannoth@marvell.com/
+v5 -> v6: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/20260126123254.1000480-11-rkannoth@marvell.com/T/#t
+
+2.43.0
 
