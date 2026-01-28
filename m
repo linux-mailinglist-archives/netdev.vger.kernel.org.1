@@ -1,186 +1,173 @@
-Return-Path: <netdev+bounces-254424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254425-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eH2WHvxcemm35QEAu9opvQ
-	(envelope-from <netdev+bounces-254424-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:01:16 +0100
+	id mAOxJqVeemm35QEAu9opvQ
+	(envelope-from <netdev+bounces-254425-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:08:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AFB5A8041
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:01:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B48A80CD
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:08:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D83C13004F2D
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 19:01:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0AC453016241
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 19:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511A82D0615;
-	Wed, 28 Jan 2026 19:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A175326926;
+	Wed, 28 Jan 2026 19:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="f/wzfIrw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFqF22Lr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A508372B58
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 19:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769626871; cv=pass; b=PMuw/Ks55+XokRzkc+F+U3RxfUd2zU6vsW3GUmmfpph3HjGzsYCWF4pyOlq46OTH5ODuxPxB2RENpcWRfscrd6RUAWmAoeoKsU3EHlVrWFLJDvuJHrdq6AVBVcybsiXWSWZcAwgKHiQBmk+X3Gfrd7uOJyDLxveJPDeXlhXjMUA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769626871; c=relaxed/simple;
-	bh=JbNk9rvhtMXbYjyC4GYa/lP1CpJ21aszdocrxrXH/T4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GYw19DIcyfKqbDPjECOvzYr6lee/vQK23yW2C57SJe+XJDUmoIeIDLCL7+KxlUqKPRh0hdQXqgC7A8H9To2grHHU5bUZTaFyjIFyoxQu5olNuqJAupSumwdN8f7TGLCSd0gCAdcF8spk8ZKZymVd5yH/RBGwkc48eGlOnR4uiu0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=f/wzfIrw; arc=pass smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-352dda4a34eso45804a91.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 11:01:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769626865; cv=none;
-        d=google.com; s=arc-20240605;
-        b=SzFRbt++G1fPE9UnMVEfoWNBh8YcNsWjUyKc/tn3w7nDVybZbK1Ih3AWPQP5YdBp9J
-         iB2P0vv0xTB5VWNHlMiV8AL+aySaLucA86p3wkufGcp85FfYdIfxaqc0fmS/5kpT39zM
-         b1+WCjL0N2hTgj6udk939Wull11v1nT1+NeirTLe5Pgsjn70DAQbRFdf2dYOlHHzCgPz
-         qoliGD/KRILooHvgp4WPLXOcxeSzvoEv2jwof70a/2D1bDiQ2IrLmoaB3nZ8tlqfqosc
-         MeaZSb9H+M52fi14QTaeK0n9IQuQuTa8Yc5JeLRh1PMMyN65A4rLGsbPKlay6yTEpYsD
-         nNhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=P3otY1GBQ3Ugyd/1LL3BCuL+2MDM2kK0rFaojsWQOo0=;
-        fh=48ZQuVh95OamZ1gW8tgwITx8ywjwZsWVDmWAS5eTGCk=;
-        b=N1mgbTeodEGTV4t8gsKopWJ4mo3xAEIsZEr97NerSJ4oR0ar2e3R07Y4Besl5CwxDR
-         sDz5ASDx7A//1wo9JfFRXvOurRumewaPenmQGEQUeVyNc8/fmqirA/+n3b7CU1UaGBvx
-         rRTa7GOonbu52Z2KTZbd1OTz7t5K7iL4FPy6Naz/seSqTwOdec3Pzd3/4Neft22VbIHJ
-         fPvenygAmsp5X3DWKOwmXyjKoJ7N/be+o9j9ENtUYhq8w7ocBeMLGrG1cGLUmJFeTjBn
-         QksJV5nw0MldAEs+oXPOonrB1MCeS2fSgDAHJCmHuCfR173npHnBYCYfCqgiSewXQLMB
-         4Jeg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A122264A9
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 19:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769627297; cv=none; b=t/F5mhE3TtFSoBo1YVN9iNizGdcNBDgoRxt5+ZdkpeUmyquUybWYlMRVr1LzQYMdL8mw5lXau8dztVsD1OudjNGYPfEcf02sZ65XPBFoO1zq/0Oo1Y4TZycdDYWhn+pKFjr1DGD/+gnM01ArhyJYfPLW8znfbRfvCWyGVlxqI8w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769627297; c=relaxed/simple;
+	bh=OuOg7fK0b5YBPtSlz+PhLb0OTUf/fvAXBnGVS6t3Bww=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Srk+iJy88AwAGv77Er6JSUhwXvVd3hSmMCRtqgvADEjF8Kdegm6YJEG+1j5ZyCPJAB7npF+4KaaidcWNp6NNNg9tMnTEtLSAiZHyVf7XdYZEJ9dgJPcVJ+bwNPmPjMlvqVcQbikXMApxDQ/cFkFGh3gTKASEzzdzJX4/yDK0Iek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFqF22Lr; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fbc544b09so190788f8f.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 11:08:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1769626865; x=1770231665; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P3otY1GBQ3Ugyd/1LL3BCuL+2MDM2kK0rFaojsWQOo0=;
-        b=f/wzfIrw/iGFhgCbZ6NU1fvJ+MXB/uw5QL/Rtz+Q7TA0Pf01o0XE7r6htgpilVaWiv
-         RXUoofcwi17oUat3Kmh051JMezL2lSKGjJBbyWvV2JZc5dbVYRakBWvwG0N3j4ex0noY
-         E2mFcM0ISvP/XKpiN9iWcwOWRnwR9b4uzaVBCRRmdORgzLCGT6H5QzdcNMRB3ds0R9zB
-         uedpICMT+efmkEgnz/PRx9nFqhMb9FXiuLZuTOxbNRe94QBtPWcW4ePKcuRlxMhMKXhR
-         XNfah7AfLZjfTmGKkcOiz0tnbQAktY7s+j13VIaQnIrdtLYGO5dQb7H8JjyoCHyxoGoM
-         lkOQ==
+        d=gmail.com; s=20230601; t=1769627294; x=1770232094; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v0ztyyoXr2qR3JG+E16z7tyT9/q0OUQVhQKgl5XpldY=;
+        b=UFqF22LrfkVxW1J+PhP9keC1ZAjvAcHwdHasVHk6/g/739vES4ed6/LGEwxL34gPs+
+         jFHYO6l5O9O0serDCGsZPps/W15x1GfivIc6S8qcaPCo8sAp5GQ+NkVvwR1mHs7UROdJ
+         nQRhv04h4mMH8BFjdSiPP0fJRSNFbiJaycJKAF5zNUEgo93KdliRX5SWNBTN8cCf156K
+         1XmN89UWM72bJxvMXgDpaqiJS6Zptp4CVWhNWaOAYQRplvFQU4LeUsE+hBkfqqUYZJJE
+         v9/mzjQRFTGMzcAD32RRC5jWYk9h9oa/eqfp0VmrWysivlB9AtL/mGqyi0zR9AbMWCk+
+         g9qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769626865; x=1770231665;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=P3otY1GBQ3Ugyd/1LL3BCuL+2MDM2kK0rFaojsWQOo0=;
-        b=QoeT+usO+j9S5D1vqA//4D0gpj8LjE7R/PzNlmwggL8hRBLeuzPJ64xjxWOlQzANkL
-         Z5Iz92sydrDUB1xMwdQ0mDV9MTPNSOh2IHByOw7lnNI/tDkI4O9iP+QYho9Pw1fOcI6X
-         evbzdgcvkBMzi/rqmpHckRWWeuoCgLnVBLQgUIqpO6Tl9MeFHWJRtuMS+bMEX16e4XhC
-         pkBdKfDDDgsKCgMSvhQqqCH7y0FJR2HS3r96o5Ab5znlX/JKvQsJ0oKaB0TZjyHTz2G4
-         z/MT2DwJYUl7WmVqAVVvT2p9An+fHk0wqOds+rkNo7nnSOyxb8QdqEwe/hpSfUWT8vsr
-         VC7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUVhBAVVkVbT35krh1EZsAiykfnaUBfkpdQ1BBHcXWZtWrliRrZ0hfR1pAy5lfL7uedHHivAok=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywzg60SAIupcIi3c3JgHbpoRHi8LBfqZpm6hdSeBgQB8Xv1W3p/
-	lU3ZrFRcmgwnnVKtWJ+S+J90kwLM50TSMxD57yAhJtdOQ/zXVsqoSgkYw1V/G1ScIcaBY4YRASN
-	Hf8+PSKLeIMQK5tckwkFTQRnxpFXqZJsvnvZb7nPFcA==
-X-Gm-Gg: AZuq6aKFp1uU73ONU/X8El6Js92D9SzlLLrVBEG39UcHa62l1SzfaYntnCbEzfQxgvO
-	plZerD4UvWNZ0E89yLNa1ywz8EeIKWr7TnWtpiBTamsPj1EWGJ/c1R6y1zeDqutiYgE8mGAm6CS
-	O7XBwmuXCZVPo5iUBvt9iQzg7KWTfBKFmGrCXPKyHnacpUyfJsz+6ZK1U5Gqiqf1zgiFAjXy1K/
-	ne0ZSy3JN51junD69G0tpHRTr6c40Dz29aKMkSmrtyReHMv243yYOt3JQ/UDr99wu4Jlg==
-X-Received: by 2002:a17:90b:5784:b0:340:4abf:391d with SMTP id
- 98e67ed59e1d1-353fecf6b60mr5694721a91.16.1769626864913; Wed, 28 Jan 2026
- 11:01:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769627294; x=1770232094;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v0ztyyoXr2qR3JG+E16z7tyT9/q0OUQVhQKgl5XpldY=;
+        b=oC7shrvfCEqmRGpn/K8iKWMo0/ANyQrV4jh0WBH8WBs3N9kqRPA90xitXF6XTbGnsB
+         ptgjnRQPdu5/FaYTR/NsV8BlbB0lyriabUf65QGjiK5xKvxHYM9Udk8ubM+6IoHLjhPe
+         uiEOozaqukV3BpnwqluANUIkE5D9m4veCJwAd+Ny+hT7gAIDMm8VyzAILTxOlFsqEBsz
+         YKnhKh2tZS2246VxDfdH7RqxCqf4Xnf/erU6Sy0GjGHU+lUm9xXxU81E1yKI/Bm/1MOy
+         Wub1DtlLw7ZejMVkEXumULMvjx69xWhInJyZ1JK0GAxv/ngs2yYDWzkZYFRZSsaFgdRd
+         W2bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1t1rRdDL27ZaErHLVhhw19m3iSFUZdW0K9Q69ok7G+UXuRQQOB5xEORPescnLFwaaGFkDK+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdLmiYgiCLgBaNMj6+syUeUuj662u+mG+OoMNRm7vBFQfRtX9o
+	+fxZ4e+2vxMtCMrD1eiFXbNZw7ye5YFGOWwDvnJMuUEDpKjaJis5tQ/T
+X-Gm-Gg: AZuq6aLMJH/WzjGEdjieQ+TnMAlpUBxCTnhRwcOpCk3rVUVr+BdEqarJkTMp9HCkytE
+	F6a2F+Uz71vQ9dt1AXugJjV5LjkcTVpnuMSYEqcPftzk+/2tgNzfg0MP/qv55/hBTelrJBhZaWv
+	TCbCOR6YgUp1LjSbnDInXuPDrD1FkeEjwq6z9uaW88KSRgwv8YmL9vO0BSJNqJ5Xy5JpZMo8wSd
+	9yiODCTtrrZ/d6mdqRnEvbK+NLeYLEkg1YrTBWlkDZDzaeooB+tN5W9L4eilez6de8ZdcqFC+y8
+	oBKE38pv8iHrX4sUNlomIg78P55iR5u1uw0hOZICd7kyCbdNgY82IDs3ePYezwv72mCAG+Kf823
+	Mgt6yLXWQiRJzZsZxCWIeMZzJChz400zM3kGZ9DH+yDGs3xsgl3ISWyAIlNANvPTFvPzP9xQY22
+	uB84LCLZFxAMx6mJ50E0dHksGYaj0zLY/DqwvUEKsL1ymcBN+gnMAAe3MlWt2UKKY2/D+tXwDpP
+	4JU82/nsAg5S0CDlFD/ZqgGKzjGKsGi2ZIfGrM+p+YP8t47000pxg0KHa4c73dd
+X-Received: by 2002:a5d:58ef:0:b0:435:dd9e:9704 with SMTP id ffacd0b85a97d-435dd9e9724mr6265093f8f.8.1769627294140;
+        Wed, 28 Jan 2026 11:08:14 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f2b:7200:a9b8:4711:836e:e074? (p200300ea8f2b7200a9b84711836ee074.dip0.t-ipconnect.de. [2003:ea:8f2b:7200:a9b8:4711:836e:e074])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10ee04csm9144019f8f.12.2026.01.28.11.08.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jan 2026 11:08:13 -0800 (PST)
+Message-ID: <4a13d635-7a22-4de6-a4bb-1ae4351b114c@gmail.com>
+Date: Wed, 28 Jan 2026 20:08:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260127071927.1520272-1-zeri@umich.edu> <aXpJWC8daHd329w9@horms.kernel.org>
-In-Reply-To: <aXpJWC8daHd329w9@horms.kernel.org>
-From: Henry Zhang <zeri@umich.edu>
-Date: Wed, 28 Jan 2026 14:00:54 -0500
-X-Gm-Features: AZwV_QieRcAuIa-KkZqAz2wvqoGSbgzOrJAA3OBAFu_jjPwzTNOlBxasEmGRRx0
-Message-ID: <CACkPEmnTuQ-FpVtydxuXEeocV2QMxZyjJPE1TDck-nte462ZuA@mail.gmail.com>
-Subject: Re: [PATCH net] mISDN: Fix data race in timer handling
-To: Simon Horman <horms@kernel.org>
-Cc: Henry Zhang <henryzhangjcle@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@kernel.org, 
-	syzbot+c6e7bcea7ffb7ff46acb@syzkaller.appspotmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 0/3] r816e: Add r816e driver in Realtek
+To: javen <javen_xu@realsil.com.cn>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, nic_swsd@realtek.com, pabeni@redhat.com
+References: <640c373b-09d9-4b54-9113-782df41aa152@gmail.com>
+ <20260128065309.556-1-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260128065309.556-1-javen_xu@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[umich.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[umich.edu:s=google-2016-06-03];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,linutronix.de,kernel.org,syzkaller.appspotmail.com,google.com];
-	TAGGED_FROM(0.00)[bounces-254424-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zeri@umich.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[umich.edu:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,c6e7bcea7ffb7ff46acb];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,appspotmail.com:email]
-X-Rspamd-Queue-Id: 7AFB5A8041
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254425-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,realsil.com.cn:email]
+X-Rspamd-Queue-Id: 10B48A80CD
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 12:37=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> + Eric
->
-> On Tue, Jan 27, 2026 at 02:19:27AM -0500, Henry Zhang wrote:
-> > KCSAN reported a data race where misdn_add_timer() writes dev->work
-> > while mISDN_read() reads it without holding the spinlock:
-> >
-> > write to 0xffff88812d848280 of 4 bytes by task 10864 on cpu 1:
-> >  misdn_add_timer drivers/isdn/mISDN/timerdev.c:175 [inline]
-> > ...
-> >
-> > read to 0xffff88812d848280 of 4 bytes by task 10857 on cpu 0:
-> >  mISDN_read+0x1f2/0x470 drivers/isdn/mISDN/timerdev.c:112
-> > ...
-> >
-> > dev->work is read locklessly in wait_event_interruptible() and
-> > mISDN_poll(). In mISDN_read(), the result is rechecked under dev->lock.
-> > In mISDN_poll(), a stale value may cause a spurious EPOLLIN or a missed
-> > wake, but wake_up_interruptible() will correct this. In both cases, the
-> > race is benign, so we can annotate these with READ_ONCE/WRITE_ONCE.
-> >
-> > Reported-by: syzbot+c6e7bcea7ffb7ff46acb@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3Dc6e7bcea7ffb7ff46acb
-> >
-> > Signed-off-by: Henry Zhang <zeri@umich.edu>
->
-> Hi Henry,
->
-> This appears to already be addressed by
-> commit 8175dbf174d4 ("mISDN: annotate data-race around dev->work")
->
-> --
-> pw-bot: cr
-Hi Simon,
-
-Thanks for pointing this out. Dropping this patch.
-
-Henry
+On 1/28/2026 7:53 AM, javen wrote:
+>> On 1/27/2026 12:34 PM, javen wrote:
+> 
+>>> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+>>>
+> 
+>>> This series patch add a fake driver r816e to ensure the kernel could 
+> 
+>>> set the correct power state for #fun through r816e driver when suspending.
+> 
+>>>
+> 
+>>
+> 
+>> I think a better approach would be to contribute to adding phylink/sfp support
+> 
+>> to r8169, so that the SFP NIC versions (incl. RTL8116AF) can be properly
+> 
+>> supported. This would have to include making the SFP I2C bus accessible by
+> 
+>> the kernel (instead of firmware only).
+> 
+>>
+> 
+> 
+> 
+> RTL8116af is a multi-function device. fun0 is a BMC virtual driver and fun1 is
+> 
+> the nic driver. The BMC virtual driver(fun0) is used for power management,
+> 
+> while fun1 provides the actual network functionality.
+> 
+> 
+If only purpose of this dummy driver is to bring the device to D3hot during system
+suspend, then this may be a question to the PCI subsystem maintainer(s).
+PCI devices are instantiated by the PCI core, just that in case of the device here
+no driver gets attached. Still PCI core applies a default suspend handling to each
+device.
 
