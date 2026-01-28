@@ -1,136 +1,233 @@
-Return-Path: <netdev+bounces-254345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254347-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GIwiIHo9emlB4wEAu9opvQ
-	(envelope-from <netdev+bounces-254345-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:46:50 +0100
+	id cM/UHXhEemn34wEAu9opvQ
+	(envelope-from <netdev+bounces-254347-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:16:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A748A618A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:46:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB0E2A6AD1
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF5B7300AC8D
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:46:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2DB0F305FAA9
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509612F2616;
-	Wed, 28 Jan 2026 16:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61323168E6;
+	Wed, 28 Jan 2026 16:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="u7Mm8CZ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/bdnRb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80022F25EF;
-	Wed, 28 Jan 2026 16:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0EBF2505AA;
+	Wed, 28 Jan 2026 16:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769618796; cv=none; b=FXn9c0qLVxSDLxXEGdM0aMwitjxkt17INRaYfs9Sv0aDer339zyPGhC+iLpTg5EdlTYxj4NRIysrOhjBuHxrDpFC0XogG2iUyG79/NnpbxXdpLKswdFAII6K7FLblNYXKobTgdXPIQZQ/3gdvcI8B1AqAmJOIHQhgdHSGv438tU=
+	t=1769619031; cv=none; b=qKx+H1tX/tZ11l7SiymKJkPepP0Jm0+8dV0S89/d5iZfSE5B2/KuIk9MQC8p9MzsSF8ZrnXN51BDcxlGUMkk/4F+yj/qWO6qGZhhppKhxN/BBX9ngBaexTRDZCnu4PVuTU2m5R4saJJpKrVDdplFK74Dh45MzTnP1lAvKRGpt/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769618796; c=relaxed/simple;
-	bh=yyoZ1sDBZV6FNchAIhxcYm41ZnVXg8dHaEZFQKQbvDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EAXlUPiDwjVquebEXXSZPA9QRaZDLijlefd3PZr0IjT2TFB8iD83Z+jSASY24aFCmzEIqsZ/bHAaRLHIl+CenDDMu+MRna/zeJvK4rNNnG54H+EINXU711PmV88HYlhfHf2vFYE0h6RvR9TWUMa5zB4jzHsK3FZ9S83hP57Ng9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=u7Mm8CZ5; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+lQl+dFqNAENGsU7mYgYRTKm9IWMInogA9Kw8B4GeF4=; b=u7Mm8CZ5lnsxv0szdO12EEGsl9
-	HEJsQZJ8deFgZLiKIb3pnu7X4cAV3JHH0I6B5unq14Qenpek/g787WgsRjZgtpcpV8XxKxFn8LY40
-	hV7qu59dY7dZ6NHJHqjRMKVth6/zQ1BuOuujqxFATPNPfG2rK1dtVc15hdr2RRY131p9yFsUO/cSH
-	oqr1eX9ixgPLEqDteD1fmhY9M1KiFlTV8u8rBwxXEzAtJwYslBX7hXkE4WaECACtfJVVnBRsagFg3
-	T0KsQIaKDwDXR8BchvGwFQ5XOF/NEGCTxiFPXQ+oNilT1+Gz+SIO4PUGRPdnqKxcFwqCrWU9EBld8
-	updm/u2w==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vl8gL-000Iu5-4N; Wed, 28 Jan 2026 16:46:17 +0000
-Date: Wed, 28 Jan 2026 08:46:10 -0800
-From: Breno Leitao <leitao@debian.org>
-To: John Ogness <john.ogness@linutronix.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
-	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, mpdesouza@suse.com, 
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next v5 4/4] netconsole: Use printk context for CPU
- and task information
-Message-ID: <aXo9DO9OCJ0I7ID5@gmail.com>
-References: <20260128-nbcon-v5-0-93b4ddbc181a@debian.org>
- <20260128-nbcon-v5-4-93b4ddbc181a@debian.org>
- <87a4xxlqz8.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1769619031; c=relaxed/simple;
+	bh=UbNYriofE/WtsPUbSLmtYEzz8gqiNFUggra4R8CS2BA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YiELS/bkMocNlI0aQpDojze/2LXJIOem4VPfTk3wDskrU66rJA1jvYOLGZzhlaetiLnWHqtqRfI3HCtyT+LWTZ8nDKHVhmu0i7NEMdKwxrkSw8f35JGdRzWWnlBysoVlbIpXQTWtIhA0h2HQ7UPufQuvtXgA3RE08XieWdlOtQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/bdnRb0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 753F6C4CEF7;
+	Wed, 28 Jan 2026 16:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769619031;
+	bh=UbNYriofE/WtsPUbSLmtYEzz8gqiNFUggra4R8CS2BA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Q/bdnRb0F86wJ7HS6Cyp6eWiPP3TJGKOgmFgxuJ65RsPq579vdhDYe+fVzfjLjpLR
+	 bQYW+sP2LP2epfwlQnKZ7Sp22sArGB4RfarEhMojtoVcVZuGNjjgTLoA1ymxA0r+to
+	 kP/2G5C4fu05NnC5O28IizXy4gZWEIwSO78HZr+ThT2dHlAa3PqE1WljduYbzBO8GD
+	 +2voYYHnYZuKawWPO5aq7HCXmKy1+8FAFsvpwkfsgF8nQeqJyhksIk+T2sAhkT2xfA
+	 zfiqrzk1X+y0tkaDhJWpouTEzvcLDNVYlsu0f/192Y0ZCnDptrESgdzA6VARMzTMBt
+	 c/PsNGftn3uNg==
+Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1vl8kO-0000000DAjS-2j79;
+	Wed, 28 Jan 2026 17:50:28 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH v2 00/25] kernel-doc: make it parse new functions and structs
+Date: Wed, 28 Jan 2026 17:49:58 +0100
+Message-ID: <cover.1769617841.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a4xxlqz8.fsf@jogness.linutronix.de>
-X-Debian-User: leitao
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254345-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-254347-lists,netdev=lfdr.de,huawei];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.com,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_TO(0.00)[davemloft.net,intel.com,kernel.org,iogearbox.net,gmail.com,lwn.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3A748A618A
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AB0E2A6AD1
 X-Rspamd-Action: no action
 
-Hello John,
+Hi Jon,
 
-On Wed, Jan 28, 2026 at 04:09:07PM +0106, John Ogness wrote:
-> On 2026-01-28, Breno Leitao <leitao@debian.org> wrote:
-> > Use the CPU and task name captured at printk() time from
-> > nbcon_write_context instead of querying the current execution context.
-> > This provides accurate information about where the message originated,
-> > rather than where netconsole happens to be running.
-> >
-> > For CPU, use wctxt->cpu instead of raw_smp_processor_id().
-> >
-> > For taskname, use wctxt->comm directly which contains the task
-> > name captured at printk time.
-> >
-> > This change ensures netconsole outputs reflect the actual context that
-> > generated the log message, which is especially important when the
-> > console driver runs asynchronously in a dedicated thread.
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> 
-> Reviewed-by: John Ogness <john.ogness@linutronix.de>
+It is impressive how a single patch became a series with 25 ones ;-)
 
-Thank you so much for all the reviews and your support throughout this
-migration. I really appreciate it!
+This version was rebased on next-20260127, which is after docs-mw
+got merged with my doc patches, solving some merge conflicts.
 
----breno
+It should now apply cleanly on the top of upstream and it will address
+the kernel-doc issues with context analysis patches that are already
+at linux-next.
+
+On this version, I opted to do something I always wanted when
+porting from the venerable kernel-doc perl logic: properly handle
+macros without writing really complex regular expressions.
+
+After those changes, the replacement logic becomes a lot more
+easier to write, as we can have a cleaner logic to handle
+function calls:
+
+	function_xforms = [
+	    (KernRe(r"^static +"), ""),
+	    (KernRe(r"^extern +"), ""),
+	...
+	    (NestedMatch(r"__cond_acquires\s*\("), ""),
+	    (NestedMatch(r"__cond_releases\s*\("), ""),
+	...
+	}
+
+It can even be used to replace comma-separated arguments like here:
+
+	struct_xforms = [
+	...
+	    (NestedMatch(r'\bstruct_group\s*\('), r'\2'),
+	    (NestedMatch(r'\bstruct_group_attr\s*\('), r'\3'),
+	    (NestedMatch(r'\bstruct_group_tagged\s*\('), r'struct \1 { \3 } \2;'),
+	    (NestedMatch(r'\b__struct_group\s*\('), r'\4'),
+	...
+	]
+
+As both KernRe and NestedMatch have sub methods, they can be placed
+altogether at the same transforms tables.
+
+The regex syntax for them are quite simple: they should end with a
+delimiter (usually open parenthesis, but brackets and square
+brackets are also supported).
+
+The first 15 patches on this series were co-developed with Randy,
+with came up with the original patch. I ended helping identifying
+kernel-doc issues and doing some changes to make the parser more
+reliable.
+
+Then, I added 10 other patches to improve NestedMatch.
+
+The final two patches on it fixes an issue when parsing
+include/net/page_pool/types.h. Right now, it doesn't parse
+well struct page_pool_params, as the second struct_group_tagged()
+has a /* private */ on it, causing the end parenthesis to be
+commented out. After the series, the documentation for it
+should be ok.
+
+-
+
+Even NestedMatch being more complex than KernRe, on my machine,
+parsing all files is 5% faster than before, because we're not
+parsing anymore macro definitions.
+
+Ah, due to the complexity of NestedMatch, I opted to write
+some unit tests to verify that the logic there is correct.
+We can use it to add other border cases.
+
+Using it is as easy as running:
+
+	$ tools/unittests/nested_match.py
+
+(I opted to create a separate directory for it, as this
+is not really documentation)
+
+Mauro Carvalho Chehab (23):
+  docs: kdoc_re: add support for groups()
+  docs: kdoc_re: don't go past the end of a line
+  docs: kdoc_parser: move var transformers to the beginning
+  docs: kdoc_parser: don't mangle with function defines
+  docs: kdoc_parser: add functions support for NestedMatch
+  docs: kdoc_parser: use NestedMatch to handle __attribute__ on
+    functions
+  docs: kdoc_parser: fix variable regexes to work with size_t
+  docs: kdoc_parser: fix the default_value logic for variables
+  docs: kdoc_parser: add some debug for variable parsing
+  docs: kdoc_parser: don't exclude defaults from prototype
+  docs: kdoc_parser: fix parser to support multi-word types
+  docs: kdoc_parser: add support for LIST_HEAD
+  docs: kdoc_re: properly handle strings and escape chars on it
+  docs: kdoc_re: better show KernRe() at documentation
+  docs: kdoc_re: don't recompile NextMatch regex every time
+  docs: kdoc_re: Change NestedMath args replacement to \0
+  docs: kdoc_re: make NextedMatch use KernRe
+  tools: kdoc_re: add support on NestedMatch for argument replacement
+  tools: python: add helpers to run unit tests
+  unittests: add tests for NestedMatch class
+  tools/lib/python/unittest_helper.py
+  docs: kdoc_parser: better handle struct_group macros
+  docs: kdoc_re: fix a parse bug on struct page_pool_params
+
+Randy Dunlap (2):
+  docs: kdoc_parser: ignore context analysis and lock attributes
+  kdoc_parser: handle struct member macro VIRTIO_DECLARE_FEATURES(name)
+
+ tools/lib/python/kdoc/kdoc_parser.py | 109 +++--
+ tools/lib/python/kdoc/kdoc_re.py     | 154 +++++--
+ tools/lib/python/unittest_helper.py  | 279 +++++++++++++
+ tools/unittests/nested_match.py      | 589 +++++++++++++++++++++++++++
+ 4 files changed, 1063 insertions(+), 68 deletions(-)
+ create mode 100755 tools/lib/python/unittest_helper.py
+ create mode 100755 tools/unittests/nested_match.py
+
+-- 
+2.52.0
+
 
