@@ -1,252 +1,716 @@
-Return-Path: <netdev+bounces-254232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254214-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OOnLz32eWkE1QEAu9opvQ
-	(envelope-from <netdev+bounces-254232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:42:53 +0100
+	id CEOxFz3zeWnT1AEAu9opvQ
+	(envelope-from <netdev+bounces-254214-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:30:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB69A0B41
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:42:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65329A06F9
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EF8C430892FF
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:31:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEF2E3008234
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8009A35503C;
-	Wed, 28 Jan 2026 11:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6F334D4FE;
+	Wed, 28 Jan 2026 11:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rIl2ppYp"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="NU+YQ0gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010063.outbound.protection.outlook.com [52.101.46.63])
+Received: from mail-10698.protonmail.ch (mail-10698.protonmail.ch [79.135.106.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BC4350A35;
-	Wed, 28 Jan 2026 11:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769599748; cv=fail; b=hVRJqBFgjvRDJnM7Q6IO1RX48D4evvnQGsiHRBDenQOezjwuTdCZzpfupxyZD1ac2XS2I4w5UENIXq4D40NvP3Zw/xA8LJ9uIHYpqCxi/8WaZ4po3FTQdINakqfnldPeINDV+IZdP8WS7Gp51audTIQ/d0EvnfAgwkPBiSgzMuk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769599748; c=relaxed/simple;
-	bh=4eeUc9RIHIgWXag318UGpUedrMXCEQ+cUkvCB4gfNTs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sv43yVLja0+q2LCaVYq56zoLT7mZAzFASyTE/w7VvYvUGgzVkB0p4/8uw+6g9mZmjKYIRirsyWefpQz59aGoENweyyMsV3y8bAUzq5p9Ryj5kc3zPyULsbst0/Vq6+rl69NvO4T7hklRanlBpXl/Uhb1o+WPN+2NCNJTyiemzzM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rIl2ppYp; arc=fail smtp.client-ip=52.101.46.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XNqKtbGMfztUHSpHlSBjRSDrv/IUsfAq15smfoPd+wSwU5yPMYwvsDIRjlddvbur9sQZjBrPVi3Yt5hPt6lW5r0/mLqcjm+ix6QprXg7lNAXkdnUHJE8cAWxjkIJzOYXb1tJTaTxlmYwGfZmdBnaG9r1F0rqfGKDOn78Tl4LNDEhHuK5YxBq64SzP4UccWSCJahOqtnrN7cFIXu2YOlzt9pmIsuQ3JJdd0NNSSONobQGNvXzgzUZNuoIdTElO9xy98pCCCxHkf5bWsLScSsyFApiK1zl42jLq/Cr0jeH0PgLG8cHQMam6bWSqejL96x9kdDqC5cVxAMSYRO+rDigsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2unoNL8G4Xxr5VtprXpzS1NFU/fJvHFzPSMcT54g87Y=;
- b=SRz0PCDfBODDYM+X2gFBM8f9jd/RG9WoQ6JcXJtzZjdS8R6hGHscE0gjHOQSuXmj4/u7d/+rU8/qVFzwX4bnHimBm8B9qk1kkD3vrnnIXVyKaf6fGhL+CD0ABt9RPa6tBp61UI9VVt+r5+Ffh4cyCEvheyCaNgRBu16A4Cz+TYYinnnJtg/B5EQOTHSU1sfmeZH3mkGsaQLKdomSvx6W3nzlX9A/D01NOOUTbk0XDvWDcQVzZL4Y5Qnj1eZCKdUYQ+3Ip6wfuDXoyq2qMDi6+2xWuCFFSWKTGW5mjaxJJ1dxQ6zogBcRe5qPXn/2ttL8jyhNq5WZyZTe+1YUfMgtzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2unoNL8G4Xxr5VtprXpzS1NFU/fJvHFzPSMcT54g87Y=;
- b=rIl2ppYp2cfjujQeOwBzqnEfKVpYA5um+62CO6PkmrZfDjqECXTcicD9ur/fTklWsCUqewcWjD0i4L1U3v8r8Amf5BLiXNckvg/NdDL4VmO4g311IiqB7mKC9QSAONhwwAKOCuWbFh4kpRkyVQJYIuV+TUsisA3ubKSTRHQQeOLWfzoDFF6oUF2qPkjRs9S60ng+ztb/QlW3n6Z9xm0NRyLSvz9Dz0eixe2iu8ongdnK+MBR+IY8hThLEnrddYBAFltAESgy2Qr6kaMIN8+cbrjPFjGyRtbRaKiYaQ7M7tfkAdtd2OohBziyAzBj34t3n9neBd8IGnbuZHWW7XKs7A==
-Received: from SA0PR11CA0047.namprd11.prod.outlook.com (2603:10b6:806:d0::22)
- by DM4PR12MB7503.namprd12.prod.outlook.com (2603:10b6:8:111::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.16; Wed, 28 Jan
- 2026 11:29:01 +0000
-Received: from SN1PEPF0002BA52.namprd03.prod.outlook.com
- (2603:10b6:806:d0:cafe::34) by SA0PR11CA0047.outlook.office365.com
- (2603:10b6:806:d0::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.15 via Frontend Transport; Wed,
- 28 Jan 2026 11:29:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002BA52.mail.protection.outlook.com (10.167.242.75) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.3 via Frontend Transport; Wed, 28 Jan 2026 11:29:00 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 28 Jan
- 2026 03:28:49 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 28 Jan
- 2026 03:28:48 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Wed, 28
- Jan 2026 03:28:43 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
-	<moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
-	<cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Randy Dunlap
-	<rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, Krzysztof Kozlowski
-	<krzk@kernel.org>
-Subject: [PATCH net-next V7 14/14] net/mlx5: Document devlink rates
-Date: Wed, 28 Jan 2026 13:25:44 +0200
-Message-ID: <20260128112544.1661250-15-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260128112544.1661250-1-tariqt@nvidia.com>
-References: <20260128112544.1661250-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD34F327BE7
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 11:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.98
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769599573; cv=none; b=Q5PzqKHi6m/9vau77sAVOEOFrEoIL50g8xm65mjp1MTobb3TJj88PeEXOyzhNKw542cL0VEcqFfOopoMGuMD6KDZaDeguw4UX7v8tZxuoIQaP13E8c5GEyrIqpTI3j1KxYaPCVsm/xHz5dWokhQ/NZlQQuQxMrVPRBX1HryYk2Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769599573; c=relaxed/simple;
+	bh=Va9OymS6I62hmBAGNUTB18fS/BXPW/oP1CxxsmBqxdw=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=nAaLmCpU3LTFbgt5nqzU4lHOe9VRNY0bXnABqjmPh4dyft05Jrb7P3jb1yEqnEImOzM10N9EgkdxmTLBO0hlBQJTape/nfMUGxJ/Neb0k/A8anNDHf/uvo/bVdwtD7jmR7x/p1glNMuMEgjRKhcvFl9j5ZubCl4pRnYMow28mx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=NU+YQ0gw; arc=none smtp.client-ip=79.135.106.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1769599561; x=1769858761;
+	bh=/0yAKNGguHhvwY57MgQS48RwpAmQAERfAjPDBJbwlQU=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=NU+YQ0gwAHxNA3Zn3ybNPFkIGrT5qlrx0luvDeivu/K1HZcwNQ0ViTj5HyQYQvKw6
+	 hRLesXpq76O9lfzdtoJ2O/mb9J9Kh2aVfUZ1eThnA/1GQMaOsqICKMGEbwa5mAxEJS
+	 4GWhPrl0XJcWbIDPt6pxg7nRnzB6CPQzoH6ZM6qKDVRjxP6eQe0KUDFDm3IAsbQmUd
+	 UgfZp1peVGq073sen0G6o/sHj3fTdtUlwNUAVoBixuS8txtHmy6JRbJGlpFDsmg+NJ
+	 D2mPDYNshoZDMv0eNioShD7fT2lIOi+zIco/lEPAaSQV8HfDyx1UROhyRyjaNldvDe
+	 S1dDJsPpYKzKA==
+Date: Wed, 28 Jan 2026 11:25:57 +0000
+To: Linux Networking <netdev@vger.kernel.org>
+From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
+Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
+Subject: Finally managed to get rsync script working after working on it for more than 7 hours since 1.30 AM on 28 Jan 2026 Wednesday
+Message-ID: <aFkDZy9fzBmqwpNggSLUGICQ1zv0HHho57ZpJexFyvgwRkWUdJZxoqyzFuI03CprptRBp1Ht1rN98zKMAW5rgajQ5StJ-xtPAfhPXu4dLnw=@protonmail.com>
+Feedback-ID: 39510961:user:proton
+X-Pm-Message-ID: 95ca48af27b2d451e43cc3edfb04baf9f5805dbe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA52:EE_|DM4PR12MB7503:EE_
-X-MS-Office365-Filtering-Correlation-Id: be471104-1475-4262-6387-08de5e606f2e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|7416014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8IRZeV+d+M7Lmw9P6vweNwL5C4I4Vs75MYChM+YZu4uRU1nRj5dEHrpf/xgu?=
- =?us-ascii?Q?9ugYIQYEioEtEIkyxyuRf4KjBfmDcXgCiv0L9labK6p2IQbs7mAFAUpEQutf?=
- =?us-ascii?Q?+Oup3Z4GanFj8ZzP7c/0o/M4jeYheNLEoU/INzsewQvDSBLqBCI5KImKDrHh?=
- =?us-ascii?Q?j80gZp7S6SoyK8Hp5yiR71JSITY3vAlnPRHUxjo+Kix4egZfOvStUn/NoioN?=
- =?us-ascii?Q?WWOnCCTSjT02V1c5FhS7Fr9IvtGM0m/eUqScOEAI4qz6ahKR8LJ3eRlbjCWv?=
- =?us-ascii?Q?2fjQOntT2VbWZKVJCjGYdTSHcr9Q0KQ5YS78KC9T5v0qlwrevumi8Y9ADNc0?=
- =?us-ascii?Q?3ggiUuzV7KNwmWEtN4jINHc3RShYIIbwfF+lNl8l+R6U7yaqY7NxrpJpLVGI?=
- =?us-ascii?Q?lz5Yz08GOOdnRm9Zr/GleZOeLR6LxXEk1DaNawkjgctGDl2CkcI+vjvCKd2k?=
- =?us-ascii?Q?UbQZ30dP6gshlqkE48B+yVifhhslZDPgoww0VMqfLoxxOT1yVNsg8M5KOJ39?=
- =?us-ascii?Q?pk+4DK1/oGV1k79YiRlUe9tHbpBo/OfolCaRNlF9lo/WUHA9WIECz41a5wx8?=
- =?us-ascii?Q?1EtIDdsF8HFFCQ7hZUKamPbgh4VEvqI2xorQAXVGoszN37FWqga8LSzQKN6g?=
- =?us-ascii?Q?3y768HyBOhve63yhvxe2i4BTwzuLQ+3SoDH0BwPeNRun2l1FTSqdqzv3VuKk?=
- =?us-ascii?Q?MhAvldMaQrZIOa6UpD0axstou1IR6JWUtXLTkj+keaQCfbDSHSrK7ONS9i/F?=
- =?us-ascii?Q?ywZJ0r5C9rSaqGYZL33uF1qUwktszCt/07lt4Cbs60wXq8a8z4JxM5LvkUIM?=
- =?us-ascii?Q?KZcWdps4yPvXNGcFceJ+jzsWSD6IBIJCVjX19V3mmz2PD6tvK6JKb3rhkEiq?=
- =?us-ascii?Q?beVr4+UwhmkbNoUQq06GEeVV90fFTjj5ZtpjJnqq2MJKUHFkkm9w/e0OqiKo?=
- =?us-ascii?Q?od6/dRUYOWIuAoOHDkQj1OLsbLQl99VzelXNtl2ac+Lk2NvWrEHvcAlz6XtU?=
- =?us-ascii?Q?VeeryN0Nh2BIcAXnpIFOe4LVPK9dwpKMWz4x2xwbvTvbJWVAde3ubbbNF/bc?=
- =?us-ascii?Q?gmcKFCja4xM1kmdWOMFncrpQFotrlRCYbV9h2GsBhqm9gnd8k7/cT8Eg89CN?=
- =?us-ascii?Q?l2Fbh7NYSGWwQLJ2GBy6IEX32u2rOO6K8n3rRg5Dx4lP9HzfTI6brSRV5N0/?=
- =?us-ascii?Q?lWng+HjbFVEFheaKR9h6Wb1qYPRw2NiUJokybY/lFO6IdF1fUUVZcp6Lf50T?=
- =?us-ascii?Q?cpy8J4hp15D+cVGOEnbI8T3BEnIWpbml55ir69Dh1ofsZKVyUUw3bkE0VZSt?=
- =?us-ascii?Q?FusqDLvAgm57umM/ypiYE5KEmhMPsAQhOm9RO2V92TxOXdiP9MM9s5PTZMSW?=
- =?us-ascii?Q?Ql5zMG/Jog7KjOfZ0VdP7vYCRW2xeITN/eb5arQp8sZzEENN5sAUUycMM8gx?=
- =?us-ascii?Q?0R+EKYfsQ6rYuxc/LAxKRQ1KdwD6OaOnQcbig61vDS7e8q6DDg3p+9GnqtZ1?=
- =?us-ascii?Q?elVCVQjjOBPqun8i+cndfQNY/u2KgYnKyKw5cCgx/NxkXCbeZfOqXc6bj0uI?=
- =?us-ascii?Q?dOf/8lczzb3mjlb/jSzZWMjrSESt7Ze83/4W7+tMjAwOKVjLu7ifQObT9kcX?=
- =?us-ascii?Q?v2zm/mrC/2KW4YHitYqWIBNygG9p9n9m6hZ3FY8Gps7YOV9LDSVafsnx6dqG?=
- =?us-ascii?Q?osFSWQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 11:29:00.7225
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: be471104-1475-4262-6387-08de5e606f2e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA52.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7503
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254232-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,lwn.net,nvidia.com,kernel.org,vger.kernel.org,infradead.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_FROM(0.00)[protonmail.com];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254214-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim];
+	FROM_NEQ_ENVFROM(0.00)[teo.en.ming@protonmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[protonmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: DBB69A0B41
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rsync_script.sh:url,protonmail.com:mid,protonmail.com:dkim]
+X-Rspamd-Queue-Id: 65329A06F9
 X-Rspamd-Action: no action
 
-From: Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Finally managed to get rsync script working after working on it fo=
+r more than 7 hours since 1.30 AM on 28 Jan 2026 Wednesday
 
-It seems rates were not documented in the mlx5-specific file, so add
-examples on how to limit VFs and groups and also provide an example of
-the intended way to achieve cross-esw scheduling.
+Good day from Singapore,
 
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- Documentation/networking/devlink/mlx5.rst | 33 +++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+I have finally managed to get rsync script working after working on it for =
+more than 7 hours since 1.30 AM on 28 Jan 2026 Wednesday.
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index 4bba4d780a4a..62c4d7bf0877 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -419,3 +419,36 @@ User commands examples:
- 
- .. note::
-    This command can run over all interfaces such as PF/VF and representor ports.
-+
-+Rates
-+=====
-+
-+mlx5 devices can limit transmission of individual VFs or a group of them via
-+the devlink-rate API in switchdev mode.
-+
-+User commands examples:
-+
-+- Print the existing rates::
-+
-+    $ devlink port function rate show
-+
-+- Set a max tx limit on traffic from VF0::
-+
-+    $ devlink port function rate set pci/0000:82:00.0/1 tx_max 10Gbit
-+
-+- Create a rate group with a max tx limit and adding two VFs to it::
-+
-+    $ devlink port function rate add pci/0000:82:00.0/group1 tx_max 10Gbit
-+    $ devlink port function rate set pci/0000:82:00.0/1 parent group1
-+    $ devlink port function rate set pci/0000:82:00.0/2 parent group1
-+
-+- Same scenario, with a min guarantee of 20% of the bandwidth for the first VFs::
-+
-+    $ devlink port function rate add pci/0000:82:00.0/group1 tx_max 10Gbit
-+    $ devlink port function rate set pci/0000:82:00.0/1 parent group1 tx_share 2Gbit
-+    $ devlink port function rate set pci/0000:82:00.0/2 parent group1
-+
-+- Cross-device scheduling::
-+
-+    $ devlink port function rate add pci/0000:82:00.0/group1 tx_max 10Gbit
-+    $ devlink port function rate set pci/0000:82:00.1/32769 parent pci/0000:82:00.0/group1
--- 
-2.44.0
+The old Synology DS713+ NAS was backed up to USB external harddisk using Hy=
+per Backup.
+
+The Hyper Backup on the USB external harddisk was fully restored on the new=
+ Synology DS1522+ NAS at 1.30 AM on 28 Jan 2026 Wednesday.
+
+Since 1.30 AM in the morning, I have been working for more than 7 hours to =
+get the rsync script working, all throughout the night.
+
+rsync daemon keeps failing with errors, so I had no choice but to turn to r=
+sync SSH.
+
+Before running rsync SSH, I need to get passwordless SSH login working firs=
+t.
+
+1=EF=B8=8F=E2=83=A3 Generate an SSH key on DS713+ (client)
+
+ssh-keygen -t rsa -b 4096
+
+Press Enter to accept the default path: /var/services/homes/rsyncuser/.ssh/=
+id_rsa
+
+Press Enter again for no passphrase (needed for automation)
+
+This creates:
+
+/var/services/homes/rsyncuser/.ssh/id_rsa       =E2=86=90 private key (keep=
+ secret!)
+/var/services/homes/rsyncuser/.ssh/id_rsa.pub   =E2=86=90 public key
+
+2=EF=B8=8F=E2=83=A3 Copy the public key to DS1522+ (server) manually
+
+SSH into DS1522+ as rsyncuser
+
+mkdir -p ~/.ssh
+
+chmod 700 ~/.ssh
+
+On DS713+, print your public key:
+
+cat /var/services/homes/rsyncuser/.ssh/id_rsa.pub
+
+---public key snipped---
+
+On DS1522+, append it to authorized_keys:
+
+vi ~/.ssh/authorized_keys
+
+chmod 600 ~/.ssh/authorized_keys
+
+3=EF=B8=8F=E2=83=A3 Test passwordless login
+
+ssh rsyncuser@192.168.0.101
+
+The authenticity of host '192.168.0.101 (192.168.0.101)' can't be establish=
+ed.
+ECDSA key fingerprint is ---snipped---
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.0.101' (ECDSA) to the list of known hos=
+ts.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Permissions 0777 for '/var/services/homes/rsyncuser/.ssh/id_rsa' are too op=
+en.
+It is required that your private key files are NOT accessible by others.
+This private key will be ignored.
+Load key "/var/services/homes/rsyncuser/.ssh/id_rsa": bad permissions
+rsyncuser@192.168.0.101's password:
+
+On DS713+:
+
+chmod 700 /var/services/homes/rsyncuser/.ssh
+
+chmod 600 /var/services/homes/rsyncuser/.ssh/id_rsa
+
+chmod 644 /var/services/homes/rsyncuser/.ssh/id_rsa.pub
+
+Passwordless ssh login is now successful.
+
+Test rsync for 1 shared folder
+
+1st test:
+
+nohup rsync -aHAX --numeric-ids \
+  --partial --info=3Dprogress2,stats2,name \
+  --outbuf=3DL \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/1 Sales/" \
+  "rsyncuser@192.168.0.101:/volume1/1 Sales/" \
+  >> /volume1/rsync_1_Sales.log 2>&1 &
+
+2nd test:
+
+nohup rsync -aHAX --numeric-ids \
+  --partial --progress --verbose \
+  --outbuf=3DL \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/1 Sales/" \
+  "rsyncuser@192.168.0.101:/volume1/1 Sales/" \
+  >> /volume1/rsync_1_Sales.log 2>&1 &
+
+No output for above rsync runs.
+
+Test rsync for small folder "web"
+
+rsync -av --progress \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/web/" \
+  "rsyncuser@192.168.0.101:/volume1/web/"
+
+Result:
+
+sending incremental file list
+rsync: opendir "/volume1/web/web_images" failed: Permission denied (13)
+./
+@eaDir/
+@eaDir/@tmp/
+
+sent 356 bytes  received 29 bytes  256.67 bytes/sec
+total size is 2,310  speedup is 6.00
+rsync error: some files/attrs were not transferred (see previous errors) (c=
+ode 23) at main.c(1462) [sender=3D3.1.2]
+
+
+Test rsync again with exclude eaDir
+
+rsync -av --progress \
+  --exclude=3D'@eaDir/' \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/web/" \
+  "rsyncuser@192.168.0.101:/volume1/web/"
+
+Result:
+
+sending incremental file list
+rsync: opendir "/volume1/web/web_images" failed: Permission denied (13)
+
+sent 275 bytes  received 14 bytes  192.67 bytes/sec
+total size is 2,310  speedup is 7.99
+rsync error: some files/attrs were not transferred (see previous errors) (c=
+ode 23) at main.c(1462) [sender=3D3.1.2]
+
+=E2=9C=85 CORRECT FIX (safe, Synology-approved)
+
+You need to re-apply and enforce ACL inheritance on the source NAS (DS713+)=
+.
+
+sudo synoacltool -add /volume1/web rsyncuser:allow:rwx
+
+Result:
+
+(synoacltool.c, 253)Unknown error
+
+
+sudo synoacltool -enforce-inherit /volume1/web
+
+rsyncuser@DiskStation:~/.ssh$ sudo -u rsyncuser ls /volume1/web/web_images
+ls: cannot open directory '/volume1/web/web_images': Permission denied
+
+=E2=9C=85 Working approach: run rsync as root via SSH
+
+Since your goal is migration to DS1522+, the easiest solution that actually=
+ works on DS713+ is:
+
+Use root on DS713+ as the source
+
+Use SSH rsync with passwordless keys for root
+
+Exclude @eaDir
+
+This avoids all ACL problems because root can read every folder, including =
+legacy ACL-protected subfolders.
+
+On DS713+:
+
+sudo -i
+ssh-keygen -t rsa
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /root/.ssh/id_rsa
+Your public key has been saved in /root/.ssh/id_rsa.pub
+The key fingerprint is:
+---snipped---
+The key's randomart image is:
++---[RSA 3072]----+
+---snipped---
++----[SHA256]-----+
+
+cat /root/.ssh/id_rsa.pub
+
+---public key snipped---
+
+On DS1522+:
+
+echo "---public key snipped---" >> /var/services/homes/rsyncuser/.ssh/autho=
+rized_keys
+
+
+chmod 600 /var/services/homes/rsyncuser/.ssh/authorized_keys
+chown -R rsyncuser:users /var/services/homes/rsyncuser/.ssh
+
+Now root on DS713+ =E2=86=92 rsyncuser on DS1522+ is passwordless.
+
+Test rsync again.
+
+rsync -aAX --numeric-ids --partial \
+  --exclude=3D'@eaDir/' \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/web/" \
+  "rsyncuser@192.168.0.101:/volume1/web/" \
+  >> /volume1/rsync_web.log=20
+
+rsync: failed to modify permissions on "/volume1/web/intranet": Operation n=
+ot permitted (1)
+rsync: rsync_xal_set: set_xattr_syno_acl(""/volume1/web/."","user.rsync.syn=
+oacl") failed: Permission denied (13)
+rsync error: some files/attrs were not transferred (see previous errors) (c=
+ode 23) at main.c(1462) [sender=3D3.1.2]
+
+Test rsync again:
+
+rsync -a --numeric-ids --partial \
+  --exclude=3D'@eaDir/' \
+  --no-acls --no-xattrs \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/web/" \
+  "rsyncuser@192.168.0.101:/volume1/web/" \
+  >> /volume1/rsync_web.log=20
+
+rsync: failed to set permissions on "/volume1/web/.htaccess": Operation not=
+ permitted (1)
+rsync: failed to set permissions on "/volume1/web/index.html": Operation no=
+t permitted (1)
+rsync: failed to set permissions on "/volume1/web/intranet": Operation not =
+permitted (1)
+rsync: failed to modify permissions on "/volume1/web/intranet": Operation n=
+ot permitted (1)
+rsync: failed to set permissions on "/volume1/web/intranet/***_index.php": =
+Operation not permitted (1)
+rsync: failed to set permissions on "/volume1/web/intranet/index.php": Oper=
+ation not permitted (1)
+rsync error: some files/attrs were not transferred (see previous errors) (c=
+ode 23) at main.c(1462) [sender=3D3.1.2]
+
+Test rsync again:
+
+rsync -av --numeric-ids --partial \
+  --exclude=3D'@eaDir/' \
+  --chmod=3Dugo=3DrwX \
+  --no-acls --no-xattrs \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/web/" \
+  "rsyncuser@192.168.0.101:/volume1/web/" \
+  >> /volume1/rsync_web.log
+
+rsync: failed to set permissions on "/volume1/web/.htaccess": Operation not=
+ permitted (1)
+rsync: failed to set permissions on "/volume1/web/intranet/***_index.php": =
+Operation not permitted (1)
+rsync: failed to set permissions on "/volume1/web/intranet/index.php": Oper=
+ation not permitted (1)
+rsync: failed to set permissions on "/volume1/web/web_images": Operation no=
+t permitted (1)
+rsync: failed to set permissions on "/volume1/web/web_images/bg.png": Opera=
+tion not permitted (1)
+rsync: failed to set permissions on "/volume1/web/web_images/icon.png": Ope=
+ration not permitted (1)
+rsync error: some files/attrs were not transferred (see previous errors) (c=
+ode 23) at main.c(1462) [sender=3D3.1.2]
+
+Test rsync again:
+
+rsync -rltDv --progress \
+  --exclude=3D'@eaDir/' \
+  --no-perms --no-owner --no-group --no-acls --no-xattrs \
+  -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+  "/volume1/web/" \
+  "rsyncuser@192.168.0.101:/volume1/web/" \
+  >> /volume1/rsync_web.log
+
+Output:
+
+sending incremental file list
+
+sent 280 bytes  received 14 bytes  196.00 bytes/sec
+total size is 233,274  speedup is 793.45
+
+New rsync script:
+
+vi rsync_script.sh
+
+#!/bin/bash
+# DS713+ -> DS1522+ migration via rsync over SSH
+# All shared folders in a loop, passwordless SSH, background-safe
+
+# Target NAS and user
+TARGET_USER=3D"rsyncuser"
+TARGET_HOST=3D"192.168.0.101"
+
+# Shared folders to migrate
+FOLDERS=3D(
+"1 Sales"
+"2 OPERATIONS"
+"3 Admin"
+"4 ISO 9001"
+"5 Finance"
+"6 IT"
+"7 Volume_1"
+"8"
+"8 SynologyLog"
+"Completed Projects"
+"Disk 2"
+"docker"
+"OSV and LLP"
+"Volume_2"
+"web"
+"web_packages"
+)
+
+# Base log folder on source NAS
+LOGDIR=3D"/volume1/rsync_logs"
+mkdir -p "$LOGDIR"
+
+# Loop over folders
+for F in "${FOLDERS[@]}"; do
+    # Escape spaces in folder name for rsync destination
+    DEST_FOLDER=3D"$F"
+
+    echo "Starting rsync for folder: $F"
+
+    nohup rsync -rltDv --progress \
+        --exclude=3D'@eaDir/' \
+        --no-perms --no-owner --no-group --no-acls --no-xattrs \
+        -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+        "/volume1/$F/" \
+        "$TARGET_USER@$TARGET_HOST:/volume1/$DEST_FOLDER/" \
+        >> "$LOGDIR/rsync_$(echo $F | tr ' ' '_').log" 2>&1 &
+
+done
+
+echo "All rsync jobs started in background. Logs are in $LOGDIR"
+
+End of script.
+
+
+
+chmod +x rsync_script.sh
+
+/root/rsync_script.sh
+
+Output:
+
+root@DiskStation:/volume1/rsync_logs# tail -f rsync_1_Sales.log
+kex_exchange_identification: Connection closed by remote host
+rsync error: unexplained error (code 255) at io.c(254) [sender=3D3.1.2]
+
+Test another script:
+
+#!/bin/bash
+# Sequential background rsync for Synology migration
+# Source: DS713+, Target: DS1522+ (rsyncuser)
+# One folder at a time to avoid SSH session limits
+
+TARGET_USER=3D"rsyncuser"
+TARGET_HOST=3D"192.168.0.101"
+
+FOLDERS=3D(
+"1 Sales"
+"2 OPERATIONS"
+"3 Admin"
+"4 ISO 9001"
+"5 Finance"
+"6 IT"
+"7 Volume_1"
+"8"
+"8 SynologyLog"
+"Completed Projects"
+"Disk 2"
+"docker"
+"OSV and LLP"
+"Volume_2"
+"web"
+"web_packages"
+)
+
+LOGDIR=3D"/volume1/rsync_logs"
+mkdir -p "$LOGDIR"
+
+for F in "${FOLDERS[@]}"; do
+    LOGFILE=3D"$LOGDIR/rsync_$(echo $F | tr ' ' '_').log"
+    echo "=3D=3D=3D=3D=3D Starting rsync for folder: $F at $(date) =3D=3D=
+=3D=3D=3D" >> "$LOGFILE"
+
+    # Run rsync sequentially but in background via nohup
+    nohup rsync -rltDv --progress \
+        --exclude=3D'@eaDir/' \
+        --no-perms --no-owner --no-group --no-acls --no-xattrs \
+        -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+        "/volume1/$F/" \
+        "$TARGET_USER@$TARGET_HOST:/volume1/$F/" \
+        >> "$LOGFILE" 2>&1
+
+    echo "=3D=3D=3D=3D=3D Completed rsync for folder: $F at $(date) =3D=3D=
+=3D=3D=3D" >> "$LOGFILE"
+done
+
+echo "All rsync folders queued sequentially in nohup. Logs in $LOGDIR"
+
+End of script
+
+nohup /root/rsync_script.sh &
+
+Output:
+
+=3D=3D=3D=3D=3D Starting rsync for folder: 1 Sales at Wed Jan 28 12:31:35 +=
+08 2026 =3D=3D=3D=3D=3D
+sending incremental file list
+rsync: [sender] write error: Broken pipe (32)
+rsync error: error in socket IO (code 10) at io.c(871) [sender=3D3.1.2]
+=3D=3D=3D=3D=3D Completed rsync for folder: 1 Sales at Wed Jan 28 12:31:37 =
++08 2026 =3D=3D=3D=3D=3D
+
+Testing another script:
+
+#!/bin/bash
+# DS713+ -> DS1522+ migration via SSH rsync
+# Sequentially process 16 shared folders, per-folder logging
+# Skip ACLs/xattrs to avoid permission errors
+# Exclude @eaDir
+
+# Target NAS and user
+TARGET_USER=3D"rsyncuser"
+TARGET_HOST=3D"192.168.0.101"
+
+# Shared folders to migrate
+FOLDERS=3D(
+"1 Sales"
+"2 OPERATIONS"
+"3 Admin"
+"4 ISO 9001"
+"5 Finance"
+"6 IT"
+"7 Volume_1"
+"8"
+"8 SynologyLog"
+"Completed Projects"
+"Disk 2"
+"docker"
+"OSV and LLP"
+"Volume_2"
+"web"
+"web_packages"
+)
+
+# Base log folder on source NAS
+LOGDIR=3D"/volume1/rsync_logs"
+mkdir -p "$LOGDIR"
+
+# Loop through folders sequentially
+for F in "${FOLDERS[@]}"; do
+    LOGFILE=3D"$LOGDIR/rsync_$(echo "$F" | tr ' ' '_').log"
+    echo "=3D=3D=3D=3D=3D Starting rsync for folder: $F at $(date) =3D=3D=
+=3D=3D=3D" >> "$LOGFILE"
+
+    rsync -rltDv --progress \
+        --exclude=3D'@eaDir/' \
+        --no-perms --no-owner --no-group --no-acls --no-xattrs \
+        -e "ssh -o ServerAliveInterval=3D30 -o ServerAliveCountMax=3D20" \
+        "/volume1/$F/" \
+        "$TARGET_USER@$TARGET_HOST:/volume1/$F/" \
+        >> "$LOGFILE" 2>&1
+
+    echo "=3D=3D=3D=3D=3D Completed rsync for folder: $F at $(date) =3D=3D=
+=3D=3D=3D" >> "$LOGFILE"
+done
+
+echo "All folders have been processed sequentially. Logs are in $LOGDIR"
+
+
+
+
+nohup /root/rsync_script.sh > /volume1/rsync_master.log 2>&1 &
+
+Output:
+
+=3D=3D=3D=3D=3D Starting rsync for folder: 1 Sales at Wed Jan 28 12:37:26 +=
+08 2026 =3D=3D=3D=3D=3D
+sending incremental file list
+rsync: [sender] write error: Broken pipe (32)
+rsync error: error in socket IO (code 10) at io.c(871) [sender=3D3.1.2]
+=3D=3D=3D=3D=3D Completed rsync for folder: 1 Sales at Wed Jan 28 12:37:27 =
++08 2026 =3D=3D=3D=3D=3D
+
+
+
+
+GRAND FINAL WORKING RSYNC SCRIPT - CONFIRMED AND TESTED TO BE WORKING! - AS=
+ AT 28 JAN 2026 Wednesday 1.36 PM
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+#!/bin/bash
+# Bulletproof Synology migration script: DS713+ -> DS1522+
+# Sequential SSH rsync for 16 shared folders
+# Handles spaces, retries, logs, #recycle excluded
+
+# ----------------------------
+# Configuration
+# ----------------------------
+TARGET_USER=3D"rsyncuser"
+TARGET_HOST=3D"192.168.0.101"
+BW_LIMIT=3D3000          # KB/s, adjust as needed
+MAX_RETRIES=3D3
+LOGDIR=3D"/volume1/rsync_logs"
+mkdir -p "$LOGDIR"
+
+# List of shared folders to migrate
+FOLDERS=3D(
+"1 Sales"
+"2 OPERATIONS"
+"3 Admin"
+"4 ISO 9001"
+"5 Finance"
+"6 IT"
+"7 Volume_1"
+"8"
+"8 SynologyLog"
+"Completed Projects"
+"Disk 2"
+"docker"
+"OSV and LLP"
+"Volume_2"
+"web"
+"web_packages"
+)
+
+# ----------------------------
+# Pre-create all destination folders on DS1522+
+# ----------------------------
+echo "Creating all target folders on $TARGET_HOST..."
+for F in "${FOLDERS[@]}"; do
+    ssh "$TARGET_USER@$TARGET_HOST" "mkdir -p '/volume1/$F'"
+done
+echo "All destination folders created."
+
+# ----------------------------
+# Migration loop
+# ----------------------------
+for F in "${FOLDERS[@]}"; do
+    LOGFILE=3D"$LOGDIR/rsync_$(echo "$F" | tr ' ' '_').log"
+    echo "=3D=3D=3D=3D=3D Starting rsync for folder: $F at $(date) =3D=3D=
+=3D=3D=3D" >> "$LOGFILE"
+
+    RETRY_COUNT=3D0
+    SUCCESS=3D0
+
+    while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+        rsync -rltDv --progress \
+            --exclude=3D'@eaDir/' \
+            --exclude=3D'#recycle/' \
+            --no-perms --no-owner --no-group --no-acls --no-xattrs \
+            --bwlimit=3D$BW_LIMIT \
+            -e "ssh -o ServerAliveInterval=3D15 -o ServerAliveCountMax=3D10=
+ -o TCPKeepAlive=3Dyes" \
+            "/volume1/$F/" \
+            "$TARGET_USER@$TARGET_HOST:'/volume1/$F/'" \
+            >> "$LOGFILE" 2>&1
+
+        if [ $? -eq 0 ]; then
+            SUCCESS=3D1
+            echo "=3D=3D=3D=3D=3D Completed rsync for folder: $F at $(date)=
+ SUCCESS =3D=3D=3D=3D=3D" >> "$LOGFILE"
+            break
+        else
+            RETRY_COUNT=3D$((RETRY_COUNT+1))
+            echo "=3D=3D=3D=3D=3D rsync FAILED for folder: $F, retry $RETRY=
+_COUNT/$MAX_RETRIES at $(date) =3D=3D=3D=3D=3D" >> "$LOGFILE"
+            sleep 5
+        fi
+    done
+
+    if [ $SUCCESS -eq 0 ]; then
+        echo "=3D=3D=3D=3D=3D Folder $F FAILED after $MAX_RETRIES retries a=
+t $(date) =3D=3D=3D=3D=3D" >> "$LOGFILE"
+    fi
+done
+
+echo "All folders processed sequentially. Logs are in $LOGDIR"
+
+End of script.
+
+
+chmod +x rsync_script.sh
+
+nohup /root/rsync_script.sh > /volume1/rsync_master.log 2>&1 &
+
+Thank you.
+
+Regards,
+
+Mr. Turritopsis Dohrnii Teo En Ming
+Extremely Democratic People's Republic of Singapore
+28 Jan 2026 Wednesday 7.24 pm Singapore Time
+
+
+
 
 
