@@ -1,51 +1,90 @@
-Return-Path: <netdev+bounces-254184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gJvaIpHgeWm50gEAu9opvQ
-	(envelope-from <netdev+bounces-254184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:10:25 +0100
+	id mDYGDXbieWm50gEAu9opvQ
+	(envelope-from <netdev+bounces-254185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:18:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F93D9F44C
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:10:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FD59F5CA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:18:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AECA63003EC4
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:05:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B24993030B3A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BF62D4B77;
-	Wed, 28 Jan 2026 10:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559682E7BD2;
+	Wed, 28 Jan 2026 10:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ug73yjXI"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="aFFlQZUP";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="tzKFvR1L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.163])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07BD278E5D;
-	Wed, 28 Jan 2026 10:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769594758; cv=none; b=BVC1RM0S9bFAJPHuKJCkSsFKGmX72sRqkHTsuwYj/1+tf7GekPjrfmhGnq+FjeU25Q1WsQCaF6Knn60qVi3a37Odu+u64hxlucG0M3SgOxCSSsFsXJREo8idqaxcKeMgcPCMhjCXLbkMns4lJoMv/NrzCA3NEfftlz4NFH1JDNs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769594758; c=relaxed/simple;
-	bh=mNogkX6AMNbYNT9d0odM8p5Ws8xBsTc5rwxPzqRLBSQ=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345F02DC791;
+	Wed, 28 Jan 2026 10:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.163
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769595451; cv=pass; b=TQZvM6My8fmUnK+g8RxOmWHCvCG2zn2o0mujqe6M5GRVa/KQcBbRlgbAyXfkqHJj7kTJcmgv6XTtxT3pGwnQLjsOMk6U6/BIplHH6QsmU3xJ7cTKQllYr23HXkt5qocFPGMQE50YzVhb1q0WlKM1P7f56qH6Ot73hYLJCoq8NtA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769595451; c=relaxed/simple;
+	bh=xmq+xeoli88jDyA1F0PUrkVYfYeMP0i3gmFODwVQTfQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LaNtW/ZEqvD1zCAI82I2cKP6boKSrec7AdMYacxU88+RVzVn4YxUvrWX8p3CHoQnrAIXJxhxOO0YfWykuTZMHeLza9cya3I64LupJIRM1T6HkvhU9ob9Um4w/eIN4g5PS2gKklPl/vM5913J51HcQH/rLJCOJBEGvwdtQ2t2ONU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ug73yjXI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F9CC4CEF1;
-	Wed, 28 Jan 2026 10:05:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769594758;
-	bh=mNogkX6AMNbYNT9d0odM8p5Ws8xBsTc5rwxPzqRLBSQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ug73yjXIv5tH9NOLkWogciX2FvYW41BTFvfR0W2aAuVfWpEbdzxoupA8x3PKQztHV
-	 JJcbVEqyS3Ted/xj/wVkTNaowQ4dpsCEmT9lmY3Rx2cWEu+o50/mLK8T1ilMY4bbcD
-	 zQfLVq80sBpxrHlEfo920OVp3kGbMAEJcgEvhQen3ZTmTmwB43DnDpGIZ73qcMBr58
-	 c+7qbrKxVi+XveF3o/3caM8C7YAxm5oraCDv09Tn4V1vPftNeGoP90dMEfb8Z6hWHh
-	 ZeIZ4C7GYsLX5AmaqK/cLyY/UTY1370mg0H1WVvVDU8LD59FuDUHh2OFAQOuW+QVEu
-	 45LKLh8NLI73Q==
-Message-ID: <3ed93cd3-677c-4d0c-a3a6-25c3d47a4ef2@kernel.org>
-Date: Wed, 28 Jan 2026 11:05:51 +0100
+	 In-Reply-To:Content-Type; b=JRJruZOsPZpcUAVntPJnJbnkZacFvj1LWtrzETZ/gZ2iMo4nT9flL7m2rZeoYzPoLn4YUCWkuceCeFQbGowmtlORKCvhp/ByS0ZyBAPT5PwZM+p0gdZlBENOUWZOYPRbJABjfFIghVohk0Pzd/qVsNw//c9hoQQpk2pLs2zOXv4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=aFFlQZUP; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=tzKFvR1L; arc=pass smtp.client-ip=81.169.146.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1769595440; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=s/E8wWyTMn0xmuGMar5cOpjWI5yiU438dL+JfF30KhHwVQ40U7Ba3TLcMt/OBoe7FZ
+    0L9GrAQPcsVc8hkd+7E3JhfkOx05JZtr/qLcgp0rUZCtl56h4rkQBFnn0z1vM9alGYkd
+    4U24yw7y5niOOpYvDZKHVa5G4r0ITOMu/dzBp0E2Sm+rsu4o8bJHsDfV7XZaz6Y6s6Ix
+    TvsZdtwIX5lxY7U8O8t9rMMFyc5nJAMTo0uHqapa3oYEbMEWoUJaj+fV1A+9ih3iUGEn
+    RGEwyQZTlsJiRDyr5PR6NVdD8LbV4htW4iHRoZtDAoyz/Xba240KPQyWfajsXb2l9QzS
+    Rbhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1769595440;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=+03VpZOpxRwSZDIGepRERpUpATI+KbCQQgYl+eWVP58=;
+    b=D+9uYz938B70iW+HUbfUK91mMSbRnBhS+OxHEHR5EU17cjg/NIhPzWe+x99Kw0btBG
+    JaygbqCTYIJGivvJn5cWTORZx3Dka2ttvQ+QBujFVcqeRfrs4le9LKQWRDImy5y9bkOy
+    209DjmzI3kzxnm6A75VoQ4R5GSABUiXpRwuBtPFa8RxgrDgswJHczSFzZ+dkL3waCj3n
+    JYe8FDYi+DgKIS8TXyEj1zWFfMO9KZSW7s2hHSL87ssbUN4OuGu/5os7fj3ERSp20EBq
+    uijc5lyys53EP+aH9WhvX7IaQeCd6BWzv2T7N8na18mO4WfzL+QOTs3jQPZJkVLzg2Sb
+    5+1Q==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1769595440;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=+03VpZOpxRwSZDIGepRERpUpATI+KbCQQgYl+eWVP58=;
+    b=aFFlQZUPrljmDf8DZIiLS0VG4A3qR4O8FfNVzpafTwIWzArqEBINzwEjm2yLQfm9Gw
+    jn/8XRBIbV01nZJva/CoGM1x+ay19MViXNVR5aTVsjuI5F0ym9PTF9mLUCBIRIYVNnv7
+    JqKikzbdozDz0PVwyfiRHfwlAXOcbl4ppSQXj14DyXTYPKjQvH67Y8Vtbn09P9I0JKNd
+    ZzrdssJosJ2C2M2ho2gLJVGDn/16uCGpsK4BSWKEd9gmHlSfjdPIHIDP2ofMlCzfyer3
+    uY28ncLdUiMUkhgWRACgDmOfajItUoYWA7Ke5bThMd7bA/5R48NSwNXRsWayHurBWnYy
+    9QOA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1769595440;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=+03VpZOpxRwSZDIGepRERpUpATI+KbCQQgYl+eWVP58=;
+    b=tzKFvR1LYmmezXqTpM2MlY0k0KKfiK1A6TqYU8xZnebkbTjROw/48kgqkfIxw9YPOq
+    ufd+USsh3pozi7WojpDQ==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8YjX10Q=="
+Received: from [IPV6:2a00:6020:4a38:6810::76e]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b20SAHKlEU
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 28 Jan 2026 11:17:20 +0100 (CET)
+Message-ID: <e159066a-d957-4b42-a6ba-2439e837d9cb@hartkopp.net>
+Date: Wed, 28 Jan 2026 11:17:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,137 +92,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
- control
-To: Bo Gan <ganboing@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- rmk+kernel@armlinux.org.uk, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- ningyu@eswincomputing.com, linmin@eswincomputing.com,
- pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
-References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
- <20260109080859.1285-1-lizhi2@eswincomputing.com>
- <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
- <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
- <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
- <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
- <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
- <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
- <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
- <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ linux-can@vger.kernel.org
+References: <20260125201601.5018-1-socketcan@hartkopp.net>
+ <20260127174937.4c5fc226@kernel.org>
+ <67cb17f4-2f72-4847-aa04-3633f3d8df33@hartkopp.net>
+ <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
+ <20260128-keen-owl-of-emphasis-ca7f18-mkl@pengutronix.de>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20260128-keen-owl-of-emphasis-ca7f18-mkl@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,reject];
+	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254184-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254185-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[hartkopp.net:+];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,eswincomputing.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MAILSPIKE_FAIL(0.00)[2600:3c0a:e001:db::12fc:5321:query timed out];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1F93D9F44C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:url,strato-hosting.co.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hartkopp.net:email,hartkopp.net:dkim,hartkopp.net:mid,rzone.de:url]
+X-Rspamd-Queue-Id: 97FD59F5CA
 X-Rspamd-Action: no action
 
-On 23/01/2026 11:47, Bo Gan wrote:
-> Hi Krzysztof,
-> 
-> On 1/23/26 02:07, Krzysztof Kozlowski wrote:
->> On 23/01/2026 08:39, Bo Gan wrote:
->>>> I assume the address of the interface is fixed. So you can just key
->>>> off that to distinguish the two instances.
->>>>
->>>> Since this is an internal property, not a board property, it is not
->>>> clear it actually belongs on DT.
->>>>
->>>>       Andrew
+
+
+On 28.01.26 11:04, Marc Kleine-Budde wrote:
+> On 28.01.2026 10:07:13, Marc Kleine-Budde wrote:
+>>> In fact patch 6 stuck in my providers mail system which responded this to
+>>> (only) patch 6 ¯\_(ツ)_/¯
 >>>
->>> IMO, they should be in DT to provide maximum flexibility. The SoC .dtsi
+>>> 5.7.1 Refused by local policy. No SPAM please! (B-EX
+>>> 155302::1769588601-AC38E895-223F95BA/10/71040183929) see https://www.strato-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered
+>>> [MSG0011]
+>>>
+>>> As this could not been solved since Sunday I'll kindly ask Marc to send the
+>>> attached v2 patchset (including your __u32 remark) to the mailing list, so
+>>> that also the AI bot can take a look at it.
 >>
->> This is not the purpose of DT. Please rather use arguments in terms of
->> DT rules (see docs, presentations).
->>
-> Any examples? links? Thank you for your patience.
+>> I'll do. In the mean time, please have a look at b4, it has support for
+>> sending patches via a web hook.
+> 
+> Your ISP's mailserver also classified Patch#6 as spam when I was sending
+> it :/
+> 
+> | Reporting-MTA: dns; metis.whiteo.stw.pengutronix.de
+> |
+> | Action: failed
+> | Final-Recipient: rfc822;socketcan@hartkopp.net
+> | Status: 5.0.0
+> | Remote-MTA: dns; smtpin.rzone.de
+> | Diagnostic-Code: smtp; 550 5.7.1 Refused by local policy. No SPAM please! (B-EX 149500::1769594129-F202EB70-729865BA/10/71040183929) see https://www.strato-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered [MSG0011]
 
-Really, doing simple search for it is your homework, not our task. You
-need to try harder if you want to prove that you are not wasting our time.
+Yes. I was looking in my inbox where it was missing too o_O
+Fortunately it showed up in patchwork :-)
 
-Documentation/devicetree/bindings
-
-Or any elinux resources or any recent talks of mine.
+I'll add that to my problem report ...
 
 Best regards,
-Krzysztof
+Oliver
 
