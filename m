@@ -1,126 +1,133 @@
-Return-Path: <netdev+bounces-254275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAmHL3sbemlS2QEAu9opvQ
-	(envelope-from <netdev+bounces-254275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:21:47 +0100
+	id qIIUGxYaemlS2QEAu9opvQ
+	(envelope-from <netdev+bounces-254276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:15:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA21A2A9C
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:21:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE55A299D
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:15:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 79510305A406
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 14:15:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2962B300B1A8
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 14:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000DC2192F4;
-	Wed, 28 Jan 2026 14:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CE5221DAE;
+	Wed, 28 Jan 2026 14:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2laH6QUh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sbvk2P4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F3D15539A
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 14:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0BF1E572F
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 14:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769609739; cv=none; b=Lr7U/42eJp6hJFNxFaOdx55Ohi8SmJ3Nec16/KSNYvkTmo/xNM/vKd4HUOISlJVZ4sBo3m1CxU86Hj+qgqJztmZIlyNROIL5McnvEMfKfGeUGWNITj8TxHU9OtqyKDUK1gtlr1r3/fMaUcWaL1pWMZ2/JG37DtjUljJ7f5nL5Ks=
+	t=1769609743; cv=none; b=rWJypUBy9LsBJBraQWN9t+JvGPVkXS8VRNGl+Gwpw6Ywx94Ib9Zi3gEV5aJajyCqiLG5cJQrSalXyMTITrCT3mFkLPKxyWKCBcFU2BNMmQ236UCsOmkx7gDXt5es4z5FwWRfdU6u9G4FqD2oTRwhZ0Lp+AgGRZznkvMxQWdne7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769609739; c=relaxed/simple;
-	bh=bkDLy03dnBpy3kR9hyawvjbxX2sRY3xbivrggE47a8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=czStEjfPnz27PB+HyRPJA71EKbUCx+wNthpCHqY+bF0DAZO6c5l2m/R7tu3mpeHHoXLwkT4eX+Hmy+/C2Dh2ok1Sl+8XmROqvai6SHUXwY2v1qRVS1V2htB9U1jemtt76Q+/LjD3svm6ej3ba2TQr1bFamdS+Y1PQL+SEpedPFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2laH6QUh; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id A5C38C211E8;
-	Wed, 28 Jan 2026 14:15:39 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 235796071F;
-	Wed, 28 Jan 2026 14:15:37 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 97CFC119A880E;
-	Wed, 28 Jan 2026 15:15:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769609736; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=JzIHVDwFjCIwEjLThlMak+eaj2p5mVb9GNydSBLEdFY=;
-	b=2laH6QUhpYYvedtbtK1TszrakUYndSaoMPZaLGLxQjTtGVjD7aGeF+DbC9TmEefWfX62Fm
-	gIwU0WSgtC4YkPybIWcrIK2XaM8Le2TNik5+kLG/e0q+ZQBvah2yYHnpg7nBhponAxEYVw
-	kF2p+eWpeZQn5ONETh64nPywAe3yLa1yLoMHt+DWGwZzHAyBNWshe4ma6ifcAwZHevNnR4
-	tjCqa0Gj5r1k8INjkOOtv7xuzz+YT5OdnPZ62x2CzES5G6sXm8b5oj+kWgOyfPqvzwoSVS
-	ly2jTDoCeHscriEYmFOWCjzZFD1Fc9qggGWZx5zLC3i+di4YixudZFyqQUtHGA==
-Message-ID: <cca153df-ae6d-4644-97ca-653f3078564d@bootlin.com>
-Date: Wed, 28 Jan 2026 15:15:32 +0100
+	s=arc-20240116; t=1769609743; c=relaxed/simple;
+	bh=gKcgG3XT4Lf6N/zBcFjLBA8r/eqPwC9sRVuaU5TeCac=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nNiSqXgsOrEzcxvOIakfd60Y+FWLvbIQTXI2VWpVfupyotSf9xFsr00wNKvYSI6A5XO4j34yG7O25aZW7AgJPj3NymZP8WC9vJce4BcrDcegSrymi6AuxkLCBi4WFLjh1/QfkEhpxVds7Fp3eoT0dNtlI8GXHg7aWoQJu3InC2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sbvk2P4s; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c5296c7e57so1091745685a.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 06:15:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769609741; x=1770214541; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OTvBn8cPeuEiu3n22B1RbD01hVDEbLOUn9gW9IHy0nA=;
+        b=sbvk2P4s2sYAuN1UQNesFTkCR75rWcp9I133qc/WNrOPY1Wy0kSCO7jSJZTOu/Bxu0
+         kffUYClWAM7Ztlt7YOc7ChkiHxShCv0O1O+wlQyfW0homNL+NhEf+Jw7WAJps5sOmBf4
+         97MfRQmZbuL3xYS0Px0gL+77vw5GYwNaE/RNvVCeQkwXDc40URaYpvkDnpC6dQZu6pFe
+         vnppXl5LA9JC+SCStZfHse3mtGVlOALOhO6AAAouzEg67691xLP/udCCPd2BqrvkOTY/
+         eaC16OlCKDyvNQFIpGjZSHOqmcxiyL1K+cj5wMvoTpdlRH/FWN39qwVEjKbTILHLjVJU
+         u3fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769609741; x=1770214541;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OTvBn8cPeuEiu3n22B1RbD01hVDEbLOUn9gW9IHy0nA=;
+        b=SLKLsi6rrXb2axjV5TJsZ7turwMqQmneyTAwtaGMEJ7bu7SkWWcWrpgTSeI11Zwp1h
+         Z8Zimm/Wu9JXn3QUQszkplbPECnqG/+CxdtMypRA4m6h7h8mDQqm7JTSh8BuGHKTFxw6
+         51Rn5B02OEjLkOX+8cPn9zr422KANZcvaRqrqHugVXyJ/wEJumV/NYulj3o1EGvi0OE0
+         fcQ4ewP81tAtSQQuOeyAPPMl/gPZelloCNNYwQ54RoucUVvl1d7d8TwrmroDey2p5fk7
+         ZJABWzAFZXlBa+ZP1Tn3334qFqQxI5EobqblfrBH1Ej9qkiUGEZC/csQ03I0pVVhF0gQ
+         Q+bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ4XecaCi9Mw9rkPSWjnLaSM5y7AN3MkX5MLDcDNJKAKqoAz337Cc5SGpCTv2N/FA3dPKw0WU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEGfs+MHohOAbV4PuIfvGrwh+hoc3FxtZIK/dyHjQ+vXQqKRAf
+	Hk2x+Gs/5V6wqVMbc95weyhaRzc9TjBcrauRj7DvCmp6CBrIpVknVQQaB8/uHP1UiDypWC0qaAn
+	MwKoOlHR10pDKMA==
+X-Received: from qkap8.prod.google.com ([2002:a05:620a:a908:b0:8b2:eb2c:2ed2])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:f10:b0:8c5:2b63:2d1d with SMTP id af79cd13be357-8c70b91480cmr634460985a.73.1769609741111;
+ Wed, 28 Jan 2026 06:15:41 -0800 (PST)
+Date: Wed, 28 Jan 2026 14:15:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: stmmac: thead: avoid conflicts with
- PHY_INTF_* definitions
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Drew Fustini <fustini@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Fu Wei <wefu@redhat.com>,
- Guo Ren <guoren@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aXnpTy6XckPGcmg0@shell.armlinux.org.uk>
- <E1vl36A-00000006urf-19ox@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vl36A-00000006urf-19ox@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260128141539.3404400-1-edumazet@google.com>
+Subject: [PATCH v2 net 0/2] net: fix potential crash in net/sched/cls_u32.c
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, GangMin Kim <km.kim1503@gmail.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254275-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254276-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1BA21A2A9C
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2EE55A299D
 X-Rspamd-Action: no action
 
-Hi,
+GangMin Kim provided a report and a repro fooling u32_classify().
 
-On 28/01/2026 11:48, Russell King (Oracle) wrote:
-> Avoid conflicts between stmmac PHY_INTF_* and GMAC_INTF_CTRL register
-> definitions by replacing the PHY_ prefix with GMAC_.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Add skb_header_pointer_careful() variant of skb_header_pointer()
+and use it in net/sched/cls_u32.c.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Later we can also use it in net/sched/act_pedit.c
 
-Maxime
+Eric Dumazet (2):
+  net: add skb_header_pointer_careful() helper
+  net/sched: cls_u32: use skb_header_pointer_careful()
+
+ include/linux/skbuff.h | 12 ++++++++++++
+ net/sched/cls_u32.c    | 13 ++++++-------
+ 2 files changed, 18 insertions(+), 7 deletions(-)
+
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
