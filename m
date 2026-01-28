@@ -1,197 +1,225 @@
-Return-Path: <netdev+bounces-254462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254463-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iENXBep7emka7AEAu9opvQ
-	(envelope-from <netdev+bounces-254462-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:13:14 +0100
+	id WB9eDBZ9emlN7AEAu9opvQ
+	(envelope-from <netdev+bounces-254463-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:18:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9792A9001
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:13:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A60A908D
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:18:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFFC33068D73
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:11:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E5FC93007210
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B3037881C;
-	Wed, 28 Jan 2026 21:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A10313520;
+	Wed, 28 Jan 2026 21:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kECsAd+W"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VcAbRWxC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BD43783A3;
-	Wed, 28 Jan 2026 21:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD0121E087
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 21:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769634700; cv=none; b=kKN8KVc3d/ZDb/O24PIWQafMpokKRfwB8UR6mS7cbZR5zkmZK2BPCG2N6A9hkP5MySevtOefV761NvzmfSMA6vvXgVlDEbo4Jx6Jvio7LAfIuhGrx76ahwSgXdFL2llF+a/N30i+9khHO9VaixalEC1gZvz/g7RYvYYiwcBhFAc=
+	t=1769635087; cv=none; b=lbA8Z2wSWCCnBJB3Qk49ISHEJcvlOcscLcU8+h7x9NOTV+Y8YuKpCTDV/ivlAQ8i/sBZ3vBJKjicnMfXhV/AFpqdL0DTChA/7Yg8e2kOvAmzH6ZonnfgJj8bifOSKoeBenEcoFjTz6/V8VEbzaPBIv9Mlxi0LaR6SC1ZOPeyAtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769634700; c=relaxed/simple;
-	bh=/Q2rO//nNvQwbQGtThXRokVEEWYfBatKLnNyBVLMKUs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MXvdPjvloY+KK8sF5daImGAvqzN5oEp5bx2JDxR2tXbIxtuWKVYRxI+ZXRJa4IJCzttMSWMTGcP2RyO+lw0qAmad9zs9xNS9KfObAbCQDi7iHDNmKHQj6M1Kh8wIFMg92m7NCXjjb5kE2/C1A/Qu/2/isIoz19/p7nzTunCI4tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kECsAd+W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 06FCBC4AF09;
-	Wed, 28 Jan 2026 21:11:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769634700;
-	bh=/Q2rO//nNvQwbQGtThXRokVEEWYfBatKLnNyBVLMKUs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=kECsAd+WvwQaDYbYoX9EJzKA2M1zXTwenUDbP7ERhyMDMTtbY102Z6CDlk2mtvmR4
-	 Gv0S1TlS8U6RIRS9EhW6sBPkjtPLTdErsPnA3rKQri7vChb6B3zEC65szEEsjf2Knm
-	 tNSi5wdodEnf4jQ9rvp1KP7oTUMQ3InRMwPFlemqLEWXVQsHZ9gz158a9O63S4gsJD
-	 TL6LuyJMrUm5k5IdRNz/lSS8AYx90J7OOTxRqaJ4bOYxR7JdspU0GJDgNCivtB+kKZ
-	 /4ktfOfum26lVpmlJ/OJFDwjXCjXMZuO8zcTnK9WSHHP2KADKJFIp1sE2PKOH9ejrl
-	 bsbb+dsWXZ93g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F04FAD46C04;
-	Wed, 28 Jan 2026 21:11:39 +0000 (UTC)
-From: Oliver Hartkopp via B4 Relay <devnull+socketcan.hartkopp.net@kernel.org>
-Date: Wed, 28 Jan 2026 22:10:57 +0100
-Subject: [PATCH net-next V3 7/7] can: gw: use can_gw_hops instead of
- sk_buff::csum_start
+	s=arc-20240116; t=1769635087; c=relaxed/simple;
+	bh=kjFXNlbmAL0BO92rYrTkCSuMABiMP5ofoNy2abW+ap8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z8ObZTzjLvnBA1lYEeMVlbWreF/fUD0PNMeKTMoNgmsuoircR9jWm+FBtDX7PrRCOltEljvTcb+4y2reCTKCyELXtUl08RTylGFeonE1onY8KeeGi3b3LVEmUtJCCbTuEcUE49sOcZmaB2f5+rMZ9GDhLkWPrxvbLyJaobQHLVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VcAbRWxC; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47ee07570deso2229865e9.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 13:18:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1769635085; x=1770239885; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZU7FEnl0OZQVA7ODIpy0SKJAEacHqZRjK4EaXTvPIzs=;
+        b=VcAbRWxCx1sqsR7wsEPCek4TghMY0a1vc9GxEknZR59yeMCqkqjg1CaJoLrqOfymzc
+         LYIMCKsdWDcGTXFFAeHuG1vHMeb1H+qG5dYzKoFl7O7O7tffhq8wkVwb943kpXJavfS0
+         JXZsmZ0mietseQsxHDXU+1WCIwSUXbjThkfHww+t/wfYahNCHJc0k2smjB2CrMlHRT1J
+         oIQsBhMzeHlO8saKSiNKhXA9/h9DM4jnwQKUtbAdkzeoYpUc8uBTKgDNTO8n/XeLXBVg
+         zwGU85oRqLdKHO38LyxQs5lZtHxrEalkUPEs9Yf3ZRzRT6Goe8iMzyZqQbtbc0i++cMy
+         lmNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769635085; x=1770239885;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZU7FEnl0OZQVA7ODIpy0SKJAEacHqZRjK4EaXTvPIzs=;
+        b=hIHB7RH0fNzpJsa0qUW04qieS2mvJ3Nwh0Jmi2KYSvNz/wwHyihbToG8Ch99HAJh9B
+         OgZknZ2kZI3c4fFux+eenFwhDuqe35uy1SCEbgnvOtjf4J+JUEEPJZ4Vd1s3KpAvxnn1
+         HsBcUC+CtGTnManPX5vRDCxWGLfQxRRBKw6HTbSWuDtUuYoMwD2tBqKUKFAypwbhezD2
+         WkgZ402n5k1HOpvzAYM/BbnLL58MHgh/tK7iOfjuBV7lhZBQNa0JOx9bUGhLG1uaqCMm
+         WT2VOAQe6YqxUDLkhAxQ3BK3azmxNUW4PugLHokzZ2DgBTmhkzNbmOR1DNrTpu1/Wkan
+         j+bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWN2r4CzsznI7S76S3e0s2cIoGlZiQO7Kp7Rz+0TBesRpQzUqOHpn9hfYCBA2FMBeBFejlU628=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtDWqe996EDF5FAb/RFK8C9VyQIbB+aGuE4BDJ/64d5vvVTFQZ
+	h+om1aGfN0qe1ZsPdpE5S8YCw9cr0/TV59s5ORgKtY5qnGfm5KtK6ESyDyUoq42eGXE=
+X-Gm-Gg: AZuq6aLhVaBrb+oB2ntYQ6ohpco9FjI25yl+eppMZbiTo6F+iyHdVjTuym/quqauXD6
+	RUadgNU+1z5ZFcPvVmnAw45JyWdkkrD6lvun9u0uvhoX1NOaNiIBUlzqWxQlNqnengdqdMJyGgh
+	wv1PHMRf/+3DtamK48oVjoWzplWFDUfN5tUjERu0xn2rTm21F1mtNFmDtXcoKrXTsqgw1eS9imY
+	XDi00jwX7h8wMqT1ggIXrCqZ4ADK8MeE2jVphpnVCcCac9wIetSj/XJP65ejqcxFVb5DEKvojxp
+	9jMcHLdISXxwiXCii0WSAxxCqWziEibRGufiVLWxCHwyy8U8mKxFdJrKZwCDpJDC2oQxwLigjVT
+	mifh7b2N/Mb7/XMp5mbX8nQjE17JhTDAnxUdbrPN+BgGZCXMyEJX6yfIwM4FgYlUtkcvAW+1OZ6
+	o5FRjjvm2aaNEBaQZ2nQ1zIymn
+X-Received: by 2002:a05:600c:154c:b0:47e:e9bf:dd8a with SMTP id 5b1f17b1804b1-48069cb2fddmr85513805e9.37.1769635084662;
+        Wed, 28 Jan 2026 13:18:04 -0800 (PST)
+Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806ce4c515sm85708295e9.11.2026.01.28.13.18.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 13:18:04 -0800 (PST)
+Date: Wed, 28 Jan 2026 22:18:03 +0100
+From: Michal Hocko <mhocko@suse.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aXp9CzgCTBEhlDqM@tiehlicka>
+References: <20260125224541.50226-1-frederic@kernel.org>
+ <20260125224541.50226-4-frederic@kernel.org>
+ <aXeZQoSHJ9QX7B6W@tiehlicka>
+ <aXizUsfywjtIIN50@localhost.localdomain>
+ <aXnMj1phN3TJZkNz@tiehlicka>
+ <aXnymtIZSc-fw1b8@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260128-can_skb_ext-v1-7-71b8bcbfd8cf@hartkopp.net>
-References: <20260128-can_skb_ext-v1-0-71b8bcbfd8cf@hartkopp.net>
-In-Reply-To: <20260128-can_skb_ext-v1-0-71b8bcbfd8cf@hartkopp.net>
-To: netdev@vger.kernel.org, linux-can@vger.kernel.org
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
- Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1769634697; l=3097;
- i=socketcan@hartkopp.net; s=20260128; h=from:subject:message-id;
- bh=G0PyhBZW9Q7e9z6lpqwdaRFJ89PaevlNpycS/X4tDSQ=;
- b=q6rHO3Uul5CHO5OeJZrz0VkivSn/VVtO0y/TioVJkYJcULo78Zrnm4ZEcNa7XCY4d4d+YmGNa
- QW2ucVfnjX7BUkgA4jvXLoD6Didr/tg55nNvP29SFBEWcjzmla735Mt
-X-Developer-Key: i=socketcan@hartkopp.net; a=ed25519;
- pk=/gU/7/wBqak3kTsTeFbCCqUi9dnh+1i6ITEkfPj/BvU=
-X-Endpoint-Received: by B4 Relay for socketcan@hartkopp.net/20260128 with
- auth_id=620
-X-Original-From: Oliver Hartkopp <socketcan@hartkopp.net>
-Reply-To: socketcan@hartkopp.net
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXnymtIZSc-fw1b8@localhost.localdomain>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254462-lists,netdev=lfdr.de,socketcan.hartkopp.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254463-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[mhocko@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[socketcan@hartkopp.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[hartkopp.net:replyto,hartkopp.net:email,hartkopp.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:email]
-X-Rspamd-Queue-Id: A9792A9001
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 54A60A908D
 X-Rspamd-Action: no action
 
-From: Oliver Hartkopp <socketcan@hartkopp.net>
+On Wed 28-01-26 12:27:22, Frederic Weisbecker wrote:
+> Le Wed, Jan 28, 2026 at 09:45:03AM +0100, Michal Hocko a écrit :
+> > On Tue 27-01-26 13:45:06, Frederic Weisbecker wrote:
+> > > Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a écrit :
+> > > > On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
+> > > > > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> > > > > runtime. In order to synchronize against memcg workqueue to make sure
+> > > > > that no asynchronous draining is pending or executing on a newly made
+> > > > > isolated CPU, target and queue a drain work under the same RCU critical
+> > > > > section.
+> > > > > 
+> > > > > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
+> > > > > workqueue flush will also be issued in a further change to make sure
+> > > > > that no work remains pending after a CPU has been made isolated.
+> > > > > 
+> > > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > > > > ---
+> > > > >  mm/memcontrol.c | 21 +++++++++++++++++----
+> > > > >  1 file changed, 17 insertions(+), 4 deletions(-)
+> > > > > 
+> > > > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> > > > > index be810c1fbfc3..2289a0299331 100644
+> > > > > --- a/mm/memcontrol.c
+> > > > > +++ b/mm/memcontrol.c
+> > > > > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
+> > > > >  	return flush;
+> > > > >  }
+> > > > >  
+> > > > > +static void schedule_drain_work(int cpu, struct work_struct *work)
+> > > > > +{
+> > > > > +	/*
+> > > > > +	 * Protect housekeeping cpumask read and work enqueue together
+> > > > > +	 * in the same RCU critical section so that later cpuset isolated
+> > > > > +	 * partition update only need to wait for an RCU GP and flush the
+> > > > > +	 * pending work on newly isolated CPUs.
+> > > > > +	 */
+> > > > > +	guard(rcu)();
+> > > > > +	if (!cpu_is_isolated(cpu))
+> > > > > +		schedule_work_on(cpu, work);
+> > > > 
+> > > > Shouldn't this in the guarded rcu section?
+> > > 
+> > > This is what guard(rcu)() does, right?
+> > > Or am I missing something?
+> > 
+> > I am probably misreading the patch. But I've had the following in mind
+> > 
+> > 	scoped_guard(rcu) {
+> > 		if (!cpu_is_isolated(cpu))
+> > 			schedule_work_on(cpu, work);
+> > 	}
+> 
+> guard(...)() protects everything that follows within the same block
+> (here the whole function) whereas scoped_guard only applies to the
+> following scope (here what is inside the {} in your example).
+> 
+> So both work.
 
-As CAN skbs don't use IP checksums the skb->csum_start variable was used to
-store the can-gw CAN frame time-to-live counter together with
-skb->ip_summed set to CHECKSUM_UNNECESSARY.
-
-Remove the 'hack' using the skb->csum_start variable and move the content
-to can_skb_ext::can_gw_hops of the CAN skb extensions.
-
-The module parameter 'max_hops' has been reduced to a single byte to fit
-can_skb_ext::can_gw_hops as the maximum value to be stored is 6.
-
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
- net/can/gw.c | 23 ++++++-----------------
- 1 file changed, 6 insertions(+), 17 deletions(-)
-
-diff --git a/net/can/gw.c b/net/can/gw.c
-index ad89a1913b3422f77fdf91b5552380282b2db09a..2c134c9e5159d659b83881c51b3814debbc5f9c8 100644
---- a/net/can/gw.c
-+++ b/net/can/gw.c
-@@ -69,12 +69,12 @@ MODULE_ALIAS(CAN_GW_NAME);
- 
- #define CGW_MIN_HOPS 1
- #define CGW_MAX_HOPS 6
- #define CGW_DEFAULT_HOPS 1
- 
--static unsigned int max_hops __read_mostly = CGW_DEFAULT_HOPS;
--module_param(max_hops, uint, 0444);
-+static unsigned char max_hops __read_mostly = CGW_DEFAULT_HOPS;
-+module_param(max_hops, byte, 0444);
- MODULE_PARM_DESC(max_hops,
- 		 "maximum " CAN_GW_NAME " routing hops for CAN frames "
- 		 "(valid values: " __stringify(CGW_MIN_HOPS) "-"
- 		 __stringify(CGW_MAX_HOPS) " hops, "
- 		 "default: " __stringify(CGW_DEFAULT_HOPS) ")");
-@@ -478,23 +478,12 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
- 		return;
- 
- 	/* Do not handle CAN frames routed more than 'max_hops' times.
- 	 * In general we should never catch this delimiter which is intended
- 	 * to cover a misconfiguration protection (e.g. circular CAN routes).
--	 *
--	 * The Controller Area Network controllers only accept CAN frames with
--	 * correct CRCs - which are not visible in the controller registers.
--	 * According to skbuff.h documentation the csum_start element for IP
--	 * checksums is undefined/unused when ip_summed == CHECKSUM_UNNECESSARY.
--	 * Only CAN skbs can be processed here which already have this property.
- 	 */
--
--#define cgw_hops(skb) ((skb)->csum_start)
--
--	BUG_ON(skb->ip_summed != CHECKSUM_UNNECESSARY);
--
--	if (cgw_hops(skb) >= max_hops) {
-+	if (csx->can_gw_hops >= max_hops) {
- 		/* indicate deleted frames due to misconfiguration */
- 		gwj->deleted_frames++;
- 		return;
- 	}
- 
-@@ -530,15 +519,15 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
- 		gwj->dropped_frames++;
- 		return;
- 	}
- 
- 	/* put the incremented hop counter in the cloned skb */
--	cgw_hops(nskb) = cgw_hops(skb) + 1;
-+	ncsx->can_gw_hops = csx->can_gw_hops + 1;
- 
- 	/* first processing of this CAN frame -> adjust to private hop limit */
--	if (gwj->limit_hops && cgw_hops(nskb) == 1)
--		cgw_hops(nskb) = max_hops - gwj->limit_hops + 1;
-+	if (gwj->limit_hops && ncsx->can_gw_hops == 1)
-+		ncsx->can_gw_hops = max_hops - gwj->limit_hops + 1;
- 
- 	nskb->dev = gwj->dst.dev;
- 
- 	/* pointer to modifiable CAN frame */
- 	cf = (struct canfd_frame *)nskb->data;
-
+I see. Thanks for the clarification. I would probably prefer a more
+explicit call convention but no strong opinion on that.
 -- 
-2.47.3
-
-
+Michal Hocko
+SUSE Labs
 
