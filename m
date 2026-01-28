@@ -1,120 +1,145 @@
-Return-Path: <netdev+bounces-254313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LPPMwsqemmi3gEAu9opvQ
-	(envelope-from <netdev+bounces-254313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:23:55 +0100
+	id oKNuLwIyemlo4gEAu9opvQ
+	(envelope-from <netdev+bounces-254314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:57:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F83FA3B75
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:23:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7C6A4D01
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 79C723044A72
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:22:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 50F7030294AE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B12936BCCE;
-	Wed, 28 Jan 2026 15:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ykB7DvF4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AB32DFA3A;
+	Wed, 28 Jan 2026 15:42:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1092A369223
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 15:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F262D9EDB;
+	Wed, 28 Jan 2026 15:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769613779; cv=none; b=cUZ7UJ3D++/9RrwPO+NJS+L8KsP/M2m0OyNa90gN+aAbog9qWKVpFlCJBfnU9Vd3SjNeTwpslgsdZaogwiS6lunYKg+Ea96kwgE2kKjKyVZsrg/rk0URavUWJzAlz1DyZXYy5j7SEYW+b1Lxz1d36EfV3/Ka4jaHx4TldCCjnAM=
+	t=1769614922; cv=none; b=kll0qEtY0+EkqIIrVrANqa/+tvTB9lDCOHqVGWG10JQNlPkcEzc5AlFkney1gmV4Kq4h6Tn1qGSTkk6qKPLDRVFsx+BYK7HJnMVd6a3KYml9Ieic8SYw4q7tfQ4P/7p792SZNUlFsoqa4fbI3OhE8VZiTui8CXaVIWV3thEz4wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769613779; c=relaxed/simple;
-	bh=oDGZAzxpT8+c+W10giNoSo5eRIcv7WVHULBRFvPt0X4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oDj4ZfjAvXfIysI+0tzIWI/Dja318EGEubD9Vi4SqHIpeCZsCWZi2GLckFWPRlfrdC31+6zKLg/GrPMRQ6Olm5DW6RAKDM1dEe5yE7AoDgkuqvaenbfvrm9aQZS0FLEBkNnqaS2FngbsHqjEcwtt7HSRKfqvmG/Qe0ipmwG+2is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ykB7DvF4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PPY3upBqg5MalFXO6RLn/LnGpdfwG/fgbwSurd8Xego=; b=ykB7DvF4uBNZ4QLpk5GhwEU0Jl
-	67r0d9OMNJbCQPpxU4u29+GLj97BcG7Ir4Uml/9thVUQuG4hJ6uXt2McR3NcFjmmNF1F4hK5aFe6J
-	RyMZGvRGSvIQpAkO4f0XsDxqi6oSE/fvLDFkDPbvSlHcS0b9U+etK4bZLWT2XpkukVwM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vl7Nc-005DI2-DO; Wed, 28 Jan 2026 16:22:52 +0100
-Date: Wed, 28 Jan 2026 16:22:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heinrich =?iso-8859-1?Q?T=F6ws_=28TWx=29?= <ht@twx-software.de>
-Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org
-Subject: Re: [PATCH v1 1/3] dt-bindings: net: dsa: microchip: add
- microchip,single-led-mode flag
-Message-ID: <18c6696a-7874-454d-8032-ca5130e41665@lunn.ch>
-References: <20260128133842.1173406-1-ht@twx-software.de>
- <20260128133842.1173406-2-ht@twx-software.de>
- <6871816c-2732-4c5f-9f10-1f9773d5f23d@lunn.ch>
- <9090d12e-e85e-4827-9dc3-5bbece12c50d@twx-software.de>
+	s=arc-20240116; t=1769614922; c=relaxed/simple;
+	bh=UXwJBXzoRVPAwW4gySv934q5snc/aJEijnpgR+Jq88E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WhGoJf1brJn0ikvdCa4DyZY1Xv+/e2HstBy1u2ZAFTnwa6fV2GK5RfTvIHusKMLa4JN/O0euBYRvLraeTxWd+nW1vr472fwx+VOsa9dvLClV21diuZvbKJ71839acyZkCempv7HVKperqpKf8D8ZnSdJmCjutE0kP5a8GoZqQKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 75C8860520; Wed, 28 Jan 2026 16:41:58 +0100 (CET)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net-next 0/9] netfilter: updates for net-next
+Date: Wed, 28 Jan 2026 16:41:46 +0100
+Message-ID: <20260128154155.32143-1-fw@strlen.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9090d12e-e85e-4827-9dc3-5bbece12c50d@twx-software.de>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254313-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,linaro.org];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0F83FA3B75
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254314-lists,netdev=lfdr.de];
+	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 1A7C6A4D01
 X-Rspamd-Action: no action
 
-> There is no "Manual Mode" or "GPIO Mode" for these pins. They are driven by
-> a fixed internal state machine. Since we cannot control the pins' brightness
-> or trigger events independently from the PHY's hardcoded logic, the netdev
-> trigger or the LED class cannot be used to emulate this behavior.
+Hi,
 
-Thanks for checking.
+The following patchset contains Netfilter fixes for *net-next*:
 
-> > Is there a dual LED mode? Triple LED mode? What happens if this
-> > property is not found?
-> 
-> If the property is not found, the switch remains in its default "Tri-Color
-> Dual-LED Mode".
+Patches 1 to 4 add IP6IP6 tunneling acceleration to the flowtable
+infrastructure.  Patch 5 extends test coverage for this.
+From Lorenzo Bianconi.
 
-Is that really true? Generally, what actually happens is the
-configuration is left alone. So if the boot loader, for example, has
-set the configuration, that configuration is left unchanged. So it
-could actually be in single LED mode, not tri-colour.
+Patch 6 removes a duplicated helper from xt_time extension, we can
+use an existing helper for this, from Jinjie Ruan.
 
-      Andrew
+Patch 7 adds an rhashtable to nfnetink_queue to speed up out-of-order
+verdict processing.  Before this list walk was required due to in-order
+design assumption.
+
+Patch 8 fixes an esoteric packet-drop problem with UDPGRO and nfqueue added
+in v6.11. Patch 9 adds a test case for this.
+
+Please, pull these changes from:
+The following changes since commit 239f09e258b906deced5c2a7c1ac8aed301b558b:
+
+  selftests: ptp: treat unsupported PHC operations as skip (2026-01-27 17:57:28 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-26-01-28
+
+for you to fetch changes up to f0ba90068f33a2d18fa4cc848ea7477d489194bf:
+
+  selftests: netfilter: nft_queue.sh: add udp fraglist gro test case (2026-01-28 16:29:55 +0100)
+
+----------------------------------------------------------------
+netfilter pull request nf-next-26-01-28
+
+----------------------------------------------------------------
+Florian Westphal (2):
+  netfilter: nfnetlink_queue: do shared-unconfirmed check before segmentation
+  selftests: netfilter: nft_queue.sh: add udp fraglist gro test case
+
+Jinjie Ruan (1):
+  netfilter: xt_time: use is_leap_year() helper
+
+Lorenzo Bianconi (5):
+  netfilter: Add ctx pointer in nf_flow_skb_encap_protocol/nf_flow_ip4_tunnel_proto signature
+  netfilter: Introduce tunnel metadata info in nf_flowtable_ctx struct
+  netfilter: flowtable: Add IP6IP6 rx sw acceleration
+  netfilter: flowtable: Add IP6IP6 tx sw acceleration
+  selftests: netfilter: nft_flowtable.sh: Add IP6IP6 flowtable selftest
+
+Scott Mitchell (1):
+  netfilter: nfnetlink_queue: optimize verdict lookup with hash table
+
+ include/net/netfilter/nf_queue.h              |   4 +
+ net/ipv6/ip6_tunnel.c                         |  27 ++
+ net/netfilter/nf_flow_table_ip.c              | 243 +++++++++++++---
+ net/netfilter/nfnetlink_queue.c               | 263 ++++++++++++------
+ net/netfilter/xt_time.c                       |   8 +-
+ .../selftests/net/netfilter/nft_flowtable.sh  |  62 ++++-
+ .../selftests/net/netfilter/nft_queue.sh      | 142 +++++++++-
+ 7 files changed, 612 insertions(+), 137 deletions(-)
+-- 
+2.52.0
 
