@@ -1,154 +1,167 @@
-Return-Path: <netdev+bounces-254190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254191-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCp7L8DkeWl60wEAu9opvQ
-	(envelope-from <netdev+bounces-254190-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:28:16 +0100
+	id 6PZRC+/keWl60wEAu9opvQ
+	(envelope-from <netdev+bounces-254191-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:29:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCEB9F732
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:28:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE54A9F764
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:29:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8D169300DA7E
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:28:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6ECD030095CB
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7492EDD70;
-	Wed, 28 Jan 2026 10:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA2F2FBDFF;
+	Wed, 28 Jan 2026 10:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="P9Smfeyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466E22DA75C
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C0B2E8B6B;
+	Wed, 28 Jan 2026 10:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769596092; cv=none; b=Zq9441xByDrxZfvg03YAIy8MAL9ft6Qw1WmXcotX/cwpg0SwujbqkvN1EqIsA5udK5zZtvfUag0UFFe59lbJQSwcXXDlQP2a9Xzvd5+RhxXv+0EG+hCLGfyTGar2WOorzTQOX18yPDui1nTUhZzLljsRbsgcmLFizLdcpM8nAwU=
+	t=1769596117; cv=none; b=GdcdQhgyZQdpA/3UH37fO1soUtheyKWSTovgrQdO98T3hGCsz9UBB2yErGysZuZPYqG5T51DB6fVVGjfC1aPiI4+FCmzXaY6/crEgtOOUsCP3LYFQ1n26sRTNYa20K1QkG7B3dGu3hxAjH0LKrEYngHVLsz2W25YRgvkn0mEmrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769596092; c=relaxed/simple;
-	bh=pbVl0ODL9OzExgUwxrbIhZ3mNab1RLmbIY3owANW0Js=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fu5i7ICXGPbGEneK/SrO9MGoab6urJeSXHiJ0OSo5JawGgPY6uZg0g7/TDo/JalTkPDSCSgyxdgAI4E8xVOH+H2m4aa1s4ct3WMzqg4Pcofi2778/N4/hWT9pjg+caZbJMOS+VX+NZGMea+JUMizHry40PR/YAYwpEl/nS2yFa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60SAS7W1005303;
-	Wed, 28 Jan 2026 19:28:07 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60SAS78j005299
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 28 Jan 2026 19:28:07 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
-Date: Wed, 28 Jan 2026 19:28:05 +0900
+	s=arc-20240116; t=1769596117; c=relaxed/simple;
+	bh=fST2TX5PPZJpDLOSpjQLko63WnxUbMvUHXK4UwSoCIc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=MWNd47XxXB6yczMsvjO3DiLUd40aYFaIi0DGj4pQb8N/yXf8FIm4MrywbWnFyHV/lcpiq6+bIzDuvycks1KXBlA0wrknexVQO11j5UIcBndbrXMrok1PtGmJEeQiLa39ci53Nh6C5wF8P+Nx9zbc+2Q4HKqHyKTGxDFSQbZM4Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=P9Smfeyh; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1769596105;
+	bh=fST2TX5PPZJpDLOSpjQLko63WnxUbMvUHXK4UwSoCIc=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=P9Smfeyhj+3R4c507f8lR4nt3CVe+M1aTK5Mu2SpAP/JV2jc1lv8CZTSt4RE2DcWt
+	 MLOZwcMzcRi01fsbbjpBCDmN6DRmyM40MfJLGCnxyUjxryOghhQI95MqRds0HYeULL
+	 3g3LdFnJEb/JIPRDnKdt30zA30vl3jDLEQQOFhG88qzWVNcBbhyjAWflv6EwCacvaS
+	 /Nta5fC2XAF2KfOQHLW7gPcFQpOq2+Q7T+pkZtIT8H0ONJi/DLVoiYEDvR5b0wJLN+
+	 9pitWreykAIi4jFCYMYZO3/TzltNHHoLG88uqml/ZsNcQ7cUg2H41TAW/dP2U13LV+
+	 HQCieJFCUx5RA==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id C082764706;
+	Wed, 28 Jan 2026 18:28:24 +0800 (AWST)
+Message-ID: <189d4a03f32ace3fd995596e8b5415ced6ae9c3a.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, Matt Johnston
+ <matt@codeconstruct.com.au>, linux-i2c@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Wed, 28 Jan 2026 18:28:24 +0800
+In-Reply-To: <aXjDENOsmWe5_VqS@kuha>
+References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
+	 <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
+	 <aXdyll4KVOF6SWni@kuha>
+	 <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
+	 <aXjDENOsmWe5_VqS@kuha>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
-To: Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-References: <2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp>
- <CAHC9VhQikhv+qCyQdnJguvy-qTkGXB+NU7=QZjw5d+WfyVxZhw@mail.gmail.com>
- <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
- <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav203.rs.sakura.ne.jp
-X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[I-love.SAKURA.ne.jp:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	MIME_TRACE(0.00)[0:+];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254191-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254190-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_ALL(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 9CCEB9F732
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,codeconstruct.com.au:mid,codeconstruct.com.au:dkim]
+X-Rspamd-Queue-Id: DE54A9F764
 X-Rspamd-Action: no action
 
-On 2026/01/28 6:59, Paul Moore wrote:
-> It sounds like we either need to confirm that
-> security_xfrm_{policy,state}_delete() is already present in all code
-> paths that result in SPD/SAD deletions (in a place that can safely
-> fail and return an error),
+Hi Heikki,
 
-Yes.
+> Uh, no. You should only use interfaces like new_device with the
+> devices that really can't be detected in kernel, which isn't the case
+> here.
 
->                            or we need to place
-> xfrm_dev_{policy,state}_flush_secctx_check() in a location that can
-> safely fail.
+Who is deciding this "you should only" case? If the facility works, it's
+suitable. You raise some good points that may mean it is not a suitable
+approach for an ARP implementation, but we should still make sure we're
+taking the right approach.
 
-Did you mean xfrm_{policy,state}_flush_secctx_check() ?
+[You seem pretty defensive here? I'm not saying no to the kernel
+implementation, just doing our homework before agreeing to it]
 
-Regarding xfrm_policy_flush() as an example, we can observe that we are
-calling LSM hooks for must-not-fail callers. If the task_valid argument was
-meant to be interpreted as whether to call LSM hooks, xfrm_policy_flush() needs
-below change.
+> So why would you want involve the user space at all since it would
+> just add complexity and limitations without any benefits?
 
- int xfrm_policy_flush(struct net *net, u8 type, bool task_valid)
- {
- (...snipped...)
--	err = xfrm_policy_flush_secctx_check(net, type, task_valid);
-+	err = task_valid ? xfrm_policy_flush_secctx_check(net, type, task_valid) : 0;
- (...snipped...)
- }
+Because we have fewer risks implementing this in userspace.
 
->               The patch doesn't relocate
-> xfrm_dev_{policy,state}_flush_secctx_check() and I don't really see
-> any mention about security_xfrm_{policy,state}_delete() in the patch
-> or description;
->                 have you verified that the LSM xfrm hooks are still
-> being called to authorize the removals?
+As an example, you currently seem to have a stack information leak in
+the proposed Get UDID implementation, which would be much less of an
+issue for the equivalent protocol handling implemented in userspace.
 
-Please distinguish caller for "delete" and caller for "release".
-LSM xfrm hooks need to be called for "delete" callers, but
-LSM xfrm hooks need to be bypassed for "release" callers.
+> - You still need to deliver the UDID to the kernel because of things
+> =C2=A0 like the PEC flag, and the drivers will also need information from
+> =C2=A0 it.
 
-Maybe task_valid == true is for "delete" callers and task_valid == false is
-for "release" callers; though it seems that some locations are passing wrong
-task_valid flag (e.g. xfrm_dev_down() is passing task_valid == true despite
-it is a "release" caller).
+That seems like the main reason for requiring a kernel approach, in that
+we need more information than just the assigned address. It's not
+possible (at present) to specify the PEC flag through existing
+interfaces, right?
 
-If 'task_valid == true is for "delete" callers and task_valid == false is for
-"release" callers' does not hold, we might need to add a "forced" flag
-(which is interpreted as whether LSM hooks must be bypassed) like
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit?h=next-20260123&id=fc0f090e41e652d158f946c616cdd82baed3c8f4
-does.
+For me, this would be the deciding factor to go for a kernel approach,
+in that we otherwise cannot properly describe ARPed devices to the i2c
+subsystem. We *could* push a new_device with a UDID, but I'm not sure
+that's a great idea.
 
-Anyway, this patch which kills xfrm_dev_{state,policy}_flush_secctx_check()
-can be applied as-is because all callers are "release" callers.
+> - With the static (not hotplugged) devices you need to assign the
+> =C2=A0 correct ACPI node (or what ever fwnode) to the ARP-device.
 
+Is that possible at present? how are you planning to represent ARPed
+devices in the DT - or more importantly, correlate DT (or other fwnode)
+nodes to discovered devices?
+
+> - When the device is hotplugged, you would need new ABI, like I think
+> =C2=A0 you already noticed, but this really does not make any sense. We
+> =C2=A0 simply don't need it, because the kernel can process this
+> =C2=A0 information on its own very simply.
+
+Even this "very simple" implementation may have bugs.
+
+Assuming we go with a kernel approach: For the MCTP case, for full ARP
+support of MCTP endpoints, we would still need to consume a hotplug
+event that indicates that the device is available at its new address
+- there is no kernel driver bound for the remote MCTP endpoints. This
+event would be consumed by the (existing) MCTP infrastructure in order
+to start MCTP enumeration. Is this something you have looked at
+already? If so, if you can send an example of an actual event, I will
+look at the mctpd part of this.
+
+Cheers,
+
+
+Jeremy
 
