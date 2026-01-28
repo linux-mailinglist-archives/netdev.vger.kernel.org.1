@@ -1,225 +1,157 @@
-Return-Path: <netdev+bounces-254667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKnyM5che2mZBgIAu9opvQ
-	(envelope-from <netdev+bounces-254667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:00:07 +0100
+	id mG5PImQ9emlB4wEAu9opvQ
+	(envelope-from <netdev+bounces-254333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:46:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6C9AADE7E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:00:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF08A616D
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 91A713036D7E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:58:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AE93301F33A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E08A37E309;
-	Thu, 29 Jan 2026 08:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CC73090C2;
+	Wed, 28 Jan 2026 16:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rkgg6Ksu"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="nHxaf6B1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16FD37C117
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 08:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586F230BBAE
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 16:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769677131; cv=none; b=p/BtBdfc9jkHesWFNP+Hrks59pUf8dTlv6olZDj0QE4iwR00B8QjL+X94tuZPL/Q4XhCFB7zzR0aq++KDdb4+r5nQpUTjTUp0QkD4DiJ3frj4gx1KE9de1yr+aNgiMQZhL/gMEe7eV/Nsosd7+fXnQuPdN0WEpkfzojRf5TvL8o=
+	t=1769616508; cv=none; b=UDff0QEIPDzDiSTFmbt6HXUFaKGN2S/QUH/RnssVDKhy9BjYZCAvfipwJusbZx7zWS+q0Nz5GTQHfRR6WUIM2o/lSS/v7jo3y4wsSG+bvmg/lvMzF+mbIDfu+IoKvsrzqrDTrs+5i3UVdVHsYBr8+o/cadIcrVPrcuv/GMqlXV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769677131; c=relaxed/simple;
-	bh=vGP1YcOzisZFk3goy+byrCsiUTgc94En+9zxANd8jHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZxGe62C0Z7c4uqUOXJVP7txBE2NYqQxR4e16/wan050Iz9ZXOKBzB3ZYCfRRxSigLhdn010USsdbxqUy7cV6dkds/LjGz0z0Ooeu0Trg0ClREFtUu5sagIOpa30PRFMR7SCpnSGYufEt2utd3lieXo8DVl4/CqB/bKwMX/gCNLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Rkgg6Ksu; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 883434E42312;
-	Thu, 29 Jan 2026 08:58:48 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5D1F8606B6;
-	Thu, 29 Jan 2026 08:58:48 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 53D20119A884F;
-	Thu, 29 Jan 2026 09:58:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769677127; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=0lpsejodSfO2xeC8iceURSJ0Dhu9I3pcZF7RZAekES0=;
-	b=Rkgg6Ksuvq7N4GdoXrmEAVQhA4PKZDw5xC9FSmu/4I1vTUxzbBp94GByBQzvuOZKeqEM8V
-	Ww701W29KEVD+G0O/E9U/efovoa6xg+lfxLefejJguK6nexr2sacrYJGTPHW2b4GPY3EnE
-	GAaGqO9uKqxgQ1IltJESEyPtcS6kYtYxXjP3jAzvvemBtNqy6n/W7qGphU58XDR+o+CqIS
-	NcgqVY3ztdcVNhFvFzFYsyG0TMUpbP64rykuALRIb4M3SUYnp0Qzq/NJSRs/GMUytm2zyX
-	8lfbaXWp92KOYFvZoIp4y1nKArsgFWyuebITTozZ16PYBWGLz7u70TZTcmO2AQ==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
- Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject:
- Re: [PATCH net-next 08/13] net: phylink: Represent PHY-less SFP modules with
- phy_port
-Date: Wed, 28 Jan 2026 17:01:24 +0100
-Message-ID: <3029118.e9J7NaK4W3@fw-rgant>
-In-Reply-To: <20260127134202.8208-9-maxime.chevallier@bootlin.com>
-References:
- <20260127134202.8208-1-maxime.chevallier@bootlin.com>
- <20260127134202.8208-9-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1769616508; c=relaxed/simple;
+	bh=Ck3/TVpGdm5XlyDxvF+26c/QDieIZ9lm12lyWxVd61Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eg9nYmwGfiqSOhd7ITpE4Nna5w4Npbr1Jqou2m9Fa62tKBmoM52hzBBfi1TqL0cwKSdjmYEEReBqwZyNOIoMHO50CQGC+gKngDzc2nfGD1tnAiV/Fju7FH3mK2cgovKgy2xqF+Si7zpmBA9Z/2PcS3SZ6HIizCjy+GtN82qk//c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=nHxaf6B1; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4806ce0f97bso128095e9.0
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 08:08:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1769616506; x=1770221306; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WiKaoWtjMRDBROQANeCkUjaTheWdM6fcaXZ1pKr3nZg=;
+        b=nHxaf6B15jotdI2axA3YudjRkAFwxCm0qGEUjgzS+MUfGkWpCfdtwaj+nD4uyxcW6Y
+         EwQmXaJ4qwofIGbqbkKqn4+azI4sQATqDEWNYOrasKVmh9o2DSUCLdAdiZzU88z1453z
+         KyoccNrcsPWtNVuwJCmPgOpEp+xHh37UOLgtYGCb6m1hXlkAirlImsILuM5FHu7bncim
+         OlkYmuLqUJ31JFbDAXx/XpDyioDqtTs2loThh7gkihAmwHqYWgdkUWZ4PMb5ZCZ+akt3
+         ykvnpHOdw/7VeKHKA3rZkojG2shZKMP8XUvX4B25SeR9EZDcr211ErgM1CobJXQpJqof
+         WQsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769616506; x=1770221306;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WiKaoWtjMRDBROQANeCkUjaTheWdM6fcaXZ1pKr3nZg=;
+        b=UUAcniTQrcigOHxV7wI+LJBoVvKQazqzXjFvKGe4HU902GMS6cZVxbNJCVzGBYZQI7
+         q6D7Tq34lR6SqAIFEU5t2izVkryWecfk7TT6erBstwLh7KRv61nu+tCBM2MF5Cg0LQ8F
+         lAZjt/fzZNHQoj7hDY54o5qQiwJJcXLCCCGHKAKzgrNa8MLLBbNfXJYdD01fMnd1Q2f2
+         xyGbS0PSQld2DVFy8COeLp8MH2FlhAN9/CdRFa9JvL1BIAZeQitFS0WmwbHl7AsOn6+m
+         kHtuM1Wa2ZK821zwFl70KCoNx1xAPi4e7LL/9qllHSnqOfpGw51u/6iF+9SYThRrvZod
+         r4XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSpsghrS+VfNUGDfIixyPAOgrO+zkmx1IKkrlets5tcRvVFEVjmSb8qNPNBV89pIxpaALg6xg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygfxhvvdVTsJw08p4cVib/OTAurbaA2aRyUhEWr5KfkKSJcOt1
+	ag1iZ0CmTGs/Gr/x/obB0Ws+nQ0/Xaklr1ACeLAzgAdUW2kUs28Ap/UW9KTMAH6r1lscLU8EG42
+	Ni3Tf
+X-Gm-Gg: AZuq6aLmfSf4pxJk/0kgHPDnE6R7cRRj7dxbpA9xRh1yAiUZdIpT7D2n9Qp3Bi9G+JK
+	9gc/S14qcObbLHtHW2CCU/c31kuMjbJQ6YXqIKmO/hzCYOvJmfG5S6oA2HsXCduEqfd1gNObZgt
+	0y/F5LnARZhj5KA5WSRQuj2tYyAKmSuUxmGf8ev0uJdnLJyt3s7SLx6zBcpVYcSKZG9l8MhFgwR
+	XG9u1JHESiZR54mAjVChjNbtPHuud2DlqVZIdp10klyQmKEspXvqvnu+6fMWbF61WcPOwMo3win
+	n7PQIyx5yUvZhPJkZ94JEMMzEr9Dvy1swn12BW/sbomNWzu54/9iuV+8q0vtIWUETr8947b2hAJ
+	oRMlQJdyz+g2oAG882c80jZ60bSPXG6CaXVJqAJZG7b/JjVFrzNvYRy/zmJOMMmEdNTdMwEn3cV
+	DQSHD6hWLgA8iCxfOjFrQ1eKzADycMZ8yoxBCYEUriPw==
+X-Received: by 2002:a05:600c:458a:b0:47b:e2a9:2bd7 with SMTP id 5b1f17b1804b1-48069c6970fmr66761015e9.19.1769616505584;
+        Wed, 28 Jan 2026 08:08:25 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c40e04sm138669265e9.13.2026.01.28.08.08.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jan 2026 08:08:25 -0800 (PST)
+Message-ID: <15f092c1-fb1d-4dc0-b04b-a389c53cd62d@blackwall.org>
+Date: Wed, 28 Jan 2026 18:08:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3394203.aeNJFYEL58";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: bridge: fix static key check
+To: Martin Kaiser <martin@kaiser.cx>, Ido Schimmel <idosch@nvidia.com>
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260127101925.1754425-1-martin@kaiser.cx>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260127101925.1754425-1-martin@kaiser.cx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254667-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,bootlin.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-254333-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[blackwall.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[romain.gantois@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:url,bootlin.com:dkim]
-X-Rspamd-Queue-Id: C6C9AADE7E
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kaiser.cx:email,blackwall.org:email,blackwall.org:dkim,blackwall.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DEF08A616D
 X-Rspamd-Action: no action
 
---nextPart3394203.aeNJFYEL58
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Wed, 28 Jan 2026 17:01:24 +0100
-Message-ID: <3029118.e9J7NaK4W3@fw-rgant>
-In-Reply-To: <20260127134202.8208-9-maxime.chevallier@bootlin.com>
-MIME-Version: 1.0
-
-On Tuesday, 27 January 2026 14:41:56 CET Maxime Chevallier wrote:
-...
-> @@ -1786,13 +1787,31 @@ static int phylink_create_sfp_port(struct phylink
-> *pl) else
+On 27/01/2026 12:19, Martin Kaiser wrote:
+> Fix the check if netfilter's static keys are available. netfilter defines
+> and exports static keys if CONFIG_JUMP_LABEL is enabled. (HAVE_JUMP_LABEL
+> is never defined.)
 > 
->  		pl->sfp_bus_port = port;
+> Fixes: 971502d77faa ("bridge: netfilter: unroll NF_HOOK helper in bridge input path")
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> ---
+>   net/bridge/br_input.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> +	if (pl->mod_port) {
-> +		ret = phy_link_topo_add_port(pl->netdev, pl->mod_port);
-> +		if (ret)
-> +			goto out_bus_port;
-> +	}
-> +
-> +	return 0;
-> +out_bus_port:
-> +	phy_link_topo_del_port(pl->netdev, port);
+> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+> index e355a15bf5ab..1405f1061a54 100644
+> --- a/net/bridge/br_input.c
+> +++ b/net/bridge/br_input.c
+> @@ -274,7 +274,7 @@ static int nf_hook_bridge_pre(struct sk_buff *skb, struct sk_buff **pskb)
+>   	int ret;
+>   
+>   	net = dev_net(skb->dev);
+> -#ifdef HAVE_JUMP_LABEL
+> +#ifdef CONFIG_JUMP_LABEL
+>   	if (!static_key_false(&nf_hooks_needed[NFPROTO_BRIDGE][NF_BR_PRE_ROUTING]))
+>   		goto frame_finish;
+>   #endif
 
-This seems strange to me. Why clean up after phy_link_topo_add_port() if it 
-returned an error code? Presumably phy_link_topo_add_port() cleans up after 
-itself if it encounters an error doesn't it?
-
-> +	phy_port_destroy(port);
-> 
->  	return ret;
->  
->  }
->  
->  static void phylink_destroy_sfp_port(struct phylink *pl)
->  {
-> 
-> -	if (pl->netdev && pl->sfp_bus_port)
-> -		phy_link_topo_del_port(pl->netdev, pl->sfp_bus_port);
-> +	if (pl->netdev) {
-> +		if (pl->sfp_bus_port)
-> +			phy_link_topo_del_port(pl->netdev, pl->sfp_bus_port);
-> +
-> +		/* Only remove it from the topology, it will be destroyed at
-> +		 * module removal.
-> +		 */
-> +		if (pl->mod_port)
-> +			phy_link_topo_del_port(pl->netdev, pl->mod_port);
-> +	}
-> 
->  	if (pl->sfp_bus_port)
->  	
->  		phy_port_destroy(pl->sfp_bus_port);
-> 
-> @@ -3998,6 +4017,49 @@ static void phylink_sfp_disconnect_phy(void
-> *upstream, phylink_disconnect_phy(upstream);
-> 
->  }
-> 
-> +static int phylink_sfp_connect_nophy(void *upstream)
-
-I'd name this "phylink_sfp_connect_no_phy" just to keep the name formatting 
-consistent.
-
-Thanks,
-
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---nextPart3394203.aeNJFYEL58
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAml6MtQACgkQKCYAIARz
-eA6u3w/+N/ctzBbYD6Ll0Ehaf69tTIzVqSV6sLi7X3t7ODunMDatH8KKVJc+zO17
-XtwU+N2KCLU75+oEj8xL/k/kfdJILn/abR2JNvaIyKd43skyI3g7kpXGxjfA/0zp
-tJmBqbW3IdQhMFulDfzvKd7Dm7L07zKGM0oP5HmY8loBEdzjKSLLN6aG5CPsx/7x
-93zL9D7XYNvmyMdzt4vBQiSaTGG7swxs2oBmSewO5TjrrtMFHkG5RRqC5T4++WyF
-e9VpENxEvnNB20MrYDYZ9Zt51id3mGurVgMyE5cGIQeBdG1xkPfdkJTml9bywMTv
-HmJGJ6DQkqMSFD9v62+GD2e5l8KcnRSNPmJJMRsVnsDD3B03mYqmsVMnSgVHxbqx
-A2P7GBMTaWrqUqwM2GyD/FQKnKIhooTJXPitNwwN14PFrEz0ShR56WAOfXoPRSRX
-sVoiCipaSoL2+fj1Z6Wp7uiJzRKFDprw25GxFTUn2IDn/Fw+4F8QGzq5OPk5R6dN
-SF5171FMUSCXXgRpkado2Q9TiEb3S+fF/hJrI54NkLM7MLjx5okYju8+jK+UcPMK
-Pp2/QrcWg2KjGHnCE5X2m9G56/nfl7bS0SQcgqrOgZzcR/hN9fvYAArrxcHy9xDB
-UfltOo7Oum1LEPx57Mq+Nmu//jeqbGjSfvSpcsaUSHKscSOK+DI=
-=qqwZ
------END PGP SIGNATURE-----
-
---nextPart3394203.aeNJFYEL58--
-
-
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
