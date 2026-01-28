@@ -1,224 +1,290 @@
-Return-Path: <netdev+bounces-254436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id hHjhA4Jyemme6gEAu9opvQ
-	(envelope-from <netdev+bounces-254436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:33:06 +0100
+	id EFqbBLB1emmE6wEAu9opvQ
+	(envelope-from <netdev+bounces-254437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:46:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75A6A899B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:33:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7566AA8C86
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7F1823025E64
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:31:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 397273021736
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C54374752;
-	Wed, 28 Jan 2026 20:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9A52FE053;
+	Wed, 28 Jan 2026 20:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUXXe7xE";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwcBGGuw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FeD+OlV2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12202374199
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF7D25771;
+	Wed, 28 Jan 2026 20:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769632291; cv=none; b=dMkLNhlgljYAuDmMDwIaZcqiM29o1wYheX4b3XA6gGRJj2g2G7r7OJ475hIRPpTDRen+jbv+4xkZoOwqDsZ2ek0BhocxFEKphT9mlhqnCYlihhLl0rCEkTs5R5c3Pfil8c2ZrQuSmaZnvjUSSLkxclFpWtMDAllcISKCwVIrCHc=
+	t=1769633144; cv=none; b=sgqGnNuEAaersD1oC5vwpxDOo4bnAv1uNrnbUMKwSlIe3NFGGP8f17eXsSGFAQbfT1vYC9ZPlLgZ1ivpB1RKqxhsG6CoD6IANekI2PtNooY/WXvSeA9EeL9ehFt0ePgN0ikStConQcffZFvdPPaxPzq1o0DYJluIl9/Tbk0oawU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769632291; c=relaxed/simple;
-	bh=2qvxf/62yttfNIZNAODh63qlXVSL99Ksrx5/ufwbejY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=spWucQeEZPdp7UK+KxSI6ZoQOBGAbRpIHGgcb9Gr0IgpplNp611/Jp+D3hgWRqtLoCArVjQsProuiI/E0Tngj2EQ2FJAwJCkr5uDVf2+7fpbQNJoxeEdaN1cpgCKuvxTsstz3T+alKPu9rcxbLvcL54eo2wUDb3Y5DaE7YevUUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUXXe7xE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwcBGGuw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769632288;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
-	b=XUXXe7xETErab3wRuyukJ0+lVBhbKkaCcNv8QLKZwc4IIIOHcz3YCrmR6f3vNH/wlZJpjk
-	RnC4h+hm/NmAXYcWToR0nweZcgFZTxuS7xUNA6G2dCk/ERzre7e1N9gkt+KnsEx7+IwE5O
-	OR9QHTRzknUlppVd6rQJVsvP5dNvT5I=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-683-KZUrWKFLOpui4XPNw7AHcw-1; Wed, 28 Jan 2026 15:31:26 -0500
-X-MC-Unique: KZUrWKFLOpui4XPNw7AHcw-1
-X-Mimecast-MFC-AGG-ID: KZUrWKFLOpui4XPNw7AHcw_1769632285
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47ee3dd7fc8so2289955e9.3
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 12:31:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769632285; x=1770237085; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
-        b=fwcBGGuw7IqQDPevelrNI5mPPr97koUxkOdPBeevIRXEdn2WQmQxRqzM4vbWV5CQ1K
-         GzG9MFQtT4t1UxM8me4DW4lGDGZMEMK2FdX8SYol2akxmRNKL/MKMwIty3VtcOZAXl9Y
-         wWS67ozLZW0GAsRqnPn39uwB0neig513SYS7rQ4feyTLBzJhhqABshCSXW7vNqJZmDFf
-         A4TdMWerNpSOIlJWmzAwR31lzurm2R3U59p0qiXMV54wKq1LH3nxg60LZ94v/n0WM/10
-         YOFMpQJ7sMCG/fIm2pvP57/YDw7JqNTudoYipg0ZAcyARnfbopdd6agIeA4ATotjkCEM
-         Kigg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769632285; x=1770237085;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
-        b=hLtNasnSSW6/K/QkeCAerXI6gxaRknt3TdB5A89DISMKFmazVLVqcdMnglaUGyGtzL
-         xnvRAFY5F4FKcntH4zO2KGORVRzOqfDA3R/HBmCQmX1qiVzwm+0l4lHrF3SEHC9CKgsQ
-         hKo9swshAlxmt/loXAjFHSTagu4Drtxd9EzqMlP0Rs/VhZ1/EShmNfb72MD1s9LKTd7j
-         gnm8et3XKoa+y3kql7JMMhCMbxqdk9u911fFC0ZgvyNhm5/Oj15qEv7vZVvf/oukcA8x
-         GN3AC+t/exI36q8EYHlN8pPMJZ8yxgNmXX9/W3Jpxw6w4rvn1sVL9nSXEUC5Lf/+MsAS
-         t3PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8vN65EgynP4qqCZQ2cBXTwEffwVsaQymqSCRzoDobCWnXctRv+pu19vAckcDXJXrpjQ1Slpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyexRUoOhWaVqnlfm5+Zqr1uECO4WAQ44RMUeZhsdsp/D9lJPyp
-	Xz/6sks2sOAWrSM6oonpKzNiyucCz4NaIectjnOl7Ztl7aDoPOPF0QMGbczw+H6WC0BWrOUO4II
-	NBDO7JgdGtZFizD0exO1RTiP2W/Fw+TyWpCxRH21d9mTO9gMWJNLWSVOyMA==
-X-Gm-Gg: AZuq6aJd0ocKDCy+LYq5FYgxTfEfS2BLtFc2qWu/0DOZv9qUEh5+X4MirxpH1GOkDUr
-	6BFeg/HqyvDP8HVDgEuos8wnVUFksqUFbR+YM3Z+oyx21ufqPSpV9itFRehOAqBbSOR9mKIFoJ8
-	QwL8yWtxus3mXoMBXzoGqO773dcRcERoXtleTqkuOCJzM9QYcBUPqMJyMuWfU1+xXIqH0e2je/y
-	IBHAsltH1Ceo7GnAQe6NKozaeWUEb7DlJGVk6zBZJ/bYrwPhXi1kSv6CLWE9Ty28i8Rw+SkrjHC
-	Xpe5fLQpBAvtbVW2oDxzNm1cZT9lDOraI+ql/p9h5ldIXmpZjPZUq3iQgo86BI8VQL3N5unzjSq
-	Xm7xw7+iQru2t31ZAE1ljL2CW3HOoBNwDSA==
-X-Received: by 2002:a05:600c:6995:b0:477:7af8:c8ad with SMTP id 5b1f17b1804b1-48069c92c03mr93433865e9.31.1769632285343;
-        Wed, 28 Jan 2026 12:31:25 -0800 (PST)
-X-Received: by 2002:a05:600c:6995:b0:477:7af8:c8ad with SMTP id 5b1f17b1804b1-48069c92c03mr93433305e9.31.1769632284808;
-        Wed, 28 Jan 2026 12:31:24 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066beeaf9sm161529595e9.6.2026.01.28.12.31.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 12:31:24 -0800 (PST)
-Date: Wed, 28 Jan 2026 15:31:21 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1769633144; c=relaxed/simple;
+	bh=agmIuA0jKGejqOuG7P4B/+NJFILSA9Kngwy+mUgo/n0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HtXsjmpIOeSqpSEVdmCiKoXQQl6v1PJjHlxRh1KjVhb+3znQcDG+ugqjRLU0HWbKo/l7K7oXrqgrKcK4Q4UK71XjJBYrOqsWhY4ILiNWFWmThgglonVqXlJKDMuxN+W9k001tQ73W8Qng3klMZr7aiIWd/OtSj1w3aRkhCi3pio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FeD+OlV2; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 6C8371A2AD4;
+	Wed, 28 Jan 2026 20:45:40 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 393756071F;
+	Wed, 28 Jan 2026 20:45:40 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1210A119A8832;
+	Wed, 28 Jan 2026 21:45:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769633139; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=s5fS1rrnHGQs4rPW9/Yuw9uBBu9ItJsA2bAU8smwRmQ=;
+	b=FeD+OlV2np052iZgePFxlfAdvjDGBvh7jQMLhGpft6Ytqzz4+Cx0tuZ8/MV4VXSFndOBQU
+	NBbsvJJGqGfU89wJLDPglFHV6HcJg6HhseCEQz5BLcLQViSDahDNmcf1Tau8wthUvh/7F+
+	CQWkb8rdGsDIiRT4/XaKeKxD0PmOsV/YYk10uxs6vBbJAewqZHrT+nKfRxCr7IG3hH+wXp
+	2i1TCe7d4OJz8Q01SfbVlw/gcJiOZmlDbtJQwD5yJ6enDqYUX/X1GqPBVDTvyv45Z8B6Wk
+	2X+Gzbb8xEuxynmPxVJb81ZTyWGDxSi1qs+liMpZfm/19fEBAxnACT4rcaUOEQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v3 15/15] vsock/virtio: reorder fields to reduce padding
-Message-ID: <ce44f61af415521e00ab7492aa16d3d19f00bd5e.1769632071.git.mst@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: [PATCH net-next v2 00/12] net: phy_port: SFP modules representation and phy_port listing
+Date: Wed, 28 Jan 2026 21:45:13 +0100
+Message-ID: <20260128204526.170927-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f1221bbc120df6adaba9006710a517f1e84a10b2.1767601130.git.mst@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lwn.net,selenic.com,gondor.apana.org.au,redhat.com,hansenpartnership.com,oracle.com,linux.alibaba.com,samsung.com,arm.com,davemloft.net,google.com,kernel.org,suse.com,ziepe.ca,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-254436-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-254437-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B75A6A899B
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7566AA8C86
 X-Rspamd-Action: no action
 
-Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
-last. This eliminates the padding from aligning the struct size on
-ARCH_DMA_MINALIGN.
+Hello everyone,
 
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+Here's V2 of the second phy_port series, this time bringing support for
+more phy_port use especially for SFP, as well as the beggining of a
+ethnl uAPI. That's a quick repost, but with the build issues and AI
+review, I think it's worth getting this version out there for review.
 
-changes from v2:
-	move event_lock and event_run too, to keep
-	event things logically together, as suggested by
-	Stefano Garzarella.
+It builds on the recent addition of phy_port representation to enable
+listing the front-facing ports of an interface. For now, we don't control
+these ports, we merely list their presence and their capabilities.
 
-Note: this is the only change in v3 and it's cosmetic, so I am
-not reposting the whole patchset.
+As the most common use-case of multi-port interfaces is combo-ports that
+provide both RJ45 and SFP connectors on a single MAC, there's a lot of
+SFP stuff in this series.
+
+This series is in 2 main parts. The first one aims at representing the
+SFP cages and modules using phy_port, as combo-ports with RJ45 + SFP are
+by far the most common cases for multi-connector setups.
+
+The second part is the netlink interface to list those ports, now that
+most use-cases are covered.
+
+Let's see what we can do with some examples of the new ethtool API :
+
+- Get MII interfaces supported by an empty SFP cage :
+
+# ethtool --show-ports eth3
+
+Port for eth3:
+	Port id: 1
+	Occupied: no
+	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
+	Port type: sfp
 
 
- net/vmw_vsock/virtio_transport.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+- Get Combo-ports supported modes, on each port :
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 999a0839726a..b333a7591b26 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -55,15 +55,6 @@ struct virtio_vsock {
- 	int rx_buf_nr;
- 	int rx_buf_max_nr;
- 
--	/* The following fields are protected by event_lock.
--	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
--	 */
--	struct mutex event_lock;
--	bool event_run;
--	__dma_from_device_group_begin();
--	struct virtio_vsock_event event_list[8];
--	__dma_from_device_group_end();
--
- 	u32 guest_cid;
- 	bool seqpacket_allow;
- 
-@@ -77,6 +68,15 @@ struct virtio_vsock {
- 	 */
- 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
- 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
-+
-+	/* The following fields are protected by event_lock.
-+	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
-+	 */
-+	struct mutex event_lock;
-+	bool event_run;
-+	__dma_from_device_group_begin();
-+	struct virtio_vsock_event event_list[8];
-+	__dma_from_device_group_end();
- };
- 
- static u32 virtio_transport_get_local_cid(void)
+# ethtool --show-ports eth0
+
+Port for eth0:
+	Port id: 1
+	Occupied: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Half 1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth0:
+	Port id: 2
+	Occupied: no
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+	
+
+- Get Achievable linkmodes on a SFP module (combo port with a DAC in the
+SFP cage)
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Occupied: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Half 1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Occupied: yes
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+Port for eth1:
+	Port id: 3
+	Occupied: no
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+
+Note that here, we have 3 ports :
+ - The Copper port
+ - The SFP Cage itself, marked as 'occupied'
+ - The SFP module
+
+This series builds on top of phy_port and phy_link_topology to allow
+tracking the ports of an interface. We maintain a list of supported
+linkmodes/interfaces on each port, which allows for fine-grained
+reporting of each port's capability.
+
+What this series doesn't do :
+ - We don't support selecting which port is active. This is the next step.
+ - We only support PHY-driven combo ports. The end-goal of this whole
+   journey that started with phy_link_topology is to get support for MII
+   muxes, such as the one we have on the Turris Omnia. This will eventually
+   be upstreamed as well.
+
+If you want to play around with it, here's [1] the patched ethtool that I've
+been using to produce the outputs above.
+
+Thanks !
+
+Maxime
+
+[1] : https://github.com/minimaxwell/ethtool/tree/mc/ethtool_port
+
+Changelog :
+
+Changes in V2:
+ - Fix the cleanup path of phy_link_topo_add_phy, as per AI review
+ - Fix the cleanup path of phy_sfp_probe, as per AI review
+ - Fix the call-site of the disconnect_nophy sfp bus ops, per AI review
+ - Fix the netdev-less case uin phylink, per AI review
+ - Fix the prototype of phy_link_topo_get_port for the stubs
+ - Dropped patch 11. It ended-up breaking 'allnoconfig', so instead we
+   built a phy_interface_names array in net/ethtool/netlink.c
+ - Fix an ethool-netlink spec discrepancy with the type of an attribute
+ - Fix the size computation in the netlink port API
+ - Fix the cleanup path in the netlink port API
+
+Maxime Chevallier (12):
+  net: phy: phy_port: Correctly recompute the port's linkmodes
+  net: phy: phy_link_topology: Add a helper for opportunistic alloc
+  net: phy: phy_link_topology: Track ports in phy_link_topology
+  net: phylink: Register a phy_port for MAC-driven SFP busses
+  net: phy: Create SFP phy_port before registering usptream
+  net: sfp: Add a sfp-bus ops when connecting a module without PHY
+  net: phy: Represent PHY-less SFP modules with phy_port
+  net: phylink: Represent PHY-less SFP modules with phy_port
+  net: phy: phy_port: Store information about a MII port's occupancy
+  net: phy: phy_link_topology: Add a helper to retrieve ports
+  netlink: specs: Add ethernet port listing with ethtool
+  net: ethtool: Introduce ethtool command to list ports
+
+ Documentation/netlink/specs/ethtool.yaml      |  50 +++
+ Documentation/networking/ethtool-netlink.rst  |  35 ++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/phy-caps.h                    |   2 +
+ drivers/net/phy/phy_caps.c                    |  26 ++
+ drivers/net/phy/phy_device.c                  | 106 ++++-
+ drivers/net/phy/phy_link_topology.c           |  82 +++-
+ drivers/net/phy/phy_port.c                    |   9 +-
+ drivers/net/phy/phylink.c                     | 124 ++++++
+ drivers/net/phy/sfp-bus.c                     |  20 +
+ drivers/net/phy/sfp.c                         |  14 +
+ drivers/net/phy/sfp.h                         |   2 +
+ include/linux/phy.h                           |   4 +
+ include/linux/phy_link_topology.h             |  35 ++
+ include/linux/phy_port.h                      |   5 +
+ include/linux/sfp.h                           |   5 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  19 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/netlink.c                         |  26 ++
+ net/ethtool/netlink.h                         |   8 +
+ net/ethtool/port.c                            | 376 ++++++++++++++++++
+ 21 files changed, 925 insertions(+), 26 deletions(-)
+ create mode 100644 net/ethtool/port.c
+
 -- 
-MST
+2.49.0
 
 
