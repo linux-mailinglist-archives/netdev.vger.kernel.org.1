@@ -1,193 +1,208 @@
-Return-Path: <netdev+bounces-254200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254203-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AMtXGZvqeWkF1AEAu9opvQ
-	(envelope-from <netdev+bounces-254200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:53:15 +0100
+	id cKfsKAzreWkF1AEAu9opvQ
+	(envelope-from <netdev+bounces-254203-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:55:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B145D9FBA3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:53:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2193B9FC66
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:55:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89011301E958
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:52:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92379301DAF9
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFA032FA00;
-	Wed, 28 Jan 2026 10:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F017F33123C;
+	Wed, 28 Jan 2026 10:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nqvYJteQ"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="E9BCQzLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D1A31062C
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6647732D45C;
+	Wed, 28 Jan 2026 10:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769597522; cv=none; b=V69yABOdQHWUgTPxHVahdisb+Utn+kFyDY3MzrIMTphZ7AqlQHtSOfzKUGyZO7Kr0QF6VHDMdJwY2rMs6i/jGCqfHDN8FKeQP2WrLSlt2y87Dax8FdtbQnmCNfcfyzcWMxDFUfFz0nMQC08WCdyD77jfvX4I5XyXpGKYVAtVuIE=
+	t=1769597572; cv=none; b=Dx8V12KQS3JJCPufnlpTD8C7P7HK6byWoU8ceQ9QvTUgj0megAwoRhWiWUzPY8xna/OLg0GUtWUOkUL4M3kGz/ieNfuw8dKE0Cb+2gq6bCTDGjYChhpUzBh+xd1kXGTXA3pc7ix+e7m0tlY6liauysotTM9GMo4UJbWf8WCjh1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769597522; c=relaxed/simple;
-	bh=c9Eiagdq6U48mRTb9hfve6FYWqdBjsr8AYWZRxD3hag=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=QxyMHfVi7+S7Cc58Whph2GktW096hxZt5rW+NByoZhgoxgDbz+s1nMNHbzdh9VbW1jRL2EQfEMctqJKeEg6XQRb5S0FcEbUxKD3m9UyXG9mkJ0WXkN5H17aNNiDA8YZi3YRPKWRSOzVlif1L00vqYR7/skQbNCOUQYxjJhrXZYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nqvYJteQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=XtC8yJQgyjPmZTdImoZeQxZHnTGIV1u/ZfImELjtTq4=; b=nqvYJteQoEGSF1YlajDty2HRBs
-	Peq9TUComiO7lbywl06o8X61iGWDhLn5XTYKvxlL+he6UY9ByWSJd2vsPx5JN5Rdu7d4GJvLccW86
-	FS3vztXNXK4Cm20Y1Bi/wSdFMi/t3gK6rqk8iREoZgeULvynGxlImQOPfhTFUr4THEo4P9jSVLHlR
-	Wf0rqOXMXrRIdsLmZh0YzHHw6oUheBA9aJzAUjHl3SN20d6B6BLDAjCUdnWdWndJCGPSVG+dZSXv2
-	MA0MYnv991258qcLK7N5ozfxGuHv7NPucTw0ol+0kiOMGJxuzyobECBOqovjPxcFBMzJkchO7Gyzs
-	LZmgIWpA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38786 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vl39R-000000007ER-0oWK;
-	Wed, 28 Jan 2026 10:51:57 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vl39Q-00000006utm-229h;
-	Wed, 28 Jan 2026 10:51:56 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: phylink: fix NULL pointer deref in
- phylink_major_config()
+	s=arc-20240116; t=1769597572; c=relaxed/simple;
+	bh=chFVlExx02x7eOkOc52rAKK3G+AgR3nxx/rr3P2A+tE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDQmrA8xjWRoQbiRMzLGojVom1KMRvTt2JKkVKeLJBPJ/604ClA3/HA5wpXyVA4rUoOpA1fM/zaFbra57J9MkaVn8ha+8ES4nJt8Asl141CE5CSHKu8Gbxfi5JPvs4e5qtUtGz43pYl89q5wXqoF3+XakREjuAo3XXWm/aMfoZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=E9BCQzLO; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=TkMLrcCk4up3zhJI58Pdp/XlfDts76WUyYeW8kG7V2k=; b=E9BCQzLOfQCqzzVpXEWsfVE6n/
+	hQKoIEVWKmXFSQyitLOtpcpkrWaa84GEj7yjpdf8x+cYG7FUM/iwG/KGmq6938EbLbkqsSWRWrcS2
+	79JNrqqqkbEhyyIGhPI4IGwopDVzp38qNkXpOviNo4Ts5aVKLDQGIH4bb8oT48FQiEwMhV+pmxfMp
+	lvkq36QijUtp5LHhibj5m7r8ZqB2EZXhMJ8nIOZee/F59cLkTA/ilYscMEMSvQQ3GqdDQOh6FCHoa
+	L0pOz/pbR+cYNjuh5/ft22WO18vUe7FnRs6MKdjAdIMEsRauAzAGCL1kMKsRhZTNryU7FTrqpPrCY
+	CU7X28Hw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vl39v-00077K-7T; Wed, 28 Jan 2026 10:52:27 +0000
+Date: Wed, 28 Jan 2026 02:52:21 -0800
+From: Breno Leitao <leitao@debian.org>
+To: John Ogness <john.ogness@linutronix.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, mpdesouza@suse.com, 
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v4 1/5] printk: Add execution context (task
+ name/CPU) to printk_info
+Message-ID: <aXnp0uRXlrSMUlcH@gmail.com>
+References: <20260123-nbcon-v4-0-46a5cf567926@debian.org>
+ <20260123-nbcon-v4-1-46a5cf567926@debian.org>
+ <87ldhi7pn6.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vl39Q-00000006utm-229h@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 28 Jan 2026 10:51:56 +0000
+In-Reply-To: <87ldhi7pn6.fsf@jogness.linutronix.de>
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254200-lists,netdev=lfdr.de,kernel];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DMARC_NA(0.00)[debian.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254203-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.com,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B145D9FBA3
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2193B9FC66
 X-Rspamd-Action: no action
 
-When a MAC driver returns a PCS for an interface mode, and then we
-attempt to switch to a different mode that doesn't require a PCS,
-this causes phylink to oops:
+Hello John,
 
-Unable to handle kernel NULL pointer dereference at virtual address 0000000000000010
-Mem abort info:
-  ESR = 0x0000000096000044
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x04: level 0 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-  CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-user pgtable: 4k pages, 48-bit VAs, pgdp=0000000137f96000
-[0000000000000010] pgd=0000000000000000, p4d=0000000000000000
-Internal error: Oops: 0000000096000044 [#1]  SMP
-Modules linked in: --
-CPU: 1 UID: 0 PID: 55 Comm: kworker/u33:0 Not tainted 6.19.0-rc5-00581-g73cb8467a63e #1 PREEMPT
-Hardware name: Qualcomm Technologies, Inc. Lemans Ride Rev3 (DT)
-Workqueue: events_power_efficient phylink_resolve
-pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS    +BTYPE=--)
-pc : phylink_major_config+0x408/0x948
-lr : phylink_major_config+0x3fc/0x948
-sp : ffff800080353c60
-x29: ffff800080353cb0 x28: ffffb305068a8a00 x27: ffffb305068a8000
-x26: ffff000080092100 x25: 0000000000000000 x24: 0000000000000000
-x23: 0000000000000001 x22: 0000000000000000 x21: ffffb3050555b3d0
-x20: ffff800080353d10 x19: ffff0000b6059400 x18: 00000000ffffffff
-x17: 74756f2f79687020 x16: ffffb305045e4f18 x15: 6769666e6f632072
-x14: 6f6a616d203a3168 x13: 782d657361623030 x12: ffffb305068c6a98
-x11: 0000000000000583 x10: 0000000000000018 x9 : ffffb305068c6a98
-x8 : 0000000100006583 x7 : 0000000000000000 x6 : ffff00008083cc40
-x5 : ffff00008083cc40 x4 : 0000000000000001 x3 : 0000000000000001
-x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0000b269e5a8
-Call trace:
- phylink_major_config+0x408/0x948 (P)
- phylink_resolve+0x294/0x6e4
- process_one_work+0x148/0x28c
- worker_thread+0x2d8/0x3d8
- kthread+0x134/0x208
- ret_from_fork+0x10/0x20
-Code: d63f0020 f9400e60 b4000040 f900081f (f9000ad3)
----[ end trace 0000000000000000 ]---
+On Tue, Jan 27, 2026 at 09:49:25PM +0106, John Ogness wrote:
+> On 2026-01-23, Breno Leitao <leitao@debian.org> wrote:
+> > diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
+> > index 32fc12e536752..391a58be0c5b3 100644
+> > --- a/kernel/printk/nbcon.c
+> > +++ b/kernel/printk/nbcon.c
+> > @@ -946,6 +946,19 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
+> >  }
+> >  EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
+> >  
+> > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > +static void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
+> > +				     struct printk_message *pmsg)
+> > +{
+> > +	wctxt->cpu = pmsg->cpu;
+> > +	wctxt->pid = pmsg->pid;
+> > +	memcpy(wctxt->comm, pmsg->comm, TASK_COMM_LEN);
+> 
+> Perhaps using sizeof() instead?
+> 
+> 	memcpy(wctxt->comm, pmsg->comm, sizeof(wctxt->comm));
+> 
+> And adding a static assert that the sizes match?
+> 
+> 	static_assert(sizeof(wctxt->comm) == sizeof(pmsg->comm));
 
-This is caused by "pcs" being NULL when we attempt to execute:
+Sure, I move the size from TASK_COMM_LEN to sizeof(wctxt->comm) and also
+adding the build time assert.
 
-		pcs->phylink = pl;
+> > diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+> > index 1d765ad242b82..7daaa27705339 100644
+> > --- a/kernel/printk/printk.c
+> > +++ b/kernel/printk/printk.c
+> > @@ -2131,12 +2131,37 @@ static inline void printk_delay(int level)
+> >  	}
+> >  }
+> >  
+> > +#define CALLER_ID_MASK 0x80000000
+> > +
+> >  static inline u32 printk_caller_id(void)
+> >  {
+> >  	return in_task() ? task_pid_nr(current) :
+> > -		0x80000000 + smp_processor_id();
+> > +		CALLER_ID_MASK + smp_processor_id();
+> > +}
+> > +
+> > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > +/* Store the opposite info than caller_id. */
+> > +static u32 printk_caller_id2(void)
+> > +{
+> > +	return !in_task() ? task_pid_nr(current) :
+> > +		CALLER_ID_MASK + smp_processor_id();
+> >  }
+> >  
+> > +static pid_t printk_info_get_pid(const struct printk_info *info)
+> > +{
+> > +	u32 caller_id = info->caller_id;
+> > +	u32 caller_id2 = info->caller_id2;
+> > +
+> > +	return caller_id & CALLER_ID_MASK ? caller_id2 : caller_id;
+> > +}
+> > +
+> > +static int printk_info_get_cpu(const struct printk_info *info)
+> > +{
+> > +	return ((info->caller_id & CALLER_ID_MASK ?
+> > +		 info->caller_id : info->caller_id2) & ~CALLER_ID_MASK);
+> > +}
+> 
+> It is a bit odd that printk_info_get_pid() uses local variables and
+> printk_info_get_cpu() does not. I could understand if things evolve that
+> way over time, but it is odd to use the two different styles from the
+> beginning.
+>
+> I would prefer the local variable variant. But mostly I would prefer
+> that they are the same style.
 
-Make this conditional on pcs being non-null.
+They evolve different, I will get both of them using local variables and
+in the same style.
 
-Fixes: 486dc391ef43 ("net: phylink: allow mac_select_pcs() to remove a PCS")
-Reported-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-Even though this is marked with a Fixes tag, and has been noticed by
-Mohd while testing my other PCS patches, I would like it merged into
-net-next rather than net so Mohd doesn't have to apply this in
-addition to my series when testing. This isn't a bug that will be
-seen by others.
+> > +
+> > +static void pmsg_load_execution_ctx(struct printk_message *pmsg,
+> > +				    const struct printk_info *info)
+> > +{
+> > +	pmsg->cpu = printk_info_get_cpu(info);
+> > +	pmsg->pid = printk_info_get_pid(info);
+> > +	memcpy(pmsg->comm, info->comm, TASK_COMM_LEN);
+> 
+> Here I also suggest using sizeof() and static_assert():
+> 
+> 	memcpy(pmsg->comm, info->comm, sizeof(pmsg->comm));
+> 	static_assert(sizeof(pmsg->comm) == sizeof(info->comm));
 
- drivers/net/phy/phylink.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Ack! I will respin it.
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 7641f1f41e39..e1f01d7fc4da 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1293,7 +1293,8 @@ static void phylink_major_config(struct phylink *pl, bool restart,
- 		if (pl->pcs)
- 			pl->pcs->phylink = NULL;
- 
--		pcs->phylink = pl;
-+		if (pcs)
-+			pcs->phylink = pl;
- 
- 		pl->pcs = pcs;
- 	}
--- 
-2.47.3
-
+Thanks for the review,
+--breno
 
