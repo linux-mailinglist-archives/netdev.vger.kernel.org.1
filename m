@@ -1,219 +1,212 @@
-Return-Path: <netdev+bounces-254148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFIcDSvMeWmOzgEAu9opvQ
-	(envelope-from <netdev+bounces-254148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:43:23 +0100
+	id CHKJC5jMeWmOzgEAu9opvQ
+	(envelope-from <netdev+bounces-254149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:45:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC1659E4EB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:43:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920999E4FC
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67A6C3008D08
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:43:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 829B13009F39
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059C332D0D3;
-	Wed, 28 Jan 2026 08:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FBC29992A;
+	Wed, 28 Jan 2026 08:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NdTROMJ4"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SZIbsb4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792A12BB13
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 08:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769589800; cv=pass; b=q3u5gXcexDfFaP6zJg45awHxmjXICs9CtUEdVv6sURFPIe2iJwA3RBveYDIk+j5+arEpnxSRFi0DMh3tfS/O9vKOrcKxJ09QiBKNdw8v7aVPMTNszyxySPKBNy5D9C7TX8nBJkSk4j31f6CkpHsaWxzxygZgKXuao5DkD2WzVNQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769589800; c=relaxed/simple;
-	bh=qpPYMb16VdCUv92aapQrddLwsi0jTlbxU1hx8criwPM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=OYFZ4YsjpKB1bL5CPYhAgmffjec+e/kNHcSrMrRi0AAQWYQKEfFqRQm2z8gAWgwPpZ0LnZM+fRQ7jlkCiG4/15vixFPm6T0qkEJ+oktpsgHvqdhmqilM/8hFgf4XgsxmDXnktc0aPPBsu1qPacoa62gGdIfDeW0+DhXKCjCte38=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NdTROMJ4; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-50299648ae9so288111cf.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 00:43:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769589798; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YQV1M0TGVZ9GP+piysYK0kx+ahNcJUMahAmCGpJcMWtWa+2sJQtYBDBrr0tvANCNCP
-         82hdPHiZr6ESnWoDbDN7qnBpbbMCIH+3TFI1abooFYMd3R8YyuHyrzt2OFeRl+Z4zund
-         XUA2IsBx2U64mzu4bRXMLEzC0G/b8EBzIczQng6757VRa5YKfLEEGMo/APTDOjXJoFP0
-         TDh6wETnJ1wZNL0o4BoTiApqet3bi9VLJTHEUZQgauPX6KxsFz0l47dNh/+Y4YPuCpew
-         3jiMY4a8jFg2ZKFUF8MlES7yzXbQbHgFXfh3NPa6UWxK533XPhL+vYJomnMlVpnkzOS5
-         67tQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:dkim-signature;
-        bh=LFoeBbAgdVTZxH8eTqVhKR5q6RrTMpobaw0FVj77xqA=;
-        fh=gC5ce42drpgO9R62PgECEBhoTAJZVLQhFz5WcV0oH6U=;
-        b=BFVWCqlopP6dEo5jYr+8wgp0xAfiiAqGYvpUQBDArGKg5CEygM1YwW2JtVskm5W6nV
-         eABC7Dz15VOoMU7tMER9dO1CGSaALS/bPzOvyY2YqN2ruye0UnSg/NX+hxDmuRRHBk1w
-         lrWlnIR0evYCETZdDIjeuka8nvqhpRzVu0V6b6EzxamdeDFSgbkcE81Q6DXWDQRaKoVv
-         0otmV/2j+2iq3c6vzuL8zd18mWe+10aWteugZr0y3QOHpEFVyJYRm8SFEs+XZhSDkxa4
-         bo+nxxOCtZs/iSGrNx2LF3YLN2Xgi5fVRemeDRxwmReflOgD3T1DbQdPJw7505Nv7Km9
-         IsNg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36263337BAA
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 08:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769589909; cv=none; b=Alz55b549FiCQUQ8aWjx77G+fWgmEirrNAxf1sFO6gV1APsiDaGLDP2fWc/YbWgc0FdvcYkXHfo9cURXfuvCvjNZm0DAq/bxXTOSjAG5PEETMzBlX8bincoNfPvBo3iEDjS0CeXOyogRVmUVufd/1nFhPEtlv5tkq7P+/QLDgxI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769589909; c=relaxed/simple;
+	bh=RmjPdOoSLN83hdmAOBaQ60Ic1/65Z53zJZ8NP4f3+Rw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LNmyCVXlsrKxweUql6H9b5y2Z6hQKsxu9dt/K3DXJioyu8Dd41oi4l/v/3TsfdaVnb+LRKCRXPgc667mGP08BEkAcXF6D5qsqso1ZZc13Btyz7VfzswTdFUBTIuIOPrCAruAX0x7tYP/+pfr9hdcjppG4C516FmQRQkTtjRRyG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SZIbsb4u; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47edd6111b4so74144815e9.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 00:45:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769589798; x=1770194598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=LFoeBbAgdVTZxH8eTqVhKR5q6RrTMpobaw0FVj77xqA=;
-        b=NdTROMJ448U6OvcPnvEUEJW6G0g0X4v7HOtjZz03HDUY+GSFootkKvjraBfalbXIyz
-         g0b65UPGcEPiL8WYyGP7ooRW9bldEF3pmmxDYNc80CXHR0i43hftXePyraNfN6550fN8
-         SeyNd/xz25zxiHiO7qcDfdFMe7Ukq6XuRB+iMz96g3L2/c9zI04arrmO76jTvhAtn26C
-         XFzQQhUcpFHMGCvTxjnZFYjxkuN4mMTvdZ+xzJmCUNPxZn0tPe8V6ZGfNZJwWOS+x+7X
-         QSx64RXfUmfzXrD8SgNhLKUz/79AKk5At1fURY5Mh7W3+XYTPjcMuhJCS7+mGhYEDvD/
-         877w==
+        d=suse.com; s=google; t=1769589905; x=1770194705; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yzZ5aaJur2cGbo3tv1Z3AlCZuGpqhSu9RlDH7L/IIPI=;
+        b=SZIbsb4uqLo2GtuIKPa3bbLA7N6dH7jjl6viB/R0/10DmYtuzJlEe7d0Lgh3AsecRy
+         Jb04vA7E9/uLgkJZj1z+cgSxI3Pw1kEmK8VTCRIPmIz0NhYj96oATGrLZoy7Q77sTuDw
+         mGjKnzWQTVqorHggE4D4U6/8Mf1kmcypiioWs0sIzDr+ORIOuLY1V6G4ENM7uvS7yfSs
+         ZNvihc9rHZx9imvV17/9Oe01/vYcd1kY83/3Hw76N9KkKngapUjdwLQYcCYYynsVx+y9
+         1Jbevjw8z6Hb9P7DLqp8t2bANC8o9Q00TSBYdZxWguV1RtcG2SS3gAKfvOKvJZxcgBXk
+         4HcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769589798; x=1770194598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LFoeBbAgdVTZxH8eTqVhKR5q6RrTMpobaw0FVj77xqA=;
-        b=ZnRRkGGRM9WLAu8R/zt+eeIYypyvSZfAseN4YsGrSSCMDnLCcX2O2m9JS206mF2o/w
-         XLqbw9uS7n3GO3ciR+kGyb1zCPYHAzy531ERirVoNNz9P2+KHg4spbKoW/+EPSwJXh7T
-         mdu2/6+NreL1mJJR+wLqeH8oq6CwWANAAF6s4fM4ukqoenFJpFJDh8qdn6Z7XMZNbNL3
-         hRAnqPPfhLQzj3vSrDO8IkzLw5OpoGoVli6aI3aPYaCSYIJ1OVicWRv/kkzc9xXDGoMg
-         JsnmGlueuCv+iEbspkSLxcL7R0zt35UTVkXgxNwDD4s8lBuhaN2I+gN5HYIRnZ71gLqU
-         33pg==
-X-Gm-Message-State: AOJu0YxOo9tvy6wgoGQhCUnnD/stI9/f97SBeTclUI5fCh2AIM63W7lD
-	43Zv7J3no1xcue59YEa4xkUV+dT22M9H8u3dPEo/GxielnGXzZPy5dFUvuvMspTI8N/RoEB8SOJ
-	BDvuUAZLYZRX8yjPtLae+oK7iVHq8rvkLvWmX0hObE63idmvc87HOeBoU60nNACmm
-X-Gm-Gg: AZuq6aLkOkqI27757WCaFFpY1hz57uI9oAjh99PRxmv59adOiCQaMboTlBpzoVkZV00
-	VJNB4X7/5liRlOVVWjLgj6KUOvoA5GXs/xOXpOrSIR3s6iqy6ELwzvsWnStFWlnC3vUw6TCO3+a
-	FCQTeTBE6McOFHXqJkEkxqywED6DuoKBkgt179RDTcYKSFjsv6X7q/ecs3e0qTVCYZ4W7TO09e7
-	Tc4JqqVU4gel58pbXEApd0AeCeIQCF1yB15lbiL52u6oOdkZlq0zSaeoO7fnVxFkBT1mRYdbMpv
-	NGHDoYD4/+vwK0MolA==
-X-Received: by 2002:ac8:5e52:0:b0:4ff:cb75:2a22 with SMTP id
- d75a77b69052e-5032f44cd01mr4496291cf.3.1769589798070; Wed, 28 Jan 2026
- 00:43:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769589905; x=1770194705;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzZ5aaJur2cGbo3tv1Z3AlCZuGpqhSu9RlDH7L/IIPI=;
+        b=VPwOF8n/aM8WQiitIFfcbUe2QfHqXgc5EhMqqCOHP8wXX3onwVtU7NXvpvPCI8K9Yp
+         62Y0opDHnZal1lGlADRYQ6biMFcQ7+JqA2WjLNaXB0E9y8LcbKNRA2By0cxSyYY1o6wk
+         QZnJQ4Q8x9nAKpugO1clHadDWcDlCU0oAJYUcaCupyyzjB+IGz4BsPvBggvwsF4b26ea
+         +VgmdVS/WNqXIH0Xgx+91F/+v/en6/NGYiD4GyHg5cYUU92/KS+BRtK/of8fhrElWivd
+         k8qM3L+m6o+piyfFy4ZBOgL4tLXYBqGQ2TrCtX2lO8k6aQ/6FHXty4kPnIxpa+5sgnZb
+         QuUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWrN6rKYFp+lQb7Iv+FE6wU/XpXQuTp6QEntqcsThcDv3S+q5McUUuqLJNWp0MxpVAcS4Dk5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFj6ohuwwrb+8NWFx8G7jK7CodkkYm4x/lInQWMFx2QhJ/7LHv
+	5MX1Fx0hxryeexYxxvNhabUng07gbJgXueVM7jkBjAkLq4JQc01mj8b2Z8asfXJZEpQ=
+X-Gm-Gg: AZuq6aIxohbAvdZGb+SBSnXTMVlJyDDY5ahsdrUb9NWXj6vobG7Hd6m8FjMS81pIDGG
+	B/Ar9e0n8ge+n15ODRGqf+WUV7K7oTaj+O1gUCkKa/jTTHatDh8oroKgVa6G1IN7Ihp3Vk4HVE2
+	HCGFStmphvlnvqBUKBaTR20lEcpiwL5higRdIOVhkl608wyzEv1OH6mW5aPaZv3VLR5LG4yDu4d
+	Nys4x9ZZo2ncFUOLLeiyrzveSS6aAZv4rrjE35eeBK7kUbAv4/4wHPAJHhsW3xdEZmL4+KW01F2
+	L63GBko9Vrr5lDwey2FtbzpI+YHEOff5Riee7qvXskfgWrmBWFcwe4ZpvQSNpNHaqzDZqCv2zPt
+	DasIrLm/vqywOO/VeRZwI7fpy4UPI/yYFrekDAtrOrgOoSv9G56IhL+YdonqUx5+s4toelsr/jv
+	OLC0vLgAheU6o7JNVxkJ2xVfuQ
+X-Received: by 2002:a05:600c:4e12:b0:480:6873:b2f6 with SMTP id 5b1f17b1804b1-48069c557d0mr54819185e9.20.1769589905328;
+        Wed, 28 Jan 2026 00:45:05 -0800 (PST)
+Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066bee7d0sm121124905e9.4.2026.01.28.00.45.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 00:45:04 -0800 (PST)
+Date: Wed, 28 Jan 2026 09:45:03 +0100
+From: Michal Hocko <mhocko@suse.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aXnMj1phN3TJZkNz@tiehlicka>
+References: <20260125224541.50226-1-frederic@kernel.org>
+ <20260125224541.50226-4-frederic@kernel.org>
+ <aXeZQoSHJ9QX7B6W@tiehlicka>
+ <aXizUsfywjtIIN50@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yan Yan <evitayan@google.com>
-Date: Wed, 28 Jan 2026 16:43:06 +0800
-X-Gm-Features: AZwV_Qh4qrYofudHvr0LtebolcUCHL3GrShnYCNvJvSkQDsgLSNXvemKifzvjtA
-Message-ID: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
-Subject: [REGRESSION] Discussion on "xfrm: Duplicate SPI Handling"
-To: netdev@vger.kernel.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	antony.antony@secunet.com, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, 
-	horms@kernel.org, saakashkumar@marvell.com, akamluddin@marvell.com, 
-	Nathan Harold <nharold@google.com>, greg@kroah.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXizUsfywjtIIN50@localhost.localdomain>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254149-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254148-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[evitayan@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mhocko@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC1659E4EB
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 920999E4FC
 X-Rspamd-Action: no action
 
-Hi all,
+On Tue 27-01-26 13:45:06, Frederic Weisbecker wrote:
+> Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a écrit :
+> > On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
+> > > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> > > runtime. In order to synchronize against memcg workqueue to make sure
+> > > that no asynchronous draining is pending or executing on a newly made
+> > > isolated CPU, target and queue a drain work under the same RCU critical
+> > > section.
+> > > 
+> > > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
+> > > workqueue flush will also be issued in a further change to make sure
+> > > that no work remains pending after a CPU has been made isolated.
+> > > 
+> > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > > ---
+> > >  mm/memcontrol.c | 21 +++++++++++++++++----
+> > >  1 file changed, 17 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> > > index be810c1fbfc3..2289a0299331 100644
+> > > --- a/mm/memcontrol.c
+> > > +++ b/mm/memcontrol.c
+> > > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
+> > >  	return flush;
+> > >  }
+> > >  
+> > > +static void schedule_drain_work(int cpu, struct work_struct *work)
+> > > +{
+> > > +	/*
+> > > +	 * Protect housekeeping cpumask read and work enqueue together
+> > > +	 * in the same RCU critical section so that later cpuset isolated
+> > > +	 * partition update only need to wait for an RCU GP and flush the
+> > > +	 * pending work on newly isolated CPUs.
+> > > +	 */
+> > > +	guard(rcu)();
+> > > +	if (!cpu_is_isolated(cpu))
+> > > +		schedule_work_on(cpu, work);
+> > 
+> > Shouldn't this in the guarded rcu section?
+> 
+> This is what guard(rcu)() does, right?
+> Or am I missing something?
 
-I am writing because unfortunately commit: 94f39804d891 ("xfrm:
-Duplicate SPI Handling") has caused a regression in the Android OS, so
-we would like to gain some context to help determine next steps. The
-issue is caused by the new requirement for global SPI uniqueness
-during allocation. Based on our review of RFC 4301 and the previous
-review history, we would like to highlight a few concerns:
+I am probably misreading the patch. But I've had the following in mind
 
-1. Regression on Android:
-This change breaks production behavior in Android, which uses
-XFRM_MSG_ALLOCSPI to create larval SAs for both directions. Since RFC
-4301 allows duplicate outbound SPIs, and larval SAs are often created
-before direction or selectors are finalized, the allocator must remain
-permissive (at least in our current design).
-This also aligns with a concern Herbert Xu raised during the initial
-review regarding compatibility:
->    "It's also dangerous to unilaterally do this since existing deployment=
-s
->    could rely on the old behaviour. You'd need to add a toggle for
->    compatibility."
-
-2. Inbound SPI uniqueness should not be a hard requirement:
-The justification for enforcing global SPI uniqueness often cites the
-statement in RFC 4301, Section 4.1, that for unicast traffic, the SPI
-"by itself suffices to specify an SA." However, we don=E2=80=99t think this
-means inbound SPI uniqueness is a hard requirement because of the two
-following reasons:
-
-=E2=80=93 Another statement implies that SPI uniqueness is just an
-implementation choice:
->    "Each entry in the SA Database (SAD) MUST
->    indicate whether the SA lookup makes use of the destination IP address=
-, or the
->    destination and source IP addresses, in addition to the SPI."
-
-=E2=80=93 There is a "Longest Match" mandate which makes SPI uniqueness unn=
-ecessary:
->    "For each inbound, IPsec-protected packet, an implementation MUST
->    conduct its search of the SAD such that it finds the entry that
->    matches the 'longest' SA identifier. In this context, if two or more
->    SAD entries match based on the SPI value, then the entry that also
->    matches based on destination address... is the 'longest' match."
-
-3. Further clarification on the specific problem being addressed would
-be helpful. The "real-world" problem this commit intends to fix
-remains unclear. The patch mentions:
->    "This behavior causes inconsistencies during SPI lookups for inbound p=
-ackets.
->    Since the lookup may return an arbitrary SA among those with the same =
-SPI,
->    packet processing can fail, resulting in packet drops."
-
-However, Linux kernel lookups using the triplet (SPI, Protocol, Daddr)
-are deterministic. The lookup will not return an "arbitrary" SA
-because the destination address is used to disambiguate the state.
-
-As Antony suggested, this change may cater to SPI-only hardware
-indexing. If that is the case, we are concerned about applying such
-hardware-specific limits to the software stack, especially if the
-behavior is not opt-in, as it appears to require an overly-narrow
-reading of the RFC 4301.
-
-Given these concerns, would it be possible to discuss a revert or,
-alternatively, could further context be provided regarding the
-specific real-world problem this commit was intended to address? Once
-the underlying issue is clearly defined, we can work together to find
-a backward-compatible solution that satisfies all requirements.
-
-Review threads are attached for easy reference:
-https://lore.kernel.org/netdev/aDQhZ_ikHEt_pLn_@gondor.apana.org.au/T/#r45c=
-1786651ce5af730f757aca7438474d494a323
-https://lore.kernel.org/netdev/20250616100621.837472-1-saakashkumar@marvell=
-.com/T/#u
-
-Best regards,
-
-Yan (on behalf of the Android IPsec team)
+	scoped_guard(rcu) {
+		if (!cpu_is_isolated(cpu))
+			schedule_work_on(cpu, work);
+	}
+-- 
+Michal Hocko
+SUSE Labs
 
