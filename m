@@ -1,287 +1,135 @@
-Return-Path: <netdev+bounces-254323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KE4xCH4yemlo4gEAu9opvQ
-	(envelope-from <netdev+bounces-254323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:59:58 +0100
+	id OCS9J8Qyeml+4gEAu9opvQ
+	(envelope-from <netdev+bounces-254324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:01:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C234A4E47
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:59:57 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1E5A4EE2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D2CE0303ABF0
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:43:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E01233171D43
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707F02F745B;
-	Wed, 28 Jan 2026 15:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA662EA172;
+	Wed, 28 Jan 2026 15:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/feX2du"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD294307AF2;
-	Wed, 28 Jan 2026 15:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4663081BD;
+	Wed, 28 Jan 2026 15:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769614963; cv=none; b=RRjlvl0stmwvTYM90JY31ZzHsvh/mgYhEXApbKdt0fgU0Kbt56nJEAFi3m1EoyCxW3l1RbD+TiT0mPLOg5FttRDKQdtC9k2B7D4G/ylJIS8NjHyBOteglrhC22Uw0GkVG6e6K8wOkIg9QxGUVmtIbxTwmebSPNv05FVzb6BSeAw=
+	t=1769615017; cv=none; b=KqHpqOLw5K8aIOjAXy7nLorFUrVTCA2FsaQuSQHacweMAoZo3ZChkI5KG0F8ey7sHsc4L9iadPAuk4AdaM39Zq9KN4kjMNE7QbZdlbvGfOrT2ohPhO4Uch66rciwXUlImtlesRWQu2fZyqGe9DImTitmiyMqKLGYt5AhWnuMRW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769614963; c=relaxed/simple;
-	bh=uyN33aUCJ/8oKLfIUaYp8Ta7ulzubtTL2pXFlzzbgpE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H1YRuRtYXgvawgu0tGHWF9qBwQgMFwPeKRE8/sYnbp98ddMatYHs6vomyboWNuArvOfENluOgWqJzyJQOvk4oTbv5hgRJwNbzov2shWPfbD+wI0wkwBjFGo1MP/XRQJrY39dcq5K8mzqnCaBc1TB8KJxCQ8QfHp7oN16c2MHUQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 8B3C86054D; Wed, 28 Jan 2026 16:42:37 +0100 (CET)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net-next 9/9] selftests: netfilter: nft_queue.sh: add udp fraglist gro test case
-Date: Wed, 28 Jan 2026 16:41:55 +0100
-Message-ID: <20260128154155.32143-10-fw@strlen.de>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260128154155.32143-1-fw@strlen.de>
-References: <20260128154155.32143-1-fw@strlen.de>
+	s=arc-20240116; t=1769615017; c=relaxed/simple;
+	bh=Ms6JSPLx+R0AGkkQXNUtlIKDAJmwsS9TPgZf+SoweB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M/Z2swyLU5be7xdQffQh/gWijLVJF1I6j3wi9dVpuvfHk4Ug0zilA02H5luy3vzB8gc0I8T+ub+8b2SqGo+tNJzjHcndQDOeOmW4I/vWAwhuHgTR1oLx4Tlyfx4uCWoGc8k8C9pRsL5Ie0IodXu/SUBKmSfB/8080MNv2C9YNgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/feX2du; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E418AC116C6;
+	Wed, 28 Jan 2026 15:43:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769615017;
+	bh=Ms6JSPLx+R0AGkkQXNUtlIKDAJmwsS9TPgZf+SoweB0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k/feX2duw105DXZwD6VCd+YxveRBQQvZwG1gOS/X0ZdFYkzFA6flqG/HNZxbCSfEo
+	 9S8zDChgoORh5Zyax+Grj+WTS3kYtPu9i+rikFALF271mQxYnQpc9H9/qdlMYKUfZF
+	 AsBZ1QCegWxjyUlNMxdHoA0QkK/ou4etDhoUDKOHIHSLKb0z/7NK3UEWtL6R1o08hs
+	 7MG3+rRl/P54CNe8LJHDsqbTyk4VKLMXkVVlsfhwjS2FCEAH8bGgkEjI1Z5sPALKEG
+	 yP0jnOXkMTCnXyidLUhJ0LwyZCZCQybgN1qZ1dURyhzo/rGFzVuw/VvYe3wKcGr374
+	 q2owya+xV+W4A==
+Message-ID: <1fca424a-6215-4303-a0cd-623063945ce6@kernel.org>
+Date: Wed, 28 Jan 2026 16:43:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] powerpc: dts: fsl: Drop unused .dtsi files
+To: "Rob Herring (Arm)" <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20260128140222.1627203-1-robh@kernel.org>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260128140222.1627203-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	NEURAL_HAM(-0.00)[-0.989];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-254324-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254323-lists,netdev=lfdr.de];
-	R_DKIM_NA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 3C234A4E47
+	FREEMAIL_TO(0.00)[kernel.org,linux.ibm.com,ellerman.id.au,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
+	RSPAMD_EMAILBL_FAIL(0.00)[robh.kernel.org:query timed out,chleroy.kernel.org:query timed out];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 0E1E5A4EE2
 X-Rspamd-Action: no action
 
-Without the preceding patch, this fails with:
 
-FAIL: test_udp_gro_ct: Expected udp conntrack entry
-FAIL: test_udp_gro_ct: Expected software segmentation to occur, had 10 and 0
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- .../selftests/net/netfilter/nft_queue.sh      | 142 +++++++++++++++++-
- 1 file changed, 136 insertions(+), 6 deletions(-)
+Le 28/01/2026 à 15:02, Rob Herring (Arm) a écrit :
+> These files are not included by anything and therefore don't get built or
+> tested.
+> 
+> There's also no upstream driver for the interlaken-lac stuff.
+> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>   .../boot/dts/fsl/interlaken-lac-portals.dtsi  | 156 ------------------
+>   arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi |  45 -----
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_queue.sh b/tools/testing/selftests/net/netfilter/nft_queue.sh
-index 6136ceec45e0..139bc1211878 100755
---- a/tools/testing/selftests/net/netfilter/nft_queue.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_queue.sh
-@@ -510,7 +510,7 @@ EOF
- 
- udp_listener_ready()
- {
--	ss -S -N "$1" -uln -o "sport = :12345" | grep -q 12345
-+	ss -S -N "$1" -uln -o "sport = :$2" | grep -q "$2"
- }
- 
- output_files_written()
-@@ -518,7 +518,7 @@ output_files_written()
- 	test -s "$1" && test -s "$2"
- }
- 
--test_udp_ct_race()
-+test_udp_nat_race()
- {
-         ip netns exec "$nsrouter" nft -f /dev/stdin <<EOF
- flush ruleset
-@@ -545,8 +545,8 @@ EOF
- 	ip netns exec "$nsrouter" ./nf_queue -q 12 -d 1000 &
- 	local nfqpid=$!
- 
--	busywait "$BUSYWAIT_TIMEOUT" udp_listener_ready "$ns2"
--	busywait "$BUSYWAIT_TIMEOUT" udp_listener_ready "$ns3"
-+	busywait "$BUSYWAIT_TIMEOUT" udp_listener_ready "$ns2" 12345
-+	busywait "$BUSYWAIT_TIMEOUT" udp_listener_ready "$ns3" 12345
- 	busywait "$BUSYWAIT_TIMEOUT" nf_queue_wait "$nsrouter" 12
- 
- 	# Send two packets, one should end up in ns1, other in ns2.
-@@ -557,7 +557,7 @@ EOF
- 
- 	busywait 10000 output_files_written "$TMPFILE1" "$TMPFILE2"
- 
--	kill "$nfqpid"
-+	kill "$nfqpid" "$rpid1" "$rpid2"
- 
- 	if ! ip netns exec "$nsrouter" bash -c 'conntrack -L -p udp --dport 12345 2>/dev/null | wc -l | grep -q "^1"'; then
- 		echo "FAIL: Expected One udp conntrack entry"
-@@ -585,6 +585,135 @@ EOF
- 	echo "PASS: both udp receivers got one packet each"
- }
- 
-+# Make sure UDPGRO aggregated packets don't lose
-+# their skb->nfct entry when nfqueue passes the
-+# skb to userspace with software gso segmentation on.
-+test_udp_gro_ct()
-+{
-+	local errprefix="FAIL: test_udp_gro_ct:"
-+
-+	ip netns exec "$nsrouter" conntrack -F 2>/dev/null
-+
-+        ip netns exec "$nsrouter" nft -f /dev/stdin <<EOF
-+flush ruleset
-+table inet udpq {
-+	# Number of packets/bytes queued to userspace
-+	counter toqueue { }
-+	# Number of packets/bytes reinjected from userspace with 'ct new' intact
-+	counter fromqueue { }
-+	# These two counters should be identical and not 0.
-+
-+	chain prerouting {
-+		type filter hook prerouting priority -300; policy accept;
-+
-+		# userspace sends small packets, if < 1000, UDPGRO did
-+		# not kick in, but test needs a 'new' conntrack with udpgro skb.
-+		meta iifname veth0 meta l4proto udp meta length > 1000 accept
-+
-+		# don't pick up non-gso packets and don't queue them to
-+		# userspace.
-+		notrack
-+	}
-+
-+        chain postrouting {
-+		type filter hook postrouting priority 0; policy accept;
-+
-+		# Only queue unconfirmed fraglist gro skbs to userspace.
-+		udp dport 12346 ct status ! confirmed counter name "toqueue" mark set 1 queue num 1
-+        }
-+
-+	chain validate {
-+		type filter hook postrouting priority 1; policy accept;
-+		# ... and only count those that were reinjected with the
-+		# skb->nfct intact.
-+		mark 1 counter name "fromqueue"
-+	}
-+}
-+EOF
-+	timeout 10 ip netns exec "$ns2" socat UDP-LISTEN:12346,fork,pf=ipv4 OPEN:"$TMPFILE1",trunc &
-+	local rpid=$!
-+
-+	ip netns exec "$nsrouter" ./nf_queue -G -c -q 1 -t 2 > "$TMPFILE2" &
-+	local nfqpid=$!
-+
-+	ip netns exec "$nsrouter" ethtool -K "veth0" rx-udp-gro-forwarding on rx-gro-list on generic-receive-offload on
-+
-+	busywait "$BUSYWAIT_TIMEOUT" udp_listener_ready "$ns2" 12346
-+	busywait "$BUSYWAIT_TIMEOUT" nf_queue_wait "$nsrouter" 1
-+
-+	local bs=512
-+	local count=$(((32 * 1024 * 1024) / bs))
-+	dd if=/dev/zero bs="$bs" count="$count" 2>/dev/null | for i in $(seq 1 16); do
-+		timeout 5 ip netns exec "$ns1" \
-+			socat -u -b 512 STDIN UDP-DATAGRAM:10.0.2.99:12346,reuseport,bind=0.0.0.0:55221 &
-+	done
-+
-+	busywait 10000 test -s "$TMPFILE1"
-+
-+	kill "$rpid"
-+
-+	wait
-+
-+	local p
-+	local b
-+	local pqueued
-+	local bqueued
-+
-+	c=$(ip netns exec "$nsrouter" nft list counter inet udpq "toqueue" | grep packets)
-+	read p pqueued b bqueued <<EOF
-+$c
-+EOF
-+	local preinject
-+	local breinject
-+	c=$(ip netns exec "$nsrouter" nft list counter inet udpq "fromqueue" | grep packets)
-+	read p preinject b breinject <<EOF
-+$c
-+EOF
-+	ip netns exec "$nsrouter" ethtool -K "veth0" rx-udp-gro-forwarding off
-+	ip netns exec "$nsrouter" ethtool -K "veth1" rx-udp-gro-forwarding off
-+
-+	if [ "$pqueued" -eq 0 ];then
-+		# happens when gro did not build at least on aggregate
-+		echo "SKIP: No packets were queued"
-+		return
-+	fi
-+
-+	local saw_ct_entry=0
-+	if ip netns exec "$nsrouter" bash -c 'conntrack -L -p udp --dport 12346 2>/dev/null | wc -l | grep -q "^1"'; then
-+		saw_ct_entry=1
-+	else
-+		echo "$errprefix Expected udp conntrack entry"
-+		ip netns exec "$nsrouter" conntrack -L
-+		ret=1
-+	fi
-+
-+	if [ "$pqueued" -ge "$preinject" ] ;then
-+		echo "$errprefix Expected software segmentation to occur, had $pqueued and $preinject"
-+		ret=1
-+		return
-+	fi
-+
-+	# sw segmentation adds extra udp and ip headers.
-+	local breinject_expect=$((preinject * (512 + 20 + 8)))
-+
-+	if [ "$breinject" -eq "$breinject_expect" ]; then
-+		if [ "$saw_ct_entry" -eq 1 ];then
-+			echo "PASS: fraglist gro skb passed with conntrack entry"
-+		else
-+			echo "$errprefix fraglist gro skb passed without conntrack entry"
-+			ret=1
-+		fi
-+	else
-+		echo "$errprefix Counter mismatch, conntrack entry dropped by nfqueue? Queued: $pqueued, $bqueued. Post-queue: $preinject, $breinject. Expected $breinject_expect"
-+		ret=1
-+	fi
-+
-+	if ! ip netns exec "$nsrouter" nft delete table inet udpq; then
-+		echo "$errprefix: Could not delete udpq table"
-+		ret=1
-+	fi
-+}
-+
- test_queue_removal()
- {
- 	read tainted_then < /proc/sys/kernel/tainted
-@@ -663,7 +792,8 @@ test_tcp_localhost_connectclose
- test_tcp_localhost_requeue
- test_sctp_forward
- test_sctp_output
--test_udp_ct_race
-+test_udp_nat_race
-+test_udp_gro_ct
- 
- # should be last, adds vrf device in ns1 and changes routes
- test_icmp_vrf
--- 
-2.52.0
+Those two files were added by commit 8c43d2b0ca10 ("powerpc: Add T4 LAC 
+device tree binding & defs") together with 
+Documentation/devicetree/bindings/powerpc/fsl/interlaken-lac.txt
 
+Should the Documentation file be removed as well ?
+
+Regardless,
+
+Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+
+
+
+>   .../boot/dts/fsl/pq3-mpic-message-B.dtsi      |  43 -----
+>   .../fsl/qoriq-fman3-0-10g-1-best-effort.dtsi  |  80 ---------
+>   4 files changed, 324 deletions(-)
+>   delete mode 100644 arch/powerpc/boot/dts/fsl/interlaken-lac-portals.dtsi
+>   delete mode 100644 arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi
+>   delete mode 100644 arch/powerpc/boot/dts/fsl/pq3-mpic-message-B.dtsi
+>   delete mode 100644 arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
+> 
 
