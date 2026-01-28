@@ -1,159 +1,215 @@
-Return-Path: <netdev+bounces-254207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHpWOuLseWkF1AEAu9opvQ
-	(envelope-from <netdev+bounces-254207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:02:58 +0100
+	id KKBAH3HveWnG1AEAu9opvQ
+	(envelope-from <netdev+bounces-254208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:13:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DCA89FE2E
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:02:58 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 257CDA01E8
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:13:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F1E36303FADE
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:59:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 83A0D300599A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469BE31062C;
-	Wed, 28 Jan 2026 10:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7F033C51B;
+	Wed, 28 Jan 2026 11:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sAs4uHaq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QsOIO6cV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE17A3382DA
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750DE32ED24;
+	Wed, 28 Jan 2026 11:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769597942; cv=none; b=rDgD4x2cZzJCeMSvnfnvA2Np5Sx2wfJ7wPGtrHpAt4N7UnL+PN1HPOaai982/ovsBX7m0uqckUi0zy44VJPysVtOqiApz8bOpzsf52TluBpfGdCizlLQH5QeTQ+5d6+izY7hgAHTUFs22X5YEwRttdjmYB0yzRGX4qYEn1HTcis=
+	t=1769598830; cv=none; b=LWuPoZTZMRKzG29om/bpnj9r3dAYUXxrCwQ10A9d4doLFUgTLxoxKOkkh4qJthz10PO9rbAwsspABcJj2SwAmtQlzORrf4aEnFMPvarHykHMOjl7sqhFla1HPciJhQhCCoqoX8UJypTVEai1r1fwE8oJ+ExkaX+SbGAEO8SyS0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769597942; c=relaxed/simple;
-	bh=e9Cn3fZBy7ua4Ur/Gg16beyVhcWlhkMUmrbQR2yXAJU=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=qK5Zet3oopdmrn8WUGvJhM07c69XRKlrgw1MmuO6gUUAH5rP+5eX2AT/BclkIanVs+DEr4x8TWJ4HYbf8+twIVvyMP7TzrseSUhFFfMYjWDSzAcJvAODzgejc8gQXi8VjoFSxYGMogV2Hg7PmPb3FO9Qs4B5Xsd8uc6bQ7LUvLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sAs4uHaq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EGBTNGnmTxwMKDHsZMSMTT/mAkSrcZT730/nj1ps4ck=; b=sAs4uHaqj/eILKLiSvLRLGbGBw
-	lXuPAVJBPWgHm2vpJxoAlCbiWnYdTfuJhWQJ3y/pnwzodn/QhmW9we7R3mcN9iXjbSHIY2t87E/Xh
-	8DM0/dkS2L3/af1Cigcen5LhkRCq8bG/8bzuZ3eIg2mIep4jHPAKC/mpWgXhv32Hhk4L/CrAsF9A9
-	N5NJCFMVuPA/+oSfBycuiqhh+Kc4l8dHuIn2HRQLrc9WjY5bekltn2HnUNGBJf93cWYiyH0XMA6W2
-	hFHrvWyRD1iLhausbhXVCu/vgdvxFITS6uUmUK5m6/d+0dt/d7tLIi6gn+OPY8ADWAIPzzlEwsLTO
-	Terzf0wg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42812 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vl3G7-000000007GL-1MhJ;
-	Wed, 28 Jan 2026 10:58:51 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vl3G5-00000006v3X-2zfD;
-	Wed, 28 Jan 2026 10:58:49 +0000
-In-Reply-To: <aXnrzIbZN-gaZTia@shell.armlinux.org.uk>
-References: <aXnrzIbZN-gaZTia@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1769598830; c=relaxed/simple;
+	bh=XhAa/knyZ6haG7FHsLWt0DcbM4mnkccj/WzXt56VTpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oTeTdPz3FIlMC8KZepjA4CutgSr1HJ3P6/dXIrQZ50cqJOi8ELLIEfyc1lOa4CFOqHcvHpQawAJQ0Je3EiHEwoM1O5siMSoCn+fKrVwFZ/Ve+NyPnVLakEmRgxxIIdYiDchNpxoe3epa9D0QqDFU8Qx3+L5O/cK2eCkqUPf/YD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QsOIO6cV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E815DC4CEF1;
+	Wed, 28 Jan 2026 11:13:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769598830;
+	bh=XhAa/knyZ6haG7FHsLWt0DcbM4mnkccj/WzXt56VTpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QsOIO6cV70uo0MZSW5kkJyDzI6RcSrMOzS5q7b7ULZKvuvWOx/IEA15z5DVAGIIJB
+	 coB0IBdwYPmvjySgO+Q5k0Jh7yt3uJdRV7gfvJoAN354mNNBcRN0nPgfT+cNOutquJ
+	 ZpegGQAj4wSMSonkLxC7IwKMy3Ey977CuGMoGbkKTiCHGIQ0NLz5TwtRb/TERR82EW
+	 gi+yJN3vH9nFSz8UetoM6ON9giYtcaD2dAs7OBryHfj7ofCebLLX0mZMO5KXNUbTV6
+	 tJEsoktIRK3o+24kAK4i4HfY3V6Kp+kTlsfAFbeP/LXceIkOsVtbdbiUnMiqvrXZhI
+	 Zl1Y90LMpECMQ==
+Date: Wed, 28 Jan 2026 13:13:46 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dust Li <dust.li@linux.alibaba.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Subject: [PATCH net-next 3/3] net: stmmac: rk: add SoC specific ->init()
- method
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com
+Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
+Message-ID: <20260128111346.GD12149@unreal>
+References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
+ <20260123082349.42663-3-alibuda@linux.alibaba.com>
+ <aXPEFdEdtSmd6AzF@milan>
+ <20260124093505.GA98529@j66a10360.sqa.eu95>
+ <aXSjm1DXm6yP62tD@pc636>
+ <20260124145754.GA57116@j66a10360.sqa.eu95>
+ <20260127133417.GU13967@unreal>
+ <20260128034558.GA126415@j66a10360.sqa.eu95>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vl3G5-00000006v3X-2zfD@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 28 Jan 2026 10:58:49 +0000
+In-Reply-To: <20260128034558.GA126415@j66a10360.sqa.eu95>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254207-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-254208-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 3DCA89FE2E
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: 257CDA01E8
 X-Rspamd-Action: no action
 
-Add a SoC specific init method.
+On Wed, Jan 28, 2026 at 11:45:58AM +0800, D. Wythe wrote:
+> On Tue, Jan 27, 2026 at 03:34:17PM +0200, Leon Romanovsky wrote:
+> > On Sat, Jan 24, 2026 at 10:57:54PM +0800, D. Wythe wrote:
+> > > On Sat, Jan 24, 2026 at 11:48:59AM +0100, Uladzislau Rezki wrote:
+> > > > Hello, D. Wythe!
+> > > > 
+> > > > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
+> > > > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
+> > > > > > > find_vm_area() provides a way to find the vm_struct associated with a
+> > > > > > > virtual address. Export this symbol to modules so that modularized
+> > > > > > > subsystems can perform lookups on vmalloc addresses.
+> > > > > > > 
+> > > > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> > > > > > > ---
+> > > > > > >  mm/vmalloc.c | 1 +
+> > > > > > >  1 file changed, 1 insertion(+)
+> > > > > > > 
+> > > > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+> > > > > > > index ecbac900c35f..3eb9fe761c34 100644
+> > > > > > > --- a/mm/vmalloc.c
+> > > > > > > +++ b/mm/vmalloc.c
+> > > > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
+> > > > > > >  
+> > > > > > >  	return va->vm;
+> > > > > > >  }
+> > > > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
+> > > > > > >  
+> > > > > > This is internal. We can not just export it.
+> > > > > > 
+> > > > > > --
+> > > > > > Uladzislau Rezki
+> > > > > 
+> > > > > Hi Uladzislau,
+> > > > > 
+> > > > > Thank you for the feedback. I agree that we should avoid exposing
+> > > > > internal implementation details like struct vm_struct to external
+> > > > > subsystems.
+> > > > > 
+> > > > > Following Christoph's suggestion, I'm planning to encapsulate the page
+> > > > > order lookup into a minimal helper instead:
+> > > > > 
+> > > > > unsigned int vmalloc_page_order(const void *addr){
+> > > > > 	struct vm_struct *vm;
+> > > > >  	vm = find_vm_area(addr);
+> > > > > 	return vm ? vm->page_order : 0;
+> > > > > }
+> > > > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
+> > > > > 
+> > > > > Does this approach look reasonable to you? It would keep the vm_struct
+> > > > > layout private while satisfying the optimization needs of SMC.
+> > > > > 
+> > > > Could you please clarify why you need info about page_order? I have not
+> > > > looked at your second patch.
+> > > > 
+> > > > Thanks!
+> > > > 
+> > > > --
+> > > > Uladzislau Rezki
+> > > 
+> > > Hi Uladzislau,
+> > > 
+> > > This stems from optimizing memory registration in SMC-R. To provide the
+> > > RDMA hardware with direct access to memory buffers, we must register
+> > > them with the NIC. During this process, the hardware generates one MTT
+> > > entry for each physically contiguous block. Since these hardware entries
+> > > are a finite and scarce resource, and SMC currently defaults to a 4KB
+> > > registration granularity, a single 2MB buffer consumes 512 entries. In
+> > > high-concurrency scenarios, this inefficiency quickly exhausts NIC
+> > > resources and becomes a major bottleneck for system scalability.
+> > 
+> > I believe this complexity can be avoided by using the RDMA MR pool API,
+> > as other ULPs do, for example NVMe.
+> > 
+> > Thanks
+> > 
+> 
+> Hi Leon,
+> 
+> Am I correct in assuming you are suggesting mr_pool to limit the number
+> of MRs as a way to cap MTTE consumption?
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+I don't see this a limit, but something that is considered standard
+practice to reduce MTT consumption.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 976d42fd90df..ea01c5965cbb 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -35,6 +35,7 @@ struct rk_reg_speed_data {
- };
- 
- struct rk_gmac_ops {
-+	int (*init)(struct rk_priv_data *bsp_priv);
- 	void (*set_to_rgmii)(struct rk_priv_data *bsp_priv,
- 			     int tx_delay, int rx_delay);
- 	void (*set_to_rmii)(struct rk_priv_data *bsp_priv);
-@@ -1618,6 +1619,15 @@ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
- 
- 	bsp_priv->dev = dev;
- 
-+	if (ops->init) {
-+		ret = ops->init(bsp_priv);
-+		if (ret) {
-+			reset_control_put(bsp_priv->phy_reset);
-+			dev_err_probe(dev, ret, "failed to init BSP\n");
-+			return ERR_PTR(ret);
-+		}
-+	}
-+
- 	return bsp_priv;
- }
- 
--- 
-2.47.3
+> 
+> However, our goal is to maximize the total registered memory within
+> the MTTE limits rather than to cap it. In SMC-R, each connection
+> occupies a configurable, fixed-size registered buffer; consequently,
+> the more memory we can register, the more concurrent connections
+> we can support.
 
+It is not cap, but more efficient use of existing resources.
+
+> 
+> By leveraging vmalloc_huge() and the proposed helper to increase the
+> page_size in ib_map_mr_sg(), each MTTE covers a much larger contiguous
+> physical block. This significantly reduces the total number of entries
+> required to map the same amount of memory, allowing us to serve more
+> connections under the same hardware constraints
+> 
+> D. Wythe
 
