@@ -1,183 +1,147 @@
-Return-Path: <netdev+bounces-254893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHEmI9+we2mSHwIAu9opvQ
-	(envelope-from <netdev+bounces-254893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:11:27 +0100
+	id 0MPNJdize2neHwIAu9opvQ
+	(envelope-from <netdev+bounces-254894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:24:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B762B3D25
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:11:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3B5B3E94
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F0605300D147
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:11:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BB36301874E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8297030FF3A;
-	Thu, 29 Jan 2026 19:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1563164B8;
+	Thu, 29 Jan 2026 19:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhViWA9v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZsW9XCk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8C82F1FDA;
-	Thu, 29 Jan 2026 19:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144C9312837;
+	Thu, 29 Jan 2026 19:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769713872; cv=none; b=aPgCl8f0HAPV28lTrc4SO9+nElx6lEs7dgAhhz34+MQit0jStun+OiLchz/oHz+w1m7rn231OjISY3Bv0VPYzUEHrJOkeuFW0xSEWAg4jP1TNwhHJ907vfgEHVXJXovf6rpVToLGBYPpf2APMcsbH73BkqzLf7OJAxQbHX2LTPs=
+	t=1769714632; cv=none; b=koWp1GWQgOF6owYWjpDkSkHVVMBTK/BtzzkD88eL/+DI6z+cse4O55pylzPwX/c5Nb4ZJOD4cMiYfyJupAqPWNisJnmcYBthTtv5gIL1berzUW/lFpuAEwQgJZ/V35SOdc+P3I5+mFV61HftURPgSyAxKBKu2SA9Y00RfbDI8sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769713872; c=relaxed/simple;
-	bh=PXiFVpw3vQsBkikcL7ARemeTUV09T2UQRlYXy1KFMhU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iNuAatHOn0lHbK/gzCeVAVySsDG22LuuLCo+hgQ15tfjtdfkIOwfHrVUy0cLWJkwbTkRzuFXsGDzY/2Oat3e0f4nvp7nB8B5arsZlc5elxbvi+JX72sNjcgnscxBkMcWZdDK3feFfcFft8ht9PJvucxMzfNgP1V6z6ov/Nu7RCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhViWA9v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC2DCC4CEF7;
-	Thu, 29 Jan 2026 19:11:08 +0000 (UTC)
+	s=arc-20240116; t=1769714632; c=relaxed/simple;
+	bh=7G4hK+Fx0+WXACikUbIwu/8/ScanNimNyKZLC59bpfE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=C0frviw52l7l3U6JO5ipDYALa1R1qJw2WeHY73xD9ql0Ta06jZYYfGKshMwLbxpziPYymciFr7iuSsHy6+OX4VMPUbkeNY+wdGIaJAiBAasM6eM8EFl++gtCErPInwtvqM7mpCFp5KizRRvtbP3fGldiJnv8zE21KnSnBefDLRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZsW9XCk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 017C0C4CEF7;
+	Thu, 29 Jan 2026 19:23:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769713872;
-	bh=PXiFVpw3vQsBkikcL7ARemeTUV09T2UQRlYXy1KFMhU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YhViWA9vgk/2iatXTsOD1EjJsLmwtEu4lC1PKvdNLFbb4EtlRZtnx42nZfDd+M/fM
-	 v2XajnyB1Ufl58l52nkJpAw4yyeGr70dm3ltFDSn+C7Pt7bmyCcQHGzqkkQVWtAXnm
-	 O238HuflTVA7psK90uxDq62YGzJ72UDltGgSXLiHMnrEzWJCrIMLoulepqJFQbLCpY
-	 VWA7sb5wHRpS5YqDm9EJ0jDQ/SdG6LjZ2Sn/+n9nA0sa7535VmH7UKci12Og4lGJzn
-	 uQm4Neht6K1iIFRphWI35UuUwQ/fA6vs/VHoV2I2hB5xaVg/fQu4sXfa0HmegGozRf
-	 qZV3HktHvMeUw==
-Message-ID: <10ae780e-07a3-42bd-8f05-cf4f7721a325@kernel.org>
-Date: Thu, 29 Jan 2026 20:11:07 +0100
+	s=k20201202; t=1769714631;
+	bh=7G4hK+Fx0+WXACikUbIwu/8/ScanNimNyKZLC59bpfE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=fZsW9XCkX6tEhdoewkmvltyS24bdxh2jDTkZA1P4kTkT5S/y7DWyNNXvcL5Rhru2s
+	 cTHASoEBXub55JKsQkXWDkONuBjqWAXvbPhdoejgtnkkZSxcmaf4IS6Ub2to3Za6vY
+	 KZ4zrYd9NrrfAyFWsCQtNvQjDFaS0de+sWrqmP41qR7mmjYMDXYoa986F4fOPJDKGY
+	 vrUwdZ4sN7IaXeakQmsKIo/GDCfdcFO97ImbQ2ItzntRzEXSkxKN+pTWMd/HL1KfwW
+	 ovhS4s7IAhNq0lk1vO0RshJOMdOGxumUpdZ9ZyN7Oj7jS3QY+htQj0muRQCyWzVCuW
+	 8Y9OI/8FITB9Q==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/6] mptcp: implement .read_sock and .splice_read
+Date: Thu, 29 Jan 2026 20:23:33 +0100
+Message-Id: <20260129-net-next-mptcp-splice-v1-0-994cac40daa0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: sched: sfq: add detailed drop reasons
- for monitoring
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>
-Cc: bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- horms@kernel.org, jiri@resnulli.us, edumazet@google.com,
- xiyou.wangcong@gmail.com, jhs@mojatatu.com, carges@cloudflare.com,
- kernel-team@cloudflare.com
-References: <176917072608.1186611.11185920960590396939.stgit@firesoul>
- <78899cbc-3e1f-4f84-83a1-a2a5e6301c05@redhat.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <78899cbc-3e1f-4f84-83a1-a2a5e6301c05@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALWze2kC/zWMMQqAMAwAvyKZDdiggn5FHGqNGtBa2iIF8e8Ww
+ eGGG+5uCOyFA/TFDZ4vCXLaLKoswGzarowyZweqqK0UdWg5ZlLEw0XjMLhdDGNL81RrpTvTEOT
+ WeV4kfd8B/gTG53kB0sjm1XEAAAA=
+X-Change-ID: 20260129-net-next-mptcp-splice-62db4a1a9c52
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Hannes Reinecke <hare@kernel.org>, Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1366; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=7G4hK+Fx0+WXACikUbIwu/8/ScanNimNyKZLC59bpfE=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKrNx9gr/2cWxSzTcYxenX/UZ59FsG1Ohbep9fO7ep5I
+ cHlsK2wo5SFQYyLQVZMkUW6LTJ/5vMq3hIvPwuYOaxMIEMYuDgFYCKlHYwMSwN+zV7+6fdfjzXr
+ VxV4VxVEb3jl6LXJMa3ty+IXf3NKFRn+6a1hm7nx3y/PLTNSQ17aH92RpuP+9crO95MPzFojn/4
+ kgh8A
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254893-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254894-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,vger.kernel.org,gmail.com,davemloft.net];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,toke.dk,resnulli.us,google.com,gmail.com,mojatatu.com,cloudflare.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2B762B3D25
+X-Rspamd-Queue-Id: 3B3B5B3E94
 X-Rspamd-Action: no action
 
+This series is a preparation work for future in-kernel MPTCP sockets
+usage. Here, two interfaces are implemented: read_sock and splice_read.
+As a result of this series, splice() with MPTCP sockets -- which was
+already supported -- is now improved.
 
+- Patches 1-2: .read_sock implementation
 
-On 29/01/2026 11.36, Paolo Abeni wrote:
-> On 1/23/26 1:18 PM, Jesper Dangaard Brouer wrote:
->> Add specific drop reasons to SFQ qdisc to improve packet drop
->> observability and monitoring capabilities. This change replaces
->> generic qdisc_drop() calls with qdisc_drop_reason() to provide
->> granular metrics about different drop scenarios in production
->> environments.
->>
->> Two new drop reasons are introduced:
->>
->> - SKB_DROP_REASON_QDISC_SFQ_MAXFLOWS: Used when a new flow cannot
->>    be created because the maximum number of flows (flows parameter)
->>    has been reached and no free flow slots are available.
->>
->> - SKB_DROP_REASON_QDISC_SFQ_MAXDEPTH: Used when a flow's queue
->>    length exceeds the per-flow depth limit (depth parameter),
->>    triggering either tail drop or head drop depending on headdrop
->>    configuration.
->>
->> The existing SKB_DROP_REASON_QDISC_OVERLIMIT is used in sfq_drop()
->> when the overall qdisc limit is exceeded and packets are dropped
->> from the longest queue.
->>
->> The naming uses qdisc-specific drop reasons tied to SFQ tunables,
->> following the pattern established by Eric's FQ commit 5765c7f6e317
->> ("net_sched: sch_fq: add three drop_reason") which introduced
->> FQ_BAND_LIMIT, FQ_HORIZON_LIMIT, and FQ_FLOW_LIMIT.
->>
->> The new drop reasons are inserted in the middle of the enum after
->> SKB_DROP_REASON_QDISC_CONGESTED to group all qdisc-related reasons
->> together. While drop reason enum values are not UAPI, the enum
->> names implicitly become UAPI as userspace tools rely on BTF to
->> resolve names to values. This makes middle-insertion safe as long
->> as names remain stable.
->>
->> These detailed drop reasons enable production monitoring systems
->> to distinguish between different SFQ drop scenarios and generate
->> specific metrics for:
->> - Flow table exhaustion (flows exceeded)
->> - Per-flow congestion (depth limit exceeded)
->> - Global qdisc congestion (overall limit exceeded)
->>
->> This granular visibility allows operators to identify capacity
->> planning needs, detect traffic patterns, and optimize SFQ
->> configuration based on real-world drop patterns.
->>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> 
-> Given the lack of endorsing from any 3rd party, the possible BPF
-> alternative and the previous controversial conversation, I'm also not
-> going to apply this change, sorry.
+- Patches 3-4: .splice_read implementation
 
+- Patches 5-6: validate splice() support with MPTCP sockets.
 
-I agree that we need someone else "3rd party" to review and ACK this
-patch *before* it can be applied. I talked to Toke and Simon yesterday,
-and they have promised to take a look.  So, I ask for some time for
-them to review it.
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (6):
+      mptcp: add eat_recv_skb helper
+      mptcp: implement .read_sock
+      tcp: export tcp_splice_state
+      mptcp: implement .splice_read
+      selftests: mptcp: add splice io mode
+      selftests: mptcp: connect: cover splice mode
 
-I think this patch is simply following the same pattern as existing
-code, that adds similar drop_reasons like FQ and CAKE did.  I
-unfortunately think it complicated the discussion that I explained *my*
-complicated/advanced use-case. I think these drop_reasons are generally
-practical for others to use.  It makes is really easy to troubleshoot
-qdisc code issues for debugging, where we want these drop_reason to
-quickly identify the code (and not be too general).
+ include/net/tcp.h                                  |  11 ++
+ net/ipv4/tcp.c                                     |  13 +-
+ net/mptcp/protocol.c                               | 215 ++++++++++++++++++++-
+ tools/testing/selftests/net/mptcp/Makefile         |   1 +
+ tools/testing/selftests/net/mptcp/mptcp_connect.c  |  63 +++++-
+ .../selftests/net/mptcp/mptcp_connect_splice.sh    |   5 +
+ 6 files changed, 289 insertions(+), 19 deletions(-)
+---
+base-commit: e75e408dc524ba32b3bd66e89d2ba1e337877bfa
+change-id: 20260129-net-next-mptcp-splice-62db4a1a9c52
 
-Like Eric shows in commit 5765c7f6e317 this is also usable from perf:
-  perf record -a -e skb:kfree_skb sleep 1; perf script
-
-
---Jesper
-
-
-
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
