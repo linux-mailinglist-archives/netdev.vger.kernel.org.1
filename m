@@ -1,295 +1,164 @@
-Return-Path: <netdev+bounces-254771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0KkqM1VFe2l+DAIAu9opvQ
-	(envelope-from <netdev+bounces-254771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:32:37 +0100
+	id KAYrC0dGe2kBDQIAu9opvQ
+	(envelope-from <netdev+bounces-254772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:36:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F773AFA75
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:32:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F348AFACE
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:36:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 235913011763
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:29:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92D36301778A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C774385514;
-	Thu, 29 Jan 2026 11:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2744A387580;
+	Thu, 29 Jan 2026 11:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtCFWk4n"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="VLRUTcDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C67933F8A8
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7584337A497;
+	Thu, 29 Jan 2026 11:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769686140; cv=none; b=s8Vbp/qDsb1nByQXow+FlWI4oOQePlaoCfFhMK+S9ZPO45x1NOQZCVcMt/d+TJbLE7nQ1/mPrAF8k1Y2+b9PasJ12eRIykzRUUPWmtIKiVFQ6BieweiyoRlKQcWkrL6dc07TeSZAr9Z9KwpYlnyR7mj31mDxzJDWzQQs0xGk7rY=
+	t=1769686576; cv=none; b=pZu45BKJzXQqPZKlAo9gKl4n41x+fHyBeRZGSBAnyS9Gs830GEVHsWYf+oMO4kgORfLkDPt24pRJTl84Mp2ciBmu2cVCLDx6Qg9WoP+PHq/9xxAPgmlBfM4yqS+VW9D6dOFOhOGDB4GESSSWVZxqQbWXzz4++w6MCPPuGUxkb5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769686140; c=relaxed/simple;
-	bh=Fdx+BMq3ACq5OZ/GJmdaTC1h+53HqwSXuGmPRqEjRgs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X6/zF9kDLjBWGwihrS1mr42qjAILV8RM+WT4f5xB9yyVZmbN7AGRIAVIdTGkFL/TR2PRjHEs1M5WsGxTXlgLG0BXlZXdd+SWo1iWOq1A85CM8GK4ndaoqz/JGEDnU+j65oYNbyhDjJErKxdRWRzY31X+4U2pwyYAvmNntrMnYKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LtCFWk4n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769686138;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xyOewARlXAdDx9eGdjOXC/PiuzLgu4lKqtxRoMbSrDU=;
-	b=LtCFWk4nLVQmFIMXeeQSUa/UcGpUUVN/6gMA941KknWSHOnR0YQo/87J4xJBU7aVgs3JJM
-	28zna0PPFlLrJTIbfxTRKfu3lXji+gHErg3Moch/lQFo6/FkrhMHqQWTQ3d6Bx5AB++Hig
-	ewXWxW0+3dCaOV16oKNuWo05NuV3uIU=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-182-Kc8t1z37MJCNuwWevr6dhQ-1; Thu,
- 29 Jan 2026 06:28:56 -0500
-X-MC-Unique: Kc8t1z37MJCNuwWevr6dhQ-1
-X-Mimecast-MFC-AGG-ID: Kc8t1z37MJCNuwWevr6dhQ_1769686135
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 595D5180044D;
-	Thu, 29 Jan 2026 11:28:55 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.45.225.83])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7539F1800109;
-	Thu, 29 Jan 2026 11:28:53 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dsahern@kernel.org,
-	stephen@networkplumber.org,
-	jiri@resnulli.us,
-	Petr Oros <poros@redhat.com>
-Subject: [PATCH iproute2 net-next] dpll: add mode setting support
-Date: Thu, 29 Jan 2026 12:28:49 +0100
-Message-ID: <20260129112849.8796-1-poros@redhat.com>
+	s=arc-20240116; t=1769686576; c=relaxed/simple;
+	bh=d4CmdYYqvsYOE6rAuMRjm6IC6UqDM9BG3uDwhGiiAlg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6s5zM+9/8n7k6inBTgmUcb+edZmluTNVk2S/w/iE/TUKwBy508/sTv9Jc/AQQ1OSBnsWW3pjntfzz0pgnmnYnpydTNOjT5ra9WPUBWoQa/ziQ3kTPDKw7SjMO4xP16lkoRC1D+/kPjdkFw0eUOW6/rkpSi4t7y9sh3YO1v5Qhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=VLRUTcDO; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1769686570; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=wI26mgk49lgLhCsakpVqc1lnp0wxouQs7L+0UFUDFuo=;
+	b=VLRUTcDOC6sdDDZoNGp/5LTM95JVuf8oiKV84vOZX3OoPIfAB7K0LLLqwHuMptcDYeG+dFBM+p7P61Fe26ZHNMQCLnNMUZxZRksYWu5uiqv5oJh8RhfMZpjGAZZGYWgGR4goFl54NMdbdsMAXd7pRxJS+41ljtPrkTpVMQykgOg=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wy7EuPK_1769686569 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 29 Jan 2026 19:36:09 +0800
+Date: Thu, 29 Jan 2026 19:36:09 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com
+Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
+Message-ID: <20260129113609.GA37734@j66a10360.sqa.eu95>
+References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
+ <20260123082349.42663-3-alibuda@linux.alibaba.com>
+ <aXPEFdEdtSmd6AzF@milan>
+ <20260124093505.GA98529@j66a10360.sqa.eu95>
+ <aXSjm1DXm6yP62tD@pc636>
+ <20260124145754.GA57116@j66a10360.sqa.eu95>
+ <20260127133417.GU13967@unreal>
+ <20260128034558.GA126415@j66a10360.sqa.eu95>
+ <20260128180629.GT1641016@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260128180629.GT1641016@ziepe.ca>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254772-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254771-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,kernel.org,gmail.com,davemloft.net,linux-foundation.org,google.com,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7F773AFA75
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,j66a10360.sqa.eu95:mid]
+X-Rspamd-Queue-Id: 8F348AFACE
 X-Rspamd-Action: no action
 
-Add ability to set DPLL device operating mode (automatic/manual)
-through "dpll device set id ID mode MODE" command.
+On Wed, Jan 28, 2026 at 02:06:29PM -0400, Jason Gunthorpe wrote:
+> On Wed, Jan 28, 2026 at 11:45:58AM +0800, D. Wythe wrote:
+> 
+> > By leveraging vmalloc_huge() and the proposed helper to increase the
+> > page_size in ib_map_mr_sg(), each MTTE covers a much larger contiguous
+> > physical block.
+> 
+> This doesn't seem right, if your goal is to take a vmalloc() pointer
+> and convert it to a MR via a scatterlist and ib_map_mr_sg() then you
+> should be asking for a helper to convert a kernel pointer into a
+> scatterlist.
+> 
+> Even if you do this in a naive way and call the
+> sg_alloc_append_table_from_pages() function it will automatically join
+> physically contiguous ranges together for you.
+> 
+> From there you can check the resulting scatterlist and compute the
+> page_size to pass to ib_map_mr_sg().
+> 
+> No need to ask the MM for anything other than the list of physicals to
+> build the scatterlist with.
+> 
+> Still, I wouldn't mind seeing a helper to convert a kernel pointer
+> into a scatterlist because I have see that opencoded in a few places,
+> and maybe there are ways to optimize that using more information from
+> the MM - but it should be APIs used only by this helper not exposed to
+> drivers.
+> 
+> Jason
 
-In automatic mode, the DPLL autonomously selects the best input
-source based on priority and quality. In manual mode, the input
-source must be explicitly configured.
+Hi Jason,
 
-The implementation adds dpll_mode_map for string-to-enum conversion,
-str_to_dpll_mode() and dpll_parse_mode() functions, and refactors
-dpll_mode_name() to use str_map_lookup_uint() for consistency.
+To be honest, I was previously unaware of the
+sg_alloc_append_table_from_pages() function, although I had indeed
+considered manually calculating the size of contiguous physical blocks.
+The reason I proposed the MM helper is that SMC is not driver, it  utilizes
+vmalloc() for memory allocation and is thus in direct contact with the MM;
+from this perspective, having the MM provide the page_order would be the most
+straightforward approach.
 
-Man page and bash completion updated accordingly.
+Given the significant opposition and our plans to transition SMC to newer
+APIs in the future anyway, I agree that introducing this helper now is
+less justified.
 
-Signed-off-by: Petr Oros <poros@redhat.com>
----
- bash-completion/dpll |  6 ++++-
- dpll/dpll.c          | 52 +++++++++++++++++++++++++++++++++++---------
- man/man8/dpll.8      | 18 ++++++++++++++-
- 3 files changed, 64 insertions(+), 12 deletions(-)
+I will follow your suggestion and update the next version accordingly.
 
-diff --git a/bash-completion/dpll b/bash-completion/dpll
-index 6e4d39a5b5b6bb..caf86a36f2adf3 100644
---- a/bash-completion/dpll
-+++ b/bash-completion/dpll
-@@ -73,6 +73,10 @@ _dpll_device()
-                         "$(_dpll_direct_complete device_id)" -- "$cur" ) )
-                     return 0
-                     ;;
-+                mode)
-+                    COMPREPLY=( $( compgen -W "automatic manual" -- "$cur" ) )
-+                    return 0
-+                    ;;
-                 phase-offset-monitor)
-                     COMPREPLY=( $( compgen -W "enable disable true false 0 1" -- "$cur" ) )
-                     return 0
-@@ -82,7 +86,7 @@ _dpll_device()
-                     return 0
-                     ;;
-                 *)
--                    COMPREPLY=( $( compgen -W "id phase-offset-monitor \
-+                    COMPREPLY=( $( compgen -W "id mode phase-offset-monitor \
-                         phase-offset-avg-factor" -- "$cur" ) )
-                     return 0
-                     ;;
-diff --git a/dpll/dpll.c b/dpll/dpll.c
-index 846ad4b04c63d2..9dc3f8db373d28 100644
---- a/dpll/dpll.c
-+++ b/dpll/dpll.c
-@@ -42,6 +42,14 @@ static const char *str_enable_disable(bool v)
- 	return v ? "enable" : "disable";
- }
- 
-+static struct str_num_map dpll_mode_map[] = {
-+	{ .str = "automatic", .num = DPLL_MODE_AUTOMATIC },
-+	{ .str = "manual", .num = DPLL_MODE_MANUAL },
-+	{
-+		.str = NULL,
-+	},
-+};
-+
- static struct str_num_map pin_state_map[] = {
- 	{ .str = "connected", .num = DPLL_PIN_STATE_CONNECTED },
- 	{ .str = "disconnected", .num = DPLL_PIN_STATE_DISCONNECTED },
-@@ -132,6 +140,17 @@ static bool dpll_no_arg(struct dpll *dpll)
- 	return dpll_argc(dpll) == 0;
- }
- 
-+static int str_to_dpll_mode(const char *mode_str, __u32 *mode)
-+{
-+	int num;
-+
-+	num = str_map_lookup_str(dpll_mode_map, mode_str);
-+	if (num < 0)
-+		return num;
-+	*mode = num;
-+	return 0;
-+}
-+
- static int str_to_dpll_pin_state(const char *state_str, __u32 *state)
- {
- 	int num;
-@@ -154,6 +173,18 @@ static int str_to_dpll_pin_type(const char *type_str, __u32 *type)
- 	return 0;
- }
- 
-+static int dpll_parse_mode(struct dpll *dpll, __u32 *mode)
-+{
-+	const char *str = dpll_argv(dpll);
-+
-+	if (str_to_dpll_mode(str, mode)) {
-+		pr_err("invalid state: %s (use automatic/manual)\n", str);
-+		return -EINVAL;
-+	}
-+	dpll_arg_inc(dpll);
-+	return 0;
-+}
-+
- static int dpll_parse_state(struct dpll *dpll, __u32 *state)
- {
- 	const char *str = dpll_argv(dpll);
-@@ -585,21 +616,18 @@ dpll_free:
- static void cmd_device_help(void)
- {
- 	pr_err("Usage: dpll device show [ id DEVICE_ID ]\n");
--	pr_err("       dpll device set id DEVICE_ID [ phase-offset-monitor { enable | disable } ]\n");
--	pr_err("                                      [ phase-offset-avg-factor NUM ]\n");
-+	pr_err("       dpll device set id DEVICE_ID [ mode { automatic | manual } ]\n");
-+	pr_err("                                    [ phase-offset-monitor { enable | disable } ]\n");
-+	pr_err("                                    [ phase-offset-avg-factor NUM ]\n");
- 	pr_err("       dpll device id-get [ module-name NAME ] [ clock-id ID ] [ type TYPE ]\n");
- }
- 
- static const char *dpll_mode_name(__u32 mode)
- {
--	switch (mode) {
--	case DPLL_MODE_MANUAL:
--		return "manual";
--	case DPLL_MODE_AUTOMATIC:
--		return "automatic";
--	default:
--		return "unknown";
--	}
-+	const char *str;
-+
-+	str = str_map_lookup_uint(dpll_mode_map, mode);
-+	return str ? str : "unknown";
- }
- 
- static const char *dpll_lock_status_name(__u32 status)
-@@ -839,6 +867,10 @@ static int cmd_device_set(struct dpll *dpll)
- 				return -EINVAL;
- 			mnl_attr_put_u32(nlh, DPLL_A_ID, id);
- 			has_id = true;
-+		} else if (dpll_argv_match_inc(dpll, "mode")) {
-+			if (dpll_parse_attr_enum(dpll, nlh, "mode", DPLL_A_MODE,
-+						 dpll_parse_mode))
-+				return -EINVAL;
- 		} else if (dpll_argv_match(dpll, "phase-offset-monitor")) {
- 			const char *str = dpll_argv_next(dpll);
- 			bool val;
-diff --git a/man/man8/dpll.8 b/man/man8/dpll.8
-index fcc1c4a67af5d9..e82f083feac64b 100644
---- a/man/man8/dpll.8
-+++ b/man/man8/dpll.8
-@@ -88,7 +88,7 @@ Temperature (if supported)
- Type (PPS or EEC)
- .RE
- 
--.SS dpll device set id ID [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
-+.SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
- 
- Configure DPLL device parameters.
- 
-@@ -96,6 +96,17 @@ Configure DPLL device parameters.
- .BI id " ID"
- Specifies which device to configure (required).
- 
-+.TP
-+.BI mode " { automatic | manual }"
-+Set the operating mode of the DPLL device.
-+In
-+.B automatic
-+mode, the DPLL autonomously selects the best available input source
-+based on priority and quality. In
-+.B manual
-+mode, the input source must be explicitly configured and the DPLL
-+will not automatically switch sources.
-+
- .TP
- .BI phase-offset-monitor " { enable | disable | true | false | 0 | 1 }"
- Enable or disable phase offset monitoring between the device and its pins.
-@@ -283,6 +294,11 @@ Press Ctrl+C to stop monitoring.
- .B dpll -j device show id 0
- .fi
- 
-+.SS Set device 0 to manual mode
-+.nf
-+.B dpll device set id 0 mode manual
-+.fi
-+
- .SS Enable phase offset monitoring on device 0
- .nf
- .B dpll device set id 0 phase-offset-monitor enable
--- 
-2.52.0
+Thanks.
+
 
 
