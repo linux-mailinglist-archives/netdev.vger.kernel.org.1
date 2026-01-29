@@ -1,111 +1,111 @@
-Return-Path: <netdev+bounces-254902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4KIcBou3e2k0IAIAu9opvQ
-	(envelope-from <netdev+bounces-254902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:39:55 +0100
+	id mDahCMy3e2k0IAIAu9opvQ
+	(envelope-from <netdev+bounces-254903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:41:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A45B40B7
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:39:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A861B40C7
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 817AD3005AB6
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:39:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6E88730058EE
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E1F328B49;
-	Thu, 29 Jan 2026 19:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833EF328B47;
+	Thu, 29 Jan 2026 19:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBskQaXk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDUaVZHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AD43271EB
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 19:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107082F6590
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 19:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769715589; cv=pass; b=WgFiTCOZkv1Ul4NZQQo/lii28ZKfRiyeGqKDqAWrFSJ5FL/8DeNh86MRtfgCWsNiCCezjcH5Yiz82TIYMyxFgnli8WKHYfbKj/0H7t1nJxT/GEPBlDIIKhHMhrLZdS/RHPdnqALNBPRORSktOQrAiO2/n7l6bE5vM+cBbgorGX8=
+	t=1769715656; cv=pass; b=if0lQK3gayJCS0kXOUYsWBa0ijGaLuiRrKag1Ym1MFZzhQiJpmgDV+8UMb8nTbJwyihUhSayh5HpEiY8pK9L4VNIzjKzdA+trVPCT9GqTqlQ8Codh1+P7uhlH+NXswqaa+1wNsxYXEkHkHaqmErONdp/1CNmare+ra7hFD7/tak=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769715589; c=relaxed/simple;
-	bh=slWb1gPv2FtqXq1twLRiSOtOOA1QvUUzSYzROoZg1Y8=;
+	s=arc-20240116; t=1769715656; c=relaxed/simple;
+	bh=OQufuj5kkmYMxx6ttww64CZWm+ndiofyh3a3rNhNfCY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XMzlIaORqB7gdifpTFCR66Bxbw/5TaEQYAZOHMOyzv1dH3iS6axdd/WNxzgXVjV/+aMGOJRz37HLlf259CMyR+4dkP8lRN05acMN6vZwokNbdkboVQlpPtnG8LNHJQKSKYI9i00IGFh6ozYTfY9KkNGJeEXIjFhS6tA1zbWiues=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBskQaXk; arc=pass smtp.client-ip=209.85.216.54
+	 To:Cc:Content-Type; b=c+sH9JN2gLZCqTkM2X/ifQjWIsrva8dn1CHwh7eDBeJnZzRa2QRJ2JJO0SE4eh3jL7Sb//Vbubncsv11ZY89aLXdTQEHquH1DU93eXxn1IXF6P+JRqLyvriF68pUBXCmcl0MGNbzblzJQeB4vAWA50pFG2rWxVFpZkys1DnIt68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TDUaVZHL; arc=pass smtp.client-ip=209.85.217.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-352c414bbbeso1488936a91.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:39:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769715587; cv=none;
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-5f52fa0d48dso412465137.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:40:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769715654; cv=none;
         d=google.com; s=arc-20240605;
-        b=io5d6RKzEU1N1B4EKz53ZIA/W2h+d9VL/nHq5OG2SWDB1q+gdLChh1Li4aUEfF3iaD
-         /pGxkegXsp15YwJJui/8xXzcIblI30MdRwUgHDNFYlHRedULhYjs6SY3JFZaQFqqkZ2u
-         VKJSFJ6h0cgF4U/ls57zcPu/mdATzRGLCguhCVYbLcH2jKVCva2X7kvHGk9/eOIFhv6o
-         BsimEd+RNeBF0AH7wYOGhS+PDz0BjY+3Y93sPb4WWfuAePB91U9CreXOOQlPRF61bn9U
-         hK9tvjFRkv3nu2AD0DcTvESbip2qB6iQQksnvxzYLnojsN+Yh4+eTU3GZwX7TNU0hFng
-         IfPA==
+        b=GzPEUJWFj81eFFmDXWAmtspG1EGv8V17y6D0ipvCLB/cjQFq3+CR4nTQLux4xf8BuA
+         ZghL9mUTJGKny/dNdPAYqw1F4A751zfpUs+lkDvrNAGptVtlU6hA3XbXTkxbjfd1ab1M
+         gErUwhoA7J/N1FNVCRIj8ws6TX7RiD6Jdubgx+NyuNj2rX4EeeAFDY2+Op8/AiyueyW/
+         6fAdsF2VDUh3Rr/AZgaJQlUterkZKq4IoK8Vg0Ait44vs8T8DFFhyVqOEpXvA/RyMSVV
+         MCmk1YfDRQvd1tBzJOabKBG7jCRugWhN7FlX2QJ+brDKArqzghrRBBdM9Iy0x0P2t+vB
+         Z84w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=76tIsRX/4Fg/g4PCHkk+TBEOGwkN2KFdE8yBjFB4Hrg=;
+        bh=vWXOUBeb3b+nw5Cfis8wSYxSsjd/F4GCHIXMwqvZur4=;
         fh=fDbUfIcx4Ncec9AV4wxOHXS/c8ilfxJ4Jm8OWBj8/eg=;
-        b=YgzjFR5ClgD7F88gRjvI8Rcp/hcXSgB/d9MT44TIbWpBlQdaNMtesAbfROAY9OMhYE
-         VcUnWc5rKzf6Fo+IDKkU7ADsqnz+Fxs4m1El5aZ1vU8jvLtxFA61d8CJc/3/0MW24rA+
-         5U3OnLDy7zMh+sGHH9GMn3rBwYjlbK+jXr5IK9rwP0b+QCNIaeEoXUErufP1zqFJy+KM
-         cxFGIBUuKXGIOatpYnCC+Sh0z+Sil6YnfTxgRs/faQhLnuDVnnpvkMLNU9DgKGw5jJjw
-         rnYXiUZ+Dphv7EZWDt1igR3WsP0ZUO2CTiyy+xZS5ZORAl9UOeAQk1bOm0VSwR/KqY9O
-         Jb+g==;
+        b=TPCEg6YwnXw5BoBKyMJUXT5uvQYeIbZkaH9qD9I8PTX/PFUTM6l8HWh3cZAHqFwAF5
+         r1jdfoVbtqx+oq1qFdgIigBy6fUVRrw3vtsCdUl+1R0bb/O+3iaZ28oJ6bK9cp5GYp6K
+         +gvqJM522/pYa+ttlXz5jzxmwk6fOc7VPti0oNc3JVBs1R20vl6T0GxzGU2wpyFPxQJl
+         EQX0JXkqVxZXbafrYiZlkNycDruDU3SSLQfZuxqEFw97p738qkItdAFqnAoSiVqFRSvr
+         EjoCe4cnc3+/C3Iph9W7jWnnFKsVZutLaqeTweYI6UkrnDrgQmKdERct3CBJeWAIH4zn
+         YioA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769715587; x=1770320387; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769715654; x=1770320454; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=76tIsRX/4Fg/g4PCHkk+TBEOGwkN2KFdE8yBjFB4Hrg=;
-        b=eBskQaXk2hQaEIK86G5J0Iyuznrw1oI+qxFpSkyfjH4X/Yw2JJRtEjEp2EPpyZLGJV
-         KVDcaAy0zRkFE8JpigO72TLmHotHxmjgJorVXIXpoO8SyKZ1IVMDD/n468JZcRld9ZD9
-         lK09kaph6FaXUv+6wCBSYLzPN0b6P4xes2zpDpBMRXBiNQm8zL9KqsKLxEf8PUjTR9Rb
-         CdIBnGY37raWztdpv9odTDzrH+OSHmX1R62r9jP94/C90ni36ZO9zpdbcxJWCmsBpoXZ
-         SwtcUUzNNTnbw7GNiobI7xbvZk8QVNyL2wQkZuCXzsz/0Sx5r/El1/YT4EWJxub41r/x
-         lPJQ==
+        bh=vWXOUBeb3b+nw5Cfis8wSYxSsjd/F4GCHIXMwqvZur4=;
+        b=TDUaVZHLKS6j8mBQqgRKfis+WbqxJrpZLP6/Xvs0c3IEw8N2Cmsmn2ZLJUljZSeULi
+         YLt50yi0EpsnbAVU0Kam8JKrRFpMcyE8J4N7xOpJ1YuFCE1IziipaSTAqGpxLLUeCWZF
+         7rRjbV5T21seHDGe89XVSx7JWPNdoK3DzjRkjpMH7u1np7+IWm6fFrNrDnbN7q/+8zJx
+         i/MCvMOy1UiN0xAsXsUwQMIP2KVfPCYyIhO79+cHR0vv7GMApT3N50WP31XHZiIV5XWT
+         1PUPignZ5q6gMwP8VcxpNYKVrfXZ7tFUR2qsR2yyGiMAZ7dTvugzHjYu/P9fkpd4BtJu
+         wJWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769715587; x=1770320387;
+        d=1e100.net; s=20230601; t=1769715654; x=1770320454;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=76tIsRX/4Fg/g4PCHkk+TBEOGwkN2KFdE8yBjFB4Hrg=;
-        b=fQbAsVbLa9yStkXseLEl91gkmdnzj5gd5Fd9zlM/35lnR60RSOY69m+hCdBjUG1Ofg
-         Qcaxx0s77+7bBARs6gjoJTYSbtRZSh06f4lGt4/3ylA0UjIzpazef1peCc5AG3ZumRcg
-         Y1Wjr7u8NRUczkletV4h8E0ehBP/YcY6LPYgmzIIOz2c0oGNByFJIPScKNZQHoBBfVz/
-         D9wIGLfy1O+p52PN8mF/ghXoyJZcG3nSZZj7EtnJ7KOHIv7qtR3B0SNofi3WrTfztYL1
-         RIDIs7V1WirbwTVnrBq/b7NkBxPqHjpUd7lD62TAThorJTl3X5AVNRPXJetM8j6Hd/+K
-         YoPg==
-X-Gm-Message-State: AOJu0Yxe/oy0hw9NhiwQ2IQKIp7XqxoccYELIiFIgp7eqhcuVJ4gUf7F
-	anks3JjpLeGNOLir+4jBjkB2wHYUw52N8LRLpjHdLE7382zIrnDnj439uy8V2hXUO/IJFaRePdY
-	Z5PXV+g5Cywz8hYAbDHS4AxfrGQLpG/4=
-X-Gm-Gg: AZuq6aJz1vRUUwR5WyzQyUJ2g6/Wc/swBPT9yMGAnegWNP/+gtHpFzp2h8LQ4NDGKqx
-	ZJfena8auD8hfVU+GwY1ubiNSGzI3r9/tD3u0h4pfFUORV3aM9BtelNPEA4/9QQG9/NrsuySdOH
-	rDlAzYwaPhiGqKhRgivKG4A+dijTkrJlhZuVW33Ezh6fXN7VipXWiXiaJ1rzPPixUPQlB9CpRcb
-	drvnj1dlBDpNNDj5mlTmrqJzjDqoRDGa1+DKQ8gSIwz7wzrtcZqUO1QfASGLVsIjod62Y25Y7bT
-	ONUgIFKBW077P/ODu8wOwV2vZFnybw==
-X-Received: by 2002:a17:90b:33c1:b0:34a:c671:50df with SMTP id
- 98e67ed59e1d1-35429b2e55cmr3308198a91.17.1769715587450; Thu, 29 Jan 2026
- 11:39:47 -0800 (PST)
+        bh=vWXOUBeb3b+nw5Cfis8wSYxSsjd/F4GCHIXMwqvZur4=;
+        b=sfFHuXIdnaMDeWxmq6hxQcZqR/hBlk9Qhs1CJvJN3q2wp3B81TxYljzvjbUmzWkfNZ
+         8+Ovi7dZ9KqmrYSCSxIkqIauZ9z5jYrGTN7ndBUc1EhU3bMntMHTBSKygxe2BwUdB7/S
+         dBTdFGuX0/5zUhFJfjD6gUSR3aPCMepIi81LKZM/isKyaDCkQS9KLCIRM8SZ6Vf6A3Vq
+         HPydpwbV0uPoBQnygI8JVMK64vhH+ikoQ+h9lq3iv6DQykwZigNZb9nmbcR4MXQdRM18
+         P9rZme6K+2ijGkBaFTUXJKRH2ERWOT5J8vdmErJUN7Ox61uvyAKgsyRRm4irdHF36XZ8
+         YK4g==
+X-Gm-Message-State: AOJu0YywOK5MfnwDpgqkdsIGGj82DcdttRzgIj0L5HlaEHXqkVRKVEDC
+	6Ttlam7iitufypfMcyZTrfiOWOXMM628lIq4AUb59PwvFEmR9VPa9+SjR4OsUZ0hXJPNo+RjwqF
+	+C6dqYmdWpt6vFVzZusdAOkzMucygYqea7NZVeGLDUw==
+X-Gm-Gg: AZuq6aJ5TnGGIdwfHwOXBTZY5pCWsjL22G5DS/zc4kXATN+KCcSpXV49p6VZJ5EOjfg
+	e9xuV9hmE9gFmJ2Z3Bgpu4fetKcVdrVM3GLe9OqC7b8SKDmQExtSZbNGADJpBv5fbYZ/xoP2fzq
+	tGBwWDaMiDsU0dJmEpLuD55zoXZY1RvzxvpcvKiCuMOgrNTF6YGsqpSVjY3u9hD7Gk8p6yZvSRd
+	7UwWpAKWknOnQQxLyJXNh6VuS2JSgLwu+iqB2H+lNYA2rosvLWbp1BAnucdfV9xnY/UrmzyHvMD
+	oEJZnMeJw3raCUhyAJv4NxX1R5t1Tw==
+X-Received: by 2002:a05:6102:304e:b0:5f5:2e08:bbab with SMTP id
+ ada2fe7eead31-5f8e23e7d3amr226299137.6.1769715653861; Thu, 29 Jan 2026
+ 11:40:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1769439073.git.lucien.xin@gmail.com> <4ec3ade7dfc709658a2b1839dbe29c9467b25fdf.1769439073.git.lucien.xin@gmail.com>
- <b0045978-ea65-422b-8260-d079b43eb553@redhat.com>
-In-Reply-To: <b0045978-ea65-422b-8260-d079b43eb553@redhat.com>
+References: <cover.1769439073.git.lucien.xin@gmail.com> <1cbfbd45fda48c82f629b000fc102ee011515e12.1769439073.git.lucien.xin@gmail.com>
+ <9c17e0f5-0a07-4800-9356-0ee9445e3922@redhat.com>
+In-Reply-To: <9c17e0f5-0a07-4800-9356-0ee9445e3922@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 29 Jan 2026 14:39:36 -0500
-X-Gm-Features: AZwV_QhlVoBaCiIz5kopBTHIpw23-lZlR_vHRkTAGEfDtCF_CgQBWEVXy3dNJWo
-Message-ID: <CADvbK_d9FE+Z72JpdFER65dJ7X19Or_m0sLBPdWOZP9DPbksQA@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 14/15] quic: add packet builder base
+Date: Thu, 29 Jan 2026 14:40:40 -0500
+X-Gm-Features: AZwV_Qjx14-1bOrrh8LVqqfM15IbyrS2KpNfixIqKIZVNgumQoCFAq17MEBRSlw
+Message-ID: <CADvbK_f7++7shAGwYLcz=ph-te_d+z+bMxiaTtY2Ahze+Wagqg@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 03/15] quic: provide common utilities and data structures
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
@@ -134,7 +134,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254902-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254903-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -152,113 +152,55 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A9A45B40B7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 0A861B40C7
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 11:40=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+On Thu, Jan 29, 2026 at 11:26=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
 ote:
 >
 > On 1/26/26 3:51 PM, Xin Long wrote:
-> > +/* Configure the QUIC packet header and routing based on encryption le=
-vel and path. */
-> > +int quic_packet_config(struct sock *sk, u8 level, u8 path)
-> > +{
-> > +     struct quic_conn_id_set *dest =3D quic_dest(sk), *source =3D quic=
-_source(sk);
-> > +     struct quic_packet *packet =3D quic_packet(sk);
-> > +     struct quic_config *c =3D quic_config(sk);
-> > +     u32 hlen =3D QUIC_HLEN;
+> > +struct quic_skb_cb {
+> > +     /* Callback and temporary context when encryption/decryption comp=
+letes in async mode */
+> > +     void (*crypto_done)(struct sk_buff *skb, int err);
+> > +     void *crypto_ctx;
+> > +     union {
+> > +             struct sk_buff *last;   /* Last packet in bundle on TX */
+> > +             u64 time;               /* Arrival timestamp in UDP tunne=
+l on RX */
+> > +     };
+> > +     s64 number;             /* Parsed packet number, or the largest p=
+reviously seen */
+> > +     u32 seqno;              /* Dest connection ID number on RX */
+> > +     u16 errcode;            /* Error code if encryption/decryption fa=
+ils */
+> > +     u16 length;             /* Payload length + packet number length =
+*/
 > > +
-> > +     /* If packet already has data, no need to reconfigure. */
-> > +     if (!quic_packet_empty(packet))
-> > +             return 0;
+> > +     u16 number_offset;      /* Offset of packet number field */
+> > +     u8 number_len;          /* Length of the packet number field */
+> > +     u8 level;               /* Encryption level: Initial, Handshake, =
+App, or Early */
 > > +
-> > +     packet->ack_eliciting =3D 0;
-> > +     packet->frame_len =3D 0;
-> > +     packet->ipfragok =3D 0;
-> > +     packet->padding =3D 0;
-> > +     packet->frames =3D 0;
-> > +     hlen +=3D QUIC_PACKET_NUMBER_LEN; /* Packet number length. */
-> > +     hlen +=3D quic_conn_id_choose(dest, path)->len; /* DCID length. *=
-/
-> > +     if (level) {
-> > +             hlen +=3D 1; /* Length byte for DCID. */
-> > +             hlen +=3D 1 + quic_conn_id_active(source)->len; /* Length=
- byte + SCID length. */
-> > +             if (level =3D=3D QUIC_CRYPTO_INITIAL) /* Include token fo=
-r Initial packets. */
-> > +                     hlen +=3D quic_var_len(quic_token(sk)->len) + qui=
-c_token(sk)->len;
-> > +             hlen +=3D QUIC_VERSION_LEN; /* Version length. */
-> > +             hlen +=3D QUIC_PACKET_LENGTH_LEN; /* Packet length field =
-length. */
-> > +             /* Allow fragmentation if PLPMTUD is enabled, as it no lo=
-nger relies on ICMP
-> > +              * Toobig messages to discover the path MTU.
-> > +              */
-> > +             packet->ipfragok =3D !!c->plpmtud_probe_interval;
-> > +     }
-> > +     packet->level =3D level;
-> > +     packet->len =3D (u16)hlen;
-> > +     packet->overhead =3D (u8)hlen;
+> > +     u8 key_update:1;        /* Key update triggered by this packet */
+> > +     u8 key_phase:1;         /* Key phase used (0 or 1) */
+> > +     u8 backlog:1;           /* Enqueued into backlog list */
+> > +     u8 resume:1;            /* Crypto already processed (encrypted or=
+ decrypted) */
+> > +     u8 path:1;              /* Packet arrived from a new or migrating=
+ path */
+> > +     u8 ecn:2;               /* ECN marking used on TX */
+> > +};
+> > +
+> > +#define QUIC_SKB_CB(skb)     ((struct quic_skb_cb *)&((skb)->cb[0]))
 >
-> Given the above math, it looks like hlen can never be > 255, but
-> possibly a DEBUG_NET_WARN_ON_ONCE() could save from future bug and make
-> the code more clear?
+> Please add a build time check on quic_skb_cb size.
 >
-sounds good.
+I may put this in quic_init():
 
-> > +
-> > +     if (packet->path !=3D path) { /* If the path changed, update and =
-reset routing cache. */
-> > +             packet->path =3D path;
-> > +             __sk_dst_reset(sk);
-> > +     }
-> > +
-> > +     /* Perform routing and MSS update for the configured packet. */
-> > +     if (quic_packet_route(sk) < 0)
-> > +             return -1;
-> > +     return 0;
-> > +}
-> > +
-> > +static void quic_packet_encrypt_done(struct sk_buff *skb, int err)
-> > +{
-> > +     /* Free it for now, future patches will implement the actual defe=
-rred transmission logic. */
-> > +     kfree_skb(skb);
-> > +}
-> > +
-> > +/* Coalescing Packets. */
-> > +static int quic_packet_bundle(struct sock *sk, struct sk_buff *skb)
-> > +{
-> > +     struct quic_skb_cb *head_cb, *cb =3D QUIC_SKB_CB(skb);
-> > +     struct quic_packet *packet =3D quic_packet(sk);
-> > +     struct sk_buff *p;
-> > +
-> > +     if (!packet->head) { /* First packet to bundle: initialize the he=
-ad. */
-> > +             packet->head =3D skb;
-> > +             cb->last =3D skb;
-> > +             goto out;
-> > +     }
-> > +
-> > +     /* If bundling would exceed MSS, flush the current bundle. */
-> > +     if (packet->head->len + skb->len >=3D packet->mss[0]) {
-> > +             quic_packet_flush(sk);
-> > +             packet->head =3D skb;
-> > +             cb->last =3D skb;
-> > +             goto out;
->
-> The same code is duplicate a few lines above; you could reduce
-> duplication jumping to a common label.
->
-will add a goto label at the end for this:
+BUILD_BUG_ON(sizeof(struct quic_skb_cb) > sizeof_field(struct sk_buff, cb))=
+;
 
-init:
-        packet->head =3D skb;
-        cb->last =3D skb;
-        goto out;
-
-Thanks.
+thanks.
 
