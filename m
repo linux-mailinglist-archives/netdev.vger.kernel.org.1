@@ -1,204 +1,213 @@
-Return-Path: <netdev+bounces-254829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254830-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GRAEmF5e2nWEwIAu9opvQ
-	(envelope-from <netdev+bounces-254829-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:14:41 +0100
+	id 6HyVCoh6e2kQFAIAu9opvQ
+	(envelope-from <netdev+bounces-254830-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:19:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABED4B1568
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:14:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8926FB15FF
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9712E3007E13
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 15:13:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B8AD63015487
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 15:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2524F3002A5;
-	Thu, 29 Jan 2026 15:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEC826F288;
+	Thu, 29 Jan 2026 15:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G9DH9WV1"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JtUxkb2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53D31BBBFC
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 15:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769699608; cv=pass; b=fVfbh3T/pGW5dGWL+wkd6WNMc//5ZQtAQw9Mkc9gzlNlEGdTobhWtn9E9xiK+ZbpjrKPCNVMd2LiSJjYSXJpl550JBGRCsVgv4ZfOuiQIgn+puDBPCB5T9faBW4lXS/TFeKshbMedZZs2eiItwOVNJ6o35/fVjspAWq7y43E5uo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769699608; c=relaxed/simple;
-	bh=6nI/4cno/Ox5Kf2rYuxNEhwElQwT1lpHaQpPDRP3xEw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xb9AeK0SXnNvGWNT6k7SderOMRrvkDrI6NHQku878ROHvHVAhwQ+E33DSTeyRcWxm9MAZpECI3CkX0S1yJzcAv4yD3cwTkov/qIqPUUPfxE+NCKGe/RKYT/KwRL48TuHnPNjqAdEMtJ4ehTGgsXQr61IlnxGh1RUbsz2qo2W4Jk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G9DH9WV1; arc=pass smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79088484065so9691647b3.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 07:13:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769699606; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Akp4Jz59BjXpjfKrEvt209rMith+pJQ49GL+Zoeiuy4J1x7vFh4FvM0F5QkhQP0Zth
-         QqcWDTvn8SRoo72+3kvHUP7ftaLnGhYq/w/LfO4ULKYzuNDA/tn9CvbDyHQGbK90HI7b
-         EgqpxdpQJBbQg016hq6yL4xtM8MiUFN76vFg2USwnzk2EiAeoWCoLPAY3sw6GWZKL8nl
-         MtiyYj527OOFtK0N1Rzv7Vq79eTqyYdHrIOiQGX/46ggQQsoa/jbpoh7WygzSUtG8dtW
-         yhx8tOOlrfcxV23pmfB+OYN1QOSqtjUGMQoRy0WIEVd7Gjd0xOza6WQcQY4DGh5KfmLQ
-         cY+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7RLQERTdb05wedLUFRRmJ/cz5RnX6lW0lIzp3k35GCk=;
-        fh=uiaNYJ4YKPOb2lFWip463nNNKY1RayT76tZO6yZQt2k=;
-        b=UD9+iRxWmmbuyRbdFdFicqzY27GNteFqRpQnaTFtF5A2Mgjb0vZTG8SdaOFR1X6DlQ
-         9ECrsi41dGQNsY/e+G5PJzi7JgKXvL4OnHkYv5fQJ+j80Vt5TCaIzj9BeWMQnJbskNls
-         bma0c46oKVZUkE4NV862XJYtQTLB2oyx9S8m44iq7j19522IBBQonjZZHouuAF3rU3Hr
-         9/oLs7DqYoF8aBbPO5pwQiDcnL5ErGXiSi4QwdeFJ1crR7LnUXAWYsYhT26NTE/DHDcK
-         1f8v7UuzDyTOYd+MA9aoQENee8uxldbwUsxLZanStZOF4wNTs25+IZZT5Gj73JLSYoyr
-         LauQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF114221F03
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 15:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769699955; cv=none; b=gBqPsh78cC9HNBK8yprJCeC9tBOTngv1XxchNG0QaWLQ8hRv++JysqY2HSMVU6DxXFab4H7LMzcbyI98LR1HQocO6aJPr38S6X3Lnj/ow8DYcYBEEX9wjznU04CLEnfHVCnyIKKFTBEB9WMb0u8gnSSMzDdpFyXfnwMBW9Sbzjw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769699955; c=relaxed/simple;
+	bh=+tmrzRllSFS3UuYo3ZY8r+bPOjC6VUQ2B+vahz2nAVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qw5loyrB+DEmAo+oFaZsr0U71kpXabX8R2z47cjQcDQlQWOZGSzt+FiCiiEdUOgkjn0VjsEceWpxnspU4nEoWF48gLyWqBMGnEt8a7HlDj/1iIcV2dkCkLdTMExFGVYHPJ38dWEAKBPoZ755oEs1TEt5iHmQ5iBZs9BtGT04ydI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JtUxkb2f; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4801d7c72a5so8591115e9.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 07:19:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769699606; x=1770304406; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7RLQERTdb05wedLUFRRmJ/cz5RnX6lW0lIzp3k35GCk=;
-        b=G9DH9WV1EjALtvujPh8STWEGGnZxNRCmGIPnBv/wuoDwUsCn1DKurdh5pvf8VN1Jv0
-         VBEunxaVHdIz8fK+TfblBlRdqmU3wGFlIIa+ZRUTc8ssfLuKg7t07OEtdsPULrAfK1WN
-         sGxL9KvxIX1DMKQZXXKeaD5fA2wYWPTvn67s4/Qsjhw+I0DQ0JLdI7taEStc9bytcc+d
-         h+GgqKwCpdygDExVd5KWcGCdODAjDDnPVHhj0pnf58wAUn+Lu6i4w6yWvqoRcRbfnP//
-         R91mGR6eV6QLWXrma24gyba41KZOYwG+M4fSvJMwYMl7O0qYkpCGyF1fhGyqG9U2FtJi
-         zgzw==
+        d=suse.com; s=google; t=1769699952; x=1770304752; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MsXQrimwewQ8w9Fgh0pLIlGot9P2osFHXzwl6y2/yiU=;
+        b=JtUxkb2fg1gE6rezHHyO/F3n9KTJvBt52O1kDQLFP4aBvEhDX7WKVxT85Pbe++Uzkl
+         R2iwCu2deClFOvBFwuVikR/dMC/9oYLzqFgWXC4ERvByVL4p86bkmI547fh5UOaBYQwj
+         ZehZpyXLBvGzZFITnEYjnBRYiC2aZPOYl85LPoN2Q2VzVHwDUQDWbt6YZkIJTbToQbnw
+         wQWg1uN2EHltHi4HT1+lw/bfK40VY23rM27uNukbe1mAJtBnhcOMi4LyGTqcXdBkodNn
+         MxYAXhq3It+9D1sCvANj0YKRPcW7s3OsWFak4xq5mTVedZxsTXv849JPN/ywMdhPaBEH
+         2rUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769699606; x=1770304406;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7RLQERTdb05wedLUFRRmJ/cz5RnX6lW0lIzp3k35GCk=;
-        b=WDfPe6TVtZG+AFYvzgPvzQuG7OSDzwVfrvzKZ2Y0XmfjSXmxubPxu99a/xzlM09Lye
-         Kt1uY4Jmc9xTs4mitDoBKpFzMXUhOab7KkIcHEP7bDL4ZVn6Ufh9Rl+0e4BVI9iAmR/I
-         hUNJbvWWFZYXTHVQ4RWtxq+0F5xQrR+gcAu8Bypkply2bO//hxfVVXkKcLq3TpWsxkWU
-         Xo1xzMvx8D5OpN6TzWerLO1BB5vs67NfmEzWrCcAD2PQM+ns1Id6AE+LNpaAW6sbE+PJ
-         Lyt3VpKS+NO0xIJU1SQkHvc0Z/nbtf4dpkVJeJK8dWDLkIf6P82uPlxfHe+7Z0dd6ER8
-         sG+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwGqYCBH+DOL2aPI34CnGcUFwgvp/CbLfqwOCiY1xX3/bzqQgNQtpyDrO2JHbgzVGhDXh5/Bc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpIvQ76D8/n67I6yKgJwbPyPx98nYHIFf0xFvfv73ZKdcmLRCE
-	3h5O6zAKtgOxeQG+BfYJGlLy9MhMXf5DqHj+ME6RVmBXAmsVfv0dPCXmtD+59iLsc3jVcMEKbE8
-	4qeewPSUk7LImAAaQPB7DK8dkyo4sAimTnae+352P
-X-Gm-Gg: AZuq6aJRtAyDtXo1/SxrgpSA5eeaMR1NtZrqdaL/TdbAEnwLrqBFvl2kFcXiItAS4YX
-	UmBOVTzijRZgwkO64QqHxNyNDsW5l+UkIVUsyaKHiqDrl/vA9vB+8GTt9DcjLBIR2ixaL80rHKS
-	bDwVv8CG2Su4pVdjZHsxkm7+jUyQUlEYHAaMqrpcHJPIkMimwq7gMoIPXiw1UClqG9j+F6ABubP
-	xw26nz1MAmmiHVCnYpt1zqB6QA3E/HgnWWX0eYExqXKr1xgju87cigRI+fyU6iXO7sjw9Y/XI7+
-	R0yxaeQ=
-X-Received: by 2002:a05:690c:312:b0:794:647:6719 with SMTP id
- 00721157ae682-7947ac4b97dmr163532397b3.50.1769699605380; Thu, 29 Jan 2026
- 07:13:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769699952; x=1770304752;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MsXQrimwewQ8w9Fgh0pLIlGot9P2osFHXzwl6y2/yiU=;
+        b=tzBSn4L90j64W1YAv1kyzmX+A4bf17RVav9J6VVMlS+I3oUbg097zbKevfayRnnKRp
+         LahIMfSuFZTUmsJAtdyJPE3I974xfm1kgy/tAEXwbcI9d2LBvVqvvXgQhV/FjBGEr55C
+         YdDXNhwEMtPDvyNSRVLAwi273W0wBXbp1qhGVdHTcANODiOiwg3hsziIMVXq00opHf7k
+         7UMfGkcWcKeeCBtetEGwBm830jiDc9PW4yYmcag7WkE7ApU76nUtYhgdjRCguTxcmWEL
+         9hu9GO0O2rqIgq7CZG7bLUmeWMarZNo4cYutwTbLh/l9k7l0s4OpjzdOl9hTQ9eBviFR
+         JPVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ4+Ofr7PMTkXJfEFb8zQJhqBe5OZ6vmf2YRLSCzao+9ent+kvfa/mmRY2d8aoEZem8NjFd4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMVNeH3hgxvo5UJR8bd7eSBGE2RNwoE/a20byuqlgZ/VJ0jtiY
+	cXQ1Ygi+O09J6ihbDaMFKZXbFyk3G+U+ogPTjKHEmlT/iGLF0ACmvGqvdN0dJisFuvk=
+X-Gm-Gg: AZuq6aK/yiZD9Q8pdbPHqcJwHbdkiFV8QSjFv4Gk4kD6JnLdqm9i8pS5JwzrVT+aOaM
+	uisUXpxoI9ah5JZbxqaNKGvcB2HVjtq4rFCWtAAEpXWXBG3WCj2CGggyiIJ7vN9Lc1cd9nTztPT
+	w0OHmhmPGMN43g0sKjD/adXe9MSCrkAS5EvHgtcHQEpVf6XBxtJkFic+GhSInstBR5lZZGWFvAr
+	9kozuHZRu9R4qf+h//3SozTyfKAyxGp6OsqOfVWR8wjNVfSr2IE/mXLxVUAZCf2fheAyVwQ3ExK
+	GEbvshCe05t+u1oP2HMYcaThaC76n1KvbUJJ/VNHpoZuk2+J4Yy7f+npZ3PnOs8kIj83tahU7iA
+	W7BdkLpsKVrcFBFB9HaDsR998AraRyuLiSSTq30wIqM/oY60i0IgzX+RhdkiTsQUdRr8TM1G9Sq
+	bjG0Nng/XINFD9oCkfu0RV1B5Z
+X-Received: by 2002:a05:600c:46d5:b0:477:5897:a0c4 with SMTP id 5b1f17b1804b1-48069c3fb85mr106936725e9.4.1769699952070;
+        Thu, 29 Jan 2026 07:19:12 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c40e04sm201022335e9.13.2026.01.29.07.19.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 07:19:11 -0800 (PST)
+Date: Thu, 29 Jan 2026 16:19:08 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	john.ogness@linutronix.de,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+	mpdesouza@suse.com, kernel-team@meta.com
+Subject: Re: [PATCH net-next v5 3/4] netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <aXt6bD4KNb-5aY6c@pathway.suse.cz>
+References: <20260128-nbcon-v5-0-93b4ddbc181a@debian.org>
+ <20260128-nbcon-v5-3-93b4ddbc181a@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89i+UsejDXBJv-SqPJTCb-jO7p_+28zVLOOxvHoyV2MKwCQ@mail.gmail.com>
- <20260129150457.ob6le4lb2v6j7mqf@skbuf>
-In-Reply-To: <20260129150457.ob6le4lb2v6j7mqf@skbuf>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 29 Jan 2026 16:13:14 +0100
-X-Gm-Features: AZwV_QgL1erQXX1syyECIMq7gpsMdrhuCD6WEK4fumn5DTXFkf-9xxU3wQt9gOE
-Message-ID: <CANn89iLQeLPegmtqJ09vFs0QVAqFaf5Hy3P7agfqU0tvCXBsOw@mail.gmail.com>
-Subject: Re: [BUG dsa] lack of barriers in netdev_uses_dsa()
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev <netdev@vger.kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260128-nbcon-v5-3-93b4ddbc181a@debian.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-254829-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254830-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: ABED4B1568
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8926FB15FF
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 4:05=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> Hi Eric,
->
-> On Thu, Jan 29, 2026 at 02:16:56PM +0100, Eric Dumazet wrote:
-> > Hi dsa experts
-> >
-> > It seems netdev_uses_dsa() does not have any barrier.
-> >
-> > A compiler could read dev->dsa_ptr and get a NULL the second time.
-> >
-> > include/net/dsa.h:1336:static inline bool netdev_uses_dsa(const struct
-> > net_device *dev)
-> > include/net/dsa.h-1337-{
-> > include/net/dsa.h-1338-#if IS_ENABLED(CONFIG_NET_DSA)
-> > include/net/dsa.h-1339- return dev->dsa_ptr && dev->dsa_ptr->rcv;
-> > include/net/dsa.h-1340-#endif
-> > include/net/dsa.h-1341- return false;
-> > include/net/dsa.h-1342-}
-> >
-> > I was looking at this because I wanted to inline eth_type_trans().
-> >
-> > Note the wmb() in dsa_conduit_teardown(), which is not good enough.
-> >
-> > Any suggestions?
-> >
-> > Ideally, it would be nice if netdev_uses_dsa() could test a single bit
-> > in "struct net_device",
-> > without a dereference of dsa_ptr.
-> >
-> > Thanks.
->
-> It's been like this for a really long time.
->
-> Alexander Sverdlin had a patch to convert dev->dsa_ptr to RCU/RTNL
-> protection, but his problem ended up being solved in a simpler way:
-> https://lore.kernel.org/netdev/20240910130321.337154-1-alexander.sverdlin=
-@siemens.com/
->
-> I also started working a while ago on some patches to gradually replace
-> netdev_uses_dsa() with one of
-> netdev_uses_dsa_rcu()
-> netdev_uses_dsa_rcu_bh()
-> netdev_uses_dsa_rtnl()
-> https://github.com/vladimiroltean/linux/blob/dsa-rcu-rtnl-my-try-v1/inclu=
-de/net/dsa.h#L1360
->
-> but I didn't submit anything and I almost forgot about that patch set.
->
-> How urgent is this?
+On Wed 2026-01-28 06:17:39, Breno Leitao wrote:
+> Convert netconsole from the legacy console API to the NBCON framework.
+> NBCON provides threaded printing which unblocks printk()s and flushes in
+> a thread, decoupling network TX from printk() when netconsole is
+> in use.
+> 
+> Since netconsole relies on the network stack which cannot safely operate
+> from all atomic contexts, mark both consoles with
+> CON_NBCON_ATOMIC_UNSAFE. (See discussion in [1])
+> 
+> CON_NBCON_ATOMIC_UNSAFE restricts write_atomic() usage to emergency
+> scenarios (panic) where regular messages are sent in threaded mode.
+> 
+> Implementation changes:
+> - Unify write_ext_msg() and write_msg() into netconsole_write()
+> - Add device_lock/device_unlock callbacks to manage target_list_lock
+> - Use nbcon_enter_unsafe()/nbcon_exit_unsafe() around network
+>   operations.
+>   - If nbcon_enter_unsafe() fails, just return given netconsole lost
+>     the ownership of the console.
 
-This is not urgent, thank you for the quick answer.
+I was just curious and scratched my head around this a bit.
+If I get it correctly then it might fail only in a single situation.
+It actually should never happen on systems which stop CPUs by NMI.
 
-Although using rcu from  eth_type_trans() seems overkill (on builds
-where rcu_read_lock() and rcu_read_unlock() are not NOP)
+My thiking is:
 
-If ETH_P_XDSA is returned from eth_type_trans(), another rcu and
-rcu_dereference() will be needed later.
+  1. nbcon->write_thread() is called only from the dedicated kthread
+     so that there is always only one instance.
+
+     It might actually be called also by the legacy loop when a boot
+     console is registed. But the kthread is blocked in this case.
+
+     Anyway, the callback is serialized also using netcon->device_lock().
+
+
+  2. nbcon->write_atomic() is called only by the final
+     nbcon_atomic_flush_unsafe() because of CON_NBCON_ATOMIC_UNSAFE.
+
+     nbcon_enter_unsafe() always succeeds here because the _usafe_
+     takeover is allowed.
+
+
+  3. No other lock is synchronized with nbcon context.
+
+     It is acceptable because nbcon->write_atomic() is called
+     only by nbcon_atomic_flush_unsafe() where the nbcon context
+     synchronization is ignored anyway.
+
+So, nbcon_enter_unsafe() might fail only in netcon->write_thread()
+when the kthread is still running on another CPU while
+nbcon_atomic_flush_unsafe() is called on the panic CPU.
+
+And it should never happen when the non-panic CPUs are stopped
+by NMI.
+
+By other words, the nbcon context synchronization does not have
+much value when CON_NBCON_ATOMIC_UNSAFE is used.
+
+It is acceptable from my POV. I write this just to make
+the expectations clear. I wish, I had time to write a more
+comprehensible documentation about the printk design...
+
+> - Set write_thread and write_atomic callbacks (both use same function)
+> 
+> Link: https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/ [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+
+Feel free to use:
+
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+
+Best Regards,
+Petr
 
