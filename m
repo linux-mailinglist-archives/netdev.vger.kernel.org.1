@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-254626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254635-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDeEIZoXe2lCBQIAu9opvQ
-	(envelope-from <netdev+bounces-254626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:30 +0100
+	id MN5OOdUXe2lCBQIAu9opvQ
+	(envelope-from <netdev+bounces-254635-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:18:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18FAAD613
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6245DAD664
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:18:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 59E603019322
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:10:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 607D8305DF09
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564EA37BE65;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEB0385EF5;
 	Thu, 29 Jan 2026 08:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSjxV5N8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HxEvSNHQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E3837C0F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8525537C105;
 	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769674111; cv=none; b=uTTqEy8ob3UXH3Bqba3/XsxFhrRgfAev9XVomCJRKIhqjiimQ0+Xv/HsoXxyrIZCpmpX3lagsycv2p8XYVxlF0s0jV6fSZ1vdxrmUMVV/vNn7ux4ndj2XK86fktcDf/8zlsMw7CYDKQnngV7I6jpLpjONpuaGPaGbHcIwNJSr+k=
+	t=1769674111; cv=none; b=sQGDUrcR4Cfq9oYfe8RDvtqjRat/IqKTXj0WDLf+UhGUQr3gkRj814rHtDfmczsYvjDjEOr9jYj3Kznely1g581hbDb24Z726winwadgDUmpeowM5qSCpQm5gwrR8g+MsoUCCrw2I4P89kK/uwAGmmyrU07Pflu0aWLspQ1FJqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769674111; c=relaxed/simple;
-	bh=HZIWPQtHuKRBHDG4lIuIJ9k4nhNjGP3jcqbI9/NYBFM=;
+	bh=aAYr/rdf8rPhk+DzwcPpBGhnCkODn024mb+J5zDgPZA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j2nvXdTkWTG2kS9CeK+RZfOHWYpUhARvzwzASi1rD/xPERbLJgQfAURROynFDfyObg00FSTYtut6+bBCbdXfeXOkaZLTaZttbVVqMIkZSNwBc2AG6b/IB6Ftkq6PbGlETZ5Lupga0Eh51llD+J9/jy5L0lXvTfm++Iehmab5lhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GSjxV5N8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26799C2BCFC;
+	 MIME-Version:Content-Type; b=tcacPTVsdrDSLe0lZKA0ISnQuTxnRI7PJ7ngTechVgjUa09WqE9NepeDydISynU6k8np2ewizL/KiGUzPuOCcZ5MRNy/KwR5lYMxsmm9Uvb2WLyf29maS8ey3Az2P2cqIPdIdECGTlJziFgzmCNxT62jHt0QpE+kpF0dQk4SOWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HxEvSNHQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C2EAC2BCB6;
 	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769674111;
-	bh=HZIWPQtHuKRBHDG4lIuIJ9k4nhNjGP3jcqbI9/NYBFM=;
+	bh=aAYr/rdf8rPhk+DzwcPpBGhnCkODn024mb+J5zDgPZA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GSjxV5N8m6DyFxui8ZZdGu4+xPizuar3wU0AtGMsI1qMuSXRq0l1WC9X+Zm3hRWAb
-	 uHyt5mVPJxNtLtSoi/g5xBZ+XgycQK5IV5d3TCaY/cONDpBFpi5AZyMGEDMZSMAaS7
-	 PvNQ9d8qwDoZkcH6vynHxk5dHtdrfMEC/byQCk12jutLU9F/f4tGSLoCiUvVb+ZNzT
-	 3plvFnws7sQ+qDOtrTZrwPZvo0lOixx671zZ3a8i3gmYGclELOt1gfZs/iCquZRctV
-	 r9AB9hYU9TzKNAtgXBplJu0RrpHkoOish+Q/YVMq167JVSHF23onkBcndBpuq5xnaA
-	 thMRLBM+FNnVg==
+	b=HxEvSNHQEtL0D59ODsnQi0p3l8kMpRAIJaWt8HUV5lvtVPe2caGw5Z0eLuIIQN8Cr
+	 4xRaxDBGT+igKQhlHOaxNvX+eFQ6ZA82YxsTv0FjkNdeBvTBYl+iYm50wea3VTsOcQ
+	 fKt6u+LN7F4u4p4Zx30THYRuTvRzoAHmjiH9PlcAVFT47GW9CKIqfpogm1q0jwt9b3
+	 7RjMh3jWaL0T1izR+e8ryofdpsfSH4aWF1PVlipelfiqJLjpGEWRmXNp90sSw+dIzh
+	 /5erIn2XU+qhq6rfbrfcgR33uPNecU9q3U2RZybpjFOVd8oICaZfNpY9xMZj77zvIS
+	 xM/EStNmmUzQA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vlN4n-0000000EROD-1cdk;
+	id 1vlN4n-0000000EROH-1jpG;
 	Thu, 29 Jan 2026 09:08:29 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>,
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
 	Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	bpf@vger.kernel.org,
@@ -59,9 +60,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v3 26/30] docs: kdoc_parser: use the new CFunction class
-Date: Thu, 29 Jan 2026 09:08:17 +0100
-Message-ID: <4ca4e256922bc42ce1c86e70c20e6a35a599fcfd.1769673038.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v3 27/30] docs: kdoc_parser: minimize differences with struct_group_tagged
+Date: Thu, 29 Jan 2026 09:08:18 +0100
+Message-ID: <50ef80ed8a1a638d08974e55a7828371bab09c0d.1769673038.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769673038.git.mchehab+huawei@kernel.org>
 References: <cover.1769673038.git.mchehab+huawei@kernel.org>
@@ -80,7 +81,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -88,7 +89,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254626-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-254635-lists,netdev=lfdr.de,huawei];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -96,95 +97,65 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F18FAAD613
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6245DAD664
 X-Rspamd-Action: no action
 
-The match logic for transforms becomes a lot clearer if we use
-CFunction convenient alias class instead of NestedMatch.
+While the previous version does a better job representing
+the actual struct, it ends losing documentation from each
+member.
+
+Change the replacements to minimize such changes. With that,
+the only differences before/after using NestedMatch new
+replacement logic are (at man page output):
+
+    --- before.log  2026-01-29 06:14:20.163592584 +0100
+    +++ after.log   2026-01-29 06:32:04.811370234 +0100
+    @@ -1573701 +1573701 @@
+    -.BI "    struct ice_health_tx_hang_buf  tx_hang_buf;"
+    +.BI "    struct ice_health_tx_hang_buf tx_hang_buf;"
+    @@ -4156451 +4156451 @@
+    -.BI "    struct libeth_fq_fp  fp;"
+    +.BI "    struct libeth_fq_fp fp;"
+    @@ -4164041 +4164041 @@
+    -.BI "    struct libeth_xskfq_fp  fp;"
+    +.BI "    struct libeth_xskfq_fp fp;"
+    @@ -4269434 +4269434 @@
+    -.BI "    struct page_pool_params_fast  fast;"
+    +.BI "    struct page_pool_params_fast fast;"
+    @@ -4269452 +4269452 @@
+    -.BI "    struct page_pool_params_slow  slow;"
+    +.BI "    struct page_pool_params_slow slow;"
+    @@ -4269454 +4269454 @@
+    -.BI "    STRUCT_GROUP( struct net_device *netdev;"
+    +.BI "    struct net_device *netdev;"
+
+e.g. basically whitespaces, plus a fix NestedMatch to
+better handle /* private */ comments.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/lib/python/kdoc/kdoc_parser.py | 38 ++++++++++++++--------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ tools/lib/python/kdoc/kdoc_parser.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/lib/python/kdoc/kdoc_parser.py b/tools/lib/python/kdoc/kdoc_parser.py
-index d2eb93f9d489..50d57c6799bb 100644
+index 50d57c6799bb..1e8e156e2a9e 100644
 --- a/tools/lib/python/kdoc/kdoc_parser.py
 +++ b/tools/lib/python/kdoc/kdoc_parser.py
-@@ -13,7 +13,7 @@ import sys
- import re
- from pprint import pformat
- 
--from kdoc.kdoc_re import NestedMatch, KernRe
-+from kdoc.kdoc_re import CFunction, KernRe
- from kdoc.kdoc_item import KdocItem
- 
- #
-@@ -119,22 +119,22 @@ struct_xforms = [
+@@ -126,7 +126,7 @@ struct_xforms = [
      #
-     # As it doesn't properly match the end parenthesis on some cases.
-     #
--    # So, a better solution was crafted: there's now a NestedMatch
-+    # So, a better solution was crafted: there's now a CFunction
-     # class that ensures that delimiters after a search are properly
-     # matched. So, the implementation to drop STRUCT_GROUP() will be
-     # handled in separate.
-     #
--    (NestedMatch(r'\bstruct_group\s*\('), r'\2'),
--    (NestedMatch(r'\bstruct_group_attr\s*\('), r'\3'),
--    (NestedMatch(r'\bstruct_group_tagged\s*\('), r'struct \1 { \3 } \2;'),
--    (NestedMatch(r'\b__struct_group\s*\('), r'\4'),
-+    (CFunction('struct_group'), r'\2'),
-+    (CFunction('struct_group_attr'), r'\3'),
-+    (CFunction('struct_group_tagged'), r'struct \1 { \3 } \2;'),
-+    (CFunction('__struct_group'), r'\4'),
+     (CFunction('struct_group'), r'\2'),
+     (CFunction('struct_group_attr'), r'\3'),
+-    (CFunction('struct_group_tagged'), r'struct \1 { \3 } \2;'),
++    (CFunction('struct_group_tagged'), r'struct \1 \2; \3'),
+     (CFunction('__struct_group'), r'\4'),
  
      #
-     # Replace macros
-     #
--    # TODO: use NestedMatch for FOO($1, $2, ...) matches
-+    # TODO: use CFunction on all FOO($1, $2, ...) matches
-     #
--    # it is better to also move those to the NestedMatch logic,
-+    # it is better to also move those to the CFunction logic,
-     # to ensure that parentheses will be properly matched.
-     #
-     (KernRe(r'__ETHTOOL_DECLARE_LINK_MODE_MASK\s*\(([^\)]+)\)', re.S),
-@@ -185,17 +185,17 @@ function_xforms = [
-     (KernRe(r"DECL_BUCKET_PARAMS\s*\(\s*(\S+)\s*,\s*(\S+)\s*\)"), r"\1, \2"),
-     (KernRe(r"__no_context_analysis\s*"), ""),
-     (KernRe(r"__attribute_const__ +"), ""),
--    (NestedMatch(r"__cond_acquires\s*\("), ""),
--    (NestedMatch(r"__cond_releases\s*\("), ""),
--    (NestedMatch(r"__acquires\s*\("), ""),
--    (NestedMatch(r"__releases\s*\("), ""),
--    (NestedMatch(r"__must_hold\s*\("), ""),
--    (NestedMatch(r"__must_not_hold\s*\("), ""),
--    (NestedMatch(r"__must_hold_shared\s*\("), ""),
--    (NestedMatch(r"__cond_acquires_shared\s*\("), ""),
--    (NestedMatch(r"__acquires_shared\s*\("), ""),
--    (NestedMatch(r"__releases_shared\s*\("), ""),
--    (NestedMatch(r"__attribute__\s*\("), ""),
-+    (CFunction("__cond_acquires"), ""),
-+    (CFunction("__cond_releases"), ""),
-+    (CFunction("__acquires"), ""),
-+    (CFunction("__releases"), ""),
-+    (CFunction("__must_hold"), ""),
-+    (CFunction("__must_not_hold"), ""),
-+    (CFunction("__must_hold_shared"), ""),
-+    (CFunction("__cond_acquires_shared"), ""),
-+    (CFunction("__acquires_shared"), ""),
-+    (CFunction("__releases_shared"), ""),
-+    (CFunction("__attribute__"), ""),
- ]
- 
- #
 -- 
 2.52.0
 
