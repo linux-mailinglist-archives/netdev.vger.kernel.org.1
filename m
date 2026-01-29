@@ -1,118 +1,110 @@
-Return-Path: <netdev+bounces-254906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPyrMj26e2llIAIAu9opvQ
-	(envelope-from <netdev+bounces-254906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:51:25 +0100
+	id eHEVH8+9e2mnIAIAu9opvQ
+	(envelope-from <netdev+bounces-254907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:06:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA7EB4186
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:51:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1FB7B4243
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:06:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EFADB300DF48
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:51:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 694753010161
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E9B329E67;
-	Thu, 29 Jan 2026 19:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FFB3246E8;
+	Thu, 29 Jan 2026 20:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="ITSyv0aF"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="K3JEyVB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D462F6562
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 19:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F2129B8D0
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 20:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769716278; cv=none; b=DF8yB2XHuDrcwV71wkmugfvQsmsbfZ5iGxEK09Nd4sZHx6ijGLcsGqbFCbU35r521RTNSMs4d2oV9wgp6lBVDzWXhVI1mC0Ekh3zbUnbfYHwxMshXavOzKj25v5nVN0BYx/9Jvdh0ap5yGv/HXtbpAovUT7HmaV01l2JbVXSfL4=
+	t=1769717196; cv=none; b=kqES3gg8fXjR5bhJqGZW3yaYAlS6lzat0SfmgEQPIe2qFKMotxjP1rJ8KaJFDft9XAK7UAfXCsjBegE5BElGC3YKYxFKHEHnlBLeinU+M3oS3k/3/Y/ZauYRHhXQQyZK/C4SRxPFQgn4BijlfK1cjDDTy0wpE7PRz3bVNDD7XJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769716278; c=relaxed/simple;
-	bh=kz/UmQnF/kQZX0padhdk52aftyV/7o2JgBiZXIT2EDo=;
+	s=arc-20240116; t=1769717196; c=relaxed/simple;
+	bh=+eh/SUwQU9XD5Cmg6Rs5yD/vpU03vvM05wtq9Pa0vkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ST32aopfMpmKFFsnSD20zmImQ3qNWvI6vS9K+6wagcBF2d1owSDQfZ53kt1djPjDJA9roysx+XqGl8xw8BLLedkz3ZxAe1DKoFjhChhBsbcsdFNqtkjdhXc/kSPiUqnzmDun1o6l6I3kPRhGVWa3DGYMOQs0zQd9rvnMtJjPwdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=ITSyv0aF; arc=none smtp.client-ip=209.85.210.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=TlYh9xyGJlPQ01aso1nIrBn8zmWnq4+fqUx581rhiTTqulIsjDuYdDr+MhIUgd7YQeLSj6zoWHU39ygDn3elm7HnkBXooQeSHwYbsKjQCPAVDFBj+W8ZotW5xexKdHcGC8/77sKz1m2S1mPujck/OcoSk9vAinHhGgjWYw+QLTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=K3JEyVB0; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-81e8b1bdf0cso815285b3a.3
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:51:17 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a7a23f5915so8820675ad.2
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 12:06:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1769716277; x=1770321077; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1769717195; x=1770321995; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MnxwsZAxF8STswOuh2vgfeXNVDToeemAzI/Ew3hWeYM=;
-        b=ITSyv0aF7wrRfDHDdQ3a62ddXHRJYVwLBxKF6kH65YqZ/XtdRaYTJLMdikeVBXLd+S
-         Z8hQ7W3do45qhiWOkAzbUe6wFpkMKYV5zwVfk/jzvsnYsD59QPdMwBEAmO8S1Rx+QsT2
-         CFJECTtRZEkyAlGkYcsKzn++zrZUJSnHIXpwFLDDoN5YNl8/xsxyJo99WIG2Mojo7BHl
-         p4kjZM654Vkf42b7/DFutFgH+kFklcf2Z1FQN98RZM7XnA2rikToOD+pgcNMo8T5NE13
-         NtyesdcZii/47aFK4dALYPyY1rujf0zk0J0HeqKedfzoeHCD6yrxde6vML1fzLCeef/g
-         Zzyg==
+        bh=St0oud0e7oWpK/kNC2zmpDnKbjo7wRZGc2JcqraRRS0=;
+        b=K3JEyVB0ZinlHzNJg+HCDg5yKi1ukkD6IdP9BuJhG9FDpWLhYWTIhgf80+bvtSv6h4
+         gr6+xwYl91l9d7LgqGAmfP6qY46K94+/M0qWWYrckeuJmvGrl2KQbg4Tx6GlaZ6AR86u
+         7rfdcKtVmR8NS1OX9Xofd84AUVk1jokwNF/9cmAIgYMPHFZXTPUAXlGqxF6FvIpLmH4B
+         00ZsvGuvgnVx/rDx0AOUn57NyDZ7M6Kn/QNChU8B/oZ7l1vzGAKKhmQRdYUp8MR2VND5
+         QitaJWJh21wEuPkHi8AL14dRQb841GR9XwIsCUfg7mRnI6cRKl2BsRWkHTiMIHn4PBj1
+         /41g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769716277; x=1770321077;
+        d=1e100.net; s=20230601; t=1769717195; x=1770321995;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MnxwsZAxF8STswOuh2vgfeXNVDToeemAzI/Ew3hWeYM=;
-        b=QXkDUHAb0CfpT21UxF0jvVfiuwikFwPo4Z72IHJ13IAYztx7tYocacsTZvcpxJPrq+
-         bfFZSp/Fso3htgxWLLLN1266Pms2VYfHQbQlVExu0OKBh1+zF2svpUUpYETsLw0aZqkG
-         9YW7WtYPsY/8Vqp3IafgnXUaeysqe3eE8svFl3aRL8eRuLsRtC1gHI7Cp0kiHMrxnOQ3
-         I4MlYZh60zrDheF9VnnlYnNsyp3XtkkTptAZPVj0/NDZ0IOGaRNf0mW7sL3nx4R+jrqp
-         4uqJTxQ1g0hten95gvP4qJxoHRA7OkUaHnJXdpsKBMyf4652fIU7wJCnigNfViyGlykf
-         UBxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUUkXwpNrwp0Yr3BEZa7lCExCsc83mulFBHFQhzl7Xyn6IYHFq+WeG+IxN4umb8mlZoEZWU0Sw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbHpEeo4MPVBAwMrW4M7B0wuZQ+81qpClu42BAf/zWi9UHm3np
-	/jHwYoSqCOFU3CK5hjydLtWmXeHLjOS9v09RXgXgXcqH+4Dff2NiC+rGggTUxAa/IUo=
-X-Gm-Gg: AZuq6aIQbS5jUR9owIGfX6NjnQ8lY16uPceejqn1FfuBxQXsKloaMUSwDDSmRKNOTq/
-	ugQqTuhbl2TgaQFoShmmsxjGmgSiRxYZBiLs5cM1lDjiuLLNWRYxSCKQ4cA+Yjdot1lbJTn1zxT
-	DAbqoBJvjY1cAbZ6ZCQnnBeaF3kjj5Lmj4D92gXvm+0G1y8u+doh+h2gr9Jh7H8Scw7qwQPvsmQ
-	S16YdbNNv0WUOLYA0qu2hNK9r+JbR7us0P7D14vQ9aRNbjSegBCKtocQir4b+FN85r21X6suZHf
-	nxump+0j2D5nk7kHMODBhjEzPUenVxn8ZC7sOBZdqnQT/0S3BifMWntsIPb7a87XYp03lgcYhy4
-	4/vFOlyWbtPu1qAR0TSzRbfHnFYb4wkO0xneB4drzQB4Mu+X06kZRhtU0p0GPAV+XIdyR6irHo0
-	NkTA==
-X-Received: by 2002:a05:6a00:3d42:b0:81e:dcb2:52cb with SMTP id d2e1a72fcca58-823aa3fd50dmr448408b3a.2.1769716276774;
-        Thu, 29 Jan 2026 11:51:16 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:3::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379c54d4dsm7133424b3a.67.2026.01.29.11.51.16
+        bh=St0oud0e7oWpK/kNC2zmpDnKbjo7wRZGc2JcqraRRS0=;
+        b=T6eVYBU5DIhk12ZJ0JoFg+72nNRpayAcHOlG0oz2IbPyWC5aFB0FSim8CTAxpUd51X
+         9Tv81Zy1F7Mh9JqPFzVKO5vqRo0wbR9+uEZRovi3estyiA62j3rbfUMRsdf3bonwErdk
+         k2AcP/gVSq70SQGNhhV8sQgK/Tp01ow/SfCL8+TB6/VDyXRckxb6psNycDeF7dtkCrK2
+         uBoAvC8dA/uDAX/HFnT62THT2QMW4zSQwjVyZNeIT71RDQXnSDHKrxXO28MTGz/4+7YB
+         HA1vOGizNr04tCvxk2B8pSh8ciaFpDAI/UcoynostDhYRboYygGA6ld3XIb8Kmu8uZC5
+         WD0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUzOEsIVUNPD2eVIy8gESldXtzpggWBfXdM0flcAJm0eLV3o+W8exlpDG7RXILpyTl8gK4vIGE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQ59CDw26oQyUUvcu6INYfZiolCJp1YN9l4LY4atBJniJVqGth
+	1HicFoRCOe0sieBNxhld/p4/q3KuJH2EmoIawJgRLTlLIA6TJlws0goNOCrt2L+5odQ=
+X-Gm-Gg: AZuq6aI3w4X2WZNbcVVVOhE5WnXbg9gZDRxCBD2UB71eoKCYuDiNMXY4llpHV/Q2cw3
+	X0AvZ1l55Bz6Sh1xXGq4e+u4Hvqi9Dd1Rz5ogbAG3P3AJmGk//mYcgMNKLSuC2yoanlcAwEQuJd
+	qvpiuSJdtSvM+3TGRbPWt4NXjKpIxGcho8ihR04KMBd68ahvRhQPn76CcwACMGXr11rPQhbVz3+
+	2xQ+TdZQ7HVBqpuPVLz0A7fnrqPN/aJBfOCcsckUQNRDETmSnXJZRUEJBH0lkOrCSusQV76yVJx
+	CjItDrhZjZcxs6n29oEFR+v8ijuvDC9J3kgn8aI+/cKo4gTSSCmvexUY1Nty4WgLgKXJglNCbgi
+	gvHhVX+YCrpVX+gLMPmbVy1o3cmwFxtY3FN2rPM3ekwjRkovoVk2aLsigcl2eRt6+uA4if/H+bO
+	I=
+X-Received: by 2002:a17:902:d4c9:b0:2a0:bb0a:a5dd with SMTP id d9443c01a7336-2a8d9a60127mr2972515ad.57.1769717194904;
+        Thu, 29 Jan 2026 12:06:34 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b414cc7sm58495255ad.33.2026.01.29.12.06.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 11:51:16 -0800 (PST)
-Date: Thu, 29 Jan 2026 11:51:15 -0800
+        Thu, 29 Jan 2026 12:06:34 -0800 (PST)
+Date: Thu, 29 Jan 2026 12:06:33 -0800
 From: Joe Damato <joe@dama.to>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH net-next] net: stmmac: spelling corrections
-Message-ID: <aXu6M3BKyDhJIXIx@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>, Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>, Zhou Shuai <zhoushuai28@huawei.com>,
+	Wu Like <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>,
+	Luo Yang <luoyang82@h-partners.com>
+Subject: Re: [PATCH net-next v03 3/4] hinic3: Use array_size instead of
+ multiplying
+Message-ID: <aXu9yZBySHREdqoY@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>, Fan Gong <gongfan1@huawei.com>,
+	Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	linux-sunxi@lists.linux.dev
-References: <20260129-stmmac-spell-v1-1-c7df9a96e482@kernel.org>
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>, Zhou Shuai <zhoushuai28@huawei.com>,
+	Wu Like <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>,
+	Luo Yang <luoyang82@h-partners.com>
+References: <cover.1769656467.git.zhuyikai1@h-partners.com>
+ <b7d6d384ccc0bd4c0d3e7af1f90901d589cbd0b1.1769656467.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,56 +113,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260129-stmmac-spell-v1-1-c7df9a96e482@kernel.org>
+In-Reply-To: <b7d6d384ccc0bd4c0d3e7af1f90901d589cbd0b1.1769656467.git.zhuyikai1@h-partners.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254906-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254907-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	DMARC_NA(0.00)[dama.to];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,pengutronix.de,sholland.org,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20230601.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid]
-X-Rspamd-Queue-Id: 1FA7EB4186
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,dama.to:email,devvm20253.cco0.facebook.com:mid,dama-to.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,h-partners.com:email]
+X-Rspamd-Queue-Id: D1FB7B4243
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 05:35:03PM +0000, Simon Horman wrote:
-> Correct spelling as flagged by codespell.
+On Thu, Jan 29, 2026 at 12:01:10PM +0800, Fan Gong wrote:
+> Since commit 17fcb3dc12bb ("hinic3: module initialization and tx/rx logic")
+> use "size * sizeof(u64)" in hinic3_feature_nego.
+> Use array_size instead of multiplying can make it clearer.
 > 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+> Link: https://lore.kernel.org/netdev/20250911123120.GG30363@horms.kernel.org/
+> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
 > ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c        |  4 ++--
->  drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c      |  4 ++--
->  drivers/net/ethernet/stmicro/stmmac/dwmac1000.h        |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c    |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/enh_desc.c         |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/mmc_core.c         |  4 ++--
->  drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c      | 10 +++++-----
->  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c      |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c |  2 +-
->  10 files changed, 17 insertions(+), 17 deletions(-)
+>  drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+
+create_cmdq_wq in hinic3_cmdq.c has a memcpy that could probably benefit from
+array_size, but I'm not sure.
+
+For this change though:
 
 Reviewed-by: Joe Damato <joe@dama.to>
 
