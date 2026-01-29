@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-254629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEL6M6oXe2lCBQIAu9opvQ
-	(envelope-from <netdev+bounces-254629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:46 +0100
+	id 4HRdNKsWe2kZBQIAu9opvQ
+	(envelope-from <netdev+bounces-254631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:13:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 079F4AD61B
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7139AAD508
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:13:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5B7FA3043410
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:11:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C81A1304075D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654ED385ECE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DFB385EEE;
 	Thu, 29 Jan 2026 08:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7PkFnqw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OdQsPwCU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D4037C0F1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B9537C104;
 	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769674111; cv=none; b=u6jgVqeeCvwfGYnHtuHw73Swd1owHmwIBECta1BXvsIh9FeVznQIWep+X+PSBJReoHf28jEaoknVDy3PtRd3E2/1Qg5lKjlQNIc2CNqo5AZ94K9rPo1gNFeKWWh9z/5g/zuWXEK5XdP+rs0o/TzU+Lv/MFb797+AAlH4hv6DrnY=
+	t=1769674111; cv=none; b=Pw8GpZIdyp5eMkso9cXhgOhPHA0Hk7OaHBpK0eA01gUSvW7a29fG33kXp+a8zn9IMUHq5R5uhTyLdJ/56ozR/d58u1ooiCnTYbXr65pgSzEnrSvojXvRFP/YaY10JgPCp4H15svuYpK+2nKo0U8C5BQb9RAnL+0daJrN1ZREjkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769674111; c=relaxed/simple;
-	bh=jXKyTJKBXMc1s7NB0MjWyQ30waz0m2moRL2HWFXUGcQ=;
+	bh=5IMb08zUAZZvfVWXPYkW/4qcvpNOxc4eEZSFARXvZuc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dBrkRFGrqQpg6Gtya8LRDlsBrSDmrIt4Se4p1CWFF3cGhD7tqzU94uw49mKNSNq5PjKpwg2lLtiO/wChJsEN67QGNR8PLA013IGoL0bUqDEa9CX7+KeYMijf0TLAj38ztRzmfSjBvyMm/AVOevJQPOJAcYrF5NhMPryeShxaeA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7PkFnqw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1810FC4AF0B;
+	 MIME-Version:Content-Type; b=frg14hcQBlAebLT0Udj6YitGakgBc+qeX10/fTrcGeRdMFjVGezgVCk017vck4q3l6su1x3gsJDe5Z5bLjnsbcAOt8CRUF6uqJf4JCMfZ6DTyIEDkxF8n6GuPM3CH71EqGUJrIgUGC5U1f7/jvhHGOVIqLvMY4GSkMfZu5b3Sh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OdQsPwCU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2207DC2BC9E;
 	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769674111;
-	bh=jXKyTJKBXMc1s7NB0MjWyQ30waz0m2moRL2HWFXUGcQ=;
+	bh=5IMb08zUAZZvfVWXPYkW/4qcvpNOxc4eEZSFARXvZuc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J7PkFnqwl2NyEeDLu1PjLukhjjtiF+Ro2e05fbSOt0bbYe/La5snvMsV/XSZp0/kW
-	 7tRFxouHgJdH9LNlXIjiRrXisPkCjbjbWU9X1TqnPD/6OWGeQnW+BE9DSIENFTYMF/
-	 4S4+ZvgncMp8Y9a3LrLSBQnR6jUE4VacgREmd58LhtEpvytSPSjgZrw9MvJVRAzHad
-	 bdu1aKJI4bLQ8C59UsWBAeaFD3L1LyrHoTj93SSsJE3mrYLitlkoBHoa4XSIJKmrm/
-	 6a0A8riOd4DXnNvl8SDpJ06A4ULLZT/BFl63zJyP1oHt86G3GO6DqRXRFLKKrrHh2a
-	 QuIqETItOATxQ==
+	b=OdQsPwCU87ijJQAvR4bFQKGyfKuTiPXIrfP8nlxqb3ywYjSJv61k2ROvpdRebYQsQ
+	 ABZtUOiBDZCpHsKzaWLcBfp2ZXefQ+izcFxzYQ99yaj+nffM7X5FXlaGQVnAbK/CLp
+	 LmfjgelLDoPuEDMDekhHRjI6cipt3FcG1Wl3xHKoEJ2XI7mRm8ij5ewcMbHurgHpmS
+	 0Pj2A7Lb+VIUKweKzqbb13O4Q68pi4Uvwjr+/shCizR50sNjLOybTe6OU+G+8DJejB
+	 1dgaqR3yRPxd1r7i2FySvp2R2lxxpzqRa9h+nx8y3b9QCVM/dYVziKX6YVqt6lN/Gq
+	 ObnCqicRTDTqA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vlN4n-0000000ERO5-1O5T;
+	id 1vlN4n-0000000ERO9-1VNv;
 	Thu, 29 Jan 2026 09:08:29 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -59,9 +59,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v3 24/30] docs: kdoc_re: fix a parse bug on struct page_pool_params
-Date: Thu, 29 Jan 2026 09:08:15 +0100
-Message-ID: <053367b7bf66f07444b45790db0e2b1998d3a3fe.1769673038.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v3 25/30] docs: kdoc_re: add a helper class to declare C function matches
+Date: Thu, 29 Jan 2026 09:08:16 +0100
+Message-ID: <9d3d27d956b25921cf40410e59a17a86caef32f6.1769673038.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769673038.git.mchehab+huawei@kernel.org>
 References: <cover.1769673038.git.mchehab+huawei@kernel.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254629-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-254631-lists,netdev=lfdr.de,huawei];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -96,76 +96,42 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 079F4AD61B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7139AAD508
 X-Rspamd-Action: no action
 
-The struct page_pool_params definition has a private
-definition on it:
-
-    struct page_pool_params {
-	struct_group_tagged(page_pool_params_fast, fast,
-		unsigned int	order;
-		unsigned int	pool_size;
-		int		nid;
-		struct device	*dev;
-		struct napi_struct *napi;
-		enum dma_data_direction dma_dir;
-		unsigned int	max_len;
-		unsigned int	offset;
-	);
-	struct_group_tagged(page_pool_params_slow, slow,
-		struct net_device *netdev;
-		unsigned int queue_idx;
-		unsigned int	flags;
-    /* private: used by test code only */
-		void (*init_callback)(netmem_ref netmem, void *arg);
-		void *init_arg;
-	);
-   };
-
-This makes kernel-doc parser to miss the end parenthesis of
-the second struct_group_tagged, causing documentation issues.
-
-Address it by ensuring that, if are there anything at the stack,
-it will be placed as the last part of the argument.
+Add a more convenient class to match C functions and avoiding
+issues at the beginning and ending of NestedMatch inits.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/lib/python/kdoc/kdoc_re.py | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/lib/python/kdoc/kdoc_re.py | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tools/lib/python/kdoc/kdoc_re.py b/tools/lib/python/kdoc/kdoc_re.py
-index 858cc688a58f..5f455ffff7b2 100644
+index 5f455ffff7b2..a49b42e3d189 100644
 --- a/tools/lib/python/kdoc/kdoc_re.py
 +++ b/tools/lib/python/kdoc/kdoc_re.py
-@@ -201,6 +201,9 @@ class NestedMatch:
+@@ -380,3 +380,14 @@ class NestedMatch:
          """
  
-         stack = []
-+        start = 0
-+        offset = 0
-+        pos = 0
- 
-         for match_re in self.regex.finditer(line):
-             start = match_re.start()
-@@ -250,6 +253,11 @@ class NestedMatch:
-                         yield start, offset, pos + 1
-                         break
- 
-+        # When /* private */ is used, it may end the end delimiterq
-+        if stack:
-+            stack.pop()
-+            yield start, offset, len(line) + 1
+         return f'NestedMatch("{self.regex.regex.pattern}")'
 +
-     def search(self, line):
-         """
-         This is similar to re.search:
++
++class CFunction(NestedMatch):
++    r"""
++    Variant of NestedMatch.
++
++    It overrides the init method to ensure that the regular expression will
++    start with a ``\b`` and end with a C function delimiter (open parenthesis).
++    """
++    def __init__(self, regex):
++        self.regex = KernRe(r"\b" + regex + r"\s*\(")
 -- 
 2.52.0
 
