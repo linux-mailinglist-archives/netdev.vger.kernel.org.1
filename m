@@ -1,397 +1,146 @@
-Return-Path: <netdev+bounces-254746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254747-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FYxLBY+e2mNCgIAu9opvQ
-	(envelope-from <netdev+bounces-254746-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:01:42 +0100
+	id aHlGGRw+e2mNCgIAu9opvQ
+	(envelope-from <netdev+bounces-254747-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:01:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A15BAF510
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:01:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3805AF517
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CCAC830AE44C
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:55:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 987EA301CFB4
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060DC385510;
-	Thu, 29 Jan 2026 10:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86023816F1;
+	Thu, 29 Jan 2026 10:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Gm7ef+Pi"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619C93816F1;
-	Thu, 29 Jan 2026 10:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE8F33BBB4;
+	Thu, 29 Jan 2026 10:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769684104; cv=none; b=ApoWIlPzHquyAiLwSz0FDW7Su4/AQDndivAplQDsA/LKLLbIdFsvn7GYLEhV/8IVQBx3fQO/edbYs7oREiFvMxYRTY0Kh2kx+iBsAQ/i7wcMc8mSCXih44r+WNZfyC9Ux3YWpE26ZdmsMS64kjgcHBB/SszDlEr8mOlNxeYpnQY=
+	t=1769684144; cv=none; b=Y4iuHN9hZVAjaaRIOXiHbXfH08BiIbZNLN2bTbeHEga1wzOrYRvOuC/9r0ZnTnoCuPqpRgqMPw+KP+XV813ZhzizKAUZw1jSaHX7Ok0QmeT6IG6Xz7Ddr0zDnjDtMxAXtytqZTEKL62d5dfYa7NEt0EYn4cmb76Yyo48rAvmItA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769684104; c=relaxed/simple;
-	bh=yaEWRSqaI+2Cf9Otd8/xYtW1YKUcait8SbBYDRJ/OTw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sU5V6utFgaNpejP71HDAuHNuN002ELs9qhhCEsVOq4h1ErdgT7Yw+r3OjtZvTbv837hZlyUPJ++wFqRVFih7K3t1HHkto25ZcxhFqp7cIP0NEEDbvs1Xy5nFRqqM9+t+tJ2TGVUMUlvsEmqVoGYd+bruMYZ9rZiSv40w9oAZgcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 1B61460516; Thu, 29 Jan 2026 11:55:02 +0100 (CET)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1769684144; c=relaxed/simple;
+	bh=/+hfH01HdJGxMr0GEzw+vMVh+JcYcOhmSVnmoG4kr3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h2CSu6tbkgmiGx02I66yftIGvSVR7rnsTBjLbfpGbdI0gnY2G581guFE2nhwdAojsRKZaKhE6souyU1oC3x5Wz3LSCP4zfLuG1yXdxkxWtGiXMyr0cDghjbJl0abDyOsIuJTlIlZPNJ9VGYgEOSQkzdKy4Q4yCT+oR0Q23YMq9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Gm7ef+Pi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jefi+XwQ73nwaagx0CNNNGtK/XfXgCjuzxBF6exADZo=; b=Gm7ef+PiXrMGgKIZ406JoUii9L
+	JuJdizsok1yO9T05Eej4iMkHOccC2XgpGvQy9YCNNt6C9d1OUn1MrpPZBp91or4kH/cRo5bQcAkoR
+	BUFhk2PUQ6buihb7HN+tfcw645poUjg+14qhY4mLQ4WKZDfE9BNyeqad6gmywrAShWWXRxNf5zAde
+	LSMTluyGsz8balx5M62wwt4ooEYBSXEKgw2YJRzcPnvShjLxAGn5Lj8r/xUKrT+mM7GfHNYVrjU2V
+	Yp6lOXi5uc8rcN6fG1+B5j2liAttfO18/QxhgzcCUQ7fbIEWYo84HkkZ2AQX+BO79Pb4U5fhoG5Ro
+	RHFWH3mA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56930)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vlPgL-000000008R1-47Sl;
+	Thu, 29 Jan 2026 10:55:26 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vlPgJ-000000007ti-3PkK;
+	Thu, 29 Jan 2026 10:55:23 +0000
+Date: Thu, 29 Jan 2026 10:55:23 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marco Felsch <m.felsch@pengutronix.de>
+Cc: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
+	Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH v2 net-next 7/7] netfilter: nfnetlink_queue: optimize verdict lookup with hash table
-Date: Thu, 29 Jan 2026 11:54:27 +0100
-Message-ID: <20260129105427.12494-8-fw@strlen.de>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260129105427.12494-1-fw@strlen.de>
-References: <20260129105427.12494-1-fw@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into
+ phy_init_hw
+Message-ID: <aXs8m8UodO4griTY@shell.armlinux.org.uk>
+References: <20260128094644.302313-1-michael@amarulasolutions.com>
+ <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch>
+ <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
+ <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
+ <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
+ <aXqJ_TtdBnkvEZ_i@shell.armlinux.org.uk>
+ <20260129104123.zir4rtgeiu5qv3i7@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260129104123.zir4rtgeiu5qv3i7@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254746-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254747-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[amarulasolutions.com,lunn.ch,nxp.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
+	TO_DN_ALL(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	RSPAMD_EMAILBL_FAIL(0.00)[scottkmitch1.gmail.com:query timed out];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:mid,strlen.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A15BAF510
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: E3805AF517
 X-Rspamd-Action: no action
 
-From: Scott Mitchell <scott.k.mitch1@gmail.com>
+On Thu, Jan 29, 2026 at 11:41:23AM +0100, Marco Felsch wrote:
+> As said, I don't see a problem with the LAN8710. But while checking the
+> Linux source code, I saw commit
+> 57ec5a8735dc5dccd1ee68afdb1114956a3fce0d which re-introduced the reset
+> handling :-/
 
-The current implementation uses a linear list to find queued packets by
-ID when processing verdicts from userspace. With large queue depths and
-out-of-order verdicting, this O(n) lookup becomes a significant
-bottleneck, causing userspace verdict processing to dominate CPU time.
+So now we get to the bottom of it. This is a regression, right? The
+addition of that patch has caused previously working boards to stop
+working, correct?
 
-Replace the linear search with a hash table for O(1) average-case
-packet lookup by ID. A global rhashtable spanning all network
-namespaces attributes hash bucket memory to kernel but is subject to
-fixed upper bound.
+That means it needs to be reverted.
 
-Signed-off-by: Scott Mitchell <scott.k.mitch1@gmail.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/net/netfilter/nf_queue.h |   3 +
- net/netfilter/nfnetlink_queue.c  | 146 ++++++++++++++++++++++++-------
- 2 files changed, 119 insertions(+), 30 deletions(-)
+We also need to get out of our heads the idea that LAN8710A is somehow
+special in needing this. It isn't. Thus, there should be no special
+flags to "work around" this "problem".
 
-diff --git a/include/net/netfilter/nf_queue.h b/include/net/netfilter/nf_queue.h
-index 4aeffddb7586..e6803831d6af 100644
---- a/include/net/netfilter/nf_queue.h
-+++ b/include/net/netfilter/nf_queue.h
-@@ -6,11 +6,13 @@
- #include <linux/ipv6.h>
- #include <linux/jhash.h>
- #include <linux/netfilter.h>
-+#include <linux/rhashtable-types.h>
- #include <linux/skbuff.h>
- 
- /* Each queued (to userspace) skbuff has one of these. */
- struct nf_queue_entry {
- 	struct list_head	list;
-+	struct rhash_head	hash_node;
- 	struct sk_buff		*skb;
- 	unsigned int		id;
- 	unsigned int		hook_index;	/* index in hook_entries->hook[] */
-@@ -20,6 +22,7 @@ struct nf_queue_entry {
- #endif
- 	struct nf_hook_state	state;
- 	u16			size; /* sizeof(entry) + saved route keys */
-+	u16			queue_num;
- 
- 	/* extra space to store route keys */
- };
-diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-index 8fa0807973c9..671b52c652ef 100644
---- a/net/netfilter/nfnetlink_queue.c
-+++ b/net/netfilter/nfnetlink_queue.c
-@@ -30,6 +30,8 @@
- #include <linux/netfilter/nf_conntrack_common.h>
- #include <linux/list.h>
- #include <linux/cgroup-defs.h>
-+#include <linux/rhashtable.h>
-+#include <linux/jhash.h>
- #include <net/gso.h>
- #include <net/sock.h>
- #include <net/tcp_states.h>
-@@ -47,6 +49,8 @@
- #endif
- 
- #define NFQNL_QMAX_DEFAULT 1024
-+#define NFQNL_HASH_MIN     1024
-+#define NFQNL_HASH_MAX     1048576
- 
- /* We're using struct nlattr which has 16bit nla_len. Note that nla_len
-  * includes the header length. Thus, the maximum packet length that we
-@@ -56,6 +60,26 @@
-  */
- #define NFQNL_MAX_COPY_RANGE (0xffff - NLA_HDRLEN)
- 
-+/* Composite key for packet lookup: (net, queue_num, packet_id) */
-+struct nfqnl_packet_key {
-+	possible_net_t net;
-+	u32 packet_id;
-+	u16 queue_num;
-+} __aligned(sizeof(u32));  /* jhash2 requires 32-bit alignment */
-+
-+/* Global rhashtable - one for entire system, all netns */
-+static struct rhashtable nfqnl_packet_map __read_mostly;
-+
-+/* Helper to initialize composite key */
-+static inline void nfqnl_init_key(struct nfqnl_packet_key *key,
-+				  struct net *net, u32 packet_id, u16 queue_num)
-+{
-+	memset(key, 0, sizeof(*key));
-+	write_pnet(&key->net, net);
-+	key->packet_id = packet_id;
-+	key->queue_num = queue_num;
-+}
-+
- struct nfqnl_instance {
- 	struct hlist_node hlist;		/* global list of queues */
- 	struct rcu_head rcu;
-@@ -100,6 +124,39 @@ static inline u_int8_t instance_hashfn(u_int16_t queue_num)
- 	return ((queue_num >> 8) ^ queue_num) % INSTANCE_BUCKETS;
- }
- 
-+/* Extract composite key from nf_queue_entry for hashing */
-+static u32 nfqnl_packet_obj_hashfn(const void *data, u32 len, u32 seed)
-+{
-+	const struct nf_queue_entry *entry = data;
-+	struct nfqnl_packet_key key;
-+
-+	nfqnl_init_key(&key, entry->state.net, entry->id, entry->queue_num);
-+
-+	return jhash2((u32 *)&key, sizeof(key) / sizeof(u32), seed);
-+}
-+
-+/* Compare stack-allocated key against entry */
-+static int nfqnl_packet_obj_cmpfn(struct rhashtable_compare_arg *arg,
-+				  const void *obj)
-+{
-+	const struct nfqnl_packet_key *key = arg->key;
-+	const struct nf_queue_entry *entry = obj;
-+
-+	return !net_eq(entry->state.net, read_pnet(&key->net)) ||
-+	       entry->queue_num != key->queue_num ||
-+	       entry->id != key->packet_id;
-+}
-+
-+static const struct rhashtable_params nfqnl_rhashtable_params = {
-+	.head_offset = offsetof(struct nf_queue_entry, hash_node),
-+	.key_len = sizeof(struct nfqnl_packet_key),
-+	.obj_hashfn = nfqnl_packet_obj_hashfn,
-+	.obj_cmpfn = nfqnl_packet_obj_cmpfn,
-+	.automatic_shrinking = true,
-+	.min_size = NFQNL_HASH_MIN,
-+	.max_size = NFQNL_HASH_MAX,
-+};
-+
- static struct nfqnl_instance *
- instance_lookup(struct nfnl_queue_net *q, u_int16_t queue_num)
- {
-@@ -188,33 +245,45 @@ instance_destroy(struct nfnl_queue_net *q, struct nfqnl_instance *inst)
- 	spin_unlock(&q->instances_lock);
- }
- 
--static inline void
-+static int
- __enqueue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
- {
--       list_add_tail(&entry->list, &queue->queue_list);
--       queue->queue_total++;
-+	int err;
-+
-+	entry->queue_num = queue->queue_num;
-+
-+	err = rhashtable_insert_fast(&nfqnl_packet_map, &entry->hash_node,
-+				     nfqnl_rhashtable_params);
-+	if (unlikely(err))
-+		return err;
-+
-+	list_add_tail(&entry->list, &queue->queue_list);
-+	queue->queue_total++;
-+
-+	return 0;
- }
- 
- static void
- __dequeue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
- {
-+	rhashtable_remove_fast(&nfqnl_packet_map, &entry->hash_node,
-+			       nfqnl_rhashtable_params);
- 	list_del(&entry->list);
- 	queue->queue_total--;
- }
- 
- static struct nf_queue_entry *
--find_dequeue_entry(struct nfqnl_instance *queue, unsigned int id)
-+find_dequeue_entry(struct nfqnl_instance *queue, unsigned int id,
-+		   struct net *net)
- {
--	struct nf_queue_entry *entry = NULL, *i;
-+	struct nfqnl_packet_key key;
-+	struct nf_queue_entry *entry;
- 
--	spin_lock_bh(&queue->lock);
-+	nfqnl_init_key(&key, net, id, queue->queue_num);
- 
--	list_for_each_entry(i, &queue->queue_list, list) {
--		if (i->id == id) {
--			entry = i;
--			break;
--		}
--	}
-+	spin_lock_bh(&queue->lock);
-+	entry = rhashtable_lookup_fast(&nfqnl_packet_map, &key,
-+				       nfqnl_rhashtable_params);
- 
- 	if (entry)
- 		__dequeue_entry(queue, entry);
-@@ -404,8 +473,7 @@ nfqnl_flush(struct nfqnl_instance *queue, nfqnl_cmpfn cmpfn, unsigned long data)
- 	spin_lock_bh(&queue->lock);
- 	list_for_each_entry_safe(entry, next, &queue->queue_list, list) {
- 		if (!cmpfn || cmpfn(entry, data)) {
--			list_del(&entry->list);
--			queue->queue_total--;
-+			__dequeue_entry(queue, entry);
- 			nfqnl_reinject(entry, NF_DROP);
- 		}
- 	}
-@@ -885,23 +953,23 @@ __nfqnl_enqueue_packet(struct net *net, struct nfqnl_instance *queue,
- 	if (nf_ct_drop_unconfirmed(entry))
- 		goto err_out_free_nskb;
- 
--	if (queue->queue_total >= queue->queue_maxlen) {
--		if (queue->flags & NFQA_CFG_F_FAIL_OPEN) {
--			failopen = 1;
--			err = 0;
--		} else {
--			queue->queue_dropped++;
--			net_warn_ratelimited("nf_queue: full at %d entries, dropping packets(s)\n",
--					     queue->queue_total);
--		}
--		goto err_out_free_nskb;
--	}
-+	if (queue->queue_total >= queue->queue_maxlen)
-+		goto err_out_queue_drop;
-+
- 	entry->id = ++queue->id_sequence;
- 	*packet_id_ptr = htonl(entry->id);
- 
-+	/* Insert into hash BEFORE unicast. If failure don't send to userspace. */
-+	err = __enqueue_entry(queue, entry);
-+	if (unlikely(err))
-+		goto err_out_queue_drop;
-+
- 	/* nfnetlink_unicast will either free the nskb or add it to a socket */
- 	err = nfnetlink_unicast(nskb, net, queue->peer_portid);
- 	if (err < 0) {
-+		/* Unicast failed - remove entry we just inserted */
-+		__dequeue_entry(queue, entry);
-+
- 		if (queue->flags & NFQA_CFG_F_FAIL_OPEN) {
- 			failopen = 1;
- 			err = 0;
-@@ -911,11 +979,22 @@ __nfqnl_enqueue_packet(struct net *net, struct nfqnl_instance *queue,
- 		goto err_out_unlock;
- 	}
- 
--	__enqueue_entry(queue, entry);
--
- 	spin_unlock_bh(&queue->lock);
- 	return 0;
- 
-+err_out_queue_drop:
-+	if (queue->flags & NFQA_CFG_F_FAIL_OPEN) {
-+		failopen = 1;
-+		err = 0;
-+	} else {
-+		queue->queue_dropped++;
-+
-+		if (queue->queue_total >= queue->queue_maxlen)
-+			net_warn_ratelimited("nf_queue: full at %d entries, dropping packets(s)\n",
-+					     queue->queue_total);
-+		else
-+			net_warn_ratelimited("nf_queue: hash insert failed: %d\n", err);
-+	}
- err_out_free_nskb:
- 	kfree_skb(nskb);
- err_out_unlock:
-@@ -1427,7 +1506,7 @@ static int nfqnl_recv_verdict(struct sk_buff *skb, const struct nfnl_info *info,
- 
- 	verdict = ntohl(vhdr->verdict);
- 
--	entry = find_dequeue_entry(queue, ntohl(vhdr->id));
-+	entry = find_dequeue_entry(queue, ntohl(vhdr->id), info->net);
- 	if (entry == NULL)
- 		return -ENOENT;
- 
-@@ -1774,10 +1853,14 @@ static int __init nfnetlink_queue_init(void)
- {
- 	int status;
- 
-+	status = rhashtable_init(&nfqnl_packet_map, &nfqnl_rhashtable_params);
-+	if (status < 0)
-+		return status;
-+
- 	status = register_pernet_subsys(&nfnl_queue_net_ops);
- 	if (status < 0) {
- 		pr_err("failed to register pernet ops\n");
--		goto out;
-+		goto cleanup_rhashtable;
- 	}
- 
- 	netlink_register_notifier(&nfqnl_rtnl_notifier);
-@@ -1802,7 +1885,8 @@ static int __init nfnetlink_queue_init(void)
- cleanup_netlink_notifier:
- 	netlink_unregister_notifier(&nfqnl_rtnl_notifier);
- 	unregister_pernet_subsys(&nfnl_queue_net_ops);
--out:
-+cleanup_rhashtable:
-+	rhashtable_destroy(&nfqnl_packet_map);
- 	return status;
- }
- 
-@@ -1814,6 +1898,8 @@ static void __exit nfnetlink_queue_fini(void)
- 	netlink_unregister_notifier(&nfqnl_rtnl_notifier);
- 	unregister_pernet_subsys(&nfnl_queue_net_ops);
- 
-+	rhashtable_destroy(&nfqnl_packet_map);
-+
- 	rcu_barrier(); /* Wait for completion of call_rcu()'s */
- }
- 
 -- 
-2.52.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
