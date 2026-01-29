@@ -1,82 +1,84 @@
-Return-Path: <netdev+bounces-254868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKN+I9iWe2nOGAIAu9opvQ
-	(envelope-from <netdev+bounces-254868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:20:24 +0100
+	id APEuAyaXe2nOGAIAu9opvQ
+	(envelope-from <netdev+bounces-254869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:21:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDBEAB2C2C
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:20:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D90BB2C62
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:21:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A0A130125E8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:18:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D6803031CF0
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948A53382CA;
-	Thu, 29 Jan 2026 17:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3493344033;
+	Thu, 29 Jan 2026 17:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0joNbhq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uu0DgLFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5256A2D948A
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 17:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE028DC4
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 17:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769707102; cv=none; b=ox/UpNoMUTvP8hgUZziA9GC2dN92vjGR/2Aa3CAiiEWwK96EWL6Kdy68HzGLpx5rsmKXxyy0P4/LI86BhFuvuyMgaqgo2585H2oyDgGdI7KMZbxesXAbWlZyOdDBhDu9gNm9LHhlGsVYBtQJFZwrA8t4tPatZDGn8UHeP+D5Wek=
+	t=1769707175; cv=none; b=uP9c/z+iYq+tRQWu7qyvn/vm+86sxXxgtYFptLJ7ckXZVMBiqf1VI+mvXs01CM+bC4h34bDq+hR34Sx0MxyrZNZ0tfzokOrWQIefai/twwF5n0tv9lcaWTs9KXMrQg9tHVoRplwdGcCMUNBG1T97UB6MGhHnDZw80HUlwxsTbT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769707102; c=relaxed/simple;
-	bh=554pWWQlQUlqHeVmXAilXixOBW+TR4XeL/cKhqnajuI=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=NJnoWXDD5RyoCx+STQMPMV1Vi+M0/Z9IpQbfFqrxC0UbQ7PhOVVlIp7KiXdAYmVEXrQEHX4XtIS6msfnnJ9AdjqfqYeJ2GhVa9fBYCURGhZ0xmJxQMBFhZ5gDqFdFoKwDsQxUD2lqcWw9ZxUV3mGwpegl9FKgyvV+gKtCI36Mjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0joNbhq; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1769707175; c=relaxed/simple;
+	bh=JAWrFU7vHqS6oBoH7J6k7PgYZoNDXNbj0FUCj9SWlOQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pO3QtAq61C62QyaHLV8CQEHXgZFK1OdoPJYNVh+JOKLfL73iwcYrG6FsnP4+q4RuEDK06UjBfYO1KlxpMCNfsssJETw4kwOG9r8ys7zcCOARYK9yXKIZjY2I57VVrTMGwq4rxTPqzoBAbsXKvAfYEo65o3sv10RkXpG1NBktfhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uu0DgLFu; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4806f9e61f9so6791365e9.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 09:18:20 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-432d2c96215so1089511f8f.3
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 09:19:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769707099; x=1770311899; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P947yepk6pUF5VyzqiHdBuUEvIXyMAxqe9Rqeqp2Ilg=;
-        b=A0joNbhqvu5Gorcyv76mrHw+utxgwLmWSFZkrSF3Ok2D5eEDP2Vd9P8JjxNHme07hn
-         XM7HvWOMCNd+6SdrGafBMvAT6ocUzygxp+ifUHeFJ8WUWvkT3ePqYcAfuS/r5rO1a08c
-         5SuxCOMp5CNrGts6EWl4GDuA+GJ5MHXkm9N5bq/cBiRf6iw3Ght0Nn8BdEf7V43U/iLt
-         mV0bP7DZAK085y41CzZXhBQ+XvvLP6Ei3L+9e0unx8wBFpvfk/H6RkpeNQXx/kOOLl09
-         7k7vA/BDokRD/oiBSJLVkS6cU/X7Fwb45XlfYymDChtuzYpl48tvcOT4dhnSG0s4ceV/
-         x7+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769707099; x=1770311899;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+        d=gmail.com; s=20230601; t=1769707173; x=1770311973; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=P947yepk6pUF5VyzqiHdBuUEvIXyMAxqe9Rqeqp2Ilg=;
-        b=E43zzsOS6/mVjyO/RB9iOq6UAyLKoQpLuCIaUHC4PMC++TJb/b0pKJ6To7y5+OXv+4
-         eRH/m6MVHzQocSygUMRHLXLYEIE1dQa+nJ7in9IjM8TWUTuJPnunN/qhJ87rgB0KzBbO
-         ReHI1Pz0cdzQGCpkCztTGP07pT8sONkzNhRIWeQX1lTt16Zx9VL8Se+/DM9zVk8/K13x
-         pz9DXo+EOtHgZ2sRRrrbaZL9/vMjFejqOWfYieInNwni83MQ0DjobGiUHs3RcEDehmOr
-         hO1iRDPArELTszN7RU+xwBS8OJtMt89S1xhAQGNvGseFO6919uh+WINeoFGDiUSOFof1
-         JkCw==
-X-Gm-Message-State: AOJu0YyZd+oiQaXjXVs080r7GZocHZD4+q6ZjVw40R9emsgLQNYrD0Qm
-	3cW2GgKD5marO/QzlXrJ+3VoARuZ6DXrwLXv2DR2j/IpVDk0zU95xy4G
-X-Gm-Gg: AZuq6aIKK+WmjPFnnYHQaRr8bucxMbASBY3vOqfc+Vn6FQILbvRXyKowvnKcA6pwo7V
-	/+va4TtmsYfo+U4cL17De3vf69JfMvPPOQi/xJfeRmeD20D4/qvT9jF+adQA7fEjE0LHiSHO1b8
-	83j6nmQFQKcxyJTMVMWMhEYusUPag0SlqGHrHCfOTg+XEhvSnbKWGK3kV715ElPo1ppgtHQpDcJ
-	vRBVPkCbFCaAJ9PJwQZSBmrgWHIMMplA9/MewojB1U0D7TfVt/d6hfpOYJpzMidbntuX8nb+D0O
-	aAmdZemF9nE3HLVPzQVl/5LN9yHUpsudJrsROnk5XdzlARK94LslqO4PqioDtrTDc65L3Y1V1qz
-	cRyuDnYYbOnY8r3YlYBIXw4zAvkUDOWtjQ1NJbHNluD7ON0RVqtgwOovsoVNdPWvfAuQqSj1a0U
-	OLJuOrTQ/aqhkB6Fpj8wqiJxQc0Z5YYV9AgKGXWg4t1zUIQXP+IH80U35HftgCPpt3jCS9tog9w
-	CNeVaUG2LvW4Xg53pP+U5rx++eg+1Bo8F0tnU8fZvYMrnFZgrBx1OWI3EzqgaxB
-X-Received: by 2002:a05:600c:4fc4:b0:480:3338:292d with SMTP id 5b1f17b1804b1-48069c8b7demr138128205e9.31.1769707098257;
-        Thu, 29 Jan 2026 09:18:18 -0800 (PST)
+        bh=lQAHoAe72kF+hFvj2sT6lTtKxgEAzGcjolt58+bwc44=;
+        b=Uu0DgLFuloSW0afu3SYefZxdSDxKoLKkDYO8YXY6K7OuxDzjhQnNk+WpGERogX5EXw
+         XNqF+Cfouq65DAMRhhLNWpEgXTgRrI1ZEzjSWMw3QhSyQZIagt4J91yMAyBWpk8g/7nN
+         mGcz2uZp3E9omXXqD3LpCO2J5k8eqxRq7PG6+5WERMfQZJcgeChZcaOckXUsv9yeBy8j
+         7RKRe3BZoqquQMOCINugMS3CFCmtVJyU3mjXVunDNWCqvkTDMbL5th7Vj4AVgoWU0ILy
+         nhbA1R71IMgCJqV8ISsF+0Y5NgVA5jeWtrIebHhvZMuKH/EDUV+Ua8rFJhLQZRjFTiLz
+         B1GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769707173; x=1770311973;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lQAHoAe72kF+hFvj2sT6lTtKxgEAzGcjolt58+bwc44=;
+        b=dgzZ5Nv1FV9PpWBEaZITgYbLnv/y82QOtVYlPd2pGvbZ/KbvBUoFZfCQ/WKraL8X0i
+         apWQf8NBWrtOggTb9+k1NVnQqfLIRpNBzZXndaqsO29HzwsSWU2YtIAvjgrUA3s1oLpL
+         YNDPg6mRW3x9WlOHZydFOQNf8H4tXuhUrLv66zydjVnRDnygBbCTOB/UYbGNr1BkJiWp
+         k+PEuJ9XC/yfvnIkP2C+k07130vQjfdpYP36QFifKBXczM142wcwK4//kjJMRyDccGjY
+         YNavwqMfVQVStvACBADSs7H7DN36BrDUB2BBG23nLSdrC2JhORN6IKu4huZNPFnQ/2oI
+         Ihgg==
+X-Gm-Message-State: AOJu0YzLagPcTbDX9xSXN55QrQFYTUydJj5QL2Q0y1p3MexhKeQf+PRh
+	4F+M2hV5aeDBI9WdU4utW5KNETk6l/NYHU1z+QeJCIsyDZZraDw6bH3R
+X-Gm-Gg: AZuq6aJ9g41ctGXGG8/e7d0ntOfy5L2icnUL/QnZKoybVRIE/Tx6C7hUvo1EUVnH23K
+	S1iMwToSbI+nYIqkUhpDjrYjxboJ0VRqxce5VPY0whVu9ihKoCdT59kQN+lRI9GUuCukYMVMA4B
+	UguZBzJCz/IWCbMYtcs+DHJj50/5fzDWY3mesAIX0KZEKm16BWLrWjdDMwUg+tcLPYPA4+hkJ7N
+	5eZUs5Yh6vS4wG4s7hvC023NcGVAcZt7ApM4mln7sGO7Eo32U0w6WvAa7HhStaqahTUiE2kBZLb
+	rSWP/C1cOR7/sElGmL0UJExjbOaaVFtUqzwoTcBS0jJn0utq/AvXomJdlKg3M/ebgNWIKAG4AeV
+	TeUIyUB6WHGErIDxUasbnLeC9goJn9FBXeIIBArAivs6sVMYmiK5yQ7E9NgTWbE9GDZmXzcMSd1
+	fWZi+3mtZxScWCTd4S6282EMsAmCEc8KBZEwKwk1xfaCoGzZU35/4eVYwB5c00hAUDNYi5Nyg9K
+	b/L5SgrMiDA2sLhCSnPEiZwDgRiTKlJ5Us27gqdjFGW014qIKSTeET43K84RSo4
+X-Received: by 2002:a05:6000:1a8d:b0:42b:41d3:daf1 with SMTP id ffacd0b85a97d-435f3aaa61fmr500999f8f.38.1769707172458;
+        Thu, 29 Jan 2026 09:19:32 -0800 (PST)
 Received: from ?IPV6:2003:ea:8f0b:f500:2d0a:8724:17dc:1df1? (p200300ea8f0bf5002d0a872417dc1df1.dip0.t-ipconnect.de. [2003:ea:8f0b:f500:2d0a:8724:17dc:1df1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-481a5dc81dcsm1283395e9.11.2026.01.29.09.18.16
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10edfccsm15077189f8f.17.2026.01.29.09.19.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jan 2026 09:18:17 -0800 (PST)
-Message-ID: <7b2b53b6-d230-47bb-98d9-b7acfbfdd8ca@gmail.com>
-Date: Thu, 29 Jan 2026 18:18:15 +0100
+        Thu, 29 Jan 2026 09:19:31 -0800 (PST)
+Message-ID: <489999a0-b99d-4b72-976f-4f646f01be08@gmail.com>
+Date: Thu, 29 Jan 2026 18:19:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,882 +86,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: Status of orphaned ltq_etop ethernet driver: mainline vs. OpenWRT
+To: Hauke Mehrtens <hauke@hauke-m.de>, John Crispin <john@phrozen.org>,
+ Daniel Golle <daniel@makrotopia.org>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ OpenWrt Development List <openwrt-devel@lists.openwrt.org>
+References: <43dff7cf-cb00-4480-8856-501a8313951e@gmail.com>
+ <d80fef86-ba14-4bd4-bce5-4d61a75d591b@hauke-m.de>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: lantiq_etop: remove driver
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Hauke Mehrtens <hauke@hauke-m.de>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
- Daniel Golle <daniel@makrotopia.org>
+In-Reply-To: <d80fef86-ba14-4bd4-bce5-4d61a75d591b@hauke-m.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-254868-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254869-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,phrozen.org:email]
-X-Rspamd-Queue-Id: EDBEAB2C2C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6D90BB2C62
 X-Rspamd-Action: no action
 
-This driver in mainline lost its in-tree user with commit cd93b4895ea5
-("MIPS: lantiq: drop mips_machine support") in 2012. Since then it has
-had no in-tree user. Only user seems to be OpenWRT, with several changes
-to the in-tree driver version:
-target/linux/lantiq/patches-6.12/035-owrt-lantiq-wifi-and-ethernet-eeprom-handling.patch
-target/linux/lantiq/patches-6.12/028-NET-lantiq-various-etop-fixes.patch
-target/linux/lantiq/patches-6.12/701-NET-lantiq-etop-of-mido.patch
-So it seems the driver is maintained in OpenWrt only, except tree-wide
-in-tree changes. According to OpenWRT maintainers it would be ok to
-remove the driver in mainline and keep it downstream only (see linked
-conversation).
+On 1/29/2026 1:04 AM, Hauke Mehrtens wrote:
+> On 1/28/26 21:23, Heiner Kallweit wrote:
+>> This driver in mainline lost its in-tree user with commit
+>> cd93b4895ea5 ("MIPS: lantiq: drop mips_machine support")
+>> in 2012. Since then it has had no in-tree user.
+>>
+>> Only (?) user seems to be OpenWRT, with several changes to
+>> the in-tree driver version:
+>> target/linux/lantiq/patches-6.12/035-owrt-lantiq-wifi-and-ethernet-eeprom-handling.patch
+>> target/linux/lantiq/patches-6.12/028-NET-lantiq-various-etop-fixes.patch
+>> target/linux/lantiq/patches-6.12/701-NET-lantiq-etop-of-mido.patch
+>> So it seems the driver is maintained in OpenWrt only
+>> (except tree-wide in-tree changes).
+>>
+>> To me this leaves two questions:
+>> - Move this driver to OpenWRT completely?
+>> - Or mainline all downstream changes, maintain driver in
+>>    mainline, and mainline also the users of this driver?
+>>
+> 
+> Hi,
+> 
+> I think dropping this from the mainline kernel is fine, if it causes efforts for you.
+> This is the Ethernet of the Lantiq Danube SoC, the SoC is probably EoL since 15 years. I assume that all users either use the vendor SDK with Linux 2.6.X or OpenWrt.
+> 
+> I will not spend much effort on this driver and others will probably also not spend much effort. We can move it completely into OpenWrt and keep it running there.
+> 
+Great, thanks for the prompt reply. Then I'll submit a patch for
+removing this driver from mainline.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-Link: https://lore.kernel.org/netdev/d80fef86-ba14-4bd4-bce5-4d61a75d591b@hauke-m.de/T/#t
----
- .../include/asm/mach-lantiq/lantiq_platform.h |  18 -
- drivers/net/ethernet/Kconfig                  |   6 -
- drivers/net/ethernet/Makefile                 |   1 -
- drivers/net/ethernet/lantiq_etop.c            | 745 ------------------
- 4 files changed, 770 deletions(-)
- delete mode 100644 arch/mips/include/asm/mach-lantiq/lantiq_platform.h
- delete mode 100644 drivers/net/ethernet/lantiq_etop.c
+> Hauke
 
-diff --git a/arch/mips/include/asm/mach-lantiq/lantiq_platform.h b/arch/mips/include/asm/mach-lantiq/lantiq_platform.h
-deleted file mode 100644
-index 70ebb4d6f05..00000000000
---- a/arch/mips/include/asm/mach-lantiq/lantiq_platform.h
-+++ /dev/null
-@@ -1,18 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- *
-- *  Copyright (C) 2010 John Crispin <john@phrozen.org>
-- */
--
--#ifndef _LANTIQ_PLATFORM_H__
--#define _LANTIQ_PLATFORM_H__
--
--#include <linux/socket.h>
--
--/* struct used to pass info to network drivers */
--struct ltq_eth_data {
--	struct sockaddr mac;
--	int mii_mode;
--};
--
--#endif
-diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-index aa7103e7f47..9775fd401b0 100644
---- a/drivers/net/ethernet/Kconfig
-+++ b/drivers/net/ethernet/Kconfig
-@@ -93,12 +93,6 @@ config KORINA
- 	  If you have a Mikrotik RouterBoard 500 or IDT RC32434
- 	  based system say Y. Otherwise say N.
- 
--config LANTIQ_ETOP
--	tristate "Lantiq SoC ETOP driver"
--	depends on SOC_TYPE_XWAY
--	help
--	  Support for the MII0 inside the Lantiq SoC
--
- config LANTIQ_XRX200
- 	tristate "Lantiq / Intel xRX200 PMAC network driver"
- 	depends on SOC_TYPE_XWAY
-diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
-index 6615a67a63d..743ec1b7e5f 100644
---- a/drivers/net/ethernet/Makefile
-+++ b/drivers/net/ethernet/Makefile
-@@ -53,7 +53,6 @@ obj-$(CONFIG_NET_VENDOR_MICROSOFT) += microsoft/
- obj-$(CONFIG_NET_VENDOR_XSCALE) += xscale/
- obj-$(CONFIG_JME) += jme.o
- obj-$(CONFIG_KORINA) += korina.o
--obj-$(CONFIG_LANTIQ_ETOP) += lantiq_etop.o
- obj-$(CONFIG_LANTIQ_XRX200) += lantiq_xrx200.o
- obj-$(CONFIG_NET_VENDOR_LITEX) += litex/
- obj-$(CONFIG_NET_VENDOR_MARVELL) += marvell/
-diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/lantiq_etop.c
-deleted file mode 100644
-index 83ce3bfefa5..00000000000
---- a/drivers/net/ethernet/lantiq_etop.c
-+++ /dev/null
-@@ -1,745 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- *
-- *   Copyright (C) 2011 John Crispin <blogic@openwrt.org>
-- */
--
--#include <linux/kernel.h>
--#include <linux/slab.h>
--#include <linux/errno.h>
--#include <linux/types.h>
--#include <linux/interrupt.h>
--#include <linux/uaccess.h>
--#include <linux/in.h>
--#include <linux/netdevice.h>
--#include <linux/etherdevice.h>
--#include <linux/phy.h>
--#include <linux/ip.h>
--#include <linux/tcp.h>
--#include <linux/skbuff.h>
--#include <linux/mm.h>
--#include <linux/platform_device.h>
--#include <linux/ethtool.h>
--#include <linux/init.h>
--#include <linux/delay.h>
--#include <linux/io.h>
--#include <linux/dma-mapping.h>
--#include <linux/module.h>
--#include <linux/property.h>
--
--#include <asm/checksum.h>
--
--#include <lantiq_soc.h>
--#include <xway_dma.h>
--#include <lantiq_platform.h>
--
--#define LTQ_ETOP_MDIO		0x11804
--#define MDIO_REQUEST		0x80000000
--#define MDIO_READ		0x40000000
--#define MDIO_ADDR_MASK		0x1f
--#define MDIO_ADDR_OFFSET	0x15
--#define MDIO_REG_MASK		0x1f
--#define MDIO_REG_OFFSET		0x10
--#define MDIO_VAL_MASK		0xffff
--
--#define PPE32_CGEN		0x800
--#define LQ_PPE32_ENET_MAC_CFG	0x1840
--
--#define LTQ_ETOP_ENETS0		0x11850
--#define LTQ_ETOP_MAC_DA0	0x1186C
--#define LTQ_ETOP_MAC_DA1	0x11870
--#define LTQ_ETOP_CFG		0x16020
--#define LTQ_ETOP_IGPLEN		0x16080
--
--#define MAX_DMA_CHAN		0x8
--#define MAX_DMA_CRC_LEN		0x4
--#define MAX_DMA_DATA_LEN	0x600
--
--#define ETOP_FTCU		BIT(28)
--#define ETOP_MII_MASK		0xf
--#define ETOP_MII_NORMAL		0xd
--#define ETOP_MII_REVERSE	0xe
--#define ETOP_PLEN_UNDER		0x40
--#define ETOP_CGEN		0x800
--
--/* use 2 static channels for TX/RX */
--#define LTQ_ETOP_TX_CHANNEL	1
--#define LTQ_ETOP_RX_CHANNEL	6
--#define IS_TX(x)		((x) == LTQ_ETOP_TX_CHANNEL)
--#define IS_RX(x)		((x) == LTQ_ETOP_RX_CHANNEL)
--
--#define ltq_etop_r32(x)		ltq_r32(ltq_etop_membase + (x))
--#define ltq_etop_w32(x, y)	ltq_w32(x, ltq_etop_membase + (y))
--#define ltq_etop_w32_mask(x, y, z)	\
--		ltq_w32_mask(x, y, ltq_etop_membase + (z))
--
--#define DRV_VERSION	"1.0"
--
--static void __iomem *ltq_etop_membase;
--
--struct ltq_etop_chan {
--	int idx;
--	int tx_free;
--	struct net_device *netdev;
--	struct napi_struct napi;
--	struct ltq_dma_channel dma;
--	struct sk_buff *skb[LTQ_DESC_NUM];
--};
--
--struct ltq_etop_priv {
--	struct net_device *netdev;
--	struct platform_device *pdev;
--	struct ltq_eth_data *pldata;
--
--	struct mii_bus *mii_bus;
--
--	struct ltq_etop_chan ch[MAX_DMA_CHAN];
--
--	int tx_burst_len;
--	int rx_burst_len;
--
--	spinlock_t lock;
--};
--
--static int
--ltq_etop_alloc_skb(struct ltq_etop_chan *ch)
--{
--	struct ltq_etop_priv *priv = netdev_priv(ch->netdev);
--
--	ch->skb[ch->dma.desc] = netdev_alloc_skb(ch->netdev, MAX_DMA_DATA_LEN);
--	if (!ch->skb[ch->dma.desc])
--		return -ENOMEM;
--	ch->dma.desc_base[ch->dma.desc].addr =
--		dma_map_single(&priv->pdev->dev, ch->skb[ch->dma.desc]->data,
--			       MAX_DMA_DATA_LEN, DMA_FROM_DEVICE);
--	ch->dma.desc_base[ch->dma.desc].addr =
--		CPHYSADDR(ch->skb[ch->dma.desc]->data);
--	ch->dma.desc_base[ch->dma.desc].ctl =
--		LTQ_DMA_OWN | LTQ_DMA_RX_OFFSET(NET_IP_ALIGN) |
--		MAX_DMA_DATA_LEN;
--	skb_reserve(ch->skb[ch->dma.desc], NET_IP_ALIGN);
--	return 0;
--}
--
--static void
--ltq_etop_hw_receive(struct ltq_etop_chan *ch)
--{
--	struct ltq_etop_priv *priv = netdev_priv(ch->netdev);
--	struct ltq_dma_desc *desc = &ch->dma.desc_base[ch->dma.desc];
--	struct sk_buff *skb = ch->skb[ch->dma.desc];
--	int len = (desc->ctl & LTQ_DMA_SIZE_MASK) - MAX_DMA_CRC_LEN;
--	unsigned long flags;
--
--	spin_lock_irqsave(&priv->lock, flags);
--	if (ltq_etop_alloc_skb(ch)) {
--		netdev_err(ch->netdev,
--			   "failed to allocate new rx buffer, stopping DMA\n");
--		ltq_dma_close(&ch->dma);
--	}
--	ch->dma.desc++;
--	ch->dma.desc %= LTQ_DESC_NUM;
--	spin_unlock_irqrestore(&priv->lock, flags);
--
--	skb_put(skb, len);
--	skb->protocol = eth_type_trans(skb, ch->netdev);
--	netif_receive_skb(skb);
--}
--
--static int
--ltq_etop_poll_rx(struct napi_struct *napi, int budget)
--{
--	struct ltq_etop_chan *ch = container_of(napi,
--				struct ltq_etop_chan, napi);
--	int work_done = 0;
--
--	while (work_done < budget) {
--		struct ltq_dma_desc *desc = &ch->dma.desc_base[ch->dma.desc];
--
--		if ((desc->ctl & (LTQ_DMA_OWN | LTQ_DMA_C)) != LTQ_DMA_C)
--			break;
--		ltq_etop_hw_receive(ch);
--		work_done++;
--	}
--	if (work_done < budget) {
--		napi_complete_done(&ch->napi, work_done);
--		ltq_dma_ack_irq(&ch->dma);
--	}
--	return work_done;
--}
--
--static int
--ltq_etop_poll_tx(struct napi_struct *napi, int budget)
--{
--	struct ltq_etop_chan *ch =
--		container_of(napi, struct ltq_etop_chan, napi);
--	struct ltq_etop_priv *priv = netdev_priv(ch->netdev);
--	struct netdev_queue *txq =
--		netdev_get_tx_queue(ch->netdev, ch->idx >> 1);
--	unsigned long flags;
--
--	spin_lock_irqsave(&priv->lock, flags);
--	while ((ch->dma.desc_base[ch->tx_free].ctl &
--			(LTQ_DMA_OWN | LTQ_DMA_C)) == LTQ_DMA_C) {
--		dev_kfree_skb_any(ch->skb[ch->tx_free]);
--		ch->skb[ch->tx_free] = NULL;
--		memset(&ch->dma.desc_base[ch->tx_free], 0,
--		       sizeof(struct ltq_dma_desc));
--		ch->tx_free++;
--		ch->tx_free %= LTQ_DESC_NUM;
--	}
--	spin_unlock_irqrestore(&priv->lock, flags);
--
--	if (netif_tx_queue_stopped(txq))
--		netif_tx_start_queue(txq);
--	napi_complete(&ch->napi);
--	ltq_dma_ack_irq(&ch->dma);
--	return 1;
--}
--
--static irqreturn_t
--ltq_etop_dma_irq(int irq, void *_priv)
--{
--	struct ltq_etop_priv *priv = _priv;
--	int ch = irq - LTQ_DMA_CH0_INT;
--
--	napi_schedule(&priv->ch[ch].napi);
--	return IRQ_HANDLED;
--}
--
--static void
--ltq_etop_free_channel(struct net_device *dev, struct ltq_etop_chan *ch)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--
--	ltq_dma_free(&ch->dma);
--	if (ch->dma.irq)
--		free_irq(ch->dma.irq, priv);
--	if (IS_RX(ch->idx)) {
--		struct ltq_dma_channel *dma = &ch->dma;
--
--		for (dma->desc = 0; dma->desc < LTQ_DESC_NUM; dma->desc++)
--			dev_kfree_skb_any(ch->skb[ch->dma.desc]);
--	}
--}
--
--static void
--ltq_etop_hw_exit(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	int i;
--
--	ltq_pmu_disable(PMU_PPE);
--	for (i = 0; i < MAX_DMA_CHAN; i++)
--		if (IS_TX(i) || IS_RX(i))
--			ltq_etop_free_channel(dev, &priv->ch[i]);
--}
--
--static int
--ltq_etop_hw_init(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	int i;
--	int err;
--
--	ltq_pmu_enable(PMU_PPE);
--
--	switch (priv->pldata->mii_mode) {
--	case PHY_INTERFACE_MODE_RMII:
--		ltq_etop_w32_mask(ETOP_MII_MASK, ETOP_MII_REVERSE,
--				  LTQ_ETOP_CFG);
--		break;
--
--	case PHY_INTERFACE_MODE_MII:
--		ltq_etop_w32_mask(ETOP_MII_MASK, ETOP_MII_NORMAL,
--				  LTQ_ETOP_CFG);
--		break;
--
--	default:
--		netdev_err(dev, "unknown mii mode %d\n",
--			   priv->pldata->mii_mode);
--		return -ENOTSUPP;
--	}
--
--	/* enable crc generation */
--	ltq_etop_w32(PPE32_CGEN, LQ_PPE32_ENET_MAC_CFG);
--
--	ltq_dma_init_port(DMA_PORT_ETOP, priv->tx_burst_len, priv->rx_burst_len);
--
--	for (i = 0; i < MAX_DMA_CHAN; i++) {
--		int irq = LTQ_DMA_CH0_INT + i;
--		struct ltq_etop_chan *ch = &priv->ch[i];
--
--		ch->dma.nr = i;
--		ch->idx = ch->dma.nr;
--		ch->dma.dev = &priv->pdev->dev;
--
--		if (IS_TX(i)) {
--			ltq_dma_alloc_tx(&ch->dma);
--			err = request_irq(irq, ltq_etop_dma_irq, 0, "etop_tx", priv);
--			if (err) {
--				netdev_err(dev,
--					   "Unable to get Tx DMA IRQ %d\n",
--					   irq);
--				return err;
--			}
--		} else if (IS_RX(i)) {
--			ltq_dma_alloc_rx(&ch->dma);
--			for (ch->dma.desc = 0; ch->dma.desc < LTQ_DESC_NUM;
--					ch->dma.desc++)
--				if (ltq_etop_alloc_skb(ch))
--					return -ENOMEM;
--			ch->dma.desc = 0;
--			err = request_irq(irq, ltq_etop_dma_irq, 0, "etop_rx", priv);
--			if (err) {
--				netdev_err(dev,
--					   "Unable to get Rx DMA IRQ %d\n",
--					   irq);
--				return err;
--			}
--		}
--		ch->dma.irq = irq;
--	}
--	return 0;
--}
--
--static void
--ltq_etop_get_drvinfo(struct net_device *dev, struct ethtool_drvinfo *info)
--{
--	strscpy(info->driver, "Lantiq ETOP", sizeof(info->driver));
--	strscpy(info->bus_info, "internal", sizeof(info->bus_info));
--	strscpy(info->version, DRV_VERSION, sizeof(info->version));
--}
--
--static const struct ethtool_ops ltq_etop_ethtool_ops = {
--	.get_drvinfo = ltq_etop_get_drvinfo,
--	.nway_reset = phy_ethtool_nway_reset,
--	.get_link_ksettings = phy_ethtool_get_link_ksettings,
--	.set_link_ksettings = phy_ethtool_set_link_ksettings,
--};
--
--static int
--ltq_etop_mdio_wr(struct mii_bus *bus, int phy_addr, int phy_reg, u16 phy_data)
--{
--	u32 val = MDIO_REQUEST |
--		((phy_addr & MDIO_ADDR_MASK) << MDIO_ADDR_OFFSET) |
--		((phy_reg & MDIO_REG_MASK) << MDIO_REG_OFFSET) |
--		phy_data;
--
--	while (ltq_etop_r32(LTQ_ETOP_MDIO) & MDIO_REQUEST)
--		;
--	ltq_etop_w32(val, LTQ_ETOP_MDIO);
--	return 0;
--}
--
--static int
--ltq_etop_mdio_rd(struct mii_bus *bus, int phy_addr, int phy_reg)
--{
--	u32 val = MDIO_REQUEST | MDIO_READ |
--		((phy_addr & MDIO_ADDR_MASK) << MDIO_ADDR_OFFSET) |
--		((phy_reg & MDIO_REG_MASK) << MDIO_REG_OFFSET);
--
--	while (ltq_etop_r32(LTQ_ETOP_MDIO) & MDIO_REQUEST)
--		;
--	ltq_etop_w32(val, LTQ_ETOP_MDIO);
--	while (ltq_etop_r32(LTQ_ETOP_MDIO) & MDIO_REQUEST)
--		;
--	val = ltq_etop_r32(LTQ_ETOP_MDIO) & MDIO_VAL_MASK;
--	return val;
--}
--
--static void
--ltq_etop_mdio_link(struct net_device *dev)
--{
--	/* nothing to do  */
--}
--
--static int
--ltq_etop_mdio_probe(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	struct phy_device *phydev;
--
--	phydev = phy_find_first(priv->mii_bus);
--
--	if (!phydev) {
--		netdev_err(dev, "no PHY found\n");
--		return -ENODEV;
--	}
--
--	phydev = phy_connect(dev, phydev_name(phydev),
--			     &ltq_etop_mdio_link, priv->pldata->mii_mode);
--
--	if (IS_ERR(phydev)) {
--		netdev_err(dev, "Could not attach to PHY\n");
--		return PTR_ERR(phydev);
--	}
--
--	phy_set_max_speed(phydev, SPEED_100);
--
--	phy_attached_info(phydev);
--
--	return 0;
--}
--
--static int
--ltq_etop_mdio_init(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	int err;
--
--	priv->mii_bus = mdiobus_alloc();
--	if (!priv->mii_bus) {
--		netdev_err(dev, "failed to allocate mii bus\n");
--		err = -ENOMEM;
--		goto err_out;
--	}
--
--	priv->mii_bus->priv = dev;
--	priv->mii_bus->read = ltq_etop_mdio_rd;
--	priv->mii_bus->write = ltq_etop_mdio_wr;
--	priv->mii_bus->name = "ltq_mii";
--	snprintf(priv->mii_bus->id, MII_BUS_ID_SIZE, "%s-%x",
--		 priv->pdev->name, priv->pdev->id);
--	if (mdiobus_register(priv->mii_bus)) {
--		err = -ENXIO;
--		goto err_out_free_mdiobus;
--	}
--
--	if (ltq_etop_mdio_probe(dev)) {
--		err = -ENXIO;
--		goto err_out_unregister_bus;
--	}
--	return 0;
--
--err_out_unregister_bus:
--	mdiobus_unregister(priv->mii_bus);
--err_out_free_mdiobus:
--	mdiobus_free(priv->mii_bus);
--err_out:
--	return err;
--}
--
--static void
--ltq_etop_mdio_cleanup(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--
--	phy_disconnect(dev->phydev);
--	mdiobus_unregister(priv->mii_bus);
--	mdiobus_free(priv->mii_bus);
--}
--
--static int
--ltq_etop_open(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	int i;
--
--	for (i = 0; i < MAX_DMA_CHAN; i++) {
--		struct ltq_etop_chan *ch = &priv->ch[i];
--
--		if (!IS_TX(i) && (!IS_RX(i)))
--			continue;
--		ltq_dma_open(&ch->dma);
--		ltq_dma_enable_irq(&ch->dma);
--		napi_enable(&ch->napi);
--	}
--	phy_start(dev->phydev);
--	netif_tx_start_all_queues(dev);
--	return 0;
--}
--
--static int
--ltq_etop_stop(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	int i;
--
--	netif_tx_stop_all_queues(dev);
--	phy_stop(dev->phydev);
--	for (i = 0; i < MAX_DMA_CHAN; i++) {
--		struct ltq_etop_chan *ch = &priv->ch[i];
--
--		if (!IS_RX(i) && !IS_TX(i))
--			continue;
--		napi_disable(&ch->napi);
--		ltq_dma_close(&ch->dma);
--	}
--	return 0;
--}
--
--static netdev_tx_t
--ltq_etop_tx(struct sk_buff *skb, struct net_device *dev)
--{
--	int queue = skb_get_queue_mapping(skb);
--	struct netdev_queue *txq = netdev_get_tx_queue(dev, queue);
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	struct ltq_etop_chan *ch = &priv->ch[(queue << 1) | 1];
--	struct ltq_dma_desc *desc = &ch->dma.desc_base[ch->dma.desc];
--	int len;
--	unsigned long flags;
--	u32 byte_offset;
--
--	if (skb_put_padto(skb, ETH_ZLEN))
--		return NETDEV_TX_OK;
--	len = skb->len;
--
--	if ((desc->ctl & (LTQ_DMA_OWN | LTQ_DMA_C)) || ch->skb[ch->dma.desc]) {
--		netdev_err(dev, "tx ring full\n");
--		netif_tx_stop_queue(txq);
--		return NETDEV_TX_BUSY;
--	}
--
--	/* dma needs to start on a burst length value aligned address */
--	byte_offset = CPHYSADDR(skb->data) % (priv->tx_burst_len * 4);
--	ch->skb[ch->dma.desc] = skb;
--
--	netif_trans_update(dev);
--
--	spin_lock_irqsave(&priv->lock, flags);
--	desc->addr = ((unsigned int)dma_map_single(&priv->pdev->dev, skb->data, len,
--						DMA_TO_DEVICE)) - byte_offset;
--	/* Make sure the address is written before we give it to HW */
--	wmb();
--	desc->ctl = LTQ_DMA_OWN | LTQ_DMA_SOP | LTQ_DMA_EOP |
--		LTQ_DMA_TX_OFFSET(byte_offset) | (len & LTQ_DMA_SIZE_MASK);
--	ch->dma.desc++;
--	ch->dma.desc %= LTQ_DESC_NUM;
--	spin_unlock_irqrestore(&priv->lock, flags);
--
--	if (ch->dma.desc_base[ch->dma.desc].ctl & LTQ_DMA_OWN)
--		netif_tx_stop_queue(txq);
--
--	return NETDEV_TX_OK;
--}
--
--static int
--ltq_etop_change_mtu(struct net_device *dev, int new_mtu)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	unsigned long flags;
--
--	WRITE_ONCE(dev->mtu, new_mtu);
--
--	spin_lock_irqsave(&priv->lock, flags);
--	ltq_etop_w32((ETOP_PLEN_UNDER << 16) | new_mtu, LTQ_ETOP_IGPLEN);
--	spin_unlock_irqrestore(&priv->lock, flags);
--
--	return 0;
--}
--
--static int
--ltq_etop_set_mac_address(struct net_device *dev, void *p)
--{
--	int ret = eth_mac_addr(dev, p);
--
--	if (!ret) {
--		struct ltq_etop_priv *priv = netdev_priv(dev);
--		unsigned long flags;
--
--		/* store the mac for the unicast filter */
--		spin_lock_irqsave(&priv->lock, flags);
--		ltq_etop_w32(*((u32 *)dev->dev_addr), LTQ_ETOP_MAC_DA0);
--		ltq_etop_w32(*((u16 *)&dev->dev_addr[4]) << 16,
--			     LTQ_ETOP_MAC_DA1);
--		spin_unlock_irqrestore(&priv->lock, flags);
--	}
--	return ret;
--}
--
--static void
--ltq_etop_set_multicast_list(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	unsigned long flags;
--
--	/* ensure that the unicast filter is not enabled in promiscious mode */
--	spin_lock_irqsave(&priv->lock, flags);
--	if ((dev->flags & IFF_PROMISC) || (dev->flags & IFF_ALLMULTI))
--		ltq_etop_w32_mask(ETOP_FTCU, 0, LTQ_ETOP_ENETS0);
--	else
--		ltq_etop_w32_mask(0, ETOP_FTCU, LTQ_ETOP_ENETS0);
--	spin_unlock_irqrestore(&priv->lock, flags);
--}
--
--static int
--ltq_etop_init(struct net_device *dev)
--{
--	struct ltq_etop_priv *priv = netdev_priv(dev);
--	struct sockaddr mac;
--	int err;
--	bool random_mac = false;
--
--	dev->watchdog_timeo = 10 * HZ;
--	err = ltq_etop_hw_init(dev);
--	if (err)
--		goto err_hw;
--	ltq_etop_change_mtu(dev, 1500);
--
--	memcpy(&mac, &priv->pldata->mac, sizeof(struct sockaddr));
--	if (!is_valid_ether_addr(mac.sa_data)) {
--		pr_warn("etop: invalid MAC, using random\n");
--		eth_random_addr(mac.sa_data);
--		random_mac = true;
--	}
--
--	err = ltq_etop_set_mac_address(dev, &mac);
--	if (err)
--		goto err_netdev;
--
--	/* Set addr_assign_type here, ltq_etop_set_mac_address would reset it. */
--	if (random_mac)
--		dev->addr_assign_type = NET_ADDR_RANDOM;
--
--	ltq_etop_set_multicast_list(dev);
--	err = ltq_etop_mdio_init(dev);
--	if (err)
--		goto err_netdev;
--	return 0;
--
--err_netdev:
--	unregister_netdev(dev);
--	free_netdev(dev);
--err_hw:
--	ltq_etop_hw_exit(dev);
--	return err;
--}
--
--static void
--ltq_etop_tx_timeout(struct net_device *dev, unsigned int txqueue)
--{
--	int err;
--
--	ltq_etop_hw_exit(dev);
--	err = ltq_etop_hw_init(dev);
--	if (err)
--		goto err_hw;
--	netif_trans_update(dev);
--	netif_wake_queue(dev);
--	return;
--
--err_hw:
--	ltq_etop_hw_exit(dev);
--	netdev_err(dev, "failed to restart etop after TX timeout\n");
--}
--
--static const struct net_device_ops ltq_eth_netdev_ops = {
--	.ndo_open = ltq_etop_open,
--	.ndo_stop = ltq_etop_stop,
--	.ndo_start_xmit = ltq_etop_tx,
--	.ndo_change_mtu = ltq_etop_change_mtu,
--	.ndo_eth_ioctl = phy_do_ioctl,
--	.ndo_set_mac_address = ltq_etop_set_mac_address,
--	.ndo_validate_addr = eth_validate_addr,
--	.ndo_set_rx_mode = ltq_etop_set_multicast_list,
--	.ndo_select_queue = dev_pick_tx_zero,
--	.ndo_init = ltq_etop_init,
--	.ndo_tx_timeout = ltq_etop_tx_timeout,
--};
--
--static int __init
--ltq_etop_probe(struct platform_device *pdev)
--{
--	struct net_device *dev;
--	struct ltq_etop_priv *priv;
--	int err;
--	int i;
--
--	ltq_etop_membase = devm_platform_ioremap_resource(pdev, 0);
--	if (IS_ERR(ltq_etop_membase)) {
--		dev_err(&pdev->dev, "failed to remap etop engine %d\n",
--			pdev->id);
--		err = PTR_ERR(ltq_etop_membase);
--		goto err_out;
--	}
--
--	dev = alloc_etherdev_mq(sizeof(struct ltq_etop_priv), 4);
--	if (!dev) {
--		err = -ENOMEM;
--		goto err_out;
--	}
--	dev->netdev_ops = &ltq_eth_netdev_ops;
--	dev->ethtool_ops = &ltq_etop_ethtool_ops;
--	priv = netdev_priv(dev);
--	priv->pdev = pdev;
--	priv->pldata = dev_get_platdata(&pdev->dev);
--	priv->netdev = dev;
--	spin_lock_init(&priv->lock);
--	SET_NETDEV_DEV(dev, &pdev->dev);
--
--	err = device_property_read_u32(&pdev->dev, "lantiq,tx-burst-length", &priv->tx_burst_len);
--	if (err < 0) {
--		dev_err(&pdev->dev, "unable to read tx-burst-length property\n");
--		goto err_free;
--	}
--
--	err = device_property_read_u32(&pdev->dev, "lantiq,rx-burst-length", &priv->rx_burst_len);
--	if (err < 0) {
--		dev_err(&pdev->dev, "unable to read rx-burst-length property\n");
--		goto err_free;
--	}
--
--	for (i = 0; i < MAX_DMA_CHAN; i++) {
--		if (IS_TX(i))
--			netif_napi_add_weight(dev, &priv->ch[i].napi,
--					      ltq_etop_poll_tx, 8);
--		else if (IS_RX(i))
--			netif_napi_add_weight(dev, &priv->ch[i].napi,
--					      ltq_etop_poll_rx, 32);
--		priv->ch[i].netdev = dev;
--	}
--
--	err = register_netdev(dev);
--	if (err)
--		goto err_free;
--
--	platform_set_drvdata(pdev, dev);
--	return 0;
--
--err_free:
--	free_netdev(dev);
--err_out:
--	return err;
--}
--
--static void ltq_etop_remove(struct platform_device *pdev)
--{
--	struct net_device *dev = platform_get_drvdata(pdev);
--
--	if (dev) {
--		netif_tx_stop_all_queues(dev);
--		ltq_etop_hw_exit(dev);
--		ltq_etop_mdio_cleanup(dev);
--		unregister_netdev(dev);
--	}
--}
--
--static struct platform_driver ltq_mii_driver = {
--	.remove = ltq_etop_remove,
--	.driver = {
--		.name = "ltq_etop",
--	},
--};
--
--static int __init
--init_ltq_etop(void)
--{
--	int ret = platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
--
--	if (ret)
--		pr_err("ltq_etop: Error registering platform driver!");
--	return ret;
--}
--
--static void __exit
--exit_ltq_etop(void)
--{
--	platform_driver_unregister(&ltq_mii_driver);
--}
--
--module_init(init_ltq_etop);
--module_exit(exit_ltq_etop);
--
--MODULE_AUTHOR("John Crispin <blogic@openwrt.org>");
--MODULE_DESCRIPTION("Lantiq SoC ETOP");
--MODULE_LICENSE("GPL");
--- 
-2.52.0
-
+Heiner
 
