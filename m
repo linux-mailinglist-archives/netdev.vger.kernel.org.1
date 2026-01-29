@@ -1,190 +1,225 @@
-Return-Path: <netdev+bounces-254736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254737-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKWXKLY5e2mNCgIAu9opvQ
-	(envelope-from <netdev+bounces-254736-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:43:02 +0100
+	id MIlJFno8e2mNCgIAu9opvQ
+	(envelope-from <netdev+bounces-254737-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:54:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 470DFAEFD7
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:43:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB397AF33D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:54:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 06662301078F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:40:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0F1C305EF70
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775F5379979;
-	Thu, 29 Jan 2026 10:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T5me+9lj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BS1ER0eE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C6637AA99;
+	Thu, 29 Jan 2026 10:41:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C7E2D9797
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2BC37F117
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769683257; cv=none; b=H0hj3V2YfARwfpqYRyF08+70GLHZlqo98vWOPa8UcLP1B2XVzF30QKgU9kvlRX9blzMiSUzyEdnvxez3eeAr5UeI3WbCGjNpLwRFcq4QcfUboRhqnvUVM7Lr8ozS6ifdo0BI+0XHnX8Tw79v/9gNxs+tIwAeBqu/EW8+tYIndxU=
+	t=1769683295; cv=none; b=PkRDmkMQQKewfTOcQM8vZZZenF/a6m6vbKhdnIa2OcsDR2nmevriuovGkhaDwDLV9b1kjD3Mi5b5c5IsW6lotZMVejTxwDl/2/8vL0sSrecHSRYxfB26uU8L2wgU6J3HnBD6k1rXzlxQuY+nB0o/ss7Ygmoeyn1gU/4j/ytnFrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769683257; c=relaxed/simple;
-	bh=EY7ZZODRHs6t4AqR0EKeIIKLzssqQhMZPQBNOuqt/pQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AP+GOfu646FHBTaYMrg9yTkiq4BlfYkRy60C4Q/hURqR+IOlS7UZVbzRfmPxlCP5pKoQOt4mcnza5XDYr4l/J7WboOKAsLNU1d2y8N5Q+wo4gNA5BR4YRUtiOruoIhrtFvANyRLyAKmrGjXPCCDQQp+Lkh9Sp0xTCSkFzewyvXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T5me+9lj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BS1ER0eE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769683255;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iQTltzdGEETDMvC1aosQeu/r/ya637/iAmhGi/CVLVc=;
-	b=T5me+9ljzlpAmyZthSTzm0bjkhaF4GIPZPDFBPFYTyIFlK6mv2qXY/kedOV/S/nKy2h94z
-	fA0wX+IcQTLvwfN+tWFGRoiCJ50eClw/AL+YoqCTMARJa7qkPyuUYZXm0Tlzh/CWIU16ua
-	Ln/jFL6BguqUsKXlzbZ8eUDX5+smnMU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-0a3LuUmWNjWu8YPXNTpPvw-1; Thu, 29 Jan 2026 05:40:53 -0500
-X-MC-Unique: 0a3LuUmWNjWu8YPXNTpPvw-1
-X-Mimecast-MFC-AGG-ID: 0a3LuUmWNjWu8YPXNTpPvw_1769683252
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4325b81081aso1537759f8f.3
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 02:40:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769683252; x=1770288052; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iQTltzdGEETDMvC1aosQeu/r/ya637/iAmhGi/CVLVc=;
-        b=BS1ER0eE5xBjzzO3dg6lS29/gB3H66lgOa4S1lFhMsNuvzYiT2bzhFmmRa5CXlxts4
-         axbaHQgn+BT5U1qFoC6ZSyxFYoDQ4+WfdTrmc+uTIBvWjpI3iLCDkmrmuJQRlyEPcwDR
-         +e0o1Y/mw+uXdX/0hxIS5ZPmTo7V6WMIQbS9A5GSrc2QYPQ8VWIT6i8ifzBfaHVLTpi2
-         gh/3Bjb9k3+Q2ze9J+clQ53PlhKkKqUYvOgv9jYGS4PBjSo4xEVu0+hqXbR2P0QGk2jF
-         x+2iyt8KsTTN1sIMbhOfwN9voEr7hHzw85tFzPqrfyv5aQuklA3IeWk0J2HZCP95KwRO
-         HtBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769683252; x=1770288052;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iQTltzdGEETDMvC1aosQeu/r/ya637/iAmhGi/CVLVc=;
-        b=uUmGitPaYll6o0TFSKM5m4yF4Q6rPHJTE8hgL4OHTt8j9Efcpa0gEudi+bwWFg/SEI
-         sz1pTMfAzs/fMNUb3p0vzwjzhHPWvOLSG13UgIO6WD9XlmQ8mFHiQK7nNSlH7rRbN4w3
-         qSvkhVF3ugE/+nrhKbZawWlERdtgXtkNZF1WLJgxhJxhYJ4EcQM3zh4a7aTb/kMH28lq
-         MdtI+xzCrKgQGXCNaJ8qrYDr3Qkn83fFUBiDL9KjL6GzuUZ8x6QTf9X1j0CSMCKt09el
-         ltznQsv3Ny3eLsWhmiSc+Knlp+cQaGTMomIsjoftvq/JYCAtI2SUbmM7XuNBLgZALkfi
-         eTCQ==
-X-Gm-Message-State: AOJu0Yz6fEN4zlYVk6KCdBojVQ02nxPGq+3fsJ6Oht29MWC+nJ7VQCW0
-	4p4PytpZB4OoaY3NJFM6DYT8OHLAN1Q/4EDnK+i7oUjqy4eO+GQshT/6TwS/O3Z15871BHxrMoK
-	/FR1dJwQa/jw57MfU+x+3YwQWg3KDJ04hEKeD3YRhIJWDUB6KuchGCWXvSw==
-X-Gm-Gg: AZuq6aIW9uXnpe1kchxqpVBXVbj8z/Flt0tXniXYTy7CElqagq6ud+yLqCogD0U83hg
-	yP6pZt51+cNPggmK5CzqOktCuDTV4ARZw+LG7LM4CtkCeUT/qOea2UhLu+5CIc4mtu/cPqKEhlx
-	lhclFFq5sC1wcoSTU4nbt3tf9C4rFXGjYcBe89ai9OaxoEIcRQlJ7PD+aCzIw4PmLBKkhpVqD9V
-	+HUTunYsM3OvqFE36UKuX6rxWqTHVdBPIkYYqM8qXlLFDcP+Z337ACxp61X5e7nCZsAvUZMdnKu
-	ETE9CtqaS40iWiJcG43SgZsKezU2Tcl81Dbt7gCRqHmalJ644qAA7thG7gsZWBHzp9bQ1ptWTYZ
-	0QGNY+hq7SdUM
-X-Received: by 2002:a05:6000:2386:b0:431:38f:8bc4 with SMTP id ffacd0b85a97d-435dd1d913emr11847907f8f.61.1769683252017;
-        Thu, 29 Jan 2026 02:40:52 -0800 (PST)
-X-Received: by 2002:a05:6000:2386:b0:431:38f:8bc4 with SMTP id ffacd0b85a97d-435dd1d913emr11847875f8f.61.1769683251529;
-        Thu, 29 Jan 2026 02:40:51 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.56])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e46cesm12955210f8f.7.2026.01.29.02.40.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jan 2026 02:40:51 -0800 (PST)
-Message-ID: <490eedd3-bd04-48bc-9526-09a5a786b667@redhat.com>
-Date: Thu, 29 Jan 2026 11:40:50 +0100
+	s=arc-20240116; t=1769683295; c=relaxed/simple;
+	bh=FiZ9X1ZiRAw8pfadpGXOcan82VTROQ4NtEmXU5JRd1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vyme2zOjkO/Q70Zt3+07/b2t/TZIT/kopV6LK3hRZ+dlx5DrPNmJI1QBWx1jhuRIdT6PQmDap8Yc1GQhWUzAPaxKX0SOtd83QklpFA/CDejl2198eh4xMUWYgjat4L/tpktO3/3FQSdGsiDfTSS5RHZgdQyWrsmz2d4cWnw7pi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vlPSm-00079E-E7; Thu, 29 Jan 2026 11:41:24 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vlPSm-0034Mh-1G;
+	Thu, 29 Jan 2026 11:41:23 +0100
+Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vlPSl-004eYx-1s;
+	Thu, 29 Jan 2026 11:41:23 +0100
+Date: Thu, 29 Jan 2026 11:41:23 +0100
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
+	Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into
+ phy_init_hw
+Message-ID: <20260129104123.zir4rtgeiu5qv3i7@pengutronix.de>
+References: <20260128094644.302313-1-michael@amarulasolutions.com>
+ <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch>
+ <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
+ <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
+ <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
+ <aXqJ_TtdBnkvEZ_i@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/9] netfilter: updates for net-next
-To: Florian Westphal <fw@strlen.de>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
-References: <20260128154155.32143-1-fw@strlen.de>
- <20260128210313.787486ba@kernel.org> <aXsgxfHxTEU1_k6e@strlen.de>
- <aXsxr8KQGFOhnLIa@strlen.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <aXsxr8KQGFOhnLIa@strlen.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXqJ_TtdBnkvEZ_i@shell.armlinux.org.uk>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[amarulasolutions.com,lunn.ch,nxp.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-254737-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254736-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[pengutronix.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[m.felsch@pengutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.996];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 470DFAEFD7
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:url,pengutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: AB397AF33D
 X-Rspamd-Action: no action
 
-On 1/29/26 11:08 AM, Florian Westphal wrote:
-> Florian Westphal <fw@strlen.de> wrote:
->> Jakub Kicinski <kuba@kernel.org> wrote:
->>> [  580.340726][T19113] sctp: Hash tables configured (bind 32/56)
->>> [  601.749973][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  601.985349][    C2] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  602.191750][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  602.555469][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  602.895890][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  603.226543][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  603.435907][    C0] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  603.569421][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  603.672454][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  603.821679][    C1] TCP: request_sock_TCP: Possible SYN flooding on port 127.0.0.1:23456. Sending cookies.
->>> [  618.553975][T19316] ==================================================================
->>> [  618.554200][T19316] BUG: KASAN: slab-use-after-free in nfqnl_enqueue_packet+0x8f1/0x9e0 [nfnetlink_queue]
->>> [  618.554424][T19316] Write of size 1 at addr ff1100001cc9ae68 by task socat/19316
->>> [  618.554600][T19316] 
->>
->> Did not occur here during local testing :-(
->>
->> Should I send a v2 without the last two patches or will you pull and
->> discard the last two changes?
+On 26-01-28, Russell King (Oracle) wrote:
+> On Wed, Jan 28, 2026 at 09:26:34PM +0100, Marco Felsch wrote:
+> > |   Some PHYs need the refclk to be a continuous clock. Therefore they don't
+> > |   allow turning it off and on again during operation. Nonetheless such a
+> > |   clock switching is performed by some ETH drivers (namely FEC [1]) for
+> > |   power saving reasons. An example for an affected PHY is the
+> > |   SMSC/Microchip LAN8720 in "REF_CLK In Mode".
+> > 
+> > This can be achieved with commit
+> > bedd8d78aba300860cec3f85d6ff549b3b7f2679 if specified accordingly.
 > 
-> Alternatively you can also pull this:
+> I don't think this is unusual. I've just checked the 88E151x
+> documentation, and that also requires: 10ms after power and 10 clock
+> cycles on XTAL_IN before deasserting reset. The timing diagram indicates
+> that subsequent hardware resets must be 10ms in duration, and show the
+> XTAL_IN clock running during the reset.
 > 
->   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-26-01-29
+> Looking at AR8035, it is similar - the clock must be running before
+> releasing reset and while reset is asserted.
+
+This is like every external IC or internal IP ;) What's special is the
+phy generic compatible handling... (please see below)
+
+> So, to say that LAN8710 is somehow special seems wrong to me - it isn't
+> just these PHYs that have the requirement to be clocked before reset is
+> released nor while reset is asserted.
+
+IIRC the Linux phy framework does have this hard dependency, that a
+phy needs to be accessible to make use of the generic phy compatible
+probing to read-out the phy-id registers.
+
+This requires that $someone e.g. the bootloader already did the phy
+power-up sequencing for us so the phy-id can be read.
+
+Once it comes to the FEC the situation is like this:
+ - The FEC can provide the PHY clock via ("enet_out"), no external
+   crystal required.
+ - If the phy clk is specified the FEC will turn on this clock during
+   the probe() and issues the MII bus probe incl. the phy probe().
+ - Afterwards the clock is gets disabled
+
+My patch added the support to keep to request the clock during
+phy.probe() and keep phy-clock running till the phy.remove() callback
+gets called. Therefore no such local quirk like PHY_RST_AFTER_CLK_EN is
+required.
+
+> I'm guessing the problem here is that, most cases the clock is provided
+> by a crystal, in these cases it's being sourced from the SoC, and that
+> puts the responsibility on the SoC parts to guarantee the reset timing
+> required for the PHY in some way.
+
+This was exactly my use-case too and it's beeing addressed just fine
+with no PHY_RST_AFTER_CLK_EN but the clock and reset specified within
+the DTS.
+
+> In other words, by sourcing it from the SoC, it's not phylib nor the
+> PHY driver's problem (the PHY driver comes along way too late) but the
+> responsibility for the boot firmware / DT description / network driver
+> to detect this situation and give the PHY what it requires to reset
+> properly before registering the MDIO bus.
+
+Yes but I don't see a problem at all if everything was specified
+accordingly.
+
+> The boot firmware route is how this is handled with SolidRun i.MX6
+> based boards - the PHY reset is a GPIO, but that GPIO is *not* told to
+> the kernel except as a hog. u-boot takes care of setting up the 25MHz
+> clock for the PHY and releasing its reset - it actually does two
+> resets due to running off the ANATOP provided clock. This is an AR8035
+> PHY, which as I've mentioned above, requires the clock running before
+> releasing reset, just like the LAN8710-like PHY that you're discussing
+> here.
+
+Yes, it's very common that the bootloader does the initial work since
+sometimes strapping pins are involved which need to be pulled too for
+the reset sequence which are later on re-used for $other purpose.
+
+As said, I don't see a problem with the LAN8710. But while checking the
+Linux source code, I saw commit
+57ec5a8735dc5dccd1ee68afdb1114956a3fce0d which re-introduced the reset
+handling :-/
+
+> Given all the complexity we've had with systems with two FECs, where
+> the PHY for one is connected via the MDIO bus on the other FEC, it
+> seems to me that pushing the clocking and reset handling into the
+> kernel is just asking for lots of pain.
+
+I wouldn't recommend such setups at all. It's like asking for troubles
+;)
+
+Regards,
+  Marco
+
 > 
-> Which is the same series but without the last two patches, i.e. up to
-> e19079adcd26a25d7d3e586b1837493361fdf8b6:
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 > 
->   netfilter: nfnetlink_queue: optimize verdict lookup with hash table (2026-01-29 09:52:07 +0100)
 
-Would you mind sending a formal v2 of the PR, so that the CI catches it
-up and it's properly tracked in PW?
+-- 
+#gernperDu 
+#CallMeByMyFirstName
 
-Thanks!
-
-Paolo
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
