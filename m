@@ -1,165 +1,261 @@
-Return-Path: <netdev+bounces-254873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SGE8LvKYe2nOGAIAu9opvQ
-	(envelope-from <netdev+bounces-254873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:29:22 +0100
+	id IO2CGkuae2nOGAIAu9opvQ
+	(envelope-from <netdev+bounces-254874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:35:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38921B2E79
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:29:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C7CB2F6E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 112443019828
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:28:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA77330036F2
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4109D34CFDC;
-	Thu, 29 Jan 2026 17:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F21346E6C;
+	Thu, 29 Jan 2026 17:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lyP7M79M"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="C9TYwcLd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013032.outbound.protection.outlook.com [40.93.196.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE88634BA2E
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 17:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2DE1DF73A;
+	Thu, 29 Jan 2026 17:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769707711; cv=pass; b=eYUFN1XVrSw3k9lkXFN3NrE45WMWeEFy5mXF5Llzsw8hwfnzU61Ai+tJKcXqIJ+60HCpfAokEpULgCtKJedi85kOyfvyFbRbjag8EGo8hVvxSSK8CMtryn81MQdn7lBW4QwHFyULRgI/yneZStjw4ea/R6L4sXlVC0u38VsU1IU=
+	t=1769707902; cv=fail; b=fHADtMJC0zfzziygwkTt+F8qv6ZrpRiZQnFuMDav42uQymzUULq70FrACQ3CC/iLMlskQHclzCMN31u2NPo2fg/XMf01+xknYlVN9cHZh7zxseS9F0vw7hY932AKGrd7MbDzzXCqsS93AA37eXIXXlFuRMILflEvhGtPvlNTLB8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769707711; c=relaxed/simple;
-	bh=WAXGGgfoNH2wYmvcahTrKOBjipuZ78ZveCgg1/MRkUo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JgCsu2rjwtT/QWHtXGvWLVTCiDwsBjsKUkY/GY/8+232cq8/6PC9oh82lzJpD81UhXx4Nl10iBiHsAoRvOpWHYJOQwR4NoH8n9eFeo8xatAH/YSRax22aVFKcQJ56CmVLCVpq2lPRbkUGu++AzYEWLSpCBweTr8rCPugcWK+iD8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lyP7M79M; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5028fb9d03bso10334881cf.3
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 09:28:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769707709; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MkEV9VCjSHPfSD7Xhnhd0CZTtBvDdwzbWSd8AXwHttFha31V3m4iEkWA2NtTPWH/Ow
-         2XneeUXYzSPW6Sul0t8h4a41kp2MFIVOYkxTdh78yL2ITn+vFR6m6pHB8QO06fKKfynd
-         AfU5icIQe5Lj6wGoAfusQZyg62nw60ukonpa2mMKxCKE3BBWGvhsfAYfJ4o/eB0iC4vI
-         yZ47hX+Up+/OnnW6gExxmyCh34EavIAZxmel6vGUOdePUy/K9DemUVqvQ3vnCPpH4XUf
-         hLTqlp6eDkJ71SJH9vEuVtOPQAI5ktKYoKSt/lBFnakSpBXpvK4lGJz2Ag1j0u7/cCdK
-         A/OA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WAXGGgfoNH2wYmvcahTrKOBjipuZ78ZveCgg1/MRkUo=;
-        fh=mk8pMWFgWO0kbUEWYlgAYR8jg3wNjNJiS2/jcFTDq4U=;
-        b=cjsK8O9+VIFKDWEBcyUQaNuLGeAUJeR2F10HXgF8FlaOi7hKMBauuUjfr1gjdxpNf6
-         8QHKqyPi4kajqKduIVZUHW3zsrXPgaKGER6GnWvuAAUb59yoapz4Zx2dd8qPBUCBYb2r
-         r5LhYSPPI8G3VsgTyEIKyxdCseoMFToybhJXmAYAcvd9hVWJo8O8lLYVEesO3C2A0LbF
-         yUhhwECzY64rHRX3HYAmL4aHXOSEM5+8yKyR+CPzU4O7/8DPnaXBUoTxy87eWlht29yM
-         WdjACrQqIG+E2dj4oURRECdIJne5S58BtmyKd9/3X/vm+8tAUxz1dnH4Jj9HJpuNXPeR
-         G3Iw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769707709; x=1770312509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WAXGGgfoNH2wYmvcahTrKOBjipuZ78ZveCgg1/MRkUo=;
-        b=lyP7M79MYJfiI5V1MmRkFf1OZHccB9cMJlAADYYd/rxnDZF8JiM73jsdPBn6gCtWUR
-         cTkSNf22DZ3nuyyVbkWyl8zBkrV4IpN+bnmIO8xB1y7U8KCuZ7UmCnix7pmOtNIr23Un
-         EsxBNnmo6TESbug7yYMvkS1VOroIpKomB4n/XkCdnW+NIT/T3i1v2cf3ebmxk8nYzDzV
-         +4WF4+EojusHc7fE1c+ekTwfRcoe6t0a5dUOgrL2dmoQueeLftZPWSMvEpL87eknmF79
-         H+Uzsqg0r51+PdYD+Ux3xDdx72kHipwRFddsP14v+mfDdlJf0YsWEl0mm3+NGuUN0ZDd
-         Nr0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769707709; x=1770312509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WAXGGgfoNH2wYmvcahTrKOBjipuZ78ZveCgg1/MRkUo=;
-        b=rYwL5VK91raBlULtZYFVVPnM/Gdw1C8O3L4C8MMmHIuCPWCk/vxSZup41Je7MAe+xX
-         7Mn29lwekn6NhsHqRfi3YwPv5f077zLT7h9PBbxHv3o3CCtT4KHjWwCVVHzhNptB+7Nx
-         QYTMPbTtV7ar4I+9K9Dl5fZEp6AqaTAhc/a+Wq5EVTs/23j4Bx2iVnmW0D71nttY5ofe
-         Sx/g+/sjH4SsDvBtoHDNQHgriccrXbqz40eIC96RowSC47pTaFGKkALXZjT0zIh+dU8Y
-         lYzmZscvcleytY2npYITIlMwS625nkdYoTIPQBYvsU5Yn/o9pQq7QdjVHJTuWe61z7l1
-         1hsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWBgXAFlWtVGtx3KVRxpo0V2t6PPtjsg+5Uah3gZ7FCDK5Ma8nb6plO3Tv9XBsEocexIebiEIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB5CJtW5TT3lhGAVH4y79ebdd7J4tdWlv+SglXbstKBsFccN1K
-	n4cDZrN+dE7sz8qZvdiFb0IKmvAH67fgwBZZC52tbZTTtxBkTxdIsvQ2f4VGrySfvykXqc1sMdT
-	PZ8Am4qFWWPL/FFRit3rulMjsN8PaCI9PRExx7iDz
-X-Gm-Gg: AZuq6aLoQ0Ne35CVu2Nv8srcSuCKFe+2QW8dLQgQNR9xG8eWRXRQgQsMldyQ04Mfl04
-	tdEkP60TOoI81x+jXAWwlHcZ3GftH6y65WW+aTvpw+rk+qdBpU0cEO5md/up+fQHwysuOfZe3bl
-	dB1yocJXd9gXK9KbsVUBpq8ZqhxgCR3AYUsKhKhFMqGo734u2pr8QRJo5GLx56U5GQO1Wl0IVqB
-	4ZM48kdlLe6RQISu+e/w154uuXy5ru8/0Ras3maNZvPESscvIr7kviKnSz/De1Da2DGJxRQ
-X-Received: by 2002:ac8:7fcc:0:b0:502:f81b:9961 with SMTP id
- d75a77b69052e-505d2191537mr2863481cf.19.1769707708337; Thu, 29 Jan 2026
- 09:28:28 -0800 (PST)
+	s=arc-20240116; t=1769707902; c=relaxed/simple;
+	bh=kGlaJjltJVE99fg4p70oUEBbKvu/xlsbYaT6omeFcco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mAfXwJ29RFo+I1FEp+vGFF89GXfbMws7pUQ5onnULeZzYUIR2TDvV1LKFN18SKJ7Hk9wxmJ9aDNX0e/XiXkfJ5gLhFQmEUw1Oj23hmOqAWO7G/TXy8wedDNELIIclWU7WqBk7DVArKg+g7v2vZ70cNi78O49/NYGPqPxrk95SHM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=C9TYwcLd; arc=fail smtp.client-ip=40.93.196.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UT4AZhM+p1j6yKXYst85olJt6Y9Ac3aCf41HCkwbqqknJMlZJE0kpNj8wSmOejVcqAwp+0jOO7pgki85HNUo/AP/Go1u/g0a7v4qT2hs4o97n2fL+CUdB2iV5YDy5746JTc2BRkZ2XoDaJo+2le2fuDLTCeNiXY0Op5TpiE331MCOiimJdTpoc2BG3lXMKWjQ4NA0O2ZqSqk8QqaOR4qlllfS+ATytCeo6yqfVxis+4iH0PnDpHtCt1LBiHxmLP1ZpuP3qqS1G6C++Tcog33VrLPtDlLzmo3800lh9RdYFBgqy3HSYJkyLPT1devDDhdP+vk3Aln4yN0ZlrdRhGWvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=djM7YEFuqPTMn2i5CgjwsanHHMItEMxm0XAfTXNVk+U=;
+ b=yqbOCG/sHNXCilN9NFUX53FOWUJsDfsYFBEcg4RSyB7oKDcypxDsEaQMpa9jNlUDbPBvL8VnuIW+vZx2WVmUYPqkQOvjgvxNeSkExF4y4G+oAC9zygc6aqj0BKbvu6gZHXeexjtSej+8TS6HZj+CKS6w28bS83P0tA7Ot0WxppMEeRPkwz3tMGT52+LNLSDK7aYJzPG9Yiq3rk+cNXaJwhUbX5+XpmdKCOf8CCD/azvr79QIA9a3anmjJ8gRhjoG9tjQahuZsC/961ytBM1cwpNOuBALeDLsUo7D2ksobYK7n+NPgR1UiMU5TLjenPmdF3yBbcNnyQ6LFm5874010w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.194) smtp.rcpttodomain=phytec.de smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=djM7YEFuqPTMn2i5CgjwsanHHMItEMxm0XAfTXNVk+U=;
+ b=C9TYwcLdkhE+20DZnHTB22R+VYDG3jtKihj+iMUHH4+4xLvjyzf9NbVSSf43yutdNqbcoCSaXq5Xlz4ZcYfR4JxuT7dtVezrInagCxW7/dTfyMCRS1JVyCrit/I+18QNT6a4Gb4glsBz7Sb06II25sF3G09XvuMtoqMzBeXv6qo=
+Received: from BY1P220CA0025.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5c3::12)
+ by CH0PR10MB5113.namprd10.prod.outlook.com (2603:10b6:610:c9::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Thu, 29 Jan
+ 2026 17:31:37 +0000
+Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
+ (2603:10b6:a03:5c3:cafe::3f) by BY1P220CA0025.outlook.office365.com
+ (2603:10b6:a03:5c3::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.11 via Frontend Transport; Thu,
+ 29 Jan 2026 17:31:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
+Received: from flwvzet200.ext.ti.com (198.47.21.194) by
+ SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9564.3 via Frontend Transport; Thu, 29 Jan 2026 17:31:34 +0000
+Received: from DFLE203.ent.ti.com (10.64.6.61) by flwvzet200.ext.ti.com
+ (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 29 Jan
+ 2026 11:31:30 -0600
+Received: from DFLE204.ent.ti.com (10.64.6.62) by DFLE203.ent.ti.com
+ (10.64.6.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 29 Jan
+ 2026 11:31:30 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE204.ent.ti.com
+ (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Thu, 29 Jan 2026 11:31:30 -0600
+Received: from [10.249.42.149] ([10.249.42.149])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 60THVT804118949;
+	Thu, 29 Jan 2026 11:31:29 -0600
+Message-ID: <b7b8f855-bf38-41ba-96c4-1bdc3a1c2cc8@ti.com>
+Date: Thu, 29 Jan 2026 11:31:29 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129083806.204752-1-mahdifrmx@gmail.com> <willemdebruijn.kernel.1622279a11643@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.1622279a11643@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 29 Jan 2026 18:28:15 +0100
-X-Gm-Features: AZwV_Qi6YHwqNaAJpk5o-rx7Hejn9nptNrcazNuQbTil0h17nK82AhZ9hQ0nvkY
-Message-ID: <CANn89iLBpw=yEUODcwdhJA+HEUWhO7YC36q1BqyRc7e7mvJxPg@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Mahdi Faramarzpour <mahdifrmx@gmail.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>, kshitiz.bartariya@zohomail.in
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] net: phy: dp83867: add numeric impedance DT property
+To: Teresa Remmet <t.remmet@phytec.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<upstream@lists.phytec.de>, Yannic Moog <y.moog@phytec.de>, Benjamin Hahn
+	<b.hahn@phytec.de>, Yashwanth Varakala <y.varakala@phytec.de>, Jan Remmet
+	<j.remmet@phytec.de>
+References: <20260129-wip-t-remmet-phytec-de-bspimx95-132_upstream-v1-0-8deccd658d16@phytec.de>
+Content-Language: en-US
+From: Andrew Davis <afd@ti.com>
+In-Reply-To: <20260129-wip-t-remmet-phytec-de-bspimx95-132_upstream-v1-0-8deccd658d16@phytec.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|CH0PR10MB5113:EE_
+X-MS-Office365-Filtering-Correlation-Id: a8c7e133-1279-4909-9c0b-08de5f5c4009
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|7416014|376014|82310400026|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VUozMmpzOWpkQlpNUGh0MFdsRGNqOHIvS2hzTVdibFI2OThLUTdVTW9yY0Zq?=
+ =?utf-8?B?alVQWFU5YmZ4OFVEd3hkUC9ON2NXN1Zjc2Vmc3UzVi9BRUl1VXh6YkxrSk9q?=
+ =?utf-8?B?NHhGVmZuekY3aUV3ZWVlbzcvYk8rVVMzMmhRa1BRcTdlNEdLRDRsOWZvRVdC?=
+ =?utf-8?B?ZHJxSTJrczc0LzdjaDEwS2Y0K1JubW1tU1JzQjR3R05qOWg5aGpaVzQxcVcr?=
+ =?utf-8?B?K3BuYW80aGVPVnorUVRIUUNmYU1xOTdFQVYxRkhQS3RUNG40V2lQQ2x6aFo2?=
+ =?utf-8?B?VnBKTStNSTY1RVJXUStNeVZnRG03YkQzNnVkalBmSWxvRWxRZ05CMEpsclJL?=
+ =?utf-8?B?RHpydWMvNWlESnZNZGJvSG5UVU9kTkl1eEZ5bW00UWhuZy9meDAwQXFFMzVY?=
+ =?utf-8?B?cGpHbDcrTHZKUzd3TXZUZWpwbCsrb0tPa1ZtMWtKL1RMblFZc1FJNzczUXdJ?=
+ =?utf-8?B?MktBWVhrNmdtUFFxRCswS0tlTitzcERpZGFRMElWRkdBVVJkQkFhVUdlM0xX?=
+ =?utf-8?B?RVlCNUZaMC8xTHVra1VHZFlvbjZIWHFyK3pLZEhkSllCdjFlbm9jbTNqZFpr?=
+ =?utf-8?B?c3FGZEVyRS9Vc2liUmhXV05GQVBUMWY5dlovTVArb1YrRTgwVjRwVWRkMDVJ?=
+ =?utf-8?B?RnF2WE9WM3QzQVpKNjVtZ2RMS3Yxd0kzZHpOWVllWi9KODd2dDdpc295aVlT?=
+ =?utf-8?B?aDEwTG9ReXh6ajkvWE03bUN3OENrY2tuV0ZoUHRUZlBiRjB6WlE2SXpLdlZR?=
+ =?utf-8?B?TUcyd0xzYWdUNlBjS1hwZFlReng5MUNGRkJxZ2FpRVJOZ2gxcW9uRDh5UDha?=
+ =?utf-8?B?bzAvSnpob3FxMXBZcnpXQ3pRdDhxRkJIdlExc04xT3ZyZUV1SVBIdWF1dkhp?=
+ =?utf-8?B?aW9FQTU0Y1Jxemc3eGFhZW5HQ1FmanJpdjdyOWdWa3VNOWJUSTJWQTgxSDlp?=
+ =?utf-8?B?RXVNb0VtT1dmYThlbHljc1VHNlBLN1lLR2U5NjNsdUtHRjBMWHpUY2t3bnQ1?=
+ =?utf-8?B?aDhqZExETjYwbHJ3akU4allOZEZ1TXB1ZWlhM2p2UzVCVU9PVkhET1VVUFhU?=
+ =?utf-8?B?elZuOFlIZWhkdml2N2dsbEpTTmtBVU1vUEpMejR2bU9tRDR2eGU3QjdZZm10?=
+ =?utf-8?B?SFYvNEQvbitiWnJmZC9PWE1TSDZlMGJZem1PL0xXZUxXK3NYT2FDdzQzYmV5?=
+ =?utf-8?B?ZnRjL0tuUUlDYlRNSmt3cFZlYjdMem82WVNES0Q4UXVXbTFLUVhVc2FZT0pN?=
+ =?utf-8?B?M2VDK2krVHovdkJGZWRrSHFxa2tRWUZrS0hjTnI5Yy9Gcnc4NmtMOWwzMkFN?=
+ =?utf-8?B?WTA5YzlqaTZVUmZ0L0pWaFg1blJ5Vlh2bUdSZlYrNTlveHFNRzBuSk45azcr?=
+ =?utf-8?B?YXphangzaXFYa3phZkFYNEZGVEdUSTJ6Tm4wUWt4VFc0dGtqNTFFelUrUytL?=
+ =?utf-8?B?Mk9IZTFjb3YvSE9tcG9Gb3ZWV2x3dXpVVkcyYmo4TlpyMjJKVVdzQTBpd1A4?=
+ =?utf-8?B?djlxTmdWai9qdkV1WWphQTN4a29QY1hjTkJHd0sxLy9JSVBSTUp2c3VQQm5K?=
+ =?utf-8?B?OXovUFN1WHN1T041SWhPWHo3cXU3dG5Sa3ZyOTZ2alNiVng5Wk5SYVI3UVlL?=
+ =?utf-8?B?ZHo0VE5JNkVZMkJvSHMwTEMxV1MwSGZVaW0xMTd3K04xQm9RYW9xRDBKRTNh?=
+ =?utf-8?B?U1kvUlc3dEE3ZVd1S3hkUHZrMjVxcGNyc0RlZDZqSGRlQ0lONk1FNXlmbWJJ?=
+ =?utf-8?B?T2Y4UWVuVUdwNFBZV3FHU1o5YWR6QTlhTHFsVHp2eDNsdSt1OFN5Q3BTMHZv?=
+ =?utf-8?B?ZHJhTUZxRU85T0xwZ21jczNjUWUzbnpPaXR1NXAvVmZ5S2IrK0U1aUoxYTBo?=
+ =?utf-8?B?UWRMWDhWMzNKVk9uWkxwRXVUeXMvdHNUZEsydjZKSEk5ckhnTkFkbXI5UGpC?=
+ =?utf-8?B?Y2h2THA1ampRZFBGSHhqa1Nac1lsYjFTUTVZN3JLcEdwZDBTNmhTaUxCeWtZ?=
+ =?utf-8?B?WStlUFZzMWVpYVp0T2o1b0dqcU84WjlyWXpjLzhZWUcvNUpZYk56dVN4WHhD?=
+ =?utf-8?B?bFpwcGpzQWpWOUQybDJHalhNUlkrbnVmQWx3TWJ3QjhPKytCOU5aY3ozZmpr?=
+ =?utf-8?B?SDVLajN0TTMxenN6YStJY3hXOHVQaS9HQ05DdWd3a09EV1ZOd0FiVlhOVUNV?=
+ =?utf-8?B?N0RyY3NoRWdXSEdBd1BhZ3lKazYyK2VEWXBjKzY2RitiMU1wT0JOZThGVHRD?=
+ =?utf-8?B?WVR1UnZVT2dhQW56UXNjV0VRamhBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	XV1UHOzIgPkIzIlozZ36t5h5bpOo/oYjJ5n28ZSWZQwgQdTAkpkcMk0zkN+uzKjmGGsgXwc1hTRff2IvSgA+TbyF5xdxqg6bNfC+zhNRBocqy/3iyQViHoS9D2OQ2pe6UkDn6i0+PHrQz0+L/DRgw64DVxkKJ45IRYAEKkl7uA79XIEjc3rTQsaRI/pojhRTS2TZzvH6LF7t1E1SW3upst9lRkGtgscAaULowYXmSJlfp1yeUNTvHx1rifDlU8D3pX0ml/5zaO6U0yEdtd+WjN/qFp+8Xh+Df0yz4GSjH1yxQL89XMULmuri+M6nTqJBse/YZie+iNB77W547gMamXp6uHVTJl9s+YJYMnCVlExcmgPIXQy4S0YP2M6a6zmLxb3E2eNC8eW2H5o0KPByNEPhveNxM63IqmmNBqpAHAXRFgm3vzhkZn03FYx/6nVq
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 17:31:34.7974
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8c7e133-1279-4909-9c0b-08de5f5c4009
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDD.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5113
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-254874-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254873-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,kernel.org,redhat.com,zohomail.in];
+	FREEMAIL_TO(0.00)[phytec.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,armlinux.org.uk:email,lunn.ch:email,phytec.de:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 38921B2E79
+	FROM_NEQ_ENVFROM(0.00)[afd@ti.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ti.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: C2C7CB2F6E
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 6:17=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Mahdi Faramarzpour wrote:
-> > This commit adds SNMP drop count increment for the packets in
-> > per NUMA queues which were introduced in commit b650bf0977d3
-> > ("udp: remove busylock and add per NUMA queues"). note that SNMP
-> > counters are incremented currently by the caller for skb. And
-> > that these skbs on the intermediate queue cannot be counted
-> > there so need similar logic in their error path.
-> >
-> > Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+On 1/29/26 8:13 AM, Teresa Remmet wrote:
+> Introduce a new way to set the output impedance over device tree.
+> So far it is possible to pass the value either over an nvmem
+> cell or to set the min and max booleans over device tree.
+> 
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+We have a similar issue in our networking driver, we can either get
+the MAC address though a NVMEM cell, or when that is unavailable use
+fallback to using a hardcoded value in DT.
 
-Thanks
+I wonder if it would make sense to add a new type of NVMEM cell that
+encodes the content of the cell in DT itself..
+
+That way we can use the same NVMEM interface in both cases, without
+adding all these custom fallback properties to every NVMEM consumer.
+
+Andrew
+
+> In our use case we want to be able to set the impedance over
+> device tree but the boolean values are not the right fit to
+> provide best signal integrity for the hardware.
+> 
+> To: Andrew Lunn <andrew+netdev@lunn.ch>
+> To: David S. Miller <davem@davemloft.net>
+> To: Eric Dumazet <edumazet@google.com>
+> To: Jakub Kicinski <kuba@kernel.org>
+> To: Paolo Abeni <pabeni@redhat.com>
+> To: Rob Herring <robh@kernel.org>
+> To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> To: Conor Dooley <conor+dt@kernel.org>
+> To: Andrew Davis <afd@ti.com>
+> To: Andrew Lunn <andrew@lunn.ch>
+> To: Heiner Kallweit <hkallweit1@gmail.com>
+> To: Russell King <linux@armlinux.org.uk>
+> Cc: netdev@vger.kernel.org
+> Cc: devicetree@vger.kernel.org
+> Cc: upstream@lists.phytec.de
+> 
+> Signed-off-by: Teresa Remmet <t.remmet@phytec.de>
+> ---
+> Teresa Remmet (2):
+>        dt-bindings: dp83867: add binding for ti,output-impedance property
+>        net: phy: dp83867: add numeric io impedance DT property
+> 
+>   Documentation/devicetree/bindings/net/ti,dp83867.yaml | 19 ++++++++++++++-----
+>   drivers/net/phy/dp83867.c                             | 17 +++++++++++++----
+>   2 files changed, 27 insertions(+), 9 deletions(-)
+> ---
+> base-commit: 1f97d9dcf53649c41c33227b345a36902cbb08ad
+> change-id: 20260128-wip-t-remmet-phytec-de-bspimx95-132_upstream-48188a567544
+> 
+> Best regards,
+
 
