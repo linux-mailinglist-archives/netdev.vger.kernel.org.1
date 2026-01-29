@@ -1,76 +1,67 @@
-Return-Path: <netdev+bounces-254786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cH8qBKlXe2k0EAIAu9opvQ
-	(envelope-from <netdev+bounces-254786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:50:49 +0100
+	id +FPoL7pZe2mvEAIAu9opvQ
+	(envelope-from <netdev+bounces-254787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:59:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DE3B026B
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:50:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3126AB035B
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 037113006171
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:50:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9BD8301AA6A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CDA387579;
-	Thu, 29 Jan 2026 12:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287EF38885D;
+	Thu, 29 Jan 2026 12:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YBsbgzet"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="he6GzI9X"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E7F3446D0;
-	Thu, 29 Jan 2026 12:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025D919F135;
+	Thu, 29 Jan 2026 12:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769691044; cv=none; b=rYOXvpg9EWLfTc0o/Z451FjGyGiVXYuAV+feFjVit9vBoIrizIYE3bflgqrMb1RP+PeMkOiuDp06XEjzdsKo31V/W1haGvkOeSQUEEeQMbAgeGQo61Eu21ZlJC/afG51Cc42CxLZl2GXvyVp8mSRNn4DwscufA7pGr/qc4S0EKE=
+	t=1769691563; cv=none; b=nBbxmfVOobeIBdSxWQSF8OnqLpueAdHQkqLShNew+kmihBSctzVHNhFhob6rhiDbWXm7p19bhCIR1Q5eBiqbr8+kYSI2VekeLaJQKDBSbP7CkA0Wkjzju2CTYj3/IkS+9m22LiZn/kLnUGuNt/RZUP/aAmkniLn/0WEAaxMpAn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769691044; c=relaxed/simple;
-	bh=dKEyniS8msElg9I2eUpjPbKKyQaDxmxe3UKN/HK+008=;
+	s=arc-20240116; t=1769691563; c=relaxed/simple;
+	bh=oSZPaLcjK0DJK4c/oRcbBRrktXJEgY6brvhmdnpaE5M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pV3KAM44fsOdgATPnBMRmteI6ymE4JqXR5P96RZHD/BjIuo3iST/7NWhHVL8G4qqyQKLRLG26z4LFTBzMUBd4AW1GSz0xT5ooVz+oicOLb7zGS1czDMH17whv62UvTp3taFdrlBkqsSGqANXI0OuFJHg2pkkxzQsMJUxiB1k664=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YBsbgzet; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ri8FmvbEKjZW/onf1C/Nwis8086NQS8jtNxaTm37K7I=; b=YBsbgzetUI+pZ0B+dhC0HTSbIH
-	FCQ4UA5XTl4KDjqgho0iNjJCUMplsRJGlH3R7CKYGddxbYYC1WTtpxSybVDmJj8wMEaU2kCgW0ae1
-	Voe7H//VPd/i5NGIiieHcglCf62kUTn4TFZReeuePCTcRLTct+JNRvXczYtDxl5UWCAS9tfUGy+C5
-	HoxcmvjDG+nW69BvFtx7bZ7GfMFy1B4rhw7NuosQWlxMQ136BHCjoPCcCCvczxKxOvHfOz+SWkSzb
-	pjMLUDodHA4RZBUQtnLdXs5iDrN1/zS9tJNC+O/ULTcu5XlPvTW8jX7cm2nsxrZ+nSbcVYwI4OUPY
-	bExHcVqA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33910)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vlRTm-000000008Vz-1IP1;
-	Thu, 29 Jan 2026 12:50:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vlRTk-000000007z5-2C1q;
-	Thu, 29 Jan 2026 12:50:32 +0000
-Date: Thu, 29 Jan 2026 12:50:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
-	p.zabel@pengutronix.de, ghennadi.procopciuc@nxp.com,
-	bogdan-gabriel.roman@nxp.com, Ionut.Vicovan@nxp.com,
-	alexandru-catalin.ionita@nxp.com, linux-phy@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	Frank.li@nxp.com
-Subject: Re: [PATCH 1/4] dt-bindings: serdes: s32g: Add NXP serdes subsystem
-Message-ID: <aXtXmN1V8wg57yuE@shell.armlinux.org.uk>
-References: <20260126092159.815968-1-vincent.guittot@linaro.org>
- <20260126092159.815968-2-vincent.guittot@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fGBdwkO7WypF2GqciAdpZEHHklQeQXAH8ILnr3K+Z1CcKasXjFoqXiwsiip5RlaHl+PaCba68+V/0jNQy0P568yduLJg0jOBvBQt+ooboPpEXezBU5QYPu+ExQGofh1VTrNidiwVl7dPnlqY6YdbMFab3LMzVlThRqy4oAklvCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=he6GzI9X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60E85C4CEF7;
+	Thu, 29 Jan 2026 12:59:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769691562;
+	bh=oSZPaLcjK0DJK4c/oRcbBRrktXJEgY6brvhmdnpaE5M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=he6GzI9XNL/sUz8kcBTQVvi2rhZZ+iTZkYlKnzTfj52lRPa+okPe1qBezIfmvhQl3
+	 rSg68PVxY4G2UyIVIWG1Fl7lQN3SSqGFFopPgoTvAJS02bceU0XEJt3Nr3g8894GG/
+	 EYgjLmnJnod+gZIxjOGByhPcy2NNylOueZYZ4vuIVvrqbPS9fB3Bnmz9JNNvnvwA6z
+	 +VBgrM0zonHjkdispj9yE/GQQVuDo4aQ3fuTvZ631GxLS41bUA55gBTPwViAol3vNS
+	 +HNM5rX7zW8BAAqH5F6ZrDUJ+OJvOIO0A1dnWsBXs7jcY5Gsy4QczZ6vWd3B18fMDf
+	 WHdBCVAGPPxeA==
+Date: Thu, 29 Jan 2026 12:59:17 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
+	Alexandre Cassen <acassen@corp.free.fr>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net] xfrm: skip templates check for packet offload tunnel
+ mode
+Message-ID: <aXtZpSuGT1WPNwWO@horms.kernel.org>
+References: <1769518163-125874-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,96 +70,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260126092159.815968-2-vincent.guittot@linaro.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <1769518163-125874-1-git-send-email-tariqt@nvidia.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254786-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-254787-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url,nxp.com:email,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: B8DE3B026B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 3126AB035B
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 10:21:56AM +0100, Vincent Guittot wrote:
-> Describe the serdes subsystem available on the S32G platforms.
+On Tue, Jan 27, 2026 at 02:49:23PM +0200, Tariq Toukan wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
-> ---
->  .../bindings/phy/nxp,s32g-serdes.yaml         | 154 ++++++++++++++++++
->  1 file changed, 154 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> In packet offload, hardware is responsible to check templates. The
+> result of its operation is forwarded through secpath by relevant
+> drivers. That secpath is actually removed in __xfrm_policy_check2().
 > 
-> diff --git a/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-> new file mode 100644
-> index 000000000000..fad34bee2a4f
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-> @@ -0,0 +1,154 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/phy/nxp,s32g-serdes.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: NXP S32G2xxx/S32G3xxx SerDes PHY subsystem
-> +
-> +maintainers:
-> +  - Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
-> +
-> +description: |
-> +  The SerDes subsystem on S32G SoC Family includes two types of PHYs:
-> +    - One PCIe PHY: Supports various PCIe operation modes
-> +    - Two Ethernet Physical Coding Sublayer (XPCS) controllers
-> +
-> +  SerDes operation mode selects the enabled PHYs and speeds. Clock frequency
-> +  must be adapted accordingly. Below table describes all possible operation
-> +  modes.
-> +
-> +  Mode  PCIe	XPCS0		XPCS1		PHY clock	Description
-> +                SGMII		SGMII		  (MHz)
-> +  -------------------------------------------------------------------------
-> +  0	Gen3	N/A		N/A		100		Single PCIe
-> +  1	Gen2	1.25Gbps	N/A		100		PCIe/SGMII
-> +  2	Gen2	N/A		1.25Gbps	100		PCIe/SGMII
-> +  3	N/A	1.25Gbps	1.25Gbps	100,125		SGMII
-> +  4	N/A	3.125/1.25Gbps	3.125/1.25Gbps 	125		SGMII
-> +  5	Gen2	N/A	        3.125Gbps     	100		PCIe/SGMII
+> In case packet is forwarded, this secpath is reset in RX, but pushed
+> again to TX where policy is rechecked again against dummy secpath
+> in xfrm_policy_ok().
+> 
+> Such situation causes to unexpected XfrmInTmplMismatch increase.
+> 
+> As a solution, simply skip template mismatch check.
+> 
+> Fixes: 600258d555f0 ("xfrm: delete intermediate secpath entry in packet offload mode")
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Shouldn't the mode be configured via phy_set_mode_ext()?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-This identifies whether it is operating as PCIe or for networking and
-in the case of networking, the PHY interface mode should be passed as
-the submode.
-
-Have a look at include/linux/phy/pcie.h to see the submodes that may
-be appropriate to pass to phy_set_mode_ext() - but talk to the PHY
-subsystem maintainers.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
