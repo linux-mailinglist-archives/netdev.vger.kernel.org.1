@@ -1,167 +1,193 @@
-Return-Path: <netdev+bounces-254841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254842-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCiXO3yJe2mlFQIAu9opvQ
-	(envelope-from <netdev+bounces-254841-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:23:25 +0100
+	id MCOWDNuIe2mlFQIAu9opvQ
+	(envelope-from <netdev+bounces-254842-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:20:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59BBFB21EF
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:23:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86C5B213A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:20:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E79E301110F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:20:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DF1F4300E63D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA9B2441B8;
-	Thu, 29 Jan 2026 16:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E819340279;
+	Thu, 29 Jan 2026 16:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BI/Pn3gI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qk8qGl+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593CB335081
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 16:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295851DC997;
+	Thu, 29 Jan 2026 16:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769703611; cv=none; b=ux7oUb1LZn5dRUYyjydrwlmLGr9G5r5ZuaLB+pCH7KzDI+cJsPd04fYC+vCPv1ry+pKABqEhybczsJI8gbjeyfHq/hPJjVRcZ/08KxAomL1iIIF4C1qJ4mRUzC5gvHOwuuvYcKm3ysDEVJ7qnkDimXJjxMfZOQDOTIdpx6SK3T8=
+	t=1769703634; cv=none; b=rULVbUWKB8JFAW75D8wc7Ntvy3gtv+xyWryvIRJlPPBOFMwXYSgGCevgd/FpyMgNKQSwtQD4+TcUUMDAbEq3j47XpqXj+9AO1RGKJFsixInIzoXmPzcub5k91Xmr7FJUKF1+nQ68Ek5mnPdX/4I3f+gZqENCNo5ofavtCZCnjBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769703611; c=relaxed/simple;
-	bh=PFVmj3wg7i5RLRoiMygNxFHiRuKHl3fDkfLH6PUFNMg=;
+	s=arc-20240116; t=1769703634; c=relaxed/simple;
+	bh=Fz1cXF6f+rJrvUbhHS3fdB4yadryUHMv1k4BpBRxD8U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kYztX/2VAHapqgxChnDbnMTYcQhRmdkiPgg3dFJc0q/RxlRKA2koQqrXFwGsG+cwrL/u37Tc3yqjabMnBnz70nyBptoHwabLotrDBFMgSWn3B3bXAC0I8CTceq+lD0+DElw5sTkH8VlZrlWZUPIdm60yIK+iYE+PXawy2WwWHF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BI/Pn3gI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769703609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UT3UX+BhCHFvVpv2R2yyOC3sJNzabMmhRqPV2ECO9GA=;
-	b=BI/Pn3gIJW7g/UIMxcyyvCddqKHhI3xwiWJhXfAyyKgJ8OktMC1n28zfE8Pr2HT/sYTt9e
-	Z/lRJ+otSEjhl0vR4fBNNDY0YtKiuE4acDlxJVSmd8iM9CTrN6IPvreZCSAPjSLykFk+e7
-	7NrixZRlniSYsCHIDDvh10nYqjBB8J8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-138-IX1mGp4-PhWqurOb3hRbGw-1; Thu,
- 29 Jan 2026 11:20:04 -0500
-X-MC-Unique: IX1mGp4-PhWqurOb3hRbGw-1
-X-Mimecast-MFC-AGG-ID: IX1mGp4-PhWqurOb3hRbGw_1769703600
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A9971954204;
-	Thu, 29 Jan 2026 16:20:00 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.34.121])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F3DE81955F43;
-	Thu, 29 Jan 2026 16:19:56 +0000 (UTC)
-Date: Thu, 29 Jan 2026 17:19:53 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
-	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net
-Subject: Re: [PATCH net-next v2 8/9] hsr: Update PRP duplicate discard KUnit
- test for new algorithm
-Message-ID: <aXuIqWm9Aiu_f4vg@thinkpad>
-References: <cover.1769093335.git.fmaurer@redhat.com>
- <e1e0065cd9ff84a970625d77300ba028392981c4.1769093335.git.fmaurer@redhat.com>
- <20260129151241.44i6yt-r@linutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fAZiVqpHuZmD4cwXtLyh+dN4zLGD57BZ6YQg5OrNndvEhowcxmcvYH1zqmCLE4Fusl5rUaAbidyN22fxfERChUaCs8ZCHSCP153qWQBHhD799QiIUvmrhPBZSpoZmMIEX8oLXVD6VzeYkPHfjdQj1py5clctjohZSqbrk0JPnSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qk8qGl+P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF5CC19422;
+	Thu, 29 Jan 2026 16:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769703634;
+	bh=Fz1cXF6f+rJrvUbhHS3fdB4yadryUHMv1k4BpBRxD8U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qk8qGl+Pkcd4d1ocyt263pGIIb71t4DaBVUNxvGVhL4GjZ+0VFhvreTqIrTOl9min
+	 8TRYYRMyiAqaFRi+sYi/V4FURJnui5PEeeyiYNGGRsOCTbEHfV/k/Rd/efbn4aJw16
+	 3ZuZEWelIPyL13/nkF/pOeQBDfkdqq+kS2QmkNk1F0qyHQ8KFV3zbEbrPJnYv8M87r
+	 JAL/uuvmRFDGH1Ppn1vGBb4mahgzodbqTAWTygv7ryClXuV3gOk2/wm6XYyNCcl8/d
+	 /ueY04E03nuGlhj+h4NdCERf0RQH104yambHI+iDX17QbO79apmkgPv0zLaACAxAZQ
+	 Ur7QUYivF1ZGg==
+Date: Thu, 29 Jan 2026 16:20:28 +0000
+From: Simon Horman <horms@kernel.org>
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
+	p.zabel@pengutronix.de, linux@armlinux.org.uk,
+	ghennadi.procopciuc@nxp.com, bogdan-gabriel.roman@nxp.com,
+	Ionut.Vicovan@nxp.com, alexandru-catalin.ionita@nxp.com,
+	linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, Frank.li@nxp.com
+Subject: Re: [PATCH 3/4] phy: s32g: Add serdes xpcs subsystem
+Message-ID: <aXuIzJdZYEGX3XVy@horms.kernel.org>
+References: <20260126092159.815968-1-vincent.guittot@linaro.org>
+ <20260126092159.815968-4-vincent.guittot@linaro.org>
+ <aXtLsuOkMMryrUs4@horms.kernel.org>
+ <CAKfTPtB8xDB8qYUZwGnH+h94ww3+gSyOuZ+RL+zOh5tYGuu_HQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260129151241.44i6yt-r@linutronix.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <CAKfTPtB8xDB8qYUZwGnH+h94ww3+gSyOuZ+RL+zOh5tYGuu_HQ@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254841-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254842-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 59BBFB21EF
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D86C5B213A
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 04:12:41PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2026-01-22 15:57:03 [+0100], Felix Maurer wrote:
-> > With the new duplicate discard algorithm from the earlier patches, the
-> > KUnit test for the algorithm needs to be updated. The updates are done in a
-> > way to match the original intends pretty closely. Currently, there is much
-> > knowledge about the actual algorithm baked into the tests (especially the
-> > expectations) which may need some redesign in the future.
->
-> So the below isn't new but I wasn't aware we have this kunit thing
-> earlier. It triggers even before your series, just differently now. The
-> problem seems to be that node member isn't properly initialized. So
-> lockep complains:
->
-> | 1..1
-> |     KTAP version 1
-> |     # Subtest: prp_duplicate_discard
-> |     # module: prp_dup_discard_test
-> |     1..5
-> | INFO: trying to register non-static key.
-> | The code is fine but needs lockdep annotation, or maybe
-> | you didn't initialize this object before use?
-> | turning off the locking correctness validator.
-> …
-> |  lock_acquire+0xc8/0x210
-> |  rt_spin_lock+0x2e/0x1e0
-> |  hsr_check_duplicate+0x40/0xb0
-> |  prp_dup_discard_forward+0x30/0x180 [prp_dup_discard_test]
->
-> It needs:
->
-> diff --git a/net/hsr/prp_dup_discard_test.c b/net/hsr/prp_dup_discard_test.c
-> index a7a5beb52d62f..2ab346d920bbd 100644
-> --- a/net/hsr/prp_dup_discard_test.c
-> +++ b/net/hsr/prp_dup_discard_test.c
-> @@ -27,6 +27,7 @@ static struct prp_test_data *build_prp_test_data(struct kunit *test)
->  					     GFP_ATOMIC);
->  	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, data);
->  	xa_init(&data->node.seq_blocks);
-> +	spin_lock_init(&data->node.seq_out_lock);
->
->  	data->frame.node_src = &data->node;
->  	data->frame.port_rcv = &data->port_rcv;
+On Thu, Jan 29, 2026 at 02:24:15PM +0100, Vincent Guittot wrote:
+> On Thu, 29 Jan 2026 at 12:59, Simon Horman <horms@kernel.org> wrote:
+> >
+> > On Mon, Jan 26, 2026 at 10:21:58AM +0100, Vincent Guittot wrote:
+> >
+> > ...
+> >
+> > > diff --git a/drivers/phy/freescale/phy-nxp-s32g-serdes.c b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
+> >
+> > ...
+> >
+> > > +static void s32g_serdes_prepare_pma_mode5(struct s32g_serdes *serdes)
+> > > +{
+> > > +     u32 val;
+> > > +     /* Configure TX_VBOOST_LVL and TX_TERM_CTRL */
+> > > +     val = readl(serdes->ctrl.ss_base + S32G_PCIE_PHY_EXT_MISC_CTRL_2);
+> > > +     val &= ~(EXT_TX_VBOOST_LVL_MASK | EXT_TX_TERM_CTRL_MASK);
+> > > +     val |= FIELD_PREP(EXT_TX_VBOOST_LVL_MASK, 0x3) |
+> > > +             FIELD_PREP(EXT_TX_TERM_CTRL_MASK, 0x4);
+> > > +     writel(val, serdes->ctrl.ss_base + S32G_PCIE_PHY_EXT_MISC_CTRL_2);
+> >
+> > This is part of an AI Generated review.
+> > I have looked over it and I think it warrants investigation.
+> > For information on how to reproduce locally, as I did, please see [1].
+> >
+> >         The entire s32g_serdes_prepare_pma_mode5() function is ~70 lines of
+> >         magic numbers with zero explanation. These appear to be
+> >         hardware-specific PLL/PHY tuning parameters for 2.5G mode.
+> 
+> Unfortunately there is no additional information in the reference
+> manual other than
+> *step 4:
+> - Write 3h to EXT_TX_VBOOST_LVL.
+> - Write 4h to EXT_TX_TERM_CTRL
 
-Thanks, I'll add it!
+Understood. Sometimes you have the play the hand you're dealt.
 
-   Felix
+> 
+> >
+> > Please consider using #defines, to give values names.
+> >
+> > ...
+> >
+> > > +static int s32g_serdes_init_clks(struct s32g_serdes *serdes)
+> > > +{
+> > > +     struct s32g_serdes_ctrl *ctrl = &serdes->ctrl;
+> > > +     struct s32g_xpcs_ctrl *xpcs = &serdes->xpcs;
+> > > +     int ret, order[2], xpcs_id;
+> > > +     size_t i;
+> > > +
+> > > +     switch (ctrl->ss_mode) {
+> > > +     case 0:
+> > > +             return 0;
+> > > +     case 1:
+> > > +             order[0] = 0;
+> > > +             order[1] = XPCS_DISABLED;
+> > > +             break;
+> > > +     case 2:
+> > > +     case 5:
+> > > +             order[0] = 1;
+> > > +             order[1] = XPCS_DISABLED;
+> > > +             break;
+> > > +     case 3:
+> > > +             order[0] = 1;
+> > > +             order[1] = 0;
+> > > +             break;
+> > > +     case 4:
+> > > +             order[0] = 0;
+> > > +             order[1] = 1;
+> > > +             break;
+> > > +     default:
+> > > +             return -EINVAL;
+> >
+> > AI review also flags that s32g_serdes_get_ctrl_resources() ensures that
+> > ss_mode is <= 5.  So this check is unnecessary.
+> 
+> okay but providing a default seems a good practice
 
-> Sebastian
+Yeah, I was of two minds about forwarding on this part of the report.
 
+...
+
+> > AI review also flags that s32g_xpcs_regmap_reg_read and
+> > s32g_xpcs_regmap_reg_write do not protect against concurrent access.
+> 
+> but regmap framework should
+
+If it does, then I agree there is no problem here.
 
