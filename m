@@ -1,439 +1,319 @@
-Return-Path: <netdev+bounces-254677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OPRA70te2mbCAIAu9opvQ
-	(envelope-from <netdev+bounces-254677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:51:57 +0100
+	id 0J+MHE8ue2m3CAIAu9opvQ
+	(envelope-from <netdev+bounces-254678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:54:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BCEAAE46C
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:51:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDE01AE4A1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:54:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8CF7D30028FB
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:51:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB02E3013B5D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9552377573;
-	Thu, 29 Jan 2026 09:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE1C37FF71;
+	Thu, 29 Jan 2026 09:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OMNFC21b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKX7li8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A4A37107A;
-	Thu, 29 Jan 2026 09:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EF037F8B1;
+	Thu, 29 Jan 2026 09:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769680308; cv=none; b=uUG5n8ZfI3S0WyBJLJIeTTYX5WGvK4U5Infejc10pNxGtiU/QxuU335hPVOTrFcRHRQqAI2J3+8GNp1j0JpIdviaP3DespfXrYqgOtpNZZ4tJ53loSa0pIQf8XJsrSHP8GBMnOGzbQ6AKK9DHHydgSSUZt82caf9wzFn753h93o=
+	t=1769680459; cv=none; b=KqmIRWgHxLgLh4muu7//3JcN+Uabz4Ldeu3oLNVu9C/Sj22kSiLEDfPiR7CaUsNb7ua7xPjNK77Fhr+8PiZdrxiiPt6tt5Uq1CsE7qnzJ8tHROfN3gtvjVW0T3InLzfmGNybBqmzWgiq2iBhz/NoPJO8wHOUexQ2CK1TbtT9XlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769680308; c=relaxed/simple;
-	bh=55fkgyMa5KZnkX57ju+SGbrWhY3WOJUg/JpVndE1Cso=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=UK+Ko/hf6LGIdg4n2bGgaOeNKjDs1c2Dbb+LuefxonheqtIZ6gny7/WcN0yCsrttlp7nme8OvyF3aXcAFgUxwgb8x6pKemQj8BBADhLxO+H0VwCpqlnVKY/KZV6ByboTf3fI/klJmi/adsLY9xzBQE08izOm4yJNS96U5J5DTyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OMNFC21b; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769680302; h=Message-ID:Subject:Date:From:To;
-	bh=pEppn9QCwRC6bHz8KvmcpcbUTlzm4KOe0Qh7ji/Rg5s=;
-	b=OMNFC21bfpELHSg3juK82EiygxXQa5+m8L54C9S1GNHGMglhV+nfkGm2nGYPFZjYf0g/JbzPp2kcA9//2cA1vUheexPGRtFtM8c5Pwo0a3Vjsl+YZQxco6rfpDJsF+ACG/fVxMW3UnO7j9U66R+3byA3komyiD3FA9tdHUFq4Xs=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wy7.EFS_1769680302 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 29 Jan 2026 17:51:42 +0800
-Message-ID: <1769680105.7884188-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH RFC v2 2/2] virtio-net: support receive timestamp
-Date: Thu, 29 Jan 2026 17:48:25 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-References: <20260129-v6-7-topic-virtio-net-ptp-v2-0-30a27dc52760@pengutronix.de>
- <20260129-v6-7-topic-virtio-net-ptp-v2-2-30a27dc52760@pengutronix.de>
-In-Reply-To: <20260129-v6-7-topic-virtio-net-ptp-v2-2-30a27dc52760@pengutronix.de>
+	s=arc-20240116; t=1769680459; c=relaxed/simple;
+	bh=EnOTj/7CZJ9tyZqdurXyWWI0fv+qLb1PjDZ8+646Wj4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=scoqhxeZCCCwI8lOfzwhUbNrIrdVNT2DYXHY8IlC4CqF5Ec3LtgK9oI1jbesXKEbYOKfsnQ5luE3fjp75AyN9FhBS9MN1ME/XabBXXjK4yQJxQD2JziKH8P5CEZKVvufSHNqUTFuaf/eds1B7lbubm/BeiExN3LehPoT4p/iL3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKX7li8J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48A56C4CEF7;
+	Thu, 29 Jan 2026 09:54:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769680458;
+	bh=EnOTj/7CZJ9tyZqdurXyWWI0fv+qLb1PjDZ8+646Wj4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uKX7li8JfZPEdKeB1hBz8vBzLGN3uCNhd+sHkwTGTkJD5nNgCGxu88Shq8feblZWM
+	 7fb/NUtu1fVDkPOIYo0mlr8zHv9A3KUBNPNnN1Pt50ZycH3lvLgXAl6H7J0xaHtEid
+	 rApdiYCn5zrDIUovDT7gonalq6ycUOIABp9ypiyB4yhTDtiWsRx3XOZBjw3xUMqi+A
+	 0HkyXHWBY0bPE/9w0XWx+R9T+w4uw4MzzSx1nzr+MWICq1lAr4FInbGkUX55Y2+ZgH
+	 LICcilYOu7iiKrVFCMl3SjduswdnI20aCMusYEipXRpakmFazkmWpSEqzOyec3Ck3v
+	 OPQKsuwm5Yl5g==
+Date: Thu, 29 Jan 2026 09:54:13 +0000
+From: Simon Horman <horms@kernel.org>
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
+	p.zabel@pengutronix.de, linux@armlinux.org.uk,
+	ghennadi.procopciuc@nxp.com, bogdan-gabriel.roman@nxp.com,
+	Ionut.Vicovan@nxp.com, alexandru-catalin.ionita@nxp.com,
+	linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, Frank.li@nxp.com
+Subject: Re: [PATCH 2/4] phy: s32g: Add serdes subsystem phy
+Message-ID: <aXsuRTZUUnw0kdzV@horms.kernel.org>
+References: <20260126092159.815968-1-vincent.guittot@linaro.org>
+ <20260126092159.815968-3-vincent.guittot@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126092159.815968-3-vincent.guittot@linaro.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,pengutronix.de,redhat.com,davemloft.net,google.com,kernel.org,gmail.com,lunn.ch];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254677-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-254678-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,pengutronix.de:email]
-X-Rspamd-Queue-Id: 2BCEAAE46C
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: DDE01AE4A1
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 09:06:42 +0100, Steffen Trumtrar <s.trumtrar@pengutronix.de> wrote:
-> Add optional hardware rx timestamp offload for virtio-net.
->
-> Introduce virtio feature VIRTIO_NET_F_TSTAMP. If negotiated, the
-> virtio-net header is expanded with room for a timestamp.
->
-> To get and set the hwtstamp the functions ndo_hwtstamp_set/get need
-> to be implemented. This allows filtering the packets and only time stamp
-> the packets where the filter matches. This way, the timestamping can
-> be en/disabled at runtime.
->
-> Tested:
->   guest: ./timestamping eth0 \
->           SOF_TIMESTAMPING_RAW_HARDWARE \
->           SOF_TIMESTAMPING_RX_HARDWARE
->   host: nc -4 -u 192.168.1.1 319
->
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
->
-> --
->   Changes to last version:
->   - rework series to use flow filters
->   - add new struct virtio_net_hdr_v1_hash_tunnel_ts
->   - original work done by: Willem de Bruijn <willemb@google.com>
-> ---
->  drivers/net/virtio_net.c        | 136 ++++++++++++++++++++++++++++++++++++----
->  include/uapi/linux/virtio_net.h |   9 +++
->  2 files changed, 133 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 1bb3aeca66c6e..4e8d9b20c1b34 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -429,6 +429,9 @@ struct virtnet_info {
->  	struct virtio_net_rss_config_trailer rss_trailer;
->  	u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
->
-> +	/* Device passes time stamps from the driver */
-> +	bool has_tstamp;
+On Mon, Jan 26, 2026 at 10:21:57AM +0100, Vincent Guittot wrote:
+
+...
+
+> diff --git a/drivers/phy/freescale/phy-nxp-s32g-serdes.c b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
+> new file mode 100644
+> index 000000000000..8336c868c8dc
+> --- /dev/null
+> +++ b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
+> @@ -0,0 +1,569 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/**
+> + * SerDes driver for S32G SoCs
+> + *
+> + * Copyright 2021-2026 NXP
+> + */
 > +
->  	/* Has control virtqueue */
->  	bool has_cvq;
->
-> @@ -475,6 +478,8 @@ struct virtnet_info {
->
->  	struct control_buf *ctrl;
->
-> +	struct kernel_hwtstamp_config tstamp_config;
-> +
->  	/* Ethtool settings */
->  	u8 duplex;
->  	u32 speed;
-> @@ -511,6 +516,7 @@ struct virtio_net_common_hdr {
->  		struct virtio_net_hdr_mrg_rxbuf	mrg_hdr;
->  		struct virtio_net_hdr_v1_hash hash_v1_hdr;
->  		struct virtio_net_hdr_v1_hash_tunnel tnl_hdr;
-> +		struct virtio_net_hdr_v1_hash_tunnel_ts ts_hdr;
->  	};
->  };
->
-> @@ -682,6 +688,13 @@ skb_vnet_common_hdr(struct sk_buff *skb)
->  	return (struct virtio_net_common_hdr *)skb->cb;
->  }
->
-> +static inline struct virtio_net_hdr_v1_hash_tunnel_ts *skb_vnet_hdr_ts(struct sk_buff *skb)
+> +#include <dt-bindings/phy/phy.h>
+> +#include <linux/clk.h>
+> +#include <linux/delay.h>
+
+Hi Vincent, all,
+
+I think that you also need:
+
+#include <linux/iopoll.h>
+
+So that read_poll_timeout() is declared.
+Else this patch causes a transient build failure
+(for x86_64 allmodconfig)
+
+> +#include <linux/module.h>
+> +#include <linux/of_platform.h>
+> +#include <linux/of_address.h>
+> +#include <linux/phy/phy.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/processor.h>
+> +#include <linux/reset.h>
+> +#include <linux/units.h>
+
+...
+
+> +static int s32g_serdes_phy_set_mode_ext(struct phy *p,
+> +					enum phy_mode mode, int submode)
 > +{
-> +	BUILD_BUG_ON(sizeof(struct virtio_net_hdr_v1_hash_tunnel_ts) > sizeof(skb->cb));
+> +	struct s32g_serdes *serdes = phy_get_drvdata(p);
 > +
-> +	return (void *)skb->cb;
-> +}
+> +	if (mode == PHY_MODE_PCIE)
+> +		return -EINVAL;
+
+This is part of an AI Generated review.
+I have looked over it and I think it warrants investigation.
+For information on how to reproduce locally, as I did, please see [1].
+
+[1] https://netdev-ai.bots.linux.dev/ai-local.html
+
+  This returns error if mode IS PHY_MODE_PCIE, but this is a PCIe PHY!
+  This looks like a typo. Should be !=.
+
 > +
->  /*
->   * private is used to chain pages for big packets, put the whole
->   * most recent used list in the beginning for reuse
-> @@ -2560,6 +2573,15 @@ virtio_net_hash_value(const struct virtio_net_hdr_v1_hash *hdr_hash)
->  		(__le16_to_cpu(hdr_hash->hash_value_hi) << 16);
->  }
->
-> +static inline u64
-> +virtio_net_tstamp_value(const struct virtio_net_hdr_v1_hash_tunnel_ts *hdr_hash_ts)
-> +{
-> +	return  (u64)__le16_to_cpu(hdr_hash_ts->tstamp_0) |
-> +	       ((u64)__le16_to_cpu(hdr_hash_ts->tstamp_1) << 16) |
-> +	       ((u64)__le16_to_cpu(hdr_hash_ts->tstamp_2) << 32) |
-> +	       ((u64)__le16_to_cpu(hdr_hash_ts->tstamp_3) << 48);
-> +}
+> +	if (!is_pcie_phy_mode_valid(submode))
+> +		return -EINVAL;
 > +
->  static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
->  				struct sk_buff *skb)
->  {
-> @@ -2589,6 +2611,18 @@ static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
->  	skb_set_hash(skb, virtio_net_hash_value(hdr_hash), rss_hash_type);
->  }
->
-> +static inline void virtnet_record_rx_tstamp(const struct virtnet_info *vi,
-> +					    struct sk_buff *skb)
-> +{
-> +	struct skb_shared_hwtstamps *shhwtstamps = skb_hwtstamps(skb);
-> +	const struct virtio_net_hdr_v1_hash_tunnel_ts *h = skb_vnet_hdr_ts(skb);
-> +	u64 ts;
+> +	/*
+> +	 * Do not configure SRIS or CRSS PHY MODE in conjunction
+> +	 * with any SGMII mode on the same SerDes subsystem
+> +	 */
+> +	if ((submode == CRSS || submode == SRIS) &&
+> +	    serdes->ctrl.ss_mode != 0)
+> +		return -EINVAL;
 > +
-> +	ts = virtio_net_tstamp_value(h);
-> +	memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
-> +	shhwtstamps->hwtstamp = ns_to_ktime(ts);
-> +}
+> +	/*
+> +	 * Internal reference clock cannot be used with either Common clock
+> +	 * or Spread spectrum, leaving only SRNSS
+> +	 */
+> +	if (submode != SRNS &&  !serdes->ctrl.ext_clk)
+> +		return -EINVAL;
 > +
->  static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *rq,
->  				 struct sk_buff *skb, u8 flags)
->  {
-> @@ -2617,6 +2651,8 @@ static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *
->  		goto frame_err;
->  	}
->
-> +	if (vi->has_tstamp && vi->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE)
-> +		virtnet_record_rx_tstamp(vi, skb);
->  	skb_record_rx_queue(skb, vq2rxq(rq->vq));
->  	skb->protocol = eth_type_trans(skb, dev);
->  	pr_debug("Receiving skb proto 0x%04x len %i type %i\n",
-> @@ -3321,7 +3357,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
->  {
->  	const unsigned char *dest = ((struct ethhdr *)skb->data)->h_dest;
->  	struct virtnet_info *vi = sq->vq->vdev->priv;
-> -	struct virtio_net_hdr_v1_hash_tunnel *hdr;
-> +	struct virtio_net_hdr_v1_hash_tunnel_ts *hdr;
->  	int num_sg;
->  	unsigned hdr_len = vi->hdr_len;
->  	bool can_push;
-> @@ -3329,8 +3365,8 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
->  	pr_debug("%s: xmit %p %pM\n", vi->dev->name, skb, dest);
->
->  	/* Make sure it's safe to cast between formats */
-> -	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr));
-> -	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr.hdr));
-> +	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->tnl.hash_hdr));
-> +	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->tnl.hash_hdr.hdr));
->
->  	can_push = vi->any_header_sg &&
->  		!((unsigned long)skb->data & (__alignof__(*hdr) - 1)) &&
-> @@ -3338,18 +3374,18 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
->  	/* Even if we can, don't push here yet as this would skew
->  	 * csum_start offset below. */
->  	if (can_push)
-> -		hdr = (struct virtio_net_hdr_v1_hash_tunnel *)(skb->data -
-> -							       hdr_len);
-> +		hdr = (struct virtio_net_hdr_v1_hash_tunnel_ts *)(skb->data -
-> +								  hdr_len);
->  	else
-> -		hdr = &skb_vnet_common_hdr(skb)->tnl_hdr;
-> +		hdr = &skb_vnet_common_hdr(skb)->ts_hdr;
->
-> -	if (virtio_net_hdr_tnl_from_skb(skb, hdr, vi->tx_tnl,
-> +	if (virtio_net_hdr_tnl_from_skb(skb, &hdr->tnl, vi->tx_tnl,
->  					virtio_is_little_endian(vi->vdev), 0,
->  					false))
->  		return -EPROTO;
->
->  	if (vi->mergeable_rx_bufs)
-> -		hdr->hash_hdr.hdr.num_buffers = 0;
-> +		hdr->tnl.hash_hdr.hdr.num_buffers = 0;
->
->  	sg_init_table(sq->sg, skb_shinfo(skb)->nr_frags + (can_push ? 1 : 2));
->  	if (can_push) {
-> @@ -5563,6 +5599,22 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
->  	return 0;
->  }
->
-> +static int virtnet_get_ts_info(struct net_device *dev,
-> +			       struct kernel_ethtool_ts_info *info)
-> +{
-> +	/* setup default software timestamp */
-> +	ethtool_op_get_ts_info(dev, info);
-> +
-> +	info->rx_filters = (BIT(HWTSTAMP_FILTER_NONE) |
-> +			    BIT(HWTSTAMP_FILTER_PTP_V1_L4_SYNC) |
-> +			    BIT(HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ) |
-> +			    BIT(HWTSTAMP_FILTER_ALL));
-> +
-> +	info->tx_types = HWTSTAMP_TX_OFF;
+> +	serdes->pcie.phy_mode = submode;
+
+The AI review also suggested that it may be unsafe
+to set the submode after s32g_serdes_phy_power_on()
+has been called. And that there is nothing preventing that.
+
+TBH, I am unsure if either of those statements are true.
+But it seems worth validating with you.
+
 > +
 > +	return 0;
 > +}
-> +
->  static void virtnet_init_settings(struct net_device *dev)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
-> @@ -5658,7 +5710,7 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
->  	.get_ethtool_stats = virtnet_get_ethtool_stats,
->  	.set_channels = virtnet_set_channels,
->  	.get_channels = virtnet_get_channels,
-> -	.get_ts_info = ethtool_op_get_ts_info,
-> +	.get_ts_info = virtnet_get_ts_info,
->  	.get_link_ksettings = virtnet_get_link_ksettings,
->  	.set_link_ksettings = virtnet_set_link_ksettings,
->  	.set_coalesce = virtnet_set_coalesce,
-> @@ -6242,6 +6294,58 @@ static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
->  		   jiffies_to_usecs(jiffies - READ_ONCE(txq->trans_start)));
->  }
->
-> +static int virtnet_hwtstamp_get(struct net_device *dev,
-> +				struct kernel_hwtstamp_config *tstamp_config)
+
+...
+
+> +static int s32g_serdes_get_ctrl_resources(struct platform_device *pdev, struct s32g_serdes *serdes)
 > +{
-> +	struct virtnet_info *vi = netdev_priv(dev);
+> +	struct s32g_serdes_ctrl *ctrl = &serdes->ctrl;
+> +	struct device *dev = &pdev->dev;
+> +	int ret, idx;
 > +
-> +	if (!netif_running(dev))
+> +	ret = of_property_read_u32(dev->of_node, "nxp,sys-mode",
+> +				   &ctrl->ss_mode);
+> +	if (ret) {
+> +		dev_err(dev, "Failed to get SerDes subsystem mode\n");
 > +		return -EINVAL;
-> +
-> +	*tstamp_config = vi->tstamp_config;
-> +
-> +	return 0;
-> +}
-> +
-> +static int virtnet_hwtstamp_set(struct net_device *dev,
-> +				struct kernel_hwtstamp_config *tstamp_config,
-> +				struct netlink_ext_ack *extack)
-> +{
-> +	struct virtnet_info *vi = netdev_priv(dev);
-> +
-> +	if (!netif_running(dev))
-> +		return -EINVAL;
-> +
-> +	switch (tstamp_config->rx_filter) {
-> +	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
-> +		break;
-> +	case HWTSTAMP_FILTER_PTP_V2_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
-> +	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
-> +	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
-> +	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
-> +	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
-> +		tstamp_config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
-> +		break;
-> +	case HWTSTAMP_FILTER_NONE:
-> +		break;
-> +	case HWTSTAMP_FILTER_ALL:
-> +		tstamp_config->rx_filter = HWTSTAMP_FILTER_ALL;
-> +		break;
-> +	default:
-> +		tstamp_config->rx_filter = HWTSTAMP_FILTER_ALL;
-> +		return -ERANGE;
 > +	}
 > +
-> +	vi->tstamp_config = *tstamp_config;
+> +	if (ctrl->ss_mode > S32G_SERDES_MODE_MAX) {
+> +		dev_err(dev, "Invalid SerDes subsystem mode %u\n",
+> +			ctrl->ss_mode);
+> +		return -EINVAL;
+> +	}
 > +
-> +	return 0;
+> +	ctrl->ss_base = devm_platform_ioremap_resource_byname(pdev, "ss_pcie");
+> +	if (IS_ERR(ctrl->ss_base)) {
+> +		dev_err(dev, "Failed to map 'ss_pcie'\n");
+> +		return PTR_ERR(ctrl->ss_base);
+> +	}
+> +
+> +	ctrl->rst = devm_reset_control_get(dev, "serdes");
+> +	if (IS_ERR(ctrl->rst))
+> +		return dev_err_probe(dev, PTR_ERR(ctrl->rst),
+> +				     "Failed to get 'serdes' reset control\n");
+> +
+> +	ctrl->nclks = devm_clk_bulk_get_all(dev, &ctrl->clks);
+> +	if (ctrl->nclks < 1)
+> +		return dev_err_probe(dev, ctrl->nclks,
+> +				     "Failed to get SerDes clocks\n");
+
+If devm_clk_bulk_get_all returns 0 then this value will
+be passed to dev_err_probe(). And 0 will, in turn be returned by
+dev_err_probe() and this function. However, that will be treated
+as success by the caller, even though this is an error condition.
+
+Perhaps something like this is more appropriate if ctrl->nclks
+must be greater than 0. (Completely untested!)
+
+	if (ctrl->nclks < 1) {
+		ret = ctrl->nclks ? : -EINVAL;
+		return dev_err_probe(dev, ret,
+				     "Failed to get SerDes clocks\n");
+	}
+
+Flagged by Smatch.
+
+...
+
+> +static int s32g_serdes_parse_lanes(struct device *dev, struct s32g_serdes *serdes)
+> +{
+> +	int ret;
+> +
+> +	for_each_available_child_of_node_scoped(dev->of_node, of_port) {
+> +		ret = s32g2_serdes_create_phy(serdes, of_port);
+> +		if (ret)
+> +			break;
+> +	}
+> +
+> +	return ret;
+
+Perhaps it cannot occur.
+But if the loop above iterates zero times,
+then ret will be used uninitialised here.
+
+Also flagged by Smatch.
+
 > +}
 > +
->  static int virtnet_init_irq_moder(struct virtnet_info *vi)
->  {
->  	u8 profile_flags = 0, coal_flags = 0;
-> @@ -6289,6 +6393,8 @@ static const struct net_device_ops virtnet_netdev = {
->  	.ndo_get_phys_port_name	= virtnet_get_phys_port_name,
->  	.ndo_set_features	= virtnet_set_features,
->  	.ndo_tx_timeout		= virtnet_tx_timeout,
-> +	.ndo_hwtstamp_set	= virtnet_hwtstamp_set,
-> +	.ndo_hwtstamp_get	= virtnet_hwtstamp_get,
->  };
->
->  static void virtnet_config_changed_work(struct work_struct *work)
-> @@ -6911,6 +7017,9 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
->  		vi->has_rss_hash_report = true;
->
-> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_TSTAMP))
-> +		vi->has_tstamp = true;
+> +static int s32g_serdes_probe(struct platform_device *pdev)
+> +{
+> +	struct s32g_serdes *serdes;
+> +	struct device *dev = &pdev->dev;
+> +	int ret;
 > +
->  	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
->  		vi->has_rss = true;
->
-> @@ -6945,8 +7054,10 @@ static int virtnet_probe(struct virtio_device *vdev)
->  		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
->  	}
->
-> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) ||
-> -	    virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO))
-> +	if (vi->has_tstamp)
-> +		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash_tunnel_ts);
-> +	else if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) ||
-> +		 virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO))
->  		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash_tunnel);
->  	else if (vi->has_rss_hash_report)
->  		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-> @@ -7269,7 +7380,8 @@ static struct virtio_device_id id_table[] = {
->  	VIRTIO_NET_F_SPEED_DUPLEX, VIRTIO_NET_F_STANDBY, \
->  	VIRTIO_NET_F_RSS, VIRTIO_NET_F_HASH_REPORT, VIRTIO_NET_F_NOTF_COAL, \
->  	VIRTIO_NET_F_VQ_NOTF_COAL, \
-> -	VIRTIO_NET_F_GUEST_HDRLEN, VIRTIO_NET_F_DEVICE_STATS
-> +	VIRTIO_NET_F_GUEST_HDRLEN, VIRTIO_NET_F_DEVICE_STATS, \
-> +	VIRTIO_NET_F_TSTAMP
->
->  static unsigned int features[] = {
->  	VIRTNET_FEATURES,
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index 1db45b01532b5..9f967575956b8 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -56,6 +56,7 @@
->  #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
->  					 * Steering */
->  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> +#define VIRTIO_NET_F_TSTAMP	  49	/* Device sends TAI receive time */
->  #define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
->  #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
->  #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
-> @@ -215,6 +216,14 @@ struct virtio_net_hdr_v1_hash_tunnel {
->  	__le16 inner_nh_offset;
->  };
->
-> +struct virtio_net_hdr_v1_hash_tunnel_ts {
-> +	struct virtio_net_hdr_v1_hash_tunnel tnl;
-> +	__le16 tstamp_0;
-> +	__le16 tstamp_1;
-> +	__le16 tstamp_2;
-> +	__le16 tstamp_3;
-> +};
+> +	serdes = devm_kzalloc(dev, sizeof(*serdes), GFP_KERNEL);
+> +	if (!serdes)
+> +		return -ENOMEM;
+> +
+> +	platform_set_drvdata(pdev, serdes);
+> +	serdes->dev = dev;
+> +
+> +	ret = s32g_serdes_get_ctrl_resources(pdev, serdes);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = s32g_serdes_get_pcie_resources(pdev, serdes);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = s32g_serdes_parse_lanes(dev, serdes);
+> +	if (ret)
+> +		return ret;
 
+The I review also says:
 
-Since patch #1 used this struct, this one should be placed first in the series.
-Also, has the virtio specification process accepted such a draft proposal?
+  The probe function calls s32g_serdes_init() which enables clocks,
+  configures hardware, and deasserts reset. However,
+  s32g_serdes_parse_lanes() creates PHY providers via
+  devm_of_phy_provider_register().
 
-Thanks
+  Problem: PHY consumers can start calling PHY ops (like power_on) as soon
+  as the provider is registered, but the hardware isn't initialized until
+  s32g_serdes_init() runs afterward. This creates a race window.
 
+  Recommendation: Move s32g_serdes_init() before s32g_serdes_parse_lanes().
 
 > +
->  #ifndef VIRTIO_NET_NO_LEGACY
->  /* This header comes first in the scatter-gather list.
->   * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated, it must
->
-> --
-> 2.52.0
->
+> +	ret = s32g_serdes_init(serdes);
+> +
+> +	return ret;
+
+nit: This could be more succinctly written as:
+
+	return s32g_serdes_init(serdes);
+
+> +}
+
+...
 
