@@ -1,191 +1,211 @@
-Return-Path: <netdev+bounces-254573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6CatOcruemnn/wEAu9opvQ
-	(envelope-from <netdev+bounces-254573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:23:22 +0100
+	id eOMCH2jwemkhAAIAu9opvQ
+	(envelope-from <netdev+bounces-254574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:30:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 606C5ABE4D
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:23:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF6FABEC4
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 515F53019142
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:23:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 87499300E73B
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84D62D77FE;
-	Thu, 29 Jan 2026 05:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Wbnfu26x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1E92D9EEC;
+	Thu, 29 Jan 2026 05:29:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB24215F42;
-	Thu, 29 Jan 2026 05:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4ED2D9797;
+	Thu, 29 Jan 2026 05:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769664200; cv=none; b=JVQMd0653fLhDrWq/Je+vCxp/TwrBXCp11noAcKl1aP9r6K+rrB+igWYRc5nFwNDG7OypzszuzD8qXnJc54xaN0N8yCiA11rrnopVCNfBQ39+8wvtnIwkv7CW/PSbTNvuoeqZrMNOrcK1jAx1/jgp8WP7VvUB/vntrG8u4A5z98=
+	t=1769664599; cv=none; b=k4ItmG7l3yRN2TaI46ZXJnIPAEVtdCONL+FA/sIq/70I4TYWbx/Jts9BIUQswiUOhE0EwUhph/3hfatHEELY8pBtbYZWnz5hu6diT/nXkqQ91XRF8vDL1OvCRMNOD/rvhW4CWi6PEllnYq4kS0BGaJj+81vXXAEh0WZTOWzb1P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769664200; c=relaxed/simple;
-	bh=8EtvXezDL8nN9hK+Dc+RZe77AUI6FGI4Xofxz/NF6Fw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oeoC7OXK0+ARq0avX9K4gELjnYCnez1v4LU806pObHFxXVFxsG0+TqQRTHZPcKfqN/NEy+k/O4/gTpYemvLTcdJzqTnr++Q8OZY5zewWJwI8zpYZIBnZkMtSBkWfgXN1MVv6ChMnpu7n11pa1y1WmgMLBEZab+IHyr8Ckqa5RzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Wbnfu26x; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60SMINpW2897781;
-	Wed, 28 Jan 2026 21:23:06 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=bZKX6jWk5XCvLHe9aZFiQu2xD
-	RKzfqh+0jt/H29EaBA=; b=Wbnfu26xZBjRCmybcY7NkVzYgOaXk3EaQ9P5J75Ii
-	FczKcuyc0GNjKfZWh5ZOBLR4+R1bldbTUgOTiXSutYWFvaDQo21oXSWzj/Qab8Ac
-	Om6QAQ8DL5dUF0J+Nz+Emxv6elEAaaXM+DtSWhtbxVbo/s1Pp4yIxTEkjREqgoEo
-	JtegfXWPyQ2e9HRt3ldO7sDaEoUqTnNVm1imza5nGdr8FannI4eoWBx1WR26Jr1O
-	Xmqd7J7V6aB+BHmcgjUeB598da+rzWWG1+9yBC1TKOcToxAfT7mbuVCEG2y1AOvW
-	e1sQ2+l7e5Ms5QpAwtu84hTRBtDfUJkIQtmfVAZPzkX+A==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4byu4s0tcp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Jan 2026 21:23:06 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 28 Jan 2026 21:23:21 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 28 Jan 2026 21:23:21 -0800
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id ECDAB3F704B;
-	Wed, 28 Jan 2026 21:23:01 -0800 (PST)
-Date: Thu, 29 Jan 2026 10:53:00 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <edumazet@google.com>, <sumang@marvell.com>,
-        <linux-kernel@vger.kernel.org>, <sbhatta@marvell.com>,
-        <davem@davemloft.net>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>
-Subject: Re: [net-next,v6,01/13] octeontx2-af: npc: cn20k: Index management
-Message-ID: <aXrutHgsKEuJUlGK@rkannoth-OptiPlex-7090>
-References: <20260128071235.3577206-2-rkannoth@marvell.com>
- <20260129051301.376533-1-kuba@kernel.org>
+	s=arc-20240116; t=1769664599; c=relaxed/simple;
+	bh=30+imTi0yv9XJyqLeLF4BtuFVz4ZSuLiBHlKCiyICQY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XosbDX8YUaqSgcWWi67AJ4ExFxDPy5a87jDh2ilFpGYN98F/R+90FoxwC/Mj3mnKDmaC77d/PTUJiG6AKm7r0Mdh7n/BtfFOGaT9xJhI+CRRcHFDG9w2lVz5HfHKGKChh/o0mB+SzN/abh0GQoz8b8LkU1Q/lAgziuq1qJ15q40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [10.213.22.141] (unknown [210.73.43.101])
+	by APP-01 (Coremail) with SMTP id qwCowAAHr2pB8HppvVmpBg--.14477S2;
+	Thu, 29 Jan 2026 13:29:39 +0800 (CST)
+Message-ID: <11bd0685-8665-45ef-bec1-8ccf9e38ad6c@iscas.ac.cn>
+Date: Thu, 29 Jan 2026 13:29:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260129051301.376533-1-kuba@kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI5MDAzMiBTYWx0ZWRfX7gS2l9JlT2DA
- pTl7jzDuaYHLpuHzOvotrgb5UeanijQ6NXqJJDjMxOPaWcl4GsFMLZtuGpF9Mems7xRIkvkAaXf
- EzZvPRkriiQJYrNM825zijYSmEtUw11Rtd1bDtqvjZsNDexruDD2QgZpJWzZqMZODdhMOFrd2Rg
- AJGTanl4A/AhvTMp9DXSTBQVG84CylI81P80LM9d/A3zDzo8ARgokY9tcB4hwm4PyJfTfFsNuCn
- 1UViHIe+vM1d0LyJtyymxGzPDUKXEym2J6YfKdCFlJlvWFhE8ESAJx+vneu0vniFWXMlFWDhBNJ
- 4gPXS2OCKjMfwtIWEu/xDi8qa87Ql3h5uDToKFchICz3Lpilv6EuW8r+TNN6yA73+ekA8HkA//i
- LZq4xvwog//AZJucB+TFKqt3avCr2u1509HokuGk1A2BWrbwzxU/TCJR8bTH80HXGQegmgAAtJ2
- PUCpQqhJpUCDyfrgM/Q==
-X-Proofpoint-ORIG-GUID: z_fAJUEA0GcCdZ0aZjoTS4tSw-CbziIo
-X-Authority-Analysis: v=2.4 cv=XeOEDY55 c=1 sm=1 tr=0 ts=697aeeba cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=9R54UkLUAAAA:8 a=VwQbUJbxAAAA:8 a=zNruMUKu9Wi_VSSbIxoA:9 a=CjuIK1q_8ugA:10
- a=16MAPSKLCI0A:10 a=YTcpBFlVQWkNscrzJ_Dz:22
-X-Proofpoint-GUID: z_fAJUEA0GcCdZ0aZjoTS4tSw-CbziIo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-28_06,2026-01-28_03,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] net: spacemit: k1-emac: fix jumbo frame support
+To: Tomas Hlavacek <tmshlvck@gmail.com>, netdev@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dlan@kernel.org, stable@vger.kernel.org
+References: <20260129042908.410326-1-tmshlvck@gmail.com>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20260129042908.410326-1-tmshlvck@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowAAHr2pB8HppvVmpBg--.14477S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxAw47Zr1UWrWrAr43ZF15CFg_yoWrAF1kpF
+	4Y9F90krs0yrn2k3Z2ya18tFn8ta17Wr10k3yjv3y8Z3sFkr9rGrnxKrW3Cr9rurWkWF1F
+	9a4UZrnruFWDXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvlb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
+	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
+	MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvj
+	DU0xZFpf9x07betCcUUUUU=
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254573-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-254574-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 606C5ABE4D
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: EDF6FABEC4
 X-Rspamd-Action: no action
 
-On 2026-01-29 at 10:43:01, Jakub Kicinski (kuba@kernel.org) wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+On 1/29/26 12:29, Tomas Hlavacek wrote:
+> The driver never programs the MAC frame size and jabber registers,
+> causing the hardware to reject frames larger than the default 1518
+> bytes even when larger DMA buffers are allocated.
 >
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> Program MAC_MAXIMUM_FRAME_SIZE, MAC_TRANSMIT_JABBER_SIZE, and
+> MAC_RECEIVE_JABBER_SIZE based on the configured MTU. Also fix the
+> maximum buffer size from 4096 to 4095, since the descriptor buffer
+> size field is only 12 bits. Account for double VLAN tags in frame
+> size calculations.
+>
+> Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Tomas Hlavacek <tmshlvck@gmail.com>
 > ---
-> octeontx2-af: npc: cn20k: Index management
+> v3:
+> - Set all three frame/jabber registers, fix 12-bit buffer size field
+>   overflow, use actual frame size with VLAN headroom consistently.
 >
-> This patch adds MCAM index management for CN20K silicon, implementing
-> contiguous and non-contiguous allocation schemes across the new subbank
-> architecture with 32 subbanks of 256 entries each.
+> v2: https://lore.kernel.org/netdev/20260126171449.83288-1-tmshlvck@gmail.com/
+> - Added Fixes tag and Cc stable.
 >
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> > new file mode 100644
-> > index 000000000000..30cc05c64487
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> v1: https://lore.kernel.org/netdev/20260126135919.77168-1-tmshlvck@gmail.com/
+> ---
+>  drivers/net/ethernet/spacemit/k1_emac.c | 21 +++++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
 >
-> [ ... ]
->
-> > +static int npc_create_srch_order(int cnt)
-> > +{
-> > +	int val = 0;
-> > +
-> > +	subbank_srch_order = kcalloc(cnt, sizeof(int),
-> > +				     GFP_KERNEL);
-> > +	if (!subbank_srch_order)
-> > +		return -ENOMEM;
-> > +
-> > +	for (int i = 0; i < cnt; i += 2) {
-> > +		subbank_srch_order[i] = cnt / 2 - val - 1;
-> > +		subbank_srch_order[i + 1] = cnt / 2 + 1 + val;
->                                    ^^^^^
->
-> When cnt is odd, the final loop iteration has i = cnt - 1, which means
-> subbank_srch_order[i + 1] writes to index cnt, which is out of bounds.
->
-> For example with cnt = 5, the loop iterates with i = 0, 2, 4. At i = 4,
-> the array access subbank_srch_order[5] overflows the allocated array of
-> 5 elements.
->
-> While CN20K hardware typically has 32 subbanks (even), the value is read
-> from a hardware register at npc_priv_init() without validation beyond
-> checking for zero. Could this lead to memory corruption if the hardware
-> reports an odd subbank count?
-subbank count is 16 or 8, depending on SoC variant. i will add a WARN check on
-odd ?
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+> index 220eb5ce7583..cd6879d7434c 100644
+> --- a/drivers/net/ethernet/spacemit/k1_emac.c
+> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/dma-mapping.h>
+>  #include <linux/etherdevice.h>
+>  #include <linux/ethtool.h>
+> +#include <linux/if_vlan.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/io.h>
+>  #include <linux/iopoll.h>
+> @@ -38,7 +39,7 @@
+>  
+>  #define EMAC_DEFAULT_BUFSIZE		1536
+>  #define EMAC_RX_BUF_2K			2048
+> -#define EMAC_RX_BUF_4K			4096
+> +#define EMAC_RX_BUF_MAX			FIELD_MAX(RX_DESC_1_BUFFER_SIZE_1_MASK)
+>  
+>  /* Tuning parameters from SpacemiT */
+>  #define EMAC_TX_FRAMES			64
+> @@ -202,8 +203,7 @@ static void emac_init_hw(struct emac_priv *priv)
+>  {
+>  	/* Destination address for 802.3x Ethernet flow control */
+>  	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
+> -
+> -	u32 rxirq = 0, dma = 0;
+> +	u32 rxirq = 0, dma = 0, frame_sz;
+>  
+>  	regmap_set_bits(priv->regmap_apmu,
+>  			priv->regmap_apmu_offset + APMU_EMAC_CTRL_REG,
+> @@ -228,6 +228,15 @@ static void emac_init_hw(struct emac_priv *priv)
+>  		DEFAULT_TX_THRESHOLD);
+>  	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
+>  
+> +	/* Set maximum frame size and jabber size based on configured MTU,
+> +	 * accounting for Ethernet header, double VLAN tags, and FCS.
+> +	 */
+> +	frame_sz = priv->ndev->mtu + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
+> +
+> +	emac_wr(priv, MAC_MAXIMUM_FRAME_SIZE, frame_sz);
+> +	emac_wr(priv, MAC_TRANSMIT_JABBER_SIZE, frame_sz);
+> +	emac_wr(priv, MAC_RECEIVE_JABBER_SIZE, frame_sz);
+> +
+>  	/* Configure flow control (enabled in emac_adjust_link() later) */
+>  	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
+>  	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
+> @@ -924,14 +933,14 @@ static int emac_change_mtu(struct net_device *ndev, int mtu)
+>  		return -EBUSY;
+>  	}
+>  
+> -	frame_len = mtu + ETH_HLEN + ETH_FCS_LEN;
+> +	frame_len = mtu + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
+>  
+>  	if (frame_len <= EMAC_DEFAULT_BUFSIZE)
+>  		priv->dma_buf_sz = EMAC_DEFAULT_BUFSIZE;
+>  	else if (frame_len <= EMAC_RX_BUF_2K)
+>  		priv->dma_buf_sz = EMAC_RX_BUF_2K;
+>  	else
+> -		priv->dma_buf_sz = EMAC_RX_BUF_4K;
+> +		priv->dma_buf_sz = EMAC_RX_BUF_MAX;
+>  
+>  	ndev->mtu = mtu;
+>  
+> @@ -2005,7 +2014,7 @@ static int emac_probe(struct platform_device *pdev)
+>  	ndev->hw_features = NETIF_F_SG;
+>  	ndev->features |= ndev->hw_features;
+>  
+> -	ndev->max_mtu = EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
+> +	ndev->max_mtu = EMAC_RX_BUF_MAX - (ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN);
+>  	ndev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
+>  
+>  	priv = netdev_priv(ndev);
 
->
-> > +		val++;
-> > +	}
-> > +
-> > +	subbank_srch_order[cnt - 1] = cnt / 2;
-> > +	return 0;
-> > +}
->
-> [ ... ]
-> --
-> pw-bot: cr
+Thanks for the fix. This essentially matches what I've been testing as well.
+
+Reviewed-by: Vivian Wang <wangruikang@iscas.ac.cn>
+
+
 
