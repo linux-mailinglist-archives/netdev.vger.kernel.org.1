@@ -1,203 +1,295 @@
-Return-Path: <netdev+bounces-254770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHrRH5pDe2l+DAIAu9opvQ
-	(envelope-from <netdev+bounces-254770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:25:14 +0100
+	id 0KkqM1VFe2l+DAIAu9opvQ
+	(envelope-from <netdev+bounces-254771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:32:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE5FAF94D
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:25:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F773AFA75
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:32:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 479803001F88
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:25:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 235913011763
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E89238737D;
-	Thu, 29 Jan 2026 11:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C774385514;
+	Thu, 29 Jan 2026 11:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MfMEOB07"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtCFWk4n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3F4387370
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C67933F8A8
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769685907; cv=none; b=g+thoaWGIwyCO3fDKzRxIcFQLM1uOQttUWDvWo5EVRQnjABDCL1hRzyLWFFJ4Gu1a2xMVKxNXfhpNBMSwH/hwNvsY1Jwi5jvIbikST2ZYWtKbHwd6M7YzG7RsDyjWT8+jZzkaGwaBWb/ApmtyLFhr0jdVMCcQWyqm0Gy+O94MsM=
+	t=1769686140; cv=none; b=s8Vbp/qDsb1nByQXow+FlWI4oOQePlaoCfFhMK+S9ZPO45x1NOQZCVcMt/d+TJbLE7nQ1/mPrAF8k1Y2+b9PasJ12eRIykzRUUPWmtIKiVFQ6BieweiyoRlKQcWkrL6dc07TeSZAr9Z9KwpYlnyR7mj31mDxzJDWzQQs0xGk7rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769685907; c=relaxed/simple;
-	bh=hAcVxOH7BXynvR0QexOQJ5luWYMUN1rnOFrg9Uirz44=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rx31tcu4t5aATCnXZauF8+R88RPzUF1iu6t2u3kH0kOtkwJXQI7+5Y30w3XZBIhl+bTRWKGpiltHZxz7HGyXhi4U54PJ4RuZO6bNs/N6iH93Ry3Nv0FjH4mTD0ig4wr/YqXS/f5qgDpkKYmz3r+mOFdCaUz0n2pmjyDFHYC7UCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MfMEOB07; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769685906; x=1801221906;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hAcVxOH7BXynvR0QexOQJ5luWYMUN1rnOFrg9Uirz44=;
-  b=MfMEOB07yY03QvA0AoeLD5izIcbGkDomZ6GNLSQMt1tzzUISOnBnTh4S
-   Nz+rCR9CfSqOkQ6a8FSNswPWVQAl5yQoWfKl+67aiVvl4dEow00QZtO28
-   jzAAVPYYIHsNVlEJy1O3m08+2WhpxTpLlHXMwByd51qRzltKWLClzQKSW
-   A99p8UgYXvhyuJa1VXt4Q+5lcU9GReAcA4K9cJ2TQbDj4/NnfZcwYE4kZ
-   CUt2KwyTp2+zKG3wPJmULIDu9hGe8jOEMFiwwOKZvnIixft4cfhln15QX
-   O1vxbXbg/uZnJ8Z5HsRRaRYRHSBC1eONgYxqlInJ4lgpxKBYgWzXPWXre
-   Q==;
-X-CSE-ConnectionGUID: 6fm2aHAaTeup0N9LZtHVVg==
-X-CSE-MsgGUID: vqLxZh14QVqBXiNPNdSd1g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="69937439"
-X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
-   d="scan'208";a="69937439"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 03:25:05 -0800
-X-CSE-ConnectionGUID: ahqjcYT/R1enFlUL/HWdyw==
-X-CSE-MsgGUID: ivHFzpodTR2R1raoPfgBiw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
-   d="scan'208";a="208912366"
-Received: from unknown (HELO [10.217.180.154]) ([10.217.180.154])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 03:25:03 -0800
-Message-ID: <d1fcdfd8-b6c2-4bff-9138-3113084c50cb@linux.intel.com>
-Date: Thu, 29 Jan 2026 12:24:58 +0100
+	s=arc-20240116; t=1769686140; c=relaxed/simple;
+	bh=Fdx+BMq3ACq5OZ/GJmdaTC1h+53HqwSXuGmPRqEjRgs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X6/zF9kDLjBWGwihrS1mr42qjAILV8RM+WT4f5xB9yyVZmbN7AGRIAVIdTGkFL/TR2PRjHEs1M5WsGxTXlgLG0BXlZXdd+SWo1iWOq1A85CM8GK4ndaoqz/JGEDnU+j65oYNbyhDjJErKxdRWRzY31X+4U2pwyYAvmNntrMnYKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LtCFWk4n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769686138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xyOewARlXAdDx9eGdjOXC/PiuzLgu4lKqtxRoMbSrDU=;
+	b=LtCFWk4nLVQmFIMXeeQSUa/UcGpUUVN/6gMA941KknWSHOnR0YQo/87J4xJBU7aVgs3JJM
+	28zna0PPFlLrJTIbfxTRKfu3lXji+gHErg3Moch/lQFo6/FkrhMHqQWTQ3d6Bx5AB++Hig
+	ewXWxW0+3dCaOV16oKNuWo05NuV3uIU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-182-Kc8t1z37MJCNuwWevr6dhQ-1; Thu,
+ 29 Jan 2026 06:28:56 -0500
+X-MC-Unique: Kc8t1z37MJCNuwWevr6dhQ-1
+X-Mimecast-MFC-AGG-ID: Kc8t1z37MJCNuwWevr6dhQ_1769686135
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 595D5180044D;
+	Thu, 29 Jan 2026 11:28:55 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.45.225.83])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7539F1800109;
+	Thu, 29 Jan 2026 11:28:53 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@kernel.org,
+	stephen@networkplumber.org,
+	jiri@resnulli.us,
+	Petr Oros <poros@redhat.com>
+Subject: [PATCH iproute2 net-next] dpll: add mode setting support
+Date: Thu, 29 Jan 2026 12:28:49 +0100
+Message-ID: <20260129112849.8796-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net] ice: fix setting RSS VSI hash for
- E830
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20260109085339.49839-1-marcin.szycik@linux.intel.com>
- <ddd25fe0-a6a8-4ba9-8cb1-3f91ca562928@linux.dev>
- <1e162d79-20a2-4de3-8862-aa4fbe842132@linux.intel.com>
- <979e42ca-66fb-4ca6-b68f-c10b4e441369@linux.dev>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <979e42ca-66fb-4ca6-b68f-c10b4e441369@linux.dev>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254770-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-254771-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,linux.intel.com:mid]
-X-Rspamd-Queue-Id: AAE5FAF94D
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7F773AFA75
 X-Rspamd-Action: no action
 
+Add ability to set DPLL device operating mode (automatic/manual)
+through "dpll device set id ID mode MODE" command.
 
+In automatic mode, the DPLL autonomously selects the best input
+source based on priority and quality. In manual mode, the input
+source must be explicitly configured.
 
-On 12.01.2026 12:15, Vadim Fedorenko wrote:
-> On 12/01/2026 09:36, Marcin Szycik wrote:
->>
->>
->> On 09.01.2026 17:44, Vadim Fedorenko wrote:
->>> On 09/01/2026 08:53, Marcin Szycik wrote:
->>>> ice_set_rss_hfunc() performs a VSI update, in which it sets hashing
->>>> function, leaving other VSI options unchanged. However, ::q_opt_flags is
->>>> mistakenly set to the value of another field, instead of its original
->>>> value, probably due to a typo. What happens next is hardware-dependent:
->>>>
->>>> On E810, only the first bit is meaningful (see
->>>> ICE_AQ_VSI_Q_OPT_PE_FLTR_EN) and can potentially end up in a different
->>>> state than before VSI update.
->>>>
->>>> On E830, some of the remaining bits are not reserved. Setting them
->>>> to some unrelated values can cause the firmware to reject the update
->>>> because of invalid settings, or worse - succeed.
->>>>
->>>> Reproducer:
->>>>     sudo ethtool -X $PF1 equal 8
->>>>
->>>> Output in dmesg:
->>>>     Failed to configure RSS hash for VSI 6, error -5
->>>>
->>>> Fixes: 352e9bf23813 ("ice: enable symmetric-xor RSS for Toeplitz hash function")
->>>> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->>>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->>>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
->>>> ---
->>>>    drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
->>>> index cf8ba5a85384..08268f1a03da 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_main.c
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
->>>> @@ -8038,7 +8038,7 @@ int ice_set_rss_hfunc(struct ice_vsi *vsi, u8 hfunc)
->>>>        ctx->info.q_opt_rss |=
->>>>            FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_HASH_M, hfunc);
->>>>        ctx->info.q_opt_tc = vsi->info.q_opt_tc;
->>>> -    ctx->info.q_opt_flags = vsi->info.q_opt_rss;
->>>> +    ctx->info.q_opt_flags = vsi->info.q_opt_flags;
->>>
->>> The very same typo pattern is in ice_vc_handle_rss_cfg() in
->>> ice/virt/rss.c
->>>
->>> I believe both places have to be fixed.
->>
->> Hmm... where exactly? ice_vc_rss_hash_update() (called from ice_vc_handle_rss_cfg()) looks correct.
-> 
-> Sorry, it was fixed in 3a6d87e2eaac ("ice: implement GTP RSS context
-> tracking and configuration") when the logic was moved to
-> ice_vc_rss_hash_update(), but this code was never backported, the
-> problem exists in 6.18...
+The implementation adds dpll_mode_map for string-to-enum conversion,
+str_to_dpll_mode() and dpll_parse_mode() functions, and refactors
+dpll_mode_name() to use str_map_lookup_uint() for consistency.
 
-Sorry for late reply, I don't know why, but I assumed the patch you
-mention would be independently picked up to stable. Now that I've
-looked into it, I see it's a feature implementation that accidentally (?)
-also fixed that one line in ice_vc_handle_rss_cfg(), so it won't be
-backported.
+Man page and bash completion updated accordingly.
 
-Do we know if the mistake in ice_vc_handle_rss_cfg() is an actual issue?
-So far I wasn't even able to enter that branch (rss_cfg->rss_algorithm is
-never VIRTCHNL_RSS_ALG_R_ASYMMETRIC, in fact this is the only usage of
-VIRTCHNL_RSS_ALG_R_ASYMMETRIC - dead code?). If I understand correctly,
-"theoretical" fixes are not welcome in stable.
+Signed-off-by: Petr Oros <poros@redhat.com>
+---
+ bash-completion/dpll |  6 ++++-
+ dpll/dpll.c          | 52 +++++++++++++++++++++++++++++++++++---------
+ man/man8/dpll.8      | 18 ++++++++++++++-
+ 3 files changed, 64 insertions(+), 12 deletions(-)
 
-Thanks,
-Marcin
-
-> 
->>
->> Thanks for reviewing,
->> Marcin
->>
->>>
->>>>          err = ice_update_vsi(hw, vsi->idx, ctx, NULL);
->>>>        if (err) {
->>>
->>
-> 
+diff --git a/bash-completion/dpll b/bash-completion/dpll
+index 6e4d39a5b5b6bb..caf86a36f2adf3 100644
+--- a/bash-completion/dpll
++++ b/bash-completion/dpll
+@@ -73,6 +73,10 @@ _dpll_device()
+                         "$(_dpll_direct_complete device_id)" -- "$cur" ) )
+                     return 0
+                     ;;
++                mode)
++                    COMPREPLY=( $( compgen -W "automatic manual" -- "$cur" ) )
++                    return 0
++                    ;;
+                 phase-offset-monitor)
+                     COMPREPLY=( $( compgen -W "enable disable true false 0 1" -- "$cur" ) )
+                     return 0
+@@ -82,7 +86,7 @@ _dpll_device()
+                     return 0
+                     ;;
+                 *)
+-                    COMPREPLY=( $( compgen -W "id phase-offset-monitor \
++                    COMPREPLY=( $( compgen -W "id mode phase-offset-monitor \
+                         phase-offset-avg-factor" -- "$cur" ) )
+                     return 0
+                     ;;
+diff --git a/dpll/dpll.c b/dpll/dpll.c
+index 846ad4b04c63d2..9dc3f8db373d28 100644
+--- a/dpll/dpll.c
++++ b/dpll/dpll.c
+@@ -42,6 +42,14 @@ static const char *str_enable_disable(bool v)
+ 	return v ? "enable" : "disable";
+ }
+ 
++static struct str_num_map dpll_mode_map[] = {
++	{ .str = "automatic", .num = DPLL_MODE_AUTOMATIC },
++	{ .str = "manual", .num = DPLL_MODE_MANUAL },
++	{
++		.str = NULL,
++	},
++};
++
+ static struct str_num_map pin_state_map[] = {
+ 	{ .str = "connected", .num = DPLL_PIN_STATE_CONNECTED },
+ 	{ .str = "disconnected", .num = DPLL_PIN_STATE_DISCONNECTED },
+@@ -132,6 +140,17 @@ static bool dpll_no_arg(struct dpll *dpll)
+ 	return dpll_argc(dpll) == 0;
+ }
+ 
++static int str_to_dpll_mode(const char *mode_str, __u32 *mode)
++{
++	int num;
++
++	num = str_map_lookup_str(dpll_mode_map, mode_str);
++	if (num < 0)
++		return num;
++	*mode = num;
++	return 0;
++}
++
+ static int str_to_dpll_pin_state(const char *state_str, __u32 *state)
+ {
+ 	int num;
+@@ -154,6 +173,18 @@ static int str_to_dpll_pin_type(const char *type_str, __u32 *type)
+ 	return 0;
+ }
+ 
++static int dpll_parse_mode(struct dpll *dpll, __u32 *mode)
++{
++	const char *str = dpll_argv(dpll);
++
++	if (str_to_dpll_mode(str, mode)) {
++		pr_err("invalid state: %s (use automatic/manual)\n", str);
++		return -EINVAL;
++	}
++	dpll_arg_inc(dpll);
++	return 0;
++}
++
+ static int dpll_parse_state(struct dpll *dpll, __u32 *state)
+ {
+ 	const char *str = dpll_argv(dpll);
+@@ -585,21 +616,18 @@ dpll_free:
+ static void cmd_device_help(void)
+ {
+ 	pr_err("Usage: dpll device show [ id DEVICE_ID ]\n");
+-	pr_err("       dpll device set id DEVICE_ID [ phase-offset-monitor { enable | disable } ]\n");
+-	pr_err("                                      [ phase-offset-avg-factor NUM ]\n");
++	pr_err("       dpll device set id DEVICE_ID [ mode { automatic | manual } ]\n");
++	pr_err("                                    [ phase-offset-monitor { enable | disable } ]\n");
++	pr_err("                                    [ phase-offset-avg-factor NUM ]\n");
+ 	pr_err("       dpll device id-get [ module-name NAME ] [ clock-id ID ] [ type TYPE ]\n");
+ }
+ 
+ static const char *dpll_mode_name(__u32 mode)
+ {
+-	switch (mode) {
+-	case DPLL_MODE_MANUAL:
+-		return "manual";
+-	case DPLL_MODE_AUTOMATIC:
+-		return "automatic";
+-	default:
+-		return "unknown";
+-	}
++	const char *str;
++
++	str = str_map_lookup_uint(dpll_mode_map, mode);
++	return str ? str : "unknown";
+ }
+ 
+ static const char *dpll_lock_status_name(__u32 status)
+@@ -839,6 +867,10 @@ static int cmd_device_set(struct dpll *dpll)
+ 				return -EINVAL;
+ 			mnl_attr_put_u32(nlh, DPLL_A_ID, id);
+ 			has_id = true;
++		} else if (dpll_argv_match_inc(dpll, "mode")) {
++			if (dpll_parse_attr_enum(dpll, nlh, "mode", DPLL_A_MODE,
++						 dpll_parse_mode))
++				return -EINVAL;
+ 		} else if (dpll_argv_match(dpll, "phase-offset-monitor")) {
+ 			const char *str = dpll_argv_next(dpll);
+ 			bool val;
+diff --git a/man/man8/dpll.8 b/man/man8/dpll.8
+index fcc1c4a67af5d9..e82f083feac64b 100644
+--- a/man/man8/dpll.8
++++ b/man/man8/dpll.8
+@@ -88,7 +88,7 @@ Temperature (if supported)
+ Type (PPS or EEC)
+ .RE
+ 
+-.SS dpll device set id ID [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
++.SS dpll device set id ID [ mode { automatic | manual } ] [ phase-offset-monitor { enable | disable } ] [ phase-offset-avg-factor FACTOR ]
+ 
+ Configure DPLL device parameters.
+ 
+@@ -96,6 +96,17 @@ Configure DPLL device parameters.
+ .BI id " ID"
+ Specifies which device to configure (required).
+ 
++.TP
++.BI mode " { automatic | manual }"
++Set the operating mode of the DPLL device.
++In
++.B automatic
++mode, the DPLL autonomously selects the best available input source
++based on priority and quality. In
++.B manual
++mode, the input source must be explicitly configured and the DPLL
++will not automatically switch sources.
++
+ .TP
+ .BI phase-offset-monitor " { enable | disable | true | false | 0 | 1 }"
+ Enable or disable phase offset monitoring between the device and its pins.
+@@ -283,6 +294,11 @@ Press Ctrl+C to stop monitoring.
+ .B dpll -j device show id 0
+ .fi
+ 
++.SS Set device 0 to manual mode
++.nf
++.B dpll device set id 0 mode manual
++.fi
++
+ .SS Enable phase offset monitoring on device 0
+ .nf
+ .B dpll device set id 0 phase-offset-monitor enable
+-- 
+2.52.0
 
 
