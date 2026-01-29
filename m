@@ -1,217 +1,227 @@
-Return-Path: <netdev+bounces-254688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254689-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDV0NIwze2lJCQIAu9opvQ
-	(envelope-from <netdev+bounces-254688-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:16:44 +0100
+	id MEeaNEs0e2lJCQIAu9opvQ
+	(envelope-from <netdev+bounces-254689-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:19:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F3BAE778
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:16:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5E5CAE82B
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:19:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0E171300A320
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:16:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 998FD305EC0B
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F80340A4D;
-	Thu, 29 Jan 2026 10:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fn1LsHnT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AB92749ED;
+	Thu, 29 Jan 2026 10:16:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C34327C0F
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B338A22A7E4
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769681786; cv=none; b=eXgxWJ+ENQXIBQhbXBIfP4yk3lezIoftab7j3Lu4bjiy5UinuOWb6gR8q6IcxxnwTRW5s/MHKRPm3wo5dRXnhvFI9JlutXlBDCJEXpk2ScsnFpBiqpi8e2ULsXIoCtEOCEBsVQYuFc+HMB/i1uf3kN3Mqi+0VWkdZBJJemsc8I4=
+	t=1769681795; cv=none; b=ba9NJfGKaIyKfL349NbZBn3Px2qmKrQR/wGN7GtHJR2fJVR0NmKldE123XojlHKaGkdmRg0UQd493bIsoMmIbw+d1aBzNrbF/dVJC7knA33tTQBeMczcsdPFCWuwV9LKBk+Lh9nTiIXngcwkqHcrSfPiHUkMMTr4gVsUcOgUs6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769681786; c=relaxed/simple;
-	bh=J/SoU3MkP2MY74o7Q2lAtkpaITboiBABKZxNYr/6I5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZWF8eyaQwvqKuoJzn338fUFfijRfBeB3hBfErCUKQulxEhxie7emjVZLoYvKcdC9xfy0p9+vkX3ic1WqdD1Rg0LBV7wHPSHlOH9BEBnMXvOSZxAQ7HD3jXIXR4pK5wl9uvXvO2+jX+1E5UpcA0EuO0TIvyfJPmvmljWGP3mJHLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fn1LsHnT; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4806f3fc50bso7618885e9.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 02:16:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769681783; x=1770286583; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=scwnG4+Nck1/cLGODsLX+wXP9q98UaUDMSFVIL+kckU=;
-        b=Fn1LsHnTZZuhO9s7j0iy8OLAOxLuTxc4NaiAm8OWogllw+3qIdTsjIrrLkumJZbYQP
-         uc10GKVQX042Q1nfopJ6X9cSZcBnejfFHwB8RIMfhpoasVq/AuhiHbyT7313Dm7d+mCl
-         yKh/OaIlCahvOQXlhSXCqlqBfnQ0s7nioVwho/6zDIScwqqLx784TtCgbsmJZRBwjUeL
-         0o0oXosFizz4ZI/ArNkSyG+c1PSBQLdX5LL4SsjsO9RZbj1S6lbbWw5F4cx9V1+WHg53
-         7nbZWohnXrE2Eic2UAozRFm8dcYA6xG69ScnwGNrquj4kzIHCNNCFq/Zuh8i8GOWZlqA
-         ajig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769681783; x=1770286583;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=scwnG4+Nck1/cLGODsLX+wXP9q98UaUDMSFVIL+kckU=;
-        b=T9WhFl6yIM5lPL3X9EjZFcBGoPm/wCA2qy0TBnpl6ru9VIO0IrwvIFJCvHp3RdGp50
-         XqJcf6oPe3H3wUEDqriSiPSXD4Rcp81uqHKNQhMzjtn+Y/Ii/RqVZKqvln469iIfu+Xk
-         lJzKP+l6CmNmm8YNBx5vP3XYbiKhap6jfc5sPv5y6SbCTlWFEZkodwf13fsoZHaR4JbK
-         jvkTrfCb2nVRRM6oiEyE57e6qefKabMIqEvC69l4h6pxEbwmy8K5rU2w7J7gYTRNAWxl
-         EKNHtZ10gpEoOOD/z8K2V3sNOs6Us/XfIpf5qTaRnjKocTKC53LxBkLmKas/UJWDDs8Z
-         yJFg==
-X-Gm-Message-State: AOJu0YyUK1Nx7ZGdtgJPK4DLEqIynwFdDvYKJjtsc1/0XMslVAXGH/Jc
-	PTqsllRCNrJ+PwhXg2uF8EdPi4ccrGYxOU4PyYpm85TD3DlNAnOoOsPU
-X-Gm-Gg: AZuq6aKsHCCVUszLoye/ALHrAq4f/A/Nv5OH4BT9Sw6skTGsuhIgFgi7cxXVBx8tvL2
-	5Ca00VofXfW22sq2pnrOL9LFJCaU9DozzOg8uwkrUl/PHx+BdqZsrkTQ+mmQ8Gy0/ynxHOOdKOQ
-	BaoHjLJLp3Nt7PkPkACz/jF65SgbH2MvjaD4CsFybwW9ZZAcKtknUOSvQW8DbKaiXF7jtznDeSH
-	jyVIJd4gh+NEocp2fpEYMxP4+urI+xx1aHRlii2e+S+lnjHRHJEc+WoVKuzQl9+LG0hRcjjToR3
-	UUMg67CNnMqSJ8NbeUdsbJfaR5GiGZMa4HFRd2qoCk1WywQIkUCFfNB5+PL8fJKgIj5CHbcT3Zn
-	pmR9Cy8SQiF8HiyMO83Vpg1cKyNjh6SLxCC1+nOEhIeFEHS9OgsmvQ4uAtAAfk+vdUk37EPeuuy
-	r55Z4peEDQuik=
-X-Received: by 2002:a05:600c:8b84:b0:47e:e78a:c832 with SMTP id 5b1f17b1804b1-48069c82494mr90663755e9.37.1769681783205;
-        Thu, 29 Jan 2026 02:16:23 -0800 (PST)
-Received: from nas.local ([2001:912:1ac0:1e00:c662:37ff:fe09:93df])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e132303fsm13413662f8f.36.2026.01.29.02.16.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 02:16:22 -0800 (PST)
-From: Damien Dejean <dam.dejean@gmail.com>
-To: andrew@lunn.ch,
-	krzk+dt@kernel.org,
-	robh@kernel.org,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	hkallweit1@gmail.com,
-	Damien Dejean <dam.dejean@gmail.com>
-Subject: [PATCH v4 4/4] net: phy: realtek: add RTL8224 polarity support
-Date: Thu, 29 Jan 2026 11:16:06 +0100
-Message-ID: <20260129101606.33972-4-dam.dejean@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260129101606.33972-1-dam.dejean@gmail.com>
-References: <20260129101606.33972-1-dam.dejean@gmail.com>
+	s=arc-20240116; t=1769681795; c=relaxed/simple;
+	bh=sv+5GU+1B/FWvyWCE7lvr2zO1CWRi6lch4R+W5q0W8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=odBzrRy/yxATbvUGUCx4bQl7kUSMiEb/z5DLyYGZJ/NnPo1fupE1UFNMWZ0ZLoqaPG0UgCSwWVn6jw1so3YXc3pnlFbkxZ/CSma7/5eNJ3gPClLqekjk9miqggAlNmtXwfns6iEB5lWY/n+DjiEOmWK95sBl8zKk2yfJUEX1NW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60TAGUVN027372;
+	Thu, 29 Jan 2026 19:16:30 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60TAGUFj027368
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 29 Jan 2026 19:16:30 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <d0aa3c51-291b-40fd-82b4-15024dc4404b@I-love.SAKURA.ne.jp>
+Date: Thu, 29 Jan 2026 19:16:30 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xfrm: always flush state and policy upon
+ NETDEV_DOWN/NETDEV_UNREGISTER events
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Ilan Tayari <ilant@mellanox.com>, Guy Shapiro <guysh@mellanox.com>,
+        Yossi Kuperman <yossiku@mellanox.com>,
+        Network Development <netdev@vger.kernel.org>
+References: <1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp>
+ <20260128102404.GC12149@unreal>
+ <83d06aca-4437-4d61-9c99-ac19b797a243@I-love.SAKURA.ne.jp>
+ <20260128123546.GC40916@unreal>
+ <b91432c3-5ed4-4669-8d7c-02cf7ea6f8fa@I-love.SAKURA.ne.jp>
+ <20260129090959.GD10992@unreal>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260129090959.GD10992@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav405.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254688-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[damdejean@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254689-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A9F3BAE778
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:url,ffff888052f24618:email]
+X-Rspamd-Queue-Id: A5E5CAE82B
 X-Rspamd-Action: no action
 
-The RTL8224 has a register to configure the polarity of every pair of
-each port. It provides device designers more flexbility when wiring the
-chip.
+On 2026/01/29 18:09, Leon Romanovsky wrote:
+> On Thu, Jan 29, 2026 at 05:06:08PM +0900, Tetsuo Handa wrote:
+>> On 2026/01/28 21:35, Leon Romanovsky wrote:
+>>> On Wed, Jan 28, 2026 at 07:44:02PM +0900, Tetsuo Handa wrote:
+>>>> On 2026/01/28 19:24, Leon Romanovsky wrote:
+>>>>> I think this can work, but IMHO the more robust approach is to ensure that all
+>>>>> states and policies are removed when the NETIF_F_HW_ESP feature bit is cleared.
+>>>>
+>>>> The transaction will become complicated, for dev->features manipulation
+>>>> function can fail.
+>>>
+>>> Line above returning NOTIFY_OK, check that NETIF_F_HW_ESP is cleared,
+>>> and remove everything.
+>>
+>> That answer needs more clarification. I came to get confused about what we should do.
+>>
+>> Question 1:
+>>
+>>   Since NETIF_F_HW_ESP is a hardware dependent flag, not all "struct net_device"
+>>   support NETIF_F_HW_ESP flag. Is this interpretation correct?
+> 
+> Yes, however any device (SW or HW) should set this flag if they want to
+> provide IPsec offload.
 
-Unfortunately, the register is left in an unknown state after a reset.
-Thus on devices where the bootloader don't initialize it, the driver has
-to do it to detect and use a link.
+OK. There are "IPsec with offload" and "IPsec without offload".
+Both cases use code in net/xfrm/ directory.
 
-The MDI polarity swap can be set in the device tree using the property
-enet-phy-lane-polarity. The u32 value is a bitfield where bit[0..3]
-control the polarity of pairs A..D.
+Users (not the kernel source but Linux administrator) can choose
+"IPsec without offload" by clearing the NETIF_F_HW_ESP bit via
+"ethtool -K $dev esp-hw-offload off" command even if $dev supports
+both "IPsec with offload" and "IPsec without offload".
 
-Signed-off-by: Damien Dejean <dam.dejean@gmail.com>
----
- drivers/net/phy/realtek/realtek_main.c | 39 +++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+> 
+>>
+>> Question 2:
+>>
+>>   Sabrina Dubroca commented
+>>
+>>     But the current behavior ("ignore NETIF_F_HW_ESP and call
+>>     xdo_dev_state_add for new states anyway") has been established for
+>>     multiple years. Changing that now seems a bit risky.
+>>
+>>   at https://lkml.kernel.org/r/aXd3QjzwOVm0Q9LF@krikkit .
+>>
+>>   Is that comment saying that we have been permitting a "struct net_device"
+>>   to be selected by xfrm_dev_state_add() even if that "struct net_device"
+>>   does not support NETIF_F_HW_ESP flag. Is this interpretation correct?
+> 
+> I don't understand what does it mean "device doesn't support offload but
+> state was offloaded anyway".
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 79c2762b610e..8013ba453f05 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -172,6 +172,7 @@
- #define RTL8224_SRAM_RTCT_LEN(pair)		(0x8028 + (pair) * 4)
- 
- #define RTL8224_VND1_MDI_PAIR_SWAP		0xa90
-+#define RTL8224_VND1_MDI_POLARITY_SWAP		0xa94
- 
- #define RTL8366RB_POWER_SAVE			0x15
- #define RTL8366RB_POWER_SAVE_ON			BIT(12)
-@@ -1855,9 +1856,45 @@ static int rtl8224_mdi_config_order(struct phy_device *phydev)
- 				       RTL8224_VND1_MDI_PAIR_SWAP, val);
- }
- 
-+static int rtl8224_mdi_config_polarity(struct phy_device *phydev)
-+{
-+	struct device_node *np = phydev->mdio.dev.of_node;
-+	u8 port_offset = phydev->mdio.addr & 3;
-+	u32 polarity = 0;
-+	int ret, val;
-+
-+	ret = of_property_read_u32(np, "enet-phy-lane-polarity", &polarity);
-+
-+	/* Do nothing if the property is not present */
-+	if (ret == -EINVAL)
-+		return 0;
-+
-+	if (ret)
-+		return ret;
-+
-+	if (polarity & ~0xf)
-+		return -EINVAL;
-+
-+	val = __phy_package_read_mmd(phydev, 0, MDIO_MMD_VEND1,
-+				     RTL8224_VND1_MDI_POLARITY_SWAP);
-+	if (val < 0)
-+		return val;
-+
-+	val &= ~(0xf << port_offset);
-+	val |= polarity << port_offset;
-+	return __phy_package_write_mmd(phydev, 0, MDIO_MMD_VEND1,
-+				       RTL8224_VND1_MDI_POLARITY_SWAP, val);
-+}
-+
- static int rtl8224_config_init(struct phy_device *phydev)
- {
--	return rtl8224_mdi_config_order(phydev);
-+	int ret;
-+
-+	ret = rtl8224_mdi_config_order(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return rtl8224_mdi_config_polarity(phydev);
- }
- 
- static int rtl8224_probe(struct phy_device *phydev)
--- 
-2.47.3
+Users (not the kernel source but Linux administrator) who are using $dev
+which supports only "IPsec without offload" can call xfrm_dev_state_add()
+because xfrm_dev_state_add() does not check for the NETIF_F_HW_ESP bit.
+
+Therefore such users can create "struct xfrm_state" with a reference to
+"struct net_device" held at
+https://elixir.bootlin.com/linux/v6.19-rc5/source/net/xfrm/xfrm_user.c#L986 .
+
+> 
+>>
+>> Question 3:
+>>
+>>   Leon Romanovsky suggested that, as a more robust approach, remove all states
+>>   and policies when the NETIF_F_HW_ESP feature bit is cleared.
+>>
+>>   But I consider that such approach will not work, for (according to Q2 above)
+>>   xfrm_dev_state_add() can be called even if the NETIF_F_HW_ESP feature bit is not
+>>   set. Also, I think that there is no guarantee that dev->features manipulation
+>>   function is called after xfrm_dev_state_add() was called.
+>>
+>>   Therefore, we need an event that are guaranteed to be called.
+>>   The NETDEV_UNREGISTER event is guaranteed to be called when unregistring
+>>   a "struct net_device", and therefore a good place to remove all states and
+>>   policies.
+>>
+>>   Is this interpretation correct?
+
+Since we don't have a syzbot reproducer, I can't tell whether syzbot is manually
+clearing the NETIF_F_HW_ESP bit or not. But as described above, a syzbot report
+
+  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
+  ref_tracker: netdev@ffff888052f24618 has 1/1 users at
+       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
+       netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
+       xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
+
+indicates that "struct xfrm_state" with a reference to "struct net_device" held
+is remaining because xfrm_dev_state_flush() is not called upon NETDEV_UNREGISTER
+event.
+
+>>
+>> Question 4:
+>>
+>>   If Q1 is correct, Sabrina's comment
+>>
+>>     Changing that now seems a bit risky.
+>>
+>>   in Q2 might be applicable to xfrm_dev_down().
+>>
+>>   That is, someone who is using xfrm with a !NETIF_F_HW_ESP hardware might be
+>>   expecting that state and policy are not flushed upon NETDEV_DOWN event.
+> 
+> Do we have such in-tree devices? If the answer is no, you shouldn't be
+> worried about that case.
+
+The "user" here is not "in-tree devices" but "Linux administrator" (such as Alice
+and Bob).
+
+We can't guess whether Alice is using $dev which supports only "IPsec without offload"
+and is calling xfrm_dev_state_add(). If Alice is doing so, Alice might be expecting that
+"struct xfrm_state" with a reference to "struct net_device" held is not released upon
+NETDEV_DOWN event.
+
+> 
+>>
+>>   If there is such possibility, I think we should avoid changing xfrm_dev_down()
+>>   and instead re-introduce xfrm_dev_unregister(). What do you think?
 
 
