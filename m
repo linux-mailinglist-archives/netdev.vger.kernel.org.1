@@ -1,44 +1,79 @@
-Return-Path: <netdev+bounces-254603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +DBpGD8Ve2n5BAIAu9opvQ
-	(envelope-from <netdev+bounces-254603-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:07:27 +0100
+	id MIvdINwVe2n5BAIAu9opvQ
+	(envelope-from <netdev+bounces-254609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:10:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1216AD1CF
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:07:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ADA5AD3BC
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:10:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B3153023A48
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:07:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E8D82304BC16
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FBD37BE69;
-	Thu, 29 Jan 2026 08:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C6837C101;
+	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojfk/quO"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B749336ECD
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 08:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F57E37BE63;
+	Thu, 29 Jan 2026 08:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769674038; cv=none; b=uYQIUz78UZS7OSBeGHYPUSKZ0m5qMSSLAg0F5mzyDlTQqcq0TqKaU9C4x9BrrKKbeefoV9vgzy6Zj8sY4evgsaVdyLiyLzRrb8NRZBoT2/2VBMOZAzhSRl61iB1kZWX0dh/yYn4wIg6v1RJM97znMWLXUGJimHpUVI8mfYyzNHw=
+	t=1769674111; cv=none; b=qhV0otajJb/YxIuyCS5fycZHjNoEQM9fwjN/VAGlh7fTypDkZ9tiuzlfDDIevM/nenChVSH+tO3yA13oL84J+ljcnnYfXCGjzcehxCC1/LDgmOPDxS/jwJgPdS7QBvnDabscVaWkWar1BBHpm0NZ01c7SmIiMndhHyzugeYYZ0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769674038; c=relaxed/simple;
-	bh=+xCKWt/Q3JTX2qrK4zrcv0kuPlLBRe4WDt8CynuLje4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qNMD5ocXjMyhZWhyFrrRj7LnTF6P8nkbmM7FAP25hbzBC/Hda+MmoQEduWRLd/QF4EGIRkNz8AQhbuacEb9ZRX2ODqF/AjdngBXRUukADtkebIiCbhJKF26+z8SWo1jGrFrsJivlYXOo4qHjCKO04tIi4/Asjux/TNtDcBzQA+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.trumtrar.info)
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <s.trumtrar@pengutronix.de>)
-	id 1vlN3K-0006b0-89; Thu, 29 Jan 2026 09:06:58 +0100
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Date: Thu, 29 Jan 2026 09:06:42 +0100
-Subject: [PATCH RFC v2 2/2] virtio-net: support receive timestamp
+	s=arc-20240116; t=1769674111; c=relaxed/simple;
+	bh=CpFZnCKsXaKpTRcH1wYRERdcRFhRq9xxZ9K2UwivETI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kHzYUUwwYYShBgPpQvFdfVIu5zECg3fPtav7zXdcoeGX4aFwSMuFlUPJUqkZk98aDQRYrHDLTvbNEXU9eSeBC4/+c5kbQJ5H6IPT1A0Bf6qKptArzU1VHl77mKYDfsdQsNCvr+uqP1VTOeNnBHr6/azGa5P43WinHCq3ejrUcto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojfk/quO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A32AFC4CEF7;
+	Thu, 29 Jan 2026 08:08:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769674110;
+	bh=CpFZnCKsXaKpTRcH1wYRERdcRFhRq9xxZ9K2UwivETI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ojfk/quOeC6rlZ6ssOp/3ezqD86OPKPGp+gEq6gQjjU+aP/6zPZySdSfcS3dJpOrs
+	 C3Pu8IIE64/3oJHlonHHs3TKQ8jBtzusidNS/7f8ctf13+hyyarNu3thYQ1F8m/n2H
+	 ihhMgGrVjQtJiXhbytiy9ScvuaMoxsyshf3AnsruFw23OFM9j7X4LeApwfVgHKku56
+	 ZNx0odlnA7Cp7H5y6xSUeCnn2HU8pEHw9p74iWb0JJEGyCHFKunQxLjNPPO+r0PvW/
+	 +Wjnt+60lgN6+85zccoOnibHci40PVDKMCIGnJ23f9BLBHtpcHXoi7Cj6L8VSU/CCm
+	 hyTdJUcLiT3Vg==
+Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1vlN4m-0000000ERMY-2ftW;
+	Thu, 29 Jan 2026 09:08:28 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Kees Cook <kees@kernel.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-doc@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH v3 00/30]  kernel-doc: make it parse new functions and structs
+Date: Thu, 29 Jan 2026 09:07:51 +0100
+Message-ID: <cover.1769673038.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,376 +81,192 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260129-v6-7-topic-virtio-net-ptp-v2-2-30a27dc52760@pengutronix.de>
-References: <20260129-v6-7-topic-virtio-net-ptp-v2-0-30a27dc52760@pengutronix.de>
-In-Reply-To: <20260129-v6-7-topic-virtio-net-ptp-v2-0-30a27dc52760@pengutronix.de>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Steffen Trumtrar <s.trumtrar@pengutronix.de>
-X-Mailer: b4 0.14.3
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[redhat.com,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com,lunn.ch];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254603-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,intel.com,iogearbox.net,gmail.com,vger.kernel.org,lists.osuosl.org,infradead.org,linuxfoundation.org,fomichev.me];
+	TAGGED_FROM(0.00)[bounces-254609-lists,netdev=lfdr.de,huawei];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[s.trumtrar@pengutronix.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,huawei];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pengutronix.de:mid,pengutronix.de:email]
-X-Rspamd-Queue-Id: D1216AD1CF
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3ADA5AD3BC
 X-Rspamd-Action: no action
 
-Add optional hardware rx timestamp offload for virtio-net.
 
-Introduce virtio feature VIRTIO_NET_F_TSTAMP. If negotiated, the
-virtio-net header is expanded with room for a timestamp.
+Hi Jon,
 
-To get and set the hwtstamp the functions ndo_hwtstamp_set/get need
-to be implemented. This allows filtering the packets and only time stamp
-the packets where the filter matches. This way, the timestamping can
-be en/disabled at runtime.
+And the size grew again: it is now 31 patches...
 
-Tested:
-  guest: ./timestamping eth0 \
-          SOF_TIMESTAMPING_RAW_HARDWARE \
-          SOF_TIMESTAMPING_RX_HARDWARE
-  host: nc -4 -u 192.168.1.1 319
+This is still based on next-20260127.
 
-Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+On this version, I created a new "CFunction" class, with is
+just an alias for "NestedMatch" class, meant to simplify the
+logic and maintainership for Linux Kernel macros that require
+transforms.
 
---
-  Changes to last version:
-  - rework series to use flow filters
-  - add new struct virtio_net_hdr_v1_hash_tunnel_ts
-  - original work done by: Willem de Bruijn <willemb@google.com>
+With that, a transform list (for instance to cleanup structs)
+become a lot simpler and easier to understand:
+
+    #: Transforms for structs and unions
+    struct_xforms = [
+        (CFunction("__attribute__"), ' '),
+        (CFunction('__aligned'), ' '),
+        (CFunction('__counted_by'), ' '),
+        (CFunction('__counted_by_(le|be)'), ' '),
+        (CFunction('__guarded_by'), ' '),
+        (CFunction('__pt_guarded_by'), ' '),
+
+        (KernRe(r'\s*__packed\s*', re.S), ' '),
+        (KernRe(r'\s*CRYPTO_MINALIGN_ATTR', re.S), ' '),
+        (KernRe(r'\s*__private', re.S), ' '),
+        (KernRe(r'\s*__rcu', re.S), ' '),
+        (KernRe(r'\s*____cacheline_aligned_in_smp', re.S), ' '),
+        (KernRe(r'\s*____cacheline_aligned', re.S), ' '),
+
+        (CFunction('__cacheline_group_(begin|end)'), ''),
+
+        (CFunction('struct_group'), r'\2'),
+        (CFunction('struct_group_attr'), r'\3'),
+        (CFunction('struct_group_tagged'), r'struct \1 \2; \3'),
+        (CFunction('__struct_group'), r'\4'),
+
+        (CFunction('__ETHTOOL_DECLARE_LINK_MODE_MASK'), r'DECLARE_BITMAP(\1, __ETHTOOL_LINK_MODE_MASK_NBITS)'),
+        (CFunction('DECLARE_PHY_INTERFACE_MASK',), r'DECLARE_BITMAP(\1, PHY_INTERFACE_MODE_MAX)'),
+        (CFunction('DECLARE_BITMAP'), r'unsigned long \1[BITS_TO_LONGS(\2)]'),
+
+        (CFunction('DECLARE_HASHTABLE'), r'unsigned long \1[1 << ((\2) - 1)]'),
+        (CFunction('DECLARE_KFIFO'), r'\2 *\1'),
+        (CFunction('DECLARE_KFIFO_PTR'), r'\2 *\1'),
+        (CFunction('(?:__)?DECLARE_FLEX_ARRAY'), r'\1 \2[]'),
+        (CFunction('DEFINE_DMA_UNMAP_ADDR'), r'dma_addr_t \1'),
+        (CFunction('DEFINE_DMA_UNMAP_LEN'), r'__u32 \1'),
+        (CFunction('VIRTIO_DECLARE_FEATURES'), r'union { u64 \1; u64 \1_array[VIRTIO_FEATURES_U64S]; }'),
+    ]
+
+(that is the entire set of struct transforms).
+
+I also moved the transforms to a single separate module,
+placed at: tools/lib/python/kdoc/xforms_lists.py.
+
+As KernRe, CFunction and NestedMatch have a ".sub" method, a
+single transforms table can have all of them altogether.
+
+The first 15 patches on this series were co-developed with Randy,
+with came up after the original patch to support sparse annotations
+used by clang thread-safety-analysis.
+
+I ended helping identifying kernel-doc issues while help testing
+and addressing its and doing some changes to make the parser more
+reliable.
+
+After those, I added other patches to cleanup macro
+transforms.
+
+Even NestedMatch being more complex than KernRe, on my machine,
+parsing all files is 5% faster than before, because we're not
+parsing anymore macro definitions.
+
+Ah, due to the complexity of NestedMatch, I opted to write
+some unit tests to verify that the logic there is correct.
+We can use it to add other border cases.
+
+Using it is as easy as running:
+
+	$ tools/unittests/nested_match.py
+
+(I opted to create a separate directory for it, as this
+is not really documentation)
+
 ---
- drivers/net/virtio_net.c        | 136 ++++++++++++++++++++++++++++++++++++----
- include/uapi/linux/virtio_net.h |   9 +++
- 2 files changed, 133 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1bb3aeca66c6e..4e8d9b20c1b34 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -429,6 +429,9 @@ struct virtnet_info {
- 	struct virtio_net_rss_config_trailer rss_trailer;
- 	u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
- 
-+	/* Device passes time stamps from the driver */
-+	bool has_tstamp;
-+
- 	/* Has control virtqueue */
- 	bool has_cvq;
- 
-@@ -475,6 +478,8 @@ struct virtnet_info {
- 
- 	struct control_buf *ctrl;
- 
-+	struct kernel_hwtstamp_config tstamp_config;
-+
- 	/* Ethtool settings */
- 	u8 duplex;
- 	u32 speed;
-@@ -511,6 +516,7 @@ struct virtio_net_common_hdr {
- 		struct virtio_net_hdr_mrg_rxbuf	mrg_hdr;
- 		struct virtio_net_hdr_v1_hash hash_v1_hdr;
- 		struct virtio_net_hdr_v1_hash_tunnel tnl_hdr;
-+		struct virtio_net_hdr_v1_hash_tunnel_ts ts_hdr;
- 	};
- };
- 
-@@ -682,6 +688,13 @@ skb_vnet_common_hdr(struct sk_buff *skb)
- 	return (struct virtio_net_common_hdr *)skb->cb;
- }
- 
-+static inline struct virtio_net_hdr_v1_hash_tunnel_ts *skb_vnet_hdr_ts(struct sk_buff *skb)
-+{
-+	BUILD_BUG_ON(sizeof(struct virtio_net_hdr_v1_hash_tunnel_ts) > sizeof(skb->cb));
-+
-+	return (void *)skb->cb;
-+}
-+
- /*
-  * private is used to chain pages for big packets, put the whole
-  * most recent used list in the beginning for reuse
-@@ -2560,6 +2573,15 @@ virtio_net_hash_value(const struct virtio_net_hdr_v1_hash *hdr_hash)
- 		(__le16_to_cpu(hdr_hash->hash_value_hi) << 16);
- }
- 
-+static inline u64
-+virtio_net_tstamp_value(const struct virtio_net_hdr_v1_hash_tunnel_ts *hdr_hash_ts)
-+{
-+	return  (u64)__le16_to_cpu(hdr_hash_ts->tstamp_0) |
-+	       ((u64)__le16_to_cpu(hdr_hash_ts->tstamp_1) << 16) |
-+	       ((u64)__le16_to_cpu(hdr_hash_ts->tstamp_2) << 32) |
-+	       ((u64)__le16_to_cpu(hdr_hash_ts->tstamp_3) << 48);
-+}
-+
- static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
- 				struct sk_buff *skb)
- {
-@@ -2589,6 +2611,18 @@ static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
- 	skb_set_hash(skb, virtio_net_hash_value(hdr_hash), rss_hash_type);
- }
- 
-+static inline void virtnet_record_rx_tstamp(const struct virtnet_info *vi,
-+					    struct sk_buff *skb)
-+{
-+	struct skb_shared_hwtstamps *shhwtstamps = skb_hwtstamps(skb);
-+	const struct virtio_net_hdr_v1_hash_tunnel_ts *h = skb_vnet_hdr_ts(skb);
-+	u64 ts;
-+
-+	ts = virtio_net_tstamp_value(h);
-+	memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
-+	shhwtstamps->hwtstamp = ns_to_ktime(ts);
-+}
-+
- static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *rq,
- 				 struct sk_buff *skb, u8 flags)
- {
-@@ -2617,6 +2651,8 @@ static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *
- 		goto frame_err;
- 	}
- 
-+	if (vi->has_tstamp && vi->tstamp_config.rx_filter != HWTSTAMP_FILTER_NONE)
-+		virtnet_record_rx_tstamp(vi, skb);
- 	skb_record_rx_queue(skb, vq2rxq(rq->vq));
- 	skb->protocol = eth_type_trans(skb, dev);
- 	pr_debug("Receiving skb proto 0x%04x len %i type %i\n",
-@@ -3321,7 +3357,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
- {
- 	const unsigned char *dest = ((struct ethhdr *)skb->data)->h_dest;
- 	struct virtnet_info *vi = sq->vq->vdev->priv;
--	struct virtio_net_hdr_v1_hash_tunnel *hdr;
-+	struct virtio_net_hdr_v1_hash_tunnel_ts *hdr;
- 	int num_sg;
- 	unsigned hdr_len = vi->hdr_len;
- 	bool can_push;
-@@ -3329,8 +3365,8 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
- 	pr_debug("%s: xmit %p %pM\n", vi->dev->name, skb, dest);
- 
- 	/* Make sure it's safe to cast between formats */
--	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr));
--	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr.hdr));
-+	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->tnl.hash_hdr));
-+	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->tnl.hash_hdr.hdr));
- 
- 	can_push = vi->any_header_sg &&
- 		!((unsigned long)skb->data & (__alignof__(*hdr) - 1)) &&
-@@ -3338,18 +3374,18 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
- 	/* Even if we can, don't push here yet as this would skew
- 	 * csum_start offset below. */
- 	if (can_push)
--		hdr = (struct virtio_net_hdr_v1_hash_tunnel *)(skb->data -
--							       hdr_len);
-+		hdr = (struct virtio_net_hdr_v1_hash_tunnel_ts *)(skb->data -
-+								  hdr_len);
- 	else
--		hdr = &skb_vnet_common_hdr(skb)->tnl_hdr;
-+		hdr = &skb_vnet_common_hdr(skb)->ts_hdr;
- 
--	if (virtio_net_hdr_tnl_from_skb(skb, hdr, vi->tx_tnl,
-+	if (virtio_net_hdr_tnl_from_skb(skb, &hdr->tnl, vi->tx_tnl,
- 					virtio_is_little_endian(vi->vdev), 0,
- 					false))
- 		return -EPROTO;
- 
- 	if (vi->mergeable_rx_bufs)
--		hdr->hash_hdr.hdr.num_buffers = 0;
-+		hdr->tnl.hash_hdr.hdr.num_buffers = 0;
- 
- 	sg_init_table(sq->sg, skb_shinfo(skb)->nr_frags + (can_push ? 1 : 2));
- 	if (can_push) {
-@@ -5563,6 +5599,22 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
- 	return 0;
- }
- 
-+static int virtnet_get_ts_info(struct net_device *dev,
-+			       struct kernel_ethtool_ts_info *info)
-+{
-+	/* setup default software timestamp */
-+	ethtool_op_get_ts_info(dev, info);
-+
-+	info->rx_filters = (BIT(HWTSTAMP_FILTER_NONE) |
-+			    BIT(HWTSTAMP_FILTER_PTP_V1_L4_SYNC) |
-+			    BIT(HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ) |
-+			    BIT(HWTSTAMP_FILTER_ALL));
-+
-+	info->tx_types = HWTSTAMP_TX_OFF;
-+
-+	return 0;
-+}
-+
- static void virtnet_init_settings(struct net_device *dev)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
-@@ -5658,7 +5710,7 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.get_ethtool_stats = virtnet_get_ethtool_stats,
- 	.set_channels = virtnet_set_channels,
- 	.get_channels = virtnet_get_channels,
--	.get_ts_info = ethtool_op_get_ts_info,
-+	.get_ts_info = virtnet_get_ts_info,
- 	.get_link_ksettings = virtnet_get_link_ksettings,
- 	.set_link_ksettings = virtnet_set_link_ksettings,
- 	.set_coalesce = virtnet_set_coalesce,
-@@ -6242,6 +6294,58 @@ static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 		   jiffies_to_usecs(jiffies - READ_ONCE(txq->trans_start)));
- }
- 
-+static int virtnet_hwtstamp_get(struct net_device *dev,
-+				struct kernel_hwtstamp_config *tstamp_config)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+
-+	if (!netif_running(dev))
-+		return -EINVAL;
-+
-+	*tstamp_config = vi->tstamp_config;
-+
-+	return 0;
-+}
-+
-+static int virtnet_hwtstamp_set(struct net_device *dev,
-+				struct kernel_hwtstamp_config *tstamp_config,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+
-+	if (!netif_running(dev))
-+		return -EINVAL;
-+
-+	switch (tstamp_config->rx_filter) {
-+	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
-+		break;
-+	case HWTSTAMP_FILTER_PTP_V2_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
-+	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
-+		tstamp_config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
-+		break;
-+	case HWTSTAMP_FILTER_NONE:
-+		break;
-+	case HWTSTAMP_FILTER_ALL:
-+		tstamp_config->rx_filter = HWTSTAMP_FILTER_ALL;
-+		break;
-+	default:
-+		tstamp_config->rx_filter = HWTSTAMP_FILTER_ALL;
-+		return -ERANGE;
-+	}
-+
-+	vi->tstamp_config = *tstamp_config;
-+
-+	return 0;
-+}
-+
- static int virtnet_init_irq_moder(struct virtnet_info *vi)
- {
- 	u8 profile_flags = 0, coal_flags = 0;
-@@ -6289,6 +6393,8 @@ static const struct net_device_ops virtnet_netdev = {
- 	.ndo_get_phys_port_name	= virtnet_get_phys_port_name,
- 	.ndo_set_features	= virtnet_set_features,
- 	.ndo_tx_timeout		= virtnet_tx_timeout,
-+	.ndo_hwtstamp_set	= virtnet_hwtstamp_set,
-+	.ndo_hwtstamp_get	= virtnet_hwtstamp_get,
- };
- 
- static void virtnet_config_changed_work(struct work_struct *work)
-@@ -6911,6 +7017,9 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
- 		vi->has_rss_hash_report = true;
- 
-+	if (virtio_has_feature(vdev, VIRTIO_NET_F_TSTAMP))
-+		vi->has_tstamp = true;
-+
- 	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
- 		vi->has_rss = true;
- 
-@@ -6945,8 +7054,10 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
- 	}
- 
--	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) ||
--	    virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO))
-+	if (vi->has_tstamp)
-+		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash_tunnel_ts);
-+	else if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) ||
-+		 virtio_has_feature(vdev, VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO))
- 		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash_tunnel);
- 	else if (vi->has_rss_hash_report)
- 		vi->hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-@@ -7269,7 +7380,8 @@ static struct virtio_device_id id_table[] = {
- 	VIRTIO_NET_F_SPEED_DUPLEX, VIRTIO_NET_F_STANDBY, \
- 	VIRTIO_NET_F_RSS, VIRTIO_NET_F_HASH_REPORT, VIRTIO_NET_F_NOTF_COAL, \
- 	VIRTIO_NET_F_VQ_NOTF_COAL, \
--	VIRTIO_NET_F_GUEST_HDRLEN, VIRTIO_NET_F_DEVICE_STATS
-+	VIRTIO_NET_F_GUEST_HDRLEN, VIRTIO_NET_F_DEVICE_STATS, \
-+	VIRTIO_NET_F_TSTAMP
- 
- static unsigned int features[] = {
- 	VIRTNET_FEATURES,
-diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-index 1db45b01532b5..9f967575956b8 100644
---- a/include/uapi/linux/virtio_net.h
-+++ b/include/uapi/linux/virtio_net.h
-@@ -56,6 +56,7 @@
- #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
- 					 * Steering */
- #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-+#define VIRTIO_NET_F_TSTAMP	  49	/* Device sends TAI receive time */
- #define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
- #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
- #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
-@@ -215,6 +216,14 @@ struct virtio_net_hdr_v1_hash_tunnel {
- 	__le16 inner_nh_offset;
- };
- 
-+struct virtio_net_hdr_v1_hash_tunnel_ts {
-+	struct virtio_net_hdr_v1_hash_tunnel tnl;
-+	__le16 tstamp_0;
-+	__le16 tstamp_1;
-+	__le16 tstamp_2;
-+	__le16 tstamp_3;
-+};
-+
- #ifndef VIRTIO_NET_NO_LEGACY
- /* This header comes first in the scatter-gather list.
-  * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated, it must
+v3:
+- improved the unittest helper to allow adding in the future
+  a runner to create a test suite directly;
+- added unittest to tools/python library documentation;
+- improved comments at the new modules;
+- did several cleanups at the new logic;
+- added a fix for NestedMatch not remove ";" at the end,
+  mimicing the behavior of KernRe;
+- moved transforms to a separate module;
+- replaced all regexes to parse macros with the new CFunction
+  alias for NestedMatch.
+
+v2:
+- added 10 new patches adding support at NestedMatch
+  to properly group and replace arguments with \1, \2, ...
+
+Mauro Carvalho Chehab (28):
+  docs: kdoc_re: add support for groups()
+  docs: kdoc_re: don't go past the end of a line
+  docs: kdoc_parser: move var transformers to the beginning
+  docs: kdoc_parser: don't mangle with function defines
+  docs: kdoc_parser: add functions support for NestedMatch
+  docs: kdoc_parser: use NestedMatch to handle __attribute__ on
+    functions
+  docs: kdoc_parser: fix variable regexes to work with size_t
+  docs: kdoc_parser: fix the default_value logic for variables
+  docs: kdoc_parser: add some debug for variable parsing
+  docs: kdoc_parser: don't exclude defaults from prototype
+  docs: kdoc_parser: fix parser to support multi-word types
+  docs: kdoc_parser: add support for LIST_HEAD
+  docs: kdoc_re: properly handle strings and escape chars on it
+  docs: kdoc_re: better show KernRe() at documentation
+  docs: kdoc_re: don't recompile NextMatch regex every time
+  docs: kdoc_re: Change NestedMath args replacement to \0
+  docs: kdoc_re: make NextedMatch use KernRe
+  docs: kdoc_re: add support on NestedMatch for argument replacement
+  docs: python: add helpers to run unit tests
+  unittests: add tests for NestedMatch class
+  docs: kdoc_parser: better handle struct_group macros
+  docs: kdoc_re: fix a parse bug on struct page_pool_params
+  docs: kdoc_re: add a helper class to declare C function matches
+  docs: kdoc_parser: use the new CFunction class
+  docs: kdoc_parser: minimize differences with struct_group_tagged
+  docs: kdoc_parser: move transform lists to a separate file
+  docs: kdoc_re: don't remove the trailing ";" with NestedMatch
+  docs: xforms_lists.py: use CFuntion to handle all function macros
+
+Randy Dunlap (2):
+  docs: kdoc_parser: ignore context analysis and lock attributes
+  kdoc_parser: handle struct member macro VIRTIO_DECLARE_FEATURES(name)
+
+ Documentation/tools/kdoc_parser.rst   |   8 +
+ Documentation/tools/python.rst        |   2 +
+ Documentation/tools/unittest.rst      |  24 ++
+ tools/lib/python/kdoc/kdoc_files.py   |   3 +-
+ tools/lib/python/kdoc/kdoc_parser.py  | 182 ++------
+ tools/lib/python/kdoc/kdoc_re.py      | 215 +++++++---
+ tools/lib/python/kdoc/xforms_lists.py | 105 +++++
+ tools/lib/python/unittest_helper.py   | 348 +++++++++++++++
+ tools/unittests/nested_match.py       | 589 ++++++++++++++++++++++++++
+ 9 files changed, 1277 insertions(+), 199 deletions(-)
+ create mode 100644 Documentation/tools/unittest.rst
+ create mode 100644 tools/lib/python/kdoc/xforms_lists.py
+ create mode 100755 tools/lib/python/unittest_helper.py
+ create mode 100755 tools/unittests/nested_match.py
 
 -- 
 2.52.0
