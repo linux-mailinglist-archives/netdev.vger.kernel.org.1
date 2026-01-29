@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-254569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QD3EHdjsemmE/wEAu9opvQ
-	(envelope-from <netdev+bounces-254569-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:15:04 +0100
+	id 8IrJH/jsemnC/wEAu9opvQ
+	(envelope-from <netdev+bounces-254571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:15:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE118ABDE5
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:15:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D69B1ABE0C
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:15:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6E14304E0CD
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:13:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84EC43059806
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C033E2E7623;
-	Thu, 29 Jan 2026 05:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398702DC76E;
+	Thu, 29 Jan 2026 05:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="klH5MSfe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Si3mX+vj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2242D9EEC;
-	Thu, 29 Jan 2026 05:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D7C25332E;
+	Thu, 29 Jan 2026 05:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769663589; cv=none; b=LNTrEDbOUVotPmxu5/RLD7kkN/xsaEQ2pKqcJ36HJ9z08e1h5KBDMaV3r9EcPPy69pSZoMY34bROEzxozm8Iup2OArPAyb6SGFlcQK+i+SvecDwNY2rC74kUHpp3Nsdj3Bk9/cm+TgVGEKX4OhgKAFgSWo+LKyplPN0I9B9L2Ug=
+	t=1769663593; cv=none; b=g7Xr3WJ0O1Gv0HRR+07zVQLApAls3mmzWTZDcK4b5j06EQT9yxByUWQePmznujeLqXEdq1heanpJJsnW2sbe0Cp3yPqe4zvdikzI4sEz1KSS9DC9WaIQZIjT/wJEw7TVfujNdp59RpPWaIq8Xt0/NLnLHyE+QROCbk5BM8uClqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769663589; c=relaxed/simple;
-	bh=3Ad3DlMjIgIEv6QksfGagi8nhcC2wkZPvAuz16purjc=;
+	s=arc-20240116; t=1769663593; c=relaxed/simple;
+	bh=G+NlfwUBgakE9GFP/kt8+9HheUg6TSAq9NXWmYcqrgw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ozJpmu1KM0LHtnWgdgFksIByepTO+VST2+OkyznWm3v+s4JcLiXPSuMo1ZpEPClqJ1qCeHwQNXIGP8Re946G4DrplU/ZAa9DQ8DsFS/4iwtcNA8gJophfqQMh/Ai12MizqiKbTzh1jJsNHq3gc/fNrrMAsUQ9WSPJQk/SVxHkjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=klH5MSfe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B376BC19421;
-	Thu, 29 Jan 2026 05:13:08 +0000 (UTC)
+	 MIME-Version; b=ZT5eQ56L/XAKzWDkPC+KIcKFmgydBFAPdSz8zVVfXh55hjrc/Upeyf4oYIUIRuP4Xbl1iSACBrJJRzFjb2t7KuRcZ6+VNpJHbk2kfcgNRL4SS1a5Zwrxbr2vxc8YaAXA0JDcQEdvcrm6WIY2qEiBaH19qUL8tYDyh7H+/etiNOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Si3mX+vj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 863BAC19422;
+	Thu, 29 Jan 2026 05:13:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769663589;
-	bh=3Ad3DlMjIgIEv6QksfGagi8nhcC2wkZPvAuz16purjc=;
+	s=k20201202; t=1769663591;
+	bh=G+NlfwUBgakE9GFP/kt8+9HheUg6TSAq9NXWmYcqrgw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=klH5MSfew+LtWXhbcbhx9T9YxER2r3/v+2izEzSkWu2Q4K3qRsf1fzYb8Tts7pIb+
-	 fTNzCQfUB2JmRARLCUNJCDg9N05h0JCq119bkBtfHejgE33ii2o1J/bi6jTArWobpb
-	 /9ruZiQx2gpOdtS6veRlSx2SesEmAl4EY859qvAd68xY8CukxOY5LvWnbuOUEOuEpV
-	 Mf4fVjSrRPOsSZ7An1RMXJeGQSaQBgv6iFudo4NSoEYoQTik++MFOzLBaa1hybU60u
-	 RnSHu/A3UOVonilAzelnOGGFq69C5qEciAC6SrYDf0FlcrKQiB9ZSasVZb70ESooSq
-	 ehTWE4SXbiWzw==
+	b=Si3mX+vj5CP4XiImhIkxeCZnhWwRKwpRUEoz41moMa+ceKJBYizqniST2jrD0LNDB
+	 Pe8ifcRzXeKbg2Wy02OKYGkUn1P01KCmDBRXeyVAyA3hOs94vBc8Y+C1qZAd8uEmyh
+	 ATnD3tOXgZNEDydXYhI/bApnuwdK2deaThrcQ1MlGmJVKNBvklOLqzNuI7hFUl0i4G
+	 KeCb1PkSWmsphFYvL5ns1B+UvOtxAeNKEUY+g2uwECntQa25i4K7q8/QSZAM+lXzpH
+	 NnzkA1oDJuhdqSZdzfTWWYvq617iE8IVI6GvJiOv5+NJDslf1cFDcyPXdvHLf3A4H8
+	 Tfg19S9tkz5tA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: rkannoth@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -56,12 +56,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	sgoutham@marvell.com
-Subject: Re: [net-next,v6,09/13] octeontx2-af: npc: cn20k: virtual index support
-Date: Wed, 28 Jan 2026 21:13:07 -0800
-Message-ID: <20260129051307.376632-1-kuba@kernel.org>
+Subject: Re: [net-next,v6,10/13] octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
+Date: Wed, 28 Jan 2026 21:13:09 -0800
+Message-ID: <20260129051309.376665-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260128071235.3577206-10-rkannoth@marvell.com>
-References: <20260128071235.3577206-10-rkannoth@marvell.com>
+In-Reply-To: <20260128071235.3577206-11-rkannoth@marvell.com>
+References: <20260128071235.3577206-11-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +76,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -85,9 +85,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254569-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254571-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -97,8 +97,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CE118ABDE5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: D69B1ABE0C
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -106,101 +106,97 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-octeontx2-af: npc: cn20k: virtual index support
+octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
 
-This patch adds virtual MCAM index allocation support for CN20K,
-enabling defragmentation by allowing entries to be moved while
-maintaining stable virtual indexes for callers.
+This patch extends the install_flow mailbox request message with
+additional fields that allow the AF driver to determine the required
+NPC MCAM entry type, allocate the entry, and install the flow in a
+single step for CN20K.
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> index 62b4d657c369..642336b0d476 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> index 82afb4993346..7a48ba1db5e9 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
 
 [ ... ]
 
-> +static int npc_vidx_maps_modify(struct rvu *rvu, u16 vidx, u16 new_midx)
+> @@ -1642,6 +1643,75 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
+>  	return 0;
+>  }
+>
+> +static int
+> +rvu_npc_free_entry_for_flow_install(struct rvu *rvu, u16 pcifunc,
+> +				    bool free_entry, int mcam_idx)
 > +{
-> +	u16 old_midx;
-> +	void *map;
-> +	int rc;
-> +
-> +	if (!npc_is_vidx(vidx)) {
-> +		dev_err(rvu->dev,
-> +			"%s: vidx(%u) does not map to proper mcam idx\n",
-> +			__func__, vidx);
-> +		return -ESRCH;
-> +	}
-> +
-> +	map = xa_erase(&npc_priv.xa_vidx2idx_map, vidx);
-> +	if (!map) {
-> +		dev_err(rvu->dev,
-> +			"%s: vidx(%u) could not be deleted from vidx2idx map\n",
-> +			__func__, vidx);
-> +		return -ESRCH;
-> +	}
-> +
-> +	old_midx = xa_to_value(map);
-> +
-> +	rc = xa_insert(&npc_priv.xa_vidx2idx_map, vidx,
-> +		       xa_mk_value(new_midx), GFP_KERNEL);
-> +	if (rc) {
-> +		dev_err(rvu->dev,
-> +			"%s: vidx(%u) cannot be added to vidx2idx map\n",
-> +			__func__, vidx);
-> +		goto fail1;
-> +	}
-> +
-> +	map = xa_erase(&npc_priv.xa_idx2vidx_map, old_midx);
-> +	if (!map) {
-> +		dev_err(rvu->dev,
-> +			"%s: old_midx(%u, vidx(%u)) cannot be added to idx2vidx map\n",
-> +			__func__, old_midx, vidx);
-> +		rc = -ESRCH;
-> +		goto fail2;
-> +	}
-> +
-> +	rc = xa_insert(&npc_priv.xa_idx2vidx_map, new_midx,
-> +		       xa_mk_value(vidx), GFP_KERNEL);
-> +	if (rc) {
-> +		dev_err(rvu->dev,
-> +			"%s: new_midx(%u, vidx(%u)) cannot be added to idx2vidx map\n",
-> +			__func__, new_midx, vidx);
-> +		goto fail3;
-> +	}
-> +
-> +	return 0;
-> +
-> +fail3:
-> +	if (xa_insert(&npc_priv.xa_idx2vidx_map, old_midx,
-> +		      xa_mk_value(vidx), GFP_KERNEL))
-> +		dev_err(rvu->dev,
-> +			"%s: Error to roll back idx2vidx old_midx=%u vidx=%u\n",
-> +			__func__, old_midx, vidx);
-> +fail2:
-> +	if (xa_erase(&npc_priv.xa_vidx2idx_map, vidx))
-> +		dev_err(rvu->dev,
-> +			"%s: Failed to roll back vidx2idx vidx=%u\n",
-> +			__func__, vidx);
-> +
-> +fail1:
-> +	if (xa_insert(&npc_priv.xa_idx2vidx_map, old_midx,
-> +		      xa_mk_value(vidx), GFP_KERNEL))
-
-The rollback at fail1 appears to operate on the wrong XArray. When
-xa_insert() fails above and we jump to fail1, the xa_idx2vidx_map still
-contains old_midx since the erase of xa_idx2vidx_map has not executed yet.
-This xa_insert() will return -EBUSY because the key already exists.
-
-Should this instead restore vidx to xa_vidx2idx_map with the original
-old_midx value, since that was the map modified before the failure?
-
-> +		dev_err(rvu->dev,
-> +			"%s: Faled to roll back idx2vidx to old_midx=%u, vidx=%u\n",
-> +			__func__, old_midx, vidx);
-> +
-> +	return rc;
-> +}
 
 [ ... ]
+
+> +static int
+> +rvu_npc_alloc_entry_for_flow_install(struct rvu *rvu,
+> +				     struct npc_install_flow_req *fl_req,
+> +				     u16 *mcam_idx, u8 *kw_type,
+> +				     bool *allocated)
+> +{
+
+[ ... ]
+
+> +	if (!is_cn20k(rvu->pdev))
+> +		return 0;
+> +
+> +	if (!fl_req->alloc_entry)
+> +		return 0;
+
+[ ... ]
+
+>  int rvu_mbox_handler_npc_install_flow(struct rvu *rvu,
+>  				      struct npc_install_flow_req *req,
+>  				      struct npc_install_flow_rsp *rsp)
+>  {
+
+[ ... ]
+
+> +	bool allocated = false;
+>  	bool enable = true;
+> +	u8 kw_type;
+>  	u16 target;
+
+[ ... ]
+
+> +	err = rvu_npc_alloc_entry_for_flow_install(rvu, req, &req->entry,
+> +						   &kw_type, &allocated);
+> +	if (err) {
+> +		dev_err(rvu->dev,
+> +			"%s: Error to alloc mcam entry for pcifunc=%#x\n",
+> +			__func__, req->hdr.pcifunc);
+> +		return err;
+> +	}
+
+[ ... ]
+
+>  	mutex_lock(&rswitch->switch_lock);
+>  	err = npc_install_flow(rvu, blkaddr, target, nixlf, pfvf,
+>  			       req, rsp, enable, pf_set_vfs_mac);
+> +	if (err)
+> +		rvu_npc_free_entry_for_flow_install(rvu, req->hdr.pcifunc,
+> +						    allocated, req->entry);
+> +
+> +	rsp->kw_type = kw_type;
+> +	rsp->entry = req->entry;
+            ^^^^^^^^
+
+Is kw_type initialized in all paths here?
+
+When rvu_npc_alloc_entry_for_flow_install() returns early because either
+is_cn20k() is false or alloc_entry is not set, kw_type is never written.
+The function returns 0 without setting *kw_type, leaving the local variable
+uninitialized.
+
+The uninitialized stack value then gets copied to rsp->kw_type.
+
+Should this be initialized to 0 at declaration?
+
+>  	mutex_unlock(&rswitch->switch_lock);
+>
+>  	return err;
+>  }
 
