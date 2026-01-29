@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-254509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFb2Dm2+emnw+AEAu9opvQ
-	(envelope-from <netdev+bounces-254509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:57:01 +0100
+	id MGkHFHG+emnw+AEAu9opvQ
+	(envelope-from <netdev+bounces-254510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:57:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59416AAECA
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:57:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB9F3AAEE0
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:57:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D8164300621C
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 01:56:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3879D3014110
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 01:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC6832571F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABD3328B6A;
 	Thu, 29 Jan 2026 01:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7A530AAD6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7382FE593;
 	Thu, 29 Jan 2026 01:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769651816; cv=none; b=QyeHuJhSojsW2e8fkObOUxgistFtpeKL9HB/xjfeBsGL1cYb+7/MyU3uk6cq8i3f9cSTFIODK43FHVx29O4YCDOCzVGzAyi9XaxrqDR0lbYtMTzCnrnQkLHSTI++nJYhKysLt0fprAV6hgBf8iZ+cWvILbQdiNIFZ1ACb8Kxehw=
+	t=1769651816; cv=none; b=Cq64EjiLhJAtGbs/LoRxy4GK6G0oSqxaViWmS/rOas0Vxa5rgs2CscLnlbEMJaTOyAk5+mXApKXUoKcC4iy7r1YNgbgk+YOfsenD1hdYU4UiP019mFxNhpicciZiYwdRwdcUv8xLbVxt5RIloWcIL/cHUDJtcudqj8OmmkKdDk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769651816; c=relaxed/simple;
-	bh=gwBFthLlV6jDktSmU/0O54YQtDlxAKg2cUwtNcE24yg=;
+	bh=zGfH18yRIvuOi+Et7eT41SaQHaj8zR4H43u4BelTkZc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bxhEe4vJEte3MTGFrkk8KT4jCV1SxauC3EoVAOH1E3XK47LpT7AEnvBUd5n3owtbUDEX1uzLxFwL6+8rOYEVaj6poImlzlGR+Spyx9AJV1C0joxGFcLYBLYwFbeRQsYR7grd4UXqLz8MDcCbmNAfAODorcEc3CEcZdNc96qYmMk=
+	 In-Reply-To:To:Cc; b=McFN3//FyH80WlAVHFHm1xVsZqlQ643MA5zdk2F8dwXSLiiaQq5WqJ1BZw2ez4+Dn/aeKl0Qq2tNbLvw9FIjxwMyJ8cKl7qsVgOWek5rj5TvOUq15VINYhcgRTC1XzxAplJw0xrfOhGVIG5LIAm8McvK/V3B9rx10a7mgBdpKH4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from [127.0.0.2] (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowAAntwpDvnpps5z0Bg--.39391S5;
+	by APP-05 (Coremail) with SMTP id zQCowAAntwpDvnpps5z0Bg--.39391S6;
 	Thu, 29 Jan 2026 09:56:20 +0800 (CST)
 From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Thu, 29 Jan 2026 09:56:08 +0800
-Subject: [PATCH v4 3/4] drm/radeon: Raise msi_addr_mask to dma_bits
+Date: Thu, 29 Jan 2026 09:56:09 +0800
+Subject: [PATCH v4 4/4] ALSA: hda/intel: Raise msi_addr_mask to dma_bits
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,7 +46,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260129-pci-msi-addr-mask-v4-3-70da998f2750@iscas.ac.cn>
+Message-Id: <20260129-pci-msi-addr-mask-v4-4-70da998f2750@iscas.ac.cn>
 References: <20260129-pci-msi-addr-mask-v4-0-70da998f2750@iscas.ac.cn>
 In-Reply-To: <20260129-pci-msi-addr-mask-v4-0-70da998f2750@iscas.ac.cn>
 To: Madhavan Srinivasan <maddy@linux.ibm.com>, 
@@ -65,32 +65,33 @@ Cc: Han Gao <gaohan@iscas.ac.cn>, Vivian Wang <wangruikang@iscas.ac.cn>,
  linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
  dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, linux-sound@vger.kernel.org, 
- linux-riscv@lists.infradead.org, sophgo@lists.linux.dev
+ linux-riscv@lists.infradead.org, sophgo@lists.linux.dev, 
+ Takashi Iwai <tiwai@suse.de>
 X-Mailer: b4 0.14.3
-X-CM-TRANSID:zQCowAAntwpDvnpps5z0Bg--.39391S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF4kJF1UWF4fAr15JrWfuFg_yoW8Zw1kpF
-	43GFZxtr9Iy3WUKa9Fkay7ZF15Aa1FkayfXr4DG39I9a4YyryUCry3Zw43J34kXr1kXr42
-	qr18G3y5uF1FvF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUQY14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxd
-	M2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjx
-	v20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1l
-	F7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2
-	IY04v7MxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwVWkMxAIw28IcxkI7VAKI48JMxC2
-	0s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI
-	0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE
-	14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRRiF4JUUUUU==
+X-CM-TRANSID:zQCowAAntwpDvnpps5z0Bg--.39391S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF4kJF1UWFW3Ar1xXr17Awb_yoW8Ar18pa
+	1DWayftF4jqay5Ja1kKa1j9F13CayFkwnxGrWkK3s3Kas0vr10gr9FkryxJayxGF4vgw1Y
+	vrWjv3WkWF45Za7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUQI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+	z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+	4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j
+	6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x
+	IIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_
+	Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8c
+	xan2IY04v7MxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwVWkMxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRRG-e5UUUUU==
 X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -99,11 +100,11 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254509-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-254510-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
@@ -112,8 +113,8 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 59416AAECA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BB9F3AAEE0
 X-Rspamd-Action: no action
 
 The code was originally written using no_64bit_msi, which restricts the
@@ -125,48 +126,42 @@ precisely and allowing these devices to work on platforms with MSI
 doorbell address above the 32-bit limit, as long as it is within the
 hardware's addressable range.
 
+Acked-by: Takashi Iwai <tiwai@suse.de>
 Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
-
 ---
 v4: Patch message rewording for more consistency
 ---
- drivers/gpu/drm/radeon/radeon_device.c  |  1 +
- drivers/gpu/drm/radeon/radeon_irq_kms.c | 10 ----------
- 2 files changed, 1 insertion(+), 10 deletions(-)
+ sound/hda/controllers/intel.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/gpu/drm/radeon/radeon_device.c b/drivers/gpu/drm/radeon/radeon_device.c
-index 60afaa8e56b4..5faae0361361 100644
---- a/drivers/gpu/drm/radeon/radeon_device.c
-+++ b/drivers/gpu/drm/radeon/radeon_device.c
-@@ -1374,6 +1374,7 @@ int radeon_device_init(struct radeon_device *rdev,
- 		pr_warn("radeon: No suitable DMA available\n");
- 		return r;
- 	}
-+	rdev->pdev->msi_addr_mask = DMA_BIT_MASK(dma_bits);
- 	rdev->need_swiotlb = drm_need_swiotlb(dma_bits);
+diff --git a/sound/hda/controllers/intel.c b/sound/hda/controllers/intel.c
+index c9542ebdf7e2..a44de2306a2b 100644
+--- a/sound/hda/controllers/intel.c
++++ b/sound/hda/controllers/intel.c
+@@ -1903,11 +1903,6 @@ static int azx_first_init(struct azx *chip)
+ 		chip->gts_present = true;
+ #endif
  
- 	/* Registers mapping */
-diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm/radeon/radeon_irq_kms.c
-index d550554a6f3f..839d619e5602 100644
---- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
-+++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
-@@ -245,16 +245,6 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
- 	if (rdev->flags & RADEON_IS_AGP)
- 		return false;
- 
--	/*
--	 * Older chips have a HW limitation, they can only generate 40 bits
--	 * of address for "64-bit" MSIs which breaks on some platforms, notably
--	 * IBM POWER servers, so we limit them
--	 */
--	if (rdev->family < CHIP_BONAIRE) {
--		dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
--		rdev->pdev->msi_addr_mask = DMA_BIT_MASK(32);
+-	if (chip->msi && chip->driver_caps & AZX_DCAPS_NO_MSI64) {
+-		dev_dbg(card->dev, "Disabling 64bit MSI\n");
+-		pci->msi_addr_mask = DMA_BIT_MASK(32);
 -	}
 -
- 	/* force MSI on */
- 	if (radeon_msi == 1)
- 		return true;
+ 	pci_set_master(pci);
+ 
+ 	gcap = azx_readw(chip, GCAP);
+@@ -1958,6 +1953,11 @@ static int azx_first_init(struct azx *chip)
+ 		dma_set_mask_and_coherent(&pci->dev, DMA_BIT_MASK(32));
+ 	dma_set_max_seg_size(&pci->dev, UINT_MAX);
+ 
++	if (chip->msi && chip->driver_caps & AZX_DCAPS_NO_MSI64) {
++		dev_dbg(card->dev, "Restricting MSI to %u-bit\n", dma_bits);
++		pci->msi_addr_mask = DMA_BIT_MASK(dma_bits);
++	}
++
+ 	/* read number of streams from GCAP register instead of using
+ 	 * hardcoded value
+ 	 */
 
 -- 
 2.52.0
