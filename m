@@ -1,83 +1,64 @@
-Return-Path: <netdev+bounces-254564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLtqJuPremmE/wEAu9opvQ
-	(envelope-from <netdev+bounces-254564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:10:59 +0100
+	id qCf2JQXsemmE/wEAu9opvQ
+	(envelope-from <netdev+bounces-254565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:11:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1CBABD73
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:10:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E656ABD82
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B62C0300622E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:10:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05F1E3019FD4
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D7B2D8DDB;
-	Thu, 29 Jan 2026 05:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0ABF2D94BA;
+	Thu, 29 Jan 2026 05:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6V3DB04"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hc4twbEy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4A6273D8D;
-	Thu, 29 Jan 2026 05:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E83C2D46B3
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 05:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769663438; cv=none; b=N/Z7lcOSefpq/wAVhno0uSubapQbXNYayF8ifj0z6JjEMA7hDqToEEPtqxsUnNGAHLVeOggEsOyle0thCqp0whAtkCuxOn9RLqrKchwQsPzKwQFrJhc5leDTaSpEbn+UcMJmDOLEZt9tRkRGV6yEiQ9P+qczltjuLIvXcKYasvA=
+	t=1769663473; cv=none; b=D+O3gWyllgQpN2aKaciH2ByvXD2RcZIDk4CoNlgMACNuJvWl3Mwv1F7MkmksHaBHXxABf8Qos/JcmgBvinwyhQPQG+RutlLo450JxKN5S09/tbxVvSOgLquVPxsy82eB4LL7aNBgnUPPGq0o3PhcFu/0/PriwYufRMUPN0Rxx44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769663438; c=relaxed/simple;
-	bh=/QRvDVT9GAiToi3v8vcF+/vGPRfAWiWi238lSh1gI44=;
+	s=arc-20240116; t=1769663473; c=relaxed/simple;
+	bh=W9fqYP+KrfTCzJpFa0BishbYUbcgHmATKHrdr0OacMI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wc1jVxFcJ0TWTFZQA6IVNlpQ8qCcL3JBy9WvRx7mdQljw2cxPneMiI5TxXDOrpUwxK0hAJoImeiZoWC9E0VwoiWqfyMhjEJ/1gm9SFukXwKuaeNdDxwILqoFoP+3RDqz0ZTzwh8aqo7zrAywKDrU7VTEEj2NoIfYf89AmapwH6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6V3DB04; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BB9FC116D0;
-	Thu, 29 Jan 2026 05:10:36 +0000 (UTC)
+	 MIME-Version; b=i0I6uiO1ISgZB96tYfRr8qTh2TrJcrxDjhYDhJ/33cK1Aij5fdI6Qxsz7+2ePkyuyO1b9U820xnXeRdKN+YEnrJy/KWWhnvxDGwHNUsdMBoTToTHIceYILuVAI+pkgxhgiLsdnE3U/YckHrd0JHKAIlmsn4ZPhV6IwMnQTCCdzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hc4twbEy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B63C2C116D0;
+	Thu, 29 Jan 2026 05:11:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769663437;
-	bh=/QRvDVT9GAiToi3v8vcF+/vGPRfAWiWi238lSh1gI44=;
+	s=k20201202; t=1769663473;
+	bh=W9fqYP+KrfTCzJpFa0BishbYUbcgHmATKHrdr0OacMI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c6V3DB04Gz6boAr8Vs3t5FEeQjtRG5O84q1Ij/YXCv8c2F0w+MP9w1Tl2kPB0FcD4
-	 Xl/KgTLm0SxwSQJXbGYJ6tfseKUXZ+CFjkOf/nUEoHgjuj7x/FKMxVShY+7j4ttbhZ
-	 5+sfRBkBxbb962nCJs7GbfVtdy768H2Exifqa8Ha+bB7KZvUd4Xo/aKskK81XNQGkw
-	 lnlgJId6jwxkrazRSAnNzK8/QoGifKaPigQScm3ox0Q/GRuIa18M4rZWDdeRxfa2zP
-	 LTWyvIAL7Ydpp1ig4pj/yLFBMNtFHQ+unTB2PyaqFIOEAul1W7rReRwo/4Dg3LnP0r
-	 jlcHsRNYrgHlw==
+	b=hc4twbEyR/Ek9EGD44bFFn8wehzl7xdWkRlHTpu7ultX5sb7hWcpEeU8dw1yb/ehM
+	 tCJ3q7MbisSj8UJHrougdG2wLdVvcs3fNglCUI1jQ7JJbgmdGOwB6EthH7CFX/85+o
+	 6pO2uK0ETY6PSQTuztN7loH0sR7dnJiezcmvNMgTohLUTUUfq/8M/xEGqaycXvhtfV
+	 m+oRaBXeow3dYuVn7BWkEID4VDBOQPojeGIGqu+LvFkmfiBwfSUaBCGehUQN2Wwvb1
+	 n/CtRuuqW6gCfqcisD9awCA/h9MRbTKT9SyUmhin0igXpqoQhSzGM8jHeaycAAbNEZ
+	 ce8WN5xCGptXQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: dan.carpenter@linaro.org
+To: Raju.Rangoju@amd.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	jan.petrous@oss.nxp.com,
-	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	imx@lists.linux.dev,
-	chester62515@gmail.com,
-	mbrugger@suse.com,
-	netdev@vger.kernel.org,
-	s32@nxp.com,
-	conor+dt@kernel.org,
-	andrew+netdev@lunn.ch,
-	robh@kernel.org,
-	kernel@pengutronix.de,
-	linux-stm32@st-md-mailman.stormreply.com,
-	shawnguo@kernel.org,
-	linux-kernel@vger.kernel.org,
-	ghennadi.procopciuc@oss.nxp.com,
-	linaro-s32@linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	alexandre.torgue@foss.st.com,
-	krzk+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	festevam@gmail.com,
-	s.hauer@pengutronix.de
-Subject: Re: [v5,2/3] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
-Date: Wed, 28 Jan 2026 21:10:35 -0800
-Message-ID: <20260129051035.375905-1-kuba@kernel.org>
+	davem@davemloft.net,
+	Shyam-sundar.S-k@amd.com
+Subject: Re: [net-next] amd-xgbe: add support rx alignment and length errors
+Date: Wed, 28 Jan 2026 21:11:11 -0800
+Message-ID: <20260129051111.376038-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <939fdaf94038613486bdbba510a92a1e57e18c71.1769592679.git.dan.carpenter@linaro.org>
-References: <939fdaf94038613486bdbba510a92a1e57e18c71.1769592679.git.dan.carpenter@linaro.org>
+In-Reply-To: <20260128075843.696961-1-Raju.Rangoju@amd.com>
+References: <20260128075843.696961-1-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,34 +69,33 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,oss.nxp.com,davemloft.net,google.com,redhat.com,gmail.com,lists.linux.dev,suse.com,vger.kernel.org,nxp.com,lunn.ch,pengutronix.de,st-md-mailman.stormreply.com,linaro.org,lists.infradead.org,foss.st.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TAGGED_FROM(0.00)[bounces-254564-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254565-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BF1CBABD73
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 2E656ABD82
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -123,34 +103,25 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
+amd-xgbe: add support rx alignment and length errors
 
-This commit adds the nxp,phy-sel property to the S32 DWMAC binding,
-allowing access to the GMAC_0_CTRL_STS register via a syscon interface
-instead of the previous ad-hoc direct register mapping.
+This patch adds support for reading rx alignment errors from the hardware
+MMC registers and updates the rtnl_link_stats64 structure.
 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> index 2b8b74c5feec..65633b10e49e 100644
-> --- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> index b5a60a048896..ebc5fe8324ea 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> @@ -1838,6 +1838,8 @@ static void xgbe_get_stats64(struct net_device *netdev,
+>  	s->rx_length_errors = pstats->rxlengtherror;
+>  	s->rx_crc_errors = pstats->rxcrcerror;
+>  	s->rx_over_errors = pstats->rxfifooverflow;
+> +	s->rx_frame_errors = pstats->rxalignmenterror;
+> +	s->rx_length_errors = pstats->rxlengtherror;
 
-[ ... ]
-
-> +  nxp,phy-sel:
-> +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> +    items:
-> +      - items:
-> +          - description: phandle to the GPR syscon node
-> +          - description: offset of PHY selection register
-> +    description:
-> +      This phandle points to the GMAC_0_CTRL_STS register which controls the
-> +      GMAC_0 configuration options.  The register lets you select the PHY
-> +      interface and the PHY mode.  It also controls if the FTM_0 or FTM_1
-> +      FlexTimer Modules connect to GMAC_O.
-                                       ^^^^^^
-
-Should this be GMAC_0 (with a zero) instead of GMAC_O (with a letter O)?
-The rest of the description uses GMAC_0_CTRL_STS and GMAC_0 consistently.
+Is this line a duplicate? The assignment to s->rx_length_errors already
+appears three lines above. Perhaps this was intended to be a different
+assignment?
 -- 
 pw-bot: cr
 
