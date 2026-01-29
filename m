@@ -1,78 +1,76 @@
-Return-Path: <netdev+bounces-254766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGK1KdZBe2n6CwIAu9opvQ
-	(envelope-from <netdev+bounces-254766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:17:42 +0100
+	id UIuACABCe2n6CwIAu9opvQ
+	(envelope-from <netdev+bounces-254767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:18:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A16AF875
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:17:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EAFEAF891
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B8F7300B117
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:17:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65E4E300DE0D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239872EAB61;
-	Thu, 29 Jan 2026 11:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D563806AA;
+	Thu, 29 Jan 2026 11:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wQX7OV28"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5AE327C0F
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 11:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FEF2EAB61;
+	Thu, 29 Jan 2026 11:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769685460; cv=none; b=Bbj7P+dADcvBzQPHjbE8OF352twrf7YsRCxXaNYBQviK3jXCJTIHq8xtVw3q5AZ/PLtUABUiY3b3vpqiJ6hG+/FuFPFbKittVbyvYhaFy8KjkxsF4IU49dnhPZAU1scb/RKGHJoeXmy3ij2lfkq3mATBJSJjWXviGk1Dpj/Uijc=
+	t=1769685472; cv=none; b=chsJLfSC5HS/+8hSHJmGi/wnkks4rdM6C+3kPH9NEs1Dgbj/C5A5fNxCHauL74CgNksGAu9zLztyU9LCBwHMgEXWHzeow/fwzWrOs79K/Ac17YWJkdFAUIDrlwFEyAzpx+DuK0/kjvSZ6AdpXikcrCDTbXcwRM3uBNU3WPvEOTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769685460; c=relaxed/simple;
-	bh=zj84EtgCbu4++Eo7Wq/IxAONMKAi2gpxcTZyU2kKteE=;
+	s=arc-20240116; t=1769685472; c=relaxed/simple;
+	bh=hWoB8NJnZzKT+p4uTPHE7XVADyAG8YytwVhjFS3wcGU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mlWBOVFlVIdC/gIHvtk5AsRSZxDUfI0RNvW0BGi5sS76JgboWUBCR7SN2ZPv78Oo3SpwuyFWe968by+6/hZ/snZWBB8ilHkYimxB0by6LoyZPHa5AeZ4XhPiYYwCE5D0rfZHlwf5QmxMJR498UzYB4lCZAhx+pixTFtYkyLrJ34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1vlQ1f-0004Hp-VC; Thu, 29 Jan 2026 12:17:27 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1vlQ1e-0034hH-2k;
-	Thu, 29 Jan 2026 12:17:26 +0100
-Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1vlQ1e-004f9L-09;
-	Thu, 29 Jan 2026 12:17:26 +0100
-Date: Thu, 29 Jan 2026 12:17:26 +0100
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
-	Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>,
-	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into
- phy_init_hw
-Message-ID: <20260129111726.jjkcq46dpghuorco@pengutronix.de>
-References: <20260128094644.302313-1-michael@amarulasolutions.com>
- <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch>
- <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
- <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
- <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
- <aXqJ_TtdBnkvEZ_i@shell.armlinux.org.uk>
- <20260129104123.zir4rtgeiu5qv3i7@pengutronix.de>
- <aXs8m8UodO4griTY@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ex6erJgxX2S/rOnNhIocJ09fStPOAjSyunJ6B6DFGijzEDs8Bmzz1HCjCRpKg/1LoQXSYlkTxjCp4KNCuyzQd/EWIn62KBgFklJTiUudRl6q6re44+2acFKWbgf/hZ4BLae1RJ/VGBPQZGc6FodnRO66P8mZVCeZ5orgT5eMMt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wQX7OV28; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xRbGhk3MppX3QDh9iQp/r9WXjYsRk1w3/DNqD5xKN6Y=; b=wQX7OV28trnhd/CmJjo5OstW0W
+	VacPFX0Hr4C4H6AbOwz1lgX2ZqOb0qMQVpvLLDABSpoFhqUNZuAjs3dGP0OY4Sw2nkRfZrHdsf6tz
+	Byj2tuwWQ3clIjdIAOi1F0fYLpc6Cw1NZ3ejgQJewEBjjmLuuepHETy5Kh5NH+qJ15rkPEx1Tu1/2
+	xE/vVczNvP+OKQnO5K2qJfwsR4dGPLdV/a6pNs6k0WN5nGF0Ehp69lQlS6mfqr4lMDzUMlm8ED1KW
+	zE3yJeokfswi0AyQTr0+bfHTh7xiIYTNjiOalKMazWFmGNAEeOVsCN8+fRdBFwN3kFAuOnKkgoCRo
+	FRD67AYw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57138)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vlQ1s-000000008S8-0a6Z;
+	Thu, 29 Jan 2026 11:17:40 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vlQ1p-000000007v4-3EdQ;
+	Thu, 29 Jan 2026 11:17:37 +0000
+Date: Thu, 29 Jan 2026 11:17:37 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
+	p.zabel@pengutronix.de, ghennadi.procopciuc@nxp.com,
+	bogdan-gabriel.roman@nxp.com, Ionut.Vicovan@nxp.com,
+	alexandru-catalin.ionita@nxp.com, linux-phy@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Frank.li@nxp.com
+Subject: Re: [PATCH 2/4] phy: s32g: Add serdes subsystem phy
+Message-ID: <aXtB0QcVOkE_hhny@shell.armlinux.org.uk>
+References: <20260126092159.815968-1-vincent.guittot@linaro.org>
+ <20260126092159.815968-3-vincent.guittot@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,86 +79,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXs8m8UodO4griTY@shell.armlinux.org.uk>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20260126092159.815968-3-vincent.guittot@linaro.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amarulasolutions.com,lunn.ch,nxp.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-254766-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254767-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m.felsch@pengutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.996];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 09A16AF875
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8EAFEAF891
 X-Rspamd-Action: no action
 
-On 26-01-29, Russell King (Oracle) wrote:
-> On Thu, Jan 29, 2026 at 11:41:23AM +0100, Marco Felsch wrote:
-> > As said, I don't see a problem with the LAN8710. But while checking the
-> > Linux source code, I saw commit
-> > 57ec5a8735dc5dccd1ee68afdb1114956a3fce0d which re-introduced the reset
-> > handling :-/
-> 
-> So now we get to the bottom of it. This is a regression, right? The
-> addition of that patch has caused previously working boards to stop
-> working, correct?
+On Mon, Jan 26, 2026 at 10:21:57AM +0100, Vincent Guittot wrote:
+> +/*
+> + * Until now, there is no generic way to describe and set PCIe clock mode.
+> + * PCIe controller uses the default CRNS = 0 mode.
+> + */
+> +enum pcie_phy_mode {
+> +	CRNS = 0, /* Common Reference Clock, No Spread Spectrum */
+> +	CRSS = 1, /* Common Reference Clock, Spread Spectrum */
+> +	SRNS = 2, /* Separate Reference Clock, No Spread Spectrum */
+> +	SRIS = 3  /* Separate Reference Clock, Spread Spectrum */
+> +};
 
-The commit is part of 6.17 and the system I've added the support for the
-clk handling is currently running on 6.14. I have to ask a colleague of
-mine to very this.
+So this is a PCIe thing. If it's part of the driver's API, then it
+should be common and not driver-private.
 
-But yes, it seems like a regression.
+> +static inline bool is_pcie_phy_mode_valid(int mode)
+> +{
+> +	switch (mode) {
+> +	case CRNS:
+> +	case CRSS:
+> +	case SRNS:
+> +	case SRIS:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
 
-> That means it needs to be reverted.
+This checks that the submode is one of the PCIe private modes that this
+driver wants to see.
 
-Yes.
+> +
+> +static int s32g_serdes_phy_set_mode_ext(struct phy *p,
+> +					enum phy_mode mode, int submode)
+> +{
+> +	struct s32g_serdes *serdes = phy_get_drvdata(p);
+> +
+> +	if (mode == PHY_MODE_PCIE)
+> +		return -EINVAL;
+> +
+> +	if (!is_pcie_phy_mode_valid(submode))
+> +		return -EINVAL;
 
-> We also need to get out of our heads the idea that LAN8710A is somehow
-> special in needing this. It isn't. Thus, there should be no special
-> flags to "work around" this "problem".
+This checks for the PCIe submode, but notice the test immediately
+above. PCIE mode is being rejected. So, this driver supports
+everything else but PCIe.
 
-IMHO this flag should be removed completely because it makes the
-phy-driver mac-driver dependent. Since the FEC is the only driver
-checking this flag.
-
-Regards,
-  Marco
-
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> 
+That doesn't seem right.
 
 -- 
-#gernperDu 
-#CallMeByMyFirstName
-
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
