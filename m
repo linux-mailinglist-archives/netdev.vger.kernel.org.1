@@ -1,344 +1,230 @@
-Return-Path: <netdev+bounces-254884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMafEq2ie2kVHgIAu9opvQ
-	(envelope-from <netdev+bounces-254884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:10:53 +0100
+	id EDd6B8Sie2kVHgIAu9opvQ
+	(envelope-from <netdev+bounces-254885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:11:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35DCB369E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:10:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 517F1B36AC
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:11:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7FBC300B077
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:10:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BA963028EE6
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518363563C9;
-	Thu, 29 Jan 2026 18:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49842356A2A;
+	Thu, 29 Jan 2026 18:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CAp+QDXB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YyhDE2IP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC59F33A030
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769710244; cv=fail; b=NwyYy1dPOBUx6uzat7WEcVxDseS4Ms1HjHwl/1I7Ee78vne/8LYoCSRCwxYrMm+dcFW9rvf25aa1dlh92zUzatDPv9JrWU6rUNi5LSwBnSgs/V3YZRqbtmmMgUDJEq8sySXu25lE5mA6/1sGZ2zl2cs6YZNPxg49fw0Ne7g4F94=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769710244; c=relaxed/simple;
-	bh=yCPc/QW5NQgRTALS2Uxo5YrGtTUc1JRzTp9Lxfj7W4Q=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=F8Ealq+QS7sYwNVBynidkVqP7Wm8iPejFVfypVHiXimIVb4Pu2RZneGJPoVU3LtbiFbLuz1KD/4BwXskmlzosI257m9unQEQC4ce/wj9Kx8Rp1DSryL0AVO9+r4Di349wNFrXbOYqCmz/SHJRby6FZ+U1Mmwerd6LYrn/rtXSnE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CAp+QDXB; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769710243; x=1801246243;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=yCPc/QW5NQgRTALS2Uxo5YrGtTUc1JRzTp9Lxfj7W4Q=;
-  b=CAp+QDXBbHv5fcZTSecJjhIi9mFhym375TS/2M6SXRM80cRENMbpugmR
-   69/5A5ytNKdeHiQ2uULUp1zSEvSYp1wuQPHpQyTZZi97Z1s1etwW7czOX
-   UCYrERmERU2oKLgqbc/4RujieTt1ndfzpOyWh+kJ/CHThAZgeZXsPlZZW
-   7CgWd2bCV5wRX0/IJ2wePDCpT3vHWcNomvKlDz+FchOMkc8cmaABTMb1j
-   2q19w66/A95qlt2Ws9VvIcwFx3CWCJ1Li18dt9IoH0zLRjhXZTIiTAOWW
-   bYmLxv1H7LaAiQwSaliX4djqVkB6VlLWPAt6bT/ESY9Xvn6YhK7DFvMsl
-   Q==;
-X-CSE-ConnectionGUID: qqoRuNcKTUie7A0MHUWaKA==
-X-CSE-MsgGUID: mcjPY1u6T1CCiPGahnjVOw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="96422465"
-X-IronPort-AV: E=Sophos;i="6.21,261,1763452800"; 
-   d="scan'208";a="96422465"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 10:10:41 -0800
-X-CSE-ConnectionGUID: jqnbI46YQ4W3opq/BWhjTw==
-X-CSE-MsgGUID: nXLUBuilTfSifFsTx3jf6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,261,1763452800"; 
-   d="scan'208";a="208749858"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 10:10:41 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Thu, 29 Jan 2026 10:10:40 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Thu, 29 Jan 2026 10:10:40 -0800
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.43) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Thu, 29 Jan 2026 10:10:40 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gasluaitJRbIuyXu8VTTWUr1I/quP3k67KqC6gj/7CsbAhyTEeT5WGCD628QdyH7gwxDu0MgCaVyGOvEp/Hq+JZjbgmbUl7mb+1kxcJFitiq++ehpbTc/Cd8TJuiKsgkLkS3ETObz3ZRh9NJyvTyKdPnAOhENKuyw+ItdoKVndR5oy0h9Xvm1nWBu9B6Aol38cO0N1j8/pnnuKi9YzVVD6Ipys+1+To99RiSxOVzVez2N5uy9Mif3PdZHStU5twAEkrU7UeJTrwru+JG9/4IUygaqb0H5nrDh9YDtZ3kBj2vMyMpTYFneqw2SUTALD6VGg0JcmCB1OVtDzHVUXszcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PF7AZHim96oogQK+LA2SOzaHCWSLlhS3bt/l6TnbHr0=;
- b=JN9rXiDsIiFyWGCWVL1zLNKvHsTM1CyHZ9c1hDVTvdF5KIep+qaTmFqt4UYkRgpdf7yRlwL3/yteamIwhFvvwE6qHIkfIKuos9snaxihtE0X12HUKX0IT3vtQQf8h8vxlrfOtCWD0d8vbFtgrEuHDegZpJN2U8UQ2Pi7QYuO9Oeh8Bb5ALILaDyoQkfvA9P7XGKPoINv1TJsUnOZawTIHcThBmjWZw2WfS4pMtgvTCtZf8Sl4yJBJGNjMuuJ3a6i/RaNF9gkYJgRDJlDboZndRM8m/eflrKAXaVS01agSCiXt2Kxst6D6bUT0lRuNdek62QkscnFJ1njsWMPxTusxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH3PPF23335A1E7.namprd11.prod.outlook.com (2603:10b6:518:1::d0e) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Thu, 29 Jan
- 2026 18:10:38 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9542.010; Thu, 29 Jan 2026
- 18:10:38 +0000
-Message-ID: <8b146fee-a63e-4e22-a1c1-eae052786e66@intel.com>
-Date: Thu, 29 Jan 2026 10:10:37 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ixgbe: e610: remove redundant
- assignment
-To: Andrew Lunn <andrew@lunn.ch>, Piotr Kwapulinski
-	<piotr.kwapulinski@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<dan.carpenter@linaro.org>, <horms@kernel.org>, <pmenzel@molgen.mpg.de>
-References: <20260129175455.174241-1-piotr.kwapulinski@intel.com>
- <60e6bfa6-4267-4d33-9987-24b87c0d0091@lunn.ch>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <60e6bfa6-4267-4d33-9987-24b87c0d0091@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0324.namprd04.prod.outlook.com
- (2603:10b6:303:82::29) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DC933A030;
+	Thu, 29 Jan 2026 18:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769710255; cv=none; b=XFlqSAF4//HSd0eRrtmG/0cLqA8OeFoxCUG4yrKrAqoo3l6qAtw0qBeknWZi4mCvBcQjJBWyZhKg5GiwYwgv6psV4m1t+GRjoUwXqf5yeQroR+0M2J6iwypzPMYWX9P+HD01ytCQCYnGOEfj/+zDUis8l8U8oM6SoZLCaD/0RVY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769710255; c=relaxed/simple;
+	bh=gj6Kch/gDkrYPm7SM9ELLrMVc5N6rJh2Q7URFp3VW/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H7QvZ0m/aTmTqVg9k5lxAaMYk/X9Vr03p4JTJTo3hY6RqWRwcQx8HCbVBlfL4U0s3QxTHcJB6SzqqqsQL5nWyVFuOh/SOyGFGYCYUhJGa8amMTa2joldi5NoM/Ywz2wh/ASbquaU4njbhCVsXrojts/5PHlM9mRWxrK+FnA5DLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YyhDE2IP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF603C4CEF7;
+	Thu, 29 Jan 2026 18:10:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769710254;
+	bh=gj6Kch/gDkrYPm7SM9ELLrMVc5N6rJh2Q7URFp3VW/0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YyhDE2IPcS/cAQR0wIW11PJgANDsZsHaTeJR/n/efou4KjLS7ZC0L67E9POaW8nZH
+	 Pgk91Z/PT8X2DZ2gguN1Mql6a1WjpwUGS/ByFge7TOAbl24d1wI1Ygj1wdoPvHO/n9
+	 PS+5BRI/5d469v+b4HQRDtDuUYhEKCZUEYutq4mVGVKBS2XBwmRsRCR+SgHxfg/W1m
+	 o5rrJ7pnvCaldVc+GVhVHZYn5Vp4qzPBjjT4/r8Gp0R8LPhP0AsQN2qorFbKBRv5sn
+	 dkGt1BnfOgyxetysIdqvGFVPOFZl1VX6qOIwM0tVreljqGk91mfmu+DdZyRxA8lTgs
+	 5eU/eot4xT2oQ==
+Date: Thu, 29 Jan 2026 12:10:53 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Serge Semin <fancer.lancer@gmail.com>
+Subject: Re: [PATCH v2 net-next 09/15] dt-bindings: net: dsa: sja1105:
+ document the PCS nodes
+Message-ID: <176971025335.1390033.17907150388219680260.robh@kernel.org>
+References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
+ <20260122105654.105600-10-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH3PPF23335A1E7:EE_
-X-MS-Office365-Filtering-Correlation-Id: 51b21128-2d87-4cda-569d-08de5f61b4b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Vk96OUFUcU4zb05QVEtETjRyVndhYUpyb2h0OWJISUFuOXVMRitaT3VEZC9i?=
- =?utf-8?B?Qm9VNEMwblB5ZTkrQXNwYnZqd3RxaC82ckg4L3JaZ3lDOVFUMVAyaENKQzJw?=
- =?utf-8?B?QWpyMU5lMVZUNXNsVjJLTWVaempSWHVBeU9zMG9MWGZVOEkvRlJidjFoVDhJ?=
- =?utf-8?B?dC9HRUorcW9sdXpVcm1Zc2h2STl3QTgwcUZob3g4c01RL0lVSmQrckxTczQ4?=
- =?utf-8?B?SmgzcFhFMThKVVJocEZjUjIrd3g5VFFwb1JoVllBNG5ncDZpa2doN2MwNGdv?=
- =?utf-8?B?d2MvUVdvSVMrbHJncjJCckErN3U3SlBwU2RUb1FaeE1XUjZTWEtIZnI3aFRY?=
- =?utf-8?B?a1ZUT0xFaVNBTGJ3VERKWUhBTnpqVFp4UnVSbmhwaVZJaStYOURWUFpzaU5W?=
- =?utf-8?B?U2FWUDNxOVpmekhIMVg5WWpZSUt5aXZUdTFKT3lzNG90ZVMvdHRoQlFaQnRO?=
- =?utf-8?B?a1phTnlVQVEycWwzR0w5d1pGS3l4dS9zS1k1LzQwRTAySVVvQkxERUh6cTNp?=
- =?utf-8?B?WXpQK0tPUWpFSWx6Qm9XQ0tnbjdFMUc3TVovNWd2S3UveW5ZOWQrT3U5VFgw?=
- =?utf-8?B?WlluWTlvSjhDdUxVMFo3OUlUeHc0ODBnY1NnTEsrV2J3UkRQYXNieHQ1YkY3?=
- =?utf-8?B?bnIxckVHdkliYVB6NGFpeFM4Y1RIOUwyVEtjSHNTUk83azAvY0ZuU05lTlpD?=
- =?utf-8?B?elZySmk5anZITzl3YTlTUWduMjhmZG9ORzNnM3NkOWttVkJlWGUvTWFQeHY0?=
- =?utf-8?B?WnhDK2xHNy9qUzdYazVSN0ovNmh3RHRncmxZT2ZQcm9MekhKVE9COHlWamdK?=
- =?utf-8?B?Rnhnc0VPNGk3ZTY5UmtlUkdETVJoVS80eGpqckFOSDV1WURXZWNBRlAzckVD?=
- =?utf-8?B?OU15OTZ3QU5LbmVlTXlCV1RobHRiM3IyS1pCczZhMW9OUG9TbS92RmpBbGxt?=
- =?utf-8?B?R3dmeHlCVmt2L05ITHlxQ0lsVmtieFMwTWtaMllwMDhaUzhOcnpqMjdTNWRM?=
- =?utf-8?B?Y3hwV013eWx5bzV3dmVrNjh4V2FoaDg0ZzdoSWFkOVYwbDV5ck02YUI2bXR2?=
- =?utf-8?B?a0g4WmszSEpsQlBjNUh1TGdKaFpjRnl0bUplZmd1K2J2Y0VKSEE5aWwvOXhu?=
- =?utf-8?B?THVoSFNhQzVIKzUzZmhpaDJWQldnT2FPUHpwRnJmem9RRVpkRmo1a0Vhamc4?=
- =?utf-8?B?K3NDSi9WNWNTYUJkdHVvRFVpNGxXajVVVWU5b3B3YnRVOWVSU3luamlBbXpP?=
- =?utf-8?B?T3lwUEJXV2FacHROOW9GWlppZG5yWWk2VDdkMHBaZll6NWkvSytFbmZQUktQ?=
- =?utf-8?B?clg1QVVIbENVNjFndFJwcm52MVpVWE9waDJmWUFQUDNsYUMxdEhIZzVTcS9t?=
- =?utf-8?B?M25ucmhJOUt0bGJDRFQ1SWVjaGdUakRVQkpOVStva0JXeWFjUThOMkl2VDFw?=
- =?utf-8?B?REVnc3R1Zk9OODNObnNYOVVZY0ZjWXpXbmJoTjhCV01hWFpPSmdBNnk2UWdT?=
- =?utf-8?B?NzEvZ3o2N0RwdzhLSTVLYTRQOTZZbVgzT3B5SVR5dk9lSnlsL2pmR0tJRWpy?=
- =?utf-8?B?bWRrTmovdXE3N1ZRMnBib1ppcVVXNmN2bjJsR2FmRnY2QjE1ZzVUNFlwS1Az?=
- =?utf-8?B?YU1HTlVXbjNNYy9DSTVpbUphMFMxbmRoMDNSQUsxVFlKMWtRZVY4ajFKOHhC?=
- =?utf-8?B?NFlLODl1YXBJUllsYXJjZlo5eEUveGJFaERJNXJVZS9GVTQ3Kysrc0pGa244?=
- =?utf-8?B?MkJQYldjN3hUNHY0bmR1bG43Q1RyaXhXK1YwK3ppelFkd2JLK29pQlFna1Rr?=
- =?utf-8?B?Vkh3Y3hCbkRwVDZqbjdrWXZNNDdzWEtNM3dXTjdhRUtJRlJyQ0pTV1Z2L1Vl?=
- =?utf-8?B?alB3dHVHTlBsUW5RMmc0TjVMaVFSUStzdGNicThyakY1Y09NZ0FXbW03VWdJ?=
- =?utf-8?B?cGMvS3ZEb2MwU0lybjJzZ3FHbWJQS2ZmK3NHdW5CUDRQZ3BOWUQ1Z0lWbFlX?=
- =?utf-8?B?R0wvaUdsV043RDM2U3BTV0ROaFNXYTlrL0dtQlg0M2VGeWtuZHMvdHdJOXF2?=
- =?utf-8?B?cGJwaGxuSTFiVEgrL2FwajJTRklMUmhsdFlkKy9wRCsrQ2FSL2N4bEhla01P?=
- =?utf-8?Q?MtC0=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dFZpK2EzL3BxK1FncVNWalZjSVp0bFI1VE9mNmRLQ2hHeHdWcDNKaktaMzQz?=
- =?utf-8?B?WDY3d2hrcDM2dEhJUUoybWllNEJzT3Q1V0cyb2duZXB5YzIxTHc0VGREZ094?=
- =?utf-8?B?akxNamRsc2dya3I3ZzdWdUFBWTVzUkhzQ29vdjdVR2FleU94bDlDNi9jSkNr?=
- =?utf-8?B?NThHeU9zNzVSM1FYdHgrcWl4dVpuQnlWTXlhU3A0d2lKbFRyYmlYRTFWc1F0?=
- =?utf-8?B?djc5OE9YY3hROXYxcDViNnNKTFBzd0IxZml0SWQrdlIrOFFpNy96eFo5bUlp?=
- =?utf-8?B?dTJjTjRRTlp5R3N3TnJLN05EN25UbW5IdTFBd0t6UWVMbXRyOUVhTnVTejhv?=
- =?utf-8?B?RHpucU5TM092RVF3MWZudWM2VzR3UEY0clA3ZEgzMDRLOW1sVjR2ZWVlVHVo?=
- =?utf-8?B?VWxsR2hzbmVSTWtVakRvNENhTmpqbnU5MzZJSTE1ZzIzWmpXN2phRkhFaDAx?=
- =?utf-8?B?RGZoNkFPV3VMZk96WngzK0JRWEZ3NmtKS2VSZC96cHlOdVpYZDhDdWlnK2x0?=
- =?utf-8?B?eHBmNUFKRVBlM1N4Qk41YVI5czRDUnZGZnVad2M1SExlUmxGb1pRR25yR1h1?=
- =?utf-8?B?R2pzd2ZJUUh3WTFQY0FZVk1zSlhyckFWZXQrcWZuRUZKNXVpQ1FLd01uTkN6?=
- =?utf-8?B?V0RUcFB4dmdGWjFQekloV2lKa1pmRWtybFBnSlQrc1ZrcVR1WEovWnNSSGFl?=
- =?utf-8?B?OTMraXU5TW1mMGNFRnB4VHJXMjlIVzRNZzZianFrVEduck43QWdEeHA4YXVN?=
- =?utf-8?B?dFJ6QTgrNTJhWk5MUGpRREF2Rm5xb0oyYnhCVDN4b1YxV0xWcHNPOExkUzRy?=
- =?utf-8?B?Q0s4dmhObmdnMXl6eERvMFNWL2hBc3p2akZhdnBLOFUyd1BxSkp3Y3RuY2JZ?=
- =?utf-8?B?MnZLOUpvbDJSNGc5VlZqV015clFYOXREZm1oZGZ3OG9pdEh3RUpnSVNlMXF4?=
- =?utf-8?B?RWxKZG9YcG1vV2dRYnpqZmFESllWUEZacENORzBzaXFTcG0wYXBaQVVYNWZY?=
- =?utf-8?B?aUs5bW1PNUtNRFpCTEdMbFl2RW1ydVF2TGlnTjI1QU96Y1kwcXN3TGU0VnR1?=
- =?utf-8?B?SDFwV2wrTVJrUDFYZG1UaityNDNTNUU3RUk5UExKYmhaZW53MlRWY3dwSFN6?=
- =?utf-8?B?RmtnOUd6a3NSY0dDd213cGNSU25HcHg4MkoxQVhhc1RqRThaR2FXYmJLWlQx?=
- =?utf-8?B?QklheVdIeDhKeG1QODRSWlhBc29sRVp1aXBZSFM1d0ROV21qOS9NSkZkNDN0?=
- =?utf-8?B?SzJrRCtjaXRrVjM4U3p5VXRtUmhKd0ZtU2FVZUNwWUpVcC9aZWtyb1BJbHZk?=
- =?utf-8?B?RHZvQmI2Q3lBbE1hbFdtL3B0MEhNWnAxRTNjeUY5bW5KK3prbld5WUtFME9h?=
- =?utf-8?B?QnVNd3ZXdkQreHNMeWZzeHRBYys2cy9NU0FRcXhUMWtUaFBPU01NTWo1QnBi?=
- =?utf-8?B?RWhGcWtpTXErSGJ2Z2Zpc0NZdXM5MXNVSlhWdmsrR0NQT2sxV2dNYjYwWVVD?=
- =?utf-8?B?dXhiTFVMeVkxWWYrQ1B3bE1jTVh5elBpd0VMV3QyVEJKOTcwNUNEaDdxQWlw?=
- =?utf-8?B?SlFDWXhDK2J2OEJaTjgrbjJLUDd4TzFkMFNUbTZVbEtoc3g4SVdDaWxFNXNn?=
- =?utf-8?B?U1o1UlZ1Uk5uZVBKbFplRjFNR3VuaDhmVzJSNkt3MEZrblNzRmNwcHRObm9S?=
- =?utf-8?B?bEpzNFF2QVJldE9INHJ1U2NkOThGU21ScGZqejMzeHZxcFFQZ2ZhYTFSSlJO?=
- =?utf-8?B?UktFbm5xeFE4TjhmWkVDZFB4M2RwRmVVUUtUQVg0cm9nNGtOSDI2YUwvSEIr?=
- =?utf-8?B?NFZOWDhuekpmUWhSeGNNSGdTbWdSTUkraVB1UXV0NDc1L0xpZGF6QzkwVXZy?=
- =?utf-8?B?SmtLRFNGZXBMaFRRUnh1Tzd4cXJiLzJncG9QcHc5M3pkY1pCbUhmNWpiVW5x?=
- =?utf-8?B?Z0RZUWtTc0JBL0VXbkoxaUZsMmE3Y2JTWmdjZFFTWjRyVlJmVHJMTnQ4OWtp?=
- =?utf-8?B?STFjcEhrMkc1RGhjTzVJdjJsdCtxMDNZb0NqeHJVUGhuYmpKbXBSNU8rMXh6?=
- =?utf-8?B?cEVzN0kvbm9TZHBNVjIzNDFMTEMrVUhqZlNCWTNzeE04eVArbHlLa3hldkh0?=
- =?utf-8?B?OVlWSFZzbXBEcGhmWXE0bXJYL2FBTnEva0ZwUzg1STQ2VDRDaXZQaDRUVS9P?=
- =?utf-8?B?czJENlhVT284amVkY1VtdHVWL0s5NHBoMkdoUEhSQmN2ajk5OWZEbFFXRmxo?=
- =?utf-8?B?YnZLMVpKeTRPN1RFa0VnbUs3TnhUcEZEUU9RMm9vWW42L3NBWWp6QUpSWWhG?=
- =?utf-8?B?OXNGTTZSM2ljMUZaV1BxbHMwVzc0cUg3YlBtbUd2ZzRvWHVBRG1Bd3VZb3Br?=
- =?utf-8?Q?/zT9nS92IaHwUlpM=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51b21128-2d87-4cda-569d-08de5f61b4b7
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 18:10:38.2725
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c0ORZix7gZ/l5m/LuLeJVEYE2+Mi7AKz2KBNJMV+NCmLIL3uyAkG7XeOOK0II1I4bIRTSjmCxRgpou7ty/aHurUwCJpbiwu1QH/v22c/dw0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF23335A1E7
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260122105654.105600-10-vladimir.oltean@nxp.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,bootlin.com,redhat.com,lunn.ch,gmail.com,linux.intel.com,kernel.org,armlinux.org.uk,vger.kernel.org,trustnetic.com,davemloft.net];
+	TAGGED_FROM(0.00)[bounces-254885-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-254884-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_PROHIBIT(0.00)[0.10.201.184:email,0.10.197.208:email,0.10.205.160:email];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: A35DCB369E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.10.193.232:email,0.0.0.0:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email]
+X-Rspamd-Queue-Id: 517F1B36AC
 X-Rspamd-Action: no action
 
 
-
-On 1/29/2026 9:44 AM, Andrew Lunn wrote:
->>   	/* Read sync Admin Command response */
->> -	if ((hicr & IXGBE_PF_HICR_SV)) {
->> -		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
->> +	if ((hicr & IXGBE_PF_HICR_SV))
->> +		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
->>   			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
->> -			raw_desc[i] = raw_desc[i];
+On Thu, 22 Jan 2026 12:56:48 +0200, Vladimir Oltean wrote:
+> Some (not all) use cases are in dire need of describing the XPCS blocks
+> embedded in the NXP SJA1105 and SJA1110 switches in the device tree.
+> The use case driving this effort is specifying custom 'rx-polarity' or
+> 'tx-polarity' property values.
 > 
-> Did you look through the history? When i see code like this it makes
-> me want to have an understanding why it exists, since it looks so odd.
+> These PCS blocks follow the same bindings as the other instances which
+> are memory-mapped using an APB3 or MCI interface.
 > 
-> Is it a merge conflict resolution gone bad? Is it a typo and there is
-> a cooked_desc[i] which could be set?
+> Since the SJA1105 applies the
+> Documentation/devicetree/bindings/net/ethernet-switch.yaml schema
+> directly on the SPI device OF node, its bindings are incompatible with
+> describing address space regions where sub-devices like the XPCS exist.
+> Namely, ethernet-switch.yaml wants #address-cells and #size-cells = <0>
+> to satisfy the unit-address-less '^(ethernet-)?ports$' child node.
+> But the XPCS sub-devices want their unit address to be the start
+> of their "reg" region in the switch address space, and that
+> requires #address-cells and #size-cells = <1>.
 > 
-
-Nope. Looking at git blame for the kernel, this appears to have been 
-here since its submission. I then went and checked what was done in the 
-out-of-tree releases out of curiosity, and it looks like there was 
-originally a CPU_TO_LE32 macro which was doing byte swaps, and an 
-equivalent when writing the data in to the registers.
-
-raw_desc[1] = read_reg(...);
-raw_desc[1] = cpu_to_le32(raw_desc[i]);
-
-I suspect the byte swapping got removed from the original upstream 
-submission but no one noticed the extra assignment.
-
-Of course the register accesses always read the values in host order, 
-and I can't imagine an OS not doing that...
-
-Hmm.. But now I have some questions...
-
-The raw_desc value comes from the desc parameter of the function. Thats 
-libie_aq_desc now, and  its defined using __le* values..
-
-We're chunking up the descriptor buffer and writing it to a bunch of 
-register blocks, and we don't convert from LE32 to CPU now... so on a 
-BigEndian system this is going to not swap the values properly...
-
-Which makes me think the original change would be required on BE32 
-systems.. But.. even worse..
-
-I don't think we actually can just blindly copy the values as chunks of 
-4 bytes and byte swap them.. That would re-arrange the fields, since the 
-structure layout uses __le16:
-
-> struct libie_aq_desc {
->         __le16  flags;
->         __le16  opcode;
-
-These would get swapped out of order.
-
->         __le16  datalen;
->         __le16  retval;
->         __le32  cookie_high;
->         __le32  cookie_low;
->         union {
->                 u8      raw[16];
->                 struct  libie_aqc_generic generic;
->                 struct  libie_aqc_get_ver get_ver;
->                 struct  libie_aqc_driver_ver driver_ver;
->                 struct  libie_aqc_req_res res_owner;
->                 struct  libie_aqc_list_caps get_cap;
->                 struct  libie_aqc_fw_log fw_log;
->         } params;
+> If the SPI device OF node had an MFD-style schema, i.e. "(1)" from here:
+> https://lore.kernel.org/netdev/20260109121432.lu2o22iijd4i57qq@skbuf/
+> things would have been simpler. But that ship has sailed and we need to
+> continue supporting the direction in which the SJA1105 bindings have
+> started already.
+> 
+> The retrofit-ready compromise solution is for the ethernet-switch to
+> define a custom "regs" sub-node with #address-cells and #size-cells = <1>,
+> and this will hold any memory-mapped sub-devices, like the XPCS in this
+> case.
+> 
+> This solution could have been used for the "nxp,sja1110-base-t1-mdio"
+> and "nxp,sja1110-base-tx-mdio" sub-devices too (although that ship has
+> also sailed), and is further extensible for other SJA1110 sub-devices
+> not yet supported (GPIO controller, cascaded IRQ controller).
+> 
+> Document the XPCS integration-specific compatible string, positioning in
+> the switch's "regs" subnode, and the pcs-handle to them.
+> 
+> The "type: object" addition in the ethernet-port node is to suppress
+> a dt_binding_check warning that states "node schemas must have a type
+> or $ref". Rob Herring explains why this started being required just now:
+> https://lore.kernel.org/netdev/20251120173012.GA1563834-robh@kernel.org/
+> 
+> Because the regs and ethernet-pcs nodes are optional, I don't want to
+> pollute the example with them. However, I think I can add them to the
+> commit message:
+> 
+> compatible = "nxp,sja1105s";
+> ...
+> regs {
+> 	#address-cells = <0x01>;
+> 	#size-cells = <0x01>;
+> 
+> 	ethernet-pcs@0 {
+> 		compatible = "nxp,sja1105-pcs";
+> 		reg = <0x00 0x800000>;
+> 		reg-names = "direct";
+> 		reg-io-width = <0x04>;
+> 		tx-polarity = <PHY_POL_INVERTED>;
+> 	};
 > };
-> LIBIE_CHECK_STRUCT_LEN(32, libie_aq_desc);
-
-I actually don't know which is "correct", as I don't really understand 
-what the register interface expects, and how it will get interpreted by 
-the firmware...
-
-Maybe the byteswap of each 4-byte block is right? but I'm really 
-uncertain now...
-
-Presumably it expects flags first and then opcode? we're writing it that 
-way now on a LE system.. But on a BE system thats going to be 
-byteswapped before going into the register.. so our 4byte chunk would 
-end up potentially reversing the flags and opcode w.r.t what the 
-firmware sees??
-
-Hmm.....
-
->>   	/* Read async Admin Command response */
->> -	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
->> -		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
->> +	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C))
->> +		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
->>   			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
->> -			raw_desc[i] = raw_desc[i];
 > 
-> and it exists twice. Which makes it even odder....
+> compatible = "nxp,sja1110a";
+> ...
+> regs {
+> 	#address-cells = <0x01>;
+> 	#size-cells = <0x01>;
 > 
->      Andrew
+> 	ethernet-pcs@705000 {
+> 		compatible = "nxp,sja1110-pcs";
+> 		reg = <0x705000 0x1000>;
+> 		reg-names = "indirect";
+> 		reg-io-width = <0x04>;
+> 		tx-polarity = <PHY_POL_NORMAL>;
+> 	};
+> 
+> 	ethernet-pcs@706000 {
+> 		compatible = "nxp,sja1110-pcs";
+> 		reg = <0x706000 0x1000>;
+> 		reg-names = "indirect";
+> 		reg-io-width = <0x04>;
+> 		tx-polarity = <PHY_POL_NORMAL>;
+> 	};
+> 
+> 	ethernet-pcs@707000 {
+> 		compatible = "nxp,sja1110-pcs";
+> 		reg = <0x707000 0x1000>;
+> 		reg-names = "indirect";
+> 		reg-io-width = <0x04>;
+> 		tx-polarity = <PHY_POL_NORMAL>;
+> 	};
+> 
+> 	ethernet-pcs@708000 {
+> 		compatible = "nxp,sja1110-pcs";
+> 		reg = <0x708000 0x1000>;
+> 		reg-names = "indirect";
+> 		reg-io-width = <0x04>;
+> 		tx-polarity = <PHY_POL_NORMAL>;
+> 	};
+> };
+> 
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> Cc: Conor Dooley <conor+dt@kernel.org>
+> Cc: devicetree@vger.kernel.org
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> v1->v2: rewrite commit message
+> 
+>  .../bindings/net/dsa/nxp,sja1105.yaml         | 27 +++++++++++++++++++
+>  .../bindings/net/pcs/snps,dw-xpcs.yaml        |  8 ++++++
+>  2 files changed, 35 insertions(+)
+> 
+
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
