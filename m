@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-254618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPRRCSYXe2lCBQIAu9opvQ
-	(envelope-from <netdev+bounces-254618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:15:34 +0100
+	id mHGBJJcXe2lCBQIAu9opvQ
+	(envelope-from <netdev+bounces-254625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A63FAD5A2
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:15:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0646AD605
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9370130A7064
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:09:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5677A3041B0F
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8603806D5;
-	Thu, 29 Jan 2026 08:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BF53859F2;
+	Thu, 29 Jan 2026 08:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ClkZ5Aac"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUAsCq5q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5181337BE84;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7187C37C0EB;
 	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769674111; cv=none; b=HyIHJGBdQKE25Cmi6kFMuf9RFoOEre16hdlHHgQ/hoLxx7cV2NmamvpFYXIOUkeGeftMDcxhiwRy5l1EcANh8knrzj5lb/orps+QzGPi7tqlHm+EDP5d9FplvkfQqaDMFK8ou8rUIsjjpy92qS8frSoUNEILUVHwqC1BOwuab50=
+	t=1769674111; cv=none; b=TOd4AggQaMUJfoyo/8f4e8y8365XmchUXaaGEnN+IYIPLCkbAlLT1/OqE1T9PE3NI0je94cUpDzUU2/oih5g1DEAemraOPudjrMt5dLumaW+GpEQJuBUgJMYxZ2msRzRjAVyyc7kmrgLMVFc99UhuWP+mHzFdtjT3H9oVar8Xgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769674111; c=relaxed/simple;
-	bh=ceZVyyPX2HM3A215qLrOaX/Gfxk8tK5tZhLuxNFkn38=;
+	bh=rCmGw1Wb+1Jckq+xhR2lN4gdNL9na4qiJFEWwkWiJR0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eAKIeRwbNI9k+ekQe4DOK9+iPwcxgvMDqf3RFa4/HTOCUFuQWmaamjOycGkvCIqi3jnWtHGAYCqpWhN9NC9nDJE6JVdCEIKtAXzKZqANI8Vu2PmkaB0U19wqHXzXXKv2S/D2SBlgKNChoLpWu5xUmmMvQJwHcVEN7Od31hxZ2io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ClkZ5Aac; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7CAC2BCFB;
+	 MIME-Version:Content-Type; b=m0VNCtN6Vu0Ec/iFJkl6sMcdnqKhBzjb7OhYhB8/FKCLkb0C4BrGsg11uKvvdf1W5U8IIm+EoFELYIuJKuMSDFOVnqLdeBFNA78AXG4cKFVlH/MlH//pAqnuZqFywW32OB+rtoeGvzrtBcjMPMm2ptvXRVv03hlOg32VUk0cBtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IUAsCq5q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E68C7C32781;
 	Thu, 29 Jan 2026 08:08:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769674110;
-	bh=ceZVyyPX2HM3A215qLrOaX/Gfxk8tK5tZhLuxNFkn38=;
+	s=k20201202; t=1769674111;
+	bh=rCmGw1Wb+1Jckq+xhR2lN4gdNL9na4qiJFEWwkWiJR0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ClkZ5AacxK6NDrStNwCjyJvXg1qxbkYQbqzXHd0p6ie26FisfEYXRx1Fve4+WqsCG
-	 g6PjeE7mgn/fxMdcinSrXRkXqvTRcYI0aTI02MMrd+RO6nQWx2MvRMNg4gPatHCNBX
-	 XzdcND/d/AYxjkLtNpBaIIpfsFeSqBKNLk+ZckxxX6lS5EOZelaPTmqxP1daprU72v
-	 7QQbYWRYMS1IH5ihm1Ok1VznBJ1gRad8Q4+8gf1Q4PlorofDvarbqBU3LWTIQhjIVW
-	 OpygAxI1pZEpFjmERWxyQAlrD81lwSnJxebh38jf7AfqxclrgiKrBM6qP1yxnT0qN1
-	 AQEpCw6tsVEDA==
+	b=IUAsCq5qj7DiIxihFXTCS1JgP1c4yGGiUCww/qZKGIPCTSyxdMq+eAMsid9MGZ4DC
+	 RpdvbLFm2ssU03DL9ukwFVfGeTabsDkCSNjPNpbvcP/CvtIihKcWgMpjzuEQywSt80
+	 h3kAKbpm1rr+cRlZfuRxabolUJ12tKi6lyPNtWNSUG/FLyB4ZxIrZRZ0V6NdvZeBdU
+	 08CtnRJG7Fxs6NmE4RVKOoyNhp6dY6v14omfHGlaytD1BashrOX8Z3Snr7aUgs7Rmf
+	 zPjJ3h8P1OEN7y4S7XzrxynaOBumW/Rn9dEEENjcCR1R5QrzJyIiJLdF2MUVEr78LD
+	 V+dmCTRqoiLDA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vlN4n-0000000ERNd-0XBz;
+	id 1vlN4n-0000000ERNh-0eOz;
 	Thu, 29 Jan 2026 09:08:29 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -59,9 +59,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v3 17/30] docs: kdoc_re: don't recompile NextMatch regex every time
-Date: Thu, 29 Jan 2026 09:08:08 +0100
-Message-ID: <168e559a46713f390c2984fc1c11e16e552ab0c1.1769673038.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v3 18/30] docs: kdoc_re: Change NestedMath args replacement to \0
+Date: Thu, 29 Jan 2026 09:08:09 +0100
+Message-ID: <04552ce2ac1a426e74bf7353e1ba1586e2af4f36.1769673038.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769673038.git.mchehab+huawei@kernel.org>
 References: <cover.1769673038.git.mchehab+huawei@kernel.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254618-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-254625-lists,netdev=lfdr.de,huawei];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -96,100 +96,68 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8A63FAD5A2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C0646AD605
 X-Rspamd-Action: no action
 
-Store delimiters and its regex-compiled version as const vars.
+Future patches will allow parsing each argument instead of the
+hole set. Prepare for it by changing the replace all args from
+\1 to \0.
+
+No functional changes.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/lib/python/kdoc/kdoc_re.py | 35 ++++++++++++++++++++------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
+ tools/lib/python/kdoc/kdoc_parser.py | 2 +-
+ tools/lib/python/kdoc/kdoc_re.py     | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
+diff --git a/tools/lib/python/kdoc/kdoc_parser.py b/tools/lib/python/kdoc/kdoc_parser.py
+index db140363104a..4d52a00acfad 100644
+--- a/tools/lib/python/kdoc/kdoc_parser.py
++++ b/tools/lib/python/kdoc/kdoc_parser.py
+@@ -160,7 +160,7 @@ struct_xforms = [
+ # is allowed.
+ #
+ struct_nested_prefixes = [
+-    (re.compile(r'\bSTRUCT_GROUP\('), r'\1'),
++    (re.compile(r'\bSTRUCT_GROUP\('), r'\0'),
+ ]
+ 
+ #
 diff --git a/tools/lib/python/kdoc/kdoc_re.py b/tools/lib/python/kdoc/kdoc_re.py
-index 3f405addcc58..7b7ddc50ac36 100644
+index 7b7ddc50ac36..8933e1a62776 100644
 --- a/tools/lib/python/kdoc/kdoc_re.py
 +++ b/tools/lib/python/kdoc/kdoc_re.py
-@@ -99,6 +99,13 @@ class KernRe:
-         self.last_match = self.regex.search(string)
-         return self.last_match
+@@ -289,8 +289,9 @@ class NestedMatch:
+         It matches a regex that it is followed by a delimiter,
+         replacing occurrences only if all delimiters are paired.
  
-+    def finditer(self,  string):
-+        """
-+        Alias to re.finditer.
-+        """
-+
-+        return self.regex.finditer(string)
-+
-     def findall(self, string):
-         """
-         Alias to re.findall.
-@@ -134,6 +141,16 @@ class KernRe:
+-        if r'\1' is used, it works just like re: it places there the
+-        matched paired data with the delimiter stripped.
++        if r'\0' is used, it works on a similar way of using re.group(0):
++        it places the entire args of the matched paired data, with the
++        delimiter stripped.
  
-         return self.last_match.groups()
+         If count is different than zero, it will replace at most count
+         items.
+@@ -306,9 +307,9 @@ class NestedMatch:
+             # Value, ignoring start/end delimiters
+             value = line[end:pos - 1]
  
-+#: Nested delimited pairs (brackets and parenthesis)
-+DELIMITER_PAIRS = {
-+    '{': '}',
-+    '(': ')',
-+    '[': ']',
-+}
-+
-+#: compiled delimiters
-+RE_DELIM = KernRe(r'[\{\}\[\]\(\)]')
-+
+-            # replaces \1 at the sub string, if \1 is used there
++            # replaces \0 at the sub string, if \0 is used there
+             new_sub = sub
+-            new_sub = new_sub.replace(r'\1', value)
++            new_sub = new_sub.replace(r'\0', value)
  
- class NestedMatch:
-     """
-@@ -183,14 +200,6 @@ class NestedMatch:
-     #
-     #   FOO(arg1, arg2, arg3)
+             out += new_sub
  
--    DELIMITER_PAIRS = {
--        '{': '}',
--        '(': ')',
--        '[': ']',
--    }
--
--    RE_DELIM = re.compile(r'[\{\}\[\]\(\)]')
--
-     def _search(self, regex, line):
-         """
-         Finds paired blocks for a regex that ends with a delimiter.
-@@ -220,13 +229,13 @@ class NestedMatch:
-             escape = False
- 
-             d = line[offset - 1]
--            if d not in self.DELIMITER_PAIRS:
-+            if d not in DELIMITER_PAIRS:
-                 continue
- 
--            end = self.DELIMITER_PAIRS[d]
-+            end = DELIMITER_PAIRS[d]
-             stack.append(end)
- 
--            for match in self.RE_DELIM.finditer(line[offset:]):
-+            for match in RE_DELIM.finditer(line[offset:]):
-                 pos = match.start() + offset
- 
-                 d = line[pos]
-@@ -247,8 +256,8 @@ class NestedMatch:
-                     string_char = d
-                     continue
- 
--                if d in self.DELIMITER_PAIRS:
--                    end = self.DELIMITER_PAIRS[d]
-+                if d in DELIMITER_PAIRS:
-+                    end = DELIMITER_PAIRS[d]
- 
-                     stack.append(end)
-                     continue
 -- 
 2.52.0
 
