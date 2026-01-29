@@ -1,211 +1,221 @@
-Return-Path: <netdev+bounces-254630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDq7N7IXe2lCBQIAu9opvQ
-	(envelope-from <netdev+bounces-254630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:54 +0100
+	id AL4tDxUse2lRCAIAu9opvQ
+	(envelope-from <netdev+bounces-254676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:44:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5003BAD632
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:17:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F58AAE3A7
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:44:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D23373043BF3
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:11:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A60F3009FAF
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8072A385EE3;
-	Thu, 29 Jan 2026 08:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D133E37FF62;
+	Thu, 29 Jan 2026 09:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhVQE0cl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3BoS78Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f66.google.com (mail-vs1-f66.google.com [209.85.217.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CA437C0F6;
-	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF092D0C95
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 09:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769674111; cv=none; b=ArtXMIcKOuPbvkrH3Hys2N9Wl8rXj3eZTMziwhfq0ZUERFfOBY0Tz9bm/Wi2EkzOhDRPXMKDbkXN2xib20cckVD19Urwlb4AsMJ+3lYForP8S6gHLy3d16zMFT6myFAmcU+OINhYD5YC4PciCGMP1f8AY7HnvFSu5Pjr08y/dP8=
+	t=1769679877; cv=none; b=rXjXy3KK3F0QjInZvwCuR9twGiRyQ0SXTVuIGuU4OvsIzhuSRXxch10XFON2eDdCDG98JxMRe1T2K4ZIyX3uaA4VO5mTXONHsO8ztm4UD9P79F1mI9Eyg3pVTCR2do2GEOZk2OzDkzj2hr60z0bes2yIYiVz+3Tk+JWAJGYiXz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769674111; c=relaxed/simple;
-	bh=zrn1R99JmhSDpw80vFG4cNPSq/xnegn/WMP5J1mznhQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XCDURU2mhzsgMAECovZjpwrotwFzjH5hWfc7EUIiXtrgI8NaJ3lJ1ODj/MPH0jRevjh8uVRuTwwhFXswuBWHe2ZEog0lEMHmWGH2XyDMA9H/pHXKFdjk+mGtn+VvLNbGk8MzVuhg2aAFlEX6l3gIUtTUPZNP6inMRv9rHhnJnmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhVQE0cl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A3C2C2BD04;
-	Thu, 29 Jan 2026 08:08:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769674111;
-	bh=zrn1R99JmhSDpw80vFG4cNPSq/xnegn/WMP5J1mznhQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uhVQE0clrmRRFi6sGV6bb+5Ub4LO1z8yNb9HI/vnrJW+Jp3s1Br8Ym/rNoefncoiC
-	 nA/7J5lgEJMtAXkHq6CY/wh84UMpacfDQkvPayr4v4Er5buS5c+Vm8psLK21oXkf6A
-	 BaJnF4xeffly1o7j0tzxhLJLrA6B5FRmk95Wjf0/eZ35OGyx6juJ1Bdkl1pVWkgZ1D
-	 yljMKKDrrJM3H4UHjz5mvwyNNGAUJ5MWu6WwwtgzhCVRr50bigYZmwY5yF7qanLyBP
-	 pdX8AHr2XMznKUKthYQgDBRLSb0pETFbZPskImF6+HcUYgHYDI1dKqc2KcAI70hDly
-	 SxomQMtuh381g==
-Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
-	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vlN4n-0000000EROT-25XE;
-	Thu, 29 Jan 2026 09:08:29 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Kees Cook <kees@kernel.org>,
-	Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	bpf@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v3 30/30] docs: xforms_lists.py: use CFuntion to handle all function macros
-Date: Thu, 29 Jan 2026 09:08:21 +0100
-Message-ID: <823756f6f8e5864817464560227820d8ef3a600f.1769673038.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <cover.1769673038.git.mchehab+huawei@kernel.org>
-References: <cover.1769673038.git.mchehab+huawei@kernel.org>
+	s=arc-20240116; t=1769679877; c=relaxed/simple;
+	bh=MI+D2Ic6bz3jYMbMxWU4odca96W1KdTlxUzB6WUQDjA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hcyfh/Zzk/qx2LEqtC3B8QNoXJmIy6uyWV4Vg7pHOznVuMgOdhYhe+VB4NVexGp/W2xpCgbwR11IBb7r6yWYkoyzkIbt1e3bLgZl3KlNiXYEMBdsnMHP0xRksg8cdBkKcVy9dDmf/3fC8Msz7cLGw0VcrZ7+JIdEBidO7+uP/UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z3BoS78Y; arc=none smtp.client-ip=209.85.217.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f66.google.com with SMTP id ada2fe7eead31-5f52ed75c45so574469137.2
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 01:44:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769679875; x=1770284675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LEB8Yp/SddLVwrY1R6Js1dQZWhnZcm4xY82a3ZUzWc4=;
+        b=Z3BoS78YspPjS4+5j/4WIz8I0i8W6YRxeryEEam83NiDLjMlHJ3izLLknuhcxIiMrs
+         OCus3DS3b+TI5+NHSVHudawIDxkXv4LkYN+/YFfSUdH0ARSN3vbXsNt6z7vEYsXtLNOd
+         2NBXR1fmLDlcI21qmtMZD5rcLGhTsJvKtoATHfjyN0GOcA9dvojAT3DTsQuOhssvur01
+         bNQ6iUkcynB3yexnSa06mqxdv+TwvSilpX5hLYnBMmdUOZb47nwWSU7fAmCIH+FQSaSg
+         nO7+3bXMprz/sxiAib7unDGjzMW5eJUnRlqZOp92vapBblN55kdxIw4MRESMnIfylAQO
+         MnPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769679875; x=1770284675;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LEB8Yp/SddLVwrY1R6Js1dQZWhnZcm4xY82a3ZUzWc4=;
+        b=aTBea4xpCg/BrvkOy1QUd/1Y7RSdf26+MmTATUxBt02DbgnbKhl/wTDbnu2eM3pZhj
+         upnp4vC6sfpIWNRfxeizWqL/z0g2+dB6FaKlNBUPi3Oj/bnEYI/lOYGBENn8Ozog5iRf
+         in6WtehoTVMlZfa1HypdJXBB9Pplrbz8GTcCBLXi/YsNiwm8g+smUQ0YZ5u4R3BTTkbE
+         BTgh9bqkjTNx1ZWLRtkbMT/qcA317+OoAqMo8heyxWKsokzNYZv80lrLflb9+plPU7Nj
+         kXsVloXCREkfMTRFSUYvOfbccgtzkvatTiYWrLrXasTx9VTEcNP+e51Q6pbnvFRwUIOA
+         xkug==
+X-Forwarded-Encrypted: i=1; AJvYcCWxNzY65HM4/Kr21KmitV10L9bcfNOv/syBRzFPoPptKMNhnGZX7AeztZdJ7rbT+CQpBfakNU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlIAQZ4vfdmS9OK+C25KswEig0XywWTulSe0jjz/G5nuEXIXcQ
+	NgWkKm46wRko+rjzpcWe0C2mVPWgmJvud9hgRR28pLXS7zfpLS8JYegJTskR6kZQ
+X-Gm-Gg: AZuq6aKG7PefsS6Kc/bvM95vGssQv40yPAF3NBxRO7EGSn9XBgdfhLQEJJcD/vvKFwQ
+	78JocDHaPNaQ7N/r/tAUKT/K8VhsoOWkkoz3Kg+RCGD6ZxQg0zCal/p5jFgFURb1tsfdsYRefNb
+	pWiauYHcVJlgfAgUr8/svPrvH67XUJ8Cu2DQQPgs7yBePQXZmsEl2RhUKpYPDyFhdh2z3M89SlG
+	QEhc68GCbxgojruMUJPn0VrQA4i4wM8DuOsGIL0a3wOFgxY3GX2hBJi9JG/WP1h9FyEVNd1r2hU
+	oFxeUT9KUzj5e4MKycyLfRgr4jJMpzXLCoU0IfeRjMBpMVFDzeell1aX3tq+N6pIZpK6nSHSn1f
+	uC4h0lX0cLsiXHo6jYrgo5ILjnnxyRnJsmsuTW4uAR3Hz7W6avjVkFSZuge1pS56bjEj2ZSY0Z8
+	qBiJZ2Ibvj5F/RwFQL1E4XzOwSSwOGJhquuRV5JF1Z63Qv6d2X+xszEuRoKn4b1W1GrDDasam3E
+	qkyIniroZhIkYRKoo84K9Ni21nb1HnFvw4kefVzrq2UBYhkpPxy477v2U3V+KYbddMyJwkpJKVH
+	mGae
+X-Received: by 2002:a05:6830:828d:b0:7ab:e111:1a57 with SMTP id 46e09a7af769-7d18512db09mr5036559a34.31.1769674175726;
+        Thu, 29 Jan 2026 00:09:35 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d18c831394sm3317768a34.31.2026.01.29.00.09.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 00:09:35 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: linux-x25@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Joerg Reuter <jreuter@yaina.de>
+Subject: [PATCH] net: ax25: remove plumbing for never-implemented DAMA Master support
+Date: Thu, 29 Jan 2026 00:09:04 -0800
+Message-ID: <20260129080908.44710-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254630-lists,netdev=lfdr.de,huawei];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,yaina.de];
+	TAGGED_FROM(0.00)[bounces-254676-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,huawei];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5003BAD632
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux-ax25.in-berlin.de:url]
+X-Rspamd-Queue-Id: 9F58AAE3A7
 X-Rspamd-Action: no action
 
-The new CFunction class handles better macros, as it works the same
-way C compilers do, handling delimiters tha right way.
+The AX25_DAMA_MASTER option has been unimplemented and marked broken
+ever since it was introduced in 2007 in commit 954b2e7f4c37 ("[NET]
+AX.25 Kconfig and docs updates and fixes"). At this point, it is very
+unlikely it will be implemented. Remove it.
 
-This allows removing complex regular expressions, placing instead
-just a simple one with the name(s) of the functions to be replaced.
-
-Doing a before/after check using "kernel-doc -man ." shows only
-cosmetic changes (whitespaces, mostly).
-
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- tools/lib/python/kdoc/xforms_lists.py | 54 +++++++++++----------------
- 1 file changed, 21 insertions(+), 33 deletions(-)
+ include/net/ax25.h  |  8 ++------
+ net/ax25/Kconfig    | 14 --------------
+ net/ax25/ax25_dev.c |  2 --
+ 3 files changed, 2 insertions(+), 22 deletions(-)
 
-diff --git a/tools/lib/python/kdoc/xforms_lists.py b/tools/lib/python/kdoc/xforms_lists.py
-index 88968bafdb78..6e917beceb89 100644
---- a/tools/lib/python/kdoc/xforms_lists.py
-+++ b/tools/lib/python/kdoc/xforms_lists.py
-@@ -17,51 +17,38 @@ class CTransforms:
+diff --git a/include/net/ax25.h b/include/net/ax25.h
+index a7bba42dde15..ad3d7626130e 100644
+--- a/include/net/ax25.h
++++ b/include/net/ax25.h
+@@ -116,10 +116,6 @@ enum {
+ 	AX25_PROTO_STD_DUPLEX,
+ #ifdef CONFIG_AX25_DAMA_SLAVE
+ 	AX25_PROTO_DAMA_SLAVE,
+-#ifdef CONFIG_AX25_DAMA_MASTER
+-	AX25_PROTO_DAMA_MASTER,
+-#define AX25_PROTO_MAX AX25_PROTO_DAMA_MASTER
+-#endif
+ #endif
+ 	__AX25_PROTO_MAX,
+ 	AX25_PROTO_MAX = __AX25_PROTO_MAX -1
+@@ -138,7 +134,7 @@ enum {
+ 	AX25_VALUES_IDLE,	/* Connected mode idle timer */
+ 	AX25_VALUES_N2,		/* Default N2 value */
+ 	AX25_VALUES_PACLEN,	/* AX.25 MTU */
+-	AX25_VALUES_PROTOCOL,	/* Std AX.25, DAMA Slave, DAMA Master */
++	AX25_VALUES_PROTOCOL,	/* Std AX.25, DAMA Slave */
+ #ifdef CONFIG_AX25_DAMA_SLAVE
+ 	AX25_VALUES_DS_TIMEOUT,	/* DAMA Slave timeout */
+ #endif
+@@ -226,7 +222,7 @@ typedef struct ax25_dev {
+ 	struct net_device	*forward;
+ 	struct ctl_table_header *sysheader;
+ 	int			values[AX25_MAX_VALUES];
+-#if defined(CONFIG_AX25_DAMA_SLAVE) || defined(CONFIG_AX25_DAMA_MASTER)
++#ifdef CONFIG_AX25_DAMA_SLAVE
+ 	ax25_dama_info		dama;
+ #endif
+ 	refcount_t		refcount;
+diff --git a/net/ax25/Kconfig b/net/ax25/Kconfig
+index e23a3dc14b93..310169ce1488 100644
+--- a/net/ax25/Kconfig
++++ b/net/ax25/Kconfig
+@@ -63,20 +63,6 @@ config AX25_DAMA_SLAVE
+ 	  be enabled at runtime.  For more about DAMA see
+ 	  <https://linux-ax25.in-berlin.de>.  If unsure, say Y.
  
-     #: Transforms for structs and unions
-     struct_xforms = [
--        # Strip attributes
--        (KernRe(r"__attribute__\s*\(\([a-z0-9,_\*\s\(\)]*\)\)", flags=re.I | re.S, cache=False), ' '),
--        (KernRe(r'\s*__aligned\s*\([^;]*\)', re.S), ' '),
--        (KernRe(r'\s*__counted_by\s*\([^;]*\)', re.S), ' '),
--        (KernRe(r'\s*__counted_by_(le|be)\s*\([^;]*\)', re.S), ' '),
--        (KernRe(r'\s*__guarded_by\s*\([^\)]*\)', re.S), ' '),
--        (KernRe(r'\s*__pt_guarded_by\s*\([^\)]*\)', re.S), ' '),
-+        (CFunction("__attribute__"), ' '),
-+        (CFunction('__aligned'), ' '),
-+        (CFunction('__counted_by'), ' '),
-+        (CFunction('__counted_by_(le|be)'), ' '),
-+        (CFunction('__guarded_by'), ' '),
-+        (CFunction('__pt_guarded_by'), ' '),
-+
-         (KernRe(r'\s*__packed\s*', re.S), ' '),
-         (KernRe(r'\s*CRYPTO_MINALIGN_ATTR', re.S), ' '),
-         (KernRe(r'\s*__private', re.S), ' '),
-         (KernRe(r'\s*__rcu', re.S), ' '),
-         (KernRe(r'\s*____cacheline_aligned_in_smp', re.S), ' '),
-         (KernRe(r'\s*____cacheline_aligned', re.S), ' '),
--        (KernRe(r'\s*__cacheline_group_(begin|end)\([^\)]+\);'), ''),
-+
-+        (CFunction('__cacheline_group_(begin|end)'), ''),
+-# placeholder until implemented
+-config AX25_DAMA_MASTER
+-	bool 'AX.25 DAMA Master support'
+-	depends on AX25_DAMA_SLAVE && BROKEN
+-	help
+-	  DAMA is a mechanism to prevent collisions when doing AX.25
+-	  networking. A DAMA server (called "master") accepts incoming traffic
+-	  from clients (called "slaves") and redistributes it to other slaves.
+-	  If you say Y here, your Linux box will act as a DAMA master; this is
+-	  transparent in that you don't have to do any special DAMA
+-	  configuration. Linux cannot yet act as a DAMA server.  This option
+-	  only compiles DAMA slave support into the kernel.  It still needs to
+-	  be explicitly enabled, so if unsure, say Y.
+-
+ config NETROM
+ 	tristate "Amateur Radio NET/ROM protocol"
+ 	depends on AX25
+diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
+index 3733c0254a50..c504ed9c3a88 100644
+--- a/net/ax25/ax25_dev.c
++++ b/net/ax25/ax25_dev.c
+@@ -82,9 +82,7 @@ void ax25_dev_device_up(struct net_device *dev)
  
-         (CFunction('struct_group'), r'\2'),
-         (CFunction('struct_group_attr'), r'\3'),
-         (CFunction('struct_group_tagged'), r'struct \1 \2; \3'),
-         (CFunction('__struct_group'), r'\4'),
+ #ifdef CONFIG_AX25_DAMA_SLAVE
+ 	ax25_dev->values[AX25_VALUES_DS_TIMEOUT]= AX25_DEF_DS_TIMEOUT;
+-#endif
  
--        #
--        # Replace macros
--        #
--        # TODO: use CFunction on all FOO($1, $2, ...) matches
--        #
--        # it is better to also move those to the CFunction logic,
--        # to ensure that parentheses will be properly matched.
--        #
--        (KernRe(r'__ETHTOOL_DECLARE_LINK_MODE_MASK\s*\(([^\)]+)\)', re.S),
--        r'DECLARE_BITMAP(\1, __ETHTOOL_LINK_MODE_MASK_NBITS)'),
--        (KernRe(r'DECLARE_PHY_INTERFACE_MASK\s*\(([^\)]+)\)', re.S),
--        r'DECLARE_BITMAP(\1, PHY_INTERFACE_MODE_MAX)'),
--        (KernRe(r'DECLARE_BITMAP\s*\(' + struct_args_pattern + r',\s*' + struct_args_pattern + r'\)',
--                re.S), r'unsigned long \1[BITS_TO_LONGS(\2)]'),
--        (KernRe(r'DECLARE_HASHTABLE\s*\(' + struct_args_pattern + r',\s*' + struct_args_pattern + r'\)',
--                re.S), r'unsigned long \1[1 << ((\2) - 1)]'),
--        (KernRe(r'DECLARE_KFIFO\s*\(' + struct_args_pattern + r',\s*' + struct_args_pattern +
--                r',\s*' + struct_args_pattern + r'\)', re.S), r'\2 *\1'),
--        (KernRe(r'DECLARE_KFIFO_PTR\s*\(' + struct_args_pattern + r',\s*' +
--                struct_args_pattern + r'\)', re.S), r'\2 *\1'),
--        (KernRe(r'(?:__)?DECLARE_FLEX_ARRAY\s*\(' + struct_args_pattern + r',\s*' +
--                struct_args_pattern + r'\)', re.S), r'\1 \2[]'),
--        (KernRe(r'DEFINE_DMA_UNMAP_ADDR\s*\(' + struct_args_pattern + r'\)', re.S), r'dma_addr_t \1'),
--        (KernRe(r'DEFINE_DMA_UNMAP_LEN\s*\(' + struct_args_pattern + r'\)', re.S), r'__u32 \1'),
--        (KernRe(r'VIRTIO_DECLARE_FEATURES\(([\w_]+)\)'), r'union { u64 \1; u64 \1_array[VIRTIO_FEATURES_U64S]; }'),
-+        (CFunction('__ETHTOOL_DECLARE_LINK_MODE_MASK'), r'DECLARE_BITMAP(\1, __ETHTOOL_LINK_MODE_MASK_NBITS)'),
-+        (CFunction('DECLARE_PHY_INTERFACE_MASK',), r'DECLARE_BITMAP(\1, PHY_INTERFACE_MODE_MAX)'),
-+        (CFunction('DECLARE_BITMAP'), r'unsigned long \1[BITS_TO_LONGS(\2)]'),
-+
-+        (CFunction('DECLARE_HASHTABLE'), r'unsigned long \1[1 << ((\2) - 1)]'),
-+        (CFunction('DECLARE_KFIFO'), r'\2 *\1'),
-+        (CFunction('DECLARE_KFIFO_PTR'), r'\2 *\1'),
-+        (CFunction('(?:__)?DECLARE_FLEX_ARRAY'), r'\1 \2[]'),
-+        (CFunction('DEFINE_DMA_UNMAP_ADDR'), r'dma_addr_t \1'),
-+        (CFunction('DEFINE_DMA_UNMAP_LEN'), r'__u32 \1'),
-+        (CFunction('VIRTIO_DECLARE_FEATURES'), r'union { u64 \1; u64 \1_array[VIRTIO_FEATURES_U64S]; }'),
-     ]
+-#if defined(CONFIG_AX25_DAMA_SLAVE) || defined(CONFIG_AX25_DAMA_MASTER)
+ 	ax25_ds_setup_timer(ax25_dev);
+ #endif
  
-     #: Transforms for function prototypes
-@@ -91,6 +78,7 @@ class CTransforms:
-         (KernRe(r"DECL_BUCKET_PARAMS\s*\(\s*(\S+)\s*,\s*(\S+)\s*\)"), r"\1, \2"),
-         (KernRe(r"__no_context_analysis\s*"), ""),
-         (KernRe(r"__attribute_const__ +"), ""),
-+
-         (CFunction("__cond_acquires"), ""),
-         (CFunction("__cond_releases"), ""),
-         (CFunction("__acquires"), ""),
 -- 
-2.52.0
+2.43.0
 
 
