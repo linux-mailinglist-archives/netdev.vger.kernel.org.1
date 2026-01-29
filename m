@@ -1,120 +1,79 @@
-Return-Path: <netdev+bounces-254839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254840-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HNEBEOGe2lOFQIAu9opvQ
-	(envelope-from <netdev+bounces-254839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:09:39 +0100
+	id UBT6MhSIe2mlFQIAu9opvQ
+	(envelope-from <netdev+bounces-254840-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:17:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86A5BB1DB2
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:09:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 732D1B2050
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 072A13051EA7
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:05:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CB0A33004605
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99AF3382D2;
-	Thu, 29 Jan 2026 16:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56A233D6D4;
+	Thu, 29 Jan 2026 16:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Rp5qcXQ0";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TVXxIpso"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SS4JMYJ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5711F2DF14C
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 16:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E151933D6F1
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 16:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769702739; cv=none; b=iOLxevqQwgxNKsW/RFegncUdjYjZOJNNXlD4RA++0vu0DhYMW87rE9CU1WvubUcFHxR+dgi6vMX6324JCKYnaLP1AfBeLfxF8Ps8D/C7psRWfX8/w5eA3Uw4Zeh65LAs2eXxsv/pY9klct0FmHBD1kR6m1huWuZC+UjfFgRBUII=
+	t=1769703442; cv=none; b=aD2NIxBa7OswXZMGDXb61+OfDcVYixn1jmQHdXH4pXaYRqs2b3SPpAoq55NyqFb4EYwDpi7N59dCYCVStcUtAk9wDoXU5vOT31ScM07MME1MfUNQJ4pT31vV7FIdR8TuJaBCR9xAPVRAbl44hVhyMnPudAfe1kxoMLYldgh/f9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769702739; c=relaxed/simple;
-	bh=kLg0F8tT/ad5OM4Ry7CO76NQ696xuhsA+vCaKr/rr9o=;
+	s=arc-20240116; t=1769703442; c=relaxed/simple;
+	bh=cqHOU9GrGSzPVakVpvKCnAMfJOIM4PnLQhTrCneb2EM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/VcePINW68tmUt928xXIPTE9Ei/cN1ZphB0UyBRO5iyU7Jap2pBhlGnvI4H2EJ+GCSvXinjFveR6DC5wuxaxHPi52/LpcsZq8Vwbg3wlaX3XRzdRZNWFfoheCrkwCyCi/67hhGGKVa/dzt7ty/4QHDbUF3lbTjXxEpdyT6rqs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Rp5qcXQ0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TVXxIpso; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 73C397A012D;
-	Thu, 29 Jan 2026 11:05:35 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Thu, 29 Jan 2026 11:05:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1769702735; x=
-	1769789135; bh=5C/0w9828r3/pM8qUF6Phk7KB/JC1AyC7NztzYLbxg4=; b=R
-	p5qcXQ0Jg+y8DlDMl0iMjC2tsOB66eFEerLZzYuRuxUaeShm39TKmpj7CTCkJ4yD
-	pE53F6Js/J9og4izdtWfQBtJnLDffwWuQfdwbuGybJu4gM24Pv9dq5ImNEhN3rTs
-	+H4lWr/Dz0UJjnMzoh/6kmpmdQmTMHHE43r7tf6eSuk5iQKZumbNgGimfThrmMN2
-	8a7dCYRJMdXoAhJKgWVugq50F+spsN/YV/+f1HjFPSkll/ThBVPB2TXoVg447IgT
-	d4A7QvO+hIbcjHBtaDu+tAJstsWvjdV12nEVuXBwA186duoJ/LHBvdza0TcqLCeX
-	LM+Am5VlQSCTXQ4QTJ2yw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1769702735; x=1769789135; bh=5C/0w9828r3/pM8qUF6Phk7KB/JC1AyC7Nz
-	tzYLbxg4=; b=TVXxIpsovasxwXH8qUx4Z7RckR/O039DYwOzSLCeCPwVd0i8u3y
-	936AJn0Qr7N43FzhFhEuW2d4LjjuHJcKtjnaTVAxqIm0U1T7q9jz4a2B2jcDa71Z
-	J3vwJrDdOF+WWPqio2z3M6Xzpq+taB8TYU5/XTvvvz3mo9AUkQEcE4FXz/pow8IA
-	9ybC7RcVZecHM6/WTYeOERlnJQkOP50QcncTy6639cwjWV9wPOTB+ZfkCf+bnWzB
-	mSQt7xM3Ftv5rvOd4T/Zw0jR+PXxnkMJ1vvUC9yoaFXO2XAbeoDXoWr0JC/Cta7f
-	zhLkZS5WKPZQhegZ+FxloKwmJuK4IrjJKNg==
-X-ME-Sender: <xms:ToV7aWUxYZ7Q-KpOSZcwHhFfj-zfbjgLGNa3xDdQm9x9vlfbWwEmMA>
-    <xme:ToV7aRFOSQB7XfDlczq2ijZBvhawbFZr80BYKEVEEJUQt0AUKRGJ5aDWYs0-gkRTp
-    UxU2KZ2LIALa8sotBSiipVB8JGcRVhU_CxXZTb-QSdOTjyPPtY8deo>
-X-ME-Received: <xmr:ToV7aV7CI08yfmyyJXzeuvK67jqmIANpThOV6gLzryatddu0LcXUjMNU0n92>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeiheelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepheeljefgveehudetieejjeefffetgfduudehfeevjeelvdduhefghffh
-    ueeikefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomh
-    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsuges
-    qhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudefpdhmohguvgepsh
-    hmthhpohhuthdprhgtphhtthhopehpvghnghhuihhnqdhkvghrnhgvlhesihdqlhhovhgv
-    rdhsrghkuhhrrgdrnhgvrdhjphdprhgtphhtthhopehlvghonheskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgt
-    ohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrd
-    gruhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthht
-    ohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdp
-    rhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:ToV7aXfJ_WdBZXO7bW44VnkXBebpp8NcAfO-wwMUTNpshFSmvHdQdQ>
-    <xmx:ToV7aZkxpHZvOyTiy_Holvq_LP6rK8TMv-Mv3_Qs2dk2gBF490qYfg>
-    <xmx:ToV7aU8lQLLGHoKpoiaqoVwtFCd3eIOUJANXKE3fCVA4yGwhQdLQWQ>
-    <xmx:ToV7aXHx3fS-EQfAAQPX5SVYy5UJ74Sz_coQRx7mRgZVV3jlRk2O2Q>
-    <xmx:T4V7aYCIGyiXi5KbASqVpZT2yC1-8o78Vk3t11zmoyFOQ_VotC7CFGTS>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 29 Jan 2026 11:05:34 -0500 (EST)
-Date: Thu, 29 Jan 2026 17:05:32 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Ilan Tayari <ilant@mellanox.com>,
-	Guy Shapiro <guysh@mellanox.com>,
-	Yossi Kuperman <yossiku@mellanox.com>,
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH net] xfrm: always flush state and policy upon
- NETDEV_DOWN/NETDEV_UNREGISTER events
-Message-ID: <aXuFTJZ3SvaCBXj5@krikkit>
-References: <1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp>
- <20260128102404.GC12149@unreal>
- <83d06aca-4437-4d61-9c99-ac19b797a243@I-love.SAKURA.ne.jp>
- <20260128123546.GC40916@unreal>
- <b91432c3-5ed4-4669-8d7c-02cf7ea6f8fa@I-love.SAKURA.ne.jp>
- <20260129090959.GD10992@unreal>
- <d0aa3c51-291b-40fd-82b4-15024dc4404b@I-love.SAKURA.ne.jp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tLDE9q9KX2GfgkCYcQhgd1hY7OGQ916fIndP3wBNZ8HU10Naa3FYT5TYfn9Q+8EydRs4uilB52P9RDxyh1nftwpVAk+EwsJvWARv4R7j+A0VmcQRImFNJ2OMysZVyiS1MCXD9BsdnAFyTNw3q+oR9X7wPNVhsf+dEH5+590Hhq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SS4JMYJ0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769703439;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4It8slVtarCu4DVvMInrTQl3b78Xd5NgimOoy6AXI8c=;
+	b=SS4JMYJ0A61wH57HxMJcm2sUAPUJGIiVsIsfIfpOebnOH/SNjq1G5mZSmsHQgmR+3lQVi0
+	EWhYfVC+iwhL+YbtH6K9+fvQ/8bNfDqI1hJSLOpzZMQ79mU/6OopeVB25phGDADqEYoFva
+	M5gWjuq8k1MgFLNxyf6MbZ1EKXrY3mA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-558-d8FDsvFHMPmefNIqWAOTJA-1; Thu,
+ 29 Jan 2026 11:17:14 -0500
+X-MC-Unique: d8FDsvFHMPmefNIqWAOTJA-1
+X-Mimecast-MFC-AGG-ID: d8FDsvFHMPmefNIqWAOTJA_1769703432
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 108471954B21;
+	Thu, 29 Jan 2026 16:17:12 +0000 (UTC)
+Received: from thinkpad (unknown [10.44.34.121])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 290AE180009E;
+	Thu, 29 Jan 2026 16:17:07 +0000 (UTC)
+Date: Thu, 29 Jan 2026 17:17:04 +0100
+From: Felix Maurer <fmaurer@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
+	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net,
+	Yoann Congal <yoann.congal@smile.fr>
+Subject: Re: [PATCH net-next v2 6/9] hsr: Implement more robust duplicate
+ discard for HSR
+Message-ID: <aXuIAFJ_m6gMUFFO@thinkpad>
+References: <cover.1769093335.git.fmaurer@redhat.com>
+ <07b90a435ed7d3450c1949e3a21910916d8538de.1769093335.git.fmaurer@redhat.com>
+ <20260129144348.CIs44m-d@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -123,152 +82,187 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d0aa3c51-291b-40fd-82b4-15024dc4404b@I-love.SAKURA.ne.jp>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260129144348.CIs44m-d@linutronix.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-254839-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254840-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,smile.fr];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:url,messagingengine.com:dkim,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 86A5BB1DB2
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 732D1B2050
 X-Rspamd-Action: no action
 
-2026-01-29, 19:16:30 +0900, Tetsuo Handa wrote:
-> On 2026/01/29 18:09, Leon Romanovsky wrote:
-> > On Thu, Jan 29, 2026 at 05:06:08PM +0900, Tetsuo Handa wrote:
-> >> On 2026/01/28 21:35, Leon Romanovsky wrote:
-> >>> On Wed, Jan 28, 2026 at 07:44:02PM +0900, Tetsuo Handa wrote:
-> >>>> On 2026/01/28 19:24, Leon Romanovsky wrote:
-> >>>>> I think this can work, but IMHO the more robust approach is to ensure that all
-> >>>>> states and policies are removed when the NETIF_F_HW_ESP feature bit is cleared.
-> >>>>
-> >>>> The transaction will become complicated, for dev->features manipulation
-> >>>> function can fail.
-> >>>
-> >>> Line above returning NOTIFY_OK, check that NETIF_F_HW_ESP is cleared,
-> >>> and remove everything.
-> >>
-> >> That answer needs more clarification. I came to get confused about what we should do.
-> >>
-> >> Question 1:
-> >>
-> >>   Since NETIF_F_HW_ESP is a hardware dependent flag, not all "struct net_device"
-> >>   support NETIF_F_HW_ESP flag. Is this interpretation correct?
-> > 
-> > Yes, however any device (SW or HW) should set this flag if they want to
-> > provide IPsec offload.
-> 
-> OK. There are "IPsec with offload" and "IPsec without offload".
-> Both cases use code in net/xfrm/ directory.
-> 
-> Users (not the kernel source but Linux administrator) can choose
-> "IPsec without offload" by clearing the NETIF_F_HW_ESP bit via
-> "ethtool -K $dev esp-hw-offload off" command even if $dev supports
-> both "IPsec with offload" and "IPsec without offload".
+On Thu, Jan 29, 2026 at 03:43:48PM +0100, Sebastian Andrzej Siewior wrote:
+> On 2026-01-22 15:57:01 [+0100], Felix Maurer wrote:
+> …
+> > As the problem (we accidentally skip over a sequence number that has not
+> > been received but will be received in the future) is similar to PRP, we can
+> > apply a similar solution. The duplicate discard algorithm based on the
+> > "sparse bitmap" works well for HSR if it is extended to track one bitmap
+> > for each port (A, B, master, interlink). To do this, change the sequence
+> > number blocks to contain a flexible array member as the last member that
+> > can keep chunks for as many bitmaps as we need. This design makes it easy
+> > to reuse the same algorithm in a potential PRP RedBox implementation.
+>
+> I know you just "copy" the logic based on what we have now but…
+> Why do we have to track the sequence number for A, B and interlink? The
+> 'master' port is what we feed into the stack so this needs to be
+> de-duplicated. I am not sure how 'interlink' works so I keep quiet here.
+> But A and B? There shouldn't be any duplicates on A and B unless the
+> destination node forwards the node. Or do I miss something?
+> I'm bringing this up because limiting to one (or two since I am unsure
+> about interlink) would save some memory and avoid needless updates. And
+> if you have HW-offloading enabled then you shouldn't see any packets
+> which are not directed to _this_ node.
 
-We should avoid talking about "IPsec with/without offload" when this
-can mean multiple different things:
+About the interlink: that's the interface where you attach devices that
+know nothing about HSR, i.e., when we are a RedBox. I consider it very
+similar to the master port, it's our responsibility to de-duplicate what
+we send out there.
 
- - ip xfrm state add ... offload ...
-   (and the offload request actually succeeded)
- - packet going through all the offload code and to the device
- - device with NETIF_F_HW_ESP set in dev->features
- - device with ->xdo_dev_state_add
+I was thinking about exactly this while working on the patch as well and
+I came to each conclusion (A,B are needed vs. are not needed) at least
+once. In the end, I think we will need it. It's right that a well
+behaving node in the ring should not forward "frames for which the node
+is the unique destination" (5.3.2.1). But there could be frames that
+have no unique destination in the ring at all: multicast frames or
+frames addressed to a non-existing MAC address. We should not forward
+such frames either to prevent them from looping forever.
 
-(I'm probably forgetting a few more)
+Now, such frames should probably only reach back to us, if we sent them
+(either from our stack or from the interlink port). We could track
+sequence numbers sent to master and interlink (for de-duplication) and
+sent by master and interlink (for loop prevention) for more clarity, but
+then we're back at four bitmaps again.
 
-> >> Question 2:
-> >>
-> >>   Sabrina Dubroca commented
-> >>
-> >>     But the current behavior ("ignore NETIF_F_HW_ESP and call
-> >>     xdo_dev_state_add for new states anyway") has been established for
-> >>     multiple years. Changing that now seems a bit risky.
-> >>
-> >>   at https://lkml.kernel.org/r/aXd3QjzwOVm0Q9LF@krikkit .
-> >>
-> >>   Is that comment saying that we have been permitting a "struct net_device"
-> >>   to be selected by xfrm_dev_state_add() even if that "struct net_device"
-> >>   does not support NETIF_F_HW_ESP flag. Is this interpretation correct?
-> > 
-> > I don't understand what does it mean "device doesn't support offload but
-> > state was offloaded anyway".
+I agree that we can and should optimize the HW-offloaded case. I'd
+suggest to do that in a separate patchset, though, partly because I
+don't have access to a hardware with HSR offload at the moment.
 
-To Leon: this is not what Tetsuo wrote.
-(but to be fair, "net_device does not support NETIF_F_HW_ESP flag" is
-a bit confusing)
+> …
+> > diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+> > index 70b3819e9298..c9bd25e6a7cc 100644
+> > --- a/net/hsr/hsr_framereg.c
+> > +++ b/net/hsr/hsr_framereg.c
+> > @@ -805,6 +774,39 @@ void *hsr_get_next_node(struct hsr_priv *hsr, void *_pos,
+> >  	return NULL;
+> >  }
+> >
+> > +/* Fill the last sequence number that has been received from node on if1 by
+> > + * finding the last sequence number sent on port B; accordingly get the last
+> > + * received sequence number for if2 using sent sequence numbers on port A.
+> > + */
+> > +static void fill_last_seq_nrs(struct hsr_node *node, u16 *if1_seq, u16 *if2_seq)
+> > +{
+> > +	struct hsr_seq_block *block;
+> > +	unsigned int block_off;
+> > +	size_t block_sz;
+> > +	u16 seq_bit;
+> > +
+> > +	spin_lock_bh(&node->seq_out_lock);
+> > +
+> > +	// Get last inserted block
+> > +	block_off = (node->next_block - 1) & (HSR_MAX_SEQ_BLOCKS - 1);
+> > +	block_sz = hsr_seq_block_size(node);
+> > +	block = node->block_buf + block_off * block_sz;
+> > +
+> > +	if (!bitmap_empty(block->seq_nrs[HSR_PT_SLAVE_B - 1],
+> > +			  HSR_SEQ_BLOCK_SIZE)) {
+> > +		seq_bit = find_last_bit(block->seq_nrs[HSR_PT_SLAVE_B - 1],
+> > +					HSR_SEQ_BLOCK_SIZE);
+> > +		*if1_seq = (block->block_idx << HSR_SEQ_BLOCK_SHIFT) | seq_bit;
+> > +	}
+> > +	if (!bitmap_empty(block->seq_nrs[HSR_PT_SLAVE_A - 1],
+> > +			  HSR_SEQ_BLOCK_SIZE)) {
+> > +		seq_bit = find_last_bit(block->seq_nrs[HSR_PT_SLAVE_A - 1],
+> > +					HSR_SEQ_BLOCK_SIZE);
+> > +		*if2_seq = (block->block_idx << HSR_SEQ_BLOCK_SHIFT) | seq_bit;
+> > +	}
+> > +	spin_unlock_bh(&node->seq_out_lock);
+>
+> I know you preserve what is already here but what is this even used for?
+> | ip -d link show dev hsr0
+>
+> does not show these numbers. It shows the sequence number of the hsr0
+> interface which I understand.
+> But then it is also possible to show the last received sequence number
+> of any node on either of the two interfaces?
 
-> Users (not the kernel source but Linux administrator) who are using $dev
-> which supports only "IPsec without offload" can call xfrm_dev_state_add()
-> because xfrm_dev_state_add() does not check for the NETIF_F_HW_ESP bit.
-> 
-> Therefore such users can create "struct xfrm_state" with a reference to
-> "struct net_device" held at
-> https://elixir.bootlin.com/linux/v6.19-rc5/source/net/xfrm/xfrm_user.c#L986 .
-> 
-> > 
-> >>
-> >> Question 3:
-> >>
-> >>   Leon Romanovsky suggested that, as a more robust approach, remove all states
-> >>   and policies when the NETIF_F_HW_ESP feature bit is cleared.
-> >>
-> >>   But I consider that such approach will not work, for (according to Q2 above)
-> >>   xfrm_dev_state_add() can be called even if the NETIF_F_HW_ESP feature bit is not
-> >>   set. Also, I think that there is no guarantee that dev->features manipulation
-> >>   function is called after xfrm_dev_state_add() was called.
-> >>
-> >>   Therefore, we need an event that are guaranteed to be called.
-> >>   The NETDEV_UNREGISTER event is guaranteed to be called when unregistring
-> >>   a "struct net_device", and therefore a good place to remove all states and
-> >>   policies.
-> >>
-> >>   Is this interpretation correct?
-> 
-> Since we don't have a syzbot reproducer, I can't tell whether syzbot is manually
-> clearing the NETIF_F_HW_ESP bit or not. But as described above, a syzbot report
-> 
->   unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
->   ref_tracker: netdev@ffff888052f24618 has 1/1 users at
->        __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
->        netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
->        xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
-> 
-> indicates that "struct xfrm_state" with a reference to "struct net_device" held
-> is remaining because xfrm_dev_state_flush() is not called upon NETDEV_UNREGISTER
-> event.
+This is only exposed through the HSR_C_GET_NODE_STATUS netlink command
+for the "HSR" (sic!) netlink family. I'm not aware of a userspace tool
+that actually shows this data. It's unclear if it is of any real use.
 
-I don't know what syzbot did, but this triggers the same symptoms for
-me:
+I assume that the two sequence numbers are reported because they would
+in theory allow to detect a broken ring: if one of the numbers stops
+increasing or the numbers generally diverge, some link in the ring is
+broken. If we have traffic from multiple nodes, we could even detect
+where the ring is broken. That's likely also the reason for the weird
+cross-assinment of B->1, A->2. What we send out on B has to have arrived
+on port A resp. 1 before.
 
-echo 0 > /sys/bus/netdevsim/new_device
-dev=$(ls -1 /sys/bus/netdevsim/devices/netdevsim0/net/)
-ip x s a src 192.168.13.1 dst 192.168.13.2 proto esp spi 0x1000 mode tunnel aead 'rfc4106(gcm(aes))' $key 128 offload crypto dev $dev dir out
-ethtool -K $dev esp-hw-offload off
-echo 0 > /sys/bus/netdevsim/del_device
+We can discuss removing this stuff in the future, but I'd prefer not to
+touch userspace at this time.
 
--- 
-Sabrina
+> > +}
+> > +
+> >  int hsr_get_node_data(struct hsr_priv *hsr,
+> >  		      const unsigned char *addr,
+> >  		      unsigned char addr_b[ETH_ALEN],
+> …
+> > --- a/net/hsr/hsr_framereg.h
+> > +++ b/net/hsr/hsr_framereg.h
+> > @@ -82,15 +82,18 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
+> >  #define hsr_seq_block_index(sequence_nr) ((sequence_nr) >> HSR_SEQ_BLOCK_SHIFT)
+> >  #define hsr_seq_block_bit(sequence_nr) ((sequence_nr) & HSR_SEQ_BLOCK_MASK)
+> >
+> > +#define DECLARE_BITMAP_FLEX_ARRAY(name, bits) \
+> > +	unsigned long name[][BITS_TO_LONGS(bits)]
+> > +
+> >  struct hsr_seq_block {
+> >  	unsigned long		time;
+> >  	u16			block_idx;
+> > -	DECLARE_BITMAP(seq_nrs, HSR_SEQ_BLOCK_SIZE);
+> > +	DECLARE_BITMAP_FLEX_ARRAY(seq_nrs, HSR_SEQ_BLOCK_SIZE);
+>
+> is there a story behind DECLARE_BITMAP_FLEX_ARRAY()? We have just this
+> one user.
+
+I've added it this way to make it obvious that almost all of it is the
+same as DECLARE_BITMAP(). But probably it's better to get rid of the
+macro, add the definition directly to the struct, and maybe add a
+comment that it's supposed to be similar to what DECLARE_BITMAP()
+produces. What do you think?
+
+Thanks for your comments,
+   Felix
+
+
+> >  };
+>
+> Sebastian
+
 
