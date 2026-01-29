@@ -1,177 +1,263 @@
-Return-Path: <netdev+bounces-254920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254923-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mM32B5rYe2l3IwIAu9opvQ
-	(envelope-from <netdev+bounces-254920-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:00:58 +0100
+	id 8IRZHUHfe2ljJAIAu9opvQ
+	(envelope-from <netdev+bounces-254923-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:29:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF78B527D
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:00:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2A50B54D2
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:29:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 377FF30041C8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:00:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 493BA30210D9
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F1C33DEF5;
-	Thu, 29 Jan 2026 22:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3967B36B04E;
+	Thu, 29 Jan 2026 22:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FuORfFkK"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="lbiWguvn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65FD326D69;
-	Thu, 29 Jan 2026 22:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32D032571F;
+	Thu, 29 Jan 2026 22:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769724055; cv=none; b=mjlr10czhk6Yzila4jCKCJRFpJ8Au7cywedtl2YRoDofCFP7g2Iwh65hEKt49Qjgxd2Q//J56Lakv0WkQLa9d6eYJ5JjEMV3dd+if9N+Eq4MlFANUehhHEAXD3m9sB4gfo4rAtD6dzNkTsaLfdjCHGTn4xwC9sHaTXLYuBx/VTA=
+	t=1769725735; cv=none; b=CQo6A/O3AeCwpONGqMPZWXJfC2u8YV0Jk7xUZALDLjjAbCqW24UoCuiMySpZH2GmfUDiJSFUOMKu/+naSy1RFNJ/fhYdvSSJ/v6TZo4SR0eNQ+oBbrlyMV+0xjNydfQ8Ewd1eRndmRDp4g22T7Okm7jdasruFlz5dbmo2B/DCos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769724055; c=relaxed/simple;
-	bh=YqNWb+uEWkjz1XXk8wLbalCffPtk4g7xZuyyJzhd2iA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NXaaz4PLtKg6nSOcfw4guB6naEy4HNlpRhhNgEV/5A7zHcGH20DpMLAsoFJ28YUC3hcXX/9HI7cUdsRs6S5Drew6bixbEhsam9nXOkQ4OS93EyEEmI68KdbZQ9wQ8NbRk2GgPMDDAYPigmX4BlyI/NwFpc5qwRn1x9hjbc7F+DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FuORfFkK; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	s=arc-20240116; t=1769725735; c=relaxed/simple;
+	bh=WPuF5LZ8152Wv6FX0PCRrh9Ta9GpC4sX2UOZqvvCbU8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YMq1AOFYd179cyjpSDZzzEbsoVILGSYvvlQYuRbooO1hfjyFSvelDUtFV60INKT4ynRhDrhzYV2OUqGRPpFF3RfsUMs04xSRp2usl2Jj/c+egJmFxJfLdkW3YUbO1RUX8HPlRf37jVyAxwHlw5Mohr5LduGcA2uWOuq7ht/ZUFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=lbiWguvn; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5NaZq7/qOx5j3sYVWWAXyxivGGckilTrm3I0MWAebJ0=; b=FuORfFkKV0DQIUUuMAonHTBSMq
-	HF2MOUM/Hc7enwPm0B5st77tQNNjf0eKU/pZo/h8uFpZk3KazeRogVT16rnuLFu4rRtaZ6WB50HuT
-	oQloQVUjqsYNnVPMNueythTNsQumeeZJpD7lFjQuMi2kGPSSZ/2aqJe5xufgqTlMcawAYyslgphns
-	OxxQAsBSIewVc03grwlhmNGyURyOFRkdaZLHvnAGAntQeeeLslHwVSeWeW1Nl1gP66MfK6N91OFj9
-	5OB/+2cFKWTslP6LNj6Kz3pKBbMrqn4RcR2kAjhsppKEXH6aexaqY+7IKQt7qE+B8ThTjVf70J7OS
-	v6U1biyg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39260)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vla4A-000000000Va-0f2c;
-	Thu, 29 Jan 2026 22:00:42 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vla44-000000008Kd-1QMZ;
-	Thu, 29 Jan 2026 22:00:36 +0000
-Date: Thu, 29 Jan 2026 22:00:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
- inband goodies
-Message-ID: <aXvYhM6mHE4p_B14@shell.armlinux.org.uk>
-References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
- <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
- <aXPo5R1Q-qWG3r3l@shell.armlinux.org.uk>
- <aXjSbu6L6ICYOPiJ@oss.qualcomm.com>
- <aXjdAZeUl2Dsu4mE@shell.armlinux.org.uk>
- <aXsLyb+x76/WaXcs@oss.qualcomm.com>
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=rXDRn8OqT0lUi72rpZaS2H0Wd+xni8iCaiH3Gg1xyZU=; b=lbiWguvnTzVSrHKsAfAmZ0aBhj
+	DxLPQI5AwHOQr0DqRNme191otBBkEt4w2/ESs2mghf7q/oSxJt72GcRdtxupwLuWKhnfCZiHiG2pg
+	uMA0ROwRxDY6wSdtQIjLXvZPRwBO98flDo91IrCJfnNAewHwnLZYq05X2G2Mq68jd0WmNjBpOn6cY
+	qY9Pmrh/4GtW+GIQzycIZnprKncvA8ubKHsw9DHDtHf4xiuot3CepbR2ALAVUq7ArP5ixTqTLj4og
+	mf1d2TJUs4RJxZ6tx8hJSqYyzwsgWE1P32llQazs0Kwv7O1ggy1lCne8XelU0Tj5tel//+jOPGbC3
+	iN9euUoQ==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vlaV5-0008oR-2j;
+	Thu, 29 Jan 2026 23:28:31 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	sdf@fomichev.me,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	dw@davidwei.uk,
+	toke@redhat.com,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: [PATCH net-next v8 00/16] netkit: Support for io_uring zero-copy and AF_XDP
+Date: Thu, 29 Jan 2026 23:28:14 +0100
+Message-ID: <20260129222830.439687-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXsLyb+x76/WaXcs@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27896/Thu Jan 29 08:24:11 2026)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254920-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,jrife.io,intel.com,davidwei.uk,bytedance.com];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254923-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: BCF78B527D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:mid,iogearbox.net:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E2A50B54D2
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 12:57:05PM +0530, Mohd Ayaan Anwar wrote:
-> I was thinking about the "good" sequence (i.e., the current net-next
-> tree):
-> 	-> phylink_up
-> 	  -> mac_link_up
-> 	    -> fix_mac_speed
-> 	      -> SerDes configured via phy_set_speed
-> 	      -> stmmac_pcs_ctrl_ane(priv, enable/disable, 0)
-> 
-> Please let me know if you want me to try any other experiments.
-> Maybe I need to do some more testing after playing around with the
-> sequence followed by this series?
+Containers use virtual netdevs to route traffic from a physical netdev
+in the host namespace. They do not have access to the physical netdev
+in the host and thus can't use memory providers or AF_XDP that require
+reconfiguring/restarting queues in the physical netdev.
 
-Given discussion elsewhere, it seems that the generic PHY maintainers
-have come to the conclusion (at my request) that the documentation is
-incorrect and needs to be changed:
+This patchset adds the concept of queue leasing to virtual netdevs that
+allow containers to use memory providers and AF_XDP at native speed.
+Leased queues are bound to a real queue in a physical netdev and act
+as a proxy.
 
-	Order of API calls
-	==================
+Memory providers and AF_XDP operations take an ifindex and queue id,
+so containers would pass in an ifindex for a virtual netdev and a queue
+id of a leased queue, which then gets proxied to the underlying real
+queue.
 
-	The general order of calls should be::
+We have implemented support for this concept in netkit and tested the
+latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+(bnxt_en) 100G NICs. For more details see the individual patches.
 
-	    [devm_][of_]phy_get()
-	    phy_init()
-	    phy_power_on()
-	    [phy_set_mode[_ext]()]
-	    ...
-	    phy_power_off()
-	    phy_exit()
-	    [[of_]phy_put()]
+v7->v8:
+ - Rework and refactor net_mp_{open,close}_rxq patch (Jakub)
+ - Moved queue lease netlink command from env into test (Jakub)
+ - Support netns_id also in queue create call and not only dump
+ - Rebase and retested everything with mlx5 + bnxt_en
+v6->v7:
+ - Add xsk_dev_queue_valid real_num_rx_queues check given bound
+   xs->queue_id could be from a TX queue (AI review bot)
+ - Fix up exception path in queue leasing selftest (AI review bot)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v5->v6:
+ - Fix nest_queue test in netdev_nl_queue_fill_one (Jakub/AI review bot)
+ - Fix netdev notifier locking leak (Jakub/AI review bot)
+ - Drop NETREG_UNREGISTERING WARN_ON_ONCE to avoid confusion (Stan)
+ - Remove slipped-in .gitignore cruft in net selftest (Stan)
+ - Fix Pylint warnings in net selftest (Jakub)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v4->v5:
+ - Rework of the core API into queue-create op (Jakub)
+ - Rename from queue peering to queue leasing (Jakub)
+ - Add net selftests for queue leasing (Stan, Jakub)
+ - Move netkit_queue_get_dma_dev into core (Jakub)
+ - Dropped netkit_get_channels (Jakub)
+ - Moved ndo_queue_create back to return index or error (Jakub)
+ - Inline __netdev_rx_queue_{peer,unpeer} helpers (Jakub)
+ - Adding helpers in patches where they are used (Jakub)
+ - Undo inline for netdev_put_lock (Jakub)
+ - Factoring out checks whether device can lease (Jakub)
+ - Fix up return codes in netdev_nl_bind_queue_doit (Jakub)
+ - Reject when AF_XDP or mp already bound (Jakub)
+ - Switch some error cases to NL_SET_BAD_ATTR() (Jakub)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v3->v4:
+ - ndo_queue_create store dst queue via arg (Nikolay)
+ - Small nits like a spelling issue + rev xmas (Nikolay)
+ - admin-perm flag in bind-queue spec (Jakub)
+ - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
+ - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
+ - New patch (12/14) to handle the underlying device going away (Jakub)
+ - Improve commit message on queue-get (Jakub)
+ - Do not expose phys dev info from container on queue-get (Jakub)
+ - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
+ - Rework xsk handling to simplify the code and drop a few patches
+ - Rebase and retested everything with mlx5 + bnxt_en
+v2->v3:
+ - Use netdev_ops_assert_locked instead of netdev_assert_locked (syzbot)
+ - Add missing netdev_lockdep_set_classes in netkit
+v1->v2:
+ - Removed bind sample ynl code (Stan)
+ - Reworked netdev locking to have consistent order (Stan, Kuba)
+ - Return 'not supported' in API patch (Stan)
+ - Improved ynl documentation (Kuba)
+ - Added 'max: s32-max' in ynl spec for ifindex (Kuba)
+ - Added also queue type in ynl to have user specify rx to make
+   it obvious (Kuba)
+ - Use of netdev_hold (Kuba)
+ - Avoid static inlines from another header (Kuba)
+ - Squashed some commits (Kuba, Stan)
+ - Removed ndo_{peer,unpeer}_queues callback and simplified
+   code (Kuba)
+ - Improved commit messages (Toke, Kuba, Stan, zf)
+ - Got rid of locking genl_sk_priv_get (Stan)
+ - Removed af_xdp cleanup churn (Maciej)
+ - Added netdev locking asserts (Stan)
+ - Reject ethtool ioctl path queue resizing (Kuba)
+ - Added kdoc for ndo_queue_create (Stan)
+ - Uninvert logic in netkit single dev mode (Jordan)
+ - Added binding support for multiple queues
 
-Essentially, most users of generic PHY do not follow this, but call
-phy_set_mode[_ext]() before phy_power_on().
+Daniel Borkmann (10):
+  net: Add queue-create operation
+  net: Implement netdev_nl_queue_create_doit
+  net: Add lease info to queue-get response
+  net, ethtool: Disallow leased real rxqs to be resized
+  net: Slightly simplify net_mp_{open,close}_rxq
+  xsk: Extend xsk_rcv_check validation
+  xsk: Proxy pool management for leased queues
+  netkit: Add single device mode for netkit
+  netkit: Add netkit notifier to check for unregistering devices
+  netkit: Add xsk support for af_xdp applications
 
-This will have implications for this patch series, particularly the
-serdes related changes, and will make the update to qcom-sgmii-eth
-more complex (as its current phy_power_on() implementation does
-very little and isn't the reverse of phy_power_off().)
+David Wei (6):
+  net: Proxy net_mp_{open,close}_rxq for leased queues
+  net: Proxy netdev_queue_get_dma_dev for leased queues
+  netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
+  selftests/net: Add bpf skb forwarding program
+  selftests/net: Add env for container based tests
+  selftests/net: Add netkit container tests
 
-
-In the mean time, please test patch 2 to see whether that can be
-merged.
-
-I'm going to re-order some of the patches in this series to see what
-else can be merged without depending on that and without affecting
-dwmac-qcom-ethqos, and thus shrinking this series.
+ Documentation/netlink/specs/netdev.yaml       |  44 +++
+ drivers/net/netkit.c                          | 360 +++++++++++++++---
+ include/linux/netdevice.h                     |   6 +
+ include/net/netdev_queues.h                   |  19 +-
+ include/net/netdev_rx_queue.h                 |  21 +-
+ include/net/page_pool/memory_provider.h       |  14 +-
+ include/net/xdp_sock_drv.h                    |   2 +-
+ include/uapi/linux/if_link.h                  |   6 +
+ include/uapi/linux/netdev.h                   |  11 +
+ io_uring/zcrx.c                               |   4 +-
+ net/core/dev.c                                |   7 +
+ net/core/dev.h                                |   2 +
+ net/core/devmem.c                             |   6 +-
+ net/core/netdev-genl-gen.c                    |  20 +
+ net/core/netdev-genl-gen.h                    |   2 +
+ net/core/netdev-genl.c                        | 208 ++++++++++
+ net/core/netdev_queues.c                      |  74 +++-
+ net/core/netdev_rx_queue.c                    | 190 +++++++--
+ net/ethtool/channels.c                        |  12 +-
+ net/ethtool/ioctl.c                           |   9 +-
+ net/xdp/xsk.c                                 |  79 +++-
+ tools/include/uapi/linux/netdev.h             |  11 +
+ .../testing/selftests/drivers/net/README.rst  |   7 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../drivers/net/hw/lib/py/__init__.py         |   7 +-
+ .../selftests/drivers/net/hw/nk_forward.bpf.c |  49 +++
+ .../selftests/drivers/net/hw/nk_netns.py      |  23 ++
+ .../selftests/drivers/net/hw/nk_qlease.py     |  90 +++++
+ .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
+ .../selftests/drivers/net/lib/py/env.py       | 120 ++++++
+ 30 files changed, 1272 insertions(+), 140 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
