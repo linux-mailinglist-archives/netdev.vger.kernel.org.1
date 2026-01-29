@@ -1,117 +1,224 @@
-Return-Path: <netdev+bounces-254508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254511-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yA7WB966emkr9gEAu9opvQ
-	(envelope-from <netdev+bounces-254508-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:41:50 +0100
+	id 2C73GqC+emnw+AEAu9opvQ
+	(envelope-from <netdev+bounces-254511-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:57:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65EEDAADB4
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:41:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9039AAF2E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D8F53018D76
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 01:41:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66D4A303A864
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 01:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D96C318B96;
-	Thu, 29 Jan 2026 01:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGyD6dSg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E255632ED40;
+	Thu, 29 Jan 2026 01:56:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A74931355C;
-	Thu, 29 Jan 2026 01:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313F43203B0;
+	Thu, 29 Jan 2026 01:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769650899; cv=none; b=DJQM5qq0bamJgFyw/wDIyrYedU1rx+STH/l420NwojitOZUV6b/JlDs8SAh9HjBOCkqnpX3UEEPzxVcdJN4Ve5YFK3oC8mm2ei1r7O1rYPy7/g4cDh6+3X3aw3lk80jLVFK9xWIzbERNs4hNF0ZrMJy3MhNYFh62DP5t/XcF7is=
+	t=1769651817; cv=none; b=CxZUqHtWsCWpVfGftNO8/DoWKn3zqEJFEQR99u72pKIjGW+ap48Jx/umG9W/3O5+0dZhbZXBO9mFqATGmaGXkhpVDEpJFBopdEPyWPDtaCUs0NHk3SaOLjJTtwecvX0V3a+MPI4Gf0JX6vSD+wqyFn5H7D/fGsxDe0CB/OA88kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769650899; c=relaxed/simple;
-	bh=xDPqYiZQa7TzJ8mSUu1DL8UHnEMsE1fthjzDfHVLDyM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FuHr7ThiZDuw5FFmReiDgUwK4hurWDiIBKP9FL1QBJrjq5Ers25JMketqQvSstiNfYogWnOObYxV9cmSiV9pdwzxkrsUBrKoWExkzlUhtdEO5M29UZn3yISJV7Len6Uef2EHKWwUC8vLZRBsJDXR0DqvntsyFZpXcmGUVie+e+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGyD6dSg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B69CC4CEF1;
-	Thu, 29 Jan 2026 01:41:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769650898;
-	bh=xDPqYiZQa7TzJ8mSUu1DL8UHnEMsE1fthjzDfHVLDyM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TGyD6dSgfJMlRuEck/YRbTZmCy35V0telRLezAySciRZ5rsNPqR35Up8zki6spQOw
-	 IiS4pBSdiXieVP/hdt22dsaSfhcOCgOKfY2fJO8M1WVfOqElpWJc7u/0BoCSJA9yv/
-	 Z+ZUu35lE4sen/mze4yJTKtssVd3WdgAQSacJOWUKVXf7N7eyB3Ypvb6MzjkiPwQlv
-	 hx7aKfC21j9UnAr6gFY9zEBWsYJqLqU/Q6xqq92j5ZgbAhMLpIqLOEBK1yqmlIcgjj
-	 N/aJFAJZtanTKpr90zPSy9P7tf8AYiyA0ZPvT37XNY4mAxiHi9Gkt+kM0eCkBwQCCS
-	 K//SiJb5Cuk+Q==
-Date: Wed, 28 Jan 2026 17:41:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oliver Hartkopp via B4 Relay <devnull+socketcan.hartkopp.net@kernel.org>
-Cc: socketcan@hartkopp.net, netdev@vger.kernel.org,
- linux-can@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: Re: [PATCH net-next v4 0/6] move CAN skb headroom content to skb
- extensions
-Message-ID: <20260128174137.65929694@kernel.org>
-In-Reply-To: <20260128-can_skb_ext-v1-0-330f60fd5d7e@hartkopp.net>
-References: <20260128-can_skb_ext-v1-0-330f60fd5d7e@hartkopp.net>
+	s=arc-20240116; t=1769651817; c=relaxed/simple;
+	bh=j7CQU4VnbHcO/pWhc7tKbgzkvWg3RjTm1QiVX9uoteQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=DRhT1lDb3j1U1rwVSsl9BiNQPCuf/m5QlFrljR6tgP5cGtbU5v6LI3OH5PgP8qLsmJRTFmEFf9okM8ZhW2nwoIHkmaPdZ6OtoQa3ftvM9AIqy3RaIA/EPd+H85VuJ/t6gtRq/KLqvpEzVJiysDIQZ+E6Q3Y5UUVly+1F0PalicY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [127.0.0.2] (unknown [210.73.43.101])
+	by APP-05 (Coremail) with SMTP id zQCowAAntwpDvnpps5z0Bg--.39391S2;
+	Thu, 29 Jan 2026 09:56:19 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Subject: [PATCH v4 0/4] PCI/MSI: Generalize no_64bit_msi into msi_addr_mask
+Date: Thu, 29 Jan 2026 09:56:05 +0800
+Message-Id: <20260129-pci-msi-addr-mask-v4-0-70da998f2750@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADW+emkC/23Q3UrFMAwH8FcZvTaj32c9V76HKKRd5wmy7djOo
+ oy9u3VHQXGX/5D8ErKyHBPFzM7NylIslGmeatB3DQsXnJ4jUF8zk1waIaWCayAYMwH2fYIR8wv
+ I/mQNnqJXjrM6d01xoPfdfHi85RRf3yq93IrMY44Q5nGk5dwU2woHKYindWNf/RfKy5w+9pOK2
+ Ae+t+uD7UUAB27QDsFrrwO/pxwwtxjaMO1ekT+G5UKKI0NWY9DSOCVs5zr331C/jaMvFFUNNzi
+ PyHVnpP5rbNv2CXj0dcRsAQAA
+X-Change-ID: 20251223-pci-msi-addr-mask-2d765a7eb390
+To: Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
+ Alex Deucher <alexander.deucher@amd.com>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>, 
+ Takashi Iwai <tiwai@suse.com>, Brett Creeley <brett.creeley@amd.com>
+Cc: Han Gao <gaohan@iscas.ac.cn>, Vivian Wang <wangruikang@iscas.ac.cn>, 
+ Thomas Gleixner <tglx@kernel.org>, linuxppc-dev@lists.ozlabs.org, 
+ linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-sound@vger.kernel.org, 
+ linux-riscv@lists.infradead.org, sophgo@lists.linux.dev, 
+ Takashi Iwai <tiwai@suse.de>
+X-Mailer: b4 0.14.3
+X-CM-TRANSID:zQCowAAntwpDvnpps5z0Bg--.39391S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJFy3ZFy7CrWxur4kZryrZwb_yoWrtw4DpF
+	W5G3yagr40yryxKa9rCw47ZF43t3Z5t34xKr1DK3sa9an0vFy8Zrn3tr4ru347Xr4xJw40
+	qr9rW3WkZaykuaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67AK6w4l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRRtCzUUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254508-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254511-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,socketcan.hartkopp.net];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 65EEDAADB4
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E9039AAF2E
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 23:43:39 +0100 Oliver Hartkopp via B4 Relay wrote:
-> CAN bus related skbuffs (ETH_P_CAN/ETH_P_CANFD/ETH_P_CANXL) simply contain
-> CAN frame structs for CAN CC/FD/XL of skb->len length at skb->data. Those
-> CAN skbs do not have network/mac/transport headers nor other such
-> references for encapsulated protocols like ethernet/IP protocols.
-> 
-> To store data for CAN specific use-cases all CAN bus related skbuffs are
-> created with a 16 byte private skb headroom (struct can_skb_priv). Using
-> the skb headroom and accessing skb->head for this private data led to
-> several problems in the past likely due to "The struct can_skb_priv
-> business is highly unconventional for the networking stack." [1]
-> 
-> This patch set aims to remove the unconventional skb headroom usage for CAN
-> bus related skbuffs and use the common skb extensions instead.
+The Sophgo SG2042 is a cursed machine in more ways than one.
 
-If you're targeting netdev trees please comply with our community
-guidelines:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+The one way relevant to this patch series is that its PCIe controller
+has neither INTx nor a low-address MSI doorbell wired up. Instead, the
+only usable MSI doorbell is a SoC one at 0x7030010300, which is above
+the 32-bit limit.
+
+Currently, the no_64bit_msi flag on a PCI device declares that a device
+needs a 32-bit MSI address. Since no more precise indication is
+possible, devices supporting less than 64 bits of MSI addresses are all
+lumped into one "need 32-bit MSI address" bucket. This of course
+prevents these devices from working with MSI enabled on SG2042 because a
+32-bit MSI doorbell address is not possible. Combined with a lack of
+INTx, some of them have trouble working on SG2042 at all.
+
+There were previous dirtier attempts to allow overriding no_64bit_msi
+for radeon [1] and hda/intel [2].
+
+To fix this, generalize the single bit no_64bit_msi into a full address
+mask msi_addr_mask to more precisely describe the restriction. The
+existing DMA masks seems insufficient, as for e.g. radeon the
+msi_addr_mask and coherent_dma_mask seems to be different on more recent
+devices.
+
+The patches are structured as follows:
+
+- Patch 1 conservatively introduces msi_addr_mask, without introducing
+  any functional changes (hopefully, if I've done everything right), by
+  only using DMA_BIT_MASK(32) and DMA_BIT_MASK(64).
+- The rest of the series actually make use of intermediate values of
+  msi_addr_mask, and should be independently appliable. Patch 2 relaxes
+  msi_verify_entries() to allow intermediate values of msi_addr_mask.
+  Patch 3 onwards raises msi_addr_mask in individual device drivers.
+
+I still believe this safe approach is the way to go, since we don't know
+the MSI addressing limitations of *every single* PCI(e) device out
+there. Brett's comment from v1 [3] indicates at least the *possibility*
+of MSI mask being larger than DMA mask, so let's play it safe for now
+and not randomly disable some other device's MSI just because of this
+one cursed platform.
+
+Tested on SG2042 with a Radeon R5 220 which makes use of radeon and
+hda/intel. PPC changes and pensanto/ionic changes are compile-tested
+only, since I do not have the hardware.
+
+I would appreciate if driver maintainers can take a look and see whether
+the masks I've set makes sense, although I believe they shouldn't cause
+problems on existing platforms. I'm also not familiar with PPC enough to
+touch the arch/powerpc firmware calls further - help would be
+appreciated.
+
+My intention is that the first two patches are taken up by PCI
+maintainers, and the rest go through the maintainers of individual
+drivers since they could use more device-specific testing and review. If
+this is not convenient I'll be happy to split it up or something.
+
+[1]: https://lore.kernel.org/all/20251220163338.3852399-1-gaohan@iscas.ac.cn/
+[2]: https://lore.kernel.org/all/20251220170501.3972438-1-gaohan@iscas.ac.cn/
+[3]: https://lore.kernel.org/all/970e6955-d345-48e3-8ea5-83c577ecc563@amd.com/
+
+---
+Changes in v4:
+- Minor patch message rewording (Thomas)
+- Minor code style fix (Thomas)
+- Link to v3: https://lore.kernel.org/r/20260123-pci-msi-addr-mask-v3-0-9f9baa048524@iscas.ac.cn
+
+Changes in v3:
+- Patch 2: %llx -> %#llx while printing addresses (Bjorn)
+- Link to v2: https://lore.kernel.org/r/20260121-pci-msi-addr-mask-v2-0-f42593168989@iscas.ac.cn
+
+Changes in v2:
+- Patch 3: Fix the mask for radeon (Christian)
+- Drop what was patch 5, keep the behavior for pensando unchanged for now
+- Add Cc for linux-riscv and sophgo. Oops.
+- Link to v1: https://lore.kernel.org/r/20251224-pci-msi-addr-mask-v1-0-05a6fcb4b4c0@iscas.ac.cn/
+
+---
+Vivian Wang (4):
+      PCI/MSI: Conservatively generalize no_64bit_msi into msi_addr_mask
+      PCI/MSI: Check msi_addr_mask in msi_verify_entries()
+      drm/radeon: Raise msi_addr_mask to dma_bits
+      ALSA: hda/intel: Raise msi_addr_mask to dma_bits
+
+ arch/powerpc/platforms/powernv/pci-ioda.c           |  2 +-
+ arch/powerpc/platforms/pseries/msi.c                |  4 ++--
+ drivers/gpu/drm/radeon/radeon_device.c              |  1 +
+ drivers/gpu/drm/radeon/radeon_irq_kms.c             | 10 ----------
+ drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c |  2 +-
+ drivers/pci/msi/msi.c                               | 10 ++++++----
+ drivers/pci/msi/pcidev_msi.c                        |  2 +-
+ drivers/pci/probe.c                                 |  7 +++++++
+ include/linux/pci.h                                 |  8 +++++++-
+ sound/hda/controllers/intel.c                       | 10 +++++-----
+ 10 files changed, 31 insertions(+), 25 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251223-pci-msi-addr-mask-2d765a7eb390
+
+Best regards,
 -- 
-pv-bot: 24h
+Vivian "dramforever" Wang
+
 
