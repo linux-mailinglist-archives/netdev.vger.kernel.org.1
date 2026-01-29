@@ -1,145 +1,235 @@
-Return-Path: <netdev+bounces-254550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id PNVyK8Dhemnh/AEAu9opvQ
-	(envelope-from <netdev+bounces-254550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:27:44 +0100
+	id uyBSFy7iemnw/AEAu9opvQ
+	(envelope-from <netdev+bounces-254551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:29:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F65ABAC8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:27:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059C5ABAD1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0979930166EB
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 04:27:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 21E273004F11
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 04:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A93F28B4FD;
-	Thu, 29 Jan 2026 04:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EB82D0C62;
+	Thu, 29 Jan 2026 04:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgTdV3Bt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZOaZA8C0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FDA2586FE
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 04:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CE628C5B1
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 04:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769660861; cv=none; b=EI3Yi620YFG310vzv0BAPyj9MvbweFoQL80VZckLWQ8Vr6QMF4cNKUl1fautpfisvZkgR4lA9MiIN3qQX2zTzsze7onFa4tOKbVcXCrJM27t9pFfjJecbCh+7Y8W5S99m/8vPPNeQSLv6AgXpmQkW5HJyrA/NJgqZYZRtEAVRl8=
+	t=1769660969; cv=none; b=KsbJIdoNyHFL3NaOTzD6uo+26ZEiz3S5bvgoKW8H69dXk2wP46o2qPNKfblaPBvHQwr3TVw8vjr0+tPbCp6CDr/xKEXQ1eWK1HDwalgCtofTy7RNAAJ49O+FOQFZZDucei0rGkACN3B89uJeF8VjfYufUxegzutbvAR4V+Yayys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769660861; c=relaxed/simple;
-	bh=4d1E1Kgqrk7jtfKN+WbGmnwelRQwKo3JX3U3ym0jIf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RkedF0LXZskc9h7w0TeSe+NlXFaRoB6PbgFSNv+yJM3lF1yZsRNXoduQ3pGXyexMkzKEaijw68ai0GmmqcItzT7jNIqgpi3xID31U7mlsxS3PLK+IjwYrIfC964K1iPhSQscNK+bEudePsGB/KxlsmujGFQWG5+XZ3jd4c+vCPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgTdV3Bt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E80C116D0;
-	Thu, 29 Jan 2026 04:27:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769660860;
-	bh=4d1E1Kgqrk7jtfKN+WbGmnwelRQwKo3JX3U3ym0jIf8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mgTdV3Btju8w2u/jExh3atbm7kGC58Z80502KhmUzU0BEk5XlZPH6wh2lf8FUV4jr
-	 xm/9y1HsZs2Z/zSAMg44FzbmbLao06+WF3eqwNB3s3aAR3g9+2aRV1IHn11Y2DvyL+
-	 YN6w9fXWAy+8v4MqPGKRtxnlJyASSd04mY9yMxsvGYjpR58nuTZcaZpG2d8fexHLUG
-	 s+hN9FqNx+8Sdh4OSoqgCVRDhmnN5hKSgthN4VhGa/cvPy4pWsUovm8gaDT7atOvbC
-	 zWkhBWXuELmzbx88Sh4brJ9IyuohDjk4+g0jWNl//wuUK1rtDAlJhyqCO9ul2JDCNy
-	 2nQEWBfkfHILQ==
-Date: Wed, 28 Jan 2026 20:27:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marc =?UTF-8?B?U3XDscOp?= <marcdevel@gmail.com>
-Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
- netdev@vger.kernel.org, dborkman@kernel.org, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net v2 2/4] selftests/net: add no ARP b/mcast,null
- poison test
-Message-ID: <20260128202739.79af1bb8@kernel.org>
-In-Reply-To: <713d6f1ca57b402be420ade1331acee4898675c4.1769464405.git.marcdevel@gmail.com>
-References: <cover.1769464405.git.marcdevel@gmail.com>
-	<713d6f1ca57b402be420ade1331acee4898675c4.1769464405.git.marcdevel@gmail.com>
+	s=arc-20240116; t=1769660969; c=relaxed/simple;
+	bh=umLeoIezuuzWDN9KcyKP6hmewbYcA3GAdo8L2bv2ZrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m7EL5h7qLIrkTuqo/wNMAhv1LxgpakjyTx3toMxlvhVa/Q5w6tHUEDRJPo0HOGPuSHXLjhG3CbY0HytGzWIcS7pwCau5+H8Yep+dvUhQvmp+7iRMTC9pF6m8YbHdKpoO48Z3/oRleTbkahQzL7c0nVKvsmgbUl5rbHBXs2+mw7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZOaZA8C0; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4806f3fc50bso4846095e9.0
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:29:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769660966; x=1770265766; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nLsfEdXp1ghYI/zV3x1liW6kVNIuPDvLp5lPLO4doYE=;
+        b=ZOaZA8C0o/Tf235t+A/S/cl8EPfsJONJNNwqLA6ghOTu7fV3xPyaKkswSE4Xw+MNM5
+         JHr3vVww1hJarqL0vlDXiueQMD/mFjsixebWvucthWz2Nf2rMvKHHx16eAHT9rxlyMIi
+         peEem6q1ak6NYI3j9lwsuilF3U7tfjTJ7z0oK5fE1PLa2kNTyF9IQ+JzLZjnD25QbxBO
+         cuN+mPYKDhn5LhPtvvgzKd/YXXcvlItawxarTJxpX+HD4Q2YVuhW7PvYiP3tlbwxhVEg
+         /U7AzjrOxlwHsKZNXI0yQFWvmJlWJNR6ZLyYAOiHD2ZuTb7FurD8PE6nhmgCkzLSiidD
+         YK6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769660966; x=1770265766;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nLsfEdXp1ghYI/zV3x1liW6kVNIuPDvLp5lPLO4doYE=;
+        b=jLiWPD7IDOZWMe7xZvTl7Dgh2MGbI475xAlONMGoUFpH8c+f0dX66D2zn6MGMlFau8
+         rgoulIc5UrSm2A7/ZFvG4cvBzimF4mLeiri7wbxNkedsUwRXpYF8y5RH9BfVhY81fN90
+         qb6ZwGfldeLWDk5ig5Y9J7J01udRLCJ5R4aIRr3lVmMWcPA3r6y8Q08A6wSW9ApqK35r
+         NiItYMv9KuZ/YDadn+KVtb0mUmc0u9vyB6BNwh2Ik4VPPSwIyw1BN7CnPyUUvODpqcnZ
+         8CEynpUVPfWcC4HCbz//mb5yWzQ3oGVd7+J0TBSpx8rPLu8jeIWqotTk4pusbMOR7m68
+         daJQ==
+X-Gm-Message-State: AOJu0YzmCjNfQM43GUowBqcpyJg2fJdjO6hdL8dU13uHwxSI4DVFSUAh
+	gW2sd4dAzbli5eigGUDqGMvA1iJijRaFlFLf2/31yteAUsQZRbEctCqSanHVIuFfeA==
+X-Gm-Gg: AZuq6aJvX6n4BalmDOmzEfjhGAxVui8PAVpHllydtxpaHeqEyUvBRThEIUKXMspxwmm
+	XlBGg4wB5GUrf4t0sKUu5pHT8yUPbnIyKcja8SAB/JGklE/Sc8wTxXMxoE1nlYvwMLUHCmIkQUz
+	BNEE+GgF+nXmpjot0RxVLKcJgm/KqfZgKpXZqFFJselze2DNyu68IMtJzXQorjOGbMDgbGAfETY
+	t1niVHkRHJVjKNbCVX16IbLiesuODlkQDPCFtAgygejo++Jxmp8HpBKbLlZqmGNRL/5BATfY931
+	fuKqrmfpC+eUZ3jr/qJM++kWC/ftLQLgXKcCMlGm5U5OJ5e0NZpTgzdby9+k2xgZ/m17NiKTec9
+	/izJF5dR117WdNiaI5Wj3amOYMEsDmfTXJ8Jait6P4X1afkZXcZHtFBDxr7uVD26ZkBaO+r9PM/
+	KJgSO6
+X-Received: by 2002:a05:600c:468c:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-48069c54167mr87577045e9.20.1769660965693;
+        Wed, 28 Jan 2026 20:29:25 -0800 (PST)
+Received: from localhost ([2a02:169:c218:1:5130:f7b6:9c17:fb83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e474csm11650096f8f.2.2026.01.28.20.29.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 20:29:23 -0800 (PST)
+From: Tomas Hlavacek <tmshlvck@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dlan@kernel.org,
+	wangruikang@iscas.ac.cn,
+	Tomas Hlavacek <tmshlvck@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v3] net: spacemit: k1-emac: fix jumbo frame support
+Date: Thu, 29 Jan 2026 05:29:08 +0100
+Message-ID: <20260129042908.410326-1-tmshlvck@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254550-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,kernel.org,linux.dev];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lists.infradead.org,lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,iscas.ac.cn,gmail.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254551-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tmshlvck@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amt.sh:url]
-X-Rspamd-Queue-Id: F3F65ABAC8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 059C5ABAD1
 X-Rspamd-Action: no action
 
-On Tue, 27 Jan 2026 00:53:03 +0100 Marc Su=C3=B1=C3=A9 wrote:
-> Add a selftest to test that ARP bcast/mcast/null poisioning checks
-> are never bypassed.
+The driver never programs the MAC frame size and jabber registers,
+causing the hardware to reject frames larger than the default 1518
+bytes even when larger DMA buffers are allocated.
 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index 45c4ea381bc3..a765f1800752 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -9,6 +9,7 @@ CFLAGS +=3D -I../
->  TEST_PROGS :=3D \
->  	altnames.sh \
->  	amt.sh \
-> +	arp_no_invalid_sha_poision.sh \
+Program MAC_MAXIMUM_FRAME_SIZE, MAC_TRANSMIT_JABBER_SIZE, and
+MAC_RECEIVE_JABBER_SIZE based on the configured MTU. Also fix the
+maximum buffer size from 4096 to 4095, since the descriptor buffer
+size field is only 12 bits. Account for double VLAN tags in frame
+size calculations.
 
-alphabetical sort pls
+Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tomas Hlavacek <tmshlvck@gmail.com>
+---
+v3:
+- Set all three frame/jabber registers, fix 12-bit buffer size field
+  overflow, use actual frame size with VLAN headroom consistently.
 
->  	arp_ndisc_evict_nocarrier.sh \
->  	arp_ndisc_untracked_subnets.sh \
->  	bareudp.sh \
+v2: https://lore.kernel.org/netdev/20260126171449.83288-1-tmshlvck@gmail.com/
+- Added Fixes tag and Cc stable.
 
-> +readonly V4_ADDR0=3D"10.0.10.1"
-> +readonly V4_ADDR1=3D"10.0.10.2"
-> +readonly BCAST_MAC=3D"ff:ff:ff:ff:ff:ff"
-> +readonly MCAST_MAC=3D"01:00:5e:00:00:00"
-> +readonly NULL_MAC=3D"00:00:00:00:00:00"
-> +readonly VALID_MAC=3D"02:01:02:03:04:05"
-> +readonly ARP_REQ=3D1
-> +readonly ARP_REPLY=3D2
-> +nsid=3D100
+v1: https://lore.kernel.org/netdev/20260126135919.77168-1-tmshlvck@gmail.com/
+---
+ drivers/net/ethernet/spacemit/k1_emac.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-unused? (please run shellcheck)
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+index 220eb5ce7583..cd6879d7434c 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -12,6 +12,7 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
++#include <linux/if_vlan.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+@@ -38,7 +39,7 @@
+ 
+ #define EMAC_DEFAULT_BUFSIZE		1536
+ #define EMAC_RX_BUF_2K			2048
+-#define EMAC_RX_BUF_4K			4096
++#define EMAC_RX_BUF_MAX			FIELD_MAX(RX_DESC_1_BUFFER_SIZE_1_MASK)
+ 
+ /* Tuning parameters from SpacemiT */
+ #define EMAC_TX_FRAMES			64
+@@ -202,8 +203,7 @@ static void emac_init_hw(struct emac_priv *priv)
+ {
+ 	/* Destination address for 802.3x Ethernet flow control */
+ 	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
+-
+-	u32 rxirq = 0, dma = 0;
++	u32 rxirq = 0, dma = 0, frame_sz;
+ 
+ 	regmap_set_bits(priv->regmap_apmu,
+ 			priv->regmap_apmu_offset + APMU_EMAC_CTRL_REG,
+@@ -228,6 +228,15 @@ static void emac_init_hw(struct emac_priv *priv)
+ 		DEFAULT_TX_THRESHOLD);
+ 	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
+ 
++	/* Set maximum frame size and jabber size based on configured MTU,
++	 * accounting for Ethernet header, double VLAN tags, and FCS.
++	 */
++	frame_sz = priv->ndev->mtu + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
++
++	emac_wr(priv, MAC_MAXIMUM_FRAME_SIZE, frame_sz);
++	emac_wr(priv, MAC_TRANSMIT_JABBER_SIZE, frame_sz);
++	emac_wr(priv, MAC_RECEIVE_JABBER_SIZE, frame_sz);
++
+ 	/* Configure flow control (enabled in emac_adjust_link() later) */
+ 	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
+ 	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
+@@ -924,14 +933,14 @@ static int emac_change_mtu(struct net_device *ndev, int mtu)
+ 		return -EBUSY;
+ 	}
+ 
+-	frame_len = mtu + ETH_HLEN + ETH_FCS_LEN;
++	frame_len = mtu + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
+ 
+ 	if (frame_len <= EMAC_DEFAULT_BUFSIZE)
+ 		priv->dma_buf_sz = EMAC_DEFAULT_BUFSIZE;
+ 	else if (frame_len <= EMAC_RX_BUF_2K)
+ 		priv->dma_buf_sz = EMAC_RX_BUF_2K;
+ 	else
+-		priv->dma_buf_sz = EMAC_RX_BUF_4K;
++		priv->dma_buf_sz = EMAC_RX_BUF_MAX;
+ 
+ 	ndev->mtu = mtu;
+ 
+@@ -2005,7 +2014,7 @@ static int emac_probe(struct platform_device *pdev)
+ 	ndev->hw_features = NETIF_F_SG;
+ 	ndev->features |= ndev->hw_features;
+ 
+-	ndev->max_mtu = EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
++	ndev->max_mtu = EMAC_RX_BUF_MAX - (ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN);
+ 	ndev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
+ 
+ 	priv = netdev_priv(ndev);
+-- 
+2.52.0
 
-> +ret=3D0
-> +veth0_ifindex=3D0
-> +veth1_mac=3D
-
-> diff --git a/tools/testing/selftests/net/arp_send.c b/tools/testing/selft=
-ests/net/arp_send.c
-> new file mode 100644
-
-Could you check if mausezahn from netsniff-ng can send these
-packets already? We already depend on mausezahn for other tests.
-
-Similar comments on patch 4, I'm not gonna repeat.
 
