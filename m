@@ -1,221 +1,171 @@
-Return-Path: <netdev+bounces-254670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPCaN/Ije2nXBgIAu9opvQ
-	(envelope-from <netdev+bounces-254670-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:10:10 +0100
+	id qLKhFwIke2nXBgIAu9opvQ
+	(envelope-from <netdev+bounces-254671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:10:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F0BADF25
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:10:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B94ADF2C
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FACA300879B
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:10:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6872F30039BA
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA79B2DB79A;
-	Thu, 29 Jan 2026 09:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E3F376BD4;
+	Thu, 29 Jan 2026 09:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S523vRyn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xGP5rYpl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84CF23E356
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 09:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F9525771
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 09:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769677804; cv=none; b=IRphlOKszEQ9hoYnrIfneZOkfpCUklmk3kwHFq9jawS4m7Pxxlvn+0F9JJLI7wn0NQIDXrBntwep2u55fwVAaiyqFmEJHi7RNUQnu5MJWLEAjRIMuso4xBWukFAIVjbz9U+RLwsdRdZkwxQM9ZEm0i3CA3T6Gw3t9hRGNaQsc9g=
+	t=1769677824; cv=none; b=qkLqEe5bDa6jCYnw7oDXeBGfNFKXiKIEQy4Ia4KAG8loV3Z8gHWnqJRVXs6SylBhXxI/pDBi/DJPUQrNIeiC1TKzIjWEkmTPfJM6fyWepekUUFfoYcuYL6CVOEOxGsg/ns5EJ7EzDxV/hPvwKYLicKV499WSAC6f4lZhn+rv9BQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769677804; c=relaxed/simple;
-	bh=76zIBPU9JUdTpnHC/NoQParoOAOGM2ybYTXpnD4JwwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GOORCOgf3KiYPx2M+eDDXH0qKqmM9moJjzE4bcrUbZZdX1Aa+ArglDTYa2csUo1ncC+bXDKE72EibMuNq1WZcX7h2qj35Z+K/28S94LSZBwYk0erdyEYrw5PFH5etazPwlm64K9Nx43JZl6Os5tbAsJGQQqZcwauX0U0RqjQ9L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S523vRyn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C37C4CEF7;
-	Thu, 29 Jan 2026 09:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769677804;
-	bh=76zIBPU9JUdTpnHC/NoQParoOAOGM2ybYTXpnD4JwwA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S523vRyneLWWGOmArkjf+WmU889uJURI1qn208B4p7xI99/ZTXxt0b+ffr72x/dFC
-	 gk5UlOgRQswEqh+Auu0cZXlDMOShmcIMuL+XEIsdcB6n0VLY0NNGQx9XBy00J9FTqH
-	 b+uepOT+o5jq1kBu6cu9H0ECMS/yWbcGa8+xnGDKOycnmCSYPfYUZWIz1qs4WwV/t1
-	 OBPHQPdg/OtaA11pWa+G5saghPgTQAxiuSw9nhjL/xxhrUnL/ql5M0PzqG4dP3GJXU
-	 4I0JfZ6nARgdkEaiKfSNKSsgyqgec9VrewaVnByRwf9vToLb8lJF1q10QNlqw+Qfan
-	 /pSkOaJxcF50w==
-Date: Thu, 29 Jan 2026 11:09:59 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Ilan Tayari <ilant@mellanox.com>,
-	Guy Shapiro <guysh@mellanox.com>,
-	Yossi Kuperman <yossiku@mellanox.com>,
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH net] xfrm: always flush state and policy upon
- NETDEV_DOWN/NETDEV_UNREGISTER events
-Message-ID: <20260129090959.GD10992@unreal>
-References: <1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp>
- <20260128102404.GC12149@unreal>
- <83d06aca-4437-4d61-9c99-ac19b797a243@I-love.SAKURA.ne.jp>
- <20260128123546.GC40916@unreal>
- <b91432c3-5ed4-4669-8d7c-02cf7ea6f8fa@I-love.SAKURA.ne.jp>
+	s=arc-20240116; t=1769677824; c=relaxed/simple;
+	bh=Y8QjYEV2e+XLKh7ojdJJWgjzgGZijPNGPijAgdPuByE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t725+CoYUE8XPz/H0/FUJgm3QEupvew5Rga427XBnyBy45/NgdoUO7Fjr0m0MBKQY8vehPYNpsTAFScPpiK6vNSMICxI2dG8pHNPa9zkf16Z5JMP4zaPNXazQje69OwOPmYcSH1iJMSilsWhJ9kWKrgspCa95L13EVZIOGbr17A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xGP5rYpl; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 72D711A2AD3;
+	Thu, 29 Jan 2026 09:10:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 43A83606B6;
+	Thu, 29 Jan 2026 09:10:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0ADE4119A868D;
+	Thu, 29 Jan 2026 10:10:12 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769677819; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=8ubz8mQbuyDAcwX3mFPA+MVyZlmeRo18IJrG9xjq+pc=;
+	b=xGP5rYplEB20A8KcokwjmQhMpvN5z57UzjpHWAyKzEPnTpNRFgpPsxzW8rmTs9xu2rpX4u
+	8m1RssvjFUxZUIk/hmnPa4LtUuJkacfq358LWBCBrElNswu/K6faMrDsERDSQ/fLa+AD2u
+	PTOoJr5PTtpnB18zobTMw+DaMTickoqljHj6FYfs+sUHfAwvoVu7gH2Eu8NmUobInF/kjv
+	eMUObQ8d47Q+nTbEUnBaVaAO+SfiimJ/GJ1WxstGTMYzErmtIVwO585n3yV9worLQQvuXa
+	yt02Ky0XQzbZCp5I/7omTEJIqAEmMv5TNGWurpnAYwxj0ijO1/ysqEXYmiMQAg==
+Message-ID: <7df10272-a06b-4509-ab8a-519d43944424@bootlin.com>
+Date: Thu, 29 Jan 2026 10:10:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b91432c3-5ed4-4669-8d7c-02cf7ea6f8fa@I-love.SAKURA.ne.jp>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: add device link between MAC device and MDIO
+ device
+To: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, florian.fainelli@broadcom.com,
+ xiaolei.wang@windriver.com, quic_abchauha@quicinc.com,
+ quic_sarohasa@quicinc.com
+Cc: imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260126104409.1070403-1-wei.fang@nxp.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260126104409.1070403-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-254671-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254670-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,windriver.com,quicinc.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B4F0BADF25
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 05B94ADF2C
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 05:06:08PM +0900, Tetsuo Handa wrote:
-> On 2026/01/28 21:35, Leon Romanovsky wrote:
-> > On Wed, Jan 28, 2026 at 07:44:02PM +0900, Tetsuo Handa wrote:
-> >> On 2026/01/28 19:24, Leon Romanovsky wrote:
-> >>> I think this can work, but IMHO the more robust approach is to ensure that all
-> >>> states and policies are removed when the NETIF_F_HW_ESP feature bit is cleared.
-> >>
-> >> The transaction will become complicated, for dev->features manipulation
-> >> function can fail.
-> > 
-> > Line above returning NOTIFY_OK, check that NETIF_F_HW_ESP is cleared,
-> > and remove everything.
-> 
-> That answer needs more clarification. I came to get confused about what we should do.
-> 
-> Question 1:
-> 
->   Since NETIF_F_HW_ESP is a hardware dependent flag, not all "struct net_device"
->   support NETIF_F_HW_ESP flag. Is this interpretation correct?
+Hi
 
-Yes, however any device (SW or HW) should set this flag if they want to
-provide IPsec offload.
-
+[...]
 > 
-> Question 2:
-> 
->   Sabrina Dubroca commented
-> 
->     But the current behavior ("ignore NETIF_F_HW_ESP and call
->     xdo_dev_state_add for new states anyway") has been established for
->     multiple years. Changing that now seems a bit risky.
-> 
->   at https://lkml.kernel.org/r/aXd3QjzwOVm0Q9LF@krikkit .
-> 
->   Is that comment saying that we have been permitting a "struct net_device"
->   to be selected by xfrm_dev_state_add() even if that "struct net_device"
->   does not support NETIF_F_HW_ESP flag. Is this interpretation correct?
-
-I don't understand what does it mean "device doesn't support offload but
-state was offloaded anyway".
-
-> 
-> Question 3:
-> 
->   Leon Romanovsky suggested that, as a more robust approach, remove all states
->   and policies when the NETIF_F_HW_ESP feature bit is cleared.
-> 
->   But I consider that such approach will not work, for (according to Q2 above)
->   xfrm_dev_state_add() can be called even if the NETIF_F_HW_ESP feature bit is not
->   set. Also, I think that there is no guarantee that dev->features manipulation
->   function is called after xfrm_dev_state_add() was called.
-> 
->   Therefore, we need an event that are guaranteed to be called.
->   The NETDEV_UNREGISTER event is guaranteed to be called when unregistring
->   a "struct net_device", and therefore a good place to remove all states and
->   policies.
-> 
->   Is this interpretation correct?
-> 
-> Question 4:
-> 
->   If Q1 is correct, Sabrina's comment
-> 
->     Changing that now seems a bit risky.
-> 
->   in Q2 might be applicable to xfrm_dev_down().
-> 
->   That is, someone who is using xfrm with a !NETIF_F_HW_ESP hardware might be
->   expecting that state and policy are not flushed upon NETDEV_DOWN event.
-
-Do we have such in-tree devices? If the answer is no, you shouldn't be
-worried about that case.
-
-> 
->   If there is such possibility, I think we should avoid changing xfrm_dev_down()
->   and instead re-introduce xfrm_dev_unregister(). What do you think?
-> 
->  net/xfrm/xfrm_device.c |   12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index 52ae0e034d29..550457e4c4f0 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -544,6 +544,14 @@ static int xfrm_dev_down(struct net_device *dev)
->  	return NOTIFY_DONE;
->  }
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 81984d4ebb7c..d5ac7506fe39 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -1768,12 +1768,21 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 >  
-> +static int xfrm_dev_unregister(struct net_device *dev)
-> +{
-> +	xfrm_dev_state_flush(dev_net(dev), dev, true);
-> +	xfrm_dev_policy_flush(dev_net(dev), dev, true);
-> +
-> +	return NOTIFY_DONE;
-> +}
-> +
->  static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void *ptr)
->  {
->  	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-> @@ -556,8 +564,10 @@ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void
->  		return xfrm_api_check(dev);
->  
->  	case NETDEV_DOWN:
-> -	case NETDEV_UNREGISTER:
->  		return xfrm_dev_down(dev);
-> +
-> +	case NETDEV_UNREGISTER:
-> +		return xfrm_dev_unregister(dev);
->  	}
->  	return NOTIFY_DONE;
->  }
-> 
-> 
+>  	/**
+>  	 * If the external phy used by current mac interface is managed by
+> -	 * another mac interface, so we should create a device link between
+> -	 * phy dev and mac dev.
+> +	 * another MDIO controller, which means that the MAC and MDIO are
+> +	 * separated devices, then we should create a device link between
+> +	 * the MAC device and the MDIO device.
+>  	 */
+
+I was confused by the use of the "MDIO device" terminology here, which
+refers to a device sitting on an mdio bus, such as a PHY. I think though
+that what you actually refer to is the MDIO controller itself, right ?
+
+> -	if (dev && phydev->mdio.bus->parent && dev->dev.parent != phydev->mdio.bus->parent)
+> -		phydev->devlink = device_link_add(dev->dev.parent, &phydev->mdio.dev,
+> -						  DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
+> +	if (dev && phydev->mdio.bus->parent &&
+> +	    dev->dev.parent != phydev->mdio.bus->parent) {
+> +		if (!device_link_add(dev->dev.parent, phydev->mdio.bus->parent,
+> +				     DL_FLAG_PM_RUNTIME |
+> +				     DL_FLAG_AUTOREMOVE_SUPPLIER)) {
+
+Don't we have the same problem with SFP ? The struct mii_bus for SFP
+PHYs also completely disappears when you remove the module.
+
+That being said, I ran some tests with SFP and this patch, and the
+netdev actually didn't dissapear under my feet.
+
+I'm a total noob with fw_devlink, but I can see there seems to already
+be a link between MAC devices and the associated SFP bus :
+
+on cyclone V :
+
+# ls /sys/class/devlink
+ [...]
+platform:sfp--platform:ff702000.ethernet
+
+on macchiatobin :
+
+# ls /sys/class/devlink
+ [...]
+platform:sfp-eth3--platform:f4000000.ethernet
+
+So I guess this is what's preventing the netdev from going away.
+
+Now, these seems to be automagically populated based on DT, but I don't
+know if it also works with non-DT platforms. If this is DT-specific,
+then I guess we still can't use DL_FLAG_AUTOREMOVE_SUPPLIER.
+
+Maxime
+
 
