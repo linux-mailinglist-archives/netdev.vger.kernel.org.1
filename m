@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-254687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFbqHtUze2lJCQIAu9opvQ
-	(envelope-from <netdev+bounces-254687-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:17:57 +0100
+	id GDV0NIwze2lJCQIAu9opvQ
+	(envelope-from <netdev+bounces-254688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:16:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E08DCAE7CA
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:17:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F3BAE778
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 11:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74E7930398A3
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:16:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0E171300A320
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 10:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8509133B6D0;
-	Thu, 29 Jan 2026 10:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F80340A4D;
+	Thu, 29 Jan 2026 10:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0YPloFl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fn1LsHnT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC27433D6FA
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C34327C0F
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769681784; cv=none; b=mbETHtdn7IwZCoZMbyVb+GutQvrMXlNHMcu/brU167OPFVfxkqACklpUWSzgr0H0k/Pl5VCjzJNlICRBECAQICrjd1WIRp7NFSwX+C5TgUE4j3G3bWfs+X8aeRt/ME7n8D7DbFy1gznvHEicZUvvRfDSOsdO0/kgzaX3WNENf48=
+	t=1769681786; cv=none; b=eXgxWJ+ENQXIBQhbXBIfP4yk3lezIoftab7j3Lu4bjiy5UinuOWb6gR8q6IcxxnwTRW5s/MHKRPm3wo5dRXnhvFI9JlutXlBDCJEXpk2ScsnFpBiqpi8e2ULsXIoCtEOCEBsVQYuFc+HMB/i1uf3kN3Mqi+0VWkdZBJJemsc8I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769681784; c=relaxed/simple;
-	bh=Se0P0dL3b3W51U6MVaZg7UsTm1e1L6pVdlM/Sha3Lt8=;
+	s=arc-20240116; t=1769681786; c=relaxed/simple;
+	bh=J/SoU3MkP2MY74o7Q2lAtkpaITboiBABKZxNYr/6I5g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uXGZwE/8xhO6kPXC9nMUJwyGXkvLrvFHPeuoOoxsaHzvAzLlBLnav9tziEu15H5OGpG/lUkpxEamCLRzt2Hmqk5qZiqhLV++4Ph7bqWp4Q5sFvPmJkrZ1G/Gv735R3ZF0/jVRPdnhG+/u5gw/8ccQfJVS0D3jiZM+yLpANzU3WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O0YPloFl; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version; b=ZWF8eyaQwvqKuoJzn338fUFfijRfBeB3hBfErCUKQulxEhxie7emjVZLoYvKcdC9xfy0p9+vkX3ic1WqdD1Rg0LBV7wHPSHlOH9BEBnMXvOSZxAQ7HD3jXIXR4pK5wl9uvXvO2+jX+1E5UpcA0EuO0TIvyfJPmvmljWGP3mJHLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fn1LsHnT; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4327555464cso638132f8f.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 02:16:22 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4806f3fc50bso7618885e9.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 02:16:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769681781; x=1770286581; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769681783; x=1770286583; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q3zK/4SLK4ukG/iXcIDXnPvimWgfkq6O3gX4ZLAuWM8=;
-        b=O0YPloFlDnRYZu4IX+w+ZGUpRdZQXQyXxneVKYh1Jr7ij15mi8Bgc1i1SzErkHUX9m
-         TaWXiFwk+a1eIS7t1i2yoYJHTB8qrgG353kCAdISPuLTEzbN8TV8OEHQCFKtCwJontM7
-         urnNag0HN2t9ZUg0F6GCtNLxN4IaN5jYXbhZCbQ/bi7RqoQZeDcEl3+vGPMehmsrYlrv
-         ZrTse5y4l+MAige5Ql8s9JVnZNHVjh3VM7x1FmGT3ZZo8YBrjEknXUfpGHW9PMCPT4Tw
-         0EyiVwUUde8E0ac9ZBbcj81/WLEB64O+0aYLAcWzWdjTOp4KA0n6VUNuig0xRo4qN7OO
-         02Yg==
+        bh=scwnG4+Nck1/cLGODsLX+wXP9q98UaUDMSFVIL+kckU=;
+        b=Fn1LsHnTZZuhO9s7j0iy8OLAOxLuTxc4NaiAm8OWogllw+3qIdTsjIrrLkumJZbYQP
+         uc10GKVQX042Q1nfopJ6X9cSZcBnejfFHwB8RIMfhpoasVq/AuhiHbyT7313Dm7d+mCl
+         yKh/OaIlCahvOQXlhSXCqlqBfnQ0s7nioVwho/6zDIScwqqLx784TtCgbsmJZRBwjUeL
+         0o0oXosFizz4ZI/ArNkSyG+c1PSBQLdX5LL4SsjsO9RZbj1S6lbbWw5F4cx9V1+WHg53
+         7nbZWohnXrE2Eic2UAozRFm8dcYA6xG69ScnwGNrquj4kzIHCNNCFq/Zuh8i8GOWZlqA
+         ajig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769681781; x=1770286581;
+        d=1e100.net; s=20230601; t=1769681783; x=1770286583;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=q3zK/4SLK4ukG/iXcIDXnPvimWgfkq6O3gX4ZLAuWM8=;
-        b=e85QGGcxIhz/RrR0mAHtfZtS+/Kb/uyRz7yz9FxhiWPh+wASgcHp77ppl7/VDuWgho
-         0zHjQ5RGfDZRO5s1intkiwtOAEMxFmBl3w0K3eipp4ou6eKSEO+IEBMHkUwTrUpKiTYE
-         wtKK8jg9hPcx4MVOQYVcTDqs9R/SvMn3Fdo7ZjO2M8tZS6psvk7FOqQQzlH/fiasnCyK
-         jPTF/5jhwehzohsQxbTeCTTH+WlRuf2JWAAj/y/ig6dSAtzrzBMfr33Lr7gnX2lhco8C
-         MmyRRzo0WA9z9Vs96FwESawNOypKxRPDMdNzK8wURJn6VJvd1JDcFCfXFJLB6pNiUM78
-         bjOg==
-X-Gm-Message-State: AOJu0YwQW78RKk+dz45c5WbECGyMyDhtyY9xyqjQnRpJoKwvon82X2qI
-	7SiHkmGfm2+1H834ouJKDsw6+Ii7EXpNsCaMFAU1GEMm8QjttyUlq972
-X-Gm-Gg: AZuq6aLVCwwQJ52TqB7uztnDE7h4VoV+t+KphvlJeGLwn9VsZ7W+C4KWQyg9thyJCsK
-	6DcG5CGssMgS9gIRcM1KAcsxSRSnFEC7aqV/XFvqMZ7eY6EEe2XYY+UMEY2YiS8s2Mi2r+rovO2
-	Dkgl3rgplnNCfFGM7mAocZeRohgNcOaeb2Dq6GI5wNTPNRUuyuYkfqoPBwYxwtSVxE41vwqbu1f
-	+r1k5aMwtGI47r7/SIuFuYy8eIo3BEODNnGqIgLcnB6YqTXNeCCKOEhhpp+Zg7jM+TZgpcfWcnQ
-	7q/as8dR0F4Se1kqqpTDuySKOoC4xM0vNZwPV3rHBRL50Gh7SeBRCJk0CYf53Pj4EUHppoAxHSF
-	imLYy5FmeU5S7tw62qM7YQGCAk98vF3Hy2BkTPqa2felAs7u5UzmgoXsg/HieG4RWzUrDpbTYr5
-	XyNYwnUzYHMAE=
-X-Received: by 2002:a05:6000:2907:b0:435:bcfe:b11 with SMTP id ffacd0b85a97d-435dd05c94dmr11343793f8f.18.1769681781211;
-        Thu, 29 Jan 2026 02:16:21 -0800 (PST)
+        bh=scwnG4+Nck1/cLGODsLX+wXP9q98UaUDMSFVIL+kckU=;
+        b=T9WhFl6yIM5lPL3X9EjZFcBGoPm/wCA2qy0TBnpl6ru9VIO0IrwvIFJCvHp3RdGp50
+         XqJcf6oPe3H3wUEDqriSiPSXD4Rcp81uqHKNQhMzjtn+Y/Ii/RqVZKqvln469iIfu+Xk
+         lJzKP+l6CmNmm8YNBx5vP3XYbiKhap6jfc5sPv5y6SbCTlWFEZkodwf13fsoZHaR4JbK
+         jvkTrfCb2nVRRM6oiEyE57e6qefKabMIqEvC69l4h6pxEbwmy8K5rU2w7J7gYTRNAWxl
+         EKNHtZ10gpEoOOD/z8K2V3sNOs6Us/XfIpf5qTaRnjKocTKC53LxBkLmKas/UJWDDs8Z
+         yJFg==
+X-Gm-Message-State: AOJu0YyUK1Nx7ZGdtgJPK4DLEqIynwFdDvYKJjtsc1/0XMslVAXGH/Jc
+	PTqsllRCNrJ+PwhXg2uF8EdPi4ccrGYxOU4PyYpm85TD3DlNAnOoOsPU
+X-Gm-Gg: AZuq6aKsHCCVUszLoye/ALHrAq4f/A/Nv5OH4BT9Sw6skTGsuhIgFgi7cxXVBx8tvL2
+	5Ca00VofXfW22sq2pnrOL9LFJCaU9DozzOg8uwkrUl/PHx+BdqZsrkTQ+mmQ8Gy0/ynxHOOdKOQ
+	BaoHjLJLp3Nt7PkPkACz/jF65SgbH2MvjaD4CsFybwW9ZZAcKtknUOSvQW8DbKaiXF7jtznDeSH
+	jyVIJd4gh+NEocp2fpEYMxP4+urI+xx1aHRlii2e+S+lnjHRHJEc+WoVKuzQl9+LG0hRcjjToR3
+	UUMg67CNnMqSJ8NbeUdsbJfaR5GiGZMa4HFRd2qoCk1WywQIkUCFfNB5+PL8fJKgIj5CHbcT3Zn
+	pmR9Cy8SQiF8HiyMO83Vpg1cKyNjh6SLxCC1+nOEhIeFEHS9OgsmvQ4uAtAAfk+vdUk37EPeuuy
+	r55Z4peEDQuik=
+X-Received: by 2002:a05:600c:8b84:b0:47e:e78a:c832 with SMTP id 5b1f17b1804b1-48069c82494mr90663755e9.37.1769681783205;
+        Thu, 29 Jan 2026 02:16:23 -0800 (PST)
 Received: from nas.local ([2001:912:1ac0:1e00:c662:37ff:fe09:93df])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e132303fsm13413662f8f.36.2026.01.29.02.16.20
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e132303fsm13413662f8f.36.2026.01.29.02.16.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 02:16:20 -0800 (PST)
+        Thu, 29 Jan 2026 02:16:22 -0800 (PST)
 From: Damien Dejean <dam.dejean@gmail.com>
 To: andrew@lunn.ch,
 	krzk+dt@kernel.org,
@@ -88,9 +88,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	hkallweit1@gmail.com,
 	Damien Dejean <dam.dejean@gmail.com>
-Subject: [PATCH v4 3/4] dt-bindings: net: ethernet-phy: add property enet-phy-lane-polarity
-Date: Thu, 29 Jan 2026 11:16:05 +0100
-Message-ID: <20260129101606.33972-3-dam.dejean@gmail.com>
+Subject: [PATCH v4 4/4] net: phy: realtek: add RTL8224 polarity support
+Date: Thu, 29 Jan 2026 11:16:06 +0100
+Message-ID: <20260129101606.33972-4-dam.dejean@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260129101606.33972-1-dam.dejean@gmail.com>
 References: <20260129101606.33972-1-dam.dejean@gmail.com>
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -117,10 +117,10 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254687-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254688-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[damdejean@gmail.com,netdev@vger.kernel.org];
@@ -131,42 +131,86 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E08DCAE7CA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A9F3BAE778
 X-Rspamd-Action: no action
 
-Add the property enet-phy-lane-polarity to describe the polarity of the
-PHY lanes. To ease PCB designs some manufacturers allow to wire the
-pairs with a reverse polarity and provide a way to configure it.
+The RTL8224 has a register to configure the polarity of every pair of
+each port. It provides device designers more flexbility when wiring the
+chip.
 
-The property 'enet-phy-lane-polarity' sets the polarity of each pair.
-Bit 0 to 3 configure the polarity or pairs A to D, if set to 1 the
-polarity is reversed for this pair.
+Unfortunately, the register is left in an unknown state after a reset.
+Thus on devices where the bootloader don't initialize it, the driver has
+to do it to detect and use a link.
+
+The MDI polarity swap can be set in the device tree using the property
+enet-phy-lane-polarity. The u32 value is a bitfield where bit[0..3]
+control the polarity of pairs A..D.
 
 Signed-off-by: Damien Dejean <dam.dejean@gmail.com>
 ---
- Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/net/phy/realtek/realtek_main.c | 39 +++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-index 8347d4e134d2..67747493352b 100644
---- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-@@ -132,6 +132,14 @@ properties:
-     description:
-       For normal (0) or reverse (1) order of the pairs (ABCD -> DCBA).
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 79c2762b610e..8013ba453f05 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -172,6 +172,7 @@
+ #define RTL8224_SRAM_RTCT_LEN(pair)		(0x8028 + (pair) * 4)
  
-+  enet-phy-lane-polarity:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    maximum: 0xf
-+    description:
-+      A bitmap to describe pair polarity swap. Bit 0 to swap polarity of pair A,
-+      bit 1 to swap polarity of pair B, bit 2 to swap polarity of pair C and bit
-+      3 to swap polarity of pair D.
+ #define RTL8224_VND1_MDI_PAIR_SWAP		0xa90
++#define RTL8224_VND1_MDI_POLARITY_SWAP		0xa94
+ 
+ #define RTL8366RB_POWER_SAVE			0x15
+ #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+@@ -1855,9 +1856,45 @@ static int rtl8224_mdi_config_order(struct phy_device *phydev)
+ 				       RTL8224_VND1_MDI_PAIR_SWAP, val);
+ }
+ 
++static int rtl8224_mdi_config_polarity(struct phy_device *phydev)
++{
++	struct device_node *np = phydev->mdio.dev.of_node;
++	u8 port_offset = phydev->mdio.addr & 3;
++	u32 polarity = 0;
++	int ret, val;
 +
-   eee-broken-100tx:
-     $ref: /schemas/types.yaml#/definitions/flag
-     description:
++	ret = of_property_read_u32(np, "enet-phy-lane-polarity", &polarity);
++
++	/* Do nothing if the property is not present */
++	if (ret == -EINVAL)
++		return 0;
++
++	if (ret)
++		return ret;
++
++	if (polarity & ~0xf)
++		return -EINVAL;
++
++	val = __phy_package_read_mmd(phydev, 0, MDIO_MMD_VEND1,
++				     RTL8224_VND1_MDI_POLARITY_SWAP);
++	if (val < 0)
++		return val;
++
++	val &= ~(0xf << port_offset);
++	val |= polarity << port_offset;
++	return __phy_package_write_mmd(phydev, 0, MDIO_MMD_VEND1,
++				       RTL8224_VND1_MDI_POLARITY_SWAP, val);
++}
++
+ static int rtl8224_config_init(struct phy_device *phydev)
+ {
+-	return rtl8224_mdi_config_order(phydev);
++	int ret;
++
++	ret = rtl8224_mdi_config_order(phydev);
++	if (ret)
++		return ret;
++
++	return rtl8224_mdi_config_polarity(phydev);
+ }
+ 
+ static int rtl8224_probe(struct phy_device *phydev)
 -- 
 2.47.3
 
