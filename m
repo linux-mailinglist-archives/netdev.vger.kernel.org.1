@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-254926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHTdG4Tfe2kdJAIAu9opvQ
-	(envelope-from <netdev+bounces-254926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:30:28 +0100
+	id 2Ku6OaDfe2ljJAIAu9opvQ
+	(envelope-from <netdev+bounces-254929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:30:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C40A8B5517
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:30:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9C3B5535
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7444330427F3
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:29:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 083D030495C7
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC4636BCDD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5414836C0AA;
 	Thu, 29 Jan 2026 22:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="aDUtiXMv"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="h6uu9vgZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E40536B056;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7989D36B063;
 	Thu, 29 Jan 2026 22:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769725736; cv=none; b=qYCwj0miOgCFYV7wvL4BPbCCq2LC8u17pZZr2GQ32GTjloB/XJTZkDbJXrOx3gHX0ARalY8nq1UF/yx3gqEhHNCUbkdjvzMZk5GjEXZL0dcO2qP3s6mpPcHimvaryWJpuvnbz/55rpTZnu4zM3EQLVbmxmQD2OBqX9x6szbOMj4=
+	t=1769725737; cv=none; b=jXYOhcsLKnBwWuCgHB52VwD2VkrFL1BdQ6NshAaNfJOHbv4qOOgxdKa5Md0vxOLftCuLBf4EdpUtBWY/l+1+N8tCe5qrKEtcmAOm8pvsWU4XbEElQ+MPW6+AcIPuuxo3oJFW0Z7hwW3e5xevy4/YyBHAWHB7pqsElMpqSXJyCUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769725736; c=relaxed/simple;
-	bh=jGyDQtWtcC0cNRXWiZBwN2vxQJP2rZlpIRiaE6n2dQc=;
+	s=arc-20240116; t=1769725737; c=relaxed/simple;
+	bh=LBa0VT7VCDibgc5wrZA9kODKixJDxAoyWDlnCItGRzw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hwgAVDcdgXjmWYarh9orMjs7uoERqVTXxSC/kw3uVZFyXHaECuxkSuwjyqf68LAOj4sk6GBznGAtKALzJk5oE8PtfXdyvYgn91HSWTxN7rjlmB8x+vWqUFdw9JGqB6EAmrZvWUfemE0b1pLLivjVuH6RYSyHBHQ/qkHzvH4KM30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=aDUtiXMv; arc=none smtp.client-ip=213.133.104.62
+	 MIME-Version; b=Sw1pmpNDK8QtcSGPIV+a8A/LT/QAX0G3np7gJzPVxLVvSpUvpCktC5s7DhwavMpbY0L2fSd0GtD1V7OaPrS1sMXvrh6h7IfMdRllzvhFyYWxpPPzqQ0w3jgrDwj/1tAqJCspa9nFtK6xRGQj9wWd+NNCRyWHwyV2Z4GIy5rx7qE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=h6uu9vgZ; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=P3swmN9pFDPGlPd7bLV0qRVLYqCUoNxoL3L7ISSJO3o=; b=aDUtiXMvLEMb0udhYclgedbpNG
-	ImDC8/yZxbsA2GXC9G1+fI7oBC1IjjNXujBusP8sNwmLQ4GCRwmhHL3RW+CBbsmZGHqD9oWH29nLY
-	YG5mxIFpgBeZ/lU8Bw+Bn5GmWbGkg3iV6KdcWT5oB2wZ3VUMyghg2JwvseXJJAwRs4h4aVBtq2Fp1
-	yk6FXxkI4aRu/BmNcATkn+Vh2+9+fz6tLqIwnOVYm3LXz0hSFEWQW/j6mwoNLzmy18PtoQ4hc8/eV
-	oV7FtV9poUntDi2l/f5pIg5TgtOdWlU6zFDC8KneL6EJHdiVvtRs7g7vysjeJqIQ9l7BAYS6FGLF2
-	+HQTyurA==;
+	bh=BbtrNpjMEEX3CrWS99akLKiRj9FlJnmnV4Py3Vjg+JI=; b=h6uu9vgZaXTi5MPG91XnwvoR8Z
+	V2ErYw6RbfrU94Fmp11R05zVnYpDXtLXsj4WorZ6qg5ZkNiJt6te3uFWJDoZCcUpygjfoGrWLPrpt
+	74UGSKNpQGZB/PsSb2UgWzgVmPLJzZxHflW9NtZhg+GQwyVnPMr9TlxV22rALiyrYKXhirpAYVjIS
+	ukuSl4bUKW1GRn1TD6HOA3NJyiUiHFh7lcHyg9Sz8UN9y4rmreood9kYc9mrGdEMvgDqHopWUV4yn
+	FqfG9TMQyh7wgcmWBftL7ibLebSKxR5GUaHClyNe6ot1mpdQChIBMy2gFKcip6+LtInOLzF/YOHjr
+	5VTyJEig==;
 Received: from localhost ([127.0.0.1])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1vlaVF-0008pH-0U;
-	Thu, 29 Jan 2026 23:28:41 +0100
+	id 1vlaVG-0008pP-0q;
+	Thu, 29 Jan 2026 23:28:42 +0100
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: bpf@vger.kernel.org,
 	toke@redhat.com,
 	yangzhenze@bytedance.com,
 	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v8 08/16] xsk: Extend xsk_rcv_check validation
-Date: Thu, 29 Jan 2026 23:28:22 +0100
-Message-ID: <20260129222830.439687-9-daniel@iogearbox.net>
+Subject: [PATCH net-next v8 09/16] xsk: Proxy pool management for leased queues
+Date: Thu, 29 Jan 2026 23:28:23 +0100
+Message-ID: <20260129222830.439687-10-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260129222830.439687-1-daniel@iogearbox.net>
 References: <20260129222830.439687-1-daniel@iogearbox.net>
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254926-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254929-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
@@ -113,19 +113,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davidwei.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid,fomichev.me:email,blackwall.org:email]
-X-Rspamd-Queue-Id: C40A8B5517
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid,fomichev.me:email,davidwei.uk:email]
+X-Rspamd-Queue-Id: 4D9C3B5535
 X-Rspamd-Action: no action
 
-xsk_rcv_check tests for inbound packets to see whether they match
-the bound AF_XDP socket. Refactor the test into a small helper
-xsk_dev_queue_valid and move the validation against xs->dev and
-xs->queue_id there.
-
-The fast-path case stays in place and allows for quick return in
-xsk_dev_queue_valid. If it fails, the validation is extended to
-check whether the AF_XDP socket is bound against a leased queue,
-and if the case then the test is redone.
+Similarly to the net_mp_{open,close}_rxq handling for leased queues, proxy
+the xsk_{reg,clear}_pool_at_qid via netif_get_rx_queue_lease_locked such
+that in case a virtual netdev picked a leased rxq, the request gets through
+to the real rxq in the physical netdev. The proxying is only relevant for
+queue_id < dev->real_num_rx_queues since right now its only supported for
+rxqs.
 
 Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 Co-developed-by: David Wei <dw@davidwei.uk>
@@ -133,54 +130,84 @@ Signed-off-by: David Wei <dw@davidwei.uk>
 Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- net/xdp/xsk.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+ net/xdp/xsk.c | 48 +++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 35 insertions(+), 13 deletions(-)
 
 diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 67f32a249ecb..747865f9341d 100644
+index 747865f9341d..92f791433725 100644
 --- a/net/xdp/xsk.c
 +++ b/net/xdp/xsk.c
-@@ -324,14 +324,37 @@ static bool xsk_is_bound(struct xdp_sock *xs)
- 	return false;
+@@ -23,6 +23,8 @@
+ #include <linux/netdevice.h>
+ #include <linux/rculist.h>
+ #include <linux/vmalloc.h>
++
++#include <net/netdev_queues.h>
+ #include <net/xdp_sock_drv.h>
+ #include <net/busy_poll.h>
+ #include <net/netdev_lock.h>
+@@ -117,10 +119,18 @@ EXPORT_SYMBOL(xsk_get_pool_from_qid);
+ 
+ void xsk_clear_pool_at_qid(struct net_device *dev, u16 queue_id)
+ {
+-	if (queue_id < dev->num_rx_queues)
+-		dev->_rx[queue_id].pool = NULL;
+-	if (queue_id < dev->num_tx_queues)
+-		dev->_tx[queue_id].pool = NULL;
++	struct net_device *orig_dev = dev;
++	unsigned int id = queue_id;
++
++	if (id < dev->real_num_rx_queues)
++		WARN_ON_ONCE(!netif_get_rx_queue_lease_locked(&dev, &id));
++
++	if (id < dev->real_num_rx_queues)
++		dev->_rx[id].pool = NULL;
++	if (id < dev->real_num_tx_queues)
++		dev->_tx[id].pool = NULL;
++
++	netif_put_rx_queue_lease_locked(orig_dev, dev);
  }
  
-+static bool xsk_dev_queue_valid(const struct xdp_sock *xs,
-+				const struct xdp_rxq_info *info)
-+{
-+	struct net_device *dev = xs->dev;
-+	u32 queue_index = xs->queue_id;
-+	struct netdev_rx_queue *rxq;
-+
-+	if (info->dev == dev &&
-+	    info->queue_index == queue_index)
-+		return true;
-+
-+	if (queue_index < dev->real_num_rx_queues) {
-+		rxq = READ_ONCE(__netif_get_rx_queue(dev, queue_index)->lease);
-+		if (!rxq)
-+			return false;
-+
-+		dev = rxq->dev;
-+		queue_index = get_netdev_rx_queue_index(rxq);
-+
-+		return info->dev == dev &&
-+		       info->queue_index == queue_index;
-+	}
-+	return false;
-+}
-+
- static int xsk_rcv_check(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+ /* The buffer pool is stored both in the _rx struct and the _tx struct as we do
+@@ -130,17 +140,29 @@ void xsk_clear_pool_at_qid(struct net_device *dev, u16 queue_id)
+ int xsk_reg_pool_at_qid(struct net_device *dev, struct xsk_buff_pool *pool,
+ 			u16 queue_id)
  {
- 	if (!xsk_is_bound(xs))
- 		return -ENXIO;
--
--	if (xs->dev != xdp->rxq->dev || xs->queue_id != xdp->rxq->queue_index)
-+	if (!xsk_dev_queue_valid(xs, xdp->rxq))
- 		return -EINVAL;
--
- 	if (len > xsk_pool_get_rx_frame_size(xs->pool) && !xs->sg) {
- 		xs->rx_dropped++;
- 		return -ENOSPC;
+-	if (queue_id >= max_t(unsigned int,
+-			      dev->real_num_rx_queues,
+-			      dev->real_num_tx_queues))
+-		return -EINVAL;
++	struct net_device *orig_dev = dev;
++	unsigned int id = queue_id;
++	int ret = 0;
+ 
+-	if (queue_id < dev->real_num_rx_queues)
+-		dev->_rx[queue_id].pool = pool;
+-	if (queue_id < dev->real_num_tx_queues)
+-		dev->_tx[queue_id].pool = pool;
++	if (id >= max(dev->real_num_rx_queues,
++		      dev->real_num_tx_queues))
++		return -EINVAL;
++	if (id < dev->real_num_rx_queues) {
++		if (!netif_get_rx_queue_lease_locked(&dev, &id))
++			return -EBUSY;
++		if (xsk_get_pool_from_qid(dev, id)) {
++			ret = -EBUSY;
++			goto out;
++		}
++	}
+ 
+-	return 0;
++	if (id < dev->real_num_rx_queues)
++		dev->_rx[id].pool = pool;
++	if (id < dev->real_num_tx_queues)
++		dev->_tx[id].pool = pool;
++out:
++	netif_put_rx_queue_lease_locked(orig_dev, dev);
++	return ret;
+ }
+ 
+ static int __xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff_xsk *xskb, u32 len,
 -- 
 2.43.0
 
