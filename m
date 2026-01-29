@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-254923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254930-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IRZHUHfe2ljJAIAu9opvQ
-	(envelope-from <netdev+bounces-254923-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:29:21 +0100
+	id ELTXNuDfe2ljJAIAu9opvQ
+	(envelope-from <netdev+bounces-254930-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:32:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A50B54D2
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:29:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 496D3B55BD
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:32:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 493BA30210D9
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:28:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3AC94305CF4E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3967B36B04E;
-	Thu, 29 Jan 2026 22:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1745B36B060;
+	Thu, 29 Jan 2026 22:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="lbiWguvn"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JVx31r1e"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32D032571F;
-	Thu, 29 Jan 2026 22:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A69036BCF8;
+	Thu, 29 Jan 2026 22:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769725735; cv=none; b=CQo6A/O3AeCwpONGqMPZWXJfC2u8YV0Jk7xUZALDLjjAbCqW24UoCuiMySpZH2GmfUDiJSFUOMKu/+naSy1RFNJ/fhYdvSSJ/v6TZo4SR0eNQ+oBbrlyMV+0xjNydfQ8Ewd1eRndmRDp4g22T7Okm7jdasruFlz5dbmo2B/DCos=
+	t=1769725739; cv=none; b=FwhK+7NS5c0NHcOh9folIEyc6z59cP3oc3AMZsGb+Qx9x8M0FA9FPhvU9oR5bAkiMopgRasY0UV+tg0LUy5UE+vhwLdbdeQllkFqlo3fZVLjf/NO3v/Qq7bDCeWuk9eTJFubhwuSOY74QaQtkGuGz+WyP2uRrAZWEkWTPoWgd70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769725735; c=relaxed/simple;
-	bh=WPuF5LZ8152Wv6FX0PCRrh9Ta9GpC4sX2UOZqvvCbU8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YMq1AOFYd179cyjpSDZzzEbsoVILGSYvvlQYuRbooO1hfjyFSvelDUtFV60INKT4ynRhDrhzYV2OUqGRPpFF3RfsUMs04xSRp2usl2Jj/c+egJmFxJfLdkW3YUbO1RUX8HPlRf37jVyAxwHlw5Mohr5LduGcA2uWOuq7ht/ZUFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=lbiWguvn; arc=none smtp.client-ip=213.133.104.62
+	s=arc-20240116; t=1769725739; c=relaxed/simple;
+	bh=Xu5R6kglyxfujZd7d2yqKg0pjfYAupgN2FXVs2DSdkQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QEpIeESeE7bpipyxSFbKTz6EisCbSrozx2XJc9iYd7cqSfJFqsqC24o8J9VKMCC1W2ZjB/S+SptwXLlEm3Ar7xqGJTC+snGgovC2RTZAbZnwPzpOHh9jnIWhGkN2K5Hb6t/+JBb2Zdi4ON+9z1Pw5ND/rk1A9Mwby4SVUmqLzNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JVx31r1e; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=rXDRn8OqT0lUi72rpZaS2H0Wd+xni8iCaiH3Gg1xyZU=; b=lbiWguvnTzVSrHKsAfAmZ0aBhj
-	DxLPQI5AwHOQr0DqRNme191otBBkEt4w2/ESs2mghf7q/oSxJt72GcRdtxupwLuWKhnfCZiHiG2pg
-	uMA0ROwRxDY6wSdtQIjLXvZPRwBO98flDo91IrCJfnNAewHwnLZYq05X2G2Mq68jd0WmNjBpOn6cY
-	qY9Pmrh/4GtW+GIQzycIZnprKncvA8ubKHsw9DHDtHf4xiuot3CepbR2ALAVUq7ArP5ixTqTLj4og
-	mf1d2TJUs4RJxZ6tx8hJSqYyzwsgWE1P32llQazs0Kwv7O1ggy1lCne8XelU0Tj5tel//+jOPGbC3
-	iN9euUoQ==;
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=xKYxEdD3mx0Lm0HevCytFzTsmqFjvYSvcOiqnpgaBao=; b=JVx31r1eMxdZ9Jt1sbPO77tlv3
+	IVggDf2rWXzvaK1CyRWl6nEegjrwetcAo4M06wY93Es4Ob7MUssjNkvEjgI2mCfpZ7KxLrfqbbghe
+	oYfZcwyqBiOCfTcUFbyBC1xySlhQsRAnHPobDL/XZ/Yr51LibPfYMCig+o7nDE37ThqFG5zy7kzhZ
+	bRXoW0a5sMqQdvoRJ2FQmTPpH6XsTtlSVVauzN+L1fhvbG24jCvqeUzXF2NuOtL/WRDdA1Am6GiyI
+	AC3ajDXTOfrTdQ6yC2UPSgByPBIuI26tBAaZK5cEzofT0HVKFtqqiFKTFoI6e9j990ctb0MTDGvJl
+	6iKayUEQ==;
 Received: from localhost ([127.0.0.1])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1vlaV5-0008oR-2j;
-	Thu, 29 Jan 2026 23:28:31 +0100
+	id 1vlaV7-0008oY-0a;
+	Thu, 29 Jan 2026 23:28:33 +0100
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -68,10 +69,12 @@ Cc: bpf@vger.kernel.org,
 	toke@redhat.com,
 	yangzhenze@bytedance.com,
 	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v8 00/16] netkit: Support for io_uring zero-copy and AF_XDP
-Date: Thu, 29 Jan 2026 23:28:14 +0100
-Message-ID: <20260129222830.439687-1-daniel@iogearbox.net>
+Subject: [PATCH net-next v8 01/16] net: Add queue-create operation
+Date: Thu, 29 Jan 2026 23:28:15 +0100
+Message-ID: <20260129222830.439687-2-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260129222830.439687-1-daniel@iogearbox.net>
+References: <20260129222830.439687-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254923-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254930-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
@@ -110,153 +113,305 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:mid,iogearbox.net:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E2A50B54D2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid,fomichev.me:email,davidwei.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ebpf.io:url]
+X-Rspamd-Queue-Id: 496D3B55BD
 X-Rspamd-Action: no action
 
-Containers use virtual netdevs to route traffic from a physical netdev
-in the host namespace. They do not have access to the physical netdev
-in the host and thus can't use memory providers or AF_XDP that require
-reconfiguring/restarting queues in the physical netdev.
+Add a ynl netdev family operation called queue-create that creates a
+new queue on a netdevice:
 
-This patchset adds the concept of queue leasing to virtual netdevs that
-allow containers to use memory providers and AF_XDP at native speed.
-Leased queues are bound to a real queue in a physical netdev and act
-as a proxy.
+      name: queue-create
+      attribute-set: queue
+      flags: [admin-perm]
+      do:
+        request:
+          attributes:
+            - ifindex
+            - type
+            - lease
+        reply: &queue-create-op
+          attributes:
+            - id
 
-Memory providers and AF_XDP operations take an ifindex and queue id,
-so containers would pass in an ifindex for a virtual netdev and a queue
-id of a leased queue, which then gets proxied to the underlying real
-queue.
+This is a generic operation such that it can be extended for various
+use cases in future. Right now it is mandatory to specify ifindex,
+the queue type which is enforced to rx and a lease. The newly created
+queue id is returned to the caller.
 
-We have implemented support for this concept in netkit and tested the
-latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
-(bnxt_en) 100G NICs. For more details see the individual patches.
+A queue from a virtual device can have a lease which refers to another
+queue from a physical device. This is useful for memory providers
+and AF_XDP operations which take an ifindex and queue id to allow
+applications to bind against virtual devices in containers. The lease
+couples both queues together and allows to proxy the operations from
+a virtual device in a container to the physical device.
 
-v7->v8:
- - Rework and refactor net_mp_{open,close}_rxq patch (Jakub)
- - Moved queue lease netlink command from env into test (Jakub)
- - Support netns_id also in queue create call and not only dump
- - Rebase and retested everything with mlx5 + bnxt_en
-v6->v7:
- - Add xsk_dev_queue_valid real_num_rx_queues check given bound
-   xs->queue_id could be from a TX queue (AI review bot)
- - Fix up exception path in queue leasing selftest (AI review bot)
- - Rebase and retested everything with mlx5 + bnxt_en
-v5->v6:
- - Fix nest_queue test in netdev_nl_queue_fill_one (Jakub/AI review bot)
- - Fix netdev notifier locking leak (Jakub/AI review bot)
- - Drop NETREG_UNREGISTERING WARN_ON_ONCE to avoid confusion (Stan)
- - Remove slipped-in .gitignore cruft in net selftest (Stan)
- - Fix Pylint warnings in net selftest (Jakub)
- - Rebase and retested everything with mlx5 + bnxt_en
-v4->v5:
- - Rework of the core API into queue-create op (Jakub)
- - Rename from queue peering to queue leasing (Jakub)
- - Add net selftests for queue leasing (Stan, Jakub)
- - Move netkit_queue_get_dma_dev into core (Jakub)
- - Dropped netkit_get_channels (Jakub)
- - Moved ndo_queue_create back to return index or error (Jakub)
- - Inline __netdev_rx_queue_{peer,unpeer} helpers (Jakub)
- - Adding helpers in patches where they are used (Jakub)
- - Undo inline for netdev_put_lock (Jakub)
- - Factoring out checks whether device can lease (Jakub)
- - Fix up return codes in netdev_nl_bind_queue_doit (Jakub)
- - Reject when AF_XDP or mp already bound (Jakub)
- - Switch some error cases to NL_SET_BAD_ATTR() (Jakub)
- - Rebase and retested everything with mlx5 + bnxt_en
-v3->v4:
- - ndo_queue_create store dst queue via arg (Nikolay)
- - Small nits like a spelling issue + rev xmas (Nikolay)
- - admin-perm flag in bind-queue spec (Jakub)
- - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
- - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
- - New patch (12/14) to handle the underlying device going away (Jakub)
- - Improve commit message on queue-get (Jakub)
- - Do not expose phys dev info from container on queue-get (Jakub)
- - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
- - Rework xsk handling to simplify the code and drop a few patches
- - Rebase and retested everything with mlx5 + bnxt_en
-v2->v3:
- - Use netdev_ops_assert_locked instead of netdev_assert_locked (syzbot)
- - Add missing netdev_lockdep_set_classes in netkit
-v1->v2:
- - Removed bind sample ynl code (Stan)
- - Reworked netdev locking to have consistent order (Stan, Kuba)
- - Return 'not supported' in API patch (Stan)
- - Improved ynl documentation (Kuba)
- - Added 'max: s32-max' in ynl spec for ifindex (Kuba)
- - Added also queue type in ynl to have user specify rx to make
-   it obvious (Kuba)
- - Use of netdev_hold (Kuba)
- - Avoid static inlines from another header (Kuba)
- - Squashed some commits (Kuba, Stan)
- - Removed ndo_{peer,unpeer}_queues callback and simplified
-   code (Kuba)
- - Improved commit messages (Toke, Kuba, Stan, zf)
- - Got rid of locking genl_sk_priv_get (Stan)
- - Removed af_xdp cleanup churn (Maciej)
- - Added netdev locking asserts (Stan)
- - Reject ethtool ioctl path queue resizing (Kuba)
- - Added kdoc for ndo_queue_create (Stan)
- - Uninvert logic in netkit single dev mode (Jordan)
- - Added binding support for multiple queues
+In future, the nested lease attribute can be lifted and made optional
+for other use-cases such as dynamic queue creation for physical
+netdevs. The lack of lease and the specification of the physical
+device as an ifindex will imply that we need a real queue to be
+allocated. Similarly, the queue type enforcement to rx can then be
+lifted as well to support tx.
 
-Daniel Borkmann (10):
-  net: Add queue-create operation
-  net: Implement netdev_nl_queue_create_doit
-  net: Add lease info to queue-get response
-  net, ethtool: Disallow leased real rxqs to be resized
-  net: Slightly simplify net_mp_{open,close}_rxq
-  xsk: Extend xsk_rcv_check validation
-  xsk: Proxy pool management for leased queues
-  netkit: Add single device mode for netkit
-  netkit: Add netkit notifier to check for unregistering devices
-  netkit: Add xsk support for af_xdp applications
+An early implementation had only driver-specific integration [0], but
+in order for other virtual devices to reuse, it makes sense to have
+this as a generic API in core net.
 
-David Wei (6):
-  net: Proxy net_mp_{open,close}_rxq for leased queues
-  net: Proxy netdev_queue_get_dma_dev for leased queues
-  netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
-  selftests/net: Add bpf skb forwarding program
-  selftests/net: Add env for container based tests
-  selftests/net: Add netkit container tests
+For leasing queues, the virtual netdev must have real_num_rx_queue
+less than num_rx_queues at the time of calling queue-create. The
+queue-type must be rx as only rx queues are supported for leasing
+for now. We also enforce that the queue-create ifindex must point
+to a virtual device, and that the nested lease attribute's ifindex
+must point to a physical device. The nested lease attribute set
+contains a netns-id attribute which is optional and can specify a
+netns-id relative to the caller's netns. It requires cap_net_admin
+and if the netns-id attribute is not specified, the lease ifindex
+will be retrieved from the current netns. Also, it is modeled as
+an s32 type similarly as done elsewhere in the stack.
 
- Documentation/netlink/specs/netdev.yaml       |  44 +++
- drivers/net/netkit.c                          | 360 +++++++++++++++---
- include/linux/netdevice.h                     |   6 +
- include/net/netdev_queues.h                   |  19 +-
- include/net/netdev_rx_queue.h                 |  21 +-
- include/net/page_pool/memory_provider.h       |  14 +-
- include/net/xdp_sock_drv.h                    |   2 +-
- include/uapi/linux/if_link.h                  |   6 +
- include/uapi/linux/netdev.h                   |  11 +
- io_uring/zcrx.c                               |   4 +-
- net/core/dev.c                                |   7 +
- net/core/dev.h                                |   2 +
- net/core/devmem.c                             |   6 +-
- net/core/netdev-genl-gen.c                    |  20 +
- net/core/netdev-genl-gen.h                    |   2 +
- net/core/netdev-genl.c                        | 208 ++++++++++
- net/core/netdev_queues.c                      |  74 +++-
- net/core/netdev_rx_queue.c                    | 190 +++++++--
- net/ethtool/channels.c                        |  12 +-
- net/ethtool/ioctl.c                           |   9 +-
- net/xdp/xsk.c                                 |  79 +++-
- tools/include/uapi/linux/netdev.h             |  11 +
- .../testing/selftests/drivers/net/README.rst  |   7 +
- .../testing/selftests/drivers/net/hw/Makefile |   2 +
- .../drivers/net/hw/lib/py/__init__.py         |   7 +-
- .../selftests/drivers/net/hw/nk_forward.bpf.c |  49 +++
- .../selftests/drivers/net/hw/nk_netns.py      |  23 ++
- .../selftests/drivers/net/hw/nk_qlease.py     |  90 +++++
- .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
- .../selftests/drivers/net/lib/py/env.py       | 120 ++++++
- 30 files changed, 1272 insertions(+), 140 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Co-developed-by: David Wei <dw@davidwei.uk>
+Signed-off-by: David Wei <dw@davidwei.uk>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Link: https://bpfconf.ebpf.io/bpfconf2025/bpfconf2025_material/lsfmmbpf_2025_netkit_borkmann.pdf [0]
+---
+ Documentation/netlink/specs/netdev.yaml | 44 +++++++++++++++++++++++++
+ include/uapi/linux/netdev.h             | 11 +++++++
+ net/core/netdev-genl-gen.c              | 20 +++++++++++
+ net/core/netdev-genl-gen.h              |  2 ++
+ net/core/netdev-genl.c                  |  5 +++
+ tools/include/uapi/linux/netdev.h       | 11 +++++++
+ 6 files changed, 93 insertions(+)
 
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 596c306ce52b..b86db8656eac 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -339,6 +339,15 @@ attribute-sets:
+         doc: XSK information for this queue, if any.
+         type: nest
+         nested-attributes: xsk-info
++      -
++        name: lease
++        doc: |
++          A queue from a virtual device can have a lease which refers to
++          another queue from a physical device. This is useful for memory
++          providers and AF_XDP operations which take an ifindex and queue id
++          to allow applications to bind against virtual devices in containers.
++        type: nest
++        nested-attributes: lease
+   -
+     name: qstats
+     doc: |
+@@ -537,6 +546,24 @@ attribute-sets:
+         name: id
+       -
+         name: type
++  -
++    name: lease
++    attributes:
++      -
++        name: ifindex
++        doc: The netdev ifindex to lease the queue from.
++        type: u32
++        checks:
++          min: 1
++      -
++        name: queue
++        doc: The netdev queue to lease from.
++        type: nest
++        nested-attributes: queue-id
++      -
++        name: netns-id
++        doc: The network namespace id of the netdev.
++        type: s32
+   -
+     name: dmabuf
+     attributes:
+@@ -686,6 +713,7 @@ operations:
+             - dmabuf
+             - io-uring
+             - xsk
++            - lease
+       dump:
+         request:
+           attributes:
+@@ -797,6 +825,22 @@ operations:
+         reply:
+           attributes:
+             - id
++    -
++      name: queue-create
++      doc: |
++        Create a new queue for the given netdevice. Whether this operation
++        is supported depends on the device and the driver.
++      attribute-set: queue
++      flags: [admin-perm]
++      do:
++        request:
++          attributes:
++            - ifindex
++            - type
++            - lease
++        reply: &queue-create-op
++          attributes:
++            - id
+ 
+ kernel-family:
+   headers: ["net/netdev_netlink.h"]
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index e0b579a1df4f..7df1056a35fd 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -160,6 +160,7 @@ enum {
+ 	NETDEV_A_QUEUE_DMABUF,
+ 	NETDEV_A_QUEUE_IO_URING,
+ 	NETDEV_A_QUEUE_XSK,
++	NETDEV_A_QUEUE_LEASE,
+ 
+ 	__NETDEV_A_QUEUE_MAX,
+ 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
+@@ -202,6 +203,15 @@ enum {
+ 	NETDEV_A_QSTATS_MAX = (__NETDEV_A_QSTATS_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_LEASE_IFINDEX = 1,
++	NETDEV_A_LEASE_QUEUE,
++	NETDEV_A_LEASE_NETNS_ID,
++
++	__NETDEV_A_LEASE_MAX,
++	NETDEV_A_LEASE_MAX = (__NETDEV_A_LEASE_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_A_DMABUF_IFINDEX = 1,
+ 	NETDEV_A_DMABUF_QUEUES,
+@@ -228,6 +238,7 @@ enum {
+ 	NETDEV_CMD_BIND_RX,
+ 	NETDEV_CMD_NAPI_SET,
+ 	NETDEV_CMD_BIND_TX,
++	NETDEV_CMD_QUEUE_CREATE,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index ba673e81716f..52ba99c019e7 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -28,6 +28,12 @@ static const struct netlink_range_validation netdev_a_napi_defer_hard_irqs_range
+ };
+ 
+ /* Common nested types */
++const struct nla_policy netdev_lease_nl_policy[NETDEV_A_LEASE_NETNS_ID + 1] = {
++	[NETDEV_A_LEASE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
++	[NETDEV_A_LEASE_QUEUE] = NLA_POLICY_NESTED(netdev_queue_id_nl_policy),
++	[NETDEV_A_LEASE_NETNS_ID] = { .type = NLA_S32, },
++};
++
+ const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1] = {
+ 	[NETDEV_A_PAGE_POOL_ID] = NLA_POLICY_FULL_RANGE(NLA_UINT, &netdev_a_page_pool_id_range),
+ 	[NETDEV_A_PAGE_POOL_IFINDEX] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_page_pool_ifindex_range),
+@@ -107,6 +113,13 @@ static const struct nla_policy netdev_bind_tx_nl_policy[NETDEV_A_DMABUF_FD + 1]
+ 	[NETDEV_A_DMABUF_FD] = { .type = NLA_U32, },
+ };
+ 
++/* NETDEV_CMD_QUEUE_CREATE - do */
++static const struct nla_policy netdev_queue_create_nl_policy[NETDEV_A_QUEUE_LEASE + 1] = {
++	[NETDEV_A_QUEUE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
++	[NETDEV_A_QUEUE_TYPE] = NLA_POLICY_MAX(NLA_U32, 1),
++	[NETDEV_A_QUEUE_LEASE] = NLA_POLICY_NESTED(netdev_lease_nl_policy),
++};
++
+ /* Ops table for netdev */
+ static const struct genl_split_ops netdev_nl_ops[] = {
+ 	{
+@@ -205,6 +218,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.maxattr	= NETDEV_A_DMABUF_FD,
+ 		.flags		= GENL_CMD_CAP_DO,
+ 	},
++	{
++		.cmd		= NETDEV_CMD_QUEUE_CREATE,
++		.doit		= netdev_nl_queue_create_doit,
++		.policy		= netdev_queue_create_nl_policy,
++		.maxattr	= NETDEV_A_QUEUE_LEASE,
++		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
++	},
+ };
+ 
+ static const struct genl_multicast_group netdev_nl_mcgrps[] = {
+diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+index cffc08517a41..d71b435d72c1 100644
+--- a/net/core/netdev-genl-gen.h
++++ b/net/core/netdev-genl-gen.h
+@@ -14,6 +14,7 @@
+ #include <net/netdev_netlink.h>
+ 
+ /* Common nested types */
++extern const struct nla_policy netdev_lease_nl_policy[NETDEV_A_LEASE_NETNS_ID + 1];
+ extern const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1];
+ extern const struct nla_policy netdev_queue_id_nl_policy[NETDEV_A_QUEUE_TYPE + 1];
+ 
+@@ -36,6 +37,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info);
++int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info);
+ 
+ enum {
+ 	NETDEV_NLGRP_MGMT,
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 470fabbeacd9..aae75431858d 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -1120,6 +1120,11 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+ 	return err;
+ }
+ 
++int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	return -EOPNOTSUPP;
++}
++
+ void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv)
+ {
+ 	INIT_LIST_HEAD(&priv->bindings);
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index e0b579a1df4f..7df1056a35fd 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -160,6 +160,7 @@ enum {
+ 	NETDEV_A_QUEUE_DMABUF,
+ 	NETDEV_A_QUEUE_IO_URING,
+ 	NETDEV_A_QUEUE_XSK,
++	NETDEV_A_QUEUE_LEASE,
+ 
+ 	__NETDEV_A_QUEUE_MAX,
+ 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
+@@ -202,6 +203,15 @@ enum {
+ 	NETDEV_A_QSTATS_MAX = (__NETDEV_A_QSTATS_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_LEASE_IFINDEX = 1,
++	NETDEV_A_LEASE_QUEUE,
++	NETDEV_A_LEASE_NETNS_ID,
++
++	__NETDEV_A_LEASE_MAX,
++	NETDEV_A_LEASE_MAX = (__NETDEV_A_LEASE_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_A_DMABUF_IFINDEX = 1,
+ 	NETDEV_A_DMABUF_QUEUES,
+@@ -228,6 +238,7 @@ enum {
+ 	NETDEV_CMD_BIND_RX,
+ 	NETDEV_CMD_NAPI_SET,
+ 	NETDEV_CMD_BIND_TX,
++	NETDEV_CMD_QUEUE_CREATE,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
 -- 
 2.43.0
 
