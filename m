@@ -1,78 +1,60 @@
-Return-Path: <netdev+bounces-254847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254855-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDq3FwCLe2mlFQIAu9opvQ
-	(envelope-from <netdev+bounces-254847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:29:52 +0100
+	id IEXOEreMe2mlFQIAu9opvQ
+	(envelope-from <netdev+bounces-254855-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:37:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5EDEB22DB
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:29:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB83EB2456
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 17:37:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8A7E300CC30
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:29:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8C1333004C82
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 16:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A3A33FE26;
-	Thu, 29 Jan 2026 16:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA376331A68;
+	Thu, 29 Jan 2026 16:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKaa5ih5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gaJFS/Sx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAB1313281
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 16:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881BC28934F;
+	Thu, 29 Jan 2026 16:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769704186; cv=none; b=Rr/yyL0p8o3J4ox0N+k5d3WX3DQSLhAYqkiI9WjZ5UlxX8TE2Kac0kygKSO32uWFZQVdI2YHaIA5YE9Om37HD6u0Pjv71xw2O3hLYjIM0h6Ep7am6bahWmqIASaaFFzZJ16Ko6UmTgLpQd1Xak+ho54/HoWodg2qjccRq93FQwM=
+	t=1769704609; cv=none; b=czAevvwlZhGfOL31z9V3D3+FtjZG98T2xgnywtAY4XSPffQfTA+OVIEovHKW0VVGRajCCVs1tHUOh999eVQ2ibsP4Qo4eDmBgbC6uE/2c5S21ZVRdlE+zJ94zxUkQ7awSdmcDWbywwTmp5ov3KfEu88oTlGu+rDt8EeuhujtUEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769704186; c=relaxed/simple;
-	bh=/b4eNyMwMVzbNtO0wqEvW4iwpDqJ3A/bN41to3+m6Ww=;
+	s=arc-20240116; t=1769704609; c=relaxed/simple;
+	bh=j7clNA0P0ppadRc+5o2lyO9sIBharxomFEA2q8V3Kf0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CRNxc0SDaivK8tElmYZE8uhbubNbiEzfHVE1reD2/2yG9Uew1zRY+VmrkzhiESStMkRgOfZNUOUewxp6MeXXkXlNw38Xx5pxw0prKKMrRi1naXUqnv8iT4rBKjkmcz5XyywLBRawhyTUGnAzloV6YaKALL9OskjI4fTIptSJLF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKaa5ih5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769704184;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bRFN+bsT9FwwGvOEj0EX6o1JvhKYzXv35kylJUytJQc=;
-	b=SKaa5ih5GLrYpUIojY4IPLLFI4FAEK+/7Auojc9ZIVOr1bm2m3pERQ7DgW+/lVN+e/kR2v
-	WX4c8q5A6zgmxnka5rYsxx3OdGj0lMLJcRlk6ufekNW2tE4a/fJYyBbtsd4xUpgKjLhZiQ
-	GaBlX3fQw71wsNLl+eDru1bHbPb8vIw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-31-jQn1s1u_OEOe0k76X7Ljvg-1; Thu,
- 29 Jan 2026 11:29:41 -0500
-X-MC-Unique: jQn1s1u_OEOe0k76X7Ljvg-1
-X-Mimecast-MFC-AGG-ID: jQn1s1u_OEOe0k76X7Ljvg_1769704179
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BC4F1956096;
-	Thu, 29 Jan 2026 16:29:39 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.34.121])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 644B91956056;
-	Thu, 29 Jan 2026 16:29:35 +0000 (UTC)
-Date: Thu, 29 Jan 2026 17:29:32 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, jkarrenpalo@gmail.com, tglx@linutronix.de,
-	mingo@kernel.org, allison.henderson@oracle.com, petrm@nvidia.com,
-	antonio@openvpn.net
-Subject: Re: [PATCH net-next v2 0/9] hsr: Implement more robust duplicate
- discard algorithm
-Message-ID: <aXuK7NEW_2IZHu86@thinkpad>
-References: <20260122173556.44d8b77f@kernel.org>
- <aXczshu7nvWWFMy4@thinkpad>
- <20260129152922.P0efzzu6@linutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rdap1HCKMYQcQe2Q3UY6Yoz1vZkGeUVjMv1LrC74e/sD0b+dRUUmLKgxLnWuFFHXfaxOI3rdycGK9HQXl/f+g+Tg8eL8ZPYpE9VrziEMoy5amM4xHhFfYmnuREJoh5LKkxnrbWUmZ26lJABoSI5QSXMKuZ/VvPr7wuN+GHry9Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gaJFS/Sx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 089B2C4CEF7;
+	Thu, 29 Jan 2026 16:36:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769704609;
+	bh=j7clNA0P0ppadRc+5o2lyO9sIBharxomFEA2q8V3Kf0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gaJFS/SxgM/RQFV6geLuGYu2xOfZ7Z92aE0/YtqpQ6RikpW9mNeGRZBQK9bCBgfre
+	 KJsn+2FJpObVBb4FBoIMMZ8ASL7Ls0nmXljSfsM8QeJpJodpCVhRHNURm7v41vW/hx
+	 alpB+NIt+aruDKhm23mggQM4dsDA05Evbtu1i/K/X/FfK8JjUHwSfASDSZSMjhylSc
+	 nOLP20HMLPQzxOJv0WghVSmv4ObqqHwU94xpb/2u2EN/wi/aVCZH1OEVck4xtnXDWV
+	 0kJbYeNrU6boPlGoMz64wNifZgE3+dveCNSYfdBhJunQIUdhEeeBDeVErb7fP+lnpR
+	 P19bhiv8WBbfQ==
+Date: Thu, 29 Jan 2026 16:36:44 +0000
+From: Simon Horman <horms@kernel.org>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	andrew+netdev@lunn.ch, sgoutham@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com
+Subject: Re: [net-next PATCH v2] octeontx2-pf: cn10k/cn20k: Update count_eot
+ in NPA_LF_AURA_BATCH_FREE0
+Message-ID: <aXuMnNl3B0rcXeor@horms.kernel.org>
+References: <20260128022448.4402-1-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,68 +63,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260129152922.P0efzzu6@linutronix.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20260128022448.4402-1-gakula@marvell.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254847-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254855-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:email]
-X-Rspamd-Queue-Id: D5EDEB22DB
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,horms.kernel.org:mid,marvell.com:email]
+X-Rspamd-Queue-Id: AB83EB2456
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 04:29:22PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2026-01-26 10:28:18 [+0100], Felix Maurer wrote:
-> >
-> > I'll wait for feedback from Sebastian, but I'm also fine with merging
-> > the fixes for the KUnit test into the other patches and reposting.
->
-> Overall the new algorithm is very nice. Feel free to add
-> Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On Wed, Jan 28, 2026 at 07:54:48AM +0530, Geetha sowjanya wrote:
+> This patch updates the count_eot calculation for CN20K devices. 
+> Where the count_eot feild extended to 2 bits, while maintaining
+> CN10K compatibility where only bit 0 is used.
+> 
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> ---
+> v1-v2: Fix size value based on count_eot
 
-Thank you very much for taking the time to review this series! I'll
-address the parts as I wrote in the other replies.
-
-As Jakub wrote, there is the transient build failure due to the KUnit
-test needing changes. I discussed that with Simon as well (off-list). In
-the v3, I'll add the respective fixes to the KUnit test to the patches
-where I change the algorithm so the build passes all the time. As the
-patches 4 and 6 will look quite different with that, I'll only add your
-Reviewed by tag to the remaining ones and leave 4 and 6 subject to a
-quick re-review by you.
-
-> I made a few comments where I think it should be possible to avoid
-> tracking the sequence number for interface A and B but since you
-> preserve what is done now, I don't mind to keep it as-it and try to
-> remove it later on (unless I'm wrong and it is not doable).
-
-I replied to that directly, I don't think that's doable. But we can take
-a look at the HW-offload case in the future.
-
-Thanks,
-   Felix
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
