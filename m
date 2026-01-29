@@ -1,430 +1,236 @@
-Return-Path: <netdev+bounces-254504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJSCOZ+0emma9QEAu9opvQ
-	(envelope-from <netdev+bounces-254504-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:15:11 +0100
+	id GGhfAv+4emkr9gEAu9opvQ
+	(envelope-from <netdev+bounces-254505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:33:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8954EAA8A8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:15:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FEBCAACD4
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 02:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B9ACA300DECE
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 01:15:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0839F303EA9D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 01:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A95931ED72;
-	Thu, 29 Jan 2026 01:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9973148B7;
+	Thu, 29 Jan 2026 01:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHswdMMy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qoyi5bwc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGmsQxXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB00431A56C
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 01:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769649301; cv=pass; b=THr7QgPyZvCViXD6R/Igb4aOYGEdn3bPUtFRTM+/nEsy317ARWS2gMX/hco+9Pu1xcwl0X61+qV4QysWqiiEO4ADRehAs4Wvtl77blbii3WATkCJZTm/lMHoXOzaH0VCZRUgUjhmvcXGud23cBDWT7NWbls0dY+/EnGcJrqThIo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769649301; c=relaxed/simple;
-	bh=+IbLxvhwPxFYFSa1tzHStRrP5YAWBXPRpwrDnDNPDG0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MLED8gp1yfbcsoxQE6TpJEp+5+S1Zs2u4vNr/zJ0qGrVqbdndUyhvY7vqXGVtXczkvpUFbmmw+zabdHvR59t4z3ICpmuW+/fT8eRxL2W/lCq9uxm/pj6vP7sIC3BPHGng2/fA45vwckbb13Wf8Zs1zsPsvrqLaGV40QVMwR5anw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IHswdMMy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qoyi5bwc; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769649298;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AAyqH6SmWuOGsCC3JIASR5UfDF9EMKXo/TpQLggZqgQ=;
-	b=IHswdMMygJy32/Hz6gT5vuyy4X3f0cW3BPm2ZXWh9XiINkFtpzGB+rMhvDxtDRJMe1ggmv
-	swQli8LObN5viFlB1+7Suz1HeXS3IP86J7Pfw1nwgIUNwRtLhw/vQpZDXu3U8TF4dV+ZgW
-	U/+LBtiDDxf+8wDN8n9YN0KVCzvPCww=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-XWH64tn3OBSLQa21CzQYWA-1; Wed, 28 Jan 2026 20:14:57 -0500
-X-MC-Unique: XWH64tn3OBSLQa21CzQYWA-1
-X-Mimecast-MFC-AGG-ID: XWH64tn3OBSLQa21CzQYWA_1769649296
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-34ac819b2f2so587877a91.0
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 17:14:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769649291; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DZBdhyEjkRyhmo+V4RUBfas0pRlkoWrqlPpif71uMIq1BQ776KPcY6Y3WO7eD0sbYO
-         XLoQxpDnwzhFeRMA/uk5Jv7zrxDIv9KmRAKcgLP2NX9VHqIWuuQ5cFg91IX/hHL45Mo2
-         eqajOrWSCzrNaczoFGkovWY6sPIOx8o5P7PdSUBWELdfjwZzbVVL7VneLxGa+piQwiox
-         PauxSHIrMxuF0yxbIFtkFQMTqTrWakAkZBQJBY/kes+haDBWgQ4a51UZP0kDVNAUaOJe
-         AIPN6/ehy6BHfW5zcaJkSCxTcVhuDcWDjo0sDbHQkjNEd+xxr6NfyW//iyP4qMCqY7R6
-         KTdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=AAyqH6SmWuOGsCC3JIASR5UfDF9EMKXo/TpQLggZqgQ=;
-        fh=nkt5n1IGoEOuWF8aWQDwJxMTeUK4fg4ZjPq0iY8z5Ks=;
-        b=lR8M+BiSzPU+fNuPLpobG4Ga7PzZW6oGQYW11y78INE6vndBOi7Qf2XzetdFw/W8aG
-         INbHIqfnP6VWMKNSm6gLYzoRZyPuhxjqitksuKVoBbe5HGbRSOiumQhNCb6bQoOpN9Rd
-         +rvZbxHROBcL8nG5moivqwHSbQC1R33ympH78SdozPkOqa+553/5ZuLWT5ReP0j21hOz
-         RRAOt7w/Bwdo2CAkUMX+NzdgmAkribPW+nwegWM5samx7FDQdnZPWl8v9ew44wL30spI
-         BEQ8N95yrmLNbI6CIFztBUMdJQEuLdqKHc1WS0NDVMp2uz+5MsW5PIK2o4lcvu/Ci6Xi
-         A0/A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472792236FA
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 01:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769650151; cv=none; b=c58rXL7K8kpWTNW2ip3XKo44+qggPM4SaFBt3gpLYfLeD0e+smQbfANKR0IPYz9Yh4MXofVIhRRi43Hja4q6/LdSMn5mkVs6WxTTceYDmozvOHjvge6UbFZsumy4gIr9+hjyKe0PzvYHIv0vbQ0pV11scgmGpCZiOJ26RDcmiBI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769650151; c=relaxed/simple;
+	bh=MoBOphXc78MTKLid5zGiMU4m+2RBEI6B8y9JnvhBT0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NRVo4iw99SsAHVjqzwRdFGc2iCjGNfeJjQppu8EuuH+NDfBw1d54vlrjZJZTmgbLyeUNVyaE6RH1SLj2l7wCkWb7+4CxCKatb5w94zATP5DVn3N9ZWsQOajC3my/m8FGCuhOWLmNZknKjKnzfK33C6reCGvR/OKcgdXsatrBddg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGmsQxXp; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1233bc1117fso1099805c88.0
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 17:29:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769649291; x=1770254091; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AAyqH6SmWuOGsCC3JIASR5UfDF9EMKXo/TpQLggZqgQ=;
-        b=qoyi5bwcMQZQnwjdq1SN3Dn2LeoL1NjLlr27tyCs+75/yQ9+N90/oFJGRzhqnNVQTy
-         dt+nKDD/03dZ63yzk34CTNW+Hz83LnDiUduD8V5m2uPmfbwSKayyMFuDeczRrIxyxdRJ
-         uzuJlAUI3kvqBSh8/+3pB0X5K9Lr+SUy4uHyccYQ5HhLGf8iVYy+7Lg7TyfNyfQQsu2W
-         8bbir+3Jr7ECMJqm8RmOr6moDXuglTQ3g6+iUAJENCqqVHBeCyllWjaR1A+WP4JYa844
-         YC8Rx1SxyOuUrzviHZhG+nciBipiakSj1Q6TnJ7l++7Db3HHM1Bsk0lcHaosAo+5Kg6o
-         4k+A==
+        d=gmail.com; s=20230601; t=1769650148; x=1770254948; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fz0HF8QIciQ8W/jFc7CcxIuPePjE9HmoHDdQJI7gnFg=;
+        b=bGmsQxXpjC9buvm2ON6Jfd3Re50mmEqwBVKtBNnMBW7fFxwrWkfSN5IfBNM8zeSzRn
+         dbkwJZ+A/ikbcBQBFGIMUKMul/W+Y/8fE7nT5rnra/8fUE9sugv44UiuQ52JroRLh6DG
+         FTpXPMdq1zPE8mh7ra/fGoEgeEI7hMybrBD5ZZX3pB03L0wPR6410P3Uji3Dp61IMQ5T
+         NajZaBJUk1Y52dksS/6hiy+DtAvje3nv1y8c/zn47mKcqvvbIUQb2so6Fio85Wpk82Oj
+         t0Me679qXVAD3yiyuY/K/3J1NkBQBljkMAXQqX3HeFR1qEpwB9tJ7adJHptLtD7UlS/L
+         EtIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769649291; x=1770254091;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AAyqH6SmWuOGsCC3JIASR5UfDF9EMKXo/TpQLggZqgQ=;
-        b=As7ic/pK0fe3rfgtQ7BtJZA3McNoOZufn1ssRNKQXcpBS51WJf/jX84Ul+aXMTsuOC
-         43Sgtr3ACunygheuvdN8FUEhWdOPcof5du5b371tU3LkNSK9zvIGMt1sDoHVSWOG0VrP
-         sQnY6umbavisFzhffIMo9PvzPgM/ksv0pFkIVtDF2Ja8UfDkdnXhlV6B43bSNO7E6voy
-         Ko6xQGvRbJaBD3udcedVGOqBV2h4SZJ4rpcwRM9IjBkbb2dCYdbMQnjMU3el/w53KyEu
-         v/T5Ca49aGBxoZ6nH/tB78meu2C14eh1TjMfKB/UdNo1PZwPCS/r2cPWCmNy/TeaePL2
-         QUnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQOZW0nMjpuBQ3YcQFUg7d/nTcpSbuGbxjohr1TOg0yWYc3gky0EfCGvUcBrFuKPpQImIklfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk5WmDqRLB6bpcplqNMxoPH77uqHND/6DdHzjbVvvP2kbnGmHP
-	OwcK0kE96IDxYQNWpmSME132S1zF5DpD7OqpwSbq+nAy38GJQmr08vq3fEvnpRQdbDK2uVp9Yf2
-	nHM3YFZpo77kfwbZ1uympRrdg8i7PPpYumKpyfLmv50RCgwTVCarG4fVbO8kVmFC9WaK05gbrEX
-	yXuaZTLp1FVbKGpk4V2hdcnz0jKklv7kjl
-X-Gm-Gg: AZuq6aJkCd0jmQ8jx9ln4IXy14ZklGy5QJ4OxWzle9QwiKzBJlwKj7i0zSmDCRm68QZ
-	bfj0HFjVK93HKjdliH84/zXhN8KNrCmkbLtM/udexGSmZempgyFWHLWavSV6QmsrFsP2R7Eh5kZ
-	RkWqjy/p1yptojuyRgXlRenTG6xTgwhXO6lYbmPHM8LU/CNAvCWpEoaG4XZNlGBseE
-X-Received: by 2002:a17:90b:2705:b0:340:d06d:ea73 with SMTP id 98e67ed59e1d1-353fed74b1bmr6200880a91.19.1769649291248;
-        Wed, 28 Jan 2026 17:14:51 -0800 (PST)
-X-Received: by 2002:a17:90b:2705:b0:340:d06d:ea73 with SMTP id
- 98e67ed59e1d1-353fed74b1bmr6200859a91.19.1769649290732; Wed, 28 Jan 2026
- 17:14:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769650148; x=1770254948;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fz0HF8QIciQ8W/jFc7CcxIuPePjE9HmoHDdQJI7gnFg=;
+        b=KU4Nw5MVvu71CxK0U0OaKhtfhDAUB+0qsfo48dcMzuDqeh8b0nA3RirhP0rR2KsRcf
+         inuHJZ8swSy6YG586/8KNwYalpTx/4uhtsBQ4Pptb5BNH66kyIU7IAQe0GGmBHFANG8W
+         UIrTnvXEKrKEchzgUgmb0XCDVcEYRS/EixXEP5I3HJDem2IK7eFo57fNt6iCQkG66d9q
+         +okRvNn5aZW0k6RdAZoim0ItDxka86cNoSUdacC1baCaf5B2JVLoRmN/0N/ByNlRszv2
+         G1k4HYIzB+hbj82FAuk9Ad5kDTBPnbbs8tvPm8lz7xQ4Vq8nM7ZBgZszx9BQNbGPADIh
+         VsVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUgNMOV29ZsIHGUUHt26+aTpq4EUtKKQB4ZpN38ml3ZH4oomRIgm/xFlJT277IDGUUg42/7tQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh3xf2eNeV3e2bZ7nK9LkrUtE0nAgyOBFeJ19mTjv9rNEhfhYL
+	OrllKIr0L/6YDZgCj9Q3M0i7H/QF3seeL63LYjtmeS5dhtMDKuv9gu38
+X-Gm-Gg: AZuq6aJmNh2/fypZ9vTWKvnjjn59f8Or5h0cFMdsGBx0fDd6f0+2GwqPtIx+2x+WKZL
+	yA41m7DnaGvwN2x7FUNW/Yjn/GxlKfva4Wn24i4EDsoCHyC6Ww+je0AoiwdulGodwlENrwZLuko
+	4uSi93Fwqk/xH98+ee9CnuRbHHIor/M2b4RaMZ/G3sVZs3d8ZHCK5Crc72pRj7jbuMtgGLNpf8A
+	iFdM5T5f7H4CEp3+JYSFzZ6Byr3uCIxKDLGPHY2q4WM5Gn4MJ4R7IU6+fmfrqwe1XBzW7pH8rT5
+	PRZiPF1LbHxOHdhCyehvUNu4n3KK+i5OpRIDqz+wAn2jNcxM2SxyAPjKnbFdszrRBGxCoBnKgeF
+	c+13gm09icERmKWt/AqzgMmM0rNkOir+/0k7alT8cMHBzV7E5BPijteyTdqeUCIg=
+X-Received: by 2002:a05:7022:f90:b0:11b:ca88:c4f1 with SMTP id a92af1059eb24-124b1060aa3mr729929c88.20.1769650148153;
+        Wed, 28 Jan 2026 17:29:08 -0800 (PST)
+Received: from gmail.com ([2a09:bac5:1f0b:28::4:34a])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-124a9efd3b8sm4488034c88.17.2026.01.28.17.29.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 17:29:07 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v4] ppp: enable TX scatter-gather
+Date: Thu, 29 Jan 2026 09:29:02 +0800
+Message-ID: <20260129012902.941-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-4-simon.schippers@tu-dortmund.de> <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
- <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de> <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
- <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de> <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de> <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
- <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com> <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
-In-Reply-To: <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 29 Jan 2026 09:14:38 +0800
-X-Gm-Features: AZwV_QhChibP1TQksxzISzzBmI4bS7flGPohL5vfvndiNnozn5EJ93__Ix-8njI
-Message-ID: <CACGkMEsVMz+vS3KxykYBGXvyt3MZcstnYWUiYJZhLSMoHC5Smw@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mst@redhat.com, eperezma@redhat.com, leiyang@redhat.com, 
-	stephen@networkplumber.org, jon@nutanix.com, tim.gebauer@tu-dortmund.de, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254504-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254505-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,pktgen_sample03_burst_single_flow.sh:url]
-X-Rspamd-Queue-Id: 8954EAA8A8
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5FEBCAACD4
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 3:54=E2=80=AFPM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> On 1/28/26 08:03, Jason Wang wrote:
-> > On Wed, Jan 28, 2026 at 12:48=E2=80=AFAM Simon Schippers
-> > <simon.schippers@tu-dortmund.de> wrote:
-> >>
-> >> On 1/23/26 10:54, Simon Schippers wrote:
-> >>> On 1/23/26 04:05, Jason Wang wrote:
-> >>>> On Thu, Jan 22, 2026 at 1:35=E2=80=AFPM Jason Wang <jasowang@redhat.=
-com> wrote:
-> >>>>>
-> >>>>> On Wed, Jan 21, 2026 at 5:33=E2=80=AFPM Simon Schippers
-> >>>>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>>>
-> >>>>>> On 1/9/26 07:02, Jason Wang wrote:
-> >>>>>>> On Thu, Jan 8, 2026 at 3:41=E2=80=AFPM Simon Schippers
-> >>>>>>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>>>>>
-> >>>>>>>> On 1/8/26 04:38, Jason Wang wrote:
-> >>>>>>>>> On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
-> >>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>>>>>>>
-> >>>>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_rin=
-g_consume()
-> >>>>>>>>>> and wake the corresponding netdev subqueue when consuming an e=
-ntry frees
-> >>>>>>>>>> space in the underlying ptr_ring.
-> >>>>>>>>>>
-> >>>>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be=
- introduced
-> >>>>>>>>>> in an upcoming commit.
-> >>>>>>>>>>
-> >>>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> >>>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> >>>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de=
->
-> >>>>>>>>>> ---
-> >>>>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
-> >>>>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
-> >>>>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
-> >>>>>>>>>>
-> >>>>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> >>>>>>>>>> index 1197f245e873..2442cf7ac385 100644
-> >>>>>>>>>> --- a/drivers/net/tap.c
-> >>>>>>>>>> +++ b/drivers/net/tap.c
-> >>>>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_qu=
-eue *q,
-> >>>>>>>>>>         return ret ? ret : total;
-> >>>>>>>>>>  }
-> >>>>>>>>>>
-> >>>>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
-> >>>>>>>>>> +{
-> >>>>>>>>>> +       struct ptr_ring *ring =3D &q->ring;
-> >>>>>>>>>> +       struct net_device *dev;
-> >>>>>>>>>> +       void *ptr;
-> >>>>>>>>>> +
-> >>>>>>>>>> +       spin_lock(&ring->consumer_lock);
-> >>>>>>>>>> +
-> >>>>>>>>>> +       ptr =3D __ptr_ring_consume(ring);
-> >>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(r=
-ing, 1))) {
-> >>>>>>>>>> +               rcu_read_lock();
-> >>>>>>>>>> +               dev =3D rcu_dereference(q->tap)->dev;
-> >>>>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
-> >>>>>>>>>> +               rcu_read_unlock();
-> >>>>>>>>>> +       }
-> >>>>>>>>>> +
-> >>>>>>>>>> +       spin_unlock(&ring->consumer_lock);
-> >>>>>>>>>> +
-> >>>>>>>>>> +       return ptr;
-> >>>>>>>>>> +}
-> >>>>>>>>>> +
-> >>>>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
-> >>>>>>>>>>                            struct iov_iter *to,
-> >>>>>>>>>>                            int noblock, struct sk_buff *skb)
-> >>>>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queu=
-e *q,
-> >>>>>>>>>>                                         TASK_INTERRUPTIBLE);
-> >>>>>>>>>>
-> >>>>>>>>>>                 /* Read frames from the queue */
-> >>>>>>>>>> -               skb =3D ptr_ring_consume(&q->ring);
-> >>>>>>>>>> +               skb =3D tap_ring_consume(q);
-> >>>>>>>>>>                 if (skb)
-> >>>>>>>>>>                         break;
-> >>>>>>>>>>                 if (noblock) {
-> >>>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> >>>>>>>>>> index 8192740357a0..7148f9a844a4 100644
-> >>>>>>>>>> --- a/drivers/net/tun.c
-> >>>>>>>>>> +++ b/drivers/net/tun.c
-> >>>>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun=
-_struct *tun,
-> >>>>>>>>>>         return total;
-> >>>>>>>>>>  }
-> >>>>>>>>>>
-> >>>>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
-> >>>>>>>>>> +{
-> >>>>>>>>>> +       struct ptr_ring *ring =3D &tfile->tx_ring;
-> >>>>>>>>>> +       struct net_device *dev;
-> >>>>>>>>>> +       void *ptr;
-> >>>>>>>>>> +
-> >>>>>>>>>> +       spin_lock(&ring->consumer_lock);
-> >>>>>>>>>> +
-> >>>>>>>>>> +       ptr =3D __ptr_ring_consume(ring);
-> >>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(r=
-ing, 1))) {
-> >>>>>>>>>
-> >>>>>>>>> I guess it's the "bug" I mentioned in the previous patch that l=
-eads to
-> >>>>>>>>> the check of __ptr_ring_consume_created_space() here. If it's t=
-rue,
-> >>>>>>>>> another call to tweak the current API.
-> >>>>>>>>>
-> >>>>>>>>>> +               rcu_read_lock();
-> >>>>>>>>>> +               dev =3D rcu_dereference(tfile->tun)->dev;
-> >>>>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
-> >>>>>>>>>
-> >>>>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu=
- which
-> >>>>>>>>> I'm not sure is what we want.
-> >>>>>>>>
-> >>>>>>>> What else would you suggest calling to wake the queue?
-> >>>>>>>
-> >>>>>>> I don't have a good method in my mind, just want to point out its=
- implications.
-> >>>>>>
-> >>>>>> I have to admit I'm a bit stuck at this point, particularly with t=
-his
-> >>>>>> aspect.
-> >>>>>>
-> >>>>>> What is the correct way to pass the producer CPU ID to the consume=
-r?
-> >>>>>> Would it make sense to store smp_processor_id() in the tfile insid=
-e
-> >>>>>> tun_net_xmit(), or should it instead be stored in the skb (similar=
- to the
-> >>>>>> XDP bit)? In the latter case, my concern is that this information =
-may
-> >>>>>> already be significantly outdated by the time it is used.
-> >>>>>>
-> >>>>>> Based on that, my idea would be for the consumer to wake the produ=
-cer by
-> >>>>>> invoking a new function (e.g., tun_wake_queue()) on the producer C=
-PU via
-> >>>>>> smp_call_function_single().
-> >>>>>> Is this a reasonable approach?
-> >>>>>
-> >>>>> I'm not sure but it would introduce costs like IPI.
-> >>>>>
-> >>>>>>
-> >>>>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
-> >>>>>> considered a deal-breaker for the patch set?
-> >>>>>
-> >>>>> It depends on whether or not it has effects on the performance.
-> >>>>> Especially when vhost is pinned.
-> >>>>
-> >>>> I meant we can benchmark to see the impact. For example, pin vhost t=
-o
-> >>>> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
-> >>>>
-> >>>> Thanks
-> >>>>
-> >>>
-> >>> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
-> >>> for both the stock and patched versions. The benchmarks were run with
-> >>> the full patch series applied, since testing only patches 1-3 would n=
-ot
-> >>> be meaningful - the queue is never stopped in that case, so no
-> >>> TX_SOFTIRQ is triggered.
-> >>>
-> >>> Compared to the non-pinned CPU benchmarks in the cover letter,
-> >>> performance is lower for pktgen with a single thread but higher with
-> >>> four threads. The results show no regression for the patched version,
-> >>> with even slight performance improvements observed:
-> >>>
-> >>> +-------------------------+-----------+----------------+
-> >>> | pktgen benchmarks to    | Stock     | Patched with   |
-> >>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
-> >>> | 100M packets            |           |                |
-> >>> | vhost pinned to core 0  |           |                |
-> >>> +-----------+-------------+-----------+----------------+
-> >>> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
-> >>> |  +        +-------------+-----------+----------------+
-> >>> | vhost-net | Lost        | 1154 Kpps | 0              |
-> >>> +-----------+-------------+-----------+----------------+
-> >>>
-> >>> +-------------------------+-----------+----------------+
-> >>> | pktgen benchmarks to    | Stock     | Patched with   |
-> >>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
-> >>> | 100M packets            |           |                |
-> >>> | vhost pinned to core 0  |           |                |
-> >>> | *4 threads*             |           |                |
-> >>> +-----------+-------------+-----------+----------------+
-> >>> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
-> >>> |  +        +-------------+-----------+----------------+
-> >>> | vhost-net | Lost        | 1527 Kpps | 0              |
-> >>> +-----------+-------------+-----------+----------------+
-> >
-> > The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
-> > the guest or an xdp program that did XDP_DROP in the guest.
->
-> I forgot to mention that these PPS values are per thread.
-> So overall we have 71 Kpps * 4 =3D 284 Kpps and 79 Kpps * 4 =3D 326 Kpps,
-> respectively. For packet loss, that comes out to 1154 Kpps * 4 =3D
-> 4616 Kpps and 0, respectively.
->
-> Sorry about that!
->
-> The pktgen benchmarks with a single thread look fine, right?
+PPP channels using chan->direct_xmit prepend the PPP header to a skb and
+call dev_queue_xmit() directly. In this mode the skb does not need to be
+linear, but the PPP netdevice currently does not advertise
+scatter-gather features, causing unnecessary linearization and
+preventing GSO.
 
-Still looks very low. E.g I just have a run of pktgen (using
-pktgen_sample03_burst_single_flow.sh) without a XDP_DROP in the guest,
-I can get 1Mpps.
+Enable NETIF_F_SG and NETIF_F_FRAGLIST on PPP devices. In case a linear
+buffer is required (PPP compression, multilink, and channels without
+direct_xmit), call skb_linearize() explicitly.
 
->
-> I'll still look into using an XDP program that does XDP_DROP in the
-> guest.
->
-> Thanks!
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+v3 -> v4:
+ Always expose SG and FRAGLIST, and linearize the skb if necessary.
+ - https://lore.kernel.org/linux-ppp/20260123014214.225278-1-dqfext@gmail.com/
 
-Thanks
+ drivers/net/ppp/ppp_generic.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
->
-> >
-> >>>
-> >>> +------------------------+-------------+----------------+
-> >>> | iperf3 TCP benchmarks  | Stock       | Patched with   |
-> >>> | to Debian VM 120s      |             | fq_codel qdisc |
-> >>> | vhost pinned to core 0 |             |                |
-> >>> +------------------------+-------------+----------------+
-> >>> | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
-> >>> |  +                     |             |                |
-> >>> | vhost-net              |             |                |
-> >>> +------------------------+-------------+----------------+
-> >>>
-> >>> +---------------------------+-------------+----------------+
-> >>> | iperf3 TCP benchmarks     | Stock       | Patched with   |
-> >>> | to Debian VM 120s         |             | fq_codel qdisc |
-> >>> | vhost pinned to core 0    |             |                |
-> >>> | *4 iperf3 client threads* |             |                |
-> >>> +---------------------------+-------------+----------------+
-> >>> | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
-> >>> |  +                        |             |                |
-> >>> | vhost-net                 |             |                |
-> >>> +---------------------------+-------------+----------------+
-> >>
-> >> What are your thoughts on this?
-> >>
-> >> Thanks!
-> >>
-> >>
-> >
-> > Thanks
-> >
->
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index f9f0f16c41d1..f8814d7be6f1 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -1641,6 +1641,8 @@ static void ppp_setup(struct net_device *dev)
+ 	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
+ 	dev->priv_destructor = ppp_dev_priv_destructor;
+ 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
++	dev->features = NETIF_F_SG | NETIF_F_FRAGLIST;
++	dev->hw_features = dev->features;
+ 	netif_keep_dst(dev);
+ }
+ 
+@@ -1710,6 +1712,10 @@ pad_compress_skb(struct ppp *ppp, struct sk_buff *skb)
+ 		ppp->xcomp->comp_extra + ppp->dev->hard_header_len;
+ 	int compressor_skb_size = ppp->dev->mtu +
+ 		ppp->xcomp->comp_extra + PPP_HDRLEN;
++
++	if (skb_linearize(skb))
++		return NULL;
++
+ 	new_skb = alloc_skb(new_skb_size, GFP_ATOMIC);
+ 	if (!new_skb) {
+ 		if (net_ratelimit())
+@@ -1797,6 +1803,10 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
+ 	case PPP_IP:
+ 		if (!ppp->vj || (ppp->flags & SC_COMP_TCP) == 0)
+ 			break;
++
++		if (skb_linearize(skb))
++			goto drop;
++
+ 		/* try to do VJ TCP header compression */
+ 		new_skb = alloc_skb(skb->len + ppp->dev->hard_header_len - 2,
+ 				    GFP_ATOMIC);
+@@ -1894,19 +1904,26 @@ ppp_push(struct ppp *ppp)
+ 	}
+ 
+ 	if ((ppp->flags & SC_MULTILINK) == 0) {
++		struct ppp_channel *chan;
+ 		/* not doing multilink: send it down the first channel */
+ 		list = list->next;
+ 		pch = list_entry(list, struct channel, clist);
+ 
+ 		spin_lock(&pch->downl);
+-		if (pch->chan) {
+-			if (pch->chan->ops->start_xmit(pch->chan, skb))
+-				ppp->xmit_pending = NULL;
+-		} else {
+-			/* channel got unregistered */
++		chan = pch->chan;
++		if (unlikely(!chan || (!chan->direct_xmit && skb_linearize(skb)))) {
++			/* channel got unregistered, or it requires a linear
++			 * skb but linearization failed
++			 */
+ 			kfree_skb(skb);
+ 			ppp->xmit_pending = NULL;
++			goto out;
+ 		}
++
++		if (chan->ops->start_xmit(chan, skb))
++			ppp->xmit_pending = NULL;
++
++out:
+ 		spin_unlock(&pch->downl);
+ 		return;
+ 	}
+@@ -1991,6 +2008,8 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
+ 		return 0; /* can't take now, leave it in xmit_pending */
+ 
+ 	/* Do protocol field compression */
++	if (skb_linearize(skb))
++		goto err_linearize;
+ 	p = skb->data;
+ 	len = skb->len;
+ 	if (*p == 0 && mp_protocol_compress) {
+@@ -2149,6 +2168,7 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
+ 
+  noskb:
+ 	spin_unlock(&pch->downl);
++ err_linearize:
+ 	if (ppp->debug & 1)
+ 		netdev_err(ppp->dev, "PPP: no memory (fragment)\n");
+ 	++ppp->dev->stats.tx_errors;
+-- 
+2.43.0
 
 
