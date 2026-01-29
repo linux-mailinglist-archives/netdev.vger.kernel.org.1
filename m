@@ -1,226 +1,165 @@
-Return-Path: <netdev+bounces-254909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254910-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cB65HHy/e2mnIAIAu9opvQ
-	(envelope-from <netdev+bounces-254909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:13:48 +0100
+	id wBTBD93Ae2k9IQIAu9opvQ
+	(envelope-from <netdev+bounces-254910-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:19:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE52DB42EC
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:13:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95221B4348
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:19:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1CC5301DAD7
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:13:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27462301BC3C
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 20:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F12E3254A2;
-	Thu, 29 Jan 2026 20:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF74934C826;
+	Thu, 29 Jan 2026 20:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QQeialWk"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="Roqsz8Un"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A332632F763
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 20:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4989C346E75
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 20:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769717587; cv=none; b=qeq6C/onyZvln3mnSazVUN9WYrRjtsPPixdxZTL3lgc6aKhTpS21mPXHeilra/um2jkHbXkOkN+vYpBt37cRDF9wWf0ZFgb8ilsBC6MEtUKQ5nzET/5hy/G2U9iv9Xqss+B9a8KM9XfST6A+BI22cYGc2+GXFPEkp152lBf8qWg=
+	t=1769717978; cv=none; b=BBURNOp0VDuFQkSpBuvy/8LZMysSNVV3jC4cfsw5VK1HCkg7ONPxH6hiIHlw38Hh0N4XPmWOEouGL3/jsO7ATWLhXuSRaRCGCSHky14ptgrXx0cTO/BRUn0plc88vuQT16RraONY+Cp0r++vOxggM/btUqoO/cG50Hxfyi/f0cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769717587; c=relaxed/simple;
-	bh=r81xv40H+JwVCkYOkOIZIFpTJkgRVsFhSyjutuzS5Wc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eJB6VfDt7VzLPInrhohCIlyNvUUyKEo9FwKoBS7ugMt3H3zoyy3Uv8GgUypJxl0Djhd9jVnfDrSuyvi/OZC00Nc+FtIN9XZqwLvGvzVTYylhAXTxiqivCNdKhg6aPpSD+0Fqvdb/x2eaYjLmaJhTVbUybk0x6KgK0oc2uSHZm9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QQeialWk; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-64b9cb94ff5so1793920a12.2
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 12:13:05 -0800 (PST)
+	s=arc-20240116; t=1769717978; c=relaxed/simple;
+	bh=yKKqLKrna1e75AeheR1k1gpFUJ1h20aVEE0f+9dCC70=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tt72zeXGcHr2EgaWpptcmSbcIDWjw/C/9oEKVjSBsiaST757d0MiaYzNo3ZOIaLgWKkk7+Anl8t8GcWKLZSS+nqTDRrqPuGsJhDaj8RRaRf0UX1RQGvTkN3CBK8cCHIO5i2CTKnz4CBkkp7Rxxl/xwWzYEwrUmqmnoFaK4WtdJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=Roqsz8Un; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-81df6a302b1so1354866b3a.2
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 12:19:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769717584; x=1770322384; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Vyejpy7R29nGjBVoLPL/Q1Gctjw0gEMafobmT90sO+E=;
-        b=QQeialWklkztz050ZZREqDiXseCKSUufFqfPoxrf83LjFPbKyKEPn1h2TtuzxnMaek
-         H+ZWVjY+KlL1oGzrCl+HfyhrEVX4ekBP2rVm3x1BJerUcaNh7bTt9uGADUT2sH9GWw1J
-         DVca30R8S96CiJlf0to388R0GobpP7hErsoq2pb5uNapPwNNjzpekEFl09h9WumhrEpS
-         JuNA8Ss49B7iKr7jduWxmAGWqlAmsh+BNP+s8tvrUnhDUkVb9Bu1ZhR9eUXOWHzfI3VW
-         64jYc/WAhpb5D/EhVh7Ha35aySEpyMAAXwsLFkw6Tp/1PRZ+7iOnTnw3V8Zx63lubxbc
-         MfTg==
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1769717976; x=1770322776; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MG9JP8LjRrR2xfnKj4V7+0U06WZgMz5Gz7dTiO9L8Zo=;
+        b=Roqsz8UnchpMi9RqEMlGuStitppLRWqslM3Xe4/YL3A/i6Aa2D9kWHz7Q+O6u8+qR8
+         GkDr4kLItgLg7e7LnhF4kDtYsQXLjkgy5p54Z1HEheP8+lq47z+w8387fOuGXnADt5UE
+         ow4F9rnB5iquJ2tzDmYG6KGMaHRKJuxqpFC9DaXiQwYBYjPMP7iTQP5vZhyuFK4vOxJW
+         ooTcpv4T3Qbg5rvP/FzpoWYoC2jSIlWxtLGikwD0egb2psw9omptk+nKtHmTtaVPUQsG
+         54h1zC8S7r3MiPWoIFu8sk+y75Z3wPn/yOpc87DctIVL+cwQdYXuRwBQQX7ikdXFuhbB
+         ZL2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769717584; x=1770322384;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vyejpy7R29nGjBVoLPL/Q1Gctjw0gEMafobmT90sO+E=;
-        b=H/o4rGW8ZxEuMgd5EPupd83ptixJlPg+n2nAy4QLyCkimty/xpT+194Xvz5HFXZ5jf
-         I7SWkGP04Uh983U3zGfAgF7Mk5fCHMNw2gS6SJduIbkn55sTWAe83pjeDbMRl8LJ6Qbg
-         H7/wLVTjDKThssNRJkm4Lcvjo0cfCTFNUApxDW5SHz3MCRlgjxGDehFYIwPfBtKnl87g
-         taxj8/OGw7DSNYnPp5RZxw4Pn4kGrHDAFDn1SnGj21TPT/+T1GIwpRRg58OYeoQ/9Yu+
-         pXVEmRqrL6b+soYi7zugSJdsBnLyBm9N6n7iYvn0BZ40m6cfX4cWmwb9ynYkv8WTSj8g
-         WzMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7TFiy1bbNDFDEV6JFD1el7s/uiilknN3Q7UlnWKNDCz3rHRCuHtzW2ZADI6XINJJAm5CwWfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLIZPfiTbacOij9mQYJVk8XHXFiLWgVuP9Ge8n32+4qTWXWWGb
-	X7M8S468yJ/KwmNtGMqt2NmPxedHmfXUX30e7W0ylcxuBgiBc2SanZ2o
-X-Gm-Gg: AZuq6aIVy1cocqhIry8z/lnrx2Fn58e30Oa9iYrlyNrAb82Vu5A4ZdSNEltgk2Ukul4
-	vUTuJrlKqNpAXtFhUYUw4L1HgYjoLWmAmTeEdqduQKONnWeyti+AR9VtQCHRC5T6Eor805NYuTU
-	JRla2ip9N+koFfs/Lf4tkaonXxvVswKI2HrvhGAWIaXW0Wd86GoRnesNkMy/z7ueJCFvf/n1ANV
-	g+siEvjxjfZUL1RshIyytlqEpLNpLMLoLdXCFNVbGweHxd9saZLoKDWuhU0OgdQeQDSK6Z6Bem4
-	qdmXAJuTsflgUjP2rHRvOTWO5QbOYxT18pKnyrzR39vVz48d2j1SvFyMMwYKatQ3a7WGEVYnfX7
-	/908IUXGeypwJRFg+vknKVwHhI5YHDMSCEebZ93mSntbc6QpoBf4FndCuspHQuy/96c5BQNlnXh
-	TR5h8FsW8vv9ZzXMD4ZpJhwvzzXSiJy9W9RBNrTAUr1V4kExUv5Q9H9X61dA7Zt+RQwNuqrvxK6
-	/Qs
-X-Received: by 2002:a17:907:9412:b0:b88:641b:b0e0 with SMTP id a640c23a62f3a-b8dff6f9e97mr17029266b.49.1769717583634;
-        Thu, 29 Jan 2026 12:13:03 -0800 (PST)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:8ea7:1ca8:fcdb:48b3? ([2a02:a03f:a75e:9a00:8ea7:1ca8:fcdb:48b3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8dbef86df9sm307298066b.10.2026.01.29.12.13.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jan 2026 12:13:03 -0800 (PST)
-Message-ID: <2745371a-8ea2-44c3-9238-93560fcdbb77@gmail.com>
-Date: Thu, 29 Jan 2026 21:13:02 +0100
+        d=1e100.net; s=20230601; t=1769717976; x=1770322776;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MG9JP8LjRrR2xfnKj4V7+0U06WZgMz5Gz7dTiO9L8Zo=;
+        b=j1N0L5tm9oxqyuiprFiLUOD9yI3Y0nm9Ww1q9w1FmAJJqglZSOPLzyBREtOWnN6QsZ
+         CY36qnRfwrYd4GY29E8jfVm15sBZaBqkrFCy4IZmol0JCHPpoiOyWb4t7OzeKzAd7XVu
+         PPK/G1l0SH5TqLMkqH0ggcKhOpOHypWCkrKBRmgKSZCz0kJDV+Qb7hvAm/0M2P2K4DJS
+         zunJfHqTbT5/0cALSQefn5EKQmI3StC/shbsg7nTNBxAMAQxFSp1iiiJn3ELBFUcbRKt
+         MBVO9L+RcrDWKQvfjJSwKecuP/4sfN9wXvqxoBsvD8Ec15I7kS86Z/lZYblZiq9iD9oQ
+         D5Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCXvafiDZBMEivXrjh0Tl0HPLfgHtXqm1E/e1wq9BIhTPO8R+swvbD0r1Up7Tpxla+4m/KI3GfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWu4sRIoMwue433zxTOijNA9Sv3TX6MRzXNfWNUpdj2AyU5hri
+	kMKD5b27RScyVjt/wmVJEXCZljRAfUTkLgNWG+aiiysceD+mTgO6BicqOucnyAaC27I=
+X-Gm-Gg: AZuq6aJPvAnKm9T803olQebi3pVBCSqcQ2LubnjjiXRv6kuGB95nKPEUdGP74MLjBEy
+	DIhmfYRySgEoZI3Dxl8kY62DGfxP2u0cKzp3fFx4wkL63IUTescFiPqqhrB5j1/r8z2ql43QViG
+	04xUBt8TZb6dySJeckHfXxPD0Lql7gm7rXiD8MaRKseLhzAELNE5NMxNB/0G26V7eRV4U+vujtq
+	WRydja0mDtcFQtyrOpTkmPpN34RA19tcd0w9W/nR0b1T65RUAeeDSjMhsnvhXEVzYmkY619T2Iz
+	GYJDHhia4xikBJQbhlQosrOwDIcwq3kRWRiP5I3Is3k7NZU7BdV8yvvgBzV32Bh8nlMvYMDFx+s
+	qtjDspwvkaU9r+AFgLT571TUBEp/ukQ7njErHOCPh3hVaEtZcqYBzRrj5fR6n2Y0Ugc8=
+X-Received: by 2002:a05:6a00:4c0b:b0:823:d04:dee1 with SMTP id d2e1a72fcca58-823ab706ac9mr396250b3a.32.1769717976607;
+        Thu, 29 Jan 2026 12:19:36 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff:2::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379bfcab8sm5892679b3a.36.2026.01.29.12.19.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 12:19:36 -0800 (PST)
+Date: Thu, 29 Jan 2026 12:19:35 -0800
+From: Joe Damato <joe@dama.to>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
+Subject: Re: [PATCH net 4/4] selftests: drv-net: rss_ctx: test RSS contexts
+ persist after ifdown/up
+Message-ID: <aXvA11H0AvNcjaWJ@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+References: <20260129061646.1417185-1-michael.chan@broadcom.com>
+ <20260129061646.1417185-5-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 6/7] ipv6: Enforce Extension Header ordering
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org
-References: <20260126194826.236075-1-tom@herbertland.com>
- <20260126194826.236075-7-tom@herbertland.com>
- <willemdebruijn.kernel.19061eebdb902@gmail.com>
- <31232399-4cf4-49ea-b769-84aceca61dc9@gmail.com>
- <willemdebruijn.kernel.8e46b721f5ed@gmail.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.8e46b721f5ed@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260129061646.1417185-5-michael.chan@broadcom.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254909-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,herbertland.com,davemloft.net,kernel.org,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-254910-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EE52DB42EC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm20253.cco0.facebook.com:mid,broadcom.com:email]
+X-Rspamd-Queue-Id: 95221B4348
 X-Rspamd-Action: no action
 
-On 1/29/26 20:05, Willem de Bruijn wrote:
-> Justin Iurman wrote:
->> On 1/29/26 06:18, Willem de Bruijn wrote:
->>> Tom Herbert wrote:
->>>> RFC8200 highly recommends that different Extension Headers be send in
->>>> a prescibed order and all Extension Header types occur at most once
->>>> in a packet with the exception of Destination Options that may
->>>> occur twice. This patch enforces the ordering be folowed in received
->>>> packets.
->>>>
->>>> The allowed order of Extension Headers is:
->>>>
->>>>       IPv6 header
->>>>       Hop-by-Hop Options header
->>>>       Destination Options before the Routing Header
->>>>       Routing header
->>>>       Fragment header
->>>>       Authentication header
->>>>       Encapsulating Security Payload header
->>>>       Destination Options header
->>>>       Upper-Layer header
->>>>
->>>> Each Extension Header may be present only once in a packet.
->>>>
->>>> net.ipv6.enforce_ext_hdr_order is a sysctl to enable or disable
->>>> enforcement of xtension Header order. If it is set to zero then
->>>
->>> [e]xtension. There are a few more typos in the various commit
->>> messages.
->>>
->>>> Extension Header order and number of occurences is not checked
->>>> in receive processeing (except for Hop-by-Hop Options that
->>>> must be the first Extension Header and can only occur once in
->>>> a packet.
->>>
->>> RFC 8200 also states
->>>
->>>      "IPv6 nodes must accept and attempt to process extension headers in
->>>      any order and occurring any number of times in the same packet,
->>>      except for the Hop-by-Hop Options header, which is restricted to
->>>      appear immediately after an IPv6 header only. Nonetheless, it is
->>>      strongly advised that sources of IPv6 packets adhere to the above
->>>      recommended order until and unless subsequent specifications revise
->>>      that recommendation."
->>>
->>> A case of be strict in what you send, liberal in what you accept.
->>>
->>> This new sysctl has a chance of breaking existing users.
->>
->> Willem,
->>
->> Note that RFC8200 does not use normative language, which is part of the
->> problem. It could theoretically break existing users, but I don't think
->> it will in reality. For that, you would need users to beginning with
->> (joke aside, I like EHs). Anyway, if the order is enforced at sending,
->> why would any receiver accept a different order? In this case, being
->> liberal in what we accept might be a security risk (see below).
->>
->>> The series as a whole is framed as a security improvement. Does
->>> enforcing order help with that?
->>
->> IMHO, any packet with EHs in a different order than the one specified in
->> RFC8200 looks suspicious. So, yes.
+On Wed, Jan 28, 2026 at 10:16:46PM -0800, Michael Chan wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 > 
-> Looks suspicious. But does not introduce concrete new risks?
+> Add tests to verify
+> 1. that RSS contexts persist across interface down/up
+> 2. that RSS contexts persist across interface down/up along
+> with their associated Ntuple fitlers
 > 
-> The main risk I understand around IPv6 extension headers is the risk
-> common to all untrusted network input: bugs in parsing code. Bugs can
-> cause crashes, infinite loops, or worse subtle effects. This is why we
-> introduced the BPF flow dissector, for instance.
+> Testing on bnxt_en:
 > 
-> I don't immediately see how different order of headers increases
-> parsing risk. Nor, btw, that reducing max number of headers from 8 to
-> 2 significantly mitigates a real risk.
+>  TAP version 13
+>  1..1
+>  # timeout set to 0
+>  # selftests: drivers/net/hw: rss_ctx.py
+>  # TAP version 13
+>  # 1..2
+>  # ok 1 rss_ctx.test_rss_context_persist_ifupdown
+>  # ok 2 rss_ctx.test_rss_context_ntuple_persist_ifupdown
+>  # # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+>  ok 1 selftests: drivers/net/hw: rss_ctx.py
 > 
-> No objections necessarily. But I don't fully understand the argument.
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>  .../selftests/drivers/net/hw/rss_ctx.py       | 117 +++++++++++++++++-
+>  1 file changed, 116 insertions(+), 1 deletion(-)
 
-Enforcing the order kills two birds with one stone as it also allows to 
-automatically limit the number of DestOpts in general. This is a gap 
-introduced by RFC8200, where you "must" accept EHs in any order and 
-occurring any number of times in the same packet (even though it says 
-that there might be two DestOpts max). The wording is ambiguous and 
-non-normative. Since the DestOpt can contain a certain amount of 
-options, then you theoretically end up with a nice attack vector.
-
-Regarding why "reducing max number of headers from 8 to 2 significantly 
-mitigates a real risk", it's not about the number of EHs, here this is 
-about the number of options inside a Hop-by-Hop or Destination Option 
-header specifically. Therefore, you further reduce the attack vector.
+I feel like this one might be net-next material since it is a new test and not
+a "Fixes" ?
 
