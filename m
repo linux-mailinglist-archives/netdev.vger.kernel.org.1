@@ -1,211 +1,200 @@
-Return-Path: <netdev+bounces-254574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254575-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOMCH2jwemkhAAIAu9opvQ
-	(envelope-from <netdev+bounces-254574-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:30:16 +0100
+	id 8Di6CIfwemkiAAIAu9opvQ
+	(envelope-from <netdev+bounces-254575-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:30:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF6FABEC4
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:30:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46B2ABEE1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 06:30:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 87499300E73B
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:30:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0B98301570E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1E92D9EEC;
-	Thu, 29 Jan 2026 05:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279232DD608;
+	Thu, 29 Jan 2026 05:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zqla/a0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4ED2D9797;
-	Thu, 29 Jan 2026 05:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9427A2D7394
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 05:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769664599; cv=none; b=k4ItmG7l3yRN2TaI46ZXJnIPAEVtdCONL+FA/sIq/70I4TYWbx/Jts9BIUQswiUOhE0EwUhph/3hfatHEELY8pBtbYZWnz5hu6diT/nXkqQ91XRF8vDL1OvCRMNOD/rvhW4CWi6PEllnYq4kS0BGaJj+81vXXAEh0WZTOWzb1P8=
+	t=1769664636; cv=none; b=CiwYw0WAbvoDspz0fFdwg7y8u50G8DhVLZtfoE7jJOiYQfj2Hbo+H/j2ME9icMQ6jacLxKVbHCdWTy1Pba59wZTnpc2Hy8XGhXEAFwm0kd8DIPUollBfPJ0sWYHwHu4uXWt6Qrib2zC8356eWm1vg7Ks9laiP7KFgP2BUn5g+QM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769664599; c=relaxed/simple;
-	bh=30+imTi0yv9XJyqLeLF4BtuFVz4ZSuLiBHlKCiyICQY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XosbDX8YUaqSgcWWi67AJ4ExFxDPy5a87jDh2ilFpGYN98F/R+90FoxwC/Mj3mnKDmaC77d/PTUJiG6AKm7r0Mdh7n/BtfFOGaT9xJhI+CRRcHFDG9w2lVz5HfHKGKChh/o0mB+SzN/abh0GQoz8b8LkU1Q/lAgziuq1qJ15q40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [10.213.22.141] (unknown [210.73.43.101])
-	by APP-01 (Coremail) with SMTP id qwCowAAHr2pB8HppvVmpBg--.14477S2;
-	Thu, 29 Jan 2026 13:29:39 +0800 (CST)
-Message-ID: <11bd0685-8665-45ef-bec1-8ccf9e38ad6c@iscas.ac.cn>
-Date: Thu, 29 Jan 2026 13:29:37 +0800
+	s=arc-20240116; t=1769664636; c=relaxed/simple;
+	bh=1O7cwy6hZjXpVnnCgMRUy7d2ofsehUXxO6O0OI8b05E=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Gd7l5ORBXfYgLQc4djeZhfmYC6G8IA7EZ8Ak4EM0+12ye94Q1fcXRlXCdV1h5SfTkn2hTBxDXzkXOLfiwYQzudpmyxHlsNJEMpuPxlJGut3neTMi/RutMMtjqg+LyjBJEXAAA7LXUJ/uBAVEcIt7h3rK1rHrOUrNE8/XY6Uq0w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zqla/a0S; arc=none smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-649488dc7bdso506736d50.0
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 21:30:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769664633; x=1770269433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AGKXRwN8IRAA/CVNT/tNROOm2kXqNhpzXybBMt82hSM=;
+        b=Zqla/a0SVlHokWH5mybO3JbfqyIsn6kR2wKMiOmo2CTJkzLHZyMkolkk8+me9bkiW7
+         FX13lARa6xXYJgqSm++zsCxGXUDgar3sAlYw68a9OLAKMRAVvncK8bl66Imlvz1QiZHC
+         WhyYpOCsEwP0Py6EPOmT41j5xYDpjqnXz+vIGCGRx9YgcU1UZuHefj/0oj7XZMUSIhDM
+         WzP/aRY8cVILZ+Acxag7Ri765NA9MQD8ekKwfOoUmyFlO0qe/DHMzNi18UIN0DtfHVoM
+         Cu4Q8OUzIgWdnVhi8l/wlD6ImV5b+h6+Qo09LxLSxLvNrTTacNBO3PqS2zOxzxRj8ahF
+         nzyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769664633; x=1770269433;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AGKXRwN8IRAA/CVNT/tNROOm2kXqNhpzXybBMt82hSM=;
+        b=WtOPJBPOBSCncjwq3+CIqlE+KmibkzjH2UVtJTr4thnIlSyLW6mJ2LAAp5l1ZD2htq
+         vJvrOd2fw+MjrcwntGvCLoL2BZuQ5leqPqXbP2YtwkoKgn7jHTfh+o+DbWkBfJEDQlFY
+         uKGfmoMGEQ8Ml0qQHBxSwPnrZIWirhjVba9hsRgrZHqojH0gSbcE5PMqftnfN5D/u86s
+         VYs0gtIXF9vGygzEd5/uzBVYp8PDGvyj9mj/Ga1NwisQyn4X9eYH8jyr3I152GPnfUr7
+         //dh23ZIAXYGU+udlIXdUhY1WKpCZ+3dF1IIvCirugf7TBrpId4D4hVhKgrZj9abeFCT
+         J/vg==
+X-Forwarded-Encrypted: i=1; AJvYcCVyQYml6IpDvlt9qkTLtAZzonBSaVH9Kaof8+u/wWZ+CknZXICmUGisLBRaPlLrSogAVRcT5II=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfLN8V9hCTG4v6K7SceO0R9rl+GArWbvwKgufc/YwW2sFv/8Kf
+	RviEHW0RyQDfpD2gpI0ZD52EheP5muC4lApqLluxsszYh4/0vupeD9Xa
+X-Gm-Gg: AZuq6aLB2tbKBq2bkJGYoK4YO6Homir/7anIh/ELes1h9nmGkDTE/471LKJ3c/aQiCU
+	eU6d+SBZYtzmv1/xotXpqQTrNYg4Ky8kAthfAyCywUPSgkILEwvqx8g7mjfSqeTTkR/hLzFJzQD
+	ZfBMUXqPKQucCPap+acOtXZI+smsA7Wh0pN7DhI65sblLNQ+Lw1Mpgm7KVYUrVfwNbZLMkEWZ8K
+	0Ldk/ZRuwiiv9xPb4JkyUD7pJwMcjuZ2pXDZIm1pXSeOKg+JEQJGzYL5krLOy7nkaaa5sAltN2C
+	VJe3PbJYmil2DdWrBYYYyt1N4I7exf7ll3qVl7k3wYpdt4TTgFwVCOl5LNpMwdPl59FV+jZmnJo
+	cD2Chkt/0dWP3BsVrTEHAdIEEaedKZfyBNUbqPVUSUxrVeVEefKOkpFjI4o41B84OnEBVFvq9k9
+	WNb7cQ8i4JTKOyhO8ASC8A2RyfPCXR2Rwj07R1JKWi6xmnScQQ82Xytof9MS0=
+X-Received: by 2002:a53:d016:0:b0:644:4eec:222 with SMTP id 956f58d0204a3-6498fc61cd1mr5170715d50.85.1769664633538;
+        Wed, 28 Jan 2026 21:30:33 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64996077bfdsm1872842d50.7.2026.01.28.21.30.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 21:30:33 -0800 (PST)
+Date: Thu, 29 Jan 2026 00:30:32 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Tom Herbert <tom@herbertland.com>, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ netdev@vger.kernel.org, 
+ justin.iurman@uliege.be
+Cc: Tom Herbert <tom@herbertland.com>
+Message-ID: <willemdebruijn.kernel.235a1f46c52f8@gmail.com>
+In-Reply-To: <20260126194826.236075-3-tom@herbertland.com>
+References: <20260126194826.236075-1-tom@herbertland.com>
+ <20260126194826.236075-3-tom@herbertland.com>
+Subject: Re: [PATCH net-next v5 2/7] ipv6: Cleanup IPv6 TLV definitions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: spacemit: k1-emac: fix jumbo frame support
-To: Tomas Hlavacek <tmshlvck@gmail.com>, netdev@vger.kernel.org
-Cc: linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dlan@kernel.org, stable@vger.kernel.org
-References: <20260129042908.410326-1-tmshlvck@gmail.com>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <20260129042908.410326-1-tmshlvck@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qwCowAAHr2pB8HppvVmpBg--.14477S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxAw47Zr1UWrWrAr43ZF15CFg_yoWrAF1kpF
-	4Y9F90krs0yrn2k3Z2ya18tFn8ta17Wr10k3yjv3y8Z3sFkr9rGrnxKrW3Cr9rurWkWF1F
-	9a4UZrnruFWDXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvlb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
-	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvj
-	DU0xZFpf9x07betCcUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254574-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-254575-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: EDF6FABEC4
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,herbertland.com:email]
+X-Rspamd-Queue-Id: B46B2ABEE1
 X-Rspamd-Action: no action
 
-On 1/29/26 12:29, Tomas Hlavacek wrote:
-> The driver never programs the MAC frame size and jabber registers,
-> causing the hardware to reject frames larger than the default 1518
-> bytes even when larger DMA buffers are allocated.
->
-> Program MAC_MAXIMUM_FRAME_SIZE, MAC_TRANSMIT_JABBER_SIZE, and
-> MAC_RECEIVE_JABBER_SIZE based on the configured MTU. Also fix the
-> maximum buffer size from 4096 to 4095, since the descriptor buffer
-> size field is only 12 bits. Account for double VLAN tags in frame
-> size calculations.
->
-> Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tomas Hlavacek <tmshlvck@gmail.com>
+Tom Herbert wrote:
+> Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h to be with the rest
+> of the TLV definitions. Label each of the TLV definitions as to whether
+> they are a Hop-by-Hop option, Destination option, or both.
+> 
+> Signed-off-by: Tom Herbert <tom@herbertland.com>
 > ---
-> v3:
-> - Set all three frame/jabber registers, fix 12-bit buffer size field
->   overflow, use actual frame size with VLAN headroom consistently.
->
-> v2: https://lore.kernel.org/netdev/20260126171449.83288-1-tmshlvck@gmail.com/
-> - Added Fixes tag and Cc stable.
->
-> v1: https://lore.kernel.org/netdev/20260126135919.77168-1-tmshlvck@gmail.com/
-> ---
->  drivers/net/ethernet/spacemit/k1_emac.c | 21 +++++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-> index 220eb5ce7583..cd6879d7434c 100644
-> --- a/drivers/net/ethernet/spacemit/k1_emac.c
-> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
-> @@ -12,6 +12,7 @@
->  #include <linux/dma-mapping.h>
->  #include <linux/etherdevice.h>
->  #include <linux/ethtool.h>
-> +#include <linux/if_vlan.h>
->  #include <linux/interrupt.h>
->  #include <linux/io.h>
->  #include <linux/iopoll.h>
-> @@ -38,7 +39,7 @@
+>  include/uapi/linux/in6.h        | 21 ++++++++++++++-------
+>  include/uapi/linux/ip6_tunnel.h |  1 -
+>  2 files changed, 14 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
+> index 5a47339ef7d7..438283dc5fde 100644
+> --- a/include/uapi/linux/in6.h
+> +++ b/include/uapi/linux/in6.h
+> @@ -140,14 +140,21 @@ struct in6_flowlabel_req {
 >  
->  #define EMAC_DEFAULT_BUFSIZE		1536
->  #define EMAC_RX_BUF_2K			2048
-> -#define EMAC_RX_BUF_4K			4096
-> +#define EMAC_RX_BUF_MAX			FIELD_MAX(RX_DESC_1_BUFFER_SIZE_1_MASK)
->  
->  /* Tuning parameters from SpacemiT */
->  #define EMAC_TX_FRAMES			64
-> @@ -202,8 +203,7 @@ static void emac_init_hw(struct emac_priv *priv)
->  {
->  	/* Destination address for 802.3x Ethernet flow control */
->  	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
-> -
-> -	u32 rxirq = 0, dma = 0;
-> +	u32 rxirq = 0, dma = 0, frame_sz;
->  
->  	regmap_set_bits(priv->regmap_apmu,
->  			priv->regmap_apmu_offset + APMU_EMAC_CTRL_REG,
-> @@ -228,6 +228,15 @@ static void emac_init_hw(struct emac_priv *priv)
->  		DEFAULT_TX_THRESHOLD);
->  	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
->  
-> +	/* Set maximum frame size and jabber size based on configured MTU,
-> +	 * accounting for Ethernet header, double VLAN tags, and FCS.
-> +	 */
-> +	frame_sz = priv->ndev->mtu + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
-> +
-> +	emac_wr(priv, MAC_MAXIMUM_FRAME_SIZE, frame_sz);
-> +	emac_wr(priv, MAC_TRANSMIT_JABBER_SIZE, frame_sz);
-> +	emac_wr(priv, MAC_RECEIVE_JABBER_SIZE, frame_sz);
-> +
->  	/* Configure flow control (enabled in emac_adjust_link() later) */
->  	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
->  	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
-> @@ -924,14 +933,14 @@ static int emac_change_mtu(struct net_device *ndev, int mtu)
->  		return -EBUSY;
->  	}
->  
-> -	frame_len = mtu + ETH_HLEN + ETH_FCS_LEN;
-> +	frame_len = mtu + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
->  
->  	if (frame_len <= EMAC_DEFAULT_BUFSIZE)
->  		priv->dma_buf_sz = EMAC_DEFAULT_BUFSIZE;
->  	else if (frame_len <= EMAC_RX_BUF_2K)
->  		priv->dma_buf_sz = EMAC_RX_BUF_2K;
->  	else
-> -		priv->dma_buf_sz = EMAC_RX_BUF_4K;
-> +		priv->dma_buf_sz = EMAC_RX_BUF_MAX;
->  
->  	ndev->mtu = mtu;
->  
-> @@ -2005,7 +2014,7 @@ static int emac_probe(struct platform_device *pdev)
->  	ndev->hw_features = NETIF_F_SG;
->  	ndev->features |= ndev->hw_features;
->  
-> -	ndev->max_mtu = EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
-> +	ndev->max_mtu = EMAC_RX_BUF_MAX - (ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN);
->  	ndev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
->  
->  	priv = netdev_priv(ndev);
+>  /*
+>   *	IPv6 TLV options.
+> + *
+> + *	Hop-by-Hop and Destination options share the same number space.
+> + *	For each option below whether it is a Hop-by-Hop option or
+> + *	a Destination option is indicated by HBH or DestOpt.
+>   */
+> -#define IPV6_TLV_PAD1		0
+> -#define IPV6_TLV_PADN		1
+> -#define IPV6_TLV_ROUTERALERT	5
+> -#define IPV6_TLV_CALIPSO	7	/* RFC 5570 */
+> -#define IPV6_TLV_IOAM		49	/* RFC 9486 */
+> -#define IPV6_TLV_JUMBO		194
+> -#define IPV6_TLV_HAO		201	/* home address option */
+> +#define IPV6_TLV_PAD1		0	/* HBH or DestOpt */
+> +#define IPV6_TLV_PADN		1	/* HBH or DestOpt */
+> +#define IPV6_TLV_TNL_ENCAP_LIMIT 4	/* RFC 2473, DestOpt */
+> +#define IPV6_TLV_ROUTERALERT	5	/* HBH */
+> +#define IPV6_TLV_CALIPSO	7	/* RFC 5570, HBH */
+> +#define IPV6_TLV_IOAM		49	/* RFC 9486, HBH or Destopt
+> +					 * IOAM sent and rcvd as HBH
 
-Thanks for the fix. This essentially matches what I've been testing as well.
+Explicit labeling with HBH or Destopt is quite informative.
 
-Reviewed-by: Vivian Wang <wangruikang@iscas.ac.cn>
+Does this mean that IPV6_TLV_IOAM should also be accepted in ip6_parse_tlv
+in the Destopt branch? RFC 9486 indeed did reserve a number.
+
+> +					 */
+> +#define IPV6_TLV_JUMBO		194	/* HBH */
+> +#define IPV6_TLV_HAO		201	/* home address option, DestOpt */
+>  
+>  /*
+>   *	IPV6 socket options
+> diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip6_tunnel.h
+> index 85182a839d42..35af4d9c35fb 100644
+> --- a/include/uapi/linux/ip6_tunnel.h
+> +++ b/include/uapi/linux/ip6_tunnel.h
+> @@ -6,7 +6,6 @@
+>  #include <linux/if.h>		/* For IFNAMSIZ. */
+>  #include <linux/in6.h>		/* For struct in6_addr. */
+>  
+> -#define IPV6_TLV_TNL_ENCAP_LIMIT 4
+>  #define IPV6_DEFAULT_TNL_ENCAP_LIMIT 4
+>  
+>  /* don't add encapsulation limit if one isn't present in inner packet */
+> -- 
+> 2.43.0
+> 
 
 
 
