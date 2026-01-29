@@ -1,237 +1,177 @@
-Return-Path: <netdev+bounces-254919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMfSC7DWe2klIwIAu9opvQ
-	(envelope-from <netdev+bounces-254919-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:52:48 +0100
+	id mM32B5rYe2l3IwIAu9opvQ
+	(envelope-from <netdev+bounces-254920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:00:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84838B51AE
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:52:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF78B527D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E012300E3AC
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 21:52:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 377FF30041C8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B0A3385A5;
-	Thu, 29 Jan 2026 21:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F1C33DEF5;
+	Thu, 29 Jan 2026 22:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iKLVvsVX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FuORfFkK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E32366831
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 21:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65FD326D69;
+	Thu, 29 Jan 2026 22:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769723565; cv=none; b=MJ/74EFClCvukB6Sn1mdnZOpeO3w0gwi098734yWhctQ6WQ24XNf3nY0Hs5YR3HuhaJ+aUn2qQIhRCIpcKVhiOScjp2BjsUSurOh+Imc9Eo0fHOBUcrQjOLs66V0NH4+LKrTHtNMCThe09C/7wGmIBA3ygZu6ZISgbU73RqlHyA=
+	t=1769724055; cv=none; b=mjlr10czhk6Yzila4jCKCJRFpJ8Au7cywedtl2YRoDofCFP7g2Iwh65hEKt49Qjgxd2Q//J56Lakv0WkQLa9d6eYJ5JjEMV3dd+if9N+Eq4MlFANUehhHEAXD3m9sB4gfo4rAtD6dzNkTsaLfdjCHGTn4xwC9sHaTXLYuBx/VTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769723565; c=relaxed/simple;
-	bh=mdOjVbsypDRwFTpeTgSO5uLjV0okQUVzWRSA7tx9Iac=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ECYhMXVpWldrsRc96FFS8vfFhXJFvypcgHvG7wQdiHkCy5erN+Hd0LM55GjYI+PsK3X4S6tPR+Zs/+d1J52mYWGkawaY1KdlmCOm5qHbgSPExzFOjKF74uktDATPPEhyD01s/ma9a/kiawSU9TZLZ0jXVoM79NngVSiT3l+7/zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iKLVvsVX; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769723564; x=1801259564;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:to:cc;
-  bh=mdOjVbsypDRwFTpeTgSO5uLjV0okQUVzWRSA7tx9Iac=;
-  b=iKLVvsVXcTldjycO2S1XEO27tF5l4cfVLm0L63BSbwAbIh1cjPRzHC7a
-   pRW1v+rGEqADUepOgbOxS+aFhkbIeg5UnkAbrzGva90RVnvnCkk2kqEFH
-   sysAHvwv3E59OhYpWhqOxnUFUlCf9RxHNsRKDqp1sBuo7rmAVVk9eFXtA
-   PgCA37rylxE0nJcsbCfd183VjKREV7ESx4J3uDmEnuFBgXyrmWQazF58U
-   brUUQo6nFdxDUJ0bBAUUkXjrqc3ZQCP5zhHiGTEY1uU9RYcWFw6l8a3c/
-   mnD/zTIM5N3ZDdO+nTE1y18g8OHWVJikltPIO1+EuXCgnX9iv9Z05yhlN
-   w==;
-X-CSE-ConnectionGUID: F7J73fo8S1STcFgK0SP5vA==
-X-CSE-MsgGUID: ZiabcPFBSZKAPmOx83bm4A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="71013287"
-X-IronPort-AV: E=Sophos;i="6.21,261,1763452800"; 
-   d="scan'208";a="71013287"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 13:52:42 -0800
-X-CSE-ConnectionGUID: c8hxNuRAS3KoYRTIn17JDw==
-X-CSE-MsgGUID: 64tK2ZBmTwKesOV8cxxVYA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,261,1763452800"; 
-   d="scan'208";a="208797888"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 13:52:42 -0800
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 29 Jan 2026 13:52:05 -0800
-Subject: [PATCH iwl-next] i40e: only timestamp PTP event packets
+	s=arc-20240116; t=1769724055; c=relaxed/simple;
+	bh=YqNWb+uEWkjz1XXk8wLbalCffPtk4g7xZuyyJzhd2iA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NXaaz4PLtKg6nSOcfw4guB6naEy4HNlpRhhNgEV/5A7zHcGH20DpMLAsoFJ28YUC3hcXX/9HI7cUdsRs6S5Drew6bixbEhsam9nXOkQ4OS93EyEEmI68KdbZQ9wQ8NbRk2GgPMDDAYPigmX4BlyI/NwFpc5qwRn1x9hjbc7F+DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FuORfFkK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5NaZq7/qOx5j3sYVWWAXyxivGGckilTrm3I0MWAebJ0=; b=FuORfFkKV0DQIUUuMAonHTBSMq
+	HF2MOUM/Hc7enwPm0B5st77tQNNjf0eKU/pZo/h8uFpZk3KazeRogVT16rnuLFu4rRtaZ6WB50HuT
+	oQloQVUjqsYNnVPMNueythTNsQumeeZJpD7lFjQuMi2kGPSSZ/2aqJe5xufgqTlMcawAYyslgphns
+	OxxQAsBSIewVc03grwlhmNGyURyOFRkdaZLHvnAGAntQeeeLslHwVSeWeW1Nl1gP66MfK6N91OFj9
+	5OB/+2cFKWTslP6LNj6Kz3pKBbMrqn4RcR2kAjhsppKEXH6aexaqY+7IKQt7qE+B8ThTjVf70J7OS
+	v6U1biyg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39260)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vla4A-000000000Va-0f2c;
+	Thu, 29 Jan 2026 22:00:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vla44-000000008Kd-1QMZ;
+	Thu, 29 Jan 2026 22:00:36 +0000
+Date: Thu, 29 Jan 2026 22:00:36 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
+ inband goodies
+Message-ID: <aXvYhM6mHE4p_B14@shell.armlinux.org.uk>
+References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
+ <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
+ <aXPo5R1Q-qWG3r3l@shell.armlinux.org.uk>
+ <aXjSbu6L6ICYOPiJ@oss.qualcomm.com>
+ <aXjdAZeUl2Dsu4mE@shell.armlinux.org.uk>
+ <aXsLyb+x76/WaXcs@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260129-jk-i40e-limit-timestamping-v1-1-0495e6e7d318@intel.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NQQ6CMBAAv2L27BqWVkBP/sNwQNzCKi2kbRBD+
- LsNL/A4mWRmhcBeOMD1sILnWYKMLgEdD9D2jesY5ZkY8iw/E5HC1xtFZ4yDWIkYxXKIjZ3EdVj
- pUpvWKMU6gxSYPBtZ9vgd5DOg4yVCnUwvIY7+u19n2v0/g5mQsNCcXypTcvFQN3GRh1M7Wqi3b
- fsBPCfo6c4AAAA=
-X-Change-ID: 20251113-jk-i40e-limit-timestamping-8474fcf33e40
-To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
- netdev@vger.kernel.org
-Cc: przemyslaw.korba@intel.com, Jacob Keller <jacob.e.keller@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-X-Mailer: b4 0.15-dev-f4b34
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5306;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=mdOjVbsypDRwFTpeTgSO5uLjV0okQUVzWRSA7tx9Iac=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhszqa8tE96gx71XNu1PhvPFZpfN03da7tfV8wbN+zC3Pe
- +TI+E6lo5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgImE6DIy3FfuvdQy86tjbtEP
- qVkNN1iVd+j8mOY3w11C0XjrU2POYwz/1CbcWBx532OTbHsZw6NgtqdKorfuX5Iw3RSvKids9ia
- RCQA=
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXsLyb+x76/WaXcs@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254919-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254920-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 84838B51AE
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: BCF78B527D
 X-Rspamd-Action: no action
 
-The i40e_ptp_set_timestamp_mode() function is responsible for configuring
-hardware timestamping. When programming receive timestamping, the logic
-must determine how to configure the PRTTSYN_CTL1 register for receive
-timestamping.
+On Thu, Jan 29, 2026 at 12:57:05PM +0530, Mohd Ayaan Anwar wrote:
+> I was thinking about the "good" sequence (i.e., the current net-next
+> tree):
+> 	-> phylink_up
+> 	  -> mac_link_up
+> 	    -> fix_mac_speed
+> 	      -> SerDes configured via phy_set_speed
+> 	      -> stmmac_pcs_ctrl_ane(priv, enable/disable, 0)
+> 
+> Please let me know if you want me to try any other experiments.
+> Maybe I need to do some more testing after playing around with the
+> sequence followed by this series?
 
-The i40e hardware does not support timestamping all frames. Instead,
-timestamps are captured into one of the four PRTTSYN_RXTIME registers.
+Given discussion elsewhere, it seems that the generic PHY maintainers
+have come to the conclusion (at my request) that the documentation is
+incorrect and needs to be changed:
 
-Currently, the driver configures hardware to timestamp all V2 packets on
-ports 319 and 320, including all message types. This timestamps
-significantly more packets than is actually requested by the
-HWTSTAMP_FILTER_PTP_V2_EVENT filter type.
+	Order of API calls
+	==================
 
-The documentation for HWTSTAMP_FILTER_PTP_V2_EVENT indicates that it should
-timestamp PTP v2 messages on any layer, including any kind of event
-packets.
+	The general order of calls should be::
 
-Timestamping other packets is acceptable, but not required by the filter.
-Doing so wastes valuable slots in the Rx timestamp registers. For most
-applications this doesn't cause a problem. However, for extremely high
-rates of messages, it becomes possible that one of the critical event
-packets is not timestamped.
+	    [devm_][of_]phy_get()
+	    phy_init()
+	    phy_power_on()
+	    [phy_set_mode[_ext]()]
+	    ...
+	    phy_power_off()
+	    phy_exit()
+	    [[of_]phy_put()]
 
-The PTP protocol only requires timestamps for event messages on port 319,
-but hardware is timestamping on both 319 and 320, and timestamping message
-types which do not need a timestamp value.
+Essentially, most users of generic PHY do not follow this, but call
+phy_set_mode[_ext]() before phy_power_on().
 
-The i40e hardware actually has a more strict filtering option. First, only
-timestamp layer 4 messages on port 319 instead of both 319 and 320. Second,
-note that hardware has a specific mode to timestamp only event packets
-(those with message type < 8).
+This will have implications for this patch series, particularly the
+serdes related changes, and will make the update to qcom-sgmii-eth
+more complex (as its current phy_power_on() implementation does
+very little and isn't the reverse of phy_power_off().)
 
-Update the configuration to use this mode, so that timestamps are captured
-for only event messages. This replaces the use of the 'wildcard' option of
-the V2MESSTYPE field which caused timestamping of all message types
-regardless of whether it was an event message.
 
-This avoids wasting the valuable Rx timestamp register slots on non-event
-frames, and may reduce faults when operating under high event rates.
+In the mean time, please test patch 2 to see whether that can be
+merged.
 
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_register.h | 10 ++++++++++
- drivers/net/ethernet/intel/i40e/i40e_ptp.c      |  9 +++------
- 2 files changed, 13 insertions(+), 6 deletions(-)
+I'm going to re-order some of the patches in this series to see what
+else can be merged without depending on that and without affecting
+dwmac-qcom-ethqos, and thus shrinking this series.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
-index c4051dbcc297..2560c47910d4 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-@@ -797,8 +797,18 @@
- #define I40E_PRTTSYN_CTL1_V2MESSTYPE0_SHIFT 16
- #define I40E_PRTTSYN_CTL1_V2MESSTYPE0_MASK I40E_MASK(0xF, I40E_PRTTSYN_CTL1_V2MESSTYPE0_SHIFT)
- #define I40E_PRTTSYN_CTL1_TSYNTYPE_SHIFT 24
-+#define I40E_PRTTSYN_CTL1_TSYNTYPE_MASK I40E_MASK(0x3, I40E_PRTTSYN_CTL1_TSYNTYPE_SHIFT)
-+/* Timestamp UDP v1 packets */
-+#define I40E_PRTTSYN_CTL1_TSYNTYPE_V1 \
-+	FIELD_PREP(I40E_PRTTSYN_CTL1_TSYNTYPE_MASK, 1)
-+/* Timestamp L2 and UDP v2 packets with message type < 8 */
-+#define I40E_PRTTSYN_CTL1_TSYNTYPE_V2_EVENT \
-+	FIELD_PREP(I40E_PRTTSYN_CTL1_TSYNTYPE_MASK, 3)
- #define I40E_PRTTSYN_CTL1_UDP_ENA_SHIFT 26
- #define I40E_PRTTSYN_CTL1_UDP_ENA_MASK I40E_MASK(0x3, I40E_PRTTSYN_CTL1_UDP_ENA_SHIFT)
-+/* Timestamp UDP packets on port 319 */
-+#define I40E_PRTTSYN_CTL1_UDP_ENA_319 \
-+	FIELD_PREP(I40E_PRTTSYN_CTL1_UDP_ENA_MASK, 1)
- #define I40E_PRTTSYN_CTL1_TSYNENA_SHIFT 31
- #define I40E_PRTTSYN_CTL1_TSYNENA_MASK I40E_MASK(0x1, I40E_PRTTSYN_CTL1_TSYNENA_SHIFT)
- #define I40E_PRTTSYN_INC_H 0x001E4060 /* Reset: GLOBR */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index 89abe2f22216..d70adf2e5a1c 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -24,9 +24,6 @@
- #define I40E_PTP_1GB_INCVAL_MULT	20
- #define I40E_ISGN			0x80000000
- 
--#define I40E_PRTTSYN_CTL1_TSYNTYPE_V1  BIT(I40E_PRTTSYN_CTL1_TSYNTYPE_SHIFT)
--#define I40E_PRTTSYN_CTL1_TSYNTYPE_V2  (2 << \
--					I40E_PRTTSYN_CTL1_TSYNTYPE_SHIFT)
- #define I40E_SUBDEV_ID_25G_PTP_PIN	0xB
- 
- enum i40e_ptp_pin {
-@@ -1278,7 +1275,7 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
- 		pf->ptp_rx = true;
- 		tsyntype = I40E_PRTTSYN_CTL1_V1MESSTYPE0_MASK |
- 			   I40E_PRTTSYN_CTL1_TSYNTYPE_V1 |
--			   I40E_PRTTSYN_CTL1_UDP_ENA_MASK;
-+			   I40E_PRTTSYN_CTL1_UDP_ENA_319;
- 		config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
- 		break;
- 	case HWTSTAMP_FILTER_PTP_V2_EVENT:
-@@ -1295,9 +1292,9 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
- 	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
- 		pf->ptp_rx = true;
- 		tsyntype = I40E_PRTTSYN_CTL1_V2MESSTYPE0_MASK |
--			   I40E_PRTTSYN_CTL1_TSYNTYPE_V2;
-+			   I40E_PRTTSYN_CTL1_TSYNTYPE_V2_EVENT;
- 		if (test_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps)) {
--			tsyntype |= I40E_PRTTSYN_CTL1_UDP_ENA_MASK;
-+			tsyntype |= I40E_PRTTSYN_CTL1_UDP_ENA_319;
- 			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
- 		} else {
- 			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
-
----
-base-commit: 38e28dad667f597c26856f2e0c3e95f70e0ab509
-change-id: 20251113-jk-i40e-limit-timestamping-8474fcf33e40
-
-Best regards,
---  
-Jacob Keller <jacob.e.keller@intel.com>
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
