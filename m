@@ -1,62 +1,69 @@
-Return-Path: <netdev+bounces-254946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0E+aDpHve2keJgIAu9opvQ
-	(envelope-from <netdev+bounces-254946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 00:38:57 +0100
+	id cN+RBe/ve2keJgIAu9opvQ
+	(envelope-from <netdev+bounces-254947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 00:40:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB10AB5BCA
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 00:38:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CCDB5BE0
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 00:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44541301690B
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:37:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 04C3D3006B5A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A927936C0B1;
-	Thu, 29 Jan 2026 23:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7404B374748;
+	Thu, 29 Jan 2026 23:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLhvKud+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHZq4Xz8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8600936A004
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 23:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504E3236453;
+	Thu, 29 Jan 2026 23:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769729864; cv=none; b=E7EYAZb8ahPLPLKKXwFel3VnU0ZI5uY2FTlemaWOGLDoIqNudXwhDgxspy5AzyH3KD3o06qcjnTuYPCnNUX0UM1TVTfhPKebXzMDLjRxequ1wH1Ck6Xrn4ULq+cPfs/yEj4mpoInk2VPze0dI2jax1fo3R9o/YyzGVFd4iPy15Y=
+	t=1769730026; cv=none; b=Sllsoo7AyltPuOXAtDCqe+dPLFYSjzlztZb0vRfih0f9uIrKtjM9pHjGhXccDxUrcPgYlFMeZ6/uvC4S6gWmJXUwMBoFGKN72QWgsILLaZqns7tHxL5cB7VWMt6+fDPG2y1Y0hzl97qgo/2UCN2fh+rK40gEl6uMC3VppFrzUZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769729864; c=relaxed/simple;
-	bh=avK6K4EySPGpHdKfutthBx1Cs3DdmlsHH5kiQ1OF45I=;
+	s=arc-20240116; t=1769730026; c=relaxed/simple;
+	bh=7V/w0cMiWKDJR01klhKtUJS0e5hzRvts/SSEVugoySs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uD8WuzEbmImhPiHtSpqVR9HFuf5/dyv4KEq+HgiPZKbrHbnPZ91NgHmySTZz7z2EgEKXaMlt7u4zf4flfrVMiX2MCXND5f12C0ORidxyHBzp635TKpnsjU04Gr6rYgj0XAgB9YEgNqvw+702zQDiFEXx97EEnlw9CBXO7kFtgVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLhvKud+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D837AC4CEF7;
-	Thu, 29 Jan 2026 23:37:43 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hPOWr4qHLBO7J2NAeUrUPahkOhyOrNxfTf/mvAohlrqLbY3hutM9dMP3O9zfjgZTEKJOg8LxgNHZXiBUlpkMujuLeXe6/HP5tHe9qGBxwOJMhmF7OaDWzzw2MJ3zbwjpHMZ15M/6FuhxY9U9uY1BSFYWtoAHqG0Lw5y+l0V0byQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHZq4Xz8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C218C4CEF7;
+	Thu, 29 Jan 2026 23:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769729864;
-	bh=avK6K4EySPGpHdKfutthBx1Cs3DdmlsHH5kiQ1OF45I=;
+	s=k20201202; t=1769730025;
+	bh=7V/w0cMiWKDJR01klhKtUJS0e5hzRvts/SSEVugoySs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SLhvKud+rfpOPXWpBH2g+s6LcJdHzwBCy26DaprpjDzRfla/JGuGNMql82fJj4xxp
-	 hP5UO9Ws7Jv9CjJFYlbmsO9K9X+ugX3UTsSIgoVxrGZaLG6btsOe6mIMdwHBPwGsZb
-	 q/6ziqAEa3Dn1b28nmKlsQY3XxpX0cvxDnrzEI2ZC/SqGvjUsVgseMFjkHhuVRp8zQ
-	 vSPcCItyFBtCt980iSAt46opjoa470o2Te6G8jzwWOxSDX2QYZ3l5jByA673V9tMMA
-	 lGKP94Lwcp7p6qiPtuQuZYL+1JXPg8yneI/VFyaVHXU8LqZ/BB3sJNQ3e3fZOb4maJ
-	 Kuck3Nfa4l6Tg==
-Date: Thu, 29 Jan 2026 15:37:42 -0800
+	b=nHZq4Xz8dM8FOkArZFPv+4z5ZXxi2TDozybO19H76dTX5MKZqTdf8MqZD4UCE+Ji7
+	 FtMGJOd5+0TD8Hcm5hfxn3ar5aA4aOCrSp0TqJ2meMMnLH1FOzvlEmtTwtMLVVpDRh
+	 h4h7/bF26q0XwCao27Jd2gBGSBWkkNg8DMQWJhtWxxT2Pnxf+HLHik+8LsOhdA+dBd
+	 J8S6nTdyL1YoIHK+cJQNQD1V6LhrR6lxGhopXLFXJM/eErBKDXOO/hg6CHWnn7+919
+	 EFZe+ZUeOc+aucirwIjX5OG1S9TKNT4+dGzulfcESVdraotLH8skN547lkfCuYWGkf
+	 7lG+r6hzYQJRg==
+Date: Thu, 29 Jan 2026 15:40:24 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Sune <marcdevel@gmail.com>
-Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
- netdev@vger.kernel.org, dborkman@kernel.org, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net v2 2/4] selftests/net: add no ARP b/mcast,null
- poison test
-Message-ID: <20260129153742.7062638d@kernel.org>
-In-Reply-To: <CA+3n-TprC7Fs0HiBndR+OpYmy2vq=raiuSE=_R49LVxjax8Aug@mail.gmail.com>
-References: <cover.1769464405.git.marcdevel@gmail.com>
-	<713d6f1ca57b402be420ade1331acee4898675c4.1769464405.git.marcdevel@gmail.com>
-	<20260128202739.79af1bb8@kernel.org>
-	<CA+3n-TprC7Fs0HiBndR+OpYmy2vq=raiuSE=_R49LVxjax8Aug@mail.gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com"
+ <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ "horms@kernel.org" <horms@kernel.org>, "leon@kernel.org" <leon@kernel.org>
+Subject: Re: [PATCH net V2 2/4] net/mlx5: Fix deadlock between devlink lock
+ and esw->wq
+Message-ID: <20260129154024.3915c3bf@kernel.org>
+In-Reply-To: <d52714243592921c08175aa742f32ae56e4f6651.camel@nvidia.com>
+References: <1769503961-124173-1-git-send-email-tariqt@nvidia.com>
+	<1769503961-124173-3-git-send-email-tariqt@nvidia.com>
+	<20260128205622.12e1f026@kernel.org>
+	<d52714243592921c08175aa742f32ae56e4f6651.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,65 +78,45 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254946-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,kernel.org,linux.dev];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-254947-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AB10AB5BCA
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A4CCDB5BE0
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 19:28:22 +0100 Marc Sune wrote:
-> > > diff --git a/tools/testing/selftests/net/arp_send.c b/tools/testing/selftests/net/arp_send.c
-> > > new file mode 100644  
-> >
-> > Could you check if mausezahn from netsniff-ng can send these
-> > packets already? We already depend on mausezahn for other tests.
-> >
-> > Similar comments on patch 4, I'm not gonna repeat.  
+On Thu, 29 Jan 2026 10:33:40 +0000 Cosmin Ratiu wrote:
+> > This is quite an ugly hack, is there no way to avoid the flush and
+> > let 
+> > the work discover that what it was supposed to do is no longer
+> > needed?  
 > 
-> I can do that for ARP, but not for NDP apparently. Only basic ICMPv6
-> echo req/reply is supported. For NDP (ICMPv6), it needs to be
-> specified using -P (hex). Kind of ugly...
-> 
-> In RFC v1 I proposed to use a scapy
-> (https://lore.kernel.org/netdev/3cfd28edb2c2b055e74b975623a3d38ade0237f1.1766349632.git.marcdevel@gmail.com/),
-> which is substantially smaller than arp_send/ndisc_send.c. I dropped
-> it based on the v1 review I got. I see scapy is used in bpf/ and
-> tc-testing/ self-tests.
-> 
-> What's your preference?
-> 
-> a) use mausezahn only for ARP, use ndisc_send.c for NDP
-> b) use only .c progs for consistency
-> c) recover the scapy patch and squash it in patches 2/4
+> Not possible, unfortunately. I stared at it for quite a while. The wq
+> is flushed because the esw is being unconfigured, which removes data
+> structs the work handler uses. Flushing the work is required, otherwise
+> we'll run into worse issues.
 
-Hm, I think there's another tool we use for ndisc - ndisc6
-Could you try if that works? if not maybe grep around if any
-other tool is already used by the tests, we have a bunch of 
-ndisc and igmp tests, maybe one of those will do.
-
-If not, my first choice would be to update ndisc6 or mausezahn
-to teach them. Second choice a local C code just ndisc_send.c
-scapy as the last choice.
+And having a refount on (I presume) struct mlx5_esw_functions
+so that work can hold a ref is not an option?
+Are you planning to revisit this in -next?
 
