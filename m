@@ -1,213 +1,218 @@
-Return-Path: <netdev+bounces-254886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254887-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oHBvEWOje2kVHgIAu9opvQ
-	(envelope-from <netdev+bounces-254886-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:13:55 +0100
+	id 0DNEK9Wme2lWHgIAu9opvQ
+	(envelope-from <netdev+bounces-254887-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:28:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E39D3B3713
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:13:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB0EB393C
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 19:28:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3C3FA301464D
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:13:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1E16630157F6
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 18:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FBD3446C5;
-	Thu, 29 Jan 2026 18:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D802F6188;
+	Thu, 29 Jan 2026 18:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8Qfkgu/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQkcZhBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B10919F40B
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769710409; cv=none; b=YDFE0HgmqyYf2jOqUWNJFeuvS8St1vhf5k8RR3Z2EpH2r3qmFY9ENnzB+Ua0NeZQVCM8mt+ZdzgkFqA70IWjYbmuUUVWKrfnyV/+moxBI5S/v2kCQ01YS7zxNSLH703HFIefRS22M5j9rnmPA0RO5V7ReWNR4Cu8kZHv7xR7i8s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769710409; c=relaxed/simple;
-	bh=Uv5WZMcU42sQxpjJG8wdnYQ2lhgUufULsYE1nP7I1m4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=e18IYOzNPXbhg/Oozbdr3ZWUPpJiYzlKc6ApSTlSxi3mimSrXyU/SBKT29VCVjwH/vP54Uk94w2JWllZwEc7EDX1Fr/1hARrkY2JPjw0E+uyEf7NMFF0omyKak8vDv8Nfjdpove7ycG7DbxZnYg03s0Bw/kq/YMn9st/LY/gEsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8Qfkgu/; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FB22F6168
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769711315; cv=pass; b=JA0PbvNGQUeLHWobukLV9C1frHfU0gghPNQByVvIOCgJqb9eoJS6GfFmR6iXS4YIzFRQkAAP0J/vhF7WtldHtDe48JIpkxM2ZM5drM7G6FY2G0mXRZZy1hdmzgllha3t9YOnq3URoaET0XHOIKgcttCLbckU0rPiVsJhzZJQdks=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769711315; c=relaxed/simple;
+	bh=s6dBwpRUC8kmWPUOeRbOQj49eHBSQ5EbYLn5ZF8Vrx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DkUX9vZCV5I/KyesdEVFJ4E6OpDqoDnHYq069el1aLD4Zb10etiL8iwXkRZ2qfq/Zr9Mj7VuE9gW0ZL4G/FMk4B08BM702/l5022m52J6lydbqr+CViAM5qwj8Jb9OB+gA4n/InUo3sr00mYOHkXcFlTf7r51z1eVTjMnPFb3LU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQkcZhBk; arc=pass smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4327790c4e9so814502f8f.2
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:13:27 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34c27d14559so725254a91.2
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 10:28:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769711313; cv=none;
+        d=google.com; s=arc-20240605;
+        b=H3MH6uN6+gzmsDBN8+XIktmANH3zLkgXSGqtDrBUlGLYOLhbjNWje/craH3KLYKXMq
+         /a8wVU7o+gyNY3yo+72EAkrbNYCTW7iYv+snAOIRTtVFiKh/XR0tONZgyol4a/1n5mzc
+         L6g//QHRv1HIj1RvhK+5TOPCNzm2DGnIXEvfJ09VkMJB7mdmUPxcADTTX60is58b2EiQ
+         ehowW9j9S8CNTblpTy5R7JGjfZqc6XU2CWz4VKUhvHXCU2J4zsuWdH3kUdp460bpYyJw
+         NUzuAMqO1HP8uQDTzkZcVp7bfd5cjqxgcTSOQB0B7TXw2ypu1zzTkptdc2iCnHnB+5Gv
+         8nTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Mo/ng+fMSnPglDzDDUYatnZfwWM1+7CUkEAzUwXHl1I=;
+        fh=NL42ll6Sv19svTu8aUmazgyBOzfdGp23YxKeD2oh5Og=;
+        b=dR2wtrRBHyo2+HXBq/6bmZhBJoKSiLSljx190WNwbqw4SsJesHzi4o21nVUWoouy6p
+         oNTXnUpdFP8Ephul0rGk6V6/wFcfj3ziJn2fKJn5l5Zr7kebx0gSU62nJbHbXoZVUb1q
+         Q4F34xbwzE4gKSkHv5IY+T7BDDxuys9r/3Dy2ECWGMEN3fQZ2oQInT52sukkjKUtQUqH
+         rKyWQhNn0OOw9QKHuA1BZ+TX1wyYaUc2Tdj/BrhR4Ly/XMCHw+j5vIEGXkpeEETPI0Bt
+         meNgZvsCi8IhlN48YXu9Po2LKYe5qSs6NwsflHzzjHA4u9HONzDfSb1GWmv8s7YUDBmt
+         D1Ug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769710406; x=1770315206; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nlCyxHSNnwuwcAWe3w3p+ljfIeMBEuInyL0DKq9zkyY=;
-        b=T8Qfkgu/FXXEX30gKJJfUfcivl6eEaLhIrhkA0VIcJOxaRESKcmMCRUZhwU/t0wYvu
-         jPCm2wVpwIU/ySMndEgrOdNDMNHM0TDPCXESzi0CQF3AgPdkYrngrCvbNnop39S2Jyzx
-         N1KhkzSy9A7D0yVx31ienM4BCCBE3MVyz+dpdh7Zxkoa3sL7DrjrcKQ7+vSfCgw4QXQb
-         Dqah2ruNPi2SkrkIrO4B9VL8NrQFTUuT/coFkwTPVedDj5lIfIPATeR47hmMBcJgVtXQ
-         2h1N0FxKWhFmAoTE7vQ5UFhCbDJ2rb0kzw+VO09HTXxSCzb9QXboZ485mYhZfP4BrYi2
-         VgVg==
+        d=gmail.com; s=20230601; t=1769711313; x=1770316113; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mo/ng+fMSnPglDzDDUYatnZfwWM1+7CUkEAzUwXHl1I=;
+        b=SQkcZhBkjOZk1h/WTTKWsk/X/CyQp/psg2Ue6Bnlukerd53DQ1ah4sbnccGm0NjE1n
+         h4UET6M57Hawz90EGfte+Nhy1mB/QS10KUWfJVOFn9YQ2y8R5apLAk0MJ92OdCoXEHqN
+         RJ0QYK4HI9dBH/ECPqMdOscxIvl0m5IYqDgefC0UZC4g5zht7NpPRDYhL7Iii/WUmTLt
+         7y6MWNIu2ZscZTWs3tn9dIn3L8kG3H9oMWupTuc6Gx+7+PNOt2KNYjjcTB7zMBqX8UxX
+         +Uu0iADv36JM+g2vQ8WdDN4i79e1erCsFkPuuEMDZ8tXQl0usdK6vOPjb1DHDHIYlgyB
+         NAwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769710406; x=1770315206;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nlCyxHSNnwuwcAWe3w3p+ljfIeMBEuInyL0DKq9zkyY=;
-        b=lAXfNtrr4+QY6xhSrvEdtEdzUF86oguqAwW5OgOUl9PJT5a5vGHcLbUrkYHpVM+wwR
-         ZkllHLaE3vyXcFtOe3IQyx8BaFKE/7ZzPiYTn//dFHZ8kUjE8gciB44vn8bUeVXvulbS
-         23KpWs0hmRWs9Wut3fMDABADzyQPvvtfNKp32GoBKRoLTk1iQF3M/Y6LZPjb59unPHD+
-         wueKR4ALqF5TYdGuu0crsE4rVDROwWf+jZpb7y6UCYHbQoKZQmEWZUxfPdfdbqOYQ1xe
-         X9970skK+64jBKaflzeqsowfSPTUE+976KzAzmQy2iuwczCaTgZkhEAN9YyimaWnCiwE
-         Athw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeA39MDaL0HcTE3wju6l22zRjsdbXx5UJyIKb5ZA2N2I/r5NkP76jsLhcLzbVlb/l5sqCmOL0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlhwC5fqQ3apyPuddmkWQwN1HjELipkVDnHV7nAuCpqVU2A1Nq
-	yoTH0KmJXzBnzfsHIx8V5dkkF4oykaVbOuS7cuKrMZ7Y1IDsOnm/rvN6
-X-Gm-Gg: AZuq6aKtjN6Jc7kmCXMGr8qoByS+Ss3Xuui8D9Q6ry9eltDhqZugx1IHArRA6FQ57aW
-	y9q3vJyHdHraHOD5W1qGcN959Q31o3YzxMNdqMJFAFcLMQiijAjiLqd6r0ieLoi4x8OXx3Wpt4f
-	GenYw9+8I8qC356HMGhzlnwIOqA8FgcriU91FoNmAUskm89wuX0lZACh5CREq03gBNgBHRP5ZpJ
-	kg316Uq9EBhFZZwMWk/E9sBdHCPxXQBfXLg2YTBycSPZxe0reclwZfwuT/SdvnsUCgve+zXExdg
-	Zx6MhZAmdWu1O6yR0pRYPKmiyUwkq+NC1bu7utIrLjh4UBkmUFbBu6jKP0fVH+17T2PBioA5Huu
-	19qswDgSoMacsbnvf/W3F0npgzKAKME8xO+FyfjJV29CHGo22RDl27Rn0nU/3LGlFY/328ms0aq
-	3hycBixUA5EzysgT+QTyHyr/r7FB8IGf3ZwBRV1sjg3UUNyYmK0tlrSV0tZwbEiyJfm96XEMHH7
-	jTH
-X-Received: by 2002:a05:6000:4308:b0:435:a370:2d71 with SMTP id ffacd0b85a97d-435f3aaa9b8mr745250f8f.33.1769710406259;
-        Thu, 29 Jan 2026 10:13:26 -0800 (PST)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:8ea7:1ca8:fcdb:48b3? ([2a02:a03f:a75e:9a00:8ea7:1ca8:fcdb:48b3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e4762sm15777055f8f.6.2026.01.29.10.13.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jan 2026 10:13:26 -0800 (PST)
-Message-ID: <60fb02d8-77ca-457b-be24-33a3cc7b344b@gmail.com>
-Date: Thu, 29 Jan 2026 19:13:25 +0100
+        d=1e100.net; s=20230601; t=1769711313; x=1770316113;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Mo/ng+fMSnPglDzDDUYatnZfwWM1+7CUkEAzUwXHl1I=;
+        b=UotQwlufJm0VYps9WZNr7aZj7SYO0+qDKn2SaRfME1+Ef/8YaTlgki1jfhPQpmwO/i
+         yJIzmAUubJG1GtqwhupGile5GrPOqjctegflsJf94Qc2xXJsIrzRJimuRDE6h00etu8C
+         E6vFGQv8X6WiNbsXPG4UJ6f4SRdh2zp2W1gy1C5q0gvMt8r4TcmR6go7LU9GTEt0JA8f
+         CPEvAkxqIrWriiFu9jmh5g7TOOTXhCLS2i56X7qQR2qslW2G9yQWqC52A5XBd5eyDki2
+         m+wFF43t8kTxZIL+2WgXYmHvrhn0RpaJJEZdGZ+VuAj40JvNKS3pqv94+7kNo/e1sC6v
+         TwNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVHC+cg2uzNW4pG8ijjgqkuh+xjvRH28ztakuJuCmk5z03duOdV2uKxXYELqH//Axu8GsoeX7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZFbgLDQNttQwCeTcfaW7V7P03vT+UERTwrqYOHLOBZ1kKflB7
+	vbzqTZ7Va6JiuGybiGgvK0CzFWftdAI/o+bvhVwQSSeAiwRw37DyDsa4rq3Z1tsdycqqaP3xaMj
+	r2nwL777Ze/OoeD5gROf1yKcQM7akbDE=
+X-Gm-Gg: AZuq6aLbUzw1cjkgVTYWHGjq6N9SAuieN27XYEYj0AdPPt/8wT37fZCAB6ahVvuEkO3
+	X+JaoCBZsH4orkAPZfaWPzif1uXRhZqEADmD1m3k0H1my/P9ZwO7YgsCkhBH7kCN3e7+VePJJr/
+	f8HAt8k6LmTfzDpX0dn2s9HpMfSwGvz8mLIrNTuFlk7JaecJ60Uh6tg1tSEq87YS9BtpiSP8YTc
+	ZtkvhK7e5UJhhfFxd07B2oAydvE85XvkHYVy9HHgVlwuWTkjmlPrcwTRuOfqoro8m2QMqetyRN5
+	z79wqIyNizdn4jZ1/5oQ341dFs5ZD7cwHA7RayMXi7xG3luTpjYatiMdeQ==
+X-Received: by 2002:a17:90b:3d86:b0:34e:630c:616c with SMTP id
+ 98e67ed59e1d1-3543b3d9177mr265037a91.31.1769711313198; Thu, 29 Jan 2026
+ 10:28:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/7] ipv6: Cleanup IPv6 TLV definitions
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org
-References: <20260126194826.236075-1-tom@herbertland.com>
- <20260126194826.236075-3-tom@herbertland.com>
- <willemdebruijn.kernel.235a1f46c52f8@gmail.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.235a1f46c52f8@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1769464405.git.marcdevel@gmail.com> <713d6f1ca57b402be420ade1331acee4898675c4.1769464405.git.marcdevel@gmail.com>
+ <20260128202739.79af1bb8@kernel.org>
+In-Reply-To: <20260128202739.79af1bb8@kernel.org>
+From: Marc Sune <marcdevel@gmail.com>
+Date: Thu, 29 Jan 2026 19:28:22 +0100
+X-Gm-Features: AZwV_QiZGsndQ698VlBvHu1YBGXvRJxxvZhVSffNSbWbn1WY7TtqyB2ct__Srio
+Message-ID: <CA+3n-TprC7Fs0HiBndR+OpYmy2vq=raiuSE=_R49LVxjax8Aug@mail.gmail.com>
+Subject: Re: [PATCH net v2 2/4] selftests/net: add no ARP b/mcast,null poison test
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com, netdev@vger.kernel.org, 
+	dborkman@kernel.org, vadim.fedorenko@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254886-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254887-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,herbertland.com,davemloft.net,kernel.org,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,kernel.org,linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcdevel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,herbertland.com:email]
-X-Rspamd-Queue-Id: E39D3B3713
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bareudp.sh:url,amt.sh:url,altnames.sh:url,arp_ndisc_evict_nocarrier.sh:url]
+X-Rspamd-Queue-Id: 2BB0EB393C
 X-Rspamd-Action: no action
 
-On 1/29/26 06:30, Willem de Bruijn wrote:
-> Tom Herbert wrote:
->> Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h to be with the rest
->> of the TLV definitions. Label each of the TLV definitions as to whether
->> they are a Hop-by-Hop option, Destination option, or both.
->>
->> Signed-off-by: Tom Herbert <tom@herbertland.com>
->> ---
->>   include/uapi/linux/in6.h        | 21 ++++++++++++++-------
->>   include/uapi/linux/ip6_tunnel.h |  1 -
->>   2 files changed, 14 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
->> index 5a47339ef7d7..438283dc5fde 100644
->> --- a/include/uapi/linux/in6.h
->> +++ b/include/uapi/linux/in6.h
->> @@ -140,14 +140,21 @@ struct in6_flowlabel_req {
->>   
->>   /*
->>    *	IPv6 TLV options.
->> + *
->> + *	Hop-by-Hop and Destination options share the same number space.
->> + *	For each option below whether it is a Hop-by-Hop option or
->> + *	a Destination option is indicated by HBH or DestOpt.
->>    */
->> -#define IPV6_TLV_PAD1		0
->> -#define IPV6_TLV_PADN		1
->> -#define IPV6_TLV_ROUTERALERT	5
->> -#define IPV6_TLV_CALIPSO	7	/* RFC 5570 */
->> -#define IPV6_TLV_IOAM		49	/* RFC 9486 */
->> -#define IPV6_TLV_JUMBO		194
->> -#define IPV6_TLV_HAO		201	/* home address option */
->> +#define IPV6_TLV_PAD1		0	/* HBH or DestOpt */
->> +#define IPV6_TLV_PADN		1	/* HBH or DestOpt */
->> +#define IPV6_TLV_TNL_ENCAP_LIMIT 4	/* RFC 2473, DestOpt */
->> +#define IPV6_TLV_ROUTERALERT	5	/* HBH */
->> +#define IPV6_TLV_CALIPSO	7	/* RFC 5570, HBH */
->> +#define IPV6_TLV_IOAM		49	/* RFC 9486, HBH or Destopt
->> +					 * IOAM sent and rcvd as HBH
-> 
-> Explicit labeling with HBH or Destopt is quite informative.
-> 
-> Does this mean that IPV6_TLV_IOAM should also be accepted in ip6_parse_tlv
-> in the Destopt branch? RFC 9486 indeed did reserve a number.
+Missatge de Jakub Kicinski <kuba@kernel.org> del dia dj., 29 de gen.
+2026 a les 5:27:
+>
+> On Tue, 27 Jan 2026 00:53:03 +0100 Marc Su=C3=B1=C3=A9 wrote:
+> > Add a selftest to test that ARP bcast/mcast/null poisioning checks
+> > are never bypassed.
+>
+> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selft=
+ests/net/Makefile
+> > index 45c4ea381bc3..a765f1800752 100644
+> > --- a/tools/testing/selftests/net/Makefile
+> > +++ b/tools/testing/selftests/net/Makefile
+> > @@ -9,6 +9,7 @@ CFLAGS +=3D -I../
+> >  TEST_PROGS :=3D \
+> >       altnames.sh \
+> >       amt.sh \
+> > +     arp_no_invalid_sha_poision.sh \
+>
+> alphabetical sort pls
+>
+> >       arp_ndisc_evict_nocarrier.sh \
+> >       arp_ndisc_untracked_subnets.sh \
+> >       bareudp.sh \
+>
+> > +readonly V4_ADDR0=3D"10.0.10.1"
+> > +readonly V4_ADDR1=3D"10.0.10.2"
+> > +readonly BCAST_MAC=3D"ff:ff:ff:ff:ff:ff"
+> > +readonly MCAST_MAC=3D"01:00:5e:00:00:00"
+> > +readonly NULL_MAC=3D"00:00:00:00:00:00"
+> > +readonly VALID_MAC=3D"02:01:02:03:04:05"
+> > +readonly ARP_REQ=3D1
+> > +readonly ARP_REPLY=3D2
+> > +nsid=3D100
+>
+> unused? (please run shellcheck)
 
-Nope, not right now. The only IOAM option currently implemented in the 
-kernel is the Pre-allocated Trace, which uses a Hop-by-Hop option. It 
-wouldn't make sense to have it in a Destination option, although you 
-could (i.e., it's not forbidden, just weird). Actually, the only IOAM 
-option that would make sense to carry in a Destination Option is the 
-Edge-to-Edge (E2E), but it's not implemented in the kernel. Should it be 
-implemented at some point, then yes, you'd have IPV6_TLV_IOAM in the 
-Destopt branch as well.
+Errors fixed in v3.
 
->> +					 */
->> +#define IPV6_TLV_JUMBO		194	/* HBH */
->> +#define IPV6_TLV_HAO		201	/* home address option, DestOpt */
->>   
->>   /*
->>    *	IPV6 socket options
->> diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip6_tunnel.h
->> index 85182a839d42..35af4d9c35fb 100644
->> --- a/include/uapi/linux/ip6_tunnel.h
->> +++ b/include/uapi/linux/ip6_tunnel.h
->> @@ -6,7 +6,6 @@
->>   #include <linux/if.h>		/* For IFNAMSIZ. */
->>   #include <linux/in6.h>		/* For struct in6_addr. */
->>   
->> -#define IPV6_TLV_TNL_ENCAP_LIMIT 4
->>   #define IPV6_DEFAULT_TNL_ENCAP_LIMIT 4
->>   
->>   /* don't add encapsulation limit if one isn't present in inner packet */
->> -- 
->> 2.43.0
->>
-> 
-> 
+>
+> > +ret=3D0
+> > +veth0_ifindex=3D0
+> > +veth1_mac=3D
+>
+> > diff --git a/tools/testing/selftests/net/arp_send.c b/tools/testing/sel=
+ftests/net/arp_send.c
+> > new file mode 100644
+>
+> Could you check if mausezahn from netsniff-ng can send these
+> packets already? We already depend on mausezahn for other tests.
+>
+> Similar comments on patch 4, I'm not gonna repeat.
 
+I can do that for ARP, but not for NDP apparently. Only basic ICMPv6
+echo req/reply is supported. For NDP (ICMPv6), it needs to be
+specified using -P (hex). Kind of ugly...
+
+In RFC v1 I proposed to use a scapy
+(https://lore.kernel.org/netdev/3cfd28edb2c2b055e74b975623a3d38ade0237f1.17=
+66349632.git.marcdevel@gmail.com/),
+which is substantially smaller than arp_send/ndisc_send.c. I dropped
+it based on the v1 review I got. I see scapy is used in bpf/ and
+tc-testing/ self-tests.
+
+What's your preference?
+
+a) use mausezahn only for ARP, use ndisc_send.c for NDP
+b) use only .c progs for consistency
+c) recover the scapy patch and squash it in patches 2/4
+
+Thanks
 
