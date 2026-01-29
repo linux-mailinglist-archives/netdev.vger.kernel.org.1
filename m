@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-254931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLR0A/bfe2lyJAIAu9opvQ
-	(envelope-from <netdev+bounces-254931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:32:22 +0100
+	id QD2aJEfge2lyJAIAu9opvQ
+	(envelope-from <netdev+bounces-254936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:33:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F5ADB55C4
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:32:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05188B5607
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 23:33:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF9AB3019911
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:29:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C7F30307B0A3
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 22:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F49836AB71;
-	Thu, 29 Jan 2026 22:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89F136C0B9;
+	Thu, 29 Jan 2026 22:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="gtxRwRfS"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="bJghZvj8"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6E436B06F;
-	Thu, 29 Jan 2026 22:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8561836AB5B;
+	Thu, 29 Jan 2026 22:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769725744; cv=none; b=k0FkD5QxU1Wd3AbFBPgkviOpSKQ9RJTjlBKV4B+ta9RVSJOkWpGqP01mtP8pXT9v3MQO16tIERdYnph+5e56Ju2yUj/TOabcFTQUeOX6T2nkPQ8hmkDWgTqi/GbxFdbU/yKXYo9F2wBqgV1m6lqAj/U5dg0CgC6N+MI7a3Lh3eQ=
+	t=1769725748; cv=none; b=OgwT7xjKsxptipZse/xtkTZiJSDrZL6eNgxYexM0kM/qx9WL4v0SR6kwLuwYRTUwqqb/A9KFFPIuyZWD4gdIm73pn8ryMbokjMoH2dZ+4X+wDVE6ZVQ1M/R6xRks2FMJNkFj2z6h4NbfZ7auo+cmsdMt9UiBY4P0iiTxEgpNLNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769725744; c=relaxed/simple;
-	bh=GahdlpydzfYDN8oHpu/rlXQRpUnYkR/ZKO5eJchIId8=;
+	s=arc-20240116; t=1769725748; c=relaxed/simple;
+	bh=E3jsxAVNeZSfgTtFklMaaHFG10U0cjvc/vVHRzsxTII=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X91z8WKtw1PwY7HFbgL0jND+QMsS3HwYTTm3LpVe+B/h7ZpK7oOmWupFa/Q8RYiJSk6pOqL9zzPk6oDDbTEsSYyoDt6j+A+nYguYsuyZNbv3tki7lfj8dvQd6Vq1+tgTJvDb2/QzddgcqNmeMAzwOGCaRU/mCH6DalMQb5R8xMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=gtxRwRfS; arc=none smtp.client-ip=213.133.104.62
+	 MIME-Version; b=Ih5M8PYQoH9nuhKFqQw5VxSebKxbwIusYQOlAApP9OKIK1QjEafY61GSwY+SLH3PzbEsBxKiLwS+Dumo+YAkCP+QPfqBwp6CRwcoLDvcRho0wynaNE4IoJRUor/RLiQeRAg0roBs7ozIylSM7wfdGH6WolFUvJ4lhNQalMqR3eI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=bJghZvj8; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=XYi1N1QB5dXM2rGNdQJ8CohCC8iMcPA7hQNozDsLcX8=; b=gtxRwRfSs8s6y674r8NpYiE0ec
-	mL11KECG0zCaOt0FqI/PfB8CZ8DLGZBomegomEJo4G2Q85zsNNo/oHXpAxLvO+PyKcVzWTihUWGd/
-	pjDK0OEiLg+XUgVNVnXmLDL7PdU+4HCHGi5keWEcpgWEflM5xdQBrbCwN6v+zW6KXeW5Jqs12TXCu
-	hhL7pc6xb1TaP/BC62RYigiDSUemn44Kp/KAp2Uyw10FHltFC5XNt6VOMm0MORBl5FbF/sUiEwJB7
-	fif2TbegSdFYQgPfWvbtGeMeSHbxKkrLbkr5piBh1iXagljtz2gecRwo81gCOMMVgtpSqgu/S07aN
-	I/q0eJyg==;
+	bh=4vsXr21Dw5AR4BQltiiGQybsEiHISrGXtdOR4TKZxSI=; b=bJghZvj8/jGVJdY22t4aaTDliF
+	M6ZurtA5XiJXFpClZLjFfSosmEFhjKa0XIW1aVD+T7ZNw8daFUMsBYsV3N9Mo85n3Wbi1mm1BjGo+
+	ShAAo85cP0ljzglj40V9qcVe3qjp8J5Krp7O5JVPWGm65ZRppo4J1PvI9BnQ/4SNRUlJ/jfAjDc59
+	5ceICwsKZrZ2qODWbTc6ewrEVdz0NTTsZFNiikSsMHvn184fW0V+1iacDeuKPsbV/aOhU5I3DmlKV
+	kRTXDRnYeeCZLEVV7DBPAE/+wktKhBnwbi/LETatrowW1EUXj987dGxVmOdkIY7JKX3qYJB4/YhLM
+	SwUA0R5Q==;
 Received: from localhost ([127.0.0.1])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1vlaVJ-0008pl-1O;
-	Thu, 29 Jan 2026 23:28:45 +0100
+	id 1vlaVK-0008pr-1a;
+	Thu, 29 Jan 2026 23:28:46 +0100
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: bpf@vger.kernel.org,
 	toke@redhat.com,
 	yangzhenze@bytedance.com,
 	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v8 12/16] netkit: Add netkit notifier to check for unregistering devices
-Date: Thu, 29 Jan 2026 23:28:26 +0100
-Message-ID: <20260129222830.439687-13-daniel@iogearbox.net>
+Subject: [PATCH net-next v8 13/16] netkit: Add xsk support for af_xdp applications
+Date: Thu, 29 Jan 2026 23:28:27 +0100
+Message-ID: <20260129222830.439687-14-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260129222830.439687-1-daniel@iogearbox.net>
 References: <20260129222830.439687-1-daniel@iogearbox.net>
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
 	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254931-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254936-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
@@ -111,177 +111,203 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei.uk:email,none:email]
-X-Rspamd-Queue-Id: 5F5ADB55C4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ebpf.io:url,lpc.events:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei.uk:email,blackwall.org:email,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid]
+X-Rspamd-Queue-Id: 05188B5607
 X-Rspamd-Action: no action
 
-Add a netdevice notifier in netkit to watch for NETDEV_UNREGISTER events.
-If the target device is indeed NETREG_UNREGISTERING and previously leased
-a queue to a netkit device, then collect the related netkit devices and
-batch-unregister_netdevice_many() them.
+Enable support for AF_XDP applications to operate on a netkit device.
+The goal is that AF_XDP applications can natively consume AF_XDP
+from network namespaces. The use-case from Cilium side is to support
+Kubernetes KubeVirt VMs through QEMU's AF_XDP backend. KubeVirt is a
+virtual machine management add-on for Kubernetes which aims to provide
+a common ground for virtualization. KubeVirt spawns the VMs inside
+Kubernetes Pods which reside in their own network namespace just like
+regular Pods.
 
-If this would not be done, then the netkit device would hold a reference
-on the physical device preventing it from going away. However, in case of
-both io_uring zero-copy as well as AF_XDP this situation is handled
-gracefully and the allocated resources are torn down.
+Raw QEMU AF_XDP backend example with eth0 being a physical device with
+16 queues where netkit is bound to the last queue (for multi-queue RSS
+context can be used if supported by the driver):
 
-In the case where mentioned infra is used through netkit, the applications
-have a reference on netkit, and netkit in turn holds a reference on the
-physical device. In order to have netkit release the reference on the
-physical device, we need such watcher to then unregister the netkit ones.
+  # ethtool -X eth0 start 0 equal 15
+  # ethtool -X eth0 start 15 equal 1 context new
+  # ethtool --config-ntuple eth0 flow-type ether \
+            src 00:00:00:00:00:00 \
+            src-mask ff:ff:ff:ff:ff:ff \
+            dst $mac dst-mask 00:00:00:00:00:00 \
+            proto 0 proto-mask 0xffff action 15
+  [ ... setup BPF/XDP prog on eth0 to steer into shared xsk map ... ]
+  # ip netns add foo
+  # ip link add numrxqueues 2 nk type netkit single
+  # ./pyynl/cli.py --spec ~/netlink/specs/netdev.yaml \
+                   --do queue-create \
+                   --json "{"ifindex": $(ifindex nk), "type": "rx", \
+                            "lease": { "ifindex": $(ifindex eth0), \
+                                       "queue": { "type": "rx", "id": 15 } } }"
+  {'id': 1}
+  # ip link set nk netns foo
+  # ip netns exec foo ip link set lo up
+  # ip netns exec foo ip link set nk up
+  # ip netns exec foo qemu-system-x86_64 \
+          -kernel $kernel \
+          -drive file=${image_name},index=0,media=disk,format=raw \
+          -append "root=/dev/sda rw console=ttyS0" \
+          -cpu host \
+          -m $memory \
+          -enable-kvm \
+          -device virtio-net-pci,netdev=net0,mac=$mac \
+          -netdev af-xdp,ifname=nk,id=net0,mode=native,queues=1,start-queue=1,inhibit=on,map-path=$dir/xsks_map \
+          -nographic
 
-This is generally quite similar to the dependency handling in case of
-tunnels (e.g. vxlan bound to a underlying netdev) where the tunnel device
-gets removed along with the physical device.
+We have tested the above against a dual-port Nvidia ConnectX-6 (mlx5)
+100G NIC with successful network connectivity out of QEMU. An earlier
+iteration of this work was presented at LSF/MM/BPF [0] and more
+recently at LPC [1].
 
-  # ip a
-  [...]
-  4: enp10s0f0np0: <BROADCAST,MULTICAST> mtu 1500 qdisc mq state DOWN group default qlen 1000
-      link/ether e8:eb:d3:a3:43:f6 brd ff:ff:ff:ff:ff:ff
-      inet 10.0.0.2/24 scope global enp10s0f0np0
-         valid_lft forever preferred_lft forever
-  [...]
-  8: nk@NONE: <BROADCAST,MULTICAST,NOARP> mtu 1500 qdisc noop state DOWN group default qlen 1000
-      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
-  [...]
+For getting to a first starting point to connect all things with
+KubeVirt, bind mounting the xsk map from Cilium into the VM launcher
+Pod which acts as a regular Kubernetes Pod while not perfect, is not
+a big problem given its out of reach from the application sitting
+inside the VM (and some of the control plane aspects are baked in
+the launcher Pod already), so the isolation barrier is still the VM.
+Eventually the goal is to have a XDP/XSK redirect extension where
+there is no need to have the xsk map, and the BPF program can just
+derive the target xsk through the queue where traffic was received
+on.
 
-  # rmmod mlx5_ib
-  # rmmod mlx5_core
-
-  [  309.261822] mlx5_core 0000:0a:00.0 mlx5_0: Port: 1 Link DOWN
-  [  344.235236] mlx5_core 0000:0a:00.1: E-Switch: Unload vfs: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
-  [  344.246948] mlx5_core 0000:0a:00.1: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
-  [  344.463754] mlx5_core 0000:0a:00.1: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
-  [  344.770155] mlx5_core 0000:0a:00.1: E-Switch: cleanup
-  [  345.345709] mlx5_core 0000:0a:00.0: E-Switch: Unload vfs: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
-  [  345.357524] mlx5_core 0000:0a:00.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
-  [  350.995989] mlx5_core 0000:0a:00.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
-  [  351.574396] mlx5_core 0000:0a:00.0: E-Switch: cleanup
-
-  # ip a
-  [...]
-  [ both enp10s0f0np0 and nk gone ]
-  [...]
+The exposure through netkit is because Cilium should not act as a
+proxy handing out xsk sockets. Existing applications expect a netdev
+from kernel side and should not need to rewrite just to implement
+against a CNI's protocol. Also, all the memory should not be accounted
+against Cilium but rather the application Pod itself which is consuming
+AF_XDP. Further, on up/downgrades we expect the data plane to being
+completely decoupled from the control plane; if Cilium would own the
+sockets that would be disruptive. Another use-case which opens up and
+is regularly asked from users would be to have DPDK applications on
+top of AF_XDP in regular Kubernetes Pods.
 
 Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 Co-developed-by: David Wei <dw@davidwei.uk>
 Signed-off-by: David Wei <dw@davidwei.uk>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Link: https://bpfconf.ebpf.io/bpfconf2025/bpfconf2025_material/lsfmmbpf_2025_netkit_borkmann.pdf [0]
+Link: https://lpc.events/event/19/contributions/2275/ [1]
 ---
- drivers/net/netkit.c      | 57 ++++++++++++++++++++++++++++++++++++++-
- include/linux/netdevice.h |  6 +++++
- 2 files changed, 62 insertions(+), 1 deletion(-)
+ drivers/net/netkit.c | 76 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index c6688b604337..5c417c6055d8 100644
+index 5c417c6055d8..0519f855d062 100644
 --- a/drivers/net/netkit.c
 +++ b/drivers/net/netkit.c
-@@ -1039,6 +1039,48 @@ static int netkit_change_link(struct net_device *dev, struct nlattr *tb[],
- 	return 0;
+@@ -12,6 +12,7 @@
+ #include <net/netdev_lock.h>
+ #include <net/netdev_queues.h>
+ #include <net/netdev_rx_queue.h>
++#include <net/xdp_sock_drv.h>
+ #include <net/netkit.h>
+ #include <net/dst.h>
+ #include <net/tcx.h>
+@@ -235,6 +236,76 @@ static void netkit_get_stats(struct net_device *dev,
+ 	stats->tx_dropped = DEV_STATS_READ(dev, tx_dropped);
  }
  
-+static void netkit_check_lease_unregister(struct net_device *dev)
++static bool netkit_xsk_supported_at_phys(const struct net_device *dev)
 +{
-+	LIST_HEAD(list_kill);
-+	u32 q_idx;
++	if (!dev->netdev_ops->ndo_bpf ||
++	    !dev->netdev_ops->ndo_xdp_xmit ||
++	    !dev->netdev_ops->ndo_xsk_wakeup)
++		return false;
++	if ((dev->xdp_features & NETDEV_XDP_ACT_XSK) != NETDEV_XDP_ACT_XSK)
++		return false;
++	return true;
++}
 +
-+	if (READ_ONCE(dev->reg_state) != NETREG_UNREGISTERING ||
-+	    !dev->dev.parent)
-+		return;
++static int netkit_xsk(struct net_device *dev, struct netdev_bpf *xdp)
++{
++	struct netkit *nk = netkit_priv(dev);
++	struct netdev_bpf xdp_lower;
++	struct netdev_rx_queue *rxq;
++	struct net_device *phys;
++	int ret = -EBUSY;
 +
-+	netdev_lock_ops(dev);
-+	for (q_idx = 0; q_idx < dev->real_num_rx_queues; q_idx++) {
-+		struct net_device *tmp = dev;
-+		u32 tmp_q_idx = q_idx;
++	switch (xdp->command) {
++	case XDP_SETUP_XSK_POOL:
++		if (nk->pair == NETKIT_DEVICE_PAIR)
++			return -EOPNOTSUPP;
++		if (xdp->xsk.queue_id >= dev->real_num_rx_queues)
++			return -EINVAL;
 +
-+		if (netif_rx_queue_lease_get_owner(&tmp, &tmp_q_idx)) {
-+			if (tmp->netdev_ops != &netkit_netdev_ops)
-+				continue;
-+			/* A single phys device can have multiple queues leased
-+			 * to one netkit device. We can only queue that netkit
-+			 * device once to the list_kill. Queues of that phys
-+			 * device can be leased with different individual netkit
-+			 * devices, hence we batch via list_kill.
-+			 */
-+			if (unregister_netdevice_queued(tmp))
-+				continue;
-+			netkit_del_link(tmp, &list_kill);
-+		}
++		rxq = __netif_get_rx_queue(dev, xdp->xsk.queue_id);
++		if (!rxq->lease)
++			return -EOPNOTSUPP;
++
++		phys = rxq->lease->dev;
++		if (!netkit_xsk_supported_at_phys(phys))
++			return -EOPNOTSUPP;
++
++		memcpy(&xdp_lower, xdp, sizeof(xdp_lower));
++		xdp_lower.xsk.queue_id = get_netdev_rx_queue_index(rxq->lease);
++		break;
++	case XDP_SETUP_PROG:
++		return -EPERM;
++	default:
++		return -EINVAL;
 +	}
-+	netdev_unlock_ops(dev);
-+	unregister_netdevice_many(&list_kill);
++
++	netdev_lock(phys);
++	if (!dev_get_min_mp_channel_count(phys))
++		ret = phys->netdev_ops->ndo_bpf(phys, &xdp_lower);
++	netdev_unlock(phys);
++	return ret;
 +}
 +
-+static int netkit_notifier(struct notifier_block *this,
-+			   unsigned long event, void *ptr)
++static int netkit_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
 +{
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
++	struct netdev_rx_queue *rxq;
++	struct net_device *phys;
 +
-+	if (event == NETDEV_UNREGISTER)
-+		netkit_check_lease_unregister(dev);
-+	return NOTIFY_DONE;
++	if (queue_id >= dev->real_num_rx_queues)
++		return -EINVAL;
++
++	rxq = __netif_get_rx_queue(dev, queue_id);
++	if (!rxq->lease)
++		return -EOPNOTSUPP;
++
++	phys = rxq->lease->dev;
++	if (!netkit_xsk_supported_at_phys(phys))
++		return -EOPNOTSUPP;
++
++	return phys->netdev_ops->ndo_xsk_wakeup(phys,
++			get_netdev_rx_queue_index(rxq->lease), flags);
 +}
 +
- static size_t netkit_get_size(const struct net_device *dev)
+ static int netkit_init(struct net_device *dev)
  {
- 	return nla_total_size(sizeof(u32)) + /* IFLA_NETKIT_POLICY */
-@@ -1115,18 +1157,31 @@ static struct rtnl_link_ops netkit_link_ops = {
- 	.maxtype	= IFLA_NETKIT_MAX,
+ 	netdev_lockdep_set_classes(dev);
+@@ -255,6 +326,8 @@ static const struct net_device_ops netkit_netdev_ops = {
+ 	.ndo_get_peer_dev	= netkit_peer_dev,
+ 	.ndo_get_stats64	= netkit_get_stats,
+ 	.ndo_uninit		= netkit_uninit,
++	.ndo_bpf		= netkit_xsk,
++	.ndo_xsk_wakeup		= netkit_xsk_wakeup,
+ 	.ndo_features_check	= passthru_features_check,
  };
  
-+static struct notifier_block netkit_netdev_notifier = {
-+	.notifier_call	= netkit_notifier,
-+};
-+
- static __init int netkit_mod_init(void)
- {
-+	int ret;
-+
- 	BUILD_BUG_ON((int)NETKIT_NEXT != (int)TCX_NEXT ||
- 		     (int)NETKIT_PASS != (int)TCX_PASS ||
- 		     (int)NETKIT_DROP != (int)TCX_DROP ||
- 		     (int)NETKIT_REDIRECT != (int)TCX_REDIRECT);
+@@ -381,10 +454,11 @@ static void netkit_setup(struct net_device *dev)
+ 	dev->hw_enc_features = netkit_features;
+ 	dev->mpls_features = NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE;
+ 	dev->vlan_features = dev->features & ~netkit_features_hw_vlan;
+-
+ 	dev->needs_free_netdev = true;
  
--	return rtnl_link_register(&netkit_link_ops);
-+	ret = rtnl_link_register(&netkit_link_ops);
-+	if (ret)
-+		return ret;
-+	ret = register_netdevice_notifier(&netkit_netdev_notifier);
-+	if (ret)
-+		rtnl_link_unregister(&netkit_link_ops);
-+	return ret;
+ 	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
++
++	xdp_set_features_flag(dev, NETDEV_XDP_ACT_XSK);
  }
  
- static __exit void netkit_mod_exit(void)
- {
-+	unregister_netdevice_notifier(&netkit_netdev_notifier);
- 	rtnl_link_unregister(&netkit_link_ops);
- }
- 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d4e6e00bb90a..6ad348f17d93 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3403,11 +3403,17 @@ static inline int dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
- int register_netdevice(struct net_device *dev);
- void unregister_netdevice_queue(struct net_device *dev, struct list_head *head);
- void unregister_netdevice_many(struct list_head *head);
-+
- static inline void unregister_netdevice(struct net_device *dev)
- {
- 	unregister_netdevice_queue(dev, NULL);
- }
- 
-+static inline bool unregister_netdevice_queued(const struct net_device *dev)
-+{
-+	return !list_empty(&dev->unreg_list);
-+}
-+
- int netdev_refcnt_read(const struct net_device *dev);
- void free_netdev(struct net_device *dev);
- 
+ static struct net *netkit_get_link_net(const struct net_device *dev)
 -- 
 2.43.0
 
