@@ -1,65 +1,94 @@
-Return-Path: <netdev+bounces-254778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254779-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AC8qEABOe2n9DgIAu9opvQ
-	(envelope-from <netdev+bounces-254778-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:09:36 +0100
+	id +B6aOq5Pe2n9DgIAu9opvQ
+	(envelope-from <netdev+bounces-254779-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:16:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9618EAFEA0
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:09:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60948AFFDF
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5CB78303DD7F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:08:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C639C3021D0A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 12:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E23385EE1;
-	Thu, 29 Jan 2026 12:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC7E388858;
+	Thu, 29 Jan 2026 12:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNm06Yzl"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WnGVkV5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84621289340;
-	Thu, 29 Jan 2026 12:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480BA388847
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 12:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769688484; cv=none; b=As7w/J6r3cvC/EIG41mT9l3Es3KTjJEXKqi79Oimj1KI7TC+9Yb1GDWeoCGmgB39ZQ/tp94b7YfHLw3ZDX9uhM7S7dkIJjG7fXe17g1pPumhhDnY3s2Ln7rlM1KLQCt3657YzYIgxnXSjloI4YyqyNnTSlFcslm7Urq/56O144I=
+	t=1769688913; cv=none; b=kur40Fl9gxjOljldQ8WOjftkpWA6rys0EC+8CdoaHdfym/RSaC0nAg1hNndfHk9cvkDXSI+oAx1PFbFRTbE2FHVUoLRmNmzdF8bQBn1hhVceBqMtTSlKDBUxWw7glauisyA0NhNzLTbGpwNa2yE6DqfDOCudrgi9HRMJzlxtdVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769688484; c=relaxed/simple;
-	bh=wqvYiaougo9MgdPRxH7kVqp/5WhviKS4oyIBj/a1l5Q=;
+	s=arc-20240116; t=1769688913; c=relaxed/simple;
+	bh=BKL6mXkuNwuIgjX6tk/CceCioRD11L/7svOaSUf//pQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RnJ6pge2l6xdyL+vch7SC2WA8xWSJj6D+G0Tv5wv/AelB3moQaBKfLpILlc33Jr4o8jU+xkDw7WR/8gXN0jGFCHCkXlx1CLtdp+6w2+oDae214cKt8bixqVUNviAD6klmFEmmioN2d4oS7JibNfGmaJ5Lf8WBsfpwesJh0MwjAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fNm06Yzl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE224C116D0;
-	Thu, 29 Jan 2026 12:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769688484;
-	bh=wqvYiaougo9MgdPRxH7kVqp/5WhviKS4oyIBj/a1l5Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fNm06YzlYWUIvC+UHY6+rfdL/fSPmSiM1O1bwsVae1CYKPEPfGojHo/u4XVeRTkPb
-	 zGJSnVHoGhxlyzAfDSWu+SICeSlFM0FkOQvis9LV7RtZWiJ5aqcO6pMFc5ViLc/Swm
-	 PQOSLglhpraPpwoTUh9tziGgXEqlVZbex8M8TB7ghxffsuMIHvLlVafTkeU5C6Rk0b
-	 yvmeTKpunVYQNE0/gn72MLgzAxTYn3QiGJEfopAEUMEkqQjttlqDmt2I3J051VtWVV
-	 gl+GCccV9vum4vW1FkdtB6btpYMRTQ3LyOxlo5o5Uciwi0oOfWj5r0llS82gWJIlhi
-	 fSnvfFtiNjIoQ==
-Date: Thu, 29 Jan 2026 12:07:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
-	p.zabel@pengutronix.de, linux@armlinux.org.uk,
-	ghennadi.procopciuc@nxp.com, bogdan-gabriel.roman@nxp.com,
-	Ionut.Vicovan@nxp.com, alexandru-catalin.ionita@nxp.com,
-	linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, Frank.li@nxp.com
-Subject: Re: [PATCH 4/4] MAINTAINERS: Add MAINTAINER for NXP S32G Serdes
- driver
-Message-ID: <20260129120757.GA358439@kernel.org>
-References: <20260126092159.815968-1-vincent.guittot@linaro.org>
- <20260126092159.815968-5-vincent.guittot@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Re0IH7pFLtPI0cko2/LykZhBb34aJq1MYPJs3STvktqZ7gBph49I/3tGmQoURL45TBhW1ink0JRw6geiHszDh0bCjxz0jzOuXdic0zlYB1M7Gaqoz41d3e7xAqp+SM5s68ocWMtH+vst3gpLbi0i5jHIjFYoxNcB/uTnexxF+gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WnGVkV5K; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47ee76e8656so12206155e9.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 04:15:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1769688908; x=1770293708; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jplzhxwdBCQSyKwsI7cF2uGXEBppFP2DS506Q5npTks=;
+        b=WnGVkV5Kv9rx8hO+l21tSt9csQmWvavZ2l0tcSQ+eNHbjgkyPO1CU6M5Nenaw+zjrN
+         G/S+Z3eet3mHlgGQJjIS3c4wHpg0WnAlaFXv043WQiCDt2MSai/oObcBk7xEOtFjaVMp
+         3VqAFGs+Fda4imh/uh5eOWUV8fpHsh+egh3RdRJwqBh2aU6hE4Lk1YwB7dc/Jk0QW/lw
+         lDH0wKylULizq++8WvsWBkWNR7ow1sJSizpjZ6YeRGXuR4vRWd+wGLtcmzPm5NevUCVk
+         GA53ErKhNaKdaBzdF3okWtVR/pXvyX2TceoMBmNibTd+/olBHLeJNCxbQRtN8VjOVphL
+         0PmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769688908; x=1770293708;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jplzhxwdBCQSyKwsI7cF2uGXEBppFP2DS506Q5npTks=;
+        b=ihhmWiAugyHHK88YyEV50Wsz4EdHM/7GGmdRMRCaJt3D9Dew3iMBfztXC7x43BocMt
+         r8HpTZHJDQi1HihqkasderUilWk6dlsEz74br0z0cL37YmIHBiF3OfTw5dUKOHddiNi6
+         X9xZccde9I67u4FNtsKYeD90WB4TUNF6soeQ2nZMoxJRlRKE1hIBBAplDNhTtfD2Bz7g
+         QB6UN1mrb26qI/k0wXmoFdTeyJhREgMj2CC5jYRah/dL8DCQNR6hH32hc0EVUfeHueML
+         hNd6YVuRfmaovAaDQSFoAR3XJA81mqBBBnpgD2VPVeolxSnPnI04B/5x7YcFevyg7922
+         iLAg==
+X-Gm-Message-State: AOJu0Yz9OkznGrRiDZUdYDJ03r8J0hPdyGbkAFsivoaq6qTtBDM7MmHz
+	ByhUQg6VyfwrDn732eOjK1Vow3BWTxYxiBNx4DjCDQDqTqAgrBr1XGHlbMikr2yAD74=
+X-Gm-Gg: AZuq6aIRQNQBrts4DubOb8yjdiR72T1ZiZaTxzB7WWY2oUX4t1nf3wNpOecSTCeWBwb
+	GvDLR+n0UgWGaL6YCppLFb9oDzfNCcbFa8oHq4VLDNd1zMFkpWx0AutpjRMOkWZN+J21XulJoDw
+	skl0tir5ryxhKRvT0hYzngmxZgW8RpOo6AcKHoYopWwj5B9EG4QT06raQqar6mVU15YxWLw8Wda
+	hNyOU0ELZ2HdoBA3Oil2kZTRw+6Ep0m0ZAalQacnxpbjsA36MX23CkTTC8/5uBR2oy1EbXxErG+
+	PJ4NPInMFrE7Andk4UbNnRjIjt5xxLfzJconpbISqkFNGtn3abCgrYw+3PwAQRU26kjT3LhnHk1
+	k5/+uirppmeoztUpWh/GHX/CqFG6iZkgeVTDq7qjPMDCqtNGtBznjbwRbPYIbrWIGzEIUaW4nDS
+	9TqAkUMZFzbvxYIC+nleXu9TRyGyBKQA==
+X-Received: by 2002:a05:600c:8b26:b0:477:6d96:b3e5 with SMTP id 5b1f17b1804b1-48069c164d8mr118526325e9.7.1769688908106;
+        Thu, 29 Jan 2026 04:15:08 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-481a5d4b5ecsm2960765e9.2.2026.01.29.04.15.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 04:15:07 -0800 (PST)
+Date: Thu, 29 Jan 2026 13:15:05 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Petr Oros <poros@redhat.com>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next] dpll: expose fractional frequency offset in ppt
+Message-ID: <sxjsuxqsgx2etc2t3hd4v7wpffdoe6e5epacktdobwynyv7bru@ra37na5aqxyx>
+References: <20260126162253.27890-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,73 +97,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260126092159.815968-5-vincent.guittot@linaro.org>
+In-Reply-To: <20260126162253.27890-1-ivecera@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254778-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-254779-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,linux.dev,intel.com,microchip.com,nvidia.com,lunn.ch];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 9618EAFEA0
+X-Rspamd-Queue-Id: 60948AFFDF
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 10:21:59AM +0100, Vincent Guittot wrote:
-> Add a new entry for S32G Serdes driver.
-> 
-> Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
-> ---
->  MAINTAINERS | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 765ad2daa218..888674a308a5 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3202,6 +3202,15 @@ S:	Maintained
->  F:	Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
->  F:	drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
->  
-> +ARM/NXP S32G SERDES DRIVER
-> +M:	Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-> +R:	NXP S32 Linux Team <s32@nxp.com>
-> +L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-> +S:	Maintained
-> +F:	Documentation/devicetree/bindings/pci/nxp,s32g-serdes.yaml
+Mon, Jan 26, 2026 at 05:22:51PM +0100, ivecera@redhat.com wrote:
+>Currently, the dpll subsystem exports the fractional frequency offset
+>(FFO) in parts per million (ppm). This granularity is insufficient for
+>high-precision synchronization scenarios which often require parts per
+>trillion (ppt) resolution.
+>
+>Add a new netlink attribute DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET_PPT
+>to expose the FFO in ppt.
+>
+>Update the dpll netlink core to expect the driver-provided FFO value
+>to be in ppt. To maintain backward compatibility with existing userspace
+>tools, populate the legacy DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET
+>attribute by dividing the new ppt value by 1,000,000.
+>
+>Update the zl3073x and mlx5 drivers to provide the FFO value in ppt:
+>- zl3073x: adjust the fixed-point calculation to produce ppt (10^12)
+>  instead of ppm (10^6).
+>- mlx5: scale the existing ppm value by 1,000,000.
+>
+>Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-This patchset adds the following file, not the one above:
-
-Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-                                  ^^^
-
-> +F:	drivers/phy/freescale/phy-nxp-s32g-*
-> +F:	include/linux/pcs/pcs-nxp-xpcs.h
-> +
->  ARM/Orion SoC/Technologic Systems TS-78xx platform support
->  M:	Alexander Clouter <alex@digriz.org.uk>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-> -- 
-> 2.43.0
-> 
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
