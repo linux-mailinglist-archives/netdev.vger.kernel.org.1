@@ -1,146 +1,145 @@
-Return-Path: <netdev+bounces-254549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254550-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNx9Oh3hemnN/AEAu9opvQ
-	(envelope-from <netdev+bounces-254549-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:25:01 +0100
+	id PNVyK8Dhemnh/AEAu9opvQ
+	(envelope-from <netdev+bounces-254550-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:27:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66C45ABABD
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:25:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F65ABAC8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 05:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 092F23016C86
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 04:25:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0979930166EB
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 04:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD612D6400;
-	Thu, 29 Jan 2026 04:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A93F28B4FD;
+	Thu, 29 Jan 2026 04:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hU0vvC6C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgTdV3Bt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594C228B4E2
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 04:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FDA2586FE
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 04:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769660699; cv=none; b=Y7WqoBjB/ywr2oAgqZ49tNpBXk4EaQxklPbIXEoIvcCWEOiSMi1caUXweOv5bbiCtAAiHysnAPCvHu+gdlSQfg0Zoa+0yPdwedLcxStqrqgoV5kGE3V/FQvydgD4/o+xW+JF7APef8pqIe/SWkC2Ywkn1fw389H21S5GuckECXI=
+	t=1769660861; cv=none; b=EI3Yi620YFG310vzv0BAPyj9MvbweFoQL80VZckLWQ8Vr6QMF4cNKUl1fautpfisvZkgR4lA9MiIN3qQX2zTzsze7onFa4tOKbVcXCrJM27t9pFfjJecbCh+7Y8W5S99m/8vPPNeQSLv6AgXpmQkW5HJyrA/NJgqZYZRtEAVRl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769660699; c=relaxed/simple;
-	bh=F/zJBy3s9wx1FP2zGmyPMHXEHj6g4oRv7fOw2E6nKZM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nupgkGvyW3pYQPCLLqR7QCPAcvjvtWyzNPXrGZYTtj3RCIz9jkXKFcwN79w9Rx0yThd1DqF+ZqgRR/nctwhwtf3uuJaUK3d7AgnwAqvSgmHq124dKGZoaI+jTLHwn902eb0HUKVN9MB49YQdYsmS68+MT5DVYywUCkAbVQYdDu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hU0vvC6C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB708C116D0;
-	Thu, 29 Jan 2026 04:24:58 +0000 (UTC)
+	s=arc-20240116; t=1769660861; c=relaxed/simple;
+	bh=4d1E1Kgqrk7jtfKN+WbGmnwelRQwKo3JX3U3ym0jIf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RkedF0LXZskc9h7w0TeSe+NlXFaRoB6PbgFSNv+yJM3lF1yZsRNXoduQ3pGXyexMkzKEaijw68ai0GmmqcItzT7jNIqgpi3xID31U7mlsxS3PLK+IjwYrIfC964K1iPhSQscNK+bEudePsGB/KxlsmujGFQWG5+XZ3jd4c+vCPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgTdV3Bt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E80C116D0;
+	Thu, 29 Jan 2026 04:27:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769660699;
-	bh=F/zJBy3s9wx1FP2zGmyPMHXEHj6g4oRv7fOw2E6nKZM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hU0vvC6Cws8DOibqWOSx/ZlrZ9xtfluuTmwD5O6v6sepcub2v76u51F/0oeKagEXT
-	 8tC3YPwOSBijN1+JUT6iHR1hOB6KE0u0KTN/9sMqAxjKdKcTk96vB2gDEeVc5hEmJ1
-	 lyPxlp3S8t4MHHn8c7TbY2IdcJBMCZ+C8vM+CVsIwM/jp8YkwQ0R8EZtUkceQnzVuE
-	 LXz8likdlsPHUr1iiWN5+hB9lJnGcUAI8QGQfqeBhDevVl/d0TNh1qPnVjA4P7zsN0
-	 lvVni/v5+GuwyUVNirQAKFxM6QKmXeOiYrYZQpP4uzKxFlNeQeFtPy3K5lXWaafauO
-	 G7eAnUU1NyS4w==
+	s=k20201202; t=1769660860;
+	bh=4d1E1Kgqrk7jtfKN+WbGmnwelRQwKo3JX3U3ym0jIf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mgTdV3Btju8w2u/jExh3atbm7kGC58Z80502KhmUzU0BEk5XlZPH6wh2lf8FUV4jr
+	 xm/9y1HsZs2Z/zSAMg44FzbmbLao06+WF3eqwNB3s3aAR3g9+2aRV1IHn11Y2DvyL+
+	 YN6w9fXWAy+8v4MqPGKRtxnlJyASSd04mY9yMxsvGYjpR58nuTZcaZpG2d8fexHLUG
+	 s+hN9FqNx+8Sdh4OSoqgCVRDhmnN5hKSgthN4VhGa/cvPy4pWsUovm8gaDT7atOvbC
+	 zWkhBWXuELmzbx88Sh4brJ9IyuohDjk4+g0jWNl//wuUK1rtDAlJhyqCO9ul2JDCNy
+	 2nQEWBfkfHILQ==
+Date: Wed, 28 Jan 2026 20:27:39 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: marcdevel@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	dborkman@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	netdev@vger.kernel.org,
-	vadim.fedorenko@linux.dev,
-	pabeni@redhat.com
-Subject: Re: [net,v2,3/4] neigh: discard invalid lladdr (b/mcast poison)
-Date: Wed, 28 Jan 2026 20:24:57 -0800
-Message-ID: <20260129042457.360431-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <973e792e8002319e6d61be82b79b1678027c30ee.1769464405.git.marcdevel@gmail.com>
-References: <973e792e8002319e6d61be82b79b1678027c30ee.1769464405.git.marcdevel@gmail.com>
+To: Marc =?UTF-8?B?U3XDscOp?= <marcdevel@gmail.com>
+Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, dborkman@kernel.org, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net v2 2/4] selftests/net: add no ARP b/mcast,null
+ poison test
+Message-ID: <20260128202739.79af1bb8@kernel.org>
+In-Reply-To: <713d6f1ca57b402be420ade1331acee4898675c4.1769464405.git.marcdevel@gmail.com>
+References: <cover.1769464405.git.marcdevel@gmail.com>
+	<713d6f1ca57b402be420ade1331acee4898675c4.1769464405.git.marcdevel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,linux.dev,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254549-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254550-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,kernel.org,linux.dev];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 66C45ABABD
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amt.sh:url]
+X-Rspamd-Queue-Id: F3F65ABAC8
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Tue, 27 Jan 2026 00:53:03 +0100 Marc Su=C3=B1=C3=A9 wrote:
+> Add a selftest to test that ARP bcast/mcast/null poisioning checks
+> are never bypassed.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-neigh: discard invalid lladdr (b/mcast poison)
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
+ts/net/Makefile
+> index 45c4ea381bc3..a765f1800752 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -9,6 +9,7 @@ CFLAGS +=3D -I../
+>  TEST_PROGS :=3D \
+>  	altnames.sh \
+>  	amt.sh \
+> +	arp_no_invalid_sha_poision.sh \
 
-This commit adds validation to reject NDP Neighbor Solicitation and
-Neighbor Advertisement messages that contain broadcast, multicast, or
-null MAC addresses in the link-layer address options.
+alphabetical sort pls
 
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index f6a5d8c73af9..34202a816a4f 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
+>  	arp_ndisc_evict_nocarrier.sh \
+>  	arp_ndisc_untracked_subnets.sh \
+>  	bareudp.sh \
 
-[ ... ]
+> +readonly V4_ADDR0=3D"10.0.10.1"
+> +readonly V4_ADDR1=3D"10.0.10.2"
+> +readonly BCAST_MAC=3D"ff:ff:ff:ff:ff:ff"
+> +readonly MCAST_MAC=3D"01:00:5e:00:00:00"
+> +readonly NULL_MAC=3D"00:00:00:00:00:00"
+> +readonly VALID_MAC=3D"02:01:02:03:04:05"
+> +readonly ARP_REQ=3D1
+> +readonly ARP_REPLY=3D2
+> +nsid=3D100
 
-> @@ -1033,6 +1041,14 @@ static enum skb_drop_reason ndisc_recv_na(struct sk_buff *skb)
-> 			net_dbg_ratelimited("NA: invalid link-layer address length\n");
-> 			return reason;
-> 		}
-> +
-> +		/*
-> +		 * Broadcast/Multicast and zero MAC addresses should
-> +		 * never be announced and accepted as llsrc address (prevent
-                                                  ^^^^^
+unused? (please run shellcheck)
 
-In ndisc_recv_na(), should this comment say "lltgt" (target link-layer
-address) instead of "llsrc"?
+> +ret=3D0
+> +veth0_ifindex=3D0
+> +veth1_mac=3D
 
-Looking at the code above this block, the lladdr variable is assigned from
-ndopts.nd_opts_tgt_lladdr (Target Link-Layer Address option per RFC 4861),
-not nd_opts_src_lladdr (Source Link-Layer Address option). The comment
-appears to have been copy-pasted from the NS handler without updating the
-terminology.
+> diff --git a/tools/testing/selftests/net/arp_send.c b/tools/testing/selft=
+ests/net/arp_send.c
+> new file mode 100644
 
-> +		 * NDP B/MCAST MAC poisoning attack).
-> +		 */
-> +		if (dev->type == ARPHRD_ETHER && !is_valid_ether_addr(lladdr))
-> +			return reason;
-> 	}
--- 
-pw-bot: cr
+Could you check if mausezahn from netsniff-ng can send these
+packets already? We already depend on mausezahn for other tests.
+
+Similar comments on patch 4, I'm not gonna repeat.
 
