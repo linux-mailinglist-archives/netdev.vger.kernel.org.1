@@ -1,185 +1,134 @@
-Return-Path: <netdev+bounces-254657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCSSHpgde2msBQIAu9opvQ
-	(envelope-from <netdev+bounces-254657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:43:04 +0100
+	id yFDpAlgee2msBQIAu9opvQ
+	(envelope-from <netdev+bounces-254658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:46:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64876ADA4E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:43:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B77ADADC
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 09:46:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5ED7D3008240
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:42:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 01AD13007955
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 08:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88E42FFF8C;
-	Thu, 29 Jan 2026 08:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA5737C0FA;
+	Thu, 29 Jan 2026 08:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RdD+2KK5"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB5031ED6B
-	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 08:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2573B37C111
+	for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 08:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769676168; cv=none; b=H0vzHww4393N85PO8QTG6jdgS+uq0PnZqJVkzqud1PsuUpL7OcYP01UVWro1xSzCwHbx9EJDluMvmAnptkI6m3S1FjqbcjJI6L/kt9Wn63vHPwwBZI04vCHP3aipOGBE1Hw8eFYthxn9Gg8oDuC6b2EeYHEI4zwoN3iWSyCZW1Q=
+	t=1769676347; cv=none; b=hlsQhrBtZ1ZVgXd5XS4F84ZtH8vWy7wn6Le0LYMnD6dr41qOjGDO5Ox2MlIpUZeD/Gyf499/vlWP9oCVXh69q+3evrM1TBC7J0zJSwhzotka6+HJdDmTZ9B8xJx4XBpTGok+wMOqFc2aGs7VJV5SoLBMJRr0j9K18cGXWcknk48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769676168; c=relaxed/simple;
-	bh=zw5B7N0kdtIpraKfLwgFLXeOdknd15iGUFeI/rVON+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GIY9Q55jvZ3njbdjmL9ViJ6EQZ1tvtHBcL82ogb/S1oiS5XrDt15FRSDOhH2Ue6vC2GNBb5wKZaAUafv0Yh9Pjw2Be5UzlJla10G1gCDJjNI8GUG7pwcaCxmc2iL4MpSCTmbUDo4of5m0V5kNXgUqCljJXYlCdGBTxV7UgStouw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vlNbt-0002Bv-B5; Thu, 29 Jan 2026 09:42:41 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vlNbt-0033WL-2A;
-	Thu, 29 Jan 2026 09:42:41 +0100
-Received: from pengutronix.de (p54b15bf8.dip0.t-ipconnect.de [84.177.91.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B5AB24DAED6;
-	Thu, 29 Jan 2026 08:42:40 +0000 (UTC)
-Date: Thu, 29 Jan 2026 09:42:40 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	linux-can@vger.kernel.org
-Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
-Message-ID: <20260129-horned-python-of-ampleness-188335-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <20260125201601.5018-1-socketcan@hartkopp.net>
- <20260127174937.4c5fc226@kernel.org>
- <67cb17f4-2f72-4847-aa04-3633f3d8df33@hartkopp.net>
- <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
- <20260129-versatile-tuscan-mongrel-f9b173-mkl@pengutronix.de>
- <f47126ee-8256-4077-a09c-47a1ed461f65@hartkopp.net>
+	s=arc-20240116; t=1769676347; c=relaxed/simple;
+	bh=vCM6OQOvJs5WSt+9iieMhZP3WhgJYd4K/csM+xoRSNk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YWyShrc9UA0vA9xahwbTSJK4LM4Fuo4XmW9QLjBpbTeWGhvHMCGXP+JtUEhTGJ7v47pdu9Li0IKaGk4rfjbBx80xNpYS9uUA0bHrP5JxHZ88Twwh22Qnv+OaCCxq1nC+bYqZ2SlYdFJ5z0pb//AnfW4iBb42Bzso5XVVOdEC+r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RdD+2KK5; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 59FD74E42312;
+	Thu, 29 Jan 2026 08:45:42 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 15FA3606B6;
+	Thu, 29 Jan 2026 08:45:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 75D45119A868D;
+	Thu, 29 Jan 2026 09:45:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769676341; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=d/l3TbjoYhdgkglTb6IDQq8GQZaFfOlIjIUn/T6qpWQ=;
+	b=RdD+2KK5nEuxFcbrA3BlrEEj0OtBfqtX0C2vnqEEaiGX/wQDitQjyBnTy+sf10t3JVP+b8
+	tVsRAwyQobgcAVvaxRe2Sc8B3wBF2z6Km/PcsUwUL0fm/+Dj5QhJZ0t3R05FhCVHzd9CTH
+	5HTN+N0qJ7kjvdkvwpBO3o+aJlebPXL4pFxQ8wkAJvCybKF1MNZ5OgT7CnmvY4xeMLTHEC
+	oJNO14uThFnyTIReLmbdSBI759WRriYUnUvj+TXCQdW0JJOreJUgtzASPEdo0Lg8qeJJKU
+	hUDXOo6fqFp5YVBk7py/lIAw9LNAnKG4TfykRGlI7FBDvBk3YyxhELiJ1rl/XQ==
+Message-ID: <d8d6b779-358a-4d70-90f8-eba74b5a4092@bootlin.com>
+Date: Thu, 29 Jan 2026 09:45:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="j3ifscwvihbxtgbx"
-Content-Disposition: inline
-In-Reply-To: <f47126ee-8256-4077-a09c-47a1ed461f65@hartkopp.net>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: sfp: Fix quirk for Ubiquiti U-Fiber Instant
+ SFP module
+To: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>, netdev@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+References: <20260129082227.17443-1-kabel@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260129082227.17443-1-kabel@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.56 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254657-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,gmail.com,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-254658-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 64876ADA4E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 69B77ADADC
 X-Rspamd-Action: no action
 
+Hi Marek,
 
---j3ifscwvihbxtgbx
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
-MIME-Version: 1.0
+On 29/01/2026 09:22, Marek Behún wrote:
+> Commit fd580c9830316eda ("net: sfp: augment SFP parsing with
+> phy_interface_t bitmap") did not add augumentation for the interface
+> bitmap in the quirk for Ubiquiti U-Fiber Instant.
+> 
+> The subsequent commit f81fa96d8a6c7a77 ("net: phylink: use
+> phy_interface_t bitmaps for optical modules") then changed phylink code
+> for selection of SFP interface: instead of using link mode bitmap, the
+> interface bitmap is used, and the fastest interface mode supported by
+> both SFP module and MAC is chosen.
+> 
+> Since the interface bitmap contains also modes faster than 1000base-x,
+> this caused a regression wherein this module stopped working
+> out-of-the-box.
+> 
+> Fix this.
+> 
+> Fixes: fd580c9830316eda ("net: sfp: augment SFP parsing with phy_interface_t bitmap")
+> Signed-off-by: Marek Behún <kabel@kernel.org>
 
-On 29.01.2026 08:49:24, Oliver Hartkopp wrote:
-> On 29.01.26 07:44, Marc Kleine-Budde wrote:
-> > On 28.01.2026 10:07:13, Marc Kleine-Budde wrote:
-> > > I'll do. In the mean time, please have a look at b4, it has support f=
-or
-> > > sending patches via a web hook.
-> >
-> > Hooray for switching to b4!
->
-> Yes! Unfortunately one of the most relevant features does not work:
->
-> $ b4 prep --auto-to-cc
-> Will collect To: addresses using get_maintainer.pl
-> Will collect Cc: addresses using get_maintainer.pl
-> Traceback (most recent call last):
->   File "/usr/bin/b4", line 8, in <module>
->     sys.exit(cmd())
->              ~~~^^
->   File "/usr/lib/python3/dist-packages/b4/command.py", line 417, in cmd
->     cmdargs.func(cmdargs)
->     ~~~~~~~~~~~~^^^^^^^^^
->   File "/usr/lib/python3/dist-packages/b4/command.py", line 83, in cmd_pr=
-ep
->     b4.ez.cmd_prep(cmdargs)
->     ~~~~~~~~~~~~~~^^^^^^^^^
->   File "/usr/lib/python3/dist-packages/b4/ez.py", line 2835, in cmd_prep
->     auto_to_cc()
->     ~~~~~~~~~~^^
->   File "/usr/lib/python3/dist-packages/b4/ez.py", line 2655, in auto_to_cc
->     logger.debug('added %s to seen', ltr.addr[1])
->                                      ~~~~~~~~^^^
-> TypeError: 'NoneType' object is not subscriptable
->
->
-> $ b4 --version
-> 0.14.2
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-I'm using b4.git https://kernel.googlesource.com/pub/scm/utils/b4/b4.git
-and it works for me.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---j3ifscwvihbxtgbx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAml7HX0ACgkQDHRl3/mQ
-kZxR6wf+JGfITUabQbWls0Q8ovmiTb7DAAuJNirj1IYXLWaHjU/EZzNucTelqhG5
-u1fqkPpPA6EnPjjzGrNkVOKCZTiOPq1fZy1fXGFtqyzkZdUNjE7W9pL+J0X0bLDp
-JyTR2KdHcNnC9+5ammu7Qx33ax8JrmFU6f8sG158tlLL4r6zBZGS/5KDBngif4Sw
-cWEMUEWI5H2/Cqd6P+xvyGqljSObz89MJiu4EInE0NK2AOpotQcsQ1arFvCJi2I9
-ftd6KgY93EdXwkcfo/iQH9XU7bnF9iXkdOHJvrG2YdeRzlyAJ6qvXM50OeelLnHW
-mjvonkIZ9LZQxVnHaK5JjWTAX81Jkw==
-=2EOx
------END PGP SIGNATURE-----
-
---j3ifscwvihbxtgbx--
+Maxime
 
