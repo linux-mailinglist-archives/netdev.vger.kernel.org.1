@@ -1,145 +1,272 @@
-Return-Path: <netdev+bounces-254814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPt5BMZme2l2EQIAu9opvQ
-	(envelope-from <netdev+bounces-254814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 14:55:18 +0100
+	id DRLLIvxoe2lZEgIAu9opvQ
+	(envelope-from <netdev+bounces-254815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 15:04:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63B6CB0A11
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 14:55:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D653FB0AAB
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 15:04:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BEAC9300C00D
-	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 13:51:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E46C300D97C
+	for <lists+netdev@lfdr.de>; Thu, 29 Jan 2026 14:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061E233F361;
-	Thu, 29 Jan 2026 13:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7733081BE;
+	Thu, 29 Jan 2026 14:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hwVisHL7"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="obvmdcNA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770DC38D;
-	Thu, 29 Jan 2026 13:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00701A23B9;
+	Thu, 29 Jan 2026 14:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769694711; cv=none; b=KS3iUE3RWwSMF5WSrTbG/nGjfFfb6rgUu+AunBvdjojhkFQFXA94mhRV+0zaVctwLRaQOkDtlQbsBzSxxAPsvmWh8/dTQWDLyT85pdyJKVOW52rbrBBeJJburEeLIXautC4o8aK9TKJRQHRvrk+9MnGFWy3ghNWRqlsXpjHjckg=
+	t=1769695481; cv=none; b=Jor+SxO1R9wgrVnAyrXfVyjQcL2f4V5/VRpPWA8B+fvhuG3mcKmpsnZ+U6V9WkALaQyjmherRrbnBlg0M2ydszILRAo0DAaYL91l2Ks4rXGPZmnlMnL++QVmWYn3fOsrXhYTpA5fpuycn8UvApRH5qoyzMrfcwIufig9gKTZCkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769694711; c=relaxed/simple;
-	bh=4FlT/Ehe5yNkBs6wxX5bI7W7kmk/+7Cto8xrSPojX3I=;
+	s=arc-20240116; t=1769695481; c=relaxed/simple;
+	bh=UjtjZybVAIN1Wb/gS3b6qlZEjvchqTH1bgRbHc916aI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OwQpvLnKhq7epaj7AsGh6YxjrkDXxnIOy4X62zR7/2F6+r0uGR5kyMXnuiBhx8k0+GVdUET6y7SfNUH6LY0rCx4c8O7fWwPOHOxmI/Eii9WqhtMt84ToJd/FLq/CWJ8T0+DLjTF4BsDR0GVZH60rPdupNWx7WQ7y23NmclCEL/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hwVisHL7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1lcXkV7KcZEtUSZxPr/UJgAxOsEp8lMqEuRz2Y1R0vE=; b=hwVisHL7Uv8FLJ6eYfbkDJLMes
-	GBpeZ08yNuWS77zXJljq9XMAhSSFNHaHoei6AivyUM6YSNcq84R2uyvavYuxP7zKiT5ycYZo0dBuQ
-	FYliR8wtdTW7armfsbiZxETCMctIX5SocC+PdGwY/e92ftMUEia4kZKHjir/08z1Fnk3mDTPeGD6q
-	dKQlnS5gG450UOSdUTC8Hg5Kg858ej0EejX/vHVk7O6OqadCOKasEBuvar9VTs+V7NZjUn1HaYTS1
-	EAQWTr6cSKQg9+5R0gcUZZY9WRJA0KdhprDe6RY0e0kmn5suVKf0DEkKcUhOyhd5ODY/d1yyyO1E9
-	F7cjFp5A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43926)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vlSQt-0000000008s-36KN;
-	Thu, 29 Jan 2026 13:51:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vlSQr-00000000822-21Fq;
-	Thu, 29 Jan 2026 13:51:37 +0000
-Date: Thu, 29 Jan 2026 13:51:37 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vincent Guittot <vincent.guittot@linaro.org>, vkoul@kernel.org,
-	neil.armstrong@linaro.org
-Cc: Simon Horman <horms@kernel.org>, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
-	p.zabel@pengutronix.de, ghennadi.procopciuc@nxp.com,
-	Ionut.Vicovan@nxp.com, linux-phy@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	Frank.li@nxp.com
-Subject: Re: [PATCH 2/4] phy: s32g: Add serdes subsystem phy
-Message-ID: <aXtl6eQ8zD_olTdc@shell.armlinux.org.uk>
-References: <20260126092159.815968-1-vincent.guittot@linaro.org>
- <20260126092159.815968-3-vincent.guittot@linaro.org>
- <aXsuRTZUUnw0kdzV@horms.kernel.org>
- <CAKfTPtDfnpzq2CB-isVzvh1ZCWo7kit9KRJvVGoU1C3zZTgdXw@mail.gmail.com>
- <aXtfVUb0eLwP4R28@shell.armlinux.org.uk>
- <CAKfTPtCiJcNOdoddZN5N1dKHXfUJBe0=zeWfZ5uENoXDvbMnpQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=I5vZnoO4acs/Rni8yW3k1uDmlRie+BlMJ3HIPIDb/Qb4wK1KdYzt/lXSKwjTOpYOxwbsGd8JiRiLX87PzqjpG453dphIo0j9Dsb5Rf6E5QcOeYGwxb+y7JVCthNrJ/CIjYmOCdZN5wtExQBRWtiJBU1Lnl46bZPCnLnBqqdDIm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=obvmdcNA; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1769695468; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=PB/cu5YkkLF/4qU6I+B0lmWM8syID5t0JTbxMcIST2s=;
+	b=obvmdcNAHtSbkzjgcrEXZjVJ3ERe+LvQUsGQKNfksfSDRCl3E/JF3L1dw0J+TcsVkdHLbzoiDjtbLrSB4rw1wErCT3tvDZvpmIsRTzth9u4NA1iXDqmr9UZDqo4qjXsZyBGk+Ykm/uQjhZ3Hf+DZnuMVfCI5nhmyq1uAtNnWiiU=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wy7dC-l_1769695466 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 29 Jan 2026 22:04:27 +0800
+Date: Thu, 29 Jan 2026 22:04:26 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Leon Romanovsky <leon@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com
+Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
+Message-ID: <20260129140426.GA39958@j66a10360.sqa.eu95>
+References: <20260124093505.GA98529@j66a10360.sqa.eu95>
+ <aXSjm1DXm6yP62tD@pc636>
+ <20260124145754.GA57116@j66a10360.sqa.eu95>
+ <20260127133417.GU13967@unreal>
+ <20260128034558.GA126415@j66a10360.sqa.eu95>
+ <20260128111346.GD12149@unreal>
+ <20260128124404.GA96868@j66a10360.sqa.eu95>
+ <20260128134934.GD40916@unreal>
+ <20260129110323.GA80118@j66a10360.sqa.eu95>
+ <20260129122202.GF10992@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAKfTPtCiJcNOdoddZN5N1dKHXfUJBe0=zeWfZ5uENoXDvbMnpQ@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260129122202.GF10992@unreal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254814-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-254815-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,gmail.com,davemloft.net,linux-foundation.org,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,armlinux.org.uk:email,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 63B6CB0A11
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: D653FB0AAB
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 02:36:01PM +0100, Vincent Guittot wrote:
-> On Thu, 29 Jan 2026 at 14:23, Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Thu, Jan 29, 2026 at 02:01:13PM +0100, Vincent Guittot wrote:
-> > > yes, the usual pattern is :
-> > > - phy_set_mode_ext()
-> > > - then phy_power_on()
-> > > but I can add an additional check
-> >
-> > Please read Documentation/driver-api/phy/phy.rst section "Order of API
-> > calls" which suggests phy_set_mode_ext() after phy_power_on().
+On Thu, Jan 29, 2026 at 02:22:02PM +0200, Leon Romanovsky wrote:
+> On Thu, Jan 29, 2026 at 07:03:23PM +0800, D. Wythe wrote:
+> > On Wed, Jan 28, 2026 at 03:49:34PM +0200, Leon Romanovsky wrote:
+> > > On Wed, Jan 28, 2026 at 08:44:04PM +0800, D. Wythe wrote:
+> > > > On Wed, Jan 28, 2026 at 01:13:46PM +0200, Leon Romanovsky wrote:
+> > > > > On Wed, Jan 28, 2026 at 11:45:58AM +0800, D. Wythe wrote:
+> > > > > > On Tue, Jan 27, 2026 at 03:34:17PM +0200, Leon Romanovsky wrote:
+> > > > > > > On Sat, Jan 24, 2026 at 10:57:54PM +0800, D. Wythe wrote:
+> > > > > > > > On Sat, Jan 24, 2026 at 11:48:59AM +0100, Uladzislau Rezki wrote:
+> > > > > > > > > Hello, D. Wythe!
+> > > > > > > > > 
+> > > > > > > > > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
+> > > > > > > > > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
+> > > > > > > > > > > > find_vm_area() provides a way to find the vm_struct associated with a
+> > > > > > > > > > > > virtual address. Export this symbol to modules so that modularized
+> > > > > > > > > > > > subsystems can perform lookups on vmalloc addresses.
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> > > > > > > > > > > > ---
+> > > > > > > > > > > >  mm/vmalloc.c | 1 +
+> > > > > > > > > > > >  1 file changed, 1 insertion(+)
+> > > > > > > > > > > > 
+> > > > > > > > > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+> > > > > > > > > > > > index ecbac900c35f..3eb9fe761c34 100644
+> > > > > > > > > > > > --- a/mm/vmalloc.c
+> > > > > > > > > > > > +++ b/mm/vmalloc.c
+> > > > > > > > > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
+> > > > > > > > > > > >  
+> > > > > > > > > > > >  	return va->vm;
+> > > > > > > > > > > >  }
+> > > > > > > > > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
+> > > > > > > > > > > >  
+> > > > > > > > > > > This is internal. We can not just export it.
+> > > > > > > > > > > 
+> > > > > > > > > > > --
+> > > > > > > > > > > Uladzislau Rezki
+> > > > > > > > > > 
+> > > > > > > > > > Hi Uladzislau,
+> > > > > > > > > > 
+> > > > > > > > > > Thank you for the feedback. I agree that we should avoid exposing
+> > > > > > > > > > internal implementation details like struct vm_struct to external
+> > > > > > > > > > subsystems.
+> > > > > > > > > > 
+> > > > > > > > > > Following Christoph's suggestion, I'm planning to encapsulate the page
+> > > > > > > > > > order lookup into a minimal helper instead:
+> > > > > > > > > > 
+> > > > > > > > > > unsigned int vmalloc_page_order(const void *addr){
+> > > > > > > > > > 	struct vm_struct *vm;
+> > > > > > > > > >  	vm = find_vm_area(addr);
+> > > > > > > > > > 	return vm ? vm->page_order : 0;
+> > > > > > > > > > }
+> > > > > > > > > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
+> > > > > > > > > > 
+> > > > > > > > > > Does this approach look reasonable to you? It would keep the vm_struct
+> > > > > > > > > > layout private while satisfying the optimization needs of SMC.
+> > > > > > > > > > 
+> > > > > > > > > Could you please clarify why you need info about page_order? I have not
+> > > > > > > > > looked at your second patch.
+> > > > > > > > > 
+> > > > > > > > > Thanks!
+> > > > > > > > > 
+> > > > > > > > > --
+> > > > > > > > > Uladzislau Rezki
+> > > > > > > > 
+> > > > > > > > Hi Uladzislau,
+> > > > > > > > 
+> > > > > > > > This stems from optimizing memory registration in SMC-R. To provide the
+> > > > > > > > RDMA hardware with direct access to memory buffers, we must register
+> > > > > > > > them with the NIC. During this process, the hardware generates one MTT
+> > > > > > > > entry for each physically contiguous block. Since these hardware entries
+> > > > > > > > are a finite and scarce resource, and SMC currently defaults to a 4KB
+> > > > > > > > registration granularity, a single 2MB buffer consumes 512 entries. In
+> > > > > > > > high-concurrency scenarios, this inefficiency quickly exhausts NIC
+> > > > > > > > resources and becomes a major bottleneck for system scalability.
+> > > > > > > 
+> > > > > > > I believe this complexity can be avoided by using the RDMA MR pool API,
+> > > > > > > as other ULPs do, for example NVMe.
+> > > > > > > 
+> > > > > > > Thanks
+> > > > > > > 
+> > > > > > 
+> > > > > > Hi Leon,
+> > > > > > 
+> > > > > > Am I correct in assuming you are suggesting mr_pool to limit the number
+> > > > > > of MRs as a way to cap MTTE consumption?
+> > > > > 
+> > > > > I don't see this a limit, but something that is considered standard
+> > > > > practice to reduce MTT consumption.
+> > > > > 
+> > > > > > 
+> > > > > > However, our goal is to maximize the total registered memory within
+> > > > > > the MTTE limits rather than to cap it. In SMC-R, each connection
+> > > > > > occupies a configurable, fixed-size registered buffer; consequently,
+> > > > > > the more memory we can register, the more concurrent connections
+> > > > > > we can support.
+> > > > > 
+> > > > > It is not cap, but more efficient use of existing resources.
+> > > > 
+> > > > Got it. While MRs pool might be more standard practice, but it doesn't
+> > > > address our specific bottleneck. In fact, smc already has its own internal
+> > > > MR reuse; our core issue remains reducing MTTE consumption by increasing the
+> > > > registration granularity to maximize the memory size mapped per MTT entry.
+> > > 
+> > > And this is something MR pools can handle as well. We are going in circles,
+> > > so let's summarize.
+> > 
+> > I believe some points need to be thoroughly clarified here:
+> > 
+> > > 
+> > > I see SMC‑R as one of the RDMA ULPs, and it should ideally rely on the
+> > > existing ULP API used by NVMe, NFS, and others, rather than maintaining its
+> > > own internal logic.
+> > 
+> > SMC is not opposed to adopting newer RDMA interfaces; in fact, I have
+> > already planned a gradual migration to the updated RDMA APIs. We are
+> > currently in the process of adapting to ib_cqe, for instance. As long as
+> > functionality remains intact, there is no reason to oppose changes that
+> > reduce maintenance overhead or provide additional gains, but such a
+> > transition takes time.
+> > 
+> > > 
+> > > I also do not know whether vmalloc_page_order() is an appropriate solution;
+> > > I only want to show that we can probably achieve the same result without
+> > > introducing a new function.
+> > 
+> > Regarding the specific issue under discussion, I believe the newer RDMA
+> > APIs you mentioned do not solve my problem, at least for now. My
+> > understanding is that regardless of how MRs are pooled, the core
+> > requirement is to increase the page_size parameter in ib_map_mr_sg to
+> > maximize the physical size mapped per MTTE. From the code I have
+> > examined, I see no evidence of these new APIs utilizing values other
+> > than 4KB.
+> > 
+> > Of course, I believe that regardless of whether this issue
+> > currently exists, it is something the RDMA community can resolve.
+> > However, as I mentioned, adapting to new API takes time. Before a
+> > complete transition is achieved, we need to allow for some necessary
+> > updates to SMC.
 > 
-> Fair enough.
-> That being said, all pcie drivers  that use phy_set_mode_ext(), call
-> it before phy_power_on()
+> I disagree with that statement.
+> 
+> SMC‑R has a long history of re‑implementing existing RDMA ULP APIs, and
+> not always correctly.
+> 
+> https://lore.kernel.org/netdev/20170510072627.12060-1-hch@lst.de/
+> https://lore.kernel.org/netdev/20241105112313.GE311159@unreal/#t
+>
 
-It looks like many ethernet drivers do the same, so I think maybe the
-generic PHY documentation is incorrect or misleading, or is expressing
-a preference that almost no one follows. Something for the generic PHY
-maintainers to look at and/or comment on.
+I see that this discussion has moved beyond the technical scope of the
+patch into historical design critiques. I do not wish to engage in a
+debate over SMC's history, nor am I responsible for those past
+decisions.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I will discontinue the conversation here.
+
+Thanks.
 
