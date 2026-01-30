@@ -1,95 +1,94 @@
-Return-Path: <netdev+bounces-255143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KA8VBCWwfGmbOQIAu9opvQ
-	(envelope-from <netdev+bounces-255143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:20:37 +0100
+	id ANYXElmwfGmbOQIAu9opvQ
+	(envelope-from <netdev+bounces-255144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:21:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63714BAEDA
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:20:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE650BAF08
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B01D5303A85F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:19:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 321F2304AAC7
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2E029D26B;
-	Fri, 30 Jan 2026 13:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5CD2BE047;
+	Fri, 30 Jan 2026 13:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YjpGsNaF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K+02qoNh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E58429BDBF
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01E529BDAB
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769779188; cv=none; b=FfEtbu6TcVnhV8TbvhqpfkM6IFykT2x932eFf3WzakpB7awc+rzKvAJT2wAxlvlV8ZxyHXNed290U0v60tp4p5v3hdUGFHGNGg4+glRYQ5usuNbe9FwYJcYWLFNmdnj4imVAiNVuhzaB+8VrBkMFPNMrw/njls7cQfE3IE3u+EQ=
+	t=1769779194; cv=none; b=Y9glEQMA0Qh6EMABHZxuV0/HYcbNJ1+z8bXtFziN9ZQXAQgWXWDPU0RgZ+8oqXL3egyscOBoxh5eZkWwnKbeF3Y/+OHKfyQ3bJIjeSGlFmKA/RQorfrY0Z/d6117SOxaJfjlCtIoi8Hfr5TdnVCW3+Lm57YGvmoy2uoZWOUNs3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769779188; c=relaxed/simple;
-	bh=JIWN/nz8WfABssRSPSTUU++BJd0SMkAIZLvPDkubCn0=;
+	s=arc-20240116; t=1769779194; c=relaxed/simple;
+	bh=Or5gzlK0oOcwy1+ave3d9/8tpz5OWkqv6GdelcKgrIc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TsrWORUlvrrjghUhG7spCMaIPBZcClyykZI6G+WeiHsmcALj6XPAdqbaRplbxTn2FDWOKDav6jHqlL0OIPpCws9NmHH1FYnhOP5wy6dzb5ls8MCKnqFrilAt7xCpkxUmYs6VpfCMO8Iu9AnIwMDEQsYxMjvj9qCyFqsiYQYpSVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YjpGsNaF; arc=none smtp.client-ip=209.85.128.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=VpMHWcqslGAr0y0Kb6azO06VYARoyAewaVUiiw9Xrg7qjyPEjLparjkMBoYRkn2N91EmBB7g1x3GhuTp6q9vC60jx96mCm/UFyShkJrn16s0NWUqJM3cnyJXJpl7FT2OK9D0/vBLIqP9nTObjNTrQ1BkcHMu7Olzjy8QniwbDJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K+02qoNh; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47ff94b46afso18850755e9.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 05:19:46 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47ee937ecf2so18037615e9.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 05:19:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1769779185; x=1770383985; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1769779191; x=1770383991; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6LftfxHAZaora2yPEdmX+khpJwn0jgto61bYSOyCgE0=;
-        b=YjpGsNaF7onfNlWdQaIItSmmUUM+3B6xss/znwrsGgV+wWiIpT6zmegAej8arTMecM
-         cdNBNouzSqYtc1ZsZ0PpJbvoeAg3Pe74LU0vQpju5dLC7roFDfFAdY006GKY/N4CG0U5
-         awF3LIT1qiqKwdpmnqoAQ92aE6z/K5k79PPi3dXunhtchHjCM5vjg30fFUEd85fr+Ci3
-         4gn7iRYqfSHuVkhsrrIxW63WH4hB3/fnr7DfqKFWBcQHw+33nUiBMMApYVplykMJswMr
-         CtRgcrwxrrNJFD0GDdSh5gLA571HWrdhSmd+Ksdfrf2RUSXnVUW77yT+S2U5uHFppdTh
-         H/Sw==
+        bh=Dj8w1B+8x/las144X+RSjad0uTQtR49s9DyI1HP6ogk=;
+        b=K+02qoNhN0+1i0+tP6UEgm5Z7BCScFhH9R+IT86e3trA+ip86QHrcf9djliHdvsm6+
+         1qoQuGxOQxFfCZGOcCI0qr138pEcfJGcjwMsiobn1Shp7pmCOvgIiNbls02ZAU2fYhYl
+         0sbyBsOrm2ZdEPdO1yYe1PDMhpR3xMhL7XgLiQ+eeLR+wCe5SCGsrCwEucdvFC6M51aV
+         B4ifvp5jbiWZirSr72vkLkAsynrKxFxEjHDET8z5GQ1Pf1IwYeoAF3OflADjClp4MPLk
+         SlHxtsh4nUotO+dHt35EP4dN8yP4Rs0xLphySOXwynCmgVXNd8CRK1YFL0kM+KElYU9W
+         YTeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769779185; x=1770383985;
+        d=1e100.net; s=20230601; t=1769779191; x=1770383991;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6LftfxHAZaora2yPEdmX+khpJwn0jgto61bYSOyCgE0=;
-        b=Tr6rsSvhfSXDYOCG3dsE03EJ55NARPYvYOBXuWNhlgn+iE5LjS2Zf45ikZygL4JeZl
-         JFd/Q6wouzxgFxA0dFl3QJSFYmiQIQHgckBfxIF0nKXwwTDOvA3VdiJydAmxMWwGCEVt
-         +mS7b8hFHPW857OPrkr1Bnckd2sbW8IBE0GywtJ7OG+wt/X8m0VrOkS+EDabmMEdPT5a
-         +lZ7ykZkbWGHJNxVj0zJ/SQfRworOQ74dy+/i4detHPxSP7XDaCqq73Gl5yQ1aAAcmgE
-         CC9CdP3kktakTyN0bhjKH5vP+SzvXKBJmLc0mleyebJ15UxU4+yknVOO0I7/DIu+1eK7
-         i6WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVvH0BBo/PFrnua6uBZw8avnxPiQLa/ydEwvYeB50xiDGaM5YB6OUS5vTDyhS1iPj0Ae+CLnoo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMj72ZStvde2bO7UaBGHY6X1492T1BAo1PK5Ussu7VDRxcDCbP
-	nIL1jUy2Yn/MPGPfx9SW+rZ5RkD1/bO97WUQmA/YbSOcKJKXge4iCdXtg7jFtGiHV4c=
-X-Gm-Gg: AZuq6aK4Hy2UW7xXdwjn/xs1+yUbL/LMAIbu5sgzSaGv/r8BhZVtYplHDh7sEz3Veqn
-	6t9uoyPDFFfJATaMcVKyPHKEKSMJuSqt0z3TelIqeGUw7XU5BXI+R76IpGtF/TmzAsMRNHpD2sf
-	R6FtKVl9tqrefHvOZUV6UNCBhxGcqyNJaWxMdHqh/XgHk/13C/RPFfd43bHBBYRlMNKehTv/tzh
-	kmq8FHY3G6foaDxvKNIA1zSfTmU8wT3IhcpYEwixNUTf92cFu7ep6OymrJBqJ0LVhAMTmTMr2rs
-	uhobRzqFUDTvTzln2CoTUrPPoH7fbFAdzySiBvOLnMKkkBpPk2FQyJQ7wukVBbpa0e7OhdjtMI3
-	+Rvj13U/JekowlEjyaR5RyCcYSHpUvO6fr4rKXH1D1pEChePUq01CvZqEhGljIsWgZV5wT96ZoN
-	ID/JK9KAUZwBZ5ftrg
-X-Received: by 2002:a05:600c:680a:b0:47e:e051:79ee with SMTP id 5b1f17b1804b1-480828745d7mr89683285e9.3.1769779184609;
-        Fri, 30 Jan 2026 05:19:44 -0800 (PST)
+        bh=Dj8w1B+8x/las144X+RSjad0uTQtR49s9DyI1HP6ogk=;
+        b=pZtcm9yW7+7rLSexbhvZwRhy7HKB3KOgYcUkztrNZ6zcu4Ise9HaFRQMBN/Kobqzuu
+         lwDSe0AU2XwCHCCdKyp31FObkk8Ls0Rk02O+HrwEFBYTD7bZgsFxjeQLEUJCj4rybpUC
+         n4A4E8ZDdxXJAWRnZdBtmGy0aTnPxU3QVxW+PimFZgxPNnwVuIIWe5guP0otr5egNVB/
+         XP0VdF/FAQV7DRGidaZOeppzkTNGmd7+oXJ8SzR+cA6I2wQhJgeH3DgAOjSAcZG9xySJ
+         Z+fDRxSODS4Y0lJW+aLWr06MOoen7w9Ex79VVYKnsvy5RR/CgKtrV8Ci6Bjqrkj98fVn
+         hRsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUT5yY//RJbe6yANM+A5klpBjo/AxjKUvU917VChZ5tEMjcng2Wa8ZTOcX+T55BU7FaNTuzbQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoKBYMwvtHDZNSqp7db0Ya8jxmYDjAotQJ+55Mez02ZrJku0KX
+	9Xe+KDmt/LqigpiGr1wJwXNjWUVd1AUgvGiXx0gVcvx5OXZhGplLf6QA+n8KB48jyHA=
+X-Gm-Gg: AZuq6aJKU1FJs9DgKcSCqtDu7RtXgqI/7TGiGUYxy2NEaxxI7yicwgOXN9IDKcpqfWt
+	mlIfIul1EoY6DH67L3viQG3V/+QxWv7vHlJc0AmjSOBlTI8Vob6W19V7aWJxecIhsw0F4a3MV1F
+	lHggYSycUHxsyI7BFKg4xNlHH7l9W054JS55FiwS8tvp01yF/6HrsABhzK2QqLevpDK1MhZqkzy
+	M3YcJ9ohFB9s2nh+mVEbL3NWpEQkWI9clLJeAc/p6ISM/lRaKSbzVVoJbtx9UTBamR1+bSTFwC3
+	6tWI8ZoM8eKflXchNtFdyumEkQf/B1VAD7GWyjHoXU4hxryZvpOyxU0+SfywyLIiITiDBDz9grX
+	HVxNhU+rjT6+JnC6A3JtrfN7RqSkPmeCil+2HOAlve4eFT/des93dxrDRBMYMafLFoztp2SrtjA
+	8We/7vp2VbjNtMFLR8
+X-Received: by 2002:a05:600c:64cd:b0:46e:2815:8568 with SMTP id 5b1f17b1804b1-482db476c24mr37269605e9.10.1769779190983;
+        Fri, 30 Jan 2026 05:19:50 -0800 (PST)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806cdd77b8sm200882875e9.3.2026.01.30.05.19.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c37420sm281408035e9.9.2026.01.30.05.19.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 05:19:44 -0800 (PST)
-Date: Fri, 30 Jan 2026 16:19:41 +0300
+        Fri, 30 Jan 2026 05:19:50 -0800 (PST)
+Date: Fri, 30 Jan 2026 16:19:47 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
 To: Jan Petrous <jan.petrous@oss.nxp.com>
 Cc: s32@nxp.com, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linaro-s32@linaro.org, imx@lists.linux.dev
-Subject: [PATCH v6 1/3] net: stmmac: s32: use a syscon for
- S32_PHY_INTF_SEL_RGMII
-Message-ID: <b6b60d03344d070b2b4db7f0f00527f166e594e0.1769764941.git.dan.carpenter@linaro.org>
+Subject: [PATCH v6 2/3] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
+Message-ID: <3b75e950b2f8faecd1a9fa757e7eb7b42ace838f.1769764941.git.dan.carpenter@linaro.org>
 References: <cover.1769764941.git.dan.carpenter@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -103,126 +102,87 @@ In-Reply-To: <cover.1769764941.git.dan.carpenter@linaro.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,linaro.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-255143-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linaro.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,linaro.org:email,linaro.org:dkim,linaro.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 63714BAEDA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,linaro.org:mid]
+X-Rspamd-Queue-Id: BE650BAF08
 X-Rspamd-Action: no action
 
-On the s32 chipsets the GMAC_0_CTRL_STS register is in GPR region.
-Originally, accessing this register was done in a sort of ad-hoc way,
-but we want to use the syscon interface to do it.
+The S32 chipsets have a GPR region which has a miscellaneous registers
+including the GMAC_0_CTRL_STS register.  Originally, this code accessed
+that register in a sort of ad-hoc way, but it's cleaner to use a
+syscon interface to access these registers.
 
-This is a little bit ugly because we have to maintain backwards
-compatibility to the old device trees so we have to support both ways
-to access this register.
+We still need to maintain the old method of accessing the GMAC register
+but using a syscon will let us access other registers more cleanly.
 
 Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Reviewed-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 ---
-v6: Add Jan's R-b tag
-v5: Return an error if regmap_write() fails
-v4: no change
-v3: no change
-v2: Fix forward porting bug.  s/PHY_INTF_SEL_RGMII/S32_PHY_INTF_SEL_RGMII/
+v6: Fix O vs 0 typo in GMAC_0
+v5: Add Rob's R-b tag
+v4: Fix the formatting issue Rob pointed out
+v3: Better documentation about what GMAC_0_CTRL_STS register does.
+v2: Add the vendor prefix to the phandle
+    Fix the documentation
 
- .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 28 +++++++++++++++----
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml      | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-index 5a485ee98fa7..af594a096676 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-@@ -11,12 +11,14 @@
- #include <linux/device.h>
- #include <linux/ethtool.h>
- #include <linux/io.h>
-+#include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/of_mdio.h>
- #include <linux/of_address.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
- #include <linux/platform_device.h>
-+#include <linux/regmap.h>
- #include <linux/stmmac.h>
+diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+index 2b8b74c5feec..1b2934f3c87c 100644
+--- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+@@ -32,6 +32,18 @@ properties:
+       - description: Main GMAC registers
+       - description: GMAC PHY mode control register
  
- #include "stmmac_platform.h"
-@@ -32,6 +34,8 @@
- struct s32_priv_data {
- 	void __iomem *ioaddr;
- 	void __iomem *ctrl_sts;
-+	struct regmap *sts_regmap;
-+	unsigned int sts_offset;
- 	struct device *dev;
- 	phy_interface_t *intf_mode;
- 	struct clk *tx_clk;
-@@ -40,11 +44,17 @@ struct s32_priv_data {
- 
- static int s32_gmac_write_phy_intf_select(struct s32_priv_data *gmac)
- {
--	writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
-+	int ret = 0;
++  nxp,phy-sel:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    items:
++      - items:
++          - description: phandle to the GPR syscon node
++          - description: offset of PHY selection register
++    description:
++      This phandle points to the GMAC_0_CTRL_STS register which controls the
++      GMAC_0 configuration options.  The register lets you select the PHY
++      interface and the PHY mode.  It also controls if the FTM_0 or FTM_1
++      FlexTimer Modules connect to GMAC_0.
 +
-+	if (gmac->ctrl_sts)
-+		writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
-+	else
-+		ret = regmap_write(gmac->sts_regmap, gmac->sts_offset,
-+				   S32_PHY_INTF_SEL_RGMII);
+   interrupts:
+     maxItems: 1
  
- 	dev_dbg(gmac->dev, "PHY mode set to %s\n", phy_modes(*gmac->intf_mode));
- 
--	return 0;
-+	return ret;
- }
- 
- static int s32_gmac_init(struct device *dev, void *priv)
-@@ -125,10 +135,16 @@ static int s32_dwmac_probe(struct platform_device *pdev)
- 				     "dt configuration failed\n");
- 
- 	/* PHY interface mode control reg */
--	gmac->ctrl_sts = devm_platform_get_and_ioremap_resource(pdev, 1, NULL);
--	if (IS_ERR(gmac->ctrl_sts))
--		return dev_err_probe(dev, PTR_ERR(gmac->ctrl_sts),
--				     "S32CC config region is missing\n");
-+	gmac->sts_regmap = syscon_regmap_lookup_by_phandle_args(dev->of_node,
-+					"nxp,phy-sel", 1, &gmac->sts_offset);
-+	if (gmac->sts_regmap == ERR_PTR(-EPROBE_DEFER))
-+		return PTR_ERR(gmac->sts_regmap);
-+	if (IS_ERR(gmac->sts_regmap)) {
-+		gmac->ctrl_sts = devm_platform_get_and_ioremap_resource(pdev, 1, NULL);
-+		if (IS_ERR(gmac->ctrl_sts))
-+			return dev_err_probe(dev, PTR_ERR(gmac->ctrl_sts),
-+					     "S32CC config region is missing\n");
-+	}
- 
- 	/* tx clock */
- 	gmac->tx_clk = devm_clk_get(&pdev->dev, "tx");
+@@ -74,6 +86,7 @@ examples:
+         compatible = "nxp,s32g2-dwmac";
+         reg = <0x0 0x4033c000 0x0 0x2000>, /* gmac IP */
+               <0x0 0x4007c004 0x0 0x4>;    /* GMAC_0_CTRL_STS */
++        nxp,phy-sel = <&gpr 0x4>;
+         interrupt-parent = <&gic>;
+         interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
+         interrupt-names = "macirq";
 -- 
 2.51.0
 
