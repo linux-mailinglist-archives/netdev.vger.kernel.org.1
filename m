@@ -1,297 +1,282 @@
-Return-Path: <netdev+bounces-255080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iK5lGBd6fGmWNAIAu9opvQ
-	(envelope-from <netdev+bounces-255080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:29:59 +0100
+	id yA2jEyx7fGkONgIAu9opvQ
+	(envelope-from <netdev+bounces-255083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:34:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57A5B8ED8
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:29:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD852B8F2E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:34:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBF4C300A4E2
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:29:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7536030146AB
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79125352FAC;
-	Fri, 30 Jan 2026 09:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68F33542CA;
+	Fri, 30 Jan 2026 09:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="SHPrz4qQ";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="WgU2qaie"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="gbOLUNdr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF9D2BD597;
-	Fri, 30 Jan 2026 09:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.167
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769765395; cv=pass; b=dZFbKRGBlnp2RSpeZohhGxeXlZMqQC8vZIeDaZ1nLsH2yObrMh6EL6mtuDZJ22Ao/873PkHlZxW2FJDpdsJknmRkd+Kc6Z9me1YtVuiG9HBcVFphhZYV/WwrKrXN8fIYFB4160hw0ZiYn8o3k5cvRvvYR5I1zpQI8R8k6qnuPSU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769765395; c=relaxed/simple;
-	bh=eTi299TA4ib3ukVA/wScWqLiLs4dJNFHQARXFUdJ0zU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EtbtMwRArOOjJKR78IjotNjrdIjh2XBQrWLJ3w/x3IvWbd0TBWzsb4jp6QljI+dbZNWlS1WWX3i7CgVW1yw18Qxkkv6pSFoN+OiLtoURPmxuFQbqMWUNTjXyXXRzXSyzWMvwZVMkwnQiA0cjsOAgrUq9pHQkg9hwo4vzT3kY2Qk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hartkopp.net; spf=fail smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=SHPrz4qQ; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=WgU2qaie; arc=pass smtp.client-ip=81.169.146.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1769765383; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=W0HzXwzSGE2/BDiXY+acBwtrX7xE9s9a/3lWvKZMwh1yCYaz+QPEc5fzizZfKmeEkL
-    s9svq+HJJ1xcohvZS/FHdUzo1qus2vfG+ukUWYzIKyCBQTuQiQdg7TKptynvQPnd4vCr
-    cT/dWhlB7sCJ4pvKJpZl++4/yu5SkF2sWcuoB19IVscrWZcoD8jJjk5/Th4qfVDMqkYz
-    K0xXSuuexwpLnOGuvX5Y/Tcxem4+eJkdEpKvWkaAo4VUSm8oa9ZFhXFqXbMqiUpKkS2i
-    YjpyIi6YYbVMcJF67ERAZuIFZ1+xqoEvAnHZ9hnh289TX8N7PDMDWDZCDC+MLxD6rgou
-    ZdRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1769765383;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=6Zl2IB9736D6Zj2sKyt1hKruk6QIOMbeRfa7hmxsvrw=;
-    b=AqgE2CgNxWmYbiIkXclA6l1alb55vkq7cdZse+Ev46EvVM3KtyexxarzSqW02hhOna
-    wFr7dOuybYK/vf4QtKBFVBsXmOw1klrr3Go+8+le4WSTEdjVN3zRaWo7OuRoCyL8B3Mh
-    xLXV0Saw9qwDYxFjuqsnG7qryMfo/ZWEYQXzLs7hXgaECq+DP1rMZ+dYd79tZ/mjjgEg
-    ZyBaNwHVxuuRt9xeyKvwwpd1XWRxEO1yCCLCf3h4Nim2TyYR7WV/bZeGcKUugq+Hf9ea
-    fpi4P1LXvgHmJRCxIn44Ic1onpdywCo1lqD+FhVDpUwfH8IB/8RRsRm1wnuN6kCdWGUv
-    g/yA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1769765383;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=6Zl2IB9736D6Zj2sKyt1hKruk6QIOMbeRfa7hmxsvrw=;
-    b=SHPrz4qQErm55bhoNcnw1YN2HzGMOEHOdeQd2FVtCaOYyObWrLI+HVXXo3EJKJGtMz
-    y0qM1sBAaQVm3D7Tio5EqeWXeUBK8hmKurWqv1yT2QD7slrvC+N+m3xFCAIi74nkm7hI
-    5/bNh8E/M1o05McbHUS3UQGUeoMtp4BIDqxwURsBZwnggnKaittNoJYNYxOUbFOg+t16
-    6DNmzjCIRs0Bc5kMUOMNgUvg49bY21L0djEw6tB9cy8ScsLIYgNyvQ7SVpWU1pluB0TC
-    z1f5qMqrkfaDvOAg9kaKgEjdb1MLIdNFGGF//+fjYdWKuQCNkgnhrBTTKgXCBlKyEVT/
-    y8Ww==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1769765383;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=6Zl2IB9736D6Zj2sKyt1hKruk6QIOMbeRfa7hmxsvrw=;
-    b=WgU2qaieZ6rUZbu8oj2lsTdTOysHtQAGJstgbYO+bWEbmX+XplWTWsL5LhZ6T9/Hta
-    x8g/MzWTQ23OUzSi8MCQ==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7tnMDLztswwlyqon4XDpA0w0c7HaA=="
-Received: from [IPV6:2a00:6020:4a38:6810:ae1c:f386:228b:f98a]
-    by smtp.strato.de (RZmta 55.0.1 AUTH)
-    with ESMTPSA id Ka861020U9Th2nR
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 30 Jan 2026 10:29:43 +0100 (CET)
-Message-ID: <93d61e1c-5cdf-498e-8699-43e57cbb221b@hartkopp.net>
-Date: Fri, 30 Jan 2026 10:29:37 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D292EFDBF
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 09:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769765662; cv=none; b=Vpa4uc8vhnGusMj73j3pwrvOrQUXDPM9SNwfpxyw7IhrBRaev614b3R6Q4QkfoLsOkgEaCm9pRchixg6Oiqt0gKtY8UZ4uRy72s/OjdROrDH1UZpjtFHBew9LRvBgR5xnYWYmQzQDv3A/E5sjeG7XxVL+EV3NZxWr9+lXH9Jwnc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769765662; c=relaxed/simple;
+	bh=DYPEpRyLgQshjYkkyQA56bmzSHiBrVqWpYOvWLGXiBY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VE+fLq9t7Qiwpea1X3HXLWHmfQrmEgN8hWXLI9DG9SASsnqBx1do0Frx28PsdLk/c17+KRFr3i1e9iShcbkjp2OgMOuXqzuf7u0txMMvamlFrX1o6wiOGTka45J0lwk/7yo2tcuyHd/lu2eVtCVzY4z+lg0eru8OWVFoaA5D79o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=gbOLUNdr; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1769765653; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=hezof5PvbQPTAfqpDnaBUHtm0dyfKgNnFTdjYH024yk=;
+	b=gbOLUNdr1/JzSGLqntlI+2xG3N8ssbqqnrKgiz8y8bmv5WKOsDTAtJZxQMpC8j5gJxrEYmK3K9UmU8bsiab6HzYPraaR9E3dyankQOIu3UOyn2vwjuzg4s5FydIxLp+8WpgTTwyAGrrXG+sYpmcNURJcNh8I43lVUMc2Sr5w8+E=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WyAHcHz_1769765652 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 30 Jan 2026 17:34:13 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v24 0/6] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Fri, 30 Jan 2026 17:34:06 +0800
+Message-Id: <20260130093412.98407-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 6/6] can: gw: use can_gw_hops instead of
- sk_buff::csum_start
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
- Vincent Mailhol <mailhol@kernel.org>,
- Robin van der Gracht <robin@protonic.nl>,
- Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20260130-can_skb_ext-v6-0-8fceafab7f26@hartkopp.net>
- <20260130-can_skb_ext-v6-6-8fceafab7f26@hartkopp.net>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20260130-can_skb_ext-v6-6-8fceafab7f26@hartkopp.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Git-Hash: 903c8effb36e
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255080-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255083-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[hartkopp.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hartkopp.net:email,hartkopp.net:dkim,hartkopp.net:mid]
-X-Rspamd-Queue-Id: D57A5B8ED8
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim]
+X-Rspamd-Queue-Id: BD852B8F2E
 X-Rspamd-Action: no action
 
+Add a driver framework for EEA that will be available in the future.
+
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
+
+v24:
+    1. Add null checks for enet->rx and enet->tx in eea_get_ethtool_stat to
+       prevent errors when reading rx = enet->rx[i] in case enet->rx is null.
+       tx is similar. With rtnl protection in place, this check is sufficient.
+    2. Use 'received' as the return value in eea_poll.
+
+v23:
+    I have moved netif_set_real_num_queues() out of eea_start_rxtx(), so
+    eea_start_rxtx() is now a void function. I believe enet_bind_new_q_and_cfg()
+    is a more suitable place to include netif_set_real_num_queues(). In
+    eea_active_ring_and_irq(), I first execute request_irq() before interacting
+    with the hardware to create queues. Therefore, during the NIC setup process,
+    all driver-internal operations (memory allocation, IRQ initialization, sysfs
+    configuration, etc.) will be completed before the final notification to the
+    hardware.
+
+v22:
+    1. Use the budget from the NAPI poll function as the parameter for
+       napi_consume_skb.
+    2. Stop the TX queue when the remaining ring slots cannot hold an SKB.
+
+v21:
+    Fix two issues from the previous version:
+    1, a DMA unmap operation was missing.
+    2, RCU APIs were not used in eea_stats. Although the standard practice when
+        using RCU would require adding the __rcu annotation to both the rx and
+        tx fields, in many cases these fields are read without needing RCU
+        protection.  Therefore, I do not want to add the __rcu annotation.
+        Instead, I use a spin lock to protect modifications to rx and tx.
+
+v20:
+    Fix the partially initialized structure passed to db. @Jakub
+    http://lore.kernel.org/all/20260113172353.2ae6ef81@kernel.org
+
+v19:
+    fix the comments from @Simon Horman
+
+v18:
+    v17 with [PATCH] prefix.
+
+v17:
+    1. In `eea_adminq_dev_status`, uniformly use `enet->cfg.rx_ring_num`.
+    2. Add a `struct eea_net_cfg *cfg` parameter to `eea_free_rx` and
+        `eea_free_tx`. When called in the normal path, pass `enet->cfg` as
+        the argument; when called during initialization, pass the temporary
+        `cfg` instead.
+    3. Move the `.ndo_get_stats64` callback into `eea_net.c`.
+    4. In the `.ndo_get_stats64` callback, add a comment explaining how the TX
+        and RX statistics are protected by RCU.
+
+       /* This function is protected by RCU. Here uses enet->tx and enet->rx
+        * to check whether the TX and RX structures are safe to access. In
+        * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
+        * and enet->tx are set to NULL, and synchronize_net is called.
+        */
 
 
-On 30.01.26 09:42, Oliver Hartkopp via B4 Relay wrote:
-> From: Oliver Hartkopp <socketcan@hartkopp.net>
-> 
-> As CAN skbs don't use IP checksums the skb->csum_start variable was used to
-> store the can-gw CAN frame time-to-live counter together with
-> skb->ip_summed set to CHECKSUM_UNNECESSARY.
-> 
-> Remove the 'hack' using the skb->csum_start variable and move the content
-> to can_skb_ext::can_gw_hops of the CAN skb extensions.
-> 
-> The module parameter 'max_hops' has been reduced to a single byte to fit
-> can_skb_ext::can_gw_hops as the maximum value to be stored is 6.
-> 
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> ---
->   drivers/net/can/vxcan.c |  7 ++++++-
->   net/can/gw.c            | 23 ++++++-----------------
->   2 files changed, 12 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/net/can/vxcan.c b/drivers/net/can/vxcan.c
-> index f14c6f02b662..6e642909d6ca 100644
-> --- a/drivers/net/can/vxcan.c
-> +++ b/drivers/net/can/vxcan.c
-> @@ -19,10 +19,11 @@
->   #include <linux/can/dev.h>
->   #include <linux/can/skb.h>
->   #include <linux/can/vxcan.h>
->   #include <linux/can/can-ml.h>
->   #include <linux/slab.h>
-> +#include <net/can.h>
->   #include <net/rtnetlink.h>
->   
->   #define DRV_NAME "vxcan"
->   
->   MODULE_DESCRIPTION("Virtual CAN Tunnel");
-> @@ -37,10 +38,11 @@ struct vxcan_priv {
->   static netdev_tx_t vxcan_xmit(struct sk_buff *oskb, struct net_device *dev)
->   {
->   	struct vxcan_priv *priv = netdev_priv(dev);
->   	struct net_device *peer;
->   	struct net_device_stats *peerstats, *srcstats = &dev->stats;
-> +	struct can_skb_ext *csx;
->   	struct sk_buff *skb;
->   	unsigned int len;
->   
->   	if (can_dropped_invalid_skb(dev, oskb))
->   		return NETDEV_TX_OK;
-> @@ -62,11 +64,14 @@ static netdev_tx_t vxcan_xmit(struct sk_buff *oskb, struct net_device *dev)
->   		kfree_skb(oskb);
->   		goto out_unlock;
->   	}
->   
->   	/* reset CAN GW hop counter */
-> -	skb->csum_start = 0;
-> +	csx = can_skb_ext_find(skb);
-> +	if (csx)
-> +		csx->can_gw_hops = 0;
-> +
+v16:
+    1. follow the advices from @ALOK TIWARI
+       http://lore.kernel.org/all/5ff95a71-69e5-4cb6-9b2a-5224c983bdc2@oracle.com
 
-We are dealing with a cloned skb here, where we can not be sure that the 
-original skb ("oskb") was not cloned before too.
+v15:
+    1. remove 'default m' from eea kconfig
+    2. free the resources when open failed.
 
-Therefore we need to take care that the skb extension can be written 
-without affecting potential clones of oskb.
+v14:
+    1. some tiny fixes
 
-csx = can_skb_ext_add(skb) would do a potential cow for us and also sets 
-can_gw_hops to zero.
+v13:
+    1. fix some tiny fixes @Simon
 
-Therefore the only change for vxcan.c should look like this:
+v12:
+    I encountered some issues with sending the v11 patches, as they were quite
+    messy. Therefore, I'm resending them as v12.
 
-if (!can_skb_ext_add(skb)) {
-	kfree_skb(skb);
-	goto out_unlock;
-}
+v11:
+    1. remove auto clean __free(kfree)
+    2. some tiny fixes
 
-I'll wait for a respin until tomorrow.
-Maybe there are other remarks for this patch set too.
+v10:
+    1. name the jump labels after the target @Jakub
+    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
+v9:
+    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
 
-Best regards,
-Oliver
+v8: 1. rename eea_net_tmp to eea_net_init_ctx
+    2. rm code that allocs memory to destroy queues
+    3. some other minor changes
 
->   	skb->pkt_type   = PACKET_BROADCAST;
->   	skb->dev        = peer;
->   	skb->ip_summed  = CHECKSUM_UNNECESSARY;
->   
->   	len = can_skb_get_data_len(skb);
-> diff --git a/net/can/gw.c b/net/can/gw.c
-> index 6f158abd61aa..d83fc8242e0b 100644
-> --- a/net/can/gw.c
-> +++ b/net/can/gw.c
-> @@ -69,12 +69,12 @@ MODULE_ALIAS(CAN_GW_NAME);
->   
->   #define CGW_MIN_HOPS 1
->   #define CGW_MAX_HOPS 6
->   #define CGW_DEFAULT_HOPS 1
->   
-> -static unsigned int max_hops __read_mostly = CGW_DEFAULT_HOPS;
-> -module_param(max_hops, uint, 0444);
-> +static unsigned char max_hops __read_mostly = CGW_DEFAULT_HOPS;
-> +module_param(max_hops, byte, 0444);
->   MODULE_PARM_DESC(max_hops,
->   		 "maximum " CAN_GW_NAME " routing hops for CAN frames "
->   		 "(valid values: " __stringify(CGW_MIN_HOPS) "-"
->   		 __stringify(CGW_MAX_HOPS) " hops, "
->   		 "default: " __stringify(CGW_DEFAULT_HOPS) ")");
-> @@ -478,23 +478,12 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
->   		return;
->   
->   	/* Do not handle CAN frames routed more than 'max_hops' times.
->   	 * In general we should never catch this delimiter which is intended
->   	 * to cover a misconfiguration protection (e.g. circular CAN routes).
-> -	 *
-> -	 * The Controller Area Network controllers only accept CAN frames with
-> -	 * correct CRCs - which are not visible in the controller registers.
-> -	 * According to skbuff.h documentation the csum_start element for IP
-> -	 * checksums is undefined/unused when ip_summed == CHECKSUM_UNNECESSARY.
-> -	 * Only CAN skbs can be processed here which already have this property.
->   	 */
-> -
-> -#define cgw_hops(skb) ((skb)->csum_start)
-> -
-> -	BUG_ON(skb->ip_summed != CHECKSUM_UNNECESSARY);
-> -
-> -	if (cgw_hops(skb) >= max_hops) {
-> +	if (csx->can_gw_hops >= max_hops) {
->   		/* indicate deleted frames due to misconfiguration */
->   		gwj->deleted_frames++;
->   		return;
->   	}
->   
-> @@ -534,15 +523,15 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
->   		gwj->dropped_frames++;
->   		return;
->   	}
->   
->   	/* put the incremented hop counter in the cloned skb */
-> -	cgw_hops(nskb) = cgw_hops(skb) + 1;
-> +	ncsx->can_gw_hops = csx->can_gw_hops + 1;
->   
->   	/* first processing of this CAN frame -> adjust to private hop limit */
-> -	if (gwj->limit_hops && cgw_hops(nskb) == 1)
-> -		cgw_hops(nskb) = max_hops - gwj->limit_hops + 1;
-> +	if (gwj->limit_hops && ncsx->can_gw_hops == 1)
-> +		ncsx->can_gw_hops = max_hops - gwj->limit_hops + 1;
->   
->   	nskb->dev = gwj->dst.dev;
->   
->   	/* pointer to modifiable CAN frame */
->   	cf = (struct canfd_frame *)nskb->data;
-> 
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Xuan Zhuo (6):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: introduce ethtool support
+  eea: introduce callback for ndo_get_stats64
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  28 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 421 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 156 ++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 243 ++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  49 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 651 +++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 201 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 587 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  67 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 266 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  91 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 785 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 399 +++++++++
+ 19 files changed, 4038 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+
+--
+2.32.0.3.g01195cf9f
 
 
