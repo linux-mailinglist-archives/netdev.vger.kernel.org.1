@@ -1,323 +1,263 @@
-Return-Path: <netdev+bounces-254979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254980-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFbJGGkXfGk/KgIAu9opvQ
-	(envelope-from <netdev+bounces-254979-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:28:57 +0100
+	id SORNK9QXfGk/KgIAu9opvQ
+	(envelope-from <netdev+bounces-254980-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:30:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02505B66B7
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:28:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 139F2B6721
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DF20A3005AB1
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 02:28:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C20EB300BDBD
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 02:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB962D131A;
-	Fri, 30 Jan 2026 02:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305EC309EFF;
+	Fri, 30 Jan 2026 02:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aCydlcZs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+4iYFGU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0B1200110
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 02:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.227
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769740134; cv=pass; b=OrMRcq0ApC8Xzbl/OoTGy5TZCZAds9QDpZR58DVnl76tzGSX8gVuZDOXg0RdFcbud8IekC3skXxWu3cIBP/Yi0ddV2UQqqM2gx3W/bprituvuVLfTlttWjyU4I9H0XZC/ohdlNKaVw1e4SrHcOfdYhjPfgchu+26Rv+IztceXtM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769740134; c=relaxed/simple;
-	bh=88nPunxcwJR3LUjQ9blfNiSYC54zcuXXrD335slm3HQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a8Non05L98JyJrUZxHhXakagVHIB777m61iEePh6SJt+sDQQHkCLVyaWvdWurneuh7ohpi4jNJuz0+WMaYBCQjFrBKQ4Ct0ItH03U+T4FxByRQnRCLXb/yOYJUPpU1H5AGgjWKpKgNOsxrpiQdjr9//xbmLW9PGSoRYevF6oICc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aCydlcZs; arc=pass smtp.client-ip=209.85.128.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-790992528f6so16357177b3.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:28:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769740132; x=1770344932;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FUxo3GJHU3QqBLaAx9Ff2hjEFn/nh5dyab2zaaJp9kw=;
-        b=QE2MA9hnul3PiKSp7NMrN6bYb+uaexaGiAsvPG8eVxsKjnvgyRVeb6nsJc6C8E0fDU
-         v6qfYhK3BqdELB0u9yq7seVJEfU1MjYBrZiuxmU+TzirT5iF9ipoJ1htpnErXRxzqA5K
-         sCTLxqJe0jbIuk4fHC1ftBnKdgow6y4Vn5nqoFiry89MzO11uDrtJWhwrk0npdbF7mbd
-         ZnkChgqrEWNxxVLdEpUaysb2IJoRZAeKDxMB/I/MyjiukeIebYy8R14i5okxbb58cDgw
-         zLIw0LTsy8Ngp3ZT/B1PUptIrRqvZGlPfvF47gYMkcSdTbSaNZS1Y3ZvJfG06mBhhEZ5
-         4cMA==
-X-Gm-Message-State: AOJu0Yxwufy/iwYKpUgRvYjyxzr/OK6QfVQrQX93RWm/Lb7wz+sCjL5F
-	sxIgLjipGjiDQhwWmF1zdjdx3r4MH4v3v/FGgCIAab2+ng3Exk0zieLprvUSPOYT46FqkczvRfE
-	Tu3r7AsZMUe9xGsQQ8q1IPJyRCslPsDPf/PjMEiZLmAdb172/BEH2whTfTVHossb6RivxvdMH0V
-	ejkR/8/tx2f/yaZ7iD9IIMb5umGTnacL6kgwjyOhbI29DTYi8R/NqR7YPlqf7eVoKabzxLYHTUE
-	qqJh8NRohk=
-X-Gm-Gg: AZuq6aIqcH2fqCn5KmQuMWsjhBnRi3JdrSK31kJlQmn6SgG1ggE6C8xRgzVe/S1AU+F
-	I1xQSTiKrVXcFsjownDyxcatfvLpqFViDeWuxQHoAqwiM1LxUM7XG483sBh0ahqWwyTYPguaQHV
-	80AWkWHZmL/f+r5H5c8+/MflRTYxpj4N8/deKdVVlPiyjNLucGDxKDUr2XHp9/J/0rweP7vOLIr
-	VNS7guBX3sD0hYZbiV7XdOc1tlhb40ze0xqbJzGDsoDL6r7kpUsRFNVO812bI3Mdqgsmn+UlFwW
-	i9theC13wXYIdLET+c2NixvB+PoCOaD2vLg502Nv3x5pjToXEwZvzQjaVy0o7p/P78H89yyDjjs
-	2UqRRCrYKACFh3YO8KDYJfJKVNNSfu7zriOYXBFmvkfpvp1/mdml6mm+7vEClAeBg5y7GrgDlvm
-	o/rcaElpd4YH3gfMdRy9DxF/aQg/h+YKR8ScsmquKKJs4K
-X-Received: by 2002:a05:690c:c4c3:b0:786:a0fb:fa8e with SMTP id 00721157ae682-7949deb6b21mr15072687b3.15.1769740132164;
-        Thu, 29 Jan 2026 18:28:52 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-17.dlp.protect.broadcom.com. [144.49.247.17])
-        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-794827845dcsm4113167b3.3.2026.01.29.18.28.51
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Jan 2026 18:28:52 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-658b7a088e5so1934283a12.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:28:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769740130; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NlNJpPa9E6YfdX8MALxIhP5uwd8g2nOXnLV+m4ehDSxFO8S5u5KVRbUYdFZ8fSb3Yq
-         QWzqepGz3JqEASnKAs4nMCvO+kwtpVn4rU/mMGp4gOC5or4hOSK2vtdr7qWMyZrDLVuI
-         taLRalP1MnO2ZZz8KFfwzaBL7a9mQ1byTeyHn0+nmJESbFiEEZVjnglkywY7iGscsnyb
-         UZV/moGsxuQO48wVffv2epH6pJ9jabgVdbNVgV01ZMeilkKl1kiFlMiQhRAhx339l2dT
-         DWP155somhrsFu5xkpmxS7rWqiEro77L+RlSuTVE5Jr0MfVggYqCoLdig5NHHHeZioTc
-         fqtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=FUxo3GJHU3QqBLaAx9Ff2hjEFn/nh5dyab2zaaJp9kw=;
-        fh=c37j7FzMCWiGJp9gaXNVZT++tFj1kQIjYDEvbPylJbk=;
-        b=ev9f8zGvUNfJ+l+t5emjjOFLIU1LCPDf6CFr7WMfgYJdGQHIm+s5DdoM4qEyVdAYgg
-         S8Pfkq+j4lr//KTe7hJNsE8mqrJFaaliPTelyaX4kyyo70hIPXNvhMMzhHrRiMnPh4r5
-         KlsQIuNWBiAjgO0A2W6+dzyBNKCZ3vTw5XOLZUP7d92xEKeLbXaTX61yKejrRdXgxSBt
-         pZvG+lwdAPZLdEo94HE8c0SktCE6bhf8LPhLC4acwELgeoqf86eNqT81vzN1Nw1g5Y6L
-         o4eVJUauQOZmJJr+KVv5AL0LvglWlaTurO3nR8bG+WD39Ml4IlS9HnS2dSph2/efqAk4
-         wMiQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4A92D131A
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 02:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769740201; cv=none; b=HzjT7HSc0VLbnRIETJLLrRMjNshUv6tr2IDwqeasnlq2cQ7nl1/AoFC7tX7LNQ30yGUdiEmKDDtKLw3prKzs+eCQk+D7DNlfWpwzSr796tBhA6yo/B8KhlSg7u1nm/IvLbqwZvtWzGfneU4v7JNhGmA35H7oZ2PERodFbjAXFI8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769740201; c=relaxed/simple;
+	bh=Hpy7Ihf3i1gURmCZqvZpH2haL+/JX9vw1L+0TwSCoM0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMxwGxU+G8iYta+mXvAyKZyYq6t1QydZU8vsZTFjhc5c7pBg4F0MO22ozQC1BLgfeBkNby/92ukytKi1eeCaOxlk+v+S/w9amf7T3SwTzh3HQfWJY3GWhgUfJlhk+h+BqJkbn5M1ppbk7PNXSZY0lUE4N3SK9mwU9dDoK0Y11oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V+4iYFGU; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12460a7caa2so2469325c88.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:29:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1769740130; x=1770344930; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUxo3GJHU3QqBLaAx9Ff2hjEFn/nh5dyab2zaaJp9kw=;
-        b=aCydlcZsgIS43Ka1t7rCEJHl3XlrBn4GwxEKSao7N6+B72BjV1ilAMtHN7+N/hyCBO
-         +iXJR1fDSJfAHAglgduummZrz3IdLwetlwnK2TH10Kx6jonjoYOr4PnaG3JNlMvTwxGl
-         JR0wnLcRiBKNaa8j4NDh3paAslNjtTFBwyqR4=
-X-Received: by 2002:a05:6402:146b:b0:658:bab5:5801 with SMTP id 4fb4d7f45d1cf-658de53d1c1mr972112a12.5.1769740130511;
-        Thu, 29 Jan 2026 18:28:50 -0800 (PST)
-X-Received: by 2002:a05:6402:146b:b0:658:bab5:5801 with SMTP id
- 4fb4d7f45d1cf-658de53d1c1mr972092a12.5.1769740130160; Thu, 29 Jan 2026
- 18:28:50 -0800 (PST)
+        d=gmail.com; s=20230601; t=1769740199; x=1770344999; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L8pSvMXbcScI7VOTlnNV6K7+YBBPc5KlELWYhGa9o+w=;
+        b=V+4iYFGUv7jH0E4F8vzKRU0xCWlWxyoRVrU3BW/XxiBQvzbT0dukr3ix/cpPqpE4pI
+         bpVTnswXmQVpBqn/2YgzZJ0xVtPQVmloo0dbX/AXhGOmNCFY/B52AdIa6KF0ivvElHt7
+         U2HHD6DbhgLZkRjzuCwZ+oWIpgudntcz1AfGhhE8z1ZNbm6mnWW49PGZ9auciBRqSJT2
+         ebsyE4z1bxbkeOLcKeP/neGffJi9biAo5J+9pBbwGJqtKFVT75WB8d5Kob7pkh2xslbl
+         KBhQzvLQ3g/2Y96ROMCtfUG7o7a7M2URmZtZYIqEadw62/ejoQbUZ7mz6+MJqfKGK06/
+         plow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769740199; x=1770344999;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L8pSvMXbcScI7VOTlnNV6K7+YBBPc5KlELWYhGa9o+w=;
+        b=R3QbjV/c8qUciaKmC8IsM4P/cXy2fUzf/tnyXAIxCxK7/aikWsBXk66sJZnss2VqLq
+         xsvvdhdffiKKZ3Oz36Dktv1mJuT7O8njshM2VWQbF3/oQeciJKDMGJQKMkmsF5k+abtX
+         zyWChdkwrR/j8+2r3ZISjo7qvpaf4h6W59xPHa1QkaobPKsAtMZBK8BSroI8qPAOIOB4
+         HkCETFhUTP/YHPAnUeeVWnP49yHgPUzquM1q8IaPKm6ROZXCCcMV6iG4QivVEzu5zw3S
+         y0sQthv51G0GBeWz6d4OX35B1nGi6lpNG4IwITxtmNBW/adEFQtOuP5UKHTjqOCuRJNq
+         eisA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8zCbQirFt5ECtz42/CspnDY7k97VJzCf3lmy8O+7LlamuiRwJcbxfm5FHJ1hgMhHHIr2YAxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDrP7fLpdzVKa+ko1m8k6JBCNOYG2vcjwBqBhwJMQDK7qZ7OnT
+	OXfikNWIY+QWOGPm+PUfV9UGBWJ3fvy/rEWDVS571Rs4n8XzQyekUB+E
+X-Gm-Gg: AZuq6aJJgvWXbGjgO6N5YIw0f68w2Gyu4z6oBkaSIimDKN2gqMn1v1vSsP6wrfbBEpY
+	pfnkayT0DmUPaFtB1Jr6i/xpuI8Y6wugG0dJUCjus0k8wrLqF9w3h7iMQ75ZJopoDjWU5s85Xjc
+	GovUeXl+splMHoUBAZayBrbGA2lIb9LHDUv8WBrtClo582SOpRjwOJ+DhuQVZKvpaLzuBNDtOWZ
+	vOKyvYkiqjjIkqmC3NyvVrQDtYpi4mYIPziGg4sie2u34M88nE76vXFFMcjQc244nKDu6GnsunH
+	uwbFVVKqyIhxpyvrCRM5gK0woTmbfuboATCQoTQFR/awXNu7eWVxmrO7qzb908+t7N2Swi8rJYm
+	gcK97iCppWR2bek3ScsaxBouyGytbGqxhNGLwYgeplCGzIed+AuRqeNwN2dV4FoCC741VLl1Oxx
+	KxyZc=
+X-Received: by 2002:a05:7300:6da1:b0:2b4:80f0:3bf3 with SMTP id 5a478bee46e88-2b7c8632b58mr626406eec.1.1769740198655;
+        Thu, 29 Jan 2026 18:29:58 -0800 (PST)
+Received: from debian ([74.48.213.230])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7b9e2774asm4331618eec.24.2026.01.29.18.29.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 18:29:58 -0800 (PST)
+From: Qiliang Yuan <realwujing@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Jan Kara <jack@suse.cz>,
+	Jeff Layton <jlayton@kernel.org>,
+	Qiliang Yuan <realwujing@gmail.com>
+Cc: Qiliang Yuan <yuanql9@chinatelecom.cn>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4] netns: optimize netns cleaning by batching unhash_nsid calls
+Date: Thu, 29 Jan 2026 21:29:37 -0500
+Message-ID: <20260130022951.2489133-1-realwujing@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260130002323.2561266-1-joe@dama.to>
-In-Reply-To: <20260130002323.2561266-1-joe@dama.to>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 29 Jan 2026 18:28:38 -0800
-X-Gm-Features: AZwV_QiqvpiisEFM8S50k0HqgyNVcby4kib89P1e_b2jiRZ4TsGLUiClB22e75k
-Message-ID: <CACKFLinQD_fuJZDkzqHo=qFMQZrhXujjNOxuhBzHGQ8KwRJ8Uw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] bnxt_en: Allow ntuple filters for drops
-To: Joe Damato <joe@dama.to>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, shruti.parab@broadcom.com
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d8a1d1064991bbf2"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254979-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-254980-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,suse.cz,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[realwujing@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 02505B66B7
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,chinatelecom.cn:email]
+X-Rspamd-Queue-Id: 139F2B6721
 X-Rspamd-Action: no action
 
---000000000000d8a1d1064991bbf2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Currently, unhash_nsid() scans the entire system for each netns being
+killed, leading to O(M_batch * N_system * log(N_ids)) complexity.
 
-On Thu, Jan 29, 2026 at 4:23=E2=80=AFPM Joe Damato <joe@dama.to> wrote:
->
-> It appears that in commit 7efd79c0e689 ("bnxt_en: Add drop action
-> support for ntuple"), bnxt gained support for ntuple filters for packet
-> drops.
->
-> However, support for this does not seem to work in recent kernels or
-> against net-next:
->
->   % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
->     rmgr: Cannot insert RX class rule: Operation not supported
->     Cannot insert classification rule
->
-> The issue is that the existing code uses ethtool_get_flow_spec_ring_vf,
-> which will return a non-zero value if the ring_cookie is set to
-> RX_CLS_FLOW_DISC, which then causes bnxt_add_ntuple_cls_rule to return
-> -EOPNOTSUPP because it thinks the user is trying to set an ntuple filter
-> for a vf.
->
-> Fix this by first checking that the ring_cookie is not RX_CLS_FLOW_DISC.
->
-> After this patch, ntuple filters for drops can be added:
->
->   % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
->   Added rule with ID 0
->
->   % ethtool -n eth0
->   44 RX rings available
->   Total 1 rules
->
->   Filter: 0
->       Rule Type: UDP over IPv4
->       Src IP addr: 1.1.1.1 mask: 0.0.0.0
->       Dest IP addr: 0.0.0.0 mask: 255.255.255.255
->       TOS: 0x0 mask: 0xff
->       Src port: 0 mask: 0xffff
->       Dest port: 0 mask: 0xffff
->       Action: Drop
->
-> Signed-off-by: Joe Damato <joe@dama.to>
-> ---
-> v2:
->   - Extract the FLOW_MAC_EXT and FLOW_EXT check so it happens uncondition=
-ally.
->   - Eliminate the local variable ring, which was used in only one place a=
-nd
->     call ethtool_get_flow_spec_ring instead.
->
-> v1: https://lore.kernel.org/netdev/20260128222718.1679581-1-joe@dama.to/
+Optimize this to O(N_system * N_ids) by batching unhash operations. Move
+unhash_nsid() out of the per-netns loop in cleanup_net() to perform a
+single-pass traversal over survivor namespaces using idr_for_each().
 
-One minor improvement is to eliminate the vf variable since it is also
-used only once.  But I'm fine with this patch.  Thanks.
+Identify dying peers by an 'is_dying' flag, which is set under net_rwsem
+write lock after the netns is removed from the global list. This batches
+the unhashing work and eliminates the O(M_batch) multiplier.
 
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Clean up redundant nsid_lock and simplify the destruction loop now that
+unhashing is centralized.
 
---000000000000d8a1d1064991bbf2
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
+---
+v4:
+ - Move unhash_nsid() out of the batch loop to reduce complexity from O(M*N) to O(N).
+ - Use idr_for_each() for efficient, single-pass IDR traversal.
+ - Mark 'is_dying' under net_rwsem to safely identify and batch unhashing.
+ - Simplify destruction loop by removing redundant locking and per-netns unhash logic.
+v3:
+ - Update target tree to net-next.
+ - Post as a new thread instead of a reply.
+v2:
+ - Move 'is_dying' setting to __put_net() to eliminate the O(M_batch) loop.
+ - Remove redundant initializations in preinit_net().
+v1:
+ - Initial implementation of batch unhash_nsid().
 
-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
-DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
-qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
-5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
-rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
-qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
-2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
-K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
-H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
-Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
-WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
-q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
-2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
-bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
-R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCuMg9a
-vRtoTqTCw3TOoC9LkzUmrmDzytoUbZm2jBeDuzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjAxMzAwMjI4NTBaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB2/2fydCO4PfiIIvfD7UB0Iph77xggy09kG8FasrUE
-41ctOBIcMULPcDFPeX1u4xsoV5XN8qQ0hfGtJVjSOgoIusIY5Tbpk4Bnyoo0QveGUevUbs4X5s05
-zB8sxESsLspEFR28rPaJjPTKHXg/QMeoaSZkXYGbuAkEm4U8x5zyy2Gcq6JpUJEhsqEy3cxVySeL
-WdzbvIcHNOxCNHTDKQdkmHGEL1ck3ROVkkSV6h0+80y0Jm+5jryvMRobecXy0/0S5b18KuqD90Lu
-ADzjr3boZs8yCAYuhwtovMAIB5hb8SEY0zJSqw+znzEc2LEVtAUvCdhDihq3IjiNK7+sz5ho
---000000000000d8a1d1064991bbf2--
+ include/net/net_namespace.h |  1 +
+ net/core/net_namespace.c    | 41 +++++++++++++++++++++++--------------
+ 2 files changed, 27 insertions(+), 15 deletions(-)
+
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index cb664f6e3558..bd1acc6056ac 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -69,6 +69,7 @@ struct net {
+ 
+ 	unsigned int		dev_base_seq;	/* protected by rtnl_mutex */
+ 	u32			ifindex;
++	bool			is_dying;
+ 
+ 	spinlock_t		nsid_lock;
+ 	atomic_t		fnhe_genid;
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index a6e6a964a287..9ea05fb9df5b 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -624,9 +624,29 @@ void net_ns_get_ownership(const struct net *net, kuid_t *uid, kgid_t *gid)
+ }
+ EXPORT_SYMBOL_GPL(net_ns_get_ownership);
+ 
+-static void unhash_nsid(struct net *net, struct net *last)
++static int unhash_nsid_callback(int id, void *p, void *data)
++{
++	struct net *tmp = data;
++	struct net *peer = p;
++
++	if (peer->is_dying) {
++		spin_lock(&tmp->nsid_lock);
++		if (idr_find(&tmp->netns_ids, id) == peer)
++			idr_remove(&tmp->netns_ids, id);
++		else
++			peer = NULL;
++		spin_unlock(&tmp->nsid_lock);
++
++		if (peer)
++			rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL, GFP_KERNEL);
++	}
++	return 0;
++}
++
++static void unhash_nsid(struct net *last)
+ {
+ 	struct net *tmp;
++
+ 	/* This function is only called from cleanup_net() work,
+ 	 * and this work is the only process, that may delete
+ 	 * a net from net_namespace_list. So, when the below
+@@ -634,22 +654,10 @@ static void unhash_nsid(struct net *net, struct net *last)
+ 	 * use for_each_net_rcu() or net_rwsem.
+ 	 */
+ 	for_each_net(tmp) {
+-		int id;
+-
+-		spin_lock(&tmp->nsid_lock);
+-		id = __peernet2id(tmp, net);
+-		if (id >= 0)
+-			idr_remove(&tmp->netns_ids, id);
+-		spin_unlock(&tmp->nsid_lock);
+-		if (id >= 0)
+-			rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
+-					  GFP_KERNEL);
++		idr_for_each(&tmp->netns_ids, unhash_nsid_callback, tmp);
+ 		if (tmp == last)
+ 			break;
+ 	}
+-	spin_lock(&net->nsid_lock);
+-	idr_destroy(&net->netns_ids);
+-	spin_unlock(&net->nsid_lock);
+ }
+ 
+ static LLIST_HEAD(cleanup_list);
+@@ -674,6 +682,7 @@ static void cleanup_net(struct work_struct *work)
+ 	llist_for_each_entry(net, net_kill_list, cleanup_list) {
+ 		ns_tree_remove(net);
+ 		list_del_rcu(&net->list);
++		net->is_dying = true;
+ 	}
+ 	/* Cache last net. After we unlock rtnl, no one new net
+ 	 * added to net_namespace_list can assign nsid pointer
+@@ -688,8 +697,10 @@ static void cleanup_net(struct work_struct *work)
+ 	last = list_last_entry(&net_namespace_list, struct net, list);
+ 	up_write(&net_rwsem);
+ 
++	unhash_nsid(last);
++
+ 	llist_for_each_entry(net, net_kill_list, cleanup_list) {
+-		unhash_nsid(net, last);
++		idr_destroy(&net->netns_ids);
+ 		list_add_tail(&net->exit_list, &net_exit_list);
+ 	}
+ 
+-- 
+2.51.0
+
 
