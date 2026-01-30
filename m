@@ -1,207 +1,150 @@
-Return-Path: <netdev+bounces-255095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255096-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ACMqOmGJfGmbNgIAu9opvQ
-	(envelope-from <netdev+bounces-255095-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:35:13 +0100
+	id wJSSNkKKfGnSNgIAu9opvQ
+	(envelope-from <netdev+bounces-255096-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:38:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F755B968E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:35:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12404B96C2
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 00E863004617
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:35:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0472D3003BFB
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8799E32B99E;
-	Fri, 30 Jan 2026 10:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D3135E555;
+	Fri, 30 Jan 2026 10:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehJyMnGn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUnf0vzs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9DA2F0C7F
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0779C33EAED
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769769311; cv=none; b=U5k0tD50li6/DR0oCmXM6q6edscpHT2U9Xn3MPWF6/b2Wht/7MxZjrvEVtw/WRPca3Qu/CfXsbMAQBP+AQ0x73fFaxpgtbNf7n7dlxdGMyjjRf62IBEJQGZIKpTsIWUsepSP2zpuw0CSZHxMNIjlMmTbpNbTMz4Hkz5Ry+2rM0s=
+	t=1769769532; cv=none; b=Y4E13sr3hwcRP8zCZnwPSw35CPexoaVNf/8Z1g019oWWqsrw7zHHuFDqcQAgtIdBfcX9fiXJScoANSawlHcg+VbdSGFadezwiUR8a0ViI2uLndsQ0YXQjnAka6POr9EM9YS+5gBOalY00bIMk9tyInx8lO/M/pxEmrC6OXjPut0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769769311; c=relaxed/simple;
-	bh=pInq3nYo2aIvkLqD1iP+GB2C4CFLtloDcyYkgYVwpNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CFpzdH9vYU0RlEUM7n9uLXBezJ7zBBSH2ZpkkZ5uHHXvm/tDCGtc7/dwaj8qnj0/+T1lZRTRcaZ6Rm7S90179mMSByKlNSsoh6bx0AsZDSXa7U9vNf0x0ytFUKOqD2tLepdFiZ7KgoWTQh88NqbL8cDxMMGSrfTSEnw2MfElKvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ehJyMnGn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769769308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iO/64yNVs5PmscdVfUWxzm7PpbROaEkKZpAus+RTrmg=;
-	b=ehJyMnGnzdu5QgXDkzeGRkC64Dboh8axV9rkVUs+V5mAJweBkIbBnO1a3seiT1s1KdGb9H
-	jzEhRGCIyn+UQhDa11NCPQcg+gRkAD6xhC2vofqi4RoT2ccGbDkt13QJ5wujoCMCDgpLTW
-	y7m6RCSbHI5MEQp7sfp+ZU4Cro+3d7Y=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-502-p6Pr3cvYMM69U_oWaVMhzA-1; Fri,
- 30 Jan 2026 05:35:05 -0500
-X-MC-Unique: p6Pr3cvYMM69U_oWaVMhzA-1
-X-Mimecast-MFC-AGG-ID: p6Pr3cvYMM69U_oWaVMhzA_1769769303
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6233F1954B0C;
-	Fri, 30 Jan 2026 10:35:03 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.33.70])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E30003000218;
-	Fri, 30 Jan 2026 10:34:58 +0000 (UTC)
-Date: Fri, 30 Jan 2026 11:34:55 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
-	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net,
-	Yoann Congal <yoann.congal@smile.fr>
-Subject: Re: [PATCH net-next v2 6/9] hsr: Implement more robust duplicate
- discard for HSR
-Message-ID: <aXyJTzwJ3x34B-xR@thinkpad>
-References: <cover.1769093335.git.fmaurer@redhat.com>
- <07b90a435ed7d3450c1949e3a21910916d8538de.1769093335.git.fmaurer@redhat.com>
- <20260129144348.CIs44m-d@linutronix.de>
- <aXuIAFJ_m6gMUFFO@thinkpad>
- <aXugXpSajp6jzG1o@thinkpad>
+	s=arc-20240116; t=1769769532; c=relaxed/simple;
+	bh=JMA5e3Vhieoy5LOQMLN1Rk6Lk6vh2o6PLFn1addiWl0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nFJYp9VszU+q3mpQlayUDYvzANDVjGmZYCMEOUZv9KSScKofcDG05IKMetCNUjcj4ohLjA0VnDKE3NHvR2d92R3A9rngQn/VfcnZ3SUFHXag5Dnmd4gX8dQc4ClRLpvTIDqvGgIYSz1p7LdoxdBN/fspjZVgN3ncJDjSf+jSwUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XUnf0vzs; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4359108fd24so1176272f8f.2
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 02:38:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769769529; x=1770374329; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E4btR4k0rZeSwxf2XbW90LUQwuGXqTdQA1zSC1Z01I8=;
+        b=XUnf0vzsrDO1UQANIzsAV+0H1QyKFqlDrH5nKTFklRvubu4B2Q8VsGJYJmMTxQlcyU
+         msYruiGO8snZVhSYgDwUhyMEk8a5gjGYfl+r7TGdNP9eQ9+CoPEor175N7+oiQ2xUOwQ
+         3rzOnRHSA6bQgrl6OYcgXe86hBnV3W64V991I+87tnS8wAW5wceH5mtae4+E+hPPCy++
+         YCBb0HulPIr+GTzDl1nioGpp1yOKIqQtRitH7vA16g0Wfmm8UM3VS9yiUCsFXen+bmWB
+         LzkXlLK4pzlnS0KpfwbtPk/r+qg2iLHLZJ1veggSKUCfefF+8RbaQPdv6qUEXKLHf1oj
+         nmzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769769529; x=1770374329;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E4btR4k0rZeSwxf2XbW90LUQwuGXqTdQA1zSC1Z01I8=;
+        b=gsPl5ar6X/RpwjmFb1RosTJv705MpTeDrnbPReYD7HpXRKBEvBAaHd6C3MpJpX+0xz
+         rR8OOAeDHDwxh4h5lXZ556Z0mKonhTKZG1tliMBqzjjPlULJ0+FY89OC0yPjQlPCj+Jn
+         nqfArVXapSXwzl9/3EcfwWuRa6ZmcF1Rn+uS7F+btogq9oUbqrP/Vb65xQzHg3oia3uD
+         5uvzZK7x3g7E5g4MfywgTKo0elxybOD6vj6iuMgxBOeU5DXWnDSQV4DO4lVY+snQqCdM
+         xS9Ggr2ki8mwz0yu0Ze3GqorcklbUvyJHB7jbXklpRUhy1x66ZYHOARWu0Tig4xVkQx6
+         0KRA==
+X-Gm-Message-State: AOJu0Yw3FEFBoxX1j6brcnc88xqQ0rguhNm65YMqVoh7b3O4MM35oNdw
+	xVO0OQ/bYogAL/B8kGDXFNwKR0mO/1KsUtlFDL6IPz//38rSuIYgGmiY
+X-Gm-Gg: AZuq6aJeZ8eeWHle/IsVMoBgK43FgRzZOIU1Uf2Lej6I1jgwgvEmNRu/4fRRgj2WknG
+	gNLhFBDk4IJkiqzf3KpBr7N2oPwD2+x4OC64XvGgo4TLA7g9owfLICf6jyF0BP2EqSCl8hKxbSz
+	VNkDTav2PnRs6uIh3itHZMKzyMgYrqA73dWybqm/BzYgODn8FQpJr2l9OEvFk8DQ8WvLuTqQhpj
+	Bxy+56B3YINpC/AQTWiBnrRSEwP2MqBVg2yusuMFvrfnMB8pRhDdOzl7Tajxm7BpqsEM9M9vzA7
+	pL0SZj5fUEiiB1vpuYTPILwYki14Gdu2XUJB4rGEZOKnbzO1dkk3pBtUNsPfRXealo5JI6CzCtx
+	DZweKuOTx0bAMAL5V5oyjDTGyZSBgtVgJbJ63bX4dxZojmrdJE0PNGFW7UGX87ZEdyASai7YqHM
+	ZR2VJkexa4OL3tPVydv6MPvm8KJ6FBpA5vcj9g+q3IkCneUn7lJFIzEezOZ1+/Bl7D844EVExIr
+	9eHY46ytZwiksGMkkZkrOwjF/zSU834Y/4iJuKFjFyYtTLWNvh5JZc/jQ==
+X-Received: by 2002:a5d:588d:0:b0:430:f97a:6f42 with SMTP id ffacd0b85a97d-435f3abb528mr4022094f8f.54.1769769529137;
+        Fri, 30 Jan 2026 02:38:49 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:99eb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e4762sm20800594f8f.6.2026.01.30.02.38.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jan 2026 02:38:47 -0800 (PST)
+Message-ID: <30fa29da-6e7d-424c-9169-b61a057d992c@gmail.com>
+Date: Fri, 30 Jan 2026 10:38:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXugXpSajp6jzG1o@thinkpad>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] eth: bnxt: make sure we populate the qcfg
+ defaults on old FW/HW
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com
+References: <20260128193258.125274-1-kuba@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260128193258.125274-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255095-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,smile.fr];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255096-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8F755B968E
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 12404B96C2
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 07:01:02PM +0100, Felix Maurer wrote:
-> On Thu, Jan 29, 2026 at 05:17:04PM +0100, Felix Maurer wrote:
-> > On Thu, Jan 29, 2026 at 03:43:48PM +0100, Sebastian Andrzej Siewior wrote:
-> > > On 2026-01-22 15:57:01 [+0100], Felix Maurer wrote:
-> > > …
-> > > > As the problem (we accidentally skip over a sequence number that has not
-> > > > been received but will be received in the future) is similar to PRP, we can
-> > > > apply a similar solution. The duplicate discard algorithm based on the
-> > > > "sparse bitmap" works well for HSR if it is extended to track one bitmap
-> > > > for each port (A, B, master, interlink). To do this, change the sequence
-> > > > number blocks to contain a flexible array member as the last member that
-> > > > can keep chunks for as many bitmaps as we need. This design makes it easy
-> > > > to reuse the same algorithm in a potential PRP RedBox implementation.
-> > >
-> > > I know you just "copy" the logic based on what we have now but…
-> > > Why do we have to track the sequence number for A, B and interlink? The
-> > > 'master' port is what we feed into the stack so this needs to be
-> > > de-duplicated. I am not sure how 'interlink' works so I keep quiet here.
-> > > But A and B? There shouldn't be any duplicates on A and B unless the
-> > > destination node forwards the node. Or do I miss something?
-> > > I'm bringing this up because limiting to one (or two since I am unsure
-> > > about interlink) would save some memory and avoid needless updates. And
-> > > if you have HW-offloading enabled then you shouldn't see any packets
-> > > which are not directed to _this_ node.
-> >
-> > About the interlink: that's the interface where you attach devices that
-> > know nothing about HSR, i.e., when we are a RedBox. I consider it very
-> > similar to the master port, it's our responsibility to de-duplicate what
-> > we send out there.
-> >
-> > I was thinking about exactly this while working on the patch as well and
-> > I came to each conclusion (A,B are needed vs. are not needed) at least
-> > once. In the end, I think we will need it. It's right that a well
-> > behaving node in the ring should not forward "frames for which the node
-> > is the unique destination" (5.3.2.1). But there could be frames that
-> > have no unique destination in the ring at all: multicast frames or
-> > frames addressed to a non-existing MAC address. We should not forward
-> > such frames either to prevent them from looping forever.
-> >
-> > Now, such frames should probably only reach back to us, if we sent them
-> > (either from our stack or from the interlink port). We could track
-> > sequence numbers sent to master and interlink (for de-duplication) and
-> > sent by master and interlink (for loop prevention) for more clarity, but
-> > then we're back at four bitmaps again.
->
-> Please disregard this. If we are the source, we can easily detect it
-> from the frame. I'll consider this again. Like I wrote, I'm jumping
-> between necessary and not.
+On 1/28/26 19:32, Jakub Kicinski wrote:
+> The driver now depends on the core to tell it what the rx page size
+> should be for the agg ring. We must populate the ndo_default_qcfg
+> callback even if we don't support any queue ops.
+> 
+> This fixes:
+>    Oops: divide error: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN
+>    RIP: 0010:bnxt_alloc_rx_page_pool (drivers/net/ethernet/broadcom/bnxt/bnxt.c:3852)
+> 
+> with fw version 225.1.109.0.
 
-I took another look at this. I think the IEC 62439-3:2021 is not super
-clear on this (it often refers to "duplicate frames" without being exact
-about in which domain they are duplicates). But the section on HSR Modes
-(5.3.2.1) is quite telling when all modes are read in combination.
+fwiw, looks good, thanks for the fix
 
-First, there is the mode H, which is the default and mandatory to
-implement. In this mode, a node should forward all frames "except for
-frames sent by the node itself, duplicate frames and frames for which
-the node is the unique destination". Note that "duplicate frame" is not
-further specified here. As we don't implement different modes, we should
-follow mode H in our implementation.
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-In contrast, there is also mode X (sometimes referred to as "traffic
-reduction").  It is supposed to work like mode H, but without sending
-"counter-duplicates", i.e., frames that are "a duplicate of a frame that
-it received [...] from the opposite direction."
-
-To me, this means two things for mode H, i.e., what we should be doing:
-- For a frame with one sequence number coming from one node, we should
-  be forwarding the frame once in each direction.
-- There could be duplicates of these frames in either direction that we
-  should not forward. This is also hinted at in other parts of the
-  standard, that there could be multiple duplicates, especially when HSR
-  rings are coupled.
-
-Therefore, I think it is correct to do the duplicate tracking once for
-each port, especially separately for port A and port B.
-
-Thanks,
-   Felix
-
-
-> > I agree that we can and should optimize the HW-offloaded case. I'd
-> > suggest to do that in a separate patchset, though, partly because I
-> > don't have access to a hardware with HSR offload at the moment.
->
+-- 
+Pavel Begunkov
 
 
