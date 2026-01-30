@@ -1,188 +1,186 @@
-Return-Path: <netdev+bounces-255216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wM7wAlPwfGndPQIAu9opvQ
-	(envelope-from <netdev+bounces-255216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:54:27 +0100
+	id 8FvCHmfyfGkUPgIAu9opvQ
+	(envelope-from <netdev+bounces-255217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:03:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28A8DBD84C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:54:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8ABBD949
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:03:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 172EA3033A98
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 17:53:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 39BC93001597
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8654E364054;
-	Fri, 30 Jan 2026 17:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF0134B68C;
+	Fri, 30 Jan 2026 18:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="lvqXB7nL"
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="g+Fpyp1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7CF330658
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 17:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE65919E819
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769795633; cv=pass; b=IZlkS3m631aeGpaUNGbKU5OZ6bwZiK2E0ON5JXiSpesw/axorgVroP/0pck6/TuVChV/x9zHQSmlzdSiAFSLrK0iwyEzVhuzbem1znE4SkBcu+x6MLET5GxL5D3512q93KvUkV+xeg/tINYcJo5ySwhLAL2mdJYfoPoIopyGzWA=
+	t=1769796195; cv=pass; b=MNUiTlPvE7R6tHY/x1a5uO9q9Viw6M0TI5p3MR2ThCp+rpkAUqNCvyv3lW7U87ZLQ0q+f9y8B+cNjlubjmdnCPg8W2d913pAEy0aLozGoSA3UAW9qfY51wNdNUzSMBfTSOAfpqW/aJxHUKzauesLXCQC9lwcJHXRjx6zQ/lKVEg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769795633; c=relaxed/simple;
-	bh=326he210/tRZUiUmp5+sWT8etWqVRtLzZLG9pPxkOqg=;
+	s=arc-20240116; t=1769796195; c=relaxed/simple;
+	bh=/mMMp8i3mr5QKfsno6tPsIfb257F5GtySqn3ikKFFqc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FavnL6jPohtO1w1uRbjcZ45H1ZfgnzMfnydMGATfjsPACLFIe/PQdHvM8N/Ob/bBQ7sEQn3KvXr66VQIkduVV12ywvpmhI7XBx9zoBFgc61cGdZoOQI8zaWbSsiE94Lq5gkqY+x/Wv8FkgfGzDtYFXLraKZPSmwsCTA4o/qedEc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=lvqXB7nL; arc=pass smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-81f47610542so1387765b3a.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 09:53:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769795631; cv=none;
+	 To:Cc:Content-Type; b=eMYUND1ijCnMlINdOecQj10Aiy3RALgD1ZPAo2ARc3NaRKZWB3nl5uCFAbtuoyX3o3zIaeQ780LusVOXjMkovxLqb0Q8WTTH36TcIejayF+zRGkS1qplcSmh4LM1sLx4GRrup14GZqWFOz+vIQeKiu3VOQahdfZt4sm9qtYKT88=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=g+Fpyp1C; arc=pass smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1233b953bebso3092281c88.1
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:03:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769796193; cv=none;
         d=google.com; s=arc-20240605;
-        b=PbxSAt/LjR8cakL7pk3k+YKxZtWEFAOxGDSpJ9YC5pBIiAWj22toSZTgAapqj+dXow
-         YPYsosdHQsbYZi1fPJ1vy2lHlX++mAphRXMUeYfwGXrIaDD4PeTDDTqwbWE47BCvRe3N
-         Sy/mYGYVLjEBfM3yDeLUUyrcJvhGY0jL0WleqeDI8Du1+NggsxBJsjr8UT4322xFfxbQ
-         ORPG+rYScmVjzDd5/eude1yc+2mu0eNPxUj+Qxk3Ni8hOYS/+e9XgiCIzygwiQCmWlDk
-         4tgQ4uIdJKfWUCvSHLEM77wktnnVIiEWusUbrmGj4AmJSgMm/mhE8cUB4C36aYoVRjnm
-         kLqw==
+        b=lAZm7EA+yra4UEMmxIDIhnDykw56WFO+rE6L1qQfgiEi38ARkoeUNhKl5zQGcHPAj9
+         z6wgaovC9wUG5OgHv15vrJwwNMzvj4gq3GfyCOEKCLLwbTy5LxlyYRYZToAZDspQSaUj
+         HTkgpB9eEYPLrg/TxqzrMALqMzgKwhM7hp2LMIsAydck4PKRk0aHhB0fy2Y2ZKsqVEjf
+         TblYP+d6HaTBDQ3HkOm24uZK2FoVt6qIhKJmi6Hg8oW4tHnQ6s8bQZP02Gp/y0mp+spX
+         A8IJjC0OSHOOhsKVseNsXSB89Jm/SLQ5TN7lBzjpGEZ5J8ZB/9wFEJUSQ5e27YPGejeS
+         hEXw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=2vQAO1Uv8zYyW2LQO1EawZkOK3KNj111fQmdKtqn2pc=;
-        fh=d825hyJZgoaUkZ3eAKRyzjfAo2sQ1Dz7vSNc2ZZXL9c=;
-        b=BbdMwJhk1yG+bq06vwrd0Ya2wqD+CHo1B08w/wqnmoCQRLp47hyteRBSnIlYkMlUgQ
-         hI+w3Gk4aqQBU6GAuvRt2kQYVy3rS2/Vmu6HhOPFMD4t2bZkX3LZ78yokOx7ph5P1Ozl
-         TdkqkmefgTt0tYHKUXROPbOQuLe7zrSkNHVK0VdS4ZAVoZDXqF4yU7lETBUMEEke0sv+
-         mh6Eq7LOqYx+U8Z2Qc430IleGuRVEdGSDMe1+bmT4YlROJvIUaNiBx4/ooNCrnjEm/V2
-         5TEo8mVO7g7NcMb6bzfkYO9SZrQLfmcfNl+ngEAsq4OCoQVRUil8M65xc8EYv8EPyKMa
-         c07w==;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=/mMMp8i3mr5QKfsno6tPsIfb257F5GtySqn3ikKFFqc=;
+        fh=7oZJiN79Ojm6osTuziDwo+FTFOcWm+AJYXYRPJpIDyo=;
+        b=jnODkqFu/LSun0yywmBURIYKJVNlzKsG5QO0YOHZaBFUpr3kbroCPAFMJkrgur/Ejl
+         ZUP2t+UxiWIMLoc5Xj4URMqCqV0Gvdsjr/SyQ4vglzCgDU3FYMfi3xPGxe7iVMcHFOrw
+         qVn26pXsPKf8VJZVqRBo0ykDnPwUOg3dim5t0ff5Zb57uCO2+Z5rJgY6aymXPPdNsEf1
+         GU9Cim+4TfrhjYILNmVpczISM5oY7R216M2cPm07EclSZef9DGkG7umiTLCTgwnNcQL7
+         w/HC/a1tCiSeZpPlXR1uSsSjzs5ADA4LZU4MQASDJPESYgaB6CjGQ6VkO+YtJFWatEMh
+         3X2Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769795631; x=1770400431; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2vQAO1Uv8zYyW2LQO1EawZkOK3KNj111fQmdKtqn2pc=;
-        b=lvqXB7nLsiR+cO4h+FLw1npQHKOEDqLC85zIfdXSWxy6Ae9x8QnfmhSBuEyAkhphHW
-         JW7eE/AMSZZ1Ub80WcnCPonHfvlsNi2wg5/vuOD893X/twFxOroJvFxARweAcTfGUQtk
-         HqE/PupgfPkxIOvLl0KWHyApCP6SaKrla9qhnxzTBDzSjHbnkwYBKnYXNGnZHGmaYpfI
-         J2Yds9tsH+4ZrLOKzapjjJfTdEPAJoA6rKuJ9vqu6l4XWY2rWGQERDs9SP6StOzowJRD
-         7FjQYz4wgFNnlH3pkHKYdAPp2tX1ioW/lqrVg6oTCdX/vn/keQBnWLixi9qaPawJn7Xu
-         LJ0w==
+        d=isovalent.com; s=google; t=1769796193; x=1770400993; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/mMMp8i3mr5QKfsno6tPsIfb257F5GtySqn3ikKFFqc=;
+        b=g+Fpyp1CstSS/B6GBtCcxDseEztChYONWzKjaTetoOlnFC7dkSFQBmcHE5WCI76wnR
+         2E7e/ruFc3uJ4Vxskv+IOdkZL1zYyThLHcLoRYyIuvdb5An2YI+wcNocJ7zuOuFBtyCl
+         KHCcwgBE/hlxqsMVcJdpEN8lWyCFATMlKWJ4ta7ESMRGANY4gJYDLpA1HuDOTBVOE71p
+         EBvtsAZVsAaUR8bBKEtBWqQ2JSGhRQNEkwSNGCjLkl/X98qiaPQOk/iR2QW2ujHyGX22
+         bL3jOc723NHYnbXouyRvIKcMkx/dkppPx2E5xZVvUaeLvfpUdBbr/4bUeC3QN0bZbW45
+         yb+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769795631; x=1770400431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2vQAO1Uv8zYyW2LQO1EawZkOK3KNj111fQmdKtqn2pc=;
-        b=Z4sFINpvY5x4eim924mIxtGmAm5YM6HlMFELKyfvBi3Ef5LZjfLzVoG9oAsv+to2L9
-         T9/0UmT2bSsyj7XI8Yqmfhs/aG9osJTv23tSQWqyfyN5fL/ghDvdB96r78kasNH/rVo9
-         imyKi0NmnRAPSH2BAEutzLsGzSj1PBb7G4sPmoaFtFQXm1Kxf2CqVsao6SR08dZIen2x
-         FTQ3QRknHUjcCN1hk0ki/G6LD7cr/QzzqR3kp4fJf2wZ9uOWOq0t8vHjgqY6Uttb2nzs
-         sYYIlyDf1HsQ5p45m3TUN0QydzR9WY5v/RdrVBl8Ow7qJTD/aQ/GNcgmhF9tO2F4eZnS
-         +V7A==
-X-Gm-Message-State: AOJu0YxMwuj7DLUn5wOeZ5e7q1TRh5fPaCtKBPh7dEP9ez+yPkKbJ9oh
-	YsTqdyuyCRj3xfS2OYExSuJjtNSsrWZe8X5Oqqyb+VrYpWW7rIv6ZyIuZcZGgU4Hr/ATaaVpqyY
-	8ITrOt4iwVPrdbakPrHnBttw2zVd9BcVeYjwSeQln
-X-Gm-Gg: AZuq6aJSBpAU5CWxs45o40qnIX9CuZnbBLnFXUMeYHL+MmW6nAsSWgNEga+/a0hMDCh
-	cvaHq6adCgRDyMH7ZYUMFO9zVJu9MGbjkFERvsyV11BxTZEtJkbpzLQJZJHfN3/fsxup7nB5el4
-	+T7Jz9jUR6zOACYQfhNzCjWkzWh5KIbuNONoK2/0G0Bd5JymTLuzl9FfPBQbXJyzkWCntckd1UW
-	nYPZAWl8d8xq8x+vlA0Jh101LbhAcTXwhJ2gq4U+VK3Sg0+SAyPJBHjmn977YT4Xewm27Qe+4fW
-	4K/8fLqwCWvLhw==
-X-Received: by 2002:a05:6300:6141:b0:38e:91a7:6352 with SMTP id
- adf61e73a8af0-392e0163b8dmr3106804637.66.1769795631321; Fri, 30 Jan 2026
- 09:53:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769796193; x=1770400993;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/mMMp8i3mr5QKfsno6tPsIfb257F5GtySqn3ikKFFqc=;
+        b=MCKBYI7GybMrM/l8YLsEjtxar1CzGmJd0F+Vjiir7Ewu8UzEVZPuyw/spJv5ZaObTr
+         oJ/CbAIERQ3AdxKmQ0cl5Na4KowDDGtstBOSuC0T7nPmKbr7UHHH4GwHdi0EleFxA6fd
+         dNZ0d6sil8m940GNVlekn1kUhPsffYsDNzltAxMxA4dEBT2+OHPLkKWjQlOqfoGzFZz+
+         XG5j1AbCPG5YkPJJM5/iIyM54i4Lkz/C39sO0E/Awiv8EdJ11pMldvnaJzPRpBLX22+l
+         eeYcyme23jYBRu6qJaKH575J3ORD/tu0+KLy1XCma2xqpicIdNgSTTjP4cDeVpHQdnT9
+         Ca2g==
+X-Forwarded-Encrypted: i=1; AJvYcCWEkzdYNSJkTiFGDK2IhScWDBOaQshQKRHCc2um38BuKM6auWeg3NwtVaLXuMt3WIK0SJTpR80=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxpopq1eCsLLwWcRtOh5fjSDiFpEXPT4bnGVc/6CTQJRZzgTrr8
+	rca3hIbeawEeZtP3+q3H+oUqMTR6GJvXdWoKUEKfnQD4CAW/NMFaS7TMhlMobmfemI4SDPyMbDa
+	ox2kbthohZIPEJ421zhkS2Y5rVkvuUos9KVBYX7HZteazVPsRJ7qiGB31IFMj
+X-Gm-Gg: AZuq6aLeOujtImY9Z5lYKY73SgI7Zj+yu41bxODUQZOlfllAlPIjtPaVeDikorwYNcO
+	Gjs6T6/K/jaRh9T+rkT7odmuhiV8nRSkGkL/+62pWlssU5B/a7tTyoSM4ip3IClU+XsEQhOWN07
+	FCmc2BeCg9ld31eELT3FrE8yYBGB2cPsjfSXnaZun3y0O87E5lTNq8s6s5Hf3eTKM5mE7u/aeVQ
+	Re7gQA3aHsVGiTLVRwi1VsKSN6meC2rt8QXRlSf3kXy2OZPRbKH1u2Vz0f8WRbuT/InhJnkPL3n
+	RHGMmlGxscO87gbXrrDlV8w/CvVD4uC5xqPhjHzqjnQda3uWo1x7OSxOo8MwvcvoPB+9HT6I3Ow
+	yo422Lk2CVYU=
+X-Received: by 2002:a05:7022:fa2:b0:11b:88a7:e1ac with SMTP id
+ a92af1059eb24-125c0fad4ebmr2190000c88.19.1769796192772; Fri, 30 Jan 2026
+ 10:03:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com>
- <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org>
-In-Reply-To: <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 30 Jan 2026 12:53:40 -0500
-X-Gm-Features: AZwV_QiQhjrnk_kiCNTQ9hpPibGH8uv5bn2JIzi1spPEoRMYIYMFhv-zfwvpGj0
-Message-ID: <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-To: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260106095243.15105-1-maklimek97@gmail.com> <20260113214232.129356-1-alice.kernel@fastmail.im>
+ <727b7f08-828b-449a-a89d-005ad1f50b32@gmail.com>
+In-Reply-To: <727b7f08-828b-449a-a89d-005ad1f50b32@gmail.com>
+From: Alice Mikityanska <alice@isovalent.com>
+Date: Fri, 30 Jan 2026 20:02:55 +0200
+X-Gm-Features: AZwV_QgGXafUaO-epf9_hvjdzlejtWJ6Urd35Lzewo5L8rpYpvVJ2MnlWsxyCbo
+Message-ID: <CAD0BsJVAQinyxTx8-co3yrHqmazOiDrKPx2Wr0O6FcdfLOaAtA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/3] net: gso: fix MTU validation of BIG TCP
+To: Mariusz Klimek <maklimek97@gmail.com>
+Cc: Alice Mikityanska <alice.kernel@fastmail.im>, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, Guy Harris <gharris@sonic.net>, 
+	Michael Richardson <mcr@sandelman.ca>, Denis Ovsienko <denis@ovsienko.info>, 
+	Daniel Borkmann <daniel@iogearbox.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[isovalent.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[isovalent.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-255217-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255216-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[fastmail.im,vger.kernel.org,redhat.com,sonic.net,sandelman.ca,ovsienko.info,iogearbox.net];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[alice@isovalent.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[isovalent.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,1g4.org:email,mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim,raw.githubusercontent.com:url]
-X-Rspamd-Queue-Id: 28A8DBD84C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,isovalent.com:dkim]
+X-Rspamd-Queue-Id: 9C8ABBD949
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 12:22=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
+On Fri, 30 Jan 2026 at 11:00, Mariusz Klimek <maklimek97@gmail.com> wrote:
 >
-> Yes, In net/sched/act_api.c the GETACTION notify path always does alloc_s=
-kb(NLMSG_GOODSIZE), if tca_get_fill()
-> runs out of tailroom it returns -1 and tcf_get_notify() maps that to -EIN=
-VAL. So failures are size-dependent
-> and can look intermittent across different action dumps. act_gate might b=
-e the outlier?
+> On 1/13/26 22:42, Alice Mikityanska wrote:
+> > On Tue, 06 Jan 2026 at 10:52:40 +0100, Mariusz Klimek wrote:
+> >> This series fixes the MTU validation of BIG TCP jumbograms and removes the
+> >> existing IP6SKB_FAKEJUMBO work-around that only fixes the issue in one
+> >> location.
+> >
+> > My series removes IPv6 HBH in BIG TCP entirely:
+> >
+> > https://lore.kernel.org/netdev/20260113212655.116122-1-alice.kernel@fastmail.im/T/
+> >
+> > I believe, it makes this fix no longer necessary.
+> >
 >
-
-Very bizarre that dump would fail because it is transactional. It
-shouldnt matter that you are only allocing NLMSG_GOODSIZE.
-Is there a possibility that  a single act_gate entry can be larger
-than NLMSG_GOODSIZE?
-
-> The size is already computed in tca_action_gd() (sum tcf_action_fill_size=
-() then tcf_action_full_attrs_size())
-> and add/del already allocate max(attr_size, NLMSG_GOODSIZE). This patch j=
-ust makes GETACTION consistent with
-> that.
+> You're right, your patch also fixes this issue by removing HBH headers
+> altogether. Thanks for bringing this up :)
 >
-
-I looked at act_gate dump and it is sane. Which leads to perhaps your
-test program being bugy.
-
-Install the 100 actions then use tc to count.
-Something like:
- tc actions ls action gate | grep index | wc -l
-
-cheers,
-jamal
-
-> On the reproducer: the gatebench test with 100 entries is reasonable.
-> https://raw.githubusercontent.com/jopamo/gatebench/refs/heads/main/src/se=
-lftests/test_large_dump.c
+> Heads up: I'm working on another patch series that uses some of the code
+> you're removing...
 >
-> I plan to follow this up with another patch for act_gate and believe they=
- both are integral to fully stabilize
-> act_gate.
->
-> Thanks
-> Paul
+> Paolo: should we still merge this or should we just wait for Alice's patch to
+> be accepted? Also, should I already submit my next patch series or should I
+> wait until we're finished with this one?
+
+CCed the tcpdump folks: I would appreciate if you could take forward
+either of these pull requests:
+
+https://github.com/the-tcpdump-group/tcpdump/pull/1329
+https://github.com/the-tcpdump-group/tcpdump/pull/1396
+
+That would unblock the kernel series and allow Paolo to merge it, and
+also unblock Mariusz's work.
+
+Thanks,
+Alice
+
+> --
+> Mariusz K.
 
