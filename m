@@ -1,226 +1,158 @@
-Return-Path: <netdev+bounces-255221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCWRCAr9fGnLPgIAu9opvQ
-	(envelope-from <netdev+bounces-255221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:48:42 +0100
+	id mL/UFEv+fGnLPgIAu9opvQ
+	(envelope-from <netdev+bounces-255223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:54:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C07BDF69
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:48:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71542BE004
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:54:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B2E20303C8A4
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:47:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0ED0A3013D5D
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAE53876A5;
-	Fri, 30 Jan 2026 18:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A613859CB;
+	Fri, 30 Jan 2026 18:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="aRHmPsMW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lWRzxukW"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CCB387378;
-	Fri, 30 Jan 2026 18:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769798830; cv=none; b=FQliOOZo1GmR5g0zPYCpgLGl7G5GYOVf+snCCiVPPtmQB8NOTq8QVCwsJSuP1B+Lvja6tyrL8f5hD056Xuv/n4Y6xLnErlG372fucQobpOQkv6naNoCpSvwOLct1dXwZNX3379xZ/VNgWzEaE3ZzBGzgxmIJrq32AsSLVZpPAcU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769798830; c=relaxed/simple;
-	bh=IVnLhnrcy/3xPEQctLWhlsnsImXX6rsH2GP1mnkmDNQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ninl4gqEi+mhuXkI2SVPYjQm8YdlvBaPxO6fTdO2uCl59RQcc5oI8X0S6jLwwtFuYeJNSPC0lPtPsag3YeAH9MudQZQrZuwZH4LkKvlNQR8oqeOoNqkkCdL19pbQxiEmIhH566jsoUh8ktkqtv5yKb8zW7Zb4XrHcWfgb0owjUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=aRHmPsMW; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=gW70Iuxcr93CtMyUc93o0K6n2EmDcL/0tFhB6bt/uXk=; b=aRHmPsMWedGIXc2X0YSNAMvFAT
-	gpBxbCe23doJ2GkVOjXk5qAtYdxfG7QHsv/GZFeGglF5MVb8oi8ie8ecBvqK6OwwGvp3Mrufj4R9f
-	gwTIgyr9An7iroBpuFdP4pCvSv54rbsHMadaNcOX2Oks/h19TTOICxX6Iv3LinlyE9QvOv+tbGx/L
-	wTcT5umDxfJ4bBZWN9TxcctGh0UQpm3mRZ4XmF3h5po3lGR7yRCUFQw2uBAZRzDswWic5we1XzcwF
-	/SAvFr1DLgt6bXlrFp4P21KqJpRkog5J4b+9kw2+DpFOJNuHjlhk466pmK9RtnC8VpIwnGyBr2P/L
-	ry9AY69w==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vltWK-001urn-5X; Fri, 30 Jan 2026 18:47:04 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 30 Jan 2026 10:46:19 -0800
-Subject: [PATCH net-next RFC 3/3] netlink: convert to getsockopt_iter
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B6C32E120
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769799238; cv=pass; b=X4VkqWRCWs2mDgDXzgM1pDYJMar/ItzIzojxbnw52I4GikVeBkNG4JzfOhv3X7VH5lDNqMNotQs2zvvHfHE05WL3zNRXRlKsueaThDtT/s3NZkf578aAxTjF+2553eY2yZAQFkXQ2jTdOBhYBop4L3zD+cynxUoBgUkEO6aSA38=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769799238; c=relaxed/simple;
+	bh=Yn9/aL/X+9O7klMy4Ik8tAl6jzXG8GOxnYP5QqAkigQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a0K5RVSV+/wIK1yzDzM8s7rgVYZdAoRtBXZ8A7hPG53MUMJ+TrKmc30E4dHNZ0B1utFyTdZLan01gt3vDlHazpalkZSJHXpQxqlR8NMEr1ITN9rzVGHbKRrSX9jHA9SBjIsS6DcxAvcrgOcroCD4BR0u0/2P1dMMElqPFXpdJRs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lWRzxukW; arc=pass smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8948273f5d0so34807746d6.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:53:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769799235; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WPDkgC8xsZxMUP0Av3s7Nk+S4vTuUcb861ePMNLERBY047FDIT2AP0aYrgWD+SfxTy
+         AEm5GZ9MjgC3nXb8D09LCUQGU87GGQ3LvcI01uB6Wy2RDyBUK5RX7UAPp3Y7oPZA2ytH
+         DxsoAKxwIszi3z+7O9epaqYII+Hb+QeBgD8ZcAJ59aLSpCoiXS8UrZBcjF6FtEyXv9Ad
+         C6up62y57udKnc4v7jEGUT00S2GQM7cAy/dayxkoXUpTrFa7i8wGYiNl7wsc1IjGIYrB
+         8mliElCPFaEv8QzIBiGbd0PNpMvsiR3pu9CdRzZDpck6nRIR/tyA4jBPpfTcYcM9mmof
+         +OpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Yn9/aL/X+9O7klMy4Ik8tAl6jzXG8GOxnYP5QqAkigQ=;
+        fh=wVCrfiq8uuAzXwqejJuK6kQabxrRqIp3C4MGlx31wZA=;
+        b=U+se68959V/vDEvcMsZMhxLb4/aBeo9B1g2IzDErKuhIi14HoJJUxf2t6kTfWJtj/5
+         SsyY/FrU+uSS3h9GHQUKXqpiWIhSsX6MU7/jCLd9hwSCPNlKAWnW07cKiXN073/+6LnM
+         NN7p/FprGpw/lcBPHQKFuvgUYRM4+nAj+Og++mgNZ/fnJUB2KcYv7iY75pttGcyWQvp3
+         sNh3Ei5tBixAIHCiyHNZpkEpq3GV0YQJg+YjHQo0HxVC0rXjWlIhPtHGJxj48mImSTVT
+         l8rvaX8GyJB4o4I2Yk8307U8GFgaseDR0pYcEzxMXdz7xrQAAeC8/tGQWLOyczRTlam3
+         zmrA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769799235; x=1770404035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yn9/aL/X+9O7klMy4Ik8tAl6jzXG8GOxnYP5QqAkigQ=;
+        b=lWRzxukWeQrxA4V5TRyZQhJXbvLaUCP3zBXkxfcVwKiAIc8s4j/ShRk5Pt4SIVPAg8
+         KBqSxACJYbQ+HXKvRhjWl4NyZ0jfBOW8oLOCqx6bcUPsmqcQwMhRvgjwpvcYNndnG8aM
+         Ie2eAzaalNMp+OeId0BIcbLFOmGKqEAMgQPAhiCIADjhnGc0GUky9+A8C+Luu2mvRJLZ
+         8RyfQrQjZ2QN6tr+v8FJxz/qBcbQ3HVcdgNI4vYf6va+oyPnCr4RkvIYKwWbWqVzVcJm
+         zNiBGhweKK+3WIAATyTYECUAhvaSLV0np6aEIrnTUoR2lkXG7hgtlUzXBT3zJxP/wPkt
+         oocg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769799235; x=1770404035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Yn9/aL/X+9O7klMy4Ik8tAl6jzXG8GOxnYP5QqAkigQ=;
+        b=STU9HiZozvNymaZifVaHQJgAJJWNnp7OJenk5EM0yOFgWUkyOHMSevEvNEnt5evqDH
+         QU9X7P5guDc/J5mpgvFtbDwfavgoXlIqzWfDKz5JEiG+p8LKuAZMA7lNZ2S4Q122nPBi
+         59G/AwXCRqD0Mfnc2OGYWMDZKQiCjRTcP8rQoVGVYWWzARS39bjtGq5ynJQX+sWImwoS
+         mujIFH/S1bVQflkGXMJsve3J9+7W85FFZ+co5YLeihYGT4JWT8D8pBRpowH776K4L6CC
+         Ki/u5aQbUfG6G1FQI4xcSP6CqKcjPQynSY0wtAFYJNsxPnH+4/4D1eDkNHV8Ys827ddI
+         lnCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2Eb6gwHI3XzCv2WqqEpPfQNdr8fc7jfB+1WtMkgeXZRTRXJMJvUM/XW7LnwWkht5RK6BE+og=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPEBJGUeTzOOUXNBUIalZg0a1ziTH3XpjqDIWFXnIfId9j3X97
+	+deRCjHgej4LRedCETBdjHbQbW4y/z8w26YQAUJUR1exz3DRrELKoQXZs4ZpskiGwyUlBUrPbdh
+	pTUyX0og3lbC220nBiauihMec1TFh6KChACMaJ7g2
+X-Gm-Gg: AZuq6aLLTY3D5MDshzBepgs55FNUv+d3KiSojFKUK4tzrhnWstg0TC0CqUIXEU8al6F
+	IYXxBmsqnnXS2mcv2XAJIRaOceOUVLHasfdolk5Ho7F+2et5HXFRAVHkK1ggYJLA+DwvMPNTVro
+	U6ULq2imjxS1h5hX8cTIiGfDfUKp6caeFVW2PgEWWdz41ufm/u+2uVaPCgxrovf5LR9dZFqgUW0
+	rMeiyrj6OOI/ClugWj2kZREB8oMQMGs8y0wxgZGsVGe2C2aFoIgi3ok31rZd97PstHs0f258KQ6
+	h8OVnA==
+X-Received: by 2002:a05:6214:d8f:b0:88a:2ac8:9b3 with SMTP id
+ 6a1803df08f44-894df98d504mr112725116d6.9.1769799235004; Fri, 30 Jan 2026
+ 10:53:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260130-getsockopt-v1-3-9154fcff6f95@debian.org>
-References: <20260130-getsockopt-v1-0-9154fcff6f95@debian.org>
-In-Reply-To: <20260130-getsockopt-v1-0-9154fcff6f95@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, metze@samba.org, axboe@kernel.dk, 
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
- Linus Torvalds <torvalds@linux-foundation.org>, 
- linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-f4305
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3397; i=leitao@debian.org;
- h=from:subject:message-id; bh=IVnLhnrcy/3xPEQctLWhlsnsImXX6rsH2GP1mnkmDNQ=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpfPyU2OZHI4M0lCr3semqght57TV1hos0Fo3WE
- c1nHQfKtcOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaXz8lAAKCRA1o5Of/Hh3
- bQ4lEACRll/JUEMJtdVPtrX+RF5bS7TQWHv7YtDd+8lAJdwtts5jliTofGG4ukbpoQbE4pRKcmL
- N/9T9SNairfNx6pRssn8tdoyNfc2TICWLatqB057ecdFQqlbWWefHLy4Jycya/yZUIQap+S3roY
- vR0L2UggKugpnVKUZ9+dAA4uYhYkCfVlS/SY4VU4Bk2NHNDCJvllMiGXsi71Bv2Pq7MirYfw/uv
- xiblpCNa5UEKDsIbIKV/sobPtejFcU50xdAtoxDBv2shqH6xsO0i3NxzhNBDxuJ6+ufHizF0M1Q
- zrbl+57gijjx5LAREzuKi2WQAPF7uDsNb2Tvsalu+PAD8JRZ7YznHF1L1PzPbqnoWs3OPIcjGt+
- xNcJyKiVgsbt5Pv6S1jqDc6xAL5LWxhgAhzAvPTX/SELvDNREw+K+cpSI+z9fSWKPCXonVFoFTJ
- jGCQ6XOInJel7qW1TpyKx5prRb9mVwyWxC/RV4pjjA2qR4jWSGQ8BdRysIMGBBc1ag7w0abTwFD
- K7scjnQ7i3JMdCkzk4VNJROLa+khmlxqU6rF+iJEVB+Qe7gGJWU52UiApPVoc9+pHLnOLR/ZPYF
- Tpx8H3BUSXqEYGONXfRZKraJkRpzAK9GIMCiXVrgUzXLcH4KihTVihsECbhYcLvmEH0sGkpQknh
- pios0YQFtQXxG+Q==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+References: <20260128185548.3738781-1-edumazet@google.com> <20260129184844.195df52e@kernel.org>
+In-Reply-To: <20260129184844.195df52e@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 30 Jan 2026 19:53:44 +0100
+X-Gm-Features: AZwV_QjXfBouIlUMHEv_fN9TOPLqs6vSaN9XWMAsGwnOdB8wQiTh_nv2eLENMLo
+Message-ID: <CANn89iJ_b9_wWggO1XAhML-RbJSsK7Lbrn2iDPfokN2QR2vM0A@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipv6: optimize fl6_update_dst()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-255223-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255221-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D4C07BDF69
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 71542BE004
 X-Rspamd-Action: no action
 
-Convert netlink's getsockopt implementation to use the new
-getsockopt_iter callback with sockopt_t.
+On Fri, Jan 30, 2026 at 3:48=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 28 Jan 2026 18:55:47 +0000 Eric Dumazet wrote:
+> > - * Returns NULL if no txoptions or no srcrt, otherwise returns orig
+> > + * Returns NULL if no srcrt or invalid srcrt type, otherwise returns o=
+rig
+>
+> I'm gonna take this opportunity to update this line to Return:
+> in accordance with kdoc rules, hope you don't mind. Applied.
 
-Key changes:
-- Replace (char __user *optval, int __user *optlen) with sockopt_t *opt
-- Use opt->optlen for buffer length (input) and returned size (output)
-- Use copy_to_iter() instead of put_user()/copy_to_user()
-
-The optlen field allows callbacks to return a specific length value
-independent of the bytes written via copy_to_iter().
-
-This enables io_uring to call netlink's getsockopt with kernel buffers.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/netlink/af_netlink.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 8e5151f0c6e46..8a195eb1ef761 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -39,6 +39,7 @@
- #include <linux/fs.h>
- #include <linux/slab.h>
- #include <linux/uaccess.h>
-+#include <linux/uio.h>
- #include <linux/skbuff.h>
- #include <linux/netdevice.h>
- #include <linux/rtnetlink.h>
-@@ -1716,7 +1717,7 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
- }
- 
- static int netlink_getsockopt(struct socket *sock, int level, int optname,
--			      char __user *optval, int __user *optlen)
-+			      sockopt_t *opt)
- {
- 	struct sock *sk = sock->sk;
- 	struct netlink_sock *nlk = nlk_sk(sk);
-@@ -1726,8 +1727,7 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
- 	if (level != SOL_NETLINK)
- 		return -ENOPROTOOPT;
- 
--	if (get_user(len, optlen))
--		return -EFAULT;
-+	len = opt->optlen;
- 	if (len < 0)
- 		return -EINVAL;
- 
-@@ -1743,6 +1743,8 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
- 		break;
- 	case NETLINK_LIST_MEMBERSHIPS: {
- 		int pos, idx, shift, err = 0;
-+		u32 group_val;
-+		size_t size;
- 
- 		netlink_lock_table();
- 		for (pos = 0; pos * 8 < nlk->ngroups; pos += sizeof(u32)) {
-@@ -1751,14 +1753,14 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
- 
- 			idx = pos / sizeof(unsigned long);
- 			shift = (pos % sizeof(unsigned long)) * 8;
--			if (put_user((u32)(nlk->groups[idx] >> shift),
--				     (u32 __user *)(optval + pos))) {
-+			group_val = (u32)(nlk->groups[idx] >> shift);
-+			size = copy_to_iter(&group_val, sizeof(group_val), &opt->iter);
-+			if (size != sizeof(group_val)) {
- 				err = -EFAULT;
- 				break;
- 			}
- 		}
--		if (put_user(ALIGN(BITS_TO_BYTES(nlk->ngroups), sizeof(u32)), optlen))
--			err = -EFAULT;
-+		opt->optlen = ALIGN(BITS_TO_BYTES(nlk->ngroups), sizeof(u32));
- 		netlink_unlock_table();
- 		return err;
- 	}
-@@ -1784,10 +1786,10 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
- 	len = sizeof(int);
- 	val = test_bit(flag, &nlk->flags);
- 
--	if (put_user(len, optlen) ||
--	    copy_to_user(optval, &val, len))
-+	if (copy_to_iter(&val, len, &opt->iter) != len)
- 		return -EFAULT;
- 
-+	opt->optlen = sizeof(int);
- 	return 0;
- }
- 
-@@ -2813,7 +2815,7 @@ static const struct proto_ops netlink_ops = {
- 	.listen =	sock_no_listen,
- 	.shutdown =	sock_no_shutdown,
- 	.setsockopt =	netlink_setsockopt,
--	.getsockopt =	netlink_getsockopt,
-+	.getsockopt_iter =	netlink_getsockopt,
- 	.sendmsg =	netlink_sendmsg,
- 	.recvmsg =	netlink_recvmsg,
- 	.mmap =		sock_no_mmap,
-
--- 
-2.47.3
-
+Sure thing, thank you!
 
