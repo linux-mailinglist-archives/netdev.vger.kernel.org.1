@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-255023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255024-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAMFB4QwfGlVLQIAu9opvQ
-	(envelope-from <netdev+bounces-255023-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:16:04 +0100
+	id WAhHDdcwfGlVLQIAu9opvQ
+	(envelope-from <netdev+bounces-255024-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:17:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25CBAB70B3
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:16:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83209B70CB
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:17:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB3F8301DE0B
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:15:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4349300CE6C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90192365A10;
-	Fri, 30 Jan 2026 04:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D3C23D291;
+	Fri, 30 Jan 2026 04:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K7Smu8KB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fz1uy1Sa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58450347FD3;
-	Fri, 30 Jan 2026 04:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FB41C32FF;
+	Fri, 30 Jan 2026 04:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769746537; cv=none; b=jO/eYcZGacUUFUD6ra6qYWQV2Cb1JbL3hgL/hRSdOn1TjcVhCVdedsKRw5UMxlhqLI1QcyQ3UlcQUQd89SkwERjsC9Bzlx0S5DYKDWfzTgdlZcKgFdKINYKE2zu5TDELqOLV1A5CvWaABeaK9b3ZMjCPX9XdrrwLHkeLII+/TYY=
+	t=1769746642; cv=none; b=nAYvUxfFfinmqlf5Ai8LNRaJK32/10sPWHDwI7/Cd9nffK+mitn77+zcvZ+e8ykTDGYGlXbYk1ffssuW2pqdHghk85aIYA+PvgVdNuBct6KkczkFV74YhrazigcMakD9uS7NxxVsN6AXiUfY8Fxs642epfGvA7uynYMwdCOewjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769746537; c=relaxed/simple;
-	bh=Rub9cw2ln9KYCbS9XFc8VVbW8/rmxLnoMpV7jfhXOR0=;
+	s=arc-20240116; t=1769746642; c=relaxed/simple;
+	bh=Y6LjcF5R3pXVrTlcVL2++4gcBbUe0OMuA+W09Q96gJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RHsR3esIR689VjDpaebPtpmrycBVvBQh+y4VcSaDPdpPmSu1jdNz82ompFA5eSi/c+Y8Kr3IjDVDcbj1foPLIwdbw5yiM9Qz2JcU20Iw1MV05QyHijIEDa++RymUy1bp+JvesV6TcuKgrEoGhdZGi+dzfSAnegWFac4ncRWD0HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K7Smu8KB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F6AC19421;
-	Fri, 30 Jan 2026 04:15:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TX6kXVn3A86btaTkXOvv1deJ+ji8rKS+7DA5jWmCxp2P9pHvIukofX2pXkn0gemdQfxx5c1+7RMZU/VsbSOrSYvIZxeAau0BQZ2h9knpl47BLjfhpyxuYoHi5ab9lELphPz5qSndOrfyQK/y8vIjcDpQ/Nt36/sJqdDICuKgA3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fz1uy1Sa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D07C4CEF7;
+	Fri, 30 Jan 2026 04:17:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769746536;
-	bh=Rub9cw2ln9KYCbS9XFc8VVbW8/rmxLnoMpV7jfhXOR0=;
+	s=k20201202; t=1769746641;
+	bh=Y6LjcF5R3pXVrTlcVL2++4gcBbUe0OMuA+W09Q96gJA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K7Smu8KBT4S/m+LEQ1gmVdvqMc/eP2eL+DjOXxHjX+29Z2ZfkHEnUDkrvWoR3OXeV
-	 aN77Yod0UBsxSYqzLLCNk6PlTfFecOCRdy6eG3oEcOaN53Lurg8LD0fopO0OP1M15Z
-	 svgjecEeY3O8wztbfxMGGl4PQJKHpiEJZnIZon8PCFfxUvp/AavuDhyDCXLKuaE4vx
-	 sgsvJuX4jrdM15knk4wwgxMN7R4SvE51smgmkj/a0rr40EJT7D3l1k5uX4OzVnjkWe
-	 Skd35sUqER6V7PmAIUJ0dQNPGhje6XCq/JzZwX/nh7IaVw4AeOH+osTKqSlqjfhRAU
-	 tVjzCxdNs7E/g==
-Date: Thu, 29 Jan 2026 20:15:35 -0800
+	b=Fz1uy1Sa/pMHa1dpvAA2l3PPLVMGtRMEP3TKbEiuetSsIPZlYv5q9CK7cK+mR5szl
+	 qOFSgpBCSXLeARaJzuoCUXBHZYWfkQGIbTTNcTEONCLZlq6yls4MPTc4C8Vkms/GFZ
+	 dTpsh2vPgn6BLGteQPYEhpolVDxbKjE5WcwnTfrS3x7LK0V2gRjDxnQ3/w8c+gQ1cW
+	 skBxU4CxTr4KfgMuZDBLLQ/Tr8Y9nrf01wEHLmGYnkfbc460aD7Q/Smsi4OV96l9e4
+	 J01pDCWhDHcGjxbOGKdDKpiVyUgsl8F+wZwOhstQHwj34y7n2LK4CBjkBE+/pnRhqs
+	 U67xRhUnqmV/g==
+Date: Thu, 29 Jan 2026 20:17:20 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
 Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
@@ -55,12 +55,12 @@ Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
  =?UTF-8?B?TWlxdcOobA==?= Raynal <miquel.raynal@bootlin.com>, Thomas
  Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 5/8] net: dsa: microchip: Add KSZ8463 tail
- tag handling
-Message-ID: <20260129201535.317d90bd@kernel.org>
-In-Reply-To: <20260127-ksz8463-ptp-v4-5-652e021aae86@bootlin.com>
+Subject: Re: [PATCH net-next v4 6/8] net: dsa: microchip: Enable Ethernet
+ PTP detection
+Message-ID: <20260129201720.0a63447b@kernel.org>
+In-Reply-To: <20260127-ksz8463-ptp-v4-6-652e021aae86@bootlin.com>
 References: <20260127-ksz8463-ptp-v4-0-652e021aae86@bootlin.com>
-	<20260127-ksz8463-ptp-v4-5-652e021aae86@bootlin.com>
+	<20260127-ksz8463-ptp-v4-6-652e021aae86@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,se.com,bootlin.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-255023-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255024-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -98,33 +98,15 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 25CBAB70B3
+X-Rspamd-Queue-Id: 83209B70CB
 X-Rspamd-Action: no action
 
-Sorry for the nit but:
-
-On Tue, 27 Jan 2026 10:06:47 +0100 Bastien Curutchet (Schneider
+On Tue, 27 Jan 2026 10:06:48 +0100 Bastien Curutchet (Schneider
 Electric) wrote:
->  	case DSA_TAG_PROTO_KSZ9893:
->  	case DSA_TAG_PROTO_KSZ9477:
-> +	case DSA_TAG_PROTO_KSZ8463:
->  	case DSA_TAG_PROTO_LAN937X:
+> KSZ8463 needs to enable the Ethernet PTP detection to fire the
+> interrupts when a timestamp is captured.
 
-This..
-
->  #define KSZ9477_NAME "ksz9477"
->  #define KSZ9893_NAME "ksz9893"
->  #define LAN937X_NAME "lan937x"
-> +#define KSZ8463_NAME "ksz8463"
-
-this
-
-> @@ -457,6 +526,7 @@ static struct dsa_tag_driver *dsa_tag_driver_array[] = {
->  	&DSA_TAG_DRIVER_NAME(ksz9477_netdev_ops),
->  	&DSA_TAG_DRIVER_NAME(ksz9893_netdev_ops),
->  	&DSA_TAG_DRIVER_NAME(lan937x_netdev_ops),
-> +	&DSA_TAG_DRIVER_NAME(ksz8463_netdev_ops),
-
-and this - appear to have been alphabetically sorted previously, now
-we're just adding at the end.
+Is it worth stating our expectation WRT other switches given this 
+is a shared function (not advocating to add a condition to be clear,
+just document).
 
