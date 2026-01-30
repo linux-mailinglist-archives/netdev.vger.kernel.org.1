@@ -1,51 +1,48 @@
-Return-Path: <netdev+bounces-255097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255098-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKtgDHqKfGnSNgIAu9opvQ
-	(envelope-from <netdev+bounces-255097-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:39:54 +0100
+	id eMf0LzWLfGnSNgIAu9opvQ
+	(envelope-from <netdev+bounces-255098-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:43:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB26FB96DF
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:39:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D86DB9722
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:43:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 60F27300B58A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:39:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4573C300D176
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B66D377549;
-	Fri, 30 Jan 2026 10:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VnnDBNO/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5BC36997F;
+	Fri, 30 Jan 2026 10:42:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8208936C5A4;
-	Fri, 30 Jan 2026 10:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FD533EAED
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769769586; cv=none; b=bacam/o9R8zbcNF5M60JjJOXE/QJ4yuSFjerGdT+3l+IffYi4oF7Fee5fuCan10l9PomVtAjFdu45/7asjsZGJxdaSnlSLkmxJfKUoPBJ9P8vzAQ2DUgpKJ0tSWPuHWwuiu027+6NeWIVDxMAND5esSzg2Js1r1KrmAwh4SJmuY=
+	t=1769769778; cv=none; b=L/t/pLk8YQ6MoR6J3PFpZmzDsBSiZ4QEGnJCT2oNOY8YooBIxMevRzoFxiidDLptq9nDqtPKv2u+ZyzOC4irPRrVfO/+/RqkUPLmW3cg3dLWf5zMvu2Y5h5hWjZrv+GsZwuUY4Yieqs2/6VFV38Qqpy9cqF9JM+05n789ZVemFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769769586; c=relaxed/simple;
-	bh=HqLf5fAjj919LYQEQ3fjjogDmxa6wbUD8HUVCT6MfUA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U7CHvIChRNOKWstSVflYfoX7kCuA5Hvp34W3KFTASPpNW/4cesylBNftjbXT2d0njTinrcbVXVdUghm85ciBn+YEsvMti0tUodzKKWUKaMPqLMIXs+YEOjESdmo2Wbmdt7F+DxzmPwef5iTQKtTO0Io2+eUNColXucqamd7/Lx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VnnDBNO/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D9FC19421;
-	Fri, 30 Jan 2026 10:39:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769769586;
-	bh=HqLf5fAjj919LYQEQ3fjjogDmxa6wbUD8HUVCT6MfUA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VnnDBNO/kG2fkcp9Rl0DaqlUw5pFJlYqqcbpgzlUaHW4PzNtYccnPo0uIYS0Z7QuC
-	 Cd/cXSRgptBXYilva4FihsbhIDFZSjDZLw6MooWAVvS+32V19BXNzesZomdNLjPIEM
-	 8bo2lgqs7UElyJR0mDi4cL9bOd8exIVb4cVgluUDkj+sWnRwXWrV/UR9LANR4YRXkO
-	 kD4E3E4miFzn8uTZ2k48zjckL5m2aNdrtabcI3vooDqf2aiQYaNpoEYHPCnL0jnm4p
-	 7sRuyYFE+1DAeBzUIL6SpgJCbErzHomCIEgUjeyVNmfhaoHOx7ZcOzLHEJHlSTJF0b
-	 hKi7lIMZ3X1Ew==
-Message-ID: <4e88f7b1-65bd-47e1-9875-03002bafdd04@kernel.org>
-Date: Fri, 30 Jan 2026 11:39:41 +0100
+	s=arc-20240116; t=1769769778; c=relaxed/simple;
+	bh=LHGFYVdFs7XVfQiGqqpy9wFdvOghvKWLadMefjklVKQ=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=jshX5qEkrNQhHIZjVeCZn5iEQMurvuOAOjis3CH38q2DzO8z+YKjBVo5iwxW3mU3evc9bE0TaiQzdgRd8O1nFBUOoIwNbmwP9ZmRa7l9DNqNIEWYpy9t+5SmlZ6oqEey+KP/UcF2CR6Pp/kAdteAYT+gjkB11hd+V7X34kjktcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60UAgnuB028767;
+	Fri, 30 Jan 2026 19:42:49 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60UAgmef028764
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 30 Jan 2026 19:42:48 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp>
+Date: Fri, 30 Jan 2026 19:42:47 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,123 +50,156 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/4] selftests: net: Move some UAPI header
- inclusions after libc ones
-Content-Language: en-GB, fr-BE
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
- linux-security-module@vger.kernel.org, bpf@vger.kernel.org,
- libc-alpha@sourceware.org
-References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
- <20260120-uapi-sockaddr-v2-1-63c319111cf6@linutronix.de>
- <4e673f7f-c49c-46b0-85b4-bae6e4efcb3a@kernel.org>
- <20260130111949-4b4eb870-6df7-4026-a48c-730fa8660ad6@linutronix.de>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260130111949-4b4eb870-6df7-4026-a48c-730fa8660ad6@linutronix.de>
+Content-Language: en-US
+To: Sabrina Dubroca <sd@queasysnail.net>, Leon Romanovsky <leon@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Ilan Tayari <ilant@mellanox.com>, Guy Shapiro <guysh@mellanox.com>,
+        Yossi Kuperman <yossiku@mellanox.com>,
+        Network Development <netdev@vger.kernel.org>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH net v2] xfrm: always flush state and policy upon
+ NETDEV_UNREGISTER event
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav305.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255097-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255098-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BB26FB96DF
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,I-love.SAKURA.ne.jp:mid,i-love.sakura.ne.jp:email]
+X-Rspamd-Queue-Id: 9D86DB9722
 X-Rspamd-Action: no action
 
-Hi Thomas,
+syzbot is reporting that "struct xfrm_state" refcount is leaking.
 
-On 30/01/2026 11:22, Thomas Weißschuh wrote:
+  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
+  ref_tracker: netdev@ffff888052f24618 has 1/1 users at
+       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
+       netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
+       xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
+       xfrm_state_construct net/xfrm/xfrm_user.c:986 [inline]
+       xfrm_add_sa+0x34ff/0x5fa0 net/xfrm/xfrm_user.c:1022
+       xfrm_user_rcv_msg+0x58e/0xc00 net/xfrm/xfrm_user.c:3507
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
+       xfrm_netlink_rcv+0x71/0x90 net/xfrm/xfrm_user.c:3529
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-(...)
+This is because commit d77e38e612a0 ("xfrm: Add an IPsec hardware
+offloading API") implemented xfrm_dev_unregister() as no-op despite
+xfrm_dev_state_add() from xfrm_state_construct() acquires a reference
+to "struct net_device".
+I guess that that commit expected that NETDEV_DOWN event is fired before
+NETDEV_UNREGISTER event fires, and also assumed that xfrm_dev_state_add()
+is called only if (dev->features & NETIF_F_HW_ESP) != 0.
 
->> Note that I just noticed this is the only file from this directory where
->> the "includes" are not sorted by type and alphabetical order, see
->> pm_nl_ctl.c as an example. A bit of a detail, but if you plan to send a
->> v2, do you mind doing that too here while at it, please?
-> 
-> I'll send a v3 during the next cycle.
+Sabrina Dubroca identified steps to reproduce the same symptoms as below.
 
-Thanks!
->> If not, I can look at that later, but better to avoid doing that in
->> parallel.
-> 
-> If you want to fix this up already during this cycle,
-> that would also be most welcome.
+  echo 0 > /sys/bus/netdevsim/new_device
+  dev=$(ls -1 /sys/bus/netdevsim/devices/netdevsim0/net/)
+  ip xfrm state add src 192.168.13.1 dst 192.168.13.2 proto esp \
+     spi 0x1000 mode tunnel aead 'rfc4106(gcm(aes))' $key 128   \
+     offload crypto dev $dev dir out
+  ethtool -K $dev esp-hw-offload off
+  echo 0 > /sys/bus/netdevsim/del_device
 
-Sure, I can do that.
+Like these steps indicate, the NETIF_F_HW_ESP bit can be cleared after
+xfrm_dev_state_add() acquired a reference to "struct net_device".
+Also, xfrm_dev_state_add() does not check for the NETIF_F_HW_ESP bit
+when acquiring a reference to "struct net_device".
 
-Cheers,
-Matt
+Commit 03891f820c21 ("xfrm: handle NETDEV_UNREGISTER for xfrm device")
+re-introduced the NETDEV_UNREGISTER event to xfrm_dev_event(), but that
+commit for unknown reason chose to share xfrm_dev_down() between the
+NETDEV_DOWN event and the NETDEV_UNREGISTER event.
+I guess that that commit missed the behavior in the previous paragraph.
+
+Therefore, we need to re-introduce xfrm_dev_unregister() in order to
+release the reference to "struct net_device" by unconditionally flushing
+state and policy.
+
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
+Cc: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+v2:
+  - Don't change xfrm_dev_down(), re-introduce xfrm_dev_unregister() instead.
+
+v1:
+  - https://lkml.kernel.org/r/1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp
+
+ net/xfrm/xfrm_device.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 52ae0e034d29..550457e4c4f0 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -544,6 +544,14 @@ static int xfrm_dev_down(struct net_device *dev)
+ 	return NOTIFY_DONE;
+ }
+ 
++static int xfrm_dev_unregister(struct net_device *dev)
++{
++	xfrm_dev_state_flush(dev_net(dev), dev, true);
++	xfrm_dev_policy_flush(dev_net(dev), dev, true);
++
++	return NOTIFY_DONE;
++}
++
+ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void *ptr)
+ {
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+@@ -556,8 +564,10 @@ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void
+ 		return xfrm_api_check(dev);
+ 
+ 	case NETDEV_DOWN:
+-	case NETDEV_UNREGISTER:
+ 		return xfrm_dev_down(dev);
++
++	case NETDEV_UNREGISTER:
++		return xfrm_dev_unregister(dev);
+ 	}
+ 	return NOTIFY_DONE;
+ }
 -- 
-Sponsored by the NGI0 Core fund.
+2.47.3
 
 
