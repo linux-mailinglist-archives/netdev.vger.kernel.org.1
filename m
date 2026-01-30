@@ -1,205 +1,185 @@
-Return-Path: <netdev+bounces-255036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENXWFqtRfGmwLwIAu9opvQ
-	(envelope-from <netdev+bounces-255036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:37:31 +0100
+	id 8CZFHIVZfGkYMAIAu9opvQ
+	(envelope-from <netdev+bounces-255037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:11:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0FEFB7A5F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:37:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4DEB7CAD
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:11:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 58A3330059A2
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:37:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 16E25300405F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1B6314D13;
-	Fri, 30 Jan 2026 06:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82DF306496;
+	Fri, 30 Jan 2026 07:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEWlIz8/"
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="YSYYQWsT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF36E2DF6E3
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 06:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A946A21883E;
+	Fri, 30 Jan 2026 07:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769755049; cv=none; b=cIXVDkbKN4x9gFN2o1nxHi1oSNnHOV79WjraATBandaktHG6hFx3C4wkiEBJzc3UrtD8WC8ryanTvkNAuv2bYs+QU1vTfJSsW4zAWi58Lw214LANhPMLyLP0dVPYxPaOjaB+rAG5mbrUhkSpjZCs6w5lfm+iLVCPmaZl/SYgbZ8=
+	t=1769757056; cv=none; b=RWEYikg/8HLTLH35WapGZHhxbD5FwP7CDKZyEPxbtkoq2MMPIiN8Iu7cLfctOTya4A8pYjNLwkMk7IvxqD3/h/xhwYXYNWlqThYBldKO2aw8q1NXQGAhwFduHD3c8sFmK2n52BPesutzrVJsLMjEDiYl6rwFa7ACGlZgX+mDQyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769755049; c=relaxed/simple;
-	bh=95v7NV8y8jvkm5MvFyZ3sn6LRDvHRfQIIUv1qPreNHc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hcbt9k+mljN4K397k6To+7KQC55b11i60kGUx5xfeTyS/NveZdab5PRZbnPacczemNMxh6O/61XBR+XCBRiZryV2X3A43AjXme+RRdK/qLfnAFx4gDTbMDaH02PNilE8wU7s63j2uGyCTzlHraXmaYkT5QnXh6F296zTFcUH0Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEWlIz8/; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42fb2314eb0so1510238f8f.2
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 22:37:26 -0800 (PST)
+	s=arc-20240116; t=1769757056; c=relaxed/simple;
+	bh=KyGofQA+yPanct2ad1s/4EMe4J4e3sxY1/iZhzeXLDE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dY9yJGgDo0o+nfJ0Ep96MdoEhegMlv+cM1wQItr14gp226XUBJmFsQ0DAmavdegWNTRUi9klueGXjNT28F635Q5FyJnlHPSarMxjXiWUPJjkHM8qKmtZlBV0E1kFKyedG94Qy6xZAHEK3JIe9kUUyVzuuRLOpqKJtxCZjiPp+Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=YSYYQWsT; arc=none smtp.client-ip=120.232.169.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769755045; x=1770359845; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iaIL6hcZTlvS2jyO/4/sgFg+iA2PNPmH4knID0fBdVs=;
-        b=CEWlIz8/Ey8JQ76cky6LMxI2C+nzQavRmqmYHrq30lmWQcVJP+LvIv/A1Vslie0Yny
-         Ton3JKnUPImiUuMhoV0EPZ1ErfybmYB94YvV5OOZewvpZwBfNk+w4mLAOZpqM1vhV2GW
-         CRBGt92dAW6St1lFYEDYibAU3f3azFDxGTZxswiqf7kl/OTmKPHoLDWMQArl6FwHiZLC
-         v2MIqWkb+qPPhhTcs43Kxu6jda6lFhrf9DS3gtE1YBEmluzQ5KJkRQI5kmGOv28vgzjh
-         BfECj+5ceHA5UqDsDDCE9zG4nQOCDjns/s2fdik5y8fnBiS0kjRcNOd6PqrfrdMseTRP
-         ilaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769755045; x=1770359845;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iaIL6hcZTlvS2jyO/4/sgFg+iA2PNPmH4knID0fBdVs=;
-        b=T/UHuEXjl9wf9f46U/0Y8pnAkl9qjqp4dW4h67qeAy4Ya+eks/wFFl7kDdau1zu2KX
-         IdF4HBqjB/QJtxIiZdO4DBXZ8y6RGmqtBBz1pevWzH+iFnHEch0ThieLeL7OazZ4iuke
-         m9xLwgnulkv66oqEJkfAPdkWAVi9FxFFTdBTeRsSsPSBa46DHn1kDXGVwRK/yB/4QMz4
-         3U1FKChcwn/IqTZfKkTU+RQN6f5Y4+4iIDJfVDSxSI5chjd8TyPsT5cWeuouRE7gb2gn
-         LC5ccZnQm02i1TWfJ5fAS5l1bP3lWm8mcnNfIrBtnI7VINCyjMm78lSPmAd+EbF3PEjn
-         arZQ==
-X-Gm-Message-State: AOJu0Yw3DV2q5CMBFtgCEBlOdDxOWTqRxPZifXkSWl6oZrdLpYJIXJEp
-	pyXfe6c4IqUum/k2c8McxqbRr3YeWBULz2tgS8rc0c3nQVN4MEvnNYVu
-X-Gm-Gg: AZuq6aKKLLWNO7OAYyffpw4nuDCAap3a8zG/4RxZiFPQzaHu4/u5wUIgNO3yDhwKHZa
-	5BMPifkf3uQDJk4DDebdg1IWGE/3ZMBs9iLAoCQdsz2KlCujk2diw4DWtbJHwDG6sRTp7ujnNbe
-	tRnwMGgpPRN36D7WZ/TdissT3do8xIUtuCN3M4hjPkBbM6yXSS+eaQlR8sG+P2v1CcTD+vDH3ot
-	jsiu5y/9Pr0tJVOQZ/uT9A/57Oa2bRJ3g3S6ycgRYYWgcORZnZWzuuetPWS7WaexfKS65eFZVz8
-	6gJ1b5DmuCHZglAAHXeSiibncz/PhiGbqpwK91fBjA5rHqSi58EuKCqnQ4WroJVtSZGDilNo8Nx
-	ne1yBts4lLfSYDWSwl8qzREiAJTxBYYRWHXbcrv9Ot1gt7mPcqbZk9AozO9DfYOVOqFEWyBi2JU
-	9GQTBoZgHNNFBv8c7NdD1Z+A85bMqFV+pUv9upIjBa/wp9FJdGYVDmIq/oucXjmWmfqCm/qHzQP
-	IAzejeeJPKWxSqUXdm1v/ZOUZ1NzKFlQPHBr69P/B1Q1EODlqyK9Q==
-X-Received: by 2002:a05:600c:3e10:b0:477:fcb:2256 with SMTP id 5b1f17b1804b1-482db4922d1mr20017285e9.17.1769755045218;
-        Thu, 29 Jan 2026 22:37:25 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f34:1500:a5ab:a2a5:28b0:fbf7? (p200300ea8f341500a5aba2a528b0fbf7.dip0.t-ipconnect.de. [2003:ea:8f34:1500:a5ab:a2a5:28b0:fbf7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e2543dcdsm5069745e9.9.2026.01.29.22.37.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jan 2026 22:37:24 -0800 (PST)
-Message-ID: <63ecf47d-6702-49d0-b063-f2f2510ef45b@gmail.com>
-Date: Fri, 30 Jan 2026 07:37:23 +0100
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=YSYYQWsTrYbAoBDC46vtwuLGbtuuVniXpbR6fiTZCtjrq+fGx2gcc21OSKet3JUHn3hi812bEzFHB
+	 OPH57CG8w4wvEIXe2MR35pxLZIo49HD6ocTrXxnzGsF3ZFl6khv27HqtOys1Zlo5sjokQM7OfrMWzB
+	 zgK6DNvkun82xGmE=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-09-12087 (RichMail) with SMTP id 2f37697c5978bec-04c4d;
+	Fri, 30 Jan 2026 15:10:54 +0800 (CST)
+X-RM-TRANSID:2f37697c5978bec-04c4d
+From: Li hongliang <1468888505@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	lucien.xin@gmail.com
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	vyasevich@gmail.com,
+	nhorman@tuxdriver.com,
+	marcelo.leitner@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 6.1.y] sctp: linearize cloned gso packets in sctp_rcv
+Date: Fri, 30 Jan 2026 15:10:38 +0800
+Message-Id: <20260130071038.3931297-1-1468888505@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: lantiq_etop: remove driver
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Hauke Mehrtens <hauke@hauke-m.de>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
- Daniel Golle <daniel@makrotopia.org>
-References: <7b2b53b6-d230-47bb-98d9-b7acfbfdd8ca@gmail.com>
-Content-Language: en-US
-In-Reply-To: <7b2b53b6-d230-47bb-98d9-b7acfbfdd8ca@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[139.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-255037-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-255036-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[139.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,tuxdriver.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[linuxfoundation.org,vger.kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[139.com:-];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[1468888505@139.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[139.com];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F0FEFB7A5F
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 8B4DEB7CAD
 X-Rspamd-Action: no action
 
-On 1/29/2026 6:18 PM, Heiner Kallweit wrote:
-> This driver in mainline lost its in-tree user with commit cd93b4895ea5
-> ("MIPS: lantiq: drop mips_machine support") in 2012. Since then it has
-> had no in-tree user. Only user seems to be OpenWRT, with several changes
-> to the in-tree driver version:
-> target/linux/lantiq/patches-6.12/035-owrt-lantiq-wifi-and-ethernet-eeprom-handling.patch
-> target/linux/lantiq/patches-6.12/028-NET-lantiq-various-etop-fixes.patch
-> target/linux/lantiq/patches-6.12/701-NET-lantiq-etop-of-mido.patch
-> So it seems the driver is maintained in OpenWrt only, except tree-wide
-> in-tree changes. According to OpenWRT maintainers it would be ok to
-> remove the driver in mainline and keep it downstream only (see linked
-> conversation).
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> Link: https://lore.kernel.org/netdev/d80fef86-ba14-4bd4-bce5-4d61a75d591b@hauke-m.de/T/#t
-> ---
->  .../include/asm/mach-lantiq/lantiq_platform.h |  18 -
->  drivers/net/ethernet/Kconfig                  |   6 -
->  drivers/net/ethernet/Makefile                 |   1 -
->  drivers/net/ethernet/lantiq_etop.c            | 745 ------------------
->  4 files changed, 770 deletions(-)
->  delete mode 100644 arch/mips/include/asm/mach-lantiq/lantiq_platform.h
->  delete mode 100644 drivers/net/ethernet/lantiq_etop.c
-> 
-> diff --git a/arch/mips/include/asm/mach-lantiq/lantiq_platform.h b/arch/mips/include/asm/mach-lantiq/lantiq_platform.h
-> deleted file mode 100644
-> index 70ebb4d6f05..00000000000
-> --- a/arch/mips/include/asm/mach-lantiq/lantiq_platform.h
-> +++ /dev/null
-> @@ -1,18 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0-only */
-> -/*
-> - *
-> - *  Copyright (C) 2010 John Crispin <john@phrozen.org>
-> - */
-> -
-> -#ifndef _LANTIQ_PLATFORM_H__
-> -#define _LANTIQ_PLATFORM_H__
-> -
-> -#include <linux/socket.h>
-> -
-> -/* struct used to pass info to network drivers */
-> -struct ltq_eth_data {
-> -	struct sockaddr mac;
-> -	int mii_mode;
-> -};
-> -
-> -#endif
-> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-> index aa7103e7f47..9775fd401b0 100644
-> --- a/drivers/net/ethernet/Kconfig
-> +++ b/drivers/net/ethernet/Kconfig
-> @@ -93,12 +93,6 @@ config KORINA
->  	  If you have a Mikrotik RouterBoard 500 or IDT RC32434
->  	  based system say Y. Otherwise say N.
->  
-> -config LANTIQ_ETOP
-> -	tristate "Lantiq SoC ETOP driver"
-> -	depends on SOC_TYPE_XWAY
-> -	help
-> -	  Support for the MII0 inside the Lantiq SoC
-> -
-AI review complained that setting this config symbol should be
-removed from arch/mips/configs/xway_defconfig. So I'll submit a v2.
+From: Xin Long <lucien.xin@gmail.com>
 
---
-pw-bot: cr
+[ Upstream commit fd60d8a086191fe33c2d719732d2482052fa6805 ]
+
+A cloned head skb still shares these frag skbs in fraglist with the
+original head skb. It's not safe to access these frag skbs.
+
+syzbot reported two use-of-uninitialized-memory bugs caused by this:
+
+  BUG: KMSAN: uninit-value in sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
+   sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
+   sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:998
+   sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
+   sctp_backlog_rcv+0x397/0xdb0 net/sctp/input.c:331
+   sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1122
+   __release_sock+0x1da/0x330 net/core/sock.c:3106
+   release_sock+0x6b/0x250 net/core/sock.c:3660
+   sctp_wait_for_connect+0x487/0x820 net/sctp/socket.c:9360
+   sctp_sendmsg_to_asoc+0x1ec1/0x1f00 net/sctp/socket.c:1885
+   sctp_sendmsg+0x32b9/0x4a80 net/sctp/socket.c:2031
+   inet_sendmsg+0x25a/0x280 net/ipv4/af_inet.c:851
+   sock_sendmsg_nosec net/socket.c:718 [inline]
+
+and
+
+  BUG: KMSAN: uninit-value in sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
+   sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
+   sctp_inq_push+0x2a3/0x350 net/sctp/inqueue.c:88
+   sctp_backlog_rcv+0x3c7/0xda0 net/sctp/input.c:331
+   sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
+   __release_sock+0x1d3/0x330 net/core/sock.c:3213
+   release_sock+0x6b/0x270 net/core/sock.c:3767
+   sctp_wait_for_connect+0x458/0x820 net/sctp/socket.c:9367
+   sctp_sendmsg_to_asoc+0x223a/0x2260 net/sctp/socket.c:1886
+   sctp_sendmsg+0x3910/0x49f0 net/sctp/socket.c:2032
+   inet_sendmsg+0x269/0x2a0 net/ipv4/af_inet.c:851
+   sock_sendmsg_nosec net/socket.c:712 [inline]
+
+This patch fixes it by linearizing cloned gso packets in sctp_rcv().
+
+Fixes: 90017accff61 ("sctp: Add GSO support")
+Reported-by: syzbot+773e51afe420baaf0e2b@syzkaller.appspotmail.com
+Reported-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Link: https://patch.msgid.link/dd7dc337b99876d4132d0961f776913719f7d225.1754595611.git.lucien.xin@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Li hongliang <1468888505@139.com>
+---
+This patch is lost/missing, as it has already been added
+into stable branches less than and greater than 6.1. Previous patch in
+https://lore.kernel.org/stable/20251022075549.195012-1-kovalev@altlinux.org/ is still not added.
+So I resent it again.
+---
+---
+ net/sctp/input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sctp/input.c b/net/sctp/input.c
+index 4ee9374dcfb9..182898cb754a 100644
+--- a/net/sctp/input.c
++++ b/net/sctp/input.c
+@@ -114,7 +114,7 @@ int sctp_rcv(struct sk_buff *skb)
+ 	 * it's better to just linearize it otherwise crc computing
+ 	 * takes longer.
+ 	 */
+-	if ((!is_gso && skb_linearize(skb)) ||
++	if (((!is_gso || skb_cloned(skb)) && skb_linearize(skb)) ||
+ 	    !pskb_may_pull(skb, sizeof(struct sctphdr)))
+ 		goto discard_it;
+ 
+-- 
+2.34.1
+
+
 
