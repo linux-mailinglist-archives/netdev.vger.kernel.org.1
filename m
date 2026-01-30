@@ -1,68 +1,102 @@
-Return-Path: <netdev+bounces-255077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GB2LoB3fGmWNAIAu9opvQ
-	(envelope-from <netdev+bounces-255077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:18:56 +0100
+	id APxoO8d3fGmWNAIAu9opvQ
+	(envelope-from <netdev+bounces-255078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:20:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60FD2B8D0E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:18:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507ADB8D26
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:20:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AE8EA30054D3
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:18:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33D913013B61
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BBA329C74;
-	Fri, 30 Jan 2026 09:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C391350A0E;
+	Fri, 30 Jan 2026 09:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QDsenhYz"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YP7lBMtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5539F244665;
-	Fri, 30 Jan 2026 09:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FF2329C74
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 09:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769764734; cv=none; b=nRiAiVechVuBTS1fo4SSsQOI1w0XKaTcwAg9R+qmKYVRIjbgDrRxZCNwnr9fGdS/pX5eg1fWAUaPLo8jYOiMAP91UAGC/Biju7iRLNJuS5VSEkUEuDp6SaFpN+uqgqdqirPs4vvL38zPKIIAsCOK5xK4ld0d/Wbd4lRhBEpV4lI=
+	t=1769764803; cv=none; b=Y0PGgBv2IHR7HhXEtp28zmIFnTy9SdSBRDZRCIyglABylc9Pxh1Y73TfRzCitgGK/1lp6Bkzd644satphr90ihLk+A3oZANXBs1W1CYigq7dqVGmaQhka4oTkriple/3BOXBcZlu5qAgZIMKZoqB4Mo630WnjiwHtnzpreEFGJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769764734; c=relaxed/simple;
-	bh=qGYEFSveyQjRI+xZW9jenCLk3w6BzBS5Pf7t46XDjVI=;
+	s=arc-20240116; t=1769764803; c=relaxed/simple;
+	bh=eKT+tQm3ETWhvlfEhqg1JLGrm90pC6+LX3rTH/wPMhE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=claaTdc7wYxp/1BYjtV2hf63Ynawv+0yPLZRRRzMiplUuMctCdPuH7MUhYQ3HUwb40PxUEBmyyjbe6S64kkYvGQkRETrHmqkiRcdEbTDT/sUZF1r6ZK+HS6q2uZfw2D4UD4Ly4+vvEYFEVliNJLzUsO2Z74bRICZT3vNwTSO4dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QDsenhYz; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769764729; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=b+N5hpKEHqYXdO7/x7HSMbv7XXcD6Y7cxIhWmqLUT1w=;
-	b=QDsenhYzSKXyIVx63osBoxgVqiFCRj2ZT0JOq42WZxA0XkD/GrB2JeGxX6+fGqu4z1pnjk3uNmLahp0YAXw5fpybycQXpUAYJ9W0YKdqKzakLcvVFbUD4UHhluZJdF7XJUMuuR8h0zpIrMN7Xx43yeBJLfBPjxut1cJIrqvaP+I=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WyAFf78_1769764727 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 30 Jan 2026 17:18:48 +0800
-Date: Fri, 30 Jan 2026 17:18:47 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Leon Romanovsky <leon@kernel.org>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Liu Jian <liujian56@huawei.com>,
-	dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	guangguan.wang@linux.alibaba.com, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
- smc_ib_is_sg_need_sync()
-Message-ID: <20260130091847.GA43189@j66a10360.sqa.eu95>
-References: <20250828124117.2622624-1-liujian56@huawei.com>
- <20250909094532.GD341237@unreal>
- <20260126044501.GA18724@j66a10360.sqa.eu95>
- <20260127120004.GT13967@unreal>
- <20260128055051.GA79132@j66a10360.sqa.eu95>
- <20260128112122.GE12149@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rh/XHc6fL7M+xo4Ju06AG85GnDRgx9kvL3P80RW/RmDvd4YTnsn9rpAPOQnlRlAmU+P855YX6aNpCFqTTQGnM0noBF9hJiV0G9ZHkbmgvZv2+sXkbSgclazbMMjK4XRaK5vEbOtDD1jLHUj3fe8siOWbwp2W+CKTx0MfZScRFn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YP7lBMtU; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4359249bbacso1897007f8f.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 01:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1769764800; x=1770369600; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WbTCalOWB0NHjgCMwW2yClq+WZkgEvxgQYZT9kk7Xxc=;
+        b=YP7lBMtUF/UAvR+xj6WVWh8bG8zNlZ3Qkw+ExpsD1/glssMlmQyP4ZEhUDthOpliNo
+         OLLnoQdOW/LF2RdFBM9DlegR0MuqG3XdyHzRdMuqvGHFtgu7qzv+L4RQs0sG7gofSyXJ
+         w3c28mUSTmzT2ycVQFVd1T9j75sYQS6pcBPInpIK0ygaUJhF/eHEHGWYcijGCXbSIVh9
+         xpbKT9bHCXw2RiA2oBkhYb3objqu2o+wrsQeczEWsYsgLHj9xll15b7hKjFI3LJEt/wn
+         aSBYWANRLFBg3sK4ENO3BlI4KS60HWIKs0ek+JFL8zkhrrrHg8UQ6mB3piDYnrh9TXR6
+         Pyiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769764800; x=1770369600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WbTCalOWB0NHjgCMwW2yClq+WZkgEvxgQYZT9kk7Xxc=;
+        b=A/Wmb5BUJcOJ16/SDdcqh/Y1iWxmCKACbQawthXlGdBsY4SM3AGBkMOKCVmhdemPPa
+         EqE90qBpbrFaWcuvKdPXyfRFGopOGjazXj51L8wTh2yqjshquBS9+hlCNi134JXWHTHz
+         XRCARUTMmFc92BEmQPY9Sush0l2OUI9NJMZ2KpS12gCWCLCxupIp2NqCurzszD3xZolF
+         4lTE6/iJjzmDab/uhqxlLIv9/QWEJclDnxNZP/c0gqegm0EV5XWPF2Q0XIdNOUnj5r9g
+         os+ZJM9KQEimxtQ2S4aylUTBhar3sUUmEQr/MCgK5dEoPxQ5g2kjuEKBOhMdL/LqZbha
+         ynyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXpOXfkz8zjLaDVPoHClElCqUWuQXeFkOqVi8X4NPbN1kAVPZzJEBWbdXMOjuZ1ATeYo+dUm1k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0q78F0WImWKrsxXvfb53cwUMPqPkV19C9goXDAVgx1wovVShB
+	kpHSg5Nydz7MbT6qgg064ecU6G8HZdRtMleTZ06xkj4YAbYOP53zNFKTu7o74AeXbBA=
+X-Gm-Gg: AZuq6aK7VhkNRN6Ly0sRVsEKsnhoVoXafFVtJXubioct+7PiKy4urE/DukXQ29iSosK
+	Uu4OE83WFhcToIVjY8Bfq4AQyWovMynHHN7rgZrUoUb88Wb3saR4Zwq/S96UYWPT0/60Sd1EVsZ
+	/xRYDhMeltajPoZ/GfSZVl8dfE2k6uOlV9hP7o+y2aKvKf+D0k27wIjrQBlgMoZdeSbY7P/DuyN
+	KQLW1PsRcW+Z8ZHt/Ka3dg1cl4Z7friqrx/uJXUF6QEfn16jVN2PezYaNcON7nCm/nJj45LI7K7
+	nwcxtsJgtpRnGWHx4NT/fDggUmsjJ3sNF+0cIKTj1Tfey+dohoFFjwSQcYAEf+98IoZPygcgRrh
+	pOCLcu0XdKRmWcP1PtZlzMAXNC6atdNJ1IYh2z3spW1bUAOmhklQAEX7iWFqbHEedVc3ZQTuKiy
+	C3mLwNwYeqbIRmyg==
+X-Received: by 2002:a05:6000:184b:b0:435:a43b:2dde with SMTP id ffacd0b85a97d-435f42ced91mr2869861f8f.15.1769764799879;
+        Fri, 30 Jan 2026 01:19:59 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322f40sm20218053f8f.34.2026.01.30.01.19.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 01:19:59 -0800 (PST)
+Date: Fri, 30 Jan 2026 10:19:56 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: John Ogness <john.ogness@linutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+	mpdesouza@suse.com, kernel-team@meta.com
+Subject: Re: [PATCH net-next v5 1/4] printk: Add execution context (task
+ name/CPU) to printk_info
+Message-ID: <aXx3vARHSDMq4XVN@pathway.suse.cz>
+References: <20260128-nbcon-v5-0-93b4ddbc181a@debian.org>
+ <20260128-nbcon-v5-1-93b4ddbc181a@debian.org>
+ <87ikcllrxz.fsf@jogness.linutronix.de>
+ <aXxy7usBz1-TTkVB@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,151 +105,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260128112122.GE12149@unreal>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <aXxy7usBz1-TTkVB@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-255078-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255077-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[suse.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,j66a10360.sqa.eu95:mid,huawei.com:email,linux.alibaba.com:dkim]
-X-Rspamd-Queue-Id: 60FD2B8D0E
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:email]
+X-Rspamd-Queue-Id: 507ADB8D26
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 01:21:22PM +0200, Leon Romanovsky wrote:
-> On Wed, Jan 28, 2026 at 01:50:51PM +0800, D. Wythe wrote:
-> > On Tue, Jan 27, 2026 at 02:00:04PM +0200, Leon Romanovsky wrote:
-> > > On Mon, Jan 26, 2026 at 12:45:01PM +0800, D. Wythe wrote:
-> > > > On Tue, Sep 09, 2025 at 12:45:32PM +0300, Leon Romanovsky wrote:
-> > > > > On Thu, Aug 28, 2025 at 08:41:17PM +0800, Liu Jian wrote:
-> > > > > > BUG: kernel NULL pointer dereference, address: 00000000000002ec
-> > > > > > PGD 0 P4D 0
-> > > > > > Oops: Oops: 0000 [#1] SMP PTI
-> > > > > > CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
-> > > > > > Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-> > > > > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> > > > > > Workqueue: smc_hs_wq smc_listen_work [smc]
-> > > > > > RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
-> > > > > > ...
-> > > > > > Call Trace:
-> > > > > >  <TASK>
-> > > > > >  smcr_buf_map_link+0x211/0x2a0 [smc]
-> > > > > >  __smc_buf_create+0x522/0x970 [smc]
-> > > > > >  smc_buf_create+0x3a/0x110 [smc]
-> > > > > >  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
-> > > > > >  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
-> > > > > >  smc_listen_find_device+0x1dd/0x2b0 [smc]
-> > > > > >  smc_listen_work+0x30f/0x580 [smc]
-> > > > > >  process_one_work+0x18c/0x340
-> > > > > >  worker_thread+0x242/0x360
-> > > > > >  kthread+0xe7/0x220
-> > > > > >  ret_from_fork+0x13a/0x160
-> > > > > >  ret_from_fork_asm+0x1a/0x30
-> > > > > >  </TASK>
-> > > > > > 
-> > > > > > If the software RoCE device is used, ibdev->dma_device is a null pointer.
-> > > > > > As a result, the problem occurs. Null pointer detection is added to
-> > > > > > prevent problems.
-> > > > > > 
-> > > > > > Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
-> > > > > > Signed-off-by: Liu Jian <liujian56@huawei.com>
-> > > > > > ---
-> > > > > > v1->v2:
-> > > > > > move the check outside of loop.
-> > > > > >  net/smc/smc_ib.c | 3 +++
-> > > > > >  1 file changed, 3 insertions(+)
-> > > > > > 
-> > > > > > diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> > > > > > index 53828833a3f7..a42ef3f77b96 100644
-> > > > > > --- a/net/smc/smc_ib.c
-> > > > > > +++ b/net/smc/smc_ib.c
-> > > > > > @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
-> > > > > >  	unsigned int i;
-> > > > > >  	bool ret = false;
-> > > > > >  
-> > > > > > +	if (!lnk->smcibdev->ibdev->dma_device)
-> > > > > > +		return ret;
-> > > > > 
-> > > > > Please use ib_uses_virt_dma() function for that.
-> > > > > 
-> > > > > It is clearly stated in the code:
-> > > > >   2784 struct ib_device {
-> > > > >   2785         /* Do not access @dma_device directly from ULP nor from HW drivers. */
-> > > > >   2786         struct device                *dma_device;     
-> > > > > 
-> > > > > Thanks
-> > > > > 
-> > > > >
-> > > > 
-> > > > Hi Leon,
-> > > > 
-> > > > Sorry for the late reply, I just noticed this and thank you for your review.
-> > > > I agree completely with your feedback: we should not be accessing ibdev->dma_device
-> > > > directly. Following your advice, replacing the
-> > > > 
-> > > > 	if (!lnk->smcibdev->ibdev->dma_device)
-> > > > 
-> > > > check with ib_uses_virt_dma() is straightforward and absolutely the correct
-> > > > thing to do for that part of the logic.
-> > > > 
-> > > > However, this has led me to a further challenge. The main purpose of the
-> > > > smc_ib_is_sg_need_sync() function is to get the result of dma_need_sync().
-> > > > This means that even after correctly using ib_uses_virt_dma(), the function
-> > > > still needs to call dma_need_sync(ibdev->dma_device, ...), which forces us
-> > > > right back into the direct access pattern we are trying to eliminate.
-> > > 
-> > > I would like to challenge the use of dma_need_sync() in smc_ib.c. From
-> > > what I see, it is used to avoid calls to dma_sync_single_*_device()
-> > > which will be NOP anyway in that case.
-> > > 
-> > > Why did you copy that logic from XSK?
-> > > 
+On Fri 2026-01-30 01:01:11, Breno Leitao wrote:
+> On Wed, Jan 28, 2026 at 03:48:16PM +0106, John Ogness wrote:
+> > On 2026-01-28, Breno Leitao <leitao@debian.org> wrote:
+> > > Extend struct printk_info to include the task name, pid, and CPU
+> > > number where printk messages originate. This information is captured
+> > > at vprintk_store() time and propagated through printk_message to
+> > > nbcon_write_context, making it available to nbcon console drivers.
+> > >
+> > > This is useful for consoles like netconsole that want to include
+> > > execution context in their output, allowing correlation of messages
+> > > with specific tasks and CPUs regardless of where the console driver
+> > > actually runs.
+> > >
+> > > The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+> > > automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+> > > the helper functions compile to no-ops with no overhead.
+> > >
+> > > Suggested-by: John Ogness <john.ogness@linutronix.de>
+> > > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > > Signed-off-by: Petr Mladek <pmladek@suse.com>
 > > 
-> > You are right. I just noticed that the DMA has already introduced a
-> > similar optimization.
-> > 
-> > The check in SMC was added back in 2022, while the DMA introduced
-> > the internal "skip redundant sync" mechanism in 2024 (commit f406c8e4b770).
-> > 
-> > Given this, it might be better to simply remove this redundant check
-> > from SMC now, which would also eliminate the need for direct access to
-> > ibdev->dma_device. I need to perform some tests to confirm this.
+> > Reviewed-by: John Ogness <john.ogness@linutronix.de>
 > 
-> It may also be worth looking at this series from Chuck, which reuses the
-> recently introduced DMA API to remove the SG conversions:
-> https://lore.kernel.org/linux-rdma/20260128005400.25147-1-cel@kernel.org/
-> 
-> You might be able to apply a similar approach and drop SG from your
-> datapath entirely.
-> 
-> Thanks.
->
+> Thank you for the review. To confirm, it is acceptable to queue this for
+> the next netdev version, isn't it?
 
-After a quick look at the rdma_rw_ctx, but it doesn't seem
-suitable for SMC. SMC uses a ring buffer for its transmit path and
-requires frequent offset adjustments during data transmission.
-The rdma_rw_ctx model is likely not flexible enough for this
-kind of circular buffer logic.
+Go on with it. At least I do not have anything against it. :-)
 
-D. Wythe
+Best Regards,
+Petr
 
