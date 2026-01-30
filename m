@@ -1,115 +1,121 @@
-Return-Path: <netdev+bounces-255027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIZuH6wyfGlzLQIAu9opvQ
-	(envelope-from <netdev+bounces-255027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:25:16 +0100
+	id DyFtAfs6fGkELgIAu9opvQ
+	(envelope-from <netdev+bounces-255029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:00:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108E6B7147
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:25:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05ACDB72D4
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 85571300CE54
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:25:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A3BF3011C6C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9FD2FF661;
-	Fri, 30 Jan 2026 04:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I2ayOwA7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7540C258EE0;
+	Fri, 30 Jan 2026 05:00:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from outbound.baidu.com (mx24.baidu.com [111.206.215.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE411C32FF;
-	Fri, 30 Jan 2026 04:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2881C41C72;
+	Fri, 30 Jan 2026 05:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769747105; cv=none; b=ulN19q0t5DCGZp4l2mSJcxN4/vQWcElHZdVQ2xxpSOhpRMDOPTHHXj/Kj4xIjtSUUG25Z6fPYFLNkp+tN9dl/aNF/1+UQXyY79/SVasbBkUwoDHT44cFPzqxMPtk+7dzc6sSavXzXxyglZYqU9X6QdwAjEt9PNSbYAcLJohuKOE=
+	t=1769749238; cv=none; b=oXwyB3uCgj7Gssq5O9VUxXlA3TmyXJ3jWjNMmJ1C8Mg4DoZkGt/gjp4pYcJd+y4OHZ/mfJZ7n8dA/LyLYTArQmB4Q5GEb6FVqODFPSEjSmWkOcWauwnRYQZyr0ffxyQe8/lEnmz7i2jNpCtfnvE4d/fx9XmAwGv7vmAdPcNa5H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769747105; c=relaxed/simple;
-	bh=iClT2Sc7vLZbGB0wck1dQNHPHMa1CGLidlBKYnrT81k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jZNkZuzwdM4CVSuamCTM+voQVuLGXXs+e+ymySqYZrdPAk/wDaCPqkc4s1HXJD/jeq41jyTvSAC+D5CtpX/SP35f+rCoUFfs8myhDlmk6GZ6oQqYEmid6HwoqzfWVMBDV02jqU9Y70A9V/1/HR3iqvBjV3jobmB+PaYo6vIGhqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I2ayOwA7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 287D8C4CEF7;
-	Fri, 30 Jan 2026 04:25:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769747105;
-	bh=iClT2Sc7vLZbGB0wck1dQNHPHMa1CGLidlBKYnrT81k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I2ayOwA7Txbk+U29fX0ZndhmWdTB76k8WVSsMZgAuzh2bbo89417DGwa3klHh9e3Y
-	 dYgx2T4NPE8Z6DITaioDa+XUdMD+xasQBFCNmxRCTCTJa2C7TorQIFlDQdP54dtrYM
-	 ZUOM6FKSVGO6HD92BVteQ/tn+Ivld/rMD4RDgrfdgqJ6X6fzCPVeYecE0CPjxT9jbX
-	 0MeKp+K32dAcwqdn0fBhSP5P6pOVU46iRYqeR2BtQ1XpRhCRRDD2oISwXOWTOrf1cv
-	 KCsgwzMwvZXEXs82uYuJuSpICWFok1qsEQ5r9W929rsD1sRmKeB5m7h5lRQ/8Joabh
-	 QzUYz9AltOeDw==
-Date: Thu, 29 Jan 2026 20:25:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [GIT PULL] wireless-next-2026-01-29
-Message-ID: <20260129202504.1696fdc9@kernel.org>
-In-Reply-To: <20260129110136.176980-39-johannes@sipsolutions.net>
-References: <20260129110136.176980-39-johannes@sipsolutions.net>
+	s=arc-20240116; t=1769749238; c=relaxed/simple;
+	bh=1Af3mEyk0q9nGH+AVFvTFCaP8SIK82SCL3yTzBbG660=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=afpo/Xq+1gHBJIN76Bxx/me/RG5stQl6bCBsI3l6ok5jRNf/GiZU17kWCSNcdFG+iQTcc0WjxQqvq/NFqSEt40kPagkS/ZyoovEmwfkUOMDhlZOwLX1AiNgnDhEeBlHL2OiJt5IlQRYH/fc2LRSrd25lbD6mUVC/VwouTaseZ/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: lirongqing <lirongqing@baidu.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter
+	<phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+	<netdev@vger.kernel.org>
+CC: Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH] netfilter: conntrack: remove __read_mostly from nf_conntrack_generation
+Date: Thu, 29 Jan 2026 23:43:48 -0500
+Message-ID: <20260130044348.3095-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: bjhj-exc6.internal.baidu.com (172.31.3.16) To
+ bjkjy-exc3.internal.baidu.com (172.31.50.47)
+X-FEAS-Client-IP: 172.31.50.47
+X-FE-Policy-ID: 52:10:53:SYSTEM
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[baidu.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255027-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255029-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.992];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 108E6B7147
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 05ACDB72D4
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 11:58:31 +0100 Johannes Berg wrote:
-> Another fairly large set of changes, notably:
->  - cfg80211/mac80211
->     - most of EPPKE/802.1X over auth frames support
->     - additional FTM capabilities
->     - split up drop reasons better, removing generic RX_DROP
->     - NAN cleanups/fixes
->  - ath11k:
->     - support for Channel Frequency Response measurement
->  - ath12k:
->     - support for the QCC2072 chipset
->  - iwlwifi:
->     - partial NAN support
->     - UNII-9 support
->     - some UHR/802.11bn FW APIs
->     - remove most of MLO/EHT from iwlmvm
->       (such devices use iwlmld)
->  - rtw89:
->     - preparations for RTL8922DE support
+From: Li RongQing <lirongqing@baidu.com>
 
-Pulled, thanks!
+The nf_conntrack_generation sequence counter is updated whenever
+conntrack table generations are bumped (e.g., during netns exit or
+heavy garbage collection). Under certain workloads, these updates
+can be frequent enough that the variable no longer fits the
+"read-mostly" criteria.
+
+Applying __read_mostly to a variable that is updated regularly can
+lead to cache line bouncing and performance degradation for other
+variables residing in the same section. Remove the annotation to
+let the variable reside in the standard data section.
+
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+ net/netfilter/nf_conntrack_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index d1f8eb7..233a281 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -204,7 +204,7 @@ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+ 
+ unsigned int nf_conntrack_max __read_mostly;
+ EXPORT_SYMBOL_GPL(nf_conntrack_max);
+-seqcount_spinlock_t nf_conntrack_generation __read_mostly;
++seqcount_spinlock_t nf_conntrack_generation;
+ static siphash_aligned_key_t nf_conntrack_hash_rnd;
+ 
+ static u32 hash_conntrack_raw(const struct nf_conntrack_tuple *tuple,
+-- 
+2.9.4
+
 
