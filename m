@@ -1,166 +1,223 @@
-Return-Path: <netdev+bounces-255159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255160-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JM/C/i7fGlVOgIAu9opvQ
-	(envelope-from <netdev+bounces-255159-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:11:04 +0100
+	id eCLqFhy9fGlVOgIAu9opvQ
+	(envelope-from <netdev+bounces-255160-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:15:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93DBBB77F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:11:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4624BB82C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:15:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 150353013EE0
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:10:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C493301C177
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18A9322B8F;
-	Fri, 30 Jan 2026 14:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F7E318EDC;
+	Fri, 30 Jan 2026 14:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ooMHo2S0"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECC0321457
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 14:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C20E1D5147;
+	Fri, 30 Jan 2026 14:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769782249; cv=none; b=QbMB6ekZG7I+3zG01mpTUjzXtRHBjOt41LVRLvntXZaTXlQH7yyVmB+Xx6OFc+kCWncsRNcJGuBD5GK3ggym00kuX2VIUmhzOaiNe4BcnC+qZzhVx53IZNLcKJxFenA9ri24cBb13iwNDbkri4MnRi6C2cy0W/SIPwYIUHiuZp0=
+	t=1769782509; cv=none; b=U3IOkhheKQ9HYEUbF7pBYdYspQY5MPsluiQGgtr6rvj+7rEXVbVMUnA/LIGp3Gq48jrhPTsHLhQEgMNzddKXOUCdQNHL4vUDxEMQ/a6kBOEJElfT0bXBrL3bLG+FO1zCzrXi2ecV4fDQ5RCks2u46w4Dr3VCM0HZwsb6wU0e2QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769782249; c=relaxed/simple;
-	bh=1YPPUWQxs5uySAkIkFuVYtnkZqL6uv7puXvg1S0nnsQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WLuSto4tX4M8RYp21m6JP0bP3cJLI41zFOABdF0qcJ6yzL1t1o64eoQMx+SKYzVKCAQ5fTZ0BoenJHaTiT5FAwnUVmMG6HO8iu33KxfsGBgC8G77IbO87nFIXHKYZ6M6uPKouOxPreZzvLLXfapWzCeHJ6jaeSzpY2n2Yp4dIoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8FD0720070B;
-	Fri, 30 Jan 2026 15:10:41 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 81DED2006CD;
-	Fri, 30 Jan 2026 15:10:41 +0100 (CET)
-Received: from lsv15141.swis.ro-buh01.nxp.com (lsv15141.swis.ro-buh01.nxp.com [10.162.246.138])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 2EEEE20263;
-	Fri, 30 Jan 2026 15:10:40 +0100 (CET)
-From: Claudiu Manoil <claudiu.manoil@nxp.com>
-To: vladimir.oltean@nxp.com,
-	wei.fang@nxp.com,
-	xiaoning.wang@nxp.com,
-	Frank.Li@nxp.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH net 4/4] net: enetc: Convert 16-bit register reads to 32-bit for ENETC v4
-Date: Fri, 30 Jan 2026 16:10:35 +0200
-Message-Id: <20260130141035.272471-5-claudiu.manoil@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260130141035.272471-1-claudiu.manoil@nxp.com>
-References: <20260130141035.272471-1-claudiu.manoil@nxp.com>
+	s=arc-20240116; t=1769782509; c=relaxed/simple;
+	bh=4CM+7vybFqeOsbZHgBMOyxW5M97RCoiG6HI8SD15ftE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSAu8FzwonRSECkxl6I92iqXFhVnXBYjXZcjpQtdDRABbmUGnGIqRtJemddbMeoNi5OVLuH7lYkZwtuCbwUCL2lxwCDC20HAOJfNsLtuKRoufeZYko9b17rKqYxzFOsUAJkURvN7Ms8ELRWsSH0DdOtbCQW3UjJbMLeyVnXcCXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ooMHo2S0; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769782505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CzQPYM4Xj9u9dgaPCEFQdtOnbDlQ9MEGeF3DmF2HHNQ=;
+	b=ooMHo2S0asrhch+xstWxvN4A/wxEJazpnXuUoM4yOyaqCO8RwD2kvJwbM2TG2QZL4TJCwz
+	BmYsd3cppgG+nGa5d+TLgD+vWuRfwPEZh5mWbn3UDBAIx0VYK3I4grhsGMEoJc8Za09++a
+	VRNZSjypDwp4d+UrsDkXblikVOxUJL8=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+1ec2f6a450f0b54af8c8@syzkaller.appspotmail.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] linkwatch: use __dev_put() in callers to prevent UAF
+Date: Fri, 30 Jan 2026 22:14:50 +0800
+Message-ID: <20260130141455.63201-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255159-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-255160-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[claudiu.manoil@nxp.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:mid,nxp.com:email]
-X-Rspamd-Queue-Id: C93DBBB77F
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,1ec2f6a450f0b54af8c8];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,shopee.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A4624BB82C
 X-Rspamd-Action: no action
 
-It is not recommended to access the 32‑bit registers of this hardware IP
-using lower‑width accessors (i.e. 16‑bit), and the only exception to
-this rule was introduced in the initial ENETC v1 driver for the PMAR1
-register, which holds the lower 16 bits of the primary MAC address of
-an SI. Meanwhile, this exception has been replicated in the v4 driver
-code as well.
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-Since LS1028 (the only SoC with ENETC v1) is not affected by this issue,
-the current patch converts the 16‑bit reads from PMAR1 starting with
-ENETC v4.
+After linkwatch_do_dev() calls __dev_put() to release the linkwatch
+reference, the device refcount may drop to 1. At this point,
+netdev_run_todo() can proceed (since linkwatch_sync_dev() sees an
+empty list and returns without blocking), wait for the refcount to
+become 1 via netdev_wait_allrefs_any(), and then free the device
+via kobject_put().
 
-Fixes: 99100d0d9922 ("net: enetc: add preliminary support for i.MX95 ENETC PF")
-Signed-off-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+This creates a use-after-free when __linkwatch_run_queue() tries to
+call netdev_unlock_ops() on the already-freed device.
+
+Note that adding netdev_lock_ops()/netdev_unlock_ops() pair in
+netdev_run_todo() before kobject_put() would not work, because
+netdev_lock_ops() is conditional - it only locks when
+netdev_need_ops_lock() returns true. If the device doesn't require
+ops_lock, linkwatch won't hold any lock, and netdev_run_todo()
+acquiring the lock won't provide synchronization.
+
+Fix this by moving __dev_put() from linkwatch_do_dev() to its
+callers. The device reference logically pairs with de-listing the
+device, so it's reasonable for the caller that did the de-listing
+to release it. This allows placing __dev_put() after all device
+accesses are complete, preventing UAF.
+
+The bug can be reproduced by adding mdelay(2000) after
+linkwatch_do_dev() in __linkwatch_run_queue(), then running:
+
+  ip tuntap add mode tun name tun_test
+  ip link set tun_test up
+  ip link set tun_test carrier off
+  ip link set tun_test carrier on
+  sleep 0.5
+  ip tuntap del mode tun name tun_test
+
+KASAN report:
+
+ ==================================================================
+ BUG: KASAN: use-after-free in netdev_need_ops_lock include/net/netdev_lock.h:33 [inline]
+ BUG: KASAN: use-after-free in netdev_unlock_ops include/net/netdev_lock.h:47 [inline]
+ BUG: KASAN: use-after-free in __linkwatch_run_queue+0x865/0x8a0 net/core/link_watch.c:245
+ Read of size 8 at addr ffff88804de5c008 by task kworker/u32:10/8123
+
+ CPU: 0 UID: 0 PID: 8123 Comm: kworker/u32:10 Not tainted syzkaller #0 PREEMPT(full)
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+ Workqueue: events_unbound linkwatch_event
+ Call Trace:
+  <TASK>
+  __dump_stack lib/dump_stack.c:94 [inline]
+  dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+  print_address_description mm/kasan/report.c:378 [inline]
+  print_report+0x156/0x4c9 mm/kasan/report.c:482
+  kasan_report+0xdf/0x1a0 mm/kasan/report.c:595
+  netdev_need_ops_lock include/net/netdev_lock.h:33 [inline]
+  netdev_unlock_ops include/net/netdev_lock.h:47 [inline]
+  __linkwatch_run_queue+0x865/0x8a0 net/core/link_watch.c:245
+  linkwatch_event+0x8f/0xc0 net/core/link_watch.c:304
+  process_one_work+0x9c2/0x1840 kernel/workqueue.c:3257
+  process_scheduled_works kernel/workqueue.c:3340 [inline]
+  worker_thread+0x5da/0xe40 kernel/workqueue.c:3421
+  kthread+0x3b3/0x730 kernel/kthread.c:463
+  ret_from_fork+0x754/0xaf0 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+  </TASK>
+ ==================================================================
+
+Fixes: 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+Reported-by: syzbot+1ec2f6a450f0b54af8c8@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6824d064.a70a0220.3e9d8.001a.GAE@google.com/T/
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- .../net/ethernet/freescale/enetc/enetc4_pf.c    |  2 +-
- drivers/net/ethernet/freescale/enetc/enetc_hw.h | 17 ++++++++++++++---
- 2 files changed, 15 insertions(+), 4 deletions(-)
+ net/core/link_watch.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index c0859d200a2c..5850540634b0 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -73,7 +73,7 @@ static void enetc4_pf_get_si_primary_mac(struct enetc_hw *hw, int si,
- 	u16 lower;
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index 212cde35affa..5196f8ea43f1 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -185,10 +185,6 @@ static void linkwatch_do_dev(struct net_device *dev)
  
- 	upper = __raw_readl(hw->port + ENETC4_PSIPMAR0(si));
--	lower = __raw_readw(hw->port + ENETC4_PSIPMAR1(si));
-+	lower = __raw_readl(hw->port + ENETC4_PSIPMAR1(si));
+ 		netif_state_change(dev);
+ 	}
+-	/* Note: our callers are responsible for calling netdev_tracker_free().
+-	 * This is the reason we use __dev_put() instead of dev_put().
+-	 */
+-	__dev_put(dev);
+ }
  
- 	put_unaligned_le32(upper, addr);
- 	put_unaligned_le16(lower, addr + 4);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-index 7b882b8921fe..662e4fbafb74 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-@@ -708,13 +708,24 @@ struct enetc_cmd_rfse {
- #define ENETC_RFSE_EN	BIT(15)
- #define ENETC_RFSE_MODE_BD	2
- 
-+static inline void enetc_get_primary_mac_addr(struct enetc_hw *hw, u8 *addr)
-+{
-+	u32 upper;
-+	u16 lower;
-+
-+	upper = __raw_readl(hw->reg + ENETC_SIPMAR0);
-+	lower = __raw_readl(hw->reg + ENETC_SIPMAR1);
-+
-+	put_unaligned_le32(upper, addr);
-+	put_unaligned_le16(lower, addr + 4);
-+}
-+
- static inline void enetc_load_primary_mac_addr(struct enetc_hw *hw,
- 					       struct net_device *ndev)
+ static void __linkwatch_run_queue(int urgent_only)
+@@ -243,6 +239,7 @@ static void __linkwatch_run_queue(int urgent_only)
+ 		netdev_lock_ops(dev);
+ 		linkwatch_do_dev(dev);
+ 		netdev_unlock_ops(dev);
++		__dev_put(dev);
+ 		do_dev--;
+ 		spin_lock_irq(&lweventlist_lock);
+ 	}
+@@ -278,8 +275,10 @@ void __linkwatch_sync_dev(struct net_device *dev)
  {
--	u8 addr[ETH_ALEN] __aligned(4);
-+	u8 addr[ETH_ALEN];
+ 	netdev_ops_assert_locked(dev);
  
--	*(u32 *)addr = __raw_readl(hw->reg + ENETC_SIPMAR0);
--	*(u16 *)(addr + 4) = __raw_readw(hw->reg + ENETC_SIPMAR1);
-+	enetc_get_primary_mac_addr(hw, addr);
- 	eth_hw_addr_set(ndev, addr);
+-	if (linkwatch_clean_dev(dev))
++	if (linkwatch_clean_dev(dev)) {
+ 		linkwatch_do_dev(dev);
++		__dev_put(dev);
++	}
+ }
+ 
+ void linkwatch_sync_dev(struct net_device *dev)
+@@ -288,6 +287,7 @@ void linkwatch_sync_dev(struct net_device *dev)
+ 		netdev_lock_ops(dev);
+ 		linkwatch_do_dev(dev);
+ 		netdev_unlock_ops(dev);
++		__dev_put(dev);
+ 	}
  }
  
 -- 
-2.34.1
+2.43.0
 
 
