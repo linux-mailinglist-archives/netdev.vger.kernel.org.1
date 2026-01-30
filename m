@@ -1,71 +1,96 @@
-Return-Path: <netdev+bounces-255037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255038-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CZFHIVZfGkYMAIAu9opvQ
-	(envelope-from <netdev+bounces-255037-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:11:01 +0100
+	id SCtHBC5cfGkYMAIAu9opvQ
+	(envelope-from <netdev+bounces-255038-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:22:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4DEB7CAD
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:11:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A869FB7DE4
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:22:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 16E25300405F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:10:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 172953004DFA
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82DF306496;
-	Fri, 30 Jan 2026 07:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3720E2DF6E3;
+	Fri, 30 Jan 2026 07:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="YSYYQWsT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQwmQm6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A946A21883E;
-	Fri, 30 Jan 2026 07:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D841309F08
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 07:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769757056; cv=none; b=RWEYikg/8HLTLH35WapGZHhxbD5FwP7CDKZyEPxbtkoq2MMPIiN8Iu7cLfctOTya4A8pYjNLwkMk7IvxqD3/h/xhwYXYNWlqThYBldKO2aw8q1NXQGAhwFduHD3c8sFmK2n52BPesutzrVJsLMjEDiYl6rwFa7ACGlZgX+mDQyE=
+	t=1769757738; cv=none; b=W7oDsI9KbDaGro/qKX12nqPrukMxXe4Lif8jO+KNPj9RTNMuC9YR8H/ewu9XjcHLAxZ8mUF807Hiv+pvGanPdQE3p4pHMYqJsh007hlb2HhEFuvNIp7wlFN9ll/Bp6pzIx6x0kXFLEwkTkQK4HbWZNKUlcgDyXqra/zexDYN8XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769757056; c=relaxed/simple;
-	bh=KyGofQA+yPanct2ad1s/4EMe4J4e3sxY1/iZhzeXLDE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dY9yJGgDo0o+nfJ0Ep96MdoEhegMlv+cM1wQItr14gp226XUBJmFsQ0DAmavdegWNTRUi9klueGXjNT28F635Q5FyJnlHPSarMxjXiWUPJjkHM8qKmtZlBV0E1kFKyedG94Qy6xZAHEK3JIe9kUUyVzuuRLOpqKJtxCZjiPp+Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=YSYYQWsT; arc=none smtp.client-ip=120.232.169.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+	s=arc-20240116; t=1769757738; c=relaxed/simple;
+	bh=scpHbiU85fPKFr3iZ5a8B06uHXcjdSPXniUbJsWoh5k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yk+vKc18tM/y+/p7Gxc9k/g4so3K+YVCxzoZ6blcHDgGr9OYXGahoiO6ioVPLGXXp5vFhVmGIyQvzDxQpF8XuaCyNQ2C6b3XgJZx75Rpr3h5SBjambrujP7uduD8CzDbxNCJo+ZCDxABGMKajPYQwwoWyVK2dGDEzj5xOtOzzGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQwmQm6L; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b885e8c6727so341568066b.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 23:22:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=YSYYQWsTrYbAoBDC46vtwuLGbtuuVniXpbR6fiTZCtjrq+fGx2gcc21OSKet3JUHn3hi812bEzFHB
-	 OPH57CG8w4wvEIXe2MR35pxLZIo49HD6ocTrXxnzGsF3ZFl6khv27HqtOys1Zlo5sjokQM7OfrMWzB
-	 zgK6DNvkun82xGmE=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-09-12087 (RichMail) with SMTP id 2f37697c5978bec-04c4d;
-	Fri, 30 Jan 2026 15:10:54 +0800 (CST)
-X-RM-TRANSID:2f37697c5978bec-04c4d
-From: Li hongliang <1468888505@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	lucien.xin@gmail.com
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	vyasevich@gmail.com,
-	nhorman@tuxdriver.com,
-	marcelo.leitner@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 6.1.y] sctp: linearize cloned gso packets in sctp_rcv
-Date: Fri, 30 Jan 2026 15:10:38 +0800
-Message-Id: <20260130071038.3931297-1-1468888505@139.com>
-X-Mailer: git-send-email 2.34.1
+        d=gmail.com; s=20230601; t=1769757735; x=1770362535; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0lV1Eb14MHHXl34cLNbbdByp1XdnJD9vp/7a+55/aDk=;
+        b=cQwmQm6LdQ1GoFYIID9LxpBt35vzfmqsXTxMsjgNifnTTB8MKJkO5cNjTlhfURddro
+         i5N4Pc8XW/1UNczzgir44OOAqTbquBFnP4+jXujj5gwFwyteKtFIgWTgbmS5OjzsxmZ1
+         cJBS5Xuc8cdpLglFNrwqc7n/1u20mejI+dfH1z7HOAz06ovruXlBfIuuKPJYiR/RerEy
+         Oj25silYh+WS7PYNLwJLB2l4SsBajrO7bybZ9qvFeFrdjj+WFHFQ9HcLNFcMHUZZcMym
+         tFEPpIzffyNFYjb4sOudbEqhum7T+yi1Yejpn+1NW6bSF1PF1WRYC4yeAnVLly3vmWku
+         9mvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769757735; x=1770362535;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0lV1Eb14MHHXl34cLNbbdByp1XdnJD9vp/7a+55/aDk=;
+        b=Cw/Fw+MnyzmFU5lIE5difsWspDhcbVyIa8Itvkzsyayejq5bcQi0SBpeOXvFFDqhR+
+         XAUDAE8ZlqX9QzvInssuLM/26AtJ4t4Mq6AOGc/L1Txfj7AcIM3w1R/6+c+rfW4vZNak
+         K5NTdWx0Zwp+SIuJNLLbOHFNUiz+tB/ZUcyWi9LAnx/fJ8t2uvqPspZjjWC0wRFNPvt7
+         fthI/pMDMRiOoTf1n6wXE7vGlrXCGLXoLy4sM4DS1S/g7nv7W0TrX1Z/bstcixJVfdd7
+         DM+aQ89oOOwimAuPdSA46c2W/pgMn58QMzMyfpgjYt8pR0rVPL7Qa2ckWTq/j2ZkaZaj
+         qyBA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+lPCMFjEiHaFEOk6QrvJnZC5DvYcsfHhN85B9YY6Jv30p8MtZXp+S3F48CcQh9n5/MJbJI9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHFzhS61NXE3T9z7h2Xtegw6IIzaoR4ksyIMjZltF8cKOiwjgE
+	meSdp7nTcUQ8cGhVtk15QgbjymOD999bwf/Ra78Mu89CquYFAIJr2H96n5bwBgPJthPtqg==
+X-Gm-Gg: AZuq6aJh90bQ4nfpuIpt4PQavlhWsEpAhmf2AML3e3UPx9trl2/qhOB48FFBWOopx/1
+	Y03LACadT5jNQuIHcDH789QGRBDqrfYYIjTWQpCWEI93pEeZCGEHjrhNwOqrdSOnH/0AipILLXq
+	UxlhBFKb/YRpBnAb1ztqwn+4J+GgiIO/Cy1/kISctVqnLXzp+NLh+aQqQhWKIjAJi/+oqOC1GEB
+	FlDLx7oIvBbAQK6DTTAsoEAftTnXRetOFzRJxvkwTShKGee8BSt4HK3vPy//emqM7oyH68Knd35
+	bziQeJ3GoAWtKWqmCgCA70MRr2LwE8laZpl6u6Ii7OLckkazgS1T4jP86pokge8sAAMLw4BDJQk
+	V69hzOl5o4Fs1NAbWPki3xSF/hWdovJe6qCpNiX6Of0QXSxYwYYhIaubTZoybdhg18R8=
+X-Received: by 2002:a17:907:9805:b0:b87:7430:d5e2 with SMTP id a640c23a62f3a-b8ddf85c0a2mr331985166b.12.1769757734675;
+        Thu, 29 Jan 2026 23:22:14 -0800 (PST)
+Received: from gmail.com ([2a09:bac5:4e22:2e3c::49b:47])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8dbf2f3e33sm379318466b.71.2026.01.29.23.22.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 23:22:14 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH nf-next v2] netfilter: flowtable: dedicated slab for flow entry
+Date: Fri, 30 Jan 2026 15:22:07 +0800
+Message-ID: <20260130072208.108345-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,112 +99,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255037-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-255038-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[139.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com,tuxdriver.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[linuxfoundation.org,vger.kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[139.com:-];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[1468888505@139.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[139.com];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 8B4DEB7CAD
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A869FB7DE4
 X-Rspamd-Action: no action
 
-From: Xin Long <lucien.xin@gmail.com>
+The size of `struct flow_offload` has grown beyond 256 bytes on 64-bit
+kernels (currently 280 bytes) because of the `flow_offload_tunnel`
+member added recently. So kmalloc() allocates from the kmalloc-512 slab,
+causing significant memory waste per entry.
 
-[ Upstream commit fd60d8a086191fe33c2d719732d2482052fa6805 ]
+Introduce a dedicated slab cache for flow entries to reduce memory
+footprint. Results in a reduction from 512 bytes to 320 bytes per entry
+on x86_64 kernels.
 
-A cloned head skb still shares these frag skbs in fraglist with the
-original head skb. It's not safe to access these frag skbs.
-
-syzbot reported two use-of-uninitialized-memory bugs caused by this:
-
-  BUG: KMSAN: uninit-value in sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
-   sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
-   sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:998
-   sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
-   sctp_backlog_rcv+0x397/0xdb0 net/sctp/input.c:331
-   sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1122
-   __release_sock+0x1da/0x330 net/core/sock.c:3106
-   release_sock+0x6b/0x250 net/core/sock.c:3660
-   sctp_wait_for_connect+0x487/0x820 net/sctp/socket.c:9360
-   sctp_sendmsg_to_asoc+0x1ec1/0x1f00 net/sctp/socket.c:1885
-   sctp_sendmsg+0x32b9/0x4a80 net/sctp/socket.c:2031
-   inet_sendmsg+0x25a/0x280 net/ipv4/af_inet.c:851
-   sock_sendmsg_nosec net/socket.c:718 [inline]
-
-and
-
-  BUG: KMSAN: uninit-value in sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
-   sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
-   sctp_inq_push+0x2a3/0x350 net/sctp/inqueue.c:88
-   sctp_backlog_rcv+0x3c7/0xda0 net/sctp/input.c:331
-   sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
-   __release_sock+0x1d3/0x330 net/core/sock.c:3213
-   release_sock+0x6b/0x270 net/core/sock.c:3767
-   sctp_wait_for_connect+0x458/0x820 net/sctp/socket.c:9367
-   sctp_sendmsg_to_asoc+0x223a/0x2260 net/sctp/socket.c:1886
-   sctp_sendmsg+0x3910/0x49f0 net/sctp/socket.c:2032
-   inet_sendmsg+0x269/0x2a0 net/ipv4/af_inet.c:851
-   sock_sendmsg_nosec net/socket.c:712 [inline]
-
-This patch fixes it by linearizing cloned gso packets in sctp_rcv().
-
-Fixes: 90017accff61 ("sctp: Add GSO support")
-Reported-by: syzbot+773e51afe420baaf0e2b@syzkaller.appspotmail.com
-Reported-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Link: https://patch.msgid.link/dd7dc337b99876d4132d0961f776913719f7d225.1754595611.git.lucien.xin@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Li hongliang <1468888505@139.com>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
-This patch is lost/missing, as it has already been added
-into stable branches less than and greater than 6.1. Previous patch in
-https://lore.kernel.org/stable/20251022075549.195012-1-kovalev@altlinux.org/ is still not added.
-So I resent it again.
----
----
- net/sctp/input.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2: use KMEM_CACHE macro
+  - https://lore.kernel.org/netfilter-devel/20260129101213.74557-1-dqfext@gmail.com/
 
-diff --git a/net/sctp/input.c b/net/sctp/input.c
-index 4ee9374dcfb9..182898cb754a 100644
---- a/net/sctp/input.c
-+++ b/net/sctp/input.c
-@@ -114,7 +114,7 @@ int sctp_rcv(struct sk_buff *skb)
- 	 * it's better to just linearize it otherwise crc computing
- 	 * takes longer.
- 	 */
--	if ((!is_gso && skb_linearize(skb)) ||
-+	if (((!is_gso || skb_cloned(skb)) && skb_linearize(skb)) ||
- 	    !pskb_may_pull(skb, sizeof(struct sctphdr)))
- 		goto discard_it;
+ net/netfilter/nf_flow_table_core.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
+index 06e8251a6644..2c4140e6f53c 100644
+--- a/net/netfilter/nf_flow_table_core.c
++++ b/net/netfilter/nf_flow_table_core.c
+@@ -16,6 +16,7 @@
  
+ static DEFINE_MUTEX(flowtable_lock);
+ static LIST_HEAD(flowtables);
++static __read_mostly struct kmem_cache *flow_offload_cachep;
+ 
+ static void
+ flow_offload_fill_dir(struct flow_offload *flow,
+@@ -56,7 +57,7 @@ struct flow_offload *flow_offload_alloc(struct nf_conn *ct)
+ 	if (unlikely(nf_ct_is_dying(ct)))
+ 		return NULL;
+ 
+-	flow = kzalloc(sizeof(*flow), GFP_ATOMIC);
++	flow = kmem_cache_zalloc(flow_offload_cachep, GFP_ATOMIC);
+ 	if (!flow)
+ 		return NULL;
+ 
+@@ -812,9 +813,13 @@ static int __init nf_flow_table_module_init(void)
+ {
+ 	int ret;
+ 
++	flow_offload_cachep = KMEM_CACHE(flow_offload, SLAB_HWCACHE_ALIGN);
++	if (!flow_offload_cachep)
++		return -ENOMEM;
++
+ 	ret = register_pernet_subsys(&nf_flow_table_net_ops);
+ 	if (ret < 0)
+-		return ret;
++		goto out_pernet;
+ 
+ 	ret = nf_flow_table_offload_init();
+ 	if (ret)
+@@ -830,6 +835,8 @@ static int __init nf_flow_table_module_init(void)
+ 	nf_flow_table_offload_exit();
+ out_offload:
+ 	unregister_pernet_subsys(&nf_flow_table_net_ops);
++out_pernet:
++	kmem_cache_destroy(flow_offload_cachep);
+ 	return ret;
+ }
+ 
+@@ -837,6 +844,7 @@ static void __exit nf_flow_table_module_exit(void)
+ {
+ 	nf_flow_table_offload_exit();
+ 	unregister_pernet_subsys(&nf_flow_table_net_ops);
++	kmem_cache_destroy(flow_offload_cachep);
+ }
+ 
+ module_init(nf_flow_table_module_init);
 -- 
-2.34.1
-
+2.43.0
 
 
