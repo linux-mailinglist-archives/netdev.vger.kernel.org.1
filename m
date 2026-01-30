@@ -1,184 +1,220 @@
-Return-Path: <netdev+bounces-255128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255129-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OON3HI2dfGkLOAIAu9opvQ
-	(envelope-from <netdev+bounces-255128-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:01:17 +0100
+	id frZvFLmgfGlkOAIAu9opvQ
+	(envelope-from <netdev+bounces-255129-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:14:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FEBBA4E7
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:01:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A44DABA5E9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:14:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8C5CA3002F62
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:01:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 49304300A8EF
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4815333EAED;
-	Fri, 30 Jan 2026 12:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6324A36CE16;
+	Fri, 30 Jan 2026 12:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ohkJTpA6"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="nPcmafig";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="d22heNOt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EBC2FD69E
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 12:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769774467; cv=pass; b=IabLT9rtmQcxkpVZeOyM5fHOgR7VT4ME2ItLZKfXkBDbv37pdrOXdf8MvdUMqLS2w4gdgN3w2WajHITsfPoQzyfiEyGGFDDvCWROeOISpBf+GKaSfIwwtigJyC5KlToLQcgya4BJwhCWzee+eMLeoSziDATjxJ3Xkjcg3RuMvyY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769774467; c=relaxed/simple;
-	bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DTj07GQgblrIiWmCN8LANEktPLbXL9LD2hIgsQp2iL/KoEzDVwTyDrWOeyOiagWxKrrhH7MmN8FdhsvN+qXaAkdMRsw4w6sBLaE4ggkuqcguiEjm2cV9+h/wEhJIFzSFjAavZFP0A4iA7aTTY5fuXPZjAINolVefPqIE442PdPc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ohkJTpA6; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-502a407dabaso14570891cf.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 04:01:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769774465; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DVJgK0hewMaFmsYqMchnFrgPVh2A81Jibyd+HKzw9a7O+FXEchy8VIN+lXb9QzodoU
-         x1o0pqJ8V16pAIFZwlbyTOrcPuD/Agp4IB8IHInBeHY9hEWc/4F4FseZ1xxN7aztUF6I
-         l8eyYt47OXA7L/Op6HC/xSdeLKWIzeGB7ayJOfSchJJ6pAWTUnw9jEdA4Ogkx74BcFgy
-         jXuI+eEesnxUKn1TcJpoQUsjJ+kfWFzWJisUjB3iDFaj/13tfmtaXxXcw+0xF++Hd22t
-         6TI9jIIMZBpHJR8d7HNoHOYrDCy3AD8OPc8/fIXbvDS/EITmJdcYhUa6C+iwtmj09qn6
-         8jvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
-        fh=dNSdwjG+5bbMSPg9kmgdkGAC888LaufVAQsQp8CQV10=;
-        b=P4dy+/ydWvhEwi0aTkc3+7NCrAT5LVMePXnBthXSypxSeKWsOJX8a16tRTxJXaPbgx
-         UaiyOTnmz7Qq1/JGfozITGM4gDFNFp0zKx7bOTZx5I4ePrz/cyf30VQcm776KymXQZYK
-         RCHMKbcrHJdKN/gjlYaZqDt3C0vaDCvoe/LCgLT/22/g5XGBDcGlsCNxDYtFxR85XmkH
-         RB8CBzmY6UE4q3w4b7IAZjmXP+kEX7Ew6Gp28pW1j07Xg7dLVWdNe8jIHIFwCAkko9dA
-         OgK7GymQ4cxt23ZWek80bXJ/iJh//PWfT1074EyeXnJqtg6w9+b3BKMnmNYVIQUhSgvF
-         sfDw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769774465; x=1770379265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
-        b=ohkJTpA6aUaBSogWQ7TrdqIngygfG8dwe4k30B1iIUve7IV+DuwHmINUkiCZ9//1Kw
-         86urwjq2a8pJTRq0+EOGy1cccUMbIcTJYmdFWh9+8MgVUEgGhi2yyd7+MqPLk2RFWFDq
-         XIU3iOvQqkTlBhoUFhNmD7BrMIvFtDnF2W7BMy5a2FcRo6fzPPRSJdnQPIirJ5abr4O1
-         hEpWiQVDf2it8GJol6M5VeWPYTjg9YK0Mf7Zkp+fmTkhJe2FLgG+tNvpp+sK7qR13Sse
-         p/eAUqcBY8OOasR13PMdnu+olNcyllIYDYQO2fyk7H9XfKHwQqm0V9wW83nGtnMu6r2m
-         FlEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769774465; x=1770379265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
-        b=RrpfUq3uuOVcFzSOJHoNfml/P7Y8Cfip1LBeTWr29DLRxicku6UiHfUdZfCphGLBRI
-         /5RyqJv0Wt+sh6ZEd0N0M+sdcuOzKLdWQ39lS8+v1D7z1HlIIsepfSCXV8W+/TtaE0bg
-         q9W5FeX1xXyC34GkFvtG+Mk40S13YGQ3+CS9+VTNZIwxcvNwkLGb2wm5JlqRbX+0xMMa
-         sE29Cd5a1LOhdbzaa8is5DrWl40wyZrmeM9lJJs8prTQYe9Y/Oarm5nb0QszwBvas73L
-         PDQrLbUaqo2+IrMclugbktQIk6qAX1mlKPWObHyCoatCoqWoW8shiA5Yx9EAx1KOu3nR
-         nR7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUpP1ed7Sg/lsTA1o5gWBK5VjBr9p4jyp8eaGTt+slBQ5fhJj0hIRaHF8wEqORTRHWTxcmtoCo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoRcrNmQReNt1TNtarPNF5O1/OTgE9+uzxdKuS4bQiALOerqyo
-	Ks/wZJpP/5ikhCjxJEJeZWMdpXyxOPhAUx8RqvtASIVSxAZkufC3SHA14TgDAbOMoot5xuUoslw
-	n+npwjFa6FhLqKArA3qRUooht5dc1jdnROoh33ovc
-X-Gm-Gg: AZuq6aI3U0vsi0AQBLqROKJllsEAg4qs4PJ04DkJcZw+EtNEYAjAA26L09qLrjTRXMO
-	fgUtd0CADmg45uy00Sdqvp64gh/c3/qpuHrlGLOimoRjWF+4Pqy4QQT1psW/ufxmnTPaO0/Vul9
-	dxHmDoe/S+pCbwMtslk+VPB1O17Th768fNxYRPADd2Bjm+p4l8FNEa7N6We0HizYXeYWgRKJO85
-	GvG55Ew5ycT1U3D8zFtDSrAmf/cV+G5Xz/0hln2I4EWc7cd5rVaVTHDQCV7TGFmBR+9g8k=
-X-Received: by 2002:a05:622a:254:b0:4ec:f410:2470 with SMTP id
- d75a77b69052e-505d228c282mr36041711cf.71.1769774463982; Fri, 30 Jan 2026
- 04:01:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF06A298CBC;
+	Fri, 30 Jan 2026 12:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769775286; cv=none; b=muM6sejf+nZgMGyB+2oSLNEIotZtzXhy1AWbkxhzUpLC3qtExCSoS3MfyhQ4ySr7Uuufyd7y7RmDFnJKf435oj78U59twzVrKRDm0lJQxlIkfo9KWM8hdf1v+eX2UiFUmt9uFApEmg28QxX+7311pgarMG2dNsf/Z4aOcnghEX4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769775286; c=relaxed/simple;
+	bh=T2ynszaSPwee+0PtNkIvbz3yeVwvjqtKN8AXsKO/3w8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O4M5stZaQCvXS5VgO+5SyBxjhOUc5/IpqwkAPQes61gtk696L+8Nj0BUMIV62j0HCzKfGplD7mCL5X4UAXKfEWLU9pqOWmOwJHTyiXy/G+DiJAg6yaKuxETEUGgxzxs1FWYPFTYW/DZ0dXqDHwUE993lwdnTJ7E6AIMb+LcgqLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=nPcmafig; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=d22heNOt; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id B27EA1400151;
+	Fri, 30 Jan 2026 07:14:42 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 30 Jan 2026 07:14:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1769775282; x=
+	1769861682; bh=MzLLPN6YtozLhJs3xB3wFOAPKWaat9nk7UAgnZhilC8=; b=n
+	Pcmafig3MKALAZjwDUe/tDcfnS4gR7HzXjOgLZFd1oo+JJqffrDXK8aMjG1UUJ7h
+	sa4776gtmWGgaUN1VQC+NgiiQl+MdMzKQ1+D7uLAxgEsvghe/sYxW7FcLZLP4/Zn
+	BsXjEIP1B20CBCWrhQhCWFanE4i1VKsNhZENz/QO5P7nWxngdiyY85tJDCctD5iJ
+	MEFrzgUIbzXQxVxntqMX46rekxsGx1f31hXFz85EWMIW+Jb/N6BBLOTqaX30Hfvn
+	BNzHbVKa/8JKPuiwXIWFHPnZwxqk44Z9cYpjdP5CDBoVAzvIu0YdGjLcUkebvxWS
+	q45y+OmtpjSPm5kBmL6wg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1769775282; x=1769861682; bh=MzLLPN6YtozLhJs3xB3wFOAPKWaat9nk7UA
+	gnZhilC8=; b=d22heNOtVuaN9zz5Kcf6PBqhvKzIJDVmfY1nOF4sFd2ok41E4YP
+	ZF3W2vPd5Uut9nsipZKHH2z1vMbiPnkt0V5u2SPpis1JrU3hKWnPpLjS91F+rCEy
+	7jUKofKA3NOoTcK+EEXTOkFK50cjoeTmoOrIbNxG4URx3+Vuto8uph3gDoRStCTN
+	Tz/POQT32aPVBfj7pn69ZTy2MfEXwjF1+rFsQfH4IxiaQv1nYrqh7A/HI3GKvuk+
+	XPkL+tTMaIlxPxd0bJeVL7OkXehWGBBXviTij/kZQ4NZwwg2Ifznt6/JfeaD4rWG
+	aekqRf1QFjLgJ+K8Hfh6DYWDpBVrAFgh4eg==
+X-ME-Sender: <xms:saB8afrjgaA4k2aJHc01oGS0jbj8JQSeZRWWstGnCV9obhzU_fqbIg>
+    <xme:saB8adWgXp6DPre5qo4wPJhyHJCK4QSl1BLYrz2guy8TN4ybQtviiWXWP5rr_v298
+    zdo6W8OO2Nm4skDid_13gdhYhIE0MYfZxCOGf740zTLtSyXWu6r2l4>
+X-ME-Received: <xmr:saB8aU0mnTSMoOaUb-TYCsDA2151iJBIYL2MGn7BXD5s7hcjbnPgyMV268C7>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeltdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
+    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
+    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
+    hnrgdrohhrghdrrghupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtph
+    htthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggr
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtoh
+    hmpdhrtghpthhtoheptghhihgrtghhrghnghifrghnghesghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:saB8aUTEztxgg61w-RY8AHt5t5AobuPs8yw4566a-MNbFfRBPHylfg>
+    <xmx:saB8aQQxec6VpmbtlBYu2QZx9ZOrM19W7rRzjcawqAG9t12RFCPxYw>
+    <xmx:saB8adW1cRHDV4VcKasW8fbP2PdFAr3-btZlBECubFqMkOID30AeMw>
+    <xmx:saB8aSJdn89iRB8sNCND8brrTda5v5d9J4NXVlO8OVf6-87j8CzL2Q>
+    <xmx:sqB8aZ91oPffQgNBVDOQwtJGFlPKGv4u2g8tMCDPoq06oIQoXIXDxi_0>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 30 Jan 2026 07:14:40 -0500 (EST)
+Date: Fri, 30 Jan 2026 13:14:39 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH ipsec-next v5 7/8] xfrm: add error messages to state
+ migration
+Message-ID: <aXygrzQrsQxGdDG5@krikkit>
+References: <cover.1769509130.git.antony.antony@secunet.com>
+ <dd1d5b341323d6e0f93057c214adf4fc51c3cbd1.1769509131.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com>
-In-Reply-To: <CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 30 Jan 2026 13:00:52 +0100
-X-Gm-Features: AZwV_Qg5wvn7xde5VVnxU95HF-y-lX10m7yb3gH2CXSHB4-WuKWtvMlYRHbwT3c
-Message-ID: <CANn89iJxmiqryxLAXiV9z4uTaCzR7XZns32MGSLOykC2zocW_Q@mail.gmail.com>
-Subject: Re: [PATCH net] ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()
-To: Hirokazu MORIKAWA <morikw2@gmail.com>
-Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <dd1d5b341323d6e0f93057c214adf4fc51c3cbd1.1769509131.git.antony.antony@secunet.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255128-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255129-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: E5FEBBA4E7
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:email]
+X-Rspamd-Queue-Id: A44DABA5E9
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 5:15=E2=80=AFAM Hirokazu MORIKAWA <morikw2@gmail.co=
-m> wrote:
->
-> [REGRESSION] ip6_tunnel: IPv4 traffic broken in MAP-E/DS-Lite since
-> commit df5ffde96693
->
-> Hi,
-> I am reporting a regression in the IPv6 tunneling stack (MAP-E and
-> DS-Lite) introduced in kernel 6.12.67.
->
-> [Description] After upgrading the kernel from 6.12.66 to 6.12.67 in
-> the OpenWrt snapshot, IPv4 packets can no longer be sent to the
-> external network via MAP-E or DS-Lite interfaces.
-> [Environment]
-> * Hardware: FriendlyElec NanoPi R6C
-> * OS: OpenWrt snapshot
-> * Kernel version: 6.12.67 (Broken), 6.12.66 (Working)
-> * Protocol: MAP-E and DS-Lite
-> [Culprit] By bisecting/reverting individual commits, I have identified
-> that the following commit is responsible for this issue:
-> "ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()" (Link to
-> the patch: https://lore.kernel.org/netdev/20260107163109.4188620-1-edumaz=
-et@google.com/)
-> Reverting this specific commit on top of kernel 6.12.67 restores
-> normal connectivity for both MAP-E and DS-Lite.
-> [Steps to reproduce]
-> 1. Set up a MAP-E or DS-Lite connection on kernel 6.12.67.
-> 2. Attempt to send IPv4 traffic (e.g., ping 8.8.8.8).
-> 3. The packets fail to reach the destination.
+2026-01-27, 11:43:42 +0100, Antony Antony wrote:
+> Add descriptive(extack) error messages for all error paths
+> in state migration. This improves diagnostics by
+> providing clear feedback when migration fails.
+> 
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> ---
+> v4->v5: - added this patch
+> ---
+>  net/xfrm/xfrm_state.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 88a362e46972..2e03871ae872 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -2129,15 +2129,21 @@ struct xfrm_state *xfrm_state_migrate_create(struct xfrm_state *x,
+>  	struct xfrm_state *xc;
+> 
+>  	xc = xfrm_state_clone_and_setup(x, encap, m);
+> -	if (!xc)
+> +	if (!xc) {
+> +		NL_SET_ERR_MSG(extack, "Failed to clone and setup state");
 
-Thanks for the report.
+When xfrm_state_clone_and_setup fails it's because some allocation
+failed and the user won't be able to do much about this, right? I
+don't feel extack in those situations is super helpful.
 
-Can you provide detailed instructions ?
+>  		return NULL;
+> +	}
+> 
+> -	if (xfrm_init_state(xc) < 0)
+> +	if (xfrm_init_state(xc) < 0) {
+> +		NL_SET_ERR_MSG(extack, "Failed to initialize migrated state");
 
-Apparently none of our selftests caught the issue, it would be great to add=
- one.
+xfrm_init_state itself doesn't handle extack, but it's just a wrapper
+around functions that do. Maybe better to make xfrm_init_state
+propagate extack?
 
-I have no idea what MAP-E or DS-Lite are.
+>  		goto error;
+> +	}
+> 
+>  	/* configure the hardware if offload is requested */
+> -	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
+> +	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack)) {
+> +		NL_SET_ERR_MSG(extack, "Failed to initialize state offload");
+
+We already set an extack in xfrm_dev_state_add, this chunk should be
+dropped to avoid overwriting the more specific info we got.
+
+>  		goto error;
+> +	}
+> 
+>  	return xc;
+>  error:
+> @@ -2161,6 +2167,7 @@ int xfrm_state_migrate_install(const struct xfrm_state *x,
+>  		xfrm_state_insert(xc);
+>  	} else {
+>  		if (xfrm_state_add(xc) < 0) {
+> +			NL_SET_ERR_MSG(extack, "Failed to add migrated state");
+
+Not a strong objection, but this case would be the EEXIST situation
+from xfrm_state_add, and there's not much the user can do about this?
+
+>  			if (xuo)
+>  				xfrm_dev_state_delete(xc);
+>  			xc->km.state = XFRM_STATE_DEAD;
+
+-- 
+Sabrina
 
