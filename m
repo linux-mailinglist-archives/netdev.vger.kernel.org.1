@@ -1,156 +1,134 @@
-Return-Path: <netdev+bounces-255073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IF2lLSNzfGmAMwIAu9opvQ
-	(envelope-from <netdev+bounces-255073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:00:19 +0100
+	id uKLzOJJzfGmAMwIAu9opvQ
+	(envelope-from <netdev+bounces-255074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:02:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBFBEB8ADC
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:00:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E82B8AEC
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 411EB3001CF9
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:00:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD848300D45D
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42617313276;
-	Fri, 30 Jan 2026 09:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D09314D3D;
+	Fri, 30 Jan 2026 09:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwzOYDB/"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="nY/WOovL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A1F2F90D8
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 09:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E9B327210;
+	Fri, 30 Jan 2026 09:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769763615; cv=none; b=DtGDjsgsl/7AfWDptjyHUfvIUQU3cQCNl0m1WGJIDAv1lePPV89zUbhZSrZNjIR+8IdSqeV/S0y8BQJ8DI0HELEK9w4iS5hThbWxOEe1lWUnLltOIBx1xnr1oOxx0QfefgjLv0wfNyQAwjaGMwRaOlNzji980MvFkW5nqBFxvHI=
+	t=1769763703; cv=none; b=hOxX5FW4CWI+eAcyCSz6PmeirDZkjzH3prSGfJ07KRcW+Lr90I6RF3zpmJiM8eZ03GRfkFGuJ80zlx56r77BfRNFnunBdK8fbtR0O71WtlAPu14cAgJUY2WanaKajspm6MQgKLk8ndgCKH37JzTeOxrimhn3G0QbMNeYKHw714k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769763615; c=relaxed/simple;
-	bh=ePduo64u11u6v+wbzkSP+xdsaIltB4wd0DxeqhPmXxQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UjCoTj0/2gZbyHzufg4yi2cDLl4u0tjd6rK9/nTAoZ8m7RATSoBv7/3gig1dD6ndRIM702mRotkzG8WJOYJi/LbpZCWXbwRXY71GYjJruHlNsRvi9ZPV4+nLf9XrUY6A/D8wvCdTyxn+lDXel2iBtxnC1pSQ5z5H+DRmd13R1QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VwzOYDB/; arc=none smtp.client-ip=209.85.221.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-432dee2b55fso72558f8f.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 01:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769763612; x=1770368412; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uiIvi824zY9wmJCmgI0bFR+9pFwwPhfm8LVUcK3cTY4=;
-        b=VwzOYDB/390lyTIJnfDCLmfRvLPEmbzKx9eYn5YnAS5JDfq5y5N2wnu8kEpl09ROyI
-         YmKuegq8lT9NBZI8NmMMyNab1ymg9S7WNeGRfD+P2n+NkRSacmBgNzR8G1jQlcR0UXLF
-         QqERmT2DJ0e38gd+Rj9ErgVhv6RrJlHwDYo/5lgXVkShwxNusOVzfjIDmG3uD1cc8m/W
-         9r2NRbDazH8JpTd9PgotOs6wgms01W6Mknky8KBURKPRiOw0hkx7wVhl4IkYRz32rPvr
-         6XGApCWzavSivSng2OyzAj/4mCEl3W2rrY/2psLiY/fYrKlMlNDIJ1ast+LshhbrSBLf
-         ISDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769763612; x=1770368412;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uiIvi824zY9wmJCmgI0bFR+9pFwwPhfm8LVUcK3cTY4=;
-        b=reMlG6hDA5LMx6gHARV1DXlNHghNbaKSANP/g65794W+hNCsj4cDUCOS6otIZelcAn
-         jSnK9QByYfVAVRnw92QynM/HXuqD1eu2h91X4EQgcbvqmam1iRo3s6a1wkoysGMhi4+H
-         wcSAl7AssnOUyd2IXmJTjeb5GRXjJAbPlCDc/e5mmo4OwDTmQyjqLahIeRM5CQDQL+H8
-         76+GrCVT/ABtOGqWeqx0Pmxhe5+L1jStEf/fdtSRDLnCGKr2JydHWlq/zDPJp0aWREbM
-         QHymXG2DamJBZl7GukTrLnldqOS8PVPqo2jXkShIM7P9Nhm9j4UL4JLw48Dm2Bo6Xn58
-         2lAw==
-X-Gm-Message-State: AOJu0YxWJziMjfX2a9Ur9dySaGXlEeLJx650EIUYKvS3gqrCqoMclJLm
-	m+t4xAi0qL3HRC1s/Zznp4GPDH0JvWOiJFGZ2U7xoKu80JmIRFbSkqT+
-X-Gm-Gg: AZuq6aKKnzUop+TWhh90QFW++0QdldpcEkxv2zAZQ3DLKCbH8esmVfPin41n8rH5+/C
-	78aQy/H0iKgSGYcwmXAroV3ZKkK/Zwh5MlGnI9BVITzms1jtxsiOm2UMfjMbbsrUng1wxO/LASs
-	9wO9do3z+X+GVP5GlGZlF5DEoPh/ng7GcdhGUoHxKrZV0O72NIVLzlK3EdBVZJz6JGhXI62aq7I
-	UGLIzmcTtmZQswVgA/viBnG+cRrYZySDOT3YANbbYoleFCugtPvJQYku1j2BbFQJIAqP4Fqf1G5
-	jENZniVFlkBFzxU2YO9eCwUj75e9Ea7lYEGnWK1MqJEP3dd4T8D0AWSQzFhmAk33yCZMjx5pkzF
-	qTaboHwmGIBz6qPkoDu9mjbsLksLz2kmqD5vbDWz1atzfXVaZAYBeU1tROpegtpLV1l2Y2Bbe37
-	3IZNX1rYgR
-X-Received: by 2002:a05:6000:4381:b0:435:db94:1934 with SMTP id ffacd0b85a97d-435f3ab009dmr1747822f8f.5.1769763611702;
-        Fri, 30 Jan 2026 01:00:11 -0800 (PST)
-Received: from localhost ([104.28.225.185])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e131cf16sm21898981f8f.22.2026.01.30.01.00.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jan 2026 01:00:11 -0800 (PST)
-Message-ID: <727b7f08-828b-449a-a89d-005ad1f50b32@gmail.com>
-Date: Fri, 30 Jan 2026 09:57:41 +0100
+	s=arc-20240116; t=1769763703; c=relaxed/simple;
+	bh=SGn6rcjYmhqxxcVgKcE5FUgMgb0AGIyJmqyFW//I6dM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jcx3g0XUqnOw3WWbUe2kVLcPmTfOQlognuFvQ7gHYan4SiEHq5MLLcYwbGa8f1KtYlW+2XGfWRN04lb0V0CPb+RrKHFAeL1ksQnqggd1wedF4XQqD4qNMDbLB5kSugpuLlt3UPwB2Bt48/ruUKDxSA4Kqi1vYibivI6urM1KKTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=nY/WOovL; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=dg1aAyK0fD1irzZQrfqcf/pxsLPYajOmV9tpjiRFf7c=; b=nY/WOovLAZBdvNGpSKTZUwZ+1S
+	cjDtG43+YSkjT/IwA1Jn2gdEY2XAIhsbGgBeSej8AwGXuOWBDxOpJLSl9KXNvfSES9UhSUtXU3ZHn
+	oypoUahFG6LubCKx+S/l/wcqV8vNAZgZHyS+oRMKKRkfOTfMcwRLRadbMl6rPLHdbPegODpBwaKBy
+	twWDlnzkxLZV+ID2K5vCxsdODRrfZvmIsXaFChhu/567DE+SrnQnHr7AJvDh7Ot192145v4aDinzk
+	Ah9wnn5rhSEEuv4k6nIIc5qBz5sUnJY45eyv76qh+Jh1CWgi1zquYynZJL8GZuto2x1/g0TaF/O3h
+	+RGVAldg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vlkNS-001bOC-CF; Fri, 30 Jan 2026 09:01:18 +0000
+Date: Fri, 30 Jan 2026 01:01:11 -0800
+From: Breno Leitao <leitao@debian.org>
+To: John Ogness <john.ogness@linutronix.de>, pmladek@suse.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, mpdesouza@suse.com, 
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v5 1/4] printk: Add execution context (task
+ name/CPU) to printk_info
+Message-ID: <aXxy7usBz1-TTkVB@gmail.com>
+References: <20260128-nbcon-v5-0-93b4ddbc181a@debian.org>
+ <20260128-nbcon-v5-1-93b4ddbc181a@debian.org>
+ <87ikcllrxz.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/3] net: gso: fix MTU validation of BIG TCP
-To: Alice Mikityanska <alice.kernel@fastmail.im>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Alice Mikityanska <alice@isovalent.com>
-References: <20260106095243.15105-1-maklimek97@gmail.com>
- <20260113214232.129356-1-alice.kernel@fastmail.im>
-Content-Language: en-US
-From: Mariusz Klimek <maklimek97@gmail.com>
-In-Reply-To: <20260113214232.129356-1-alice.kernel@fastmail.im>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ikcllrxz.fsf@jogness.linutronix.de>
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255073-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[fastmail.im];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[debian.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maklimek97@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-255074-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.com,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: DBFBEB8ADC
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:email]
+X-Rspamd-Queue-Id: 46E82B8AEC
 X-Rspamd-Action: no action
 
-On 1/13/26 22:42, Alice Mikityanska wrote:
-> On Tue, 06 Jan 2026 at 10:52:40 +0100, Mariusz Klimek wrote:
->> This series fixes the MTU validation of BIG TCP jumbograms and removes the
->> existing IP6SKB_FAKEJUMBO work-around that only fixes the issue in one
->> location.
+On Wed, Jan 28, 2026 at 03:48:16PM +0106, John Ogness wrote:
+> On 2026-01-28, Breno Leitao <leitao@debian.org> wrote:
+> > Extend struct printk_info to include the task name, pid, and CPU
+> > number where printk messages originate. This information is captured
+> > at vprintk_store() time and propagated through printk_message to
+> > nbcon_write_context, making it available to nbcon console drivers.
+> >
+> > This is useful for consoles like netconsole that want to include
+> > execution context in their output, allowing correlation of messages
+> > with specific tasks and CPUs regardless of where the console driver
+> > actually runs.
+> >
+> > The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+> > automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+> > the helper functions compile to no-ops with no overhead.
+> >
+> > Suggested-by: John Ogness <john.ogness@linutronix.de>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > Signed-off-by: Petr Mladek <pmladek@suse.com>
 > 
-> My series removes IPv6 HBH in BIG TCP entirely:
-> 
-> https://lore.kernel.org/netdev/20260113212655.116122-1-alice.kernel@fastmail.im/T/
-> 
-> I believe, it makes this fix no longer necessary.
-> 
+> Reviewed-by: John Ogness <john.ogness@linutronix.de>
 
-You're right, your patch also fixes this issue by removing HBH headers
-altogether. Thanks for bringing this up :)
-
-Heads up: I'm working on another patch series that uses some of the code
-you're removing...
-
-Paolo: should we still merge this or should we just wait for Alice's patch to
-be accepted? Also, should I already submit my next patch series or should I
-wait until we're finished with this one?
-
--- 
-Mariusz K.
+Thank you for the review. To confirm, it is acceptable to queue this for
+the next netdev version, isn't it?
 
