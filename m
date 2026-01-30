@@ -1,234 +1,311 @@
-Return-Path: <netdev+bounces-255046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKB8HgFhfGl0MAIAu9opvQ
-	(envelope-from <netdev+bounces-255046-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:42:57 +0100
+	id uCAJMo1gfGl0MAIAu9opvQ
+	(envelope-from <netdev+bounces-255043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:41:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC0F0B7FDF
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:42:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9618CB7F99
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6B273033898
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:41:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28B633002F6B
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A36315D35;
-	Fri, 30 Jan 2026 07:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD0D3126B4;
+	Fri, 30 Jan 2026 07:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jfMgV1Pl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XJZFAYpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A2A3128A2;
-	Fri, 30 Jan 2026 07:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769758909; cv=none; b=Vf6ZgfDZnteVZATDDo8QZgsufdOmjwBQ8T3UMZ/4sCKsxKtYY67t69oV1GrGhPGkTPhK70YCKEzKi1TOgtjuJCT5ZcbbVdc7VTaVHp9EY2cuihr0lGoYpQBjzPHIbhQJx6+738xHHM3w1+OySexgdE6n2txmP1Zo3kfQOPu0+Ac=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769758909; c=relaxed/simple;
-	bh=cXi0KRzZoV34WeDhHHBqcZR1/JcRSeqxXpA0StBk5vM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0T5ARg2jMdnT+Tjc6NXNRWFWAvqF08JWRK8vPMQyx2ivOcZUVMer8k/LHfM+uQfkdiB/jDyd4UlRTkOk7WNa3w97Cfzj70aw0s/7P7JKu9bFqg/YVV7Paw1gYBvFhW0b7ZyHIdkNXFir96yb9h4d2m7oVFbJFQ9zkni5EEHoaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jfMgV1Pl; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCC427281D;
+	Fri, 30 Jan 2026 07:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769758856; cv=fail; b=omoZWCKXBPc1IDol26pZHp8HI7A9Ogd4h21D5bvn5l9fy9S4C65WxI3h1fEbO7owaKC7d6ROar9znudBfx72Kpc5dHru9SYjdMVwGZf3DSgK/Hxy5vzndTg6gn11Nm3RIRL1hBLNYjKtK+iUoVFicZnHW2dh0Num3kDyUyZ3JvQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769758856; c=relaxed/simple;
+	bh=dTuKRI/qN301nuOgFbh/63m/aQWfM5t8thAKwbPADo8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bgq3MoL5fyt8SkhhKKC40iBf+5OEp+AHaYnEV/v4p9jpGNItdRaMuqzO514heabiCMyOpGwdkn7AYKDGB6lnH+AcDcnamqz15wqopGs7iqpR99uhYxjGmrzk5FpVYEg21R/epD/X2Yv2dyFm/rdwsMzQuz44azF9Y3Stxleq9nU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XJZFAYpw; arc=fail smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769758907; x=1801294907;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cXi0KRzZoV34WeDhHHBqcZR1/JcRSeqxXpA0StBk5vM=;
-  b=jfMgV1Pleth1hGdOzquRHRKyrsnGEgTUfTHisBmSASa/XJR8P0zY5kDo
-   4RhMu0f6I9ERTndhlcXB7wzopsmIIv+Mea12fA9cplDCN8vxwSVIKRJL2
-   QnUn196t4oOBSuA7ZC8lCYP5NnL5M2WvqUpbFioCdt0V3lwgQIl8ei7CW
-   hlGFfGH6mBCDMMjUhgLAtY0HQrN5gBK3vlj5o3cQjXKaYma0LA6Aw5h3R
-   k4TFr7h3r8ftnFVaNCr9k6IWwzdMdSi2adwD1b6NMhHvwI9DzZa+cPBZk
-   Q6YCHmrpbbWWO522Pre4v3V1XVVKYo0I/IldNg3p+OGRfivOfjgBfOnbo
-   A==;
-X-CSE-ConnectionGUID: 3apuhws5R/iaOsyrdCuiZg==
-X-CSE-MsgGUID: XS7I4GrZRRuZjn+NhcV6wA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="82378407"
+  t=1769758854; x=1801294854;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=dTuKRI/qN301nuOgFbh/63m/aQWfM5t8thAKwbPADo8=;
+  b=XJZFAYpwG76DBOZZHg+MLpbtoqw0w8ZmsXTL432aEr9CC5UhRbuV3FlT
+   JiLY+cMEYp4E1oe1ACnaIE+CyK58Sr/Jc+aO5+GhbrZARvVfx8Q5vBGOz
+   7UkVfPHC1ogfALhyCiz32HOX1GEJeAK2JhJEpYFk0Mo52lV7Lepq+EW2J
+   iL8pH1n79epntd+BVKVljP5DOGoNGjp3Gy6j8fGlUioFi+50j/AqUomzn
+   /e6hY3WvdXEN1ymP4viDgJzo8z8FPFuXrYcJvEOejZZjUEVeLOk0FpZ8C
+   tJYls26DNHKgD3cxchYFc7FSNnHtsfeZz/cbvX9roR1vfRisSNSxAQUgY
+   w==;
+X-CSE-ConnectionGUID: Be+hdXgSTEqcoAj1dRtRFw==
+X-CSE-MsgGUID: SjpaucaKShSqrW9Pr+ydZw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="81323356"
 X-IronPort-AV: E=Sophos;i="6.21,262,1763452800"; 
-   d="scan'208";a="82378407"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 23:41:46 -0800
-X-CSE-ConnectionGUID: KMnMedBOSHyr8E/b7Ob4jQ==
-X-CSE-MsgGUID: wLknmg+BTlSWpoyN9Da0yw==
+   d="scan'208";a="81323356"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 23:40:54 -0800
+X-CSE-ConnectionGUID: eIfmX2noT5eCeqVc3ZyG0A==
+X-CSE-MsgGUID: Kl2BpxkkRaqOCf3n1tTpPA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,262,1763452800"; 
-   d="scan'208";a="246411346"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 29 Jan 2026 23:41:40 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vlj8L-00000000cKo-1bmS;
-	Fri, 30 Jan 2026 07:41:37 +0000
-Date: Fri, 30 Jan 2026 15:40:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v10 4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <202601301504.2pd3tNrg-lkp@intel.com>
-References: <281fd7e777b51849fac9ef5191679586cc2a1b54.1769731630.git.daniel@makrotopia.org>
+   d="scan'208";a="240049953"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 23:40:53 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 29 Jan 2026 23:40:52 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Thu, 29 Jan 2026 23:40:52 -0800
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.9) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 29 Jan 2026 23:40:52 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BrLEs5rRT2tPAVnGWIDGXkxTWb24VyMSwiteYa4mWYN5ag3QCzhdZeyNf6e2ogecT1qQ7/GE/7tGU2c6ROccwPD8xZyzYPQhJaGlAJjhuGjNnHdqUZLxVMCvF+YhpnS9/rD0yWnfWnbxYO7/vu+HGiVX0rmuWffE0F4y9Ek/2GueEDUMBTZ5co+YX4+i47Y0DYHfLJoQhf7uk6fZ3UUiEaQEr18Q96HSW2Q5705re1pcKgraS5cU3/RKeacW9p/klCtiQ9RW8CD8GdhpkiyXkpjGg09ViL6PfaIozvcByQV7XA377BtXnbZU9F6+9tB0efsLd4qnzYCbKlXxsU6NEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AL1fhz8akFh+Y6SaLCBMZ1UszF4RRwfIuS3jGY7RXpw=;
+ b=DT6dAlaTzb/OCHwndAXXo/KgJpx5YqrjJ4d4N645yM47pCA0ICau2KveF0CtgCN9Q5kfxgb6awh1JqVq7jp6LjRB4d2NDuBiNpxoKWHj/k6bu9PZIBdv/f/hrT7I/YddT+ERyxgYEu0hp/lkyvwIuBPRvsGnh6LneHQUWKpJNQTkiHGjIRbZ07l8pPkUhhBFVF/Rn0yQ5yO0GGOxDVFztPfg7OHXBoiW7yp+bIQY1D3bS3vLaUXJvSoUGPF/aosiprn/Xg+o3rfLiXeKrs0rlKfeg/hOvOKcKWAxKEhIRwQ6wd9MJiF95eabS6nkx8je4PoxXHHe68x1txhMWQoFdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by IA3PR11MB9110.namprd11.prod.outlook.com (2603:10b6:208:576::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Fri, 30 Jan
+ 2026 07:40:49 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9542.010; Fri, 30 Jan 2026
+ 07:40:49 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Oros, Petr" <poros@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Vecera, Ivan" <ivecera@redhat.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Richard Cochran <richardcochran@gmail.com>,
+	Eric Dumazet <edumazet@google.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: RE: [Intel-wired-lan] [PATCH net] iavf: fix PTP use-after-free during
+ reset
+Thread-Topic: [Intel-wired-lan] [PATCH net] iavf: fix PTP use-after-free
+ during reset
+Thread-Index: AQHckQXFHGAflyesJE2zHtlyWD0ZIbVqVWOw
+Date: Fri, 30 Jan 2026 07:40:49 +0000
+Message-ID: <IA3PR11MB8986D77869E75AA14C8A793AE59FA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260129095723.7269-1-poros@redhat.com>
+In-Reply-To: <20260129095723.7269-1-poros@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA3PR11MB9110:EE_
+x-ms-office365-filtering-correlation-id: e32e9be8-139c-4327-d377-08de5fd2e339
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?AB5/q+jeE0JtVU2yNnxY/wKXx1LaaHzFLlq/SD2E/EYz3oljcNLNILnhhR9b?=
+ =?us-ascii?Q?TYfYh+prg54H9amMx0OnnBaf0ouWTfv5qHC60JBR67U9Nlnlm23IkfmvftI2?=
+ =?us-ascii?Q?v/ggp2ZHkc9JOiRCKMS2m26cWg6N3/jjEjLJHeYhsYmEKptG3wV62ZYxmLxh?=
+ =?us-ascii?Q?VjIw3pmyHOWMekMuphO5Wys56qFlPDRnXRgT1w1DdUoYE9SMmBRNGl23uPSj?=
+ =?us-ascii?Q?WH39higqIQAKmMh6F/BN7OJiYcV3hL70OyMZLB1/rQCuY72phvs46adA2B5C?=
+ =?us-ascii?Q?LxgjkTwCecROoIT/CfqvG2cx5IlK5gE4rGpZgT4pulyUXS4oI24eybFa6UzQ?=
+ =?us-ascii?Q?MXZlJegt6mM790mnLgQFY+Kdvje8UGLtKXI2bthm6KuzHFZPAeWmMnujxOYP?=
+ =?us-ascii?Q?jBJ/146FknKULSYahQjX/kNvQ4Ep90H1ZuTRlKquZyGWyZs4u0hUb2kQQUru?=
+ =?us-ascii?Q?9WLZsmDIYHrxaoeZS4jEkkQtDStMnhYnQKqNfTHEwOgo5ZWY0SBM24wAkDxs?=
+ =?us-ascii?Q?ceQFvSNN+2OXjlXmGF+l4/Pt9w+SefApMy1OPdXWA/UQjfG4lHymQiW8dPJ4?=
+ =?us-ascii?Q?TZe+E+Z4hhpQvxx4dPuRCiSwoKdlUQpP3VjRm1vetIgOThE12gqCNEQgaRvj?=
+ =?us-ascii?Q?eTiZmj6JKeJqGFy+/LpN/poPOTVB9MYoYRVjlkM6NBLWaEqilEHALNAwBdWJ?=
+ =?us-ascii?Q?2gNayyv0Xh7gyfW8kfAifxH0yIiTxe8Zopwp3gDf/GbUOmbM8kSeXp/p6d8e?=
+ =?us-ascii?Q?7zOUkLkQGVOlBJZvCf6JpMyY41ZbWnVkedlbfBu4pl8qWLiOddQvwIuouQfH?=
+ =?us-ascii?Q?dIw5b5vx+IMPUMgjmOE9nhPqSpChnbeNrQoAlOx1LRW/vjXGerEYE/A9Ca3T?=
+ =?us-ascii?Q?bl/xES6VlcV4osWRE991gFneAZeu4lY3WZs1rWhb8bnrLRjwOYwxaZkAGZrl?=
+ =?us-ascii?Q?IsbNQbpV+ysdf8HJW09wRoYQ4MvF/T11hG4T8ZKwyzRc62o4zgWNh9R6BJTh?=
+ =?us-ascii?Q?1FWyshRGvaBUoOVfzY0iw0+Ry7D+mSF4x6j5HonMbPV2spJ+kmeCthRf2qj6?=
+ =?us-ascii?Q?B2YEDVWSJoRfDGAV7aS9RI3ahivwHvo9YNxI2OTy45xicxQTqIuTVd6hnnd9?=
+ =?us-ascii?Q?5huJhCuDid3sjAhdrYzCecVB/cycITcL8ifDWwDA8HtCrLKzsSTTOCz54gj6?=
+ =?us-ascii?Q?TqvdSDwV2RYU2kUPjzS8lQogTXYxhQF5ZME4td4mfUy7308C0rPRT8isi9Wm?=
+ =?us-ascii?Q?acaLpsIYqw5MuK1lCvwwH/z1N4Eoo9p9kOtSX85crmzkYcfWDdK1pykV1R5N?=
+ =?us-ascii?Q?0oqxkAz20ihPlNOkqVZde+qv4VMmdjyQgnhc9EgWQK0lhw2hKvlOMEZLBC2B?=
+ =?us-ascii?Q?TlxAPjAD8yeIIMV09hJIiy84n6U5BTaq4g3t54KWLAJliWXwApvVKKHw+H+7?=
+ =?us-ascii?Q?RYYRS2anuz4v0mbO6YN3oehG9eI0aoboSgi4zzgwHpi0IEXZeJZyweysoDgI?=
+ =?us-ascii?Q?zRkaFKlQtUgDCUCektVcoDht0XdPt6ye8KxrIrqXTW8wU8k0e/dXT8LvOy19?=
+ =?us-ascii?Q?wqCMjBCXn1ZIRXnK+Ju25O5QYfrqacF7WRCE2/5zfHyiNZnXdLMbCWWCzSqZ?=
+ =?us-ascii?Q?vEdb+ZooL17vebeOFwmWuDY=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NNVN2ZY2UOVdla6mnfKT2Kyu3qGuHoCky+TX7M17K69zRctA9AwIjk4S/zye?=
+ =?us-ascii?Q?GOSZENcuEGP47faYSnoV7oaQnFb3WuHttLFkjJ0VkXBKThGtr7Smp1QXh1rP?=
+ =?us-ascii?Q?FTBhOQAfkiEqxdc2YEPr+SBFR/C78rZ14+4z6+zPYMHoqigCX+JXyoUmlYaO?=
+ =?us-ascii?Q?URmg/CzLq4Pzq2ZUlwl4d7YFhd50lCE84zSoyamlq8CslxYrfayxObkJRFq/?=
+ =?us-ascii?Q?gA7w/S0S8kphMH8HJ5unsX8dm8XZI2fFeXwnKbZQdrLLPox8hWRi2qg4B9Gd?=
+ =?us-ascii?Q?SzSwiTneXbQgTmRO0G9d59OR0DMGnSXiJGbsPzPMJUvOJ/VWJxgSvoWYFwHw?=
+ =?us-ascii?Q?N/PVJJmqc9Al4RgOqSvRI2sd1iaGfSZYEwxcvmQqHhLtdFvfY8cXXjWMBNIX?=
+ =?us-ascii?Q?8OHcx3z0nFc8qwkzhuWEFT7fRr4SOwdLbPXiJcKZMGLXdqq2ugJ+YWQGmvMu?=
+ =?us-ascii?Q?dB5MiFifsX6XEpHRUE0cN3G4TFDZiOzwElme/FhUbwq9tj1PDmS/KBPXfEqR?=
+ =?us-ascii?Q?PnQw5hTBE/I0L1kbZBELuPQ83oYMvEaajgA0WtrlAjfsVSWa3LuiFSbtBxkS?=
+ =?us-ascii?Q?dlMz0Q4gJAykJbSsxcKOFvGXNmh5NkavW3WOS1doBvTCsKUTTW12Tj+PyfwH?=
+ =?us-ascii?Q?hP5uHbuCEWg0VUHPgOymB0RljkQNJTgPhjNStWZKaaNGhXQYYCbf0i+LqEdl?=
+ =?us-ascii?Q?xJOqaspkRN703nHlvcbDry4xMKpdQIIGDrpPGy1akqRGkm0AtZcVGbsCZqYL?=
+ =?us-ascii?Q?UNq8d27HQPpzYtSJ+Tuy4YHT2uFek5ko65u59SNMyfFgx0ML+DUMUnfDTt64?=
+ =?us-ascii?Q?/DZi1myM+1qwkjPY+V7KQaLiHBx9RM/T4hFtvwrhl+p0YcY+FNJ4fvR5gvT7?=
+ =?us-ascii?Q?PT0vcWM/DRNqZfciDS2Wxpi8pEBGAUSZI/JvX+oMohXiLX+B+C46OFZZOwDy?=
+ =?us-ascii?Q?pIP3nIkja/Z/iBxpP7lkRX88FKnrqtoydaxIGJbLRg8QZoCw+QT6OnVOffyT?=
+ =?us-ascii?Q?XveiCJmcw8uEBs78wdXOrofX9btC6fZ9S5bHXUH0rWQra0F4ZJfLCrswxirY?=
+ =?us-ascii?Q?bKaiJJ1JoAPj55HkeZtFYp/NV2A0v3gMjyTICi5/hc5sd0VFgSl/IMJXK8jV?=
+ =?us-ascii?Q?5cb+bHSIWKXutBwejDMlXS1EAbSnbV2IB1pEyJTWe/hmF6s0RE0uXF2kRF62?=
+ =?us-ascii?Q?Ccvt5oFepP9zkSyCzn+B2xNectUnLu3N1e3x3/7BZJiSp6t9TEeVgyyq2MdQ?=
+ =?us-ascii?Q?orNomLd5nNPZ3c9myfdCrP154HPJri4KIofJGURDxls0lQFQt2+w4tyT2YaA?=
+ =?us-ascii?Q?cWbbr8k5Gip9w6e/fA2VuGPstmUisUqTf8lohLygXMcVrZGlBhnRNmU0QEoV?=
+ =?us-ascii?Q?N6nvzZhXI4H0jQ8vxfNBlEgfU/lrSVBJw7bAXQOpQG6qY797Am6QNM8wypMv?=
+ =?us-ascii?Q?azIdCKJUGfpfcVsXZAGvZuUYaubtuitkQZiNxIoehutedAhfraR/Y6rJFoAa?=
+ =?us-ascii?Q?SkPA+sQhwS4qSe0vzTacftTgAY3IXGg8kpDULzqPGh5sVxT7HYXtGw4lFJ/f?=
+ =?us-ascii?Q?Eg6BldFsZ651fxKLTzhtM5HPFanpyyGFrgNy+OX/HDi40fb7zdRR/yMb/tRx?=
+ =?us-ascii?Q?ROi5N8lzVq8RjI4lhGoz0WU++gHzlR1T2jR6U6ihn356JXiaKqXrv8YeZTnF?=
+ =?us-ascii?Q?69uiD6JJRGU169R2s1+/PItYcbgpAC9sieJ/Q0loByXcgZDTVzMI3/CSkqjX?=
+ =?us-ascii?Q?8ExtOIipzhCjvGeQrdL6tUltH3gqZjc=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <281fd7e777b51849fac9ef5191679586cc2a1b54.1769731630.git.daniel@makrotopia.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e32e9be8-139c-4327-d377-08de5fd2e339
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2026 07:40:49.2929
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: b/Og7flp5uT+uofbNoEhr8bkm5J+vUgm6kad2oyNsXSf8N+Cf5yRoQXDni1fFeN3boJrwUxMPIUG/c5KhKIU2v42oYoWPLfbmjN8BlGsif0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9110
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	TAGGED_FROM(0.00)[bounces-255046-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255043-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,intel.com,gmail.com,google.com,vger.kernel.org,lunn.ch,kernel.org,davemloft.net,lists.osuosl.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,intel.com:email,intel.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: DC0F0B7FDF
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 9618CB7F99
 X-Rspamd-Action: no action
 
-Hi Daniel,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/dt-bindings-net-dsa-add-MaxLinear-MxL862xx/20260130-085313
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/281fd7e777b51849fac9ef5191679586cc2a1b54.1769731630.git.daniel%40makrotopia.org
-patch subject: [PATCH net-next v10 4/4] net: dsa: add basic initial driver for MxL862xx switches
-config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20260130/202601301504.2pd3tNrg-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260130/202601301504.2pd3tNrg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601301504.2pd3tNrg-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/dsa/mxl862xx/mxl862xx.c: In function 'mxl862xx_port_setup':
->> drivers/net/dsa/mxl862xx/mxl862xx.c:331:32: error: passing argument 1 of 'dsa_port_is_unused' from incompatible pointer type [-Wincompatible-pointer-types]
-     331 |         if (dsa_port_is_unused(ds, port) ||
-         |                                ^~
-         |                                |
-         |                                struct dsa_switch *
-   In file included from drivers/net/dsa/mxl862xx/mxl862xx.c:16:
-   include/net/dsa.h:546:56: note: expected 'struct dsa_port *' but argument is of type 'struct dsa_switch *'
-     546 | static inline bool dsa_port_is_unused(struct dsa_port *dp)
-         |                                       ~~~~~~~~~~~~~~~~~^~
->> drivers/net/dsa/mxl862xx/mxl862xx.c:331:13: error: too many arguments to function 'dsa_port_is_unused'; expected 1, have 2
-     331 |         if (dsa_port_is_unused(ds, port) ||
-         |             ^~~~~~~~~~~~~~~~~~     ~~~~
-   include/net/dsa.h:546:20: note: declared here
-     546 | static inline bool dsa_port_is_unused(struct dsa_port *dp)
-         |                    ^~~~~~~~~~~~~~~~~~
->> drivers/net/dsa/mxl862xx/mxl862xx.c:332:29: error: passing argument 1 of 'dsa_port_is_dsa' from incompatible pointer type [-Wincompatible-pointer-types]
-     332 |             dsa_port_is_dsa(ds, port))
-         |                             ^~
-         |                             |
-         |                             struct dsa_switch *
-   include/net/dsa.h:531:53: note: expected 'struct dsa_port *' but argument is of type 'struct dsa_switch *'
-     531 | static inline bool dsa_port_is_dsa(struct dsa_port *port)
-         |                                    ~~~~~~~~~~~~~~~~~^~~~
->> drivers/net/dsa/mxl862xx/mxl862xx.c:332:13: error: too many arguments to function 'dsa_port_is_dsa'; expected 1, have 2
-     332 |             dsa_port_is_dsa(ds, port))
-         |             ^~~~~~~~~~~~~~~     ~~~~
-   include/net/dsa.h:531:20: note: declared here
-     531 | static inline bool dsa_port_is_dsa(struct dsa_port *port)
-         |                    ^~~~~~~~~~~~~~~
 
 
-vim +/dsa_port_is_unused +331 drivers/net/dsa/mxl862xx/mxl862xx.c
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Petr Oros
+> Sent: Thursday, January 29, 2026 10:57 AM
+> To: netdev@vger.kernel.org
+> Cc: Vecera, Ivan <ivecera@redhat.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Richard Cochran
+> <richardcochran@gmail.com>; Eric Dumazet <edumazet@google.com>; linux-
+> kernel@vger.kernel.org; Andrew Lunn <andrew+netdev@lunn.ch>; Nguyen,
+> Anthony L <anthony.l.nguyen@intel.com>; Simon Horman
+> <horms@kernel.org>; Mateusz Polchlopek <mateusz.polchlopek@intel.com>;
+> Keller, Jacob E <jacob.e.keller@intel.com>; Jakub Kicinski
+> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller
+> <davem@davemloft.net>; intel-wired-lan@lists.osuosl.org
+> Subject: [Intel-wired-lan] [PATCH net] iavf: fix PTP use-after-free
+> during reset
+>=20
+> Commit 7c01dbfc8a1c5f ("iavf: periodically cache PHC time") introduced
+> a worker to cache PHC time, but failed to stop it during reset or
+> disable.
+>=20
+> This creates a race condition where `iavf_reset_task()` or
+> `iavf_disable_vf()` free adapter resources (AQ) while the worker is
+> still running. If the worker triggers `iavf_queue_ptp_cmd()` during
+> teardown, it accesses freed memory/locks, leading to a crash.
+>=20
+> Fix this by calling `iavf_ptp_release()` before tearing down the
+> adapter.
+> This ensures `ptp_clock_unregister()` synchronously cancels the worker
+> and cleans up the chardev before the backing resources are destroyed.
+>=20
+> Fixes: 7c01dbfc8a1c5f ("iavf: periodically cache PHC time")
+> Signed-off-by: Petr Oros <poros@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 4b0fc8f354bc90..0dd58ce5a53ab1 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -3025,6 +3025,8 @@ static void iavf_disable_vf(struct iavf_adapter
+> *adapter)
+>=20
+>  	adapter->flags |=3D IAVF_FLAG_PF_COMMS_FAILED;
+>=20
+> +	iavf_ptp_release(adapter);
+> +
+>  	/* We don't use netif_running() because it may be true prior to
+>  	 * ndo_open() returning, so we can't assume it means all our
+> open
+>  	 * tasks have finished, since we're not holding the rtnl_lock
+> here.
+> @@ -3200,6 +3202,8 @@ static void iavf_reset_task(struct work_struct
+> *work)
+>  	iavf_change_state(adapter, __IAVF_RESETTING);
+>  	adapter->flags &=3D ~IAVF_FLAG_RESET_PENDING;
+>=20
+> +	iavf_ptp_release(adapter);
+> +
+>  	/* free the Tx/Rx rings and descriptors, might be better to
+> just
+>  	 * re-use them sometime in the future
+>  	 */
+> --
+> 2.52.0
 
-   317	
-   318	static int mxl862xx_port_setup(struct dsa_switch *ds, int port)
-   319	{
-   320		bool is_cpu_port = dsa_is_cpu_port(ds, port);
-   321		int ret;
-   322	
-   323		/* disable port and flush MAC entries */
-   324		ret = mxl862xx_port_state(ds, port, false);
-   325		if (ret)
-   326			return ret;
-   327	
-   328		mxl862xx_port_fast_age(ds, port);
-   329	
-   330		/* skip setup for unused and DSA ports */
- > 331		if (dsa_port_is_unused(ds, port) ||
- > 332		    dsa_port_is_dsa(ds, port))
-   333			return 0;
-   334	
-   335		/* configure tag protocol */
-   336		ret = mxl862xx_configure_sp_tag_proto(ds, port, is_cpu_port);
-   337		if (ret)
-   338			return ret;
-   339	
-   340		/* assign CTP port IDs */
-   341		ret = mxl862xx_configure_ctp_port(ds, port, port,
-   342						  is_cpu_port ? 32 - port : 1);
-   343		if (ret)
-   344			return ret;
-   345	
-   346		if (is_cpu_port)
-   347			/* assign user ports to CPU port bridge */
-   348			return mxl862xx_setup_cpu_bridge(ds, port);
-   349	
-   350		/* setup single-port bridge for user ports */
-   351		return mxl862xx_add_single_port_bridge(ds, port);
-   352	}
-   353	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
