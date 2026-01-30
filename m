@@ -1,217 +1,157 @@
-Return-Path: <netdev+bounces-255167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255168-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GMY8ITbFfGm+OgIAu9opvQ
-	(envelope-from <netdev+bounces-255167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:50:30 +0100
+	id SJoIAV7HfGnaOgIAu9opvQ
+	(envelope-from <netdev+bounces-255168-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:59:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB83ABBBE9
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:50:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3443BBD36
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:59:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0FC573002F61
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:50:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A2F30300DA44
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA26318ED1;
-	Fri, 30 Jan 2026 14:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C97A324B1C;
+	Fri, 30 Jan 2026 14:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WH5B80zX"
+	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="VK00dKWf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E072C11D7;
-	Fri, 30 Jan 2026 14:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769784624; cv=none; b=Ok2wTve3rMyO8vSJ4VKiQlNF2R477EiFYca1t7fRhct1bE/yRjr+ka9bUXbFfiZxzvKi82oLKROm/I+ZHTkDghjqSO0NZbwH4VGuYNUI90qmQFLVA5O4OmDTPOGJVzV9CtxrD3dyfuvivNKmlai+wvP0njrsutB2aGhHphM/gU4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769784624; c=relaxed/simple;
-	bh=HXujmcHAS9+iwTW6ICXOooCX0MlY74Azq227cCjStKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r4NpHNjDZSXry3n1aa5Dw5J2jt0wC+dZSKASt8LB1NmOM3RqThfLB5mZmMHHYFxIe3g9JZs97DubdG34DpLq9BQMwwJVcop3aiUlm6i98uIUzuwxVNwLa06KFygOAIGwsfT/taHU8RE0KbMetjuv0wK3/1MLqKqGCopshImk9iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WH5B80zX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LZzYYZ47MhM5DbXuBFYv+5+5v+vkghMIaO5mgHVitCI=; b=WH5B80zX3ZnL/qn/O8PYSUOAQF
-	/EGSfRNsE7jPycCz+dQZZzZe8SalMBbiZQXiHm4FltNSMewf03zVxDP/jFqYOUFGteKF3Ngv9ZlkX
-	iFPNODNPoWnURYUS0Vhowsvpmae3wTfe19CCBUl2nXKX2jr7kMwHDiX5sVud9TSAtW5MiGjMh10pG
-	76sp88yzPMDzxq3EWeO0W4PYsh00qKNcAxFD4gkSKRE7vAdrMWHXnzx+56maqPQhpm5ZlcDkkBM4I
-	TqTTE7+ISJl9mtxhtXHZeSenO5EvjqZcSafwi0aQu66BUUbABkXv3Dkd8xHMQK889/gg8cyKUkp/c
-	RVy6FFaQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35632)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vlpp4-000000001Cc-1afO;
-	Fri, 30 Jan 2026 14:50:10 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vlpp2-000000000b3-0oEH;
-	Fri, 30 Jan 2026 14:50:08 +0000
-Date: Fri, 30 Jan 2026 14:50:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Vincent Guittot <vincent.guittot@linaro.org>, neil.armstrong@linaro.org,
-	Simon Horman <horms@kernel.org>, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
-	p.zabel@pengutronix.de, ghennadi.procopciuc@nxp.com,
-	Ionut.Vicovan@nxp.com, linux-phy@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	Frank.li@nxp.com
-Subject: Re: [PATCH 2/4] phy: s32g: Add serdes subsystem phy
-Message-ID: <aXzFH09AeIRawCwU@shell.armlinux.org.uk>
-References: <20260126092159.815968-1-vincent.guittot@linaro.org>
- <20260126092159.815968-3-vincent.guittot@linaro.org>
- <aXsuRTZUUnw0kdzV@horms.kernel.org>
- <CAKfTPtDfnpzq2CB-isVzvh1ZCWo7kit9KRJvVGoU1C3zZTgdXw@mail.gmail.com>
- <aXtfVUb0eLwP4R28@shell.armlinux.org.uk>
- <CAKfTPtCiJcNOdoddZN5N1dKHXfUJBe0=zeWfZ5uENoXDvbMnpQ@mail.gmail.com>
- <aXtl6eQ8zD_olTdc@shell.armlinux.org.uk>
- <aXtvDn_-pCuKPrnf@vaman>
- <aXtwfj1vqB1cXKFM@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A11C320A14;
+	Fri, 30 Jan 2026 14:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769784719; cv=pass; b=Wfkykv5ISvWiVc/eig7fzRcPS0/Po9VsNCPpFuOH3JmAuezsYFTrUOwoT42Eygl4G12J719pUb5OJ5kV5rK56KodK/tYFoHn+JktPeL25F6gGJ5zO9sIKWdQoF9vytECN2c+ullcR82OcFIacSpu5n+s2C1pfPo5AgadDGLSY8k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769784719; c=relaxed/simple;
+	bh=j6fbFWZP2ADs2fqCLeUadbhMNFm3KNswEk7ADDlDjVE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PADWpGxmZ10mADycL8oCS8YrwkOBm2/lNHqI29je7I7F4mkTQ0Q/KsHN299BlGEixqJA8Objmn9J08jJ3NQoyBdK1YgRM0N/f9DREWb7Unfm/jv3362uyujJ40cqGN4Px7Ea0iJP459eIf8nTYDUfzpbpDwmDfZpfZE+VC87xnQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=VK00dKWf; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
+ARC-Seal: i=1; a=rsa-sha256; t=1769784700; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=kiL6eAYiiyG+XNCTUcX3pA9sH+Nk/coH6tw89v05crpDP/LxBK/YgTukWje+t5drNFZXADtH+yw3577GpIjcK0fm0k4AnxILWR8ipDqMMeC6ERsXHTfPoI8mcPfyJLZ2d0Ir4g8xCdy7zDHDJcyEhAiYg6uGk7emtfbmQPAPZMA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1769784700; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=8hiaHrWtokc3qBHDXLZaKhVyvciOytw2eznn0slri4o=; 
+	b=mTy5XzFid81gXR07Ohm1JcveXfh8kEp6jAIDeajMSoQu5ixMlOgJs3x5RlhQ+sbMRiQ4d8zl+1J0qxra3Glrm5vvdTNTzO1jO/+8/BdAGnIrzeTR2bKezMji7y5t6q0zkHBtsEATBEAcBthz74Lf9gQwYmeeKnAE6sd2Ypluk/A=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=linux.beauty;
+	spf=pass  smtp.mailfrom=me@linux.beauty;
+	dmarc=pass header.from=<me@linux.beauty>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1769784700;
+	s=zmail; d=linux.beauty; i=me@linux.beauty;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=8hiaHrWtokc3qBHDXLZaKhVyvciOytw2eznn0slri4o=;
+	b=VK00dKWfmFybsLH+7/3XM8WZzdrFP94INY3bS7PR805Du4cPMdMZTAjYV+THCqOq
+	YeXhjLVPO7NjhHv0lkbv4/YcAH63QaDfKpAkg/fnOBLtSR/v7h3PCVNHVPj27smS16W
+	ZAC6AiHWewtJHcoeCoahmQgo45hoRDM2GcH9y8nI=
+Received: by mx.zohomail.com with SMTPS id 176978469610848.338806107559435;
+	Fri, 30 Jan 2026 06:51:36 -0800 (PST)
+From: Li Chen <me@linux.beauty>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Pratyush Yadav <pratyush@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH v1 0/3] liveupdate: suppress TCP RST during post-kexec restore window
+Date: Fri, 30 Jan 2026 22:51:16 +0800
+Message-ID: <20260130145122.368748-1-me@linux.beauty>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXtwfj1vqB1cXKFM@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [8.84 / 15.00];
+	URIBL_BLACK(7.50)[linux.beauty:mid,linux.beauty:dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255167-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	R_DKIM_ALLOW(0.00)[linux.beauty:s=zmail];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255168-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DMARC_NA(0.00)[linux.beauty];
+	MIME_TRACE(0.00)[0:+];
+	GREYLIST(0.00)[pass,body];
+	DKIM_TRACE(0.00)[linux.beauty:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:url,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: EB83ABBBE9
-X-Rspamd-Action: no action
+	FROM_NEQ_ENVFROM(0.00)[me@linux.beauty,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
+	NEURAL_SPAM(0.00)[0.865];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.beauty:mid,linux.beauty:dkim]
+X-Rspamd-Queue-Id: B3443BBD36
+X-Rspamd-Action: add header
+X-Spam: Yes
 
-On Thu, Jan 29, 2026 at 02:36:46PM +0000, Russell King (Oracle) wrote:
-> On Thu, Jan 29, 2026 at 08:00:38PM +0530, Vinod Koul wrote:
-> > On 29-01-26, 13:51, Russell King (Oracle) wrote:
-> > > On Thu, Jan 29, 2026 at 02:36:01PM +0100, Vincent Guittot wrote:
-> > > > On Thu, 29 Jan 2026 at 14:23, Russell King (Oracle)
-> > > > <linux@armlinux.org.uk> wrote:
-> > > > >
-> > > > > On Thu, Jan 29, 2026 at 02:01:13PM +0100, Vincent Guittot wrote:
-> > > > > > yes, the usual pattern is :
-> > > > > > - phy_set_mode_ext()
-> > > > > > - then phy_power_on()
-> > > > > > but I can add an additional check
-> > > > >
-> > > > > Please read Documentation/driver-api/phy/phy.rst section "Order of API
-> > > > > calls" which suggests phy_set_mode_ext() after phy_power_on().
-> > > > 
-> > > > Fair enough.
-> > > > That being said, all pcie drivers  that use phy_set_mode_ext(), call
-> > > > it before phy_power_on()
-> > > 
-> > > It looks like many ethernet drivers do the same, so I think maybe the
-> > > generic PHY documentation is incorrect or misleading, or is expressing
-> > > a preference that almost no one follows. Something for the generic PHY
-> > > maintainers to look at and/or comment on.
-> > 
-> > I would feel it makes sense to configure the mode first and then power
-> > the phy up. As commented above yes it looks like apart from one tegra
-> > driver rest seem to do it this way.
-> > 
-> > Lets update the documentation
-> 
-> Please also indicate in the documentation whether changing the submode
-> of the serdes (particularly for ethernet) is permitted without doing a
-> phy_power_down()..phy_power_up() dance around the phy_set_mode_ext()
-> call.
+LUO supports kexec-based live update where userspace restores preserved state
+after the new kernel boots. For established TCP connections that are restored
+in userspace (e.g. CRIU), there is an unavoidable window where the new kernel
+has no socket yet but the peer can still send packets. The TCP no-socket path
+replies with a RST to segments with ACK set, causing the peer to immediately
+tear down the connection.
 
-Maybe something like this, which simply alters the documentation to
-indicate that phy_set_mode*() is permissible prior to phy_power_on(),
-and should be used at that point where drivers know the mode which
-will be used.
+This series tracks a bounded "restore window" in which incoming LUO sessions
+are expected to be retrieved and finished. The window ends automatically when
+all incoming sessions are retrieved and finished (or their session file
+descriptors are closed), can be terminated early via the global
+LIVEUPDATE_IOCTL_RESTORE_DONE, and is also bounded by a hard timeout (15
+minutes) so it cannot remain open indefinitely.
 
-Leaving the existing phy_set_mode*() in the sequence also indicates
-that it's permissible to call this while the PHY is still powered
-on.
+On top of that, an optional cmdline knob, liveupdate_tcp_rst_suppress=on,
+drops established (ACK && !SYN) segments that would otherwise trigger a RST
+while the restore window is in progress. Default is off and requires
+liveupdate=on.
 
-For drivers such as stmmac, it will be important that details such as
-whether phy_est_mode*() can be called with the PHY powered on are
-riveted down and not left up to the generic PHY driver author - without
-that, generic PHYs basically aren't usable from SoC/platform
-independent code, and stmmac has bazillions of platform specific glue
-already because of (a) bad code structuring and (b) lack of
-generalisation through standardised interfaces that abstract platform
-differences.
+Tested with an established TCP stream across LUO kexec + CRIU restore; calling
+RESTORE_DONE after restore avoids TCP RST and the connection continues.
 
-I want to be able for core stmmac code, or even phylink code (which
-is even more platform generic) to be able to make use of generic PHY
-stuff, but if the calls that can be made into generic PHY are platform
-dependent, that is a blocking issue against that, and makes me question
-why we have the generic PHY subsystem... it's not very generic if it
-exposes the differences of each implementation to users of its
-interfaces.
+Li Chen (3):
+  liveupdate: track post-kexec restore window
+  liveupdate: bound and control post-kexec restore window
+  liveupdate: suppress TCP RST during post-kexec restore window
 
-I think generic PHY has had the idea that its interfaces will only be
-used from platform specific code that knows about the behaviour of it's
-generic PHY driver, but as can be seen above, this will not remain the
-case given that we have hardware designs where the core of the driver
-is one vendor's IP that gets re-used across many different platforms,
-but the SerDes PHY is one of many other vendor's IP.
-
-diff --git a/Documentation/driver-api/phy/phy.rst b/Documentation/driver-api/phy/phy.rst
-index 719a2b3fd2ab..cf73e4fb0951 100644
---- a/Documentation/driver-api/phy/phy.rst
-+++ b/Documentation/driver-api/phy/phy.rst
-@@ -142,6 +142,7 @@ Order of API calls
- 
-     [devm_][of_]phy_get()
-     phy_init()
-+    [phy_set_mode[_ext]()]
-     phy_power_on()
-     [phy_set_mode[_ext]()]
-     ...
-@@ -154,7 +155,7 @@ but controllers should always call these functions to be compatible with other
- PHYs. Some PHYs may require :c:func:`phy_set_mode <phy_set_mode_ext>`, while
- others may use a default mode (typically configured via devicetree or other
- firmware). For compatibility, you should always call this function if you know
--what mode you will be using. Generally, this function should be called after
-+what mode you will be using. Generally, this function should be called before
- :c:func:`phy_power_on`, although some PHY drivers may allow it at any time.
- 
- Releasing a reference to the PHY
+ .../admin-guide/kernel-parameters.txt         | 10 +++
+ include/linux/liveupdate.h                    | 26 ++++++
+ include/uapi/linux/liveupdate.h               | 34 ++++++++
+ kernel/liveupdate/luo_core.c                  | 31 +++++++
+ kernel/liveupdate/luo_internal.h              |  5 ++
+ kernel/liveupdate/luo_session.c               | 85 ++++++++++++++++++-
+ net/ipv4/tcp_ipv4.c                           |  5 ++
+ net/ipv6/tcp_ipv6.c                           |  5 ++
+ 8 files changed, 198 insertions(+), 3 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.52.0
 
