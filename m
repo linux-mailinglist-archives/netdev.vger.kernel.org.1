@@ -1,189 +1,159 @@
-Return-Path: <netdev+bounces-254964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +KggDEwAfGmUJwIAu9opvQ
-	(envelope-from <netdev+bounces-254964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 01:50:20 +0100
+	id t5LMLMEBfGnuJwIAu9opvQ
+	(envelope-from <netdev+bounces-254966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 01:56:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B600B6057
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 01:50:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07776B60AF
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 01:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8C91F301AA8A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 00:50:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8B73330157E0
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 00:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0742FB622;
-	Fri, 30 Jan 2026 00:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E931E311967;
+	Fri, 30 Jan 2026 00:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="H3NVM6uZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ms17JHqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C593F2F4A05;
-	Fri, 30 Jan 2026 00:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A72E2DFF28
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 00:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769734212; cv=none; b=S6xKHx1O3ZT50+2LhK3e4qsDEZ0AAmkh+67MNtQij4uOpmqVE48sFfviN7E05Goo5+RyGbkMVukmVrl1FTXo4Eff+iiqRvSLvRrY5R42+Q4oKiSgLrk5KZlUgJlLzxACtOU0iNJP+9PWh4ynPy3Uo/lQKP38fUIir44QtIo0ffU=
+	t=1769734589; cv=none; b=Hn15QlNe0+WyJ7X5gn58bdVlP7n5nFAeXU6Bhqu4LlWezydbgmHXtbFhxKuOf4igKKIKEDwFc1u4wtHkz8HBQDnn96e1JxkThWN4l7847j16dG7rQLnUUUbX7jMeELOrQbNtUDkT18sfkiOofNAFqxSRSNGQX0fTxxRhhbk/CBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769734212; c=relaxed/simple;
-	bh=OPPaz39xkiwRNPcSlxBta1EIML2qCuGDBFEHllfkcLU=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rL2oWwn79tpOqjk7z4xE0ornFwWu6jrX0GevL1MQlyAcZkBhUMciNIMERo0qow8m6WDn7Tzke8asS0JcUWN/O+K8Khbb4WJDDMgHh/UDr3L/bH5qY2WeY+UfMN8+iwlvqY2AuW/Jjr0bQVTBcDVlwlXEczyw6muaHwSxDoko9nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vlci6-000000007rJ-3n2k;
-	Fri, 30 Jan 2026 00:50:07 +0000
-Date: Fri, 30 Jan 2026 00:50:04 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] net: dsa: mxl-gsw1xx: validate chip ID
-Message-ID: <9455dd521ea3f43a7c017d79f187aca88f12c486.1769733972.git.daniel@makrotopia.org>
-References: <cover.1769733972.git.daniel@makrotopia.org>
- <875329426cffe416ebe6a3064ed632604f29f100.1769733972.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1769734589; c=relaxed/simple;
+	bh=P7EKM3EHqhvyDvJfZgxgHylSj6bn0or2aJf4wK9Zvmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tDeMC1uae8XfJoBLfZf/Kao01FQCoCkvlAi9ecG+bqyn3WOGPEGGGtCSjj6JFcEiCBZsOmoRyO/K/zlALR29PdScPnk7XrF3evixL/reYFku/rNbUz7A2UIhOAAoAwoO0K/WpXItazV3vR6WAXagL43JeXn4kW7hrFh3xG1sZrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=H3NVM6uZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ms17JHqF; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 1495F1D0013C;
+	Thu, 29 Jan 2026 19:56:25 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Thu, 29 Jan 2026 19:56:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1769734584; x=
+	1769820984; bh=x/IqoU/bRE+m2Myo+HJJkiQw1QN64LOGc3GgRY85x5Y=; b=H
+	3NVM6uZRD2dW8pV0bshrN+eX3nb3VdBJLn6lgN+gd/Ix9x5E/kSWichSMxP/Yhes
+	wBtRAINiivg583wQYv6MqUEE9sG2HJnnVr/VE3hJPc1SG5BK0i6qBvwNm1gqpVqf
+	8daHDBkn54H8cSMpTOm4kph+4R33x1SE3nH5aGmdPgKSQCfFM82cz9xJ3mlyXH6N
+	JpEzAAHk2WWeGbhO7fWUGRjXinf6JNCwy9O6UHRRtWcrx8+gbMvypt9Vac7oavjj
+	X00ZMOfzl+qP4X6wUfT3xjQsCOAEhyD/PQ/oXm7EVtTkG7lXbnHtGZu+91Yo9QRl
+	KcUxW8S+fi7mFWeZ3IgUQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1769734584; x=1769820984; bh=x/IqoU/bRE+m2Myo+HJJkiQw1QN64LOGc3G
+	gRY85x5Y=; b=ms17JHqFReOuUEAzAv5mkdidoT01QHoOsCUl+8xFWqdjqdOtbT4
+	4plo8pXiZQLNIiOrwbonoAusSEAhr2unhmxHrYeOvyQTndrQI9JnfH6jkDGnVu0r
+	s2Alw4VA+rtPlMHBTsT3/9v/6WZimYKHVkHiqv/Bf0VkgZqY+PDdJ3xxQOL7g8aj
+	zPHH51sv9bwo0MDY8CjCau9d8BVC6u9bOgffhD124xqEfHgOoe8o0S0g08ZmWs20
+	CltxRJSXDSElKY8xNfoinxAjbmgse/g8X6YzQvAqILgG5PPt4QEpr9Cwt/R87bhv
+	Ekdpo79+ht2J4KvFvpa05T0UyMFwmqaJ9DQ==
+X-ME-Sender: <xms:uAF8aaX09vYEXQoCxyfudYpOFHzAlkTxJytYtBB-eISokKEcLKLZsw>
+    <xme:uAF8adkoPQhPBi_9iPGMT1qiUWGJMaoniGTjxEb2lt9mvUKzg7XMOQT3pz51tJ5pS
+    CmrENStpLHhRcR2TLC7FdP6z6kZFjJDH3KeNQu9doTJHzBB093XmLLh>
+X-ME-Received: <xmr:uAF8aTZos7hhnJt0daYVHlCA_TdJigTu0LiHcSWwZSRM4YeWnd52FYP-4IkU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieejieekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeegpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehmmhhivghtuhhsleejseihrghhohhordgtoh
+    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjrghsohhnseiigi
+    dvtgegrdgtohhm
+X-ME-Proxy: <xmx:uAF8aQPx65LJugS5f8odctH2dlTvjdAroaDdOwiMXqK-_fJRKecYyQ>
+    <xmx:uAF8aQaGA__mODH8ERGpgUmgNTjMlYvLxn-VUjsSPUx4esBoPMqOVA>
+    <xmx:uAF8aW3CB896yBHzfTZiTV2NcYbf2-RnHUW7eLpHdDZ7YO8lfVAmBQ>
+    <xmx:uAF8aefJYmlbxZDb9ZqaaNFODacl8eNyqRoz_Jh_nFih0BmkpB5y2A>
+    <xmx:uAF8aYraPT0_padRwLmAI9THLhUlH64ByaO6c-IjM1EWZKfbrs2XYze6>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 29 Jan 2026 19:56:23 -0500 (EST)
+Date: Fri, 30 Jan 2026 01:56:21 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Marek Mietus <mmietus97@yahoo.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, Jason@zx2c4.com
+Subject: Re: [PATCH net-next v7 04/11] net: tunnel: allow noref dsts in
+ udp_tunnel{,6}_dst_lookup
+Message-ID: <aXwBtY4tLDfO5rR4@krikkit>
+References: <20260127070452.6581-1-mmietus97@yahoo.com>
+ <20260127070452.6581-5-mmietus97@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <875329426cffe416ebe6a3064ed632604f29f100.1769733972.git.daniel@makrotopia.org>
+In-Reply-To: <20260127070452.6581-5-mmietus97@yahoo.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254964-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254966-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[makrotopia.org];
-	FREEMAIL_TO(0.00)[hauke-m.de,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_TO(0.00)[yahoo.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9B600B6057
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 07776B60AF
 X-Rspamd-Action: no action
 
-No check for actually present hardware is being performed in the probe
-function of the mxl-gsw1xx switch driver. So even if the switch isn't
-present at the configured MDIO bus address the driver wrongly tells the
-user that a "GSWIP version 0 mod 0" was found, outputting errors about
-PHY capabilities not matching.
+2026-01-27, 08:04:45 +0100, Marek Mietus wrote:
+> Update udp_tunnel{,6}_dst_lookup to return noref dsts when possible.
+> This is done using a new boolean which indicates whether the returned
+> dst is noref. When the returned dst is noref, the dst is only valid
+> inside the RCU read-side critical section in which it was queried.
+> 
+> Update all callers to properly use the new noref argument and convert
+> all tunnels that use udp_tunnel{,6}_dst_lookup to noref. This affects
+> bareudp, geneve and vxlan tunnels.
 
-Read and validate the chip MANU_ID and PNUM_ID registers and output
-information while probing, but return an error and abort probing in case
-the hardware is not actually present.
+Maybe I'm missing something, but after this, all users of
+udp_tunnel{,6}_dst_lookup need to be able to handle a noref dst? If
+so, can we avoid the "if (!noref) release()" dance in all callers by
+doing the release() before returning from _lookup()? The conditional
+dst_release/ip_rt_put in this patch and some of the others feels
+pretty ugly to me.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v2: no changes
-
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 27 ++++++++++++++++++++++++++-
- drivers/net/dsa/lantiq/mxl-gsw1xx.h |  9 +++++++++
- 2 files changed, 35 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index df89707dc59e..69858d73245c 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -685,7 +685,9 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- {
- 	struct device *dev = &mdiodev->dev;
- 	struct gsw1xx_priv *priv;
--	u32 version;
-+	u32 version, val;
-+	u8 shellver;
-+	u16 pnum;
- 	int ret;
- 
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-@@ -733,6 +735,27 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (IS_ERR(priv->shell))
- 		return PTR_ERR(priv->shell);
- 
-+	ret = regmap_read(priv->shell, GSW1XX_SHELL_MANU_ID, &val);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* validate chip ID */
-+	if (FIELD_GET(GSW1XX_SHELL_MANU_ID_FIX1, val) != 1)
-+		return -ENODEV;
-+
-+	if (FIELD_GET(GSW1XX_SHELL_MANU_ID_MANID, val) !=
-+	    GSW1XX_SHELL_MANU_ID_MANID_VAL)
-+		return -ENODEV;
-+
-+	pnum = FIELD_GET(GSW1XX_SHELL_MANU_ID_PNUML, val);
-+
-+	ret = regmap_read(priv->shell, GSW1XX_SHELL_PNUM_ID, &val);
-+	if (ret < 0)
-+		return ret;
-+
-+	pnum |= FIELD_GET(GSW1XX_SHELL_PNUM_ID_PNUMM, val) << 4;
-+	shellver = FIELD_GET(GSW1XX_SHELL_PNUM_ID_VER, val);
-+
- 	ret = gsw1xx_serdes_pcs_init(priv);
- 	if (ret < 0)
- 		return ret;
-@@ -753,6 +776,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (ret)
- 		return ret;
- 
-+	dev_info(dev, "standalone switch part number 0x%x v1.%u\n", pnum, shellver);
-+
- 	dev_set_drvdata(dev, &priv->gswip);
- 
- 	return 0;
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-index d1fded56e967..caa8f1008587 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-@@ -110,6 +110,15 @@
- #define GSW1XX_SHELL_BASE			0xfa00
- #define  GSW1XX_SHELL_RST_REQ			0x01
- #define   GSW1XX_RST_REQ_SGMII_SHELL		BIT(5)
-+#define  GSW1XX_SHELL_MANU_ID			0x10
-+#define   GSW1XX_SHELL_MANU_ID_PNUML		GENMASK(15, 12)
-+#define   GSW1XX_SHELL_MANU_ID_MANID		GENMASK(11, 1)
-+#define    GSW1XX_SHELL_MANU_ID_MANID_VAL	0x389
-+#define   GSW1XX_SHELL_MANU_ID_FIX1		BIT(0)
-+#define  GSW1XX_SHELL_PNUM_ID			0x11
-+#define   GSW1XX_SHELL_PNUM_ID_VER		GENMASK(15, 12)
-+#define   GSW1XX_SHELL_PNUM_ID_PNUMM		GENMASK(11, 0)
-+
- /* RGMII PAD Slew Control Register */
- #define  GSW1XX_SHELL_RGMII_SLEW_CFG		0x78
- #define   RGMII_SLEW_CFG_DRV_TXC		BIT(2)
 -- 
-2.52.0
+Sabrina
 
