@@ -1,233 +1,303 @@
-Return-Path: <netdev+bounces-255034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mP7MHutGfGn8LgIAu9opvQ
-	(envelope-from <netdev+bounces-255034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:51:39 +0100
+	id 6OwoIDhHfGn8LgIAu9opvQ
+	(envelope-from <netdev+bounces-255035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:52:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E964EB77B7
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:51:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE214B77F5
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:52:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 031A13017BE9
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:51:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D33F3300B9A5
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F09E36CDF9;
-	Fri, 30 Jan 2026 05:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A55A378800;
+	Fri, 30 Jan 2026 05:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTjaz+UI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TY8iiiUX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAB2DDA9
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 05:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769752295; cv=none; b=TkEbVHLrNbcoVbLWUx2ebMmgpdqvTs+4RL690SVlgeslR7pzQRzD6Z4tFPVdx7cGcv8RXvCUCo/T2zN9JD0Cx8HQ0Zp0yQMsqaPkncSKu7ptgXyg/RG3mr9KysASN0hg+Bu/qCbWnfK8pRj/xw8XYtGc7Z6dsTELXDAZi/af0i8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769752295; c=relaxed/simple;
-	bh=q/4+luaMFopCBKHw5CzX49QWevO8wu3OMXgDjISrosw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SqeQVK+K4OQMxTlSsKNfE70kQ4zkPrutz6utZHUNOCrO+38yT9V+UimP/WBfLm8x5X7cDcCNvl5BY8IHvvOCtn9zD8CHi2bVhc5+XkFIp/rvly5knC33FWoQrBbU1iGeP3rZavcksh4aHqcDg1FNHBhXvUX5RgRRHW8p8PJCSYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KTjaz+UI; arc=none smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-1233bc1117fso1935171c88.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 21:51:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6662874E9
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 05:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769752372; cv=pass; b=KN8Ndzaa4tWb1NIuv3ZVNTR9pGHrWMN2s/vRsITFZ0ML4hMFao/r2TSFNprqc3jtWvxh7J4XTST9ZXVK+L05Xtm4XenY+nvAF7RLLVqXzxihQ43FGnaM+ZLlYY14q8VXUnOe2vvq0Lwq8G1lWh5VD8986hisA8C9Owsd/SlPTeU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769752372; c=relaxed/simple;
+	bh=cImNh7AmhiGij1+ZhirVCLP6mOlNdsNdkU3maKdeREs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=guMfrVOQeJwinJ4QyG2XxoDNJfqCgbCsytZgNQAjIg+1xAv9Uueaxdyjk/9SF/jLsY3kH0Z7fPz0j4XhKWWp9zqNTbZRXqj7Bc6xArPTxbkIVUTvJ9ab0hUdWWEcq/sqkbG/crqRFxhr9r90tCk7oKihQ23cFn0TCe3cnhZE+8E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TY8iiiUX; arc=pass smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2b4520f6b32so3598506eec.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 21:52:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769752371; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ATTd5DHCJyNqcmwKjdTNPY/pP05FGw+HIabP4ml23zZSSgCZPFaD7y4o9+P7aDGXXH
+         KZIvv3I3H6uTi4xFD49EotDVPrB4IjWp0fSUA+YhsOO5PgLfh3k2W2vAWwQBSF4KsxWP
+         hfrFzQ68Qwly3xKmJkyrPA1Q8ho3qB8cMxo2b1G4bMA2IIHStRRBywCib5hTY/8k5vGO
+         1yargR8Md9Zu964jm13iQgg/VWz/Y31aW0qkQiHnbyrzx7BPQZZBS0EW8UyoShVRVxXS
+         pYkhvxBvD6OJnKzTZgjUfcpoMmFfZAJ/HpfJD5gNxaFDKn35EH8y+QuRzMSd5YTPEsin
+         cIAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LK2IkLpd/Wbh+zexSYrqMfHibZjGlnJWNUHv2HZ4Dtc=;
+        fh=KE3iTbuyjwI2xqVf3EaQolHM0xidMVTSTJMsvxBHRns=;
+        b=DrYmZcqrFRWxfvFew/YT4/HogWtw2fXAG+GXrvMuGkRxwNqEkvlNPp9JZNaHNKKR01
+         JHUs+9HLFPCApLokE7AcZt+TOrXdhp/Cy+t8RSbI2cjopsglGX++neI0n8HhZGad1D+N
+         Z+Mgjp9pzF2MpAjhB9DXatNMaaGnlBI3m5c16d02E/f4xi8LVlK9brNNkm/dZ88GPKBV
+         0HSdNldigdUGcHqSi/IUogRvmVdjvkdbaTr8hpm1ARZSrVNWbOvYBjTyyc9hXQPlBELr
+         AHa7gXs22Q9z1FGGmNk6TcPU4QEkNVB6sC2x7Tlrr0gQbdpAjLZVfUgbslnHjA0WXnik
+         k4aw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769752293; x=1770357093; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/9BE0BYd4UckLSdoFEUcSOw1QbcMVSNpHYwVllCdjaE=;
-        b=KTjaz+UI9R2mwOAPnCj+AwrN5fTi/WNqX/u2l0JLtxA8jb/0ra+t6J6xly5r4Jv9Oo
-         LFzf0Qb173cdpELvKEajOQlIeZa5mK6uC+vsC9kwzvLRv2a4ynwLtfa5VWUeFsgNXHDm
-         LyxakSawWl8WoAT7yCaiDxss9bjQC3E1EMXQBcfJoel8+saOHWWxCAavRoA3OGpH4qD3
-         5tXwZFrPxhWr2CfQURA4tD2Q+yDA+KdzqzmjkoTnO06CyDU7CAdrKihtIa0V8YClxwQM
-         vP/UVIeqsdgAMK4yuOrard9TNzaIVHXSZxFhkZPCMt1BxmokJIg88wRvrjns+qBvPPY1
-         D/UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769752293; x=1770357093;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1769752371; x=1770357171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/9BE0BYd4UckLSdoFEUcSOw1QbcMVSNpHYwVllCdjaE=;
-        b=UCvauZ9dLfalTGrYLZfXJx4j9pzT6qbTAtGlXEjNxnYtFIxTaPbF9oTKY1b+ZXiuTz
-         UfX8PrRRjbhVaG7u1NQd5P/Sw8PWaMPp59BzdPyz/iKGvKUJeHPvVcn3xYUOtLlQnpij
-         9YH++00at44XWXZNQxya3fWcTG6od9kpJ29R2jmCb/QtreviQM/c0CQlX/x+z4hcpY/+
-         HsaiROmR/3jdtm50luuUKmaVWSGSJP6o4PENlr5kBh6jC6sUO4xDKYavdHZehmm1P60H
-         k0adhjldKr8q9Vqedvoz4RvYt1wRrYwWBAR1wGt7D5pzR8LsWLa0uTx8PLbV0Tm42kI2
-         NtRQ==
-X-Gm-Message-State: AOJu0YwTD46Vg4pNWpaIFpIT1wAexVEKYmT3EzyhMVn58C2oT4+qSjoS
-	jsw0x6qcfJEBaLqEx14M2cXhEYKa3T/f5whpuTTv0kEZH7SnoO3ktUlcPWJxhR81
-X-Gm-Gg: AZuq6aLbFhPDxoXImSU7Tqp37aUB/zHGn4fjjR2iK5oXDyRKjPCWueg761pgEkgKqpn
-	TFRpDLAt84c9gMzmr7skAyQWCBQr5wPaAw4TBkO94vrraE7F5CaazS/3uEXwpQbgb4LOsQ3K4xp
-	DgpU5YEa4yskcQk3Z0jT6N5FNVOijm5tk7UYi8qONvcK/ggR0YhyHmGK8TQK25IHZlpM8KkRs11
-	qLJXAhkvB4K0vHiTExac7X/YasB14ukorVRh+UJ6OJjO1Lh90W9DF3Y4ql7fi/49w9RsdxbgMeL
-	XWWa41p1c3eqH56tDHLTURh/fPs9VfJEhUV1SXtByhyAayJndUhnsOL8JiISlXHQADapT5MnWHT
-	NAuUmaarBUx0GoJDpAg01rpuRymCPce7C5eUkdCJRWFc+Blsdtt/nO3BXP6X1Yb3steIf+TQq6U
-	Opf0SHPhW5BQ36ML3XfC+pXOKNEuVAWaFgq3UagTmhx0xjXE5AO3ql1ylJ0F+swydcPyZk5E8ba
-	m8hCtm1XiCIrSfS4grI3he5SQiecAMgH1nriLjUsaUcVv1MwyO21R1YcTa7Sn/JEoG/i+W7XCQ8
-	/OYhyK1FDfcb414=
-X-Received: by 2002:a05:7022:79e:b0:124:9acd:2d1e with SMTP id a92af1059eb24-125c1a03602mr869308c88.23.1769752292751;
-        Thu, 29 Jan 2026 21:51:32 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-124a9e0304bsm9183512c88.14.2026.01.29.21.51.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 21:51:32 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Korsgaard <peter@korsgaard.com>
-Subject: [PATCH net-next v2] net: usb: sr9700: remove code to drive nonexistent multicast filter
-Date: Thu, 29 Jan 2026 21:51:13 -0800
-Message-ID: <20260130055123.19269-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=LK2IkLpd/Wbh+zexSYrqMfHibZjGlnJWNUHv2HZ4Dtc=;
+        b=TY8iiiUXhYx7pzktm2+ph1CqQZp88S/t3J0DbM0zObe+FWmMlBQsAEcbEp/Pd9rDPz
+         NfsEs/Zl8KTK0p1Vzth13kPByHZobOPB7SGSyGGjiV0yhdMDryl2QSUWv2k2vchYRC0v
+         gNgnPpy65WCvl8TJosmSH63w49BA6DzUj+PglRS1Q1BU7ibHyXSuGjozTJ7v6Y8pmAtv
+         CcsH9zmTdUGMctTv0O7uTDX6Jfqbgh56EsoeUCckoqcjbHwNYxcHje4S59QEsZKwdBuU
+         FGXd3KrXhqvWMYLl264Je2x+sWudM4GwfJxKZJ8HYUrllMSLE64h9AIw/gD0gyidu3v+
+         wk/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769752371; x=1770357171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LK2IkLpd/Wbh+zexSYrqMfHibZjGlnJWNUHv2HZ4Dtc=;
+        b=tAqPJyj/iMkTygFpeEdm1MCBBki3H2kdvCJCj6VOmS8U3N1dGGQ77JvUh5/kfdNJq1
+         G2mRqvaaYBrNaAiqGFo6BavE+l5dUKmaWV4VJI/HOxdEhrdTuDN+D+hVEQ/rJPw8tzlv
+         I447abwqthIbShwH4HVKOIKt17/CaskT3Q/55iaj6C5ZRyydAMlUs7cOkjlyBa/aeYQK
+         y4fQpw40nu7ytlMPIVLImY74qZlbOO99gVgiTqqJK529OVogm01OgaQ19g3jg4W++hOo
+         p4HnJ6PNF3zjcy01cBvumd65SKLEEFMHo0lsteHyVQQ83uyo3yWOLYobpgrjEuMzYWi4
+         1OTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeJTeZHjmR7E5jYTMoxH4IbxUYvmOvmelrgkRXjfPWXtG5M7gzOEtbeE571ENTye9RroS3X4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrNoBcICoY7+Nxhjlh+GJtpkYZBKGefTQJAL5FoSpXQofaMDxl
+	JVsjFunxguShlH1cmPjP9PPu0hKWYIcWtd33TqjIJ2LDd5Ic8CElH3Lw0t6iPV7wx6AjrdRWSlM
+	LnK+bctP8AAVALgw2MWOXOIhjB6s2h6dcIaqeh9cv
+X-Gm-Gg: AZuq6aKCObNaRLxmyNg3LQZfb971nN6wDTuKVkLXIMxOM3BvdRqO9XEfN0o+AXuM608
+	rjqESa6TYfUIjQjtyYo28xdqfCAHeuzXzh0UKb4xMMnRqO9PyaEOp16DRwUdm5d4/PW32Cn4vXn
+	bmT2bX3kvxv+ExmKittK0re9OL2cyrVgPm0wTAuGEnWXEqNJBnBYC7gj9S/t8o2eeCUaxXVna1E
+	p07frsD3kOxxCviPfMQGWbdlkexAiMcIFGhJADi/anRmBlFgpBkFpnrohX6YOIQdnhAgebOomqx
+	iQB+qIT44AOrZZaFq7Ds6H6HLK0mlUzSIz70Vl12/lhbqRiOoaZFc94WvRc4
+X-Received: by 2002:a05:7022:660b:b0:119:e55a:9be4 with SMTP id
+ a92af1059eb24-125c0f11b1fmr917664c88.0.1769752369932; Thu, 29 Jan 2026
+ 21:52:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260130022951.2489133-1-realwujing@gmail.com>
+In-Reply-To: <20260130022951.2489133-1-realwujing@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 29 Jan 2026 21:52:38 -0800
+X-Gm-Features: AZwV_Qit5baUTntB5XVo6dAP8yeD2I3uUuzuZ1pgpVF_gKNdlQtkp71tMpLKJWU
+Message-ID: <CAAVpQUCb9nuY6eDvqePYQa1V9WCfQsynt1UswC3vqBTUOi779Q@mail.gmail.com>
+Subject: Re: [PATCH v4] netns: optimize netns cleaning by batching unhash_nsid calls
+To: Qiliang Yuan <realwujing@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Jeff Layton <jlayton@kernel.org>, 
+	Qiliang Yuan <yuanql9@chinatelecom.cn>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,korsgaard.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255034-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255035-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E964EB77B7
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: EE214B77F5
 X-Rspamd-Action: no action
 
-Several registers referenced in this driver's source code do not
-actually exist (they are not writable and read as zero in my testing).
-They exist in this driver because it originated as a copy of the dm9601
-driver. Notably, these include the multicast filter registers - this
-causes the driver to not support multicast packets correctly. Remove
-the multicast filter code and register definitions. Instead, set the
-chip to receive all multicast filter packets when any multicast
-addresses are in the list.
+On Thu, Jan 29, 2026 at 6:29=E2=80=AFPM Qiliang Yuan <realwujing@gmail.com>=
+ wrote:
+>
+> Currently, unhash_nsid() scans the entire system for each netns being
+> killed, leading to O(M_batch * N_system * log(N_ids)) complexity.
+>
+> Optimize this to O(N_system * N_ids) by batching unhash operations. Move
+> unhash_nsid() out of the per-netns loop in cleanup_net() to perform a
+> single-pass traversal over survivor namespaces using idr_for_each().
+>
+> Identify dying peers by an 'is_dying' flag, which is set under net_rwsem
+> write lock after the netns is removed from the global list. This batches
+> the unhashing work and eliminates the O(M_batch) multiplier.
+>
+> Clean up redundant nsid_lock and simplify the destruction loop now that
+> unhashing is centralized.
+>
+> Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
+> ---
+> v4:
+>  - Move unhash_nsid() out of the batch loop to reduce complexity from O(M=
+*N) to O(N).
+>  - Use idr_for_each() for efficient, single-pass IDR traversal.
+>  - Mark 'is_dying' under net_rwsem to safely identify and batch unhashing=
+.
+>  - Simplify destruction loop by removing redundant locking and per-netns =
+unhash logic.
+> v3:
+>  - Update target tree to net-next.
+>  - Post as a new thread instead of a reply.
+> v2:
+>  - Move 'is_dying' setting to __put_net() to eliminate the O(M_batch) loo=
+p.
+>  - Remove redundant initializations in preinit_net().
+> v1:
+>  - Initial implementation of batch unhash_nsid().
+>
+>  include/net/net_namespace.h |  1 +
+>  net/core/net_namespace.c    | 41 +++++++++++++++++++++++--------------
+>  2 files changed, 27 insertions(+), 15 deletions(-)
+>
+> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+> index cb664f6e3558..bd1acc6056ac 100644
+> --- a/include/net/net_namespace.h
+> +++ b/include/net/net_namespace.h
+> @@ -69,6 +69,7 @@ struct net {
+>
+>         unsigned int            dev_base_seq;   /* protected by rtnl_mute=
+x */
+>         u32                     ifindex;
+> +       bool                    is_dying;
+>
+>         spinlock_t              nsid_lock;
+>         atomic_t                fnhe_genid;
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index a6e6a964a287..9ea05fb9df5b 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -624,9 +624,29 @@ void net_ns_get_ownership(const struct net *net, kui=
+d_t *uid, kgid_t *gid)
+>  }
+>  EXPORT_SYMBOL_GPL(net_ns_get_ownership);
+>
+> -static void unhash_nsid(struct net *net, struct net *last)
+> +static int unhash_nsid_callback(int id, void *p, void *data)
 
-Reviewed-by: Simon Horman <horms@kernel.org> (from v1)
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
-Changes in v2:
-Remove unrelated cleanups; adjust commit message
-Use netdev_mc_empty()
+This is called without holding tmp->nsid_lock nor RCU.
 
-(I decided to send this now instead of when I finish my
-patch series because it fixes an important functional issue.)
 
- drivers/net/usb/sr9700.c | 25 ++++---------------------
- drivers/net/usb/sr9700.h |  7 +------
- 2 files changed, 5 insertions(+), 27 deletions(-)
+> +{
+> +       struct net *tmp =3D data;
+> +       struct net *peer =3D p;
+> +
+> +       if (peer->is_dying) {
+> +               spin_lock(&tmp->nsid_lock);
+> +               if (idr_find(&tmp->netns_ids, id) =3D=3D peer)
+> +                       idr_remove(&tmp->netns_ids, id);
 
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 49764bcf0912..937e6fef3ac6 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -17,7 +17,6 @@
- #include <linux/etherdevice.h>
- #include <linux/ethtool.h>
- #include <linux/usb.h>
--#include <linux/crc32.h>
- #include <linux/usb/usbnet.h>
- 
- #include "sr9700.h"
-@@ -231,31 +230,15 @@ static const struct ethtool_ops sr9700_ethtool_ops = {
- static void sr9700_set_multicast(struct net_device *netdev)
- {
- 	struct usbnet *dev = netdev_priv(netdev);
--	/* We use the 20 byte dev->data for our 8 byte filter buffer
--	 * to avoid allocating memory that is tricky to free later
--	 */
--	u8 *hashes = (u8 *)&dev->data;
- 	/* rx_ctl setting : enable, disable_long, disable_crc */
- 	u8 rx_ctl = RCR_RXEN | RCR_DIS_CRC | RCR_DIS_LONG;
- 
--	memset(hashes, 0x00, SR_MCAST_SIZE);
--	/* broadcast address */
--	hashes[SR_MCAST_SIZE - 1] |= SR_MCAST_ADDR_FLAG;
--	if (netdev->flags & IFF_PROMISC) {
-+	if (netdev->flags & IFF_PROMISC)
- 		rx_ctl |= RCR_PRMSC;
--	} else if (netdev->flags & IFF_ALLMULTI ||
--		   netdev_mc_count(netdev) > SR_MCAST_MAX) {
--		rx_ctl |= RCR_RUNT;
--	} else if (!netdev_mc_empty(netdev)) {
--		struct netdev_hw_addr *ha;
--
--		netdev_for_each_mc_addr(ha, netdev) {
--			u32 crc = ether_crc(ETH_ALEN, ha->addr) >> 26;
--			hashes[crc >> 3] |= 1 << (crc & 0x7);
--		}
--	}
-+	else if (netdev->flags & IFF_ALLMULTI || !netdev_mc_empty(netdev))
-+		/* The chip has no multicast filter */
-+		rx_ctl |= RCR_ALL;
- 
--	sr_write_async(dev, SR_MAR, SR_MCAST_SIZE, hashes);
- 	sr_write_reg_async(dev, SR_RCR, rx_ctl);
- }
- 
-diff --git a/drivers/net/usb/sr9700.h b/drivers/net/usb/sr9700.h
-index 5c04ea0306c7..d1663cb1e8cd 100644
---- a/drivers/net/usb/sr9700.h
-+++ b/drivers/net/usb/sr9700.h
-@@ -101,9 +101,7 @@
- #define		WCR_LINKEN		(1 << 5)
- /* Physical Address Reg */
- #define	SR_PAR			0x10	/* 0x10 ~ 0x15 6 bytes for PAR */
--/* Multicast Address Reg */
--#define	SR_MAR			0x16	/* 0x16 ~ 0x1D 8 bytes for MAR */
--/* 0x1e unused */
-+/* 0x16 --> 0x1E unused */
- /* Phy Reset Reg */
- #define	SR_PRR			0x1F
- #define		PRR_PHY_RST		(1 << 0)
-@@ -158,9 +156,6 @@
- /* parameters */
- #define	SR_EEPROM_TIMEOUT	1000
- #define	SR_EEPROM_LEN		256
--#define	SR_MCAST_SIZE		8
--#define	SR_MCAST_ADDR_FLAG	0x80
--#define	SR_MCAST_MAX		64
- #define	SR_TX_OVERHEAD		2	/* 2bytes header */
- #define	SR_RX_OVERHEAD		7	/* 3bytes header + 4crc tail */
- 
--- 
-2.43.0
+Also, is it safe to modify idr during iteration ?
 
+
+> +               else
+> +                       peer =3D NULL;
+> +               spin_unlock(&tmp->nsid_lock);
+> +
+> +               if (peer)
+> +                       rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL, =
+GFP_KERNEL);
+
+This may sleep, so we can't call this here.
+
+If we want to do batching, we must remember for which
+net and id we call rtnl_net_notifyid() later, but I'm not sure
+if batching is worth the change.
+
+
+
+> +       }
+> +       return 0;
+> +}
+> +
+> +static void unhash_nsid(struct net *last)
+>  {
+>         struct net *tmp;
+> +
+>         /* This function is only called from cleanup_net() work,
+>          * and this work is the only process, that may delete
+>          * a net from net_namespace_list. So, when the below
+> @@ -634,22 +654,10 @@ static void unhash_nsid(struct net *net, struct net=
+ *last)
+>          * use for_each_net_rcu() or net_rwsem.
+>          */
+>         for_each_net(tmp) {
+> -               int id;
+> -
+> -               spin_lock(&tmp->nsid_lock);
+> -               id =3D __peernet2id(tmp, net);
+> -               if (id >=3D 0)
+> -                       idr_remove(&tmp->netns_ids, id);
+> -               spin_unlock(&tmp->nsid_lock);
+> -               if (id >=3D 0)
+> -                       rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
+> -                                         GFP_KERNEL);
+> +               idr_for_each(&tmp->netns_ids, unhash_nsid_callback, tmp);
+>                 if (tmp =3D=3D last)
+>                         break;
+>         }
+> -       spin_lock(&net->nsid_lock);
+> -       idr_destroy(&net->netns_ids);
+> -       spin_unlock(&net->nsid_lock);
+>  }
+>
+>  static LLIST_HEAD(cleanup_list);
+> @@ -674,6 +682,7 @@ static void cleanup_net(struct work_struct *work)
+>         llist_for_each_entry(net, net_kill_list, cleanup_list) {
+>                 ns_tree_remove(net);
+>                 list_del_rcu(&net->list);
+> +               net->is_dying =3D true;
+>         }
+>         /* Cache last net. After we unlock rtnl, no one new net
+>          * added to net_namespace_list can assign nsid pointer
+> @@ -688,8 +697,10 @@ static void cleanup_net(struct work_struct *work)
+>         last =3D list_last_entry(&net_namespace_list, struct net, list);
+>         up_write(&net_rwsem);
+>
+> +       unhash_nsid(last);
+> +
+>         llist_for_each_entry(net, net_kill_list, cleanup_list) {
+> -               unhash_nsid(net, last);
+> +               idr_destroy(&net->netns_ids);
+>                 list_add_tail(&net->exit_list, &net_exit_list);
+>         }
+>
+> --
+> 2.51.0
+>
 
