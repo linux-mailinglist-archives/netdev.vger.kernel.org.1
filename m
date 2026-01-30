@@ -1,250 +1,206 @@
-Return-Path: <netdev+bounces-255253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255254-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKZzFh8bfWlQQQIAu9opvQ
-	(envelope-from <netdev+bounces-255253-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:57:03 +0100
+	id yB+PAScefWlQQQIAu9opvQ
+	(envelope-from <netdev+bounces-255254-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:09:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAEC2BE96C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:57:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CDD6BEB71
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:09:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8683E300D449
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:56:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 43821306A18E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D422536CDFA;
-	Fri, 30 Jan 2026 20:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585463859DE;
+	Fri, 30 Jan 2026 21:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O7O/++g5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yc9XvCdu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A73236A024
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 20:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769806581; cv=pass; b=OZ2MC0u5AidIfO6cCxAt79GiE/jm73xsFdLHwQZC8MlbBrRF6Z38wii7NDKRoCJTriIftwSIRN4JxlUS6fz8eEHVZ9JpWRnSQiDHjkN6jU3FcMd9moTw2a6j39lukeCKKho3nZjHQAV9xPb3lgsBY/1dVttDogW8NjNy1rDmeeE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769806581; c=relaxed/simple;
-	bh=Br6xQKyGbDO6MM0Z3TPAdS5EDwz4uZXbauI4tqlHtZw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ovst0hdwoMVC/wg2d0SVZYJfSK+sz1ztNTTrwXKl0lQzv+7ku8HQg/z/xRZT5g5FZBB0IvJdmSOAXRnzf1bXX183v5UqC/cJyzly+UrmS6uv+YO7J3NPC3R0HT4w53EhimRAWK892b14/bofA4RR8zyiFOvwBfi9NtgBs8TV4jU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O7O/++g5; arc=pass smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105032FD7B1
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769806988; cv=none; b=r0N5rVi03R9Y43Uo9YxGLRV4bGTOJOefGwFVMvC5sEJrydCkwh7oMHLx1uBJEo37MV23tCktVzJLoKSP1gVbeKeLITXZ7z+0dNywJCCEObGYvHrayxfypIjHYXTxZobpIdWT+A7xy1yLHL3SAksiaxuZNk9JY60aESL6wZWCkEs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769806988; c=relaxed/simple;
+	bh=FYr93gd9KKy4aOGobJqE9uypPKJ7LIzV63OubYXh7JU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Evx1XiXUxiaxvI58Z+x5aF1bI2ESjzKMHoAD9zfhRr6ZiygowjVMWD1t3cT+p49IheiiHYPGIFYgW2R6qNSnhKUO2eAaioWsPxEnJ/XImcihs4fy7t3BR0+a0kEZawDlmcWStr9pAHuACX2SlW4PlKr5ZuEx3o6Hg99wk/NAzEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yc9XvCdu; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88a288811a4so25415276d6.3
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 12:56:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769806579; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GprrwImENdk0OzVI5e5pMKvuSUwRrep5FEJ9M6aOKH0pIkJlv2NwmKv8eU1X9mdUSl
-         cBtUlUa8vR+pqzSo2CWL3curqIWbllpwFMlT81/r/AIsFigsuxVe8zGYohJbrRPn0KRK
-         oHKdhVCIiejERgg6RYIPTh214Ubowg/Jnxqf9W88nS6VWNh9SYNUhUQ6FEPFh5rpLLUe
-         Nb7sjBS0EZxuoEgFLyECIRuhMlL4h7T6NznS51wAyqu4Hs6vQFYLbuI4Tt42Yemz9D9f
-         N12YQMZHLVa4rVeqD5Yz6ZNSCS/+2aSTzb5Tk11pdYxBKsh+pfPjmFjwdolWfbJYok7V
-         F3ng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WSV8/5N/+j/2QxAKyyJXPtuQTRJ1LNLrh8eDzw4eLyA=;
-        fh=jJAW7ksWlK+xGhX346HiJms7vAScUqKaPhn4qeUPlV8=;
-        b=U9ZiVvNA1PGg6qU+Re0OSDa+TWNFITMys9NUHwLMBsfKuZHaycc8iwIsFXIMsDPLNw
-         DkGrm8d6B7ui5KL88Q0CZMpcuWwsNtBanhVLio9dm9TiwMXYKuus5yDILNBBULig8+zF
-         WA1dM7wpyYyvuD1pGIFnuXYbBwMZdwf2OK242MeD/H1Rn+ssmLE1QuRwgeL1PDSKb8Od
-         06+0M21FJCh+Xk7VAwyuXf9aDu1HdHQi+NMNoXbJe9tuRzi0KsFMMUrWDhjXAgWtQEkB
-         Vmpk7n4WY35o30s7qOPjhqf+xeh8qwhjy2o7ATa0sGkJcFl7YX7sYt6lDRlIIm4AOsrB
-         jwDg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-5014ad65e3eso96215211cf.1
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:03:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769806579; x=1770411379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WSV8/5N/+j/2QxAKyyJXPtuQTRJ1LNLrh8eDzw4eLyA=;
-        b=O7O/++g5Xvn2LasG5S+ktz4GbT0JzPYjIxNJrEi4yi2DO8x4tiibM4yYziQRniCZ0+
-         7qojDiuDtV5PWZf2UCIF72jY9fkQUJsWeejImTE4h6TV8uqyZfXiTyfBGtRWixMBW4db
-         DmBzj1AHewFNcQiRbgCCTT8j7izBG3cDZWf8DR+ytnCTU4VZ+aYTYgllq5pOvd2yDtn0
-         Bn59+Hke8Bc0RwWg0MTG1SBcbn33XlvRCcaOlMTId4n390KTTd4w53VEyON11br5QU+b
-         dHrDCFTDVpC/ps/tTkIPsBFwPiyFFmb+9HTa1uOgf7CEWMCp7zyzBxh6P0XRPtkyrCYV
-         P6TA==
+        d=google.com; s=20230601; t=1769806985; x=1770411785; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+MqVQkI5017zGwEnzpLTgDysFhCEfqgSoHYzqa+HcBw=;
+        b=yc9XvCdulfgmCG5Hcu6TBVnfwyrMg08hYFMWAaLuYbgZPw8822VHK8GFsH4vQI7JVo
+         /+YXX4tP4LchirER0SGSF1/8afclkSOmbrtRewwxReSWVpaLmBP14W2pXD/+kKBiiUX0
+         cFh/56iPbNna/AGtTIHuTZyk/5gtpcKnNNx0t/qMwFHH9FJdT2PjpS42objRBPowXrGK
+         r+StpXStZvlUD/3mzRbIW//FJBVYWE7mktAHTbYFRuTc+qKHP8nZQJOK60u/j1L7W1xo
+         1zWr06h2Fey7xEuHumT+byHH7VatSa7Ad0ss/jL3ImGAvk2z4G5QOB4l19iqyfBUFVwn
+         dqxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769806579; x=1770411379;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WSV8/5N/+j/2QxAKyyJXPtuQTRJ1LNLrh8eDzw4eLyA=;
-        b=pyaJdKd00/ptP6oxRFiq4PH11btsgte4ZfjLjUOve+Iz1RSPeOhlyL3ziulaDbMSJ1
-         iotZ+4TPmjATwtC0eCtAA/sHXweeVejGbl+02n1sfd9lMBQXQqV5M8vraDdZ5EWfsAQH
-         8bfQu1M8OYF0BWp8GWNSPOiQeLCOwfePffrxsfwb1un4myAtbeS5+cMLX5GdqX9lQNoR
-         iIM/BYFA6RqIZtSAiaqFYv1Fa5w67j+R3Wqoq6fTccf9lh/90ScOVaYIwkggGXI7k8EY
-         +ALIk1eVZQBav2qIWH+o8xi2fzPT8F9qOfDevz9YxU4Hm4CAw5DoEfaQOBrifoJhE/c1
-         CdDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVFQ2odxeqXMlRoJ6lYj+Lh5hN8gTGVv1M8Q+MCWVB8hDmN9ZfUDjdVDWHpxMJaF6pBcQHQZA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxlu0no61tfOZdvhNHRWhKvlDODpDgYIxoPwBbqOlDc7E6Z4XdA
-	Gx9oau8HibMzlst/xIUpZvfGpmr6MtoWcYy8Z+QLT34QDZFCFLl8AONgfl74RtDNXE1dIdPC8pH
-	zRM1OlhpCvyiaW7QAc+25UL8K0yfstYBr2t58Yq9n
-X-Gm-Gg: AZuq6aIemMcZa2sPCG+dVsTVpI6GvAdOUVFou4acLKeLuOPRJMVR4Q1sGDM7G6s2G0i
-	phMgl9PlsGmcR1+lAdTsTuIRTNBBBswjf6URUlj3UkZeFo+qrfw/xhHe8Lt/As92dyy7cXrzxP0
-	IvgtNgGl9AQpikCCYoFZv1HcQjNNLkFK5BYFQyMc2rA2EvnSMffQR01Q4WhIXQ/4hWisyM2zr5F
-	Z7V4qwlC2WhicIA80GtGi6RA/uc/aZuOt9D81FgPg9Ghs7AyCPp0RtVbib8oqw+q0oIRGA=
-X-Received: by 2002:ad4:5f8d:0:b0:888:7e02:50c4 with SMTP id
- 6a1803df08f44-894e9fa1e33mr57059526d6.24.1769806578764; Fri, 30 Jan 2026
- 12:56:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769806985; x=1770411785;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+MqVQkI5017zGwEnzpLTgDysFhCEfqgSoHYzqa+HcBw=;
+        b=HKC3AqjGKsfjixBEdJ/IqcrmJaqO90JP0nJF6v6NTq0tSvn7HNoUrSaZ3JwjLJbR8E
+         L1lVfXK/QvS2KNpLShVAti4slA8tcNEq8AWi3Rn2sPa7nOl8VHG+aC5hwiWIxqkI8lIb
+         v/yeaN4XIXbd86WbA5G8k8FsOw7Eodp3lc74AhJoQRNhSqxppHekVtUx42NksFkJwlEh
+         aaZGefhVgq635B7vdyMQsFA6nPsn02viOlwA0bF1po3itAQN4lg1RUlGxgltd2q6uK6q
+         cW86rLotFZXkhITBHt4wuimLqk3vNOeKRz6RVuGm2EWq5+Wd/f6KBDc5srf/w3fROXU2
+         DL8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWAuxLieysLeOL0BX0zYuckVi0llK59Cn7ufogT2aoJ/ABP7XJMfr2p0o513NHBCyvdkkqP3UY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8DEDuiinOORj8Gik3hOg4WugI9kMy9eQ9cEj8Nf6OSPnBYjSP
+	4OqIF+T46Ydui5hFs8SRTH7X0MfSjY9yDobtZrsRqQ2Y/WpOXP94vVXq9Pe1M3P3PJaPBrPNARy
+	nKO8f6olo1hPndw==
+X-Received: from qtxt1.prod.google.com ([2002:a05:622a:1481:b0:4ff:8ca8:43f2])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:7d46:0:b0:4f1:8bfe:e447 with SMTP id d75a77b69052e-505d29bd368mr52970051cf.42.1769806984929;
+ Fri, 30 Jan 2026 13:03:04 -0800 (PST)
+Date: Fri, 30 Jan 2026 21:02:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260105232504.3791806-1-joshwash@google.com> <20260106182244.7188a8f6@kernel.org>
- <CAJcM6BGWGLrS=7b5Hq6RVZTD9ZHn7HyFssU6FDW4=-U8HD0+bw@mail.gmail.com>
- <CANn89iK_=W8JT6WGb17ARnqqSgKkt5=GUaTMB6CbPfYuPNS7vA@mail.gmail.com> <CAJcM6BH11e4Cs3=7B3Uu-JxPeq4BAnQ3VDLfCAN_JcfnPLtOaw@mail.gmail.com>
-In-Reply-To: <CAJcM6BH11e4Cs3=7B3Uu-JxPeq4BAnQ3VDLfCAN_JcfnPLtOaw@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
+Message-ID: <20260130210303.3888261-1-edumazet@google.com>
+Subject: [PATCH net-next 0/8] ipv6: misc changes in output path
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 30 Jan 2026 21:56:07 +0100
-X-Gm-Features: AZwV_QiRhQ8aUH7eQGfWhKSFr9vhFJUyAeNYpfqKMwJkIBSms32xB9wnb_LdUwA
-Message-ID: <CANn89iJ=Gfjves4qN6hu_VRPSedVRosJsvEQC_irFnEJU_eMLg@mail.gmail.com>
-Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
-To: Ankit Garg <nktgrg@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Catherine Sullivan <csully@google.com>, Luigi Rizzo <lrizzo@google.com>, Jon Olson <jonolson@google.com>, 
-	Sagi Shahar <sagis@google.com>, Bailey Forrest <bcf@google.com>, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255253-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255254-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,mail.gmail.com:mid,netronome.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BAEC2BE96C
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vmlinux.new:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6CDD6BEB71
 X-Rspamd-Action: no action
 
-On Thu, Jan 8, 2026 at 9:53=E2=80=AFPM Ankit Garg <nktgrg@google.com> wrote=
-:
->
-> On Thu, Jan 8, 2026 at 8:37=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Thu, Jan 8, 2026 at 4:36=E2=80=AFPM Ankit Garg <nktgrg@google.com> w=
-rote:
-> > >
-> > > On Tue, Jan 6, 2026 at 6:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
-g> wrote:
-> > > >
-> > > > On Mon,  5 Jan 2026 15:25:02 -0800 Joshua Washington wrote:
-> > > > > This series fixes a kernel panic in the GVE driver caused by
-> > > > > out-of-bounds array access when the network stack provides an inv=
-alid
-> > > > > TX queue index.
-> > > >
-> > > > Do you know how? I seem to recall we had such issues due to bugs
-> > > > in the qdisc layer, most of which were fixed.
-> > > >
-> > > > Fixing this at the source, if possible, would be far preferable
-> > > > to sprinkling this condition to all the drivers.
-> > > That matches our observation=E2=80=94we have encountered this panic o=
-n older
-> > > kernels (specifically Rocky Linux 8) but have not been able to
-> > > reproduce it on recent upstream kernels.
-> >
-> > What is the kernel version used in Rocky Linux 8 ?
-> >
-> The kernel version where we observed this is 4.18.0 (full version
-> 4.18.0-553.81.1+2.1.el8_10_ciq)
->
-> > Note that the test against real_num_tx_queues is done before reaching
-> > the Qdisc layer.
-> >
-> > It might help to give a stack trace of a panic.
-> >
-> Crash happens in the sch_direct_xmit path per the trace.
->
-> I wonder if sch_direct_xmit is acting as an optimization to bypass the
-> queueing layer, and if that is somehow bypassing the queue index
-> checks you mentioned?
->
-> I'll try to dig a bit deeper into that specific flow, but here is the
-> trace in the meantime:
+Small optimizations mostly in ip6_xmit() path.
 
-Jakub, the issue is that before 4.20, calling synchronize_rcu()
-instead of synchronize_rcu_bh()
-was probably a bug. I suspect we had more issues like that.
+TX performance increases by about 3 %.
 
- __dev_queue_xmit takes a rcu_read_lock_bh(), while the code (that you
-added in 2018 [1])
-to update the queue netif_set_real_num_tx_queues does synchronize_net()
-(aka synchronize_rcu()) and in earlier times, it would mean that this
-would maybe return too soon (say on preemptible kernels)
+Patches 5-7: add dst4_mtu() and dst6_mtu() to save space.
 
-[1] commit ac5b70198adc25c73fba28de4f78adcee8f6be0b
-Author: Jakub Kicinski <jakub.kicinski@netronome.com>
-Date:   Mon Feb 12 21:35:31 2018 -0800
+Last patch colocates inet6_cork in inet_cork_full.
 
-    net: fix race on decreasing number of TX queues
+This series reduces kernel size by 494 bytes on x86_64:
 
-    netif_set_real_num_tx_queues() can be called when netdev is up.
-    That usually happens when user requests change of number of
-    channels/rings with ethtool -L.  The procedure for changing
-    the number of queues involves resetting the qdiscs and setting
-    dev->num_tx_queues to the new value.  When the new value is
-    lower than the old one, extra care has to be taken to ensure
-    ordering of accesses to the number of queues vs qdisc reset.
+scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 4/2 grow/shrink: 9/23 up/down: 665/-1159 (-494)
+Function                                     old     new   delta
+ip6_finish_output_gso_slowpath_drop            -     197    +197
+ip6_xmit                                    1452    1595    +143
+do_ipv6_getsockopt                          2855    2950     +95
+kzalloc_noprof                                 -      55     +55
+ip4ip6_err                                   918     955     +37
+__icmp_send                                 1499    1532     +33
+do_ip_getsockopt                            2573    2605     +32
+__ip6_append_data                           4109    4137     +28
+__pfx_kzalloc_noprof                           -      16     +16
+__pfx_ip6_finish_output_gso_slowpath_drop       -      16     +16
+ipmr_prepare_xmit                           1232    1238      +6
+ip6_forward                                 1905    1909      +4
+ip6_cork_release                             108     111      +3
+ipv6_push_nfrag_opts                         489     486      -3
+ipv6_push_frag_opts                           90      87      -3
+ip6_finish_output2                          1446    1437      -9
+ip6_tnl_xmit                                2639    2627     -12
+ip6_default_advmss                           176     160     -16
+__ip6_rt_update_pmtu                        1087    1071     -16
+tcp_v6_syn_recv_sock                        1715    1696     -19
+tcp_v4_syn_recv_sock                        1107    1088     -19
+__ip_make_skb                               1339    1320     -19
+ip_setup_cork                                406     385     -21
+ip6_setup_cork                               732     710     -22
+rawv6_push_pending_frames                    581     556     -25
+ip6_push_pending_frames                      184     157     -27
+udpv6_splice_eof                             203     170     -33
+ip6_flush_pending_frames                     220     183     -37
+ip6_append_data                              349     312     -37
+udp_v6_push_pending_frames                   155     115     -40
+sit_tunnel_xmit                             1957    1914     -43
+__pfx_dst_mtu                                 64       -     -64
+tcp_v4_mtu_reduced                           289     220     -69
+tcp_v6_mtu_reduced                           209     139     -70
+ip6_make_skb                                 574     484     -90
+ip6_finish_output                            827     697    -130
+dst_mtu                                      160       -    -160
+fib6_nh_mtu_change                           511     336    -175
+Total: Before=22584400, After=22583906, chg -0.00%
 
-    Currently the queues are reset before new dev->num_tx_queues
-    is assigned, leaving a window of time where packets can be
-    enqueued onto the queues going down, leading to a likely
-    crash in the drivers, since most drivers don't check if TX
-    skbs are assigned to an active queue.
+Eric Dumazet (8):
+  ipv6: pass proto by value to ipv6_push_nfrag_opts() and
+    ipv6_push_frag_opts()
+  ipv6: add some unlikely()/likely() clauses in ip6_output.c
+  ipv6: use __skb_push() in ip6_xmit()
+  ipv6: use SKB_DROP_REASON_PKT_TOO_BIG in ip6_xmit()
+  inet: add dst4_mtu() and dst6_mtu() helpers
+  ipv6: use dst6_mtu() instead of dst_mtu()
+  ipv4: use dst4_mtu() instead of dst_mtu()
+  ipv6: colocate inet6_cork in inet_cork_full
 
-    Fixes: e6484930d7c7 ("net: allocate tx queues in register_netdevice")
-    Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
+ include/linux/ipv6.h                |   8 ---
+ include/net/dst.h                   |   6 ++
+ include/net/inet_sock.h             |  10 +++
+ include/net/ip6_route.h             |   6 ++
+ include/net/ipv6.h                  |  16 ++---
+ net/ipv4/icmp.c                     |   2 +-
+ net/ipv4/ip_output.c                |   4 +-
+ net/ipv4/ip_sockglue.c              |   2 +-
+ net/ipv4/ipmr.c                     |   2 +-
+ net/ipv4/netfilter/nf_reject_ipv4.c |   2 +-
+ net/ipv4/tcp_ipv4.c                 |  13 ++--
+ net/ipv6/exthdrs.c                  |  55 +++++++-------
+ net/ipv6/ip6_gre.c                  |   2 +-
+ net/ipv6/ip6_output.c               | 108 ++++++++++++++--------------
+ net/ipv6/ip6_tunnel.c               |   6 +-
+ net/ipv6/ipv6_sockglue.c            |   4 +-
+ net/ipv6/raw.c                      |   2 +-
+ net/ipv6/route.c                    |  10 +--
+ net/ipv6/sit.c                      |   2 +-
+ net/ipv6/tcp_ipv6.c                 |   9 +--
+ 20 files changed, 144 insertions(+), 125 deletions(-)
 
-So perhaps a fix for pre 4.20 kernel would be: (I kept the
-synchronize_net() to be really cautious and because I really do not
-want to test)
+-- 
+2.53.0.rc1.225.gd81095ad13-goog
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 93243479085fb1d61031ed2136f5aee22d8f313d..4dd1db70561d35fe2097afc8676=
-4dd82bfd0bf27
-100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2636,6 +2636,7 @@ int netif_set_real_num_tx_queues(struct
-net_device *dev, unsigned int txq)
-
-                if (disabling) {
-                        synchronize_net();
-+                       synchronize_rcu_bh();
-                        qdisc_reset_all_tx_gt(dev, txq);
- #ifdef CONFIG_XPS
-                        netif_reset_xps_queues_gt(dev, txq);
 
