@@ -1,186 +1,242 @@
-Return-Path: <netdev+bounces-255198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255199-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHEuGR3pfGlTPQIAu9opvQ
-	(envelope-from <netdev+bounces-255198-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:23:41 +0100
+	id CPopM0fpfGlTPQIAu9opvQ
+	(envelope-from <netdev+bounces-255199-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:24:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BE1BD04E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:23:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD64BD05C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 163683053BA0
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 17:22:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14B003068158
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 17:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A81235B129;
-	Fri, 30 Jan 2026 17:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECB535E55B;
+	Fri, 30 Jan 2026 17:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="RWamMXeY"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="WE3/f3aL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F189359710;
-	Fri, 30 Jan 2026 17:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769793768; cv=none; b=IdDVIxxd59LcT8I9KwKCQVpLKsTaXmNytkBhEjzvNak/X4A71E3kTOBe9zra0st5laF0tHUCPNcrthv5lIWfS5hGBZh5/JELQveQtnkENos/zCedclXENWO0EQ0LpbivxQh7y5Qpm1sJt66w5xRLB3Y7i4jpHDsSXnQX+s7OZrc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769793768; c=relaxed/simple;
-	bh=6IsexkEpjd/dpxFx6yAbjOBMYeOwHCgMSGgGXfn9CQM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BT0xcnVlHaS0jKLbdKy37/rOIcf8xdOnoOUixgYRqmKEIhxw2Yck7fXT/Xr2R15180DuNDBPIqPe607vqDqWT0PeFhV7zhDA7RWzK0Mtei6tUfVlaQZonhbq+YATT+mJ/6jrWkWFZuPg10nlbtRqGzxPQeruTN7XOkwoMzyAu7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=RWamMXeY; arc=none smtp.client-ip=79.135.106.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1769793757; x=1770052957;
-	bh=6IsexkEpjd/dpxFx6yAbjOBMYeOwHCgMSGgGXfn9CQM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=RWamMXeYqBHKsrbXiwOuVpNWjJIxfHiElPhlRlrW1tr5VTMVcDd4WcLMq2NK6hxBF
-	 bdRBSkiJ+2DS7JBRMLjpuhwDhLh3CvLrc9q/HyHabyuOyCbZCHA6VzQOMn2xw5CfYW
-	 5RB5sgxzGdrIobprkKhb4mfv9+x4Ar2opPx7ld57CuiboRHgaJZcAn52MN3kUbYh6Y
-	 FVE3GVpgpTKDFWsLozYyPg49WNlMNxE8tFVrdZe8YJoJTjyO7jpS+PoSvlEMh1LP9g
-	 1LnUDTgQV/csEWTZo/4rfnNUuFYGizAYzOwJ0XfuKjrzNHrQPWqMJONFGqSLyEwXJP
-	 7LoqOcEwg1xEg==
-Date: Fri, 30 Jan 2026 17:22:33 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-Message-ID: <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org>
-In-Reply-To: <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com>
-References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 7b528e6ff830b50d937c1b4134436380198bfc88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4795C35CB6D
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 17:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769793780; cv=pass; b=qtQjN0Sa+kbL7TL50i18Mo3Gw6k/+/tpbDla49vxz1y5+Pt7eyzekB2RiCqOTUylrC5gEXrXY7iJhoFLDGStS5dE18i0NBROGY9aJb+f+rnVAdWy2Rs8zjRYf2w+2nMLkEprdf2Fx2+dyZZ4x9zNGxkhuMm1PXsbuwojam51flY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769793780; c=relaxed/simple;
+	bh=ocjG46c88QGqMkXQFFZZO7jfT8JcxSXik8sxiLd2fUw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pl/9+8aoOAqFWil1gPbnd+1XgYwRKDCp8SvrQmsQv4bM4usyBBK/CXLlrD44em0eVWrhbvFd4SHAGZ+Sqqikqh/XvxyKYInqfaTMNflZsKNAE0DS6Dnph8ZfyJwrvMYDexYz1TsQqPfVLo1DFY2CvjH8/P6sefxN7niAF4Xk/iw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=WE3/f3aL; arc=pass smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-385b5174f54so20293951fa.3
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 09:22:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769793774; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RNyYaPMYZjYaZey6W+zpTEPlWD9JDMu8fFZRyrdg7g/K1R3dcZt6H2b0uuxYgTnsUv
+         5+8FjraAGi45K97Nl3MK2ucynE1KPNoMYzvZYS9H7YFdmKjWcI/DxsVKRGZiI/trFNdi
+         iQJgFUnA+Vt3iMsVY3Q8YjmSLonxg5AFOCRSIfewE/b7UIrRvkPEGIcYFDql4hXBBzXR
+         b+lrnT3ZECHX6TYtJHYwcDayHd9X2s+JR77d0ZWRYuPQ8EJ3DoUHAC2qvesfB9ldrmZI
+         UVI3SRUbPuaxqnX6yFKVkIoup2ss4dETEStiNyLBqNa0y2uJbVjJzvblDjx/7Kosd+Ii
+         0hsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=2jTh3EtSrX+tiLurIKSfJpP9a1rQldqnpR/gv89ljaA=;
+        fh=atUgrihWuAdpbARaTVJA5ZvnLp3d5A7dHp7VujmWYgY=;
+        b=P/wzDmN028nH8sBqfs5Ckm9k6eZD24t2STsqrue6zXm0EJQx03MyQxez/YYKPobiO/
+         ZAlBaYdf/fQf3dAjCIK7bMhuf6Ff8HD1vejfTXetl0n1YOzwxRelCX6d9jwOS0IIRoET
+         BthcTcFwcxuSF0PxRKkf4+UmxxCNxDmmFaxQpT4U3HR05QvssN+FGKF/eDbPUSZwufjP
+         lHMD2AKhrKCZP+CVk8A9cvCM9uR0t1uBq+oSJNWNOVbXx9pMLvhkndyEUCrBCrSy6OCb
+         yIqsXwMtS18ZSen7568XvhgY1SwD6MBu5RnWClg0KwQtCTfTFrqB9fmB8Km6MSy7iVIm
+         LgoQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=herbertland.com; s=google; t=1769793774; x=1770398574; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2jTh3EtSrX+tiLurIKSfJpP9a1rQldqnpR/gv89ljaA=;
+        b=WE3/f3aL49lltjLVzq1UDSSS1fNdjT8HsbKQtNIER3CEvtgEZeDu2Xyo0S2Z3RMdnL
+         1u8jCM8ntZaSoaU6jP0V09LfAlf52lbFmZog7W2Z0mtMrf/Z0lvu6TwGsdw56K1YMJAS
+         5S/IWpmUBNhb6oV8LDpV+GrqFniEQNdEt0NvSF2CUR/yEVe+sjHX2vGmVHShVDbmtNS/
+         eSiSIUHAZZlQJbplXUMESXqm4g4xqAGml2NKUEf5trwmyFoIXAukdaP+BDE+UhvFAiGm
+         oDW2r8jqBOniSELHQL/Y45xPbrISJcqTh15zQI6x3JpiyMZzq2Ii8PAdsC7kfigAVQdR
+         vmeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769793774; x=1770398574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2jTh3EtSrX+tiLurIKSfJpP9a1rQldqnpR/gv89ljaA=;
+        b=IYaC/M650su3VoSTLmpioH62ZbjD54ZpQPhRfY0Y4DNc8afOjtbsD3ui1wwya2SCVJ
+         ckkZL4nzYvrqKjNwHQyWRmBICbkfc3aWvqEqxi6cSo3ce0oCxhkM19B/zm7eezpKPNfJ
+         UNdn5OpFNK7aLsYkk68PFwY/BJhX3PrTeHK3B2i6B9Z5pfWDO8ixQIww1MLCVR7pRGWH
+         zHElxnyRC7WSRrdV/IkP/POMbrH7Do7cSET0zwr0IAdY+2Kp1w8SZb3q5kIGT2UKmW4A
+         qgXyi6lApD2oj7BiBUWk4s7t6MpznUzd4jn35eyKqu37I9dSxwZHxbbf35WVICQPFr7B
+         yRWA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDIaXcg0ufzfrVKTNOhwXk+zfBQIvIkyZuZ74gnNtevpAU7ulk2U9bfQoWv42TNMv2BHRtwOg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznvcracyosCDNkLbMhXyAtgBJ5skKXUqMFwizsPyjy8TO5y9dB
+	3dyABBzxvW1zEMXPUcakX8HdCt71FheHrubU+bSrxSqY8rm+57M6GiRjdVQ0Kw8mRQaFWp+1tV/
+	7ZIqp78Kj2/gZ06oRW9Wq2B3EIbbkQwpnxXUqwrQNbgz7WCm9fKk=
+X-Gm-Gg: AZuq6aKDf/cfSUSUaslSOcGWky0yP7fzdF63b6ASAtEX77QKMcNAB1tUiqNMWjiBUun
+	GiAA8KCScciqjgvj9ENLaejBhRNzC+1uOizL7QhMwnoFpLJ6eGH6RTnJzAo3z8hssXLtzKE9yfl
+	BzzT70EpxCntLKB4L/InZjqcKJDHLASAGyGAbej0ouEa+mgSly0Ohc7qNmYCEsP77YCDAWctC5I
+	P3LojYgRjEc7YEWbC2/76RJ5g1sFrUJlByBkrZFSNQjjslOtCAUufJ2I9utgZjEqX7JynwwPnR2
+	WRnXFbuvlfFFOqr63yA05r/b34gmb8GV7agSwrSO8VlQFdXbjdiIFhLLrxRy
+X-Received: by 2002:a05:651c:50d:b0:382:fb5b:38f5 with SMTP id
+ 38308e7fff4ca-38646538b3cmr11855581fa.12.1769793774335; Fri, 30 Jan 2026
+ 09:22:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260126194826.236075-1-tom@herbertland.com> <20260126194826.236075-3-tom@herbertland.com>
+ <willemdebruijn.kernel.235a1f46c52f8@gmail.com> <60fb02d8-77ca-457b-be24-33a3cc7b344b@gmail.com>
+In-Reply-To: <60fb02d8-77ca-457b-be24-33a3cc7b344b@gmail.com>
+From: Tom Herbert <tom@herbertland.com>
+Date: Fri, 30 Jan 2026 09:22:43 -0800
+X-Gm-Features: AZwV_QjWPMwor3uUGO294d47RvW_z90CFWfED180mww5EX9S4BEfpFmxZTlzS6M
+Message-ID: <CALx6S35Z63WDMOkZLJ7PzR6BcEV4h5f7Jm-Okw9izcuFcygNoA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/7] ipv6: Cleanup IPv6 TLV definitions
+To: Justin Iurman <justin.iurman@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-255198-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-255199-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[herbertland.com:+];
+	RCPT_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,raw.githubusercontent.com:url,1g4.org:email,1g4.org:dkim,1g4.org:mid,mojatatu.com:email]
-X-Rspamd-Queue-Id: C2BE1BD04E
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3BD64BD05C
 X-Rspamd-Action: no action
 
-Yes, In net/sched/act_api.c the GETACTION notify path always does alloc_skb=
-(NLMSG_GOODSIZE), if tca_get_fill()=20
-runs out of tailroom it returns -1 and tcf_get_notify() maps that to -EINVA=
-L. So failures are size-dependent=20
-and can look intermittent across different action dumps. act_gate might be =
-the outlier?
+On Thu, Jan 29, 2026 at 10:13=E2=80=AFAM Justin Iurman <justin.iurman@gmail=
+.com> wrote:
+>
+> On 1/29/26 06:30, Willem de Bruijn wrote:
+> > Tom Herbert wrote:
+> >> Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h to be with the rest
+> >> of the TLV definitions. Label each of the TLV definitions as to whethe=
+r
+> >> they are a Hop-by-Hop option, Destination option, or both.
+> >>
+> >> Signed-off-by: Tom Herbert <tom@herbertland.com>
+> >> ---
+> >>   include/uapi/linux/in6.h        | 21 ++++++++++++++-------
+> >>   include/uapi/linux/ip6_tunnel.h |  1 -
+> >>   2 files changed, 14 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
+> >> index 5a47339ef7d7..438283dc5fde 100644
+> >> --- a/include/uapi/linux/in6.h
+> >> +++ b/include/uapi/linux/in6.h
+> >> @@ -140,14 +140,21 @@ struct in6_flowlabel_req {
+> >>
+> >>   /*
+> >>    * IPv6 TLV options.
+> >> + *
+> >> + *  Hop-by-Hop and Destination options share the same number space.
+> >> + *  For each option below whether it is a Hop-by-Hop option or
+> >> + *  a Destination option is indicated by HBH or DestOpt.
+> >>    */
+> >> -#define IPV6_TLV_PAD1               0
+> >> -#define IPV6_TLV_PADN               1
+> >> -#define IPV6_TLV_ROUTERALERT        5
+> >> -#define IPV6_TLV_CALIPSO    7       /* RFC 5570 */
+> >> -#define IPV6_TLV_IOAM               49      /* RFC 9486 */
+> >> -#define IPV6_TLV_JUMBO              194
+> >> -#define IPV6_TLV_HAO                201     /* home address option */
+> >> +#define IPV6_TLV_PAD1               0       /* HBH or DestOpt */
+> >> +#define IPV6_TLV_PADN               1       /* HBH or DestOpt */
+> >> +#define IPV6_TLV_TNL_ENCAP_LIMIT 4  /* RFC 2473, DestOpt */
+> >> +#define IPV6_TLV_ROUTERALERT        5       /* HBH */
+> >> +#define IPV6_TLV_CALIPSO    7       /* RFC 5570, HBH */
+> >> +#define IPV6_TLV_IOAM               49      /* RFC 9486, HBH or Desto=
+pt
+> >> +                                     * IOAM sent and rcvd as HBH
+> >
+> > Explicit labeling with HBH or Destopt is quite informative.
+> >
+> > Does this mean that IPV6_TLV_IOAM should also be accepted in ip6_parse_=
+tlv
+> > in the Destopt branch? RFC 9486 indeed did reserve a number.
+>
+> Nope, not right now. The only IOAM option currently implemented in the
+> kernel is the Pre-allocated Trace, which uses a Hop-by-Hop option. It
+> wouldn't make sense to have it in a Destination option, although you
+> could (i.e., it's not forbidden, just weird). Actually, the only IOAM
+> option that would make sense to carry in a Destination Option is the
+> Edge-to-Edge (E2E), but it's not implemented in the kernel. Should it be
+> implemented at some point, then yes, you'd have IPV6_TLV_IOAM in the
+> Destopt branch as well.
 
-The size is already computed in tca_action_gd() (sum tcf_action_fill_size()=
- then tcf_action_full_attrs_size())=20
-and add/del already allocate max(attr_size, NLMSG_GOODSIZE). This patch jus=
-t makes GETACTION consistent with=20
-that.
+Justin,
 
-On the reproducer: the gatebench test with 100 entries is reasonable.
-https://raw.githubusercontent.com/jopamo/gatebench/refs/heads/main/src/self=
-tests/test_large_dump.c
+Conceptually, someone could put IOAM in Destination Options before the
+Routing Header. There's about 0% of that ever happening though.
 
-I plan to follow this up with another patch for act_gate and believe they b=
-oth are integral to fully stabilize=20
-act_gate.
+Tom
 
-Thanks
-Paul
-
-
-
-On Friday, January 30th, 2026 at 10:05 AM, Jamal Hadi Salim <jhs@mojatatu.c=
-om> wrote:
-
->=20
->=20
-> On Fri, Jan 30, 2026 at 8:43=E2=80=AFAM Paul Moses p@1g4.org wrote:
->=20
-> > tcf_action_fill_size() already computes the required dump size, but
-> > RTM_GETACTION replies always allocate NLMSG_GOODSIZE. Large action
-> > state can overrun that skb and make dumps fail.
-> >=20
-> > Use the computed reply size for RTM_GETACTION replies so large actions
-> > can be dumped, while still keeping NLMSG_GOODSIZE as a floor.
-> >=20
-> > Fixes: 4e76e75d6aba ("net sched actions: calculate add/delete event mes=
-sage size")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Paul Moses p@1g4.org
-> > ---
-> > net/sched/act_api.c | 7 ++++---
-> > 1 file changed, 4 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> > index e1ab0faeb8113..8ab016d352850 100644
-> > --- a/net/sched/act_api.c
-> > +++ b/net/sched/act_api.c
-> > @@ -1685,12 +1685,12 @@ static int tca_get_fill(struct sk_buff *skb, st=
-ruct tc_action *actions[],
-> >=20
-> > static int
-> > tcf_get_notify(struct net *net, u32 portid, struct nlmsghdr *n,
-> > - struct tc_action *actions[], int event,
-> > + struct tc_action *actions[], int event, size_t attr_size,
-> > struct netlink_ext_ack *extack)
-> > {
-> > struct sk_buff *skb;
-> >=20
-> > - skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-> > + skb =3D alloc_skb(max_t(size_t, attr_size, NLMSG_GOODSIZE), GFP_KERNE=
-L);
-> > if (!skb)
-> > return -ENOBUFS;
-> > if (tca_get_fill(skb, actions, portid, n->nlmsg_seq, 0, event,
-> > @@ -2041,7 +2041,8 @@ tca_action_gd(struct net *net, struct nlattr *nla=
-, struct nlmsghdr *n,
-> > attr_size =3D tcf_action_full_attrs_size(attr_size);
-> >=20
-> > if (event =3D=3D RTM_GETACTION)
-> > - ret =3D tcf_get_notify(net, portid, n, actions, event, extack);
-> > + ret =3D tcf_get_notify(net, portid, n, actions, event,
-> > + attr_size, extack);
-> > else { /* delete */
-> > ret =3D tcf_del_notify(net, n, actions, portid, attr_size, extack);
-> > if (ret)
->=20
->=20
-> dunno. Is this based on some issue you found? This is a common pattern
-> in a lot of places in the stack and has not caused any issues (afaik).
->=20
-> cheers,
-> jamal
+>
+> >> +                                     */
+> >> +#define IPV6_TLV_JUMBO              194     /* HBH */
+> >> +#define IPV6_TLV_HAO                201     /* home address option, D=
+estOpt */
+> >>
+> >>   /*
+> >>    * IPV6 socket options
+> >> diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip6_=
+tunnel.h
+> >> index 85182a839d42..35af4d9c35fb 100644
+> >> --- a/include/uapi/linux/ip6_tunnel.h
+> >> +++ b/include/uapi/linux/ip6_tunnel.h
+> >> @@ -6,7 +6,6 @@
+> >>   #include <linux/if.h>              /* For IFNAMSIZ. */
+> >>   #include <linux/in6.h>             /* For struct in6_addr. */
+> >>
+> >> -#define IPV6_TLV_TNL_ENCAP_LIMIT 4
+> >>   #define IPV6_DEFAULT_TNL_ENCAP_LIMIT 4
+> >>
+> >>   /* don't add encapsulation limit if one isn't present in inner packe=
+t */
+> >> --
+> >> 2.43.0
+> >>
+> >
+> >
+>
 
