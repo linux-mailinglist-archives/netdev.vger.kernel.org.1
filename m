@@ -1,125 +1,133 @@
-Return-Path: <netdev+bounces-255232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Wgh0DOABfWlnPwIAu9opvQ
-	(envelope-from <netdev+bounces-255232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:09:20 +0100
+	id QBV+DiYEfWmRPwIAu9opvQ
+	(envelope-from <netdev+bounces-255233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:19:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F5BBE0BC
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:09:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8F9BE0EB
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:19:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B741D301326F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:09:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63422303E383
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB51381701;
-	Fri, 30 Jan 2026 19:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D3B387596;
+	Fri, 30 Jan 2026 19:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NpZRguy8"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970542EB87E;
-	Fri, 30 Jan 2026 19:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D906374196
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769800156; cv=none; b=p8pK8Jw2iDmB8gJwf8R2P/R/IQnn+U3uys7I6rJ7pgF3X3qkAMKLRYbqKMu0/2hN2tkmIO21JXrau91ro1LFRW4RAztsOV1wwoI0bTrh1Ia83zug9Ye9Gf13k2iTZyyce556edy69GMgr54REFBcE6Lqd4TtrL253yBGtLi7WR0=
+	t=1769800737; cv=none; b=XTJrLVxIEd8sk3pALNLRmBEVCdWsx+I+Zf/D9qs4L+92yjJYWOsKvcIN8i+j0N8S88q0FLaXYV41JEQ+r8tQu/lh9exrOx1AZwbCfJMGwX68e1mm0dRgUbtlftyy5GZWjrs8yK1Yl2QYN3SI5s3QB6kPhRUHlV78pLtKLLQx4VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769800156; c=relaxed/simple;
-	bh=rBhfQopWnftohEzB3BgoUhd1e9v5JvRwFWBMDnhJoH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ys4B6rxg9fxOuZuUbtEJNjzhVGWqAOmp3Cc54Esai4+FOzjaQpc+WUJU7LLn51kdE3IRH7Lrt0Z4Phu2WQopP28mVGfjPLxlTd5FksF7TW6844EKB3ENCUkwL6oKdXi/duuKID2rqHNIdJkpNGu5nn+zsJs8tMGiDMUAvdUJxQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id F3EB6602AB; Fri, 30 Jan 2026 20:09:11 +0100 (CET)
-Date: Fri, 30 Jan 2026 20:09:11 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org
-Subject: Re: [PATCH v2 net-next 0/7] netfilter: updates for net-next
-Message-ID: <aX0B1xaFGL43xxUn@strlen.de>
-References: <20260129105427.12494-1-fw@strlen.de>
- <20260130081245.6cacdde2@kernel.org>
+	s=arc-20240116; t=1769800737; c=relaxed/simple;
+	bh=2AhY+WzF0t3dfHKI/s7gCokW2fhsAvXVoNXQlUxnogg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=saydAxrCob41+NOogq3vmnq+3kE4Om5jRgUf5gkPfIQWriyHenvuIIiLizfiMsIO43mdIAMcvjJqdco2DfW9Vw5clYCiI4BCxZ5nUcI7L8dUR7Ic53lqQ+oZaARr/Nco0u2/ZfFcTWN/CGTnlqHM+T3OqAUIOv2D4mO+Y4FNA1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NpZRguy8; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 49FFCC22F63;
+	Fri, 30 Jan 2026 19:18:56 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A3C8E6075A;
+	Fri, 30 Jan 2026 19:18:52 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9CF06119A885C;
+	Fri, 30 Jan 2026 20:18:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769800731; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=Y4FPRRHG65/7gK1cs/oNVTykKIz42PNB3W+KzByRE1A=;
+	b=NpZRguy8oaVdBEFrYrzUp16bYHyPP/N9L0XrejaRHGf3l3cNE/RsxCf7qX2IErg3JBOa9/
+	L8OS1+gaSoEYt4BnHzcbFCSlpwnTSFZnw+2jFBiYhvTi77ZyhqRBBFTB0DGlM6+V0nDGyk
+	mFF9+9DzhZCzliXBJ9GUnZIBHohfHJJ9FuukEuYqVfeurYbBteFLOHabFijM5hmD2+96jp
+	OTl5YxhgJjtjJDnPXkyj/HjGopuZRXOHONy05Qc8jxEVrJiydrwUVZk8Q7laI2qY0Jz4Cz
+	Z13S2xykO/dwa9BrBTHCaRmwiWiyrWMKxp3BaEAx0Ws+Hw1s6qHznp2cQN6+Bg==
+Message-ID: <ee26c05c-a7dd-4334-b359-353449e50662@bootlin.com>
+Date: Fri, 30 Jan 2026 20:18:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260130081245.6cacdde2@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: stmmac: clear half-duplex caps where
+ unsupported
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aXyRlFw7ZuhRPiKo@shell.armlinux.org.uk>
+ <E1vlmOQ-00000006zuz-0ffN@rmk-PC.armlinux.org.uk>
+ <9dfdeee0-7758-439b-a2a5-a7f243427cf4@bootlin.com>
+ <aXzzxeRsbnF8-nAq@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aXzzxeRsbnF8-nAq@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255232-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255233-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:mid]
-X-Rspamd-Queue-Id: 76F5BBE0BC
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 9E8F9BE0EB
 X-Rspamd-Action: no action
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Thu, 29 Jan 2026 11:54:20 +0100 Florian Westphal wrote:
-> > v2: discard buggy nfqueue patch, no other changes.
-> > 
-> > The following patchset contains Netfilter updates for *net-next*:
-> > 
-> > Patches 1 to 4 add IP6IP6 tunneling acceleration to the flowtable
-> > infrastructure.  Patch 5 extends test coverage for this.
-> > From Lorenzo Bianconi.
-> > 
-> > Patch 6 removes a duplicated helper from xt_time extension, we can
-> > use an existing helper for this, from Jinjie Ruan.
-> > 
-> > Patch 7 adds an rhashtable to nfnetink_queue to speed up out-of-order
-> > verdict processing.  Before this list walk was required due to in-order
-> > design assumption.
-> 
-> Hi Florian, some more KASAN today:
-> 
-> https://netdev-ctrl.bots.linux.dev/logs/vmksft/nf-dbg/results/496421/vm-crash-thr0-0
+On 30/01/2026 19:09, Russell King (Oracle) wrote:
 
-> [ 1144.170509][   T12] ==================================================================
-> [ 1144.170759][   T12] BUG: KASAN: slab-use-after-free in idr_for_each+0x1c1/0x1f0
-> [ 1144.170922][   T12] Read of size 8 at addr ff11000012a16a70 by task kworker/u16:0/12
-> [ 1144.171079][   T12] 
-> [ 1144.171133][   T12] CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.19.0-rc7-virtme #1 PREEMPT(full) 
-> [ 1144.171137][   T12] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> [ 1144.171139][   T12] Workqueue: netns cleanup_net
-> [ 1144.171145][   T12] Call Trace:
-> [ 1144.171147][   T12]  <TASK>
-> [ 1144.171149][   T12]  dump_stack_lvl+0x6f/0xa0
-> [ 1144.171154][   T12]  print_address_description.constprop.0+0x6e/0x300
-> [ 1144.171159][   T12]  print_report+0xfc/0x1fb
-> [ 1144.171161][   T12]  ? idr_for_each+0x1c1/0x1f0
-> [ 1144.171163][   T12]  ? __virt_addr_valid+0x1da/0x430
-> [ 1144.171167][   T12]  ? idr_for_each+0x1c1/0x1f0
-> [ 1144.171168][   T12]  kasan_report+0xe8/0x120
+> If you look at /sys/kernel/debug/stmmaceth/ethX/dma_cap, it should
+> say whether half duplex is supported (I guess in your case it will
+> be, it's probably very unlikely not to be.) However, would be worth
+> knowing whether the if() is taken or not!
+> 
 
-Sigh.  Doesn't ring a bell, I will have a look.
+Just rebuilt a kernel w/ debugfs support, and indeed I have :
+[...]
+	10/100 Mbps: Y
+	1000 Mbps: Y
+	Half duplex: Y
+[...]
+
+So looks like the if() isn't taken :)
+
+Maxime
 
