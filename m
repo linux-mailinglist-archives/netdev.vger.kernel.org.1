@@ -1,145 +1,146 @@
-Return-Path: <netdev+bounces-255152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255153-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJ3fCkW2fGm7OQIAu9opvQ
-	(envelope-from <netdev+bounces-255152-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:46:45 +0100
+	id 8EBGKXu2fGm7OQIAu9opvQ
+	(envelope-from <netdev+bounces-255153-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:47:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ECA0BB50B
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:46:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0436FBB529
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1294F301E94F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:41:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2B43301B703
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9550A2D8DC8;
-	Fri, 30 Jan 2026 13:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3918030BBB6;
+	Fri, 30 Jan 2026 13:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OshYGjNO"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="U1IYfEJ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mail-08.mail-europe.com (mail-08.mail-europe.com [57.129.93.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D003EBF04
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19532690EC;
+	Fri, 30 Jan 2026 13:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.129.93.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769780492; cv=none; b=OJIvYWD69Vi2pk9qofOs3j9Y72rIvFShMAWHe0UW1pET4TPBFG9isdfOmiDciR+wFdOCe46nT7HNSBBQMJ36KlCOvwgw8FPHD0zfZ6HUzsDJZ9Eyqb/h6OyZCGbmVsGaIgB1hOr5Jflh173F76zE3h9+6DslOYb6ZqU3Oq7VTG8=
+	t=1769780633; cv=none; b=LTLDbcMVZw+LIMjrvexQOCm7qf5mfIHOCRVxcXs2cLdr6xulxwYSTCFL1katOo77/SEiwJeQUhu2Ua8ZP/NtUeF7Vnwd2/a3+CSPOtaWm+iRNr7XR3SEmw3woTIBBvGNuG1H1de4YDGHf+ty49AIHnc1d7N+oPD26i3F7c/4drM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769780492; c=relaxed/simple;
-	bh=6FsHRzd7wh8PvCwk7n6nKCZEIEPbDL/cQG0WAumT5iA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K6WdcbxErpV/NUhyqTP8wYxBjLiphR0g+uTfm7hN+suEbDzGJMOhtPAXuAX1bihf/mhiKzdwU0RDJ+W3LI7orLBUiKlCyW0e9WIDKvXxytBvzlAEtyGp8k4nOEz1GEEeSWEc5kLEMsAVNYU09y1SCkOZUiQsPwiqfNHAfIFvXkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OshYGjNO; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 53B1D1A2B3A;
-	Fri, 30 Jan 2026 13:41:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 246C26075A;
-	Fri, 30 Jan 2026 13:41:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9C4DE119A885C;
-	Fri, 30 Jan 2026 14:41:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769780488; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=TxIA3Fag8gqy+7Gr2vgkUxxZMZWgXcdj2sE3kyvxrtM=;
-	b=OshYGjNOI8uT264Wv8fROQ5dotDBe4P5mpasX/mFCf3HgmQozru5SyFyKDy3vhucSH6yAk
-	tTQLsYjxAT9Ie11untOl64hQsbD6Ekb5QLngiwWrhG+JQUlzU25n1zZz1Mb4l3+tGAEKV9
-	Jb4MmSVxq6fnbh3LGP6jkUaT1dF75YK/keSKD3g92ouQBwbCWJEZ3hl7jzqxSuQwmkqYFS
-	UaGs9XL37nhuQP0UWxryU+6O7nsN7YPeMyp70lUeVP5joMlkPlfh1MU8vDs9V9YSVrNq6r
-	OJLnJRFlGnU2xjvfLjVyVJaa0CcVsGO9b2C1wTeQ5raZ0wF3wzlQ4viD36d2rQ==
-Message-ID: <874d4b28-754d-47b8-a207-9b73db403dba@bootlin.com>
-Date: Fri, 30 Jan 2026 14:41:22 +0100
+	s=arc-20240116; t=1769780633; c=relaxed/simple;
+	bh=rAGOGx/VCQd8tSSh1Fy/QiBJT9QETQryqJToEiumKio=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=YeZhDddbTSKBBO3zTLLjF7iBMvKQv8LLeLD4/BHxUtCOv6s+LDt+zmmWE+7nR0r5xHFJhVMVcVcmx4BDIzdAnUv7wcAtzmHrlA4yt+uo7/6IIFV69xxdmpZ3FT87CrUunUrM84D5YTLmsVT3nAHISn7jxVQoSnVbtP0eajLwhvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=U1IYfEJ/; arc=none smtp.client-ip=57.129.93.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1769780613; x=1770039813;
+	bh=4KDZUqvmMno7yW8oOrUdUcN5Nz5/pz+QmHHRkxvLtuU=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=U1IYfEJ/Ko4xyhSTf72fovpGvLO3FmrTGYd97ILt7fbVP8jcVw6o4+C+GXjPkiB7u
+	 Ej3N2HXJNLdCw5/Jn9jVM35h8e1l/t0ZTA0kUqsw5dBh6nTc8kYILYXdZ1+SQiLioK
+	 8/aU7X/aCcfuMEwcAWr4p8+WC73fK/EBYy1vfLaZ0YlK9b2WbhZSxKDlwAFCy0OeRJ
+	 6UOn6DTAY+KGO4xACZDkjiTB6dYuX6KLpOFeSg8DHfg9T8i83HpH40n+lviYVTE2o8
+	 JarKd9Qv9BbHONak7JZjZGpOQEtbNiVJbl9GRrI5weTAni5hEyfiOMQaTLFfTOoHHk
+	 fCwIAyC2Os97Q==
+Date: Fri, 30 Jan 2026 13:43:29 +0000
+To: netdev@vger.kernel.org
+From: Paul Moses <p@1g4.org>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>, stable@vger.kernel.org
+Subject: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
+Message-ID: <20260130134220.305757-1-p@1g4.org>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 8aee2c205e039bc00247308ff3996e9fb0d23fc8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/13] net: phy: phy_link_topology: Add a helper
- to retrieve ports
-To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20260127134202.8208-1-maxime.chevallier@bootlin.com>
- <20260127134202.8208-11-maxime.chevallier@bootlin.com>
- <7904208.EvYhyI6sBW@fw-rgant>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <7904208.EvYhyI6sBW@fw-rgant>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255152-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[bootlin.com,davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[vger.kernel.org,bootlin.com,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255153-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,1g4.org];
+	DKIM_TRACE(0.00)[1g4.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7ECA0BB50B
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:email,1g4.org:dkim,1g4.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0436FBB529
 X-Rspamd-Action: no action
 
+tcf_action_fill_size() already computes the required dump size, but
+RTM_GETACTION replies always allocate NLMSG_GOODSIZE. Large action
+state can overrun that skb and make dumps fail.
 
+Use the computed reply size for RTM_GETACTION replies so large actions
+can be dumped, while still keeping NLMSG_GOODSIZE as a floor.
 
-On 28/01/2026 17:10, Romain Gantois wrote:
-> On Tuesday, 27 January 2026 14:41:58 CET Maxime Chevallier wrote:
->> In order to allow netlink access to phy_ports, let's add a helper to
->> retrieve them. When handling a port coming from phy_link_topology, the
->> caller must hold rtnl until it's done with it.
-> 
-> Why not use rtnl-specific lockdep annotations to make this more explicit?
+Fixes: 4e76e75d6aba ("net sched actions: calculate add/delete event message=
+ size")
+Cc: stable@vger.kernel.org
+Signed-off-by: Paul Moses <p@1g4.org>
+---
+ net/sched/act_api.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-While this makes sure the call-site holds the lock as it should, it
-doesn't guarantee the caller won't release it too early.
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index e1ab0faeb8113..8ab016d352850 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1685,12 +1685,12 @@ static int tca_get_fill(struct sk_buff *skb, struct=
+ tc_action *actions[],
+=20
+ static int
+ tcf_get_notify(struct net *net, u32 portid, struct nlmsghdr *n,
+-=09       struct tc_action *actions[], int event,
++=09       struct tc_action *actions[], int event, size_t attr_size,
+ =09       struct netlink_ext_ack *extack)
+ {
+ =09struct sk_buff *skb;
+=20
+-=09skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
++=09skb =3D alloc_skb(max_t(size_t, attr_size, NLMSG_GOODSIZE), GFP_KERNEL)=
+;
+ =09if (!skb)
+ =09=09return -ENOBUFS;
+ =09if (tca_get_fill(skb, actions, portid, n->nlmsg_seq, 0, event,
+@@ -2041,7 +2041,8 @@ tca_action_gd(struct net *net, struct nlattr *nla, st=
+ruct nlmsghdr *n,
+ =09attr_size =3D tcf_action_full_attrs_size(attr_size);
+=20
+ =09if (event =3D=3D RTM_GETACTION)
+-=09=09ret =3D tcf_get_notify(net, portid, n, actions, event, extack);
++=09=09ret =3D tcf_get_notify(net, portid, n, actions, event,
++=09=09=09=09     attr_size, extack);
+ =09else { /* delete */
+ =09=09ret =3D tcf_del_notify(net, n, actions, portid, attr_size, extack);
+ =09=09if (ret)
+--=20
+2.52.GIT
 
-Doesn't hurt to add it though :)
-
-Maxime
-
-> 
-> Thanks,
-> 
 
 
