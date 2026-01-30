@@ -1,181 +1,125 @@
-Return-Path: <netdev+bounces-255231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKA1JXoAfWk5PwIAu9opvQ
-	(envelope-from <netdev+bounces-255231-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:03:22 +0100
+	id Wgh0DOABfWlnPwIAu9opvQ
+	(envelope-from <netdev+bounces-255232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:09:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC77FBE0A8
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:03:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F5BBE0BC
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:09:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8E0A3303EE83
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:03:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B741D301326F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C552E7637;
-	Fri, 30 Jan 2026 19:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="puTFmBaa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB51381701;
+	Fri, 30 Jan 2026 19:09:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D542737F2
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970542EB87E;
+	Fri, 30 Jan 2026 19:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769799798; cv=none; b=ojUOiEk9Zcz3yvB5/Q8SVe0X9jX/1Kd6xe830tK16hgemIyq94tM+KkLeBfB/U+hwKux9rfkq/o5qf5JKf9zgoKLYQ4o7rbSoWe2QRaPIFdnod2QKD4Ff0zENgvvJKVnJJ3KuTICLK/hzzINdq1AEUUgNacGfrUBj3y4Xm8Mwuk=
+	t=1769800156; cv=none; b=p8pK8Jw2iDmB8gJwf8R2P/R/IQnn+U3uys7I6rJ7pgF3X3qkAMKLRYbqKMu0/2hN2tkmIO21JXrau91ro1LFRW4RAztsOV1wwoI0bTrh1Ia83zug9Ye9Gf13k2iTZyyce556edy69GMgr54REFBcE6Lqd4TtrL253yBGtLi7WR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769799798; c=relaxed/simple;
-	bh=dDNSwUmfeXJwNEzP6xwy2mEeBOsNB1GSoOc0BtkqYGA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XICkihymQsyxHyhPU5B84uOtTvoDKQuw7fL+AFat5a2SbVbnspPm4gJVQms1VOH1VH3Lgs13QLo4CjOZHLDRWdui447Nbu1c5o2e+PuEOLc3V6wFnl0IOzX50xYpAm2pu1Kh08+YK3Djj5XIekt1tNuMl4iDTzRCLFKmjmGlVHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=puTFmBaa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49C4EC4CEF7;
-	Fri, 30 Jan 2026 19:03:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769799797;
-	bh=dDNSwUmfeXJwNEzP6xwy2mEeBOsNB1GSoOc0BtkqYGA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=puTFmBaaZPxr5JabxVrRGklf+47UPG2PRZatvklmXqrrS9Z+nQSP7pm9uMr3UPKJw
-	 CP0/bcKPxj3Q0CPXqmdbQOhrI3caINtHMXIcU3gmxq3zExBiO6E8qLtztGnQprU2yO
-	 rWDTPHqi7GPyupi3NVvOZ3i2RNy90AZNDZEXffCJgPU9S6jkTR3NCsDmFmp5V912R5
-	 5aQIHSn8NrcozsDlVdKhz7dDA6U6S4xLU1u5ocVo0Z4KLPbFkW67MSbB+Zyh0sh/JQ
-	 SL/eJmo0oY1G0ofAB/m0V+wht5bCsmGUdPNcLKcfPI6NXRtyd0bU7DSL8DEwwiCKlN
-	 AgHaIyAs+Clvw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	maxime.chevallier@bootlin.com,
-	gal@nvidia.com
-Subject: [PATCH net] net: rss: fix reporting RXH_XFRM_NO_CHANGE as input_xfrm for contexts
-Date: Fri, 30 Jan 2026 11:03:11 -0800
-Message-ID: <20260130190311.811129-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1769800156; c=relaxed/simple;
+	bh=rBhfQopWnftohEzB3BgoUhd1e9v5JvRwFWBMDnhJoH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ys4B6rxg9fxOuZuUbtEJNjzhVGWqAOmp3Cc54Esai4+FOzjaQpc+WUJU7LLn51kdE3IRH7Lrt0Z4Phu2WQopP28mVGfjPLxlTd5FksF7TW6844EKB3ENCUkwL6oKdXi/duuKID2rqHNIdJkpNGu5nn+zsJs8tMGiDMUAvdUJxQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id F3EB6602AB; Fri, 30 Jan 2026 20:09:11 +0100 (CET)
+Date: Fri, 30 Jan 2026 20:09:11 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org
+Subject: Re: [PATCH v2 net-next 0/7] netfilter: updates for net-next
+Message-ID: <aX0B1xaFGL43xxUn@strlen.de>
+References: <20260129105427.12494-1-fw@strlen.de>
+ <20260130081245.6cacdde2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260130081245.6cacdde2@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255231-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255232-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,bootlin.com:email,lunn.ch:email]
-X-Rspamd-Queue-Id: EC77FBE0A8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:mid]
+X-Rspamd-Queue-Id: 76F5BBE0BC
 X-Rspamd-Action: no action
 
-Initializing input_xfrm to RXH_XFRM_NO_CHANGE in RSS contexts is
-problematic. I think I did this to make it clear that the context
-does not have its own settings applied. But unlike ETH_RSS_HASH_NO_CHANGE
-which is zero, RXH_XFRM_NO_CHANGE is 0xff. We need to be careful
-when reading the value back, and remember to treat 0xff as 0.
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Thu, 29 Jan 2026 11:54:20 +0100 Florian Westphal wrote:
+> > v2: discard buggy nfqueue patch, no other changes.
+> > 
+> > The following patchset contains Netfilter updates for *net-next*:
+> > 
+> > Patches 1 to 4 add IP6IP6 tunneling acceleration to the flowtable
+> > infrastructure.  Patch 5 extends test coverage for this.
+> > From Lorenzo Bianconi.
+> > 
+> > Patch 6 removes a duplicated helper from xt_time extension, we can
+> > use an existing helper for this, from Jinjie Ruan.
+> > 
+> > Patch 7 adds an rhashtable to nfnetink_queue to speed up out-of-order
+> > verdict processing.  Before this list walk was required due to in-order
+> > design assumption.
+> 
+> Hi Florian, some more KASAN today:
+> 
+> https://netdev-ctrl.bots.linux.dev/logs/vmksft/nf-dbg/results/496421/vm-crash-thr0-0
 
-Remove the initialization and switch to storing 0. This lets us
-also remove the workaround in ethnl_rss_set(). Get side does not
-need any adjustments and context get no longer reports:
+> [ 1144.170509][   T12] ==================================================================
+> [ 1144.170759][   T12] BUG: KASAN: slab-use-after-free in idr_for_each+0x1c1/0x1f0
+> [ 1144.170922][   T12] Read of size 8 at addr ff11000012a16a70 by task kworker/u16:0/12
+> [ 1144.171079][   T12] 
+> [ 1144.171133][   T12] CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.19.0-rc7-virtme #1 PREEMPT(full) 
+> [ 1144.171137][   T12] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> [ 1144.171139][   T12] Workqueue: netns cleanup_net
+> [ 1144.171145][   T12] Call Trace:
+> [ 1144.171147][   T12]  <TASK>
+> [ 1144.171149][   T12]  dump_stack_lvl+0x6f/0xa0
+> [ 1144.171154][   T12]  print_address_description.constprop.0+0x6e/0x300
+> [ 1144.171159][   T12]  print_report+0xfc/0x1fb
+> [ 1144.171161][   T12]  ? idr_for_each+0x1c1/0x1f0
+> [ 1144.171163][   T12]  ? __virt_addr_valid+0x1da/0x430
+> [ 1144.171167][   T12]  ? idr_for_each+0x1c1/0x1f0
+> [ 1144.171168][   T12]  kasan_report+0xe8/0x120
 
-  RSS input transformation:
-    symmetric-xor: on
-    symmetric-or-xor: on
-    Unknown bits in RSS input transformation: 0xfc
-
-for NICs which don't support input_xfrm.
-
-Remove the init of hfunc to ETH_RSS_HASH_NO_CHANGE while at it.
-As already mentioned this is a noop since ETH_RSS_HASH_NO_CHANGE
-is 0 and struct is zalloc'd. But as this fix exemplifies storing
-NO_CHANGE as state is fragile.
-
-This issue is implicitly caught by running our selftests because
-YNL in selftests errors out on unknown bits.
-
-Fixes: d3e2c7bab124 ("ethtool: rss: support setting input-xfrm via Netlink")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: andrew@lunn.ch
-CC: maxime.chevallier@bootlin.com
-CC: gal@nvidia.com
----
- net/ethtool/common.c | 3 ---
- net/ethtool/rss.c    | 9 ++-------
- 2 files changed, 2 insertions(+), 10 deletions(-)
-
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index c5ed88bccbb4..5fae329795c8 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -901,9 +901,6 @@ ethtool_rxfh_ctx_alloc(const struct ethtool_ops *ops,
- 	ctx->key_off = key_off;
- 	ctx->priv_size = ops->rxfh_priv_size;
- 
--	ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
--	ctx->input_xfrm = RXH_XFRM_NO_CHANGE;
--
- 	return ctx;
- }
- 
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 4dced53be4b3..da5934cceb07 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -824,8 +824,8 @@ rss_set_ctx_update(struct ethtool_rxfh_context *ctx, struct nlattr **tb,
- static int
- ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
- {
--	bool indir_reset = false, indir_mod, xfrm_sym = false;
- 	struct rss_req_info *request = RSS_REQINFO(req_info);
-+	bool indir_reset = false, indir_mod, xfrm_sym;
- 	struct ethtool_rxfh_context *ctx = NULL;
- 	struct net_device *dev = req_info->dev;
- 	bool mod = false, fields_mod = false;
-@@ -860,12 +860,7 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
- 
- 	rxfh.input_xfrm = data.input_xfrm;
- 	ethnl_update_u8(&rxfh.input_xfrm, tb[ETHTOOL_A_RSS_INPUT_XFRM], &mod);
--	/* For drivers which don't support input_xfrm it will be set to 0xff
--	 * in the RSS context info. In all other case input_xfrm != 0 means
--	 * symmetric hashing is requested.
--	 */
--	if (!request->rss_context || ops->rxfh_per_ctx_key)
--		xfrm_sym = rxfh.input_xfrm || data.input_xfrm;
-+	xfrm_sym = rxfh.input_xfrm || data.input_xfrm;
- 	if (rxfh.input_xfrm == data.input_xfrm)
- 		rxfh.input_xfrm = RXH_XFRM_NO_CHANGE;
- 
--- 
-2.52.0
-
+Sigh.  Doesn't ring a bell, I will have a look.
 
