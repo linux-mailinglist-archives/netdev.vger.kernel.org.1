@@ -1,195 +1,177 @@
-Return-Path: <netdev+bounces-255265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255266-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yP4fCvEifWnPQQIAu9opvQ
-	(envelope-from <netdev+bounces-255265-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:30:25 +0100
+	id 4OipMl8jfWnPQQIAu9opvQ
+	(envelope-from <netdev+bounces-255266-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:32:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B09BECD7
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:30:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27DA3BECE8
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86F76301573C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:30:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ADBC7301159A
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D54C3328ED;
-	Fri, 30 Jan 2026 21:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE1530275E;
+	Fri, 30 Jan 2026 21:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QAit1qa1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iWU4cc14"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1952E2E888A
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF96B2DF3CC
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769808603; cv=none; b=Q6w4ej+HCtxGyrWcM0Yx9zyLcMlkXxyl2zntJQ3lDzwchcC4DGFSJNzjz6omPRF0VzUIRe5Pd3bXOhIImToNRH2/QLrIbLE94vmBL0k2NrPX6uQdH+En9AqsuIa9Kv+O558mtM8XbjsElBTaicpNzSrdOBcmYhdfMlmWMQ/lh9s=
+	t=1769808733; cv=none; b=oG+x+BY77luMmumgTccTZOdDIwChHzB4S7XHPeIJazUddBetaeLYhHrgrdx1YroDNPY2rneiS3ZddinKGKOsWznG2U3fgz+w9rbUxEGZCYp8wwgRaik/FmmBkfIOJWGiMEMoaDLW9c5rU3TWnwL6bjFKAsRSipk2+XenPty94Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769808603; c=relaxed/simple;
-	bh=b+vwJ9y30rUaQsDIpqZJs8VFgrKQ3ws6Xm10+oYFD20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VzFd6b+lraF99HohgrqenFibJDsn5QVcCnnBuxtdghVO02oyLXD8Wj9/NZduBhB7l2czghoU13tPEieCGldbz2lvXCCT7gMFiSrd8cg8N/nICmZZfkvXs6ZTERp1veytorKyAkZgdNlTkYd6mlsDelmuP9kJv3IuLmbdeIGt4Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QAit1qa1; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <612a9446-252f-4b14-8605-ae1af000cc41@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769808590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E/fSgabw+7+o6zSM1t5+SlD+OpWpaotw1m3TFeXRHAo=;
-	b=QAit1qa1XRfuS5NlnGz0ACxb91GrlF/N1yOL9KlYhxlnN+7r2Lh4eaeC3Ds+CWvimISqA1
-	fEooa8tWAD0Y1hZnIerWQyQSec859ooeskaqw/cFaG1sZiWk2RvbR2Ie5nPhCXTTTKsSuG
-	pcbC/H7gnnKyCnzlyglTyb+dJV9TiFo=
-Date: Fri, 30 Jan 2026 13:29:44 -0800
+	s=arc-20240116; t=1769808733; c=relaxed/simple;
+	bh=0mCe4gBlCnuistQ55dGP1BpGbdSeZQWSzm3+Mp1u9LE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AmOo7MmErdTA7JwktOiADIE+7q0uc02uxBWbVB80b+pu+FG1RypF9aDQRtrNJxrAbBqNPmwmK/mkDL0Z1KDJwE6y8j+KE49uZyM6hUCeb9ap4jBr0vkMnGag/Tthij2TQBV540RoTd93s6nV6LC2DBZ4co23+tkY7cCDnjnROY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iWU4cc14; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2b7da62b487so1260489eec.1
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:32:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769808731; x=1770413531; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oyOqlCVXHF3sQdT6Vx4/sdnRG05lWhonX9HWVVa6DWA=;
+        b=iWU4cc14GGZS3cSeYgOamjQerLy4kM/k/qzAqyVurLLLy4RRWkPfFVuwAMj7ntIq82
+         k4Jz4YSKsfQORE1JiDakqtlGnPkDxv5CXITArvgNljpAeOnTdHcQH/FQ4J+urDhq7CVC
+         N0njBTgXIyHk6Pj3/VMgoidcIAjHYtCHd6tOgQZDPT0ZqJgdRzDGUvzpCUApX7clhjyP
+         xcSYoOql6cKODKKhkS7oSX8bXEd4Fp4kFZnsfj6Uf3Al+ZU8QRqTXN0TG7dJQpEYEIO6
+         CDgOwcq2MRy26ZDQuZVTIxZ1538EcZl9cXaQ1kLxdC7EfW0ORLKfA/OiqFAAgYzOJFUl
+         dsEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769808731; x=1770413531;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oyOqlCVXHF3sQdT6Vx4/sdnRG05lWhonX9HWVVa6DWA=;
+        b=CdAC6LgrBDat9m5UzUN82BTWKgW0ZW+BTcnXBTlg6uWc2xgcayK1EWihe72D3RUCxh
+         Sb75loMY0GKQZR5Z9T7ExDflVQmJa1DRmWK2JQz24KTCbGkYT6fo4dqmUJbFZQIxGfrn
+         yZp28NB8PSKGHezzuljdzjJCNlpPxUCLszB0u9GtxYimvwR1NqhyJj7yVOifBeUVN0XF
+         ++dckwpnBpfv59MVBCkpkiZmpituUHQhePQ9KoNl2ezTe3ASGTC9wyno8Tcevn8kzca3
+         sPMPz/86QnldgSsUwK/NORbWaJkcEcFTvhozs3xInLcuRtPYy1dgIhIsGDtxGNW0V7hD
+         Yz9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWh2CsFDbANJjxG/+sHFLQ9AkEEgwjrSjqZ88mScCj/2E+GR2OFtMh+evo7dLTrO8gzqa4qvX0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4e1ipejGlSs7jSSp+a3MNwIajylhSIMnvNBmwdK1ixxd3RsVs
+	W6Xbfd5O8yVkEWIYkiB0JOo03znJZmakN//cWqlIzk/rF0SshsxMHg4X7ylCPw==
+X-Gm-Gg: AZuq6aI+EU/WZrLVEwDLLCaMFZVI/H5uDq5XnkmYnADo2gLdFjx7oY+bbhZEbsLsB8f
+	M1yz0r6GCctr1k9bpgQQgLwn17uog9QiyY1BJb0XfkPGbVdNur2G9APbxdd7S+VRdZZ3bPzwUIG
+	yglyP/BKXwWVqmIq5+bGuJYULAEW5QCNJ86WecqDcDsPMXMv2BNl1UzPOHSIpBlkmcpXZh3X3Wi
+	3zMPkLCEmA8VxCXCvT7TGXSVplzG2sEL1ARnsxFhNjouT+i6nIVS2uJyiBK8TaBDHt6MdwmEA2e
+	T+If1Od+VVR5E26RgxcCD6W0XJi4zjX6MXmMD3If7ATFcR4aqnHkbO1o1U41NrEs+QwefthGvk6
+	Y1z+gHmhycrNN5jlVtBdSY+jDEB2pR7AJITlY9LTKIROXwujUEdyUFoxLHLhhjSJ+TEXL74Jx6D
+	fXSswkJbpi4Sj3/2c=
+X-Received: by 2002:a05:7301:1293:b0:2b7:9934:c42e with SMTP id 5a478bee46e88-2b7c8903d11mr2046756eec.32.1769808730817;
+        Fri, 30 Jan 2026 13:32:10 -0800 (PST)
+Received: from localhost ([129.210.115.107])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abeb6asm13751252eec.19.2026.01.30.13.32.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 13:32:10 -0800 (PST)
+Date: Fri, 30 Jan 2026 13:32:09 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
+Subject: Re: [Patch net v8 0/9] netem: Fix skb duplication logic and prevent
+ infinite loops
+Message-ID: <aX0jWU2xA6GwWhvY@pop-os.localdomain>
+References: <20260118061515.930322-1-xiyou.wangcong@gmail.com>
+ <CAM0EoMn=bx-AMR0RbFmSj8MjWTxLtB_xo5419AW18paZ9r1wDQ@mail.gmail.com>
+ <20260127091556.052604cd@kernel.org>
+ <aX0aVgCBTGpGYaJV@pop-os.localdomain>
+ <20260130131812.7f9b1eef@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
- update
-To: Michal Luczaj <mhal@rbox.co>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260129-unix-proto-update-null-ptr-deref-v1-1-e1daeb7012fd@rbox.co>
- <3fc5611f-394f-40db-b49d-2f26402e221a@linux.dev>
- <3362017f-9c3d-46cd-b3ce-cb750b565d5b@rbox.co>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <3362017f-9c3d-46cd-b3ce-cb750b565d5b@rbox.co>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260130131812.7f9b1eef@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-255265-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-255266-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[xiyouwangcong@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 87B09BECD7
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pop-os.localdomain:mid]
+X-Rspamd-Queue-Id: 27DA3BECE8
 X-Rspamd-Action: no action
 
-On 1/30/26 3:00 AM, Michal Luczaj wrote:
->>> Follow-up to discussion at
->>> https://lore.kernel.org/netdev/20240610174906.32921-1-kuniyu@amazon.com/.
->>
->> It is a long thread to dig. Please summarize the discussion in the
->> commit message.
+On Fri, Jan 30, 2026 at 01:18:12PM -0800, Jakub Kicinski wrote:
+> On Fri, 30 Jan 2026 12:53:42 -0800 Cong Wang wrote:
+> > On Tue, Jan 27, 2026 at 09:15:56AM -0800, Jakub Kicinski wrote:
+> > > On Sun, 18 Jan 2026 10:07:37 -0500 Jamal Hadi Salim wrote:  
+> > > > On Sun, Jan 18, 2026 at 1:16 AM Cong Wang <xiyou.wangcong@gmail.com> wrote:  
+> > > We (the netdev maintainers) had a chat off list and concluded that it'd
+> > > be great if we (the two of you and one maintainer) met over VC. Either
+> > > technical solution is fine, but we want to make sure there's no ongoing
+> > > animosity. No agenda for the meeting, just want to make sure you can
+> > > have a friendly chat. We can talk about the weather, AI code reviews or
+> > > everyone's favorite animals. At the end of the meeting we can either
+> > > decide or flip a coin.  
+> > 
+> > I offered people involved here for a video chat, *check note*, in
+> > 
+> > 26 Nov 2025:
+> > https://lore.kernel.org/netdev/aSe%2FIfNSZBTTAfTA@pop-os.localdomain/
+> > 8 Jul 2025:
+> > https://lore.kernel.org/netdev/aG2OUoDD2m5MqdSz@pop-os.localdomain/
+> > 
+> > No one responded, obviously.
 > 
-> OK, there we go:
+> So you should be happy that the call will finally happen, right?
 > 
-> The root cause of the null-ptr-deref is that unix_stream_connect() sets
-> sk_state (`WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED)`) _before_ it assigns
-> a peer (`unix_peer(sk) = newsk`). sk_state == TCP_ESTABLISHED makes
-> sock_map_sk_state_allowed() believe that socket is properly set up, which
-> would include having a defined peer.
+> > Jakub, please let me know how to talk to people who kept rejecting to
+> > talk. It is just logically impossible to me, and I have tried my best.
+> > 
+> > I wish you best luck for doing so.
 > 
-> In other words, there's a window when you can call
-> unix_stream_bpf_update_proto() on socket which still has unix_peer(sk) == NULL.
+> I sent you a link for scheduling the call off list.
 > 
-> My initial idea was to simply move peer assignment _before_ the sk_state
-> update, but the maintainer wasn't interested in changing the
-> unix_stream_connect() hot path. He suggested taking care of it in the
-> sockmap code.
-> 
-> My understanding is that users are not supposed to put sockets in a sockmap
-> when said socket is only half-way through connect() call. Hence `return
-> -EINVAL` on a missing peer. Now, if users should be allowed to legally race
-> connect() vs. sockmap update, then I guess we can wait for connect() to
-> "finalize" e.g. by taking the unix_state_lock(), as discussed below.
-> 
->>   From looking at this commit message, if the existing lock_sock held by
->> update_elem is not useful for af_unix,
-> 
-> Right, the existing lock_sock is not useful. update's lock_sock holds
-> sock::sk_lock, while unix_state_lock() holds unix_sock::lock.
+> Which part of this process of scheduling a call would you like 
+> me to explain further?
 
-It sounds like lock_sock is the incorrect lock to hold for af_unix. Is 
-taking lock_sock in sock_map doing anything useful for af_unix? Should 
-sock_map hold the unix_state_lock instead of lock_sock?
+I have a better solution which wastes no time of anyone:
+https://lore.kernel.org/netdev/20260130212021.46610-1-xiyou.wangcong@gmail.com/T/#u
 
-Other than update_elem, do other lock_sock() usages in sock_map have a 
-similar issue for af_unix?
+Please apply that patch, all the problems would be gone. (Nothing
+emotional here, it was after a very careful consideration.)
 
-> 
->> it is not clear why a new test
->> "!sk_pair" on top of the existing WRITE_ONCE(sk->sk_state...) is a fix.
-> 
-> "On top"? Just to make sure we're looking at the same thing: above I was
-> trying to show two parallel flows with unix_peer() fetch in thread-0 and
-> WRITE_ONCE(sk->sk_state...) and `unix_peer(sk) = newsk` in thread-1.
-> 
-> It fixes the problem because now update_proto won't call sock_hold(NULL).
-> 
->> A minor thing is sock_map_sk_state_allowed doesn't have
->> READ_ONCE(sk->sk_state) for sk_is_stream_unix also.
-> 
-> Ok, I'll add this as a separate patch in v2. Along with the !tcp case of
-> sock_map_redirect_allowed()?
+Thanks your effort, Jakub!
 
-sgtm. thanks.
-
-> 
->> If unix_stream_connect does not hold lock_sock, can unix_state_lock be
->> used here? lock_sock has already been taken, update_elem should not be
->> the hot path.
-> 
-> Yes, it can be used, it was proposed in the old thread. In fact, critical
-> section can be empty; only used to wait for unix_stream_connect() to
-> release the lock, which would guarantee unix_peer(sk) != NULL by then.
-> 
->          if (!psock->sk_pair) {
-> +               unix_state_lock(sk);
-> +               unix_state_unlock(sk);
->                  sk_pair = unix_peer(sk);
->                  sock_hold(sk_pair);
-
-I don't have a strong opinion on waiting or checking NULL. imo, both are 
-not easy to understand. One is sk_state had already been checked earlier 
-under a lock_sock but still needs to check NULL on unix_peer(). Another 
-one is an empty unix_state_[un]lock(). If taking unix_state_lock, may as 
-well just use the existing unix_peer_get(sk). If its return value cannot 
-(?) be NULL, WARN_ON_ONCE() instead of having a special empty 
-lock/unlock pattern here. If the correct lock (unix_state_lock) was held 
-earlier in update_elem, all these would go away.
-
-Also, it is not immediately clear why a non-NULL unix_peer(sk) is safe 
-here. From looking around af_unix.c, is it because the sk refcnt is held 
-earlier in update_elem? For unix_stream, unix_peer(sk) will stay valid 
-until unix_release_sock(sk). Am I reading it correctly?
-
+Regards,
+Cong
 
