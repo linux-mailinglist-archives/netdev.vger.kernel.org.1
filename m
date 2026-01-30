@@ -1,291 +1,183 @@
-Return-Path: <netdev+bounces-255267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COeVJdwmfWkGQgIAu9opvQ
-	(envelope-from <netdev+bounces-255267-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:47:08 +0100
+	id OAQRDVYpfWlEQgIAu9opvQ
+	(envelope-from <netdev+bounces-255268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:57:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C93BEE03
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:47:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3AEBEEB4
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:57:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7BBD301111E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:47:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3118330329BE
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31ECB239E88;
-	Fri, 30 Jan 2026 21:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F669344D8C;
+	Fri, 30 Jan 2026 21:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gateworks.com header.i=@gateworks.com header.b="dXMsWLBk"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="VpnxvS7I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C7E1A724C
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA65352936
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769809626; cv=pass; b=bh986bvusNfYGc6Y7fMUjIMdse8Sq34QMfPEOpXVM9BnDUCRy3a9poXu0aKeg3WrsYowlVaCJT8+L3QO5VaATu0MB8SGfY9FsnySELgFz7W+L34pXhX980F8HZh4vUweU5kYr5XAI3z9vGzKNzsbDdAyNbugYvEo8yoCovthctA=
+	t=1769810232; cv=pass; b=k29kxnT8N9c05VokV9kykfLvDUWsUOHnhNE1S4WTMLvK+FY4EMrufTjWZCiNsK66i+SnEynicmXglgvIsKINnPcpTsW0Ujb8PJzuCkdr9RW7E48JfrJm7SHuLX/r0xS1/K4yPJ+HsnQvbAboQEKUvYt55qMEDQvNRdlWbxzqoEs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769809626; c=relaxed/simple;
-	bh=Q4nD7UCCOcyO84ggSU7EZ3P1HGwvMHRcL3uoiw1nRMw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pwroN53U79EAWlmv5GfAEfi4qDlX7Vsiy5cOBuMoBczPZbgQMapymetWDTGGdGDmZMMjZVhE3ZbFZwi+abnA/b20sFkRpE3sVLd41KbyORqHXxBqsZuKqQMl9T2DT/8BDJOxi286fExjvi91bGrxAS+qkSXR5XspNz7OvXck1t0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com; spf=pass smtp.mailfrom=gateworks.com; dkim=pass (2048-bit key) header.d=gateworks.com header.i=@gateworks.com header.b=dXMsWLBk; arc=pass smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gateworks.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-662f4faf95aso1415484eaf.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:47:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769809623; cv=none;
+	s=arc-20240116; t=1769810232; c=relaxed/simple;
+	bh=ZAzvDCKA3yoG4zdUql5TXmg3+xq7tSh0DpwLUCCv05M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nV9hnXH8wGCZP7MhjzPhxoIyAGn9io0vUUE489YdBH4f5wDP9kpv8UwJrgDLyoHB4k8xr4/xuYmooa6XSOw9QzuppWuSpzhW+TiEFg3U/wQMWcuqbeZxhdy6tU7Jnk9/QdeARgmCMVXCLieJPx7/BVkvcA/TiWZ44cf8L44/D4k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=VpnxvS7I; arc=pass smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8230c839409so2141487b3a.3
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:57:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769810231; cv=none;
         d=google.com; s=arc-20240605;
-        b=RWsxnhZ8xa2GaZAYYt0F7ox9OK9WMkvHvADv0+oudxSxz1BAsqBmH4zq3SzHj0kUX8
-         DfJUi/+pI+E0ii24Kaj75jQUiNMYfVB/lRLYErFVFeBoBa3DhfuLTpPO3gUp96bjRoAi
-         5/BSEMXkWzddQiDrjWbhnGsvwSb8+jOFJr/+E0bxydpxmCh2EtSu5pOT5p2SvtsYX6lD
-         x7e7LJJgYIQS8SIZtIhpJBKklKAbfEsNuAHXm5hDF5MtjthJp39a3O9t2OQnPf/qhnWh
-         NEffFQMm6ZCipIhBYR1wrzkko0s5qLia5wRoHaJThgzIcb3hWt2kqV9vEO8tzEHgiZHr
-         75PA==
+        b=Vx9PdZJY+rE+YQVV+iUs6Aa12xQwPPmsRTAKtO9TbS6VeOn+I7vKjVTPAHQ23Xak6Z
+         3Z9gMQnGOJTf+nVFy2E16EUWcMAYTtxAiJQACQYXSTUVs/jIjOzCQmZMQml9in2RezjK
+         9oyfL0eOp3mbY6XtKHS3kVI1dDQS/J+BvgXleYtpr2QBspvqoccaczfaKPjSsMwIcyVH
+         dZz5YCPf6UlV8Dy/gNXghVneED21sd/UNijZttklLYTQ3LvVygb+cR/SUyu0itFNZya8
+         J7w5nhwdjW8HA41q2PER2e7ll2C7RwoBgcpdE8E1evXXl4uBwfoo9OlG6GDAcKS4CnEd
+         blqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=nrbWrYsen6SS71db9n2MmpGBiPPu8Ru8ite1b91qIlg=;
-        fh=y3x7o9vEuetsL6zCFSqByP/jd3REfKSE/CnSudXfy1g=;
-        b=c9zxW88PriOTi0u2vBTaB/BsK0hGIqXfICfEWyaL6OMVTgkF60j8B3rX6k7BFujC+v
-         9k5lZCyDeb3jLpiQ5rFKkneo8p/Dvn8c9AjndrcGRda1T1QWK76pratExDJAlgltHIpK
-         LFZj+UxCGrozJAJRa03lbo66gm77/SmJ+oH5ZerDCzhZDenr710KpxTdF61/Xrntzl/p
-         QyIGska7kH1UD8kxJOLpHSHADJJhn6HiADrtb9A49rz54wubIwg6Wtgd8NJzhajgQnXh
-         jzyfFTENX2+97PruLny41DMzvaroWXSUClX1pHYnymHTAvjCKMGgeqlxIdnXsgq6MOzl
-         JdXw==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0f81vVRt9lYBgk3/zE7XZDsUfpQnZqBZcRRR2bNgTuI=;
+        fh=HjHb777t8W3iDW86grBU7QuNi4RAfL3GUoZBFscD3Y4=;
+        b=Mko09G3zvpIo9DFdNANB56yPAV/Qri+teoTwIJ1Ui9K4qdPaDWf3VeZ2PmCuPTGpLr
+         v1AkAZPYuPIJzPyAWvi+/eHtF6xq3tfrV7GuROoFbRWJb4qCuXV+sI1ZvdgSas5NKaxq
+         7pU/EFUQSUzd9O4sqxhzmFHLGRDl9focOqwcM8n//xlbmKYKXPZmE2ILjwVTTaKwLEjH
+         VXu4lTj+RJkRw6TduOcrBmDXoFs5yMyawoJY8Tz+mGK3g+vM9KVp9xIrQWQgZoy8ojWs
+         hY7e5XTPM12IIKLUohxj0vYiy+UW599/XrlOwBqQpYsM4MCbUjr5jDL5kydm8/JC50TE
+         6hZg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gateworks.com; s=google; t=1769809623; x=1770414423; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nrbWrYsen6SS71db9n2MmpGBiPPu8Ru8ite1b91qIlg=;
-        b=dXMsWLBkE23DR1MCeBGLJEDdNnRi9lu2leC8cutKgLRhWJxSO+8R2Q7OR2Zg90pL/8
-         Kv9u3ibeppPFlfTV9GvPzA3rgRiM1fRE6PY5LmBm6RaRfGB6cCdwraCvYOuXDFGTJ4c/
-         Lkc1SLHrkzmuj/PxJpkLDzz5WRZHBN7XPRlnp5XV90e/8ChJAtqP1VzfC11HGgNj1IUs
-         YaV0XXXJgmjCBurxPxivSfUFhtHg4J/fP8vR4EbgzZgWqNeDks3TICRozOWY3tlhsiAi
-         H5ZOrJw7l6QQMqKabo43P/a/nlKoQXR6IZ+/fsiALkk3iN6Cue4aD8qPQUn1O+SNKLkB
-         1rwg==
+        d=paul-moore.com; s=google; t=1769810231; x=1770415031; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0f81vVRt9lYBgk3/zE7XZDsUfpQnZqBZcRRR2bNgTuI=;
+        b=VpnxvS7IHTGPLMs2SEC80XwggxREItMuAM1sJ6KYKkMkMzcwvL+drAx8C7btlboKxi
+         Uln4MB0I2BqeiGXLpBaXLA3eEI3FL1k6/XS+LtXEgHQYSh++vFCwH2r0gPTbbJuKSfEJ
+         DhXk0ec+IN2sqWJR2VrqGh3wz+RDNs1dshIYqzrI57ysXyKyTtfahMnhHY6+PxgTfZvD
+         6rjr+VVy9r7auQ318sPUXShHQAMkD6Bi50k2fv9ORIZkARWfrhCJwsG8XzU4ucoRoOEI
+         C91VEe1//QfNPIinWW68n88bO+Ml8rdU9jJWNb+jzFujJIhG5SsTIwWA6Kf2ODunhLfO
+         eoiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769809623; x=1770414423;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nrbWrYsen6SS71db9n2MmpGBiPPu8Ru8ite1b91qIlg=;
-        b=envqAe24byxHX6X75iS2oK9ZmczJzWSbXUNU1abBWmzy+qs2Ag5RPTuSXhjtGSsTSE
-         hSK7YI0wi04zYP20qErzwxzzZSB61jOIlSNbtP9aSxxJXBEmiI1M8uqQ3llr2AFslBs0
-         LUFp68Gc9JgKQCuvRc2Wwrt/OGLGBHmwL0bz0ZYp44oIuChMnztrGGfLWvO+f9nsETR5
-         iK99R6kjWwSYm5fShJE+/p4OoBZvQx6MUOHpTQzB2FBXdAmtnxAFGjVyuhNQiclXHHgt
-         fvgPaCSehI7XFPGgvcC+T37gPfRhjs3H8q7ynsUfR3Cm+U9o9EtG1tGxsMej/JkRp+po
-         F0Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGkY325wCXQU8rA83VlX2LAJcccJom0PdJXFOuu+FLWsICjpVJHlmRtyzLGZ/wL9XzW6V6p8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxS+qw3qqcU/cQ66G10WgCoSeuEAMly4XzZfIoVwp6yW+FtKRVb
-	jvpJ5eTrYjNcZJ+hx3rOJg8bt1H8SWQm8JcJ4cFGob6LU5kPi447oEY2kfJcLHbSZ0PNfuaiadQ
-	dbUhMHE6RPo6LGgcSCVybmMG84R3SZ1iN7KDfCvkHUg==
-X-Gm-Gg: AZuq6aJMAcTcMdIMTr5toEN2Smh//kPhw7YwWe53oXa99SQFrPRtyzn8Wo3wO+rOJzv
-	nDE61POJ8iibmai92aHlxJpj1qRB5t2x5Tmas2uBou+JT4VmBWiEPRlVykNhyhf6+lRuW14J9vI
-	yDqtawSssgBGQdmgEmUEjjh3EgWmzOak5PUKZplMBbGveNEKNgOa83b9+7hZriPkIHMkprHk6AX
-	nhNomgKK4+VOCmP19Yv9+MgveoIv/KaXHJ5shxgqyP1/0QQ7VKb4R5D1MyH219oMcUiKOs=
-X-Received: by 2002:a4a:e90b:0:b0:663:a6e:49a7 with SMTP id
- 006d021491bc7-6630f04dea4mr2403875eaf.19.1769809623224; Fri, 30 Jan 2026
- 13:47:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769810231; x=1770415031;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0f81vVRt9lYBgk3/zE7XZDsUfpQnZqBZcRRR2bNgTuI=;
+        b=eh+ojtn0v2g+8g/oSqJoEYq1yFMy81MMQOVvbrK6cNZIOG60OJ9VLTYONFMKG7d6pt
+         SBcQIAld8OZJrUhHoNisbsnEV7ESgnAKNBjPAvlVN+o7a+Ot7leF1T9VKkMdfEI7vkig
+         J4fNyJcNFrUiH8+zkFBAUy8rnhHKR4iu4RSPKE5oOVfByf+zmFve21tRDiMJZDS9jGlx
+         vzpZ4qdSyl+2aWhIjSeih0mMAg5jyzy+tfPR/qk8/4FSqEY9lOfimFCN/PCue52rhrlJ
+         +Z0Y7ZE7fdldpivUaCkbQezx9yaypZQcdczIA1hOj+QnosEK1lIN+x0LyDVYNMBlqHET
+         pAog==
+X-Forwarded-Encrypted: i=1; AJvYcCVA13ThsfGnubpO4GngZ1VoW9S7GPZUA+C+0n+H6tOi7EGU5qymSdG5kdxI1EdzFpvZlgJrNnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz495y4Laptt48uItmfU7VTFG1MrF2DT8X3G6YS3EMWV7jMGV5F
+	G3SWf7Kcsw7WJ2lkat3b2PH16Xm6weKaQmT1g8thUvZgaoK5UO5bBPWgCQzckVLzkPtlhQBhi9U
+	cxuePa9+CSYRVKgsihnYERNbI4zFMZbUej7yt/m/+
+X-Gm-Gg: AZuq6aI5+xN0HSDN5H+/VsgixsMFfx3gEkKWWef267R4nr2kRxi7kdjAqoRCNY8BjYT
+	kX8EnHE8KAIjURJudqzlCTZhRBVmZ1vhSyXu6/9nT2/gEr/5mTBwJYtktM8N6R4zAWdoW7CQSm7
+	908eQj4u293lQGNsuYZp8RMwy+mo/4LvnDcOvDg6wEC74fNi3jS7JVA/ia1TbWBwnyDe6hRvMWL
+	S6Wbo6pmt41u6trj2ZL810ALsPAMoztT8gSBSKJFkyXeZ6YUL3Ky0ftK6O2PbjM+HNei4ZgNvUQ
+	7g2mTw==
+X-Received: by 2002:a05:6a21:6f88:b0:38b:e398:b9fd with SMTP id
+ adf61e73a8af0-392e003c0a9mr4572431637.20.1769810231121; Fri, 30 Jan 2026
+ 13:57:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Tim Harvey <tharvey@gateworks.com>
-Date: Fri, 30 Jan 2026 13:46:52 -0800
-X-Gm-Features: AZwV_Qj4JfWMSOdJXzmdjZj4h4jHJU7Bg6VHcZ8gr-AGeFYqDyW_OTUNpXBwPI4
-Message-ID: <CAJ+vNU2c+kt3vX6PzqALakdwzyb5qh6O7Oj4xyxsWnsXCAUaRw@mail.gmail.com>
-Subject: Re: [v1,3/3] net: dsa: microchip: add single-led-mode support for KSZ9477
-To: Heinrich Toews <ht@twx-software.de>, netdev <netdev@vger.kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+References: <2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp>
+ <CAHC9VhQikhv+qCyQdnJguvy-qTkGXB+NU7=QZjw5d+WfyVxZhw@mail.gmail.com>
+ <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
+ <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com> <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
+In-Reply-To: <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 30 Jan 2026 16:56:59 -0500
+X-Gm-Features: AZwV_Qj982ND7TJxgyw6A2KozmEAmOpS-qJ0nHC9KARsT_E53n9R8n-IFelzO3k
+Message-ID: <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: SELinux <selinux@vger.kernel.org>, 
+	linux-security-module <linux-security-module@vger.kernel.org>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	FAKE_REPLY(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gateworks.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
+	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gateworks.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255267-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255268-lists,netdev=lfdr.de];
 	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,kernel.org,linaro.org];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tharvey@gateworks.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gateworks.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[paul-moore.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,gateworks.com:dkim]
-X-Rspamd-Queue-Id: 14C93BEE03
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,paul-moore.com:url,paul-moore.com:dkim,i-love.sakura.ne.jp:email]
+X-Rspamd-Queue-Id: 8C3AEBEEB4
 X-Rspamd-Action: no action
 
+On Wed, Jan 28, 2026 at 5:28=E2=80=AFAM Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+> On 2026/01/28 6:59, Paul Moore wrote:
+> > It sounds like we either need to confirm that
+> > security_xfrm_{policy,state}_delete() is already present in all code
+> > paths that result in SPD/SAD deletions (in a place that can safely
+> > fail and return an error),
 >
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> b/drivers/net/dsa/microchip/ksz_common.c
-> index e5fa1f5fc09b3..bef8ec51d9483 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -815,6 +815,9 @@  static const u16 ksz9477_regs[] = {
->   [PTP_RTC_SEC] = 0x0508,
->   [PTP_SUBNANOSEC_RATE] = 0x050C,
->   [PTP_MSG_CONF1] = 0x0514,
-> + [P_PHY_MMD_SETUP] = 0x011A,
-> + [P_PHY_MMD_DATA] = 0x011C,
-> + [P_PHY_DIGITAL_DEBUG_3] = 0x013C,
->  };
+> Yes.
+
+To clarify, do you mean "yes, I agree", or "yes, I've already checked
+this and can confirm that the LSM hooks are already being called"?
+
+> >                            or we need to place
+> > xfrm_dev_{policy,state}_flush_secctx_check() in a location that can
+> > safely fail.
 >
-> @@ -3241,6 +3244,14 @@  static u32 ksz_get_phy_flags(struct dsa_switch
-> *ds, int port)
->   if (!port)
->   return MICREL_KSZ8_P1_ERRATA;
->   break;
-> + case KSZ9477_CHIP_ID:
-> + /* KSZ9477S Errata DS80000754F
-> + *
-> + * Module 19: Single-LED Mode Setting Requires Two Register Writes
-> + *   The PHY Port LEDx_0 pin does not go low in the presence of link
-> + *   activity when Single-LED Mode is selected in the MMD LED Mode Register.
-> + */
-> + return MICREL_KSZ9_LED_ERRATA;
->   }
->
+> Did you mean xfrm_{policy,state}_flush_secctx_check() ?
 
-Hi Heinrich,
+They both call into the security_xfrm_policy_delete() LSM hook which
+is what I care about as that hook is what authorizes the operation.
 
-Thanks for doing this. I have two boards I work with that have a
-KSZ9897S switch and use single-led mode (imx8mp-venice-gw74xx.dts and
-imx8mm-venice-gw7901.dts) that suffer from this issue. In my scenario
-I take care of this in the bootloader but when ksz9477_reset_switch()
-is called and sets the SW_RESET bit of REG_SW_OPERATION it resets all
-registers and reverts to tri-color dual-led mode thus we really do
-need a dt prop and handling for this.
+> Regarding xfrm_policy_flush() as an example, we can observe that we are
+> calling LSM hooks for must-not-fail callers ...
 
-You can add the errata for KSZ9897 as well here:
-+       case KSZ9897_CHIP_ID:
-+               /* KSZ9897S Errata DS80000759F: Module 18 */
-+               return MICREL_KSZ9_LED_ERRATA;
+We need to make sure the LSM hooks are being called to authorize the
+removal of SPD and SAD entries.  If you are going to remove LSM hooks
+from the existing code, please document how that code path you are
+changing is still subject to authorization by the LSM hooks or explain
+in great detail how that authorization is not necessary.
 
-And because this errata applies to multiple chips it's probably best
-to describe the workaround once and refer to the errata # in the cases
-statements.
-
-> +static void ksz_enable_single_led_mode(struct ksz_device *dev, int
-> port, struct phy_device *phydev)
-> +{
-> + const u16 *regs = dev->info->regs;
-> +
-> + ksz_pwrite16(dev, port, regs[P_PHY_MMD_SETUP], 0x0002); /* Set up
-> register address for MMD */
-> + ksz_pwrite16(dev, port,  regs[P_PHY_MMD_DATA], 0x0000); /* Select
-> Register 00h of MMD */
-> + ksz_pwrite16(dev, port, regs[P_PHY_MMD_SETUP], 0x4002); /* Select
-> register data for MMD */
-> + ksz_pwrite16(dev, port,  regs[P_PHY_MMD_DATA], 0x0011); /* Write
-> value 0011h to MMD */
-
-These are wrong: The MMD_SETUP and MMD_DATA regs you are using here
-0x011a and 0x11c are actually 0xN11a 0x 0xN11c (where N is the port)
-so they port specific so the above only would set them for port0.
-Because these registers correspond to standardPHY register 0x0d and
-0x0e which are defined in mii.h you can just use those.
-
-What you want here is to use ksz_phy_write16 on the port which will
-call the chip-specific w_phy which will handle writing to the port
-specific register:
-ksz_phy_write16(dev, port, MII_MMD_CTRL, 0x02);
-ksz_phy_write16(dev, port, MII_MMD_DATA, 0x00);
-ksz_phy_write16(dev, port, MII_MMD_CTRL, MII_MMD_CTRL_NOINCR | 0x02);
-ksz_phy_write16(dev, port, MII_MMD_DATA, 0x10);
-
-Note on that last one, the errata says to write 0x11 but that's a typo
-as if you read closely it says 'setting bit 4' and looking at the
-datasheet bit0 is reserved, so the 0x11 should be 0x10.
-
-> +
-> + /* According to KSZ9477S Errata DS80000754F (Module 19) 0xfa00 has to
-> + * be written to the Debug Register 3 to enable Single-LED Mode.
-> + */
-> + if (phydev->dev_flags & MICREL_KSZ9_LED_ERRATA)
-> + ksz_pwrite16(dev, port, regs[P_PHY_DIGITAL_DEBUG_3], 0xfa00);
-
-Similarly the errata specifies this as PHY register 0x1E (which is a
-vendor specific register so not defined in mii.h):
-
-ksz_phy_write16(dev, port, 0x1e, 0xfa00);
-
-Your original patch doesn't work in my case (maybe it worked for you
-because you were trying to address port0?). With the above changes the
-LED's are properly configured on my boards.
-
-Best Regards,
-
-Tim
-
-> +
-> + dev_info(dev->dev, "port-%d: single-led mode enabled.\n", port);
-> +}
-> +
->  static void ksz_set_100_10mbit(struct ksz_device *dev, int port, int speed)
->  {
->   const u8 *bitval = dev->info->xmii_ctrl0;
-> @@ -3977,6 +4006,9 @@  static void ksz9477_phylink_mac_link_up(struct
-> phylink_config *config,
->   int port = dp->index;
->   struct ksz_port *p;
->
-> + if (dev->single_led_mode && port != dev->cpu_port)
-> + ksz_enable_single_led_mode(dev, port, phydev);
-> +
->   p = &dev->ports[port];
->
->   /* Internal PHYs */
-> @@ -5526,6 +5558,8 @@  int ksz_switch_register(struct ksz_device *dev)
->     "wakeup-source");
->   dev->pme_active_high = of_property_read_bool(dev->dev->of_node,
->       "microchip,pme-active-high");
-> + dev->single_led_mode = of_property_read_bool(dev->dev->of_node,
-> +     "microchip,single-led-mode");
->   }
->
->   ret = dsa_register_switch(dev->ds);
-> diff --git a/drivers/net/dsa/microchip/ksz_common.h
-> b/drivers/net/dsa/microchip/ksz_common.h
-> index 929aff4c55de5..9900e9dd91810 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.h
-> +++ b/drivers/net/dsa/microchip/ksz_common.h
-> @@ -187,6 +187,7 @@  struct ksz_device {
->   bool synclko_disable;
->   bool wakeup_source;
->   bool pme_active_high;
-> + bool single_led_mode; /* Enable Single LED Mode */
->
->   struct vlan_table *vlan_cache;
->
-> @@ -277,6 +278,9 @@  enum ksz_regs {
->   PTP_RTC_SUB_NANOSEC,
->   PTP_SUBNANOSEC_RATE,
->   PTP_MSG_CONF1,
-> + P_PHY_MMD_SETUP,
-> + P_PHY_MMD_DATA,
-> + P_PHY_DIGITAL_DEBUG_3,
->  };
->
->  enum ksz_masks {
+--=20
+paul-moore.com
 
