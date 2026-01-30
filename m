@@ -1,201 +1,138 @@
-Return-Path: <netdev+bounces-255121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFfgLLSUfGkQNwIAu9opvQ
-	(envelope-from <netdev+bounces-255121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:23:32 +0100
+	id KKuPFQKVfGkQNwIAu9opvQ
+	(envelope-from <netdev+bounces-255122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:24:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE019BA071
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:23:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F4FBA091
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:24:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F3997305CF77
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:19:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C51D73009F3B
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584A534E75E;
-	Fri, 30 Jan 2026 11:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AO675ba";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c59bHBXW";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AO675ba";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c59bHBXW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1716E352FBB;
+	Fri, 30 Jan 2026 11:24:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.baidu.com (mx24.baidu.com [111.206.215.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC11033EB01
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB17364E82;
+	Fri, 30 Jan 2026 11:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769771950; cv=none; b=sHzA4ZhH1Ot/SGOaYl3nC4TYU4tTSdSGkkxsmMYib8kchZTj9Iuemn1GvA+VA9cnvBU3/8Xp3/EXXdCu4DRTxG8DbUQ+wNvo9zMh4OwMGpdPWCQ/ZLVgpL+yHd+ikI3aMY7tqYu7rN7eYND2e4jsCAVX+BpEWtPjv2NLTHEWRjk=
+	t=1769772286; cv=none; b=F/nqSy+Ayt0vV2jUt2SC1oVSThKEJp0WEEmA989g2ueslRn4ChSfZpSqh+lUerTCydJ5kYtkjj5yC1ELOW/KeqKbugi6hDCSWsAibnNIrjsTRsW0Gtgat8f4fXNs0ujFa61qbU9e1SkYg2JQaSDvW5J7IVrEig1Nmf+LBpuknUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769771950; c=relaxed/simple;
-	bh=bCGu71GEXxNkV5/9e+2XlverC9QkEitMkRMqV0O3rHg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=hGzucd3Bz1K3qn1vV63zehQ7J9KT9dIche+g3/+wJjqOLLH2YsyTVuElEXwKzX4vPerFuetcfa/fsrfcaHCIqvK8v/hEaQXXziUVDcOHk3gjpxaC/s/o9VA/FLip/N9ppom029+rLmbPlp1R3qtusc9fIxkcjYTHdvHKK2otKwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AO675ba; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c59bHBXW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AO675ba; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c59bHBXW; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 098E05BCE2;
-	Fri, 30 Jan 2026 11:19:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1769771947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
-	b=0AO675bapcZijMdIoMDGjfhrAYKeMyB3Qn6S9e+6ZUt8R96jKAqTNci80E71OE41Cgwf8L
-	sd6ES9g4lkCKzueRr1yXyhcUeWpTU3YZTFst/2A892P41vTwkkK19z+MW0d/h/tEIsr13z
-	bDHFIg7IoHeneoY4AHeVf55PTbqv2GU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1769771947;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
-	b=c59bHBXWye7efSWk8CHVfDsO9J1jqKnHa1YrY64ANB0+vxdZ9xsODkTJXN0f4w/ITdEXMQ
-	QuSWa/dLde1zuNBA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1769771947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
-	b=0AO675bapcZijMdIoMDGjfhrAYKeMyB3Qn6S9e+6ZUt8R96jKAqTNci80E71OE41Cgwf8L
-	sd6ES9g4lkCKzueRr1yXyhcUeWpTU3YZTFst/2A892P41vTwkkK19z+MW0d/h/tEIsr13z
-	bDHFIg7IoHeneoY4AHeVf55PTbqv2GU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1769771947;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
-	b=c59bHBXWye7efSWk8CHVfDsO9J1jqKnHa1YrY64ANB0+vxdZ9xsODkTJXN0f4w/ITdEXMQ
-	QuSWa/dLde1zuNBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD5153EA61;
-	Fri, 30 Jan 2026 11:19:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id uhzgNaqTfGl0DAAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Fri, 30 Jan 2026 11:19:06 +0000
-From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] bonding: only set speed/duplex to unknown, if getting speed failed
-Date: Fri, 30 Jan 2026 12:19:04 +0100
-Message-ID: <20260130111904.144024-1-tbogendoerfer@suse.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1769772286; c=relaxed/simple;
+	bh=gY3XoYkjeVfsuCDxSemHm6hTSqPiFrY4EP7XNKMz+pk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EyxNYyuV1oDFYEcu36rgWNfGSYIp6x8XmqtGmRTJatAgQQC0nQwYi3q2FPcivujqKVGx0Kh8INyqi0Xd1aphJV7H1u1kmQBGVCluG93wL+mwo2xH+GLZVWMnYf2ckgFXYo4+DJ0DbgDcuCvjsxldyZEKC4DPCyZPZRbLo15qIyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Eric Dumazet <edumazet@google.com>
+CC: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter
+	<phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, "netfilter-devel@vger.kernel.org"
+	<netfilter-devel@vger.kernel.org>, "coreteam@netfilter.org"
+	<coreteam@netfilter.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiBb5aSW6YOo6YKu5Lu2XSBSZTogW1BBVENIXSBuZXRmaWx0ZXI6?=
+ =?utf-8?B?IGNvbm50cmFjazogcmVtb3ZlIF9fcmVhZF9tb3N0bHkgZnJvbSBuZl9jb25u?=
+ =?utf-8?Q?track=5Fgeneration?=
+Thread-Topic: =?utf-8?B?W+WklumDqOmCruS7tl0gUmU6IFtQQVRDSF0gbmV0ZmlsdGVyOiBjb25udHJh?=
+ =?utf-8?B?Y2s6IHJlbW92ZSBfX3JlYWRfbW9zdGx5IGZyb20gbmZfY29ubnRyYWNrX2dl?=
+ =?utf-8?Q?neration?=
+Thread-Index: AQHckaMKaFyWuz7BF0WyyylXiDKXFLVp/hqAgACTs4A=
+Date: Fri, 30 Jan 2026 11:23:36 +0000
+Message-ID: <7e1f38c0f792440da38ba0fa96ce932b@baidu.com>
+References: <20260130044348.3095-1-lirongqing@baidu.com>
+ <CANn89iLetxqpxpSBpQztPcg=av38nGNr2VpOo7HARrbqubREyg@mail.gmail.com>
+In-Reply-To: <CANn89iLetxqpxpSBpQztPcg=av38nGNr2VpOo7HARrbqubREyg@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
+X-FEAS-Client-IP: 172.31.3.12
+X-FE-Policy-ID: 52:10:53:SYSTEM
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[baidu.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-255121-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tbogendoerfer@suse.de,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-255122-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DE019BA071
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C9F4FBA091
 X-Rspamd-Action: no action
 
-bond_update_speed_duplex() first set speed/duplex to unknown and
-then asks slave driver for current speed/duplex. Since getting
-speed/duplex might take longer there is a race, where this false state
-is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding:
- update port speed when getting bond speed") this race gets more visible,
-if user space is calling ethtool on a regular base.
-
-Fix this by only setting speed/duplex to unknown, if link speed is
-really unknown/unusable.
-
-Fixes: 691b2bf14946 ("bonding: update port speed when getting bond speed")
-Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
----
- drivers/net/bonding/bond_main.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index e7caf400a59c..4cdf89b21ca0 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -791,26 +791,29 @@ static int bond_update_speed_duplex(struct slave *slave)
- 	struct ethtool_link_ksettings ecmd;
- 	int res;
- 
--	slave->speed = SPEED_UNKNOWN;
--	slave->duplex = DUPLEX_UNKNOWN;
--
- 	res = __ethtool_get_link_ksettings(slave_dev, &ecmd);
- 	if (res < 0)
--		return 1;
-+		goto speed_duplex_unknown;
- 	if (ecmd.base.speed == 0 || ecmd.base.speed == ((__u32)-1))
--		return 1;
-+		goto speed_duplex_unknown;
- 	switch (ecmd.base.duplex) {
- 	case DUPLEX_FULL:
- 	case DUPLEX_HALF:
- 		break;
- 	default:
--		return 1;
-+		goto speed_duplex_unknown;
- 	}
- 
- 	slave->speed = ecmd.base.speed;
- 	slave->duplex = ecmd.base.duplex;
- 
- 	return 0;
-+
-+speed_duplex_unknown:
-+	slave->speed = SPEED_UNKNOWN;
-+	slave->duplex = DUPLEX_UNKNOWN;
-+
-+	return 1;
- }
- 
- const char *bond_slave_link_status(s8 link)
--- 
-2.43.0
-
+PiBXaGF0IGFib3V0IG5mX2Nvbm50cmFja19oYXNoX3JuZCA/DQo+IA0KPiBJIF90aGlua18gdGhp
+cyBuZWVkcyB0byBiZSBfX3JlYWRfbW9zdGx5LCByZWdhcmRsZXNzIG9mIGl0cyBjdXJyZW50IGxv
+Y2F0aW9uIChpdA0KPiBtaWdodCBieSBhY2NpZGVudCBzaGFyZSBhIG1vc3RseSByZWFkIGNhY2hl
+IGxpbmUpLCBlc3BlY2lhbGx5IGlmIHlvdXIgcGF0Y2ggcHV0cw0KPiBuZl9jb25udHJhY2tfZ2Vu
+ZXJhdGlvbiBpbiB0aGUgc2FtZSBjYWNoZSBsaW5lIHRoYW4gbmZfY29ubnRyYWNrX2hhc2hfcm5k
+Lg0KPiANCj4gU2FtZSByZW1hcmsgZm9yIG5mX2N0X2V4cGVjdF9oYXNocm5kDQo+IA0KDQpZb3Ug
+YXJlIHJpZ2h0LCBuZl9jb25udHJhY2tfaGFzaF9ybmQgYW5kIG5mX2N0X2V4cGVjdF9oYXNocm5k
+IHNob3VsZCBiZSBtYXJrZWQgYXMgX19yZWFkX21vc3RseQ0KDQpUaGFua3MNCg0KLUxpDQoNCj4g
+ZGlmZiAtLWdpdCBhL25ldC9uZXRmaWx0ZXIvbmZfY29ubnRyYWNrX2NvcmUuYw0KPiBiL25ldC9u
+ZXRmaWx0ZXIvbmZfY29ubnRyYWNrX2NvcmUuYw0KPiBpbmRleA0KPiBkMWY4ZWI3MjVkNDIyM2Uw
+NDJiMDJhYjg2YmE4OWI5YjdjYWY3NWY1Li4wYTcwNWZhYjJiYjczZjc1OTA2NDdmZjA2ZA0KPiA3
+MDY2Mzk1ZTZlZWE2Ng0KPiAxMDA2NDQNCj4gLS0tIGEvbmV0L25ldGZpbHRlci9uZl9jb25udHJh
+Y2tfY29yZS5jDQo+ICsrKyBiL25ldC9uZXRmaWx0ZXIvbmZfY29ubnRyYWNrX2NvcmUuYw0KPiBA
+QCAtMjA0LDggKzIwNCw4IEBAIEVYUE9SVF9TWU1CT0xfR1BMKG5mX2Nvbm50cmFja19odGFibGVf
+c2l6ZSk7DQo+IA0KPiAgdW5zaWduZWQgaW50IG5mX2Nvbm50cmFja19tYXggX19yZWFkX21vc3Rs
+eTsNCj4gRVhQT1JUX1NZTUJPTF9HUEwobmZfY29ubnRyYWNrX21heCk7DQo+IC1zZXFjb3VudF9z
+cGlubG9ja190IG5mX2Nvbm50cmFja19nZW5lcmF0aW9uIF9fcmVhZF9tb3N0bHk7IC1zdGF0aWMN
+Cj4gc2lwaGFzaF9hbGlnbmVkX2tleV90IG5mX2Nvbm50cmFja19oYXNoX3JuZDsNCj4gK3NlcWNv
+dW50X3NwaW5sb2NrX3QgbmZfY29ubnRyYWNrX2dlbmVyYXRpb247IHN0YXRpYw0KPiArc2lwaGFz
+aF9hbGlnbmVkX2tleV90IG5mX2Nvbm50cmFja19oYXNoX3JuZCBfX3JlYWRfbW9zdGx5Ow0KPiAN
+Cj4gIHN0YXRpYyB1MzIgaGFzaF9jb25udHJhY2tfcmF3KGNvbnN0IHN0cnVjdCBuZl9jb25udHJh
+Y2tfdHVwbGUgKnR1cGxlLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25l
+ZCBpbnQgem9uZWlkLCBkaWZmIC0tZ2l0DQo+IGEvbmV0L25ldGZpbHRlci9uZl9jb25udHJhY2tf
+ZXhwZWN0LmMNCj4gYi9uZXQvbmV0ZmlsdGVyL25mX2Nvbm50cmFja19leHBlY3QuYw0KPiBpbmRl
+eA0KPiBjZmMyZGFhM2ZjN2YzNDA5Mzc4OThiNGJlZjA3NjlmZDMxZjgwMWI1Li40ZGFlNDA1NTI3
+ZmViZjkxM2FmNDNjNDlkZGINCj4gMjk2MWE4ZjA1ZTBlNA0KPiAxMDA2NDQNCj4gLS0tIGEvbmV0
+L25ldGZpbHRlci9uZl9jb25udHJhY2tfZXhwZWN0LmMNCj4gKysrIGIvbmV0L25ldGZpbHRlci9u
+Zl9jb25udHJhY2tfZXhwZWN0LmMNCj4gQEAgLTQxLDcgKzQxLDcgQEAgRVhQT1JUX1NZTUJPTF9H
+UEwobmZfY3RfZXhwZWN0X2hhc2gpOw0KPiAgdW5zaWduZWQgaW50IG5mX2N0X2V4cGVjdF9tYXgg
+X19yZWFkX21vc3RseTsNCj4gDQo+ICBzdGF0aWMgc3RydWN0IGttZW1fY2FjaGUgKm5mX2N0X2V4
+cGVjdF9jYWNoZXAgX19yZWFkX21vc3RseTsgLXN0YXRpYw0KPiBzaXBoYXNoX2FsaWduZWRfa2V5
+X3QgbmZfY3RfZXhwZWN0X2hhc2hybmQ7DQo+ICtzdGF0aWMgc2lwaGFzaF9hbGlnbmVkX2tleV90
+IG5mX2N0X2V4cGVjdF9oYXNocm5kIF9fcmVhZF9tb3N0bHk7DQo+IA0KPiAgLyogbmZfY29ubnRy
+YWNrX2V4cGVjdCBoZWxwZXIgZnVuY3Rpb25zICovICB2b2lkDQo+IG5mX2N0X3VubGlua19leHBl
+Y3RfcmVwb3J0KHN0cnVjdCBuZl9jb25udHJhY2tfZXhwZWN0ICpleHAsDQo+IA0KPiBUaGFua3Mu
+DQoNCg==
 
