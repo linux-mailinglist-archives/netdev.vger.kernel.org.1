@@ -1,220 +1,198 @@
-Return-Path: <netdev+bounces-255129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255130-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id frZvFLmgfGlkOAIAu9opvQ
-	(envelope-from <netdev+bounces-255129-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:14:49 +0100
+	id 8I0aCEamfGnCOAIAu9opvQ
+	(envelope-from <netdev+bounces-255130-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:38:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A44DABA5E9
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:14:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7339FBA95C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49304300A8EF
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:14:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 303563007E0E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6324A36CE16;
-	Fri, 30 Jan 2026 12:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF6C37BE70;
+	Fri, 30 Jan 2026 12:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="nPcmafig";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="d22heNOt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A+KOIyFK"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF06A298CBC;
-	Fri, 30 Jan 2026 12:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD7A23EAA1
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 12:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769775286; cv=none; b=muM6sejf+nZgMGyB+2oSLNEIotZtzXhy1AWbkxhzUpLC3qtExCSoS3MfyhQ4ySr7Uuufyd7y7RmDFnJKf435oj78U59twzVrKRDm0lJQxlIkfo9KWM8hdf1v+eX2UiFUmt9uFApEmg28QxX+7311pgarMG2dNsf/Z4aOcnghEX4=
+	t=1769776587; cv=none; b=lDWU6zfDURmQgGatOcI+nYaWIf9sVr4F6CQf9Ln3hl659cXmQXafq5/C9UahNMtYN7qegVJOpHVTAUkD6+fc62fSmUGgWXsj60/FRWP6saWD6KOnYW1iGb5OekXa12EzEADa9ek2rNB7k3cBzpdiVl9ceqSr/ijsRp6kGKKF6L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769775286; c=relaxed/simple;
-	bh=T2ynszaSPwee+0PtNkIvbz3yeVwvjqtKN8AXsKO/3w8=;
+	s=arc-20240116; t=1769776587; c=relaxed/simple;
+	bh=KrxdH3mljOFP58fCHOBTh/G31XI1FXKq/4/o+xP6G7s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O4M5stZaQCvXS5VgO+5SyBxjhOUc5/IpqwkAPQes61gtk696L+8Nj0BUMIV62j0HCzKfGplD7mCL5X4UAXKfEWLU9pqOWmOwJHTyiXy/G+DiJAg6yaKuxETEUGgxzxs1FWYPFTYW/DZ0dXqDHwUE993lwdnTJ7E6AIMb+LcgqLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=nPcmafig; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=d22heNOt; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id B27EA1400151;
-	Fri, 30 Jan 2026 07:14:42 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Fri, 30 Jan 2026 07:14:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1769775282; x=
-	1769861682; bh=MzLLPN6YtozLhJs3xB3wFOAPKWaat9nk7UAgnZhilC8=; b=n
-	Pcmafig3MKALAZjwDUe/tDcfnS4gR7HzXjOgLZFd1oo+JJqffrDXK8aMjG1UUJ7h
-	sa4776gtmWGgaUN1VQC+NgiiQl+MdMzKQ1+D7uLAxgEsvghe/sYxW7FcLZLP4/Zn
-	BsXjEIP1B20CBCWrhQhCWFanE4i1VKsNhZENz/QO5P7nWxngdiyY85tJDCctD5iJ
-	MEFrzgUIbzXQxVxntqMX46rekxsGx1f31hXFz85EWMIW+Jb/N6BBLOTqaX30Hfvn
-	BNzHbVKa/8JKPuiwXIWFHPnZwxqk44Z9cYpjdP5CDBoVAzvIu0YdGjLcUkebvxWS
-	q45y+OmtpjSPm5kBmL6wg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1769775282; x=1769861682; bh=MzLLPN6YtozLhJs3xB3wFOAPKWaat9nk7UA
-	gnZhilC8=; b=d22heNOtVuaN9zz5Kcf6PBqhvKzIJDVmfY1nOF4sFd2ok41E4YP
-	ZF3W2vPd5Uut9nsipZKHH2z1vMbiPnkt0V5u2SPpis1JrU3hKWnPpLjS91F+rCEy
-	7jUKofKA3NOoTcK+EEXTOkFK50cjoeTmoOrIbNxG4URx3+Vuto8uph3gDoRStCTN
-	Tz/POQT32aPVBfj7pn69ZTy2MfEXwjF1+rFsQfH4IxiaQv1nYrqh7A/HI3GKvuk+
-	XPkL+tTMaIlxPxd0bJeVL7OkXehWGBBXviTij/kZQ4NZwwg2Ifznt6/JfeaD4rWG
-	aekqRf1QFjLgJ+K8Hfh6DYWDpBVrAFgh4eg==
-X-ME-Sender: <xms:saB8afrjgaA4k2aJHc01oGS0jbj8JQSeZRWWstGnCV9obhzU_fqbIg>
-    <xme:saB8adWgXp6DPre5qo4wPJhyHJCK4QSl1BLYrz2guy8TN4ybQtviiWXWP5rr_v298
-    zdo6W8OO2Nm4skDid_13gdhYhIE0MYfZxCOGf740zTLtSyXWu6r2l4>
-X-ME-Received: <xmr:saB8aU0mnTSMoOaUb-TYCsDA2151iJBIYL2MGn7BXD5s7hcjbnPgyMV268C7>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeltdduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
-    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
-    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
-    hnrgdrohhrghdrrghupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtph
-    htthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggr
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtoh
-    hmpdhrtghpthhtoheptghhihgrtghhrghnghifrghnghesghhoohhglhgvrdgtohhm
-X-ME-Proxy: <xmx:saB8aUTEztxgg61w-RY8AHt5t5AobuPs8yw4566a-MNbFfRBPHylfg>
-    <xmx:saB8aQQxec6VpmbtlBYu2QZx9ZOrM19W7rRzjcawqAG9t12RFCPxYw>
-    <xmx:saB8adW1cRHDV4VcKasW8fbP2PdFAr3-btZlBECubFqMkOID30AeMw>
-    <xmx:saB8aSJdn89iRB8sNCND8brrTda5v5d9J4NXVlO8OVf6-87j8CzL2Q>
-    <xmx:sqB8aZ91oPffQgNBVDOQwtJGFlPKGv4u2g8tMCDPoq06oIQoXIXDxi_0>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 30 Jan 2026 07:14:40 -0500 (EST)
-Date: Fri, 30 Jan 2026 13:14:39 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QqoMGbwpwBJGAUSdQ40/jFNPlMcTclS837ScgoH2FmZkZMFqADWLsFILk2lhOWUj/96xLoJtrkA/hDbCLnvbsEEd1UfHF0DOs8uysNh6wdJVq0tIAgOQ4YDvzkfRDGeP9PRJzp6ILqDdkXWgsHnNSzqOjmOXE5nXzOCGrCIVQ1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A+KOIyFK; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2a7bceb6cd0so14598315ad.1
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 04:36:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769776586; x=1770381386; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UnO32hbWXvDgVb2EF8+0dkq47eMPxIFNlb7lppJN2vY=;
+        b=A+KOIyFK9CgcXPZoL6zLsNZnLrdpgLjs+JJvCeiQS9IjWFXma9n07VkGXj1QaxiAL8
+         rUViemxrvt7fNkYwCrooVuGJet5SQS7/hXiD+ygF9bEFFV5B0XrvPvn8IM1rhEwtk+Hw
+         o6ea2XQCXH0QdPVF7RBHTq3h8W10OMVVgoOnamkxfQoW3+71r2DkQEgbNf42vMP+LJbA
+         AJAe337r6WH3gVM7UV4rcnxYAFSdbm+J0weAWCa2d5ehX632fUsY/0fQ79XeKiHgUcfT
+         W2SYgdRKF6fG8Gr8JPNHMEtSXJWBd00aYSL/rKCjpqsTcae7snfbgtxGGEYuqbZQ5VTy
+         O6TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769776586; x=1770381386;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UnO32hbWXvDgVb2EF8+0dkq47eMPxIFNlb7lppJN2vY=;
+        b=dDbT+TibQNyVkTDAgSxBPx5ITNsPKScxGuo4IOrI7zF19/XasoBxLyGfhHUN+4OLsk
+         GrU/WmNjShpAFho9uu2qZ1SnQ4Klu4+V61qeS0aicGjrfEt7raxYem/5BvpfvWdoV3np
+         TPLJIFjjdy8de1gotQcR590CHjPoT2sF85OBHGH7DGrA1YEckTcZqmojgqLZElvYRmMj
+         g9IThHAA9jv2JaCsSX8P0PpzBEvZMUuLUxEcAaQO5XYP8oCo4GdkBGK/z9KuidJO1m8Z
+         l1Bu000nJ6pPCIF22blJNZJFqQPGt72Ohh75WSity8bFo5X8P9xtNz4tVMonL6cxCkyB
+         aGhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEMn5uf5fuJ1DL9rqi/BIsR+tZNhxnrE65oJ14FqhgBXcS1HGkJ51TewYF7OBrtsWYN/F5JJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOSjoqCkagsz3BOzKOdIsZswOPT4AyP0jWPigf18Q319+4T77M
+	kWUYgYx0ui9JFXYknXZiNlOvzPyJaROYeq89L77DECaXJFc4Ma7P8aGN
+X-Gm-Gg: AZuq6aIhengaVi5Wic+FcAxoRJviR83W1CTAMVis+k757hmUIBVmpUFbh8vaBLokYDO
+	p0BO4LE4Ju8zTW9Lf/qgLRORVWPoiZWRr+3NH0rRFbZvECFxxoHfyf+TlxvE7khPlcJ2nt4gKQd
+	tUfA68OLTQrBk3SJheTz1gP3hHe5XJC6vP6DxM6CyLFaFq74+seWItb20KomrIM6duCQ3CtWy4M
+	8vSHYjKltrfH+M/CsVl4qpR0S7mfacYe8kaoV8taRu37dLmSODkpcbRInulHhMqCQR7baMYmEUH
+	dN6j6DhrpomcgaJUJRPVhaFTAb0mB41kiAOoMEy3waHRUPEDozjAWG+N2MZj5xrctSMGVRot2E+
+	CVEUYXsUJsTFur6Y7qC8A+X2BSGFcH+RZA8+Ux3G1lqgD6DMTDSDbaGAUeyVur8uj2hahaIddvX
+	kI0ZhTFApdpsIDxyykk0AyVgKWqg==
+X-Received: by 2002:a17:903:1967:b0:2a2:acc7:f1ee with SMTP id d9443c01a7336-2a8d96b15bcmr32237805ad.21.1769776585751;
+        Fri, 30 Jan 2026 04:36:25 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b426e3csm81275885ad.44.2026.01.30.04.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 04:36:25 -0800 (PST)
+Date: Fri, 30 Jan 2026 12:36:19 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chiachang Wang <chiachangwang@google.com>,
-	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH ipsec-next v5 7/8] xfrm: add error messages to state
- migration
-Message-ID: <aXygrzQrsQxGdDG5@krikkit>
-References: <cover.1769509130.git.antony.antony@secunet.com>
- <dd1d5b341323d6e0f93057c214adf4fc51c3cbd1.1769509131.git.antony.antony@secunet.com>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: only set speed/duplex to unknown, if
+ getting speed failed
+Message-ID: <aXylwyr2pV0rZAW3@fedora>
+References: <20260130111904.144024-1-tbogendoerfer@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd1d5b341323d6e0f93057c214adf4fc51c3cbd1.1769509131.git.antony.antony@secunet.com>
+In-Reply-To: <20260130111904.144024-1-tbogendoerfer@suse.de>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255130-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255129-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:email]
-X-Rspamd-Queue-Id: A44DABA5E9
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7339FBA95C
 X-Rspamd-Action: no action
 
-2026-01-27, 11:43:42 +0100, Antony Antony wrote:
-> Add descriptive(extack) error messages for all error paths
-> in state migration. This improves diagnostics by
-> providing clear feedback when migration fails.
+On Fri, Jan 30, 2026 at 12:19:04PM +0100, Thomas Bogendoerfer wrote:
+> bond_update_speed_duplex() first set speed/duplex to unknown and
+> then asks slave driver for current speed/duplex. Since getting
+> speed/duplex might take longer there is a race, where this false state
+> is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding:
+
+The patch looks good to me. But based on your description, I don't think
+the fixes tag is correct.
+
+Thanks
+Hangbin
+>  update port speed when getting bond speed") this race gets more visible,
+> if user space is calling ethtool on a regular base.
 > 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> Fix this by only setting speed/duplex to unknown, if link speed is
+> really unknown/unusable.
+> 
+> Fixes: 691b2bf14946 ("bonding: update port speed when getting bond speed")
+> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
 > ---
-> v4->v5: - added this patch
-> ---
->  net/xfrm/xfrm_state.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+>  drivers/net/bonding/bond_main.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 > 
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 88a362e46972..2e03871ae872 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -2129,15 +2129,21 @@ struct xfrm_state *xfrm_state_migrate_create(struct xfrm_state *x,
->  	struct xfrm_state *xc;
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index e7caf400a59c..4cdf89b21ca0 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -791,26 +791,29 @@ static int bond_update_speed_duplex(struct slave *slave)
+>  	struct ethtool_link_ksettings ecmd;
+>  	int res;
+>  
+> -	slave->speed = SPEED_UNKNOWN;
+> -	slave->duplex = DUPLEX_UNKNOWN;
+> -
+>  	res = __ethtool_get_link_ksettings(slave_dev, &ecmd);
+>  	if (res < 0)
+> -		return 1;
+> +		goto speed_duplex_unknown;
+>  	if (ecmd.base.speed == 0 || ecmd.base.speed == ((__u32)-1))
+> -		return 1;
+> +		goto speed_duplex_unknown;
+>  	switch (ecmd.base.duplex) {
+>  	case DUPLEX_FULL:
+>  	case DUPLEX_HALF:
+>  		break;
+>  	default:
+> -		return 1;
+> +		goto speed_duplex_unknown;
+>  	}
+>  
+>  	slave->speed = ecmd.base.speed;
+>  	slave->duplex = ecmd.base.duplex;
+>  
+>  	return 0;
+> +
+> +speed_duplex_unknown:
+> +	slave->speed = SPEED_UNKNOWN;
+> +	slave->duplex = DUPLEX_UNKNOWN;
+> +
+> +	return 1;
+>  }
+>  
+>  const char *bond_slave_link_status(s8 link)
+> -- 
+> 2.43.0
 > 
->  	xc = xfrm_state_clone_and_setup(x, encap, m);
-> -	if (!xc)
-> +	if (!xc) {
-> +		NL_SET_ERR_MSG(extack, "Failed to clone and setup state");
-
-When xfrm_state_clone_and_setup fails it's because some allocation
-failed and the user won't be able to do much about this, right? I
-don't feel extack in those situations is super helpful.
-
->  		return NULL;
-> +	}
-> 
-> -	if (xfrm_init_state(xc) < 0)
-> +	if (xfrm_init_state(xc) < 0) {
-> +		NL_SET_ERR_MSG(extack, "Failed to initialize migrated state");
-
-xfrm_init_state itself doesn't handle extack, but it's just a wrapper
-around functions that do. Maybe better to make xfrm_init_state
-propagate extack?
-
->  		goto error;
-> +	}
-> 
->  	/* configure the hardware if offload is requested */
-> -	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
-> +	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack)) {
-> +		NL_SET_ERR_MSG(extack, "Failed to initialize state offload");
-
-We already set an extack in xfrm_dev_state_add, this chunk should be
-dropped to avoid overwriting the more specific info we got.
-
->  		goto error;
-> +	}
-> 
->  	return xc;
->  error:
-> @@ -2161,6 +2167,7 @@ int xfrm_state_migrate_install(const struct xfrm_state *x,
->  		xfrm_state_insert(xc);
->  	} else {
->  		if (xfrm_state_add(xc) < 0) {
-> +			NL_SET_ERR_MSG(extack, "Failed to add migrated state");
-
-Not a strong objection, but this case would be the EEXIST situation
-from xfrm_state_add, and there's not much the user can do about this?
-
->  			if (xuo)
->  				xfrm_dev_state_delete(xc);
->  			xc->km.state = XFRM_STATE_DEAD;
-
--- 
-Sabrina
 
