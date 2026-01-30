@@ -1,64 +1,72 @@
-Return-Path: <netdev+bounces-255160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255161-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCLqFhy9fGlVOgIAu9opvQ
-	(envelope-from <netdev+bounces-255160-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:15:56 +0100
+	id OLY0Hiq9fGlVOgIAu9opvQ
+	(envelope-from <netdev+bounces-255161-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:16:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4624BB82C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:15:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3143DBB833
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:16:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C493301C177
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:15:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A0F013002F69
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F7E318EDC;
-	Fri, 30 Jan 2026 14:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B5F2F3C1D;
+	Fri, 30 Jan 2026 14:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ooMHo2S0"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LnDCGwHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C20E1D5147;
-	Fri, 30 Jan 2026 14:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88A121ABB9;
+	Fri, 30 Jan 2026 14:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769782509; cv=none; b=U3IOkhheKQ9HYEUbF7pBYdYspQY5MPsluiQGgtr6rvj+7rEXVbVMUnA/LIGp3Gq48jrhPTsHLhQEgMNzddKXOUCdQNHL4vUDxEMQ/a6kBOEJElfT0bXBrL3bLG+FO1zCzrXi2ecV4fDQ5RCks2u46w4Dr3VCM0HZwsb6wU0e2QU=
+	t=1769782565; cv=none; b=DA5bIphGcs+VMRqSz/1KQhEyrOshdLicDHMAzJRZEXzNfayL/1cJ7IJLIshRKP+bdLDdu80/0nbnOss3bRgXJthiSm/NVjsHahsoTh5Wda6M3q7XGYiJJ1e2AozzNjzssJvLpEakwACFpbc9v1QVvZrUga493lnW/Qs1MMRyPio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769782509; c=relaxed/simple;
-	bh=4CM+7vybFqeOsbZHgBMOyxW5M97RCoiG6HI8SD15ftE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSAu8FzwonRSECkxl6I92iqXFhVnXBYjXZcjpQtdDRABbmUGnGIqRtJemddbMeoNi5OVLuH7lYkZwtuCbwUCL2lxwCDC20HAOJfNsLtuKRoufeZYko9b17rKqYxzFOsUAJkURvN7Ms8ELRWsSH0DdOtbCQW3UjJbMLeyVnXcCXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ooMHo2S0; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769782505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=CzQPYM4Xj9u9dgaPCEFQdtOnbDlQ9MEGeF3DmF2HHNQ=;
-	b=ooMHo2S0asrhch+xstWxvN4A/wxEJazpnXuUoM4yOyaqCO8RwD2kvJwbM2TG2QZL4TJCwz
-	BmYsd3cppgG+nGa5d+TLgD+vWuRfwPEZh5mWbn3UDBAIx0VYK3I4grhsGMEoJc8Za09++a
-	VRNZSjypDwp4d+UrsDkXblikVOxUJL8=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+1ec2f6a450f0b54af8c8@syzkaller.appspotmail.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] linkwatch: use __dev_put() in callers to prevent UAF
-Date: Fri, 30 Jan 2026 22:14:50 +0800
-Message-ID: <20260130141455.63201-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1769782565; c=relaxed/simple;
+	bh=zYvh5SJx0J+ykZgKVolO/Sh+059x6w9OwLwRZeMSvx8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cwfbetSe5SlGoIcHa2PzV9/T0cSIqXaZfTbuLeKu5a1pyj9EVIYRxbAfXcJcWnWErVmbrA4K0dS8Ag+FAYp5iOnjFQDjgjgTlmAa5bxewR5vyb3TkuwBpNrlOjl5YAFiKeEPFd3pWROwqw0khIsoqqueOKordLbdw03cmmuZ+JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LnDCGwHa; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60UB10bv1373632;
+	Fri, 30 Jan 2026 06:15:57 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=AxMMk9qY8+FWUBvq+R+5srw
+	+wbOnbxsqsowg9PZIxrc=; b=LnDCGwHab/VcfYoDbmx+rnXu9BBeB3MVsH2XhWV
+	lKeCSykniRbETH93kgnFJh0uyxmltvUx63SbnHiHxMSb0kpWwjlja3/aWBvr1kjt
+	LF+aF0cOZszm/PLqIOJ7N0ePbSbOVZTNZZZNZgpbz8KIDBbfuHJYsp3XDyjMSYBJ
+	Mb14N1svJwUufKpw6/aI7F34eCm1sVmo/CLFav1miNS9r4gyR3OHAKHagPiMrgdB
+	eLvMRyDI53PXtuCY6iBWaEdXwXCkNaOWx9i+MTQg5VCRzwkmPDhQrA32n10vLQs9
+	H7dL65ot1jSNA/jeOrffGFmM+RgAQHqx+apyQ5MQH6JBi6w==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4c0ucx8aq6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 30 Jan 2026 06:15:56 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 30 Jan 2026 06:16:10 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 30 Jan 2026 06:16:10 -0800
+Received: from sapphire1.sclab.marvell.com (unknown [10.111.132.245])
+	by maili.marvell.com (Postfix) with ESMTP id 2AD343F7120;
+	Fri, 30 Jan 2026 06:15:55 -0800 (PST)
+From: Vimlesh Kumar <vimleshk@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sedara@marvell.com>, <srasheed@marvell.com>, <hgani@marvell.com>,
+        "Vimlesh Kumar" <vimleshk@marvell.com>
+Subject: [PATCH RESEND net v3 0/3] disable interrupts and ensure dbell updation
+Date: Fri, 30 Jan 2026 14:15:44 +0000
+Message-ID: <20260130141549.827020-1-vimleshk@marvell.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,158 +74,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 02AGKzWmb6ap8eoY_tToRqnCnozYDpHp
+X-Authority-Analysis: v=2.4 cv=T92BjvKQ c=1 sm=1 tr=0 ts=697cbd1c cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=6bxer7aP3YgKHE6BY9wA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 02AGKzWmb6ap8eoY_tToRqnCnozYDpHp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMwMDExNiBTYWx0ZWRfX4xaVmnOiuDeg
+ BcPG2H2lgpiVXQd+pd2rwXCPOaJ/k6qeppcDKhJBrsYgPFyM5HfzbM3ojykTwEcF3BaBm7tp/67
+ fOn3/NeKBpVaQkDWhYqGXiJE6AknoSbOImr2iOezMTohF4fRpR6BNRfw7nUd1KvfAdlsTJcWi5Y
+ /oBPKPiv/rZVvdAJl+Hq5XBzBo+Wf2EVltkZKybYnF9BA2CrI4GDaotULTi3hwdFaYrNYvnAgX9
+ 0aUlHACRp0qzi9N+Gicg1XYnO2dki9ecgqdWpq4Ci0fAS7vA9Iiq3P6CAoGjABs6nRSmzG8vN+6
+ reIBVuVpMYxU+Jl78q8TevFf+8Yb8AVGnWB33Cb0xRRvCVCXSSI3kJu9o1inKJ4P5U8YNjAc1As
+ EpvB5CMuGBIM5KqoI+J80Y950rMkVKuoITazntcafZklghsIczU5TnXHMdknBOyxGVGUGpd6AFA
+ RGFmdRje+kjy+BIVuqQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-30_02,2026-01-29_01,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-255160-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255161-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[vimleshk@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,1ec2f6a450f0b54af8c8];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,shopee.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A4624BB82C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:mid,marvell.com:dkim];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 3143DBB833
 X-Rspamd-Action: no action
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+Disable per ring interrupts when netdev goes down and ensure dbell BADDR
+updation for both PFs and VFs by adding wait and check for updated value.
 
-After linkwatch_do_dev() calls __dev_put() to release the linkwatch
-reference, the device refcount may drop to 1. At this point,
-netdev_run_todo() can proceed (since linkwatch_sync_dev() sees an
-empty list and returns without blocking), wait for the refcount to
-become 1 via netdev_wait_allrefs_any(), and then free the device
-via kobject_put().
+Resending based on discussion with reviewer. 
 
-This creates a use-after-free when __linkwatch_run_queue() tries to
-call netdev_unlock_ops() on the already-freed device.
+Vimlesh Kumar (3):
+  octeon_ep: disable per ring interrupts
+  octeon_ep: ensure dbell BADDR updation
+  octeon_ep_vf: ensure dbell BADDR updation
 
-Note that adding netdev_lock_ops()/netdev_unlock_ops() pair in
-netdev_run_todo() before kobject_put() would not work, because
-netdev_lock_ops() is conditional - it only locks when
-netdev_need_ops_lock() returns true. If the device doesn't require
-ops_lock, linkwatch won't hold any lock, and netdev_run_todo()
-acquiring the lock won't provide synchronization.
-
-Fix this by moving __dev_put() from linkwatch_do_dev() to its
-callers. The device reference logically pairs with de-listing the
-device, so it's reasonable for the caller that did the de-listing
-to release it. This allows placing __dev_put() after all device
-accesses are complete, preventing UAF.
-
-The bug can be reproduced by adding mdelay(2000) after
-linkwatch_do_dev() in __linkwatch_run_queue(), then running:
-
-  ip tuntap add mode tun name tun_test
-  ip link set tun_test up
-  ip link set tun_test carrier off
-  ip link set tun_test carrier on
-  sleep 0.5
-  ip tuntap del mode tun name tun_test
-
-KASAN report:
-
- ==================================================================
- BUG: KASAN: use-after-free in netdev_need_ops_lock include/net/netdev_lock.h:33 [inline]
- BUG: KASAN: use-after-free in netdev_unlock_ops include/net/netdev_lock.h:47 [inline]
- BUG: KASAN: use-after-free in __linkwatch_run_queue+0x865/0x8a0 net/core/link_watch.c:245
- Read of size 8 at addr ffff88804de5c008 by task kworker/u32:10/8123
-
- CPU: 0 UID: 0 PID: 8123 Comm: kworker/u32:10 Not tainted syzkaller #0 PREEMPT(full)
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
- Workqueue: events_unbound linkwatch_event
- Call Trace:
-  <TASK>
-  __dump_stack lib/dump_stack.c:94 [inline]
-  dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
-  print_address_description mm/kasan/report.c:378 [inline]
-  print_report+0x156/0x4c9 mm/kasan/report.c:482
-  kasan_report+0xdf/0x1a0 mm/kasan/report.c:595
-  netdev_need_ops_lock include/net/netdev_lock.h:33 [inline]
-  netdev_unlock_ops include/net/netdev_lock.h:47 [inline]
-  __linkwatch_run_queue+0x865/0x8a0 net/core/link_watch.c:245
-  linkwatch_event+0x8f/0xc0 net/core/link_watch.c:304
-  process_one_work+0x9c2/0x1840 kernel/workqueue.c:3257
-  process_scheduled_works kernel/workqueue.c:3340 [inline]
-  worker_thread+0x5da/0xe40 kernel/workqueue.c:3421
-  kthread+0x3b3/0x730 kernel/kthread.c:463
-  ret_from_fork+0x754/0xaf0 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-  </TASK>
- ==================================================================
-
-Fixes: 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
-Reported-by: syzbot+1ec2f6a450f0b54af8c8@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6824d064.a70a0220.3e9d8.001a.GAE@google.com/T/
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- net/core/link_watch.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index 212cde35affa..5196f8ea43f1 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -185,10 +185,6 @@ static void linkwatch_do_dev(struct net_device *dev)
+V3:
+- previous discussion: https://lore.kernel.org/all/20260107131857.3434352-1-vimleshk@marvell.com/
+- Use reverse christmas tree order variable declaration.
+- Return error if timeout happens during setup oq.
  
- 		netif_state_change(dev);
- 	}
--	/* Note: our callers are responsible for calling netdev_tracker_free().
--	 * This is the reason we use __dev_put() instead of dev_put().
--	 */
--	__dev_put(dev);
- }
+V2: https://lore.kernel.org/all/20251219100751.3063135-1-vimleshk@marvell.com/
  
- static void __linkwatch_run_queue(int urgent_only)
-@@ -243,6 +239,7 @@ static void __linkwatch_run_queue(int urgent_only)
- 		netdev_lock_ops(dev);
- 		linkwatch_do_dev(dev);
- 		netdev_unlock_ops(dev);
-+		__dev_put(dev);
- 		do_dev--;
- 		spin_lock_irq(&lweventlist_lock);
- 	}
-@@ -278,8 +275,10 @@ void __linkwatch_sync_dev(struct net_device *dev)
- {
- 	netdev_ops_assert_locked(dev);
- 
--	if (linkwatch_clean_dev(dev))
-+	if (linkwatch_clean_dev(dev)) {
- 		linkwatch_do_dev(dev);
-+		__dev_put(dev);
-+	}
- }
- 
- void linkwatch_sync_dev(struct net_device *dev)
-@@ -288,6 +287,7 @@ void linkwatch_sync_dev(struct net_device *dev)
- 		netdev_lock_ops(dev);
- 		linkwatch_do_dev(dev);
- 		netdev_unlock_ops(dev);
-+		__dev_put(dev);
- 	}
- }
- 
+V1: https://lore.kernel.org/all/20251212122304.2562229-1-vimleshk@marvell.com/
+
+ .../marvell/octeon_ep/octep_cn9k_pf.c         | 21 ++++--
+ .../marvell/octeon_ep/octep_cnxk_pf.c         | 64 +++++++++++++++----
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  2 +-
+ .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |  1 +
+ .../marvell/octeon_ep/octep_regs_cnxk_pf.h    |  1 +
+ .../net/ethernet/marvell/octeon_ep/octep_rx.c |  4 +-
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  3 +-
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      | 39 ++++++++++-
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  2 +-
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  4 +-
+ 10 files changed, 118 insertions(+), 23 deletions(-)
+
 -- 
-2.43.0
+2.47.0
 
 
