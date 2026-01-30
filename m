@@ -1,205 +1,126 @@
-Return-Path: <netdev+bounces-255098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMf0LzWLfGnSNgIAu9opvQ
-	(envelope-from <netdev+bounces-255098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:43:01 +0100
+	id MNQ5IWiPfGkQNwIAu9opvQ
+	(envelope-from <netdev+bounces-255099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:00:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D86DB9722
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:43:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C849DB9AC6
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4573C300D176
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:42:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF0B8300D315
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5BC36997F;
-	Fri, 30 Jan 2026 10:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462D830F81A;
+	Fri, 30 Jan 2026 11:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="m9IBieYr"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FD533EAED
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C714D31195F
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769769778; cv=none; b=L/t/pLk8YQ6MoR6J3PFpZmzDsBSiZ4QEGnJCT2oNOY8YooBIxMevRzoFxiidDLptq9nDqtPKv2u+ZyzOC4irPRrVfO/+/RqkUPLmW3cg3dLWf5zMvu2Y5h5hWjZrv+GsZwuUY4Yieqs2/6VFV38Qqpy9cqF9JM+05n789ZVemFQ=
+	t=1769770820; cv=none; b=SxV+1VcLmLbw+Bt37ktZVi1ZR3dktSclZ9um9rQwG8Lb06wn1M7sf5oDLCT7y99GwQoWy613zJuJlyh4SKUd3sqkCHneC6kvcJ+itxljcMyvTMAH9UTsZbZlRRPPhE0lUCNlBAYwRkzRpK9SXZepSnmMYpYGIFquFJSqYjkW/98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769769778; c=relaxed/simple;
-	bh=LHGFYVdFs7XVfQiGqqpy9wFdvOghvKWLadMefjklVKQ=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=jshX5qEkrNQhHIZjVeCZn5iEQMurvuOAOjis3CH38q2DzO8z+YKjBVo5iwxW3mU3evc9bE0TaiQzdgRd8O1nFBUOoIwNbmwP9ZmRa7l9DNqNIEWYpy9t+5SmlZ6oqEey+KP/UcF2CR6Pp/kAdteAYT+gjkB11hd+V7X34kjktcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60UAgnuB028767;
-	Fri, 30 Jan 2026 19:42:49 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60UAgmef028764
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 30 Jan 2026 19:42:48 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp>
-Date: Fri, 30 Jan 2026 19:42:47 +0900
+	s=arc-20240116; t=1769770820; c=relaxed/simple;
+	bh=NXMREDFQUxvPpNS2bhnEnVwHiD7yBj8GXKXRHOeTnTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QOijXKw8DjsoqlTNgUOMqXQIV8eOXJS/CwYZ6taFxR33vdGGUVoaP9npNrBVqbeTQXgCchz6zt3/oQZmQIMS9Bg/c4OuwzpXPP4FIgr4UfG3/xKKqYR+VXovFSDY1k6OP/YvLZcGr8UsGVpkSn6esMeez/UEBrW5OiiNTKNhiJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=m9IBieYr; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XN4B7N6jTthrzUlh3IQWK+1+cvph40kSm2rN+Qhn608=; b=m9IBieYrNIGvGUs0CO/p6v01i5
+	nXGNQ5Y8M3uq2veCfShMMo8HinSSiQq7zftoz3xbBVbuwCxUHKVxLdy6jy9RIcK4iYaoWV4zvLFmu
+	S61uqtd1ch05FemkjtCyPG26264YRw2nHtMFG74xr2d0dPJTuDKQeY03cUv6gI2o0RCam3G5bHqDP
+	1oq1IrxRtLss3Hxrkv46GxIzuFWLAJg3Aai6AMSFZeZ0U4f4fTmRo5N7+t2+/d9RMPJpg9Kl2TXh7
+	sG5T+10UGUk9b+c6oPAt+DA1inpA7Sk0/cTlWnPiOvQlI0jUOxQeANaKDjo3evtt79r4ShVFMjuDq
+	gMx92bUA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42890)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vlmEJ-000000000wn-0lQE;
+	Fri, 30 Jan 2026 10:59:59 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vlmEF-000000000Ri-0zl0;
+	Fri, 30 Jan 2026 10:59:55 +0000
+Date: Fri, 30 Jan 2026 10:59:55 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 00/10] net: stmmac: rk: cleanups v3: mode and speed
+ for most
+Message-ID: <aXyPK9rlMt8h_fze@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Sabrina Dubroca <sd@queasysnail.net>, Leon Romanovsky <leon@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Ilan Tayari <ilant@mellanox.com>, Guy Shapiro <guysh@mellanox.com>,
-        Yossi Kuperman <yossiku@mellanox.com>,
-        Network Development <netdev@vger.kernel.org>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH net v2] xfrm: always flush state and policy upon
- NETDEV_UNREGISTER event
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav305.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255098-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255099-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,I-love.SAKURA.ne.jp:mid,i-love.sakura.ne.jp:email]
-X-Rspamd-Queue-Id: 9D86DB9722
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: C849DB9AC6
 X-Rspamd-Action: no action
 
-syzbot is reporting that "struct xfrm_state" refcount is leaking.
+Hi,
 
-  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
-  ref_tracker: netdev@ffff888052f24618 has 1/1 users at
-       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
-       netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
-       xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
-       xfrm_state_construct net/xfrm/xfrm_user.c:986 [inline]
-       xfrm_add_sa+0x34ff/0x5fa0 net/xfrm/xfrm_user.c:1022
-       xfrm_user_rcv_msg+0x58e/0xc00 net/xfrm/xfrm_user.c:3507
-       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
-       xfrm_netlink_rcv+0x71/0x90 net/xfrm/xfrm_user.c:3529
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Third installment in the rk cleanups, this converts the interface mode
+and speed configuration for most RK SoCs.
 
-This is because commit d77e38e612a0 ("xfrm: Add an IPsec hardware
-offloading API") implemented xfrm_dev_unregister() as no-op despite
-xfrm_dev_state_add() from xfrm_state_construct() acquires a reference
-to "struct net_device".
-I guess that that commit expected that NETDEV_DOWN event is fired before
-NETDEV_UNREGISTER event fires, and also assumed that xfrm_dev_state_add()
-is called only if (dev->features & NETIF_F_HW_ESP) != 0.
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 846 ++++++++++---------------
+ 1 file changed, 345 insertions(+), 501 deletions(-)
 
-Sabrina Dubroca identified steps to reproduce the same symptoms as below.
-
-  echo 0 > /sys/bus/netdevsim/new_device
-  dev=$(ls -1 /sys/bus/netdevsim/devices/netdevsim0/net/)
-  ip xfrm state add src 192.168.13.1 dst 192.168.13.2 proto esp \
-     spi 0x1000 mode tunnel aead 'rfc4106(gcm(aes))' $key 128   \
-     offload crypto dev $dev dir out
-  ethtool -K $dev esp-hw-offload off
-  echo 0 > /sys/bus/netdevsim/del_device
-
-Like these steps indicate, the NETIF_F_HW_ESP bit can be cleared after
-xfrm_dev_state_add() acquired a reference to "struct net_device".
-Also, xfrm_dev_state_add() does not check for the NETIF_F_HW_ESP bit
-when acquiring a reference to "struct net_device".
-
-Commit 03891f820c21 ("xfrm: handle NETDEV_UNREGISTER for xfrm device")
-re-introduced the NETDEV_UNREGISTER event to xfrm_dev_event(), but that
-commit for unknown reason chose to share xfrm_dev_down() between the
-NETDEV_DOWN event and the NETDEV_UNREGISTER event.
-I guess that that commit missed the behavior in the previous paragraph.
-
-Therefore, we need to re-introduce xfrm_dev_unregister() in order to
-release the reference to "struct net_device" by unconditionally flushing
-state and policy.
-
-Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
-Cc: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-v2:
-  - Don't change xfrm_dev_down(), re-introduce xfrm_dev_unregister() instead.
-
-v1:
-  - https://lkml.kernel.org/r/1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp
-
- net/xfrm/xfrm_device.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 52ae0e034d29..550457e4c4f0 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -544,6 +544,14 @@ static int xfrm_dev_down(struct net_device *dev)
- 	return NOTIFY_DONE;
- }
- 
-+static int xfrm_dev_unregister(struct net_device *dev)
-+{
-+	xfrm_dev_state_flush(dev_net(dev), dev, true);
-+	xfrm_dev_policy_flush(dev_net(dev), dev, true);
-+
-+	return NOTIFY_DONE;
-+}
-+
- static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void *ptr)
- {
- 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-@@ -556,8 +564,10 @@ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void
- 		return xfrm_api_check(dev);
- 
- 	case NETDEV_DOWN:
--	case NETDEV_UNREGISTER:
- 		return xfrm_dev_down(dev);
-+
-+	case NETDEV_UNREGISTER:
-+		return xfrm_dev_unregister(dev);
- 	}
- 	return NOTIFY_DONE;
- }
 -- 
-2.47.3
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
