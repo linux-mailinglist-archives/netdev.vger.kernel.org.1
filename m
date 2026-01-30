@@ -1,303 +1,205 @@
-Return-Path: <netdev+bounces-255035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255036-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OwoIDhHfGn8LgIAu9opvQ
-	(envelope-from <netdev+bounces-255035-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:52:56 +0100
+	id ENXWFqtRfGmwLwIAu9opvQ
+	(envelope-from <netdev+bounces-255036-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:37:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE214B77F5
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:52:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0FEFB7A5F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:37:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D33F3300B9A5
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:52:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 58A3330059A2
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A55A378800;
-	Fri, 30 Jan 2026 05:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1B6314D13;
+	Fri, 30 Jan 2026 06:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TY8iiiUX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEWlIz8/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6662874E9
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 05:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769752372; cv=pass; b=KN8Ndzaa4tWb1NIuv3ZVNTR9pGHrWMN2s/vRsITFZ0ML4hMFao/r2TSFNprqc3jtWvxh7J4XTST9ZXVK+L05Xtm4XenY+nvAF7RLLVqXzxihQ43FGnaM+ZLlYY14q8VXUnOe2vvq0Lwq8G1lWh5VD8986hisA8C9Owsd/SlPTeU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769752372; c=relaxed/simple;
-	bh=cImNh7AmhiGij1+ZhirVCLP6mOlNdsNdkU3maKdeREs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=guMfrVOQeJwinJ4QyG2XxoDNJfqCgbCsytZgNQAjIg+1xAv9Uueaxdyjk/9SF/jLsY3kH0Z7fPz0j4XhKWWp9zqNTbZRXqj7Bc6xArPTxbkIVUTvJ9ab0hUdWWEcq/sqkbG/crqRFxhr9r90tCk7oKihQ23cFn0TCe3cnhZE+8E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TY8iiiUX; arc=pass smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2b4520f6b32so3598506eec.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 21:52:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769752371; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ATTd5DHCJyNqcmwKjdTNPY/pP05FGw+HIabP4ml23zZSSgCZPFaD7y4o9+P7aDGXXH
-         KZIvv3I3H6uTi4xFD49EotDVPrB4IjWp0fSUA+YhsOO5PgLfh3k2W2vAWwQBSF4KsxWP
-         hfrFzQ68Qwly3xKmJkyrPA1Q8ho3qB8cMxo2b1G4bMA2IIHStRRBywCib5hTY/8k5vGO
-         1yargR8Md9Zu964jm13iQgg/VWz/Y31aW0qkQiHnbyrzx7BPQZZBS0EW8UyoShVRVxXS
-         pYkhvxBvD6OJnKzTZgjUfcpoMmFfZAJ/HpfJD5gNxaFDKn35EH8y+QuRzMSd5YTPEsin
-         cIAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=LK2IkLpd/Wbh+zexSYrqMfHibZjGlnJWNUHv2HZ4Dtc=;
-        fh=KE3iTbuyjwI2xqVf3EaQolHM0xidMVTSTJMsvxBHRns=;
-        b=DrYmZcqrFRWxfvFew/YT4/HogWtw2fXAG+GXrvMuGkRxwNqEkvlNPp9JZNaHNKKR01
-         JHUs+9HLFPCApLokE7AcZt+TOrXdhp/Cy+t8RSbI2cjopsglGX++neI0n8HhZGad1D+N
-         Z+Mgjp9pzF2MpAjhB9DXatNMaaGnlBI3m5c16d02E/f4xi8LVlK9brNNkm/dZ88GPKBV
-         0HSdNldigdUGcHqSi/IUogRvmVdjvkdbaTr8hpm1ARZSrVNWbOvYBjTyyc9hXQPlBELr
-         AHa7gXs22Q9z1FGGmNk6TcPU4QEkNVB6sC2x7Tlrr0gQbdpAjLZVfUgbslnHjA0WXnik
-         k4aw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF36E2DF6E3
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 06:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769755049; cv=none; b=cIXVDkbKN4x9gFN2o1nxHi1oSNnHOV79WjraATBandaktHG6hFx3C4wkiEBJzc3UrtD8WC8ryanTvkNAuv2bYs+QU1vTfJSsW4zAWi58Lw214LANhPMLyLP0dVPYxPaOjaB+rAG5mbrUhkSpjZCs6w5lfm+iLVCPmaZl/SYgbZ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769755049; c=relaxed/simple;
+	bh=95v7NV8y8jvkm5MvFyZ3sn6LRDvHRfQIIUv1qPreNHc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=hcbt9k+mljN4K397k6To+7KQC55b11i60kGUx5xfeTyS/NveZdab5PRZbnPacczemNMxh6O/61XBR+XCBRiZryV2X3A43AjXme+RRdK/qLfnAFx4gDTbMDaH02PNilE8wU7s63j2uGyCTzlHraXmaYkT5QnXh6F296zTFcUH0Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEWlIz8/; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42fb2314eb0so1510238f8f.2
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 22:37:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769752371; x=1770357171; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LK2IkLpd/Wbh+zexSYrqMfHibZjGlnJWNUHv2HZ4Dtc=;
-        b=TY8iiiUXhYx7pzktm2+ph1CqQZp88S/t3J0DbM0zObe+FWmMlBQsAEcbEp/Pd9rDPz
-         NfsEs/Zl8KTK0p1Vzth13kPByHZobOPB7SGSyGGjiV0yhdMDryl2QSUWv2k2vchYRC0v
-         gNgnPpy65WCvl8TJosmSH63w49BA6DzUj+PglRS1Q1BU7ibHyXSuGjozTJ7v6Y8pmAtv
-         CcsH9zmTdUGMctTv0O7uTDX6Jfqbgh56EsoeUCckoqcjbHwNYxcHje4S59QEsZKwdBuU
-         FGXd3KrXhqvWMYLl264Je2x+sWudM4GwfJxKZJ8HYUrllMSLE64h9AIw/gD0gyidu3v+
-         wk/Q==
+        d=gmail.com; s=20230601; t=1769755045; x=1770359845; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=iaIL6hcZTlvS2jyO/4/sgFg+iA2PNPmH4knID0fBdVs=;
+        b=CEWlIz8/Ey8JQ76cky6LMxI2C+nzQavRmqmYHrq30lmWQcVJP+LvIv/A1Vslie0Yny
+         Ton3JKnUPImiUuMhoV0EPZ1ErfybmYB94YvV5OOZewvpZwBfNk+w4mLAOZpqM1vhV2GW
+         CRBGt92dAW6St1lFYEDYibAU3f3azFDxGTZxswiqf7kl/OTmKPHoLDWMQArl6FwHiZLC
+         v2MIqWkb+qPPhhTcs43Kxu6jda6lFhrf9DS3gtE1YBEmluzQ5KJkRQI5kmGOv28vgzjh
+         BfECj+5ceHA5UqDsDDCE9zG4nQOCDjns/s2fdik5y8fnBiS0kjRcNOd6PqrfrdMseTRP
+         ilaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769752371; x=1770357171;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LK2IkLpd/Wbh+zexSYrqMfHibZjGlnJWNUHv2HZ4Dtc=;
-        b=tAqPJyj/iMkTygFpeEdm1MCBBki3H2kdvCJCj6VOmS8U3N1dGGQ77JvUh5/kfdNJq1
-         G2mRqvaaYBrNaAiqGFo6BavE+l5dUKmaWV4VJI/HOxdEhrdTuDN+D+hVEQ/rJPw8tzlv
-         I447abwqthIbShwH4HVKOIKt17/CaskT3Q/55iaj6C5ZRyydAMlUs7cOkjlyBa/aeYQK
-         y4fQpw40nu7ytlMPIVLImY74qZlbOO99gVgiTqqJK529OVogm01OgaQ19g3jg4W++hOo
-         p4HnJ6PNF3zjcy01cBvumd65SKLEEFMHo0lsteHyVQQ83uyo3yWOLYobpgrjEuMzYWi4
-         1OTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUeJTeZHjmR7E5jYTMoxH4IbxUYvmOvmelrgkRXjfPWXtG5M7gzOEtbeE571ENTye9RroS3X4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrNoBcICoY7+Nxhjlh+GJtpkYZBKGefTQJAL5FoSpXQofaMDxl
-	JVsjFunxguShlH1cmPjP9PPu0hKWYIcWtd33TqjIJ2LDd5Ic8CElH3Lw0t6iPV7wx6AjrdRWSlM
-	LnK+bctP8AAVALgw2MWOXOIhjB6s2h6dcIaqeh9cv
-X-Gm-Gg: AZuq6aKCObNaRLxmyNg3LQZfb971nN6wDTuKVkLXIMxOM3BvdRqO9XEfN0o+AXuM608
-	rjqESa6TYfUIjQjtyYo28xdqfCAHeuzXzh0UKb4xMMnRqO9PyaEOp16DRwUdm5d4/PW32Cn4vXn
-	bmT2bX3kvxv+ExmKittK0re9OL2cyrVgPm0wTAuGEnWXEqNJBnBYC7gj9S/t8o2eeCUaxXVna1E
-	p07frsD3kOxxCviPfMQGWbdlkexAiMcIFGhJADi/anRmBlFgpBkFpnrohX6YOIQdnhAgebOomqx
-	iQB+qIT44AOrZZaFq7Ds6H6HLK0mlUzSIz70Vl12/lhbqRiOoaZFc94WvRc4
-X-Received: by 2002:a05:7022:660b:b0:119:e55a:9be4 with SMTP id
- a92af1059eb24-125c0f11b1fmr917664c88.0.1769752369932; Thu, 29 Jan 2026
- 21:52:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769755045; x=1770359845;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iaIL6hcZTlvS2jyO/4/sgFg+iA2PNPmH4knID0fBdVs=;
+        b=T/UHuEXjl9wf9f46U/0Y8pnAkl9qjqp4dW4h67qeAy4Ya+eks/wFFl7kDdau1zu2KX
+         IdF4HBqjB/QJtxIiZdO4DBXZ8y6RGmqtBBz1pevWzH+iFnHEch0ThieLeL7OazZ4iuke
+         m9xLwgnulkv66oqEJkfAPdkWAVi9FxFFTdBTeRsSsPSBa46DHn1kDXGVwRK/yB/4QMz4
+         3U1FKChcwn/IqTZfKkTU+RQN6f5Y4+4iIDJfVDSxSI5chjd8TyPsT5cWeuouRE7gb2gn
+         LC5ccZnQm02i1TWfJ5fAS5l1bP3lWm8mcnNfIrBtnI7VINCyjMm78lSPmAd+EbF3PEjn
+         arZQ==
+X-Gm-Message-State: AOJu0Yw3DV2q5CMBFtgCEBlOdDxOWTqRxPZifXkSWl6oZrdLpYJIXJEp
+	pyXfe6c4IqUum/k2c8McxqbRr3YeWBULz2tgS8rc0c3nQVN4MEvnNYVu
+X-Gm-Gg: AZuq6aKKLLWNO7OAYyffpw4nuDCAap3a8zG/4RxZiFPQzaHu4/u5wUIgNO3yDhwKHZa
+	5BMPifkf3uQDJk4DDebdg1IWGE/3ZMBs9iLAoCQdsz2KlCujk2diw4DWtbJHwDG6sRTp7ujnNbe
+	tRnwMGgpPRN36D7WZ/TdissT3do8xIUtuCN3M4hjPkBbM6yXSS+eaQlR8sG+P2v1CcTD+vDH3ot
+	jsiu5y/9Pr0tJVOQZ/uT9A/57Oa2bRJ3g3S6ycgRYYWgcORZnZWzuuetPWS7WaexfKS65eFZVz8
+	6gJ1b5DmuCHZglAAHXeSiibncz/PhiGbqpwK91fBjA5rHqSi58EuKCqnQ4WroJVtSZGDilNo8Nx
+	ne1yBts4lLfSYDWSwl8qzREiAJTxBYYRWHXbcrv9Ot1gt7mPcqbZk9AozO9DfYOVOqFEWyBi2JU
+	9GQTBoZgHNNFBv8c7NdD1Z+A85bMqFV+pUv9upIjBa/wp9FJdGYVDmIq/oucXjmWmfqCm/qHzQP
+	IAzejeeJPKWxSqUXdm1v/ZOUZ1NzKFlQPHBr69P/B1Q1EODlqyK9Q==
+X-Received: by 2002:a05:600c:3e10:b0:477:fcb:2256 with SMTP id 5b1f17b1804b1-482db4922d1mr20017285e9.17.1769755045218;
+        Thu, 29 Jan 2026 22:37:25 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f34:1500:a5ab:a2a5:28b0:fbf7? (p200300ea8f341500a5aba2a528b0fbf7.dip0.t-ipconnect.de. [2003:ea:8f34:1500:a5ab:a2a5:28b0:fbf7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e2543dcdsm5069745e9.9.2026.01.29.22.37.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jan 2026 22:37:24 -0800 (PST)
+Message-ID: <63ecf47d-6702-49d0-b063-f2f2510ef45b@gmail.com>
+Date: Fri, 30 Jan 2026 07:37:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260130022951.2489133-1-realwujing@gmail.com>
-In-Reply-To: <20260130022951.2489133-1-realwujing@gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 29 Jan 2026 21:52:38 -0800
-X-Gm-Features: AZwV_Qit5baUTntB5XVo6dAP8yeD2I3uUuzuZ1pgpVF_gKNdlQtkp71tMpLKJWU
-Message-ID: <CAAVpQUCb9nuY6eDvqePYQa1V9WCfQsynt1UswC3vqBTUOi779Q@mail.gmail.com>
-Subject: Re: [PATCH v4] netns: optimize netns cleaning by batching unhash_nsid calls
-To: Qiliang Yuan <realwujing@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Jeff Layton <jlayton@kernel.org>, 
-	Qiliang Yuan <yuanql9@chinatelecom.cn>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: lantiq_etop: remove driver
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Hauke Mehrtens <hauke@hauke-m.de>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
+ Daniel Golle <daniel@makrotopia.org>
+References: <7b2b53b6-d230-47bb-98d9-b7acfbfdd8ca@gmail.com>
+Content-Language: en-US
+In-Reply-To: <7b2b53b6-d230-47bb-98d9-b7acfbfdd8ca@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255035-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-255036-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: EE214B77F5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F0FEFB7A5F
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 6:29=E2=80=AFPM Qiliang Yuan <realwujing@gmail.com>=
- wrote:
->
-> Currently, unhash_nsid() scans the entire system for each netns being
-> killed, leading to O(M_batch * N_system * log(N_ids)) complexity.
->
-> Optimize this to O(N_system * N_ids) by batching unhash operations. Move
-> unhash_nsid() out of the per-netns loop in cleanup_net() to perform a
-> single-pass traversal over survivor namespaces using idr_for_each().
->
-> Identify dying peers by an 'is_dying' flag, which is set under net_rwsem
-> write lock after the netns is removed from the global list. This batches
-> the unhashing work and eliminates the O(M_batch) multiplier.
->
-> Clean up redundant nsid_lock and simplify the destruction loop now that
-> unhashing is centralized.
->
-> Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
+On 1/29/2026 6:18 PM, Heiner Kallweit wrote:
+> This driver in mainline lost its in-tree user with commit cd93b4895ea5
+> ("MIPS: lantiq: drop mips_machine support") in 2012. Since then it has
+> had no in-tree user. Only user seems to be OpenWRT, with several changes
+> to the in-tree driver version:
+> target/linux/lantiq/patches-6.12/035-owrt-lantiq-wifi-and-ethernet-eeprom-handling.patch
+> target/linux/lantiq/patches-6.12/028-NET-lantiq-various-etop-fixes.patch
+> target/linux/lantiq/patches-6.12/701-NET-lantiq-etop-of-mido.patch
+> So it seems the driver is maintained in OpenWrt only, except tree-wide
+> in-tree changes. According to OpenWRT maintainers it would be ok to
+> remove the driver in mainline and keep it downstream only (see linked
+> conversation).
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Link: https://lore.kernel.org/netdev/d80fef86-ba14-4bd4-bce5-4d61a75d591b@hauke-m.de/T/#t
 > ---
-> v4:
->  - Move unhash_nsid() out of the batch loop to reduce complexity from O(M=
-*N) to O(N).
->  - Use idr_for_each() for efficient, single-pass IDR traversal.
->  - Mark 'is_dying' under net_rwsem to safely identify and batch unhashing=
-.
->  - Simplify destruction loop by removing redundant locking and per-netns =
-unhash logic.
-> v3:
->  - Update target tree to net-next.
->  - Post as a new thread instead of a reply.
-> v2:
->  - Move 'is_dying' setting to __put_net() to eliminate the O(M_batch) loo=
-p.
->  - Remove redundant initializations in preinit_net().
-> v1:
->  - Initial implementation of batch unhash_nsid().
->
->  include/net/net_namespace.h |  1 +
->  net/core/net_namespace.c    | 41 +++++++++++++++++++++++--------------
->  2 files changed, 27 insertions(+), 15 deletions(-)
->
-> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-> index cb664f6e3558..bd1acc6056ac 100644
-> --- a/include/net/net_namespace.h
-> +++ b/include/net/net_namespace.h
-> @@ -69,6 +69,7 @@ struct net {
->
->         unsigned int            dev_base_seq;   /* protected by rtnl_mute=
-x */
->         u32                     ifindex;
-> +       bool                    is_dying;
->
->         spinlock_t              nsid_lock;
->         atomic_t                fnhe_genid;
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index a6e6a964a287..9ea05fb9df5b 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -624,9 +624,29 @@ void net_ns_get_ownership(const struct net *net, kui=
-d_t *uid, kgid_t *gid)
->  }
->  EXPORT_SYMBOL_GPL(net_ns_get_ownership);
->
-> -static void unhash_nsid(struct net *net, struct net *last)
-> +static int unhash_nsid_callback(int id, void *p, void *data)
-
-This is called without holding tmp->nsid_lock nor RCU.
-
-
-> +{
-> +       struct net *tmp =3D data;
-> +       struct net *peer =3D p;
-> +
-> +       if (peer->is_dying) {
-> +               spin_lock(&tmp->nsid_lock);
-> +               if (idr_find(&tmp->netns_ids, id) =3D=3D peer)
-> +                       idr_remove(&tmp->netns_ids, id);
-
-Also, is it safe to modify idr during iteration ?
-
-
-> +               else
-> +                       peer =3D NULL;
-> +               spin_unlock(&tmp->nsid_lock);
-> +
-> +               if (peer)
-> +                       rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL, =
-GFP_KERNEL);
-
-This may sleep, so we can't call this here.
-
-If we want to do batching, we must remember for which
-net and id we call rtnl_net_notifyid() later, but I'm not sure
-if batching is worth the change.
-
-
-
-> +       }
-> +       return 0;
-> +}
-> +
-> +static void unhash_nsid(struct net *last)
->  {
->         struct net *tmp;
-> +
->         /* This function is only called from cleanup_net() work,
->          * and this work is the only process, that may delete
->          * a net from net_namespace_list. So, when the below
-> @@ -634,22 +654,10 @@ static void unhash_nsid(struct net *net, struct net=
- *last)
->          * use for_each_net_rcu() or net_rwsem.
->          */
->         for_each_net(tmp) {
-> -               int id;
+>  .../include/asm/mach-lantiq/lantiq_platform.h |  18 -
+>  drivers/net/ethernet/Kconfig                  |   6 -
+>  drivers/net/ethernet/Makefile                 |   1 -
+>  drivers/net/ethernet/lantiq_etop.c            | 745 ------------------
+>  4 files changed, 770 deletions(-)
+>  delete mode 100644 arch/mips/include/asm/mach-lantiq/lantiq_platform.h
+>  delete mode 100644 drivers/net/ethernet/lantiq_etop.c
+> 
+> diff --git a/arch/mips/include/asm/mach-lantiq/lantiq_platform.h b/arch/mips/include/asm/mach-lantiq/lantiq_platform.h
+> deleted file mode 100644
+> index 70ebb4d6f05..00000000000
+> --- a/arch/mips/include/asm/mach-lantiq/lantiq_platform.h
+> +++ /dev/null
+> @@ -1,18 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0-only */
+> -/*
+> - *
+> - *  Copyright (C) 2010 John Crispin <john@phrozen.org>
+> - */
 > -
-> -               spin_lock(&tmp->nsid_lock);
-> -               id =3D __peernet2id(tmp, net);
-> -               if (id >=3D 0)
-> -                       idr_remove(&tmp->netns_ids, id);
-> -               spin_unlock(&tmp->nsid_lock);
-> -               if (id >=3D 0)
-> -                       rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
-> -                                         GFP_KERNEL);
-> +               idr_for_each(&tmp->netns_ids, unhash_nsid_callback, tmp);
->                 if (tmp =3D=3D last)
->                         break;
->         }
-> -       spin_lock(&net->nsid_lock);
-> -       idr_destroy(&net->netns_ids);
-> -       spin_unlock(&net->nsid_lock);
->  }
->
->  static LLIST_HEAD(cleanup_list);
-> @@ -674,6 +682,7 @@ static void cleanup_net(struct work_struct *work)
->         llist_for_each_entry(net, net_kill_list, cleanup_list) {
->                 ns_tree_remove(net);
->                 list_del_rcu(&net->list);
-> +               net->is_dying =3D true;
->         }
->         /* Cache last net. After we unlock rtnl, no one new net
->          * added to net_namespace_list can assign nsid pointer
-> @@ -688,8 +697,10 @@ static void cleanup_net(struct work_struct *work)
->         last =3D list_last_entry(&net_namespace_list, struct net, list);
->         up_write(&net_rwsem);
->
-> +       unhash_nsid(last);
-> +
->         llist_for_each_entry(net, net_kill_list, cleanup_list) {
-> -               unhash_nsid(net, last);
-> +               idr_destroy(&net->netns_ids);
->                 list_add_tail(&net->exit_list, &net_exit_list);
->         }
->
-> --
-> 2.51.0
->
+> -#ifndef _LANTIQ_PLATFORM_H__
+> -#define _LANTIQ_PLATFORM_H__
+> -
+> -#include <linux/socket.h>
+> -
+> -/* struct used to pass info to network drivers */
+> -struct ltq_eth_data {
+> -	struct sockaddr mac;
+> -	int mii_mode;
+> -};
+> -
+> -#endif
+> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+> index aa7103e7f47..9775fd401b0 100644
+> --- a/drivers/net/ethernet/Kconfig
+> +++ b/drivers/net/ethernet/Kconfig
+> @@ -93,12 +93,6 @@ config KORINA
+>  	  If you have a Mikrotik RouterBoard 500 or IDT RC32434
+>  	  based system say Y. Otherwise say N.
+>  
+> -config LANTIQ_ETOP
+> -	tristate "Lantiq SoC ETOP driver"
+> -	depends on SOC_TYPE_XWAY
+> -	help
+> -	  Support for the MII0 inside the Lantiq SoC
+> -
+AI review complained that setting this config symbol should be
+removed from arch/mips/configs/xway_defconfig. So I'll submit a v2.
+
+--
+pw-bot: cr
 
