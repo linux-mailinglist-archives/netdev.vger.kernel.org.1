@@ -1,198 +1,191 @@
-Return-Path: <netdev+bounces-255250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPhfJ1ETfWnCQAIAu9opvQ
-	(envelope-from <netdev+bounces-255250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:23:45 +0100
+	id AG5RJxEZfWkhQQIAu9opvQ
+	(envelope-from <netdev+bounces-255251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:48:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480EABE611
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:23:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC50EBE85C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F3D683018777
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:23:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1A8193008D1F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4AB34EF0E;
-	Fri, 30 Jan 2026 20:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB98F2EC095;
+	Fri, 30 Jan 2026 20:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hs21MMS+"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="DZYGi1pX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-05.mail-europe.com (mail-05.mail-europe.com [85.9.206.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2A634EEE1
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 20:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769804617; cv=pass; b=iujurgQo7QkueAfX9nlSSiAntc34nZP9wsyoZ+fUTqTZehkP7nI2Nt0XR1Gexe/+itlU38FZJRZ7PPFv6dIiH/ACRysNNdhMqdXvIkOJwBTPUzN/oihyeYL1u6cn/WBUiNyWM5pAaF/ZFV17j/XfFilsLdgKLhAUtYq0S3rpxKs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769804617; c=relaxed/simple;
-	bh=lCcMWU6ocUfOz04HROZ2VVNzKSBxxiz9KSgZZT4pP64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fKXBFxXaXCAYs2hhs9k8cLX79VsgvEecbwapcBoY4fulMQ3eNH0Gjdk3adCS16kb+B0DINtewrfRd/JwjoWZ9LvdU8fW+7qU6xc5IAbvYsq+XQBZ9Fhb8zEvhN9bcQXejyVEE/e9cFTTrcc9oMutZ4gtZ22hpesaK9Nbpn8wMjA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hs21MMS+; arc=pass smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-88a26ce6619so31509586d6.3
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 12:23:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769804615; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kGudOdV1bDXQL770vbFqMgYJ3mbvPqfiaj+vtss8m2Y4QGXjmxV0+nnpubXOWJidFM
-         qhqMBWNlaNtxnzBcf7PXBOWu0yx1KdP4/15HXTst5ofxJ/nFkJcxTV9GXoXcxhvFaANj
-         FtaWiElC+hV/niHWnt+8vd9xtZmNyy6x75b6YkI8hdylG/T8dxVjNt3l4BX7vft4iQ1k
-         NG5jCTWHHXsSHARpOf/Yoc9BH3dq0JMJu5DQOqKiF4g6SwrmoDq4jKjb5d72oUlMpuqd
-         vmE1x3oMbtUtW1NwLRfqb2f5lr00f357vgZxhC91QSv7TqpP90+ae9cI9Tzxh9Bdim62
-         NhwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=EHAWuXPjXFbXWMFCvQxp8QIuB5dPbTxYBgl3Qg+Prx0=;
-        fh=8Gys8iB09Q1h8L/bhChPa8hnoHPIO9Hw3r/ziYNleTg=;
-        b=a6Wu+14hLRU6aP7A4aIOrpkGuE7pXW41K+I9r3+bNYkcC74t8jQIGTpAXxuKB5lgPO
-         WgqqnPBw1FxER6to2RSNHrLrCV9m18WVRtBONzVDd/WmuYbRGIrgJ663XqiydiGbaG/c
-         UxTg3supHHJy1LQ/7qV633kXOh9APz/el9Zje+qTdc73HlsBB7NRp9tip/btEYDXpgoM
-         ARKQnUrC9uQPGkkX5dJKz5zZGe9BRA+Az4PT1BwxOBmUJgdI2Sg7h7GjxuLaO/rUGzjZ
-         88B18gjRD3CZWOYagAqgt+brFRru5f3iuulAzGz/j74BbbRFx2yIpbAIuSvcJ4yYGRpk
-         1UYQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769804615; x=1770409415; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EHAWuXPjXFbXWMFCvQxp8QIuB5dPbTxYBgl3Qg+Prx0=;
-        b=Hs21MMS+aP2rzrNGyxWBCo31avKrL59Y2mN8clIC9aDqNw5jvh6nxNQof/o2ky3F+P
-         3O2Ap6YBL6UPOIfk8YbEGgcjUfDDPZH6ko82rKZcKouEpipNnABgGC5fATI98w0pS7P9
-         07HHWjAZTVtGRZ2EySSYtibSK5FztS22mnmURxaZ8rBL5/CHe44dlXqeKpevMaT0HrvF
-         Wbgg7eZStspOOgDMgHy0NWpn0J1saNGBDdwmnAsyrG51n9eh6BwbR0usFO+LJrfkO2C6
-         KqeNyiofTnBoae1pbf+jxOyNpV2Nq+XSXNu0GY3HPMpUkHApywcgWYn/du8CymubJZLe
-         JaNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769804615; x=1770409415;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EHAWuXPjXFbXWMFCvQxp8QIuB5dPbTxYBgl3Qg+Prx0=;
-        b=UsQhvO1wCfEEirUlD39ZruE/hsOIH6U5oIY5ZSUwezLY3RmZOqirfBHUi6eNRI73TH
-         F7HOi42RsxgcdW6q6t1z3zxxT4l2vbIWhsoTRK3rwS1/4mH8gNkLZcvs0icr/D4R3tEP
-         upJqGQS+65NLRIjDgUi4tdy1VgvEtflPntVJkCRvCEgpog7qS3Q1thaVeVF0oIDSDah+
-         EVfEFAgUVpMZsdfPvPkRmCsyU8DSy/KO7m54d+8oxbIULfBMMfp0d6wQBenCKUevFYAu
-         qB+UfIDClgeaFG0lOWARDohtrCvmGIUtqcRU+nnbOdzBHyo7kEuiUPrnHmEM5f6dM+gd
-         vR2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVdZEKVcpLogSqFs6T9qtDdtNK9UtLuXh8bb/I4XXTFH1YaGLrRCXtjJayOYZmAGLeTl1KUK9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwehbKTKP4fcT0i0WaCWoYC3w2Zp9qmgxCVh1CsUizvD/mp/BRS
-	jL9GO86OIssua/pA9FxQfygD3TQG81XwvOPue7t057WUI8tKhHN7ivSzfviyAEy/pN5Vsmy2DXX
-	qLffHmVXvBmb+q0teBq97lyAeghM24b4SBBT0M6Sr
-X-Gm-Gg: AZuq6aKI1wAq8iP12GSzDlGZWsTxy/DV3uUoP0iKsfhLIRbM6uQEwNBQ3TedeEda84Z
-	G6YNkckmken5KkNcfE8NZdIyxgOG68qXFcMzL711/FYwxNN3/dZK7tZ/f1KQ1pya53LgC9i7eX/
-	WxzaUju+676YoMe8Gr4MQ+pF5lCXFNpNa+ZVG7b3pwT/uRAJ1APUKzVc0yLPmSIwtBFlf62tDw2
-	A2wrDXNak/nYn0yuGL/Q7TmcKth5m6Wcpnl3kj0FhS0BfvfW0KX2f3O+mP1YhHlO8669KA=
-X-Received: by 2002:a05:6214:401b:b0:894:78e4:27d1 with SMTP id
- 6a1803df08f44-894ea1792b3mr66148016d6.68.1769804614835; Fri, 30 Jan 2026
- 12:23:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B65318ED8;
+	Fri, 30 Jan 2026 20:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.206.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769806091; cv=none; b=Lw13yihvD+Iwi9L1C4uZ0/B1taJtyxSosa4SFtMYTDwm4ZuA4kA2l99MvNzfLiMUCyI/GXWkdhKqDgY2qWNKLvvbe4/6jIArOVbuxOupfrcCU59jeAtybfGrTtTNO5dGGsr4svqYfEpcKiiD1++aAmww6Hf36JujoDefDeX/vpI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769806091; c=relaxed/simple;
+	bh=NH3nSMZ3689wk1k+Ydtvm9911igQwjgTtxEraXA3qqE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I6ic1KTtbaj+02jglOSZdyk3f7kgd0Di0IGj67vvsiEUwv/8nWGwQ3hqMGSWE+pQcxQ5mFGOD3MC2FCaYT2mF7OLFPl5HgYi9CnP5PjC+9jFja2iY4Rdw7GOsv+4ULIsOinueKXUckMO9X5wZcmSEC4QjKwQdTYfGzc3zvBIGD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=DZYGi1pX; arc=none smtp.client-ip=85.9.206.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1769806078; x=1770065278;
+	bh=Ns6aX4kVdG2x2DS59nidc0rJohsMUdrNgcAO4lwVAHY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=DZYGi1pXMmC/ubxw0V9VFT3GCanL1MXxliYflYZFJ0cpNFRDkbhmac4wXsyyWFpyk
+	 C0lJwJ34OSynuEP4MSuqk+6JEUe/nInqPxYzOx23wSwJO2NXCurpA3AJnX78idfvKg
+	 kQvsTMKmAzSQQA8PPrwMNTYwOWxAC2sWMOYsW1FWx6cFsfoOHD7Rk3OWCFkxcRZoc1
+	 4ONFQ7npa9bZlgP4BTreEjbydmy2mNu0Vs9vBAwPh5PFS6cK+oxwj3umDjPnco3/Fq
+	 2uxHkZ0xEbXDQcotJjGyiFEqS47iQ9zlRa+mehX0+KY6vS1t/U0jCDtfV3SPQNHUUi
+	 RpMd6vCpJ7Uaw==
+Date: Fri, 30 Jan 2026 20:47:52 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
+Message-ID: <pXV1wsavqcYDq5HfAVaW_gMoTITR9M0PBWKhnz9n6VHYxhW56DQU7qfCEoaYcCixz4iqrj31Mt9vL9bHqTNGygLK5pYvyw1z3san5ndlkkQ=@1g4.org>
+In-Reply-To: <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com>
+References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com> <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org> <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: f7035d83a69cc823dd322282f4eb5a8914867daf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129105427.12494-1-fw@strlen.de> <20260130081245.6cacdde2@kernel.org>
- <aX0B1xaFGL43xxUn@strlen.de>
-In-Reply-To: <aX0B1xaFGL43xxUn@strlen.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 30 Jan 2026 21:23:23 +0100
-X-Gm-Features: AZwV_QgqAFMVwmSqA2GrImjNKRZiJIHf6kLxIgXO_d7ss3jbAHFtbwaIY0HOCuE
-Message-ID: <CANn89iKUV07+84PVq0cHe3vMaSGNTQzhq9=xetg+_P2DmsPmQQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/7] netfilter: updates for net-next
-To: Florian Westphal <fw@strlen.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, netfilter-devel@vger.kernel.org, 
-	pablo@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255250-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-255251-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[1g4.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,strlen.de:email,linux.dev:url]
-X-Rspamd-Queue-Id: 480EABE611
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: CC50EBE85C
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 8:09=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Thu, 29 Jan 2026 11:54:20 +0100 Florian Westphal wrote:
-> > > v2: discard buggy nfqueue patch, no other changes.
-> > >
-> > > The following patchset contains Netfilter updates for *net-next*:
-> > >
-> > > Patches 1 to 4 add IP6IP6 tunneling acceleration to the flowtable
-> > > infrastructure.  Patch 5 extends test coverage for this.
-> > > From Lorenzo Bianconi.
-> > >
-> > > Patch 6 removes a duplicated helper from xt_time extension, we can
-> > > use an existing helper for this, from Jinjie Ruan.
-> > >
-> > > Patch 7 adds an rhashtable to nfnetink_queue to speed up out-of-order
-> > > verdict processing.  Before this list walk was required due to in-ord=
-er
-> > > design assumption.
-> >
-> > Hi Florian, some more KASAN today:
-> >
-> > https://netdev-ctrl.bots.linux.dev/logs/vmksft/nf-dbg/results/496421/vm=
--crash-thr0-0
->
-> > [ 1144.170509][   T12] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > [ 1144.170759][   T12] BUG: KASAN: slab-use-after-free in idr_for_each+=
-0x1c1/0x1f0
-> > [ 1144.170922][   T12] Read of size 8 at addr ff11000012a16a70 by task =
-kworker/u16:0/12
-> > [ 1144.171079][   T12]
-> > [ 1144.171133][   T12] CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not ta=
-inted 6.19.0-rc7-virtme #1 PREEMPT(full)
-> > [ 1144.171137][   T12] Hardware name: Bochs Bochs, BIOS Bochs 01/01/201=
-1
-> > [ 1144.171139][   T12] Workqueue: netns cleanup_net
-> > [ 1144.171145][   T12] Call Trace:
-> > [ 1144.171147][   T12]  <TASK>
-> > [ 1144.171149][   T12]  dump_stack_lvl+0x6f/0xa0
-> > [ 1144.171154][   T12]  print_address_description.constprop.0+0x6e/0x30=
-0
-> > [ 1144.171159][   T12]  print_report+0xfc/0x1fb
-> > [ 1144.171161][   T12]  ? idr_for_each+0x1c1/0x1f0
-> > [ 1144.171163][   T12]  ? __virt_addr_valid+0x1da/0x430
-> > [ 1144.171167][   T12]  ? idr_for_each+0x1c1/0x1f0
-> > [ 1144.171168][   T12]  kasan_report+0xe8/0x120
->
-> Sigh.  Doesn't ring a bell, I will have a look.
+What version of act_gate.c are you currently testing? Did you actually run =
+the tests? =E2=80=9Clarge dump=E2=80=9D creates ONE action at base_index, w=
+ith num_entries=3D100, then immediately does GETACTION. So =E2=80=9Ctc acti=
+ons ls action gate | grep index | wc -l=E2=80=9D won=E2=80=99t exercise thi=
+s, because it only counts actions. It doesn=E2=80=99t amplify the per actio=
+n dump size (the entry list does). It uses libmnl (mnl_socket_sendto / mnl_=
+socket_recvfrom) with MNL_SOCKET_BUFFER_SIZE. There is no custom netlink ha=
+ndling. The failure is returned by the kernel before userspace parses anyth=
+ing. The dumps are transactional at the netlink level, but an individual ac=
+tion dump still has to fit in the skb backing that message.=20
 
-Could this be related to "netns: optimize netns cleaning by batching
-unhash_nsid calls" ?
+look at af_netlink.c
+=09/* NLMSG_GOODSIZE is small to avoid high order allocations being
+=09 * required, but it makes sense to _attempt_ a 32KiB allocation
+=09 * to reduce number of system calls on dump operations, if user
+=09 * ever provided a big enough buffer.
+=09 */
+         ...
+=09/* Trim skb to allocated size. User is expected to provide buffer as
+=09 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
+=09 * netlink_recvmsg())). dump will pack as many smaller messages as
+=09 * could fit within the allocated skb. skb is typically allocated
+=09 * with larger space than required (could be as much as near 2x the
+=09 * requested size with align to next power of 2 approach). Allowing
+=09 * dump to use the excess space makes it difficult for a user to have a
+=09 * reasonable static buffer based on the expected largest dump of a
+=09 * single netdev. The outcome is MSG_TRUNC error.
+=09 */
+
+This is where I am currently but I have seen these bugs appear throughout a=
+ll my iterations including what's in the tree currently, if you show me bet=
+ter alternatives that solve my problems, I'll gladly accept.=20
+https://github.com/torvalds/linux/compare/master...jopamo:linux:net-stable-=
+upstream-v4
+
+gatebench --selftest=20
+Configuration:
+  Iterations per run: 1000
+  Warmup iterations:  100
+  Runs:               5
+  Gate entries:       10
+  Gate interval:      1000000 ns
+  Starting index:     1000
+  CPU pinning:        no
+  Netlink timeout:    1000 ms
+  Selftest:           yes
+  JSON output:        no
+  Sampling:           no
+  Clock ID:           11
+  Base time:          0 ns
+  Cycle time:         0 ns
+  Cycle time ext:     0 ns
+
+Environment:
+  Kernel: Linux 6.18.7 x86_64
+  Current CPU: 7
+  Clock source: CLOCK_MONOTONIC_RAW
+
+Running selftests...
+Running 20 selftests...
+  create missing parms           PASS (got -22)
+  create missing entry list      PASS (got -22)
+  create empty entry list        PASS (got -22)
+  create zero interval           PASS (got -22)
+  create bad clockid             PASS (got -22)
+  replace without existing       PASS (got 0)
+  duplicate create               PASS (got -17)
+  dump correctness               PASS (got 0)
+  replace persistence            PASS (got 0)
+  clockid variants               PASS (got 0)
+  cycle time derivation          PASS (got 0)
+  cycle time extension parsing   PASS (got 0)
+  replace preserve schedule      PASS (got 0)
+  base time update               PASS (got 0)
+  multiple entries               PASS (got 0)
+  malformed nesting              PASS (got -22)
+  bad attribute size             PASS (got -22)
+  param validation               PASS (got 0)
+  replace invalid                PASS (got 0)
+  large dump                     DEBUG: msg->len =3D 3112
+PASS (got 0)
+
+Selftests: 20/20 passed
+Selftests passed
+
+Running benchmark...
+Run 1/5... done (311721.5 ops/sec)
+Run 2/5... done (321045.7 ops/sec)
+Run 3/5... done (336402.3 ops/sec)
+Run 4/5... done (338419.7 ops/sec)
+Run 5/5... done (316618.9 ops/sec)
+Benchmark completed successfully
+
 
