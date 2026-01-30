@@ -1,204 +1,177 @@
-Return-Path: <netdev+bounces-255173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255174-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEOnAV7TfGlbOwIAu9opvQ
-	(envelope-from <netdev+bounces-255173-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:50:54 +0100
+	id oMQOCgjUfGlbOwIAu9opvQ
+	(envelope-from <netdev+bounces-255174-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:53:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFBFBC37E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:50:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46F3CBC42F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:53:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D8D753006B69
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:50:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 379D33012B3E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53E5343D71;
-	Fri, 30 Jan 2026 15:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2DC33C1BB;
+	Fri, 30 Jan 2026 15:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vcbvqM8z";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QdMWcBGT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aS+ac/s2"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6485234251F;
-	Fri, 30 Jan 2026 15:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DB233A9D3;
+	Fri, 30 Jan 2026 15:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769788249; cv=none; b=TFpwVJoIKpwkSh/YrV6QMank0TvcW7BmqxL/kpM8ryqRHSmgIv/Y7Dkdj4MZra+XM/I9S4+jZb0pBMKRirUXSptfjOCUGVQryxkaLxu+fsqyuKCvnIFKIowWKgyphURmhsxYJpYCK+RLEczimgIb2LIatKoekGAEaEk9czgTJ8Q=
+	t=1769788385; cv=none; b=OXaFME9rqdfzoR7QZogNuGGZ/Itk9kY/nVS8f3kqNAou+G+txmb/ZnLvxVJ3kRVZ5g+1G2aPvAeHFhghyU6QVSJW683fP2zY6BLp5TNz+zfVAtB3nWwODmhyZktRGozMyOShCV5w/9StnmUERewUUg8crJb1RnRQsHy3KbFARNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769788249; c=relaxed/simple;
-	bh=W4KBxLLfE9ElWibilqx7jUzbdgU3N1lyFdNxSsKozK8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Mj3qGkjfxXRSo/2U0/x6D6CAwDbnajQn8mkkuJoRrHXQCPU0tZm8R+gFh00quxahY9R3VZ4HYGWavdaLIbkN0DIr7HRy5OMNuWAxQD6cDR3MOw7FyloUm6HdZHcdInxF/9EPr2fNx8bYXklN6KiQCNbJpOVAlphppFb5WQDgJ38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vcbvqM8z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QdMWcBGT; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: John Ogness <john.ogness@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769788246;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VKYYYdqumsniIC39YChzbfba4q3RKQuXPKPNETM4jMs=;
-	b=vcbvqM8zYMWsd/tMS8cM3Z8mI0EFVLj960Sgnq06Gp+EE//WNnLbcLZhAA/pMTKCGlvDfP
-	yqke2jH0ufmQ2nSCXnCEz+Jn+XrQJzGXcBaQD7aRlFZRq53PQc5/Ez6pS9vF8H4vaE7v3p
-	5Os9pnShRRfDny9vUFVCUgpDJtra3pkpEpGkGFqBbqhRd67I4u4yEw2yRumLCICvxBk8BF
-	lYslZ9n7CIZiicXU68jj736XQbVbZj259QlZ9D5cpD/hhtYKt/yvG/sW6XwJQlB9xGg1Yt
-	1dTW+LYZ7TXgk5cXhk98yy4erq5rCNAMT0/GW3UcnHSmpCbIxRncuJF5VzCABA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769788246;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VKYYYdqumsniIC39YChzbfba4q3RKQuXPKPNETM4jMs=;
-	b=QdMWcBGTcUpDPEMRRsRb8Xqv5ndFVC6eiO9zg4AEYukrcFUq2iwMVZ0Wp1FzCEeMeF0WzL
-	p1LnaogxsATMNsAA==
-To: Marcos Paulo de Souza <mpdesouza@suse.com>, Richard Weinberger
- <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes
- Berg <johannes@sipsolutions.net>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Jason Wessel <jason.wessel@windriver.com>,
- Daniel Thompson <danielt@kernel.org>, Douglas Anderson
- <dianders@chromium.org>, Petr Mladek <pmladek@suse.com>, Steven Rostedt
- <rostedt@goodmis.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, Jiri
- Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Kees Cook <kees@kernel.org>, Tony Luck
- <tony.luck@intel.com>, "Guilherme G. Piccoli" <gpiccoli@igalia.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Andreas Larsson
- <andreas@gaisler.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jacky Huang <ychuang3@nuvoton.com>,
- Shan-Chun Hung <schung@nuvoton.com>, Laurentiu Tudor
- <laurentiu.tudor@nxp.com>
-Cc: linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
- kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
- netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
- linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- sparclinux@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- Marcos Paulo de Souza <mpdesouza@suse.com>
-Subject: Re: [PATCH 02/19] printk: Introduce console_is_nbcon
-In-Reply-To: <20251227-printk-cleanup-part3-v1-2-21a291bcf197@suse.com>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-2-21a291bcf197@suse.com>
-Date: Fri, 30 Jan 2026 16:56:45 +0106
-Message-ID: <875x8j3xre.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1769788385; c=relaxed/simple;
+	bh=4OXwYLN7R1JMxi+9RY657IiKw7LXuYp7oSREeO84t7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ohMHuyY6EQ18nUjDXJEIPoy6NcSVdctQNZihbf1dxBNuVYBcTD6nQNcbcHQD6Ne7bAgaQM5SuzqDgLLJW4VIt7tWzutkNz62alL80/Bi8+YlxE6wGT3KHGnsYw3v2rLEU+3PhrYtAJm7oJKgJB3YMCw33gLFXVZFVYZ73bDeqeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aS+ac/s2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=HXe//ENorTTfM0niimm1e9yrY55w/0fMrZ/qt/A7EwM=; b=aS+ac/s20VY5WOMnOTrrKTXkqw
+	CvUccuNW8erl31P/A6aO0RTRQyLv9VkiYGK0m6u5zBmV5IGGnas6fK1PiuUMqhkUiFn72vVs+igMx
+	xwSPo1it4HcrWcdKwA5gPvudx5huDaj0jFHempG5JHTFClIelb5fWTlgXb4/b0yC+EKGOZVzfurK5
+	q/ocekDnstsspNsC+ZRwBg6LMMu5lSaCp+ifYdpEwxVhOFwbEPKScaDUTp5xfiPfKaUWos/tLpPXE
+	UnDVNlFvJNhhae9c26rIO/ItRBMJQ9ASIMNaYrFECF/CamkXwyvk8uSGl9oVu+kqqAgGkkVSappfI
+	40fVGUlw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55186)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vlqnq-000000001Fc-0kyn;
+	Fri, 30 Jan 2026 15:52:58 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vlqnl-000000000dd-2qfp;
+	Fri, 30 Jan 2026 15:52:53 +0000
+Date: Fri, 30 Jan 2026 15:52:53 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Christophe Roullier <christophe.roullier@st.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed
+ interface
+Message-ID: <aXzT1UCpG4kN-dQv@shell.armlinux.org.uk>
+References: <20260114081809.12758-1-marex@nabladev.com>
+ <aWfEXX1iMHy3V5sK@shell.armlinux.org.uk>
+ <aWfOYf_YmJFUakvP@shell.armlinux.org.uk>
+ <6c9cadc2-67b7-4bfe-9cf7-2b102a0a3c21@nabladev.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c9cadc2-67b7-4bfe-9cf7-2b102a0a3c21@nabladev.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255173-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-255174-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,foss.st.com,lunn.ch,st.com,google.com,kernel.org,gmail.com,redhat.com,dh-electronics.com,lists.infradead.org,st-md-mailman.stormreply.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[46];
-	FREEMAIL_TO(0.00)[suse.com,nod.at,cambridgegreys.com,sipsolutions.net,linuxfoundation.org,windriver.com,kernel.org,chromium.org,goodmis.org,debian.org,lunn.ch,davemloft.net,google.com,redhat.com,linux-m68k.org,intel.com,igalia.com,linux.ibm.com,ellerman.id.au,gmail.com,csgroup.eu,gaisler.com,linux.intel.com,foss.st.com,nuvoton.com,nxp.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[john.ogness@linutronix.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.com:email,jogness.linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 9EFBFBC37E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 46F3CBC42F
 X-Rspamd-Action: no action
 
-On 2025-12-27, Marcos Paulo de Souza <mpdesouza@suse.com> wrote:
-> Besides checking if the current console is NBCON or not, console->flags
-> is also being read in order to serve as argument of the console_is_usable
-> function.
->
-> But CON_NBCON flag is unique: it's set just once in the console
-> registration and never cleared. In this case it can be possible to read
-> the flag when console_srcu_lock is held (which is the case when using
-> for_each_console).
->
-> This change makes possible to remove the flags argument from
-> console_is_usable in the next patches.
+On Thu, Jan 15, 2026 at 12:27:05AM +0100, Marek Vasut wrote:
+> On 1/14/26 6:12 PM, Russell King (Oracle) wrote:
+> > I think I'm going to start over, trying to figure out what happened.
+> > 
+> > c7308b2f3d0d net: stmmac: stm32: convert to suspend()/resume() methods
+> > 
+> > Did the conversion, and it always called stm32_dwmac_clk_disable() and
+> > where it exists, dwmac->ops->suspend() on suspend, provided
+> > stmmac_suspend() returns zero (which it will do, even if the interface
+> > is down. On resume, it always calls dwmac->ops->resume() and
+> > stm32_dwmac_init() before calling stmmac_resume().
+> > 
+> > The conversion added hooks into ny new ->suspend() and ->resume()
+> > methods to handle the stm32_dwmac_clk_disable(), dwmac->ops->suspend(),
+> > dwmac->ops->resume() and stm32_dwmac_init() steps.
+> > 
+> > However, in 07bbbfe7addf I failed to realise that, in order to keep
+> > things compatible with how stuff works, we need to call
+> > priv->plat->suspend() even if the interface is down. This is where
+> > the bug is, not in your glue driver.
+> > 
+> > Please try this:
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index a8a78fe7d01f..2acbb0107cd3 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -8066,7 +8066,7 @@ int stmmac_suspend(struct device *dev)
+> >   	u32 chan;
+> >   	if (!ndev || !netif_running(ndev))
+> > -		return 0;
+> > +		goto suspend_bsp;
+> >   	mutex_lock(&priv->lock);
+> > @@ -8106,6 +8106,7 @@ int stmmac_suspend(struct device *dev)
+> >   	if (stmmac_fpe_supported(priv))
+> >   		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
+> > +suspend_bsp:
+> >   	if (priv->plat->suspend)
+> >   		return priv->plat->suspend(dev, priv->plat->bsp_priv);
+> This works too, thank you.
+> 
+> Will you send this fix ?
 
-Note that console_is_usable() now also checks for the flag
-CON_NBCON_ATOMIC_UNSAFE as well.
+Sorry, I appear to have dropped this patch on the floor, and just
+tripped over it. I'm just build testing it and will send it later
+today.
 
-> diff --git a/include/linux/console.h b/include/linux/console.h
-> index 35c03fc4ed51..dd4ec7a5bff9 100644
-> --- a/include/linux/console.h
-> +++ b/include/linux/console.h
-> @@ -561,6 +561,33 @@ static inline void console_srcu_write_flags(struct console *con, short flags)
->  	WRITE_ONCE(con->flags, flags);
->  }
->  
-> +/**
-> + * console_srcu_is_nbcon - Locklessly check whether the console is nbcon
-> + * @con:	struct console pointer of console to check
-> + *
-> + * Requires console_srcu_read_lock to be held, which implies that @con might
-> + * be a registered console. The purpose of holding console_srcu_read_lock is
-> + * to guarantee that no exit/cleanup routines will run if the console
-> + * is currently undergoing unregistration.
-> + *
-> + * If the caller is holding the console_list_lock or it is _certain_ that
-> + * @con is not and will not become registered, the caller may read
-> + * @con->flags directly instead.
-> + *
-> + * Context: Any context.
-> + * Return: True when CON_NBCON flag is set.
-> + */
-> +static inline bool console_is_nbcon(const struct console *con)
-> +{
-> +	WARN_ON_ONCE(!console_srcu_read_lock_is_held());
-> +
-> +	/*
-> +	 * The CON_NBCON flag is statically initialized and is never
-> +	 * set or cleared at runtime.
-> +	 */
-> +	return data_race(con->flags & CON_NBCON);
+This problem affects every user of the platform ->suspend/resume()
+stuff, so is not just a stm32 issue.
 
-If this flag is statically initialized and is never set or cleared at
-runtime, why is the console_srcu_read_lock required? Why not just:
-
-static inline bool console_is_nbcon(const struct console *con)
-{
-        /*
-	 * The CON_NBCON flag is statically initialized and is never
-	 * set or cleared at runtime.
-	 */
-	return data_race(con->flags & CON_NBCON);
-}
-
-And even if you do need the console_srcu_read_lock, why copy/paste the
-implementation and comments of console_srcu_read_flags()? Just do:
-
-static inline bool console_is_nbcon(const struct console *con)
-{
-	return console_srcu_read_flags(con) & CON_NBCON;
-}
-
-John Ogness
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
