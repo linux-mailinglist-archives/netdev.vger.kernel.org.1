@@ -1,159 +1,184 @@
-Return-Path: <netdev+bounces-255127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBPPAFqdfGn2NwIAu9opvQ
-	(envelope-from <netdev+bounces-255127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:00:26 +0100
+	id OON3HI2dfGkLOAIAu9opvQ
+	(envelope-from <netdev+bounces-255128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:01:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD52EBA4C1
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:00:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FEBBA4E7
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:01:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7F2E0300FB78
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:00:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8C5CA3002F62
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D30136E475;
-	Fri, 30 Jan 2026 11:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4815333EAED;
+	Fri, 30 Jan 2026 12:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsgYbH5C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ohkJTpA6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0104C36C0BB
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769774398; cv=none; b=onGlfu2Qv1Jpgqgg4ytCgLI8qIuGjkZmMKCYgRgZphocBSaqkAu853bafOODF5TFt9DhUA4zSlql/2OWr+I1M3ikLD77iy2W59HmpyUSuLdwPLzrhATlzQHcE/JTD4mrr652glyZQ6tw5eDBa2v7UlbH04nJoOJdq52VsC2v+KU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769774398; c=relaxed/simple;
-	bh=S7/1JmqRyqlonm8+ljS+PK0L7DKml37Zy1l0I9r/eEQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zl2sZrzzA3kNu6dAJ42uGFIWTntp3pl5TWWGBI4+5fRwA6gFWkqKKb9RxGx3vptMKGYXJ5RbI5n0PHLQlfQ8MBZnP96hRt5LTT6ZnGCoWLafZVKzG2j0lznCIM/oW7uitxWVhnSSsr5OQKQFD/Jo+V71U5dF+9Xn4ZdLQmG4fQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsgYbH5C; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b6b0500e06so3074768eec.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 03:59:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EBC2FD69E
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 12:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769774467; cv=pass; b=IabLT9rtmQcxkpVZeOyM5fHOgR7VT4ME2ItLZKfXkBDbv37pdrOXdf8MvdUMqLS2w4gdgN3w2WajHITsfPoQzyfiEyGGFDDvCWROeOISpBf+GKaSfIwwtigJyC5KlToLQcgya4BJwhCWzee+eMLeoSziDATjxJ3Xkjcg3RuMvyY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769774467; c=relaxed/simple;
+	bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DTj07GQgblrIiWmCN8LANEktPLbXL9LD2hIgsQp2iL/KoEzDVwTyDrWOeyOiagWxKrrhH7MmN8FdhsvN+qXaAkdMRsw4w6sBLaE4ggkuqcguiEjm2cV9+h/wEhJIFzSFjAavZFP0A4iA7aTTY5fuXPZjAINolVefPqIE442PdPc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ohkJTpA6; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-502a407dabaso14570891cf.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 04:01:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769774465; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DVJgK0hewMaFmsYqMchnFrgPVh2A81Jibyd+HKzw9a7O+FXEchy8VIN+lXb9QzodoU
+         x1o0pqJ8V16pAIFZwlbyTOrcPuD/Agp4IB8IHInBeHY9hEWc/4F4FseZ1xxN7aztUF6I
+         l8eyYt47OXA7L/Op6HC/xSdeLKWIzeGB7ayJOfSchJJ6pAWTUnw9jEdA4Ogkx74BcFgy
+         jXuI+eEesnxUKn1TcJpoQUsjJ+kfWFzWJisUjB3iDFaj/13tfmtaXxXcw+0xF++Hd22t
+         6TI9jIIMZBpHJR8d7HNoHOYrDCy3AD8OPc8/fIXbvDS/EITmJdcYhUa6C+iwtmj09qn6
+         8jvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
+        fh=dNSdwjG+5bbMSPg9kmgdkGAC888LaufVAQsQp8CQV10=;
+        b=P4dy+/ydWvhEwi0aTkc3+7NCrAT5LVMePXnBthXSypxSeKWsOJX8a16tRTxJXaPbgx
+         UaiyOTnmz7Qq1/JGfozITGM4gDFNFp0zKx7bOTZx5I4ePrz/cyf30VQcm776KymXQZYK
+         RCHMKbcrHJdKN/gjlYaZqDt3C0vaDCvoe/LCgLT/22/g5XGBDcGlsCNxDYtFxR85XmkH
+         RB8CBzmY6UE4q3w4b7IAZjmXP+kEX7Ew6Gp28pW1j07Xg7dLVWdNe8jIHIFwCAkko9dA
+         OgK7GymQ4cxt23ZWek80bXJ/iJh//PWfT1074EyeXnJqtg6w9+b3BKMnmNYVIQUhSgvF
+         sfDw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769774395; x=1770379195; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q7ihQ9DOdwkh13XOnXi+IMjMF9wwJSt0xTF2SLR36Pc=;
-        b=IsgYbH5CQYLBGVZ1Z09Qku9cnYuSPmUVS2bjb/r3vEMt+Z5nCe4TDRvw9sGmgrhmai
-         Ai6DNJ7sGbIHp0GmAajq13hHNmxRVpowvD6yh6genQvt0r7P5A446kzpFS4MglG522Gn
-         1Dz9nGxKSK34DGFhZFNlw0BfGERKwWjDQchsnl4C/MUz3aQs277rCftNPBi0G38DBSHz
-         wGCGWtG+qLo4XJmlhm7HoyvaTI2ZMpngALxiW02w1IaZauxwxj8MZAHQu2WkmshDtWU+
-         63PadI1WOEV87lj2QJsmDd/ewas5W7Kod7VbDmd8wH78Dwzj2OEAzNCJikAUqLTe4vyv
-         ErAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769774395; x=1770379195;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1769774465; x=1770379265; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q7ihQ9DOdwkh13XOnXi+IMjMF9wwJSt0xTF2SLR36Pc=;
-        b=pGOmAm0SLyLwMABEswZINsW9zH9Y/aJxzTsvGiXGks5M1qVJ2XJT6joivb3CzT+vtv
-         Qqvtl9x3xm38m9ENdlJN17vxQytAJwmS2cBvqmsydX+dmfgUIXaYJSCqQ/MMz8B6buf+
-         kSrByFT/KqfkeWl9kJzqAJHYsGH20592AZglKLyhF65exL4pbwX3rdn8O1oAukzmDPP0
-         3nQ74WKsI/xfrQxmvTRWxRFxdPBPsrqkU1KMVE3Lr6pG48KP/caBLfomkmoAU5pMn384
-         LdXdGZlzzLWx0i9Cv6wNvAkaZS+C5u2/13/jqRW9/woiVX/CSH9PySn9ywkm+0g6gVRZ
-         rW1Q==
-X-Gm-Message-State: AOJu0Yxs4CFlfB62FkV2cBNa8om4w470bGH02Y6st6/062q2hZZWcn4l
-	wS9KnlRTwyPe79J0p68Q7dLkGOee71yYQZJvmb48uvAjpRXXqR8yfnbnkDJzq4L0
-X-Gm-Gg: AZuq6aKAo0CYk1jcYRd4BNidfgFlJXaJr6Fw2emJJGO/NK5/bIuydijUwV2JFlAgs6i
-	OBUZdFLR1YrZFSUaSFLYvHg6qBrGc0A5+hElsDIHLtBQX0v1Dl13qpVGmvsBYewpocb6nbnciP4
-	RWHrHCKHcyAylojSU6/RjBR+RspCqTax22tapaiPj8OcpwRKYFkc6zyvQfauYsAegOhsanmm5Z6
-	FP8xqmtFfT5YA0k91q9irbiP/xkyBxD2Ph01TkEkdby+MAtPBSMH1YdSA/sCU11NWUbPlTlLDYe
-	ZSooFKO4FtWEFlQaTtTenf5xOZrFyuIoFruycl5ydGsOrThJ/liWwmW9SgMEDT9gTmcGPIPXDq4
-	OodYpgEqOKJLiwhAoYiKYcXfKjX9KIEO0COm38hUOBmTkk54UgFu0N+dZ/W4TZe0i+CwkDgKXed
-	G492YfYuRgB6X6rV8NdUynCBv04a93Q/opaV8+DoKa117Tfy22N0JhEno9Mpj08kAMPvc/AZMlL
-	BM5KQN7ZYzkFbVN/5gHFvssYX3yHHD2bcZuYoMnJh3yvb+IWDoDNCmJA/O3J6SrWa0R+YSj+Wrt
-	v8gU
-X-Received: by 2002:a05:7300:7306:b0:2b0:514a:a8cf with SMTP id 5a478bee46e88-2b7c8663e2dmr1358850eec.17.1769774395075;
-        Fri, 30 Jan 2026 03:59:55 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a14bb02csm10505069eec.0.2026.01.30.03.59.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 03:59:54 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Eric Biggers <ebiggers@google.com>
-Subject: [PATCH net-next] net: usb: sr9700: remove unused CRC32 dependency
-Date: Fri, 30 Jan 2026 03:59:37 -0800
-Message-ID: <20260130115945.49875-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
+        b=ohkJTpA6aUaBSogWQ7TrdqIngygfG8dwe4k30B1iIUve7IV+DuwHmINUkiCZ9//1Kw
+         86urwjq2a8pJTRq0+EOGy1cccUMbIcTJYmdFWh9+8MgVUEgGhi2yyd7+MqPLk2RFWFDq
+         XIU3iOvQqkTlBhoUFhNmD7BrMIvFtDnF2W7BMy5a2FcRo6fzPPRSJdnQPIirJ5abr4O1
+         hEpWiQVDf2it8GJol6M5VeWPYTjg9YK0Mf7Zkp+fmTkhJe2FLgG+tNvpp+sK7qR13Sse
+         p/eAUqcBY8OOasR13PMdnu+olNcyllIYDYQO2fyk7H9XfKHwQqm0V9wW83nGtnMu6r2m
+         FlEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769774465; x=1770379265;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZJZXP6xEL3dYy7NoAOgI7OyTGIr9OGLgzegcneaY+Xk=;
+        b=RrpfUq3uuOVcFzSOJHoNfml/P7Y8Cfip1LBeTWr29DLRxicku6UiHfUdZfCphGLBRI
+         /5RyqJv0Wt+sh6ZEd0N0M+sdcuOzKLdWQ39lS8+v1D7z1HlIIsepfSCXV8W+/TtaE0bg
+         q9W5FeX1xXyC34GkFvtG+Mk40S13YGQ3+CS9+VTNZIwxcvNwkLGb2wm5JlqRbX+0xMMa
+         sE29Cd5a1LOhdbzaa8is5DrWl40wyZrmeM9lJJs8prTQYe9Y/Oarm5nb0QszwBvas73L
+         PDQrLbUaqo2+IrMclugbktQIk6qAX1mlKPWObHyCoatCoqWoW8shiA5Yx9EAx1KOu3nR
+         nR7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUpP1ed7Sg/lsTA1o5gWBK5VjBr9p4jyp8eaGTt+slBQ5fhJj0hIRaHF8wEqORTRHWTxcmtoCo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoRcrNmQReNt1TNtarPNF5O1/OTgE9+uzxdKuS4bQiALOerqyo
+	Ks/wZJpP/5ikhCjxJEJeZWMdpXyxOPhAUx8RqvtASIVSxAZkufC3SHA14TgDAbOMoot5xuUoslw
+	n+npwjFa6FhLqKArA3qRUooht5dc1jdnROoh33ovc
+X-Gm-Gg: AZuq6aI3U0vsi0AQBLqROKJllsEAg4qs4PJ04DkJcZw+EtNEYAjAA26L09qLrjTRXMO
+	fgUtd0CADmg45uy00Sdqvp64gh/c3/qpuHrlGLOimoRjWF+4Pqy4QQT1psW/ufxmnTPaO0/Vul9
+	dxHmDoe/S+pCbwMtslk+VPB1O17Th768fNxYRPADd2Bjm+p4l8FNEa7N6We0HizYXeYWgRKJO85
+	GvG55Ew5ycT1U3D8zFtDSrAmf/cV+G5Xz/0hln2I4EWc7cd5rVaVTHDQCV7TGFmBR+9g8k=
+X-Received: by 2002:a05:622a:254:b0:4ec:f410:2470 with SMTP id
+ d75a77b69052e-505d228c282mr36041711cf.71.1769774463982; Fri, 30 Jan 2026
+ 04:01:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com>
+In-Reply-To: <CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 30 Jan 2026 13:00:52 +0100
+X-Gm-Features: AZwV_Qg5wvn7xde5VVnxU95HF-y-lX10m7yb3gH2CXSHB4-WuKWtvMlYRHbwT3c
+Message-ID: <CANn89iJxmiqryxLAXiV9z4uTaCzR7XZns32MGSLOykC2zocW_Q@mail.gmail.com>
+Subject: Re: [PATCH net] ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()
+To: Hirokazu MORIKAWA <morikw2@gmail.com>
+Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de,armlinux.org.uk];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255127-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255128-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AD52EBA4C1
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: E5FEBBA4E7
 X-Rspamd-Action: no action
 
-The previous patch to remove code for the nonexistent multicast filter
-removed all code that relies on CRC32, but overlooked the Kconfig
-dependency. Remove it.
+On Fri, Jan 30, 2026 at 5:15=E2=80=AFAM Hirokazu MORIKAWA <morikw2@gmail.co=
+m> wrote:
+>
+> [REGRESSION] ip6_tunnel: IPv4 traffic broken in MAP-E/DS-Lite since
+> commit df5ffde96693
+>
+> Hi,
+> I am reporting a regression in the IPv6 tunneling stack (MAP-E and
+> DS-Lite) introduced in kernel 6.12.67.
+>
+> [Description] After upgrading the kernel from 6.12.66 to 6.12.67 in
+> the OpenWrt snapshot, IPv4 packets can no longer be sent to the
+> external network via MAP-E or DS-Lite interfaces.
+> [Environment]
+> * Hardware: FriendlyElec NanoPi R6C
+> * OS: OpenWrt snapshot
+> * Kernel version: 6.12.67 (Broken), 6.12.66 (Working)
+> * Protocol: MAP-E and DS-Lite
+> [Culprit] By bisecting/reverting individual commits, I have identified
+> that the following commit is responsible for this issue:
+> "ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()" (Link to
+> the patch: https://lore.kernel.org/netdev/20260107163109.4188620-1-edumaz=
+et@google.com/)
+> Reverting this specific commit on top of kernel 6.12.67 restores
+> normal connectivity for both MAP-E and DS-Lite.
+> [Steps to reproduce]
+> 1. Set up a MAP-E or DS-Lite connection on kernel 6.12.67.
+> 2. Attempt to send IPv4 traffic (e.g., ping 8.8.8.8).
+> 3. The packets fail to reach the destination.
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/usb/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+Thanks for the report.
 
-diff --git a/drivers/net/usb/Kconfig b/drivers/net/usb/Kconfig
-index d050adfe860a..52a5c0922c79 100644
---- a/drivers/net/usb/Kconfig
-+++ b/drivers/net/usb/Kconfig
-@@ -319,7 +319,6 @@ config USB_NET_DM9601
- config USB_NET_SR9700
- 	tristate "CoreChip-sz SR9700 based USB 1.1 10/100 ethernet devices"
- 	depends on USB_USBNET
--	select CRC32
- 	help
- 	  This option adds support for CoreChip-sz SR9700 based USB 1.1
- 	  10/100 Ethernet adapters.
--- 
-2.43.0
+Can you provide detailed instructions ?
 
+Apparently none of our selftests caught the issue, it would be great to add=
+ one.
+
+I have no idea what MAP-E or DS-Lite are.
 
