@@ -1,102 +1,129 @@
-Return-Path: <netdev+bounces-254972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPbzDEoVfGn4KQIAu9opvQ
-	(envelope-from <netdev+bounces-254972-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:19:54 +0100
+	id MG5LDCoWfGkeKgIAu9opvQ
+	(envelope-from <netdev+bounces-254973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:23:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFE90B65F4
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:19:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C34B6629
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4C1B3011591
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 02:19:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0ECA23015D3E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 02:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF8429B78F;
-	Fri, 30 Jan 2026 02:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1011B2F0C7F;
+	Fri, 30 Jan 2026 02:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TkICI+qS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b8cRilcR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA7D2367B3;
-	Fri, 30 Jan 2026 02:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E091123ABA9;
+	Fri, 30 Jan 2026 02:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769739572; cv=none; b=AIlrQGbrkTCV2xHQ8XCk6cN4BKj4qh37WCUD93UU4yWSZudN5s/1J7ymKLUMINq+TKY697lHD1+XstfVX7jes5h0ixCbr0bG/Bh5tFn7MEc4jSKBWyWe3oVBm3SX9y5pZMdzMLjkYF0SdeDAeysoj42NHIDZlzOHceAsXHB2oE0=
+	t=1769739813; cv=none; b=VQWWasO5O89EcyEdIzFz7Wd781GxYxGz09cMd2D79FWN+yyPnEB07hor9UE45Eb1GzyaGkbj51oo6A2pL8bXm6hHSTtdnw1bIa2JUBcJ3OlDz8Oy+pSPKfUXa16o8SislOuiATlAt1+234H/gfXRxYlCn223jAqfS+9CYJ0XnxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769739572; c=relaxed/simple;
-	bh=gZkMQkhEUvXZHWfBMMe5HCrgUclZt0xcMDnX+kw282g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TZmXXrgFjxg/HmYGui3XcrzvF4cTocH0gG3n0lDTdZLP6kO7P1GNvhpEyWdBZy/0zmL+dfR9kcWd9rPSAWBeCby8qAKcZeglkQ4ymLWL6iLcPagCi/IPXCBD40yNpIt0MVaOvEY9v+KLkJjQzPxnkHF3kfoqiaZhGZaVMdvJLXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TkICI+qS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71F7EC4CEF7;
-	Fri, 30 Jan 2026 02:19:31 +0000 (UTC)
+	s=arc-20240116; t=1769739813; c=relaxed/simple;
+	bh=BlU5eFSesktZyHuG1tmmISURPTtZ6Vo+9lfLjQHeuBw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KULIBcH2SyINN7epSkaRbDBf9OD6wUXATtos7b+9pFE211QCDBGRSUFKLEFrVt74NOaxWXwdbGtx0Rt0hFIP+iAUtVtrUIvNP3tufOJMmQyBdBGSPE/JA9rE+P5Ssff9d9kweAW0blJYYO12RfU3UMgDVYakW4Lu+YmjttzGT3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b8cRilcR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5F45C4CEF7;
+	Fri, 30 Jan 2026 02:23:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769739571;
-	bh=gZkMQkhEUvXZHWfBMMe5HCrgUclZt0xcMDnX+kw282g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TkICI+qSGIO32/Lj87LtONcmGLcBpJYozuNYY6NuKSWthc+viXda5FQ/ZWNFkjXHg
-	 M4n1leiH7uNsqiLtDxbGMEzxa9CXeC8ak5/70VzxA8Uvblh9vV4jSB7d4Om5OUFieN
-	 Ft72L1RxXAqgIL6V3O/R5Rur2FGdQG4loc23PyBg/h4HoLmiufRteXVVXhxSAl4TK/
-	 ytlu8iji9o2xfj9EWddK3ubMe1XWWY0ReWfrB5L1Q78jeCLvNq84RKAdm26lnmc46V
-	 jrJu1ydV79RTNN7IGoixPpjBvV8XDhdR9azMPRzCmJuWNZ6cPmsFimi+I4CPXpB24/
-	 uWkuKLLL5DKLQ==
-Date: Thu, 29 Jan 2026 18:19:30 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [GIT PULL] wireless-2026-01-29
-Message-ID: <20260129181930.34ef6a88@kernel.org>
-In-Reply-To: <20260129110403.178036-3-johannes@sipsolutions.net>
-References: <20260129110403.178036-3-johannes@sipsolutions.net>
+	s=k20201202; t=1769739811;
+	bh=BlU5eFSesktZyHuG1tmmISURPTtZ6Vo+9lfLjQHeuBw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=b8cRilcRYRNwQmrKFLdbgean3jPbfvHAIrTJu8C2f37BKn9y3yidBWHKqna8g97rJ
+	 qH2YnVCVIQddtO1nFlCv/s2RkxqLuc8H+Iq7SqEjgJMAknekv6R45lF9UAVf0HMGkd
+	 rTMPXGMM3jWSsIax0Py7kX2Z3rHqNOb5Zl/F0Xr8B0MiEGUJZafvxNs7+mretf85ZQ
+	 KAhy2+4aNJvYXBzhMp8SYcxeTWkYFFaKdh/x6Di4yLQmrY/58KVRTFT2AYiXmYQ7D6
+	 cX9qnMUf9WKSXZfmdim2aciyz8NYn2jU5an5JkusTbu+O6McyL+9QzwlOTWcTVaXNQ
+	 xIuojJX0bkYcw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8CB1380CEE0;
+	Fri, 30 Jan 2026 02:23:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] netconsole: selftests: Move netconsole
+ selftests to separate target
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176973980465.3141392.7468153319055882341.git-patchwork-notify@kernel.org>
+Date: Fri, 30 Jan 2026 02:23:24 +0000
+References: <20260127-netcons-selftest-target-v2-1-f509ab65b3bc@gmail.com>
+In-Reply-To: <20260127-netcons-selftest-target-v2-1-f509ab65b3bc@gmail.com>
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: shuah@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leitao@debian.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254972-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254973-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AFE90B65F4
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 99C34B6629
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 12:03:45 +0100 Johannes Berg wrote:
-> Here's just a single potential out-of-bounds read fix,
-> and I really hope that's the last for this cycle.
-> 
-> Please pull and let us know if there's any problem.
+Hello:
 
-This was merged and part of today's PR to Linus, thanks!
-(Looks like the bot didn't fire.)
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 27 Jan 2026 19:39:20 +0000 you wrote:
+> This patch moves netconsole selftests from drivers/net to its own target
+> in drivers/net/netconsole.
+> 
+> This change helps saving some resources from CI since tests in
+> drivers/net automatically run against real hardware which are not used
+> by netconsole tests as they rely solely on netdevsim.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2] netconsole: selftests: Move netconsole selftests to separate target
+    https://git.kernel.org/netdev/net-next/c/b3827c91cc99
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
