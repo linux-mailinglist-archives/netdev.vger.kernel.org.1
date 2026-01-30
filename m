@@ -1,215 +1,206 @@
-Return-Path: <netdev+bounces-255088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0O7gMqt7fGkONgIAu9opvQ
-	(envelope-from <netdev+bounces-255088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:36:43 +0100
+	id iNqkL4mCfGlwNgIAu9opvQ
+	(envelope-from <netdev+bounces-255089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:06:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A8FB8F71
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:36:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E038B925E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:06:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D2758300599D
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:36:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65478300A8F0
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 10:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73ACA354AE3;
-	Fri, 30 Jan 2026 09:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0609318B84;
+	Fri, 30 Jan 2026 10:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="RkumISXP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxhX106H"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5201E1024;
-	Fri, 30 Jan 2026 09:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA69F2DECA5;
+	Fri, 30 Jan 2026 10:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769765798; cv=none; b=c3anA31+qiFtETWH/B5S6cMzIPJ1Uau23HdFyTH1La+Jx+QUVCtxrZbAdonujbRUM3Z3tITRTQCxZoYJ2777yzXudMLgU5nhOTiPEQN/qMUx2sj+KONY1xbM/TNGEaxBEELl6zfCAgBCEjAdOj/bg2tjYnrEyDcGqkm1IFdGHd8=
+	t=1769767557; cv=none; b=cQqjq6LvTbwu8UkRLhqNhCrVeHnd2tRiD05gR+zjGEzwYPenmxknCZoNnWHoL5MbBzrU+1v/1mnJCcpWl79JerzC636M4mPdaJUSQSzZoz1erATm9lorX7qdDufwqIjQ4Si+pp4wMhcA97CFmsxE7ZCRoAmwyRLPQda1j6cFQXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769765798; c=relaxed/simple;
-	bh=ozEOcA/FDGV2CqnpFej3ARpOL9EQ9F/gPaS6uv+Xucw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WN5n76+jVzQOVYUDRE0sTJX/WE5v7OeOzZWxD7puksPgpiYJj3QNxJLnszGSfG+nsQz+fejuWVIJ9aeQOEP+rHzEvxdMxkXE3c/Nzj6YpfjAcnABEU/gKBYEjAMz593eJ1b8W3qUwQy/jeUD2hVZPvg+SVUnrchTvS6MILiPU/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=RkumISXP; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60U9ZmdE6688270, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1769765749;
-	bh=mPjrWaeCnwkBqXl5+OyLFU7vwNTqpICmpQQiUEyWFg8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=RkumISXPUl/dPrUR0sjTDmFnWJPsOWdstQm2IVUxASdQIL+V1X8CWhgPr6jnADJK2
-	 pkMbOsf6Hvb0njKjD6nxWTy1Ta1B/U8YZz6MWU2rJBGcSsIkHRucCHU6VuPTY7A5x4
-	 dDpP6Sj00AR+EvSIbCfkkokj448O9RW01Z5R9fKhJsyOobiU59A+iOACgLDZb2/5Fg
-	 E2g4ytyUtvi7/pGo7KNjQ3S8ZzcyG6War85DZHKnKM8JEaa5pb2EEG7LYOv/XzJ3dg
-	 zRTLOWTPA8cNpXJT4FKEw13XluTGh9hGAqQA4piXc9ofJyuQ4mmXP5+tlzAPK0QtQh
-	 SBu2BiHFuF2hA==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60U9ZmdE6688270
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 30 Jan 2026 17:35:49 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Fri, 30 Jan 2026 17:35:49 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Fri, 30 Jan 2026 17:35:49 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v1] r8169: add support for RTL8125cp
-Date: Fri, 30 Jan 2026 17:35:44 +0800
-Message-ID: <20260130093545.1753-1-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1769767557; c=relaxed/simple;
+	bh=BcLluus8DH03LER7CXGfhQox+YpRlCH2egU9ipltSfc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O9ua7TMx130qxwgkeb6PnjiBLrnUKMz+wszRU7UpC/0EaPlF79usGRpnExGI93UeRsEgIU6UQ6Vpjbon6CsZQx1P+ibSj4R3YIPm3Zzy+VomJB52tcTrRFPgwvRgzmHmafXEsr+5r2ClrYOQzIOn0QzDRAV6ctDyMGysNvFoxy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxhX106H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62FDAC116D0;
+	Fri, 30 Jan 2026 10:05:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769767557;
+	bh=BcLluus8DH03LER7CXGfhQox+YpRlCH2egU9ipltSfc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jxhX106HMfKlKbEVvEYUaXh/PbB47BfqFQKaGCp1rTPB5xmMt8k4Z26SKNRt3jDby
+	 IswXAifemV8eD8qUbP+D60hddHDNRpLgar8xv7pTni9eKPG3uRkcWre/UMClC56PVu
+	 Vti5uuuh6kMAG6YWaKVbaLZecMqW5c5ax00Zg/qCLILiTcaJJ1FenB4TVo8xEOVFw8
+	 zLbo1587bN2ff0upOKmVzCsZXk0icwls7XHHHx0Dw+T7iOAS5DkM6se8F8zF5JxUgG
+	 XlNkVqgNmHQLmFKM0iFbzl5zKhMRZ3GtU9xDd3AwtxEvATNa1P6B0/sX60MiyCHORt
+	 eXYHiBYAqThcA==
+Message-ID: <6c9f3c40-9a41-442e-9254-d7b1e37cf78a@kernel.org>
+Date: Fri, 30 Jan 2026 11:05:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/6] selftests: mptcp: add splice io mode
+Content-Language: en-GB, fr-BE
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260129-net-next-mptcp-splice-v1-0-994cac40daa0@kernel.org>
+ <20260129-net-next-mptcp-splice-v1-5-994cac40daa0@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260129-net-next-mptcp-splice-v1-5-994cac40daa0@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-255089-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-255088-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid]
-X-Rspamd-Queue-Id: 70A8FB8F71
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6E038B925E
 X-Rspamd-Action: no action
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+Hello,
 
-This patch adds support for chip RTL8125cp. Its XID is 0x708. We apply
-different and firmware for RTL8125cp.
+On 29/01/2026 20:23, Matthieu Baerts (NGI0) wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+> 
+> This patch adds a new 'splice' io mode for mptcp_connect to test
+> the newly added read_sock() and splice_read() functions of MPTCP.
+> 
+> do_splice() efficiently transfers data directly between two file
+> descriptors (infd and outfd) without copying to userspace, using
+> Linux's splice() system call.
+> 
+> Usage:
+> 	./mptcp_connect.sh -m splice
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
- drivers/net/ethernet/realtek/r8169.h          |  1 +
- drivers/net/ethernet/realtek/r8169_main.c     |  6 +++++
- .../net/ethernet/realtek/r8169_phy_config.c   | 22 +++++++++++++++++++
- 3 files changed, 29 insertions(+)
+(...)
 
-diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index aed4cf852091..0b9c1d4eb48b 100644
---- a/drivers/net/ethernet/realtek/r8169.h
-+++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -68,6 +68,7 @@ enum mac_version {
- 	RTL_GIGA_MAC_VER_61,
- 	RTL_GIGA_MAC_VER_63,
- 	RTL_GIGA_MAC_VER_64,
-+	RTL_GIGA_MAC_VER_65,
- 	RTL_GIGA_MAC_VER_66,
- 	RTL_GIGA_MAC_VER_70,
- 	RTL_GIGA_MAC_VER_80,
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 2f7d9809c373..d040f2074db6 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -60,6 +60,7 @@
- #define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
- #define FIRMWARE_8125K_1	"rtl_nic/rtl8125k-1.fw"
- #define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
-+#define FIRMWARE_8125CP_1	"rtl_nic/rtl8125cp-1.fw"
- #define FIRMWARE_9151A_1	"rtl_nic/rtl9151a-1.fw"
- #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
- #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
-@@ -112,6 +113,9 @@ static const struct rtl_chip_info {
- 	/* 8125BP family. */
- 	{ 0x7cf, 0x681,	RTL_GIGA_MAC_VER_66, "RTL8125BP", FIRMWARE_8125BP_2 },
- 
-+	/* 8125CP family*/
-+	{ 0x7cf, 0x708, RTL_GIGA_MAC_VER_65, "RTL8125CP", FIRMWARE_8125CP_1 },
-+
- 	/* 8125D family. */
- 	{ 0x7cf, 0x68b, RTL_GIGA_MAC_VER_64, "RTL9151A", FIRMWARE_9151A_1 },
- 	{ 0x7cf, 0x68a, RTL_GIGA_MAC_VER_64, "RTL8125K", FIRMWARE_8125K_1 },
-@@ -802,6 +806,7 @@ MODULE_FIRMWARE(FIRMWARE_8125D_1);
- MODULE_FIRMWARE(FIRMWARE_8125D_2);
- MODULE_FIRMWARE(FIRMWARE_8125K_1);
- MODULE_FIRMWARE(FIRMWARE_8125BP_2);
-+MODULE_FIRMWARE(FIRMWARE_8125CP_1);
- MODULE_FIRMWARE(FIRMWARE_9151A_1);
- MODULE_FIRMWARE(FIRMWARE_8126A_2);
- MODULE_FIRMWARE(FIRMWARE_8126A_3);
-@@ -4021,6 +4026,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
- 		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
- 		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
- 		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
-+		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
- 		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125d,
- 		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
- 		[RTL_GIGA_MAC_VER_80] = rtl_hw_start_8127a,
-diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index 032d9d2cfa2a..1896d0ce42ac 100644
---- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-+++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -1102,6 +1102,27 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
- 	rtl8125_config_eee_phy(phydev);
- }
- 
-+static void rtl8125cp_hw_phy_config(struct rtl8169_private *tp,
-+				    struct phy_device *phydev)
-+{
-+	r8169_apply_firmware(tp);
-+	rtl8168g_enable_gphy_10m(phydev);
-+
-+	phy_modify_paged(phydev, 0xad0, 0x17, 0x007f, 0x000b);
-+	phy_modify_paged(phydev, 0xad7, 0x14, 0x0000, BIT(4));
-+	rtl8125_phy_param(phydev, 0x807f, 0xff00, 0x5300);
-+	r8168g_phy_param(phydev, 0x81b8, 0xffff, 0x00b4);
-+	r8168g_phy_param(phydev, 0x81ba, 0xffff, 0x00e4);
-+	r8168g_phy_param(phydev, 0x81c5, 0xffff, 0x0104);
-+	r8168g_phy_param(phydev, 0x81d0, 0xffff, 0x054d);
-+	phy_modify_paged(phydev, 0xa43, 0x00, 0x0000, 0x1001);
-+	phy_modify_paged(phydev, 0xa44, 0x11, 0x0000, BIT(7));
-+
-+	rtl8125_legacy_force_mode(phydev);
-+	rtl8168g_disable_aldps(phydev);
-+	rtl8125_config_eee_phy(phydev);
-+}
-+
- static void rtl8125bp_hw_phy_config(struct rtl8169_private *tp,
- 				    struct phy_device *phydev)
- {
-@@ -1344,6 +1365,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
- 		[RTL_GIGA_MAC_VER_61] = rtl8125a_2_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
-+		[RTL_GIGA_MAC_VER_65] = rtl8125cp_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_66] = rtl8125bp_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_80] = rtl8127a_1_hw_phy_config,
+> diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+> index 10f6f99cfd4e..1c4fe60089a2 100644
+> --- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
+> +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+
+(...)
+
+> @@ -935,6 +936,55 @@ static int copyfd_io_sendfile(int infd, int peerfd, int outfd,
+>  	return err;
+>  }
+>  
+> +static int do_splice(const int infd, const int outfd, const size_t len,
+> +		     struct wstate *winfo)
+> +{
+> +	int pipefd[2];
+> +	ssize_t bytes;
+> +	int err;
+> +
+> +	err = pipe(pipefd);
+> +	if (err)
+> +		return err;
+> +
+> +	while ((bytes = splice(infd, NULL, pipefd[1], NULL,
+> +			       len - winfo->total_len,
+> +			       SPLICE_F_MOVE | SPLICE_F_MORE)) > 0) {
+> +		splice(pipefd[0], NULL, outfd, NULL, bytes,
+> +		       SPLICE_F_MOVE | SPLICE_F_MORE);
+
+The review assistant rightly spotted errors with splice() are simply...
+ignored! Technically, the script launching this tool will check the
+integrity of the transfer, but still, that's clearly not a good practice!
+
+Sorry for the noise, I didn't spot that when sending these patches. I
+will fix the issues and send a v2 later.
+
+pw-bot: cr
+
+Cheers,
+Matt
 -- 
-2.43.0
+Sponsored by the NGI0 Core fund.
 
 
