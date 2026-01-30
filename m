@@ -1,77 +1,101 @@
-Return-Path: <netdev+bounces-255041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kI35BmxefGkYMAIAu9opvQ
-	(envelope-from <netdev+bounces-255041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:31:56 +0100
+	id SLjMHjRgfGl0MAIAu9opvQ
+	(envelope-from <netdev+bounces-255042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:39:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86159B7F10
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:31:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1152B7F83
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E9C83011C63
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:31:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC5583014555
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 07:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C042E6CC2;
-	Fri, 30 Jan 2026 07:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 370673128A2;
+	Fri, 30 Jan 2026 07:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ErpeC7iU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lURW+nxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9782DECCB
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 07:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942CF313558
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 07:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769758307; cv=none; b=bj/WJfTCAOs+SPJ37te6btTgE4ndk7ZIBQbWOJGeD32zL4BJe3bzNzFOrfeQfqAsXnU8B68U4an6AtDUZvMJR8y3R6GfxPr5KbrP0Pof06msfpfAgi49BGdVQLz3B4rK58d7pxmv1aELHGSyrfLp13ivMQ1sZBswPjNAmFp3AzQ=
+	t=1769758752; cv=none; b=fMCe5XppvJc4+OEy07GQZ7emOZXgEDrx95u0852v2w4vwqihSoaOppvi+3F0Y3sMNiqO/0bglKl8ByJEJH0PZuoix/UvKrgC5auUDeHrY3FUmvsdGwxT9i1C/lKrnHfC8AY55cs1GzQ1PQZWFHSVEtnh5AoG51uqidIWscPNhyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769758307; c=relaxed/simple;
-	bh=p3dF4VO+6Qiz7FGczFk+FKeEobQkSsypg4n57qKJTRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PMXRIIr6FR7HyN5OmVssvb4euz+yp9271eCx13gUQSq1rRu4RbAuGcPyGF2iM6pGdvVReqB9vaFZ4RU3VV8jMo05F+CKiF153R2fbF5KpWz0wOKeipiKLEkdGFB83fczLutjeN68wp7btmfSEe8tMTIqYEVxV2k/ZOCnn4UlfZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ErpeC7iU; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60TLnhGP542649;
-	Fri, 30 Jan 2026 07:31:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=ix/+yLuaAB2x6B2AEOJyq61Uq1xnP
-	DQx9JMh2/3mi8A=; b=ErpeC7iUQTFXLHS5EbDWqL9DWWgX73JMvi6tSHL+q6Qev
-	FCX/6ise+HReD0BVg/KQ0jp/7H10IoNPyAl3AwGfWSVc7zUnzclIenmkiAWEYpIu
-	Wbhig+AX/spP3UdPthinYa4wWvfdCSIJEEIg9ghI3x1Il4UuhkzkSQaxYwOoW5ky
-	B0XteGSxxQ8MF3HW8mvFUJQFMlRDgOcb8lO3sXQ/X9eR31zLmGSkL6cz0GPNNax1
-	hGdQWbPu72QgYqw3V7MPIcWlbqq3/Wve5slSqcI8isl5L/Vj1Hd8CX3thC+t0ssO
-	QxFKOp4WHZno9a0hP09dAhJTGbkt+tZaefo2CnLOA==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4by5dj4fqj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 30 Jan 2026 07:31:29 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 60U6CCbu001851;
-	Fri, 30 Jan 2026 07:31:28 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4bvmhhwphe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 30 Jan 2026 07:31:28 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 60U7VRJf004952;
-	Fri, 30 Jan 2026 07:31:27 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4bvmhhwpgs-1;
-	Fri, 30 Jan 2026 07:31:27 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: vikas.gupta@broadcom.com, bhargava.marreddy@broadcom.com,
-        rajashekar.hudumula@broadcom.com, netdev@vger.kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] bng_en: fix misleading error message for generic firmware version
-Date: Thu, 29 Jan 2026 23:30:23 -0800
-Message-ID: <20260130073055.1609162-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1769758752; c=relaxed/simple;
+	bh=947Ihnztamc5xCRw/MGVHd3zDD8SrHrHL7SG/64BBXs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SVq9twIZL2qL7HsdkB9TYX4q8DJ/2gpIVzprxdpoqsR7TUbqOVZJ/WPdjxSNO7Dyszz2JyA5TDl4mnYxxlNSUZu8HIwVZa2/0QSKDzsHc8vrFw0Y2MucyZS9N5wb7rgUn2uMgKLYBMbGNqoQXcuDMHX/FvII+VnSfDrN9bOvkK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lURW+nxZ; arc=none smtp.client-ip=74.125.82.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-11f1fb91996so173473c88.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 23:39:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769758749; x=1770363549; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DdVE2+FCBzVjnnVs+2tHZ0yjRqOVQO47L49tKgXTrYw=;
+        b=lURW+nxZxDrOQa7lZUhD0XUexud1wi1OuRgsi25Jk6GOLuZzQ62A4r86skKx3ChuVi
+         e/br+84UFV3Jb+UQTp8lz/wtpLDkKRtiID2tiN4qOI314ZqixT0DLALCtQmcDhsldRit
+         OZXmq7MlXmLOEySZtauHf2y3McPTPDhx2TNUo5fre9xBgGjjcL4IkUgp2VJz/0dU4nTT
+         uaXnICRaDiDdkBauRDq4U7joN8HuKTzGngsUDUSe+JgqRCFCLq7b+yAq5BHqlCatJvDU
+         twVqRPuGYmKSHmyH9nQ04WgM70f7WoRhaVKG3vfXktqUkGSrKelYHGmauKJ1ud/fkEXu
+         0X4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769758749; x=1770363549;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DdVE2+FCBzVjnnVs+2tHZ0yjRqOVQO47L49tKgXTrYw=;
+        b=J9+hg3fBhaNvcsv5WmuoXiFZlgjVdzv3SZyckyFtVdayBZpFYVivpeMoQ8aHy1ZuA9
+         9ao2rvdMphFoXBR/qLS4xX5ofbl6dtGHwO/SP2/ZRUwp6g5XwueC4IVeouceDaJVv3du
+         wdiIYw0fJc3s4+vBxe1AmwqcTE606jsbMYazORl3vXZw/M3wU2zBN0L66eUWDMNLknNx
+         DcLbVq3Xonzw6BgsCy5xK0jakfRt0SvA/CwAfhfV5C9Baj62iTd8A+ajxhw9Utxu3XcH
+         7LYbvt3PMt19IY6Ogtd+DVHE0IB4XX1u22HJbWPoqNglwyKqOVMisLAxsMeFKtzo1iee
+         GnNA==
+X-Gm-Message-State: AOJu0YxqsIwzYN/zdE5oP+6dT+owiE90cICTt3oH5B28+Gy4qe5iXmfY
+	GR7oTP6d2NfAzf6xH9Zj4DE2y6gfDPH9TRk9tz7ISGmJxQknUCHBAqI449EP8RNP
+X-Gm-Gg: AZuq6aJGyhe0MJq5eKr1tKPZu38F6/rmdV6kcEtYiLgEvex8QCdOM6SADhj/jz3tVpp
+	yNzgTQQ6p2JIgkZalv9aQ5/NzW0B73GZlcaoQ323s1kwi8h7JhLOW8TpWpdP6HMqE91RreEIKSY
+	+oy+MpQ2lQI24ps29w5dLBuVmOj9w3JU2Vkj4ljzaPDxoYKeSTaAHVTIAQLsT3f+gDPRexfz+/e
+	Pin+wApZqs6IfQKFNIGK/gJc53tBQLu7QAoAM5fLrg7cypvQYBj8WWlcWpckcwT80HmTGDqp8ke
+	c7Q34a102Zurm3J4tZgGAzY5Fke7RL7OnhKv/5vTQ4gLOLhbzZyGndIqxWYnpsxV2vk8tFpzpY3
+	u9dx3CLpVg3sUGVvX8rS+3iCMrUUXGAsH0ZVPGufrkpA1JwwS0UmoLcQHKatwG2fB/3JYc9FCvJ
+	6ZWssAMtjh9vWnvGLK6tzgt/VnS8AsC7ws22UZPLUSZ3HL7+aOpIOeRvyyPXfCV5DgRRRBiNwge
+	PQXKdJNhLzLrURBJzn6NmOWPnJZIBr6XNJHwWVR/FQRiwP36DkN3CJfBBg5AT+iiP0a+kkNY/2n
+	qX+n
+X-Received: by 2002:a05:7022:2486:b0:11b:9386:a3c0 with SMTP id a92af1059eb24-125c1041f6emr983267c88.43.1769758749278;
+        Thu, 29 Jan 2026 23:39:09 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-124a9de948esm10187112c88.9.2026.01.29.23.39.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 23:39:08 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Korsgaard <peter@korsgaard.com>,
+	Steve Glendinning <steve.glendinning@shawell.net>,
+	Oliver Neukum <oneukum@suse.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Max Schulze <max.schulze@online.de>,
+	=?UTF-8?q?Krzysztof=20Ha=C5=82asa?= <khalasa@piap.pl>
+Subject: [PATCH net-next v3] net: usb: introduce usbnet_mii_ioctl helper function
+Date: Thu, 29 Jan 2026 23:37:49 -0800
+Message-ID: <20260130073810.29090-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,82 +103,256 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-29_03,2026-01-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- suspectscore=0 mlxscore=0 spamscore=0 bulkscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2601150000 definitions=main-2601300057
-X-Proofpoint-ORIG-GUID: dz6aGudXvPTCpuMz36ef80I3qzEJg5NG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMwMDA1OCBTYWx0ZWRfX7OLbKPwp9xg8
- BLig2dIqbgiCBPq9QbYEIWRngsdf97ujwMxDTwEhzhEbXkTpB0QYuahhdqe8XAP88R8tiLki36y
- 837fbHVFu0hezOyKfg/4H171aXb2CQK20x4Krh/LX+PNZ2+NjNoSnnvoW3YCfXMbshP0VQYYTPK
- wJ+noYG5dfne0jrGJ7ZiYbv0nvCDEEfR6aA/D4tw2U7m2jFyHpLMmHabEOMxi47yA7hzO10jn0J
- WIMeK+v4eQ7CGlG5uXJeGRxBPzUVw8wgXA3Wxk+Wn93sQ9Jry3sC2uGTDve9Eh5RQ0NVu+p/cwU
- MYAAPIfhBlP1Y14W4Z4PjA0xP8RQe4w/fARE0prROCcOCr48W2OfVU6Peo7Odp0EgrRcoVvj+Hm
- o6jVaPwtQ2Rr83o8GR7UYc6cnaz9jfrYPsuwhDOP4UIV8lJ+ItEcmqvi1TnPoKp9j8JkQSk70D5
- NSxrhvhbnQHas50R78tdFGutcBTYwj6b3zLUfHlw=
-X-Authority-Analysis: v=2.4 cv=IrsTsb/g c=1 sm=1 tr=0 ts=697c5e51 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=Wjh5z62sGZEWw8ZWgqsA:9 cc=ntf awl=host:13644
-X-Proofpoint-GUID: dz6aGudXvPTCpuMz36ef80I3qzEJg5NG
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-255041-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[oracle.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,korsgaard.com,shawell.net,suse.com,linuxfoundation.org,pengutronix.de,online.de,piap.pl];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email,oracle.com:dkim,oracle.com:mid]
-X-Rspamd-Queue-Id: 86159B7F10
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-255042-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D1152B7F83
 X-Rspamd-Action: no action
 
-The devlink info_get handler incorrectly reports "roce firmware" when
-populating the generic firmware version field.
+Many USB network drivers use identical code to pass ioctl
+requests on to the MII layer. Reduce code duplication by
+refactoring this code into a helper function.
 
-Update the error message to correctly describe the failing operation.
-
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev> (v1)
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- drivers/net/ethernet/broadcom/bnge/bnge_devlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v3:
+Rebase on latest net-next
+Add changelog
+Add received Reviewed-by tag
+Changes in v2 (not numbered):
+Resent with maintainer CCs
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c b/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
-index a987afebd64d..57db3caabcfb 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
-@@ -221,7 +221,7 @@ static int bnge_devlink_info_get(struct devlink *devlink,
- 			      DEVLINK_INFO_VERSION_GENERIC_FW, buf);
- 	if (rc) {
- 		NL_SET_ERR_MSG_MOD(extack,
--				   "Failed to set roce firmware version");
-+				   "Failed to set generic firmware version");
- 		return rc;
- 	}
+ drivers/net/usb/asix_devices.c | 11 ++---------
+ drivers/net/usb/ax88179_178a.c |  8 +-------
+ drivers/net/usb/dm9601.c       |  9 +--------
+ drivers/net/usb/mcs7830.c      |  8 +-------
+ drivers/net/usb/smsc75xx.c     |  4 +---
+ drivers/net/usb/sr9800.c       |  9 +--------
+ drivers/net/usb/usbnet.c       |  8 ++++++++
+ include/linux/usb/usbnet.h     |  1 +
+ 8 files changed, 16 insertions(+), 42 deletions(-)
+
+diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+index c73cf52a65a8..a453e4275e2f 100644
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -97,13 +97,6 @@ static u32 asix_get_phyid(struct usbnet *dev)
+ 	return phy_id;
+ }
  
+-static int asix_ioctl (struct net_device *net, struct ifreq *rq, int cmd)
+-{
+-	struct usbnet *dev = netdev_priv(net);
+-
+-	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
+-}
+-
+ /* We need to override some ethtool_ops so we require our
+    own structure so we don't interfere with other usbnet
+    devices that may be connected at the same time. */
+@@ -190,7 +183,7 @@ static const struct net_device_ops ax88172_netdev_ops = {
+ 	.ndo_get_stats64	= dev_get_tstats64,
+ 	.ndo_set_mac_address 	= eth_mac_addr,
+ 	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_eth_ioctl		= asix_ioctl,
++	.ndo_eth_ioctl		= usbnet_mii_ioctl,
+ 	.ndo_set_rx_mode	= ax88172_set_multicast,
+ };
+ 
+@@ -1269,7 +1262,7 @@ static const struct net_device_ops ax88178_netdev_ops = {
+ 	.ndo_set_mac_address 	= asix_set_mac_address,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_set_rx_mode	= asix_set_multicast,
+-	.ndo_eth_ioctl		= asix_ioctl,
++	.ndo_eth_ioctl		= usbnet_mii_ioctl,
+ 	.ndo_change_mtu 	= ax88178_change_mtu,
+ };
+ 
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index b034ef8a73ea..0e9ae89b840e 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -847,12 +847,6 @@ static int ax88179_set_eee(struct net_device *net, struct ethtool_keee *edata)
+ 	return ret;
+ }
+ 
+-static int ax88179_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
+-{
+-	struct usbnet *dev = netdev_priv(net);
+-	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
+-}
+-
+ static const struct ethtool_ops ax88179_ethtool_ops = {
+ 	.get_link		= ethtool_op_get_link,
+ 	.get_msglevel		= usbnet_get_msglevel,
+@@ -998,7 +992,7 @@ static const struct net_device_ops ax88179_netdev_ops = {
+ 	.ndo_change_mtu		= ax88179_change_mtu,
+ 	.ndo_set_mac_address	= ax88179_set_mac_addr,
+ 	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_eth_ioctl		= ax88179_ioctl,
++	.ndo_eth_ioctl		= usbnet_mii_ioctl,
+ 	.ndo_set_rx_mode	= ax88179_set_multicast,
+ 	.ndo_set_features	= ax88179_set_features,
+ };
+diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
+index 5540f7ec4906..f040b9673579 100644
+--- a/drivers/net/usb/dm9601.c
++++ b/drivers/net/usb/dm9601.c
+@@ -266,13 +266,6 @@ static void dm9601_get_drvinfo(struct net_device *net,
+ 	usbnet_get_drvinfo(net, info);
+ }
+ 
+-static int dm9601_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
+-{
+-	struct usbnet *dev = netdev_priv(net);
+-
+-	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
+-}
+-
+ static const struct ethtool_ops dm9601_ethtool_ops = {
+ 	.get_drvinfo	= dm9601_get_drvinfo,
+ 	.get_link	= usbnet_get_link,
+@@ -344,7 +337,7 @@ static const struct net_device_ops dm9601_netdev_ops = {
+ 	.ndo_change_mtu		= usbnet_change_mtu,
+ 	.ndo_get_stats64	= dev_get_tstats64,
+ 	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_eth_ioctl		= dm9601_ioctl,
++	.ndo_eth_ioctl		= usbnet_mii_ioctl,
+ 	.ndo_set_rx_mode	= dm9601_set_multicast,
+ 	.ndo_set_mac_address	= dm9601_set_mac_address,
+ };
+diff --git a/drivers/net/usb/mcs7830.c b/drivers/net/usb/mcs7830.c
+index fdda0616704e..1aa57645f9ca 100644
+--- a/drivers/net/usb/mcs7830.c
++++ b/drivers/net/usb/mcs7830.c
+@@ -325,12 +325,6 @@ static void mcs7830_mdio_write(struct net_device *netdev, int phy_id,
+ 	mcs7830_write_phy(dev, location, val);
+ }
+ 
+-static int mcs7830_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
+-{
+-	struct usbnet *dev = netdev_priv(net);
+-	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
+-}
+-
+ static inline struct mcs7830_data *mcs7830_get_data(struct usbnet *dev)
+ {
+ 	return (struct mcs7830_data *)&dev->data;
+@@ -473,7 +467,7 @@ static const struct net_device_ops mcs7830_netdev_ops = {
+ 	.ndo_change_mtu		= usbnet_change_mtu,
+ 	.ndo_get_stats64	= dev_get_tstats64,
+ 	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_eth_ioctl		= mcs7830_ioctl,
++	.ndo_eth_ioctl		= usbnet_mii_ioctl,
+ 	.ndo_set_rx_mode	= mcs7830_set_multicast,
+ 	.ndo_set_mac_address	= mcs7830_set_mac_address,
+ };
+diff --git a/drivers/net/usb/smsc75xx.c b/drivers/net/usb/smsc75xx.c
+index 78c821349f48..cbc7101e05a6 100644
+--- a/drivers/net/usb/smsc75xx.c
++++ b/drivers/net/usb/smsc75xx.c
+@@ -744,12 +744,10 @@ static const struct ethtool_ops smsc75xx_ethtool_ops = {
+ 
+ static int smsc75xx_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
+ {
+-	struct usbnet *dev = netdev_priv(netdev);
+-
+ 	if (!netif_running(netdev))
+ 		return -EINVAL;
+ 
+-	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
++	return usbnet_mii_ioctl(netdev, rq, cmd);
+ }
+ 
+ static void smsc75xx_init_mac_address(struct usbnet *dev)
+diff --git a/drivers/net/usb/sr9800.c b/drivers/net/usb/sr9800.c
+index ee8c6c9d3962..d32b0f78ab33 100644
+--- a/drivers/net/usb/sr9800.c
++++ b/drivers/net/usb/sr9800.c
+@@ -478,13 +478,6 @@ static void sr_get_drvinfo(struct net_device *net,
+ 	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
+ }
+ 
+-static int sr_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
+-{
+-	struct usbnet *dev = netdev_priv(net);
+-
+-	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
+-}
+-
+ static int sr_set_mac_address(struct net_device *net, void *p)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+@@ -677,7 +670,7 @@ static const struct net_device_ops sr9800_netdev_ops = {
+ 	.ndo_get_stats64	= dev_get_tstats64,
+ 	.ndo_set_mac_address	= sr_set_mac_address,
+ 	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_eth_ioctl		= sr_ioctl,
++	.ndo_eth_ioctl		= usbnet_mii_ioctl,
+ 	.ndo_set_rx_mode        = sr_set_multicast,
+ };
+ 
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 9280ef544bbb..41b95b04143d 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1085,6 +1085,14 @@ int usbnet_nway_reset(struct net_device *net)
+ }
+ EXPORT_SYMBOL_GPL(usbnet_nway_reset);
+ 
++int usbnet_mii_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
++{
++	struct usbnet *dev = netdev_priv(net);
++
++	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
++}
++EXPORT_SYMBOL_GPL(usbnet_mii_ioctl);
++
+ void usbnet_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
+index 2945923a8a95..b0e84896e6ac 100644
+--- a/include/linux/usb/usbnet.h
++++ b/include/linux/usb/usbnet.h
+@@ -290,6 +290,7 @@ extern u32 usbnet_get_msglevel(struct net_device *);
+ extern void usbnet_set_msglevel(struct net_device *, u32);
+ extern void usbnet_set_rx_mode(struct net_device *net);
+ extern void usbnet_get_drvinfo(struct net_device *, struct ethtool_drvinfo *);
++extern int usbnet_mii_ioctl(struct net_device *net, struct ifreq *rq, int cmd);
+ extern int usbnet_nway_reset(struct net_device *net);
+ 
+ extern int usbnet_manage_power(struct usbnet *, int);
 -- 
-2.50.1
+2.43.0
 
 
