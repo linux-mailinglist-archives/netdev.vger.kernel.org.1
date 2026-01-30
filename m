@@ -1,145 +1,129 @@
-Return-Path: <netdev+bounces-255001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPP/M/UffGmgKgIAu9opvQ
-	(envelope-from <netdev+bounces-255001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:05:25 +0100
+	id YDXSJOUgfGmgKgIAu9opvQ
+	(envelope-from <netdev+bounces-255002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:09:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E332B6B3C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:05:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD8EB6B7E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2261B3025166
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:05:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D4DEA30062DC
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C596C1AA7A6;
-	Fri, 30 Jan 2026 03:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 093463009D6;
+	Fri, 30 Jan 2026 03:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KlwQV+TS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aaljESXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C282D7384;
-	Fri, 30 Jan 2026 03:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2718242D8B;
+	Fri, 30 Jan 2026 03:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769742310; cv=none; b=r/KmPB9YKNmKH14qGIBONGAxlHrcO7ail4EzpS438PwRY5c1/Cx1rvhlz3eZhbs5B1gKIMreHe4qaLaiPL7qva2N57bubf7PFUZYLG+TybPzEyJy/Nc1hGjNM3bOno2cajarpR6vitFEFWXqldRcCRFK4I6eMULaxTmWXiNtP5A=
+	t=1769742560; cv=none; b=Mj+D5blPnNHfAr2HVapzhuPNgwLvjDHVPHRVdwdkS5qYmPn7hSDZSQOYSxG46JRwmn3veUAUgnzdjr+t364iJ4+WLt/eluryYQNT4n3ioOafAwyNrC7LQwuwpuBIw78kN3kkc0IUuvhJowoV2LAnDcsvY2zvzdIo7/LxLeiCtwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769742310; c=relaxed/simple;
-	bh=fIrJc6V38Gm1Xzp831y0qUcjo7su1xHPtmVZvEaRb+4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D65v80qK5uOFpMFmRYaUrMS6/EuOmfR8chODL7jMrR9DOMA/U+0xh5ZShZbGRy8WcF/Vdeej1750ki9lWWqVRXuIJa6XQKgOjlTcT9Y9gQbaiTmq+QESEit2r+ZUSg86ZaXG+8ULsrl6Y0xc8VvqS/B+8IT78kpSIQMRxzY2KW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KlwQV+TS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1B1BFi/8fLCjDIghQMyCqBsdwfNOBaYQ5QhAovF8jkQ=; b=KlwQV+TSwfw4pV4qL7mbq8CuOo
-	E97ZOuJxvR6aaj3Apx8scwubXOzPpgAToaQFhGDPEtDaLLRzz7tjj5KjEpTH7gRmFZ6jqZikW3OT6
-	LEnMLwGSzKWW0XquTB8mJQNH+jcFayqYyCMhuOG1J+nZ8kwiT/U/gu3aoyocewI16B/A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vleoB-005R2o-6Z; Fri, 30 Jan 2026 04:04:31 +0100
-Date: Fri, 30 Jan 2026 04:04:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sam <sam.chen@nebula-matrix.com>
-Cc: Illusion Wang <illusion.wang@nebula-matrix.com>,
-	Dimon <dimon.zhao@nebula-matrix.com>,
-	Alvin <alvin.wang@nebula-matrix.com>,
-	netdev <netdev@vger.kernel.org>,
-	andrew+netdev <andrew+netdev@lunn.ch>, corbet <corbet@lwn.net>,
-	kuba <kuba@kernel.org>, linux-doc <linux-doc@vger.kernel.org>,
-	lorenzo <lorenzo@kernel.org>, pabeni <pabeni@redhat.com>,
-	horms <horms@kernel.org>,
-	"vadim.fedorenko" <vadim.fedorenko@linux.dev>,
-	"lukas.bulwahn" <lukas.bulwahn@redhat.com>, hawk <hawk@kernel.org>,
-	ast <ast@kernel.org>, bpf <bpf@vger.kernel.org>,
-	sdf <sdf@fomichev.me>, daniel <daniel@iogearbox.net>,
-	"john.fastabend" <john.fastabend@gmail.com>,
-	edumazet <edumazet@google.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: =?utf-8?B?5Zue5aSN77ya5Zue5aSN77yaW1BB?=
- =?utf-8?Q?TCH_v3_net-nex?= =?utf-8?Q?t?= 01/15] net/nebula-matrix: add
- minimum nbl build framework
-Message-ID: <ecbf1ba5-6ef9-4d94-8240-518852050f03@lunn.ch>
-References: <20260123011804.31263-1-illusion.wang@nebula-matrix.com>
- <20260123011804.31263-2-illusion.wang@nebula-matrix.com>
- <88c7e349-f941-4216-89ca-70a49e82b378@lunn.ch>
- <ad0a6f0f-3ce3-4f38-b27d-2f121511d6e3.illusion.wang@nebula-matrix.com>
- <c1536b51-f441-45ca-8bfb-d5f7d8230713@lunn.ch>
- <152750cb-ab8c-4f08-9c6a-6b69ec185f30.sam.chen@nebula-matrix.com>
+	s=arc-20240116; t=1769742560; c=relaxed/simple;
+	bh=DPs443/dDi9QRedBrFczLj5v8+8O7Pbgl6i9yZ6jA5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JC1IHg1vM1ST8ZPHfvY5km48au8QpF7NSNAUDc3gMan6IfyplkAJzYd1xOJ+xt5y9FoXcyn3H+W5b3zJDYuZX85CMzBzWVNOhGWbAoCGaoJmHq3nMcqyTcZGUBuKhi8ldsAFxajpE8qRovbXB4I+dU2hgpptWL/ZqR7TsvCdfWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aaljESXf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE100C4CEF7;
+	Fri, 30 Jan 2026 03:09:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769742560;
+	bh=DPs443/dDi9QRedBrFczLj5v8+8O7Pbgl6i9yZ6jA5M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aaljESXfEaTXZvXMvqeeHo3tznCks1RupiizDBdosQawomda4Da/zsrz+KPj//kgX
+	 gnK+K95xIvoB0VIPvTtlc8HkSEYk74B/qHgzqER3VuaEFJdMmRdJRNZ+n0jWvk9ZJ6
+	 X1nDcZqW2VDbfLdg7OCQvK3tELEkNQtI64NFxXDV1aP1mbt2nYyQUwAKkdPyAkXt0v
+	 UGSBc4RbVNWC9oZB9d0Wb7SwSLIAPXRMYCd3zDqGCv/F0T9dnlSr+2hq/0+U8ByVIl
+	 HEHRLD+2WYKt8p7MlSeSVDoXayUdZYRGzK1l1Hv89EYuNQYldU0tXwYuXt9sJOkQ6+
+	 fl9O3mB0YgvRQ==
+Date: Thu, 29 Jan 2026 19:09:18 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
+ syzbot+1ec2f6a450f0b54af8c8@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stanislav Fomichev
+ <sdf@fomichev.me>, Marco Crivellari <marco.crivellari@suse.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v1] linkwatch: hold dev reference to prevent
+ UAF in __linkwatch_run_queue()
+Message-ID: <20260129190918.4d63d241@kernel.org>
+In-Reply-To: <20260128031012.195016-1-jiayuan.chen@linux.dev>
+References: <20260128031012.195016-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <152750cb-ab8c-4f08-9c6a-6b69ec185f30.sam.chen@nebula-matrix.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255001-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,fomichev.me,iogearbox.net,gmail.com,google.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-255002-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,1ec2f6a450f0b54af8c8];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6E332B6B3C
+X-Rspamd-Queue-Id: EFD8EB6B7E
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 10:23:50AM +0800, Sam wrote:
-> Thank you for your feedback. I understand what you mean.The reasons why
-> we cannot change the module name now are as follows:
-> Our driver has already been integrated into multiple communities, and
-> the module name is nbl_core. Many customers have already deployed it. If
-> we change the name, there will be a critical problem of conflict between
-> the two modules during subsequent online driver upgrades.
+On Wed, 28 Jan 2026 11:10:07 +0800 Jiayuan Chen wrote:
+> Subject: [PATCH net-next v1] linkwatch: hold dev reference to prevent UAF in __linkwatch_run_queue()
 
-To a large extent, mainline does not care about your vendor driver,
-and it does not care about any compatibility issues between your
-vendor driver and mainline.
+please use net rather than net-next for fixes.
 
-I've not looked at your driver in detail yet so i cannot comment on
-your driver in particular. But we often see vendor drivers do things
-mainline does not allow. Custom ioctl handlers, files in /sys, write
-APIs in debugfs, statistic counters wrongly grouped, etc. In a vendor
-driver this is O.K, this is all open source, you are free to do what
-you want. But when it comes to mainline, you have to keep to the
-mainline rules. Such code will need to be removed, or reworked,
-breaking compatibility with your vendor driver.
+>  		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
+>  		spin_unlock_irq(&lweventlist_lock);
+> +
+> +		/*
+> +		 * Hold extra reference to protect netdev_unlock_ops().
+> +		 * linkwatch_do_dev() calls __dev_put() which releases
+> +		 * the linkwatch reference. Without this extra hold,
+> +		 * the device could be freed by netdev_run_todo() before
+> +		 * we call netdev_unlock_ops().
+> +		 */
+> +		__dev_hold(dev);
+>  		netdev_lock_ops(dev);
+>  		linkwatch_do_dev(dev);
+>  		netdev_unlock_ops(dev);
+> +		__dev_put(dev);
 
-So it can be advantages to have different names, it then become clear
-if a customer is using the vendor driver, or is using mainline.
-
-   Andrew
-
-
-
+Please move the dev_put() from inside linkwatch_do_dev() out to its
+(3) callers, instead of taking another ref. The dev_put() inside
+linkwatch_do_dev() logically pairs with de-listing the device so
+it's reasonable for the caller that did the de-listing to do it.
+(of course that'll let you move it after the unlock)
+-- 
+pw-bot: cr
 
