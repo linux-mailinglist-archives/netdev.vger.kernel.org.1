@@ -1,168 +1,185 @@
-Return-Path: <netdev+bounces-255005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BSIOzEmfGkFKwIAu9opvQ
-	(envelope-from <netdev+bounces-255005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:32:02 +0100
+	id KHwFFbwnfGkiKwIAu9opvQ
+	(envelope-from <netdev+bounces-255006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:38:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E43BB6D8F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:32:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB1F3B6DBB
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 04:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C47F30097F4
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:31:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 696EA3013713
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B543C2857F1;
-	Fri, 30 Jan 2026 03:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438712DCF6C;
+	Fri, 30 Jan 2026 03:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N3P5Wun2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-145.mail.aliyun.com (out28-145.mail.aliyun.com [115.124.28.145])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C7E18BBAE;
-	Fri, 30 Jan 2026 03:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205AC3FF1;
+	Fri, 30 Jan 2026 03:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769743894; cv=none; b=tDr0nH89u4flSa1GZyVrcyRl+fQtEFSIq71me0h+KZy5MJGl8+zkeZruLw7M0yiZPA3SWfmP0ouvWJqbCMEEx0HOVHy5HJYwcOfIf3ByY1nEOYQnjSadQ5fTrYiwPWbacY/Ei9dm8/BEHa1oLIBd4KZB52j2Z+9xJ9M76m3d/64=
+	t=1769744312; cv=none; b=u953u4FjTh+YQwPIQzlcolhmASBSM/IKDJyuEaDIy4u2GHSyzwu//aRA1WpLvzpcQZqi+YV21IKXJMTNVCjjipT0tipMIXeT3diL5McDeu5lCwRRUPd657HEj9QehhPl0bR/UURDT5o4sS7j4uhkDFIwvN/d6T/NRk7fKxRfjrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769743894; c=relaxed/simple;
-	bh=27yybq+avVH2XtAjsD74kux4Qf/z/5pQwP4wOaT/gHo=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:References:
-	 In-Reply-To:Content-Type; b=tEuevrEk6Xsazrbyd5tTvifawWNHMldKPAH8GUWo/4e9/4S6x62fH+KrxLlUiFOtmB8x9xpnwJNS5LZYzPHnpe74pJxboHZ0Vm3AWpWoUS91xbjaUBUlG0BBhXtJs5gljuxZVK23OLb61JT5AXPsQJT205GtnLVx16MbnLY8urk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07416409|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.569133-0.00336644-0.427501;FP=5473539915353087302|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033045220102;MF=sam.chen@nebula-matrix.com;NM=1;PH=DW;RN=22;RT=22;SR=0;TI=W4_0.2.3_212505AD_1769743879611_o7001c409;
-Received: from WS-web (sam.chen@nebula-matrix.com[W4_0.2.3_212505AD_1769743879611_o7001c409] cluster:ay29) at Fri, 30 Jan 2026 11:31:27 +0800
-Date: Fri, 30 Jan 2026 11:31:27 +0800
-From: "Sam" <sam.chen@nebula-matrix.com>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: "Illusion Wang" <illusion.wang@nebula-matrix.com>,
-  "Dimon" <dimon.zhao@nebula-matrix.com>,
-  "Alvin" <alvin.wang@nebula-matrix.com>,
-  "netdev" <netdev@vger.kernel.org>,
-  "andrew+netdev" <andrew+netdev@lunn.ch>,
-  "corbet" <corbet@lwn.net>,
-  "kuba" <kuba@kernel.org>,
-  "linux-doc" <linux-doc@vger.kernel.org>,
-  "lorenzo" <lorenzo@kernel.org>,
-  "pabeni" <pabeni@redhat.com>,
-  "horms" <horms@kernel.org>,
-  "vadim.fedorenko" <vadim.fedorenko@linux.dev>,
-  "lukas.bulwahn" <lukas.bulwahn@redhat.com>,
-  "hawk" <hawk@kernel.org>,
-  "ast" <ast@kernel.org>,
-  "bpf" <bpf@vger.kernel.org>,
-  "sdf" <sdf@fomichev.me>,
-  "daniel" <daniel@iogearbox.net>,
-  "john.fastabend" <john.fastabend@gmail.com>,
-  "edumazet" <edumazet@google.com>,
-  "open list" <linux-kernel@vger.kernel.org>
-Reply-To: "Sam" <sam.chen@nebula-matrix.com>
-Message-ID: <17d3aa72-23a8-4ea8-9721-bc20fe39fdf4.sam.chen@nebula-matrix.com>
-Subject: =?UTF-8?B?5Zue5aSN77ya5Zue5aSN77ya5Zue5aSN77yaW1BBVENIIHYzIG5ldC1uZXh0IDAxLzE1XSBu?=
-  =?UTF-8?B?ZXQvbmVidWxhLW1hdHJpeDogYWRkIG1pbmltdW0gbmJsIGJ1aWxkIGZyYW1ld29yaw==?=
-X-Mailer: [Alimail-Mailagent][W4_0.2.3][null][Chrome]
+	s=arc-20240116; t=1769744312; c=relaxed/simple;
+	bh=IF1Wqx2TIJcC5YIyg8xCcU6RmGU8W2yyLN215CmEcns=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GwCDkuQZ+o0RIplktQixgF9r0MGDlRFUlETAKNJwpKJklGQ/6lsFcTrYpNu99VPuC+z7RVvalj1TbBbDZs04ePNf0TFLcLzS6jHddUVQMOyAkuZHqE5ryZ7EmCliIsbQoUxTK/hemhWSbIgXzSvcxOcsl/udccQuAgBgNHV6vLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N3P5Wun2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19E1C4CEF7;
+	Fri, 30 Jan 2026 03:38:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769744311;
+	bh=IF1Wqx2TIJcC5YIyg8xCcU6RmGU8W2yyLN215CmEcns=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N3P5Wun2RJzScLVeaMRsq72ND7Q4wbWzJWbHJYRvPyt803dvY5vYBgVp0cXRWUbmd
+	 rzEQqYSjqp6ulP4WOpIUxXkDSK5eoQPE6K3Vu+7+S1xE0aEztmx0vlOOF2nguR+8a0
+	 AyCXzoBuq5PkIJTxC4Lkn0iaHNJFRIWoL282tiqO8WA26upAQM6P/GSA3USxeZqcbx
+	 7j0vC8qzl5LMW4O/bDFj1bM7xKkQ38YTm0Hvmzot7Gpn5lDFCbEWHdCQSRBK0Ed6NB
+	 GpiCI6YfWobFOySnDTGdZXHmE7bX3YkzwBt6EHry4i2L6W9wHhH5YePVC9SNL5iOSL
+	 leY7iKwXYpXHw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Gal Pressman <gal@nvidia.com>,
+	ast@kernel.org,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	dsahern@gmail.com,
+	bpf@vger.kernel.org
+Subject: [PATCH net v2] net: don't touch dev->stats in BPF redirect paths
+Date: Thu, 29 Jan 2026 19:38:27 -0800
+Message-ID: <20260130033827.698841-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-x-aliyun-im-through: {"version":"v1.0"}
-References: <20260123011804.31263-1-illusion.wang@nebula-matrix.com> <20260123011804.31263-2-illusion.wang@nebula-matrix.com> <88c7e349-f941-4216-89ca-70a49e82b378@lunn.ch> <ad0a6f0f-3ce3-4f38-b27d-2f121511d6e3.illusion.wang@nebula-matrix.com> <c1536b51-f441-45ca-8bfb-d5f7d8230713@lunn.ch> <152750cb-ab8c-4f08-9c6a-6b69ec185f30.sam.chen@nebula-matrix.com>,<ecbf1ba5-6ef9-4d94-8240-518852050f03@lunn.ch>
-x-aliyun-mail-creator: W4_0.2.3_null_EuMTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMy4wLjY5NDMuMTQyIFNhZmFyaS81MzcuMzYgZGluZ3RhbGstd2luLzEuMC4wIG53KDAuMTQuNykgRGluZ1RhbGsoOC4yLjUtUmVsZWFzZS4yNjAxMTMwMDYpIE1vam8vMS4wLjAgTmF0aXZlIEFwcFR5cGUocmVsZWFzZSkgQ2hhbm5lbC8yMDEyMDAgQXJjaGl0ZWN0dXJlL3g4Nl82NCB3ZWJEdC9QQw==uL
-In-Reply-To: <ecbf1ba5-6ef9-4d94-8240-518852050f03@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,iogearbox.net,nvidia.com,gmail.com,linux.dev,fomichev.me];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-255006-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[nebula-matrix.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255005-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nebula-matrix.com:replyto,nebula-matrix.com:email,nebula-matrix.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,fomichev.me:email,lunn.ch:email,lwn.net:email,iogearbox.net:email];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[sam.chen@nebula-matrix.com];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam.chen@nebula-matrix.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,fomichev.me,iogearbox.net,gmail.com,google.com];
-	NEURAL_HAM(-0.00)[-0.982];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 4E43BB6D8F
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,fomichev.me:email,iogearbox.net:email]
+X-Rspamd-Queue-Id: BB1F3B6DBB
 X-Rspamd-Action: no action
 
-VGhhbmsgeW91IGZvciB5b3VyIGZlZWRiYWNrLiBZb3UgbWlnaHQgaGF2ZSBtaXN1bmRlcnN0b29k
-IG1lLgpPdXIgZGlmZmljdWx0aWVzIGxpZSBpbiB0aGUgZm9sbG93aW5nOgoxLiBBc3N1bWluZyBv
-bmx5IHRoZSBtYWlubGluZSB2ZXJzaW9uIGNoYW5nZXMgdGhlIG5hbWUgKEFzc3VtZSBuYW1lICJu
-YmwiKSwKIMKgIGFuZCBvdXIgcmVndWxhcmx5IHJlbGVhc2VkIGRyaXZlciBkb2Vzbid0IGNoYW5n
-ZSBpdHMgbmFtZSwgdGhlbiB3aGVuCiDCoCBjdXN0b21lcnMgdXBncmFkZSB0byBhIG5ldyBrZXJu
-ZWwgKGNvbnRhaW5pbmcgdGhlICJuYmwiIGRyaXZlciksCiDCoCBhbmQgdGhlbiB3YW50IHRvIHVw
-ZGF0ZSBvdXIgcmVndWxhcmx5IHJlbGVhc2VkIGRyaXZlciAobmFtZWQgIm5ibF9jb3JlIiksCiDC
-oCB0aGUgbW9kdWxlIChrbykgY29uZmxpY3Qgd2lsbCBvY2N1ci4KMi4gSWYgYm90aCBvdXIgbWFp
-bmxpbmUgYW5kIHJlZ3VsYXJseSByZWxlYXNlZCBkcml2ZXJzIGNoYW5nZSB0aGVpciBuYW1lcywK
-IMKgIHRoZW4gY3VzdG9tZXJzIHdobyBhcmUgYWxyZWFkeSB1c2luZyB0aGUgIm5ibF9jb3JlIiBk
-cml2ZXIgd2lsbCBhbHNvCiDCoCBlbmNvdW50ZXIgY29uZmxpY3QgaXNzdWVzIHdoZW4gdXBkYXRp
-bmcgdG8gdGhlIG5ldyBkcml2ZXIgIm5ibCIuCgpJcyBpdCBwb3NzaWJsZSB0byBkbyB0aGlzOiBv
-dXIgbmV0IGRyaXZlciBpcyBhbHNvIG1vZGlmaWVkIHRvIGJlIGEgZHJpdmVyIGJhc2VkCm9uIHRo
-ZSBhdXhpbGlhcnkgYnVzLCB3aGlsZSB0aGUgUENJZSBkcml2ZXIgb25seSBoYW5kbGVzIFBDSWUt
-cmVsYXRlZCBwcm9jZXNzaW5nLAphbmQgdGhlc2UgdHdvIGRyaXZlcnMgc2hhcmUgYSBzaW5nbGUg
-a2VybmVsIG1vZHVsZSAoa28pLCBuYW1lbHkgIm5ibF9jb3JlIj8KLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuWPkeS7tuS6
-uu+8mkFuZHJldyBMdW5uIDxhbmRyZXdAbHVubi5jaD4K5Y+R6YCB5pe26Ze077yaMjAyNuW5tDHm
-nIgzMOaXpSjlkajkupQpIDExOjA0CuaUtuS7tuS6uu+8mlNhbTxzYW0uY2hlbkBuZWJ1bGEtbWF0
-cml4LmNvbT4K5oqE44CA6YCB77yaSWxsdXNpb24gV2FuZzxpbGx1c2lvbi53YW5nQG5lYnVsYS1t
-YXRyaXguY29tPjsgRGltb248ZGltb24uemhhb0BuZWJ1bGEtbWF0cml4LmNvbT47IEFsdmluPGFs
-dmluLndhbmdAbmVidWxhLW1hdHJpeC5jb20+OyBuZXRkZXY8bmV0ZGV2QHZnZXIua2VybmVsLm9y
-Zz47ICJhbmRyZXcrbmV0ZGV2IjxhbmRyZXcrbmV0ZGV2QGx1bm4uY2g+OyBjb3JiZXQ8Y29yYmV0
-QGx3bi5uZXQ+OyBrdWJhPGt1YmFAa2VybmVsLm9yZz47ICJsaW51eC1kb2MiPGxpbnV4LWRvY0B2
-Z2VyLmtlcm5lbC5vcmc+OyBsb3JlbnpvPGxvcmVuem9Aa2VybmVsLm9yZz47IHBhYmVuaTxwYWJl
-bmlAcmVkaGF0LmNvbT47IGhvcm1zPGhvcm1zQGtlcm5lbC5vcmc+OyAidmFkaW0uZmVkb3Jlbmtv
-Ijx2YWRpbS5mZWRvcmVua29AbGludXguZGV2PjsgImx1a2FzLmJ1bHdhaG4iPGx1a2FzLmJ1bHdh
-aG5AcmVkaGF0LmNvbT47IGhhd2s8aGF3a0BrZXJuZWwub3JnPjsgYXN0PGFzdEBrZXJuZWwub3Jn
-PjsgYnBmPGJwZkB2Z2VyLmtlcm5lbC5vcmc+OyBzZGY8c2RmQGZvbWljaGV2Lm1lPjsgZGFuaWVs
-PGRhbmllbEBpb2dlYXJib3gubmV0PjsgImpvaG4uZmFzdGFiZW5kIjxqb2huLmZhc3RhYmVuZEBn
-bWFpbC5jb20+OyBlZHVtYXpldDxlZHVtYXpldEBnb29nbGUuY29tPjsgb3BlbiBsaXN0PGxpbnV4
-LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+CuS4u+OAgOmimO+8mlJlOiDlm57lpI3vvJrlm57lpI3v
-vJpbUEFUQ0ggdjMgbmV0LW5leHQgMDEvMTVdIG5ldC9uZWJ1bGEtbWF0cml4OiBhZGQgbWluaW11
-bSBuYmwgYnVpbGQgZnJhbWV3b3JrCgoKT24gRnJpLCBKYW4gMzAsIDIwMjYgYXQgMTA6MjM6NTBB
-TSArMDgwMCwgU2FtIHdyb3RlOgo+IFRoYW5rIHlvdSBmb3IgeW91ciBmZWVkYmFjay4gSSB1bmRl
-cnN0YW5kIHdoYXQgeW91IG1lYW4uVGhlIHJlYXNvbnMgd2h5Cj4gd2UgY2Fubm90IGNoYW5nZSB0
-aGUgbW9kdWxlIG5hbWUgbm93IGFyZSBhcyBmb2xsb3dzOgo+IE91ciBkcml2ZXIgaGFzIGFscmVh
-ZHkgYmVlbiBpbnRlZ3JhdGVkIGludG8gbXVsdGlwbGUgY29tbXVuaXRpZXMsIGFuZAo+IHRoZSBt
-b2R1bGUgbmFtZSBpcyBuYmxfY29yZS4gTWFueSBjdXN0b21lcnMgaGF2ZSBhbHJlYWR5IGRlcGxv
-eWVkIGl0LiBJZgo+IHdlIGNoYW5nZSB0aGUgbmFtZSwgdGhlcmUgd2lsbCBiZSBhIGNyaXRpY2Fs
-IHByb2JsZW0gb2YgY29uZmxpY3QgYmV0d2Vlbgo+IHRoZSB0d28gbW9kdWxlcyBkdXJpbmcgc3Vi
-c2VxdWVudCBvbmxpbmUgZHJpdmVyIHVwZ3JhZGVzLgoKVG8gYSBsYXJnZSBleHRlbnQsIG1haW5s
-aW5lIGRvZXMgbm90IGNhcmUgYWJvdXQgeW91ciB2ZW5kb3IgZHJpdmVyLAphbmQgaXQgZG9lcyBu
-b3QgY2FyZSBhYm91dCBhbnkgY29tcGF0aWJpbGl0eSBpc3N1ZXMgYmV0d2VlbiB5b3VyCnZlbmRv
-ciBkcml2ZXIgYW5kIG1haW5saW5lLgoKSSd2ZSBub3QgbG9va2VkIGF0IHlvdXIgZHJpdmVyIGlu
-IGRldGFpbCB5ZXQgc28gaSBjYW5ub3QgY29tbWVudCBvbgp5b3VyIGRyaXZlciBpbiBwYXJ0aWN1
-bGFyLiBCdXQgd2Ugb2Z0ZW4gc2VlIHZlbmRvciBkcml2ZXJzIGRvIHRoaW5ncwptYWlubGluZSBk
-b2VzIG5vdCBhbGxvdy4gQ3VzdG9tIGlvY3RsIGhhbmRsZXJzLCBmaWxlcyBpbiAvc3lzLCB3cml0
-ZQpBUElzIGluIGRlYnVnZnMsIHN0YXRpc3RpYyBjb3VudGVycyB3cm9uZ2x5IGdyb3VwZWQsIGV0
-Yy4gSW4gYSB2ZW5kb3IKZHJpdmVyIHRoaXMgaXMgTy5LLCB0aGlzIGlzIGFsbCBvcGVuIHNvdXJj
-ZSwgeW91IGFyZSBmcmVlIHRvIGRvIHdoYXQKeW91IHdhbnQuIEJ1dCB3aGVuIGl0IGNvbWVzIHRv
-IG1haW5saW5lLCB5b3UgaGF2ZSB0byBrZWVwIHRvIHRoZQptYWlubGluZSBydWxlcy4gU3VjaCBj
-b2RlIHdpbGwgbmVlZCB0byBiZSByZW1vdmVkLCBvciByZXdvcmtlZCwKYnJlYWtpbmcgY29tcGF0
-aWJpbGl0eSB3aXRoIHlvdXIgdmVuZG9yIGRyaXZlci4KClNvIGl0IGNhbiBiZSBhZHZhbnRhZ2Vz
-IHRvIGhhdmUgZGlmZmVyZW50IG5hbWVzLCBpdCB0aGVuIGJlY29tZSBjbGVhcgppZiBhIGN1c3Rv
-bWVyIGlzIHVzaW5nIHRoZSB2ZW5kb3IgZHJpdmVyLCBvciBpcyB1c2luZyBtYWlubGluZS4KCiDC
-oCBBbmRyZXcKCgo=
+Gal reports that BPF redirect increments dev->stats.tx_errors
+on failure. This is not correct, most modern drivers completely
+ignore dev->stats so these drops will be invisible to the user.
+Core code should use the dedicated core stats which are folded
+into device stats in dev_get_stats().
+
+Note that we're switching from tx_errors to tx_dropped.
+Core only has tx_dropped, hence presumably users already expect
+that counter to increment for "stack" Tx issues.
+
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Reported-by: Gal Pressman <gal@nvidia.com>
+Link: https://lore.kernel.org/c5df3b60-246a-4030-9c9a-0a35cd1ca924@nvidia.com
+Fixes: b4ab31414970 ("bpf: Add redirect_neigh helper as redirect drop-in")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - add note on tx_dropped to the commit msg
+v1: https://lore.kernel.org/20260128161030.39870-1-kuba@kernel.org
+
+CC: ast@kernel.org
+CC: eddyz87@gmail.com
+CC: song@kernel.org
+CC: yonghong.song@linux.dev
+CC: john.fastabend@gmail.com
+CC: kpsingh@kernel.org
+CC: sdf@fomichev.me
+CC: haoluo@google.com
+CC: jolsa@kernel.org
+CC: dsahern@gmail.com
+CC: bpf@vger.kernel.org
+---
+ net/core/filter.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 616e0520a0bb..2c21735798a5 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2289,12 +2289,12 @@ static int __bpf_redirect_neigh_v6(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = bpf_out_neigh_v6(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		DEV_STATS_INC(dev, tx_errors);
++		dev_core_stats_tx_dropped_inc(dev);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	DEV_STATS_INC(dev, tx_errors);
++	dev_core_stats_tx_dropped_inc(dev);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+@@ -2396,12 +2396,12 @@ static int __bpf_redirect_neigh_v4(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = bpf_out_neigh_v4(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		DEV_STATS_INC(dev, tx_errors);
++		dev_core_stats_tx_dropped_inc(dev);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	DEV_STATS_INC(dev, tx_errors);
++	dev_core_stats_tx_dropped_inc(dev);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+-- 
+2.52.0
+
 
