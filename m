@@ -1,133 +1,155 @@
-Return-Path: <netdev+bounces-255233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255234-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBV+DiYEfWmRPwIAu9opvQ
-	(envelope-from <netdev+bounces-255233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:19:02 +0100
+	id AM5CEjIEfWmRPwIAu9opvQ
+	(envelope-from <netdev+bounces-255234-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:19:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8F9BE0EB
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:19:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D22D5BE0F9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 20:19:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 63422303E383
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:19:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 179F53008D53
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D3B387596;
-	Fri, 30 Jan 2026 19:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F753876CC;
+	Fri, 30 Jan 2026 19:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NpZRguy8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ans4m2S0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f73.google.com (mail-yx1-f73.google.com [74.125.224.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D906374196
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2B63876B0
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769800737; cv=none; b=XTJrLVxIEd8sk3pALNLRmBEVCdWsx+I+Zf/D9qs4L+92yjJYWOsKvcIN8i+j0N8S88q0FLaXYV41JEQ+r8tQu/lh9exrOx1AZwbCfJMGwX68e1mm0dRgUbtlftyy5GZWjrs8yK1Yl2QYN3SI5s3QB6kPhRUHlV78pLtKLLQx4VU=
+	t=1769800750; cv=none; b=L0nfT1s+AZFVz0uMszJrhYZ+HoFZtlda/KVgIfD3oNkKohAxpEIJNgx2cpbj0L1HFd0r1ura+jEItNwJvL++gPNVvrgKwCg4q8E9PUB2NsEtbomefRHRJi82GQuEd/LPIn4rkGonGX34U4wGy+/q5qsg3ts0mUvu5urc2CZEDQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769800737; c=relaxed/simple;
-	bh=2AhY+WzF0t3dfHKI/s7gCokW2fhsAvXVoNXQlUxnogg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=saydAxrCob41+NOogq3vmnq+3kE4Om5jRgUf5gkPfIQWriyHenvuIIiLizfiMsIO43mdIAMcvjJqdco2DfW9Vw5clYCiI4BCxZ5nUcI7L8dUR7Ic53lqQ+oZaARr/Nco0u2/ZfFcTWN/CGTnlqHM+T3OqAUIOv2D4mO+Y4FNA1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NpZRguy8; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 49FFCC22F63;
-	Fri, 30 Jan 2026 19:18:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A3C8E6075A;
-	Fri, 30 Jan 2026 19:18:52 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9CF06119A885C;
-	Fri, 30 Jan 2026 20:18:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769800731; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Y4FPRRHG65/7gK1cs/oNVTykKIz42PNB3W+KzByRE1A=;
-	b=NpZRguy8oaVdBEFrYrzUp16bYHyPP/N9L0XrejaRHGf3l3cNE/RsxCf7qX2IErg3JBOa9/
-	L8OS1+gaSoEYt4BnHzcbFCSlpwnTSFZnw+2jFBiYhvTi77ZyhqRBBFTB0DGlM6+V0nDGyk
-	mFF9+9DzhZCzliXBJ9GUnZIBHohfHJJ9FuukEuYqVfeurYbBteFLOHabFijM5hmD2+96jp
-	OTl5YxhgJjtjJDnPXkyj/HjGopuZRXOHONy05Qc8jxEVrJiydrwUVZk8Q7laI2qY0Jz4Cz
-	Z13S2xykO/dwa9BrBTHCaRmwiWiyrWMKxp3BaEAx0Ws+Hw1s6qHznp2cQN6+Bg==
-Message-ID: <ee26c05c-a7dd-4334-b359-353449e50662@bootlin.com>
-Date: Fri, 30 Jan 2026 20:18:44 +0100
+	s=arc-20240116; t=1769800750; c=relaxed/simple;
+	bh=o1hke0QIyu4gHl1GaICw9kCzPdlm+XTFOvyLdnvxTd8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ni9SlUY0dJNWL/8HsJ0x3VAu/LwEkysYxg0ziyMDR76ejdPGTclMIMS9Jkkdmd9rKXTHZcHZYCJcbnL4EyzLtKyL2dGXYoZPRnkJfTzwIA3AGYaxxRDlN4vVaurZNLVI1sIiDNXi7Z3sdvidHPjyaznWBwJFrSObhi6ccNBwWlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ans4m2S0; arc=none smtp.client-ip=74.125.224.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yx1-f73.google.com with SMTP id 956f58d0204a3-645535ac027so3621589d50.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:19:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769800748; x=1770405548; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nBwSycvAATKs6athiLo7mH7KoA0xUNuGgi4ee8XCp9Y=;
+        b=ans4m2S0J3nxN2sr//h24pFVO+kY3tkrZAn2kRgZ3vz10p2U5nQSYOVcrjsRsg/QDJ
+         +Rww+iaU1ERjw2jU9DW3pJ4ORvh6U0/F1dakfci5wEqhr2OFtaQkW+yEr5AMp6K9uSTH
+         cZFsJsv8LaoglepRnPDsmnJ96eaxpKyHoKEJ/ef45tLHApO+z4XwxbJWO9oOSF7K0g+S
+         et/2/b7W90cj4nboElHikJ6SaVj1u+tPwXCKoV+DagTz9uCfuVzdH1y7LwaitOmL5LQO
+         tRzCaLa1ML9XwAIoJ6HIsXHKdXSn3y2uZPocbWBwQJqhnEYW1gkwdH85pE3iRbYyg4vz
+         43lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769800748; x=1770405548;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nBwSycvAATKs6athiLo7mH7KoA0xUNuGgi4ee8XCp9Y=;
+        b=QwtjTyRSlqzTOPSzmvIZO2w9fBbldjXUMlFuiCZoEYDD5TTLoSZvyZuGb8gcZNCtE5
+         W4YIRTLYilBZIAnt6NuEeaSkp246ajtgwYhO6zXrVYJSVFaUFuPgioKP3SKxpTljzkgB
+         wKaiwO7UAQMR2KSM7wadOWzVaa46K1FMMI/midZDOKyBMThl4av5fGfZPDcP9kgLo1Ad
+         hJOvKOnvstXcvsg9Kd6nbz/KU0uNYYtXr1/XTWDm+5Rg3jpMiPrge85Ow+CWU51Xf8Pr
+         Q4RW73LZTOWMYN2cbf92eC4xroMZr1v/VNtmDxF5mgOpsgywgRfeVCyGEL1TEzs6tuIG
+         6N+A==
+X-Forwarded-Encrypted: i=1; AJvYcCWxN0z2o3S/qk28Hpk5iTlNMxhw9bv9YrC/IBAlGmJ1z5FCn6CNCOe3rfGl+iMAMS8w+MsF9fM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGkm2embQSOf0crkjyeB1YONEEdz4oPtZOqKZ13tE/tJolU728
+	fYZokop9q8UkfEVXCVPTnCOa0SA/4QkMVcZWq5ekBgUr7qwEFkbZ4Ll6GhlLi7ZnpMEVywul3bA
+	QbRGw42rmxurgNA==
+X-Received: from yxrr22.prod.google.com ([2002:a05:690e:2556:b0:649:9616:aafe])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690e:144d:b0:640:dd02:a777 with SMTP id 956f58d0204a3-649a84e52f4mr3089356d50.69.1769800747997;
+ Fri, 30 Jan 2026 11:19:07 -0800 (PST)
+Date: Fri, 30 Jan 2026 19:19:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: stmmac: clear half-duplex caps where
- unsupported
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aXyRlFw7ZuhRPiKo@shell.armlinux.org.uk>
- <E1vlmOQ-00000006zuz-0ffN@rmk-PC.armlinux.org.uk>
- <9dfdeee0-7758-439b-a2a5-a7f243427cf4@bootlin.com>
- <aXzzxeRsbnF8-nAq@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aXzzxeRsbnF8-nAq@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
+Message-ID: <20260130191906.3781856-1-edumazet@google.com>
+Subject: [PATCH net-next] net: l3mdev: use skb_dst_dev_rcu() in l3mdev_l3_out()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255233-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255234-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
-X-Rspamd-Queue-Id: 9E8F9BE0EB
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D22D5BE0F9
 X-Rspamd-Action: no action
 
-On 30/01/2026 19:09, Russell King (Oracle) wrote:
+Extend the RCU section a bit so that we can use the safer
+skb_dst_dev_rcu() helper.
 
-> If you look at /sys/kernel/debug/stmmaceth/ethX/dma_cap, it should
-> say whether half duplex is supported (I guess in your case it will
-> be, it's probably very unlikely not to be.) However, would be worth
-> knowing whether the if() is taken or not!
-> 
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/l3mdev.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Just rebuilt a kernel w/ debugfs support, and indeed I have :
-[...]
-	10/100 Mbps: Y
-	1000 Mbps: Y
-	Half duplex: Y
-[...]
+diff --git a/include/net/l3mdev.h b/include/net/l3mdev.h
+index 1eb8dad18f7e35baf26db23b44e182540395bba0..710e98665eb36d6154b914bee27a767ecf4f6fac 100644
+--- a/include/net/l3mdev.h
++++ b/include/net/l3mdev.h
+@@ -207,18 +207,19 @@ struct sk_buff *l3mdev_ip6_rcv(struct sk_buff *skb)
+ static inline
+ struct sk_buff *l3mdev_l3_out(struct sock *sk, struct sk_buff *skb, u16 proto)
+ {
+-	struct net_device *dev = skb_dst(skb)->dev;
++	struct net_device *dev;
+ 
++	rcu_read_lock();
++	dev = skb_dst_dev_rcu(skb);
+ 	if (netif_is_l3_slave(dev)) {
+ 		struct net_device *master;
+ 
+-		rcu_read_lock();
+ 		master = netdev_master_upper_dev_get_rcu(dev);
+ 		if (master && master->l3mdev_ops->l3mdev_l3_out)
+ 			skb = master->l3mdev_ops->l3mdev_l3_out(master, sk,
+ 								skb, proto);
+-		rcu_read_unlock();
+ 	}
++	rcu_read_unlock();
+ 
+ 	return skb;
+ }
+-- 
+2.53.0.rc1.225.gd81095ad13-goog
 
-So looks like the if() isn't taken :)
-
-Maxime
 
