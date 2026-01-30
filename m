@@ -1,194 +1,256 @@
-Return-Path: <netdev+bounces-255171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255172-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wDp5E/3OfGlbOwIAu9opvQ
-	(envelope-from <netdev+bounces-255171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:32:13 +0100
+	id EHh9HZPQfGlbOwIAu9opvQ
+	(envelope-from <netdev+bounces-255172-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:38:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD439BC0B9
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:32:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB804BC1AD
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C7F430263FA
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:31:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9904E301104C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE69B329C7E;
-	Fri, 30 Jan 2026 15:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4397336EE3;
+	Fri, 30 Jan 2026 15:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0KQp0ypV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tRQx2Qeq"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="FbJXQXwl";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tO9/gv5J"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341DD31280F;
-	Fri, 30 Jan 2026 15:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145A3334C24;
+	Fri, 30 Jan 2026 15:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769787097; cv=none; b=enDKTXwAMI2BmiOuPP1mCt7Rev8i0SVeMWmFioPoimaf8tkbRcLx8t3GiFxJvZrTRZQNh62IP5YAI8c8QNq3cORdsgY408Bje7HDgWfWQSMP4Cq312ocuLl/NBMa4kpmQsswEc80A9eMJEY3al+g5iDVBIScWy7DjGC2GhpyiZU=
+	t=1769787535; cv=none; b=q1AhKPuHej0AVpAstk/36iAw5WHbJmK/nyoZErfeHGg2KyYsSiGOM4BV0Mqk+wV8h0cRCHSLsPrV5knkesh1kUaSXaSFozWiyPaq3oPObHUuIQTz5iY0twpOTVclKJxoLV7+IYsJNAyhvlkj9ge6yA9o5VWCHz2lDpzGgO27WrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769787097; c=relaxed/simple;
-	bh=fOeDEk/IglYGyJoaC4rl87IP7u52uvkE7LuzzFUoZCQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Pvgq2OAq1zO5WU0Ry5gA3FL8XDE3hoZ9a8R0+hoQcUUmYFaurmO07zP5IP/dSAhLcIUqARx1IYiQUwyQLEsn6SBkK0PZ9eJNCXa0zcgG+xV4zJSXuyzlongo5GTqQmyacpjNUgVMRM2hjR+SEQ9kQ2N61tvy1pjMy57zXDyu1g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0KQp0ypV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tRQx2Qeq; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: John Ogness <john.ogness@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769787091;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vOa37cugu1e7NFG01Hi5lQxNeOFAbNhgF4zlCMpuWB0=;
-	b=0KQp0ypVQ4kZaeO3mPHMfxJV+hK/54vG6DKBi+oQw7b2zUOdcXSHVjzGTkDhg+DII5BPUq
-	aN49RxuHT0Y324cEPE9hahaKdLHrEB12udzdH1NvAbslSIBaR+apFss0VpjAJQGlvJvNWz
-	Qkt0FDwz1uMiX4gq49nlr83YKlkc4clstGJ1Gn1qJZPTuOUjrQYGQ2og6q2aakCd23E2bK
-	j7QeXx4RcIyDXczvYB5hGiBrowZd2spJR3vfcC58o7tRoab9LXrUZs+RPcCpb6cx/pdJtb
-	HBe2qGa1jRaFKPPNxGpTtUqYNPr0BFkp5fHngur0T+mOUqFJcq3Nhz3k8u/Dpw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769787091;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vOa37cugu1e7NFG01Hi5lQxNeOFAbNhgF4zlCMpuWB0=;
-	b=tRQx2QeqDh72ig5xLjiaegMLqnl9AhaSG7GZod8dlzScFDOmHttRC8Fl88vJKoOCPg8W40
-	GHTlrnG5vPdq05BA==
-To: Petr Mladek <pmladek@suse.com>, Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>, Anton Ivanov
- <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Jason Wessel <jason.wessel@windriver.com>,
- Daniel Thompson <danielt@kernel.org>, Douglas Anderson
- <dianders@chromium.org>, Steven Rostedt <rostedt@goodmis.org>, Sergey
- Senozhatsky <senozhatsky@chromium.org>, Jiri Slaby <jirislaby@kernel.org>,
- Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook
- <kees@kernel.org>, Tony Luck <tony.luck@intel.com>, "Guilherme G. Piccoli"
- <gpiccoli@igalia.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
- Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Andreas Larsson
- <andreas@gaisler.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jacky Huang <ychuang3@nuvoton.com>,
- Shan-Chun Hung <schung@nuvoton.com>, Laurentiu Tudor
- <laurentiu.tudor@nxp.com>, linux-um@lists.infradead.org,
- linux-kernel@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
- linux-serial@vger.kernel.org, netdev@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linux-hardening@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 01/19] printk/nbcon: Use an enum to specify the required
- callback in console_is_usable()
-In-Reply-To: <aWZyEHsOJFLRLRKT@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-1-21a291bcf197@suse.com>
- <aWZyEHsOJFLRLRKT@pathway.suse.cz>
-Date: Fri, 30 Jan 2026 16:37:30 +0106
-Message-ID: <878qdf3ynh.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1769787535; c=relaxed/simple;
+	bh=bCzAuoYC2y7MrXXeTCUiZR3MapH4/FvcuXgSkwOlcm0=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=st7MhZZath3KU8umpoCTYbw9Y6vIHJxTyXfEAfI+sNipqXeOs45s/dm7e9Q0kvGz29CVtskbBlrYKPPUPwCbsxjZEmgcbXzxSfoyrD1hGf7VbrEIMRQtu8qgIJEuDvIZQoTid35ZMX9sXVfODGHe5vlpo0RddMNPt33otiHvb60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=FbJXQXwl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tO9/gv5J; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 2C2B8EC057C;
+	Fri, 30 Jan 2026 10:38:52 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Fri, 30 Jan 2026 10:38:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm1; t=1769787532; x=1769873932; bh=vSumldh0CD7k7bpV9a930
+	QhMsKp5sS4frGwyVFI0Ibo=; b=FbJXQXwlWQw7gGai/19vStSPaYXoZ1G1pGrZo
+	4O1kadFMzQ3skB6pClVyLRze4b80AhKQUSjiC1WFVsM/P8SblJl9J8BJmJXe5+SW
+	wmfBsVAXvqvRtI/Zqx7EA+s7zBSq5bLXRpF6YlkukVUDdvkDsseVFXrc9sBoNUbU
+	2aXsYa8DnTQJpfRm4eKg++bcY9OS0hptt1khSVQ2bzgU8Vhw9RGfiFOgvUXcxbMO
+	RFj/2zMdUpCd/r8o0kxiFvIxQoObxEC9HhAJ6UZhmBPmNMuwCOYZDuMibuIPbi+X
+	f5o0qsy7T3rdqIl8zVl45XUZzI2y3tsCe7uToG5BeR54XH4jQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1769787532; x=1769873932; bh=vSumldh0CD7k7bpV9a930QhMsKp5sS4frGw
+	yVFI0Ibo=; b=tO9/gv5Jt2Zcpm0wMOEdEOIlgU3C3412YKG9Kcf56Xm3DRZLJUT
+	pdK2bpZWat3Jerlv3pxd5f2K+4u3M90WJervC80FejLIjCuEmWjPAaloQaIjO/kn
+	LNhIGuZGDyIzEjZVPvToe1GX6Q8XaBY1KFMwwPl1MCmyFvP1+PxKeWov8hrFu4YW
+	nES2XzIXA1k9zc5bo37CWOjqqv/IMx0FD7rH4vPGKUaBfhA50GMe3XpCL/xM/LXv
+	RGY1DNC4XuYgUrCnNBLvP01gyzEq8JvgOOlZuopJBDcaq+uesID3yEG1Wk/hzusp
+	gFXop++1/HRt/Ab7wul3oMqMhRJwPivZyiw==
+X-ME-Sender: <xms:i9B8afSFgThw2mLY5tW03t5N2P5hMupvxF5po2Wwz8p76rR38j6SZA>
+    <xme:i9B8aVv2-4-4SPQg79E5nu_UWS-nXuuFIJclG42ZFQczrUP6za_sdLWat8V4yAt8s
+    KQCLX2t1mFTJh8pcaPxy-P3kchj5HcRN-AYi8ZjNtcl4-4bCsSlcyU>
+X-ME-Received: <xmr:i9B8aZHWATVzK0zZwId1N7TP_r-7UG9a8IaRDxM5akG_yqAdIFey-M_NxcoleOZKmyPp8w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieelgedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeeiveelffduvdevfedtheffffetfeff
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
+    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
+    htoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhm
+    rgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgt
+    phhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepthgsohhgvg
+    hnughovghrfhgvrhesshhushgvrdguvgdprhgtphhtthhopehlihhnuhigqdhkvghrnhgv
+    lhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvg
+    hrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:i9B8aexX3NXTuF-aG47CZL-8_c0czBcsRgGN6-FRkpw5zjqHQiS0RQ>
+    <xmx:i9B8ab1zZoQ8uy0aR20gFQrtDnrE0WLHQrPjgXSh_RSmM6AMsQGcDA>
+    <xmx:i9B8aWr8ons1NgdPkXC9uPEDOx8pqFHW7PySHzwFsLmp-841imiZGg>
+    <xmx:i9B8aQXuiiSgpDyv-1R1V4BVjJSN3I6GFZfjKrxDtrvIPbY6fIp5hA>
+    <xmx:jNB8afP6YfwDWqHiuMXmjyrT-Hy4vDz8d1_iAkN1zKbJsm94CwvXppO3>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 30 Jan 2026 10:38:51 -0500 (EST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 63F699FCAE; Fri, 30 Jan 2026 07:38:50 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 60C619FC7D;
+	Fri, 30 Jan 2026 07:38:50 -0800 (PST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: Thomas Bogendoerfer <tbogendoerfer@suse.de>,
+    Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: only set speed/duplex to unknown, if getting
+ speed failed
+In-reply-to: <aXylwyr2pV0rZAW3@fedora>
+References: <20260130111904.144024-1-tbogendoerfer@suse.de>
+ <aXylwyr2pV0rZAW3@fedora>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Fri, 30 Jan 2026 12:36:19 +0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3932973.1769787530.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 30 Jan 2026 07:38:50 -0800
+Message-ID: <3932974.1769787530@famine>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255171-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[45];
+	TAGGED_FROM(0.00)[bounces-255172-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[nod.at,cambridgegreys.com,sipsolutions.net,linuxfoundation.org,windriver.com,kernel.org,chromium.org,goodmis.org,debian.org,lunn.ch,davemloft.net,google.com,redhat.com,linux-m68k.org,intel.com,igalia.com,linux.ibm.com,ellerman.id.au,gmail.com,csgroup.eu,gaisler.com,linux.intel.com,foss.st.com,nuvoton.com,nxp.com,lists.infradead.org,vger.kernel.org,lists.sourceforge.net,lists.linux-m68k.org,lists.ozlabs.org,st-md-mailman.stormreply.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[john.ogness@linutronix.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,linutronix.de:email,linutronix.de:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,jogness.linutronix.de:mid]
-X-Rspamd-Queue-Id: BD439BC0B9
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: BB804BC1AD
 X-Rspamd-Action: no action
 
-On 2026-01-13, Petr Mladek <pmladek@suse.com> wrote:
-> On Sat 2025-12-27 09:16:08, Marcos Paulo de Souza wrote:
->> The current usage of console_is_usable() is clumsy. The parameter
->> @use_atomic is boolean and thus not self-explanatory. The function is
->> called twice in situations when there are no-strict requirements.
->> 
->> Replace it with enum nbcon_write_cb which provides a more descriptive
->> values for all 3 situations: atomic, thread or any.
->> 
->> Note that console_is_usable() checks only NBCON_USE_ATOMIC because
->> .write_thread() callback is mandatory. But the other two values still
->> make sense because they describe the intention of the caller.
->> 
->> --- a/include/linux/console.h
->> +++ b/include/linux/console.h
->> @@ -202,6 +202,19 @@ enum cons_flags {
->>  	CON_NBCON_ATOMIC_UNSAFE	= BIT(9),
->>  };
->>  
->> +/**
->> + * enum nbcon_write_cb - Defines which nbcon write() callback must be used based
->> + *                       on the caller context.
->> + * @NBCON_USE_ATOMIC: Use con->write_atomic().
->> + * @NBCON_USE_THREAD: Use con->write_thread().
->> + * @NBCON_USE_ANY:    The caller does not have any strict requirements.
->> + */
->> +enum nbcon_write_cb {
->> +	NBCON_USE_ATOMIC,
->> +	NBCON_USE_THREAD,
->> +	NBCON_USE_ANY,
+Hangbin Liu <liuhangbin@gmail.com> wrote:
+
+>On Fri, Jan 30, 2026 at 12:19:04PM +0100, Thomas Bogendoerfer wrote:
+>> bond_update_speed_duplex() first set speed/duplex to unknown and
+>> then asks slave driver for current speed/duplex. Since getting
+>> speed/duplex might take longer there is a race, where this false state
+>> is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding:
 >
-> AFAIK, this would define NBCON_USE_ATOMIC as zero. See below.
+>The patch looks good to me. But based on your description, I don't think
+>the fixes tag is correct.
 
-Yes, although the start value is not guaranteed. And anyway if is to be
-used as bits, it should be explicitly set so (such as with enum
-cons_flags).
+	Agreed on both points; I suspect the origin of the race window
+is:
 
-But in reality, we only care about NBCON_USE_ATOMIC and
-!NBCON_USE_ATOMIC, so I agree with your comments below about keeping it
-a simple enum and not caring about the numerical value.
+commit e9fe8efeeae11f19bb6fafd6153ec77deaeb4b83
+Author: Nikolay Aleksandrov <razor@blackwall.org>
+Date:   Tue Sep 9 23:17:01 2014 +0200
 
->> @@ -631,7 +645,7 @@ static inline bool console_is_usable(struct console *con, short flags, bool use_
->>  		return false;
->>  
->>  	if (flags & CON_NBCON) {
->> -		if (use_atomic) {
->> +		if (nwc & NBCON_USE_ATOMIC) {
->
-> Let's keep it defined by as zero and use here:
->
-> 		if (nwc == NBCON_USE_ATOMIC) {
->
-> Note that we do _not_ want to return "false" for "NBCON_USE_ANY"
-> when con->write_atomic does not exist.
+    bonding: procfs: clean bond->lock usage and use RCU
 
-I agree.
+	as this patch converted some locking in the procfs logic to be
+solely RCU.
 
-If changed to "nwc == NBCON_USE_ATOMIC":
+	-J
 
-Reviewed-by: John Ogness <john.ogness@linutronix.de>
+>Thanks
+>Hangbin
+>>  update port speed when getting bond speed") this race gets more visibl=
+e,
+>> if user space is calling ethtool on a regular base.
+>> =
+
+>> Fix this by only setting speed/duplex to unknown, if link speed is
+>> really unknown/unusable.
+>> =
+
+>> Fixes: 691b2bf14946 ("bonding: update port speed when getting bond spee=
+d")
+>> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+>> ---
+>>  drivers/net/bonding/bond_main.c | 15 +++++++++------
+>>  1 file changed, 9 insertions(+), 6 deletions(-)
+>> =
+
+>> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
+_main.c
+>> index e7caf400a59c..4cdf89b21ca0 100644
+>> --- a/drivers/net/bonding/bond_main.c
+>> +++ b/drivers/net/bonding/bond_main.c
+>> @@ -791,26 +791,29 @@ static int bond_update_speed_duplex(struct slave =
+*slave)
+>>  	struct ethtool_link_ksettings ecmd;
+>>  	int res;
+>>  =
+
+>> -	slave->speed =3D SPEED_UNKNOWN;
+>> -	slave->duplex =3D DUPLEX_UNKNOWN;
+>> -
+>>  	res =3D __ethtool_get_link_ksettings(slave_dev, &ecmd);
+>>  	if (res < 0)
+>> -		return 1;
+>> +		goto speed_duplex_unknown;
+>>  	if (ecmd.base.speed =3D=3D 0 || ecmd.base.speed =3D=3D ((__u32)-1))
+>> -		return 1;
+>> +		goto speed_duplex_unknown;
+>>  	switch (ecmd.base.duplex) {
+>>  	case DUPLEX_FULL:
+>>  	case DUPLEX_HALF:
+>>  		break;
+>>  	default:
+>> -		return 1;
+>> +		goto speed_duplex_unknown;
+>>  	}
+>>  =
+
+>>  	slave->speed =3D ecmd.base.speed;
+>>  	slave->duplex =3D ecmd.base.duplex;
+>>  =
+
+>>  	return 0;
+>> +
+>> +speed_duplex_unknown:
+>> +	slave->speed =3D SPEED_UNKNOWN;
+>> +	slave->duplex =3D DUPLEX_UNKNOWN;
+>> +
+>> +	return 1;
+>>  }
+>>  =
+
+>>  const char *bond_slave_link_status(s8 link)
+>> -- =
+
+>> 2.43.0
+>> =
+
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
