@@ -1,147 +1,186 @@
-Return-Path: <netdev+bounces-255197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255198-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IEtAwHnfGlTPQIAu9opvQ
-	(envelope-from <netdev+bounces-255197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:14:41 +0100
+	id EHEuGR3pfGlTPQIAu9opvQ
+	(envelope-from <netdev+bounces-255198-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:23:41 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A696BCE7E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:14:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BE1BD04E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:23:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06720311BB0B
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 17:09:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 163683053BA0
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 17:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59DC2253A0;
-	Fri, 30 Jan 2026 17:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A81235B129;
+	Fri, 30 Jan 2026 17:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xk3VtVhS"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="RWamMXeY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2249F34A794
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 17:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F189359710;
+	Fri, 30 Jan 2026 17:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769792940; cv=none; b=Y+QKSLk+bWTNqLrjBxn9whNUCwUJRxf652MMi6gYZupo90JCx8Lg/O9zV6P7UON2B96sW2wIogsho+bpcfdqRY0Ns8jCicLWHlF5B4z1WGRCHqn//b74f/8OGL8/SIYW12L1xIOYul8RdWlQ2sngDD94YQIksCqCYg7pYOTJRNc=
+	t=1769793768; cv=none; b=IdDVIxxd59LcT8I9KwKCQVpLKsTaXmNytkBhEjzvNak/X4A71E3kTOBe9zra0st5laF0tHUCPNcrthv5lIWfS5hGBZh5/JELQveQtnkENos/zCedclXENWO0EQ0LpbivxQh7y5Qpm1sJt66w5xRLB3Y7i4jpHDsSXnQX+s7OZrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769792940; c=relaxed/simple;
-	bh=/RvhCIrP3097qf3ngUMcUP9uD0Waf4smlT2OPGGZad0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d9Vu5VXeR/SwRN6n7p25oANhACY48jsTm7jwU8FzX7cQWmGeHM2OtA4KxFndZE9lZc55LJ6k9CBZJKkreLYCC2X+zp2MrgW8N+O03EyrZu4BTXdqT433bqAgJSuwgiJEVA7LCK51gv51HMU9pDz3DNNWsMc9yw38L4quZj2xQZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xk3VtVhS; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 38F521A2B3D;
-	Fri, 30 Jan 2026 17:08:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 038236075A;
-	Fri, 30 Jan 2026 17:08:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 69E3F119A8890;
-	Fri, 30 Jan 2026 18:08:47 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769792934; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=9ynhhTVfJX+9wMDK7jU25/Hkm3GSOpSiJRLcK/KvzLw=;
-	b=xk3VtVhSq0ZhmWisZuEZydXqIWZpPRBenoBJUh6uneH7xhY/twCtYQVjtA6IG9D3tDdf32
-	kgTGM/8YGS+6jb5ALFpIW4puKJOhb/FGXwvJB4cHzohGrwxKHFGYGaMtbIE8pTMeck62BW
-	IYPdcMSlcobuM6CWLrlCoN7aBuXy5il8IRFE6v3JN4I3IXt+OWdAAFRpKk4a+Mwcwwk1IX
-	4IsB10ZTp0y7/eE869H/j/YujmR9HbLwC4jhJc1D8MuQoendqIw5AOs+AiqY7+8nyVIovI
-	Gpvpkx9jyXQRQNPGhOFOaZM7Q09iJAQDsoZZADg+n3rVbA078npoRB7BmLD/YA==
-Message-ID: <9354d336-dfc4-426f-9c2f-6e4d4211991e@bootlin.com>
-Date: Fri, 30 Jan 2026 18:08:46 +0100
+	s=arc-20240116; t=1769793768; c=relaxed/simple;
+	bh=6IsexkEpjd/dpxFx6yAbjOBMYeOwHCgMSGgGXfn9CQM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BT0xcnVlHaS0jKLbdKy37/rOIcf8xdOnoOUixgYRqmKEIhxw2Yck7fXT/Xr2R15180DuNDBPIqPe607vqDqWT0PeFhV7zhDA7RWzK0Mtei6tUfVlaQZonhbq+YATT+mJ/6jrWkWFZuPg10nlbtRqGzxPQeruTN7XOkwoMzyAu7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=RWamMXeY; arc=none smtp.client-ip=79.135.106.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1769793757; x=1770052957;
+	bh=6IsexkEpjd/dpxFx6yAbjOBMYeOwHCgMSGgGXfn9CQM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=RWamMXeYqBHKsrbXiwOuVpNWjJIxfHiElPhlRlrW1tr5VTMVcDd4WcLMq2NK6hxBF
+	 bdRBSkiJ+2DS7JBRMLjpuhwDhLh3CvLrc9q/HyHabyuOyCbZCHA6VzQOMn2xw5CfYW
+	 5RB5sgxzGdrIobprkKhb4mfv9+x4Ar2opPx7ld57CuiboRHgaJZcAn52MN3kUbYh6Y
+	 FVE3GVpgpTKDFWsLozYyPg49WNlMNxE8tFVrdZe8YJoJTjyO7jpS+PoSvlEMh1LP9g
+	 1LnUDTgQV/csEWTZo/4rfnNUuFYGizAYzOwJ0XfuKjrzNHrQPWqMJONFGqSLyEwXJP
+	 7LoqOcEwg1xEg==
+Date: Fri, 30 Jan 2026 17:22:33 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
+Message-ID: <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org>
+In-Reply-To: <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com>
+References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 7b528e6ff830b50d937c1b4134436380198bfc88
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 06/13] net: sfp: Add a sfp-bus ops when
- connecting a module without PHY
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20260127134202.8208-1-maxime.chevallier@bootlin.com>
- <20260127134202.8208-7-maxime.chevallier@bootlin.com>
- <aXzaGg3AkHOdP30A@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aXzaGg3AkHOdP30A@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255197-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-255198-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[1g4.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6A696BCE7E
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,raw.githubusercontent.com:url,1g4.org:email,1g4.org:dkim,1g4.org:mid,mojatatu.com:email]
+X-Rspamd-Queue-Id: C2BE1BD04E
 X-Rspamd-Action: no action
 
-Hi Russell,
+Yes, In net/sched/act_api.c the GETACTION notify path always does alloc_skb=
+(NLMSG_GOODSIZE), if tca_get_fill()=20
+runs out of tailroom it returns -1 and tcf_get_notify() maps that to -EINVA=
+L. So failures are size-dependent=20
+and can look intermittent across different action dumps. act_gate might be =
+the outlier?
 
-On 30/01/2026 17:19, Russell King (Oracle) wrote:
-> On Tue, Jan 27, 2026 at 02:41:54PM +0100, Maxime Chevallier wrote:
->> The SFP bus infrastructure notifies its upstream when a PHY device was
->> discovered on the module. However, we don't have any indication when a
->> module with no PHY was inserted, except for the .insert() and .start()
->> notifications.
-> 
-> That's the way you tell - if you get the .start() callback but you
-> haven't had a PHY connected, that means there's no PHY.
-> 
-> There should be no need to add this callback, since you shouldn't be
-> thinking that the module is fully initialised until you have received
-> the .start() callback.
-> 
+The size is already computed in tca_action_gd() (sum tcf_action_fill_size()=
+ then tcf_action_full_attrs_size())=20
+and add/del already allocate max(attr_size, NLMSG_GOODSIZE). This patch jus=
+t makes GETACTION consistent with=20
+that.
 
-Ok fair point, thanks for the feedback ! I was about to send V3, but
-I'll implement something that doesn't require this new callback then.
+On the reproducer: the gatebench test with 100 entries is reasonable.
+https://raw.githubusercontent.com/jopamo/gatebench/refs/heads/main/src/self=
+tests/test_large_dump.c
 
-Thanks for taking a look :)
+I plan to follow this up with another patch for act_gate and believe they b=
+oth are integral to fully stabilize=20
+act_gate.
 
-Maxime
+Thanks
+Paul
+
+
+
+On Friday, January 30th, 2026 at 10:05 AM, Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+
+>=20
+>=20
+> On Fri, Jan 30, 2026 at 8:43=E2=80=AFAM Paul Moses p@1g4.org wrote:
+>=20
+> > tcf_action_fill_size() already computes the required dump size, but
+> > RTM_GETACTION replies always allocate NLMSG_GOODSIZE. Large action
+> > state can overrun that skb and make dumps fail.
+> >=20
+> > Use the computed reply size for RTM_GETACTION replies so large actions
+> > can be dumped, while still keeping NLMSG_GOODSIZE as a floor.
+> >=20
+> > Fixes: 4e76e75d6aba ("net sched actions: calculate add/delete event mes=
+sage size")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Paul Moses p@1g4.org
+> > ---
+> > net/sched/act_api.c | 7 ++++---
+> > 1 file changed, 4 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+> > index e1ab0faeb8113..8ab016d352850 100644
+> > --- a/net/sched/act_api.c
+> > +++ b/net/sched/act_api.c
+> > @@ -1685,12 +1685,12 @@ static int tca_get_fill(struct sk_buff *skb, st=
+ruct tc_action *actions[],
+> >=20
+> > static int
+> > tcf_get_notify(struct net *net, u32 portid, struct nlmsghdr *n,
+> > - struct tc_action *actions[], int event,
+> > + struct tc_action *actions[], int event, size_t attr_size,
+> > struct netlink_ext_ack *extack)
+> > {
+> > struct sk_buff *skb;
+> >=20
+> > - skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
+> > + skb =3D alloc_skb(max_t(size_t, attr_size, NLMSG_GOODSIZE), GFP_KERNE=
+L);
+> > if (!skb)
+> > return -ENOBUFS;
+> > if (tca_get_fill(skb, actions, portid, n->nlmsg_seq, 0, event,
+> > @@ -2041,7 +2041,8 @@ tca_action_gd(struct net *net, struct nlattr *nla=
+, struct nlmsghdr *n,
+> > attr_size =3D tcf_action_full_attrs_size(attr_size);
+> >=20
+> > if (event =3D=3D RTM_GETACTION)
+> > - ret =3D tcf_get_notify(net, portid, n, actions, event, extack);
+> > + ret =3D tcf_get_notify(net, portid, n, actions, event,
+> > + attr_size, extack);
+> > else { /* delete */
+> > ret =3D tcf_del_notify(net, n, actions, portid, attr_size, extack);
+> > if (ret)
+>=20
+>=20
+> dunno. Is this based on some issue you found? This is a common pattern
+> in a lot of places in the stack and has not caused any issues (afaik).
+>=20
+> cheers,
+> jamal
 
