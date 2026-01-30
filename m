@@ -1,148 +1,201 @@
-Return-Path: <netdev+bounces-255218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255220-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0EMvNdXzfGk5PgIAu9opvQ
-	(envelope-from <netdev+bounces-255218-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:09:25 +0100
+	id mN49FLr8fGnLPgIAu9opvQ
+	(envelope-from <netdev+bounces-255220-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:47:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC3CBD990
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:09:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8FEABDF2B
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 52BBD300335C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:09:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 091BE3038F0F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE5D36B042;
-	Fri, 30 Jan 2026 18:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD72E385EFE;
+	Fri, 30 Jan 2026 18:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="y8g5IMvG"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="BRE37BbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5519836C0B1
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5302A2D2390;
+	Fri, 30 Jan 2026 18:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769796563; cv=none; b=kMKJYBQ/PUQZq0b+pYimBC8kzdVKam5A2uMkt5A2eeKrPhvfCf4FFdz9rbU/X4uE1lMOQdn3yJbvmoCBYBssHyDMW0lTUnr8HAbwmkTJSjGBCSVxYhQNYcqM69csc6OZjDw1KbegTL73Bt8n4YJrTRaEU9/H8iCc7bVeXeBGxrI=
+	t=1769798827; cv=none; b=EWBVa1P8o51IPCTEChbdvOE7Xeg+UaaFzxKJ9Ub98/VHWMAg9GG3sewaNdNYvByvm8iQiua3imYV8bp2vbAGVMXq2jcqcEUKLn1ab//D9BsVazGxzr/LkH5q5OIBoZi1JKvCvWx6YGyaMCaoy0pGQ6xuANYD60ooPEQVt/I9XJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769796563; c=relaxed/simple;
-	bh=e/Bt9m9lnx3IOS1PLwqfMdX95DKtRAdPMruzoSYKGbA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EBufEk2D2W9lVuEgkujRXmkMkdqz5K8dtYenvJGJSfBSrbv6pqQREQGslM4+PHfhO1+fzMcmbc5jCzUORdIVKa8EKpPYpnh1KturNBdJFJwEVbNN2rezJlVX/SyH54fjhhdSD3T5inkuLxYFfuARL8R/rg4eoCAIHTcEv295qTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=y8g5IMvG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NJGHCJHC/C1S/dc48iAgg6S72Ja9f72htrzVxmHBznY=; b=y8g5IMvGwzIvn9WkzEVPh4AHot
-	IhhlsFV8sIPDLGDtax1wUOk9cjSIdE3slCsK0mabLqDgtmwGIDcfBwEi0E/4UX/Wl7s24kMfe8Tu8
-	bBA6ZgW1hDAYrFBJgDCUuzEnNC3CeL/cDDlgYJB1UNz9gvduqe34eGAgsaSzMh+7xC3RcurkARW78
-	V8fuuT8N+sUlCYCX82GH0yKvOzWgh5dVUK8XwQBH3W3F2qOGg/GL0fQPkF+AUJCqK9G+Gn24ZuTjc
-	k1azLxitSHg3NYX4yx9lGo1ieKhr+UPiKMCEHk3v7xTN7VHl5/YV97PgUcQH6S4K+XUAQJwSsF/xI
-	UyDV2bGA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46880)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vlsvh-000000001Km-0cQA;
-	Fri, 30 Jan 2026 18:09:13 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vlsvd-000000000it-3G8k;
-	Fri, 30 Jan 2026 18:09:09 +0000
-Date: Fri, 30 Jan 2026 18:09:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 1/3] net: stmmac: clear half-duplex caps where
- unsupported
-Message-ID: <aXzzxeRsbnF8-nAq@shell.armlinux.org.uk>
-References: <aXyRlFw7ZuhRPiKo@shell.armlinux.org.uk>
- <E1vlmOQ-00000006zuz-0ffN@rmk-PC.armlinux.org.uk>
- <9dfdeee0-7758-439b-a2a5-a7f243427cf4@bootlin.com>
+	s=arc-20240116; t=1769798827; c=relaxed/simple;
+	bh=BsSJNvEtopeDtqJBgSI/2Gkhl3hlLNA7p2sp0lETHP0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EhWNtTWJ9eLracIFPKA+Tq16Rv46A9FWQmV9jSS391wz4U5bXaL2EzKVSl4Te5XMlTysDw/6JqTxRQUekC7Sdogxg8C7Ii0UfZa9VvzM3QDdC6j37aTaePV9wyQvd8LeDfnSSzoNNHwvWNUQBk0AU6m3iu3jQlv4mE43Gx+OC8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=BRE37BbK; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=u+FPaYMRBpURyEluw/yBM5AMD+gZ+OchcgAsZYWmfxQ=; b=BRE37BbKjyy6Jjmg/EurSEMkii
+	RTo38av7dzeGatWW0eWXmdICH1mDOAOLRtrOayjTy2rq15CzRQwImBO2yTgvIN3J1XUc0GiIMLQVi
+	KT3OpK91ivvhwr3wa8EJAExMkWc47JHoQ01HinbnxX7FB+eoRfIDXmp5M377WoQMMGmlH6E1i7f5Z
+	0QPM1Odce5w+xuab8o1yuPdy6YLinHm84jKbcKF5XUqEf3uV0iZMRe+174Pe7gbJZVb1Dw7BLu6+r
+	rFZ6mYIhoJU0cua04c026xlpH3u9oVMs+dJ4NoMgm63Fzu6DY5PA4AMonkXbEhkJT/Pksyp5MOXic
+	SNlCGm8g==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vltW5-001upj-Km; Fri, 30 Jan 2026 18:46:50 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next RFC 0/3] net: move .getsockopt away from __user
+ buffers
+Date: Fri, 30 Jan 2026 10:46:16 -0800
+Message-Id: <20260130-getsockopt-v1-0-9154fcff6f95@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9dfdeee0-7758-439b-a2a5-a7f243427cf4@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHn8fGkC/yXMQQrCMBQFwKt83rqBNMWA2QoewG1xYdPXGoWkJ
+ FEKpXcXdT0wGwpzYIGTDZnvUEKKcNI2An+/xZkqjHACo43VbafVzFqSf6alquPUWWsO5OgHNII
+ lcwrrL+sRWVXkWuVyPuH61/IaHvT1+2HfPx3gKg58AAAA
+X-Change-ID: 20260130-getsockopt-9f36625eedcb
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, metze@samba.org, axboe@kernel.dk, 
+ Stanislav Fomichev <sdf@fomichev.me>
+Cc: io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+ Linus Torvalds <torvalds@linux-foundation.org>, 
+ linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-f4305
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2888; i=leitao@debian.org;
+ h=from:subject:message-id; bh=BsSJNvEtopeDtqJBgSI/2Gkhl3hlLNA7p2sp0lETHP0=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpfPyUfLJa7kYCbO9DaPKX8IKB5y49gG2tFLqTH
+ L/wt/Qt4O+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaXz8lAAKCRA1o5Of/Hh3
+ bYwkD/4xEVmxAXrxOB25//mNLPLzteB+X6gKqaL7XJQLuHAZ5l3mF9n8j1Pupovi8IlxeiQ5F4p
+ wb7bUSTFoAVgDXEY7hwg/mM4h06GdaeW/995ft1S+5iOQlMK4RxJBY6pT7YLM3d9TOgqVTtB/2d
+ Ky4mA7IRNTqn5Xf/Cjf/iTcQzQ2LUBIGR1qaqbfxu/k4YH+x6RKviYE73ghHMM6fIbQYQ3ABmzp
+ r35WTtMZRPsDpgMb8WyRY9OT4yph5G1/5caOOU4tgxSkUn+6mBwgjEg8G0GtG1pWUTmicDlRvIA
+ urmCQzAnD8TesVnEiD8zOvshq9hlJO87wJ1blFiHItDmdaYKxlCp2WRDx5ErMXYhzI45hv/VQQf
+ 4FEx44fzLx0YD0bmks8QsWK2azaJ32D3eAwC8mFC+J62+qWHCw2XQha2pXHDwL7axCJFH5QXmNC
+ Yi1912czfP6qtwUM6LENE84BWR8Kxm1uH3ucxi8/SnD9CVZl6BtJYx1IasTiDEshQqEQdEiA5uO
+ v2ufBY83VKdndujzznknSdGl8xFZsSTzlBfUb692Gr3A9wyztKp9Ouod9b14w/q+IsMWaTmz4Ig
+ nxdw9hFVRR8FI+BigvbjHm7xD+B8OzHwEksodPalsbGzi2hA16qPWiFuRE9j2RHEeIEqYbTv6iv
+ P2QEaFph0JnsOBg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255218-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[debian.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255220-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,armlinux.org.uk:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:email]
-X-Rspamd-Queue-Id: 6BC3CBD990
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B8FEABDF2B
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 06:29:23PM +0100, Maxime Chevallier wrote:
-> Hi,
-> 
-> On 30/01/2026 12:10, Russell King (Oracle) wrote:
-> > Where a core supports hardware features, but does not indicate support
-> > for half-duplex, clear phylink's half-duplex 1G, 100M and 10M
-> > capability bits to disallow half-duplex operation and advertisement of
-> > these link modes.
-> > 
-> > This will avoid the need for special code in the PCS driver to do this
-> > based on the ESTATUS register bits, as the support in the PCS is
-> > dependent on the same synthesis choice as the MAC core.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Gave it a quick test on socfpga, as this impacts all variants,
-> and we seem to be good so,
-> 
-> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Currently, .getsockopt callback cannot be called with kernel buffers
+because it requires userspace addresses:
 
-If you look at /sys/kernel/debug/stmmaceth/ethX/dma_cap, it should
-say whether half duplex is supported (I guess in your case it will
-be, it's probably very unlikely not to be.) However, would be worth
-knowing whether the if() is taken or not!
+  int (*getsockopt)(struct socket *sock, int level,
+		    int optname, char __user *optval, int __user *optlen);
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This prevents kernel callers (io_uring, BPF, etc) from using getsockopt
+on levels other than SOL_SOCKET, since they pass kernel pointers rather
+than __user pointers.
+
+Following Linus' suggestion [0], this series introduces a wrapper
+around iov_iter (sockopt_t) and a temporary getsockopt_iter callback:
+
+  typedef struct sockopt {
+	  struct iov_iter iter;
+	  int optlen;
+  } sockopt_t;
+
+Note: optlen was not suggested by Linus' but I believe it is needed, given
+random values could be passed by protocols back to userspace.
+
+And the callback becomes:
+
+  int (*getsockopt_iter)(struct socket *sock, int level,
+			 int optname, sockopt_t *opt);
+
+The sockopt_t structure encapsulates:
+- An iov_iter for reading/writing option data (works with both user
+  and kernel buffers)
+- An optlen field for buffer size (input) and returned data size
+  (output)
+
+The plan is to enable getsockopt to leverage kernel buffers initially,
+but then move .setsockopt from sockptr_t into this as well.
+
+This series:
+
+ 1. Adds the sockopt_t type and getsockopt_iter callback to proto_ops
+ 2. Adds do_sock_getsockopt_iter() helper that prefers getsockopt_iter
+ 3. Converts one protocol (netlink) to use getsockopt_iter as a proof of
+    concept
+
+This is what I have in mind for this work stream, to make it more
+digestible:
+
+ * Keep the temporary getsockopt_iter callback allows protocols to
+   migrate gradually.
+ * Once all protocols have been converted, getsockopt can be removed and
+   getsockopt_iter renamed back to getsockopt with the new API.
+ * Once the protocols are converted, the SOL_SOCKET limitation in
+   io_uring_cmd_getsockopt() will be removed.
+ * Covert setsockopt() to also use a similar strategy, moving it away
+   from sockptr_t.
+ * Remove sockptr_t in the front end (do_sock_getsockopt(),
+   io_uring_cmd_getsockopt()) and start with sockopt_t (instead of
+   sockptr_t) in __sys_getsockopt() and io_uring_cmd_getsockopt()
+
+Link: https://lore.kernel.org/all/CAHk-=whmzrO-BMU=uSVXbuoLi-3tJsO=0kHj1BCPBE3F2kVhTA@mail.gmail.com/ [0]
+---
+Breno Leitao (3):
+      net: add getsockopt_iter callback to proto_ops
+      net: prefer getsockopt_iter in do_sock_getsockopt
+      netlink: convert to getsockopt_iter
+
+ include/linux/net.h      | 19 +++++++++++++++++++
+ net/netlink/af_netlink.c | 22 ++++++++++++----------
+ net/socket.c             | 42 +++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 70 insertions(+), 13 deletions(-)
+---
+base-commit: 4d310797262f0ddf129e76c2aad2b950adaf1fda
+change-id: 20260130-getsockopt-9f36625eedcb
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
