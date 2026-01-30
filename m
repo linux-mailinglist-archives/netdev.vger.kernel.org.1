@@ -1,201 +1,194 @@
-Return-Path: <netdev+bounces-255170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHdDOl/LfGnaOgIAu9opvQ
-	(envelope-from <netdev+bounces-255170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:16:47 +0100
+	id wDp5E/3OfGlbOwIAu9opvQ
+	(envelope-from <netdev+bounces-255171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:32:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B41BBF1C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:16:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD439BC0B9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C9B9300879A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:16:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2C7F430263FA
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865E8346A0F;
-	Fri, 30 Jan 2026 15:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE69B329C7E;
+	Fri, 30 Jan 2026 15:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="o3p/t+Oz"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0KQp0ypV";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tRQx2Qeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303CF3542CC
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 15:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341DD31280F;
+	Fri, 30 Jan 2026 15:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769786203; cv=none; b=IdNZUTYyuRWoVqctyALI8G00QGB/80f8fq1psFKI08vZXwtw1ZchLTg+pcXwXvAxio8VwBq1zNnhqqjd27yKI+RGUP9g+yyylwzts3X6kNMJPq8QVEHqeGw7x7ASUjig47iqot1Yy5Mk7ZcZo8YuJyqJ5g1D4BrWIthh20Al81A=
+	t=1769787097; cv=none; b=enDKTXwAMI2BmiOuPP1mCt7Rev8i0SVeMWmFioPoimaf8tkbRcLx8t3GiFxJvZrTRZQNh62IP5YAI8c8QNq3cORdsgY408Bje7HDgWfWQSMP4Cq312ocuLl/NBMa4kpmQsswEc80A9eMJEY3al+g5iDVBIScWy7DjGC2GhpyiZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769786203; c=relaxed/simple;
-	bh=WmHtBHSTYxbfJ263YgNe7PXPFBdQFrEByiiVtkOz+uw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DFDPXLxgoVf4knPfdC2bHGDfHkKyi4ueNjKspyCXUbwPc/cA+otnJg8dEryMfmO0wo5YTvKY9CgBo+InSfKZJ7avk9895qiAtOvZs6j0Qy/7Uo6oY24v7tSrUn3hH+MvLYjAPvGFfq75Rqin4nujeBBH5HnBPtGhuRXMqYSebYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=o3p/t+Oz; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8948273f5d0so32543526d6.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 07:16:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1769786199; x=1770390999; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9si664lpAABtSRH5NCDTNiWW5Zo1E2FOdd2kZn8cRsw=;
-        b=o3p/t+OzNolmstthDKxfQ2xaDr4SG5Cd5MhbMtCpLSmb1pSCcPW8jaVlip9X438OsU
-         pvqcK+zIuEQTlyP6cyjSPpPISnUcNH8HBRF8XscGM0zgrtsq9YMvJCbOascyJ6SYle3K
-         5+lplx4rOZBELiGFXi7Z029vg2gzMC0aiSCWP/xkR9Zj42Ur8ylSVCaRV6w/kOkYPsRI
-         NCWMbQlXq7eyk4aNHKTwPQQYIk6ntQG++EF1z3KRTnDa5JBk2tRP7dJov/Sgzp0Jnu5a
-         SVuV3RCSgr6Qe2RLxTELd34T9s4IMJbMo5I1OeLdPPTA68gyCEv8RiFwF6w3hkirjZTv
-         /fhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769786199; x=1770390999;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9si664lpAABtSRH5NCDTNiWW5Zo1E2FOdd2kZn8cRsw=;
-        b=J64slVc0jBvKNuzHr0a2SIlqtm3K0sdKOqZbxgT1CfPhUC8kXgLJxapO9PtvY0uPYr
-         icnqHo81Pnx2iRUJChf76qE/jY/K0Y4MOhnr6LvDxdn8peK6RCd4Rsq1KMlas2n1qrd2
-         tSEdRypEjVdeitnOXB1l33P3Q2GFM9hJWGkcPF8B+7T+twmuvRmG5PgV5BV+kgs6WqGv
-         9vsXgsXJaxSPuoYuZAzNK60xWr2TfhZcqkoTufHxyTpssLusTMWN+nVN8UZvw9wJVN7q
-         qYvlRR+fsAOyKog2ZnsvcTMTB50wEjOJp2aAxIYVwtBbdG2P9I4indsjqxaRjss8EhLy
-         Q7dA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuRfSlV+v/fr6HMzEq9s3RAZtk2xf1wWkbUNyU0hsnwHxaurfM4tVbt0H7F2wnwWKC8ySAQvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8/0FB9ZJW8cILhhsW4i8E41O74XV2W3NqxQTQBbo2wacgG54W
-	jfOj9yaIgC9dKX7YQyEqcUAKkycJ1cee5HY+XBAc5EaIrA7PbSktAfiHE06GhEDEOgs=
-X-Gm-Gg: AZuq6aIj7YxrKZUirjuvcLyi5Q44jVLD74KP50pQYZT8G2NNvFHLWdbIkoxoiBuyglj
-	BfosiePlLyiavTX2cXnD2oNftootN/00J46/G5U2IoQ0z+Z/P+9CSv7ZPuC2VxaI0Q83+WJW1su
-	aJ38GH7VRDvKsvupIWVx+rDBydu72llTef3TF1P09N/LqiF3pgVPh0ajrDQjc2EKeIHdzgaABIo
-	5W9sYxwKYG+jqJ1qZ8lUeFBYM23hRt6lJrS0lrGvyHixXSMb5lFvuzBnLu/hoHJ/rnBoAyzfSRm
-	8WfqebTsZ+u3JcDWxLxO6emDd7RTxrFj2nAGj2ymknn4EeiOk9k3KazWRMOaP3pIEvK7rRirQLf
-	pcoXWHNsYRscUamy/MlBiFcSjehWmGyPuF61SV5UOQg/g4pnvI+vM9Qdw6VsvOqUVDxrpjirm42
-	pjZiwO/Z6982cRdz3AoqWz+8XGL+fwEswKM+EXZH51CED4a7naWyTJSt2o8ycEpOcDMiA=
-X-Received: by 2002:a05:6214:501d:b0:88a:4c50:3be0 with SMTP id 6a1803df08f44-894df970109mr86470926d6.6.1769786198441;
-        Fri, 30 Jan 2026 07:16:38 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5033745c5d4sm58414081cf.3.2026.01.30.07.16.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 07:16:37 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vlqEe-0000000BAef-38VG;
-	Fri, 30 Jan 2026 11:16:36 -0400
-Date: Fri, 30 Jan 2026 11:16:36 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Uladzislau Rezki <urezki@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
-Message-ID: <20260130151636.GF2328995@ziepe.ca>
-References: <aXPEFdEdtSmd6AzF@milan>
- <20260124093505.GA98529@j66a10360.sqa.eu95>
- <aXSjm1DXm6yP62tD@pc636>
- <20260124145754.GA57116@j66a10360.sqa.eu95>
- <20260127133417.GU13967@unreal>
- <20260128034558.GA126415@j66a10360.sqa.eu95>
- <20260128180629.GT1641016@ziepe.ca>
- <20260129113609.GA37734@j66a10360.sqa.eu95>
- <20260129132058.GC2307128@ziepe.ca>
- <20260130085131.GA122673@j66a10360.sqa.eu95>
+	s=arc-20240116; t=1769787097; c=relaxed/simple;
+	bh=fOeDEk/IglYGyJoaC4rl87IP7u52uvkE7LuzzFUoZCQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Pvgq2OAq1zO5WU0Ry5gA3FL8XDE3hoZ9a8R0+hoQcUUmYFaurmO07zP5IP/dSAhLcIUqARx1IYiQUwyQLEsn6SBkK0PZ9eJNCXa0zcgG+xV4zJSXuyzlongo5GTqQmyacpjNUgVMRM2hjR+SEQ9kQ2N61tvy1pjMy57zXDyu1g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0KQp0ypV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tRQx2Qeq; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: John Ogness <john.ogness@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1769787091;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vOa37cugu1e7NFG01Hi5lQxNeOFAbNhgF4zlCMpuWB0=;
+	b=0KQp0ypVQ4kZaeO3mPHMfxJV+hK/54vG6DKBi+oQw7b2zUOdcXSHVjzGTkDhg+DII5BPUq
+	aN49RxuHT0Y324cEPE9hahaKdLHrEB12udzdH1NvAbslSIBaR+apFss0VpjAJQGlvJvNWz
+	Qkt0FDwz1uMiX4gq49nlr83YKlkc4clstGJ1Gn1qJZPTuOUjrQYGQ2og6q2aakCd23E2bK
+	j7QeXx4RcIyDXczvYB5hGiBrowZd2spJR3vfcC58o7tRoab9LXrUZs+RPcCpb6cx/pdJtb
+	HBe2qGa1jRaFKPPNxGpTtUqYNPr0BFkp5fHngur0T+mOUqFJcq3Nhz3k8u/Dpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1769787091;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vOa37cugu1e7NFG01Hi5lQxNeOFAbNhgF4zlCMpuWB0=;
+	b=tRQx2QeqDh72ig5xLjiaegMLqnl9AhaSG7GZod8dlzScFDOmHttRC8Fl88vJKoOCPg8W40
+	GHTlrnG5vPdq05BA==
+To: Petr Mladek <pmladek@suse.com>, Marcos Paulo de Souza <mpdesouza@suse.com>
+Cc: Richard Weinberger <richard@nod.at>, Anton Ivanov
+ <anton.ivanov@cambridgegreys.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Jason Wessel <jason.wessel@windriver.com>,
+ Daniel Thompson <danielt@kernel.org>, Douglas Anderson
+ <dianders@chromium.org>, Steven Rostedt <rostedt@goodmis.org>, Sergey
+ Senozhatsky <senozhatsky@chromium.org>, Jiri Slaby <jirislaby@kernel.org>,
+ Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook
+ <kees@kernel.org>, Tony Luck <tony.luck@intel.com>, "Guilherme G. Piccoli"
+ <gpiccoli@igalia.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
+ Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Andreas Larsson
+ <andreas@gaisler.com>, Alexander Shishkin
+ <alexander.shishkin@linux.intel.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jacky Huang <ychuang3@nuvoton.com>,
+ Shan-Chun Hung <schung@nuvoton.com>, Laurentiu Tudor
+ <laurentiu.tudor@nxp.com>, linux-um@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+ linux-serial@vger.kernel.org, netdev@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linux-hardening@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 01/19] printk/nbcon: Use an enum to specify the required
+ callback in console_is_usable()
+In-Reply-To: <aWZyEHsOJFLRLRKT@pathway.suse.cz>
+References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+ <20251227-printk-cleanup-part3-v1-1-21a291bcf197@suse.com>
+ <aWZyEHsOJFLRLRKT@pathway.suse.cz>
+Date: Fri, 30 Jan 2026 16:37:30 +0106
+Message-ID: <878qdf3ynh.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260130085131.GA122673@j66a10360.sqa.eu95>
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
-	TAGGED_FROM(0.00)[bounces-255170-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-255171-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[45];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[nod.at,cambridgegreys.com,sipsolutions.net,linuxfoundation.org,windriver.com,kernel.org,chromium.org,goodmis.org,debian.org,lunn.ch,davemloft.net,google.com,redhat.com,linux-m68k.org,intel.com,igalia.com,linux.ibm.com,ellerman.id.au,gmail.com,csgroup.eu,gaisler.com,linux.intel.com,foss.st.com,nuvoton.com,nxp.com,lists.infradead.org,vger.kernel.org,lists.sourceforge.net,lists.linux-m68k.org,lists.ozlabs.org,st-md-mailman.stormreply.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[john.ogness@linutronix.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 46B41BBF1C
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,linutronix.de:email,linutronix.de:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,jogness.linutronix.de:mid]
+X-Rspamd-Queue-Id: BD439BC0B9
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 04:51:31PM +0800, D. Wythe wrote:
-> On Thu, Jan 29, 2026 at 09:20:58AM -0400, Jason Gunthorpe wrote:
-> > On Thu, Jan 29, 2026 at 07:36:09PM +0800, D. Wythe wrote:
-> > 
-> > > > From there you can check the resulting scatterlist and compute the
-> > > > page_size to pass to ib_map_mr_sg().
-> > 
-> > I should clarify this is done after DMA mapping the scatterlist. dma
-> > mapping can improve the page size.
-> > 
-> > And maybe the core code should be helping compute the MR's target page
-> > size for a scatterlist.. We already have code to do this in umem, and
-> > it is a pretty bit tricky considering the IOVA related rules.
-> >
-> 
-> Hi Jason,
-> 
-> After a deep dive into ib_umem_find_best_pgsz(), I have to say it is
-> much more subtle than it first appears. The IOVA-to-PA relative offset
-> rules, in particular, make it quite easy to get wrong.
-> 
-> While SMC could duplicate this logic, it is certainly not ideal for
-> maintenance. Are there any plans to refactor this into a generic RDMA
-> core helper—for instance, one that can determine the best page size
-> directly from an sg_table or scatterlist?
+On 2026-01-13, Petr Mladek <pmladek@suse.com> wrote:
+> On Sat 2025-12-27 09:16:08, Marcos Paulo de Souza wrote:
+>> The current usage of console_is_usable() is clumsy. The parameter
+>> @use_atomic is boolean and thus not self-explanatory. The function is
+>> called twice in situations when there are no-strict requirements.
+>> 
+>> Replace it with enum nbcon_write_cb which provides a more descriptive
+>> values for all 3 situations: atomic, thread or any.
+>> 
+>> Note that console_is_usable() checks only NBCON_USE_ATOMIC because
+>> .write_thread() callback is mandatory. But the other two values still
+>> make sense because they describe the intention of the caller.
+>> 
+>> --- a/include/linux/console.h
+>> +++ b/include/linux/console.h
+>> @@ -202,6 +202,19 @@ enum cons_flags {
+>>  	CON_NBCON_ATOMIC_UNSAFE	= BIT(9),
+>>  };
+>>  
+>> +/**
+>> + * enum nbcon_write_cb - Defines which nbcon write() callback must be used based
+>> + *                       on the caller context.
+>> + * @NBCON_USE_ATOMIC: Use con->write_atomic().
+>> + * @NBCON_USE_THREAD: Use con->write_thread().
+>> + * @NBCON_USE_ANY:    The caller does not have any strict requirements.
+>> + */
+>> +enum nbcon_write_cb {
+>> +	NBCON_USE_ATOMIC,
+>> +	NBCON_USE_THREAD,
+>> +	NBCON_USE_ANY,
+>
+> AFAIK, this would define NBCON_USE_ATOMIC as zero. See below.
 
-I have not heard of anyone touching this.
+Yes, although the start value is not guaranteed. And anyway if is to be
+used as bits, it should be explicitly set so (such as with enum
+cons_flags).
 
-It looks like there are only two users in the kernel that pass
-something other than PAGE_SIZE, so it seems nobody has cared about
-this till now.
+But in reality, we only care about NBCON_USE_ATOMIC and
+!NBCON_USE_ATOMIC, so I agree with your comments below about keeping it
+a simple enum and not caring about the numerical value.
 
-With high order folios being more common it seems like something
-missing.
+>> @@ -631,7 +645,7 @@ static inline bool console_is_usable(struct console *con, short flags, bool use_
+>>  		return false;
+>>  
+>>  	if (flags & CON_NBCON) {
+>> -		if (use_atomic) {
+>> +		if (nwc & NBCON_USE_ATOMIC) {
+>
+> Let's keep it defined by as zero and use here:
+>
+> 		if (nwc == NBCON_USE_ATOMIC) {
+>
+> Note that we do _not_ want to return "false" for "NBCON_USE_ANY"
+> when con->write_atomic does not exist.
 
-However, I wonder what the drivers do with the input page size, 
-segmenting a scatterlist is a bit hard and we have helpers for that
-already too.
+I agree.
 
-It is a bigger project but probably the right thing is to remove the
-page size input, wrap the scatterlist in a umem and fixup the drivers
-to use the existing umem support for building mtts, splitting
-scatterlists into blocks and so on.
+If changed to "nwc == NBCON_USE_ATOMIC":
 
-The kernel side here has been left alone for a long time..
-
-Jason
+Reviewed-by: John Ogness <john.ogness@linutronix.de>
 
