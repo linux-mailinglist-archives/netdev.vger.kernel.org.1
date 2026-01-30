@@ -1,146 +1,115 @@
-Return-Path: <netdev+bounces-255153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8EBGKXu2fGm7OQIAu9opvQ
-	(envelope-from <netdev+bounces-255153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:47:39 +0100
+	id cESJHOm7fGlVOgIAu9opvQ
+	(envelope-from <netdev+bounces-255155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:10:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0436FBB529
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:47:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1312DBB771
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:10:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2B43301B703
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 13:43:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 031EB300B3C8
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3918030BBB6;
-	Fri, 30 Jan 2026 13:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="U1IYfEJ/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB2131A069;
+	Fri, 30 Jan 2026 14:10:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-08.mail-europe.com (mail-08.mail-europe.com [57.129.93.249])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19532690EC;
-	Fri, 30 Jan 2026 13:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.129.93.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D0127AC31
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 14:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769780633; cv=none; b=LTLDbcMVZw+LIMjrvexQOCm7qf5mfIHOCRVxcXs2cLdr6xulxwYSTCFL1katOo77/SEiwJeQUhu2Ua8ZP/NtUeF7Vnwd2/a3+CSPOtaWm+iRNr7XR3SEmw3woTIBBvGNuG1H1de4YDGHf+ty49AIHnc1d7N+oPD26i3F7c/4drM=
+	t=1769782246; cv=none; b=Jrlf4xw3B/mDL5aCbYYZ7DdLoxzVzlROBQfM/htlPls2Jzp/nAfrs/5m0gtnSMnSpfZU2kiCbgNRmKCWxjUq63CTmaDsP1ZvPqLU4mNEE+fkmSJBrs1TP0Ja9YRsBD2luCV7R2QDwXb3m4pglZP6VeA3r+2rxyardSr7z+cZcu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769780633; c=relaxed/simple;
-	bh=rAGOGx/VCQd8tSSh1Fy/QiBJT9QETQryqJToEiumKio=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=YeZhDddbTSKBBO3zTLLjF7iBMvKQv8LLeLD4/BHxUtCOv6s+LDt+zmmWE+7nR0r5xHFJhVMVcVcmx4BDIzdAnUv7wcAtzmHrlA4yt+uo7/6IIFV69xxdmpZ3FT87CrUunUrM84D5YTLmsVT3nAHISn7jxVQoSnVbtP0eajLwhvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=U1IYfEJ/; arc=none smtp.client-ip=57.129.93.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1769780613; x=1770039813;
-	bh=4KDZUqvmMno7yW8oOrUdUcN5Nz5/pz+QmHHRkxvLtuU=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=U1IYfEJ/Ko4xyhSTf72fovpGvLO3FmrTGYd97ILt7fbVP8jcVw6o4+C+GXjPkiB7u
-	 Ej3N2HXJNLdCw5/Jn9jVM35h8e1l/t0ZTA0kUqsw5dBh6nTc8kYILYXdZ1+SQiLioK
-	 8/aU7X/aCcfuMEwcAWr4p8+WC73fK/EBYy1vfLaZ0YlK9b2WbhZSxKDlwAFCy0OeRJ
-	 6UOn6DTAY+KGO4xACZDkjiTB6dYuX6KLpOFeSg8DHfg9T8i83HpH40n+lviYVTE2o8
-	 JarKd9Qv9BbHONak7JZjZGpOQEtbNiVJbl9GRrI5weTAni5hEyfiOMQaTLFfTOoHHk
-	 fCwIAyC2Os97Q==
-Date: Fri, 30 Jan 2026 13:43:29 +0000
-To: netdev@vger.kernel.org
-From: Paul Moses <p@1g4.org>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>, stable@vger.kernel.org
-Subject: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-Message-ID: <20260130134220.305757-1-p@1g4.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 8aee2c205e039bc00247308ff3996e9fb0d23fc8
+	s=arc-20240116; t=1769782246; c=relaxed/simple;
+	bh=0W27QFew4CaxE2Y8p24O0EQN+GgOlw15dThWBwgPflA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=NSGn7Ap4+8a2RlOCuphUVM2aA8vFvizBuwhuh9sknDaKwlCISW5BRR2gLUOiMwyo7kLf84oHvwSRYK13v6/STYXs5BUlXarDISufd1uRcmPObm4WomUitVZQojgghFWP1QoLNLUffSvVUDUT+ymDpirqZC91cRMIa6QKcFs6nqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 9D9A71A071F;
+	Fri, 30 Jan 2026 15:10:38 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 919641A071E;
+	Fri, 30 Jan 2026 15:10:38 +0100 (CET)
+Received: from lsv15141.swis.ro-buh01.nxp.com (lsv15141.swis.ro-buh01.nxp.com [10.162.246.138])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 34473203AA;
+	Fri, 30 Jan 2026 15:10:37 +0100 (CET)
+From: Claudiu Manoil <claudiu.manoil@nxp.com>
+To: vladimir.oltean@nxp.com,
+	wei.fang@nxp.com,
+	xiaoning.wang@nxp.com,
+	Frank.Li@nxp.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH net 0/4] ENETC v4 hardware integration fixes
+Date: Fri, 30 Jan 2026 16:10:31 +0200
+Message-Id: <20260130141035.272471-1-claudiu.manoil@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255153-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,1g4.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
+	TAGGED_FROM(0.00)[bounces-255155-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:email,1g4.org:dkim,1g4.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0436FBB529
+	RCPT_COUNT_SEVEN(0.00)[11];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[claudiu.manoil@nxp.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:mid]
+X-Rspamd-Queue-Id: 1312DBB771
 X-Rspamd-Action: no action
 
-tcf_action_fill_size() already computes the required dump size, but
-RTM_GETACTION replies always allocate NLMSG_GOODSIZE. Large action
-state can overrun that skb and make dumps fail.
+ENETC v4 targeted fixes addressing SoC level integration issues
+regarding AXI settings and register access width.
 
-Use the computed reply size for RTM_GETACTION replies so large actions
-can be dumped, while still keeping NLMSG_GOODSIZE as a floor.
+Claudiu Manoil (4):
+  net: enetc: Remove SI/BDR cacheability AXI settings for ENETC v4
+  net: enetc: Remove CBDR cacheability AXI settings for ENETC v4
+  net: enetc: Convert 16-bit register writes to 32-bit for ENETC v4
+  net: enetc: Convert 16-bit register reads to 32-bit for ENETC v4
 
-Fixes: 4e76e75d6aba ("net sched actions: calculate add/delete event message=
- size")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paul Moses <p@1g4.org>
----
- net/sched/act_api.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/freescale/enetc/enetc.c    | 11 +++++++----
+ .../net/ethernet/freescale/enetc/enetc4_pf.c    |  6 +++---
+ .../net/ethernet/freescale/enetc/enetc_cbdr.c   |  4 ----
+ drivers/net/ethernet/freescale/enetc/enetc_hw.h | 17 ++++++++++++++---
+ 4 files changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index e1ab0faeb8113..8ab016d352850 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -1685,12 +1685,12 @@ static int tca_get_fill(struct sk_buff *skb, struct=
- tc_action *actions[],
-=20
- static int
- tcf_get_notify(struct net *net, u32 portid, struct nlmsghdr *n,
--=09       struct tc_action *actions[], int event,
-+=09       struct tc_action *actions[], int event, size_t attr_size,
- =09       struct netlink_ext_ack *extack)
- {
- =09struct sk_buff *skb;
-=20
--=09skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-+=09skb =3D alloc_skb(max_t(size_t, attr_size, NLMSG_GOODSIZE), GFP_KERNEL)=
-;
- =09if (!skb)
- =09=09return -ENOBUFS;
- =09if (tca_get_fill(skb, actions, portid, n->nlmsg_seq, 0, event,
-@@ -2041,7 +2041,8 @@ tca_action_gd(struct net *net, struct nlattr *nla, st=
-ruct nlmsghdr *n,
- =09attr_size =3D tcf_action_full_attrs_size(attr_size);
-=20
- =09if (event =3D=3D RTM_GETACTION)
--=09=09ret =3D tcf_get_notify(net, portid, n, actions, event, extack);
-+=09=09ret =3D tcf_get_notify(net, portid, n, actions, event,
-+=09=09=09=09     attr_size, extack);
- =09else { /* delete */
- =09=09ret =3D tcf_del_notify(net, n, actions, portid, attr_size, extack);
- =09=09if (ret)
---=20
-2.52.GIT
-
+-- 
+2.34.1
 
 
