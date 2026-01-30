@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-255261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eBUlEfwdfWlQQQIAu9opvQ
-	(envelope-from <netdev+bounces-255261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:09:16 +0100
+	id uAo9I0kefWlQQQIAu9opvQ
+	(envelope-from <netdev+bounces-255262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:10:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE262BEB54
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:09:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CE23BEB90
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 22:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1B131306FBF5
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:03:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CFB2F3071C6A
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 21:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C84D3876BE;
-	Fri, 30 Jan 2026 21:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419B9388876;
+	Fri, 30 Jan 2026 21:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zyXqEBjx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fjByS6wG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D558B388876
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB3F389447
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 21:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769806998; cv=none; b=NxxqpqBWRiIbZozz0q7RZ0KAR14vMsP/+/JjggJfm9Qd0tQJxWEArQD1hK7PfoN9fMJ+yGTmr/SqyN7GbFkDhnFTDC4yU4eF72udzy+wOqkNfcEEMjOkTnse65Xc6rV4MfMtCZLYUdvlWrMke+vKD4EMqB0uQESDCQmgW0MqQe4=
+	t=1769807000; cv=none; b=Q8NwnDfexwkuwKPg0CBglEJcKnzrbePH5xq5mB+4ayixRjVd0SAfhBFgXlhz8WI6YcgQKSmwbeh0sUuYSbCmmIZP41GrKBs8AMgHFDVQV+ShjkAg3gG7QtvlM2IVwfD2VZFFj0u4HRgFd9VV4R5dPGvEzvubEZA7Nxs4QYaYeIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769806998; c=relaxed/simple;
-	bh=w+sA1rtAhjCUPQoyuIxhCu2G9JO1zb/Gt3r9YsUIue4=;
+	s=arc-20240116; t=1769807000; c=relaxed/simple;
+	bh=BQvsG9rp5yUOmu843TFrGtlCGUjbpqKcCmrM2R9tjvs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Zr1EtbQ4t1XuAXavMe4aIRSA2eEozBn42av4Tqi2M/5yM+/H3OCM//PdYn1EjLddlbJWzr0FFBsqp5YQlHsxltF71Ah9TNzP7bD/sS6m/pYPV5qHqg//ua5fR4ebWrYQzh/dEPk3QXjcapzERllVgtGaicEQMzIhe9hES5UTIbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zyXqEBjx; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=ct1kXptfzenRGSt/C6wev4l5hQ1nHVEtHvTLEIjZEcb3X5WkUB6h/1zQk/ebw4AOlUPJtux2dG0SlwtGh0WJO4+vE8+NrkkBFAn9q3onOMmMRu+RB7+2Jq2WFl0ZPlvQRoRGwFQXtmQq/cvlQuKqRbDmu90QQ4N5KJ7/ClhBYeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fjByS6wG; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-5033c483b76so84114081cf.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:03:16 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c6deddd7f7so662909085a.3
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 13:03:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769806996; x=1770411796; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769806997; x=1770411797; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZquStuqfSOsiiQmJc9tpnTqnmOQPWfq8rhVQJrfE7kA=;
-        b=zyXqEBjxVHPxIXSR6n9xlIC+P+lvIHz7WJcDMaxTv0giwgstSYy13Q03stvykMojbt
-         qEoJNm8YLVnzzrJz2++eVV/iAKQBtvEeYhksEKroOAp8sZeexbJGSz9+yhxXO5O3ojhT
-         uUTnmlqHsgyXqAT8ZjAZKefiSzBm+IqAFcfZEIzOtuW+nRW0KL0cPqzCQfUACWK7iygZ
-         Zbi8EIpW+W49DS8MAYgEFaEIilkrvZnAiOcyrt2t6sw8J2efGNOKAm1+JlbbVmUANNe6
-         ubANVjROBolrLabt+Otbu2on0IBUCkBA1N4RuzBCEJDXrsNgG7A8glFl/cI6n4lsjGx7
-         pS9g==
+        bh=LGJJN2xyNvGKi6kKe0peK2vw4/rawXTvbRAM5FPw4z4=;
+        b=fjByS6wGkCgHDv6ydpXB81Bmedxm7B3aGZZMNIA6GKOuqE6FfyTybBOSa3XyiBrNuu
+         gyy3s1xIKGYdRlfIu+BD4vlzVHQHLS3RAQgeaqjp/X1SL8Jkmliwazpz5xbJ3S9yF3pD
+         VTgzeiQz/xeM8v3ztjdSzIVavSHqbE/aLVamvVrtq27TGtIJNxDKMO8KVT/qSIYN6Uhd
+         nyOUQkP2CKbu60rpDDds8gxwStPvxWnpRioSmXGEo1rZ3bMLYvt5fnX9LIkh4BGSaAkF
+         oKZ7LlCB5EMIonO33pqEKwhsorqvrU5o2zmds6qfggvMu1kTGsqa1nWJjjEwxK0LRkUX
+         uI/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769806996; x=1770411796;
+        d=1e100.net; s=20230601; t=1769806997; x=1770411797;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZquStuqfSOsiiQmJc9tpnTqnmOQPWfq8rhVQJrfE7kA=;
-        b=W/deUS0Nsz0xbIB5AS/jfO3Bjt1nX9q1Rn6S9nN1hdbSGXyzbVJhttXrHbYymfX4HB
-         4klTE0P5mX7elCBuoyf83yGnwaZKWt97BY00I9N+zbPFiIDZOkAuS2dhJ0lnfTVaaiVG
-         ky6YM8WVEUOlQstF2nA0XAf1SJ6i2YdQ11XAEJwx96m3fKWHJ++jNDKLTpRbDPhp3T/b
-         DxavPuL5suwB5v3bN8EvTKDdoIUSeKq/P8A3l1BCcS38ii58q/fnO0mB4ijON4xWNulX
-         MJcMVH5kgdQwElRPicRATxbmleuuSSMKH4ES+Ra0NG0rr2rcG+PqrEJFnXRQ7+0yog8s
-         FYvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWG9sDK/k1FGwJ73lcOylib6y1NEvBQZU0BpXQj91ECEa3ztEKN8VK42QQF2jkyf0y0gnqrHlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0AYrv2oxbuKPi1r4R4Kyjyeod1dAGoEURlCMOP8Qg5pqnv1UQ
-	3sBLjLQAJcx6McgUDYAWbrpYI+7Ff1wp6wtShZ4rIobx94KkiMzMDQXwmBldKG4DCmDyFtKERhs
-	NIIv7JmDT9/PAaw==
-X-Received: from qtqp23.prod.google.com ([2002:ac8:7417:0:b0:503:3412:57be])
+        bh=LGJJN2xyNvGKi6kKe0peK2vw4/rawXTvbRAM5FPw4z4=;
+        b=o+epIgBF/Z5M2Si1qUs16Cck5TTEMHL1liZ4YeWXzwm7z81bOVIJ2sngjIVXe9OyIP
+         OB+ZDs7hTjLqAQ3LSjJ/AFZEJsWhS40pkfRbP9YO1StZpbIX+HwKRwNuC82sgEQESH1Q
+         rP7t1XUtocr0bNw353hso5oFmSYBZ4c1oq3xCapIcRHmGPjXomoOg+/GXwqw9bqzJfAr
+         iGg8b3feO9pO5g6KtdNfMObz4ZbWY80e6V8lihUYsWb2J1PUy5gKmefKrZ1d66T+weTH
+         Q7/57bEvaaRJVMzvBR2NYzk5XLgTSR4K1hMIeV1ULXWa7InlJ+THpHhTuNabFdTJg1sm
+         qUvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXLhAKC3gKPIMrjCwPGElIZ4jtNSCaZ4pFl6W0CLuLRRN8wjrQujYdbk0DToSNsrr14LrhEho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeB6HT49Uy2qb3XgqjqXhLzeWlePdBsT7I1+ogrvr2kwPYKF5E
+	9uvPkt4vLfnNKzwQTuONf6GVlyEgZIfvrjxtbQtpMVj4vxfPGWe78jGf/37U4pVUaKjpEp1aBJN
+	Ahwi/CzXSDHrpog==
+X-Received: from qkpr14.prod.google.com ([2002:a05:620a:298e:b0:8b2:d765:51ef])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5a0e:0:b0:4ec:ee04:8831 with SMTP id d75a77b69052e-505d2297723mr62946611cf.57.1769806995742;
- Fri, 30 Jan 2026 13:03:15 -0800 (PST)
-Date: Fri, 30 Jan 2026 21:03:02 +0000
+ 2002:a05:620a:1a20:b0:8c7:115a:d0e3 with SMTP id af79cd13be357-8c9eb26fd93mr586292385a.37.1769806997453;
+ Fri, 30 Jan 2026 13:03:17 -0800 (PST)
+Date: Fri, 30 Jan 2026 21:03:03 +0000
 In-Reply-To: <20260130210303.3888261-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260130210303.3888261-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260130210303.3888261-8-edumazet@google.com>
-Subject: [PATCH net-next 7/8] ipv4: use dst4_mtu() instead of dst_mtu()
+Message-ID: <20260130210303.3888261-9-edumazet@google.com>
+Subject: [PATCH net-next 8/8] ipv6: colocate inet6_cork in inet_cork_full
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255261-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255262-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -112,154 +112,310 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EE262BEB54
+X-Rspamd-Queue-Id: 1CE23BEB90
 X-Rspamd-Action: no action
 
-When we expect an IPv4 dst, use dst4_mtu() instead of dst_mtu()
-to save some code space.
+All inet6_cork users also use one inet_cork_full.
+
+Reduce number of parameters and increase data locality.
+
+This saves ~275 bytes of code on x86_64.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/icmp.c                     |  2 +-
- net/ipv4/ip_output.c                |  4 ++--
- net/ipv4/ip_sockglue.c              |  2 +-
- net/ipv4/ipmr.c                     |  2 +-
- net/ipv4/netfilter/nf_reject_ipv4.c |  2 +-
- net/ipv4/tcp_ipv4.c                 | 13 ++++++-------
- net/ipv6/sit.c                      |  2 +-
- 7 files changed, 13 insertions(+), 14 deletions(-)
+ include/linux/ipv6.h    |  8 ------
+ include/net/inet_sock.h | 10 ++++++++
+ include/net/ipv6.h      |  6 ++---
+ net/ipv6/ip6_output.c   | 55 ++++++++++++++++++++---------------------
+ net/ipv6/raw.c          |  2 +-
+ 5 files changed, 40 insertions(+), 41 deletions(-)
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 19c9c838967f761a8b3a1b07cea5c5ec932bf12d..1d362a17a1c446e8d988162b164c5096a7f5d9dc 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -945,7 +945,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index 7294e4e89b797b1c45d1920686c2553e10badb81..20aae8357dd151e8c7d6972f41e77cebf1379177 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -205,13 +205,6 @@ struct ipv6_mc_socklist;
+ struct ipv6_ac_socklist;
+ struct ipv6_fl_socklist;
  
- 	/* RFC says return as much as we can without exceeding 576 bytes. */
+-struct inet6_cork {
+-	struct ipv6_txoptions *opt;
+-	u8 hop_limit;
+-	u8 tclass;
+-	u8 dontfrag:1;
+-};
+-
+ /* struct ipv6_pinfo - ipv6 private area */
+ struct ipv6_pinfo {
+ 	/* Used in tx path (inet6_csk_route_socket(), ip6_xmit()) */
+@@ -267,7 +260,6 @@ struct ipv6_pinfo {
  
--	room = dst_mtu(&rt->dst);
-+	room = dst4_mtu(&rt->dst);
- 	if (room > 576)
- 		room = 576;
- 	room -= sizeof(struct iphdr) + icmp_param->replyopts.opt.optlen;
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 75fcb58795bbbd97d9544c05b245675ad1d1383a..e4790cc7b5c2ec7d6893d4141ca250ec05a4a2f5 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1300,7 +1300,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- 		return -EFAULT;
+ 	struct sk_buff		*pktoptions;
+ 	struct sk_buff		*rxpmtu;
+-	struct inet6_cork	cork;
  
- 	cork->fragsize = ip_sk_use_pmtu(sk) ?
--			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
-+			 dst4_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
+ 	struct ipv6_mc_socklist	__rcu *ipv6_mc_list;
+ 	struct ipv6_ac_socklist	*ipv6_ac_list;
+diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+index 903b2263ec8031565990dc52b921352e6a642b1a..7cdcbed3e5cbfd1a13698942da05b9ceabf72950 100644
+--- a/include/net/inet_sock.h
++++ b/include/net/inet_sock.h
+@@ -159,6 +159,13 @@ static inline bool inet_sk_bound_dev_eq(const struct net *net,
+ #endif
+ }
  
- 	if (!inetdev_valid_mtu(cork->fragsize))
- 		return -ENETUNREACH;
-@@ -1439,7 +1439,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
- 	pmtudisc = READ_ONCE(inet->pmtudisc);
- 	if (pmtudisc == IP_PMTUDISC_DO ||
- 	    pmtudisc == IP_PMTUDISC_PROBE ||
--	    (skb->len <= dst_mtu(&rt->dst) &&
-+	    (skb->len <= dst4_mtu(&rt->dst) &&
- 	     ip_dont_fragment(sk, &rt->dst)))
- 		df = htons(IP_DF);
++struct inet6_cork {
++	struct ipv6_txoptions *opt;
++	u8 hop_limit;
++	u8 tclass;
++	u8 dontfrag:1;
++};
++
+ struct inet_cork {
+ 	unsigned int		flags;
+ 	__be32			addr;
+@@ -179,6 +186,9 @@ struct inet_cork {
+ struct inet_cork_full {
+ 	struct inet_cork	base;
+ 	struct flowi		fl;
++#if IS_ENABLED(CONFIG_IPV6)
++	struct inet6_cork	base6;
++#endif
+ };
  
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 6d9c5c20b1c4f93bd54283b5aadbb9bc61c24685..c062d9519818024e01746eec20eb3c036226f77e 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1634,7 +1634,7 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 		val = 0;
- 		dst = sk_dst_get(sk);
- 		if (dst) {
--			val = dst_mtu(dst);
-+			val = dst4_mtu(dst);
- 			dst_release(dst);
- 		}
- 		if (!val)
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index ca9eaee4c2ef5f5cdc03608291ad1a0dc187d657..131382c388e95707f27dd7d43be9b9ee2f62c85d 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -1895,7 +1895,7 @@ static int ipmr_prepare_xmit(struct net *net, struct mr_table *mrt,
- 			return -1;
- 	}
+ struct ip_mc_socklist;
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index a35f0a8114c093c65d3706f53b945cb426bd212b..c27b9d7aeb7cf4611a55abc133d6aaa0d1508a47 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -1107,8 +1107,7 @@ void ip6_flush_pending_frames(struct sock *sk);
+ int ip6_send_skb(struct sk_buff *skb);
  
--	if (skb->len+encap > dst_mtu(&rt->dst) && (ntohs(iph->frag_off) & IP_DF)) {
-+	if (skb->len+encap > dst4_mtu(&rt->dst) && (ntohs(iph->frag_off) & IP_DF)) {
- 		/* Do not fragment multicasts. Alas, IPv4 does not
- 		 * allow to send ICMP, so that packets will disappear
- 		 * to blackhole.
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-index fae4aa4a5f0955849c6a4ba85bc925c33cd9e102..fecf6621f679f9d435803a7bd522b38bf3de7ef4 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -303,7 +303,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 		goto free_nskb;
+ struct sk_buff *__ip6_make_skb(struct sock *sk, struct sk_buff_head *queue,
+-			       struct inet_cork_full *cork,
+-			       struct inet6_cork *v6_cork);
++			       struct inet_cork_full *cork);
+ struct sk_buff *ip6_make_skb(struct sock *sk,
+ 			     int getfrag(void *from, char *to, int offset,
+ 					 int len, int odd, struct sk_buff *skb),
+@@ -1119,8 +1118,7 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
  
- 	/* "Never happens" */
--	if (nskb->len > dst_mtu(skb_dst(nskb)))
-+	if (nskb->len > dst4_mtu(skb_dst(nskb)))
- 		goto free_nskb;
+ static inline struct sk_buff *ip6_finish_skb(struct sock *sk)
+ {
+-	return __ip6_make_skb(sk, &sk->sk_write_queue, &inet_sk(sk)->cork,
+-			      &inet6_sk(sk)->cork);
++	return __ip6_make_skb(sk, &sk->sk_write_queue, &inet_sk(sk)->cork);
+ }
  
- 	nf_ct_attach(nskb, oldskb);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index ffdf52fbf6463b41d7c712f3710b681ecdf6e2d7..349ae751f9d0ea4090627717719c5afc573260fc 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -374,7 +374,7 @@ void tcp_v4_mtu_reduced(struct sock *sk)
+ int ip6_dst_lookup(struct net *net, struct sock *sk, struct dst_entry **dst,
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index f110701d1eca1e5f763d9138a43e11e92c15412f..e622a9e086cc0a3bc775fc87a379115bcf438e77 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1353,12 +1353,13 @@ static void ip6_append_data_mtu(unsigned int *mtu,
+ }
+ 
+ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
+-			  struct inet6_cork *v6_cork, struct ipcm6_cookie *ipc6,
++			  struct ipcm6_cookie *ipc6,
+ 			  struct rt6_info *rt)
+ {
++	struct ipv6_txoptions *nopt, *opt = ipc6->opt;
++	struct inet6_cork *v6_cork = &cork->base6;
+ 	struct ipv6_pinfo *np = inet6_sk(sk);
+ 	unsigned int mtu, frag_size;
+-	struct ipv6_txoptions *nopt, *opt = ipc6->opt;
+ 
+ 	/* callers pass dst together with a reference, set it first so
+ 	 * ip6_cork_release() can put it down even in case of an error.
+@@ -1431,17 +1432,17 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
+ static int __ip6_append_data(struct sock *sk,
+ 			     struct sk_buff_head *queue,
+ 			     struct inet_cork_full *cork_full,
+-			     struct inet6_cork *v6_cork,
+ 			     struct page_frag *pfrag,
+ 			     int getfrag(void *from, char *to, int offset,
+ 					 int len, int odd, struct sk_buff *skb),
+ 			     void *from, size_t length, int transhdrlen,
+ 			     unsigned int flags)
+ {
+-	struct sk_buff *skb, *skb_prev = NULL;
++	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu, pmtu;
++	struct inet6_cork *v6_cork = &cork_full->base6;
+ 	struct inet_cork *cork = &cork_full->base;
+ 	struct flowi6 *fl6 = &cork_full->fl.u.ip6;
+-	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu, pmtu;
++	struct sk_buff *skb, *skb_prev = NULL;
+ 	struct ubuf_info *uarg = NULL;
+ 	int exthdrlen = 0;
+ 	int dst_exthdrlen = 0;
+@@ -1844,7 +1845,6 @@ int ip6_append_data(struct sock *sk,
+ 		    struct rt6_info *rt, unsigned int flags)
  {
  	struct inet_sock *inet = inet_sk(sk);
- 	struct dst_entry *dst;
--	u32 mtu;
-+	u32 mtu, dmtu;
+-	struct ipv6_pinfo *np = inet6_sk(sk);
+ 	int exthdrlen;
+ 	int err;
  
- 	if ((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE))
- 		return;
-@@ -386,15 +386,14 @@ void tcp_v4_mtu_reduced(struct sock *sk)
- 	/* Something is about to be wrong... Remember soft error
- 	 * for the case, if this connection will not able to recover.
- 	 */
--	if (mtu < dst_mtu(dst) && ip_dont_fragment(sk, dst))
-+	dmtu = dst4_mtu(dst);
-+	if (mtu < dmtu && ip_dont_fragment(sk, dst))
- 		WRITE_ONCE(sk->sk_err_soft, EMSGSIZE);
- 
--	mtu = dst_mtu(dst);
--
- 	if (inet->pmtudisc != IP_PMTUDISC_DONT &&
- 	    ip_sk_accept_pmtu(sk) &&
--	    inet_csk(sk)->icsk_pmtu_cookie > mtu) {
--		tcp_sync_mss(sk, mtu);
-+	    inet_csk(sk)->icsk_pmtu_cookie > dmtu) {
-+		tcp_sync_mss(sk, dmtu);
- 
- 		/* Resend the TCP packet because it's
- 		 * clear that the old packet has been
-@@ -1760,7 +1759,7 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
- 
- 	tcp_ca_openreq_child(newsk, dst);
- 
--	tcp_sync_mss(newsk, dst_mtu(dst));
-+	tcp_sync_mss(newsk, dst4_mtu(dst));
- 	newtp->advmss = tcp_mss_clamp(tcp_sk(sk), dst_metric_advmss(dst));
- 
- 	tcp_initialize_rcv_mss(newsk);
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index cf37ad9686e698bf781df84f348d89ea7160ec63..439c8a1c662520d1769c0a60a5e9ae2cc0196d15 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -962,7 +962,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
+@@ -1855,7 +1855,7 @@ int ip6_append_data(struct sock *sk,
+ 		 * setup for corking
+ 		 */
+ 		dst_hold(&rt->dst);
+-		err = ip6_setup_cork(sk, &inet->cork, &np->cork,
++		err = ip6_setup_cork(sk, &inet->cork,
+ 				     ipc6, rt);
+ 		if (err)
+ 			return err;
+@@ -1869,7 +1869,7 @@ int ip6_append_data(struct sock *sk,
  	}
  
- 	if (df) {
--		mtu = dst_mtu(&rt->dst) - t_hlen;
-+		mtu = dst4_mtu(&rt->dst) - t_hlen;
+ 	return __ip6_append_data(sk, &sk->sk_write_queue, &inet->cork,
+-				 &np->cork, sk_page_frag(sk), getfrag,
++				 sk_page_frag(sk), getfrag,
+ 				 from, length, transhdrlen, flags);
+ }
+ EXPORT_SYMBOL_GPL(ip6_append_data);
+@@ -1882,9 +1882,10 @@ static void ip6_cork_steal_dst(struct sk_buff *skb, struct inet_cork_full *cork)
+ 	skb_dst_set(skb, dst);
+ }
  
- 		if (mtu < IPV4_MIN_MTU) {
- 			DEV_STATS_INC(dev, collisions);
+-static void ip6_cork_release(struct inet_cork_full *cork,
+-			     struct inet6_cork *v6_cork)
++static void ip6_cork_release(struct inet_cork_full *cork)
+ {
++	struct inet6_cork *v6_cork = &cork->base6;
++
+ 	if (unlikely(v6_cork->opt)) {
+ 		struct ipv6_txoptions *opt = v6_cork->opt;
+ 
+@@ -1904,15 +1905,14 @@ static void ip6_cork_release(struct inet_cork_full *cork,
+ 
+ struct sk_buff *__ip6_make_skb(struct sock *sk,
+ 			       struct sk_buff_head *queue,
+-			       struct inet_cork_full *cork,
+-			       struct inet6_cork *v6_cork)
++			       struct inet_cork_full *cork)
+ {
+ 	struct sk_buff *skb, *tmp_skb;
+ 	struct sk_buff **tail_skb;
+ 	struct in6_addr *final_dst;
+ 	struct net *net = sock_net(sk);
+ 	struct ipv6hdr *hdr;
+-	struct ipv6_txoptions *opt = v6_cork->opt;
++	struct ipv6_txoptions *opt;
+ 	struct rt6_info *rt = dst_rt6_info(cork->base.dst);
+ 	struct flowi6 *fl6 = &cork->fl.u.ip6;
+ 	unsigned char proto = fl6->flowi6_proto;
+@@ -1941,6 +1941,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
+ 	__skb_pull(skb, skb_network_header_len(skb));
+ 
+ 	final_dst = &fl6->daddr;
++	opt = cork->base6.opt;
+ 	if (unlikely(opt)) {
+ 		if (opt->opt_flen)
+ 			proto = ipv6_push_frag_opts(skb, opt, proto);
+@@ -1952,10 +1953,10 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
+ 	skb_reset_network_header(skb);
+ 	hdr = ipv6_hdr(skb);
+ 
+-	ip6_flow_hdr(hdr, v6_cork->tclass,
++	ip6_flow_hdr(hdr, cork->base6.tclass,
+ 		     ip6_make_flowlabel(net, skb, fl6->flowlabel,
+ 					ip6_autoflowlabel(net, sk), fl6));
+-	hdr->hop_limit = v6_cork->hop_limit;
++	hdr->hop_limit = cork->base6.hop_limit;
+ 	hdr->nexthdr = proto;
+ 	hdr->saddr = fl6->saddr;
+ 	hdr->daddr = *final_dst;
+@@ -1982,7 +1983,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
+ 		ICMP6_INC_STATS(net, idev, ICMP6_MIB_OUTMSGS);
+ 	}
+ 
+-	ip6_cork_release(cork, v6_cork);
++	ip6_cork_release(cork);
+ out:
+ 	return skb;
+ }
+@@ -2021,8 +2022,7 @@ EXPORT_SYMBOL_GPL(ip6_push_pending_frames);
+ 
+ static void __ip6_flush_pending_frames(struct sock *sk,
+ 				       struct sk_buff_head *queue,
+-				       struct inet_cork_full *cork,
+-				       struct inet6_cork *v6_cork)
++				       struct inet_cork_full *cork)
+ {
+ 	struct sk_buff *skb;
+ 
+@@ -2033,13 +2033,13 @@ static void __ip6_flush_pending_frames(struct sock *sk,
+ 		kfree_skb(skb);
+ 	}
+ 
+-	ip6_cork_release(cork, v6_cork);
++	ip6_cork_release(cork);
+ }
+ 
+ void ip6_flush_pending_frames(struct sock *sk)
+ {
+ 	__ip6_flush_pending_frames(sk, &sk->sk_write_queue,
+-				   &inet_sk(sk)->cork, &inet6_sk(sk)->cork);
++				   &inet_sk(sk)->cork);
+ }
+ EXPORT_SYMBOL_GPL(ip6_flush_pending_frames);
+ 
+@@ -2050,9 +2050,8 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
+ 			     struct ipcm6_cookie *ipc6, struct rt6_info *rt,
+ 			     unsigned int flags, struct inet_cork_full *cork)
+ {
+-	struct inet6_cork v6_cork;
+-	struct sk_buff_head queue;
+ 	int exthdrlen = (ipc6->opt ? ipc6->opt->opt_flen : 0);
++	struct sk_buff_head queue;
+ 	int err;
+ 
+ 	if (flags & MSG_PROBE) {
+@@ -2065,21 +2064,21 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
+ 	cork->base.flags = 0;
+ 	cork->base.addr = 0;
+ 	cork->base.opt = NULL;
+-	v6_cork.opt = NULL;
+-	err = ip6_setup_cork(sk, cork, &v6_cork, ipc6, rt);
++	cork->base6.opt = NULL;
++	err = ip6_setup_cork(sk, cork, ipc6, rt);
+ 	if (err) {
+-		ip6_cork_release(cork, &v6_cork);
++		ip6_cork_release(cork);
+ 		return ERR_PTR(err);
+ 	}
+ 
+-	err = __ip6_append_data(sk, &queue, cork, &v6_cork,
++	err = __ip6_append_data(sk, &queue, cork,
+ 				&current->task_frag, getfrag, from,
+ 				length + exthdrlen, transhdrlen + exthdrlen,
+ 				flags);
+ 	if (err) {
+-		__ip6_flush_pending_frames(sk, &queue, cork, &v6_cork);
++		__ip6_flush_pending_frames(sk, &queue, cork);
+ 		return ERR_PTR(err);
+ 	}
+ 
+-	return __ip6_make_skb(sk, &queue, cork, &v6_cork);
++	return __ip6_make_skb(sk, &queue, cork);
+ }
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index b4cd05dba9b6d209bfb1024b7e1b0c703f906e5b..ee6beba03e9b498c8ea5b9e5834e26251f81e958 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -529,7 +529,7 @@ static int rawv6_push_pending_frames(struct sock *sk, struct flowi6 *fl6,
+ 
+ 	offset = rp->offset;
+ 	total_len = inet_sk(sk)->cork.base.length;
+-	opt = inet6_sk(sk)->cork.opt;
++	opt = inet_sk(sk)->cork.base6.opt;
+ 	total_len -= opt ? opt->opt_flen : 0;
+ 
+ 	if (offset >= total_len - 1) {
 -- 
 2.53.0.rc1.225.gd81095ad13-goog
 
