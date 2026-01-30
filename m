@@ -1,315 +1,900 @@
-Return-Path: <netdev+bounces-255032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKn2N99CfGl9LgIAu9opvQ
-	(envelope-from <netdev+bounces-255032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:34:23 +0100
+	id 6Pk8BE5GfGnfLgIAu9opvQ
+	(envelope-from <netdev+bounces-255033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:49:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5136CB7549
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:34:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C365B7746
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 06:49:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2D53130157DC
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:34:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 453D73019F3E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 05:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1860136E474;
-	Fri, 30 Jan 2026 05:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738F7327C10;
+	Fri, 30 Jan 2026 05:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DmtKyMmh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bUsr+oCp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497CE36CE0F
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 05:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BA62EBBB9;
+	Fri, 30 Jan 2026 05:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769751261; cv=none; b=P3t+ZTJv//7oT6Hb1McJVKJtPWQSKyNLL014PCIEg5FOYm/XF0Wt6J+W0rkmx8C95/ZcTVae4UYbTpd7qx9mXhS//JT4wXQBR+GfXI3+0osoJs8pyVzgDLX8Ed1RxVUVKCWM9VbZY1kAnwC17iF/Mn6tvdfhCl61oaRehbr+WKw=
+	t=1769752084; cv=none; b=WPi981gA86xwDaL7fah5kQg91p/LWVdRazIHaGcoKorf6ejyReaL7EwoJYDWCT/YtY4MJ0bDmvGZfSUPOuhL8O6Luf25QZBjgrfAzvxML3nZmvlORFTsNtoOhvni6otGZRMc4b1In0RXY+2+GRuat/qihsza37xpT9aGxP2Tw0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769751261; c=relaxed/simple;
-	bh=0h7xP6A49Jgeo/0GDXqLFRTApRe+v4rNX4sEgCnoL5M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XaAREXkS6e3HjVy7FQKwdZGYcUIWtbgVVGCJiFoIeG+9s4HKXn2egpEfh4yVcEjuQYgQtkt6lZUKHkiTi8vNW/cc6OQUd1ZSf4WNzDgoTWPjmxB8rH02onx+s/KXWcdldTJC/b2BbbjkrmuWiY094I8AzSmQNOETTdcv0trpR/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DmtKyMmh; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8c6aaf3cd62so183054285a.3
-        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 21:34:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769751258; x=1770356058; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UKpVoG4fkiASguZlTDW91/9jV9J6kBfvakyqskZ0dmo=;
-        b=DmtKyMmhD0F6RW5pebHUNE+KewYZhUOVILAlykZGiHaD/rB0LujTG6wr/87Rxn0riD
-         Fcx/18UGC7b/ElxVBp8YC2hSO6PLgEEdUvw9u+OytAY86MuR5I2W/eQ8yH5OwvDyr2GM
-         A1gUyb76DtxzwiFPq56fu51PqZvYxaUP/u80TTS4GHqpu4um4KoM4LfVDtYReKqdvv7f
-         lfU3YHfZNyybf7tqgI6F1sV9pjrDeFP3YGUvBV567Kas6oG0M0HjBZmToAE7GaGlqD4V
-         zy8N5eDoE4h82jML2uyI1tmMXw+HvuzBJFVpOc3crSvZcE69lcq6Zv+0u8/6US9S9eKJ
-         bd1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769751258; x=1770356058;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UKpVoG4fkiASguZlTDW91/9jV9J6kBfvakyqskZ0dmo=;
-        b=pdh0jAz4TlvK2pp0rRprOry08LNLuZEkPy5SepnkyKvk3+PTKUqkEhnU9VyW0ntwum
-         gAJYlQvUU9SKlyGx+FjNL5lSXQf6fobD7+kFWlZ2Xo2SNOm0Qa6nBLL/lsPlo2BxOAFZ
-         u6eR/lC358qvt2Jkia0iS0KSPUQ/e2IH1xyH+lkaaquRX8FjdBdex1nj1OjR/0sttCv5
-         RerjLLypJoasq31FaHj4dzoHMTbtqo1JXdhdXU5dEFUJOdC5uHPs7xetRPwOzNqSb8sD
-         AwExfT6n3XcyPJRL7gl3gq+Oy92VGBu51J2OMxx+ZjB3lvu0+9Cqhh88qIgEr+FeGILy
-         Pr3A==
-X-Gm-Message-State: AOJu0YxEAsBQNus+Ffr/fcTQ7HchZ7jY4HIxHVeIeJvU4/uRxQgtMfpl
-	Ho+mZH5DeWA1mUdgpGZdyxr3v1kF2pXubqDW0IaKokMwUfqhwOyXlP7j
-X-Gm-Gg: AZuq6aIeGy+b3RaDhdqp6Em1j8AllVewUEAa6cn0kK+h2+ufDD6D7SfhDfY8L2SiKLq
-	CSnC8TsuzDgfre8L/OaVjFjHZbGeadJOd0mK5i0tUCqGzCRtJOQi/JdeNq0p5yU0wCmTb1FU86A
-	5d3WgYRnVPtPCtkR5ihaRpFlFRlwuoQQ3qrG46K0OmkNtAbsRr5aCwRz5LmQWE0iPiIOvH8m9J7
-	wRFJGqtJHBgbK+1yy5YIHx6BhvR03LOtp947LAR6977oCV/D01DzUW8IlJfiqhvZGA1cPZfg9qH
-	kCJ72/XqG6r2VHlANXprGB1FEe3hTj83PC/sv4++wCfbqzeHMw9FDlEkI8iyhVNZgf4YidcFhK3
-	fMcHM/sjesANNS/QDi/losyEx8ecjO51GyGqua2Qahb9wUIYJ0C2eXrVsidxhqJbx19hlIqgCPl
-	bTfBBcSZuNG28+gGlufhuP
-X-Received: by 2002:a05:620a:4542:b0:8c6:b14e:655d with SMTP id af79cd13be357-8c9eb30e4a9mr249559585a.74.1769751257701;
-        Thu, 29 Jan 2026 21:34:17 -0800 (PST)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c711d2847asm551232885a.34.2026.01.29.21.34.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 21:34:17 -0800 (PST)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Fri, 30 Jan 2026 13:34:07 +0800
-Subject: [PATCH net v4] net: cpsw_new: Execute ndo_set_rx_mode callback in
- a work queue
+	s=arc-20240116; t=1769752084; c=relaxed/simple;
+	bh=Lhccew2SwapeRY9mMq3M7jhI3jE4UnFih+gogwzX4Lo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HrOkz0s3DzPxoAqf31jHirpb7uh26AhCZHdqvGXcZb5gli7O5/8gxCfYjoOpipxR+qiiqzfoSHXSPHR9yi5WGrockJEt6kcQnfimtyZUeYCX8axRboZNFRweIdlD4lKUg6+iGMjyIM2/K23IHho8luqx17hLuk6m5RZOsan+A2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bUsr+oCp; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=6ZmSC00KrPI+OiUbaGcl5aD3dIGhnovACrjYKocu8RM=; b=bUsr+oCp7dhtV/J4G9E4X8YLzE
+	a4Z7Cf0Usu+50u+A7MY1sUVATpJPXP10APVvXJJHaRgflS5N+BmBg5qVw51XIDiXT0Fzj94ppMm6m
+	VmtGB1cAVQBe6w61i9GbwUSLTXLX9hZu6+QWYl9FbT6VVXPAz7E4hH0ZE5qV55DTsBUiilm3d5kvm
+	8VcH+8sy4YWRj17y5B3i2uhnOCeegm48yaMm5IvcJHhvf+bwfJsvSV00ZgJOYRBR55GJwdCCN5oJA
+	X8Y4J7oT6LNtzH/oUExttMst8eVF9VMVJGfNQGVGCPhsZIfNAsqfASdSA1zV80JpK6iAzzUj11mZo
+	3e0wVibQ==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vlhMP-000000014YN-1Gyn;
+	Fri, 30 Jan 2026 05:48:01 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	linux-s390@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next] net/iucv: clean up iucv kernel-doc warnings
+Date: Thu, 29 Jan 2026 21:47:59 -0800
+Message-ID: <20260130054759.1301608-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260130-bbb-v4-1-2bd000a15c34@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAM5CfGkC/13MTQ7CIBAF4Ks0rMXwj7ryHsZFgaElsa2Bhmia3
- l2km2pm9WbmewtKEAMkdGkWFCGHFKaxBHFokO3bsQMcXMmIEaYIZRwbY7CzXGnplaaOoPL5jOD
- Dq7bc0AgzupdlH9I8xXdtzrSefkoyxWW0MsRoeuLCXbuhDY+jnYbqM9sbuRn2NVJo71tjz47/G
- 743ejO8GAmaei6IpXDem3VdP/xw/1UDAQAA
-X-Change-ID: 20260123-bbb-dc3675f671d0
-To: netdev@vger.kernel.org
-Cc: Kevin Hao <haokexin@gmail.com>, stable@vger.kernel.org, 
- Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, linux-omap@vger.kernel.org
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255032-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255033-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,nxp.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,ti.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davemloft.net:email]
-X-Rspamd-Queue-Id: 5136CB7549
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email,infradead.org:dkim,infradead.org:mid]
+X-Rspamd-Queue-Id: 6C365B7746
 X-Rspamd-Action: no action
 
-Commit 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for
-IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.") removed the RTNL lock for
-IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP operations. However, this
-change triggered the following call trace on my BeagleBone Black board:
-  WARNING: net/8021q/vlan_core.c:236 at vlan_for_each+0x120/0x124, CPU#0: rpcbind/496
-  RTNL: assertion failed at net/8021q/vlan_core.c (236)
-  Modules linked in:
-  CPU: 0 UID: 997 PID: 496 Comm: rpcbind Not tainted 6.19.0-rc6-next-20260122-yocto-standard+ #8 PREEMPT
-  Hardware name: Generic AM33XX (Flattened Device Tree)
-  Call trace:
-   unwind_backtrace from show_stack+0x28/0x2c
-   show_stack from dump_stack_lvl+0x30/0x38
-   dump_stack_lvl from __warn+0xb8/0x11c
-   __warn from warn_slowpath_fmt+0x130/0x194
-   warn_slowpath_fmt from vlan_for_each+0x120/0x124
-   vlan_for_each from cpsw_add_mc_addr+0x54/0xd8
-   cpsw_add_mc_addr from __hw_addr_ref_sync_dev+0xc4/0xec
-   __hw_addr_ref_sync_dev from __dev_mc_add+0x78/0x88
-   __dev_mc_add from igmp6_group_added+0x84/0xec
-   igmp6_group_added from __ipv6_dev_mc_inc+0x1fc/0x2f0
-   __ipv6_dev_mc_inc from __ipv6_sock_mc_join+0x124/0x1b4
-   __ipv6_sock_mc_join from do_ipv6_setsockopt+0x84c/0x1168
-   do_ipv6_setsockopt from ipv6_setsockopt+0x88/0xc8
-   ipv6_setsockopt from do_sock_setsockopt+0xe8/0x19c
-   do_sock_setsockopt from __sys_setsockopt+0x84/0xac
-   __sys_setsockopt from ret_fast_syscall+0x0/0x5
+Fix numerous (many) kernel-doc warnings in iucv.[ch]:
 
-This trace occurs because vlan_for_each() is called within
-cpsw_ndo_set_rx_mode(), which expects the RTNL lock to be held.
-Since modifying vlan_for_each() to operate without the RTNL lock is not
-straightforward, and because ndo_set_rx_mode() is invoked both with and
-without the RTNL lock across different code paths, simply adding
-rtnl_lock() in cpsw_ndo_set_rx_mode() is not a viable solution.
+- remove kernel-doc on static functions in iucv.c
+- convert function documentation comments to a common (kernel-doc) look,
+  even for static functions (without "/**")
+- use matching parameter and parameter description names
 
-To resolve this issue, we opt to execute the actual processing within
-a work queue, following the approach used by the icssg-prueth driver.
+Examples:
 
-Fixes: 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.")
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
-Cc: stable@vger.kernel.org
+Warning: include/net/iucv/iucv.h:210 missing initial short description
+ on line: * iucv_unregister
+Warning: include/net/iucv/iucv.h:216 function parameter 'handle' not
+ described in 'iucv_unregister'
+Warning: include/net/iucv/iucv.h:467 function parameter 'answer' not
+ described in 'iucv_message_send2way'
+Warning: net/iucv/iucv.c:727 missing initial short description on line:
+ * iucv_cleanup_queue
+
+Build-tested with both "make htmldocs" and make ARCH=s390 defconfig all".
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
-Changes in v4:
-- Using schedule_work() instead of creating a dedicated workqueue.
-
-- Link to v3: https://lore.kernel.org/r/20260127-bbb-v3-1-5e71f340c1e9@gmail.com
-
-Changes in v3:
-- Resolve the deadlock issue identified in the AI review [2]
-  by moving the netif_running() check under the RTNL lock and removing the
-  cancel_work_sync() call in cpsw_ndo_stop().
-
-- Link to v2: https://lore.kernel.org/r/20260125-bbb-v2-1-1547ffabc9d3@gmail.com
-
-Changes in v2:
-- Addresses the issue identified in the AI review [1]:
-  - Adds a netif_running() check in cpsw_ndo_set_rx_mode_work()
-  - Cancels the rx_mode_work in cpsw_ndo_stop()
-
-- Link to v1: https://lore.kernel.org/r/20260123-bbb-v1-1-176b0b71834d@gmail.com
-
-[1] https://netdev-ai.bots.linux.dev/ai-review.html?id=bd885e1e-1aed-4755-ad60-7150737ad0f5
-[2] https://netdev-ai.bots.linux.dev/ai-review.html?id=c9fc3cf8-a06c-4cb8-b26b-910e775951a0
----
-Please note that the cpsw driver also has the same issue. If this resolution
-is acceptable, I will create another patch to fix the issue in cpsw.
-
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Roger Quadros <rogerq@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Thorsten Winkler <twinkler@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: linux-omap@vger.kernel.org
----
- drivers/net/ethernet/ti/cpsw_new.c  | 33 +++++++++++++++++++++++++++++----
- drivers/net/ethernet/ti/cpsw_priv.h |  1 +
- 2 files changed, 30 insertions(+), 4 deletions(-)
+Cc: Simon Horman <horms@kernel.org>
 
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index ab88d4c02cbde76207f89cf433e2b383dcde6a83..744657cad0927da21232969d07c15e68f44811e3 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -248,15 +248,25 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
- 	return 0;
- }
+ include/net/iucv/iucv.h |   54 +++------
+ net/iucv/iucv.c         |  223 +++++++++++++++++---------------------
+ 2 files changed, 127 insertions(+), 150 deletions(-)
+
+--- linux-next-20260128.orig/include/net/iucv/iucv.h
++++ linux-next-20260128/include/net/iucv/iucv.h
+@@ -70,7 +70,7 @@
+ #define IUCV_IPLOCAL	0x01
  
--static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
-+static void cpsw_ndo_set_rx_mode_work(struct work_struct *work)
- {
--	struct cpsw_priv *priv = netdev_priv(ndev);
-+	struct cpsw_priv *priv = container_of(work, struct cpsw_priv, rx_mode_work);
- 	struct cpsw_common *cpsw = priv->cpsw;
-+	struct net_device *ndev = priv->ndev;
- 
-+	rtnl_lock();
-+	if (!netif_running(ndev)) {
-+		rtnl_unlock();
-+		return;
-+	}
-+
-+	netif_addr_lock_bh(ndev);
- 	if (ndev->flags & IFF_PROMISC) {
- 		/* Enable promiscuous mode */
- 		cpsw_set_promiscious(ndev, true);
- 		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, priv->emac_port);
-+		netif_addr_unlock_bh(ndev);
-+		rtnl_unlock();
- 		return;
- 	}
- 
-@@ -270,6 +280,15 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
- 	/* add/remove mcast address either for real netdev or for vlan */
- 	__hw_addr_ref_sync_dev(&ndev->mc, ndev, cpsw_add_mc_addr,
- 			       cpsw_del_mc_addr);
-+	netif_addr_unlock_bh(ndev);
-+	rtnl_unlock();
-+}
-+
-+static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
-+{
-+	struct cpsw_priv *priv = netdev_priv(ndev);
-+
-+	schedule_work(&priv->rx_mode_work);
- }
- 
- static unsigned int cpsw_rxbuf_total_len(unsigned int len)
-@@ -1398,6 +1417,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
- 		priv->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
- 		priv->emac_port = i + 1;
- 		priv->tx_packet_min = CPSW_MIN_PACKET_SIZE;
-+		INIT_WORK(&priv->rx_mode_work, cpsw_ndo_set_rx_mode_work);
- 
- 		if (is_valid_ether_addr(slave_data->mac_addr)) {
- 			ether_addr_copy(priv->mac_addr, slave_data->mac_addr);
-@@ -1447,13 +1467,18 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
- 
- static void cpsw_unregister_ports(struct cpsw_common *cpsw)
- {
-+	struct net_device *ndev;
-+	struct cpsw_priv *priv;
- 	int i = 0;
- 
- 	for (i = 0; i < cpsw->data.slaves; i++) {
--		if (!cpsw->slaves[i].ndev)
-+		ndev = cpsw->slaves[i].ndev;
-+		if (!ndev)
- 			continue;
- 
--		unregister_netdev(cpsw->slaves[i].ndev);
-+		priv = netdev_priv(ndev);
-+		disable_work_sync(&priv->rx_mode_work);
-+		unregister_netdev(ndev);
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
-index 91add8925e235c6cf5542fde11f3383b9234c872..acb6181c5c9e1bf6ed46a7fd14ce422efc0b724e 100644
---- a/drivers/net/ethernet/ti/cpsw_priv.h
-+++ b/drivers/net/ethernet/ti/cpsw_priv.h
-@@ -391,6 +391,7 @@ struct cpsw_priv {
- 	u32 tx_packet_min;
- 	struct cpsw_ale_ratelimit ale_bc_ratelimit;
- 	struct cpsw_ale_ratelimit ale_mc_ratelimit;
-+	struct work_struct rx_mode_work;
+ /*
+- * iucv_array : Defines buffer array.
++ * iucv_array - Defines buffer array.
+  * Inside the array may be 31- bit addresses and 31-bit lengths.
+  * Use a pointer to an iucv_array as the buffer, reply or answer
+  * parameter on iucv_message_send, iucv_message_send2way, iucv_message_receive
+@@ -196,34 +196,29 @@ struct iucv_handler {
  };
  
- #define ndev_to_cpsw(ndev) (((struct cpsw_priv *)netdev_priv(ndev))->cpsw)
-
----
-base-commit: 33a647c659ffa5bdb94abc345c8c86768ff96215
-change-id: 20260123-bbb-dc3675f671d0
-
-Best regards,
--- 
-Kevin Hao <haokexin@gmail.com>
-
+ /**
+- * iucv_register:
++ * iucv_register - Registers a driver with IUCV.
+  * @handler: address of iucv handler structure
+  * @smp: != 0 indicates that the handler can deal with out of order messages
+  *
+- * Registers a driver with IUCV.
+- *
+  * Returns: 0 on success, -ENOMEM if the memory allocation for the pathid
+  * table failed, or -EIO if IUCV_DECLARE_BUFFER failed on all cpus.
+  */
+ int iucv_register(struct iucv_handler *handler, int smp);
+ 
+ /**
+- * iucv_unregister
++ * iucv_unregister - Unregister driver from IUCV.
+  * @handler:  address of iucv handler structure
+  * @smp: != 0 indicates that the handler can deal with out of order messages
+  *
+- * Unregister driver from IUCV.
+  */
+-void iucv_unregister(struct iucv_handler *handle, int smp);
++void iucv_unregister(struct iucv_handler *handler, int smp);
+ 
+ /**
+- * iucv_path_alloc
++ * iucv_path_alloc - Allocate a new path structure for use with iucv_connect.
+  * @msglim: initial message limit
+  * @flags: initial flags
+  * @gfp: kmalloc allocation flag
+  *
+- * Allocate a new path structure for use with iucv_connect.
+- *
+  * Returns: NULL if the memory allocation failed or a pointer to the
+  * path structure.
+  */
+@@ -240,10 +235,8 @@ static inline struct iucv_path *iucv_pat
+ }
+ 
+ /**
+- * iucv_path_free
++ * iucv_path_free - Frees a path structure.
+  * @path: address of iucv path structure
+- *
+- * Frees a path structure.
+  */
+ static inline void iucv_path_free(struct iucv_path *path)
+ {
+@@ -251,7 +244,7 @@ static inline void iucv_path_free(struct
+ }
+ 
+ /**
+- * iucv_path_accept
++ * iucv_path_accept - Complete the IUCV communication path
+  * @path: address of iucv path structure
+  * @handler: address of iucv handler structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+@@ -266,7 +259,7 @@ int iucv_path_accept(struct iucv_path *p
+ 		     u8 *userdata, void *private);
+ 
+ /**
+- * iucv_path_connect
++ * iucv_path_connect - Establish an IUCV path
+  * @path: address of iucv path structure
+  * @handler: address of iucv handler structure
+  * @userid: 8-byte user identification
+@@ -285,7 +278,7 @@ int iucv_path_connect(struct iucv_path *
+ 		      void *private);
+ 
+ /**
+- * iucv_path_quiesce:
++ * iucv_path_quiesce - Temporarily suspend incoming messages
+  * @path: address of iucv path structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+  *
+@@ -297,7 +290,7 @@ int iucv_path_connect(struct iucv_path *
+ int iucv_path_quiesce(struct iucv_path *path, u8 *userdata);
+ 
+ /**
+- * iucv_path_resume:
++ * iucv_path_resume - Resume incoming messages on a suspended IUCV path
+  * @path: address of iucv path structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+  *
+@@ -309,31 +302,27 @@ int iucv_path_quiesce(struct iucv_path *
+ int iucv_path_resume(struct iucv_path *path, u8 *userdata);
+ 
+ /**
+- * iucv_path_sever
++ * iucv_path_sever - Terminates an IUCV path.
+  * @path: address of iucv path structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+  *
+- * This function terminates an IUCV path.
+- *
+  * Returns: the result from the CP IUCV call.
+  */
+ int iucv_path_sever(struct iucv_path *path, u8 *userdata);
+ 
+ /**
+- * iucv_message_purge
++ * iucv_message_purge - Cancels a message you have sent.
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @srccls: source class of message
+  *
+- * Cancels a message you have sent.
+- *
+  * Returns: the result from the CP IUCV call.
+  */
+ int iucv_message_purge(struct iucv_path *path, struct iucv_message *msg,
+ 		       u32 srccls);
+ 
+ /**
+- * iucv_message_receive
++ * iucv_message_receive - Receives messages on an established path, with locking
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: flags that affect how the message is received (IUCV_IPBUFLST)
+@@ -353,7 +342,7 @@ int iucv_message_receive(struct iucv_pat
+ 			 u8 flags, void *buffer, size_t size, size_t *residual);
+ 
+ /**
+- * __iucv_message_receive
++ * __iucv_message_receive - Terminates an IUCV path.
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: flags that affect how the message is received (IUCV_IPBUFLST)
+@@ -374,7 +363,7 @@ int __iucv_message_receive(struct iucv_p
+ 			   size_t *residual);
+ 
+ /**
+- * iucv_message_reject
++ * iucv_message_reject - Refuses a specified message
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  *
+@@ -387,7 +376,7 @@ int __iucv_message_receive(struct iucv_p
+ int iucv_message_reject(struct iucv_path *path, struct iucv_message *msg);
+ 
+ /**
+- * iucv_message_reply
++ * iucv_message_reply - Refuses a specified message
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the reply is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
+@@ -395,7 +384,7 @@ int iucv_message_reject(struct iucv_path
+  * @size: length of reply data buffer
+  *
+  * This function responds to the two-way messages that you receive. You
+- * must identify completely the message to which you wish to reply. ie,
++ * must identify completely the message to which you wish to reply. I.e.,
+  * pathid, msgid, and trgcls. Prmmsg signifies the data is moved into
+  * the parameter list.
+  *
+@@ -405,7 +394,7 @@ int iucv_message_reply(struct iucv_path
+ 		       u8 flags, void *reply, size_t size);
+ 
+ /**
+- * iucv_message_send
++ * iucv_message_send - Transmits a one-way message, with locking
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
+@@ -425,7 +414,7 @@ int iucv_message_send(struct iucv_path *
+ 		      u8 flags, u32 srccls, void *buffer, size_t size);
+ 
+ /**
+- * __iucv_message_send
++ * __iucv_message_send - Transmits a one-way message, no locking
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
+@@ -445,7 +434,7 @@ int __iucv_message_send(struct iucv_path
+ 			u8 flags, u32 srccls, void *buffer, size_t size);
+ 
+ /**
+- * iucv_message_send2way
++ * iucv_message_send2way - Transmits a two-way message
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is sent and the reply is received
+@@ -453,8 +442,9 @@ int __iucv_message_send(struct iucv_path
+  * @srccls: source class of message
+  * @buffer: address of data buffer or address of struct iucv_array
+  * @size: length of send buffer
+- * @ansbuf: address of answer buffer or address of struct iucv_array
++ * @answer: address of answer buffer or address of struct iucv_array
+  * @asize: size of reply buffer
++ * @residual: ignored
+  *
+  * This function transmits data to another application. Data to be
+  * transmitted is in a buffer. The receiver of the send is expected to
+--- linux-next-20260128.orig/net/iucv/iucv.c
++++ linux-next-20260128/net/iucv/iucv.c
+@@ -312,13 +312,12 @@ union iucv_param {
+ static union iucv_param *iucv_param[NR_CPUS];
+ static union iucv_param *iucv_param_irq[NR_CPUS];
+ 
+-/**
+- * __iucv_call_b2f0
++/*
++ * __iucv_call_b2f0 - Calls CP to execute IUCV commands.
++ *
+  * @command: identifier of IUCV call to CP.
+  * @parm: pointer to a struct iucv_parm block
+  *
+- * Calls CP to execute IUCV commands.
+- *
+  * Returns the result of the CP IUCV call.
+  */
+ static inline int __iucv_call_b2f0(int command, union iucv_param *parm)
+@@ -348,9 +347,8 @@ static inline int iucv_call_b2f0(int com
+ }
+ 
+ /*
+- * iucv_query_maxconn
+- *
+- * Determines the maximum number of connections that may be established.
++ * iucv_query_maxconn - Determine the maximum number of connections that
++ * may be established.
+  *
+  * Returns the maximum number of connections or -EPERM is IUCV is not
+  * available.
+@@ -390,11 +388,10 @@ static int iucv_query_maxconn(void)
+ 	return ccode ? -EPERM : 0;
+ }
+ 
+-/**
+- * iucv_allow_cpu
+- * @data: unused
++/*
++ * iucv_allow_cpu - Allow iucv interrupts on this cpu.
+  *
+- * Allow iucv interrupts on this cpu.
++ * @data: unused
+  */
+ static void iucv_allow_cpu(void *data)
+ {
+@@ -431,11 +428,10 @@ static void iucv_allow_cpu(void *data)
+ 	cpumask_set_cpu(cpu, &iucv_irq_cpumask);
+ }
+ 
+-/**
+- * iucv_block_cpu
+- * @data: unused
++/*
++ * iucv_block_cpu - Block iucv interrupts on this cpu.
+  *
+- * Block iucv interrupts on this cpu.
++ * @data: unused
+  */
+ static void iucv_block_cpu(void *data)
+ {
+@@ -451,11 +447,10 @@ static void iucv_block_cpu(void *data)
+ 	cpumask_clear_cpu(cpu, &iucv_irq_cpumask);
+ }
+ 
+-/**
+- * iucv_declare_cpu
+- * @data: unused
++/*
++ * iucv_declare_cpu - Declare a interrupt buffer on this cpu.
+  *
+- * Declare a interrupt buffer on this cpu.
++ * @data: unused
+  */
+ static void iucv_declare_cpu(void *data)
+ {
+@@ -506,11 +501,10 @@ static void iucv_declare_cpu(void *data)
+ 		iucv_block_cpu(NULL);
+ }
+ 
+-/**
+- * iucv_retrieve_cpu
+- * @data: unused
++/*
++ * iucv_retrieve_cpu - Retrieve interrupt buffer on this cpu.
+  *
+- * Retrieve interrupt buffer on this cpu.
++ * @data: unused
+  */
+ static void iucv_retrieve_cpu(void *data)
+ {
+@@ -532,9 +526,7 @@ static void iucv_retrieve_cpu(void *data
+ }
+ 
+ /*
+- * iucv_setmask_mp
+- *
+- * Allow iucv interrupts on all cpus.
++ * iucv_setmask_mp - Allow iucv interrupts on all cpus.
+  */
+ static void iucv_setmask_mp(void)
+ {
+@@ -551,9 +543,7 @@ static void iucv_setmask_mp(void)
+ }
+ 
+ /*
+- * iucv_setmask_up
+- *
+- * Allow iucv interrupts on a single cpu.
++ * iucv_setmask_up - Allow iucv interrupts on a single cpu.
+  */
+ static void iucv_setmask_up(void)
+ {
+@@ -568,12 +558,11 @@ static void iucv_setmask_up(void)
+ }
+ 
+ /*
+- * iucv_enable
++ * iucv_enable - Make the iucv ready for use
+  *
+- * This function makes iucv ready for use. It allocates the pathid
+- * table, declares an iucv interrupt buffer and enables the iucv
+- * interrupts. Called when the first user has registered an iucv
+- * handler.
++ * It allocates the pathid table, declares an iucv interrupt buffer and
++ * enables the iucv interrupts. Called when the first user has registered
++ * an iucv handler.
+  */
+ static int iucv_enable(void)
+ {
+@@ -603,11 +592,10 @@ out:
+ }
+ 
+ /*
+- * iucv_disable
++ * iucv_disable - Shuts down iucv.
+  *
+- * This function shuts down iucv. It disables iucv interrupts, retrieves
+- * the iucv interrupt buffer and frees the pathid table. Called after the
+- * last user unregister its iucv handler.
++ * It disables iucv interrupts, retrieves the iucv interrupt buffer and frees
++ * the pathid table. Called after the last user unregister its iucv handler.
+  */
+ static void iucv_disable(void)
+ {
+@@ -694,12 +682,11 @@ __free_cpumask:
+ 	return ret;
+ }
+ 
+-/**
+- * iucv_sever_pathid
++/*
++ * iucv_sever_pathid - Sever an iucv path to free up the pathid. Used internally.
++ *
+  * @pathid: path identification number.
+  * @userdata: 16-bytes of user data.
+- *
+- * Sever an iucv path to free up the pathid. Used internally.
+  */
+ static int iucv_sever_pathid(u16 pathid, u8 *userdata)
+ {
+@@ -713,23 +700,21 @@ static int iucv_sever_pathid(u16 pathid,
+ 	return iucv_call_b2f0(IUCV_SEVER, parm);
+ }
+ 
+-/**
+- * __iucv_cleanup_queue
+- * @dummy: unused dummy argument
++/*
++ * __iucv_cleanup_queue - Nop function called via smp_call_function to force
++ * work items from pending external iucv interrupts to the work queue.
+  *
+- * Nop function called via smp_call_function to force work items from
+- * pending external iucv interrupts to the work queue.
++ * @dummy: unused dummy argument
+  */
+ static void __iucv_cleanup_queue(void *dummy)
+ {
+ }
+ 
+-/**
+- * iucv_cleanup_queue
++/*
++ * iucv_cleanup_queue - Called after a path has been severed to find all
++ * remaining work items for the now stale pathid.
+  *
+- * Function called after a path has been severed to find all remaining
+- * work items for the now stale pathid. The caller needs to hold the
+- * iucv_table_lock.
++ * The caller needs to hold the iucv_table_lock.
+  */
+ static void iucv_cleanup_queue(void)
+ {
+@@ -757,12 +742,11 @@ static void iucv_cleanup_queue(void)
+ }
+ 
+ /**
+- * iucv_register:
++ * iucv_register - Registers a driver with IUCV.
++ *
+  * @handler: address of iucv handler structure
+  * @smp: != 0 indicates that the handler can deal with out of order messages
+  *
+- * Registers a driver with IUCV.
+- *
+  * Returns 0 on success, -ENOMEM if the memory allocation for the pathid
+  * table failed, or -EIO if IUCV_DECLARE_BUFFER failed on all cpus.
+  */
+@@ -794,11 +778,10 @@ out_mutex:
+ EXPORT_SYMBOL(iucv_register);
+ 
+ /**
+- * iucv_unregister
++ * iucv_unregister - Unregister driver from IUCV.
++ *
+  * @handler:  address of iucv handler structure
+  * @smp: != 0 indicates that the handler can deal with out of order messages
+- *
+- * Unregister driver from IUCV.
+  */
+ void iucv_unregister(struct iucv_handler *handler, int smp)
+ {
+@@ -852,7 +835,8 @@ static struct notifier_block iucv_reboot
+ };
+ 
+ /**
+- * iucv_path_accept
++ * iucv_path_accept - Complete the IUCV communication path
++ *
+  * @path: address of iucv path structure
+  * @handler: address of iucv handler structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+@@ -896,7 +880,8 @@ out:
+ EXPORT_SYMBOL(iucv_path_accept);
+ 
+ /**
+- * iucv_path_connect
++ * iucv_path_connect - Establish an IUCV path
++ *
+  * @path: address of iucv path structure
+  * @handler: address of iucv handler structure
+  * @userid: 8-byte user identification
+@@ -964,7 +949,7 @@ out:
+ EXPORT_SYMBOL(iucv_path_connect);
+ 
+ /**
+- * iucv_path_quiesce:
++ * iucv_path_quiesce - Temporarily suspend incoming messages
+  * @path: address of iucv path structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+  *
+@@ -996,7 +981,8 @@ out:
+ EXPORT_SYMBOL(iucv_path_quiesce);
+ 
+ /**
+- * iucv_path_resume:
++ * iucv_path_resume - Resume incoming messages on a suspended IUCV path
++ *
+  * @path: address of iucv path structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+  *
+@@ -1027,12 +1013,11 @@ out:
+ }
+ 
+ /**
+- * iucv_path_sever
++ * iucv_path_sever - Terminates an IUCV path.
++ *
+  * @path: address of iucv path structure
+  * @userdata: 16 bytes of data reflected to the communication partner
+  *
+- * This function terminates an IUCV path.
+- *
+  * Returns the result from the CP IUCV call.
+  */
+ int iucv_path_sever(struct iucv_path *path, u8 *userdata)
+@@ -1058,13 +1043,11 @@ out:
+ EXPORT_SYMBOL(iucv_path_sever);
+ 
+ /**
+- * iucv_message_purge
++ * iucv_message_purge - Cancels a message you have sent.
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @srccls: source class of message
+  *
+- * Cancels a message you have sent.
+- *
+  * Returns the result from the CP IUCV call.
+  */
+ int iucv_message_purge(struct iucv_path *path, struct iucv_message *msg,
+@@ -1095,14 +1078,16 @@ out:
+ }
+ EXPORT_SYMBOL(iucv_message_purge);
+ 
+-/**
+- * iucv_message_receive_iprmdata
++/*
++ * iucv_message_receive_iprmdata - Internal function to receive RMDATA
++ * stored in &struct iucv_message
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is received (IUCV_IPBUFLST)
+  * @buffer: address of data buffer or address of struct iucv_array
+  * @size: length of data buffer
+- * @residual:
++ * @residual: number of bytes remaining in the data buffer
+  *
+  * Internal function used by iucv_message_receive and __iucv_message_receive
+  * to receive RMDATA data stored in struct iucv_message.
+@@ -1140,7 +1125,8 @@ static int iucv_message_receive_iprmdata
+ }
+ 
+ /**
+- * __iucv_message_receive
++ * __iucv_message_receive - Terminates an IUCV path.
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is received (IUCV_IPBUFLST)
+@@ -1188,7 +1174,8 @@ int __iucv_message_receive(struct iucv_p
+ EXPORT_SYMBOL(__iucv_message_receive);
+ 
+ /**
+- * iucv_message_receive
++ * iucv_message_receive - Receives messages on an established path, with locking
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is received (IUCV_IPBUFLST)
+@@ -1220,7 +1207,8 @@ int iucv_message_receive(struct iucv_pat
+ EXPORT_SYMBOL(iucv_message_receive);
+ 
+ /**
+- * iucv_message_reject
++ * iucv_message_reject - Refuses a specified message
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  *
+@@ -1254,7 +1242,8 @@ out:
+ EXPORT_SYMBOL(iucv_message_reject);
+ 
+ /**
+- * iucv_message_reply
++ * iucv_message_reply - Refuses a specified message
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the reply is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
+@@ -1303,7 +1292,8 @@ out:
+ EXPORT_SYMBOL(iucv_message_reply);
+ 
+ /**
+- * __iucv_message_send
++ * __iucv_message_send - Transmits a one-way message, no locking
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
+@@ -1357,7 +1347,8 @@ out:
+ EXPORT_SYMBOL(__iucv_message_send);
+ 
+ /**
+- * iucv_message_send
++ * iucv_message_send - Transmits a one-way message, with locking
++ *
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
+@@ -1386,7 +1377,7 @@ int iucv_message_send(struct iucv_path *
+ EXPORT_SYMBOL(iucv_message_send);
+ 
+ /**
+- * iucv_message_send2way
++ * iucv_message_send2way - Transmits a two-way message
+  * @path: address of iucv path structure
+  * @msg: address of iucv msg structure
+  * @flags: how the message is sent and the reply is received
+@@ -1461,12 +1452,12 @@ struct iucv_path_pending {
+ 	u8  res4[3];
+ } __packed;
+ 
+-/**
+- * iucv_path_pending
++/*
++ * iucv_path_pending - Process connection pending work item
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process connection pending work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_path_pending(struct iucv_irq_data *data)
+ {
+@@ -1522,12 +1513,12 @@ struct iucv_path_complete {
+ 	u8  res4[3];
+ } __packed;
+ 
+-/**
+- * iucv_path_complete
++/*
++ * iucv_path_complete - Process connection complete work item
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process connection complete work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_path_complete(struct iucv_irq_data *data)
+ {
+@@ -1552,12 +1543,12 @@ struct iucv_path_severed {
+ 	u8  res5[3];
+ } __packed;
+ 
+-/**
+- * iucv_path_severed
++/*
++ * iucv_path_severed - Process connection severed work item.
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process connection severed work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_path_severed(struct iucv_irq_data *data)
+ {
+@@ -1588,12 +1579,12 @@ struct iucv_path_quiesced {
+ 	u8  res5[3];
+ } __packed;
+ 
+-/**
+- * iucv_path_quiesced
++/*
++ * iucv_path_quiesced -Process connection quiesced work item.
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process connection quiesced work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_path_quiesced(struct iucv_irq_data *data)
+ {
+@@ -1616,12 +1607,12 @@ struct iucv_path_resumed {
+ 	u8  res5[3];
+ } __packed;
+ 
+-/**
+- * iucv_path_resumed
++/*
++ * iucv_path_resumed - Process connection resumed work item.
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process connection resumed work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_path_resumed(struct iucv_irq_data *data)
+ {
+@@ -1647,12 +1638,12 @@ struct iucv_message_complete {
+ 	u8  res2[3];
+ } __packed;
+ 
+-/**
+- * iucv_message_complete
++/*
++ * iucv_message_complete - Process message complete work item.
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process message complete work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_message_complete(struct iucv_irq_data *data)
+ {
+@@ -1694,12 +1685,12 @@ struct iucv_message_pending {
+ 	u8  res2[3];
+ } __packed;
+ 
+-/**
+- * iucv_message_pending
++/*
++ * iucv_message_pending - Process message pending work item.
++ *
+  * @data: Pointer to external interrupt buffer
+  *
+- * Process message pending work item. Called from tasklet while holding
+- * iucv_table_lock.
++ * Context: Called from tasklet while holding iucv_table_lock.
+  */
+ static void iucv_message_pending(struct iucv_irq_data *data)
+ {
+@@ -1722,7 +1713,7 @@ static void iucv_message_pending(struct
+ }
+ 
+ /*
+- * iucv_tasklet_fn:
++ * iucv_tasklet_fn - Process the queue of IRQ buffers
+  *
+  * This tasklet loops over the queue of irq buffers created by
+  * iucv_external_interrupt, calls the appropriate action handler
+@@ -1766,7 +1757,7 @@ static void iucv_tasklet_fn(unsigned lon
+ }
+ 
+ /*
+- * iucv_work_fn:
++ * iucv_work_fn - Process the queue of path pending IRQ blocks
+  *
+  * This work function loops over the queue of path pending irq blocks
+  * created by iucv_external_interrupt, calls the appropriate action
+@@ -1797,9 +1788,8 @@ static void iucv_work_fn(struct work_str
+ }
+ 
+ /*
+- * iucv_external_interrupt
++ * iucv_external_interrupt - Handles external interrupts coming in from CP.
+  *
+- * Handles external interrupts coming in from CP.
+  * Places the interrupt buffer on a queue and schedules iucv_tasklet_fn().
+  */
+ static void iucv_external_interrupt(struct ext_code ext_code,
+@@ -1857,10 +1847,9 @@ struct iucv_interface iucv_if = {
+ EXPORT_SYMBOL(iucv_if);
+ 
+ static enum cpuhp_state iucv_online;
+-/**
+- * iucv_init
+- *
+- * Allocates and initializes various data structures.
++
++/*
++ * iucv_init - Allocates and initializes various data structures.
+  */
+ static int __init iucv_init(void)
+ {
+@@ -1923,10 +1912,8 @@ out:
+ 	return rc;
+ }
+ 
+-/**
+- * iucv_exit
+- *
+- * Frees everything allocated from iucv_init.
++/*
++ * iucv_exit - Frees everything allocated from iucv_init.
+  */
+ static void __exit iucv_exit(void)
+ {
 
