@@ -1,76 +1,74 @@
-Return-Path: <netdev+bounces-255111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKdVGtuPfGkQNwIAu9opvQ
-	(envelope-from <netdev+bounces-255111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:02:51 +0100
+	id 6KYRCqSRfGkQNwIAu9opvQ
+	(envelope-from <netdev+bounces-255112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:10:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F8FB9B4C
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:02:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE245B9D8B
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:10:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 62A6E302A7DC
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:02:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8161D3003733
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09915378838;
-	Fri, 30 Jan 2026 11:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1691378D7C;
+	Fri, 30 Jan 2026 11:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QNS095FJ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hho8lmdC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bmTK0DWC"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C5C378829;
-	Fri, 30 Jan 2026 11:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8037736998F
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769770955; cv=none; b=oxnNlMnqVBQpwactnWWo2tqhDyG70snaHq2vUFAyeJiJ337CrfGH/Jh0Rlc27jQUC/fYqkJwbw3bJw6tEa60uqgjVNGhR5l1VzFBPZermZTB/GhGhCP3drf5OOg01Dxlt5ERc7yVf3Tp6yRSxY9hY8BKcAsHeBwLdWcR9DAtJR0=
+	t=1769771421; cv=none; b=c2d2izWlpALYwTTmZ5mj9z572jXwVbz0kL//8S2oKezx1Un+n4IbxLhSKd0yXRQ+HZGoGsW8bJVxUdKCahq05NtOMuPmydfSsdJK5umvuQ50JxRiT3wCAisDRkV6AOfDbPDagTVjAXsRV9gQVfPi1pk28R05Rcu/MCmnTmr0HNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769770955; c=relaxed/simple;
-	bh=PD1NyunvwPhHThCv9EYctRyLMEFxSdyzAf+tt6pxd9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q85LduXrIrh0/oXDB3Bz+w6Zg+K6D+RozmzT+IdXM+Ukj4LT7Usw1HjEBri1V0CoGzggpRLs/N9bHOMPiAl5jeN7NEA3rfkdnQfmPWlsAi140dPAJSytGcGKjUg49VqIWG30o9HA3jqTFt3E2y8jNh3wvtpnS9IozEikYu07ZKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QNS095FJ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hho8lmdC; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 30 Jan 2026 12:02:32 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769770953;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O3rWeggyKHIdYr1HSLSfoFm5KQ84IafzY02+OHo3Dus=;
-	b=QNS095FJ8C29mE29P8FUxmUpoJee/JL9s0dqd5Ulc/6ZQhUHUc/9OmnO8ljjA0QNfSxwi8
-	O6VKy8YiLwWvfoRxzH4pDBSeLtmZMlOAWjQ38hNlfMDChxWXIoDXligwardDfN5k4QzZZh
-	FY3qWlD9qcCHU+NyJ5H/qawpspidfjLHKNt4Feu7BMOOlsgQVC/0gsLCgVSwcli9ndwf5S
-	0jnYmOyKOlHK7gYpFSWzIaWuSnOMm4gAbQ0x2yk9W4vpZEDl8Lxm5zXOE0lU7qRxr3ka3E
-	FkjTlodGFTfEuzkkMYT/zq50AlM1Q8A0vdwT5WcDBj3uThSqB1O38Y99pJdWEQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769770953;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O3rWeggyKHIdYr1HSLSfoFm5KQ84IafzY02+OHo3Dus=;
-	b=hho8lmdCZM17n1KK9Si8r3pZxvRh9cXf5lyzpu2wwOYBAW9i2MfbTf37FIivoHLQNTjJV0
-	WlZJxwaQgPQmBpDw==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Xi Ruoyao <libc-alpha@sourceware.org>, 
-	Carlos O'Donell <carlos@redhat.com>, Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, 
-	Rich Felker <dalias@libc.org>, Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, klibc@zytor.com
-Subject: Re: [klibc] [PATCH net-next] net: uapi: Provide an UAPI definition
- of 'struct sockaddr'
-Message-ID: <20260130115438-465fb6a1-f414-4d69-b560-2304941464fc@linutronix.de>
-References: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
- <934ca004-0aef-49a4-a4f1-3d39a2e71864@app.fastmail.com>
- <0fc5b4ef-c468-416f-a065-f64989d75378@zytor.com>
- <212d2e51-abc1-47bb-8666-755917cad889@app.fastmail.com>
- <0f257cd0-27cf-4c11-b79c-724f4e22c4bf@zytor.com>
+	s=arc-20240116; t=1769771421; c=relaxed/simple;
+	bh=lQ1GPqBG1bLMVug+IQYN9Rt4D+myfoPqfyRjjy2E4As=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tpLqwYcJ204Ns+C7GWQE+QQ+gU17J1vHlyiG4e+J024j1wYU1en25nic6iJqBR9H6aGL7V6zzC7EbQ9r5lgp+wqZJn0zPY6H/JclXW+XPlSRT/l1aYY/yP/YHrPcWg7JprC7ndiJrLP3iHo8HdXav7i2YCFcy1bcq8yx9Sva6D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bmTK0DWC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3k8TRdhaXeM2i6zJgXaeR4nkYItV8+qlQs+6J4fCWbo=; b=bmTK0DWC5RF/7ippF0fl7kF3Zr
+	ihBB4O7eJDOapBuT8ZpT7Tphf+RY8R49Fqd8jesCBeZWPtjCh8qKZ3538jnW+eIMi2xoT7B4VhGjc
+	TCAw+318c1zuuOFIX2cpMUSC4IGe71/gll3hflsdiWZJy6Q+5tBilpRhwFRLAQpKmZm+Hc30QBwvt
+	mhAjMISXD8Ob+obvY41rQcA4lP7clVw42nckn0x64m/R1KTg860WiROVah0AZRJordPbp/gOji9R9
+	GpVBAS8RljgZKhDbQ7Q/iERbgafoLzcmvWgcTUJ90+8jcv373KHvR4ub916c5P/YEDA+wzCSSxeUF
+	tgrONKWA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47814)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vlmOE-0000000012b-2SoS;
+	Fri, 30 Jan 2026 11:10:14 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vlmOC-000000000Sl-33GT;
+	Fri, 30 Jan 2026 11:10:12 +0000
+Date: Fri, 30 Jan 2026 11:10:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/3] net: stmmac: pcs preparation
+Message-ID: <aXyRlFw7ZuhRPiKo@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,72 +77,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0f257cd0-27cf-4c11-b79c-724f4e22c4bf@zytor.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255111-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255112-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 02F8FB9B4C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,armlinux.org.uk:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE245B9D8B
 X-Rspamd-Action: no action
 
-On Tue, Jan 20, 2026 at 03:20:18PM -0800, H. Peter Anvin wrote:
-> On 2026-01-20 14:31, Arnd Bergmann wrote:
-> >> 
-> > I must have accidentally cut that from my reply, sorry.
-> > Looking at it again now, I think I ran into problems with the
-> > flexible array that was removed from the in-kernel sockaddr
-> > structure in commit 2b5e9f9b7e41 ("net: Convert struct sockaddr
-> > to fixed-size "sa_data[14]""), so there is a good chance it works
-> > now with the (once more) fixed-size version.
-> > 
-> > The other problem is that the structures that embed 'sockaddr'
-> > are used a lot inside of the kernel, in particular in 'ifreq',
-> > so changing the uapi sockaddr to __kernel_sockaddr requires
-> > additional changes wherever the struct members are passed
-> > by reference.
-> >
-> 
-> Well, the kernel should do what opting-in libcs do:
-> 
-> #define sockaddr __kernel_sockaddr
+Hi,
 
-This looks reasonable, but would only apply to future libc releases, no?
+These three patches prepare for the PCS changes, which, subject to
+Qualcomm testing, should be coming in the next cycle.
 
-Adopting a new scheme for all types will be a larger undertaking. Today
-'struct sockaddr' is the only type not using the current compatibility
-mechanism. Could we first align 'struct sockaddr' as shown by the patch?
-Whatever comes next can then build on a uniform base.
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  2 --
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 31 +++++++++++++++++++---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   | 24 ++---------------
+ 4 files changed, 44 insertions(+), 31 deletions(-)
 
-> or
-> 
-> struct sockaddr { struct __kernel_sockaddr; };
-> 
-> ... now when we have ms extensions turned on. Unfortunately gcc/clang don't
-> support them without the option even with __extension__, so user space is
-> limited to using macros.
-
-
-Thomas
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
