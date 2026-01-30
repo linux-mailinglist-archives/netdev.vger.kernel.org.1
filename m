@@ -1,290 +1,191 @@
-Return-Path: <netdev+bounces-254970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Mmz0KG0RfGmiKQIAu9opvQ
-	(envelope-from <netdev+bounces-254970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:03:25 +0100
+	id kJloCbUTfGm4KQIAu9opvQ
+	(envelope-from <netdev+bounces-254971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:13:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FE5B651B
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:03:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75732B659F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 03:13:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1497C300EAA0
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 02:03:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6DD133017045
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 02:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6402512DE;
-	Fri, 30 Jan 2026 02:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78EE2F5A1A;
+	Fri, 30 Jan 2026 02:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jn5f+QcU"
+	dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b="PvW12i2p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7A91DE8AD
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 02:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741982DFF28
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 02:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769738602; cv=none; b=ikdRZgQGtaMCQTpp5kUM5UHgudHZDS6aVSOXB7SZfvvt94azYQz+HAtOI4cMuQdicfm79v1XiCOflFIbiG6uj+HZRPdrX3Syt9U/5NqtPpJuMwEBTbNgsfmj/1xvVdbuezNQTkBG9pPch2m5TrzJ2Xs8zgjpuR6AdoSNW9afQXk=
+	t=1769739186; cv=none; b=p57TFdU5R/OleEJCv0SjzsE0lPFsi/M3/IHdLNm6Dd+kYLRlXiTMfHzt/XrwfD+pQJiB2tQ9lL9uC4D5cCduSH8CJfAmbF7eevKRP18CaqGcBBT0AgwRwlY213TLMg/E1w1qZNVtM8m3suDsOWljgVG9ldMOjVln0QmOXtGgjig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769738602; c=relaxed/simple;
-	bh=cNOqiT4D/FdF9TjSY18T66fyd9g4JgwbUe9kEhdtbAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SMokcWDX7AUVD6/Cmnggo21usNZzWqD/QSsrKPN/okLnDLcJHERIGF84c9MzGrtt4Bdbj8GpCn61LvXd1UYY3sPXGnsVvA5GoJ6b5NENMhsG6QVkOhdaNFnqO3Q3dwzNB7LebM4rQ0AjUzz24Np+gyyRptG8GPSoh+oaxf0Rt3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jn5f+QcU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92EE9C4CEF7;
-	Fri, 30 Jan 2026 02:03:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769738602;
-	bh=cNOqiT4D/FdF9TjSY18T66fyd9g4JgwbUe9kEhdtbAs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Jn5f+QcUyknDgJGIAkfvDaA7ydAj6v+Xb8fO4lUSqfHvh6/2bMwBZYkmfB6/l97Ys
-	 umlK7iJ+vHMkizmN1bK3zEvPS/STDShE9TTX3lf1Y+jDJ+CtnpwOrE/SewcVjl1IcL
-	 ms2ob2ecTEr5lEY+wqYLKrPLQNEU/03YMbJr4Lt5lcBDrON7Hc6BIiP+DMdpbygcDP
-	 5BofztPmak9oiE7MGX0UatZ8cc9DHTyGV+x9vt0as4KsJ5VEEicYJCh9a0N0GTw8lx
-	 s+9AaePdEo6ZRRarny/FWWvyR+fGLYgBoE08u5YQF0d/h5S29+4tr+BlCKf7+h3zHz
-	 nq5LPxgrs+w0Q==
-Date: Thu, 29 Jan 2026 18:03:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com
-Subject: Re: [PATCH net 4/4] selftests: drv-net: rss_ctx: test RSS contexts
- persist after ifdown/up
-Message-ID: <20260129180320.1c69a0c4@kernel.org>
-In-Reply-To: <20260129061646.1417185-5-michael.chan@broadcom.com>
-References: <20260129061646.1417185-1-michael.chan@broadcom.com>
-	<20260129061646.1417185-5-michael.chan@broadcom.com>
+	s=arc-20240116; t=1769739186; c=relaxed/simple;
+	bh=Dn0oqzj3iBayzVAA5eJCgjCzUszuWjmSuPyXMeMUfZ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a/unLsjr6n8njccaXZ/wkhRx6GWUu+kyDQPaBcW6iZLUp59eCVyph0JcN7uQk4PUgasnDM3nbWJGTGqxd00c2+kDD/CMw3kVi5jIbZjV3/3nu5gOYcvrNcRaIy5JcgibRVG+DyNc5TXPkZydacBmpujLcHgA+z0Y8twXq4Gos7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu; spf=pass smtp.mailfrom=u.northwestern.edu; dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b=PvW12i2p; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=u.northwestern.edu
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-6630d0685abso568557eaf.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jan 2026 18:13:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=u-northwestern-edu.20230601.gappssmtp.com; s=20230601; t=1769739183; x=1770343983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=80SaEL47Vnh+hnTyM2lFliJDSZtWJHU4tFxt7GihUPg=;
+        b=PvW12i2p5K2TP42HSutgF8M2AWPe1rct45nHTUL3YX32iFnRa0Xz3fxdD8c6LhyS4+
+         SFtifCrIoFbrUyt4jBr2rWn+9Vd3mfByr/9Syx5zJwMAVTOpuE0+gsq0ETFI2xgBiTVf
+         RpVbwBZcuDuq9GByjQOSUTJeFQRdFQ4LrwprCT0Pflt7uQ8QxtnrGRRP1sgHSStG4EWr
+         OlsyUs4z7plnwDS/Uq+vnCJviwCMWkEpUaZx0xsTA5vi/a6YpUttrtx/3uSnZLrm7mQk
+         QX0+RxnMwS8N3kcQbRljnVAYb53tKekzMrXtjE7HmUuG6eP+rJLsKZWznThGkWpgvP5x
+         O3aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769739183; x=1770343983;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=80SaEL47Vnh+hnTyM2lFliJDSZtWJHU4tFxt7GihUPg=;
+        b=CewBmJM3oO9ahvZzB2mUftdlXFEH5APXI6bLx75R9MrqM8JdCFyvMT+adxWpZWUkR8
+         X4sIbNUEalGO3Y/+9QcADwSiXFNH4eEY3ZO2sg5aKzH/qkQsr9tb4+lvqRqIu0ROVp/1
+         24xShQMaZkgch2Tw5kOZov/beHm6YWxRArcITdvmzrLLAFDgxun8lcVoUsH0DVHh9B+O
+         qu1XlZjTVijmY0tWqNtD+faNShsdDkVtJ8ahRitgznmQxIfYETt3LBabDzv2m8mu9vKm
+         moXXXGAm88QQjwiCagk4BtI4FEbm7jm4cBLkDsNEW6e7Rc9VLuUiFOpTU8gdQHFdoDXS
+         QXQg==
+X-Forwarded-Encrypted: i=1; AJvYcCXkeIr0HtzS7K9Srcf3KQjrwKaWznUU7MZdpgtSrl11Gp14f2KyFGP524FMPXrXTl2/wQW6EdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1l/ccCK1tibDk+l8SIhoYdtTtqou+LTpBO2GlWBU/PGgF40VP
+	EXUzOkOsdDoISSBNbIf9BEp/YzuV++6OY1THx2iidf0R555tO9fUI9p9Xz//QwCncsk=
+X-Gm-Gg: AZuq6aLOfWMGP2BBoI+39XwQ95LX4rqiHURoQJp1+HV/oQ7Rhuw9sP/yg7KpYRJSPoQ
+	Tgn2aCVHP5tik+JvW3hlDspbXtcxBpLT7Lq6E8ToMTwaajGbaIy+j+bx+ZGByMvudFqEzXv5WBS
+	qW39pKSEATKRZSJuriOn7cDnLqcUEZi0ZriMeY4DQQuoBCiDt7717mLnZHhbk1zKpc9AA7dpvap
+	mMste7cNLwVDaUYoFW/OReZMhLmb1QIs4/20OBUUR6z09PDsyW2V4TILnbLdQQ0a2OlyLlZQJoA
+	eniakoFFD45rwomd82eog8ADU2yTUaf+UUb4I6iyTEGg1G7K9upmG6qK1wyagxcyHGUvV8KI0AP
+	fks26rgZWJGhn2ZZxg2TYTxWh8a90EbO5CJQ96OkhX9HGZwvfENj9jvp4Hv0LBGDKsiOFcWJ5FJ
+	/wnZGXKHlRj3N9hzSbVQp9j5/Bro7rtHPbWQmxV3RW4v0Bst4LX7ZOk0h3tv0ZOp1kli0sqqAI1
+	pFgULVmo0a2e7eF1vVaNY1lSbpAIIk=
+X-Received: by 2002:a05:6820:2909:b0:662:f997:8448 with SMTP id 006d021491bc7-6630f37792emr947590eaf.58.1769739183295;
+        Thu, 29 Jan 2026 18:13:03 -0800 (PST)
+Received: from security.cs.northwestern.edu (security.cs.northwestern.edu. [165.124.184.136])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-662f9a1a876sm4140788eaf.10.2026.01.29.18.13.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 18:13:02 -0800 (PST)
+From: Ziyi Guo <n7l8m4@u.northwestern.edu>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ziyi Guo <n7l8m4@u.northwestern.edu>
+Subject: [PATCH] net: mscc: ocelot: add missing lock protection in ocelot_port_xmit()
+Date: Fri, 30 Jan 2026 02:12:58 +0000
+Message-Id: <20260130021258.95045-1-n7l8m4@u.northwestern.edu>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[u-northwestern-edu.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[northwestern.edu : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254970-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-254971-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[u-northwestern-edu.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n7l8m4@u.northwestern.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rss_ctx.py:url]
-X-Rspamd-Queue-Id: E9FE5B651B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[u.northwestern.edu:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 75732B659F
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 22:16:46 -0800 Michael Chan wrote:
-> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> 
-> Add tests to verify
-> 1. that RSS contexts persist across interface down/up
-> 2. that RSS contexts persist across interface down/up along
-> with their associated Ntuple fitlers
-> 
-> Testing on bnxt_en:
-> 
->  TAP version 13
->  1..1
->  # timeout set to 0
->  # selftests: drivers/net/hw: rss_ctx.py
->  # TAP version 13
->  # 1..2
->  # ok 1 rss_ctx.test_rss_context_persist_ifupdown
->  # ok 2 rss_ctx.test_rss_context_ntuple_persist_ifupdown
->  # # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
->  ok 1 selftests: drivers/net/hw: rss_ctx.py
+ocelot_port_xmit() calls ocelot_can_inject() and ocelot_port_inject_frame()
+without holding ocelot->inj_lock. However, both functions have
+lockdep_assert_held(&ocelot->inj_lock) indicating that callers must hold
+this lock.
 
-Thanks for the test. Please make sure that
+The correct caller felix_port_deferred_xmit() properly acquires the lock
+using ocelot_lock_inj_grp() before calling these functions.
 
-  ruff check $file
+Add ocelot_lock_inj_grp()/ocelot_unlock_inj_grp() around the injection
+code path in ocelot_port_xmit() to fix the missing lock protection.
 
-is clean
+Signed-off-by: Ziyi Guo <n7l8m4@u.northwestern.edu>
+---
+ drivers/net/ethernet/mscc/ocelot_net.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-> diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> index ed7e405682f0..4e46c5931c7f 100755
-> --- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> +++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> @@ -809,6 +809,119 @@ def test_rss_default_context_rule(cfg):
->                            'noise' : (0, 1) })
->  
->  
-
-Please put
-
-@ksft_disruptive
-
-decorator before test cases which may disconnect the machine (take the
-link down). We won't be able to run them remotely 
-
-> +def test_rss_context_persist_ifupdown(cfg):
-> +    """
-> +    Check that RSS contexts persist across an interface down/up cycle.
-> +    """
-> +
-> +    require_context_cnt(cfg, 10)
-
-Why 10? I don't think we're gaining any coverage with > 2.
-
-> +    # Create 10 RSS contexts and store their IDs and configurations
-> +    ctx_ids = []
-> +    ctx_configs_before = {}
-
-appears unused
-
-> +    try:
-> +        for i in range(10):
-> +            ctx_id = ethtool_create(cfg, "-X", "context new")
-> +            ctx_ids.append(ctx_id)
-> +            defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
-> +    except CmdExitFailure:
-> +        raise KsftSkipEx(f"Could only create {len(ctx_ids)} contexts, test requires 10")
-> +
-> +    # Bring interface down
-
-these comments are pointless and make the whole thing look AI generated
-
-> +    ip(f"link set dev {cfg.ifname} down")
-> +
-> +    # Bring interface back up
-> +    ip(f"link set dev {cfg.ifname} up")
-> +
-> +    # Wait for interface to be fully up
-> +    cfg.wait_hw_stats_settle()
-
-Why?
-
-> +    # Verify all 10 contexts still exist after ifup
-> +    missing_contexts = []
-> +    persisted_contexts = []
-> +
-> +    for ctx_id in ctx_ids:
-> +        try:
-> +            data = get_rss(cfg, context=ctx_id)
-> +            _rss_key_check(cfg, data=data, context=ctx_id)
-> +            persisted_contexts.append(ctx_id)
-> +        except CmdExitFailure:
-> +            missing_contexts.append(ctx_id)
-> +            ksft_pr(f"Context {ctx_id} is missing after ifup")
-
-You can use netlink to get them all
-
-ctxs = cfg.ethnl.rss_get({}, dump=True)
-
-> +def test_rss_context_ntuple_persist_ifupdown(cfg):
-> +    """
-> +    Test that RSS contexts and their associated ntuple filters persist across
-> +    an interface down/up cycle.
-> +    """
-> +
-> +    require_ntuple(cfg)
-> +    require_context_cnt(cfg, 10)
-> +
-> +    # Create 10 RSS contexts with ntuple filters
-> +    ctx_ids = []
-> +    ntuple_ids = []
-> +    ports = []
-> +
-> +    try:
-> +        for i in range(10):
-> +            # Create RSS context
-> +            ctx_id = ethtool_create(cfg, "-X", "context new")
-> +            ctx_ids.append(ctx_id)
-> +            defer(ethtool, f"-X {cfg.ifname} context {ctx_id} delete")
-> +
-> +            # Create ntuple filter for this context
-> +            port = rand_port()
-> +            ports.append(port)
-> +            flow = f"flow-type tcp{cfg.addr_ipver} dst-ip {cfg.addr} dst-port {port} context {ctx_id}"
-> +            ntuple_id = ethtool_create(cfg, "-N", flow)
-> +            ntuple_ids.append(ntuple_id)
-> +            defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
-> +
-> +    except CmdExitFailure:
-> +        raise KsftSkipEx(f"Could only create {len(ctx_ids)} contexts with ntuple filters, test requires 10")
-> +
-> +    # Bring interface down
-> +    ip(f"link set dev {cfg.ifname} down")
-> +
-> +    # Bring interface back up
-> +    ip(f"link set dev {cfg.ifname} up")
-> +
-> +    # Wait for interface to be fully up
-> +    cfg.wait_hw_stats_settle()
-> +
-> +    # Verify all contexts and ntuple rules still exist after ifup
-> +    missing_contexts = []
-> +    persisted_contexts = []
-> +    missing_ntuple_rules = []
-> +    persisted_ntuple_rules = []
-> +    broken_associations = []
-> +
-> +    for i, ctx_id in enumerate(ctx_ids):
-> +        # Check if context persists
-> +        try:
-> +            data = get_rss(cfg, context=ctx_id)
-> +            _rss_key_check(cfg, data=data, context=ctx_id)
-> +            persisted_contexts.append(ctx_id)
-> +        except CmdExitFailure:
-> +            missing_contexts.append(ctx_id)
-> +            ksft_pr(f"Context {ctx_id} is missing after ifup")
-> +            continue
-> +
-> +        # Check if ntuple rule persists
-> +        ntuple_id = ntuple_ids[i]
-> +        try:
-> +            _ntuple_rule_check(cfg, ntuple_id, ctx_id)
-> +            persisted_ntuple_rules.append(ntuple_id)
-> +        except CmdExitFailure:
-> +            missing_ntuple_rules.append(ntuple_id)
-> +            ksft_pr(f"Ntuple rule {ntuple_id} is missing after ifup")
-> +        except Exception as e:
-> +            broken_associations.append((ntuple_id, ctx_id))
-> +            ksft_pr(f"Ntuple rule {ntuple_id} exists but is not properly associated with context {ctx_id}: {e}")
-
-Not sure why this is a separate test, TBH. You can remove the test
-without the ntuple filters. The two cases I would have expected based
-on patches is:
-
-tests1:
- - add a couple of contexts
- - add a n-tuple filter to one of the context
- - ifdown/ifup
- - check contexts and filters are there
- - run some traffic to make sure it flows right
-
-tests2:
- - ifdown
- - add a couple of contexts
- - add a n-tuple filter to one of the context
- - ifup
- - check contexts and filters are there
- - run some traffic to make sure it flows right
-
-You can probably have one shared implementation and pass a param to 
-it  to tell it whether to "pre-down" the interface.
+diff --git a/drivers/net/ethernet/mscc/ocelot_net.c b/drivers/net/ethernet/mscc/ocelot_net.c
+index 469784d3a1a6..da8579abea1e 100644
+--- a/drivers/net/ethernet/mscc/ocelot_net.c
++++ b/drivers/net/ethernet/mscc/ocelot_net.c
+@@ -559,15 +559,22 @@ static netdev_tx_t ocelot_port_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int port = priv->port.index;
+ 	u32 rew_op = 0;
+ 
+-	if (!static_branch_unlikely(&ocelot_fdma_enabled) &&
+-	    !ocelot_can_inject(ocelot, 0))
+-		return NETDEV_TX_BUSY;
++	if (!static_branch_unlikely(&ocelot_fdma_enabled)) {
++		ocelot_lock_inj_grp(ocelot, 0);
++
++		if (!ocelot_can_inject(ocelot, 0)) {
++			ocelot_unlock_inj_grp(ocelot, 0);
++			return NETDEV_TX_BUSY;
++		}
++	}
+ 
+ 	/* Check if timestamping is needed */
+ 	if (ocelot->ptp && (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
+ 		struct sk_buff *clone = NULL;
+ 
+ 		if (ocelot_port_txtstamp_request(ocelot, port, skb, &clone)) {
++			if (!static_branch_unlikely(&ocelot_fdma_enabled))
++				ocelot_unlock_inj_grp(ocelot, 0);
+ 			kfree_skb(skb);
+ 			return NETDEV_TX_OK;
+ 		}
+@@ -582,6 +589,7 @@ static netdev_tx_t ocelot_port_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		ocelot_fdma_inject_frame(ocelot, port, rew_op, skb, dev);
+ 	} else {
+ 		ocelot_port_inject_frame(ocelot, port, 0, rew_op, skb);
++		ocelot_unlock_inj_grp(ocelot, 0);
+ 
+ 		consume_skb(skb);
+ 	}
 -- 
-pw-bot: cr
+2.34.1
+
 
