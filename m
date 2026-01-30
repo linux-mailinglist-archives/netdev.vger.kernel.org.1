@@ -1,177 +1,163 @@
-Return-Path: <netdev+bounces-255229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255230-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AM2MHpb+fGnLPgIAu9opvQ
-	(envelope-from <netdev+bounces-255229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:55:18 +0100
+	id EBCHOrL+fGnLPgIAu9opvQ
+	(envelope-from <netdev+bounces-255230-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:55:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB699BE030
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:55:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD71BE038
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 19:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE2B9303FF38
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:54:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0D33301368E
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 18:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863CE385EEE;
-	Fri, 30 Jan 2026 18:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFE337F738;
+	Fri, 30 Jan 2026 18:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c2t76HAH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QroVKV0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EC8387357
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769799251; cv=none; b=nm3wQK3+L2ygCGRCTUDJWRLReAMJ4QSOGF3IC4f7u9PT04lDd9ScSc+lETn2Flv6NmQ5ISY31sXcjF1/divciICxioYRtOaKlnza5kUn62obMY0V8FrltsS3yDDe42dd/xdqOOeBT+g0Sa1B9s4m0D3l3cej5ZbqS/fkdv1CZt4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769799251; c=relaxed/simple;
-	bh=4hA8+5V9zUTOTtdxsL59RoF45dOCKSXugTqSOlt39M0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Iv6sqb8IgAW6eNx+EQcAky9B9APYpODfQauB9zObxp9y3o8wHu7s1YHqpuI4Kl9IW3Ce8Jh7rZ3hZbC4p3yAtqAEeh+HfLAwNM4Cs/2PzOkXOGuzit/BZt/8xlwVztXfAGqJrfP3d7y9F6XOjYnrLMWS2/PE48p+MjuHzZ7zDjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c2t76HAH; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769799250; x=1801335250;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4hA8+5V9zUTOTtdxsL59RoF45dOCKSXugTqSOlt39M0=;
-  b=c2t76HAHS9JqOk5Fv4VRGgQ9cEMvEcjQkOrs9dzUO70UACUqwVFf1gZJ
-   v+ABVAxbWxccUyT5yv/+y4TBsFVkhvbIHFfbOzFKA59jrhRdpjs/Eg2oh
-   sunWzZ+XhljlORqLmbqaKys2SRJ0dpHTQzc53cEoVCCyAp/lK39sPUluY
-   xlrCAzng7AjIghXJZ2PpElpXUOSZDod+HkfXpNzCDxye4cMtw4lPP37nL
-   HRChyNKGANZdMTD/rFXhDpNmd4aKJYAGOKe4xGCvrz7v8q6goXKSLjAVE
-   XfLbdp/Y3BN0qQe72YQJJXRMvVjdPH85qttz7X/ApIER5kQG0hqyFZKZF
-   w==;
-X-CSE-ConnectionGUID: 8IISe7JvR0mAftpf4ZVXYg==
-X-CSE-MsgGUID: gV6HlKNITIiYtPMYWAoIMQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="71091301"
-X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
-   d="scan'208";a="71091301"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 10:54:08 -0800
-X-CSE-ConnectionGUID: R2i1lEDYSGqxQ4juY5n0Gw==
-X-CSE-MsgGUID: QS9EbsQQRsK78ccrB6KxHw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
-   d="scan'208";a="231841016"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 30 Jan 2026 10:54:07 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Mohammad Heib <mheib@redhat.com>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	sdf@fomichev.me,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 5/5] i40e: drop udp_tunnel_get_rx_info() call from i40e_open()
-Date: Fri, 30 Jan 2026 10:53:58 -0800
-Message-ID: <20260130185401.1091523-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260130185401.1091523-1-anthony.l.nguyen@intel.com>
-References: <20260130185401.1091523-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88E33C534
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769799313; cv=pass; b=P+equPbnZ4MH/UvtfamwmSEMNcCIwnhULyABazC4wOkpL/ki5ISre/vtLuwvrTndncV0aFHhAmohmcwHEYQTfjgVh9yXgQ+b9YhPyJiXRa7PbJVd2liYgAZSVnsheH6Vq1wqFRXYueZROJPL4BuDDdGuRmdksC/E328bN1B5Z9Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769799313; c=relaxed/simple;
+	bh=ABEZfxsW2syqPlu6/K4Mc72DV+nXVeyyt3BSfY8vI3Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L/fxH5yd66RxVWvm9IlVmyqbdOiGvKLhesfnIkizrLY+E3NPJo2LcU03Em/FSNTB5UzrK6QeFIlZOrrPSoWlPYz/QbH0mL2rU/cqMjW2f9RBXOVzkZRmVT6Er4T5nshmb+0YoSNMX15Ou+qjMvvDPBEg+3dmMlwqInPo1eg9IDc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QroVKV0S; arc=pass smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8c07bc2ad13so192425985a.2
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 10:55:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769799311; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cSurMD/fVKHjThUAXsVvNtE/1PsP0NYv/oHI7smzl5gD9pTJVXUv2IDcyJrY0t56re
+         hiVTUP7uHCfoOv27FIJ3y9Phfs/H7Nba1h6rm0L/IM84x/gSGfCb0nsq//WguwGG87iy
+         aEcowdwu9gN+rlZHZN5Lx15J3fZiB4tptUA8hVoAC3vG9Gjz1KCwzw7/d0CdGdCyTKGt
+         2R4Q3h4NSVt1E9CfvOfMjeVjou6Y7rQviMTmfs5JLx7kIZPsGvHSsGm4fX2UyuSA8EI1
+         205ZdEsRpto7sW00R6bNW2en8Cn0p8S7LTCNA3S5hixDYCWXuHxh27y5UbPt+5p5jl5c
+         789A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ABEZfxsW2syqPlu6/K4Mc72DV+nXVeyyt3BSfY8vI3Q=;
+        fh=m/3daOiLONGVWI8KMCEcXnFlX+z/pmY/B3PJ0/IL/fE=;
+        b=IjqM+LafbWeuenDw7Ul8BkMfGm8FmVYbZI3kzxIrSL9gwag8E0n2FtZCGJpVqtnFhA
+         TTlfSQgem3QV6L2VB2CD+yTwhWYkEAGizr+MiesbfF4XFAMiLOf8emczpSSGa4bqKzhM
+         NnrIPN9zDofhCOgSq8H6TAdlzJokXkSrgeaAPAbva9nIIYZ6MDgG92hOysBHu/eO05JP
+         DNLSieMSxDvB9JtBbD7VvRi3WzeiDFgYpSsmS1Fr9FNqzb1sOLvRF24rvMc4/68KtRBJ
+         Ur2Qts6gq0oQmwMH7tHOkJBS7mxROOGl18p6cwVdPDBojngW0v4SMpp2iGcqv6RWyig5
+         dEzQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769799311; x=1770404111; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ABEZfxsW2syqPlu6/K4Mc72DV+nXVeyyt3BSfY8vI3Q=;
+        b=QroVKV0SobjZ4s/B+ILCE0TPeNkL8N4u/RlfMtYG6/eIaJynacUGbPzM+afrGvpCt0
+         U/HrYlr2Gf8cC9TpZiTldf9a3fIoUDjPcYOpPIzECz3SQJUWCJfBJsLnZy60SFOE67h5
+         iftl1df5FU+Mw6+17Bing4EH3IFITJW1BianS8zKDrp5rP5yYC49M4ONKFDiUXWD5Lnq
+         x/grGLVdufOJOHGCl74WGCiD6gssUgi0wbGdKb1i8H+yUck8Ge84NpeN3Eevvg+dQfX9
+         yzzOP2oVg5M2PgCJim3O0VRPYcjQ3TIlsywIsw9WQBxIZOr35AFCUcMKCTN4r66tn9g0
+         /xnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769799311; x=1770404111;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ABEZfxsW2syqPlu6/K4Mc72DV+nXVeyyt3BSfY8vI3Q=;
+        b=ulQYKgjKQW9ndjozha2XlsbKagQ2Mq8TjFi0pfimqfiKFw0qBO3OCrsMkdd2rpDunQ
+         spTcTqTuTjOCFEpmr4M8xWw8CD+uJYTQUGfztNWpx65cEC/jpRzz7QYT3or/6n0CuqOV
+         Fxcf0h0STEVbsdnPUmE4awnDY6AmOeDc59jkleswA2AvEvjHPr+Xhh13rbBrMXSk1wU2
+         /gUvVjCSREhqMyw6VMxr2quosE0wz1qTXZM7hE2x9XyQQa3tQzwo9bZEeXIdc29Ffi9B
+         vP4TQwxTjoGDJ6LUVxcvr4PEOsch2K6Nz/LRb5DAWNFymB3RAvQyXk5UWqxF1PZhAPmA
+         Q/tw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJuMFcCrRc82lFpu4L3CtDRHzB+tq7+v+cSTVFYLj8hAHjHX6M6iPHD9l/YJ7gju3jMEiTOQc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAQK4cMSi8SoStGB2GtcyViXbGiQac1ekgbDfKbZ8CDvVJ5Yb3
+	JeFHLT0o1nvLOFq5MPsB0cRi6fdPDHA0KHLpLTWBimahSNopSBWiZbip4eoQT/23XCrL13JsAYl
+	SbbguQRV8KOLH9+SctuHcG0fraObpvE4ezqvffCHj
+X-Gm-Gg: AZuq6aK5gehLSmVCHW07iW+TSzeE9k4e37p+wSe+l9G3xzTSyUOEJ9pw1FEy0Sn661/
+	2eUY2IVspIHF0hzmh0gc1QEUvvEd8w1SHePOVnSX4QyfDxjCGBH0u+3FmrQ8EQWVESyXx49Rai9
+	9UX7rNrcXLQiRbM4Yi2z2Tey6MBjIwnXl/5nlbkVpwqjlC6wdbfHbAmvYctVghc7I3zWWFZYvms
+	EgRjvAw0xv0Cd7b1LLVmKsfQJtAoNqZrfO/z/+RZbR6hwImJ7GajQJzYknqcrQmqzrIIMo=
+X-Received: by 2002:a05:622a:15cb:b0:4ec:f6d5:ee46 with SMTP id
+ d75a77b69052e-505d22d7693mr56735801cf.78.1769799310745; Fri, 30 Jan 2026
+ 10:55:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260130033827.698841-1-kuba@kernel.org>
+In-Reply-To: <20260130033827.698841-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 30 Jan 2026 19:54:59 +0100
+X-Gm-Features: AZwV_QgbhWvtqr9ETLsH8j_z1CK4iiFOMmiskyq0Uy4hQm7Iol3qY5ksj5H6xk0
+Message-ID: <CANn89i+ak=qy89AW22MzJFoTnqXSehGLy+uCgp24a=5K46mt9Q@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: don't touch dev->stats in BPF redirect paths
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Gal Pressman <gal@nvidia.com>, ast@kernel.org, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, dsahern@gmail.com, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255229-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255230-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,redhat.com,lunn.ch,kernel.org,iogearbox.net,nvidia.com,gmail.com,linux.dev,fomichev.me,google.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mpg.de:email,intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EB699BE030
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3AD71BE038
 X-Rspamd-Action: no action
 
-From: Mohammad Heib <mheib@redhat.com>
+On Fri, Jan 30, 2026 at 4:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Gal reports that BPF redirect increments dev->stats.tx_errors
+> on failure. This is not correct, most modern drivers completely
+> ignore dev->stats so these drops will be invisible to the user.
+> Core code should use the dedicated core stats which are folded
+> into device stats in dev_get_stats().
+>
+> Note that we're switching from tx_errors to tx_dropped.
+> Core only has tx_dropped, hence presumably users already expect
+> that counter to increment for "stack" Tx issues.
 
-The i40e driver calls udp_tunnel_get_rx_info() during i40e_open().
-This is redundant because UDP tunnel RX offload state is preserved
-across device down/up cycles. The udp_tunnel core handles
-synchronization automatically when required.
-
-Furthermore, recent changes in the udp_tunnel infrastructure require
-querying RX info while holding the udp_tunnel lock. Calling it
-directly from the ndo_open path violates this requirement,
-triggering the following lockdep warning:
-
-  Call Trace:
-   <TASK>
-   ? __udp_tunnel_nic_assert_locked+0x39/0x40 [udp_tunnel]
-   i40e_open+0x135/0x14f [i40e]
-   __dev_open+0x121/0x2e0
-   __dev_change_flags+0x227/0x270
-   dev_change_flags+0x3d/0xb0
-   devinet_ioctl+0x56f/0x860
-   sock_do_ioctl+0x7b/0x130
-   __x64_sys_ioctl+0x91/0xd0
-   do_syscall_64+0x90/0x170
-   ...
-   </TASK>
-
-Remove the redundant and unsafe call to udp_tunnel_get_rx_info() from
-i40e_open() resolve the locking violation.
-
-Fixes: 1ead7501094c ("udp_tunnel: remove rtnl_lock dependency")
-Signed-off-by: Mohammad Heib <mheib@redhat.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 0b1cc0481027..d3bc3207054f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -9030,7 +9030,6 @@ int i40e_open(struct net_device *netdev)
- 						       TCP_FLAG_FIN |
- 						       TCP_FLAG_CWR) >> 16);
- 	wr32(&pf->hw, I40E_GLLAN_TSOMSK_L, be32_to_cpu(TCP_FLAG_CWR) >> 16);
--	udp_tunnel_get_rx_info(netdev);
- 
- 	return 0;
- }
--- 
-2.47.1
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
