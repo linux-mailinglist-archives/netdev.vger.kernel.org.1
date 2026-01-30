@@ -1,304 +1,201 @@
-Return-Path: <netdev+bounces-255169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kOeDLF/HfGnaOgIAu9opvQ
-	(envelope-from <netdev+bounces-255169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:59:43 +0100
+	id YHdDOl/LfGnaOgIAu9opvQ
+	(envelope-from <netdev+bounces-255170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:16:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6076ABBD45
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:59:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B41BBF1C
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 16:16:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A1A4B30327E0
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 14:53:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C9B9300879A
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 15:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A4732938D;
-	Fri, 30 Jan 2026 14:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865E8346A0F;
+	Fri, 30 Jan 2026 15:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="SRBhcykL"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="o3p/t+Oz"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-g125.zoho.com (sender4-pp-g125.zoho.com [136.143.188.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C654303C9F;
-	Fri, 30 Jan 2026 14:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.125
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769784779; cv=pass; b=qRdfNU7yNV+r0t2fwSEQW0ruyQSzdA6uO53QhnNe/pku4RsvrPDTiC34y07buZuyBzqQXHZ4Ryy/aFqsS6C+PSqeWqUa6IWJ8apoF9zZXfB+X+SMlnIPGKQmzKFgmWszkatOX5cRcTN2kRuNhoMtgzHj2hfOjhNkN0bOWtxOBB4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769784779; c=relaxed/simple;
-	bh=41ZSw8e/e5f/AuqeCxVE2oTQbqIo+4zi3gJPu89fVgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P9ZxdAvRdAOcIkbMyJIBpZ5oeMQz96exSpkz+SurF6qrMpqpOcnenl3r8X9oZe07/Uf0jc3ogO9syz6jsupqZ12MCCfXQWWGR+oIJz3PsT00kHjhGmE0VFW8ENWtkrxaWb+8SOJYU/bZT9gvTmcO6iBdBChQwcmtsGo4WGD8eoc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=SRBhcykL; arc=pass smtp.client-ip=136.143.188.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
-ARC-Seal: i=1; a=rsa-sha256; t=1769784720; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=lo3kwHp0jF3jjdfnzFC/JNibTZag0oNVgjbwbRUQZLU9vCynlluDt44DHI2kLU7aVNn2LMh7TnN94TwBkKaU3UqSU+XmcuQDZba2jrZTjOuNi4SY0sj6tgGkLQNylcvvgESMgLANJKh/IasCWZ+NnVsRaP5ZY/YAErbEoGwPnlM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1769784720; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=g30GeD5luz415Zspf8u9IYtmiaQwDaZdE/ttvlyNc/k=; 
-	b=m8nPvh9njtD+hMoXBjSVhUYU5p5o9BgUCLxxAC6IzOnqoOG1F6o8QGnC+6XWKBakORMHBDLFM7+qR7oKIJKR3o0oJmeQyx+Wyq6MRYRhIiOQiIa6a0WZzSX+7kPPAxtj5B7GScNyrINa1P/N+Gw0CBevsioKnqwCEYMOMXZ/4n0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=linux.beauty;
-	spf=pass  smtp.mailfrom=me@linux.beauty;
-	dmarc=pass header.from=<me@linux.beauty>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1769784720;
-	s=zmail; d=linux.beauty; i=me@linux.beauty;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=g30GeD5luz415Zspf8u9IYtmiaQwDaZdE/ttvlyNc/k=;
-	b=SRBhcykLjLSun/HHplWgjobxH70QpCOxNnIB0DaWK5iZEO87zOwRxq54q8nyP2jx
-	XoHxEUvMJqbdI9x8JxfKq6C7wU84zHuW/+iGhgbIyQRHralNG+Vndzb1oQNEUZGhII6
-	2eLU4e0KbIMr5dvuwlU2SX7498WOIsToXjII5Nu8=
-Received: by mx.zohomail.com with SMTPS id 176978471899844.65970746766061;
-	Fri, 30 Jan 2026 06:51:58 -0800 (PST)
-From: Li Chen <me@linux.beauty>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303CF3542CC
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 15:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769786203; cv=none; b=IdNZUTYyuRWoVqctyALI8G00QGB/80f8fq1psFKI08vZXwtw1ZchLTg+pcXwXvAxio8VwBq1zNnhqqjd27yKI+RGUP9g+yyylwzts3X6kNMJPq8QVEHqeGw7x7ASUjig47iqot1Yy5Mk7ZcZo8YuJyqJ5g1D4BrWIthh20Al81A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769786203; c=relaxed/simple;
+	bh=WmHtBHSTYxbfJ263YgNe7PXPFBdQFrEByiiVtkOz+uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DFDPXLxgoVf4knPfdC2bHGDfHkKyi4ueNjKspyCXUbwPc/cA+otnJg8dEryMfmO0wo5YTvKY9CgBo+InSfKZJ7avk9895qiAtOvZs6j0Qy/7Uo6oY24v7tSrUn3hH+MvLYjAPvGFfq75Rqin4nujeBBH5HnBPtGhuRXMqYSebYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=o3p/t+Oz; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8948273f5d0so32543526d6.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 07:16:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1769786199; x=1770390999; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9si664lpAABtSRH5NCDTNiWW5Zo1E2FOdd2kZn8cRsw=;
+        b=o3p/t+OzNolmstthDKxfQ2xaDr4SG5Cd5MhbMtCpLSmb1pSCcPW8jaVlip9X438OsU
+         pvqcK+zIuEQTlyP6cyjSPpPISnUcNH8HBRF8XscGM0zgrtsq9YMvJCbOascyJ6SYle3K
+         5+lplx4rOZBELiGFXi7Z029vg2gzMC0aiSCWP/xkR9Zj42Ur8ylSVCaRV6w/kOkYPsRI
+         NCWMbQlXq7eyk4aNHKTwPQQYIk6ntQG++EF1z3KRTnDa5JBk2tRP7dJov/Sgzp0Jnu5a
+         SVuV3RCSgr6Qe2RLxTELd34T9s4IMJbMo5I1OeLdPPTA68gyCEv8RiFwF6w3hkirjZTv
+         /fhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769786199; x=1770390999;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9si664lpAABtSRH5NCDTNiWW5Zo1E2FOdd2kZn8cRsw=;
+        b=J64slVc0jBvKNuzHr0a2SIlqtm3K0sdKOqZbxgT1CfPhUC8kXgLJxapO9PtvY0uPYr
+         icnqHo81Pnx2iRUJChf76qE/jY/K0Y4MOhnr6LvDxdn8peK6RCd4Rsq1KMlas2n1qrd2
+         tSEdRypEjVdeitnOXB1l33P3Q2GFM9hJWGkcPF8B+7T+twmuvRmG5PgV5BV+kgs6WqGv
+         9vsXgsXJaxSPuoYuZAzNK60xWr2TfhZcqkoTufHxyTpssLusTMWN+nVN8UZvw9wJVN7q
+         qYvlRR+fsAOyKog2ZnsvcTMTB50wEjOJp2aAxIYVwtBbdG2P9I4indsjqxaRjss8EhLy
+         Q7dA==
+X-Forwarded-Encrypted: i=1; AJvYcCVuRfSlV+v/fr6HMzEq9s3RAZtk2xf1wWkbUNyU0hsnwHxaurfM4tVbt0H7F2wnwWKC8ySAQvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8/0FB9ZJW8cILhhsW4i8E41O74XV2W3NqxQTQBbo2wacgG54W
+	jfOj9yaIgC9dKX7YQyEqcUAKkycJ1cee5HY+XBAc5EaIrA7PbSktAfiHE06GhEDEOgs=
+X-Gm-Gg: AZuq6aIj7YxrKZUirjuvcLyi5Q44jVLD74KP50pQYZT8G2NNvFHLWdbIkoxoiBuyglj
+	BfosiePlLyiavTX2cXnD2oNftootN/00J46/G5U2IoQ0z+Z/P+9CSv7ZPuC2VxaI0Q83+WJW1su
+	aJ38GH7VRDvKsvupIWVx+rDBydu72llTef3TF1P09N/LqiF3pgVPh0ajrDQjc2EKeIHdzgaABIo
+	5W9sYxwKYG+jqJ1qZ8lUeFBYM23hRt6lJrS0lrGvyHixXSMb5lFvuzBnLu/hoHJ/rnBoAyzfSRm
+	8WfqebTsZ+u3JcDWxLxO6emDd7RTxrFj2nAGj2ymknn4EeiOk9k3KazWRMOaP3pIEvK7rRirQLf
+	pcoXWHNsYRscUamy/MlBiFcSjehWmGyPuF61SV5UOQg/g4pnvI+vM9Qdw6VsvOqUVDxrpjirm42
+	pjZiwO/Z6982cRdz3AoqWz+8XGL+fwEswKM+EXZH51CED4a7naWyTJSt2o8ycEpOcDMiA=
+X-Received: by 2002:a05:6214:501d:b0:88a:4c50:3be0 with SMTP id 6a1803df08f44-894df970109mr86470926d6.6.1769786198441;
+        Fri, 30 Jan 2026 07:16:38 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5033745c5d4sm58414081cf.3.2026.01.30.07.16.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 07:16:37 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vlqEe-0000000BAef-38VG;
+	Fri, 30 Jan 2026 11:16:36 -0400
+Date: Fri, 30 Jan 2026 11:16:36 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Uladzislau Rezki <urezki@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	"Borislav Petkov (AMD)" <bp@alien8.de>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Petr Mladek <pmladek@suse.com>,
-	Feng Tang <feng.tang@linux.alibaba.com>,
-	Kees Cook <kees@kernel.org>,
-	Li RongQing <lirongqing@baidu.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Askar Safin <safinaskar@gmail.com>,
-	Frank van der Linden <fvdl@google.com>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Li Chen <me@linux.beauty>
-Subject: [PATCH v1 3/3] liveupdate: suppress TCP RST during post-kexec restore window
-Date: Fri, 30 Jan 2026 22:51:19 +0800
-Message-ID: <20260130145122.368748-4-me@linux.beauty>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260130145122.368748-1-me@linux.beauty>
-References: <20260130145122.368748-1-me@linux.beauty>
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com
+Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
+Message-ID: <20260130151636.GF2328995@ziepe.ca>
+References: <aXPEFdEdtSmd6AzF@milan>
+ <20260124093505.GA98529@j66a10360.sqa.eu95>
+ <aXSjm1DXm6yP62tD@pc636>
+ <20260124145754.GA57116@j66a10360.sqa.eu95>
+ <20260127133417.GU13967@unreal>
+ <20260128034558.GA126415@j66a10360.sqa.eu95>
+ <20260128180629.GT1641016@ziepe.ca>
+ <20260129113609.GA37734@j66a10360.sqa.eu95>
+ <20260129132058.GC2307128@ziepe.ca>
+ <20260130085131.GA122673@j66a10360.sqa.eu95>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+In-Reply-To: <20260130085131.GA122673@j66a10360.sqa.eu95>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [8.84 / 15.00];
-	URIBL_BLACK(7.50)[linux.beauty:email,linux.beauty:dkim,linux.beauty:mid];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[linux.beauty];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[lwn.net,soleen.com,kernel.org,google.com,davemloft.net,redhat.com,linux-foundation.org,alien8.de,infradead.org,linux.intel.com,suse.com,linux.alibaba.com,baidu.com,arndb.de,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	R_DKIM_ALLOW(0.00)[linux.beauty:s=zmail];
-	GREYLIST(0.00)[pass,body];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
+	TAGGED_FROM(0.00)[bounces-255170-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[me@linux.beauty,netdev@vger.kernel.org];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	TAGGED_RCPT(0.00)[netdev];
-	TAGGED_FROM(0.00)[bounces-255169-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DMARC_NA(0.00)[ziepe.ca];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.900];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[linux.beauty:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.beauty:email,linux.beauty:dkim,linux.beauty:mid]
-X-Rspamd-Queue-Id: 6076ABBD45
-X-Rspamd-Action: add header
-X-Spam: Yes
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 46B41BBF1C
+X-Rspamd-Action: no action
 
-During a kexec-based live update, userspace may restore established TCP
-connections after the new kernel has booted (e.g. via CRIU). Any packet
-arriving for a not-yet-restored socket will hit the no-socket path and
-trigger a TCP RST, causing the peer to immediately drop the connection.
-Add an optional cmdline knob, liveupdate_tcp_rst_suppress=, to drop such
-packets while liveupdate_restore_in_progress() is true. Only segments
-with ACK set and SYN clear are dropped, and the default behavior remains
-unchanged.
-Document the liveupdate_tcp_rst_suppress cmdline parameter.
+On Fri, Jan 30, 2026 at 04:51:31PM +0800, D. Wythe wrote:
+> On Thu, Jan 29, 2026 at 09:20:58AM -0400, Jason Gunthorpe wrote:
+> > On Thu, Jan 29, 2026 at 07:36:09PM +0800, D. Wythe wrote:
+> > 
+> > > > From there you can check the resulting scatterlist and compute the
+> > > > page_size to pass to ib_map_mr_sg().
+> > 
+> > I should clarify this is done after DMA mapping the scatterlist. dma
+> > mapping can improve the page size.
+> > 
+> > And maybe the core code should be helping compute the MR's target page
+> > size for a scatterlist.. We already have code to do this in umem, and
+> > it is a pretty bit tricky considering the IOVA related rules.
+> >
+> 
+> Hi Jason,
+> 
+> After a deep dive into ib_umem_find_best_pgsz(), I have to say it is
+> much more subtle than it first appears. The IOVA-to-PA relative offset
+> rules, in particular, make it quite easy to get wrong.
+> 
+> While SMC could duplicate this logic, it is certainly not ideal for
+> maintenance. Are there any plans to refactor this into a generic RDMA
+> core helper—for instance, one that can determine the best page size
+> directly from an sg_table or scatterlist?
 
-Signed-off-by: Li Chen <me@linux.beauty>
----
- Documentation/admin-guide/kernel-parameters.txt | 10 ++++++++++
- include/linux/liveupdate.h                      | 11 +++++++++++
- kernel/liveupdate/luo_core.c                    | 14 ++++++++++++++
- kernel/liveupdate/luo_session.c                 |  1 +
- net/ipv4/tcp_ipv4.c                             |  5 +++++
- net/ipv6/tcp_ipv6.c                             |  5 +++++
- 6 files changed, 46 insertions(+)
+I have not heard of anyone touching this.
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 3097e4266d76..b73347a0aefd 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -3442,6 +3442,16 @@ Kernel parameters
- 			If there are multiple matching configurations changing
- 			the same attribute, the last one is used.
- 
-+	liveupdate_tcp_rst_suppress=	[KNL,EARLY]
-+			Format: <bool>
-+			When enabled, drop packets for established connections
-+			(ACK set, SYN clear) that would otherwise trigger a RST
-+			in the LUO post-kexec restore window.
-+			This is useful when userspace restores sockets after
-+			kexec (e.g. via CRIU).
-+			Requires liveupdate=on.
-+			Default: off.
-+
- 	lockd.nlm_grace_period=P  [NFS] Assign grace period.
- 			Format: <integer>
- 
-diff --git a/include/linux/liveupdate.h b/include/linux/liveupdate.h
-index 301d3e94516e..6ca740ec19d4 100644
---- a/include/linux/liveupdate.h
-+++ b/include/linux/liveupdate.h
-@@ -227,6 +227,12 @@ bool liveupdate_enabled(void);
-  */
- bool liveupdate_restore_in_progress(void);
- 
-+/*
-+ * Return true when TCP RST suppression is enabled for the post-kexec restore
-+ * window.
-+ */
-+bool liveupdate_tcp_rst_suppress_enabled(void);
-+
- /* Called during kexec to tell LUO that entered into reboot */
- int liveupdate_reboot(void);
- 
-@@ -253,6 +259,11 @@ static inline bool liveupdate_restore_in_progress(void)
- 	return false;
- }
- 
-+static inline bool liveupdate_tcp_rst_suppress_enabled(void)
-+{
-+	return false;
-+}
-+
- static inline int liveupdate_reboot(void)
- {
- 	return 0;
-diff --git a/kernel/liveupdate/luo_core.c b/kernel/liveupdate/luo_core.c
-index fb6a73c08979..0ed5c9ce1421 100644
---- a/kernel/liveupdate/luo_core.c
-+++ b/kernel/liveupdate/luo_core.c
-@@ -64,6 +64,7 @@
- 
- static struct {
- 	bool enabled;
-+	bool tcp_rst_suppress;
- 	void *fdt_out;
- 	void *fdt_in;
- 	u64 liveupdate_num;
-@@ -75,6 +76,13 @@ static int __init early_liveupdate_param(char *buf)
- }
- early_param("liveupdate", early_liveupdate_param);
- 
-+static int __init early_liveupdate_tcp_rst_suppress_param(char *buf)
-+{
-+	return kstrtobool(buf, &luo_global.tcp_rst_suppress);
-+}
-+early_param("liveupdate_tcp_rst_suppress",
-+	    early_liveupdate_tcp_rst_suppress_param);
-+
- static int __init luo_early_startup(void)
- {
- 	phys_addr_t fdt_phys;
-@@ -259,6 +267,12 @@ bool liveupdate_enabled(void)
- 	return luo_global.enabled;
- }
- 
-+bool liveupdate_tcp_rst_suppress_enabled(void)
-+{
-+	return liveupdate_enabled() && luo_global.tcp_rst_suppress;
-+}
-+EXPORT_SYMBOL_GPL(liveupdate_tcp_rst_suppress_enabled);
-+
- /**
-  * DOC: LUO ioctl Interface
-  *
-diff --git a/kernel/liveupdate/luo_session.c b/kernel/liveupdate/luo_session.c
-index 2c7dd3b12303..427ae74061ba 100644
---- a/kernel/liveupdate/luo_session.c
-+++ b/kernel/liveupdate/luo_session.c
-@@ -146,6 +146,7 @@ bool liveupdate_restore_in_progress(void)
- {
- 	return atomic_long_read(&liveupdate_incoming_sessions_left) > 0;
- }
-+EXPORT_SYMBOL_GPL(liveupdate_restore_in_progress);
- 
- void __init luo_session_restore_window_init(void)
- {
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index f8a9596e8f4d..9a95f3dbf39a 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -56,6 +56,7 @@
- #include <linux/fips.h>
- #include <linux/jhash.h>
- #include <linux/init.h>
-+#include <linux/liveupdate.h>
- #include <linux/times.h>
- #include <linux/slab.h>
- #include <linux/sched.h>
-@@ -2349,6 +2350,10 @@ int tcp_v4_rcv(struct sk_buff *skb)
- bad_packet:
- 		__TCP_INC_STATS(net, TCP_MIB_INERRS);
- 	} else {
-+		if (liveupdate_tcp_rst_suppress_enabled() &&
-+		    liveupdate_restore_in_progress() &&
-+		    th->ack && !th->syn)
-+			goto discard_it;
- 		tcp_v4_send_reset(NULL, skb, sk_rst_convert_drop_reason(drop_reason));
- 	}
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 280fe5978559..c2e680eba041 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -40,6 +40,7 @@
- #include <linux/icmpv6.h>
- #include <linux/random.h>
- #include <linux/indirect_call_wrapper.h>
-+#include <linux/liveupdate.h>
- 
- #include <net/aligned_data.h>
- #include <net/tcp.h>
-@@ -1900,6 +1901,10 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- bad_packet:
- 		__TCP_INC_STATS(net, TCP_MIB_INERRS);
- 	} else {
-+		if (liveupdate_tcp_rst_suppress_enabled() &&
-+		    liveupdate_restore_in_progress() &&
-+		    th->ack && !th->syn)
-+			goto discard_it;
- 		tcp_v6_send_reset(NULL, skb, sk_rst_convert_drop_reason(drop_reason));
- 	}
- 
--- 
-2.52.0
+It looks like there are only two users in the kernel that pass
+something other than PAGE_SIZE, so it seems nobody has cared about
+this till now.
 
+With high order folios being more common it seems like something
+missing.
+
+However, I wonder what the drivers do with the input page size, 
+segmenting a scatterlist is a bit hard and we have helpers for that
+already too.
+
+It is a bigger project but probably the right thing is to remove the
+page size input, wrap the scatterlist in a umem and fixup the drivers
+to use the existing umem support for building mtts, splitting
+scatterlists into blocks and so on.
+
+The kernel side here has been left alone for a long time..
+
+Jason
 
