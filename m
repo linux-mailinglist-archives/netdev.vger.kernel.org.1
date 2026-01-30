@@ -1,185 +1,188 @@
-Return-Path: <netdev+bounces-255059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255060-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJBoOchqfGn+MQIAu9opvQ
-	(envelope-from <netdev+bounces-255059-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:24:40 +0100
+	id oBwFJQJsfGkSMgIAu9opvQ
+	(envelope-from <netdev+bounces-255060-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:29:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E1FB850B
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:24:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7738B8583
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 09:29:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 474873011779
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:23:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4BB113004602
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 08:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43572352C50;
-	Fri, 30 Jan 2026 08:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69EF352946;
+	Fri, 30 Jan 2026 08:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lCY5wdKj";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DVBc4VdE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Lua0s3l+"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0556314D13;
-	Fri, 30 Jan 2026 08:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF12244665
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 08:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769761430; cv=none; b=iuSXubSMOl65cL54/9kLOjbpMkQ6/Q8PHm3t6vlFt29tRU1t7ia9gFfTCYLAxcSStP47DAjHmaJt4cTeCezPXuYSJ7FOeP9WEZe7H5HD5FJweE91K09qg+Q7micM2fivkIxYDlJzHaVKggB5FfljmRzRcLQk8QdGbIVn5R9gukM=
+	t=1769761788; cv=none; b=sNj3URUD2aNsADM7vyltKpsJxBmcF0aEe5263Cb16v2aPccQQD7S1E9bXoQ7VxBoNk6ovPG45MNYWCZTp8mVIzMyIAYIFeQ1Ljj4W2keagb9N+rlAdYu0t6J2aXNNqvI/dBJHv0Jz2ilulEvpFJMMgVnq3xgsH69+o61vaUVoiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769761430; c=relaxed/simple;
-	bh=YgQLkb8jX1AH0tbkh+QGod/x7UP32YjFb2qPFDBVPr8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z7WC2V1oITZvRtbuPTNCvJNfTgWUwtYT85uhUGnjXv1M/AEhO1NeKmvtMB2VHe/1Y2pZyXM4Sja8dUa9uvMYMhO4S0t0vKTaPILJPaUx8AOhfZxGDrQlkQjyaehv2SfIhSekmJ5xdDJS5vWUgpycdyj2IM+9XcDP6DMnhX6y1Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lCY5wdKj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DVBc4VdE; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 30 Jan 2026 09:23:45 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769761427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=chYIUBt/EugIr0AL9E0F3IgPc9RzQg0oeO5t8YDREvM=;
-	b=lCY5wdKjIO3MK8kbGlbMUkDaALYyAEWlUiFPNaF1WgnTixxuoXJu5RM7dtG1PgS5jHU3Ht
-	PQQ1iKP+G8yy/wIk8p2IpWjPV7eRZm1aWTTWs1rfSAzvtsDjdCaAaxmxSxEpUP4n9a5c+N
-	ZbXm2AlPgDA91dYAGgVs+F/H6zH4zaqwSfjpzBgSMKY0/KOWhf8pvPeJDYikRYWH/Hhwm7
-	9pR5Rs7VqeHOC6wsXIFs52nzocC3bLNcwbK8H7laA1d6PPXP9XVdr1K7pK+KABINGctqMc
-	FaTHiKuvg++ebTkPdvcvychobShHN57Maw2ZaahlO1nkyYA7iQf6FxfXVaIPmg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769761427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=chYIUBt/EugIr0AL9E0F3IgPc9RzQg0oeO5t8YDREvM=;
-	b=DVBc4VdE9Ucp8bmBCDVhHHvEJ4Rdf4j0vFFrMDD4EVwC7yGODIWxsO4enXJjqWXWgJhUSw
-	s3wZafA+rfQ0DZBQ==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Kir Chou <note351@hotmail.com>
-Cc: akpm@linux-foundation.org, davidgow@google.com, geert@linux-m68k.org, 
-	visitorckw@gmail.com, brendan.higgins@linux.dev, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"open list:S390 ARCHITECTURE" <linux-s390@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] lib/random32: convert selftest to KUnit
-Message-ID: <20260130091838-33f432c5-8a36-4844-aa8c-bd71b7470f52@linutronix.de>
-References: <20260124054134.71369-1-note351@hotmail.com>
+	s=arc-20240116; t=1769761788; c=relaxed/simple;
+	bh=5MEahWuCJP0dPLEmBTsIeIFENKo3FnCUwr1Mmh+9BQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uCA7HE0tuTKYBPGKnKLZHgT4E1Jl9hg6nimgrJIAVGQo+5JNpK5unXOL2suNCj9M68pQFnfHOEQMbzrNU5VHX5LdGXbyBHyxCOdXxLPDLwTpYaZmOZGwc+exM8fxBEl/ds7lnpPvs5yiVLUR6Xj/Vqz4GXl9OeWTsCrewGfH/gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Lua0s3l+; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 3F88BC22F5B;
+	Fri, 30 Jan 2026 08:29:48 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E06AB6075A;
+	Fri, 30 Jan 2026 08:29:44 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 94A3D119A885C;
+	Fri, 30 Jan 2026 09:29:38 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769761784; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=/vKn9EEQHyKCNGgNOLS9lAAVgDA2xlkQZrymT9LUk4A=;
+	b=Lua0s3l+UZuM4nHOP7UHhBh2KmaT7OYmaPFGeF3fPSrOYmJxLSqrJutiWd3qECpWBtm35p
+	/zGCIVZ7cJYfw+6mwhKTwWXc6HU0QIjrYOaKjlRCJND9LWfDb4vdCC2gdILG9sajvFGVYv
+	Y9Pvo3Km2luVhWmyF+Y2voc+PbWLxWEWLSaMudYLJzqo66xwaOOPdN9zHwPzzhy7mDIjTe
+	alBkuWD/wHpqO4m43YucrAJzumYXEOzLlTUSYSgVmkqcB/GrStBcUw4e79BypD8/H9jBC3
+	S5GDiIee6AMOHy5IMZbdiOJMSqdU9cRfvRP4YhB+W7novRZN/ZjeZcNpqyqp2A==
+Message-ID: <cb94b647-c2a4-468d-ac1c-c5f18f0734f2@bootlin.com>
+Date: Fri, 30 Jan 2026 09:29:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260124054134.71369-1-note351@hotmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: add device link between MAC device and MDIO
+ device
+To: Wei Fang <wei.fang@nxp.com>, Russell King <linux@armlinux.org.uk>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
+ "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+ "florian.fainelli@broadcom.com" <florian.fainelli@broadcom.com>,
+ "xiaolei.wang" <xiaolei.wang@windriver.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>,
+ "quic_abchauha@quicinc.com" <quic_abchauha@quicinc.com>,
+ "quic_sarohasa@quicinc.com" <quic_sarohasa@quicinc.com>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260126104409.1070403-1-wei.fang@nxp.com>
+ <20260128201501.04bb6e5c@kernel.org> <aXsxJa0D0bohafRs@shell.armlinux.org.uk>
+ <PAXPR04MB85106B63AF43DE0830B4C362889FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <PAXPR04MB85106B63AF43DE0830B4C362889FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255059-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[hotmail.com];
-	FREEMAIL_CC(0.00)[linux-foundation.org,google.com,linux-m68k.org,gmail.com,linux.dev,vger.kernel.org,googlegroups.com,linux.ibm.com,davemloft.net,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,broadcom.com,windriver.com,davemloft.net,google.com,redhat.com,quicinc.com,lists.linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255060-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 91E1FB850B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,bootlin.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A7738B8583
 X-Rspamd-Action: no action
 
-On Sat, Jan 24, 2026 at 02:41:33PM +0900, Kir Chou wrote:
-> This patch converts the existing prandom selftest (lib/random32.c) to use
-> the KUnit framework (lib/tests/random32_kunit.c). Unlike typical KUnit
-> tests, this file is directly #included into lib/random32.c.
+Hi,
+
+On 30/01/2026 04:41, Wei Fang wrote:
+>> On Wed, Jan 28, 2026 at 08:15:01PM -0800, Jakub Kicinski wrote:
+>>> On Mon, 26 Jan 2026 18:44:09 +0800 Wei Fang wrote:
+>>>> The commit bc66fa87d4fd ("net: phy: Add link between phy dev and mac
+>>>> dev") has created a device link between the MAC and the PHY if the
+>>>> MAC uses a shared MDIO bus (The MDIO and the MAC are two separate
+>> devices).
+>>>> Sarosh Hasan tried to change the DL_FLAG_STATELESS flag to
+>>>> DL_FLAG_AUTOREMOVE_SUPPLIER to fix the issue [1]. However, the
+>>>> solution does not take into account the hot-swappable PHY devices (such as
+>> SFP).
+>>>> so when the PHY device is unplugged, the MAC driver will
+>>>> automatically be removed, which is not the expected behavior.
+>>>>
+>>>> Therefore, to solve this issue of the shared MDIO bus, we create the
+>>>> device link between the MAC device and the MDIO device, rather than
+>>>> between the MAC device and the PHY device. And when the shared MDIO
+>>>> bus is removed, all MAC drivers that depend on it will also be removed.
+>>>
+>>> Anyone willing to venture a review tag?
+>>
+>> No, I don't agrew with the patch.
+>>
 > 
-> Only the file name "random32_kunit.c" keeps random32, "prandom" is used
-> for all other places for aligning with the API semantics and avoiding
-> confusion with the cryptographically secure random.c,
+> Is it because of SFP? If so, would the following modification be more
+> reasonable, while SFP still follows the previous logic? I'm not sure if
+> phydev->sfp_bus_attached can be used to distinguish between SFP
+> PHYs and non-SFP PHYs.
+
+If you want to know if the PHY is in an SFP module, you should use
+phy_on_sfp() instead :
+
+https://elixir.bootlin.com/linux/v6.18.6/source/include/linux/phy.h#L1766
+
+It's set for this kind of setups :
+
+
+               SFP module
++-----+      +-----------+
+| MAC | ---- | PHY       |
++-----+      +--\--------+
+                 \
+                  \_ phy_on_sfp(phydev) == true
+
+
+phydev->sfp_bus_attached is for the media converter user-case :
+
+                            SFP Module
++-----+      +-----+      +------------+
+| MAC | ---- | PHY | ---- |   ???      |
++-----+      +--\--+      +------------+
+                 \
+                  \_ phydev->sfp_bus_attached == true
 > 
-> The new test:
-> - Removes the legacy CONFIG_RANDOM32_SELFTEST.
+> Anyway, this problem has existed for a long time, and I think we should
+> find a way to solve it in upstream. If there's a better approach, I can help
+> verify it.
 
-This bit seems to be missing from the patch.
-'config RANDOM32_SELFTEST' still exists in lib/Kconfig.
+Sorry I wasn't available for most part of yesterday for that discussion.
 
-> - Adds CONFIG_PRANDOM_KUNIT_TEST (defaulting to KUNIT_ALL_TESTS).
-> - Moves the test logic to lib/tests/random32_kunit.c.
-> - Updates arch/s390/configs/debug_defconfig to use the new KUnit symbol.
-> 
-> This commit is verified by `./tools/testing/kunit/kunit.py run`
-> with the .kunit/.kunitconfig:
-> 
-> ```
-> CONFIG_KUNIT=y
-> CONFIG_PRANDOM_KUNIT_TEST=y
-> ```
-> 
-> Signed-off-by: Kir Chou <note351@hotmail.com>
-> ---
->  arch/s390/configs/debug_defconfig |   2 +-
->  lib/Kconfig.debug                 |  12 +++
->  lib/random32.c                    | 173 +----------------------------
->  lib/tests/random32_kunit.c        | 174 ++++++++++++++++++++++++++++++
->  4 files changed, 189 insertions(+), 172 deletions(-)
->  create mode 100644 lib/tests/random32_kunit.c
-> 
+I'll give a try to this patch today, with the above change and let you know
+how this goes.
 
-(...)
+Maxime
 
-> diff --git a/lib/tests/random32_kunit.c b/lib/tests/random32_kunit.c
-> new file mode 100644
-> index 000000000..ee50205b8
-> --- /dev/null
-> +++ b/lib/tests/random32_kunit.c
-> @@ -0,0 +1,174 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Test cases for random32 functions.
-> + */
-> +
-> +#include <kunit/test.h>
-> +
-> +static struct prandom_test1 {
-> +	u32 seed;
-> +	u32 result;
-> +} test1[] = {
-> +	{ 1U, 3484351685U },
-> +	{ 2U, 2623130059U },
-> +	{ 3U, 3125133893U },
-> +	{ 4U,  984847254U },
-> +};
-> +
-> +static struct prandom_test2 {
-
-These arrays can be 'const'.
-
-> +	u32 seed;
-> +	u32 iteration;
-> +	u32 result;
-> +} test2[] = {
-
-(...)
 
