@@ -1,80 +1,101 @@
-Return-Path: <netdev+bounces-255120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oI+LCDSUfGlPNwIAu9opvQ
-	(envelope-from <netdev+bounces-255120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:21:24 +0100
+	id oFfgLLSUfGkQNwIAu9opvQ
+	(envelope-from <netdev+bounces-255121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:23:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78162BA021
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:21:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE019BA071
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 12:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE8D73036094
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:18:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F3997305CF77
+	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 11:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F88F33EB01;
-	Fri, 30 Jan 2026 11:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584A534E75E;
+	Fri, 30 Jan 2026 11:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="geRrPgom"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AO675ba";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c59bHBXW";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0AO675ba";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c59bHBXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25374341AD8
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC11033EB01
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 11:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769771925; cv=none; b=etEfbLY/iEcXYhtd2ZKFeoU2LDXe71rXoF5XZ+YQnbmMJA6qDApXPIHL0+XH290B4uF6DGsV10DNE5zFjM0bjWMtuTF5YVG0xA6l++RFvq5PNtl5XNlNDuYDf+BCW+j6wKtip/yOwm7BQRLoYBDqQZzQnGy2+ox6wse9yCTnMWA=
+	t=1769771950; cv=none; b=sHzA4ZhH1Ot/SGOaYl3nC4TYU4tTSdSGkkxsmMYib8kchZTj9Iuemn1GvA+VA9cnvBU3/8Xp3/EXXdCu4DRTxG8DbUQ+wNvo9zMh4OwMGpdPWCQ/ZLVgpL+yHd+ikI3aMY7tqYu7rN7eYND2e4jsCAVX+BpEWtPjv2NLTHEWRjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769771925; c=relaxed/simple;
-	bh=8p8+0GQ91MvaIBdkWEAgJ+nHZa2ENvIatBXaaQcwTnM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=btDxtwtSKsjiZbrzbQyuV5wUTxh73q128H848W0mSaYdy+c7v89YVLSYQaTWNHUisrVkTBRfKH+5zgJf8TbkFIoWkIESSc9DO10IbU/XdHEN/WtxdKlOyCesqQ/A0uE7XMQnVBrayQiOPrOra41o+QBeTW9g3t2Uj3rQr8fT1L4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=geRrPgom; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769771922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4SWxrZSh3IyqnmseS1WeTTaR+05pdp5g7SrBU1oEGUQ=;
-	b=geRrPgomLMpa373UwZTftm9pGRq0bhMu7MyhD8eTENKWCS0VWG6NN3Dq1uixQ0KL+StYKA
-	waeg3nf7WojAJHuXHHdKXuXKVcM3rCcE61PZbaH8ZmKEHbnMBRN/8hawvGvbEY+yQusqSl
-	mMMsH5vnNWKcrwXDy/qzWKRTz4KvgQ4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-54-HL81I-JnPpeBG94G4989lQ-1; Fri,
- 30 Jan 2026 06:18:37 -0500
-X-MC-Unique: HL81I-JnPpeBG94G4989lQ-1
-X-Mimecast-MFC-AGG-ID: HL81I-JnPpeBG94G4989lQ_1769771916
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	s=arc-20240116; t=1769771950; c=relaxed/simple;
+	bh=bCGu71GEXxNkV5/9e+2XlverC9QkEitMkRMqV0O3rHg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=hGzucd3Bz1K3qn1vV63zehQ7J9KT9dIche+g3/+wJjqOLLH2YsyTVuElEXwKzX4vPerFuetcfa/fsrfcaHCIqvK8v/hEaQXXziUVDcOHk3gjpxaC/s/o9VA/FLip/N9ppom029+rLmbPlp1R3qtusc9fIxkcjYTHdvHKK2otKwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AO675ba; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c59bHBXW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0AO675ba; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c59bHBXW; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3EC01956080;
-	Fri, 30 Jan 2026 11:18:35 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.204])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 311A518004D8;
-	Fri, 30 Jan 2026 11:18:32 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 098E05BCE2;
+	Fri, 30 Jan 2026 11:19:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769771947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
+	b=0AO675bapcZijMdIoMDGjfhrAYKeMyB3Qn6S9e+6ZUt8R96jKAqTNci80E71OE41Cgwf8L
+	sd6ES9g4lkCKzueRr1yXyhcUeWpTU3YZTFst/2A892P41vTwkkK19z+MW0d/h/tEIsr13z
+	bDHFIg7IoHeneoY4AHeVf55PTbqv2GU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769771947;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
+	b=c59bHBXWye7efSWk8CHVfDsO9J1jqKnHa1YrY64ANB0+vxdZ9xsODkTJXN0f4w/ITdEXMQ
+	QuSWa/dLde1zuNBA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769771947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
+	b=0AO675bapcZijMdIoMDGjfhrAYKeMyB3Qn6S9e+6ZUt8R96jKAqTNci80E71OE41Cgwf8L
+	sd6ES9g4lkCKzueRr1yXyhcUeWpTU3YZTFst/2A892P41vTwkkK19z+MW0d/h/tEIsr13z
+	bDHFIg7IoHeneoY4AHeVf55PTbqv2GU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769771947;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=tFDS9SoaGcRO8FiVaarY/KBncYAPLW/z6WhT0SYl+s8=;
+	b=c59bHBXWye7efSWk8CHVfDsO9J1jqKnHa1YrY64ANB0+vxdZ9xsODkTJXN0f4w/ITdEXMQ
+	QuSWa/dLde1zuNBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD5153EA61;
+	Fri, 30 Jan 2026 11:19:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id uhzgNaqTfGl0DAAAD6G6ig
+	(envelope-from <tbogendoerfer@suse.de>); Fri, 30 Jan 2026 11:19:06 +0000
+From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+To: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 2/2] selftest: net: add a test-case for encap segmentation after GRO
-Date: Fri, 30 Jan 2026 12:17:47 +0100
-Message-ID: <276270cf825431817e46f6744d9b26d3ea954869.1769771825.git.pabeni@redhat.com>
-In-Reply-To: <cover.1769771825.git.pabeni@redhat.com>
-References: <cover.1769771825.git.pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] bonding: only set speed/duplex to unknown, if getting speed failed
+Date: Fri, 30 Jan 2026 12:19:04 +0100
+Message-ID: <20260130111904.144024-1-tbogendoerfer@suse.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,138 +103,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Spam-Flag: NO
+X-Spam-Score: -1.30
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255120-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255121-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tbogendoerfer@suse.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[udpgro_fwd.sh:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 78162BA021
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DE019BA071
 X-Rspamd-Action: no action
 
-We had a few patches in this area and no explicit coverage so far.
-The test case covers the scenario addressed by the previous fix;
-reusing the existing udpgro_fwd.sh script to leverage part of the
-of the virtual network setup, even if such script is possibly not
-a perfect fit.
+bond_update_speed_duplex() first set speed/duplex to unknown and
+then asks slave driver for current speed/duplex. Since getting
+speed/duplex might take longer there is a race, where this false state
+is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding:
+ update port speed when getting bond speed") this race gets more visible,
+if user space is calling ethtool on a regular base.
 
-Note that the mentioned script already contains several shellcheck
-violation; this patch does not fix the existing code, just avoids
-adding more issues in the new one.
+Fix this by only setting speed/duplex to unknown, if link speed is
+really unknown/unusable.
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Fixes: 691b2bf14946 ("bonding: update port speed when getting bond speed")
+Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
 ---
- tools/testing/selftests/net/udpgro_fwd.sh | 65 +++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ drivers/net/bonding/bond_main.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/net/udpgro_fwd.sh b/tools/testing/selftests/net/udpgro_fwd.sh
-index a39fdc4aa2ff..f2c1f0630b77 100755
---- a/tools/testing/selftests/net/udpgro_fwd.sh
-+++ b/tools/testing/selftests/net/udpgro_fwd.sh
-@@ -162,6 +162,39 @@ run_test() {
- 	echo " ok"
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index e7caf400a59c..4cdf89b21ca0 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -791,26 +791,29 @@ static int bond_update_speed_duplex(struct slave *slave)
+ 	struct ethtool_link_ksettings ecmd;
+ 	int res;
+ 
+-	slave->speed = SPEED_UNKNOWN;
+-	slave->duplex = DUPLEX_UNKNOWN;
+-
+ 	res = __ethtool_get_link_ksettings(slave_dev, &ecmd);
+ 	if (res < 0)
+-		return 1;
++		goto speed_duplex_unknown;
+ 	if (ecmd.base.speed == 0 || ecmd.base.speed == ((__u32)-1))
+-		return 1;
++		goto speed_duplex_unknown;
+ 	switch (ecmd.base.duplex) {
+ 	case DUPLEX_FULL:
+ 	case DUPLEX_HALF:
+ 		break;
+ 	default:
+-		return 1;
++		goto speed_duplex_unknown;
+ 	}
+ 
+ 	slave->speed = ecmd.base.speed;
+ 	slave->duplex = ecmd.base.duplex;
+ 
+ 	return 0;
++
++speed_duplex_unknown:
++	slave->speed = SPEED_UNKNOWN;
++	slave->duplex = DUPLEX_UNKNOWN;
++
++	return 1;
  }
  
-+run_test_csum() {
-+	local -r msg="$1"
-+	local -r dst="$2"
-+	local csum_error_filter=UdpInCsumErrors
-+	local csum_errors
-+
-+	printf "%-40s" "$msg"
-+
-+	is_ipv6 "$dst" && csum_error_filter=Udp6InCsumErrors
-+
-+	ip netns exec "$NS_DST" iperf3 -s -1 >/dev/null &
-+	wait_local_port_listen "$NS_DST" 5201 tcp
-+	local spid="$!"
-+	ip netns exec "$NS_SRC" iperf3 -c "$dst" -t 2 >/dev/null
-+	local retc="$?"
-+	wait "$spid"
-+	local rets="$?"
-+	if [ "$rets" -ne 0 ] || [ "$retc" -ne 0 ]; then
-+		echo " fail client exit code $retc, server $rets"
-+		ret=1
-+		return
-+	fi
-+
-+	csum_errors=$(ip netns exec "$NS_DST" nstat -as "$csum_error_filter" |
-+		      grep "$csum_error_filter" | awk '{print $2}')
-+	if [ -n "$csum_errors" ] && [ "$csum_errors" -gt 0 ]; then
-+		echo " fail - csum error on receive $csum_errors, expected 0"
-+		ret=1
-+		return
-+	fi
-+	echo " ok"
-+}
-+
- run_bench() {
- 	local -r msg=$1
- 	local -r dst=$2
-@@ -260,6 +293,38 @@ for family in 4 6; do
- 	ip netns exec $NS_SRC $PING -q -c 1 $OL_NET$DST_NAT >/dev/null
- 	run_test "GRO fwd over UDP tunnel" $OL_NET$DST_NAT 10 10 $OL_NET$DST
- 	cleanup
-+
-+	# force segmentation and re-aggregation
-+	create_vxlan_pair
-+	ip netns exec "$NS_DST" ethtool -K veth"$DST" generic-receive-offload on
-+	ip netns exec "$NS_SRC" ethtool -K veth"$SRC" tso off
-+	ip -n "$NS_SRC" link set dev veth"$SRC" mtu 1430
-+
-+	# forward to a 2nd veth pair
-+	ip -n "$NS_DST" link add br0 type bridge
-+	ip -n "$NS_DST" link set dev veth"$DST" master br0
-+
-+	# segment the aggregates TSO packet, without csum offload
-+	ip -n "$NS_DST" link add veth_segment type veth peer veth_rx
-+	for FEATURE in tso tx-udp-segmentation tx-checksumming; do
-+		ip netns exec "$NS_DST" ethtool -K veth_segment "$FEATURE" off
-+	done
-+	ip -n "$NS_DST" link set dev veth_segment master br0 up
-+	ip -n "$NS_DST" link set dev br0 up
-+	ip -n "$NS_DST" link set dev veth_rx up
-+
-+	# move the lower layer IP in the last added veth
-+	for ADDR in "$BM_NET_V4$DST/24" "$BM_NET_V6$DST/64"; do
-+		# the dad argument will let iproute emit a unharmfull warning
-+		# with ipv4 addresses
-+		ip -n "$NS_DST" addr del dev veth"$DST" "$ADDR" \
-+			nodad 2>/dev/null
-+		ip -n "$NS_DST" addr add dev veth_rx "$ADDR" \
-+			nodad 2>/dev/null
-+	done
-+
-+	run_test_csum "GSO after GRO" "$OL_NET$DST"
-+	cleanup
- done
- 
- exit $ret
+ const char *bond_slave_link_status(s8 link)
 -- 
-2.52.0
+2.43.0
 
 
