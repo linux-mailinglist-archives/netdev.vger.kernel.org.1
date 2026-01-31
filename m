@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-255477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cABsADw+fmk6WgIAu9opvQ
-	(envelope-from <netdev+bounces-255477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:39:08 +0100
+	id OGSCNok+fmk6WgIAu9opvQ
+	(envelope-from <netdev+bounces-255478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:40:25 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A473C355A
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:39:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14110C35DA
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:40:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 133BB3007AE7
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:39:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 16CC73008459
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B67135B623;
-	Sat, 31 Jan 2026 17:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0D835B638;
+	Sat, 31 Jan 2026 17:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrkUAplb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jWaujYXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCE3125A9
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB6435B627
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769881141; cv=none; b=lgc/4sEsNKqCZDWye121XIpVJKIhX2tpHl5iVMZk4qrhXhPb6iResYUVJ5euGA03TOV3dyYAWF9OQNJQKsgOJnZPYqnxaVLVfJ+6dJwEtkgXPFySbHg3LainsrwRxL3Me1CLJQMrmbDpO7+xPGVcWwkJF20Q8/ZM3yyRDSPlSss=
+	t=1769881205; cv=none; b=IFvNrWcG7ZD9LOf6z7MOrO48d8PsFNqqLNsgybrz+SZhGMLnVPS/SrlTLcSDs0hx2+GlYdm5Cw6Q51S5dQ75whjEzBrQpp4lXadnBRIuPGxGBxEF1MdHpDXCBds03qC+ZyOoLu2OqHuOwJR56srwXDf8z2/SYqv0tCm/TqIxB5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769881141; c=relaxed/simple;
-	bh=wEAzBbDX9J50XPKdtzYZVC6MUkgM4jM3Jryol1qn4Qw=;
+	s=arc-20240116; t=1769881205; c=relaxed/simple;
+	bh=XTqCrafwy0FQoJigWHKUzbxCsrGtBH6jZaO1ghXS5RA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YcL7YGCGCLokCRYSzQ6SaNTw9iGgIFgG83jnFGOOcKoiILK28Rffk7Qd0D7JDELY2rrabS9RTsYnGAQVXlcBl/bNyidsn0/l6eSD4sErziqNR+BANDCgQ65n7ly4RB2sYvi6MAjxTwJ8+9vnp1sOtUslVGtsAyX8aQO9vyf1UsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mrkUAplb; arc=none smtp.client-ip=209.85.128.41
+	 In-Reply-To:Content-Type; b=Mp5pEy3+iE4GbgZhg+4MgLOx0IZ2vDNWKZCT1nNL4OzTnhwGrFzIOHXdNeiLZFsfAEMF0s+pHpulpg6kH3SEUTknPFWGg3pJgwDTzupzoxVwsCkyoRlczMxYBdKVAiT9SgnI+or71i9zO8PDpRrIy8jZHZzaqqMte555n1m2nOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jWaujYXd; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47ff94b46afso28025055e9.1
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:38:59 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43601e96f72so96900f8f.2
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:40:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769881138; x=1770485938; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769881202; x=1770486002; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=XhA5sOYyJbdjrg3dYheIh1Yn8u/FqIdGaum/hwO7z7o=;
-        b=mrkUAplbMkuEvi+OKFLkmC4LPd/ugFZPcnSvR+fpe+E66gqSoz/mZHDiHIA4NdPJUt
-         v5nEMf5NkAYd66ggUaw/Y2rE+DyirAaWIvCX9SN+ZjeiBDlDzGtD4blqSZ2RINVv38ys
-         B+bkRiNGdObGRxZuCTEXFP7TyQbXTaXfZIz2LWv8NVoY7mgvrtNRlDJLn2RYYyZ4iv5O
-         /Hk8pEAKE41ZA1WZMxDm6HXgmsv4MoA+DPB/fjmEpxBPRAaZCeQH5QU3HP7cDiXVu21y
-         uC3S81QJzbsMrB1xmndjDZGcIPw7Nv0ZBo9Kx+zjTKPt/FZJW2Ww5sCRZ/1lE5YfluAu
-         Nw+g==
+        bh=QgmwdRM4QcAa92E/3yOVnX+erOsKbGYtR2XQGPwyhkI=;
+        b=jWaujYXdEAJgY9wbKV0+mpLy5YbimlvPDnFD/FneMtNuaJNtBgB1pAOK7b6N7T/YWs
+         Jjyj3CYOIuHRWTl6rpFzQMdP/ptiQBu7oiyw8eowiT6ZyFgmwIYq+GS1wrUV63D+rCXp
+         Ia+rV41olrYl820mrwfz8S1AmtOJZJjtCKhUZZDRR8Qpvxy+b1ONF/aIRw9BYQZL/gIl
+         KzgE0Qdu4ofqNZBJf7pU7A7rJ/XnBH7N7HjymFn3kDV/a6kWnBLKc77aC0N/GjRcumrO
+         w1lmG9q5ZcncAX3oQXwElQ5xHb8nbkRelJ5MDMPG6cJXzOrGf6cSCimGRkMudpURTCpd
+         kEdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769881138; x=1770485938;
+        d=1e100.net; s=20230601; t=1769881202; x=1770486002;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XhA5sOYyJbdjrg3dYheIh1Yn8u/FqIdGaum/hwO7z7o=;
-        b=dWP/LVGFmThVmH7cH4mL0Fpm6voWkO8SAg4N1ev6pNaOzRKzoVr0O9CUoNJM1Cz7Hm
-         5EwicsNNkkJ9v8TA26LN0mgahS03zKsCKCUPYHNF1vRPQ+pkHuF1lLPuPE/BSWnky5MZ
-         dssp+zXRcQaslvhDH0uP2g2HT9kymCn7LdY5Cw26///A9q+1BgOIrBGsoVDnfVVsrz2I
-         svLu0b9WCpnDAhrKKAPy0QBgnkrTGLYXQ0P+g/7tzxxe1rSXsaWMfklkmZ1KsKX4LF2w
-         WHyt8FiNosyybtL6ZiuTrqHYbEhdqQMEMUOF1ff3OoZLtvLKB5/wN01j6n7y0FQZo2qX
-         MOfw==
-X-Gm-Message-State: AOJu0YxZEZ+vkNaPvCHW3ny+7sHn1rT8Helkl8k2tP32aTJRCUUvinnx
-	D52EOjn4XPHdPakzTPbgmISZLdA8MSk+GcEdrkrqgMk755jwV/PIal0w
-X-Gm-Gg: AZuq6aJtHw+UbyTaUOSaujxbc6ToNb8MZl211Kovb65VCZXg39b9Ze/VZadAosNfByd
-	G9CIkvWDfqMVCqoQd1iKJAvU5SGVFxYoL0hGKEbI/Pk4Q7lro3wdub8RQN5mDuJqzAqwrEDjXgq
-	N/PNHAX8uG6C1Og8Hg3aO7OS2+S3LFPGCThwCRbPIYsCUUTTggg5UJQwTckP0ouKuS/qKwjtP1H
-	CkAeuGrnNCYWN6AoW4xxq8wPu05EPsWGjCuZ5wCJaUgWn4MmubcELVATc1a/CD6OTibThf9ub2p
-	b9u863u0LOBS9BDxmdVHfbBj/wMSm13hwJIwUuaRHWYC2QMtkYnTFru+6PO5XmwSaIfETbAbuve
-	NEhbm2dVDr+wfuv4OpKhjVjtodfrV9xoz64eEn/ZpMzXTU6NZ8/viN0CoSeXLjHolYhO7IL7gzN
-	RA8fOH03/RsgPI0A29tyfXyzea3xyJm9zDj8BNUSWwwknqFPjMQmypYz5IH0lc35tDZVSNObCTB
-	Ch+GRI4K93iBlHFAKnjtliFt22smVN/JVECXACfTGQa7BUI
-X-Received: by 2002:a05:600c:8115:b0:481:a662:b3f3 with SMTP id 5b1f17b1804b1-482db44886fmr84004865e9.7.1769881138262;
-        Sat, 31 Jan 2026 09:38:58 -0800 (PST)
+        bh=QgmwdRM4QcAa92E/3yOVnX+erOsKbGYtR2XQGPwyhkI=;
+        b=UIr2ARd4mUpr+GfKLP26tzaw0K0xXTunNz3BoDN2nsFLbC+9+h8PP0xG4FxmvA5T6v
+         WYuXc4s/SQVaWiTpjP3IwHEDD6ok/Q+LCi42STi2wZOrq6BfgeGyhkFsTMrroH+gMrlr
+         Gpzu/o2uie8HH9yC0+0OuDOe6gkos56E1/a+vnNOsMhAlIXgwqAtcthgw577DoGtio9j
+         nLrMaVpGqf0eAoJxHeAT9lAxp6aOTLNgL3wjJiS8xxFt92np4znSxC9GH4QJEADX5O3b
+         yBwrsizfj1sJdMaVJQLhhkasU0T6PO2CGkIuWObczNMsi7vZCEaqAOOlKcwVtLOfAXEs
+         2HSw==
+X-Gm-Message-State: AOJu0Yxxq0ukJGEuZ9YkesjgnQlGmCAc70B+twQeT5j65/OY1foSPSUg
+	bMrk6/qBhD8dQjhd99DALj3dw8cozFKHI8Rv/y8hptJ/M61MYc/Z1Tq2
+X-Gm-Gg: AZuq6aK7Xq9nUhC1uTcjfiDbXGpx/rk+TQ+DZVdxyPNjI6bIf3cgO6LJgvOozHy2O7T
+	OwwObWDcAz7ndodGleLlH+jsAFgxolGfdaLowzE5VN+M9KkWUZeBDb3lgop2ZqsG9Tjpezxwikd
+	BK/BGNlX3sscmJ9TURCRvaTTJonheyG+x3DP2V8/HEUeOfZ93Az1Z/OXCgDPqAw2WbxDzNh0zAP
+	W3ncB4SZx6QqoRd+vlUSCggEKxUQKheykDaHXnM+RhagqeUNMV74lvlCdqEeg+mpp/IE7idFTG/
+	BlsVqewdXSuKkKmLAAiWueLG80I2oPQ3RxHNk4HJ7LH3tjXoijJDALQYrnZ+/hCvyzcz8N58Sx2
+	3pe+wmwiMaOLdJ6QVCnHrMbNj4damR25Y3oxj4Xknd7eUlpx1wwTopDSzXnfn1+lbYiExwuF5xr
+	KbVmbOeRtMvn/5YLEPtrFCgMsIum80t60BFD5HF4T//KdSbdGTv1DsN8QrjNhNH6Uay7UIQNAJV
+	dv+khOaW504lPnA58pjATHuYFYjQeVePhV5Ough8J3R9SCt
+X-Received: by 2002:a5d:5848:0:b0:435:bdc0:48e9 with SMTP id ffacd0b85a97d-435f3ab4bdcmr9017745f8f.55.1769881201853;
+        Sat, 31 Jan 2026 09:40:01 -0800 (PST)
 Received: from ?IPV6:2003:ea:8f06:cc00:41be:d7:a063:4025? (p200300ea8f06cc0041be00d7a0634025.dip0.t-ipconnect.de. [2003:ea:8f06:cc00:41be:d7:a063:4025])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e267aad1sm43036665e9.15.2026.01.31.09.38.57
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322f40sm30276962f8f.34.2026.01.31.09.40.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 31 Jan 2026 09:38:57 -0800 (PST)
-Message-ID: <15a4318f-50b5-4df5-874e-e387ee070a9d@gmail.com>
-Date: Sat, 31 Jan 2026 18:38:56 +0100
+        Sat, 31 Jan 2026 09:40:01 -0800 (PST)
+Message-ID: <ce1c6df0-4785-4b28-8322-32dc6bceea18@gmail.com>
+Date: Sat, 31 Jan 2026 18:40:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/3] net: dsa: loop: remove MDIO device modalias
+Subject: [PATCH net-next 3/3] net: phy: remove modalias-based mdio bus
+ matching
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
@@ -112,7 +113,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255477-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255478-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,armlinux.org.uk,redhat.com,google.com,kernel.org,davemloft.net,analog.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
@@ -132,44 +133,75 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A473C355A
+X-Rspamd-Queue-Id: 14110C35DA
 X-Rspamd-Action: no action
 
-This change is a prerequisite for removing the MDIO device modalias,
-as dsa_loop is the only user. Switch from modalias to a custom
-bus match function.
+Last user dsa_loop has been migrated away from modalias-based matching,
+so we can remove this feature now. It was the only user of MDIO_NAME_SIZE,
+so remove also this constant.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/dsa/dsa_loop.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/net/phy/mdio_device.c   | 13 -------------
+ include/linux/mdio.h            |  1 -
+ include/linux/mod_devicetable.h |  1 -
+ 3 files changed, 15 deletions(-)
 
-diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
-index 4a416f2717b..b41254b3ac4 100644
---- a/drivers/net/dsa/dsa_loop.c
-+++ b/drivers/net/dsa/dsa_loop.c
-@@ -395,6 +395,12 @@ static struct mdio_driver dsa_loop_drv = {
- 	.shutdown = dsa_loop_drv_shutdown,
+diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+index 6e90ed42cd9..65636070a22 100644
+--- a/drivers/net/phy/mdio_device.c
++++ b/drivers/net/phy/mdio_device.c
+@@ -36,18 +36,6 @@ static void mdio_device_release(struct device *dev)
+ 	kfree(to_mdio_device(dev));
+ }
+ 
+-static int mdio_device_bus_match(struct device *dev,
+-				 const struct device_driver *drv)
+-{
+-	struct mdio_device *mdiodev = to_mdio_device(dev);
+-	const struct mdio_driver *mdiodrv = to_mdio_driver(drv);
+-
+-	if (mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY)
+-		return 0;
+-
+-	return strcmp(mdiodev->modalias, drv->name) == 0;
+-}
+-
+ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
+ {
+ 	struct mdio_device *mdiodev;
+@@ -60,7 +48,6 @@ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
+ 	mdiodev->dev.release = mdio_device_release;
+ 	mdiodev->dev.parent = &bus->dev;
+ 	mdiodev->dev.bus = &mdio_bus_type;
+-	mdiodev->bus_match = mdio_device_bus_match;
+ 	mdiodev->device_free = mdio_device_free;
+ 	mdiodev->device_remove = mdio_device_remove;
+ 	mdiodev->bus = bus;
+diff --git a/include/linux/mdio.h b/include/linux/mdio.h
+index 42d6d47e445..7ad7ce48f53 100644
+--- a/include/linux/mdio.h
++++ b/include/linux/mdio.h
+@@ -29,7 +29,6 @@ struct mdio_device {
+ 	struct device dev;
+ 
+ 	struct mii_bus *bus;
+-	char modalias[MDIO_NAME_SIZE];
+ 
+ 	int (*bus_match)(struct device *dev, const struct device_driver *drv);
+ 	void (*device_free)(struct mdio_device *mdiodev);
+diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+index 24eb5a88a5c..5b1725fe970 100644
+--- a/include/linux/mod_devicetable.h
++++ b/include/linux/mod_devicetable.h
+@@ -609,7 +609,6 @@ struct platform_device_id {
+ 	kernel_ulong_t driver_data;
  };
  
-+static int dsa_loop_bus_match(struct device *dev,
-+			      const struct device_driver *drv)
-+{
-+	return drv == &dsa_loop_drv.mdiodrv.driver;
-+}
-+
- static void dsa_loop_phydevs_unregister(void)
- {
- 	for (int i = 0; i < NUM_FIXED_PHYS; i++) {
-@@ -428,7 +434,7 @@ static int __init dsa_loop_create_switch_mdiodev(void)
- 	if (IS_ERR(switch_mdiodev))
- 		goto out;
+-#define MDIO_NAME_SIZE		32
+ #define MDIO_MODULE_PREFIX	"mdio:"
  
--	strscpy(switch_mdiodev->modalias, "dsa-loop");
-+	switch_mdiodev->bus_match = dsa_loop_bus_match;
- 	switch_mdiodev->dev.platform_data = &dsa_loop_pdata;
- 
- 	ret = mdio_device_register(switch_mdiodev);
+ #define MDIO_ID_FMT "%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u"
 -- 
 2.52.0
 
