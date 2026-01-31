@@ -1,160 +1,265 @@
-Return-Path: <netdev+bounces-255537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255538-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHdsIxCQfmniagIAu9opvQ
-	(envelope-from <netdev+bounces-255537-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:28:16 +0100
+	id 8G6eIM+RfmkjawIAu9opvQ
+	(envelope-from <netdev+bounces-255538-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:35:43 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4230C4551
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:28:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CBDC457D
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:35:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E62D300C5A5
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 23:28:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 460B0300F9C8
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 23:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F1A33DEFC;
-	Sat, 31 Jan 2026 23:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42059378D95;
+	Sat, 31 Jan 2026 23:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SnP/VPBu"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="q5oqgBsz";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="rBtU7rkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291CD15B0EC
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 23:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A669254AF5;
+	Sat, 31 Jan 2026 23:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769902092; cv=none; b=c6Zybbim4ZJJRsfy+1x3tYAuvPwvzlW+/kqLegr0lvpKdRjk17cc2V2kIwYYOlZir8nbALNKDx6QqafgvjkojJyzPzSewYxIAI/u66qUssHIRCv/pD+xHEUopUXoXJPvFGIaPQNtl9eICAhDGnByisqAxRPbFw994A/oVgF4e5M=
+	t=1769902539; cv=none; b=qflotsCKQHllQeJ9nhhqDg/USNKIA9PlWcWUN1x46jWvVpQEuw64Wf72l/Bo17f0FqGsgmyYkh5Bkbx0/1uilkTP4/qhNvAP//o/tHYc2uV/Ho5BcAbgNvm8Odr2DRfucSZFJ9ttkyJm7bms35DwxSsCBeWmlm6oWaaxgG6d/Io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769902092; c=relaxed/simple;
-	bh=SVnsVFIjjrl1ziY7Q9Q5pBmlCfdAoPDhVQM6QIxWBVA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sMOmFBduBzpPK3DBIA/65Hggv3pbq2ZxzRKgpiN5AWPa+raFvXvZdxp8d5gi8CRFg4T3AlpUk3TMKuPlwtccTDyxxoArw16Z/PTDvOxluKkk0MqrYHAaUR8fgPhvOfiG0Cv88MobMZ3E6d0kLYGdH/BOkcLxqXhXGjsQ9Ox6uUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=SnP/VPBu; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kIes9y28tS53Qgsq8mlA/hmeh5zQSe+vuQTcGCaQLH4=; b=SnP/VPBuH22KxGVfdB2UJKAixc
-	XVM2hHoezwF+JSBRIjcXee6VRY+f2A2Dt8SxHuoKhtphXFXjaLuHEqKGOmAlW/LGPuas7yAWsp0Jv
-	+q112L2P5WjDSye8Mkp2L6t+G6inKJkalVVwZ74B6RKQkUb5AvfLngK0Ml7yFtERFVPgNhxWIKQdy
-	Bn6PBryzaRjkQ+NZDn0lTUQTo/xfRl5SUmchU/R2jQqCdkRGsuOCXhSNKhJu432u4NrePBebZNL2k
-	qd8fHOJ6Bl025nTCABmPilcoTvfFB1h3eR/tOP1xHq14+tUNIiMBeNtu2p9w4c7cQpMxrL4yMMsel
-	rfFTFUlQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55010)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vmKNe-000000002aH-2I5S;
-	Sat, 31 Jan 2026 23:27:54 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vmKNY-000000001sG-1Jn3;
-	Sat, 31 Jan 2026 23:27:48 +0000
-Date: Sat, 31 Jan 2026 23:27:48 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1769902539; c=relaxed/simple;
+	bh=OtVfQCNSFObekCh3g3iwQSWIG51HSHTQ4btjiuOEigM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bokMJkVgoj7P8byRpb03mUwh57rN3IFMazl+OG97Cd1fWUCCulZl2WGKdsq13Rjx3669yhY/FhU2WiqWoV//llaxzMKKO8U+PyinDhGKMg8CxcAIHkaaRy0c4DNFa7rdNJnTl66e3Xxzwra6atEapr3X5X6r3nsRUD2TJP3pB38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=q5oqgBsz; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=rBtU7rkC; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4f3Tl5194Hz9tk7;
+	Sun,  1 Feb 2026 00:35:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1769902529;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GkVgFXGvU/3e9PYwEbfmGiFzgSlHSmqvjiLyU+vfITU=;
+	b=q5oqgBszzN3BT4zY8lgz8zxKBtp8z06IPFQActpGy3Jb7rg+siD33cyzdvpjRdtWpqa6WK
+	N+658/Sl+qcP3h/qdnMtncW6chwUI7RGI0iqyQNmYWItE6t4jrMkAbS3dgx7iag2Nq4DAH
+	8675rlMmBGSgnTiJ+bHAKba8sWN43FzfDj8VZtleZMD1pmQSkjgB2p1wNGudYgfdVL2FyJ
+	euGYQq5GdREk7AoBMTIX6XhrObA5VWCnXaSj9IWg/PvpOspu/U95RIe4Hd3cNhdz2MsULc
+	BW8tCrUTPuHELs6IxzfZ+/8zTsFUAg0HdbahmXdVCMEEXEzaiMg9siWdZS6aCw==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=rBtU7rkC;
+	spf=pass (outgoing_mbo_mout: domain of lukasz.majewski@mailbox.org designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=lukasz.majewski@mailbox.org
+From: Lukasz Majewski <lukasz.majewski@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1769902526;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GkVgFXGvU/3e9PYwEbfmGiFzgSlHSmqvjiLyU+vfITU=;
+	b=rBtU7rkCyiUbeNnvlAdjUdSqyh6UPQX9WEERvLQhC7b+tRjkQ7XZf5AnaYaG5dywtdhsv9
+	dJc5r+C7Uvp4RNL4QRDKby6pDlwFCgwBGuhh1eqhYfWa5tW7FT8ldU66re9W46i+B9f1eu
+	+ONedzGCkIvpS+Zvgaf50gXLobFKNtBzhMu+fvDT8VEB+agqzihvEna/ahmH897YyZV/Dt
+	dM5gCBC4ZNbyT7E3xRXeYsiSTO4V7Y4YN6//hfZDaF4rh471B4Z8IA3gz+KIIV3tbLX+uM
+	O3SW7uZsXy4H2ZUCUhUIvzKnLsyuBwhvJr44AKXwHCkQnEihIp5SJtgZDoz3tQ==
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 01/10] net: stmmac: rk: convert to mask-based
- interface mode configuration
-Message-ID: <aX6P9D99Xi4PnI2J@shell.armlinux.org.uk>
-References: <aXyPK9rlMt8h_fze@shell.armlinux.org.uk>
- <E1vlmEY-00000006znn-0N0Q@rmk-PC.armlinux.org.uk>
- <20260131140850.3c35f95a@kernel.org>
+	Stefan Wahren <wahrenst@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Lukasz Majewski <lukasz.majewski@mailbox.org>
+Subject: [net-next v22 0/7] net: mtip: Add support for MTIP imx287 L2 switch driver
+Date: Sun,  1 Feb 2026 00:34:52 +0100
+Message-Id: <20260131233459.1625279-1-lukasz.majewski@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260131140850.3c35f95a@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-ID: 9dde1f80ad7715793d9
+X-MBO-RS-META: yk7wy8y4yifuxo3kem1bx3oehdok81gy
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255537-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net,kernel.org,mailbox.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-255538-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E4230C4551
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:mid,mailbox.org:dkim]
+X-Rspamd-Queue-Id: C4CBDC457D
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 02:08:50PM -0800, Jakub Kicinski wrote:
-> On Fri, 30 Jan 2026 11:00:14 +0000 Russell King (Oracle) wrote:
-> > +	ret = rk_get_phy_intf_sel(bsp_priv->phy_iface);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	intf = ret;
-> > +
-> >  	ret = gmac_clk_enable(bsp_priv, true);
-> >  	if (ret)
-> >  		return ret;
-> >  
-> > +	if (bsp_priv->gmac_phy_intf_sel_mask ||
-> > +	    bsp_priv->gmac_rmii_mode_mask) {
-> > +		/* If defined, encode the phy_intf_sel value */
-> > +		val = rk_encode_wm16(intf, bsp_priv->gmac_phy_intf_sel_mask);
-> > +
-> > +		/* If defined, encode the RMII mode mask setting. */
-> > +		val |= rk_encode_wm16(intf == PHY_INTF_SEL_RMII,
-> > +				      bsp_priv->gmac_rmii_mode_mask);
-> > +
-> > +		ret = regmap_write(bsp_priv->grf, bsp_priv->gmac_grf_reg, val);
-> > +		if (ret < 0)
-> 
-> missing
-> 	gmac_clk_enable(bsp_priv, false);
-> here?
+This patch series adds support for More Than IP's L2 switch driver embedded
+in some NXP's SoCs. This one has been tested on imx287, but is also available
+in the vf610.
 
-Opinions vary on whether errors from regmap_write() should be handled.
-See the recent thread:
+In the past there has been performed some attempts to upstream this driver:
 
-https://lore.kernel.org/r/aXh9lcfw6D6KouI_@stanley.mountain
+1. The 4.19-cip based one [1]
+2. DSA based one for 5.12 [2] - i.e. the switch itself was treat as a DSA switch
+   with NO tag appended.
+3. The extension for FEC driver for 5.12 [3] - the trick here was to fully reuse
+   FEC when the in-HW switching is disabled. When bridge offloading is enabled,
+   the driver uses already configured MAC and PHY to also configure PHY.
 
-Seems that if regmap_write() fails, it's "buy a new computer" realms.
-If that's case, is it worth cleaning up resources, or even checking the
-return code from regmap_write() ?
+All three approaches were not accepted as eligible for upstreaming.
+
+The driver from this series has following features:
+
+1. It is fully separated from fec_main - i.e. can be used interchangeable
+   with it. To be more specific - one can build them as modules and
+   if required switch between them when e.g. bridge offloading is required.
+
+   To be more specific:
+        - Use FEC_MAIN: When one needs support for two ETH ports with separate
+          uDMAs used for both and bridging can be realized in SW.
+
+        - Use MTIPL2SW: When it is enough to support two ports with only uDMA0
+          attached to switch and bridging shall be offloaded to HW. 
+
+2. This driver uses MTIP's L2 switch internal VLAN feature to provide port
+   separation at boot time. Port separation is disabled when bridging is
+   required.
+
+3. Example usage:
+        Configuration:
+        ip link set lan0 up; sleep 1;
+        ip link set lan1 up; sleep 1;
+        ip link add name br0 type bridge;
+        ip link set br0 up; sleep 1;
+        ip link set lan0 master br0;
+        ip link set lan1 master br0;
+        bridge link;
+        ip addr add 192.168.2.17/24 dev br0;
+        ping -c 5 192.168.2.222
+
+        Removal:
+        ip link set br0 down;
+        ip link delete br0 type bridge;
+        ip link set dev lan1 down
+        ip link set dev lan0 down
+
+4. Limitations:
+        - Driver enables and disables switch operation with learning and ageing.
+        - Missing is the advanced configuration (e.g. adding entries to FBD). This is
+          on purpose, as up till now we didn't had consensus about how the driver
+          shall be added to Linux.
+          However, on top of this patch set the code with SWITCHDEV support (v6.6.
+          PREEMPT_RT enabled) has been implemented in [4].
+
+5. Clang build:
+	make LLVM_SUFFIX=-19 LLVM=1 mrproper
+	cp ./arch/arm/configs/mxs_defconfig .config
+	make ARCH=arm LLVM_SUFFIX=-19 LLVM=1 W=1 menuconfig
+	make ARCH=arm LLVM_SUFFIX=-19 LLVM=1 W=1 -j8 LOADADDR=0x40008000 uImage dtbs
+
+        make LLVM_SUFFIX=-19 LLVM=1 mrproper
+        make LLVM_SUFFIX=-19 LLVM=1 allmodconfig
+        make LLVM_SUFFIX=-19 LLVM=1 W=1 drivers/net/ethernet/freescale/mtipsw/ | tee llvm_build.log
+        make LLVM_SUFFIX=-19 LLVM=1 W=1 -j8 | tee llvm_build.log
+
+6. Kernel compliance checks:
+	make coccicheck MODE=report J=4 M=drivers/net/ethernet/freescale/mtipsw/
+        make allmodconfig; ~/work/src/smatch/smatch_scripts/kchecker drivers/net/ethernet/freescale/mtipsw/
+
+7. GCC:
+        make mrproper
+        make allmodconfig
+        make W=1 drivers/net/ethernet/freescale/mtipsw/
+
+        
+        [source OE/Yocto SDK build environment]
+        CROSS_COMPILE=arm-poky-linux-gnueabi- ARCH=arm make mrproper
+        cp ./arch/arm/configs/mxs_defconfig .config
+        CROSS_COMPILE=arm-poky-linux-gnueabi- ARCH=arm make menuconfig
+        CROSS_COMPILE=arm-poky-linux-gnueabi- ARCH=arm make -j8 LOADADDR=0x40008000 uImage dtbs
+
+8. DT_SCHEMA checks:
+        source ~/.venv/bin/activate
+        source /opt/poky/3.1.31/environment-setup-armv5e-poky-linux-gnueabi
+        make dt_binding_check DT_SCHEMA_FILES=nxp,imx28-mtip-switch.yaml
+        make CHECK_DTBS=y DT_SCHEMA_FILES=nxp,imx28-mtip-switch.yaml nxp/mxs/imx28-xea.dtb
+
+
+Links:
+[1] - https://github.com/lmajewski/linux-imx28-l2switch/commits/master
+[2] - https://github.com/lmajewski/linux-imx28-l2switch/tree/imx28-v5.12-L2-upstream-RFC_v1
+[3] - https://source.denx.de/linux/linux-imx28-l2switch/-/tree/imx28-v5.12-L2-upstream-switchdev-RFC_v1?ref_type=heads
+[4] - https://github.com/lmajewski/linux-imx28-l2switch/commits/vf610-linux-6.6.y-mtipl2sw
+
+Lukasz Majewski (7):
+  dt-bindings: net: Add MTIP L2 switch description
+  net: mtip: The L2 switch driver for imx287
+  net: mtip: Add buffers management functions to the L2 switch driver
+  net: mtip: Add net_device_ops functions to the L2 switch driver
+  net: mtip: Add mtip_switch_{rx|tx} functions to the L2 switch driver
+  net: mtip: Extend the L2 switch driver with management operations
+  net: mtip: Extend the L2 switch driver for imx287 with bridge
+    operations
+
+ .../bindings/net/nxp,imx28-mtip-switch.yaml   |  150 ++
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/freescale/Kconfig        |    1 +
+ drivers/net/ethernet/freescale/Makefile       |    1 +
+ drivers/net/ethernet/freescale/mtipsw/Kconfig |   13 +
+ .../net/ethernet/freescale/mtipsw/Makefile    |    4 +
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 2014 +++++++++++++++++
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  648 ++++++
+ .../ethernet/freescale/mtipsw/mtipl2sw_br.c   |  132 ++
+ .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c |  442 ++++
+ 10 files changed, 3412 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Kconfig
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Makefile
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.5
+
 
