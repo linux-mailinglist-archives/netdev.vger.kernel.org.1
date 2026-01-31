@@ -1,127 +1,416 @@
-Return-Path: <netdev+bounces-255285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255286-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FM2DAZPfWm+RQIAu9opvQ
-	(envelope-from <netdev+bounces-255285-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:38:30 +0100
+	id MCdZHVJQfWnORQIAu9opvQ
+	(envelope-from <netdev+bounces-255286-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:44:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA69BBFA75
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:38:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35034BFAEB
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:44:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2BABA3004DD5
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:38:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E8B4301A15C
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A7D2FE042;
-	Sat, 31 Jan 2026 00:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7104830FF37;
+	Sat, 31 Jan 2026 00:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYnxHnU/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EoiHGZOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9A519A288;
-	Sat, 31 Jan 2026 00:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315A330F540
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 00:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769819907; cv=none; b=Fajw2WdPJsywEDFrC9rzpRAiRqkOVLA9borf1F49saAzT+aJ6JumOaT6mgc0Dfgqt/Rac5yQhyYBF4zdR1d25UbNY02FbVQApN8HnjyjL8qzR7fJRb0CrHbWfuBxqpjyI+aa1xs8ouLP90I1poYRR27fgnr9bMPa2AzFyI0HISg=
+	t=1769820236; cv=none; b=cPg2R7Tg+gWkOHROC6HSTWueMfcsvBhqpsgT8OXuuYr5b6n5bQQxxxLoxFeYOplWGhTB4SIsob4ae2k9QFzPcFXEGpGUB/t5ZhyjmqOSw+IHf0otVngq5xN286HvR9vElJKhYrn8qCMWfJKTAw+pNgiHyEdyL4MYRjQF43d5/iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769819907; c=relaxed/simple;
-	bh=Jdd3buLMaqZBkACwxbSaZ9XyMhBAqA5jAjxcO9QTh9M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+ALXqIiwOIVfSJUqiWPTxf6oQQPe9GO1o8sFxPw4ajfkF36wzypX+d1VtGNuBMBg7AdNz6Ru39tYa5ncx+aeD5CSO9U8SJm4U2Z8WB7Pt+ee2T7Wc4MFrg6J7dymHRYfdgKF5tN60aeS8cGfnHEQOAC5UqzBBNBE40KHBxizpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYnxHnU/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49F75C4CEF7;
-	Sat, 31 Jan 2026 00:38:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769819907;
-	bh=Jdd3buLMaqZBkACwxbSaZ9XyMhBAqA5jAjxcO9QTh9M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bYnxHnU/XJ9Lk3D3akKRWErAxebiOZiN+kzUeQWoviWRVSAWgyfw3bHNYtPh1qdXA
-	 hGEpFGoyweQuOeWSBNm7f2vRN6k3b2i3q0kheVi6pnSmB3WWevIouZYMhOx1krHN1N
-	 yAjWxNv05ePs/d12c96gt4DeQboX9AN6QyO/9cqNUP9AyPSP8pHlN5ubIaly2KxW/P
-	 qiNQyFR64beaeD+/ja7YCcglAU63W+qnscbckUh9A0+TeYf2ZL/g5Zzwvmymk8dG7q
-	 OVeRmngY8jPaXfQ1cj5PQLWceUHwSE+Kay6q3yCiuCGm05ceeVDSvJrDMSsCj34STd
-	 w+yl4p/EOAeyg==
-Date: Fri, 30 Jan 2026 16:38:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>, Ankit Garg <nktgrg@google.com>
-Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org,
- Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Catherine Sullivan
- <csully@google.com>, Luigi Rizzo <lrizzo@google.com>, Jon Olson
- <jonolson@google.com>, Sagi Shahar <sagis@google.com>, Bailey Forrest
- <bcf@google.com>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
-Message-ID: <20260130163825.3b63222a@kernel.org>
-In-Reply-To: <CANn89iJ=Gfjves4qN6hu_VRPSedVRosJsvEQC_irFnEJU_eMLg@mail.gmail.com>
-References: <20260105232504.3791806-1-joshwash@google.com>
-	<20260106182244.7188a8f6@kernel.org>
-	<CAJcM6BGWGLrS=7b5Hq6RVZTD9ZHn7HyFssU6FDW4=-U8HD0+bw@mail.gmail.com>
-	<CANn89iK_=W8JT6WGb17ARnqqSgKkt5=GUaTMB6CbPfYuPNS7vA@mail.gmail.com>
-	<CAJcM6BH11e4Cs3=7B3Uu-JxPeq4BAnQ3VDLfCAN_JcfnPLtOaw@mail.gmail.com>
-	<CANn89iJ=Gfjves4qN6hu_VRPSedVRosJsvEQC_irFnEJU_eMLg@mail.gmail.com>
+	s=arc-20240116; t=1769820236; c=relaxed/simple;
+	bh=gAMxZn0Bbk69ZZJxMKMKvrwOH+mTYEZ1m8iOZgJYkZE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M1H+9JbF9up0f4ImHgWJYGX5I0JJmLKYIxea/xofXLx0MO9wfPE9RtgEBYXQ4TSdX+/i0E+v2LGAI9+IdbFsASP1hRPFzNMPiRcQaxX1ZOLZv9rewt2WTWmHyGpgdF7tYLbxekEgMdQVl67zxjt/Bv/LGSd3PxAuyhYRPWZNcWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EoiHGZOq; arc=none smtp.client-ip=74.125.82.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-124a95e592fso4764562c88.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 16:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769820230; x=1770425030; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lz/w+ViHe1NFxGhmvKw2Td3oBT35x8hZuCkuGLcRPRE=;
+        b=EoiHGZOq1n+YqkmJ8RdCd+vjNLjMRY8d7N0js7XEzTUkM/k4VsCUrOCG8r9Rtltflp
+         SURYEBQwRWjFb/LLK3zls1RwRTQcw6yeyP82KeLblFalF8WOg1kOC++vEb62lgRoy1y3
+         AhCZfU724LbU6Kw6WFzNfGik3fy/yXDXi4982mgcQ/5AvZFn0TfaDWIEM+zNdypUc1sS
+         IxvURZ4X584Lima7TJXbyOmxXA2RHa77Pg4KBmwtN0lC6JBQzfzn2NX4azPIU1awHW/J
+         VwXPcO0KL0i0aKGD8I4RkYUXCoxNjJ5GlQvsO6lNd7K4ZWivXKPKJrjy7dqF2f7P2inL
+         zNDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769820230; x=1770425030;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lz/w+ViHe1NFxGhmvKw2Td3oBT35x8hZuCkuGLcRPRE=;
+        b=eEmfjuevSq4Z2KV7YY9iFKbZIB9gPNoIC37L+3b3ZalIZlcoBp5N48wnmv7XFrNl0x
+         AQcYhrJnJX8AQlb9/lYFP4H6rW6o+kMh32m5O6/i/OFJGTJkLjtfaaL2fYXERVZOD9+w
+         BGPmBAdvIYTjA8H4+DJzeFGcu7q+C8+93ZT93s+3u7sOCOf1LmP+3j4DcTcbDjJ54+x5
+         sU+z/1Tpy80M7mZpfsLgcTMxTAfnZNSEThBjjJk40vJlrmTdu1av6m/wDibg/2Pv7jvp
+         WCZhjgAn1rqf3RMhq4b3OkC5np+5zeL8gYW8tCi/rZyNq99iA2+jmVk8nqy0CpTHyGga
+         4P5Q==
+X-Gm-Message-State: AOJu0YyzUOk+Wg0qe4eakYL2H6RqTqyBcuf2IelMjXVYuXmlLo+nSpUC
+	axkQNrFF5B1sdbwwWF9F/jHUrErw2IP4D9QjuZaOxDi8wpKP7MpuPk04A4cV5kEx
+X-Gm-Gg: AZuq6aKDVTL4PvhuLgTQFGBgTgkDzU3broQ8556t+g2Z9o+VyDD3ChiA0pNKqhlF1c+
+	3B8LlX/SiC1DG50pdOvbZvda7rhfFvPZiGds7mAeyHpEo9cJzaHEMPnzNZ32E9Hl2u6JXKJnmmt
+	P5Y/kV60d2Jue/3dB8nEIyV9kNwWRZ7GtgpT4P+IZcj2X/onCUl+fTO52Za0tupZLQMJChjmF84
+	xn3cvuUn7sZyoeIho5JXFKm0tAwxCrmHfw/9LhRqpWn52X+4zQiVmBOZXY2QS7Z8X1Xu78zl1VT
+	sN5/tcL8BOZLMDPTL+GVRyWPSsSBxiP9EdaQYhPLUTl/QRJM7YTB0CGkbOrqtEDDe60pmUxB5Jw
+	BCDdzZZ0v/Qo/bA/WDXSU7+ziLOg0vp8mUr2xqsAdfhBPB9ezDllAp1oouLKWXHhRB2rE6/9cSv
+	N++I1JHZepFuLhsGlYc9xA0wvOiLqOEpGmOoruhFLgh3HWjYVFjFX/Ws0mDmjCrJFyhX+uyy3TV
+	j2K4Q7anMxxltWs5uy1jj2wI4HW0XAx67L4CiybiNAtebrkTACp1G4p7Nyl922igrtm1tcDZR0j
+	o8SX
+X-Received: by 2002:a05:7022:e25:b0:11b:9386:a3cf with SMTP id a92af1059eb24-125c10211dbmr2225916c88.48.1769820229772;
+        Fri, 30 Jan 2026 16:43:49 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a16cf8f2sm14710638eec.7.2026.01.30.16.43.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 16:43:49 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Michael Grzeschik <m.grzeschik@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	=?UTF-8?q?Thomas=20M=C3=BChlbacher?= <tmuehlbacher@posteo.net>,
+	Oliver Hartkopp <socketcan@hartkopp.net>
+Subject: [PATCH net-next] net: remove unnecessary module_init/exit functions
+Date: Fri, 30 Jan 2026 16:42:56 -0800
+Message-ID: <20260131004327.18112-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255285-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,intel.com,toke.dk,realtek.com,posteo.net,hartkopp.net];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-255286-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BA69BBFA75
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mellanox.com:email,che.eu:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,realtek.com:email]
+X-Rspamd-Queue-Id: 35034BFAEB
 X-Rspamd-Action: no action
 
-On Fri, 30 Jan 2026 21:56:07 +0100 Eric Dumazet wrote:
-> Jakub, the issue is that before 4.20, calling synchronize_rcu()
-> instead of synchronize_rcu_bh()
-> was probably a bug. I suspect we had more issues like that.
-> 
->  __dev_queue_xmit takes a rcu_read_lock_bh(), while the code (that you
-> added in 2018 [1])
-> to update the queue netif_set_real_num_tx_queues does synchronize_net()
-> (aka synchronize_rcu()) and in earlier times, it would mean that this
-> would maybe return too soon (say on preemptible kernels)
-> 
-> [...]
-> 
-> So perhaps a fix for pre 4.20 kernel would be: (I kept the
-> synchronize_net() to be really cautious and because I really do not
-> want to test)
+Many network drivers have unnecessary empty module_init and module_exit
+functions. Remove them (including some that just print a message). Note
+that if a module_init function exists, a module_exit function must also
+exist; otherwise, the module cannot be unloaded.
 
-Sounds entirely plausible, FWIW. Ankit, this would mean that you have
-to convince RHEL / Rocky to take Eric's patch. Oldest kernel we can
-patch upstream is 5.10, AFAIK.
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+ drivers/net/arcnet/com20020.c                 | 16 ----------
+ drivers/net/can/sja1000/sja1000.c             | 16 ----------
+ drivers/net/ethernet/8390/8390.c              | 14 ---------
+ drivers/net/ethernet/8390/8390p.c             | 11 -------
+ drivers/net/ethernet/mellanox/mlxsw/pci.c     | 12 --------
+ drivers/net/hamradio/hdlcdrv.c                | 20 -------------
+ drivers/net/net_failover.c                    | 13 ---------
+ drivers/net/wireless/ath/ath9k/common.c       | 12 --------
+ .../realtek/rtlwifi/btcoexist/rtl_btc.c       | 13 ---------
+ drivers/net/wireless/rsi/rsi_91x_main.c       | 29 -------------------
+ 10 files changed, 156 deletions(-)
+
+diff --git a/drivers/net/arcnet/com20020.c b/drivers/net/arcnet/com20020.c
+index a0053e3992a3..b8526805ffac 100644
+--- a/drivers/net/arcnet/com20020.c
++++ b/drivers/net/arcnet/com20020.c
+@@ -401,19 +401,3 @@ EXPORT_SYMBOL(com20020_netdev_ops);
+ 
+ MODULE_DESCRIPTION("ARCnet COM20020 chipset core driver");
+ MODULE_LICENSE("GPL");
+-
+-#ifdef MODULE
+-
+-static int __init com20020_module_init(void)
+-{
+-	if (BUGLVL(D_NORMAL))
+-		pr_info("%s\n", "COM20020 chipset support (by David Woodhouse et al.)");
+-	return 0;
+-}
+-
+-static void __exit com20020_module_exit(void)
+-{
+-}
+-module_init(com20020_module_init);
+-module_exit(com20020_module_exit);
+-#endif				/* MODULE */
+diff --git a/drivers/net/can/sja1000/sja1000.c b/drivers/net/can/sja1000/sja1000.c
+index a8fa0d6516b9..7c5aa8d399d4 100644
+--- a/drivers/net/can/sja1000/sja1000.c
++++ b/drivers/net/can/sja1000/sja1000.c
+@@ -725,19 +725,3 @@ void unregister_sja1000dev(struct net_device *dev)
+ 	unregister_candev(dev);
+ }
+ EXPORT_SYMBOL_GPL(unregister_sja1000dev);
+-
+-static __init int sja1000_init(void)
+-{
+-	printk(KERN_INFO "%s CAN netdevice driver\n", DRV_NAME);
+-
+-	return 0;
+-}
+-
+-module_init(sja1000_init);
+-
+-static __exit void sja1000_exit(void)
+-{
+-	printk(KERN_INFO "%s: driver removed\n", DRV_NAME);
+-}
+-
+-module_exit(sja1000_exit);
+diff --git a/drivers/net/ethernet/8390/8390.c b/drivers/net/ethernet/8390/8390.c
+index c5636245f1ca..8e4354568f04 100644
+--- a/drivers/net/ethernet/8390/8390.c
++++ b/drivers/net/ethernet/8390/8390.c
+@@ -86,19 +86,5 @@ void NS8390_init(struct net_device *dev, int startp)
+ }
+ EXPORT_SYMBOL(NS8390_init);
+ 
+-#if defined(MODULE)
+-
+-static int __init ns8390_module_init(void)
+-{
+-	return 0;
+-}
+-
+-static void __exit ns8390_module_exit(void)
+-{
+-}
+-
+-module_init(ns8390_module_init);
+-module_exit(ns8390_module_exit);
+-#endif /* MODULE */
+ MODULE_DESCRIPTION("National Semiconductor 8390 core driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/8390p.c b/drivers/net/ethernet/8390/8390p.c
+index 6d429b11e9c6..a0bfc8e34f79 100644
+--- a/drivers/net/ethernet/8390/8390p.c
++++ b/drivers/net/ethernet/8390/8390p.c
+@@ -91,16 +91,5 @@ void NS8390p_init(struct net_device *dev, int startp)
+ }
+ EXPORT_SYMBOL(NS8390p_init);
+ 
+-static int __init NS8390p_init_module(void)
+-{
+-	return 0;
+-}
+-
+-static void __exit NS8390p_cleanup_module(void)
+-{
+-}
+-
+-module_init(NS8390p_init_module);
+-module_exit(NS8390p_cleanup_module);
+ MODULE_DESCRIPTION("National Semiconductor 8390 core for ISA driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+index 8769cba2c746..7da9ef254b72 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+@@ -2542,18 +2542,6 @@ void mlxsw_pci_driver_unregister(struct pci_driver *pci_driver)
+ }
+ EXPORT_SYMBOL(mlxsw_pci_driver_unregister);
+ 
+-static int __init mlxsw_pci_module_init(void)
+-{
+-	return 0;
+-}
+-
+-static void __exit mlxsw_pci_module_exit(void)
+-{
+-}
+-
+-module_init(mlxsw_pci_module_init);
+-module_exit(mlxsw_pci_module_exit);
+-
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Jiri Pirko <jiri@mellanox.com>");
+ MODULE_DESCRIPTION("Mellanox switch PCI interface driver");
+diff --git a/drivers/net/hamradio/hdlcdrv.c b/drivers/net/hamradio/hdlcdrv.c
+index 2263029d1a20..3b88e465d08f 100644
+--- a/drivers/net/hamradio/hdlcdrv.c
++++ b/drivers/net/hamradio/hdlcdrv.c
+@@ -742,26 +742,6 @@ EXPORT_SYMBOL(hdlcdrv_unregister);
+ 
+ /* --------------------------------------------------------------------- */
+ 
+-static int __init hdlcdrv_init_driver(void)
+-{
+-	printk(KERN_INFO "hdlcdrv: (C) 1996-2000 Thomas Sailer HB9JNX/AE4WA\n");
+-	printk(KERN_INFO "hdlcdrv: version 0.8\n");
+-	return 0;
+-}
+-
+-/* --------------------------------------------------------------------- */
+-
+-static void __exit hdlcdrv_cleanup_driver(void)
+-{
+-	printk(KERN_INFO "hdlcdrv: cleanup\n");
+-}
+-
+-/* --------------------------------------------------------------------- */
+-
+ MODULE_AUTHOR("Thomas M. Sailer, sailer@ife.ee.ethz.ch, hb9jnx@hb9w.che.eu");
+ MODULE_DESCRIPTION("Packet Radio network interface HDLC encoder/decoder");
+ MODULE_LICENSE("GPL");
+-module_init(hdlcdrv_init_driver);
+-module_exit(hdlcdrv_cleanup_driver);
+-
+-/* --------------------------------------------------------------------- */
+diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
+index 5b50d9186f12..d0361aaf25ef 100644
+--- a/drivers/net/net_failover.c
++++ b/drivers/net/net_failover.c
+@@ -819,18 +819,5 @@ void net_failover_destroy(struct failover *failover)
+ }
+ EXPORT_SYMBOL_GPL(net_failover_destroy);
+ 
+-static __init int
+-net_failover_init(void)
+-{
+-	return 0;
+-}
+-module_init(net_failover_init);
+-
+-static __exit
+-void net_failover_exit(void)
+-{
+-}
+-module_exit(net_failover_exit);
+-
+ MODULE_DESCRIPTION("Failover driver for Paravirtual drivers");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/net/wireless/ath/ath9k/common.c b/drivers/net/wireless/ath/ath9k/common.c
+index ffcf2276eb92..f55b3afb3777 100644
+--- a/drivers/net/wireless/ath/ath9k/common.c
++++ b/drivers/net/wireless/ath/ath9k/common.c
+@@ -403,15 +403,3 @@ void ath9k_cmn_init_crypto(struct ath_hw *ah)
+ 		ath_hw_keyreset(common, (u16) i);
+ }
+ EXPORT_SYMBOL(ath9k_cmn_init_crypto);
+-
+-static int __init ath9k_cmn_init(void)
+-{
+-	return 0;
+-}
+-module_init(ath9k_cmn_init);
+-
+-static void __exit ath9k_cmn_exit(void)
+-{
+-	return;
+-}
+-module_exit(ath9k_cmn_exit);
+diff --git a/drivers/net/wireless/realtek/rtlwifi/btcoexist/rtl_btc.c b/drivers/net/wireless/realtek/rtlwifi/btcoexist/rtl_btc.c
+index 4641999f3fe9..e88d92d3ae7a 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/btcoexist/rtl_btc.c
++++ b/drivers/net/wireless/realtek/rtlwifi/btcoexist/rtl_btc.c
+@@ -519,16 +519,3 @@ MODULE_AUTHOR("Realtek WlanFAE	<wlanfae@realtek.com>");
+ MODULE_AUTHOR("Larry Finger	<Larry.FInger@lwfinger.net>");
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Realtek 802.11n PCI wireless core");
+-
+-static int __init rtl_btcoexist_module_init(void)
+-{
+-	return 0;
+-}
+-
+-static void __exit rtl_btcoexist_module_exit(void)
+-{
+-	return;
+-}
+-
+-module_init(rtl_btcoexist_module_init);
+-module_exit(rtl_btcoexist_module_exit);
+diff --git a/drivers/net/wireless/rsi/rsi_91x_main.c b/drivers/net/wireless/rsi/rsi_91x_main.c
+index 2112d8d277a9..a9bb37d5d581 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_main.c
++++ b/drivers/net/wireless/rsi/rsi_91x_main.c
+@@ -425,35 +425,6 @@ void rsi_91x_deinit(struct rsi_hw *adapter)
+ }
+ EXPORT_SYMBOL_GPL(rsi_91x_deinit);
+ 
+-/**
+- * rsi_91x_hal_module_init() - This function is invoked when the module is
+- *			       loaded into the kernel.
+- *			       It registers the client driver.
+- * @void: Void.
+- *
+- * Return: 0 on success, -1 on failure.
+- */
+-static int rsi_91x_hal_module_init(void)
+-{
+-	rsi_dbg(INIT_ZONE, "%s: Module init called\n", __func__);
+-	return 0;
+-}
+-
+-/**
+- * rsi_91x_hal_module_exit() - This function is called at the time of
+- *			       removing/unloading the module.
+- *			       It unregisters the client driver.
+- * @void: Void.
+- *
+- * Return: None.
+- */
+-static void rsi_91x_hal_module_exit(void)
+-{
+-	rsi_dbg(INIT_ZONE, "%s: Module exit called\n", __func__);
+-}
+-
+-module_init(rsi_91x_hal_module_init);
+-module_exit(rsi_91x_hal_module_exit);
+ MODULE_AUTHOR("Redpine Signals Inc");
+ MODULE_DESCRIPTION("Station driver for RSI 91x devices");
+ MODULE_VERSION("0.1");
+-- 
+2.43.0
+
 
