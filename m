@@ -1,199 +1,127 @@
-Return-Path: <netdev+bounces-255284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMKbOP9NfWmkRQIAu9opvQ
-	(envelope-from <netdev+bounces-255284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:34:07 +0100
+	id 2FM2DAZPfWm+RQIAu9opvQ
+	(envelope-from <netdev+bounces-255285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:38:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A655BFA4C
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:34:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA69BBFA75
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CB53830143C8
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:33:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2BABA3004DD5
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534862FD1C5;
-	Sat, 31 Jan 2026 00:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A7D2FE042;
+	Sat, 31 Jan 2026 00:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="Rali/2oT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYnxHnU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F202D8DDD
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 00:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9A519A288;
+	Sat, 31 Jan 2026 00:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769819637; cv=none; b=WRonHg5ksfKmMJWuizyNmPLPbIJdL25vBrBbdEJgiQb0qqJAJhr1yRMwp+PjbDu5zDWqY1zn9/RzMUdwxGzvJa6KPsQwcj1YfGHmN33LiuHQmjMXX0hgeu9VSV/jpPcTtyNckB+wHl5XthcAtzL6ygONTKaxaueXTAt0Wp+IvA0=
+	t=1769819907; cv=none; b=Fajw2WdPJsywEDFrC9rzpRAiRqkOVLA9borf1F49saAzT+aJ6JumOaT6mgc0Dfgqt/Rac5yQhyYBF4zdR1d25UbNY02FbVQApN8HnjyjL8qzR7fJRb0CrHbWfuBxqpjyI+aa1xs8ouLP90I1poYRR27fgnr9bMPa2AzFyI0HISg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769819637; c=relaxed/simple;
-	bh=kXkaAnZDH5mIjoW4y8q5Q8QTe+7i086MQPfEVs63Pzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nOds8DAfD7q/NbGN9+hhh9sWZ1djOaYSQfVeLfKPw6wHNodwsBSg6Ar2XxosW5VlBWjhNVE4AYkNtbKYtbF1A6NbXKx4bBlcMJse4tnjhLWAi7pW2TDH6chUPYb00DMneB9AmCiUIwb+zrI88Tjl2K+2gMbhdH/Y36UUvpr4ReE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=Rali/2oT; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2a78e381fc1so12732895ad.3
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 16:33:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1769819635; x=1770424435; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RB9dKGGm5zaCQfa6GntcD1JuM3+Ig5ioaznQVVa/kZs=;
-        b=Rali/2oTC5XJwqHHCpOHxrNp+QuLjasxeaYHWU1v4S98BsMTaXagO3CfJBuKVG3Ax6
-         ma32m/o6DLIm8mqV53Ms+06OCARw8z5G1Efrfs7VcHvQxTns3wSO3rvPwul0y1ZWAzZf
-         8o4laUEJNYVrXCCOmx/cmCF6Eb1KoBw51PtjgoKgWZzS0jyIwSBafgH3r4MkjearCZ80
-         4OBgjvcCFKYkqKSlvO3FS4l02kLKj2zXWAqBlmfo0OAHpexb3xORH0w5L/P4Pwa79G94
-         BA22nJEKSR+stSK99zmJRPUc3/4zimIN36MPDfErnmZoaRBJoWo7gT9shNJ4lGWddfp3
-         9udQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769819635; x=1770424435;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RB9dKGGm5zaCQfa6GntcD1JuM3+Ig5ioaznQVVa/kZs=;
-        b=X1aZiSZtOtoNKSHhZE+uGbOnYY8kFn2XucBOiI2qQOHf+DMdPOAULbmSG3ykMmDX6G
-         JntB27uEaLiGHj677/jllWnfzOJcvAerPJ1b5YYWdlkpljZ3byhr8d7ZLRIJO/X39377
-         zaMOop1uvnLXN7PG2GDd9X7j5aA15vDyQmkEVXewDi0lBhfTi2jJ77Z9QxfjpSO1YUiD
-         h/ZPYv8W7zjNrvBHMeE3bVXg+bDx9xqSY6PW5h50pf5bUcY+ZZZ6bJeYeBugDlDPkAlw
-         OQlwKgDz9P/H3isjjKPr83gELajpJPzCbaNrqi5HOHmQNAIDIpqYbimRI5RBUdEYMiKa
-         gzJQ==
-X-Gm-Message-State: AOJu0Yz5JOZ9NB1OLm0yKNLrHdojuRI0NZFybC4YZ1z7Q5lwdrGO7WYw
-	Fd0FAa6zFDc7xH5fV5DUPq16mB5Xji1pUc6dTgI9PGDMazm3k4C527EMJR9ixx1bf2c=
-X-Gm-Gg: AZuq6aI7jBkOFK4wqgxsh+9eDZefQWKqwVYU4Q/18TKW3dpOUL10gvTDiGaVBmyFUo9
-	zNzqpnHhbvMxvEqalqQoUsKDF3oYXXXOqWreCB+toz8L5BXq9EDsTKk2aPTYesfA8BBjFoYwO6f
-	+AYIyPN4Ghe1RKG5i7ttdVwOiuJTyHDGnHUuyWlRTw1nJ6D3suympNNtzSycZlcsHpf2hMpB1pE
-	59XGuWl2zmKdwtuRGgEUCEZrYdYJeCoXqY9F5T8YwQphog873WbI7Gvg8AOu4R5gNwW8JZf6JzZ
-	DiB1mDyuo24oOp8TKrRn0TFV2pJ+dNoINh7CHGpOVZ3yvclwdxFLc/avg6VU2ir/zRMqr5An558
-	DVOcDeOBnDYGoQvqh4GFwrPLoYstEFXa93RVhf6PcWsh5R2DYLY99HOKH2u9YhMOWBi0=
-X-Received: by 2002:a17:902:d489:b0:29f:e787:2b9b with SMTP id d9443c01a7336-2a8d9932dbemr38719225ad.41.1769819635320;
-        Fri, 30 Jan 2026 16:33:55 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:4::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b3ede23sm86209455ad.5.2026.01.30.16.33.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 16:33:54 -0800 (PST)
-Date: Fri, 30 Jan 2026 16:33:53 -0800
-From: Joe Damato <joe@dama.to>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	shruti.parab@broadcom.com
-Subject: Re: [PATCH net-next v2] bnxt_en: Allow ntuple filters for drops
-Message-ID: <aX1N8UfZ4I+8ZTii@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Michael Chan <michael.chan@broadcom.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	shruti.parab@broadcom.com
-References: <20260130002323.2561266-1-joe@dama.to>
- <CACKFLinQD_fuJZDkzqHo=qFMQZrhXujjNOxuhBzHGQ8KwRJ8Uw@mail.gmail.com>
+	s=arc-20240116; t=1769819907; c=relaxed/simple;
+	bh=Jdd3buLMaqZBkACwxbSaZ9XyMhBAqA5jAjxcO9QTh9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E+ALXqIiwOIVfSJUqiWPTxf6oQQPe9GO1o8sFxPw4ajfkF36wzypX+d1VtGNuBMBg7AdNz6Ru39tYa5ncx+aeD5CSO9U8SJm4U2Z8WB7Pt+ee2T7Wc4MFrg6J7dymHRYfdgKF5tN60aeS8cGfnHEQOAC5UqzBBNBE40KHBxizpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYnxHnU/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49F75C4CEF7;
+	Sat, 31 Jan 2026 00:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769819907;
+	bh=Jdd3buLMaqZBkACwxbSaZ9XyMhBAqA5jAjxcO9QTh9M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bYnxHnU/XJ9Lk3D3akKRWErAxebiOZiN+kzUeQWoviWRVSAWgyfw3bHNYtPh1qdXA
+	 hGEpFGoyweQuOeWSBNm7f2vRN6k3b2i3q0kheVi6pnSmB3WWevIouZYMhOx1krHN1N
+	 yAjWxNv05ePs/d12c96gt4DeQboX9AN6QyO/9cqNUP9AyPSP8pHlN5ubIaly2KxW/P
+	 qiNQyFR64beaeD+/ja7YCcglAU63W+qnscbckUh9A0+TeYf2ZL/g5Zzwvmymk8dG7q
+	 OVeRmngY8jPaXfQ1cj5PQLWceUHwSE+Kay6q3yCiuCGm05ceeVDSvJrDMSsCj34STd
+	 w+yl4p/EOAeyg==
+Date: Fri, 30 Jan 2026 16:38:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>, Ankit Garg <nktgrg@google.com>
+Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>, Catherine Sullivan
+ <csully@google.com>, Luigi Rizzo <lrizzo@google.com>, Jon Olson
+ <jonolson@google.com>, Sagi Shahar <sagis@google.com>, Bailey Forrest
+ <bcf@google.com>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
+Message-ID: <20260130163825.3b63222a@kernel.org>
+In-Reply-To: <CANn89iJ=Gfjves4qN6hu_VRPSedVRosJsvEQC_irFnEJU_eMLg@mail.gmail.com>
+References: <20260105232504.3791806-1-joshwash@google.com>
+	<20260106182244.7188a8f6@kernel.org>
+	<CAJcM6BGWGLrS=7b5Hq6RVZTD9ZHn7HyFssU6FDW4=-U8HD0+bw@mail.gmail.com>
+	<CANn89iK_=W8JT6WGb17ARnqqSgKkt5=GUaTMB6CbPfYuPNS7vA@mail.gmail.com>
+	<CAJcM6BH11e4Cs3=7B3Uu-JxPeq4BAnQ3VDLfCAN_JcfnPLtOaw@mail.gmail.com>
+	<CANn89iJ=Gfjves4qN6hu_VRPSedVRosJsvEQC_irFnEJU_eMLg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLinQD_fuJZDkzqHo=qFMQZrhXujjNOxuhBzHGQ8KwRJ8Uw@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255284-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255285-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20230601.gappssmtp.com:dkim,dama.to:email,broadcom.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9A655BFA4C
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BA69BBFA75
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 06:28:38PM -0800, Michael Chan wrote:
-> On Thu, Jan 29, 2026 at 4:23 PM Joe Damato <joe@dama.to> wrote:
-> >
-> > It appears that in commit 7efd79c0e689 ("bnxt_en: Add drop action
-> > support for ntuple"), bnxt gained support for ntuple filters for packet
-> > drops.
-> >
-> > However, support for this does not seem to work in recent kernels or
-> > against net-next:
-> >
-> >   % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
-> >     rmgr: Cannot insert RX class rule: Operation not supported
-> >     Cannot insert classification rule
-> >
-> > The issue is that the existing code uses ethtool_get_flow_spec_ring_vf,
-> > which will return a non-zero value if the ring_cookie is set to
-> > RX_CLS_FLOW_DISC, which then causes bnxt_add_ntuple_cls_rule to return
-> > -EOPNOTSUPP because it thinks the user is trying to set an ntuple filter
-> > for a vf.
-> >
-> > Fix this by first checking that the ring_cookie is not RX_CLS_FLOW_DISC.
-> >
-> > After this patch, ntuple filters for drops can be added:
-> >
-> >   % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
-> >   Added rule with ID 0
-> >
-> >   % ethtool -n eth0
-> >   44 RX rings available
-> >   Total 1 rules
-> >
-> >   Filter: 0
-> >       Rule Type: UDP over IPv4
-> >       Src IP addr: 1.1.1.1 mask: 0.0.0.0
-> >       Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-> >       TOS: 0x0 mask: 0xff
-> >       Src port: 0 mask: 0xffff
-> >       Dest port: 0 mask: 0xffff
-> >       Action: Drop
-> >
-> > Signed-off-by: Joe Damato <joe@dama.to>
-> > ---
-> > v2:
-> >   - Extract the FLOW_MAC_EXT and FLOW_EXT check so it happens unconditionally.
-> >   - Eliminate the local variable ring, which was used in only one place and
-> >     call ethtool_get_flow_spec_ring instead.
-> >
-> > v1: https://lore.kernel.org/netdev/20260128222718.1679581-1-joe@dama.to/
+On Fri, 30 Jan 2026 21:56:07 +0100 Eric Dumazet wrote:
+> Jakub, the issue is that before 4.20, calling synchronize_rcu()
+> instead of synchronize_rcu_bh()
+> was probably a bug. I suspect we had more issues like that.
 > 
-> One minor improvement is to eliminate the vf variable since it is also
-> used only once.  But I'm fine with this patch.  Thanks.
+>  __dev_queue_xmit takes a rcu_read_lock_bh(), while the code (that you
+> added in 2018 [1])
+> to update the queue netif_set_real_num_tx_queues does synchronize_net()
+> (aka synchronize_rcu()) and in earlier times, it would mean that this
+> would maybe return too soon (say on preemptible kernels)
 > 
-> Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+> [...]
+> 
+> So perhaps a fix for pre 4.20 kernel would be: (I kept the
+> synchronize_net() to be really cautious and because I really do not
+> want to test)
 
-I made the improvement you suggested in the v3 I just sent. I retained your
-tag because the suggestion was cosmetic; I hope that's OK.
+Sounds entirely plausible, FWIW. Ankit, this would mean that you have
+to convince RHEL / Rocky to take Eric's patch. Oldest kernel we can
+patch upstream is 5.10, AFAIK.
 
