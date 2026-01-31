@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-255416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255407-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLMLIesRfmlLVQIAu9opvQ
-	(envelope-from <netdev+bounces-255416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:30:03 +0100
+	id 0JgsBuoQfmkbVQIAu9opvQ
+	(envelope-from <netdev+bounces-255407-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:25:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C17EC26AE
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:30:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C246BC24A3
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:25:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6D54C305BD68
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:26:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B9C7C30143DE
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B883624D2;
-	Sat, 31 Jan 2026 14:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CC1357A5D;
+	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="twPIeT4R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xo/3Vt23"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1490E357735;
-	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7097354ACF;
+	Sat, 31 Jan 2026 14:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769869522; cv=none; b=Ahfmxdvjz5En2UcrgU/X+u4vWDSsrT+Sj4uoG8Kyi/G1M6rCjtIhA5RWQTvuJu2JIoF7eiAIbx30DjNZe2M+7S1jATGUv2rwk6R/Zk/WdDx2JsEypNeD2mOAFkAxNbvVRfOpzwmO4LAAcoMBXibqXVycJMRZF3dtg1bLsUDqzkM=
+	t=1769869521; cv=none; b=l9v+CoL7HAOtRA5+lzqYxWePQH/C0WivyNW47XAOJycPYejlrkaFdSPZBoImmmCo/hwOJivJ0nJiQG6nMP+wyRipvV806/SMqoPEThVN4j14uuwP1cKmllsQXMNrhlU9JsQL31htbUidwJo6OHIxWkZc1KxpiwMQF92BpqdleHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769869522; c=relaxed/simple;
-	bh=V32t6uLUsEQqW7vNUksHzA79JzrYmV4ZBSdrs4RvwEY=;
+	s=arc-20240116; t=1769869521; c=relaxed/simple;
+	bh=SI0OuhHT6kvx7zPg3IIsJPCvtLTTLub7sg5GnAeFE/g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o9ESJTyZ5UAwqMW7WOEh6GCuUcGs0DAJ6xoTM0c6NHgGcubw56tDEdtm1gNewc9OwoRkDetuVz0mprOEdg77EIrvOd0XpvlJ3Y8t6NsVlPvzstUU/97qYGBtCOej0ol6HcBkXDHw2PaiV402uOujpOPXrhQIaIcy2AihR6uMTPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=twPIeT4R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C010C2BCB5;
+	 MIME-Version:Content-Type; b=nxslsWczOJDQ5s0KRUQP1a3WEzr8I2CqNsfw/k54gSUPwoggKX0AlnrxtCzNHPFPWhwibTLAY92wnSjIMnaJJaP68e6BlUEviUDaW6d0eyf9LE4NmUMIt4IixqbJ4FmUmkXTwG32RJVGhjCA+H23dH6ckWZvHjGMawNuhP9QjCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xo/3Vt23; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 642CEC16AAE;
 	Sat, 31 Jan 2026 14:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769869521;
-	bh=V32t6uLUsEQqW7vNUksHzA79JzrYmV4ZBSdrs4RvwEY=;
+	bh=SI0OuhHT6kvx7zPg3IIsJPCvtLTTLub7sg5GnAeFE/g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=twPIeT4Rza2Xt2SsVtRnszHcVtnu6rcM6vlPHqYmtRoo4W4fhwWMkFJ8/Thd8Wpg8
-	 Jj6dWe3H7UWul3858QpmKj8oj5KNQK7DaXx5xulHCbn73xHTqez/j86dsA0C9Augn6
-	 EXWBdzo2ibtS4r/78SLMsOXD85EIUMxy2mDuR6rDnI09XAXF9Vyqknp6axIAYzizeV
-	 HgpBgxTMnNhyBigDautwd3nCBNwU0XeNIup6NP9GUjYCneezJGkTvMdqO8/tu4eYz0
-	 a5wWphteWVRXNj+v3vq8g2UGOnA1lx7Bge5lTxi9H1P6uxdiRzUyXRm1G+rhWe18bd
-	 fAWS1TsIu3eQA==
+	b=Xo/3Vt23C7chjuZ7k/WMNAMPjI5tDrGE7fZP0881O6poSzzKpdAOGgMXFZkaKBcOi
+	 no/HeR0CPK5DIDvj3lJWubQwPmmVIw8DwxCavnGH5IzOrbP8WJUXLGjcB1KfG1NlgA
+	 PJ4m93OsS0puDcKLOQnP3XRvIRAPCFGTlprCq+vFHzSoLKdnW9Xj0MP9LtTnWAH7+Q
+	 pN7VlDM/8lqPDYESZtNBvPTh0ksLTf73qARHwjoy9LFFEY+K5IB+ztfVpcjxvr0a4n
+	 83vHXEwItfBnH8rSEXV+QyUi0wquTHG83DNa5ipLR1fEgeFbb+7emItvvl4KDEaRMF
+	 EPMj34EU7ssnw==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vmBuZ-0000000AVk4-1r1L;
+	id 1vmBuZ-0000000AVk8-1yFJ;
 	Sat, 31 Jan 2026 15:25:19 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -59,9 +59,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v4 05/41] docs: kdoc_parser: add functions support for NestedMatch
-Date: Sat, 31 Jan 2026 15:24:39 +0100
-Message-ID: <c514c8968aa5be22fdefcbe76ac28bf1391e668a.1769867953.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v4 06/41] docs: kdoc_parser: use NestedMatch to handle __attribute__ on functions
+Date: Sat, 31 Jan 2026 15:24:40 +0100
+Message-ID: <7efbd500b098b45d697beb769f07d471c33a7117.1769867953.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769867953.git.mchehab+huawei@kernel.org>
 References: <cover.1769867953.git.mchehab+huawei@kernel.org>
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255416-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-255407-lists,netdev=lfdr.de,huawei];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -101,116 +101,45 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:email]
-X-Rspamd-Queue-Id: 3C17EC26AE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C246BC24A3
 X-Rspamd-Action: no action
 
 Some annotations macros may have nested parenthesis, causing normal
-regex parsing to fail.
+regex parsing to fail. The __attribute__ regex is currently very
+complex to try to avoid that, but it doesn't catch all cases.
 
-Extend apply_transforms to also use NestedMatch and add support
-for nested functions.
+Ensure that the parenthesis will be properly handled by using
+the NestedMatch() logic.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 Acked-by: Randy Dunlap <rdunlap@infradead.org>
 Tested-by: Randy Dunlap <rdunlap@infradead.org>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- tools/lib/python/kdoc/kdoc_parser.py | 38 ++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+ tools/lib/python/kdoc/kdoc_parser.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/lib/python/kdoc/kdoc_parser.py b/tools/lib/python/kdoc/kdoc_parser.py
-index 3ba2cda2487a..ae5b2ef80f75 100644
+index ae5b2ef80f75..64165d8df84e 100644
 --- a/tools/lib/python/kdoc/kdoc_parser.py
 +++ b/tools/lib/python/kdoc/kdoc_parser.py
-@@ -152,7 +152,7 @@ struct_xforms = [
-     (KernRe(r'DEFINE_DMA_UNMAP_LEN\s*\(' + struct_args_pattern + r'\)', re.S), r'__u32 \1'),
- ]
+@@ -165,6 +165,7 @@ struct_nested_prefixes = [
+ # the start delimiter.
  #
--# Regexes here are guaranteed to have the end delimiter matching
-+# Struct regexes here are guaranteed to have the end delimiter matching
- # the start delimiter. Yet, right now, only one replace group
- # is allowed.
- #
-@@ -160,6 +160,13 @@ struct_nested_prefixes = [
-     (re.compile(r'\bSTRUCT_GROUP\('), r'\1'),
+ function_nested_prefixes = [
++    (re.compile(r"__attribute__\s*\("), ""),
  ]
  
-+#
-+# Function Regexes here are guaranteed to have the end delimiter matching
-+# the start delimiter.
-+#
-+function_nested_prefixes = [
-+]
-+
  #
- # Transforms for function prototypes
+@@ -195,7 +196,6 @@ function_xforms = [
+     (KernRe(r"__diagnose_as\s*\(\s*\S+\s*(?:,\s*\d+\s*)*\) +"), ""),
+     (KernRe(r"DECL_BUCKET_PARAMS\s*\(\s*(\S+)\s*,\s*(\S+)\s*\)"), r"\1, \2"),
+     (KernRe(r"__attribute_const__ +"), ""),
+-    (KernRe(r"__attribute__\s*\(\((?:[\w\s]+(?:\([^)]*\))?\s*,?)+\)\)\s+"), ""),
+ ]
+ 
  #
-@@ -207,13 +214,6 @@ var_xforms = [
- # Ancillary functions
- #
- 
--def apply_transforms(xforms, text):
--    """
--    Apply a set of transforms to a block of text.
--    """
--    for search, subst in xforms:
--        text = search.sub(subst, text)
--    return text
- 
- multi_space = KernRe(r'\s\s+')
- def trim_whitespace(s):
-@@ -408,6 +408,8 @@ class KernelDoc:
-         # Place all potential outputs into an array
-         self.entries = []
- 
-+        self.nested = NestedMatch()
-+
-         #
-         # We need Python 3.7 for its "dicts remember the insertion
-         # order" guarantee
-@@ -505,6 +507,16 @@ class KernelDoc:
-         # State flags
-         self.state = state.NORMAL
- 
-+    def apply_transforms(self, regex_xforms, nested_xforms, text):
-+        """Apply a set of transforms to a block of text."""
-+        for search, subst in regex_xforms:
-+            text = search.sub(subst, text)
-+
-+        for search, sub in nested_xforms:
-+            text = self.nested.sub(search, sub, text)
-+
-+        return text.strip()
-+
-     def push_parameter(self, ln, decl_type, param, dtype,
-                        org_arg, declaration_name):
-         """
-@@ -881,11 +893,9 @@ class KernelDoc:
-         # Go through the list of members applying all of our transformations.
-         #
-         members = trim_private_members(members)
--        members = apply_transforms(struct_xforms, members)
-+        members = self.apply_transforms(struct_xforms, struct_nested_prefixes,
-+                                        members)
- 
--        nested = NestedMatch()
--        for search, sub in struct_nested_prefixes:
--            members = nested.sub(search, sub, members)
-         #
-         # Deal with embedded struct and union members, and drop enums entirely.
-         #
-@@ -1088,7 +1098,9 @@ class KernelDoc:
-             #
-             # Apply the initial transformations.
-             #
--            prototype = apply_transforms(function_xforms, prototype)
-+            prototype = self.apply_transforms(function_xforms,
-+                                              function_nested_prefixes,
-+                                              prototype)
- 
-         # Yes, this truly is vile.  We are looking for:
-         # 1. Return type (may be nothing if we're looking at a macro)
 -- 
 2.52.0
 
