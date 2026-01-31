@@ -1,126 +1,131 @@
-Return-Path: <netdev+bounces-255339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qMtRNRV6fWlDSQIAu9opvQ
-	(envelope-from <netdev+bounces-255339-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:42:13 +0100
+	id 0ISBKaJ5fWlDSQIAu9opvQ
+	(envelope-from <netdev+bounces-255338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:40:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4255BC0907
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:42:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47047C08C0
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 65275301739F
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:42:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7654E3010168
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0022B34A76B;
-	Sat, 31 Jan 2026 03:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554E434E76A;
+	Sat, 31 Jan 2026 03:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="u+2+N6w3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hl3Q32je"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2C033439F
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 03:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9D78C1F;
+	Sat, 31 Jan 2026 03:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769830927; cv=none; b=YUO9ENb83xqoFm0F7F89KW3MoV65hXGvB/qnuu8YCFGj8FvJvLqg39TFo0UpYb5lSyK9hXwSm2bJAqAsKjg9cTKj3kjGXTE1j3xJ5Aon//aESYR4Q1zRVUiDfle53KuFHt741qx6Ic7b/9vAW9jFiNLWl+na38nc8F5QY6oeVDM=
+	t=1769830813; cv=none; b=fFmuHX/gUZwTDPvhtGpB5XJ4HoCm6ZF3WKGBfcwUnH/R+2Mc6ZthuYVfL8Ki18VWqDO6hHzKHHOKMFp1+gvJj+T6XVfQEM+YCCGOVVFcfb3qTy4lIB8djA9oIxWimGRn4Is5+VzLqcsKVsah5ToiSvnXU05H73IrD+ArkO4Sfmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769830927; c=relaxed/simple;
-	bh=WWQSJ5dEaX6KA13RinvYczKiYBwAZZdrVUHIct1ZIC0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bn/11V9i6O3chuoryUztnRFvQ0vz5BS5Us/iQ8f4dSPBn2xbO0ceV3tiWbtvAX7kRVeh84dWp2RZQiKvlhY9/T47ZhzM9KN3XysbreiAQ1AWHIzsyoevlsfuNnzHhRPKoCbU8o3NjGmFmbKPSH31o3ebHSHTG0UrJyli0/S4DkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=u+2+N6w3; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60UM8K1I3981407
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:42:05 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=s2048-2025-q2; bh=WWQSJ5dEaX6KA13RinvY
-	czKiYBwAZZdrVUHIct1ZIC0=; b=u+2+N6w35RCdA9U7dk20mP1r4RY8ZGL7u9TJ
-	MQrClz2pWHJDxRdy0Bgrzj0IH04ijVR9wQuGGgEJSHAIGSxaXh6+OLVkR9ijNRKH
-	IADpOxZyB6//YbcFFHzRjK/JLMQJL5vBMobZ5YRu9GsMCrks4eDO0wuV4RHj2D6+
-	WanbWtrt7BjlJ83gEEvWXi7jqsPbgWD/HZuj5+sR4WHUk7FnZJAL1rN36n2GDZZC
-	58hebxWOuR+rEAG2OefQtok9G623QfP12lgEQbWCiHVAKr7fTskMp14ZZ3ejRgiO
-	XJpBcDw8TwFnTGelu12qqowLZTZoiGQez15b9xmO6KIWU0kQxg==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c1561jae0-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:42:05 -0800 (PST)
-Received: from twshared108366.16.frc2.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Sat, 31 Jan 2026 03:41:50 +0000
-Received: by devbig010.atn3.facebook.com (Postfix, from userid 224791)
-	id 941BA6F28CD; Fri, 30 Jan 2026 19:39:25 -0800 (PST)
-Date: Fri, 30 Jan 2026 19:39:25 -0800
-From: Daniel Hodges <hodgesd@meta.com>
-To: <netdev@vger.kernel.org>, <@fb.com>
-CC: <jmaloy@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <tuong.t.lien@dektech.com.au>, <tipc-discussion@lists.sourceforge.net>
-Subject: Re: [PATCH 1/3] tipc: use kfree_sensitive() for session key material
-Message-ID: <aX15HnlN8B_JOpMC@fb.com>
-References: <20260131032508.4158256-1-hodgesd@meta.com>
+	s=arc-20240116; t=1769830813; c=relaxed/simple;
+	bh=SPa2ky00MTlgAVW6CPBZYtqiEy57G6865mcHfn5Fva4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GHjTfJDCWI3dADeupbBZaDztd8osojiHOtoCSgU8S2Pp6vAoakKgDHYf9RRTVCcIB9NGGZfz4aXPR25FQneWUvJH8+BLTuoOXmICiMGV2GkCGI1HQwKK8r3aWcPYHrot3HkEnDZqVz/lCu1gw0pk0/D/IFMLXvqL2p/FKiC7vpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hl3Q32je; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D19C4CEF1;
+	Sat, 31 Jan 2026 03:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769830812;
+	bh=SPa2ky00MTlgAVW6CPBZYtqiEy57G6865mcHfn5Fva4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hl3Q32jesSmbR2hXuuoqdTRzotmtlIy8xD0XeqEbyuc9r4NTXzG/9oaF/N5Kwu5fv
+	 MUoKS06t3AlPtYepLp0PSJunGKx888rIwCL+4lV7WSO4YOJDSOf71G9CtDHgtBx+D9
+	 cKkDpPzvSdZdB/f3JUfhfmv/vJeHPwGI3KVZGEa9SsnjNbI9lHWJJuv431vHpNyCW3
+	 RzujlV7YGmCYVQxuTg2KY7b/QkinWmBPtCIGwT9dr5y7+3dcEMNPg5K9yP5/7abpAS
+	 wW3Er7XEk4OslLCDAE50UnOx+b0wfPh9yLjn4gJBhaYxFp7our83XPoZjkZrF2+z/D
+	 5idM+zmOLWGMw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 11B0B380CFFF;
+	Sat, 31 Jan 2026 03:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260131032508.4158256-1-hodgesd@meta.com>
-X-FB-Internal: Safe
-X-Authority-Analysis: v=2.4 cv=KfPfcAYD c=1 sm=1 tr=0 ts=697d7a0d cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=Vxa4KF3gbYEA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=jJJBXcr-l-UN6h5ZWhYA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMxMDAyOSBTYWx0ZWRfX4NFjWUF+TWYT
- qr1lMRiclg8AOEd6rqjhhXBTQelOLTAW9/rE5/wx/TNBaGUNn/3eQfVQ45ge+0pZzcRGTk/6kTh
- ucHDA65ZkW0F+fkMOAXqSjhJqgnfmEU+BX5hARy7KcvaMck4rDRFJ060ez8lcjlNJF4FLWioPCr
- VOWxFjnsaKhDi1VaLYfNF/7WFqWGPdEMyVhQOgkFGfwAxCGTdzbZS+hFgsEgGomatgTASyeRL4L
- 3YZ93mvHzoqbBMw2PByYNoWepiu+pceNNrwOAGeG6esjzfdlryWG7pzz0vmhTwE+reHnkM0j9Ir
- OfZ8agqYJskyY+voBGpeDjhmIBxz0nSKZfMcEzjFjYY+qUIZlPZyXiKmuBwA72DLSNOpw+5fpto
- LV7uYMd5ELCnRlfW44jneFFn6oCQygfMFURtAl1A5YOAbYFMK/rqlWfDtTvqnaL1HlN2CZtZUNu
- i1ndj7zIBBhAr2/gxmA==
-X-Proofpoint-GUID: 0icjYOAjinO9vPeeiMfeOPoXU6pyDM54
-X-Proofpoint-ORIG-GUID: 0icjYOAjinO9vPeeiMfeOPoXU6pyDM54
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-30_04,2026-01-30_04,2025-10-01_01
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] Revert "net/smc: Introduce TCP ULP support"
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176983080486.3985311.3826362708256060586.git-patchwork-notify@kernel.org>
+Date: Sat, 31 Jan 2026 03:40:04 +0000
+References: <20260128055452.98251-1-alibuda@linux.alibaba.com>
+In-Reply-To: <20260128055452.98251-1-alibuda@linux.alibaba.com>
+To: D. Wythe <alibuda@linux.alibaba.com>
+Cc: davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, sidraya@linux.ibm.com,
+ wenjia@linux.ibm.com, mjambigi@linux.ibm.com, horms@kernel.org,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ oliver.yang@linux.alibaba.com, viro@zeniv.linux.org.uk
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	TO_NEEDS_ENCODING(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255339-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255338-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[meta.com:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fb.com:mid,meta.com:dkim];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[hodgesd@meta.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 4255BC0907
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47047C08C0
 X-Rspamd-Action: no action
 
-Whoops, this should only be one patch, I messed up when separating this
-patch out.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 28 Jan 2026 13:54:52 +0800 you wrote:
+> This reverts commit d7cd421da9da2cc7b4d25b8537f66db5c8331c40.
+> 
+> As reported by Al Viro, the TCP ULP support for SMC is fundamentally
+> broken. The implementation attempts to convert an active TCP socket
+> into an SMC socket by modifying the underlying `struct file`, dentry,
+> and inode in-place, which violates core VFS invariants that assume
+> these structures are immutable for an open file, creating a risk of
+> use after free errors and general system instability.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] Revert "net/smc: Introduce TCP ULP support"
+    https://git.kernel.org/netdev/net-next/c/df31a6b0a305
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
