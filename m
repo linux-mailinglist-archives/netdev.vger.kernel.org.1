@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-255319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255320-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKX+OjRifWkkRwIAu9opvQ
-	(envelope-from <netdev+bounces-255319-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:00:20 +0100
+	id AGFXFaBmfWknSAIAu9opvQ
+	(envelope-from <netdev+bounces-255320-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:19:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A3CDC02A9
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:00:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D70C03FC
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B7C630048DE
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:00:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11BE2300D331
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6758E222584;
-	Sat, 31 Jan 2026 02:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30592BEC52;
+	Sat, 31 Jan 2026 02:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtlSPQ14"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJTiOwe4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2734125B31D
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 02:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D5B6A33B
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 02:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769824818; cv=none; b=IrN0Or3s6PqjJ10GDuUaNOqHJNZQtGdbS145C1c9K2/TqByRMXdyR+TH0RRiIL4IJ5TLgK+qxY3PlLntDl1oBoEIGBwmcoT7Pnt6LWaiyZANnndg3rf0WeqPC5reJ88kZV5CXAbJJVc9LhbUVwbyFpmhg9tu3hT/HheMcdi+RJU=
+	t=1769825946; cv=none; b=EbVDIQoDPDvf45F7hOxKfIzDbYOtISwlOWxW3NP6WxNUsxSNH2hiEylZhv1YxTzdNNl/4RYr3sswxgeLBOzQsCYLc+07pXiOLYMYguh4cv4wX+uXwx5GKa4QQfkpPCWGoPRdcC2kOqBT/a32SuPLdWxSbM3gq0znBpask7Tq1Vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769824818; c=relaxed/simple;
-	bh=PcnC0cIs8o2+raeXclFwxf19lLyZNzo2rmeBKNtVlbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DB0QgMpnSEuZHPskU8zKnTqgyVZyEO4ZcR+EzGENGPOUQjyr3fgTjQRa1Cj/4jS4cA0T74obm+lq7ZlFG4ZSy6UIGvuqWEXXtmnWwsTfrijjvfeyofysT6ourhA8Vxv95b9kB4nsbDUjd7Oxs+OFj3neAJvgQ9BrM9AfVGFwqQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FtlSPQ14; arc=none smtp.client-ip=74.125.82.68
+	s=arc-20240116; t=1769825946; c=relaxed/simple;
+	bh=aAdnMvR2ckA+MK4a7O2S7GrscaBMh639AZEAZBIzNag=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UDj4+uwwrCzvaVdokyShwXxebkorMhIwOgpWIRGGtPrmuRtIqbCg0WTKiPn5lUxADpHysEC1JU5wN0guXFL27b+7jIrcXYMwEq7Fc7WuHXer/bKSlcY0pYAJWtTq3MG+u7wPqfhpCdH5rFKb0U3OK2dQsXchSkNvXdZzNqYaaE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nJTiOwe4; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-124a95e592fso4875092c88.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:00:17 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a0d67f1877so17684795ad.2
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:19:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769824816; x=1770429616; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769825945; x=1770430745; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=A7Pln/lrrLR4dH8KvvW/wU7k2y3WN7F5GccQPSyOhNE=;
-        b=FtlSPQ14+gmpdpFepbVKeFzG5jsWxoHbXI3KwwuaYb664sAwaiC1QCGnLt0c53zsdM
-         8pyPmILGBdaG5YS4KMKrIBwE1ycEEeK1wDtMmU+FC/fCQgDrY6fFsNHoazKmN0lR2VDj
-         7XRby6ms294U8w+2wYb4XkBr2CCUy56GeWO6T+n4Juc6cQgG+VIJu4zZz1w7PmmoTFPQ
-         hqhSOVhZc2QqKoKiM8vBxlCGn06XiQqsRerDYSSuThfuv0XmXXcOe4pK/dBnOF6A10lz
-         xKLP65okUjkPWsn2jEHJOcA0yj6dwHrdKaMJ63GoZQX75wV3Lg/UvQRyeTG6a/ygzxvV
-         7D6w==
+        bh=4xu3nAMKMno7i+bpi3HHulZypUbwiOV1otmmd5ESVeE=;
+        b=nJTiOwe4flah3xvJvyCHYdslAnm2HfepgR+R2DMYj8c15fWX/gh0OsoUdowkxgkGQa
+         qjURlEOPrzNqM3fMRPSOXbRjn3L925XrIMhP9rMWp+7TFmu0/iVSCu6xQnv3NVva9MLg
+         hG2JHhBXEUIrTBXW2WcgtGHLwdRxdjRZpRaOGTjSuGK3x7ySA0nGuUmUjmNKfTxKePwk
+         3KcxSsbzC56QaLg6ZPX/sWLH65ElB8/zv8hgPhMtwFhFqpKrejo0TDrR3ALS+HESJDUv
+         zVDs7wAyBVMX5a8NLALO6MykvvSfzxYz9SjA0G7Nl6N16v7BODoKJzsfhX2/ehlwms18
+         uOcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769824816; x=1770429616;
+        d=1e100.net; s=20230601; t=1769825945; x=1770430745;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A7Pln/lrrLR4dH8KvvW/wU7k2y3WN7F5GccQPSyOhNE=;
-        b=wmu5Z8mBKzWbupMtYLSg03sZrMWu0tVD2yRnzfzeB77gVSwyW0GFcshGbKMs8C+XKQ
-         YclYTnfgrRRWGGtdHowBfiH3GLPQ2I+MrUOs5A3r1u0OJJ1xN2EspUl7E0L37oq2XZ5b
-         1zC5eI5pmVXd9i/kB2jeTuphylYqW17Z8NWLDCdgsgyKOYr8xFNhCjuDzHiMD6g50XPB
-         eqzdgaCS7JyZJKAddKydX5B17YyHLaAvFCT9/+WNlimws8BgHJ2spBbiSCIRcdeDrvJ4
-         /hvkp7/ZYwue74X0seiopVLdrocrPfagv15+C9wnOCiz5eaFlwOlkkEwBotkJFjyALpT
-         mHYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXceNADEwMexIV9MAdk4GLyPKtwLCHko6dpZhbvbJeX8v0HIM6/1zVQ6La1Fe73B0QQECV9xss=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp+xTrr0xYTImXFnMu0GdaLzMVsVUS4K/IAohuXC011Inh5nQE
-	gqn1H4ZyYyP/X86TVmfHUrFN4AKTVFXs66NSGXM1aLfKTBoP3i1ptw8v
-X-Gm-Gg: AZuq6aJmPcehHn+3Gfs9t/qGuoWsiwEa+XwU+HWckNGEAj6XSFGN30PhNG2o5UijwgZ
-	j+cUigabTQwW2fcQukbyRA9RcSV/5aBMbGK9veAQO1ELG15dHa0aKmd6rA3SFsMxeKY029IE1/d
-	uJotwlXdkurpZB7btiP2j99ISgbS6fQAtZqPuLzXEH5m+GhN/f4n+7cBi0UMFx9ictO9DafMCKr
-	z4Hy9XHCqmxkFeNBMY8SYUFFN3W4mBHtHwnv14i58sTSn3pAR31BDgLbAoQYmcpF/Rmy79QDKmX
-	5FBZ8pOR+4k303XC1eDt69jOADXlwumraHy48A70uNqgpv4vMx6oeR7Am62lLB2QUGNE8+0S4bM
-	a94vIDTEocecLRkV4CO0B746kZQ7HpI+/QkppV0R1uyGp8fKjxHg3PwlJ/httpz/+wsIXrJvCKV
-	Pd29k6B4OGZ0puy2UjoXDUHr1/fT87yQ4+h8BKGQazB30YYpZz0MtWkOltyTm7yrIDMYc4EFj9F
-	hzq/LV3DBZP8DOZPwCVZbTmRcBOMZqgbwd9/jkF/of6hCCwHHSuEAcea1gUNO2/mBIRVu51ZJHv
-	GvT7hN4Lx6Vp9Ms=
-X-Received: by 2002:a05:7022:e13:b0:11b:c4ee:66b with SMTP id a92af1059eb24-125c10092c8mr2442262c88.37.1769824816261;
-        Fri, 30 Jan 2026 18:00:16 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe57csm15945242eec.22.2026.01.30.18.00.15
+        bh=4xu3nAMKMno7i+bpi3HHulZypUbwiOV1otmmd5ESVeE=;
+        b=vtSJeAvoyu3k/sgzEeHitvmq6DF990Sf9xoWr31c6qpruDEkhhaaKYOr0Xa0L22xIi
+         zWa9V7MAb8mbTf6ykB+L91/H3ySn4jMz01YHcEXI7jbn+gbHk1LTvxGPqBbjWOLM2YhD
+         G3xsoVcyfM0hkB19PQQ3Y+/24D/4eUPNeQlY7ecCUcdRtZZ1QB+kGEFkDMAcLnK1iFfu
+         Yq+VnpRki/N7TL/UTZGI6Dj5slD2osknXJDRWdFOabHT6zVQg2AVbp7IV1OgLFl9AfoM
+         R25DMfBlxsjY4aos+GuFlkkoSRz6DjWeL0qyq+4eqhDmx8MzuPHNdspBU+I58ONSilxC
+         o2xA==
+X-Gm-Message-State: AOJu0Yyda3CQNeMd2N34ESJituThxNly7qkUlFPXrTM6np4mfhhkf7lt
+	pRJ58KoecBAlAlVvhXKA3Vh3ii5Yd16cAi3C/0C8gGdaWJ5wzT5H92gv9W0+jA==
+X-Gm-Gg: AZuq6aJRQUtaeXlz0g4mmACGdcm3T7L5Rhv1v/xPcHrlrfiRvDVToVXhEKPvVvrkXiB
+	Tg0wBFgh3YLk6dAwQdl1nHccJdcMYmcdeTY7xb5HNHRhq5CYuWJImDBwZYu2KKx+CaKMG9D2MZF
+	xZskWEPloeMhuAUa+/IqnJRHP/seAWH7AweEaU9I0LVLYZxVrw/nNIn/YucK3RkDbWLlAY2YWaO
+	AZ3jCnHFNV+s1LQbbbUyq9OwWvxx+a48lwG+XMwgduimXtm33gGxs/BOuBn8OgaRkaoC06O+HsR
+	waJiGmbleR906SuSTXNCRNtwiQuAKukJAgOKyJPmHFFa4+g7vtgCzUJ8LDo7n/nO9PSQK4L65XG
+	Thb00fumX57jj5EdVsB7B/U44UBd1ij6U44ThAPfzdMp6Z5GS6uykI97u6htZwbd5T8kTftotZL
+	o1ZFnKL4IKLPswQ/thncaqwQd7XgS6IPbzDIQ=
+X-Received: by 2002:a17:902:ce06:b0:2a0:f0db:690e with SMTP id d9443c01a7336-2a8d819ace3mr53803275ad.52.1769825944793;
+        Fri, 30 Jan 2026 18:19:04 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([2a09:bac1:7680:d30::4:384])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b3eeebcsm83427365ad.10.2026.01.30.18.19.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 18:00:16 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Subject: [PATCH] vhost: remove unnecessary module_init/exit functions
-Date: Fri, 30 Jan 2026 18:00:09 -0800
-Message-ID: <20260131020010.45647-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 30 Jan 2026 18:19:04 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v6 0/5] net: dsa: yt921x: Add DCB/QoS support
+Date: Sat, 31 Jan 2026 10:18:46 +0800
+Message-ID: <20260131021854.3405036-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,71 +98,67 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-255319-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255320-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5A3CDC02A9
+X-Rspamd-Queue-Id: A0D70C03FC
 X-Rspamd-Action: no action
 
-The vhost driver has unnecessary empty module_init and
-module_exit functions. Remove them. Note that if a module_init function
-exists, a module_exit function must also exist; otherwise, the module
-cannot be unloaded.
+This series add DCB/QoS support to the driver.
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/vhost/vhost.c | 12 ------------
- 1 file changed, 12 deletions(-)
+v5: https://lore.kernel.org/r/20260128215202.2244266-1-mmyangfl@gmail.com
+  - fix xmit priority for tag driver
+v4: https://lore.kernel.org/r/20260127020847.1482724-1-mmyangfl@gmail.com
+  - change the color for DEI bit and add a comment for it
+v3: https://lore.kernel.org/r/20260125001328.3784006-1-mmyangfl@gmail.com
+  - fix port_del_dscp_prio()
+  - split yt921x_chip_setup()
+v2: https://lore.kernel.org/r/20260122194233.2777550-1-mmyangfl@gmail.com
+  - make DCB support optional
+  - refine with enum yt921x_app_selector
+  - add missing dscp_prio_mapping_is_global
+  - fix pcp support
+v1: https://lore.kernel.org/r/20260119185935.2072685-1-mmyangfl@gmail.com
+  - rebase
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index bccdc9eab267..d0e2b9638ecc 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -3326,18 +3326,6 @@ void vhost_set_backend_features(struct vhost_dev *dev, u64 features)
- }
- EXPORT_SYMBOL_GPL(vhost_set_backend_features);
- 
--static int __init vhost_init(void)
--{
--	return 0;
--}
--
--static void __exit vhost_exit(void)
--{
--}
--
--module_init(vhost_init);
--module_exit(vhost_exit);
--
- MODULE_VERSION("0.0.1");
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Michael S. Tsirkin");
+David Yang (5):
+  net: dsa: tag_yt921x: clarify priority and code fields
+  net: dsa: tag_yt921x: add priority support
+  net: dsa: yt921x: Refactor VLAN awareness setting
+  net: dsa: yt921x: Refactor yt921x_chip_setup()
+  net: dsa: yt921x: Add DCB/QoS support
+
+ drivers/net/dsa/Kconfig  |   1 +
+ drivers/net/dsa/yt921x.c | 310 ++++++++++++++++++++++++++++++++++++---
+ drivers/net/dsa/yt921x.h |  55 +++++--
+ net/dsa/tag_yt921x.c     |  89 +++++++----
+ 4 files changed, 393 insertions(+), 62 deletions(-)
+
 -- 
-2.43.0
+2.51.0
 
 
