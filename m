@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-255451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SRFvGa0jfmkDWAIAu9opvQ
-	(envelope-from <netdev+bounces-255451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 16:45:49 +0100
+	id cFe3Ov4kfmk3WAIAu9opvQ
+	(envelope-from <netdev+bounces-255452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 16:51:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC92DC2BF1
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 16:45:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC48C2C74
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 16:51:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 583C6300D943
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:45:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EB71D3019FF6
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5855433438D;
-	Sat, 31 Jan 2026 15:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5B83346A9;
+	Sat, 31 Jan 2026 15:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kkkiI1a8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WB1kNw1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925FB3382E0;
-	Sat, 31 Jan 2026 15:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B774B318EC4;
+	Sat, 31 Jan 2026 15:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769874324; cv=none; b=gy20+txUdNiv5LkI10m7j8EU+3YxXXtXwhFg1Kxlrjx1VVjRxAYKGnWkrtN4+U1zZq3jfS34lZSV2/PML5/scPgMYoadFHkFJY2ml5lWWG9tG76iQBg2Cj0eNvMOmxR648U14vcvqKrdojicbv3/fzlsHvRsYkvaVIet9U8Ct5s=
+	t=1769874680; cv=none; b=iBSzDz/M20YfCUOlojBRV9q5sDuH4UAn4LLUaRu1zzT+C1Ba/tpWc9FaFTWx+MlfoK3w4KuGWa/JhQj2qubRG5mqk1iwcmPd7E2H0GTQ9jL1KjRhQvL1fz7uc8+vEqqghU+n+uHTWFB+2fYDuegeI5ZODt4tvDce5xkXMDXTdnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769874324; c=relaxed/simple;
-	bh=z4mDeCsk3H9uQQF2Mca+22wxYAlmcrWmEXsBJ/Nfwcg=;
+	s=arc-20240116; t=1769874680; c=relaxed/simple;
+	bh=k7x77b3W3ADSBaDPL6FsspOeylNLRUTlxoCAl5BYycA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GCwFXkHEDb0sLlz1xvNrlfMuVM2Rod7Wy3QrahgE9ikKQwSjpVxhheJbZffnkS4ZKZ50YnBtTGCSkJ9acHZUwfn8QHSbPoWaqTG1dB0XrpAVFl0o8ApPZ/fYvncTwfquknsckBbyV+ZFo9I45CBUWCPykcBBuXrDaEzgqCkRqZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kkkiI1a8; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=O6owKUvz9wEgB3AOYnz3z/ucHot5IgYc/CyUt8hwZKhvWj7pQDB0yYjy6Npi0/gU/mKdiuG3boN+kQ5twVZZSIl8ECExSAi+F+IzMpyUC47ycaInYDD18p0jgi7wHOmkjri9bLUyD30U6Yh6UksX8Od4fUObnTX+JXptZHdIaHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WB1kNw1P; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769874321; x=1801410321;
+  t=1769874679; x=1801410679;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=z4mDeCsk3H9uQQF2Mca+22wxYAlmcrWmEXsBJ/Nfwcg=;
-  b=kkkiI1a8uC+cfX5AuXOABUKdR43gUMk3AbIZDdkoZDizyFQSU1aI3r1z
-   9fwpq2yA0kXc4NcesPEflChn5V0URQFmcd/l/AxWZiCPTCg8rtA9KUi45
-   dxRUeqOOTRpiyuMw8jKNut7c08SRdZQATEce4mfNpNlsNDSY/IeZIdSQM
-   7SOhq4Q95AA0ksKP/FZBelIPGMhmvYlrD5jBbsTE0qY/UX7f1NPXWk9jc
-   5NpzQvkfOb+UXBdZP+mkAUZz9dfdiTdaWfQN6jUQryw0xcJWgInPtPnK+
-   xzAcnVItJwZ68BwIkI2U+yALP/u7J1+9JisDLdLb3KXn6cZs2bE9A+ok8
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=k7x77b3W3ADSBaDPL6FsspOeylNLRUTlxoCAl5BYycA=;
+  b=WB1kNw1PmfuGzx++YG9Xmz1Ol74DCUTvthsgdWAJPR7p/gs7KfN+X3Ne
+   2r1UaCqeUdb+QOFiTlJL402zmiL+8eYfHk27Nhxr8hgGlQXEgNe72ixDw
+   gt59qeB1zOI8bQtltGvQVQDd+BOSL9Gt9ryxxJeeFVpBnS5DxEOGg1VTH
+   579+lRwSrROhXJsHQpSGWDAf93aW5x2GImLbtNxyH5sRq20vlG2pqZSf7
+   Vh1GtmVTyQMNQ96PCrKXya4Z/xwqyg1xDtBD+2rUPmwn6MPpdUSW3uwyp
+   I2JI4DAwSfogdtmo4lw6aOFB5GZdqAGn+k7Lm0kCFfZQW87fc9+0yJQXa
    g==;
-X-CSE-ConnectionGUID: lyWz+3CfQDyhw0d4abPwwg==
-X-CSE-MsgGUID: QdUY5WzeQUKJhxX3xyIcAA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="71156744"
+X-CSE-ConnectionGUID: m1qULCB8TuituCxMEUqB/A==
+X-CSE-MsgGUID: ZsmlLJlTR7i8MRiwojbToQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="71000739"
 X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="71156744"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 07:45:20 -0800
-X-CSE-ConnectionGUID: ADQGpyl5TsqougCezebZxw==
-X-CSE-MsgGUID: YFaECUstSt2+xdAn3DaIZg==
+   d="scan'208";a="71000739"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2026 07:51:18 -0800
+X-CSE-ConnectionGUID: oj9/6QIuQ7eCnZRJ8oXo9A==
+X-CSE-MsgGUID: BT1v+xNfSjyQJveBHKITMQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,265,1763452800"; 
-   d="scan'208";a="213596685"
-Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
-  by fmviesa005.fm.intel.com with ESMTP; 31 Jan 2026 07:45:16 -0800
-Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
+   d="scan'208";a="232032014"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 31 Jan 2026 07:51:14 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
 	(envelope-from <lkp@intel.com>)
-	id 1vmD9u-000000002iT-0UCJ;
-	Sat, 31 Jan 2026 15:45:14 +0000
-Date: Sat, 31 Jan 2026 16:44:56 +0100
+	id 1vmDFg-00000000e7w-25kD;
+	Sat, 31 Jan 2026 15:51:12 +0000
+Date: Sat, 31 Jan 2026 23:50:49 +0800
 From: kernel test robot <lkp@intel.com>
 To: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>, anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
@@ -77,7 +77,7 @@ Cc: oe-kbuild-all@lists.linux.dev, intel-wired-lan@lists.osuosl.org,
 	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>, stable@vger.kernel.org
 Subject: Re: [Intel-wired-lan] [PATCH v2] i40e: add an error handling path in
  i40e_xsk_pool_enable()
-Message-ID: <202601311618.xd5faCRh-lkp@intel.com>
+Message-ID: <202601312359.c8Furmbm-lkp@intel.com>
 References: <20260131055217.729048-1-lihaoxiang@isrc.iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,8 +85,9 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <20260131055217.729048-1-lihaoxiang@isrc.iscas.ac.cn>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
@@ -94,12 +95,12 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255451-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255452-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -112,19 +113,19 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: AC92DC2BF1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,01.org:url,intel.com:email,intel.com:dkim,intel.com:mid,git-scm.com:url]
+X-Rspamd-Queue-Id: 6AC48C2C74
 X-Rspamd-Action: no action
 
 Hi Haoxiang,
 
-kernel test robot noticed the following build errors:
+kernel test robot noticed the following build warnings:
 
-[auto build test ERROR on tnguy-next-queue/dev-queue]
-[also build test ERROR on tnguy-net-queue/dev-queue linus/master v6.16-rc1 next-20260130]
+[auto build test WARNING on tnguy-next-queue/dev-queue]
+[also build test WARNING on tnguy-net-queue/dev-queue linus/master v6.19-rc7 next-20260130]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -133,24 +134,24 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Haoxiang-Li/i40e-add-an-e
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
 patch link:    https://lore.kernel.org/r/20260131055217.729048-1-lihaoxiang%40isrc.iscas.ac.cn
 patch subject: [Intel-wired-lan] [PATCH v2] i40e: add an error handling path in i40e_xsk_pool_enable()
-config: x86_64-rhel-9.4-kunit (https://download.01.org/0day-ci/archive/20260131/202601311618.xd5faCRh-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601311618.xd5faCRh-lkp@intel.com/reproduce)
+config: mips-allyesconfig (https://download.01.org/0day-ci/archive/20260131/202601312359.c8Furmbm-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260131/202601312359.c8Furmbm-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601311618.xd5faCRh-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601312359.c8Furmbm-lkp@intel.com/
 
-All error/warnings (new ones prefixed by >>):
+All warnings (new ones prefixed by >>):
 
    drivers/net/ethernet/intel/i40e/i40e_xsk.c: In function 'i40e_xsk_pool_enable':
->> drivers/net/ethernet/intel/i40e/i40e_xsk.c:130:9: error: implicit declaration of function 'i40e_xsk_pool_disable'; did you mean 'i40e_xsk_pool_enable'? [-Wimplicit-function-declaration]
+   drivers/net/ethernet/intel/i40e/i40e_xsk.c:130:9: error: implicit declaration of function 'i40e_xsk_pool_disable'; did you mean 'i40e_xsk_pool_enable'? [-Wimplicit-function-declaration]
      130 |         i40e_xsk_pool_disable(vsi, qid);
          |         ^~~~~~~~~~~~~~~~~~~~~
          |         i40e_xsk_pool_enable
    drivers/net/ethernet/intel/i40e/i40e_xsk.c: At top level:
->> drivers/net/ethernet/intel/i40e/i40e_xsk.c:141:12: error: conflicting types for 'i40e_xsk_pool_disable'; have 'int(struct i40e_vsi *, u16)' {aka 'int(struct i40e_vsi *, short unsigned int)'}
+   drivers/net/ethernet/intel/i40e/i40e_xsk.c:141:12: error: conflicting types for 'i40e_xsk_pool_disable'; have 'int(struct i40e_vsi *, u16)' {aka 'int(struct i40e_vsi *, short unsigned int)'}
      141 | static int i40e_xsk_pool_disable(struct i40e_vsi *vsi, u16 qid)
          |            ^~~~~~~~~~~~~~~~~~~~~
    drivers/net/ethernet/intel/i40e/i40e_xsk.c:142:1: note: an argument type that has a default promotion cannot match an empty parameter name list declaration
@@ -165,111 +166,69 @@ All error/warnings (new ones prefixed by >>):
          | ^
 
 
-vim +130 drivers/net/ethernet/intel/i40e/i40e_xsk.c
+vim +131 drivers/net/ethernet/intel/i40e/i40e_xsk.c
 
-    72	
-    73	/**
-    74	 * i40e_xsk_pool_enable - Enable/associate an AF_XDP buffer pool to a
-    75	 * certain ring/qid
-    76	 * @vsi: Current VSI
-    77	 * @pool: buffer pool
-    78	 * @qid: Rx ring to associate buffer pool with
-    79	 *
-    80	 * Returns 0 on success, <0 on failure
-    81	 **/
-    82	static int i40e_xsk_pool_enable(struct i40e_vsi *vsi,
-    83					struct xsk_buff_pool *pool,
-    84					u16 qid)
-    85	{
-    86		struct net_device *netdev = vsi->netdev;
-    87		bool if_running;
-    88		int err;
-    89	
-    90		if (vsi->type != I40E_VSI_MAIN)
-    91			return -EINVAL;
-    92	
-    93		if (qid >= vsi->num_queue_pairs)
-    94			return -EINVAL;
-    95	
-    96		if (qid >= netdev->real_num_rx_queues ||
-    97		    qid >= netdev->real_num_tx_queues)
-    98			return -EINVAL;
-    99	
-   100		err = xsk_pool_dma_map(pool, &vsi->back->pdev->dev, I40E_RX_DMA_ATTR);
-   101		if (err)
-   102			return err;
-   103	
-   104		set_bit(qid, vsi->af_xdp_zc_qps);
-   105	
-   106		if_running = netif_running(vsi->netdev) && i40e_enabled_xdp_vsi(vsi);
-   107	
-   108		if (if_running) {
-   109			err = i40e_queue_pair_disable(vsi, qid);
-   110			if (err)
-   111				goto err_out;
-   112	
-   113			err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], true);
-   114			if (err)
-   115				goto err_out;
-   116	
-   117			err = i40e_queue_pair_enable(vsi, qid);
-   118			if (err)
-   119				goto err_out;
-   120	
-   121			/* Kick start the NAPI context so that receiving will start */
-   122			err = i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX);
-   123			if (err)
-   124				goto err_out;
-   125		}
-   126	
-   127		return 0;
-   128	
-   129	err_out:
- > 130		i40e_xsk_pool_disable(vsi, qid);
- > 131	}
-   132	
-   133	/**
-   134	 * i40e_xsk_pool_disable - Disassociate an AF_XDP buffer pool from a
-   135	 * certain ring/qid
-   136	 * @vsi: Current VSI
-   137	 * @qid: Rx ring to associate buffer pool with
-   138	 *
-   139	 * Returns 0 on success, <0 on failure
-   140	 **/
- > 141	static int i40e_xsk_pool_disable(struct i40e_vsi *vsi, u16 qid)
-   142	{
-   143		struct net_device *netdev = vsi->netdev;
-   144		struct xsk_buff_pool *pool;
-   145		bool if_running;
-   146		int err;
-   147	
-   148		pool = xsk_get_pool_from_qid(netdev, qid);
-   149		if (!pool)
-   150			return -EINVAL;
-   151	
-   152		if_running = netif_running(vsi->netdev) && i40e_enabled_xdp_vsi(vsi);
-   153	
-   154		if (if_running) {
-   155			err = i40e_queue_pair_disable(vsi, qid);
-   156			if (err)
-   157				return err;
-   158		}
-   159	
-   160		clear_bit(qid, vsi->af_xdp_zc_qps);
-   161		xsk_pool_dma_unmap(pool, I40E_RX_DMA_ATTR);
-   162	
-   163		if (if_running) {
-   164			err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], false);
-   165			if (err)
-   166				return err;
-   167			err = i40e_queue_pair_enable(vsi, qid);
-   168			if (err)
-   169				return err;
-   170		}
-   171	
-   172		return 0;
-   173	}
-   174	
+aae425efdfd1b1 Jan Sokolowski  2022-10-12   72  
+0a714186d3c0f7 Björn Töpel     2018-08-28   73  /**
+1742b3d528690a Magnus Karlsson 2020-08-28   74   * i40e_xsk_pool_enable - Enable/associate an AF_XDP buffer pool to a
+1742b3d528690a Magnus Karlsson 2020-08-28   75   * certain ring/qid
+0a714186d3c0f7 Björn Töpel     2018-08-28   76   * @vsi: Current VSI
+1742b3d528690a Magnus Karlsson 2020-08-28   77   * @pool: buffer pool
+1742b3d528690a Magnus Karlsson 2020-08-28   78   * @qid: Rx ring to associate buffer pool with
+0a714186d3c0f7 Björn Töpel     2018-08-28   79   *
+0a714186d3c0f7 Björn Töpel     2018-08-28   80   * Returns 0 on success, <0 on failure
+0a714186d3c0f7 Björn Töpel     2018-08-28   81   **/
+1742b3d528690a Magnus Karlsson 2020-08-28   82  static int i40e_xsk_pool_enable(struct i40e_vsi *vsi,
+1742b3d528690a Magnus Karlsson 2020-08-28   83  				struct xsk_buff_pool *pool,
+0a714186d3c0f7 Björn Töpel     2018-08-28   84  				u16 qid)
+0a714186d3c0f7 Björn Töpel     2018-08-28   85  {
+f3fef2b6e1cc80 Jan Sokolowski  2018-12-18   86  	struct net_device *netdev = vsi->netdev;
+0a714186d3c0f7 Björn Töpel     2018-08-28   87  	bool if_running;
+0a714186d3c0f7 Björn Töpel     2018-08-28   88  	int err;
+0a714186d3c0f7 Björn Töpel     2018-08-28   89  
+0a714186d3c0f7 Björn Töpel     2018-08-28   90  	if (vsi->type != I40E_VSI_MAIN)
+0a714186d3c0f7 Björn Töpel     2018-08-28   91  		return -EINVAL;
+0a714186d3c0f7 Björn Töpel     2018-08-28   92  
+0a714186d3c0f7 Björn Töpel     2018-08-28   93  	if (qid >= vsi->num_queue_pairs)
+0a714186d3c0f7 Björn Töpel     2018-08-28   94  		return -EINVAL;
+0a714186d3c0f7 Björn Töpel     2018-08-28   95  
+f3fef2b6e1cc80 Jan Sokolowski  2018-12-18   96  	if (qid >= netdev->real_num_rx_queues ||
+f3fef2b6e1cc80 Jan Sokolowski  2018-12-18   97  	    qid >= netdev->real_num_tx_queues)
+0a714186d3c0f7 Björn Töpel     2018-08-28   98  		return -EINVAL;
+0a714186d3c0f7 Björn Töpel     2018-08-28   99  
+c4655761d3cf62 Magnus Karlsson 2020-08-28  100  	err = xsk_pool_dma_map(pool, &vsi->back->pdev->dev, I40E_RX_DMA_ATTR);
+0a714186d3c0f7 Björn Töpel     2018-08-28  101  	if (err)
+0a714186d3c0f7 Björn Töpel     2018-08-28  102  		return err;
+0a714186d3c0f7 Björn Töpel     2018-08-28  103  
+44ddd4f1709249 Björn Töpel     2019-02-12  104  	set_bit(qid, vsi->af_xdp_zc_qps);
+44ddd4f1709249 Björn Töpel     2019-02-12  105  
+0a714186d3c0f7 Björn Töpel     2018-08-28  106  	if_running = netif_running(vsi->netdev) && i40e_enabled_xdp_vsi(vsi);
+0a714186d3c0f7 Björn Töpel     2018-08-28  107  
+0a714186d3c0f7 Björn Töpel     2018-08-28  108  	if (if_running) {
+0a714186d3c0f7 Björn Töpel     2018-08-28  109  		err = i40e_queue_pair_disable(vsi, qid);
+0a714186d3c0f7 Björn Töpel     2018-08-28  110  		if (err)
+a086001db7c4af Haoxiang Li     2026-01-31  111  			goto err_out;
+0a714186d3c0f7 Björn Töpel     2018-08-28  112  
+aae425efdfd1b1 Jan Sokolowski  2022-10-12  113  		err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], true);
+aae425efdfd1b1 Jan Sokolowski  2022-10-12  114  		if (err)
+a086001db7c4af Haoxiang Li     2026-01-31  115  			goto err_out;
+aae425efdfd1b1 Jan Sokolowski  2022-10-12  116  
+0a714186d3c0f7 Björn Töpel     2018-08-28  117  		err = i40e_queue_pair_enable(vsi, qid);
+0a714186d3c0f7 Björn Töpel     2018-08-28  118  		if (err)
+a086001db7c4af Haoxiang Li     2026-01-31  119  			goto err_out;
+14ffeb52f3693a Magnus Karlsson 2019-01-29  120  
+14ffeb52f3693a Magnus Karlsson 2019-01-29  121  		/* Kick start the NAPI context so that receiving will start */
+9116e5e2b1fff7 Magnus Karlsson 2019-08-14  122  		err = i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX);
+14ffeb52f3693a Magnus Karlsson 2019-01-29  123  		if (err)
+a086001db7c4af Haoxiang Li     2026-01-31  124  			goto err_out;
+0a714186d3c0f7 Björn Töpel     2018-08-28  125  	}
+0a714186d3c0f7 Björn Töpel     2018-08-28  126  
+0a714186d3c0f7 Björn Töpel     2018-08-28  127  	return 0;
+a086001db7c4af Haoxiang Li     2026-01-31  128  
+a086001db7c4af Haoxiang Li     2026-01-31  129  err_out:
+a086001db7c4af Haoxiang Li     2026-01-31  130  	i40e_xsk_pool_disable(vsi, qid);
+0a714186d3c0f7 Björn Töpel     2018-08-28 @131  }
+0a714186d3c0f7 Björn Töpel     2018-08-28  132  
 
 -- 
 0-DAY CI Kernel Test Service
