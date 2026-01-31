@@ -1,156 +1,373 @@
-Return-Path: <netdev+bounces-255276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MZ/Dp9EfWnzRAIAu9opvQ
-	(envelope-from <netdev+bounces-255276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:54:07 +0100
+	id sOluAYJIfWlZRQIAu9opvQ
+	(envelope-from <netdev+bounces-255277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:10:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9067BBF738
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:54:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD62BF80B
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27777301BCE5
-	for <lists+netdev@lfdr.de>; Fri, 30 Jan 2026 23:53:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 31CA6301179B
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BEE38B7CE;
-	Fri, 30 Jan 2026 23:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCkAZzdS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558881A0BE0;
+	Sat, 31 Jan 2026 00:10:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B6F308F1A
-	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 23:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769817224; cv=pass; b=ofY4cwxvxJueXzdFENxBT9qxEjLIhwwBueRwFUEa/zPRZRonZbCtOm1scQ8AffR0mtunDTlQBaEQ+KBK3XLMUCCnwUXw188lYUBMwiTMR31ZFvv5Wpz/rmlI6VCiufwXP6bWW0oksPdyJo//lBdD7m1hK3uR+SAw7IxhOFoB9Sw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769817224; c=relaxed/simple;
-	bh=1d9YOiG4jFqmU1NDXS2YzRpMa0FxqgStJnDc5X6hsWg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=o6XxhRRQigD0zPNSBB2JhzP9FQ4qTH8jC5ZuOMI0CddyOvvJpuFhf+IYSukmckVPbMtb7EDCXN6/Qw/l3L3OZHZhN2Prkn31Ndfp6oFiT5Uqh4PMm7eMdrqu04KzWk+WL2WoIeu0erSngHPxs6XBYB9ECZ1BdlGAJdRxlX8bRfM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCkAZzdS; arc=pass smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-649ae700ba0so852135d50.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 15:53:43 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769817222; cv=none;
-        d=google.com; s=arc-20240605;
-        b=HgouuQyZrLr/HHZRyXWa0PwXkRhdtFxiLByg9rqd2rx8oDjWD7gX75GtvioELV4sWB
-         lF+aws4+31HraMRSLtNKVBIuPxMHjoCCgpg61ThN9Wc/krFaWEIj+OSzMh3h5tTNhadX
-         KEmXJprWzI+4D8UZI59m4Auve0IVSrvNYbBvmHQRgKFqSoEGbU1+HEeNKGGRFC7pMl++
-         oAoEodmf5sfG+vhQAOOE3WDYf8nYieo7u+/OXGPaU5/DpLb0L2HCuvBcMKljUlen9ED5
-         ba0TjWoYBCAfBwhxc4De7KfNum17UYPtoCKV8mqppvAtutpDaDQnY/GsAOGcJ2YV3Al0
-         DE8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=1d9YOiG4jFqmU1NDXS2YzRpMa0FxqgStJnDc5X6hsWg=;
-        fh=9V6P1+Wa0rOQjm0S9ejPMzXfdGgrFi6cCGuhEzFBIn4=;
-        b=DfG/wYhA50agAdUOzbpnibs4D8dq0XUnhmDBvB/3g6xkd5/Dd/akE1igoeB42NVv22
-         bk5ZerY7zaHovuVROW8Bl1Fc8zMX//mT2Jy89IOEYsNaTniVT4E6h1XHk0HgOcN20GBU
-         AtpSllSQupm5zShVv5uxz9TVi5lUeloHQbRjjxI4sPniYbbNTShE1aP4s/dHlA4/QW0T
-         x0O3bZ4vTxqJDvES0wAbPj0TgAo0mh3M/H/qsh4tlzJ6t11nA+G8b0zNiMqylLWBpnDO
-         XQ45xPxR+RoGqeDCYJolWr5C3bRWQN4kvUDN4v9uxmq5g6TRRM1qP82UJhT48NOFS8Qh
-         XuAw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769817222; x=1770422022; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1d9YOiG4jFqmU1NDXS2YzRpMa0FxqgStJnDc5X6hsWg=;
-        b=bCkAZzdSfgWr5MSP305rboSiB17TO7WkaPRpypjfAFUM7yhCKGdww+p7RKJRRqopWf
-         RaO/8Oed+E+uJ9X6AuRonO1mB5VhsHSyWlw7SaDpnSGs/znR8yB7CF2UDgNtd7GuRet+
-         1FDdi2uNDkWXnFlSSSC+nnBtLhbPBIlNbBE8UwthYFjk2tzCvRSEifgZaA8in0nVI0gA
-         JHKdwNV6DBCOts0by4bXtJaJ2zYoszpwyVr6edkrE9bF/4G5C0c+xO//nXCkYNapvF9A
-         3yvkKxoE2l75vCkAS2OtT5zKiSrXu54wPuLL3wO1eZsKaYu+xSstsNedA4liGfu2Gkjs
-         zXlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769817222; x=1770422022;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1d9YOiG4jFqmU1NDXS2YzRpMa0FxqgStJnDc5X6hsWg=;
-        b=niHNe5GY2Z4W6EOwoSaAcWurgpeAT4hZRQDPUwvajg6ZmE+6eeC8j/ZLNsF4chV0kv
-         tQQP/3mnYqQV4z9/Ezo/av1bNqrZVIWanZjKYtk0NiL/U3IWrjfvLOPvHhOg5HSa7w/G
-         ilFlAE0EsfvlL/Opm02nBSfUuWAcM3vIThWTTDP4vkATO5rYCDKi01RFmDP9I5KynYPq
-         InPCg0oEoZdgy2SgbuXSftboM2MQ4fBbTjQxrwGs7xWWrR0JjgPtTPc+xsMFRQqLBLaD
-         GIBvg7G1fOF8Ixsh40UoWZiDxTyt+usv7NsU/3jA1FJnTW/0NEIwlvE8S2DEQVw8weXs
-         f6wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUADYTwz6rz4xOZMejznuclAzjJGrFtIDUeiOKB5PwRxxjW0kDSCB1Whl6pZYB/i/3Rfwu1Zp4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya26ROvBjbkXCeUcmHDAJ+MmIV5Whq07OnGgmW0am5vDAED/KO
-	8Lh2IXXB6XRAVBRGtOIX8hDG6iignOKzC+ftpdvURwiLonqhKIh6toHbe8NgQjoCD8ShWt8c6X6
-	6yuEii4zxou2DITYi772M619Z5JHwslA=
-X-Gm-Gg: AZuq6aLYMx1LRXVomlLekr7YFbXlsVMQpCQzEhhKfRcd+3nWf7WrPf+hSZckonu9DG3
-	enFSmOby+YXI/wt72hI6Ph4AzxMz+JfJALjEgtc280LHCxB8ILg15D1AyBpqrkVGAzC/t/EeVZ/
-	xvtxlRz15mCh0uyFpJRSkRhe2OGRcGnpUPJF1TwlToCF5/OJL5DOHR/bvBzZU9F9uYXEuqVs1b7
-	l/aEZdgHZxmmfDnTB8j1UWvijZRN8LB+r+mMg8+1OA9Uj18mb1q2S43ZIBUyWWQN2vLRAKQ/kEE
-	s3aW4KPiGhBtWLL81/xCW/8StxBsUuhTSB+8HHz3
-X-Received: by 2002:a05:690c:c4f1:b0:793:99bb:62d with SMTP id
- 00721157ae682-7949e075b0fmr90826507b3.55.1769817222369; Fri, 30 Jan 2026
- 15:53:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49DE189F30;
+	Sat, 31 Jan 2026 00:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769818237; cv=none; b=o6bQfimW4U5/V1fJigyZl13Ur8eN9TTaT95Ci81IEr6TT7zcWTpqyFnmd5A84GjRehe8bif6edVTDEo2uPFI2Ec+9Kjw54NIYBzylAIxPBRZHvBOJzAoZdw3B4jQxXWgrjz/L5Ni6pq0QGpJ3pEmRXHYlf+jcbRUYK26CnFwVZE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769818237; c=relaxed/simple;
+	bh=Xv2M6M6O6sfrEraeTgLEyvZPLflWLWqXsd5lWTcqpIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YS/+Pt+mdO9mToD9SI85XsoLLQqqWmIocibnIXekj8yh9lxSnrwSXrEb671zOjXXOWi4o4Vtj4q/KLvKPFjOtkxRBvIsVMhu4ChNVyYT4Sp1yiGHz2KuBcjcr1j+03qE12KqWD22YWZHTTTqF7CAZtm/XQMY0Fy+cwhW3dXvcaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vlyZD-000000005ep-0Qb5;
+	Sat, 31 Jan 2026 00:10:23 +0000
+Date: Sat, 31 Jan 2026 00:10:18 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v11 0/4] net: dsa: initial support for MaxLinear
+ MxL862xx switches
+Message-ID: <cover.1769817939.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Hirokazu MORIKAWA <morikw2@gmail.com>
-Date: Sat, 31 Jan 2026 08:53:31 +0900
-X-Gm-Features: AZwV_QiA_mdEdnimCxhHdFtlbD6FulKfZC6Up31PRQnuWagDgHC8X5T8-9Ky3c8
-Message-ID: <CAA2RiuQr=OaaSk=1AVKQFjWzrHO-8+qU1TN3_C05U5FyE13k6Q@mail.gmail.com>
-Subject: Re: [PATCH net] ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()
-To: edumazet@google.com
-Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
-	kuba@kernel.org, Hirokazu MORIKAWA <morikw2@gmail.com>, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	FAKE_REPLY(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255276-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255277-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[morikw2@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9067BBF738
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,makrotopia.org:mid]
+X-Rspamd-Queue-Id: 6DD62BF80B
 X-Rspamd-Action: no action
 
-> Can you provide detailed instructions ?
+This series adds very basic DSA support for the MaxLinear MxL86252
+(5x 2500Base-T PHYs) and MxL86282 (8x 2500Base-T PHYs) switches.
+In addition to the 2.5G TP ports both switches also come with two
+SerDes interfaces which can be used either to connect external PHYs
+or SFP cages, or as CPU port when using the switch with this DSA driver.
 
-It is configured as a router.
-OpenWrt isssue link: https://github.com/openwrt/openwrt/issues/21737
+MxL862xx integrates a firmware running on an embedded processor (based on
+Zephyr RTOS). Host interaction uses a simple netlink-like API transported
+over MDIO/MMD.
 
-> I have no idea what MAP-E or DS-Lite are.
-MAP-E (RFC 7597) and DS-Lite (RFC 6333) are IPv6 transition
-technologies used to tunnel IPv4 traffic over IPv6-only networks. They
-are widely deployed by ISPs, particularly in Japan, to handle the
-shortage of IPv4 addresses.
+This series includes only what's needed to pass traffic between user
+ports and the CPU port: relayed MDIO to internal PHYs, basic port
+enable/disable, and CPU-port special tagging.
 
-I have packet captures from 6.12.67 (Broken) and 6.12.66 (Working).
-The ICMP request-reply appears normal.
-However, the ping command does not return a reply.
+The SerDes interface of the CPU port is automatically configured by the
+switch after reset using a board-specific configuration stored together
+with the firmware in the flash chip attached to the switch, so no action
+is needed from the driver to setup the interface mode of the CPU port.
+
+Also MAC settings of the PHY ports are automatically configured, which
+means the driver works fine with phylink_mac_ops being all no-op stubs.
+
+Multiple follow up series will bring support for setting up the other
+SerDes PCS interface (ie. not used for the CPU port), bridge, VLAN, ...
+offloading, and support for using an 802.1Q-based special tag instead of
+the proprietary 8-byte tag.
+---
+basic DSA selftests were run, results:
+ * no_forwarding.sh: all tests PASS
+ * bridge_vlan_unaware.sh: all tests PASS
+ * bridge_vlan_mcast.sh: all tests PASS
+ * bridge_vlan_aware.sh: all tests PASS
+ * local_termination.sh: all tests PASS or XFAIL, except for
+TEST: VLAN over vlan_filtering=1 bridged port: Unicast IPv4 to unknown MAC address   [FAIL]
+        reception succeeded, but should have failed
+TEST: VLAN over vlan_filtering=1 bridged port: Unicast IPv4 to unknown MAC address, allmulti   [FAIL]
+        reception succeeded, but should have failed
+
+As obviously this is mostly testing the Linux software bridge at this
+point so I didn't bother to run any of the FDB or MDB related tests.
+
+Some mystery about the relationship between the sub-interface ID and CTP
+port assignment remains for now, so I cannot yet fully explain the magic
+numbers when calculating the two.
+(Why is it neccesary to allocate 23 CTPs when using port 9 as CPU port
+while there are at most 17 phyiscal interfaces in total, and only at
+most 13 when using one of the two SerDes as CPU interface? Why is there
+an offset of 16 when calculating the sub-interface ID? How will a total
+of 17 ports be possibly represented in a 4-bit field in the tag RX
+path?)
+
+At this point this doesn't impact functionality, and I hope for further
+clarification discussing all that with MaxLinear engineers.
+
+I believe the initial driver is anyway in good shape now, a follow-up
+series addressing configuring the SerDes interfaces will also have to
+take care of CTP assignment and sub-interfaces to not hit the mentioned
+4-bit cap in the tag driver.
+
+Changes since v10:
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * no changes
+2/4 net: dsa: add tag format for MxL862xx switches
+ * arrange local variables in reverse xmas tree order (again)
+ * use MXL862_NAME as .name in struct dsa_device_ops
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * no changes
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * fix fatal last-second changes dsa_port_is_unused vs. dsa_is_unused_port
+   and dsa_port_is_unused vs. dsa_is_unused_port
+ * use cpu_to_le16 in mxl862xx_configure_ctp_port
+ * improve formatting of some kerneldoc comments
+
+Changes since v9:
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * add microcontroller port 0
+2/4 net: dsa: add tag format for MxL862xx switches
+ * count ports starting from 0
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * no changes
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * fix indentation in kernel-doc
+ * remove misleading comment regarding sub-interface IDs
+ * remove unused macros, set MXL862XX_MAX_PORTS to 17
+ * count ports starting from 0, 0 being the microcontroller
+ * improve port setup:
+   - split tag protocol and CTP port assignment
+   - use ports cpu_dp instead of relying on single (ie. first) CPU port
+   - handle CPU port like any other port
+   - prepare forward DT compatibility with multiple CPU ports
+
+Changes since v8:
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * no changes
+2/4 net: dsa: add tag format for MxL862xx switches
+ * no changes
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * no changes
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * remove practically unused struct hw_info
+ * lots of kerneldoc improvements in mxl862xx-api.h
+ * drop .mac_select_pcs() stub
+ * better handling for firmware error return value
+ * apply reverse xmas tree in mxl862xx_api_wrap
+ * guard headers with #ifdef macro
+ * include net/dsa.h and linux/mdio.h in mxl862xx.h
+ * call mxl862xx_port_fast_age() only once in .port_setup
+ * don't create isolation bridges for unused ports
+ * replace errornous cast with correct range of values denoting firmware errors
+
+Changes since v7
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * no changes
+2/4 net: dsa: add tag format for MxL862xx switches
+ * no changes
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * no changes
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * use little-endian in bridge_port_config API
+ * remove duplciate assignment of br_port_cfg.bridge_port_id when setting
+   up CPU port
+
+Changes since v6
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * no changes
+2/4 net: dsa: add tag format for MxL862xx switches
+ * no changes
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * no changes
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * fix kerneldoc style
+
+Changes since RFC v5
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * no changes
+
+2/4 net: dsa: add tag format for MxL862xx switches
+ * remove unnecessary check for skb != NULL
+ * merge consecutively printed warnings into single dev_warn_ratelimited
+
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * no changes
+
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * include bridge and bridgeport API needed to isolate ports
+ * remove warning in .setup as ports are now isolated
+ * make ready-after-reset check more robust by adding delay
+ * sort structs in order of struct definitions
+ * best effort to sort functions without introducing additional prototypes
+ * always use enums with kerneldoc comments in mxl862xx-api.h
+ * remove bogus .phy_read and .phy_write DSA ops as the driver anyway registers
+   a user MDIO bus with Clause-22 and Clause-45 operations
+ * various small style fixes
+
+Changes since RFC v4
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * no changes
+
+2/4 net: dsa: add tag format for MxL862xx switches
+ * drop unused precompiler macros
+
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * fix indentation
+
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * output warning in .setup regarding unknown pre-configuration
+ * add comment explaining why CFGGET is used in reset function
+
+Changes since RFC v3
+1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+ * remove labels from example
+ * remove 'bindings for' from commit title
+
+2/4 net: dsa: add tag format for MxL862xx switches
+ * describe fields and variables with comments
+ * sub-interface is only 5 bits
+ * harmonize Kconfig symbol name
+ * maintain alphabetic order in Kconfig
+ * fix typo s/beginnig/beginning/
+ * fix typo s/swtiches/switches/
+ * arrange local variables in reverse xmas tree order
+
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * unchanged
+
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * poll switch readiness after reset
+ * implement driver shutdown
+ * added port_fast_aging API call and driver op
+ * unified port setup in new .port_setup op
+ * improve comment explaining special handlign for unaligned API read
+ * various typos and formatting improvements
+
+Changes since RFC v2
+1/4, 2/4, 3/4: unchanged
+
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * fix return value being uninitialized on error in mxl862xx_api_wrap()
+ * add missing description in kerneldoc comment of
+   struct mxl862xx_ss_sp_tag
+
+Changes since initial RFC
+
+1/4 dt-bindings: net: dsa: add bindings for MaxLinear MxL862xx
+ * better description in dt-bindings doc
+
+2/4 net: dsa: add tag formats for MxL862xx switches
+ * make sure all tag fields are initialized
+
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * new patch
+
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * make use of struct mdio_device
+ * add phylink_mac_ops stubs
+ * drop leftover nonsense from mxl862xx_phylink_get_caps()
+ * fix endian conversions
+ * use __le32 instead of enum types in over-the-wire structs
+ * use existing MDIO_* macros whenever possible
+ * simplify API constants to be more readable
+ * use readx_poll_timeout instead of open-coding poll timeout loop
+ * add mxl862xx_reg_read() and mxl862xx_reg_write() helpers
+ * demystify error codes returned by the firmware
+ * add #defines for mxl862xx_ss_sp_tag member values
+ * move reset to dedicated function, clarify magic number being the
+   reset command ID
+
+
+Daniel Golle (4):
+  dt-bindings: net: dsa: add MaxLinear MxL862xx
+  net: dsa: add tag format for MxL862xx switches
+  net: mdio: add unlocked mdiodev C45 bus accessors
+  net: dsa: add basic initial driver for MxL862xx switches
+
+ .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 160 +++++
+ MAINTAINERS                                   |   8 +
+ drivers/net/dsa/Kconfig                       |   2 +
+ drivers/net/dsa/Makefile                      |   1 +
+ drivers/net/dsa/mxl862xx/Kconfig              |  12 +
+ drivers/net/dsa/mxl862xx/Makefile             |   3 +
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h       | 675 ++++++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h       |  49 ++
+ drivers/net/dsa/mxl862xx/mxl862xx-host.c      | 245 +++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-host.h      |  12 +
+ drivers/net/dsa/mxl862xx/mxl862xx.c           | 476 ++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx.h           |  16 +
+ include/linux/mdio.h                          |  13 +
+ include/net/dsa.h                             |   2 +
+ net/dsa/Kconfig                               |   7 +
+ net/dsa/Makefile                              |   1 +
+ net/dsa/tag_mxl862xx.c                        | 110 +++
+ 17 files changed, 1792 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+ create mode 100644 drivers/net/dsa/mxl862xx/Kconfig
+ create mode 100644 drivers/net/dsa/mxl862xx/Makefile
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-api.h
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.c
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.h
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.c
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.h
+ create mode 100644 net/dsa/tag_mxl862xx.c
+
+-- 
+2.52.0
 
