@@ -1,165 +1,194 @@
-Return-Path: <netdev+bounces-255367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2A1IBLmYfWlOSwIAu9opvQ
-	(envelope-from <netdev+bounces-255367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:52:57 +0100
+	id bJo+O5mafWlvSwIAu9opvQ
+	(envelope-from <netdev+bounces-255368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 07:00:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575A7C0E5B
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:52:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E998FC0E83
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 07:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8F57300C93C
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 05:52:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0F3273003D1E
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9782C158E;
-	Sat, 31 Jan 2026 05:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF2B2C21FE;
+	Sat, 31 Jan 2026 06:00:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505E6221F20;
-	Sat, 31 Jan 2026 05:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E54072618
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 06:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769838773; cv=none; b=kqCpQteBc+zI/CDxQZIz+YVoXQYlcHo4Krtt8DExjPHwFIzpBrI2OjmhSQOVh4BLcJs1Fai9TETPsAt7kd6/nwshD1riZ4JhwQ+O0oGIuqrqnyYAZu92oAnnA4oX8OByfBJGAqn38t3jCGsFx50hiA6qFUlegjvoG0MDUY9TOC0=
+	t=1769839254; cv=none; b=teNGoNgvuHdT4tWxmNdFmxnTUGdFASmujo6p6V/1AINR7ITu3XAJhqGiF2XOTfT7ZUS15SLzVbee11oW2HsG+RJsPe1MqAvf7woukASw9I4celQKzqSX0uYFyEtJvSIMa5hP28ALWhYpQXUDj79t7z1v4rPyyfnNpOS8vb/fU/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769838773; c=relaxed/simple;
-	bh=PmbAJYJkov8V5YggkGt6mnyWmVPIBHeFOH5at+c+duk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BrXbp0GX1mZNMXyd9Sg7PSC8fJBMRD9M7oWPVRB248VNbsvqJLmFr5BIt4XZ2b1lvBVhLiEHEU3kghRiHXjtbl1XTkAWYlgajb4deJA/wAk/GxcRKSkyeqhzYi9eT30N8D0M16Fj4EiYisZr3W3ak+aPAdsxAsE5fPn4exGetR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from localhost.localdomain (unknown [36.112.3.223])
-	by APP-05 (Coremail) with SMTP id zQCowAAXpgmSmH1pKjcfBw--.29939S2;
-	Sat, 31 Jan 2026 13:52:19 +0800 (CST)
-From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	daniel@iogearbox.net,
-	magnus.karlsson@intel.com,
-	bjorn@kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] i40e: add an error handling path in i40e_xsk_pool_enable()
-Date: Sat, 31 Jan 2026 13:52:17 +0800
-Message-Id: <20260131055217.729048-1-lihaoxiang@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1769839254; c=relaxed/simple;
+	bh=XFSqGcQf7wlZVW5B2uLPHbg7lW5PULw1g7x8Zd6FuU4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=gh2eomRJwEAQ5ZoA0JSDyPE1IyFHrc6v650QN4efLO6C5NtBLJAP6hQ0GzTKKNmGmIVhXv4Tzn9bPUTqUUV2Vd7kmYWYcppUW/cleq3AlWUC4yMZ23DfqYHl4RdGCi8/4q7rnTlCVt7XCo6KsTRESJkmZxM1Qxu39EAw6hf66tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60V60mrC015045;
+	Sat, 31 Jan 2026 15:00:48 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60V60mJZ015041
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 31 Jan 2026 15:00:48 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
+Date: Sat, 31 Jan 2026 15:00:47 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+To: Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp>
+ <CAHC9VhQikhv+qCyQdnJguvy-qTkGXB+NU7=QZjw5d+WfyVxZhw@mail.gmail.com>
+ <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
+ <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
+ <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
+ <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAXpgmSmH1pKjcfBw--.29939S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF4xJF4DJF43uF13Aw1UZFb_yoW8Gw17pr
-	4j9a95Cr1rXFW5Wa9rJF4j9an8Ja1ftry0gF4fGanY9r15ta17JF1xtFWFgFy8ZrW8Janx
-	KF1DArs8CFn8J3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiCRAEE2l9cjNJQwAAsR
+X-Anti-Virus-Server: fsav301.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255367-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-255368-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[isrc.iscas.ac.cn:mid]
-X-Rspamd-Queue-Id: 575A7C0E5B
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:url,i-love.sakura.ne.jp:email,I-love.SAKURA.ne.jp:mid]
+X-Rspamd-Queue-Id: E998FC0E83
 X-Rspamd-Action: no action
 
-In i40e_xsk_pool_enable(), add an error handling path to
-prevent potential memory leaks.
+On 2026/01/31 6:56, Paul Moore wrote:
+> On Wed, Jan 28, 2026 at 5:28 AM Tetsuo Handa
+> <penguin-kernel@i-love.sakura.ne.jp> wrote:
+>> On 2026/01/28 6:59, Paul Moore wrote:
+>>> It sounds like we either need to confirm that
+>>> security_xfrm_{policy,state}_delete() is already present in all code
+>>> paths that result in SPD/SAD deletions (in a place that can safely
+>>> fail and return an error),
+>>
+>> Yes.
+> 
+> To clarify, do you mean "yes, I agree", or "yes, I've already checked
+> this and can confirm that the LSM hooks are already being called"?
 
-Fixes: 1742b3d52869 ("xsk: i40e: ice: ixgbe: mlx5: Pass buffer pool to driver instead of umem")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
----
-Changes in v2:
-- Add a Fixes tag. Thanks, Paul!
-- Replace unmap with i40e_xsk_pool_disable() to prevent
-a limbo state of queues. Thanks, Maciej! 
----
- drivers/net/ethernet/intel/i40e/i40e_xsk.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+I mean "yes, I agree".
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-index 9f47388eaba5..a72a309540c3 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-@@ -108,23 +108,26 @@ static int i40e_xsk_pool_enable(struct i40e_vsi *vsi,
- 	if (if_running) {
- 		err = i40e_queue_pair_disable(vsi, qid);
- 		if (err)
--			return err;
-+			goto err_out;
- 
- 		err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], true);
- 		if (err)
--			return err;
-+			goto err_out;
- 
- 		err = i40e_queue_pair_enable(vsi, qid);
- 		if (err)
--			return err;
-+			goto err_out;
- 
- 		/* Kick start the NAPI context so that receiving will start */
- 		err = i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX);
- 		if (err)
--			return err;
-+			goto err_out;
- 	}
- 
- 	return 0;
-+
-+err_out:
-+	i40e_xsk_pool_disable(vsi, qid);
- }
- 
- /**
--- 
-2.25.1
+> 
+>>>                            or we need to place
+>>> xfrm_dev_{policy,state}_flush_secctx_check() in a location that can
+>>> safely fail.
+>>
+>> Did you mean xfrm_{policy,state}_flush_secctx_check() ?
+> 
+> They both call into the security_xfrm_policy_delete() LSM hook which
+> is what I care about as that hook is what authorizes the operation.
 
+I can't understand what your authorization is.
+No authorization can be placed during must-not-fail operation.
+
+For example, please consider the following sequence.
+
+  mkdir /mnt/tmpfs
+  unshare -m
+  mount -t tmpfs none /mnt/tmpfs
+  touch /mnt/tmpfs/file1
+  mkdir /mnt/tmpfs/dir1
+  exit
+
+Although there are LSM hooks for deleting a file/directory and LSM hook for
+unmounting, no LSM hook is called before deleting file1, deleting dir1,
+and unmounting /mnt/tmpfs because operations that happen during tear-down of
+a namespace must not fail.
+
+What "[PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()" is doing
+is the same thing for a network device. NETDEV_UNREGISTER is a must-not-fail
+operation that happens during tear-down of a network device. LSM hooks are not
+allowed to veto must-not-fail operations.
+
+> 
+>> Regarding xfrm_policy_flush() as an example, we can observe that we are
+>> calling LSM hooks for must-not-fail callers ...
+> 
+> We need to make sure the LSM hooks are being called to authorize the
+> removal of SPD and SAD entries.  If you are going to remove LSM hooks
+> from the existing code, please document how that code path you are
+> changing is still subject to authorization by the LSM hooks or explain
+> in great detail how that authorization is not necessary.
+
+Again, LSM hooks are not allowed to veto operations that happen during
+NETDEV_UNREGISTER event. Current XFRM code for NETDEV_UNREGISTER event is broken
+because the behavior is
+
+  while (security_xfrm_state_delete() != 0) {
+    schedule_timeout_uninterruptible(10 * HZ);
+    pr_emerg("unregister_netdevice: waiting for %s to become free. Usage count = %d\n",
+             dev->name, netdev_refcnt_read(dev));
+  }
+  while (security_xfrm_policy_delete() != 0) {
+    schedule_timeout_uninterruptible(10 * HZ);
+    pr_emerg("unregister_netdevice: waiting for %s to become free. Usage count = %d\n",
+             dev->name, netdev_refcnt_read(dev));
+  }
+
+which is a denial-of-service kernel bug.
+
+No room for debating "authorize the removal of SPD and SAD entries".
+This path is a must-not-fail operation. Removal of SPD and SAD entries has to be done
+without authorization when NETDEV_UNREGISTER event fired.
+
+Though, you could argue whether removal of SPD and SAD entries is really what they want
+when NETDEV_DOWN event fired. I don't know what the authors of commit d77e38e612a0
+("xfrm: Add an IPsec hardware offloading API") are expecting because deleted entries
+are not automatically revived when NETDEV_UP event fires
+( https://lkml.kernel.org/r/cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp ).
+
+Hmm, does
+https://elixir.bootlin.com/linux/v6.19-rc5/source/include/linux/netdevice.h#L3142 mean that
+LSM hooks are as well not allowed to veto operations that happen during
+NETDEV_UP/NETDEV_DOWN events?
 
