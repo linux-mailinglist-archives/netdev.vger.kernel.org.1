@@ -1,111 +1,111 @@
-Return-Path: <netdev+bounces-255492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id q4ejGQpOfmkJXAIAu9opvQ
-	(envelope-from <netdev+bounces-255492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:46:34 +0100
+	id oH48J19OfmkJXAIAu9opvQ
+	(envelope-from <netdev+bounces-255493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:47:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B34F3C3902
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:46:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F9EC3919
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D5F9300B44B
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:46:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B014730078C3
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6251367F24;
-	Sat, 31 Jan 2026 18:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DD2366DC9;
+	Sat, 31 Jan 2026 18:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vc+M2eaV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MICfNkkz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB1435E53B
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 18:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2EA340DB1
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 18:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769885182; cv=pass; b=C8NUpA66ctJN6ADEK6f6VXepdIp9FDOJV2DPW7sGULvoCcq8rqyJKBi+sDHdQFd5b0CPrriuY/y+08cD4bpPNdUY43/OQImKhWBCU83FoTpZSFch60s8Aelfp8i8UEMzccUHc7jX2P8OH7Pg2PYLjebHHhq7UzGEw7fQV3MIKUE=
+	t=1769885276; cv=pass; b=dCtrhGhJLKwWYzIgw22GszJ2+7sFqBAO9xSfrRFVSnhua/gwWORwsKCSxbEZYJlpgxjI/DbubfJYV0ed+XvgFj7bWV5694lu5ToZ+nqvosCw3vwBMLU8/FBGf1MIfCefBjoABRR3PkOrBxAiw8Abbj8LrsExuPPBeOlsRgqFEvQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769885182; c=relaxed/simple;
-	bh=gjyoI+aqRNh9f6i4kHhtuIbw2jbHU9s631hyA+eBL44=;
+	s=arc-20240116; t=1769885276; c=relaxed/simple;
+	bh=01NcniRWk73RX7UWSG45TL3VMgsq2VHUVlBj2/LT2S4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W/h70NIVfIV842VPVVs95ho+yoKGBZXjdF0z7Gc6OryMpv+yMsJw8Uu+avzkftdntDALaaGws2NdvcscCHdMGnITh7STdGw61cUpLYhlItJu4icLmcSd2ZHtKasjGB4v3j3D3Jxc3ozoFokrBxLqt7+FbKQNPZTBFPyjtIYssjs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vc+M2eaV; arc=pass smtp.client-ip=74.125.224.46
+	 To:Cc:Content-Type; b=JSSepf5Ny6HSuqrCVuyF6M3uuFniMGF6HFpDetMI9ugUM6JIRNRqG6ihF4UUPPrEmrsZ0QZ/3z9HccVp1CoXvo7HA97ilHHHYkzFx1bh3sa5kI24CNLB1Ddw1k6YzCzvruJho6F1fmngX2SqY4z6Y1a/cABWQ6O/rGHlO3sJc/g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MICfNkkz; arc=pass smtp.client-ip=74.125.224.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-649655f14d7so3194229d50.1
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 10:46:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769885180; cv=none;
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64997a5c93bso3470999d50.3
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 10:47:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769885274; cv=none;
         d=google.com; s=arc-20240605;
-        b=Lxbnh4vjtG6qJ5lyA9iALRK1mvW4DactRDCi9MXkRgglNzwBwY+aABE4AnTSKZOZYE
-         6NYe1IvOk3oBNu0HNEpoes2Ncf+kYtbB4yLEtC4p48t2r16uhXTzUrk4GUKPW6692uon
-         pvzPzlFaH9iHSuB9UNuwbr67/2hLrM4XdbGDtJryI7M5SSpdbC9OO4BdHC6+PfsveQk9
-         i1lHpUE47Uv3yVfRuxQ86RVgAwfOOtoB9peFzfUDJohgdPIQIAqavqmTXS7cwO49yphy
-         vxMSclKLSb1W9IMpUpVi0n/gKtj27ncFhDEn+tS7PbVcgAZIAtiWY1hpA5DGRFR9ZRHN
-         HiYw==
+        b=dnlKiiQf0WIjuZnAu0/TEf2eJpSn0WcNSDMZpGCiCNAGQ8y3+IfvHCRXaPgQT+8RYI
+         jX2WD46u642gtyMOJWUnaV02j5unXZxrsmxRcVaBMzpL8zhcB8LsTeDupysVsX2OZmdm
+         5xEzdq6Dktn3QDMXxJCArXLtRjW459zlOhmDuIeu3NGeidgdvzONFCmdjmJMzu9+4gL1
+         OjMJlmAXrYRij9Ubz7Qnf9KFP0bilJ9PF9bBG2q92t+5hfnURwEQ1oj7MR/XtlIT9sLc
+         yzzOvMhl6irI4C4X0eYyDBfkdDWRc9Bdid+t3Wx9Ao3kvuFErgRQeSMnHxv0Hb+YeGwS
+         OMBQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=8fh4osU5Y3eXPnZOJ7E5U71ADiiPnVo958vEhF9Dljs=;
-        fh=OglO3yZSuzSAUF+VMr1AvpBmzuPX1SYHr6ZKIKAM9+o=;
-        b=aiZka0uskw2yKT9eax4Et734pCyput6SDHOZB4iIZS7EwS2T462ApycC+emslPcD8A
-         SuYrzKq7QS/vGtHRwMBHI6x0B2cQXwBfDB1HnDUE48DiYzDA9qGlu7JRWs5vPdQXJNSA
-         /H7Df0nVVTSqiUeA+EeiHrIvrvjM7tjdKu0a4ogj9ag8aOopk2hGd5Sbj9WhshGSWlRJ
-         8JR8QMLsOPL7PtGWav6nosJTxyuRy7vgXJLFxm7SOJ+suKDs+1A58GlX83CRKBB+ulst
-         veWWMnp3BI5MMbpnjfRjtmI9uSaBYsFkBDe9wNbwmmuoTYWNn0bmHS3yhJxSV8CyclW5
-         +9Vw==;
+        bh=hq6gglAydMNz6LDEt0GsAhlm/k2RMlxREitLZ+elzRc=;
+        fh=fmN6jYPHf6qysz3jcBeLOIeoMcmbVvmbsmJDSjmmYEY=;
+        b=Frp7pY8QWc56b/46S8PtslUsDn2c3p/U0gUv0owdKv+kGvutmATA4VW6iM9ve9pAc/
+         5TPxOUqYal3inr8Xet748trb38qb4PUt0HCFsvE2syBc8CSt/snqVn+3ow8AWpHryy90
+         Aj3hM39WiOhEbtqmr7fdm1u0Ie3w6dT2B1JUcLuI/qymzxZzI5AAgJil+fLNS35UbyYD
+         uAMxGg1tG9HNQYn1Sq/199n4Y+nyOwywOkT+VL956ag1rtb5Ob3Ra5ACRx/vOjGuFdhw
+         inOwMFXckMSCbQG79lPQJnv95Wbsx4vvDJeAczE8J/k9XHba41hchPJGXvKCj9rZSIPl
+         6eyw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769885180; x=1770489980; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769885274; x=1770490074; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8fh4osU5Y3eXPnZOJ7E5U71ADiiPnVo958vEhF9Dljs=;
-        b=Vc+M2eaVwY8XTqjvrsbBrqYLKl8Ftcpj6AEn2LBFxSg+sMcBNrvT1SQA6xOyaSQ9qa
-         u0qFkKSqXa5BDXi7kWsiyHnnFwonqxIzLeBOEZiZWjgOPwlen2D4qWYZLv4xCZ0yj3yq
-         QB9B10EEN8Iy7qZIkkUKzbcBoVwRKWY11/hOcAaw1rSzTXzvs2Zdbfq1tSsr43SBiN6b
-         4twMBTs60tygb5AszdH60BiJfGOf+J9nLEJPqsn5Yf4GircqSyytM+j2FE3GqhSpCNTw
-         OMAwoBT3wn7fK07vcoXhi6tE3UcsQHBkr/3vvTz4NEyFiNBC7U4OsHhIHFMHlwgfQbqn
-         PDlg==
+        bh=hq6gglAydMNz6LDEt0GsAhlm/k2RMlxREitLZ+elzRc=;
+        b=MICfNkkzfJIRUG4hLQVjE8eTBQdCBdXQU6oNsvSaG0O1OWPgC2T9/N2c3YCb1GzYSL
+         50mJSfaKRHjT1xrbuhF89RqzzuNPMMfG6/kqApiUB/uDp14uWd15UhL6besBs0dkq6Qj
+         Vb4QrMKsvKSy+lXqn8msrcdwwp7L5Cw6WThAGI//G0vK5bF/sI+tHuVGDk/BqCgWQ7Rd
+         IYM24ikCSwqgxDzELiP6fgLpRpgklByGGNPFEegxBIkeXsN+Irbr9OjcoxEvcMowM2un
+         43jTk0KtRDRUd56bqG6x1zYX8CGPCzg0Mel0PM54QF1ZGJYXPXI/F299Ow6TNInxgbhG
+         ELzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769885180; x=1770489980;
+        d=1e100.net; s=20230601; t=1769885274; x=1770490074;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=8fh4osU5Y3eXPnZOJ7E5U71ADiiPnVo958vEhF9Dljs=;
-        b=Cn3Ag/cO8gsa/JyLoelc2uii6lmhs9I1pGODlkZ/pqypQiW0cMeDPoCmR/OAW8HiBz
-         IijFrhZXPjPxac4A4lGHTefqCqFLBRkDPowRNqdFfEy4L6NPVMogpHjbe7Zq/0sz1WuY
-         HI14YFza1LkPacixNZto2Iw+89SGWISklT90qlFNPcseh8aIWCK6iP/aihVtKarxHbPT
-         qIg59nNgajAHkzSasqZt3RvEHHz7IhjppPSbL0UfL9O03tPeutB8ySzLnnGwXiVUAPBC
-         Qn/mGW4EIJxy3bhAKt+tZURjQinE1JmkFpjPRsGKBuTbP6WUJzg86QWKZz151/9mfgkz
-         k6eg==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ01xKAOR2rcxuXLmZB9FPyNCQxVrhOCMbSWr558n/FITQm5Y79+hlZ9Q9qvgiw4MnFKpSnGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxfydf2E6T21vl05D9Q6SaLuYVU9l2B1oqKwsn8l6EtY+POAlzp
-	0LPHD4TRqJJsHmkKhB4N29mmtoze6L5Ptig416jfzQqSfrugMQnT5Q+ds6Xt5y2zW5TWH2qv8uy
-	YTnW/Jr5lbUC4jHc0bGFvPJnaEHj3na8=
-X-Gm-Gg: AZuq6aI9OhJcRzUS8BSYyGkkiyEDy/pl+kjBsT+eK4fz5LbKgnsWOp9njJHvmU+8bRy
-	7aa/gYeU3KRwdxDPdMxmJzXAVRvylqFe5VrgVi0xWzOZr2AKkWM94GkQN3B+RpovF+j/l4wuUgS
-	BCE2K9V2it2sZUVM2a8VbfM7CBpEX34hjw1Yiyl466vMTWJiqIW52XViiWb0TY5aZKjL+w+pT+O
-	JW3lJA8qCYxrNUFvV5zrIFRbY2ptuZwvqRRkMjB/AwKJuruXyrBMJK1M7CqGdS7l7kOo8c=
-X-Received: by 2002:a05:690e:1249:b0:63f:b952:dfef with SMTP id
- 956f58d0204a3-649a825bc25mr5211366d50.0.1769885179889; Sat, 31 Jan 2026
- 10:46:19 -0800 (PST)
+        bh=hq6gglAydMNz6LDEt0GsAhlm/k2RMlxREitLZ+elzRc=;
+        b=mrbxyFSez1IfEZe3HPE4cZufg19zxFVLprCZOtWJbLJJqfxQf3iJVRrHtzsvDp6sFE
+         QszO110kSKQtfr/yezpC2U1vtqtWdXpEXbNgEgLaJqYDVe4EI4beRdPY+EgFMyZDTwnK
+         L5aYtyK2xDuICzR7Hd3ACVW5iWzeZv/lt8uPI37PEK76CrMx3ne3Hr3NEMbBteHnkHgN
+         uGUYhUW4OSerAx5qldUuCzY1/3OvIgfrvAdJqnG7hak0586FKaFHEKkxgKjnV4iqc/0E
+         mgmhu7phVPK2Txy1oLr9LzEsRGLlw2WJ3GhabiRgZvNtB5w9QgPr2qzhZ/xVUUAjDFyB
+         zPAg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1mkINYgCm37cPbPlP3aP0ID0nau5NEpwr8q6RHnBqVeMLntPPEE0fwS+DAlBvgpsZ3hW7hzU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1slm1iIwBrqzE1ElMz8H/qCC8AIFWUho10AOS0H14JYq7mdet
+	l/dlQN297vLn7F+2a7igWJ6MTLHbplc3NLBOhdBP2OqO9AT5yV79tUPEqqPcEZNtkkM/XD7NOI3
+	7uJS5bCfcHN7v9Rff368AA3XAhN4tNR4=
+X-Gm-Gg: AZuq6aJBmU0S3SRmzo8A/v1/2Rjv4ZQueW80zQXVGEYYaP9xq5X/rMeRdQCNVbsPrS/
+	YHlGj+qyjwNGvelm7NSdqoEGm2mFRT+s3Tv6onmwnDmCsi35tpttuQW8aMlbOga2gtUa22v47Vj
+	vfSh1gFZK5/PG3OYIcifbftU/QeIaus04lLoYyQaXkGpWqgoLveRHxfNZ/4ewRIJMReNqMABdQw
+	oP0q4D37RbA2FXIgY55AFdFlh7lnmTC2l+Qs4fES3G+NgcukK3be5tbILKsBREVEs1ZBw8=
+X-Received: by 2002:a05:690e:d07:b0:641:f5bc:698b with SMTP id
+ 956f58d0204a3-649a84ef9c4mr5293993d50.71.1769885274122; Sat, 31 Jan 2026
+ 10:47:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260131050920.2574084-6-ameryhung@gmail.com> <0a0eaa11c4b429d41ea2adfc36b56b75b61eacd777dffb2a25cd2857f72d5f2d@mail.kernel.org>
-In-Reply-To: <0a0eaa11c4b429d41ea2adfc36b56b75b61eacd777dffb2a25cd2857f72d5f2d@mail.kernel.org>
+References: <20260131050920.2574084-15-ameryhung@gmail.com> <bc860132eed39c90ac3599a9db86e80c781cce157f7edf455826d46260905a7f@mail.kernel.org>
+In-Reply-To: <bc860132eed39c90ac3599a9db86e80c781cce157f7edf455826d46260905a7f@mail.kernel.org>
 From: Amery Hung <ameryhung@gmail.com>
-Date: Sat, 31 Jan 2026 10:46:09 -0800
-X-Gm-Features: AZwV_Qj4nDCbzN_Zy7806jAMA7hzx_7N4tuIi7HkMm7XEcf5sh35YEA-9k4xwGw
-Message-ID: <CAMB2axPxujt7tUXcZrhQVf4BC6tM35GqTg00pSB7KyGs6ndohw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 05/16] bpf: Change local_storage->lock and
- b->lock to rqspinlock
+Date: Sat, 31 Jan 2026 10:47:43 -0800
+X-Gm-Features: AZwV_QjeI9z4V6kjV9l0CrQHNZtAvmOJlSNJxtI-nJ5LEEqpQRjioTMUKxnFaBo
+Message-ID: <CAMB2axMmbZWgY96miTwmvOL_a4pGMdHUOR81ofeQCCq7iqmAHg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 14/16] selftests/bpf: Update
+ task_local_storage/task_storage_nodeadlock test
 To: bot+bpf-ci@kernel.org
 Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
 	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
@@ -120,11 +120,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255492-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255493-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -143,69 +143,52 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: B34F3C3902
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 07F9EC3919
 X-Rspamd-Action: no action
 
 On Fri, Jan 30, 2026 at 9:33=E2=80=AFPM <bot+bpf-ci@kernel.org> wrote:
 >
-> > diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_stor=
-age.c
-> > index 824d05325..7661319ad 100644
-> > --- a/kernel/bpf/bpf_local_storage.c
-> > +++ b/kernel/bpf/bpf_local_storage.c
 >
-> [ ... ]
+> commit d58597062a783f7c4b2997c007bb7178b268dd14
+> Author: Amery Hung <ameryhung@gmail.com>
 >
-> > @@ -572,7 +591,9 @@ bpf_local_storage_update(void *owner, struct bpf_lo=
-cal_storage_map *smap,
-> >       if (!alloc_selem)
-> >               return ERR_PTR(-ENOMEM);
-> >
-> > -     raw_spin_lock_irqsave(&local_storage->lock, flags);
-> > +     err =3D raw_res_spin_lock_irqsave(&local_storage->lock, flags);
-> > +     if (err)
-> > +             return ERR_PTR(err);
+> selftests/bpf: Update task_local_storage/task_storage_nodeadlock test
 >
-> If the lock acquisition fails here, doesn't this leak alloc_selem? The
-> allocation at the top of this function succeeded:
+> This commit updates the task_storage_nodeadlock test to check for the new
+> error codes (-EDEADLK or -ETIMEDOUT) that bpf_task_storage_delete() retur=
+ns
+> after the rqspinlock conversion, replacing the previous -EBUSY check.
 >
->     alloc_selem =3D selem =3D bpf_selem_alloc(smap, owner, value, ...);
->     if (!alloc_selem)
->         return ERR_PTR(-ENOMEM);
+> > Adjsut the error code we are checking against as bpf_task_storage_get()
+>   ^^^^^^
 >
-> But on lock failure, the early return bypasses the cleanup at the end of
-> the function:
+> There's a typo here: "Adjsut" should be "Adjust".
 >
->     if (alloc_selem) {
->         mem_uncharge(smap, owner, smap->elem_size);
->         bpf_selem_free(alloc_selem, true);
->     }
+> > Adjsut the error code we are checking against as bpf_task_storage_get()
+> >                                                  ^^^^^^^^^^^^^^^^^^^^^^
+> > now returns -EDEADLK or -ETIMEDOUT when deadlock happens.
 >
-> Should this goto unlock instead of returning directly, or add explicit
-> cleanup before returning?
+> Should this say bpf_task_storage_delete() instead of bpf_task_storage_get=
+()?
 
-Right. It should be "goto unlock".
+Yes. I will change the commit message.
 
 >
-> [ ... ]
+> The test code checks the return value of bpf_task_storage_delete():
 >
-> This isn't a bug, but the commit message has a minor wording issue:
+>     ret =3D bpf_task_storage_delete(&task_storage,
+>                                   bpf_get_current_task_btf());
+>     if (ret =3D=3D -EDEADLK || ret =3D=3D -ETIMEDOUT)
 >
-> > Change bpf_local_storage::lock and bpf_local_storage_map_bucket::lock t=
-o
-> > from raw_spin_lock to rqspinlock.
+> Looking at the kernel implementation, bpf_task_storage_get() returns NULL=
+ on
+> failure (not error codes), while bpf_task_storage_delete() propagates int=
+eger
+> error codes from bpf_selem_unlink() which can return -EDEADLK or -ETIMEDO=
+UT
+> from the rqspinlock.
 >
-> "to from" should be "from".
->
-> > For, __bpf_local_storage_map_cache(), instead of handling the error,
-> > skip updating the cache.
->
-> There's an extra comma after "For".
->
-
-Ack.
-
 >
 > ---
 > AI reviewed your patch. Please fix the bug or email reply why it's not a =
@@ -217,12 +200,12 @@ E.md
 40647
 >
 > AI-authorship-score: low
-> AI-authorship-explanation: The commit follows standard kernel development=
- patterns with appropriate technical detail and no AI-typical phrasing or s=
-tructure.
-> issues-found: 1
+> AI-authorship-explanation: The typo 'Adjsut' and incorrect function name =
+reference suggest human error rather than AI generation, which typically pr=
+oduces more precise but sometimes generic content.
+> issues-found: 2
 > issue-severity-score: low
-> issue-severity-explanation: Memory leak on error path in bpf_local_storag=
-e_update when rqspinlock times out; affects only rare lock failure scenario=
-s.
+> issue-severity-explanation: Both issues are commit message errors (typo a=
+nd wrong function name) that do not affect functionality of the selftest co=
+de.
 
