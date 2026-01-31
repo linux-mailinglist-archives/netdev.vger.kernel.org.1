@@ -1,163 +1,227 @@
-Return-Path: <netdev+bounces-255282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255283-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIH1OuFKfWlZRQIAu9opvQ
-	(envelope-from <netdev+bounces-255282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:20:49 +0100
+	id Oy0xNmVNfWmkRQIAu9opvQ
+	(envelope-from <netdev+bounces-255283-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:31:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42120BF9D6
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:20:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29625BFA15
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:31:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B260A3004C59
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:20:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7467C3014C62
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 00:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318142F0673;
-	Sat, 31 Jan 2026 00:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E03B2D8367;
+	Sat, 31 Jan 2026 00:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BEvZzNem"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="heUjay/2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f66.google.com (mail-qv1-f66.google.com [209.85.219.66])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD37B283686
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 00:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769818847; cv=pass; b=pPw+UowsSo4P+zl7jLvIYRLuWwPCjNnqHPsPy2e/BZHkZx0yxTwuCzgC6Hk7UG9qLAQFndBmnT94IVX9lNzv71TQM9Zlzgz94d2MfowaDLAwt0xueXEzlvRfPXP6BVy1qPQMSqQ1uLMAF4GJ1tEAw74iWP6ZolKLVu8jt0HQydo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769818847; c=relaxed/simple;
-	bh=BxvFuJC0bIZLCHrCpS3SPXZeathH+1ZgXjBGfDE8li0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L//h59YPeTUcYIoE0CUBwBh+uj14PCGSkuqjS7pFPC5rYOT4NRr7UGchoUHJQEtokn/gVZknLu77ezC2mdjj89qRXlMw9cMCc11tglYaCImgw+H9EPjqUwqRuPBFmTKY2/U5E81NNUUxby+MyTjX9LfY+nuRDMWgLy3Ikyjaux8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BEvZzNem; arc=pass smtp.client-ip=209.85.219.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f66.google.com with SMTP id 6a1803df08f44-8947e6ffd30so32222776d6.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 16:20:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769818845; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OQjLoanPewQVFCiiWwuQaWWHczd8H4DSdZnTx/h5xz7mtJhlBVGv8F4O2q+v3EAl6/
-         tFmMkLtKUalnXLiNaj2a5//8C1JLu2qutIDjtsFg3jNp+GTxILkfZHz+prgVsY6OFPP/
-         AjDHYx4cHgZEvxk2A98e2a2lD/jmh5T7Z0Bt7v/szF/LNRl66sD2KzPdJleM3Wm1Px+X
-         cwsrIyCOFVnqWDP7hT7ecr9BjVoRPMEQgJa7z6dI0U7ip0Zd/Z8hmTNnZISVJ/xKq1LT
-         fQwEutJVvn4qCPeBDJ1Blb+cO1JAkLFho/D+1Z+58oDPsO+2XVRjnkbRcYEZROCE3BHp
-         hlGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=BxvFuJC0bIZLCHrCpS3SPXZeathH+1ZgXjBGfDE8li0=;
-        fh=M6DBnmXk01vJZXT6LcvJlKrL0Q3rciMXhrE+yDJvfoY=;
-        b=T9tkI/kBf9kmSzXOkvXoMAxQTkbA9y+cSlVINZP4NHMKRFclLN+fdaZJRgGGyrxIWc
-         dNlaXmoG6lcOHc9wN5ymSGFrCbpiB9pwMSSUsetsHQ5EBeAj6I21boeenBpWelzIzgh7
-         hZWzZGs2IBYpKu8Rr2Y7qNKYcSdItIv6hB/L7BNjKacfPpIkN9KxEGn8xowPBCtJxrSR
-         3WiXyonN6B6KBDF1bspU9tdIUKdCGuHLA6QhVO3e3pXU5MIb35dSpgmsA4Nzo46CHt+c
-         By7tcwjiywGX+6DzeZdF64xo0USOFDziuZv2YBvmy54o1svmkNg4ic6xh8pdvSYocI8p
-         644g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9E218027
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 00:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769819490; cv=none; b=IxMwe+unt5DeaVqs8I6fEzx14CEcFfsmYBnkTJKjHtauGe4QnhLk7K3DuYJ/v/bH0ktTzkTIjthB2foniv0l4v2Y+ne+raaQKlQbelx2xvSNFf2paqiKcma6lZtG0Uw0VjAzXPAgLBmo+B3COSmxIXORzTp7wNrLjWveu5le5Rk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769819490; c=relaxed/simple;
+	bh=9oBcU60APrXdRDUwgOJ/YVbZTh/KIjGr/FLUseRN3zo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ozG3NfQlhrj1OYaZ7prR1CwKlVBD4roB27Lzkwd2leQIxhPloOPDeacAWUR4LnQEtkKeWLYJcui6BRniRhd9SL6oTj3fXMBA7Kre8sOd36vyWT3wYRbTH47FbVo2yZqJqVGOLJ9x4SxgSfxYkzPcrqjDNcc7KVPCTat0FTZTAMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=heUjay/2; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c06cb8004e8so1057002a12.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 16:31:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769818845; x=1770423645; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BxvFuJC0bIZLCHrCpS3SPXZeathH+1ZgXjBGfDE8li0=;
-        b=BEvZzNemY1yqb7XszHK6CD7Vz2RG1j/6mzwlx3M4de5X8vDvpXWVXLOPN1FIQa3enm
-         6+Ak/lmT9ipPI+byMtCpG11kXjZIOkInWU/7P3X0nGSzlK17a0s5OaYjo6Tk95u5vST2
-         BeOF0hZqwh2NuXpg1FjOOummNDsk2Iagrivr8w47AK/Q+0z9a6mzE6uEkePKdQHQ5ctg
-         C6+HM21Ocem1aV4Yz+rt7secOkkxt39R4smUTD5aKvR7xO1heKrDKJkcB5eOlnxECBws
-         gNhWXmXnZ1BqjLxuYAQhRjGU9qhFrZB3aqJSQ0SpPbqmnBAbLspkUZxKxxZQR6ANjG/V
-         82Iw==
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1769819488; x=1770424288; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nNet+qCw5kKXXKdFjfZxFhD9/MzzBmPNM66XEuqgsbs=;
+        b=heUjay/2bOLDS3cGfZWOcCaK24YcgEukJXeHlRJ/7+wwMfELzdQB6hbnoi/xE/bTEY
+         UmFMVwbXVr1MBJx+Mhocw9/u8fHkFZYkZA7ImJNWDgRu6mo2xaV1tUoaYmjO3w9Zzkng
+         ABuLtzEttUzTrt+qF0QJRKZryCENlbYgZAUf2kWyXVELXn4P8RV+eDtUUQ6J09BGGiBp
+         g6d7DnmkbtqhqhWgGEZR590ziCVaFkYGTAKAm6OZeb+6dKhhtsedcJ3nWZC0/J/yFgNd
+         n4+UVsdCZCFpVt8vc1eVb3MuBQwT3OpUpN1nCjBva5tMEM+WBPAg0z6fsYv0C/9XEQ0D
+         /e6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769818845; x=1770423645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=BxvFuJC0bIZLCHrCpS3SPXZeathH+1ZgXjBGfDE8li0=;
-        b=llQ0VkgQEvlW1hdEIqlSD+u/s+yfXfllbekExGtWfEqFySIkuW5hE8TSc4PKmnNTZ0
-         DprVhHY7VOZtVLjOdN2hohtdIKZFh8uwJCKZ6qeI+mA7pl/HgFjRmaQ9Zo0Ff1oBC4fq
-         /JLdmL/mPYn6kyCW4+jLnYrMHXzTuB7ObBZDQ1Sg6NCCCyuvwFK1Z0mZqYKuWy83SUEv
-         eNRxZgD9X/sIQGCaQ3G3Gj05RwLv0n0b/mnHot5S7u1mt2G5KlBms8xJsg2oIn3QHSzI
-         YA9+Iou0hAzNQchGVTkIHqM3Bs5n2GjYG7cy7HjX+pJfqGOPUTDT3Jg4vyoGuv0Nk9bH
-         9SoQ==
-X-Gm-Message-State: AOJu0Yx/Ej1D9Ahq87ARA9wpp85ay6/DI/AjxCyjLBUqstbUGk4LIOL2
-	Xi1gzruUlNapaIIRs0ylgQewW8zL+fL+JF+wh/zttfZ3tJKRbFyeeWtnOfclw/QO6z7m7yTQfiB
-	vYCtdCM9a9sAOh+/e8jodYZ/pFtUVduGq0t4lcno=
-X-Gm-Gg: AZuq6aIzOV5QF1JHZq/LlYpAe++B38ScVm3XoHXanGe1xOk5fKY+UR5nfvv8HPZdkty
-	ZAMixQuKs+fV29I6jLmaTPcLvQq4qL5lGew77VT6915uq4NJEJ9+AM74Ejh78bwI5CeBSC15YF1
-	f633DpRQZ2puiGWKJUJkVKpYuFUNk8H5ch1L6aLgT+pjThYCSAMEjypE6TQLDs13mVh4A9iqa8P
-	PGe0fhaEIkE1+yZ0QA/Q0h8rEQDIsuJERmM9lL4BQxsImvaU3oYxSaT3BblbHPlGCdHes8Jp7se
-	YJnlW7n+ZwVxWnxd85mH3jDe9g0gA37V+PKVHsKDNk7pWGIHnYni9sUk
-X-Received: by 2002:ad4:5cea:0:b0:894:7e6f:f92c with SMTP id
- 6a1803df08f44-894ea11702cmr71373576d6.58.1769818844692; Fri, 30 Jan 2026
- 16:20:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769819488; x=1770424288;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nNet+qCw5kKXXKdFjfZxFhD9/MzzBmPNM66XEuqgsbs=;
+        b=Mla97sTluxyQbkDJLKbiFZY0KEZyd5vqcrReQEwdfeBEQB9SvM/xggsG1k6vhluhvC
+         zwm/qVF/YTzKNu1YOLAmGJSjQCCbuT/q+olB1fPKnx+5RuRjDkQ6k8fmCanjIU0/OAsw
+         Kp0f0mZPAC6dLX5aUI0hxWm0dZHwWwpv0Z7b3yTQTM9fzH2Ux4yI4+hGzzya/J9I+N8x
+         CXZnYe7cQrVPEJWRXkqiF7nVPXL/TMI9rYY4+mQIwsWuea6XF8xYn7qNBjAF/ts3Ur3J
+         Fps6Tcs5QY8RyEp3Y50qb0/tVSjOf8/liEptoE/2mstKV+v9I4QFZ+MIkRbPNKemL9w0
+         oeQQ==
+X-Gm-Message-State: AOJu0Yzd7QnzVIM9Ih4WVziAZzemu5bX36pJto/y1y/nMyxLN0xTwxR+
+	ZBPu0Hr34rQ/7nXsxBD08Gc1MuSK/sIw6ouc3a1mjN/B9HDCn06lVGqUyZsV7GF/6/6coqPQptt
+	PNMOS
+X-Gm-Gg: AZuq6aJnjtohgEXmIp+37grPv19RlxQNW/4jCHx8sCd2jMzrUOIt2hZl00U/fj0XgoM
+	BUNeReWc9UIo+6Pz0UKBK/wC5RkAACKsP0L0axrFAPioF5kE+u/6OF7R5jsIHi+dNakZFciDt8T
+	kzPD6D6b6c5yIMotBwEHGHc535hO1L1J5zQZv07M389kpV5rniT6MsQ/32IXvDXdTfGWnCEfiIK
+	U19TpKsd0lrmv6UpaJzBKqN8bcoGjFqyKKEHCETFszs6ukGtT3zFI12J7o536ImBlprznIRbRrf
+	T/mriw8coTLMxMB1xmuZ4c/Q+tQ9cR7Fz74up85RjrExLUyovk0EuJqZ+fxW3KFxWoaaevsLykv
+	XfBvrDmMWvHS9pfad+HoZGHip1+x27u7gnuV28JpLm/aGyzOCbL/PH8h7dMh81Yo6s9f8obZU0O
+	ieMLs=
+X-Received: by 2002:a17:90b:2e41:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-3543b34fcbcmr4748872a91.15.1769819487720;
+        Fri, 30 Jan 2026 16:31:27 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff:71::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379c1eeebsm9213290b3a.45.2026.01.30.16.31.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 16:31:27 -0800 (PST)
+From: Joe Damato <joe@dama.to>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: shruti.parab@broadcom.com,
+	Joe Damato <joe@dama.to>
+Subject: [PATCH net-next v3] bnxt_en: Allow ntuple filters for drops
+Date: Fri, 30 Jan 2026 16:30:41 -0800
+Message-ID: <20260131003042.2570434-1-joe@dama.to>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260130093412.98407-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20260130093412.98407-1-xuanzhuo@linux.alibaba.com>
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Fri, 30 Jan 2026 16:20:33 -0800
-X-Gm-Features: AZwV_QiONEu0gkSuPS6SfVZkmenzt-yOhvJlJ170RUgBj563Xy1w4BI2i3y3J2c
-Message-ID: <CADkSEUhHch7E9rfb5UQ1XRZRhF=vGx-B5J5g1QATYrXxh2L5Qg@mail.gmail.com>
-Subject: Re: [PATCH net-next v24 0/6] eea: Add basic driver framework for
- Alibaba Elastic Ethernet Adaptor
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>, 
-	Philo Lu <lulie@linux.alibaba.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Dong Yibo <dong100@mucse.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@redhat.com>, 
-	Dust Li <dust.li@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255283-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255282-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_NA(0.00)[dama.to];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 42120BF9D6
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email]
+X-Rspamd-Queue-Id: 29625BFA15
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 1:34=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
-> Add a driver framework for EEA that will be available in the future.
+It appears that in commit 7efd79c0e689 ("bnxt_en: Add drop action
+support for ntuple"), bnxt gained support for ntuple filters for packet
+drops.
 
-Hi, Xuan,
+However, support for this does not seem to work in recent kernels or
+against net-next:
 
-Would you please remove me from the CC list on future patches? I think
-I am only getting CC'd because I recently edited
-drivers/net/ethernet/Kconfig.
+  % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
+    rmgr: Cannot insert RX class rule: Operation not supported
+    Cannot insert classification rule
 
-Ethan
+The issue is that the existing code uses ethtool_get_flow_spec_ring_vf,
+which will return a non-zero value if the ring_cookie is set to
+RX_CLS_FLOW_DISC, which then causes bnxt_add_ntuple_cls_rule to return
+-EOPNOTSUPP because it thinks the user is trying to set an ntuple filter
+for a vf.
+
+Fix this by first checking that the ring_cookie is not RX_CLS_FLOW_DISC.
+
+After this patch, ntuple filters for drops can be added:
+
+  % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
+  Added rule with ID 0
+
+  % ethtool -n eth0
+  44 RX rings available
+  Total 1 rules
+
+  Filter: 0
+      Rule Type: UDP over IPv4
+      Src IP addr: 1.1.1.1 mask: 0.0.0.0
+      Dest IP addr: 0.0.0.0 mask: 255.255.255.255
+      TOS: 0x0 mask: 0xff
+      Src port: 0 mask: 0xffff
+      Dest port: 0 mask: 0xffff
+      Action: Drop
+
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: Joe Damato <joe@dama.to>
+---
+v3:
+ - Removed unused vf variable as suggested by Michael Chan
+ - Added Michael Chan's Reviewed-by
+
+v2: https://lore.kernel.org/netdev/20260130002323.2561266-1-joe@dama.to/
+  - Extract the FLOW_MAC_EXT and FLOW_EXT check so it happens unconditionally. 
+  - Eliminate the local variable ring, which was used in only one place and
+    call ethtool_get_flow_spec_ring instead.
+
+v1: https://lore.kernel.org/netdev/20260128222718.1679581-1-joe@dama.to/
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 6b15fedbb16f..53a83b6680c4 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -1346,16 +1346,17 @@ static int bnxt_add_ntuple_cls_rule(struct bnxt *bp,
+ 	struct bnxt_l2_filter *l2_fltr;
+ 	struct bnxt_flow_masks *fmasks;
+ 	struct flow_keys *fkeys;
+-	u32 idx, ring;
++	u32 idx;
+ 	int rc;
+-	u8 vf;
+ 
+ 	if (!bp->vnic_info)
+ 		return -EAGAIN;
+ 
+-	vf = ethtool_get_flow_spec_ring_vf(fs->ring_cookie);
+-	ring = ethtool_get_flow_spec_ring(fs->ring_cookie);
+-	if ((fs->flow_type & (FLOW_MAC_EXT | FLOW_EXT)) || vf)
++	if (fs->flow_type & (FLOW_MAC_EXT | FLOW_EXT))
++		return -EOPNOTSUPP;
++
++	if (fs->ring_cookie != RX_CLS_FLOW_DISC &&
++	    ethtool_get_flow_spec_ring_vf(fs->ring_cookie))
+ 		return -EOPNOTSUPP;
+ 
+ 	if (flow_type == IP_USER_FLOW) {
+@@ -1481,7 +1482,7 @@ static int bnxt_add_ntuple_cls_rule(struct bnxt *bp,
+ 	if (fs->ring_cookie == RX_CLS_FLOW_DISC)
+ 		new_fltr->base.flags |= BNXT_ACT_DROP;
+ 	else
+-		new_fltr->base.rxq = ring;
++		new_fltr->base.rxq = ethtool_get_flow_spec_ring(fs->ring_cookie);
+ 	__set_bit(BNXT_FLTR_VALID, &new_fltr->base.state);
+ 	rc = bnxt_insert_ntp_filter(bp, new_fltr, idx);
+ 	if (!rc) {
+
+base-commit: 6ad42b24413630199cb9f35d073f71768788f8dc
+-- 
+2.47.3
+
 
