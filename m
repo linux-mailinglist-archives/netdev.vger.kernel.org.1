@@ -1,191 +1,226 @@
-Return-Path: <netdev+bounces-255479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255480-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPwjKOE+fmk6WgIAu9opvQ
-	(envelope-from <netdev+bounces-255479-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:41:53 +0100
+	id cGBgKepAfmmPWgIAu9opvQ
+	(envelope-from <netdev+bounces-255480-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:50:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0166C360F
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:41:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50959C368D
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 480D23007B0D
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:41:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89D723032CD0
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4981B35BDBF;
-	Sat, 31 Jan 2026 17:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D79C362142;
+	Sat, 31 Jan 2026 17:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moPDA118"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hY+mskVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344FD35BDB8
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769881307; cv=none; b=OZM5pG8AcxS69Ik31cYWckfm/HaUwN+eRax8OoOUFmH/Ehoj2tRdZueLPdCmOmXdmczLfqBsHjye5KPiK6zWeE7Xp0fln7OL9hKBRLWo/5NEyBrJ05T89LgbEO/HRpYqSlsGpD215IHoTp2iOM3zzdp8T/a84e/oeH+L46NpG2k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769881307; c=relaxed/simple;
-	bh=U7DriEUcK86dPkxQhAKAzOz2fvIGiGMZpIz2TatGivM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=LIoXAcX81AVg4WtmDSpXo2K0V7MyFHqdxtVsIF6wo3gOM8WSQzAa9h9AU8RSAKurEvt4h31OWgto2r0e4/aCEogxh9FI/dOG3YphgdJ8WtttW+MMrCnJpdG6ZAkNOIM9dshgLNrFWWKJsYZIcL/GtlnzwyUWw6PgcZM7KK7x8x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=moPDA118; arc=none smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64970870c0dso3058564d50.0
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:41:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DE0361DB5
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769881824; cv=pass; b=I3k5JiP9yYXnsPufXQ0fb87bdnMolyVKqz94ffddjY4lN+qsI3/hgpJSX830PKwhJS/iLO8nby+nG/UMCfU5KEDGrQbL19myR6mCXtsqhVghCZ3vlj2dgHAT3wCTVass6MCVNx7nk11XYGFfMYc+CJ2ActWZkG2wrUvxPobMDDw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769881824; c=relaxed/simple;
+	bh=2Y2BujAHsclU7T5BY1yexqxfK32dnixNYzgQTFG2vI8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cRaaZOUo3VelfJh0xjARyyv2RGfDO1h8KSPFWHWx4YKHKbMxqozMJBWwuiHiwqi+X0ZWrHm3pErTflAQ37AAwWEFcxi5Jxho3LgGF5NpJ6/pzYU7ziRmdoLQ7L57L8PQGOJFT7vFYFgemLP5Bb41In/1f1IsQaSTaRIUIe+BlWc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hY+mskVR; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-501488a12cbso37664601cf.3
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:50:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769881821; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KsfjGpLS3iRp42ov3XZZp7srFY8aORK4WmqjryjY7rOBESveoiflzCCu2nTwdv4s7R
+         KXdjm7oFeYfNIYNE8YrM0q7OG8HsMCqwvUnF7gs8dx5U3CbN7oSfDRcG4kymO9j+wLUX
+         rJdh92DWml5UI7GFrCjSYYYklZIa9K6COLXoGfUw4dFH4B7XhbEBrYW/bWInIG+4Fc6a
+         OwNt6TYapBjKOTxBXvBL1+sqDs2uHai7ebJ1SYZ5iSchHsYc9NUKCynD1QNZnn5mjxt0
+         FfM+VTsiV85sOf0m64h6mxzjGWYC/XUtyI8Jg07yIY+hKo747RXH/cDEjRKFbtpt6sLK
+         FlFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=K00MmcXjKYVCCFxtITvYE2L51mTblfO92rCXNxYYf0I=;
+        fh=lVTVYsYmiuyJFbhGIHbxNRaEKPYGHeF1FnfZWxmq7tk=;
+        b=H3xdj3GlMrUDSoDRCSg22NYpTSlaB1jjiT+OQsV7avFas9wtAA4qSlBuDC13hzAlPY
+         8IfOHcZ89iWhaOLeO4UBkj+P0VdMst2G00PzRS1MpDSSoSQ9+/Eac/vPRs0QYRS0L3hp
+         q6mxfc9C4kDdmA4SD1MqI9VTJA2I8Xb1aVvUC1NPbNKcwtluzwUJMpgPZus2qcmoHuuF
+         QhI8SsssCALA361Oztsielpzoe5/uzHyQKzhQSxprOeUKJafJeMOzLt92FPhAYKU4zMT
+         DCJ+QADpwh6ZLyCWQjDKzh0x/3s/4VPQD3LKySIiR767VbRQr3MjY2B/o+nUDX1rG++N
+         XePw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769881304; x=1770486104; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1769881821; x=1770486621; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K8wf43Hct6xWw5pdPTFk6uNM8HLpNcMz3YOsh2PRxWU=;
-        b=moPDA118TxQwjrn0Aev18p+r85+lymEQQTSbbZ+HfOgZe3cy51sjeQ2ejt1HUG9wHU
-         zew1+nDq/sJHXhItqnNsDKmWd0C65hkaT8Jo/FaDUi71LK50TfhpokC+YZRUypQLOWnj
-         YC7Vh1dTHuUW8B26binG4AMJHXqI82Sk99EGeybjAyT0LGMG5zsGBYtnQh5wqiUxGhQg
-         E1D9KTvn6zYTqNCTQZRR19DzOW5Q56B1ape2aXl0WKwndHaCoFPvPmiJFRzq1IwPlK1J
-         sDzY8QFtjyHrIxfXrGloAVTM0Ocq7nQlPqdeNe+c1XGHb6dlve0v1YOF0PeW/REVRZOZ
-         IiJw==
+        bh=K00MmcXjKYVCCFxtITvYE2L51mTblfO92rCXNxYYf0I=;
+        b=hY+mskVRNAei7n2iwD7rLHJuVjqFE2SfWwleMjlKRWhACc1LqQpXiGtebAit9AxJdo
+         Kkw3V9PV3+Y7txeu5aBZ8+RL7EUecV06IP3d5UJYfW9eR/nDzJg6++HBxwn8gGOzGY+Y
+         dS5vaRdOxIB/z2DXZE9124uhXBaAV0/posoQEqUMrhhtyr27b4oNJXcwcfl3ZHXus073
+         H/3JAgrG768xsQPLaO/K+iOYY3fxFLi+BckWZSu7RwC1qadKarKJRyJcUZjNuopl5UXk
+         i9VVaxgoeDiZKnvcuFTa4P3TwUL+NMFpP62JRSB+rh3UQXeYVfd8Jh+xvpA9f/3aCHio
+         jISQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769881304; x=1770486104;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K8wf43Hct6xWw5pdPTFk6uNM8HLpNcMz3YOsh2PRxWU=;
-        b=WaK6AYHuhMttUQDCsULA5Ev9MGgc8aMw773Wrh/W2wlk8mabYhtCvwgCjPBMHY6joc
-         y1lc/C9mQ+ZaWmJok3M7wSthGtX6denjIEvbBdjGXy1vWn1I2HfuORrHEqF3J3kDVVCH
-         k7cxJDQq5JPLijWcIiaoTK7taNXgM0I0QD32zwBdXBemR+8Hi3KLwgacsASGBh/XqjN7
-         Br/L3nRgr+6+67814Q65LjLEq+TuubWKSYvJWi021C7DiRB/k4a/tQFIbdJgmw5xKHRE
-         JGpPj88MzM9hgogl2r9XBB+N6wfolNDtuRV+gaB4w2nmjLMmNwuHvX4IgUlZoq5LHDzN
-         O7Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCUOJb8sFo0xLXtnaXxn8VxmJNKMR7XmiPryqbBhC+7twV9inMKrk+9BeYq6FW0sBjY816ojSTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBif170q6z1MkyzGiGkv+VjtFBs/F/COnXLV1/skpEKqJ3ncuF
-	KWveoLwDYnLu1UlH9WjhpmpWTf+h4og7IDNzeChxsFqDhPkAYyi7Ddvd
-X-Gm-Gg: AZuq6aKvkwLIO+1Hza4Mn9QOphmjOPyhYEskcIdHYKFHtgxiA6KfD8UaU6fniW2etyj
-	eHOgVkH3BAR51LReOdJUie/ixlS9X6FqAsS3hcfuecBmddOIhqk7RmbYkaxT8jyrJdGKQqIyENB
-	eXQg88ln6fyeuRQYMhQNODAX0ps+MaPYrbgdc8YgNkvvoeTvK4636TSgxQG7iKdzcQXfMk2CyWo
-	D7nWRCmPmckAoJC4LERrOKsiljkGpoofllRk4V/eeUj8QbUFvtm5c4bdXwkOLH/uXmA9PwVYG1w
-	nuirV//9yC8p/tpwAm2ts4XwCKw32FSR5uh30YcmfN/KTrbHvVAAsUUoxIq63i7RA6wQkc4t1dn
-	8gcErWhSPBW03Tr+yXwkXef4+qYe5cSYG15ErvujziGXgi6sR/lGAPE6OabdRvL88WvCNgYA4OH
-	ymucpX6YcWj/pp39LRE/z4TEltJ2dwUS3viflLZBQk9E+lao4cqKi5Pw/k9wM=
-X-Received: by 2002:a05:690e:b89:b0:641:f5bc:6950 with SMTP id 956f58d0204a3-649a8521a3cmr5252742d50.84.1769881303890;
-        Sat, 31 Jan 2026 09:41:43 -0800 (PST)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79482761800sm48563027b3.4.2026.01.31.09.41.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jan 2026 09:41:43 -0800 (PST)
-Date: Sat, 31 Jan 2026 12:41:42 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- fengwei_yin@linux.alibaba.com, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.39472926ed88e@gmail.com>
-In-Reply-To: <20260130191845.404c5e64@kernel.org>
-References: <20260128070359.6762-1-fengwei_yin@linux.alibaba.com>
- <20260130191845.404c5e64@kernel.org>
-Subject: Re: [PATCH] net: procfs: Fix RCU stall and soft lockup in
- ptype_seq_next()
+        d=1e100.net; s=20230601; t=1769881821; x=1770486621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=K00MmcXjKYVCCFxtITvYE2L51mTblfO92rCXNxYYf0I=;
+        b=LZzcNBoxW56vApQV7rs7rXvYQZdF33jkZNzNTMCx3mo/p0kOIgwjwD2VuT+8PyyyF1
+         c/jQp8oIJOyRa+2DrJEKi8Eh8BughRGRYm0UuSgmBgotOXPv1ft7zyV2VE3ISIZ/mG8B
+         jP5Kq3Ia4CjdZz5nZtCshMo6npQBlmWq0YptfIbRm1up2vREA8M00VtKl4Bq2aX3+rX2
+         d7qL/uVGTVPpi/X1ZxsP9X8PxVkIHKn5dnFPoOA4hIlACt7bJd5lKrfXy+fw8XQmyEwV
+         3DeuwAGu2JxDS2p9EFXLHVw4RnmC0Tojb6kJaycnc0HDA2sF5S/Ne/Mcw/q1T8Wj9Fw9
+         /pAw==
+X-Forwarded-Encrypted: i=1; AJvYcCU58ex+wajBBfCzQsVqibAhciRXxf62EkrkZzbaQVxUfp2234eGA9dqTodgbYBiF9SqFOh5mu0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yygq84l3BFRTk7Se7Amlmjx/58oHOeIOMkr2puJYphDpdmsc6Fi
+	x+7Pr+Ta9EvC7TL8hoK67H3HGo/RjaPEYYI5FXwtBxG0B/0NRl2Z2ZoqrsrHYAi4+ukHlO5s3tT
+	lTfCqtLqgC+aZtfrOqtwjGKtQNNLCmHPui5+yHRBjqfiRzYLgldtYi8LxgUI=
+X-Gm-Gg: AZuq6aIQxAtONbJQ9+qdZNruV/U0ZOj/OJFA/PsfQQNudYb3sTVYFLbkm1ohVvPuCa5
+	XfMPbgpeOKOGQ3/D4xpNDSj1IkvNZiun1LhT/QXtbhIvsSQZd0847AiZhURGKqFoWqZsvRQZ1Jl
+	RksUKssjK2Gc6S11v8jVzNWdwSjB2qbfE6QcY5T05MlljBDjOFHuFRBjM8I5FQP8uNnwG92VX1o
+	POBWdONbp7MskI2MlBw8gvTQ3DK65p/oUcyPXSJw+y7iz8QX5cww1MRznTE/YrQUv8sew==
+X-Received: by 2002:ac8:7fc3:0:b0:4ee:4a3a:bd07 with SMTP id
+ d75a77b69052e-505d22b1c9dmr93283271cf.75.1769881820961; Sat, 31 Jan 2026
+ 09:50:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20260128070359.6762-1-fengwei_yin@linux.alibaba.com>
+ <20260130191845.404c5e64@kernel.org> <willemdebruijn.kernel.39472926ed88e@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.39472926ed88e@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 31 Jan 2026 18:50:10 +0100
+X-Gm-Features: AZwV_QhflGpRC729rLlBZ22ro3ARXyRtEbQgBianeoaVabhAatyw3CIVru6iAYQ
+Message-ID: <CANn89i+pv6ECtn5zrPYgUfcKkoEMF1BABfxQb13yTP41QhcGvg@mail.gmail.com>
+Subject: Re: [PATCH] net: procfs: Fix RCU stall and soft lockup in ptype_seq_next()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, fengwei_yin@linux.alibaba.com, davem@davemloft.net, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255479-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,linux.alibaba.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255480-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C0166C360F
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: 50959C368D
 X-Rspamd-Action: no action
 
-Jakub Kicinski wrote:
-> On Wed, 28 Jan 2026 15:03:59 +0800 fengwei_yin@linux.alibaba.com wrote:
-> > The root cause is in ptype_seq_next(): when iterating over packet
-> > types, it's possible that a packet type entry (pt) has been removed,
-> > its dev set to NULL, and pt->af_packet_net is not initialized.
-> > In that case, the function may return the same 'nxt' pointer indefinitely.
-> > This results in an infinite loop under RCU read-side critical section,
-> > causing an RCU stall and eventually a soft lockup.
-> > 
-> > Fix the issue by properly handling the case where 'nxt' points to
-> > an empty list, ensuring forward progress in the iterator.
-> 
-> > @@ -247,7 +247,7 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-> >  
-> >  	if (pt->af_packet_net) {
-> >  net_ptype_all:
-> > -		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
-> > +		if (!list_empty(nxt) && nxt != &net->ptype_all && nxt != &net->ptype_specific)
-> >  			goto found;
-> >  
-> >  		if (nxt == &net->ptype_all) {
-> > @@ -267,6 +267,9 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-> >  			return NULL;
-> >  		nxt = ptype_base[hash].next;
-> >  	}
-> > +
-> > +	if (list_empty(nxt))
-> > +		return NULL;
-> >  found:
-> >  	return list_entry(nxt, struct packet_type, list);
-> >  }
-> 
-> I'm not sure this fix works, TBH, we're dealing with an RCU list here.
-> The elements are not deleted with list_del_init(), so they won't
-> look "empty".
-> 
-> If the pt entries are under RCU protection I think the issue is that
-> af_packet is clearing pt->dev before waiting for the grace period to
-> expire.
+On Sat, Jan 31, 2026 at 6:41=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> Willem, is there a reason for that or just convenience?
+> Jakub Kicinski wrote:
+> > On Wed, 28 Jan 2026 15:03:59 +0800 fengwei_yin@linux.alibaba.com wrote:
+> > > The root cause is in ptype_seq_next(): when iterating over packet
+> > > types, it's possible that a packet type entry (pt) has been removed,
+> > > its dev set to NULL, and pt->af_packet_net is not initialized.
+> > > In that case, the function may return the same 'nxt' pointer indefini=
+tely.
+> > > This results in an infinite loop under RCU read-side critical section=
+,
+> > > causing an RCU stall and eventually a soft lockup.
+> > >
+> > > Fix the issue by properly handling the case where 'nxt' points to
+> > > an empty list, ensuring forward progress in the iterator.
+> >
+> > > @@ -247,7 +247,7 @@ static void *ptype_seq_next(struct seq_file *seq,=
+ void *v, loff_t *pos)
+> > >
+> > >     if (pt->af_packet_net) {
+> > >  net_ptype_all:
+> > > -           if (nxt !=3D &net->ptype_all && nxt !=3D &net->ptype_spec=
+ific)
+> > > +           if (!list_empty(nxt) && nxt !=3D &net->ptype_all && nxt !=
+=3D &net->ptype_specific)
+> > >                     goto found;
+> > >
+> > >             if (nxt =3D=3D &net->ptype_all) {
+> > > @@ -267,6 +267,9 @@ static void *ptype_seq_next(struct seq_file *seq,=
+ void *v, loff_t *pos)
+> > >                     return NULL;
+> > >             nxt =3D ptype_base[hash].next;
+> > >     }
+> > > +
+> > > +   if (list_empty(nxt))
+> > > +           return NULL;
+> > >  found:
+> > >     return list_entry(nxt, struct packet_type, list);
+> > >  }
+> >
+> > I'm not sure this fix works, TBH, we're dealing with an RCU list here.
+> > The elements are not deleted with list_del_init(), so they won't
+> > look "empty".
+> >
+> > If the pt entries are under RCU protection I think the issue is that
+> > af_packet is clearing pt->dev before waiting for the grace period to
+> > expire.
+> >
+> > Willem, is there a reason for that or just convenience?
+>
+> That would be wrong. Do we see it doing that somewhere?
+>
+> These handlers should get removed with dev_remove_pack. Or
+> __dev_remove_pack and observe the RCU grace period some other way.
+> I can review these, but was not aware of any abuses.
+>
 
-That would be wrong. Do we see it doing that somewhere?
+packet_notifier()
 
-These handlers should get removed with dev_remove_pack. Or
-__dev_remove_pack and observe the RCU grace period some other way.
-I can review these, but was not aware of any abuses.
-
-> -- 
-> pw-bot: cr
-
-
+case NETDEV_DOWN:
+if (dev->ifindex =3D=3D po->ifindex) {
+spin_lock(&po->bind_lock);
+if (packet_sock_flag(po, PACKET_SOCK_RUNNING)) {
+__unregister_prot_hook(sk, false);
+/* removed without a synchronize_rcu() */
+sk->sk_err =3D ENETDOWN;
+if (!sock_flag(sk, SOCK_DEAD))
+sk_error_report(sk);
+}
+if (msg =3D=3D NETDEV_UNREGISTER) {
+packet_cached_dev_reset(po);
+WRITE_ONCE(po->ifindex, -1);
+netdev_put(po->prot_hook.dev,
+   &po->prot_hook.dev_tracker);
+po->prot_hook.dev =3D NULL;                       // pointer set to NULL
+}
+spin_unlock(&po->bind_lock);
+}
+break;
 
