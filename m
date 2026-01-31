@@ -1,204 +1,176 @@
-Return-Path: <netdev+bounces-255390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEygCHnWfWn/TwIAu9opvQ
-	(envelope-from <netdev+bounces-255390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 11:16:25 +0100
+	id COo6AO3YfWlCUAIAu9opvQ
+	(envelope-from <netdev+bounces-255394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 11:26:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B98C187D
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 11:16:24 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 245A8C1920
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 11:26:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34215301DB9F
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 10:15:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 355EB3002B61
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 10:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2CA342CBB;
-	Sat, 31 Jan 2026 10:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1936133FE12;
+	Sat, 31 Jan 2026 10:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ujFcBGUs";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="o3Mf3maH"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A8529B789
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 10:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C44932B99F;
+	Sat, 31 Jan 2026 10:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769854533; cv=none; b=mFeZf11ibtycB65hotk5wJFS+O65Xfi0DE/8ck4/z9LvY4Ghb6DzWccv0mmvEKFqMKPzwEnWOHkNOXKwEwz9ZXAuPQcYMxk7perVQN1p1lFs9kobxgz9XCz225Ylwg6Cb4BDsxIs5AdSqTLd/3Pe6P92FKmWKnxg11y6zBPy+m4=
+	t=1769855204; cv=none; b=rAGGL4irw/u/c2xh9s3ZLkq7bcQQZD3n8bXccw1Sdbhek89M0Tb5k2Dn+6RNvV1gNsLLMIGiCDjCLpCB4W7JhIOi3QICMn8ejQ5A8DsUlwPjApM3HiCerUtuGePn8gIrHeoypSBFg/9uWrjE300KyX5cziwqpPim0zSx2ugzCkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769854533; c=relaxed/simple;
-	bh=yJEM19TKPK8Lkj2rFjErC95dTA2VwhZ8bpyLwZHtoXc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S0HoMTFW63AxE6ZEJtQ7qajH+JpXNAmxq5a1e4MDnJT9VJ7uIQHvDfdOOz5MCjvWITx5+XVanIW1CMM0ZCI3toElBP4BLc8WVNQHn7ZzrDdyKcLnq7REvtbLIjHCge2MEzsfP+USxQl5ORusrSI1gdE/wccEI1kqlEoXDi1m3lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vm80f-0002Sz-Ou; Sat, 31 Jan 2026 11:15:21 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vm80f-003OWn-1Y;
-	Sat, 31 Jan 2026 11:15:20 +0100
-Received: from blackshift.org (unknown [IPv6:2001:67c:1810:f051:d04a:1c63:e2:421c])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id E0CDF4DC575;
-	Sat, 31 Jan 2026 10:15:19 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Michael Tretter <m.tretter@pengutronix.de>,
-	Achim Baumgartner <abaumgartner@topcon.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 8/8] can: sja1000: sja1000_err(): use error counter for error state
-Date: Sat, 31 Jan 2026 11:11:49 +0100
-Message-ID: <20260131101512.1958907-9-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260131101512.1958907-1-mkl@pengutronix.de>
-References: <20260131101512.1958907-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1769855204; c=relaxed/simple;
+	bh=fSYUV7IS3o69dTdqJYCTCDDpkpgEmF9ZMQCatBCrxIY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=PstHHjJ1DIEtlA3xO7/oN6p3z6qcnGUPwjmqzP4gy0f27NypuIJ2JkTgdf+Tpv1wa6PL6b2bxhc0eJJvosS/AKI/lF97t2e3ChXdhuEzgszN/zU66tmVLAojrERySmF7pmijecH9AiCR+16r09uqbSFEqyEO74MA1A2MSGgXGHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ujFcBGUs; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=o3Mf3maH; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Sat, 31 Jan 2026 11:26:32 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1769855200;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fSYUV7IS3o69dTdqJYCTCDDpkpgEmF9ZMQCatBCrxIY=;
+	b=ujFcBGUsImqUv9Waw+ZtvA+p6fZ4LIbAmiS6QztDYuHyPXm/6tntcMoEMIYEjU8lOqcO84
+	JUUDN/6Kukil9yK//36hXfaWpntbhqwS7rpoYqgNp8J7vH2rEgPLSWBSOJCFhT370lMrz/
+	7gRztUGxucgA8FZM7aBr49ieKm/ipXKorVgUa2YcofyppS0h5L2o6S+vxx6wdHHiyZuQP7
+	4tDa97C40tHmopdF7sfKWCecB4iWhSWR6wxuCMHjQF5PnvXeR7OeAHevgmM2vMyuDCG3al
+	xfxPZ+QZ+kVu3G/6B75qY9SyFT5dp8UfXmQfVcVLA1dNhzZVtJfmKcKv2Y6xrg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1769855200;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fSYUV7IS3o69dTdqJYCTCDDpkpgEmF9ZMQCatBCrxIY=;
+	b=o3Mf3maHGlMurUXPFEwRlLNYIUYFFIj6zqdetL38/IGpMYAIMViNT6qayDv5qUM3kMIQ3B
+	XwdioEIZ+jxY1TDQ==
+From: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	=?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>, linux-kselftest@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-security-module@vger.kernel.org,
+	bpf@vger.kernel.org, libc-alpha@sourceware.org,
+	Carlos O'Donell <carlos@redhat.com>,
+	Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+	Rich Felker <dalias@libc.org>, klibc@zytor.com,
+	Florian Weimer <fweimer@redhat.com>
+Message-ID: <3c46fc49-b41b-44a2-b42a-669cc7e6bb02@linutronix.de>
+In-Reply-To: <20260130081741.425a92e0@kernel.org>
+References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de> <20260121192729.2095aa25@kernel.org> <20260130112309-28f2645b-e756-4173-96da-cf5c59191520@linutronix.de> <20260130081741.425a92e0@kernel.org>
+Subject: Re: [PATCH net-next v2 0/4] net: uapi: Provide an UAPI definition
+ of 'struct sockaddr'
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Correlation-ID: <3c46fc49-b41b-44a2-b42a-669cc7e6bb02@linutronix.de>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_FROM(0.00)[bounces-255390-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255394-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,davemloft.net,kernel.org,digikod.net,iogearbox.net,gmail.com,fomichev.me,linux.dev,vger.kernel.org,arndb.de,lists.linux.dev,sourceware.org,linaro.org,libc.org,zytor.com];
+	RCPT_COUNT_TWELVE(0.00)[40];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,pengutronix.de:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 70B98C187D
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
+X-Rspamd-Queue-Id: 245A8C1920
 X-Rspamd-Action: no action
 
-From: Michael Tretter <m.tretter@pengutronix.de>
+Jan 30, 2026 17:17:46 Jakub Kicinski <kuba@kernel.org>:
 
-The CAN controller sends the EPI interrupt whenever it reaches the error
-passive status or enters the error active status from the error passive
-status.
+> On Fri, 30 Jan 2026 11:34:15 +0100 Thomas Wei=C3=9Fschuh wrote:
+>>> Are all those selftests / samples getting broken by this patch set?=C2=
+=A0
+>>
+>> Yes.
+>>
+>> Some of them get broken by the new 'struct sockaddr', but some others ar=
+e
+>> already broken just by the new transitive inclusion of libc-compat.h.
+>> So any header starting to use the compatibility machinery may trigger br=
+eakage
+>> in code including UAPI headers before libc header, even for completely n=
+ew type
+>> definitions which themselves would not conflict with libc.
+>
+> Let's split the uAPI header changes from any selftest changes.
+> If you're saying the the selftests no longer build after the uAPI
+> header changes then of course we can't apply the patches.
 
-Instead of keeping track of the controller status in the driver, read the
-txerr and rxerr counters and use can_state_get_by_berr_counter() to
-determine the state of the CAN controller.
+Yes, the selftests don't build anymore after the uAPI changes.
 
-Suggested-by: Achim Baumgartner <abaumgartner@topcon.com>
-Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
-Link: https://patch.msgid.link/20260123-sja1000-state-handling-v2-2-687498087dad@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/sja1000/sja1000.c | 33 +++++++------------------------
- 1 file changed, 7 insertions(+), 26 deletions(-)
+"can't apply" as in
+* "can't apply separately"
+* "are unacceptable in general"
+* "are too late for this cycle"
+?
 
-diff --git a/drivers/net/can/sja1000/sja1000.c b/drivers/net/can/sja1000/sja1000.c
-index ae3244b63b65..67fccc15ed20 100644
---- a/drivers/net/can/sja1000/sja1000.c
-+++ b/drivers/net/can/sja1000/sja1000.c
-@@ -407,10 +407,9 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- {
- 	struct sja1000_priv *priv = netdev_priv(dev);
- 	struct net_device_stats *stats = &dev->stats;
-+	enum can_state state, rx_state, tx_state;
- 	struct can_frame *cf;
- 	struct sk_buff *skb;
--	enum can_state state = priv->can.state;
--	enum can_state rx_state, tx_state;
- 	struct can_berr_counter bec;
- 	uint8_t ecc, alc;
- 	int ret = 0;
-@@ -418,6 +417,12 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 	skb = alloc_can_err_skb(dev, &cf);
- 
- 	sja1000_get_berr_counter(dev, &bec);
-+	can_state_get_by_berr_counter(dev, &bec, &tx_state, &rx_state);
-+
-+	if (status & SR_BS)
-+		rx_state = CAN_STATE_BUS_OFF;
-+
-+	state = max(tx_state, rx_state);
- 
- 	if (isrc & IRQ_DOI) {
- 		/* data overrun interrupt */
-@@ -440,18 +445,6 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 		if (priv->flags & SJA1000_QUIRK_RESET_ON_OVERRUN)
- 			ret = IRQ_WAKE_THREAD;
- 	}
--
--	if (isrc & IRQ_EI) {
--		/* error warning interrupt */
--		netdev_dbg(dev, "error warning interrupt\n");
--
--		if (status & SR_BS)
--			state = CAN_STATE_BUS_OFF;
--		else if (status & SR_ES)
--			state = CAN_STATE_ERROR_WARNING;
--		else
--			state = CAN_STATE_ERROR_ACTIVE;
--	}
- 	if (state != CAN_STATE_BUS_OFF && skb) {
- 		cf->can_id |= CAN_ERR_CNT;
- 		cf->data[6] = bec.txerr;
-@@ -493,15 +486,6 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 			stats->rx_errors++;
- 		}
- 	}
--	if (isrc & IRQ_EPI) {
--		/* error passive interrupt */
--		netdev_dbg(dev, "error passive interrupt\n");
--
--		if (state == CAN_STATE_ERROR_PASSIVE)
--			state = CAN_STATE_ERROR_WARNING;
--		else
--			state = CAN_STATE_ERROR_PASSIVE;
--	}
- 	if (isrc & IRQ_ALI) {
- 		/* arbitration lost interrupt */
- 		netdev_dbg(dev, "arbitration lost interrupt\n");
-@@ -514,9 +498,6 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
- 	}
- 
- 	if (state != priv->can.state) {
--		tx_state = bec.txerr >= bec.rxerr ? state : 0;
--		rx_state = bec.txerr <= bec.rxerr ? state : 0;
--
- 		can_change_state(dev, cf, tx_state, rx_state);
- 
- 		if(state == CAN_STATE_BUS_OFF)
--- 
-2.51.0
+None of this is urgent.
+We can do the selftests in one cycle and the uAPI in another one.
+Feel free to pick up the patches as you see fit.
+(The mptcp changes already go through their tree, so need to be dropped her=
+e)
+I can also resubmit the patches differently if preferred.
 
+
+Thomas
 
