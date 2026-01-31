@@ -1,179 +1,119 @@
-Return-Path: <netdev+bounces-255504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGL3B/dofmnnYQIAu9opvQ
-	(envelope-from <netdev+bounces-255504-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:41:27 +0100
+	id 6hljC2JtfmkbYwIAu9opvQ
+	(envelope-from <netdev+bounces-255505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 22:00:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EE55C3E88
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:41:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0C75C3EDA
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 22:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 805BB300678A
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 20:41:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D4DAA300362D
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03A43783D5;
-	Sat, 31 Jan 2026 20:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9wfntQV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA9C36CDFA;
+	Sat, 31 Jan 2026 21:00:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93101E1024;
-	Sat, 31 Jan 2026 20:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD5036C5A2;
+	Sat, 31 Jan 2026 21:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769892082; cv=none; b=SGSWWqE8tnalFYWa1iRNqPzopx/Sjh3cT85GLhVgZew2g8KN4u8zEAnF6OBufndvgbyozyLslPm7wLkRr7RneIhuS1Vuch1oK8ANltSkHDBzvKPfeTDcgKwWo50/7mVZ7UK6QIpWPFIoXjJBAlApBPgGke9MU9o05gvN/DmMjyQ=
+	t=1769893214; cv=none; b=Bl6Q+cyqvPHUfRYaqqNPTQY2WdYaWjapE/ZF5enkzjG4vLMJsWarenf9Ow0lNthkNI3PaiUik/uiwdxjKTfcIdI13+QCNe34CsxlzBTaLz7qp5ipytsTKVdtlbz3hgYNUmelEku3gyh7NSU/NPtuxIlGUKn1GHIimMdvgrbi80g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769892082; c=relaxed/simple;
-	bh=0L9KHIRomV4Jf/gGMn8eAxBc1vQow6EnmR9i9GB45X8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=smoXNIgiq0UeF+8z2Jx/2IXhTnVLgyzu4E1PVDvod6ulUwgYEAXA/ElPFH3Q3g/x39kYO0i3I9vtwXXNT4ac98BhKD6e9+ViEpegfNqiow45OvBEeU6hijV//MqSMTxnlyEv/Vi4zyjvLDXDqrnZ33Q6U0xTU40/rfFT2BAUcxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9wfntQV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC0D0C4CEF1;
-	Sat, 31 Jan 2026 20:41:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769892082;
-	bh=0L9KHIRomV4Jf/gGMn8eAxBc1vQow6EnmR9i9GB45X8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s9wfntQV4G/S6o0H1SS0WjOXHPLfqyfakQr52mFSxxf9YnVifL+OnZlm+RBTK/Lo3
-	 tTef/j3HOyWcyLM2/32Rcj7B/BsaeKwRcVid1BJ8E/xVwXbWcOJGoJQxtLc7JMq1Nb
-	 S++LeiHWawD8rI9dv383XRRVJySmDjzZdic2qF5xGAjMQIQINcqgIYt40F7LHphoI+
-	 nP+czU+BscUZITDR/KpIDCycZNDeIWewB9wQxA2Kp+LwryBfdap8SAxHBkrzrixl+b
-	 NyJnQBbna9/YeEwYiz6SIgK1tXJteoDseT92oU7fb57uQcroVjRL55kIqMFIdyKxM6
-	 NJSSbtOYJ2GGg==
-Date: Sat, 31 Jan 2026 12:41:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kevin Hao <haokexin@gmail.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- linux-omap@vger.kernel.org
-Subject: Re: [PATCH net v4] net: cpsw_new: Execute ndo_set_rx_mode callback
- in a work queue
-Message-ID: <20260131124120.744bd931@kernel.org>
-In-Reply-To: <20260130-bbb-v4-1-2bd000a15c34@gmail.com>
-References: <20260130-bbb-v4-1-2bd000a15c34@gmail.com>
+	s=arc-20240116; t=1769893214; c=relaxed/simple;
+	bh=+oxbG0yy9swBgtz/1bCOAwZzhbzAHF4ojzsXTULOXak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z5yg9H9g1/UtpY/y7BVGNimk6LOAWQTfh9uJXR7UrSpuFL2s4OPizqY3qdmX9VVmqyk0diGZGeS/c8nfdDxK1QcpSJk5qGvCQVxSeKIdfI8W2lphD9hJDLD5ssefoN+OpwINSacOZ0UTiahIyCbanDMI4CZPspXUYIXxhH8onAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 5DC4C60186; Sat, 31 Jan 2026 22:00:04 +0100 (CET)
+Date: Sat, 31 Jan 2026 22:00:03 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netfilter-devel@vger.kernel.org, pablo@netfilter.org
+Subject: Re: [PATCH v2 net-next 0/7] netfilter: updates for net-next
+Message-ID: <aX5tQtxzcYzbYW6o@strlen.de>
+References: <20260129105427.12494-1-fw@strlen.de>
+ <20260130081245.6cacdde2@kernel.org>
+ <aX0B1xaFGL43xxUn@strlen.de>
+ <CANn89iKUV07+84PVq0cHe3vMaSGNTQzhq9=xetg+_P2DmsPmQQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANn89iKUV07+84PVq0cHe3vMaSGNTQzhq9=xetg+_P2DmsPmQQ@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255504-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255505-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_NA(0.00)[strlen.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6EE55C3E88
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B0C75C3EDA
 X-Rspamd-Action: no action
 
-On Fri, 30 Jan 2026 13:34:07 +0800 Kevin Hao wrote:
-> --- a/drivers/net/ethernet/ti/cpsw_new.c
-> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+Eric Dumazet <edumazet@google.com> wrote:
+> > > Hi Florian, some more KASAN today:
+> > >
+> > > https://netdev-ctrl.bots.linux.dev/logs/vmksft/nf-dbg/results/496421/vm-crash-thr0-0
+> >
+> > > [ 1144.170509][   T12] ==================================================================
+> > > [ 1144.170759][   T12] BUG: KASAN: slab-use-after-free in idr_for_each+0x1c1/0x1f0
+> > > [ 1144.170922][   T12] Read of size 8 at addr ff11000012a16a70 by task kworker/u16:0/12
+> > > [ 1144.171079][   T12]
+> > > [ 1144.171133][   T12] CPU: 1 UID: 0 PID: 12 Comm: kworker/u16:0 Not tainted 6.19.0-rc7-virtme #1 PREEMPT(full)
+> > > [ 1144.171137][   T12] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> > > [ 1144.171139][   T12] Workqueue: netns cleanup_net
+> > > [ 1144.171145][   T12] Call Trace:
+> > > [ 1144.171147][   T12]  <TASK>
+> > > [ 1144.171149][   T12]  dump_stack_lvl+0x6f/0xa0
+> > > [ 1144.171154][   T12]  print_address_description.constprop.0+0x6e/0x300
+> > > [ 1144.171159][   T12]  print_report+0xfc/0x1fb
+> > > [ 1144.171161][   T12]  ? idr_for_each+0x1c1/0x1f0
+> > > [ 1144.171163][   T12]  ? __virt_addr_valid+0x1da/0x430
+> > > [ 1144.171167][   T12]  ? idr_for_each+0x1c1/0x1f0
+> > > [ 1144.171168][   T12]  kasan_report+0xe8/0x120
+> >
+> > Sigh.  Doesn't ring a bell, I will have a look.
+> 
+> Could this be related to "netns: optimize netns cleaning by batching
+> unhash_nsid calls" ?
 
-What's your plan for fixing drivers/net/ethernet/ti/cpsw.c ?
-My preference would be to post both of the fixes at once,
-I think this version is quite close, just a couple of nit picks
-below..
+Thanks Eric, that seems plausible.
 
-> @@ -248,15 +248,25 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
->  	return 0;
->  }
->  
-> -static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
-> +static void cpsw_ndo_set_rx_mode_work(struct work_struct *work)
->  {
-> -	struct cpsw_priv *priv = netdev_priv(ndev);
-> +	struct cpsw_priv *priv = container_of(work, struct cpsw_priv, rx_mode_work);
->  	struct cpsw_common *cpsw = priv->cpsw;
-> +	struct net_device *ndev = priv->ndev;
->  
-> +	rtnl_lock();
-> +	if (!netif_running(ndev)) {
-> +		rtnl_unlock();
-> +		return;
-
-since the "undo" logic is getting complex you should use a goto.
-Replace the unlock and the return; here with:
-
-		goto unlock_rtnl;
-
-> +	}
-> +
-> +	netif_addr_lock_bh(ndev);
->  	if (ndev->flags & IFF_PROMISC) {
->  		/* Enable promiscuous mode */
->  		cpsw_set_promiscious(ndev, true);
->  		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, priv->emac_port);
-> +		netif_addr_unlock_bh(ndev);
-> +		rtnl_unlock();
-
-
-		goto unlock_addr;
-
->  		return;
->  	}
->  
-> @@ -270,6 +280,15 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
->  	/* add/remove mcast address either for real netdev or for vlan */
->  	__hw_addr_ref_sync_dev(&ndev->mc, ndev, cpsw_add_mc_addr,
->  			       cpsw_del_mc_addr);
-
-And place a labels here:
-
-unlock_addr:
-
-> +	netif_addr_unlock_bh(ndev);
-
-unlock_rtnl:
-
-> +	rtnl_unlock();
-> +}
-
->  	for (i = 0; i < cpsw->data.slaves; i++) {
-> -		if (!cpsw->slaves[i].ndev)
-> +		ndev = cpsw->slaves[i].ndev;
-> +		if (!ndev)
->  			continue;
->  
-> -		unregister_netdev(cpsw->slaves[i].ndev);
-> +		priv = netdev_priv(ndev);
-> +		disable_work_sync(&priv->rx_mode_work);
-> +		unregister_netdev(ndev);
-
-I understand that this is safe but I think that more logical ordering
-would be to shut things down _after_ object is unregistered.
--- 
-pw-bot: cr
+Did not yet have much luck with reproducing this so far, I will
+look at this in more detail lon monday.
 
