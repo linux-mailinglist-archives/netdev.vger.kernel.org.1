@@ -1,240 +1,244 @@
-Return-Path: <netdev+bounces-255488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255489-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LZ5OQ5Mfmm/WwIAu9opvQ
-	(envelope-from <netdev+bounces-255488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:38:06 +0100
+	id aTb8FaNMfmnQWwIAu9opvQ
+	(envelope-from <netdev+bounces-255489-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:40:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E0FC387C
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:38:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B474EC389C
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:40:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0031D3019FF9
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:38:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4A4E4301495C
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB5536683D;
-	Sat, 31 Jan 2026 18:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D84F366DA9;
+	Sat, 31 Jan 2026 18:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ff+QUqlx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XuJdc+DM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E55366054
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 18:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769884684; cv=none; b=Yda+dSbqmmzLUR400gdCJVyX8b3lRDElEUUkpJkmvHz4V6oh++ZZkxvCnNuJLOISO3j0KlfzNVjbR+OfkJs8q/kUM+QyyFBqRa5G/Hyd5Piwh0I03U5crjGtLa0j1+20QyjwxxF9DrDU6f3QgWhChUogWwanVfXZ1wFhHGdVE6s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769884684; c=relaxed/simple;
-	bh=eQO+qr/OAGr9BumSBlJp5RbhUoi9LqCr0xzqBeub5g4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=U41JbdH9JtjYiIeCh/JPvIxgLPPsx1o5pnPr1Gvg1U7xv7GIVJlEDru5cvii4V7JKvKBtflKqF6kBvCLa8s/WxLFv0ObwYfUX1yb5bizM/N3vGKctOVATIQSOfdAGZObh6rJuAjToMBshlR+qQyrM8I5iSSQ/KPwF4YaontFUi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ff+QUqlx; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6B233AD8B
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 18:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769884831; cv=pass; b=Olswe50ZyEIw0ZN+Cg+lsGYuRT4wEFCq2JK2Wrizocx9DgMFMYwaveZY9d44/9WhOxWIDWNsMYi3H/L/Pk6ed/9HO/Uryue21GmzY2McPSsNyWRb8pZ3rrPKmQ3BP131WeK0UnUJTY0rinV5bj8FOQUrGblqcRO8PMF1c5OxIv0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769884831; c=relaxed/simple;
+	bh=PRn824+A/c7Ht8xBpSIA1cULL2eht/BI7CyXtooYyNA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PLNqDhd6Q7SZplp2eJeI2M/N2I1D8TEbxJdPH4/LOwPYwMHX6/nWrshh4winxgW4Xq/o/S9qgo1TSvPlvYsM8WHiIXBHGoOJZV2SKK+F88k74xeuosV8nzk48l2DA+L3Ptw08gadF15k1UT2OTuP8y/7dDvoj6EOTFXiJp9VzLo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XuJdc+DM; arc=pass smtp.client-ip=74.125.224.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-79456d5ebf9so30532347b3.2
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 10:38:02 -0800 (PST)
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-649523de905so4815806d50.1
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 10:40:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769884829; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IkkOdmlqhHphmEKJeXK0O/65YHgYQOhxcLwZf0MfK5LSx4toeT+auaENE1wwQoXoLC
+         cbIR1gT/Dh3o5dOsJF7ZmURR4pIlqnDYeIJW2McYuw9Yg9zEIs4ziKuFS/qHo3xF3AlF
+         +TaN9e0u36DUNFialT9YR7nsxXbG68tzsOvXA3EqG2S6i/vVC6Vxf5eqeYPIIylt5y+8
+         mv2DPmTTPtrOnLQtPxCAZlR+N7oTCA7HoM0EKf/Yt9UbJxYF3xBL5BsVX+fNJnyb5Hp5
+         oZrkDycvJOb6o+Me4zdRgwPEAdrLbC00GVc/tHHVGOMqe6gaV0RX/4iMH0XkOKEKUgiK
+         g4rw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZAAZwuiurkfmrGKZybeACCskuypcxNx54sP1LxN8Mkg=;
+        fh=gjhgfmB2zH3N4yqBesZ43KlkX//64+Y4PaGLjhSFiSI=;
+        b=HyNZGdM4ixwPLAUZhEhz1voN/Xu1Iwj+81XdQ8RqB+uxeot6amJXBxRr1ulu1m+voq
+         Uj78VQZwsWx8LIiLDBVe/RUYn3oLvRLrr3BkplxaVKQVBVhGTi8iIFI/OISd374ulU1w
+         NJIhu6l/Ku/OD6Uf8paA8ugSyfTWdyIB+mRBejp7QL9oIp0bn3v99bcVKRIjjF88kHhX
+         PGAUQdAg5t6Wfi42UxCuYKtAb2E4KH91ZTz+y4D0zUo+egcLi4mfh98JhrcTeDWcuaQC
+         1r5cCaSCdg65eXOfuJsSDIv0VyDcCFRq0d5WlK/cMnOOau8rjZMC+FwJay36h1BvLvyA
+         mu1w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769884681; x=1770489481; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769884829; x=1770489629; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MTDA4EVY1dnSx40dh4iSEtt/xAzscLfbujiihQuN6II=;
-        b=ff+QUqlxZktBpcFgaxIRBYpmf/MiVlduPaQytdwY8X7/sLXiO3FUeBR6ANBRKBXZiE
-         BfwAfYfMAsKkIs3Tmq0hoQP8rFSRV7khEeVyzcO7FgayplnfG8FigTaJ+vxDIDmXbx+e
-         WutNRTblft6QgAZOzbQO6yTCG0bw/A7Eq4/W61z4P8sf/sxwLDwAmNedZeK39bUgAIld
-         tW6GLaN3+UOJEXvEVq/WjfsZJP8EcxWWQr8TnR9URsLwok8KIu3uETsn/71Gpozyocr1
-         W3pPy2I32OgGf7uj4zlpC4hV81/8WRdLsb8dB7U25qUhhz5vPP4JQ87WOY2c87PW8Oje
-         gzYQ==
+        bh=ZAAZwuiurkfmrGKZybeACCskuypcxNx54sP1LxN8Mkg=;
+        b=XuJdc+DMAGQDyljVXnnF35jRAGnQJnn4Xju31mOumd5wW1jFZeC7rNtMgfjASTmoL5
+         +sw0iWZfXsDpbKsc3oO+9QWjVzGa99cHuc0GT3Zn/TyAf1q3KZwu84i4D+hf5+LmVi2s
+         1dudSdYTvaY+i+hCtDGe40sfvvtyPP7CypoQ3QRYYcxlI23zT3fi/cqciuo/ST87NIUA
+         uXN1S+Vtk/92AiZcD6aZp5iaLPpEDA7vhoKTK/QZ2ebmN0B9kU00YcEMUK8w9Z3Dd/LP
+         RkMLxmLhTLqGGGt9bxLp8Rw4+xj5rvGQjf+QpNYL+8jOeLC4fAx/Lh3KjHPY/T02eDRO
+         WsTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769884681; x=1770489481;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MTDA4EVY1dnSx40dh4iSEtt/xAzscLfbujiihQuN6II=;
-        b=gUPEbXPBOFVgG1e/DNRLv/Wvplttb2aApHwtz/cCcKFibjkq1vKXV2PjDWYn0Q0j21
-         KoXAeJr+bHhT2EItlIj7/VXnLX7d2iRmpYtSryA8NY6xqPoRRDv/ftTGNYGMZp8Kei3U
-         gPatiblYXXZsKK3kh1XeBc58OnYNd9yA0vT2hHZZqfMS36sDZOWA4FpTT4lNHMvvzH7K
-         noqm+6rjSpS2qYhLqoA8YHqpwn2Pj4KhyzWOctdiuzjuVWSeBs2WsBAkpvv7f7u9Eb4Z
-         jHolQW/qO4MwQKTjH9zTaJMIyUeDlQpMZomoPOQJGnYNK1mRdwS1m3nqwHpJHejavINs
-         LWHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtP9/cpCF96XDoFEjek2bSLkXC5K/rs0Yvp7wEje1Nx/i5U068yH+SgwXmDdI4aPY9xDWFyDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgKFAFBRnSWU5U+5pcVvoT5i49+M0MnYlpG0hh6OGvh9TVirl0
-	i/ld/1giDqtTsxuRI4+rTPjmQcpHlSI0Rkjcw5GN12CIRFU8O+uXY1ie
-X-Gm-Gg: AZuq6aJZn27BjniX9Gsga/G9NKcdvFczJ+onQ9a0uolM/Y0uCeRRKl+EVp5BodsFvOj
-	gGkDENdrVa1vGST7CYXqTWJkEsuxwaIsC+JBuKsfq1/rOJEnE1ECfJQDM1UuE6Dnsba5etq1ONL
-	NFFtQy/4lA+FX/dnSvrjGxkIkJLrRe/ALodnOednmkr9IYpFLLWr+wMlEN49oAPfmb3VupEuIOH
-	o4V5G1AtVJ49fRUSmLrNEVVVjfH+w5HII0fUr5yxl4X4/i9MQLWzA972XtvRmmrqP69Mgtn9lzE
-	+WBLcMhfW00Mo7JCQxtWCxhwzpv6nYUqFYMUeTbo5gpOilHeO4LsEQ0kUO/yb8HwifV7xck8e3a
-	8jcqtlFfk7HaoOqUeyluEDuWryBvmBdm3/S+hRtynBlYT5dNKD2aTppKDEhamxUmuGQBXagq/yF
-	Fyzu/b7aje9Fu0llVS5ExVyNl/smD3xEw6qn/K7OmX7RgkSoXd224VOXVU7UE=
-X-Received: by 2002:a81:ee06:0:b0:786:6179:1a47 with SMTP id 00721157ae682-7949dfba546mr42643307b3.44.1769884681521;
-        Sat, 31 Jan 2026 10:38:01 -0800 (PST)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79482766c5dsm48500557b3.12.2026.01.31.10.38.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jan 2026 10:38:00 -0800 (PST)
-Date: Sat, 31 Jan 2026 13:38:00 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- shuah@kernel.org, 
- willemb@google.com, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.1c864b559c885@gmail.com>
-In-Reply-To: <20260131095047.2096ac8f@kernel.org>
-References: <20260130192912.826454-1-kuba@kernel.org>
- <willemdebruijn.kernel.29ba7c9e89f32@gmail.com>
- <20260131095047.2096ac8f@kernel.org>
-Subject: Re: [PATCH net-next] selftests: drv-net: rss: validate min RSS table
- size
+        d=1e100.net; s=20230601; t=1769884829; x=1770489629;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZAAZwuiurkfmrGKZybeACCskuypcxNx54sP1LxN8Mkg=;
+        b=S9CgJUGOpWKi4lj2/hOo8veAXmljlrtxUTi/e9AcTe6rQpF0RfTpa+WFp7mm7SRKVP
+         ODrUnISPVsf1OG0OcbTy29mjBLxJuZh5qPznebOz3bje36diffTXCSUz/taHHm4yPwrg
+         R4dXzkGyVltnfnDRbSTHQfYaZ1S+A39VocQ4ioalO3sl+TLMHZib3mCsCSeDQTxFrZpN
+         AmiU7D5PugYPD53drxu3pNa+mFemCdt45ortva5X/V3zusZlgQsfSEP8aYTMbI69Wdij
+         zz/c1L3TrtxxvcvZTojFpfvKHoo8WUNGBOXbZ0rKP+61FENq71PiSTN6jB/ENCH4sq8y
+         8wxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzlyRRmfGU1BpGCi+mn2RTDwAT3ucVy8iJ2qcYHCQlEG8AN7CZNaDgZ3Kb+Msbg6Pa+pAaiPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytSnnLSp6xko62TdOKAam7L7zma8rf+qyp/zLLALBNzRmwOgs5
+	yn3t62rfabbXrVXRNH/HGfVRtGd5yYcziEpfD669hAOIRwi4YkvWJNjVgFUGaVejn8gKIvWWvvf
+	0QvyGPpRctqU5cfkwGhh0A8tdzsgufZo=
+X-Gm-Gg: AZuq6aK9E/9qPUm4oJMKlq1qbORTr2D++8IvC0yFwIJgAxzge8DZgG732c3H1rgFQEn
+	hNqvQ4yWWA0uYB8bgVVoCoo99hlXajhM/6dGvI9bTz3tX+vO3ASwK3vaulCfHhZiPWz2UMBxd5n
+	LNJSgcGlpsyruDS85dH+OXE84a9mbO3HdQdFjdk8J3lDK+Q7wcEwzZLOGdDTcwI8RnmfVru4ZVx
+	qNetZBQgq+jw0rdRBR3Rxwz12RzpnzIYSeEGNqFcHdW+W3T7WpJKsKXdKL7l9oDLfGN/EY=
+X-Received: by 2002:a05:690e:118a:b0:649:4621:92a3 with SMTP id
+ 956f58d0204a3-649a8e90d32mr5040731d50.45.1769884828958; Sat, 31 Jan 2026
+ 10:40:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20260131050920.2574084-2-ameryhung@gmail.com> <fc5f36c2f50b99cba8b9b6d020a7400911a84c372ca15be7707c8513239228f3@mail.kernel.org>
+In-Reply-To: <fc5f36c2f50b99cba8b9b6d020a7400911a84c372ca15be7707c8513239228f3@mail.kernel.org>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Sat, 31 Jan 2026 10:40:18 -0800
+X-Gm-Features: AZwV_QgZdXjlzSWfe-SaHSbm78i9UD87mqJEBMyrqX5PVwUTPucEaKRgHovIzR8
+Message-ID: <CAMB2axMA_8t6M2RJ97Y-9BB_E3N0h=9ZKArazbNKS_ySuNkKAQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 01/16] bpf: Select bpf_local_storage_map_bucket
+ based on bpf_local_storage
+To: bot+bpf-ci@kernel.org
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
+	martin.lau@kernel.org, kpsingh@kernel.org, yonghong.song@linux.dev, 
+	song@kernel.org, haoluo@google.com, kernel-team@meta.com, ast@kernel.org, 
+	eddyz87@gmail.com, clm@meta.com, ihor.solodrai@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255489-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-255488-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 58E0FC387C
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B474EC389C
 X-Rspamd-Action: no action
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Fri, Jan 30, 2026 at 9:33=E2=80=AFPM <bot+bpf-ci@kernel.org> wrote:
+>
+> > diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_stor=
+age.c
+> > index e2fe6c328..6615091dd 100644
+> > --- a/kernel/bpf/bpf_local_storage.c
+> > +++ b/kernel/bpf/bpf_local_storage.c
+>
+> [ ... ]
+>
+> > @@ -368,9 +371,13 @@ static void bpf_selem_unlink_map(struct bpf_local_=
+storage_elem *selem)
+> >  void bpf_selem_link_map(struct bpf_local_storage_map *smap,
+> >                       struct bpf_local_storage_elem *selem)
+> >  {
+> > -     struct bpf_local_storage_map_bucket *b =3D select_bucket(smap, se=
+lem);
+> > +     struct bpf_local_storage *local_storage;
+> > +     struct bpf_local_storage_map_bucket *b;
+> >       unsigned long flags;
+> >
+> > +     local_storage =3D rcu_dereference_check(selem->local_storage,
+> > +                                           bpf_rcu_lock_held());
+> > +     b =3D select_bucket(smap, local_storage);
+>
+> The commit message states: "This is safe since a selem is always linked t=
+o
+> local_storage before linked to map."
+>
+> Is this claim accurate? Looking at bpf_local_storage_update(), the order =
+is:
+>
+>     /* First, link the new selem to the map */
+>     bpf_selem_link_map(smap, selem);
+>
+>     /* Second, link (and publish) the new selem to local_storage */
+>     bpf_selem_link_storage_nolock(local_storage, selem);
+>
+> The comment explicitly says "First, link the new selem to the map" which =
+is
+> the opposite order from what the commit message claims.
+>
+> Similarly, in bpf_sk_storage_clone() when new_sk_storage is non-NULL:
+>
+>     bpf_selem_link_map(smap, copy_selem);
+>     bpf_selem_link_storage_nolock(new_sk_storage, copy_selem);
+>
+> Since bpf_selem_alloc() does not initialize selem->local_storage (it only
+> sets SDATA(selem)->smap), and bpf_selem_link_storage_nolock() is what set=
+s
+> selem->local_storage, wouldn't this mean bpf_selem_link_map() reads NULL
+> from selem->local_storage?
+>
+> With local_storage being NULL, select_bucket() would compute hash_ptr(NUL=
+L)
+> which returns 0, placing all newly linked selems into bucket 0. Later whe=
+n
+> bpf_selem_unlink_map() runs, selem->local_storage has been set, so it
+> computes a different bucket and tries to unlink from the wrong bucket.
+>
+> The next commit in the series (82de4fd08 "bpf: Convert bpf_selem_unlink_m=
+ap
+> to failable") introduces bpf_selem_link_map_nolock() to fix this for
+> bpf_local_storage_alloc() and bpf_local_storage_update(), but
+> bpf_sk_storage_clone() still uses bpf_selem_link_map() and appears to
+> remain affected throughout the series.
 
-Jakub Kicinski wrote:
-> On Sat, 31 Jan 2026 12:18:55 -0500 Willem de Bruijn wrote:
-> > > +def _test_rss_indir_size(cfg, qcnt, context=0):
-> > > +    """Test that indirection table size is at least 4x queue count."""
-> > > +    ethtool(f"-L {cfg.ifname} combined {qcnt}")  
-> > 
-> > Remind me: does this work with devices that advertise RX N TX N rather
-> > than combined N?
-> 
-> It doesn't. But I haven't seen a device which doesn't at least
-> advertise combined made in this decade. I started typing this with
+AI is right here. I will fix the bug. We should follow the
+local_storage then map linking order in these three places.
 
-I was indeed thinking of mlx4 as one example.
-
-> support for "rx" vs "combined" initially, but it complicates the code
-> for no real benefit.
-> 
-> If a driver which doesn't have "combined" starts reporting results 
-> to NIPA I'll care, right now - CBA.
-
-Fair. It's good to gracefully and skip on older platforms.
-I guess the test does that by virtue of the KsftSkipEx if
-combined-max < 3. Ack.
-
-> > > +    rss = _get_rss(cfg, context=context)
-> > > +    indir = rss['rss-indirection-table']
-> > > +    ksft_ge(len(indir), 4 * qcnt, "Table smaller than 4x")
-> > > +    return len(indir)
-> > > +
-> > > +
-> > > +@ksft_variants([
-> > > +    KsftNamedVariant("main", False),
-> > > +    KsftNamedVariant("ctx", True),
-> > > +])
-> > > +def indir_size_4x(cfg, create_context):
-> > > +    """
-> > > +    Test that the indirection table has at least 4 entries per queue.
-> > > +    Empirically network-heavy workloads like memcache suffer with the 33%
-> > > +    imbalance of a 2x indirection table size.
-> > > +    4x table translates to a 16% imbalance.
-> > > +    """
-> > > +    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-> > > +    ch_max = channels.get('combined-max', 0)  
-> > 
-> > Same here: not all drivers set this.
-> > 
-> > Perhaps we should skip if absent?
-> > 
-> > And does combined-max mean all queues across all contexts, or per
-> > context?
-> 
-> Could you rephrase? Not sure I understand.
-
-I implicitly assumed mutually exclusive sets of queues associated with
-the two contexts.
-
-If max channels is a driver global limit, then cannot 
-exclusively assign max channels to both contexts.
-
-But my assumption was wrong of course. Multiple RSS contexts can have
-the same queues in their indirection tables. And this test does not
-include any flow steering to an exclusive (set of) queue(s) for the
-additional context.
-
-I had not previously given any thought to how additional contexts'
-indirection tables are (expected by the kernel to be) initialized.
-
-> channels are interrupts, we use it in place of max Rx queues because 
-> we don't have an API to allocate queues directly.
-> 
-> When queue count is changed and the user did not set the indirection
-> table of the main context the main context's indir table is auto-
-> -repopulated. It may also be resized.
-> 
-> The indir tables of additional contexts are not repopulated.
-> We do not have the concept of "default" indirection table in 
-> an additional context because it has no practical use (just use
-> the main table if you don't care about the queue selection!?)
-> Since we don't have an explicit API to size them, (yet),
-> we expect the size of additional contexts to follow the size 
-> of the main indirection table.
-> 
-> If a table is resized the expectation should be that the driver
-> folds/unfolds the existing table eg [0, 1, 0, 1] can fold into [0, 1]
-> or unfold into [0, 1, 0, 1, 0, 1, 0, 1]. Resizing tables of additional
-> contexts is currently broken / no possible. My colleague is supposed
-> to be working on fixing that but appears to be making slow progress :/
-> 
-> > The test seems to imply the second. My intuition was the
-> > first. Is it clearly defined across devices. per ethtool_channels,
-> > seems per device?
-> > 
-> >   * @max_combined: Read only. Maximum number of combined channel the driver
-> >   *      support. Set of queues RX, TX or other.
-> 
-
-
+>
+> >       raw_spin_lock_irqsave(&b->lock, flags);
+> >       hlist_add_head_rcu(&selem->map_node, &b->list);
+> >       raw_spin_unlock_irqrestore(&b->lock, flags);
+>
+>
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a =
+bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
+E.md
+>
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/215393=
+40647
+>
+> AI-authorship-score: low
+> AI-authorship-explanation: The commit has typical human characteristics: =
+domain-specific BPF knowledge, concise explanations, and follows kernel con=
+ventions.
+> issues-found: 1
+> issue-severity-score: high
+> issue-severity-explanation: Hash bucket mismatch causes selems to be inse=
+rted into wrong bucket and never properly unlinked, leading to hash list co=
+rruption.
 
