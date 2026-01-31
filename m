@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-255296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oI2tMwNafWmBRgIAu9opvQ
-	(envelope-from <netdev+bounces-255296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:25:23 +0100
+	id sMcgCFxafWmBRgIAu9opvQ
+	(envelope-from <netdev+bounces-255297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:26:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1638BFF7C
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:25:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE28BFFDE
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 077E93008C33
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:25:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F3863052600
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E507330B3E;
-	Sat, 31 Jan 2026 01:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F6C3328EA;
+	Sat, 31 Jan 2026 01:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luLlsLUP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SC1oEpeL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6588B318146;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4253314B8;
 	Sat, 31 Jan 2026 01:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769822713; cv=none; b=NZXvV3qihq9VR0+JiuKqC9W8PdkmnKsuqzCwtvWh+PK3L+vFZYD/dKiBaxuQmCgutygkbLqn507qnDU0vr0yLuCvkIJ+5Hk8VxdWcXkFmXeQIW2pxySlwpYZ0Agg0g+Ttqwun8Wqu7RAdHFz2kKZvz+PS+X/0X8Vx9a5XRaMpBE=
+	t=1769822713; cv=none; b=lkQBH6SyD3Fh6D7+Izpzb8UswkMSb+aVWClVur/h7rcClwshQRAQWZLdWxSwPftoQ3RgDudsRJDkxnrGNI61TO9X/OnSUzTpCHwt+5oEiUOgg6qtpldV7dq1wuKtTrHVwgV7ZnUM3vMiegNv7ELWwISIq7f66jsHwcotQHIq/zA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769822713; c=relaxed/simple;
-	bh=h4t6CKlu7x8fZ7JonwTHLu30EuoT2G+8oJphjmZ0WHo=;
+	bh=YZvCmVjouOSOm1pcxaO24JXHnRqJmdoBqq6+LTkBkhE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DRM0jdOj+Bfi9cz/2d5uLGE5q75hdhjFNkf5NWWwZPHaQNVoQSsK4H0ejfrC/fHDKOpu3q3xtF+lforMgafW58xY6Sex+gmkPgrrTv+4S+vRFBxnmyVJvLgDGjpajBvDx7AnpWfUccgHXQjIzosW1qkPF1Zrm3xqKP4k0u6fXQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luLlsLUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B912C19425;
-	Sat, 31 Jan 2026 01:25:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nuLprYXLB3L4bLcjSjRJMywgLlHhOkeXJXzkr0cvwImvhmCnGXwXXPksVQWuTYg6/lHAWkwq5wVRXc1VLo/97dV0gztIDupQrpGtYUitGWPTuS/VxRJEVPKvnxBj7h2RTddamNUWX9uDPIjiTuDr84kL8l2xXXCp0LFLkmLci0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SC1oEpeL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29ED4C4CEF7;
+	Sat, 31 Jan 2026 01:25:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769822713;
-	bh=h4t6CKlu7x8fZ7JonwTHLu30EuoT2G+8oJphjmZ0WHo=;
+	bh=YZvCmVjouOSOm1pcxaO24JXHnRqJmdoBqq6+LTkBkhE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=luLlsLUPqrtCnCtCWUPKI4SYUNY9N1HRgcxPba7w3+Pw0L4H8WN8+HxVew6f4oehL
-	 0s+4oLvXvFzfWLjmIN3HTHcFtvMrSn6SYVMg66DgQoHF0jE8Qfvk19VEyDPi/4zokK
-	 rcTGDgqncPP3kC1lJMriCo0qdkrGWsMtJBSs52wg7R8zV+51iQacndAmT1hPkzBVaO
-	 MxqmrmF5VJgtTIkd7JFynzWmXCm8eZWqbC4IwZ0zHW1p1/pV9cWUSCfjmwHhSvXrUr
-	 V+3+ySC7+ikuQ7JGHst0dBw2id8kYs5qM3GDlwhOUWwHc+NmkEjfPrt9hlEf04xQhZ
-	 0CbPlfjmW4tIQ==
+	b=SC1oEpeL/iHmtwgwWlJCtzftEojIraaj3w4RCEN8yRzQ0u1SVwPI/OHX+YA65hxPZ
+	 QLc/5dQzORkbUosGS1fbOCn//5VZ+Q5yKF1Kr3DcNu5OMdV9fzKyeEp4YsJ9vKUrXz
+	 SFwdiF0mNINPSmgv6Z5FNd2lBNXuIg/IsdoHdtsfODP02sJAWenSOwibLX/nwnV1fJ
+	 fvZrltfRwEvAq/F82IjWZjyQw6IFAfLTU//8EfpJPHbBrZAUmzVA5vOo3qveDuzOjG
+	 1LooyMwxOrRzmE0/x6xJ6mHqm1jvUEnhP9b4bsfwMdDx7TXBKX7N06mfIoqEM5CmPM
+	 vzcfGs6f6svIA==
 From: Allison Henderson <achender@kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-kselftest@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: linux-kselftest@vger.kernel.org,
 	horms@kernel.org,
 	linux-rdma@vger.kernel.org,
 	allison.henderson@oracle.com
-Subject: [PATCH net-next v4 4/8] net/rds: Kick-start TCP receiver after accept
-Date: Fri, 30 Jan 2026 18:25:03 -0700
-Message-ID: <20260131012507.814119-5-achender@kernel.org>
+Subject: [PATCH net-next v4 5/8] net/rds: Clear reconnect pending bit
+Date: Fri, 30 Jan 2026 18:25:04 -0700
+Message-ID: <20260131012507.814119-6-achender@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260131012507.814119-1-achender@kernel.org>
 References: <20260131012507.814119-1-achender@kernel.org>
@@ -66,74 +66,64 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255297-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-255296-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: B1638BFF7C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email]
+X-Rspamd-Queue-Id: 8AE28BFFDE
 X-Rspamd-Action: no action
 
-From: Gerd Rausch <gerd.rausch@oracle.com>
+From: Håkon Bugge <haakon.bugge@oracle.com>
 
-In cases where the server (the node with the higher IP-address)
-in an RDS/TCP connection is overwhelmed it is possible that the
-socket that was just accepted is chock-full of messages, up to
-the limit of what the socket receive buffer permits.
+When canceling the reconnect worker, care must be taken to reset the
+reconnect-pending bit. If the reconnect worker has not yet been
+scheduled before it is canceled, the reconnect-pending bit will stay
+on forever.
 
-Subsequently, "rds_tcp_data_ready" won't be called anymore,
-because there is no more space to receive additional messages.
-
-Nor was it called prior to the point of calling "rds_tcp_set_callbacks",
-because the "sk_data_ready" pointer didn't even point to
-"rds_tcp_data_ready" yet.
-
-We fix this by simply kick-starting the receive-worker
-for all cases where the socket state is neither
-"TCP_CLOSE_WAIT" nor "TCP_CLOSE".
-
-Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
+Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
 Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
 ---
- net/rds/tcp_listen.c | 2 ++
+ net/rds/connection.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 492dcc6568bf..b5786227623c 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -291,6 +291,8 @@ int rds_tcp_accept_one(struct rds_tcp_net *rtn)
- 	    new_sock->sk->sk_state == TCP_LAST_ACK ||
- 	    new_sock->sk->sk_state == TCP_CLOSE)
- 		rds_conn_path_drop(cp, 0);
-+	else
-+		queue_delayed_work(cp->cp_wq, &cp->cp_recv_w, 0);
- 
- 	new_sock = NULL;
- 	ret = 0;
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index 3f26a67f3180..4b7715eb2111 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -442,6 +442,8 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
+ 	 * to the conn hash, so we never trigger a reconnect on this
+ 	 * conn - the reconnect is always triggered by the active peer. */
+ 	cancel_delayed_work_sync(&cp->cp_conn_w);
++
++	clear_bit(RDS_RECONNECT_PENDING, &cp->cp_flags);
+ 	rcu_read_lock();
+ 	if (!hlist_unhashed(&conn->c_hash_node)) {
+ 		rcu_read_unlock();
 -- 
 2.43.0
 
