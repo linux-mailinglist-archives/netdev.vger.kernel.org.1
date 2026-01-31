@@ -1,113 +1,133 @@
-Return-Path: <netdev+bounces-255510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255511-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 9tqbLH1xfmlSZAIAu9opvQ
-	(envelope-from <netdev+bounces-255510-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 22:17:49 +0100
+	id 0C9RIhFyfmltZAIAu9opvQ
+	(envelope-from <netdev+bounces-255511-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 22:20:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12929C3F8B
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 22:17:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B3AC3FC9
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 22:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9792F300C01A
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:17:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C4CF300CC05
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2026E337BAC;
-	Sat, 31 Jan 2026 21:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A45378806;
+	Sat, 31 Jan 2026 21:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEi0rZoN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WoKnJ7p0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA847082F;
-	Sat, 31 Jan 2026 21:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AFC369222;
+	Sat, 31 Jan 2026 21:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769894267; cv=none; b=L4N7skmvzLxuGNkDh78j8TrLwr9NAO/iaavjc+lUPIBGjIUSMZt+icuyrfNr0uj6gBf0Mtuguj8Aknpm6QSd08bLPE3fB6UsCO2prvWA/0Qy4rIrpZlLtTQ3aBCpKYWkZdzH3RkRtJ+SVDl8i6/ju+DFI5DqZc2MSSpIgdujbME=
+	t=1769894413; cv=none; b=mYOc1MQK/o6HFJoSEj7Epd7mRp2q4zt8QBya+qZIhNQHEHbnh/GGaj8oY/ehdgL/4qYAv4ZzTB1CweXYv4w4SWCd3DBNvqnJcczq6XlR3Fu+D3kKOYfEKuLPgmUGpXyzlvy14BXa5tGpWnhD0KaMcR8/8alEPeYTLhSydem2GK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769894267; c=relaxed/simple;
-	bh=tzp/4c6I7b/Oupolrn0O69jKkxK2Bb6x6WKlbg3eS8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A8Lc+i3PN7JVHQ6qBw/ZHnR4pErgyBFAq5MKRiFrtrB29n9prm3Lxo4zJfKMU33r6tDx9kxWZrxtPratiKBFaaVAtNgh0jaoLuTNtQm7Or2ruK331L5Bthsvvv+roTmSL9EWovfkx4E6uLCcNKaKabMkU4JhF2RCSh5p7lt/eNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEi0rZoN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C3A2C4CEF1;
-	Sat, 31 Jan 2026 21:17:46 +0000 (UTC)
+	s=arc-20240116; t=1769894413; c=relaxed/simple;
+	bh=hKIy/Qo0E1EplOkbfKz8dOatftmvrL+i51wk4H040tI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=C7y5JG2UZx6RP8xC8HF7z5VVlYBV8BS01QP/a22QKdJ280WBi7gZQryYSkWRIIPAvXehWtqcZIsBej0ZMZzf0kfTAjeKM1tC881jLLRtiiNG7o3wn2bp1nWBONsxfR9znM47qLvljG+I1sfXvGCjngXszGJkwYLW4qCLlopqgSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WoKnJ7p0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 053A7C4CEF1;
+	Sat, 31 Jan 2026 21:20:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769894266;
-	bh=tzp/4c6I7b/Oupolrn0O69jKkxK2Bb6x6WKlbg3eS8s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WEi0rZoNyDM0qNpmsSd58KYueY6PygYxo6GeLeyyeD5g4IIf6ZO0+Bnq6uiLXLB/6
-	 1tNFVBlMSROpnR52TSYvL1fS0AeusBgpYbeiFMz9rbOcrsn+vB2k5gQM2q6plZ8TLs
-	 nJV7KRtMbwHdNgS72MXprxfjjjmbkYUwTAqW7biEEaajVjrWeg9HhOeefg8t/oZYUy
-	 GZ7J96a4WdTk47BL71t/2d6FDFdBoQjn3raqjSBBWB0dvndDdr8ugj8n3H7tTap0I6
-	 i4ZdtwiEEcQ8OYWTwWuqBAfOnbGshE9qJfYsYjTbTp87ikg29WJN4XqaPgHEcDB2Ti
-	 JNSgKvWSnNePA==
-Date: Sat, 31 Jan 2026 13:17:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- netfilter-devel@vger.kernel.org, pablo@netfilter.org
-Subject: Re: [PATCH v2 net-next 0/7] netfilter: updates for net-next
-Message-ID: <20260131131745.0387502b@kernel.org>
-In-Reply-To: <aX5tQtxzcYzbYW6o@strlen.de>
-References: <20260129105427.12494-1-fw@strlen.de>
-	<20260130081245.6cacdde2@kernel.org>
-	<aX0B1xaFGL43xxUn@strlen.de>
-	<CANn89iKUV07+84PVq0cHe3vMaSGNTQzhq9=xetg+_P2DmsPmQQ@mail.gmail.com>
-	<aX5tQtxzcYzbYW6o@strlen.de>
+	s=k20201202; t=1769894413;
+	bh=hKIy/Qo0E1EplOkbfKz8dOatftmvrL+i51wk4H040tI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WoKnJ7p0lakGwcjeOO9tUoalAdDum0305sUT29jFiG/tRNAg80FMv1jINGkhDJFPo
+	 gzcWC6+AlmTneQrGmI7gsGFfuZd+IUSmefExwPzbvKSwm9SDYKAkmyoR97QXv0AB7f
+	 OR6DsjdE4tuTgvML1k4xUQH/oe9sTHaHSkdCPnvOeF3ISWbYPwW4eliEs/GNXS/0yu
+	 OBm2JIyuoetiAHbrGh48sdiw7aTFsh5UZa3lBNTaBmydCMsjG9p1880NgAmZNK77/p
+	 UglUYvYZKqaSksuaWxd6aIkiGg/ZDY1iZ43+/Mw+x43iZWEAMXeOkeg6uZ8BGjX2Cw
+	 MxEMRAcFSuBKg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 118E5380DBD4;
+	Sat, 31 Jan 2026 21:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: don't touch dev->stats in BPF redirect paths
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176989440486.4193461.10700024811655891037.git-patchwork-notify@kernel.org>
+Date: Sat, 31 Jan 2026 21:20:04 +0000
+References: <20260130033827.698841-1-kuba@kernel.org>
+In-Reply-To: <20260130033827.698841-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ martin.lau@kernel.org, daniel@iogearbox.net, gal@nvidia.com, ast@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, dsahern@gmail.com, bpf@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-255511-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,iogearbox.net,nvidia.com,gmail.com,linux.dev,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-255510-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 12929C3F8B
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D9B3AC3FC9
 X-Rspamd-Action: no action
 
-On Sat, 31 Jan 2026 22:00:03 +0100 Florian Westphal wrote:
-> Eric Dumazet <edumazet@google.com> wrote:
-> > > Sigh.  Doesn't ring a bell, I will have a look.  
-> > 
-> > Could this be related to "netns: optimize netns cleaning by batching
-> > unhash_nsid calls" ?  
-> 
-> Thanks Eric, that seems plausible.
-> 
-> Did not yet have much luck with reproducing this so far, I will
-> look at this in more detail lon monday.
+Hello:
 
-To be clear -- the patch Eric pointed out is _not_ merged yet.
-It was pending in the test branch but it's not in net-next.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 29 Jan 2026 19:38:27 -0800 you wrote:
+> Gal reports that BPF redirect increments dev->stats.tx_errors
+> on failure. This is not correct, most modern drivers completely
+> ignore dev->stats so these drops will be invisible to the user.
+> Core code should use the dedicated core stats which are folded
+> into device stats in dev_get_stats().
+> 
+> Note that we're switching from tx_errors to tx_dropped.
+> Core only has tx_dropped, hence presumably users already expect
+> that counter to increment for "stack" Tx issues.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: don't touch dev->stats in BPF redirect paths
+    https://git.kernel.org/netdev/net/c/fdf3f6800be3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
