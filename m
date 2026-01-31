@@ -1,74 +1,71 @@
-Return-Path: <netdev+bounces-255545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255544-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKtcN/SRfmkjawIAu9opvQ
-	(envelope-from <netdev+bounces-255545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:36:20 +0100
+	id CH/uIMSSfmkjawIAu9opvQ
+	(envelope-from <netdev+bounces-255544-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:39:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07465C45A3
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:36:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA993C4614
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 00:39:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6750E300B45B
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 23:36:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39B293074A47
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 23:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F027838B9AD;
-	Sat, 31 Jan 2026 23:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88F138B9A2;
+	Sat, 31 Jan 2026 23:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="o2Tzd7y1";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="Q8TBF9XL"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="TA+sxQti";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="t/+Kz5O9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DFC28DC4;
-	Sat, 31 Jan 2026 23:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE841385EF0;
+	Sat, 31 Jan 2026 23:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769902566; cv=none; b=rRTrsfj/3m1/Jl//Ban/ttaV9/abk/2BP3fH16tGMWjmBE+BHtVbTLPxpqrVNRLHXvZPD4VtPQPrQHvbkXG94Og0dQTR0tmwt6yQYl5xI/o74o+lT2QeF/+TPTXZKceF81yZ/5jCKcqQX26Oh9rMObLjH4ZhCE3JkvoLShUsjms=
+	t=1769902563; cv=none; b=hsolNgbfYnZtuLzzC1AQiuVfd7zk+S6VMmJSgZOb55JaVqox3KRFMW/l4ATNX/5phet4OhHLN9+kJ0imwmQ8CV6itW3hbUcwL3zE10E4dMq6cMW1/bWUScnwbshmOliUqGLu6qC9XsECPD+uRfPYcV0eRn5NMEV8wwqLGAUxF8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769902566; c=relaxed/simple;
-	bh=FOL9wR+sij6GwcoSyDVptA7vaBNbRaUtJEG+EcBkVhc=;
+	s=arc-20240116; t=1769902563; c=relaxed/simple;
+	bh=X0qAXFoeKKkNE7e5IWdpWRbrFsvExI0lhAQudJ9z/UU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BjnBO9U3yprInBxY10okrc17iw/CBZEdgyI7iZe5mX07Qs+Bh4FeQzJKyluab3dMzrZgMQ1js57pQrKewcT4CXR5Zln1B3D7Z+d6jygL1sbr7Duun68QqJ/GCLmhKHERS/GCSka/5OV052cNxSpVQy/rFG8Mx9UzNfKXRQwJaQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=o2Tzd7y1; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=Q8TBF9XL; arc=none smtp.client-ip=80.241.56.172
+	 MIME-Version; b=pm9Y67oZ8Mqk7IKiLx4g64JJyK0ZyL4h0jo/JIeLGwSFPM5ZrcwK0BtL+MM3ScsXlnAGmcsOGBulMu0ME9MfW9YUj9HSOy4JybNq4n4j4doQ10RD2TxlqFs/re0VVNvX/tAm3+jMbu4l5LFBEqpR1KjRhm493wvs/ws4U1e8Ipw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=TA+sxQti; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=t/+Kz5O9; arc=none smtp.client-ip=80.241.56.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4f3Tlb6F1Bz9tnx;
-	Sun,  1 Feb 2026 00:35:55 +0100 (CET)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4f3Tlh18y7z9tmf;
+	Sun,  1 Feb 2026 00:36:00 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1769902555;
+	t=1769902560;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=12m+T2Yr1cvHsYmAC4pX4OyNKZZE6DknWK02KH3EFFs=;
-	b=o2Tzd7y1a7xAeGienWP65LkHCp0tXPCXCyD3MmnhmK+F1DGaRFbh1HRXOBxzpG3lfkq9G6
-	8DtH/9b9htPjDDUYQ7aTsaMhxftXlB2hE8NVFYxdof4HK9P28f4mPX98+e1y4iU4kmBodH
-	gdDoxhO0VXLUdNeC08m6Hyq7xS9ez6LFEkZvgDaTXkJF5GxZ+9uG05BGzwhQyCfnYEOUP7
-	tyXawdd1Uf39w36gZT2hslBZsmGO5XWstK0CxQQ5bpaw3jxu6zbISAhFkIMU+E2eJQt14q
-	xT0q9Un+NfhGAv/WEKDVdpAYZDDTJ22Swec1UqgB1PkuWdtyYLSkpedySP+bKA==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=Q8TBF9XL;
-	spf=pass (outgoing_mbo_mout: domain of lukasz.majewski@mailbox.org designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=lukasz.majewski@mailbox.org
+	bh=raWHLzH2DhkmSipO6r6I8wlLMN2egX6bQDFFsapx5Ts=;
+	b=TA+sxQtiTYaAneUZpsbKWOjHgv+xmPjlEGTCnzM7oRNGGRWo2lLuRgJ1wGWnW0KL9Q8AI8
+	tnv6aTnP0SHubNAL+xVFdTFIy9KGQI6KiaOCqKd55YGYWdYHTvXd5DRJA896yYEqiUfwFu
+	NwRz/zm66BpJMNxx3PophQql7jWForW0hFDE1WMA0d+gSLOWQIsd5Mzu8vZX5T/Er1jl3R
+	v1DwdJzYoTLbpW5VQlyUvLIYJ+vFB3vP+Gw/Xjz+pf2nTukPkD/AIXbvbjompxWq6wOHO0
+	KoBzwkdDgFAMlhtmwzn3ciku0QM6zPrQfj112QnQljrVWeje3Vrr9hBPx75uHQ==
 From: Lukasz Majewski <lukasz.majewski@mailbox.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1769902554;
+	t=1769902558;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=12m+T2Yr1cvHsYmAC4pX4OyNKZZE6DknWK02KH3EFFs=;
-	b=Q8TBF9XLFSfwibM+8E/XSraiBIyZTlIzQcYxDkUxfSJi1DMWBLIhjv0EMSoEFtglD+fYMo
-	b60l83jGO5FCoLGzOoLOeL7rRGgox0dS3c12hEw7TFKETRp9PKP43tbLJv1IkTRXZ+ntR/
-	3fVy6Lnv4waZdD7S7DELrKwsmgzbfs2lsZE2jvSx/bu298GzQXbYcn2pQVsbBk2ZXKVGhC
-	7pHfnmV4SoRkx93VvweGLGObnZ3puFM7BOVBRMs2/1vs6aYkxprPrghLB9jKyx6qAv+URY
-	N6a/rymJfW4Bv6VzWA4aXE02V1VQJsVOrK38ew4cvzfUamuDDf1v9nQLkv6+vA==
+	bh=raWHLzH2DhkmSipO6r6I8wlLMN2egX6bQDFFsapx5Ts=;
+	b=t/+Kz5O9xv6l+BTnvs0DC/1q5hEJz6rjAF6SYhp6F80LwUyq3OnAOCAaYzh8ONxLXaohXZ
+	eFVvpvFcme8x7pwJGfBTELotzXff37xycEdxH+VIfh8qJsZDNHYMlFs8Rm9bpqIfn1f2DO
+	PgUSddZeZOOAn3SpMVwaVSugiS97tD+xZQGm5G/kwqZCbLRKl8B7jAYBkGXKORmFvhU+pO
+	/dZQMIXSsUJQb0oVHPSf3GXmE6U+sohrO5yRIDbRuW5BYWj+OOqQV7VXoMe/zlhnplo60r
+	PjjjLRToC3aX8kqnq+q+f/qzKS8utIZRTs22xZUUg5s6eyFzFKQDCjP7dVnguw==
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
@@ -90,9 +87,9 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	Stefan Wahren <wahrenst@gmx.net>,
 	Simon Horman <horms@kernel.org>,
 	Lukasz Majewski <lukasz.majewski@mailbox.org>
-Subject: [net-next v22 6/7] net: mtip: Extend the L2 switch driver with management operations
-Date: Sun,  1 Feb 2026 00:34:58 +0100
-Message-Id: <20260131233459.1625279-7-lukasz.majewski@mailbox.org>
+Subject: [net-next v22 7/7] net: mtip: Extend the L2 switch driver for imx287 with bridge operations
+Date: Sun,  1 Feb 2026 00:34:59 +0100
+Message-Id: <20260131233459.1625279-8-lukasz.majewski@mailbox.org>
 In-Reply-To: <20260131233459.1625279-1-lukasz.majewski@mailbox.org>
 References: <20260131233459.1625279-1-lukasz.majewski@mailbox.org>
 Precedence: bulk
@@ -102,8 +99,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: yce483f3m4b7n8i1e13g4tgakepnokah
-X-MBO-RS-ID: 6869384a656d8f70d71
+X-MBO-RS-META: osnig3xo4nbq5nocg7oir1bwa91ao6ee
+X-MBO-RS-ID: 7d7cf797d3bce7622ac
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -112,14 +109,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net,kernel.org,mailbox.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-255545-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255544-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -130,579 +127,246 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[mailbox.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[denx.de:email,mailbox.org:email,mailbox.org:dkim,mailbox.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,freescale.com:email]
-X-Rspamd-Queue-Id: 07465C45A3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:email,mailbox.org:dkim,mailbox.org:mid,denx.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DA993C4614
 X-Rspamd-Action: no action
 
-This patch provides function necessary for managing the L2 switch.
+After this change the MTIP L2 switch can be configured as offloading
+device for packet switching when bridge on its interfaces is created.
 
 Signed-off-by: Lukasz Majewski <lukasz.majewski@mailbox.org>
-
 ---
+
 Changes for v13:
 - New patch - created by excluding some code from large (i.e. v12 and
   earlier) MTIP driver
 
-Changes for v14 - v21:
+Changes for v14 - v15:
 - None
 
+Changes for v16:
+- Enable MTIP ports to support bridge offloading
+
+Changes for v17 - v20:
+- None
+
+Changes for v21:
+- Avoid double call of notifier_from_errno() on -EOPNOTSUPP
+- Rollback changes to driver state when switchdev_bridge_port_offload()
+  fails
+
 Changes for v22:
-- Update 'mode' check in mtip_vlan_input_process(). The comment was
-  misleading, so it has been removed. ESW_VIMSEL accepts "Mode" 1 to 4,
-  but it has allowed values from 0 to 3 (the IM fields' values)
+- Reorder setting of br_members and master_dev to successful call of
+  switchdev_bridge_port_offload()
 ---
  .../net/ethernet/freescale/mtipsw/Makefile    |   2 +-
- .../net/ethernet/freescale/mtipsw/mtipl2sw.c  |  31 ++
- .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  23 +
- .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c | 442 ++++++++++++++++++
- 4 files changed, 497 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  |   9 +-
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |   2 +
+ .../ethernet/freescale/mtipsw/mtipl2sw_br.c   | 132 ++++++++++++++++++
+ 4 files changed, 143 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
 
 diff --git a/drivers/net/ethernet/freescale/mtipsw/Makefile b/drivers/net/ethernet/freescale/mtipsw/Makefile
-index bd8ffb30939a..a99aaf6ddfb2 100644
+index a99aaf6ddfb2..81e2b0e03e6c 100644
 --- a/drivers/net/ethernet/freescale/mtipsw/Makefile
 +++ b/drivers/net/ethernet/freescale/mtipsw/Makefile
 @@ -1,4 +1,4 @@
  # SPDX-License-Identifier: GPL-2.0
  
  obj-$(CONFIG_FEC_MTIP_L2SW) += nxp-mtipl2sw.o
--nxp-mtipl2sw-objs := mtipl2sw.o
-+nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o
+-nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o
++nxp-mtipl2sw-objs := mtipl2sw.o mtipl2sw_mgnt.o mtipl2sw_br.o
 diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-index ffb2c0e6cef8..b46b587c0823 100644
+index b46b587c0823..52dc434ec344 100644
 --- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
 +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-@@ -492,8 +492,35 @@ static void mtip_config_switch(struct switch_enet_private *fep)
+@@ -1933,11 +1933,15 @@ static int mtip_sw_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return dev_err_probe(&pdev->dev, ret, "Could not alloc IRQ\n");
  
- 	writel(0, fep->hwp + ESW_BKLR);
++	ret = mtip_register_notifiers(fep);
++	if (ret)
++		return ret;
++
+ 	ret = mtip_switch_dma_init(fep);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "%s: ethernet switch init fail (%d)!\n",
+ 			__func__, ret);
+-		return ret;
++		goto unregister_notifiers;
+ 	}
  
-+	/* Do NOT disable learning */
-+	mtip_port_learning_config(fep, 0, 0, 0);
-+	mtip_port_learning_config(fep, 1, 0, 0);
-+	mtip_port_learning_config(fep, 2, 0, 0);
-+
-+	/* Disable blocking */
-+	mtip_port_blocking_config(fep, 0, 0);
-+	mtip_port_blocking_config(fep, 1, 0);
-+	mtip_port_blocking_config(fep, 2, 0);
-+
- 	writel(MCF_ESW_IMR_TXF | MCF_ESW_IMR_RXF,
- 	       fep->hwp + ESW_IMR);
-+
-+	mtip_port_enable_config(fep, 0, 1, 1);
-+	mtip_port_enable_config(fep, 1, 1, 1);
-+	mtip_port_enable_config(fep, 2, 1, 1);
-+
-+	mtip_port_broadcast_config(fep, 0, 1);
-+	mtip_port_broadcast_config(fep, 1, 1);
-+	mtip_port_broadcast_config(fep, 2, 1);
-+
-+	/* Disable multicast receive on port 0 (MGNT) */
-+	mtip_port_multicast_config(fep, 0, 0);
-+	mtip_port_multicast_config(fep, 1, 1);
-+	mtip_port_multicast_config(fep, 2, 1);
-+
-+	/* Setup VLANs to provide port separation */
-+	if (!fep->br_offload)
-+		mtip_switch_en_port_separation(fep);
+ 	ret = mtip_mii_init(fep, pdev);
+@@ -1969,6 +1973,8 @@ static int mtip_sw_probe(struct platform_device *pdev)
+ 			  fep->bd_dma);
+ 	fep->rx_bd_base = NULL;
+ 	fep->tx_bd_base = NULL;
++ unregister_notifiers:
++	mtip_unregister_notifiers(fep);
+ 
+ 	return ret;
  }
+@@ -1977,6 +1983,7 @@ static void mtip_sw_remove(struct platform_device *pdev)
+ {
+ 	struct switch_enet_private *fep = platform_get_drvdata(pdev);
  
- static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
-@@ -579,6 +606,10 @@ static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
++	mtip_unregister_notifiers(fep);
+ 	mtip_ndev_cleanup(fep);
  
- 	skb_tx_timestamp(skb);
- 
-+	/* For port separation - force sending via specified port */
-+	if (!fep->br_offload && port != 0)
-+		mtip_forced_forward(fep, port, 1);
-+
- 	dev->stats.tx_bytes += skb->len;
- 	/* If this was the last BD in the ring,
- 	 * start at the beginning again.
+ 	mtip_mii_remove(fep);
 diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-index bbc61c904c02..4054415d39f9 100644
+index 4054415d39f9..449eca41e6b6 100644
 --- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
 +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
-@@ -618,6 +618,29 @@ static inline int mtip_get_time(void)
- 
- #define MTIP_PORT_FORWARDING_INIT 0xFF
- 
-+/* Switch Management functions */
-+int mtip_vlan_input_process(struct switch_enet_private *fep,
-+			    int port, int mode, unsigned short port_vlanid,
-+			    int vlan_verify_en, int vlan_domain_num,
-+			    int vlan_domain_port);
-+int mtip_set_vlan_verification(struct switch_enet_private *fep, int port,
-+			       int vlan_domain_verify_en,
-+			       int vlan_discard_unknown_en);
-+int mtip_port_multicast_config(struct switch_enet_private *fep, int port,
-+			       bool enable);
-+int mtip_vlan_output_process(struct switch_enet_private *fep, int port,
-+			     int mode);
-+void mtip_switch_en_port_separation(struct switch_enet_private *fep);
-+void mtip_switch_dis_port_separation(struct switch_enet_private *fep);
-+int mtip_port_broadcast_config(struct switch_enet_private *fep,
-+			       int port, bool enable);
-+int mtip_forced_forward(struct switch_enet_private *fep, int port, bool enable);
-+int mtip_port_learning_config(struct switch_enet_private *fep, int port,
-+			      bool disable, bool irq_adj);
-+int mtip_port_blocking_config(struct switch_enet_private *fep, int port,
-+			      bool enable);
+@@ -640,6 +640,8 @@ int mtip_port_learning_config(struct switch_enet_private *fep, int port,
+ int mtip_port_blocking_config(struct switch_enet_private *fep, int port,
+ 			      bool enable);
  bool mtip_is_switch_netdev_port(const struct net_device *ndev);
-+int mtip_port_enable_config(struct switch_enet_private *fep, int port,
-+			    bool tx_en, bool rx_en);
++int mtip_register_notifiers(struct switch_enet_private *fep);
++void mtip_unregister_notifiers(struct switch_enet_private *fep);
+ int mtip_port_enable_config(struct switch_enet_private *fep, int port,
+ 			    bool tx_en, bool rx_en);
  void mtip_clear_atable(struct switch_enet_private *fep);
- #endif /* __MTIP_L2SWITCH_H_ */
-diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
+diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
 new file mode 100644
-index 000000000000..30c712b43f6b
+index 000000000000..1fdc95a600e8
 --- /dev/null
-+++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
-@@ -0,0 +1,442 @@
++++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+@@ -0,0 +1,132 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ *  L2 switch Controller driver for MTIP block - switch MGNT
++ *  L2 switch Controller driver for MTIP block - bridge network interface
 + *
 + *  Copyright (C) 2025 DENX Software Engineering GmbH
 + *  Lukasz Majewski <lukma@denx.de>
-+ *
-+ *  Based on a previous work by:
-+ *
-+ *  Copyright 2010-2012 Freescale Semiconductor, Inc.
-+ *  Alison Wang (b18965@freescale.com)
-+ *  Jason Jin (Jason.jin@freescale.com)
-+ *
-+ *  Copyright (C) 2010-2013 Freescale Semiconductor, Inc. All Rights Reserved.
-+ *  Shrek Wu (B16972@freescale.com)
 + */
 +
 +#include <linux/etherdevice.h>
 +#include <linux/netdevice.h>
 +#include <linux/platform_device.h>
++#include <net/switchdev.h>
 +
 +#include "mtipl2sw.h"
 +
-+int mtip_vlan_input_process(struct switch_enet_private *fep,
-+			    int port, int mode, unsigned short port_vlanid,
-+			    int vlan_verify_en, int vlan_domain_num,
-+			    int vlan_domain_port)
++static int mtip_ndev_port_link(struct net_device *ndev,
++			       struct net_device *br_ndev,
++			       struct netlink_ext_ack *extack)
 +{
-+	if (mode < 0 || mode > 3) {
-+		dev_err(&fep->pdev->dev,
-+			"%s: VLAN input processing mode (%d) not supported\n",
-+			__func__, mode);
-+		return -EINVAL;
++	struct mtip_ndev_priv *priv = netdev_priv(ndev), *other_priv;
++	struct switch_enet_private *fep = priv->fep;
++	struct net_device *other_ndev;
++	int err;
++
++	/* Check if one port of MTIP switch is already bridged */
++	if (fep->br_members && !fep->br_offload) {
++		/* Get the second bridge ndev */
++		other_ndev = fep->ndev[fep->br_members - 1];
++		other_priv = netdev_priv(other_ndev);
++		if (other_priv->master_dev != br_ndev) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "L2 offloading only possible for the same bridge!");
++			return -EOPNOTSUPP;
++		}
++
++		fep->br_offload = 1;
++		mtip_switch_dis_port_separation(fep);
++		mtip_clear_atable(fep);
 +	}
 +
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported!\n",
-+			__func__, port);
-+		return -EINVAL;
++	err = switchdev_bridge_port_offload(ndev, ndev, NULL, NULL, NULL,
++					    false, extack);
++	if (err) {
++		dev_err(&ndev->dev, "can't offload bridge port %s [err: %d]\n",
++			ndev->name, err);
++		return err;
 +	}
 +
-+	if (vlan_verify_en == 1 &&
-+	    (vlan_domain_num < 0 || vlan_domain_num > 32)) {
-+		dev_err(&fep->pdev->dev, "%s: Domain out of range\n", __func__);
-+		return -EINVAL;
-+	}
++	if (!priv->master_dev)
++		priv->master_dev = br_ndev;
 +
-+	writel(FIELD_PREP(MCF_ESW_PID_VLANID_MASK, port_vlanid),
-+	       fep->hwp + ESW_PID(port));
-+	if (port == 0) {
-+		if (vlan_verify_en == 1)
-+			writel(FIELD_PREP(MCF_ESW_VRES_VLANID_MASK,
-+					  port_vlanid) | MCF_ESW_VRES_P0,
-+			       fep->hwp + ESW_VRES(vlan_domain_num));
++	fep->br_members |= BIT(priv->portnum - 1);
 +
-+		writel(readl(fep->hwp + ESW_VIMEN) | MCF_ESW_VIMEN_EN0,
-+		       fep->hwp + ESW_VIMEN);
-+		writel(readl(fep->hwp + ESW_VIMSEL) |
-+		       FIELD_PREP(MCF_ESW_VIMSEL_IM0_MASK, mode),
-+		       fep->hwp + ESW_VIMSEL);
-+	} else if (port == 1) {
-+		if (vlan_verify_en == 1)
-+			writel(FIELD_PREP(MCF_ESW_VRES_VLANID_MASK,
-+					  port_vlanid) | MCF_ESW_VRES_P1,
-+			       fep->hwp + ESW_VRES(vlan_domain_num));
++	dev_dbg(&ndev->dev,
++		"%s: ndev: %s br: %s fep: %p members: 0x%x offload: %d\n",
++		__func__, ndev->name,  br_ndev->name, fep, fep->br_members,
++		fep->br_offload);
 +
-+		writel(readl(fep->hwp + ESW_VIMEN) | MCF_ESW_VIMEN_EN1,
-+		       fep->hwp + ESW_VIMEN);
-+		writel(readl(fep->hwp + ESW_VIMSEL) |
-+		       FIELD_PREP(MCF_ESW_VIMSEL_IM1_MASK, mode),
-+		       fep->hwp + ESW_VIMSEL);
-+	} else if (port == 2) {
-+		if (vlan_verify_en == 1)
-+			writel(FIELD_PREP(MCF_ESW_VRES_VLANID_MASK,
-+					  port_vlanid) | MCF_ESW_VRES_P2,
-+			       fep->hwp + ESW_VRES(vlan_domain_num));
-+
-+		writel(readl(fep->hwp + ESW_VIMEN) | MCF_ESW_VIMEN_EN2,
-+		       fep->hwp + ESW_VIMEN);
-+		writel(readl(fep->hwp + ESW_VIMSEL) |
-+		       FIELD_PREP(MCF_ESW_VIMSEL_IM2_MASK, mode),
-+		       fep->hwp + ESW_VIMSEL);
-+	}
-+
-+	return 0;
++	return NOTIFY_DONE;
 +}
 +
-+int mtip_vlan_output_process(struct switch_enet_private *fep, int port,
-+			     int mode)
++static void mtip_netdevice_port_unlink(struct net_device *ndev)
 +{
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported!\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
++	struct mtip_ndev_priv *priv = netdev_priv(ndev);
++	struct switch_enet_private *fep = priv->fep;
 +
-+	if (port == 0) {
-+		writel(readl(fep->hwp + ESW_VOMSEL) |
-+		       FIELD_PREP(MCF_ESW_VOMSEL_OM0_MASK, mode),
-+		       fep->hwp + ESW_VOMSEL);
-+	} else if (port == 1) {
-+		writel(readl(fep->hwp + ESW_VOMSEL) |
-+		       FIELD_PREP(MCF_ESW_VOMSEL_OM1_MASK, mode),
-+		       fep->hwp + ESW_VOMSEL);
-+	} else if (port == 2) {
-+		writel(readl(fep->hwp + ESW_VOMSEL) |
-+		       FIELD_PREP(MCF_ESW_VOMSEL_OM2_MASK, mode),
-+		       fep->hwp + ESW_VOMSEL);
-+	}
++	dev_dbg(&ndev->dev, "%s: ndev: %s members: 0x%x\n", __func__,
++		ndev->name, fep->br_members);
 +
-+	return 0;
++	switchdev_bridge_port_unoffload(ndev, NULL, NULL, NULL);
++
++	fep->br_members &= ~BIT(priv->portnum - 1);
++	priv->master_dev = NULL;
++
++	if (fep->br_members && fep->br_offload) {
++		fep->br_offload = 0;
++		mtip_switch_en_port_separation(fep);
++		mtip_clear_atable(fep);
++	}
 +}
 +
-+int mtip_set_vlan_verification(struct switch_enet_private *fep, int port,
-+			       int vlan_domain_verify_en,
-+			       int vlan_discard_unknown_en)
++/* netdev notifier */
++static int mtip_netdevice_event(struct notifier_block *unused,
++				unsigned long event, void *ptr)
 +{
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported!\n",
-+			__func__, port);
-+		return -EINVAL;
++	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
++	struct netdev_notifier_changeupper_info *info = ptr;
++	struct netlink_ext_ack *extack;
++	int ret = NOTIFY_DONE;
++
++	if (!mtip_is_switch_netdev_port(ndev))
++		return NOTIFY_DONE;
++
++	extack = netdev_notifier_info_to_extack(&info->info);
++
++	switch (event) {
++	case NETDEV_CHANGEUPPER:
++		if (!netif_is_bridge_master(info->upper_dev))
++			break;
++
++		if (info->linking)
++			ret = mtip_ndev_port_link(ndev, info->upper_dev,
++						  extack);
++		else
++			mtip_netdevice_port_unlink(ndev);
++
++		break;
++	default:
++		return NOTIFY_DONE;
 +	}
 +
-+	if (vlan_domain_verify_en == 1) {
-+		if (port == 0)
-+			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_VV0,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 1)
-+			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_VV1,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 2)
-+			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_VV2,
-+			       fep->hwp + ESW_VLANV);
-+	} else if (vlan_domain_verify_en == 0) {
-+		if (port == 0)
-+			writel(readl(fep->hwp + ESW_VLANV) & ~MCF_ESW_VLANV_VV0,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 1)
-+			writel(readl(fep->hwp + ESW_VLANV) & ~MCF_ESW_VLANV_VV1,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 2)
-+			writel(readl(fep->hwp + ESW_VLANV) & ~MCF_ESW_VLANV_VV2,
-+			       fep->hwp + ESW_VLANV);
-+	}
-+
-+	if (vlan_discard_unknown_en == 1) {
-+		if (port == 0)
-+			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_DU0,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 1)
-+			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_DU1,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 2)
-+			writel(readl(fep->hwp + ESW_VLANV) | MCF_ESW_VLANV_DU2,
-+			       fep->hwp + ESW_VLANV);
-+	} else if (vlan_discard_unknown_en == 0) {
-+		if (port == 0)
-+			writel(readl(fep->hwp + ESW_VLANV) & ~MCF_ESW_VLANV_DU0,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 1)
-+			writel(readl(fep->hwp + ESW_VLANV) & ~MCF_ESW_VLANV_DU1,
-+			       fep->hwp + ESW_VLANV);
-+		else if (port == 2)
-+			writel(readl(fep->hwp + ESW_VLANV) & ~MCF_ESW_VLANV_DU2,
-+			       fep->hwp + ESW_VLANV);
-+	}
-+
-+	dev_dbg(&fep->pdev->dev, "%s: ESW_VLANV %#x\n", __func__,
-+		readl(fep->hwp + ESW_VLANV));
-+
-+	return 0;
++	return notifier_from_errno(ret);
 +}
 +
-+int mtip_port_multicast_config(struct switch_enet_private *fep,
-+			       int port, bool enable)
++static struct notifier_block mtip_netdevice_nb __read_mostly = {
++	.notifier_call = mtip_netdevice_event,
++};
++
++int mtip_register_notifiers(struct switch_enet_private *fep)
 +{
-+	u32 reg = 0;
++	int ret = register_netdevice_notifier(&mtip_netdevice_nb);
 +
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
++	if (ret)
++		dev_err(&fep->pdev->dev, "can't register netdevice notifier\n");
 +
-+	reg = readl(fep->hwp + ESW_DMCR);
-+	if (enable) {
-+		if (port == 0)
-+			reg |= MCF_ESW_DMCR_P0;
-+		else if (port == 1)
-+			reg |= MCF_ESW_DMCR_P1;
-+		else if (port == 2)
-+			reg |= MCF_ESW_DMCR_P2;
-+	} else {
-+		if (port == 0)
-+			reg &= ~MCF_ESW_DMCR_P0;
-+		else if (port == 1)
-+			reg &= ~MCF_ESW_DMCR_P1;
-+		else if (port == 2)
-+			reg &= ~MCF_ESW_DMCR_P2;
-+	}
-+
-+	writel(reg, fep->hwp + ESW_DMCR);
-+	return 0;
++	return ret;
 +}
 +
-+/* enable or disable port n tx or rx
-+ * tx_en 0 disable port n tx
-+ * tx_en 1 enable  port n tx
-+ * rx_en 0 disable port n rx
-+ * rx_en 1 enable  port n rx
-+ */
-+int mtip_port_enable_config(struct switch_enet_private *fep, int port,
-+			    bool tx_en, bool rx_en)
++void mtip_unregister_notifiers(struct switch_enet_private *fep)
 +{
-+	u32 reg = 0;
-+
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
-+
-+	reg = readl(fep->hwp + ESW_PER);
-+	if (tx_en) {
-+		if (port == 0)
-+			reg |= MCF_ESW_PER_TE0;
-+		else if (port == 1)
-+			reg |= MCF_ESW_PER_TE1;
-+		else if (port == 2)
-+			reg |= MCF_ESW_PER_TE2;
-+	} else {
-+		if (port == 0)
-+			reg &= (~MCF_ESW_PER_TE0);
-+		else if (port == 1)
-+			reg &= (~MCF_ESW_PER_TE1);
-+		else if (port == 2)
-+			reg &= (~MCF_ESW_PER_TE2);
-+	}
-+
-+	if (rx_en) {
-+		if (port == 0)
-+			reg |= MCF_ESW_PER_RE0;
-+		else if (port == 1)
-+			reg |= MCF_ESW_PER_RE1;
-+		else if (port == 2)
-+			reg |= MCF_ESW_PER_RE2;
-+	} else {
-+		if (port == 0)
-+			reg &= (~MCF_ESW_PER_RE0);
-+		else if (port == 1)
-+			reg &= (~MCF_ESW_PER_RE1);
-+		else if (port == 2)
-+			reg &= (~MCF_ESW_PER_RE2);
-+	}
-+
-+	writel(reg, fep->hwp + ESW_PER);
-+	return 0;
-+}
-+
-+void mtip_switch_en_port_separation(struct switch_enet_private *fep)
-+{
-+	u32 reg;
-+
-+	mtip_vlan_input_process(fep, 0, 3, 0x10, 1, 0, 0);
-+	mtip_vlan_input_process(fep, 1, 3, 0x11, 1, 1, 0);
-+	mtip_vlan_input_process(fep, 2, 3, 0x12, 1, 2, 0);
-+
-+	reg = readl(fep->hwp + ESW_VRES(0));
-+	writel(reg | MCF_ESW_VRES_P1 | MCF_ESW_VRES_P2,
-+	       fep->hwp + ESW_VRES(0));
-+
-+	reg = readl(fep->hwp + ESW_VRES(1));
-+	writel(reg | MCF_ESW_VRES_P0, fep->hwp + ESW_VRES(1));
-+
-+	reg = readl(fep->hwp + ESW_VRES(2));
-+	writel(reg | MCF_ESW_VRES_P0, fep->hwp + ESW_VRES(2));
-+
-+	dev_dbg(&fep->pdev->dev, "%s: VRES0: 0x%x\n",
-+		__func__, readl(fep->hwp + ESW_VRES(0)));
-+	dev_dbg(&fep->pdev->dev, "%s: VRES1: 0x%x\n", __func__,
-+		readl(fep->hwp + ESW_VRES(1)));
-+	dev_dbg(&fep->pdev->dev, "%s: VRES2: 0x%x\n", __func__,
-+		readl(fep->hwp + ESW_VRES(2)));
-+
-+	mtip_set_vlan_verification(fep, 0, 1, 0);
-+	mtip_set_vlan_verification(fep, 1, 1, 0);
-+	mtip_set_vlan_verification(fep, 2, 1, 0);
-+
-+	mtip_vlan_output_process(fep, 0, 2);
-+	mtip_vlan_output_process(fep, 1, 2);
-+	mtip_vlan_output_process(fep, 2, 2);
-+}
-+
-+void mtip_switch_dis_port_separation(struct switch_enet_private *fep)
-+{
-+	writel(0, fep->hwp + ESW_PID(0));
-+	writel(0, fep->hwp + ESW_PID(1));
-+	writel(0, fep->hwp + ESW_PID(2));
-+
-+	writel(0, fep->hwp + ESW_VRES(0));
-+	writel(0, fep->hwp + ESW_VRES(1));
-+	writel(0, fep->hwp + ESW_VRES(2));
-+
-+	writel(0, fep->hwp + ESW_VIMEN);
-+	writel(0, fep->hwp + ESW_VIMSEL);
-+	writel(0, fep->hwp + ESW_VLANV);
-+	writel(0, fep->hwp + ESW_VOMSEL);
-+}
-+
-+int mtip_port_broadcast_config(struct switch_enet_private *fep,
-+			       int port, bool enable)
-+{
-+	u32 reg = 0;
-+
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
-+
-+	reg = readl(fep->hwp + ESW_DBCR);
-+	if (enable) {
-+		if (port == 0)
-+			reg |= MCF_ESW_DBCR_P0;
-+		else if (port == 1)
-+			reg |= MCF_ESW_DBCR_P1;
-+		else if (port == 2)
-+			reg |= MCF_ESW_DBCR_P2;
-+	} else {
-+		if (port == 0)
-+			reg &= ~MCF_ESW_DBCR_P0;
-+		else if (port == 1)
-+			reg &= ~MCF_ESW_DBCR_P1;
-+		else if (port == 2)
-+			reg &= ~MCF_ESW_DBCR_P2;
-+	}
-+
-+	writel(reg, fep->hwp + ESW_DBCR);
-+	return 0;
-+}
-+
-+/* The frame is forwarded to the forced destination ports.
-+ * It only replace the MAC lookup function,
-+ * all other filtering(eg.VLAN verification) act as normal
-+ */
-+int mtip_forced_forward(struct switch_enet_private *fep, int port, bool enable)
-+{
-+	u32 reg = 0;
-+
-+	if (port & ~GENMASK(1, 0)) {
-+		dev_err(&fep->pdev->dev,
-+			"%s: Forced forward for port(s): 0x%x not supported!\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
-+
-+	/* Enable Forced forwarding for port(s) */
-+	reg |= FIELD_PREP(MCF_ESW_P0FFEN_FD_MASK, port & GENMASK(1, 0));
-+
-+	if (enable)
-+		reg |= MCF_ESW_P0FFEN_FEN;
-+	else
-+		reg &= ~MCF_ESW_P0FFEN_FEN;
-+
-+	writel(reg, fep->hwp + ESW_P0FFEN);
-+	return 0;
-+}
-+
-+int mtip_port_learning_config(struct switch_enet_private *fep, int port,
-+			      bool disable, bool irq_adj)
-+{
-+	u32 reg = 0;
-+
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
-+
-+	reg = readl(fep->hwp + ESW_BKLR);
-+	if (disable) {
-+		if (irq_adj)
-+			writel(readl(fep->hwp + ESW_IMR) & ~MCF_ESW_IMR_LRN,
-+			       fep->hwp + ESW_IMR);
-+
-+		if (port == 0)
-+			reg |= MCF_ESW_BKLR_LD0;
-+		else if (port == 1)
-+			reg |= MCF_ESW_BKLR_LD1;
-+		else if (port == 2)
-+			reg |= MCF_ESW_BKLR_LD2;
-+	} else {
-+		if (irq_adj)
-+			writel(readl(fep->hwp + ESW_IMR) | MCF_ESW_IMR_LRN,
-+			       fep->hwp + ESW_IMR);
-+
-+		if (port == 0)
-+			reg &= ~MCF_ESW_BKLR_LD0;
-+		else if (port == 1)
-+			reg &= ~MCF_ESW_BKLR_LD1;
-+		else if (port == 2)
-+			reg &= ~MCF_ESW_BKLR_LD2;
-+	}
-+
-+	writel(reg, fep->hwp + ESW_BKLR);
-+	dev_dbg(&fep->pdev->dev, "%s ESW_BKLR %#x, ESW_IMR %#x\n", __func__,
-+		readl(fep->hwp + ESW_BKLR), readl(fep->hwp + ESW_IMR));
-+
-+	return 0;
-+}
-+
-+int mtip_port_blocking_config(struct switch_enet_private *fep, int port,
-+			      bool enable)
-+{
-+	u32 reg = 0;
-+
-+	if (port < 0 || port > 2) {
-+		dev_err(&fep->pdev->dev, "%s: Port (%d) not supported\n",
-+			__func__, port);
-+		return -EINVAL;
-+	}
-+
-+	reg = readl(fep->hwp + ESW_BKLR);
-+	if (enable) {
-+		if (port == 0)
-+			reg |= MCF_ESW_BKLR_BE0;
-+		else if (port == 1)
-+			reg |= MCF_ESW_BKLR_BE1;
-+		else if (port == 2)
-+			reg |= MCF_ESW_BKLR_BE2;
-+	} else {
-+		if (port == 0)
-+			reg &= ~MCF_ESW_BKLR_BE0;
-+		else if (port == 1)
-+			reg &= ~MCF_ESW_BKLR_BE1;
-+		else if (port == 2)
-+			reg &= ~MCF_ESW_BKLR_BE2;
-+	}
-+
-+	writel(reg, fep->hwp + ESW_BKLR);
-+	return 0;
++	unregister_netdevice_notifier(&mtip_netdevice_nb);
 +}
 -- 
 2.39.5
