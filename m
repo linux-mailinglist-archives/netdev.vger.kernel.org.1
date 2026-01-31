@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-255433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGNeCtASfml6VQIAu9opvQ
-	(envelope-from <netdev+bounces-255433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:33:52 +0100
+	id 8Ax/GgUSfmlLVQIAu9opvQ
+	(envelope-from <netdev+bounces-255438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:30:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4B72C2761
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:33:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9322DC26CA
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D1F7F3030992
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:27:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 85E73301D240
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF7136681B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E3E36683F;
 	Sat, 31 Jan 2026 14:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GwEnvRTB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUlq74Q3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749CC359FAF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CC835A93B;
 	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769869522; cv=none; b=CmbQZiQe0EcCcPv+U49bmZqqi+Sa30H7s6yDATlO9SBaDe2HKzDdBB6mgZtOHaLv0r/6qCFaZakBPhJXNb2HWHyUFcgcFNcIZ+2uoOSLuZ0HsJBNkuzO3RQPcXDi3ych/fACSbDba+VGEJv6plCi6Htpw0DJf+q7RJaaJkhLkcg=
+	t=1769869522; cv=none; b=Z1V2qWONqM4HChq0CxOUihiQy/OaO9KJ92p73XB8++aU7r/4s6panXOf8V3f43oJIe5H9askYBHDhOxfKPOmd3CqqnUv0geKChUMZAAJY4TbqUnsElGJGvrLzSe2QDIGKEcM29WmmwgxkphtW6SDpNoW03397xHPQGP4FyvyHqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769869522; c=relaxed/simple;
-	bh=4aMfKYcVERhHxWAsYjEi8+tgICvrID1mZsAmSUTyoxc=;
+	bh=C2cStPoOoGCftK6fYM/VQjKEO1UC2wtJ9483nmjaklU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=th9Tign/ogcZUgLi3jjfBzw97d8T2X1DpH9VRj/qxpnqtvC0BPGVWc8U14fDxSiUg0OdM35aUEfcbvF8QJoBn0KatSC0YxWOCetMZMKdEjugVqgdX672sV0qsyu+9Bgd2GznMqiM+hPZDXpT+0NMON1gaiwa5pE/Rqb9rI6JKqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GwEnvRTB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E75FEC4CEF1;
-	Sat, 31 Jan 2026 14:25:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cEOfetqAl1XlXVsZlqdJHNBO6Eqeu/fodY7hFQ6jhgWaS0MS2gGzJtLf5rYihITKGnIY7ly0QSiEQJLKDQ/REILIU+C3nS+ZFtl7DO5vmn34BPXvda5eohjeLJLY4Ojy+nsE3sJe5HrTLgxZykh0KfRz0Ra/ZjhkOHR9W6f4vy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUlq74Q3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04926C4AF67;
+	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769869522;
-	bh=4aMfKYcVERhHxWAsYjEi8+tgICvrID1mZsAmSUTyoxc=;
+	bh=C2cStPoOoGCftK6fYM/VQjKEO1UC2wtJ9483nmjaklU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GwEnvRTBbcukjFCvBXvPdgcMk8cgUg/NaCFQ0rJOvDeTecyO+ZPAkjpB/Ku3JxiY8
-	 GMBLmijNIKMU44tEeKWSwefOeYvvim8vyZpfqFsjJMPO27NfrgSeVMkDacZNKm60Cb
-	 XNLdkazVD4yre6r7b0aF1is/lkAwGwRGaMrdozz4fvmF7zDzMfTsOM4TI6kuu2Slbq
-	 HzMCVXVkDYQh+J+b9YGeyPpOtOwVbT/ma64oMzW8R51OIxHD7f2f8KzCF9jzsjf+ZK
-	 Yy7GXjlkf9Owx8xrNBMDZGTq6Wzv4s0SsQNowqDsocRn2CoCKudSeOONO5uwmZbHCx
-	 3ZESXL3Kdrumg==
+	b=XUlq74Q3cKfYzyY2KmtaeWNQkjLbbRDt5JtA5d4kbIkyhkSG2+r9AGrHLU4Qs3OAO
+	 3CImQgNMNaRltbbsjangUr8/RFy/xKGsHu358A75l53bxFqHHyasF1Y45xDrcFc7ZZ
+	 zUGz4lPK3g2E73Jcj6dtY4eaNtIuN0oRlF39s22PGLYoBlu/2KrKfAQvAhr+IyXRR+
+	 fiDNVldhW85MRQCVRgbBHJVmTVarAAtjw7rDnTFIEHavj+WTvsWpLmLJ87yKpKiD0Q
+	 +HIoB2dNIDt/n0P2oHfuEaY5mV8k8GNS3pw9TsRmf1W18wyoLE9yQyFvxtldDB8Ism
+	 kso7P7jRnB1bA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vmBua-0000000AVlr-0oEC;
+	id 1vmBua-0000000AVlv-0v7X;
 	Sat, 31 Jan 2026 15:25:20 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
-	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>
+	Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	intel-wired-lan@lists.osuosl.org,
 	linux-hardening@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>,
 	Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v4 32/41] docs: sphinx-build-wrapper: allow -v override -q
-Date: Sat, 31 Jan 2026 15:25:06 +0100
-Message-ID: <64fe15e0ddaba7de59a7c031db03f87c19873c04.1769867954.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v4 33/41] tools: sphinx-build-wrapper: improve its help message
+Date: Sat, 31 Jan 2026 15:25:07 +0100
+Message-ID: <9a41e5aa1da74e30a05bc21537a0c170450f01e3.1769867954.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769867953.git.mchehab+huawei@kernel.org>
 References: <cover.1769867953.git.mchehab+huawei@kernel.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255433-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-255438-lists,netdev=lfdr.de,huawei];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -96,72 +96,83 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B4B72C2761
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9322DC26CA
 X-Rspamd-Action: no action
 
-Documentation builds were using "-q" for a long time, but sometimes
-it is nice to see the Sphinx progress, without increasing build
-verbosity - which would also turn on kernel-doc verbosity.
+Besides the parameters that are passed via command line arguments,
+the wrapper's behavior is affected by several environment variables.
 
-Instead of doing that, let's parse the sphinx-build already-existing
--v: each time it is used, it increases the verbosity level.
-
-With that, if the default is to use -q, a single -v will disable
-quiet mode. Passing more -v will keep increasing its verbosity.
+Document that. While here, use __doc__ for its description.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/docs/sphinx-build-wrapper | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ tools/docs/sphinx-build-wrapper | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
 diff --git a/tools/docs/sphinx-build-wrapper b/tools/docs/sphinx-build-wrapper
-index 78ff7ac202ef..8080ace60680 100755
+index 8080ace60680..b7c149dff06b 100755
 --- a/tools/docs/sphinx-build-wrapper
 +++ b/tools/docs/sphinx-build-wrapper
-@@ -168,6 +168,7 @@ class SphinxBuilder:
-         parser = argparse.ArgumentParser()
-         parser.add_argument('-j', '--jobs', type=int)
-         parser.add_argument('-q', '--quiet', action='store_true')
-+        parser.add_argument('-v', '--verbose', default=0, action='count')
+@@ -814,20 +814,42 @@ def jobs_type(value):
+     except ValueError:
+         raise argparse.ArgumentTypeError(f"Must be 'auto' or positive integer, got {value}")  # pylint: disable=W0707
  
-         #
-         # Other sphinx-build arguments go as-is, so place them
-@@ -179,10 +180,14 @@ class SphinxBuilder:
-         # Build a list of sphinx args, honoring verbosity here if specified
-         #
- 
--        verbose = self.verbose
-         sphinx_args, self.sphinxopts = parser.parse_known_args(sphinxopts)
++EPILOG="""
++Besides the command line arguments, several environment variables affect its
++default behavior, meant to be used when called via Kernel Makefile:
 +
-+        verbose = sphinx_args.verbose
-+        if self.verbose:
-+            verbose += 1
++- KERNELVERSION:  Kernel major version
++- KERNELRELEASE:  Kernel release
++- KBUILD_VERBOSE: Contains the value of "make V=[0|1] variable.
++                  When V=0 (KBUILD_VERBOSE=0), sets verbose level to "-q".
++- SPHINXBUILD:    Documentation build tool (default: "sphinx-build").
++- SPHINXOPTS:     Extra options pased to SPHINXBUILD
++                  (default: "-j auto" and "-q" if KBUILD_VERBOSE=0).
++                  The "-v" flag can be used to increase verbosity.
++                  If V=0, the first "-v" will drop "-q".
++- PYTHON3:        Python command to run SPHINXBUILD
++- PDFLATEX:       LaTeX PDF engine. (default: "xelatex")
++- LATEXOPTS:      Optional set of command line arguments to the LaTeX engine
++- srctree:        Location of the Kernel root directory (default: ".").
 +
-         if sphinx_args.quiet is True:
--            verbose = False
-+            verbose = 0
++"""
++
+ def main():
+     """
+     Main function. The only mandatory argument is the target. If not
+     specified, the other arguments will use default values if not
+     specified at os.environ.
+     """
+-    parser = argparse.ArgumentParser(description="Kernel documentation builder")
++    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
++                                     description=__doc__,
++                                     epilog=EPILOG)
  
-         #
-         # If the user explicitly sets "-j" at command line, use it.
-@@ -195,8 +200,11 @@ class SphinxBuilder:
-         else:
-             self.n_jobs = None
+     parser.add_argument("target", choices=list(TARGETS.keys()),
+                         help="Documentation target to build")
+     parser.add_argument("--sphinxdirs", nargs="+",
+                         help="Specific directories to build")
+     parser.add_argument("--builddir", default="output",
+-                        help="Sphinx configuration file")
++                        help="Sphinx configuration file (default: %(default)s)")
  
--        if not verbose:
-+        if verbose < 1:
-             self.sphinxopts += ["-q"]
-+        else:
-+            for i in range(1, sphinx_args.verbose):
-+                self.sphinxopts += ["-v"]
+     parser.add_argument("--theme", help="Sphinx theme to use")
  
-     def __init__(self, builddir, venv=None, verbose=False, n_jobs=None,
-                  interactive=None):
+@@ -843,7 +865,7 @@ def main():
+                         help="place build in verbose mode")
+ 
+     parser.add_argument('-j', '--jobs', type=jobs_type,
+-                        help="Sets number of jobs to use with sphinx-build")
++                        help="Sets number of jobs to use with sphinx-build(default: auto)")
+ 
+     parser.add_argument('-i', '--interactive', action='store_true',
+                         help="Change latex default to run in interactive mode")
 -- 
 2.52.0
 
