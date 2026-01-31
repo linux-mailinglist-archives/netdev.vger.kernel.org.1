@@ -1,175 +1,165 @@
-Return-Path: <netdev+bounces-255366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKd8DJ6UfWnQSgIAu9opvQ
-	(envelope-from <netdev+bounces-255366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:35:26 +0100
+	id 2A1IBLmYfWlOSwIAu9opvQ
+	(envelope-from <netdev+bounces-255367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:52:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A509FC0D22
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:35:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 575A7C0E5B
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:52:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32114303B7E4
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 05:33:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8F57300C93C
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 05:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A3F339870;
-	Sat, 31 Jan 2026 05:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dh6Ok4ym"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9782C158E;
+	Sat, 31 Jan 2026 05:52:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC7E32BF3A;
-	Sat, 31 Jan 2026 05:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505E6221F20;
+	Sat, 31 Jan 2026 05:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769837613; cv=none; b=m4UxOUF6K2ze4MVWXNMPGeYMZ+o1y1C3XfRYcQZrK0H99UKv1MbZRlXH+lD8Vv/3KzzNvgsoPKSCU71S2phMt5LAVk2goOZ0sEFh6h+wF9YWfqDsvGuWGhKKOccJ/zsFb7pUZW60ejKjWwPnSPNfwE4JW9T7+p6sBTR5CiKVpoU=
+	t=1769838773; cv=none; b=kqCpQteBc+zI/CDxQZIz+YVoXQYlcHo4Krtt8DExjPHwFIzpBrI2OjmhSQOVh4BLcJs1Fai9TETPsAt7kd6/nwshD1riZ4JhwQ+O0oGIuqrqnyYAZu92oAnnA4oX8OByfBJGAqn38t3jCGsFx50hiA6qFUlegjvoG0MDUY9TOC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769837613; c=relaxed/simple;
-	bh=P+p16aunagLmuKqsTKiUhxUEzv4rjEwCmBflcpJwHdI=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=k8SizdPNRED3jsMUxeCR6Q/ve04rpcqnQkwqTnOkKdtCgS3FywSSHWiRNRtHD0VBRPPAHCsIqZ6tbQk0flvkhazSk9f2J1Jv1Ezp8XIvJeYIwekPpTe9Sdao3yPpEdiDpBRZRHtbkkvDB3JtKVicsWzNwviyldYEi4ilN1fFV6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dh6Ok4ym; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4202C4CEF1;
-	Sat, 31 Jan 2026 05:33:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769837613;
-	bh=P+p16aunagLmuKqsTKiUhxUEzv4rjEwCmBflcpJwHdI=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=Dh6Ok4ymEd8QNHh6368BbA7TP49LZtLdwXYM41msKUJf4bo86qdVkgXbJZOgcVqsJ
-	 0SJ5KlfGSPIDyKWwUXIxzVoic8rnLqX84586HWELMmCwXHtFBVGWQIRVp7yqxcG/Bh
-	 jVUF5OGQGPSGy0p3yjq8WhlYXFt9IGXLwaYoMhbYVskKw+OEoDUPPL8fnuD3xjcVJ/
-	 2HPXRAWvalx/HI60OFdUOIFft5HgbYNO4hNMqt6tE4738kAJpEdeXNmGksB4lVGnPq
-	 XHCWJPqpaB7VlFChiyhpmdTU27P4wetMtUG/w5t97yXagcVcbOYSWIWL2pJIJFeoc6
-	 6MI4xng/ILQRQ==
-Content-Type: multipart/mixed; boundary="===============0743677568194036131=="
+	s=arc-20240116; t=1769838773; c=relaxed/simple;
+	bh=PmbAJYJkov8V5YggkGt6mnyWmVPIBHeFOH5at+c+duk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BrXbp0GX1mZNMXyd9Sg7PSC8fJBMRD9M7oWPVRB248VNbsvqJLmFr5BIt4XZ2b1lvBVhLiEHEU3kghRiHXjtbl1XTkAWYlgajb4deJA/wAk/GxcRKSkyeqhzYi9eT30N8D0M16Fj4EiYisZr3W3ak+aPAdsxAsE5fPn4exGetR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from localhost.localdomain (unknown [36.112.3.223])
+	by APP-05 (Coremail) with SMTP id zQCowAAXpgmSmH1pKjcfBw--.29939S2;
+	Sat, 31 Jan 2026 13:52:19 +0800 (CST)
+From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel@iogearbox.net,
+	magnus.karlsson@intel.com,
+	bjorn@kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] i40e: add an error handling path in i40e_xsk_pool_enable()
+Date: Sat, 31 Jan 2026 13:52:17 +0800
+Message-Id: <20260131055217.729048-1-lihaoxiang@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <fc5f36c2f50b99cba8b9b6d020a7400911a84c372ca15be7707c8513239228f3@mail.kernel.org>
-In-Reply-To: <20260131050920.2574084-2-ameryhung@gmail.com>
-References: <20260131050920.2574084-2-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v4 01/16] bpf: Select bpf_local_storage_map_bucket based on bpf_local_storage
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,memxor@gmail.com,martin.lau@kernel.org,kpsingh@kernel.org,yonghong.song@linux.dev,song@kernel.org,haoluo@google.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sat, 31 Jan 2026 05:33:32 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAAXpgmSmH1pKjcfBw--.29939S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF4xJF4DJF43uF13Aw1UZFb_yoW8Gw17pr
+	4j9a95Cr1rXFW5Wa9rJF4j9an8Ja1ftry0gF4fGanY9r15ta17JF1xtFWFgFy8ZrW8Janx
+	KF1DArs8CFn8J3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiCRAEE2l9cjNJQwAAsR
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255366-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	TAGGED_FROM(0.00)[bounces-255367-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: A509FC0D22
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[isrc.iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: 575A7C0E5B
 X-Rspamd-Action: no action
 
---===============0743677568194036131==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In i40e_xsk_pool_enable(), add an error handling path to
+prevent potential memory leaks.
 
-> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-> index e2fe6c328..6615091dd 100644
-> --- a/kernel/bpf/bpf_local_storage.c
-> +++ b/kernel/bpf/bpf_local_storage.c
-
-[ ... ]
-
-> @@ -368,9 +371,13 @@ static void bpf_selem_unlink_map(struct bpf_local_storage_elem *selem)
->  void bpf_selem_link_map(struct bpf_local_storage_map *smap,
->  			struct bpf_local_storage_elem *selem)
->  {
-> -	struct bpf_local_storage_map_bucket *b = select_bucket(smap, selem);
-> +	struct bpf_local_storage *local_storage;
-> +	struct bpf_local_storage_map_bucket *b;
->  	unsigned long flags;
->
-> +	local_storage = rcu_dereference_check(selem->local_storage,
-> +					      bpf_rcu_lock_held());
-> +	b = select_bucket(smap, local_storage);
-
-The commit message states: "This is safe since a selem is always linked to
-local_storage before linked to map."
-
-Is this claim accurate? Looking at bpf_local_storage_update(), the order is:
-
-    /* First, link the new selem to the map */
-    bpf_selem_link_map(smap, selem);
-
-    /* Second, link (and publish) the new selem to local_storage */
-    bpf_selem_link_storage_nolock(local_storage, selem);
-
-The comment explicitly says "First, link the new selem to the map" which is
-the opposite order from what the commit message claims.
-
-Similarly, in bpf_sk_storage_clone() when new_sk_storage is non-NULL:
-
-    bpf_selem_link_map(smap, copy_selem);
-    bpf_selem_link_storage_nolock(new_sk_storage, copy_selem);
-
-Since bpf_selem_alloc() does not initialize selem->local_storage (it only
-sets SDATA(selem)->smap), and bpf_selem_link_storage_nolock() is what sets
-selem->local_storage, wouldn't this mean bpf_selem_link_map() reads NULL
-from selem->local_storage?
-
-With local_storage being NULL, select_bucket() would compute hash_ptr(NULL)
-which returns 0, placing all newly linked selems into bucket 0. Later when
-bpf_selem_unlink_map() runs, selem->local_storage has been set, so it
-computes a different bucket and tries to unlink from the wrong bucket.
-
-The next commit in the series (82de4fd08 "bpf: Convert bpf_selem_unlink_map
-to failable") introduces bpf_selem_link_map_nolock() to fix this for
-bpf_local_storage_alloc() and bpf_local_storage_update(), but
-bpf_sk_storage_clone() still uses bpf_selem_link_map() and appears to
-remain affected throughout the series.
-
->  	raw_spin_lock_irqsave(&b->lock, flags);
->  	hlist_add_head_rcu(&selem->map_node, &b->list);
->  	raw_spin_unlock_irqrestore(&b->lock, flags);
-
-
+Fixes: 1742b3d52869 ("xsk: i40e: ice: ixgbe: mlx5: Pass buffer pool to driver instead of umem")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+Changes in v2:
+- Add a Fixes tag. Thanks, Paul!
+- Replace unmap with i40e_xsk_pool_disable() to prevent
+a limbo state of queues. Thanks, Maciej! 
+---
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21539340647
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+index 9f47388eaba5..a72a309540c3 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+@@ -108,23 +108,26 @@ static int i40e_xsk_pool_enable(struct i40e_vsi *vsi,
+ 	if (if_running) {
+ 		err = i40e_queue_pair_disable(vsi, qid);
+ 		if (err)
+-			return err;
++			goto err_out;
+ 
+ 		err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], true);
+ 		if (err)
+-			return err;
++			goto err_out;
+ 
+ 		err = i40e_queue_pair_enable(vsi, qid);
+ 		if (err)
+-			return err;
++			goto err_out;
+ 
+ 		/* Kick start the NAPI context so that receiving will start */
+ 		err = i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX);
+ 		if (err)
+-			return err;
++			goto err_out;
+ 	}
+ 
+ 	return 0;
++
++err_out:
++	i40e_xsk_pool_disable(vsi, qid);
+ }
+ 
+ /**
+-- 
+2.25.1
 
-AI-authorship-score: low
-AI-authorship-explanation: The commit has typical human characteristics: domain-specific BPF knowledge, concise explanations, and follows kernel conventions.
-issues-found: 1
-issue-severity-score: high
-issue-severity-explanation: Hash bucket mismatch causes selems to be inserted into wrong bucket and never properly unlinked, leading to hash list corruption.
-
---===============0743677568194036131==--
 
