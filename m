@@ -1,53 +1,63 @@
-Return-Path: <netdev+bounces-255502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oN8vI/lcfmnfXgIAu9opvQ
-	(envelope-from <netdev+bounces-255502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 20:50:17 +0100
+	id 6HYqHGtmfmkzYQIAu9opvQ
+	(envelope-from <netdev+bounces-255503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:30:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB0EC3B93
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 20:50:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9651C3E3A
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 21:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38486300DDE9
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 19:50:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CFE6330193BB
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 20:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E6D35E536;
-	Sat, 31 Jan 2026 19:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE8236827A;
+	Sat, 31 Jan 2026 20:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4C8ELmJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T5K9lXfi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BCA2C0F81
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 19:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD2E2F7478
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 20:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769889014; cv=none; b=oE8UiF92BYWdgHQz6C0gdgSjB+CnBFZWL5lsqJdN8CMtPm58meI+hR32V5tT9dBAxCEFymqniFllOHLzHQ1G0iUR+lD6jplrAiFen2lOOgl5pC8lKClxPNei37Wvh+sWUqtmcMrXORDMKJs4AvPkl+tWt2NmlP+Ck7lf3qQEhoE=
+	t=1769891431; cv=none; b=Cpf3DdK4J2ntgOzQs8D7kHt5WFUHSa43Bd6Kz7E7SFjQOa9QK5Qm18YagRsW8q65LD5P/NkFp57LTuie+J1QicIFIHE+C8cM3WmUvvBW/1Gm8hIHHUlSyBXw74EbiyLGr+apBjrUFnPBsDKojImS9hk6yddzxTrhkiHIWR24VYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769889014; c=relaxed/simple;
-	bh=n/i8YbvvBVIYjFIE8pAiIV6lyzqV5egfdgrxbTsb+2Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Oiu6mskLbIjNSe26seIqjSxdCYYyGcblC1SqJaOpr/tlDFtykOxdSlvqYo9NVPGbJEL0I9kOI3OuTH2hkB05CrpZadvzIM7963lFkYhChOniCzLkAk5m9HiEG5jF2Ip9lhpjwlWtD4c9kpuVLKGUS3D3NI0qWyqRLYL0EPAAOKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4C8ELmJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 459F8C4CEF1;
-	Sat, 31 Jan 2026 19:50:14 +0000 (UTC)
+	s=arc-20240116; t=1769891431; c=relaxed/simple;
+	bh=YrLARkMIUubX1RMXUb206ecBLrRdcpgg5pAUbAAH9+Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kwG2tSv6MTHLVqDmlN+B3RbjL3Sj52d0ExfSvPHwsV92ijigH92Ls83RRqtjmwpNc2lhQqs2jYfIwVVgCae5IBk0PiYba34mpYk9tcSh8Ui0pCRQpdJ4BJrkxNZBTE6qgXuQzk/mtnlJh81dwDKbFimGoqLSCPsvw5FIQUxsF4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T5K9lXfi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D224AC4CEF1;
+	Sat, 31 Jan 2026 20:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769889014;
-	bh=n/i8YbvvBVIYjFIE8pAiIV6lyzqV5egfdgrxbTsb+2Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Q4C8ELmJnI/kcc4Z5a/XsU17uJdIkA0uFYM7LUum4XXoqpSmn5pMq1JHmQkA5d9Gy
-	 bLxbocH4EOrhpJEBpQ101iIRMKqj5B/1lQjeXP6aJOcCknPNyPp67yCKjP7gpxN4KB
-	 dkQght1eZRKcD0wZJemLi43ANquHbcffTSq06DUTMwo3Rq/6Th4xnQDfpYAu9dSyJT
-	 LRJhglX9PVZAB9icikRdWI5HuSwRHQM3zU6Ct0aMBn79X+p67Yqb3LLEbmt2evqZkq
-	 M2mDpcxazFnRQICVseFSr3I+FZXYY+Kx/4HlUbbxAh+C4LCGz8uhSCw+aTlztqCxbT
-	 nfHA81671fKJg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EAE7380DBD3;
-	Sat, 31 Jan 2026 19:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1769891431;
+	bh=YrLARkMIUubX1RMXUb206ecBLrRdcpgg5pAUbAAH9+Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=T5K9lXfiuAVrVLOR9EiLXAZzvzIFcSPEu9ePejLmyAEXSOJjGBgvVMkGbvEmuuOwi
+	 1nGeUnb4P8JvGJqeWFuJrq35jMJVm7woTi3A+MkFtDpaYgMqsKmqIj4IQqyNwSo/jo
+	 Pii44hHeXT2UhcYL8xDPhXcZitW3IFYt6ZU2PRzD3xdFUxTl1CQkqP3w11TTJOJXoa
+	 bbJv0h51R6Tsye6W55+1gI07/HZdcIpnN2wvcsjk2LtKXKgMyo6b7WXlz+tPTKXznr
+	 SU5OA3yUw3nlh6ieue4p5vDHtKjstkceS5XRLYMPwLRis7zzlFj2zSwuIWm2RPanWU
+	 nb9GmV2FeQKEQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	donald.hunter@gmail.com,
+	sdf@fomichev.me,
+	gal@nvidia.com
+Subject: [PATCH net-next] tools: ynl: cli: make the output compact
+Date: Sat, 31 Jan 2026 12:30:29 -0800
+Message-ID: <20260131203029.1173492-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,65 +65,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] man: Fix spelling in tipc-link man page
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176988900611.4174530.10079504144242944655.git-patchwork-notify@kernel.org>
-Date: Sat, 31 Jan 2026 19:50:06 +0000
-References: <20260131191741.32416-1-dsahern@kernel.org>
-In-Reply-To: <20260131191741.32416-1-dsahern@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-255502-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,fomichev.me,nvidia.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255503-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DDB0EC3B93
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,fomichev.me:email]
+X-Rspamd-Queue-Id: D9651C3E3A
 X-Rspamd-Action: no action
 
-Hello:
+Make the default (non-JSON) output more compact. Looking at RSS
+context dumps is pretty much impossible without this, because
+default print shows the indirection table with line per entry:
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+  'indir': [0,
+            1,
+            2,
+	    ...
 
-On Sat, 31 Jan 2026 12:17:40 -0700 you wrote:
-> Signed-off-by: David Ahern <dsahern@kernel.org>
-> ---
->  man/man8/tipc-link.8 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+And indirection tables have 100-200 entries each.
 
-Here is the summary with links:
-  - [iproute2] man: Fix spelling in tipc-link man page
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=72f679c0d076
+The compact output is far more readable:
 
-You are awesome, thank you!
+    'indir': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+              16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: donald.hunter@gmail.com
+CC: sdf@fomichev.me
+CC: gal@nvidia.com
+---
+ tools/net/ynl/pyynl/cli.py | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+index fdac1ab10a40..94a5ba348b69 100755
+--- a/tools/net/ynl/pyynl/cli.py
++++ b/tools/net/ynl/pyynl/cli.py
+@@ -44,6 +44,10 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+         return f"{modifiers}{text}{Colors.RESET}"
+     return text
+ 
++def term_width():
++    """ Get terminal width in columns (80 if stdout is not a terminal) """
++    return shutil.get_terminal_size().columns
++
+ def schema_dir():
+     """
+     Return the effective schema directory, preferring in-tree before
+@@ -103,8 +107,7 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+ 
+             if attr.yaml.get('doc'):
+                 doc_prefix = prefix + ' ' * 4
+-                term_width = shutil.get_terminal_size().columns
+-                doc_text = textwrap.fill(attr.yaml['doc'], width=term_width,
++                doc_text = textwrap.fill(attr.yaml['doc'], width=term_width(),
+                                          initial_indent=doc_prefix,
+                                          subsequent_indent=doc_prefix)
+                 attr_info += f"\n{doc_text}"
+@@ -264,7 +267,7 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+         if args.output_json:
+             print(json.dumps(msg, cls=YnlEncoder))
+         else:
+-            pprint.PrettyPrinter().pprint(msg)
++            pprint.pprint(msg, width=term_width(), compact=True)
+ 
+     if args.list_families:
+         for filename in sorted(os.listdir(spec_dir())):
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.52.0
 
 
