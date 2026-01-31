@@ -1,248 +1,210 @@
-Return-Path: <netdev+bounces-255468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wDFkNnQ5fmn7WQIAu9opvQ
-	(envelope-from <netdev+bounces-255468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:18:44 +0100
+	id YCWZJ5A5fmn7WQIAu9opvQ
+	(envelope-from <netdev+bounces-255469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:19:12 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C72CC3297
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:18:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A78DC32B6
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:19:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93340301FCA3
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:18:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CCE90301FCB7
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF1334844C;
-	Sat, 31 Jan 2026 17:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8FB348445;
+	Sat, 31 Jan 2026 17:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="n7fQcUve"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVY8nC1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-08.mail-europe.com (mail-08.mail-europe.com [57.129.93.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CA3329C78;
-	Sat, 31 Jan 2026 17:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.129.93.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E7C329C78
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769879919; cv=none; b=myHY4xpn7VL7qiemcAwinrvZGjkt/j1B7Mv3k/rxe74DL2rqjJc5/UNkmNDrBO23MK8JaB6kFXEk+jRbesIaQ/sLY4+sxNIJgVX8X8DknTfA8b2UlnH4UudB26St+l8g1UmxjNsYL2F80o/MSRIyjwkheQoOdyrJbTnfXApQj7A=
+	t=1769879939; cv=none; b=VsG5i9M0hJdfa30f7m07d1HGKwgcFjIH9RPxIeXbULLHq2uDnHUKjkISa7Eop5PO8fz0cK7HGEfe0SJd3nuIRu4jx0Y2698rpZDrUOvJPCM3zIseCUBdQPfFj0I+5gFzuNag8nJwmMmq0M7O5zrfYD3Kh+trXND9UJGYkbVrlSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769879919; c=relaxed/simple;
-	bh=/TkOQGchM66F3gOA8TWfrK7sewXmnSyDisuWvpdNpTI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tvDVnOsX4pFISvb0QmjDLvcmcqhZVsVvieLire8Rr2U5gGIrPr/ReRdH9sjK6p8N7zyTHSsFZvxDgeK+/3Pku/iC1YDVzB6yRKTAKaPwb0YBtQv+sOuvowBD/3QHnB5ngcVKPFPcCCanxwNt+NPCevcOewf4aDFBYE9SJh9pflA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=n7fQcUve; arc=none smtp.client-ip=57.129.93.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1769879900; x=1770139100;
-	bh=/TkOQGchM66F3gOA8TWfrK7sewXmnSyDisuWvpdNpTI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=n7fQcUveggFTIBk8Wxc/LOpujkQ4LBPU+hdAcNflu3c4iIM4O6VVZcaQL9zhtGXCc
-	 GcOa4KWlQE+ivEfWi2iDOuSsWA1ly/cxC6HVP1KNshNzkE3D/Rm7KrNrdeTe8y2DDq
-	 +N9jd0TtSG1ifJqLS/nws1Hwep05gE7DIzmT+ctFX+jKFsrRRk1DmuGaZLEuj5ybkt
-	 eDCvW1aY9Uq88MOaYkb3tOFAK6TCZl/vM20YFuvw2B8xNoL6vBcrbxqyfVcq6wectr
-	 nzwwZmsNerb+bIRhy2bCPwq6Jm7Aq/9SULBXTOVcqDZKSGquSTlxXqr10kO+dDg8Pc
-	 S9Cj0Kgxl72qg==
-Date: Sat, 31 Jan 2026 17:18:16 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, Po Liu <Po.Liu@nxp.com>
-Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-Message-ID: <tuZof6471icLlkjecTuMCBxpZ5zJVhOeUv7lAK7MFwt3g7LfrH7ZFlbE5odrcbTFUukV6J8Dywy9daCrLI-kiY-_vpiABXStvdudLw-HXDI=@1g4.org>
-In-Reply-To: <CAM0EoMnseQw6H+a4wzhg7BkPJraFwN-=2x4FOSOUp5f7=XbyaQ@mail.gmail.com>
-References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com> <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org> <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com> <pXV1wsavqcYDq5HfAVaW_gMoTITR9M0PBWKhnz9n6VHYxhW56DQU7qfCEoaYcCixz4iqrj31Mt9vL9bHqTNGygLK5pYvyw1z3san5ndlkkQ=@1g4.org> <CAM0EoMkBb+d_5dn6vdtSxPJ-HuUUL9uei65euSQfX3bXYm9RAw@mail.gmail.com> <CAM0EoMnseQw6H+a4wzhg7BkPJraFwN-=2x4FOSOUp5f7=XbyaQ@mail.gmail.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: aef02823bc64f2c0d3fa85ecfd4f31cc27086972
+	s=arc-20240116; t=1769879939; c=relaxed/simple;
+	bh=SRbpMgp//MlZoMroQOq3CCTxUaqu/v6YKoNy6fCQMoE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XRSn4QMof7PWycw2GlStl6EQcdJzgFeyWn87k8v4LDruI6Nc7zjYIP0oAdWXZUubhebCZkpTByLF9xDXaLzU3IBzIg9QJto+apdNXx0OZ+ga7i9swo9w9rZRzPWYYvl9FwEEyZPsk5KMOz1jbLmb2ByAU9HstbHwB1Xc57VEi5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVY8nC1x; arc=none smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-649655f14daso2911432d50.0
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:18:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769879937; x=1770484737; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nf1H39GseXa0MaF9o3mhYXYnAWA6yd8MoMX3kBkjYXQ=;
+        b=eVY8nC1xqm/DNSOrzzMhTrzIhfElUBvr9J37OkRa6RrmLJOZHOJ9PKgfeUzXV6kedI
+         GubIHzkZgpy430Kf3Ph2gsvaVOCMrSZQUvQ+uzecHeM2ywz9WXiMHsMas8fMlV3krZ0T
+         yu+EG1ySjNC1eE1nnYidKgd/5xZ6hjSQJSWvoAnbBlTF1m6IHHqDNFHl77oL6Zsa+rWx
+         aNLRG6Z66gz85crgIYbUh/6u9srxbxESPe5Xz+2grzOwoOnhI1zpFbkpGCIqVn6o6SkD
+         S3vwswfUNQAm1urkoGrnNn06HtrwdtCqbk5h5iWVIg7WhRFDcfdTPY5JqQUO+kEx+xof
+         sRiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769879937; x=1770484737;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nf1H39GseXa0MaF9o3mhYXYnAWA6yd8MoMX3kBkjYXQ=;
+        b=ZopSXTWEWoH2POi9Wr9g3DjNlaclnnceOSJEG3qoc3IycqYPsA6KmzpGlz8yKUmHSE
+         WzTCyReBwgu8swpsSZj/uzYBEPUUyvZtm9Rl5tyUCyUh560CUy0EQeCvBw27D15OROel
+         +ZvuLIQJXjtjDjxN2tz56rWB+Gbgju75m1JPPIJALnQrLDqPa/67fczZFHS5Yb5PjxoR
+         +uTXosKHeXEYMvESlkkFw3agHoQCg/MIs5zg0ki4tuW6ZHADAcKoIKEKgYHV+BYcMsAw
+         lPcDS4vlbSfoFrVeH6tILwVU83lQtG3ZpQUs8J5pkRwoCHdIwqPVTj2/UHgxiJ8G+rLg
+         1ZlQ==
+X-Gm-Message-State: AOJu0Yw9CRJVnOEKOdug3b1DQ2ZuV/z/bnxd+8PNU+HCgorzhZqBbh3N
+	5Y6WxLFv6AX/uUGzXR5nTNwmGl/wPE4tDhA02gEG/DFmyWGuabXwhlVV
+X-Gm-Gg: AZuq6aKILp1/jeAbLAg4zciIz2y4C4HpyyNOXaFCl7+OlBG8GzzZE1lhWFFlKldTlth
+	PaewvbWP6CNvVIe7lT9qL8dMrXTIBbu0BX3yThiClmwPaHxteKpo91W48ZvtMKZmxzoIhoN6Wg7
+	GRxZUuvfjBuop7KepjTU5xg1lsI0z3pXJZTriY2LymLQs/1d2HqfC9DEbpr1Nnr+4IZb3VT0P4G
+	yAsb6qF2UCYS7AJ4OX8KghnXHSyZJFp35WP9o4USPHAqsAxpxOkk7FkYA/sERHr8SnxSEF5CRnV
+	1PThBLY30EOFLZx2Yn7XO/VgL/nqlNZ87tcSwtYJD36wMDYwzeA+bxpHZkl0GWmlOd8VLb82Qwh
+	hr3arq+l/06GtL2Feoe321hKtunyDBRIhpK2jOp5U7JNqKzzohvHuafMXmucV0nMnO3Bi29nwHg
+	oM11zP5jxi0rjYkhJiTjt9Vai7EW0scokx8Efin3m881kJ1STAbiQreheRXkw=
+X-Received: by 2002:a05:690e:4106:b0:649:6a9b:9902 with SMTP id 956f58d0204a3-649a84e05bdmr4993542d50.65.1769879936963;
+        Sat, 31 Jan 2026 09:18:56 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64996105c96sm5135603d50.23.2026.01.31.09.18.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 Jan 2026 09:18:56 -0800 (PST)
+Date: Sat, 31 Jan 2026 12:18:55 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.29ba7c9e89f32@gmail.com>
+In-Reply-To: <20260130192912.826454-1-kuba@kernel.org>
+References: <20260130192912.826454-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next] selftests: drv-net: rss: validate min RSS table
+ size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255468-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,nxp.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255469-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:email,1g4.org:dkim,1g4.org:mid,mojatatu.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1C72CC3297
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3A78DC32B6
 X-Rspamd-Action: no action
 
-1. Your script creates 100 separate gate actions, not one gate action with =
-a large schedule.
-2. Each =E2=80=9Ctc actions add =E2=80=A6 gate =E2=80=A6=E2=80=9D call crea=
-tes a new action, so you end up with 100 small actions.
-3. The issue I am reporting needs one single gate action that contains many=
- sched-entry objects.
-4. Because of that, your test only exercises the dump path with many small =
-actions.
-5. The failure I see is in the GETACTION notify path, not in the generic du=
-mp batching logic.
-6. In that path, tcf_get_notify() allocates a fixed-size skb using NLMSG_GO=
-ODSIZE.
-7. The kernel then tries to serialize one action into that skb.
-8. If a single action contains a large gate schedule, tca_get_fill() runs o=
-ut of tailroom and fails, and the kernel returns -EINVAL.
-9. A single sched-entry does not exceed NLMSG_GOODSIZE.
-10. The problem is one action with many sched-entries, because the entire e=
-ntry list is serialized into the payload of that one action.
-11. The =E2=80=9Ctotal acts 12 / 12 / 76=E2=80=9D output only shows how man=
-y small actions were packed into each dump batch.
-12. It does not reflect the size of an individual action dump, and in your =
-test each action is small.
-13. To reproduce with tc, you need one tc invocation that adds many sched-e=
-ntry attributes to the same gate action, and then run =E2=80=9Ctc actions g=
-et action gate index <idx>=E2=80=9D on that action.
-14. tc has it's own limit at 1024 apparently "addattr_l ERROR: message exce=
-eded bound of 1024"
+Jakub Kicinski wrote:
+> Add a test which checks that the RSS table is at least 4x the max
+> queue count supported by the device. The original RSS spec from
+> Microsoft stated that the RSS indirection table should be 2 to 8
+> times the CPU count, presumably assuming queue per CPU. If the
+> CPU count is not a power of two, however, a power-of-2 table
+> 2x larger than queue count results in a 33% traffic imbalance.
+> Validate that the indirection table is at least 4x the queue
+> count. This lowers the imbalance to 16% which empirically
+> appears to be more acceptable to memcache-like workloads.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+> +def _test_rss_indir_size(cfg, qcnt, context=0):
+> +    """Test that indirection table size is at least 4x queue count."""
+> +    ethtool(f"-L {cfg.ifname} combined {qcnt}")
+
+Remind me: does this work with devices that advertise RX N TX N rather
+than combined N?
+
+> +
+> +    rss = _get_rss(cfg, context=context)
+> +    indir = rss['rss-indirection-table']
+> +    ksft_ge(len(indir), 4 * qcnt, "Table smaller than 4x")
+> +    return len(indir)
+> +
+> +
+> +@ksft_variants([
+> +    KsftNamedVariant("main", False),
+> +    KsftNamedVariant("ctx", True),
+> +])
+> +def indir_size_4x(cfg, create_context):
+> +    """
+> +    Test that the indirection table has at least 4 entries per queue.
+> +    Empirically network-heavy workloads like memcache suffer with the 33%
+> +    imbalance of a 2x indirection table size.
+> +    4x table translates to a 16% imbalance.
+> +    """
+> +    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
+> +    ch_max = channels.get('combined-max', 0)
+
+Same here: not all drivers set this.
+
+Perhaps we should skip if absent?
+
+And does combined-max mean all queues across all contexts, or per
+context? The test seems to imply the second. My intuition was the
+first. Is it clearly defined across devices. per ethtool_channels,
+seems per device?
+
+  * @max_combined: Read only. Maximum number of combined channel the driver
+  *      support. Set of queues RX, TX or other.
 
 
-I'm not opposed to gate being clamped instead of adding support for large s=
-chedule sizes, but I wanted to thoroughly document why it's not possible so=
- the next person isn't chasing a cryptic -EINVAL like I did.
+> +    qcnt = channels['combined-count']
+> +
+> +    if ch_max < 3:
+> +        raise KsftSkipEx(f"Not enough queues for the test: max={ch_max}")
+> +
+> +    defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
+> +    ethtool(f"-L {cfg.ifname} combined 3")
+> +
+> +    ctx_id = _maybe_create_context(cfg, create_context)
+> +
+> +    indir_sz = _test_rss_indir_size(cfg, 3, context=ctx_id)
+> +
+> +    # Test with max queue count (max - 1 if max is a power of two)
+> +    test_max = ch_max - 1 if _is_power_of_two(ch_max) else ch_max
+> +    if test_max > 3 and indir_sz < test_max * 4:
+> +        _test_rss_indir_size(cfg, test_max, context=ctx_id)
+> +
 
-Thanks
-Paul
-
-
-
-
-On Saturday, January 31st, 2026 at 11:14 AM, Jamal Hadi Salim <jhs@mojatatu=
-.com> wrote:
-
->=20
->=20
-> On Sat, Jan 31, 2026 at 11:51=E2=80=AFAM Jamal Hadi Salim jhs@mojatatu.co=
-m wrote:
->=20
-> > .
-> >=20
-> > On Fri, Jan 30, 2026 at 3:48=E2=80=AFPM Paul Moses p@1g4.org wrote:
-> >=20
-> > > What version of act_gate.c are you currently testing?
-> >=20
-> > I am running plain ubuntu on this machine using their shipped kernel 6.=
-8.0.
-> > But i did look at the latest kernel tree and the dumping code has not c=
-hanged.
-> > +Cc Po Liu who i believe added that code.
-> >=20
-> > > Did you actually run the tests? =E2=80=9Clarge dump=E2=80=9D creates =
-ONE action at base_index, with num_entries=3D100, then immediately does GET=
-ACTION. So =E2=80=9Ctc actions ls action gate | grep index | wc -l=E2=80=
-=9D won=E2=80=99t exercise this, because it only counts actions. It doesn=
-=E2=80=99t amplify the per action dump size (the entry list does). It uses =
-libmnl (mnl_socket_sendto / mnl_socket_recvfrom) with MNL_SOCKET_BUFFER_SIZ=
-E. There is no custom netlink handling. The failure is returned by the kern=
-el before userspace parses anything. The dumps are transactional at the net=
-link level, but an individual action dump still has to fit in the skb backi=
-ng that message.
-> >=20
-> > Sorry - I am not running your code (didnt want to compile anything on
-> > this machine), just plain tc and i have to admit I dont know much
-> > about the mechanics or spec for gate, so my example is based on
-> > something Po Liu posted, here's a script to add 100 entries:
-> > ---
-> > for i in {1..100}; do
-> > echo "$i"
-> > tc actions add action gate clockid CLOCK_TAI sched-entry open
-> > 200000000 -1 8000000 sched-entry close 100000000 -1 -1
-> > done
-> > ---
-> >=20
-> > Then dumping:
-> >=20
-> > $ sudo tc actions ls action gate | grep index
-> > index 1 ref 1 bind 0
-> > index 2 ref 1 bind 0
-> > index 3 ref 1 bind 0
-> > index 4 ref 1 bind 0
-> > index 5 ref 1 bind 0
-> > index 6 ref 1 bind 0
-> > ..
-> > ...
-> > ....
-> > index 95 ref 1 bind 0
-> > index 96 ref 1 bind 0
-> > index 97 ref 1 bind 0
-> > index 98 ref 1 bind 0
-> > index 99 ref 1 bind 0
-> > index 100 ref 1 bind 0
-> > $
-> >=20
-> > > look at af_netlink.c
-> > > /* NLMSG_GOODSIZE is small to avoid high order allocations being
-> > > * required, but it makes sense to attempt a 32KiB allocation
-> > > * to reduce number of system calls on dump operations, if user
-> > > * ever provided a big enough buffer.
-> > > /
-> > > ...
-> > > / Trim skb to allocated size. User is expected to provide buffer as
-> > > * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
-> > > * netlink_recvmsg())). dump will pack as many smaller messages as
-> > > * could fit within the allocated skb. skb is typically allocated
-> > > * with larger space than required (could be as much as near 2x the
-> > > * requested size with align to next power of 2 approach). Allowing
-> > > * dump to use the excess space makes it difficult for a user to have =
-a
-> > > * reasonable static buffer based on the expected largest dump of a
-> > > * single netdev. The outcome is MSG_TRUNC error.
-> > > */
-> > >=20
-> > > This is where I am currently but I have seen these bugs appear throug=
-hout all my iterations including what's in the tree currently, if you show =
-me better alternatives that solve my problems, I'll gladly accept.
-> > > https://github.com/torvalds/linux/compare/master...jopamo:linux:net-s=
-table-upstream-v4
-> >=20
-> > I dont see a problem with "dump" as you seem to be suggesting. I asked
-> > earlier if it is possible that you can create some single entry - not
-> > 100 as shown above that will consume more than NLMSG_GOODSIZE? My
-> > limited knowledge is not helping me see such a scenario.
->=20
->=20
-> Aha. I think there is a terminology mixup ;->
->=20
-> "dump" (a very unfortunate use of that word in the netlink world ;->)
->=20
-> is a very special word. So when you take a dump in this world you are
-> GETing a whole table. In this case all the gate actions.
->=20
-> If i am not mistaken in your case this is not a dump - rather, you are
-> CREATing a single entry which is bigger than NLMSG_GOODSIZE as i
-> suspected. I dont believe iproute2 will allow you to do that.
-> What's happening then is that the generated netlink event notification
-> for that single entry is too big to fit in NLMSG_GOODSIZE.
-> Let me try to craft something for that...
->=20
-> cheers,
-> jamal
 
