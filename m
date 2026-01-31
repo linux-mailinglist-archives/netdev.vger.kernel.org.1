@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-255362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBl3MkGUfWnQSgIAu9opvQ
-	(envelope-from <netdev+bounces-255362-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:33:53 +0100
+	id +A19J1iUfWnQSgIAu9opvQ
+	(envelope-from <netdev+bounces-255363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:34:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC24C0C11
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:33:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AAD7C0C20
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 06:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 050DB3013A74
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 05:33:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DA02301E95A
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 05:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6941D3385B9;
-	Sat, 31 Jan 2026 05:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82BE33AD93;
+	Sat, 31 Jan 2026 05:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8iTAydk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwyb52KT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C3B320A33;
-	Sat, 31 Jan 2026 05:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5ACE330D22;
+	Sat, 31 Jan 2026 05:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769837607; cv=none; b=BrkEu87KU53zqk7A32+a3t6MblgRzdOPOXTplXKC6fIWH+tWUU5krNEdCuegKFUX7RIJh+J0FYCPu08FFGzIxDdFYuqxd67TLfB2vW79MAYWa9e1nXjrFVwyX9aUG43fKdggBHnMPnLuMAbLChO5jLeNb02DaeT+iDWX5l3ytOM=
+	t=1769837608; cv=none; b=H9UM0NE92kqWQMiS6AOPfek6OSLWvJEjItPcqUNseQXABvTtLwkMjh+tK4JipkHV7SARneHaYCry7LXzOBQcGxKf4BR0s2/nzpuBy8oO2gvDI3ObAboPwrsO+fjzILMoWHz5xx2VpxaSobh+JhCgU9Bxiw+OstwsrVTSxP6oSD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769837607; c=relaxed/simple;
-	bh=pE93mOE3ROvKWsUdTGhrdMaZIaCMbNOjj+VOr4ezq0M=;
+	s=arc-20240116; t=1769837608; c=relaxed/simple;
+	bh=8ffLlQi5yu6y2CoYrGheNppIvKGqGUsruKHAdfTnxsU=;
 	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=APtpa1BGCKeQNrfMm5p4hP2zhYUjtp2FlStV60mV1feBs02bc5jzJO7qim1Lo3gKSCIvCtRjaQhTfTacxFHJyzrhz/JR43e4zHlxO2pLUaeAtZe/Jqx/cBJ1Miyubcf3YrB2f97TKfbe/vIIyiXQi7N8L1ugf7H3hXO8aDphB74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8iTAydk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F01C4CEF1;
-	Sat, 31 Jan 2026 05:33:26 +0000 (UTC)
+	 Subject:From:To:Cc:Date; b=Ik8eosOxc3nOI+WxDo8yVEgnfADxpwECvuinjbWfz62VuB4mFcTOIltHbmbLyRyuMGIqWyS6z6rdi0GFHWefHyoxvNlXBHHsDedvFkbXvS2yx22aI/aS1baVtkSXmJY5cfsL+BmX4bpTR/OkUOD8Q51IFkpMQylTVIkfQ9vPxDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwyb52KT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F24C4CEF1;
+	Sat, 31 Jan 2026 05:33:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769837606;
-	bh=pE93mOE3ROvKWsUdTGhrdMaZIaCMbNOjj+VOr4ezq0M=;
+	s=k20201202; t=1769837608;
+	bh=8ffLlQi5yu6y2CoYrGheNppIvKGqGUsruKHAdfTnxsU=;
 	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=X8iTAydk/RqiszQ1x0d4KdYBNZCj5rjAK1XCr8eGjvgyk/2yE2lLRSWfxkBo1FOCD
-	 BG6W2pjUeuAT+GFaKF7kUVXeTWxkGDQut3OZhR/9j3fbo0g830Wx0309ZqBMh2MgNa
-	 xvnn7BWZQXar+Av/Rj1Is6888AsRXomgjTBbDUa8bKsHEyeYEh7mwoxty4QymLzriR
-	 Kb8VKlfWYnstwVObDcAFCwLOXuW1z+18Pl71o11dYVrDltCA3NQ7RL0p7PleWUpEg3
-	 guz/n7j4Yfi/a6zkddLoDjWjw1h8fkdbI64o+/SRkaZ/IjWQm0gNDJx7BAJzsNC6jT
-	 uyjhxBY2PMIxg==
-Content-Type: multipart/mixed; boundary="===============0051958228225853625=="
+	b=hwyb52KTuCEMFnfoLRmVberydugwfW8kimp+FvBdOh4lS8Ob6bnuuYgHCmtyZDsH9
+	 KGq2Bkie8ZTu/K1pOC+H+bvKtPlngme+5NQwGIqDsH/D6MxKOnGEpzPf1KZ3rOop2n
+	 8TpvoSYqWBasMaaljDHmhLeI8oPJDM3ZAbuZJCoYT6rQs+NPU3zMTxWqxkMukWDJ1i
+	 VM5hESgRTZw/h16l4Fgms0msUNzbMR4jrcE0xZOlNpCrLe62yAOvtueNmJ66HSK7Hc
+	 gOsB/9dLoXN54SSvWXtKB9RuBYY7l044jDXSFzbfXj4Foi40X0Wx74n5DtmPOZymAv
+	 vg8JjO+VOUvww==
+Content-Type: multipart/mixed; boundary="===============8438482101024718409=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <bc860132eed39c90ac3599a9db86e80c781cce157f7edf455826d46260905a7f@mail.kernel.org>
-In-Reply-To: <20260131050920.2574084-15-ameryhung@gmail.com>
-References: <20260131050920.2574084-15-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v4 14/16] selftests/bpf: Update task_local_storage/task_storage_nodeadlock test
+Message-Id: <0a0eaa11c4b429d41ea2adfc36b56b75b61eacd777dffb2a25cd2857f72d5f2d@mail.kernel.org>
+In-Reply-To: <20260131050920.2574084-6-ameryhung@gmail.com>
+References: <20260131050920.2574084-6-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v4 05/16] bpf: Change local_storage->lock and b->lock to rqspinlock
 From: bot+bpf-ci@kernel.org
 To: ameryhung@gmail.com,bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,memxor@gmail.com,martin.lau@kernel.org,kpsingh@kernel.org,yonghong.song@linux.dev,song@kernel.org,haoluo@google.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sat, 31 Jan 2026 05:33:26 +0000 (UTC)
+Date: Sat, 31 Jan 2026 05:33:28 +0000 (UTC)
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255362-lists,netdev=lfdr.de,bpf-ci];
+	TAGGED_FROM(0.00)[bounces-255363-lists,netdev=lfdr.de,bpf-ci];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
 	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -88,48 +88,64 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 3EC24C0C11
+X-Rspamd-Queue-Id: 1AAD7C0C20
 X-Rspamd-Action: no action
 
---===============0051958228225853625==
+--===============8438482101024718409==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
+> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
+> index 824d05325..7661319ad 100644
+> --- a/kernel/bpf/bpf_local_storage.c
+> +++ b/kernel/bpf/bpf_local_storage.c
 
-commit d58597062a783f7c4b2997c007bb7178b268dd14
-Author: Amery Hung <ameryhung@gmail.com>
+[ ... ]
 
-selftests/bpf: Update task_local_storage/task_storage_nodeadlock test
+> @@ -572,7 +591,9 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
+>  	if (!alloc_selem)
+>  		return ERR_PTR(-ENOMEM);
+>
+> -	raw_spin_lock_irqsave(&local_storage->lock, flags);
+> +	err = raw_res_spin_lock_irqsave(&local_storage->lock, flags);
+> +	if (err)
+> +		return ERR_PTR(err);
 
-This commit updates the task_storage_nodeadlock test to check for the new
-error codes (-EDEADLK or -ETIMEDOUT) that bpf_task_storage_delete() returns
-after the rqspinlock conversion, replacing the previous -EBUSY check.
+If the lock acquisition fails here, doesn't this leak alloc_selem? The
+allocation at the top of this function succeeded:
 
-> Adjsut the error code we are checking against as bpf_task_storage_get()
-  ^^^^^^
+    alloc_selem = selem = bpf_selem_alloc(smap, owner, value, ...);
+    if (!alloc_selem)
+        return ERR_PTR(-ENOMEM);
 
-There's a typo here: "Adjsut" should be "Adjust".
+But on lock failure, the early return bypasses the cleanup at the end of
+the function:
 
-> Adjsut the error code we are checking against as bpf_task_storage_get()
->                                                  ^^^^^^^^^^^^^^^^^^^^^^
-> now returns -EDEADLK or -ETIMEDOUT when deadlock happens.
+    if (alloc_selem) {
+        mem_uncharge(smap, owner, smap->elem_size);
+        bpf_selem_free(alloc_selem, true);
+    }
 
-Should this say bpf_task_storage_delete() instead of bpf_task_storage_get()?
+Should this goto unlock instead of returning directly, or add explicit
+cleanup before returning?
 
-The test code checks the return value of bpf_task_storage_delete():
+[ ... ]
 
-    ret = bpf_task_storage_delete(&task_storage,
-                                  bpf_get_current_task_btf());
-    if (ret == -EDEADLK || ret == -ETIMEDOUT)
+This isn't a bug, but the commit message has a minor wording issue:
 
-Looking at the kernel implementation, bpf_task_storage_get() returns NULL on
-failure (not error codes), while bpf_task_storage_delete() propagates integer
-error codes from bpf_selem_unlink() which can return -EDEADLK or -ETIMEDOUT
-from the rqspinlock.
+> Change bpf_local_storage::lock and bpf_local_storage_map_bucket::lock to
+> from raw_spin_lock to rqspinlock.
+
+"to from" should be "from".
+
+> For, __bpf_local_storage_map_cache(), instead of handling the error,
+> skip updating the cache.
+
+There's an extra comma after "For".
 
 
 ---
@@ -139,10 +155,10 @@ See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21539340647
 
 AI-authorship-score: low
-AI-authorship-explanation: The typo 'Adjsut' and incorrect function name reference suggest human error rather than AI generation, which typically produces more precise but sometimes generic content.
-issues-found: 2
+AI-authorship-explanation: The commit follows standard kernel development patterns with appropriate technical detail and no AI-typical phrasing or structure.
+issues-found: 1
 issue-severity-score: low
-issue-severity-explanation: Both issues are commit message errors (typo and wrong function name) that do not affect functionality of the selftest code.
+issue-severity-explanation: Memory leak on error path in bpf_local_storage_update when rqspinlock times out; affects only rare lock failure scenarios.
 
---===============0051958228225853625==--
+--===============8438482101024718409==--
 
