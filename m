@@ -1,78 +1,92 @@
-Return-Path: <netdev+bounces-255318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKN+AylhfWkARwIAu9opvQ
-	(envelope-from <netdev+bounces-255318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:55:53 +0100
+	id WKX+OjRifWkkRwIAu9opvQ
+	(envelope-from <netdev+bounces-255319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:00:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D201C025B
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:55:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A3CDC02A9
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:00:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 047693029C35
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:54:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B7C630048DE
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C04332EAE;
-	Sat, 31 Jan 2026 01:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6758E222584;
+	Sat, 31 Jan 2026 02:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkPomI6Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtlSPQ14"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A67274B32;
-	Sat, 31 Jan 2026 01:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2734125B31D
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 02:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769824482; cv=none; b=UXCt5ZyswuR/dHNBF9r/jiLmRY8+MdO7qvZOvLk1SCOQ6hsUvMAzkhKGT3Gqg2/Hd/CgehFAvk0QjsSwIqfM+4FC8b8Dt/diuWaKer932+ig1l7U+tmlKOryJhtpgGhoBC5jJ8kjOILV0JVUbIl5psf2F2hMrvqiYXQkvDiqO+k=
+	t=1769824818; cv=none; b=IrN0Or3s6PqjJ10GDuUaNOqHJNZQtGdbS145C1c9K2/TqByRMXdyR+TH0RRiIL4IJ5TLgK+qxY3PlLntDl1oBoEIGBwmcoT7Pnt6LWaiyZANnndg3rf0WeqPC5reJ88kZV5CXAbJJVc9LhbUVwbyFpmhg9tu3hT/HheMcdi+RJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769824482; c=relaxed/simple;
-	bh=TsyqeOrPuckAqP0Hj4KXTJnB1l2bVSsm7IOcY61ZTe4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P1I1Fi/eAZQm7+Mpg4H5W16q7Un6ukhQ4jVWux6o1Ojh0/c7sk6ECKqH4XPK1aGEHI6Q2ddzIi8bZKveoeDF4K4xtb/kpwdS4SVpzCjLW5g509hfN4jLiNEPLmbcH9WcGMTF49sYtjOyqPfhPwFYepN+2zboI+/VKvQuuPDHzLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkPomI6Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B21C19421;
-	Sat, 31 Jan 2026 01:54:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769824482;
-	bh=TsyqeOrPuckAqP0Hj4KXTJnB1l2bVSsm7IOcY61ZTe4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PkPomI6Q0yax9KU0rc40lebfnQzP7qWqBJUMuw1c0L65LGVBshpN49QaTGfvBXj85
-	 Hqq97zQvMxDDTgzkyFjphw/VBXKvzGRMPPMp/OG6yjF55IPgywh3+WAVwIBoqI2XAE
-	 J0IepQAxgBIIuUA5WbNvpGXEsLcwGISZWy+B8tEkLtdYlYTvnxh5SYM5p8itnPIk3y
-	 f0IIfMzUCqNkuJUo0YJn1azFrKMDJJRsgH1GAElPnfzDWyjpnob5MN5EZcAHEjCztX
-	 IEQT5lpGe3zs5gVXOTHKs7niJbJDTXA+sCiBqsbs6H83yvq5J5XblNJmkEiyClwD/W
-	 Rf8nHrg+IaUwQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: lukasz.majewski@mailbox.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	devicetree@vger.kernel.org,
-	horms@kernel.org,
-	krzk+dt@kernel.org,
-	s.hauer@pengutronix.de,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de,
-	richardcochran@gmail.com,
-	shawnguo@kernel.org,
-	edumazet@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	wahrenst@gmx.net,
-	davem@davemloft.net,
-	festevam@gmail.com,
-	conor+dt@kernel.org,
-	imx@lists.linux.dev,
-	andrew@lunn.ch,
-	robh@kernel.org
-Subject: Re: [net-next,v21,7/7] net: mtip: Extend the L2 switch driver for imx287 with bridge operations
-Date: Fri, 30 Jan 2026 17:54:40 -0800
-Message-ID: <20260131015440.972531-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260129110154.1699976-8-lukasz.majewski@mailbox.org>
-References: <20260129110154.1699976-8-lukasz.majewski@mailbox.org>
+	s=arc-20240116; t=1769824818; c=relaxed/simple;
+	bh=PcnC0cIs8o2+raeXclFwxf19lLyZNzo2rmeBKNtVlbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DB0QgMpnSEuZHPskU8zKnTqgyVZyEO4ZcR+EzGENGPOUQjyr3fgTjQRa1Cj/4jS4cA0T74obm+lq7ZlFG4ZSy6UIGvuqWEXXtmnWwsTfrijjvfeyofysT6ourhA8Vxv95b9kB4nsbDUjd7Oxs+OFj3neAJvgQ9BrM9AfVGFwqQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FtlSPQ14; arc=none smtp.client-ip=74.125.82.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-124a95e592fso4875092c88.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 18:00:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769824816; x=1770429616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=A7Pln/lrrLR4dH8KvvW/wU7k2y3WN7F5GccQPSyOhNE=;
+        b=FtlSPQ14+gmpdpFepbVKeFzG5jsWxoHbXI3KwwuaYb664sAwaiC1QCGnLt0c53zsdM
+         8pyPmILGBdaG5YS4KMKrIBwE1ycEEeK1wDtMmU+FC/fCQgDrY6fFsNHoazKmN0lR2VDj
+         7XRby6ms294U8w+2wYb4XkBr2CCUy56GeWO6T+n4Juc6cQgG+VIJu4zZz1w7PmmoTFPQ
+         hqhSOVhZc2QqKoKiM8vBxlCGn06XiQqsRerDYSSuThfuv0XmXXcOe4pK/dBnOF6A10lz
+         xKLP65okUjkPWsn2jEHJOcA0yj6dwHrdKaMJ63GoZQX75wV3Lg/UvQRyeTG6a/ygzxvV
+         7D6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769824816; x=1770429616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A7Pln/lrrLR4dH8KvvW/wU7k2y3WN7F5GccQPSyOhNE=;
+        b=wmu5Z8mBKzWbupMtYLSg03sZrMWu0tVD2yRnzfzeB77gVSwyW0GFcshGbKMs8C+XKQ
+         YclYTnfgrRRWGGtdHowBfiH3GLPQ2I+MrUOs5A3r1u0OJJ1xN2EspUl7E0L37oq2XZ5b
+         1zC5eI5pmVXd9i/kB2jeTuphylYqW17Z8NWLDCdgsgyKOYr8xFNhCjuDzHiMD6g50XPB
+         eqzdgaCS7JyZJKAddKydX5B17YyHLaAvFCT9/+WNlimws8BgHJ2spBbiSCIRcdeDrvJ4
+         /hvkp7/ZYwue74X0seiopVLdrocrPfagv15+C9wnOCiz5eaFlwOlkkEwBotkJFjyALpT
+         mHYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXceNADEwMexIV9MAdk4GLyPKtwLCHko6dpZhbvbJeX8v0HIM6/1zVQ6La1Fe73B0QQECV9xss=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp+xTrr0xYTImXFnMu0GdaLzMVsVUS4K/IAohuXC011Inh5nQE
+	gqn1H4ZyYyP/X86TVmfHUrFN4AKTVFXs66NSGXM1aLfKTBoP3i1ptw8v
+X-Gm-Gg: AZuq6aJmPcehHn+3Gfs9t/qGuoWsiwEa+XwU+HWckNGEAj6XSFGN30PhNG2o5UijwgZ
+	j+cUigabTQwW2fcQukbyRA9RcSV/5aBMbGK9veAQO1ELG15dHa0aKmd6rA3SFsMxeKY029IE1/d
+	uJotwlXdkurpZB7btiP2j99ISgbS6fQAtZqPuLzXEH5m+GhN/f4n+7cBi0UMFx9ictO9DafMCKr
+	z4Hy9XHCqmxkFeNBMY8SYUFFN3W4mBHtHwnv14i58sTSn3pAR31BDgLbAoQYmcpF/Rmy79QDKmX
+	5FBZ8pOR+4k303XC1eDt69jOADXlwumraHy48A70uNqgpv4vMx6oeR7Am62lLB2QUGNE8+0S4bM
+	a94vIDTEocecLRkV4CO0B746kZQ7HpI+/QkppV0R1uyGp8fKjxHg3PwlJ/httpz/+wsIXrJvCKV
+	Pd29k6B4OGZ0puy2UjoXDUHr1/fT87yQ4+h8BKGQazB30YYpZz0MtWkOltyTm7yrIDMYc4EFj9F
+	hzq/LV3DBZP8DOZPwCVZbTmRcBOMZqgbwd9/jkF/of6hCCwHHSuEAcea1gUNO2/mBIRVu51ZJHv
+	GvT7hN4Lx6Vp9Ms=
+X-Received: by 2002:a05:7022:e13:b0:11b:c4ee:66b with SMTP id a92af1059eb24-125c10092c8mr2442262c88.37.1769824816261;
+        Fri, 30 Jan 2026 18:00:16 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe57csm15945242eec.22.2026.01.30.18.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 18:00:16 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+Subject: [PATCH] vhost: remove unnecessary module_init/exit functions
+Date: Fri, 30 Jan 2026 18:00:09 -0800
+Message-ID: <20260131020010.45647-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,108 +95,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-255319-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255318-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,pengutronix.de,gmail.com,google.com,lists.infradead.org,lunn.ch,redhat.com,gmx.net,davemloft.net,lists.linux.dev];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 7D201C025B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5A3CDC02A9
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+The vhost driver has unnecessary empty module_init and
+module_exit functions. Remove them. Note that if a module_init function
+exists, a module_exit function must also exist; otherwise, the module
+cannot be unloaded.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
-net: mtip: Extend the L2 switch driver for imx287 with bridge operations
+ drivers/vhost/vhost.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-This patch adds bridge operations support to the MTIP L2 switch driver,
-enabling hardware offloading for packet switching when a bridge is
-created on the switch interfaces.
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index bccdc9eab267..d0e2b9638ecc 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -3326,18 +3326,6 @@ void vhost_set_backend_features(struct vhost_dev *dev, u64 features)
+ }
+ EXPORT_SYMBOL_GPL(vhost_set_backend_features);
+ 
+-static int __init vhost_init(void)
+-{
+-	return 0;
+-}
+-
+-static void __exit vhost_exit(void)
+-{
+-}
+-
+-module_init(vhost_init);
+-module_exit(vhost_exit);
+-
+ MODULE_VERSION("0.0.1");
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Michael S. Tsirkin");
+-- 
+2.43.0
 
-> diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
-> --- /dev/null
-> +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
-
-[ ... ]
-
-> +static int mtip_ndev_port_link(struct net_device *ndev,
-> +			       struct net_device *br_ndev,
-> +			       struct netlink_ext_ack *extack)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(ndev), *other_priv;
-> +	struct switch_enet_private *fep = priv->fep;
-> +	struct net_device *other_ndev;
-> +	int err;
-> +
-> +	/* Check if one port of MTIP switch is already bridged */
-> +	if (fep->br_members && !fep->br_offload) {
-> +		/* Get the second bridge ndev */
-> +		other_ndev = fep->ndev[fep->br_members - 1];
-> +		other_priv = netdev_priv(other_ndev);
-> +		if (other_priv->master_dev != br_ndev) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "L2 offloading only possible for the same bridge!");
-> +			return -EOPNOTSUPP;
-> +		}
-> +
-> +		fep->br_offload = 1;
-> +		mtip_switch_dis_port_separation(fep);
-> +		mtip_clear_atable(fep);
-> +	}
-> +
-> +	if (!priv->master_dev)
-> +		priv->master_dev = br_ndev;
-> +
-> +	fep->br_members |= BIT(priv->portnum - 1);
-> +
-> +	err = switchdev_bridge_port_offload(ndev, ndev, NULL, NULL, NULL,
-> +					    false, extack);
-> +	if (err) {
-> +		dev_err(&ndev->dev, "can't offload bridge port %s [err: %d]\n",
-> +			ndev->name, err);
-> +
-> +		fep->br_members &= ~BIT(priv->portnum - 1);
-> +		priv->master_dev = NULL;
-> +
-> +		return err;
-> +	}
-
-When switchdev_bridge_port_offload() fails, should the error path also
-revert the state changes made earlier? Specifically, when the second port
-joins the same bridge and passes the bridge check, the code sets
-fep->br_offload = 1 and calls mtip_switch_dis_port_separation(). However,
-the error handling only clears br_members and master_dev.
-
-If switchdev_bridge_port_offload() fails at this point, fep->br_offload
-remains set to 1 and port separation stays disabled, even though only
-one port is actually bridged. This could leave the hardware in an
-inconsistent state.
-
-Looking at the TI cpsw driver for comparison, it modifies br_members
-after switchdev_bridge_port_offload() succeeds, avoiding this ordering
-issue.
 
