@@ -1,209 +1,191 @@
-Return-Path: <netdev+bounces-255478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255479-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGSCNok+fmk6WgIAu9opvQ
-	(envelope-from <netdev+bounces-255478-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:40:25 +0100
+	id WPwjKOE+fmk6WgIAu9opvQ
+	(envelope-from <netdev+bounces-255479-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:41:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14110C35DA
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:40:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0166C360F
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 16CC73008459
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:40:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 480D23007B0D
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0D835B638;
-	Sat, 31 Jan 2026 17:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4981B35BDBF;
+	Sat, 31 Jan 2026 17:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jWaujYXd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moPDA118"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB6435B627
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344FD35BDB8
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769881205; cv=none; b=IFvNrWcG7ZD9LOf6z7MOrO48d8PsFNqqLNsgybrz+SZhGMLnVPS/SrlTLcSDs0hx2+GlYdm5Cw6Q51S5dQ75whjEzBrQpp4lXadnBRIuPGxGBxEF1MdHpDXCBds03qC+ZyOoLu2OqHuOwJR56srwXDf8z2/SYqv0tCm/TqIxB5c=
+	t=1769881307; cv=none; b=OZM5pG8AcxS69Ik31cYWckfm/HaUwN+eRax8OoOUFmH/Ehoj2tRdZueLPdCmOmXdmczLfqBsHjye5KPiK6zWeE7Xp0fln7OL9hKBRLWo/5NEyBrJ05T89LgbEO/HRpYqSlsGpD215IHoTp2iOM3zzdp8T/a84e/oeH+L46NpG2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769881205; c=relaxed/simple;
-	bh=XTqCrafwy0FQoJigWHKUzbxCsrGtBH6jZaO1ghXS5RA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Mp5pEy3+iE4GbgZhg+4MgLOx0IZ2vDNWKZCT1nNL4OzTnhwGrFzIOHXdNeiLZFsfAEMF0s+pHpulpg6kH3SEUTknPFWGg3pJgwDTzupzoxVwsCkyoRlczMxYBdKVAiT9SgnI+or71i9zO8PDpRrIy8jZHZzaqqMte555n1m2nOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jWaujYXd; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1769881307; c=relaxed/simple;
+	bh=U7DriEUcK86dPkxQhAKAzOz2fvIGiGMZpIz2TatGivM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=LIoXAcX81AVg4WtmDSpXo2K0V7MyFHqdxtVsIF6wo3gOM8WSQzAa9h9AU8RSAKurEvt4h31OWgto2r0e4/aCEogxh9FI/dOG3YphgdJ8WtttW+MMrCnJpdG6ZAkNOIM9dshgLNrFWWKJsYZIcL/GtlnzwyUWw6PgcZM7KK7x8x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=moPDA118; arc=none smtp.client-ip=74.125.224.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43601e96f72so96900f8f.2
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:40:03 -0800 (PST)
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64970870c0dso3058564d50.0
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:41:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769881202; x=1770486002; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QgmwdRM4QcAa92E/3yOVnX+erOsKbGYtR2XQGPwyhkI=;
-        b=jWaujYXdEAJgY9wbKV0+mpLy5YbimlvPDnFD/FneMtNuaJNtBgB1pAOK7b6N7T/YWs
-         Jjyj3CYOIuHRWTl6rpFzQMdP/ptiQBu7oiyw8eowiT6ZyFgmwIYq+GS1wrUV63D+rCXp
-         Ia+rV41olrYl820mrwfz8S1AmtOJZJjtCKhUZZDRR8Qpvxy+b1ONF/aIRw9BYQZL/gIl
-         KzgE0Qdu4ofqNZBJf7pU7A7rJ/XnBH7N7HjymFn3kDV/a6kWnBLKc77aC0N/GjRcumrO
-         w1lmG9q5ZcncAX3oQXwElQ5xHb8nbkRelJ5MDMPG6cJXzOrGf6cSCimGRkMudpURTCpd
-         kEdQ==
+        d=gmail.com; s=20230601; t=1769881304; x=1770486104; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K8wf43Hct6xWw5pdPTFk6uNM8HLpNcMz3YOsh2PRxWU=;
+        b=moPDA118TxQwjrn0Aev18p+r85+lymEQQTSbbZ+HfOgZe3cy51sjeQ2ejt1HUG9wHU
+         zew1+nDq/sJHXhItqnNsDKmWd0C65hkaT8Jo/FaDUi71LK50TfhpokC+YZRUypQLOWnj
+         YC7Vh1dTHuUW8B26binG4AMJHXqI82Sk99EGeybjAyT0LGMG5zsGBYtnQh5wqiUxGhQg
+         E1D9KTvn6zYTqNCTQZRR19DzOW5Q56B1ape2aXl0WKwndHaCoFPvPmiJFRzq1IwPlK1J
+         sDzY8QFtjyHrIxfXrGloAVTM0Ocq7nQlPqdeNe+c1XGHb6dlve0v1YOF0PeW/REVRZOZ
+         IiJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769881202; x=1770486002;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QgmwdRM4QcAa92E/3yOVnX+erOsKbGYtR2XQGPwyhkI=;
-        b=UIr2ARd4mUpr+GfKLP26tzaw0K0xXTunNz3BoDN2nsFLbC+9+h8PP0xG4FxmvA5T6v
-         WYuXc4s/SQVaWiTpjP3IwHEDD6ok/Q+LCi42STi2wZOrq6BfgeGyhkFsTMrroH+gMrlr
-         Gpzu/o2uie8HH9yC0+0OuDOe6gkos56E1/a+vnNOsMhAlIXgwqAtcthgw577DoGtio9j
-         nLrMaVpGqf0eAoJxHeAT9lAxp6aOTLNgL3wjJiS8xxFt92np4znSxC9GH4QJEADX5O3b
-         yBwrsizfj1sJdMaVJQLhhkasU0T6PO2CGkIuWObczNMsi7vZCEaqAOOlKcwVtLOfAXEs
-         2HSw==
-X-Gm-Message-State: AOJu0Yxxq0ukJGEuZ9YkesjgnQlGmCAc70B+twQeT5j65/OY1foSPSUg
-	bMrk6/qBhD8dQjhd99DALj3dw8cozFKHI8Rv/y8hptJ/M61MYc/Z1Tq2
-X-Gm-Gg: AZuq6aK7Xq9nUhC1uTcjfiDbXGpx/rk+TQ+DZVdxyPNjI6bIf3cgO6LJgvOozHy2O7T
-	OwwObWDcAz7ndodGleLlH+jsAFgxolGfdaLowzE5VN+M9KkWUZeBDb3lgop2ZqsG9Tjpezxwikd
-	BK/BGNlX3sscmJ9TURCRvaTTJonheyG+x3DP2V8/HEUeOfZ93Az1Z/OXCgDPqAw2WbxDzNh0zAP
-	W3ncB4SZx6QqoRd+vlUSCggEKxUQKheykDaHXnM+RhagqeUNMV74lvlCdqEeg+mpp/IE7idFTG/
-	BlsVqewdXSuKkKmLAAiWueLG80I2oPQ3RxHNk4HJ7LH3tjXoijJDALQYrnZ+/hCvyzcz8N58Sx2
-	3pe+wmwiMaOLdJ6QVCnHrMbNj4damR25Y3oxj4Xknd7eUlpx1wwTopDSzXnfn1+lbYiExwuF5xr
-	KbVmbOeRtMvn/5YLEPtrFCgMsIum80t60BFD5HF4T//KdSbdGTv1DsN8QrjNhNH6Uay7UIQNAJV
-	dv+khOaW504lPnA58pjATHuYFYjQeVePhV5Ough8J3R9SCt
-X-Received: by 2002:a5d:5848:0:b0:435:bdc0:48e9 with SMTP id ffacd0b85a97d-435f3ab4bdcmr9017745f8f.55.1769881201853;
-        Sat, 31 Jan 2026 09:40:01 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f06:cc00:41be:d7:a063:4025? (p200300ea8f06cc0041be00d7a0634025.dip0.t-ipconnect.de. [2003:ea:8f06:cc00:41be:d7:a063:4025])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322f40sm30276962f8f.34.2026.01.31.09.40.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 31 Jan 2026 09:40:01 -0800 (PST)
-Message-ID: <ce1c6df0-4785-4b28-8322-32dc6bceea18@gmail.com>
-Date: Sat, 31 Jan 2026 18:40:00 +0100
+        d=1e100.net; s=20230601; t=1769881304; x=1770486104;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K8wf43Hct6xWw5pdPTFk6uNM8HLpNcMz3YOsh2PRxWU=;
+        b=WaK6AYHuhMttUQDCsULA5Ev9MGgc8aMw773Wrh/W2wlk8mabYhtCvwgCjPBMHY6joc
+         y1lc/C9mQ+ZaWmJok3M7wSthGtX6denjIEvbBdjGXy1vWn1I2HfuORrHEqF3J3kDVVCH
+         k7cxJDQq5JPLijWcIiaoTK7taNXgM0I0QD32zwBdXBemR+8Hi3KLwgacsASGBh/XqjN7
+         Br/L3nRgr+6+67814Q65LjLEq+TuubWKSYvJWi021C7DiRB/k4a/tQFIbdJgmw5xKHRE
+         JGpPj88MzM9hgogl2r9XBB+N6wfolNDtuRV+gaB4w2nmjLMmNwuHvX4IgUlZoq5LHDzN
+         O7Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCUOJb8sFo0xLXtnaXxn8VxmJNKMR7XmiPryqbBhC+7twV9inMKrk+9BeYq6FW0sBjY816ojSTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBif170q6z1MkyzGiGkv+VjtFBs/F/COnXLV1/skpEKqJ3ncuF
+	KWveoLwDYnLu1UlH9WjhpmpWTf+h4og7IDNzeChxsFqDhPkAYyi7Ddvd
+X-Gm-Gg: AZuq6aKvkwLIO+1Hza4Mn9QOphmjOPyhYEskcIdHYKFHtgxiA6KfD8UaU6fniW2etyj
+	eHOgVkH3BAR51LReOdJUie/ixlS9X6FqAsS3hcfuecBmddOIhqk7RmbYkaxT8jyrJdGKQqIyENB
+	eXQg88ln6fyeuRQYMhQNODAX0ps+MaPYrbgdc8YgNkvvoeTvK4636TSgxQG7iKdzcQXfMk2CyWo
+	D7nWRCmPmckAoJC4LERrOKsiljkGpoofllRk4V/eeUj8QbUFvtm5c4bdXwkOLH/uXmA9PwVYG1w
+	nuirV//9yC8p/tpwAm2ts4XwCKw32FSR5uh30YcmfN/KTrbHvVAAsUUoxIq63i7RA6wQkc4t1dn
+	8gcErWhSPBW03Tr+yXwkXef4+qYe5cSYG15ErvujziGXgi6sR/lGAPE6OabdRvL88WvCNgYA4OH
+	ymucpX6YcWj/pp39LRE/z4TEltJ2dwUS3viflLZBQk9E+lao4cqKi5Pw/k9wM=
+X-Received: by 2002:a05:690e:b89:b0:641:f5bc:6950 with SMTP id 956f58d0204a3-649a8521a3cmr5252742d50.84.1769881303890;
+        Sat, 31 Jan 2026 09:41:43 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-79482761800sm48563027b3.4.2026.01.31.09.41.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 Jan 2026 09:41:43 -0800 (PST)
+Date: Sat, 31 Jan 2026 12:41:42 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ fengwei_yin@linux.alibaba.com, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.39472926ed88e@gmail.com>
+In-Reply-To: <20260130191845.404c5e64@kernel.org>
+References: <20260128070359.6762-1-fengwei_yin@linux.alibaba.com>
+ <20260130191845.404c5e64@kernel.org>
+Subject: Re: [PATCH] net: procfs: Fix RCU stall and soft lockup in
+ ptype_seq_next()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 3/3] net: phy: remove modalias-based mdio bus
- matching
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Simon Horman <horms@kernel.org>,
- Michael Hennerich <michael.hennerich@analog.com>,
- Alexandru Tachici <alexandru.tachici@analog.com>,
- Vladimir Oltean <olteanv@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <d9543e7d-23e1-4dba-a6b3-35dcd6a35dec@gmail.com>
-Content-Language: en-US
-In-Reply-To: <d9543e7d-23e1-4dba-a6b3-35dcd6a35dec@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-255479-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,linux.alibaba.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255478-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,armlinux.org.uk,redhat.com,google.com,kernel.org,davemloft.net,analog.com,gmail.com];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 14110C35DA
+X-Rspamd-Queue-Id: C0166C360F
 X-Rspamd-Action: no action
 
-Last user dsa_loop has been migrated away from modalias-based matching,
-so we can remove this feature now. It was the only user of MDIO_NAME_SIZE,
-so remove also this constant.
+Jakub Kicinski wrote:
+> On Wed, 28 Jan 2026 15:03:59 +0800 fengwei_yin@linux.alibaba.com wrote:
+> > The root cause is in ptype_seq_next(): when iterating over packet
+> > types, it's possible that a packet type entry (pt) has been removed,
+> > its dev set to NULL, and pt->af_packet_net is not initialized.
+> > In that case, the function may return the same 'nxt' pointer indefinitely.
+> > This results in an infinite loop under RCU read-side critical section,
+> > causing an RCU stall and eventually a soft lockup.
+> > 
+> > Fix the issue by properly handling the case where 'nxt' points to
+> > an empty list, ensuring forward progress in the iterator.
+> 
+> > @@ -247,7 +247,7 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+> >  
+> >  	if (pt->af_packet_net) {
+> >  net_ptype_all:
+> > -		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
+> > +		if (!list_empty(nxt) && nxt != &net->ptype_all && nxt != &net->ptype_specific)
+> >  			goto found;
+> >  
+> >  		if (nxt == &net->ptype_all) {
+> > @@ -267,6 +267,9 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+> >  			return NULL;
+> >  		nxt = ptype_base[hash].next;
+> >  	}
+> > +
+> > +	if (list_empty(nxt))
+> > +		return NULL;
+> >  found:
+> >  	return list_entry(nxt, struct packet_type, list);
+> >  }
+> 
+> I'm not sure this fix works, TBH, we're dealing with an RCU list here.
+> The elements are not deleted with list_del_init(), so they won't
+> look "empty".
+> 
+> If the pt entries are under RCU protection I think the issue is that
+> af_packet is clearing pt->dev before waiting for the grace period to
+> expire.
+>
+> Willem, is there a reason for that or just convenience?
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/mdio_device.c   | 13 -------------
- include/linux/mdio.h            |  1 -
- include/linux/mod_devicetable.h |  1 -
- 3 files changed, 15 deletions(-)
+That would be wrong. Do we see it doing that somewhere?
 
-diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-index 6e90ed42cd9..65636070a22 100644
---- a/drivers/net/phy/mdio_device.c
-+++ b/drivers/net/phy/mdio_device.c
-@@ -36,18 +36,6 @@ static void mdio_device_release(struct device *dev)
- 	kfree(to_mdio_device(dev));
- }
- 
--static int mdio_device_bus_match(struct device *dev,
--				 const struct device_driver *drv)
--{
--	struct mdio_device *mdiodev = to_mdio_device(dev);
--	const struct mdio_driver *mdiodrv = to_mdio_driver(drv);
--
--	if (mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY)
--		return 0;
--
--	return strcmp(mdiodev->modalias, drv->name) == 0;
--}
--
- struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
- {
- 	struct mdio_device *mdiodev;
-@@ -60,7 +48,6 @@ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
- 	mdiodev->dev.release = mdio_device_release;
- 	mdiodev->dev.parent = &bus->dev;
- 	mdiodev->dev.bus = &mdio_bus_type;
--	mdiodev->bus_match = mdio_device_bus_match;
- 	mdiodev->device_free = mdio_device_free;
- 	mdiodev->device_remove = mdio_device_remove;
- 	mdiodev->bus = bus;
-diff --git a/include/linux/mdio.h b/include/linux/mdio.h
-index 42d6d47e445..7ad7ce48f53 100644
---- a/include/linux/mdio.h
-+++ b/include/linux/mdio.h
-@@ -29,7 +29,6 @@ struct mdio_device {
- 	struct device dev;
- 
- 	struct mii_bus *bus;
--	char modalias[MDIO_NAME_SIZE];
- 
- 	int (*bus_match)(struct device *dev, const struct device_driver *drv);
- 	void (*device_free)(struct mdio_device *mdiodev);
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 24eb5a88a5c..5b1725fe970 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -609,7 +609,6 @@ struct platform_device_id {
- 	kernel_ulong_t driver_data;
- };
- 
--#define MDIO_NAME_SIZE		32
- #define MDIO_MODULE_PREFIX	"mdio:"
- 
- #define MDIO_ID_FMT "%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u%u"
--- 
-2.52.0
+These handlers should get removed with dev_remove_pack. Or
+__dev_remove_pack and observe the RCU grace period some other way.
+I can review these, but was not aware of any abuses.
+
+> -- 
+> pw-bot: cr
 
 
 
