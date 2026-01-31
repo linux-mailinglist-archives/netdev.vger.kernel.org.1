@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-255411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIbwDlwRfmkqVQIAu9opvQ
-	(envelope-from <netdev+bounces-255411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:27:40 +0100
+	id YIENINkQfmkbVQIAu9opvQ
+	(envelope-from <netdev+bounces-255406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:25:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9034FC2627
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:27:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C58FC23CF
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 594BA3002508
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:26:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E98B63003D2C
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E677361DDA;
-	Sat, 31 Jan 2026 14:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B9C357A37;
+	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PEDWcGd3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B6u5o/al"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5D635771C;
-	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7014354ACE;
+	Sat, 31 Jan 2026 14:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769869522; cv=none; b=B4Wee1Cy2RUPKrLNNqtI8rYj1WwDvkICK14vyKN3JmLbplaD4fIPsW4OOakB3O1FBGWf0kBPaSwmZMT5Gr8nOEioi1Onj03dHqwbZIrGfmDnW08FbfJXwSJEwrL0dl6zdscvVo+dXWyBA6KrZeJmIoks5ARU1s2KXftwziRKJXU=
+	t=1769869521; cv=none; b=Lk4uuYVRkEeWi9vjM4viKrRgmIANj3DoDkFMcsBYs5Ltjg1B4evuoHTANOY1NsRKcHqA46Pi5Yxg/GodJc1xzJM0+Y4vq4eHSNs2sqW1ZLf7uC1uD4dx1v2qFm2l9T18Xj4eW3t1nrYq/qUeSKEe3Cs1ptgkVyCV3d2hXG2tUFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769869522; c=relaxed/simple;
-	bh=cDzNSL27IncK8WPRKmlP9JMukq5yWhzhTMzDMh9MrSM=;
+	s=arc-20240116; t=1769869521; c=relaxed/simple;
+	bh=a6lkkyCGl+XetcnP8/XAHQbs/mIXiTfJmq3uiOJoYsc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LVov3wBEDYfTMwKz5YobSNymkxXie2BUcsJacFdPIliGLBFAXYcPa39dKP/5bIL92iuV0oW/o2C1vUlgl+M7Tmt3vqSPs/po6NysBdVRugZPi4/mtBRJl+BMxeWsXJddWlkjLjbGNFlBUM69vmVRZbchmNPXB36rPKHiE7qLyvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PEDWcGd3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E77CC2BCB0;
+	 MIME-Version:Content-Type; b=Vh0TT3K/Dfsu1UiSfHmkThKNo/Ho2vOowcaVoDT+9356GDVaNapqDCz/8WYsjSJbiqUqHfu3z01LWXS6E52e/9bEgX2bWrKXuw+I0tg6mgVrI72wXXemKaH8X39af8CZ6CCuyTGljJL5g3GVn/G35z55Dr0DBWu6rjwJrH+L6Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B6u5o/al; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F0EC19425;
 	Sat, 31 Jan 2026 14:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769869521;
-	bh=cDzNSL27IncK8WPRKmlP9JMukq5yWhzhTMzDMh9MrSM=;
+	bh=a6lkkyCGl+XetcnP8/XAHQbs/mIXiTfJmq3uiOJoYsc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PEDWcGd36euZpi8nOiel3TXpYdJOL8abL9z7ynodbLLhy6rzLqH6A8vSGVIswFiDA
-	 3y5hQspd0NPBIj/tAoDiMDAMaRyJ9qyRI3pSP1lif0B5157uLWHc6XKebCgeHgxaaa
-	 whWaaVTQKCyrRQUroRgucN/UNavm1g/fH50aiq6ALDRfF+g1TiLRrSX4AAhuZb/luH
-	 trXAg7Lp6wQYMHHRMh3baqgO/j/SwREzI1gjamVgtw8pwvJpTjeFCqUXf+Y5XIjpBn
-	 FefP8nlRqqX6DwsYD353Icu7UoRIRA0woOB1cHIzO3Kj+ErLdVj+KJg84eorZ3P47G
-	 LBDnMRsAFsxGw==
+	b=B6u5o/alVJagTQ7ZiNo2WcIAEFBEGkXfokP+2uYASByjtfTxwyk4pFLgDCtEPwoHr
+	 PxMm7Obl/uy0ipJ7M6zAVf/yoPOKjLXRsk1gnyUlJufdMYVq0bZ4fVqsDthHPI/hmI
+	 uN0Bo89oKezlv53rTBHOcm3k+gPbNcXVmoOiPZX7v79oPVd1M2rEt3CJEYTYuuS0lB
+	 mg15INJEDvO4ZYZksPOARNdQ0Vqx73OD9BYq2szwL54HODmw6BpQP0GrlhkrZ0D5yM
+	 A4/IiKDCshiFpZO1MxXrSnvXIav2dhiKhO2zvtV3ByZzOBXWbrH9o1YCqJh2j9IHUA
+	 V/BF+NoiyZC/Q==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vmBuZ-0000000AVjs-1UXg;
+	id 1vmBuZ-0000000AVjw-1c9g;
 	Sat, 31 Jan 2026 15:25:19 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -59,9 +59,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v4 02/41] docs: kdoc_re: don't go past the end of a line
-Date: Sat, 31 Jan 2026 15:24:36 +0100
-Message-ID: <e7811e28fcdb928ba88d4cf510717fbb029989b3.1769867953.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v4 03/41] docs: kdoc_parser: move var transformers to the beginning
+Date: Sat, 31 Jan 2026 15:24:37 +0100
+Message-ID: <f35657cd289db4dd5868f879bbd889bb24c150f6.1769867953.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769867953.git.mchehab+huawei@kernel.org>
 References: <cover.1769867953.git.mchehab+huawei@kernel.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255411-lists,netdev=lfdr.de,huawei];
+	TAGGED_FROM(0.00)[bounces-255406-lists,netdev=lfdr.de,huawei];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -96,41 +96,77 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,huawei];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,infradead.org:email]
-X-Rspamd-Queue-Id: 9034FC2627
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6C58FC23CF
 X-Rspamd-Action: no action
 
-The logic which checks if the line ends with ";" is currently
-broken: it may try to read past the buffer.
+Just like functions and structs had their transform variables
+placed at the beginning, move variable transforms to there
+as well.
 
-Fix it by checking before trying to access line[pos].
+No functional changes.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 Acked-by: Randy Dunlap <rdunlap@infradead.org>
 Tested-by: Randy Dunlap <rdunlap@infradead.org>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- tools/lib/python/kdoc/kdoc_re.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/lib/python/kdoc/kdoc_parser.py | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/tools/lib/python/kdoc/kdoc_re.py b/tools/lib/python/kdoc/kdoc_re.py
-index 19e777e2c97e..a0402c065d3a 100644
---- a/tools/lib/python/kdoc/kdoc_re.py
-+++ b/tools/lib/python/kdoc/kdoc_re.py
-@@ -265,7 +265,7 @@ class NestedMatch:
-             out += new_sub
+diff --git a/tools/lib/python/kdoc/kdoc_parser.py b/tools/lib/python/kdoc/kdoc_parser.py
+index fd57944ae907..0b68b140cd02 100644
+--- a/tools/lib/python/kdoc/kdoc_parser.py
++++ b/tools/lib/python/kdoc/kdoc_parser.py
+@@ -191,6 +191,18 @@ function_xforms  = [
+     (KernRe(r"__attribute__\s*\(\((?:[\w\s]+(?:\([^)]*\))?\s*,?)+\)\)\s+"), ""),
+ ]
  
-             # Drop end ';' if any
--            if line[pos] == ';':
-+            if pos < len(line) and line[pos] == ';':
-                 pos += 1
++#
++# Transforms for variable prototypes
++#
++var_xforms = [
++    (KernRe(r"__read_mostly"), ""),
++    (KernRe(r"__ro_after_init"), ""),
++    (KernRe(r"(?://.*)$"), ""),
++    (KernRe(r"(?:/\*.*\*/)"), ""),
++    (KernRe(r";$"), ""),
++    (KernRe(r"=.*"), ""),
++]
++
+ #
+ # Ancillary functions
+ #
+@@ -971,15 +983,6 @@ class KernelDoc:
+         ]
+         OPTIONAL_VAR_ATTR = "^(?:" + "|".join(VAR_ATTRIBS) + ")?"
  
-             cur_pos = pos
+-        sub_prefixes = [
+-            (KernRe(r"__read_mostly"), ""),
+-            (KernRe(r"__ro_after_init"), ""),
+-            (KernRe(r"(?://.*)$"), ""),
+-            (KernRe(r"(?:/\*.*\*/)"), ""),
+-            (KernRe(r";$"), ""),
+-            (KernRe(r"=.*"), ""),
+-        ]
+-
+         #
+         # Store the full prototype before modifying it
+         #
+@@ -1003,7 +1006,7 @@ class KernelDoc:
+         # Drop comments and macros to have a pure C prototype
+         #
+         if not declaration_name:
+-            for r, sub in sub_prefixes:
++            for r, sub in var_xforms:
+                 proto = r.sub(sub, proto)
+ 
+         proto = proto.rstrip()
 -- 
 2.52.0
 
