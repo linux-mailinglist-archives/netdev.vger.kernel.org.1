@@ -1,361 +1,218 @@
-Return-Path: <netdev+bounces-255300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eIBqBqFafWmBRgIAu9opvQ
-	(envelope-from <netdev+bounces-255300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:28:01 +0100
+	id QCfgEi1dfWnKRgIAu9opvQ
+	(envelope-from <netdev+bounces-255302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:38:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79031C0012
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:28:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FE8C00A3
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 02:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D49CD30649F6
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:25:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E06D300D442
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 01:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19908334685;
-	Sat, 31 Jan 2026 01:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDB92FD1DB;
+	Sat, 31 Jan 2026 01:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HT69voow"
+	dkim=pass (2048-bit key) header.d=hammer065.de header.i=@hammer065.de header.b="RkdZmJjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omashu.hammer065.de (omashu.hammer065.de [78.46.39.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3EB32B9BE;
-	Sat, 31 Jan 2026 01:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5E02BEC55
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 01:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.46.39.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769822717; cv=none; b=gagATlyNALLSqkGL3r7AOn4i/KAQmilkKzRxlf7+kyymWGCzexIk4Di51cz8P8aSOwcdbnoLd6xsgUxdbAzBZIYo5eo8jh4cwoBuEA0ie3HKKBlgaWQ4aF/yKtpm0veGRnDasDiGUaYJlaUf9FQApgVp8Ug3KjuUlJj+pFBg3A0=
+	t=1769823530; cv=none; b=oqnmU5WM/HwOt8pntwx0FCN0gtiFqrMI3XFIsN9pPW0+3+H3HzUUGm5gg4Tou7IHkHdU4YQ1WK23L18D0TIkED4DAQLJTry8F3czI+90SO3U5URpDtfGR7tLuctTeLY4c4EabAn1Oe1zncLtz5Bq7IotxusK0VpJCvWeC0FcT9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769822717; c=relaxed/simple;
-	bh=9cKpNKd985w4dA4LqASMf31OJjqTjQzRadKCmrGgVzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DfzblHVsAmX6cqC4aM8TF1i7SmBPkz+nwZQyk8QtSLKCeLp1Kz67rGPd+cQS1po+Vl9EqT3YaDLbgZacIbOEg6bdkGTTvuCDeFWRgFUiDJvMy0Lgg0C8WJrQ+op3gzAkZ12vZhiiSIbbWig3ivUrk34VPhFIqNUOj3iPzXJ8DSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HT69voow; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABB42C4CEF7;
-	Sat, 31 Jan 2026 01:25:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769822716;
-	bh=9cKpNKd985w4dA4LqASMf31OJjqTjQzRadKCmrGgVzY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HT69voowptdrLTcvhSxzm7KfzkxZB1sA0x2dOkfMiSsOsGJaXIkDHUmEKu+bDWKMq
-	 xEVrOmxsTD5S6Obe0B45gTL5KyooSw+6RENBxZKx3d3UCRqeNF1jJ4nBfV2YBwtWCW
-	 jv2+buuF41skkhROEO3WSlDrNy9aZzTMhbYE6/ULAKJGrA/4wJYmiSb3pHxX3SEI2z
-	 OaThZ9qIozmzlFaQRk+TLlYOrSfnk3Cu0hb+Sk66ETDOAM880jg+HARlEp1tGh+ls5
-	 KqDiilNrKpQlb3AmLTJlHbeeVxH3rhv3NJu9wN5vRm6U3co0IJFHvRHqSRbOC7P3Cg
-	 AQW37Zj+9gf4Q==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v4 8/8] net/rds: Trigger rds_send_ping() more than once
-Date: Fri, 30 Jan 2026 18:25:07 -0700
-Message-ID: <20260131012507.814119-9-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260131012507.814119-1-achender@kernel.org>
-References: <20260131012507.814119-1-achender@kernel.org>
+	s=arc-20240116; t=1769823530; c=relaxed/simple;
+	bh=dvbpuBgfHkXvI74jwsIi70OCwWGSabjyNTtw1X9EsBQ=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=lc/J1ChXVJ10q6hiLG7+VsvvxuqRTw5PGK55fPBxGS1IieMjqnJ/b6cStz/vf8pFeMaFHETNqOkIFbq0E3j8y9O+3GDbyqlSz5Xr7VUURWTnMauTGmHnLbGfQEp5CyZPjXVib+Kp0kcXPF+O6UImD8d688Gp53LAQXzpgdgURBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hammer065.de; spf=pass smtp.mailfrom=hammer065.de; dkim=pass (2048-bit key) header.d=hammer065.de header.i=@hammer065.de header.b=RkdZmJjY; arc=none smtp.client-ip=78.46.39.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hammer065.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammer065.de
+From: hammer065 <hammer065@hammer065.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammer065.de;
+	s=dkim; t=1769822936;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TsTvVyiUF/FkiGnwPy6wcq92IsSNiO4BYxtZJZk8CUg=;
+	b=RkdZmJjY/ldtvZWW11z53acUH8tzfCEHXVZ4sudguhVmCQK3oYlZIrkiybdvIsKEGa1PWy
+	6EWWu0vVK43EnNLl66+9kMDUwaU4q4xjtbdXbylbj9+hdF34tioBBMocORzFHaoowmNl3y
+	XH/a/Vhms1APDgV1uPGO3DzSP38Pm0v8JxH60Btul+7Vm0tOEjlu1RGwfXLg5AsQrOywWD
+	M/HwIjd+4YZjAQpA5pF6koroJR2L2KxIh/VEnSbyYs364idSbs2OWqlNkLkzm9NmXa4Dsa
+	MpaT2bJcLWpG7C/C200iOJ1UxkoJw2PCHsdE3EW/lP+2T3m4LFwT1szLf0mF1g==
+Authentication-Results: omashu.hammer065.de;
+	auth=pass smtp.mailfrom=hammer065@hammer065.de
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Subject: Re: [PATCH net] ip6_tunnel: use skb_vlan_inet_prepare() in
+ __ip6_tnl_rcv()
+Message-Id: <37F1606C-F47C-4E56-8EA2-BC0D1CCAB835@hammer065.de>
+Date: Sat, 31 Jan 2026 02:28:40 +0100
+Cc: Hirokazu MORIKAWA <morikw2@gmail.com>,
+ davem@davemloft.net,
+ eric.dumazet@gmail.com,
+ horms@kernel.org,
+ kuba@kernel.org,
+ netdev@vger.kernel.org,
+ pabeni@redhat.com,
+ syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com
+To: Eric Dumazet <edumazet@google.com>
+X-Spam-Level: **
+X-Spamd-Bar: ++
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	FAKE_REPLY(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[hammer065.de,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[hammer065.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-255300-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255302-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hammer065@hammer065.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[hammer065.de:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email]
-X-Rspamd-Queue-Id: 79031C0012
+	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hammer065.de:mid,hammer065.de:dkim]
+X-Rspamd-Queue-Id: 96FE8C00A3
 X-Rspamd-Action: no action
 
-From: Original Author <email@example.com>
+Hello together,
 
-Even though a peer may have already received a
-non-zero value for "RDS_EXTHDR_NPATHS" from a node in the past,
-the current peer may not.
+I=E2=80=99ll chime in as I was the original reporter of the downstream =
+issue at OpenWRT:
+https://github.com/openwrt/openwrt/issues/21737
 
-Therefore it is important to initiate another rds_send_ping()
-after a re-connect to any peer:
-It is unknown at that time if we're still talking to the same
-instance of RDS kernel modules on the other side.
+> Can you provide detailed instructions ?
+When setting up an ipip6 (IPv4 in IPv6) tunnel on top of another =
+(IPv6-only) interface,
+received ipip6 packets do not get decapsulated to the tunnel interface.
+However, one can see that they get received on the parent (IPv6-only) =
+interface.
 
-Otherwise, the peer may just operate on a single lane
-("c_npaths == 0"), not knowing that more lanes are available.
 
-However, if "c_with_sport_idx" is supported,
-we also need to check that the connection we accepted on lane#0
-meets the proper source port modulo requirement, as we fan out:
+Steps to reproduce:
+1. Have an IPv6-only interface, which has access to another server which =
+receives and answers ipip6 packets (for example an AFTR server of your =
+ISP).
+2. Create an ipip6 tunnel interface, using the afore mentioned interface =
+as a =E2=80=9Eparent=E2=80=9C and use it as a NAT.
+3. Send *any* IPv4 packet (in this example an ICMP ping) which then gets =
+encapsulated as an ipip6 packet.
 
-Since the exchange of "RDS_EXTHDR_NPATHS" and "RDS_EXTHDR_SPORT_IDX"
-is asynchronous, initially we have no choice but to accept an incoming
-connection (via "accept") in the first slot ("cp_index == 0")
-for backwards compatibility.
+Local IPv6 device <-IPv6-> AFTR-Server / Remote IPv6 <-IPv4-> Remote =
+IPv4
 
-But that very connection may have come from a different lane
-with "cp_index != 0", since the peer thought that we already understood
-and handled "c_with_sport_idx" properly, as indicated by a previous
-exchange before a module was reloaded.
+ip a:
+xx: ipv6-only: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue =
+state UP group default qlen 1000
+    link/ether
+    inet6 [Local IPv6]/128 scope global dynamic noprefixroute
+       valid_lft forever preferred_lft forever
+yy: ipip6-tunnel@ipv6-only: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1460 =
+qdisc noqueue state UNKNOWN group default qlen 1000
+    link/tunnel6 [Local IPv6] peer [Remote IPv6] permaddr =
+abcd:ef01:2345::
+    inet 192.0.0.2 peer 192.0.0.1/32 brd 255.255.255.255 scope global =
+ipip6-tunnel
+       valid_lft forever preferred_lft forever
 
-In short:
-If a module gets reloaded, we recover from that, but do *not*
-allow a downgrade to support fewer lanes.
+ip -6 t:
+ipip6-tunnel: ip/ipv6 remote [Remote IPv6] local [Local IPv6] dev =
+ipv6-only encaplimit none hoplimit 64 tclass 0x00 flowlabel 0x00000 =
+(flowinfo 0x00000000)
 
-Downgrades would require us to merge messages from separate lanes,
-which is rather tricky with the current RDS design.
-Each lane has its own sequence number space and all messages
-would need to be re-sequenced as we merge, all while
-handling "RDS_FLAG_RETRANSMITTED" and "cp_retrans" properly.
 
-Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
-Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
----
- net/rds/connection.c |  5 +++-
- net/rds/rds.h        |  2 +-
- net/rds/recv.c       |  7 +++++-
- net/rds/send.c       | 18 +++++++++++++++
- net/rds/tcp.h        |  2 +-
- net/rds/tcp_listen.c | 55 +++++++++++++++++++++++++++++++++-----------
- 6 files changed, 72 insertions(+), 17 deletions(-)
+Expected:
+When the AFTR server sends the ipip6 encapsulated response packet, it =
+gets decapsulated on the tunnel interface as an IPv4 packet.
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index 4b7715eb2111..185f73b01694 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -447,13 +447,16 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
- 	rcu_read_lock();
- 	if (!hlist_unhashed(&conn->c_hash_node)) {
- 		rcu_read_unlock();
-+		if (conn->c_trans->t_mp_capable &&
-+		    cp->cp_index == 0)
-+			rds_send_ping(conn, 0);
- 		rds_queue_reconnect(cp);
- 	} else {
- 		rcu_read_unlock();
- 	}
- 
- 	if (conn->c_trans->conn_slots_available)
--		conn->c_trans->conn_slots_available(conn);
-+		conn->c_trans->conn_slots_available(conn, false);
- }
- 
- /* destroy a single rds_conn_path. rds_conn_destroy() iterates over
-diff --git a/net/rds/rds.h b/net/rds/rds.h
-index 6d9f4a08b0ee..6e0790e4b570 100644
---- a/net/rds/rds.h
-+++ b/net/rds/rds.h
-@@ -549,7 +549,7 @@ struct rds_transport {
- 	 * messages received on the new socket are not discarded when no
- 	 * connection path was available at the time.
- 	 */
--	void (*conn_slots_available)(struct rds_connection *conn);
-+	void (*conn_slots_available)(struct rds_connection *conn, bool fan_out);
- 	int (*conn_path_connect)(struct rds_conn_path *cp);
- 
- 	/*
-diff --git a/net/rds/recv.c b/net/rds/recv.c
-index 889a5b7935e5..4b3f9e4a8bfd 100644
---- a/net/rds/recv.c
-+++ b/net/rds/recv.c
-@@ -209,6 +209,7 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 	bool new_with_sport_idx = false;
- 	u32 new_peer_gen_num = 0;
- 	int new_npaths;
-+	bool fan_out;
- 
- 	new_npaths = conn->c_npaths;
- 
-@@ -248,7 +249,11 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 		spin_lock_irqsave(&cp0->cp_lock, flags);
- 		conn->c_cp0_mprds_catchup_tx_seq = cp0->cp_next_tx_seq;
- 		spin_unlock_irqrestore(&cp0->cp_lock, flags);
-+		fan_out = true;
-+	} else {
-+		fan_out = false;
- 	}
-+
- 	/* if RDS_EXTHDR_NPATHS was not found, default to a single-path */
- 	conn->c_npaths = max_t(int, new_npaths, 1);
- 
-@@ -257,7 +262,7 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 
- 	if (conn->c_npaths > 1 &&
- 	    conn->c_trans->conn_slots_available)
--		conn->c_trans->conn_slots_available(conn);
-+		conn->c_trans->conn_slots_available(conn, fan_out);
- }
- 
- /* rds_start_mprds() will synchronously start multiple paths when appropriate.
-diff --git a/net/rds/send.c b/net/rds/send.c
-index 599c2cfb7a1d..6e96f108473e 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -1339,6 +1339,24 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
- 		cpath = &conn->c_path[0];
- 	}
- 
-+	 /* If we're multipath capable and path 0 is down, queue reconnect
-+	  * and send a ping. This initiates the multipath handshake through
-+	  * rds_send_probe(), which sends RDS_EXTHDR_NPATHS to the peer,
-+	  * starting multipath capability negotiation.
-+	  */
-+	if (conn->c_trans->t_mp_capable &&
-+	    !rds_conn_path_up(&conn->c_path[0])) {
-+		/* Ensures that only one request is queued.  And
-+		 * rds_send_ping() ensures that only one ping is
-+		 * outstanding.
-+		 */
-+		if (!test_and_set_bit(RDS_RECONNECT_PENDING,
-+				      &conn->c_path[0].cp_flags))
-+			queue_delayed_work(conn->c_path[0].cp_wq,
-+					   &conn->c_path[0].cp_conn_w, 0);
-+		rds_send_ping(conn, 0);
-+	}
-+
- 	rm->m_conn_path = cpath;
- 
- 	/* Parse any control messages the user may have included. */
-diff --git a/net/rds/tcp.h b/net/rds/tcp.h
-index b36af0865a07..39c86347188c 100644
---- a/net/rds/tcp.h
-+++ b/net/rds/tcp.h
-@@ -90,7 +90,7 @@ void rds_tcp_state_change(struct sock *sk);
- struct socket *rds_tcp_listen_init(struct net *net, bool isv6);
- void rds_tcp_listen_stop(struct socket *sock, struct work_struct *acceptor);
- void rds_tcp_listen_data_ready(struct sock *sk);
--void rds_tcp_conn_slots_available(struct rds_connection *conn);
-+void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out);
- int rds_tcp_accept_one(struct rds_tcp_net *rtn);
- void rds_tcp_keepalive(struct socket *sock);
- void *rds_tcp_listen_sock_def_readable(struct net *net);
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index b5786227623c..6fb5c928b8fd 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -56,14 +56,8 @@ void rds_tcp_keepalive(struct socket *sock)
- 	tcp_sock_set_keepintvl(sock->sk, keepidle);
- }
- 
--/* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
-- * client's ipaddr < server's ipaddr. Otherwise, close the accepted
-- * socket and force a reconneect from smaller -> larger ip addr. The reason
-- * we special case cp_index 0 is to allow the rds probe ping itself to itself
-- * get through efficiently.
-- */
--static struct rds_tcp_connection *
--rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
-+static int
-+rds_tcp_get_peer_sport(struct socket *sock)
- {
- 	union {
- 		struct sockaddr_storage storage;
-@@ -71,11 +65,9 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 		struct sockaddr_in sin;
- 		struct sockaddr_in6 sin6;
- 	} saddr;
--	int sport, npaths, i_min, i_max, i;
-+	int sport;
- 
--	if (conn->c_with_sport_idx &&
--	    kernel_getpeername(sock, &saddr.addr) >= 0) {
--		/* cp->cp_index is encoded in lowest bits of source-port */
-+	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
- 		switch (saddr.addr.sa_family) {
- 		case AF_INET:
- 			sport = ntohs(saddr.sin.sin_port);
-@@ -90,6 +82,26 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 		sport = -1;
- 	}
- 
-+	return sport;
-+}
-+
-+/* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
-+ * client's ipaddr < server's ipaddr. Otherwise, close the accepted
-+ * socket and force a reconneect from smaller -> larger ip addr. The reason
-+ * we special case cp_index 0 is to allow the rds probe ping itself to itself
-+ * get through efficiently.
-+ */
-+static struct rds_tcp_connection *
-+rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
-+{
-+	int sport, npaths, i_min, i_max, i;
-+
-+	if (conn->c_with_sport_idx)
-+		/* cp->cp_index is encoded in lowest bits of source-port */
-+		sport = rds_tcp_get_peer_sport(sock);
-+	else
-+		sport = -1;
-+
- 	npaths = max_t(int, 1, conn->c_npaths);
- 
- 	if (sport >= 0) {
-@@ -111,10 +123,12 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 	return NULL;
- }
- 
--void rds_tcp_conn_slots_available(struct rds_connection *conn)
-+void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out)
- {
- 	struct rds_tcp_connection *tc;
- 	struct rds_tcp_net *rtn;
-+	struct socket *sock;
-+	int sport, npaths;
- 
- 	if (rds_destroy_pending(conn))
- 		return;
-@@ -124,6 +138,21 @@ void rds_tcp_conn_slots_available(struct rds_connection *conn)
- 	if (!rtn)
- 		return;
- 
-+	sock = tc->t_sock;
-+
-+	/* During fan-out, check that the connection we already
-+	 * accepted in slot#0 carried the proper source port modulo.
-+	 */
-+	if (fan_out && conn->c_with_sport_idx && sock &&
-+	    rds_addr_cmp(&conn->c_laddr, &conn->c_faddr) > 0) {
-+		/* cp->cp_index is encoded in lowest bits of source-port */
-+		sport = rds_tcp_get_peer_sport(sock);
-+		npaths = max_t(int, 1, conn->c_npaths);
-+		if (sport >= 0 && sport % npaths != 0)
-+			/* peer initiated with a non-#0 lane first */
-+			rds_conn_path_drop(conn->c_path, 0);
-+	}
-+
- 	/* As soon as a connection went down,
- 	 * it is safe to schedule a "rds_tcp_accept_one"
- 	 * attempt even if there are no connections pending:
--- 
-2.43.0
+tcpdump -i ipv6-only:
+IP6 [Local IPv6] > [Remote IPv6]: IP 192.0.0.2 > [Remote IPv4]: ICMP =
+echo request, id 56869, seq 0, length 64
+IP6 [Remote IPv6] > [Local IPv6]: IP [Remote IPv4] > 192.0.0.2: ICMP =
+echo reply, id 56869, seq 0, length 64
+IP6 [Local IPv6] > [Remote IPv6]: IP 192.0.0.2 > [Remote IPv4]: ICMP =
+echo request, id 56869, seq 1, length 64
+IP6 [Remote IPv6] > [Local IPv6]: IP [Remote IPv4] > 192.0.0.2 ICMP echo =
+reply, id 56869, seq 1, length 64
 
+tcpdump -i ipip6-tunnel:
+IP 192.0.0.2 > [Remote IPv4]: ICMP echo request, id 56869, seq 0, length =
+64
+IP [Remote IPv4] > 192.0.0.2: ICMP echo reply, id 56869, seq 0, length =
+64
+IP 192.0.0.2 > [Remote IPv4]: ICMP echo request, id 56869, seq 1, length =
+64
+IP [Remote IPv4] > 192.0.0.2: ICMP echo reply, id 56869, seq 1, length =
+64
+
+
+Actual (due to the mentioned commit):
+The ipip6 packet does not get decapsulated, so only the sent IPv4 =
+packets are present on the tunnel interface.
+However, the ipip6 packets get properly received on the parent =
+interface.
+
+tcpdump -i ipv6-only:
+IP6 [Local IPv6] > [Remote IPv6]: IP 192.0.0.2 > [Remote IPv4]: ICMP =
+echo request, id 56869, seq 0, length 64
+IP6 [Remote IPv6] > [Local IPv6]: IP [Remote IPv4] > 192.0.0.2: ICMP =
+echo reply, id 56869, seq 0, length 64
+IP6 [Local IPv6] > [Remote IPv6]: IP 192.0.0.2 > [Remote IPv4]: ICMP =
+echo request, id 56869, seq 1, length 64
+IP6 [Remote IPv6] > [Local IPv6]: IP [Remote IPv4] > 192.0.0.2 ICMP echo =
+reply, id 56869, seq 1, length 64
+
+tcpdump -i ipip6-tunnel:
+IP 192.0.0.2 > [Remote IPv4]: ICMP echo request, id 56869, seq 0, length =
+64
+IP 192.0.0.2 > [Remote IPv4]: ICMP echo request, id 56869, seq 1, length =
+64
+
+
+> I have no idea what MAP-E or DS-Lite are.
+I have no idea what MAP-E is, but Dual-Stack-Lite is a way for ISPs to =
+save on IPv4 addresses
+by providing a CG-NAT in form of an dedicated AFTR server, which receive =
+and respond to ipip6 packets
+and therefore providing access to the IPv4 internet with customers only =
+receiving an IPv6 address(-range).
+
+I hope this clears everything up. If not, feel free to ask further =
+questions about the issue. :)
+If it helps, I can provide a bare-bones example config for OpenWRT to =
+test against.
+
+Best regards,
+
+-- hammer065=
 
