@@ -1,263 +1,193 @@
-Return-Path: <netdev+bounces-255466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255467-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 1Os+GWs4fmnwWQIAu9opvQ
-	(envelope-from <netdev+bounces-255466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:14:19 +0100
+	id aOdMDvw4fmn7WQIAu9opvQ
+	(envelope-from <netdev+bounces-255467-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:16:44 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98274C323A
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:14:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9B3C326F
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 18:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC6E73010D97
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:14:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F83530382AD
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E64E342CBB;
-	Sat, 31 Jan 2026 17:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E949347BBB;
+	Sat, 31 Jan 2026 17:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ac6AQ+HE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YvQami6F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8643733F370
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769879654; cv=pass; b=IjkfHZeiUcb27eFkhYSuWXa8h/9brvfmunArx+RzAKSWJOhqowHqSMiYwkM1EH/YYK5hztyroaxrJwZTL1P2gWffyZSDw2uR4HpmBIqNhggd4DGuWKS94gL3uHAmGT9z9duf1qd5mSHxijCYRlM/uVpJE02iP3FFDJ/p+/meiQ0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769879654; c=relaxed/simple;
-	bh=r+vwDs7BuZngUPxeijC/0bcS3Gi48Tqn+Nl4riVXyC8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o8Hkjv9BgpsWxrtbSkxcUVn8L5bXP4yG3GZZC60WXZMP/X+ZA6vuHFW6EjlkNCe0k7zF0CZ9HiH1WRrFaeDKvLI1UCQd3HjW0jE96aHHrGexoX7nLzDitMWi3KBQVCdQukO8kxTzXiCYzUZzAuers4UDLJPBl4v8dUrM3o/t30U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ac6AQ+HE; arc=pass smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-823081bb15fso1660269b3a.3
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:14:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769879653; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Y9Ou/0UwHKYVbeYRaAAxxpMQ4cgX3UCltJ433fNzDefabBjwiHsA1pnRWIODc1wBF6
-         EkDXt1qlZ/AKuICd9sl5Qjx1XhHmeZ5UUezHP9Jxh8jkAn2K5WClzREnOBC+r4O90NkQ
-         b8NCysDIkICARRn5z0DyPUjtVM3Rv8TtxSIj0pYG3quBv3mCyPYFOntbcIotCz7eGzEy
-         vJXMD1Pj84i2vzR2/P+GCgiNpN/zdIqlZfWYmnEiko3YkkmhIcLQUJ/smC1ALufKj9QP
-         ltBqTK0KMJVK58O8/MtbLhy4QOcPLYjtQO7Cepu+XGCs35eN4YxMwMzbKkuDkQkSVayW
-         E4Bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=C+DEJkDZ8t1gSzphKTb6gNVdppljsyPu97cg1FwdVG0=;
-        fh=x9QdEeNHueCIkNXX527hi19agiCELBBIpe2v3pSsflY=;
-        b=fDLeD62quMlYi0YoOwphoA/VadgEiC1mCVnsdVcoi/3NbYqLVRwGjJVRx0W2NBXjyV
-         YCoInYWcAzPcpQtrCY0EvkQfVNVJkK8QKGCAqtyE9GLMO/Q+LG0UIjsUdBs5XuPUWCWB
-         A72DxcNA3wuvOUFfcanpVRJC8JUSnb+4pwvFs0lK3ysT1yP8C4oFog0xKJhECwiT9und
-         a63yWM5huGjHIayeEk+IsaavW3tc3jWXbuoOFp3ub+t8q4q0tCBwdkRIIpYWa/QlKbty
-         fGw38IoNC2XkTklsZDSuXL24FSLogT7w7Ac9sVvXW73n7C1Tl4vG18zSC6SQ+zau95Tl
-         XjsQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91918345CD9
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 17:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769879791; cv=none; b=FoSOep0yRuZSt6llFvsuMkXFX/2qblXRLyncjkkgRbYWaApg7urmeXJAKOmXdvfOejoqLCe15wyRsBJtaeis8kSfQl3JZotZuZ+eALZh3z0hhX80/9IJeGxN3pDW9y8fp7lbuRH7adCiP5bJLphPBy//f/XpA6M9HBnVc04LvpI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769879791; c=relaxed/simple;
+	bh=yHopSMXDBMMcoBjx9jbnywnCG20y2n2IGcs3V4FIwzk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IQVQhBbdphIywxFAbHFCByeovTTya5kUl60gOnGmurAIbYsL+o3DrAboyr1K3ZpRSHUg/yIsS319qy9+2Y/HsSPXshONAQn4OC6qYxfk2D0PjTSkT6EzEHvmA4GepL05Ps75ubKvBvvciL2frwQYlxsY6qg7E4aLDDfY+7VORDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YvQami6F; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-89473f5a755so106278096d6.0
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:16:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769879653; x=1770484453; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C+DEJkDZ8t1gSzphKTb6gNVdppljsyPu97cg1FwdVG0=;
-        b=ac6AQ+HE0jew4ccZ88RekymdsiPy9dXnI44jQeu9ZwFnxtp+Rz0KfAepDoPHxfMcfD
-         Z5J8Z3+fiC+MHbTB3SGktoSpk8T0di9Qzt2iEn3S2j9+zpif0yLPQIh47GWyiZBssch1
-         P3SpG2KCKv5/32x5wTjlduggC3wxqTG0UNs3rIddwOLTa25i7nehxlTjIw/bfjBHirqx
-         rrDKq2/hMchede6vcDXCO9xkGGVU2fo+8sNSwMbSBLpahv+mxmCYBA7XffnOosHkzZsV
-         J9EPlk1h1teGnn4sI+5lwlyuU6LKrnedw74LTqMm4j9HWamu7jf5mAPH+GAP72kZr6Jb
-         9HZw==
+        d=google.com; s=20230601; t=1769879788; x=1770484588; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=J6YEsEshXwESZt3m5/fo9MO3bsnz5IVpBfwyJCOBE0Q=;
+        b=YvQami6FecdA6WKyox0EJXuiIyz/vhQgZFf0RWB7ZXOhWwvVxiuQKRBsvOq2WgGNTr
+         ZnmSvElBWCTVNslUz8tjKC7Vn1m8VrcUCAAxqJoDBQWLTe0tK2Tr+b1MclTo6ZiBRXjw
+         +/ObgdwqM1cpt3vmoYsi0/ZCAqLO8USGhoa2OBUG8I7bKRE6kxj1Xo1VZ4MnpM37xqFP
+         QAuVVWXvEBCVwQjjbNgtCOD3KX73e9KjeTG40WLYaPu/fGLYugLubkVSdKKP4dNSFPxw
+         Qo5g56AFeUwe5Qnc2zqwCGUP2SWLz6sgwBi5exybkYfNJEAYl6HololQXOAWHn1s6Kxi
+         9GHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769879653; x=1770484453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=C+DEJkDZ8t1gSzphKTb6gNVdppljsyPu97cg1FwdVG0=;
-        b=r5+/RISweJ7K8ZHtEwc3cG79EMZgwHbMBITg/0F764F9c0Jp2jYs3dktNkX/x4RJag
-         syXXtK60HhjNhfBlnZ19m+9NyoyUSSGXirYFoMcY3Hb6d8jChl22G/f64LY53oBMcOFl
-         CMjO717Cnr8CjdO7xPB1l/TptyEDIeAKWwVp3aQqUraB0UuL/6dP/Z5gMWROJvZ7MYri
-         PvRQ52UCInH5yFZD5u+uyRGek9wlhjSVLY9Lacd+3jyoQ39Hdc5oKgH5geJtOBvzeqbs
-         SgCJbFPDQq4CBLqTJingZFvym8EdQ20foW8xFlErhgO+qNEz/DRnoQgynF5XP5E4EjW1
-         CXww==
-X-Gm-Message-State: AOJu0YzFUZyaUGoPmDDnxR/JW5e9L9e7wVoqGyqwptNPiV1yEp7NNiPr
-	QoxLETDQwrOtr6d6SjWXiX6GtPf5nbzuY/YuyoYr6oj2LuLNbmyjmljRawgVu/0I7sOP6p4ZRtE
-	TjGJicBvLlpvmfCBRrJbs8QNpZUbhyaep22Ki2HX0
-X-Gm-Gg: AZuq6aKxi+Z99OLMQSW2hrpSAVuBP7qhchJzfkFTnj1PkerKe+Rxp6iXeBZotHQ045e
-	AArk7+BM+yVTV3ShuPRPKXS3CAzVfSknCc/ERh4gFQ/r+DHWvlukZMukh3vkKDgva9ZjRDa+y4M
-	jXFESUFzF6bAGSMk5Hu5XTgUFEfM7d7S0gC7VonsHcG8gK8lP9VZryesacZhphgIXpUjheTkrT7
-	NEYqo5kOxiVP2aGKFii0MgHwLxepa3EF3ef3IhYJ8RdV3Cb8VUemOyhAZl20ccaP86gTqg3UtIv
-	dOk=
-X-Received: by 2002:a05:6a21:730e:b0:38d:e9e8:25e0 with SMTP id
- adf61e73a8af0-392e0051edemr6582546637.20.1769879652878; Sat, 31 Jan 2026
- 09:14:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769879788; x=1770484588;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=J6YEsEshXwESZt3m5/fo9MO3bsnz5IVpBfwyJCOBE0Q=;
+        b=RIQ2LzgYP9jtDQmIpzZnIdT5JEK8rPic9hZXWrnUSSmchSZ2z7Ue1ykXU+b3r/rPdl
+         uANtLwGWMDPGNZCpAeIDlws3rbuqHC++rDNXHkfs7cFpxr5FdeMdDuYiTgmTEtQetvUM
+         t0bIU+dEIN1kwlD7QSFrt+tA0q+wN6EZjoUXVXcjneMVsIhsODhgwfqf6uOe59JRU+5a
+         RcG/Gh8MNHMBGwmXjPMKQISUz4VfAmCdBvxAuQuB5GXhnSpRp6MAkMViZurhe7MFKA9+
+         D9P6HJ08S/1pqHsGApKDdSCTg5W6M2iBHo00TowFboNNxaCHuTTqOC2/xuSPOKlEI4BK
+         lyPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWvVmZ5iccG3dNkstSFd9LTYdWbNd2/pVMlCtKJt/eGBWEsPJWlv7WON1dCfgxr3tV4ftYovEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEDRy9Mw8ns8mKqw1+z7mF96wCvQ4TpMxcAZwMb4p7rl7pFJLM
+	xZrVHKItirxumaHBw5uPRCXGY3MHP9URd2JwZlcU+WT9NylhT1//noFxeJIerTu0lG+nc6iI2o4
+	rc0JZ3cA0iGiWfA==
+X-Received: from qvbkd26.prod.google.com ([2002:a05:6214:401a:b0:888:db8:f98c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:1306:b0:894:7051:bdaa with SMTP id 6a1803df08f44-894e9f7110amr81679656d6.21.1769879788620;
+ Sat, 31 Jan 2026 09:16:28 -0800 (PST)
+Date: Sat, 31 Jan 2026 17:16:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMkS2Uoarr+551wNe7zvmPTGFZxdb-otKYLBPF5+2s+FEg@mail.gmail.com>
- <Fkv_0Ju_R82Hh-rBUDW7uALCp8vjL8WZqAsQhreDrulXNad2A2PlNWkSO-95bSzYNai0wYDsZZZFtC2-YAr-B9ZWWtNg8iqafAMDUA0F7Pc=@1g4.org>
- <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com>
- <pXV1wsavqcYDq5HfAVaW_gMoTITR9M0PBWKhnz9n6VHYxhW56DQU7qfCEoaYcCixz4iqrj31Mt9vL9bHqTNGygLK5pYvyw1z3san5ndlkkQ=@1g4.org>
- <CAM0EoMkBb+d_5dn6vdtSxPJ-HuUUL9uei65euSQfX3bXYm9RAw@mail.gmail.com>
-In-Reply-To: <CAM0EoMkBb+d_5dn6vdtSxPJ-HuUUL9uei65euSQfX3bXYm9RAw@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 31 Jan 2026 12:14:01 -0500
-X-Gm-Features: AZwV_Qgs08CtqhIcbX8IL2co-VDwAiZD2ridaHVUhIq8MI3H4zkSvLzNniTVE_E
-Message-ID: <CAM0EoMnseQw6H+a4wzhg7BkPJraFwN-=2x4FOSOUp5f7=XbyaQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-To: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Po Liu <Po.Liu@nxp.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
+Message-ID: <20260131171627.1852894-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: move __reqsk_free() out of line
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255466-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255467-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,nxp.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu.com:email,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 98274C323A
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7C9B3C326F
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 11:51=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
->
-> .
->
-> On Fri, Jan 30, 2026 at 3:48=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
-> >
-> > What version of act_gate.c are you currently testing?
->
-> I am running plain ubuntu on this machine using their shipped kernel 6.8.=
-0.
-> But i did look at the latest kernel tree and the dumping code has not cha=
-nged.
-> +Cc Po Liu who i believe added that code.
->
-> >Did you actually run the tests? =E2=80=9Clarge dump=E2=80=9D creates ONE=
- action at base_index, with num_entries=3D100, then immediately does GETACT=
-ION. So =E2=80=9Ctc actions ls action gate | grep index | wc -l=E2=80=9D wo=
-n=E2=80=99t exercise this, because it only counts actions. It doesn=E2=80=
-=99t amplify the per action dump size (the entry list does). It uses libmnl=
- (mnl_socket_sendto / mnl_socket_recvfrom) with MNL_SOCKET_BUFFER_SIZE. The=
-re is no custom netlink handling. The failure is returned by the kernel bef=
-ore userspace parses anything. The dumps are transactional at the netlink l=
-evel, but an individual action dump still has to fit in the skb backing tha=
-t message.
->
-> Sorry - I am not running your code (didnt want to compile anything on
-> this machine), just plain tc and i have to admit I dont know much
-> about the mechanics or spec for gate, so my example is based on
-> something Po Liu posted, here's a script to add 100 entries:
-> ---
-> for i in {1..100}; do
->     echo "$i"
->     tc actions add action gate clockid CLOCK_TAI sched-entry open
-> 200000000 -1 8000000 sched-entry close 100000000 -1 -1
-> done
-> ---
->
-> Then dumping:
->
-> $ sudo tc actions ls action gate | grep index
-> index 1 ref 1 bind 0
-> index 2 ref 1 bind 0
-> index 3 ref 1 bind 0
-> index 4 ref 1 bind 0
-> index 5 ref 1 bind 0
-> index 6 ref 1 bind 0
-> ..
-> ...
-> ....
-> index 95 ref 1 bind 0
-> index 96 ref 1 bind 0
-> index 97 ref 1 bind 0
-> index 98 ref 1 bind 0
-> index 99 ref 1 bind 0
-> index 100 ref 1 bind 0
-> $
->
->
-> >
-> > look at af_netlink.c
-> >         /* NLMSG_GOODSIZE is small to avoid high order allocations bein=
-g
-> >          * required, but it makes sense to _attempt_ a 32KiB allocation
-> >          * to reduce number of system calls on dump operations, if user
-> >          * ever provided a big enough buffer.
-> >          */
-> >          ...
-> >         /* Trim skb to allocated size. User is expected to provide buff=
-er as
-> >          * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped a=
-t
-> >          * netlink_recvmsg())). dump will pack as many smaller messages=
- as
-> >          * could fit within the allocated skb. skb is typically allocat=
-ed
-> >          * with larger space than required (could be as much as near 2x=
- the
-> >          * requested size with align to next power of 2 approach). Allo=
-wing
-> >          * dump to use the excess space makes it difficult for a user t=
-o have a
-> >          * reasonable static buffer based on the expected largest dump =
-of a
-> >          * single netdev. The outcome is MSG_TRUNC error.
-> >          */
-> >
-> > This is where I am currently but I have seen these bugs appear througho=
-ut all my iterations including what's in the tree currently, if you show me=
- better alternatives that solve my problems, I'll gladly accept.
-> > https://github.com/torvalds/linux/compare/master...jopamo:linux:net-sta=
-ble-upstream-v4
-> >
->
-> I dont see a problem with "dump" as you seem to be suggesting. I asked
-> earlier if it is possible that you can create some single entry - not
-> 100 as shown above that will consume more than NLMSG_GOODSIZE? My
-> limited knowledge is not helping me see such a scenario.
+Inlining __reqsk_free() is overkill, let's reclaim 2 Kbytes of text.
 
-Aha. I think there is a terminology mixup ;->
-"dump" (a very unfortunate use of that word in the netlink world ;->)
-is a very special word. So when you take a dump in this world you are
-GETing a whole table. In this case all the gate actions.
+scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 2/2 grow/shrink: 1/14 up/down: 194/-2276 (-2082)
+Function                                     old     new   delta
+__reqsk_free                                   -     114    +114
+sock_edemux                                   18      82     +64
+__pfx___reqsk_free                             -      16     +16
+__pfx_reqsk_free                              16       -     -16
+tcp_req_err                                  272     177     -95
+reqsk_fastopen_remove                        348     253     -95
+cookie_bpf_check                             157      62     -95
+cookie_tcp_reqsk_alloc                       387     290     -97
+cookie_v4_check                             1568    1465    -103
+reqsk_free                                   105       -    -105
+cookie_v6_check                             1519    1412    -107
+sock_gen_put                                 187      78    -109
+sock_pfree                                   212      82    -130
+tcp_try_fastopen                            1818    1683    -135
+tcp_v4_rcv                                  3478    3294    -184
+reqsk_put                                    306      90    -216
+tcp_get_cookie_sock                          551     318    -233
+tcp_v6_rcv                                  3404    3141    -263
+tcp_conn_request                            2677    2384    -293
+Total: Before=22582599, After=22580517, chg -0.01%
 
-If i am not mistaken in your case this is not a dump - rather, you are
-CREATing a single entry which is bigger than NLMSG_GOODSIZE as i
-suspected. I dont believe iproute2 will allow you to do that.
-What's happening then is that the generated netlink event notification
-for that single entry is too big to fit in NLMSG_GOODSIZE.
-Let me try to craft something for that...
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/request_sock.h      |  9 +--------
+ net/ipv4/inet_connection_sock.c | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-cheers,
-jamal
+diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+index 9b9e04f6bb8931088d9bb2fa7d4420fecf235895..0cd5a400e5265d8aa1b2452967b4007521c2eee8 100644
+--- a/include/net/request_sock.h
++++ b/include/net/request_sock.h
+@@ -123,14 +123,7 @@ static inline struct sock *skb_steal_sock(struct sk_buff *skb,
+ 	return sk;
+ }
+ 
+-static inline void __reqsk_free(struct request_sock *req)
+-{
+-	req->rsk_ops->destructor(req);
+-	if (req->rsk_listener)
+-		sock_put(req->rsk_listener);
+-	kfree(req->saved_syn);
+-	kmem_cache_free(req->rsk_ops->slab, req);
+-}
++void __reqsk_free(struct request_sock *req);
+ 
+ static inline void reqsk_free(struct request_sock *req)
+ {
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 13372d2cbed53e83510e24a34bc57c7de0a17004..c048a36f26b130dd167e0594d190bcc3bb49e635 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -918,6 +918,16 @@ struct request_sock *inet_reqsk_alloc(const struct request_sock_ops *ops,
+ }
+ EXPORT_SYMBOL(inet_reqsk_alloc);
+ 
++void __reqsk_free(struct request_sock *req)
++{
++	req->rsk_ops->destructor(req);
++	if (req->rsk_listener)
++		sock_put(req->rsk_listener);
++	kfree(req->saved_syn);
++	kmem_cache_free(req->rsk_ops->slab, req);
++}
++EXPORT_IPV6_MOD_GPL(__reqsk_free);
++
+ static struct request_sock *inet_reqsk_clone(struct request_sock *req,
+ 					     struct sock *sk)
+ {
+-- 
+2.53.0.rc1.225.gd81095ad13-goog
+
 
