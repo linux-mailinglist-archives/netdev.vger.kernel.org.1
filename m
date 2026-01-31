@@ -1,188 +1,126 @@
-Return-Path: <netdev+bounces-255337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eI5ULAx4fWknSQIAu9opvQ
-	(envelope-from <netdev+bounces-255337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:33:32 +0100
+	id qMtRNRV6fWlDSQIAu9opvQ
+	(envelope-from <netdev+bounces-255339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:42:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4920CC088D
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:33:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4255BC0907
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4F9413006B5C
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:33:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65275301739F
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8432335029F;
-	Sat, 31 Jan 2026 03:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0022B34A76B;
+	Sat, 31 Jan 2026 03:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2KIepuD"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="u+2+N6w3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EDB34E76A;
-	Sat, 31 Jan 2026 03:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2C033439F
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 03:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769830405; cv=none; b=UAb6Nr16LQb8ssEBgTkkJHu1tEJW3C/0cqYUrCRBNshMrGbeuocEgBD3fL/GKCFlDyeKcH2SfbXnxsAhLsv2SJW08cKaZGxyjMbj8bW+GCySZGcfCiL0GjPl6THcao0lvz4LYh8jUZUWC+VO/vqx9s43lE0jsQQX3hr+ZCs68gk=
+	t=1769830927; cv=none; b=YUO9ENb83xqoFm0F7F89KW3MoV65hXGvB/qnuu8YCFGj8FvJvLqg39TFo0UpYb5lSyK9hXwSm2bJAqAsKjg9cTKj3kjGXTE1j3xJ5Aon//aESYR4Q1zRVUiDfle53KuFHt741qx6Ic7b/9vAW9jFiNLWl+na38nc8F5QY6oeVDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769830405; c=relaxed/simple;
-	bh=pb/l1QnS42Xhg7djJDxHxh6dWiXBRyj70BDc+XB5/3U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A7Yxl+h+e5TiBbHI3LDefeBXAtnz/YkAJxIsAl0WUa+IvP/IYon4cF8ZBFFjRtr43Se7GUpP184i7wK/dejFTbI5ZxgRZLjztAE9W+mhr5hxRQHESVYN00EWfk0ALJJ+SgqpygfJDbv0U3RfngMiGoxNLo9qwp6i3VQj7TvmUNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2KIepuD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C494CC4CEF1;
-	Sat, 31 Jan 2026 03:33:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769830405;
-	bh=pb/l1QnS42Xhg7djJDxHxh6dWiXBRyj70BDc+XB5/3U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=q2KIepuDQtjsNW/f+U3XEpmIQ3aS3351GYbP8raffAAV7oVpeYRn3Buw/Yhn75PIs
-	 x6bfN2saWn1Ll7ael2/XjIQWnaiLk1mx8qiqZRPlMCos4n9dfpI41qCu48J9EikX56
-	 8ZkuZCQvjxqqt7plj6VjRlvai6gXIfG4GnIdwz5rczY0ueSqydlcLcxhgwE2ULNZgv
-	 tbR62Zgvtrqh+JG3hGPa5TY2/HdR/J20bLbLZa/Z8SS1ODoxvlnL9+v/Zh6wHWM63o
-	 fKATPdY/ifNj3ZpeV0xTNhU0b/ijx1WfXME5P9E8YNTjE0DiJVNVFhmGqmAJ83eXTZ
-	 l8OA+Zz2ZPwmg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: rkannoth@marvell.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v7,11/13] octeontx2-pf: cn20k: Add TC rules support
-Date: Fri, 30 Jan 2026 19:33:23 -0800
-Message-ID: <20260131033323.1013856-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260129083339.264386-12-rkannoth@marvell.com>
-References: <20260129083339.264386-12-rkannoth@marvell.com>
+	s=arc-20240116; t=1769830927; c=relaxed/simple;
+	bh=WWQSJ5dEaX6KA13RinvYczKiYBwAZZdrVUHIct1ZIC0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bn/11V9i6O3chuoryUztnRFvQ0vz5BS5Us/iQ8f4dSPBn2xbO0ceV3tiWbtvAX7kRVeh84dWp2RZQiKvlhY9/T47ZhzM9KN3XysbreiAQ1AWHIzsyoevlsfuNnzHhRPKoCbU8o3NjGmFmbKPSH31o3ebHSHTG0UrJyli0/S4DkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=u+2+N6w3; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60UM8K1I3981407
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:42:05 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=WWQSJ5dEaX6KA13RinvY
+	czKiYBwAZZdrVUHIct1ZIC0=; b=u+2+N6w35RCdA9U7dk20mP1r4RY8ZGL7u9TJ
+	MQrClz2pWHJDxRdy0Bgrzj0IH04ijVR9wQuGGgEJSHAIGSxaXh6+OLVkR9ijNRKH
+	IADpOxZyB6//YbcFFHzRjK/JLMQJL5vBMobZ5YRu9GsMCrks4eDO0wuV4RHj2D6+
+	WanbWtrt7BjlJ83gEEvWXi7jqsPbgWD/HZuj5+sR4WHUk7FnZJAL1rN36n2GDZZC
+	58hebxWOuR+rEAG2OefQtok9G623QfP12lgEQbWCiHVAKr7fTskMp14ZZ3ejRgiO
+	XJpBcDw8TwFnTGelu12qqowLZTZoiGQez15b9xmO6KIWU0kQxg==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c1561jae0-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 30 Jan 2026 19:42:05 -0800 (PST)
+Received: from twshared108366.16.frc2.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Sat, 31 Jan 2026 03:41:50 +0000
+Received: by devbig010.atn3.facebook.com (Postfix, from userid 224791)
+	id 941BA6F28CD; Fri, 30 Jan 2026 19:39:25 -0800 (PST)
+Date: Fri, 30 Jan 2026 19:39:25 -0800
+From: Daniel Hodges <hodgesd@meta.com>
+To: <netdev@vger.kernel.org>, <@fb.com>
+CC: <jmaloy@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <tuong.t.lien@dektech.com.au>, <tipc-discussion@lists.sourceforge.net>
+Subject: Re: [PATCH 1/3] tipc: use kfree_sensitive() for session key material
+Message-ID: <aX15HnlN8B_JOpMC@fb.com>
+References: <20260131032508.4158256-1-hodgesd@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260131032508.4158256-1-hodgesd@meta.com>
+X-FB-Internal: Safe
+X-Authority-Analysis: v=2.4 cv=KfPfcAYD c=1 sm=1 tr=0 ts=697d7a0d cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=Vxa4KF3gbYEA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=jJJBXcr-l-UN6h5ZWhYA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMxMDAyOSBTYWx0ZWRfX4NFjWUF+TWYT
+ qr1lMRiclg8AOEd6rqjhhXBTQelOLTAW9/rE5/wx/TNBaGUNn/3eQfVQ45ge+0pZzcRGTk/6kTh
+ ucHDA65ZkW0F+fkMOAXqSjhJqgnfmEU+BX5hARy7KcvaMck4rDRFJ060ez8lcjlNJF4FLWioPCr
+ VOWxFjnsaKhDi1VaLYfNF/7WFqWGPdEMyVhQOgkFGfwAxCGTdzbZS+hFgsEgGomatgTASyeRL4L
+ 3YZ93mvHzoqbBMw2PByYNoWepiu+pceNNrwOAGeG6esjzfdlryWG7pzz0vmhTwE+reHnkM0j9Ir
+ OfZ8agqYJskyY+voBGpeDjhmIBxz0nSKZfMcEzjFjYY+qUIZlPZyXiKmuBwA72DLSNOpw+5fpto
+ LV7uYMd5ELCnRlfW44jneFFn6oCQygfMFURtAl1A5YOAbYFMK/rqlWfDtTvqnaL1HlN2CZtZUNu
+ i1ndj7zIBBhAr2/gxmA==
+X-Proofpoint-GUID: 0icjYOAjinO9vPeeiMfeOPoXU6pyDM54
+X-Proofpoint-ORIG-GUID: 0icjYOAjinO9vPeeiMfeOPoXU6pyDM54
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-30_04,2026-01-30_04,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	TO_NEEDS_ENCODING(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255339-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255337-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[meta.com:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fb.com:mid,meta.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4920CC088D
+	FROM_NEQ_ENVFROM(0.00)[hodgesd@meta.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 4255BC0907
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-octeontx2-pf: cn20k: Add TC rules support
-
-This patch adds dynamic MCAM entry allocation for TC rules on CN20K,
-with X2/X4 key width support and entry shifting based on priorities.
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-
-[ ... ]
-
-> +int cn20k_tc_update_mcam_table_add_req(struct otx2_nic *nic,
-> +				       struct otx2_flow_config *flow_cfg,
-> +				       struct otx2_tc_flow *node)
-> +{
-> +	struct otx2_tc_flow *tmp;
-> +	u16 cntr_val = 0;
-> +	int list_idx, i;
-> +	int entry, prev;
-> +
-> +	list_idx = otx2_tc_add_to_flow_list(flow_cfg, node);
-> +	entry = node->entry;
-> +	if (!cn20k_tc_check_entry_shiftable(nic, flow_cfg, node,
-> +					    list_idx, true)) {
-> +		/* Due to mix of X2 and X4, entries cannot be shifted.
-> +		 * In this case free the entry allocated for this rule.
-> +		 */
-> +		if (cn20k_tc_free_mcam_entry(nic, entry))
-> +			netdev_err(nic->netdev,
-> +				   "Freeing entry %d to AF failed\n", entry);
-> +		return -EINVAL;
-                ^^^^^^^^^^^^^^
-
-When this returns -EINVAL, the caller otx2_tc_add_flow() will then jump
-to free_leaf and call cn20k_tc_free_mcam_entry() again with the same
-entry value (stored in new_node->entry). Is this a double-free of the
-MCAM entry?
-
-> +	}
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-
-[ ... ]
-
-> +	if (is_cn20k(nic->pdev)) {
-> +		rc = cn20k_tc_alloc_entry(nic, tc_flow_cmd, new_node, &dummy);
-> +		if (rc) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "MCAM rule allocation failed");
-> +			kfree_rcu(new_node, rcu);
-> +			return rc;
-> +		}
-> +	}
-> +
-> +	entry = otx2_tc_update_mcam_table(nic, flow_cfg, new_node, true);
-> +	if (entry < 0) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Adding rule failed");
-> +		rc = entry;
-> +		goto free_leaf;
-> +	}
-> +
->  	mutex_lock(&nic->mbox.lock);
->  	req = otx2_mbox_alloc_msg_npc_install_flow(&nic->mbox);
->  	if (!req) {
->  		mutex_unlock(&nic->mbox.lock);
->  		rc = -ENOMEM;
->  		goto free_leaf;
->  	}
-
-[ ... ]
-
->  free_leaf:
-> +	cn20k_tc_free_mcam_entry(nic, new_node->entry);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This function is called unconditionally in the error path, but on
-non-CN20K devices new_node->entry was never initialized (it would be 0
-from kzalloc). Would this send a mbox message to free MCAM entry 0 on
-older silicon? Should this call be guarded with is_cn20k()?
-
-Additionally, when cn20k_tc_update_mcam_table_add_req() fails due to
-X2/X4 mix, it already frees the entry before returning -EINVAL. Reaching
-this point would then attempt to free the same entry again.
+Whoops, this should only be one patch, I messed up when separating this
+patch out.
 
