@@ -1,69 +1,66 @@
-Return-Path: <netdev+bounces-255434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255431-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIh5OfISfmlLVQIAu9opvQ
-	(envelope-from <netdev+bounces-255434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:34:26 +0100
+	id uMH4HrwSfmlLVQIAu9opvQ
+	(envelope-from <netdev+bounces-255431-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:33:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79970C2776
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:34:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F23CC2752
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 15:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C99903031AE7
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:27:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19AA63087203
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 14:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5168536682C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8F536656B;
 	Sat, 31 Jan 2026 14:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FlayTHJs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHMXU/pk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0C4359F88;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F8A3596ED;
 	Sat, 31 Jan 2026 14:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769869522; cv=none; b=hf/7Eojp+sO5kNF1UFOYGCbOsAStSGT971b3ZmzN1OjmhJ/NahJbEoU0aj5VEqX9JCgOM0/kCHVcnpMI4NufIUwcBZBc8Yh/oo7fLVJgH4oOmTqavNCnXWO9HUXAZfiffyiN2Nqe4C0Z6mML6g82iEzETLCXaYhmFHPLBKE7K04=
+	t=1769869522; cv=none; b=C9OxefML0YkzoFz+sbXLWTrto3t7R8ecMF8FcsbUN0iaNvvz2I41YXK0b6R8ZIi2jPtO45y4yjdOGYcQf58uN2vv265ZoPitnTcFR3FERJFOUqgiCcFQX96wNMwJELnB9bAM5ZtfI/Dq6zAKWdkPEDCPT9hXHQIITKRZv9PLU6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769869522; c=relaxed/simple;
-	bh=c78VBSuB3zJR1YCeHGb5UJcGA9b8DZwRfytxgWk/nVQ=;
+	bh=3n5zkoFrFUOIWGD8NapCIbtnoFCw7B0BzF+EBvzaUy8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=paJnUAMntG6yxEOje+bkag+xHAkbE2eqlBetkzhDylg4xkle54EhJlvFxhdWax4h7vyISFVfrcvf7rSjKviYeCetyjkMiYXsiAf/Khxc8BRxhkCyt6+hNJpryjXEQk1F0N+i9G+PEIAmkK+plGtoJXJ4IMo1TayR6oN82ahUuiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FlayTHJs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6D96C4AF1B;
+	 MIME-Version:Content-Type; b=gWSMovoNjRfEGQ+DU6ym9kl6CykgTCZT35xGu9Sv2ClLPCpuQMaCcoJ2xDZJe8AVtcc+8mkYdRoeQZqwTCGQwkDjH+f8ay5/8xnKGDqdkpxa+bR2cYxuVJS6YQgFzZ6raGA9onrpbg11TISH4UtSYYDKqccLr3Mju7iyuSmFa50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHMXU/pk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6A65C4AF48;
 	Sat, 31 Jan 2026 14:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769869521;
-	bh=c78VBSuB3zJR1YCeHGb5UJcGA9b8DZwRfytxgWk/nVQ=;
+	bh=3n5zkoFrFUOIWGD8NapCIbtnoFCw7B0BzF+EBvzaUy8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FlayTHJs2JUrQOYizmq+bu9LbW2w66UJVg9tbVq+HjdhRH0wnlriOKQ+ObL4grHnZ
-	 +r98L9a4ebz0IGwaVufND7ECK2QORhXbBvQVK5a+kMDa7qGwng3sDR4o0E+xDmh6Op
-	 VlmGodLkSbAOyoXmJxvDaIwuRmHzyOtGFbDIInKiTpzGbIK10Z0gzL/C6WkfT6FQTL
-	 Ppij1jr5RxAiEHQouiIYV7XVqh0HDtQumuNQ46hazfxSkW5WVTVX3lu2dcaOXH1KrM
-	 y3vvDQo+EnhPO+Mu8nbkXFfGeeANwYzVECJbdDObW/IbfycnsGRe0ICaCffV0Ut1G7
-	 58BrPSt6HvYoA==
+	b=dHMXU/pk4asVAvvkpHiG3eEJ5oA7riAKDCt3bzpKkOYdYUxfNrsNR73LYNJVGZuAU
+	 S8TXpfIoIBqt5UuHSafFQzct84M+zzW8u96y7Vw1vbNbAquzD6dvnE2qmeM75Afg6n
+	 xWdPbDEofdwioK5S71f/8SMHuxI4kCCY5uP/zsFstkvlsaq5Ec3TYOppshkcLZAF23
+	 Inn3PDCwICFQoGtuh2TWzXrljwmhDiw5UpFOu6Vn1OIuWmG1cIBdiBdoqL1NwrqGkQ
+	 9QjAAda+dkEIbjVqIzsJns52YoGLV+ASOJc8IN/6N1V4YKWhdDJQMwVCL76+vX4JQS
+	 bwP7h8SY6Wnew==
 Received: from mchehab by mail.kernel.org with local (Exim 4.99.1)
 	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1vmBua-0000000AVlf-0TIM;
+	id 1vmBua-0000000AVlj-0aF2;
 	Sat, 31 Jan 2026 15:25:20 +0100
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>,
-	Kees Cook <kees@kernel.org>,
 	Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	intel-wired-lan@lists.osuosl.org,
 	linux-hardening@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Mauro Carvalho Chehab <mchehab@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v4 29/41] docs: xforms_lists.py: use CFuntion to handle all function macros
-Date: Sat, 31 Jan 2026 15:25:03 +0100
-Message-ID: <4ad68fce80ea7f994665ce2d72b39f0098df2476.1769867953.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v4 30/41] docs: kdoc_files: allows the caller to use a different xforms class
+Date: Sat, 31 Jan 2026 15:25:04 +0100
+Message-ID: <a6ff5862682267a0a8e0c6dffa6df69f5700e933.1769867953.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1769867953.git.mchehab+huawei@kernel.org>
 References: <cover.1769867953.git.mchehab+huawei@kernel.org>
@@ -81,156 +78,84 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255434-lists,netdev=lfdr.de,huawei];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255431-lists,netdev=lfdr.de,huawei];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,huawei];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,huawei];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 79970C2776
+X-Rspamd-Queue-Id: 2F23CC2752
 X-Rspamd-Action: no action
 
-The new CFunction class handles better macros, as it works the same
-way C compilers do, handling delimiters tha right way.
+While the main goal for kernel-doc is to be used inside the Linux
+Kernel, other open source projects could benefit for it. That's
+currently the case of QEMU, which has a fork, mainly due to two
+reasons:
 
-This allows removing complex regular expressions, placing instead
-just a simple one with the name(s) of the functions to be replaced.
+  - they need an extra C function transform rule;
+  - they handle the html output a little bit different.
 
-Doing a before/after check using "kernel-doc -man ." shows only
-cosmetic changes (whitespaces, mostly).
+Add an extra optional argument to make easier for the code to be
+shared, as, with that, QEMU can just create a new derivated class
+that will contain its specific rulesets, and just copy the
+remaining kernel-doc files as-is.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- tools/lib/python/kdoc/xforms_lists.py | 71 ++++++++++++---------------
- 1 file changed, 31 insertions(+), 40 deletions(-)
+ tools/lib/python/kdoc/kdoc_files.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tools/lib/python/kdoc/xforms_lists.py b/tools/lib/python/kdoc/xforms_lists.py
-index 88968bafdb78..ea6520b38ea2 100644
---- a/tools/lib/python/kdoc/xforms_lists.py
-+++ b/tools/lib/python/kdoc/xforms_lists.py
-@@ -17,51 +17,38 @@ class CTransforms:
+diff --git a/tools/lib/python/kdoc/kdoc_files.py b/tools/lib/python/kdoc/kdoc_files.py
+index 7357c97a4b01..c35e033cf123 100644
+--- a/tools/lib/python/kdoc/kdoc_files.py
++++ b/tools/lib/python/kdoc/kdoc_files.py
+@@ -118,7 +118,7 @@ class KernelFiles():
+         if fname in self.files:
+             return
  
-     #: Transforms for structs and unions
-     struct_xforms = [
--        # Strip attributes
--        (KernRe(r"__attribute__\s*\(\([a-z0-9,_\*\s\(\)]*\)\)", flags=re.I | re.S, cache=False), ' '),
--        (KernRe(r'\s*__aligned\s*\([^;]*\)', re.S), ' '),
--        (KernRe(r'\s*__counted_by\s*\([^;]*\)', re.S), ' '),
--        (KernRe(r'\s*__counted_by_(le|be)\s*\([^;]*\)', re.S), ' '),
--        (KernRe(r'\s*__guarded_by\s*\([^\)]*\)', re.S), ' '),
--        (KernRe(r'\s*__pt_guarded_by\s*\([^\)]*\)', re.S), ' '),
-+        (CFunction("__attribute__"), ' '),
-+        (CFunction('__aligned'), ' '),
-+        (CFunction('__counted_by'), ' '),
-+        (CFunction('__counted_by_(le|be)'), ' '),
-+        (CFunction('__guarded_by'), ' '),
-+        (CFunction('__pt_guarded_by'), ' '),
-+
-         (KernRe(r'\s*__packed\s*', re.S), ' '),
-         (KernRe(r'\s*CRYPTO_MINALIGN_ATTR', re.S), ' '),
-         (KernRe(r'\s*__private', re.S), ' '),
-         (KernRe(r'\s*__rcu', re.S), ' '),
-         (KernRe(r'\s*____cacheline_aligned_in_smp', re.S), ' '),
-         (KernRe(r'\s*____cacheline_aligned', re.S), ' '),
--        (KernRe(r'\s*__cacheline_group_(begin|end)\([^\)]+\);'), ''),
-+
-+        (CFunction('__cacheline_group_(begin|end)'), ''),
+-        doc = KernelDoc(self.config, fname, CTransforms)
++        doc = KernelDoc(self.config, fname, self.xforms)
+         export_table, entries = doc.parse_kdoc()
  
-         (CFunction('struct_group'), r'\2'),
-         (CFunction('struct_group_attr'), r'\3'),
-         (CFunction('struct_group_tagged'), r'struct \1 \2; \3'),
-         (CFunction('__struct_group'), r'\4'),
+         self.export_table[fname] = export_table
+@@ -154,7 +154,7 @@ class KernelFiles():
  
--        #
--        # Replace macros
--        #
--        # TODO: use CFunction on all FOO($1, $2, ...) matches
--        #
--        # it is better to also move those to the CFunction logic,
--        # to ensure that parentheses will be properly matched.
--        #
--        (KernRe(r'__ETHTOOL_DECLARE_LINK_MODE_MASK\s*\(([^\)]+)\)', re.S),
--        r'DECLARE_BITMAP(\1, __ETHTOOL_LINK_MODE_MASK_NBITS)'),
--        (KernRe(r'DECLARE_PHY_INTERFACE_MASK\s*\(([^\)]+)\)', re.S),
--        r'DECLARE_BITMAP(\1, PHY_INTERFACE_MODE_MAX)'),
--        (KernRe(r'DECLARE_BITMAP\s*\(' + struct_args_pattern + r',\s*' + struct_args_pattern + r'\)',
--                re.S), r'unsigned long \1[BITS_TO_LONGS(\2)]'),
--        (KernRe(r'DECLARE_HASHTABLE\s*\(' + struct_args_pattern + r',\s*' + struct_args_pattern + r'\)',
--                re.S), r'unsigned long \1[1 << ((\2) - 1)]'),
--        (KernRe(r'DECLARE_KFIFO\s*\(' + struct_args_pattern + r',\s*' + struct_args_pattern +
--                r',\s*' + struct_args_pattern + r'\)', re.S), r'\2 *\1'),
--        (KernRe(r'DECLARE_KFIFO_PTR\s*\(' + struct_args_pattern + r',\s*' +
--                struct_args_pattern + r'\)', re.S), r'\2 *\1'),
--        (KernRe(r'(?:__)?DECLARE_FLEX_ARRAY\s*\(' + struct_args_pattern + r',\s*' +
--                struct_args_pattern + r'\)', re.S), r'\1 \2[]'),
--        (KernRe(r'DEFINE_DMA_UNMAP_ADDR\s*\(' + struct_args_pattern + r'\)', re.S), r'dma_addr_t \1'),
--        (KernRe(r'DEFINE_DMA_UNMAP_LEN\s*\(' + struct_args_pattern + r'\)', re.S), r'__u32 \1'),
--        (KernRe(r'VIRTIO_DECLARE_FEATURES\(([\w_]+)\)'), r'union { u64 \1; u64 \1_array[VIRTIO_FEATURES_U64S]; }'),
-+        (CFunction('__ETHTOOL_DECLARE_LINK_MODE_MASK'), r'DECLARE_BITMAP(\1, __ETHTOOL_LINK_MODE_MASK_NBITS)'),
-+        (CFunction('DECLARE_PHY_INTERFACE_MASK',), r'DECLARE_BITMAP(\1, PHY_INTERFACE_MODE_MAX)'),
-+        (CFunction('DECLARE_BITMAP'), r'unsigned long \1[BITS_TO_LONGS(\2)]'),
-+
-+        (CFunction('DECLARE_HASHTABLE'), r'unsigned long \1[1 << ((\2) - 1)]'),
-+        (CFunction('DECLARE_KFIFO'), r'\2 *\1'),
-+        (CFunction('DECLARE_KFIFO_PTR'), r'\2 *\1'),
-+        (CFunction('(?:__)?DECLARE_FLEX_ARRAY'), r'\1 \2[]'),
-+        (CFunction('DEFINE_DMA_UNMAP_ADDR'), r'dma_addr_t \1'),
-+        (CFunction('DEFINE_DMA_UNMAP_LEN'), r'__u32 \1'),
-+        (CFunction('VIRTIO_DECLARE_FEATURES'), r'union { u64 \1; u64 \1_array[VIRTIO_FEATURES_U64S]; }'),
-     ]
+         self.error(f"Cannot find file {fname}")
  
-     #: Transforms for function prototypes
-@@ -85,12 +72,14 @@ class CTransforms:
-         (KernRe(r"__sched +"), ""),
-         (KernRe(r"_noprof"), ""),
-         (KernRe(r"__always_unused *"), ""),
--        (KernRe(r"__printf\s*\(\s*\d*\s*,\s*\d*\s*\) +"), ""),
--        (KernRe(r"__(?:re)?alloc_size\s*\(\s*\d+\s*(?:,\s*\d+\s*)?\) +"), ""),
--        (KernRe(r"__diagnose_as\s*\(\s*\S+\s*(?:,\s*\d+\s*)*\) +"), ""),
--        (KernRe(r"DECL_BUCKET_PARAMS\s*\(\s*(\S+)\s*,\s*(\S+)\s*\)"), r"\1, \2"),
-         (KernRe(r"__no_context_analysis\s*"), ""),
-         (KernRe(r"__attribute_const__ +"), ""),
+-    def __init__(self, verbose=False, out_style=None,
++    def __init__(self, verbose=False, out_style=None, xforms=None,
+                  werror=False, wreturn=False, wshort_desc=False,
+                  wcontents_before_sections=False,
+                  logger=None):
+@@ -193,6 +193,11 @@ class KernelFiles():
+         self.config.wshort_desc = wshort_desc
+         self.config.wcontents_before_sections = wcontents_before_sections
+ 
++        if xforms:
++            self.xforms = xforms
++        else:
++            self.xforms = CTransforms()
 +
-+        (CFunction('__printf'), ""),
-+        (CFunction('__(?:re)?alloc_size'), ""),
-+        (CFunction("__diagnose_as"), ""),
-+        (CFunction("DECL_BUCKET_PARAMS"), r"\1, \2"),
-+
-         (CFunction("__cond_acquires"), ""),
-         (CFunction("__cond_releases"), ""),
-         (CFunction("__acquires"), ""),
-@@ -108,9 +97,11 @@ class CTransforms:
-     var_xforms = [
-         (KernRe(r"__read_mostly"), ""),
-         (KernRe(r"__ro_after_init"), ""),
--        (KernRe(r'\s*__guarded_by\s*\([^\)]*\)', re.S), ""),
--        (KernRe(r'\s*__pt_guarded_by\s*\([^\)]*\)', re.S), ""),
--        (KernRe(r"LIST_HEAD\(([\w_]+)\)"), r"struct list_head \1"),
-+
-+        (CFunction('__guarded_by'), ""),
-+        (CFunction('__pt_guarded_by'), ""),
-+        (CFunction("LIST_HEAD"), r"struct list_head \1"),
-+
-         (KernRe(r"(?://.*)$"), ""),
-         (KernRe(r"(?:/\*.*\*/)"), ""),
-         (KernRe(r";$"), ""),
+         if not logger:
+             self.config.log = logging.getLogger("kernel-doc")
+         else:
 -- 
 2.52.0
 
