@@ -1,53 +1,60 @@
-Return-Path: <netdev+bounces-255334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255335-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFaeCn13fWkYSQIAu9opvQ
-	(envelope-from <netdev+bounces-255334-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:31:09 +0100
+	id 2fViKAV4fWknSQIAu9opvQ
+	(envelope-from <netdev+bounces-255335-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:33:25 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEB50C086D
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:31:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7670C0886
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 04:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 69E25303A5CD
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:30:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DAF9300DDD0
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 03:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3631234EEF3;
-	Sat, 31 Jan 2026 03:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB32134D923;
+	Sat, 31 Jan 2026 03:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWFDoWrS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NC3ZSbNA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F48343D67;
-	Sat, 31 Jan 2026 03:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8823C241CB7;
+	Sat, 31 Jan 2026 03:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769830218; cv=none; b=tW31bldaPGjJ9VcWCLmLLiQ9HyMIMLNZOUY38OTDjrQLpTu4+Mu9bTJgYEQgRRbnAUsoHZiVPGi+63It2rBB+A1dYc8aG/qowT4h3qVUN4c7dufm/MADXJOS1Uc2u5VOWb8LyQrUoa40vex0jGrv3tjE43pDCdJHrtvfB1TgNOM=
+	t=1769830402; cv=none; b=cDjL/RPHQB9b449uviKSJmN6ov1jpSKDe5k49SULi42B3nDabfanDga28FG/Me/sBenpLNzNnKr4kYA/prasy43UVXd2sKNSjbZWBZ/ycDrGIkgLAp/OgtP+sjxO5AFuVvBeZxekwSOh9e9YbpBIu2G/Z/hAJAQdAnuXzJZJkoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769830218; c=relaxed/simple;
-	bh=PBkK4XFVJtKTvWBomxF8RfLVZws1JNwbP6cXL3HT8UE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U/Vj0ih7uxx7yPxg9TebpWS+VOw8BtdXJyuPzTcuEhPp2c+dErWRgR+2NgaS783UJZeCHIdKUi3+d5crJo1pOxl8UivXLVWrmXo5dWSYE1U15PjyzQeDAERhNdZLkkgvyZdfQpxE6G1lkEYU12SKkjFMp04GFoOMnUKHTXvdbr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWFDoWrS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A0B3C4CEF7;
-	Sat, 31 Jan 2026 03:30:17 +0000 (UTC)
+	s=arc-20240116; t=1769830402; c=relaxed/simple;
+	bh=YGnGv8L+mEeAGVkTCNcg2HwdA4oRWh26LMl2uNwPWAY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d5AUP86QRlxbRunQ9yONOzjWFYUz2bIm0Bg3zu21DZUbyfKax9HXO7datdvxtUuRQX6UDxednqx3n9FyEC6Vmg2fRpCK0ZiZ9/ACemAo7WD4TM5JGZ/nb4Cz4bNajiev/KbaI8cJ17tQ8+YugquxEHLvSYfT4bSG50XytimlXRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NC3ZSbNA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1B7EC4CEF1;
+	Sat, 31 Jan 2026 03:33:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769830217;
-	bh=PBkK4XFVJtKTvWBomxF8RfLVZws1JNwbP6cXL3HT8UE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qWFDoWrSm+MT5PAg0YA6m4MeEx6+J7BJD8iSTHWLmAS+/ZaXi5X2uZ82KgePNYKxE
-	 YYYppUJCc1MoNKVk2aEeMuh9FJWsgEgIzfSetPGIWw5vx0Uajud422ZR8yTXA1tZdU
-	 VQgYqYw4jIirzzZajLn5ELhdvSxQ3tgikoG47yWj+g38nncVBXaJ3VCpN+MA/UdXwZ
-	 66Hy5Qlo5NR+A6aXzRWm5h2pf0AkWmp7Hw6Wgh+sS44UmyUGdhatmooYMAC7g25RfB
-	 dtxDi8WIxGemnPmL2rJwYbp0Bw2B8fbzhFbSnxTBa5AgsoUlsAjINI5ZBh65val2NZ
-	 c/3yaf3VotY0w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8C53380CFFF;
-	Sat, 31 Jan 2026 03:30:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1769830402;
+	bh=YGnGv8L+mEeAGVkTCNcg2HwdA4oRWh26LMl2uNwPWAY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NC3ZSbNA9z7QmLIxwohozV1gq+meS4RzCeLalP8c60wE4dZpKSSF+7t8OmYhXQsQ4
+	 XNjtawnj19JonkMGgye6hzzW5TvH7b3Hf5+/hWZUwcdhrthm1Dfo7HptHv1IrEEr4X
+	 fezxDLHlbmjTCTzl9jv/Nrz3kIr9ht9rX8NcfcddiGlm9DNV8xT/htguTho3zvmqUW
+	 VVF4d8xPb9yJwI7Vtb0be1R1tWZiHohugHf30j7ZiFwUBe9zh86F2xYHr7Oh2Bbxvr
+	 NcoYTLnNtHZN4xLME1Hsd/HGygMkop8/eq8npnXkCSrO08x+oCopyMZizWpVRAk+tN
+	 SZQIXjbnpXx8A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: rkannoth@marvell.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next,v7,01/13] octeontx2-af: npc: cn20k: Index management
+Date: Fri, 30 Jan 2026 19:33:20 -0800
+Message-ID: <20260131033320.1013816-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260129083339.264386-2-rkannoth@marvell.com>
+References: <20260129083339.264386-2-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,74 +62,128 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: ax25: remove plumbing for never-implemented DAMA
- Master
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176983020935.3983574.5434657650924305702.git-patchwork-notify@kernel.org>
-Date: Sat, 31 Jan 2026 03:30:09 +0000
-References: <20260129080908.44710-1-enelsonmoore@gmail.com>
-In-Reply-To: <20260129080908.44710-1-enelsonmoore@gmail.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: linux-x25@vger.kernel.org, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jreuter@yaina.de
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-255334-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255335-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BEB50C086D
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,npc_priv.sb:url]
+X-Rspamd-Queue-Id: E7670C0886
 X-Rspamd-Action: no action
 
-Hello:
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+octeontx2-af: npc: cn20k: Index management
 
-On Thu, 29 Jan 2026 00:09:04 -0800 you wrote:
-> The AX25_DAMA_MASTER option has been unimplemented and marked broken
-> ever since it was introduced in 2007 in commit 954b2e7f4c37 ("[NET]
-> AX.25 Kconfig and docs updates and fixes"). At this point, it is very
-> unlikely it will be implemented. Remove it.
-> 
-> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-> 
-> [...]
+This patch adds MCAM index management for CN20K silicon, implementing
+contiguous and non-contiguous allocation schemes across the new subbank
+architecture with reference, limit, and priority parameters.
 
-Here is the summary with links:
-  - net: ax25: remove plumbing for never-implemented DAMA Master support
-    https://git.kernel.org/netdev/net-next/c/82fff3b055d4
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> new file mode 100644
+> index 000000000000..de3d5ad762d1
+> --- /dev/null
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
 
-You are awesome, thank you!
+[ ... ]
+
+> +static int __npc_subbank_alloc(struct rvu *rvu, struct npc_subbank *sb,
+> +			       int key_type, int ref, int limit, int prio,
+> +			       bool contig, int count, u16 *mcam_idx,
+> +			       int idx_sz, bool max_alloc, int *alloc_cnt)
+> +{
+> +	int cnt, t, b, i, blkaddr;
+> +	bool new_sub_bank = false;
+> +	unsigned long *bmap;
+> +	u16 *save = NULL;
+> +	int sidx, eidx;
+> +	bool diffbank;
+> +	int bw, bfree;
+> +	int rc = 0;
+> +	bool ret;
+
+[ ... ]
+
+> +	/* Mark new subbank bank as used */
+> +	if (new_sub_bank) {
+> +		blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+> +		if (blkaddr < 0) {
+> +			dev_err(rvu->dev,
+> +				"%s: NPC block not implemented\n", __func__);
+> +			goto err;
+                        ^^^^^^^^
+
+When rvu_get_blkaddr() fails here, the code jumps to the err label but rc
+is still 0 from initialization. Every other error path in this function
+sets rc before going to err. Should rc be set to blkaddr (or another error
+code) before the goto?
+
+> +		}
+> +
+> +		rc =  __npc_subbank_mark_used(rvu, sb, key_type);
+
+[ ... ]
+
+> +err:
+> +	kfree(save);
+> +	return rc;
+> +}
+
+[ ... ]
+
+> +static void npc_subbank_init(struct rvu *rvu, struct npc_subbank *sb, int idx)
+> +{
+> +	mutex_init(&sb->lock);
+
+[ ... ]
+
+> +void npc_cn20k_deinit(struct rvu *rvu)
+> +{
+> +	int i;
+> +
+> +	xa_destroy(&npc_priv.xa_sb_used);
+> +	xa_destroy(&npc_priv.xa_sb_free);
+> +	xa_destroy(&npc_priv.xa_idx2pf_map);
+> +	xa_destroy(&npc_priv.xa_pf_map);
+> +
+> +	for (i = 0; i < npc_priv.pf_cnt; i++)
+> +		xa_destroy(&npc_priv.xa_pf2idx_map[i]);
+> +
+> +	kfree(npc_priv.xa_pf2idx_map);
+> +	kfree(npc_priv.sb);
+
+The subbank mutexes are initialized in npc_subbank_init() but are not
+destroyed here. Is mutex_destroy() needed for each sb->lock before freeing
+npc_priv.sb? The same issue applies to the fail2 error path in
+npc_priv_init().
+
+> +	kfree(subbank_srch_order);
+> +}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
