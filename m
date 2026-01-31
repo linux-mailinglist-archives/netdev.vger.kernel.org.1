@@ -1,108 +1,70 @@
-Return-Path: <netdev+bounces-255456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGD0EE4qfmkJWQIAu9opvQ
-	(envelope-from <netdev+bounces-255456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:14:06 +0100
+	id GP7UFDYufmlLWQIAu9opvQ
+	(envelope-from <netdev+bounces-255457-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:30:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91DA2C2ED5
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:14:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907B9C3017
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 17:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 91FF6304CA6B
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 16:13:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C8423014669
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 16:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B381933EAEA;
-	Sat, 31 Jan 2026 16:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2C7339853;
+	Sat, 31 Jan 2026 16:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAwNn3lJ"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="up6oGSR0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C7633A9E4
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 16:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F7F32D0EF
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 16:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769875978; cv=none; b=fWpyo6iOZiXyugQWVNp0fYwXnpsv9v9jPKQ9GcvnnrEZMzz+sKpz8PBD8ka6/vH3AEUtND2wS1T/n62kdtVJZgFvRJU0N7ynklCEaMhjGYKFtYV8a/1/ezb/8krKYM5Lt3NRjkvY3DbNNIGPedJEoFP8PqIFtQR7psVIQG6GWdo=
+	t=1769877042; cv=none; b=WSUgBAa7s3tN6Vhd8TgdET0AeBoG59e6C0tqT6qZPw1RqB+4VjrMCN7UyU8NfwFXVJniv2qC598qjbxeb6Ke4DEKYtgPzvvonIn1n5QayOlVsk3e2ryUI3/43X36kSBt5IdQl+M82Mkc9OlpBugPHoCaRpxRCKK1sp4AB9MYm38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769875978; c=relaxed/simple;
-	bh=wWlQDWVTHIyD2w74yQV82Lw2rsusocwhOpWbuGfQW5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WjZu3CMisANTUDVRAQzee3AuP3ueYR12OYNJJEoYn9OiJd6udpQtLYxgaMeKHFhAgOxnPKTNrADOIl1BbQEnJvKi9qdUc7KCM9Om3eR8i+KiONvt26Uz766LJiyQ0n9TXcH4ZQJcWfd9MxTuGbzBQQJ7BV6uyhL0CSmP7otRQqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAwNn3lJ; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b884cb1e717so629074066b.0
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 08:12:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769875975; x=1770480775; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XTq2LBbLb5L85nE2s4woY/0r3B7VxHgm3zekbSlXMv4=;
-        b=WAwNn3lJcZJW+kwyL10xcJ+Qr95ZudUH7bl/cLZswB1zpV/CnLQuIIL5xm2hjjrZSe
-         fOwA+CsrLwvzjo+J74c4HKEd4HtxfHSZHlMnb//9tqnhkZbes5AoN6G2DOJtLlnFeDKv
-         Gp7IcVBTJ12dTc94mV1esBZmMXqyoznZzz5Cf0TojbWopcdCWalsKRrwg3hsDS71jGZ3
-         y4HJH75Km2zkJ5ScOaS2V54xg/YT8f65PGTiabSHoAmqW5oPc/+4QjYWt/xASxFU6kR/
-         W+QL4il11Nt+WxvBxLbuCUuSgmLzXHa87/gkW31NdqZRrVvmYkwRjCoBT8dJeJAh1pm1
-         kSmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769875975; x=1770480775;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XTq2LBbLb5L85nE2s4woY/0r3B7VxHgm3zekbSlXMv4=;
-        b=apFXUkjy2hMQnurAhUlzr+HOw4OIjA2w9mAKE39JJ+VdQvI2Q1N7BMGgnbP7+P8EsD
-         +9vcQGSRi68S8OH3AVk2/NOAAIaijeLqGcl6Oh6ErWHYlMoPAvpScsT4DXsgKIzic27w
-         br8l+B48DZi7fTB4jWZe/58ijIzH6aP+BFERiq2gpzUUuf+ae44dZGw/ix5krX2iLnV6
-         61GPNcwTz4TNRyWdHmxaPGmZh1z30Zc5ltSFs4CqMeR/2c1dw49OV/mHa+KFcUQZOY9K
-         oFNOFaEvNiZz5Hej3ovQnxloegVRmA8Q46xhMZaHAtK3Feybrz8KsEAttLd5XJd2ARz9
-         B9uw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjc4I843bRN7fB4Yiz3Z+W5Y1pOpP49xJw9EiH3ilLI0ulCMaIKlxHsqb/n3BgjTI0FFRx6R0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4PCHaVReVPtdt3KAaXm7WK0wv19xOcepMkDLgX8g6XudcAUnK
-	FQQkSH3hlxHSIgsJlgPI2Rh5PVF0dv8hxsPQNeICHfYVx+LebuGJ5GwN
-X-Gm-Gg: AZuq6aI/HlpI444ffEKIlJYg3wfzj3NOZluDCEyGeH1tcLaWYSeozxYroJTF8B6ZrCo
-	xXdvu5crF9DqQZMCb27s+VSFyIvJLe4XG3syzJ53Bha+0OwodGxqi4DzyiDau7gYeTon4XqTqg0
-	Z4GAcWM4eJgZ7Wmt62sL7MAGYG1wT4TJpGDhX8reMjeVAtQA6dqbDUokNYS8uJ8o5A0XgDhMXcO
-	FE9NTrDrlT2CAW82UPsRxWOVHH0lQimwKRGXZakMN1G0xSQoRfnHKJ1Vn3Yfyo+woFDz3gxMm0M
-	EpcTt03RG1xFG0EdXgJYtkBdEXWkg2vfqMiZfwyGJ1zAx7ik6EG3934YwUFQCIfvhEs2eHBvB3o
-	T3jNUsTdqlvDDpxSoL14dFHtCSFpYGbyjwlWzARYmsKOpfFfXsRKTxK4RUCgXN4qZUp8/nzlKD/
-	VisdsCpHUxIYQCtTrBaylJJMeddQECbbvjJsM=
-X-Received: by 2002:a17:907:9701:b0:b88:5b72:ec39 with SMTP id a640c23a62f3a-b8ddf805340mr625902766b.5.1769875975203;
-        Sat, 31 Jan 2026 08:12:55 -0800 (PST)
-Received: from localhost.localdomain ([2a00:23c4:a758:8a01:46ad:7674:ff90:13f3])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-658b46ac0e8sm5433232a12.34.2026.01.31.08.12.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jan 2026 08:12:54 -0800 (PST)
-From: Biju <biju.das.au@gmail.com>
-X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
-To: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Biju Das <biju.das.au@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH net-next v3 2/2] net: stmmac: dwmac-renesas-gbeth: Add support for RZ/G3L SoC
-Date: Sat, 31 Jan 2026 16:12:43 +0000
-Message-ID: <20260131161250.5047-3-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260131161250.5047-1-biju.das.jz@bp.renesas.com>
-References: <20260131161250.5047-1-biju.das.jz@bp.renesas.com>
+	s=arc-20240116; t=1769877042; c=relaxed/simple;
+	bh=osA1pyvQjT5obJ61HgNuHe+4VMk5oDw4WwCvI/6XkLU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SLt1UnvX/0C8KJk8lViU/lvDCWDIgQP1ntkPwFT1aWUcKBgvGuLxlAkr4guGLpmH6Ol4FHaQCYTHecJGxov/UVBs86reWUv++yS2GMk5Jy46s/gMbQNHQRNEdVx5Hhe7xxFp5e1p6zH+wEiIQSdyqYJGsWhhffCGECtz93r/YeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=up6oGSR0; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from ms-a2 (248.212.13.160.dy.iij4u.or.jp [160.13.212.248])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 60VGUcS2039137
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 1 Feb 2026 01:30:39 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=/LaTNBzU1ZqwGjSbsitnVGu2AjeEHf5402YTnnjokBU=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:To:Subject:Date:Message-ID;
+        s=rs20251215; t=1769877039; v=1;
+        b=up6oGSR0BnRs59uNdGoleUeQWdyRDQ1MElhF4/8+iH5g+NjR6xMa5NPi0uQGc0Lc
+         Sn8X6xDFmfx5RnABSQEnBr4vEdlmxHqxr0YlNjIVnne6sy2f7rW1iip0mRLmN+wO
+         bfT+FxNqbgTnU9MNTQu2DFS1eAzeDKSVN+S5m6PvR82Cux/11vQhSlQxGCQvXn3O
+         1cU6d4yMVvlHPgabxes/UyCw7oJWaeuSsSMrkmvNzj6kpBvLx2ttCdP06MLfDP/N
+         i1mVIfqUHxCV3TJrP0J05yxRgfRcFqQxtFC5Hx+XWOcO85GD1EJAtr2m9A7s7LXw
+         tT37C7Wd08/g9ZsTVq/mfw==
+From: Kohei Enju <kohei@enjuk.jp>
+To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Vitaly Lifshits <vitaly.lifshits@intel.com>,
+        Simon Horman <horms@kernel.org>,
+        Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+        kohei.enju@gmail.com, Kohei Enju <kohei@enjuk.jp>
+Subject: [PATCH v2 iwl-next 0/3] igc: add RSS key get/set support
+Date: Sat, 31 Jan 2026 16:29:35 +0000
+Message-ID: <20260131163037.88108-1-kohei@enjuk.jp>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,70 +75,86 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_MATCH_TO(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255456-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[bp.renesas.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,glider.be];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-255457-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[bp.renesas.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,gmail.com,armlinux.org.uk];
-	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas,kernel];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bp.renesas.com:mid,renesas.com:email]
-X-Rspamd-Queue-Id: 91DA2C2ED5
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:mid,enjuk.jp:dkim]
+X-Rspamd-Queue-Id: 907B9C3017
 X-Rspamd-Action: no action
 
-From: Biju Das <biju.das.jz@bp.renesas.com>
+This series adds ethtool get/set support for the RSS hash key.
 
-Compared to other Renesas GBETH stmmac glue drivers, RZ/G3L GBETH IP use
-the version Synopsys DesignWare MAC (version 5.30). It has an extra clock
-compared to RZ/V2H and has ptp_pps_o interrupts. Add support for RZ/G3L
-GBETH by reusing device data of RZ/V2H and can be extended to add other
-functionalities later.
+Without patch:
+ # ethtool -x $DEV | grep key -A1
+ RSS hash key:
+ Operation not supported
+ # ethtool -X $DEV hkey be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef
+ Cannot set RX flow hash configuration:
+  Hash key setting not supported
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
-v2->v3:
- * Collected tag.
-v1->v2:
- * No change.
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c | 1 +
- 1 file changed, 1 insertion(+)
+With patch:
+ # ethtool -x $DEV | grep key -A1
+ RSS hash key:
+ dd:7c:1f:06:1a:42:dc:e5:7e:90:2c:48:aa:3f:5d:5a:d7:da:ec:44:3e:3f:df:78:89:1e:3c:68:2e:59:da:a0:23:5a:32:5c:cf:5e:7e:7b
+ # ethtool -X $DEV hkey be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef
+ # ethtool -x $DEV | grep key -A1
+ RSS hash key:
+ be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef:be:ef
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-index be7f5eb2cdcf..19f34e18bfef 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-@@ -214,6 +214,7 @@ static const struct renesas_gbeth_of_data renesas_gmac_of_data = {
- };
- 
- static const struct of_device_id renesas_gbeth_match[] = {
-+	{ .compatible = "renesas,r9a08g046-gbeth", .data = &renesas_gbeth_of_data },
- 	{ .compatible = "renesas,r9a09g077-gbeth", .data = &renesas_gmac_of_data },
- 	{ .compatible = "renesas,rzv2h-gbeth", .data = &renesas_gbeth_of_data },
- 	{ /* Sentinel */ }
+Also tested with rss_api.py and toeplitz.py.
+ # ./tools/testing/selftests/drivers/net/hw/rss_api.py | grep rss_api.test_rxfh_nl_set_key
+ ok 6 rss_api.test_rxfh_nl_set_key
+ # tools/testing/selftests/drivers/net/hw/toeplitz.py | grep "# Totals"
+ # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Notes:
+Since the 2/3 patch is unchanged, I preserved Tested-by and Reviewed-by
+tags for the patch.
+
+Changes:
+  v2:
+    - call netdev_rss_key_fill() in igc_sw_init(), not in
+      igc_setup_mrqc()
+    - add documentation for igc_write_rss_key()
+    - drop has_user_rss_key flag, since rss_key is never cleared except
+      for user operations
+    - change email address from @amazon.com to @enjuk.jp
+  v1: https://lore.kernel.org/intel-wired-lan/20251025150136.47618-1-enjuk@amazon.com/
+
+Kohei Enju (3):
+  igc: prepare for RSS key get/set support
+  igc: expose RSS key via ethtool get_rxfh
+  igc: allow configuring RSS key via ethtool set_rxfh
+
+ drivers/net/ethernet/intel/igc/igc.h         |  3 +
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 67 +++++++++++++++-----
+ drivers/net/ethernet/intel/igc/igc_main.c    |  8 +--
+ 3 files changed, 57 insertions(+), 21 deletions(-)
+
 -- 
-2.43.0
+2.51.0
 
 
