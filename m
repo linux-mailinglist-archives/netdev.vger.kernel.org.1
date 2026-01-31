@@ -1,295 +1,376 @@
-Return-Path: <netdev+bounces-255382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEkOO5/QfWlQTwIAu9opvQ
-	(envelope-from <netdev+bounces-255382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 10:51:27 +0100
+	id iUrSN8TSfWmlTwIAu9opvQ
+	(envelope-from <netdev+bounces-255383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 11:00:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4960EC1712
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 10:51:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE09C1760
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 11:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49218300F9DD
-	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 09:49:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 06525300A51F
+	for <lists+netdev@lfdr.de>; Sat, 31 Jan 2026 10:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9115D30748B;
-	Sat, 31 Jan 2026 09:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E484F2FDC52;
+	Sat, 31 Jan 2026 10:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUCoLcA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f80.google.com (mail-oa1-f80.google.com [209.85.160.80])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72D92C21FE
-	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 09:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20667269811
+	for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 10:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769852970; cv=none; b=Ts1WTFcCVLx8BPIS/b2Iynrbq3bLiOqB11foneDUEGQ8Km2WsoGXcnSdLrPXdvwQcNjyYqNsiuh8gRMJOmZF96ruxjSaaMlCU+tpziVH8TvcmNKho4yr2+E4SOTaLxqKecEzZUCs6zkPO32DkUWkfBKSZBKG57sYiEa1VaMAOqk=
+	t=1769853633; cv=none; b=rT1FWSazoyvSzKbLH3NIVxSYzV+M8UWAb40WU4jZNCQIkCX5Hu/GjEWnCgo84ysgLiKb72g/Cxd+pQiOyPmLVYLMNzbh43Atz3ZhnXeyZF2FM/moyyggiqCfcbpY7fq8sBRP7NVoVo/z8tJ+HutLyjgztLsNAUXPojKK4dhWfyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769852970; c=relaxed/simple;
-	bh=/ks4b6pp0susYSFfnNG3DLwHfn9h11l6YCNj0wrWAmY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fxUUyfc4CHMBGzTNyhrNUP0FM0MK92ZOwrecAyXSIIrYzqWIbZeL7T4hFUcXAZdGkYiHK0bLX0HNaEUt3CeU1aizHeMTWziPNlyiJaT7ZQKdp1PgzytrpXf8lQEnd7J1RRk9Tji8qd6WbxqI197VVETZzKcfUlaKlUF+zuflLWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f80.google.com with SMTP id 586e51a60fabf-4096f92cf50so6554750fac.3
-        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 01:49:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769852967; x=1770457767;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1769853633; c=relaxed/simple;
+	bh=iJTfuvfV8vC9zefeW3F+vGRO+ganuLj6I65A9RBlbSY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TS5RTDWoq8rVt4JsvPsD89gUXykiKc3aH4gIyd89SbKV4wMFOtEAGYpchEpqC6vwPOwOBDs3Qsb1T3jYgXNiA17ohoT+zFMFkBCulzZZZmu7AHC3u1yZxMxXin2UPhLTUCjgDN5BMIoM14LLZyHAge91jE28IF0+S+5A1f3AOBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUCoLcA0; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43284ed32a0so1554209f8f.3
+        for <netdev@vger.kernel.org>; Sat, 31 Jan 2026 02:00:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769853630; x=1770458430; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=sk0dwA9mXpxiPETTlMSUdfR5P+at6XuhGJ8JtKY8jYA=;
-        b=E5B8xom2oqmA655K6+6lekZM9S+tIEPaWTTq1CocSxqJJJUMy6bkve/mOb2obCMY1D
-         4u7FDkKgJa05zE1YHg8YQeDjrYUsb0s7c4okEaLmIXiGZb4O+N0HWocaDxQggW20f5Yg
-         9nbth8J0EVuqbU0A8WQT5qQP0qUaflw377OWQwOoAG5OsAW0WOffF5NRsGNCl4inJE1d
-         lv/Za7nfIjRa1f5S8ES3HVnwNx8e35H3a5N8Lme7TBmGYe6WUt/QKfKZ9RqoYRRqlYAh
-         laiqWz/vmueg13dMXlrZ7cLVfq/YQhN4RhLq1POPxDwLYl9g/I8xGIjws+2xtdDtg92r
-         DAZg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxkjzkyPDKuUgkI09L2Y433jKZMf+YcOcRN+rkbT1sRTsGcy3GgKIuJkpB6wobrVllzxvhP8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZwH/Hw+J50Z5leK6zyFJbjwnd+CFVB9Je/oU/GhyisMBvI/ff
-	tqRADFL5cmNHmdr8NRH5OiCXOZz6+/blyd6jGtpamDyee+HwaCAic7ldeUGG/lkLpThVP1fKnbD
-	rYBnd6dhzIvn97g716J8340f8/M+nJ62HHzEZdugyXdBb/2KlYHA2ZD04TBI=
+        bh=RH2Hxqmgz4Jkez8a6zJZwhFxMTwo2PRy/we9HJl414g=;
+        b=eUCoLcA0wQ9hd1Ttn6wxIvFmbZCFRF0/SWZ6jsoxNupsGm+ALJo16wKrI1ZwUf6t1b
+         /iyLcRB4BfPnmjavOUKhH12yBoecp0v0cETAPlsYOZYvQXfLK6pZZZBliSNcMVnO+8X0
+         Wm61ZJ0/8STKkiNABLwpPgEzBLsPmqEPXaEYWPgCPj7mer79kHIjlHwFtCj4si9XdmPR
+         r7afIltXpfEVFsZMbG2UpFBCJo7RturnzxBeGZW7xRYYSjVMqbbOalehVp0TkmINLoX4
+         Odk6mevAmb2sFXAHOPa+uUdwwTcF60nTyHnnlgsG400Fp2dcwETI0MmyJCjMwVkb5R1P
+         B5qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769853630; x=1770458430;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RH2Hxqmgz4Jkez8a6zJZwhFxMTwo2PRy/we9HJl414g=;
+        b=qWvuY39PmkOEms1jYAikgmmE1MXv0O62NP7SPhOB5LzWhe9HiyP2h6ei0A/0A6Ff9r
+         ZyR0hME0ibwoED5zXeEmyeriffnEiWSUxsb2dY5wim7brjAe651dOx/Fhpv4KLsqjfFp
+         PlUR8VfE70+OcpMZXhixf9jhHwFsyurUDYhbOrfJEPKKY5QsaCtl52Xu69Hw0S+lLwq2
+         0FGt6246aM9fFCQIgZGZNKYoTQuQUZAs8JRDSOHG8pDTrfbx7yml7Dc7I0LQxh6cwOB6
+         fR3AOfE5uZnOcrTL1+GKnvDlj4eA749yyKiM1XAD0V4WTuk9sHOgBr+vKlj+R+e74Sxo
+         adSA==
+X-Gm-Message-State: AOJu0YygjKwDR0bhixMp/Nanjn0Af7cv7kwyA8atfWDS2C7R+PIobzZL
+	k2rLRYBZIG2pP3LtPEmspTrJIjojaBXLV+n0nSro7LsJ1CN4wbYVbS5o
+X-Gm-Gg: AZuq6aKSWht/jh6xujTzug9A+XzSVHkK8QtzoDZMjHWFbN2S5RIe8pokZBQrpm9wgYj
+	T5dV3EFuLHrX87Z5EtLEIEZlsiOkFUYg3ZL3onvINXUij2B4PMDFW8FuoTIrkuf8gKRnpr8SSJ3
+	ZogG9gQWJ9n9Wpeh5oPoLB7JMwenqMkxWJOp5/Yj8tUB1MYXBNgaQrT5WSvbp8mZEilqawp3wI3
+	7wX4NHQRSNgxHJovg2qEl2xGVfukdNwcOricF9SnSV2GlGB5zsB8gzHq1IOQ1Fv0+2s8I6ldv57
+	iAJd2MplqPwmWQ4XEyuMZQuQKKNyH8kffEluZb6BYG/8KBmi0OHM8XjrwzhkSLJQgrxj/jQBZlF
+	mcDeA8d6kLCbjhUJ37UY+M08P/Erde78eivgR4o98gcL9G4LWApcaAN9ic3Hap1SSYvj6865Ni3
+	iSWdEyp0kV181GEQ5YkZ41igsq1ZfHmWnzgDnEqA/wbDkLBP4q2RccByHe8D6RB8VWSNHlqL0R/
+	v/lXSxu7v7L1LqpGxwf6PMqR+dywILlJYTRdPmZYVIBBgiEIbVvlcMnrqE=
+X-Received: by 2002:a05:6000:2689:b0:435:e436:7fb with SMTP id ffacd0b85a97d-435f3ab00edmr8468899f8f.50.1769853630179;
+        Sat, 31 Jan 2026 02:00:30 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f06:cc00:41be:d7:a063:4025? (p200300ea8f06cc0041be00d7a0634025.dip0.t-ipconnect.de. [2003:ea:8f06:cc00:41be:d7:a063:4025])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10ee040sm28310429f8f.11.2026.01.31.02.00.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 31 Jan 2026 02:00:29 -0800 (PST)
+Message-ID: <641d92a2-93fb-4ffe-89d8-77bf10edecf8@gmail.com>
+Date: Sat, 31 Jan 2026 11:00:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:60f:b0:662:fe6d:619f with SMTP id
- 006d021491bc7-6630ef5f752mr2430640eaf.0.1769852967511; Sat, 31 Jan 2026
- 01:49:27 -0800 (PST)
-Date: Sat, 31 Jan 2026 01:49:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <697dd027.050a0220.1d0a41.0005.GAE@google.com>
-Subject: [syzbot] [hams?] KASAN: slab-use-after-free Write in nr_neigh_put
-From: syzbot <syzbot+08ca620c862d89afe6d6@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: phy: micrel: Add support for lan9645x
+ internal phy
+To: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>,
+ Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, o.rempel@pengutronix.de,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260130-phy_micrel_add_support_for_lan9645x_internal_phy-v2-1-202ac31cf9c4@microchip.com>
+ <92ba22ee64b2670448295b44d663d8ae7e8fe9c4.camel@microchip.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <92ba22ee64b2670448295b44d663d8ae7e8fe9c4.camel@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2c36acc86fd56a9d];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-255383-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-255382-lists,netdev=lfdr.de,08ca620c862d89afe6d6];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,googlegroups.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url,goo.gl:url]
-X-Rspamd-Queue-Id: 4960EC1712
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1FE09C1760
 X-Rspamd-Action: no action
 
-Hello,
+On 1/31/2026 7:29 AM, Jens Emil Schulz Ostergaard wrote:
+> Hi,
+> 
+> On Fri, 2026-01-30 at 10:12 +0100, Jens Emil Schulz Østergaard wrote:
+>> LAN9645X is a family of switch chips with 5 internal copper phys. The
+>> internal PHY is based on parts of LAN8832. This is a low-power, single
+>> port triple-speed (10BASE-T/100BASE-TX/1000BASE-T) ethernet physical
+>> layer transceiver (PHY) that supports transmission and reception of data
+>> on standard CAT-5, as well as CAT-5e and CAT-6 Unshielded Twisted
+>> Pair (UTP) cables.
+>>
+>> Add support for the internal PHY of the lan9645x chip family.
+>>
+>> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+>> Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+>> Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+>> ---
+>> Changes in v2:
+>> - Check write errors in lan9645x_config_intr.
+>> - Added more comments for the erratas which are not yet documented in
+>>   the datasheet.
+>> - Change workaround in lan9645x_suspend from ANEG restart and sleep to
+>>   asserting Software Soft Reset and poll for self-clear.
+>> - Return IRQ_NONE when IRQ is not handled in lan9645x_handle_interrupt.
+>> - Link to v1: https://lore.kernel.org/r/20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com
+>> ---
+>>  drivers/net/phy/micrel.c   | 152 +++++++++++++++++++++++++++++++++++++++++++++
+>>  include/linux/micrel_phy.h |   1 +
+>>  2 files changed, 153 insertions(+)
+>>
+>> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+>> index 225d4adf28be..fe77ad899f10 100644
+>> --- a/drivers/net/phy/micrel.c
+>> +++ b/drivers/net/phy/micrel.c
+>> @@ -6502,6 +6502,142 @@ static void lan8842_get_phy_stats(struct phy_device *phydev,
+>>  	stats->tx_errors = priv->phy_stats.tx_errors;
+>>  }
+>>  
+>> +#define LAN9645X_CONTROL_REGISTER		0x1f
+>> +#define LAN9645X_CONTROL_REGISTER_SOFT_RESET	BIT(1)
+>> +
+>> +#define LAN9645X_DAC_ICAS_AMP_POWER_DOWN	0x47
+>> +#define LAN9645X_BTRX_QBIAS_POWER_DOWN		0x46
+>> +#define LAN9645X_TX_LOW_I_CH_CD_POWER_MGMT	0x45
+>> +#define LAN9645X_TX_LOW_I_CH_B_POWER_MGMT	0x44
+>> +#define LAN9645X_TX_LOW_I_CH_A_POWER_MGMT	0x43
+>> +
+>> +static const struct lanphy_reg_data force_dac_tx_errata[] = {
+>> +	/* Force channel A/B/C/D TX on */
+>> +	{ LAN8814_PAGE_POWER_REGS,
+>> +	  LAN9645X_DAC_ICAS_AMP_POWER_DOWN,
+>> +	  0 },
+>> +	/* Force channel A/B/C/D QBias on */
+>> +	{ LAN8814_PAGE_POWER_REGS,
+>> +	  LAN9645X_BTRX_QBIAS_POWER_DOWN,
+>> +	  0xaa },
+>> +	/* Tx low I on channel C/D overwrite */
+>> +	{ LAN8814_PAGE_POWER_REGS,
+>> +	  LAN9645X_TX_LOW_I_CH_CD_POWER_MGMT,
+>> +	  0xbfff },
+>> +	/* Channel B low I overwrite */
+>> +	{ LAN8814_PAGE_POWER_REGS,
+>> +	  LAN9645X_TX_LOW_I_CH_B_POWER_MGMT,
+>> +	  0xabbf },
+>> +	/* Channel A low I overwrite */
+>> +	{ LAN8814_PAGE_POWER_REGS,
+>> +	  LAN9645X_TX_LOW_I_CH_A_POWER_MGMT,
+>> +	  0xbd3f },
+>> +};
+>> +
+>> +static int lan9645x_config_init(struct phy_device *phydev)
+>> +{
+>> +	int ret;
+>> +
+>> +	/* Apply erratas from previous generations.  */
+>> +	ret = lan8842_erratas(phydev);
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+>> +	/* Apply errata for an issue where bringing a port down, can cause a few
+>> +	 * CRC errors for traffic flowing through adjacent ports.
+>> +	 */
+>> +	return lanphy_write_reg_data(phydev, force_dac_tx_errata,
+>> +				     ARRAY_SIZE(force_dac_tx_errata));
+>> +}
+>> +
+>> +static int lan9645x_suspend(struct phy_device *phydev)
+>> +{
+>> +	int ret, val;
+>> +
+>> +	/* Force link down before software power down (SPD), by doing software
+>> +	 * soft reset. This resets the PHY, but keeps all register configuration
+>> +	 * intact. The bit self clears.
+>> +	 *
+>> +	 * This is needed as a workaround for an issue where performing SPD on a
+>> +	 * port can bring adjacent ports down, when there is traffic flowing
+>> +	 * through the ports.
+>> +	 */
+>> +	ret = phy_modify(phydev, LAN9645X_CONTROL_REGISTER,
+>> +			 LAN9645X_CONTROL_REGISTER_SOFT_RESET, 1);
 
-syzbot found the following issue on:
-
-HEAD commit:    6ad42b244136 Merge branch 'bng_en-enhancements-for-rx-and-..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1421a72a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2c36acc86fd56a9d
-dashboard link: https://syzkaller.appspot.com/bug?extid=08ca620c862d89afe6d6
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2b03def814aa/disk-6ad42b24.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e677d64cb110/vmlinux-6ad42b24.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e89660ed5369/bzImage-6ad42b24.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+08ca620c862d89afe6d6@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
-BUG: KASAN: slab-use-after-free in atomic_fetch_sub_release include/linux/atomic/atomic-instrumented.h:400 [inline]
-BUG: KASAN: slab-use-after-free in __refcount_sub_and_test include/linux/refcount.h:389 [inline]
-BUG: KASAN: slab-use-after-free in __refcount_dec_and_test include/linux/refcount.h:432 [inline]
-BUG: KASAN: slab-use-after-free in refcount_dec_and_test include/linux/refcount.h:450 [inline]
-BUG: KASAN: slab-use-after-free in nr_neigh_put+0x21/0x170 include/net/netrom.h:139
-Write of size 4 at addr ffff888026ddaf3c by task syz.1.8003/5600
-
-CPU: 0 UID: 0 PID: 5600 Comm: syz.1.8003 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xba/0x230 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:-1 [inline]
- kasan_check_range+0x264/0x2c0 mm/kasan/generic.c:200
- instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
- atomic_fetch_sub_release include/linux/atomic/atomic-instrumented.h:400 [inline]
- __refcount_sub_and_test include/linux/refcount.h:389 [inline]
- __refcount_dec_and_test include/linux/refcount.h:432 [inline]
- refcount_dec_and_test include/linux/refcount.h:450 [inline]
- nr_neigh_put+0x21/0x170 include/net/netrom.h:139
- nr_del_neigh+0x25a/0x2d0 net/netrom/nr_route.c:440
- nr_rt_ioctl+0xd62/0xf90 net/netrom/nr_route.c:682
- sock_do_ioctl+0x101/0x320 net/socket.c:1254
- sock_ioctl+0x5c6/0x7f0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f3bd0f9aeb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3bd1d7a028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f3bd1216090 RCX: 00007f3bd0f9aeb9
-RDX: 0000200000000680 RSI: 000000000000890c RDI: 0000000000000006
-RBP: 00007f3bd1008c1f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f3bd1216128 R14: 00007f3bd1216090 R15: 00007fffa738a9e8
- </TASK>
-
-Allocated by task 5599:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x3d1/0x6e0 mm/slub.c:5780
- kmalloc_noprof include/linux/slab.h:957 [inline]
- nr_add_neigh+0x104/0x520 net/netrom/nr_route.c:392
- nr_rt_ioctl+0xdf9/0xf90 net/netrom/nr_route.c:660
- sock_do_ioctl+0x101/0x320 net/socket.c:1254
- sock_ioctl+0x5c6/0x7f0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 5600:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2540 [inline]
- slab_free mm/slub.c:6674 [inline]
- kfree+0x1be/0x650 mm/slub.c:6882
- __nr_remove_neigh net/netrom/nr_route.c:299 [inline]
- nr_remove_neigh net/netrom/nr_route.c:308 [inline]
- nr_del_neigh+0x246/0x2d0 net/netrom/nr_route.c:439
- nr_rt_ioctl+0xd62/0xf90 net/netrom/nr_route.c:682
- sock_do_ioctl+0x101/0x320 net/socket.c:1254
- sock_ioctl+0x5c6/0x7f0 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888026ddaf00
- which belongs to the cache kmalloc-64 of size 64
-The buggy address is located 60 bytes inside of
- freed 64-byte region [ffff888026ddaf00, ffff888026ddaf40)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x26dda
-ksm flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000000 ffff88813fe268c0 ffffea0000a56ec0 dead000000000003
-raw: 0000000000000000 0000000080200020 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5835, tgid 5835 (syz-executor), ts 88717173954, free_ts 88621883212
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x228/0x280 mm/page_alloc.c:1884
- prep_new_page mm/page_alloc.c:1892 [inline]
- get_page_from_freelist+0x24dc/0x2580 mm/page_alloc.c:3945
- __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5240
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2486
- alloc_slab_page mm/slub.c:3075 [inline]
- allocate_slab+0x86/0x3a0 mm/slub.c:3248
- new_slab mm/slub.c:3302 [inline]
- ___slab_alloc+0xd82/0x1760 mm/slub.c:4656
- __slab_alloc+0x65/0x100 mm/slub.c:4779
- __slab_alloc_node mm/slub.c:4855 [inline]
- slab_alloc_node mm/slub.c:5251 [inline]
- __do_kmalloc_node mm/slub.c:5656 [inline]
- __kmalloc_noprof+0x46c/0x7e0 mm/slub.c:5669
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- tnode_alloc net/ipv4/fib_trie.c:327 [inline]
- tnode_new+0xc3/0x3b0 net/ipv4/fib_trie.c:380
- fib_insert_node net/ipv4/fib_trie.c:1125 [inline]
- fib_insert_alias+0x9f7/0x1100 net/ipv4/fib_trie.c:1159
- fib_table_insert+0x695/0x1b50 net/ipv4/fib_trie.c:1354
- fib_magic+0x434/0x510 net/ipv4/fib_frontend.c:1134
- fib_add_ifaddr+0x144/0x5f0 net/ipv4/fib_frontend.c:1156
- fib_inetaddr_event+0x12e/0x190 net/ipv4/fib_frontend.c:1470
- notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
- blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
-page last free pid 5832 tgid 5832 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1433 [inline]
- __free_frozen_pages+0xbf8/0xd70 mm/page_alloc.c:2973
- rcu_do_batch kernel/rcu/tree.c:2605 [inline]
- rcu_core+0xc9e/0x1750 kernel/rcu/tree.c:2857
- handle_softirqs+0x22a/0x7c0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x5f/0x150 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1056
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-
-Memory state around the buggy address:
- ffff888026ddae00: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
- ffff888026ddae80: 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc
->ffff888026ddaf00: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-                                        ^
- ffff888026ddaf80: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
- ffff888026ddb000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+Any specific reason why you use a vendor-specific register here instead of BMCR
+via genphy_soft_reset()?
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>> +	if (ret)
+>> +		return ret;
+>> +
+> 
+> AI review pointed out an error here. I will fix in the next version.
+> 
+>> +	ret = phy_read_poll_timeout(phydev, LAN9645X_CONTROL_REGISTER, val,
+>> +				    !(val & LAN9645X_CONTROL_REGISTER_SOFT_RESET),
+>> +				    3000, 100000, true);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	return genphy_suspend(phydev);
+>> +}
+>> +
+>> +static int lan9645x_config_intr(struct phy_device *phydev)
+>> +{
+>> +	int err;
+>> +
+>> +	/* enable / disable interrupts */
+>> +	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+>> +		/* This is an internal PHY of lan9645x and is not possible to
+>> +		 * change the polarity of irq sources in the OIC (CPU_INTR)
+>> +		 * found in lan9645x. Therefore change the polarity of the
+>> +		 * interrupt in the PHY from being active low instead of active
+>> +		 * high.
+>> +		 */
+>> +		err = phy_write(phydev, LAN8804_CONTROL,
+>> +				LAN8804_CONTROL_INTR_POLARITY);
+>> +		if (err)
+>> +			return err;
+>> +
+>> +		/* By default interrupt buffer is open-drain in which case the
+>> +		 * interrupt can be active only low. Therefore change the
+>> +		 * interrupt buffer to be push-pull to be able to change
+>> +		 * interrupt polarity.
+>> +		 */
+>> +		err = phy_write(phydev, LAN8804_OUTPUT_CONTROL,
+>> +				LAN8804_OUTPUT_CONTROL_INTR_BUFFER);
+>> +		if (err)
+>> +			return err;
+>> +
+>> +		err = lan8814_ack_interrupt(phydev);
+>> +		if (err)
+>> +			return err;
+>> +
+>> +		err = phy_write(phydev, LAN8814_INTC,
+>> +				LAN8814_INT_LINK | LAN8814_INT_FLF);
+>> +	} else {
+>> +		err = phy_write(phydev, LAN8814_INTC, 0);
+>> +		if (err)
+>> +			return err;
+>> +
+>> +		err = lan8814_ack_interrupt(phydev);
+>> +	}
+>> +
+>> +	return err;
+>> +}
+>> +
+>> +static irqreturn_t lan9645x_handle_interrupt(struct phy_device *phydev)
+>> +{
+>> +	int status;
+>> +
+>> +	status = phy_read(phydev, LAN8814_INTS);
+>> +	if (status < 0) {
+>> +		phy_error(phydev);
+>> +		return IRQ_NONE;
+>> +	}
+>> +
+>> +	if (status & (LAN8814_INT_LINK | LAN8814_INT_FLF)) {
+>> +		phy_trigger_machine(phydev);
+>> +		return IRQ_HANDLED;
+>> +	}
+>> +
+>> +	return IRQ_NONE;
+>> +}
+>> +
+>>  static struct phy_driver ksphy_driver[] = {
+>>  {
+>>  	PHY_ID_MATCH_MODEL(PHY_ID_KS8737),
+>> @@ -6740,6 +6876,21 @@ static struct phy_driver ksphy_driver[] = {
+>>  	.set_tunable	= lan8842_set_tunable,
+>>  	.cable_test_start	= lan8814_cable_test_start,
+>>  	.cable_test_get_status	= ksz886x_cable_test_get_status,
+>> +}, {
+>> +	PHY_ID_MATCH_MODEL(PHY_ID_LAN9645X),
+>> +	.name		= "Microchip LAN9645X Gigabit PHY",
+>> +	.config_init	= lan9645x_config_init,
+>> +	.driver_data	= &ksz9021_type,
+>> +	.probe		= kszphy_probe,
+>> +	.soft_reset	= genphy_soft_reset,
+>> +	.suspend	= lan9645x_suspend,
+>> +	.resume		= genphy_resume,
+>> +	.config_intr	= lan9645x_config_intr,
+>> +	.handle_interrupt = lan9645x_handle_interrupt,
+>> +	.get_tunable	= lan8842_get_tunable,
+>> +	.set_tunable	= lan8842_set_tunable,
+>> +	.get_phy_stats	= lan8842_get_phy_stats,
+>> +	.update_stats	= lan8842_update_stats,
+>>  }, {
+>>  	PHY_ID_MATCH_MODEL(PHY_ID_KSZ9131),
+>>  	.name		= "Microchip KSZ9131 Gigabit PHY",
+>> @@ -6838,6 +6989,7 @@ static const struct mdio_device_id __maybe_unused micrel_tbl[] = {
+>>  	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN8804) },
+>>  	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN8841) },
+>>  	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN8842) },
+>> +	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN9645X) },
+>>  	{ }
+>>  };
+>>  
+>> diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
+>> index ca691641788b..9c6f9817383f 100644
+>> --- a/include/linux/micrel_phy.h
+>> +++ b/include/linux/micrel_phy.h
+>> @@ -33,6 +33,7 @@
+>>  #define PHY_ID_LAN8804		0x00221670
+>>  #define PHY_ID_LAN8841		0x00221650
+>>  #define PHY_ID_LAN8842		0x002216C0
+>> +#define PHY_ID_LAN9645X		0x002216D0
+>>  
+>>  #define PHY_ID_KSZ886X		0x00221430
+>>  #define PHY_ID_KSZ8863		0x00221435
+>>
+>> ---
+>> base-commit: cbe8e6bef6a3b4b895b47ea56f5952f1936aacb6
+>> change-id: 20260114-phy_micrel_add_support_for_lan9645x_internal_phy-6ef9a782cb8b
+>>
+>> Best regards,
+> 
+> Thanks,
+> 
+> Emil
+> 
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
