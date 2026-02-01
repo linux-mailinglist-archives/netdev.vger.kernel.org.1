@@ -1,408 +1,201 @@
-Return-Path: <netdev+bounces-255673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255674-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +eINF2S1f2mSwQIAu9opvQ
-	(envelope-from <netdev+bounces-255673-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 21:19:48 +0100
+	id dqLdE9++f2l9xAIAu9opvQ
+	(envelope-from <netdev+bounces-255674-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 22:00:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EBD0C7264
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 21:19:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FC0C73A8
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 22:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5DA20300579A
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 20:19:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F37323000FF5
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 21:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D632264C7;
-	Sun,  1 Feb 2026 20:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E382D839F;
+	Sun,  1 Feb 2026 21:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="YDs78gcR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBzbZMnI"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81692AD00;
-	Sun,  1 Feb 2026 20:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D642D948A
+	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 21:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769977181; cv=none; b=LR4B40wODEvPtmDqaq/pISoHj6Hf+91PNTI+XAXubxr3KCfS5aN6imfJeYd2bFKQ8vadZozXMWrWnkUP3pcjODGpEWJE6mSPh3rQsyX8C5DQ7j0JqpWb8kbQtDikYcP81bUL7uRQNbGUgH9nIWSDp1+N0AKjXxXBHZTDfC0bqJE=
+	t=1769979611; cv=none; b=asjUvr1r5Q/GaEAyLUEHjLe14Rc2Vp31Ha/yl6GCoUy2awqixydnHB/c2u2FXhTJCdbaic02Y3H/FHEQK5IGG6RR0oCvnhfoaEaa2F/y7VHcozy52LlM+q4QlHkzyeNfwKyx5L/w2M3WEbe58Uar4FgJsFCqyGEYQpCiGxxKXtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769977181; c=relaxed/simple;
-	bh=KnqahI823dby2t3W4nsZXOrMp5OxyRHyQv9tM/EmL0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z5OY2KphBr0QKnvPnW27oBt/nRk6TBhYh+wUl1Rsz0ZkEuRtyI1jFhKAMquHl1moeX5QxCT6I30e/kEfQVdaSsP3zSVV/peE53Wm9c2diUOmETJuc4sUNrJ2ZPCauPjEkyjxsbCIZW78NV1MMbxkOMq8XuoarpYFZff9eFDqBM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=YDs78gcR; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [192.168.178.121] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 611KJH4M005137
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 1 Feb 2026 21:19:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1769977160;
-	bh=KnqahI823dby2t3W4nsZXOrMp5OxyRHyQv9tM/EmL0Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=YDs78gcR3MB23Pl+N3NdhkHZhAMEUs8mGh6PtHWwjDe8C8ep16a7wQcqV+OWyWK/G
-	 KpozbSjJRl1b+tBN4aXZMD3UDEBEijNswjJT6bb6aM2RbgZqyW13O7g+1juxpyztDG
-	 +RY8bMUaoB5BFbHdfb5BOa0m9VdKdvWMZF5fIPlk=
-Message-ID: <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
-Date: Sun, 1 Feb 2026 21:19:17 +0100
+	s=arc-20240116; t=1769979611; c=relaxed/simple;
+	bh=AogniDSenuhKHGa0cFSla2/PdbM2zPi3vyokWKYGcDc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=g6+izyYrmQMOskkb+pRFjmFBVO5dcZvDglAYZgeCpBAEqmGDdad0tB4/s8zVkg4nKBm5Wjbug0Dlz3IdjPCWk1BK8e3IKm5wDwv4thhf+fLfXWvvi2v72NvdAm80ypp3SlJg1xmWYC0IwEwFL+roBNYHqmgmgHKZIudG77dbX70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBzbZMnI; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-794c2db2ee5so8114257b3.2
+        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 13:00:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769979609; x=1770584409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JrM4NX39l+4X3I0Jzz5a+t2W5kTMBNHHRvTlPtw0XBk=;
+        b=gBzbZMnI02S1ghQ8QZKNhdHSnzOXrIHHscxax4BenHUZRN5qJXh8MAXnwO3uDsMuDg
+         oAsgBzRjysFr8DB4DOzO8ZnbiKU0wqQsqelJLa7/LuWbWJQzruSGxkN7Y0lq4QMeJFo5
+         zTxDSn0i92uYJAxZpFgJDO/5pogpdmO5isH6sd20/t7KEGR8/3nNuY6GE6RbxJDzNNXT
+         vd19fzGbPjHraASOCLgUNLZk10R6MOxwU/5sfv71jtugv7WLyrL+Wpfx/+VzkuYTeexr
+         L6D1n7qoFr21XLFwX02eRRt3hRrbLQpbB+Pvq2cBRvFpsunfUccmDIKwAyGmuSL1/cw6
+         dxRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769979609; x=1770584409;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JrM4NX39l+4X3I0Jzz5a+t2W5kTMBNHHRvTlPtw0XBk=;
+        b=K1z4SEj448zACnFtRlkL76zaeTZTkC0CyPbEIJyxvkECDa6bEc4iFaw/Lvp14voPUV
+         QxozZSBft2mD/0CKvnlrb9n1nb+7I3Wa8FI5+JrRz0xquZrNbk5SeegxzGBwanGy4/7i
+         j81UafzGIJ7U3wVO2/jyIN3Zu38N74IQjJw2lnWdv9yurVbJYb2OXHRELj8Qh5Ch5u1D
+         CBp+5FnHm2ATr27UyEhLfiAT3dwmfujNtktICEGEyt2JOYNtzUfD9yD9cOdqR4nBWFDr
+         5LDeJF7OVgSAcnPBXlRbz6EgnNmiRT3i+dsqs+LlVP+JSd/QQffWEE2lNMszdN1XW0aE
+         HZPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVTxUSFmNzz6TeixkpQaAmk28KCvt0FUD4acRI7ag9IhZhtYTp55vZiuQdZ66pXOtlVFRfGD0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXOBwELjgVk0O8CcGTHUuKabo/32zo6Zpu6uRiLKhJJYR/0wVJ
+	FeLyjOKn2QxrODnni1d3RLeDCYjP8d+ClMCKy/SvleQf7ZJUdvQy9sMq
+X-Gm-Gg: AZuq6aLNOh3BARQVGXTtqTE0AXRlI0ME1sRJEW4qzeh1Yj7GgUkTHvZSqKUhl/fvBqi
+	2egHAb4tDyrie3uYK54nJXyASYZtb2bx1/BCN70PObuD9mJ31x1wrGKQTNjGLOpLSuksKi5x8QJ
+	oedLK1ScikvsBLZhFgu9N7vLC1QjgnaMrlWYIFTZ3cgJyHk2w/VfOl2VGncOjHh2K71tCJ+nPzk
+	xlaXSCrokmYjB7BrycmeR7ZsT09YB/I8/rI4OQTBKJKQ9pXZHki3Jq9URa5D/tYjY3SVOJRBws3
+	Jkr/CoGk3o0OlH0SeuofsQBczOL0UDmx8lJYV1PW/f7T7NzM3CPG5i6wgqzJwW0oDH8OR9rAih4
+	xehuI0X9EmjxSFt8FGMcdM6r1ASMIaYGEFbK774dRlTzXIrzfX/+oLLsAKIbW8sr5JIDFsyJFig
+	pOZAdxTdExfA5vftxGdjKQjObmcTJ3rmKujvdA3E1YhbbyHFtz408B1caq4+k=
+X-Received: by 2002:a05:690c:34c3:b0:794:cb5b:89f4 with SMTP id 00721157ae682-794cb5ba215mr18826067b3.41.1769979608674;
+        Sun, 01 Feb 2026 13:00:08 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-794d7cceafdsm4958417b3.15.2026.02.01.13.00.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Feb 2026 13:00:07 -0800 (PST)
+Date: Sun, 01 Feb 2026 16:00:07 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>
+Cc: virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Message-ID: <willemdebruijn.kernel.279585f37ad8@gmail.com>
+In-Reply-To: <20260129-v6-7-topic-virtio-net-ptp-v2-0-30a27dc52760@pengutronix.de>
+References: <20260129-v6-7-topic-virtio-net-ptp-v2-0-30a27dc52760@pengutronix.de>
+Subject: Re: [PATCH RFC v2 0/2] virtio-net: add flow filter for receive
+ timestamps
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-4-simon.schippers@tu-dortmund.de>
- <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
- <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
- <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
- <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
- <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
- <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
- <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
- <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
- <CACGkMEsVMz+vS3KxykYBGXvyt3MZcstnYWUiYJZhLSMoHC5Smw@mail.gmail.com>
- <ba17ba38-9f61-4a10-b375-d0da805e6b73@tu-dortmund.de>
- <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255673-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-255674-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[pengutronix.de,redhat.com,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com,lunn.ch];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid]
-X-Rspamd-Queue-Id: 7EBD0C7264
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D3FC0C73A8
 X-Rspamd-Action: no action
 
-On 1/30/26 02:51, Jason Wang wrote:
-> On Thu, Jan 29, 2026 at 5:25 PM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 1/29/26 02:14, Jason Wang wrote:
->>> On Wed, Jan 28, 2026 at 3:54 PM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> On 1/28/26 08:03, Jason Wang wrote:
->>>>> On Wed, Jan 28, 2026 at 12:48 AM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> On 1/23/26 10:54, Simon Schippers wrote:
->>>>>>> On 1/23/26 04:05, Jason Wang wrote:
->>>>>>>> On Thu, Jan 22, 2026 at 1:35 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>>>>>
->>>>>>>>> On Wed, Jan 21, 2026 at 5:33 PM Simon Schippers
->>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>
->>>>>>>>>> On 1/9/26 07:02, Jason Wang wrote:
->>>>>>>>>>> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
->>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>
->>>>>>>>>>>> On 1/8/26 04:38, Jason Wang wrote:
->>>>>>>>>>>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
->>>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
->>>>>>>>>>>>>> and wake the corresponding netdev subqueue when consuming an entry frees
->>>>>>>>>>>>>> space in the underlying ptr_ring.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
->>>>>>>>>>>>>> in an upcoming commit.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>>>>>>>> ---
->>>>>>>>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
->>>>>>>>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
->>>>>>>>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->>>>>>>>>>>>>> index 1197f245e873..2442cf7ac385 100644
->>>>>>>>>>>>>> --- a/drivers/net/tap.c
->>>>>>>>>>>>>> +++ b/drivers/net/tap.c
->>>>>>>>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
->>>>>>>>>>>>>>         return ret ? ret : total;
->>>>>>>>>>>>>>  }
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
->>>>>>>>>>>>>> +{
->>>>>>>>>>>>>> +       struct ptr_ring *ring = &q->ring;
->>>>>>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>>>>>> +       void *ptr;
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>>>>>> +               dev = rcu_dereference(q->tap)->dev;
->>>>>>>>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
->>>>>>>>>>>>>> +               rcu_read_unlock();
->>>>>>>>>>>>>> +       }
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +       spin_unlock(&ring->consumer_lock);
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +       return ptr;
->>>>>>>>>>>>>> +}
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>>>>>                            struct iov_iter *to,
->>>>>>>>>>>>>>                            int noblock, struct sk_buff *skb)
->>>>>>>>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>>>>>                                         TASK_INTERRUPTIBLE);
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>                 /* Read frames from the queue */
->>>>>>>>>>>>>> -               skb = ptr_ring_consume(&q->ring);
->>>>>>>>>>>>>> +               skb = tap_ring_consume(q);
->>>>>>>>>>>>>>                 if (skb)
->>>>>>>>>>>>>>                         break;
->>>>>>>>>>>>>>                 if (noblock) {
->>>>>>>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>>>>>>>>>>> index 8192740357a0..7148f9a844a4 100644
->>>>>>>>>>>>>> --- a/drivers/net/tun.c
->>>>>>>>>>>>>> +++ b/drivers/net/tun.c
->>>>>>>>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>>>>>>>>>>>         return total;
->>>>>>>>>>>>>>  }
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
->>>>>>>>>>>>>> +{
->>>>>>>>>>>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
->>>>>>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>>>>>> +       void *ptr;
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>>>>>
->>>>>>>>>>>>> I guess it's the "bug" I mentioned in the previous patch that leads to
->>>>>>>>>>>>> the check of __ptr_ring_consume_created_space() here. If it's true,
->>>>>>>>>>>>> another call to tweak the current API.
->>>>>>>>>>>>>
->>>>>>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>>>>>> +               dev = rcu_dereference(tfile->tun)->dev;
->>>>>>>>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
->>>>>>>>>>>>>
->>>>>>>>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
->>>>>>>>>>>>> I'm not sure is what we want.
->>>>>>>>>>>>
->>>>>>>>>>>> What else would you suggest calling to wake the queue?
->>>>>>>>>>>
->>>>>>>>>>> I don't have a good method in my mind, just want to point out its implications.
->>>>>>>>>>
->>>>>>>>>> I have to admit I'm a bit stuck at this point, particularly with this
->>>>>>>>>> aspect.
->>>>>>>>>>
->>>>>>>>>> What is the correct way to pass the producer CPU ID to the consumer?
->>>>>>>>>> Would it make sense to store smp_processor_id() in the tfile inside
->>>>>>>>>> tun_net_xmit(), or should it instead be stored in the skb (similar to the
->>>>>>>>>> XDP bit)? In the latter case, my concern is that this information may
->>>>>>>>>> already be significantly outdated by the time it is used.
->>>>>>>>>>
->>>>>>>>>> Based on that, my idea would be for the consumer to wake the producer by
->>>>>>>>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
->>>>>>>>>> smp_call_function_single().
->>>>>>>>>> Is this a reasonable approach?
->>>>>>>>>
->>>>>>>>> I'm not sure but it would introduce costs like IPI.
->>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
->>>>>>>>>> considered a deal-breaker for the patch set?
->>>>>>>>>
->>>>>>>>> It depends on whether or not it has effects on the performance.
->>>>>>>>> Especially when vhost is pinned.
->>>>>>>>
->>>>>>>> I meant we can benchmark to see the impact. For example, pin vhost to
->>>>>>>> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>>
->>>>>>>
->>>>>>> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
->>>>>>> for both the stock and patched versions. The benchmarks were run with
->>>>>>> the full patch series applied, since testing only patches 1-3 would not
->>>>>>> be meaningful - the queue is never stopped in that case, so no
->>>>>>> TX_SOFTIRQ is triggered.
->>>>>>>
->>>>>>> Compared to the non-pinned CPU benchmarks in the cover letter,
->>>>>>> performance is lower for pktgen with a single thread but higher with
->>>>>>> four threads. The results show no regression for the patched version,
->>>>>>> with even slight performance improvements observed:
->>>>>>>
->>>>>>> +-------------------------+-----------+----------------+
->>>>>>> | pktgen benchmarks to    | Stock     | Patched with   |
->>>>>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>>>>>> | 100M packets            |           |                |
->>>>>>> | vhost pinned to core 0  |           |                |
->>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
->>>>>>> |  +        +-------------+-----------+----------------+
->>>>>>> | vhost-net | Lost        | 1154 Kpps | 0              |
->>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>
->>>>>>> +-------------------------+-----------+----------------+
->>>>>>> | pktgen benchmarks to    | Stock     | Patched with   |
->>>>>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>>>>>> | 100M packets            |           |                |
->>>>>>> | vhost pinned to core 0  |           |                |
->>>>>>> | *4 threads*             |           |                |
->>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
->>>>>>> |  +        +-------------+-----------+----------------+
->>>>>>> | vhost-net | Lost        | 1527 Kpps | 0              |
->>>>>>> +-----------+-------------+-----------+----------------+
->>>>>
->>>>> The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
->>>>> the guest or an xdp program that did XDP_DROP in the guest.
->>>>
->>>> I forgot to mention that these PPS values are per thread.
->>>> So overall we have 71 Kpps * 4 = 284 Kpps and 79 Kpps * 4 = 326 Kpps,
->>>> respectively. For packet loss, that comes out to 1154 Kpps * 4 =
->>>> 4616 Kpps and 0, respectively.
->>>>
->>>> Sorry about that!
->>>>
->>>> The pktgen benchmarks with a single thread look fine, right?
->>>
->>> Still looks very low. E.g I just have a run of pktgen (using
->>> pktgen_sample03_burst_single_flow.sh) without a XDP_DROP in the guest,
->>> I can get 1Mpps.
->>
->> Keep in mind that I am using an older CPU (i5-6300HQ). For the
->> single-threaded tests I always used pktgen_sample01_simple.sh, and for
->> the multi-threaded tests I always used pktgen_sample02_multiqueue.sh.
->>
->> Using pktgen_sample03_burst_single_flow.sh as you did fails for me (even
->> though the same parameters work fine for sample01 and sample02):
->>
->> samples/pktgen/pktgen_sample03_burst_single_flow.sh -i tap0 -m
->> 52:54:00:12:34:56 -d 10.0.0.2 -n 100000000
->> /samples/pktgen/functions.sh: line 79: echo: write error: Operation not
->> supported
->> ERROR: Write error(1) occurred
->> cmd: "burst 32 > /proc/net/pktgen/tap0@0"
->>
->> ...and I do not know what I am doing wrong, even after looking at
->> Documentation/networking/pktgen.rst. Every burst size except 1 fails.
->> Any clues?
+Steffen Trumtrar wrote:
+> This series tries to pick up the work on the virtio-net timestamping
+> feature from Willem de Bruijn.
 > 
-> Please use -b 0, and I'm Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz.
-
-I tried using "-b 0", and while it worked, there was no noticeable
-performance improvement.
-
+> Original series
+>     Message-Id: 20210208185558.995292-1-willemdebruijn.kernel@gmail.com
+>     Subject: [PATCH RFC v2 0/4] virtio-net: add tx-hash, rx-tstamp,
+>     tx-tstamp and tx-time
+>     From: Willem de Bruijn <willemb@google.com>
 > 
-> Another thing I can think of is to disable
+>     RFC for four new features to the virtio network device:
 > 
-> 1) mitigations in both guest and host
-> 2) any kernel debug features in both host and guest
-
-I also rebuilt the kernel with everything disabled under
-"Kernel hacking", but that didn’t make any difference either.
-
-Because of this, I ran "pktgen_sample01_simple.sh" and
-"pktgen_sample02_multiqueue.sh" on my AMD Ryzen 5 5600X system. The
-results were about 374 Kpps with TAP and 1192 Kpps with TAP+vhost_net,
-with very similar performance between the stock and patched kernels.
-
-Personally, I think the low performance is to blame on the hardware.
-
-Thanks!
-
+>     1. pass tx flow state to host, for routing + telemetry
+>     2. pass rx tstamp to guest, for better RTT estimation
+>     3. pass tx tstamp to guest, idem
+>     3. pass tx delivery time to host, for accurate pacing
 > 
-> Thanks
+>     All would introduce an extension to the virtio spec.
 > 
->>
->> Thanks!
->>
->>>
->>>>
->>>> I'll still look into using an XDP program that does XDP_DROP in the
->>>> guest.
->>>>
->>>> Thanks!
->>>
->>> Thanks
->>>
->>>>
->>>>>
->>>>>>>
->>>>>>> +------------------------+-------------+----------------+
->>>>>>> | iperf3 TCP benchmarks  | Stock       | Patched with   |
->>>>>>> | to Debian VM 120s      |             | fq_codel qdisc |
->>>>>>> | vhost pinned to core 0 |             |                |
->>>>>>> +------------------------+-------------+----------------+
->>>>>>> | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
->>>>>>> |  +                     |             |                |
->>>>>>> | vhost-net              |             |                |
->>>>>>> +------------------------+-------------+----------------+
->>>>>>>
->>>>>>> +---------------------------+-------------+----------------+
->>>>>>> | iperf3 TCP benchmarks     | Stock       | Patched with   |
->>>>>>> | to Debian VM 120s         |             | fq_codel qdisc |
->>>>>>> | vhost pinned to core 0    |             |                |
->>>>>>> | *4 iperf3 client threads* |             |                |
->>>>>>> +---------------------------+-------------+----------------+
->>>>>>> | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
->>>>>>> |  +                        |             |                |
->>>>>>> | vhost-net                 |             |                |
->>>>>>> +---------------------------+-------------+----------------+
->>>>>>
->>>>>> What are your thoughts on this?
->>>>>>
->>>>>> Thanks!
->>>>>>
->>>>>>
->>>>>
->>>>> Thanks
->>>>>
->>>>
->>>
->>
+> The changes in this series are to the driver side. For the changes to qemu see:
+>     https://github.com/strumtrar/qemu/tree/v10.2.0/virtio-rx-stamps    
 > 
+> Currently only virtio-net is supported. Performance was tested with
+> pktgen which doesn't show a decrease in transfer speeds.
+> 
+> As these patches are now mostly different from the initial patchset, I removed
+> the Signed-off-bys from Willem, so he mustn't be ashamed of what his work evolved to ;)
+
+Good to see this picked up. I would also still like to see support in
+virtio-net for HW timestamps pass-through for virtio-net.
+
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> ---
+> Changes in v2:
+> - rework patches to use flow filter instead of feature flag
+> - Link to v1: https://lore.kernel.org/r/20231218-v6-7-topic-virtio-net-ptp-v1-0-cac92b2d8532@pengutronix.de
+> 
+> ---
+> Steffen Trumtrar (2):
+>       tun: support rx-tstamp
+>       virtio-net: support receive timestamp
+> 
+>  drivers/net/tun.c               |  30 +++++----
+>  drivers/net/virtio_net.c        | 136 ++++++++++++++++++++++++++++++++++++----
+>  include/uapi/linux/virtio_net.h |   9 +++
+>  3 files changed, 151 insertions(+), 24 deletions(-)
+> ---
+> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> change-id: 20231218-v6-7-topic-virtio-net-ptp-3df023bc4f4d
+> 
+> Best regards,
+> -- 
+> Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> 
+
+
 
