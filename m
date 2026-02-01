@@ -1,393 +1,161 @@
-Return-Path: <netdev+bounces-255588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id nwLSLT8af2nHjwIAu9opvQ
-	(envelope-from <netdev+bounces-255588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 10:17:51 +0100
+	id L1ThIWYhf2nukQIAu9opvQ
+	(envelope-from <netdev+bounces-255589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 10:48:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43867C552E
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 10:17:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B960DC55B2
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 10:48:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2AB103002330
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 09:17:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9022C300FEC7
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 09:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD18A31ED83;
-	Sun,  1 Feb 2026 09:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01AC2EDD4D;
+	Sun,  1 Feb 2026 09:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMFwtY5D";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9teKUJW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h1w5+llC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B032E2F6164
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 09:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769937468; cv=none; b=AVo25nCJDUpBZDG4flGqxNbiKFyNtNLYg1Y10NqelCTAblVu+pwEbqTbrIDg4wHXZAQlc6ukFrl4fRWTHZtHpzHRkNYksOcsMkFG5GQQ6dv7uac80+PugUasinohKoYU2FZ5XwDbd6adSM7fpB9a4rNcpWIC6ynyusUVQbLyNIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769937468; c=relaxed/simple;
-	bh=LaKEqrgvYkhsFwqyindBMnW1p2HUBq4DbwnLjR4F0Go=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oGrohtdRX3m+wXjFyNUB5qNeutyJWQUStiiHVsm7cksY+BiR0URjeaMUT1Uu+hqWXzOWP4mLpjqVUVRC3uuYzX3UGHNrs9afGOA6atQZLbfh7MR/mI8qvFoGVgwyxpgXH8Gms+6MQ5Kr/4FHJnBO7iCEjZPEbkrpyjd2aviXTjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZMFwtY5D; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g9teKUJW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769937464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b1F5jlC4KkSLd9axs6reavDIsao7rIgQww1rrTaK/DA=;
-	b=ZMFwtY5D0nzd7Rwx24Llyd63vm7hRPECVEJRDLS4JD0U/MlcwMU8150DsyqP4unL2zk2QH
-	UNsY8llyJATtkZwsUjzx97MASvD6xSVy9higavJCL5KL5GxxqA4S30xq0mPXVY6PZLE5fB
-	z/GNPKAzBJeQhKZTBHVxQkUGtXlj0SA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-308-NdBaSlTpON-o3yqGyJjRgw-1; Sun, 01 Feb 2026 04:17:43 -0500
-X-MC-Unique: NdBaSlTpON-o3yqGyJjRgw-1
-X-Mimecast-MFC-AGG-ID: NdBaSlTpON-o3yqGyJjRgw_1769937462
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48025e12b5bso53768675e9.2
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 01:17:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBDE19B5A7
+	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 09:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769939298; cv=pass; b=R7kOg4zN60q/5ZcYEqQqfDvrV7lqmtDpyqjDxGf98Wp+B9ulyOCSfSXLLIF0bjfWhrfnOJZXx2QLUVZG3hf1lTC6OIF5j/g7De0FP21CvIIhyMkhh1o6W0R+/RVPd54BaLi4f769lw10Tm4/RWLx8Ga8sSeweTYWxtSV3DSoV0A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769939298; c=relaxed/simple;
+	bh=EXkN9oyywybnewmZSwlkjibNHUjLNW+K3CsKXmN5TTw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cJ9QQ8zwsA66J9zJZAw3MV+wnoBsAJDAARGxtdg/sW8gPI9D8JF2WkbU9KzV5eR4iaMTpL9inikxtKDoF4qMf2UqnnK9E9AxWk610GFMlFjb+6cFlVyjV+oI6qw5NjDRO4QxcP/Ojl3JHu/1GLODNB3VapJ4XFofGWPhc5SzFVU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h1w5+llC; arc=pass smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-894a2309a29so50681186d6.1
+        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 01:48:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769939296; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SdBKK5lab6SDwwxCLcaVytj5wOg0SGnIaYf/XpOlwZqqlFFp8tn2BwG7xxnsfj/Txn
+         kCvzln8BLfwa/O3rx3bXsHuhCSd4Mk9MsruYb7WZ/CE3VnagXAaWSlAtoHn8hgQym/PR
+         gM/+HqZV9NBxCOhVbEYy6E2WBsRO4xnhg/N/LR5yekK/KM1Q/Epg3ZTGOajkebUWuByJ
+         rxowNO+VnBvU1MOmFZl/uwSrVStqoQ+1gQIJ6W6O0RbSBqXjA38YwPmWU9EgZFZAjMYe
+         C90Pw+Z1yP9LN1jSy9WLI1PPCMvchUQaQAMkdA7nRO9gMRKkCBuFtGN4SbtJIEhnJA64
+         n8KQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EXkN9oyywybnewmZSwlkjibNHUjLNW+K3CsKXmN5TTw=;
+        fh=SqoYs0dAYe18d6soaOlWMwFfvoz7BzLgBG+bjH0GILU=;
+        b=Nl9CIxBOlUJnpek+xDFTG7u+LE7ehPCVZ1VCWRdeXrmBzqdbbaEnfXQA+gJTBzuYE0
+         XdUKNhj4CSgaqwwFt8Ecjw/xSsEGrozaW8fo0BR8LQUNyoo8Wt0jv8ij+KOKn2BFcvtu
+         i6yFXo/emfrCw0n+f0jdfvJxi1F062gfuPSwiRKd9QwAwz3aj6uSs8/jRO7arUGFtaCX
+         NhZn6o5XIM7zrVEUyfBU9zH0Ho/kA/Qikm9mtQRRxnTw0fp3mhAvmj5k34z5plXF7GH6
+         ifENF6dbiYdkcQ/Q04u1ZZHNzuA5ZdJEFFqoagyjWOVPFKJdv3tAF8JSPqjlqwaNZyY6
+         Ys6g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769937462; x=1770542262; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b1F5jlC4KkSLd9axs6reavDIsao7rIgQww1rrTaK/DA=;
-        b=g9teKUJWmIzv/YgFxs39Hoalac8WQQJPdt107OW4pXtEuUor7a5B9Rj5vqSNoNgAkq
-         vSlkUQ7qa36Zrls1J/kwCVyA3cTTG5Hni3IX78LwWUcHCdlfxBZTQ3JFKtGhd3tUgbPn
-         cDC6piFB7ylW9ABQNIDmkA7APgPltel6CcSAyJxth1f1qTfmc0yppwOdvAQbE7bKuGbo
-         myG1p6y/eNJ4qOz/tTEHR1OPDB5gG65OfIkKvXMBVHjWlvpY2jNCTz1qXSCDjIz4JPHb
-         6CP5hgWYUbQ66smXlP52Kp6Ov+3ngDYIPh0csoTfzjAF3/tLo+0nNpTRpIBMcMfhun+F
-         Z/Bg==
+        d=google.com; s=20230601; t=1769939296; x=1770544096; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EXkN9oyywybnewmZSwlkjibNHUjLNW+K3CsKXmN5TTw=;
+        b=h1w5+llCCiuIxjPNhVXpGF+Ct8UzHQQec6wl3+wukIQQL2Kl+mahgVwyhwW54DVti2
+         Jz8/uTckRoLMMGQcPRTjeJF26KYNEaaq35LN7LA7CqnQsXzTdDTJKCb84xvpXqwrv24I
+         D56rHSNkA3y9y/yt0PEHwieO074xLIZYoLMkdwSAbtoeTfRG4q6Q0CYxJGgRkT0rZd8I
+         W+XNkKMZ0CwDFH0mPE4+zjHZq165ZTsUsNFj2pyoJ98vhBRsJUi9deCVOv8eaV6e3atQ
+         QDSB5YzqOE3b/ozGkEux88pHIsyGVER7drdnktrPQv4Do6lhmTCU5V5fFKPlLx6g0Kf3
+         cO8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769937462; x=1770542262;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b1F5jlC4KkSLd9axs6reavDIsao7rIgQww1rrTaK/DA=;
-        b=DfX5DGFbRh/ToqrBoyqys2pauvOR9FZ9/D+NuGyiVhvbuqeBtRmVcbDPNfFeEEvk9F
-         PdMGAJkhNopCvOsPJRVN03pEbQBHDuOdJ65dONayQZ6jkshNb4Pgfy2Ofnm/5dmbscbr
-         B1WC/BS30ogpNSEipOBr2ArCJUdkPd78B+SN1WFW3M1S/JY9Yo/Ao9hCkNcicTvhrb3j
-         mCKgz+eyM/RYB23WvRa+Uv6k+uVYxdyDYNEKhFx37/4cdiwVKirmHLkF+33JWnELAj0T
-         vOj0NpwPA7mnqpXKJDmN5VgIilC5Wh3Up2eAYAjl1AreqAvRV+vXR6yJlAov2MDb+/QT
-         LuTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsr7f3ZRDFIt1nv2j56r0H8mB38mAW8+Z1EiEt655IUE/gXYAZgn1sKLSjNxAHmJbjCvRye3g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1ZFXtRUcxBLEOAhG3HhdqeR8qJqTlnLQx51naIQMTYOihXxx6
-	+9LbFEPYnV2odv4rpMqo0hOSgwAHwmuVJbuUNvtMcQVPjaFhHU5Yma8QqzG/oiFrGqtlsMuDZDZ
-	c5zJAzh1XmTDpPgsdq9YQWKU6hKrANpugO+TiiozWbPjdtDYBW9ULTESX/w==
-X-Gm-Gg: AZuq6aIiuzapvQNGaAANxJGfUKsREdYiE7Ja+5Gan7J3J6swiSRvHCRYYz4KoeF2CR3
-	PjkwvhT9bHrkm3Wsz6/GUP5Tm/Wtk1vG0oTPkA8ym+1W2ykd3zwJogPXQj3HJr8C1mI1PFyu41s
-	W1X7QDDvnQ/uwH/b2GPB3lrzP8UkcHxBCq6CFAepEvOUgaKKcKxs1Gt8bZf82v+M/mfnxlMABoA
-	SI79bS2MI2xWB4yjEBanyrPnvl2DYZdRU/uj/hvhgBMZ4/2xgal0SZrCBLjoasuObvCjel88CN7
-	c88nW/7mVQ2ym4WruNUQQeJfARNaQ8pEqrOpaAww+aWMdNdgV3Sjrx3hyXzzilO5da16gCM4SUi
-	IzZhm8I+w4B9Z7TezqmG4SD1X3zukFmZGJA==
-X-Received: by 2002:a05:6000:4313:b0:432:dfea:1fa8 with SMTP id ffacd0b85a97d-435f3abc65cmr11406029f8f.45.1769937461781;
-        Sun, 01 Feb 2026 01:17:41 -0800 (PST)
-X-Received: by 2002:a05:6000:4313:b0:432:dfea:1fa8 with SMTP id ffacd0b85a97d-435f3abc65cmr11405975f8f.45.1769937461191;
-        Sun, 01 Feb 2026 01:17:41 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e131ce58sm34407293f8f.20.2026.02.01.01.17.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Feb 2026 01:17:40 -0800 (PST)
-Date: Sun, 1 Feb 2026 04:17:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: tariqt@nvidia.com, linux-rdma@vger.kernel.org, shaojijie@huawei.com,
-	shenjian15@huawei.com, salil.mehta@huawei.com, mbloch@nvidia.com,
-	saeedm@nvidia.com, leon@kernel.org, eperezma@redhat.com,
-	brett.creeley@amd.com, jasowang@redhat.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	pabeni@redhat.com, edumazet@google.com, parav@nvidia.com,
-	linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
-	dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
-	kuba@kernel.org, stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	andrew+netdev@lunn.ch, donald.hunter@gmail.com, ast@fiberby.net,
-	liuhangbin@gmail.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, ij@kernel.org,
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Subject: Re: [PATCH v1 net-next 3/3] virtio_net: Accurate ECN flag in
- virtio_net_hdr
-Message-ID: <20260201035912-mutt-send-email-mst@kernel.org>
-References: <20260131225510.2946-1-chia-yu.chang@nokia-bell-labs.com>
- <20260131225510.2946-4-chia-yu.chang@nokia-bell-labs.com>
+        d=1e100.net; s=20230601; t=1769939296; x=1770544096;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EXkN9oyywybnewmZSwlkjibNHUjLNW+K3CsKXmN5TTw=;
+        b=vaBUfE2vkGLCSiXLSnMqixOV2GU6iNV0PvW+rgeftenE2lnklMsza0FdRkyc6L/dB9
+         rEY+b5tmk6naa+AGKjR+s3MAaE1RXv8+RbasERacqx0cP9nJp5wBLBf+SXG3Io990XRe
+         di7HXUOs+XXHgyk3KQAUkI9ulCvr+Iti+xj1RWcC8760KHTnN+DN0jtdcTgfcKED5HFK
+         7ByZ4eV/Kri8PpzlyR7DwBH7PiBngPao8s1oWCaOViuG0eTuj9hxk/rl7uLy9ysnppOl
+         pypEuoT1B7V1tiOhSD0xJdfxDfipM2fptAWNBsrwl2pOjC+k7uv+BxNVkqyhzMbper4s
+         UDlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhJz6Ibc4rRfw/9fKSWecHLytjBZlPxxgr/XceoKCMMCKPNUsKrtmjaG/gPw+qgk60emqNP8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXGiiBDc4Q1h+ftfCHSCOuIf5ut9NQrbXCXbt6UGTeEE2ehfzw
+	6YlLRpMUMdejj/DNoFFg7NydWc+5VxaA/2PJ6QuzXJGtvewRsBQgl7D2DeT8rP3RvTcOPFF3g8s
+	SRKlMT/3cjrg+ciZ1a0tkjxI/NumYzev2WNQgSk4i
+X-Gm-Gg: AZuq6aI+vPC6ZbSYIwoExjtsbJP01jy81twH/HrjPsXx0p/ZlQOnJY/4hUd9AeODvS8
+	HF7mbO+JnjJ2bOxr8WZJlIKumVylDVSZDFKnWPpLDr6a91fmdXCMvfq6Ao+bk/bQZFVras9SFK7
+	aOFXHTuitDc6K7GAwCfAVMbTSg7a5QUVTF2uu2hHY4tzVveqUC2mWxZ323WSS1buVb7K+sbZCDM
+	OBGiz8gR0YUXgZMfwpwC2YMCV9S/XYwDZ57jibJwZYzrjTOlLdXX8cWDgb1BIH/MIk96+8=
+X-Received: by 2002:a05:620a:710a:b0:8b2:eefb:c8ab with SMTP id
+ af79cd13be357-8c728ad7591mr1412506185a.19.1769939296149; Sun, 01 Feb 2026
+ 01:48:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260131225510.2946-4-chia-yu.chang@nokia-bell-labs.com>
+References: <20260201022128.2658251-1-hodgesd@meta.com>
+In-Reply-To: <20260201022128.2658251-1-hodgesd@meta.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 1 Feb 2026 10:48:05 +0100
+X-Gm-Features: AZwV_Qgr21uZb6Gw6qcoEI0Og8GwGJ1uywAoPTfLxzPls-8511ycqj1xtKmr1ek
+Message-ID: <CANn89iKZaoJV-zRLzB7jrrkvrun-AqrN+TjxTkNgrKeB3uML8A@mail.gmail.com>
+Subject: Re: [PATCH] tipc: fix RCU dereference race in tipc_aead_users_dec()
+To: Daniel Hodges <hodgesd@meta.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ying Xue <ying.xue@windreiver.com>, Tuong Lien <tuong.t.lien@dektech.com.au>, 
+	netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,huawei.com,kernel.org,redhat.com,amd.com,lists.linux.dev,linux.alibaba.com,google.com,lwn.net,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255588-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255589-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nokia-bell-labs.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 43867C552E
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B960DC55B2
 X-Rspamd-Action: no action
 
-Thanks for the patch! Yet something to improve:
+On Sun, Feb 1, 2026 at 3:31=E2=80=AFAM Daniel Hodges <hodgesd@meta.com> wro=
+te:
+>
+> tipc_aead_users_dec() calls rcu_dereference(aead) twice: once to store
+> in 'tmp' for the NULL check, and again inside the atomic_add_unless()
+> call.
+>
+> Use the already-dereferenced 'tmp' pointer consistently, matching the
+> correct pattern used in tipc_aead_users_inc() and tipc_aead_users_set().
+>
+> Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+> Cc: stable@vger.kernel.org
+>
+> Signed-off-by: Daniel Hodges <hodgesd@meta.com>
 
-On Sat, Jan 31, 2026 at 11:55:10PM +0100, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> Unlike RFC 3168 ECN, accurate ECN uses the CWR flag as part of the ACE
-> field to count new packets with CE mark; however, it will be corrupted
-> by the RFC 3168 ECN-aware TSO. Therefore, fallback shall be applied by
-> seting NETIF_F_GSO_ACCECN to ensure that the CWR flag should not be
-> changed within a super-skb.
-> 
-> To apply the aforementieond new AccECN GSO for virtio, new featue bits
-> for host and guest are added for feature negotiation between driver and
-> device. And the translation of Accurate ECN GSO flag between
-> virtio_net_hdr and skb header for NETIF_F_GSO_ACCECN is also added to
-> avoid CWR flag corruption due to RFC3168 ECN TSO.
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-
-
-To the best of my understanding, this is a new feature - support
-for VIRTIO_NET_F_HOST_ACCECN, VIRTIO_NET_F_GUEST_ACCECN?
-The commit log makes it sound like it fixes some behaviour for
-existing hardware, but that is not the case.
-
-
-
-
-
-> ---
-> v2:
-> - Replace VIRTIO_NET_HDR_GSO_ECN with VIRTIO_NET_HDR_GSO_ECN_FLAGS
-
-but where is v2? this is v1...
-
-> ---
->  drivers/net/virtio_net.c        | 14 +++++++++++---
->  drivers/vdpa/pds/debugfs.c      |  6 ++++++
->  include/linux/virtio_net.h      | 18 +++++++++++-------
->  include/uapi/linux/virtio_net.h |  5 +++++
->  4 files changed, 33 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index db88dcaefb20..103fb87c690e 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -75,6 +75,7 @@ static const unsigned long guest_offloads[] = {
->  	VIRTIO_NET_F_GUEST_TSO4,
->  	VIRTIO_NET_F_GUEST_TSO6,
->  	VIRTIO_NET_F_GUEST_ECN,
-> +	VIRTIO_NET_F_GUEST_ACCECN,
->  	VIRTIO_NET_F_GUEST_UFO,
->  	VIRTIO_NET_F_GUEST_CSUM,
->  	VIRTIO_NET_F_GUEST_USO4,
-> @@ -87,6 +88,7 @@ static const unsigned long guest_offloads[] = {
->  #define GUEST_OFFLOAD_GRO_HW_MASK ((1ULL << VIRTIO_NET_F_GUEST_TSO4) | \
->  			(1ULL << VIRTIO_NET_F_GUEST_TSO6) | \
->  			(1ULL << VIRTIO_NET_F_GUEST_ECN)  | \
-> +			(1ULL << VIRTIO_NET_F_GUEST_ACCECN) | \
->  			(1ULL << VIRTIO_NET_F_GUEST_UFO)  | \
->  			(1ULL << VIRTIO_NET_F_GUEST_USO4) | \
->  			(1ULL << VIRTIO_NET_F_GUEST_USO6) | \
-> @@ -5976,6 +5978,7 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
->  	    && (virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO4) ||
->  	        virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO6) ||
->  	        virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_ECN) ||
-> +		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_ACCECN) ||
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_UFO) ||
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_CSUM) ||
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_USO4) ||
-> @@ -6635,6 +6638,7 @@ static bool virtnet_check_guest_gso(const struct virtnet_info *vi)
->  	return virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO4) ||
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO6) ||
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_ECN) ||
-> +		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_ACCECN) ||
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_UFO) ||
->  		(virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_USO4) &&
->  		virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_USO6));
-> @@ -6749,6 +6753,8 @@ static int virtnet_probe(struct virtio_device *vdev)
->  			dev->hw_features |= NETIF_F_TSO6;
->  		if (virtio_has_feature(vdev, VIRTIO_NET_F_HOST_ECN))
->  			dev->hw_features |= NETIF_F_TSO_ECN;
-> +		if (virtio_has_feature(vdev, VIRTIO_NET_F_HOST_ACCECN))
-> +			dev->hw_features |= NETIF_F_GSO_ACCECN;
->  		if (virtio_has_feature(vdev, VIRTIO_NET_F_HOST_USO))
->  			dev->hw_features |= NETIF_F_GSO_UDP_L4;
->  
-> @@ -7169,9 +7175,11 @@ static struct virtio_device_id id_table[] = {
->  	VIRTIO_NET_F_CSUM, VIRTIO_NET_F_GUEST_CSUM, \
->  	VIRTIO_NET_F_MAC, \
->  	VIRTIO_NET_F_HOST_TSO4, VIRTIO_NET_F_HOST_UFO, VIRTIO_NET_F_HOST_TSO6, \
-> -	VIRTIO_NET_F_HOST_ECN, VIRTIO_NET_F_GUEST_TSO4, VIRTIO_NET_F_GUEST_TSO6, \
-> -	VIRTIO_NET_F_GUEST_ECN, VIRTIO_NET_F_GUEST_UFO, \
-> -	VIRTIO_NET_F_HOST_USO, VIRTIO_NET_F_GUEST_USO4, VIRTIO_NET_F_GUEST_USO6, \
-> +	VIRTIO_NET_F_HOST_ECN, VIRTIO_NET_F_HOST_ACCECN, \
-> +	VIRTIO_NET_F_GUEST_TSO4, VIRTIO_NET_F_GUEST_TSO6, \
-> +	VIRTIO_NET_F_GUEST_ECN, VIRTIO_NET_F_GUEST_ACCECN, \
-> +	VIRTIO_NET_F_GUEST_UFO, VIRTIO_NET_F_HOST_USO, \
-> +	VIRTIO_NET_F_GUEST_USO4, VIRTIO_NET_F_GUEST_USO6, \
->  	VIRTIO_NET_F_MRG_RXBUF, VIRTIO_NET_F_STATUS, VIRTIO_NET_F_CTRL_VQ, \
->  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
->  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
-> diff --git a/drivers/vdpa/pds/debugfs.c b/drivers/vdpa/pds/debugfs.c
-> index c328e694f6e7..90bd95db0245 100644
-> --- a/drivers/vdpa/pds/debugfs.c
-> +++ b/drivers/vdpa/pds/debugfs.c
-> @@ -78,6 +78,9 @@ static void print_feature_bits_all(struct seq_file *seq, u64 features)
->  		case BIT_ULL(VIRTIO_NET_F_GUEST_ECN):
->  			seq_puts(seq, " VIRTIO_NET_F_GUEST_ECN");
->  			break;
-> +		case BIT_ULL(VIRTIO_NET_F_GUEST_ACCECN):
-> +			seq_puts(seq, " VIRTIO_NET_F_GUEST_ACCECN");
-> +			break;
->  		case BIT_ULL(VIRTIO_NET_F_GUEST_UFO):
->  			seq_puts(seq, " VIRTIO_NET_F_GUEST_UFO");
->  			break;
-> @@ -90,6 +93,9 @@ static void print_feature_bits_all(struct seq_file *seq, u64 features)
->  		case BIT_ULL(VIRTIO_NET_F_HOST_ECN):
->  			seq_puts(seq, " VIRTIO_NET_F_HOST_ECN");
->  			break;
-> +		case BIT_ULL(VIRTIO_NET_F_HOST_ACCECN):
-> +			seq_puts(seq, " VIRTIO_NET_F_HOST_ACCECN");
-> +			break;
->  		case BIT_ULL(VIRTIO_NET_F_HOST_UFO):
->  			seq_puts(seq, " VIRTIO_NET_F_HOST_UFO");
->  			break;
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index 75dabb763c65..0cf86b026828 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -11,7 +11,7 @@
->  
->  static inline bool virtio_net_hdr_match_proto(__be16 protocol, __u8 gso_type)
->  {
-> -	switch (gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
-> +	switch (gso_type & ~VIRTIO_NET_HDR_GSO_ECN_FLAGS) {
->  	case VIRTIO_NET_HDR_GSO_TCPV4:
->  		return protocol == cpu_to_be16(ETH_P_IP);
->  	case VIRTIO_NET_HDR_GSO_TCPV6:
-> @@ -31,7 +31,7 @@ static inline int virtio_net_hdr_set_proto(struct sk_buff *skb,
->  	if (skb->protocol)
->  		return 0;
->  
-> -	switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
-> +	switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN_FLAGS) {
->  	case VIRTIO_NET_HDR_GSO_TCPV4:
->  	case VIRTIO_NET_HDR_GSO_UDP:
->  	case VIRTIO_NET_HDR_GSO_UDP_L4:
-> @@ -58,7 +58,7 @@ static inline int __virtio_net_hdr_to_skb(struct sk_buff *skb,
->  	unsigned int ip_proto;
->  
->  	if (hdr_gso_type != VIRTIO_NET_HDR_GSO_NONE) {
-> -		switch (hdr_gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
-> +		switch (hdr_gso_type & ~VIRTIO_NET_HDR_GSO_ECN_FLAGS) {
->  		case VIRTIO_NET_HDR_GSO_TCPV4:
->  			gso_type = SKB_GSO_TCPV4;
->  			ip_proto = IPPROTO_TCP;
-> @@ -84,7 +84,9 @@ static inline int __virtio_net_hdr_to_skb(struct sk_buff *skb,
->  			return -EINVAL;
->  		}
->  
-> -		if (hdr_gso_type & VIRTIO_NET_HDR_GSO_ECN)
-> +		if (hdr_gso_type & VIRTIO_NET_HDR_GSO_ACCECN)
-> +			gso_type |= SKB_GSO_TCP_ACCECN;
-> +		else if (hdr_gso_type & VIRTIO_NET_HDR_GSO_ECN)
->  			gso_type |= SKB_GSO_TCP_ECN;
->  
->  		if (hdr->gso_size == 0)
-> @@ -159,7 +161,7 @@ static inline int __virtio_net_hdr_to_skb(struct sk_buff *skb,
->  		unsigned int nh_off = p_off;
->  		struct skb_shared_info *shinfo = skb_shinfo(skb);
->  
-> -		switch (gso_type & ~SKB_GSO_TCP_ECN) {
-> +		switch (gso_type & ~(SKB_GSO_TCP_ECN | SKB_GSO_TCP_ACCECN)) {
->  		case SKB_GSO_UDP:
->  			/* UFO may not include transport header in gso_size. */
->  			nh_off -= thlen;
-> @@ -231,7 +233,9 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
->  			hdr->gso_type = VIRTIO_NET_HDR_GSO_UDP_L4;
->  		else
->  			return -EINVAL;
-> -		if (sinfo->gso_type & SKB_GSO_TCP_ECN)
-> +		if (sinfo->gso_type & SKB_GSO_TCP_ACCECN)
-> +			hdr->gso_type |= VIRTIO_NET_HDR_GSO_ACCECN;
-> +		else if (sinfo->gso_type & SKB_GSO_TCP_ECN)
->  			hdr->gso_type |= VIRTIO_NET_HDR_GSO_ECN;
->  	} else
->  		hdr->gso_type = VIRTIO_NET_HDR_GSO_NONE;
-> @@ -282,7 +286,7 @@ virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
->  		return -EINVAL;
->  
->  	/* The UDP tunnel must carry a GSO packet, but no UFO. */
-> -	gso_inner_type = hdr->gso_type & ~(VIRTIO_NET_HDR_GSO_ECN |
-> +	gso_inner_type = hdr->gso_type & ~(VIRTIO_NET_HDR_GSO_ECN_FLAGS |
->  					   VIRTIO_NET_HDR_GSO_UDP_TUNNEL);
->  	if (!gso_inner_type || gso_inner_type == VIRTIO_NET_HDR_GSO_UDP)
->  		return -EINVAL;
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index 1db45b01532b..af5bfe45aa1f 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -56,6 +56,8 @@
->  #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
->  					 * Steering */
->  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> +#define VIRTIO_NET_F_HOST_ACCECN 25	/* Host can handle GSO of AccECN */
-> +#define VIRTIO_NET_F_GUEST_ACCECN 26	/* Guest can handle GSO of AccECN */
->  #define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
->  #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
->  #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
-> @@ -165,6 +167,9 @@ struct virtio_net_hdr_v1 {
->  #define VIRTIO_NET_HDR_GSO_UDP_TUNNEL (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 | \
->  				       VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6)
->  #define VIRTIO_NET_HDR_GSO_ECN		0x80	/* TCP has ECN set */
-> +#define VIRTIO_NET_HDR_GSO_ACCECN	0x10	/* TCP AccECN segmentation */
-> +#define VIRTIO_NET_HDR_GSO_ECN_FLAGS	(VIRTIO_NET_HDR_GSO_ECN | \
-> +					 VIRTIO_NET_HDR_GSO_ACCECN)
->  	__u8 gso_type;
->  	__virtio16 hdr_len;	/* Ethernet + IP + tcp/udp hdrs */
->  	__virtio16 gso_size;	/* Bytes to append to hdr_len per frame */
-
-
-UAPI changes need to be added to the virtio spec.
-Pls get this approved by the virtio TC.
-Thanks!
-
-
-> -- 
-> 2.34.1
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
