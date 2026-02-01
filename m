@@ -1,189 +1,177 @@
-Return-Path: <netdev+bounces-255576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sOnTBcbLfmneeQIAu9opvQ
-	(envelope-from <netdev+bounces-255576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:43:02 +0100
+	id uDOkKcvbfmkgfwIAu9opvQ
+	(envelope-from <netdev+bounces-255577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 05:51:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98609C4DDE
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:43:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC4FC4EFF
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 05:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6BD63017BFB
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 03:42:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0447300FEE3
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 04:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FA1280A51;
-	Sun,  1 Feb 2026 03:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4319E2D6E58;
+	Sun,  1 Feb 2026 04:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b="SSzaRxEU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2C8214A97;
-	Sun,  1 Feb 2026 03:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769917346; cv=none; b=eImPpqSDW2QMUAaglYv1Za9eO7v3cTW5b0DNVJjEBNnB/lxcUB1upi5bwNiNLSDEpnPNyczPD2PEqX9Bdsy5BuhM6ckyWvHvGO2JQMsRwe7c+cJJhdSRT2kRL98di2c2FtChoJBqrtMt6QjGiThVXuj+bGXBpJiaqBL53Aq6Q1A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769917346; c=relaxed/simple;
-	bh=y5+QMwEDBy51k3wsErYHXEtqjXeGgkIxQaoB/RxTjzo=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vbn5ZDQ9ZWJ2Q1YvnEJF0lFmG4tICsTYgnGacMkhSlv/jhkY9audIEp6J0MrxVNqrZz3A+FE1RAhsWlJFGekRwYPauCCOhGoZrZ3K4r/2doIUCObls0XlhdneoseVyhepJsAV8wX0MN3XshMFw1/q9hm6tGB1pVs1Ua/jhBzYj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vmOLt-000000002XJ-2EXk;
-	Sun, 01 Feb 2026 03:42:21 +0000
-Date: Sun, 1 Feb 2026 03:42:18 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2957748F;
+	Sun,  1 Feb 2026 04:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769921079; cv=pass; b=K8P28nQYCtASxYW/RoP93ERwYk4i4sbGdnEReVY/oqICgzaQmVXRqQRtP42Q4G67w+2JQLl8i3rzzc7h1MRkwnEVdb81ih3Wx2vIL4gmUQuXtukf3ZQuAp7qfMnOggKeraGt/wUPGJVNpPkDy0iwM6z1c8jbNzubEsLdbJDz3/E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769921079; c=relaxed/simple;
+	bh=cMOwmr47IFzgPtRwSpvF15YpswFde47IVbxdIUPq4z8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k9sKwMjJcbUn/higIdHjV5e9S6IruXmPZ8XuVz4eonmXGhU2Hre8XwA7ad5VJ9BIAngiPQSSppka5QHlQlf6BFG8FK6ogkql7ilwgb+ojlURe7NoBGG+b7mwBkixxNNGIcQTSeR9VAglZ6tINniPfqaK4TfkcWgnGaqxTv4fx+Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b=SSzaRxEU; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
+ARC-Seal: i=1; a=rsa-sha256; t=1769921036; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=h1dtd9gdsIywSjU2hq1rbCIgojDhVIZwk4+zdhO80bnRfgH7yY7Si0LZ8AXS6I0msRMgOiytWfwta9+7U0MDUJSmZ121YVgXtWKDEgZk8xoeIQvr2Hficb+8JUIqgdYpxOKfL0zdq4wat/AJ/zHljp17O8QlIc+nhC3tyzNcYDI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1769921036; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=jN3A5mwNdsi4fNTvnSJvZchnh0nKK5f4E1gczxpNa3I=; 
+	b=lyO1+EF+ZqnMLk6mt2qxq0OKbHManaxrJ7/cNQSLB24Qe1w0Nk/j6SrCAUXgYzdS7eVsdahst2oNj3GNe40eHDEch6kh6hiqkxUP8fEozGdTKQ+J3vJNJeC0MXFyUASVq8rg2ueiw+hy+LMQqj5oSeA+YFA5xexk3X33Zx/Qo7M=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=ziyao.cc;
+	spf=pass  smtp.mailfrom=me@ziyao.cc;
+	dmarc=pass header.from=<me@ziyao.cc>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1769921036;
+	s=zmail; d=ziyao.cc; i=me@ziyao.cc;
+	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:Message-Id:Reply-To;
+	bh=jN3A5mwNdsi4fNTvnSJvZchnh0nKK5f4E1gczxpNa3I=;
+	b=SSzaRxEUvcYgnS6zLR63wLwlIAImto2Wcv/C0LhhZXOqkLwgILYrT7Z4/2mAA7wg
+	4t+HgqimafucOYal3YlyzN+hO6ABtp4MDL8pGxGsmFQPvnVCYmrNkZYLaV+p6Uto/m+
+	r2U8uV1mwuLek8MBCq1vO4/IGCdpqC+KyN3BIdj0=
+Received: by mx.zohomail.com with SMTPS id 1769921032597677.9981604122934;
+	Sat, 31 Jan 2026 20:43:52 -0800 (PST)
+Date: Sun, 1 Feb 2026 04:43:37 +0000
+From: Yao Zi <me@ziyao.cc>
+To: Huacai Chen <chenhuacai@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 3/3] net: dsa: mxl-gsw1xx: validate chip ID
-Message-ID: <3194d3d3bb0b51f08755d392e1fdf7bb6dc49608.1769916962.git.daniel@makrotopia.org>
-References: <cover.1769916962.git.daniel@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Yanteng Si <si.yanteng@linux.dev>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Serge Semin <fancer.lancer@gmail.com>, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net-next] net: stmmac: Correct spelling from clk_scr_i to
+ clk_csr_i
+Message-ID: <aX7Z-ZjXvhNa3Wsp@pie>
+References: <20260201023619.366505-1-chenhuacai@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1769916962.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260201023619.366505-1-chenhuacai@loongson.cn>
+X-ZohoMailClient: External
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [9.34 / 15.00];
+	URIBL_BLACK(7.50)[ziyao.cc:dkim];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255576-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[makrotopia.org];
-	FREEMAIL_TO(0.00)[hauke-m.de,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	R_DKIM_ALLOW(0.00)[ziyao.cc:s=zmail];
+	GREYLIST(0.00)[pass,body];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255577-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[ziyao.cc,quarantine];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[me@ziyao.cc,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,foss.st.com,synopsys.com,gmail.com,lists.linux.dev,vger.kernel.org];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[ziyao.cc:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 98609C4DDE
-X-Rspamd-Action: no action
+	NEURAL_SPAM(0.00)[0.436];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ziyao.cc:dkim,loongson.cn:email]
+X-Rspamd-Queue-Id: 0BC4FC4EFF
+X-Rspamd-Action: add header
+X-Spam: Yes
 
-No check for actually present hardware is being performed in the probe
-function of the mxl-gsw1xx switch driver. So even if the switch isn't
-present at the configured MDIO bus address the driver wrongly tells the
-user that a "GSWIP version 0 mod 0" was found, outputting errors about
-PHY capabilities not matching.
+On Sun, Feb 01, 2026 at 10:36:19AM +0800, Huacai Chen wrote:
+> In include/linux/stmmac.h clk_csr_i is spelled as clk_scr_i by mistake,
+> so correct it.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> ---
+>  include/linux/stmmac.h | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index f1054b9c2d8a..1ba583ef6e03 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -28,14 +28,14 @@
+>   * This could also be configured at run time using CPU freq framework. */
+>  
+>  /* MDC Clock Selection define*/
+> -#define	STMMAC_CSR_60_100M	0x0	/* MDC = clk_scr_i/42 */
+> -#define	STMMAC_CSR_100_150M	0x1	/* MDC = clk_scr_i/62 */
+> -#define	STMMAC_CSR_20_35M	0x2	/* MDC = clk_scr_i/16 */
+> -#define	STMMAC_CSR_35_60M	0x3	/* MDC = clk_scr_i/26 */
+> -#define	STMMAC_CSR_150_250M	0x4	/* MDC = clk_scr_i/102 */
+> -#define	STMMAC_CSR_250_300M	0x5	/* MDC = clk_scr_i/124 */
+> -#define	STMMAC_CSR_300_500M	0x6	/* MDC = clk_scr_i/204 */
+> -#define	STMMAC_CSR_500_800M	0x7	/* MDC = clk_scr_i/324 */
+> +#define	STMMAC_CSR_60_100M	0x0	/* MDC = clk_csr_i/42 */
+> +#define	STMMAC_CSR_100_150M	0x1	/* MDC = clk_csr_i/62 */
+> +#define	STMMAC_CSR_20_35M	0x2	/* MDC = clk_csr_i/16 */
+> +#define	STMMAC_CSR_35_60M	0x3	/* MDC = clk_csr_i/26 */
+> +#define	STMMAC_CSR_150_250M	0x4	/* MDC = clk_csr_i/102 */
+> +#define	STMMAC_CSR_250_300M	0x5	/* MDC = clk_csr_i/124 */
+> +#define	STMMAC_CSR_300_500M	0x6	/* MDC = clk_csr_i/204 */
+> +#define	STMMAC_CSR_500_800M	0x7	/* MDC = clk_csr_i/324 */
 
-Read and validate the chip MANU_ID and PNUM_ID registers and output
-information while probing, but return an error and abort probing in case
-the hardware is not actually present.
+This seems only a fix to typo in comments, instead of real functionality
+bugs, should this be backported?
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v3: no changes
-v2: no changes
+> It must either fix a real bug that bothers people or just add a device
+> ID. To elaborate on the former:
+> ...
+> - No “trivial” fixes without benefit for users (spelling changes,
+>   whitespace cleanups, etc).[1]
 
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 27 ++++++++++++++++++++++++++-
- drivers/net/dsa/lantiq/mxl-gsw1xx.h |  9 +++++++++
- 2 files changed, 35 insertions(+), 1 deletion(-)
+>  /* MTL algorithms identifiers */
+>  #define MTL_TX_ALGORITHM_WRR	0x0
+> -- 
+> 2.47.3
+> 
+> 
 
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index 61220b5fe5af..a1104b2f92a9 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -688,7 +688,9 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- {
- 	struct device *dev = &mdiodev->dev;
- 	struct gsw1xx_priv *priv;
--	u32 version;
-+	u32 version, val;
-+	u8 shellver;
-+	u16 pnum;
- 	int ret;
- 
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-@@ -736,6 +738,27 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (IS_ERR(priv->shell))
- 		return PTR_ERR(priv->shell);
- 
-+	ret = regmap_read(priv->shell, GSW1XX_SHELL_MANU_ID, &val);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* validate chip ID */
-+	if (FIELD_GET(GSW1XX_SHELL_MANU_ID_FIX1, val) != 1)
-+		return -ENODEV;
-+
-+	if (FIELD_GET(GSW1XX_SHELL_MANU_ID_MANID, val) !=
-+	    GSW1XX_SHELL_MANU_ID_MANID_VAL)
-+		return -ENODEV;
-+
-+	pnum = FIELD_GET(GSW1XX_SHELL_MANU_ID_PNUML, val);
-+
-+	ret = regmap_read(priv->shell, GSW1XX_SHELL_PNUM_ID, &val);
-+	if (ret < 0)
-+		return ret;
-+
-+	pnum |= FIELD_GET(GSW1XX_SHELL_PNUM_ID_PNUMM, val) << 4;
-+	shellver = FIELD_GET(GSW1XX_SHELL_PNUM_ID_VER, val);
-+
- 	ret = gsw1xx_serdes_pcs_init(priv);
- 	if (ret < 0)
- 		return ret;
-@@ -756,6 +779,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (ret)
- 		return ret;
- 
-+	dev_info(dev, "standalone switch part number 0x%x v1.%u\n", pnum, shellver);
-+
- 	dev_set_drvdata(dev, &priv->gswip);
- 
- 	return 0;
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-index d1fded56e967..caa8f1008587 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-@@ -110,6 +110,15 @@
- #define GSW1XX_SHELL_BASE			0xfa00
- #define  GSW1XX_SHELL_RST_REQ			0x01
- #define   GSW1XX_RST_REQ_SGMII_SHELL		BIT(5)
-+#define  GSW1XX_SHELL_MANU_ID			0x10
-+#define   GSW1XX_SHELL_MANU_ID_PNUML		GENMASK(15, 12)
-+#define   GSW1XX_SHELL_MANU_ID_MANID		GENMASK(11, 1)
-+#define    GSW1XX_SHELL_MANU_ID_MANID_VAL	0x389
-+#define   GSW1XX_SHELL_MANU_ID_FIX1		BIT(0)
-+#define  GSW1XX_SHELL_PNUM_ID			0x11
-+#define   GSW1XX_SHELL_PNUM_ID_VER		GENMASK(15, 12)
-+#define   GSW1XX_SHELL_PNUM_ID_PNUMM		GENMASK(11, 0)
-+
- /* RGMII PAD Slew Control Register */
- #define  GSW1XX_SHELL_RGMII_SLEW_CFG		0x78
- #define   RGMII_SLEW_CFG_DRV_TXC		BIT(2)
--- 
-2.52.0
+Regards,
+Yao Zi
+
+[1]: https://docs.kernel.org/6.15/process/stable-kernel-rules.html
 
