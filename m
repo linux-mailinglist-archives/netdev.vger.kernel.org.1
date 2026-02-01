@@ -1,147 +1,124 @@
-Return-Path: <netdev+bounces-255572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255573-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gLJ/NGK8fmnDdQIAu9opvQ
-	(envelope-from <netdev+bounces-255572-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 03:37:22 +0100
+	id bzDPCX7LfmneeQIAu9opvQ
+	(envelope-from <netdev+bounces-255573-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:41:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489CAC4B0C
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 03:37:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D0CC4D9A
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:41:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D06573015480
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 02:37:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 167CE300C59F
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 03:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F1D26D4EF;
-	Sun,  1 Feb 2026 02:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDFE279DAD;
+	Sun,  1 Feb 2026 03:41:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F67526C3AE;
-	Sun,  1 Feb 2026 02:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8671EDA2C;
+	Sun,  1 Feb 2026 03:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769913440; cv=none; b=tt1X5OSU/lx+2Wbi86BGsvNijRRPrX4dUbQuLD5phBIqH3YxeDxrdO0RGd1tJST+PXWIcN6W17JBIr0HkwG9DG3MX89tINx3rlpaxRZjKi3UhAlhtkuhM90NcEJQmTiiB+XKIOjbRAbnKU25q09hgwWh4JGVqrdQV5z9NRIiEW0=
+	t=1769917307; cv=none; b=ngw3W+yAaj99/yF4rKUEIStMINPxTHj5hlA+mtcHg3MTd8fUikN650x7rLEZ3HziAjNUVN79x9Z0SnaLif9L0Sm9Ml5devUStOMb0QOI4sUnXO+8PhqR8WZfGvi8U1V26BMvDV5n6fA8i9DOodspysHpoPzJ5/W7DUE3v4OmxLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769913440; c=relaxed/simple;
-	bh=dfwtDsNZTVl508HHg0yruQEJKMr8pmWepXHXdV2sVEU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DIIqaQRursdQnt98TGmdILqK33dKV/1kdG32OP7e0CJlvoU6pJg3M4M/mD+2IINuqmSnNbjEVhSFyFMzKg38YC2DdmiWy/ERbGxEj185RRyCr0WYaOlvfogW5t7l+C+ukdJo7xWCd1sZMpsAwCfzwvHvxQjuBV9Zm0chIKlLAf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.69.42])
-	by gateway (Coremail) with SMTP id _____8DxPMNcvH5p+6kOAA--.47756S3;
-	Sun, 01 Feb 2026 10:37:16 +0800 (CST)
-Received: from localhost.localdomain (unknown [223.64.69.42])
-	by front1 (Coremail) with SMTP id qMiowJCxecFVvH5pCI48AA--.22277S2;
-	Sun, 01 Feb 2026 10:37:13 +0800 (CST)
-From: Huacai Chen <chenhuacai@loongson.cn>
-To: Huacai Chen <chenhuacai@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1769917307; c=relaxed/simple;
+	bh=bnnJAHumSHO4V2SDDaOm9PehTi5dNf6iI3BecXzzN2c=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZvJ1YZExfe40n4gHD8T3Tsi/X8E/ZdHlRQgMmziQ/3uYApj5M1PQesSQfuTna3dW4Bt6HHGvm0J6RJh9QBJlLYLCgwAx5HTA9JfUOria7Yr4+j4hGHF1Pm1IfsXfUebAJcf4cPP6l8jfiT7Zy/5U8+a9b5HT4Ig5lc9Obv14zkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vmOLB-000000002WN-4BU9;
+	Sun, 01 Feb 2026 03:41:38 +0000
+Date: Sun, 1 Feb 2026 03:41:34 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Yanteng Si <si.yanteng@linux.dev>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	loongarch@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Huacai Chen <chenhuacai@loongson.cn>,
-	stable@vger.kernel.org,
-	Hongliang Wang <wanghongliang@loongson.cn>
-Subject: [PATCH net-next] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
-Date: Sun,  1 Feb 2026 10:37:00 +0800
-Message-ID: <20260201023700.366531-1-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.47.3
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/3] net: dsa: mxl-gsw1xx: setup polarities and
+ validate chip
+Message-ID: <cover.1769916962.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCxecFVvH5pCI48AA--.22277S2
-X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7CrWDtF13CrWrKFW7ArW3twc_yoW8Gr1fpr
-	Z7Aa47W3yayr17K3Z5Xw1UZFy5ua90gFZ7WFsrJws3WFs2y34jqry5tFZ8uFW7uFWrCF1a
-	vF1qkr43CF1DCwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
-	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0L0ePUUUUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-255573-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255572-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[loongson.cn];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[hauke-m.de,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[linux.dev,foss.st.com,synopsys.com,gmail.com,lists.linux.dev,vger.kernel.org,loongson.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	FROM_NEQ_ENVFROM(0.00)[chenhuacai@loongson.cn,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,loongson.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 489CAC4B0C
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 70D0CC4D9A
 X-Rspamd-Action: no action
 
-Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
-and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
-Loongson STMMAC use 125MHz clocks and need 62 freq division to within
-2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
-to 100-150MHz.
+Now that common PHY properties make it easy to configure the SerDes RX
+and TX polarities, use that for the SGMII/1000Base-X/2500Base-X port of
+the MaxLinear GSW1xx switches.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
-Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+Also, validate hardware in probe() function to make sure the switch is
+actually present and MDIO communication works properly.
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes since v2:
+ * be more clear about describing polarity at port, ie. external pin level
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 107a7c84ace8..c05e3e7a539c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -91,8 +91,8 @@ static void loongson_default_data(struct pci_dev *pdev,
- 	/* Get bus_id, this can be overwritten later */
- 	plat->bus_id = pci_dev_id(pdev);
- 
--	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
--	plat->clk_csr = STMMAC_CSR_20_35M;
-+	/* clk_csr_i = 100-150MHz & MDC = clk_csr_i/62 */
-+	plat->clk_csr = STMMAC_CSR_100_150M;
- 	plat->core_type = DWMAC_CORE_GMAC;
- 	plat->force_sf_dma_mode = 1;
- 
+Changes since initial submission:
+ * use allOf to include phy-common-props in dt-schema
+ * use phy_get_manual_rx_polarity and phy_get_manual_tx_polarity helpers
+   instead of open-coding them
+
+
+Daniel Golle (3):
+  dt-bindings: net: dsa: lantiq,gswip: reference common PHY properties
+  net: dsa: mxl-gsw1xx: configure SerDes port polarities
+  net: dsa: mxl-gsw1xx: validate chip ID
+
+ .../bindings/net/dsa/lantiq,gswip.yaml        |  4 ++
+ drivers/net/dsa/lantiq/Kconfig                |  1 +
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c           | 66 +++++++++++++++----
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h           |  9 +++
+ 4 files changed, 68 insertions(+), 12 deletions(-)
+
 -- 
-2.47.3
-
+2.52.0
 
