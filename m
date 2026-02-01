@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-255575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJpBManLfmneeQIAu9opvQ
-	(envelope-from <netdev+bounces-255575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:42:33 +0100
+	id sOnTBcbLfmneeQIAu9opvQ
+	(envelope-from <netdev+bounces-255576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:43:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9CFC4DC7
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:42:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98609C4DDE
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 04:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2703730157DB
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 03:42:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C6BD63017BFB
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 03:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8834427FB3A;
-	Sun,  1 Feb 2026 03:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FA1280A51;
+	Sun,  1 Feb 2026 03:42:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A1123A9A8;
-	Sun,  1 Feb 2026 03:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2C8214A97;
+	Sun,  1 Feb 2026 03:42:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769917328; cv=none; b=jGZk9XgV2YDuQ7rHvlosKR6nvIy3TSRbJES0SvKT+DLTFPa1az3aJHIjLbpw9yu+2TXzdk0B3EdkNpIMLNwy2xMscfZR5PYkHZKU375cwZYzcNySXrfYxM1eAqA53luOiLq86CUvCC5u1rYYUdeI/gslXL2wRZztwPibpqxESJw=
+	t=1769917346; cv=none; b=eImPpqSDW2QMUAaglYv1Za9eO7v3cTW5b0DNVJjEBNnB/lxcUB1upi5bwNiNLSDEpnPNyczPD2PEqX9Bdsy5BuhM6ckyWvHvGO2JQMsRwe7c+cJJhdSRT2kRL98di2c2FtChoJBqrtMt6QjGiThVXuj+bGXBpJiaqBL53Aq6Q1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769917328; c=relaxed/simple;
-	bh=q1yqherTZ1VwTP5irNF4KDqWVxAHd1f324KoOIjrlh8=;
+	s=arc-20240116; t=1769917346; c=relaxed/simple;
+	bh=y5+QMwEDBy51k3wsErYHXEtqjXeGgkIxQaoB/RxTjzo=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZRsiiIqCgyxpg43jDvhv7s9IMSdmHOw617JhroyoS8D2sw2LdRg9i5d7gWAxShnB1PF1D55fiCdCpHAnVHnSN/MSzU/A5Q50DsxZudmQs3tBdtumw0O5iKdNH9p7sbaMtmX+M6WQA+QAbzGj9lm6g/9LxjQyNf7PSsRXL9tnxA=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vbn5ZDQ9ZWJ2Q1YvnEJF0lFmG4tICsTYgnGacMkhSlv/jhkY9audIEp6J0MrxVNqrZz3A+FE1RAhsWlJFGekRwYPauCCOhGoZrZ3K4r/2doIUCObls0XlhdneoseVyhepJsAV8wX0MN3XshMFw1/q9hm6tGB1pVs1Ua/jhBzYj4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -36,9 +36,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vmOLb-000000002Wu-1HSD;
-	Sun, 01 Feb 2026 03:42:03 +0000
-Date: Sun, 1 Feb 2026 03:42:00 +0000
+	id 1vmOLt-000000002XJ-2EXk;
+	Sun, 01 Feb 2026 03:42:21 +0000
+Date: Sun, 1 Feb 2026 03:42:18 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -49,9 +49,8 @@ To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 2/3] net: dsa: mxl-gsw1xx: configure SerDes port
- polarities
-Message-ID: <8bf79b3476e23673fceffbe2bc9d6abc13d132e5.1769916962.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v3 3/3] net: dsa: mxl-gsw1xx: validate chip ID
+Message-ID: <3194d3d3bb0b51f08755d392e1fdf7bb6dc49608.1769916962.git.daniel@makrotopia.org>
 References: <cover.1769916962.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,7 +70,7 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255575-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255576-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[makrotopia.org];
 	FREEMAIL_TO(0.00)[hauke-m.de,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
@@ -91,133 +90,100 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6E9CFC4DC7
+X-Rspamd-Queue-Id: 98609C4DDE
 X-Rspamd-Action: no action
 
-Configure SerDes (port 4) RX and TX polarities using the newly
-introduced generic properties. The polarities are described at the port
-level which equals the polarities of the external pins of the chip.
+No check for actually present hardware is being performed in the probe
+function of the mxl-gsw1xx switch driver. So even if the switch isn't
+present at the configured MDIO bus address the driver wrongly tells the
+user that a "GSWIP version 0 mod 0" was found, outputting errors about
+PHY capabilities not matching.
 
-Note that the RX lane is inverted internally and the vendor driver
-simply always sets bit GSW1XX_SGMII_PHY_RX0_CFG2_INVERT unconditionally
-to end up with the correct (ie. as documented in datasheets) polarity at
-the external pins.
-
-In this sense, PHY_POLARITY_NORMAL denotes normal polarity for pins as
-documented for the MRQFN 105-pin package (GSW120, GSW125, GSW140, GSW141
-and GSW145 all use the same package and have identical pin layouts
-except for TP port 2 and 3 being N/C on GSW12x):
-pin B18 (TX0_P) positive signal of the differential SGMII data output pair
-pin B19 (TX0_M) negative signal of the differential SGMII data output pair
-pin B20 (RX0_P) positive signal of the differential SGMII data input pair
-pin B21 (RX0_M) negative signal of the differential SGMII data input pair
+Read and validate the chip MANU_ID and PNUM_ID registers and output
+information while probing, but return an error and abort probing in case
+the hardware is not actually present.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v3: be clear about describing polarity at external pins
-v2: use phy_get_manual_rx_polarity and phy_get_manual_tx_polarity
----
- drivers/net/dsa/lantiq/Kconfig      |  1 +
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 39 +++++++++++++++++++++--------
- 2 files changed, 29 insertions(+), 11 deletions(-)
+v3: no changes
+v2: no changes
 
-diff --git a/drivers/net/dsa/lantiq/Kconfig b/drivers/net/dsa/lantiq/Kconfig
-index bad13817af25..98efeef2661b 100644
---- a/drivers/net/dsa/lantiq/Kconfig
-+++ b/drivers/net/dsa/lantiq/Kconfig
-@@ -15,6 +15,7 @@ config NET_DSA_MXL_GSW1XX
- 	tristate "MaxLinear GSW1xx Ethernet switch support"
- 	select NET_DSA_TAG_MXL_GSW1XX
- 	select NET_DSA_LANTIQ_COMMON
-+	select PHY_COMMON_PROPS
- 	help
- 	  This enables support for the Intel/MaxLinear GSW1xx family of 1GE
- 	  switches.
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c | 27 ++++++++++++++++++++++++++-
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h |  9 +++++++++
+ 2 files changed, 35 insertions(+), 1 deletion(-)
+
 diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index 79cf72cc77be..61220b5fe5af 100644
+index 61220b5fe5af..a1104b2f92a9 100644
 --- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
 +++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -15,6 +15,8 @@
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/of_mdio.h>
-+#include <linux/phy/phy-common-props.h>
-+#include <linux/property.h>
- #include <linux/regmap.h>
- #include <linux/workqueue.h>
- #include <net/dsa.h>
-@@ -229,11 +231,17 @@ static int gsw1xx_pcs_phy_xaui_write(struct gsw1xx_priv *priv, u16 addr,
- 					1000, 100000);
- }
- 
--static int gsw1xx_pcs_reset(struct gsw1xx_priv *priv)
-+static int gsw1xx_pcs_reset(struct gsw1xx_priv *priv, phy_interface_t interface)
+@@ -688,7 +688,9 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
  {
-+	struct dsa_port *sgmii_port;
-+	unsigned int pol;
+ 	struct device *dev = &mdiodev->dev;
+ 	struct gsw1xx_priv *priv;
+-	u32 version;
++	u32 version, val;
++	u8 shellver;
++	u16 pnum;
  	int ret;
- 	u16 val;
  
-+	sgmii_port = dsa_to_port(priv->gswip.ds, GSW1XX_SGMII_PORT);
-+	if (!sgmii_port)
-+		return -EINVAL;
-+
- 	/* Assert and deassert SGMII shell reset */
- 	ret = regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
- 			      GSW1XX_RST_REQ_SGMII_SHELL);
-@@ -260,15 +268,20 @@ static int gsw1xx_pcs_reset(struct gsw1xx_priv *priv)
- 	      FIELD_PREP(GSW1XX_SGMII_PHY_RX0_CFG2_FILT_CNT,
- 			 GSW1XX_SGMII_PHY_RX0_CFG2_FILT_CNT_DEF);
+ 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+@@ -736,6 +738,27 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
+ 	if (IS_ERR(priv->shell))
+ 		return PTR_ERR(priv->shell);
  
-+	ret = phy_get_manual_rx_polarity(of_fwnode_handle(sgmii_port->dn),
-+					 phy_modes(interface), &pol);
-+	if (ret)
++	ret = regmap_read(priv->shell, GSW1XX_SHELL_MANU_ID, &val);
++	if (ret < 0)
 +		return ret;
 +
- 	/* RX lane seems to be inverted internally, so bit
- 	 * GSW1XX_SGMII_PHY_RX0_CFG2_INVERT needs to be set for normal
--	 * (ie. non-inverted) operation.
--	 *
--	 * TODO: Take care of inverted RX pair once generic property is
--	 *       available
-+	 * (ie. non-inverted) operation matching the chips external pins as
-+	 * described in datasheets dated 2023-11-08, ie. pin B20 (RX0_P) being
-+	 * the positive signal and pin B21 (RX0_M) being the negative signal of
-+	 * the differential input pair.
- 	 */
--
--	val |= GSW1XX_SGMII_PHY_RX0_CFG2_INVERT;
-+	if (pol == PHY_POL_NORMAL)
-+		val |= GSW1XX_SGMII_PHY_RX0_CFG2_INVERT;
- 
- 	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_RX0_CFG2, val);
- 	if (ret < 0)
-@@ -277,9 +290,13 @@ static int gsw1xx_pcs_reset(struct gsw1xx_priv *priv)
- 	val = FIELD_PREP(GSW1XX_SGMII_PHY_TX0_CFG3_VBOOST_LEVEL,
- 			 GSW1XX_SGMII_PHY_TX0_CFG3_VBOOST_LEVEL_DEF);
- 
--	/* TODO: Take care of inverted TX pair once generic property is
--	 *       available
--	 */
-+	ret = phy_get_manual_tx_polarity(of_fwnode_handle(sgmii_port->dn),
-+					 phy_modes(interface), &pol);
-+	if (ret)
++	/* validate chip ID */
++	if (FIELD_GET(GSW1XX_SHELL_MANU_ID_FIX1, val) != 1)
++		return -ENODEV;
++
++	if (FIELD_GET(GSW1XX_SHELL_MANU_ID_MANID, val) !=
++	    GSW1XX_SHELL_MANU_ID_MANID_VAL)
++		return -ENODEV;
++
++	pnum = FIELD_GET(GSW1XX_SHELL_MANU_ID_PNUML, val);
++
++	ret = regmap_read(priv->shell, GSW1XX_SHELL_PNUM_ID, &val);
++	if (ret < 0)
 +		return ret;
 +
-+	if (pol == PHY_POL_INVERT)
-+		val |= GSW1XX_SGMII_PHY_TX0_CFG3_INVERT;
- 
- 	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_TX0_CFG3, val);
++	pnum |= FIELD_GET(GSW1XX_SHELL_PNUM_ID_PNUMM, val) << 4;
++	shellver = FIELD_GET(GSW1XX_SHELL_PNUM_ID_VER, val);
++
+ 	ret = gsw1xx_serdes_pcs_init(priv);
  	if (ret < 0)
-@@ -336,7 +353,7 @@ static int gsw1xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	priv->tbi_interface = PHY_INTERFACE_MODE_NA;
- 
- 	if (!reconf)
--		ret = gsw1xx_pcs_reset(priv);
-+		ret = gsw1xx_pcs_reset(priv, interface);
- 
+ 		return ret;
+@@ -756,6 +779,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
  	if (ret)
  		return ret;
+ 
++	dev_info(dev, "standalone switch part number 0x%x v1.%u\n", pnum, shellver);
++
+ 	dev_set_drvdata(dev, &priv->gswip);
+ 
+ 	return 0;
+diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
+index d1fded56e967..caa8f1008587 100644
+--- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
++++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
+@@ -110,6 +110,15 @@
+ #define GSW1XX_SHELL_BASE			0xfa00
+ #define  GSW1XX_SHELL_RST_REQ			0x01
+ #define   GSW1XX_RST_REQ_SGMII_SHELL		BIT(5)
++#define  GSW1XX_SHELL_MANU_ID			0x10
++#define   GSW1XX_SHELL_MANU_ID_PNUML		GENMASK(15, 12)
++#define   GSW1XX_SHELL_MANU_ID_MANID		GENMASK(11, 1)
++#define    GSW1XX_SHELL_MANU_ID_MANID_VAL	0x389
++#define   GSW1XX_SHELL_MANU_ID_FIX1		BIT(0)
++#define  GSW1XX_SHELL_PNUM_ID			0x11
++#define   GSW1XX_SHELL_PNUM_ID_VER		GENMASK(15, 12)
++#define   GSW1XX_SHELL_PNUM_ID_PNUMM		GENMASK(11, 0)
++
+ /* RGMII PAD Slew Control Register */
+ #define  GSW1XX_SHELL_RGMII_SLEW_CFG		0x78
+ #define   RGMII_SLEW_CFG_DRV_TXC		BIT(2)
 -- 
 2.52.0
 
