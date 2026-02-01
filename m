@@ -1,226 +1,255 @@
-Return-Path: <netdev+bounces-255679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPK0HSPPf2mqxwIAu9opvQ
-	(envelope-from <netdev+bounces-255679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 23:09:39 +0100
+	id +YGqDWfRf2kWyAIAu9opvQ
+	(envelope-from <netdev+bounces-255680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 23:19:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B95C7581
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 23:09:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE2CC75B1
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 23:19:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A5D73005794
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 22:09:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5C612300538F
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 22:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F36E2E975E;
-	Sun,  1 Feb 2026 22:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC36B2EAB72;
+	Sun,  1 Feb 2026 22:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="due/wvn7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6NYKWqs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6A31DF751
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 22:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559C12E7BD6
+	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 22:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769983774; cv=none; b=ivgE/hqfuNJrDABhwAuWSKoqf7zNphuOpVypZg8W32CuSrjC7Uzjlj5ZNIsq6x2L0SznJGRT1+Ix1WzFgICB6YXWb04w73VYF5ciyE6T7KtCoZflWnkZzru4lKURq9fpa5h5hbab164Y4B/bsWXzSmFH1aMfufrYBRiaD6zMZvo=
+	t=1769984354; cv=none; b=g5qPmH5GznE5rMSBicy1MCjV0mypLkrUoScI/hL+hZLMAZXNt6D8x5fxW6abywN0XL3lnnMIK3TNiGnfe1I3mludGFOOKBmrevrKctbFxzWaTaaKHna+PANy1JANZbms5mTZU9vM114OegQau7aklxgX/hUyWeP3FCntxXAdOWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769983774; c=relaxed/simple;
-	bh=JM15UKXeJzdijzrGgJ2NdmQsbx2yOp3QX/8hr3ooJnc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BOhiKCm2UA8M9l+ZJ6l391RPb+JX7XEqeRk8Ed6Qlyf+MV3jCs0l3QpNEtNPeOl19IHJrB/dbXxXG3LzepZZ82c4/kY6x+nGOL58TQ0B5HK/s+hkq2QC6QOqjnH/N31rscQ4sAraigHFJXg4axRL4dsAwu3hkksf1BexCYFt/Pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=due/wvn7; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-350fe1f8ea3so1772397a91.2
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 14:09:32 -0800 (PST)
+	s=arc-20240116; t=1769984354; c=relaxed/simple;
+	bh=FW2IFjug0wipIm+wvKJOEqF0GHSnAGPr4QuVJ8hWyfI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=diJxXJaZ10KgWb4Y1erYnNDby2Oc4l36FWHKRhw5SizpvRGcR7wTDluQ/FzLhu6AS38WXZXR1ZEBa1t5W2oGrZexVYDK8a1daE1oksOYp0/2t5mtyDbAhabYtHr3uBAhIjqyVaX3Arzz/4g9V0k2eKzJTqmuWYzAR5NoROL3u2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P6NYKWqs; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-79478ec4cf1so36136017b3.3
+        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 14:19:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1769983772; x=1770588572; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HSollAbkysYIn6q3WBkPyjvDyYQliySWNckXJuEYpIs=;
-        b=due/wvn7jkrcJYb4gMKEuXtMPclw+Z3ntYt+N/sRQUPdo/fc4iX67IeCOc/Sl/AHlF
-         Igpkx4ulYYmd2DsP7Y0sTQbk7lVye0o/lQonANspNBtmEjg2Ui41FBWJt28xa9pzoRxx
-         6Gc0GL1XwuXvU1VBAfUYXdvEKeG9j8jFokMEImxds1uXsXKXk3DDq0ewR36otJc1QpCz
-         YMX2BeE0l8XEeW6l8KVr0n+250zsNZmLPia3+yUrwwvRGD+2VpcWvA9Pkdki/mZf5+OR
-         0lonD+S4tlYW3s1MbqYB2rqzNqeNnIYwR7AyQS5L4ubNNPZLTntc3FzLPmA3oE4RzeLQ
-         BJHg==
+        d=gmail.com; s=20230601; t=1769984352; x=1770589152; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xoRg5azkP2+tD6BZ4JF2O1+QmNtK8W7tl0pO+XrNBaE=;
+        b=P6NYKWqsOy9qX+e7w4NE9FscgrQBIIGXQX4E+27ZFhSsQRv9QhibqXjn/LRdpzZ7EZ
+         DKitMTfUIqYgux3xm2WqZqK5aWJtzjq47K+7nrPwLi5UCf5tWoczGQylJDjL2Q7djErH
+         uxHi53pPf2E70xfEurQQ6tyySQ1iMO+LtrZfP2SqgYV3w+jTVvHDd8uoDqOZvBfEwqWg
+         lvgTfYX4SB9bxfn60EogZyJtVi6wtk4S31dnoo1lW6sME09D7IVwb1dshrWyk+CN6jko
+         biBXyWwtzPGpY6x7KMRcWH0hR+ragbLJQ/Wi0Rbry+szWWG0eDkjXjlxYFq95Z/sYlPV
+         MkDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769983772; x=1770588572;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HSollAbkysYIn6q3WBkPyjvDyYQliySWNckXJuEYpIs=;
-        b=uW5YyOwbZ6bgwU1ZBrRWLAxNynQaV2UDQvBBUQt84v7NBvVzkVU+q//7wo1V5xpTuW
-         A1zVDY+c3bqYFyEbM8ksVJbFAdSpFcKDKbkxzZbPfIzV+vLXaqP0VBUj1fOhQXCLTcO3
-         jSRifmDOXtZhcdMxs2zebKri2OnK5ilB5JGq8BCy8v5CJJ0L2ItfDSU0yCsqN067fh67
-         wpqLVEHZl8gZLYZX1BKEUwnA6CLcqCP5/CxWZXGdR+UHq7hh2NcO9j+Axm0MonCRpO7G
-         8pmxSMwo+iGruMSC+EnaAMlmaTcBVkiClRg2w1gYsMf+ji7jb0nYcDTRATegFSk45lIO
-         KijQ==
-X-Gm-Message-State: AOJu0YwBE6dWoYwIvkyCef3r3/wb7HUerLYnkDkIjSovrxp8Usgzog0N
-	OpALTrFZdJH+YuVvnldTy1jK9GYb6ZtCnXobDdFbgnJzV8FMcYDVi31RZYTiPFZkeQVzUfQE1q1
-	OA6k57Ng=
-X-Gm-Gg: AZuq6aKm4k4m6pEFDQJVw6trlOY1UGaTfZYva7PvZ75zRKqbLoTQhpAByIcLRDE56mm
-	iyCAm/xXn90WlmVzKTjGBISTJjVBClbuzxxRW01QKQF/t6b6pByAY0Sczt+gp9kULLttB9gj6N/
-	Xl7oN/Ic+CVjzOCr7h7dr45zVjRQ9HmPWkuDIoslfzdqWoTK2mvbSZqt33uoMEr4nl5X4QdPWSA
-	MyAPqkiNuSazogSbCdqsBkJcLgoSW5ofz9m1G8JWVSvkMk+LYVZ/YsRAz7HlZ1SVx7JVIjEUUft
-	yOVN40j0UoB25TK4tLE9rEp9CENACFm7ptjQtXAH6x84U8Q0JYfkeX+OQ9l2CQYcS70aUP3kgEJ
-	Dpgr5kJwet2IMYDQLjLPrUjSwj4m8gCHcGCNZQZMZkIAoAx6cnttVpAZnqeuOHbJ1QpjPh64sjN
-	2dPad9bS8rZy64BUa5PK6xbi7YNF49dNdX18hI0Gu/pE0z2WFY8LtyRVbo18hE0VYdHhZJVrQbW
-	deXP8bS4+GzUMgfqQ==
-X-Received: by 2002:a17:90b:3949:b0:353:2e1:95f6 with SMTP id 98e67ed59e1d1-3543b4021admr9000467a91.32.1769983772225;
-        Sun, 01 Feb 2026 14:09:32 -0800 (PST)
-Received: from [192.168.100.174] (p94025-ipoefx.ipoe.ocn.ne.jp. [153.246.129.24])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3540f2f02aasm13536653a91.7.2026.02.01.14.09.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Feb 2026 14:09:31 -0800 (PST)
-Message-ID: <5f8a0b59-0ca8-43bd-8d28-99d306ff5bbf@davidwei.uk>
-Date: Mon, 2 Feb 2026 07:09:25 +0900
+        d=1e100.net; s=20230601; t=1769984352; x=1770589152;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xoRg5azkP2+tD6BZ4JF2O1+QmNtK8W7tl0pO+XrNBaE=;
+        b=EtEBWQZikjSdcvNZvaUfVzJ5uRsgJQFilMzUE1mCbCRTi9M0RCRp+lZVwnx2m/mMII
+         IjNkTClTR+BNmMQdNmq13Y1bjGIJ8kVmYuQtB1M9Mj5+LoKpWTdrcA0+z/fo1IaK+MjG
+         8y0z8N4Y+1csSHvorcIeJOBzJivEeQqQzOdn9G5qyzRYAZeafkPKPDZbWxYhp9N4woTE
+         34Ur27A7ycSI28kE1mHtA+z9HaEp/F0AiInwhIXKnay4H7B+d9aW0bH0Hhnvr91knemP
+         RSBvtbbBdkRaZM/EVoTXQzQCCnZsMZx5V31VTEK/9r5vRzxUIrlITSa7GG7V/z5cMqX+
+         W8Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCXuX9s6xcXb36D9tDES9wJ0vY1GsX8CnKtnR9Ajgftvc1BslVUx10hEIZHycrXAj52JoJiN1hQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMe5+g9CTDaxKjVvwsDr1996f5tTAQ/MZEYRIe5RdbnqOamm+7
+	LT1YsLgQp8aEWCaA6J3kI+Rg7Qz1azSmx5I3wW3+XGrCzm6OPi+ggt5/
+X-Gm-Gg: AZuq6aLEiLiaXd92f/vtOMRK6mrL5V/sYXOP8NP/TTmCK0YJc9z3PmQJVFTZiS+QKWr
+	XdBL36LtKbENMKjegDfAk/pDREIp+2daUCb3IIdRi9e2KZfJoWgp2UJHK8YRKw9x56H2u/BwTgN
+	a10lGjG3G4B89fsuuX6mUR9QKLhj7a5nDi5+nYX7aoFL76uBe+pelEqW+Zb05D7bwvS2cQF3d6/
+	xzm8YLyPlbAWax8ApNFh4h4buWHNlpMaWqvuMOhLCm1Uqv+a9yaU4wN6k+1qqJEfLTNx4bdnurP
+	PWd9qJFxEb2Je09aNdJkjuKDVBI+y7BykElhWmIyEGHrRzPVyemQyeXjFWAMMkxdKGU60QyyIG7
+	1+HMD2USoEcsvGO49/AhODwrDyEJjXKSlNAyDv3vTi1otdTVMrEytaWfzAaWecT/H/xtPpkoNGi
+	kq5xwBRHlLuh9/7qXcIFTLvW9GpV26ayq75SdZXDnPi4V7iYKaP4uqcRuV3Nw=
+X-Received: by 2002:a05:690c:4b0b:b0:794:c810:6c4f with SMTP id 00721157ae682-794c8107296mr21604887b3.34.1769984352322;
+        Sun, 01 Feb 2026 14:19:12 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-794b7356db4sm30204627b3.20.2026.02.01.14.19.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Feb 2026 14:19:11 -0800 (PST)
+Date: Sun, 01 Feb 2026 17:19:11 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Richard Gobert <richardbgobert@gmail.com>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.14968a7a11ed8@gmail.com>
+In-Reply-To: <276270cf825431817e46f6744d9b26d3ea954869.1769771825.git.pabeni@redhat.com>
+References: <cover.1769771825.git.pabeni@redhat.com>
+ <276270cf825431817e46f6744d9b26d3ea954869.1769771825.git.pabeni@redhat.com>
+Subject: Re: [PATCH net 2/2] selftest: net: add a test-case for encap
+ segmentation after GRO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 06/16] net: Proxy net_mp_{open,close}_rxq for
- leased queues
-To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20260129222830.439687-1-daniel@iogearbox.net>
- <20260129222830.439687-7-daniel@iogearbox.net>
- <20260131160237.07789674@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20260131160237.07789674@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255679-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[davidwei.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,bytedance.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255680-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei.uk:mid]
-X-Rspamd-Queue-Id: B8B95C7581
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,udpgro_fwd.sh:url]
+X-Rspamd-Queue-Id: 8CE2CC75B1
 X-Rspamd-Action: no action
 
-On 2026-02-01 09:02, Jakub Kicinski wrote:
-> On Thu, 29 Jan 2026 23:28:20 +0100 Daniel Borkmann wrote:
->> @@ -191,24 +214,15 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
->>   }
->>   EXPORT_SYMBOL_NS_GPL(netdev_rx_queue_restart, "NETDEV_INTERNAL");
->>   
->> -int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
->> -		    const struct pp_memory_provider_params *p,
->> -		    struct netlink_ext_ack *extack)
->> +static int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
->> +			     const struct pp_memory_provider_params *p,
->> +			     struct netlink_ext_ack *extack)
->>   {
->>   	const struct netdev_queue_mgmt_ops *qops = dev->queue_mgmt_ops;
->>   	struct netdev_queue_config qcfg[2];
->>   	struct netdev_rx_queue *rxq;
->>   	int ret;
->>   
->> -	if (!netdev_need_ops_lock(dev))
->> -		return -EOPNOTSUPP;
->> -
->> -	if (rxq_idx >= dev->real_num_rx_queues) {
->> -		NL_SET_ERR_MSG(extack, "rx queue index out of range");
->> -		return -ERANGE;
->> -	}
->> -	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
->> -
+Paolo Abeni wrote:
+> We had a few patches in this area and no explicit coverage so far.
+> The test case covers the scenario addressed by the previous fix;
+> reusing the existing udpgro_fwd.sh script to leverage part of the
+> of the virtual network setup, even if such script is possibly not
+> a perfect fit.
 > 
->> +int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
->> +		    const struct pp_memory_provider_params *p,
->> +		    struct netlink_ext_ack *extack)
->> +{
->> +	struct net_device *orig_dev = dev;
->> +	int ret;
->> +
->> +	if (!netdev_need_ops_lock(dev))
->> +		return -EOPNOTSUPP;
->> +
->> +	if (rxq_idx >= dev->real_num_rx_queues) {
->> +		NL_SET_ERR_MSG(extack, "rx queue index out of range");
->> +		return -ERANGE;
->> +	}
->> +
+> Note that the mentioned script already contains several shellcheck
+> violation; this patch does not fix the existing code, just avoids
+> adding more issues in the new one.
 > 
-> nit: delete this empty line please, like it was in the original code.
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-Yes.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
+> ---
+>  tools/testing/selftests/net/udpgro_fwd.sh | 65 +++++++++++++++++++++++
+>  1 file changed, 65 insertions(+)
 > 
->> +	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
->> +
->> +	if (!netif_get_rx_queue_lease_locked(&dev, &rxq_idx)) {
->> +		NL_SET_ERR_MSG(extack, "rx queue leased to a virtual netdev");
->> +		return -EBUSY;
->> +	}
->> +	if (!dev->dev.parent) {
->> +		NL_SET_ERR_MSG(extack, "rx queue belongs to a virtual netdev");
->> +		ret = -EOPNOTSUPP;
->> +		goto out;
->> +	}
->> +
->> +	ret = __net_mp_open_rxq(dev, rxq_idx, p, extack);
->> +out:
->> +	netif_put_rx_queue_lease_locked(orig_dev, dev);
->> +	return ret;
-> 
-> Please:
-> 
-> 	if (!netif_queue_is_a_lease())
-> 		return __net_mp_open_rxq(dev, rxq_idx, p, extack);
-> 
-> 	..explicit code that deals with the lease, no conditional locking
-> 	...
-> 	ret = __net_mp_open_rxq($dev, $rxq_idx, p, extack);
-> 	...
+> diff --git a/tools/testing/selftests/net/udpgro_fwd.sh b/tools/testing/selftests/net/udpgro_fwd.sh
+> index a39fdc4aa2ff..f2c1f0630b77 100755
+> --- a/tools/testing/selftests/net/udpgro_fwd.sh
+> +++ b/tools/testing/selftests/net/udpgro_fwd.sh
+> @@ -162,6 +162,39 @@ run_test() {
+>  	echo " ok"
+>  }
+>  
+> +run_test_csum() {
+> +	local -r msg="$1"
+> +	local -r dst="$2"
+> +	local csum_error_filter=UdpInCsumErrors
+> +	local csum_errors
+> +
+> +	printf "%-40s" "$msg"
+> +
+> +	is_ipv6 "$dst" && csum_error_filter=Udp6InCsumErrors
+> +
+> +	ip netns exec "$NS_DST" iperf3 -s -1 >/dev/null &
+> +	wait_local_port_listen "$NS_DST" 5201 tcp
+> +	local spid="$!"
+> +	ip netns exec "$NS_SRC" iperf3 -c "$dst" -t 2 >/dev/null
+> +	local retc="$?"
+> +	wait "$spid"
+> +	local rets="$?"
+> +	if [ "$rets" -ne 0 ] || [ "$retc" -ne 0 ]; then
+> +		echo " fail client exit code $retc, server $rets"
+> +		ret=1
+> +		return
+> +	fi
+> +
+> +	csum_errors=$(ip netns exec "$NS_DST" nstat -as "$csum_error_filter" |
+> +		      grep "$csum_error_filter" | awk '{print $2}')
+> +	if [ -n "$csum_errors" ] && [ "$csum_errors" -gt 0 ]; then
+> +		echo " fail - csum error on receive $csum_errors, expected 0"
+> +		ret=1
+> +		return
+> +	fi
+> +	echo " ok"
+> +}
+> +
+>  run_bench() {
+>  	local -r msg=$1
+>  	local -r dst=$2
+> @@ -260,6 +293,38 @@ for family in 4 6; do
+>  	ip netns exec $NS_SRC $PING -q -c 1 $OL_NET$DST_NAT >/dev/null
+>  	run_test "GRO fwd over UDP tunnel" $OL_NET$DST_NAT 10 10 $OL_NET$DST
+>  	cleanup
+> +
+> +	# force segmentation and re-aggregation
+> +	create_vxlan_pair
+> +	ip netns exec "$NS_DST" ethtool -K veth"$DST" generic-receive-offload on
+> +	ip netns exec "$NS_SRC" ethtool -K veth"$SRC" tso off
+> +	ip -n "$NS_SRC" link set dev veth"$SRC" mtu 1430
+> +
+> +	# forward to a 2nd veth pair
+> +	ip -n "$NS_DST" link add br0 type bridge
+> +	ip -n "$NS_DST" link set dev veth"$DST" master br0
+> +
+> +	# segment the aggregates TSO packet, without csum offload
+> +	ip -n "$NS_DST" link add veth_segment type veth peer veth_rx
+> +	for FEATURE in tso tx-udp-segmentation tx-checksumming; do
+> +		ip netns exec "$NS_DST" ethtool -K veth_segment "$FEATURE" off
+> +	done
 
-Understood.
+fwiw, tx off will disable all the dependent tx offloads too
 
-> 
-> 
->> -	rxq = __netif_get_rx_queue(dev, ifq_idx);
->> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
-> 
-> Indeed good to cleanup the ifq_idx naming that sneaked in, but IDK if
-> this belongs in this commit :S
+> +	ip -n "$NS_DST" link set dev veth_segment master br0 up
+> +	ip -n "$NS_DST" link set dev br0 up
+> +	ip -n "$NS_DST" link set dev veth_rx up
+> +
+> +	# move the lower layer IP in the last added veth
+> +	for ADDR in "$BM_NET_V4$DST/24" "$BM_NET_V6$DST/64"; do
+> +		# the dad argument will let iproute emit a unharmfull warning
 
-It really annoyed me haha. I'll remove this from this series and send it
-as a follow up.
+unimportant but minor typo: unharmful. Also above aggregates -> aggregated
+
+> +		# with ipv4 addresses
+> +		ip -n "$NS_DST" addr del dev veth"$DST" "$ADDR" \
+> +			nodad 2>/dev/null
+
+nodad probably only matters on add?
+
+> +		ip -n "$NS_DST" addr add dev veth_rx "$ADDR" \
+> +			nodad 2>/dev/null
+> +	done
+> +
+> +	run_test_csum "GSO after GRO" "$OL_NET$DST"
+> +	cleanup
+>  done
+>  
+>  exit $ret
+> -- 
+> 2.52.0
+> 
+
+
 
