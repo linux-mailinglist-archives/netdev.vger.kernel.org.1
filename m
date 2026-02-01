@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-255658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255661-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNtLEUSTf2lotwIAu9opvQ
-	(envelope-from <netdev+bounces-255658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 18:54:12 +0100
+	id ULUkK3yTf2lotwIAu9opvQ
+	(envelope-from <netdev+bounces-255661-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 18:55:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F037C6D33
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 18:54:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36796C6D50
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 18:55:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B3393038A77
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 17:51:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 313C73044A57
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 17:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63484284B54;
-	Sun,  1 Feb 2026 17:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE7E2264DC;
+	Sun,  1 Feb 2026 17:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKmW2As9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgD3a3GM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7D127E074
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 17:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8386F285CA2
+	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 17:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769968268; cv=none; b=KpBRio6Owm8URtLlU1brCvnK1DKyzilP4mh6Zpazbn3nMUmnKmPkyw/0cuXvj5iuH21eFFRInpgXlocwX8GKQ7GM4COhPn2dqkzNLu1g0bQRw+KJbjYYleSicZVl4Xix4/cdwAaqBHdql3LIuER9xYsk87zW4tURg2/9pZjRibE=
+	t=1769968273; cv=none; b=QsmU9B5/RCUmI5649jYZ/yNQoDyM0o9Jvj7Z56ogxGe9GfVUc8RZtwwQ/ny0w76YjG9XshklK1l5AochrIVBL3ZmNCDJWNdFcxDy47zaVI2V2QtkrOZr//jFOu5nga3WwZRC/HImMlcesk+55NYhhxxSruti70eLsufg6zcY9qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769968268; c=relaxed/simple;
-	bh=3iS/7iavCieY0vGjt3CSw+m+ZHXLXWxjaSalApUkmvc=;
+	s=arc-20240116; t=1769968273; c=relaxed/simple;
+	bh=TADLOMRKh4Q7PejR9tjfy5dVMNcv1vOqD5dk+oNJKhI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PYWJCkIlKUk1G1goG0ULkzX0HO0d4eGVt+FGXwqqk8FlY8l556gXhJ895nRQeb8Fyj4iblyJ2+ux+O6Qfb92m7f3H+grqOUfE7+aOkM8PJ+ReK/IfHFzTjqWwroI73/D2XJPTRS6gVWnjr4przI9MjCJL9jVMUpHqtjAV3ckNdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKmW2As9; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=Cmiaii9PrWBlnx7eQTeysWK/p98+aJB6YYznSMB36AeeHwTwCwbKivhExa8MSere1kmXyenrd4ko8bVbIm8MQ8WE90B4Bwwz6vBZ5xdGArjgUbjbkmyyov5X23LpoKBc/I382+6ioJHpcnBkdyDCBht1IS3mQ56VxSAmQvCBUDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KgD3a3GM; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8230f8f27cfso1876218b3a.0
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 09:51:06 -0800 (PST)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-350fe1f8ea3so1721755a91.2
+        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 09:51:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769968266; x=1770573066; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769968268; x=1770573068; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QVecu991SVFveWbBZhAv7g6YYbwLWhpF7kmZTPpREKw=;
-        b=eKmW2As9OjOf6JCyNfm10Eg8ftIOOMpoVAtxqX69Y2reXIr5CJbJw2WuiWb+Xd5jmh
-         0CJskERJj6QdAYLg3qDyb3KEt4OLfICxfbO4wWZ/hF1DyQUCssMwVCqos0yh6m0lWvBh
-         4/h5gL4DhegrZoYLZKVKioXH7pbd467wYXCykU9yG3uqob2uNj1Kaz5nuwb+vRmaUkgN
-         iP496TU18ks5Qs1wLgEDbr4eRnLj50iyxl2ajlcmp+NfkeUndgwKyAwVg+jO6wqMic5w
-         VAU9j++UfaetZ/xpt101q84Gj2/Xh9nbpMT73k/25jW/TRnsDQBRGgkIyujAE32y+9hb
-         YYTA==
+        bh=NYHVAl2Jp6GfAhmX3kqqnc7v6eyJBa0A6W5eDY8skXU=;
+        b=KgD3a3GMXpnsWPTJf7bDLd0ytX7nFM0ngn8IA5q75U2b+9M5DzsdrgAkmf6gXkhbzP
+         VHLAoRfQ1eX6K4hB0XYj1hEZKtiBkm0uqi7H31lrT4lnBoq08hHBjBZqdAQO1UrIHtW5
+         IeEMwUL2kf2JCN65XvukO1kPrsFEwKJg59bLzZ+NxgufMqVh/aJWYAXGlx53PTuEuALg
+         4DS8PB8Cob8MsUJnrzSi1uz7hZc/dkTFEvrOnjvORHCbz1fJSkKk75LObycUsWDBj5be
+         QBVsgpj0Pwm40K1fyxfX8lHBYGUSFh26pfw/HPO98OHFM0auzN+eY15fxSHnbUcWkbxb
+         6CZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769968266; x=1770573066;
+        d=1e100.net; s=20230601; t=1769968268; x=1770573068;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QVecu991SVFveWbBZhAv7g6YYbwLWhpF7kmZTPpREKw=;
-        b=rCcX1fuVUOg+67Hj1+ZaHgxmsSzMe11kgp9AI0rkHwEBm2rSsdwkt2vcyJGJn9HFk5
-         D2mXUv+xBR/VI9MMsMFiEhesOF+jZ9Q7NSCldCgrcAMg7R6hfW3MOXE21ICRQrbGbzCg
-         gnGm+9LFTaVlN/A5eJrL0ixLXd/OZ0ytF/8+x8jWlxvvwWYAZa/32udbebFYFgHeYB5U
-         AOlb1jWfUTCFgu7pOz+5jXzNv5x8unXJlt1D8VsOnizUqIPZgasKey5Y37VlPj80d8tR
-         4gdaXFnvcTbUxrMEA5bIDD5+s/MPPEX7oR9AMKqfwq2Hx26vsMaLst7SOW002bb6IcIU
-         RVBQ==
-X-Gm-Message-State: AOJu0Yx3G6UFw5WKT0jas/eSD66b2hGZ9iHu1Ieja4YYJ7fOwihV8z30
-	S1piy5bRPbB0kZ+ZD7LA17glpoMNu38/2ETX86l0D52WVdoci76o5J/c
-X-Gm-Gg: AZuq6aJVYsLLxKNrfwEbXQxHFFqYYH42MDANIBwZ7za1SR3v2CxyviQkc+O8FEhe2yZ
-	PL1vftGt/TY+qXxCV4t7Ct/ExINvNG6fxYEno/aL0Eb1siBbeVddmGYHq2vRfSTTtlybUa3KISj
-	Cy11az3FAyBjvNTV227XOz5AVBJVbjZQ222AUhswgbWaMFaZXeLXbWBQXhyznZYUaULqnIBNank
-	3mtSQTUU/Ewz5WoBrmPm1mo8dRUYtLlujOWPAfkqfuL1aEEY/wzMYr6trjip3PgvluSwGyKo1d2
-	iu+xTRxoJmj/fnfJI63rnxZFqRI8fRKNaqcwwWG08NLWGeekeC4bK0dN0yg9tlCjjqwAP6unOkI
-	z1leDvbRYPNjt6+MTV1N+Szykzz+VYhbqNjci6xVmBbf3pxMys5G4iBY2Mwgqan7PtH75tXoNt0
-	4XJw==
-X-Received: by 2002:a17:90b:3f85:b0:341:8b2b:43c with SMTP id 98e67ed59e1d1-3543b3d65e2mr9511884a91.18.1769968266006;
-        Sun, 01 Feb 2026 09:51:06 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:4d::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6428371715sm12318496a12.13.2026.02.01.09.51.05
+        bh=NYHVAl2Jp6GfAhmX3kqqnc7v6eyJBa0A6W5eDY8skXU=;
+        b=kDq4NJOxUNy0u53jOtCeil/H2EssH5ejxgLw9/HbLr4JkBfi6DlP/U4u/gcbghypMA
+         /z4J5KWHeVWjAmW0WXK+v7nxPYhzHC71fIqDxSfDmv2qoL4x1vtRkSQ1bQ8CZpbCNRH0
+         x7IZrPEpcVH/qBQj7suTt3tVSDlOCXP01NtA4CTmvnWJNigwHEpM8m1wgSawVGM7sOqe
+         py/eFDTSxOloMUzyN1fv3j81RC9xbC4YTQVlFH0mvxnf5ylf2Yu6t9dAWQ2TdjOjqEiG
+         9zZTZsAZZwnOVAMzt79p+s1SadPhq4sXHywdndMxE1TTN4Ik+pbD7P91maXx0AyXmZyf
+         +0yw==
+X-Gm-Message-State: AOJu0YwNjjas/5hPW6Aj+zIhG22cnOJO3WV4smYXbjkcsSvOiqRzAUoC
+	WmZ2T8c+P6yIaPzCFPpdC0LdRtlf91qA+2Ow/yIARjiogknh8mfg39qn
+X-Gm-Gg: AZuq6aKQgTV0H7QoJErprAlssJyKnQq4d70YdGkP5iJDWSnd45LdGKJjJi6S3OzMiKu
+	OII8wzwWhZPIcTYB7Nva5MAXcQSR0aW0fijh91fcZt1wwKg2A6TRU7gfoBSLW/Qn8Oij9HCOQg1
+	fcY4lfb7Yi/Q+JC5EZ4OnOi9OiCqxTv7zuCV6NW7lL4jNNBaBOZSY+2IvNz/392EcRALTaRFS43
+	2xvotvBrKC2i1d1+YyD6hBXML1N0zMLEKAmSa+jDvGuMyh+KIPkc0bKNDXiEv3Xi/scjNxAQwjf
+	pibXPWhtThr4ISpc8xiryoI16bEIpAOemdqzgfhrRxkT0x0DFfVy3IsqvvAh3rzrNcbN2AZER4A
+	8BhRUbcmsOVcBnytNfe+tWWzcz4Kc7DACXt71Xm0I3/2kEi7C4vPZbdKfTfa6jlm4NMdy1eyLvQ
+	zoqmEo5v5V2+0=
+X-Received: by 2002:a17:90b:3b42:b0:353:6373:590b with SMTP id 98e67ed59e1d1-3543b3138ecmr10128847a91.7.1769968267672;
+        Sun, 01 Feb 2026 09:51:07 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:d::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3540f2f24aesm13228350a91.6.2026.02.01.09.51.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Feb 2026 09:51:05 -0800 (PST)
+        Sun, 01 Feb 2026 09:51:06 -0800 (PST)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -89,9 +89,9 @@ Cc: netdev@vger.kernel.org,
 	haoluo@google.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 12/16] selftests/bpf: Update sk_storage_omem_uncharge test
-Date: Sun,  1 Feb 2026 09:50:45 -0800
-Message-ID: <20260201175050.468601-13-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v5 13/16] selftests/bpf: Update task_local_storage/recursion test
+Date: Sun,  1 Feb 2026 09:50:46 -0800
+Message-ID: <20260201175050.468601-14-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260201175050.468601-1-ameryhung@gmail.com>
 References: <20260201175050.468601-1-ameryhung@gmail.com>
@@ -120,7 +120,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255658-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255661-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -133,65 +133,120 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 9F037C6D33
+X-Rspamd-Queue-Id: 36796C6D50
 X-Rspamd-Action: no action
 
-Check sk_omem_alloc when the caller of bpf_local_storage_destroy()
-returns. bpf_local_storage_destroy() now returns the memory to uncharge
-to the caller instead of directly uncharge. Therefore, in the
-sk_storage_omem_uncharge, check sk_omem_alloc when bpf_sk_storage_free()
-returns instead of bpf_local_storage_destroy().
+Update the expected result of the selftest as recursion of task local
+storage syscall and helpers have been relaxed. Now that the percpu
+counter is removed, task local storage helpers, bpf_task_storage_get()
+and bpf_task_storage_delete() can now run on the same CPU at the same
+time unless they cause deadlock.
+
+Note that since there is no percpu counter preventing recursion in
+task local storage helpers, bpf_trampoline now catches the recursion
+of on_update as reported by recursion_misses.
+
+on_enter: tp_btf/sys_enter
+on_update: fentry/bpf_local_storage_update
+
+           Old behavior                         New behavior
+           ____________                         ____________
+on_enter                             on_enter
+  bpf_task_storage_get(&map_a)         bpf_task_storage_get(&map_a)
+    bpf_task_storage_trylock succeed     bpf_local_storage_update(&map_a)
+    bpf_local_storage_update(&map_a)
+
+    on_update                            on_update
+      bpf_task_storage_get(&map_a)         bpf_task_storage_get(&map_a)
+        bpf_task_storage_trylock fail        on_update::misses++ (1)
+        return NULL                        create and return map_a::ptr
+
+                                           map_a::ptr += 1 (1)
+
+                                           bpf_task_storage_delete(&map_a)
+                                             return 0
+
+      bpf_task_storage_get(&map_b)         bpf_task_storage_get(&map_b)
+        bpf_task_storage_trylock fail        on_update::misses++ (2)
+        return NULL                        create and return map_b::ptr
+
+                                           map_b::ptr += 1 (1)
+
+    create and return map_a::ptr         create and return map_a::ptr
+  map_a::ptr = 200                     map_a::ptr = 200
+
+  bpf_task_storage_get(&map_b)         bpf_task_storage_get(&map_b)
+    bpf_task_storage_trylock succeed     lockless lookup succeed
+    bpf_local_storage_update(&map_b)     return map_b::ptr
+
+    on_update
+      bpf_task_storage_get(&map_a)
+        bpf_task_storage_trylock fail
+        lockless lookup succeed
+        return map_a::ptr
+
+      map_a::ptr += 1 (201)
+
+      bpf_task_storage_delete(&map_a)
+        bpf_task_storage_trylock fail
+        return -EBUSY
+      nr_del_errs++ (1)
+
+      bpf_task_storage_get(&map_b)
+        bpf_task_storage_trylock fail
+        return NULL
+
+    create and return ptr
+
+  map_b::ptr = 100
+
+Expected result:
+
+map_a::ptr = 201                          map_a::ptr = 200
+map_b::ptr = 100                          map_b::ptr = 1
+nr_del_err = 1                            nr_del_err = 0
+on_update::recursion_misses = 0           on_update::recursion_misses = 2
+On_enter::recursion_misses = 0            on_enter::recursion_misses = 0
 
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- .../selftests/bpf/progs/sk_storage_omem_uncharge.c   | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ .../selftests/bpf/prog_tests/task_local_storage.c      | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c b/tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c
-index 46d6eb2a3b17..c8f4815c8dfb 100644
---- a/tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c
-+++ b/tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c
-@@ -6,7 +6,6 @@
- #include <bpf/bpf_tracing.h>
- #include <bpf/bpf_core_read.h>
+diff --git a/tools/testing/selftests/bpf/prog_tests/task_local_storage.c b/tools/testing/selftests/bpf/prog_tests/task_local_storage.c
+index 42e822ea352f..7bee33797c71 100644
+--- a/tools/testing/selftests/bpf/prog_tests/task_local_storage.c
++++ b/tools/testing/selftests/bpf/prog_tests/task_local_storage.c
+@@ -112,24 +112,24 @@ static void test_recursion(void)
+ 	task_ls_recursion__detach(skel);
  
--void *local_storage_ptr = NULL;
- void *sk_ptr = NULL;
- int cookie_found = 0;
- __u64 cookie = 0;
-@@ -19,21 +18,17 @@ struct {
- 	__type(value, int);
- } sk_storage SEC(".maps");
+ 	/* Refer to the comment in BPF_PROG(on_update) for
+-	 * the explanation on the value 201 and 100.
++	 * the explanation on the value 200 and 1.
+ 	 */
+ 	map_fd = bpf_map__fd(skel->maps.map_a);
+ 	err = bpf_map_lookup_elem(map_fd, &task_fd, &value);
+ 	ASSERT_OK(err, "lookup map_a");
+-	ASSERT_EQ(value, 201, "map_a value");
+-	ASSERT_EQ(skel->bss->nr_del_errs, 1, "bpf_task_storage_delete busy");
++	ASSERT_EQ(value, 200, "map_a value");
++	ASSERT_EQ(skel->bss->nr_del_errs, 0, "bpf_task_storage_delete busy");
  
--SEC("fexit/bpf_local_storage_destroy")
--int BPF_PROG(bpf_local_storage_destroy, struct bpf_local_storage *local_storage)
-+SEC("fexit/bpf_sk_storage_free")
-+int BPF_PROG(bpf_sk_storage_free, struct sock *sk)
- {
--	struct sock *sk;
--
--	if (local_storage_ptr != local_storage)
-+	if (sk_ptr != sk)
- 		return 0;
+ 	map_fd = bpf_map__fd(skel->maps.map_b);
+ 	err = bpf_map_lookup_elem(map_fd, &task_fd, &value);
+ 	ASSERT_OK(err, "lookup map_b");
+-	ASSERT_EQ(value, 100, "map_b value");
++	ASSERT_EQ(value, 1, "map_b value");
  
--	sk = bpf_core_cast(sk_ptr, struct sock);
- 	if (sk->sk_cookie.counter != cookie)
- 		return 0;
+ 	prog_fd = bpf_program__fd(skel->progs.on_update);
+ 	memset(&info, 0, sizeof(info));
+ 	err = bpf_prog_get_info_by_fd(prog_fd, &info, &info_len);
+ 	ASSERT_OK(err, "get prog info");
+-	ASSERT_EQ(info.recursion_misses, 0, "on_update prog recursion");
++	ASSERT_EQ(info.recursion_misses, 2, "on_update prog recursion");
  
- 	cookie_found++;
- 	omem = sk->sk_omem_alloc.counter;
--	local_storage_ptr = NULL;
- 
- 	return 0;
- }
-@@ -50,7 +45,6 @@ int BPF_PROG(inet6_sock_destruct, struct sock *sk)
- 	if (value && *value == 0xdeadbeef) {
- 		cookie_found++;
- 		sk_ptr = sk;
--		local_storage_ptr = sk->sk_bpf_storage;
- 	}
- 
- 	return 0;
+ 	prog_fd = bpf_program__fd(skel->progs.on_enter);
+ 	memset(&info, 0, sizeof(info));
 -- 
 2.47.3
 
