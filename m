@@ -1,659 +1,323 @@
-Return-Path: <netdev+bounces-255619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFRAEy5uf2nNqQIAu9opvQ
-	(envelope-from <netdev+bounces-255619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 16:15:58 +0100
+	id mIWcGBpvf2nNqQIAu9opvQ
+	(envelope-from <netdev+bounces-255621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 16:19:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B62AEC6487
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 16:15:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86ABC64FA
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 16:19:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D5F1230254D5
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 15:13:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E46203005743
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 15:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC5D242D70;
-	Sun,  1 Feb 2026 15:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE8B1EEA5F;
+	Sun,  1 Feb 2026 15:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="L+xjFEkJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CERqomDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010022.outbound.protection.outlook.com [52.101.193.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 297392397AA;
-	Sun,  1 Feb 2026 15:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769958823; cv=none; b=STXZpaPEPFRI2/9jN5vPMSY5Zz8E/fYXNippv6+bkt67UHczYTtHzrT5hJGlyo1ccNZ50fgDBif+RZX+Kt/5HZc9ndDF8ASchnkQS3vWw8ZJZuP6BK0VSPt22TtuK9JB62IuRUwIQVQAfslwPthBUNfgre6eWCqGLhzjJGEXTDA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769958823; c=relaxed/simple;
-	bh=Hi0hgp7iKwULXA+T7jYAxiFylxpAewRHWgQsebJPiqs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gkZKeuMT18dP0OmQOsLfz6Cq9d9KgblEkCnfB/CbKs9iXnxqth9K8ce5lhzyOyzDx4Uw9IoxgQesZ0InU/3042uOhDBen2RPCC6ssGSon9B0ckU8ruZ1okvnPR6F1FmUNwuPnIipuTrmPx13XMs/jyrHtiVEjLwPMNvZ3lniD5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=L+xjFEkJ; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id EF86A1A2B83;
-	Sun,  1 Feb 2026 15:13:39 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C283C60720;
-	Sun,  1 Feb 2026 15:13:39 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EBAAE119A865B;
-	Sun,  1 Feb 2026 16:13:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769958818; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=5hkEWysS/CxNma2DqiXrYZTcYVE95ux9SHUasDRkTEk=;
-	b=L+xjFEkJsk4EmZLWaIY6giPNIXvVVMxwV59L1gECzFPuwsOWFB8ZlmobCAbaZJP4RZrmPC
-	VldjcR9Rocv5V4Jx3Qe8NF8Zq1VsWzXbpqQdso9xfqHjHGsOtN4i4vWm78/xjCoEnjuP61
-	6/Ag5p6BYn4I0qwDjZDMNNbG3X9ec0K1NWikVHacyOwP3P8NEQOtYAL7SD4CI9Y5v/NvaF
-	QLp27GHR6wGk50/+kx1gmVhAmL+vHn+1htDt91vl4txhRGK0PtLsQ8rPEjXSnEpxsKaBBI
-	+QuvOdZQFqOWxXiqB+xoYcBXh8WY1X5PmDGm/EHJCJGIWarZIZZuX8LFh26Cbg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next v3 11/11] net: ethtool: Introduce ethtool command to list ports
-Date: Sun,  1 Feb 2026 16:12:48 +0100
-Message-ID: <20260201151249.642015-12-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
-References: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCF61DF25F;
+	Sun,  1 Feb 2026 15:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.22
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769959162; cv=fail; b=oNqt7VaKoUv1AloaxKRT5Rv9lDMTJXkgshKBzmEbwylBylf2TFQv/e8TuXo1q2srZ2ELAQUzD7f+5VM4/qcIdiqOwlrxs2YkrYFcplxWRW4+TDdPYnIqrc+EKXNaWaJT6H6rdK0/QjBns2hTwKneSKlTR8aQct1mc2qyEY4+5UY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769959162; c=relaxed/simple;
+	bh=9dc/4yAuZnVrXPKBzqzCbXFIRdPpYh6oKpQ9idtT+nQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=P9rGaT1yxkxpcPl8NpOfVTxLVFSb2Us8EwjDaeIgTqg0lc6FUU8rdOQhFmyBxyKLv6VTxKg7kZgn84L96puPUO3T+3eWjvjRBBILGFMCHMFjpnGlp0nWBG35jftto09LaKfZ7ED8xhRk209JiAREb4yqEZMYREIP+WsCrDa881U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CERqomDp; arc=fail smtp.client-ip=52.101.193.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HA1UZa6VLQ/bKoTmQFycdKNKoXBquFB0JFAXqDyfv9f3kPesr28yY71k386lIOym4in80RsIz+wTc4v3Opq6G+Pr3N0ZovxKDxAMB6/E4vnw9Rz/mxekmdxFfD/Hy35pEnpr2zdBDJBS8W5YvTs0Kyn4A5gFoMVmQduKcQol8ieSZveFBusSAGYveej7JTFfJzZPVesaNyv2Mqft6gsH2seeNqWejDC8xZb1zXO9+pqeEtPDMDaEZkukSU96uW0HJuiSkvDsZyJeSOo+srGMpKxRbPnhplZqnDUH1PUk+Mq0XO3i2p4ZgFhQuDQPiqHfyBzgG9TX52cPT3qi4Z80Qg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pnuEI5vbO/xCfD8+ltw/JJlL/eiMv/27Hi/fByB4POg=;
+ b=cieZ2twjUb70e21cpibB51g3RSWoWOswB2aFFbWvBp+vAIMTge0Uk/oinhVI+sy0ISLdm5j175wBwONO6+ZvvcHXUX5sY/zJS+y86pecJHrjhNRTl5joh5FmTafBFWboYbgAuJPrbuFQhJK//7xbYJcKUlgqBeGDaPGtRZrDsTXAXuYc3T6F7ziDZglNjASwNOsZFOznSZMwik6PUv5ofGKjUG3HRobiQ7/XAUBl+AlKjDp64Ai3NUYFtOY+K5pNrMz0rZBD6knQAUZWRLXdYGE9JiS6/rI8QdXqOJFjNmktIKkHSy0Bq9kqa5A7zilxX6RRk7egSbQo7TX9Ho7m9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pnuEI5vbO/xCfD8+ltw/JJlL/eiMv/27Hi/fByB4POg=;
+ b=CERqomDpKvR5a1pmlqSne8xPBl8vfaGhh6SczUFowDweSeSlkQSeXi0xZb3goddn1JGYPh+G5j1+nSk2MR4exQ3gN8Mkw1mmKlcIdGdK0YP7xTyk1xuWhM6tOb73Hu/S6crGRZtclEHoXWdcbnbhjr65Gl4VzdlitLqW8O3nACfxb6vQHnTQIw3QL/ePi3ERqemvE9/JmCt9UFraea4pvYYaShvibp09AM93/L2j/Wch3EYMBteVuxlcMQg7V81IS7ax9z1ytkFOjYdMA19QYEiz5VgRVh2cdBkQ83P9YsmPLM8JaeSpvSgmdunABr5ohTZPm166KLZEPGCfJvyqsA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SA1PR12MB8857.namprd12.prod.outlook.com (2603:10b6:806:38d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.15; Sun, 1 Feb
+ 2026 15:19:18 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%2]) with mapi id 15.20.9564.013; Sun, 1 Feb 2026
+ 15:19:18 +0000
+Date: Sun, 1 Feb 2026 17:19:10 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: David Corvaglia <david@corvaglia.dev>
+Cc: razor@blackwall.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	bridge@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: bridge: use sysfs_emit instead of sprintf
+Message-ID: <20260201151910.GA139675@shredder>
+References: <0100019c14f90490-950ddd9b-1897-4111-bddd-0d4b8abf380a-000000@email.amazonses.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0100019c14f90490-950ddd9b-1897-4111-bddd-0d4b8abf380a-000000@email.amazonses.com>
+X-ClientProxiedBy: TLZP290CA0015.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:9::11) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SA1PR12MB8857:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4ca31e9e-ac70-4418-72e3-08de61a544ab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?2DdN5eCW+EUcOmZA5goOGWy7vtGHrIziqXuY9x3DVqbkB9JSPP9TQ5VgcuQ9?=
+ =?us-ascii?Q?Ub9G8AFHTuIGSedFCR7LwBxuRY+uf5/I/bz6Ly998tmO72O3btayL7Y2NOha?=
+ =?us-ascii?Q?uPtocE2z4GGv0EjWruNUC9vKAN+h79lskUYyjsJbLkWjAjocdFydXkGTPhnq?=
+ =?us-ascii?Q?njIntzmEorYpJ7BJEUlrcByS7dPnsqaJ7nAmerPdWGNrHsP8CITrIG1G65fj?=
+ =?us-ascii?Q?TJzOY2iRXLmMibbSVHaS/66L8DUedz0mek8pa6WYuAfiyEwZeigA6HjfPkGJ?=
+ =?us-ascii?Q?9IdF2vH60v1Nqgf9dx9BNNX9ESS7jQIBugvkHndbRHEBFWly3Oc7hmwHJXlA?=
+ =?us-ascii?Q?kPrpm0rgsrnIdy5Lu08Ju56bgsqke9g8Bq8DbauyJKt+ZK7WRd4L1OeaZeBE?=
+ =?us-ascii?Q?39kTTKffCVoXXC3nOaOlV3AbIvG3u/NGfFQn769iFHDVuZpwE88E9yUX0zKV?=
+ =?us-ascii?Q?Cpcml90ibBmfKFTEfS4Z3FWEKUTUFFZF5kUYpnZY0ntc+ZQji1fMh4km4Pr/?=
+ =?us-ascii?Q?552hTDIzHrUk7awTy9qrZ1rKFQtx0aC0AVazZrqQPcR4l+hPqUKg1u5UI547?=
+ =?us-ascii?Q?4DazoqRbL0fYL+eaBI1J6erjuc1CkZho29eBCg0S6xAU8uPHn9eqoDJuvjL0?=
+ =?us-ascii?Q?uQFdzZQTQdNmRhtKnUbu/ZQodU5I3UhskFndRveBIEmmPxzWYD86fJmkbxLx?=
+ =?us-ascii?Q?OeO8lU02GfY0Y2NMSoEiyqXJOJZsIkWSXGtZQeLvu5OjcyaLaf5kxlLCp2sF?=
+ =?us-ascii?Q?M+D7u6ThZ+GJ0CfwpbEuIeL9yd3sRlebukKBG5GUgTLhxdEeDU9Hu9m7MzYz?=
+ =?us-ascii?Q?0okQ7eSlujgrlGI9NOjwTgwWmK+MXDlfOZZ9Ax7VQDkgLOU+CcNcGapqzxr6?=
+ =?us-ascii?Q?YCcLdisNMDXAN3os3CelGkNQrMsf8VxlpkdGCwFQl8JmC/eQ9viOrJi/bh8/?=
+ =?us-ascii?Q?SRa0eslhbGcVk3F8P9/8bEBYAT7W1UWZgpVzRJVXY9Bh8FnPr0MAn4+kGRTx?=
+ =?us-ascii?Q?9rjgMAJAdwlJzfmJ95NN0CqTp3eoXCi9neAcINDvRuzAparw9GFVTEe5xao+?=
+ =?us-ascii?Q?PSUZOu0TS3iS1ZK+qUQ1rcMtKAO2s+KieJvUDBSmiLrcmNRBqphoejgfF2/a?=
+ =?us-ascii?Q?E/1FihAAARaBfnBZbdA1d4/BS6pllOXRHuzv1IhfFCapRVw0HQTOxf9padft?=
+ =?us-ascii?Q?vv7GNvfNZ+t9GpIy4G9jUHapvwuw+kNUXKtKWzwZyPUG/NqrPF47KpEeASz6?=
+ =?us-ascii?Q?N4iA3PBTAqbjixwPP6G8AsuzcnlsJ4/jplVCcACvaFA45f0KnzM5IyUkYjMS?=
+ =?us-ascii?Q?yAEENJBINr7YqXZQtYmjFLcOkm+9NSiylYfxj6rwD0M+j4ijBIqcxutMOUw3?=
+ =?us-ascii?Q?sHNeNDC10S+/s828QuMvtNqOsM1Mz6VftmoummihYsl655hYo8EQfQE/JB/c?=
+ =?us-ascii?Q?JKaM6gxQ3wB6E9w5gDJPPWoG96P0edKyZaY3rsIU5XS7FBCbcQxCuj7KqI5X?=
+ =?us-ascii?Q?ipJy9sho2DUXAsj9WVIJ34Xn+2dB+QpGtzX+e2///KmzWPckityVz1FB0RTq?=
+ =?us-ascii?Q?m59M3SdE64Pi8j279U8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?hOh2FsGuEdUpCwuLRl8xH6drbqMVokpakcTr2IthR3T0jsWhhWktnx6OU077?=
+ =?us-ascii?Q?xroMMApxOqPGJi+lBwBK6qSggfO6lGabfDagHkb1A1fWFoSPUuvitD46mHEc?=
+ =?us-ascii?Q?a2bS8Q+eSRIvCkFvRhhqUBPO+9sHowlED9hs0WzY2dPEwdmY/LtwDvmec2b4?=
+ =?us-ascii?Q?JWkYo1gSFOTife/0qVAkIRPqdtJiJTRGX5vx2FuTa3zhSiAerGnzrA8wZj8e?=
+ =?us-ascii?Q?axSonv0okNT+1v73iHAdX1mdPqB8SQXSwCxwEkvFunA+pZtWE4QSEolIIlXC?=
+ =?us-ascii?Q?4sGmMrp3Yjbqh31paJTLU+2Ue24IrFYjs+PChassXsVwKWDVvwb6Rby+uW08?=
+ =?us-ascii?Q?O9KZQaFlSoJQOK+q6vwEU0uAC+/yBDVScWfsk5zH81ogKR/PODLKoXqiBMnz?=
+ =?us-ascii?Q?0w3VfddMYcthww2HzzKtfkW1PoR6L+Fm2UdGPK69SWP27PZfKm/jwUJhiKni?=
+ =?us-ascii?Q?PVgDXDljhclZhC9lGnezGse5yI9GuMpYZ6yiAlighJXNScHeLERE/sly0d6f?=
+ =?us-ascii?Q?xO535ZCD1Mbucjf8+ti3vcOhxzJmRIghoGQkJ8WcczQUmtCor0EtVoyGYq2D?=
+ =?us-ascii?Q?nF+61SKfvWSNT3t1JXRHzGAdH7zVoAz4aHZ827h5mCHQgeH9O22KdzSIkFsA?=
+ =?us-ascii?Q?JEmTJ8QszE9wzJJT1ECHjQ6+JC+SPKPfSu2EdiVBKisLnTyxiLv6OmZDVnwh?=
+ =?us-ascii?Q?VKNFyWVqeccd8NF+M25BSWnMxhsPQD96LmX2U5l89/LhgJSXmTqgi94++9gV?=
+ =?us-ascii?Q?5pO4dwWHUo/1Z05DhzIewOrKaeFgJAgFys1Ge8BgqSl1kF+9UuUo7uYvvi6Y?=
+ =?us-ascii?Q?1hjDqWE8/h+1h2hI99viqyz7MGt6LS/OXABjz3+Z0nkyT0hveghwFxlat2nK?=
+ =?us-ascii?Q?i664B9rI8M1LvTHTYmuCu8ykKiXt67VmcFuQDAoxgi+zLfgEQnvqvctLmhnC?=
+ =?us-ascii?Q?cGM2RF8jUfL81fxHEYbIeOrE8YmggacrdkXPzo+tdVMEy0xmsogA/T22CivN?=
+ =?us-ascii?Q?+Gdk+cA1HftyJv5+5i2ohpM1NDhVTd+b9r/VGkm/IX8K8NyU+YgR8DAykvFx?=
+ =?us-ascii?Q?jsDBaue5NL/zwEM6yrwEkW21Mjnfp02koerrReTCVXR1c8IMfKDcYO5zOnV5?=
+ =?us-ascii?Q?UTA4hJ2loM32oUNF5V3wSe9m7pbpkSi3V1pO1JgASg+T9kPWYDSkCUuNtxV/?=
+ =?us-ascii?Q?N/pprx0P4VM9pE7sFSerUdJvIsXtTPjMLtOnsNCbfxT9mBEEJLlzJjZzYTod?=
+ =?us-ascii?Q?PPgz0zrp9lIP/qNDlXOmc2UMVecKjlAwucj/cK19GzJ/siK5Zs4OXK2vtCSy?=
+ =?us-ascii?Q?iqKcEJ52k7VzjQJgI3Y12ScloPSB/3qa6UhXKlo0y3TN172+N7p/UgAjZKug?=
+ =?us-ascii?Q?zyAjKkUX9N5iYqpJHgoQFK5DEGJjivXm8R1hHPheMjQKYUqexxmG7B67vr0V?=
+ =?us-ascii?Q?9XOezH5ZhtcWpe6eGV4bAZlug/tsalyB/c7CKTkXOqRKlQH00vqt6Cz96ckx?=
+ =?us-ascii?Q?Jjl9qR/J/pcnJ1m5VEmvH2LCD4ptAxKinI8Ail77KAgyIqQsHAuezCC4JtQ1?=
+ =?us-ascii?Q?MTZG/fTGjG660KArq3YAiU4JTSM369A9Hvk+qhfxRCug7n7FSFQXN0oKkQId?=
+ =?us-ascii?Q?rMwCRlQrMmht+32Zf/JdrHNljC8FYRlK2bCoJURQkqOs5ZzE79TTnao33DYP?=
+ =?us-ascii?Q?44PRmzUXp+k7nAN3oW3xsWu8IbP80I2W02dexBwVnT5chsI7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4ca31e9e-ac70-4418-72e3-08de61a544ab
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2026 15:19:18.3862
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HREEd8tdejIsZstszOY/nWX3upMt5qdwTIIEwV/LO8kbRJvyXKoN0+89s2m+qEbJ1FJCnGgHGdSgWZmS6mIKEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8857
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-255619-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255621-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
-X-Rspamd-Queue-Id: B62AEC6487
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,corvaglia.dev:email]
+X-Rspamd-Queue-Id: B86ABC64FA
 X-Rspamd-Action: no action
 
-Expose the phy_port information to userspace, so that we can know how
-many ports are available on a given interface, as well as their
-capabilities. For MDI ports, we report the list of supported linkmodes
-based on what the PHY that drives this port says.
-For MII ports, i.e. empty SFP cages, we report the MII linkmodes that we
-can output on this port.
+On Sat, Jan 31, 2026 at 04:53:09PM +0000, David Corvaglia wrote:
+> Replace sprintf with sysfs_emit in sysfs show() methods as outlined in
+> Documentation/filesystems/sysfs.rst. sysfs_emit is preferred to sprintf 
+> in sysfs show() methods as it is safer with buffer handling.
+> 
+> Signed-off-by: David Corvaglia <david@corvaglia.dev>
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- MAINTAINERS           |   1 +
- net/ethtool/Makefile  |   2 +-
- net/ethtool/netlink.c |  26 +++
- net/ethtool/netlink.h |   8 +
- net/ethtool/port.c    | 376 ++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 412 insertions(+), 1 deletion(-)
- create mode 100644 net/ethtool/port.c
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0caa8aee5840..cc8999191357 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18219,6 +18219,7 @@ F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
- F:	Documentation/networking/phy-port.rst
- F:	drivers/net/phy/phy_port.c
- F:	include/linux/phy_port.h
-+F:	net/ethtool/port.c
- K:	struct\s+phy_port|phy_port_
- 
- NETWORKING [GENERAL]
-diff --git a/net/ethtool/Makefile b/net/ethtool/Makefile
-index 629c10916670..9b5b09670008 100644
---- a/net/ethtool/Makefile
-+++ b/net/ethtool/Makefile
-@@ -9,4 +9,4 @@ ethtool_nl-y	:= netlink.o bitset.o strset.o linkinfo.o linkmodes.o rss.o \
- 		   channels.o coalesce.o pause.o eee.o tsinfo.o cabletest.o \
- 		   tunnels.o fec.o eeprom.o stats.o phc_vclocks.o mm.o \
- 		   module.o cmis_fw_update.o cmis_cdb.o pse-pd.o plca.o \
--		   phy.o tsconfig.o mse.o
-+		   phy.o tsconfig.o mse.o port.o
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index 6e5f0f4f815a..90674aed7777 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -18,6 +18,8 @@ static u32 ethnl_bcast_seq;
- 			     ETHTOOL_FLAG_OMIT_REPLY)
- #define ETHTOOL_FLAGS_STATS (ETHTOOL_FLAGS_BASIC | ETHTOOL_FLAG_STATS)
- 
-+char phy_interface_names[PHY_INTERFACE_MODE_MAX][ETH_GSTRING_LEN] __ro_after_init;
-+
- const struct nla_policy ethnl_header_policy[] = {
- 	[ETHTOOL_A_HEADER_DEV_INDEX]	= { .type = NLA_U32 },
- 	[ETHTOOL_A_HEADER_DEV_NAME]	= { .type = NLA_NUL_STRING,
-@@ -421,6 +423,7 @@ ethnl_default_requests[__ETHTOOL_MSG_USER_CNT] = {
- 	[ETHTOOL_MSG_TSCONFIG_SET]	= &ethnl_tsconfig_request_ops,
- 	[ETHTOOL_MSG_PHY_GET]		= &ethnl_phy_request_ops,
- 	[ETHTOOL_MSG_MSE_GET]		= &ethnl_mse_request_ops,
-+	[ETHTOOL_MSG_PORT_GET]		= &ethnl_port_request_ops,
- };
- 
- static struct ethnl_dump_ctx *ethnl_dump_context(struct netlink_callback *cb)
-@@ -1544,6 +1547,16 @@ static const struct genl_ops ethtool_genl_ops[] = {
- 		.policy = ethnl_mse_get_policy,
- 		.maxattr = ARRAY_SIZE(ethnl_mse_get_policy) - 1,
- 	},
-+	{
-+		.cmd	= ETHTOOL_MSG_PORT_GET,
-+		.doit	= ethnl_default_doit,
-+		.start	= ethnl_port_dump_start,
-+		.dumpit	= ethnl_port_dumpit,
-+		.done	= ethnl_port_dump_done,
-+		.policy = ethnl_port_get_policy,
-+		.maxattr = ARRAY_SIZE(ethnl_port_get_policy) - 1,
-+	},
-+
- };
- 
- static const struct genl_multicast_group ethtool_nl_mcgrps[] = {
-@@ -1566,10 +1579,23 @@ static struct genl_family ethtool_genl_family __ro_after_init = {
- 
- /* module setup */
- 
-+static void __init ethnl_phy_names_populate(void)
-+{
-+	const char *name;
-+	int i;
-+
-+	for (i = 0; i < PHY_INTERFACE_MODE_MAX; i++) {
-+		name = phy_modes(i);
-+		strscpy(phy_interface_names[i], name, ETH_GSTRING_LEN);
-+	}
-+}
-+
- static int __init ethnl_init(void)
- {
- 	int ret;
- 
-+	ethnl_phy_names_populate();
-+
- 	ret = genl_register_family(&ethtool_genl_family);
- 	if (WARN(ret < 0, "ethtool: genetlink family registration failed"))
- 		return ret;
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 89010eaa67df..e849bc63ac58 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -5,11 +5,14 @@
- 
- #include <linux/ethtool_netlink.h>
- #include <linux/netdevice.h>
-+#include <linux/phy.h>
- #include <net/genetlink.h>
- #include <net/sock.h>
- 
- struct ethnl_req_info;
- 
-+extern char phy_interface_names[PHY_INTERFACE_MODE_MAX][ETH_GSTRING_LEN];
-+
- u32 ethnl_bcast_seq_next(void);
- int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
- 			       const struct nlattr *nest, struct net *net,
-@@ -443,6 +446,7 @@ extern const struct ethnl_request_ops ethnl_mm_request_ops;
- extern const struct ethnl_request_ops ethnl_phy_request_ops;
- extern const struct ethnl_request_ops ethnl_tsconfig_request_ops;
- extern const struct ethnl_request_ops ethnl_mse_request_ops;
-+extern const struct ethnl_request_ops ethnl_port_request_ops;
- 
- extern const struct nla_policy ethnl_header_policy[ETHTOOL_A_HEADER_FLAGS + 1];
- extern const struct nla_policy ethnl_header_policy_stats[ETHTOOL_A_HEADER_FLAGS + 1];
-@@ -499,6 +503,7 @@ extern const struct nla_policy ethnl_phy_get_policy[ETHTOOL_A_PHY_HEADER + 1];
- extern const struct nla_policy ethnl_tsconfig_get_policy[ETHTOOL_A_TSCONFIG_HEADER + 1];
- extern const struct nla_policy ethnl_tsconfig_set_policy[ETHTOOL_A_TSCONFIG_MAX + 1];
- extern const struct nla_policy ethnl_mse_get_policy[ETHTOOL_A_MSE_HEADER + 1];
-+extern const struct nla_policy ethnl_port_get_policy[ETHTOOL_A_PORT_ID + 1];
- 
- int ethnl_set_features(struct sk_buff *skb, struct genl_info *info);
- int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info);
-@@ -514,6 +519,9 @@ int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
- int ethnl_tsinfo_done(struct netlink_callback *cb);
- int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info);
- int ethnl_rss_delete_doit(struct sk_buff *skb, struct genl_info *info);
-+int ethnl_port_dump_start(struct netlink_callback *cb);
-+int ethnl_port_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
-+int ethnl_port_dump_done(struct netlink_callback *cb);
- 
- extern const char stats_std_names[__ETHTOOL_STATS_CNT][ETH_GSTRING_LEN];
- extern const char stats_eth_phy_names[__ETHTOOL_A_STATS_ETH_PHY_CNT][ETH_GSTRING_LEN];
-diff --git a/net/ethtool/port.c b/net/ethtool/port.c
-new file mode 100644
-index 000000000000..9e6821a8d00b
---- /dev/null
-+++ b/net/ethtool/port.c
-@@ -0,0 +1,376 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2026 Bootlin
-+ *
-+ */
-+#include "common.h"
-+#include "bitset.h"
-+#include "netlink.h"
-+
-+#include <linux/phy.h>
-+#include <linux/phy_link_topology.h>
-+#include <linux/phy_port.h>
-+#include <net/netdev_lock.h>
-+
-+struct port_req_info {
-+	struct ethnl_req_info base;
-+	u32 port_id;
-+};
-+
-+struct port_reply_data {
-+	struct ethnl_reply_data	base;
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
-+	DECLARE_PHY_INTERFACE_MASK(interfaces);
-+	u32 port_id;
-+	bool mii;
-+	bool sfp;
-+	bool vacant;
-+};
-+
-+#define PORT_REQINFO(__req_base) \
-+	container_of(__req_base, struct port_req_info, base)
-+
-+#define PORT_REPDATA(__reply_base) \
-+	container_of(__reply_base, struct port_reply_data, base)
-+
-+const struct nla_policy ethnl_port_get_policy[ETHTOOL_A_PORT_ID + 1] = {
-+	[ETHTOOL_A_PORT_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
-+	[ETHTOOL_A_PORT_ID] = { .type = NLA_U32},
-+};
-+
-+static int port_parse_request(struct ethnl_req_info *req_info,
-+			      struct nlattr **tb,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct port_req_info *request = PORT_REQINFO(req_info);
-+
-+	/* PORT id is required for GET requests */
-+	if (tb[ETHTOOL_A_PORT_ID])
-+		request->port_id = nla_get_u32(tb[ETHTOOL_A_PORT_ID]);
-+
-+	if (!request->port_id) {
-+		NL_SET_ERR_MSG(extack, "port id missing");
-+		return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+
-+static int port_prepare_data(const struct ethnl_req_info *req_info,
-+			     struct ethnl_reply_data *reply_data,
-+			     const struct genl_info *info)
-+{
-+	struct port_reply_data *reply = PORT_REPDATA(reply_data);
-+	struct port_req_info *request = PORT_REQINFO(req_info);
-+	struct phy_port *port;
-+
-+	/* RTNL must be held while holding a ref to the phy_port. Here, caller
-+	 * holds RTNL.
-+	 */
-+	port = phy_link_topo_get_port(req_info->dev, request->port_id);
-+	if (!port)
-+		return -ENODEV;
-+
-+	linkmode_copy(reply->supported, port->supported);
-+	phy_interface_copy(reply->interfaces, port->interfaces);
-+	reply->port_id = port->id;
-+	reply->mii = port->is_mii;
-+	reply->sfp = port->is_sfp;
-+	reply->vacant = port->vacant;
-+
-+	return 0;
-+}
-+
-+static int port_reply_size(const struct ethnl_req_info *req_info,
-+			   const struct ethnl_reply_data *reply_data)
-+{
-+	bool compact = req_info->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
-+	struct port_reply_data *reply = PORT_REPDATA(reply_data);
-+	size_t size = 0;
-+	int ret;
-+
-+	/* ETHTOOL_A_PORT_ID */
-+	size += nla_total_size(sizeof(u32));
-+
-+	if (!reply->mii) {
-+		/* ETHTOOL_A_PORT_SUPPORTED_MODES */
-+		ret = ethnl_bitset_size(reply->supported, NULL,
-+					__ETHTOOL_LINK_MODE_MASK_NBITS,
-+					link_mode_names, compact);
-+		if (ret < 0)
-+			return ret;
-+
-+		size += ret;
-+	} else {
-+		/* ETHTOOL_A_PORT_SUPPORTED_INTERFACES */
-+		ret = ethnl_bitset_size(reply->interfaces, NULL,
-+					PHY_INTERFACE_MODE_MAX,
-+					phy_interface_names, compact);
-+		if (ret < 0)
-+			return ret;
-+
-+		size += ret;
-+	}
-+
-+	/* ETHTOOL_A_PORT_TYPE */
-+	size += nla_total_size(sizeof(u8));
-+
-+	/* ETHTOOL_A_PORT_VACANT */
-+	size += nla_total_size(sizeof(u8));
-+
-+	return size;
-+}
-+
-+static int port_fill_reply(struct sk_buff *skb,
-+			   const struct ethnl_req_info *req_info,
-+			   const struct ethnl_reply_data *reply_data)
-+{
-+	bool compact = req_info->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
-+	struct port_reply_data *reply = PORT_REPDATA(reply_data);
-+	int ret, port_type = ETHTOOL_PORT_TYPE_MDI;
-+
-+	if (nla_put_u32(skb, ETHTOOL_A_PORT_ID, reply->port_id))
-+		return -EMSGSIZE;
-+
-+	if (!reply->mii) {
-+		ret = ethnl_put_bitset(skb, ETHTOOL_A_PORT_SUPPORTED_MODES,
-+				       reply->supported, NULL,
-+				       __ETHTOOL_LINK_MODE_MASK_NBITS,
-+				       link_mode_names, compact);
-+		if (ret < 0)
-+			return -EMSGSIZE;
-+	} else {
-+		ret = ethnl_put_bitset(skb, ETHTOOL_A_PORT_SUPPORTED_INTERFACES,
-+				       reply->interfaces, NULL,
-+				       PHY_INTERFACE_MODE_MAX,
-+				       phy_interface_names, compact);
-+		if (ret < 0)
-+			return -EMSGSIZE;
-+	}
-+
-+	if (reply->mii || reply->sfp)
-+		port_type = ETHTOOL_PORT_TYPE_SFP;
-+
-+	if (nla_put_u8(skb, ETHTOOL_A_PORT_TYPE, port_type) ||
-+	    nla_put_u8(skb, ETHTOOL_A_PORT_VACANT, reply->vacant))
-+		return -EMSGSIZE;
-+
-+	return 0;
-+}
-+
-+struct port_dump_ctx {
-+	struct port_req_info	*req_info;
-+	struct port_reply_data	*reply_data;
-+	unsigned long		ifindex;
-+	unsigned long		pos_portid;
-+};
-+
-+static struct port_dump_ctx *
-+port_dump_ctx_get(struct netlink_callback *cb)
-+{
-+	return (struct port_dump_ctx *)cb->ctx;
-+}
-+
-+int ethnl_port_dump_start(struct netlink_callback *cb)
-+{
-+	const struct genl_dumpit_info *info = genl_dumpit_info(cb);
-+	struct port_dump_ctx *ctx = port_dump_ctx_get(cb);
-+	struct nlattr **tb = info->info.attrs;
-+	struct port_reply_data *reply_data;
-+	struct port_req_info *req_info;
-+	int ret;
-+
-+	BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
-+
-+	req_info = kzalloc(sizeof(*req_info), GFP_KERNEL);
-+	if (!req_info)
-+		return -ENOMEM;
-+
-+	reply_data = kmalloc(sizeof(*reply_data), GFP_KERNEL);
-+	if (!reply_data) {
-+		ret = -ENOMEM;
-+		goto free_req_info;
-+	}
-+
-+	ret = ethnl_parse_header_dev_get(&req_info->base, tb[ETHTOOL_A_PORT_HEADER],
-+					 genl_info_net(&info->info),
-+					 info->info.extack, false);
-+	if (ret < 0)
-+		goto free_rep_data;
-+
-+	ctx->ifindex = 0;
-+
-+	/* For filtered DUMP requests, let's just store the ifindex. We'll check
-+	 * again if the netdev is still there when looping over the netdev list
-+	 * in the DUMP loop.
-+	 */
-+	if (req_info->base.dev) {
-+		ctx->ifindex = req_info->base.dev->ifindex;
-+		netdev_put(req_info->base.dev, &req_info->base.dev_tracker);
-+		req_info->base.dev = NULL;
-+	}
-+
-+	ctx->req_info = req_info;
-+	ctx->reply_data = reply_data;
-+
-+	return 0;
-+
-+free_rep_data:
-+	kfree(reply_data);
-+free_req_info:
-+	kfree(req_info);
-+
-+	return ret;
-+}
-+
-+static int port_dump_one(struct sk_buff *skb, struct net_device *dev,
-+			 struct netlink_callback *cb)
-+{
-+	struct port_dump_ctx *ctx = port_dump_ctx_get(cb);
-+	void *ehdr;
-+	int ret;
-+
-+	ehdr = ethnl_dump_put(skb, cb, ETHTOOL_A_PORT_HEADER);
-+	if (!ehdr)
-+		return -EMSGSIZE;
-+
-+	memset(ctx->reply_data, 0, sizeof(struct port_reply_data));
-+	ctx->reply_data->base.dev = dev;
-+
-+	rtnl_lock();
-+	netdev_lock_ops(dev);
-+
-+	ret = port_prepare_data(&ctx->req_info->base, &ctx->reply_data->base,
-+				genl_info_dump(cb));
-+
-+	netdev_unlock_ops(dev);
-+	rtnl_unlock();
-+
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_PORT_HEADER);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = port_fill_reply(skb, &ctx->req_info->base, &ctx->reply_data->base);
-+
-+out:
-+	ctx->reply_data->base.dev = NULL;
-+	if (ret < 0)
-+		genlmsg_cancel(skb, ehdr);
-+	else
-+		genlmsg_end(skb, ehdr);
-+
-+	return ret;
-+}
-+
-+static int port_dump_one_dev(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	struct port_dump_ctx *ctx = port_dump_ctx_get(cb);
-+	struct net_device *dev;
-+	struct phy_port *port;
-+	int ret;
-+
-+	dev = ctx->req_info->base.dev;
-+
-+	if (!dev->link_topo)
-+		return 0;
-+
-+	xa_for_each_start(&dev->link_topo->ports, ctx->pos_portid, port,
-+			  ctx->pos_portid) {
-+		ctx->req_info->port_id = ctx->pos_portid;
-+
-+		ret = port_dump_one(skb, dev, cb);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	ctx->pos_portid = 0;
-+
-+	return 0;
-+}
-+
-+static int port_dump_all_dev(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	struct port_dump_ctx *ctx = port_dump_ctx_get(cb);
-+	struct net *net = sock_net(skb->sk);
-+	netdevice_tracker dev_tracker;
-+	struct net_device *dev;
-+	int ret = 0;
-+
-+	rcu_read_lock();
-+	for_each_netdev_dump(net, dev, ctx->ifindex) {
-+		netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
-+		rcu_read_unlock();
-+
-+		ctx->req_info->base.dev = dev;
-+		ret = port_dump_one_dev(skb, cb);
-+
-+		rcu_read_lock();
-+		netdev_put(dev, &dev_tracker);
-+		ctx->req_info->base.dev = NULL;
-+
-+		if (ret < 0 && ret != -EOPNOTSUPP) {
-+			if (likely(skb->len))
-+				ret = skb->len;
-+			break;
-+		}
-+		ret = 0;
-+	}
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
-+int ethnl_port_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	const struct genl_dumpit_info *info = genl_dumpit_info(cb);
-+	struct port_dump_ctx *ctx = port_dump_ctx_get(cb);
-+	int ret = 0;
-+
-+	if (ctx->ifindex) {
-+		netdevice_tracker dev_tracker;
-+		struct net_device *dev;
-+
-+		dev = netdev_get_by_index(genl_info_net(&info->info),
-+					  ctx->ifindex, &dev_tracker,
-+					  GFP_KERNEL);
-+		if (!dev)
-+			return -ENODEV;
-+
-+		ctx->req_info->base.dev = dev;
-+		ret = port_dump_one_dev(skb, cb);
-+		if (ret < 0 && ret != -EOPNOTSUPP && likely(skb->len))
-+			ret = skb->len;
-+
-+		netdev_put(dev, &dev_tracker);
-+	} else {
-+		ret = port_dump_all_dev(skb, cb);
-+	}
-+
-+	return ret;
-+}
-+
-+int ethnl_port_dump_done(struct netlink_callback *cb)
-+{
-+	struct port_dump_ctx *ctx = port_dump_ctx_get(cb);
-+
-+	kfree(ctx->req_info);
-+	kfree(ctx->reply_data);
-+
-+	return 0;
-+}
-+
-+const struct ethnl_request_ops ethnl_port_request_ops = {
-+	.request_cmd		= ETHTOOL_MSG_PORT_GET,
-+	.reply_cmd		= ETHTOOL_MSG_PORT_GET_REPLY,
-+	.hdr_attr		= ETHTOOL_A_PORT_HEADER,
-+	.req_info_size		= sizeof(struct port_req_info),
-+	.reply_data_size	= sizeof(struct port_reply_data),
-+
-+	.parse_request		= port_parse_request,
-+	.prepare_data		= port_prepare_data,
-+	.reply_size		= port_reply_size,
-+	.fill_reply		= port_fill_reply,
-+};
--- 
-2.49.0
+But the patch is introducing a few alignment issues and it would be good
+to fix them in v2. See below.
 
+[...]
+
+> @@ -87,7 +87,7 @@ static DEVICE_ATTR_RW(forward_delay);
+>  static ssize_t hello_time_show(struct device *d, struct device_attribute *attr,
+>  			       char *buf)
+>  {
+> -	return sprintf(buf, "%lu\n",
+> +	return sysfs_emit(buf, "%lu\n",
+>  		       jiffies_to_clock_t(to_bridge(d)->hello_time));
+
+Here
+
+>  }
+>  
+> @@ -108,7 +108,7 @@ static DEVICE_ATTR_RW(hello_time);
+>  static ssize_t max_age_show(struct device *d, struct device_attribute *attr,
+>  			    char *buf)
+>  {
+> -	return sprintf(buf, "%lu\n",
+> +	return sysfs_emit(buf, "%lu\n",
+>  		       jiffies_to_clock_t(to_bridge(d)->max_age));
+
+Here
+
+>  }
+>  
+
+[...]
+
+>  static int set_group_fwd_mask(struct net_bridge *br, unsigned long val,
+> @@ -200,7 +200,7 @@ static ssize_t priority_show(struct device *d, struct device_attribute *attr,
+>  			     char *buf)
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+> -	return sprintf(buf, "%d\n",
+> +	return sysfs_emit(buf, "%d\n",
+>  		       (br->bridge_id.prio[0] << 8) | br->bridge_id.prio[1]);
+
+Here
+
+>  }
+
+[...]
+
+> @@ -425,7 +425,7 @@ static ssize_t multicast_query_use_ifaddr_show(struct device *d,
+>  					       char *buf)
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+> -	return sprintf(buf, "%d\n",
+> +	return sysfs_emit(buf, "%d\n",
+>  		       br_opt_get(br, BROPT_MULTICAST_QUERY_USE_IFADDR));
+
+Here
+
+>  }
+
+> @@ -583,7 +583,7 @@ static ssize_t multicast_last_member_interval_show(
+>  	struct device *d, struct device_attribute *attr, char *buf)
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+> -	return sprintf(buf, "%lu\n",
+> +	return sysfs_emit(buf, "%lu\n",
+>  		       jiffies_to_clock_t(br->multicast_ctx.multicast_last_member_interval));
+
+Here
+
+>  }
+>  
+> @@ -606,7 +606,7 @@ static ssize_t multicast_membership_interval_show(
+>  	struct device *d, struct device_attribute *attr, char *buf)
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+> -	return sprintf(buf, "%lu\n",
+> +	return sysfs_emit(buf, "%lu\n",
+>  		       jiffies_to_clock_t(br->multicast_ctx.multicast_membership_interval));
+
+Here
+
+>  }
+>  
+> @@ -630,7 +630,7 @@ static ssize_t multicast_querier_interval_show(struct device *d,
+>  					       char *buf)
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+> -	return sprintf(buf, "%lu\n",
+> +	return sysfs_emit(buf, "%lu\n",
+>  		       jiffies_to_clock_t(br->multicast_ctx.multicast_querier_interval));
+
+Here
+
+>  }
+>  
+> @@ -654,7 +654,7 @@ static ssize_t multicast_query_interval_show(struct device *d,
+>  					     char *buf)
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+> -	return sprintf(buf, "%lu\n",
+> +	return sysfs_emit(buf, "%lu\n",
+>  		       jiffies_to_clock_t(br->multicast_ctx.multicast_query_interval));
+
+Here
+
+>  }
+
+[...]
+
+> @@ -727,7 +727,7 @@ static ssize_t multicast_stats_enabled_show(struct device *d,
+>  {
+>  	struct net_bridge *br = to_bridge(d);
+>  
+> -	return sprintf(buf, "%d\n",
+> +	return sysfs_emit(buf, "%d\n",
+>  		       br_opt_get(br, BROPT_MULTICAST_STATS_ENABLED));
+
+Here
+
+>  }
 
