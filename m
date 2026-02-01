@@ -1,144 +1,132 @@
-Return-Path: <netdev+bounces-255599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFaOG9dff2ncpAIAu9opvQ
-	(envelope-from <netdev+bounces-255599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 15:14:47 +0100
+	id sGFlMIBgf2kMpQIAu9opvQ
+	(envelope-from <netdev+bounces-255600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 15:17:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75CEC61C5
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 15:14:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B782C61E6
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 15:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 202F53004C55
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 14:14:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 072C73000FE3
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 14:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191A8346763;
-	Sun,  1 Feb 2026 14:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="jHULLAp6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293B028DEE9;
+	Sun,  1 Feb 2026 14:17:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABC233CEB9
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 14:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A4A2AD20
+	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 14:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769955283; cv=none; b=S7cOzu5SgTc5u0OMDkb8tcJfek7UA7GiNTP2kZJwYNvuJXt0CjHzhbngESTujrRZZ9YCu/Ll7IJTOtkRVok7hIIMBSBkBTJeuzwVaxldHijZbQ6ZGRZy+Je154B+9I4rCviaQSPGVEuO1ELC8kZ6s3oH/ARIPxJJX2T/K8BlY3s=
+	t=1769955452; cv=none; b=indm1QRp89Tyy/NKZpLgQitcl8RCXC09rgdUM6rG7BWuR1CQz3bDThsHniRhGCKs/h4m80jejFH3d5aayHUvP3Zk0ODQzJCBJd2/ww0lCD1JwFhSJsE0HmPuRYpsLLGFIxZ10aCbzTUOx9V30C8srHOz93ppMcJZ4GjVGnnkGVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769955283; c=relaxed/simple;
-	bh=MgOywgjpVbTVfAhVRGWjklJ4VfDwc9t3bcDSNF8jTEQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tGQdOGC6vUZk7baydj1Fc5Jz2Mf/aTq1UACg58KP/o/oXRdxZBN223zQT/UgHIqXG6Wl6+RxizOQCNSNh4HPpvIkWvPUcoNKie3AKkqmFI49OcHLUsAoo+VENOoOpVGHhXl2zP7Z4HE+B8quPBiYLV7NAWhqsEuBOiHpROJ/688=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=jHULLAp6; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (182.51.30.125.dy.iij4u.or.jp [125.30.51.182])
+	s=arc-20240116; t=1769955452; c=relaxed/simple;
+	bh=gl0lXncd62Tnf6kPllTJwc57kMyuanR54eBFQ5YuHNw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kyyaZg/im1f8U3epKD3U8B60vB12OjuvfkvXu4mgxrGwI3BeCFMsyDv5C5g1jxTmrwujx6cn0UAS0xfBni5Ql9qEyjTBQRgW5c1qx0/NtlD4el35Q5Ns5LGP884vSDf+7QYkpQ+ZifgTKtcKXTzXkNuSI2K2ZsomTemckwdBM9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 611EHRpA029308;
+	Sun, 1 Feb 2026 23:17:27 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
 	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 611EEWh2001191
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 1 Feb 2026 23:14:33 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=NsDbxjjmDR7CvHkvxGhq8nSyf2oqDfr3q8OmR6MlyCQ=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1769955273; v=1;
-        b=jHULLAp6oKbuXYDcbKLPKiG/1tfUlOI1mcpKIrrSPQpjY2q5LtCJZ/w3N5Os+4tN
-         ADBk2kK5J758uT3e1l7mvCxnillFqYnySDCBgxBlfoYehf4IfmpAjH/BFVLAtWcl
-         gyuHhTIwDiBBFVKJdat4FoK2uXg/JUhgjV++xeSdFgmJS0VtjD0Drf2Cir05EZB0
-         tsh6jw2G5q2fltSqltwI10XcpjfsqiNOtjSK6FqS2xXVNtP5wt4cdgFdvGaHHQXz
-         la8EU5nKsAl6WRH16a7nBgAZxSQbdTLNbBoqubI1e8clbHSr+TP5hsF2yrSQeo/v
-         xZJxF2fBGQiaJVCtN4j2PQ==
-From: Kohei Enju <kohei@enjuk.jp>
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-        Simon Horman <horms@kernel.org>, kohei.enju@gmail.com,
-        Kohei Enju <kohei@enjuk.jp>
-Subject: [PATCH v1 iwl-net] ice: ptp: don't WARN when controlling PF is unavailable
-Date: Sun,  1 Feb 2026 14:14:00 +0000
-Message-ID: <20260201141430.131063-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 611EHRE0029304
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 1 Feb 2026 23:17:27 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <fcbbbf70-f28c-4da8-be10-1863d4a6c0d8@I-love.SAKURA.ne.jp>
+Date: Sun, 1 Feb 2026 23:17:24 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xfrm: always flush state and policy upon
+ NETDEV_DOWN/NETDEV_UNREGISTER events
+To: Leon Romanovsky <leon@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Ilan Tayari <ilant@mellanox.com>, Guy Shapiro <guysh@mellanox.com>,
+        Yossi Kuperman <yossiku@mellanox.com>,
+        Network Development <netdev@vger.kernel.org>
+References: <1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp>
+ <20260128102404.GC12149@unreal>
+ <83d06aca-4437-4d61-9c99-ac19b797a243@I-love.SAKURA.ne.jp>
+ <20260128123546.GC40916@unreal>
+ <b91432c3-5ed4-4669-8d7c-02cf7ea6f8fa@I-love.SAKURA.ne.jp>
+ <20260129090959.GD10992@unreal>
+ <d0aa3c51-291b-40fd-82b4-15024dc4404b@I-love.SAKURA.ne.jp>
+ <aXuFTJZ3SvaCBXj5@krikkit> <20260201131253.GD34749@unreal>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260201131253.GD34749@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav303.rs.sakura.ne.jp
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-255599-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255600-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B75CEC61C5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9B782C61E6
 X-Rspamd-Action: no action
 
-In VFIO passthrough setups, it is possible to pass through only a PF
-which doesn't own the source timer. In that case the PTP controlling PF
-(adapter->ctrl_pf) is never initialized in the VM, so ice_get_ctrl_ptp()
-returns NULL and triggers WARN_ON() in ice_ptp_setup_pf().
+On 2026/02/01 22:12, Leon Romanovsky wrote:
+> I don't think that it is correct thing to adapt core code to something
+> specific to netdevsim which was introduced to emulate missing HW device.
+> Like in real HW device, the expectation is to have NETIF_F_HW_ESP bit,
+> we should have that bit in netdevsim too.
 
-Since this is an expected behavior in that configuration, replace
-WARN_ON() with an informational message and return -EOPNOTSUPP.
+I posted https://lkml.kernel.org/r/cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp
+as what I think we should do regardless of netdevsim module.
 
-Fixes: e800654e85b5 ("ice: Use ice_adapter for PTP shared data instead of auxdev")
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+syzbot is reporting "struct net_device" cannot be released because xfrm_dev_down()
+cannot release reference to "struct net_device" unless NETIF_F_HW_ESP bit is set.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 272683001476..082313023024 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -3048,7 +3048,13 @@ static int ice_ptp_setup_pf(struct ice_pf *pf)
- 	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
- 	struct ice_ptp *ptp = &pf->ptp;
- 
--	if (WARN_ON(!ctrl_ptp) || pf->hw.mac_type == ICE_MAC_UNKNOWN)
-+	if (!ctrl_ptp) {
-+		dev_info(ice_pf_to_dev(pf),
-+			 "PTP unavailable: no controlling PF\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (pf->hw.mac_type == ICE_MAC_UNKNOWN)
- 		return -ENODEV;
- 
- 	INIT_LIST_HEAD(&ptp->port.list_node);
--- 
-2.51.0
+But I wonder when "struct xfrm_state" (without reference to "struct net_device") can be
+released if xfrm_dev_down() becomes no-op due to checking for NETIF_F_HW_ESP bit;
+I suspect there remains a resource leak bug unless xfrm_dev_unregister() is added.
+
+Currently 50%+ reports of "unregister_netdevice: waiting for DEV to become free"
+problem is hitting this xfrm path. Since there are other paths remaining, I want to
+exclude xfrm path as quick as possible.
+
+My question is, apart from how to fix netdevsim module, can my xfrm_dev_unregister()
+patch be accepted?
 
 
