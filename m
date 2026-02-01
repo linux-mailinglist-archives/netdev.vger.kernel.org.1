@@ -1,149 +1,181 @@
-Return-Path: <netdev+bounces-255550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id NnD4E9KXfmlSbQIAu9opvQ
-	(envelope-from <netdev+bounces-255550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 01:01:22 +0100
+	id yN9LByKYfmlTbQIAu9opvQ
+	(envelope-from <netdev+bounces-255551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 01:02:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98559C46BA
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 01:01:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EA5C46CA
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 01:02:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6470E3016283
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 00:01:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 790B13015D1D
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 00:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B40F191;
-	Sun,  1 Feb 2026 00:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A791A3EBF35;
+	Sun,  1 Feb 2026 00:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="h501Bb3n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KeviGF80"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6864B3A1B5;
-	Sun,  1 Feb 2026 00:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CCF163;
+	Sun,  1 Feb 2026 00:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769904078; cv=none; b=GRUEkh/D+c2e+28hwnsJvBcWGbaXRtCwW8b1mFEMF6ZxyxtbGs+TSnZc6C5uoZCxR1Tcmfv96uQeyhpJrziJbTRyamDIev2aXkfxYSh78czB/c3LeQ8H2f+O/exdmaXBy1buXza2FlB0BDlDHKAc203wwrHSUd0VZWG4hINGGfU=
+	t=1769904159; cv=none; b=MGt4W9oyN8m4jrxoPQ4k1TJWz8bnZ0TkvuMweiOwjA9cdzdRKG0Mn79QglMLARff5+sRy0gz4L7Yl5cAEQ9h/q+z9Z+h5B56e004f76RccQlV0gdUf9k+aNYGNBJvXm42YSDB7gd6AKp1LmNwdXl9CXUii0tS0oDLkOkn4l+mpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769904078; c=relaxed/simple;
-	bh=pFUH64fTAkeU9bkrBC97ZI46DOQturvErPYQ3kgqYhY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LdFp407zSeM8IovpGLqiJbkEyu5cjaFZTi8hSVHX+7uwsyeTdDKInbU7gf6ID1f+xAJ28WzAXRzf4Ka0QC1txWU/pHqkp8JKYp94RuRsCJu27R6jayjHoxbpfH7+lPjJ7rsSnYdpNm15ooDGj7g4/cP4NLCznqU8x005eIXLGCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=h501Bb3n; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=CnBY/5KwliOTevCAoDnrILa84iIB602z10HXwkVWJos=; b=h501Bb3nkWZobsUNe8wmhMv6Vg
-	/o35AUYsk05S/EdD289nzfsvt4O6biYimbgQFH+PpmpZ9TIdxwMGnUdjF1t+fqWgKbZw8Nnbs8gPF
-	s5YiBugK/fkFo0Z0GzonvtF3pyJqlJUgibrAyIpv20lHakaEWyxkUh2IDLye1pBl6vI6brBGXlN7C
-	3E2VLAaMI1VHrLnFuFaOvLuY4lmx+v23h4iKGaFi2Dq4pNbTf3E814PINyrMIapPFE9q4eBQKQHdx
-	NmTq6F8tzJzB2bb1u0p90spB6YXB2uQ0tdsCYqAZ1JwnxCRZKmxWVTpG2vaiD0/JWv9MJjh8RorG9
-	8F8zhwrg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vmKtm-000000036eq-1MM2;
-	Sun, 01 Feb 2026 00:01:06 +0000
-Message-ID: <16c2528a-85be-4f7b-a60a-923613ecc8fb@infradead.org>
-Date: Sat, 31 Jan 2026 16:01:04 -0800
+	s=arc-20240116; t=1769904159; c=relaxed/simple;
+	bh=oUi0nMaMrH1PZFx8wHi2LyYp7blgKlrgCLUYZ5ozKPM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kbrJQdQ/X2vO//lVxsM16M3B0wMv+ZNZZ+oo6HU0jNpw8Qbj4zUVlUPKzMXeYQGlb/c8zMdZ4+8/fAz7013l/B5/pUHCSw714+lpCrmhXWx/bXMelD7wCgaBS14R1X+Cxx+rk4199DxwdFX+xcZ+WFp+zosQXQjG9QCV+7qKMiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KeviGF80; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52CEAC4CEF1;
+	Sun,  1 Feb 2026 00:02:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769904159;
+	bh=oUi0nMaMrH1PZFx8wHi2LyYp7blgKlrgCLUYZ5ozKPM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KeviGF80GbEOwKXkmGzPFGEvOoJbynhnNP4CHPfOse/QOJUuAArBFGZJBEB/Wvipl
+	 M8RjTqHqoDxp4Cyc8sclpm54bKeIbv1Vk+GFqkfRasFgu8MkemXr/8fuMu2xVDq8Vn
+	 VdlDzm8WYer+MlVPCddWggGCR52yf1GfqjCXWnSD071LiSqGjyDd/emvTwGj12WlzF
+	 Be4xyrPeM66sracyqGo3Rct1W0WL57cJNggYPt5CqWhf/aJlrXLEx4yNJPApboHOlX
+	 TN7IHEmp8VQ62chlh4l7JqeTlBiuMaiHp5ffhRB0eMDSGYxOYqs7YFTqcXMKf6MLfW
+	 Pf0dOct40M0Xw==
+Date: Sat, 31 Jan 2026 16:02:37 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
+ sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
+ jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+ wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v8 06/16] net: Proxy net_mp_{open,close}_rxq
+ for leased queues
+Message-ID: <20260131160237.07789674@kernel.org>
+In-Reply-To: <20260129222830.439687-7-daniel@iogearbox.net>
+References: <20260129222830.439687-1-daniel@iogearbox.net>
+	<20260129222830.439687-7-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/iucv: clean up iucv kernel-doc warnings
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20260130054759.1301608-1-rdunlap@infradead.org>
- <20260131131131.0d854805@kernel.org>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260131131131.0d854805@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255550-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255551-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,davidwei.uk,bytedance.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:mid,infradead.org:dkim]
-X-Rspamd-Queue-Id: 98559C46BA
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 89EA5C46CA
 X-Rspamd-Action: no action
 
+On Thu, 29 Jan 2026 23:28:20 +0100 Daniel Borkmann wrote:
+> @@ -191,24 +214,15 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+>  }
+>  EXPORT_SYMBOL_NS_GPL(netdev_rx_queue_restart, "NETDEV_INTERNAL");
+>  
+> -int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+> -		    const struct pp_memory_provider_params *p,
+> -		    struct netlink_ext_ack *extack)
+> +static int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+> +			     const struct pp_memory_provider_params *p,
+> +			     struct netlink_ext_ack *extack)
+>  {
+>  	const struct netdev_queue_mgmt_ops *qops = dev->queue_mgmt_ops;
+>  	struct netdev_queue_config qcfg[2];
+>  	struct netdev_rx_queue *rxq;
+>  	int ret;
+>  
+> -	if (!netdev_need_ops_lock(dev))
+> -		return -EOPNOTSUPP;
+> -
+> -	if (rxq_idx >= dev->real_num_rx_queues) {
+> -		NL_SET_ERR_MSG(extack, "rx queue index out of range");
+> -		return -ERANGE;
+> -	}
+> -	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
+> -
+
+> +int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+> +		    const struct pp_memory_provider_params *p,
+> +		    struct netlink_ext_ack *extack)
+> +{
+> +	struct net_device *orig_dev = dev;
+> +	int ret;
+> +
+> +	if (!netdev_need_ops_lock(dev))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (rxq_idx >= dev->real_num_rx_queues) {
+> +		NL_SET_ERR_MSG(extack, "rx queue index out of range");
+> +		return -ERANGE;
+> +	}
+> +
+
+nit: delete this empty line please, like it was in the original code.
+
+> +	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
+> +
+> +	if (!netif_get_rx_queue_lease_locked(&dev, &rxq_idx)) {
+> +		NL_SET_ERR_MSG(extack, "rx queue leased to a virtual netdev");
+> +		return -EBUSY;
+> +	}
+> +	if (!dev->dev.parent) {
+> +		NL_SET_ERR_MSG(extack, "rx queue belongs to a virtual netdev");
+> +		ret = -EOPNOTSUPP;
+> +		goto out;
+> +	}
+> +
+> +	ret = __net_mp_open_rxq(dev, rxq_idx, p, extack);
+> +out:
+> +	netif_put_rx_queue_lease_locked(orig_dev, dev);
+> +	return ret;
+
+Please:
+
+	if (!netif_queue_is_a_lease())
+		return __net_mp_open_rxq(dev, rxq_idx, p, extack);
+
+	..explicit code that deals with the lease, no conditional locking
+	...
+	ret = __net_mp_open_rxq($dev, $rxq_idx, p, extack);
+	...
 
 
-On 1/31/26 1:11 PM, Jakub Kicinski wrote:
-> On Thu, 29 Jan 2026 21:47:59 -0800 Randy Dunlap wrote:
->>  /**
->> - * __iucv_message_receive
->> + * __iucv_message_receive - Terminates an IUCV path.
-> 
-> AI code review complains this is odd wording since the main body
-> describes reception not termination.
-> 
->>   * @path: address of iucv path structure
->>   * @msg: address of iucv msg structure
->>   * @flags: flags that affect how the message is received (IUCV_IPBUFLST)
->> @@ -374,7 +363,7 @@ int __iucv_message_receive(struct iucv_p
->>  			   size_t *residual);
->>  
->>  /**
->> - * iucv_message_reject
->> + * iucv_message_reject - Refuses a specified message
->>   * @path: address of iucv path structure
->>   * @msg: address of iucv msg structure
->>   *
->> @@ -387,7 +376,7 @@ int __iucv_message_receive(struct iucv_p
->>  int iucv_message_reject(struct iucv_path *path, struct iucv_message *msg);
->>  
->>  /**
->> - * iucv_message_reply
->> + * iucv_message_reply - Refuses a specified message
-> 
-> Same here, refuses or replies?
-> 
->>   * @path: address of iucv path structure
->>   * @msg: address of iucv msg structure
->>   * @flags: how the reply is sent (IUCV_IPRMDATA, IUCV_IPPRTY, IUCV_IPBUFLST)
-> 
-> In general -- Could we possibly delete the duplicated kdocs in 
-> the header. As clearly shown by this patch it's double the work
-> and kernel-doc will be able to find the definition wherever it is.
-> Kernel coding guide recommends kdoc next to definition.
+> -	rxq = __netif_get_rx_queue(dev, ifq_idx);
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
 
-Thanks. I'll check all of that.
-
--- 
-~Randy
-
+Indeed good to cleanup the ifq_idx naming that sneaked in, but IDK if
+this belongs in this commit :S
 
