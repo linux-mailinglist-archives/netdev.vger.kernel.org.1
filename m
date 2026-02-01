@@ -1,168 +1,166 @@
-Return-Path: <netdev+bounces-255662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255667-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BxuKKCTf2lotwIAu9opvQ
-	(envelope-from <netdev+bounces-255662-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 18:55:44 +0100
+	id 2MA4Gj6df2nquQIAu9opvQ
+	(envelope-from <netdev+bounces-255667-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:36:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D399C6D66
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 18:55:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA7FC6F37
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 054A6304B5BF
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 17:51:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5BAFA300103F
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 18:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6E227EC80;
-	Sun,  1 Feb 2026 17:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FB227FB3A;
+	Sun,  1 Feb 2026 18:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGPew7Nr"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="NBNAV/Wq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD799280324
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 17:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E24326FA6F;
+	Sun,  1 Feb 2026 18:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769968277; cv=none; b=iQCL4JUqlgqCfawuAAXouDPYTCQ25zYOTyOtTqftMpZ2IxpJ86+R8hhNXp03RuL0RYwVvySiNKxF+nZ2cYt0gtQ7viuT5itHroWOH0G+DyzRg03kBETzPS47j8PC+vDFnOpdUHcJAa3bxGpnqCxfrJTwZ2AG8T/OWoSFHrsUJuk=
+	t=1769971002; cv=none; b=e3ttjWsjlyaTVlArFI/SJ2eOKjxVLL/U70uYqCr8sJtvkxIR+hTRh0iSPZuLk1WAYGiab1wSWuUMYzjcPggZagtpsvzlK0uC1trwnN+l4QqX+HRyO57qrki4A1r2L67iG0lO5FNS1IQ83KdqIBDLTs6UsDBb1fgRUB9fHRjMKrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769968277; c=relaxed/simple;
-	bh=exa/YP9fyICJ77EYEDHbnzjy54eXhqjQuSP7ACG5gVg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UNF3ffCjS8GS7vX3a9MfH94oqTCS33MhNYDGyY6SHbyuML69BUfXJ4KtWmOP3IlU56tv5np8s/8lxiOLTV6IBwDPGt2kjPpHtnWOqLICEZGyxxnB1nSiNPWoIz2Uz7H+I9xjA25vf3obI5CCO3bs48gBRDRNIIqGmxJLUyXEftQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGPew7Nr; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-81f47610542so1989351b3a.0
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 09:51:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769968271; x=1770573071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uRf+SRIGQU8su06GPIQHkqNg5txYSi+urlSE/fCNWGY=;
-        b=bGPew7NrLebHj9dB9DEE/zsshkLACYQGdPowqtgsISA/yLaheVQQBRlWLZ6hyBDQPf
-         tw3KN29xR5M+VlBbO4tmGSuS9MRBIHHhb8h17YlFxPaQXfNNY8c1+9C6ArIh9i9+2ELJ
-         NMsFcLqMpnHoWKgJlIJr236lJMv6t9sfLiOhgvko5QD7HycB4w+NnYfZmuCg8lVOPQr/
-         6GvAASG6ti7tkWN8O1bwQsY5p0/cnkdXRvyvPG4+JrQc+Cs4url6ZkusZyXmVuJMcogX
-         YjynDHHS4Q/KuGuDbtIgVa6ZVHbog6amISPqz51b9c7++LthejbHPimZJzz3PwNvXcB8
-         yt4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769968271; x=1770573071;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uRf+SRIGQU8su06GPIQHkqNg5txYSi+urlSE/fCNWGY=;
-        b=hU1L+zqezmOvfOFLhNNMbrojivYuAvQ8pmNbOSbHvFFr+iaL6C9x/4LQghdANUwTei
-         hkPYSVsUSYYYjQ38WudYnJvoCQVE1x+oUIJxWDINTbOlEo3VPo8uXn9u8RSLqE5pxQGC
-         +q8q8CT0PmrMFhcT4LCEHs06GEeDX+V+154MNylREHpH9lfw4N9oU3dInqv2M+KoTrct
-         Pdk7Ye7Zv5/oTOCIIkSDswDFo5ZfvKwoHeoI9BFsLimRnV9Q0DFx/v4k2gPAc3SJapxW
-         xCEm8rQIMEhBF8b4QFiqmbZLlHzy3fLsWqBAV5fLbXEm2e5taIAIOyaE5bz2qCIoLEC3
-         Zceg==
-X-Gm-Message-State: AOJu0Yxo6iGrPgRWUx+7z3pC2w01+Sa9gll+GgIjkEgZIzTzf/FM1bCS
-	Kn2aCsu8xsbiPhW48tO6P9j2BlJZkpHT989huZVUnhMTvMCrIydTcXJn
-X-Gm-Gg: AZuq6aJwsvSghijp0ImzL+9UyLLn8+PQID7YGAQlrBG99VhlQG0V7LGCdS6hI8sc5rQ
-	BnkmAXUHfYiLuHuuEHYeaaE8uYLuf6zRt30ciAJtGQLHGf1bAh5kkzXwl/5XwU0/I6YjgQ9Muhl
-	oaAGNzGy2pPOz9w/5M6NGO8mr3rbYknfvXY5i7WuCjYS55PY6sg33TajQjqbPsBJhKtYjjk6jzz
-	yZqz4UDWNFmz9M5AtjPt0FBG8ffwTcyNqTzhXNJZn4XH8WUu/wamPeB/Towum5lTSoMJydaAKo9
-	rCP7KO+T7qZFFTfnWiNyi+ldznlzN60M9of1NO420dE63JpqSEDyqTUKZmQrlMCyACLYoloa08j
-	b9iH0FUVdlAfJm2NcZsSZqWaftIgE89ooEboqYyTxvh7e5mQg0XQeNdSdFfSD1qjLBhGJlB4VZo
-	dchA==
-X-Received: by 2002:a05:6a00:2316:b0:81f:394a:489e with SMTP id d2e1a72fcca58-823ab65ef08mr8539752b3a.10.1769968271114;
-        Sun, 01 Feb 2026 09:51:11 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:5e::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379b1bc1asm13967537b3a.9.2026.02.01.09.51.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Feb 2026 09:51:10 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	kpsingh@kernel.org,
-	yonghong.song@linux.dev,
-	song@kernel.org,
-	haoluo@google.com,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 16/16] selftests/bpf: Choose another percpu variable in bpf for btf_dump test
-Date: Sun,  1 Feb 2026 09:50:49 -0800
-Message-ID: <20260201175050.468601-17-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260201175050.468601-1-ameryhung@gmail.com>
-References: <20260201175050.468601-1-ameryhung@gmail.com>
+	s=arc-20240116; t=1769971002; c=relaxed/simple;
+	bh=FKQ+iMI50ehFmBlFkW5r/p6X/TrPjJq5F3z6fG9hjE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UPei46GbmbRUiQRKB9hwcAZkJ0zRp5ELxFxWQ2RCJf6qsAl3MPI+lNimE6PJ74JfHeL7AjqdxeP1qwMtOmZ/ZXgelgpJIFV3CoQJJkJ3OkGZVomIPVgW2MTrkI0MbNf0qZMzUvNHQYFYFzMBNMuJtCn/HviEsT1PmGaNerW8Kjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=NBNAV/Wq; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5F55C109D9D;
+	Sun,  1 Feb 2026 19:36:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1769970991;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=LARm2Y3oL9MqfVRvr87lH7jEV+ZHtuB87P+3QLUsfN8=;
+	b=NBNAV/WqTMJCNSC3XKmzFMaQg50nfqsgqNjohQWgTwz2cl63bw7bslLiPdI7BHXhL/Czq7
+	FOeJO9GgdbK7MVeCHC8R7tilL8fqzmPLqNh7TiJcxRp4BoaYI+6CqlY4d5fe55jho6HQEU
+	9tmHj3kpUwsKNhQyYMYrmdRHKPQi8atOhn9uj6n20dGBsqoGFybPwDpSmRiN7iH3p3qKH2
+	NDZhfrvRzkRz33AokZ7yITLhWf6B3ysRdf2lk+rQHg44Uyg84JbZH3lXJYWoPZTMlM6bV0
+	SMEcPVnREi3xMMEgNGgiz/oGwm9csACAkFjfxPSV3MJXaH6JRgYbT0cVtc8tWw==
+Message-ID: <35d31893-2a28-410f-a1c7-038b4167e265@nabladev.com>
+Date: Sun, 1 Feb 2026 19:20:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed
+ interface
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Christophe Roullier <christophe.roullier@st.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
+References: <20260114081809.12758-1-marex@nabladev.com>
+ <aWfEXX1iMHy3V5sK@shell.armlinux.org.uk>
+ <aWfOYf_YmJFUakvP@shell.armlinux.org.uk>
+ <6c9cadc2-67b7-4bfe-9cf7-2b102a0a3c21@nabladev.com>
+ <aXzT1UCpG4kN-dQv@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <aXzT1UCpG4kN-dQv@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255662-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255667-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,foss.st.com,lunn.ch,st.com,google.com,kernel.org,gmail.com,redhat.com,dh-electronics.com,lists.infradead.org,st-md-mailman.stormreply.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nabladev.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4D399C6D66
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nabladev.com:mid,nabladev.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EFA7FC6F37
 X-Rspamd-Action: no action
 
-bpf_cgrp_storage_busy has been removed. Use bpf_bprintf_nest_level
-instead. This percpu variable is also in the bpf subsystem so that
-if it is removed in the future, BPF-CI will catch this type of CI-
-breaking change.
-
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- tools/testing/selftests/bpf/prog_tests/btf_dump.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/btf_dump.c b/tools/testing/selftests/bpf/prog_tests/btf_dump.c
-index 10cba526d3e6..f1642794f70e 100644
---- a/tools/testing/selftests/bpf/prog_tests/btf_dump.c
-+++ b/tools/testing/selftests/bpf/prog_tests/btf_dump.c
-@@ -875,8 +875,8 @@ static void test_btf_dump_var_data(struct btf *btf, struct btf_dump *d,
- 	TEST_BTF_DUMP_VAR(btf, d, NULL, str, "cpu_number", int, BTF_F_COMPACT,
- 			  "int cpu_number = (int)100", 100);
- #endif
--	TEST_BTF_DUMP_VAR(btf, d, NULL, str, "bpf_cgrp_storage_busy", int, BTF_F_COMPACT,
--			  "static int bpf_cgrp_storage_busy = (int)2", 2);
-+	TEST_BTF_DUMP_VAR(btf, d, NULL, str, "bpf_bprintf_nest_level", int, BTF_F_COMPACT,
-+			  "static int bpf_bprintf_nest_level = (int)2", 2);
- }
- 
- struct btf_dump_string_ctx {
--- 
-2.47.3
-
+On 1/30/26 4:52 PM, Russell King (Oracle) wrote:
+> On Thu, Jan 15, 2026 at 12:27:05AM +0100, Marek Vasut wrote:
+>> On 1/14/26 6:12 PM, Russell King (Oracle) wrote:
+>>> I think I'm going to start over, trying to figure out what happened.
+>>>
+>>> c7308b2f3d0d net: stmmac: stm32: convert to suspend()/resume() methods
+>>>
+>>> Did the conversion, and it always called stm32_dwmac_clk_disable() and
+>>> where it exists, dwmac->ops->suspend() on suspend, provided
+>>> stmmac_suspend() returns zero (which it will do, even if the interface
+>>> is down. On resume, it always calls dwmac->ops->resume() and
+>>> stm32_dwmac_init() before calling stmmac_resume().
+>>>
+>>> The conversion added hooks into ny new ->suspend() and ->resume()
+>>> methods to handle the stm32_dwmac_clk_disable(), dwmac->ops->suspend(),
+>>> dwmac->ops->resume() and stm32_dwmac_init() steps.
+>>>
+>>> However, in 07bbbfe7addf I failed to realise that, in order to keep
+>>> things compatible with how stuff works, we need to call
+>>> priv->plat->suspend() even if the interface is down. This is where
+>>> the bug is, not in your glue driver.
+>>>
+>>> Please try this:
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> index a8a78fe7d01f..2acbb0107cd3 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> @@ -8066,7 +8066,7 @@ int stmmac_suspend(struct device *dev)
+>>>    	u32 chan;
+>>>    	if (!ndev || !netif_running(ndev))
+>>> -		return 0;
+>>> +		goto suspend_bsp;
+>>>    	mutex_lock(&priv->lock);
+>>> @@ -8106,6 +8106,7 @@ int stmmac_suspend(struct device *dev)
+>>>    	if (stmmac_fpe_supported(priv))
+>>>    		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
+>>> +suspend_bsp:
+>>>    	if (priv->plat->suspend)
+>>>    		return priv->plat->suspend(dev, priv->plat->bsp_priv);
+>> This works too, thank you.
+>>
+>> Will you send this fix ?
+> 
+> Sorry, I appear to have dropped this patch on the floor, and just
+> tripped over it. I'm just build testing it and will send it later
+> today.
+> 
+> This problem affects every user of the platform ->suspend/resume()
+> stuff, so is not just a stm32 issue.
+ACK, thank you.
 
