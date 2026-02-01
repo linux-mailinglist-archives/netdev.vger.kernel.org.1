@@ -1,204 +1,185 @@
-Return-Path: <netdev+bounces-255666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMJjL4qcf2nwuQIAu9opvQ
-	(envelope-from <netdev+bounces-255666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:33:46 +0100
+	id B5GIE6adf2lXugIAu9opvQ
+	(envelope-from <netdev+bounces-255668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:38:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56A31C6EAD
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:33:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9459BC6F49
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 83E393000FE6
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 18:33:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B45AC3003EDB
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 18:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1682F239E9A;
-	Sun,  1 Feb 2026 18:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DE922D4E9;
+	Sun,  1 Feb 2026 18:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuxseuYf"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="CEuxUVSZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Q5npvgpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780232749D9
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 18:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769970824; cv=pass; b=aGYQsJjC2RCAwVQumueAaWycH2/ULmldC3esJ21K1M10JgYC4S1ZGEiR8XjoQnXsCWwuCG/iiVz/dSkkHkxd4mNFfENB9/PlrLNFkdXBhg6Wb7gYDm+tgiTIvzAug1DS53E3FnPjmt1LdnYyl0BVICCuN0f2hg22tcLIO5Ly1js=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769970824; c=relaxed/simple;
-	bh=hFea+MpgdlgMUUjAVsq/4Azz3DGpM7IngnTvBlvhvMs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CDwKjJLUaXhrC1fPdsNUo6K+j0mOcEae9w6BS93l43fSwbv2vBaPB83pMLLjEbnEnrndjxo63IIv4Xlteyt3iUHtHbIipUD/1Hqx1wnk+pXzaG+bsJHdo6dOd0hEpztfdoBUm4WTrrg84ZnylI1d6NlslmPy1rkPBvaU/TVwYKs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KuxseuYf; arc=pass smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-432da746749so2094564f8f.0
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 10:33:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769970821; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RvKzNIVq79HQYaqXfJ8UR+kE/kjWBdGGTAopxnt/WmbvHOGgR09YXXgjJc8Jkce6sw
-         HmZM4OSiTefaJs1iwASdN2I8JIV3BFzFOcXWQla1AOc67N7X7wpmmoIHLMhPER5AJYuQ
-         keWZeafqhnIJOEQb+ondgxAW+rHxUt8XfI/+I6JUrpj36y/G2Y+baRelYwwOATETBcJT
-         l+uijxjjkSrfWj9X3JDSrCO71EikShyz+qZdQnGZqhBGHUsKAneL7pVoIhvI2SaS8iPN
-         c/mU97NNnM+DAj0KnNCd76onJjsEP4XLj6M5VRrtNmIA4wYgFok763I+Uf3yI8cli7RS
-         XKuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ya5yGFEaw5toM9HVuI7d0yc/AabXJ23lQu580Ng5uVA=;
-        fh=nSLWEUJ8PJGXXlrP0vQryznIEZ6AgIP8BH8VhTmSVFo=;
-        b=BQV+bwlHJOJhx2K8sfh6xYFnwUN56r/NVgMcLKCyu/XGm4g5u/3eF3qe1sMHvQtVAY
-         xQjpc6HSQtbrw4gLKv19GT/ke/+vL0viJ6k6ITSBKgLcbjeG9xyx+hmZ7zrfiaXLrFlU
-         471/AQeqcHjlUkyQKyrreQoZh/1I8Tf8M52a8flomHKbtt9kWl3aGBckZveP1yDWMoKJ
-         QhfChxLWoUmoaqZqELOao9p2vf8qp9F07Ex0H9kloRFRnaN8QPIyCf4fNh6+Lc3CwTo1
-         qNVQ/0gp/AH8vlqhhty5xYlB2v1MU14UcFL1KKvOfoD4RTNWhy5lrKfdMhUS/kOsgCoH
-         TPkg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769970821; x=1770575621; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ya5yGFEaw5toM9HVuI7d0yc/AabXJ23lQu580Ng5uVA=;
-        b=KuxseuYf8ahudiTkyssDYtKlr9EKCXGru+Lxcl/rA9U08fZqwM+zlRnSlcPuJuxKiu
-         LYh3g+VhDn8mYtGRm5/VbOkQn+nvwNLZOR3BTRxjs9DZVKKJsKjK2IJoR6JYvu3ZvX4y
-         iADRiJqdV3Ah4JCKVJlOcsXNpgWjgd1f/gk9bjyWFiUrKdSAhhCoUOMAM27SX22GNKol
-         /BspzLMb9nrOwKdURdNtJqBQF2J1JA89XX+FR2/74VW2ZXhBjMQXrQUAL+b8PFcHKnvX
-         B9dXZ8f7wXSpzltMg1c15vzE3cSHUVJSaZm3Au/CW3jX8H9bxfrR0yRp/aWEm8Ei32nQ
-         nshg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769970821; x=1770575621;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ya5yGFEaw5toM9HVuI7d0yc/AabXJ23lQu580Ng5uVA=;
-        b=dZuTJREizvmoO6Kr6iEsokv1SctZQs39tFxo4YpYTNQOR+PWufuT4l85ZOUQBd1Id9
-         5hoh0hM4f1uDG612u7y4J8W7BN+r+hSnFgjxmzl7DK20EJJzdBQ06uZy+E70MR2WVvE4
-         QkDRZ1IjbS3LGfw+XKL/SA4LSQEcuV1yIglHfDS495wH22wnkoYlHiKBozRISKJ9SZPj
-         a4yQhQHTrfyzS3doCMhun3K3WvyBzbB3Ba3/gW/oBCA2YR4iy5iVNfdbRzGuBdi2W4KO
-         E8IlDDGFtLyS/N7fdIWHintcmSdsV65HKliCQpdJhSK5/DxrivKmD6vbWx37ocAcWP9M
-         2G8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX1r3wOMX7jgP6FxFaPpnb/J/m/CjsxjN/Q8IY4f3b78G/ynrh1MAvBFMgmyug7A9NGCRFyyYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFWQiZlP354Y69rAzCMcoB0Bwp4HSa4eHWr1vuRC6GEyk7bSBu
-	A800+R08JUgD6eoNskspFhve98YPvHoQq9l9bs6gj4vVNvfnvuufaIQPk6CvDx4jY3uvjKZDZgN
-	yglRTxGH+Iq+DgiENZGqVWqWfSzm+jCg=
-X-Gm-Gg: AZuq6aKfXadofgMgN9gUEPB7BWPs202v4ngqm8IKgeJETl1QOPnZo8KgFhG7zN9wHDE
-	AC9Nl2B8AhTtGj6e4hpN2MI5KOZqtfwGCTT/5HZxx+b/4/nPSUpKf/XXWQdyNP16ZIzJRNQPWFR
-	n7eTzkOFuaqyUxDCWHwdpp+flacAudnq63We+HqBlF3idvvz3OjljOzf87tbzAftqj7qNP/T5ec
-	hqH3bKKbuTyddO0MuQvY0+sS/TYtspxlYtlLMex4pbYi90tgRR0Tdh8LlPuKMrddL5bVF27JFzx
-	ZUunG6dmkvAZv69osnFb8aUs8EoLoo+NpGCC8/bFrwWwRVNXjwseu23p2OH05I6Ha4vz
-X-Received: by 2002:a05:6000:1ac8:b0:432:8651:4071 with SMTP id
- ffacd0b85a97d-435f3a8873dmr13278042f8f.18.1769970820751; Sun, 01 Feb 2026
- 10:33:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3231DF25F;
+	Sun,  1 Feb 2026 18:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769971106; cv=none; b=cSFST5bXdSdRnqD+Wkki4PHZm2AJmVd8Tl9cXtB6NPt6Jw9Q7Db+nUbEcPPO9azJRQlZXzGT4o0+cucDL0WnrsmXErQQF+e5e08Rvozg+IHgjqAwm5/UNWVJQvMlJgOTFOQ8+iYE0lrESFrBAk0YQLN88qfR04ioNWzpbtn/5eE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769971106; c=relaxed/simple;
+	bh=6xuqKg+GrCudEOVi3hiXo4OVT7nz9eZJ5Z1ERtSYe0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i8Sl94mWUHmo4Q1W6/1VA1Dho9lDWVl0I8o+CXq+x05SiH4jIvJDYuF6k90OvJtshM7dhsuHyMG+hHO+jOCLhxIzx54JFpm+/wgdV6kzuOUBAoETlOvzXM+DjMqsfcssbAiH/FDUt5Qvn3m2OYPlPXoiPnryP4cPv5R9+gkaROE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=CEuxUVSZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Q5npvgpw; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 1432E7A00F0;
+	Sun,  1 Feb 2026 13:38:23 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Sun, 01 Feb 2026 13:38:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1769971102; x=1770057502; bh=qq
+	PX1DAJpcS6WM8ffzRbukkbvsolsaErTSrgi+r6RWY=; b=CEuxUVSZeydQAlVylc
+	4G+crhIdjfv2WPI50rk2uNoCZSPtun7W+TCI2YHYk+AgT88nwV2si0kklp6qlLYG
+	gvxRrP+pBUiZ5r7IEMLU5pOlOIb4KrEmrL1EB0V3NcXgL3MqIZcns+je4GGllYUx
+	Iy7jERwhup193WB+NFePRcXSfhjuuwXoEcooNfuSu+7NdKgBULimDC9ISR7UqlA8
+	LJE0SLTdCXsmeRqfoDET3NiMH7D7SNkJY/m67VQPWYJsvtTdwHUIyHijnN2iF/6D
+	pDl4MIa2Wmsn0C2+JwmF6SySn0p1iVrfNPZ3uyoQxuf8wzI7xlImtEPpF4Iq+v8S
+	vQ6w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1769971102; x=1770057502; bh=qqPX1DAJpcS6WM8ffzRbukkbvsol
+	saErTSrgi+r6RWY=; b=Q5npvgpwVAUXBg9Pzg0Giv1hXMMgZb24sVZZxsmNX67I
+	MX0oz9e4hfqf73y1l5G0E8hI3L4xHB3gibaiNlbI4ZpPyGQ98KWXZCNV5+t763Nc
+	UsoIVNS6XOS6LgvF9h/wfGIynoSBNkD1cLjCBJfP3lH/tdgFBJMygcRgjmSm3Ggb
+	m8Zqeb6OnyP30hCCXzpAH4HEM3t9bUfizZx5++Lyl6qA8ZI01yTrLI39ttCXXeQF
+	Ux1u/AoMYt+OltyzgOHr1kNMOzbI24U/tdwAzpOou86AsCUIMTrCfHO0xCK+qcWC
+	RVcQLfGKG1dCuICemQkznLUU/E/Ui1LI9NG6SEU1kw==
+X-ME-Sender: <xms:nZ1_aZv_zZS8CUhK1IPLLFXWbJtZo9fz0z_7XTkMeLlMh_RN4-P6Dg>
+    <xme:nZ1_aX-tycKJPoFBR5W3kjdLScHN40Mkm9YMCNxNG6FkJPCx3k1c9FBOy6cavTXHl
+    MIa1S-KfJ2sUcusBMZy5rsoBABepg9x5ME1Gyx_QZGSpCxqWMd07Q>
+X-ME-Received: <xmr:nZ1_ab3K0V9KwwfFgerElfSAD6WEapW-eBymaB_GLINy6Fc04LWa7vz0gG0bZCHrOyliJ2MIcowgSypXqTUWbxtx>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeehheefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgrshcu
+    ufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrsh
+    esrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeehudelteetkefgffef
+    udefuedvjeeivdekhfevieefgeffheeltddvvefhfeetgeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhluhhn
+    ugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopeduvddpmhhouggvpehsmh
+    htphhouhhtpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehr
+    vghnvghsrghsrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunh
+    hnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghp
+    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopehgvggvrhhtodhrvghnvghsrghssehglhhiuggvrhdrsggvpdhrtg
+    hpthhtohepmhgrghhnuhhsrdgurghmmhesghhmrghilhdrtghomhdprhgtphhtthhopehr
+    ihgthhgrrhgutghotghhrhgrnhesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:nZ1_aUguTt7lAIoBh-QsHpuF96J2djQm42I1TmmjcTRVRUY9_YXy_g>
+    <xmx:nZ1_aTbjqFFJgAyvaQ-AqKpQniVRrjtGRt8wrQ2u-wmMaSKpmWQLYQ>
+    <xmx:nZ1_aYVjw0cs76IRyzrL2WrortxJnOCA2qc-hR_1bAhlgl9UARDSbg>
+    <xmx:nZ1_aTF9pJN-6VQ5MPmCrjSAIxzHbFh_kuHD77P2urmGNmWUQnA96g>
+    <xmx:np1_aeTproz9uE6hbflPNcgGteAFCGcGdFfbqOuHmUoJAXTtKkdtUPSx>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 1 Feb 2026 13:38:20 -0500 (EST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next 0/4] net: ethernet: renesas: rcar_gen4_ptp: Hide private data
+Date: Sun,  1 Feb 2026 19:37:41 +0100
+Message-ID: <20260201183745.1075399-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260131161250.5047-1-biju.das.jz@bp.renesas.com> <20260131161250.5047-3-biju.das.jz@bp.renesas.com>
-In-Reply-To: <20260131161250.5047-3-biju.das.jz@bp.renesas.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Sun, 1 Feb 2026 18:33:13 +0000
-X-Gm-Features: AZwV_Qj_oRyCrNwk1d4EkOcOrEcSe3PZ-OQGreA6B9xVWTkAhiCPU1GA5dw0no0
-Message-ID: <CA+V-a8tj74WYJ=i5y4rg4OEtr_rXh381w9+s+ycn8qjajC4QxA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/2] net: stmmac: dwmac-renesas-gbeth: Add
- support for RZ/G3L SoC
-To: Biju <biju.das.au@gmail.com>
-Cc: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Russell King <rmk+kernel@armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm2,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255666-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-255668-lists,netdev=lfdr.de,renesas];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_TO(0.00)[renesas.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,glider.be,gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[prabhakarcsengg@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[bp.renesas.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,armlinux.org.uk];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,renesas,kernel];
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,renesas.com:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 56A31C6EAD
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9459BC6F49
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 4:14=E2=80=AFPM Biju <biju.das.au@gmail.com> wrote:
->
-> From: Biju Das <biju.das.jz@bp.renesas.com>
->
-> Compared to other Renesas GBETH stmmac glue drivers, RZ/G3L GBETH IP use
-> the version Synopsys DesignWare MAC (version 5.30). It has an extra clock
-> compared to RZ/V2H and has ptp_pps_o interrupts. Add support for RZ/G3L
-> GBETH by reusing device data of RZ/V2H and can be extended to add other
-> functionalities later.
->
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-> ---
-> v2->v3:
->  * Collected tag.
-> v1->v2:
->  * No change.
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c | 1 +
->  1 file changed, 1 insertion(+)
->
-Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Hello,
 
-Cheers,
-Prabhakar
+The R-Car Gen4 PTP module started out as an exclusive feature of a 
+single driver, but have since been extended to cover both R-Car Switch 
+and TSN driver implementations on Gen4.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/=
-drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> index be7f5eb2cdcf..19f34e18bfef 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> @@ -214,6 +214,7 @@ static const struct renesas_gbeth_of_data renesas_gma=
-c_of_data =3D {
->  };
->
->  static const struct of_device_id renesas_gbeth_match[] =3D {
-> +       { .compatible =3D "renesas,r9a08g046-gbeth", .data =3D &renesas_g=
-beth_of_data },
->         { .compatible =3D "renesas,r9a09g077-gbeth", .data =3D &renesas_g=
-mac_of_data },
->         { .compatible =3D "renesas,rzv2h-gbeth", .data =3D &renesas_gbeth=
-_of_data },
->         { /* Sentinel */ }
-> --
-> 2.43.0
->
->
+The feature have already been extended to be built as its own module 
+with an interface exposed thru a local header file. The header file 
+however also exposes the modules private data structure. The two 
+existing users have already started to poke at members of the struct.  
+
+The exposed private data being manipulated by users makes refactoring 
+and future rework hard as the interface for the module becomes to 
+chaotic. This small series aims to create two helpers to hide the 
+private data.
+
+This is done as a small preparation before a third, new, users of the 
+Gen4 PTP will be added in a follow up series.
+
+Niklas Söderlund (4):
+  net: ethernet: renesas: rcar_gen4_ptp: Move address assignment
+  net: ethernet: renesas: rcar_gen4_ptp: Add helper to get clock index
+  net: ethernet: renesas: rcar_gen4_ptp: Add helper to read time
+  net: ethernet: renesas: rcar_gen4_ptp: Hide private data from users
+
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 34 +++++++++++++++++++-
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.h | 18 ++++-------
+ drivers/net/ethernet/renesas/rswitch_main.c  | 11 +++----
+ drivers/net/ethernet/renesas/rtsn.c          | 30 +++++++----------
+ 4 files changed, 57 insertions(+), 36 deletions(-)
+
+-- 
+2.52.0
+
 
