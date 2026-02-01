@@ -1,166 +1,226 @@
-Return-Path: <netdev+bounces-255678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255679-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +L+gOI3Df2lvxQIAu9opvQ
-	(envelope-from <netdev+bounces-255678-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 22:20:13 +0100
+	id wPK0HSPPf2mqxwIAu9opvQ
+	(envelope-from <netdev+bounces-255679-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 23:09:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 427E1C7449
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 22:20:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B95C7581
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 23:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC0AD30056D2
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 21:20:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A5D73005794
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 22:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FAF2DC774;
-	Sun,  1 Feb 2026 21:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F36E2E975E;
+	Sun,  1 Feb 2026 22:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YatxhdhD"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="due/wvn7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0595418859B
-	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 21:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6A31DF751
+	for <netdev@vger.kernel.org>; Sun,  1 Feb 2026 22:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769980811; cv=none; b=mkvn8ZXRGLxP2WmL28nwKe98Q0l+o+my3iHcVxPBorLfZ9cSPcJ2eZShwcgcyjBtk/1w/Yv3CHWE6gmWHsexpq1wYSElu8+gXJL7KbJh1lCjBiX+jhaaIQkp3QWMg3a/Tb3LrI6AM8blfBPlQJU4eiM+oi3dG7mp2OWDioF1oFA=
+	t=1769983774; cv=none; b=ivgE/hqfuNJrDABhwAuWSKoqf7zNphuOpVypZg8W32CuSrjC7Uzjlj5ZNIsq6x2L0SznJGRT1+Ix1WzFgICB6YXWb04w73VYF5ciyE6T7KtCoZflWnkZzru4lKURq9fpa5h5hbab164Y4B/bsWXzSmFH1aMfufrYBRiaD6zMZvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769980811; c=relaxed/simple;
-	bh=w9bXIFUK/voqwE/CbztC+pRGOkCHpgqMxVqTnijLUg0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dBIVUZttuu1pFzE25CRI6b9zCsktVSEnWRcFLW3ILCqaPs4Vj9jmduuNCLAhfJgxC3nbAlYdwyppZMfOLWEsz8JT2UaWWX77+tS8s0cKqJq/KJ1VWrBk5EGNSTxmDHx+vlIk7wIiufX7wUJneYpJaXK6FQ5G2SwLAgGHmPh4t18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YatxhdhD; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47edd6111b4so39735665e9.1
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 13:20:09 -0800 (PST)
+	s=arc-20240116; t=1769983774; c=relaxed/simple;
+	bh=JM15UKXeJzdijzrGgJ2NdmQsbx2yOp3QX/8hr3ooJnc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BOhiKCm2UA8M9l+ZJ6l391RPb+JX7XEqeRk8Ed6Qlyf+MV3jCs0l3QpNEtNPeOl19IHJrB/dbXxXG3LzepZZ82c4/kY6x+nGOL58TQ0B5HK/s+hkq2QC6QOqjnH/N31rscQ4sAraigHFJXg4axRL4dsAwu3hkksf1BexCYFt/Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=due/wvn7; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-350fe1f8ea3so1772397a91.2
+        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 14:09:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769980808; x=1770585608; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yQPeVhxyJvaj92kOf8274ETVzZ9axgBQSCCHTjUHOe0=;
-        b=YatxhdhDZSFAGi43OXxbPvz2BvmcMcjzM9G8T9ggtBkZlieTGWQOQk67FCkEgyQRL4
-         LHOV7/lnzhLGIz7e2gfMsorpvxqJU0P5T53ppeEJIbSuo2nrysQSWro/vT/hY1Q5wSjJ
-         nkO/8x2aw7JXWlZu/UE0XbD+i/zBgLl0v7U1BbWLbPKx02mOFEoVNhp+iTCzYL3kCPFS
-         MZmtKOfSPK1KhZz9rVvActJnYbUk3nKLZdsYBo+FloP/hWrlUs4PnC5Fr12+a+ona25T
-         Bi6Tc5NKHEtnyi2guwZ0QAPu8CDveCGRIHX+MTGCKJK+M+iszG7GbQYfdGo7g6CFdtNa
-         S06Q==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1769983772; x=1770588572; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HSollAbkysYIn6q3WBkPyjvDyYQliySWNckXJuEYpIs=;
+        b=due/wvn7jkrcJYb4gMKEuXtMPclw+Z3ntYt+N/sRQUPdo/fc4iX67IeCOc/Sl/AHlF
+         Igpkx4ulYYmd2DsP7Y0sTQbk7lVye0o/lQonANspNBtmEjg2Ui41FBWJt28xa9pzoRxx
+         6Gc0GL1XwuXvU1VBAfUYXdvEKeG9j8jFokMEImxds1uXsXKXk3DDq0ewR36otJc1QpCz
+         YMX2BeE0l8XEeW6l8KVr0n+250zsNZmLPia3+yUrwwvRGD+2VpcWvA9Pkdki/mZf5+OR
+         0lonD+S4tlYW3s1MbqYB2rqzNqeNnIYwR7AyQS5L4ubNNPZLTntc3FzLPmA3oE4RzeLQ
+         BJHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769980808; x=1770585608;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yQPeVhxyJvaj92kOf8274ETVzZ9axgBQSCCHTjUHOe0=;
-        b=gS1M4i/djHr73fapplCjD2hagZFUqP8LbQ0+h7EQ5YUHFGMsQDPjoRziY18wsFX3MH
-         EFWWocuwfRzguqJwOKkPHAU3KOkIo/XFmGonzeUhfJQ0tT74gamWNPOQfKZW+k4/vn9e
-         0X0936PuuVOq2HP3M7IWqWmhkHbzBTyJ1iVuIol7NkK3lJPWa1UzNykZ8F4WoEbD4eRl
-         bu2ORDERIvwyC/0U1hflfR3IJH04zad7Y2SAN+SpDAdb1tq8Zl+LwU2QX1/i/gLiX8AK
-         l0aCb8J+fiV6HXMaCIFnIw70AASQqBpPQSrmEINAzosrjnQSZtk2R3Men1Qrgr7x87Hi
-         Wt8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUih44ugoT/B1VqgfznqBZ4ry1xHiDDM+quzJo2w2OS6XLsUgn6AqCYD//2ZLGW94aoebiN8WU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe0m7/rS2aJWbOHvyB8Beu7JJyDmItnEiM8U0NMWFChdFbe1lF
-	HW3Ueq2drv4yT3xRCLRnmHgz68h4Tr1IF2jFu4/RK260QBvGLbC9zy/y
-X-Gm-Gg: AZuq6aK4MVBjbiiqHF4PqNXxLmzizy5J7l9KPurJrbghwxViJBs1e9tgL1KaZGUP0Um
-	WCMLhXvs3DJvTfqTPAeKJtesL4BDoUX8QXUnk8fbte0WsrroJTlVU5+l+286hIQgSlJeO7bKUn2
-	iaG47a2YKEraGmlnyHsEjSwcBiiPhZE9cymMAhdB5ZTYOo2fsA7d5WIn7goubu8anTTJAyYHoH8
-	YfHCd9Jv76zMWQH8JhZMHlk5ulAto1ArbE0P9dBlCcwlx4fTNzK4pbJ3vgQ3snhd0i4KbnqLmiv
-	zHIo/9FWs6gNyUmJ11PyONyDrjkUBwUwEAmLlxQokITIprhNBamEzAFNONe1dkQ9ynkN6r4KZuc
-	CccDr3UNIN/X6CNqu3H/4WWM+dMq9dCk7iTOUFqWff3bhA05M9yjYWCoErsqdcPbJPs4KIKO1eZ
-	xMpS0LH8zz8wmyRsnHddI/XS9rp4wNXfzPil14SipONpE6i5Hc4W2dJgbVsrSHqbOW/+wLH5MsC
-	E6U6R2DfRvCVae4LA==
-X-Received: by 2002:a05:600c:474a:b0:46e:35a0:3587 with SMTP id 5b1f17b1804b1-482db48e828mr124303785e9.27.1769980808341;
-        Sun, 01 Feb 2026 13:20:08 -0800 (PST)
-Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806ce4c3d1sm366369545e9.9.2026.02.01.13.20.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Feb 2026 13:20:07 -0800 (PST)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: asml.silence@gmail.com,
-	axboe@kernel.dk,
-	netdev@vger.kernel.org
-Subject: [PATCH io_uring 1/1] io_uring/zcrx: fix rq flush locking
-Date: Sun,  1 Feb 2026 21:19:56 +0000
-Message-ID: <634b9ef89352140259494d6d08086aaa30a72e02.1769962683.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        d=1e100.net; s=20230601; t=1769983772; x=1770588572;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HSollAbkysYIn6q3WBkPyjvDyYQliySWNckXJuEYpIs=;
+        b=uW5YyOwbZ6bgwU1ZBrRWLAxNynQaV2UDQvBBUQt84v7NBvVzkVU+q//7wo1V5xpTuW
+         A1zVDY+c3bqYFyEbM8ksVJbFAdSpFcKDKbkxzZbPfIzV+vLXaqP0VBUj1fOhQXCLTcO3
+         jSRifmDOXtZhcdMxs2zebKri2OnK5ilB5JGq8BCy8v5CJJ0L2ItfDSU0yCsqN067fh67
+         wpqLVEHZl8gZLYZX1BKEUwnA6CLcqCP5/CxWZXGdR+UHq7hh2NcO9j+Axm0MonCRpO7G
+         8pmxSMwo+iGruMSC+EnaAMlmaTcBVkiClRg2w1gYsMf+ji7jb0nYcDTRATegFSk45lIO
+         KijQ==
+X-Gm-Message-State: AOJu0YwBE6dWoYwIvkyCef3r3/wb7HUerLYnkDkIjSovrxp8Usgzog0N
+	OpALTrFZdJH+YuVvnldTy1jK9GYb6ZtCnXobDdFbgnJzV8FMcYDVi31RZYTiPFZkeQVzUfQE1q1
+	OA6k57Ng=
+X-Gm-Gg: AZuq6aKm4k4m6pEFDQJVw6trlOY1UGaTfZYva7PvZ75zRKqbLoTQhpAByIcLRDE56mm
+	iyCAm/xXn90WlmVzKTjGBISTJjVBClbuzxxRW01QKQF/t6b6pByAY0Sczt+gp9kULLttB9gj6N/
+	Xl7oN/Ic+CVjzOCr7h7dr45zVjRQ9HmPWkuDIoslfzdqWoTK2mvbSZqt33uoMEr4nl5X4QdPWSA
+	MyAPqkiNuSazogSbCdqsBkJcLgoSW5ofz9m1G8JWVSvkMk+LYVZ/YsRAz7HlZ1SVx7JVIjEUUft
+	yOVN40j0UoB25TK4tLE9rEp9CENACFm7ptjQtXAH6x84U8Q0JYfkeX+OQ9l2CQYcS70aUP3kgEJ
+	Dpgr5kJwet2IMYDQLjLPrUjSwj4m8gCHcGCNZQZMZkIAoAx6cnttVpAZnqeuOHbJ1QpjPh64sjN
+	2dPad9bS8rZy64BUa5PK6xbi7YNF49dNdX18hI0Gu/pE0z2WFY8LtyRVbo18hE0VYdHhZJVrQbW
+	deXP8bS4+GzUMgfqQ==
+X-Received: by 2002:a17:90b:3949:b0:353:2e1:95f6 with SMTP id 98e67ed59e1d1-3543b4021admr9000467a91.32.1769983772225;
+        Sun, 01 Feb 2026 14:09:32 -0800 (PST)
+Received: from [192.168.100.174] (p94025-ipoefx.ipoe.ocn.ne.jp. [153.246.129.24])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3540f2f02aasm13536653a91.7.2026.02.01.14.09.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 01 Feb 2026 14:09:31 -0800 (PST)
+Message-ID: <5f8a0b59-0ca8-43bd-8d28-99d306ff5bbf@davidwei.uk>
+Date: Mon, 2 Feb 2026 07:09:25 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 06/16] net: Proxy net_mp_{open,close}_rxq for
+ leased queues
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20260129222830.439687-1-daniel@iogearbox.net>
+ <20260129222830.439687-7-daniel@iogearbox.net>
+ <20260131160237.07789674@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20260131160237.07789674@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-255678-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255679-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[davidwei.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,bytedance.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 427E1C7449
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei.uk:mid]
+X-Rspamd-Queue-Id: B8B95C7581
 X-Rspamd-Action: no action
 
-zcrx needs to keep the rq lock for uref manipulations, for now move all
-zcrx_return_buffers() under the lock.
+On 2026-02-01 09:02, Jakub Kicinski wrote:
+> On Thu, 29 Jan 2026 23:28:20 +0100 Daniel Borkmann wrote:
+>> @@ -191,24 +214,15 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+>>   }
+>>   EXPORT_SYMBOL_NS_GPL(netdev_rx_queue_restart, "NETDEV_INTERNAL");
+>>   
+>> -int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>> -		    const struct pp_memory_provider_params *p,
+>> -		    struct netlink_ext_ack *extack)
+>> +static int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>> +			     const struct pp_memory_provider_params *p,
+>> +			     struct netlink_ext_ack *extack)
+>>   {
+>>   	const struct netdev_queue_mgmt_ops *qops = dev->queue_mgmt_ops;
+>>   	struct netdev_queue_config qcfg[2];
+>>   	struct netdev_rx_queue *rxq;
+>>   	int ret;
+>>   
+>> -	if (!netdev_need_ops_lock(dev))
+>> -		return -EOPNOTSUPP;
+>> -
+>> -	if (rxq_idx >= dev->real_num_rx_queues) {
+>> -		NL_SET_ERR_MSG(extack, "rx queue index out of range");
+>> -		return -ERANGE;
+>> -	}
+>> -	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
+>> -
+> 
+>> +int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>> +		    const struct pp_memory_provider_params *p,
+>> +		    struct netlink_ext_ack *extack)
+>> +{
+>> +	struct net_device *orig_dev = dev;
+>> +	int ret;
+>> +
+>> +	if (!netdev_need_ops_lock(dev))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	if (rxq_idx >= dev->real_num_rx_queues) {
+>> +		NL_SET_ERR_MSG(extack, "rx queue index out of range");
+>> +		return -ERANGE;
+>> +	}
+>> +
+> 
+> nit: delete this empty line please, like it was in the original code.
 
-Fixes: 475eb39b00478 ("io_uring/zcrx: add sync refill queue flushing")
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/zcrx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Yes.
 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 0c4b339f712e..d8b6db456bd7 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -1097,8 +1097,6 @@ static unsigned zcrx_parse_rq(netmem_ref *netmem_array, unsigned nr,
- 	unsigned int mask = zcrx->rq_entries - 1;
- 	unsigned int i;
- 
--	guard(spinlock_bh)(&zcrx->rq_lock);
--
- 	nr = min(nr, io_zcrx_rqring_entries(zcrx));
- 	for (i = 0; i < nr; i++) {
- 		struct io_uring_zcrx_rqe *rqe = io_zcrx_get_rqe(zcrx, mask);
-@@ -1143,9 +1141,11 @@ static int zcrx_flush_rq(struct io_ring_ctx *ctx, struct io_zcrx_ifq *zcrx,
- 		return -EINVAL;
- 
- 	do {
--		nr = zcrx_parse_rq(netmems, ZCRX_FLUSH_BATCH, zcrx);
-+		scoped_guard(spinlock_bh, &zcrx->rq_lock) {
-+			nr = zcrx_parse_rq(netmems, ZCRX_FLUSH_BATCH, zcrx);
-+			zcrx_return_buffers(netmems, nr);
-+		}
- 
--		zcrx_return_buffers(netmems, nr);
- 		total += nr;
- 
- 		if (fatal_signal_pending(current))
--- 
-2.52.0
+> 
+>> +	rxq_idx = array_index_nospec(rxq_idx, dev->real_num_rx_queues);
+>> +
+>> +	if (!netif_get_rx_queue_lease_locked(&dev, &rxq_idx)) {
+>> +		NL_SET_ERR_MSG(extack, "rx queue leased to a virtual netdev");
+>> +		return -EBUSY;
+>> +	}
+>> +	if (!dev->dev.parent) {
+>> +		NL_SET_ERR_MSG(extack, "rx queue belongs to a virtual netdev");
+>> +		ret = -EOPNOTSUPP;
+>> +		goto out;
+>> +	}
+>> +
+>> +	ret = __net_mp_open_rxq(dev, rxq_idx, p, extack);
+>> +out:
+>> +	netif_put_rx_queue_lease_locked(orig_dev, dev);
+>> +	return ret;
+> 
+> Please:
+> 
+> 	if (!netif_queue_is_a_lease())
+> 		return __net_mp_open_rxq(dev, rxq_idx, p, extack);
+> 
+> 	..explicit code that deals with the lease, no conditional locking
+> 	...
+> 	ret = __net_mp_open_rxq($dev, $rxq_idx, p, extack);
+> 	...
 
+Understood.
+
+> 
+> 
+>> -	rxq = __netif_get_rx_queue(dev, ifq_idx);
+>> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+> 
+> Indeed good to cleanup the ifq_idx naming that sneaked in, but IDK if
+> this belongs in this commit :S
+
+It really annoyed me haha. I'll remove this from this series and send it
+as a follow up.
 
