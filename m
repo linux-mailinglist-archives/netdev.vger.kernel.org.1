@@ -1,166 +1,137 @@
-Return-Path: <netdev+bounces-255667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255664-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MA4Gj6df2nquQIAu9opvQ
-	(envelope-from <netdev+bounces-255667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:36:46 +0100
+	id AMFHFf2Zf2kZuQIAu9opvQ
+	(envelope-from <netdev+bounces-255664-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:22:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA7FC6F37
-	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:36:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56F7C6E4C
+	for <lists+netdev@lfdr.de>; Sun, 01 Feb 2026 19:22:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5BAFA300103F
-	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 18:36:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C9153003E91
+	for <lists+netdev@lfdr.de>; Sun,  1 Feb 2026 18:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FB227FB3A;
-	Sun,  1 Feb 2026 18:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E72283CB1;
+	Sun,  1 Feb 2026 18:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="NBNAV/Wq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8+fFDWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E24326FA6F;
-	Sun,  1 Feb 2026 18:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1532F22759C;
+	Sun,  1 Feb 2026 18:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769971002; cv=none; b=e3ttjWsjlyaTVlArFI/SJ2eOKjxVLL/U70uYqCr8sJtvkxIR+hTRh0iSPZuLk1WAYGiab1wSWuUMYzjcPggZagtpsvzlK0uC1trwnN+l4QqX+HRyO57qrki4A1r2L67iG0lO5FNS1IQ83KdqIBDLTs6UsDBb1fgRUB9fHRjMKrw=
+	t=1769970170; cv=none; b=OOrY7YXCfl1ZU9YCKf6A3wH7iIKP4a9rou6AA/HOkbMpjKoxrFxmqg7QP9YPM7IBwIbhe60qCxMX6OMng59Itez2xeMLvB19g8PxQiNq5nzB/Rwfi3xz84B8vBB+iikCVF7Pjnu7jV60kp3ikHm8c1tfP7QtBnc4tD53o0sIkFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769971002; c=relaxed/simple;
-	bh=FKQ+iMI50ehFmBlFkW5r/p6X/TrPjJq5F3z6fG9hjE4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UPei46GbmbRUiQRKB9hwcAZkJ0zRp5ELxFxWQ2RCJf6qsAl3MPI+lNimE6PJ74JfHeL7AjqdxeP1qwMtOmZ/ZXgelgpJIFV3CoQJJkJ3OkGZVomIPVgW2MTrkI0MbNf0qZMzUvNHQYFYFzMBNMuJtCn/HviEsT1PmGaNerW8Kjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=NBNAV/Wq; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5F55C109D9D;
-	Sun,  1 Feb 2026 19:36:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1769970991;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=LARm2Y3oL9MqfVRvr87lH7jEV+ZHtuB87P+3QLUsfN8=;
-	b=NBNAV/WqTMJCNSC3XKmzFMaQg50nfqsgqNjohQWgTwz2cl63bw7bslLiPdI7BHXhL/Czq7
-	FOeJO9GgdbK7MVeCHC8R7tilL8fqzmPLqNh7TiJcxRp4BoaYI+6CqlY4d5fe55jho6HQEU
-	9tmHj3kpUwsKNhQyYMYrmdRHKPQi8atOhn9uj6n20dGBsqoGFybPwDpSmRiN7iH3p3qKH2
-	NDZhfrvRzkRz33AokZ7yITLhWf6B3ysRdf2lk+rQHg44Uyg84JbZH3lXJYWoPZTMlM6bV0
-	SMEcPVnREi3xMMEgNGgiz/oGwm9csACAkFjfxPSV3MJXaH6JRgYbT0cVtc8tWw==
-Message-ID: <35d31893-2a28-410f-a1c7-038b4167e265@nabladev.com>
-Date: Sun, 1 Feb 2026 19:20:09 +0100
+	s=arc-20240116; t=1769970170; c=relaxed/simple;
+	bh=grlXjdm8xmThX3zhXh4qR9eXyekhcJ8bFV4lxhv8hKM=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=EYLxW9diqXWh0X6kSFcIvjjL4AGqG0BhdAC/vMvpg17+M1a6Fgrhr/N8GB7akZ0yZJerO6yCaxiZA8wir3ljR4DhTSF786KL4CWj8xpRhE696DhouKCXy2XeLMrtJWHKZLh8bxmP61fOoRXOLQcNaWhU2nxU3Y7yPHzOHh198wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8+fFDWG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7443AC4CEF7;
+	Sun,  1 Feb 2026 18:22:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769970169;
+	bh=grlXjdm8xmThX3zhXh4qR9eXyekhcJ8bFV4lxhv8hKM=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=X8+fFDWGKvmGL/kZL1a4RmRCl5FZ4L1eJsOUy16c+f9p/XvE5lgwFYLlVJYDEnn/F
+	 jiR6NAa5bgJNSQozAjx205p1yaBerkmfPh/+E9Z0m6acTezM/w44gkC58KjNNrZ9ii
+	 bkJi6VHBPy7uwRdiSb7cx6uofduFTfEPIqwoHbqPf1n8qJn3+jjoIJiNRVS6hX/U6D
+	 Gt9WFjVNX1+2EFfLXk/Oa9/Q30ZX51gdC0uM0Ad0JjeEHLQm3e3QY0OnO54k3SoM6l
+	 3JxlS+KHaiADCB//hGkGlpBzAwzpDz6ek9kIYVMxp4rkfNpu4BgTzxBFRhPnPvFV4e
+	 F/6759iIg5X4A==
+Content-Type: multipart/mixed; boundary="===============5808050125888543634=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed
- interface
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Christophe Roullier <christophe.roullier@st.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
-References: <20260114081809.12758-1-marex@nabladev.com>
- <aWfEXX1iMHy3V5sK@shell.armlinux.org.uk>
- <aWfOYf_YmJFUakvP@shell.armlinux.org.uk>
- <6c9cadc2-67b7-4bfe-9cf7-2b102a0a3c21@nabladev.com>
- <aXzT1UCpG4kN-dQv@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <aXzT1UCpG4kN-dQv@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Message-Id: <805211652ab5a5433408cf5070e41ea289611a908c1f1f3c2584ba0c334a9560@mail.kernel.org>
+In-Reply-To: <20260201175050.468601-11-ameryhung@gmail.com>
+References: <20260201175050.468601-11-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v5 10/16] bpf: Support lockless unlink when freeing map or local storage
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,memxor@gmail.com,martin.lau@kernel.org,kpsingh@kernel.org,yonghong.song@linux.dev,song@kernel.org,haoluo@google.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sun,  1 Feb 2026 18:22:49 +0000 (UTC)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255667-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255664-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,foss.st.com,lunn.ch,st.com,google.com,kernel.org,gmail.com,redhat.com,dh-electronics.com,lists.infradead.org,st-md-mailman.stormreply.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nabladev.com:mid,nabladev.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EFA7FC6F37
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A56F7C6E4C
 X-Rspamd-Action: no action
 
-On 1/30/26 4:52 PM, Russell King (Oracle) wrote:
-> On Thu, Jan 15, 2026 at 12:27:05AM +0100, Marek Vasut wrote:
->> On 1/14/26 6:12 PM, Russell King (Oracle) wrote:
->>> I think I'm going to start over, trying to figure out what happened.
->>>
->>> c7308b2f3d0d net: stmmac: stm32: convert to suspend()/resume() methods
->>>
->>> Did the conversion, and it always called stm32_dwmac_clk_disable() and
->>> where it exists, dwmac->ops->suspend() on suspend, provided
->>> stmmac_suspend() returns zero (which it will do, even if the interface
->>> is down. On resume, it always calls dwmac->ops->resume() and
->>> stm32_dwmac_init() before calling stmmac_resume().
->>>
->>> The conversion added hooks into ny new ->suspend() and ->resume()
->>> methods to handle the stm32_dwmac_clk_disable(), dwmac->ops->suspend(),
->>> dwmac->ops->resume() and stm32_dwmac_init() steps.
->>>
->>> However, in 07bbbfe7addf I failed to realise that, in order to keep
->>> things compatible with how stuff works, we need to call
->>> priv->plat->suspend() even if the interface is down. This is where
->>> the bug is, not in your glue driver.
->>>
->>> Please try this:
->>>
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> index a8a78fe7d01f..2acbb0107cd3 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> @@ -8066,7 +8066,7 @@ int stmmac_suspend(struct device *dev)
->>>    	u32 chan;
->>>    	if (!ndev || !netif_running(ndev))
->>> -		return 0;
->>> +		goto suspend_bsp;
->>>    	mutex_lock(&priv->lock);
->>> @@ -8106,6 +8106,7 @@ int stmmac_suspend(struct device *dev)
->>>    	if (stmmac_fpe_supported(priv))
->>>    		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
->>> +suspend_bsp:
->>>    	if (priv->plat->suspend)
->>>    		return priv->plat->suspend(dev, priv->plat->bsp_priv);
->> This works too, thank you.
->>
->> Will you send this fix ?
-> 
-> Sorry, I appear to have dropped this patch on the floor, and just
-> tripped over it. I'm just build testing it and will send it later
-> today.
-> 
-> This problem affects every user of the platform ->suspend/resume()
-> stuff, so is not just a stm32 issue.
-ACK, thank you.
+--===============5808050125888543634==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+commit 5ca113c57e19a4ef0ccfc390cc9274cc9ff66abc
+Author: Amery Hung <ameryhung@gmail.com>
+
+bpf: Support lockless unlink when freeing map or local storage
+
+This commit introduces bpf_selem_unlink_nofail() to handle errors from
+rqspinlock during map or local storage freeing. It uses a link_cnt refcount
+to coordinate between map_free() and destroy() when lock acquisition fails.
+
+> Under normal circumstances, bpf_selem_unlink_nofail() will be able to
+> grab locks and unlink a selem from map and local storage in sequeunce,
+
+This isn't a bug, but there is a typo: "sequeunce" should be "sequence".
+
+> Then, only when both map and
+> local storage are gone, an selem can be free by the last caller that
+
+This isn't a bug, but there is a grammar issue: "can be free by" should be
+"can be freed by".
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21567682421
+
+AI-authorship-score: low
+AI-authorship-explanation: The commit shows deep understanding of kernel synchronization primitives and BPF local storage internals with natural technical writing style typical of experienced kernel developers.
+issues-found: 2
+issue-severity-score: low
+issue-severity-explanation: Minor typo and grammar errors in commit message only, no code issues found.
+
+--===============5808050125888543634==--
 
