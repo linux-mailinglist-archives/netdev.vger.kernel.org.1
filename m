@@ -1,211 +1,230 @@
-Return-Path: <netdev+bounces-255868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAGzA3KogGmeAAMAu9opvQ
-	(envelope-from <netdev+bounces-255868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:36:50 +0100
+	id eA1+M12rgGkFAQMAu9opvQ
+	(envelope-from <netdev+bounces-255869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:49:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A6CCCD15
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:36:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C12BCCEE1
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:49:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76E8830D1348
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:31:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E48F303CE10
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB5E36923F;
-	Mon,  2 Feb 2026 13:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C71369235;
+	Mon,  2 Feb 2026 13:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1USnL06"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxoO561d"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5E819E819
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 13:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E7C27FD49
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 13:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770039065; cv=none; b=oRC/I68xrrG5AYO494Y29UtJQdBy74CiMHInNKE2R6nmB9uWKlOquQ6zpBPaOE2+YYk2RumWGKmnOf1AKNNVLBxzyEX3D4UStdSARlY47GQaYR2pe+BEWKoJieFwpGlBrUCZfLUPE6U39Tx454WG5ky9fJCqZEXhUQAE11AGti4=
+	t=1770039816; cv=none; b=TRjPM8chfqreUA3dpt/d5lsMB3RdhM36g6jLBlNbUjuPoM52acew2RG/WqYur9XoSIjzfE4s8n3Y+ptISRXHuMIrNG1u+m88UclljET1tUJ5ZWtkFxAV176RqtPRWI9fXx1H2BdaiQvzJdZJDMnZ1c4FAQN4FnQaSMfk5OjY1AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770039065; c=relaxed/simple;
-	bh=Ilzh9ciqWATBs9AlKHDb+gm1BEnXioRQZHASm6hE6xE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jZL4cnpB6U0Uwypx3mY1NcCVS2ryOz3cRxOf+a0390kCJTYp1t+NxOPIaVLa6aE8YHqFWpaNmLjZDj5h/8jxOgaYkXp0WhX/53CSPnDPSZ8NzFkzClYxwpbSaGPMfVpicTTDPAcDQQq9HJGn0503Gw297AsLRpyxf1NCHo9t+38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i1USnL06; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770039063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eBN4sgUDtqNg4GpSirkeIULyv0JMY2X6vXXcs8fqAFc=;
-	b=i1USnL061XtcNb1yezRAl94iNj6wg0AX2AE+3K5BF01NbKcDTjqiEsvkLLD/VZrZsqAtWf
-	1MfwUhf4OdAWYoHy2+PCmd8W7HyL/f8S1GEHucQODKdhYz5JhNJDpV6RrlXfHv8dw13Tj2
-	WufOmFTV2NN85lnFh0VynogECzMccns=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-189-BBHCiaKeNxGZckjG__3xLw-1; Mon,
- 02 Feb 2026 08:31:00 -0500
-X-MC-Unique: BBHCiaKeNxGZckjG__3xLw-1
-X-Mimecast-MFC-AGG-ID: BBHCiaKeNxGZckjG__3xLw_1770039058
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E265195608A;
-	Mon,  2 Feb 2026 13:30:58 +0000 (UTC)
-Received: from [10.45.225.123] (unknown [10.45.225.123])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5469518008FF;
-	Mon,  2 Feb 2026 13:30:54 +0000 (UTC)
-Message-ID: <1e28083b-691a-480b-bcf6-cd57222e08a1@redhat.com>
-Date: Mon, 2 Feb 2026 14:30:52 +0100
+	s=arc-20240116; t=1770039816; c=relaxed/simple;
+	bh=jCXFB8g3+e5C1Zr9hEdpI/1Lo+Q0TYtwpGk/hgYVtFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g/l5t9YbyYvB36f/XuHeUQyxGQSL2bGHSHJ5bEP+nlJfpv4xVkxbzKxhbN7lPuBASnopR5T4/GnfocZUCwRBXAcRTPlwvYpXMEpNx1aQZ2wUssOXMlEzI5AdMaYgA8XOLxJPemK8VGUyw64ajyXpjn8+kWu1ykW0lgfKdzAxQIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxoO561d; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-432c0b8f114so237280f8f.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 05:43:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770039814; x=1770644614; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0j81eM6QfZ7o4aJKQrTqYKKS8lGCGE49fOPRgvQwWhE=;
+        b=HxoO561dj++HhTOvAnKZq1f85c6hpij6vmePLc4R4tsefIvRYtjNuo7vW+NJU/VUKE
+         QYP+9B//+F2ZTzp45bH6qoh3OO6xZaMaXSxl60OpCsNCmKfbc0zUfOwheoVJ8RlngnEs
+         UakAAEGp0b22LIZeYJPEVA4KB44/yEvlKCsikZy7YTWiVbONdUFGSCfSlDHDnPywLAXX
+         WBNIlrQ3csY1wKlGibPMU63GzFJ2konK6xq03G6kI6jK1QF97Sdw8vSP9YGks2Uss6TJ
+         D/4jqAGl5CGZ+XkLq5k6/soj0DElgQjCPLNwnc8qB7eMxwxmeYLJUz8b5BDbkV2oV5JU
+         +Nyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770039814; x=1770644614;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0j81eM6QfZ7o4aJKQrTqYKKS8lGCGE49fOPRgvQwWhE=;
+        b=uQlfY4VHsCQdvWagfvhmVroovXwVCa6xgInmhmvGQi00Hor4gNPXI7cw2yo84aeJ33
+         NgZNmfSxQ/aH67fFC1uIMxliSkc8eXif4wv6+hhoyzeudRMLdPTv22OTT4pn3+voz0x3
+         FUhAxdW/0YFV/JNIDhne4xlK5b+8C2W6Y1sWizejrQ/yCt9H25Sxe5Dv7iNZjAQEpWxG
+         H7JbsUZ3fBZxRS2eaiUVnh8fyLsr22OcREs1I3RlDr2pIUAe3bLra3+Qasrqvnjn/oUd
+         6ODqDmpg6404Xb8JA+tuMEsqY4Lpez4PEHjonL9oV/uQB2V1+pbX2sONw1FX1uqXIWYi
+         lWLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqWhclbdxYEIkLtfuAGV7p66XVDNBYYDWul08V39rhxVN3EP+i7Bf1X3HpBeRNU48WbG0NHMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEQKdKMbybQNWnmu5XqKkN/Q65qvSrZkVkGI2E+bEZd2MC6CBZ
+	Wi+hpZOZLS0wioKSQ1zJ/ifyiy/cXX2ob4Usq7JTqY1hxblUbKrSaeWq
+X-Gm-Gg: AZuq6aKeZEC2Qg0seG3j84PdnF2Hr3KrlGc55Zrd3ogOavbEtX5moOt58spZ8kRkM4D
+	STwQ/HZfAvwMmHCIPL2DrmFwQXZWaqauygJj9pn3N15CsTgUMlBnkTvmVJr7g8PhkL4SfzGcltG
+	Yk7gq9WvaLys/NZhgGyqpwQbX3bekRlCUFsz4Am79+tEIvul7FdhMBbOm5/BTEiiRiIlmEbCWvD
+	mBt5JjG0Uv7rlz498cM4QHfKlyoSzuNCJZ4xfTNVzwRHz7EPYgrBWri3bMDNMChDZsaBfFF1hOC
+	Wc14f9IENlI12YeSZiyeE2ftMGdfYg8NhzNXG8p2sdcM/lx0LfZqMdMB415DncKxq0WM1IrouIe
+	QhWOOso1l0JvYr0t/2bwpbAJ0BJ25JIrcbLSaXI8KGHRiOpPq5j3XTmx4803gbM8sGNX2UMSEVH
+	9W/Yc=
+X-Received: by 2002:a05:6000:1a8f:b0:435:db94:1935 with SMTP id ffacd0b85a97d-435f3adfbe2mr9056078f8f.8.1770039813334;
+        Mon, 02 Feb 2026 05:43:33 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:74c4:3a65:f9a9:6c29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10ee040sm43731062f8f.11.2026.02.02.05.43.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 05:43:32 -0800 (PST)
+Date: Mon, 2 Feb 2026 15:43:30 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Pascal Eberhard <pascal.eberhard@se.com>,
+	=?utf-8?Q?Miqu=C3=A8l?= Raynal <miquel.raynal@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 8/8] net: dsa: microchip: Add two-step PTP
+ support for KSZ8463
+Message-ID: <20260202134330.xzc2wmcwwqhw4dfc@skbuf>
+References: <20260127-ksz8463-ptp-v4-0-652e021aae86@bootlin.com>
+ <20260127-ksz8463-ptp-v4-0-652e021aae86@bootlin.com>
+ <20260127-ksz8463-ptp-v4-8-652e021aae86@bootlin.com>
+ <20260127-ksz8463-ptp-v4-8-652e021aae86@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] iavf: fix deadlock in reset handling
-To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
-Cc: mschmidt@redhat.com, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
- linux-kernel@vger.kernel.org
-References: <20260202084820.260033-1-poros@redhat.com>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20260202084820.260033-1-poros@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260127-ksz8463-ptp-v4-8-652e021aae86@bootlin.com>
+ <20260127-ksz8463-ptp-v4-8-652e021aae86@bootlin.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255868-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-255869-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A0A6CCCD15
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email]
+X-Rspamd-Queue-Id: 5C12BCCEE1
 X-Rspamd-Action: no action
 
-On 2/2/26 9:48 AM, Petr Oros wrote:
-> Three driver callbacks schedule a reset and wait for its completion:
-> ndo_change_mtu(), ethtool set_ringparam(), and ethtool set_channels().
+On Tue, Jan 27, 2026 at 10:06:50AM +0100, Bastien Curutchet (Schneider Electric) wrote:
+> The KSZ8463 switch supports PTP but it's not supported by driver.
 > 
-> Waiting for reset in ndo_change_mtu() and set_ringparam() was added by
-> commit c2ed2403f12c74 ("iavf: Wait for reset in callbacks which trigger
-> it") to fix a race condition where adding an interface to bonding
-> immediately after MTU or ring parameter change failed because the
-> interface was still in __RESETTING state. The same commit also added
-> waiting in iavf_set_priv_flags(), which was later removed by commit
-> 53844673d55529 ("iavf: kill "legacy-rx" for good").
+> Add L2 two-step PTP support for the KSZ8463. IPv4 and IPv6 layers aren't
+> supported. Neither is one-step PTP.
 > 
-> Waiting in set_channels() was introduced earlier by commit 4e5e6b5d9d13
-> ("iavf: Fix return of set the new channel count") to ensure the PF has
-> enough time to complete the VF reset when changing channel count, and to
-> return correct error codes to userspace.
+> The pdelay_req and pdelay_resp timestamps share one interrupt bit status.
+> So introduce last_tx_is_pdelayresp to keep track of the last sent event
+> type. Use it to retrieve the relevant timestamp when the interrupt is
+> caught.
 > 
-> Commit ef490bbb226702 ("iavf: Add net_shaper_ops support") added
-> net_shaper_ops to iavf, which required reset_task to use _locked NAPI
-> variants (napi_enable_locked, napi_disable_locked) that need the netdev
-> instance lock.
-> 
-> Later, commit 7e4d784f5810 ("net: hold netdev instance lock during
-> rtnetlink operations") and commit 2bcf4772e45adb ("net: ethtool: try to
-> protect all callback with netdev instance lock") started holding the
-> netdev instance lock during ndo and ethtool callbacks for drivers with
-> net_shaper_ops.
-> 
-> The combination of waiting for reset and the new locking requirements
-> creates a deadlock: the callback holds the lock and waits for reset_task,
-> but reset_task is blocked waiting for the same lock:
-> 
->    Thread 1 (callback)               Thread 2 (reset_task)
->    -------------------               ---------------------
->    netdev_lock()
->    ndo_change_mtu() or ethtool op
->      iavf_schedule_reset()
->      iavf_wait_for_reset()           iavf_reset_task()
->        waiting...                      netdev_lock() <- DEADLOCK
-> 
-> Reproducer:
-> 
->    # echo 16 > /sys/class/net/$PF/device/sriov_numvfs
->    # ip link set $VF up
->    # ip link set $VF mtu 5000
->    RTNETLINK answers: Device or resource busy
-> 
->    # dmesg | tail -1
->    iavf: MTU change interrupted waiting for reset
-> 
-> Fix this by temporarily releasing the lock while waiting for reset to
-> complete. This follows the pattern used elsewhere in the kernel (e.g.,
-> do_set_master() releases rtnl_lock before calling ndo_add_slave()).
-> 
-> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
-> Signed-off-by: Petr Oros <poros@redhat.com>
+> Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 > ---
->   drivers/net/ethernet/intel/iavf/iavf_main.c | 15 ++++++++++++---
->   1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> index 8aa6e92c16431f..d7738fb8fa60bc 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -189,13 +189,22 @@ static bool iavf_is_reset_in_progress(struct iavf_adapter *adapter)
->    * iavf_wait_for_reset - Wait for reset to finish.
->    * @adapter: board private structure
->    *
-> + * The iavf driver selects NET_SHAPER, so callbacks that trigger reset are
-> + * always called with netdev instance lock held, while reset_task also needs
-> + * this lock. Release the lock while waiting to avoid deadlock.
-> + *
->    * Returns 0 if reset finished successfully, negative on timeout or interrupt.
->    */
->   int iavf_wait_for_reset(struct iavf_adapter *adapter)
->   {
-> -	int ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
-> -					!iavf_is_reset_in_progress(adapter),
-> -					msecs_to_jiffies(5000));
-> +	struct net_device *netdev = adapter->netdev;
-> +	int ret;
+> @@ -518,6 +535,8 @@ void ksz_port_txtstamp(struct dsa_switch *ds, int port, struct sk_buff *skb)
+>  	if (!hdr)
+>  		return;
+>  
+> +	prt->last_tx_is_pdelayresp = false;
 > +
-> +	netdev_unlock(netdev);
-> +	ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
-> +					       !iavf_is_reset_in_progress(adapter),
-> +					       msecs_to_jiffies(5000));
-> +	netdev_lock(netdev);
->   
->   	/* If ret < 0 then it means wait was interrupted.
->   	 * If ret == 0 then it means we got a timeout while waiting
+>  	ptp_msg_type = ptp_get_msgtype(hdr, type);
+>  
+>  	switch (ptp_msg_type) {
+> @@ -528,6 +547,7 @@ void ksz_port_txtstamp(struct dsa_switch *ds, int port, struct sk_buff *skb)
+>  	case PTP_MSGTYPE_PDELAY_REQ:
+>  		break;
+>  	case PTP_MSGTYPE_PDELAY_RESP:
+> +		prt->last_tx_is_pdelayresp = true;
+>  		if (prt->tstamp_config.tx_type == HWTSTAMP_TX_ONESTEP_P2P) {
+>  			KSZ_SKB_CB(skb)->ptp_type = type;
+>  			KSZ_SKB_CB(skb)->update_correction = true;
+> @@ -972,7 +992,17 @@ void ksz_ptp_clock_unregister(struct dsa_switch *ds)
+>  
+>  static int ksz_read_ts(struct ksz_port *port, u16 reg, u32 *ts)
+>  {
+> -	return ksz_read32(port->ksz_dev, reg, ts);
+> +	u16 ts_reg = reg;
+> +
+> +	/**
+> +	 * On KSZ8463 DREQ and DRESP timestamps share one interrupt line
+> +	 * so we have to check the nature of the latest event sent to know
+> +	 * where the timestamp is located
+> +	 */
+> +	if (ksz_is_ksz8463(port->ksz_dev) && port->last_tx_is_pdelayresp)
+> +		ts_reg += KSZ8463_DRESP_TS_OFFSET;
+> +
+> +	return ksz_read32(port->ksz_dev, ts_reg, ts);
+>  }
 
-Reviewed-by: Ivan Vecera <ivecera@redhat.com>
+There is a race condition here.
 
+ksz_port_txtstamp() is called "at line rate" - it doesn't wait for the
+timestamping of the currently in progress skb to finish.
+
+See the order in
+static netdev_tx_t dsa_user_xmit(struct sk_buff *skb, struct net_device *dev)
+{
+	struct dsa_user_priv *p = netdev_priv(dev);
+	struct sk_buff *nskb;
+
+	dev_sw_netstats_tx_add(dev, 1, skb->len);
+
+	memset(skb->cb, 0, sizeof(skb->cb));
+
+	dsa_skb_tx_timestamp(p, skb); // calls ksz_port_txtstamp()
+
+	...
+
+	nskb = p->xmit(skb, dev); // calls ksz9893_xmit() -> ksz_defer_xmit()
+	if (!nskb) {
+		kfree_skb(skb); // deferred xmit enters this code path
+		return NETDEV_TX_OK;
+	}
+
+	return dsa_enqueue_skb(nskb, dev);
+}
+
+The deferred worker gets scheduled much later, time during which a
+second PTP packet may be transmitted from the stack.
+
+If you let the second skb change the port->last_tx_is_pdelayresp which
+ksz_ptp_msg_thread_fn() -> ksz_read_ts() thinks is associated with the
+first skb, you're in big trouble.
+
+You need to set port->last_tx_is_pdelayresp in the atomic section where
+you know for sure that there's a single TX timestampable skb in flight.
+There's no explicit lock which creates that atomic section, but the fact
+that the worker kthread of the tagger processes work items one by one is
+what gives you that guarantee.
 
