@@ -1,168 +1,260 @@
-Return-Path: <netdev+bounces-255823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DPzEO57gGnE8wIAu9opvQ
-	(envelope-from <netdev+bounces-255823-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:26:54 +0100
+	id UI8yBwB7gGnE8wIAu9opvQ
+	(envelope-from <netdev+bounces-255824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:22:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FE69CADFF
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:26:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A32E4CACFE
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:22:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DD3EF304E617
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:14:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 87E0E3031804
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8E7357A3D;
-	Mon,  2 Feb 2026 10:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1975A357735;
+	Mon,  2 Feb 2026 10:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PkyEPkwj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGVvg6mf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852EE357707
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 10:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859372E92BC
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 10:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770027273; cv=none; b=Xy7tl8kdu4PsPsfMOSgof8rSNcHhYKNcbhg523upmmtc7S24uUcPNQeWld9pli1Wq8lFhkEVVcqwuMa2JrMRP94K3XW/72FTHzW4sFUYi5lwKA6harfc2MPfSlX6hHdIttnrcGbdTBcfoKKtcDW7YT2EwEVgpFcnQpDSk+X16KE=
+	t=1770027508; cv=none; b=UG6g8mxSkvsxTEg6kkBBTzBgcLqOWmoAzO8LlAJrMKl3/a8l7eybEmXh6Ykd9Z7if4AxPbViFyQgFLvYkuRQrurf4TzYin5EEaS81B9O60bEZIOYAgiwddL0fB/bttQfIlzevH7pGJ5N1JpEZXoJjrUeniE4p/DmB30KRRnlM44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770027273; c=relaxed/simple;
-	bh=8VzmCD6zmthbjJ6e29NsFnoebW8tRXPgQWLhoogWYDk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dEe4xZKNz2wFkNjAoFpV2GCREqpZOo9ELpWvIbi7gV9mT8PZss2SArLZ0Jl+kJIi8nyGNJ+Q/xcQ4m40dnLQIHeSbP8z9kWJfk7gzHXLknrQWKd4PJ8WQ8fDmOIJW30NFsJziikgEQZIBBIefwMmbdwyZTy+5vOr8jTpU6HWaT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PkyEPkwj; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4806dffc64cso31759265e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 02:14:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770027270; x=1770632070; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qrYZR6rjkuzxmU3P4nDHzp2Z/smbaycErCPCyN/9Pdo=;
-        b=PkyEPkwjq8nlF8HnND3XJr8eZb2DGW/dH+4Q/9AI6w4qYoXJH+N4aChpBvFQFl2EMz
-         cgtmu+2oIhrwyIOuj7B9M6rqURKzA2t5TQkGHwIEQzpfV8zFeXMYpTiiBZF7Vc1TkI1x
-         LuzaUEJRQkYADLzeCFyfFyaFg7YvwpCJ/P81b04taF4YNCo9GRGJurGcJkUVpf4wZvzI
-         0HYgyPJPZCWZusyy9X3ZUXz+wjkEeBdH1EAJZLepfLKdDXKQUWrBzbW2KHa3cjQ9HUvq
-         oY/Nh8IqShYySpEuye75Lyq4YMz/aGg4LPT7Tjg116r+SuqT8H9N0mxoegD/+inlTr/T
-         ytzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770027270; x=1770632070;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qrYZR6rjkuzxmU3P4nDHzp2Z/smbaycErCPCyN/9Pdo=;
-        b=LHJPk9mWliE3eyOOvZzHlmYKWPnReSrqmWNfNwgtU2dChqFwRiGswAWZH9kVSgckU4
-         0NnK2ktuBzHxaaTHaKe1J+wR2X8tv7iHf4AmWpbiL2k+JiMsDVIjwMtjFGIHVd1D+EXj
-         S1SUuPpt8Pv/GeR+Ere6ZrFoWQqlrzYVzntVqUugwyB+Hn+QMVRHrvEmZm38t1ITI4un
-         sQOCnrYO2nyKev2wGGnsih1WLBMdc8W9o7GX0qiQHaIRH9RfF2KTAqCsnFcqAc8RQv/2
-         839z9myLDqhZ+J0FzBvKOnRrzs5WyS4bjPgAEIyw2ZQDRWTrLZd5/n8sdsfrBRvPMj2H
-         pYqw==
-X-Gm-Message-State: AOJu0Yzo5DiM+CDvNrBxe7xDJfL0xtlH+iYPZJbalEnidxNwaHZWodz9
-	wzVEZjBos6LUgxesGZgPLDOH3L8GcYZMUtQY2NrCzmPdGokp55mS+0pc
-X-Gm-Gg: AZuq6aLAI31UbfBzZDI5+/MT3KkJenZT+2+XLTPa4X4GgqUzS+ffFkG+SoCDY1vtc0z
-	LADdG2HG2CmHpYXsaQCl+rBvegKIl8oYyn/AlVL9N6F5st6RI9GOpxLa+tiFLW9KGixi6W2wrX5
-	oMB4lyLouNar5//+BtVPbU9Z/BpO3WBZpzg3+e9O9tRwnglNG8Wz50TDYbL2uuIU+zJpiUUqND0
-	jBVQGNQbSV9pY/PFtd3umO9OG1q/ONdLZ0QvYCFodDK0WjObSMedWW0/MhUrayRo0BTKJcxbKFU
-	C9O8+jBBwXLKhdGDcXKg8nh+ZdO8CBtG4Z2J7NaCdfYar6++FhSI3S9qSr9Z6Zk50s/5izikzSX
-	6sIc+IB7mnPxv2ZZzUowM2BWZVhZm0qf6W/99AtGCna8R9cNAOp5c4ow9u+IeyjmPz7k0P27lz7
-	o62Eg1vV6jHnBTCERrI3U=
-X-Received: by 2002:a05:600c:6298:b0:480:5951:fc1e with SMTP id 5b1f17b1804b1-482db45fbf4mr141852155e9.11.1770027269821;
-        Mon, 02 Feb 2026 02:14:29 -0800 (PST)
-Received: from [192.168.1.187] ([148.63.225.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482da8eb486sm109926285e9.2.2026.02.02.02.14.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 02:14:29 -0800 (PST)
-Message-ID: <d1ce010411a0acc56393dde86cdec38cc4866e09.camel@gmail.com>
-Subject: Re: [PATCH net-next] net: ethernet: adi: adin1110: Check return
- value of devm_gpiod_get_optional() in adin1110_check_spi()
-From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
-To: Chen Ni <nichen@iscas.ac.cn>, andrew+netdev@lunn.ch,
- davem@davemloft.net, 	edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuniyu@google.com, 	nicolas.dichtel@6wind.com,
- alexandru.tachici@analog.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Mon, 02 Feb 2026 10:15:11 +0000
-In-Reply-To: <20260202040228.4129097-1-nichen@iscas.ac.cn>
-References: <20260202040228.4129097-1-nichen@iscas.ac.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 
+	s=arc-20240116; t=1770027508; c=relaxed/simple;
+	bh=2mSffkAlx2LWmOLKktkDUc/RWeoA2F8mcxyQ4brpPo8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZYWJZrkrTiULSOfSK1qs/udV5/c2oIiHs6O7W0eFXL8gn9WISYNZ2lg6Or1DCR0IuU6SeqZZlZQqOYjQq2jr0aaMqXefhdpCPvovY31G6YxA1nSAZhqrPqzT9nlYXkeizkbLpfSkL6CwSBTc+RdRVJp9pmhVz7r6lROXHdobmyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hGVvg6mf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770027505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QwkSiX1Hp8rIk3qxgAOsnlMj5FGX8DKdzbss4//3U/M=;
+	b=hGVvg6mfegE18J5Ko4QN9+KNPbG5IJ8qJoNHThgqTjJ0vAYVFP4t6V6Z76uSExfgfZ77dI
+	6FiQRrysPeo7KL1+8hzb+ldxpdkomT5bk+Fb61c1b8SlM1yAAAyLkjYynY2Eyt8iURC0eS
+	4/Y8F41NjTy2nxCJtamIO1yWgUmZNIE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-261-EV51GaeONfiBLUq-hmGr9A-1; Mon,
+ 02 Feb 2026 05:18:22 -0500
+X-MC-Unique: EV51GaeONfiBLUq-hmGr9A-1
+X-Mimecast-MFC-AGG-ID: EV51GaeONfiBLUq-hmGr9A_1770027499
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77DC2195606F;
+	Mon,  2 Feb 2026 10:18:19 +0000 (UTC)
+Received: from rhel-developer-toolbox-latest (unknown [10.43.3.143])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 37F9D19560A2;
+	Mon,  2 Feb 2026 10:18:16 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] ice: fix crash in ethtool offline loopback test
+Date: Mon,  2 Feb 2026 11:17:54 +0100
+Message-ID: <20260202101755.315528-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255823-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255824-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nonamenuno@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mschmidt@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iscas.ac.cn:email,analog.com:email]
-X-Rspamd-Queue-Id: 5FE69CADFF
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A32E4CACFE
 X-Rspamd-Action: no action
 
-On Mon, 2026-02-02 at 12:02 +0800, Chen Ni wrote:
-> The devm_gpiod_get_optional() function may return an ERR_PTR in case of
-> genuine GPIO acquisition errors, not just NULL which indicates the
-> legitimate absence of an optional GPIO.
->=20
-> Add an IS_ERR() check after the call in adin1110_check_spi(). On error,
-> return the error code to ensure proper failure handling rather than
-> proceeding with invalid pointers.
->=20
-> Fixes: 36934cac7aaf ("net: ethernet: adi: adin1110: add reset GPIO")
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-> ---
+Since the conversion of ice to page pool, the ethtool loopback test
+crashes:
 
-For the change itself:
+ BUG: kernel NULL pointer dereference, address: 000000000000000c
+ #PF: supervisor write access in kernel mode
+ #PF: error_code(0x0002) - not-present page
+ PGD 1100f1067 P4D 0
+ Oops: Oops: 0002 [#1] SMP NOPTI
+ CPU: 23 UID: 0 PID: 5904 Comm: ethtool Kdump: loaded Not tainted 6.19.0-0.rc7.260128g1f97d9dcf5364.49.eln154.x86_64 #1 PREEMPT(lazy)
+ Hardware name: [...]
+ RIP: 0010:ice_alloc_rx_bufs+0x1cd/0x310 [ice]
+ Code: 83 6c 24 30 01 66 41 89 47 08 0f 84 c0 00 00 00 41 0f b7 dc 48 8b 44 24 18 48 c1 e3 04 41 bb 00 10 00 00 48 8d 2c 18 8b 04 24 <89> 45 0c 41 8b 4d 00 49 d3 e3 44 3b 5c 24 24 0f 83 ac fe ff ff 44
+ RSP: 0018:ff7894738aa1f768 EFLAGS: 00010246
+ RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+ RDX: 0000000000000000 RSI: 0000000000000700 RDI: 0000000000000000
+ RBP: 0000000000000000 R08: ff16dcae79880200 R09: 0000000000000019
+ R10: 0000000000000001 R11: 0000000000001000 R12: 0000000000000000
+ R13: 0000000000000000 R14: 0000000000000000 R15: ff16dcae6c670000
+ FS:  00007fcf428850c0(0000) GS:ff16dcb149710000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 000000000000000c CR3: 0000000121227005 CR4: 0000000000773ef0
+ PKRU: 55555554
+ Call Trace:
+  <TASK>
+  ice_vsi_cfg_rxq+0xca/0x460 [ice]
+  ice_vsi_cfg_rxqs+0x54/0x70 [ice]
+  ice_loopback_test+0xa9/0x520 [ice]
+  ice_self_test+0x1b9/0x280 [ice]
+  ethtool_self_test+0xe5/0x200
+  __dev_ethtool+0x1106/0x1a90
+  dev_ethtool+0xbe/0x1a0
+  dev_ioctl+0x258/0x4c0
+  sock_do_ioctl+0xe3/0x130
+  __x64_sys_ioctl+0xb9/0x100
+  do_syscall_64+0x7c/0x700
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  [...]
 
-Reviewed-by: Nuno S=C3=A1 <nuno.sa@analog.com>
+It crashes because we have not initialized libeth for the rx ring.
 
-> =C2=A0drivers/net/ethernet/adi/adin1110.c | 3 +++
-> =C2=A01 file changed, 3 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/a=
-di/adin1110.c
-> index 30f9d271e595..71a2397edf2b 100644
-> --- a/drivers/net/ethernet/adi/adin1110.c
-> +++ b/drivers/net/ethernet/adi/adin1110.c
-> @@ -1089,6 +1089,9 @@ static int adin1110_check_spi(struct adin1110_priv =
-*priv)
-> =C2=A0
-> =C2=A0	reset_gpio =3D devm_gpiod_get_optional(&priv->spidev->dev, "reset"=
-,
-> =C2=A0					=C2=A0=C2=A0=C2=A0=C2=A0 GPIOD_OUT_LOW);
-> +	if (IS_ERR(reset_gpio))
-> +		return dev_err_probe(&priv->spidev->dev, PTR_ERR(reset_gpio),
-> +				=C2=A0=C2=A0=C2=A0=C2=A0 "failed to get reset gpio\n");
-> =C2=A0	if (reset_gpio) {
-> =C2=A0		/* MISO pin is used for internal configuration, can't have
-> =C2=A0		 * anyone else disturbing the SDO line.
+Fix it by treating ICE_VSI_LB VSIs slightly more like normal PF VSIs and
+letting them have a q_vector. It's just a dummy, because the loopback
+test does not use interrupts, but it contains a napi struct that can be
+passed to libeth_rx_fq_create() called from ice_vsi_cfg_rxq() ->
+ice_rxq_pp_create().
+
+Fixes: 93f53db9f9dc ("ice: switch to Page Pool")
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+---
+ drivers/net/ethernet/intel/ice/ice_base.c    |  5 ++++-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c |  4 ++++
+ drivers/net/ethernet/intel/ice/ice_lib.c     | 15 ++++++++++-----
+ 3 files changed, 18 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index eadb1e3d12b3..f0da50df6791 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -124,6 +124,8 @@ static int ice_vsi_alloc_q_vector(struct ice_vsi *vsi, u16 v_idx)
+ 	if (vsi->type == ICE_VSI_VF) {
+ 		ice_calc_vf_reg_idx(vsi->vf, q_vector);
+ 		goto out;
++	} else if (vsi->type == ICE_VSI_LB) {
++		goto skip_alloc;
+ 	} else if (vsi->type == ICE_VSI_CTRL && vsi->vf) {
+ 		struct ice_vsi *ctrl_vsi = ice_get_vf_ctrl_vsi(pf, vsi);
+ 
+@@ -662,7 +664,8 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 	u32 rx_buf_len;
+ 	int err;
+ 
+-	if (ring->vsi->type == ICE_VSI_PF || ring->vsi->type == ICE_VSI_SF) {
++	if (ring->vsi->type == ICE_VSI_PF || ring->vsi->type == ICE_VSI_SF ||
++	    ring->vsi->type == ICE_VSI_LB) {
+ 		if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
+ 			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+ 						 ring->q_index,
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 3565a5d96c6d..e9f2618950c8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -1289,6 +1289,10 @@ static u64 ice_loopback_test(struct net_device *netdev)
+ 	test_vsi->netdev = netdev;
+ 	tx_ring = test_vsi->tx_rings[0];
+ 	rx_ring = test_vsi->rx_rings[0];
++	/* Dummy q_vector and napi. Fill the minimum required for
++	 * ice_rxq_pp_create().
++	 */
++	rx_ring->q_vector->napi.dev = netdev;
+ 
+ 	if (ice_lbtest_prepare_rings(test_vsi)) {
+ 		ret = 2;
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index d47af94f31a9..bad67e4dc044 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -107,10 +107,6 @@ static int ice_vsi_alloc_arrays(struct ice_vsi *vsi)
+ 	if (!vsi->rxq_map)
+ 		goto err_rxq_map;
+ 
+-	/* There is no need to allocate q_vectors for a loopback VSI. */
+-	if (vsi->type == ICE_VSI_LB)
+-		return 0;
+-
+ 	/* allocate memory for q_vector pointers */
+ 	vsi->q_vectors = devm_kcalloc(dev, vsi->num_q_vectors,
+ 				      sizeof(*vsi->q_vectors), GFP_KERNEL);
+@@ -239,6 +235,8 @@ static void ice_vsi_set_num_qs(struct ice_vsi *vsi)
+ 	case ICE_VSI_LB:
+ 		vsi->alloc_txq = 1;
+ 		vsi->alloc_rxq = 1;
++		/* A dummy q_vector, no actual IRQ. */
++		vsi->num_q_vectors = 1;
+ 		break;
+ 	default:
+ 		dev_warn(ice_pf_to_dev(pf), "Unknown VSI type %d\n", vsi_type);
+@@ -2424,14 +2422,21 @@ static int ice_vsi_cfg_def(struct ice_vsi *vsi)
+ 		}
+ 		break;
+ 	case ICE_VSI_LB:
+-		ret = ice_vsi_alloc_rings(vsi);
++		ret = ice_vsi_alloc_q_vectors(vsi);
+ 		if (ret)
+ 			goto unroll_vsi_init;
+ 
++		ret = ice_vsi_alloc_rings(vsi);
++		if (ret)
++			goto unroll_alloc_q_vector;
++
+ 		ret = ice_vsi_alloc_ring_stats(vsi);
+ 		if (ret)
+ 			goto unroll_vector_base;
+ 
++		/* Simply map the dummy q_vector to the only rx_ring */
++		vsi->rx_rings[0]->q_vector = vsi->q_vectors[0];
++
+ 		break;
+ 	default:
+ 		/* clean up the resources and exit */
+-- 
+2.52.0
+
 
