@@ -1,198 +1,150 @@
-Return-Path: <netdev+bounces-255703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255705-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOBwOjojgGlX3QIAu9opvQ
-	(envelope-from <netdev+bounces-255703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 05:08:26 +0100
+	id QJGwHvspgGl73gIAu9opvQ
+	(envelope-from <netdev+bounces-255705-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 05:37:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526B6C81FD
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 05:08:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6458C82E3
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 05:37:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04DA8300F9D2
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 04:08:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25A6430075EB
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 04:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FEF27E049;
-	Mon,  2 Feb 2026 04:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2AEE2BE7BB;
+	Mon,  2 Feb 2026 04:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="IvWIS+Xz"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YAY9zmia"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1C727B340
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 04:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770005284; cv=pass; b=e+l/liAUubAY9Onn9hpsHx/LcBdyMAyVCJM37vgxpGA8afmqjLxlnXRyqWHI+9f3LhUDx1tQsCLXGmd9ybV+cSmRQAIkq6E/L0EzE8zEOrNpUf7IfO8GjrPI2MBItit1v+zNnDBQqjZ+bflu6WW0vDxwA/VvgaDrMEfRelb84gU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770005284; c=relaxed/simple;
-	bh=YOKr40N5NMnJSSsWi5gI3boLeIf3C3Tjpjo+QN3HJjg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qdfz9T3v2Fzp0hQ0nRipZPzZ5o3ceLbYqEYX3PQOSls19WqvuP2HQ3Bodzvb9GCUBSCx//XO7PviZ8dmA1mGMx5Qp3ZrDEXkhbnFZf5riEopzx3xfUHzkwAeuXAz+PYn40LUoVvgvfVnUnNgRa0bXgTwCPbXsWgMGzubaQGskzs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=IvWIS+Xz; arc=pass smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34f634dbfd6so3110520a91.2
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 20:08:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770005283; cv=none;
-        d=google.com; s=arc-20240605;
-        b=aZzgNPNeu/CoKEvPMOGMlqOeYY5CU6LLDAiHeHIdymSpCn1FF2hLxo03JqRgOQ+gca
-         512zpOQzlWcAZITexrtK03G/RWUc49XJAK49D+f4jgAHMrDBvSdz0iSzY+zXoVOsh+qH
-         4PIJsX4OPFHIqWkPsKu4wsrQ/B9MydDYr0T+ly1Qykz0g6ZNERnVONzFDRt00zMN5idR
-         xmrhlPLwatkZHXkv0Usq5ZQrHkoGaSy7AqkjdfOuWMHHA/OOX7RGXxkkXz4JBH3qLPVg
-         Lrfk2xL8+VUCBdXCdNa5+iUgsd8Tf+X0LaTp4Rg0CbHiW6YDuqcdPxtX0zIbCPOkti0d
-         d4Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=V0H+rWHAjETqi9RQMu+lWQENmuwh8JTpCpYCQS4X1u8=;
-        fh=E/Xc0oC8vd26r9Af1kCsdX5ecafYKfTV8kBU38a+898=;
-        b=S6OtXVQ+fIo2sfdyKSH4A+4hhnY5dqV8r4hnVGa5hlNFvtQbiuTSiBoVfC45v/BAZZ
-         akYZKK03HcvbA23cHEg9ea9zZ4UB9S/ueeRjh4p6+oeoB90kqZfvI7hBQCt6/GyZOYNf
-         SMGvl7HHriYptsj3tQapnFlp4Dnzv3INOB1nKzktSAtAs9E8/zEP/BT6nrquVv1ZGbDS
-         ZrYQ1VhOUuYG1JtT5qjRr9SqHMJnWM2cel52+KrK4BuXdLXcVQ+Tr1k0oM2z+PV/QAo6
-         dGzk3huypHGJk0+BKSBYbdyN8iZo2tAPtzE17k/v7aKZwOtF9hWBuUIZIa0Oh2f36aoL
-         TMkQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1770005283; x=1770610083; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V0H+rWHAjETqi9RQMu+lWQENmuwh8JTpCpYCQS4X1u8=;
-        b=IvWIS+XzZ6U7rFPnUSWCGO8Q3sknl0BedpgeIZL6i8mAFEWGtcK5Efs2l8bT8pM6PV
-         SGcDQmHDZ2mURMsU9hej5blJxnPZ3iNIuBcZPQy6nXkhztPJdB6dDkQCtYefYPl30Puo
-         /DJPPseUGvDG0ijkPFAo4Nzv49LIKIxHY+DYElnW2U9NIhfj7cLnyodQWno48Oem4hJA
-         SmS2rCOdhbxZpedZMgomtz8EnynLBJDX5PFDpRy83dJ/JMADB5zhhdFQbEcLabIFADqL
-         QpDxWjfjVjeaxnwUdbnXriMMXSU6JrOnIcbyOzlsfYYvmlpXoBJ1MftB7Nu4VlgNhZQk
-         +SBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770005283; x=1770610083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=V0H+rWHAjETqi9RQMu+lWQENmuwh8JTpCpYCQS4X1u8=;
-        b=bs5hFRclLyqTnccXrjYJbSxFzos+M3aj3XF6aHDQpuesFL+zzMOopJWdDqpDiTtZ5r
-         lfReyz/+2ar5b6j3N68TSeZmj8nnqz/b9cFf1Asxu1k9pJiImaGJxw2i0XoBgaNvmqWv
-         LAW6CTsLsGdgHfDEjqBri5julrn6bQDB36FZldfLJzREMjoPEWZFm9Kwhr43Ry9tcPy/
-         BIJ8S37dEhBcnrFj3S3S5Ah9oUuWgKh+2mQ6j7PvfSTY/uBUQum5r4FtQ8fe3geEQO/x
-         8iNwu36ICBQlY6IXwIG+ZSwqAkeQP7t8sBCJ3bUWRY5TncgWswNlIRP3ap+q5lEF+oPC
-         g5Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCVY4HCEkcWPiauacIQ9ZeI13r2KfuJfA84AA1fbMRwyyLzJZXjIEcveA8lKYw1MP9uzefiIxcM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuXaNRzdTdfz+ILfo9ruF6AmrCw0jHFMOHRuuvQMElJuG36UHk
-	Nn30ye33cyVgohJ3OQGFbh/b26oJM73daXux5yz8egr2bdW6jExVndMkJLE4gCLXV4JdrU5aRVS
-	HSawUl1OvSmTjAA4j/PZb2oJvICM8WiyPVj0j5Rwy
-X-Gm-Gg: AZuq6aIW3E+PU3gNyWZufY3JX+Ful99cwawxeb+w/LgZXkpmQkj2OE1SAlnpZYofcbY
-	Fw7d+cUX/dotE1yaQth4zuMvGtaG5kHpSVj5wz5+ZFlQibnw4z24cJhD+we7dZMyJL57HLAm0c+
-	nA0Hm/AyEfGqY+bsM+A8B+HH3APIEv4Yww4LRMVb9GSo2OaZ7TzRldWcMYE2p6HiuvUCuFVKmwc
-	dCkYTPBD0i0IgCOpcl05yMIQR8p7f/7AfPjihqJG2WHWG4lAUJssfFylEaGEQAKYZD8+h0=
-X-Received: by 2002:a17:90b:2e47:b0:34a:b8fc:f1d8 with SMTP id
- 98e67ed59e1d1-3543b3e3a6amr10303423a91.37.1770005282654; Sun, 01 Feb 2026
- 20:08:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3022BD5A2;
+	Mon,  2 Feb 2026 04:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770007032; cv=none; b=MeJbF/8TNdgvdKGe6tsih+gZRylD00oHt7mqFQPys21C/Xt2RwLqRUMmLWCasNL65haaAuu6vpOAgDX492TsXWfRt8531MZ93fdSXBu9/9d7N1PnolOnS+Rr5Sm6VZ4/n6XPzXYX+xmiFJPCS9/HM95GVq6fLjUEWD1kDICofgk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770007032; c=relaxed/simple;
+	bh=2M1FlUwZmy9rpiw3aEyqteFrrP++1HMD9u+KqGT+ipA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=emcFMFuZvu+qWOrjvJMuruRE7ZFsKpLT7aGxMxSBpSrGGOxQwJQkK7BX/uMDgTL9/B8a8W3nEFNJu8yy9tyWulDmq9sMVX7iCl2HXKo4ZRgZQmJkxU3TS4NIBkA6t49qGSw3Q+qd9nXz0X+QRF25zW0fiyJ1frsUiRX2Q+CdiWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YAY9zmia; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 611NsDP93463246;
+	Sun, 1 Feb 2026 20:11:10 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=Mgp9VulRLNfMc5bfmTK+x0ifw
+	Ky71HfYrFn4vr1yauc=; b=YAY9zmiaE2ZoCdnTNrvLohp4vlrVAWgnJfHbnhjb8
+	qv34WQ3p1VGiVo7DtpgEID1de3ZqqPDoRBpqmzP/Yb54cJuvP69Sv81NQTTmK7ws
+	YmlXGkBjZmh0i9JeLH1sdfKXvcghgTt7Cc3GM46YrmqUc1ENPP0fZT8TX+lIxt03
+	Uond4BOuGlcAr3YeZ1Xf3MgjgXQN0xvZF6L1mykzieb94FEo7PSZzNPa9GLAWxeP
+	Er1JfbmhTcIfAo0P8x1IkBqiopKZ1eMB9ceiPy6+50QA2U08wnGU+b6fWmnWcpQu
+	Th5NwqcsGjjE+roCPH2j/i+1k53YMMQiJObQsJLgknVLg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4c28mvrvgy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 01 Feb 2026 20:11:09 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 1 Feb 2026 20:11:08 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 1 Feb 2026 20:11:08 -0800
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 5E47A3F70E6;
+	Sun,  1 Feb 2026 20:11:07 -0800 (PST)
+Date: Mon, 2 Feb 2026 09:41:06 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next,v7,09/13] octeontx2-af: npc: cn20k: virtual index
+ support
+Message-ID: <aYAj2gIfrlNq2_zt@rkannoth-OptiPlex-7090>
+References: <20260129083339.264386-10-rkannoth@marvell.com>
+ <20260131033322.1013834-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp>
- <CAHC9VhQikhv+qCyQdnJguvy-qTkGXB+NU7=QZjw5d+WfyVxZhw@mail.gmail.com>
- <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
- <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
- <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
- <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com> <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
-In-Reply-To: <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
-From: Paul Moore <paul@paul-moore.com>
-Date: Sun, 1 Feb 2026 23:07:51 -0500
-X-Gm-Features: AZwV_Qj0ZPr30GBIZpy2KTBmQCeMzIbAaQJB4ILIbQRznBk2H145kQkQiYyOBUA
-Message-ID: <CAHC9VhQPKU5DqG-ryZsiCV2vZeGGf_a-JStR_LVVCCn03C4usQ@mail.gmail.com>
-Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: SELinux <selinux@vger.kernel.org>, 
-	linux-security-module <linux-security-module@vger.kernel.org>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260131033322.1013834-1-kuba@kernel.org>
+X-Authority-Analysis: v=2.4 cv=MuhfKmae c=1 sm=1 tr=0 ts=698023dd cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=7eULd4cwdJC3NnIBy84A:9 a=CjuIK1q_8ugA:10
+ a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-ORIG-GUID: _Id3mGfy8m2JQyijmOMVQgvNX9wt6Jyc
+X-Proofpoint-GUID: _Id3mGfy8m2JQyijmOMVQgvNX9wt6Jyc
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDAzMyBTYWx0ZWRfX4xo81nCLnTTW
+ lK+0kPOUrg4PjkqNy17im8AV0oEr6bzjfQ8xNfmGzEwrL/GEsHvEAwsLwVvoxl2PUxXEVWCXT86
+ j0oV5d0gKE4WfawWoRKEXIo7ZEEvxROKh793ZPVtK7t70X6dbxUiUtpr/v0dgRoFCSCLKrERXN1
+ OodRoM2rP7ZnGqpmCK/XXULKD4AF+A6Wb5bZzK6RsDUboHFs50GUQxO4ZqJCJ8Ig4OoyzbhqzPI
+ 32tTicAofyMQMWZs84UTHlcV1SWG7yVitjl5w9D2/w2vuc8HLK7wUBnNsGhigtAhZjytVTYnts/
+ gdCjyPDaV5huMMOXEzMu8p5tw1ptMA5DujBMPnAsa0fuHpFOnvGm52Ugpl53wkPJK/ipLt+c482
+ yrILSlkC1WjmeslmVapySdcTCaBcCeII0L3dc9Ni25FP5eRkC5z/IxGTBhjURA0MfBanjtaZhKp
+ RQTPMXaN9gJbijUulGQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-02_01,2026-01-30_04,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[paul-moore.com,none];
-	R_DKIM_ALLOW(-0.20)[paul-moore.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255703-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-255705-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[paul-moore.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[paul@paul-moore.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,i-love.sakura.ne.jp:email]
-X-Rspamd-Queue-Id: 526B6C81FD
+	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: E6458C82E3
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 1:01=E2=80=AFAM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
-> On 2026/01/31 6:56, Paul Moore wrote:
-> > On Wed, Jan 28, 2026 at 5:28=E2=80=AFAM Tetsuo Handa
-> > <penguin-kernel@i-love.sakura.ne.jp> wrote:
-> >> On 2026/01/28 6:59, Paul Moore wrote:
-> >>> It sounds like we either need to confirm that
-> >>> security_xfrm_{policy,state}_delete() is already present in all code
-> >>> paths that result in SPD/SAD deletions (in a place that can safely
-> >>> fail and return an error),
-> >>
-> >> Yes.
-> >
-> > To clarify, do you mean "yes, I agree", or "yes, I've already checked
-> > this and can confirm that the LSM hooks are already being called"?
+On 2026-01-31 at 09:03:22, Jakub Kicinski (kuba@kernel.org) wrote:
 >
-> I mean "yes, I agree".
+> > +fail1:
+> > +	if (xa_insert(&npc_priv.xa_idx2vidx_map, old_midx,
+> > +		      xa_mk_value(vidx), GFP_KERNEL))
+> > +		dev_err(rvu->dev,
+> > +			"%s: Faled to roll back vidx2idx to old_midx=%u, vidx=%u\n",
+> > +			__func__, old_midx, vidx);
+> > +
+> > +	return rc;
+> > +}
 >
-> >
-> >>>                            or we need to place
-> >>> xfrm_dev_{policy,state}_flush_secctx_check() in a location that can
-> >>> safely fail.
-> >>
-> >> Did you mean xfrm_{policy,state}_flush_secctx_check() ?
-> >
-> > They both call into the security_xfrm_policy_delete() LSM hook which
-> > is what I care about as that hook is what authorizes the operation.
+> When we jump to fail1, it's because the xa_insert() into xa_vidx2idx_map
+> failed (around line 352). At that point, xa_idx2vidx_map hasn't been touched
+> yet - only xa_vidx2idx_map had the vidx erased. The rollback here tries to
+> insert into xa_idx2vidx_map, but shouldn't this restore vidx -> old_midx
+> in xa_vidx2idx_map instead? This appears to be operating on the wrong xarray
+> and would leave the mapping inconsistent on error.
 >
-> I can't understand what your authorization is.
-
-I'm asking you to verify that we have the LSM xfrm hooks in all of the
-necessary locations to ensure that we are safely and comprehensively
-gating all of the operations that result in removal of SPD and SAD
-entries.
-
-> No authorization can be placed during must-not-fail operation.
-
-Of course, but that means that we simply need to make sure we have the
-authorization hooks placed elsewhere to ensure that users can not
-remove SPD and SAD entries if they are not allowed.  I'm not arguing
-about if returning an error in a place that can not handle an error
-condition is correct or not, I'm arguing that you should audit the SPD
-and SAD removal code paths to ensure that they all have the proper LSM
-xfrm hook authorizations.
-
---=20
-paul-moore.com
+> This was also raised in lore review feedback:
+> https://lore.kernel.org/all/20260129051307.376632-1-kuba@kernel.org/
+Label fall1: is modifying vidx2idx_map in V7. Am i missing anything here ?
 
