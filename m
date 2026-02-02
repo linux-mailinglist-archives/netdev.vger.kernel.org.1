@@ -1,183 +1,214 @@
-Return-Path: <netdev+bounces-255883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEQKE5W0gGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:28:37 +0100
+	id UMNqGF+0gGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:27:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFEACD594
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:28:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE24DCD568
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:27:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9FF01300D4F5
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 14:28:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C3F7D30185BB
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 14:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BE736D4FF;
-	Mon,  2 Feb 2026 14:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E102D2493;
+	Mon,  2 Feb 2026 14:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WenBnx0T"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ppNC/Xa5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85D536C598;
-	Mon,  2 Feb 2026 14:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4359C1A76DE
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 14:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770042500; cv=none; b=BnsbeX7E9T9aQM5xaCg5hzv7seqv3RXgR4Wkhqo02ul16BKR0Xn803tSlfuE9/4f+rY7czDBj84TZtojWKNgvQCF8SjMiPnI+0YUi/k+w7cU5/NtewZPDv4uy5B6dmLf8GvxJzyA1OuLy8+MYYQ9kdMdS99jSOIpHIOMrdw+6n0=
+	t=1770042459; cv=none; b=mYYtkDIWlgxM3YiDgnW2RVIIuHXMAwGY6HS5oVlGFDN6yXkWskXlo0YMieAvwuwM09PqrRiSwXGjxtx210Ba7b+FkzEJg0dNK9HYQl+FDk/ouQYsGgRkiM486WTW5DFQX81mmkCtg33adZiUBaTYhN/zFKt12Ky2m1pDCcrQATs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770042500; c=relaxed/simple;
-	bh=9GK7c/+ItwHetxr6eJlNOJePzxSiR/TFo01yiisSKV0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d1E02RG9CubD40nZiLU1F/0MwRljqkrMAIK7yiCVlx9+LaCJEgT/1IFDLPfzpoeZd2EjDJfjYoQH+7XDwNMJzmVYB2ZWMqZzMZK5+8QWKMRL6GkoCTiAXim/7YNb3/Ue2QHjH1BTegsYYZXVXdgD8qVucOMuP/Ues+BLD0UGrQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WenBnx0T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A191C19422;
-	Mon,  2 Feb 2026 14:28:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770042499;
-	bh=9GK7c/+ItwHetxr6eJlNOJePzxSiR/TFo01yiisSKV0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WenBnx0ThipuTGAaEC1onJkXKqsZQUieHUHYbvUCrtoP6RMH9x2d2nh+Qw/X7+grO
-	 MpO9/e4dnTsnyg9/G2yIShTGyrsqigzHVCYwX7tkeEgi2HZ6kUKy87sO9MO3Zsbpwv
-	 btliJlexQfREdwUM26ILJ9dePCP2LwZ5fayXXDpdYnVanBOfUpA8WNxEi5ZnsmhqDn
-	 +45Vtgi2PxGAU10DNmaX7Bw5Wl8j9agc7o95LtY+2TluU6kBDbvXn6xgl4zzoMjMBN
-	 3uV11nowhRsUBQ+HxXAPeUach42vKs3dx+CPNvPtvT6ZvFzuKKOsXTCheczw3lEgNX
-	 AApTrw4q5kWrw==
-From: Simon Horman <horms@kernel.org>
-To: wei.fang@nxp.com
-Cc: Simon Horman <horms@kernel.org>,
-	john.fastabend@gmail.com,
-	linux-kernel@vger.kernel.org,
-	sdf@fomichev.me,
-	netdev@vger.kernel.org,
-	xiaoning.wang@nxp.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	bpf@vger.kernel.org,
-	imx@lists.linux.dev,
-	ast@kernel.org,
-	frank.li@nxp.com,
-	shenwei.wang@nxp.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	davem@davemloft.net,
-	daniel@iogearbox.net
-Subject: Re: [v5,net-next,06/15] net: fec: add fec_enet_rx_queue_xdp() for XDP path
-Date: Mon,  2 Feb 2026 14:26:55 +0000
-Message-ID: <20260202142655.1847932-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260129103447.1893129-7-wei.fang@nxp.com>
-References: <20260129103447.1893129-7-wei.fang@nxp.com>
+	s=arc-20240116; t=1770042459; c=relaxed/simple;
+	bh=+R4++M8FUTG1DIxvU5O6fXt+ps/irZYihVg1KCToE6M=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NMgKesbowzyxtiDiIv4pJaMCGmgJ10JP49GqKV7n3Kl9WTJk6Rlu/7/gUJsttYm4N0ylKpZcG/5JNL+1JguDzHEb6L8qE+EUQ8NR5c9CfgVxEMZXMf4QvIxNekkG9M8ZhNk7yDGVszjHvkF/I+Xl77fJZw0bVTLNOqK5tN+g8lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ppNC/Xa5; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 3CE45201E2;
+	Mon,  2 Feb 2026 15:27:34 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MQSt0OA811MK; Mon,  2 Feb 2026 15:27:33 +0100 (CET)
+Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 3871F201A1;
+	Mon,  2 Feb 2026 15:27:33 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 3871F201A1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1770042453;
+	bh=K4RY8oKI9qwfYPI3CVBDF4ISYDibmHkncYTTzUEs0PA=;
+	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
+	b=ppNC/Xa5vz1xnSD6lcj6JS7V9Lezp58YMU9R1H8FzbcifpVDG2s90QPg0L3K+iBZ7
+	 Hm4ewws7Peo4ON8A3D7pe6W4JHBkHNRjHbhKhSBBTox6EYZzQMKM7ME8IOVf/7nPzY
+	 9GXWNyPJjonob7LS+ymespHBhv3aQPRy2v/c/f0+4p/NocLMVdTKaNTQgq2eUbFh0u
+	 33q4Zkxvtts5Ay4uBinZHMezKNePxsRHyXmFvzBrOh5Fa29Gl6hwID9QbnDzMgiFrc
+	 LCrgF3dl6U914qtazX95VSxZUx5rjfzecaTpMIVW88k4QWGdGPCxkgozma0YlPW3nx
+	 zTXhWAFytZqTQ==
+Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
+ (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Feb
+ 2026 15:27:32 +0100
+Date: Mon, 2 Feb 2026 15:27:06 +0100
+From: Antony Antony <antony.antony@secunet.com>
+To: Yan Yan <evitayan@google.com>
+CC: <netdev@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, <antony.antony@secunet.com>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<saakashkumar@marvell.com>, <akamluddin@marvell.com>, Nathan Harold
+	<nharold@google.com>, <greg@kroah.com>
+Subject: Re: [REGRESSION] Discussion on "xfrm: Duplicate SPI Handling"
+Message-ID: <aYC0OvkVPkOnVU-i@moon.secunet.de>
+Reply-To: <antony.antony@secunet.com>
+References: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-02.secunet.de
+ (10.32.0.172)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	URIBL_MULTI_FAIL(0.00)[sto.lore.kernel.org:server fail,linux.dev:server fail];
-	TAGGED_FROM(0.00)[bounces-255883-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,fomichev.me,nxp.com,redhat.com,lunn.ch,lists.linux.dev,google.com,davemloft.net,iogearbox.net];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-255882-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:replyto,secunet.com:dkim,moon.secunet.de:mid];
+	HAS_ORG_HEADER(0.00)[];
+	TO_DN_SOME(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MISSING_XM_UA(0.00)[];
+	HAS_REPLYTO(0.00)[antony.antony@secunet.com];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DFFEACD594
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: CE24DCD568
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hi Yan,
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: fec: add fec_enet_rx_queue_xdp() for XDP path
+On Wed, Jan 28, 2026 at 16:43:06 +0800, Yan Yan wrote:
+> Hi all,
+> 
+> I am writing because unfortunately commit: 94f39804d891 ("xfrm:
+> Duplicate SPI Handling") has caused a regression in the Android OS, so
+> we would like to gain some context to help determine next steps. The
+> issue is caused by the new requirement for global SPI uniqueness
+> during allocation. Based on our review of RFC 4301 and the previous
+> review history, we would like to highlight a few concerns:
+> 
+> 1. Regression on Android:
+> This change breaks production behavior in Android, which uses
+> XFRM_MSG_ALLOCSPI to create larval SAs for both directions. Since RFC
+> 4301 allows duplicate outbound SPIs, and larval SAs are often created
 
-This commit separates XDP path packet processing from protocol stack
-processing by creating a dedicated fec_enet_rx_queue_xdp() function.
-The goal is to optimize XDP performance by removing unnecessary code
-paths that were interleaved with regular packet processing.
+To clarify, how are larval outbound SAs created in Android?
+Are they created with zero or non-zero SPIs? Multiple zero SPIs (acquire states) are allowed. However, I guess there is no user API for managing these acquire states. Only the kernel can create them and handle expiration or deletion via SA updates with acq_req?
 
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
+A user API (UAPI) for creating and deleting acquire states might be a possible solution.
 
-[ ... ]
+I haven’t been able to consistently reproduce the issue Marvell reported,
+but I suspect the bug could also affect outbound SAs with non-zero SPIs.
+Also when one peer is behind NAT. 
 
-> +static void fec_xdp_drop(struct fec_enet_priv_rx_q *rxq,
-> +			 struct xdp_buff *xdp, u32 sync)
-> +{
-> +	struct page *page = virt_to_head_page(xdp->data);
-> +
-> +	page_pool_put_page(rxq->page_pool, page, sync, true);
-> +}
+I wonder wouldn't duplicate SPI when behind NAT cause issues for output SAs? 
+Because the triplet is SPI, Protocol, Daddr. There is  no dport in it.
 
-[ ... ]
+> before direction or selectors are finalized, the allocator must remain
+> permissive (at least in our current design).
+> This also aligns with a concern Herbert Xu raised during the initial
+> review regarding compatibility:
+> >    "It's also dangerous to unilaterally do this since existing deployments
+> >    could rely on the old behaviour. You'd need to add a toggle for
+> >    compatibility."
+> 
+> 2. Inbound SPI uniqueness should not be a hard requirement:
+> The justification for enforcing global SPI uniqueness often cites the
+> statement in RFC 4301, Section 4.1, that for unicast traffic, the SPI
+> "by itself suffices to specify an SA." However, we don’t think this
+> means inbound SPI uniqueness is a hard requirement because of the two
+> following reasons:
+> 
+> – Another statement implies that SPI uniqueness is just an
+> implementation choice:
+> >    "Each entry in the SA Database (SAD) MUST
+> >    indicate whether the SA lookup makes use of the destination IP address, or the
+> >    destination and source IP addresses, in addition to the SPI."
+> 
+> – There is a "Longest Match" mandate which makes SPI uniqueness unnecessary:
+> >    "For each inbound, IPsec-protected packet, an implementation MUST
+> >    conduct its search of the SAD such that it finds the entry that
+> >    matches the 'longest' SA identifier. In this context, if two or more
+> >    SAD entries match based on the SPI value, then the entry that also
+> >    matches based on destination address... is the 'longest' match."
+> 
+> 3. Further clarification on the specific problem being addressed would
+> be helpful. The "real-world" problem this commit intends to fix
+> remains unclear. The patch mentions:
+> >    "This behavior causes inconsistencies during SPI lookups for inbound packets.
+> >    Since the lookup may return an arbitrary SA among those with the same SPI,
+> >    packet processing can fail, resulting in packet drops."
+> 
+> However, Linux kernel lookups using the triplet (SPI, Protocol, Daddr)
+> are deterministic. The lookup will not return an "arbitrary" SA
+> because the destination address is used to disambiguate the state.
+> 
+> As Antony suggested, this change may cater to SPI-only hardware
+> indexing. If that is the case, we are concerned about applying such
+> hardware-specific limits to the software stack, especially if the
+> behavior is not opt-in, as it appears to require an overly-narrow
+> reading of the RFC 4301. 
 
-> +static int fec_enet_rx_queue_xdp(struct fec_enet_private *fep, int queue,
-> +				 int budget, struct bpf_prog *prog)
-> +{
+I agree with your suggestion that making the behavior opt-in. 
+I would prefer the Default : to allow duplicate.
 
-[ ... ]
+> Given these concerns, would it be possible to discuss a revert or,
+> alternatively, could further context be provided regarding the
+> specific real-world problem this commit was intended to address? Once
+> the underlying issue is clearly defined, we can work together to find
+> a backward-compatible solution that satisfies all requirements.
+> 
+> Review threads are attached for easy reference:
+> https://lore.kernel.org/netdev/aDQhZ_ikHEt_pLn_@gondor.apana.org.au/T/#r45c1786651ce5af730f757aca7438474d494a323
+> https://lore.kernel.org/netdev/20250616100621.837472-1-saakashkumar@marvell.com/T/#u
 
-> +		switch (act) {
-> +		case XDP_PASS:
-> +			rxq->stats[RX_XDP_PASS]++;
-> +			/* The packet length includes FCS, but we don't want to
-> +			 * include that when passing upstream as it messes up
-> +			 * bridging applications.
-> +			 */
-> +			skb = fec_build_skb(fep, rxq, bdp, page, pkt_len);
-> +			if (!skb) {
-> +				fec_xdp_drop(rxq, &xdp, sync);
-> +				trace_xdp_exception(ndev, prog, XDP_PASS);
-> +			} else {
-> +				napi_gro_receive(&fep->napi, skb);
-> +			}
-> +			break;
-
-When fec_build_skb() fails, it already returns the page to the page pool
-via page_pool_recycle_direct():
-
-    static struct sk_buff *fec_build_skb(...)
-    {
-        skb = build_skb(page_address(page), ...);
-        if (unlikely(!skb)) {
-            page_pool_recycle_direct(rxq->page_pool, page);
-            ...
-            return NULL;
-        }
-        ...
-    }
-
-Calling fec_xdp_drop() after fec_build_skb() returns NULL will return
-the same page to the pool a second time. Can this cause page pool
-corruption under memory pressure when build_skb() fails?
-
-[ ... ]
+-antony
 
