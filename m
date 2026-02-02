@@ -1,282 +1,164 @@
-Return-Path: <netdev+bounces-255735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255748-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id bYk5Io5IgGnB5gIAu9opvQ
-	(envelope-from <netdev+bounces-255735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 07:47:42 +0100
+	id WLKyLvZLgGne5wIAu9opvQ
+	(envelope-from <netdev+bounces-255748-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:02:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40965C8EDA
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 07:47:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25642C902D
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:02:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA96A3003EC4
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:47:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACD673004627
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 07:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAC030ACF0;
-	Mon,  2 Feb 2026 06:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="Ea7hJZIc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7808306B02;
+	Mon,  2 Feb 2026 07:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-113.mail.139.com (n169-113.mail.139.com [120.232.169.113])
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FB2AD24;
-	Mon,  2 Feb 2026 06:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C09F2FFF87;
+	Mon,  2 Feb 2026 07:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770014858; cv=none; b=DTao07s1gaEcUqDq5JC7Jk3nvoJGMW/75/9yeO7TozRMk89u5TIoxItsUu8UjgvuxRoTHmDY1gJNq9PYPc8vH4VQuFHD9Z7LaR2yIy8alsvtxwWrl8swGoJsEmCqVcvQL9PpQD6Pi5zZcKJOEyu7d/m1k9L85+G4tPWl/OCuFQU=
+	t=1770015731; cv=none; b=nOpF3gx8+Tpja4HHuXrAGP2i0/Y1GzAgomq+7w41WlS1+XAe47DYzIzBoJOnlrGf53tEGKA1OGEJbnBhV+22pPZsiCr99i2AHF71drNETISTiiL+ppFtxvksdzSKN1vTH9B+/uWgO01B/mAud25qXR4G9OWOkrUC4bgKg2MckXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770014858; c=relaxed/simple;
-	bh=79QRdfY8Kh+DAQbA6nusrCU+fQQBIGh+BTOLrtWJ15M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=smU4fpgLhqZBBXKxSvRUamWXasudLxjlMH+qRdnCkL6v/YoiI8OPgJsWtjz/Sgn6OSDc2+MN4q4tRnDDhe5aw3AG1GMT98sL9JxOwkITxSm46a+cHtv00G20qe49TcEZWFZm2LalQjUYhV32184DuvHvYyEiBNQ3op63g9vagQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=Ea7hJZIc; arc=none smtp.client-ip=120.232.169.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=Ea7hJZIcRwhgFQQhJKhefcXvmBkcNsRnweH1xGaUt9jFHnpLK3veN5QXseIugetZkpT8l+ifj+m4q
-	 ytaKl49Zi5FE56UTl3lp0axemitE/8mPsG+JenpR1ifs5RaFZm3eK4wBNMDH8h8x1mG6L3ozJyInBu
-	 8jHZMQ/qNtSLeVnc=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-36-12050 (RichMail) with SMTP id 2f1269804dba213-0223f;
-	Mon, 02 Feb 2026 15:09:54 +0800 (CST)
-X-RM-TRANSID:2f1269804dba213-0223f
-From: Li hongliang <1468888505@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	michael.christie@oracle.com
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	pbonzini@redhat.com,
-	stefanha@redhat.com,
-	mlombard@redhat.com,
-	asias@redhat.com,
-	nab@linux-iscsi.org,
-	virtualization@lists.linux-foundation.org,
-	kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	wh1sper@zju.edu.cn,
-	sgarzare@redhat.com
-Subject: [PATCH 6.1.y] vhost-scsi: Fix handling of multiple calls to vhost_scsi_set_endpoint
-Date: Mon,  2 Feb 2026 14:47:19 +0800
-Message-Id: <20260202064719.642351-1-1468888505@139.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1770015731; c=relaxed/simple;
+	bh=w2b1ntVS1o5foLpIBIHR8PBWnn5GOU1gK40AGtzTNL4=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=Z0SABvH4G8+Q9ZUmuaWbZ+IEIo0cNHxla1qqUBoqz24y6TT3Be/tXNz3V4WRmOD7oWSqvoonTT4V4Well0uFmCR8xV3ukqV8fhuaQdyZGzVSnaIIsISMd4ylJ5rz7zk0ev87ZufcSUInM33GEJDn7rYbXVdlD+z8tAj0ZR1zvqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Mon, 2 Feb
+ 2026 14:57:00 +0800
+Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Mon, 2 Feb 2026 14:57:00 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+Subject: [PATCH net-next v3 00/15] net: ftgmac100: Various probe cleanups
+Date: Mon, 2 Feb 2026 14:56:54 +0800
+Message-ID: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALZKgGkC/2XNQQqDMBQE0KtI1k3J/2oIXfUepYsYfzRQoySpW
+ MS7N2RV6nIY5s3OIgVHkd2qnQVaXXSzz6G+VMyM2g/EXZ8zQ4EtoFDcpmHShpsXaf9eOIoOse5
+ sIxWwPFoCWbcV8ME8Je5pS+yZm9HFNIdPeVqh9BmVAkT7j67ABe+kokbXvbId3XVciPpEZryae
+ Sreij8GyJOB2VBgG7ACLGp1Mo7j+AKmmWGa/wAAAA==
+X-Change-ID: 20251208-ftgmac-cleanup-20b223bf4681
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
+	<horms@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015419; l=2429;
+ i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
+ bh=w2b1ntVS1o5foLpIBIHR8PBWnn5GOU1gK40AGtzTNL4=;
+ b=+PCBrw2Z/8AjKd4w0Bo5guzn24SwBfD9PH7yo2UzdhZsX87IYNMn+efE93+QdyJkC+9OfqzFG
+ hh6tNvoE9DJA82BJxs9SAkkWZiN/yGcn6TmbcGAPzuxcu0vatIPRE4i
+X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
+ pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[aspeedtech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255735-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[139.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[1468888505@139.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255748-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[139.com:-];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacky_chou@aspeedtech.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[139.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zju.edu.cn:email]
-X-Rspamd-Queue-Id: 40965C8EDA
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[aspeedtech.com:mid,aspeedtech.com:email,lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 25642C902D
 X-Rspamd-Action: no action
 
-From: Mike Christie <michael.christie@oracle.com>
+The probe function of the ftgmac100 is rather complex, due to the way
+it has evolved over time, dealing with poor DT descriptions, and new
+variants of the MAC.
 
-[ Upstream commit 5dd639a1646ef5fe8f4bf270fad47c5c3755b9b6 ]
+Make use of DT match data to identify the MAC variant, rather than
+looking at the compatible string all the time.
 
-If vhost_scsi_set_endpoint is called multiple times without a
-vhost_scsi_clear_endpoint between them, we can hit multiple bugs
-found by Haoran Zhang:
+Make use of devm_ calls to simplify cleanup. This indirectly fixes
+inconsistent goto label names.
 
-1. Use-after-free when no tpgs are found:
+Always probe the MDIO bus, when it exists. This simplifies the logic a
+bit.
 
-This fixes a use after free that occurs when vhost_scsi_set_endpoint is
-called more than once and calls after the first call do not find any
-tpgs to add to the vs_tpg. When vhost_scsi_set_endpoint first finds
-tpgs to add to the vs_tpg array match=true, so we will do:
+Move code into helpers to simply probe.
 
-vhost_vq_set_backend(vq, vs_tpg);
-...
-
-kfree(vs->vs_tpg);
-vs->vs_tpg = vs_tpg;
-
-If vhost_scsi_set_endpoint is called again and no tpgs are found
-match=false so we skip the vhost_vq_set_backend call leaving the
-pointer to the vs_tpg we then free via:
-
-kfree(vs->vs_tpg);
-vs->vs_tpg = vs_tpg;
-
-If a scsi request is then sent we do:
-
-vhost_scsi_handle_vq -> vhost_scsi_get_req -> vhost_vq_get_backend
-
-which sees the vs_tpg we just did a kfree on.
-
-2. Tpg dir removal hang:
-
-This patch fixes an issue where we cannot remove a LIO/target layer
-tpg (and structs above it like the target) dir due to the refcount
-dropping to -1.
-
-The problem is that if vhost_scsi_set_endpoint detects a tpg is already
-in the vs->vs_tpg array or if the tpg has been removed so
-target_depend_item fails, the undepend goto handler will do
-target_undepend_item on all tpgs in the vs_tpg array dropping their
-refcount to 0. At this time vs_tpg contains both the tpgs we have added
-in the current vhost_scsi_set_endpoint call as well as tpgs we added in
-previous calls which are also in vs->vs_tpg.
-
-Later, when vhost_scsi_clear_endpoint runs it will do
-target_undepend_item on all the tpgs in the vs->vs_tpg which will drop
-their refcount to -1. Userspace will then not be able to remove the tpg
-and will hang when it tries to do rmdir on the tpg dir.
-
-3. Tpg leak:
-
-This fixes a bug where we can leak tpgs and cause them to be
-un-removable because the target name is overwritten when
-vhost_scsi_set_endpoint is called multiple times but with different
-target names.
-
-The bug occurs if a user has called VHOST_SCSI_SET_ENDPOINT and setup
-a vhost-scsi device to target/tpg mapping, then calls
-VHOST_SCSI_SET_ENDPOINT again with a new target name that has tpgs we
-haven't seen before (target1 has tpg1 but target2 has tpg2). When this
-happens we don't teardown the old target tpg mapping and just overwrite
-the target name and the vs->vs_tpg array. Later when we do
-vhost_scsi_clear_endpoint, we are passed in either target1 or target2's
-name and we will only match that target's tpgs when we loop over the
-vs->vs_tpg. We will then return from the function without doing
-target_undepend_item on the tpgs.
-
-Because of all these bugs, it looks like being able to call
-vhost_scsi_set_endpoint multiple times was never supported. The major
-user, QEMU, already has checks to prevent this use case. So to fix the
-issues, this patch prevents vhost_scsi_set_endpoint from being called
-if it's already successfully added tpgs. To add, remove or change the
-tpg config or target name, you must do a vhost_scsi_clear_endpoint
-first.
-
-Fixes: 25b98b64e284 ("vhost scsi: alloc cmds per vq instead of session")
-Fixes: 4f7f46d32c98 ("tcm_vhost: Use vq->private_data to indicate if the endpoint is setup")
-Reported-by: Haoran Zhang <wh1sper@zju.edu.cn>
-Closes: https://lore.kernel.org/virtualization/e418a5ee-45ca-4d18-9b5d-6f8b6b1add8e@oracle.com/T/#me6c0041ce376677419b9b2563494172a01487ecb
-Signed-off-by: Mike Christie <michael.christie@oracle.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20250129210922.121533-1-michael.christie@oracle.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-[ Minor conflict resolved. ]
-Signed-off-by: Li hongliang <1468888505@139.com>
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/vhost/scsi.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+Changes in v3:
+- [06/15] Add check for devm_clk_get_optional_enabled().
+- [09/15] Directly return status from ftgmac100_setup_mdio(). That is
+  [13/15] patch behavior, so delete [13/15].
+- [09/15] Adjust err lable.
+- Add a new patch to make use of devm_ methods for mdiobus to simplify
+  cleanup.
+- Link to v2: https://lore.kernel.org/r/20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com
 
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index de6f108a50a9..f9ef17c3e566 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -1572,14 +1572,19 @@ vhost_scsi_set_endpoint(struct vhost_scsi *vs,
- 		}
- 	}
- 
-+	if (vs->vs_tpg) {
-+		pr_err("vhost-scsi endpoint already set for %s.\n",
-+		       vs->vs_vhost_wwpn);
-+		ret = -EEXIST;
-+		goto out;
-+	}
-+
- 	len = sizeof(vs_tpg[0]) * VHOST_SCSI_MAX_TARGET;
- 	vs_tpg = kzalloc(len, GFP_KERNEL);
- 	if (!vs_tpg) {
- 		ret = -ENOMEM;
- 		goto out;
- 	}
--	if (vs->vs_tpg)
--		memcpy(vs_tpg, vs->vs_tpg, len);
- 
- 	list_for_each_entry(tpg, &vhost_scsi_list, tv_tpg_list) {
- 		mutex_lock(&tpg->tv_tpg_mutex);
-@@ -1594,11 +1599,6 @@ vhost_scsi_set_endpoint(struct vhost_scsi *vs,
- 		tv_tport = tpg->tport;
- 
- 		if (!strcmp(tv_tport->tport_name, t->vhost_wwpn)) {
--			if (vs->vs_tpg && vs->vs_tpg[tpg->tport_tpgt]) {
--				mutex_unlock(&tpg->tv_tpg_mutex);
--				ret = -EEXIST;
--				goto undepend;
--			}
- 			/*
- 			 * In order to ensure individual vhost-scsi configfs
- 			 * groups cannot be removed while in use by vhost ioctl,
-@@ -1643,15 +1643,15 @@ vhost_scsi_set_endpoint(struct vhost_scsi *vs,
- 		}
- 		ret = 0;
- 	} else {
--		ret = -EEXIST;
-+		ret = -ENODEV;
-+		goto free_tpg;
- 	}
- 
- 	/*
--	 * Act as synchronize_rcu to make sure access to
--	 * old vs->vs_tpg is finished.
-+	 * Act as synchronize_rcu to make sure requests after this point
-+	 * see a fully setup device.
- 	 */
- 	vhost_scsi_flush(vs);
--	kfree(vs->vs_tpg);
- 	vs->vs_tpg = vs_tpg;
- 	goto out;
- 
-@@ -1668,6 +1668,7 @@ vhost_scsi_set_endpoint(struct vhost_scsi *vs,
- 			target_undepend_item(&tpg->se_tpg.tpg_group.cg_item);
- 		}
- 	}
-+free_tpg:
- 	kfree(vs_tpg);
- out:
- 	mutex_unlock(&vs->dev.mutex);
-@@ -1757,6 +1758,7 @@ vhost_scsi_clear_endpoint(struct vhost_scsi *vs,
- 	vhost_scsi_flush(vs);
- 	kfree(vs->vs_tpg);
- 	vs->vs_tpg = NULL;
-+	memset(vs->vs_vhost_wwpn, 0, sizeof(vs->vs_vhost_wwpn));
- 	WARN_ON(vs->vs_events_nr);
- 	mutex_unlock(&vs->dev.mutex);
- 	mutex_unlock(&vhost_scsi_mutex);
+Changes in v2:
+- Add net-next prefix.
+- [08/15] Updated commit message.
+- [04/15] Deleted {}.
+- Link to v1: https://lore.kernel.org/r/20260105-ftgmac-cleanup-v1-0-b68e4a3d8fbe@aspeedtech.com
+
+---
+Andrew Lunn (14):
+      net: ftgmac100: List all compatibles
+      net: ftgmac100: Add match data containing MAC ID
+      net: ftgmac100: Replace all of_device_is_compatible()
+      net: ftgmac100: Use devm_alloc_etherdev()
+      net: ftgmac100: Use devm_request_memory_region/devm_ioremap
+      net: ftgmac100: Use devm_clk_get_enabled
+      net: ftgmac100: Simplify error handling for ftgmac100_initial_mac
+      net: ftgmac100: Move NCSI probe code into a helper
+      net: ftgmac100: Always register the MDIO bus when it exists
+      net: ftgmac100: Simplify legacy MDIO setup
+      net: ftgmac100: Move DT probe into a helper
+      net: ftgmac100: Remove redundant PHY_POLL
+      net: ftgmac100: Simplify condition on HW arbitration
+      net: ftgmac100: Fix wrong netif_napi_del in release
+
+Jacky Chou (1):
+      net: ftgmac100: Use devm_mdiobus_alloc/devm_of_mdiobus_register
+
+ drivers/net/ethernet/faraday/ftgmac100.c | 342 ++++++++++++++++---------------
+ 1 file changed, 180 insertions(+), 162 deletions(-)
+---
+base-commit: a22f57757f7e88c890499265c383ecb32900b645
+change-id: 20251208-ftgmac-cleanup-20b223bf4681
+
+Best regards,
 -- 
-2.34.1
-
+Jacky Chou <jacky_chou@aspeedtech.com>
 
 
