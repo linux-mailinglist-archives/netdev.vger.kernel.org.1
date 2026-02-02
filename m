@@ -1,94 +1,84 @@
-Return-Path: <netdev+bounces-255865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255867-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YECTCEWigGni/wIAu9opvQ
-	(envelope-from <netdev+bounces-255865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:10:29 +0100
+	id YNWHM+yngGlNAAMAu9opvQ
+	(envelope-from <netdev+bounces-255867-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:34:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 794A7CC9E0
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:10:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31DC0CCC6D
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2BAD7300EF86
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:10:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CFBC3038511
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EA5366060;
-	Mon,  2 Feb 2026 13:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD5E367F48;
+	Mon,  2 Feb 2026 13:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0gmmAoY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U/0KRZek"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EDB361DA3
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 13:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BA3367F3A;
+	Mon,  2 Feb 2026 13:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770037826; cv=none; b=gDt0Qq0OntCCWjBAFGHUF+W6Mod65vNzRsVEMaNcrTWofLaV0M2T/+KGgSzrbjrmlkflShHWIPFBeDVSOgP6WT95d977IKbCt/dj5cxaSx3VCYESa9r8piJX7LNyBP2yy5pmjcYkm+hEpfg5bI0+gl1crEpfwnuFi2chGkC00VU=
+	t=1770039000; cv=none; b=DrLoNia1q0P/s7Lt3gRAi2pEhfFvzx/XZl47TU+FUTkSnYF363TLbyfZGRJn4RKFGrzRF5UmCc0T7moVljHIxySCR1a854cK1XokhdYNroITLcLEdfMG41zluw7YT146zE/D6OxZlbA6HXDma3Hj0kqYxOwnPLrnJYNiVIWlMvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770037826; c=relaxed/simple;
-	bh=kTc+By8vcdbzquQ8RjRTi/Kx9huvLukCOUjDmfuFC3g=;
+	s=arc-20240116; t=1770039000; c=relaxed/simple;
+	bh=Po4XURyEzCW8smpz/DmF0VKvnXajycyLgM7X+skVhFU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OtK5ZE/VzQCyUZRxWysvG6XBgdB3rEkIXLtBh+LBghq8DxSwbLDXsdoLKisI2dd6Tm8Sn5a99J2cWU0oHVWRIQChN/+L+L6ybCEH26dN0P4G0HHUDBRollCu5YjxzDGmRx3xuS2quoH2CJF4juCBTNaT5tv1DTGpEoJanXEI8rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0gmmAoY; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47ee9463ca3so3081405e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 05:10:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770037823; x=1770642623; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M5zMF7HqmfdsxiMzbiVAGcCbe9kzfgf1p2X3RVPb0ck=;
-        b=g0gmmAoYvSRmshMoRgJ73gOVMsDs0ak8a8QACiC63mZ3llizoAkRyS93jn5zLpAnOh
-         gfuR2rxMxV2UblstTnkY5Tr1OVn0tvXMnOHu+VnQ/H0DIf9HwKNOE7lnczXfZS2UI3A+
-         07o7J1zb8zw6kXAXzW8yQfxmQt9CgHFj9GZkec8h4nHfPZqP2zKWVKQ6ToxYNr+o4WBU
-         68t7szp+VbVyUtFX1wWuURT6YSAycXVWw57ykqA/g2PzyNjZAeEKfTRB4zDOq9lCh2y0
-         0jij2huz/TThEsGY+/w40fBAWNu7NZXVzsQUNoxD9cfNIcx2io5MQlKk1/S38Xv6FxeC
-         R84A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770037823; x=1770642623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M5zMF7HqmfdsxiMzbiVAGcCbe9kzfgf1p2X3RVPb0ck=;
-        b=T4pgXUG31KF2t7OCy+lijKjpsf3VAcGG0842FZIEqSOaSFIlfv1OiHPiE9zLlTR2Lc
-         PFqvyebrFkiaYlYgMseR063jAA1+HJxXFvZOtvLQcmF2jZeXx7gbFDMX8SJyxfVE5vwJ
-         K/g589DXW1imJlzcefAgooUL5Wouf6ObiIJotg20wSfXyY8/YzLPvoGvH0MAfnDSS1rt
-         VW9qWPiiF9BSmj5JCRPyiQUFE999EGMgexdWOZe0pC3nAdr0Muo1wc6zJs8AzdZZaxXs
-         rKNQP4wFNlXL914zkVfOMxedhN26+cZhnS8L6R94GH5BxYZlxvAXujL6Qj5wZRrF4DfF
-         +aoA==
-X-Gm-Message-State: AOJu0YwtqdK6SB2G9ZCNt49ItUPCowy7GGThDJ2yDjDOu39B5Sk/2nlc
-	zzl91wOH22MmPxOdq8jPAWxxt2pd2qMa9cbCCGUeX6RjAZBhXdk+1VfD
-X-Gm-Gg: AZuq6aLG3nEcNNo8BRw5u2ZR9nO+EJGNwO7vJtzq2amdovNUODXJX/yiYCl81/zeLCt
-	h++hTAgJ9FVrOY/60tqiViJIAKM2UY/3qKRlci2Q2PnN+z8MWcOaMjoKF3PEa057Obe3/8oCbu9
-	zsgiBpf+CrSpgAdjGCYyobJ83vIv+79H3a/zWrhh1S7AhVMLq9049Z7snCsDRgTuhbxDDdm8uis
-	7whGmNQWlQ9HVn2YxqG7dGLZ/M8MEhcf640eF1TSxVb4lDuuOdKKpTJHiPWNNyQ3cZfI5NTmkfc
-	1HGTOcOocDqgZTvc3WrDSbC41sYgv62A44fwS6NYKVIsHxNjBpqzR80gyM4wvVd2pGpMv2cxuhW
-	mNH804JkfKgiQcdfYiyNNYc60ktSaq9osv6/rNOYQG3/9ZhmGs8Jv4gN0Oa1gq6Ge18xBMOitFh
-	wPbr8=
-X-Received: by 2002:a05:600c:4f10:b0:480:6612:253 with SMTP id 5b1f17b1804b1-482db494609mr94330815e9.3.1770037822450;
-        Mon, 02 Feb 2026 05:10:22 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:74c4:3a65:f9a9:6c29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322f40sm42729518f8f.34.2026.02.02.05.10.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 05:10:21 -0800 (PST)
-Date: Mon, 2 Feb 2026 15:10:19 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 5/5] net: dsa: yt921x: Add DCB/QoS support
-Message-ID: <20260202131019.6qz73anlgutewrww@skbuf>
-References: <20260131021854.3405036-1-mmyangfl@gmail.com>
- <20260131021854.3405036-1-mmyangfl@gmail.com>
- <20260131021854.3405036-6-mmyangfl@gmail.com>
- <20260131021854.3405036-6-mmyangfl@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZROhbA065oE+F6QMuCTe0yIYZqhrJ/nUG+7ItuS9QGdbEycx6smsZqUgjlfmxb62R+sBzzE+8IaaCnZqoC3FQJCpFbgzwuisGAXj4D9iL/QqY0Wn+BUegB+MP4hA8hFMnGd4vIbGgzi5LWvHzIvRerTib3KHwjaVC4ITs3WF2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U/0KRZek; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770038998; x=1801574998;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Po4XURyEzCW8smpz/DmF0VKvnXajycyLgM7X+skVhFU=;
+  b=U/0KRZekQNjIenTlHjmSICTXHvakT6d2/JcvnXkVA3wtdEP2z1GYL7Lc
+   UCFjJ1DdgtwgRKTalSuSSL65rLYUrtQqnPl9JVfuAGurGjwuv1jLOKqQg
+   aOPWH0CvERrlTTwM5WAa0rSA7O8uXX4u8ymDEe7ClUn+yZYmaeg13r6aq
+   9kx2bJ9/JrI2GTegNj1Ss0VyWHy6ckEqtPNbqCpwKzpP4BQFNV78bZTtP
+   +UfELfjt401S8AntAsr0WzBlMw7A9/lzBmnp0IgNHpOwkmDnFTz15gsro
+   qlC71dkjrvF60twcjWCq9fXhJx5qyNLMz3PUVf2Sq99qh6DgsnZe4U9RD
+   w==;
+X-CSE-ConnectionGUID: Xykm/tHeTX6aojYrTLWWHA==
+X-CSE-MsgGUID: +PuUh3KnRRKWjY/WFmWZKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11689"; a="58775899"
+X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
+   d="scan'208";a="58775899"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 05:29:58 -0800
+X-CSE-ConnectionGUID: ZYPY+pYURVuRlB3Zf8gDvQ==
+X-CSE-MsgGUID: 90mJWH+vQrC4SbdR7ZitkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
+   d="scan'208";a="232445658"
+Received: from vverma7-mobl3.amr.corp.intel.com (HELO kuha) ([10.124.221.53])
+  by fmviesa002.fm.intel.com with SMTP; 02 Feb 2026 05:29:55 -0800
+Received: by kuha (sSMTP sendmail emulation); Mon, 02 Feb 2026 15:29:27 +0200
+Date: Mon, 2 Feb 2026 15:29:27 +0200
+From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
+Message-ID: <aYCmt6Jnn9uieXwy@kuha>
+References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
+ <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
+ <aXdyll4KVOF6SWni@kuha>
+ <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
+ <aXjDENOsmWe5_VqS@kuha>
+ <189d4a03f32ace3fd995596e8b5415ced6ae9c3a.camel@codeconstruct.com.au>
+ <aXokxtlFTeZK8lP8@kuha>
+ <547a1a5fd7238897b35b26e83ac27db452e6a5f7.camel@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,60 +87,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260131021854.3405036-6-mmyangfl@gmail.com>
- <20260131021854.3405036-6-mmyangfl@gmail.com>
+In-Reply-To: <547a1a5fd7238897b35b26e83ac27db452e6a5f7.camel@codeconstruct.com.au>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255865-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255867-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[heikki.krogerus@linux.intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 794A7CC9E0
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: 31DC0CCC6D
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 10:18:51AM +0800, David Yang wrote:
-> @@ -1774,8 +1778,11 @@ yt921x_vlan_aware_set(struct yt921x_priv *priv, int port, bool vlan_aware)
->  {
->  	u32 ctrl;
->  
-> +	/* Abuse SVLAN for PCP parsing without polluting the FDB - it just works
-> +	 * despite YT921X_VLAN_CTRL_SVLAN_EN never being set
-> +	 */
+Hi,
 
-Why "abuse" - what else does this setting affect? Does the port not
-remain VLAN-unaware w.r.t. filtering/forwarding destinations?
+> > There seems to be another a bit more severe issue with ARP and
+> > i2c-dev. Right now it seems that anything that can access the i2c
+> > character devices can silently (without the kernel having any idea
+> > what's going on) assign a conflicting address to a dynamically
+> > addressed ARP-device. Perhaps more importantly, the user space can
+> > remove access to an ARP-device by silently assigning a new address to
+> > it or simply by resetting its state with Prepare to ARP.
+> > 
+> > That can happen accidentally, but it can also be done intentionally.
+> > 
+> > Unless I've missed something, this really is a major threat that we
+> > have to solve. Right now the only idea that I have is that we simply
+> > prevent the i2c-dev from using the SMBus Default Address.
+> 
+> I don't necessarily see this as an issue; access to the chardev somewhat
+> implies full access to the i2c bus, and so arbitrary interactions with
+> devices to alter device states. Including the i2c address as part of the
+> affected state doesn't seem like a huge difference in access.
+> 
+> There may be a specific case that is interesting though:
+> 
+>  - an ARP-able device is in use by a kernel driver, which excludes
+>    access through the chardev
+> 
+>  - interactions with that device are possible using ARP commands to
+>    address 0x61 over the chardev
+> 
+>  - so, the device may be re-addressed, now allowing accesses through
+>    the chardev
+> 
+> However, I am not sure there are existing cases where access to the
+> chardev is a distinct privilege domain to not just unbind the driver
+> anyway.
 
-How is the unused YT921X_VLAN_CTRL_PRIO_EN field from VLAN table entries
-related to VLAN PCP parsing?
+Thanks for the answer. I don't think this is necessarily a major
+problem either, but since it was raiced (internally) I had to make a
+note. Let's not worry about this for now.
 
->  	if (!vlan_aware)
-> -		ctrl = 0;
-> +		ctrl = YT921X_PORT_IGR_TPIDn_STAG(0);
->  	else
->  		ctrl = YT921X_PORT_IGR_TPIDn_CTAG(0);
->  	return yt921x_reg_write(priv, YT921X_PORTn_IGR_TPID(port), ctrl);
+> I would have a few requests:
+> 
+>  - that ARP is enabled explicitly. I'd be interested in having a DT
+>    property on the controller node that allows us to enable ARP on a
+>    per-bus basis.
+> 
+>    Otherwise, I'm pretty sure we'll break someone's existing platform
+>    by assuming we can start interactions on the SMBus default address.
+> 
+>    Is there some equivalent facility for ACPI based config?
+
+With ACPI systems, we just don't know what the platform is going to be
+used for in the end. This is a bit tricky with ACPI.
+
+But I'll make the registration of the feature conditional somehow in
+any case.
+
+> > > Is that possible at present? how are you planning to represent ARPed
+> > > devices in the DT - or more importantly, correlate DT (or other fwnode)
+> > > nodes to discovered devices?
+> > 
+> > I don't know about DT, but with ACPI the devices are expected to
+> > either be fixed address devices or just use target address that
+> > matches to the address in the I2C Serial Bus Connection Resource
+> > Descriptor. The mapping is not yet done, but the idea is to just
+> > assign the detected UDID to the i2c-client that was already created
+> > from the fwnode.
+> 
+> OK, but how do you map the UDID to the resource descriptor? I don't know
+> much about ACPI, but the descriptor seems to be only keyed on a target
+> address, which is now dynamic.
+> 
+> (same with DT, devices are keyed by target address)
+
+I don't know how a dynamically addressed device, that does not return
+any kind of target address with the UDID, could be mapped to the
+fwnode.
+
+> > > Assuming we go with a kernel approach: For the MCTP case, for full ARP
+> > > support of MCTP endpoints, we would still need to consume a hotplug
+> > > event that indicates that the device is available at its new address
+> > > - there is no kernel driver bound for the remote MCTP endpoints. This
+> > > event would be consumed by the (existing) MCTP infrastructure in order
+> > > to start MCTP enumeration. Is this something you have looked at
+> > > already? If so, if you can send an example of an actual event, I will
+> > > look at the mctpd part of this.
+> > 
+> > We will have the address attribute file that the user space can use.
+> > If the address changes uevent will be send it.
+> 
+> Sounds good, but for MCTP there is no struct device bound to the remote
+> i2c device/address. Are you proposing we change that?
+
+I'm sorry, I'm probable missing something here. If the address gets
+changed, then you have to inform the remote endpoint about the new
+address somehow in any case, right? So how did you do that with the
+user space approach?
+
+Br,
+
+-- 
+heikki
 
