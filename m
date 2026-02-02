@@ -1,173 +1,211 @@
-Return-Path: <netdev+bounces-255866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HLOCrCngGlNAAMAu9opvQ
-	(envelope-from <netdev+bounces-255866-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:33:36 +0100
+	id mAGzA3KogGmeAAMAu9opvQ
+	(envelope-from <netdev+bounces-255868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:36:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E22FCCC48
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:33:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A6CCCD15
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:36:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B2CC30107FF
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:29:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76E8830D1348
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3362367F3A;
-	Mon,  2 Feb 2026 13:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB5E36923F;
+	Mon,  2 Feb 2026 13:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+TwLkTA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1USnL06"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D28A366833
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 13:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5E819E819
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 13:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770038993; cv=none; b=ZzWkY7gUOoRHHZ+toTQzJTJXd2A4ls6u/zrNVshxjrwJYBxxoz9xlWRA5RUee+mV56xxGpGqnNXgK1++CrY48XNNR0X6wCZjTveyF/mfHk9fLzw0z+CQvjbEWqQx59I/L4OMM9E7OeH4QhLqWc8E5YGRcxzpapnC3c9M686218I=
+	t=1770039065; cv=none; b=oRC/I68xrrG5AYO494Y29UtJQdBy74CiMHInNKE2R6nmB9uWKlOquQ6zpBPaOE2+YYk2RumWGKmnOf1AKNNVLBxzyEX3D4UStdSARlY47GQaYR2pe+BEWKoJieFwpGlBrUCZfLUPE6U39Tx454WG5ky9fJCqZEXhUQAE11AGti4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770038993; c=relaxed/simple;
-	bh=WaHKZ/McEXzUzbe8XhWNI/3c2hNKFJZt7wOD2NDguBw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jYJ967TFb/Uri4m3+4v6kFmDRjcy9JE1AN6ZH90zs0NfiU5ltDfRqT4rQF1K7v2e3UA/0Vh3PcSF4xENLsdldHw3rDKnHRNBSTbWfXnak/YU/4j1itkzqaFcadpftZUXU+3ckoxuug2iiAWaZ0j8G7It4mKQDDqNu3FuC7JCzOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+TwLkTA; arc=none smtp.client-ip=209.85.128.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-4806ca496feso2655585e9.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 05:29:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770038991; x=1770643791; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SgTWxHTq6zBlc2AIUdyfY21mpRfZc8LW47kfkCH8qhg=;
-        b=i+TwLkTAuSWAx2cq1nDH+R4qjEPkMakDvejMuiQ92jOwG0KD5EUOsxF6OziGlgWLRk
-         0GLxTJ38orhozZATg7HzJiGl9Ttf2WN5Bt6D2F3CGDew2widkmPjncATaLDFMOTu/YpZ
-         t5aYCCkFsJ+BnpdIeBorhgCjzewmWyvxgnW1xaEKWL/XfTuhsbrF+Pyo9E0lPGWT5MIV
-         qVjkhc0VoooXu8ecHzJRVTDV1uo2cstISjWSH4dQs3pGBqrAkNo8iXExdtTqMz/1Rclu
-         ITR/AbdIE9qy1fo34C78P5kPcptRv25rvytr0P1zSKfj9hcTILCE/oEmtzUG2Yu+b61M
-         HLjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770038991; x=1770643791;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SgTWxHTq6zBlc2AIUdyfY21mpRfZc8LW47kfkCH8qhg=;
-        b=aSuXPn2SNINigNLAJ3eRtruFPDJ6edN9TzydQItXgMrzmLYzsuk97dvMRwVPTBfiDJ
-         AaK6h/AitDGX+FXfGW2z23NFXSW/nADe1Uo0wkzTEztQGqJKbQKzgCKChMDtvutSz+Rs
-         +/if0QKFE6GiKYmd/y1WWMuQHR2pZhtXXLoBe/rURIs3sVmgc92LbHcQbyWF532o+pdf
-         b91sYDYGsWAZky6qutK/EDP/RI5Hv+r2iw945r82a3zJPouSrUQEkcwi6KCSBn9QoTJm
-         n39lb/hrkk80S/JiAnrgd10eohULSmmBHzMFDwa4pGpwRmn+4D8RnRxlxR6jAU5u1ZRH
-         y5Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCULB7xuOS0/vkNz+UUj0JozGYpL3nlpcgyHGPDGO6IfyW32z9YN8Y1uBVUr1Ul6dQmfu8EHbOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQLMBDvJVjWQGxT79xtpQRvOGL4iwdhh4kL37tvVR3Ve59eGwR
-	c54hmosKS78NApLUyqkU/6mstOIRGAXWOuAaPgCIG/UWA0Byy0dkp689
-X-Gm-Gg: AZuq6aIOrls3ePsKGtkjiwVES3xXOsAJHJJ4O+UN/Dl0LAOi9d9b8DcQXlKilBEWS8j
-	g3FGk8KTUf8bC9ByRn7FpUigtZwqJrC4Qrn+hGjojzo3kKnfJMa7DVK7lqRWZn8vE1R3LsC6J1s
-	LcDkE3OjFeCcJi2SdAH1CLbpV9FAx+zJdyzMbEtDqY68uWVDc2Oe8Z7m++rKjEsA5cFo8dHVxf8
-	asW877R50G+dlIXNbndcrC9c3Wk7IXKqp3D719ynd2E/o7g0b0OjCAhw76/CF0enB/Z4D5+2yox
-	Rwdh0TPRQyWm6b67kzt2lieUCk2xyc7lmLPBMNuEK6mICqYKDpoQVK3GRO0IlnOvtXoeXVo9Ll0
-	sEKP51sAAa59lOHVCpT/b/g4mxvt09YtB6/uPjdhNz5E3XTReLJvpBPalGRnsDi/hld9m1hqWXZ
-	Mxmgg=
-X-Received: by 2002:a05:600c:8b61:b0:47b:d992:601e with SMTP id 5b1f17b1804b1-482db4568b0mr95233925e9.2.1770038990732;
-        Mon, 02 Feb 2026 05:29:50 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:74c4:3a65:f9a9:6c29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482da903a30sm117174295e9.1.2026.02.02.05.29.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 05:29:50 -0800 (PST)
-Date: Mon, 2 Feb 2026 15:29:47 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Pascal Eberhard <pascal.eberhard@se.com>,
-	=?utf-8?Q?Miqu=C3=A8l?= Raynal <miquel.raynal@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 5/8] net: dsa: microchip: Add KSZ8463 tail
- tag handling
-Message-ID: <20260202132947.gepuhzdh4bepk4ot@skbuf>
-References: <20260127-ksz8463-ptp-v4-0-652e021aae86@bootlin.com>
- <20260127-ksz8463-ptp-v4-5-652e021aae86@bootlin.com>
+	s=arc-20240116; t=1770039065; c=relaxed/simple;
+	bh=Ilzh9ciqWATBs9AlKHDb+gm1BEnXioRQZHASm6hE6xE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jZL4cnpB6U0Uwypx3mY1NcCVS2ryOz3cRxOf+a0390kCJTYp1t+NxOPIaVLa6aE8YHqFWpaNmLjZDj5h/8jxOgaYkXp0WhX/53CSPnDPSZ8NzFkzClYxwpbSaGPMfVpicTTDPAcDQQq9HJGn0503Gw297AsLRpyxf1NCHo9t+38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i1USnL06; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770039063;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eBN4sgUDtqNg4GpSirkeIULyv0JMY2X6vXXcs8fqAFc=;
+	b=i1USnL061XtcNb1yezRAl94iNj6wg0AX2AE+3K5BF01NbKcDTjqiEsvkLLD/VZrZsqAtWf
+	1MfwUhf4OdAWYoHy2+PCmd8W7HyL/f8S1GEHucQODKdhYz5JhNJDpV6RrlXfHv8dw13Tj2
+	WufOmFTV2NN85lnFh0VynogECzMccns=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-189-BBHCiaKeNxGZckjG__3xLw-1; Mon,
+ 02 Feb 2026 08:31:00 -0500
+X-MC-Unique: BBHCiaKeNxGZckjG__3xLw-1
+X-Mimecast-MFC-AGG-ID: BBHCiaKeNxGZckjG__3xLw_1770039058
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E265195608A;
+	Mon,  2 Feb 2026 13:30:58 +0000 (UTC)
+Received: from [10.45.225.123] (unknown [10.45.225.123])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5469518008FF;
+	Mon,  2 Feb 2026 13:30:54 +0000 (UTC)
+Message-ID: <1e28083b-691a-480b-bcf6-cd57222e08a1@redhat.com>
+Date: Mon, 2 Feb 2026 14:30:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260127-ksz8463-ptp-v4-5-652e021aae86@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] iavf: fix deadlock in reset handling
+To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
+Cc: mschmidt@redhat.com, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
+ linux-kernel@vger.kernel.org
+References: <20260202084820.260033-1-poros@redhat.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260202084820.260033-1-poros@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255866-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-255868-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7E22FCCC48
+X-Rspamd-Queue-Id: A0A6CCCD15
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026 at 10:06:47AM +0100, Bastien Curutchet (Schneider Electric) wrote:
-> @@ -383,6 +384,74 @@ static const struct dsa_device_ops ksz9893_netdev_ops = {
->  DSA_TAG_DRIVER(ksz9893_netdev_ops);
->  MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KSZ9893, KSZ9893_NAME);
->  
-> +#define KSZ8463_TAIL_TAG_PRIO		GENMASK(4, 3)
-> +#define KSZ8463_TAIL_TAG_EG_PORT_M	GENMASK(2, 0)
+On 2/2/26 9:48 AM, Petr Oros wrote:
+> Three driver callbacks schedule a reset and wait for its completion:
+> ndo_change_mtu(), ethtool set_ringparam(), and ethtool set_channels().
+> 
+> Waiting for reset in ndo_change_mtu() and set_ringparam() was added by
+> commit c2ed2403f12c74 ("iavf: Wait for reset in callbacks which trigger
+> it") to fix a race condition where adding an interface to bonding
+> immediately after MTU or ring parameter change failed because the
+> interface was still in __RESETTING state. The same commit also added
+> waiting in iavf_set_priv_flags(), which was later removed by commit
+> 53844673d55529 ("iavf: kill "legacy-rx" for good").
+> 
+> Waiting in set_channels() was introduced earlier by commit 4e5e6b5d9d13
+> ("iavf: Fix return of set the new channel count") to ensure the PF has
+> enough time to complete the VF reset when changing channel count, and to
+> return correct error codes to userspace.
+> 
+> Commit ef490bbb226702 ("iavf: Add net_shaper_ops support") added
+> net_shaper_ops to iavf, which required reset_task to use _locked NAPI
+> variants (napi_enable_locked, napi_disable_locked) that need the netdev
+> instance lock.
+> 
+> Later, commit 7e4d784f5810 ("net: hold netdev instance lock during
+> rtnetlink operations") and commit 2bcf4772e45adb ("net: ethtool: try to
+> protect all callback with netdev instance lock") started holding the
+> netdev instance lock during ndo and ethtool callbacks for drivers with
+> net_shaper_ops.
+> 
+> The combination of waiting for reset and the new locking requirements
+> creates a deadlock: the callback holds the lock and waits for reset_task,
+> but reset_task is blocked waiting for the same lock:
+> 
+>    Thread 1 (callback)               Thread 2 (reset_task)
+>    -------------------               ---------------------
+>    netdev_lock()
+>    ndo_change_mtu() or ethtool op
+>      iavf_schedule_reset()
+>      iavf_wait_for_reset()           iavf_reset_task()
+>        waiting...                      netdev_lock() <- DEADLOCK
+> 
+> Reproducer:
+> 
+>    # echo 16 > /sys/class/net/$PF/device/sriov_numvfs
+>    # ip link set $VF up
+>    # ip link set $VF mtu 5000
+>    RTNETLINK answers: Device or resource busy
+> 
+>    # dmesg | tail -1
+>    iavf: MTU change interrupted waiting for reset
+> 
+> Fix this by temporarily releasing the lock while waiting for reset to
+> complete. This follows the pattern used elsewhere in the kernel (e.g.,
+> do_set_master() releases rtnl_lock before calling ndo_add_slave()).
+> 
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Signed-off-by: Petr Oros <poros@redhat.com>
+> ---
+>   drivers/net/ethernet/intel/iavf/iavf_main.c | 15 ++++++++++++---
+>   1 file changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 8aa6e92c16431f..d7738fb8fa60bc 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -189,13 +189,22 @@ static bool iavf_is_reset_in_progress(struct iavf_adapter *adapter)
+>    * iavf_wait_for_reset - Wait for reset to finish.
+>    * @adapter: board private structure
+>    *
+> + * The iavf driver selects NET_SHAPER, so callbacks that trigger reset are
+> + * always called with netdev instance lock held, while reset_task also needs
+> + * this lock. Release the lock while waiting to avoid deadlock.
+> + *
+>    * Returns 0 if reset finished successfully, negative on timeout or interrupt.
+>    */
+>   int iavf_wait_for_reset(struct iavf_adapter *adapter)
+>   {
+> -	int ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+> -					!iavf_is_reset_in_progress(adapter),
+> -					msecs_to_jiffies(5000));
+> +	struct net_device *netdev = adapter->netdev;
+> +	int ret;
 > +
-> +static struct sk_buff *ksz8463_xmit(struct sk_buff *skb,
-> +				    struct net_device *dev)
-> +{
-> +	u16 queue_mapping = skb_get_queue_mapping(skb);
-> +	u8 prio = netdev_txq_to_tc(dev, queue_mapping);
-> +	struct dsa_port *dp = dsa_user_to_port(dev);
-> +	u8 *tag;
-> +
-> +	if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
-> +		return NULL;
-> +
-> +	tag = skb_put(skb, KSZ_INGRESS_TAG_LEN);
-> +
-> +	*tag = BIT(dp->index);
+> +	netdev_unlock(netdev);
+> +	ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+> +					       !iavf_is_reset_in_progress(adapter),
+> +					       msecs_to_jiffies(5000));
+> +	netdev_lock(netdev);
+>   
+>   	/* If ret < 0 then it means wait was interrupted.
+>   	 * If ret == 0 then it means we got a timeout while waiting
 
-You're out of sync with mainline which has transitioned all
-BIT(dp->index) users to dsa_xmit_port_mask(skb, dev).
+Reviewed-by: Ivan Vecera <ivecera@redhat.com>
 
-To avoid this in the future please do not duplicate the ksz9893 xmit
-implementation, but call a common function and use a "bool do_tstamp"
-variable which is true when called from ksz9893 and false from ksz8463.
-
-> +	*tag |= FIELD_PREP(KSZ8463_TAIL_TAG_PRIO, prio);
-> +
-> +	return ksz_defer_xmit(dp, skb);
-> +}
 
