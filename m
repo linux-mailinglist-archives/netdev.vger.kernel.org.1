@@ -1,353 +1,252 @@
-Return-Path: <netdev+bounces-256006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BVYD9QOgWnmDwMAu9opvQ
-	(envelope-from <netdev+bounces-256006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:53:40 +0100
+	id M2ymIUAOgWnmDwMAu9opvQ
+	(envelope-from <netdev+bounces-256007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:51:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC744D152D
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:53:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA1FD14C3
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:51:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 981F1303AF07
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 20:50:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9FB1730160DA
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 20:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4982309DDB;
-	Mon,  2 Feb 2026 20:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E572A30EF80;
+	Mon,  2 Feb 2026 20:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="tNVODMtq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0xx1qsv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-08.mail-europe.com (mail-08.mail-europe.com [57.129.93.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505CF274B35;
-	Mon,  2 Feb 2026 20:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.129.93.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B642E645
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 20:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770065415; cv=none; b=LjaNTdWnwFWL8w+VvDXkmWEmXz8CrPXSoQRYl6SC+OZURzi1hNq/e3S0fyAVarpr7jscz30qncdisOplJoORX092JVXvGVCe5tiOpN4mdniy9nE0XS7JjqKCHoPPA4l6HBGpriFuNOYI0PASrtAD0cFQmaoplGN+PBmQi/JWpp8=
+	t=1770065435; cv=none; b=nsIqAlLfBaIDV50ExZfUsCk5wj3z8wcX9WhWH59h0isgsUTIZ0jepATY+eQ5LpRvuGvZXkPIZ1lPM1af7nYEZtAr0gvTxfb5cXB75PK4KQA7vg/M7i3BsSzJn6psrWIKe1iY3ZokDE6mpKc81PXQKeA2TrNQciAIb1GRn4O2wJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770065415; c=relaxed/simple;
-	bh=mg9H9F5yHPJp2fzisdbRYIC4qAhmlgFf9LgyCdIy7Fg=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PuPh++v5w/pLovjcQ8q6fKlUePLPWjmlSQXIHsWQy3FRo4uLFIZSY61codXcyhh23SCsuo9pM37O/Td/lGwXO1YMuOZz2MljPH1A+oWS5urdeRvE3Z3dOCTtORf9it9poW+OeRhW4YRny3GPsRmK0xdfjj4MMn/C4BZ5lLIAzOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=tNVODMtq; arc=none smtp.client-ip=57.129.93.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1770065403; x=1770324603;
-	bh=mg9H9F5yHPJp2fzisdbRYIC4qAhmlgFf9LgyCdIy7Fg=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=tNVODMtqgSDrSuVGkzD/O12xGKo2bVqGaePQnshXE92J1Jw8P595OC4CPwja1wseJ
-	 OvLCUJYHjX7Of2GD0Nvp+xjkJW++herNcaraYg/NSAhPQqDltvOCXAkoRjOV3IwUKU
-	 6l582l5OSo/ohTzrxIH18fcsiVDCSmwGpqZjRvZ/pMtT+1R0QSxOtP/1F+rHQ46L42
-	 HW77YUJR/Xt/MuUbtf7DcGEUTaKQjK/41fDVaFBj7Jjx31bfQVI+1vc05QIGElsbSJ
-	 e1CpSyieJkoXac40jHl/AjzNJF9xA0TZXdhBYkywvNN2sWLy5HOJR9qSF2xorge07U
-	 +5ZTJM3LdyN3A==
-Date: Mon, 02 Feb 2026 20:49:59 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-Message-ID: <JLZxnCN_V32FjW6UUERYLlLtbbzDCDUmB3LOJ8ovdzV5pbUuGMRKi8K7ebh1j2yDt1u3A0pc1y4Zjjsw6-c7zucKHasFnfvYjnZ7hvT7aR4=@1g4.org>
-In-Reply-To: <CAM0EoM=T4QiGB+_3jqWKYze_OrcsjYBy0UvckTiGtHkxSm6BDQ@mail.gmail.com>
-References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com> <pXV1wsavqcYDq5HfAVaW_gMoTITR9M0PBWKhnz9n6VHYxhW56DQU7qfCEoaYcCixz4iqrj31Mt9vL9bHqTNGygLK5pYvyw1z3san5ndlkkQ=@1g4.org> <CAM0EoMkBb+d_5dn6vdtSxPJ-HuUUL9uei65euSQfX3bXYm9RAw@mail.gmail.com> <CAM0EoMnseQw6H+a4wzhg7BkPJraFwN-=2x4FOSOUp5f7=XbyaQ@mail.gmail.com> <tuZof6471icLlkjecTuMCBxpZ5zJVhOeUv7lAK7MFwt3g7LfrH7ZFlbE5odrcbTFUukV6J8Dywy9daCrLI-kiY-_vpiABXStvdudLw-HXDI=@1g4.org> <CAM0EoMkD=3aRFq=tXijcop5tYsD4X_Ki0REcnj3x+w_C69MaFw@mail.gmail.com> <tRA-1eVt0Av_cRCmND6povnCqYiBpaOoilgpCM2qNbo3GIe6szAEIN1mI20gRjgf215ODBQJBfolBlBzyJ4en67AQVHhLt6QmtWlQUjLqfc=@1g4.org> <CAM0EoM=T4QiGB+_3jqWKYze_OrcsjYBy0UvckTiGtHkxSm6BDQ@mail.gmail.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 73133abcbfe30135cf85dd77d7b8607584a036b6
+	s=arc-20240116; t=1770065435; c=relaxed/simple;
+	bh=0Mv2UnXKNuE61lNLIpRpGZBoya+eYa2OWZrEI4bK9zc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UFmVB1QHJB1YKCiP1hBoiAJEzPijmCH8enZto6swHDddHxO4K/XjYnheSM64Me5yv4+S30mKD6qt9w8oOPFzhTbrxrZb3dMhO/7Dvsv1z/EkRfiYUJRAKGYZs6gyB+0gdF4DolB2qwvrah8mjBG85LbjJ8u00F7lc2Tlv2T18yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0xx1qsv; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4806ce0f97bso41928975e9.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 12:50:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770065433; x=1770670233; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=79ZaT7+tLNQJBFox4Qi/6GxwY40SpKIsixlC4sAkdgA=;
+        b=e0xx1qsv1WFASSCJ+g9oYLMoc7jSow1kyRpShLqIMgWqWH/L45CKnrXm8rMVNdOfCp
+         VvdbMAy3wjuH7ELq/7RG97RziyDaSmsxuXWc5n8cY8EiOqGOE59ZQE7po8iEszvYp+ZY
+         GM1Dsuc57PErAHQqpkYcZQWto6jzUfdGBCK6LMBrx/MwRaUKpVWHUjOcdCpzM9N8dZh8
+         kzY3eTxWkvvpz+hK0ugg66PbKVs13OvIleaRdc6AYMsnyhcpB3h8FN7S3OBA41cSmYSL
+         oparjcwWqu1JfS/hV8it5Wf5V0gFsXyhxEiFVaAgg2WD3ce5ZmmLvA/ExfcCZLZaDG27
+         XClQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770065433; x=1770670233;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=79ZaT7+tLNQJBFox4Qi/6GxwY40SpKIsixlC4sAkdgA=;
+        b=JPSvNyOZpc+RelI48Rx/BGt78fBTgTpRiUuftnUbn9FOMJtM7cJKz0cULldviPIq4z
+         +im78ylJtW+6dvXdwjQy0Uf/bxlI+VQKl6gdRDuUQLQmUkYjPriMCkLoq45ZvZvwFXmr
+         Eb+iMQdnPNMXKJ5MUBWHQd730BBfdAxfgYfC2wgxgStB7Ti3md6wU2sfkkTPGkNYLiWc
+         Ydpasged5rRdeqf6K5VgfVUBegFye8AgYvVjdtG8fSYW2nHwTaMHICjEmTPaRXsVUhWh
+         IuXmw0wWjabEdNu1Q380JOJL8q7xNRwQvq+ip1zcojFAivk6JS3BK1Zx5EEYxSVSR+id
+         c34g==
+X-Gm-Message-State: AOJu0Yw/rzZ6UhIQqsmCqZ1UN08ODYhrLvXBkItUZmaSGuDg84lrQ6n8
+	HpZFrk4XYlDQ5GbHNccCRTQ5Ib7Q7qm7L+KuIgOZhvJHLYyp2Dpm7Npy
+X-Gm-Gg: AZuq6aK3aEs34mSJYzFC8DHAZb595rD7gk5yszDXgxncVa0meOfqxkkh8PRVuVKFhyx
+	Wy/VTazycf/EGb5vjRb7c1+chUbK3XlHtE+vC27er9/OL7+WG5EDuMLxykaYyrV89vsP6MY401K
+	dPtBhggse1ZMCWjOw2cb3AFfr0G154e7sASEyoezoMIvtnn1YWEaczfrQVFEBAiHPRdrQ5eGoYN
+	bONngeBUsDT+WyAhFNHX3+DrbQ3omcsZwzceVzv+r8IvO6IZy54YuW8Vp58zVa02s/eJj28FVOj
+	JhDUriIHliWqXZe9pWXxVC+DSI2YOhU/P9bpfK2+ZQ1hI0asPG4gEvFxhMRBbWGR/w/9O3OoObF
+	KukjdlwiMCcI3a6LVxjQV9Q6maA9Tk3pTUKPNsqQodEdv8C7Map/UOGOEVehFm7JrZcAq1VqzRi
+	LIPY2gkkDDUXe8GmoAQMce1JVl6fg+lPb/E2ixBqtrYc85ESF4IGGrbAm/g/PMj593FRbaSuOGb
+	a8unzIiTM9uiZ+CfgJVdtg+CmHj0q+nXULynSVqueqb4Hvn
+X-Received: by 2002:a05:600c:3e0b:b0:47b:e2a9:2bd7 with SMTP id 5b1f17b1804b1-482db47cda9mr168299265e9.19.1770065432448;
+        Mon, 02 Feb 2026 12:50:32 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f4b:2a00:742c:21a1:3b90:f2? (p200300ea8f4b2a00742c21a13b9000f2.dip0.t-ipconnect.de. [2003:ea:8f4b:2a00:742c:21a1:3b90:f2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e266fbefsm98485695e9.14.2026.02.02.12.50.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Feb 2026 12:50:31 -0800 (PST)
+Message-ID: <f54e4d2a-666c-444a-a79e-0df2ddec97d9@gmail.com>
+Date: Mon, 2 Feb 2026 21:50:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] r8169: add support for RTL8125cp
+To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260202105828.54-1-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260202105828.54-1-javen_xu@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-256006-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256007-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,1g4.org:email,1g4.org:dkim,1g4.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CC744D152D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0CA1FD14C3
 X-Rspamd-Action: no action
 
-Want to be clear, as I said before, I spent months on this before I approac=
-hed.=20
+On 2/2/2026 11:58 AM, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> This patch adds support for chip RTL8125cp. Its XID is 0x708. We apply
+> different and firmware for RTL8125cp.
+> 
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> ---
+> v2: This patch fix one mistake on phy_modify_paged(phydev, 0xa43, 0x10,
+> 0x0000, 0x1001) which is phy_modify_paged(phydev, 0xa43, 0x00, 0x0000, 0x1001) on patch v1.
+> 
+> v3: Set phy_modify_paged(phydev, 0xa43, 0x10, 0x0000, 0x0003), bit 0
+> means 'link speed 10m PLL OFF', bit 1 means 'ALDPS PLL OFF', bit 2 means
+> 'ENABLE ALDPS', bit 12 means 'ALDPS XTAL OFF'.
 
-The gates are programmed by a controller and used to orchestrate determinis=
-tic traffic admission. This is not a simple open/close mechanism configured=
- by humans.=20
+ALDPS is disabled two lines later in rtl8125cp_hw_phy_config().
+So why bother with ALDPS settings if ALDPS is disabled anyway?
 
-I am moving closer to IEEE not further away from.
+And a formal note:
+A new version of a patch should be submitted >=24h later, to leave
+time for further review comments.
 
-Thanks
-Paul
+> ---
+>  drivers/net/ethernet/realtek/r8169.h          |  1 +
+>  drivers/net/ethernet/realtek/r8169_main.c     |  6 +++++
+>  .../net/ethernet/realtek/r8169_phy_config.c   | 22 +++++++++++++++++++
+>  3 files changed, 29 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+> index aed4cf852091..0b9c1d4eb48b 100644
+> --- a/drivers/net/ethernet/realtek/r8169.h
+> +++ b/drivers/net/ethernet/realtek/r8169.h
+> @@ -68,6 +68,7 @@ enum mac_version {
+>  	RTL_GIGA_MAC_VER_61,
+>  	RTL_GIGA_MAC_VER_63,
+>  	RTL_GIGA_MAC_VER_64,
+> +	RTL_GIGA_MAC_VER_65,
+>  	RTL_GIGA_MAC_VER_66,
+>  	RTL_GIGA_MAC_VER_70,
+>  	RTL_GIGA_MAC_VER_80,
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 2f7d9809c373..d040f2074db6 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -60,6 +60,7 @@
+>  #define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
+>  #define FIRMWARE_8125K_1	"rtl_nic/rtl8125k-1.fw"
+>  #define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
+> +#define FIRMWARE_8125CP_1	"rtl_nic/rtl8125cp-1.fw"
+>  #define FIRMWARE_9151A_1	"rtl_nic/rtl9151a-1.fw"
+>  #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
+>  #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
+> @@ -112,6 +113,9 @@ static const struct rtl_chip_info {
+>  	/* 8125BP family. */
+>  	{ 0x7cf, 0x681,	RTL_GIGA_MAC_VER_66, "RTL8125BP", FIRMWARE_8125BP_2 },
+>  
+> +	/* 8125CP family*/
+> +	{ 0x7cf, 0x708, RTL_GIGA_MAC_VER_65, "RTL8125CP", FIRMWARE_8125CP_1 },
+> +
+>  	/* 8125D family. */
+>  	{ 0x7cf, 0x68b, RTL_GIGA_MAC_VER_64, "RTL9151A", FIRMWARE_9151A_1 },
+>  	{ 0x7cf, 0x68a, RTL_GIGA_MAC_VER_64, "RTL8125K", FIRMWARE_8125K_1 },
+> @@ -802,6 +806,7 @@ MODULE_FIRMWARE(FIRMWARE_8125D_1);
+>  MODULE_FIRMWARE(FIRMWARE_8125D_2);
+>  MODULE_FIRMWARE(FIRMWARE_8125K_1);
+>  MODULE_FIRMWARE(FIRMWARE_8125BP_2);
+> +MODULE_FIRMWARE(FIRMWARE_8125CP_1);
+>  MODULE_FIRMWARE(FIRMWARE_9151A_1);
+>  MODULE_FIRMWARE(FIRMWARE_8126A_2);
+>  MODULE_FIRMWARE(FIRMWARE_8126A_3);
+> @@ -4021,6 +4026,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
+>  		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
+>  		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
+>  		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
+> +		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8125d,
+>  		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125d,
+>  		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
+>  		[RTL_GIGA_MAC_VER_80] = rtl_hw_start_8127a,
+> diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
+> index 032d9d2cfa2a..a880df7c1f70 100644
+> --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
+> +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
+> @@ -1102,6 +1102,27 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
+>  	rtl8125_config_eee_phy(phydev);
+>  }
+>  
+> +static void rtl8125cp_hw_phy_config(struct rtl8169_private *tp,
+> +				   struct phy_device *phydev)
+> +{
+> +	r8169_apply_firmware(tp);
+> +	rtl8168g_enable_gphy_10m(phydev);
+> +
+> +	phy_modify_paged(phydev, 0xad0, 0x17, 0x007f, 0x000b);
+> +	phy_modify_paged(phydev, 0xad7, 0x14, 0x0000, BIT(4));
+> +	rtl8125_phy_param(phydev, 0x807f, 0xff00, 0x5300);
+> +	r8168g_phy_param(phydev, 0x81b8, 0xffff, 0x00b4);
+> +	r8168g_phy_param(phydev, 0x81ba, 0xffff, 0x00e4);
+> +	r8168g_phy_param(phydev, 0x81c5, 0xffff, 0x0104);
+> +	r8168g_phy_param(phydev, 0x81d0, 0xffff, 0x054d);
+> +	phy_modify_paged(phydev, 0xa43, 0x10, 0x0000, 0x0003);
+> +	phy_modify_paged(phydev, 0xa44, 0x11, 0x0000, BIT(7));
+> +
+> +	rtl8125_legacy_force_mode(phydev);
+> +	rtl8168g_disable_aldps(phydev);
+> +	rtl8125_config_eee_phy(phydev);
+> +}
+> +
+>  static void rtl8125bp_hw_phy_config(struct rtl8169_private *tp,
+>  				    struct phy_device *phydev)
+>  {
+> @@ -1344,6 +1365,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+>  		[RTL_GIGA_MAC_VER_61] = rtl8125a_2_hw_phy_config,
+>  		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
+>  		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
+> +		[RTL_GIGA_MAC_VER_65] = rtl8125cp_hw_phy_config,
+>  		[RTL_GIGA_MAC_VER_66] = rtl8125bp_hw_phy_config,
+>  		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
+>  		[RTL_GIGA_MAC_VER_80] = rtl8127a_1_hw_phy_config,
 
-
-On Monday, February 2nd, 2026 at 8:33 AM, Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
-
->=20
->=20
-> On Sun, Feb 1, 2026 at 4:57=E2=80=AFAM Paul Moses p@1g4.org wrote:
->=20
-> > The hardware manufacturers impose their own limits based on design cons=
-traints, it's not based on the spec. iproute2's value seems arbitrary, 1024=
- comes out to be about 32 entries, based on the message length of 3112 at 1=
-00 entries (this isn't counting overhead). Is page size ever less than 4k? =
-May as well see what can safely fit into NLMSG_GOODSIZE at it's lowest poss=
-ible value.
-> >=20
-> > With 4k page size, the failure point appears to be 93 entries:
-> > large dump DEBUG: large dump msg_len=3D2904 cap=3D12288 entries=3D93 cy=
-cle_time=3D9304278
-> >=20
-> > So bounding it at 64 entries or so(for now at least) would be a safe ch=
-oice to maintain a margin and not impose arbitrarily low values.
->=20
->=20
-> Why dont we pick some value that doesnt require changes to iproute2? Exam=
-ple 32.
->=20
-> > Yes, I've wanted to talk to Po for a while now. :)
->=20
->=20
-> There has to be someone else, vendor, etc who is invested in this..
-> That looks like magic valves to me that open/close - not sure why you
-> want to do it more than once.
->=20
-> cheers,
-> jamal
->=20
-> > Thanks,
-> > Paul
-> >=20
-> > On Saturday, January 31st, 2026 at 11:34 AM, Jamal Hadi Salim jhs@mojat=
-atu.com wrote:
-> >=20
-> > > On Sat, Jan 31, 2026 at 12:18=E2=80=AFPM Paul Moses p@1g4.org wrote:
-> > >=20
-> > > > 1. Your script creates 100 separate gate actions, not one gate acti=
-on with a large schedule.
-> > > > 2. Each =E2=80=9Ctc actions add =E2=80=A6 gate =E2=80=A6=E2=80=
-=9D call creates a new action, so you end up with 100 small actions.
-> > > > 3. The issue I am reporting needs one single gate action that conta=
-ins many sched-entry objects.
-> > > > 4. Because of that, your test only exercises the dump path with man=
-y small actions.
-> > > > 5. The failure I see is in the GETACTION notify path, not in the ge=
-neric dump batching logic.
-> > > > 6. In that path, tcf_get_notify() allocates a fixed-size skb using =
-NLMSG_GOODSIZE.
-> > > > 7. The kernel then tries to serialize one action into that skb.
-> > > > 8. If a single action contains a large gate schedule, tca_get_fill(=
-) runs out of tailroom and fails, and the kernel returns -EINVAL.
-> > > > 9. A single sched-entry does not exceed NLMSG_GOODSIZE.
-> > > > 10. The problem is one action with many sched-entries, because the =
-entire entry list is serialized into the payload of that one action.
-> > > > 11. The =E2=80=9Ctotal acts 12 / 12 / 76=E2=80=9D output only shows=
- how many small actions were packed into each dump batch.
-> > > > 12. It does not reflect the size of an individual action dump, and =
-in your test each action is small.
-> > > > 13. To reproduce with tc, you need one tc invocation that adds many=
- sched-entry attributes to the same gate action, and then run =E2=80=9Ctc a=
-ctions get action gate index <idx>=E2=80=9D on that action.
-> > > > 14. tc has it's own limit at 1024 apparently "addattr_l ERROR: mess=
-age exceeded bound of 1024"
-> > >=20
-> > > Yes, thats the same error i was getting (with script below).
-> > > ---
-> > > ENTRY=3D"sched-entry open 200000000 -1 8000000 sched-entry close 1000=
-00000 -1 -1 "
-> > > SCHEDULE=3D$(printf "$ENTRY%.0s" {1..100})
-> > > #SCHEDULE=3D$(printf "$ENTRY%.0s" {1..10})
-> > >=20
-> > > for i in {1..2}; do
-> > > echo "Iteration: $i"
-> > > tc actions add action gate clockid CLOCK_TAI $SCHEDULE
-> > > done
-> > > ----
-> > >=20
-> > > I know of no other action that exceeds this limit with all its params
-> > > batched, and of course tc in userspace truncates it to about 32.
-> > > Addition does succeed at 32 of those things per action.
-> > > I have no idea if above is legal but it is allowed by the system.
-> > >=20
-> > > > I'm not opposed to gate being clamped instead of adding support for=
- large schedule sizes, but I wanted to thoroughly document why it's not pos=
-sible so the next person isn't chasing a cryptic -EINVAL like I did.
-> > >=20
-> > > We cant have it to be infinite for sure - we will need to put an uppe=
-r
-> > > bound in parse_gate_list().
-> > > Are you knowledgeable about this spec? I was Ccing Po Liu but his
-> > > email is bouncing (so i removed him).
-> > >=20
-> > > So back to your first post: I agree we have an issue here. Your
-> > > solution will solve the event notifications but then we will need an
-> > > upper bound check. We will also need to check that same upper bound i=
-n
-> > > user space iproute2 code so we dont allow arbitrary values. Current
-> > > number of 16 seems to work just fine - if we agree that is a "good"
-> > > number (or if the specs dicate it is) then you can simply provide tha=
-t
-> > > fix..
-> > >=20
-> > > cheers,
-> > > jamal
-> > >=20
-> > > > Thanks
-> > > > Paul
-> > > >=20
-> > > > On Saturday, January 31st, 2026 at 11:14 AM, Jamal Hadi Salim jhs@m=
-ojatatu.com wrote:
-> > > >=20
-> > > > > On Sat, Jan 31, 2026 at 11:51=E2=80=AFAM Jamal Hadi Salim jhs@moj=
-atatu.com wrote:
-> > > > >=20
-> > > > > > .
-> > > > > >=20
-> > > > > > On Fri, Jan 30, 2026 at 3:48=E2=80=AFPM Paul Moses p@1g4.org wr=
-ote:
-> > > > > >=20
-> > > > > > > What version of act_gate.c are you currently testing?
-> > > > > >=20
-> > > > > > I am running plain ubuntu on this machine using their shipped k=
-ernel 6.8.0.
-> > > > > > But i did look at the latest kernel tree and the dumping code h=
-as not changed.
-> > > > > > +Cc Po Liu who i believe added that code.
-> > > > > >=20
-> > > > > > > Did you actually run the tests? =E2=80=9Clarge dump=E2=80=
-=9D creates ONE action at base_index, with num_entries=3D100, then immediat=
-ely does GETACTION. So =E2=80=9Ctc actions ls action gate | grep index | wc=
- -l=E2=80=9D won=E2=80=99t exercise this, because it only counts actions. I=
-t doesn=E2=80=99t amplify the per action dump size (the entry list does). I=
-t uses libmnl (mnl_socket_sendto / mnl_socket_recvfrom) with MNL_SOCKET_BUF=
-FER_SIZE. There is no custom netlink handling. The failure is returned by t=
-he kernel before userspace parses anything. The dumps are transactional at =
-the netlink level, but an individual action dump still has to fit in the sk=
-b backing that message.
-> > > > > >=20
-> > > > > > Sorry - I am not running your code (didnt want to compile anyth=
-ing on
-> > > > > > this machine), just plain tc and i have to admit I dont know mu=
-ch
-> > > > > > about the mechanics or spec for gate, so my example is based on
-> > > > > > something Po Liu posted, here's a script to add 100 entries:
-> > > > > > ---
-> > > > > > for i in {1..100}; do
-> > > > > > echo "$i"
-> > > > > > tc actions add action gate clockid CLOCK_TAI sched-entry open
-> > > > > > 200000000 -1 8000000 sched-entry close 100000000 -1 -1
-> > > > > > done
-> > > > > > ---
-> > > > > >=20
-> > > > > > Then dumping:
-> > > > > >=20
-> > > > > > $ sudo tc actions ls action gate | grep index
-> > > > > > index 1 ref 1 bind 0
-> > > > > > index 2 ref 1 bind 0
-> > > > > > index 3 ref 1 bind 0
-> > > > > > index 4 ref 1 bind 0
-> > > > > > index 5 ref 1 bind 0
-> > > > > > index 6 ref 1 bind 0
-> > > > > > ..
-> > > > > > ...
-> > > > > > ....
-> > > > > > index 95 ref 1 bind 0
-> > > > > > index 96 ref 1 bind 0
-> > > > > > index 97 ref 1 bind 0
-> > > > > > index 98 ref 1 bind 0
-> > > > > > index 99 ref 1 bind 0
-> > > > > > index 100 ref 1 bind 0
-> > > > > > $
-> > > > > >=20
-> > > > > > > look at af_netlink.c
-> > > > > > > /* NLMSG_GOODSIZE is small to avoid high order allocations be=
-ing
-> > > > > > > * required, but it makes sense to attempt a 32KiB allocation
-> > > > > > > * to reduce number of system calls on dump operations, if use=
-r
-> > > > > > > * ever provided a big enough buffer.
-> > > > > > > /
-> > > > > > > ...
-> > > > > > > / Trim skb to allocated size. User is expected to provide buf=
-fer as
-> > > > > > > * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped =
-at
-> > > > > > > * netlink_recvmsg())). dump will pack as many smaller message=
-s as
-> > > > > > > * could fit within the allocated skb. skb is typically alloca=
-ted
-> > > > > > > * with larger space than required (could be as much as near 2=
-x the
-> > > > > > > * requested size with align to next power of 2 approach). All=
-owing
-> > > > > > > * dump to use the excess space makes it difficult for a user =
-to have a
-> > > > > > > * reasonable static buffer based on the expected largest dump=
- of a
-> > > > > > > * single netdev. The outcome is MSG_TRUNC error.
-> > > > > > > */
-> > > > > > >=20
-> > > > > > > This is where I am currently but I have seen these bugs appea=
-r throughout all my iterations including what's in the tree currently, if y=
-ou show me better alternatives that solve my problems, I'll gladly accept.
-> > > > > > > https://github.com/torvalds/linux/compare/master...jopamo:lin=
-ux:net-stable-upstream-v4
-> > > > > >=20
-> > > > > > I dont see a problem with "dump" as you seem to be suggesting. =
-I asked
-> > > > > > earlier if it is possible that you can create some single entry=
- - not
-> > > > > > 100 as shown above that will consume more than NLMSG_GOODSIZE? =
-My
-> > > > > > limited knowledge is not helping me see such a scenario.
-> > > > >=20
-> > > > > Aha. I think there is a terminology mixup ;->
-> > > > >=20
-> > > > > "dump" (a very unfortunate use of that word in the netlink world =
-;->)
-> > > > >=20
-> > > > > is a very special word. So when you take a dump in this world you=
- are
-> > > > > GETing a whole table. In this case all the gate actions.
-> > > > >=20
-> > > > > If i am not mistaken in your case this is not a dump - rather, yo=
-u are
-> > > > > CREATing a single entry which is bigger than NLMSG_GOODSIZE as i
-> > > > > suspected. I dont believe iproute2 will allow you to do that.
-> > > > > What's happening then is that the generated netlink event notific=
-ation
-> > > > > for that single entry is too big to fit in NLMSG_GOODSIZE.
-> > > > > Let me try to craft something for that...
-> > > > >=20
-> > > > > cheers,
-> > > > > jamal
 
