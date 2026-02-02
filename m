@@ -1,161 +1,221 @@
-Return-Path: <netdev+bounces-255972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8I4jA2XmgGleCAMAu9opvQ
-	(envelope-from <netdev+bounces-255972-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 19:01:09 +0100
+	id wCWdGFnmgGleCAMAu9opvQ
+	(envelope-from <netdev+bounces-255973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 19:00:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CCF7CFDFC
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 19:01:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7090BCFDE7
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 19:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09E07300C916
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:53:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 90C853003813
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 18:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2241389458;
-	Mon,  2 Feb 2026 17:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C43538B9B5;
+	Mon,  2 Feb 2026 18:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="R/qUZXeo";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ax3CJWmc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mnsGnWB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B77C38944C
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92DF1F09B3;
+	Mon,  2 Feb 2026 18:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770054796; cv=none; b=gkQKr388y4Z+2ms4006p43Vz0zkmXFWl/iA9Bksevnj3rLNnuWewdeaPwsIKtYQtpLs0rkGNE4+5jyy1TQca1G+wrKtWCK6qpinsQ59WI0X0jJXWdqb7e1cnCDRCP5DDxHmlBIYDaLJ7beaLYlbfPnhYWe+NemLfo0vBNrKGiHI=
+	t=1770055251; cv=none; b=I0l0XDOZckT2PKSwVNmOj/YWdUiSESkyDwsCeyjw8tiK6NiXs/7weHwxPP5fJRYcvCBcm0tnm9SPbnij/tDoUomIqGrJjCMhEhd20/ivRBXL7uXAtd9oTv1B5lS2FBUFiyQxtSZ0eZDrMtOBTAFg7/kmleQybhZFwRf5X33WWuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770054796; c=relaxed/simple;
-	bh=ZUCB+LpycsZKHXVaQiVA5dvSCiWqPUge+/Ph4dvFeGg=;
+	s=arc-20240116; t=1770055251; c=relaxed/simple;
+	bh=n+32tUg6O9xBgJs12jayYezBMjMC+1eYFOQZvUKfdEM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hf2di/e/cir3KG3G4qw6TZS4JPrEzQc+JPkZB1CepBhE3HCid874dlLpicNkfBlY7nARAFKvn3dHNuXh3jjbQcG+q9nuXqIzHXSeyOZOSEANGK6YZ9WJZIY7xp/9ZXqy8r9wv2wVhI2Ht5bzn/4/sQfAmSyUWF9FDB17IwKgfDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=R/qUZXeo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ax3CJWmc; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 2 Feb 2026 18:53:11 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770054793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XsYaxiJ7pUInLkmjViQvaY++X9xDIRfk/eCBPZD4ZkU=;
-	b=R/qUZXeoqoTOV2eyV52ZXzivpa1II6UFbbq1ifMmKsP10zOySKMUT//VDAJ0RgkQmghOfa
-	zQBbUBvI8EnY+Gk4WsX5s5RniqtL5JwHnj+2a7j58Hhp/UVvu7WkSq+j8g50tNqRbamO4J
-	PVOXk6fAzcIMKhQIfwpWIot80GlIfy2v6mnUmDYdlvi1uBMq7uwpH8yj6HVILzHhfALe5i
-	9jJk2sOak3M77iLlR/h29IW/nMYQrTD3bMKnJM2A5B0J/Di0U6PREg+nfcww4D0njpUarJ
-	Wshrvqwwn/nk9df4ul33/O/xaj7ZWNWvLXgmUjQCgsbdL4yBWyYBWLCAWw7AwQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770054793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XsYaxiJ7pUInLkmjViQvaY++X9xDIRfk/eCBPZD4ZkU=;
-	b=Ax3CJWmcXhqnIAjyxNgYz5A70ujx1iLTnmKTcGaio/bv5q/QJDui6Z6dnSyxcAKEmHFg62
-	D6hINZeA3Pd8YhCA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
-	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net,
-	Yoann Congal <yoann.congal@smile.fr>
-Subject: Re: [PATCH net-next v2 6/9] hsr: Implement more robust duplicate
- discard for HSR
-Message-ID: <20260202175311.m2Qu8pEp@linutronix.de>
-References: <cover.1769093335.git.fmaurer@redhat.com>
- <07b90a435ed7d3450c1949e3a21910916d8538de.1769093335.git.fmaurer@redhat.com>
- <20260129144348.CIs44m-d@linutronix.de>
- <aXuIAFJ_m6gMUFFO@thinkpad>
- <aXugXpSajp6jzG1o@thinkpad>
- <aXyJTzwJ3x34B-xR@thinkpad>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pEXNMlsyNVRKrsYPZq5vVrFWCQczuwAXqwSunp1TXeaZbNo0bHVxJRfNtOEUvUFNq4j6IfsKTS6vkzW22pcp4SGkgPmo+71dKo1IfmqO6494sXo6E+io6cZsFlZYf5CkY4FQbsVDwXJjdj/aXJjbqFA8e1hPYVgh1hN2gr/LGNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mnsGnWB0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=F9Pa8fGQcKdQAj56BjKT9x2u/Vm+Xm14aWdPy01eY2Y=; b=mnsGnWB0p3aNqcH65j+Qel+xYn
+	g6K3dhtIFiS8DkUnbAnYbdZxbe6oRxkf3c65aYN2a5qBOu3m65Vi/p8K4oBZ8vr9Yx6Xr1x2DjRAs
+	vTFZ9yLMh7jgr6YxeKYLFrpFNQDbbUa2MhMfGGqXoWfnzFeELA1mW4BbfgmydHtVMdxEfrqJSJLK8
+	VSYw87GWpAyt54LJaEgvjiDecPObpf6Ql8JdudQrq55GA/Cro1o1Jj1GyDn2MA818e+rmk5HjptaE
+	0AzIHFrw00NILdSQ+7UEpgv/AgVtQ6Sc+78ZwvNrULuxoL6pyScMXg8AMANuvbkxU2LAXS9MKEE3c
+	IN9sgd3w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57954)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vmyDx-000000004Ew-3OHr;
+	Mon, 02 Feb 2026 18:00:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vmyDt-000000003a5-1CT8;
+	Mon, 02 Feb 2026 18:00:29 +0000
+Date: Mon, 2 Feb 2026 18:00:29 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, florian.fainelli@broadcom.com,
+	xiaolei.wang@windriver.com, quic_abchauha@quicinc.com,
+	quic_sarohasa@quicinc.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: phy: change devlink flag to
+ AUTOREMOVE_SUPPLIER for non-SFP PHYs
+Message-ID: <aYDmPUN5Z-eRWW2K@shell.armlinux.org.uk>
+References: <20260202054533.539883-1-wei.fang@nxp.com>
+ <267c78c1-4ad2-4f06-be63-0fb506c5134d@bootlin.com>
+ <aYCzxVTTZvok9_d1@shell.armlinux.org.uk>
+ <0689a2ab-352a-4275-9662-0c45daf8a0b2@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXyJTzwJ3x34B-xR@thinkpad>
+In-Reply-To: <0689a2ab-352a-4275-9662-0c45daf8a0b2@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255972-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,smile.fr];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,windriver.com,quicinc.com,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255973-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:mid,linutronix.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8CCF7CFDFC
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[quicinc.com:email,bootlin.com:email,nxp.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 7090BCFDE7
 X-Rspamd-Action: no action
 
-On 2026-01-30 11:34:55 [+0100], Felix Maurer wrote:
-> I took another look at this. I think the IEC 62439-3:2021 is not super
-> clear on this (it often refers to "duplicate frames" without being exact
-> about in which domain they are duplicates). But the section on HSR Modes
-> (5.3.2.1) is quite telling when all modes are read in combination.
+On Mon, Feb 02, 2026 at 06:38:48PM +0100, Maxime Chevallier wrote:
 > 
-> First, there is the mode H, which is the default and mandatory to
-> implement. In this mode, a node should forward all frames "except for
-> frames sent by the node itself, duplicate frames and frames for which
-> the node is the unique destination". Note that "duplicate frame" is not
-> further specified here. As we don't implement different modes, we should
-> follow mode H in our implementation.
 > 
-> In contrast, there is also mode X (sometimes referred to as "traffic
-> reduction").  It is supposed to work like mode H, but without sending
-> "counter-duplicates", i.e., frames that are "a duplicate of a frame that
-> it received [...] from the opposite direction."
+> On 02/02/2026 15:25, Russell King (Oracle) wrote:
+> > On Mon, Feb 02, 2026 at 12:10:41PM +0100, Maxime Chevallier wrote:
+> >> Hi Wei,
+> >>
+> >> On 02/02/2026 06:45, Wei Fang wrote:
+> >>> For the shared MDIO bus use case, multiple MACs will share the same MDIO
+> >>> bus. Therefore, these MACs all depend on this MDIO bus. If this shared
+> >>> MDIO bus is removed, all the PHY devices attached to this MDIO bus will
+> >>> also be removed. Consequently, the MAC driver should not access the PHY
+> >>> device, otherwise, it will lead to some potential crashes. Because the
+> >>> corresponding phydev and the mii_bus have been freed, some pointers have
+> >>> become invalid.
+> >>>
+> >>> For example. Abhishek reported a crash issue that occurred if the MDIO
+> >>> bus driver was removed first, followed by the MAC driver. The crash log
+> >>> is as below.
+> >>>
+> >>> Call trace:
+> >>>  __list_del_entry_valid_or_report+0xa8/0xe0
+> >>>  __device_link_del+0x40/0xf0
+> >>>  device_link_put_kref+0xb4/0xc8
+> >>>  device_link_del+0x38/0x58
+> >>>  phy_detach+0x2c/0x170
+> >>>  phy_disconnect+0x4c/0x70
+> >>>  phylink_disconnect_phy+0x6c/0xc0 [phylink]
+> >>>  stmmac_release+0x60/0x358 [stmmac]
+> >>>
+> >>> Another example is the i.MX95-15x15 platform which has two ENETC ports.
+> >>> When all the external PHYs are managed the EMDIO (the MDIO controller),
+> >>> if the enetc driver is removed after the EMDIO driver. Users will see
+> >>> the below crash log and the console is hanged.
+> >>>
+> >>> Call trace:
+> >>>  _phy_state_machine+0x230/0x36c (P)
+> >>>  phy_stop+0x74/0x190
+> >>>  phylink_stop+0x28/0xb8
+> >>>  enetc_close+0x28/0x8c
+> >>>  __dev_close_many+0xb4/0x1d8
+> >>>  netif_close_many+0x8c/0x13c
+> >>>  enetc4_pf_remove+0x2c/0x84
+> >>>  pci_device_remove+0x44/0xe8
+> >>>
+> >>> To address this issue, Sarosh Hasan tried to change the devlink flag to
+> >>> DL_FLAG_AUTOREMOVE_SUPPLIER [1], so that the MAC driver will be removed
+> >>> along with the PHY driver. However, the solution does not take into
+> >>> account the hot-swappable PHY devices (SFP PHYs), so when the PHY device
+> >>> is unplugged, the MAC driver will automatically be removed, which is not
+> >>> the expected behavior. This issue should not exist for SFP PHYs, so based
+> >>> on the Sarosh's patch, the flag is changed to DL_FLAG_AUTOREMOVE_SUPPLIER
+> >>> for non-SFP PHYs.
+> >>>
+> >>> Reported-by: Abhishek Chauhan (ABC) <quic_abchauha@quicinc.com>
+> >>> Closes: https://lore.kernel.org/all/d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com/
+> >>> Link: https://lore.kernel.org/imx/20250703090041.23137-1-quic_sarohasa@quicinc.com/ # [1]
+> >>> Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
+> >>> Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> >>> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> >>
+> >> I gave that patch a test, with the following cases :
+> >>
+> >>  - On Macchiatobin (we have PHYs that share an mdiobus).
+> >> When unbinding a PHY, the MAC dissapears as well :
+> > 
+> > Correct, this is why these band-aids are harmful. One "device" can
+> > correspond with *multiple* network interfaces, and the loss of one
+> > PHY can have a *very* detrimental effect.
+> > 
+> > Consider the case where root-NFS is being used, and removing a PHY
+> > on another interface takes out the interface that root-NFS is
+> > using. Your machine is now dead in the water.
 > 
-> To me, this means two things for mode H, i.e., what we should be doing:
-> - For a frame with one sequence number coming from one node, we should
->   be forwarding the frame once in each direction.
-> - There could be duplicates of these frames in either direction that we
->   should not forward. This is also hinted at in other parts of the
->   standard, that there could be multiple duplicates, especially when HSR
->   rings are coupled.
-> 
-> Therefore, I think it is correct to do the duplicate tracking once for
-> each port, especially separately for port A and port B.
+> That's what I've been seeing. I unbound one PHY, it took out 3 netdevs
+> and I don't have log regarding "why". I guess there's devlink debug
+> knobs for that, but not enabled by default it seems.
 
-I will not argue with you here.
-But. :)
-If you track duplicates for A and B and see a duplicate on port A then
-this indicates that the sender of this packet did not remove it from the
-ring once it received it back. This looks like a failure.
-If you track duplicates for A and B in a single "bitmap" then this would
-mode X.
+See what I said above. "One "device" can correspond with *multiple*
+network interfaces".
 
-I nag here a bit because you allocate 16 + (128 / 8) * 4 * 64 = 4112
-bytes for this bitmap per node. That is a bit over 4kib. Then adding and
-removing sequences got a bit more expensive. Anyway. There is table
-F.19+ specifying HSR tests and don't find "forwarding duplicate over
-port A". So lets keep it.
+On Armada 8040, one network "device" has multiple ports - they all
+share the same packet infrastructure. Each port is a separate
+interface in the kernel.
 
-> Thanks,
->    Felix
+Consequently, the "struct device" is common across all ports on one
+of the CP110 dies (there are two dies.) If one triggers an unbind
+of that struct device, then you lose *all* ports on that CP110 die
+whether or not the others _could_ remain functional.
 
-Sebastian
+Consider a DSA switch, which has external PHYs connected. Should
+unbinding one port's PHYs take out the entire switch - and in the
+case of multiple switches, cause the entire switch tree to be taken
+out?
+
+This is why devlinks is a bad idea. It's too heavy handed for cases
+beyond the simple "one network device per struct device" model that
+doesn't exist everywhere. For simple cases, yes, maybe, but not
+where it means that taking out one minor part of the system destroys
+the entire system because it chose to unbind a multi-interface device.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
