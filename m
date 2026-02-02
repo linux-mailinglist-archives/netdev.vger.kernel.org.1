@@ -1,177 +1,216 @@
-Return-Path: <netdev+bounces-255956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255957-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPOlGFXcgGnMBwMAu9opvQ
-	(envelope-from <netdev+bounces-255956-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:18:13 +0100
+	id mMDtNnbdgGnMBwMAu9opvQ
+	(envelope-from <netdev+bounces-255957-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:23:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B85DCF7DB
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:18:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5853CCF8AD
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:23:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6E6D43002910
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:11:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 41661301B144
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621353815EF;
-	Mon,  2 Feb 2026 17:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69AD385512;
+	Mon,  2 Feb 2026 17:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hr+l1ifk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0XXCTxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058D2239086
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770052301; cv=pass; b=DSD6mwuvS3rkJkUWKcq+FAKGb51Teu2iRhW9N+DoSnkzU/RP2zA2EiNceoscUj8LtnnNL5I1ZXXh4vvDKgLdwl3Krmf8qenwMWr9gcHw+omL3aSgb2LUrSZ/Tvs3xPm8bjmtuPHP28Vs06MaT2O/PkMsPt8oYgFVBdbee0qAd/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770052301; c=relaxed/simple;
-	bh=5tdaA9mbInyE7lSzXuoItIXNxRipUEMsM2MOyx9QNDs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VbqTg9LXZXiUBk1zB1hO8CtoUMNinD3HKAe/uSFHRv7H/W8yKxOhHQIRQxojy7Nbf80NshPeZtQ8uMUwhSdTyioZOxlfNTcPdDYQOFzJm/6fDqdAWSeTBkQLa55vK0CEBwG8J8K4JOAWVu4CFi0bYbvHv1a40uNijb/qHSDWWp0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hr+l1ifk; arc=pass smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50145d27b4cso51676641cf.2
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 09:11:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770052299; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AApZ4aqViW/jsrLeG1Y3Loph/CnvTVhLMEPfDpWst86lCmfaBgO/QaH2PeZ+tuUH8N
-         MqLl336uge27qOzRMjJcQ3UofDPQWCUh+SygPFFQKA9mfNu5bGdv0rqOzAbkE4wAVHfe
-         WMtT+11v4bvM3LBnAHXPv2ZRAK4/puiprtY9IOy7qxGsiOQPS0twcQMQHrze0JQT20gq
-         fdjKW89eq7HP9OqtlyiDlZ7AHS7tzubAB0IA6O8fCkzvXqsqooJmnBFmYl3VACGmIoZj
-         SLUpR5G17oLzePSVJqBiOwKMI9S6+fyfO74yuySaX3nuVLegbS3yQ3EfUPTTJ7O6SC0u
-         +4Lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cfJX/aRPoy6PZQ1T5RXrd9yoDPla7R52CDpMZ5aJtzs=;
-        fh=9sJ8AfartyeKYNj52yTscbQ9vjiGyOn8TBRIlD8bJKs=;
-        b=jJE+/37wIRbAjR+RU5PYT1YyuccjCRMwyROXcmqJbS5OJ34HiYrFG9EX6QqfQ+Jnia
-         9avqFtuAMCrnorYalnwz6q1rR4nDm+7vounbdYCqrOGxeer58qgYFBCmy0770utNSzcb
-         u5A0oijDcKOVE9soj73MBr6g/yKE3OEEzzzJhfhaaMM9tGWFFdmQx5Y2V9dbsohnpOiH
-         JG8LspqMc99dwpocY9nveEQtOP7GZ1D+pGoid7iGpgXJGNfBt3lYohotIlWqp4UHWmaE
-         9XpY38dE0bAVxUm/5/gfstLWyzp8qs4ckZ0qPd/V5JTJ4i7m6mglLj82jxgCA956hrQY
-         UtYw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770052299; x=1770657099; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cfJX/aRPoy6PZQ1T5RXrd9yoDPla7R52CDpMZ5aJtzs=;
-        b=hr+l1ifk/P+52mrSn6zz12nZkfISuELGcCJrvFqr8lcZN53AXZ+hjn6hRYqfJ3sjKk
-         REDVvOcmlSYZXfHbHGIHXU213rIgP11u1mseMW+poP/D14jTLQfRPuP5HXmmYw+L6p73
-         MnSwMuxRRoHssZjFoYLx0paPC4Gr7l8x/qT6wJ/aLXgDQ2eARgIrEyBW9PxwffWqQC7R
-         vScDgPCucXRvNF0/U8WxBv9RFG5CJy2F2r3A7e4KhP8N3JBGRK+rnkMaFJYJBbNGLMpE
-         NV8kzorhDGbUgjFvQnnD1c9aMRqO5G6uoCQubuv3SWZvEVSt/o9dWPg/zmLCxr/tI0r3
-         t/Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770052299; x=1770657099;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cfJX/aRPoy6PZQ1T5RXrd9yoDPla7R52CDpMZ5aJtzs=;
-        b=XOe+ppuKFkxSkfa/fZJr/cBAz4tzUl4zBUBof3lDthvOF2BDlNF0Wy/fz5udjQZCWY
-         bEHeyJ0juEq8Lg6r1CzikzMEuzhujTlHni9OnqPlWY9AkPUa1G2QZ4awUVJM6HK1pGUh
-         2uYU/vLLXSlBk64X+MDChtujc8jDP0vALvX1zOvG3AwdPnAiZwLl3COxI0SJPMr6biPu
-         J5jW6XXTOcs/BAJQ+vEZkznRyzEpScH3OM/ahKZIVWxcmsLECppAYgCFwbMuUdofPXcA
-         A0pCas+5drd4M5C44mXbGEmgwNUdgRG2WRKa1vZgTBFR0utH+KBKsSBaco08FgUSr4sy
-         Nesg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjum4a/DaW511Wom2XJjiRzHWBPEExpgEohRM9uhXgxA7GcfrQIgmUf3e72k+rEJ8bpBEMLNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI8abU9hRxDtE2OP/loH4dN1u/7TE9gDoEPFgIcnQR+SpUTvF7
-	7/4M+icY2K7X+AJNhLccXXY7EPSzO8XkY85TOru0Ti49tfTmpLJufAQVUcmbOi4pCNBpmkZqeOa
-	FSNZnHk6wu5O9sUtPnQpBKHGQUajiJxUz62RpGGQ/
-X-Gm-Gg: AZuq6aJ3l88flKXEUY9VfhxErPsg2HVOVz8LAegy/ZSv5WkbUTIljlf+YJlygMizUo8
-	FI5kgZIiEsnkumWtRByBNoawD0i2cktqSqI2z4QDCCj00qx2zOHJA3gOeh6OEcQNWRA3xIXo/2s
-	EJfaXQ9iNY+k7yb9hgj86mi59DsoygqEDuBUddDTlTRkzmLClIsfO7SeYJ0gWbi5/nzXdTRxS/7
-	mSD5GRm9dlhaCJB+nDtkGTUCIGXw/6E93QXp6j9kao2WHiHA23hqMdU+ZW7pCE/gkie1yU=
-X-Received: by 2002:a05:622a:282:b0:501:4807:6162 with SMTP id
- d75a77b69052e-505d2297becmr154490271cf.72.1770052298513; Mon, 02 Feb 2026
- 09:11:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0853806CC
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770052619; cv=none; b=X4sQ8+OTcV0t7sefRw8dayyJrZ6fL+6Y1AdVcTDow5QjvnWWlWZLQH8LJss4Q817yQYAuiX3YqukQFMFmJRBSObGtN2nBAW+t2UUbkO8JIjNA22KvHXql8wKEfLiIsuU8WeuosFaP23UvI9RyEKa9WgE1NzYyuVLJzO3D/V31y0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770052619; c=relaxed/simple;
+	bh=4sS49PRCEw/DOA13A6nnYwbX3MvIb6L4ox+1prlLFiM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DuM0eS5F6Wfrtrx5V4M2Ciu5hDcPAErCAYnBrgjVLNAQnA11zH89lvIEruFLeI+l3aD5fo0Au1RwuMG+fm/paR7JrmxcF5QfLgncDp4Oci1VqKEb8a/4+GHTEhCOKxk3Lchsl0dLbfuiLp32dXBXhKwB2KpJmkCjiTBvj/V1c30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B0XXCTxi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770052617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DbKKp/LYmfzMX+xhzFDmFmu3k9T3X4s2ZmnFsLvfCS4=;
+	b=B0XXCTxiaTYYcm6jc2L0LUwm6ukSoDJrUwla86AS7xfjVarHj8q56Ni3P2D/6tui2oDUCz
+	1iNbA1TowsJ2MBMFv7dgUZQTHU0vogS/sLk17WYi5oRhIubvMNfbE7TN952auaZ0VJR8/v
+	D0PLFVIEKcWouptZAJuKu1Ha6VVQ1Ow=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-112-rgkna-pCMNC_9kP493hrXw-1; Mon,
+ 02 Feb 2026 12:16:50 -0500
+X-MC-Unique: rgkna-pCMNC_9kP493hrXw-1
+X-Mimecast-MFC-AGG-ID: rgkna-pCMNC_9kP493hrXw_1770052606
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 469C81956060;
+	Mon,  2 Feb 2026 17:16:46 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.45.224.17])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2343519560B2;
+	Mon,  2 Feb 2026 17:16:39 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next v4 0/9] dpll: Core improvements and ice E825-C SyncE support
+Date: Mon,  2 Feb 2026 18:16:29 +0100
+Message-ID: <20260202171638.17427-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
- <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
- <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com>
- <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
- <CACwEKLp42TwpK_3FEp85bq81eA1zg3777guNMonW9cm2i7aN2Q@mail.gmail.com>
- <CAA3_Gnqo37RxLi2McF0=oRPZSw_P3Kya_3m3JBA2s6c0vaf5sw@mail.gmail.com>
- <CANn89iL8FnPG9bD6zW0eHmeSNzc33SJgrUR7Aab4PFG-O4nfTw@mail.gmail.com>
- <CAA3_GnpijQeBNVOqy6QtUMDjhy_ku_b54uf30zfEq=etMTqKrA@mail.gmail.com>
- <CANn89iK-Ojmi4kCZwXhFq-pG5PacLs=m71Jtw4zRpxaPEbJdhg@mail.gmail.com> <CAA3_GnpJ-RV=1xaf4DKRd30RgH0HoAxXJA1tx0cvBCX05OcYuA@mail.gmail.com>
-In-Reply-To: <CAA3_GnpJ-RV=1xaf4DKRd30RgH0HoAxXJA1tx0cvBCX05OcYuA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Feb 2026 18:11:26 +0100
-X-Gm-Features: AZwV_Qi5HFFMPVx5ILjN-D4qYqBYalcMJjpsT99MatUnx0HCyn5BRa-cmbfqMBE
-Message-ID: <CANn89iLVEJKoBtYNbAdLgxsPr03Fkgi9CJmTh1a0y0L5fV-HNA@mail.gmail.com>
-Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
-To: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
-Cc: pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255956-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,resnulli.us,gmail.com,nvidia.com,redhat.com,microchip.com,linux.dev,lists.osuosl.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255957-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8B85DCF7DB
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5853CCF8AD
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 11:46=E2=80=AFAM =E6=88=B8=E7=94=B0=E6=99=83=E5=A4=
-=AA <kota.toda@gmo-cybersecurity.com> wrote:
->
-> Here is the patch with the barriers added, based on v6.12.67.
->
-> However, as Yuki said, we are wondering if this would be considered an
-> acceptable change
-> from the perspective of the maintainers (or in terms of Linux kernel
-> culture). This is because
-> the patch adds `READ_ONCE` to several locations outside of bonding subsys=
-tem.
-> Please let me know if you have any concerns regarding this point.
->
-> >  Also, please clarify what happens with stacks of two or more bonding d=
-evices ?
->
-> To clarify, currently the `header_ops` of the bottom-most
-> interface are used regardless of the number of bonding layers.
-> This patch changes it so that `&bond->bond_header_ops` is used
-> as the bond device's `header_ops`, regardless of the stack depth.
+This series introduces Synchronous Ethernet (SyncE) support for the Intel
+E825-C Ethernet controller. Unlike previous generations where DPLL
+connections were implicitly assumed, the E825-C architecture relies
+on the platform firmware (ACPI) to describe the physical connections
+between the Ethernet controller and external DPLLs (such as the ZL3073x).
 
-Could you try to cook a patch series perhaps ?
+To accommodate this, the series extends the DPLL subsystem to support
+firmware node (fwnode) associations, asynchronous discovery via notifiers,
+and dynamic pin management. Additionally, a significant refactor of
+the DPLL reference counting logic is included to ensure robustness and
+debuggability.
 
-The READ_ONCE()/WRITE_ONCE() on dev->header_ops->cache could be done separa=
-tely.
+DPLL Core Extensions:
+* Firmware Node Association: Pins can now be associated with a struct
+  fwnode_handle after allocation via dpll_pin_fwnode_set(). This allows
+  drivers to link pin objects with their corresponding DT/ACPI nodes.
+* Asynchronous Notifiers: A raw notifier chain is added to the DPLL core.
+  This allows the Ethernet driver to subscribe to events and react when
+  the platform DPLL driver registers the parent pins, resolving probe
+  ordering dependencies.
+* Dynamic Indexing: Drivers can now request DPLL_PIN_IDX_UNSPEC to have
+  the core automatically allocate a unique pin index.
 
-Thanks.
+Reference Counting & Debugging:
+* Refactor: The reference counting logic in the core is consolidated.
+  Internal list management helpers now automatically handle hold/put
+  operations, removing fragile open-coded logic in the registration paths.
+* Reference Tracking: A new Kconfig option DPLL_REFCNT_TRACKER is added.
+  This allows developers to instrument and debug reference leaks by
+  recording stack traces for every get/put operation.
+
+Driver Updates:
+* zl3073x: Updated to associate pins with fwnode handles using the new
+  setter and support the 'mux' pin type.
+* ice: Implements the E825-C specific hardware configuration for SyncE
+  (CGU registers). It utilizes the new notifier and fwnode APIs to
+  dynamically discover and attach to the platform DPLLs.
+
+Patch Summary:
+Patch 1: DPLL Core (fwnode association).
+Patch 2: Driver zl3073x (Set fwnode).
+Patch 3-4: DPLL Core (Notifiers and dynamic IDs).
+Patch 5: Driver zl3073x (Mux type).
+Patch 6: DPLL Core (Refcount refactor).
+Patch 7-8: Refcount tracking infrastructure and driver updates.
+Patch 9: Driver ice (E825-C SyncE logic).
+
+Changes in v4:
+* Fixed documentation and function stub issues found by AI
+
+Arkadiusz Kubalewski (1):
+  ice: dpll: Support E825-C SyncE and dynamic pin discovery
+
+Ivan Vecera (7):
+  dpll: Allow associating dpll pin with a firmware node
+  dpll: zl3073x: Associate pin with fwnode handle
+  dpll: Support dynamic pin index allocation
+  dpll: zl3073x: Add support for mux pin type
+  dpll: Enhance and consolidate reference counting logic
+  dpll: Add reference count tracking support
+  drivers: Add support for DPLL reference count tracking
+
+Petr Oros (1):
+  dpll: Add notifier chain for dpll events
+
+ drivers/dpll/Kconfig                          |  15 +
+ drivers/dpll/dpll_core.c                      | 288 ++++++-
+ drivers/dpll/dpll_core.h                      |  11 +
+ drivers/dpll/dpll_netlink.c                   |   6 +
+ drivers/dpll/zl3073x/dpll.c                   |  15 +-
+ drivers/dpll/zl3073x/dpll.h                   |   2 +
+ drivers/dpll/zl3073x/prop.c                   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 755 +++++++++++++++---
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  30 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   3 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  32 +
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |   9 +-
+ drivers/net/ethernet/intel/ice/ice_tspll.c    | 217 +++++
+ drivers/net/ethernet/intel/ice/ice_tspll.h    |  13 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   6 +
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  16 +-
+ drivers/ptp/ptp_ocp.c                         |  18 +-
+ include/linux/dpll.h                          |  59 +-
+ 18 files changed, 1347 insertions(+), 150 deletions(-)
+
+-- 
+2.52.0
+
 
