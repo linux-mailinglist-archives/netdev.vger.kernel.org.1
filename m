@@ -1,134 +1,129 @@
-Return-Path: <netdev+bounces-255809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255810-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHo2Led2gGkV8gIAu9opvQ
-	(envelope-from <netdev+bounces-255809-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:05:27 +0100
+	id EKVgKxt4gGne8gIAu9opvQ
+	(envelope-from <netdev+bounces-255810-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:10:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD56FCA76B
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:05:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2EDECA9B2
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7A9433001CFD
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:01:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C4693037D5A
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563B52DB7BC;
-	Mon,  2 Feb 2026 10:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F432E8E09;
+	Mon,  2 Feb 2026 10:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="UfVdUp3Q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eA1Cmf3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A77D2727F3
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 10:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA65B13DDA4
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 10:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770026495; cv=none; b=Pxx1DoimTH9XUc/flfIDvMTkqEpYpeGhThBWgFrjf6EQkIypXeXRryN0NBA4m7+wTQZHMyDmhZbK3chtpWfeHp22JySkFobo24iF3a8Fr1Mac8d7shB55VaAjnNqUZg0UeEhp5GF3noOxNW0SOLr3YRIGIUy2SKQbBEHU555rys=
+	t=1770026634; cv=none; b=VRMTounXAEt50n3etGrDX7LCc2gxBcdYYkpCMZJqgucQQDgUfYr4/oDd2oOfE9HYmeOYZlTJ8LMrotV9sNMFfi5h8TJI7CzBO1JxgETWKwZ36Yr+QQ9JiXgaWL41uStmObq4GHdL0faHRXeT3Di7/2KH9s5J+Y6FXXJPHizDZ2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770026495; c=relaxed/simple;
-	bh=BT27XXnsF8PVSkgMhuFXuuDVDHqgX3B43iAqZHoPKug=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h6rJ5sBh3dGqtGgAuAm/PnepzM0AQnbwPasT/69kjmRKF7FlgLlQncfpAgqasAubD1iVO9ShZNty+e2cyfZzSoSgxEdn1iDsRF7iRqpYfuMe5Lq5mRo/XAPXKsq4XXZm9gzBbAdwbj+MJnu/tP0rRwcE20VmEuq0X2/VXp7h4xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=UfVdUp3Q; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 9824B20612;
-	Mon,  2 Feb 2026 11:01:31 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YOTzhElci5aq; Mon,  2 Feb 2026 11:01:31 +0100 (CET)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 1CCB920049;
-	Mon,  2 Feb 2026 11:01:31 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 1CCB920049
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1770026491;
-	bh=i90NN/5ACiS0RzdU5ZdUhx8eXQk0YKRJrIylpjF8U/s=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=UfVdUp3Qb/+taU+wKTnV9wx0KMoANOC6Ql+pGA7Z3CfVwkxSBpjgh10g3tYQQ0lx2
-	 htHXLEJgKyJCx1Qvx4B/0+VpaXkDMCYYVJ2fJlT3sh0B0uHrqJmAbHlCnamk18TYd1
-	 RmcP8z02WMcQA1zJatokmd0uMuD+4BFBEjpHnPlBcVmsFkxfHmKUN4s9Xvux6m9Z1N
-	 C9OyYc5xPFhhoKz4MGGnT7jKTT63kWP3LWX+Ye+B0skOiR2Z9KmuHT6nNP2Fkc31F1
-	 iyaVNR1jizydWmHjYe0AePDOuDHFkJcjpnaTS2xbIESj2GzHCoVNFowW7X7kwYKe1R
-	 GhZnm4C1zWWyQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Feb
- 2026 11:01:29 +0100
-Received: (nullmailer pid 1585532 invoked by uid 1000);
-	Mon, 02 Feb 2026 10:01:28 -0000
-Date: Mon, 2 Feb 2026 11:01:28 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Sabrina Dubroca
-	<sd@queasysnail.net>, Herbert Xu <herbert@gondor.apana.org.au>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Ilan Tayari <ilant@mellanox.com>, Guy Shapiro
-	<guysh@mellanox.com>, Yossi Kuperman <yossiku@mellanox.com>, Network
- Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v2] xfrm: always flush state and policy upon
- NETDEV_UNREGISTER event
-Message-ID: <aYB1-MtqQgPnjJjg@secunet.com>
-References: <cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp>
- <20260201141739.GE34749@unreal>
+	s=arc-20240116; t=1770026634; c=relaxed/simple;
+	bh=zU9xsdxQWo1cAJU6zW0aDwvPDV5V48zlvk8LzpLyOfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mYFPwnSVgOZmF7wG5vYLHYpKEtJ2eM/fgvfJZZDf6bPcl9VsMhzWn9NGPyGh0Sc5f6IkkVvdtdMq85m2gzXmafE9zqoqcQRiWoiNqVrN/ZeMLmw9iS7dYfovumcWzBKUiMJhvLkvSI00jQc8lB103xda5ZPEQiPXfDWzqh/ouqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eA1Cmf3U; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qE//TZYliqp6X02AKuMaRivUK7A25u9E1VF9BpM0TMk=; b=eA1Cmf3U+AlNGD3kezQEHFQU7H
+	Zt3u9f/cbJvdhlAFql5AhdZoiLL75RWbOH/2eSY5hh+N2CrPD7egUkBjs1ovtny44Es4CfvjhTq60
+	zNn1H5xTzlhL3SJaCzP5aTcX0y/9ndInm/RN+ZpAewZ151oKc70BwsBua6XRg5eP9lvGcwEPpQ+Tx
+	fW9Szrs4qEeRA69pIz2fl9vEQtCfy7FVXCq2I4wdtZaIB9N+rc33iFT4yxek+V5r+37A/hzYbVcVS
+	6efIrTGycDva1NtLWyrmLlCFPiwes2xv2Y4maLdAFraBLEzwidd/MS3Hsp49V/4sOGMP0dP2zlbQ/
+	6E24bRZA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60412)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vmqmL-000000003lt-0zDK;
+	Mon, 02 Feb 2026 10:03:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vmqmG-000000003Ij-3gQt;
+	Mon, 02 Feb 2026 10:03:28 +0000
+Date: Mon, 2 Feb 2026 10:03:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2 00/10] net: stmmac: rk: cleanups v3: mode and
+ speed for most
+Message-ID: <aYB2cKRu3DQh6yXK@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260201141739.GE34749@unreal>
-X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
- (10.32.0.171)
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255809-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,secunet.com:mid,secunet.com:dkim];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255810-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: DD56FCA76B
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: C2EDECA9B2
 X-Rspamd-Action: no action
 
-On Sun, Feb 01, 2026 at 04:17:39PM +0200, Leon Romanovsky wrote:
-> 
-> Steffen,
-> 
-> If you decide to take it, please queue it in your -next branch, so we will have enough
-> time to test in our regression. It seems too risky for -rc8.
+Hi,
 
-I plan to take the patch as is. It is a fix, so I'll
-take it into the ipsec tree, not ipsec-next. But
-I can hold it off until after the release if that
-will help regression testing.
+Third installment in the rk cleanups, this converts the interface mode
+and speed configuration for most RK SoCs.
+
+--
+v2: disable clocks on regmap_write() failure
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 846 ++++++++++---------------
+ 1 file changed, 345 insertions(+), 501 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
