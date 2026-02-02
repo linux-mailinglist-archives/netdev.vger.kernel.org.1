@@ -1,158 +1,155 @@
-Return-Path: <netdev+bounces-255853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255837-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNK6FSeXgGnL/gIAu9opvQ
-	(envelope-from <netdev+bounces-255853-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:23:03 +0100
+	id CKs5NliEgGnE8wIAu9opvQ
+	(envelope-from <netdev+bounces-255837-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:02:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80880CC4E1
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:23:02 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFF6CB69D
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B07C3010170
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:21:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C63C630059A1
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 11:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74249361674;
-	Mon,  2 Feb 2026 12:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8164E35D5FD;
+	Mon,  2 Feb 2026 11:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="L0P7fYB9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e1C5v3m7"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD03A125A9;
-	Mon,  2 Feb 2026 12:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E0623EA99;
+	Mon,  2 Feb 2026 11:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770034867; cv=none; b=GRE1R1LKws3Tu7Ipu+rK0Pbs+8cBUmdG2HyitpZAPI1v5vXFB2eqj4OwHDKxCfC6zSEUdUQNLdnCtsEbUF7QIfu4mYMcwl9RKsMjm6PYI/RMAcCp7AqLc5GLm5xVTB8eEl/eZRmPYXYB2Ch46lqLeXQmUY+ERZ4AOE3XLvIb0v0=
+	t=1770030166; cv=none; b=SNlzZ6rPrhqEiQjdxetKdsI3TkqALhrGsucNXEyAlWjDxlTIejO1LH+yaKn+8ABH/1ZuhaXMGRTPw3wqDrH0xl8Hw/7RTsiQBy4JdPvxpV+l+3fYGMZ0nJHkapydCFB8Dven9ILB7CUOS+l80ClaTiF6iuOoxmqWmfxkdi3aBQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770034867; c=relaxed/simple;
-	bh=AnT2YVUFFJTO+No6eubNJyX2iZEY+PrnugKi2bq8Qmk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qGZf058aioP6E1h+UGV4DSiPP/bpd6UL4JQckXPa6seVijQDML/fgTuRN1so44JtVKaHCSFnx44aOB/suUvarLmXzoRJjC6xm1uTXHnSrIcuslw7PTS7XwrCKqzJ7pnRBTXu4+OHGCaiKJJXA3MwcXBzM4+BSJJLY8lgK8z4r2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=L0P7fYB9; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=ryEz7iWunP67PC5bU94lyAnDGpTcxQMYgCmjDULTlMg=;
-	b=L0P7fYB9UrI9o9eIxZc2flmv4Gqj4ILOnxz1Ar659XR2GeVKDjvrXIUniritYKaeGp+T/G68B
-	212cX8hPa3MU/SvXygbgVKuy5UfeEjCRECa5ZvB4OMQLhEc0Qk/Qq3OUmvVwMXdTrmcyVhXfb5w
-	/lBGCad1/eSCi/Yf1oTtA5A=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4f4Qbl3TF5zKm4p;
-	Mon,  2 Feb 2026 20:17:23 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3A12040565;
-	Mon,  2 Feb 2026 20:20:55 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Mon, 2 Feb 2026 20:20:54 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <lantao5@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH net] net: hns3: fix double free issue for tx spare buffer
-Date: Mon, 2 Feb 2026 18:58:37 +0800
-Message-ID: <20260202105837.1909444-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	s=arc-20240116; t=1770030166; c=relaxed/simple;
+	bh=hZ26fDidiQHdeKBfaZdypSRdmQ/WD1YSdkZPa9SDtxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TTlUSGWfBJaoI1kGjvzLXiz28SCGn/ZUq/3v+uNCgqXa0m5wy+pVv0ygrKpEyfM2W9ST3DUabkVVag7dzekG7TyK4iof/ee2aAjf6M+7oHQ6kjG9NLZvbR7z4dQDtpm//GTSl3cBPXl8arqpT+j5CFgLSJMuRRIeMmNUIs7F/fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e1C5v3m7; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IOYz2TuhVp85h0jhI1HUwXLqYbeA4OKb+Y19Cz43y/E=; b=e1C5v3m71HQEFE+NdXuiJSWjVf
+	WB+g3NMiak3HrbVsDD1ryKPCC/bZC6BdPzGClmo5S5UttzXBG3gtgYBlL2T23POoudKMZQU57QxQQ
+	0P6JTwiarTXfajkZT2ws3UtV83W+PQGrORIYUun5jvxSSxPm72VlBJSL5ROI9mbazCwfIBFPuH55w
+	cPQMfKqLwmMzWo+G/J/aXjyywDBils1KDt/M5s5v64mrSO7c3izOuCto1chym22gCymLRlXoCR4yt
+	1ZpFfRXB5paLK4lkQOiiUFePEiU/dWnSCTRYEYpgQeDTGyBqq005UNEcMcTp5VftEsC4Y6S8caen1
+	RLgaCQVQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44854)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vmrhO-000000003tp-1v8X;
+	Mon, 02 Feb 2026 11:02:30 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vmrhL-000000003L4-3UCM;
+	Mon, 02 Feb 2026 11:02:27 +0000
+Date: Mon, 2 Feb 2026 11:02:27 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next v4 3/4] net: mdio: add unlocked mdiodev C45
+ bus accessors
+Message-ID: <aYCEQ1fAzc2OWcPP@shell.armlinux.org.uk>
+References: <cover.1767718090.git.daniel@makrotopia.org>
+ <36fbca0aaa0ca86450c565190931d987931ab958.1767718090.git.daniel@makrotopia.org>
+ <aV1MGQirTHyFdv7Q@shell.armlinux.org.uk>
+ <aV2OWT4g0jwfS548@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aV2OWT4g0jwfS548@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255853-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TAGGED_FROM(0.00)[bounces-255837-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 80880CC4E1
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 7EFF6CB69D
 X-Rspamd-Action: no action
 
-From: Jian Shen <shenjian15@huawei.com>
+On Tue, Jan 06, 2026 at 10:36:09PM +0000, Daniel Golle wrote:
+> On Tue, Jan 06, 2026 at 05:53:29PM +0000, Russell King (Oracle) wrote:
+> > On Tue, Jan 06, 2026 at 05:14:57PM +0000, Daniel Golle wrote:
+> > > +static inline int __mdiodev_c45_write(struct mdio_device *mdiodev, u32 devad,
+> > > +				      u16 regnum, u16 val)
+> > > +{
+> > > +	return __mdiobus_c45_write(mdiodev->bus, mdiodev->addr, devad, regnum,
+> > > +				 val);
+> > 
+> > Something doesn't look right here - missing a couple of spaces to
+> > correctly align? I suspect checkpatch would spot it?
+> 
+> Somehow those two spaces got dropped somewhere on the way. Strangely
+> neither checkpatch.pl locally nor on patchwork[1] caught that -- maybe
+> because 'return' statements are somehow treated differently?
+> 
+> Anyway, fixed in my local tree now and going to be fixed in v5.
+> 
+> Are you otherwise fine with adding those unlocked mdiodev c45 helpers?
 
-The driver missed to clear ring->tx_spare to NULL when
-fail to initialize tx spare buffer. And it will try to
-free the tx spare buffer in hns3_fini_ring() if tx_spare
-is not NULL. So it may cause double free issue.
+Yes.
 
-Fixes: 907676b130711 ("net: hns3: use tx bounce buffer for small packets")
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 7a9573dcab74..e879b04e21b0 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -1048,13 +1048,13 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- 	int order;
- 
- 	if (!alloc_size)
--		return;
-+		goto not_init;
- 
- 	order = get_order(alloc_size);
- 	if (order > MAX_PAGE_ORDER) {
- 		if (net_ratelimit())
- 			dev_warn(ring_to_dev(ring), "failed to allocate tx spare buffer, exceed to max order\n");
--		return;
-+		goto not_init;
- 	}
- 
- 	tx_spare = devm_kzalloc(ring_to_dev(ring), sizeof(*tx_spare),
-@@ -1092,6 +1092,13 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- 	devm_kfree(ring_to_dev(ring), tx_spare);
- devm_kzalloc_error:
- 	ring->tqp->handle->kinfo.tx_spare_buf_size = 0;
-+not_init:
-+	/* When driver init or reset_init, the ring->tx_spare is always NULL;
-+	 * but when called from hns3_set_ringparam, it's usually not NULL, and
-+	 * will be restored if hns3_init_all_ring() failed. So it's safe to set
-+	 * ring->tx_spare to NULL here.
-+	 */
-+	ring->tx_spare = NULL;
- }
- 
- /* Use hns3_tx_spare_space() to make sure there is enough buffer
 -- 
-2.33.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
