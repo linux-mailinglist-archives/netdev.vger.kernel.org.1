@@ -1,126 +1,144 @@
-Return-Path: <netdev+bounces-255691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMt6Hsr/f2kn1QIAu9opvQ
-	(envelope-from <netdev+bounces-255691-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 02:37:14 +0100
+	id EBwUOOkHgGkq1wIAu9opvQ
+	(envelope-from <netdev+bounces-255694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 03:11:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97C0C7C5D
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 02:37:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88191C7D97
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 03:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C9C73007954
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 01:37:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F08333000880
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 02:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627EE39FD4;
-	Mon,  2 Feb 2026 01:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98371ADC83;
+	Mon,  2 Feb 2026 02:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IWd83D4K"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OV3rHIoe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441EC1B808;
-	Mon,  2 Feb 2026 01:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954421531C8
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 02:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769996220; cv=none; b=qt+XzPwbkskyPX62j8Ij80aDvBZ7esa6iVN0oaWm/Lw/B6nFaXUblyyEzGQDsl+SlVdwuyGbne1fBQ3bMwA2s4Ta7B+adv+L4H9kRbljYcd/XEbFtfGPw0JNxf7oK4/CISYIEqhS6TGtW9xabFTAtjSk4pdQ+8cHOdhGMW4zGC4=
+	t=1769998310; cv=none; b=iqSMUtfX40gem8i5NgXNG2rk1yFJJiuIGllbFrUT3g6t6JgPY4cdhwttYj9K5mX4XHJ/nxKeLULNA921NUlpUaBMBUo4uh7/ZQZSEXfut3l+32if3HBmQKMCeHTGsXxY7hr5pnkGIZFs/WraEM9j0Se64eMHSpLByY8th8imJXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769996220; c=relaxed/simple;
-	bh=ETZ+62J+NEaiIT2xIi7QLCl79Aw4vvIfnMq2tEMZXZI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vDrNCx2tNzHfTPwtObnJ0RQ+Q2egNmuPpbjS0qhd/T8+wit5wPjYrBRztmZP6IM5iTiR6sy6ehKCb++D8XZkPhMoY7on+VuEBK4vRlsQe+RADxgoWz8CkVwSI0EHu+5/xw52ZhMpDkFTVCuI+NtD7ZjLJQ4atqfo820lUkaPB00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IWd83D4K; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <524246d9-bc9b-4d65-814d-d544b53bcd0b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769996205;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ETZ+62J+NEaiIT2xIi7QLCl79Aw4vvIfnMq2tEMZXZI=;
-	b=IWd83D4KhaPIx+Dj979Nf3QydeIapFOGLD3toXTVuMqcMaNURbg6LL4gnfLt6wvJEQeaY4
-	9jGoskxMncIe8lwAUoOE881b6RI330dT9rCiMPIfI2ZD1hPYBUN+Z75SknEWLeavDjnqQy
-	bCbZ58D5MeZ9slbFKKqJgQoYDrjRpGU=
-Date: Mon, 2 Feb 2026 09:36:26 +0800
+	s=arc-20240116; t=1769998310; c=relaxed/simple;
+	bh=YUJDwKGdxTvppASRafZF2OTsXz5pF2johsyqZtYNH+s=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=DzmAe5rOshUJyxMq394DKuil8LmOdGfayDC5l4k3qEWcJUxp7U4zinPHYcHUgTiEtL3c/gMu4VvrnVNOabeQ3cRnJyQ64s2nfu7ew+EUO/e9UxgRCrJ3JNK5ruGPS+bGBYHRNelynNZCfVYKXZLyXkXDRyirgzMDco9dEri3zPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OV3rHIoe; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1769998298; h=Message-ID:Subject:Date:From:To;
+	bh=YUJDwKGdxTvppASRafZF2OTsXz5pF2johsyqZtYNH+s=;
+	b=OV3rHIoegMyZ+hSaCpWXrt1MyE3AZimdqeU1RkIPfrJww4iiDeJ2lvsiZP9oTte33YEVhKDy+gmdk01bd9uCrs8Jy5kbhEV7kfOFWzviiASRcFtI92OvJK4RLCN1tKYiBZ2bwcd6yizqDLMxztdGgwgfgYKGOeBRTh2KjRV8I6k=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WyI0WA8_1769998297 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 02 Feb 2026 10:11:37 +0800
+Message-ID: <1769998184.776148-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [net-next,v24,6/6] eea: introduce callback for ndo_get_stats64
+Date: Mon, 2 Feb 2026 10:09:44 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ lorenzo@kernel.org,
+ andrew+netdev@lunn.ch,
+ hkallweit1@gmail.com,
+ dust.li@linux.alibaba.com,
+ edumazet@google.com,
+ davem@davemloft.net,
+ pabeni@redhat.com,
+ lulie@linux.alibaba.com,
+ andrew@lunn.ch,
+ netdev@vger.kernel.org,
+ guwen@linux.alibaba.com,
+ dong100@mucse.com,
+ lukas.bulwahn@redhat.com,
+ vadim.fedorenko@linux.dev,
+ enelsonmoore@gmail.com
+References: <20260130093412.98407-1-xuanzhuo@linux.alibaba.com>
+ <20260130093412.98407-7-xuanzhuo@linux.alibaba.com>
+ <20260130233245.923444-1-kuba@kernel.org>
+In-Reply-To: <20260130233245.923444-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: stmmac: Correct spelling from clk_scr_i to
- clk_csr_i
-To: Huacai Chen <chenhuacai@loongson.cn>, Huacai Chen
- <chenhuacai@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Serge Semin <fancer.lancer@gmail.com>,
- loongarch@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260201023619.366505-1-chenhuacai@loongson.cn>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <20260201023619.366505-1-chenhuacai@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255691-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,linux.alibaba.com,google.com,davemloft.net,redhat.com,vger.kernel.org,mucse.com,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,synopsys.com,gmail.com,lists.linux.dev,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-255694-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[si.yanteng@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,loongson.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D97C0C7C5D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim]
+X-Rspamd-Queue-Id: 88191C7D97
 X-Rspamd-Action: no action
 
-
-在 2026/2/1 10:36, Huacai Chen 写道:
-> In include/linux/stmmac.h clk_csr_i is spelled as clk_scr_i by mistake,
-> so correct it.
+On Fri, 30 Jan 2026 15:32:45 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 >
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> eea: introduce callback for ndo_get_stats64
+>
+> This commit adds ndo_get_stats64 support to the Alibaba Elastic Ethernet
+> Adapter driver and introduces a spinlock to protect concurrent access to
+> rx and tx pointers when gathering statistics.
+>
+> The commit message says "Add basic driver framework for the Alibaba
+> Elastic Ethernet Adapter(EEA)." But shouldn't this say it's adding stats
+> support to an existing framework rather than adding the basic framework
+> itself? The other commits in the series appear to have already introduced
+> the framework.
 
-fix tag?
-
-But this is just a comment, no need to backport it (I'm fine either way).
-
-If no fix tag, please update the subject to typo fix instead.
+Will update the commit log.
 
 
-Thanks,
+>
+> This commit introduces a spinlock to protect against races between
+> eea_stats() and the queue setup/teardown functions. The race being fixed
+> was introduced in commit cf49df362e30 ("eea: create/destroy rx,tx queues
+> for netdevice open and stop"). Should this commit include a Fixes: tag?
 
-Yanteng
+Not fix, before this commit, there is no race problem.
+There are protected by rtnl.
+
+Thanks.
 
 
+
+>
+> Fixes: cf49df362e30 ("eea: create/destroy rx,tx queues for netdevice open and stop")
 
