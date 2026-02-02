@@ -1,264 +1,177 @@
-Return-Path: <netdev+bounces-256018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IFoAB8cgWm0EAMAu9opvQ
-	(envelope-from <netdev+bounces-256018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:50:23 +0100
+	id AHL3J4kcgWm0EAMAu9opvQ
+	(envelope-from <netdev+bounces-256019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:52:09 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 791EDD1D77
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:50:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12441D1DE2
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF1933051CBC
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 21:48:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60ABC30416EC
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 21:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECDE314A64;
-	Mon,  2 Feb 2026 21:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D47314A73;
+	Mon,  2 Feb 2026 21:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YeppS5uA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bKYcQ3L1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC173148CD
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 21:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F593128D2;
+	Mon,  2 Feb 2026 21:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770068904; cv=none; b=LKsgDCxFtrlHa0yjywqFKvUk/uXfPJ9Nm1on2RunvM7XeNLymHBDJjysZSR323LkN0V83mE+9b5S0ONkZKEXQSZJv/3RFXkYjVVIAfo2mr51DLf2JtbECuqVgMY+VNTrByCRZTrCNpJhngXD1B3bioARb3NU60MGnKFP1QtPN0s=
+	t=1770068972; cv=none; b=jBT1dsdjx/iSgE2IItfHA4G3s6BgHR2LLCBlGm+rVbynppTyZNMIPhWfsI/9FnxO3ByqppVS+MA2trGiN62bLpcZm+KmBb2leyZyULbB0GzDBn2fnFy5eE9lujnx5LqNHZ8Cw5BrfwjO0mVfYIn3BShw5pJ3kYY560ypXkJL1hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770068904; c=relaxed/simple;
-	bh=sRBNZON7oW9WvFwOdR9auvkrhzjheeJQcj/mDu/ihqA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DQaFkWgwli9EqjJeGKQDHYVs5MONUMVeecNriENp6Na/6H8XMT+kqPQ/Sp2SvYEo8y6rQxOzflv7lhfDTlwZQntld5cXbCmHy/AnqFhzBWD1LvTCyCNMuHvQs0UzmAF6fRVHZkKCacD8ienU/chuX+/R6o8QtcK57dZ10rHZMbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YeppS5uA; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a8a7269547so47785715ad.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 13:48:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770068902; x=1770673702; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ANJntNTEBOQFcB1rB+a7FIJxQ8XZz4gzzWECmu7M+1M=;
-        b=YeppS5uAw3jhHpDKJknWloGd/eXhdD2AtVLcVCKVV91MOfPrYQNtHFNJi41CFhb5Sp
-         STiiWqbUWTVVs1vz5EdA5V6OBrHhqv0IunHjByQiA0jO77HdPU4RVd8jzcSX1ejUjIOP
-         2alfJ55sTgLIv6rumGwSG/4Et1BVRooWM/ZIU0TRrax003DsI+oXY5RXxlTY0uHBBzD9
-         aHz+WgPr6cXPgTPLm3EGmiPfHCUn8gA/HyRyIaGhS4ry/fsC9pS2h3+0foUQjbLqscnN
-         0aBOBsesJgWFoJ0DvYMzQMH1PDF4haE6E3HJk4MiwWqAK9gcelwx/3POl9tWiviRNSQa
-         znpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770068902; x=1770673702;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ANJntNTEBOQFcB1rB+a7FIJxQ8XZz4gzzWECmu7M+1M=;
-        b=vpW9zffn437dEMAds8Tcre8tWw4LszwSG9R3fuubhKN4x1G8LLRiuyK6/me5L18sYW
-         SaELQ2guKpE8NJnYW4WF0kDvzkvILACSU1MWMt8/AAWhnszPGkl/lynCMIHwHHohut8Z
-         5eK9ZmdDp5Mcx4rIqGw0wsXjv8z93RtvgK8jhUqjvVxHT6JUc50GRy/unayOx3/lFUuO
-         lecO8O1nqZly8V+UxfzMvW2S4em/gQQ3gxjVocz3B0U8k49QNPuSdWKU5oT6ps7RXDSe
-         n5qPHcMWoGFI1e14Jtmw5MectTW0ryE8495NACezJDLcCFNKLfaPbm9iu6evkX7cqHwm
-         pspQ==
-X-Gm-Message-State: AOJu0YzkevSj6omgBSFOoJVIBUK6EVtjt02xSF2VaN7MURXvMli34lCy
-	UM3zGXJ9RoOrFlVdGni8vaV4OjNKUqpWP0fa8DvZqo1yZ4O5X3QvvAWe
-X-Gm-Gg: AZuq6aIIJffxXQ3zHdM9LR+uSVFhkxRLGJJZVi3Z95w+aXqmyr/XBfmQMOFTF+94Hgt
-	xhuHK2Li47eCTSuRUZcoigElGVnmGk/Nu27/uyn+7Ojso4zdQ83iqfYojVkvsIRodLJRyeC/Gfb
-	8fCFI0Mcl7UF7Ek81NgzBhzy3Rv94nSnfVLsFDNgGlMVdt/TNiW8qB9cYQgsOA7fkb7DQcESj3S
-	DbZ1DaiY8uHiN1S8zB6L+pJBspt4fC3cnnodlF3+Z0FiTclGFU8pzyqMge9gGkoDpktXcoLCuC9
-	szQ91rJCqZQYvfLQR/h02R5g+/LJJEnseagMNb3vaxRTWS1JFTZT38yoU/vk166J3XoqMkoi6pF
-	R7Vvt/4y0wvecxAS22ZBTk+CTpowkkBPD314jXxvr+Vpx+4T5+RAzTP2pA9KmoatzO+QocWbwMY
-	gchGCLj69LWFda
-X-Received: by 2002:a17:903:8c6:b0:2a7:a6b1:4f8d with SMTP id d9443c01a7336-2a8d9931d2emr146281985ad.40.1770068901718;
-        Mon, 02 Feb 2026 13:48:21 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:72::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a8b47f4717sm147463335ad.18.2026.02.02.13.48.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 13:48:21 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [RFC PATCH bpf-next v1 4/4] selftests/bpf: Test using slice after invalidating dynptr clone
-Date: Mon,  2 Feb 2026 13:48:17 -0800
-Message-ID: <20260202214817.2853236-4-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260202214817.2853236-1-ameryhung@gmail.com>
-References: <20260202214817.2853236-1-ameryhung@gmail.com>
+	s=arc-20240116; t=1770068972; c=relaxed/simple;
+	bh=EY2CrS28kRVeb7uWnMWJfY8xjXKXRdCHiuTKy5sQkoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BhUd6JJ1bx97T3jXMyI80u4O8IHCHQJPKglNn78RQWfl9XAighO1EFcwhAn7UbYZU74CwD7AUT5jMeHHkLYuvY0aGt94x/lqy8Uiv2Us1U904UK+wjro89bMVuiNiu6t731lZ8j2N07zjbERXCqo4e2jGQbUNC41mvCONTkRZbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bKYcQ3L1; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770068970; x=1801604970;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EY2CrS28kRVeb7uWnMWJfY8xjXKXRdCHiuTKy5sQkoY=;
+  b=bKYcQ3L1AlHtTx3aL3vINnmlrJcTWTV6JnNoVpMC3EQsPEtmRHmHWAJB
+   dgptjY9N5Kot5pOko6ts1ab6b8O44jrgbtqZXhhnr5iRaSPPWc/iMVD2X
+   6n59WqhjMpg0CZy84KMj4SarOsZZcISyRMzpwIB96B+9PgLOo0DylPFEX
+   ah1kQP7GvM/X7AOAHCfVeQySIts0XkZ8d5Jik7jszVh4rHjXB+n1dxBKJ
+   R62cBqbpYYSjEeJuWV+rbTr7+UGvHFEeraMEWgFKIXD5HdvRPx2Y7ndib
+   OJWa5XTPbHXhjsE/pn9ZAAMjRX/rcjS9BRsU67ibRnLlU/x5Ft0GWFAuA
+   Q==;
+X-CSE-ConnectionGUID: iYpCt/ImSmiCj4tnMUqnOg==
+X-CSE-MsgGUID: gzLtq9edQOKRvrB0HrbDVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="71317560"
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="71317560"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 13:49:30 -0800
+X-CSE-ConnectionGUID: 1mLhGU+kRviswRU3MKb1ZA==
+X-CSE-MsgGUID: 3/hN4atiQQuJCR8s9tAfFQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="208743963"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 02 Feb 2026 13:49:24 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vn1nN-00000000fzM-1pxx;
+	Mon, 02 Feb 2026 21:49:21 +0000
+Date: Tue, 3 Feb 2026 05:48:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	linux-rdma@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4 7/9] dpll: Add reference
+ count tracking support
+Message-ID: <202602030538.6ok1xugA-lkp@intel.com>
+References: <20260202171638.17427-8-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260202171638.17427-8-ivecera@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256018-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[lists.linux.dev,google.com,intel.com,kernel.org,vger.kernel.org,lists.osuosl.org,redhat.com,resnulli.us,gmail.com,microchip.com,linux.dev,nvidia.com,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-256019-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 791EDD1D77
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 12441D1DE2
 X-Rspamd-Action: no action
 
-The parent object of a cloned dynptr is skb not the original dynptr.
-Invalidate the original dynptr should not prevent the program from
-using the slice derived from the cloned dynptr.
+Hi Ivan,
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../selftests/bpf/prog_tests/bpf_qdisc.c      | 14 ++++
- .../bpf/progs/bpf_qdisc_dynptr_clone.c        | 69 +++++++++++++++++++
- 2 files changed, 83 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_clone.c
+kernel test robot noticed the following build errors:
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-index ec5b346138c5..ba14738c509b 100644
---- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-@@ -11,6 +11,7 @@
- #include "bpf_qdisc_fail__invalid_dynptr.skel.h"
- #include "bpf_qdisc_fail__invalid_dynptr_slice.skel.h"
- #include "bpf_qdisc_fail__invalid_dynptr_cross_frame.skel.h"
-+#include "bpf_qdisc_dynptr_clone.skel.h"
- 
- #define LO_IFINDEX 1
- 
-@@ -186,6 +187,17 @@ static void test_invalid_dynptr_cross_frame(void)
- 		bpf_qdisc_fail__invalid_dynptr_cross_frame__destroy(skel);
- }
- 
-+static void test_dynptr_clone(void)
-+{
-+	struct bpf_qdisc_dynptr_clone *skel;
-+
-+	skel = bpf_qdisc_dynptr_clone__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "bpf_qdisc_dynptr_clone__open_and_load"))
-+		return;
-+
-+	bpf_qdisc_dynptr_clone__destroy(skel);
-+}
-+
- static int get_default_qdisc(char *qdisc_name)
- {
- 	FILE *f;
-@@ -259,6 +271,8 @@ void test_ns_bpf_qdisc(void)
- 		test_invalid_dynptr_slice();
- 	if (test__start_subtest("invalid_dynptr_cross_frame"))
- 		test_invalid_dynptr_cross_frame();
-+	if (test__start_subtest("dynptr_clone"))
-+		test_dynptr_clone();
- }
- 
- void serial_test_bpf_qdisc_default(void)
-diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_clone.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_clone.c
-new file mode 100644
-index 000000000000..f23581e19da1
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_clone.c
-@@ -0,0 +1,69 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <vmlinux.h>
-+#include "bpf_experimental.h"
-+#include "bpf_qdisc_common.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+int proto;
-+
-+SEC("struct_ops")
-+int BPF_PROG(bpf_qdisc_test_enqueue, struct sk_buff *skb, struct Qdisc *sch,
-+	     struct bpf_sk_buff_ptr *to_free)
-+{
-+	struct bpf_dynptr ptr, ptr_clone;
-+	struct ethhdr *hdr;
-+
-+	bpf_dynptr_from_skb((struct __sk_buff *)skb, 0, &ptr);
-+
-+	bpf_dynptr_clone(&ptr, &ptr_clone);
-+
-+	hdr = bpf_dynptr_slice(&ptr_clone, 0, NULL, sizeof(*hdr));
-+	if (!hdr) {
-+		bpf_qdisc_skb_drop(skb, to_free);
-+		return NET_XMIT_DROP;
-+	}
-+
-+	*(int *)&ptr = 0;
-+
-+	proto = hdr->h_proto;
-+
-+	bpf_qdisc_skb_drop(skb, to_free);
-+
-+	return NET_XMIT_DROP;
-+}
-+
-+SEC("struct_ops")
-+struct sk_buff *BPF_PROG(bpf_qdisc_test_dequeue, struct Qdisc *sch)
-+{
-+	return NULL;
-+}
-+
-+SEC("struct_ops")
-+int BPF_PROG(bpf_qdisc_test_init, struct Qdisc *sch, struct nlattr *opt,
-+	     struct netlink_ext_ack *extack)
-+{
-+	return 0;
-+}
-+
-+SEC("struct_ops")
-+void BPF_PROG(bpf_qdisc_test_reset, struct Qdisc *sch)
-+{
-+}
-+
-+SEC("struct_ops")
-+void BPF_PROG(bpf_qdisc_test_destroy, struct Qdisc *sch)
-+{
-+}
-+
-+SEC(".struct_ops")
-+struct Qdisc_ops test = {
-+	.enqueue   = (void *)bpf_qdisc_test_enqueue,
-+	.dequeue   = (void *)bpf_qdisc_test_dequeue,
-+	.init      = (void *)bpf_qdisc_test_init,
-+	.reset     = (void *)bpf_qdisc_test_reset,
-+	.destroy   = (void *)bpf_qdisc_test_destroy,
-+	.id        = "bpf_qdisc_test",
-+};
-+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dpll-Allow-associating-dpll-pin-with-a-firmware-node/20260203-012705
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260202171638.17427-8-ivecera%40redhat.com
+patch subject: [Intel-wired-lan] [PATCH net-next v4 7/9] dpll: Add reference count tracking support
+config: i386-randconfig-141-20260203 (https://download.01.org/0day-ci/archive/20260203/202602030538.6ok1xugA-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+smatch version: v0.5.0-8994-gd50c5a4c
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602030538.6ok1xugA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602030538.6ok1xugA-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/core/rtnetlink.c:61:
+>> include/linux/dpll.h:235:1: error: expected identifier or '('
+     235 | {
+         | ^
+   1 error generated.
+
+
+vim +235 include/linux/dpll.h
+
+877c40367bc8a7 Ivan Vecera 2026-02-02  232  
+877c40367bc8a7 Ivan Vecera 2026-02-02  233  static inline struct dpll_pin *
+bed78c2008cb37 Ivan Vecera 2026-02-02  234  fwnode_dpll_pin_find(struct fwnode_handle *fwnode, dpll_tracker *tracker);
+877c40367bc8a7 Ivan Vecera 2026-02-02 @235  {
+877c40367bc8a7 Ivan Vecera 2026-02-02  236  	return NULL;
+877c40367bc8a7 Ivan Vecera 2026-02-02  237  }
+5f18426928800c Jiri Pirko  2023-09-13  238  #endif
+5f18426928800c Jiri Pirko  2023-09-13  239  
+
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
