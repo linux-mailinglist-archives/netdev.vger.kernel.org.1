@@ -1,134 +1,224 @@
-Return-Path: <netdev+bounces-256020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256021-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDX1OKEdgWm0EAMAu9opvQ
-	(envelope-from <netdev+bounces-256020-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:56:49 +0100
+	id oLIuGmoggWm0EAMAu9opvQ
+	(envelope-from <netdev+bounces-256021-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:08:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82381D1E36
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:56:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C18E9D1F27
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:08:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D38A13004F15
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 21:56:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20E07301C8B3
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 22:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69BF318BAE;
-	Mon,  2 Feb 2026 21:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE373324B1D;
+	Mon,  2 Feb 2026 22:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TnPxR8X+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0VGAEeMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563C33164D8;
-	Mon,  2 Feb 2026 21:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B313242D7;
+	Mon,  2 Feb 2026 22:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770069407; cv=none; b=gxYvkmupPEgutV+XS7Z5qg3Z/Mw9lTfPaO5yWHqOjCGiKPxjVG/dGwUx9faSaXXNx9M0ivacA5CtsRENYn2mdAEfLPLzWMeMidGU5O1AqIz2T5B/nSyTw47pFS7sM7D30Mm5W6KpFLcD1qZy98qT2XnUhoFaf29yHdJzCocTmWo=
+	t=1770070076; cv=none; b=AX//4Uiz0Ri/iJzYrcJGL69Mod3P3LcZAfr5tIgw6iG+e6/elQmKlxDH9p+t3MRO2tGzvWl+VFo4Id4KqZ5jZj483DIebTFqlSWACNu1fhObKgGVodwUKT/IEf4zyp9ODbd/3CDrIALt5RtEAdg1ZpwRavmQ3PNN/49bYz20cD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770069407; c=relaxed/simple;
-	bh=icNL53FMGHZpKJ4q+2FtrZzRr7eH0qXFby9T73+w2xA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QNsa1IJDZbA+u4hDB2eaYQ2ecZVQPG5I7dEGMPM1XqyGgykuBMn4L99Zrs+Lsmpyk4wBWVk5FGm4HXv/sjwFYxBm+uMI/vJcdUA4h33Wc/J4smVAc7Ul1nqFSq0rdG9Pb+iGXw1rXti2jpBQG/gI+PGh6oynuYwcfuWavrQ56R0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TnPxR8X+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=rJvzut9ZNDadtUO4vR0GCubAl85vutbghKxFZL86ddI=; b=Tn
-	PxR8X+/lLbO1GfT2BaLa4eARDN6IEu7e9CjwsRQ5R4hH/L1ShhyD4GOae6iH8OsOg0IYv5idoI9fp
-	xYKcV5GFu8MwUlDGM6Nb4xeq1y/KPEaG5yluGqwqfHOUrHnvdqNLhZx/rcHk7M695EzjPfVAhmgCM
-	1aSTmhpLBNleiPY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vn1uV-005sPv-2L; Mon, 02 Feb 2026 22:56:43 +0100
-Date: Mon, 2 Feb 2026 22:56:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, linux-can@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Thomas =?iso-8859-1?Q?M=FChlbacher?= <tmuehlbacher@posteo.net>,
-	Oliver Hartkopp <socketcan@hartkopp.net>
-Subject: Re: [PATCH net-next] net: remove unnecessary module_init/exit
- functions
-Message-ID: <4b7b8238-3997-45d1-a8ee-b659afc0374c@lunn.ch>
-References: <20260131004327.18112-1-enelsonmoore@gmail.com>
- <66924451-2b19-4a3b-ba99-16437dc79011@lunn.ch>
- <CADkSEUjEYY=Wwyumv3Ft_T=xWLJY2hiy4uw_YMus=4o=61H+BQ@mail.gmail.com>
+	s=arc-20240116; t=1770070076; c=relaxed/simple;
+	bh=bnqz5Lg6zNKkWyFFDbFNMuu1DFfsTzpptKhA1xhLbYY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BDr6GmbHrS0KthF0I1t//77gfhymM/kMHo1Lop8SpUuPAB1SSf7+C2NOxyS3KtqkpBNHvYxV2ectJp2PTBUSFqhY6L+Zj6cf+C+ezEptR61YAp6LlJtYkglNaBggLoYFI6jzXx6C+ufM1CbRPOHaUYoqTeBjum0Gok28K71x08o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0VGAEeMQ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=tQeInzoDicgl882XpJgNlflAuI9sUNfJX9nLKOj1C6U=; b=0VGAEeMQq9zyPoVeCSBkEdtC1b
+	IyATzwMpgVSpweaqcrhV45DJMFaK8BGy6taCJ3kfc5O0tGd1fyOK+bVZiykflvhRHwJffw5DOcqiI
+	8zN4qf53qI7I1D5dUPUnx31er1WJzEuf8e4k9OggbUJdkrddZHmpC3rkEhYQE7kg2qyai5E6/7b4n
+	6ooPCHL/zX3QWjOELoDMUd49WgSWf9/gTc2oRzYBlrZcRmF18nsY/fbKh8T6MSLr/NVg7157hhIon
+	tE3eq6eU5vEw7VDTw0LTmX8TT9Q8HUw88la6Rvh8hQ0QjS2dr+OWk1n8Xydg4/uRbn7EJusPAAE2x
+	zAMNh1eQ==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vn25I-00000005goZ-0Nzk;
+	Mon, 02 Feb 2026 22:07:52 +0000
+Message-ID: <136674a3-cf8d-4da9-a82d-d0edea6aca03@infradead.org>
+Date: Mon, 2 Feb 2026 14:07:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADkSEUjEYY=Wwyumv3Ft_T=xWLJY2hiy4uw_YMus=4o=61H+BQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next] net/iucv: clean up iucv kernel-doc warnings
+To: Alexandra Winter <wintera@linux.ibm.com>, netdev@vger.kernel.org
+Cc: Thorsten Winkler <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+References: <20260201072309.222155-1-rdunlap@infradead.org>
+ <2ddf6abd-d10c-4d75-8f84-0fd1ccb5435c@linux.ibm.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <2ddf6abd-d10c-4d75-8f84-0fd1ccb5435c@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-256021-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256020-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 82381D1E36
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email,infradead.org:dkim,infradead.org:mid]
+X-Rspamd-Queue-Id: C18E9D1F27
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 12:33:08PM -0800, Ethan Nelson-Moore wrote:
-> Hi, Andrew,
+Hi,
+
+On 2/2/26 7:35 AM, Alexandra Winter wrote:
 > 
-> On Mon, Feb 2, 2026 at 12:29 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> > I could be missing it, but which module does not have an module_exit
-> > function?
-> None of them. That sentence was just to explain why other instances of
-> empty module_exit functions were not removed, in case someone else
-> tries to do that. I didn't realize module_exit was required to unload
-> the module at first, and other people might not either.
+> 
+> On 01.02.26 08:23, Randy Dunlap wrote:
+>> Fix numerous (many) kernel-doc warnings in iucv.[ch]:
+>>
+>> - remove kernel-doc on static functions in iucv.c
+>> - convert function documentation comments to a common (kernel-doc) look,
+>>   even for static functions (without "/**")
+>> - use matching parameter and parameter description names
+>>
+>> Examples:
+>>
+>> Warning: include/net/iucv/iucv.h:210 missing initial short description
+>>  on line: * iucv_unregister
+>> Warning: include/net/iucv/iucv.h:216 function parameter 'handle' not
+>>  described in 'iucv_unregister'
+>> Warning: include/net/iucv/iucv.h:467 function parameter 'answer' not
+>>  described in 'iucv_message_send2way'
+>> Warning: net/iucv/iucv.c:727 missing initial short description on line:
+>>  * iucv_cleanup_queue
+>>
+>> Build-tested with both "make htmldocs" and "make ARCH=s390 defconfig all".
+>>
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> ---
+> 
+> Thank you very much for your effort Randy.
+> FYI: I had to use 'scripts/kernel-doc.py -none -Wall include/net/iucv/*' to see the warnings.
+> 
+> 
+> 
+>> v2:
+>> - correct verbs in descriptions of 2 functions (Jakub)
+>> - removed duplicate kernel-doc comments from the header file (Jakub)
+>>
+>> Cc: Alexandra Winter <wintera@linux.ibm.com>
+>> Cc: Thorsten Winkler <twinkler@linux.ibm.com>
+>> Cc: linux-s390@vger.kernel.org
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>>
+>>  include/net/iucv/iucv.h |  209 ------------------------------
+>>  net/iucv/iucv.c         |  259 ++++++++++++++++++--------------------
+>>  2 files changed, 128 insertions(+), 340 deletions(-)
+>>
+>> --- linux-next-20260130.orig/include/net/iucv/iucv.h
+>> +++ linux-next-20260130/include/net/iucv/iucv.h
+>> @@ -70,7 +70,7 @@
+>>  #define IUCV_IPLOCAL	0x01
+>>  
+>>  /*
+>> - * iucv_array : Defines buffer array.
+>> + * iucv_array - Defines buffer array.
+> 
+> Did that create a kernel doc warning? It's a struct, not a function.
 
-You need to be careful with commit messages. Reviewers read them, and
-think about the implications of what they say. As a result, you wasted
-some of my time looking for a driver which did not have an
-module_exit, and wondering if there was a legitimate reason for not
-having it, and had you just broken it....
+It's not kernel-doc, so no warning.
+However, JFYI, for kernel-doc, it would need a "short description" after the
+hyphen, whether it's a function, struct, enum, typedef, union, or define (macro).
 
-       Andrew
+
+> I propose
+> + * struct iucv_array
+> like other structs in this file.
+
+OK, that's fine for structs that don't have kernel-doc notation.
+
+> [...]
+> 
+>> @@ -757,13 +742,12 @@ static void iucv_cleanup_queue(void)
+>>  }
+>>
+>>  /**
+>> - * iucv_register:
+>> + * iucv_register - Registers a driver with IUCV.
+>> + *
+>>   * @handler: address of iucv handler structure
+>>   * @smp: != 0 indicates that the handler can deal with out of order messages
+>>   *
+>> - * Registers a driver with IUCV.
+>> - *
+>> - * Returns 0 on success, -ENOMEM if the memory allocation for the pathid
+>> + * Returns: 0 on success, -ENOMEM if the memory allocation for the pathid
+>>   * table failed, or -EIO if IUCV_DECLARE_BUFFER failed on all cpus.
+>>   */
+>>  int iucv_register(struct iucv_handler *handler, int smp)
+> 
+> Before this one, you changed /** to /*
+> after this one you left /**
+> That's a bit inconsistent.
+
+That's described in the patch description:
+
+>> - remove kernel-doc on static functions in iucv.c
+
+but I can restore the "/**" (i.e., not change them to "/*").
+OK, I'll do that.
+
+
+> 
+> All the fixes look good to me. And they get rid of the mentioned warnings.
+> I appreciate your approach to use the existing wording, though it may not
+> be according to the latest style guidelines.
+
+Is that IBM style guidelines or kernel?
+
+> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+
+
+I'll send a v3. Hopefully it will be satisfactory.
+
+Thanks.
+-- 
+~Randy
 
 
