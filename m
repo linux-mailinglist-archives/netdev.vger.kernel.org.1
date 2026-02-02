@@ -1,186 +1,303 @@
-Return-Path: <netdev+bounces-255860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255861-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CEtLDKacgGl2/wIAu9opvQ
-	(envelope-from <netdev+bounces-255860-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:46:30 +0100
+	id mBvQNfSegGl2/wIAu9opvQ
+	(envelope-from <netdev+bounces-255861-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:56:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FFBCCC754
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:46:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 540C8CC869
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:56:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C013E30305DB
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:45:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A980301184C
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4950335A943;
-	Mon,  2 Feb 2026 12:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC1D1A5B9E;
+	Mon,  2 Feb 2026 12:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="PSAHUPqY"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TalsC5oY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28F12ECE97
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 12:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770036301; cv=pass; b=TiGVLAnt3ysoGDuwSF2HmqPe2NFkt9bA/Z4qHPZJYsHTdNNxgRhMDGcBM9fjJA74Xajzfta1y5UnfqCmeqXkEK3w7VfNUz0sHf7rbVYWWeFoDMv6DldwseZvxfqrpLH2HYzqqG7pmaCRzyPQ+wkpGv5A9DT5exfNDhaDL3yjh1k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770036301; c=relaxed/simple;
-	bh=tQSoxSnuQz8YfhPc3rcEDsrMSNKgNj6Tz1/4fwwzdP4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OxzA9ONkdH8Vzh9INFEfqGzfZmY9EfrDXX3E09fzwlfvG4yYUfUlcqcFTpuHU3TNfApN6b4MYRTUpOqrZbNkbXk2HhG0Wd29etUI3QmwOMxEEKmDWkJgP0VZ5ihfyvO1dYrd1Fr+An0KFzHxboQGE23wMcig6VOrj56bQABjvQ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=PSAHUPqY; arc=pass smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-649b1ca87ddso1937420d50.3
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 04:44:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770036298; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X2rgGcm0FC+FL5DuZFQQQf+a9wxT0919Djy4ycokxO9HmdycqoVLL5SwB0BeZ1yF0U
-         D4rf1F0CaABb+mMkQffa1DscNlRXgJckIWyyu93LKidYC+n871HMqyTUsKxWaKkVwz7W
-         MsG1UeT+POpbZkGDT8FiaXpSCbnQpUmF54JQmRiwL4Z7dIG+7uxf9WsKoRKvUqHwTgm5
-         WdYlowdajuz3D/TY2lFlHHFOq1bBewrZgQ5eilRLMiJ5AzZEeMO+Q4akBE2k8gZXqe9z
-         NoLZpDu0w6MZFURsFZ0wXe8/0LyUyMQf4YoRz9zPNzevi5e5FXEtMH+vuvPfgfYGHmwO
-         hhCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Cd3ZADWHvFtHeHemiyPrlkf1w1DGp34lTmfV/FUGG0w=;
-        fh=NCv5ASnofJ4t0U0jBAj24Y0mSuwq7rQ0dhhDhzgmYnQ=;
-        b=ZBJUIGeCNo9VtOk3VYr5hmru/WhPl9ymckmg0pG5mgBVfQoCRiuxpE3gXnDjl7QN5X
-         qCzDVoT/FfIfGo+cIktsyQysfiJRngz0jjbExvT5fX4biU8v4beIetnitqlYFY6zKiwu
-         Lh+dwBtGI9OcTUu8RkT4rT7G5Sqf+OUcvXiZtPctqWcWwQ9B3mxujCYXyCght9/KR5+U
-         KLN6xC9urO4qgfadAYU0bRlb5zjkrKxADurfh2Vk7KNRddGGh6vpm+Mrp7qOswsJo1G7
-         bI2vLiSv0LEBhnDtcg/YCJ+HnF0t74F0AE8jRNjfQrFzL+/6ck8hpqlwivxklTUxMEe9
-         7ieA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1770036298; x=1770641098; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cd3ZADWHvFtHeHemiyPrlkf1w1DGp34lTmfV/FUGG0w=;
-        b=PSAHUPqYbWW0JltpO2o4BKNnQjJDZ8suAdmu4epw8kQgIO5xdbgnshYJvThEznYpzc
-         NIKGpxAMwb+AJXyO/aROQEurNbKzP8kYVspeZ3KaH5c1Ms5hhilNi4I/l7OgOZFeQ9MW
-         e3NU+8J2GA/ihJZHgW0x9CnvCfnNlbuOVBVhwMY9p4pi/4HO9GnypjTQXXtKRaCzQWIn
-         8BsLvYbsTu8E6ipCnnG22PLmD1SQ/nlLtmnWURqlydJMKMRtemoVePAscL3MfKmW+AFK
-         yVPo9lXVKghxS5WTSZ2egulSKou/adjFNL1ycOtv6n6MGBdDS9pcm/hM8wWK8a6pJ9x+
-         Uj4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770036298; x=1770641098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Cd3ZADWHvFtHeHemiyPrlkf1w1DGp34lTmfV/FUGG0w=;
-        b=hCR9TRGvtevbt+IKa1jGVT3sHpRk1y2x+FKfY/1Ua/22vJP5sHbINJvs1pt7Husptl
-         gYIM65pGBQbxGVH+vQ3jGPpk1MPeb/he+4krh78KArXXtGg3gemQBXZn048qB03MXUjm
-         4qfT6uDYsH8hOXBjexvU8K0dVL8w6XuQhBHCLyNpLowLI5uG0bzhl5ojrmnucplwkgMI
-         TqMWytiRavsC5Xm0h0bpBfhy8olfo6sPpJixfW+61ECxdQ3816YHAjdht1nSs7c6baR5
-         CYnil6VzRI1CDuzhAoVEh1o9Z7f3NDkoNNUNnbPudmleVuzWJW0RNmxbMJGaLqTB9upU
-         yE2w==
-X-Gm-Message-State: AOJu0YyaIYS1TCSUz/3gKOFv4x6Sy42/wcW0ouoMwm1YyfY8H+3r/K9N
-	2v2AdyRm9/YgVKIOYZhx6eJZ5butolzZpUArLUx2s1lZn7SHiVRlLMg710vCluc5TK/EVZ/Vb9/
-	/SblfR54Fafn4Iq2gGzA/emZ6BQkUCaZNZUK4hkmw
-X-Gm-Gg: AZuq6aKy7+rhUZKPLhKBksBJb69DzaH1hBKsYgT8kSaiEK3eEhaCCgVNAlUB6FVr6hU
-	yVYV4mG8RkMhoLew8HWIj+PefpbxundQKf6fc+V18M8m2IaL5MasY6mLWNyBKjEhAbIOHaSWzeW
-	nbvRup+sjC2QDUhYSGCfiL4Wv3Z5f0Pn+68BVt1/EvB87rTaQQ/gaz0eayBN7Rvrt/DZ1gmagkF
-	GtB3LaSa3fdLzu7qLdi1fv6kDEXz3+xKa64eMdjZW3ND9wOWYAmqY1yLVNw3cZkvVBQasD6VnGf
-	epSIaspi9Q==
-X-Received: by 2002:a05:690e:e8a:b0:649:d0ac:962a with SMTP id
- 956f58d0204a3-649d0ac986bmr163583d50.46.1770036298595; Mon, 02 Feb 2026
- 04:44:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AA3199FAC
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 12:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770036846; cv=none; b=KnlXWZ0xqsksVrwB1vpzfYfrooI/Rg0XKp5IBLAmgG4PVuXXgPcxvbwEf9naXVliBpVcHIiwIMogvJUG7CXWjw4TfE1LxlTS+XzC09Mg+1SUQ8I5y32Ss3a0XOCT+DhkqN4pxtyITSYLTvftAFYha6d9CWo6irqtwT9cE6c5c2I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770036846; c=relaxed/simple;
+	bh=cosfBNIN7L3c4jhjdlmyyBBU1waSFPgeMbzGNcZNZpc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YyTF+qAdZCY8KuO9lPm7F1GUb86996IEBVMwxO+d30Xgs2Tvoq8gQt0vcrFw0VAMemH1C7mdE2PP+8QCoR3bdoW/hdzb+MWGAGOix8p5XVdQCU7u/plyWmjZrmuey0JEUmcGUd6SugxQTFD4TiipnPtTODJaN7aEAEj0ORNWTpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TalsC5oY; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=DoEHeSEz5BuOy39fRx7cDEHXYzqftlVWK2wOiFdbyRo=;
+	b=TalsC5oY9+Rl4hNmwVf6/TWzZ4/l2VVzlE3vXuDu4f+So5nqmTyVIDsb/aTQOfk9aH4N8uDMH
+	cqbT+mib2n0Y1CJU4LizyZa9aeYHoyL4e6onYppCnlsxwz3+zMJeWfxi1JXGmArZZTMI8bCn82u
+	wtMDowA6Cw+bJ55Hvf7AZIY=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4f4RKm38Gwz1prLN;
+	Mon,  2 Feb 2026 20:50:20 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 60A8E40538;
+	Mon,  2 Feb 2026 20:53:53 +0800 (CST)
+Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 2 Feb 2026 20:53:53 +0800
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 2 Feb 2026 20:53:52 +0800
+Message-ID: <7befb796-be66-4518-96a5-6df607edd41d@huawei.com>
+Date: Mon, 2 Feb 2026 20:53:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-7-p@1g4.org>
- <c8a8ae22-c5c4-4112-8084-0faa256a1d84@mojatatu.com> <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
- <77q-JcImMG2fuQxj_GMUtYmaFAIuPrYMasj4I3aqIVID-Op24JIShBIPgt9kozLZgN4HvsGCS8Ez16mKq4Wq9juL1IOKydWUJwMwCYgHRMg=@1g4.org>
- <CA+NMeC-65UfJyq=34_K9tzf9J=-XFPJqDe1BxLNZv0mnjkxZEA@mail.gmail.com> <Pr4njxDDR8e9tElhovQfunuoyxlxUQdZqfdGBZg028rsKLPq4w1aYIUNKcAlF9EuqQHZjoj-9ocK2wEltjyQoRhUvsoKyZYveLK3oCAAd4k=@1g4.org>
-In-Reply-To: <Pr4njxDDR8e9tElhovQfunuoyxlxUQdZqfdGBZg028rsKLPq4w1aYIUNKcAlF9EuqQHZjoj-9ocK2wEltjyQoRhUvsoKyZYveLK3oCAAd4k=@1g4.org>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Mon, 2 Feb 2026 09:44:47 -0300
-X-Gm-Features: AZwV_QgeJd9ZvG9ufUv8Hpm45B6AerrNBuED0AF7SqMRy0jxcb1zjHR0qlJx_0I
-Message-ID: <CA+NMeC8HnFHgMFfx4xwwgbkyPMgkjy4jyVwJkoZReMkYGgXRWg@mail.gmail.com>
-Subject: Re: [PATCH net v3 6/7] net/sched: act_gate: reject empty schedule list
-To: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] net: add RCU protection to (struct
+ packet_type)->dev
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	<netdev@vger.kernel.org>, <eric.dumazet@gmail.com>, Yin Fengwei
+	<fengwei_yin@linux.alibaba.com>
+References: <20260202102658.858769-1-edumazet@google.com>
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+In-Reply-To: <20260202102658.858769-1-edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemq200002.china.huawei.com (7.202.195.90)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,linux.alibaba.com];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255860-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	TAGGED_FROM(0.00)[bounces-255861-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,1g4.org:email,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 7FFBCCC754
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dongchenchen2@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 540C8CC869
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 12:00=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
->
-> Ok, just to confirm the intended behavior changes compared to what is cur=
-rently in the tree:
->
->   create missing entry list      FAIL (got -22, expected 0)
->   create empty entry list        FAIL (got -22, expected 0)
->   replace append entries         REPLACE append failed: expected 2 entrie=
-s, got 1
->                                   FAIL (got -22, expected 0)
->
-> - CREATE with missing or empty entry list now returns -EINVAL
->   Previously, CREATE could appear to succeed if cycle_time was
->   provided even with no entries, but it still left an
->   empty schedule and later called list_first_entry() at
->   net/sched/act_gate.c:552, which is unsafe. Returning -EINVAL here is th=
-e
->   correct behavior fix.
->
-> - REPLACE now replaces the schedule, it does not append
->   The old append behavior was an accident caused by reusing the same list=
- and
->   never clearing it. With the RCU snapshot change, a fresh schedule is bu=
-ilt
->   and swapped atomically, so providing a new entry list on REPLACE replac=
-es
->   the old one and avoids stale data.
->
-> - REPLACE with an empty entry list keeps the old schedule
 
-At first glance it looks ok.
-However I can only be sure once you send it and I run some
-tests. Just in case I am missing something.
+在 2026/2/2 18:26, Eric Dumazet 写道:
+> Yin Fengwei reported an RCU stall in ptype_seq_show() and provided a patch.
+>
+> Real issue is that (struct packet_type)->dev needs RCU protection:
+>
+> ptype_seq_show() runs under rcu_read_lock(), and reads pt->dev
+> to get device name without any barrier.
+>
+> At the same time, concurrent writer can remove a packet_type structure
+> (which is correctly freed after an RCU grace period) _and_ clear pt->dev
+> without an RCU grace period.
+>
+> Fix this issue by using proper RCU on pt->dev pointer.
+>
+> Then, we need to record this dev pointer in ptype_iter_state
+> so that ptype_seq_next() can properly detect the end of dev->ptype_all.
+>
+> We also need to add full RCU protection in ptype_seq_next().
+> (Missing READ_ONCE() when reading .next values)
+>
+> Many thanks to Dong Chenchen for providing a repro.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Fixes: 1d10f8a1f40b ("net-procfs: show net devices bound packet types")
+> Fixes: c353e8983e0d ("net: introduce per netns packet chains")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: Yin Fengwei <fengwei_yin@linux.alibaba.com>
+> Reported-by: Dong Chenchen <dongchenchen2@huawei.com>
+> Closes: https://lore.kernel.org/netdev/CANn89iKRRKPnWjJmb-_3a=sq+9h6DvTQM4DBZHT5ZRGPMzQaiA@mail.gmail.com/T/#m7b80b9fc9b9267f90e0b7aad557595f686f9c50d
+> ---
+>   drivers/net/ethernet/amd/xgbe/xgbe-selftest.c |  2 +-
+>   .../ethernet/mellanox/mlx5/core/en_selftest.c |  2 +-
+>   .../stmicro/stmmac/stmmac_selftests.c         | 12 ++---
+>   drivers/scsi/bnx2fc/bnx2fc_fcoe.c             |  4 +-
+>   drivers/scsi/fcoe/fcoe.c                      |  6 +--
+>   include/linux/netdevice.h                     |  2 +-
+>   net/batman-adv/hard-interface.c               |  2 +-
+>   net/core/dev.c                                | 30 ++++++-----
+>   net/core/net-procfs.c                         | 51 +++++++++++++------
+>   net/core/selftests.c                          |  2 +-
+>   net/ncsi/ncsi-manage.c                        |  2 +-
+>   net/packet/af_packet.c                        | 24 +++++----
+>   net/tipc/bearer.c                             |  6 +--
+>   13 files changed, 85 insertions(+), 60 deletions(-)
 
-cheers,
-Victor
+Hi, Eric! Obtaining dev from ptype_iter_stateis sufficient to solve this issue, so it seems we do not need to add RCU 
+protection for dev in ptype procfs. Perhaps the changes related to RCU 
+could be moved to another patch? -----
+Best Regards,
+Dong Chenchen
+
+> diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
+> index 70e0e9a3b650c0753f0b865642aa372a956a4bf5..ad63556c9e0abd15cbfac7777c31894d2eef037b 100644
+> --- a/net/core/net-procfs.c
+> +++ b/net/core/net-procfs.c
+> @@ -170,8 +170,15 @@ static const struct seq_operations softnet_seq_ops = {
+>   	.show  = softnet_seq_show,
+>   };
+>   
+> +
+> +struct ptype_iter_state {
+> +	struct seq_net_private	p;
+> +	struct net_device	*dev;
+> +};
+> +
+>   static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
+>   {
+> +	struct ptype_iter_state *iter = seq->private;
+>   	struct list_head *ptype_list = NULL;
+>   	struct packet_type *pt = NULL;
+>   	struct net_device *dev;
+> @@ -181,12 +188,16 @@ static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
+>   	for_each_netdev_rcu(seq_file_net(seq), dev) {
+>   		ptype_list = &dev->ptype_all;
+>   		list_for_each_entry_rcu(pt, ptype_list, list) {
+> -			if (i == pos)
+> +			if (i == pos) {
+> +				iter->dev = dev;
+>   				return pt;
+> +			}
+>   			++i;
+>   		}
+>   	}
+>   
+> +	iter->dev = NULL;
+> +
+>   	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_all, list) {
+>   		if (i == pos)
+>   			return pt;
+> @@ -218,6 +229,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
+>   
+>   static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+>   {
+> +	struct ptype_iter_state *iter = seq->private;
+>   	struct net *net = seq_file_net(seq);
+>   	struct net_device *dev;
+>   	struct packet_type *pt;
+> @@ -229,19 +241,21 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+>   		return ptype_get_idx(seq, 0);
+>   
+>   	pt = v;
+> -	nxt = pt->list.next;
+> -	if (pt->dev) {
+> -		if (nxt != &pt->dev->ptype_all)
+> +	nxt = READ_ONCE(pt->list.next);
+> +	dev = iter->dev;
+> +	if (dev) {
+> +		if (nxt != &dev->ptype_all)
+>   			goto found;
+>   
+> -		dev = pt->dev;
+>   		for_each_netdev_continue_rcu(seq_file_net(seq), dev) {
+> -			if (!list_empty(&dev->ptype_all)) {
+> -				nxt = dev->ptype_all.next;
+> +			nxt = READ_ONCE(dev->ptype_all.next);
+> +			if (nxt != &dev->ptype_all) {
+> +				iter->dev = NULL;
+>   				goto found;
+>   			}
+>   		}
+> -		nxt = net->ptype_all.next;
+> +		iter->dev = NULL;
+> +		nxt = READ_ONCE(net->ptype_all.next);
+>   		goto net_ptype_all;
+>   	}
+>   
+> @@ -252,20 +266,20 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+>   
+>   		if (nxt == &net->ptype_all) {
+>   			/* continue with ->ptype_specific if it's not empty */
+> -			nxt = net->ptype_specific.next;
+> +			nxt = READ_ONCE(net->ptype_specific.next);
+>   			if (nxt != &net->ptype_specific)
+>   				goto found;
+>   		}
+>   
+>   		hash = 0;
+> -		nxt = ptype_base[0].next;
+> +		nxt = READ_ONCE(ptype_base[0].next);
+>   	} else
+>   		hash = ntohs(pt->type) & PTYPE_HASH_MASK;
+>   
+>   	while (nxt == &ptype_base[hash]) {
+>   		if (++hash >= PTYPE_HASH_SIZE)
+>   			return NULL;
+> -		nxt = ptype_base[hash].next;
+> +		nxt = READ_ONCE(ptype_base[hash].next);
+>   	}
+>   found:
+>   	return list_entry(nxt, struct packet_type, list);
+> @@ -279,19 +293,24 @@ static void ptype_seq_stop(struct seq_file *seq, void *v)
+>   
+>   static int ptype_seq_show(struct seq_file *seq, void *v)
+>   {
+> +	struct ptype_iter_state *iter = seq->private;
+>   	struct packet_type *pt = v;
+> +	struct net_device *dev;
+>   
+> -	if (v == SEQ_START_TOKEN)
+> +	if (v == SEQ_START_TOKEN) {
+>   		seq_puts(seq, "Type Device      Function\n");
+> -	else if ((!pt->af_packet_net || net_eq(pt->af_packet_net, seq_file_net(seq))) &&
+> -		 (!pt->dev || net_eq(dev_net(pt->dev), seq_file_net(seq)))) {
+> +		return 0;
+> +	}
+> +	dev = iter->dev;
+> +	if ((!pt->af_packet_net || net_eq(pt->af_packet_net, seq_file_net(seq))) &&
+> +		 (!dev || net_eq(dev_net(dev), seq_file_net(seq)))) {
+>   		if (pt->type == htons(ETH_P_ALL))
+>   			seq_puts(seq, "ALL ");
+>   		else
+>   			seq_printf(seq, "%04x", ntohs(pt->type));
+>   
+>   		seq_printf(seq, " %-8s %ps\n",
+> -			   pt->dev ? pt->dev->name : "", pt->func);
+> +			   dev ? dev->name : "", pt->func);
+>   	}
+>   
+>   	return 0;
+> @@ -315,7 +334,7 @@ static int __net_init dev_proc_net_init(struct net *net)
+>   			 &softnet_seq_ops))
+>   		goto out_dev;
+>   	if (!proc_create_net("ptype", 0444, net->proc_net, &ptype_seq_ops,
+> -			sizeof(struct seq_net_private)))
+> +			sizeof(struct ptype_iter_state)))
+>   		goto out_softnet;
+>   
+>   	if (wext_proc_init(net))
+>
 
