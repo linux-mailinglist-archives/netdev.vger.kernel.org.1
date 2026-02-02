@@ -1,84 +1,58 @@
-Return-Path: <netdev+bounces-255968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAf+MxvegGleCAMAu9opvQ
-	(envelope-from <netdev+bounces-255968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:25:47 +0100
+	id KDYoH/LhgGleCAMAu9opvQ
+	(envelope-from <netdev+bounces-255969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:42:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D73BCF92E
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:25:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F84CFB4E
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 021F2301ECE3
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:25:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B0E6300361D
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0119385EF5;
-	Mon,  2 Feb 2026 17:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B15385EDD;
+	Mon,  2 Feb 2026 17:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikh7Opdv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aO7KJbS8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C3C387346
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DF63816E9
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770053120; cv=none; b=tNv0iOKqc0o088dc+byjnKsurI1xwbsTLQ1uSRJnUYOsr53QqblrgrRgb/XfcjIHl0z/895zGl8vx6+6abpZQ6QTvH8cZPAaQ75DAXegv9USZAKYJioI/H2Wy5caSOrCK2ansu3BVITYkrQzpxr/hSEYuORy4GXGKdrtDplXCxw=
+	t=1770053950; cv=none; b=kLAQEkgy7ZB/8qHMPjU1TFIL9ab/NA6YjBwnEoTNnXUbwi+UEZJenqr77j9lU1qoosX+M0jRczYTOgAjpq2p9xoehQM0R1qPwkDNuwS38QzcChDev7/oUmeZEMPUqex/F6hSr4AbCQrWleGaBDqLVIjfmIYgd7C3P0tLFX+LSVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770053120; c=relaxed/simple;
-	bh=N5emsJVnbYDypIuMxaWYpQNd4XXz+i3X9KxdIpzvmYo=;
+	s=arc-20240116; t=1770053950; c=relaxed/simple;
+	bh=H8ge6u2G9ETLaUdtm8m9+HEAAf7jKP2YUXl5JQrlHeE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HVDFt6WBMRukWq5HDvSZo3z5eqQPd8gA5e62u/gV72Nl7rZiPjzaR+UkIHUA3DpXmc/9XRswpbmAs/WG6d/IlhMRfqkZtmhGlkyJUR2aem5yOAJ3Tb1QqGqiacyZGL3czxeDUU40OsmKJlaFnKz18Df/Y5UIlYFdjgH2sfgKdlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ikh7Opdv; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59dd263bf42so4951376e87.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 09:25:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770053117; x=1770657917; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iHlrgeVFZ66XfJyR0Ky7VPQSi5vlBXbdXZD7jGGpR6c=;
-        b=ikh7OpdvXkYof18sKHYAhCW5gsH8KsrikELQRX9PJ2oSueqNzL09JAQCM0zlSG4OwY
-         FuJgudO7NCK17lQHywVbHpVfrle+rYQRVZj5vkhIJRvfZqiXcTpF321X9tEq3S/6vJlc
-         1jeptKcxH86oQGabn/N44R2hOAhRegk9LMO4/4jA+F5XxXh1NTH7UiHHdSWx1by3cyy5
-         /wGDQvR7FqtpFh3IZGjoj4AcWBXw3tu+psqx4bDcnivj2HfJvQzAoUf7r3MlkZUglEaD
-         OogJVMcG80VAk2sY4KoV0noJ7+DdOC1a252aw1bdPFM6Rb6758JBTvgzsoF5slj8ETjr
-         aI0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770053117; x=1770657917;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iHlrgeVFZ66XfJyR0Ky7VPQSi5vlBXbdXZD7jGGpR6c=;
-        b=WM2WqBLtsXYZoUwBOQGC8NjQxTMcCoPKJqz8fCw7VFtgnhIiPUBufXu/sDTOBumMLH
-         PgqiVzFmgNmVkMSLPpBhuoFDGdv3LfWAic8pMdDarhDl1wP3T90J8526AjFbIBKImsBJ
-         TkYJ/bOum32/bzQKB9P4gdu7gv63aHu0m3XWTS673GCb6X+Eu71KHqZoV2NwEsURJaRC
-         dVrLtakyQ3xM20dprppO9EyQVuZ5SQNx9g72HzbAvQSJwgAnRmdzstEr+/EyLIrhsQiM
-         qfyTJq8vjzUC4q2G7mgF1FWxmufG714z6NqwwB9XKxAr1su1Q6lUzEoAGD40+GkGjUQ7
-         OjRQ==
-X-Gm-Message-State: AOJu0YzyCvBzzh8/mDouSuOFZoxxLlkzPSqm5d6f+jtA0ALB4JORkm16
-	6D7TaVS3VXwwaGqJd06QZ2WHGmVAf+jKD4wfhP1chtRuZHnGSRSzPQ9GE/kqtA==
-X-Gm-Gg: AZuq6aJtXVaVVyc7OTwvAXM7mIRQp9R/PFRwv8pUIK9RhqdvVL3S1sMP05vWnC3B1ZB
-	lLOecWWZeSEHTSPtFkxgquiC+G2hVtyjqOSkFJigl51nAhELjL2gzLxGo1DRLEt8Qxom+6GliAW
-	QVu2HCZezguLrWxe7ci8ppkwUYGAouAC3gjdOAv+JLT0fI1xOAZnM3ham1p76Tw+jkwh1HMXwyi
-	oLX4Dmv4A1pcwk5gj+OzD8q7mmFIWJHSHT2tHOa5MMHU7kLi6hykH7XdOeym2GGBTODbpS5FU47
-	AZkmjfMTmi8s3+r0NktgzSX7fyZCO2nwF48B7pnM8ib2E6SKjQRqc4rGxzHsIbavdwEdn4WhPT0
-	0mlekGnRVP79CQ29eIO2kWnehi5f7bIUbkfV1sYmzvzYLF54PfYLq9ELELr44OCVcko6uHlERtj
-	0X11s1c6XdCCm7MZtTzZJv2iSqPkHcD51u2u3s1LAZlsIRfTffcgFQTjM9pkyalitiSjjnOSG5I
-	+GECNoM4kdmf+eS6bxHrrrEb8WxLuYYrezNJOS85Y2cekLl
-X-Received: by 2002:a05:600c:3148:b0:47a:935f:618e with SMTP id 5b1f17b1804b1-482db45ce3amr158497445e9.15.1770053106341;
-        Mon, 02 Feb 2026 09:25:06 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f4b:2a00:742c:21a1:3b90:f2? (p200300ea8f4b2a00742c21a13b9000f2.dip0.t-ipconnect.de. [2003:ea:8f4b:2a00:742c:21a1:3b90:f2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e2e3beadsm94827185e9.20.2026.02.02.09.25.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Feb 2026 09:25:05 -0800 (PST)
-Message-ID: <602a08b9-134f-421e-bc2a-b89b0867b2e3@gmail.com>
-Date: Mon, 2 Feb 2026 18:25:05 +0100
+	 In-Reply-To:Content-Type; b=WfKpCUR2l6bXumTdz+khVWuFCHkUUPIYNCCLuSZ95DF91F+SEzk/WgaBgeA27DhVQRazDod9APQMA1Y3LSuXexRSurmgge1H/otB6N7v1S3ky12/MN+LPKpnRfVDksBnzz31Zdn1etGDXlcGZsMozbL+QFHea7xB38HQqxrFwZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aO7KJbS8; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id CC2A2C237F3;
+	Mon,  2 Feb 2026 17:39:11 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BA5E960767;
+	Mon,  2 Feb 2026 17:39:06 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 414E2119A8888;
+	Mon,  2 Feb 2026 18:38:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1770053945; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=c1h4euVzUgrsm8tkmQ9pvrCo/Vv3M9QxABZPkbxAwm0=;
+	b=aO7KJbS8NSpYo5S5oDL+njQYcE85HvoejlfbW7DXcpX0YdfdYWwC2xLyt46gLO8V0vHOz3
+	U8J1Q527/uqJlqqf4Mm4bVaiqa4mpq5iqTa57VKuaxes//OwtF6MxpvigOY+4oZN+mkJ7k
+	rzwlPLFwR++P/bDRcAiM4sR/U/ATwOMtlFKhTBcNK4zcw/2Kh+1kWS+TqT04YogK6mHREY
+	0G3T3BfscbdveB6+yUvMh0bt4XGzkAxkss7zRc6CkCyqAoTTnJWeb0HsjkrkwWOXtAdcJZ
+	tKXg5qZvg1AhDQWZdK1o68pdDrWPHpGaNrnbffADy5n37aM1LQt2jTfmMuc0ew==
+Message-ID: <0689a2ab-352a-4275-9662-0c45daf8a0b2@bootlin.com>
+Date: Mon, 2 Feb 2026 18:38:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,78 +60,175 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Weird issue with r8169: shutdown on carrier comeback
-To: Tanguy Ortolo <tanguy@ortolo.eu>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Francois Romieu <romieu@fr.zoreil.com>
-Cc: netdev@vger.kernel.org
-References: <aYDYSHhaF1vQSxdW@ortolo.eu>
+Subject: Re: [PATCH v2 net] net: phy: change devlink flag to
+ AUTOREMOVE_SUPPLIER for non-SFP PHYs
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, florian.fainelli@broadcom.com,
+ xiaolei.wang@windriver.com, quic_abchauha@quicinc.com,
+ quic_sarohasa@quicinc.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260202054533.539883-1-wei.fang@nxp.com>
+ <267c78c1-4ad2-4f06-be63-0fb506c5134d@bootlin.com>
+ <aYCzxVTTZvok9_d1@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <aYDYSHhaF1vQSxdW@ortolo.eu>
+In-Reply-To: <aYCzxVTTZvok9_d1@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255968-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,windriver.com,quicinc.com,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255969-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2D73BCF92E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,nxp.com:email,quicinc.com:email]
+X-Rspamd-Queue-Id: D4F84CFB4E
 X-Rspamd-Action: no action
 
-On 2/2/2026 6:00 PM, Tanguy Ortolo wrote:
-> Hello,
+
+
+On 02/02/2026 15:25, Russell King (Oracle) wrote:
+> On Mon, Feb 02, 2026 at 12:10:41PM +0100, Maxime Chevallier wrote:
+>> Hi Wei,
+>>
+>> On 02/02/2026 06:45, Wei Fang wrote:
+>>> For the shared MDIO bus use case, multiple MACs will share the same MDIO
+>>> bus. Therefore, these MACs all depend on this MDIO bus. If this shared
+>>> MDIO bus is removed, all the PHY devices attached to this MDIO bus will
+>>> also be removed. Consequently, the MAC driver should not access the PHY
+>>> device, otherwise, it will lead to some potential crashes. Because the
+>>> corresponding phydev and the mii_bus have been freed, some pointers have
+>>> become invalid.
+>>>
+>>> For example. Abhishek reported a crash issue that occurred if the MDIO
+>>> bus driver was removed first, followed by the MAC driver. The crash log
+>>> is as below.
+>>>
+>>> Call trace:
+>>>  __list_del_entry_valid_or_report+0xa8/0xe0
+>>>  __device_link_del+0x40/0xf0
+>>>  device_link_put_kref+0xb4/0xc8
+>>>  device_link_del+0x38/0x58
+>>>  phy_detach+0x2c/0x170
+>>>  phy_disconnect+0x4c/0x70
+>>>  phylink_disconnect_phy+0x6c/0xc0 [phylink]
+>>>  stmmac_release+0x60/0x358 [stmmac]
+>>>
+>>> Another example is the i.MX95-15x15 platform which has two ENETC ports.
+>>> When all the external PHYs are managed the EMDIO (the MDIO controller),
+>>> if the enetc driver is removed after the EMDIO driver. Users will see
+>>> the below crash log and the console is hanged.
+>>>
+>>> Call trace:
+>>>  _phy_state_machine+0x230/0x36c (P)
+>>>  phy_stop+0x74/0x190
+>>>  phylink_stop+0x28/0xb8
+>>>  enetc_close+0x28/0x8c
+>>>  __dev_close_many+0xb4/0x1d8
+>>>  netif_close_many+0x8c/0x13c
+>>>  enetc4_pf_remove+0x2c/0x84
+>>>  pci_device_remove+0x44/0xe8
+>>>
+>>> To address this issue, Sarosh Hasan tried to change the devlink flag to
+>>> DL_FLAG_AUTOREMOVE_SUPPLIER [1], so that the MAC driver will be removed
+>>> along with the PHY driver. However, the solution does not take into
+>>> account the hot-swappable PHY devices (SFP PHYs), so when the PHY device
+>>> is unplugged, the MAC driver will automatically be removed, which is not
+>>> the expected behavior. This issue should not exist for SFP PHYs, so based
+>>> on the Sarosh's patch, the flag is changed to DL_FLAG_AUTOREMOVE_SUPPLIER
+>>> for non-SFP PHYs.
+>>>
+>>> Reported-by: Abhishek Chauhan (ABC) <quic_abchauha@quicinc.com>
+>>> Closes: https://lore.kernel.org/all/d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com/
+>>> Link: https://lore.kernel.org/imx/20250703090041.23137-1-quic_sarohasa@quicinc.com/ # [1]
+>>> Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
+>>> Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+>>> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+>>
+>> I gave that patch a test, with the following cases :
+>>
+>>  - On Macchiatobin (we have PHYs that share an mdiobus).
+>> When unbinding a PHY, the MAC dissapears as well :
 > 
-> I am experiencing a weird computer issue that is at least partly linked to the r8169 driver: the computer shuts down when the Ethernet cable is pulled off and plugged again. Or when the switch goes down and up again.
+> Correct, this is why these band-aids are harmful. One "device" can
+> correspond with *multiple* network interfaces, and the loss of one
+> PHY can have a *very* detrimental effect.
 > 
-> To be more specific, the computer is a [Trigkey Key-N100][1] running Debian Trixie. That computer has two Gigabit Ethernet controllers:
->     $ lspci | grep Ethernet
->     01:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller (rev 15)
->     02:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller (rev 15)
+> Consider the case where root-NFS is being used, and removing a PHY
+> on another interface takes out the interface that root-NFS is
+> using. Your machine is now dead in the water.
+
+That's what I've been seeing. I unbound one PHY, it took out 3 netdevs
+and I don't have log regarding "why". I guess there's devlink debug
+knobs for that, but not enabled by default it seems.
+
+However, we seem to have the issue even without this patch.
+
+On MCBin, if I unbind eth1 for example, all 3 interfaces that are on CP1
+are gone :
+
+cd /sys/class/net/eth1/device/driver
+echo f4000000.ethernet > unbind
+
+only eth0 is now left. This is on net-next/main :(
+
+For Wei's case where unbinding netdev 1 brings the mdio bus down, used
+by PHY on netdev 2, we'd be also dead in the water as well no matter
+what as well no ?
+
+> In my opinion, we should be concentrating more on the issue behind
+> the oops.
 > 
-> [1]: https://devhome.corp.adobe.com/docs/default/component/ethos-flex/docs/devhome/prerequisites/
+> Given that this problem is because of the bus being removed, one
+> thing that would help would be for the MDIO bus to be properly
+> refcounted, and when the bus is unbound, to replace the bus ops
+> with versions that return -ENXIO or similar under the MII bus
+> lock. This would be easier of the MDIO bus ops were a separate struct
+> to struct mii_bus.
 > 
-> One of them is configured, and when I pull off its Ethernet cable and plug it again after a few seconds (or if I reboot the switch it is connected to), something simulates a power key press (log from systemd-logind: “Power key pressed short”). Even though I configured logind to ignore such events, one second after this, the computer shuts itself down brutally, as if experiencing a power loss.
+> Similar with the PHY itself - if the PHY is in-use, it should be
+> refcounted to stop the struct phy_device from going away, and
+> should we have the situation where the PHY driver is unbound,
+> phydev->drv should be set to a set of dummy ops (under the phydev
+> mutex and probably rtnl.)
 > 
-> After a few experiments, I determined that:
-> * it happens on both Ethernet interfaces of that computer;
-> * it happens only on _configured_ interfaces: in particular, it does not
->   happen if I unplug the Ethernet cable, run `ip link set enp1s0 down`
->   and plug the cable again;
-> * it does not happen with the proprietary driver r8168.
+> It seems to me that throwing devlinks at this problem is giving us
+> more problems than it's solving.
 > 
-> I am not really sure the r8169 driver is at fault here; it sounds more like a very weird hardware issue in specific conditions, which are met when using it. Anyway, I though you deserved to know, in case it could be useful. Please tell me if there is anything else I could do to further diagnose that issue.
+> A graceful way to handle a MAC losing its PHY is for phylib to
+> indicate that the PHY has gone down, rather than removing the
+> network interface (and potentially a whole host of other network
+> interfaces in the case of one struct device being associated
+> with many interfaces.)
 > 
 
-Thanks for the report. Interesting issue .. The network driver (r8169) has no link to the input system.
-Therefore it's likely your network manager which is causing this behavior. Maybe r8168 is different in what
-network notifications it sends. But hard to say w/o knowing what the network manager looks at to detect
-link-down/-up events.
+Agreed, that's quite the can of worms though I suspect :(
 
-> Regards,
-> 
+Maxime
 
 
