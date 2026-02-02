@@ -1,429 +1,290 @@
-Return-Path: <netdev+bounces-256027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIP6FE8sgWl6EgMAu9opvQ
-	(envelope-from <netdev+bounces-256027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:59:27 +0100
+	id ICJfIuwrgWlgEgMAu9opvQ
+	(envelope-from <netdev+bounces-256028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:57:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54ABD28CB
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:59:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F17ED28AC
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:57:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AF81302794C
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 22:53:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 575593004600
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 22:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BBB345738;
-	Mon,  2 Feb 2026 22:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9142BE05B;
+	Mon,  2 Feb 2026 22:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aZiO8ONr"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HJ+XYcFK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF7D33B6ED
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 22:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770072817; cv=none; b=Dsq7F0cnhDIgg4RfyUwdZT5qaBfVXn0pr00G/FZ5ZUIfGhUA8TL5tQCXxyUxJT9dNJfJdSVNyLgqe7gu3M+P26rrlZR2uruJZQrG3GsoUhA6z80uAuqoN4Ck8O9dRHL278zgqX26pAi34kslGmjfR9HPThxCPwLFbaQuKkbNAxk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770072817; c=relaxed/simple;
-	bh=9jJkKSmHjIY4PvmTJDT7aV53FEqAwXGVXBEAlca9+SQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BRNy3djG/nnqjWzlqsDxxY8eSTzT2euizWd3s85w/l0Z35PGZdX37pr++5LOepKWjcPUBODLhFhpgRhhgJLPmyJ3N/zOYU4jlmY4D511/E6V5h/VDVwi//0N+Nc2v5jp3qutXeLnCvUII7qz2lZpGkxcbCO11Uq7Cjh8wij5ZRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aZiO8ONr; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770072814; x=1801608814;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9jJkKSmHjIY4PvmTJDT7aV53FEqAwXGVXBEAlca9+SQ=;
-  b=aZiO8ONrbtXqKmGa32NzEpXFSkH+enPw/p0+6GJM5zgQpw/wiwAV+ybu
-   YewHE60AltP8bUhuI0gc1rW1Xj1hKuaYbs64gYpZGkgPdin6VleE9ql/3
-   ytDLMAJhJPrP7n3QXHJgJKiA8gzzpgrFF2gZuFTpZB6VepUP8GI/L8S4G
-   NtFOZ1iFGIeoxxf8iwZDQVVZACVD6Ngol/0WDvWr4ebypFlh/tQThSgDi
-   PD5tWK7+bddtzPYaKrA0bleWdSTqkHbpIM5Jk9B6LXM0LaxS8PplSwqOU
-   MNzdb1NLsXFu4a7R6MEX+Cdx2a+Nxbaz9pnjLmOborUpainUVH9kJhWtx
-   g==;
-X-CSE-ConnectionGUID: bdEswjkvTwyCwLVPzEfE1Q==
-X-CSE-MsgGUID: JTaj837URLabZ30nzMQDbA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="70444688"
-X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
-   d="scan'208";a="70444688"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 14:53:34 -0800
-X-CSE-ConnectionGUID: Op/gtPnQThup9+D+67l0kQ==
-X-CSE-MsgGUID: Z6MA8XHuSTm3sPal1HjJbg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
-   d="scan'208";a="209660424"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 02 Feb 2026 14:53:28 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vn2nN-00000000g24-3BAB;
-	Mon, 02 Feb 2026 22:53:25 +0000
-Date: Tue, 3 Feb 2026 06:52:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: Riana Tauro <riana.tauro@intel.com>, intel-xe@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org
-Cc: oe-kbuild-all@lists.linux.dev, aravind.iddamsetty@linux.intel.com,
-	anshuman.gupta@intel.com, rodrigo.vivi@intel.com,
-	joonas.lahtinen@linux.intel.com, simona.vetter@ffwll.ch,
-	airlied@gmail.com, pratik.bari@intel.com,
-	joshua.santosh.ranjan@intel.com, ashwin.kumar.kulkarni@intel.com,
-	shubham.kumar@intel.com, ravi.kishore.koppuravuri@intel.com,
-	raag.jadav@intel.com,
-	Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
-	Lijo Lazar <lijo.lazar@amd.com>,
-	Hawking Zhang <Hawking.Zhang@amd.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Riana Tauro <riana.tauro@intel.com>
-Subject: Re: [PATCH v5 1/5] drm/ras: Introduce the DRM RAS infrastructure
- over generic netlink
-Message-ID: <202602030622.mmakbYmv-lkp@intel.com>
-References: <20260202064356.286243-8-riana.tauro@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54C7335555
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 22:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.225
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770073064; cv=pass; b=Vck7wLVdR1Lry3PQosByQBk5lJpZuxdof/b8dJVFkuy2UA+Kfg0gdUj0qCZjxsOaKhm2JAxJyw2d0q7d/v2atT58Hc11nWcoGeug7KTbXiJQC20xT3FtlgrXksblMCQT/rz4A4CigSG71RvS80thjZc10FeraAp+S9Cu+XWEeUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770073064; c=relaxed/simple;
+	bh=XMAqWinPZsGTb5brKQ7alAddT2vZjlBTcH4b325z1EU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qYv4PE/tA08x1FDftN59DgZdnfm5oOdhTbYN8STCgV/kWO26PouhoKYjuwgwpdRVugtXba+CXPaM9nQe79N0fNUzni8wqnRO9Epw6JX8lAc/87UoVYwTp7V69oaHelKDP2L4xkxyW2Ez3/bnTJ5aP7dOGuEJKxYvoH5QbxkM57w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=HJ+XYcFK; arc=pass smtp.client-ip=209.85.214.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2a871daa98fso32280795ad.1
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 14:57:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770073062; x=1770677862;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XMAqWinPZsGTb5brKQ7alAddT2vZjlBTcH4b325z1EU=;
+        b=oa8nsn/uUEWxSYW9jx1DvG5bX+006SRrSbkawuUAdmr260JFp2nvj0P0UFKdDb3D6o
+         sndjfC4Wg7gTD45bjVCIFQ3LmHV9x0676J3zAIDYi5Y7mAV+gSecw7190fORGGWgj9sV
+         U3BygIpEWdHr8oIK2QiAnKbCkxYs5OkZi4NfmhIY3twfc/eJ/xdHa/5SzLfUUavPel4L
+         +Yq4A0eomq6bI6TEy/SfhcV3p5FYTb2/7ciCi4vMG6huYpNQsCm23yLt7dDC2J2+sHyL
+         40954exl0YBFjKZVZRlPZjyW0wEkp8tQVy9Lf+Wdno4IpEgOWQv1Zdky/gqebdK+Eow1
+         QFnA==
+X-Forwarded-Encrypted: i=2; AJvYcCVcsa60hIJpiOVYAFmL8AsgZt93+LbLgcn8Gb6V6UDYvnpSJboRhgxBErBkRENnzVoSwTV1Bl4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuPhlmE2wvJ3uXQwbVr71zaH58MWGzixyZKr5V0Dnl/+RbVi4e
+	+CCi/tV/BGLdtoVyAOK8sS6e639mDxi3SS++1uvIscOvtW+DB+LI2iZMfJn69Z1ciiA3cCbR2G9
+	1FMbo9gMc8Wu1ChKb6IZV7ceNB+N7bntQy7F4NRbTyE4pgkI5U0XHzdMi45PRlD5XAcQ2JDZDcy
+	OTrh8v/jRYieQ6xu4X5EM2cB19LLNHGu5EZRqN18k8G5vmDSNvLHRIKouzeZgCiUugOgNc7rz8E
+	R0pfui+fIc=
+X-Gm-Gg: AZuq6aL2a8fCpPHY5fuCyqO/1f9CKNpQnduu6NXO5HuEljEyBMhTb4eFUIHp5rvwLkw
+	QlDGshGx8EuJI4Qrrbh63ZnbIrhFOOwxxLHwwh92MdxbqJ03miilcCsaOtLKAmAtEoc0s1YH5nZ
+	WEFF4ydswEnoQ7leb2snbmAbAN4hl3kdE//y8VLOznQoUUdTSIht7XYtRwdXSuWPHtV0dFRCasQ
+	qZO1nPStsoytWKyJXG93p/lmWLPHNWPuPHHGhmC/HdGep7+XZDITf/eTDPD1bP1+ymIZCC0mfKp
+	ZE1+Roe7ubCOQLStny1YP1Jqe922ar09G8uE+vFBvd4eM2Sm6IQZg2F6YHzP50RMf7AzlqTRuc1
+	zkmeT9iulo+RvXA2Z+rDJUGTyiIA52D99okDTVPtnY67AlHzQAosMzhoYFIR178nyd+ML9R3NMe
+	kYYe84sSFs0fxca8Tr0KGyt2NBNnLzZKEPklD4pQadOg==
+X-Received: by 2002:a17:903:3b83:b0:29d:df04:fcdf with SMTP id d9443c01a7336-2a8d9932404mr121879745ad.42.1770073061858;
+        Mon, 02 Feb 2026 14:57:41 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-0.dlp.protect.broadcom.com. [144.49.247.0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a88b41544esm22440795ad.21.2026.02.02.14.57.41
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 02 Feb 2026 14:57:41 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-658e629003cso4578228a12.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 14:57:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770073059; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VASTbdRzl5hBAnREF/AhAPlKo98HfMEPG4An73TZ5M/Pa8LXAncR3/nd4Y9vc0Dq8L
+         GANfiLnYa8uvYFin7fyfTUxNFUPtrpu4194iZFakEdNbHmUkqBZg+fS0HtBY2ijDqrec
+         6LwUd1kSMXWYOJXS5qGSZb/1lXnGXLUvJzLN9d9F0qf8MrbRTlqmC5L+N/fFHzWiRDww
+         8FAZ8u6A7o2sb9qRl9hz9GdJ4rHuhhsrBOYa+r1OQ0jZCOkU/V5lLbM2p45fz8NQ7svx
+         cqB3FODQFBGOwRiKAh2LfPBS1PQs7I4cEZ1wpvgYGY8h9xmp7lMHEVUFuzQ/r+ROvL3P
+         fuGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=XMAqWinPZsGTb5brKQ7alAddT2vZjlBTcH4b325z1EU=;
+        fh=LNxVWiQGN9/6g9W/9PBS0LngqaOorJkT/BhC0wQgVrQ=;
+        b=MJYtScv8NwRMeHIwUmY/wBhM8ByITWqTp9a9eyEiOVc2pBVOeqlaEflEBv6GTAtAHF
+         afiJUTi2fYkwBp5YaUJwxfVrgAlL1d8dQMumQvvJ3xPj6zmy8s//baOKHnT0iNKby7hd
+         RsIBc8HH13fSXgZONSkqfBdcKBpnG5x8n4mTMOO4zX+Mhy/4cWZkaTMbANrJgyE+sZMS
+         iMEUnnFc9h3jmmy0eJpBfzewG/xStlppjbhgOvTZCV24Czins2P+8MxTP5JxFfrvTjHC
+         aFGM9o/myxJDbtUOo5oXXdmi9OzAzGMvaIuW0xE+YuzY8iVq2tClwt98zfLKIa0w9swE
+         2F0g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1770073059; x=1770677859; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XMAqWinPZsGTb5brKQ7alAddT2vZjlBTcH4b325z1EU=;
+        b=HJ+XYcFK+exWtBbCynYOwJFSdqopg83ZvRaJHhwfTbpm3O/+wlYJ57ZEwXuvefbyGe
+         yPg4O2+fUK47Ug3dN7adgGAQ7O/LTR2vbrLD9A6vNyggQh4Es4jkgdQseXhJfXyzPqqs
+         5VaEPjGh12wW+L9V+/EuCEabYxHYGdQuL0S/8=
+X-Forwarded-Encrypted: i=1; AJvYcCWqwqDCXo3rbfgTUUPBC5kETvFw7tKQYS4ynxpOIVzy0Gz3vMkjRG2gUWHNmQPrRcpst6VD+5M=@vger.kernel.org
+X-Received: by 2002:a05:6402:2310:b0:658:e629:73a0 with SMTP id 4fb4d7f45d1cf-658e629757emr5596815a12.30.1770073059468;
+        Mon, 02 Feb 2026 14:57:39 -0800 (PST)
+X-Received: by 2002:a05:6402:2310:b0:658:e629:73a0 with SMTP id
+ 4fb4d7f45d1cf-658e629757emr5596804a12.30.1770073059052; Mon, 02 Feb 2026
+ 14:57:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260202064356.286243-8-riana.tauro@intel.com>
+References: <20260202192338.2373930-1-alice.projects@fastmail.im> <20260202192338.2373930-9-alice.projects@fastmail.im>
+In-Reply-To: <20260202192338.2373930-9-alice.projects@fastmail.im>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Mon, 2 Feb 2026 14:57:27 -0800
+X-Gm-Features: AZwV_QjyY0LnidDbPD1YLAaKN2DO6KfuPC3i-o92CLRBz4Rg4bT7aEe4WAzIMdU
+Message-ID: <CACKFLim1YdN4R6z6uNkJxwsUhf2mA4skgmzYz-bz_qM6GuQNWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 08/11] bnxt_en: Remove jumbo_remove step from
+ TX path
+To: Alice Mikityanska <alice.projects@fastmail.im>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Xin Long <lucien.xin@gmail.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	David Ahern <dsahern@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org, 
+	Alice Mikityanska <alice@isovalent.com>
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000f594020649df3f4f"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256027-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,linux.intel.com,intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,kernel.org,redhat.com,google.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256028-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[fastmail.im];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	HAS_ATTACHMENT(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org,vger.kernel.org,isovalent.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,gitlab.freedesktop.org:url,git-scm.com:url,01.org:url]
-X-Rspamd-Queue-Id: A54ABD28CB
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,broadcom.com:email,broadcom.com:dkim,isovalent.com:email,fastmail.im:email]
+X-Rspamd-Queue-Id: 2F17ED28AC
 X-Rspamd-Action: no action
 
-Hi Riana,
+--000000000000f594020649df3f4f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-kernel test robot noticed the following build errors:
+On Mon, Feb 2, 2026 at 11:28=E2=80=AFAM Alice Mikityanska
+<alice.projects@fastmail.im> wrote:
+>
+> From: Alice Mikityanska <alice@isovalent.com>
+>
+> Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
+> unnecessary steps from the bnxt_en TX path, that used to check and
+> remove HBH.
+>
+> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-[auto build test ERROR on drm-xe/drm-xe-next]
-[also build test ERROR on drm-misc/drm-misc-next drm/drm-next linus/master v6.19-rc8]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Riana-Tauro/drm-ras-Introduce-the-DRM-RAS-infrastructure-over-generic-netlink/20260202-141553
-base:   https://gitlab.freedesktop.org/drm/xe/kernel.git drm-xe-next
-patch link:    https://lore.kernel.org/r/20260202064356.286243-8-riana.tauro%40intel.com
-patch subject: [PATCH v5 1/5] drm/ras: Introduce the DRM RAS infrastructure over generic netlink
-config: csky-randconfig-002-20260203 (https://download.01.org/0day-ci/archive/20260203/202602030622.mmakbYmv-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602030622.mmakbYmv-lkp@intel.com/reproduce)
+--000000000000f594020649df3f4f
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602030622.mmakbYmv-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
->> include/net/netlink.h:1459:(.text+0x12): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_string':
-   include/net/netlink.h:1657:(.text+0x28): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
-   include/net/netlink.h:1459:(.text+0x3a): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `drm_ras_node_unregister':
->> drivers/gpu/drm/drm_ras.c:350:(.text+0x10c): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `__genlmsg_iput':
->> include/net/genetlink.h:342:(.text+0x246): undefined reference to `genlmsg_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
-   include/net/netlink.h:1459:(.text+0x262): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_string':
-   include/net/netlink.h:1657:(.text+0x27e): undefined reference to `nla_put'
->> csky-linux-ld: include/net/netlink.h:1657:(.text+0x29a): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
-   include/net/netlink.h:1459:(.text+0x2b6): undefined reference to `nla_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_trim':
->> include/net/netlink.h:1108:(.text+0x2e4): undefined reference to `skb_trim'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `drm_ras_nl_list_nodes_dumpit':
->> drivers/gpu/drm/drm_ras.c:144:(.text+0x330): undefined reference to `genlmsg_put'
->> csky-linux-ld: drivers/gpu/drm/drm_ras.c:144:(.text+0x334): undefined reference to `nla_put'
->> csky-linux-ld: drivers/gpu/drm/drm_ras.c:144:(.text+0x344): undefined reference to `skb_trim'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `__genlmsg_iput':
-   include/net/genetlink.h:342:(.text+0x408): undefined reference to `genlmsg_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_trim':
-   include/net/netlink.h:1108:(.text+0x45a): undefined reference to `skb_trim'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `alloc_skb':
->> include/linux/skbuff.h:1383:(.text+0x4f8): undefined reference to `__alloc_skb'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `__genlmsg_iput':
-   include/net/genetlink.h:342:(.text+0x510): undefined reference to `genlmsg_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `kfree_skb_reason':
->> include/linux/skbuff.h:1322:(.text+0x51e): undefined reference to `sk_skb_reason_drop'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `doit_reply_value':
-   drivers/gpu/drm/drm_ras.c:196:(.text+0x534): undefined reference to `genlmsg_put'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.c:196:(.text+0x544): undefined reference to `skb_trim'
->> csky-linux-ld: drivers/gpu/drm/drm_ras.c:196:(.text+0x548): undefined reference to `__alloc_skb'
->> csky-linux-ld: drivers/gpu/drm/drm_ras.c:196:(.text+0x54c): undefined reference to `sk_skb_reason_drop'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_trim':
-   include/net/netlink.h:1108:(.text+0x5a4): undefined reference to `skb_trim'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `kfree_skb_reason':
-   include/linux/skbuff.h:1322:(.text+0x5b6): undefined reference to `sk_skb_reason_drop'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_unicast':
->> include/net/netlink.h:1198:(.text+0x5d6): undefined reference to `netlink_unicast'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `drm_ras_nl_query_error_counter_doit':
->> drivers/gpu/drm/drm_ras.c:312:(.text+0x614): undefined reference to `skb_trim'
-   csky-linux-ld: drivers/gpu/drm/drm_ras.c:312:(.text+0x618): undefined reference to `sk_skb_reason_drop'
->> csky-linux-ld: drivers/gpu/drm/drm_ras.c:312:(.text+0x61c): undefined reference to `init_net'
->> csky-linux-ld: drivers/gpu/drm/drm_ras.c:312:(.text+0x620): undefined reference to `netlink_unicast'
-   csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.o: in function `drm_ras_genl_family_register':
->> drivers/gpu/drm/drm_ras_genl_family.c:23:(.text+0xa): undefined reference to `genl_register_family'
-   csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.o: in function `drm_ras_genl_family_unregister':
->> drivers/gpu/drm/drm_ras_genl_family.c:39:(.text+0x4c): undefined reference to `genl_unregister_family'
->> csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.c:42:(.text+0x64): undefined reference to `genl_register_family'
->> csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.c:42:(.text+0x68): undefined reference to `genl_unregister_family'
-
-
-vim +1459 include/net/netlink.h
-
-24c410dce335db David S. Miller 2012-04-01  1448  
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1449  /**
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1450   * nla_put_u32 - Add a u32 netlink attribute to a socket buffer
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1451   * @skb: socket buffer to add attribute to
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1452   * @attrtype: attribute type
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1453   * @value: numeric value
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1454   */
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1455  static inline int nla_put_u32(struct sk_buff *skb, int attrtype, u32 value)
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1456  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1457  	u32 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1458  
-b4391db42308c9 Arnd Bergmann   2017-09-22 @1459  	return nla_put(skb, attrtype, sizeof(u32), &tmp);
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1460  }
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1461  
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1462  /**
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1463   * nla_put_uint - Add a variable-size unsigned int to a socket buffer
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1464   * @skb: socket buffer to add attribute to
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1465   * @attrtype: attribute type
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1466   * @value: numeric value
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1467   */
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1468  static inline int nla_put_uint(struct sk_buff *skb, int attrtype, u64 value)
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1469  {
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1470  	u64 tmp64 = value;
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1471  	u32 tmp32 = value;
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1472  
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1473  	if (tmp64 == tmp32)
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1474  		return nla_put_u32(skb, attrtype, tmp32);
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1475  	return nla_put(skb, attrtype, sizeof(u64), &tmp64);
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1476  }
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1477  
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1478  /**
-569a8fc38367df David S. Miller 2012-03-29  1479   * nla_put_be32 - Add a __be32 netlink attribute to a socket buffer
-569a8fc38367df David S. Miller 2012-03-29  1480   * @skb: socket buffer to add attribute to
-569a8fc38367df David S. Miller 2012-03-29  1481   * @attrtype: attribute type
-569a8fc38367df David S. Miller 2012-03-29  1482   * @value: numeric value
-569a8fc38367df David S. Miller 2012-03-29  1483   */
-569a8fc38367df David S. Miller 2012-03-29  1484  static inline int nla_put_be32(struct sk_buff *skb, int attrtype, __be32 value)
-569a8fc38367df David S. Miller 2012-03-29  1485  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1486  	__be32 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1487  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1488  	return nla_put(skb, attrtype, sizeof(__be32), &tmp);
-569a8fc38367df David S. Miller 2012-03-29  1489  }
-569a8fc38367df David S. Miller 2012-03-29  1490  
-6c1dd3b6a35178 David S. Miller 2012-04-01  1491  /**
-6c1dd3b6a35178 David S. Miller 2012-04-01  1492   * nla_put_net32 - Add 32-bit network byte order netlink attribute to a socket buffer
-6c1dd3b6a35178 David S. Miller 2012-04-01  1493   * @skb: socket buffer to add attribute to
-6c1dd3b6a35178 David S. Miller 2012-04-01  1494   * @attrtype: attribute type
-6c1dd3b6a35178 David S. Miller 2012-04-01  1495   * @value: numeric value
-6c1dd3b6a35178 David S. Miller 2012-04-01  1496   */
-6c1dd3b6a35178 David S. Miller 2012-04-01  1497  static inline int nla_put_net32(struct sk_buff *skb, int attrtype, __be32 value)
-6c1dd3b6a35178 David S. Miller 2012-04-01  1498  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1499  	__be32 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1500  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1501  	return nla_put_be32(skb, attrtype | NLA_F_NET_BYTEORDER, tmp);
-6c1dd3b6a35178 David S. Miller 2012-04-01  1502  }
-6c1dd3b6a35178 David S. Miller 2012-04-01  1503  
-24c410dce335db David S. Miller 2012-04-01  1504  /**
-24c410dce335db David S. Miller 2012-04-01  1505   * nla_put_le32 - Add a __le32 netlink attribute to a socket buffer
-24c410dce335db David S. Miller 2012-04-01  1506   * @skb: socket buffer to add attribute to
-24c410dce335db David S. Miller 2012-04-01  1507   * @attrtype: attribute type
-24c410dce335db David S. Miller 2012-04-01  1508   * @value: numeric value
-24c410dce335db David S. Miller 2012-04-01  1509   */
-24c410dce335db David S. Miller 2012-04-01  1510  static inline int nla_put_le32(struct sk_buff *skb, int attrtype, __le32 value)
-24c410dce335db David S. Miller 2012-04-01  1511  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1512  	__le32 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1513  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1514  	return nla_put(skb, attrtype, sizeof(__le32), &tmp);
-24c410dce335db David S. Miller 2012-04-01  1515  }
-24c410dce335db David S. Miller 2012-04-01  1516  
-73520786b0793c Nicolas Dichtel 2016-04-22  1517  /**
-73520786b0793c Nicolas Dichtel 2016-04-22  1518   * nla_put_u64_64bit - Add a u64 netlink attribute to a skb and align it
-73520786b0793c Nicolas Dichtel 2016-04-22  1519   * @skb: socket buffer to add attribute to
-73520786b0793c Nicolas Dichtel 2016-04-22  1520   * @attrtype: attribute type
-73520786b0793c Nicolas Dichtel 2016-04-22  1521   * @value: numeric value
-73520786b0793c Nicolas Dichtel 2016-04-22  1522   * @padattr: attribute type for the padding
-73520786b0793c Nicolas Dichtel 2016-04-22  1523   */
-73520786b0793c Nicolas Dichtel 2016-04-22  1524  static inline int nla_put_u64_64bit(struct sk_buff *skb, int attrtype,
-73520786b0793c Nicolas Dichtel 2016-04-22  1525  				    u64 value, int padattr)
-73520786b0793c Nicolas Dichtel 2016-04-22  1526  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1527  	u64 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1528  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1529  	return nla_put_64bit(skb, attrtype, sizeof(u64), &tmp, padattr);
-73520786b0793c Nicolas Dichtel 2016-04-22  1530  }
-73520786b0793c Nicolas Dichtel 2016-04-22  1531  
-569a8fc38367df David S. Miller 2012-03-29  1532  /**
-b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1533   * nla_put_be64 - Add a __be64 netlink attribute to a socket buffer and align it
-569a8fc38367df David S. Miller 2012-03-29  1534   * @skb: socket buffer to add attribute to
-569a8fc38367df David S. Miller 2012-03-29  1535   * @attrtype: attribute type
-569a8fc38367df David S. Miller 2012-03-29  1536   * @value: numeric value
-b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1537   * @padattr: attribute type for the padding
-569a8fc38367df David S. Miller 2012-03-29  1538   */
-b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1539  static inline int nla_put_be64(struct sk_buff *skb, int attrtype, __be64 value,
-b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1540  			       int padattr)
-569a8fc38367df David S. Miller 2012-03-29  1541  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1542  	__be64 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1543  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1544  	return nla_put_64bit(skb, attrtype, sizeof(__be64), &tmp, padattr);
-569a8fc38367df David S. Miller 2012-03-29  1545  }
-569a8fc38367df David S. Miller 2012-03-29  1546  
-6c1dd3b6a35178 David S. Miller 2012-04-01  1547  /**
-e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1548   * nla_put_net64 - Add 64-bit network byte order nlattr to a skb and align it
-6c1dd3b6a35178 David S. Miller 2012-04-01  1549   * @skb: socket buffer to add attribute to
-6c1dd3b6a35178 David S. Miller 2012-04-01  1550   * @attrtype: attribute type
-6c1dd3b6a35178 David S. Miller 2012-04-01  1551   * @value: numeric value
-e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1552   * @padattr: attribute type for the padding
-6c1dd3b6a35178 David S. Miller 2012-04-01  1553   */
-e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1554  static inline int nla_put_net64(struct sk_buff *skb, int attrtype, __be64 value,
-e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1555  				int padattr)
-6c1dd3b6a35178 David S. Miller 2012-04-01  1556  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1557  	__be64 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1558  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1559  	return nla_put_be64(skb, attrtype | NLA_F_NET_BYTEORDER, tmp,
-e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1560  			    padattr);
-6c1dd3b6a35178 David S. Miller 2012-04-01  1561  }
-6c1dd3b6a35178 David S. Miller 2012-04-01  1562  
-24c410dce335db David S. Miller 2012-04-01  1563  /**
-e7479122befd70 Nicolas Dichtel 2016-04-22  1564   * nla_put_le64 - Add a __le64 netlink attribute to a socket buffer and align it
-24c410dce335db David S. Miller 2012-04-01  1565   * @skb: socket buffer to add attribute to
-24c410dce335db David S. Miller 2012-04-01  1566   * @attrtype: attribute type
-24c410dce335db David S. Miller 2012-04-01  1567   * @value: numeric value
-e7479122befd70 Nicolas Dichtel 2016-04-22  1568   * @padattr: attribute type for the padding
-24c410dce335db David S. Miller 2012-04-01  1569   */
-e7479122befd70 Nicolas Dichtel 2016-04-22  1570  static inline int nla_put_le64(struct sk_buff *skb, int attrtype, __le64 value,
-e7479122befd70 Nicolas Dichtel 2016-04-22  1571  			       int padattr)
-24c410dce335db David S. Miller 2012-04-01  1572  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1573  	__le64 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1574  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1575  	return nla_put_64bit(skb, attrtype, sizeof(__le64), &tmp, padattr);
-24c410dce335db David S. Miller 2012-04-01  1576  }
-24c410dce335db David S. Miller 2012-04-01  1577  
-4778e0be16c291 Jiri Pirko      2012-07-27  1578  /**
-4778e0be16c291 Jiri Pirko      2012-07-27  1579   * nla_put_s8 - Add a s8 netlink attribute to a socket buffer
-4778e0be16c291 Jiri Pirko      2012-07-27  1580   * @skb: socket buffer to add attribute to
-4778e0be16c291 Jiri Pirko      2012-07-27  1581   * @attrtype: attribute type
-4778e0be16c291 Jiri Pirko      2012-07-27  1582   * @value: numeric value
-4778e0be16c291 Jiri Pirko      2012-07-27  1583   */
-4778e0be16c291 Jiri Pirko      2012-07-27  1584  static inline int nla_put_s8(struct sk_buff *skb, int attrtype, s8 value)
-4778e0be16c291 Jiri Pirko      2012-07-27  1585  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1586  	s8 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1587  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1588  	return nla_put(skb, attrtype, sizeof(s8), &tmp);
-4778e0be16c291 Jiri Pirko      2012-07-27  1589  }
-4778e0be16c291 Jiri Pirko      2012-07-27  1590  
-4778e0be16c291 Jiri Pirko      2012-07-27  1591  /**
-4778e0be16c291 Jiri Pirko      2012-07-27  1592   * nla_put_s16 - Add a s16 netlink attribute to a socket buffer
-4778e0be16c291 Jiri Pirko      2012-07-27  1593   * @skb: socket buffer to add attribute to
-4778e0be16c291 Jiri Pirko      2012-07-27  1594   * @attrtype: attribute type
-4778e0be16c291 Jiri Pirko      2012-07-27  1595   * @value: numeric value
-4778e0be16c291 Jiri Pirko      2012-07-27  1596   */
-4778e0be16c291 Jiri Pirko      2012-07-27  1597  static inline int nla_put_s16(struct sk_buff *skb, int attrtype, s16 value)
-4778e0be16c291 Jiri Pirko      2012-07-27  1598  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1599  	s16 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1600  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1601  	return nla_put(skb, attrtype, sizeof(s16), &tmp);
-4778e0be16c291 Jiri Pirko      2012-07-27  1602  }
-4778e0be16c291 Jiri Pirko      2012-07-27  1603  
-4778e0be16c291 Jiri Pirko      2012-07-27  1604  /**
-4778e0be16c291 Jiri Pirko      2012-07-27  1605   * nla_put_s32 - Add a s32 netlink attribute to a socket buffer
-4778e0be16c291 Jiri Pirko      2012-07-27  1606   * @skb: socket buffer to add attribute to
-4778e0be16c291 Jiri Pirko      2012-07-27  1607   * @attrtype: attribute type
-4778e0be16c291 Jiri Pirko      2012-07-27  1608   * @value: numeric value
-4778e0be16c291 Jiri Pirko      2012-07-27  1609   */
-4778e0be16c291 Jiri Pirko      2012-07-27  1610  static inline int nla_put_s32(struct sk_buff *skb, int attrtype, s32 value)
-4778e0be16c291 Jiri Pirko      2012-07-27  1611  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1612  	s32 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1613  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1614  	return nla_put(skb, attrtype, sizeof(s32), &tmp);
-4778e0be16c291 Jiri Pirko      2012-07-27  1615  }
-4778e0be16c291 Jiri Pirko      2012-07-27  1616  
-4778e0be16c291 Jiri Pirko      2012-07-27  1617  /**
-756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1618   * nla_put_s64 - Add a s64 netlink attribute to a socket buffer and align it
-4778e0be16c291 Jiri Pirko      2012-07-27  1619   * @skb: socket buffer to add attribute to
-4778e0be16c291 Jiri Pirko      2012-07-27  1620   * @attrtype: attribute type
-4778e0be16c291 Jiri Pirko      2012-07-27  1621   * @value: numeric value
-756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1622   * @padattr: attribute type for the padding
-4778e0be16c291 Jiri Pirko      2012-07-27  1623   */
-756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1624  static inline int nla_put_s64(struct sk_buff *skb, int attrtype, s64 value,
-756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1625  			      int padattr)
-4778e0be16c291 Jiri Pirko      2012-07-27  1626  {
-b4391db42308c9 Arnd Bergmann   2017-09-22  1627  	s64 tmp = value;
-b4391db42308c9 Arnd Bergmann   2017-09-22  1628  
-b4391db42308c9 Arnd Bergmann   2017-09-22  1629  	return nla_put_64bit(skb, attrtype, sizeof(s64), &tmp, padattr);
-4778e0be16c291 Jiri Pirko      2012-07-27  1630  }
-4778e0be16c291 Jiri Pirko      2012-07-27  1631  
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1632  /**
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1633   * nla_put_sint - Add a variable-size signed int to a socket buffer
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1634   * @skb: socket buffer to add attribute to
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1635   * @attrtype: attribute type
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1636   * @value: numeric value
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1637   */
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1638  static inline int nla_put_sint(struct sk_buff *skb, int attrtype, s64 value)
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1639  {
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1640  	s64 tmp64 = value;
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1641  	s32 tmp32 = value;
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1642  
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1643  	if (tmp64 == tmp32)
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1644  		return nla_put_s32(skb, attrtype, tmp32);
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1645  	return nla_put(skb, attrtype, sizeof(s64), &tmp64);
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1646  }
-374d345d9b5e13 Jakub Kicinski  2023-10-18  1647  
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1648  /**
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1649   * nla_put_string - Add a string netlink attribute to a socket buffer
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1650   * @skb: socket buffer to add attribute to
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1651   * @attrtype: attribute type
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1652   * @str: NUL terminated string
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1653   */
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1654  static inline int nla_put_string(struct sk_buff *skb, int attrtype,
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1655  				 const char *str)
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1656  {
-bfa83a9e03cf8d Thomas Graf     2005-11-10 @1657  	return nla_put(skb, attrtype, strlen(str) + 1, str);
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1658  }
-bfa83a9e03cf8d Thomas Graf     2005-11-10  1659  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+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
+DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
+qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
+5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
+rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
+qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
+2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
+K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
+H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
+Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
+WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
+q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
+2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
+bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
+R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDaQnIv
+wKxT5Xlm3/LxVLvrbzi4Vi7eWWmzWgvRd/TcNzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjAyMDIyMjU3MzlaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQASDROuVn6WQSksgsMCQisYkPZpYSR9Mg73UqvW6cRV
+N3OfFt2QQdCRRltRRotY0hU9dU+uEDfX5gk+VrdTuC2aRKUOo5hkOFCFPAAeihaE8FLxPQv05Anz
+VnWIr68rOud7NqqpfXKMhrnXYkECXkRy9CiCYG3oj+BVGxV85dU6cPOXplPF9p6gsWbzYN3AEntj
+i8KLxZUruDSFvtZupM8INhRX6GPEgVDbLLQfili5NNIUJa27Bw8CPR7y7IqJ+WCRS7HCpMcWrEfd
+Kx8DG+XI0aRH0j0yKIMgY2pSv7SsTrdBN5oH0xegBhgUXPPPx1wEiBnCJJS/Jl1rO9/vdpEn
+--000000000000f594020649df3f4f--
 
