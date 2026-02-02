@@ -1,287 +1,212 @@
-Return-Path: <netdev+bounces-255805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255806-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHl7DvdxgGkw8QIAu9opvQ
-	(envelope-from <netdev+bounces-255805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:23 +0100
+	id QDj3JhpygGkw8QIAu9opvQ
+	(envelope-from <netdev+bounces-255806-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F290CA3C1
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 187C8CA3ED
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DF061301840D
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 09:44:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0CE683002E43
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 09:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6B533A9FF;
-	Mon,  2 Feb 2026 09:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9362D836D;
+	Mon,  2 Feb 2026 09:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g07vD4Td"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="HuSaPAfk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9D52D836D
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 09:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6041DF987
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 09:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770025452; cv=none; b=b1E9pgY+OW/0EjCjqnZUuzNPDCJMkL8LL4L0CXW8TJwxKqXbi5tICJTEIfpRc1KQ2eUfg3ult1fUWFwnf95wakOsGdPEEKKMEVtiLjNF/x3sQP9Wpv6VExGGZwd4y/60fKow1qY6o3cZAosmaYfhb6sdTLlamXslGX9SLAoZZ00=
+	t=1770025496; cv=none; b=sJdjlHUWJTR6tqBa9W31U9I2clIh0stWcN20Iz+hHyQkruGPGW4DlU/qmNVLDC0gC/YIxZaKp2cV6bRxP6ZFhmcYgzh/4VF36orzVx921VYojTpef+dxZmpunsrbfmf26LyRhSCN5mPJ6d8qAB6X5CdcSLs5+ap+yoNmmG2fjmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770025452; c=relaxed/simple;
-	bh=5EL6AsHcVBdeADGxMcjKBj+/YFrUYYn5U1xjZYVD1R0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=on8MMeUVwSih/2sR6jI/RRmZ1y+GddgwMppGo5PP3PMDWEvpkWsMp/8Ogu6hq3Vc/LGnCAaNhlLSPA5kUvDwHVw3Q6WDb+oBm6XNy8hKXJf2JnM2L65hIi3+kwV0d24/btLuFe1lwEz+IMz2j2FeWx19UJntbUs4z2jmvwtOkfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g07vD4Td; arc=none smtp.client-ip=209.85.128.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-47ee2aa5e9eso1704235e9.2
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 01:44:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770025450; x=1770630250; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0rIIYAGyPLAQP7m4TA99kT+nOX8OsDiOc0NkESM+vog=;
-        b=g07vD4TdYLrGyQVgQVplCyFnKiXbeflmRduplqxTWOcj5qyhfYdzdzWagR+HnmQhv4
-         HOWSI+iuUUN5G6s6mGyCxbwycNAdZD0e6pZiZYyXqNVIuFah0brR3N+/agXoOYYRgNlv
-         6r21hsieVmtSzuI1uGHasNpKqQEQi5PloS7l4n3iYVbfa3AJ2SrfFIcdtLQbF5gQq093
-         cGsSuRH6nAXd8W2zwknDLWKaIDvqlWmnfixu3Y/IHcKgU2a+nJ18BpgH82ajMegoxDv3
-         3Fmz2BpXdocJckeTara/hHaUSZ/44YHLHPjIueOaJPyV1HGegQ4LinDx8R9fwHGdRxIX
-         LGOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770025450; x=1770630250;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0rIIYAGyPLAQP7m4TA99kT+nOX8OsDiOc0NkESM+vog=;
-        b=fWVWihR88KsUlhr5ZJFnqv7+VOop0melIALovWDt3nx7/1aQLdxmq5OjNC9OrI/x2K
-         QzJb+WWnWr7+abv55TQpD3ZQk4Ej8yfbfM1tZA+1gLwBR+oyCv8iSf3To3SucoPRhLmh
-         WUrVJIQastm1vBiTdwkGtKlMO97EfWPvBGAn0qLoT6cFvsGRQV4Fbu8Mk/3WjIW8LNMO
-         5lGBfrMO10Qt+TAyJ+Au5vtk7ajYigFGp1GFkH8fOS5aUb5rSVpb1kQJPUG7uTEB2Ynq
-         SLQ9Eq4O8IaSEecVSv5oetOAF3+bk4vMFheFRqfqJQTXUqOt+qdLG6oGOszhzNbxehnQ
-         0Zrg==
-X-Forwarded-Encrypted: i=1; AJvYcCVnD3nbtpTIVnQEB+g/xuH3bLF/55FcC25+2jJVBT5v7vm0n7623LwRnng+mHkFi3OKufVevM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRsYN7Mrk9K4RrUdTQb2xpHyziE8j9bP1gpRssiudiuRkkX6cV
-	zJp8zC9Y90ODS3lm/D0mA4+4V6gdmfWMkG8ktPVxeaGdHUZFI7iGchxa
-X-Gm-Gg: AZuq6aJZAOxk/5RpRVwJ05q6UUFzYtfuxCY1sTt35ppncWKDuD0W53tsOLo2DuxrPs8
-	tiiZNTDbcGRfvKIicl5RmvQxGMBlHewxvsrsKb1eeMxXKXn8DJ0XsZ/eQayBA7JO1gcyc0m+bLp
-	EtqdoTqd1wTMnGO4g43hr9EwftXa7WL6aQrBATFQXkDJd+SzIJMS321wqQMt7oQvF/HbvHAQYMd
-	85gGQ4oBatRbkXac1hspnJGNMGO6hWvnU+2BhrTBinIRiVg6wWsDewxky0vfI+yPaE+8LYITK/E
-	tlTBzFQoskakukQ9/xgtYVipRdzE0cYeARuFjPC8+EE2G+f9Hb+z6W8NnYHR81FNRRBEmqJSObr
-	kjZdqaQDaQm/YLVdV1eTsFD1ccLkzqcfD6OpkMx64cyNBmIP6h4x0Q4az9lKHVAPbkpdVIq8x9C
-	n4BjE=
-X-Received: by 2002:a05:600c:818e:b0:477:9dd9:ac57 with SMTP id 5b1f17b1804b1-482db2022f4mr72271205e9.0.1770025449530;
-        Mon, 02 Feb 2026 01:44:09 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:74c4:3a65:f9a9:6c29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e4757sm44205033f8f.5.2026.02.02.01.44.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 01:44:08 -0800 (PST)
-Date: Mon, 2 Feb 2026 11:44:05 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: daniel@makrotopia.org, lxu@maxlinear.com, hkallweit1@gmail.com,
-	yweng@maxlinear.com, ajayaraman@maxlinear.com, andrew@lunn.ch,
-	netdev@vger.kernel.org, bxu@maxlinear.com, krzk+dt@kernel.org,
-	linux-kernel@vger.kernel.org, lrosu@maxlinear.com, chad@monroe.io,
-	conor+dt@kernel.org, devicetree@vger.kernel.org, robh@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, cezary.wilmanski@adtran.com,
-	davem@davemloft.net, john@phrozen.org, frankwu@gmx.de,
-	jpovazanec@maxlinear.com, linux@armlinux.org.uk,
-	fchan@maxlinear.com, horms@kernel.org
-Subject: Re: [net-next,v11,4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <20260202094405.rsojaz5xmorubjfz@skbuf>
-References: <46226b74030f76bd04149ed5c92b3e263abbe6c2.1769817939.git.daniel@makrotopia.org>
- <20260131175243.1122906-2-kuba@kernel.org>
+	s=arc-20240116; t=1770025496; c=relaxed/simple;
+	bh=gHHIjAzRY/u/956j/yU7dogymyJfxap9e8VqtCo++o0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BuYlYYabdz79dh0Cc2MeXBBmFheQ/jso9k/8OwCpQa+D4/QVQeu6Pvp9X6Ij4ATejP/pziAIBm/QTcaJeiK8m0icvwaSrpwB+53Zkz6zVKPeeUYueLxGsHLzaNCW5udNWj2L8TaVHo9UVOg0IWSYrnjtDYM17bCDdaj50zR/RwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=HuSaPAfk; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 58E8920539;
+	Mon,  2 Feb 2026 10:44:45 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NitvhfW6o6px; Mon,  2 Feb 2026 10:44:44 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 9C45C207AC;
+	Mon,  2 Feb 2026 10:44:44 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 9C45C207AC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1770025484;
+	bh=lrpU+NshVLPt9NIOaJ1IfKNBf7Tqt1CauPGpJAm3LHQ=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=HuSaPAfkKKARmnU3s5ZM0YzD/guofpo5edhGiy9b9mTtxQ2K5IJyvMbhgtLbybUMo
+	 82cTitAXtYLTJHPsWAIky+2KiktVhJR6GCZbEyckV5Xd4vXs30pD1oCU+Q9dlJ9S6p
+	 OKFcwug4kpRggAs5Pjke0XGj1tf+mAqgsFkvx/uEHnq4w2XBZQQ3A9nD+c18xhDvlh
+	 Qts9EVPL+pK/uVdX/ECPDWWMjPuiCw6UGLPXxHL5nJ6M3TtX5ikA00vcfRqwgusRRJ
+	 WAnOW1rmGtZGWpVf4Hrg5bmvO70NpnvRv/zmicHzODK4T3fS/TjFTN+ssAzW4unuF7
+	 /w7DPXZxTLkOA==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Feb
+ 2026 10:44:43 +0100
+Received: (nullmailer pid 1571467 invoked by uid 1000);
+	Mon, 02 Feb 2026 09:44:43 -0000
+Date: Mon, 2 Feb 2026 10:44:43 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Yan Yan <evitayan@google.com>
+CC: <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+	<antony.antony@secunet.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
+	<akamluddin@marvell.com>, Nathan Harold <nharold@google.com>,
+	<greg@kroah.com>
+Subject: Re: [REGRESSION] Discussion on "xfrm: Duplicate SPI Handling"
+Message-ID: <aYByCz-DWi2VZMy-@secunet.com>
+References: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20260131175243.1122906-2-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-255806-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255805-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[makrotopia.org,maxlinear.com,gmail.com,lunn.ch,vger.kernel.org,kernel.org,monroe.io,google.com,redhat.com,adtran.com,davemloft.net,phrozen.org,gmx.de,armlinux.org.uk];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,secunet.com:mid,secunet.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9F290CA3C1
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 187C8CA3ED
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 09:52:44AM -0800, Jakub Kicinski wrote:
-> > +static int mxl862xx_add_single_port_bridge(struct dsa_switch *ds, int port)
-> > +{
-> > +	struct mxl862xx_bridge_port_config br_port_cfg = {};
-> > +	struct dsa_port *dp = dsa_to_port(ds, port);
-> > +	struct mxl862xx_bridge_alloc br_alloc = {};
-> > +	int ret;
-> > +
-> > +	ret = MXL862XX_API_READ(ds->priv, MXL862XX_BRIDGE_ALLOC, br_alloc);
-> > +	if (ret) {
-> > +		dev_err(ds->dev, "failed to allocate a bridge for port %d\n", port);
-> > +		return ret;
-> > +	}
-> > +
-> > +	br_port_cfg.bridge_id = br_alloc.bridge_id;
-> > +	br_port_cfg.bridge_port_id = cpu_to_le16(port);
-> > +	br_port_cfg.mask = cpu_to_le32(MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_ID |
-> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_PORT_MAP |
-> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_MC_SRC_MAC_LEARNING |
-> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_VLAN_BASED_MAC_LEARNING);
-> > +	br_port_cfg.src_mac_learning_disable = true;
-> > +	br_port_cfg.vlan_src_mac_vid_enable = false;
-> > +	br_port_cfg.vlan_dst_mac_vid_enable = false;
-> > +	br_port_cfg.bridge_port_map[0] = cpu_to_le16(BIT(dp->cpu_dp->index));
+On Wed, Jan 28, 2026 at 04:43:06PM +0800, Yan Yan wrote:
+> Hi all,
 > 
-> Can this dereference NULL pointers?
+> I am writing because unfortunately commit: 94f39804d891 ("xfrm:
+> Duplicate SPI Handling") has caused a regression in the Android OS, so
+> we would like to gain some context to help determine next steps. The
+> issue is caused by the new requirement for global SPI uniqueness
+> during allocation. Based on our review of RFC 4301 and the previous
+> review history, we would like to highlight a few concerns:
+> 
+> 1. Regression on Android:
+> This change breaks production behavior in Android, which uses
+> XFRM_MSG_ALLOCSPI to create larval SAs for both directions. Since RFC
+> 4301 allows duplicate outbound SPIs, and larval SAs are often created
+> before direction or selectors are finalized, the allocator must remain
+> permissive (at least in our current design).
+> This also aligns with a concern Herbert Xu raised during the initial
+> review regarding compatibility:
+> >    "It's also dangerous to unilaterally do this since existing deployments
+> >    could rely on the old behaviour. You'd need to add a toggle for
+> >    compatibility."
 
-No. DSA will not make calls to ds->ops->port_setup() with "port" values
-for which dsa_to_port(ds, port) will not find a struct dsa_port *.
+Indeed, it was...
 
-> The dsa_to_port() function can return NULL if the port is not found in
-> the switch tree. The code stores the result in dp but doesn't check if
-> dp is NULL before dereferencing dp->cpu_dp->index.
+> 2. Inbound SPI uniqueness should not be a hard requirement:
+> The justification for enforcing global SPI uniqueness often cites the
+> statement in RFC 4301, Section 4.1, that for unicast traffic, the SPI
+> "by itself suffices to specify an SA." However, we don’t think this
+> means inbound SPI uniqueness is a hard requirement because of the two
+> following reasons:
 > 
-> Looking at include/net/dsa.h, dsa_to_port() returns NULL when the port
-> is not found:
-> 
->     static inline struct dsa_port *dsa_to_port(struct dsa_switch *ds, int p)
->     {
->         struct dsa_switch_tree *dst = ds->dst;
->         struct dsa_port *dp;
-> 
->         list_for_each_entry(dp, &dst->ports, list)
->             if (dp->ds == ds && dp->index == p)
->                 return dp;
-> 
->         return NULL;
->     }
-> 
-> Additionally, even if dp is non-NULL, dp->cpu_dp could also be NULL if
-> the CPU port hasn't been properly assigned during initialization.
+> – Another statement implies that SPI uniqueness is just an
+> implementation choice:
+> >    "Each entry in the SA Database (SAD) MUST
+> >    indicate whether the SA lookup makes use of the destination IP address, or the
+> >    destination and source IP addresses, in addition to the SPI."
 
-mxl862xx_add_single_port_bridge() has been called when all other port
-types except user ports have been excluded. All user and DSA ports have
-a non-NULL dp->cpu_dp pointer after dsa_tree_setup_cpu_ports() runs,
-i.e. also at the time of ds->ops->port_setup().
+When reading RFC 4301, I'd interpret this as 'The SA
+must indicate whether it is unicast or multicast'.
 
-> > +static int mxl862xx_setup_mdio(struct dsa_switch *ds)
-> > +{
-> > +	struct mxl862xx_priv *priv = ds->priv;
-> > +	struct device *dev = ds->dev;
-> > +	struct device_node *mdio_np;
-> > +	struct mii_bus *bus;
-> > +	static int idx;
-> > +	int ret;
-> > +
-> > +	bus = devm_mdiobus_alloc(dev);
-> > +	if (!bus)
-> > +		return -ENOMEM;
-> > +
-> > +	bus->priv = priv;
-> > +	ds->user_mii_bus = bus;
-> > +	bus->name = KBUILD_MODNAME "-mii";
-> > +	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d", idx++);
 > 
-> Can concurrent probes race on the idx variable?
-> 
-> The static int idx is shared across all driver instances and accessed
-> without synchronization. If multiple instances of this driver are probed
-> concurrently on different CPU cores, they could race on the idx++
-> operation potentially leading to duplicate MII bus IDs. MII bus IDs must
-> be unique system-wide.
-> 
-> [ ... ]
+> – There is a "Longest Match" mandate which makes SPI uniqueness unnecessary:
+> >    "For each inbound, IPsec-protected packet, an implementation MUST
+> >    conduct its search of the SAD such that it finds the entry that
+> >    matches the 'longest' SA identifier. In this context, if two or more
+> >    SAD entries match based on the SPI value, then the entry that also
+> >    matches based on destination address... is the 'longest' match."
 
-Technically ds->ops->setup() runs under dsa2_mutex, but the "static int idx"
-is still not ideal due to the ever-increasing index upon unbinding and
-rebinding.
+This is meant for multicast SAs, we don't support multicast SAs.
 
-> > +static int mxl862xx_setup_cpu_bridge(struct dsa_switch *ds, int port)
-> > +{
-> > +	struct mxl862xx_bridge_port_config br_port_cfg = {};
-> > +	struct mxl862xx_priv *priv = ds->priv;
-> > +	u16 bridge_port_map = 0;
-> > +	struct dsa_port *dp;
-> > +
-> > +	/* CPU port bridge setup */
-> > +	br_port_cfg.mask = cpu_to_le32(MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_PORT_MAP |
-> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_MC_SRC_MAC_LEARNING |
-> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_VLAN_BASED_MAC_LEARNING);
-> > +
-> > +	br_port_cfg.bridge_port_id = cpu_to_le16(port);
-> > +	br_port_cfg.src_mac_learning_disable = false;
-> > +	br_port_cfg.vlan_src_mac_vid_enable = true;
-> > +	br_port_cfg.vlan_dst_mac_vid_enable = true;
-> > +
-> > +	/* include all assigned user ports in the CPU portmap */
-> > +	dsa_switch_for_each_user_port(dp, ds) {
-> > +		if (dp->cpu_dp->index != port)
-> > +			continue;
+> 3. Further clarification on the specific problem being addressed would
+> be helpful. The "real-world" problem this commit intends to fix
+> remains unclear. The patch mentions:
+> >    "This behavior causes inconsistencies during SPI lookups for inbound packets.
+> >    Since the lookup may return an arbitrary SA among those with the same SPI,
+> >    packet processing can fail, resulting in packet drops."
 > 
-> Can dp->cpu_dp be dereferenced safely here?
-> 
-> The code dereferences dp->cpu_dp->index without checking if cpu_dp is
-> NULL. While the DSA framework should ensure user ports have a CPU port
-> assigned during initialization, there is no explicit NULL check. If
-> cpu_dp is NULL for any reason such as incomplete initialization or
-> configuration error, this will cause a NULL pointer dereference and
-> kernel crash.
+> However, Linux kernel lookups using the triplet (SPI, Protocol, Daddr)
+> are deterministic. The lookup will not return an "arbitrary" SA
+> because the destination address is used to disambiguate the state.
 
-No incompletely initialized ports are published to dst->ports.
+That was how RFC 2401 did it:
 
-> > +	ret = dsa_register_switch(ds);
-> > +	if (ret)
-> > +		return ret;
-> 
-> Is dev_set_drvdata() called too early?
-> 
-> The function calls dev_set_drvdata(dev, ds) before calling
-> dsa_register_switch(ds). If dsa_register_switch() fails, the function
-> returns the error but leaves the driver data pointing to an unregistered
-> switch.
-> 
-> This creates a problem for cleanup paths. The mxl862xx_remove() function
-> retrieves the switch with dev_get_drvdata() and calls
-> dsa_unregister_switch(ds). If probe failed, ds is not NULL so the check
-> passes but the switch was never successfully registered. Similarly,
-> mxl862xx_shutdown() could be called and would also operate on an
-> unregistered switch. While dsa_switch_shutdown() has a check for
-> ds->setup flag that provides some protection, this is fragile and could
-> lead to inconsistent state or crashes in error scenarios.
-> 
-> [Jakub] AI is a bit pedantic about leaving the drvdata pointer in place
->         but I guess it's not a bad thing to clean up
+A security association is uniquely identified by a triple consisting
+of a Security Parameter Index (SPI), an IP Destination Address, and a
+security protocol (AH or ESP) identifier.
 
-Can somebody gently explain what is the point? It is easily testable
-that if mdio_driver :: probe() fails, .remove() or .shutdown() will not
-be called. It really does not matter whether dev_set_drvdata() was
-called or not.
+That was obsoleted by RFC RFC 4301 saying the SPI alone identifies
+the SA for unicast traffic.
+
+Unfortunately our implementation is somewhat between RFC 2401
+and RFC 4301. There was no clear cut to support both versions.
+
+Maybe it is time to do this now and implement RFC 4301
+with a toggle to fallback to RFC 2401. This would avoid
+these kind of problems in the future, at least.
+
+> As Antony suggested, this change may cater to SPI-only hardware
+> indexing. If that is the case, we are concerned about applying such
+> hardware-specific limits to the software stack, especially if the
+> behavior is not opt-in, as it appears to require an overly-narrow
+> reading of the RFC 4301.
+> 
+> Given these concerns, would it be possible to discuss a revert or,
+> alternatively, could further context be provided regarding the
+> specific real-world problem this commit was intended to address? Once
+> the underlying issue is clearly defined, we can work together to find
+> a backward-compatible solution that satisfies all requirements.
+
+Here we end up with the question about the default behaviour,
+should the default be RFC 4301 or RFC 2401?
 
