@@ -1,84 +1,58 @@
-Return-Path: <netdev+bounces-255767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yC/9Cp1YgGkd6gIAu9opvQ
-	(envelope-from <netdev+bounces-255767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:56:13 +0100
+	id QJ08MR1ZgGns6wIAu9opvQ
+	(envelope-from <netdev+bounces-255772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:58:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823BFC964E
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:56:12 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8CB7C96BD
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:58:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C1F37302BE93
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 07:47:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AE872300383E
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 07:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA213314B79;
-	Mon,  2 Feb 2026 07:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A18A2C237F;
+	Mon,  2 Feb 2026 07:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJTh01WI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="vL463cxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A4D312834
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 07:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A592BE7DC
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 07:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770018422; cv=none; b=KcWrGcO2xrzkjufPhuxoKPRQToHtXsMccgyhHH5TT3X9SiP+21txSVahoKGUJTJNz0lUHrX7516yHeJx+yKWY85IDayg1j8Rqw9vG6EvYCt75nbglWj8UzAObIIgIjPm6kyx1+sLpjYcJr4xrv87uySdKgtAyuGiAM4Z3BP0HE4=
+	t=1770018991; cv=none; b=UWC1gt2+sB+eqd73+NoEyyiAmtmvy3mZrHjz0HZAxyRx9aoztxHnshJHBa/Z75zh7uMBk3cgwnS+Qc5lOQsMRSB+pnQzLcCcqcaeFxOqQ0Qv7+whvVDYe/l6z94Lhq5dT6XlUlrKjzVmeWn2EEbG59f0Xdb47XtbVf65QaE+BR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770018422; c=relaxed/simple;
-	bh=VdDgSvpaieI2p/IyVOSxK0KmRJwvG2dxqD556BPWle8=;
+	s=arc-20240116; t=1770018991; c=relaxed/simple;
+	bh=nchdBZXNLi6jVZ7u6RO58+pyCkNf4bWSFjQWZd4W/AE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OgiYsIOH72iasu6J+bZho3ADmv6jbOgQNGgcAZ8MehawxqekPhX6moXBDA5QqkMQon60VyRX0PwuOkg0hiVRbu3Y5wTrUFUjaNJn2j9s9BqaSepGN0peW+TyRVy1aalQdsD+Wmkg7ERt4Q9Gcns7x7rWpTnrmC8YuNxHCnooyzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJTh01WI; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47f5c2283b6so33571765e9.1
-        for <netdev@vger.kernel.org>; Sun, 01 Feb 2026 23:47:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770018419; x=1770623219; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tvEh3LdulASC4NAVEE51TIBolXq42cdGqQesFC9LyN8=;
-        b=iJTh01WI66x9nchD6SiAAK9nyAbpIoG8n4xXn7LMNqQqHowFCkdllUOw3CXIG/Henn
-         Rksz+ezYslkcHp+V4MmmBF5nhXvkpgPJEky6edn1cv4oiwIEaPI9KsfgX0C14S42uT+u
-         kKGzzrdHfmmLHo3opQVa8P6cZacuslVQ+ipVghPPfDta2QBFxbJc9OhbmqPG1E6QFQXf
-         Oz31esXDYWSlBGR2DLgwS1ThgbhQH+0SI/6ygfu67GjghJENKGiXIZN2ROyyf/DMpc3J
-         4rcRRh6vK78xnAoANdM+BgZuwdIrRTaGGd21A/SXX+2YDCTVU3TY1+JOlMNA2raE8YPz
-         wdng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770018419; x=1770623219;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tvEh3LdulASC4NAVEE51TIBolXq42cdGqQesFC9LyN8=;
-        b=OSA2+svMMmygYeDbZmAd8pORmXFxQnhjY6jYaPZYNk6lV6tl/Dp1M9o3X3N3Vguq98
-         nbaoBf17aG9c+AYf7muEacoH5F5xXcK51siWFFOY+UBzUxsTSvbBemlpSMfWCv88rfht
-         HNRcZiiv/TJwqbxP3lFaeCkS0kSVxGj95gxxsh2mOQnJHaNGAqQIQjXhPVAmn0BR9CB6
-         6TUdPyUw1JrJoe7zO96wsO+5mS3fFzeBscbG5pBsJ6CxI+F5nkIeBJ3NNHbP3tBGauE5
-         mkPM4V8WKoi9ezmtIiorz9VIji8ncJqBdK+Rc2+iTMJGdnZX2WV8dyIeIaGeiklStcU/
-         nKWg==
-X-Gm-Message-State: AOJu0YwdNqGsfg0AE4A/QHQ8XY5xFAyytqObxKObOoKibvddN1/SpcW+
-	4g4H6/ag/Y0kVXyCaK5fDfJiIk/XnyfEQ+Vii2M3SazWh+Mulgbh4Cam
-X-Gm-Gg: AZuq6aLsMYeUuoG4f4FI3yFo76pl3D5dKlK1v3J15bcFfqAD4yxXpQDTiv27R+rhFHo
-	4EX7OASl3fgyPoSZ3xRW4sQBuqQvfUQ40Ls22d+qekksqK2HmyybIBpMm1rsdVDkewUo9aH1PmZ
-	3Zogwk2tGY55H+ZAl2LHpxNR2AJF0yu4fU3304NbtK1V4yG4EVoGjQrK0tf1GtKr9nqV5Rf2MWP
-	i/iyA5rnOZm4iaRNAXD8BB2YgoX5tUbKe3YxGNOA9p+3WWMY+DJX1rKkZxEuiLgqbbujmDVkQve
-	bCCTh7grACcXMhmoMpE215SYQT9NiPssSvmtgtIj3u+H9mBL2gAWfFj3t15Zk+c2ow3r6s5GqUb
-	2ZR7rhpJKqSQt6eA7Wdtd0QsisuL11ORKETOzlnxlTxECyYAx34kGlxcE43EAua/lv6G13a4/TF
-	XXZBQZ7G31BwfPBRduAMlLbamWuZkEx8tx29S8hDgE5xg76QHO/yfdMQrmipVQjJjhApqamRSHg
-	yx5luPKEQOpySzFJ5YuyIhtD6rZdMVDrfJsAm8VqpV5l5r3uXQUzQ==
-X-Received: by 2002:a05:600c:4f8a:b0:477:76c2:49c9 with SMTP id 5b1f17b1804b1-482db4568dbmr144485575e9.2.1770018418392;
-        Sun, 01 Feb 2026 23:46:58 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f4b:2a00:c9cd:e574:8d91:9180? (p200300ea8f4b2a00c9cde5748d919180.dip0.t-ipconnect.de. [2003:ea:8f4b:2a00:c9cd:e574:8d91:9180])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806ce4c3c6sm370898395e9.10.2026.02.01.23.46.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Feb 2026 23:46:57 -0800 (PST)
-Message-ID: <415271ac-f37b-4efa-97ad-f6da68353e54@gmail.com>
-Date: Mon, 2 Feb 2026 08:46:57 +0100
+	 In-Reply-To:Content-Type; b=IShT1WbaXDZ++Fuf5xIT+Jc7T25yt2qhTQeG3OuviYQT62wOywx7K4rUqn5AxLLVtfFgg/+mtfrIzT6BK2fk7iO/3OLYlwSZ4fo22abqaf5Xs9+s2NASC/+ehQC4Mcs9E0OD88v4J59deymQuInIRF6nyh8dITbo5SD/OUlP8QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vL463cxo; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id EE5321A2B94;
+	Mon,  2 Feb 2026 07:56:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BEFCE60767;
+	Mon,  2 Feb 2026 07:56:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5D4A0119A8891;
+	Mon,  2 Feb 2026 08:56:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1770018985; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=DuCrnCOcQYVNXU3bhLaDSyIoMIusOApYWue7sfV4pqQ=;
+	b=vL463cxobzZxL9deO4Lo4O3kEm2JHAVLHOdRANOXFPlwWhk5UExzmzWQdsJVplPlDcAhmB
+	E8OHVuzNl1d5rA+/WtU/wePVxbCyzpRr1WIy/C69BsLsK6m0fR7T3CIYocHd0i9gX6ahnH
+	81mK2bEtna8/bS3OzAxheqfFvAQcvhAKLxfl5l78agUHIcR+ZYodiDC9mFqEXuWh0hPHZq
+	OeAUyrsaQUYFVuZDkuLM1PRbHbaX0dVgJSLP0yVZlqjwOVXg1QPMwe3J+hj4E2JhWKmmav
+	E5NIHLQl98138RMFi+HaTdi0FLJiEtpREiBQZmfcOG1dqcTkX7VxiuYYQONq7Q==
+Message-ID: <921c59ea-a3e5-439b-9a25-73374545a921@bootlin.com>
+Date: Mon, 2 Feb 2026 08:56:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,63 +60,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] r8169: add support for RTL8125cp
-To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260202021800.182-1-javen_xu@realsil.com.cn>
+Subject: Re: [PATCH net-next v3 00/11] net: phy_port: SFP modules
+ representation and phy_port listing
+To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260202021800.182-1-javen_xu@realsil.com.cn>
+In-Reply-To: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255767-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-255772-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,bootlin.com,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 823BFC964E
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: E8CB7C96BD
 X-Rspamd-Action: no action
 
-On 2/2/2026 3:18 AM, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
+Hi,
+
+On 01/02/2026 16:12, Maxime Chevallier wrote:
+> Hello everyone,
 > 
-> This patch adds support for chip RTL8125cp. Its XID is 0x708. We apply
-> different and firmware for RTL8125cp.
+> Here's V3 of the second phy_port series, this time bringing support for
+> more phy_port use especially for SFP, as well as the begining of a
+> ethnl uAPI.
 > 
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> ---
-> v2: This patch fix one mistake on phy_modify_paged(phydev, 0xa43, 0x10,
-> 0x0000, 0x1001) which is phy_modify_paged(phydev, 0xa43, 0x00, 0x0000, 0x1001) on patch v1.
-> 
-0xa43/0x10 is PHYCR1 (at least on RTL8221). There bit 12 is "ALDPS XTAL-OFF", and valid only
-if bit 2 is set too. And bits 0 and 1 are marked as reserved, to be 0 always.
-What PHY is RTL8125cp using, and has register 0xa43/0x10 a different meaning there?
+
+I saw there are some more AI reviews, I'll sift through these :)
+
+Maxime
 
 
