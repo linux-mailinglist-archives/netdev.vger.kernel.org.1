@@ -1,174 +1,256 @@
-Return-Path: <netdev+bounces-255977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256004-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNCABQDwgGkgDQMAu9opvQ
-	(envelope-from <netdev+bounces-255977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 19:42:08 +0100
+	id QJvMIKgJgWkCDwMAu9opvQ
+	(envelope-from <netdev+bounces-256004-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:31:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0A1D03F4
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 19:42:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A9AD119C
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 170FA300A8CA
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 18:41:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4B9873004D34
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 20:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B19C2F1FFC;
-	Mon,  2 Feb 2026 18:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429C829D29F;
+	Mon,  2 Feb 2026 20:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJaGx704"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jawdc6do"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EBF2F0C6A;
-	Mon,  2 Feb 2026 18:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948B022DFA4
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 20:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770057699; cv=none; b=dyKvezZYeh6VrT77FB2C8EGBR1/p0oz7PmhQxQJdLSSr6mrgrNno2X7nnaZBhBsEfKEkIkCnjqjES016ipgJhGRgumcgigyb+X0XFWNr/T0m7gP6rGsCjc+F6L7HNQvC3oXDRTnqtipd914SKYC+3tEDeunuCISbRHe4gGUf/DE=
+	t=1770064294; cv=none; b=StUkpoDUZFtzPTorNG7lCC0zq0u74FyH2MfTqFTimENd7hWl4ZwvL9pwUgM+EeJ3kXveNtxJOGFoITtfAcH4MRCAxKHxroOnsUZP43775d72DXYg7ZcBOaOPEW5tnC8G9u3X7uPKwlczXtSn1t2jggVyOpDQ3JnOC9UPv0jajhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770057699; c=relaxed/simple;
-	bh=p4XRwZ/6o5ZB7v1K1pUKC2mtPp1ItnetvzxJkA5gE0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MBtHVqpwHGZ0c5KXsgdAKtgBcNp9dwfkHdaDSzo5GwKIo9OHSiDTKp2Ul7Jt7i9iYgC8CdRHDGN/msjgPOW5BOiwfrIX0YOIZ0G7V/IQ5w6lEZKiigdHj3xd43cOeL74jFz0WaAkJAq/VCtBw9dbsVS8Xs2C/LsVdS8sVZ/V3j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJaGx704; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D067DC116C6;
-	Mon,  2 Feb 2026 18:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770057698;
-	bh=p4XRwZ/6o5ZB7v1K1pUKC2mtPp1ItnetvzxJkA5gE0g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tJaGx704PRvbxyLUAKLJY1RSxACoUJ+DiIK1abp3+JexDrY0r/BIIFaS6YRqsxL/x
-	 s0cBm17VSQhYiuzjCc4GJChsBP/I8ojzikERV2vzTsrZDpF/G0Rg6kyv277aMPuflk
-	 jD71FKz4cclCYyJBcFeUDNHcwLcE23DLZxj6OvScyTpKvvCPuOjq7ZfG/GOwjULnvQ
-	 IYOPduH9oO6KPBvoO/5crPhKAJm3rMJ+Jm8lGzn3rfvWVZOeZ7YaHc8i/NWaRqj4oX
-	 MxckD9NkdzDFpYTY1DoAum+pk9kaa4yW4Vey/FmKNmtMWM6QzpWh1tMDOrssaWEElr
-	 uAmXAGVVme9Tw==
-Date: Mon, 2 Feb 2026 10:41:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, davem@davemloft.net, razor@blackwall.org,
- pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-Subject: Re: [PATCH net-next v8 15/16] selftests/net: Add env for container
- based tests
-Message-ID: <20260202104136.4a7adbdf@kernel.org>
-In-Reply-To: <9037828b-c7fd-4eb1-9dd8-19ee49063361@davidwei.uk>
-References: <20260129222830.439687-1-daniel@iogearbox.net>
-	<20260129222830.439687-16-daniel@iogearbox.net>
-	<20260131163834.2c3d160d@kernel.org>
-	<9037828b-c7fd-4eb1-9dd8-19ee49063361@davidwei.uk>
+	s=arc-20240116; t=1770064294; c=relaxed/simple;
+	bh=CxDKue/QwhEnlG+wJswifFJfqAtRqJfZjvjccCJpzJk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SSe4Y1V3mpuW490GkbXN0Vm/q+Lk3plyHvJPtqSb5SKsiv2Hy1dyfKxSp/n4cwCSHwPyKYjDzuBFvGrmdP9/rnwus0pN+ixvhY6awPu3+V0TbJWLgX3eCjGVljPFI5UoimQEF+xgpP6thn6+qpC/0oYkWc6PUbL76JT6WUkKKrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jawdc6do; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b8869cd7bb1so856433566b.1
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 12:31:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770064291; x=1770669091; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MjBpuLkcLUaCRKPdP4eX6OjLAhe9FJoKGb09vlloYBU=;
+        b=jawdc6doCvtx4Z1LFBrfCVpZqoUMyclBPaWQNSBkJnPFXDHrApynCXj1aph+AbvpCf
+         Luu1unTsdFnKXeO3oB6EBPGwGSmZDh0igjIVSpA0V5fdeMj3zYO7n0vPT3FjfBpXJelB
+         ITBlh7RW3i5LRmHc+ixcK2rxludGuclkIR7yvtxBDeKqwkXSloR9xJsLfdlm3zakrXxz
+         kB2r7VI4+TFXwfeN9335jftVgoAvjQF+6crTtl8y0XeUJvTa+j32krMuALLFip2XCKQn
+         BEZNN0EJiiO1EQf4RUsPlzBVZoMJ9yJ4EdgXEq/SDbjDmn7n0bPAdD4UhEFsa+abypvS
+         nypg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770064291; x=1770669091;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MjBpuLkcLUaCRKPdP4eX6OjLAhe9FJoKGb09vlloYBU=;
+        b=Fw8aYURe6reJFIqaA//bA1GedPKFrBaYwBK+9lSaEP4KvqjFvpRyZXbWmQ+HfTpUaq
+         yeff5bEq6LITGuAXaOkIHNxsWqBBxiYAz8g2Mutngb/9+Y17CWWcIRJFEJilZdPmHfd0
+         V7ve9++pRZi78MX01RYNhHAFoIWcMMC1PC+RjBGBwfTvwUhK9R4jmux9NF546DN9ldgc
+         dKcH6thEKyL3Bh/0P6gNO8/pOhMaC3oT1LrHQkT5+YSdiZDSmD4bCKb8Sp1bQ3aMVIBG
+         17wuWJToS38ypUjKLmRGx3bfaMKTv/m15gxGcT5l8BUiry3f+NdldONSpBpJE/EuFGd4
+         iZtg==
+X-Forwarded-Encrypted: i=1; AJvYcCULp8wlZqx/uXv9qx25/aZggTb0h3RDLwxkPnGw8ZiGhQZS49+Tj7eIpuT0sz1v26va4h53l+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+GWUT2+QnNzwT+wxD1hRRURyZNFOGJ1luzTva65FTylGKwOZj
+	FeJIuKRvag/lUjQoHwWU3c3LtV6Qe7iotneWCq8eefq+afj5ZKzSrit4zBSTRw==
+X-Gm-Gg: AZuq6aLWXWO43qOZsU7Lez/4T8fY99b6VjUdMkUy1/87XbNaC5skDm5unYkwgRVj2Ad
+	ZlUymFFdUeeQILMimHEo+JuLzGgwaafZymRX/op2+c6lag9kxOOSwJzEMhmoC9FI3csyKB12kq3
+	ZtxcqdXz9seE3O3oudZcD37nYVo2dMUkV0Y/UUEQWorYA6UlehTUaIzw1HId8Ss3/jCPCxEFfNV
+	PX5rVJuHUFJ73zqJm3OWYhU7v8+oOET5DxJVfc+us2zLOHdVC96lFvH0V1GaoPzS0oK/uVcb6IX
+	ukkYzxMSp16fVacA6eW9sGJ3fZHa/RAQVtmHMpW6HW6FF+0vtLhbYBp3goZ3OlyIrq/FF599tHV
+	tZicVQP2N4+7a5FmhooQAb22F03/1+uVw9ekX4iBOTTiFNZtXszWRgdl1DFmqVpkn/0Oe7dAMzm
+	j3jipf2FWonI2TjU3CWvG+rxTm
+X-Received: by 2002:a05:600c:1385:b0:47e:dc64:f1c6 with SMTP id 5b1f17b1804b1-482db493eb4mr189595615e9.6.1770058495160;
+        Mon, 02 Feb 2026 10:54:55 -0800 (PST)
+Received: from [192.168.0.7] ([86.124.200.187])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482db623407sm125687055e9.0.2026.02.02.10.54.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Feb 2026 10:54:54 -0800 (PST)
+Message-ID: <f95f73b9-d024-4697-bca1-02fb8bc044af@gmail.com>
+Date: Mon, 2 Feb 2026 20:54:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next] net: stmmac: provide flag to disable EEE
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Clark Wang <xiaoning.wang@nxp.com>,
+ Daniel Scally <dan.scally@ideasonboard.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, imx@lists.linux.dev,
+ Jakub Kicinski <kuba@kernel.org>,
+ Kieran Bingham <kieran.bingham@ideasonboard.com>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Rob Herring <robh@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Shawn Guo <shawnguo@kernel.org>, Stefan Klug <stefan.klug@ideasonboard.com>,
+ Wei Fang <wei.fang@nxp.com>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+References: <E1vNUjC-0000000FhjR-0h6P@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+In-Reply-To: <E1vNUjC-0000000FhjR-0h6P@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255977-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256004-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[iogearbox.net,vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,bytedance.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,nxp.com,ideasonboard.com,davemloft.net,gmail.com,google.com,lists.linux.dev,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,pengutronix.de,redhat.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[ovidiupanaitoss@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,kernel];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D0A1D03F4
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 00A9AD119C
 X-Rspamd-Action: no action
 
-On Mon, 2 Feb 2026 07:53:34 +0900 David Wei wrote:
-> On 2026-02-01 09:38, Jakub Kicinski wrote:
-> > I'm not a Python expert but the pre-init of variables that are set
-> > later on in __init__() (on all possible paths) seems like a waste of LoC  
+
+Hi Russell,
+
+On 11/24/25 1:27 PM, Russell King (Oracle) wrote:
+> Some platforms have problems when EEE is enabled, and thus need a way
+> to disable stmmac EEE support. Add a flag before the other LPI related
+> flags which tells stmmac to avoid populating the phylink LPI
+> capabilities, which causes phylink to call phy_disable_eee() for any
+> PHY that is attached to the affected phylink instance.
 > 
-> It's so that exceptions thrown -> __del__() don't complain about
-> undefined vars.
-
-I see. I guess that's cleaner than hasattr(self, "xyz"), fair.
-
-> >> +
-> >> +        ip(f"link add type netkit mode l2 forward peer forward numrxqueues {rxqueues}")  
-> > 
-> > Would we be able to do this with YNL?
-> > no big deal but always nice to avoid the dependency on very latest CLI  
+> iMX8MP is an example - the lpi_intr_o signal is wired to an OR gate
+> along with the main dwmac interrupts. Since lpi_intr_o is synchronous
+> to the receive clock domain, and takes four clock cycles to clear, this
+> leads to interrupt storms as the interrupt remains asserted for some
+> time after the LPI control and status register is read.
 > 
-> Hmm, I tried looking into this already. My understanding is that this
-> can be done in C but not currently in YNL, not without adding a spec.
-
-I thought the only thing C can do that Python can't is deciding nested
-extacks.. Ah, of course.. I missed that patch 10 is not updating the
-YAML spec. That needs to be fixed, we want YAML to stay in sync for the
-families that are already YAML-ized.
-
-> >> +    def _setup_ns(self):
-> >> +        self.netns = NetNS()
-> >> +        cmd("ip netns attach init 1")
-> >> +        self._init_ns_attached = True
-> >> +        ip("netns set init 0", ns=self.netns)  
-> > 
-> > Hm, refactor class NetNSEnter or just use its enter method?  
+> This problem becomes worse when the receive clock from the PHY stops
+> when the receive path enters LPI state - which means that lpi_intr_o
+> can not deassert until the clock restarts. Since the LPI state of the
+> receive path depends on the link partner, this is out of our control.
+> We could disable RX clock stop at the PHY, but that doesn't get around
+> the slow-to-deassert lpi_intr_o mentioned in the above paragraph.
 > 
-> I did consider this but I didn't feel like it fit the very specific
-> purpose of NetNSEnter. I needed the init ns to have a valid nsid from
-> within the test netns, which I didn't think many other tests would need.
-
-What about the "ip netns attach init 1" ?
-that's the main thing that gave me pause TBH
-Why is it needed?
-
-> > Don't we need to also add a qdisc if there isn't one already?  
+> Previously, iMX8MP worked around this by disabling gigabit EEE, but
+> this is insufficient - the problem is also visible at 100M speeds,
+> where the receive clock is slower.
 > 
-> Sorry, why would qdisc be needed? The bpf prog attaches to tc. I don't
-> know anything about qdisc, though.
-
-There's a new way of attaching qdisc-less (TCX) but IIUC here you're
-attaching in the old way. So you must have a parent object. The ingress
-/ clsact qdisc isn't really for queuing packets, it's just a fake qdisc
-that lets you attach TC filters to an interface. Machines at Meta have 
-a clsact qdisc installed by init, but that's far from normal (try to
-run this command in vng, you'll see)
-
-> >> +        match = re.search(r'pref (\d+).*nk_forward\.bpf.*id (\d+)', tc_info)  
-> > 
-> > I haven't checked but TC doesn't support enough JSON and YNL doesn't
-> > support enough TC to avoid re hacks? :( :(  
+> There is extensive discussion and investigation in the thread linked
+> below, the result of which is summarised in this commit message.
 > 
-> Yeah the old TC tool doesn't give me this info programmatically :(
+
+We are seeing the same lpi_intr_o interrupt storm on the Renesas RZ/V2H
+EVK (dwmac-renesas-gbeth.c). On this platform, lpi_intr_o is routed as a
+separate, dedicated interrupt line to the CPU rather than being OR'd
+with the main DWMAC interrupt as on iMX8MP. This corresponds to the
+"eth_lpi" interrupt in the stmmac bindings:
+"""
+- description: The interrupt that occurs when Rx exits the LPI state
+const: eth_lpi
+"""
+
+Looking through the other glue drivers/device-trees, it looks to me that
+every platform that defines a separate "eth_lpi" irq might have the
+interrupt storm problem.
+
+To fix this issue on these platforms, rather than disabling EEE
+altogether, would it be possible to just not request the eth_lpi
+interrupt and let EEE continue to work? Perhaps a new flag could let
+each platform decide.
+
+If not, maybe this patch could be merged to add the flag that disables
+EEE and I will just send a patch to disable EEE on our platforms as well.
+
+Thanks,
+Ovidiu
+
+
+> Reported-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Link: https://lore.kernel.org/r/20251026122905.29028-1-laurent.pinchart@ideasonboard.com
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> For Laurent to add to a patch series appropriately adding
+> STMMAC_FLAG_EEE_DISABLE to dwmac-imx.c
 > 
-> Borkmann mentioned TC is outdated/unmaintained. I did use tcx via a C
-> loader before, but that was removed in an earlier iteration.
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 ++++++-
+>  include/linux/stmmac.h                            | 9 +++++----
+>  2 files changed, 11 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 6cacedb2c9b3..ca0eee58a8a8 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -1324,7 +1324,12 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
+>  				 config->supported_interfaces,
+>  				 pcs->supported_interfaces);
+>  
+> -	if (priv->dma_cap.eee) {
+> +	/* Some platforms, e.g. iMX8MP, wire lpi_intr_o to the same interrupt
+> +	 * used for stmmac's main interrupts, which leads to interrupt storms.
+> +	 * STMMAC_FLAG_EEE_DISABLE allows EEE to be disabled on such platforms.
+> +	 */
+> +	if (priv->dma_cap.eee &&
+> +	    !(priv->plat->flags & STMMAC_FLAG_EEE_DISABLE)) {
+>  		/* Assume all supported interfaces also support LPI */
+>  		memcpy(config->lpi_interfaces, config->supported_interfaces,
+>  		       sizeof(config->lpi_interfaces));
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index f1054b9c2d8a..5ed49d5363ee 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -187,10 +187,11 @@ enum dwmac_core_type {
+>  #define STMMAC_FLAG_MULTI_MSI_EN		BIT(7)
+>  #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
+>  #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
+> -#define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+> -#define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+> -#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP	BIT(12)
+> -#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(13)
+> +#define STMMAC_FLAG_EEE_DISABLE			BIT(10)
+> +#define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(11)
+> +#define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(12)
+> +#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP	BIT(13)
+> +#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(14)
+>  
+>  struct mac_device_info;
+>  
 
-Not sure what you're saying. tc bpf CLI supports JSON output since:
-
-commit 3175bca7182b0867c6e9a3d5d1551fdecf70118c
-Author: Davide Caratti <dcaratti@redhat.com>
-Date:   Thu Apr 30 20:03:30 2020 +0200
-
-    tc: full JSON support for 'bpf' filter
 
