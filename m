@@ -1,700 +1,287 @@
-Return-Path: <netdev+bounces-255802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255805-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHKXGxZygGkw8QIAu9opvQ
-	(envelope-from <netdev+bounces-255802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:54 +0100
+	id SHl7DvdxgGkw8QIAu9opvQ
+	(envelope-from <netdev+bounces-255805-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F09CA3E6
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F290CA3C1
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 10:44:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 607CE300EABB
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 09:41:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DF061301840D
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 09:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B422302CC0;
-	Mon,  2 Feb 2026 09:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6B533A9FF;
+	Mon,  2 Feb 2026 09:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="YLnhYZ+v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g07vD4Td"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24428.protonmail.ch (mail-24428.protonmail.ch [109.224.244.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BF64A21;
-	Mon,  2 Feb 2026 09:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9D52D836D
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 09:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770025280; cv=none; b=Dmw8ENq+pHzgWvBsxd7bw47l1iVJqY9ldyEdh137va5kFI80DPP0VRXZ/zoRZdnpL2QeClHj0XRW67TF4PyxmuZ8ph++pNqCNmoOIMWtK3RcldV+sCYy73/TAKmKajDluVN+JOvWD9Smxd45GZKmbh/8crLP7YCf5eAMjXohAG4=
+	t=1770025452; cv=none; b=b1E9pgY+OW/0EjCjqnZUuzNPDCJMkL8LL4L0CXW8TJwxKqXbi5tICJTEIfpRc1KQ2eUfg3ult1fUWFwnf95wakOsGdPEEKKMEVtiLjNF/x3sQP9Wpv6VExGGZwd4y/60fKow1qY6o3cZAosmaYfhb6sdTLlamXslGX9SLAoZZ00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770025280; c=relaxed/simple;
-	bh=QJZjowOtK0/by+xhEWVSBQBQZze3KAhc+NgA4nLwZ8g=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A0cmNjC9RkXl54gxOn0SfOT2J4dedjEEq/9kYvtbcsWYmAgMfWjPidazbS0jZLYZPuRTR7mWc0dkJ432vtlvshryEyM/CRil7hHTI0+puJiTaEsYA8i+cdtPrA6DGLuwvXx4jYOPVlST2wlYbFkJrGCfBW+nLg8eOPYENulHL/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=YLnhYZ+v; arc=none smtp.client-ip=109.224.244.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1770025276; x=1770284476;
-	bh=n7+4tdcZCvoxWkNx6ZUG9llFiUi1cRnrd1biahF2TEc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=YLnhYZ+vzW4/LV7R0UhhAtAajPelizLcc1JlhXnaBf3XD5xk+DGI4cG2vJoTcWfEP
-	 ydg8vIdd+M5E/u7mnlnEkaC1CWFS20ZDpM7W8N3M06Her9GQyqPm0vOwTDAYHZI2SU
-	 ZahfGGPxdKF6gAgPckMMynHAmTkPd5o6AlmCJpOn8YKaiwHAg8WRWSsQtbJJkSS3rT
-	 k+AwYk59ioXT/M1vYmLZqIsl15fCtuNherRBAIVsr+MQqkbeAoIkdqOdGfQfTegeUo
-	 QdF+qMHzhZWLWr5wIh+q+B3saiUd3hYuKc7bcV4NhftcfbMSiNCCh1QdJ6yoOMLVuD
-	 olWv6wI4N+Beg==
-Date: Mon, 02 Feb 2026 09:41:14 +0000
-To: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-From: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, "Remy D. Farley" <one-d-wide@protonmail.com>
-Subject: [PATCH net-next v7 5/5] doc/netlink: nftables: Fill out operation attributes
-Message-ID: <20260202093928.742879-6-one-d-wide@protonmail.com>
-In-Reply-To: <20260202093928.742879-1-one-d-wide@protonmail.com>
-References: <20260202093928.742879-1-one-d-wide@protonmail.com>
-Feedback-ID: 59017272:user:proton
-X-Pm-Message-ID: 08c0c1da51c00866807755c1f583af91e297b096
+	s=arc-20240116; t=1770025452; c=relaxed/simple;
+	bh=5EL6AsHcVBdeADGxMcjKBj+/YFrUYYn5U1xjZYVD1R0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=on8MMeUVwSih/2sR6jI/RRmZ1y+GddgwMppGo5PP3PMDWEvpkWsMp/8Ogu6hq3Vc/LGnCAaNhlLSPA5kUvDwHVw3Q6WDb+oBm6XNy8hKXJf2JnM2L65hIi3+kwV0d24/btLuFe1lwEz+IMz2j2FeWx19UJntbUs4z2jmvwtOkfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g07vD4Td; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-47ee2aa5e9eso1704235e9.2
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 01:44:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770025450; x=1770630250; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0rIIYAGyPLAQP7m4TA99kT+nOX8OsDiOc0NkESM+vog=;
+        b=g07vD4TdYLrGyQVgQVplCyFnKiXbeflmRduplqxTWOcj5qyhfYdzdzWagR+HnmQhv4
+         HOWSI+iuUUN5G6s6mGyCxbwycNAdZD0e6pZiZYyXqNVIuFah0brR3N+/agXoOYYRgNlv
+         6r21hsieVmtSzuI1uGHasNpKqQEQi5PloS7l4n3iYVbfa3AJ2SrfFIcdtLQbF5gQq093
+         cGsSuRH6nAXd8W2zwknDLWKaIDvqlWmnfixu3Y/IHcKgU2a+nJ18BpgH82ajMegoxDv3
+         3Fmz2BpXdocJckeTara/hHaUSZ/44YHLHPjIueOaJPyV1HGegQ4LinDx8R9fwHGdRxIX
+         LGOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770025450; x=1770630250;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0rIIYAGyPLAQP7m4TA99kT+nOX8OsDiOc0NkESM+vog=;
+        b=fWVWihR88KsUlhr5ZJFnqv7+VOop0melIALovWDt3nx7/1aQLdxmq5OjNC9OrI/x2K
+         QzJb+WWnWr7+abv55TQpD3ZQk4Ej8yfbfM1tZA+1gLwBR+oyCv8iSf3To3SucoPRhLmh
+         WUrVJIQastm1vBiTdwkGtKlMO97EfWPvBGAn0qLoT6cFvsGRQV4Fbu8Mk/3WjIW8LNMO
+         5lGBfrMO10Qt+TAyJ+Au5vtk7ajYigFGp1GFkH8fOS5aUb5rSVpb1kQJPUG7uTEB2Ynq
+         SLQ9Eq4O8IaSEecVSv5oetOAF3+bk4vMFheFRqfqJQTXUqOt+qdLG6oGOszhzNbxehnQ
+         0Zrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnD3nbtpTIVnQEB+g/xuH3bLF/55FcC25+2jJVBT5v7vm0n7623LwRnng+mHkFi3OKufVevM0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRsYN7Mrk9K4RrUdTQb2xpHyziE8j9bP1gpRssiudiuRkkX6cV
+	zJp8zC9Y90ODS3lm/D0mA4+4V6gdmfWMkG8ktPVxeaGdHUZFI7iGchxa
+X-Gm-Gg: AZuq6aJZAOxk/5RpRVwJ05q6UUFzYtfuxCY1sTt35ppncWKDuD0W53tsOLo2DuxrPs8
+	tiiZNTDbcGRfvKIicl5RmvQxGMBlHewxvsrsKb1eeMxXKXn8DJ0XsZ/eQayBA7JO1gcyc0m+bLp
+	EtqdoTqd1wTMnGO4g43hr9EwftXa7WL6aQrBATFQXkDJd+SzIJMS321wqQMt7oQvF/HbvHAQYMd
+	85gGQ4oBatRbkXac1hspnJGNMGO6hWvnU+2BhrTBinIRiVg6wWsDewxky0vfI+yPaE+8LYITK/E
+	tlTBzFQoskakukQ9/xgtYVipRdzE0cYeARuFjPC8+EE2G+f9Hb+z6W8NnYHR81FNRRBEmqJSObr
+	kjZdqaQDaQm/YLVdV1eTsFD1ccLkzqcfD6OpkMx64cyNBmIP6h4x0Q4az9lKHVAPbkpdVIq8x9C
+	n4BjE=
+X-Received: by 2002:a05:600c:818e:b0:477:9dd9:ac57 with SMTP id 5b1f17b1804b1-482db2022f4mr72271205e9.0.1770025449530;
+        Mon, 02 Feb 2026 01:44:09 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:74c4:3a65:f9a9:6c29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e4757sm44205033f8f.5.2026.02.02.01.44.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 01:44:08 -0800 (PST)
+Date: Mon, 2 Feb 2026 11:44:05 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: daniel@makrotopia.org, lxu@maxlinear.com, hkallweit1@gmail.com,
+	yweng@maxlinear.com, ajayaraman@maxlinear.com, andrew@lunn.ch,
+	netdev@vger.kernel.org, bxu@maxlinear.com, krzk+dt@kernel.org,
+	linux-kernel@vger.kernel.org, lrosu@maxlinear.com, chad@monroe.io,
+	conor+dt@kernel.org, devicetree@vger.kernel.org, robh@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, cezary.wilmanski@adtran.com,
+	davem@davemloft.net, john@phrozen.org, frankwu@gmx.de,
+	jpovazanec@maxlinear.com, linux@armlinux.org.uk,
+	fchan@maxlinear.com, horms@kernel.org
+Subject: Re: [net-next,v11,4/4] net: dsa: add basic initial driver for
+ MxL862xx switches
+Message-ID: <20260202094405.rsojaz5xmorubjfz@skbuf>
+References: <46226b74030f76bd04149ed5c92b3e263abbe6c2.1769817939.git.daniel@makrotopia.org>
+ <20260131175243.1122906-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260131175243.1122906-2-kuba@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255802-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255805-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[makrotopia.org,maxlinear.com,gmail.com,lunn.ch,vger.kernel.org,kernel.org,monroe.io,google.com,redhat.com,adtran.com,davemloft.net,phrozen.org,gmx.de,armlinux.org.uk];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,vger.kernel.org,protonmail.com];
-	DKIM_TRACE(0.00)[protonmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[one-d-wide@protonmail.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[protonmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[protonmail.com:email,protonmail.com:dkim,protonmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 16F09CA3E6
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9F290CA3C1
 X-Rspamd-Action: no action
 
-Filled out operation attributes:
-- newtable
-- gettable
-- deltable
-- destroytable
-- newchain
-- getchain
-- delchain
-- destroychain
-- newrule
-- getrule
-- getrule-reset
-- delrule
-- destroyrule
-- newset
-- getset
-- delset
-- destroyset
-- newsetelem
-- getsetelem
-- getsetelem-reset
-- delsetelem
-- destroysetelem
-- getgen
-- newobj
-- getobj
-- delobj
-- destroyobj
-- newflowtable
-- getflowtable
-- delflowtable
-- destroyflowtable
+On Sat, Jan 31, 2026 at 09:52:44AM -0800, Jakub Kicinski wrote:
+> > +static int mxl862xx_add_single_port_bridge(struct dsa_switch *ds, int port)
+> > +{
+> > +	struct mxl862xx_bridge_port_config br_port_cfg = {};
+> > +	struct dsa_port *dp = dsa_to_port(ds, port);
+> > +	struct mxl862xx_bridge_alloc br_alloc = {};
+> > +	int ret;
+> > +
+> > +	ret = MXL862XX_API_READ(ds->priv, MXL862XX_BRIDGE_ALLOC, br_alloc);
+> > +	if (ret) {
+> > +		dev_err(ds->dev, "failed to allocate a bridge for port %d\n", port);
+> > +		return ret;
+> > +	}
+> > +
+> > +	br_port_cfg.bridge_id = br_alloc.bridge_id;
+> > +	br_port_cfg.bridge_port_id = cpu_to_le16(port);
+> > +	br_port_cfg.mask = cpu_to_le32(MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_ID |
+> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_PORT_MAP |
+> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_MC_SRC_MAC_LEARNING |
+> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_VLAN_BASED_MAC_LEARNING);
+> > +	br_port_cfg.src_mac_learning_disable = true;
+> > +	br_port_cfg.vlan_src_mac_vid_enable = false;
+> > +	br_port_cfg.vlan_dst_mac_vid_enable = false;
+> > +	br_port_cfg.bridge_port_map[0] = cpu_to_le16(BIT(dp->cpu_dp->index));
+> 
+> Can this dereference NULL pointers?
 
-Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
----
- Documentation/netlink/specs/nftables.yaml | 292 ++++++++++++++++++----
- 1 file changed, 250 insertions(+), 42 deletions(-)
+No. DSA will not make calls to ds->ops->port_setup() with "port" values
+for which dsa_to_port(ds, port) will not find a struct dsa_port *.
 
-diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netl=
-ink/specs/nftables.yaml
-index ced567e7a..5a9d8727a 100644
---- a/Documentation/netlink/specs/nftables.yaml
-+++ b/Documentation/netlink/specs/nftables.yaml
-@@ -1566,7 +1566,10 @@ operations:
-         request:
-           value: 0xa00
-           attributes:
-+            # Mentioned in nf_tables_newtable()
-             - name
-+            - flags
-+            - userdata
-     -
-       name: gettable
-       doc: Get / dump tables.
-@@ -1576,11 +1579,21 @@ operations:
-         request:
-           value: 0xa01
-           attributes:
-+            # Mentioned in nf_tables_gettable()
-             - name
-         reply:
-           value: 0xa00
--          attributes:
-+          attributes: &get-table
-+            # Mentioned in nf_tables_fill_table_info()
-             - name
-+            - use
-+            - handle
-+            - flags
-+            - owner
-+            - userdata
-+      dump:
-+        reply:
-+          attributes: *get-table
-     -
-       name: deltable
-       doc: Delete an existing table.
-@@ -1589,8 +1602,10 @@ operations:
-       do:
-         request:
-           value: 0xa02
--          attributes:
-+          attributes: &del-table
-+            # Mentioned in nf_tables_deltable()
-             - name
-+            - handle
-     -
-       name: destroytable
-       doc: |
-@@ -1601,8 +1616,7 @@ operations:
-       do:
-         request:
-           value: 0xa1a
--          attributes:
--            - name
-+          attributes: *del-table
-     -
-       name: newchain
-       doc: Create a new chain.
-@@ -1612,7 +1626,23 @@ operations:
-         request:
-           value: 0xa03
-           attributes:
-+            # Mentioned in nf_tables_newchain()
-+            - table
-+            - handle
-+            - policy
-+            - flags
-+            # Mentioned in nf_tables_updchain()
-+            - hook
-+            - name
-+            - counters
-+            - policy
-+            # Mentioned in nf_tables_addchain()
-+            - hook
-             - name
-+            - counters
-+            - userdata
-+            # Mentioned in nft_chain_parse_hook()
-+            - type
-     -
-       name: getchain
-       doc: Get / dump chains.
-@@ -1622,11 +1652,27 @@ operations:
-         request:
-           value: 0xa04
-           attributes:
-+            # Mentioned in nf_tables_getchain()
-+            - table
-             - name
-         reply:
-           value: 0xa03
--          attributes:
-+          attributes: &get-chain
-+            # Mentioned in nf_tables_fill_chain_info()
-+            - table
-             - name
-+            - handle
-+            - hook
-+            - policy
-+            - type
-+            - flags
-+            - counters
-+            - id
-+            - use
-+            - userdata
-+      dump:
-+        reply:
-+          attributes: *get-chain
-     -
-       name: delchain
-       doc: Delete an existing chain.
-@@ -1635,8 +1681,12 @@ operations:
-       do:
-         request:
-           value: 0xa05
--          attributes:
-+          attributes: &del-chain
-+            # Mentioned in nf_tables_delchain()
-+            - table
-+            - handle
-             - name
-+            - hook
-     -
-       name: destroychain
-       doc: |
-@@ -1647,8 +1697,7 @@ operations:
-       do:
-         request:
-           value: 0xa1b
--          attributes:
--            - name
-+          attributes: *del-chain
-     -
-       name: newrule
-       doc: Create a new rule.
-@@ -1658,7 +1707,16 @@ operations:
-         request:
-           value: 0xa06
-           attributes:
--            - name
-+            # Mentioned in nf_tables_newrule()
-+            - table
-+            - chain
-+            - chain-id
-+            - handle
-+            - position
-+            - position-id
-+            - expressions
-+            - userdata
-+            - compat
-     -
-       name: getrule
-       doc: Get / dump rules.
-@@ -1667,12 +1725,30 @@ operations:
-       do:
-         request:
-           value: 0xa07
--          attributes:
--            - name
-+          attributes: &get-rule-request
-+            # Mentioned in nf_tables_getrule_single()
-+            - table
-+            - chain
-+            - handle
-         reply:
-           value: 0xa06
-+          attributes: &get-rule
-+            # Mentioned in nf_tables_fill_rule_info()
-+            - table
-+            - chain
-+            - handle
-+            - position
-+            - expressions
-+            - userdata
-+      dump:
-+        request:
-           attributes:
--            - name
-+            # Mentioned in nf_tables_dump_rules_start()
-+            - table
-+            - chain
-+        reply:
-+          attributes: *get-rule
-+
-     -
-       name: getrule-reset
-       doc: Get / dump rules and reset stateful expressions.
-@@ -1681,12 +1757,15 @@ operations:
-       do:
-         request:
-           value: 0xa19
--          attributes:
--            - name
-+          attributes: *get-rule-request
-         reply:
-           value: 0xa06
--          attributes:
--            - name
-+          attributes: *get-rule
-+      dump:
-+        request:
-+          attributes: *get-rule-request
-+        reply:
-+          attributes: *get-rule
-     -
-       name: delrule
-       doc: Delete an existing rule.
-@@ -1695,8 +1774,11 @@ operations:
-       do:
-         request:
-           value: 0xa08
--          attributes:
--            - name
-+          attributes: &del-rule
-+            - table
-+            - chain
-+            - handle
-+            - id
-     -
-       name: destroyrule
-       doc: |
-@@ -1706,8 +1788,7 @@ operations:
-       do:
-         request:
-           value: 0xa1c
--          attributes:
--            - name
-+          attributes: *del-rule
-     -
-       name: newset
-       doc: Create a new set.
-@@ -1717,7 +1798,24 @@ operations:
-         request:
-           value: 0xa09
-           attributes:
-+            # Mentioned in nf_tables_newset()
-+            - table
-             - name
-+            - key-len
-+            - id
-+            - key-type
-+            - key-len
-+            - flags
-+            - data-type
-+            - data-len
-+            - obj-type
-+            - timeout
-+            - gc-interval
-+            - policy
-+            - desc
-+            - table
-+            - name
-+            - userdata
-     -
-       name: getset
-       doc: Get / dump sets.
-@@ -1727,11 +1825,35 @@ operations:
-         request:
-           value: 0xa0a
-           attributes:
-+            # Mentioned in nf_tables_getset()
-+            - table
-             - name
-         reply:
-           value: 0xa09
--          attributes:
-+          attributes: &get-set
-+            # Mentioned in nf_tables_fill_set()
-+            - table
-             - name
-+            - handle
-+            - flags
-+            - key-len
-+            - key-type
-+            - data-type
-+            - data-len
-+            - obj-type
-+            - gc-interval
-+            - policy
-+            - userdata
-+            - desc
-+            - expr
-+            - expressions
-+      dump:
-+        request:
-+          attributes:
-+            # Mentioned in nf_tables_getset()
-+            - table
-+        reply:
-+          attributes: *get-set
-     -
-       name: delset
-       doc: Delete an existing set.
-@@ -1740,7 +1862,10 @@ operations:
-       do:
-         request:
-           value: 0xa0b
--          attributes:
-+          attributes: &del-set
-+            # Mentioned in nf_tables_delset()
-+            - table
-+            - handle
-             - name
-     -
-       name: destroyset
-@@ -1751,8 +1876,7 @@ operations:
-       do:
-         request:
-           value: 0xa1d
--          attributes:
--            - name
-+          attributes: *del-set
-     -
-       name: newsetelem
-       doc: Create a new set element.
-@@ -1762,7 +1886,11 @@ operations:
-         request:
-           value: 0xa0c
-           attributes:
--            - name
-+            # Mentioned in nf_tables_newsetelem()
-+            - table
-+            - set
-+            - set-id
-+            - elements
-     -
-       name: getsetelem
-       doc: Get / dump set elements.
-@@ -1772,11 +1900,27 @@ operations:
-         request:
-           value: 0xa0d
-           attributes:
--            - name
-+            # Mentioned in nf_tables_getsetelem()
-+            - table
-+            - set
-+            - elements
-         reply:
-           value: 0xa0c
-           attributes:
--            - name
-+            # Mentioned in nf_tables_fill_setelem_info()
-+            - elements
-+      dump:
-+        request:
-+          attributes: &dump-set-request
-+            # Mentioned in nft_set_dump_ctx_init()
-+            - table
-+            - set
-+        reply:
-+          attributes: &dump-set
-+            # Mentioned in nf_tables_dump_set()
-+            - table
-+            - set
-+            - elements
-     -
-       name: getsetelem-reset
-       doc: Get / dump set elements and reset stateful expressions.
-@@ -1786,11 +1930,20 @@ operations:
-         request:
-           value: 0xa21
-           attributes:
--            - name
-+            # Mentioned in nf_tables_getsetelem_reset()
-+            - elements
-         reply:
-           value: 0xa0c
-           attributes:
--            - name
-+            # Mentioned in nf_tables_dumpreset_set()
-+            - table
-+            - set
-+            - elements
-+      dump:
-+        request:
-+          attributes: *dump-set-request
-+        reply:
-+          attributes: *dump-set
-     -
-       name: delsetelem
-       doc: Delete an existing set element.
-@@ -1799,8 +1952,11 @@ operations:
-       do:
-         request:
-           value: 0xa0e
--          attributes:
--            - name
-+          attributes: &del-setelem
-+            # Mentioned in nf_tables_delsetelem()
-+            - table
-+            - set
-+            - elements
-     -
-       name: destroysetelem
-       doc: Delete an existing set element with destroy semantics.
-@@ -1809,8 +1965,7 @@ operations:
-       do:
-         request:
-           value: 0xa1e
--          attributes:
--            - name
-+          attributes: *del-setelem
-     -
-       name: getgen
-       doc: Get / dump rule-set generation.
-@@ -1819,12 +1974,16 @@ operations:
-       do:
-         request:
-           value: 0xa10
--          attributes:
--            - name
-         reply:
-           value: 0xa0f
--          attributes:
--            - name
-+          attributes: &get-gen
-+            # Mentioned in nf_tables_fill_gen_info()
-+            - id
-+            - proc-pid
-+            - proc-name
-+      dump:
-+        reply:
-+          attributes: *get-gen
-     -
-       name: newobj
-       doc: Create a new stateful object.
-@@ -1834,7 +1993,12 @@ operations:
-         request:
-           value: 0xa12
-           attributes:
-+            # Mentioned in nf_tables_newobj()
-+            - type
-             - name
-+            - data
-+            - table
-+            - userdata
-     -
-       name: getobj
-       doc: Get / dump stateful objects.
-@@ -1844,11 +2008,29 @@ operations:
-         request:
-           value: 0xa13
-           attributes:
-+            # Mentioned in nf_tables_getobj_single()
-             - name
-+            - type
-+            - table
-         reply:
-           value: 0xa12
--          attributes:
-+          attributes: &obj-info
-+            # Mentioned in nf_tables_fill_obj_info()
-+            - table
-             - name
-+            - type
-+            - handle
-+            - use
-+            - data
-+            - userdata
-+      dump:
-+        request:
-+          attributes:
-+            # Mentioned in nf_tables_dump_obj_start()
-+            - table
-+            - type
-+        reply:
-+          attributes: *obj-info
-     -
-       name: delobj
-       doc: Delete an existing stateful object.
-@@ -1858,7 +2040,11 @@ operations:
-         request:
-           value: 0xa14
-           attributes:
-+            # Mentioned in nf_tables_delobj()
-+            - table
-             - name
-+            - type
-+            - handle
-     -
-       name: destroyobj
-       doc: Delete an existing stateful object with destroy semantics.
-@@ -1868,7 +2054,11 @@ operations:
-         request:
-           value: 0xa1f
-           attributes:
-+            # Mentioned in nf_tables_delobj()
-+            - table
-             - name
-+            - type
-+            - handle
-     -
-       name: newflowtable
-       doc: Create a new flow table.
-@@ -1878,7 +2068,11 @@ operations:
-         request:
-           value: 0xa16
-           attributes:
-+            # Mentioned in nf_tables_newflowtable()
-+            - table
-             - name
-+            - hook
-+            - flags
-     -
-       name: getflowtable
-       doc: Get / dump flow tables.
-@@ -1888,11 +2082,22 @@ operations:
-         request:
-           value: 0xa17
-           attributes:
-+            # Mentioned in nf_tables_getflowtable()
-             - name
-+            - table
-         reply:
-           value: 0xa16
--          attributes:
-+          attributes: &flowtable-info
-+            # Mentioned in nf_tables_fill_flowtable_info()
-+            - table
-             - name
-+            - handle
-+            - use
-+            - flags
-+            - hook
-+      dump:
-+        reply:
-+          attributes: *flowtable-info
-     -
-       name: delflowtable
-       doc: Delete an existing flow table.
-@@ -1901,8 +2106,12 @@ operations:
-       do:
-         request:
-           value: 0xa18
--          attributes:
-+          attributes: &del-flowtable
-+            # Mentioned in nf_tables_delflowtable()
-+            - table
-             - name
-+            - handle
-+            - hook
-     -
-       name: destroyflowtable
-       doc: Delete an existing flow table with destroy semantics.
-@@ -1911,8 +2120,7 @@ operations:
-       do:
-         request:
-           value: 0xa20
--          attributes:
--            - name
-+          attributes: *del-flowtable
-=20
- mcast-groups:
-   list:
---=20
-2.51.2
+> The dsa_to_port() function can return NULL if the port is not found in
+> the switch tree. The code stores the result in dp but doesn't check if
+> dp is NULL before dereferencing dp->cpu_dp->index.
+> 
+> Looking at include/net/dsa.h, dsa_to_port() returns NULL when the port
+> is not found:
+> 
+>     static inline struct dsa_port *dsa_to_port(struct dsa_switch *ds, int p)
+>     {
+>         struct dsa_switch_tree *dst = ds->dst;
+>         struct dsa_port *dp;
+> 
+>         list_for_each_entry(dp, &dst->ports, list)
+>             if (dp->ds == ds && dp->index == p)
+>                 return dp;
+> 
+>         return NULL;
+>     }
+> 
+> Additionally, even if dp is non-NULL, dp->cpu_dp could also be NULL if
+> the CPU port hasn't been properly assigned during initialization.
 
+mxl862xx_add_single_port_bridge() has been called when all other port
+types except user ports have been excluded. All user and DSA ports have
+a non-NULL dp->cpu_dp pointer after dsa_tree_setup_cpu_ports() runs,
+i.e. also at the time of ds->ops->port_setup().
 
+> > +static int mxl862xx_setup_mdio(struct dsa_switch *ds)
+> > +{
+> > +	struct mxl862xx_priv *priv = ds->priv;
+> > +	struct device *dev = ds->dev;
+> > +	struct device_node *mdio_np;
+> > +	struct mii_bus *bus;
+> > +	static int idx;
+> > +	int ret;
+> > +
+> > +	bus = devm_mdiobus_alloc(dev);
+> > +	if (!bus)
+> > +		return -ENOMEM;
+> > +
+> > +	bus->priv = priv;
+> > +	ds->user_mii_bus = bus;
+> > +	bus->name = KBUILD_MODNAME "-mii";
+> > +	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d", idx++);
+> 
+> Can concurrent probes race on the idx variable?
+> 
+> The static int idx is shared across all driver instances and accessed
+> without synchronization. If multiple instances of this driver are probed
+> concurrently on different CPU cores, they could race on the idx++
+> operation potentially leading to duplicate MII bus IDs. MII bus IDs must
+> be unique system-wide.
+> 
+> [ ... ]
+
+Technically ds->ops->setup() runs under dsa2_mutex, but the "static int idx"
+is still not ideal due to the ever-increasing index upon unbinding and
+rebinding.
+
+> > +static int mxl862xx_setup_cpu_bridge(struct dsa_switch *ds, int port)
+> > +{
+> > +	struct mxl862xx_bridge_port_config br_port_cfg = {};
+> > +	struct mxl862xx_priv *priv = ds->priv;
+> > +	u16 bridge_port_map = 0;
+> > +	struct dsa_port *dp;
+> > +
+> > +	/* CPU port bridge setup */
+> > +	br_port_cfg.mask = cpu_to_le32(MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_PORT_MAP |
+> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_MC_SRC_MAC_LEARNING |
+> > +				       MXL862XX_BRIDGE_PORT_CONFIG_MASK_VLAN_BASED_MAC_LEARNING);
+> > +
+> > +	br_port_cfg.bridge_port_id = cpu_to_le16(port);
+> > +	br_port_cfg.src_mac_learning_disable = false;
+> > +	br_port_cfg.vlan_src_mac_vid_enable = true;
+> > +	br_port_cfg.vlan_dst_mac_vid_enable = true;
+> > +
+> > +	/* include all assigned user ports in the CPU portmap */
+> > +	dsa_switch_for_each_user_port(dp, ds) {
+> > +		if (dp->cpu_dp->index != port)
+> > +			continue;
+> 
+> Can dp->cpu_dp be dereferenced safely here?
+> 
+> The code dereferences dp->cpu_dp->index without checking if cpu_dp is
+> NULL. While the DSA framework should ensure user ports have a CPU port
+> assigned during initialization, there is no explicit NULL check. If
+> cpu_dp is NULL for any reason such as incomplete initialization or
+> configuration error, this will cause a NULL pointer dereference and
+> kernel crash.
+
+No incompletely initialized ports are published to dst->ports.
+
+> > +	ret = dsa_register_switch(ds);
+> > +	if (ret)
+> > +		return ret;
+> 
+> Is dev_set_drvdata() called too early?
+> 
+> The function calls dev_set_drvdata(dev, ds) before calling
+> dsa_register_switch(ds). If dsa_register_switch() fails, the function
+> returns the error but leaves the driver data pointing to an unregistered
+> switch.
+> 
+> This creates a problem for cleanup paths. The mxl862xx_remove() function
+> retrieves the switch with dev_get_drvdata() and calls
+> dsa_unregister_switch(ds). If probe failed, ds is not NULL so the check
+> passes but the switch was never successfully registered. Similarly,
+> mxl862xx_shutdown() could be called and would also operate on an
+> unregistered switch. While dsa_switch_shutdown() has a check for
+> ds->setup flag that provides some protection, this is fragile and could
+> lead to inconsistent state or crashes in error scenarios.
+> 
+> [Jakub] AI is a bit pedantic about leaving the drvdata pointer in place
+>         but I guess it's not a bad thing to clean up
+
+Can somebody gently explain what is the point? It is easily testable
+that if mdio_driver :: probe() fails, .remove() or .shutdown() will not
+be called. It really does not matter whether dev_set_drvdata() was
+called or not.
 
