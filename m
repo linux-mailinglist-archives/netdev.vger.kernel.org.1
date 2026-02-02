@@ -1,283 +1,429 @@
-Return-Path: <netdev+bounces-256026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIW4NPEqgWkwEgMAu9opvQ
-	(envelope-from <netdev+bounces-256026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:53:37 +0100
+	id kIP6FE8sgWl6EgMAu9opvQ
+	(envelope-from <netdev+bounces-256027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:59:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F633D2815
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:53:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A54ABD28CB
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 23:59:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E78E4314179D
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 22:39:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1AF81302794C
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 22:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1903038E124;
-	Mon,  2 Feb 2026 22:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BBB345738;
+	Mon,  2 Feb 2026 22:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="FlQP8GBC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aZiO8ONr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F7835BDB8
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 22:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770071858; cv=pass; b=TgNFrrWMIuJYCi7tNIbtbgPES/DRrAsDcoQr5+ndNkvCU680mNP4t39cPiNC+HWZo0LrrPQRrVLawCMZkAKLp6EksvCZI4800UhIm8R3/frHpaKo/8v8vfaLuxt4wxAlJvJGrVwCrk0jIGaRMP1dw/0w+7iD3wJ/bY+BnLKp+3M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770071858; c=relaxed/simple;
-	bh=uqpVk1kXWM3Pmy/dC2HNpzzdgmO4DjT0q/bvcdp7gk8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IUhwwwt2AOpbgePSNBE0Sp5vT8yN9zkdhvHs1/dbaPdASkJrMpV3b2JQMmVlqUDrMupan+qX9KOQNB60u0O7Bo0GOH+BVZqTCNHaG9kmXUQDloTCpcMeGIzAVBMITEmSF6w06TDN4wditVvu9pyOEiZ1VreVNXT+C4jKRSt/JhE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=FlQP8GBC; arc=pass smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-59de8860b94so5911599e87.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 14:37:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770071855; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QkIKYOr6LVY5HxMvZ6Bo10+4CgKEZrzs5dXxSkQQe4ShKoDvA+6CU0ZG50dfHv24gJ
-         MWOqCL1gHc9YZLa03e0LXuJKDQ1tnWNvJzgl26zpx6dnnJckpMmNRKPiCWpCFsZf+HMM
-         j34XMbZJ0GX+qi7NrPcdbgrfNSVZGOcZ/dMXy7G89VnA19Y9nH08xcVGBaF8gXAAfhGS
-         ojJTHRSoMA4O81NXwLMvJORX8CrsMjI1DF2+Lj24I/SUV85swjOP17MQBe5tXJfVUB0Y
-         SpoTldArR2xjX04DGbmR6Rb0N32scDLVPZuafd/csdJhlOwRXBUtIkdkjQYFxbJ+aEAi
-         od0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rld5NdYNgKbh8fG9m8l42rpH9XuNkYcLSLYsgKSKvp4=;
-        fh=BME+by8lQv8ih3QsC8/89cgMc/SDcxxAy3w0ajaed74=;
-        b=LHq+lqwxOH3FnTTeBppeyms4ynZO4d7CIVew4y0TbY0MtvfllV2xe2y4NwxOQcJ7er
-         farAmbf2pKDADpnridaRte2Hs4useXRcz874Tr1r/QPSfiuVVxcq4EP6wyVjST0tBRc+
-         G7RlIKRm2s/MrAUVLzfNQvXOCkqh65KRrLVJNATsIDgYY3hRgbhAzGYsliDIGHHotrxr
-         TFfkHlZIIlI2PguzfXnVO1jyMfwcBK+h4vKFUu0HP60QAa2jVwGuHC97h+i9ZBpn6lCI
-         1TFxoWIOT7vUJ77oyUa6tJ5HZZmtb+4T+j9qTCKAIwXftO7n8MoHD1JrCp3hbTuQiYnp
-         n4VQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1770071855; x=1770676655; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rld5NdYNgKbh8fG9m8l42rpH9XuNkYcLSLYsgKSKvp4=;
-        b=FlQP8GBCrR3Rb3Ne/Bnv6jHetFqiaxQPrWl3B/NM3xWmWXFPwTmXeHZfbEuNeCI0js
-         Q7DFIOWJkrxFKXdmvfe0BEScfFXI7G7M/Dw6WtizlM6ZbwLQpK6k9A9ZqChnjzJM2M0w
-         yauYixPRSebKOVvB2z/A7KEoYibH1tIbhFwe779/Q+nw5lMShjMaqMsim+z79jzUhg62
-         3VUBIhHMIJR5ptIqZU70W+HSqunLv2AZVmcojm2N5jhbyEZaXHRqJebN2VuROeDVLT8T
-         JKZ5CYEpzhjaUJEeJXuOvA4o27qFOVD5zs1QMAKoD/EwHslFUGo/23utCzkSHV2kTK9m
-         7PmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770071855; x=1770676655;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rld5NdYNgKbh8fG9m8l42rpH9XuNkYcLSLYsgKSKvp4=;
-        b=H7/5KteTWATUmwPcY5n5mzPcUTIRUFFJ48V1o9z2MeCCHwXiEGiYTZ0Z4Cb+fTyck2
-         vr+RksGUuCigTjZ/erc94WIq3/88bZBcRCVoE+N/YAuVn23d5zOQLhA+OnlS2N4i0zky
-         jHJjrgxSxWdO5Y8ZXM2KE5zu99Z6CYDoc6a7Ebse5l2H9T290wUqDHlVBvbNnXivpQ7g
-         V8TrdAYyvT4OXo/FYAOsv1mIy3ewsBk7wA6YjTHEEb4OivR4pbkq97SWtqa0Qf8GA08Q
-         lXqV5htooxQGfdCPGv1RiFmdz8V28tJ2/nE2X8NZS1BYtvhg/r8bE9hIzGaEgYxLclbJ
-         3ycA==
-X-Forwarded-Encrypted: i=1; AJvYcCVd3sFtn4pMCMeZlri060QvCqh4rgelWL9EgjQGpFAQOQVsKDNTv8cBPhu29JPfR61yJA8a1FI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKG3tQKgJrliSFhuqev3Ht6Z+46a/PwTyZfkJMUv2EDsJ0M4n+
-	5/gd3eUvEPEaZRLX93EiEBHdX7VxyOgdZHNEw8FKI0UQTgLE5FnUHFshjFxQVpbTwz7N/TEyYlN
-	xroufq+W0kk+OOiC3Ghu4wmARLQJeRs79frr417xm9rRrUNNmRIk=
-X-Gm-Gg: AZuq6aL/sfQxILIGJ0RouI7mvPZ17KULv+5lG6rroHYaUrfzGaP8rJvqAe0vMLV8iRq
-	T6OkO5CJGiEPZHRL6M1JpH6XAfOthNf6db3J0d40wY2dVidFqGDxNU/wSZg+4myZsNC+UjOQJJ1
-	NPI0Zl6bIUxUb6Z/iKduqphu6mGfP3qsPCdAnU1onCHps0xXwphsJUjWYKFf8wf/NPAhH7IihMs
-	lc3FiE5BTHSjYoXsgTCxepMPrtlvF9/AUAkRzLbk6T3L7C6HnN+L8D0iMDtKsdPTmMr9TW2RKol
-	fDrNbAY84dhvhpolPRJjwyD+g5s9Ga64XQ3h8PaQtS3NIDEgP1LGSGyEdEEK
-X-Received: by 2002:a05:6512:39ce:b0:59e:7e4:c019 with SMTP id
- 2adb3069b0e04-59e163f58b1mr4219911e87.9.1770071855196; Mon, 02 Feb 2026
- 14:37:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF7D33B6ED
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 22:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770072817; cv=none; b=Dsq7F0cnhDIgg4RfyUwdZT5qaBfVXn0pr00G/FZ5ZUIfGhUA8TL5tQCXxyUxJT9dNJfJdSVNyLgqe7gu3M+P26rrlZR2uruJZQrG3GsoUhA6z80uAuqoN4Ck8O9dRHL278zgqX26pAi34kslGmjfR9HPThxCPwLFbaQuKkbNAxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770072817; c=relaxed/simple;
+	bh=9jJkKSmHjIY4PvmTJDT7aV53FEqAwXGVXBEAlca9+SQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRNy3djG/nnqjWzlqsDxxY8eSTzT2euizWd3s85w/l0Z35PGZdX37pr++5LOepKWjcPUBODLhFhpgRhhgJLPmyJ3N/zOYU4jlmY4D511/E6V5h/VDVwi//0N+Nc2v5jp3qutXeLnCvUII7qz2lZpGkxcbCO11Uq7Cjh8wij5ZRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aZiO8ONr; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770072814; x=1801608814;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9jJkKSmHjIY4PvmTJDT7aV53FEqAwXGVXBEAlca9+SQ=;
+  b=aZiO8ONrbtXqKmGa32NzEpXFSkH+enPw/p0+6GJM5zgQpw/wiwAV+ybu
+   YewHE60AltP8bUhuI0gc1rW1Xj1hKuaYbs64gYpZGkgPdin6VleE9ql/3
+   ytDLMAJhJPrP7n3QXHJgJKiA8gzzpgrFF2gZuFTpZB6VepUP8GI/L8S4G
+   NtFOZ1iFGIeoxxf8iwZDQVVZACVD6Ngol/0WDvWr4ebypFlh/tQThSgDi
+   PD5tWK7+bddtzPYaKrA0bleWdSTqkHbpIM5Jk9B6LXM0LaxS8PplSwqOU
+   MNzdb1NLsXFu4a7R6MEX+Cdx2a+Nxbaz9pnjLmOborUpainUVH9kJhWtx
+   g==;
+X-CSE-ConnectionGUID: bdEswjkvTwyCwLVPzEfE1Q==
+X-CSE-MsgGUID: JTaj837URLabZ30nzMQDbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="70444688"
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="70444688"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 14:53:34 -0800
+X-CSE-ConnectionGUID: Op/gtPnQThup9+D+67l0kQ==
+X-CSE-MsgGUID: Z6MA8XHuSTm3sPal1HjJbg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="209660424"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 02 Feb 2026 14:53:28 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vn2nN-00000000g24-3BAB;
+	Mon, 02 Feb 2026 22:53:25 +0000
+Date: Tue, 3 Feb 2026 06:52:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Riana Tauro <riana.tauro@intel.com>, intel-xe@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org
+Cc: oe-kbuild-all@lists.linux.dev, aravind.iddamsetty@linux.intel.com,
+	anshuman.gupta@intel.com, rodrigo.vivi@intel.com,
+	joonas.lahtinen@linux.intel.com, simona.vetter@ffwll.ch,
+	airlied@gmail.com, pratik.bari@intel.com,
+	joshua.santosh.ranjan@intel.com, ashwin.kumar.kulkarni@intel.com,
+	shubham.kumar@intel.com, ravi.kishore.koppuravuri@intel.com,
+	raag.jadav@intel.com,
+	Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
+	Lijo Lazar <lijo.lazar@amd.com>,
+	Hawking Zhang <Hawking.Zhang@amd.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Riana Tauro <riana.tauro@intel.com>
+Subject: Re: [PATCH v5 1/5] drm/ras: Introduce the DRM RAS infrastructure
+ over generic netlink
+Message-ID: <202602030622.mmakbYmv-lkp@intel.com>
+References: <20260202064356.286243-8-riana.tauro@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126194826.236075-1-tom@herbertland.com> <20260126194826.236075-3-tom@herbertland.com>
- <willemdebruijn.kernel.235a1f46c52f8@gmail.com> <60fb02d8-77ca-457b-be24-33a3cc7b344b@gmail.com>
- <CALx6S35Z63WDMOkZLJ7PzR6BcEV4h5f7Jm-Okw9izcuFcygNoA@mail.gmail.com> <d0b4b06a-94ba-4665-9593-2c507ffb552a@gmail.com>
-In-Reply-To: <d0b4b06a-94ba-4665-9593-2c507ffb552a@gmail.com>
-From: Tom Herbert <tom@herbertland.com>
-Date: Mon, 2 Feb 2026 14:37:24 -0800
-X-Gm-Features: AZwV_QhrW9P9xeG8aJ5-nv0javsLb96_jOby2Lzjq4tAaEWydj6f8_5K7MGMZ-k
-Message-ID: <CALx6S36g4wVcHpXam80C5iMOYa+=G4_1rGFkhXKGBvvPvUmyDw@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/7] ipv6: Cleanup IPv6 TLV definitions
-To: Justin Iurman <justin.iurman@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260202064356.286243-8-riana.tauro@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256026-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-256027-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,linux.intel.com,intel.com,ffwll.ch,gmail.com,oss.qualcomm.com,amd.com,kernel.org,redhat.com,google.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[herbertland.com:+];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,herbertland.com:email,herbertland.com:dkim,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 3F633D2815
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,gitlab.freedesktop.org:url,git-scm.com:url,01.org:url]
+X-Rspamd-Queue-Id: A54ABD28CB
 X-Rspamd-Action: no action
 
-On Sun, Feb 1, 2026 at 12:48=E2=80=AFAM Justin Iurman <justin.iurman@gmail.=
-com> wrote:
->
-> On 1/30/26 18:22, Tom Herbert wrote:
-> > On Thu, Jan 29, 2026 at 10:13=E2=80=AFAM Justin Iurman <justin.iurman@g=
-mail.com> wrote:
-> >>
-> >> On 1/29/26 06:30, Willem de Bruijn wrote:
-> >>> Tom Herbert wrote:
-> >>>> Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h to be with the res=
-t
-> >>>> of the TLV definitions. Label each of the TLV definitions as to whet=
-her
-> >>>> they are a Hop-by-Hop option, Destination option, or both.
-> >>>>
-> >>>> Signed-off-by: Tom Herbert <tom@herbertland.com>
-> >>>> ---
-> >>>>    include/uapi/linux/in6.h        | 21 ++++++++++++++-------
-> >>>>    include/uapi/linux/ip6_tunnel.h |  1 -
-> >>>>    2 files changed, 14 insertions(+), 8 deletions(-)
-> >>>>
-> >>>> diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
-> >>>> index 5a47339ef7d7..438283dc5fde 100644
-> >>>> --- a/include/uapi/linux/in6.h
-> >>>> +++ b/include/uapi/linux/in6.h
-> >>>> @@ -140,14 +140,21 @@ struct in6_flowlabel_req {
-> >>>>
-> >>>>    /*
-> >>>>     * IPv6 TLV options.
-> >>>> + *
-> >>>> + *  Hop-by-Hop and Destination options share the same number space.
-> >>>> + *  For each option below whether it is a Hop-by-Hop option or
-> >>>> + *  a Destination option is indicated by HBH or DestOpt.
-> >>>>     */
-> >>>> -#define IPV6_TLV_PAD1               0
-> >>>> -#define IPV6_TLV_PADN               1
-> >>>> -#define IPV6_TLV_ROUTERALERT        5
-> >>>> -#define IPV6_TLV_CALIPSO    7       /* RFC 5570 */
-> >>>> -#define IPV6_TLV_IOAM               49      /* RFC 9486 */
-> >>>> -#define IPV6_TLV_JUMBO              194
-> >>>> -#define IPV6_TLV_HAO                201     /* home address option =
-*/
-> >>>> +#define IPV6_TLV_PAD1               0       /* HBH or DestOpt */
-> >>>> +#define IPV6_TLV_PADN               1       /* HBH or DestOpt */
-> >>>> +#define IPV6_TLV_TNL_ENCAP_LIMIT 4  /* RFC 2473, DestOpt */
-> >>>> +#define IPV6_TLV_ROUTERALERT        5       /* HBH */
-> >>>> +#define IPV6_TLV_CALIPSO    7       /* RFC 5570, HBH */
-> >>>> +#define IPV6_TLV_IOAM               49      /* RFC 9486, HBH or Des=
-topt
-> >>>> +                                     * IOAM sent and rcvd as HBH
-> >>>
-> >>> Explicit labeling with HBH or Destopt is quite informative.
-> >>>
-> >>> Does this mean that IPV6_TLV_IOAM should also be accepted in ip6_pars=
-e_tlv
-> >>> in the Destopt branch? RFC 9486 indeed did reserve a number.
-> >>
-> >> Nope, not right now. The only IOAM option currently implemented in the
-> >> kernel is the Pre-allocated Trace, which uses a Hop-by-Hop option. It
-> >> wouldn't make sense to have it in a Destination option, although you
-> >> could (i.e., it's not forbidden, just weird). Actually, the only IOAM
-> >> option that would make sense to carry in a Destination Option is the
-> >> Edge-to-Edge (E2E), but it's not implemented in the kernel. Should it =
-be
-> >> implemented at some point, then yes, you'd have IPV6_TLV_IOAM in the
-> >> Destopt branch as well.
-> >
-> > Justin,
-> >
-> > Conceptually, someone could put IOAM in Destination Options before the
-> > Routing Header. There's about 0% of that ever happening though.
->
-> Tom,
->
-> Correct. However, I wouldn't say there's about 0% of that ever
-> happening. At some point, I remember that we even thought about using
-> the IOAM Pre-allocated Trace in the Destination Options header (the
-> first one, before the RH). The goal was to use it with SRv6 and collect
-> telemetry for the overlay. There was also an attempt at including IOAM
-> within SRv6 directly (draft-ali-spring-ioam-srv6), which didn't get
-> consensus at that time.
+Hi Riana,
 
-Hi Justin,
+kernel test robot noticed the following build errors:
 
-For sure, there's always going to be someone who wants to use these
-things someday. But to date, these have all been nothing more than a
-pipe dream for the past forty years. I know that the Internet has its
-roots in being an experimental network and a playground, but on the
-other hand at some point we have to acknowledge that it's kind of
-critical to humankind. We can't keep every option open just because
-someone thinks they might use it someday. By definition, any code path
-that isn't ever being used is liability, so at some point it's the
-greater good to remove it rather than keep it around just in case
-someone finally finds a use for it (other than DDoS).
+[auto build test ERROR on drm-xe/drm-xe-next]
+[also build test ERROR on drm-misc/drm-misc-next drm/drm-next linus/master v6.19-rc8]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Does it really make sense to keep code paths running in 5 billion
-devices of which the vast majority, possibly even all of them,  don't
-care about? -- I think it's a fair question to at least ask :-).
+url:    https://github.com/intel-lab-lkp/linux/commits/Riana-Tauro/drm-ras-Introduce-the-DRM-RAS-infrastructure-over-generic-netlink/20260202-141553
+base:   https://gitlab.freedesktop.org/drm/xe/kernel.git drm-xe-next
+patch link:    https://lore.kernel.org/r/20260202064356.286243-8-riana.tauro%40intel.com
+patch subject: [PATCH v5 1/5] drm/ras: Introduce the DRM RAS infrastructure over generic netlink
+config: csky-randconfig-002-20260203 (https://download.01.org/0day-ci/archive/20260203/202602030622.mmakbYmv-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602030622.mmakbYmv-lkp@intel.com/reproduce)
 
-Tom
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602030622.mmakbYmv-lkp@intel.com/
 
->
-> Justin
->
-> > Tom
-> >
-> >>
-> >>>> +                                     */
-> >>>> +#define IPV6_TLV_JUMBO              194     /* HBH */
-> >>>> +#define IPV6_TLV_HAO                201     /* home address option,=
- DestOpt */
-> >>>>
-> >>>>    /*
-> >>>>     * IPV6 socket options
-> >>>> diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip=
-6_tunnel.h
-> >>>> index 85182a839d42..35af4d9c35fb 100644
-> >>>> --- a/include/uapi/linux/ip6_tunnel.h
-> >>>> +++ b/include/uapi/linux/ip6_tunnel.h
-> >>>> @@ -6,7 +6,6 @@
-> >>>>    #include <linux/if.h>              /* For IFNAMSIZ. */
-> >>>>    #include <linux/in6.h>             /* For struct in6_addr. */
-> >>>>
-> >>>> -#define IPV6_TLV_TNL_ENCAP_LIMIT 4
-> >>>>    #define IPV6_DEFAULT_TNL_ENCAP_LIMIT 4
-> >>>>
-> >>>>    /* don't add encapsulation limit if one isn't present in inner pa=
-cket */
-> >>>> --
-> >>>> 2.43.0
-> >>>>
-> >>>
-> >>>
-> >>
->
+All errors (new ones prefixed by >>):
+
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
+>> include/net/netlink.h:1459:(.text+0x12): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_string':
+   include/net/netlink.h:1657:(.text+0x28): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
+   include/net/netlink.h:1459:(.text+0x3a): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `drm_ras_node_unregister':
+>> drivers/gpu/drm/drm_ras.c:350:(.text+0x10c): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `__genlmsg_iput':
+>> include/net/genetlink.h:342:(.text+0x246): undefined reference to `genlmsg_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
+   include/net/netlink.h:1459:(.text+0x262): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_string':
+   include/net/netlink.h:1657:(.text+0x27e): undefined reference to `nla_put'
+>> csky-linux-ld: include/net/netlink.h:1657:(.text+0x29a): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nla_put_u32':
+   include/net/netlink.h:1459:(.text+0x2b6): undefined reference to `nla_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_trim':
+>> include/net/netlink.h:1108:(.text+0x2e4): undefined reference to `skb_trim'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `drm_ras_nl_list_nodes_dumpit':
+>> drivers/gpu/drm/drm_ras.c:144:(.text+0x330): undefined reference to `genlmsg_put'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras.c:144:(.text+0x334): undefined reference to `nla_put'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras.c:144:(.text+0x344): undefined reference to `skb_trim'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `__genlmsg_iput':
+   include/net/genetlink.h:342:(.text+0x408): undefined reference to `genlmsg_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_trim':
+   include/net/netlink.h:1108:(.text+0x45a): undefined reference to `skb_trim'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `alloc_skb':
+>> include/linux/skbuff.h:1383:(.text+0x4f8): undefined reference to `__alloc_skb'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `__genlmsg_iput':
+   include/net/genetlink.h:342:(.text+0x510): undefined reference to `genlmsg_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `kfree_skb_reason':
+>> include/linux/skbuff.h:1322:(.text+0x51e): undefined reference to `sk_skb_reason_drop'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `doit_reply_value':
+   drivers/gpu/drm/drm_ras.c:196:(.text+0x534): undefined reference to `genlmsg_put'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.c:196:(.text+0x544): undefined reference to `skb_trim'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras.c:196:(.text+0x548): undefined reference to `__alloc_skb'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras.c:196:(.text+0x54c): undefined reference to `sk_skb_reason_drop'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_trim':
+   include/net/netlink.h:1108:(.text+0x5a4): undefined reference to `skb_trim'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `kfree_skb_reason':
+   include/linux/skbuff.h:1322:(.text+0x5b6): undefined reference to `sk_skb_reason_drop'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `nlmsg_unicast':
+>> include/net/netlink.h:1198:(.text+0x5d6): undefined reference to `netlink_unicast'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.o: in function `drm_ras_nl_query_error_counter_doit':
+>> drivers/gpu/drm/drm_ras.c:312:(.text+0x614): undefined reference to `skb_trim'
+   csky-linux-ld: drivers/gpu/drm/drm_ras.c:312:(.text+0x618): undefined reference to `sk_skb_reason_drop'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras.c:312:(.text+0x61c): undefined reference to `init_net'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras.c:312:(.text+0x620): undefined reference to `netlink_unicast'
+   csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.o: in function `drm_ras_genl_family_register':
+>> drivers/gpu/drm/drm_ras_genl_family.c:23:(.text+0xa): undefined reference to `genl_register_family'
+   csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.o: in function `drm_ras_genl_family_unregister':
+>> drivers/gpu/drm/drm_ras_genl_family.c:39:(.text+0x4c): undefined reference to `genl_unregister_family'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.c:42:(.text+0x64): undefined reference to `genl_register_family'
+>> csky-linux-ld: drivers/gpu/drm/drm_ras_genl_family.c:42:(.text+0x68): undefined reference to `genl_unregister_family'
+
+
+vim +1459 include/net/netlink.h
+
+24c410dce335db David S. Miller 2012-04-01  1448  
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1449  /**
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1450   * nla_put_u32 - Add a u32 netlink attribute to a socket buffer
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1451   * @skb: socket buffer to add attribute to
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1452   * @attrtype: attribute type
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1453   * @value: numeric value
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1454   */
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1455  static inline int nla_put_u32(struct sk_buff *skb, int attrtype, u32 value)
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1456  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1457  	u32 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1458  
+b4391db42308c9 Arnd Bergmann   2017-09-22 @1459  	return nla_put(skb, attrtype, sizeof(u32), &tmp);
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1460  }
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1461  
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1462  /**
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1463   * nla_put_uint - Add a variable-size unsigned int to a socket buffer
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1464   * @skb: socket buffer to add attribute to
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1465   * @attrtype: attribute type
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1466   * @value: numeric value
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1467   */
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1468  static inline int nla_put_uint(struct sk_buff *skb, int attrtype, u64 value)
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1469  {
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1470  	u64 tmp64 = value;
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1471  	u32 tmp32 = value;
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1472  
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1473  	if (tmp64 == tmp32)
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1474  		return nla_put_u32(skb, attrtype, tmp32);
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1475  	return nla_put(skb, attrtype, sizeof(u64), &tmp64);
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1476  }
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1477  
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1478  /**
+569a8fc38367df David S. Miller 2012-03-29  1479   * nla_put_be32 - Add a __be32 netlink attribute to a socket buffer
+569a8fc38367df David S. Miller 2012-03-29  1480   * @skb: socket buffer to add attribute to
+569a8fc38367df David S. Miller 2012-03-29  1481   * @attrtype: attribute type
+569a8fc38367df David S. Miller 2012-03-29  1482   * @value: numeric value
+569a8fc38367df David S. Miller 2012-03-29  1483   */
+569a8fc38367df David S. Miller 2012-03-29  1484  static inline int nla_put_be32(struct sk_buff *skb, int attrtype, __be32 value)
+569a8fc38367df David S. Miller 2012-03-29  1485  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1486  	__be32 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1487  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1488  	return nla_put(skb, attrtype, sizeof(__be32), &tmp);
+569a8fc38367df David S. Miller 2012-03-29  1489  }
+569a8fc38367df David S. Miller 2012-03-29  1490  
+6c1dd3b6a35178 David S. Miller 2012-04-01  1491  /**
+6c1dd3b6a35178 David S. Miller 2012-04-01  1492   * nla_put_net32 - Add 32-bit network byte order netlink attribute to a socket buffer
+6c1dd3b6a35178 David S. Miller 2012-04-01  1493   * @skb: socket buffer to add attribute to
+6c1dd3b6a35178 David S. Miller 2012-04-01  1494   * @attrtype: attribute type
+6c1dd3b6a35178 David S. Miller 2012-04-01  1495   * @value: numeric value
+6c1dd3b6a35178 David S. Miller 2012-04-01  1496   */
+6c1dd3b6a35178 David S. Miller 2012-04-01  1497  static inline int nla_put_net32(struct sk_buff *skb, int attrtype, __be32 value)
+6c1dd3b6a35178 David S. Miller 2012-04-01  1498  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1499  	__be32 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1500  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1501  	return nla_put_be32(skb, attrtype | NLA_F_NET_BYTEORDER, tmp);
+6c1dd3b6a35178 David S. Miller 2012-04-01  1502  }
+6c1dd3b6a35178 David S. Miller 2012-04-01  1503  
+24c410dce335db David S. Miller 2012-04-01  1504  /**
+24c410dce335db David S. Miller 2012-04-01  1505   * nla_put_le32 - Add a __le32 netlink attribute to a socket buffer
+24c410dce335db David S. Miller 2012-04-01  1506   * @skb: socket buffer to add attribute to
+24c410dce335db David S. Miller 2012-04-01  1507   * @attrtype: attribute type
+24c410dce335db David S. Miller 2012-04-01  1508   * @value: numeric value
+24c410dce335db David S. Miller 2012-04-01  1509   */
+24c410dce335db David S. Miller 2012-04-01  1510  static inline int nla_put_le32(struct sk_buff *skb, int attrtype, __le32 value)
+24c410dce335db David S. Miller 2012-04-01  1511  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1512  	__le32 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1513  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1514  	return nla_put(skb, attrtype, sizeof(__le32), &tmp);
+24c410dce335db David S. Miller 2012-04-01  1515  }
+24c410dce335db David S. Miller 2012-04-01  1516  
+73520786b0793c Nicolas Dichtel 2016-04-22  1517  /**
+73520786b0793c Nicolas Dichtel 2016-04-22  1518   * nla_put_u64_64bit - Add a u64 netlink attribute to a skb and align it
+73520786b0793c Nicolas Dichtel 2016-04-22  1519   * @skb: socket buffer to add attribute to
+73520786b0793c Nicolas Dichtel 2016-04-22  1520   * @attrtype: attribute type
+73520786b0793c Nicolas Dichtel 2016-04-22  1521   * @value: numeric value
+73520786b0793c Nicolas Dichtel 2016-04-22  1522   * @padattr: attribute type for the padding
+73520786b0793c Nicolas Dichtel 2016-04-22  1523   */
+73520786b0793c Nicolas Dichtel 2016-04-22  1524  static inline int nla_put_u64_64bit(struct sk_buff *skb, int attrtype,
+73520786b0793c Nicolas Dichtel 2016-04-22  1525  				    u64 value, int padattr)
+73520786b0793c Nicolas Dichtel 2016-04-22  1526  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1527  	u64 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1528  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1529  	return nla_put_64bit(skb, attrtype, sizeof(u64), &tmp, padattr);
+73520786b0793c Nicolas Dichtel 2016-04-22  1530  }
+73520786b0793c Nicolas Dichtel 2016-04-22  1531  
+569a8fc38367df David S. Miller 2012-03-29  1532  /**
+b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1533   * nla_put_be64 - Add a __be64 netlink attribute to a socket buffer and align it
+569a8fc38367df David S. Miller 2012-03-29  1534   * @skb: socket buffer to add attribute to
+569a8fc38367df David S. Miller 2012-03-29  1535   * @attrtype: attribute type
+569a8fc38367df David S. Miller 2012-03-29  1536   * @value: numeric value
+b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1537   * @padattr: attribute type for the padding
+569a8fc38367df David S. Miller 2012-03-29  1538   */
+b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1539  static inline int nla_put_be64(struct sk_buff *skb, int attrtype, __be64 value,
+b46f6ded906ef0 Nicolas Dichtel 2016-04-22  1540  			       int padattr)
+569a8fc38367df David S. Miller 2012-03-29  1541  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1542  	__be64 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1543  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1544  	return nla_put_64bit(skb, attrtype, sizeof(__be64), &tmp, padattr);
+569a8fc38367df David S. Miller 2012-03-29  1545  }
+569a8fc38367df David S. Miller 2012-03-29  1546  
+6c1dd3b6a35178 David S. Miller 2012-04-01  1547  /**
+e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1548   * nla_put_net64 - Add 64-bit network byte order nlattr to a skb and align it
+6c1dd3b6a35178 David S. Miller 2012-04-01  1549   * @skb: socket buffer to add attribute to
+6c1dd3b6a35178 David S. Miller 2012-04-01  1550   * @attrtype: attribute type
+6c1dd3b6a35178 David S. Miller 2012-04-01  1551   * @value: numeric value
+e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1552   * @padattr: attribute type for the padding
+6c1dd3b6a35178 David S. Miller 2012-04-01  1553   */
+e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1554  static inline int nla_put_net64(struct sk_buff *skb, int attrtype, __be64 value,
+e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1555  				int padattr)
+6c1dd3b6a35178 David S. Miller 2012-04-01  1556  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1557  	__be64 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1558  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1559  	return nla_put_be64(skb, attrtype | NLA_F_NET_BYTEORDER, tmp,
+e9bbe898cbe89b Nicolas Dichtel 2016-04-22  1560  			    padattr);
+6c1dd3b6a35178 David S. Miller 2012-04-01  1561  }
+6c1dd3b6a35178 David S. Miller 2012-04-01  1562  
+24c410dce335db David S. Miller 2012-04-01  1563  /**
+e7479122befd70 Nicolas Dichtel 2016-04-22  1564   * nla_put_le64 - Add a __le64 netlink attribute to a socket buffer and align it
+24c410dce335db David S. Miller 2012-04-01  1565   * @skb: socket buffer to add attribute to
+24c410dce335db David S. Miller 2012-04-01  1566   * @attrtype: attribute type
+24c410dce335db David S. Miller 2012-04-01  1567   * @value: numeric value
+e7479122befd70 Nicolas Dichtel 2016-04-22  1568   * @padattr: attribute type for the padding
+24c410dce335db David S. Miller 2012-04-01  1569   */
+e7479122befd70 Nicolas Dichtel 2016-04-22  1570  static inline int nla_put_le64(struct sk_buff *skb, int attrtype, __le64 value,
+e7479122befd70 Nicolas Dichtel 2016-04-22  1571  			       int padattr)
+24c410dce335db David S. Miller 2012-04-01  1572  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1573  	__le64 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1574  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1575  	return nla_put_64bit(skb, attrtype, sizeof(__le64), &tmp, padattr);
+24c410dce335db David S. Miller 2012-04-01  1576  }
+24c410dce335db David S. Miller 2012-04-01  1577  
+4778e0be16c291 Jiri Pirko      2012-07-27  1578  /**
+4778e0be16c291 Jiri Pirko      2012-07-27  1579   * nla_put_s8 - Add a s8 netlink attribute to a socket buffer
+4778e0be16c291 Jiri Pirko      2012-07-27  1580   * @skb: socket buffer to add attribute to
+4778e0be16c291 Jiri Pirko      2012-07-27  1581   * @attrtype: attribute type
+4778e0be16c291 Jiri Pirko      2012-07-27  1582   * @value: numeric value
+4778e0be16c291 Jiri Pirko      2012-07-27  1583   */
+4778e0be16c291 Jiri Pirko      2012-07-27  1584  static inline int nla_put_s8(struct sk_buff *skb, int attrtype, s8 value)
+4778e0be16c291 Jiri Pirko      2012-07-27  1585  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1586  	s8 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1587  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1588  	return nla_put(skb, attrtype, sizeof(s8), &tmp);
+4778e0be16c291 Jiri Pirko      2012-07-27  1589  }
+4778e0be16c291 Jiri Pirko      2012-07-27  1590  
+4778e0be16c291 Jiri Pirko      2012-07-27  1591  /**
+4778e0be16c291 Jiri Pirko      2012-07-27  1592   * nla_put_s16 - Add a s16 netlink attribute to a socket buffer
+4778e0be16c291 Jiri Pirko      2012-07-27  1593   * @skb: socket buffer to add attribute to
+4778e0be16c291 Jiri Pirko      2012-07-27  1594   * @attrtype: attribute type
+4778e0be16c291 Jiri Pirko      2012-07-27  1595   * @value: numeric value
+4778e0be16c291 Jiri Pirko      2012-07-27  1596   */
+4778e0be16c291 Jiri Pirko      2012-07-27  1597  static inline int nla_put_s16(struct sk_buff *skb, int attrtype, s16 value)
+4778e0be16c291 Jiri Pirko      2012-07-27  1598  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1599  	s16 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1600  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1601  	return nla_put(skb, attrtype, sizeof(s16), &tmp);
+4778e0be16c291 Jiri Pirko      2012-07-27  1602  }
+4778e0be16c291 Jiri Pirko      2012-07-27  1603  
+4778e0be16c291 Jiri Pirko      2012-07-27  1604  /**
+4778e0be16c291 Jiri Pirko      2012-07-27  1605   * nla_put_s32 - Add a s32 netlink attribute to a socket buffer
+4778e0be16c291 Jiri Pirko      2012-07-27  1606   * @skb: socket buffer to add attribute to
+4778e0be16c291 Jiri Pirko      2012-07-27  1607   * @attrtype: attribute type
+4778e0be16c291 Jiri Pirko      2012-07-27  1608   * @value: numeric value
+4778e0be16c291 Jiri Pirko      2012-07-27  1609   */
+4778e0be16c291 Jiri Pirko      2012-07-27  1610  static inline int nla_put_s32(struct sk_buff *skb, int attrtype, s32 value)
+4778e0be16c291 Jiri Pirko      2012-07-27  1611  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1612  	s32 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1613  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1614  	return nla_put(skb, attrtype, sizeof(s32), &tmp);
+4778e0be16c291 Jiri Pirko      2012-07-27  1615  }
+4778e0be16c291 Jiri Pirko      2012-07-27  1616  
+4778e0be16c291 Jiri Pirko      2012-07-27  1617  /**
+756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1618   * nla_put_s64 - Add a s64 netlink attribute to a socket buffer and align it
+4778e0be16c291 Jiri Pirko      2012-07-27  1619   * @skb: socket buffer to add attribute to
+4778e0be16c291 Jiri Pirko      2012-07-27  1620   * @attrtype: attribute type
+4778e0be16c291 Jiri Pirko      2012-07-27  1621   * @value: numeric value
+756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1622   * @padattr: attribute type for the padding
+4778e0be16c291 Jiri Pirko      2012-07-27  1623   */
+756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1624  static inline int nla_put_s64(struct sk_buff *skb, int attrtype, s64 value,
+756a2f59b73cd6 Nicolas Dichtel 2016-04-22  1625  			      int padattr)
+4778e0be16c291 Jiri Pirko      2012-07-27  1626  {
+b4391db42308c9 Arnd Bergmann   2017-09-22  1627  	s64 tmp = value;
+b4391db42308c9 Arnd Bergmann   2017-09-22  1628  
+b4391db42308c9 Arnd Bergmann   2017-09-22  1629  	return nla_put_64bit(skb, attrtype, sizeof(s64), &tmp, padattr);
+4778e0be16c291 Jiri Pirko      2012-07-27  1630  }
+4778e0be16c291 Jiri Pirko      2012-07-27  1631  
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1632  /**
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1633   * nla_put_sint - Add a variable-size signed int to a socket buffer
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1634   * @skb: socket buffer to add attribute to
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1635   * @attrtype: attribute type
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1636   * @value: numeric value
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1637   */
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1638  static inline int nla_put_sint(struct sk_buff *skb, int attrtype, s64 value)
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1639  {
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1640  	s64 tmp64 = value;
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1641  	s32 tmp32 = value;
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1642  
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1643  	if (tmp64 == tmp32)
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1644  		return nla_put_s32(skb, attrtype, tmp32);
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1645  	return nla_put(skb, attrtype, sizeof(s64), &tmp64);
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1646  }
+374d345d9b5e13 Jakub Kicinski  2023-10-18  1647  
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1648  /**
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1649   * nla_put_string - Add a string netlink attribute to a socket buffer
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1650   * @skb: socket buffer to add attribute to
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1651   * @attrtype: attribute type
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1652   * @str: NUL terminated string
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1653   */
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1654  static inline int nla_put_string(struct sk_buff *skb, int attrtype,
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1655  				 const char *str)
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1656  {
+bfa83a9e03cf8d Thomas Graf     2005-11-10 @1657  	return nla_put(skb, attrtype, strlen(str) + 1, str);
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1658  }
+bfa83a9e03cf8d Thomas Graf     2005-11-10  1659  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
