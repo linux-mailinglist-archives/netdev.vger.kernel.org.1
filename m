@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-255743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255744-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AK6CJPJLgGne5wIAu9opvQ
-	(envelope-from <netdev+bounces-255743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:02:10 +0100
+	id cLG6N8dLgGne5wIAu9opvQ
+	(envelope-from <netdev+bounces-255744-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:01:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4727DC9026
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:02:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB32CC9016
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:01:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F4C1301938E
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:59:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DD8673004C8D
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43133312816;
-	Mon,  2 Feb 2026 06:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1790314A65;
+	Mon,  2 Feb 2026 06:58:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA23312805;
-	Mon,  2 Feb 2026 06:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659EC313532;
+	Mon,  2 Feb 2026 06:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770015507; cv=none; b=oJDIecMJVsXozYJJP2A4M4NP5UJu6fIgqgK/I2t26ar5vFd2lbYlaXdEvmWYF7TWbmp4LwMzh5VTPQi3wjyJeglA/q4Kdc+ttEUDPYGgbay7TBUy6VslpCd8p4ZEvtfewgj27/Rs2f+FBpDOe8N3EVo4g8NLdc1UsvaKnJTltpc=
+	t=1770015508; cv=none; b=L243Sr/QUK/9LiMVV94Cfr01+vCcDZawuAkRcvrQv1pfJMtb6NperL+x/7BAokJlp1C83uP0T9wqK0sWkcx6eEgM6zvA2voWjPXAhh/3G41yGjS3XFO69clC2DRbO3omtT9XkVNVCfDHtx5hJLGqF4/u/pBDaFqpxT6y088FqsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770015507; c=relaxed/simple;
-	bh=xYzuPf4JpHkrgbcNDcIhc2AIPUmm1ELC+ia/CAI9TEw=;
+	s=arc-20240116; t=1770015508; c=relaxed/simple;
+	bh=PDYi6UpYkJptqVcGU/3hRklZnU4sEbljA07zhsRbTso=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=ALwMxxPRFV8JQPngE3hgK4PJhYfp3cVlaJgYmjNPOSXz0CivdvCsB+p+ozem3eKGZzrmTy6G/noMaWLSVoDZUMLFlR7cW5FT6UGP7htO7PyUfBThYeehEagEg82isCY5UakPRYSjgGnpcuURhBZA7N0HkVCP5c1bvBk/03xu2Mk=
+	 In-Reply-To:To:CC; b=gSDAF03MsFpNOOjR75OTGyMbwWJGyewt79fNfhmdauisyFcX/Yux5c2Ak96ibbrw/R5G2uUuFGEngGff2iVR6xXXz3NCBLHz1/13byOs8tod7EwgKxX0DOvEcNILFNZ86EHHSWOD+W75FvWyT3B0vnwi3yP12MP12m0sGchsilg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -40,9 +40,9 @@ Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
  (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
  Transport; Mon, 2 Feb 2026 14:57:01 +0800
 From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Mon, 2 Feb 2026 14:57:06 +0800
-Subject: [PATCH net-next v3 12/15] net: ftgmac100: Remove redundant
- PHY_POLL
+Date: Mon, 2 Feb 2026 14:57:07 +0800
+Subject: [PATCH net-next v3 13/15] net: ftgmac100: Simplify condition on HW
+ arbitration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260202-ftgmac-cleanup-v3-12-6a6a8d45280a@aspeedtech.com>
+Message-ID: <20260202-ftgmac-cleanup-v3-13-6a6a8d45280a@aspeedtech.com>
 References: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 In-Reply-To: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -61,11 +61,11 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
 	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
 	<horms@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015420; l=1321;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015420; l=1250;
  i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=1fAu1sJrlN8RbP5zBZRB1ty0MJGnS8BU28stOLewZ40=;
- b=4AG56XV68HiduK30y/FQj160NBHCnugr9EGcenSUJgJMPGijXlScVXK/4iCGe3F7l/wv+0BRw
- uB27BeW40+uBo0UBXqAJOSliF0O/vd6QjAWU9uOWtdtmdRNRI4krY+o
+ bh=ezU52f1OQn+OfdME2BnrNSlfDj+674WoYoINJjV0Dxo=;
+ b=jBgGn7VN3r1DXosYMyHg1R+OEyTXUGNXZ1ov5HgZ3B5WMDXlkVlJ1khp9TP48i2wQEYZyETz3
+ /T11MHFi3ijDHOzRmTND9T11VCstOaYYUkzy+QAL9LTTjTUdquK8Y+7
 X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
  pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 X-Rspamd-Server: lfdr
@@ -73,14 +73,14 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	DMARC_POLICY_QUARANTINE(1.50)[aspeedtech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255743-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255744-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -93,46 +93,44 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,aspeedtech.com:mid,aspeedtech.com:email]
-X-Rspamd-Queue-Id: 4727DC9026
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:email,aspeedtech.com:mid,aspeedtech.com:email]
+X-Rspamd-Queue-Id: EB32CC9016
 X-Rspamd-Action: no action
 
 From: Andrew Lunn <andrew@lunn.ch>
 
-When an MDIO bus is allocated, the irqs for each PHY are set to
-polling. Remove the redundant code in the MAC driver which does the
-same.
+The MAC ID is sufficient to indicate this is a ast2600.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/net/ethernet/faraday/ftgmac100.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index eac0eddff641..491b684a79fb 100644
+index 491b684a79fb..55a592b3d2c6 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1712,7 +1712,7 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
- 	struct platform_device *pdev = to_platform_device(priv->dev);
- 	struct device_node *np = pdev->dev.of_node;
- 	struct device_node *mdio_np;
--	int i, err = 0;
-+	int err = 0;
- 	u32 reg;
- 
- 	/* initialize mdio bus */
-@@ -1740,9 +1740,6 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
- 	priv->mii_bus->read = ftgmac100_mdiobus_read;
- 	priv->mii_bus->write = ftgmac100_mdiobus_write;
- 
--	for (i = 0; i < PHY_MAX_ADDR; i++)
--		priv->mii_bus->irq[i] = PHY_POLL;
+@@ -2032,13 +2032,13 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 		err = ftgmac100_setup_clk(priv);
+ 		if (err)
+ 			goto err;
 -
- 	mdio_np = of_get_child_by_name(np, "mdio");
+-		/* Disable ast2600 problematic HW arbitration */
+-		if (priv->mac_id == FTGMAC100_AST2600)
+-			iowrite32(FTGMAC100_TM_DEFAULT,
+-				  priv->base + FTGMAC100_OFFSET_TM);
+ 	}
  
- 	err = of_mdiobus_register(priv->mii_bus, mdio_np);
++	/* Disable ast2600 problematic HW arbitration */
++	if (priv->mac_id == FTGMAC100_AST2600)
++		iowrite32(FTGMAC100_TM_DEFAULT,
++			  priv->base + FTGMAC100_OFFSET_TM);
++
+ 	/* Default ring sizes */
+ 	priv->rx_q_entries = priv->new_rx_q_entries = DEF_RX_QUEUE_ENTRIES;
+ 	priv->tx_q_entries = priv->new_tx_q_entries = DEF_TX_QUEUE_ENTRIES;
 
 -- 
 2.34.1
