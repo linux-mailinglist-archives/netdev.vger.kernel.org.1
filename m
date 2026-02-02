@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-255736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255737-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AOuMMgtLgGne5wIAu9opvQ
-	(envelope-from <netdev+bounces-255736-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 07:58:19 +0100
+	id qKgkOhlLgGne5wIAu9opvQ
+	(envelope-from <netdev+bounces-255737-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 07:58:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EA21C8F91
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 07:58:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97528C8F9F
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 07:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 089EB3004D3A
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:58:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 409E93004D3F
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E95430BB93;
-	Mon,  2 Feb 2026 06:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D2930DD3F;
+	Mon,  2 Feb 2026 06:58:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D352BDC1C;
-	Mon,  2 Feb 2026 06:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EBF30BF6B;
+	Mon,  2 Feb 2026 06:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770015494; cv=none; b=OfXnLHiftg/fzMycObC/4eXDjQyXl+1+z2XxshrEL0bw/C6CiW7t9nchFj2cleO5oe3lqzG4HDEBx3FdziQribMj7whWWt1BdHbJwjXyQ69fssFIsj8G/cAo1Iw2ih2J3r2yQSVl0y3eRmw8sSaHcXt8kpEcj/A4GlrjyPwWwZ8=
+	t=1770015496; cv=none; b=OFd+YV+CFcYBES0EKV0zAjpQriNXP62XIcXq8GHMUQLDnmREg8ev0XPqO+JmfNEGPsEQ5tVQoCTI+HWUp9R/R9a0n3hYRFmlION4S5R61feyYHSYAUXvo2/CMky4+bV1oZXeKScRvEiQV0whevGd4OAQbbcWDUEJGcNH8uAAASs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770015494; c=relaxed/simple;
-	bh=ceYR9uOBjSpJRI2oiBkcEl1sbI98TqqWni7uo64dK5I=;
+	s=arc-20240116; t=1770015496; c=relaxed/simple;
+	bh=XgKX0xdZa46he8amsmEI8h76ecDZ3K1z1hppQLAht+Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=dRRXWMJARy3DDmSDZ+atb7HrNexU37QLQzeWTntRXd0vYwAmummV1+J8IZtJzgipaMndFZXS4zO3+uSr3gjNKb+LvsN9VZIdUUaA8/VI1FtpHRXKplqUnZsnIXOYdfX594Slk6ZB/pR8CLIXKsTK2K+zRoW3ip+vOiEULHMLn/c=
+	 In-Reply-To:To:CC; b=ATKzd1u9c7BK+OEvfAvkkL5fnfxk8gBaAXusGKhIJ9gFBxszro19y7cd/EgUZMsgDiO01aucs4QYqB9uqe8giPEkqQW0OY3F/f918yMrM/21F5O6VxMI1cW0LwyxBjjnh7AJc7ULwcTxJ4dUsZnLlg0MelBW+Wbff8vdPosQbBA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -40,9 +40,8 @@ Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
  (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
  Transport; Mon, 2 Feb 2026 14:57:00 +0800
 From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Mon, 2 Feb 2026 14:56:59 +0800
-Subject: [PATCH net-next v3 05/15] net: ftgmac100: Use
- devm_request_memory_region/devm_ioremap
+Date: Mon, 2 Feb 2026 14:57:00 +0800
+Subject: [PATCH net-next v3 06/15] net: ftgmac100: Use devm_clk_get_enabled
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,7 +50,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260202-ftgmac-cleanup-v3-5-6a6a8d45280a@aspeedtech.com>
+Message-ID: <20260202-ftgmac-cleanup-v3-6-6a6a8d45280a@aspeedtech.com>
 References: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 In-Reply-To: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -61,11 +60,11 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
 	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
 	<horms@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015419; l=1997;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015419; l=2593;
  i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=PabSzzWHuOc4GjJAVT/Ar4WEHvlB1Z2Il9a4L8Pq5xY=;
- b=UealA8MQUvPt394swGWa6cSd3LUKbrLyOXgyMKqfUdg266dFocu3tHSAG/trMwDoIR77Sr7hZ
- Y7BcBVgS66BBC8bOYyBWca/bnSSASuLmOCd+Exq1JfJmUNyDDGWo/xs
+ bh=a77ZGVgJdbUEVv/HmsFHuKrP2+pmsIXAJ/kpHVOPu+Y=;
+ b=UoU/RcmgIrg/89sLoLp2Y7uKkyCiF7qAIXOGJBjBYxyiY3awKE5TyLnNP50yG0cQikoV/9laF
+ U6zuyaMhpbkCtZHmp0Bk1jduUsqA3Q7Aq94jh19Aq3zS59XbrNQC2SZ
 X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
  pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 X-Rspamd-Server: lfdr
@@ -80,7 +79,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255736-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255737-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -93,73 +92,87 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:email]
-X-Rspamd-Queue-Id: 5EA21C8F91
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,aspeedtech.com:mid,aspeedtech.com:email]
+X-Rspamd-Queue-Id: 97528C8F9F
 X-Rspamd-Action: no action
 
 From: Andrew Lunn <andrew@lunn.ch>
 
-Make use of devm_ methods to request and remap the device memory to
-simplify cleanup.
+Make use of devm_ methods to request and enable clocks to simplify
+cleanup.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/faraday/ftgmac100.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 397ada43c851..ec2e7ec23ddf 100644
+index ec2e7ec23ddf..1fb03dd55c8f 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1897,19 +1897,18 @@ static int ftgmac100_probe(struct platform_device *pdev)
- 	INIT_WORK(&priv->reset_task, ftgmac100_reset_task);
+@@ -1801,13 +1801,10 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
+ 	struct clk *clk;
+ 	int rc;
  
- 	/* map io memory */
--	priv->res = request_mem_region(res->start, resource_size(res),
--				       dev_name(&pdev->dev));
-+	priv->res = devm_request_mem_region(&pdev->dev,
-+					    res->start, resource_size(res),
-+					    dev_name(&pdev->dev));
- 	if (!priv->res) {
- 		dev_err(&pdev->dev, "Could not reserve memory region\n");
--		err = -ENOMEM;
--		goto err_req_mem;
-+		return -ENOMEM;
- 	}
+-	clk = devm_clk_get(priv->dev, NULL /* MACCLK */);
++	clk = devm_clk_get_enabled(priv->dev, NULL /* MACCLK */);
+ 	if (IS_ERR(clk))
+ 		return PTR_ERR(clk);
+ 	priv->clk = clk;
+-	rc = clk_prepare_enable(priv->clk);
+-	if (rc)
+-		return rc;
  
--	priv->base = ioremap(res->start, resource_size(res));
-+	priv->base = devm_ioremap(&pdev->dev, res->start, resource_size(res));
- 	if (!priv->base) {
- 		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
--		err = -EIO;
--		goto err_ioremap;
-+		return -EIO;
- 	}
+ 	/* Aspeed specifies a 100MHz clock is required for up to
+ 	 * 1000Mbit link speeds. As NCSI is limited to 100Mbit, 25MHz
+@@ -1816,21 +1813,17 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
+ 	rc = clk_set_rate(priv->clk, priv->use_ncsi ? FTGMAC_25MHZ :
+ 			  FTGMAC_100MHZ);
+ 	if (rc)
+-		goto cleanup_clk;
++		return rc;
  
- 	netdev->irq = irq;
-@@ -2074,10 +2073,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
- 		ncsi_unregister_dev(priv->ndev);
- 	ftgmac100_destroy_mdio(netdev);
- err_setup_mdio:
--	iounmap(priv->base);
--err_ioremap:
--	release_resource(priv->res);
--err_req_mem:
- 	return err;
- }
+ 	/* RCLK is for RMII, typically used for NCSI. Optional because it's not
+ 	 * necessary if it's the AST2400 MAC, or the MAC is configured for
+ 	 * RGMII, or the controller is not an ASPEED-based controller.
+ 	 */
+-	priv->rclk = devm_clk_get_optional(priv->dev, "RCLK");
+-	rc = clk_prepare_enable(priv->rclk);
+-	if (!rc)
+-		return 0;
++	priv->rclk = devm_clk_get_optional_enabled(priv->dev, "RCLK");
++	if (IS_ERR(priv->rclk))
++		return PTR_ERR(priv->rclk);
  
-@@ -2104,9 +2099,6 @@ static void ftgmac100_remove(struct platform_device *pdev)
- 	ftgmac100_phy_disconnect(netdev);
- 	ftgmac100_destroy_mdio(netdev);
- 
--	iounmap(priv->base);
--	release_resource(priv->res);
+-cleanup_clk:
+-	clk_disable_unprepare(priv->clk);
 -
- 	netif_napi_del(&priv->napi);
+-	return rc;
++	return 0;
  }
  
+ static bool ftgmac100_has_child_node(struct device_node *np, const char *name)
+@@ -2064,8 +2057,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_register_netdev:
+-	clk_disable_unprepare(priv->rclk);
+-	clk_disable_unprepare(priv->clk);
+ err_phy_connect:
+ 	ftgmac100_phy_disconnect(netdev);
+ err_ncsi_dev:
+@@ -2088,9 +2079,6 @@ static void ftgmac100_remove(struct platform_device *pdev)
+ 		ncsi_unregister_dev(priv->ndev);
+ 	unregister_netdev(netdev);
+ 
+-	clk_disable_unprepare(priv->rclk);
+-	clk_disable_unprepare(priv->clk);
+-
+ 	/* There's a small chance the reset task will have been re-queued,
+ 	 * during stop, make sure it's gone before we free the structure.
+ 	 */
 
 -- 
 2.34.1
