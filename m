@@ -1,220 +1,185 @@
-Return-Path: <netdev+bounces-255926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBxJH1TNgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:14:12 +0100
+	id KFr9OXLQgGlBBwMAu9opvQ
+	(envelope-from <netdev+bounces-255927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:27:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2058CCEC2C
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:14:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465EACEF37
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5D64B3001476
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 16:13:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C71EA30427C1
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 16:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2156937D11C;
-	Mon,  2 Feb 2026 16:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2FB2765C3;
+	Mon,  2 Feb 2026 16:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="YQL3lGEq"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Agq9KvgT"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DCC26FDAC
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 16:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF62E23C4E9
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 16:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770048816; cv=none; b=cKF5zOoWbin7sza6AgK0UHwtiPkHXaqWpcGFUvjfFFXXDUkA35/T99NYRQzVmbcsYVLj/rbOUIhhlsBirEt/uGwMDxMYbHPXkopZWAu1T9iIfRPsgQNEyRPziNIStTpMJXmYtaxcTAuo48vaVAUQ32U8IvvmGxiS3X3YpnMtuC0=
+	t=1770049118; cv=none; b=dGXuUVLMLy6je4z46jehbf5SHgsCQa5U0PTFRobD9zoIsjA+Y4eiYH/+nWoGleguyEPBZJR5yFbqrRWDztG9Z3Y3VPTjdLLgNpVkQlqSuBq4t5zFvNcvJc28lxTrf7qzuqg12zHCGxCIZtV/q7f3FZNgGTLlUJbS6tNE6Jw0GS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770048816; c=relaxed/simple;
-	bh=a4N7z8UAB/VGHl+U+pzsuK5fOZS3vCpucP5duJHCtNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=agB90dbLyXMNLAeaQ+VvlqqhFgw/qH/ps9YJDOyVGjpVMaEIyJghz+kJH+mPjWZZVNHSnC0Dvxr4TfHVtpF2JoRJvVtHrqu/G5San5gz5Q7Ad6oS3cwTJAv8GVTOlYfNYTKimySjyWxntGx9IgutlpdS4EzIB4+Mln2TH7M68ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=YQL3lGEq; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=0/1yOWNK+/yM30idaZ3iUunkcFAEII9ZljB8J8tox94=; b=YQL3lGEqXNsTS6UaRqgujdtAbH
-	rbG8sdMUrBTf71w/xflKakudCsgwA3ZBa93RAA6iDJtnhasesq3FGABfM7bVq46s8LP1ylCrEtPxv
-	OUWBdcXL9zfeDN5gwflIRyCVNkV6wTfQmzk7B/MpUrwcuR1ezX3ga/Zgz1G/dI+ThXtXxO3l6khNv
-	Hgt1WwQV9OZ2LWBOXDrKUUXXa1nJuXJX8XpFfkmiqraxk1lcvxVo9smxveqY7b1oquurgeuPKg6tp
-	ukogT8oVroovWX08IyOtd0817EHOXc2ljNDsycdbQD7iUmezBh+t/wWctE0EO/o3Z2U3MsgrTiTxy
-	KwtcMI3g==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vmwYD-0000BL-35;
-	Mon, 02 Feb 2026 17:13:22 +0100
-Received: from localhost ([127.0.0.1])
-	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vmwYE-0006gv-0J;
-	Mon, 02 Feb 2026 17:13:21 +0100
-Message-ID: <2a3bd098-0d88-4c11-8ac3-7b13f8bbbd9f@iogearbox.net>
-Date: Mon, 2 Feb 2026 17:13:20 +0100
+	s=arc-20240116; t=1770049118; c=relaxed/simple;
+	bh=b8Z3/LKuA+OW063oB2bh8WJdnmTEl/LI0BKNPYDDaZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ru+hcnGmL/9HvwhY7fdXiMBS7cFP8kmyd37tYS62cAtvoShCt7z9uEqwq8ERoWqDJ5W6pKvQlEsaPk57OU+Jw+fqQY/zmtMM5PvR27pE8lqL066A3nmk2Ic429AYzeOm5tNyAlFLV6mRa9i+cK2P6FN14be+dhsNH5DZK0b8ea4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Agq9KvgT; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from ms-a2 (182.51.30.125.dy.iij4u.or.jp [125.30.51.182])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 612GIRwd025215
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 3 Feb 2026 01:18:28 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=1rZ2SEYb9Cchgc3kP9Zh8vieF6lrwjUU6HQCddLtTBk=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:To:Subject:Date:Message-ID;
+        s=rs20251215; t=1770049108; v=1;
+        b=Agq9KvgTjCzE3Mg3Gg3RuebX3twA/tQPT6qwicWfwyXycOuUHLLkVYUhfUBpY+Wz
+         uGs0sFMNPB87h4kAXxnrekCohRm1pi3sZzo6FaJ3THUpuJee4l4NTlm0hjEfqApn
+         2Rxghv1aSYaIT2XSdC2touXJ0yt6C4omirerbeJaedBO6iiT3DBfaRkCJSvQ6xdD
+         ypxwWEoy4Kc2KZ9vb/DH5Y3SLmdUMPo0BppWQGK/XNVfeyV4SxwJe/WG9ISY+y/I
+         F6nZ1SRyDbTAVrHMoTDa3PAF60SyG1woCR3EMTQMj6JGaseYEqXAQ4UQh7RRytCu
+         NPnMEO5VVPLBJB8Dwe7qPw==
+From: Kohei Enju <kohei@enjuk.jp>
+To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Alexander Lobakin <aleksander.lobakin@intel.com>, kohei.enju@gmail.com,
+        Kohei Enju <kohei@enjuk.jp>
+Subject: [PATCH v1 iwl-next] ice: fix NULL pointer dereference when changing RX queue length
+Date: Mon,  2 Feb 2026 16:17:14 +0000
+Message-ID: <20260202161826.114393-1-kohei@enjuk.jp>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5e: Undo saving per-channel async ICOSQ
-To: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org
-Cc: William Tu <witu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
- Gal Pressman <gal@nvidia.com>, alice.kernel@fastmail.im
-References: <20260123223916.361295-1-daniel@iogearbox.net>
- <85776531-d5fa-4762-90aa-74c8397dc09b@gmail.com>
- <6188b9f5-ce38-4de9-80b7-c7b1cab48595@iogearbox.net>
- <421d9b09-a157-4f95-8775-7883ea097038@gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <421d9b09-a157-4f95-8775-7883ea097038@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27900/Mon Feb  2 08:24:10 2026)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,davidwei.uk,kernel.org,fastmail.im];
-	TAGGED_FROM(0.00)[bounces-255926-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-255927-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2058CCEC2C
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 465EACEF37
 X-Rspamd-Action: no action
 
-Hi Tariq,
+When changing RX queue length via 'ethtool -G $DEV rx $NUM', a WARNING
+indicates the driver missed unregistering xdp_rxq_info [1], and then
+NULL pointer dereference panics the kernel. [2]
 
-On 2/1/26 1:50 PM, Tariq Toukan wrote:
-> On 26/01/2026 11:23, Daniel Borkmann wrote:
->> On 1/25/26 9:33 AM, Tariq Toukan wrote:
->>> On 24/01/2026 0:39, Daniel Borkmann wrote:
->>>> This reverts the following commits:
->>>>
->>>>    - ea945f4f3991 ("net/mlx5e: Move async ICOSQ lock into ICOSQ struct")
->>>>    - 56aca3e0f730 ("net/mlx5e: Use regular ICOSQ for triggering NAPI")
->>>>    - 1b080bd74840 ("net/mlx5e: Move async ICOSQ to dynamic allocation")
->>>>    - abed42f9cd80 ("net/mlx5e: Conditionally create async ICOSQ")
->>>>
->>>> There are a couple of regressions on the xsk side I ran into:
->>>>
->>>> Commit 56aca3e0f730 triggers an illegal synchronize_rcu() in an RCU read-
->>>> side critical section via mlx5e_xsk_wakeup() -> mlx5e_trigger_napi_icosq()
->>>> -> synchronize_net(). The stack holds RCU read-lock in xsk_poll().
->>>>
->>>> Additionally, this also hits a NULL pointer dereference in mlx5e_xsk_wakeup():
->>>>
->>>>    [  103.963735] BUG: kernel NULL pointer dereference, address: 0000000000000240
->>>>    [  103.963743] #PF: supervisor read access in kernel mode
->>>>    [  103.963746] #PF: error_code(0x0000) - not-present page
->>>>    [  103.963749] PGD 0 P4D 0
->>>>    [  103.963752] Oops: Oops: 0000 [#1] SMP
->>>>    [  103.963756] CPU: 0 UID: 0 PID: 2255 Comm: qemu-system-x86 Not tainted 6.19.0-rc5+ #229 PREEMPT(none)
->>>>    [  103.963761] Hardware name: [...]
->>>>    [  103.963765] RIP: 0010:mlx5e_xsk_wakeup+0x53/0x90 [mlx5_core]
->>>>
->>>> What happens is that c->async_icosq is NULL when in mlx5e_xsk_wakeup()
->>>> and therefore access to c->async_icosq->state triggers it. (On the NIC
->>>> there is an XDP program installed by the control plane where traffic
->>>> gets redirected into an xsk map - there was no xsk pool set up yet.
->>>> At some later time a xsk pool is set up and the related xsk socket is
->>>> added to the xsk map of the XDP program.)
->>>
->>> Thanks for your report.
->>>
->>>> Reverting the series fixes the problems again.
->>>
->>> Revert is too aggressive here. A fix is preferable.
->>> We're investigating the issue in order to fix it.
->>> We'll update.
->> Ok, sounds good. Certainly the kTLS fixes seem independent, from the cause
->> of the issues I've hit it just seemed to me that they were quite fundamental
->> and that perhaps a different approach would be needed (or alternatively only
->> kTLS would need fixing, and the xsk optimization left as it was originally).
->> Anyway, I'll keep the revert locally for now, and happy to test patches.
-> 
-> Please check attached patch.
-> We were able to repro the issues internally and verify the fix.
-> We're finalizing it before submission.
-> 
-> I'd be glad if you can confirm it solves the issues for you.
-That seems to work for me, yes. Feel free to add my Tested-by.
+The following sequence in ice_set_ringparam() triggers this bug.
+1. Allocate new rx_rings
+2. rx_rings[i] = *vsi->rx_rings[i];
+3. ice_down() unregisters vsi->rx_rings[i]->xdp_rxq
+4. ice_up() registers rx_ring[i]->xdp_rxq
+   a. __xdp_rxq_info_reg() sees the copied state REG_STATE_REGISTERED
+      and calls xdp_rxq_info_unreg() to fix it [1]
+   b. xdp_unreg_mem_model() looks up the stale mem.id in rhashtable,
+      which was already removed in step 3, causing NULL dereference [2]
 
-Thanks,
-Daniel
+The root cause is that struct copying includes xdp_rxq_info which
+contains registration state that should not be duplicated.
+
+Fix by clearing xdp_rxq_info after copying the ring so it starts with
+REG_STATE_NEW instead of the stale REG_STATE_REGISTERED.
+
+[1]
+ Missing unregister, handled but fix driver
+ WARNING: net/core/xdp.c:182 at __xdp_rxq_info_reg+0x89/0x150, CPU#4: ethtool/1105
+ [...]
+ RIP: 0010:__xdp_rxq_info_reg+0x89/0x150
+ [...]
+ Call Trace:
+  <TASK>
+  ice_queue_mem_alloc+0x159/0x240
+  ice_vsi_cfg_rxq+0xc3/0x160
+  ice_vsi_cfg_rxqs+0x4f/0x70
+  ice_up+0xd/0x20
+  ice_set_ringparam+0x34f/0x4e0
+
+[2]
+ BUG: kernel NULL pointer dereference, address: 0000000000000008
+ [...]
+ RIP: 0010:xdp_unreg_mem_model+0x113/0x340
+ [...]
+ Call Trace:
+  <TASK>
+  __xdp_rxq_info_reg+0xfd/0x150
+  ice_queue_mem_alloc+0x159/0x240
+  ice_vsi_cfg_rxq+0xc3/0x160
+  ice_vsi_cfg_rxqs+0x4f/0x70
+  ice_up+0xd/0x20
+  ice_set_ringparam+0x34f/0x4e0
+
+Fixes: 111a8e2be488 ("ice: implement Rx queue management ops")
+Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+---
+I see the Fixes: commit exists in only tnguy/next-queue.git, so I'm
+sending this patch to iwl-next, not iwl-net.
+
+Also IIUC dev-queue in tnguy/next-queue.git is rebased continuously, so
+the commit hash will be stale soon, and I don't know how to handle this.
+
+I'd appreciate it if iwl-folks know the way to handle it. Thanks!
+---
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index ddd252fb1124..e4c286a22ff5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -3338,6 +3338,7 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
+ 		rx_rings[i].cached_phctime = pf->ptp.cached_phc_time;
+ 		rx_rings[i].desc = NULL;
+ 		rx_rings[i].xdp_buf = NULL;
++		memset(&rx_rings[i].xdp_rxq, 0, sizeof(rx_rings[i].xdp_rxq));
+ 
+ 		/* this is to allow wr32 to have something to write to
+ 		 * during early allocation of Rx buffers
+-- 
+2.51.0
+
 
