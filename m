@@ -1,207 +1,356 @@
-Return-Path: <netdev+bounces-255938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255939-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNBDKITVgGmFBwMAu9opvQ
-	(envelope-from <netdev+bounces-255938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:49:08 +0100
+	id kHnoOtbXgGnMBwMAu9opvQ
+	(envelope-from <netdev+bounces-255939-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:59:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258E0CF256
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:49:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87FD5CF450
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 17:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA39F300CC8A
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 16:45:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 05A6D3019042
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 16:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7450B37F8C3;
-	Mon,  2 Feb 2026 16:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EEB37FF41;
+	Mon,  2 Feb 2026 16:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gCXGxi7G";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2SZFUFJJ"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="CBiDOAHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011020.outbound.protection.outlook.com [40.107.130.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1593637FF5B
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 16:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770050757; cv=none; b=FwMd0xG9KpPSZbRvBHlW9tO4CVMmYV1KENSYmvmM/2Z8czFl3RTuEa4GJpkC4Jt8mufTFLjoaHUBlyzzg2G/PP/YwwEhaKFZJLUvfdh6vn3NS027pKrIRP8emkv4rMuwhoDSs5uv2FuuGW3wwj+Zp1o/z0WIxFfcWdwzjFpBRp0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770050757; c=relaxed/simple;
-	bh=2rCUUjPQ5Gw2eMK1VPZU67Sv7/uV2Mzy3MdK6iz0PNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hceC+Dd1hLKgGzAGBJlJNz2XGzi9VUVVucHBrbqJdlZ8Li9OWx82P5i9jhJ+18eRa1dQuC3yhkKVXOfXzah0Rb0zhiUUbe4Vq1RmfPMr17c1RqUjdkh2D6BiZU+OOw0shHkBPzsxCcT3A2ngb5Gu8vLgDcSlFrlUbvDGzrflmJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gCXGxi7G; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2SZFUFJJ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 2 Feb 2026 17:45:50 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770050752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oWvAbJTREsFu30nv38G6OQAZAsf9k53l2zsbZmrJpLc=;
-	b=gCXGxi7GfCMjLwyErUeogIPBT5+UtM6LWBwOhz9dAO6pvD9e9q6vbAAdWj8hq5bVZ8wsqd
-	aCOnoWN966/tQ9iLiZhOXZhx2nNBUkK0aIqy1wl8DQDhAyQ8rolcE8ih7+3aks/bplonoP
-	d8Zz6q/zqH0uef6p4cKWphkn6AFsxym6HvBYJnSZ0LcjbTszdJMU0YWeQb/4TUE4eL6Gyx
-	zqZWNHpt+lPWCu5I3oX4d4kePJOI0uXpdBjkmO2rz535cPFYlRDSh7Y8v+Y3fRqxL+4zbe
-	IJPgTKNuonvrrHT3IFWpBkZQTkTP9XFX0hRnCw3aLsDqj/9n3KyTzebdx9PROg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770050752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oWvAbJTREsFu30nv38G6OQAZAsf9k53l2zsbZmrJpLc=;
-	b=2SZFUFJJwsk2VFrHeY0jiVHJ48t1Ye9W5ZUoTya1l4rN8M6QVMTb+RpxUud2WYgxy+2JQi
-	7ni5xYNb9vBejADA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
-	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net
-Subject: Re: [PATCH net-next v2 5/9] selftests: hsr: Add tests for more link
- faults with PRP
-Message-ID: <20260202164550.1TDNCEe_@linutronix.de>
-References: <cover.1769093335.git.fmaurer@redhat.com>
- <774d7a2327d1c05b78ee30ac21297794bfcb0245.1769093335.git.fmaurer@redhat.com>
- <20260129133217.xNoDm9nn@linutronix.de>
- <aYCK5Dczg_0tbuEA@thinkpad>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B605237419D;
+	Mon,  2 Feb 2026 16:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770051405; cv=fail; b=UekfWlYvYK/W42McEOeqocGK+BoqoPx/tlFsFumfASZMFKkm5a2Z/aDYjSeKx51ZyZm97bS5okRNNW+E/hp2em0s5+jdr4kkvXILgMaDTrv6ENieXxTw89EUtflNwGOG51nqVtrIrNCBDIdnR7z+HByepqUblLElBZ66DK6BNhQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770051405; c=relaxed/simple;
+	bh=Y1qXTw85FGeSMlR+0WPqObedTtP/0pcuJCf0Q5klE8Y=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CTVdaDlFPE7j4IAkTISVA3b5fRqZNAG96XYsU35+FaF5aqcdzox0Z/8zVltGw2gFOdly4PbxhyJHx0foD3LSsFgCKoGVpRsziusi9752QJNy+cCvH3SOmH6b6ZFJIibNBs1zNubrSdyhb5ZSwAs5cwPwmZffLUbqFFl9uINsVoU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=CBiDOAHQ; arc=fail smtp.client-ip=40.107.130.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Qyq3lDgQvUCiK1V2fG2kwg2Xm7b7J72UtFLZJA5vHEMekqL4ehEE7QoOoMI0UYj+HSqSc1wrZ5ppnXK2Gw18JCLlPzxmljUh3Ecdph6nxm09ilEZzJcnPfd0sEnq+tdRHJdcPC+Xe0Pdtix41svO47hgqH7jC3qcZdttkfqOT0RZLaU/Csf3Wr+975cRxYWXV5bRcbMVgDF7mrdVlF2rLJpjFhXFLyrn+7BKfZKFXSQVwOZDkyRUzpuJIEEIC8/HxUB27L3LTCtquOcBOKv/wAuW3zgMdIuy+43ATgd6yv3wDzHvt0T8d+o6Sh29P0MfWc7wFEi34U6QrG5OM010ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B2zXMBTjx3O1bYGuFVB2ljdZ9wzbdkis1Iv5vSHStdM=;
+ b=xFY8GsKYRD969PzQcRYK767pyXNw50Hmf9XQT8C7qHDw02hinIKY9r4lmw840S5f5Z6fuiMcLn+OIx43TvG5rm7j3FRBhyNlTcQDzG0pkVRnvIYxWHMcP5imsUawVPmfRzKWuzHmbyHH+i2ah33oOCwOK21HYpHp1URcmvdhGdWb9ilieBcbkb3pmeDWTEYncUg2IsPmTthy6/LkbVZF0Q1cUOsM0Aa/RrY5Lt6uXdzWf3iQbewpCSSA75+uDpbxC7Cmprup0Y3DTM+/E727k9eDccB4nk+HuT+5GoBkjrcJXeVEtU4sCo6cmbZ8RgDVPFU+2CJiuPegv6jwznPymA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
+ header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B2zXMBTjx3O1bYGuFVB2ljdZ9wzbdkis1Iv5vSHStdM=;
+ b=CBiDOAHQNxcUmh7n3rUbq1IZYyPjz9h6KgtqIA7oSk7u3z5CuoCFp87cDjxsSR7Bln8ieAxsCB6c4EvB4H2LyfUkONE3qTtjKhYttGTPuMUrrRNSfxucWAygEFAtbPFo7OM0KMCrRnyTFhYMzQO4SEYOsSsE73eb4m89hUz1bvIdNKlW3toJ8s7Ayjcz7gDeoHVTugZYpig//SI0v86XXs2IJKJl9GTXh5I8UREkzsI3KLthyhZk6Q+ZnAEr7wr+spjvtPFbqOYmS6/jpXn7aGDXxv54GkD5GYUrnCPHKgyVFN/rM8F2msoSEZ1zqYTizxlat83MuwNGDPWdYZSEig==
+Received: from AM9PR07MB7969.eurprd07.prod.outlook.com (2603:10a6:20b:302::15)
+ by GVXPR07MB9751.eurprd07.prod.outlook.com (2603:10a6:150:11c::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Mon, 2 Feb
+ 2026 16:56:38 +0000
+Received: from AM9PR07MB7969.eurprd07.prod.outlook.com
+ ([fe80::b676:5e6b:e3e7:4bbd]) by AM9PR07MB7969.eurprd07.prod.outlook.com
+ ([fe80::b676:5e6b:e3e7:4bbd%5]) with mapi id 15.20.9564.007; Mon, 2 Feb 2026
+ 16:56:38 +0000
+From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: "tariqt@nvidia.com" <tariqt@nvidia.com>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "shaojijie@huawei.com" <shaojijie@huawei.com>,
+	"shenjian15@huawei.com" <shenjian15@huawei.com>, "salil.mehta@huawei.com"
+	<salil.mehta@huawei.com>, "mbloch@nvidia.com" <mbloch@nvidia.com>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"eperezma@redhat.com" <eperezma@redhat.com>, "brett.creeley@amd.com"
+	<brett.creeley@amd.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, "parav@nvidia.com" <parav@nvidia.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "corbet@lwn.net"
+	<corbet@lwn.net>, "horms@kernel.org" <horms@kernel.org>, "dsahern@kernel.org"
+	<dsahern@kernel.org>, "kuniyu@google.com" <kuniyu@google.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
+	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
+	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
+Subject: RE: [PATCH v1 net-next 3/3] virtio_net: Accurate ECN flag in
+ virtio_net_hdr
+Thread-Topic: [PATCH v1 net-next 3/3] virtio_net: Accurate ECN flag in
+ virtio_net_hdr
+Thread-Index: AQHckwSvr7yGsOyrpUmxwtqxbyNbCbVtkSqAgAIPIWA=
+Date: Mon, 2 Feb 2026 16:56:38 +0000
+Message-ID:
+ <AM9PR07MB79696F945D8DBEF370CD4DC6A39AA@AM9PR07MB7969.eurprd07.prod.outlook.com>
+References: <20260131225510.2946-1-chia-yu.chang@nokia-bell-labs.com>
+ <20260131225510.2946-4-chia-yu.chang@nokia-bell-labs.com>
+ <20260201035912-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260201035912-mutt-send-email-mst@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM9PR07MB7969:EE_|GVXPR07MB9751:EE_
+x-ms-office365-filtering-correlation-id: db36bcc6-1213-4bed-ef8d-08de627c080b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?2xrz1i75qvoslWC9AdEDM2SimC9QpGAv2VpnjdxzExY1bZ6ujjdMWkBpsQJM?=
+ =?us-ascii?Q?qlnufJuI0yE9PsRqz4bp49Dc8Rlplr/ELOTpUXS6EdX2gLaHisN1BLgGCJes?=
+ =?us-ascii?Q?NInuScAejnzsCN1fx3XhdTbVzfyMULAxn7qRETIleIEQvehgaC9HqrszMyNg?=
+ =?us-ascii?Q?XyKfOviKLCCfE/lvytsDUyWUslfwg53c7O/wY2Eye3Cvok8DSkbRyC+5/wFU?=
+ =?us-ascii?Q?7DZQwnVZfs+QldIL+kQl5qLsaIpDKTcrDjRR1fb2kpwi4X8NPCtFUh60iJX/?=
+ =?us-ascii?Q?q3km284UrAyHRo8ZLUx0nbMAczgfJDfUh04CASxIhaxBzU7V1WbEMT3S19kc?=
+ =?us-ascii?Q?RbcrwfFwzYcJ0KL8pF/VT4lPqKeXIbTkDkMkejV76jo8xDPWk50rlAHWByXT?=
+ =?us-ascii?Q?N3iv7oRUxrijd8/2hW5WLjcZI1iJhOW4RNHdA7fTzOjU0hYcr+xVjRhuk5sZ?=
+ =?us-ascii?Q?wSWUhqAhsXWfYhNjo4G62tm9JOc4twzQlayNFd1p2Zk3mn+03sFfCLz8YqgM?=
+ =?us-ascii?Q?uAG6GaF9rjOLydg1rjLuNebzcBbB1WfDMSa9YzCSQAq0PIh+P6kw8/nrVntD?=
+ =?us-ascii?Q?uUSzeTBtT5PmNN9/IngwL59/lQoMbpp2jgiu1LaJZKM1fgcanmR+y7pqkKur?=
+ =?us-ascii?Q?uupCnquncP7vt/8h2kYTkQb1gq3vYUl2zbwDXT9dUxEBj0Izvv14t/xOjtp7?=
+ =?us-ascii?Q?s5A1FMrYOlBb5IeODRWcjdkNN2aSAf+Omx6K4vSHqpZhETl4fa2Aq79oHTwl?=
+ =?us-ascii?Q?nJSi5Kxd9dt3Pvj0hG24nNxZ8C4fuZ1kA6ifdsICVrsA2EdJlDpLQD1SRvMT?=
+ =?us-ascii?Q?NdqxbCbavNly/lEHp87bRZaL08Bj3C7COqnOhzzqPdt8VQoItqmcYVF6FRq9?=
+ =?us-ascii?Q?cR/Hi3VsdN+22Jp8ogwc33IZNoEzc64TxO7CwSEe5zFo3OGGVyXYFXI5DN0K?=
+ =?us-ascii?Q?VJDh+bbuoULjtbI76CCxKnmc73xb8Kea6MkN53NP6pFnOuHOXtz90CG187uz?=
+ =?us-ascii?Q?SuZavp5MBafgkOzDXKB07zTPHL7ctRR+bn1snaD/SznhNLxmOdfys4ETcdrn?=
+ =?us-ascii?Q?IQydA4Ax9NaRO2gXrM2guyarb7tM6akyk/7upDja1XDn98UWUXBcHM8GtWPD?=
+ =?us-ascii?Q?AkWPLW0AFfn3C8xpUXj43shz9WcwFcNN3N3E25bpWse1HW5cr+KlyKNM2C9p?=
+ =?us-ascii?Q?PAKemzaeVR8ruDkikuVRnbK5b1H9Wqexic2ZsO2CFI2kJUCCn1fugmLPYoiw?=
+ =?us-ascii?Q?AJNk3x6Oelt2V1Eg7EdQD1djLP6hzBOKjzmU2XN3pGvmrwhXovE81JmsDf0W?=
+ =?us-ascii?Q?4nqrnr9T7OZgfvzJQ/mda9tQZosORmWkWW3fmV6mSHEfuYOPIxYfxyBicrip?=
+ =?us-ascii?Q?KIpOjRQC2mtJ601VOxhhY0pv8b9CevzvCtGvAqpj0fnIalgswYmk9lgpG1kL?=
+ =?us-ascii?Q?RECHdRhhCMeJxnQftKs5/vgjw+kPJ/h7rJEvNxj1I3Sxv2FrIRzzwr6ZaAMA?=
+ =?us-ascii?Q?qjcREaPH/E3zQeXU5gLhvzKBVkB7WydUwk/H66sRSdSdew8t0zQuRgSODt82?=
+ =?us-ascii?Q?OjzX6de1YZUcBvGXEoo60qPlFDBIUSPNsW1qhapLlasmBhLKdt9jvTPdj5Jh?=
+ =?us-ascii?Q?TVZWPumDG8A9kFtDedznRE0=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR07MB7969.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?qOr7/WFPBd7DKpVhIlVGKgYJrfuDrs/vd7b5YkLTqR/jjd5ypVewtFrxAzpS?=
+ =?us-ascii?Q?WWoxfZLaUxqrk+o61p8IPdYj4/Z8n+7WDrDEupFFRpU53V36u3ZeeHaTsTyd?=
+ =?us-ascii?Q?A9L5thwVs5/LOPsJmsKvY8gobUz7ZKWPIxmf4y5po5C+18cVgkschP4uocht?=
+ =?us-ascii?Q?n88bIqDdcLJHIGxR8CbV7LVlmJPZHR6Y9scSMpNwBsm5Aq3NFgyrnpsOZl+R?=
+ =?us-ascii?Q?cUXUwPmJibNoHVy4ZdPzHIq5DOOfyyFgqKYVUAGoEHUuUjXXuc7bt7xx8Ded?=
+ =?us-ascii?Q?p95NvGM1Nwd7g9ztXgVIY/0QToox2VT02e+f12cRTZo/uKRzL9JfPfEyfPur?=
+ =?us-ascii?Q?cXyrV4HUpEayL1cxocXyDc2p/gKS1XSBZjqflzip3MhyVe779GBi2R3bhszw?=
+ =?us-ascii?Q?7XWSTI0UVmJ7IqaYHqXz4wAykVy0d7SHTMvWMFT+8Mlhfkbw+T0BdsT+v7j6?=
+ =?us-ascii?Q?E51wV6ldHJerEMsuO8L6H7ujFuqFyZdWxZzvr/FgJd3Z+qzo6NMbCWOLh8m3?=
+ =?us-ascii?Q?wCHqE1fk6sMO6qM9QpRpJfFORCkdu3x5oilS6FkgnQd8t5db4cVGkpJqb4i4?=
+ =?us-ascii?Q?8JkZkh8EPoofCbVC9A9uyHfu6xb6dX9CgEZ3wZ5BkuGuAwdAG1uOXMDDalX8?=
+ =?us-ascii?Q?HtE6W+c5jI2YdKl9+I/PIT1jDT9p3xd9LZnDX6bPQxz0dpscbN5Dx6HYSQKv?=
+ =?us-ascii?Q?IrIfwSYvPWNFU2MbegYA8tinu0cY+amFtkN/jRPSul/NBjTsjvGTGt2n/Pov?=
+ =?us-ascii?Q?KoTwJMDmjRuTT3ZLs5aF21mprvlPiwCe6gtNRPlgbhImYcexv2mRKXVmoDhQ?=
+ =?us-ascii?Q?hN8KnNU2NxaGnbVoiVihPNdk0reUfkF6OfJw76NFQwPGa4i/G5JB45zPJTqu?=
+ =?us-ascii?Q?svOvTpNJjxjW+Oe9jRE+YeswEESn1AsA+lLVr7pQDcMz1nV9IJqSvHlktHxE?=
+ =?us-ascii?Q?qTPo2ER2R0vzDZtRtRwntsGxwyD7g6tzm+HAsSARSOxf8RhTPDHr8yZGvye9?=
+ =?us-ascii?Q?gjba57qZfi7uW9KRzQeiI0EGqxNyCMOd+oW0JfxCGqgic0QoTLx/9j4Cz/HI?=
+ =?us-ascii?Q?V5iRmCOzN3o0c7RGA9Czl3YuwncI6W4n3myH8pQ+b0Xjzw2P0GB4ZRhpxX9y?=
+ =?us-ascii?Q?YNq/et2ik+0EzkWo41SobhL7aLhZWJLVjb5An098ZfawCqY9kpg8YgTiZp81?=
+ =?us-ascii?Q?YnPZ9MqPyltiSKWokJlMttE9eo7qswOV+OWkIBKDh1zdMAmxjCzC6ok4UrZG?=
+ =?us-ascii?Q?wYGzDs2n4GlxjYjUgaVA7cIbuj33HlRd5S0crUIj9PCJlSZNXz3vJ2XoN2cF?=
+ =?us-ascii?Q?CyfKjvT5OF1rdMzw2IqhRvZNHReAkwOrtnf6lQx7mPkC8Oo4H/JeUmk64gys?=
+ =?us-ascii?Q?623I5sgpdFyROOBNZLfrdiZ7qedV3c/U7SFXNv9108XfgLONO5oCglKCZ5UM?=
+ =?us-ascii?Q?0ZOvKww/l/uPciA/w+A23CtAGQD10wowv6KCRkmIiqIh+xbSUL4qbvLoLwZu?=
+ =?us-ascii?Q?7cVJxUXJyxeAk98sUT27/Oeo2wm0ItRDviOuLqppMFQctNgEXdF01RLIM6ae?=
+ =?us-ascii?Q?cUnA4Lrh2HCd7cGCnP18qoYbT5sXAp8VkHwuUetnqqva4GnYrrdh7koEUIAo?=
+ =?us-ascii?Q?ukwLmz/jwl+2LBuCpIFTFTMLLYWZ5kt+PwW2rHq85IYglpsnr7uXmqP3tMRC?=
+ =?us-ascii?Q?sUcjFR5m6V7iu6Cm9kZ+/Hqar61FNFfXyrKElTSGaeav01lt5NKP8OrT0yS8?=
+ =?us-ascii?Q?IG7cpnd0JoLPNxiDBCQuPsDmqho5vwk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aYCK5Dczg_0tbuEA@thinkpad>
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR07MB7969.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db36bcc6-1213-4bed-ef8d-08de627c080b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2026 16:56:38.3187
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Maywnx5SCf32KnGSbZVBSnJWvduGAqCUF5m9WNFIeFfNHVOve6O9KKpZMsMtQWLP6GmN+0B7Vj6BAxyMGXhfok4BT5rehpOunNjo19AWQpPY63rSiPFRmXEAc6Q/tKUr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR07MB9751
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nokia-bell-labs.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nokia-bell-labs.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255938-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255939-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,huawei.com,kernel.org,redhat.com,amd.com,lists.linux.dev,linux.alibaba.com,google.com,lwn.net,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 258E0CF256
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chia-yu.chang@nokia-bell-labs.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nokia-bell-labs.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87FD5CF450
 X-Rspamd-Action: no action
 
-On 2026-02-02 12:30:44 [+0100], Felix Maurer wrote:
-> On Thu, Jan 29, 2026 at 02:32:17PM +0100, Sebastian Andrzej Siewior wrote:
-> > On 2026-01-22 15:57:00 [+0100], Felix Maurer wrote:
-> > > Add tests where one link has different rates of packet loss or reorders
-> > > packets. PRP should still be able to recover from these link faults and
-> > > show no packet loss.  However, it is acceptable to receive some level of
-> > > duplicate packets. This matches the current specification (IEC
-> > > 62439-3:2021) of the duplicate discard algorithm that requires it to be
-> > > "designed such that it never rejects a legitimate frame, while occasional
-> > > acceptance of a duplicate can be tolerated." The rate of acceptable
-> > > duplicates in this test is intentionally high (10%) to make the test
-> > > stable, the values I observed in the worst test cases (20% loss) are around
-> > > 5% duplicates.
+> -----Original Message-----
+> From: Michael S. Tsirkin <mst@redhat.com>=20
+> Sent: Sunday, February 1, 2026 10:18 AM
+> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
+> Cc: tariqt@nvidia.com; linux-rdma@vger.kernel.org; shaojijie@huawei.com; =
+shenjian15@huawei.com; salil.mehta@huawei.com; mbloch@nvidia.com; saeedm@nv=
+idia.com; leon@kernel.org; eperezma@redhat.com; brett.creeley@amd.com; jaso=
+wang@redhat.com; virtualization@lists.linux.dev; xuanzhuo@linux.alibaba.com=
+; pabeni@redhat.com; edumazet@google.com; parav@nvidia.com; linux-doc@vger.=
+kernel.org; corbet@lwn.net; horms@kernel.org; dsahern@kernel.org; kuniyu@go=
+ogle.com; bpf@vger.kernel.org; netdev@vger.kernel.org; dave.taht@gmail.com;=
+ jhs@mojatatu.com; kuba@kernel.org; stephen@networkplumber.org; xiyou.wangc=
+ong@gmail.com; jiri@resnulli.us; davem@davemloft.net; andrew+netdev@lunn.ch=
+; donald.hunter@gmail.com; ast@fiberby.net; liuhangbin@gmail.com; shuah@ker=
+nel.org; linux-kselftest@vger.kernel.org; ij@kernel.org; ncardwell@google.c=
+om; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.whit=
+e@cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlewind@ericsso=
+n.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com; vid=
+hi_goel@apple.com
+> Subject: Re: [PATCH v1 net-next 3/3] virtio_net: Accurate ECN flag in vir=
+tio_net_hdr
+>=20
+>=20
+> CAUTION: This is an external email. Please be very careful when clicking =
+links or opening attachments. See the URL nok.it/ext for additional informa=
+tion.
+>=20
+>=20
+>=20
+> Thanks for the patch! Yet something to improve:
+>=20
+> On Sat, Jan 31, 2026 at 11:55:10PM +0100, chia-yu.chang@nokia-bell-labs.c=
+om wrote:
+> > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > >
-> > Do you know why we have the duplicates? It is because of the high
-> > sending rate at which point the blocks are dropped and we can't
-> > recognise the duplicate?
-> 
-> I could not give a definitive answer on this last week, I had to dig a
-> bit and think through this. The reason for the duplicates is not a high
-> sending rate leading to dropped blocks. Rather, it's the low sending
-> rate leading to expiring blocks: in the test, the ping interval is set
-> to 10ms. As the blocks expire based on the timestamp of the first
-> received sequence number, the 400ms entry expiry gets hit every ca. 40
-> frames, at which we basically clear all received sequence number in the
-> block by creating a new block. This happens on both nodes (for ping
-> requests and replies) ca. 10 times during the test, leading to about 20
-> duplicate packets, which is the ca. 5% duplicates I observed in multiple
-> runs of this test.
-> 
-> This means the duplicate rate is highly dependent on the traffic pattern
-> and the test manages to hit exactly this situation. I'll add the
-> explanation to the message in v3. If similar traffic patterns are hit in
-> the real world too often, we could test different block sizes. I just
-> did this and the results are as expected:
-> - 64 bit blocks: the duplicate rate is about the same because the block
->   still expires once.
-> - 32 bit blocks: the duplicate rate drops to around 4% because,
->   including the netem delay in the test, this is roughly the edge
->   between expiring a block and already hitting a new one. But if we keep
->   the bitmap as it is, we waste 50% of memory.
-> - 16 bit blocks: duplicate rate is zero because we use new blocks way
->   before the expiry time. But this wastes about 75% memory for each
->   block and the overhead of the timestamp in each block gets quite
->   significant.
-> 
-> I'd suggest to keep the 128 bit blocks to have a chance to detect
-> duplicates at higher data rates for some delay difference (up to about
-> 5.5ms with 1Gbit/s). 64 bit blocks would halve the maximum delay
-> difference, but probably still strike a good balance between memory
-> overhead and duplicate rate. Do you prefer one over the other?
+> > Unlike RFC 3168 ECN, accurate ECN uses the CWR flag as part of the ACE=
+=20
+> > field to count new packets with CE mark; however, it will be corrupted=
+=20
+> > by the RFC 3168 ECN-aware TSO. Therefore, fallback shall be applied by=
+=20
+> > seting NETIF_F_GSO_ACCECN to ensure that the CWR flag should not be=20
+> > changed within a super-skb.
+> >
+> > To apply the aforementieond new AccECN GSO for virtio, new featue bits=
+=20
+> > for host and guest are added for feature negotiation between driver=20
+> > and device. And the translation of Accurate ECN GSO flag between=20
+> > virtio_net_hdr and skb header for NETIF_F_GSO_ACCECN is also added to=20
+> > avoid CWR flag corruption due to RFC3168 ECN TSO.
+> >
+> > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>=20
+>=20
+> To the best of my understanding, this is a new feature - support for VIRT=
+IO_NET_F_HOST_ACCECN, VIRTIO_NET_F_GUEST_ACCECN?
+> The commit log makes it sound like it fixes some behaviour for existing h=
+ardware, but that is not the case.
+>=20
 
-We had false positives with the old algorithm so having now some is not
-the end of the world. 128bit blocks are fine I guess. The question is
-how far do we want to tune it and everything comes with a price.
+Thansk for the feedback, I will update commit message in v3.
+>=20
+> > ---
+> > v2:
+> > - Replace VIRTIO_NET_HDR_GSO_ECN with VIRTIO_NET_HDR_GSO_ECN_FLAGS
+>=20
+> but where is v2? this is v1...
 
-If I update bitmap every time there is a valid packet:
+I shall update this version as v2, will do at the next version.
 
-diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-index 08f91f10a9347..bb9b13940c35b 100644
---- a/net/hsr/hsr_framereg.c
-+++ b/net/hsr/hsr_framereg.c
-@@ -572,6 +572,7 @@ static int hsr_check_duplicate(struct hsr_frame_info *frame,
- 	if (test_and_set_bit(seq_bit, block->seq_nrs[port_type]))
- 		goto out_seen;
- 
-+	block->time = jiffies;
- out_new:
- 	spin_unlock_bh(&node->seq_out_lock);
- 	return 0;
+[...]
+> > diff --git a/include/uapi/linux/virtio_net.h=20
+> > b/include/uapi/linux/virtio_net.h index 1db45b01532b..af5bfe45aa1f=20
+> > 100644
+> > --- a/include/uapi/linux/virtio_net.h
+> > +++ b/include/uapi/linux/virtio_net.h
+> > @@ -56,6 +56,8 @@
+> >  #define VIRTIO_NET_F_MQ      22      /* Device supports Receive Flow
+> >                                        * Steering */
+> >  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23        /* Set MAC address */
+> > +#define VIRTIO_NET_F_HOST_ACCECN 25  /* Host can handle GSO of AccECN=
+=20
+> > +*/ #define VIRTIO_NET_F_GUEST_ACCECN 26 /* Guest can handle GSO of=20
+> > +AccECN */
+> >  #define VIRTIO_NET_F_DEVICE_STATS 50 /* Device can provide=20
+> > device-level statistics. */  #define VIRTIO_NET_F_VQ_NOTF_COAL 52 /* De=
+vice supports virtqueue notification coalescing */
+> >  #define VIRTIO_NET_F_NOTF_COAL       53      /* Device supports notifi=
+cations coalescing */
+> > @@ -165,6 +167,9 @@ struct virtio_net_hdr_v1 {  #define=20
+> > VIRTIO_NET_HDR_GSO_UDP_TUNNEL (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 | \
+> >                                      VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6=
+)
+> >  #define VIRTIO_NET_HDR_GSO_ECN               0x80    /* TCP has ECN se=
+t */
+> > +#define VIRTIO_NET_HDR_GSO_ACCECN    0x10    /* TCP AccECN segmentatio=
+n */
+> > +#define VIRTIO_NET_HDR_GSO_ECN_FLAGS (VIRTIO_NET_HDR_GSO_ECN | \
+> > +                                      VIRTIO_NET_HDR_GSO_ACCECN)
+> >       __u8 gso_type;
+> >       __virtio16 hdr_len;     /* Ethernet + IP + tcp/udp hdrs */
+> >       __virtio16 gso_size;    /* Bytes to append to hdr_len per frame *=
+/
+>=20
+>=20
+> UAPI changes need to be added to the virtio spec.
+> Pls get this approved by the virtio TC.
+> Thanks!
 
-then I the test
-| TEST: test_cut_link - HSRv1                                         [ OK ]
-| INFO: Wait for node table entries to be merged.
-| INFO: Running ping node1-NUb1aJ -> 100.64.0.2
-| INFO: 400 packets transmitted, 400 received, +22 duplicates, 0% packet loss, time 6113ms
+There were some discussions last October in virtio-comment@lists.linux.dev =
+mailing list.
 
-turns into
+At that moment, it is suggested to make Linux kernel accept new comments fo=
+r SKB_GSO_TCP_ECN and SKB_GSO_TCP_ACCECN first.
 
-| TEST: test_cut_link - HSRv1                                         [ OK ]
-| INFO: Wait for node table entries to be merged.
-| INFO: Running ping node1-6i4xNe -> 100.64.0.2
-| INFO: 400 packets transmitted, 400 received, 0% packet loss, time 6067ms
+So, could virtio-spec colleague give your feedback? (Parav?).
 
-which could be considered as an improvement. On the other hand the live
-time of the block gets pushed past the HSR_ENTRY_FORGET_TIME so
-the first entry survives longer theoretically 127 * (400-1) = ~50 seconds.
-In the reboot case the box should be quiet for 500ms at which point the
-entry gets removed anyway so the longer "hold time" shouldn't matter.
+Otherwise, the CWR handling of virtio will be wrong after all Accurate ECN =
+commits are merged in Linux.
 
-It sounds like a good idea but I don't want to rush anything ;)
-
-> Thanks,
->    Felix
-
-Sebastian
+Chia-Yu
 
