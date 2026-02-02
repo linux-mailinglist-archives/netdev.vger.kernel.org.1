@@ -1,197 +1,260 @@
-Return-Path: <netdev+bounces-255901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6JeBF4a+gGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:11:02 +0100
+	id eNwTC3fBgGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB649CDF27
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:11:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AE56CE252
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F7813020D66
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:08:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C6BB6304B92F
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C0D37474E;
-	Mon,  2 Feb 2026 15:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CEC3783B7;
+	Mon,  2 Feb 2026 15:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvz43z7Q";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7U/y5XG"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="YbBnNvU4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E25369979
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 15:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221E327AC45;
+	Mon,  2 Feb 2026 15:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770044910; cv=none; b=nKquX8JxJUahydHtk6QGFsgRx3bJdmizPOBuPasgzq28AmIaoSCNSPOADmvxd0GTOZJHHT0z5du2mJlhJNPxLbtUga3ap+z+8JqtbcDOAod1orDvc9o+IlCjwIeoKGkmI28ffCbn5MeK0GXe1NCI2I4SvWBKBSYaLkJYx+JuTXU=
+	t=1770045090; cv=none; b=pAOSRpmNHbxwoshlBoGryGHXvPZyIp4rp4CTWa3X+ZOwKMvji80voaPlGGBST6SA05GbHa6FSevgW4e8PvsGUqDVH+yZDuqAegEGPv9k5ESn4HUu7PyDTO24lfvjyba6WkDy/9QBC1xyHYr8vErVADYjft0HDPqVN5/BcHcGRqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770044910; c=relaxed/simple;
-	bh=SVolWuOHyIqcRg+uvjd7iiXovrXqdcc+sa09t+IEIJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R/GxQyL6uoiroFYWAG6Bp1g+ifi/7jNYoZ2AH9iPZ7Qrh77qsuIY4KaN2kSRDvB5k49HFc5WZZo9jnYvXqAmeecs4/4S5Y0v3pSS7QB2OeoUSJJiIJnNwDW95xdPQwHuwX/+66dYCOfnsvvEuoVpUllIpDlHQmNgJEJMit1rsLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hvz43z7Q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=L7U/y5XG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770044907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0jFNC5c+FwcbzYbXzyxYOv7WT8Hr3pWREwm90Rx8QYs=;
-	b=hvz43z7QFxJJzY4I97QlD4iN/AzotjaZheJkHvgTJIno1YJ72cJqgMGy/cPShTNBbGXibV
-	p4Rk0QJ6bQhpqSuAepcUcZoaN0mkP9h5SNeyexjT+LA8IqfyMKj7E3x1FnOaNNlgeC/K4u
-	U6kIU4T7ZvpeeRqKYUR39NN3+tH4NPg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-586-PRlY9iRTPAiSFHUxURFNYw-1; Mon, 02 Feb 2026 10:08:26 -0500
-X-MC-Unique: PRlY9iRTPAiSFHUxURFNYw-1
-X-Mimecast-MFC-AGG-ID: PRlY9iRTPAiSFHUxURFNYw_1770044906
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-480711d09f1so65244955e9.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 07:08:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770044905; x=1770649705; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jFNC5c+FwcbzYbXzyxYOv7WT8Hr3pWREwm90Rx8QYs=;
-        b=L7U/y5XGAjZH5Ht8uY9Mos+RXWNdSkkSv/WjSc45bROS0lAvt/t8C2ZsTNsYk9lSzu
-         zZutAZTmT7+3zt6Cfr6qWgQPulYECoK0OktHi2VtGAUCDRrKyW7OSeewpFmJetIInAzH
-         Af9wqZ2wdpq0HDCJwCNG05py3NnxHLrgutNrJUcBL7BQyv4iJdHv7AU64pCRLMDPXkWJ
-         4BHuDv/l14I6h1UGbbRyv1aoPr8FRZUw+xgIGFqOxzZ4wQNI87/kXJFazuhnlRyfLOty
-         IbejPMw+V07ndGrJborc1P/RwRa4Re77f+BMmDZnznNMzh8af+Ie1xWKmIMIRgRa62LO
-         Blcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770044905; x=1770649705;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0jFNC5c+FwcbzYbXzyxYOv7WT8Hr3pWREwm90Rx8QYs=;
-        b=Vf+KBF7ZE0lF8E14hyOdtxL7vN9L4dkRr1cHm75/H6UFg9Vixk/cH5Y1HH8F/2jSka
-         Ojo8YYaA01z3B4u/0hp4Sk+NrWGn0rBb3KU5OFKhUGKqe1rEqv0515TdlZlxT5MEfqmK
-         PwByjRAqeibUg02xaias1byBzsLkCjN1LT+Ig1/uPEHuqHVQMDHLmcKHjMdumzyPQqUN
-         OttqHFl05+Z98oCm7yxYuSqduh6LLaRgAqr7Dtvv11vvfmK/83jSIL25FBJU7KhNEeff
-         oXZ5t5KNVKv7vgZ2ATbAsxDsurihDxF1ghyqiyswsblAFOZ0aqV6fejZ1E22u/Ejbts9
-         v8aA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrQYvG1qpuyzK7Vr1UozItWdkwQIFSzVxJ8x+Z4/lJK9T5Lt279lP0K+QnNFZtsPuaSa7whE4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj2GMjkAqQxvRiOlerVv/g4xA7TWvWGWgu16uMuHVp0thrTwt6
-	PDEktaJS6aCjxEH/2bN59V9OfMCN75uWKvyLwuxVNuUsfSENdGzd9SfWXZa+7Bvbyt1Bg2dX4mH
-	R+Mawmn7iHdkBmkXuwYoY8coZdbfe4E0wH4E3rKZBy+LzZGIRTdjrw4sizeaGuwQLRA==
-X-Gm-Gg: AZuq6aIJm7I0PZsDQ2eqFBPfPa+zreQ6bPKL4tKorfkxnt9tejMfy+oJn8qa0+Dhb0l
-	X7ZV41zCytMcwtui1JrdMIlquEy/AxYQA93Ll0oGwr/4UzvpwNlKFgK6gnYXQgwy1k0K+VD1xzw
-	Tsa7qNCAMjDKiIGcc6lyZb5lTP8vetvwD85otsW+ShHuYGa3SG0ThiCk4Bh2RgAkrNqH/pbOkre
-	Us+NhrF7VopxPTwylvYCUTK1r9GgWKHyNt07TFRorIVx37SIDMLo9LVyq+gsckvTH/vLkh5uxpD
-	dWueg0MVrZPgdRDqfVjMjUjGIonheNbw35xn1JsqFRCfwkbsXkhk2QUpPbPfzl4YqOy26Zsq4Mp
-	FRmTl9jkM
-X-Received: by 2002:a05:600c:628b:b0:47e:de9c:92ec with SMTP id 5b1f17b1804b1-482db46074amr147715095e9.14.1770044905052;
-        Mon, 02 Feb 2026 07:08:25 -0800 (PST)
-X-Received: by 2002:a05:600c:628b:b0:47e:de9c:92ec with SMTP id 5b1f17b1804b1-482db46074amr147714545e9.14.1770044904521;
-        Mon, 02 Feb 2026 07:08:24 -0800 (PST)
-Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbd21f5dsm112595095e9.8.2026.02.02.07.08.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 07:08:23 -0800 (PST)
-Date: Mon, 2 Feb 2026 16:08:23 +0100
-From: Davide Caratti <dcaratti@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net/sched: don't use dynamic lockdep keys with
- clsact/ingress/noqueue
-Message-ID: <aYC952E_49Se6MOA@dcaratti.users.ipa.redhat.com>
-References: <68f55cee98e5402af2509f1d3873fbc7a27f67e9.1769699825.git.dcaratti@redhat.com>
- <20260130192921.1fbf5e21@kernel.org>
+	s=arc-20240116; t=1770045090; c=relaxed/simple;
+	bh=EuNsfQDC+GwzZgMlzlDh70cwShNvSn7Z72szG+hMKUs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QOwIS8evmr0rnG3NgTikRojvVtj2mJFkkkXQkS/I9ppyIwTPIMJye6Z7nMoDnO3xg5oKPeN24Jmm34vhlAAqLUdBsXNqPLyWHNvnN1oALRNxWKEgfV3GN07CwoUSWXvE4qSkorpgSo5oJYjZwUj4/ygPoa0absrm3AOZX2hbKOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=YbBnNvU4; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vmva3-00C09r-Os; Mon, 02 Feb 2026 16:11:11 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=P36EvglWh6B36/yp8p2qXvwqnN34foHJfiKZdt7lA94=; b=YbBnNvU4foyoMtrt62cp9yGybT
+	EM/Pcm8a0W0s/o0+LcZv1oU86lrBj6n8d1ixe4NtE8gSp5bfr9pX0hhxBVxU630DX6xhO48ncbOxT
+	qNNxijyiv11IvNwL6TkYTBjDAjbRLH1uE4On1MSG+ARFMuwjORFfoA24IqTQaACCh20S9v5trPp+z
+	eWuIkEiywLQrur1nWNkVNGKyTxOALcM1ICNgy1ncQZQ51DD9jgQNX/ZBYh/uls4A1GIbijrbELTmv
+	IKA5UkNf6D4nUXnU5IsaJ7arhtYI+nWovbasLGJuAxm15BY0qnnahAhFhtnxTkrKsARHoTiuCvzSG
+	9PO2X5dA==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vmva2-0005wE-Oi; Mon, 02 Feb 2026 16:11:10 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vmvZp-00De8r-J4; Mon, 02 Feb 2026 16:10:58 +0100
+Message-ID: <b98a40e8-1be2-47f0-8238-92dee8f5a204@rbox.co>
+Date: Mon, 2 Feb 2026 16:10:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260130192921.1fbf5e21@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
+ update
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260129-unix-proto-update-null-ptr-deref-v1-1-e1daeb7012fd@rbox.co>
+ <3fc5611f-394f-40db-b49d-2f26402e221a@linux.dev>
+ <3362017f-9c3d-46cd-b3ce-cb750b565d5b@rbox.co>
+ <612a9446-252f-4b14-8605-ae1af000cc41@linux.dev>
+ <CAAVpQUAc3S+Ebx2qp-Pbg9qH-Zc=yHdzVJbchCu++V_4XF3DLg@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <CAAVpQUAc3S+Ebx2qp-Pbg9qH-Zc=yHdzVJbchCu++V_4XF3DLg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255902-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255901-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[rbox.co:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CB649CDF27
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,rbox.co:mid,rbox.co:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4AE56CE252
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 07:29:21PM -0800, Jakub Kicinski wrote:
-> On Thu, 29 Jan 2026 16:24:35 +0100 Davide Caratti wrote:
-> > +static inline void qdisc_lock_init(struct Qdisc *sch, const struct Qdisc_ops *ops)
+On 1/31/26 11:06, Kuniyuki Iwashima wrote:
+> On Fri, Jan 30, 2026 at 1:30 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 1/30/26 3:00 AM, Michal Luczaj wrote:
+>>>>> Follow-up to discussion at
+>>>>> https://lore.kernel.org/netdev/20240610174906.32921-1-kuniyu@amazon.com/.
+>>>>
+>>>> It is a long thread to dig. Please summarize the discussion in the
+>>>> commit message.
+>>>
+>>> OK, there we go:
+>>>
+>>> The root cause of the null-ptr-deref is that unix_stream_connect() sets
+>>> sk_state (`WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED)`) _before_ it assigns
+>>> a peer (`unix_peer(sk) = newsk`). sk_state == TCP_ESTABLISHED makes
+>>> sock_map_sk_state_allowed() believe that socket is properly set up, which
+>>> would include having a defined peer.
+>>>
+>>> In other words, there's a window when you can call
+>>> unix_stream_bpf_update_proto() on socket which still has unix_peer(sk) == NULL.
+>>>
+>>> My initial idea was to simply move peer assignment _before_ the sk_state
+>>> update, but the maintainer wasn't interested in changing the
+>>> unix_stream_connect() hot path. He suggested taking care of it in the
+>>> sockmap code.
 > 
-> wrap at 80 please
-
-hi Jakub, thanks for reading. Sure, will fix in v2.
- 
-> > +{
-> > +	bool skip_dynamic_key = (ops->static_flags & TCQ_F_INGRESS) ||
-> > +				(ops == &noqueue_qdisc_ops);
-> > +
-> > +	if (!skip_dynamic_key)
-> > +		lockdep_register_key(&sch->root_lock_key);
-> > +
-> > +	spin_lock_init(&sch->q.lock);
-> > +	if (!skip_dynamic_key)
-> > +		lockdep_set_class(&sch->q.lock, &sch->root_lock_key);
+> Yes, we already have a memory barrier for unix_peer(sk) there
+> (to save sock_hold()/sock_put() in sendmsg(), see 830a1e5c212fb)
+> and another one just for sk->sk_state is not worth the unlikely
+> case in sockmap by a buggy user.
 > 
-> is there a reason for the order of things here? 
-
-I was self-convinced that CONFIG_DEBUG_SPINLOCK and similar would
-complain with the ordering below, but I'm now seeing empirically
-that it doesn't.
-
-> The code flow would be far more natural with:
 > 
-> {
-> 	spin_lock_init(&sch->q.lock);
+>>>
+>>> My understanding is that users are not supposed to put sockets in a sockmap
+>>> when said socket is only half-way through connect() call. Hence `return
+>>> -EINVAL` on a missing peer. Now, if users should be allowed to legally race
+>>> connect() vs. sockmap update, then I guess we can wait for connect() to
+>>> "finalize" e.g. by taking the unix_state_lock(), as discussed below.
 > 
-> 	/* Skip dynamic keys for qdiscs which can't nest */
-> 	if (ops->static_flags & TCQ_F_INGRESS ||
->             ops == &noqueue_qdisc_ops)
-> 		return;
+> If a user hit the issue, the user must have updated sockmap while the
+> user knows connect() had not returned.  Such a user must prepare
+> for failures since it could occur before sock_map_sk_state_allowed() too.
 > 
-> 	lockdep_register_key(&sch->root_lock_key);
-> 	lockdep_set_class(&sch->q.lock, &sch->root_lock_key);
-> }
+> This is a subtle timing issue and I don't think the kernel should be
+> friendly to such buggy users by waiting for connect() etc.
+> 
+> 
+>>>
+>>>>   From looking at this commit message, if the existing lock_sock held by
+>>>> update_elem is not useful for af_unix,
+>>>
+>>> Right, the existing lock_sock is not useful. update's lock_sock holds
+>>> sock::sk_lock, while unix_state_lock() holds unix_sock::lock.
+>>
+>> It sounds like lock_sock is the incorrect lock to hold for af_unix. Is
+>> taking lock_sock in sock_map doing anything useful for af_unix? Should
+>> sock_map hold the unix_state_lock instead of lock_sock?
+> 
+> If sockmap code does not sleep, unix_state_lock can be used there.
+> 
+> 
+>>
+>> Other than update_elem, do other lock_sock() usages in sock_map have a
+>> similar issue for af_unix?
 
-will do some additional tests and re-send this way if it doesn't
-complain.
+As for the sockmap, I think that would be it.
 
--- 
-davide
+In related news, looks like bpf_iter_unix_seq_show() is missing
+unix_state_lock(): lock_sock_fast() won't stop unix_release_sock(). E.g.
+bpf iterator can grab unix_sock::peer as it is being released.
+
+>>>> it is not clear why a new test
+>>>> "!sk_pair" on top of the existing WRITE_ONCE(sk->sk_state...) is a fix.
+>>>
+>>> "On top"? Just to make sure we're looking at the same thing: above I was
+>>> trying to show two parallel flows with unix_peer() fetch in thread-0 and
+>>> WRITE_ONCE(sk->sk_state...) and `unix_peer(sk) = newsk` in thread-1.
+>>>
+>>> It fixes the problem because now update_proto won't call sock_hold(NULL).
+>>>
+>>>> A minor thing is sock_map_sk_state_allowed doesn't have
+>>>> READ_ONCE(sk->sk_state) for sk_is_stream_unix also.
+>>>
+>>> Ok, I'll add this as a separate patch in v2. Along with the !tcp case of
+>>> sock_map_redirect_allowed()?
+>>
+>> sgtm. thanks.
+>>
+>>>
+>>>> If unix_stream_connect does not hold lock_sock, can unix_state_lock be
+>>>> used here? lock_sock has already been taken, update_elem should not be
+>>>> the hot path.
+>>>
+>>> Yes, it can be used, it was proposed in the old thread. In fact, critical
+>>> section can be empty; only used to wait for unix_stream_connect() to
+>>> release the lock, which would guarantee unix_peer(sk) != NULL by then.
+>>>
+>>>          if (!psock->sk_pair) {
+>>> +               unix_state_lock(sk);
+>>> +               unix_state_unlock(sk);
+> 
+> I don't like this... we had a similar one in recvmsg(MSG_PEEK) path
+> for GC with a biiiiiig comment, which I removed in 118f457da9ed .
+> 
+> 
+>>>                  sk_pair = unix_peer(sk);
+>>>                  sock_hold(sk_pair);
+>>
+>> I don't have a strong opinion on waiting or checking NULL. imo, both are
+>> not easy to understand. One is sk_state had already been checked earlier
+>> under a lock_sock but still needs to check NULL on unix_peer(). Another
+>> one is an empty unix_state_[un]lock(). If taking unix_state_lock, may as
+>> well just use the existing unix_peer_get(sk).
+> 
+> Yes, unix_peer_get() can be safely used there (with extra sock_put()).
+> 
+> 
+>> If its return value cannot
+>> (?) be NULL, WARN_ON_ONCE() instead of having a special empty
+> 
+> I suggested WARN_ON_ONCE() because Michal reproduced it with
+> mdelay() and I did not think it could occur in real life, but considering
+> PREEMPT_RT, it could be real.  So, the current form in this patch looks
+> good to me.
+
+FWIW, it reproduces on CONFIG_PREEMPT_RT=n without mdelay().
+Please see
+https://lore.kernel.org/bpf/20260123-selftest-signal-on-connect-v1-0-b0256e7025b6@rbox.co/
+
+>> lock/unlock pattern here. If the correct lock (unix_state_lock) was held
+>> earlier in update_elem, all these would go away.
+>>
+>> Also, it is not immediately clear why a non-NULL unix_peer(sk) is safe
+>> here. From looking around af_unix.c, is it because the sk refcnt is held
+>> earlier in update_elem? For unix_stream, unix_peer(sk) will stay valid
+>> until unix_release_sock(sk). Am I reading it correctly?
+> 
+> unix_stream_connect() holds the peer's refcnt, and once unix_peer(sk)
+> is set, it and refcnt are not cleared until close()d.  So unix_peer_get() is
+> a bit redundant for sane users.
 
 
