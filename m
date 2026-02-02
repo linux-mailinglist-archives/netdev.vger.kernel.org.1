@@ -1,313 +1,234 @@
-Return-Path: <netdev+bounces-255777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255778-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHeIIzVfgGlj7AIAu9opvQ
-	(envelope-from <netdev+bounces-255777-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 09:24:21 +0100
+	id QITOCGZfgGlj7AIAu9opvQ
+	(envelope-from <netdev+bounces-255778-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 09:25:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0AD7C9A78
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 09:24:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6775EC9A89
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 09:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3754F301724F
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 08:22:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 829C0300363C
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 08:23:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBCE34F49B;
-	Mon,  2 Feb 2026 08:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C32A34FF55;
+	Mon,  2 Feb 2026 08:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LyW643KH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h0wjohOX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19C334D3B2
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 08:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770020531; cv=none; b=rB3CkWwTAoM0hapkgSZk7H2aKWLkw+hdoRyBeKMw4SNtgIDEsJdzSZkgsq4Wjpa5AXlFdOHD28vilavwPRu1ySCkSbTHOtvAsanZhI8C6G+ZQuXtH8LFkXSTwqxED0uKGVGThWgG04W4zzCO7vV2dBEPE+iBYVDoTDkdQSnhclM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770020531; c=relaxed/simple;
-	bh=13+24GoN9Q7NR6ShhitKGzXCeAt20nkk7/iOX+J+m2E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=enUcIy0lrs/ewc5KRUAqisIpNIUtOIL0Dk9jC90Nd9eeCcqSBCuz9ukB8Ix1hbD1kk2oHmP7MO4ykNDMZAmKc6L9nw4/l/TC7cjekcE4ADFGxUG0h4SzBm6fxftUQJswsXX3QuE67PlWMHFfERq3SlLi9eZYDFG714q63rRp83g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LyW643KH; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C27350A2F
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 08:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770020594; cv=pass; b=CsQx2qvNuYHc7rm9gyhdYUZvkQicvFDNi+ynb7ILM7X2V82gWQYKByoqtKx02s34bT76zsVRY36e7TjN/kzCsimMnI7E4NC9cWqn9p8UPAAQVX+XuIOMbyiKlX8iWrOl+IEKQq6AUf3JIKeAB55XiQxV5P3FtO9lZZYrSGd2B/Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770020594; c=relaxed/simple;
+	bh=Xb8ycnICOBUVm6SbnueUDP5FWyrKE9M/i2fo2QgfUtA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E7u3Nvqa7HG3W3vKJJnUqd997o89PyZY/XoESPqQ6hKX+/zwrzW8JLO7eQ9mzotX5sPO3Ioc8tz5MNMWYHql6mS6BGf2H7nZEPUph83mJINFZntsx46VGVdFRnNnWLwkbeXrk/+KJE9PycigCwMhaHLC/eAVapA6q91DDR+4mrk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h0wjohOX; arc=pass smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-5014b22d678so55317251cf.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 00:22:04 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8c655e0ee70so456813885a.3
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 00:23:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770020586; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dEZVPpV0l3XbRFanqyyVAbcYYua7Gy079u9PaFT4PnsSR37Zbyt342AfPJ0oPjyc/b
+         9VHKwONWZ+YXF9QHuxjHRY2oNEWWrRO14CdSx4C8VDDd5SIbKf4ZLj4UlPoMRyahFF05
+         03NKHKtjt5jQS89Pd+rDzu3V+GFLFFRWsTHbfCvw/Vlwh8kAe9baPVI8rvLTR/6R7XzF
+         G8RXVRI0mPjAIffqghe47lopzupIa42geH2ep15t+jy3VfnxxFWKe5umhuVBkVy/RnsP
+         rV6eqIdg+iK67IoR8gLavWocZ6B1n+52I0BD0uanZEoDynz6ZQjcxLO0vohbr+Q8+8y0
+         mNcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xD0tXzCBUd9HZNxUnh+N0JTGf22f7HfA0H4YN5OlBDo=;
+        fh=fHG20/kL6kimtbiRLp+qZTWBbP52sjDSgvBui/c4T2E=;
+        b=hbtAhWOabuktIOycPq5DeGMiaXEn/aM2fhO1KUo6mG7/vhFC+WKWcwicwQ8cnbh3+W
+         PeDopxjgS0H1VggrgAFHD5DQE+8xt02wdY1XFYKfkTAzqBB06Xzmi+IflRXL35j0PtyD
+         qMpKM8mrfxHNsbBNJvpq7w2BtXoRbrlF4bqYyEKbsZroYFGn74BtU0698Zkxaw4P5nIl
+         z1TVZelGVBKy89tkS/5lNX9krjZFdHmEjSdRgJEzqC9SASfnVYSfg4NRZ8PwPB4MpErz
+         1i8lMccKBn3qxZ5037dggqZ3QIRxU39jF3gQH9JYx/B5mUIFRdS3iwgdEMB0T60XSSgq
+         TXoA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770020522; x=1770625322; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TJJaRGodZX4XraMP9lCrBN/Y/C2KPyXRQPk9jNGAz6k=;
-        b=LyW643KHjltD9BLUva2xQ7VtzmY01riKV6+ifUeQMc9hC0ij26/9PV4tjLOyYzJbXe
-         DAten4C1wExdxc0ZUVpGMxP+YYUefJxLUWF6sMX7GoqqlKgfGoQ7fQLqD3j+vRH7nkU7
-         kBlzrKPtR646PGNZ7l6OKzDqPYNBvX+UuHZnWVHPvPYzS6PeoQm/Lb+pM9giGpSK41t3
-         L/LqBaDeuKjl3+xk2oBnWR9Nht0IyAYaIP/PrTGdxroufEPJOwx/ypIn7sagXEnBT3FB
-         +zfEIEMiJrewusA07yudGHlVtpCo7DClzhet3goq3fcmmKsbkUMWhtje6ntn25wNwhb0
-         Z+ZQ==
+        d=google.com; s=20230601; t=1770020586; x=1770625386; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xD0tXzCBUd9HZNxUnh+N0JTGf22f7HfA0H4YN5OlBDo=;
+        b=h0wjohOXYM6EhZJ36qDDTZfVcXtLs63pWvZLxHJG25y2ZDk6w8GE5aTAIhHW9+xzVU
+         2n2reuvJ+n77nNYQsU99d3pV3ndJgAW7DcnlOWTv8qynY1wKTQvDSo9eErmioePHbgYs
+         ObhCmG03vHd1TiokNKmomVt+P+oEZ2rNsuwBij9ZPeBB+U3e+Wt+7CtB+JNGw+qf85+c
+         EMknUKvst6iXoJ86VY1KKeV3G/h7kOQMzDy/Hd3NlgJLuDC/H0SBL3iviAZ0S43iydJ8
+         MsXVrELng1z3iJtljCo/0baJXJ3nTCGuKuonbfZzWK//Uf3VkUXqRcE9lrDjOY45W+8H
+         NH1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770020522; x=1770625322;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TJJaRGodZX4XraMP9lCrBN/Y/C2KPyXRQPk9jNGAz6k=;
-        b=p+6K7x6/n9IidzZoeibXWaWtxT0Mbz4Xr0LwCKUhmE8PkkRJ0RPuftcRmoQYnbnQIx
-         eq6bLt8yAL1ovDbMw5tlodQtOI3fa1wc+N+phz6x2tcQxxyURxue1oGQl3z5usco+v+I
-         Mvt44l9hgyrUk0sbi0EbbmRoK6Zo0tHdzUvi0/nexVYGuUcpHN1XxOhO7kAHK811jt7k
-         bFpxiPsNLhxLkhdFgV7QaOCpppM32Wy1OGuPR7YY6Wkq8/qyzB7oTUTbglqcm+enTJvz
-         aRYS77Xt6OtTeLDxepfDDnS7eV44i4FVGw7sfHfUK2mhA1vUuFfahHCcuaPdWxnnESBb
-         j9SA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3E03Fe3ebvkoTBQqGJDb1U6SrgdkHYqvvX2g43qkcuP2oXYjjcCp4EKAeSZtg35S9tzCMfr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxfe9BYy8m/9JbvhjZwapJGlbBPCggrgHwo8XRZOhuC0wkF4ich
-	AjPuapRfMJZQ30dNdmEXjbp3NcXza0i9E+HlO2+8C0f38TrKFoKF1nvVqr5k7X22Xtv1Rpqa7r3
-	HOtJ05rVqn6PMKg==
-X-Received: from qtbay22.prod.google.com ([2002:a05:622a:2296:b0:4f4:d5be:49eb])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:342:b0:501:5281:5388 with SMTP id d75a77b69052e-505d2263cd3mr149782311cf.48.1770020521884;
- Mon, 02 Feb 2026 00:22:01 -0800 (PST)
-Date: Mon,  2 Feb 2026 08:22:00 +0000
+        d=1e100.net; s=20230601; t=1770020586; x=1770625386;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xD0tXzCBUd9HZNxUnh+N0JTGf22f7HfA0H4YN5OlBDo=;
+        b=LmujlJzjnB2Pv/Vj7w6gF+D0lZzrlXendxCZYIRTVoNKIkHUWVptSEA0GVH6vNNSFQ
+         7GyMb3By1r41apMUChiTIGt9aBDhSjOnZ5LRCyJP9X+JOVAbQLnW38hc41RhVYDV6/L3
+         orDQyFBKqKkWr5dcxqwTKIOZUIypkE0S3avjqVWDnEJ4saECQYtg+Facp6oyTqZduAI5
+         KWJ4qlV/+bqCB29+lxQDZtIx8ivzx/sAvjrbg/FfVenr8tRanZgfap8spkUu30NPOUmp
+         KcMFAhG7fBvZaXg9/ABpfSZws7ZwGZTtHQWhiqUe+a+jDbAVRdbaVF1tLG6soDxP4RwC
+         n1ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/B+Lcz3hXd2VbrO8lxzsI+yaij/oNdApwXvh/X8CSgaXbJgfUECLmkJg2g0jb79x3Z+yvSPs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTEz1x9Z8j1ibRV0TmDD2qt90DJ6ETdnsrYBF8UuXax2YSGm1a
+	FhMBU5RJksJHPDF7WWQUW/qNPUq6hGx1yMMfArCGi79AAT7uZX+SIOhYt6Qs2XeCAmkUQLY6Fv1
+	6KVnXUOrxLi4V9qOUt0T9pjK8XgNqimW0KPlsEmtq
+X-Gm-Gg: AZuq6aLI/J71QNFZlAWpU0fd/qZQ9ighybwfViQ0eJ0bjIz9IzBXpBTRjT+0ZgA+DLN
+	JLvlrX+51SCYxz7xcUtSdPM9WgVxCZJZFD08HKyi9Do4Ha9KhWgurltkwoiU1vfJzO6QB/A4xmO
+	AInxkO3LFtfkFn0s+d59IOfJSK07ylzhJ592V9xHbHh7K8Put5sMBwRcYtY25GlW1iQXeUjTsVe
+	HuHv88qvwj9tr07lFkSdAHoCitWAk9BQCjDR79hT4RJxOmTKf9Lo6pE+F6BSLBj+/11xKs=
+X-Received: by 2002:ac8:5a0d:0:b0:503:36fa:4398 with SMTP id
+ d75a77b69052e-505d21848f3mr160774991cf.32.1770020585573; Mon, 02 Feb 2026
+ 00:23:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260202082200.650516-1-edumazet@google.com>
-Subject: [PATCH net-next] net: add vlan_get_protocol_offset_inline() helper
+MIME-Version: 1.0
+References: <20260131212934.2547995-1-edumazet@google.com> <j3fofrzb4c3xcckk55y7rdpc7x5m23mphkksnp7vuijimzqpml@3nzu5xyfuyer>
+ <CANn89iJh67=bSTS_ziVuQUS-ht0yqeW_Q8eaFCV=8M7zuETAsw@mail.gmail.com> <c63047b5-3059-4176-8d9d-5465d557e605@huawei.com>
+In-Reply-To: <c63047b5-3059-4176-8d9d-5465d557e605@huawei.com>
 From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Feb 2026 09:22:54 +0100
+X-Gm-Features: AZwV_QgefbQqgzdk2wfsCED4etmSyW8QPUusxNmVu-a97oIBAAD_3jMUlF4C07Q
+Message-ID: <CANn89iJ=2pFqfepmK94aydxr1s18PK6PN9gMkqBjPw4Ss=V0_Q@mail.gmail.com>
+Subject: Re: [PATCH net] net: add RCU protection to (struct packet_type)->dev
+To: "dongchenchen (A)" <dongchenchen2@huawei.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	fengwei_yin@linux.alibaba.com, zhangchangzhong@huawei.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255777-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,linux.alibaba.com,huawei.com];
+	TAGGED_FROM(0.00)[bounces-255778-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A0AD7C9A78
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email,mail.gmail.com:mid,prot_hook.dev:url,alibaba.com:email]
+X-Rspamd-Queue-Id: 6775EC9A89
 X-Rspamd-Action: no action
 
-skb_protocol() is bloated, and forces slow stack canaries in many
-fast paths.
+On Mon, Feb 2, 2026 at 9:21=E2=80=AFAM dongchenchen (A)
+<dongchenchen2@huawei.com> wrote:
+>
+>
+> > On Mon, Feb 2, 2026 at 4:16=E2=80=AFAM YinFengwei <fengwei_yin@linux.al=
+ibaba.com> wrote:
+> >> + Chenchen as he hit the exact same issue.
+> >>
+> >> Hi Eric,
+> >>
+> >>> Yin Fengwei reported an RCU stall in ptype_seq_show() and provided a =
+patch.
+> >>>
+> >>> Real issue is that (struct packet_type)->dev needs RCU protection:
+> >>>
+> >>> ptype_seq_show() runs under rcu_read_lock(), and reads pt->dev
+> >>> to get device name without any barrier.
+> >>>
+> >>> At the same time, concurrent writer can remove a packet_type structur=
+e
+> >>> (which is correctly freed after an RCU grace period) _and_ clear pt->=
+dev
+> >>> without an RCU grace period.
+> >>>
+> >>> Fix this issue by using proper RCU on pt->dev pointer.
+> >> Still can hit this issue with same backtrace even with this fixing pat=
+ch.
+> >>
+> >> Look at the __dev_remove_pack(), the pt->list is protected by ptype_lo=
+ck
+> >> while prot_hook.dev is protected by bind_lock. Could it make sure the
+> >> procfs interface see either the list element with prot_hook.dev not NU=
+LL
+> >> or can't see the list element with NULL prot_hook.dev?
+> >>
+> >> Regards
+> >> Yin, Fengwei
+> > Please share the new stack trace (with the symbols), or the repro, than=
+ks !
+>
+> Hi, Eric.
+> I encountered a similar issue.
+> https://lore.kernel.org/all/20260128112348.3950437-1-dongchenchen2@huawei=
+.com/
+> we can reproduce it using the following method[1][2][3].
+>
+> I think the reason why using only rcu to protect dev cannot fix this prob=
+lem
+> is that pt->head.nxt is not protected by rcu.
+>
+> list_del_rcu
+> __list_del
+>      next->prev =3D prev;
+>      WRITE_ONCE(prev->next, next);
+>
+> While traversing the ptype sequence, once the nxt pointer is obtained,
+> pt can be concurrently deleted or modified. When pt->dev does not corresp=
+ond
+> to the list that pt is currently in, the list head detection will no long=
+er
+> work correctly.
+>
+> CPU1                            CPU2
+> ptype_seq_next
+>      nxt =3D pt->list.next;
+>      //nxt =3D ptype_head(pt) =3D dev->ptype_all
+>                                 packet_release/packet_notifier
+>                                     unregister_prot_hook(sk, false);
+>                                     //no sync wait, pt->list.next not cha=
+nge
+>                                     rcu_assign_pointer(po->prot_hook.dev,=
+ NULL);
+>      dev =3D rcu_dereference(pt->dev);
+>      if (pt->dev) //check fail
+>          if (nxt !=3D &pt->dev->ptype_all)
+>              goto found;
+>      if (nxt !=3D &ptype_all) //check success
+>          goto found;
+> found:
+>      return list_entry(nxt, struct packet_type, list);
+>      //return list head to seq traversal
+>
+> -----
+> Best Regards,
+> Dong Chenchen
 
-Add vlan_get_protocol_offset_inline() which deals with the non-vlan
-common cases.
-
-__vlan_get_protocol_offset() is now out of line.
-
-It returns a type_depth struct to avoid stack canaries in callers.
-
-struct type_depth {
-       __be16 type;
-       u16 depth;
-};
-
-$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.1
-add/remove: 0/2 grow/shrink: 0/22 up/down: 0/-6320 (-6320)
-Function                                     old     new   delta
-vlan_get_protocol_dgram                       61      59      -2
-__pfx_skb_protocol                            16       -     -16
-__vlan_get_protocol_offset                   307     273     -34
-tap_get_user                                1374    1207    -167
-ip_md_tunnel_xmit                           1625    1452    -173
-tap_sendmsg                                  940     753    -187
-netif_skb_features                          1079     866    -213
-netem_enqueue                               3017    2800    -217
-vlan_parse_protocol                          271      50    -221
-tso_start                                    567     344    -223
-fq_dequeue                                  1908    1685    -223
-skb_network_protocol                         434     205    -229
-ip6_tnl_xmit                                2639    2409    -230
-br_dev_queue_push_xmit                       474     236    -238
-skb_protocol                                 258       -    -258
-packet_parse_headers                         621     357    -264
-__ip6_tnl_rcv                               1306    1039    -267
-skb_csum_hwoffload_help                      515     224    -291
-ip_tunnel_xmit                              2635    2339    -296
-sch_frag_xmit_hook                          1582    1233    -349
-bpf_skb_ecn_set_ce                           868     457    -411
-IP6_ECN_decapsulate                         1297     768    -529
-ip_tunnel_rcv                               2121    1489    -632
-ipip6_rcv                                   2572    1922    -650
-Total: Before=24892803, After=24886483, chg -0.03%
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/if_vlan.h | 51 +++++++++++++++++------------------------
- net/core/skbuff.c       | 36 +++++++++++++++++++++++++++++
- net/packet/af_packet.c  |  5 ++--
- 3 files changed, 60 insertions(+), 32 deletions(-)
-
-diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
-index f7f34eb15e068785e464303b60f2f050b3bec0ec..f5e70e0a38256c23ef731ff8d7d6cc1449db42e3 100644
---- a/include/linux/if_vlan.h
-+++ b/include/linux/if_vlan.h
-@@ -594,8 +594,17 @@ static inline int vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
- 	}
- }
- 
-+struct type_depth {
-+	__be16 type;
-+	u16 depth;
-+};
-+
-+struct type_depth __vlan_get_protocol_offset(const struct sk_buff *skb,
-+					     __be16 type,
-+					     int mac_offset);
-+
- /**
-- * __vlan_get_protocol_offset() - get protocol EtherType.
-+ * vlan_get_protocol_offset_inline() - get protocol EtherType.
-  * @skb: skbuff to query
-  * @type: first vlan protocol
-  * @mac_offset: MAC offset
-@@ -604,40 +613,22 @@ static inline int vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
-  * Returns: the EtherType of the packet, regardless of whether it is
-  * vlan encapsulated (normal or hardware accelerated) or not.
-  */
--static inline __be16 __vlan_get_protocol_offset(const struct sk_buff *skb,
--						__be16 type,
--						int mac_offset,
--						int *depth)
-+static inline
-+__be16 vlan_get_protocol_offset_inline(const struct sk_buff *skb,
-+				       __be16 type,
-+				       int mac_offset,
-+				       int *depth)
- {
--	unsigned int vlan_depth = skb->mac_len, parse_depth = VLAN_MAX_DEPTH;
--
--	/* if type is 802.1Q/AD then the header should already be
--	 * present at mac_len - VLAN_HLEN (if mac_len > 0), or at
--	 * ETH_HLEN otherwise
--	 */
- 	if (eth_type_vlan(type)) {
--		if (vlan_depth) {
--			if (WARN_ON(vlan_depth < VLAN_HLEN))
--				return 0;
--			vlan_depth -= VLAN_HLEN;
--		} else {
--			vlan_depth = ETH_HLEN;
--		}
--		do {
--			struct vlan_hdr vhdr, *vh;
--
--			vh = skb_header_pointer(skb, mac_offset + vlan_depth,
--						sizeof(vhdr), &vhdr);
--			if (unlikely(!vh || !--parse_depth))
--				return 0;
-+		struct type_depth res = __vlan_get_protocol_offset(skb, type, mac_offset);
- 
--			type = vh->h_vlan_encapsulated_proto;
--			vlan_depth += VLAN_HLEN;
--		} while (eth_type_vlan(type));
-+		if (depth && res.type)
-+			*depth = res.depth;
-+		return res.type;
- 	}
- 
- 	if (depth)
--		*depth = vlan_depth;
-+		*depth = skb->mac_len;
- 
- 	return type;
- }
-@@ -645,7 +636,7 @@ static inline __be16 __vlan_get_protocol_offset(const struct sk_buff *skb,
- static inline __be16 __vlan_get_protocol(const struct sk_buff *skb, __be16 type,
- 					 int *depth)
- {
--	return __vlan_get_protocol_offset(skb, type, 0, depth);
-+	return vlan_get_protocol_offset_inline(skb, type, 0, depth);
- }
- 
- /**
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4d3920e5b141a02117186c3095f15f4f7a35b1df..35984a54b36fdf0b1b2590993ba08cdb403216e7 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -7440,3 +7440,39 @@ void __put_netmem(netmem_ref netmem)
- 		net_devmem_put_net_iov(netmem_to_net_iov(netmem));
- }
- EXPORT_SYMBOL(__put_netmem);
-+
-+struct type_depth __vlan_get_protocol_offset(const struct sk_buff *skb,
-+					     __be16 type,
-+					     int mac_offset)
-+{
-+	unsigned int vlan_depth = skb->mac_len, parse_depth = VLAN_MAX_DEPTH;
-+
-+	/* if type is 802.1Q/AD then the header should already be
-+	 * present at mac_len - VLAN_HLEN (if mac_len > 0), or at
-+	 * ETH_HLEN otherwise
-+	 */
-+	if (vlan_depth) {
-+		if (WARN_ON_ONCE(vlan_depth < VLAN_HLEN))
-+			return (struct type_depth) { 0 };
-+		vlan_depth -= VLAN_HLEN;
-+	} else {
-+		vlan_depth = ETH_HLEN;
-+	}
-+	do {
-+		struct vlan_hdr vhdr, *vh;
-+
-+		vh = skb_header_pointer(skb, mac_offset + vlan_depth,
-+					sizeof(vhdr), &vhdr);
-+		if (unlikely(!vh || !--parse_depth))
-+			return (struct type_depth) { 0 };
-+
-+		type = vh->h_vlan_encapsulated_proto;
-+		vlan_depth += VLAN_HLEN;
-+	} while (eth_type_vlan(type));
-+
-+	return (struct type_depth) {
-+		.type = type,
-+		.depth = vlan_depth
-+	};
-+}
-+EXPORT_SYMBOL(__vlan_get_protocol_offset);
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 494d628d10a5105a6a32788b4673993f218ec881..a1005359085a8336edc3c95eceaf101025e75489 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -572,8 +572,9 @@ static __be16 vlan_get_protocol_dgram(const struct sk_buff *skb)
- 	__be16 proto = skb->protocol;
- 
- 	if (unlikely(eth_type_vlan(proto)))
--		proto = __vlan_get_protocol_offset(skb, proto,
--						   skb_mac_offset(skb), NULL);
-+		proto = vlan_get_protocol_offset_inline(skb, proto,
-+							skb_mac_offset(skb),
-+							NULL);
- 
- 	return proto;
- }
--- 
-2.53.0.rc1.225.gd81095ad13-goog
-
+Thanks a lot, I will take a look.
 
