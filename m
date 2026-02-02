@@ -1,125 +1,186 @@
-Return-Path: <netdev+bounces-255859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMqMHHCagGnL/gIAu9opvQ
-	(envelope-from <netdev+bounces-255859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:37:04 +0100
+	id CEtLDKacgGl2/wIAu9opvQ
+	(envelope-from <netdev+bounces-255860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:46:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F99CC68F
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:37:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FFBCCC754
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C321430073C2
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:37:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C013E30305DB
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C68B8003D;
-	Mon,  2 Feb 2026 12:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4950335A943;
+	Mon,  2 Feb 2026 12:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DL7VxExb"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="PSAHUPqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0A0AD2C
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 12:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770035822; cv=none; b=nvGqXWzt8byw7HjrvgzWWyixZq9fuHm/Tuvop54RBqHsCbPnow0Yin+d2A88DOnZu03SFsARgW56JvH2tajOXo/8XDZj8/yiwrg5qE7cWIykL2dwI7jnMJyrRC4vBRn31ALldSuItTJo8t8ULFO1X8e/xKpD16Ev78AKuTf0fE4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770035822; c=relaxed/simple;
-	bh=oZM3IUrXABHK6B393fnQrD2/r7SS5uZL0vfWqa+Ebao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N4nCce8/WVvoycLMQeWm1lr4yL3XujFkOQkmHhwnAL/P5muS8C/9Rb/dFl1ouijBcbzCJKBA3zqjokeRJA84ZgXtPRjMGw7PPmsOQme0iWYzbj76duVf38gUvjHtyHXG0BdcfKW6iVfwPmQ1NKK0XTEy76FlDaL2rnWzN0PY/hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DL7VxExb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B447C116C6;
-	Mon,  2 Feb 2026 12:37:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770035821;
-	bh=oZM3IUrXABHK6B393fnQrD2/r7SS5uZL0vfWqa+Ebao=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DL7VxExb/injE/53Ry0Cui4AoUWQGI+vJQdmeRgeYmpYz7d/fZWSPQw2Did6UWnGg
-	 VRArHCYHcwFp/yiPFbjI49bN/ANEvZCKnxGk7d1Js6ddBv6EyXD/jbGrq+uAR3aXUc
-	 qwcBlB0s4mUXk+vjKuSF8ZSIqeGXv5RwkC6nuZ9+IaDAnzSZESDgPJc1PHIH7kuPaB
-	 P9mHRwHt3JFevE8KDPTz2SfxVIpkLDi2nvV+Kbcj0gvqOyRz+T+X/QARtMvK3rpAqH
-	 6YCW142asSKg8SNobizWqx51a33/uLZifUf+OZB2kB38O2TQyzb6JSe1q5evZ5UObP
-	 DrNyYi+WZDhIg==
-Date: Mon, 2 Feb 2026 14:36:55 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Ilan Tayari <ilant@mellanox.com>,
-	Guy Shapiro <guysh@mellanox.com>,
-	Yossi Kuperman <yossiku@mellanox.com>,
-	Network Development <netdev@vger.kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net v2] xfrm: always flush state and policy upon
- NETDEV_UNREGISTER event
-Message-ID: <20260202123655.GK34749@unreal>
-References: <cea4b855-fe94-4b4e-9c2d-3cef7aac1be3@I-love.SAKURA.ne.jp>
- <20260201141739.GE34749@unreal>
- <aYB1-MtqQgPnjJjg@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28F12ECE97
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 12:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770036301; cv=pass; b=TiGVLAnt3ysoGDuwSF2HmqPe2NFkt9bA/Z4qHPZJYsHTdNNxgRhMDGcBM9fjJA74Xajzfta1y5UnfqCmeqXkEK3w7VfNUz0sHf7rbVYWWeFoDMv6DldwseZvxfqrpLH2HYzqqG7pmaCRzyPQ+wkpGv5A9DT5exfNDhaDL3yjh1k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770036301; c=relaxed/simple;
+	bh=tQSoxSnuQz8YfhPc3rcEDsrMSNKgNj6Tz1/4fwwzdP4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OxzA9ONkdH8Vzh9INFEfqGzfZmY9EfrDXX3E09fzwlfvG4yYUfUlcqcFTpuHU3TNfApN6b4MYRTUpOqrZbNkbXk2HhG0Wd29etUI3QmwOMxEEKmDWkJgP0VZ5ihfyvO1dYrd1Fr+An0KFzHxboQGE23wMcig6VOrj56bQABjvQ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=PSAHUPqY; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-649b1ca87ddso1937420d50.3
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 04:44:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770036298; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X2rgGcm0FC+FL5DuZFQQQf+a9wxT0919Djy4ycokxO9HmdycqoVLL5SwB0BeZ1yF0U
+         D4rf1F0CaABb+mMkQffa1DscNlRXgJckIWyyu93LKidYC+n871HMqyTUsKxWaKkVwz7W
+         MsG1UeT+POpbZkGDT8FiaXpSCbnQpUmF54JQmRiwL4Z7dIG+7uxf9WsKoRKvUqHwTgm5
+         WdYlowdajuz3D/TY2lFlHHFOq1bBewrZgQ5eilRLMiJ5AzZEeMO+Q4akBE2k8gZXqe9z
+         NoLZpDu0w6MZFURsFZ0wXe8/0LyUyMQf4YoRz9zPNzevi5e5FXEtMH+vuvPfgfYGHmwO
+         hhCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Cd3ZADWHvFtHeHemiyPrlkf1w1DGp34lTmfV/FUGG0w=;
+        fh=NCv5ASnofJ4t0U0jBAj24Y0mSuwq7rQ0dhhDhzgmYnQ=;
+        b=ZBJUIGeCNo9VtOk3VYr5hmru/WhPl9ymckmg0pG5mgBVfQoCRiuxpE3gXnDjl7QN5X
+         qCzDVoT/FfIfGo+cIktsyQysfiJRngz0jjbExvT5fX4biU8v4beIetnitqlYFY6zKiwu
+         Lh+dwBtGI9OcTUu8RkT4rT7G5Sqf+OUcvXiZtPctqWcWwQ9B3mxujCYXyCght9/KR5+U
+         KLN6xC9urO4qgfadAYU0bRlb5zjkrKxADurfh2Vk7KNRddGGh6vpm+Mrp7qOswsJo1G7
+         bI2vLiSv0LEBhnDtcg/YCJ+HnF0t74F0AE8jRNjfQrFzL+/6ck8hpqlwivxklTUxMEe9
+         7ieA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1770036298; x=1770641098; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cd3ZADWHvFtHeHemiyPrlkf1w1DGp34lTmfV/FUGG0w=;
+        b=PSAHUPqYbWW0JltpO2o4BKNnQjJDZ8suAdmu4epw8kQgIO5xdbgnshYJvThEznYpzc
+         NIKGpxAMwb+AJXyO/aROQEurNbKzP8kYVspeZ3KaH5c1Ms5hhilNi4I/l7OgOZFeQ9MW
+         e3NU+8J2GA/ihJZHgW0x9CnvCfnNlbuOVBVhwMY9p4pi/4HO9GnypjTQXXtKRaCzQWIn
+         8BsLvYbsTu8E6ipCnnG22PLmD1SQ/nlLtmnWURqlydJMKMRtemoVePAscL3MfKmW+AFK
+         yVPo9lXVKghxS5WTSZ2egulSKou/adjFNL1ycOtv6n6MGBdDS9pcm/hM8wWK8a6pJ9x+
+         Uj4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770036298; x=1770641098;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Cd3ZADWHvFtHeHemiyPrlkf1w1DGp34lTmfV/FUGG0w=;
+        b=hCR9TRGvtevbt+IKa1jGVT3sHpRk1y2x+FKfY/1Ua/22vJP5sHbINJvs1pt7Husptl
+         gYIM65pGBQbxGVH+vQ3jGPpk1MPeb/he+4krh78KArXXtGg3gemQBXZn048qB03MXUjm
+         4qfT6uDYsH8hOXBjexvU8K0dVL8w6XuQhBHCLyNpLowLI5uG0bzhl5ojrmnucplwkgMI
+         TqMWytiRavsC5Xm0h0bpBfhy8olfo6sPpJixfW+61ECxdQ3816YHAjdht1nSs7c6baR5
+         CYnil6VzRI1CDuzhAoVEh1o9Z7f3NDkoNNUNnbPudmleVuzWJW0RNmxbMJGaLqTB9upU
+         yE2w==
+X-Gm-Message-State: AOJu0YyaIYS1TCSUz/3gKOFv4x6Sy42/wcW0ouoMwm1YyfY8H+3r/K9N
+	2v2AdyRm9/YgVKIOYZhx6eJZ5butolzZpUArLUx2s1lZn7SHiVRlLMg710vCluc5TK/EVZ/Vb9/
+	/SblfR54Fafn4Iq2gGzA/emZ6BQkUCaZNZUK4hkmw
+X-Gm-Gg: AZuq6aKy7+rhUZKPLhKBksBJb69DzaH1hBKsYgT8kSaiEK3eEhaCCgVNAlUB6FVr6hU
+	yVYV4mG8RkMhoLew8HWIj+PefpbxundQKf6fc+V18M8m2IaL5MasY6mLWNyBKjEhAbIOHaSWzeW
+	nbvRup+sjC2QDUhYSGCfiL4Wv3Z5f0Pn+68BVt1/EvB87rTaQQ/gaz0eayBN7Rvrt/DZ1gmagkF
+	GtB3LaSa3fdLzu7qLdi1fv6kDEXz3+xKa64eMdjZW3ND9wOWYAmqY1yLVNw3cZkvVBQasD6VnGf
+	epSIaspi9Q==
+X-Received: by 2002:a05:690e:e8a:b0:649:d0ac:962a with SMTP id
+ 956f58d0204a3-649d0ac986bmr163583d50.46.1770036298595; Mon, 02 Feb 2026
+ 04:44:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYB1-MtqQgPnjJjg@secunet.com>
+References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-7-p@1g4.org>
+ <c8a8ae22-c5c4-4112-8084-0faa256a1d84@mojatatu.com> <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
+ <77q-JcImMG2fuQxj_GMUtYmaFAIuPrYMasj4I3aqIVID-Op24JIShBIPgt9kozLZgN4HvsGCS8Ez16mKq4Wq9juL1IOKydWUJwMwCYgHRMg=@1g4.org>
+ <CA+NMeC-65UfJyq=34_K9tzf9J=-XFPJqDe1BxLNZv0mnjkxZEA@mail.gmail.com> <Pr4njxDDR8e9tElhovQfunuoyxlxUQdZqfdGBZg028rsKLPq4w1aYIUNKcAlF9EuqQHZjoj-9ocK2wEltjyQoRhUvsoKyZYveLK3oCAAd4k=@1g4.org>
+In-Reply-To: <Pr4njxDDR8e9tElhovQfunuoyxlxUQdZqfdGBZg028rsKLPq4w1aYIUNKcAlF9EuqQHZjoj-9ocK2wEltjyQoRhUvsoKyZYveLK3oCAAd4k=@1g4.org>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Mon, 2 Feb 2026 09:44:47 -0300
+X-Gm-Features: AZwV_QgeJd9ZvG9ufUv8Hpm45B6AerrNBuED0AF7SqMRy0jxcb1zjHR0qlJx_0I
+Message-ID: <CA+NMeC8HnFHgMFfx4xwwgbkyPMgkjy4jyVwJkoZReMkYGgXRWg@mail.gmail.com>
+Subject: Re: [PATCH net v3 6/7] net/sched: act_gate: reject empty schedule list
+To: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255859-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255860-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D5F99CC68F
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,1g4.org:email,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 7FFBCCC754
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 11:01:28AM +0100, Steffen Klassert wrote:
-> On Sun, Feb 01, 2026 at 04:17:39PM +0200, Leon Romanovsky wrote:
-> > 
-> > Steffen,
-> > 
-> > If you decide to take it, please queue it in your -next branch, so we will have enough
-> > time to test in our regression. It seems too risky for -rc8.
-> 
-> I plan to take the patch as is. It is a fix, so I'll
-> take it into the ipsec tree, not ipsec-next. But
-> I can hold it off until after the release if that
-> will help regression testing.
+On Sat, Jan 31, 2026 at 12:00=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
+>
+> Ok, just to confirm the intended behavior changes compared to what is cur=
+rently in the tree:
+>
+>   create missing entry list      FAIL (got -22, expected 0)
+>   create empty entry list        FAIL (got -22, expected 0)
+>   replace append entries         REPLACE append failed: expected 2 entrie=
+s, got 1
+>                                   FAIL (got -22, expected 0)
+>
+> - CREATE with missing or empty entry list now returns -EINVAL
+>   Previously, CREATE could appear to succeed if cycle_time was
+>   provided even with no entries, but it still left an
+>   empty schedule and later called list_first_entry() at
+>   net/sched/act_gate.c:552, which is unsafe. Returning -EINVAL here is th=
+e
+>   correct behavior fix.
+>
+> - REPLACE now replaces the schedule, it does not append
+>   The old append behavior was an accident caused by reusing the same list=
+ and
+>   never clearing it. With the RCU snapshot change, a fresh schedule is bu=
+ilt
+>   and swapped atomically, so providing a new entry list on REPLACE replac=
+es
+>   the old one and avoids stale data.
+>
+> - REPLACE with an empty entry list keeps the old schedule
 
-Let's wait until the end of the week. We will include this fix in tonight's
-nightly regression, and I will need a couple of runs to reduce the risk of a
-statistical error.
+At first glance it looks ok.
+However I can only be sure once you send it and I run some
+tests. Just in case I am missing something.
 
-Thanks
+cheers,
+Victor
 
