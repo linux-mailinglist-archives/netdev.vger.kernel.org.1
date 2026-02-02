@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-255987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KB/4OOv5gGn9DQMAu9opvQ
-	(envelope-from <netdev+bounces-255987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:24:27 +0100
+	id 4FG1Dg36gGn9DQMAu9opvQ
+	(envelope-from <netdev+bounces-255988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:25:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D3CFD07CF
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:24:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C37DD07EC
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:25:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 529B4301A86F
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 19:24:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E3EC23008092
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 19:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0BE30149E;
-	Mon,  2 Feb 2026 19:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79F52F2918;
+	Mon,  2 Feb 2026 19:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="CUF9LwUN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Rs2yJZT/"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="YfMuwetT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="V1yPDVAI"
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B592301702
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 19:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5D33033CE
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 19:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770060249; cv=none; b=VLLe9YCjwRKyTwoBNNyY8LLe6IOZMD+kegfBCiuALb7qPcOIeT8HYgWArS3ofg6CIi/POVu0RauqQW2NOPemeulzSFhKzGWY5TweYL4FnX/5FRioqhdfViGNVnC+hMla2UMJiEPrDLXNKlx142Xq+LeY7NFzBk2XYWMq6PZa4SY=
+	t=1770060252; cv=none; b=P6cYNse7BGGNGrzj/5UmhTc688oyc88rNqJMKAJr3H24WexoJG0bnMebbkrFTr3Ft0NjgJxWS3oyLDuHHSvEUGOEBEYsPjYuqabxmP9FsMkiMCTM3hVr9/65fPOz9LGn9nUKQ+McxNUdJ2oqWVJUReoXF4kglrlrOX78wj9pWGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770060249; c=relaxed/simple;
-	bh=meNHIeposXCjUubv5TWlm3npDnkVGYLPTiFPkR+HS90=;
+	s=arc-20240116; t=1770060252; c=relaxed/simple;
+	bh=Ba21zK+xy8whSi1uvypXiPYj/GD4rr0g9y0UmYN6QaU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mVUxz41VPY/72oqrH1gdK+gtbICDc+zye/HmJjbz87bvFshW5RqEepRIgMBY+cvXhBf0DzO+G+jqN/dyjuIavJZBQPFjk55qzLIQaQZOEeFCkrNQF1nFrzWfYpR96+ZDN/T2UZrjjbLhkcTMhakSi50oDNNTospF9CmDVEtyiW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=CUF9LwUN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Rs2yJZT/; arc=none smtp.client-ip=202.12.124.146
+	 MIME-Version; b=Q9ZAGQgxfJ2OcT17Hh544ine1BUgTHW+LCN2dqlmKuc4JVK3DrzHVEmoA3UhWOTv/DbKN+P3GShefGcFdeq3xDTMof714aulsmD1QSMxFvyxJ7M6mTvo73zrrDsDHF1c7+BLQWhgxKTafI4tIsxpmpeqGlmrT1N4RJc7QUkrGFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=YfMuwetT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=V1yPDVAI; arc=none smtp.client-ip=202.12.124.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 6A9791D00077;
-	Mon,  2 Feb 2026 14:24:07 -0500 (EST)
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5B3BA1D0007D;
+	Mon,  2 Feb 2026 14:24:10 -0500 (EST)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Mon, 02 Feb 2026 14:24:07 -0500
+  by phl-compute-05.internal (MEProxy); Mon, 02 Feb 2026 14:24:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1770060247; x=
-	1770146647; bh=l3IEk7ow+Rw+68kmp4DOFBN+X/0wiwg+8X2m6zlCOr8=; b=C
-	UF9LwUNpRTLQ/GflcwlEmvoCknnlIUR8RzmybTTFrWeFoI8IvkBk2k+NKoCo8hnX
-	dO+muxGNoMZVMjvjW6iPJs76+vJ5YeS1GpHqHnX9azHf4ucrmy1YXnr2BzWFJQJU
-	UmRLzo07DuDkeGsKbKnFlmHYKDxg6vVAFM8BDOWJ97DRJ/d+z1VzLxQcYfegjX4G
-	84Uh/d99zD4CdqDhdPFZTS8rm98vIPweinVV8U3ac2tk2yBD24hcNKUn/KgQU7ZJ
-	/JOmFriUS7bK1YG5lME6Ql8/FyAnaenL6f1CBRbgYZpzCIliJOFbt5deAV4vN900
-	WuhqYQ+yZczAQykUl5TIw==
+	:reply-to:subject:subject:to:to; s=fm3; t=1770060250; x=
+	1770146650; bh=ysWQYenW1E5JBD/ZriSc/A9baoyz8/2cvdsp8SufhvA=; b=Y
+	fMuwetTzwdppMb9c+q8dPrm1qV3OV49RpZE8hdDXraVOQ2Ftt2Ay7vmovkNhWrkV
+	CXE8PrVRkdDB2JtZBdgWltRo1Iwz5mEDWElze9eiBjDzfRBGEuxSGjVGMwLdN2BA
+	7fTg3A+2udluTKUOCcLhHXrPaEaqdccsghUVMdfriRnSq+cipGXOjCdJJGP5zv7C
+	lcDcX6AZEDHwRX+CCuW4/LpjsBr855i5s3J/vMb6gWWyP2JX7dirV1GQ00hxVE5I
+	O9DU749e6tAgRg0mTtPd6FjrcnYqCgYzSWU/YVSCL7QIt4pPZr2Z4yKU1wDKnoCD
+	ISZqpLEOC5/TW96nLwzRA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1770060247; x=1770146647; bh=l
-	3IEk7ow+Rw+68kmp4DOFBN+X/0wiwg+8X2m6zlCOr8=; b=Rs2yJZT/UvFq/GJP7
-	v+IrtbR/7QcprksRKE4ZZF4JZEOjR3fpBaARIy7xK1aHC7gaZ1vlZ7eM/iNp7RRC
-	vg3z4T9tAbTl8p/nsFCaT8hYdSBA1fdoW8cO1iA1A7y/yTOhSEfEDDmx77Bi8fvS
-	owQSFu3kxjBXHOwfp1R9q8B/SXToQ1ONGU5oMAAGhPMNeH81dKWO96D7u+8nccxb
-	EzjabIt1AE+KcJOZ2qfEy1NQUScsaHDkLjrHY/r+r6v6vB0RWVcJ6ua9M6wLIbOt
-	/ApCQbcSdsV1/CTiKOmoVrXmLlahXdR0I46X3UWdcjAeJHXWj0xygb1vilNiAcd8
-	BO2Kw==
-X-ME-Sender: <xms:1_mAacPlc2nb74dte-DlQeZ5G3K6NwPuJ32yhyGDLEWw3XAXBbktqA>
-    <xme:1_mAaZWE9EKAj6Jf_haZDEBfFFa08RFU6cx7Ea4ZfR8jMd7ylUnH9q91jzz9FaW-x
-    gYhL_5lUEbjfsPOpbae5p2AkRYrqFX2431gfZ1R8KpidSjTaxWoyiU>
-X-ME-Received: <xmr:1_mAafhyhh0U4dS-45JkYwyn3EsDR15HuocQK3-d1HgBiK1r_bH0PrNwO6c>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1770060250; x=1770146650; bh=y
+	sWQYenW1E5JBD/ZriSc/A9baoyz8/2cvdsp8SufhvA=; b=V1yPDVAIWIheiC/1G
+	ggQln+00qz3XnAr3JimMQoAeh4zlBsIHeJ9rZxZ3DZ9xT18bjtujq2v4TMcttJnW
+	u7WkWd9juaYJ1xruj48wkQbVIC6Ho/Jw9jaNY5v/gZo2XVaUTgaPUKwaaYWjCsn6
+	6TfjRxvQkq2yJCkILS0svxdP41Tu37GIGWwLAorUJRHk5bwP0yyx6ESbV5rQ2e0K
+	zJG2OrrTH2hDMeqsexCytg846VoW7jNzQ6eFbQUOCcHjYWblsbinPh+Uxn51WZ56
+	2vpzGU15wNdVBjJTFeS6e3jS+lFzXP+IMjYKP0dEmvmucxgsi6D7RRl4VjXgAoqD
+	8xjXQ==
+X-ME-Sender: <xms:2vmAaUxguSvmuPP02TPdFNhT_83XyY7N7TgzUDmR1aNtW0ZN6hMPyQ>
+    <xme:2vmAaerG7CrhBFBMKfpmscZD5Pipm6IRUUIHj-QBeWTeJwMSLHdB9BhaB2OmxKCvZ
+    AVqBlYU5JxCnEd0-5_NtSZdmKQIsACqgIvgEJGJ6Yi1gIFb2nD9tXo>
+X-ME-Received: <xmr:2vmAaSkPL8q8dafvpaWihfRVBEZuHOSlnGcjdj4m_uv5Q9g93K3UG-1mOM4>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeekgeejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomheptehlihgtvgcu
     ofhikhhithihrghnshhkrgcuoegrlhhitggvrdhprhhojhgvtghtshesfhgrshhtmhgrih
     hlrdhimheqnecuggftrfgrthhtvghrnhepkeefudffgfejjeejhfdttddvvdelgeelhfdv
-    iedtteegueejlefgjeekuedthfejnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrg
+    iedtteegueejlefgjeekuedthfejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
     hmpehmrghilhhfrhhomheprghlihgtvgdrphhrohhjvggtthhssehfrghsthhmrghilhdr
     ihhmpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
     epuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhes
@@ -84,14 +84,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeekgeejucetufdote
     hnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhk
     vghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnh
     gvlhdrohhrghdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhg
-X-ME-Proxy: <xmx:1_mAaShjl88JhfxD9j_BwBLd5-WBQfFxrfPcuGC22v-1UZi6ujcNOA>
-    <xmx:1_mAadEyVRhQ-tzeEz5MQjeBC8ykD0EZFgoCHc9pjRa2TsEzDpXyXw>
-    <xmx:1_mAafC0RAyOeyOYBoWORzUPABlTZk20-3yRgItR4rMLtClLkVaA5w>
-    <xmx:1_mAaTCN_lp70RyukJp7aa4JJ5rhOGOunHYHOcGMH-SM2v-hkpJ6OQ>
-    <xmx:1_mAaYYsFrB-_C25_sslmve2ScyHOh-litnzeru-jFwpm5fSUg67PL99>
+X-ME-Proxy: <xmx:2vmAaQXq4UpBaFRzmqCbuFJdO_XCu71j91XPxTSHxxdmthacdij6xg>
+    <xmx:2vmAaeos94X74DMnmMXICTTAx9I-cs1xWpp5kPcIKDOVtMcEtKZnAg>
+    <xmx:2vmAaZWn-n1mwjNlQNbIRwc4E3J1blgvVJj_YpD6a_uwc1xZpXO11g>
+    <xmx:2vmAaXEbkwNrEKZGGa1gDyrwXPOafiGyJL-2q9-Tmu-E_YM3ohb6TQ>
+    <xmx:2vmAaUsPupbow9u1Nc6XT0LIzg1ftd1Q6H2OHeDDxkQs-ZxGcya8eswI>
 Feedback-ID: i1ede4ba7:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Feb 2026 14:24:06 -0500 (EST)
+ 2 Feb 2026 14:24:09 -0500 (EST)
 From: Alice Mikityanska <alice.projects@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -106,9 +106,9 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Stanislav Fomichev <stfomichev@gmail.com>,
 	netdev@vger.kernel.org,
 	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v3 05/11] net/mlx5e: Remove jumbo_remove step from TX path
-Date: Mon,  2 Feb 2026 21:23:32 +0200
-Message-ID: <20260202192338.2373930-6-alice.projects@fastmail.im>
+Subject: [PATCH net-next v3 06/11] net/mlx4: Remove jumbo_remove step from TX path
+Date: Mon,  2 Feb 2026 21:23:33 +0200
+Message-ID: <20260202192338.2373930-7-alice.projects@fastmail.im>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260202192338.2373930-1-alice.projects@fastmail.im>
 References: <20260202192338.2373930-1-alice.projects@fastmail.im>
@@ -127,13 +127,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,isovalent.com];
 	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-255987-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255988-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
@@ -148,116 +148,113 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,isovalent.com:email]
-X-Rspamd-Queue-Id: 8D3CFD07CF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[isovalent.com:email,messagingengine.com:dkim,fastmail.im:mid,fastmail.im:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5C37DD07EC
 X-Rspamd-Action: no action
 
 From: Alice Mikityanska <alice@isovalent.com>
 
 Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
-unnecessary steps from the mlx5e and mlx5i TX path, that used to check
-and remove HBH.
+unnecessary steps from the mlx4 TX path, that used to check and remove
+HBH.
 
 Signed-off-by: Alice Mikityanska <alice@isovalent.com>
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_tx.c   | 75 +++----------------
- 1 file changed, 12 insertions(+), 63 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c | 42 +++++-----------------
+ 1 file changed, 8 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-index a01ee656a1e7..9f0272649fa1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-@@ -152,12 +152,11 @@ mlx5e_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struct sk_buff *skb,
-  * to inline later in the transmit descriptor
-  */
- static inline u16
--mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb, int *hopbyhop)
-+mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb)
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+index 87f35bcbeff8..c5d564e5a581 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+@@ -636,28 +636,20 @@ static int get_real_size(const struct sk_buff *skb,
+ 			 struct net_device *dev,
+ 			 int *lso_header_size,
+ 			 bool *inline_ok,
+-			 void **pfrag,
+-			 int *hopbyhop)
++			 void **pfrag)
  {
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 	u16 ihs;
+ 	struct mlx4_en_priv *priv = netdev_priv(dev);
+ 	int real_size;
  
--	*hopbyhop = 0;
- 	if (skb->encapsulation) {
- 		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
- 			ihs = skb_inner_transport_offset(skb) +
-@@ -167,17 +166,12 @@ mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb, int *hopbyhop)
- 		stats->tso_inner_packets++;
- 		stats->tso_inner_bytes += skb->len - ihs;
- 	} else {
--		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
-+		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
- 			ihs = skb_transport_offset(skb) + sizeof(struct udphdr);
--		} else {
-+		else
- 			ihs = skb_tcp_all_headers(skb);
--			if (ipv6_has_hopopt_jumbo(skb)) {
+ 	if (shinfo->gso_size) {
+ 		*inline_ok = false;
+-		*hopbyhop = 0;
+ 		if (skb->encapsulation) {
+ 			*lso_header_size = skb_inner_tcp_all_headers(skb);
+ 		} else {
+-			/* Detects large IPV6 TCP packets and prepares for removal of
+-			 * HBH header that has been pushed by ip6_xmit(),
+-			 * mainly so that tcpdump can dissect them.
+-			 */
+-			if (ipv6_has_hopopt_jumbo(skb))
 -				*hopbyhop = sizeof(struct hop_jumbo_hdr);
--				ihs -= sizeof(struct hop_jumbo_hdr);
--			}
--		}
- 		stats->tso_packets++;
--		stats->tso_bytes += skb->len - ihs - *hopbyhop;
-+		stats->tso_bytes += skb->len - ihs;
- 	}
- 
- 	return ihs;
-@@ -239,7 +233,6 @@ struct mlx5e_tx_attr {
- 	__be16 mss;
- 	u16 insz;
- 	u8 opcode;
--	u8 hopbyhop;
- };
- 
- struct mlx5e_tx_wqe_attr {
-@@ -275,16 +268,14 @@ static void mlx5e_sq_xmit_prepare(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 
- 	if (skb_is_gso(skb)) {
--		int hopbyhop;
--		u16 ihs = mlx5e_tx_get_gso_ihs(sq, skb, &hopbyhop);
-+		u16 ihs = mlx5e_tx_get_gso_ihs(sq, skb);
- 
- 		*attr = (struct mlx5e_tx_attr) {
- 			.opcode    = MLX5_OPCODE_LSO,
- 			.mss       = cpu_to_be16(skb_shinfo(skb)->gso_size),
- 			.ihs       = ihs,
- 			.num_bytes = skb->len + (skb_shinfo(skb)->gso_segs - 1) * ihs,
--			.headlen   = skb_headlen(skb) - ihs - hopbyhop,
--			.hopbyhop  = hopbyhop,
-+			.headlen   = skb_headlen(skb) - ihs,
- 		};
- 
- 		stats->packets += skb_shinfo(skb)->gso_segs;
-@@ -439,7 +430,6 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	struct mlx5_wqe_data_seg *dseg;
- 	struct mlx5e_tx_wqe_info *wi;
- 	u16 ihs = attr->ihs;
+ 			*lso_header_size = skb_tcp_all_headers(skb);
+ 		}
+ 		real_size = CTRL_SIZE + shinfo->nr_frags * DS_SIZE +
+-			ALIGN(*lso_header_size - *hopbyhop + 4, DS_SIZE);
++			ALIGN(*lso_header_size + 4, DS_SIZE);
+ 		if (unlikely(*lso_header_size != skb_headlen(skb))) {
+ 			/* We add a segment for the skb linear buffer only if
+ 			 * it contains data */
+@@ -884,7 +876,6 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int desc_size;
+ 	int real_size;
+ 	u32 index, bf_index;
 -	struct ipv6hdr *h6;
- 	struct mlx5e_sq_stats *stats = sq->stats;
- 	int num_dma;
+ 	__be32 op_own;
+ 	int lso_header_size;
+ 	void *fragptr = NULL;
+@@ -893,7 +884,6 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	bool stop_queue;
+ 	bool inline_ok;
+ 	u8 data_offset;
+-	int hopbyhop;
+ 	bool bf_ok;
  
-@@ -456,28 +446,7 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	if (ihs) {
- 		u8 *start = eseg->inline_hdr.start;
+ 	tx_ind = skb_get_queue_mapping(skb);
+@@ -903,7 +893,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		goto tx_drop;
  
--		if (unlikely(attr->hopbyhop)) {
+ 	real_size = get_real_size(skb, shinfo, dev, &lso_header_size,
+-				  &inline_ok, &fragptr, &hopbyhop);
++				  &inline_ok, &fragptr);
+ 	if (unlikely(!real_size))
+ 		goto tx_drop_count;
+ 
+@@ -956,7 +946,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		data = &tx_desc->data;
+ 		data_offset = offsetof(struct mlx4_en_tx_desc, data);
+ 	} else {
+-		int lso_align = ALIGN(lso_header_size - hopbyhop + 4, DS_SIZE);
++		int lso_align = ALIGN(lso_header_size + 4, DS_SIZE);
+ 
+ 		data = (void *)&tx_desc->lso + lso_align;
+ 		data_offset = offsetof(struct mlx4_en_tx_desc, lso) + lso_align;
+@@ -1021,31 +1011,15 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			((ring->prod & ring->size) ?
+ 				cpu_to_be32(MLX4_EN_BIT_DESC_OWN) : 0);
+ 
+-		lso_header_size -= hopbyhop;
+ 		/* Fill in the LSO prefix */
+ 		tx_desc->lso.mss_hdr_size = cpu_to_be32(
+ 			shinfo->gso_size << 16 | lso_header_size);
+ 
++		/* Copy headers;
++		 * note that we already verified that it is linear
++		 */
++		memcpy(tx_desc->lso.header, skb->data, lso_header_size);
+ 
+-		if (unlikely(hopbyhop)) {
 -			/* remove the HBH header.
 -			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
 -			 */
--			if (skb_vlan_tag_present(skb)) {
--				mlx5e_insert_vlan(start, skb, ETH_HLEN + sizeof(*h6));
--				ihs += VLAN_HLEN;
--				h6 = (struct ipv6hdr *)(start + sizeof(struct vlan_ethhdr));
--			} else {
--				unsafe_memcpy(start, skb->data,
--					      ETH_HLEN + sizeof(*h6),
--					      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
--				h6 = (struct ipv6hdr *)(start + ETH_HLEN);
--			}
+-			memcpy(tx_desc->lso.header, skb->data, ETH_HLEN + sizeof(*h6));
+-			h6 = (struct ipv6hdr *)((char *)tx_desc->lso.header + ETH_HLEN);
 -			h6->nexthdr = IPPROTO_TCP;
 -			/* Copy the TCP header after the IPv6 one */
 -			memcpy(h6 + 1,
@@ -265,59 +262,15 @@ index a01ee656a1e7..9f0272649fa1 100644
 -					sizeof(struct hop_jumbo_hdr),
 -			       tcp_hdrlen(skb));
 -			/* Leave ipv6 payload_len set to 0, as LSO v2 specs request. */
--		} else if (skb_vlan_tag_present(skb)) {
-+		if (skb_vlan_tag_present(skb)) {
- 			mlx5e_insert_vlan(start, skb, ihs);
- 			ihs += VLAN_HLEN;
- 			stats->added_vlan_packets++;
-@@ -491,7 +460,7 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	}
- 
- 	dseg += wqe_attr->ds_cnt_ids;
--	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr->ihs + attr->hopbyhop,
-+	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr->ihs,
- 					  attr->headlen, dseg);
- 	if (unlikely(num_dma < 0))
- 		goto err_drop;
-@@ -1019,34 +988,14 @@ void mlx5i_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
- 	eseg->mss = attr.mss;
- 
- 	if (attr.ihs) {
--		if (unlikely(attr.hopbyhop)) {
--			struct ipv6hdr *h6;
--
--			/* remove the HBH header.
--			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
--			 */
--			unsafe_memcpy(eseg->inline_hdr.start, skb->data,
--				      ETH_HLEN + sizeof(*h6),
--				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
--			h6 = (struct ipv6hdr *)((char *)eseg->inline_hdr.start + ETH_HLEN);
--			h6->nexthdr = IPPROTO_TCP;
--			/* Copy the TCP header after the IPv6 one */
--			unsafe_memcpy(h6 + 1,
--				      skb->data + ETH_HLEN + sizeof(*h6) +
--						  sizeof(struct hop_jumbo_hdr),
--				      tcp_hdrlen(skb),
--				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
--			/* Leave ipv6 payload_len set to 0, as LSO v2 specs request. */
 -		} else {
--			unsafe_memcpy(eseg->inline_hdr.start, skb->data,
--				      attr.ihs,
--				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
+-			/* Copy headers;
+-			 * note that we already verified that it is linear
+-			 */
+-			memcpy(tx_desc->lso.header, skb->data, lso_header_size);
 -		}
-+		unsafe_memcpy(eseg->inline_hdr.start, skb->data,
-+			      attr.ihs,
-+			      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
- 		eseg->inline_hdr.sz = cpu_to_be16(attr.ihs);
- 		dseg += wqe_attr.ds_cnt_inl;
- 	}
+ 		ring->tso_packets++;
  
--	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr.ihs + attr.hopbyhop,
-+	num_dma = mlx5e_txwqe_build_dsegs(sq, skb, skb->data + attr.ihs,
- 					  attr.headlen, dseg);
- 	if (unlikely(num_dma < 0))
- 		goto err_drop;
+ 		i = shinfo->gso_segs;
 -- 
 2.52.0
 
