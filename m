@@ -1,84 +1,99 @@
-Return-Path: <netdev+bounces-255867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNWHM+yngGlNAAMAu9opvQ
-	(envelope-from <netdev+bounces-255867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:34:36 +0100
+	id 8HLOCrCngGlNAAMAu9opvQ
+	(envelope-from <netdev+bounces-255866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:33:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31DC0CCC6D
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:34:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E22FCCC48
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 14:33:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CFBC3038511
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:30:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B2CC30107FF
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 13:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD5E367F48;
-	Mon,  2 Feb 2026 13:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3362367F3A;
+	Mon,  2 Feb 2026 13:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U/0KRZek"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+TwLkTA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BA3367F3A;
-	Mon,  2 Feb 2026 13:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D28A366833
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 13:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770039000; cv=none; b=DrLoNia1q0P/s7Lt3gRAi2pEhfFvzx/XZl47TU+FUTkSnYF363TLbyfZGRJn4RKFGrzRF5UmCc0T7moVljHIxySCR1a854cK1XokhdYNroITLcLEdfMG41zluw7YT146zE/D6OxZlbA6HXDma3Hj0kqYxOwnPLrnJYNiVIWlMvM=
+	t=1770038993; cv=none; b=ZzWkY7gUOoRHHZ+toTQzJTJXd2A4ls6u/zrNVshxjrwJYBxxoz9xlWRA5RUee+mV56xxGpGqnNXgK1++CrY48XNNR0X6wCZjTveyF/mfHk9fLzw0z+CQvjbEWqQx59I/L4OMM9E7OeH4QhLqWc8E5YGRcxzpapnC3c9M686218I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770039000; c=relaxed/simple;
-	bh=Po4XURyEzCW8smpz/DmF0VKvnXajycyLgM7X+skVhFU=;
+	s=arc-20240116; t=1770038993; c=relaxed/simple;
+	bh=WaHKZ/McEXzUzbe8XhWNI/3c2hNKFJZt7wOD2NDguBw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LZROhbA065oE+F6QMuCTe0yIYZqhrJ/nUG+7ItuS9QGdbEycx6smsZqUgjlfmxb62R+sBzzE+8IaaCnZqoC3FQJCpFbgzwuisGAXj4D9iL/QqY0Wn+BUegB+MP4hA8hFMnGd4vIbGgzi5LWvHzIvRerTib3KHwjaVC4ITs3WF2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U/0KRZek; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770038998; x=1801574998;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Po4XURyEzCW8smpz/DmF0VKvnXajycyLgM7X+skVhFU=;
-  b=U/0KRZekQNjIenTlHjmSICTXHvakT6d2/JcvnXkVA3wtdEP2z1GYL7Lc
-   UCFjJ1DdgtwgRKTalSuSSL65rLYUrtQqnPl9JVfuAGurGjwuv1jLOKqQg
-   aOPWH0CvERrlTTwM5WAa0rSA7O8uXX4u8ymDEe7ClUn+yZYmaeg13r6aq
-   9kx2bJ9/JrI2GTegNj1Ss0VyWHy6ckEqtPNbqCpwKzpP4BQFNV78bZTtP
-   +UfELfjt401S8AntAsr0WzBlMw7A9/lzBmnp0IgNHpOwkmDnFTz15gsro
-   qlC71dkjrvF60twcjWCq9fXhJx5qyNLMz3PUVf2Sq99qh6DgsnZe4U9RD
-   w==;
-X-CSE-ConnectionGUID: Xykm/tHeTX6aojYrTLWWHA==
-X-CSE-MsgGUID: +PuUh3KnRRKWjY/WFmWZKg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11689"; a="58775899"
-X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
-   d="scan'208";a="58775899"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 05:29:58 -0800
-X-CSE-ConnectionGUID: ZYPY+pYURVuRlB3Zf8gDvQ==
-X-CSE-MsgGUID: 90mJWH+vQrC4SbdR7ZitkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
-   d="scan'208";a="232445658"
-Received: from vverma7-mobl3.amr.corp.intel.com (HELO kuha) ([10.124.221.53])
-  by fmviesa002.fm.intel.com with SMTP; 02 Feb 2026 05:29:55 -0800
-Received: by kuha (sSMTP sendmail emulation); Mon, 02 Feb 2026 15:29:27 +0200
-Date: Mon, 2 Feb 2026 15:29:27 +0200
-From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
-Message-ID: <aYCmt6Jnn9uieXwy@kuha>
-References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
- <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
- <aXdyll4KVOF6SWni@kuha>
- <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
- <aXjDENOsmWe5_VqS@kuha>
- <189d4a03f32ace3fd995596e8b5415ced6ae9c3a.camel@codeconstruct.com.au>
- <aXokxtlFTeZK8lP8@kuha>
- <547a1a5fd7238897b35b26e83ac27db452e6a5f7.camel@codeconstruct.com.au>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYJ967TFb/Uri4m3+4v6kFmDRjcy9JE1AN6ZH90zs0NfiU5ltDfRqT4rQF1K7v2e3UA/0Vh3PcSF4xENLsdldHw3rDKnHRNBSTbWfXnak/YU/4j1itkzqaFcadpftZUXU+3ckoxuug2iiAWaZ0j8G7It4mKQDDqNu3FuC7JCzOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+TwLkTA; arc=none smtp.client-ip=209.85.128.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-4806ca496feso2655585e9.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 05:29:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770038991; x=1770643791; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SgTWxHTq6zBlc2AIUdyfY21mpRfZc8LW47kfkCH8qhg=;
+        b=i+TwLkTAuSWAx2cq1nDH+R4qjEPkMakDvejMuiQ92jOwG0KD5EUOsxF6OziGlgWLRk
+         0GLxTJ38orhozZATg7HzJiGl9Ttf2WN5Bt6D2F3CGDew2widkmPjncATaLDFMOTu/YpZ
+         t5aYCCkFsJ+BnpdIeBorhgCjzewmWyvxgnW1xaEKWL/XfTuhsbrF+Pyo9E0lPGWT5MIV
+         qVjkhc0VoooXu8ecHzJRVTDV1uo2cstISjWSH4dQs3pGBqrAkNo8iXExdtTqMz/1Rclu
+         ITR/AbdIE9qy1fo34C78P5kPcptRv25rvytr0P1zSKfj9hcTILCE/oEmtzUG2Yu+b61M
+         HLjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770038991; x=1770643791;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SgTWxHTq6zBlc2AIUdyfY21mpRfZc8LW47kfkCH8qhg=;
+        b=aSuXPn2SNINigNLAJ3eRtruFPDJ6edN9TzydQItXgMrzmLYzsuk97dvMRwVPTBfiDJ
+         AaK6h/AitDGX+FXfGW2z23NFXSW/nADe1Uo0wkzTEztQGqJKbQKzgCKChMDtvutSz+Rs
+         +/if0QKFE6GiKYmd/y1WWMuQHR2pZhtXXLoBe/rURIs3sVmgc92LbHcQbyWF532o+pdf
+         b91sYDYGsWAZky6qutK/EDP/RI5Hv+r2iw945r82a3zJPouSrUQEkcwi6KCSBn9QoTJm
+         n39lb/hrkk80S/JiAnrgd10eohULSmmBHzMFDwa4pGpwRmn+4D8RnRxlxR6jAU5u1ZRH
+         y5Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCULB7xuOS0/vkNz+UUj0JozGYpL3nlpcgyHGPDGO6IfyW32z9YN8Y1uBVUr1Ul6dQmfu8EHbOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQLMBDvJVjWQGxT79xtpQRvOGL4iwdhh4kL37tvVR3Ve59eGwR
+	c54hmosKS78NApLUyqkU/6mstOIRGAXWOuAaPgCIG/UWA0Byy0dkp689
+X-Gm-Gg: AZuq6aIOrls3ePsKGtkjiwVES3xXOsAJHJJ4O+UN/Dl0LAOi9d9b8DcQXlKilBEWS8j
+	g3FGk8KTUf8bC9ByRn7FpUigtZwqJrC4Qrn+hGjojzo3kKnfJMa7DVK7lqRWZn8vE1R3LsC6J1s
+	LcDkE3OjFeCcJi2SdAH1CLbpV9FAx+zJdyzMbEtDqY68uWVDc2Oe8Z7m++rKjEsA5cFo8dHVxf8
+	asW877R50G+dlIXNbndcrC9c3Wk7IXKqp3D719ynd2E/o7g0b0OjCAhw76/CF0enB/Z4D5+2yox
+	Rwdh0TPRQyWm6b67kzt2lieUCk2xyc7lmLPBMNuEK6mICqYKDpoQVK3GRO0IlnOvtXoeXVo9Ll0
+	sEKP51sAAa59lOHVCpT/b/g4mxvt09YtB6/uPjdhNz5E3XTReLJvpBPalGRnsDi/hld9m1hqWXZ
+	Mxmgg=
+X-Received: by 2002:a05:600c:8b61:b0:47b:d992:601e with SMTP id 5b1f17b1804b1-482db4568b0mr95233925e9.2.1770038990732;
+        Mon, 02 Feb 2026 05:29:50 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:74c4:3a65:f9a9:6c29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482da903a30sm117174295e9.1.2026.02.02.05.29.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 05:29:50 -0800 (PST)
+Date: Mon, 2 Feb 2026 15:29:47 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Pascal Eberhard <pascal.eberhard@se.com>,
+	=?utf-8?Q?Miqu=C3=A8l?= Raynal <miquel.raynal@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/8] net: dsa: microchip: Add KSZ8463 tail
+ tag handling
+Message-ID: <20260202132947.gepuhzdh4bepk4ot@skbuf>
+References: <20260127-ksz8463-ptp-v4-0-652e021aae86@bootlin.com>
+ <20260127-ksz8463-ptp-v4-5-652e021aae86@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,137 +102,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <547a1a5fd7238897b35b26e83ac27db452e6a5f7.camel@codeconstruct.com.au>
+In-Reply-To: <20260127-ksz8463-ptp-v4-5-652e021aae86@bootlin.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255867-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255866-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,se.com,bootlin.com,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[heikki.krogerus@linux.intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim]
-X-Rspamd-Queue-Id: 31DC0CCC6D
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7E22FCCC48
 X-Rspamd-Action: no action
 
-Hi,
+On Tue, Jan 27, 2026 at 10:06:47AM +0100, Bastien Curutchet (Schneider Electric) wrote:
+> @@ -383,6 +384,74 @@ static const struct dsa_device_ops ksz9893_netdev_ops = {
+>  DSA_TAG_DRIVER(ksz9893_netdev_ops);
+>  MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KSZ9893, KSZ9893_NAME);
+>  
+> +#define KSZ8463_TAIL_TAG_PRIO		GENMASK(4, 3)
+> +#define KSZ8463_TAIL_TAG_EG_PORT_M	GENMASK(2, 0)
+> +
+> +static struct sk_buff *ksz8463_xmit(struct sk_buff *skb,
+> +				    struct net_device *dev)
+> +{
+> +	u16 queue_mapping = skb_get_queue_mapping(skb);
+> +	u8 prio = netdev_txq_to_tc(dev, queue_mapping);
+> +	struct dsa_port *dp = dsa_user_to_port(dev);
+> +	u8 *tag;
+> +
+> +	if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
+> +		return NULL;
+> +
+> +	tag = skb_put(skb, KSZ_INGRESS_TAG_LEN);
+> +
+> +	*tag = BIT(dp->index);
 
-> > There seems to be another a bit more severe issue with ARP and
-> > i2c-dev. Right now it seems that anything that can access the i2c
-> > character devices can silently (without the kernel having any idea
-> > what's going on) assign a conflicting address to a dynamically
-> > addressed ARP-device. Perhaps more importantly, the user space can
-> > remove access to an ARP-device by silently assigning a new address to
-> > it or simply by resetting its state with Prepare to ARP.
-> > 
-> > That can happen accidentally, but it can also be done intentionally.
-> > 
-> > Unless I've missed something, this really is a major threat that we
-> > have to solve. Right now the only idea that I have is that we simply
-> > prevent the i2c-dev from using the SMBus Default Address.
-> 
-> I don't necessarily see this as an issue; access to the chardev somewhat
-> implies full access to the i2c bus, and so arbitrary interactions with
-> devices to alter device states. Including the i2c address as part of the
-> affected state doesn't seem like a huge difference in access.
-> 
-> There may be a specific case that is interesting though:
-> 
->  - an ARP-able device is in use by a kernel driver, which excludes
->    access through the chardev
-> 
->  - interactions with that device are possible using ARP commands to
->    address 0x61 over the chardev
-> 
->  - so, the device may be re-addressed, now allowing accesses through
->    the chardev
-> 
-> However, I am not sure there are existing cases where access to the
-> chardev is a distinct privilege domain to not just unbind the driver
-> anyway.
+You're out of sync with mainline which has transitioned all
+BIT(dp->index) users to dsa_xmit_port_mask(skb, dev).
 
-Thanks for the answer. I don't think this is necessarily a major
-problem either, but since it was raiced (internally) I had to make a
-note. Let's not worry about this for now.
+To avoid this in the future please do not duplicate the ksz9893 xmit
+implementation, but call a common function and use a "bool do_tstamp"
+variable which is true when called from ksz9893 and false from ksz8463.
 
-> I would have a few requests:
-> 
->  - that ARP is enabled explicitly. I'd be interested in having a DT
->    property on the controller node that allows us to enable ARP on a
->    per-bus basis.
-> 
->    Otherwise, I'm pretty sure we'll break someone's existing platform
->    by assuming we can start interactions on the SMBus default address.
-> 
->    Is there some equivalent facility for ACPI based config?
-
-With ACPI systems, we just don't know what the platform is going to be
-used for in the end. This is a bit tricky with ACPI.
-
-But I'll make the registration of the feature conditional somehow in
-any case.
-
-> > > Is that possible at present? how are you planning to represent ARPed
-> > > devices in the DT - or more importantly, correlate DT (or other fwnode)
-> > > nodes to discovered devices?
-> > 
-> > I don't know about DT, but with ACPI the devices are expected to
-> > either be fixed address devices or just use target address that
-> > matches to the address in the I2C Serial Bus Connection Resource
-> > Descriptor. The mapping is not yet done, but the idea is to just
-> > assign the detected UDID to the i2c-client that was already created
-> > from the fwnode.
-> 
-> OK, but how do you map the UDID to the resource descriptor? I don't know
-> much about ACPI, but the descriptor seems to be only keyed on a target
-> address, which is now dynamic.
-> 
-> (same with DT, devices are keyed by target address)
-
-I don't know how a dynamically addressed device, that does not return
-any kind of target address with the UDID, could be mapped to the
-fwnode.
-
-> > > Assuming we go with a kernel approach: For the MCTP case, for full ARP
-> > > support of MCTP endpoints, we would still need to consume a hotplug
-> > > event that indicates that the device is available at its new address
-> > > - there is no kernel driver bound for the remote MCTP endpoints. This
-> > > event would be consumed by the (existing) MCTP infrastructure in order
-> > > to start MCTP enumeration. Is this something you have looked at
-> > > already? If so, if you can send an example of an actual event, I will
-> > > look at the mctpd part of this.
-> > 
-> > We will have the address attribute file that the user space can use.
-> > If the address changes uevent will be send it.
-> 
-> Sounds good, but for MCTP there is no struct device bound to the remote
-> i2c device/address. Are you proposing we change that?
-
-I'm sorry, I'm probable missing something here. If the address gets
-changed, then you have to inform the remote endpoint about the new
-address somehow in any case, right? So how did you do that with the
-user space approach?
-
-Br,
-
--- 
-heikki
+> +	*tag |= FIELD_PREP(KSZ8463_TAIL_TAG_PRIO, prio);
+> +
+> +	return ksz_defer_xmit(dp, skb);
+> +}
 
