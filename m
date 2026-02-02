@@ -1,281 +1,163 @@
-Return-Path: <netdev+bounces-255700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255701-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id vH3BCbgagGls2wIAu9opvQ
-	(envelope-from <netdev+bounces-255700-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 04:32:08 +0100
+	id SDIHC30cgGmu2wIAu9opvQ
+	(envelope-from <netdev+bounces-255701-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 04:39:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69A60C80D5
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 04:32:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8204EC810B
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 04:39:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3647530062F7
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 03:32:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F5193005D2A
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 03:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16AD21D5BC;
-	Mon,  2 Feb 2026 03:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF56D259C92;
+	Mon,  2 Feb 2026 03:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="r4TBnQbh"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="W6bwNNRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BE248CFC
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 03:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03AC248F73
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 03:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770003123; cv=none; b=bl7RaJ9qbR9L6x3l9ufcGmrk4jd282W1AeZgBCfkP6PYL8YK1bdwhwgTTRCGvIA9NZpSxJ7AFm73s+Nz7/Yx6KTIBFwQISTxo3dFEbZM/0P8u+U3GIEePW6cBZRC4nkmfyfpSqhEUv+0WlIMyh/ufwjbE+KBodZyB0i9GDZwO0I=
+	t=1770003577; cv=none; b=bGj2jjCvOc7mHRGJ6lvbRrrdatzmMloBxpZceHO9xnhRbsBZm0X7mtLnLBLL+eXRCJ8uBUD3ZUd5rPEzn9PSOWl1S7IU+GAz/1E8oYbaGPx228c8hN0v67cV/d6OaWJ3WmDHZTHDbQ4w6OubJHp62tDAHvwYO3eJLZqZK7HyGTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770003123; c=relaxed/simple;
-	bh=IX6Jo8Ihn1Vpv4+UaYg3ZLYFp4RM085sv1RB2EaPfMo=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Nwp6/CVqZx29/cVNNSDOidBWy+/cG+qT5BZZxvcgfjWWiNzJ3KzB0CX+2FiXBOaEnYJ31UYSFj+k70e8DEKdPsRUdw4om/dNTpSGO25A8QZdo2Oc+w6ZfItzej/bQkOLK+Xt9u5X84Ida/nmLL9DE0LU0kOI/6dPRvXAJixc5+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=r4TBnQbh; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1770003116; h=Message-ID:Subject:Date:From:To;
-	bh=49zk2btPVFNY7x4l1bBCULgTNxOWwveuN6O0Jo5im+k=;
-	b=r4TBnQbhFYsr/IBCOcj7FCrClpgfjykNtXqE9DeKVJNGPnz8hlAZcraDVAzkmhaV4Gw4PZl0WsF4QTn1nVSe2r/SwAZgqT1mZM2E20Nsg2/yxFBdVUo7e7d13m20DuQ7D2FrVfoPqTFuiaafpDgmI2CT72mkTQfcWLBGmBG80q0=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WyIoPfz_1770003115 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 02 Feb 2026 11:31:55 +0800
-Message-ID: <1770002612.3297296-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [net-next,v24,4/6] eea: create/destroy rx,tx queues for netdevice open and stop
-Date: Mon, 2 Feb 2026 11:23:32 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- lorenzo@kernel.org,
- andrew+netdev@lunn.ch,
- hkallweit1@gmail.com,
- dust.li@linux.alibaba.com,
- edumazet@google.com,
- davem@davemloft.net,
- pabeni@redhat.com,
- lulie@linux.alibaba.com,
- andrew@lunn.ch,
- netdev@vger.kernel.org,
- guwen@linux.alibaba.com,
- dong100@mucse.com,
- lukas.bulwahn@redhat.com,
- vadim.fedorenko@linux.dev,
- enelsonmoore@gmail.com
-References: <20260130093412.98407-1-xuanzhuo@linux.alibaba.com>
- <20260130093412.98407-5-xuanzhuo@linux.alibaba.com>
- <20260130233243.923376-1-kuba@kernel.org>
-In-Reply-To: <20260130233243.923376-1-kuba@kernel.org>
+	s=arc-20240116; t=1770003577; c=relaxed/simple;
+	bh=DV7tfqiNTbEr5VOTEJGIOZFedhzs+wrYkdyZvApHCl0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dHDcf2is5jTvoRMSG6qH5Hz41cv1B34i+8mQsjOG+sfTp+DEYl341uOGEgeUW4jutOV07euaingwBBf7qef6p1BHEvhYgGAQCWcOeRQyJX5FlD49EEhvY2LWSWDb/HGH3oQiIzOJpjqXVsZlkJDn+No3HI4E6AZRd2XgpOuKde4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=W6bwNNRM; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6121tnLW1497411;
+	Mon, 2 Feb 2026 03:39:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=8BRn6GS6RzHTd7VvEahqNMmXhoH2Y
+	Sy1UTHGRJwlPVM=; b=W6bwNNRMeTUhd0elCoh+XiB77WrBN5d52uTh+q7rruRP6
+	TTGQ9rQP4LoTzS2M1rIeKPt8c3EfKnToJvQkRIsa4EgVinrNHzmvII2GpWESiTYM
+	X6XH1z2tTFm15YML/aVm4gnAJ6bQ5BDRMmUdG5mqw7jsBw1MCyE8Ka8lsm3bucS8
+	xfO9kcwoWRrqPxfQZJnktdxviFHPj1Ty50VcUP/qRZvXBRQytz8Pci64Sk0TrP74
+	jKLyPQAuuJe8OER9MccqJYZYi0Zi/g4FMKehteDtK9KJvlZdbaeWKpv73UhHapvb
+	OV9oqMnTPgpcsZ+H8wjIZ4H3pFHDhvyYpTMve01wg==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4c1atm9c45-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Feb 2026 03:39:20 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 6123RaRX018713;
+	Mon, 2 Feb 2026 03:39:19 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4c186jcf2e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Feb 2026 03:39:19 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 6123dJk7015479;
+	Mon, 2 Feb 2026 03:39:19 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4c186jcf1s-1;
+	Mon, 02 Feb 2026 03:39:19 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: vikas.gupta@broadcom.com, bhargava.marreddy@broadcom.com,
+        rajashekar.hudumula@broadcom.com, netdev@vger.kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH v2 net-next] bng_en: fix misleading error message for generic firmware version
+Date: Sun,  1 Feb 2026 19:38:43 -0800
+Message-ID: <20260202033848.22993-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-02_01,2026-01-30_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
+ suspectscore=0 mlxlogscore=999 adultscore=0 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2601150000
+ definitions=main-2602020028
+X-Proofpoint-ORIG-GUID: K5EXjDtB_BKTcMD_McAQXOqx8QlKCAYD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDAyOCBTYWx0ZWRfXx3rJ5Wguj7ht
+ 6HHfnrA6fHD1MoHSK7i2csveSAzeV+1D5qOyFwXRcZzORJIwtKLJgfBgQKcw+tGz5HvpVelal0D
+ mFU4egLDSG0UZa24dPx0o7PumXuJjERvMDXjDEp9DPLVbE9aRkeanMyfQ//1yqKkgtzdbI0yeHF
+ w44EomJQSnQ2saXjqYA9thqR6joBVaTaRPbI9vrJUtvxWUxbKrxklEc639emesmATUStAvloYHD
+ uBlCWQVVh7Oej6hLu0Wj2iefUdS6QUJV8RSh1g87K5nJtLXT9F8DZ/Z7bLtGWsgTx8kmxhmnBzw
+ P9EIhVKUwAi7lTujdglnP4k3BXaJ8m22uYvPOcOAR8/s8nIoC+ufQAxlAbrjjjPRr023nUHQ5zY
+ 1T8ZroknMrWCT+Vad8rENtL+cO44D0Rlw0x0PUWOtRIEYlOdKYe7DCeM/easXAP8Jy0gQvKNYN4
+ Aa5YjPCczcmL91L18+aGxmxb+7Phe6J7uhsxo8r4=
+X-Proofpoint-GUID: K5EXjDtB_BKTcMD_McAQXOqx8QlKCAYD
+X-Authority-Analysis: v=2.4 cv=E+nAZKdl c=1 sm=1 tr=0 ts=69801c68 b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=X1PviDuHVR5GJcKRcNUA:9 cc=ntf awl=host:12103
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,linux.alibaba.com,google.com,davemloft.net,redhat.com,vger.kernel.org,mucse.com,linux.dev];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	TAGGED_FROM(0.00)[bounces-255701-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255700-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,oracle.com:dkim,oracle.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 69A60C80D5
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 8204EC810B
 X-Rspamd-Action: no action
 
-On Fri, 30 Jan 2026 15:32:43 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> eea: create/destroy rx,tx queues for netdevice open and stop
->
-> This commit introduces the implementation for netdevice open and stop in
-> the Alibaba Elastic Ethernet Adapter (EEA) driver, including RX/TX queue
-> allocation, NAPI setup, and resource management.
+The devlink info_get handler incorrectly reports "roce firmware" when
+populating the generic firmware version field.
 
-[...]
+Update the error message to correctly describe the failing operation.
 
->
->
-> > +	}
-> > +
-> > +	err = eea_active_ring_and_irq(enet);
-> > +	if (err) {
-> > +		netdev_err(enet->netdev,
-> > +			   "eea reset: active new ring and irq failed. err %d\n",
-> > +			   err);
-> > +		return err;
->
-> Does this code leak the newly allocated queues when eea_active_ring_and_irq
-> fails?
->
-> In this scenario:
-> 1. New queues allocated in ctx at line 277
-> 2. Old queues freed by eea_netdev_stop at line 285
-> 3. enet_bind_new_q_and_cfg succeeds at line 294, transferring ctx->rx and
->    ctx->tx to enet->rx and enet->tx
-> 4. eea_active_ring_and_irq fails at line 303
-> 5. Function returns at line 308 without freeing enet->rx and enet->tx
->
-> The newly allocated and transferred resources remain in enet->rx and
-> enet->tx but are never freed. The comment at lines 287-292 claims resources
-> are deferred for cleanup, but there is no mechanism to track these orphaned
-> resources for later cleanup.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+v1 -> v2
+remove generic word in ERR_MSG
+---
+ drivers/net/ethernet/broadcom/bnge/bnge_devlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c b/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
+index a987afebd64d..f3a984d4d5f1 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
+@@ -221,7 +221,7 @@ static int bnge_devlink_info_get(struct devlink *devlink,
+ 			      DEVLINK_INFO_VERSION_GENERIC_FW, buf);
+ 	if (rc) {
+ 		NL_SET_ERR_MSG_MOD(extack,
+-				   "Failed to set roce firmware version");
++				   "Failed to set firmware version");
+ 		return rc;
+ 	}
+ 
+-- 
+2.50.1
 
-
-The mechanism of the netdev close does this.
-
-
->
-> [ ... ]
->
-> > +static void eea_meta_free_xmit(struct eea_net_tx *tx, struct eea_tx_meta *meta,
-> > +			       int budget)
-> > +{
-> > +	struct eea_net_stats *stats = &tx->stats;
-> > +
-> > +	++stats->packets;
-> > +	stats->bytes += meta->skb->len;
-> > +	napi_consume_skb(meta->skb, budget);
->
-> The second parameter to napi_consume_skb() should be a boolean indicating
-> NAPI context (0 or non-zero), not the actual budget value.
->
-> Jakub Kicinski raised this concern in v21 review, referencing commit
-> cd18e8ac030e646 which added kdoc clarifying this. The current code passes
-> 'budget' (which could be any positive integer like 64) instead of just 1 to
-> indicate NAPI context. While the function still works correctly (any
-> non-zero value indicates NAPI context), using the budget value is
-> semantically incorrect.
->
-> Reference: https://lore.kernel.org/netdev/20260121170658.371e0e63@kernel.org/
-
-
-I think the parameter budget should be an int value from NAPI context.
-
-
->
-> > +	meta->skb = NULL;
-> > +
-> > +	eea_tx_meta_put_and_unmap(tx, meta);
-> > +}
->
-> [ ... ]
->
-> [ ... ]
->
-> > +static struct eea_tx_meta *eea_tx_desc_fill(struct eea_net_tx *tx,
-> > +					    dma_addr_t addr, u32 size,
-> > +					    bool is_last, struct sk_buff *skb,
-> > +					    u32 flags)
-> > +{
-> > +	struct eea_tx_desc *desc;
-> > +	struct eea_tx_meta *meta;
-> > +
-> > +	meta = eea_tx_meta_get(tx);
-> > +
-> > +	desc = ering_sq_alloc_desc(tx->ering, meta->id, is_last, flags);
->
-> Can this code dereference a NULL pointer?
-
-
-The validation performed after packet posting is sufficient, as large fragmented
-packets do not affect this check. The below follows the same principle.
-
-Thanks.
-
->
-> eea_tx_meta_get() can return NULL when the free list is exhausted (tx->free
-> is NULL, as seen in lines 40-41 of eea_tx_meta_get). When NULL is returned,
-> line 182 unconditionally dereferences meta->id without checking if meta is
-> NULL, causing a kernel crash.
->
-> The TX queue flow control check (netif_txq_maybe_stop) happens AFTER packet
-> posting in eea_tx_xmit (line 280), not before. When the ring is under heavy
-> load with fragmented packets, the meta free list can be exhausted before the
-> queue is stopped.
->
-> The meta array has cfg.tx_ring_depth entries (allocated at line 360 in
-> eea_alloc_tx). Each packet can consume 1 + nr_frags meta entries (up to
-> MAX_SKB_FRAGS + 1). With small ring depths and many large fragmented packets
-> in flight, the free list can be completely exhausted.
->
-> Call path:
-> Network stack -> eea_tx_xmit -> eea_tx_post_skb (line 274) ->
-> eea_tx_desc_fill (line 231) -> eea_tx_meta_get (line 180) returns NULL ->
-> line 182 crashes.
->
-> > +
-> > +	meta->data = (void *)skb;
-> > +	meta->dma = addr;
-> > +	meta->desc = desc;
-> > +
-> > +	return meta;
-> > +}
->
-> [ ... ]
->
-> > +static int eea_tx_post_skb(struct sk_buff *skb, struct eea_net_tx *tx,
-> > +			   int flags)
-> > +{
-> > +	dma_addr_t addr;
-> > +	u32 hlen;
-> > +	struct skb_shared_info *shinfo = skb_shinfo(skb);
-> > +	struct eea_tx_meta *meta;
-> > +	int err, last = 0;
-> > +	struct device *dmadev;
-> > +
-> > +	dmadev = ering_get_dma_device(tx->ering);
-> > +
-> > +	hlen = skb_headlen(skb);
-> > +
-> > +	addr = dma_map_single(dmadev, skb->data, hlen, DMA_TO_DEVICE);
-> > +	if (dma_mapping_error(dmadev, addr))
-> > +		return -ENOMEM;
-> > +
-> > +	meta = eea_tx_desc_fill(tx, addr, hlen, !shinfo->nr_frags, skb, flags);
-> > +
-> > +	if (eea_fill_desc_from_skb(skb, tx->ering, meta->desc))
->
-> Can this code dereference a NULL pointer?
->
-> eea_tx_desc_fill() at line 231 can return NULL when the meta free list is
-> exhausted (root cause explained earlier). Line 233 unconditionally
-> dereferences meta->desc without checking if meta is NULL.
->
-> This is a consequence of the same underlying issue: the TX queue flow
-> control happens after packet posting rather than before.
->
-> Call path:
-> eea_tx_xmit (line 274) -> eea_tx_post_skb -> eea_tx_desc_fill (line 231)
-> returns NULL -> line 233 crashes accessing meta->desc.
->
-> > +		goto err_cancel;
->
-> [ ... ]
 
