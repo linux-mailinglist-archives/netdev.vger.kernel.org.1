@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-255902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255906-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eNwTC3fBgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:35 +0100
+	id 4OlaEm7EgGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255906-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:36:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE56CE252
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 554D6CE4E8
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:36:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C6BB6304B92F
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:11:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AF5B2300608A
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CEC3783B7;
-	Mon,  2 Feb 2026 15:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D08D221DB9;
+	Mon,  2 Feb 2026 15:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="YbBnNvU4"
+	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="uEklFGEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221E327AC45;
-	Mon,  2 Feb 2026 15:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A16337AA81;
+	Mon,  2 Feb 2026 15:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770045090; cv=none; b=pAOSRpmNHbxwoshlBoGryGHXvPZyIp4rp4CTWa3X+ZOwKMvji80voaPlGGBST6SA05GbHa6FSevgW4e8PvsGUqDVH+yZDuqAegEGPv9k5ESn4HUu7PyDTO24lfvjyba6WkDy/9QBC1xyHYr8vErVADYjft0HDPqVN5/BcHcGRqk=
+	t=1770045843; cv=none; b=pMYhhr02Iy9re4v46dXCeZwnNuUHCibwOqDwSzc7cdySGAxwR62PHgllCmVYRy7+5x0OQ4ON5p5Tcc1WVj31VamkSLHg0yqGdelxsvHER+MlIX2PXHSljML5asIESQrYQhYUb4ei8RSAhA6GV9j+sD2r/S9D5e7y39ozYi4i+eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770045090; c=relaxed/simple;
-	bh=EuNsfQDC+GwzZgMlzlDh70cwShNvSn7Z72szG+hMKUs=;
+	s=arc-20240116; t=1770045843; c=relaxed/simple;
+	bh=ZOMvloZpNoMhFlLtr09Mi3WPCTznnwTUTRzItsEszKg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QOwIS8evmr0rnG3NgTikRojvVtj2mJFkkkXQkS/I9ppyIwTPIMJye6Z7nMoDnO3xg5oKPeN24Jmm34vhlAAqLUdBsXNqPLyWHNvnN1oALRNxWKEgfV3GN07CwoUSWXvE4qSkorpgSo5oJYjZwUj4/ygPoa0absrm3AOZX2hbKOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=YbBnNvU4; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vmva3-00C09r-Os; Mon, 02 Feb 2026 16:11:11 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=P36EvglWh6B36/yp8p2qXvwqnN34foHJfiKZdt7lA94=; b=YbBnNvU4foyoMtrt62cp9yGybT
-	EM/Pcm8a0W0s/o0+LcZv1oU86lrBj6n8d1ixe4NtE8gSp5bfr9pX0hhxBVxU630DX6xhO48ncbOxT
-	qNNxijyiv11IvNwL6TkYTBjDAjbRLH1uE4On1MSG+ARFMuwjORFfoA24IqTQaACCh20S9v5trPp+z
-	eWuIkEiywLQrur1nWNkVNGKyTxOALcM1ICNgy1ncQZQ51DD9jgQNX/ZBYh/uls4A1GIbijrbELTmv
-	IKA5UkNf6D4nUXnU5IsaJ7arhtYI+nWovbasLGJuAxm15BY0qnnahAhFhtnxTkrKsARHoTiuCvzSG
-	9PO2X5dA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vmva2-0005wE-Oi; Mon, 02 Feb 2026 16:11:10 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vmvZp-00De8r-J4; Mon, 02 Feb 2026 16:10:58 +0100
-Message-ID: <b98a40e8-1be2-47f0-8238-92dee8f5a204@rbox.co>
-Date: Mon, 2 Feb 2026 16:10:56 +0100
+	 In-Reply-To:Content-Type; b=D1pWI+Hs3x8zapqh6SJG5e/SWQiPwdp5zvJRxQmTw/o+8AdzqElrIbuJ0FXTJNvegs5OWaZn4zLC5WsGZjpLSsz9bqaAYLSB1HKr48p/eS3ZoBZVjrdtCHCbF+3BMAiWc3aF1PYEvs2BoQyumyGP6dOxyweM4/OwU3r3K6ERR5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=uEklFGEc; arc=none smtp.client-ip=109.202.192.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
+Received: from localhost (localhost [127.0.0.1])
+	by mail.codelabs.ch (Postfix) with ESMTP id 30E9A5A0003;
+	Mon, 02 Feb 2026 16:16:05 +0100 (CET)
+Received: from mail.codelabs.ch ([127.0.0.1])
+ by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id DhGq3aCiKGkT; Mon,  2 Feb 2026 16:16:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
+	s=default; t=1770045363;
+	bh=ZOMvloZpNoMhFlLtr09Mi3WPCTznnwTUTRzItsEszKg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uEklFGEchrx5Q7Mc7TCb+vZYPro4WvC5aOuP1tfKi35uw2e3C7bhPd456HjI6yGO8
+	 4HKqkc1EAW/dOQ+xGrAUegk+K1JLV+1m9B+33JBFAV84i+nLm9bnbPGCnM6NJ4NLmy
+	 FsWddc/EfMU37CiqI/G79+cw6f7IP18DcPwEPwHOQAvF2aW1leJnFnNXxWV8po0glw
+	 HzSoIzPFApqBIUCuYFVmF+rUmAF+wYGN4bhc1RWnqjvdrubRNyB9YkMaIp1WdkXaqA
+	 gJSEw3z06Cf5NTAlmHN3jG27AeOhrcJMaSg1hQgPmyX8HkqK6vihVFY4hv961z68iq
+	 xSW5D1RVV5hdw==
+Received: from [IPV6:2a02:16a:6e09::1f84] (unknown [IPv6:2a02:16a:6e09::1f84])
+	by mail.codelabs.ch (Postfix) with ESMTPSA id B0C515A0001;
+	Mon, 02 Feb 2026 16:16:03 +0100 (CET)
+Message-ID: <4eb261ce-5f05-49dd-a668-6bb18e332f91@strongswan.org>
+Date: Mon, 2 Feb 2026 16:16:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,197 +62,151 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
- update
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260129-unix-proto-update-null-ptr-deref-v1-1-e1daeb7012fd@rbox.co>
- <3fc5611f-394f-40db-b49d-2f26402e221a@linux.dev>
- <3362017f-9c3d-46cd-b3ce-cb750b565d5b@rbox.co>
- <612a9446-252f-4b14-8605-ae1af000cc41@linux.dev>
- <CAAVpQUAc3S+Ebx2qp-Pbg9qH-Zc=yHdzVJbchCu++V_4XF3DLg@mail.gmail.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <CAAVpQUAc3S+Ebx2qp-Pbg9qH-Zc=yHdzVJbchCu++V_4XF3DLg@mail.gmail.com>
+Subject: Re: [devel-ipsec] Re: [PATCH net-next v4 1/2] icmp: fix ICMP error
+ source address when xfrm policy matches
+To: Paul Wouters <paul@nohats.ca>, Antony Antony <antony@phenome.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Antony Antony <antony.antony@secunet.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Shuah Khan <shuah@kernel.org>,
+ devel@linux-ipsec.org, Simon Horman <horms@kernel.org>,
+ stable+noautosel@kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1769595011.git.antony.antony@secunet.com>
+ <f820e0e9f80b1467f97d1408f00f61b1fdb1b986.1769595011.git.antony.antony@secunet.com>
+ <20260129184510.01319683@kernel.org> <aYCTfwblH8wtnF6c@Antony2201.local>
+ <d54db2a8-d3ab-b8ff-21fc-a26716a21494@nohats.ca>
+From: Tobias Brunner <tobias@strongswan.org>
+Content-Language: de-CH, en-US
+Autocrypt: addr=tobias@strongswan.org; keydata=
+ xsFNBFNaX0kBEADIwotwcpW3abWt4CK9QbxUuPZMoiV7UXvdgIksGA1132Z6dICEaPPn1SRd
+ BnkFBms+I2mNPhZCSz409xRJffO41/S+/mYCrpxlSbCOjuG3S13ubuHdcQ3SmDF5brsOobyx
+ etA5QR4arov3abanFJYhis+FTUScVrJp1eyxwdmQpk3hmstgD/8QGheSahXj8v0SYmc1705R
+ fjUxmV5lTl1Fbszjyx7Er7Wt+pl+Bl9ReqtDnfBixFvDaFu4/HnGtGZ7KOeiaElRzytU24Hm
+ rlW7vkWxtaHf94Qc2d2rIvTwbeAan1Hha1s2ndA6Vk7uUElT571j7OB2+j1c0VY7/wiSvYgv
+ jXyS5C2tKZvJ6gI/9vALBpqypNnSfwuzKWFH37F/gww8O2cB6KwqZX5IRkhiSpBB4wtBC2/m
+ IDs5VPIcYMCpMIGxinHfl7efv3+BJ1KFNEXtKjmDimu2ViIFhtOkSYeqoEcU+V0GQfn3RzGL
+ 0blCFfLmmVfZ4lfLDWRPVfCP8pDifd3L2NUgekWX4Mmc5R2p91unjs6MiqFPb2V9eVcTf6In
+ Dk5HfCzZKeopmz5+Ewwt+0zS1UmC3+6thTY3h66rB/asK6jQefa7l5xDg+IzBNIczuW6/YtV
+ LrycjEvW98HTO4EMxqxyKAVpt33oNbNfYTEdoJH2EzGYRkyIVQARAQABzSZUb2JpYXMgQnJ1
+ bm5lciA8dG9iaWFzQHN0cm9uZ3N3YW4ub3JnPsLBkQQTAQgAOwIbAwULCQgHAwUVCgkICwUW
+ AgMBAAIeAQIXgBYhBBJTj49om18fFfB74XZf4mxrRnWEBQJgm9DNAhkBAAoJEHZf4mxrRnWE
+ rtoP+gMKaOxLKnNME/+D645LUncp4Pd6OvIuZQ/vmdH3TKgOqOC+XH74sEfVO8IcCPskbo/4
+ zvM7GVc2oKo91OAlVuH+Z813qHj6X8DDln9smNfQz+KXUtMZPRedKBKBkh60S1JNoDOYekO+
+ 5Szgl8kcXHUeP3JPesiwRoWTBBcQHNI2fj2Xgox/2/C5+p43+GNMnQDbbyNYbdLgCKzeBXTE
+ kbDH5Yri0kATPLcr7WhQaZYgxgPGgEGToh3hQJlk1BTbyvOXBKFOnrnpIVlhIICTfCPJ4KB0
+ BI1hRyE7F5ShaPlvMzpUp2i0gK2/EFJwHnVKrc9hd8mMksDlXc4teM/rorHHnlsmLV41eHuN
+ 004sXP9KLkGkiK7crUlm6rCUBNkXfNYJEYvTZ6n/LMRm6Mpe6W71/De9RlZy9jk9oft2/Bjd
+ ynsBxx8+RpJKypQv8il4dyDGnaMroCPtDZe6p20GDiPyG8AXEjfnPU/6hllaxNLkRc6wv9bg
+ gq/Liv1PyzQxqTxbWQSK9JP+ZM5aMBlpwQMBTdGriPzEBuajYqkeG4iMt5pkqPQi/TGba/Qf
+ A7lsAm4ME9B8BnwhNxmHLFPjtnMQRoRasdkZl6/LlMa580AZyguUuxlnrvhOzam5HmLLESiQ
+ BLgp858h5jjf1LDM9G8sv8l3jGa4f12vFzw97hylzsFNBFNaX0kBEADhckpvf4e88j1PACTt
+ zYdy+kJJLwhOLh379TX8N+lbOyNOkN69oiKoHfoyRRGRz1u7e4+caKCu/ProcmgDz7oIBSWR
+ 4c68Yag9SQMFHFqackW5pYtXwFUzf469YnAC/VnBxffkggOCambzvgLcy3LNxBWi4paJRSMD
+ mEjPVWN1jLyEF4L9ab8IsA6XCD+NiIziXic/Llr9HgGT2g52cdTWQhcvtzBGD07e7AsC3VbA
+ l8healcCo8pbrv2eXC59MObmZ/LqucgwebEEgM0CptecyypZbBPST7+291wvi/yiDmNr5A8+
+ hpgcr1NguXs9IOEBy88UNuQUu1TfMYcvDzy97HxkfJ001Ze89IJvY03sZrL0vvzhIzTXWpt3
+ nO8nGAMCe9bQpwpANsLn3sBFMD74/b0/2pXKHuu1jswEWzhvT2c8P80vO3KKPh3344p4I4Vj
+ DPH2oCLsZKIlLeHSofVlJrXh/y80ajxjVRjniPaTUzYihq2J974xA7Dt9ZFsFtbpZVqK/hy8
+ Lw186K40a+g2BVEJkYsJsGGkc5VxqUQS6CCNXc8ItmbFgxfugVF8SrjYZPreOQApYNBr8vjh
+ olopOsrO788JvQ9W5K+v84OAQbHYR+8VvSlriRfSJrjvOQRblEZZ2CBMLiID1Lwi5vO5knbn
+ w8JdxW4iA2g/kr28LwARAQABwsFfBBgBCAAJBQJTWl9JAhsMAAoJEHZf4mxrRnWERz4P/R2a
+ RSewNNoM9YiggNtNJMx2AFcS4HXRrO8D26kkDlYtuozcQs0fxRnJGfQZ5YPZhxlq7cUdwHRN
+ IWKRoCppbRNW8G/LcdaPZJGw3MtWjxNL8dANjHdAspoRACdwniR1KFX5ocqjk0+mNPpyeR9C
+ 7h8cOzwIBketoKE5PcCODb/BO802fFDC1BYncZeQIRnMWilECp8Lb8tLxXAmq9L3R4c7CzID
+ wMWWfOMmMqZnhnVEAiH9E4O94kwHZ4HWC4AYQizqgeRuYQUWWwoSBAzGzzagHg57ys6rJiwN
+ tvIC3j+rtuqY9Ii8ehtliHlXMokOAXPgeJus0EHg7mMFN7GbmvrdTMdGhdHdd9+qbzhuCJBM
+ ijszT5xoxLlqKxYH93zsx0SHKZp68ZyZJQwni63ZqN5P/4ox098M00eVpky1PLp9l5EBpsQH
+ 9QlGq+ZLOB5zxTFFTuvC9PC/M3OpFUXdLr7yc83FyXh5YbGVNIxR49Qv58T1ZmKc9H34H31Z
+ 6KRJPGmCzyQxHYSbP9KDT4S5/Dx/+iaMDb1G9fduSBrPxIIT5GEk3BKkH/SoAEFs7xxkljlo
+ ggXfJu2a/qBTDPNzticcsvXz5XNnXRiZIrbpNkJ8hE0Huq2gdzHC+0hWMyoBNId9c2o38y5E
+ tvkh7XWO2ycrW1UlzUzM4KV3SDLIhfOU
+In-Reply-To: <d54db2a8-d3ab-b8ff-21fc-a26716a21494@nohats.ca>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[strongswan.org,none];
+	R_DKIM_ALLOW(-0.20)[strongswan.org:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-255902-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255906-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[rbox.co:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DKIM_TRACE(0.00)[strongswan.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tobias@strongswan.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,noautosel];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,rbox.co:mid,rbox.co:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4AE56CE252
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strongswan.org:mid,strongswan.org:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 554D6CE4E8
 X-Rspamd-Action: no action
 
-On 1/31/26 11:06, Kuniyuki Iwashima wrote:
-> On Fri, Jan 30, 2026 at 1:30 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+On 02.02.26 15:53, Paul Wouters wrote:
+> On Mon, 2 Feb 2026, Antony Antony via Devel wrote:
+> 
+>> Hi Jakub,
 >>
->> On 1/30/26 3:00 AM, Michal Luczaj wrote:
->>>>> Follow-up to discussion at
->>>>> https://lore.kernel.org/netdev/20240610174906.32921-1-kuniyu@amazon.com/.
->>>>
->>>> It is a long thread to dig. Please summarize the discussion in the
->>>> commit message.
+>> On Thu, Jan 29, 2026 at 06:45:10PM -0800, Jakub Kicinski via Devel wrote:
+>>> On Wed, 28 Jan 2026 11:25:14 +0100 Antony Antony wrote:
+>>>> Subject: [PATCH net-next v4 1/2] icmp: fix ICMP error source address when xfrm policy matches
 >>>
->>> OK, there we go:
+>>>> Fixes: 415b3334a21a ("icmp: Fix regression in nexthop resolution during replies.")
+>>>> Cc: stable+noautosel@kernel.org # Avoid false positives in tests
 >>>
->>> The root cause of the null-ptr-deref is that unix_stream_connect() sets
->>> sk_state (`WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED)`) _before_ it assigns
->>> a peer (`unix_peer(sk) = newsk`). sk_state == TCP_ESTABLISHED makes
->>> sock_map_sk_state_allowed() believe that socket is properly set up, which
->>> would include having a defined peer.
->>>
->>> In other words, there's a window when you can call
->>> unix_stream_bpf_update_proto() on socket which still has unix_peer(sk) == NULL.
->>>
->>> My initial idea was to simply move peer assignment _before_ the sk_state
->>> update, but the maintainer wasn't interested in changing the
->>> unix_stream_connect() hot path. He suggested taking care of it in the
->>> sockmap code.
-> 
-> Yes, we already have a memory barrier for unix_peer(sk) there
-> (to save sock_hold()/sock_put() in sendmsg(), see 830a1e5c212fb)
-> and another one just for sk->sk_state is not worth the unlikely
-> case in sockmap by a buggy user.
-> 
-> 
->>>
->>> My understanding is that users are not supposed to put sockets in a sockmap
->>> when said socket is only half-way through connect() call. Hence `return
->>> -EINVAL` on a missing peer. Now, if users should be allowed to legally race
->>> connect() vs. sockmap update, then I guess we can wait for connect() to
->>> "finalize" e.g. by taking the unix_state_lock(), as discussed below.
-> 
-> If a user hit the issue, the user must have updated sockmap while the
-> user knows connect() had not returned.  Such a user must prepare
-> for failures since it could occur before sock_map_sk_state_allowed() too.
-> 
-> This is a subtle timing issue and I don't think the kernel should be
-> friendly to such buggy users by waiting for connect() etc.
-> 
-> 
->>>
->>>>   From looking at this commit message, if the existing lock_sock held by
->>>> update_elem is not useful for af_unix,
->>>
->>> Right, the existing lock_sock is not useful. update's lock_sock holds
->>> sock::sk_lock, while unix_state_lock() holds unix_sock::lock.
+>>> I don't understand what you're trying to express with all these tags.
+>>> We are sending incorrect ICMP packets, seems like a normal net-worthy
+>>> fix to me?
 >>
->> It sounds like lock_sock is the incorrect lock to hold for af_unix. Is
->> taking lock_sock in sock_map doing anything useful for af_unix? Should
->> sock_map hold the unix_state_lock instead of lock_sock?
-> 
-> If sockmap code does not sleep, unix_state_lock can be used there.
-> 
-> 
+>> You're right that we're sending incorrect ICMP packets when IPsec/xfrm is
+>> enabled and this is a legitimate fix. My concern with backporting is about
+>> potential disruption rather than the correctness of the fix itself.
+>> The issue is that some existing test scripts and monitoring tools may have
+>> hardcoded expectations for the current(incorrect) source address behavior.
+>> When this one-line fix gets backported to all maintained kernels, those
+>> tests would start failing, potentially triggering regression reports and
+>> requests to revert the fix from stable kernels.
 >>
->> Other than update_elem, do other lock_sock() usages in sock_map have a
->> similar issue for af_unix?
+>> Additionally, without the
+>> commit 63b21caba17e ("xfrm: introduce forwarding of ICMP Error messages")
+>> being present in older kernels, the behavior change could be viewed
+>> differently in stable branches.
+>>
+>> This is also the sense I got from IPsec users.
+>> Given these considerations, I opted for the safer path of targeting net-next
+>> with stable+noautosel, no backporting.
+> 
+> libreswan is unaffected, other than the old code showing a weird
+> unexplainable log message.  So we are not really affected by whether or
+> not this get backported. We would slightly prefer the backport just to
+> get proper icmp messages out there (and we might need to fix a few test
+> cases but that is okay with us). If someone reaches out with strong
+> arguments to not backport, we would be fine with not doing it.
 
-As for the sockmap, I think that would be it.
+I think the main concern is that without Antony's patch that adds ICMP
+forwarding via reverse lookup (63b21caba17e ("xfrm: introduce forwarding
+of ICMP Error messages")), which was not backported, packets with the
+correct source IP will not get tunneled if the gateway's IP is not
+contained in the traffic selectors.  So if at all, backporting should
+only be considered to v6.9+ and not anything earlier (the commit
+Antony's Fixes tag references, 415b3334a21a, was released with v3.1).
 
-In related news, looks like bpf_iter_unix_seq_show() is missing
-unix_state_lock(): lock_sock_fast() won't stop unix_release_sock(). E.g.
-bpf iterator can grab unix_sock::peer as it is being released.
-
->>>> it is not clear why a new test
->>>> "!sk_pair" on top of the existing WRITE_ONCE(sk->sk_state...) is a fix.
->>>
->>> "On top"? Just to make sure we're looking at the same thing: above I was
->>> trying to show two parallel flows with unix_peer() fetch in thread-0 and
->>> WRITE_ONCE(sk->sk_state...) and `unix_peer(sk) = newsk` in thread-1.
->>>
->>> It fixes the problem because now update_proto won't call sock_hold(NULL).
->>>
->>>> A minor thing is sock_map_sk_state_allowed doesn't have
->>>> READ_ONCE(sk->sk_state) for sk_is_stream_unix also.
->>>
->>> Ok, I'll add this as a separate patch in v2. Along with the !tcp case of
->>> sock_map_redirect_allowed()?
->>
->> sgtm. thanks.
->>
->>>
->>>> If unix_stream_connect does not hold lock_sock, can unix_state_lock be
->>>> used here? lock_sock has already been taken, update_elem should not be
->>>> the hot path.
->>>
->>> Yes, it can be used, it was proposed in the old thread. In fact, critical
->>> section can be empty; only used to wait for unix_stream_connect() to
->>> release the lock, which would guarantee unix_peer(sk) != NULL by then.
->>>
->>>          if (!psock->sk_pair) {
->>> +               unix_state_lock(sk);
->>> +               unix_state_unlock(sk);
-> 
-> I don't like this... we had a similar one in recvmsg(MSG_PEEK) path
-> for GC with a biiiiiig comment, which I removed in 118f457da9ed .
-> 
-> 
->>>                  sk_pair = unix_peer(sk);
->>>                  sock_hold(sk_pair);
->>
->> I don't have a strong opinion on waiting or checking NULL. imo, both are
->> not easy to understand. One is sk_state had already been checked earlier
->> under a lock_sock but still needs to check NULL on unix_peer(). Another
->> one is an empty unix_state_[un]lock(). If taking unix_state_lock, may as
->> well just use the existing unix_peer_get(sk).
-> 
-> Yes, unix_peer_get() can be safely used there (with extra sock_put()).
-> 
-> 
->> If its return value cannot
->> (?) be NULL, WARN_ON_ONCE() instead of having a special empty
-> 
-> I suggested WARN_ON_ONCE() because Michal reproduced it with
-> mdelay() and I did not think it could occur in real life, but considering
-> PREEMPT_RT, it could be real.  So, the current form in this patch looks
-> good to me.
-
-FWIW, it reproduces on CONFIG_PREEMPT_RT=n without mdelay().
-Please see
-https://lore.kernel.org/bpf/20260123-selftest-signal-on-connect-v1-0-b0256e7025b6@rbox.co/
-
->> lock/unlock pattern here. If the correct lock (unix_state_lock) was held
->> earlier in update_elem, all these would go away.
->>
->> Also, it is not immediately clear why a non-NULL unix_peer(sk) is safe
->> here. From looking around af_unix.c, is it because the sk refcnt is held
->> earlier in update_elem? For unix_stream, unix_peer(sk) will stay valid
->> until unix_release_sock(sk). Am I reading it correctly?
-> 
-> unix_stream_connect() holds the peer's refcnt, and once unix_peer(sk)
-> is set, it and refcnt are not cleared until close()d.  So unix_peer_get() is
-> a bit redundant for sane users.
+Regards,
+Tobias
 
 
