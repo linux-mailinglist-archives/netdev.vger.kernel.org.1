@@ -1,223 +1,203 @@
-Return-Path: <netdev+bounces-255834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCbRISyCgGnE8wIAu9opvQ
-	(envelope-from <netdev+bounces-255834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:53:32 +0100
+	id aMJVEeKDgGnE8wIAu9opvQ
+	(envelope-from <netdev+bounces-255835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:00:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1334CB41B
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:53:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C7A7CB636
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6814300E61F
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:53:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D5F3302EE85
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF81F35B142;
-	Mon,  2 Feb 2026 10:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD88A35B142;
+	Mon,  2 Feb 2026 10:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Uuy+MpB6"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kfX+EitI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA763570B2;
-	Mon,  2 Feb 2026 10:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160B835A943;
+	Mon,  2 Feb 2026 10:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770029609; cv=none; b=S0QgL7FXxBXUnD47jpvKX72MsLUj1FCGOkS6wFhwnVhzX6T/z5d2GTZ22tGUelXG70kRk7khE076oEHmaVZ0gsCgg6AFSHqQZnuFN5FHlNbdemlyDlFPTIVbDvHlX4RC2538y8dzMzWWNqeiQKrsxr9XJP1vc+NGo4T6ODX6Y3Y=
+	t=1770029640; cv=none; b=npGgXffgosUeVNz4AZjwnhXPFV4G3Z9ZbfDMz7arZloG3sJQIW8drx8yrxO68aA19k8L/iBdScwdOJwPPRPDP6cBvIBFzle+FIzN+QzAB9en2+Zjtoln0n6p2jLJnFbm2U8Q009ruFxbM8DG6vaeV9Y7FV/kwqcDt1yVNAHVyVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770029609; c=relaxed/simple;
-	bh=HyRFau/B4PvpkUmXjRWTSCugbqWxZrtnQbv5mnBLvMU=;
-	h=Date:From:To:CC:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=nK9a5uNeXubw373VbGQpjeRM4W28yMcLuYjuirfP+YYDaDGNzBTa+EQ25L5pcaXfFDiqsF3OE/QMRCNl/2iVy3Cxlxf06qxag41R4pca1gIcFaRXnXU0siEWiVTspxYYWCS+SboyanBCE1aBIkIGqPVcWp+xqCMwhG2KY1UpkKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Uuy+MpB6; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 611NhMSK3444759;
-	Mon, 2 Feb 2026 02:53:17 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:to; s=
-	pfpt0220; bh=RvbaCQYqi0+TU5bKUnmjI23R5nhj4Bsy1HU1n0lVaOo=; b=Uuy
-	+MpB6479MXpcRzN5u5WAvCsFggvTrhJe/u5CL5KxFPIXxjPxO6nBrOVLvBONVW5q
-	xFNpqO6g+ADPok9ppJBTK8/IVPxD/Tr0uqPchY1dT3WA51eq6vkS78neJpe8pqrN
-	RzjWKF2V+Zh5NktbyhFgTfjM3EZrc6P+1FmBukXmEdycF8kUQOoSpTuvo9jtemyy
-	huN+tQdPxyyVCYnR7PXbjZ+gOZDdkRIEcsHssqdjrHnoR8Z9KZgjZpUHnUrrgpkj
-	33qmb4lkr83Z7rKudzeUTWIAEz+ilyh2UlpjByJWFBFXV4GVji9QUiJvfVttMjh0
-	UZmiupWPpPryRKLubuA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4c28mvsjvf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Feb 2026 02:53:17 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	s=arc-20240116; t=1770029640; c=relaxed/simple;
+	bh=HwCPtUyDzn3GjIOFIcuEtdzXyFqDrHtJb3bccpySMOE=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=HVSApu9nqcZFXmiMDYudFJ2e89ZBFERrObVu4AEC97sDkbJr5S93tx5ogta/+pLZgoQu0v6tUH402FyOWQfVR1b3zum3f6Ah9bZvC6QbaKaLCBLmCdRVzEgfc9TfiG7N4OoPXaewfiiJFAI1PRwCKNixQNeeL/eebRF1QgxT/as=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kfX+EitI; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=IAB7g4oOle0bWWJEkgpFGulKR8NRIdAGZJceBUD5WTc=;
+	b=kfX+EitIJx+3rT9MiKn70t2HWlc1bskbaNbNMHwrgMRMdUia76qxh81DRZIqQ9wEjeJNP2KG6
+	0KfitBm7bVxhOACqRXqKy3oAIpiJj5vD3yoy1dPbESJRZmwrCLPZhfNbeNstAbFiYrSZjysmCeS
+	J+RfqzGdoxE0Rroi83vvx5I=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4f4Nf33M03zLlTg;
+	Mon,  2 Feb 2026 18:49:15 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4755F4048B;
+	Mon,  2 Feb 2026 18:53:48 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 2 Feb 2026 02:53:32 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 2 Feb 2026 02:53:32 -0800
-Received: from ccs-coresight-hyd (ccs-coresight-hyd.marvell.com [10.29.40.42])
-	by maili.marvell.com (Postfix) with SMTP id 372313F7054;
-	Mon,  2 Feb 2026 02:53:11 -0800 (PST)
-Date: Mon, 2 Feb 2026 10:53:11 +0000
-From: Anshumali Gaur <agaur@marvell.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya
-	<gakula@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>, hariprasad
-	<hkelam@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Message-ID: <aYCCFw3cTeyA3p8R@ccs-coresight-hyd>
+ 15.2.1544.36; Mon, 2 Feb 2026 18:53:47 +0800
+Message-ID: <df89d793-ee1a-4519-bc36-3a1580a33b12@huawei.com>
+Date: Mon, 2 Feb 2026 18:53:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-Authority-Analysis: v=2.4 cv=MuhfKmae c=1 sm=1 tr=0 ts=6980821d cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=s5jvgZ67dGcA:10 a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10
- a=VkNPw1HP01LnGYTKEx00:22 a=QyXUC8HyAAAA:8 a=M5GUcnROAAAA:8
- a=NDRoTk8RXLtyl5LrLHUA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 0D4climlWH_y_tOVQX2UyuYN8Kl0GX2s
-X-Proofpoint-GUID: 0D4climlWH_y_tOVQX2UyuYN8Kl0GX2s
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDA4NyBTYWx0ZWRfX40eaDISd/L2U
- nrUYeUg4CmP0wxlQSnreKgGJC/AtomWr7FQk7pzC/q7Mzmgq15ylLanukXaO65EqymQA6sU8OPr
- dNuGmGivfkroKv2dXcOlweRGx4i8T1ooZ9y511WemSRcTm6TuBIK7xLjwGKa3E9uKUOXFJg8skD
- Nk5uDhWDUkSDaqwimPkZjWLP4foroWqfrk5QszITbDq4Auv3Ag9HTClz5ep7wTOrdrDEDk5uxnv
- Sz+MQ+YJ53HjGYsu6VaJ/nGtmUc3lLMo3fbhymrTQgX2t7HZlkxujI5/p7xWGJY1Iq2HuaH5QW6
- UrKJX7bXnmthTTFTnJ1NhafSZCr7vmgbF9dZPXXkcGmRakxXJjLoKtw3yjiXAQCuIT7dtLr+b1h
- Mr+v+rdJ/JCPz6f7J6ZAD2cZJE81RcVhMhVGRQFJcBjtJr+LXYyWBJQE+L5dKVUNIHKnUqbDweC
- /Qi/1eJmSpG0crQlDAg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-02_03,2026-01-30_04,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <ivecera@redhat.com>, <mschmidt@redhat.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] iavf: fix deadlock in reset handling
+To: Petr Oros <poros@redhat.com>, <netdev@vger.kernel.org>
+References: <20260202084820.260033-1-poros@redhat.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260202084820.260033-1-poros@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
-	MISSING_SUBJECT(2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255834-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255835-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[agaur@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: F1334CB41B
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 9C7A7CB636
 X-Rspamd-Action: no action
 
-On 2026-01-29 at 23:02:43, Jacob Keller (jacob.e.keller@intel.com) wrote:
-> 
-> 
-> On 1/29/2026 1:19 AM, Anshumali Gaur wrote:
-> > When both AF and PF drivers are built as modules, the PF driver in the
-> > kexec kernel may probe before the AF driver is ready. This leads to
-> > a crash due to uninitialized hardware state.
-> > 
-> > This patch ensures the PF driver properly detects and waits for AF
-> > driver readiness before proceeding with initialization.
-> > 
-> 
-> To me, the patch description is not sufficient to describe the what and why
-> of this change.
-> 
-> Could you please provide a better explanation of how the addition of the
-> provided shutdown handler fixes initialization?
+
+on 2026/2/2 16:48, Petr Oros wrote:
+> Three driver callbacks schedule a reset and wait for its completion:
+> ndo_change_mtu(), ethtool set_ringparam(), and ethtool set_channels().
 >
-Hi Jacob,
-The issue being addressed here is specific to kexec and persistent AF
-hardware state across kernel transitions. When both AF and PF drivers
-are built as modules and a kexec kernel is performed, the PF driver in
-the new kernel may probe before the AF driver has completed probing and
-reinitializing the RVU hardware. In this scenario, the hardware state
-left behind by the AF driver in the old kernel is still visible to the
-PF driver in the new kernel resulting in crash due to stale state.
-> > Fixes: 54494aa5d1e6 ("octeontx2-af: Add Marvell OcteonTX2 RVU AF driver")
-> > Signed-off-by: Anshumali Gaur <agaur@marvell.com>
-> > ---
-> >   drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 11 +++++++++++
-> >   1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> > index 747fbdf2a908..8530df8b3fda 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> > @@ -3632,11 +3632,22 @@ static void rvu_remove(struct pci_dev *pdev)
-> >   	devm_kfree(&pdev->dev, rvu);
-> >   }
-> > +static void rvu_shutdown(struct pci_dev *pdev)
-> > +{
-> > +	struct rvu *rvu = pci_get_drvdata(pdev);
-> > +
-> > +	if (!rvu)
-> > +		return;
-> > +
-> > +	rvu_clear_rvum_blk_revid(rvu);
-> 
-> Here, I guess you are clearing some data about the device status. Does that
-> mean that when you initialize later you will wait for the AF driver to
-> finish probing and configure this? It would be nice to explain how this
-> change fixes initialization.
+> Waiting for reset in ndo_change_mtu() and set_ringparam() was added by
+> commit c2ed2403f12c74 ("iavf: Wait for reset in callbacks which trigger
+> it") to fix a race condition where adding an interface to bonding
+> immediately after MTU or ring parameter change failed because the
+> interface was still in __RESETTING state. The same commit also added
+> waiting in iavf_set_priv_flags(), which was later removed by commit
+> 53844673d55529 ("iavf: kill "legacy-rx" for good").
 >
-The RVUM block revision field acts as an implicit indication that the AF
-driver has completed its initialization. If this value is left uncleared
-during kexec kernel booting, the PF driver may observe a non-zero/valid
-RVUM block revision and incorrectly assume that the AF is already
-initialized and ready, even though the AF driver in the kexec kernel has
-not yet probed. This leads to PF initialization proceeding against
-partially initialized hardware, resulting in a crash.
-> > +}
-> > +
-> >   static struct pci_driver rvu_driver = {
-> >   	.name = DRV_NAME,
-> >   	.id_table = rvu_id_table,
-> >   	.probe = rvu_probe,
-> >   	.remove = rvu_remove,
-> > +	.shutdown = rvu_shutdown,
-> 
-> This is the shutdown handler:
-> > 
-> >  * @shutdown:   Hook into reboot_notifier_list (kernel/sys.c).
-> >  *              Intended to stop any idling DMA operations.
-> >  *              Useful for enabling wake-on-lan (NIC) or changing
-> >  *              the power state of a device before reboot.
-> >  *              e.g. drivers/net/e100.c.
-> 
-> How does this have anything to do with initialization?
-> 
-> >   };
-> >   static int __init rvu_init_module(void)
-> 
-> 
+> Waiting in set_channels() was introduced earlier by commit 4e5e6b5d9d13
+> ("iavf: Fix return of set the new channel count") to ensure the PF has
+> enough time to complete the VF reset when changing channel count, and to
+> return correct error codes to userspace.
+>
+> Commit ef490bbb226702 ("iavf: Add net_shaper_ops support") added
+> net_shaper_ops to iavf, which required reset_task to use _locked NAPI
+> variants (napi_enable_locked, napi_disable_locked) that need the netdev
+> instance lock.
+>
+> Later, commit 7e4d784f5810 ("net: hold netdev instance lock during
+> rtnetlink operations") and commit 2bcf4772e45adb ("net: ethtool: try to
+> protect all callback with netdev instance lock") started holding the
+> netdev instance lock during ndo and ethtool callbacks for drivers with
+> net_shaper_ops.
+>
+> The combination of waiting for reset and the new locking requirements
+> creates a deadlock: the callback holds the lock and waits for reset_task,
+> but reset_task is blocked waiting for the same lock:
+>
+>    Thread 1 (callback)               Thread 2 (reset_task)
+>    -------------------               ---------------------
+>    netdev_lock()
+>    ndo_change_mtu() or ethtool op
+>      iavf_schedule_reset()
+>      iavf_wait_for_reset()           iavf_reset_task()
+>        waiting...                      netdev_lock() <- DEADLOCK
+>
+> Reproducer:
+>
+>    # echo 16 > /sys/class/net/$PF/device/sriov_numvfs
+>    # ip link set $VF up
+>    # ip link set $VF mtu 5000
+>    RTNETLINK answers: Device or resource busy
+>
+>    # dmesg | tail -1
+>    iavf: MTU change interrupted waiting for reset
+>
+> Fix this by temporarily releasing the lock while waiting for reset to
+> complete. This follows the pattern used elsewhere in the kernel (e.g.,
+> do_set_master() releases rtnl_lock before calling ndo_add_slave()).
+>
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Signed-off-by: Petr Oros <poros@redhat.com>
+
+
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+
+> ---
+>   drivers/net/ethernet/intel/iavf/iavf_main.c | 15 ++++++++++++---
+>   1 file changed, 12 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 8aa6e92c16431f..d7738fb8fa60bc 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -189,13 +189,22 @@ static bool iavf_is_reset_in_progress(struct iavf_adapter *adapter)
+>    * iavf_wait_for_reset - Wait for reset to finish.
+>    * @adapter: board private structure
+>    *
+> + * The iavf driver selects NET_SHAPER, so callbacks that trigger reset are
+> + * always called with netdev instance lock held, while reset_task also needs
+> + * this lock. Release the lock while waiting to avoid deadlock.
+> + *
+>    * Returns 0 if reset finished successfully, negative on timeout or interrupt.
+>    */
+>   int iavf_wait_for_reset(struct iavf_adapter *adapter)
+>   {
+> -	int ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+> -					!iavf_is_reset_in_progress(adapter),
+> -					msecs_to_jiffies(5000));
+> +	struct net_device *netdev = adapter->netdev;
+> +	int ret;
+> +
+> +	netdev_unlock(netdev);
+> +	ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+> +					       !iavf_is_reset_in_progress(adapter),
+> +					       msecs_to_jiffies(5000));
+> +	netdev_lock(netdev);
+>   
+>   	/* If ret < 0 then it means wait was interrupted.
+>   	 * If ret == 0 then it means we got a timeout while waiting
 
