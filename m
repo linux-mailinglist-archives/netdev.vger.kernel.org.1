@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-255999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPpDIB0EgWnZDgMAu9opvQ
-	(envelope-from <netdev+bounces-255999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:07:57 +0100
+	id XDedA1kDgWnZDgMAu9opvQ
+	(envelope-from <netdev+bounces-256000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:04:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D39D0F19
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:07:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6EFD0E82
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 21:04:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 133243026C06
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 20:04:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 341483017DFB
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 20:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6910130DEB5;
-	Mon,  2 Feb 2026 20:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BD13783AE;
+	Mon,  2 Feb 2026 20:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F7Cun27Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="isDCH0k6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F90830B52F
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 20:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8F230EF69
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 20:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770062664; cv=none; b=VQjNMGvCM3j9+pEo4oT1TD+YjIEm52r42Ak1AzKNz+V6OMQvvcC8+1on5ZXb55HTG7Cfse6rFoWirUkSARw+qYPNCLncmYIDUFQhxjTYHQOFz42wt/398nPiXExeSbfaQ4fjzeQJMl/tZdsD+djrtq/ouXT2ruacZT3gYyTNE4I=
+	t=1770062666; cv=none; b=gY8b5y4C4NbfvdlVINtIaHLjCzDQIkft/tNLD0g9w2XFRKMiIg02qDdJe4/CHUiUF9rkANjbxkbDAoc8bbOqfVVoKd9dzKjAz26ckx2EQxNivANzKCMbXwQSpUI4KEMjJ2EEy8cV2eXuCt+dQXT5jErQsVeXxEbqejz5M9lXYBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770062664; c=relaxed/simple;
-	bh=6mwvgcU4b+9/QTYhLf3cWuarnifzlcz1Qc4XoUMHFqM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kk1sq7rmWcwP5eaZstE58EMw49fq1PQ63oQJcB/+OGqcrZx3f8McdXoNkQZL4PcI7fsEMMcrDjDiBa/xseTpHq7nxNaWOxcKYhMUJNcb95zZG0292B0nfxAuFrbHRuuG3BdiJNBrmZlWIka/Di7XBvaDq0AU5dP3pf/tYcRcwAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F7Cun27Q; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1770062666; c=relaxed/simple;
+	bh=FQWd66idNIPPBt7TUF6kuXek5+OLh0Gsn4zYraBgsdM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fOB3ebP4CPQp/uN98kZyG+R2Ls1Iw/rwxzrS6ECLIrnt3BQ3t3v04nuvuDSouYlSwKtRvOwUXfUuPSpy9GrGfh9yHeY/fBhUdGo6kjoEv5akTflSofRs4XMuPDRBmwpO7BDHPtBLOaOiY+w7EMVxAvybf+h9xk/stj5FKok3Y2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=isDCH0k6; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4806dffc64cso37278955e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 12:04:22 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-481188b7760so32362225e9.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 12:04:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770062661; x=1770667461; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DnYB/5fk0KIL/28WT7coTBmZftn7pWijOsAyfPHOv0M=;
-        b=F7Cun27QNCOib2REAEqHghZdC+P4RXNgP8DndZJ+9FXrerYXZqhy5zjJmAV4CXfYUA
-         XaUFbz1seYnZpYC34LCTsVRwbR8cv8MP/7mKvvUE5Bn4UkZqpg8ZevZFGUgJt3nJEbmX
-         ba7zJIwTSNYo40nN4oxAiKJGsmbdZBSXFhSXwWGkT7yvOM/O9EnfCd1YO+5pZDeRf7VP
-         QUlQSM+uL449fVmertIG36He/wb78txxKxCTXfqWC+ccn3dG9gxIrtX1SPEiSGeNna42
-         r/qh7WBev2ebF7eurRIw46EmnGmQ3aHoopECWooKVfN+8ZLAnaBvUD/5C7MAVb5gTXKy
-         qwhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770062661; x=1770667461;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1770062663; x=1770667463; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DnYB/5fk0KIL/28WT7coTBmZftn7pWijOsAyfPHOv0M=;
-        b=SkLtgjZyw5JABytPt39hXwB5q4JyAeZ7obJ+vxzmLZfNkts4VY+EvBw+72TMLwQLHb
-         8MSyZnPjGcTPvVplHSYiiKmnN8Qboj+Jmzt/0P2jD5UTnRHm66zpL3lteN8JWevxf5d4
-         FdYsJLzS7GxMz8YLzHOm5sO5+wDe4uFHy3QRhMrBa1xb4jvI1FhobUVgo/6ehQLXkxi4
-         d7IPLwAaTLMZ8YKQ1Xa/v1ihVSyP8ps9IfK1SFxP4c6XjhiUMEcA4WACnthQGjIT+wnK
-         8Nc+sTejGQ35UqzZqObGWb1lagHHUP3tzM/lHJ0piRWJxuTXg6FT8U7hmhZ1ldslOp9i
-         jjWw==
-X-Gm-Message-State: AOJu0YzJZ4TbdCAplGUGNnlzqtg9WfEp59rrGuXUOtTmuIvqFTYVz+qX
-	5RupAUiK/WShZU55TGrQMIUSUiPKmJ6NK4SMAjvwWB+9oaszy1Ts044i
-X-Gm-Gg: AZuq6aJ+WnUJXCg8OgW20IyaBr6tOtUJqCnrHE2YWfb0JdKVWEmA9cp/tLFDhVGoFa0
-	Q1H00E7Px4NXCS1k4na4XWoFdXwo6iCcRrQr7Qef3IYBZ36EynzEYt8FxwmsK8baH8Rdp+L6S0i
-	X8NuIGcKT4mGU46LA93mAmMKARpLcjAhuyJW3VQXdzmaZ2U5tQD9OLWpKLpIyxT3pT6mL2BQCaF
-	X+nCoLJSh0D3ljWmFPnktz9TF5UfiKWlrIL8OuWQaf3VbFuTM/vZiWkk29zLfKDeWLiAKu3slOY
-	2YT5O7I7b+SFoe5sOzrbcZnx6NcmaTNWMNcFJ09xahdxY26/sc3va9htt2+qGMb8vOrKU/riOr7
-	7aAewB9kjdMqhv+4CmXMq3IFZh7HeFRwTJkQz9aZp7uqgokERSK8XDfAsxTYvpeSJPfsuABAdtC
-	HNujniY4G88XI=
-X-Received: by 2002:a05:600c:4f8a:b0:47d:92bb:2723 with SMTP id 5b1f17b1804b1-482db456350mr180655745e9.3.1770062660562;
-        Mon, 02 Feb 2026 12:04:20 -0800 (PST)
+        bh=GQ3Xd1JUldaEb0EE6XNzb7a8EiRdMWPdAN1y5gE4vRE=;
+        b=isDCH0k6XqQRIo1V9owXcGM1UoI8I98Dv1GfPduWf0zKO/AmEkJnkRzOXD6eC/nwXj
+         PdYrFBYp463gRj9czFGdUtTD/1/RWk2K0Y2A1yQMejk65RXtTa2qLTrkUWWRa30H0bPN
+         Al4Md68jqgAAnVgB3FDcxgzubLzaEh7WLBHEnXMlVFFrMzNxI4zfKrptVdMQ3T741Pcv
+         tEbbqGgtzE8WdmKvT+cpgdUABLGCBZGpBsUk1lDKXVxZVf3iUtX9/ZJaV5LbPlhSc9df
+         Fx6Q7wD9KOnaDEitSs9NMof9HvoOmCvagsLGWuQgThtMPQRqV3bFVIQypgohZFfW/eYa
+         okiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770062663; x=1770667463;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GQ3Xd1JUldaEb0EE6XNzb7a8EiRdMWPdAN1y5gE4vRE=;
+        b=JRl9Gxdhr1K2CGF7Q0rliRK5EENSQJvqmqRgIh+VLeJPKsUZU9YA8Vq/kWCMF6bD6d
+         RjimW0W/20aixcQ45GHzjOxlQC+Jz3taHkeq08RxD02Gl5o0fIXTOyhy/Tru2cFdndoA
+         bK0lQx7SFL4qHnMHf7y14l5bp/y4reL0PXsmYjLvFQpki8BHPsEXUweQUK8Q7lL1fPbb
+         Nd9mk2E0KmdPRZI7656A71n5H7c/KYW78DznPDG7Y9k8gKLajz0fLP5DFZrTglxw+DcZ
+         gUhirJncCl7524rPeMZCU6lKAnIRcwrUagUCqH67gkbua78REilKEVX7j+lyyWW4Uj9g
+         cO8Q==
+X-Gm-Message-State: AOJu0YzZ7gkR8QafWI6JQl9/+bzj8f/2tMdDyThqRJ9zAGQQXv0dLOoy
+	LS0t7oT1Su6atoJBUIvvclzdMwUvI8KJoqTwipbakHuNKwP1jyBCIm92
+X-Gm-Gg: AZuq6aII2uY20Xm2AOh0/es6u5xY8h5O6Z4byqnq/Bvfl+pmnPrjbT950ua/T7df8bv
+	Ujdk4iOXoGkZEXbCCmKugTN0HVkNWNBhBW/42Fq2kbM3XFjIBl8WMjX+60a4P4d91br/ETmog4b
+	vjg/ExQ9murK09eNn6Qnkn5GnejTGncQuR+M3gpQhc46m8BYhRChBljFerHaSiDxGrUGdguTuQA
+	aHLWpZ4U65B4X9dCk9T2iC9/kGz2dUbiYZLLwrJOfVifmefB4fTyXSMDOCoszvCU8U+Pp295g5y
+	pgewbmuKvRFi/Yicd6gNvKENGHVEYT1FYiPDvFyZgkph7EijYnXkSXtcQzdQ/ICpq0KVoDwWGOg
+	4F5DQQF6dtvK4TeMdIt6VlLNkHELSx4jaugdGs+OIdBdbhn0H1ys0ClqZ/VkSpqOuPdODjdJaDj
+	lKbVgKED2nQOY=
+X-Received: by 2002:a05:600c:b99:b0:480:1e40:3d2 with SMTP id 5b1f17b1804b1-482db49a4a6mr185536155e9.29.1770062662900;
+        Mon, 02 Feb 2026 12:04:22 -0800 (PST)
 Received: from nas.local ([2001:912:1ac0:1e00:c662:37ff:fe09:93df])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbd3953esm120842955e9.4.2026.02.02.12.04.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbd3953esm120842955e9.4.2026.02.02.12.04.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 12:04:20 -0800 (PST)
+        Mon, 02 Feb 2026 12:04:22 -0800 (PST)
 From: Damien Dejean <dam.dejean@gmail.com>
 To: andrew@lunn.ch,
 	krzk+dt@kernel.org,
@@ -86,10 +88,12 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	hkallweit1@gmail.com,
 	Damien Dejean <dam.dejean@gmail.com>
-Subject: [PATCH v5 1/4] dt-bindings: net: ethernet-phy: add property enet-phy-lane-order
-Date: Mon,  2 Feb 2026 21:04:08 +0100
-Message-ID: <20260202200411.373161-1-dam.dejean@gmail.com>
+Subject: [PATCH v5 2/4] net: phy: realtek: add RTL8224 pair order support
+Date: Mon,  2 Feb 2026 21:04:09 +0100
+Message-ID: <20260202200411.373161-2-dam.dejean@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260202200411.373161-1-dam.dejean@gmail.com>
+References: <20260202200411.373161-1-dam.dejean@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,7 +107,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -113,10 +117,10 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255999-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256000-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[damdejean@gmail.com,netdev@vger.kernel.org];
@@ -127,40 +131,122 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 28D39D0F19
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9C6EFD0E82
 X-Rspamd-Action: no action
 
-Add property enet-phy-lane-order to the device tree bindings to define
-the lane order of the PHY. To simplify PCB design some manufacturers
-allow to wire the pairs in a reverse order, and change the order in
-software.
+The RTL8224 has a register to configure a pair swap (from ABCD order to
+DCBA) providing PCB designers more flexbility when wiring the chip. The
+swap parameter has to be set correctly for each of the 4 ports before
+the chip can detect a link.
 
-The property can be set to 0 to force the normal lane order (ABCD), or 1
-to force the reverse lane order (DCBA).
+After a reset, this register is (unfortunately) left in a random state,
+thus it has to be initialized. On most of the devices the bootloader
+does it once for all and we can rely on the value set, on some other it
+is not and the kernel has to do it.
+
+The MDI pair swap can be set in the device tree using the property
+enet-phy-lane-order. The property is set to 0 to keep the default order
+(ABCD), or 1 to reverse the pairs (DCBA).
 
 Signed-off-by: Damien Dejean <dam.dejean@gmail.com>
 ---
- Documentation/devicetree/bindings/net/ethernet-phy.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/phy/realtek/Kconfig        |  1 +
+ drivers/net/phy/realtek/realtek_main.c | 55 ++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-index 58634fee9fc4..8347d4e134d2 100644
---- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-@@ -126,6 +126,12 @@ properties:
-       e.g. wrong bootstrap configuration caused by issues in PCB
-       layout design.
+diff --git a/drivers/net/phy/realtek/Kconfig b/drivers/net/phy/realtek/Kconfig
+index b05c2a1e9024..a741b34d193e 100644
+--- a/drivers/net/phy/realtek/Kconfig
++++ b/drivers/net/phy/realtek/Kconfig
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config REALTEK_PHY
+ 	tristate "Realtek PHYs"
++	select PHY_PACKAGE
+ 	help
+ 	  Currently supports RTL821x/RTL822x and fast ethernet PHYs
  
-+  enet-phy-lane-order:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    enum: [0, 1]
-+    description:
-+      For normal (0) or reverse (1) order of the pairs (ABCD -> DCBA).
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 75565fbdbf6d..85e928a0d3dc 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -171,6 +171,8 @@
+ 
+ #define RTL8224_SRAM_RTCT_LEN(pair)		(0x8028 + (pair) * 4)
+ 
++#define RTL8224_VND1_MDI_PAIR_SWAP		0xa90
 +
-   eee-broken-100tx:
-     $ref: /schemas/types.yaml#/definitions/flag
-     description:
+ #define RTL8366RB_POWER_SAVE			0x15
+ #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+ 
+@@ -1820,6 +1822,57 @@ static int rtl8224_cable_test_get_status(struct phy_device *phydev, bool *finish
+ 	return rtl8224_cable_test_report(phydev, finished);
+ }
+ 
++static int rtl8224_mdi_config_order(struct phy_device *phydev)
++{
++	struct device_node *np = phydev->mdio.dev.of_node;
++	u8 port_offset = phydev->mdio.addr & 3;
++	u32 order = 0;
++	int ret, val;
++
++	ret = of_property_read_u32(np, "enet-phy-lane-order", &order);
++
++	/* Do nothing in case the property is not present */
++	if (ret == -EINVAL)
++		return 0;
++
++	if (ret)
++		return ret;
++
++	if (order & ~1)
++		return -EINVAL;
++
++	phy_lock_mdio_bus(phydev);
++	val = __phy_package_read_mmd(phydev, 0, MDIO_MMD_VEND1,
++				     RTL8224_VND1_MDI_PAIR_SWAP);
++	if (val < 0) {
++		ret = val;
++		goto exit;
++	}
++
++	if (order)
++		val |= (1 << port_offset);
++	else
++		val &= ~(1 << port_offset);
++
++	ret = __phy_package_write_mmd(phydev, 0, MDIO_MMD_VEND1,
++				      RTL8224_VND1_MDI_PAIR_SWAP, val);
++exit:
++	phy_unlock_mdio_bus(phydev);
++	return ret;
++}
++
++static int rtl8224_config_init(struct phy_device *phydev)
++{
++	return rtl8224_mdi_config_order(phydev);
++}
++
++static int rtl8224_probe(struct phy_device *phydev)
++{
++	/* Chip exposes 4 ports, join all of them in the same package */
++	return devm_phy_package_join(&phydev->mdio.dev, phydev,
++				     phydev->mdio.addr & ~3, 0);
++}
++
+ static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
+ {
+ 	int val;
+@@ -2392,6 +2445,8 @@ static struct phy_driver realtek_drvs[] = {
+ 		PHY_ID_MATCH_EXACT(0x001ccad0),
+ 		.name		= "RTL8224 2.5Gbps PHY",
+ 		.flags		= PHY_POLL_CABLE_TEST,
++		.probe		= rtl8224_probe,
++		.config_init	= rtl8224_config_init,
+ 		.get_features	= rtl822x_c45_get_features,
+ 		.config_aneg	= rtl822x_c45_config_aneg,
+ 		.read_status	= rtl822x_c45_read_status,
 -- 
 2.47.3
 
