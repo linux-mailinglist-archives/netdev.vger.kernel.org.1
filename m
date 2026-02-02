@@ -1,258 +1,222 @@
-Return-Path: <netdev+bounces-255907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255908-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHgwBz3GgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255907-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:43:57 +0100
+	id YEiGA2TGgGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255908-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:44:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62B1DCE63B
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E431CE649
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC92B308734D
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:35:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 198E4301952A
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8992A23FC54;
-	Mon,  2 Feb 2026 15:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C6C36C0B2;
+	Mon,  2 Feb 2026 15:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SnFVY670"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="eeuV9jVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013059.outbound.protection.outlook.com [40.93.201.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0074E23D7FC;
-	Mon,  2 Feb 2026 15:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770046549; cv=none; b=evF+ocHcvbGGrwx2GfKAyMQjB2JLeayKq1rw8YP0XPxMeaPM8G/OYgBQUW99LpmzRBRW3XojpLs4TRXNtl7vsgQqew81cV9ioSjVpgLWd0ByO1esNGlkBL5t+CKAW6LfYH9ZsSLvp/y/7wv3WCOkMV4nhNuk7vaJjZNr1gK2flM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770046549; c=relaxed/simple;
-	bh=JSV3GkPQFWTvQDoMtc9vQalyIuWccRoO2J2Vlt7ee8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o8ZPDJPS0PVvDsmkmNcmyei0m3am27ChDJT/PxZUTEy+TVPflokiFyWefLIv1RxxEmVUc9OurvyUcUyQEYwv90IfQyNlwPGIDi6rdkJ5TMFBBgevq2wT8lZLvLu84Nvb3qjYK35w9GTfvQk10rSsnTtexrR4bxz4i6PIOYMGyRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SnFVY670; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 612ERMpu006538;
-	Mon, 2 Feb 2026 15:35:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+bNH8c
-	8azHGqltgCQV3/8XTF0YASLgikDm2nMiipNE0=; b=SnFVY670H9s5+S5EEGaSvA
-	CA8aR30PKPcVrhbD4iqSwtfqioebXcchmCOJ1b7ZkHbvkuG3sg34fwTr5VGdhAxH
-	7nVNu/+iMgBqVDWRxMdR3lSaa69Xg66AAvOZMh4nlodjrPHGxR+AsQq046cj7x8N
-	eWnnC3sqR+h7By4oKImBDvWluZTQDy4uJXtQBdpKEp3RB6/OJ2skB0tfHQ/T3lCl
-	y0ga7OXZRQTIqzz8HL/I4rt+dK7MS80x5rS1MhbuaKW+4gkNCM20ubi6fxJwM3zN
-	Fy6kInoqaM/9kbY+PcmVtiYnw5WqMIutP0UyBGptCnW6xOPKe/3aopxXgEo4X/YQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c185gqmub-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Feb 2026 15:35:34 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 612FZYXC026409;
-	Mon, 2 Feb 2026 15:35:34 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c185gqmu6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Feb 2026 15:35:34 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 612FA3iu005938;
-	Mon, 2 Feb 2026 15:35:33 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c1x9j5c6v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Feb 2026 15:35:33 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 612FZVAB30081728
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 2 Feb 2026 15:35:31 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 85D862004B;
-	Mon,  2 Feb 2026 15:35:31 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 566EC20040;
-	Mon,  2 Feb 2026 15:35:31 +0000 (GMT)
-Received: from [9.52.217.119] (unknown [9.52.217.119])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  2 Feb 2026 15:35:31 +0000 (GMT)
-Message-ID: <2ddf6abd-d10c-4d75-8f84-0fd1ccb5435c@linux.ibm.com>
-Date: Mon, 2 Feb 2026 16:35:31 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5515023717F;
+	Mon,  2 Feb 2026 15:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770046573; cv=fail; b=Xhzt/Nz+jNN4W3VZTD8h2lMukj1h9K0kc7G0hk4YCKF0JN3Dj8jN2g/vBXsL8X+fxPYE3OPNIH8mTrR/V0gIgyIaV7FgFkZ10K+F4CP4jsdnpxTf1a8rT0+fDPiWqKfGlSd/dlBsUe0Hj3qnsygn+z958RBrJifHCIlKBHZRMbA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770046573; c=relaxed/simple;
+	bh=fOI1TPxHZyAoVJB4QxKVxVdYqoOo6FCEEK+5qXVPIBM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tcrHkXgqsjZycQZ7OGpdEBpvnsMBJoKo0LZ1+Bj6usro3lFIsQMTqmbjyc9aDUrDzbJsCsqLsZtaevvmOQFsz64PiWZkyw1rS8BqBrAepKWPsLebRwyQPF/bVK1bKC3ySbf3YWTzDAZ1dG5ECJWbYlTM3jkLQMa0OWvEYypHr+s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=eeuV9jVf; arc=fail smtp.client-ip=40.93.201.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hW0iq4Mqg5goNVnAO3ZzQDTlJXBvs1P4Em3UjnrNlg5YNyZSxzupeeH/qAP6f56Fb+lxRJcMQtXIvOAGqXluM0XG/L2ldj//OYleVkutBoE0oLrFswsWGt+kMs/3DXZ5rK/1E5i8AV9MPWCsRJYuIiW5UplpMDbwfQZ4v72e3+00U4L6EltmVNLA1x3d1WBK2B2b3BVjnOsHNbO+2ekPmGVFfB7CEUYlRf+C7PaPa/RUQohTLjtNojnAbzJIfMUCXvqPys6GJRlwxd+7SkJJbww0aFhk/QWmYjWDz35CmcLomm9PUSOD6tlqcopZARJ/vtS+lpJHWfxizrfdAFTZxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qat5/FBe71DRQLVYLFMMtYrdkKaEpK60l9eYzQAFkh8=;
+ b=XoWpwPjO4rlbVuwu7YDi3+Vno97j7ZhH+WrbFgpjMn/Bs/qNhptJzt+utsCBHWreiJzZoxiwTm0sqXREZDQtiald8rPpDiLUkfZ/9exmzLHcomelKDN0ZpBUx4l5YJjx4HYrTTjDrJQFcC8qd0s4TKtj2u7L3sW4E+ikNNepuovexckercoMCvMMZRGjlVwUhMMLx8vGMdP7OS890Gufa6gTGJNFA19lt40aajX509i5O7V0SGRQsBfAEp1yilQsDk949RomVf+OC0C9Wm4MtI6NBKiyNRB/cSXAdpcf1haN5yKKmak7Ww1kUl99p3ZsLN/iSebLVjc3yWmQWlL8DQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qat5/FBe71DRQLVYLFMMtYrdkKaEpK60l9eYzQAFkh8=;
+ b=eeuV9jVfO9oxyhD7HdQkHjjAuaRNRjtyyxdP9UTs1xFw6/t0zyfcnYg/h3gV8oeUTZCjH5ysp48l8gQrmweaqz+Vk+XeEtG+QmLNKwoP6TGt9W/vvhH9d6t8OYv9KSGD7JY/eMUD0zVqpweZ7r8Qc79lT2jnIAdAn/R2/QPEJKc=
+Received: from BN9PR03CA0550.namprd03.prod.outlook.com (2603:10b6:408:138::15)
+ by DS0PR12MB7559.namprd12.prod.outlook.com (2603:10b6:8:134::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Mon, 2 Feb
+ 2026 15:36:07 +0000
+Received: from BN3PEPF0000B075.namprd04.prod.outlook.com
+ (2603:10b6:408:138:cafe::6) by BN9PR03CA0550.outlook.office365.com
+ (2603:10b6:408:138::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.16 via Frontend Transport; Mon,
+ 2 Feb 2026 15:36:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BN3PEPF0000B075.mail.protection.outlook.com (10.167.243.120) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9587.10 via Frontend Transport; Mon, 2 Feb 2026 15:36:07 +0000
+Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Feb
+ 2026 09:36:04 -0600
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <horms@kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
+	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<linux-kernel@vger.kernel.org>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
+	<Raju.Rangoju@amd.com>
+Subject: [PATCH 0/3] net: amd-xgbe: add ARP offload and RSS self-tests
+Date: Mon, 2 Feb 2026 21:05:39 +0530
+Message-ID: <20260202153542.1727429-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] net/iucv: clean up iucv kernel-doc warnings
-To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
-Cc: Thorsten Winkler <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20260201072309.222155-1-rdunlap@infradead.org>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20260201072309.222155-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=UdxciaSN c=1 sm=1 tr=0 ts=6980c446 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=JfrnYn6hAAAA:8 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=J1Y8HTJGAAAA:8
- a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=870lcERhYe6XzqJw7_QA:9 a=QEXdDO2ut3YA:10
- a=1CNFftbPRP8L7MoqJWF3:22 a=y1Q9-5lHfBjTkpIzbSAN:22
-X-Proofpoint-GUID: eYdBFQ2MAJ_pblbNvaBPYQJY-0S9WFLx
-X-Proofpoint-ORIG-GUID: r-y7vermKIigoHM0DSEUBBdDhV2CK284
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDEyMSBTYWx0ZWRfX/9qiXIyf3Dze
- tLf7RiqJ+EVCIrJN6o21BTgnZyWh9VKLi0aBKd0fIJOTIj5PK6QLMA63JMyUn+Nb9uD3ChxjSsP
- W+twnyfbHebOODtHGgTGsRheFQA0/2d7NcOBGhnK+0SbT1xDSOa5BdLUHIpP8X2Z3UmV22oAk6X
- sgtbe87mryUl39QyBDrYM3rMXT5/cVcMkSgJLvcWMeAyzWD81T3acFT17Sk5Xc8F+WyT3QtJyaW
- yUhXavCTQZ4IPBQfX7+O820UrFIDJyyaavV/jsaE5tDBu7J4W/X77GrqyBKsfuimrXQBmUhIaZu
- CIkEdZiiO6eTiQsVmMGjYbZyP+N4djx2BBnPyUY6l/iEqH4lgmXJycWeUrOr1V/paH0c41R8IGo
- wXKq7A+glToNlq8ZJCb8pdfSqilINMYd3gtKkJVDJrhnWtnuDu7aMX7CWF9pQLR+TAQuVDWaEw+
- bcCPm3myXd7OxaOh1Hw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-02_04,2026-01-30_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 impostorscore=0 lowpriorityscore=0
- suspectscore=0 clxscore=1011 bulkscore=0 spamscore=0 phishscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2602020121
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B075:EE_|DS0PR12MB7559:EE_
+X-MS-Office365-Filtering-Correlation-Id: b071980b-bff6-46a5-3140-08de6270c867
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/XDf1jLI2sO31qZzxUvUe/t0g/AKrbKEkDUOUnbJ0R+LrR2qoY5ZgpeN0+eP?=
+ =?us-ascii?Q?IFOwnaJ92n0Tv+dJEu7j5EPX+egnvfhReD+Ou8wy4Cgs2X7GIKQU5cwDPEsU?=
+ =?us-ascii?Q?8TDxS/q2/XhLcJ+BwO2GzhlbJdZ/La6QnHvHOQpqGoynxdS1luScxc+JsXgz?=
+ =?us-ascii?Q?ZZAuhtBn4rQstIBjh+M2Af87m7IjQfcJSpIeeIPALftWmqJ2nGAXzRWQiMch?=
+ =?us-ascii?Q?WMIsYqKCC4jl9AZWbbqFHlJ/jU1Z8UpsAco5YtRrED3GMuvq4ZEMDHzbCVm6?=
+ =?us-ascii?Q?hS+slckGNQpPQGaav8ws/E29XGGblvtlmC/F8o5zPkAiOIp840arnFR2vAKo?=
+ =?us-ascii?Q?XGrvtz5N6tk3cUfW5rNVAS4lr/ddozbLj9dTZXxBUZbJdICwSRshxF3tvnWq?=
+ =?us-ascii?Q?A+30vRtEfMRLVVnlqO6Z7t5+0UsHlRsioBN8nI/Gxy7839+Splmk+MrFpAkI?=
+ =?us-ascii?Q?Tt0NhCwUxFKKXIEeGisuvuEe7BykuKXOVOQ0DUGM+uU29qrA5kgoXmVec7mf?=
+ =?us-ascii?Q?TTnhn89wU3ktXDSopnwFGYErUAkLkLhPUd8gNgomVUjJ0YQHKHhGQAxGjF2c?=
+ =?us-ascii?Q?wGM4LOBX1Es2fPKJS0iLZqpPRKNGKBD6E9apCCSi8fP6B+/Q62HWmbA4e4C+?=
+ =?us-ascii?Q?ossPMvhsKp1YnfnKp/tyvDYcBMHVrYXkDXCp9PGLKS5Zbn5utcUiL1pd8ceF?=
+ =?us-ascii?Q?ICe7MZ04qPaNsTLMYXfB7q+EgwZB49LEIW1MKv5kEDoWsxGR8WTE04Oc6ROJ?=
+ =?us-ascii?Q?KtGLEBMiCEYNaG7Zbko8Jta9AsZaTWxTjyGtxKHTQVUfJW7Q0Dq07+jBcI1O?=
+ =?us-ascii?Q?P8/c086WLB7buslsbMR1fLrCwSR49nnm/dyw95xTmxP7WjKdSgSN6ZpR8vf1?=
+ =?us-ascii?Q?G8QC+8/tsJjAnaQXaosCri80lRarFU8GmVjbYtp/lO0ImZXawN7uYNL2ziLj?=
+ =?us-ascii?Q?/gIVW519Af/ogt6tXIhkjd4uYbZjyK2jSB6sFXmWpkcSdQ5RpgAC10sXkMhM?=
+ =?us-ascii?Q?oUYX7FvUeuFl4d32Xrk3aRYR6vmQnVlsvAsHXzJPHc9K/YMaI9FYmdCO73dz?=
+ =?us-ascii?Q?/1qfaezu7glUsER4WKuZEgR4fTcJ++47p7xu1Kga8h8kvTJeZpHjGcOFcnhu?=
+ =?us-ascii?Q?KpCKWvKSQWBna7l3V4qliDLcbN1vkTTaea0TGGXe9EfpMVYRf4VHLdakuvR+?=
+ =?us-ascii?Q?HtsjZrVahsUBByDH4PLiq5F33DRSZvVgzHlZDUwcGfDM9jL31HoDMlOYQuS6?=
+ =?us-ascii?Q?qhMl18fYYc/WEMZMzCp9zXY6eVLa2GDG8JSYH1HCS0WSoI2iq09l8GDlwvXL?=
+ =?us-ascii?Q?WwyYxZ9zOGoYTUo1ePEXSOOzu46IfW7TNgoR3i7BxhGlYpacIjrKhHM5sZNT?=
+ =?us-ascii?Q?Z0K4zoAy69V+aRe59qqERyYMksSLiihM+OZCKXIidOppFAnwYZ1f64JoX2sr?=
+ =?us-ascii?Q?XYfENxgX0Bf7JzVGFDrBQUVzJSu2G/9ZQmTg1b5GrgZ8Ec50+mY0bU+t1ag/?=
+ =?us-ascii?Q?825KhSEz83OldhUf2k9CO5dhkrJG+HNBuZ2fs+1QohuxXF2rcRfw2k2HyG/h?=
+ =?us-ascii?Q?wd3MvLRO/f6tmiyawelB38/Eq4Cehn1uakwYNeoKCCr23/Oahe/s5jUZbJoL?=
+ =?us-ascii?Q?0yjHsWFgadtSXqIDRWn4Of51LejsDsqpbOZK96i35zW5v534hcZfGLhLgmhI?=
+ =?us-ascii?Q?TYSrnQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	91XvwyzyiK61K7dZkmvqo6qDrJd0khIHQht/q74U5hYa8SYpAozC8txl37ggTXkLt2nchMZhHSCMdnBaMm7Asg53X8h7Jq6Z1y5jP3nPMGV+FV/l8fyXWSjmPM3tFQK1hmHYjQzrpWuLllZHUleEXVRrV4S3JgLIowDe0dLhGCeFmiIBK7kNKsxlC7/6smTodRM3XRSXdRZ46POjpUEPdOdpobqZMTNQZR0gPH8qz6LAsA7/RPGYSjw7kZR6MT1l/qRvLelYL7euVAVhrx2pck1PErvndKicVds6Gneb7oqJl/uPMX7ova6A+rhthi0FhiYvqWbiJELZmWEZRtRga6q5gHW6MlMKWhSUETB+Ivkg2iRKzlNPoaSiscybfT40duVK/iU9w1Km6oUxb9PMfV4t9ZXDV50542wJyA2yhEaxrzpyQRBaP7u6CYbq+sxW
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2026 15:36:07.0838
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b071980b-bff6-46a5-3140-08de6270c867
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B075.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7559
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255907-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255908-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWELVE(0.00)[13];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 62B1DCE63B
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 5E431CE649
 X-Rspamd-Action: no action
 
+This series adds ARP offload support and ethtool self-tests for the
+AMD XGBE 10 Gigabit Ethernet driver.
 
+Patch 1 adds hardware ARP offload functionality that allows the MAC
+to automatically respond to ARP requests without CPU intervention,
+reducing system latency and power consumption during suspend/resume
+and normal operation.
 
-On 01.02.26 08:23, Randy Dunlap wrote:
-> Fix numerous (many) kernel-doc warnings in iucv.[ch]:
-> 
-> - remove kernel-doc on static functions in iucv.c
-> - convert function documentation comments to a common (kernel-doc) look,
->   even for static functions (without "/**")
-> - use matching parameter and parameter description names
-> 
-> Examples:
-> 
-> Warning: include/net/iucv/iucv.h:210 missing initial short description
->  on line: * iucv_unregister
-> Warning: include/net/iucv/iucv.h:216 function parameter 'handle' not
->  described in 'iucv_unregister'
-> Warning: include/net/iucv/iucv.h:467 function parameter 'answer' not
->  described in 'iucv_message_send2way'
-> Warning: net/iucv/iucv.c:727 missing initial short description on line:
->  * iucv_cleanup_queue
-> 
-> Build-tested with both "make htmldocs" and "make ARCH=s390 defconfig all".
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
+Patches 2 and 3 add ethtool self-tests for ARP offload and RSS
+functionality respectively, allowing users to verify these hardware
+features are working correctly via 'ethtool -t <interface>'.
 
-Thank you very much for your effort Randy.
-FYI: I had to use 'scripts/kernel-doc.py -none -Wall include/net/iucv/*' to see the warnings.
+The tests are integrated into the existing XGBE self-test framework
+that already includes MAC loopback, PHY loopback, split header, and
+jumbo frame tests.
 
+Test results example:
+  $ ethtool -t eth0
+  The test result is PASS
+  The test extra info:
+  MAC Loopback       0
+  PHY Loopback       0
+  Split Header       0
+  Jumbo Frame        0
+  ARP Offload        0
+  RSS                0
 
+Raju Rangoju (3):
+  net: amd-xgbe: add hardware ARP offload support
+  net: amd-xgbe: add ARP offload ethtool self-test
+  net: amd-xgbe: add RSS ethtool self-test
 
-> v2:
-> - correct verbs in descriptions of 2 functions (Jakub)
-> - removed duplicate kernel-doc comments from the header file (Jakub)
-> 
-> Cc: Alexandra Winter <wintera@linux.ibm.com>
-> Cc: Thorsten Winkler <twinkler@linux.ibm.com>
-> Cc: linux-s390@vger.kernel.org
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> 
->  include/net/iucv/iucv.h |  209 ------------------------------
->  net/iucv/iucv.c         |  259 ++++++++++++++++++--------------------
->  2 files changed, 128 insertions(+), 340 deletions(-)
-> 
-> --- linux-next-20260130.orig/include/net/iucv/iucv.h
-> +++ linux-next-20260130/include/net/iucv/iucv.h
-> @@ -70,7 +70,7 @@
->  #define IUCV_IPLOCAL	0x01
->  
->  /*
-> - * iucv_array : Defines buffer array.
-> + * iucv_array - Defines buffer array.
+ drivers/net/ethernet/amd/xgbe/xgbe-common.h   |   3 +
+ drivers/net/ethernet/amd/xgbe/xgbe-dev.c      |  24 +++
+ drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 149 ++++++++++++++++++
+ drivers/net/ethernet/amd/xgbe/xgbe.h          |   4 +
+ include/net/selftests.h                       |   1 +
+ 5 files changed, 181 insertions(+)
 
-Did that create a kernel doc warning? It's a struct, not a function.
-I propose
-+ * struct iucv_array
-like other structs in this file.
-
-[...]
-
-> @@ -757,13 +742,12 @@ static void iucv_cleanup_queue(void)
->  }
->
->  /**
-> - * iucv_register:
-> + * iucv_register - Registers a driver with IUCV.
-> + *
->   * @handler: address of iucv handler structure
->   * @smp: != 0 indicates that the handler can deal with out of order messages
->   *
-> - * Registers a driver with IUCV.
-> - *
-> - * Returns 0 on success, -ENOMEM if the memory allocation for the pathid
-> + * Returns: 0 on success, -ENOMEM if the memory allocation for the pathid
->   * table failed, or -EIO if IUCV_DECLARE_BUFFER failed on all cpus.
->   */
->  int iucv_register(struct iucv_handler *handler, int smp)
-
-Before this one, you changed /** to /*
-after this one you left /**
-That's a bit inconsistent.
-
-
-
-
-
-All the fixes look good to me. And they get rid of the mentioned warnings.
-I appreciate your approach to use the existing wording, though it may not
-be according to the latest style guidelines.
-
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-
-
-
-
-
+-- 
+2.34.1
 
 
