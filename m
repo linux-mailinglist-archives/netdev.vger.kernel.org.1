@@ -1,220 +1,177 @@
-Return-Path: <netdev+bounces-255955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MH7jDsjagGnMBwMAu9opvQ
-	(envelope-from <netdev+bounces-255955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:11:36 +0100
+	id qPOlGFXcgGnMBwMAu9opvQ
+	(envelope-from <netdev+bounces-255956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:18:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87D6DCF69E
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:11:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B85DCF7DB
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7E2B3019538
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:11:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6E6D43002910
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C9C37F748;
-	Mon,  2 Feb 2026 17:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621353815EF;
+	Mon,  2 Feb 2026 17:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kXdbngpt";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Tp0fZXrQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hr+l1ifk"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A85223705
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770052288; cv=none; b=gRMyiaYa0pRpKqYByVvkb58qgdkbgwA/FFtyXrmuB/Tdj3nxDI7Pdb00fTvsVDlq5KmY281AyTZj1brxSlhlK/uEagXeD2fskTWcEQdR/kWIG6bvWgrmV44uKDQPoiiDA6LrcukSQfi35bosqHk2jlIDW4bG8oueepukwHP8tvg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770052288; c=relaxed/simple;
-	bh=8qEr4+1VWnQSWbxPPevstOON1lzFS4aCMI7EJNXyQ9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CFHFDTO4+Atpm43KN7c0unR/OYtYBWcoaMT6jYLdb9vE+V8q4HWrcuFVxA2wwvA6qHpcjBL2DRKdxS9VDk7BtTQLjnZy7IU4x7uw7zWIFurEyykt+IFS5CaLY2C3V8wat+D+BQoM3WK2uaoIDMzuEMGInvFBO9jCw0uWc0V2ks0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kXdbngpt; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Tp0fZXrQ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 2 Feb 2026 18:11:23 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770052285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JLdsYJbOnOhJ2Z0r76q/Y+OjJwnvYYdSVfTg6jw2pWg=;
-	b=kXdbngpt53lh1dqzrfwIPZv0gnSn4Sg5OC6zzAha6Me5VUojOCcbLcTFg25Ap/oSQ8vlBa
-	PwtNu/RWhGZ5YrIXENkfFQA2Bs1t7P8215BhLilSA88pPEAg3kb7GggcQMEOKQuVxjfMDR
-	wTDXIl27nAY1+5GeRjkmNtXdM6TT2sct4XNuai59aA0ROBAT7C191b+sopnoUBIekSxhlz
-	XGr9MCIweBrSOnmnUvoDCdUuIJvxZuouVmx6sj4BVkkX5jTRQUf7eXnxuFzY98k/x38md3
-	z9B9OEjRKsdsVqqgfeadwSGJ5e15gN0yBzRU55XDmitkuHIhkDXbYArFj4Fgwg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770052285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JLdsYJbOnOhJ2Z0r76q/Y+OjJwnvYYdSVfTg6jw2pWg=;
-	b=Tp0fZXrQEkxV/iq/OvjMbeMt6Eq3uebtGgxUuCdH71aacH9x5MzvO26y6BqzH3yrvh1Z3T
-	PfWdlVfXpAaeK0CQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
-	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net,
-	Yoann Congal <yoann.congal@smile.fr>
-Subject: Re: [PATCH net-next v2 6/9] hsr: Implement more robust duplicate
- discard for HSR
-Message-ID: <20260202171123.LkzpiAMv@linutronix.de>
-References: <cover.1769093335.git.fmaurer@redhat.com>
- <07b90a435ed7d3450c1949e3a21910916d8538de.1769093335.git.fmaurer@redhat.com>
- <20260129144348.CIs44m-d@linutronix.de>
- <aXuIAFJ_m6gMUFFO@thinkpad>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058D2239086
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770052301; cv=pass; b=DSD6mwuvS3rkJkUWKcq+FAKGb51Teu2iRhW9N+DoSnkzU/RP2zA2EiNceoscUj8LtnnNL5I1ZXXh4vvDKgLdwl3Krmf8qenwMWr9gcHw+omL3aSgb2LUrSZ/Tvs3xPm8bjmtuPHP28Vs06MaT2O/PkMsPt8oYgFVBdbee0qAd/M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770052301; c=relaxed/simple;
+	bh=5tdaA9mbInyE7lSzXuoItIXNxRipUEMsM2MOyx9QNDs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VbqTg9LXZXiUBk1zB1hO8CtoUMNinD3HKAe/uSFHRv7H/W8yKxOhHQIRQxojy7Nbf80NshPeZtQ8uMUwhSdTyioZOxlfNTcPdDYQOFzJm/6fDqdAWSeTBkQLa55vK0CEBwG8J8K4JOAWVu4CFi0bYbvHv1a40uNijb/qHSDWWp0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hr+l1ifk; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50145d27b4cso51676641cf.2
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 09:11:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770052299; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AApZ4aqViW/jsrLeG1Y3Loph/CnvTVhLMEPfDpWst86lCmfaBgO/QaH2PeZ+tuUH8N
+         MqLl336uge27qOzRMjJcQ3UofDPQWCUh+SygPFFQKA9mfNu5bGdv0rqOzAbkE4wAVHfe
+         WMtT+11v4bvM3LBnAHXPv2ZRAK4/puiprtY9IOy7qxGsiOQPS0twcQMQHrze0JQT20gq
+         fdjKW89eq7HP9OqtlyiDlZ7AHS7tzubAB0IA6O8fCkzvXqsqooJmnBFmYl3VACGmIoZj
+         SLUpR5G17oLzePSVJqBiOwKMI9S6+fyfO74yuySaX3nuVLegbS3yQ3EfUPTTJ7O6SC0u
+         +4Lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cfJX/aRPoy6PZQ1T5RXrd9yoDPla7R52CDpMZ5aJtzs=;
+        fh=9sJ8AfartyeKYNj52yTscbQ9vjiGyOn8TBRIlD8bJKs=;
+        b=jJE+/37wIRbAjR+RU5PYT1YyuccjCRMwyROXcmqJbS5OJ34HiYrFG9EX6QqfQ+Jnia
+         9avqFtuAMCrnorYalnwz6q1rR4nDm+7vounbdYCqrOGxeer58qgYFBCmy0770utNSzcb
+         u5A0oijDcKOVE9soj73MBr6g/yKE3OEEzzzJhfhaaMM9tGWFFdmQx5Y2V9dbsohnpOiH
+         JG8LspqMc99dwpocY9nveEQtOP7GZ1D+pGoid7iGpgXJGNfBt3lYohotIlWqp4UHWmaE
+         9XpY38dE0bAVxUm/5/gfstLWyzp8qs4ckZ0qPd/V5JTJ4i7m6mglLj82jxgCA956hrQY
+         UtYw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770052299; x=1770657099; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cfJX/aRPoy6PZQ1T5RXrd9yoDPla7R52CDpMZ5aJtzs=;
+        b=hr+l1ifk/P+52mrSn6zz12nZkfISuELGcCJrvFqr8lcZN53AXZ+hjn6hRYqfJ3sjKk
+         REDVvOcmlSYZXfHbHGIHXU213rIgP11u1mseMW+poP/D14jTLQfRPuP5HXmmYw+L6p73
+         MnSwMuxRRoHssZjFoYLx0paPC4Gr7l8x/qT6wJ/aLXgDQ2eARgIrEyBW9PxwffWqQC7R
+         vScDgPCucXRvNF0/U8WxBv9RFG5CJy2F2r3A7e4KhP8N3JBGRK+rnkMaFJYJBbNGLMpE
+         NV8kzorhDGbUgjFvQnnD1c9aMRqO5G6uoCQubuv3SWZvEVSt/o9dWPg/zmLCxr/tI0r3
+         t/Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770052299; x=1770657099;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cfJX/aRPoy6PZQ1T5RXrd9yoDPla7R52CDpMZ5aJtzs=;
+        b=XOe+ppuKFkxSkfa/fZJr/cBAz4tzUl4zBUBof3lDthvOF2BDlNF0Wy/fz5udjQZCWY
+         bEHeyJ0juEq8Lg6r1CzikzMEuzhujTlHni9OnqPlWY9AkPUa1G2QZ4awUVJM6HK1pGUh
+         2uYU/vLLXSlBk64X+MDChtujc8jDP0vALvX1zOvG3AwdPnAiZwLl3COxI0SJPMr6biPu
+         J5jW6XXTOcs/BAJQ+vEZkznRyzEpScH3OM/ahKZIVWxcmsLECppAYgCFwbMuUdofPXcA
+         A0pCas+5drd4M5C44mXbGEmgwNUdgRG2WRKa1vZgTBFR0utH+KBKsSBaco08FgUSr4sy
+         Nesg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjum4a/DaW511Wom2XJjiRzHWBPEExpgEohRM9uhXgxA7GcfrQIgmUf3e72k+rEJ8bpBEMLNA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI8abU9hRxDtE2OP/loH4dN1u/7TE9gDoEPFgIcnQR+SpUTvF7
+	7/4M+icY2K7X+AJNhLccXXY7EPSzO8XkY85TOru0Ti49tfTmpLJufAQVUcmbOi4pCNBpmkZqeOa
+	FSNZnHk6wu5O9sUtPnQpBKHGQUajiJxUz62RpGGQ/
+X-Gm-Gg: AZuq6aJ3l88flKXEUY9VfhxErPsg2HVOVz8LAegy/ZSv5WkbUTIljlf+YJlygMizUo8
+	FI5kgZIiEsnkumWtRByBNoawD0i2cktqSqI2z4QDCCj00qx2zOHJA3gOeh6OEcQNWRA3xIXo/2s
+	EJfaXQ9iNY+k7yb9hgj86mi59DsoygqEDuBUddDTlTRkzmLClIsfO7SeYJ0gWbi5/nzXdTRxS/7
+	mSD5GRm9dlhaCJB+nDtkGTUCIGXw/6E93QXp6j9kao2WHiHA23hqMdU+ZW7pCE/gkie1yU=
+X-Received: by 2002:a05:622a:282:b0:501:4807:6162 with SMTP id
+ d75a77b69052e-505d2297becmr154490271cf.72.1770052298513; Mon, 02 Feb 2026
+ 09:11:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
+ <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
+ <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com>
+ <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
+ <CACwEKLp42TwpK_3FEp85bq81eA1zg3777guNMonW9cm2i7aN2Q@mail.gmail.com>
+ <CAA3_Gnqo37RxLi2McF0=oRPZSw_P3Kya_3m3JBA2s6c0vaf5sw@mail.gmail.com>
+ <CANn89iL8FnPG9bD6zW0eHmeSNzc33SJgrUR7Aab4PFG-O4nfTw@mail.gmail.com>
+ <CAA3_GnpijQeBNVOqy6QtUMDjhy_ku_b54uf30zfEq=etMTqKrA@mail.gmail.com>
+ <CANn89iK-Ojmi4kCZwXhFq-pG5PacLs=m71Jtw4zRpxaPEbJdhg@mail.gmail.com> <CAA3_GnpJ-RV=1xaf4DKRd30RgH0HoAxXJA1tx0cvBCX05OcYuA@mail.gmail.com>
+In-Reply-To: <CAA3_GnpJ-RV=1xaf4DKRd30RgH0HoAxXJA1tx0cvBCX05OcYuA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Feb 2026 18:11:26 +0100
+X-Gm-Features: AZwV_Qi5HFFMPVx5ILjN-D4qYqBYalcMJjpsT99MatUnx0HCyn5BRa-cmbfqMBE
+Message-ID: <CANn89iLVEJKoBtYNbAdLgxsPr03Fkgi9CJmTh1a0y0L5fV-HNA@mail.gmail.com>
+Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
+To: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
+Cc: pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	=?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <aXuIAFJ_m6gMUFFO@thinkpad>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255955-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,smile.fr];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-255956-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 87D6DCF69E
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8B85DCF7DB
 X-Rspamd-Action: no action
 
-On 2026-01-29 17:17:04 [+0100], Felix Maurer wrote:
-> About the interlink: that's the interface where you attach devices that
-> know nothing about HSR, i.e., when we are a RedBox. I consider it very
-> similar to the master port, it's our responsibility to de-duplicate what
-> we send out there.
+On Wed, Jan 28, 2026 at 11:46=E2=80=AFAM =E6=88=B8=E7=94=B0=E6=99=83=E5=A4=
+=AA <kota.toda@gmo-cybersecurity.com> wrote:
+>
+> Here is the patch with the barriers added, based on v6.12.67.
+>
+> However, as Yuki said, we are wondering if this would be considered an
+> acceptable change
+> from the perspective of the maintainers (or in terms of Linux kernel
+> culture). This is because
+> the patch adds `READ_ONCE` to several locations outside of bonding subsys=
+tem.
+> Please let me know if you have any concerns regarding this point.
+>
+> >  Also, please clarify what happens with stacks of two or more bonding d=
+evices ?
+>
+> To clarify, currently the `header_ops` of the bottom-most
+> interface are used regardless of the number of bonding layers.
+> This patch changes it so that `&bond->bond_header_ops` is used
+> as the bond device's `header_ops`, regardless of the stack depth.
 
-Right. It should contain the same "seen" values as the master port.
+Could you try to cook a patch series perhaps ?
 
-> I was thinking about exactly this while working on the patch as well and
-> I came to each conclusion (A,B are needed vs. are not needed) at least
-> once. In the end, I think we will need it. It's right that a well
-> behaving node in the ring should not forward "frames for which the node
-> is the unique destination" (5.3.2.1). But there could be frames that
-> have no unique destination in the ring at all: multicast frames or
-> frames addressed to a non-existing MAC address. We should not forward
-> such frames either to prevent them from looping forever.
+The READ_ONCE()/WRITE_ONCE() on dev->header_ops->cache could be done separa=
+tely.
 
-But multicast and non-existing destination frames do one round in the
-circle, reach the sender which will remove them from the ring and not
-forward.
-
-> Now, such frames should probably only reach back to us, if we sent them
-> (either from our stack or from the interlink port). We could track
-> sequence numbers sent to master and interlink (for de-duplication) and
-> sent by master and interlink (for loop prevention) for more clarity, but
-> then we're back at four bitmaps again.
-
-I think we could avoid tracking A/ B. The packets that we receive from
-A/ B and forward to the master after de-duplication should be the same
-as those that are forwarded to the interlink port.
-
-> I agree that we can and should optimize the HW-offloaded case. I'd
-> suggest to do that in a separate patchset, though, partly because I
-> don't have access to a hardware with HSR offload at the moment.
-
-Sure.
-
-> > I know you preserve what is already here but what is this even used for?
-> > | ip -d link show dev hsr0
-> >
-> > does not show these numbers. It shows the sequence number of the hsr0
-> > interface which I understand.
-> > But then it is also possible to show the last received sequence number
-> > of any node on either of the two interfaces?
->=20
-> This is only exposed through the HSR_C_GET_NODE_STATUS netlink command
-> for the "HSR" (sic!) netlink family. I'm not aware of a userspace tool
-> that actually shows this data. It's unclear if it is of any real use.
-
-hehe. Great.
-
-> I assume that the two sequence numbers are reported because they would
-> in theory allow to detect a broken ring: if one of the numbers stops
-> increasing or the numbers generally diverge, some link in the ring is
-> broken. If we have traffic from multiple nodes, we could even detect
-> where the ring is broken. That's likely also the reason for the weird
-> cross-assinment of B->1, A->2. What we send out on B has to have arrived
-> on port A resp. 1 before.
->=20
-> We can discuss removing this stuff in the future, but I'd prefer not to
-> touch userspace at this time.
-
-Sure. I was just looking who is using this and this netlink interface
-was the only user. It looks like debug code.
-
-> > > +}
-> > > +
-> > >  int hsr_get_node_data(struct hsr_priv *hsr,
-> > >  		      const unsigned char *addr,
-> > >  		      unsigned char addr_b[ETH_ALEN],
-> > =E2=80=A6
-> > > --- a/net/hsr/hsr_framereg.h
-> > > +++ b/net/hsr/hsr_framereg.h
-> > > @@ -82,15 +82,18 @@ int prp_register_frame_out(struct hsr_port *port,=
- struct hsr_frame_info *frame);
-> > >  #define hsr_seq_block_index(sequence_nr) ((sequence_nr) >> HSR_SEQ_B=
-LOCK_SHIFT)
-> > >  #define hsr_seq_block_bit(sequence_nr) ((sequence_nr) & HSR_SEQ_BLOC=
-K_MASK)
-> > >
-> > > +#define DECLARE_BITMAP_FLEX_ARRAY(name, bits) \
-> > > +	unsigned long name[][BITS_TO_LONGS(bits)]
-> > > +
-> > >  struct hsr_seq_block {
-> > >  	unsigned long		time;
-> > >  	u16			block_idx;
-> > > -	DECLARE_BITMAP(seq_nrs, HSR_SEQ_BLOCK_SIZE);
-> > > +	DECLARE_BITMAP_FLEX_ARRAY(seq_nrs, HSR_SEQ_BLOCK_SIZE);
-> >
-> > is there a story behind DECLARE_BITMAP_FLEX_ARRAY()? We have just this
-> > one user.
->=20
-> I've added it this way to make it obvious that almost all of it is the
-> same as DECLARE_BITMAP(). But probably it's better to get rid of the
-> macro, add the definition directly to the struct, and maybe add a
-> comment that it's supposed to be similar to what DECLARE_BITMAP()
-> produces. What do you think?
-
-I would get rid of it. There the "official" DECLARE_BITMAP(). If this
-doesn't work just open code it avoiding the macro.
-
-> Thanks for your comments,
->    Felix
-
-Sebastian
+Thanks.
 
