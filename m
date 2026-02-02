@@ -1,224 +1,155 @@
-Return-Path: <netdev+bounces-255846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YO/0LlaOgGkl+wIAu9opvQ
-	(envelope-from <netdev+bounces-255846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:45:26 +0100
+	id 6MLzKXSPgGkl+wIAu9opvQ
+	(envelope-from <netdev+bounces-255848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:50:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B88CBE1E
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:45:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CBB8CBEC6
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 12:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CFF6E3030EFA
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 11:43:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A65343004DE5
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 11:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461C3363C6E;
-	Mon,  2 Feb 2026 11:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9955035BDBF;
+	Mon,  2 Feb 2026 11:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZmBZI++"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="pz2uI5Zy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182403624BC
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 11:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284C736166F;
+	Mon,  2 Feb 2026 11:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770032628; cv=none; b=XWfqxnUoyUU+Ke6VHJQvKlae9s5zmRRgpFHPwBYXBNmpljGU5dEmwTfuKK402byKHdXGHKJPopLmbVMxZZHV0/8kYaxWuvIFpCW8nHylIOAAO+jWAKWhDI9oNTee+y3X1QuAmv43ubxgVVJ3ev+qYvdwZ8epzlPisF0t5R3aGQg=
+	t=1770033010; cv=none; b=KmlwOzULV5kcFos78rysFw64J080JWuoRyLDYz7uzErL3MGYLYub6di05txmrmU7HybGK1ImtnQIlXeDjVSFEDSWASjGnBWVzTYqUdl2NL/CKWlQT7/4QzGqvh0vdRd1mfyIbc2QACkuDi/VUcg5My2K6QXtd7XKhMbHx3hng3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770032628; c=relaxed/simple;
-	bh=4kAMjAlfHV5FL+KQNiAU/dddvVYtgDqX2k0UR9Pe2Vk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cUDH7+P3gYR7YHWiuoaaYZS5km8+i2rZK7f9sVbft8yEwzfTuztAWEg0lbK/mnFD+nkujipzD9faZMEWmKgQXxswX0fY/iZWkMXXcT1YG8+KE884CFnxnyoRksqxKe+XoGad8WkgEOeVCvmskXBnAOkDAM00ozgIiLglxWmQPBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fZmBZI++; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770032625;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K8KIicsK93MGllIH0s+WH+EggiXfnu0nHP9hncCx9kQ=;
-	b=fZmBZI++tUrQwWwmtx//9Kp6FFt5oxCg+98pizUHKEbhU8oxXiRdAoEB3xdT81jIS74Kg4
-	N+DyR6dzF7aSGPHeIVmT3ERwxTWiPVQZU/5pRp/fA8tyXXfMW84zIHLZ35icOwCzW5ZE4w
-	lZktfeb04jFoZVQLg2C2kzie720bwNM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-QL_P_QWINkCy3hh90dBo8A-1; Mon,
- 02 Feb 2026 06:43:43 -0500
-X-MC-Unique: QL_P_QWINkCy3hh90dBo8A-1
-X-Mimecast-MFC-AGG-ID: QL_P_QWINkCy3hh90dBo8A_1770032622
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 32BC31956059;
-	Mon,  2 Feb 2026 11:43:42 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.250])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 17B811956053;
-	Mon,  2 Feb 2026 11:43:38 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	linux-kselftest@vger.kernel.org,
-	aleksander.lobakin@intel.com
-Subject: [PATCH v2 net 2/2] selftest: net: add a test-case for encap segmentation after GRO
-Date: Mon,  2 Feb 2026 12:43:15 +0100
-Message-ID: <768ca132af81e83856e34d3105b86c37e566a7ad.1770032084.git.pabeni@redhat.com>
-In-Reply-To: <cover.1770032084.git.pabeni@redhat.com>
-References: <cover.1770032084.git.pabeni@redhat.com>
+	s=arc-20240116; t=1770033010; c=relaxed/simple;
+	bh=kXvnfinhZiYCbgGMJg8Xh9KSm64a3yapRQylokUJwLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P5aFAXRixUen0Duw+TNo8MOZgbhfLZim4u4yJSagTTmQWwYrcqgPrGQShxMNRMia+u3Un1ryL8VR5ZI4gekAU9n6lkC/aoiIOI4t0XCIc7V/ffWRGmlU2TSLkG/TxCH6dkDG0Wyv5EeRsL3XpKpoEjobMzA/CxQ4MDT0W6Ksw/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=pz2uI5Zy; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=c8x3hVVlSe3yBAUyt8ShoEyWnsoTcwMhB08qqtBA3iU=; b=pz2uI5Zy88V4Pm2qtdkC4BBKNY
+	tPc3oNUXR38HCgi/h7aKvCvX55zbIksp/tOna03g0GFE9cFq53Za6G8iRXMmEUgj5z3rdkgniPzJl
+	RLAhyYuyEEkH1LUXKJNWH5tqyI530LIwkjCk7HjmNRFOuRq1WJ6LyNchvrUppfV/iP9gpt2gq1MGo
+	LnQ3ScfyR98HcTGq7zmgcjiszwgThNiTgpPbjauaw6gRbJU5/dgstP5ITF/u5UdKbn40gchZOklNO
+	aLQMeMT5EEDIf8BDbbdSauVL3m36MmqGG/P70q0WnNgpdnBmD7b/efhxBO6L3oUuCA4tmSXibP1ah
+	hmvJPzNA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vmsR1-0041ND-JT; Mon, 02 Feb 2026 11:49:40 +0000
+Date: Mon, 2 Feb 2026 03:49:32 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com, john.ogness@linutronix.de, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, mpdesouza@suse.com, 
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v5 1/4] printk: Add execution context (task
+ name/CPU) to printk_info
+Message-ID: <aYCFnYCga1dgWniG@gmail.com>
+References: <20260128-nbcon-v5-0-93b4ddbc181a@debian.org>
+ <20260128-nbcon-v5-1-93b4ddbc181a@debian.org>
+ <20260130173243.4e3fff89@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260130173243.4e3fff89@kernel.org>
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255846-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,intel.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[debian.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255848-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,suse.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[udpgro_fwd.sh:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 10B88CBE1E
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4CBB8CBEC6
 X-Rspamd-Action: no action
 
-We had a few patches in this area and no explicit coverage so far.
-The test case covers the scenario addressed by the previous fix;
-reusing the existing udpgro_fwd.sh script to leverage part of the
-of the virtual network setup, even if such script is possibly not
-a perfect fit.
+Hello Jakub,
 
-Note that the mentioned script already contains several shellcheck
-violation; this patch does not fix the existing code, just avoids
-adding more issues in the new one.
+On Fri, Jan 30, 2026 at 05:32:43PM -0800, Jakub Kicinski wrote:
+> On Wed, 28 Jan 2026 06:17:37 -0800 Breno Leitao wrote:
+> > +config CONSOLE_HAS_EXECUTION_CTX
+> > +	bool
+> > +	help
+> > +	  Selected by console drivers that support execution context
+> > +	  (task name/CPU) in their output. This enables PRINTK_EXECUTION_CTX
+> > +	  to provide the necessary infrastructure.
+> > +
+> > +config PRINTK_EXECUTION_CTX
+> > +	bool "Include execution context (task/CPU) in printk messages"
+> > +	depends on PRINTK && CONSOLE_HAS_EXECUTION_CTX
+> > +	default CONSOLE_HAS_EXECUTION_CTX
+>
+> AFAIU the double-symbol thing serves no practical purpose?
+>
+> If none of the console drivers uses the metadata what would be the
+> point of capturing it?
+>
+> Conversely if some console driver wants this data there's no option
+> for the user to disable it.
+>
+> AFAICT this patch should only add one invisible symbol for capturing
+> the context and have netcons enable it.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v1 -> v2:
-  - fixed comment typos
-  - dropped unneeded 'nodad' from del command
----
- tools/testing/selftests/net/udpgro_fwd.sh | 64 +++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+The two-symbol design establishes a clear separation between what console
+drivers require and how the printk core implements it.
 
-diff --git a/tools/testing/selftests/net/udpgro_fwd.sh b/tools/testing/selftests/net/udpgro_fwd.sh
-index a39fdc4aa2ff..9b722c1e4b0f 100755
---- a/tools/testing/selftests/net/udpgro_fwd.sh
-+++ b/tools/testing/selftests/net/udpgro_fwd.sh
-@@ -162,6 +162,39 @@ run_test() {
- 	echo " ok"
- }
- 
-+run_test_csum() {
-+	local -r msg="$1"
-+	local -r dst="$2"
-+	local csum_error_filter=UdpInCsumErrors
-+	local csum_errors
-+
-+	printf "%-40s" "$msg"
-+
-+	is_ipv6 "$dst" && csum_error_filter=Udp6InCsumErrors
-+
-+	ip netns exec "$NS_DST" iperf3 -s -1 >/dev/null &
-+	wait_local_port_listen "$NS_DST" 5201 tcp
-+	local spid="$!"
-+	ip netns exec "$NS_SRC" iperf3 -c "$dst" -t 2 >/dev/null
-+	local retc="$?"
-+	wait "$spid"
-+	local rets="$?"
-+	if [ "$rets" -ne 0 ] || [ "$retc" -ne 0 ]; then
-+		echo " fail client exit code $retc, server $rets"
-+		ret=1
-+		return
-+	fi
-+
-+	csum_errors=$(ip netns exec "$NS_DST" nstat -as "$csum_error_filter" |
-+		      grep "$csum_error_filter" | awk '{print $2}')
-+	if [ -n "$csum_errors" ] && [ "$csum_errors" -gt 0 ]; then
-+		echo " fail - csum error on receive $csum_errors, expected 0"
-+		ret=1
-+		return
-+	fi
-+	echo " ok"
-+}
-+
- run_bench() {
- 	local -r msg=$1
- 	local -r dst=$2
-@@ -260,6 +293,37 @@ for family in 4 6; do
- 	ip netns exec $NS_SRC $PING -q -c 1 $OL_NET$DST_NAT >/dev/null
- 	run_test "GRO fwd over UDP tunnel" $OL_NET$DST_NAT 10 10 $OL_NET$DST
- 	cleanup
-+
-+	# force segmentation and re-aggregation
-+	create_vxlan_pair
-+	ip netns exec "$NS_DST" ethtool -K veth"$DST" generic-receive-offload on
-+	ip netns exec "$NS_SRC" ethtool -K veth"$SRC" tso off
-+	ip -n "$NS_SRC" link set dev veth"$SRC" mtu 1430
-+
-+	# forward to a 2nd veth pair
-+	ip -n "$NS_DST" link add br0 type bridge
-+	ip -n "$NS_DST" link set dev veth"$DST" master br0
-+
-+	# segment the aggregated TSO packet, without csum offload
-+	ip -n "$NS_DST" link add veth_segment type veth peer veth_rx
-+	for FEATURE in tso tx-udp-segmentation tx-checksumming; do
-+		ip netns exec "$NS_DST" ethtool -K veth_segment "$FEATURE" off
-+	done
-+	ip -n "$NS_DST" link set dev veth_segment master br0 up
-+	ip -n "$NS_DST" link set dev br0 up
-+	ip -n "$NS_DST" link set dev veth_rx up
-+
-+	# move the lower layer IP in the last added veth
-+	for ADDR in "$BM_NET_V4$DST/24" "$BM_NET_V6$DST/64"; do
-+		# the dad argument will let iproute emit a unharmful warning
-+		# with ipv4 addresses
-+		ip -n "$NS_DST" addr del dev veth"$DST" "$ADDR"
-+		ip -n "$NS_DST" addr add dev veth_rx "$ADDR" \
-+			nodad 2>/dev/null
-+	done
-+
-+	run_test_csum "GSO after GRO" "$OL_NET$DST"
-+	cleanup
- done
- 
- exit $ret
--- 
-2.52.0
+This approach was discussed here:
+https://lore.kernel.org/all/87eco09hgb.fsf@jogness.linutronix.de/
 
+> I don't see a reason at this
+> stage to prompt users with netcons disabled whether they want
+> PRINTK_EXECUTION_CTX
+
+Users won't see a prompt when netconsole is disabled. Since
+CONSOLE_HAS_EXECUTION_CTX is only selected when NETCONSOLE_DYNAMIC is
+enabled, PRINTK_EXECUTION_CTX will be automatically deselected without
+prompting. Additionally, CONSOLE_HAS_EXECUTION_CTX is a hidden symbol that
+cannot be manually forced.
+
+That said, I'm open to making PRINTK_EXECUTION_CTX invisible as well,
+given it is behaving like one already.
 
