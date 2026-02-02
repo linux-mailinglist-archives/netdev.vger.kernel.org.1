@@ -1,148 +1,213 @@
-Return-Path: <netdev+bounces-255880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKxcAwyzgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:22:04 +0100
+	id iM+fA+SzgGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:25:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1425CD457
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:22:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4C2CD4FF
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:25:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5AB813003702
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 14:21:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 53F053002D00
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 14:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C644136D516;
-	Mon,  2 Feb 2026 14:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25C436C5A3;
+	Mon,  2 Feb 2026 14:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDx0u0Mt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="13AE52ga"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E71836C5B5
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 14:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6BE36A033;
+	Mon,  2 Feb 2026 14:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770042065; cv=none; b=cHlwKv4TGYCwtN5y6cvLIMwncWSCvhytyBpLW3vbJCpE/Z9yzaAr3R9+64SdXGn4G32Lr7U3WTVo5WL4CrXa7vzugyEk6r4e1AzwHFUOaQ7csUWx65mvdqKQeOK8zKJWggdKPrtx82SMv0ZDj0fJzQ+I1MXy2f39dZiok0awfHs=
+	t=1770042334; cv=none; b=cjX4mSEcphtyb18WoeOw/3Qa4tpEWKYPonVuJvaMAmldZ2QcBpl0qZKxSLvFsKt5wnJ5cT35tXP/2iCDE5IzhvaM5OKfkHrsr/9aw0FJcGlwf07K7Q4GznF68rfdjU7lGwyBWPkEByxVg/eNYr2KdI8J4tfrq7Ec7PkZ4Krqwhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770042065; c=relaxed/simple;
-	bh=8gO7528RUzkj9wu5Go/PvbCOEjLCeSXEx8yiDRNM9ec=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C/jVOl2sqVfqf6YNoTYrlhNC4Pldxn+cogzuoo9Si0EqI4cTtj3sT+w/whLneKHEm/W6z0bsdQ7olmXuaGGqwtBS0jkpE0X7coiTZ5cad7R6LdE1C8O79hKRT7nKe41w53I/NwH5nVJfLR1wQS2N62b4QehFGIncQqmDci5qd2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FDx0u0Mt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770042063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hUjfsNXbYtv1aL5ENWAmxX+YM/BhggZrRjlSYm8SL4M=;
-	b=FDx0u0MtiBacSfEydEvd1f3QiJPEaZ5XrLvrInd/pHUSe6u6BqgZ3sUt0nl2nugebEop03
-	W70cyA6EEpLmBaZDIcnIehsg2NiAFZ9+aJZaeVBoL39RvAXjW8NpIzfeaDYTs0MEBia3aE
-	eXnSRSdtBDY0+eCI6/AYybNPyau0H5s=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-407-KVBoOB9YNkOi2jAS-5MuRw-1; Mon,
- 02 Feb 2026 09:20:59 -0500
-X-MC-Unique: KVBoOB9YNkOi2jAS-5MuRw-1
-X-Mimecast-MFC-AGG-ID: KVBoOB9YNkOi2jAS-5MuRw_1770042058
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F3C671956054;
-	Mon,  2 Feb 2026 14:20:57 +0000 (UTC)
-Received: from thinkpad.redhat.com (unknown [10.44.34.1])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 45C931800577;
-	Mon,  2 Feb 2026 14:20:54 +0000 (UTC)
-From: Felix Maurer <fmaurer@redhat.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	jkarrenpalo@gmail.com,
-	tglx@kernel.org,
-	mingo@kernel.org,
-	bigeasy@linutronix.de,
-	matttbe@kernel.org,
-	allison.henderson@oracle.com,
-	petrm@nvidia.com,
-	antonio@openvpn.net
-Subject: [PATCH net-next v3 8/8] MAINTAINERS: Assign hsr selftests to HSR
-Date: Mon,  2 Feb 2026 15:19:24 +0100
-Message-ID: <d75f1cdf860f032b84673a1eae564c01e486d55c.1770041682.git.fmaurer@redhat.com>
-In-Reply-To: <cover.1770041682.git.fmaurer@redhat.com>
-References: <cover.1770041682.git.fmaurer@redhat.com>
+	s=arc-20240116; t=1770042334; c=relaxed/simple;
+	bh=GGdDwTUpk5EUeNzmFSrWkTf1lB4XJJ1VZLtzjfdQSuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EyOb4yIf3s1QCF7MlkGXK3Fv44rxXR1oHcJI/suhKINl4LJM+Wt5COv9FAMtXkv7DJ2khoeA73DgLY10pvjFh9g0LrTudOq4PdVt1+eFkxPYRYLKGIQRdvNIuOYNZtjGQZvipbdnqsI1HbhWrHrHPcqNgqac1lYxiMIov0Gz2jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=13AE52ga; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rhBN/4CEHrHWFvjQolbwtIzJ8rg0Id6dJ4/fTSIzWQg=; b=13AE52galpTNyjipvDVESbKnoi
+	UaXvLNM/NjMJsIhewAJZBBaX05Bk1R3bO3S6OK7W3T9RrxTN5/ESCBgrUvBjeoedIgqhqWMz7b25t
+	evfwsiY+UVOMZAJ6Lxh9CJEzkso4rQUnTcbl5ZVNmwHQJpMlRJ2/HfO+Qt4nZerDkoWSPex9tZ3qj
+	FJKbL9XgcmBZOx0CDZFQoR9k6DvCNPIysBa2dnJ7ajDe7LPxfK7J7H/2edJlxC/1uVjmEw3i7sdpO
+	fI7fA8KPw0Aur7E82XilZTeb/vt7c46Haof66U7S1b2M7Tyhu4BQ0l132yu9xJpbSHsKr1W3I8zZF
+	6aHw2dBg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41688)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vmurb-0000000045o-3qFZ;
+	Mon, 02 Feb 2026 14:25:15 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vmurV-000000003T2-190d;
+	Mon, 02 Feb 2026 14:25:09 +0000
+Date: Mon, 2 Feb 2026 14:25:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, florian.fainelli@broadcom.com,
+	xiaolei.wang@windriver.com, quic_abchauha@quicinc.com,
+	quic_sarohasa@quicinc.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: phy: change devlink flag to
+ AUTOREMOVE_SUPPLIER for non-SFP PHYs
+Message-ID: <aYCzxVTTZvok9_d1@shell.armlinux.org.uk>
+References: <20260202054533.539883-1-wei.fang@nxp.com>
+ <267c78c1-4ad2-4f06-be63-0fb506c5134d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <267c78c1-4ad2-4f06-be63-0fb506c5134d@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	TAGGED_FROM(0.00)[bounces-255880-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,windriver.com,quicinc.com,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-255881-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linutronix.de:email,protonic.nl:email]
-X-Rspamd-Queue-Id: C1425CD457
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,bootlin.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1D4C2CD4FF
 X-Rspamd-Action: no action
 
-Despite the HSR subsystem being orphaned at the moment due to the original
-maintainer being unreachable for a while, assign the selftests to the
-subsystem for the future.
+On Mon, Feb 02, 2026 at 12:10:41PM +0100, Maxime Chevallier wrote:
+> Hi Wei,
+> 
+> On 02/02/2026 06:45, Wei Fang wrote:
+> > For the shared MDIO bus use case, multiple MACs will share the same MDIO
+> > bus. Therefore, these MACs all depend on this MDIO bus. If this shared
+> > MDIO bus is removed, all the PHY devices attached to this MDIO bus will
+> > also be removed. Consequently, the MAC driver should not access the PHY
+> > device, otherwise, it will lead to some potential crashes. Because the
+> > corresponding phydev and the mii_bus have been freed, some pointers have
+> > become invalid.
+> > 
+> > For example. Abhishek reported a crash issue that occurred if the MDIO
+> > bus driver was removed first, followed by the MAC driver. The crash log
+> > is as below.
+> > 
+> > Call trace:
+> >  __list_del_entry_valid_or_report+0xa8/0xe0
+> >  __device_link_del+0x40/0xf0
+> >  device_link_put_kref+0xb4/0xc8
+> >  device_link_del+0x38/0x58
+> >  phy_detach+0x2c/0x170
+> >  phy_disconnect+0x4c/0x70
+> >  phylink_disconnect_phy+0x6c/0xc0 [phylink]
+> >  stmmac_release+0x60/0x358 [stmmac]
+> > 
+> > Another example is the i.MX95-15x15 platform which has two ENETC ports.
+> > When all the external PHYs are managed the EMDIO (the MDIO controller),
+> > if the enetc driver is removed after the EMDIO driver. Users will see
+> > the below crash log and the console is hanged.
+> > 
+> > Call trace:
+> >  _phy_state_machine+0x230/0x36c (P)
+> >  phy_stop+0x74/0x190
+> >  phylink_stop+0x28/0xb8
+> >  enetc_close+0x28/0x8c
+> >  __dev_close_many+0xb4/0x1d8
+> >  netif_close_many+0x8c/0x13c
+> >  enetc4_pf_remove+0x2c/0x84
+> >  pci_device_remove+0x44/0xe8
+> > 
+> > To address this issue, Sarosh Hasan tried to change the devlink flag to
+> > DL_FLAG_AUTOREMOVE_SUPPLIER [1], so that the MAC driver will be removed
+> > along with the PHY driver. However, the solution does not take into
+> > account the hot-swappable PHY devices (SFP PHYs), so when the PHY device
+> > is unplugged, the MAC driver will automatically be removed, which is not
+> > the expected behavior. This issue should not exist for SFP PHYs, so based
+> > on the Sarosh's patch, the flag is changed to DL_FLAG_AUTOREMOVE_SUPPLIER
+> > for non-SFP PHYs.
+> > 
+> > Reported-by: Abhishek Chauhan (ABC) <quic_abchauha@quicinc.com>
+> > Closes: https://lore.kernel.org/all/d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com/
+> > Link: https://lore.kernel.org/imx/20250703090041.23137-1-quic_sarohasa@quicinc.com/ # [1]
+> > Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
+> > Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> 
+> I gave that patch a test, with the following cases :
+> 
+>  - On Macchiatobin (we have PHYs that share an mdiobus).
+> When unbinding a PHY, the MAC dissapears as well :
 
-Signed-off-by: Felix Maurer <fmaurer@redhat.com>
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Correct, this is why these band-aids are harmful. One "device" can
+correspond with *multiple* network interfaces, and the loss of one
+PHY can have a *very* detrimental effect.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0caa8aee5840..d50ed2f88ff7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11586,6 +11586,7 @@ HSR NETWORK PROTOCOL
- L:	netdev@vger.kernel.org
- S:	Orphan
- F:	net/hsr/
-+F:	tools/testing/selftests/net/hsr/
- 
- HT16K33 LED CONTROLLER DRIVER
- M:	Robin van der Gracht <robin@protonic.nl>
+Consider the case where root-NFS is being used, and removing a PHY
+on another interface takes out the interface that root-NFS is
+using. Your machine is now dead in the water.
+
+In my opinion, we should be concentrating more on the issue behind
+the oops.
+
+Given that this problem is because of the bus being removed, one
+thing that would help would be for the MDIO bus to be properly
+refcounted, and when the bus is unbound, to replace the bus ops
+with versions that return -ENXIO or similar under the MII bus
+lock. This would be easier of the MDIO bus ops were a separate struct
+to struct mii_bus.
+
+Similar with the PHY itself - if the PHY is in-use, it should be
+refcounted to stop the struct phy_device from going away, and
+should we have the situation where the PHY driver is unbound,
+phydev->drv should be set to a set of dummy ops (under the phydev
+mutex and probably rtnl.)
+
+It seems to me that throwing devlinks at this problem is giving us
+more problems than it's solving.
+
+A graceful way to handle a MAC losing its PHY is for phylib to
+indicate that the PHY has gone down, rather than removing the
+network interface (and potentially a whole host of other network
+interfaces in the case of one struct device being associated
+with many interfaces.)
+
 -- 
-2.52.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
