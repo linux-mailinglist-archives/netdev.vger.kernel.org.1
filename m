@@ -1,322 +1,150 @@
-Return-Path: <netdev+bounces-255822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOtZLtt5gGne8gIAu9opvQ
-	(envelope-from <netdev+bounces-255822-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:18:03 +0100
+	id OHdIEsZ7gGnE8wIAu9opvQ
+	(envelope-from <netdev+bounces-255826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:26:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A693CAC04
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:18:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B409DCADE2
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 11:26:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 436133009B34
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:11:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1ACF5300AEE8
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 10:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDBB2DE711;
-	Mon,  2 Feb 2026 10:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H0Zp3Owb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A05D2D8764;
+	Mon,  2 Feb 2026 10:25:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a2412.mx.srv.dfn.de (a2412.mx.srv.dfn.de [194.95.233.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78750126BF1
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 10:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770027064; cv=pass; b=Ad88kWE2+DZsTN4yDoEcIMil90+SA5/COLtaWCti0uo+1jLEmGgSuJyiio3x56vDwi5mYrJp247TAdbZl0L3ZLq28F68S6LPev3Y895PsrE58IJtm4tVT61pXfTfWbyII6BQXoeevcjmgElTeJxU67aaDKF9RmQB2CcE3f36pEQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770027064; c=relaxed/simple;
-	bh=s8jkXMkjCGV/E5vW0aAw3oB5IaPoxxZes8GJmqiNvdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eSqdp4VXtf1ShpOesgUX29S76Pj5zkfw5vl+W0jFy7tMuSdcby3s8avVtJRXeOIxr5XU/rRL1VW3UqC4FdqjakIqiFEM7NtKpBfsXuF3qC8r4GdP61fQYfyADugwdBbzKHtxd6eTYw8Pn+T7JAKkDkDGnXYTLjfklX2NQS0fYRg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H0Zp3Owb; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5033a2c4b81so51907301cf.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 02:11:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770027062; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PEsqSwoAioH3C9AhsU1NypqFK7l/+A4Xun6+uofQxstKRiljiIfuNrkfcRW2jf0Xro
-         xP4e12XoRjbZD65MqgawKODhNaBx6wCET02izIrYhJVV2+U6YaEh2hAA2T2OAxWRInWO
-         D00RV7IiXkYlAQ1UxZxNJpGCMqlTYLPj4eTQtIeOCAZPLw54MtHsBVt9ur0Yw8pIGQSq
-         voGcH0W3jTeCCYMs9ADFcpqbHbAJfHMa8xFIzsOwo88sZQjKZZzIu9vav8fc4wHlE2cT
-         HUi/UwVNMCY9oAJWqmujwZxEaav6QwoTnGUTB+xGNwr0GH6hYbzCzYUIFPoXzZwBLFQC
-         CmjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Btp1cSJ3gD5Q5hHrfWq6ySyy2b2lUTGs3ekCWWjad0s=;
-        fh=kVh3VRP0gxQbJ/U4EdgL4R6o/NDaGFziGL68Lf5U2RQ=;
-        b=GPch9n5PfJjfwg6Pk96/A8WMnl4Aq4fkAp7/+lO/Y8cDHmfA8aZhMxUSuZ7Tw5SF34
-         Q66vT1+VtTXOrjsUZX8/o5rpN3mKLjtk4to02ad/fi8Bq06LEUuMqRSuzeDYbMl/ormS
-         EGB1LElsWWAYBcX+qS0JLklCc5me4d/8GSvb4Ho0gOH2FkRFYPUvmmh8O2AQZ7ySknDW
-         h8yzGWSwYDYK6KT+nrOD3Tl7OBJpCDVUOLr1FwTHhYqn7IK2wMNayg9WRhC28iA0YXJ8
-         xfVurPAX5Dc2nfFh8jT7rTSu9jLvIuq8AuSznNc+mBzrIvJxZQh3p3K1Gk6nHeEvOFpI
-         yQGg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770027062; x=1770631862; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Btp1cSJ3gD5Q5hHrfWq6ySyy2b2lUTGs3ekCWWjad0s=;
-        b=H0Zp3Owb6lmoYYZIw8PRW7oXs0W71kb3i3nHYm86oUGFsAQ45Rf/yLolkSGdTeUzum
-         WcDyjty6xZlNNlSPVPnV+NiUY5Q4r+0p/Oj9IEXLQQ+ZddSemMHPhom/KzgJ9AlT0pVL
-         PaI4kpG7JFrEwHnGt1YcLMYpSH5qo8OFkEVbm5aJbAw/Oo42/59lZ0BkJBhThA3yDSmd
-         IaX3pot7GaWw1EWDWMLJ/Lf2APvVp3KM9ThLH/j0nqRnpTSTzTylawI0cfs2lyCN1rv0
-         jn3bX9ySDoa/Y8hvYpF1u35eOLVKqrG7cCp5XLTGRmlx8t3VaVltkcnW7Sb+2MIVh/IE
-         RM3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770027062; x=1770631862;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Btp1cSJ3gD5Q5hHrfWq6ySyy2b2lUTGs3ekCWWjad0s=;
-        b=GOz2RIeRDvUHP/mHz3BrApVf3akvenB95/1P0NjsDrQs2gn9HMTVmWZZPNd129bIOO
-         8QfPZVXOgCGanmkcLCzLD6M3iFZ2t0trMRDSVXtqYlNKEp8hS3BP2UmM65YZxAfheMCF
-         9IiwfX68Ckoo7Znm93ck+nhZnL4M7lem5bbe4QgnTtAZWZ6TS82oT3RqtR0gQve6pQyL
-         B2kEg25pwtcb0kBaAZpKhmDI5E529B8v2jLLCTp8e9ZxoEabVQfpH6qBkwAHABLsFCpj
-         qv/SE1LdvtdFhOpWEAJBXZ7P6uVqlOsRdUCCOczLSdmX0xkcY6fP8WEev3ORl56XtfZ0
-         CS6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXDSDT6yVe+EjkIiuoI1eqo97qIIEGNi6403T2VPegXY9tQIjQdT2UqX1sOg7fXatKt5Fp4vlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSyVuTn7nDcv9lkeHW3vBtMWGwO5QgvUHupPPAj/CvbGI86I9U
-	CUkWgy5CRBNSzuMVwaOyH5y7b0I6i3b/mgMaySiyf8NkZp2gJoAKgbekchXU3j6Hv9bdUbB9veO
-	gH96YvGHLLOGwsfBrMOxgEhCmgLMyHIqR0l5Qdks/
-X-Gm-Gg: AZuq6aJarduj7qbT/bHtEUQRUAe64QpDhXpPSIDZXtIgG8a3uESNzIwFPW992MTg6f5
-	fsx1/QPQtZ4uzGmGP6KoZ8dgnSziOAe9wjKFyYMl8Gc8ORhlXQHXHc1Pxpa3VzoukRE0quAHxot
-	5t0fB2wze5AYC61uHFSpnejckcrgz7QhDRUN4ETUXmK611V+RqHuGPhK+pU3Oy6U+4WvX6y6YCF
-	bWvIDLT3GM1uWVd3Jnv7FYfZUUbmyiWdYNNgImlNBh1JBmVrHONUoVqUDEZJARHjKoyj0M=
-X-Received: by 2002:a05:622a:48f:b0:4ee:26ef:7f4c with SMTP id
- d75a77b69052e-505d217c4e4mr137983991cf.17.1770027061826; Mon, 02 Feb 2026
- 02:11:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DAA4AEE2
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 10:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.95.233.75
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770027910; cv=none; b=Q1XicQ5sA9jyl4+RbaCpp9xkNrriv237QhDvFDs9VW1IOCynOFQYEUeyMLdei1pYfSOfebKWXOfIqs8L08oq4omjKlPNKUvQxMu0iHFJKmZso2V6eZXno+9j4cL1EW9uMJM9Fg9RiSh+9U7t0sgnbVNAQiCoP1XQNB89B0fWJ74=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770027910; c=relaxed/simple;
+	bh=zs6yiC3tZmYe7mQh0Lk+YfZZKmUb+3sX1SpN/fwigzo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TLPJdy53lOOH5mYj75Wajhnp775uHrKEKOPJyVjuaUYKn4ruy2X222yYXT69+2SXqvw28K+HoqWev0jYmSiXlEQrADkBrWduYu3T3kNL52XFIO9IQV6+Ty6yHV23iME2OCRFDIHurKWpUO2Hf5GCU2Rje86odZc8EZwOwR/ORKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uni-osnabrueck.de; spf=pass smtp.mailfrom=uni-osnabrueck.de; arc=none smtp.client-ip=194.95.233.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uni-osnabrueck.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uni-osnabrueck.de
+Received: from vm411.rz.uni-osnabrueck.de (vm411.rz.uni-osnabrueck.de [IPv6:2001:638:508:100::83ad:108f])
+	by a2412.mx.srv.dfn.de (Postfix) with ESMTPS id BECF060197;
+	Mon,  2 Feb 2026 11:15:02 +0100 (CET)
+Received: from kelmenhorst-Latitude-7450.. (unknown [IPv6:2001:638:508:f000:dc51:8c71:7bd3:8975])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: kelmenhorst)
+	by vm411.rz.uni-osnabrueck.de (Postfix) with ESMTPSA id 8006930056C3;
+	Mon,  2 Feb 2026 11:15:02 +0100 (CET)
+From: kelmenhorst <kelmenhorst@uni-osnabrueck.de>
+To: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>,
+	netdev@vger.kernel.org,
+	kelmenhorst <kelmenhorst@uni-osnabrueck.de>
+Subject: [PATCH net-next] net: tcp_bbr: use high pacing gain when the sender fails to put enough data inflight
+Date: Mon,  2 Feb 2026 11:14:54 +0100
+Message-ID: <20260202101454.89445-1-kelmenhorst@uni-osnabrueck.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260131212934.2547995-1-edumazet@google.com> <j3fofrzb4c3xcckk55y7rdpc7x5m23mphkksnp7vuijimzqpml@3nzu5xyfuyer>
- <CANn89iJh67=bSTS_ziVuQUS-ht0yqeW_Q8eaFCV=8M7zuETAsw@mail.gmail.com>
- <c63047b5-3059-4176-8d9d-5465d557e605@huawei.com> <CANn89iK95qb_=KWrcsvqEB9Bn0PXi3JkY5h09NiWuVWARABOww@mail.gmail.com>
- <CANn89iJRmEPJiz5-L_yJorU+xH5kBwraFy2_-=TwgkHzzfjKEg@mail.gmail.com>
-In-Reply-To: <CANn89iJRmEPJiz5-L_yJorU+xH5kBwraFy2_-=TwgkHzzfjKEg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Feb 2026 11:10:50 +0100
-X-Gm-Features: AZwV_QgbqiYSnOe_cp77sJ-3hAskXlj85vMYZZA5bFuBmkAX_OjtT-3sDaoIcHA
-Message-ID: <CANn89iJd_jCkYsoey5Zf0zc8ASwt4+sg6bOjgyesQefWkBVE5w@mail.gmail.com>
-Subject: Re: [PATCH net] net: add RCU protection to (struct packet_type)->dev
-To: "dongchenchen (A)" <dongchenchen2@huawei.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	fengwei_yin@linux.alibaba.com, zhangchangzhong@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[uni-osnabrueck.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,linux.alibaba.com,huawei.com];
-	TAGGED_FROM(0.00)[bounces-255822-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:email]
-X-Rspamd-Queue-Id: 3A693CAC04
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255826-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kelmenhorst@uni-osnabrueck.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B409DCADE2
 X-Rspamd-Action: no action
 
-On Mon, Feb 2, 2026 at 10:14=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Mon, Feb 2, 2026 at 9:47=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Mon, Feb 2, 2026 at 9:21=E2=80=AFAM dongchenchen (A)
-> > <dongchenchen2@huawei.com> wrote:
-> > >
-> > >
-> > > }
-> > >
-> > > [2] add delay to pype_seq_next
-> > > diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-> > > index 160dd729178f..73f5a20ef57c 100644
-> > > --- a/net/core/net-procfs.c
-> > > +++ b/net/core/net-procfs.c
-> > > @@ -230,11 +230,14 @@ static void *ptype_seq_next(struct seq_file *se=
-q, void *v, loff_t *pos)
-> > >
-> > >          pt =3D v;
-> > >          nxt =3D pt->list.next;
-> > > +       if (pt->dev)
-> > > +               mdelay(5000);
-> >
-> > Waiting 5 seconds while holding RCU is going to fire the soft lockup
-> > detection after ~two calls to ptype_seq_next()
-> >
-> > What is the actual trace you got, and what happens if you reduce to
-> > mdelay(1000) ?
->
-> OK, I took a look, and ptype_get_idx() needs to return information
-> about what list the returned pt is in.
->
-> I will send a V2 ,thanks.
+This patch addresses a robustness issue of TCP BBR when run in Virtual Machines
+- a common use case considering modern web hosting.
+Prior experiments in AWS VMs (https://ieeexplore.ieee.org/abstract/document/9546441),
+and our recent measurements in a controlled setup show that VM-based BBR senders
+heavily underestimate the available bandwidth during periods of CPU contention.
+In our configuration with 10ms periodic timeslices, BBR already degrades in VMs
+with less than 70% CPU time share, and the throughput continuously drops with
+decreasing CPU shares until it is bandwidth-independently capped at 10 Mbps for
+CPU time shares at 35% and lower.
+Considering the common use case of BBR in (resource-limited) Linux VMs, this
+issue could potentially compromise the robustness of the Internet's transport
+layer.
 
-Here is what I will squash, the diff against V1 is :
+In contrast to Cubic, BBR is very sensitive to off-CPU times. This is because
+pacing evenly spreads the target inflight over the RTT, essentially assuming
+that the CPU is available during the whole RTT. If this assumption is not met,
+the BBR sender cannot achieve the target pacing rate and concludes that the full
+bandwidth has been reached, even though the throughput is far below the actual
+bandwidth limit.
 
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index 160dd729178fd37a6340148d9e35f95bd92aecdb..ad63556c9e0abd15cbfac7777c3=
-1894d2eef037b
-100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -170,8 +170,15 @@ static const struct seq_operations softnet_seq_ops =3D=
- {
-        .show  =3D softnet_seq_show,
- };
+This commit detects the problematic condition in bbr_update_gains() by
+comparing BBR's current target inflight (bbr_inflight() * tp->mss_cache) with
+the actual number of bytes inflight (tp->bytes_sent - tp->bytes_acked), and
+applies high pacing gain (bbr_high_gain), until the inflight deficit recovers.
+With a higher pacing gain, BBR can send faster when the VM does have the CPU,
+so that the target inflight volume can be achieved despite off-CPU times.
+Re-using the constant STARTUP gain can only solve the issue up to a certain
+point, but avoids complex algorithm changes.
+Effectively, the patch solves the degradation problem for most critical cases:
+with 10ms periodic timeslices, BBRv1 is robust for CPU time shares of 35% and
+higher -  instead of 70% and higher when using the original code.
 
-+
-+struct ptype_iter_state {
-+       struct seq_net_private  p;
-+       struct net_device       *dev;
-+};
-+
- static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
- {
-+       struct ptype_iter_state *iter =3D seq->private;
-        struct list_head *ptype_list =3D NULL;
-        struct packet_type *pt =3D NULL;
-        struct net_device *dev;
-@@ -181,12 +188,16 @@ static void *ptype_get_idx(struct seq_file *seq,
-loff_t pos)
-        for_each_netdev_rcu(seq_file_net(seq), dev) {
-                ptype_list =3D &dev->ptype_all;
-                list_for_each_entry_rcu(pt, ptype_list, list) {
--                       if (i =3D=3D pos)
-+                       if (i =3D=3D pos) {
-+                               iter->dev =3D dev;
-                                return pt;
-+                       }
-                        ++i;
-                }
-        }
+We can share further results of our measurement study upon individual request.
 
-+       iter->dev =3D NULL;
-+
-        list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_all, list) {
-                if (i =3D=3D pos)
-                        return pt;
-@@ -218,6 +229,7 @@ static void *ptype_seq_start(struct seq_file *seq,
-loff_t *pos)
+Signed-off-by: Kathrin Elmenhorst <kelmenhorst@uni-osnabrueck.de>
+---
+ net/ipv4/tcp_bbr.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
- static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
-+       struct ptype_iter_state *iter =3D seq->private;
-        struct net *net =3D seq_file_net(seq);
-        struct net_device *dev;
-        struct packet_type *pt;
-@@ -229,19 +241,21 @@ static void *ptype_seq_next(struct seq_file
-*seq, void *v, loff_t *pos)
-                return ptype_get_idx(seq, 0);
+diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+index 760941e55153..ca6361931491 100644
+--- a/net/ipv4/tcp_bbr.c
++++ b/net/ipv4/tcp_bbr.c
+@@ -1011,6 +1011,13 @@ static void bbr_update_gains(struct sock *sk)
+ 		WARN_ONCE(1, "BBR bad mode: %u\n", bbr->mode);
+ 		break;
+ 	}
++        // overwrite pacing gain in case the sender fails to put enough data inflight
++        struct tcp_sock *tp = tcp_sk(sk);
++        u64 real_inflight = tp->bytes_sent - tp->bytes_acked;
++        u32 target_inflight = bbr_inflight(sk, bbr_bw(sk), BBR_UNIT) * tp->mss_cache;
++        if (real_inflight < target_inflight) {
++                bbr->pacing_gain = bbr_high_gain;
++        }
+ }
+ 
+ static void bbr_update_model(struct sock *sk, const struct rate_sample *rs)
+-- 
+2.43.0
 
-        pt =3D v;
--       nxt =3D pt->list.next;
--       dev =3D rcu_dereference(pt->dev);
-+       nxt =3D READ_ONCE(pt->list.next);
-+       dev =3D iter->dev;
-        if (dev) {
-                if (nxt !=3D &dev->ptype_all)
-                        goto found;
-
-                for_each_netdev_continue_rcu(seq_file_net(seq), dev) {
--                       if (!list_empty(&dev->ptype_all)) {
--                               nxt =3D dev->ptype_all.next;
-+                       nxt =3D READ_ONCE(dev->ptype_all.next);
-+                       if (nxt !=3D &dev->ptype_all) {
-+                               iter->dev =3D NULL;
-                                goto found;
-                        }
-                }
--               nxt =3D net->ptype_all.next;
-+               iter->dev =3D NULL;
-+               nxt =3D READ_ONCE(net->ptype_all.next);
-                goto net_ptype_all;
-        }
-
-@@ -252,20 +266,20 @@ static void *ptype_seq_next(struct seq_file
-*seq, void *v, loff_t *pos)
-
-                if (nxt =3D=3D &net->ptype_all) {
-                        /* continue with ->ptype_specific if it's not empty=
- */
--                       nxt =3D net->ptype_specific.next;
-+                       nxt =3D READ_ONCE(net->ptype_specific.next);
-                        if (nxt !=3D &net->ptype_specific)
-                                goto found;
-                }
-
-                hash =3D 0;
--               nxt =3D ptype_base[0].next;
-+               nxt =3D READ_ONCE(ptype_base[0].next);
-        } else
-                hash =3D ntohs(pt->type) & PTYPE_HASH_MASK;
-
-        while (nxt =3D=3D &ptype_base[hash]) {
-                if (++hash >=3D PTYPE_HASH_SIZE)
-                        return NULL;
--               nxt =3D ptype_base[hash].next;
-+               nxt =3D READ_ONCE(ptype_base[hash].next);
-        }
- found:
-        return list_entry(nxt, struct packet_type, list);
-@@ -279,6 +293,7 @@ static void ptype_seq_stop(struct seq_file *seq, void *=
-v)
-
- static int ptype_seq_show(struct seq_file *seq, void *v)
- {
-+       struct ptype_iter_state *iter =3D seq->private;
-        struct packet_type *pt =3D v;
-        struct net_device *dev;
-
-@@ -286,7 +301,7 @@ static int ptype_seq_show(struct seq_file *seq, void *v=
-)
-                seq_puts(seq, "Type Device      Function\n");
-                return 0;
-        }
--       dev =3D rcu_dereference(pt->dev);
-+       dev =3D iter->dev;
-        if ((!pt->af_packet_net || net_eq(pt->af_packet_net,
-seq_file_net(seq))) &&
-                 (!dev || net_eq(dev_net(dev), seq_file_net(seq)))) {
-                if (pt->type =3D=3D htons(ETH_P_ALL))
-@@ -319,7 +334,7 @@ static int __net_init dev_proc_net_init(struct net *net=
-)
-                         &softnet_seq_ops))
-                goto out_dev;
-        if (!proc_create_net("ptype", 0444, net->proc_net, &ptype_seq_ops,
--                       sizeof(struct seq_net_private)))
-+                       sizeof(struct ptype_iter_state)))
-                goto out_softnet;
-
-        if (wext_proc_init(net))
 
