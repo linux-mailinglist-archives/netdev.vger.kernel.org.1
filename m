@@ -1,182 +1,146 @@
-Return-Path: <netdev+bounces-255903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255904-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kOGzOYXBgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255903-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:49 +0100
+	id cAvuLFPBgGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255904-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:22:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68182CE261
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB60CE234
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:22:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86A183029ADA
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:18:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 305E3301F871
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A1A36B07F;
-	Mon,  2 Feb 2026 15:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0D737BE99;
+	Mon,  2 Feb 2026 15:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="RULgRksi"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="w8u0SG/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.ms.icloud.com (p-west3-cluster6-host8-snip4-3.eps.apple.com [57.103.75.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B10376BD0
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 15:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.75.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C460137AA89
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 15:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770045516; cv=none; b=fv69Ax5qTpwbC85sjDJMNJ7vBQQhNsV8QgmICeNpIs6GmCa2/sDk/nYAzD/d1bX2aNZp1ILiHn8UBHnAUGA6mwlDVh/9SuB9BIIRsDF1oB7D29IsXJ/Eu9eHCgK8+cmTEMaQVdCao2afFG/oksZZmcNpmNI9Ntb5mjFAzFqt5tY=
+	t=1770045698; cv=none; b=JvZueE39tYbYi4nVtdnDKv21NNG6WeLoAv9olhBs7wsMGeoF6fBW+GZRwY4aJewI2f02jFFT+wuoXbGu+d2O2fZajqcrurlP3feUnTN+9VdCs4EPmGG1zq7Zewtn8gj1rw2UB4VXDt9C2GEe16VQRJDa8VesoEEf/TOW1G4yiOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770045516; c=relaxed/simple;
-	bh=qnPBRg7FWAUGaMjpD3aSpGilx63FWH9xhtNIZLPRvmU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZePLdFsjPIlj9KiogWU5FL9H8ymqbm+zWOidE+iRyrD2sSCweuZIw71qs6Nldy6sE+gkV6zR/0vjK/vBC1jx9yOJIcr4W34XMweF/fDbs6wVcYz0mx7Ats50XlzphDAiEHhelwEhLpEFOs+HxewsgJvJsUpzK+y54KvpMJuLN1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=RULgRksi reason="key not found in DNS"; arc=none smtp.client-ip=57.103.75.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-3a-60-percent-3 (Postfix) with ESMTPS id 80EFA18001DE;
-	Mon,  2 Feb 2026 15:18:31 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; t=1770045514; x=1772637514; bh=86URY0R3OWFSx2Fa+dwHF/mkgOf10kvIJA3+jyD+2yg=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=RULgRksiOqAttMOuRup3Z4MLUGg/fgKF48XXGB369P2C94ZpnadpOSM2fLIXHvwtz4q2eRL2IvV5O6RO2hhKK5MfWh3wKF0TrAduOvpFwkteCiagC7AGYOccmVI7+OHLuvQrkt+VJwS0toh1Yzp6X97z+9SDSiHxkD81TSiJiposrCGUiLWNA3N1BxjOs3A9n9YB4fuGxRr4rIHolXR3e4kG7Yqfk0fX8AnZ2d0A1mLNfA/h1fbfQMXw9HRzHriQE4z1taaS95Dk8x+OGW6aVq1uvOKLARVaIM/5AxHWbxYpPpJ1pooOwtnpF80pFtaZfx/torgVCNZueqRF+J3EUw==
-mail-alias-created-date: 1719758601013
-Received: from desktop.tail809fd.ts.net (unknown [17.57.154.37])
-	by p00-icloudmta-asmtp-us-west-3a-60-percent-3 (Postfix) with ESMTPSA id AF6E618001C5;
-	Mon,  2 Feb 2026 15:18:26 +0000 (UTC)
-From: Yohei Kojima <yk@y-koj.net>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Yohei Kojima <yk@y-koj.net>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] docs: ethtool: clarify the bit-by-bit bitset format description
-Date: Tue,  3 Feb 2026 00:17:19 +0900
-Message-ID: <e9ea0fe8bf7935d6439e4dc883414b685afbaf58.1770045398.git.yk@y-koj.net>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1770045698; c=relaxed/simple;
+	bh=cxS5f7uc7f5GnSEnsquzqegRUY+RwqW1yaO2iV3mNj0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=GzLbaNVyGdPywCZJ/7VBjx/+4fvsA0S61Itz/RkYsSRbHJN7xB7MlDyFEWGVOtLN5rlNSCeS7b/N31ka7nnFv/kkIptz3IZj007HuAHwP3BAFtfYK8HiZfWdFCg/QPleEk6O09H8E7PvZaxZSwgr9TjDUSJ9N7EolEm5glgp/ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=w8u0SG/O; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7d19bfe1190so3415761a34.1
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 07:21:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770045696; x=1770650496; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wxj6zizRkl91lZaIWrOHbU5uPIPw1msSpAEANOdO+m4=;
+        b=w8u0SG/OWJNKy6KXytuSOrr9jVlB87Jw3YqEAn/kbx62Ul7umG69VwssA8u7iwtjFd
+         zbyNsKG1kupKZcySb4zGmJndiIjjw6Q2j0qFnOEqIbDmnrfypMN2ThSRLg/ovjllF+s7
+         A2+xgHFnlFBGloJ4WUhuJ11WP2mH45A1p4nKTfrYBd0J4diivrSUdN7eaYab9CiQ2IiX
+         3ckeOj1NfAKp/dhsi3JGuKBebhCY/qBZEPOPSwLaPkoF8wMH3Is1xlHecdy1wgSAoEl3
+         d6pKMuTwYnQmJtUEmzkYhvHr+oX0C6kseGPrPTjmW1F1uaVILFIhgm3zql5ri+PwU32q
+         4TXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770045696; x=1770650496;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wxj6zizRkl91lZaIWrOHbU5uPIPw1msSpAEANOdO+m4=;
+        b=XbzZiNmTLTGvA42fI6RVxQKbo5jaCd/n9KH/HmZ799rbxCqHIRw51uxjM0vU1Og08T
+         S3643qfDto0UAKsUfEPtado2SSBI6UN9ieJhrHcdGAQanZ+sG6uSK7CYaio+R63jdtKS
+         2nikWZlGO0Ceti6bnP0OqhJ6RgZkInSPdGlsPnMLAk0P6fOa8XD4EFtLk2WnFgtX1r2o
+         9W98uAYplLxvALFcZH/tPR1glCbIV90H2JScwkmYg3VJekxaODrcPaUH6m4JWuEDAzfm
+         PtX+Lb6YyeDIRYl1IlrLlFpX95hiVp6bQAm0VmWSOiL/mhfm1qhe9jkp//Q4mm4tOKwD
+         LIDg==
+X-Gm-Message-State: AOJu0YychDl9rIb+LjXfeezhPewi3SUvj9FnyTjAB/4Laqjl9SVRhFWy
+	JWq85o86COPlUYhxiYgWLBcszrseTBK4Q/e8HvWtMaL8iVAwIp+8CbG+vA+bHcCcX0o=
+X-Gm-Gg: AZuq6aIcIRccIFfrH1CgQj8Mf/3CG5VISBEgcwhcTzRMgrMDQ5l7EeZsw3VuSg5MeFK
+	ICZnbD7zvdpu7F7X1shC0uq6hi7OQNhyXUijf7zYx6+UWbVKkuCx7gmr6ktU3Z4kNMQy8yT/RlI
+	sjNqfDb17ve1XqX+G5LlWtMulVIYpzjNvgaESdeAYgppiafEGin0gTcxl7VtJdiq0AsykqasLMy
+	EAIoYixgo7HB9fe74iKf0AvOU3W2yzc3c5eYXRsgczsf+Qv7uEJWEOfobAb4EZTAedSNKAmfTRB
+	xf0kHxZnIkUbMELFOrImavv9Ie3/19/duARx/esyFJgJuQlDeULGLNKCqJmyGywMZ7CbYOlB0Dp
+	z+HQdt5A8gbT8VK98vqBrDKQPZrZX2o3l7BhJcRbL0jpNY+rmpD32H4p+aFb8AHqxiqldfCNEAD
+	9Xdc0kO196LUqnxA0o6Qoin6wZvKcvSEC3j2oLkqNnfk10PZ1CjS3yFxCW/hNtSYgQbB3+5C39s
+	0E=
+X-Received: by 2002:a05:6830:440b:b0:7cf:d1b7:c076 with SMTP id 46e09a7af769-7d1a534ea50mr7157112a34.23.1770045695782;
+        Mon, 02 Feb 2026 07:21:35 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d18c7ffcbcsm10613171a34.24.2026.02.02.07.21.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 07:21:34 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org
+In-Reply-To: <8b46043155b3abd8a6421c6aa9a61064d1d430e4.1769962652.git.asml.silence@gmail.com>
+References: <8b46043155b3abd8a6421c6aa9a61064d1d430e4.1769962652.git.asml.silence@gmail.com>
+Subject: Re: [PATCH io_uring 1/1] io_uring/zcrx: fix page array leak
+Message-Id: <177004569461.1085433.7355294259467729179.b4-ty@kernel.dk>
+Date: Mon, 02 Feb 2026 08:21:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDEyMSBTYWx0ZWRfXwwi1FkKIODPm
- YQJoXNRo1d94rfWWM5bX67vmcEYAdMV/TDRioAcKh/Gl5KrwaN2Zn1Ag6Z+oLta3K/z8doTf4vA
- 5RvZDOPe1zQIoaqy5naFS2UFttBQ97sv0ic+bgH8LwFeOv+f0nWLTz19vjr5tlrLqczGdVt9PiU
- S1/vQ83n0LvuJ33y1pCEpq6RCYAPycRRJpZN5AvpW/1VDpz/uPsNjTp6H1TVCaro/KTcFpMSfGH
- qp0jVS90TRKrRSw6qaaUWZ0kCH9Jt5gSDyHX1BT+4E1t9jmXrDGklrDVxcQrBlpwMLD108ERqUX
- JknZ3FLhxeYVla7VWIA3XFpbwtLb7K7LKCLNLtJII0+3+WSxjcJWpxllCHHcm4=
-X-Proofpoint-GUID: AHt_TwtUlF6C5Ha09unb-ZnJq36hs8F2
-X-Authority-Info-Out: v=2.4 cv=BcrVE7t2 c=1 sm=1 tr=0 ts=6980c048
- cx=c_apl:c_apl_out:c_pps a=qkKslKyYc0ctBTeLUVfTFg==:117 a=HzLeVaNsDn8A:10
- a=VkNPw1HP01LnGYTKEx00:22 a=jnl5ZKOAAAAA:8 a=hY83FSAyczh_wuX0RbwA:9
- a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-ORIG-GUID: AHt_TwtUlF6C5Ha09unb-ZnJq36hs8F2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-02_04,2026-01-30_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- clxscore=1030 mlxlogscore=999 lowpriorityscore=0 bulkscore=0 phishscore=0
- mlxscore=0 adultscore=0 suspectscore=0 malwarescore=0 classifier=spam
- authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602020121
-X-JNJ: AAAAAAABhHzFeiUT9L0dTIBkseIX36xI7QHD+2ifPOsmHfw4AZo/RMWB+nWubnIbNGZlXzKDblVLe8NMaJS2h2bB2soNGaWIkdSCg4jlJNdeSNEV2doL5oM6iJfOmVB7u3n7xEQrUgwaKdOPS9wTOgiek6qQLTjt/WZGirLkWiC8EDRZrka6WLOaYiSpDfgZd5fUYKdc5naRhSBe0+A5wRy4Bzpa/+4UKMb7H9Q2guMcgMCUZ34xmzqZgxKqQoVlUbrXTWz7vMc/DHpn7n+UP0NFrX+GtEb97aFbo/yDhoQLjwGo7BBfxEegSkTfjK//hOFrc7snoA5W/CZ60WHDW1zTB8qJhdhHpXJby7GC7NFxMYXG0b7C0KzGRR7aUc2eEGOUIwqekqwNRRHk6meZLZaziV4Va9OP4t0SZU9Juf7T8yHCdx8ltpTQQOtGbyYablLz4onS6iaFQ5hITPPyWOJHa87INPw/OXQLP86VSEAYPjNXbtYTlm5tLPXa6TpdyFeFUtohlCCkoX7dj5PmLosa/krbsj72KSVWKyQ7y985D6Q/Xd2XKDW9fqB4bvQvFeBrMv/njdylmsyhBrN9/advLdkz5mses+scVEPOUFqkdA+yigI497BY5rROY3q+T8j/AyNzfV9B45E/Ju7UUgrEi5cvz60ybvCoSq2+6DJyUL8mDfGzdr90jf+m1VLcAO5NPY4FdYZGo26wWUsmcKsc3c1FbfyCWOKf78v6kW3tgHvfio5HpZF9575IDze9zjRirESoTXj6eDCgVdWr1mc+VnVdHJixtcY8hXFa/Q==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[y-koj.net:~];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-255903-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255904-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[y-koj.net];
-	R_DKIM_PERMFAIL(0.00)[y-koj.net:s=sig1];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yk@y-koj.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DMARC_NA(0.00)[kernel.dk];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
+	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.994];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,y-koj.net:mid,y-koj.net:email]
-X-Rspamd-Queue-Id: 68182CE261
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20230601.gappssmtp.com:dkim,kernel.dk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5BB60CE234
 X-Rspamd-Action: no action
 
-Clarify the format and semantics of the bit-by-bit bitset by the
-following changes:
-* Explicitly describe the mandatory and optional fields in one paragraph
-* Detail what happens if ETHTOOL_A_BITSET_NOMASK is set
-* Clarify that users can set both BIT_INDEX and BIT_NAME fields
 
-Signed-off-by: Yohei Kojima <yk@y-koj.net>
----
- Documentation/networking/ethtool-netlink.rst | 31 ++++++++++++--------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+On Sun, 01 Feb 2026 21:18:53 +0000, Pavel Begunkov wrote:
+> d9f595b9a65e ("io_uring/zcrx: fix leaking pages on sg init fail") fixed
+> a page leakage but didn't free the page array, release it as well.
+> 
+> 
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index af56c304cef4..e20f8b541a5b 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -96,7 +96,7 @@ For short bitmaps of (reasonably) fixed length, standard ``NLA_BITFIELD32``
- type is used. For arbitrary length bitmaps, ethtool netlink uses a nested
- attribute with contents of one of two forms: compact (two binary bitmaps
- representing bit values and mask of affected bits) and bit-by-bit (list of
--bits identified by either index or name).
-+bits identified by index or name).
- 
- Verbose (bit-by-bit) bitsets allow sending symbolic names for bits together
- with their values which saves a round trip (when the bitset is passed in a
-@@ -156,17 +156,24 @@ Bit-by-bit form: nested (bitset) attribute contents:
-  | | | ``ETHTOOL_A_BITSET_BIT_VALUE`` | flag   | present if bit is set       |
-  +-+-+--------------------------------+--------+-----------------------------+
- 
--Bit size is optional for bit-by-bit form. ``ETHTOOL_A_BITSET_BITS`` nest can
--only contain ``ETHTOOL_A_BITSET_BITS_BIT`` attributes but there can be an
--arbitrary number of them.  A bit may be identified by its index or by its
--name. When used in requests, listed bits are set to 0 or 1 according to
--``ETHTOOL_A_BITSET_BIT_VALUE``, the rest is preserved. A request fails if
--index exceeds kernel bit length or if name is not recognized.
--
--When ``ETHTOOL_A_BITSET_NOMASK`` flag is present, bitset is interpreted as
--a simple bitmap. ``ETHTOOL_A_BITSET_BIT_VALUE`` attributes are not used in
--such case. Such bitset represents a bitmap with listed bits set and the rest
--zero.
-+For bit-by-bit form, ``ETHTOOL_A_BITSET_BITS`` attribute is mandatory, and
-+``ETHTOOL_A_BITSET_SIZE`` is optional. ``ETHTOOL_A_BITSET_BITS`` contains
-+zero or more ``ETHTOOL_A_BITSET_BITS_BIT``, which must contain
-+``ETHTOOL_A_BITSET_BIT_INDEX`` and/or ``ETHTOOL_A_BITSET_BIT_NAME``.
-+``ETHTOOL_A_BITSET_BIT_VALUE`` is optional, and ignored if
-+``ETHTOOL_A_BITSET_NOMASK`` is present.
-+
-+``ETHTOOL_A_BITSET_NOMASK`` specifies the semantics of the bitset. If
-+``ETHTOOL_A_BITSET_NOMASK`` is present, the bitset represents a list of the
-+enabled bits (e.g. all bits are unset if ``ETHTOOL_A_BITSET_BITS`` is empty).
-+On the other hand, if ``ETHTOOL_A_BITSET_NOMASK`` is not present, the bitset
-+represents a list of the masked (valid) bits, and
-+``ETHTOOL_A_BITSET_BIT_VALUE`` is present iff the bit is set.
-+
-+``ETHTOOL_A_BITSET_BIT_INDEX`` and ``ETHTOOL_A_BITSET_BIT_NAME`` identify
-+the bit in the bitset. If both are set, the index and the name must point
-+to the same bit. A request fails if the index exceeds kernel bit length or
-+the name is not recognized.
- 
- In requests, application can use either form. Form used by kernel in reply is
- determined by ``ETHTOOL_FLAG_COMPACT_BITSETS`` flag in flags field of request
+Applied, thanks!
+
+[1/1] io_uring/zcrx: fix page array leak
+      commit: 0ae91d8ab70922fb74c22c20bedcb69459579b1c
+
+Best regards,
 -- 
-2.52.0
+Jens Axboe
+
+
 
 
