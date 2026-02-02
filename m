@@ -1,177 +1,134 @@
-Return-Path: <netdev+bounces-256019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHL3J4kcgWm0EAMAu9opvQ
-	(envelope-from <netdev+bounces-256019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:52:09 +0100
+	id EDX1OKEdgWm0EAMAu9opvQ
+	(envelope-from <netdev+bounces-256020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:56:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12441D1DE2
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:52:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82381D1E36
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 22:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60ABC30416EC
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 21:49:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D38A13004F15
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 21:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D47314A73;
-	Mon,  2 Feb 2026 21:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69BF318BAE;
+	Mon,  2 Feb 2026 21:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bKYcQ3L1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TnPxR8X+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F593128D2;
-	Mon,  2 Feb 2026 21:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563C33164D8;
+	Mon,  2 Feb 2026 21:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770068972; cv=none; b=jBT1dsdjx/iSgE2IItfHA4G3s6BgHR2LLCBlGm+rVbynppTyZNMIPhWfsI/9FnxO3ByqppVS+MA2trGiN62bLpcZm+KmBb2leyZyULbB0GzDBn2fnFy5eE9lujnx5LqNHZ8Cw5BrfwjO0mVfYIn3BShw5pJ3kYY560ypXkJL1hU=
+	t=1770069407; cv=none; b=gxYvkmupPEgutV+XS7Z5qg3Z/Mw9lTfPaO5yWHqOjCGiKPxjVG/dGwUx9faSaXXNx9M0ivacA5CtsRENYn2mdAEfLPLzWMeMidGU5O1AqIz2T5B/nSyTw47pFS7sM7D30Mm5W6KpFLcD1qZy98qT2XnUhoFaf29yHdJzCocTmWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770068972; c=relaxed/simple;
-	bh=EY2CrS28kRVeb7uWnMWJfY8xjXKXRdCHiuTKy5sQkoY=;
+	s=arc-20240116; t=1770069407; c=relaxed/simple;
+	bh=icNL53FMGHZpKJ4q+2FtrZzRr7eH0qXFby9T73+w2xA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BhUd6JJ1bx97T3jXMyI80u4O8IHCHQJPKglNn78RQWfl9XAighO1EFcwhAn7UbYZU74CwD7AUT5jMeHHkLYuvY0aGt94x/lqy8Uiv2Us1U904UK+wjro89bMVuiNiu6t731lZ8j2N07zjbERXCqo4e2jGQbUNC41mvCONTkRZbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bKYcQ3L1; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770068970; x=1801604970;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EY2CrS28kRVeb7uWnMWJfY8xjXKXRdCHiuTKy5sQkoY=;
-  b=bKYcQ3L1AlHtTx3aL3vINnmlrJcTWTV6JnNoVpMC3EQsPEtmRHmHWAJB
-   dgptjY9N5Kot5pOko6ts1ab6b8O44jrgbtqZXhhnr5iRaSPPWc/iMVD2X
-   6n59WqhjMpg0CZy84KMj4SarOsZZcISyRMzpwIB96B+9PgLOo0DylPFEX
-   ah1kQP7GvM/X7AOAHCfVeQySIts0XkZ8d5Jik7jszVh4rHjXB+n1dxBKJ
-   R62cBqbpYYSjEeJuWV+rbTr7+UGvHFEeraMEWgFKIXD5HdvRPx2Y7ndib
-   OJWa5XTPbHXhjsE/pn9ZAAMjRX/rcjS9BRsU67ibRnLlU/x5Ft0GWFAuA
-   Q==;
-X-CSE-ConnectionGUID: iYpCt/ImSmiCj4tnMUqnOg==
-X-CSE-MsgGUID: gzLtq9edQOKRvrB0HrbDVQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="71317560"
-X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
-   d="scan'208";a="71317560"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 13:49:30 -0800
-X-CSE-ConnectionGUID: 1mLhGU+kRviswRU3MKb1ZA==
-X-CSE-MsgGUID: 3/hN4atiQQuJCR8s9tAfFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
-   d="scan'208";a="208743963"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 02 Feb 2026 13:49:24 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vn1nN-00000000fzM-1pxx;
-	Mon, 02 Feb 2026 21:49:21 +0000
-Date: Tue, 3 Feb 2026 05:48:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	linux-rdma@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QNsa1IJDZbA+u4hDB2eaYQ2ecZVQPG5I7dEGMPM1XqyGgykuBMn4L99Zrs+Lsmpyk4wBWVk5FGm4HXv/sjwFYxBm+uMI/vJcdUA4h33Wc/J4smVAc7Ul1nqFSq0rdG9Pb+iGXw1rXti2jpBQG/gI+PGh6oynuYwcfuWavrQ56R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TnPxR8X+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=rJvzut9ZNDadtUO4vR0GCubAl85vutbghKxFZL86ddI=; b=Tn
+	PxR8X+/lLbO1GfT2BaLa4eARDN6IEu7e9CjwsRQ5R4hH/L1ShhyD4GOae6iH8OsOg0IYv5idoI9fp
+	xYKcV5GFu8MwUlDGM6Nb4xeq1y/KPEaG5yluGqwqfHOUrHnvdqNLhZx/rcHk7M695EzjPfVAhmgCM
+	1aSTmhpLBNleiPY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vn1uV-005sPv-2L; Mon, 02 Feb 2026 22:56:43 +0100
+Date: Mon, 2 Feb 2026 22:56:43 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-can@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	Michael Grzeschik <m.grzeschik@pengutronix.de>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 7/9] dpll: Add reference
- count tracking support
-Message-ID: <202602030538.6ok1xugA-lkp@intel.com>
-References: <20260202171638.17427-8-ivecera@redhat.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Thomas =?iso-8859-1?Q?M=FChlbacher?= <tmuehlbacher@posteo.net>,
+	Oliver Hartkopp <socketcan@hartkopp.net>
+Subject: Re: [PATCH net-next] net: remove unnecessary module_init/exit
+ functions
+Message-ID: <4b7b8238-3997-45d1-a8ee-b659afc0374c@lunn.ch>
+References: <20260131004327.18112-1-enelsonmoore@gmail.com>
+ <66924451-2b19-4a3b-ba99-16437dc79011@lunn.ch>
+ <CADkSEUjEYY=Wwyumv3Ft_T=xWLJY2hiy4uw_YMus=4o=61H+BQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260202171638.17427-8-ivecera@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADkSEUjEYY=Wwyumv3Ft_T=xWLJY2hiy4uw_YMus=4o=61H+BQ@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[lists.linux.dev,google.com,intel.com,kernel.org,vger.kernel.org,lists.osuosl.org,redhat.com,resnulli.us,gmail.com,microchip.com,linux.dev,nvidia.com,lunn.ch];
-	TAGGED_FROM(0.00)[bounces-256019-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256020-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 12441D1DE2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 82381D1E36
 X-Rspamd-Action: no action
 
-Hi Ivan,
+On Mon, Feb 02, 2026 at 12:33:08PM -0800, Ethan Nelson-Moore wrote:
+> Hi, Andrew,
+> 
+> On Mon, Feb 2, 2026 at 12:29 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > I could be missing it, but which module does not have an module_exit
+> > function?
+> None of them. That sentence was just to explain why other instances of
+> empty module_exit functions were not removed, in case someone else
+> tries to do that. I didn't realize module_exit was required to unload
+> the module at first, and other people might not either.
 
-kernel test robot noticed the following build errors:
+You need to be careful with commit messages. Reviewers read them, and
+think about the implications of what they say. As a result, you wasted
+some of my time looking for a driver which did not have an
+module_exit, and wondering if there was a legitimate reason for not
+having it, and had you just broken it....
 
-[auto build test ERROR on net-next/main]
+       Andrew
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dpll-Allow-associating-dpll-pin-with-a-firmware-node/20260203-012705
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260202171638.17427-8-ivecera%40redhat.com
-patch subject: [Intel-wired-lan] [PATCH net-next v4 7/9] dpll: Add reference count tracking support
-config: i386-randconfig-141-20260203 (https://download.01.org/0day-ci/archive/20260203/202602030538.6ok1xugA-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-smatch version: v0.5.0-8994-gd50c5a4c
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602030538.6ok1xugA-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602030538.6ok1xugA-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from net/core/rtnetlink.c:61:
->> include/linux/dpll.h:235:1: error: expected identifier or '('
-     235 | {
-         | ^
-   1 error generated.
-
-
-vim +235 include/linux/dpll.h
-
-877c40367bc8a7 Ivan Vecera 2026-02-02  232  
-877c40367bc8a7 Ivan Vecera 2026-02-02  233  static inline struct dpll_pin *
-bed78c2008cb37 Ivan Vecera 2026-02-02  234  fwnode_dpll_pin_find(struct fwnode_handle *fwnode, dpll_tracker *tracker);
-877c40367bc8a7 Ivan Vecera 2026-02-02 @235  {
-877c40367bc8a7 Ivan Vecera 2026-02-02  236  	return NULL;
-877c40367bc8a7 Ivan Vecera 2026-02-02  237  }
-5f18426928800c Jiri Pirko  2023-09-13  238  #endif
-5f18426928800c Jiri Pirko  2023-09-13  239  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
