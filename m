@@ -1,303 +1,161 @@
-Return-Path: <netdev+bounces-255861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBvQNfSegGl2/wIAu9opvQ
-	(envelope-from <netdev+bounces-255861-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:56:20 +0100
+	id aMFqEYCfgGl2/wIAu9opvQ
+	(envelope-from <netdev+bounces-255862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:58:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 540C8CC869
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:56:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC46DCC897
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 13:58:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A980301184C
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:54:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A434E300AB05
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 12:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC1D1A5B9E;
-	Mon,  2 Feb 2026 12:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62495364037;
+	Mon,  2 Feb 2026 12:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TalsC5oY"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="xwznYkPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AA3199FAC
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 12:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9861367;
+	Mon,  2 Feb 2026 12:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770036846; cv=none; b=KnlXWZ0xqsksVrwB1vpzfYfrooI/Rg0XKp5IBLAmgG4PVuXXgPcxvbwEf9naXVliBpVcHIiwIMogvJUG7CXWjw4TfE1LxlTS+XzC09Mg+1SUQ8I5y32Ss3a0XOCT+DhkqN4pxtyITSYLTvftAFYha6d9CWo6irqtwT9cE6c5c2I=
+	t=1770037117; cv=none; b=BQpAacDkye5+V1+tB5G/YF0krm5hfhEXUxXEgigauAssnacPAakELqbev1XaQZpZSBmutDsHkvSE7qkfP8VD9IFSH8Cw+JbBkPW9q5j43evXNxP4vR9jG8VgsMjyG8iVurD/EedoeZXlUz71yQgbiUwYm+vbF1L1Gw9/Dgry56Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770036846; c=relaxed/simple;
-	bh=cosfBNIN7L3c4jhjdlmyyBBU1waSFPgeMbzGNcZNZpc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YyTF+qAdZCY8KuO9lPm7F1GUb86996IEBVMwxO+d30Xgs2Tvoq8gQt0vcrFw0VAMemH1C7mdE2PP+8QCoR3bdoW/hdzb+MWGAGOix8p5XVdQCU7u/plyWmjZrmuey0JEUmcGUd6SugxQTFD4TiipnPtTODJaN7aEAEj0ORNWTpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TalsC5oY; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=DoEHeSEz5BuOy39fRx7cDEHXYzqftlVWK2wOiFdbyRo=;
-	b=TalsC5oY9+Rl4hNmwVf6/TWzZ4/l2VVzlE3vXuDu4f+So5nqmTyVIDsb/aTQOfk9aH4N8uDMH
-	cqbT+mib2n0Y1CJU4LizyZa9aeYHoyL4e6onYppCnlsxwz3+zMJeWfxi1JXGmArZZTMI8bCn82u
-	wtMDowA6Cw+bJ55Hvf7AZIY=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4f4RKm38Gwz1prLN;
-	Mon,  2 Feb 2026 20:50:20 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 60A8E40538;
-	Mon,  2 Feb 2026 20:53:53 +0800 (CST)
-Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 2 Feb 2026 20:53:53 +0800
-Received: from [10.174.177.223] (10.174.177.223) by
- kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 2 Feb 2026 20:53:52 +0800
-Message-ID: <7befb796-be66-4518-96a5-6df607edd41d@huawei.com>
-Date: Mon, 2 Feb 2026 20:53:51 +0800
+	s=arc-20240116; t=1770037117; c=relaxed/simple;
+	bh=EQYgeFMRnAra6VD3mRXRAYPSuobvY0vgyn4p7L6o7Wk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T8pK65+IqgBThzyiOpqy3NHf3eyXiRjcsZKMngXqqThFRI1uIHtzNo6sn9/VYC/33CQbMGemcpBOZB6g7RcZ61r3C6/M4vAoIqZzUATcQQfI9gD1Lk6uAuv+uR6dW9OSx9PVBCP3YDcRWWasr22YRq2ld2+fvzq/pPyREMwoKi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=xwznYkPw; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id CEDE0207B2;
+	Mon,  2 Feb 2026 13:58:31 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rgW3CbLfYYHm; Mon,  2 Feb 2026 13:58:31 +0100 (CET)
+Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 4210520704;
+	Mon,  2 Feb 2026 13:58:31 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 4210520704
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1770037111;
+	bh=j1sWmd7dduqlWa8sGRzIIEoYszWoZKE2Z6bA0k5T654=;
+	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
+	b=xwznYkPwCLpxFORZf5xNq5lQM/IUxJMsFYsFeeJzJOP2PLikoBzJN9og2IqLQsH/e
+	 H5MVyTkBfnBO8BK9s64dAr82GWLdYxpkol7QZI8BB+B9SU189pbvy+x+9WeMMDh8kP
+	 ToA2N+xEqe6MGA4kowBp93YQl8bsikcvQaUsiwt9piXMridzvvTrw54N4DKOhYxPDm
+	 BkqwjmoS+1+l/r3cch0Z4xwHab55AIil2Ixdh9Aj1SZWMglVnnVw6j4j28SJ7eaDvk
+	 a6mbYeSUz2QKXHG9dXIStx2sSTtJ79RnjlZtIKlazMjCBfgXW188fSU6KWBqCEfoTm
+	 JGBy1fZ9qtl3Q==
+Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
+ (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Feb
+ 2026 13:58:30 +0100
+Date: Mon, 2 Feb 2026 13:57:56 +0100
+From: Antony Antony <antony.antony@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
+	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	<netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Chiachang Wang <chiachangwang@google.com>, Yan Yan
+	<evitayan@google.com>, <devel@linux-ipsec.org>, Simon Horman
+	<horms@kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH ipsec-next v5 3/8] xfrm: allow migration from UDP
+ encapsulated to non-encapsulated ESP
+Message-ID: <aYCfVAeKGqF7MIRq@moon.secunet.de>
+Reply-To: <antony.antony@secunet.com>
+References: <cover.1769509130.git.antony.antony@secunet.com>
+ <7c30e7f8543048a384f693684ccba5f71fe8543b.1769509131.git.antony.antony@secunet.com>
+ <aXyV028imsUPWSyq@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: add RCU protection to (struct
- packet_type)->dev
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
-	<netdev@vger.kernel.org>, <eric.dumazet@gmail.com>, Yin Fengwei
-	<fengwei_yin@linux.alibaba.com>
-References: <20260202102658.858769-1-edumazet@google.com>
-From: "dongchenchen (A)" <dongchenchen2@huawei.com>
-In-Reply-To: <20260202102658.858769-1-edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200002.china.huawei.com (7.202.195.90)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aXyV028imsUPWSyq@krikkit>
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-02.secunet.de
+ (10.32.0.172)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,linux.alibaba.com];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	TAGGED_FROM(0.00)[bounces-255861-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email];
+	TAGGED_FROM(0.00)[bounces-255862-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	HAS_ORG_HEADER(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dongchenchen2@huawei.com,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	MISSING_XM_UA(0.00)[];
+	HAS_REPLYTO(0.00)[antony.antony@secunet.com];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 540C8CC869
+X-Rspamd-Queue-Id: CC46DCC897
 X-Rspamd-Action: no action
 
+On Fri, Jan 30, 2026 at 12:28:19 +0100, Sabrina Dubroca wrote:
+> 2026-01-27, 11:42:40 +0100, Antony Antony wrote:
+> > The current code prevents migrating an SA from UDP encapsulation to
+> > plain ESP. This is needed when moving from a NATed path to a non-NATed
+> > one, for example when switching from IPv4+NAT to IPv6.
+> > 
+> > Only copy the existing encapsulation during migration if the encap
+> > attribute is explicitly provided.
+> 
+> Are we sure nobody out there relies on this behavior (silently copying
+> the existing UDP encap without having to explicitly request it in the
+> MIGRATE request)? If there are, this patch would break their setup by
+> clearing the encap that they expect to still be present.
 
-在 2026/2/2 18:26, Eric Dumazet 写道:
-> Yin Fengwei reported an RCU stall in ptype_seq_show() and provided a patch.
->
-> Real issue is that (struct packet_type)->dev needs RCU protection:
->
-> ptype_seq_show() runs under rcu_read_lock(), and reads pt->dev
-> to get device name without any barrier.
->
-> At the same time, concurrent writer can remove a packet_type structure
-> (which is correctly freed after an RCU grace period) _and_ clear pt->dev
-> without an RCU grace period.
->
-> Fix this issue by using proper RCU on pt->dev pointer.
->
-> Then, we need to record this dev pointer in ptype_iter_state
-> so that ptype_seq_next() can properly detect the end of dev->ptype_all.
->
-> We also need to add full RCU protection in ptype_seq_next().
-> (Missing READ_ONCE() when reading .next values)
->
-> Many thanks to Dong Chenchen for providing a repro.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Fixes: 1d10f8a1f40b ("net-procfs: show net devices bound packet types")
-> Fixes: c353e8983e0d ("net: introduce per netns packet chains")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: Yin Fengwei <fengwei_yin@linux.alibaba.com>
-> Reported-by: Dong Chenchen <dongchenchen2@huawei.com>
-> Closes: https://lore.kernel.org/netdev/CANn89iKRRKPnWjJmb-_3a=sq+9h6DvTQM4DBZHT5ZRGPMzQaiA@mail.gmail.com/T/#m7b80b9fc9b9267f90e0b7aad557595f686f9c50d
-> ---
->   drivers/net/ethernet/amd/xgbe/xgbe-selftest.c |  2 +-
->   .../ethernet/mellanox/mlx5/core/en_selftest.c |  2 +-
->   .../stmicro/stmmac/stmmac_selftests.c         | 12 ++---
->   drivers/scsi/bnx2fc/bnx2fc_fcoe.c             |  4 +-
->   drivers/scsi/fcoe/fcoe.c                      |  6 +--
->   include/linux/netdevice.h                     |  2 +-
->   net/batman-adv/hard-interface.c               |  2 +-
->   net/core/dev.c                                | 30 ++++++-----
->   net/core/net-procfs.c                         | 51 +++++++++++++------
->   net/core/selftests.c                          |  2 +-
->   net/ncsi/ncsi-manage.c                        |  2 +-
->   net/packet/af_packet.c                        | 24 +++++----
->   net/tipc/bearer.c                             |  6 +--
->   13 files changed, 85 insertions(+), 60 deletions(-)
+Libreswan and Android are the main users of migrate method. Libreswan sets the
+value in every call. I am guessing Android does that too.
 
-Hi, Eric! Obtaining dev from ptype_iter_stateis sufficient to solve this issue, so it seems we do not need to add RCU 
-protection for dev in ptype procfs. Perhaps the changes related to RCU 
-could be moved to another patch? -----
-Best Regards,
-Dong Chenchen
+Yan, would this patch cause regression in Android?
 
-> diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-> index 70e0e9a3b650c0753f0b865642aa372a956a4bf5..ad63556c9e0abd15cbfac7777c31894d2eef037b 100644
-> --- a/net/core/net-procfs.c
-> +++ b/net/core/net-procfs.c
-> @@ -170,8 +170,15 @@ static const struct seq_operations softnet_seq_ops = {
->   	.show  = softnet_seq_show,
->   };
->   
-> +
-> +struct ptype_iter_state {
-> +	struct seq_net_private	p;
-> +	struct net_device	*dev;
-> +};
-> +
->   static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
->   {
-> +	struct ptype_iter_state *iter = seq->private;
->   	struct list_head *ptype_list = NULL;
->   	struct packet_type *pt = NULL;
->   	struct net_device *dev;
-> @@ -181,12 +188,16 @@ static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
->   	for_each_netdev_rcu(seq_file_net(seq), dev) {
->   		ptype_list = &dev->ptype_all;
->   		list_for_each_entry_rcu(pt, ptype_list, list) {
-> -			if (i == pos)
-> +			if (i == pos) {
-> +				iter->dev = dev;
->   				return pt;
-> +			}
->   			++i;
->   		}
->   	}
->   
-> +	iter->dev = NULL;
-> +
->   	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_all, list) {
->   		if (i == pos)
->   			return pt;
-> @@ -218,6 +229,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
->   
->   static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
->   {
-> +	struct ptype_iter_state *iter = seq->private;
->   	struct net *net = seq_file_net(seq);
->   	struct net_device *dev;
->   	struct packet_type *pt;
-> @@ -229,19 +241,21 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
->   		return ptype_get_idx(seq, 0);
->   
->   	pt = v;
-> -	nxt = pt->list.next;
-> -	if (pt->dev) {
-> -		if (nxt != &pt->dev->ptype_all)
-> +	nxt = READ_ONCE(pt->list.next);
-> +	dev = iter->dev;
-> +	if (dev) {
-> +		if (nxt != &dev->ptype_all)
->   			goto found;
->   
-> -		dev = pt->dev;
->   		for_each_netdev_continue_rcu(seq_file_net(seq), dev) {
-> -			if (!list_empty(&dev->ptype_all)) {
-> -				nxt = dev->ptype_all.next;
-> +			nxt = READ_ONCE(dev->ptype_all.next);
-> +			if (nxt != &dev->ptype_all) {
-> +				iter->dev = NULL;
->   				goto found;
->   			}
->   		}
-> -		nxt = net->ptype_all.next;
-> +		iter->dev = NULL;
-> +		nxt = READ_ONCE(net->ptype_all.next);
->   		goto net_ptype_all;
->   	}
->   
-> @@ -252,20 +266,20 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
->   
->   		if (nxt == &net->ptype_all) {
->   			/* continue with ->ptype_specific if it's not empty */
-> -			nxt = net->ptype_specific.next;
-> +			nxt = READ_ONCE(net->ptype_specific.next);
->   			if (nxt != &net->ptype_specific)
->   				goto found;
->   		}
->   
->   		hash = 0;
-> -		nxt = ptype_base[0].next;
-> +		nxt = READ_ONCE(ptype_base[0].next);
->   	} else
->   		hash = ntohs(pt->type) & PTYPE_HASH_MASK;
->   
->   	while (nxt == &ptype_base[hash]) {
->   		if (++hash >= PTYPE_HASH_SIZE)
->   			return NULL;
-> -		nxt = ptype_base[hash].next;
-> +		nxt = READ_ONCE(ptype_base[hash].next);
->   	}
->   found:
->   	return list_entry(nxt, struct packet_type, list);
-> @@ -279,19 +293,24 @@ static void ptype_seq_stop(struct seq_file *seq, void *v)
->   
->   static int ptype_seq_show(struct seq_file *seq, void *v)
->   {
-> +	struct ptype_iter_state *iter = seq->private;
->   	struct packet_type *pt = v;
-> +	struct net_device *dev;
->   
-> -	if (v == SEQ_START_TOKEN)
-> +	if (v == SEQ_START_TOKEN) {
->   		seq_puts(seq, "Type Device      Function\n");
-> -	else if ((!pt->af_packet_net || net_eq(pt->af_packet_net, seq_file_net(seq))) &&
-> -		 (!pt->dev || net_eq(dev_net(pt->dev), seq_file_net(seq)))) {
-> +		return 0;
-> +	}
-> +	dev = iter->dev;
-> +	if ((!pt->af_packet_net || net_eq(pt->af_packet_net, seq_file_net(seq))) &&
-> +		 (!dev || net_eq(dev_net(dev), seq_file_net(seq)))) {
->   		if (pt->type == htons(ETH_P_ALL))
->   			seq_puts(seq, "ALL ");
->   		else
->   			seq_printf(seq, "%04x", ntohs(pt->type));
->   
->   		seq_printf(seq, " %-8s %ps\n",
-> -			   pt->dev ? pt->dev->name : "", pt->func);
-> +			   dev ? dev->name : "", pt->func);
->   	}
->   
->   	return 0;
-> @@ -315,7 +334,7 @@ static int __net_init dev_proc_net_init(struct net *net)
->   			 &softnet_seq_ops))
->   		goto out_dev;
->   	if (!proc_create_net("ptype", 0444, net->proc_net, &ptype_seq_ops,
-> -			sizeof(struct seq_net_private)))
-> +			sizeof(struct ptype_iter_state)))
->   		goto out_softnet;
->   
->   	if (wext_proc_init(net))
->
+Without this fix migrating from v4 nat to v6 and no v4 nat won't  work.
+
+Also the ENCAP migrate with UDP port was broken before, 2017,
+the commit 4ab47d47af20 ("xfrm: extend MIGRATE with UDP encapsulation port") ?
+So likely it was never used by older code and PF_KEY.
+
+For the new methed strongSwan wants to support migrating from UDP encap
+to no UDP encap.
+
+regards
+-antony
+
+PS : Steffen advised not to Fixes tag.
 
