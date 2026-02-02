@@ -1,144 +1,257 @@
-Return-Path: <netdev+bounces-255905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KApGN2HBgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255905-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:13 +0100
+	id KHgwBz3GgGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:43:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 892B2CE242
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:23:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62B1DCE63B
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 16:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4DAE930224FC
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:21:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC92B308734D
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 15:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6C437C0F3;
-	Mon,  2 Feb 2026 15:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8992A23FC54;
+	Mon,  2 Feb 2026 15:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aiYrJAju"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SnFVY670"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7E937B3F6
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 15:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0074E23D7FC;
+	Mon,  2 Feb 2026 15:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770045699; cv=none; b=nID6Cwdqt3X4ekjCtX2MNAs2fpFvH3oCR2t0KGdBqRtWvoyTWQK9duSJ14Cy0vBtuNRO+ZrV29s4qYkzkgcqeNlm5smeA06Y8Zx2eHB9hsFrD3yCLArn5ZOq54iuuW/rPVJmdK71kvRAx4YpPj/CPhX59tnyTA2nI2HJcBz4FPY=
+	t=1770046549; cv=none; b=evF+ocHcvbGGrwx2GfKAyMQjB2JLeayKq1rw8YP0XPxMeaPM8G/OYgBQUW99LpmzRBRW3XojpLs4TRXNtl7vsgQqew81cV9ioSjVpgLWd0ByO1esNGlkBL5t+CKAW6LfYH9ZsSLvp/y/7wv3WCOkMV4nhNuk7vaJjZNr1gK2flM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770045699; c=relaxed/simple;
-	bh=8Q88YVpVN3f3KDYwz/Bw/XL91VtecrW4X14Cb3DAFDU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=p5kdOPRN3stM6ukghe96yvcRUxHjzEilHL+u5c5BrbZEUSf64jCxPYYjsYGk7VmbX7RMwLb8T41B5FPBMINnV78tv0J97EImca+F5cN9KsDe1EiczOG84rTAhoEtsVsXpk0G/MiSGA6FkTAncx5JN28U+ZNL21l8R8GbIQNEUdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aiYrJAju; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7d15b8feca3so4426435a34.3
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 07:21:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770045697; x=1770650497; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uLiAs6xCi3OF/LJRXhhuk0xFYAWHNsdktdbtat4hSjg=;
-        b=aiYrJAjueiUgJ/jQVBQdnW7Du4jBRFhi/+UzWwaLimkR6qgXB9O3yF26ivKn6H2aZg
-         SIL0MmRfQd+Zz7+tgKTkX3Y+Cas3nZSirA3to+/IhpmfMcSvD7Rkeeg+k1dQcFETSzh0
-         2Qd7ab5uRLelI1KCwKvEUJJBI1aeAcve9sG36yWt2n0c1j7Ozuetk78rflGVPJUyeDFl
-         fxH5JOkw8pCxVm34ECaC2VCmEWGwETtcqIjzK7/uvJV9UZF7RPgCutkPmLC/lsMQPofz
-         Oph0KEfmp6hPwOt4Xb9Pzdm24OExKOuorQNuf/dPXCoE4T4h1cAy5ip9HhpIjc/xK8jv
-         dNlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770045697; x=1770650497;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uLiAs6xCi3OF/LJRXhhuk0xFYAWHNsdktdbtat4hSjg=;
-        b=qN2G/Sz4yvp0aBy2XmMWVSAkIjcPnnYrUOcf/nubdJ0t1bFOJk0MptyI7MDTulzw6s
-         GAbTy3sf7238oVuIXOaK/64j2MOG6V/8CB4VojrTR/KpXocTo1ODQ2nubG079+AMxOFm
-         kve/iEAR4uy1pBgIqwYHh3vu5atpLJmXmOCK/xAKjV48Ea1wymeZOHwQhZyxFEZJ5mPo
-         Umd2fH7nw/4W07vc0L77jYMEdWyrxOqHrxo3vopBtbLL3poGPv51Ix0QkzBxcBwi0zvc
-         mW4VIC2iwDgxBofopOki/6HUWYFOz9eXFhAhM9sgW6DLcsH9d+bXRiA19cLQG1Dfjer5
-         XFeg==
-X-Gm-Message-State: AOJu0YxacdRMIGHYVafEs9WrzzGXvhCrh/K6GeEq8vNTtIKfWjY3Kmgv
-	/dgkvfx+We/5sGviFp0YoRBNATRZkstprZj9Cb6TK2Ly0L7v9dfrktofwTjyFCdHQiw=
-X-Gm-Gg: AZuq6aLFraLSboDOpG/oHprFcigL/gk9EkzLFdV/S8RDQhBdAK589AhQ8NtzbfZR0fh
-	5GFAffda0qQwAS0tbAwNrD/USwKczBXs1lHv1jynVYk4LkAWTnxW5s5CeNe5+Sw9TuashCuvjH0
-	4bAozOyZ4WpoO6O1fSkJwnRck+QbnNI7SBaZ5btTiQOVr9dvKA/enV23Wa8sHo45SQrKOvggXTU
-	5QiKgMSbuWhfit0IBISXhBcCsqKyh5+STeDKvBkll4eveDPAYpb7hfo2IMkLlh/V7/4NARursz0
-	pWOLv7Nem8LsXC6nj54IwTz2+8J+0juGSsEpS8pHSEb1BpwBw2uQ1tf0nf4Ms7igW0IRHMS3FVK
-	aYydq+plkUwIlKgXUe+Mhrbz6ePI1r7oB3ERvgqn16QEBsjkarNbChaAF4XVYNlfb8zuPi1bD0O
-	r5V+465GXtgcXoGaKAycjRAzHjgi8nqJ+Zk4Fr7DtqKBoV6SiahjEdjnOGqLT6AuSh
-X-Received: by 2002:a05:6830:3103:b0:7cf:d168:1f3e with SMTP id 46e09a7af769-7d1a52a738bmr6797945a34.3.1770045696904;
-        Mon, 02 Feb 2026 07:21:36 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d18c7ffcbcsm10613171a34.24.2026.02.02.07.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 07:21:36 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org
-In-Reply-To: <634b9ef89352140259494d6d08086aaa30a72e02.1769962683.git.asml.silence@gmail.com>
-References: <634b9ef89352140259494d6d08086aaa30a72e02.1769962683.git.asml.silence@gmail.com>
-Subject: Re: [PATCH io_uring 1/1] io_uring/zcrx: fix rq flush locking
-Message-Id: <177004569590.1085433.5381405081805742961.b4-ty@kernel.dk>
-Date: Mon, 02 Feb 2026 08:21:35 -0700
+	s=arc-20240116; t=1770046549; c=relaxed/simple;
+	bh=JSV3GkPQFWTvQDoMtc9vQalyIuWccRoO2J2Vlt7ee8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o8ZPDJPS0PVvDsmkmNcmyei0m3am27ChDJT/PxZUTEy+TVPflokiFyWefLIv1RxxEmVUc9OurvyUcUyQEYwv90IfQyNlwPGIDi6rdkJ5TMFBBgevq2wT8lZLvLu84Nvb3qjYK35w9GTfvQk10rSsnTtexrR4bxz4i6PIOYMGyRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SnFVY670; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 612ERMpu006538;
+	Mon, 2 Feb 2026 15:35:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=+bNH8c
+	8azHGqltgCQV3/8XTF0YASLgikDm2nMiipNE0=; b=SnFVY670H9s5+S5EEGaSvA
+	CA8aR30PKPcVrhbD4iqSwtfqioebXcchmCOJ1b7ZkHbvkuG3sg34fwTr5VGdhAxH
+	7nVNu/+iMgBqVDWRxMdR3lSaa69Xg66AAvOZMh4nlodjrPHGxR+AsQq046cj7x8N
+	eWnnC3sqR+h7By4oKImBDvWluZTQDy4uJXtQBdpKEp3RB6/OJ2skB0tfHQ/T3lCl
+	y0ga7OXZRQTIqzz8HL/I4rt+dK7MS80x5rS1MhbuaKW+4gkNCM20ubi6fxJwM3zN
+	Fy6kInoqaM/9kbY+PcmVtiYnw5WqMIutP0UyBGptCnW6xOPKe/3aopxXgEo4X/YQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c185gqmub-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Feb 2026 15:35:34 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 612FZYXC026409;
+	Mon, 2 Feb 2026 15:35:34 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c185gqmu6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Feb 2026 15:35:34 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 612FA3iu005938;
+	Mon, 2 Feb 2026 15:35:33 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c1x9j5c6v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Feb 2026 15:35:33 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 612FZVAB30081728
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 2 Feb 2026 15:35:31 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 85D862004B;
+	Mon,  2 Feb 2026 15:35:31 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 566EC20040;
+	Mon,  2 Feb 2026 15:35:31 +0000 (GMT)
+Received: from [9.52.217.119] (unknown [9.52.217.119])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  2 Feb 2026 15:35:31 +0000 (GMT)
+Message-ID: <2ddf6abd-d10c-4d75-8f84-0fd1ccb5435c@linux.ibm.com>
+Date: Mon, 2 Feb 2026 16:35:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next] net/iucv: clean up iucv kernel-doc warnings
+To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
+Cc: Thorsten Winkler <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20260201072309.222155-1-rdunlap@infradead.org>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20260201072309.222155-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=UdxciaSN c=1 sm=1 tr=0 ts=6980c446 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=JfrnYn6hAAAA:8 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=J1Y8HTJGAAAA:8
+ a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=870lcERhYe6XzqJw7_QA:9 a=QEXdDO2ut3YA:10
+ a=1CNFftbPRP8L7MoqJWF3:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+X-Proofpoint-GUID: eYdBFQ2MAJ_pblbNvaBPYQJY-0S9WFLx
+X-Proofpoint-ORIG-GUID: r-y7vermKIigoHM0DSEUBBdDhV2CK284
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDEyMSBTYWx0ZWRfX/9qiXIyf3Dze
+ tLf7RiqJ+EVCIrJN6o21BTgnZyWh9VKLi0aBKd0fIJOTIj5PK6QLMA63JMyUn+Nb9uD3ChxjSsP
+ W+twnyfbHebOODtHGgTGsRheFQA0/2d7NcOBGhnK+0SbT1xDSOa5BdLUHIpP8X2Z3UmV22oAk6X
+ sgtbe87mryUl39QyBDrYM3rMXT5/cVcMkSgJLvcWMeAyzWD81T3acFT17Sk5Xc8F+WyT3QtJyaW
+ yUhXavCTQZ4IPBQfX7+O820UrFIDJyyaavV/jsaE5tDBu7J4W/X77GrqyBKsfuimrXQBmUhIaZu
+ CIkEdZiiO6eTiQsVmMGjYbZyP+N4djx2BBnPyUY6l/iEqH4lgmXJycWeUrOr1V/paH0c41R8IGo
+ wXKq7A+glToNlq8ZJCb8pdfSqilINMYd3gtKkJVDJrhnWtnuDu7aMX7CWF9pQLR+TAQuVDWaEw+
+ bcCPm3myXd7OxaOh1Hw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-02_04,2026-01-30_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ suspectscore=0 clxscore=1011 bulkscore=0 spamscore=0 phishscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
+ definitions=main-2602020121
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-255905-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-255907-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWELVE(0.00)[13];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kernel-dk.20230601.gappssmtp.com:dkim,kernel.dk:mid]
-X-Rspamd-Queue-Id: 892B2CE242
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 62B1DCE63B
 X-Rspamd-Action: no action
 
 
-On Sun, 01 Feb 2026 21:19:56 +0000, Pavel Begunkov wrote:
-> zcrx needs to keep the rq lock for uref manipulations, for now move all
-> zcrx_return_buffers() under the lock.
+
+On 01.02.26 08:23, Randy Dunlap wrote:
+> Fix numerous (many) kernel-doc warnings in iucv.[ch]:
 > 
+> - remove kernel-doc on static functions in iucv.c
+> - convert function documentation comments to a common (kernel-doc) look,
+>   even for static functions (without "/**")
+> - use matching parameter and parameter description names
 > 
+> Examples:
+> 
+> Warning: include/net/iucv/iucv.h:210 missing initial short description
+>  on line: * iucv_unregister
+> Warning: include/net/iucv/iucv.h:216 function parameter 'handle' not
+>  described in 'iucv_unregister'
+> Warning: include/net/iucv/iucv.h:467 function parameter 'answer' not
+>  described in 'iucv_message_send2way'
+> Warning: net/iucv/iucv.c:727 missing initial short description on line:
+>  * iucv_cleanup_queue
+> 
+> Build-tested with both "make htmldocs" and "make ARCH=s390 defconfig all".
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> ---
 
-Applied, thanks!
+Thank you very much for your effort Randy.
+FYI: I had to use 'scripts/kernel-doc.py -none -Wall include/net/iucv/*' to see the warnings.
 
-[1/1] io_uring/zcrx: fix rq flush locking
-      commit: af07330e28ad65352126270b0b3af226df46e307
 
-Best regards,
--- 
-Jens Axboe
+
+> v2:
+> - correct verbs in descriptions of 2 functions (Jakub)
+> - removed duplicate kernel-doc comments from the header file (Jakub)
+> 
+> Cc: Alexandra Winter <wintera@linux.ibm.com>
+> Cc: Thorsten Winkler <twinkler@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> 
+>  include/net/iucv/iucv.h |  209 ------------------------------
+>  net/iucv/iucv.c         |  259 ++++++++++++++++++--------------------
+>  2 files changed, 128 insertions(+), 340 deletions(-)
+> 
+> --- linux-next-20260130.orig/include/net/iucv/iucv.h
+> +++ linux-next-20260130/include/net/iucv/iucv.h
+> @@ -70,7 +70,7 @@
+>  #define IUCV_IPLOCAL	0x01
+>  
+>  /*
+> - * iucv_array : Defines buffer array.
+> + * iucv_array - Defines buffer array.
+
+Did that create a kernel doc warning? It's a struct, not a function.
+I propose
++ * struct iucv_array
+like other structs in this file.
+
+[...]
+
+> @@ -757,13 +742,12 @@ static void iucv_cleanup_queue(void)
+>  }
+>
+>  /**
+> - * iucv_register:
+> + * iucv_register - Registers a driver with IUCV.
+> + *
+>   * @handler: address of iucv handler structure
+>   * @smp: != 0 indicates that the handler can deal with out of order messages
+>   *
+> - * Registers a driver with IUCV.
+> - *
+> - * Returns 0 on success, -ENOMEM if the memory allocation for the pathid
+> + * Returns: 0 on success, -ENOMEM if the memory allocation for the pathid
+>   * table failed, or -EIO if IUCV_DECLARE_BUFFER failed on all cpus.
+>   */
+>  int iucv_register(struct iucv_handler *handler, int smp)
+
+Before this one, you changed /** to /*
+after this one you left /**
+That's a bit inconsistent.
+
+
+
+
+
+All the fixes look good to me. And they get rid of the mentioned warnings.
+I appreciate your approach to use the existing wording, though it may not
+be according to the latest style guidelines.
+
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+
+
+
 
 
 
