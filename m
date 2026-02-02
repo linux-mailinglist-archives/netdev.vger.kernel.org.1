@@ -1,333 +1,163 @@
-Return-Path: <netdev+bounces-255967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFIUCtbcgGnMBwMAu9opvQ
-	(envelope-from <netdev+bounces-255967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:20:22 +0100
+	id MAf+MxvegGleCAMAu9opvQ
+	(envelope-from <netdev+bounces-255968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:25:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC76ACF827
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:20:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D73BCF92E
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 18:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B7F9301FA48
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:20:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 021F2301ECE3
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 17:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160E6385ECF;
-	Mon,  2 Feb 2026 17:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0119385EF5;
+	Mon,  2 Feb 2026 17:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ru8wny+a";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALHckiru"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikh7Opdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1077637D12F
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C3C387346
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 17:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770052800; cv=none; b=atGpCjZs0k8s5zgY5H+ByQ89v5QJz9WBkxgAjWO3WBiF3NCOQoyufxM04ct3PXwX2P2P6jjho/amoebiezqYAXqiAxNepEZV2otQwrK7E5cJt7d+ySzy2LpkA+ne6OBaRF4AW2jd/jw6mMU+cmt8EcFwbYtiSHVXwrSjKLmBxro=
+	t=1770053120; cv=none; b=tNv0iOKqc0o088dc+byjnKsurI1xwbsTLQ1uSRJnUYOsr53QqblrgrRgb/XfcjIHl0z/895zGl8vx6+6abpZQ6QTvH8cZPAaQ75DAXegv9USZAKYJioI/H2Wy5caSOrCK2ansu3BVITYkrQzpxr/hSEYuORy4GXGKdrtDplXCxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770052800; c=relaxed/simple;
-	bh=sg7r2bggyNeKqLAfbEeFBVcgdfvWyCSGQHXTajmTCS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gtTXKfiZCfpE04nctQpD3ImVt2t9RPR6cWge+4V0KCl4yyBdN2x1kl33K2BT/0ZaEC9TWsRDQ1BbgZ4iJ0A0zM4FARhF1tCZAus9Pg8Yp8B/ykJYes2KVjt4LmJtC7BTMn2tW3jz3HsEj3QiZDiLAimbuyO9qjd0GSp8r7I9OB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ru8wny+a; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ALHckiru; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770052797;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ueRmNBsULHX80WZv6MW3ddncHXPCqgI+9LkeT0jMc9E=;
-	b=Ru8wny+avuOYn/24ln9rRybEEL+TosE9X/sn0ESESfwb5q5ba8MplUOHhW0VN60AZc9wjV
-	NHHo0Apn4MyWnbLAYPWAltdwFe8LB+ryhLaqhMcGYsW/+JQqJd2sYxz56YZ6BFRmAsGeds
-	X2J1U2IfjGVT7FGF/tN1sDl9c663cGY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-330-I3T75DWpPBGvtxbdEdsIYg-1; Mon, 02 Feb 2026 12:19:55 -0500
-X-MC-Unique: I3T75DWpPBGvtxbdEdsIYg-1
-X-Mimecast-MFC-AGG-ID: I3T75DWpPBGvtxbdEdsIYg_1770052794
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-432db1a9589so3221914f8f.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 09:19:55 -0800 (PST)
+	s=arc-20240116; t=1770053120; c=relaxed/simple;
+	bh=N5emsJVnbYDypIuMxaWYpQNd4XXz+i3X9KxdIpzvmYo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HVDFt6WBMRukWq5HDvSZo3z5eqQPd8gA5e62u/gV72Nl7rZiPjzaR+UkIHUA3DpXmc/9XRswpbmAs/WG6d/IlhMRfqkZtmhGlkyJUR2aem5yOAJ3Tb1QqGqiacyZGL3czxeDUU40OsmKJlaFnKz18Df/Y5UIlYFdjgH2sfgKdlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ikh7Opdv; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59dd263bf42so4951376e87.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 09:25:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770052794; x=1770657594; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ueRmNBsULHX80WZv6MW3ddncHXPCqgI+9LkeT0jMc9E=;
-        b=ALHckiruESfNzZ7hHsXUXRLtVe7//5gK/OLLXESaB9pB5FBdAZdGPXf2bqNy7dC7g1
-         eRb0O1xS0E2jYlIjbYSkN+Qne0asRv6XoXyNTGzDkYDwV4b016xgvpGmJSOhOaYQKvAm
-         M3XMRwQHDSH2aA5qzVtNOQ/AKEVF5zfTdS2drgB3FA7fefqI1B5xAXvsMQjpYYGV6f+P
-         kzT0Wqgb4kRjHiaY+HzgdcSeHCH9vvZzYAe/Fw8JltI19I/2bvPBN2UfMH5AIcJYV3CK
-         xfOf/smPA0Ke/MVI9+1gd47Xcu5naSCSPygRNptpbZ0AEHVY6PhYzfZ/kHYMdaQH5CLd
-         xLSg==
+        d=gmail.com; s=20230601; t=1770053117; x=1770657917; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iHlrgeVFZ66XfJyR0Ky7VPQSi5vlBXbdXZD7jGGpR6c=;
+        b=ikh7OpdvXkYof18sKHYAhCW5gsH8KsrikELQRX9PJ2oSueqNzL09JAQCM0zlSG4OwY
+         FuJgudO7NCK17lQHywVbHpVfrle+rYQRVZj5vkhIJRvfZqiXcTpF321X9tEq3S/6vJlc
+         1jeptKcxH86oQGabn/N44R2hOAhRegk9LMO4/4jA+F5XxXh1NTH7UiHHdSWx1by3cyy5
+         /wGDQvR7FqtpFh3IZGjoj4AcWBXw3tu+psqx4bDcnivj2HfJvQzAoUf7r3MlkZUglEaD
+         OogJVMcG80VAk2sY4KoV0noJ7+DdOC1a252aw1bdPFM6Rb6758JBTvgzsoF5slj8ETjr
+         aI0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770052794; x=1770657594;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ueRmNBsULHX80WZv6MW3ddncHXPCqgI+9LkeT0jMc9E=;
-        b=VrYIHdgONG1QWit+6GxjMzQ0O7ZWUSn/h3NdWAoxk0H0FOZ3XR0Le1UWRX5Fh2MnLF
-         onu962QXf/vyKUc774bFxWZrsmxN40zBlQNYhkT5CO2m/f41iTbFYwZ1ItdDWYXpD7m1
-         Pz33rjg2prwn5FSAjmDgY7MH39CJagHqXhdH+1PaG1WpmGkVMcOvZB8sLNWcqS7g+35Y
-         +AtRWxFTZGppn3gKy9fRaYW+eSOCcqUqbRTJFqdIJxncFfBPN7p+kOizK1e+cwcGmCiI
-         S1iwuewCn4oNnSzyF9o4Z5U/qVssvEycFTPcHhdm5kIdi0tjX0yib2nnocGI+dCdUFtr
-         kikA==
-X-Forwarded-Encrypted: i=1; AJvYcCUgLy/438ow1ONdjeVghw8z8Lb7dRY9M2cJbwywXfrobMCdpMaap4sZZOKTIV4tem8WBRTHlsM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUtgJfXuxigHui+JMu8ny5PdCMqzz/LRv5ml/lHPFjXvnsCYks
-	JW267J8906h4D/4IeRlnEmGIR4BgQwbg0KLIPG6Sp/AO4zhVOU2h34bU+uQM9EHHINyLWCGqSdM
-	Z19DlCUknGdbwo24Mid0r/kbabNRYAm8H6eIozwOrpH8oCsNddbfSNdN5ZQ==
-X-Gm-Gg: AZuq6aKJjhim6xQ2PC4Jk/zx1xAg8dcKtI/TFwnQxhgE3NxxlGH/LhD8BPCi9CVbr8q
-	uy00854tLmM6YOD+hEvacD0EDZMm+yc8L7sbBh/93sqndiqWgmmVRHVZQMOXymflV7xGPVvYVnL
-	1PPJgkivIKjBlZAaqjteMYLFKH6PBht+pGsv86Ay1eojHGdoWhseXBQJmeDbxrQ5D7Tao4FDn3e
-	1gv52G1J/4DV3aQtet5c9czPR9+zJOiQb25ADu2lEOpiJmozQmG0glTcYVMDBgIcoM1RgxQgCZM
-	f6KzF2lioRdsnG+rWFDU3ybMYrPq0X0BPX9soJ6APyzojXok/BmgO0Mqb0bTsr4P2T8LrGJi5M4
-	tj2N/tw==
-X-Received: by 2002:a05:600c:c4a5:b0:47e:e946:3a59 with SMTP id 5b1f17b1804b1-482db4992d3mr133149875e9.34.1770052794258;
-        Mon, 02 Feb 2026 09:19:54 -0800 (PST)
-X-Received: by 2002:a05:600c:c4a5:b0:47e:e946:3a59 with SMTP id 5b1f17b1804b1-482db4992d3mr133149375e9.34.1770052793718;
-        Mon, 02 Feb 2026 09:19:53 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73e3:8f00:866c:5eeb:fc46:7674])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48305129419sm2637285e9.6.2026.02.02.09.19.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 09:19:53 -0800 (PST)
-Date: Mon, 2 Feb 2026 12:19:48 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-Cc: "tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"shaojijie@huawei.com" <shaojijie@huawei.com>,
-	"shenjian15@huawei.com" <shenjian15@huawei.com>,
-	"salil.mehta@huawei.com" <salil.mehta@huawei.com>,
-	"mbloch@nvidia.com" <mbloch@nvidia.com>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"eperezma@redhat.com" <eperezma@redhat.com>,
-	"brett.creeley@amd.com" <brett.creeley@amd.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"parav@nvidia.com" <parav@nvidia.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"kuniyu@google.com" <kuniyu@google.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dave.taht@gmail.com" <dave.taht@gmail.com>,
-	"jhs@mojatatu.com" <jhs@mojatatu.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"ast@fiberby.net" <ast@fiberby.net>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"ij@kernel.org" <ij@kernel.org>,
-	"ncardwell@google.com" <ncardwell@google.com>,
-	"Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>,
-	"g.white@cablelabs.com" <g.white@cablelabs.com>,
-	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>,
-	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>,
-	"cheshire@apple.com" <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>,
-	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>,
-	"vidhi_goel@apple.com" <vidhi_goel@apple.com>
-Subject: Re: [PATCH v1 net-next 3/3] virtio_net: Accurate ECN flag in
- virtio_net_hdr
-Message-ID: <20260202121830-mutt-send-email-mst@kernel.org>
-References: <20260131225510.2946-1-chia-yu.chang@nokia-bell-labs.com>
- <20260131225510.2946-4-chia-yu.chang@nokia-bell-labs.com>
- <20260201035912-mutt-send-email-mst@kernel.org>
- <AM9PR07MB79696F945D8DBEF370CD4DC6A39AA@AM9PR07MB7969.eurprd07.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1770053117; x=1770657917;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iHlrgeVFZ66XfJyR0Ky7VPQSi5vlBXbdXZD7jGGpR6c=;
+        b=WM2WqBLtsXYZoUwBOQGC8NjQxTMcCoPKJqz8fCw7VFtgnhIiPUBufXu/sDTOBumMLH
+         PgqiVzFmgNmVkMSLPpBhuoFDGdv3LfWAic8pMdDarhDl1wP3T90J8526AjFbIBKImsBJ
+         TkYJ/bOum32/bzQKB9P4gdu7gv63aHu0m3XWTS673GCb6X+Eu71KHqZoV2NwEsURJaRC
+         dVrLtakyQ3xM20dprppO9EyQVuZ5SQNx9g72HzbAvQSJwgAnRmdzstEr+/EyLIrhsQiM
+         qfyTJq8vjzUC4q2G7mgF1FWxmufG714z6NqwwB9XKxAr1su1Q6lUzEoAGD40+GkGjUQ7
+         OjRQ==
+X-Gm-Message-State: AOJu0YzyCvBzzh8/mDouSuOFZoxxLlkzPSqm5d6f+jtA0ALB4JORkm16
+	6D7TaVS3VXwwaGqJd06QZ2WHGmVAf+jKD4wfhP1chtRuZHnGSRSzPQ9GE/kqtA==
+X-Gm-Gg: AZuq6aJtXVaVVyc7OTwvAXM7mIRQp9R/PFRwv8pUIK9RhqdvVL3S1sMP05vWnC3B1ZB
+	lLOecWWZeSEHTSPtFkxgquiC+G2hVtyjqOSkFJigl51nAhELjL2gzLxGo1DRLEt8Qxom+6GliAW
+	QVu2HCZezguLrWxe7ci8ppkwUYGAouAC3gjdOAv+JLT0fI1xOAZnM3ham1p76Tw+jkwh1HMXwyi
+	oLX4Dmv4A1pcwk5gj+OzD8q7mmFIWJHSHT2tHOa5MMHU7kLi6hykH7XdOeym2GGBTODbpS5FU47
+	AZkmjfMTmi8s3+r0NktgzSX7fyZCO2nwF48B7pnM8ib2E6SKjQRqc4rGxzHsIbavdwEdn4WhPT0
+	0mlekGnRVP79CQ29eIO2kWnehi5f7bIUbkfV1sYmzvzYLF54PfYLq9ELELr44OCVcko6uHlERtj
+	0X11s1c6XdCCm7MZtTzZJv2iSqPkHcD51u2u3s1LAZlsIRfTffcgFQTjM9pkyalitiSjjnOSG5I
+	+GECNoM4kdmf+eS6bxHrrrEb8WxLuYYrezNJOS85Y2cekLl
+X-Received: by 2002:a05:600c:3148:b0:47a:935f:618e with SMTP id 5b1f17b1804b1-482db45ce3amr158497445e9.15.1770053106341;
+        Mon, 02 Feb 2026 09:25:06 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f4b:2a00:742c:21a1:3b90:f2? (p200300ea8f4b2a00742c21a13b9000f2.dip0.t-ipconnect.de. [2003:ea:8f4b:2a00:742c:21a1:3b90:f2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e2e3beadsm94827185e9.20.2026.02.02.09.25.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Feb 2026 09:25:05 -0800 (PST)
+Message-ID: <602a08b9-134f-421e-bc2a-b89b0867b2e3@gmail.com>
+Date: Mon, 2 Feb 2026 18:25:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <AM9PR07MB79696F945D8DBEF370CD4DC6A39AA@AM9PR07MB7969.eurprd07.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Weird issue with r8169: shutdown on carrier comeback
+To: Tanguy Ortolo <tanguy@ortolo.eu>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Francois Romieu <romieu@fr.zoreil.com>
+Cc: netdev@vger.kernel.org
+References: <aYDYSHhaF1vQSxdW@ortolo.eu>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <aYDYSHhaF1vQSxdW@ortolo.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,huawei.com,kernel.org,redhat.com,amd.com,lists.linux.dev,linux.alibaba.com,google.com,lwn.net,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
-	TAGGED_FROM(0.00)[bounces-255967-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-255968-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BC76ACF827
+X-Rspamd-Queue-Id: 2D73BCF92E
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 04:56:38PM +0000, Chia-Yu Chang (Nokia) wrote:
-> > -----Original Message-----
-> > From: Michael S. Tsirkin <mst@redhat.com>=20
-> > Sent: Sunday, February 1, 2026 10:18 AM
-> > To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
-> > Cc: tariqt@nvidia.com; linux-rdma@vger.kernel.org; shaojijie@huawei.com=
-; shenjian15@huawei.com; salil.mehta@huawei.com; mbloch@nvidia.com; saeedm@=
-nvidia.com; leon@kernel.org; eperezma@redhat.com; brett.creeley@amd.com; ja=
-sowang@redhat.com; virtualization@lists.linux.dev; xuanzhuo@linux.alibaba.c=
-om; pabeni@redhat.com; edumazet@google.com; parav@nvidia.com; linux-doc@vge=
-r.kernel.org; corbet@lwn.net; horms@kernel.org; dsahern@kernel.org; kuniyu@=
-google.com; bpf@vger.kernel.org; netdev@vger.kernel.org; dave.taht@gmail.co=
-m; jhs@mojatatu.com; kuba@kernel.org; stephen@networkplumber.org; xiyou.wan=
-gcong@gmail.com; jiri@resnulli.us; davem@davemloft.net; andrew+netdev@lunn.=
-ch; donald.hunter@gmail.com; ast@fiberby.net; liuhangbin@gmail.com; shuah@k=
-ernel.org; linux-kselftest@vger.kernel.org; ij@kernel.org; ncardwell@google=
-=2Ecom; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.=
-white@cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlewind@eri=
-csson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com;=
- vidhi_goel@apple.com
-> > Subject: Re: [PATCH v1 net-next 3/3] virtio_net: Accurate ECN flag in v=
-irtio_net_hdr
-> >=20
-> >=20
-> > CAUTION: This is an external email. Please be very careful when clickin=
-g links or opening attachments. See the URL nok.it/ext for additional infor=
-mation.
-> >=20
-> >=20
-> >=20
-> > Thanks for the patch! Yet something to improve:
-> >=20
-> > On Sat, Jan 31, 2026 at 11:55:10PM +0100, chia-yu.chang@nokia-bell-labs=
-=2Ecom wrote:
-> > > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> > >
-> > > Unlike RFC 3168 ECN, accurate ECN uses the CWR flag as part of the AC=
-E=20
-> > > field to count new packets with CE mark; however, it will be corrupte=
-d=20
-> > > by the RFC 3168 ECN-aware TSO. Therefore, fallback shall be applied b=
-y=20
-> > > seting NETIF_F_GSO_ACCECN to ensure that the CWR flag should not be=
-=20
-> > > changed within a super-skb.
-> > >
-> > > To apply the aforementieond new AccECN GSO for virtio, new featue bit=
-s=20
-> > > for host and guest are added for feature negotiation between driver=
-=20
-> > > and device. And the translation of Accurate ECN GSO flag between=20
-> > > virtio_net_hdr and skb header for NETIF_F_GSO_ACCECN is also added to=
-=20
-> > > avoid CWR flag corruption due to RFC3168 ECN TSO.
-> > >
-> > > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> >=20
-> >=20
-> > To the best of my understanding, this is a new feature - support for VI=
-RTIO_NET_F_HOST_ACCECN, VIRTIO_NET_F_GUEST_ACCECN?
-> > The commit log makes it sound like it fixes some behaviour for existing=
- hardware, but that is not the case.
-> >=20
->=20
-> Thansk for the feedback, I will update commit message in v3.
-> >=20
-> > > ---
-> > > v2:
-> > > - Replace VIRTIO_NET_HDR_GSO_ECN with VIRTIO_NET_HDR_GSO_ECN_FLAGS
-> >=20
-> > but where is v2? this is v1...
->=20
-> I shall update this version as v2, will do at the next version.
->=20
-> [...]
-> > > diff --git a/include/uapi/linux/virtio_net.h=20
-> > > b/include/uapi/linux/virtio_net.h index 1db45b01532b..af5bfe45aa1f=20
-> > > 100644
-> > > --- a/include/uapi/linux/virtio_net.h
-> > > +++ b/include/uapi/linux/virtio_net.h
-> > > @@ -56,6 +56,8 @@
-> > >  #define VIRTIO_NET_F_MQ      22      /* Device supports Receive Flow
-> > >                                        * Steering */
-> > >  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23        /* Set MAC address */
-> > > +#define VIRTIO_NET_F_HOST_ACCECN 25  /* Host can handle GSO of AccEC=
-N=20
-> > > +*/ #define VIRTIO_NET_F_GUEST_ACCECN 26 /* Guest can handle GSO of=
-=20
-> > > +AccECN */
-> > >  #define VIRTIO_NET_F_DEVICE_STATS 50 /* Device can provide=20
-> > > device-level statistics. */  #define VIRTIO_NET_F_VQ_NOTF_COAL 52 /* =
-Device supports virtqueue notification coalescing */
-> > >  #define VIRTIO_NET_F_NOTF_COAL       53      /* Device supports noti=
-fications coalescing */
-> > > @@ -165,6 +167,9 @@ struct virtio_net_hdr_v1 {  #define=20
-> > > VIRTIO_NET_HDR_GSO_UDP_TUNNEL (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 | \
-> > >                                      VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IP=
-V6)
-> > >  #define VIRTIO_NET_HDR_GSO_ECN               0x80    /* TCP has ECN =
-set */
-> > > +#define VIRTIO_NET_HDR_GSO_ACCECN    0x10    /* TCP AccECN segmentat=
-ion */
-> > > +#define VIRTIO_NET_HDR_GSO_ECN_FLAGS (VIRTIO_NET_HDR_GSO_ECN | \
-> > > +                                      VIRTIO_NET_HDR_GSO_ACCECN)
-> > >       __u8 gso_type;
-> > >       __virtio16 hdr_len;     /* Ethernet + IP + tcp/udp hdrs */
-> > >       __virtio16 gso_size;    /* Bytes to append to hdr_len per frame=
- */
-> >=20
-> >=20
-> > UAPI changes need to be added to the virtio spec.
-> > Pls get this approved by the virtio TC.
-> > Thanks!
->=20
-> There were some discussions last October in virtio-comment@lists.linux.de=
-v mailing list.
+On 2/2/2026 6:00 PM, Tanguy Ortolo wrote:
+> Hello,
+> 
+> I am experiencing a weird computer issue that is at least partly linked to the r8169 driver: the computer shuts down when the Ethernet cable is pulled off and plugged again. Or when the switch goes down and up again.
+> 
+> To be more specific, the computer is a [Trigkey Key-N100][1] running Debian Trixie. That computer has two Gigabit Ethernet controllers:
+>     $ lspci | grep Ethernet
+>     01:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller (rev 15)
+>     02:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller (rev 15)
+> 
+> [1]: https://devhome.corp.adobe.com/docs/default/component/ethos-flex/docs/devhome/prerequisites/
+> 
+> One of them is configured, and when I pull off its Ethernet cable and plug it again after a few seconds (or if I reboot the switch it is connected to), something simulates a power key press (log from systemd-logind: “Power key pressed short”). Even though I configured logind to ignore such events, one second after this, the computer shuts itself down brutally, as if experiencing a power loss.
+> 
+> After a few experiments, I determined that:
+> * it happens on both Ethernet interfaces of that computer;
+> * it happens only on _configured_ interfaces: in particular, it does not
+>   happen if I unplug the Ethernet cable, run `ip link set enp1s0 down`
+>   and plug the cable again;
+> * it does not happen with the proprietary driver r8168.
+> 
+> I am not really sure the r8169 driver is at fault here; it sounds more like a very weird hardware issue in specific conditions, which are met when using it. Anyway, I though you deserved to know, in case it could be useful. Please tell me if there is anything else I could do to further diagnose that issue.
+> 
 
+Thanks for the report. Interesting issue .. The network driver (r8169) has no link to the input system.
+Therefore it's likely your network manager which is causing this behavior. Maybe r8168 is different in what
+network notifications it sends. But hard to say w/o knowing what the network manager looks at to detect
+link-down/-up events.
 
-That's it I could not find it. Could you include the archive link pls?=20
-
-
-> At that moment, it is suggested to make Linux kernel accept new comments =
-for SKB_GSO_TCP_ECN and SKB_GSO_TCP_ACCECN first.
-> So, could virtio-spec colleague give your feedback? (Parav?).
->=20
-> Otherwise, the CWR handling of virtio will be wrong after all Accurate EC=
-N commits are merged in Linux.
->=20
-> Chia-Yu
-
-if there's a general agreement we don't need to block linux on tc
-approval.
-
---=20
-MST
+> Regards,
+> 
 
 
