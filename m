@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-255745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255746-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WA9aGzNMgGne5wIAu9opvQ
-	(envelope-from <netdev+bounces-255745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:03:15 +0100
+	id EIm/FVRMgGne5wIAu9opvQ
+	(envelope-from <netdev+bounces-255746-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:03:48 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA171C9047
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:03:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6DBDC906A
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 08:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6B7C300DD5A
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:59:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A07A304DC8E
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 06:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989E4315D58;
-	Mon,  2 Feb 2026 06:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B7531812F;
+	Mon,  2 Feb 2026 06:58:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20462314A79;
-	Mon,  2 Feb 2026 06:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1F03161BB;
+	Mon,  2 Feb 2026 06:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770015510; cv=none; b=eLW6M4L0PWLM1E1fbWBR599kXd8Axp5yMbd4C366A3Y8GM129lKR/OZ3P8E9WmjBnLw4JBcusspSfzB7sui1t7+1KVCTJkValj4GV2f9qPOWKSSJ4fyqTHtu+Dw7/6zJYhRfzdwKrk5UZucM+0uZY/H0SUVQkiPolEFQhMkwsNI=
+	t=1770015512; cv=none; b=Fglmc6gqNDiSUzfz2aHtCby4ygN+Abr01xvrVgTK6a3nR4Xed54AaI94rdjQyYK3mFy4Atn76qWpFtOnkVK9vypbNubAMIeInl+P1LtatKfe2uEiaotnnYedilB2POrMenZQ66UezGfX9UE2yFBgr4Da57qbG5qoEktOIO2qxDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770015510; c=relaxed/simple;
-	bh=UjgZvyr3h7j7m5xJ9jp66e9iDUJvnvWRprKsNxTiiq0=;
+	s=arc-20240116; t=1770015512; c=relaxed/simple;
+	bh=8z5Asf4hOzuHazRpZ4TfjfOeTZlsMlsx0v93+W03d8o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=DtJW5XwbZNmekKFydu3FSzRgNsZEXqu8VDnd4xJkl1R18Q16yHQOg2lYfMG2sPgCdWLgVYoKwUBB1c7PGUNTDVkN+WuLDPg4jGRrM61E8cwx6gRlb5wtIgCX29VUzAXO02ZrJtqrleeBH0o4wObEjrHGMbBjRUr3jwy3YFnL2UI=
+	 In-Reply-To:To:CC; b=gswVRN4+BS79JgRWCtxmlq7FhlDPwm8FXJY8eguJRlIt+aYoYyPwxSxQXCTDsD0Iw+gO8BO7aQidVx1umBEycn0Im4ogsG2e2sqbqG1Uxx1oLz3SYOPA/4sNRsHD3sOehg7Pk7teh0eXalE123F0Dj7a715vWh3vhNccjP4ffQw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -40,9 +40,9 @@ Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
  (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
  Transport; Mon, 2 Feb 2026 14:57:01 +0800
 From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Mon, 2 Feb 2026 14:57:08 +0800
-Subject: [PATCH net-next v3 14/15] net: ftgmac100: Fix wrong netif_napi_del
- in release
+Date: Mon, 2 Feb 2026 14:57:09 +0800
+Subject: [PATCH net-next v3 15/15] net: ftgmac100: Use
+ devm_mdiobus_alloc/devm_of_mdiobus_register
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,21 +51,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260202-ftgmac-cleanup-v3-14-6a6a8d45280a@aspeedtech.com>
+Message-ID: <20260202-ftgmac-cleanup-v3-15-6a6a8d45280a@aspeedtech.com>
 References: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 In-Reply-To: <20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
 	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
 	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
-	<horms@kernel.org>
+	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015420; l=910;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1770015420; l=2368;
  i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=AaqHFFSyE0sFfHM4rRsamXsCM6KZqCk9Cn6V4gwrWUw=;
- b=XoFVsNKZwTlWGjOES42L87QjdfBNMmrevu2+5xBFCQh+HFFBi1nao7/k1yfrQ3Kk5QfFQQMqX
- VdS+AS8QXDJApHgJgz3tUGe+otLn8vFAYNtmTelzW4XlqALFg2QTURP
+ bh=8z5Asf4hOzuHazRpZ4TfjfOeTZlsMlsx0v93+W03d8o=;
+ b=xtAOu7T0BfUKJ5qHYr7c7kiIRnrG0s0iKMJkZo4AJWCjRqYcZWDqb+fRgpNYu699j+/9salV+
+ kAsT8+K/pi5AS6Dbsaitszv3OjEwrsOSDp240ne5weU8DILWMmjAB5F
 X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
  pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 X-Rspamd-Server: lfdr
@@ -80,7 +79,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-255745-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255746-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -92,34 +91,86 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[aspeedtech.com:mid,aspeedtech.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
-X-Rspamd-Queue-Id: EA171C9047
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[aspeedtech.com:mid,aspeedtech.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C6DBDC906A
 X-Rspamd-Action: no action
 
-From: Andrew Lunn <andrew@lunn.ch>
+Make use of devm_ methods to allocate and register mdiobus to simplify
+cleanup.
 
-netif_napi_add() is called in open. There is a symmetric call to
-netif_napi_del() in stop. Remove to wrong call to netif_napi_del() in
-release.
-
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++----------------------
+ 1 file changed, 4 insertions(+), 22 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 55a592b3d2c6..45312b9ef35f 100644
+index 45312b9ef35f..36ec230312ad 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -2101,8 +2101,6 @@ static void ftgmac100_remove(struct platform_device *pdev)
+@@ -1716,7 +1716,7 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
+ 	u32 reg;
+ 
+ 	/* initialize mdio bus */
+-	priv->mii_bus = mdiobus_alloc();
++	priv->mii_bus = devm_mdiobus_alloc(priv->dev);
+ 	if (!priv->mii_bus)
+ 		return -EIO;
+ 
+@@ -1742,19 +1742,14 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
+ 
+ 	mdio_np = of_get_child_by_name(np, "mdio");
+ 
+-	err = of_mdiobus_register(priv->mii_bus, mdio_np);
++	err = devm_of_mdiobus_register(priv->dev, priv->mii_bus, mdio_np);
++	of_node_put(mdio_np);
+ 	if (err) {
+ 		dev_err(priv->dev, "Cannot register MDIO bus!\n");
+-		goto err_register_mdiobus;
++		return err;
+ 	}
+ 
+-	of_node_put(mdio_np);
+-
+ 	return 0;
+-
+-err_register_mdiobus:
+-	mdiobus_free(priv->mii_bus);
+-	return err;
+ }
+ 
+ static void ftgmac100_phy_disconnect(struct net_device *netdev)
+@@ -1773,17 +1768,6 @@ static void ftgmac100_phy_disconnect(struct net_device *netdev)
+ 		fixed_phy_unregister(phydev);
+ }
+ 
+-static void ftgmac100_destroy_mdio(struct net_device *netdev)
+-{
+-	struct ftgmac100 *priv = netdev_priv(netdev);
+-
+-	if (!priv->mii_bus)
+-		return;
+-
+-	mdiobus_unregister(priv->mii_bus);
+-	mdiobus_free(priv->mii_bus);
+-}
+-
+ static void ftgmac100_ncsi_handler(struct ncsi_dev *nd)
+ {
+ 	if (unlikely(nd->state != ncsi_dev_state_functional))
+@@ -2078,7 +2062,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 	ftgmac100_phy_disconnect(netdev);
+ 	if (priv->ndev)
+ 		ncsi_unregister_dev(priv->ndev);
+-	ftgmac100_destroy_mdio(netdev);
+ 	return err;
+ }
+ 
+@@ -2100,7 +2083,6 @@ static void ftgmac100_remove(struct platform_device *pdev)
+ 	cancel_work_sync(&priv->reset_task);
  
  	ftgmac100_phy_disconnect(netdev);
- 	ftgmac100_destroy_mdio(netdev);
--
--	netif_napi_del(&priv->napi);
+-	ftgmac100_destroy_mdio(netdev);
  }
  
  static const struct ftgmac100_match_data ftgmac100_match_data_ast2400 = {
