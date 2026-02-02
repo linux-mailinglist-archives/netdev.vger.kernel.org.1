@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-255992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255993-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AK8ZMuH6gGn9DQMAu9opvQ
-	(envelope-from <netdev+bounces-255992-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:28:33 +0100
+	id wO6zLo76gGn9DQMAu9opvQ
+	(envelope-from <netdev+bounces-255993-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:27:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B689D0848
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:28:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC292D082A
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 20:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 660D0303AB51
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 19:24:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5B42F3014880
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 19:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1FF302CD5;
-	Mon,  2 Feb 2026 19:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424E23064AE;
+	Mon,  2 Feb 2026 19:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="rpjaJ+Bv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WVtoXjAj"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="DJEOUclV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ybf0y/ky"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1C03033D8
-	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 19:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B79305064
+	for <netdev@vger.kernel.org>; Mon,  2 Feb 2026 19:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770060265; cv=none; b=utbp/Z1LgCPV6lGpdPPFr6EKkRW92ToFNO5eV6AFDP5HrYMuZ9RqKQ3LBwfJQAy198ABeOjbNTSkAsOE5kkA1g5kvP/XB03emQLqW3s6tycHYwJ+pW30yKYo7Q9t0KyaCSKK3XuOyH6Ka0Yi0PZGG+TDZFvqbwjY+ecg0Uq7mmo=
+	t=1770060268; cv=none; b=p9/4PIUIyCZs2oOssFjqvVLUXpispudVcy8sqhM0JEPds+piklNjFfSbsYq6ocsRXLBA5mm5n++sCDlL4dHbtV7W0724ZitlBOheSeZVD/bMEpVsFT7jcrsDrnCW3q5t4WWP31YXL62bR/52iHkmrlM7m2RkVgUhyLxc70K1drs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770060265; c=relaxed/simple;
-	bh=qbbgl8/0P98bJ/pFGdJYocV4wnKr2XcvuNG+8qi/D3g=;
+	s=arc-20240116; t=1770060268; c=relaxed/simple;
+	bh=VgVO28xCcdCLk3XjS6VgS/UCx90P5pmFqJwSQHVirdQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pm9xA31/39KgixZLIQVKxgTIYR1gl2W1EVcqumYuGcBzAtFY7brM7abnOHDif+uDgVn31n5nOUJ0od3MhLQByJukchWpyH0Ie4uW2VWv1B8tSP34pZAZtN0LdGt6qSLCWuf0ndexiHcPUc/qXrOm6eC1Zvwqnp29qYSJ7pSxxnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=rpjaJ+Bv; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WVtoXjAj; arc=none smtp.client-ip=202.12.124.153
+	 MIME-Version; b=L2H0AF2HU462RygbUeMm61HtrRe16ov5BW92gsFSt3YRV98m6RuPhqlRHaRtcA8Xu9O88CnPvAm+vVxLlYRtObjNFv4BRcgMgLsHnikWblz5oOwk6RCswEwKW4hhCHTqJbNMBqIB/PFgZDK0c3TLLNdsGhjG8O1tGUECgjvgRHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=DJEOUclV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ybf0y/ky; arc=none smtp.client-ip=202.12.124.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 304CA7A0099;
-	Mon,  2 Feb 2026 14:24:23 -0500 (EST)
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id 294311D0006A;
+	Mon,  2 Feb 2026 14:24:26 -0500 (EST)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Mon, 02 Feb 2026 14:24:23 -0500
+  by phl-compute-03.internal (MEProxy); Mon, 02 Feb 2026 14:24:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1770060263; x=
-	1770146663; bh=UnB1GS/j3Wt64HhPVoD63HZlrPus3VlrHSUH8XM4Hac=; b=r
-	pjaJ+BvItaltoDvgU8PAWR+Ky3hNRTLSIz/0jk+he1hUBLNASvu5YiSFnYxIPf3c
-	ezayGX5OKRq3HsFnL4NahR3CmZx5PdOkPbwS+r6jDn0GnOju/MmAmtuJjOoFIFBT
-	oIi/hUxjDyWXzRF4tHrOYpG1MSjx/NanA5ECt5GoelifaFPqkdevHmDjX1+yICsh
-	ah29isr6dj/l8A9aGzsE/8Ps5Ftb36bvS7oo612Mw8/dipTXcGybZMI4pLmNwvX4
-	benCiJdhvx3zPDxYmR6ZZY5AuXlYRmMS1xRcpjgHO7sRxTeLVg6Qj7TlsGC4j2/Q
-	/zhlOcnuWUeSUsJFhwmRg==
+	:reply-to:subject:subject:to:to; s=fm3; t=1770060266; x=
+	1770146666; bh=OwhRt3wnZ2tKo2u4sJIwTKA7+lFyKDfZ8+RHd2/QFjg=; b=D
+	JEOUclVp0NG0DpTnEUl8WT8eeZJbDp3OTfzM04JQ9HqtlEVRmLlHzlTkTqGFuCvt
+	ButWbhYl3BhQWuz0R7dGW846g1cuwYg8oSFEpd8s1o4O3jhAimChoWLfY+YfaK64
+	N4P11H5qG07pb8ZFNNDsaVSxhV61vloNvNYl0VH9Tj40NJEJUJsRDW1D5Hqw2hRX
+	4SpO22apZ1PxMBWc16CGN2eOG7v5sCddJzm92Zgw5E4E4AajZZP/UPU/vvjW43Y4
+	vYFAy8qH8zwS1d2QdCyliR+Zk0Z/vb6gadKzWxBKKD+hHDGS7uuQF+67WhFe3VQo
+	5CN+0KiQqlQfpTC50rMAg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1770060263; x=1770146663; bh=U
-	nB1GS/j3Wt64HhPVoD63HZlrPus3VlrHSUH8XM4Hac=; b=WVtoXjAjv2tEelBTw
-	weptQbLETqADokdayR7pdBwBNsIavQvy+TycfRqW4+nDpPA9FqvoN5pGVYVMo7Zx
-	LtqogAJhXNOYYueiCFDIac2QMPdjWOpAT15NQV4jZMoJvqYK7sMABIcBld9IRh6s
-	a1W3g6o8hhViGIdJFWT1GKQEDWa1WNo+c850dtHhL+/MPM1+9vQ6N5Esw+j1uTz5
-	xOALLL5mA/ugzz0WcqAkhzOZTvjTiJVLAg06lgkjKeYDMBNFy2t5TqWF75wToKIo
-	GS7DonAocVq8GZAnFiN8r5HVVzcJdvstQZF1IdfQOsnh05BQqV5FHH0yROWJeW+C
-	6t+Xw==
-X-ME-Sender: <xms:5vmAaRCWs9RVvV5GgkqaNnPfwSgRsLie-p387GKNJxE67-cSfuxG1w>
-    <xme:5vmAaV7Dc3K7536-8Zv8ZFprTBZ2ezl3t3sHygAtbgsJbAIW_lW88lo13qt2rcK_Y
-    JLuF8HVAQKpL8L_m1A8AJXZuewRdUI3TJDB6bRIS-c_SVm4qAb4Pen2>
-X-ME-Received: <xmr:5vmAaY3EaNiQA_ldb6v5cZJTXWLM7QucceZHnqSyhf63gzt1ROMuSWsPOFg>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1770060266; x=1770146666; bh=O
+	whRt3wnZ2tKo2u4sJIwTKA7+lFyKDfZ8+RHd2/QFjg=; b=Ybf0y/kydoVvKIiPR
+	TqpfEhryldeRJN+Udhk9azH2NGf1d+qff6Rn9sJZuaoO8vdfYq9HYirMrS1JgCkD
+	Vfam0fAN8uylKAN/mE8MK0eOu/Vkz+b3T3Fu/e2XJwJWoUpHDenSMPNnuWOVfXRS
+	397oFlbtL2ozmVaxjjiqKcqdIvzhd5uQjAS/YWT+anG57O6r3Jdo2VDBaFgX+QiV
+	+5dtLcvHPXw5FOkgdJMzaBfKb7ck8KAYZfbNMAhh3yvDYzv27BMh4OkP0X7eejN6
+	sW9ycfIr9XdYRdJefxvsy6C0eYK0AIJ3+ljiizBG/xnmh9EHOiKrRIHniTtNxxjC
+	sT/qg==
+X-ME-Sender: <xms:6fmAaWnNV4g-U90cjNaFQzEtIWSxM54UHRYELE4XlToKFx30yLs-AQ>
+    <xme:6fmAaUNKJa2HtshuHYLGg8-l1kMN3lL2kO6ttoy3ktbvwvQD_YWQ3zFhtSB7oMUPN
+    ovKX7XVTaZXe8Eyo3ctgW3zPOVOwizM9ytD8Wl_tjQnXO65n4dVg78>
+X-ME-Received: <xmr:6fmAaQ7yTEZqbugTHv9vB-bnPKFFp6ZMzko7kMGIyJ7HLJTszQhKrtSzTFI>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeekgeejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomheptehlihgtvgcu
     ofhikhhithihrghnshhkrgcuoegrlhhitggvrdhprhhojhgvtghtshesfhgrshhtmhgrih
     hlrdhimheqnecuggftrfgrthhtvghrnhepkeefudffgfejjeejhfdttddvvdelgeelhfdv
-    iedtteegueejlefgjeekuedthfejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    iedtteegueejlefgjeekuedthfejnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrg
     hmpehmrghilhhfrhhomheprghlihgtvgdrphhrohhjvggtthhssehfrghsthhmrghilhdr
     ihhmpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
     epuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhes
@@ -84,14 +84,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeekgeejucetufdote
     hnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhk
     vghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnh
     gvlhdrohhrghdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhg
-X-ME-Proxy: <xmx:5vmAaZn9myIHiZEwNa-XI4Pf7-se3PPrpEOzBM9FTh2eBsOo-LyZ9Q>
-    <xmx:5vmAae56OPJAQ_Q9JRdIOGtQ1gw65OZsa_FjBOp_QiLXcMNkecZIjg>
-    <xmx:5vmAaUl3kKXa9tegMl42eInfocUZ9TkSeuGxqu5Yi62-4-FIMLY0bg>
-    <xmx:5vmAaRVD6AjJO2Zfsj7JqjE8UMnGw08HYhXMt3hlKipw9Y2FYERtoQ>
-    <xmx:5_mAaX9z7sjUQ4vUR4ecWsAv2Q1ug-pQqxknF84fk8vfexAkyHlUrZ6R>
+X-ME-Proxy: <xmx:6fmAaYZDkb75Iv6omnQF6Pt6XR9bghe0K-VayVOPg7fmwD9Y5u8dRg>
+    <xmx:6fmAadcu9rJncKHHWeVZk_QR9ZmWc85D72E32aNMAeWEP9o7iM7Qmw>
+    <xmx:6fmAaX5nxQ5YuQ7KC_Ie6G4Eyvx9dsy_bUnJwvtZl5QLBt4OmRYOfw>
+    <xmx:6fmAaaYnHsv_00m-kuuCbvHg4bdS1XVXrJkKBHjLsrPOhZ5SCvXDBQ>
+    <xmx:6vmAadSdWN9YHAPMUyw5IMgm-mgFoejvbDo32cerP8lhwu4OCjn6Mdhq>
 Feedback-ID: i1ede4ba7:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Feb 2026 14:24:22 -0500 (EST)
+ 2 Feb 2026 14:24:25 -0500 (EST)
 From: Alice Mikityanska <alice.projects@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -106,9 +106,9 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Stanislav Fomichev <stfomichev@gmail.com>,
 	netdev@vger.kernel.org,
 	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v3 10/11] net: mana: Remove jumbo_remove step from TX path
-Date: Mon,  2 Feb 2026 21:23:37 +0200
-Message-ID: <20260202192338.2373930-11-alice.projects@fastmail.im>
+Subject: [PATCH net-next v3 11/11] net/ipv6: Remove HBH helpers
+Date: Mon,  2 Feb 2026 21:23:38 +0200
+Message-ID: <20260202192338.2373930-12-alice.projects@fastmail.im>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260202192338.2373930-1-alice.projects@fastmail.im>
 References: <20260202192338.2373930-1-alice.projects@fastmail.im>
@@ -127,13 +127,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,isovalent.com];
 	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-255992-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-255993-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
@@ -148,38 +148,118 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fastmail.im:mid,fastmail.im:dkim,messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,isovalent.com:email]
-X-Rspamd-Queue-Id: 3B689D0848
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,isovalent.com:email,fastmail.im:mid,fastmail.im:dkim,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: DC292D082A
 X-Rspamd-Action: no action
 
 From: Alice Mikityanska <alice@isovalent.com>
 
-Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
-unnecessary steps from the mana TX path, that used to check and remove
-HBH.
+Now that the HBH jumbo helpers are not used by any driver or GSO, remove
+them altogether.
 
 Signed-off-by: Alice Mikityanska <alice@isovalent.com>
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
- drivers/net/ethernet/microsoft/mana/mana_en.c | 3 ---
- 1 file changed, 3 deletions(-)
+ include/net/ipv6.h | 77 ----------------------------------------------
+ 1 file changed, 77 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 91c418097284..9b5a72ada5c4 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -355,9 +355,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	if (skb_cow_head(skb, MANA_HEADROOM))
- 		goto tx_drop_count;
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 024c2c2784cb..16bc7498c329 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -149,17 +149,6 @@ struct frag_hdr {
+ 	__be32	identification;
+ };
  
--	if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
--		goto tx_drop_count;
+-/*
+- * Jumbo payload option, as described in RFC 2675 2.
+- */
+-struct hop_jumbo_hdr {
+-	u8	nexthdr;
+-	u8	hdrlen;
+-	u8	tlv_type;	/* IPV6_TLV_JUMBO, 0xC2 */
+-	u8	tlv_len;	/* 4 */
+-	__be32	jumbo_payload_len;
+-};
 -
- 	txq = &apc->tx_qp[txq_idx].txq;
- 	gdma_sq = txq->gdma_sq;
- 	cq = &apc->tx_qp[txq_idx].tx_cq;
+ #define	IP6_MF		0x0001
+ #define	IP6_OFFSET	0xFFF8
+ 
+@@ -462,72 +451,6 @@ bool ipv6_opt_accepted(const struct sock *sk, const struct sk_buff *skb,
+ struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
+ 					   struct ipv6_txoptions *opt);
+ 
+-/* This helper is specialized for BIG TCP needs.
+- * It assumes the hop_jumbo_hdr will immediately follow the IPV6 header.
+- * It assumes headers are already in skb->head.
+- * Returns: 0, or IPPROTO_TCP if a BIG TCP packet is there.
+- */
+-static inline int ipv6_has_hopopt_jumbo(const struct sk_buff *skb)
+-{
+-	const struct hop_jumbo_hdr *jhdr;
+-	const struct ipv6hdr *nhdr;
+-
+-	if (likely(skb->len <= GRO_LEGACY_MAX_SIZE))
+-		return 0;
+-
+-	if (skb->protocol != htons(ETH_P_IPV6))
+-		return 0;
+-
+-	if (skb_network_offset(skb) +
+-	    sizeof(struct ipv6hdr) +
+-	    sizeof(struct hop_jumbo_hdr) > skb_headlen(skb))
+-		return 0;
+-
+-	nhdr = ipv6_hdr(skb);
+-
+-	if (nhdr->nexthdr != NEXTHDR_HOP)
+-		return 0;
+-
+-	jhdr = (const struct hop_jumbo_hdr *) (nhdr + 1);
+-	if (jhdr->tlv_type != IPV6_TLV_JUMBO || jhdr->hdrlen != 0 ||
+-	    jhdr->nexthdr != IPPROTO_TCP)
+-		return 0;
+-	return jhdr->nexthdr;
+-}
+-
+-/* Return 0 if HBH header is successfully removed
+- * Or if HBH removal is unnecessary (packet is not big TCP)
+- * Return error to indicate dropping the packet
+- */
+-static inline int ipv6_hopopt_jumbo_remove(struct sk_buff *skb)
+-{
+-	const int hophdr_len = sizeof(struct hop_jumbo_hdr);
+-	int nexthdr = ipv6_has_hopopt_jumbo(skb);
+-	struct ipv6hdr *h6;
+-
+-	if (!nexthdr)
+-		return 0;
+-
+-	if (skb_cow_head(skb, 0))
+-		return -1;
+-
+-	/* Remove the HBH header.
+-	 * Layout: [Ethernet header][IPv6 header][HBH][L4 Header]
+-	 */
+-	memmove(skb_mac_header(skb) + hophdr_len, skb_mac_header(skb),
+-		skb_network_header(skb) - skb_mac_header(skb) +
+-		sizeof(struct ipv6hdr));
+-
+-	__skb_pull(skb, hophdr_len);
+-	skb->network_header += hophdr_len;
+-	skb->mac_header += hophdr_len;
+-
+-	h6 = ipv6_hdr(skb);
+-	h6->nexthdr = nexthdr;
+-
+-	return 0;
+-}
+-
+ static inline bool ipv6_accept_ra(const struct inet6_dev *idev)
+ {
+ 	s32 accept_ra = READ_ONCE(idev->cnf.accept_ra);
 -- 
 2.52.0
 
