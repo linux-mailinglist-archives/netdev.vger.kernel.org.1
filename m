@@ -1,213 +1,183 @@
-Return-Path: <netdev+bounces-255881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-255883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iM+fA+SzgGl3AgMAu9opvQ
-	(envelope-from <netdev+bounces-255881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:25:40 +0100
+	id gEQKE5W0gGl3AgMAu9opvQ
+	(envelope-from <netdev+bounces-255883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:28:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D4C2CD4FF
-	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:25:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFEACD594
+	for <lists+netdev@lfdr.de>; Mon, 02 Feb 2026 15:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 53F053002D00
-	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 14:25:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9FF01300D4F5
+	for <lists+netdev@lfdr.de>; Mon,  2 Feb 2026 14:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25C436C5A3;
-	Mon,  2 Feb 2026 14:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BE736D4FF;
+	Mon,  2 Feb 2026 14:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="13AE52ga"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WenBnx0T"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6BE36A033;
-	Mon,  2 Feb 2026 14:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85D536C598;
+	Mon,  2 Feb 2026 14:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770042334; cv=none; b=cjX4mSEcphtyb18WoeOw/3Qa4tpEWKYPonVuJvaMAmldZ2QcBpl0qZKxSLvFsKt5wnJ5cT35tXP/2iCDE5IzhvaM5OKfkHrsr/9aw0FJcGlwf07K7Q4GznF68rfdjU7lGwyBWPkEByxVg/eNYr2KdI8J4tfrq7Ec7PkZ4Krqwhg=
+	t=1770042500; cv=none; b=BnsbeX7E9T9aQM5xaCg5hzv7seqv3RXgR4Wkhqo02ul16BKR0Xn803tSlfuE9/4f+rY7czDBj84TZtojWKNgvQCF8SjMiPnI+0YUi/k+w7cU5/NtewZPDv4uy5B6dmLf8GvxJzyA1OuLy8+MYYQ9kdMdS99jSOIpHIOMrdw+6n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770042334; c=relaxed/simple;
-	bh=GGdDwTUpk5EUeNzmFSrWkTf1lB4XJJ1VZLtzjfdQSuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EyOb4yIf3s1QCF7MlkGXK3Fv44rxXR1oHcJI/suhKINl4LJM+Wt5COv9FAMtXkv7DJ2khoeA73DgLY10pvjFh9g0LrTudOq4PdVt1+eFkxPYRYLKGIQRdvNIuOYNZtjGQZvipbdnqsI1HbhWrHrHPcqNgqac1lYxiMIov0Gz2jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=13AE52ga; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rhBN/4CEHrHWFvjQolbwtIzJ8rg0Id6dJ4/fTSIzWQg=; b=13AE52galpTNyjipvDVESbKnoi
-	UaXvLNM/NjMJsIhewAJZBBaX05Bk1R3bO3S6OK7W3T9RrxTN5/ESCBgrUvBjeoedIgqhqWMz7b25t
-	evfwsiY+UVOMZAJ6Lxh9CJEzkso4rQUnTcbl5ZVNmwHQJpMlRJ2/HfO+Qt4nZerDkoWSPex9tZ3qj
-	FJKbL9XgcmBZOx0CDZFQoR9k6DvCNPIysBa2dnJ7ajDe7LPxfK7J7H/2edJlxC/1uVjmEw3i7sdpO
-	fI7fA8KPw0Aur7E82XilZTeb/vt7c46Haof66U7S1b2M7Tyhu4BQ0l132yu9xJpbSHsKr1W3I8zZF
-	6aHw2dBg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41688)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vmurb-0000000045o-3qFZ;
-	Mon, 02 Feb 2026 14:25:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vmurV-000000003T2-190d;
-	Mon, 02 Feb 2026 14:25:09 +0000
-Date: Mon, 2 Feb 2026 14:25:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, florian.fainelli@broadcom.com,
-	xiaolei.wang@windriver.com, quic_abchauha@quicinc.com,
-	quic_sarohasa@quicinc.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net] net: phy: change devlink flag to
- AUTOREMOVE_SUPPLIER for non-SFP PHYs
-Message-ID: <aYCzxVTTZvok9_d1@shell.armlinux.org.uk>
-References: <20260202054533.539883-1-wei.fang@nxp.com>
- <267c78c1-4ad2-4f06-be63-0fb506c5134d@bootlin.com>
+	s=arc-20240116; t=1770042500; c=relaxed/simple;
+	bh=9GK7c/+ItwHetxr6eJlNOJePzxSiR/TFo01yiisSKV0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d1E02RG9CubD40nZiLU1F/0MwRljqkrMAIK7yiCVlx9+LaCJEgT/1IFDLPfzpoeZd2EjDJfjYoQH+7XDwNMJzmVYB2ZWMqZzMZK5+8QWKMRL6GkoCTiAXim/7YNb3/Ue2QHjH1BTegsYYZXVXdgD8qVucOMuP/Ues+BLD0UGrQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WenBnx0T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A191C19422;
+	Mon,  2 Feb 2026 14:28:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770042499;
+	bh=9GK7c/+ItwHetxr6eJlNOJePzxSiR/TFo01yiisSKV0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WenBnx0ThipuTGAaEC1onJkXKqsZQUieHUHYbvUCrtoP6RMH9x2d2nh+Qw/X7+grO
+	 MpO9/e4dnTsnyg9/G2yIShTGyrsqigzHVCYwX7tkeEgi2HZ6kUKy87sO9MO3Zsbpwv
+	 btliJlexQfREdwUM26ILJ9dePCP2LwZ5fayXXDpdYnVanBOfUpA8WNxEi5ZnsmhqDn
+	 +45Vtgi2PxGAU10DNmaX7Bw5Wl8j9agc7o95LtY+2TluU6kBDbvXn6xgl4zzoMjMBN
+	 3uV11nowhRsUBQ+HxXAPeUach42vKs3dx+CPNvPtvT6ZvFzuKKOsXTCheczw3lEgNX
+	 AApTrw4q5kWrw==
+From: Simon Horman <horms@kernel.org>
+To: wei.fang@nxp.com
+Cc: Simon Horman <horms@kernel.org>,
+	john.fastabend@gmail.com,
+	linux-kernel@vger.kernel.org,
+	sdf@fomichev.me,
+	netdev@vger.kernel.org,
+	xiaoning.wang@nxp.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	bpf@vger.kernel.org,
+	imx@lists.linux.dev,
+	ast@kernel.org,
+	frank.li@nxp.com,
+	shenwei.wang@nxp.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	davem@davemloft.net,
+	daniel@iogearbox.net
+Subject: Re: [v5,net-next,06/15] net: fec: add fec_enet_rx_queue_xdp() for XDP path
+Date: Mon,  2 Feb 2026 14:26:55 +0000
+Message-ID: <20260202142655.1847932-1-horms@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260129103447.1893129-7-wei.fang@nxp.com>
+References: <20260129103447.1893129-7-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <267c78c1-4ad2-4f06-be63-0fb506c5134d@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,windriver.com,quicinc.com,lists.linux.dev,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-255881-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	URIBL_MULTI_FAIL(0.00)[sto.lore.kernel.org:server fail,linux.dev:server fail];
+	TAGGED_FROM(0.00)[bounces-255883-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,fomichev.me,nxp.com,redhat.com,lunn.ch,lists.linux.dev,google.com,davemloft.net,iogearbox.net];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,bootlin.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1D4C2CD4FF
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DFFEACD594
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 12:10:41PM +0100, Maxime Chevallier wrote:
-> Hi Wei,
-> 
-> On 02/02/2026 06:45, Wei Fang wrote:
-> > For the shared MDIO bus use case, multiple MACs will share the same MDIO
-> > bus. Therefore, these MACs all depend on this MDIO bus. If this shared
-> > MDIO bus is removed, all the PHY devices attached to this MDIO bus will
-> > also be removed. Consequently, the MAC driver should not access the PHY
-> > device, otherwise, it will lead to some potential crashes. Because the
-> > corresponding phydev and the mii_bus have been freed, some pointers have
-> > become invalid.
-> > 
-> > For example. Abhishek reported a crash issue that occurred if the MDIO
-> > bus driver was removed first, followed by the MAC driver. The crash log
-> > is as below.
-> > 
-> > Call trace:
-> >  __list_del_entry_valid_or_report+0xa8/0xe0
-> >  __device_link_del+0x40/0xf0
-> >  device_link_put_kref+0xb4/0xc8
-> >  device_link_del+0x38/0x58
-> >  phy_detach+0x2c/0x170
-> >  phy_disconnect+0x4c/0x70
-> >  phylink_disconnect_phy+0x6c/0xc0 [phylink]
-> >  stmmac_release+0x60/0x358 [stmmac]
-> > 
-> > Another example is the i.MX95-15x15 platform which has two ENETC ports.
-> > When all the external PHYs are managed the EMDIO (the MDIO controller),
-> > if the enetc driver is removed after the EMDIO driver. Users will see
-> > the below crash log and the console is hanged.
-> > 
-> > Call trace:
-> >  _phy_state_machine+0x230/0x36c (P)
-> >  phy_stop+0x74/0x190
-> >  phylink_stop+0x28/0xb8
-> >  enetc_close+0x28/0x8c
-> >  __dev_close_many+0xb4/0x1d8
-> >  netif_close_many+0x8c/0x13c
-> >  enetc4_pf_remove+0x2c/0x84
-> >  pci_device_remove+0x44/0xe8
-> > 
-> > To address this issue, Sarosh Hasan tried to change the devlink flag to
-> > DL_FLAG_AUTOREMOVE_SUPPLIER [1], so that the MAC driver will be removed
-> > along with the PHY driver. However, the solution does not take into
-> > account the hot-swappable PHY devices (SFP PHYs), so when the PHY device
-> > is unplugged, the MAC driver will automatically be removed, which is not
-> > the expected behavior. This issue should not exist for SFP PHYs, so based
-> > on the Sarosh's patch, the flag is changed to DL_FLAG_AUTOREMOVE_SUPPLIER
-> > for non-SFP PHYs.
-> > 
-> > Reported-by: Abhishek Chauhan (ABC) <quic_abchauha@quicinc.com>
-> > Closes: https://lore.kernel.org/all/d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com/
-> > Link: https://lore.kernel.org/imx/20250703090041.23137-1-quic_sarohasa@quicinc.com/ # [1]
-> > Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
-> > Suggested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> 
-> I gave that patch a test, with the following cases :
-> 
->  - On Macchiatobin (we have PHYs that share an mdiobus).
-> When unbinding a PHY, the MAC dissapears as well :
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Correct, this is why these band-aids are harmful. One "device" can
-correspond with *multiple* network interfaces, and the loss of one
-PHY can have a *very* detrimental effect.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: fec: add fec_enet_rx_queue_xdp() for XDP path
 
-Consider the case where root-NFS is being used, and removing a PHY
-on another interface takes out the interface that root-NFS is
-using. Your machine is now dead in the water.
+This commit separates XDP path packet processing from protocol stack
+processing by creating a dedicated fec_enet_rx_queue_xdp() function.
+The goal is to optimize XDP performance by removing unnecessary code
+paths that were interleaved with regular packet processing.
 
-In my opinion, we should be concentrating more on the issue behind
-the oops.
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
 
-Given that this problem is because of the bus being removed, one
-thing that would help would be for the MDIO bus to be properly
-refcounted, and when the bus is unbound, to replace the bus ops
-with versions that return -ENXIO or similar under the MII bus
-lock. This would be easier of the MDIO bus ops were a separate struct
-to struct mii_bus.
+[ ... ]
 
-Similar with the PHY itself - if the PHY is in-use, it should be
-refcounted to stop the struct phy_device from going away, and
-should we have the situation where the PHY driver is unbound,
-phydev->drv should be set to a set of dummy ops (under the phydev
-mutex and probably rtnl.)
+> +static void fec_xdp_drop(struct fec_enet_priv_rx_q *rxq,
+> +			 struct xdp_buff *xdp, u32 sync)
+> +{
+> +	struct page *page = virt_to_head_page(xdp->data);
+> +
+> +	page_pool_put_page(rxq->page_pool, page, sync, true);
+> +}
 
-It seems to me that throwing devlinks at this problem is giving us
-more problems than it's solving.
+[ ... ]
 
-A graceful way to handle a MAC losing its PHY is for phylib to
-indicate that the PHY has gone down, rather than removing the
-network interface (and potentially a whole host of other network
-interfaces in the case of one struct device being associated
-with many interfaces.)
+> +static int fec_enet_rx_queue_xdp(struct fec_enet_private *fep, int queue,
+> +				 int budget, struct bpf_prog *prog)
+> +{
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+[ ... ]
+
+> +		switch (act) {
+> +		case XDP_PASS:
+> +			rxq->stats[RX_XDP_PASS]++;
+> +			/* The packet length includes FCS, but we don't want to
+> +			 * include that when passing upstream as it messes up
+> +			 * bridging applications.
+> +			 */
+> +			skb = fec_build_skb(fep, rxq, bdp, page, pkt_len);
+> +			if (!skb) {
+> +				fec_xdp_drop(rxq, &xdp, sync);
+> +				trace_xdp_exception(ndev, prog, XDP_PASS);
+> +			} else {
+> +				napi_gro_receive(&fep->napi, skb);
+> +			}
+> +			break;
+
+When fec_build_skb() fails, it already returns the page to the page pool
+via page_pool_recycle_direct():
+
+    static struct sk_buff *fec_build_skb(...)
+    {
+        skb = build_skb(page_address(page), ...);
+        if (unlikely(!skb)) {
+            page_pool_recycle_direct(rxq->page_pool, page);
+            ...
+            return NULL;
+        }
+        ...
+    }
+
+Calling fec_xdp_drop() after fec_build_skb() returns NULL will return
+the same page to the pool a second time. Can this cause page pool
+corruption under memory pressure when build_skb() fails?
+
+[ ... ]
 
