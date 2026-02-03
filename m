@@ -1,53 +1,102 @@
-Return-Path: <netdev+bounces-256270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDSmGh/ngWl0LwMAu9opvQ
-	(envelope-from <netdev+bounces-256270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:16:31 +0100
+	id CPMzNejogWkFMAMAu9opvQ
+	(envelope-from <netdev+bounces-256271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:24:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2BC3D8E21
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:16:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9FED8F6E
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7DABA30E12BC
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:11:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9612C310C420
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24B333DECD;
-	Tue,  3 Feb 2026 12:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D97F33FE0A;
+	Tue,  3 Feb 2026 12:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGZ2/SRA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2UeWlRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B028333D6EC
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F57B3346B9
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770120672; cv=none; b=FplFeEti/8JiMxF8zz2LEceZyPDWJlljSDIbW98oVmsq6WHD3oNCxEO2DAFBnMSLWKlFQl2/HSkIPuIK/M+iuR9ND7OTrbfvv9UNKB0i+SaIa1Gqcx45obvGuCUyfXJTmPbA+v0QWdVHfX+2m2FSvb4/1Ln6tM+CFe1F+6XK3hw=
+	t=1770121050; cv=none; b=lGQmOF+Cux+JM9quF7QLh1iwZaepHfiTXwKvUYefkET2hXlCoqaYpE4ep+eCSrRhoVXH3eiBzUvTJG8WmTwyJS8up4F2uKw5S/ga8v4D5a4PkalnrAovxXmZv7hMEvvs7a5IqN6PHK+pemTH0ItYJIbtlkEawnKG+2unmLh0H2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770120672; c=relaxed/simple;
-	bh=btxg6cj1MpBBv6o4ZJYl1baCFxxuZ4c10nHxlIhqYoo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cCgF6rYUcoj1HM2dCP4LmLokdfks0E/CkTOEYDYyxnZr9P6hLDmB0x8fvhBjrBUrbW8NzgmMplZrW34V//KmRmZRVuH/HRr+aQSrf8KmOKl/uH+ZSRuU9zZUeUNfrmFHupDgr45h02rHtpZGjrzKMqF7fNLlm02umyoGgLIGCp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SGZ2/SRA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AE15C116D0;
-	Tue,  3 Feb 2026 12:11:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770120672;
-	bh=btxg6cj1MpBBv6o4ZJYl1baCFxxuZ4c10nHxlIhqYoo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SGZ2/SRAXajDZdpqulGGDjLUpDDrzD7n9EtIxq+pSFqGBLPLSS7YLf3QRYb6EqtEV
-	 NpSSDMN00B9K+YDXljuZIYzCFmFnWWH35PO6aexsqW1TsGMKj8SCyIBTBAXRCMlulQ
-	 SEIvuObqc6g4l7Z8jY7FghpWJyapY/wruw8vEQn5rBQPPO1hRRxwO6mUI4b07Zs3f8
-	 eVenCxqYv5n4XkNtDEjT4Q/AgmxXdCXXl9+DpajknQXLpQVf6ZW6zAoIAc6Rhn7L9h
-	 j+fWquTuRoiAyG5gOiScllfVbrKlPLh1y8Fq7ZrJRdseeUm2cG636YAVxeG+rpsbeR
-	 HNEKTUl3urhrw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 16EDE3808200;
-	Tue,  3 Feb 2026 12:11:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1770121050; c=relaxed/simple;
+	bh=gninZlBoLuHNxge4GK5ffuEcWrBCJW7xBMyZoit0cSQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gSuUnOPFOYZMFCz+ku4uNdVJgNSl2RglMAAuDzTPGhvisSKZSnIAndet1o+LKl9sUNTIrA5TkILsjVSSQNvvqWX05tLy59EkMJIIZEAUKoMd8OJgkxLuRR11Btm1M9MbGjKT1YCDrkUh4yQhPhWZF8dRSYv3vhuI9M/xdVWCYmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2UeWlRe; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4806b43beb6so40772005e9.3
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 04:17:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770121046; x=1770725846; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fcy8M4BGhMrAt0/LmVopycDbCegF7gwE/HhYCJa6vg4=;
+        b=l2UeWlReGN5RKajqvFD8OpnPtmrYkmCLDlD2uf0WV3VcsKlWIowdYrObskQA+y735b
+         fd76Mjhh9LExpS4yY5mtrBEKNW7llQBzSu60VGR/hcjurP1AdBcR+yHDUAtdV/tl/eNL
+         uUmozzaVaiKyoHBhn1o722CAs1ReE/6GmszA6PuQgnMM47dFUF7gYeNvb92TrX2eD7bL
+         NAKqPmntTVz8d60vvDXrqW+ASJtQOpgITRxDHCgDBnptK6uT5Dob3BAq3PGD3QZ3a4pv
+         SXJFaSdtyVZvncPfXyMusnNPvPHGNRbET1qZkg+q2GAJ17ggWwo8UqDTuF6m80KYUmD0
+         hjXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770121046; x=1770725846;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fcy8M4BGhMrAt0/LmVopycDbCegF7gwE/HhYCJa6vg4=;
+        b=GChzuIceFWf2hVc1XHEseTSGpd+GkfD95fmJlDPmoPo87WWag0yKBdAEf29T9XDz5G
+         x2XekIXapEYyr1LqdJCh3VjozCzHjyq7hAn001WOvD6TUs/+sDHTzxGBKqpFL1CZ7hjK
+         4yBj4YMxLabY9kpSQ1Pl61E9yh3RjZm9XjcpBm7IEK5PyswDImeinwqzZx4dtgMnjNw5
+         zDZAWesZGb5b5qE+CtQy22qtkFFp0SIYiQnCtXOdJfv4Bb749yEifdPWyWYK6YZcnY/+
+         Vz9bz5feqk9he2BDE0yWHPBIqzI1O6hPFzBVH4VioS8+8hZCweqUbOMh6o8zBKYHmpam
+         2B4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXLXCsafITZN8F0fkviMK1AIQm7J3VVyRiLLPRibCCMnOahoV0lI4IUMRjEeQh81rK9WgcaPF4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyw8lKgX21bZCwFZYTQLlT/dZQxe4+2b8HJcjej4aShlm5XZ20F
+	xTmL4+mzsUZRuoS0A4Ti2GlmwQR6Y40Yd5dflxelAh3mfkFFnmzILhIc
+X-Gm-Gg: AZuq6aLnHG6wn5lp0XMGqZsVUghfVLDPP05HNReehNjxYvLwPh/TUOnMwd50+nieXzk
+	AM3D8bJXC/TifUpOKRy1XgCam40cSG6VsKPlULu3uOHm3DB1XO2wBQQw3TND8KLyzCPsku0cunV
+	RIm4zyuAydptGyxpytfYaGNA3VYsqGGRhocWrqUpdDA4I5dx41OVznLsEFglmpvvVuUp6d74AEv
+	yiy7FHJ39WfDdjBAbPIvuH6gqKKYUbS5qyjQVyZYxPe35kOWw1TIW3ay3SbTv5zheaVv7hPdwGX
+	i549Zw4bFl9hBE/ftYj/juY5WMM7ew5r6rcGcODmE5hefatkHhrP9doI+zJM2h7hzsu6E0ur/00
+	l54BMHxAQ8D+6q71a9AdyHi71DuZt0IPQsomV+pTrrmhKB9NZjs02R8yscR8Nit5btqF9z60y88
+	uDqahWZ7ahCIl8HMvlCVwB9bPJr9mo
+X-Received: by 2002:a05:600c:4451:b0:477:639d:bca2 with SMTP id 5b1f17b1804b1-482db457724mr217768105e9.4.1770121045688;
+        Tue, 03 Feb 2026 04:17:25 -0800 (PST)
+Received: from biju.lan ([2a00:23c4:a758:8a01:9cd9:f748:166d:55fc])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48305129419sm56042495e9.6.2026.02.03.04.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 04:17:25 -0800 (PST)
+From: Biju <biju.das.au@gmail.com>
+X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+	Stefan Eichenberger <eichest@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Biju Das <biju.das.au@gmail.com>,
+	linux-renesas-soc@vger.kernel.org
+Subject: [PATCH net-next] dt-bindings: net: micrel: Fix dtbs compatible too long warnings
+Date: Tue,  3 Feb 2026 12:17:21 +0000
+Message-ID: <20260203121723.312336-1-biju.das.jz@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,84 +104,121 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] net: phy: remove modalias-based MDIO device
- bus
- matching
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177012066888.1451422.8966131592859053735.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Feb 2026 12:11:08 +0000
-References: <d9543e7d-23e1-4dba-a6b3-35dcd6a35dec@gmail.com>
-In-Reply-To: <d9543e7d-23e1-4dba-a6b3-35dcd6a35dec@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, linux@armlinux.org.uk,
- pabeni@redhat.com, edumazet@google.com, kuba@kernel.org, davem@davemloft.net,
- horms@kernel.org, michael.hennerich@analog.com, alexandru.tachici@analog.com,
- olteanv@gmail.com, netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256270-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,armlinux.org.uk,redhat.com,google.com,kernel.org,davemloft.net,analog.com,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-256271-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[bp.renesas.com,gmail.com,vger.kernel.org,glider.be];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F2BC3D8E21
+	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3C9FED8F6E
 X-Rspamd-Action: no action
 
-Hello:
+From: Biju Das <biju.das.jz@bp.renesas.com>
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+The KSZ9131 PHY is suitable for IEEE 802.3 applications.
 
-On Sat, 31 Jan 2026 18:36:07 +0100 you wrote:
-> modalias-based MDIO device bus matching has only one user (dsa-loop),
-> where we can replace modalias-based matching with a simple custom
-> match function. This, and first patch of the series, lay the foundation
-> for removing modalias-based matching.
-> 
-> Heiner Kallweit (3):
->   net: ethernet: adi: make name member of struct adin1110_cfg a pointer
->   net: dsa: loop: remove MDIO device modalias
->   net: phy: remove modalias-based mdio bus matching
-> 
-> [...]
+Fix the below dtbs warning "compatible: ['ethernet-phy-id0022.1640',
+'ethernet-phy-ieee802.3-c22'] is too long" on the below dts:
 
-Here is the summary with links:
-  - [net-next,1/3] net: ethernet: adi: make name member of struct adin1110_cfg a pointer
-    https://git.kernel.org/netdev/net-next/c/f7aa2ef10c0e
-  - [net-next,2/3] net: dsa: loop: remove MDIO device modalias
-    https://git.kernel.org/netdev/net-next/c/5fddafbb92e0
-  - [net-next,3/3] net: phy: remove modalias-based mdio bus matching
-    https://git.kernel.org/netdev/net-next/c/3051419f3d1a
+r8a774b1-beacon-rzg2n-kit.dtb
+r8a774a1-beacon-rzg2m-kit.dtb
+r8a774e1-beacon-rzg2h-kit.dtb
+r9a08g046l48-smarc.dtb
+r9a07g043u11-smarc.dtb
+r9a07g044c2-smarc.dtb
+r9a07g044l2-smarc.dtb
+r9a07g044l2-smarc.dtb
+r9a07g054l2-smarc.dtb
+r9a07g054l2-smarc.dtb
+r9a09g047e57-smarc.dtb
+r9a09g047e57-smarc.dtb
+r9a09g056n48-rzv2n-evk.dtb
+r9a09g056n48-rzv2n-evk.dtb
+r9a09g057h44-rzv2h-evk.dtb
+r9a09g057h44-rzv2h-evk.dtb
+r9a07g043u11-smarc-cru-csi-ov5645.dtb
+r9a07g043u11-smarc-pmod.dtb
+r9a07g043u11-smarc-du-adv7513.dtb
+r9a09g047e57-smarc-cru-csi-ov5645.dtb
+r9a07g044c2-smarc-cru-csi-ov5645.dtb
+r9a09g047e57-smarc-cru-csi-ov5645.dtb
+r9a07g044l2-smarc-cru-csi-ov5645.dtb
+r9a07g044l2-smarc-cru-csi-ov5645.dtb
+r9a07g054l2-smarc-cru-csi-ov5645.dtb
+r9a07g054l2-smarc-cru-csi-ov5645.dtb
+r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
+r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
+r9a09g056n48-rzv2n-evk-cn15-sd.dtb
+r9a09g057h44-rzv2h-evk-cn15-sd.dtb
+r9a09g056n48-rzv2n-evk-cn15-sd.dtb
+r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
+r9a09g057h44-rzv2h-evk-cn15-sd.dtb
+r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
 
-You are awesome, thank you!
+Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+---
+ .../bindings/net/micrel,gigabit.yaml          | 23 +++++++++++--------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/micrel,gigabit.yaml b/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
+index 384b4ea6181e..284c3ba379f3 100644
+--- a/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
++++ b/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
+@@ -17,15 +17,20 @@ description:
+ 
+ properties:
+   compatible:
+-    enum:
+-      - ethernet-phy-id0022.1610  # KSZ9021
+-      - ethernet-phy-id0022.1611  # KSZ9021RLRN
+-      - ethernet-phy-id0022.1620  # KSZ9031
+-      - ethernet-phy-id0022.1631  # KSZ9477
+-      - ethernet-phy-id0022.1640  # KSZ9131
+-      - ethernet-phy-id0022.1650  # LAN8841
+-      - ethernet-phy-id0022.1660  # LAN8814
+-      - ethernet-phy-id0022.1670  # LAN8804
++    oneOf:
++      - items:
++          - const: ethernet-phy-id0022.1640
++          - const: ethernet-phy-ieee802.3-c22
++      - items:
++          - enum:
++              - ethernet-phy-id0022.1610  # KSZ9021
++              - ethernet-phy-id0022.1611  # KSZ9021RLRN
++              - ethernet-phy-id0022.1620  # KSZ9031
++              - ethernet-phy-id0022.1631  # KSZ9477
++              - ethernet-phy-id0022.1640  # KSZ9131
++              - ethernet-phy-id0022.1650  # LAN8841
++              - ethernet-phy-id0022.1660  # LAN8814
++              - ethernet-phy-id0022.1670  # LAN8804
+ 
+   micrel,force-master:
+     type: boolean
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
