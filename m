@@ -1,274 +1,159 @@
-Return-Path: <netdev+bounces-256440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256441-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLCCAQdEgmlHRQMAu9opvQ
-	(envelope-from <netdev+bounces-256440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:52:55 +0100
+	id kNnkOGhDgmlHRQMAu9opvQ
+	(envelope-from <netdev+bounces-256441-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:50:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF4EDDDEF
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:52:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050E6DDD84
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 69F8C30EF621
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:44:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BAB923011117
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2143D7D83;
-	Tue,  3 Feb 2026 18:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C03226738B;
+	Tue,  3 Feb 2026 18:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVJUX3yu"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="U5Qb4Uzy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CA536F415;
-	Tue,  3 Feb 2026 18:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4CE1F471F
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 18:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770144185; cv=none; b=JSZVaLDOabmrPi6BYROPWQxf6PBvO+M/XddBvNfAbJ1ic1SYCloDuC6RHMNGcWnDGTwpoaUCS0z1ca8vXt+BvU0S0A9ygkybo0DBQg8GYCbPTpXq8iagqYHBJyFDWzcmTloDmcEOupEBWQ0mTLcvfiNYylUlCtmbB47pzTTa7Os=
+	t=1770144493; cv=none; b=EhPDSd9huOvJMygkIaAlFpfVvnA8jD+Q9OBRGQCc+rkrhiP2rpb/iEMKZPn9GEePpJE65xuUFbrvysh12RBstNKkwhaOQ2N8PyYqIsQc33nqVQN+mg1E7MfmNH0gT8Khqfosv/tIDcnmMfHWgMQOAhsDobmIYarHAYPe4L2bcgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770144185; c=relaxed/simple;
-	bh=8AUrYwtKKnckhCv/Ter8FB1r7t0MKFfzvxhFPKBF/ks=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=coIX5PJncvT3ZtugjzLXvDGfSew3UGIAPp9vmeqgRZRT/XkrEeCN9Zx1HmmuR047sjPGipRoAom0u7EHZxnxMo+QR5y2AaK950nB4G+SjW7+WJfrsBJVuEdDgiVQPkdltjyjRqBxfRMMzuNNM+Rt0gYASyCPUU0/QkYrW+S/AEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVJUX3yu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D652EC116D0;
-	Tue,  3 Feb 2026 18:43:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770144184;
-	bh=8AUrYwtKKnckhCv/Ter8FB1r7t0MKFfzvxhFPKBF/ks=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=XVJUX3yuBe4DYGy5U6Sc+nCW3R1nqGXPrIbLqAP4Lh3X0D5ymbfYBkQ2v9EnYUZ2j
-	 UptazNcNIfSTPUJsWX8MBWd8JAr6VRzqWhBaq8ILBDCpmCA9hCvdwlDHqTyPXpLTat
-	 ySCDiBqaaNA7huiEeOK2KDTaJryZYoAwtuh/5vOsAv2tYTDl2B8BD8Zt3FW3IcyL4+
-	 LWbiOXuz+eQal8lWxioPQY/C2tU0kDmKEHv9ITQ+9vxWmVidslCOfIFuvXlqq3l/fG
-	 j++T9QoblOHCv8A2Ee5eUILqDi64vaT53sc3f8i1T21pb6ds+uM9fZ8AcgKnCzC4Fk
-	 3N0FwOgtlxDwQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 03 Feb 2026 19:41:31 +0100
-Subject: [PATCH net-next 15/15] selftests: mptcp: join: no SKIP mark for
- group checks
+	s=arc-20240116; t=1770144493; c=relaxed/simple;
+	bh=0ZkS/2V7FPAWDAK6Lzd7Dzyu4NHZhHfR6598dZr3Uds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CMGWR52kVho/4rWhatS9FCYaR/ky0kUeO+icxrol3vHMTZ7xI471vJee90x6taXah3/OId5YmWGIIHkRDkVsJdfazTneLG2rHNZfG7k3uzbetCi6jkS75lmLMjVeBDtFIJesHJ0/NFfwekzSSaNssSA8hKyhl3HR9fK2fSe8M6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=U5Qb4Uzy; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4806bf03573so29748055e9.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 10:48:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1770144490; x=1770749290; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gT8iugg3DypdsymaapbZQnPM7bd63J+XzwPfRkwzGAw=;
+        b=U5Qb4Uzyvi605Vf8zBDOA8iIlymqiwPq4vuSTHgMmhrqrqfUByLgMTkLVIwzs1EeTq
+         J9f6hPJMWsBEFWn+IVG9jCEzmnB2XWC8H9DE7bBguYyChycZrunD3oIoPoeS3jFRmqfs
+         q+PFvaZQXexiD36QzfutjDsdKj2/XZlQvA9UODzjPqh1adviJ6rCyw00E8qa92e3rmoN
+         Ar851tCqcuqAwxmmK/5jukDeLFKEGfdhTkWfmj4vaSuxQRiDzcJRoBE8IYfaA0OECKxH
+         h4ih2RySTUn9fcFjlLITIhaM0DGbWI4m9UaA4e+jVcnh5z0EEoOqQyNux4aiy3kf17rz
+         Ew2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770144490; x=1770749290;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gT8iugg3DypdsymaapbZQnPM7bd63J+XzwPfRkwzGAw=;
+        b=o8HyDFP3pagHVVL8RJtjHFmrhPrJblgtWus/OIEkIFpKhUoI2di6yDEJ2vfQj5C56j
+         Uf/amk1qEbwTH/yxxiS16R4mI9AlIlHdO4Rti9Do64CQPU7TrDyVEgroWseQik1qzwwe
+         DR0X7Ls1Iyw663W4kSTi5qCEXNtoLV5nIGNinHwBXd7EW++cGjbnxBSsXDB23JQMFKHY
+         4J7u3Jf2HDCC0o011IjkGXov6yZiHHdOvNRlW3OzUp2Sq/DLB0VOVn/wrpJZ3AkuQ+DB
+         bQt3ee+TEfk0o88T2AVcqBoHgBPnYLT6ShsJI/JhYceD3+rPwTTKxhV7P6ycpfBwGkiZ
+         SAng==
+X-Forwarded-Encrypted: i=1; AJvYcCVGQCU5GZlMvsWEI0VSarqSjAxZ4I0aZznVzUoep0T0dfB4I/mNURKzqD4kS7t3sjBOlALcQmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTd+wA/NsRZMMOl+Z/EgkIH8gN1FgGVhZkSQc4H6QTN7C2drpG
+	718qyBF5zOj2wwYnc3y1DCLaZhffiePxa9YZ1kv9N6lI8SQ7V8ogstlN07/T1ic3IYA=
+X-Gm-Gg: AZuq6aLRkOpJgS9KTzmNJ/HF+/N1IjkRQ1HsPeZxQJ4hd94JQw7aK+QAiI72eZcRe5U
+	JoxQwVPevdqRzojPkjaNLdik46PXNr0A4POdJoEG7N44qKTc+hPCQAw4w6/6ZYK1uX0vsz9twBi
+	lAl1W4PcKmokmUGyH/QTmHLcqfTTBFNbu7KGbNloYw4gCjqOkBXmM8RECqdcrmv+bJfNHiU7qcj
+	ksqr6uXFEL4Kz6VPpvsTHKFyvSYxBK9kN+wFpTmBEYBPB/Cs51pCfrGsIbssggQyGMAHhCB73Q9
+	CK8LSWJor2lcGWafFWoiWqquOS9bNVGo1lQVe/5L6tKvCHkQBZyyXRFDa5epToggBz0BUnjtqbf
+	MX3d/G9ZbeyZ9KDtNoS8Lo0sTk5MnXDocpZGs24Ie/plUeW3I9I78JTV9i6Dg+qFSiMoXH9Qn9c
+	Zvawr7JjKjmJBYP6nZ8yEVMnkY0cL55EWvFqXLZ1xf2RgY2FgRt1wD
+X-Received: by 2002:a05:600c:1f93:b0:477:55ce:f3c2 with SMTP id 5b1f17b1804b1-4830e94e543mr8295085e9.14.1770144489805;
+        Tue, 03 Feb 2026 10:48:09 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4830512e0edsm85320555e9.7.2026.02.03.10.48.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Feb 2026 10:48:09 -0800 (PST)
+Message-ID: <2ce5f52b-faa3-4d5e-afc7-08544bd8e241@blackwall.org>
+Date: Tue, 3 Feb 2026 20:48:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] bonding: only set speed/duplex to unknown, if
+ getting speed failed
+To: Thomas Bogendoerfer <tbogendoerfer@suse.de>,
+ Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Weiping Pan <wpan@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260203141153.51581-1-tbogendoerfer@suse.de>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260203141153.51581-1-tbogendoerfer@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260203-net-next-mptcp-misc-feat-6-20-v1-15-31ec8bfc56d1@kernel.org>
-References: <20260203-net-next-mptcp-misc-feat-6-20-v1-0-31ec8bfc56d1@kernel.org>
-In-Reply-To: <20260203-net-next-mptcp-misc-feat-6-20-v1-0-31ec8bfc56d1@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5452; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=8AUrYwtKKnckhCv/Ter8FB1r7t0MKFfzvxhFPKBF/ks=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKbHCfkTp+4a9Jy7+/JgfduWV57epF7/5pHGefFGmdNW
- 8e/Yd70lI5SFgYxLgZZMUUW6bbI/JnPq3hLvPwsYOawMoEMYeDiFICJXGtl+KfcIHEyaUlohzvD
- tbVBHnFL1qg/e+nU9Ivh+aQa1f091+MY/squmcg4bTmvZH0aQ0BISVFTtLSS0c/bWwwY9r8s75r
- KyQYA
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256440-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	TAGGED_FROM(0.00)[bounces-256441-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[blackwall.org];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5BF4EDDDEF
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:email,blackwall.org:email,blackwall.org:dkim,blackwall.org:mid]
+X-Rspamd-Queue-Id: 050E6DDD84
 X-Rspamd-Action: no action
 
-When executing the last MPTCP selftests on older kernels, this output is
-printed:
+On 03/02/2026 16:11, Thomas Bogendoerfer wrote:
+> bond_update_speed_duplex() first set speed/duplex to unknown and
+> then asks slave driver for current speed/duplex. Since getting
+> speed/duplex might take longer there is a race, where this false state
+> is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding:
+>   update port speed when getting bond speed") this race gets more visible,
+> if user space is calling ethtool on a regular base.
+> 
+> Fix this by only setting speed/duplex to unknown, if link speed is
+> really unknown/unusable.
+> 
+> Fixes: 98f41f694f46 ("bonding:update speed/duplex for NETDEV_CHANGE")
+> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+> ---
+> v2: corrected fixes tag
+> v1: https://lore.kernel.org/all/20260130111904.144024-1-tbogendoerfer@suse.de/
+> 
+>   drivers/net/bonding/bond_main.c | 15 +++++++++------
+>   1 file changed, 9 insertions(+), 6 deletions(-)
+> 
 
-  # 001 no JOIN
-  #       join Rx                             [SKIP]
-  #       join Tx                             [SKIP]
-  #       fallback                            [SKIP]
-
-In fact, behind each line, a few counters are checked, and likely not
-all of them have been skipped because the they are not available on
-these kernels. Instead, "new" and unsupported counters for these groups
-are now ignored, and [ OK ] will be printed instead of [SKIP].
-
-Note that on the MPTCP CI, when validating the dev versions, any
-unsupported counter will cause the tests to fail. So this is safe not to
-print 'SKIP' for these group checks.
-
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 30 ++++++++++++-------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 0f9253d607c3..dc1f200aaa81 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -1402,7 +1402,7 @@ chk_join_tx_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns2} "MPTcpExtMPJoinSynTxCreatSkErr")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$create" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "syn tx create socket error"
-@@ -1411,7 +1411,7 @@ chk_join_tx_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns2} "MPTcpExtMPJoinSynTxBindErr")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$bind" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "syn tx bind error"
-@@ -1420,7 +1420,7 @@ chk_join_tx_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns2} "MPTcpExtMPJoinSynTxConnectErr")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$connect" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "syn tx connect error"
-@@ -1446,7 +1446,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtInfiniteMapTx")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$infinite_map_tx" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns infinite map tx fallback"
-@@ -1455,7 +1455,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtDSSCorruptionFallback")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$dss_corruption" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns dss corruption fallback"
-@@ -1464,7 +1464,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtSimultConnectFallback")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$simult_conn" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns simult conn fallback"
-@@ -1473,7 +1473,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtMPCapableFallbackACK")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$mpc_passive" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns mpc passive fallback"
-@@ -1482,7 +1482,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtMPCapableFallbackSYNACK")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$mpc_active" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns mpc active fallback"
-@@ -1491,7 +1491,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtMPCapableDataFallback")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$mpc_data" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns mpc data fallback"
-@@ -1500,7 +1500,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtMD5SigFallback")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$md5_sig" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns MD5 Sig fallback"
-@@ -1509,7 +1509,7 @@ chk_fallback_nr()
- 
- 	count=$(mptcp_lib_get_counter ${!ns} "MPTcpExtDssFallback")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$dss" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "$ns dss fallback"
-@@ -1585,7 +1585,7 @@ chk_join_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns2} "MPTcpExtMPJoinSynAckHMacFailure")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "0" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "synack HMAC"
-@@ -1594,7 +1594,7 @@ chk_join_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns1} "MPTcpExtMPJoinAckRx")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$ack_nr" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "ack rx"
-@@ -1603,7 +1603,7 @@ chk_join_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns1} "MPTcpExtMPJoinAckHMacFailure")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "0" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "ack HMAC"
-@@ -1612,7 +1612,7 @@ chk_join_nr()
- 
- 	count=$(mptcp_lib_get_counter ${ns1} "MPTcpExtMPJoinRejected")
- 	if [ -z "$count" ]; then
--		rc=${KSFT_SKIP}
-+		: # ignore skip
- 	elif [ "$count" != "$syn_rej" ]; then
- 		rc=${KSFT_FAIL}
- 		print_check "syn rejected"
-
--- 
-2.51.0
+Please CC all people who were involved in the previous patch version review.
+Looks good to me,
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
