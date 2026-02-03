@@ -1,182 +1,153 @@
-Return-Path: <netdev+bounces-256096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0CAiC3hhgWn6FwMAu9opvQ
-	(envelope-from <netdev+bounces-256096-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:46:16 +0100
+	id eMmuChtigWn6FwMAu9opvQ
+	(envelope-from <netdev+bounces-256097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:48:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF32ED3D81
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:46:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FDB5D3DEF
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:48:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E070B300ACB8
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 02:46:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FFB9303DADA
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 02:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB9E31D371;
-	Tue,  3 Feb 2026 02:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505A5321445;
+	Tue,  3 Feb 2026 02:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e/bWSx1m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YRVd/TcM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F682C17B3
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 02:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3C231E0EB
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 02:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770086773; cv=none; b=mjYVSpgLzwY3XJTLZEo1fR73K6cgtvoRqOQGzFyEWpwomLRtQ/YTxQ+Bh/+cVJ88eZS5GaLE/t92ms3pgEr05uGi6OZu6Fqwkk3LWHV2D3v6lG8SGvbePru6dbkzGir4m4b4Wws1zjRK8bQUaEy+hwgkn3kSS4SNWCEqmFmYKhw=
+	t=1770086874; cv=none; b=qksqPZ/X8aRdyRdl+7C23n5Dg5J/t9aW1MhwZXMEF7a7RYb0Qxq3AkFQXrmnA2VhgiW4LeVUDTzbEnUi4lW6cC2SPVS6VRtIc6pKh+yvTvIJzzFhko6gFt/hHVatKkiRESlFhPDrXEGJ+pwOAlg9iIhPodjLN2BqjLI/hJKhPVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770086773; c=relaxed/simple;
-	bh=MHWjScnw2mHYNunesu3nSDK5qe3mHgj0G4SC4Jvr2XU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=MWerosauIN76pt54nlHOU7c+meLCzPhmGGz/HFCFHtksl4YAWC6vA1czulnuaUBluekoEoH864yZrXN7fU2HK2pmoXtGBu2o6erc+3vC4bmuze6p5HFAudWteCLFoG6jifsAhtz1IgTlGo+LwXuXcJdq02Mp8OGL8+7r8GDxUwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e/bWSx1m; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-794cbd4bb51so19735637b3.3
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 18:46:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770086771; x=1770691571; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3LJpOCzBEdNG1mnFmQf3Sr/pCbkVsB2iWzX+wmEipxQ=;
-        b=e/bWSx1mnIG/do42t27Hrj5Y82Wxg5+O5pLfb6baKO/a6JVoSXrQKoLKbG1C+Sjsio
-         guF0sioWrypdRPjXbITgG7Kqjhjm+Ps2dEAnnapFFFVh3/kGNf9HzirhwP/mGFK8U0SE
-         IK6au/P0aAoaQNb5+TcwTdlTOdqkxju13Srg1B7HjFCK0CZZUSnJ4o8To1p1bnvOXOJh
-         gfn8Fn8G3TQV9v2Ia8bWli7/zMP83W6waDfh8gfVhd3gyHWY6IwVaAVPYLAc9IG9BalJ
-         wlr3IaQTog+B3tav8uISY96TUXD856J2rirhtYIGfATMFG2K9Ppfce5ixkNh68cTRC8n
-         4uag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770086771; x=1770691571;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3LJpOCzBEdNG1mnFmQf3Sr/pCbkVsB2iWzX+wmEipxQ=;
-        b=txQakTmBMFjOOYY2Gg7zN0SE2iTXseMVNRdudtHdTA7WF8Ot1eWo2in6ddGSPp502Q
-         OnrFUsxSP5THAk3o7Y9H598LyIpzS+jObWb/FGEMOiGFyzMTiIyusLsT/hwwxqEaNHT6
-         JdwX3Al0NwByR6f/9KQVHG3t8NUviecSTxhTXbKDSZ32ly33m1EUf+HxFQdETPi76nsd
-         L6JS3fibzZd3UAe4ymK9Rco9xVi13g1fkfRZSilUfYLo0TR555eR3m2ycJcYcT0zZW/E
-         qBrt3Hsk3WcH8GUhS70Hd6xyNgoFMfvl99v49Cb6Ta+jMjapEUQlxb5mZGijKpYZE3x6
-         D03Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWuU1pidIb5lx1GNf/Ee9yPignz8L4nhiWXSGmpEqRjiQXl1rGhzxcKcphovLg0dTe0Svx42xU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrOSFsvF+Tp5dQEd4oKWI/Oki05hQc3XWhjofq7TxrfQfYV9CZ
-	lcdSaNtu6fBQooV1Kvx09bPc8d0nZOVS2FqsrOyUXuJ/jfPmsnF96zM0
-X-Gm-Gg: AZuq6aJ86ld2O5vqKCchjic/moi5LgazkNDmlScmNAF4fzgq7Ig7BJHFGi3xuBI/DGO
-	5BZGWbyIt+G8ZPax/rVNguwBn8PH9A0Fjs9xDysVXBYMzaD8nBNg7tvvE+zEz7xYUeLOem6+VmI
-	mcYQngcs4q2al8OEQQ+Ac/IpjCYDoac3sA6poCDnrEM8Z2anc9Vt+ZiIwPuRA6UcBuz4MzPDRKA
-	ROmSV2gC3rOXndO585KwpYCZbd0JFZx8e8hO602+yi3UacxmXhEHBLRKjzPLX0UvqtqBTAJbE2C
-	ve3M9GOqbOqQl4Tjfa1bMtaqrR+eude9Eaxh/+e1maO7Xss9XHKvtCO3N8cMJoC8+RYiEHa8vYG
-	PWK2ZM2hx1kps45ixEh8nXKTAt7SiKchzRD/TCfJp8MVyRPShINll4vBiPt/z3C2d2KZKqJ998H
-	rKTwcaAIujf6/15qT1LYuAXZamxA/R6Hs0wVZGripxl+T1VcHJD7P5JWMQ1DQ=
-X-Received: by 2002:a05:690c:6d8a:b0:793:c89a:b39e with SMTP id 00721157ae682-7949de6e22dmr119003187b3.14.1770086771441;
-        Mon, 02 Feb 2026 18:46:11 -0800 (PST)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-794828cb304sm98485947b3.45.2026.02.02.18.46.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 18:46:10 -0800 (PST)
-Date: Mon, 02 Feb 2026 21:46:09 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- Yin Fengwei <fengwei_yin@linux.alibaba.com>, 
- Dong Chenchen <dongchenchen2@huawei.com>
-Message-ID: <willemdebruijn.kernel.31f40e7930810@gmail.com>
-In-Reply-To: <20260202205217.2881198-1-edumazet@google.com>
-References: <20260202205217.2881198-1-edumazet@google.com>
-Subject: Re: [PATCH v3 net] net: add proper RCU protection to /proc/net/ptype
+	s=arc-20240116; t=1770086874; c=relaxed/simple;
+	bh=opVN2Uy5CV1GyOyVv04l4w99A8x7CInPOUJcM14Wc7c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ubb2Jz+lQMjU0lMaUUmdIsiKbcfj/1aiT73PwhPpSWRKhHOE7osKvbci+Tr5stPDvv+F6MoSHcvn/ltJjy5t56xQh89eOmHECDElTEefO2TZ06IL+GdHJNZJZQaaFhULeW40oZgNqH2XaSFwMX+b2+zHbbhhLonePvmC02Q+nx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YRVd/TcM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2D74C2BC9E
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 02:47:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770086874;
+	bh=opVN2Uy5CV1GyOyVv04l4w99A8x7CInPOUJcM14Wc7c=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=YRVd/TcMoUZlvY+H99CsGdndoLhglHsDtgWv7HfE80EuYIBtcCTS3vFznCOKoqJN/
+	 3NfCqaxcycvj5SPWAs8sVCr4v6m//exvtJU4BVFhikDMxb9VHCNMtJM8iMXAV9MG8d
+	 FKyi7QPHw66JbIyee7LdImDlxqQugbTJrKej8Vmngw/XzdGpzfcSEPrLjYuqDjfW5t
+	 Ad+ejtqkYu+VFI1Ym5Bi5QSpz3HHGb+vn4LopccWzBluWsg/tZcz6UAi2Gd3YjMwFq
+	 m0ZpQBCHItjUwKNG6MITYDOShjpF81xMcMRW4vQJCGFUtHniRO5cvan9H7JNF1am+q
+	 6pka2kOvpCr+g==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b79f8f7ea43so858650166b.2
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 18:47:53 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXtpXdJ5VJ5XmYIeHNkWFH1xM0YBPbk+TmcsVKO/BoJYltJpV0M7V1kUy22OtgJLWrH6FACMnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbIaJBs4OOXj97sqEFKBSCACPx4/+gYL+M6O+fLNTlBsjmWLTr
+	kLX6GSpWDot4NgW7aLmdKJOc90uy5PQ2uJb1CictkO9A5p2RfiKTLzxIfqWdMF5U9h4LMWAb7bn
+	1W8Cuy1bcUSxa8a47c6qRukOccamFdgA=
+X-Received: by 2002:a17:906:478b:b0:b88:7568:26d5 with SMTP id
+ a640c23a62f3a-b8dff5bf946mr825230966b.27.1770086872391; Mon, 02 Feb 2026
+ 18:47:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20260201023700.366531-1-chenhuacai@loongson.cn> <4d1abb0c-e518-4751-b462-345ed76bb3f1@lunn.ch>
+In-Reply-To: <4d1abb0c-e518-4751-b462-345ed76bb3f1@lunn.ch>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 3 Feb 2026 10:47:43 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7WwZM8Sg_E0Z0-+e6V-NtJA0r8Aiqw30TqH0_pyLKTdA@mail.gmail.com>
+X-Gm-Features: AZwV_Qh1O3Zhzst3pqZnN_WRLwJiAXHYLEQSgCfKfN6tjdg68bwOz8eKRTnfKWA
+Message-ID: <CAAhV-H7WwZM8Sg_E0Z0-+e6V-NtJA0r8Aiqw30TqH0_pyLKTdA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Huacai Chen <chenhuacai@loongson.cn>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yanteng Si <si.yanteng@linux.dev>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <fancer.lancer@gmail.com>, loongarch@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Hongliang Wang <wanghongliang@loongson.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com,linux.alibaba.com,huawei.com];
-	TAGGED_FROM(0.00)[bounces-256096-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256097-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[loongson.cn,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,foss.st.com,synopsys.com,gmail.com,lists.linux.dev,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: BF32ED3D81
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,lunn.ch:email]
+X-Rspamd-Queue-Id: 9FDB5D3DEF
 X-Rspamd-Action: no action
 
-Eric Dumazet wrote:
-> Yin Fengwei reported an RCU stall in ptype_seq_show() and provided
-> a patch.
-> 
-> Real issue is that ptype_seq_next() and ptype_seq_show() violate
-> RCU rules.
-> 
-> ptype_seq_show() runs under rcu_read_lock(), and reads pt->dev
-> to get device name without any barrier.
-> 
-> At the same time, concurrent writers can remove a packet_type structure
-> (which is correctly freed after an RCU grace period) and clear pt->dev
-> without an RCU grace period.
-> 
-> Define ptype_iter_state to carry a dev pointer along seq_net_private:
-> 
-> struct ptype_iter_state {
-> 	struct seq_net_private	p;
-> 	struct net_device	*dev; // added in this patch
-> };
-> 
-> We need to record the device pointer in ptype_get_idx() and
-> ptype_seq_next() so that ptype_seq_show() is safe against
-> concurrent pt->dev changes.
-> 
-> We also need to add full RCU protection in ptype_seq_next().
-> (Missing READ_ONCE() when reading list.next values)
-> 
-> Many thanks to Dong Chenchen for providing a repro.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Fixes: 1d10f8a1f40b ("net-procfs: show net devices bound packet types")
-> Fixes: c353e8983e0d ("net: introduce per netns packet chains")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: Yin Fengwei <fengwei_yin@linux.alibaba.com>
-> Reported-by: Dong Chenchen <dongchenchen2@huawei.com>
-> Closes: https://lore.kernel.org/netdev/CANn89iKRRKPnWjJmb-_3a=sq+9h6DvTQM4DBZHT5ZRGPMzQaiA@mail.gmail.com/T/#m7b80b9fc9b9267f90e0b7aad557595f686f9c50d
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Hi, Andrew,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Tue, Feb 3, 2026 at 5:42=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Sun, Feb 01, 2026 at 10:37:00AM +0800, Huacai Chen wrote:
+> > Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
+> > and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
+> > Loongson STMMAC use 125MHz clocks and need 62 freq division to within
+> > 2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
+> > to 100-150MHz.
+> >
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
+> > Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+>
+> Fixes tag?
+OK, will add it.
 
-Thanks for the fix Eric! This one is super tricky.
+>
+> Does the error mean that MDC is ticking at 9.7Mhz? That is pretty fast
+> for PHYs. But i assume it must work for some boards.
+Yes, some PHYs work while others don't.
+
+Huacai
+>
+> Separate to this fix, you might be interested in:
+>
+>   clock-frequency:
+>     description:
+>       Desired MDIO bus clock frequency in Hz. Values greater than IEEE 80=
+2.3
+>       defined 2.5MHz should only be used when all devices on the bus supp=
+ort
+>       the given clock speed.
+>
+> So you could allow faster MDC values using this property.
+>
+>     Andrew
+>
+> ---
+> pw-bot: cr
 
