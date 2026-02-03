@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-256320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256321-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OGkHQAJgmmCOQMAu9opvQ
-	(envelope-from <netdev+bounces-256320-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:41:04 +0100
+	id aDeBERIJgmmCOQMAu9opvQ
+	(envelope-from <netdev+bounces-256321-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:41:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDE7DAB6A
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:41:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A9EDAB71
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3815F30346FB
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 14:41:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 00699300D0AF
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 14:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BE23AA1AD;
-	Tue,  3 Feb 2026 14:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365E83ACA46;
+	Tue,  3 Feb 2026 14:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IMaQf2TU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CeehfEAp"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C22F3AA1B5
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 14:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF32F3A1CFE
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 14:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770129658; cv=none; b=LE3DMjC4deKux9N5R1OwEckvuAQasQSFxoLwsJMuZZdDyWaG2tOWPdO/GU0FY0NOp2BnNkGCIf9RBQtMz8qCZYLLKAgkoPO4HdcVxdg/PlVFyzhjhq+rcUzzJW7mSRR3loDawGlkkdvoJ1EEUbO5+YWKChSoWIG9wRBITNo5+6o=
+	t=1770129660; cv=none; b=E0+Cvqr2onkx/elDEsyIbxyYIumLltfFwuizwuMiiDSRIbkj6fNx6urg8XSI2Oajv2sO4RvRYM6+86ebvNRfoaOpcQtyD+Gei8G1cQyBHyHC76ZcHlAang+CyR/zSHzwhVx9l7YtOPT7U+HcYQp1reTHCQ+tvNXeBuawW0QUjWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770129658; c=relaxed/simple;
-	bh=bufmR8isNAcmqVKwRF2F9LTDB2ri9F+mCoGlTm+p0fU=;
+	s=arc-20240116; t=1770129660; c=relaxed/simple;
+	bh=wwd3OZacg5GUCFZnFSXV7gqjBKmaOq4whtDwHJkNVM0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lusQ37AU9xohllsX6/Kw5U6c01FO4YVzM+UnTvyDOR5NFcHOYm1A3XEqJuXZHKt36remUJAIH2cU2Wb99mhNE2h527Xb7GYdRt4BpdD/IY5IqMcKXgeMl8S3Vq8hsYUPwBabeS5YAkz13YlSesy78D2i43qjPm0Xbz51aYY9l3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IMaQf2TU; arc=none smtp.client-ip=209.85.222.202
+	 To:Cc:Content-Type; b=Z6/dBOV53ZS2p/DAozkNVNkrnRTmngSHJzxmw6SR+pSoPhpE/OgReyK5xD/Zp7PcLCSqiQsRk1mvJXNvdO7QFymBotdQjSZ56Vu98rdNZzXIb+utfPcqIUfHsQZCzz88oiT0oYdV3h7W3MLKRPAEjLUkoqjGWTfS3whKk8SygyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CeehfEAp; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c6ad709d8fso251436485a.1
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 06:40:57 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c70a62ca32so1750178785a.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 06:40:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770129656; x=1770734456; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770129658; x=1770734458; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJIo7YeM0Ar5YQFxSbzJMlGYj1ttnLmgiT0ZVX95veg=;
-        b=IMaQf2TUJuKvhBL/XZ2972kIoNcVGt0wQyUlVMy/LiQVVT/hPFnGWZ0mJV52SW/Jh+
-         4XFpp0qi6k2UMlI9oEoAF8UHTFJZrb2HE0hOBOKyKhgUZ1wUApwRCYp5D9a+/UhT8I66
-         yuHfUbvIkPy3DiPDxacETRElH5iNlI1Rj8TJGyUUXeizAcoXPvSdRPMNGlhjEQSkc28h
-         Tfv4XDMzJvGlKF4R3EtnGeNdFvZzAlR4mU5D6WNy10WSROZDgCa/oz6Gi/Y0NcqapEwk
-         B3buHHVhElNPRStsIe9ybu8OqakbjmPCZRO85vymsCipftjg9FCX390VDw1KhEx1Y2yZ
-         ccww==
+        bh=zlOho2/h05NwpTDmj25mR5j0ETQs3XlRwug7OGIdxRU=;
+        b=CeehfEApguPNY1YU0dT5gHcwXICunmgRBywkDcXpSLD9nniRjLxNG0PYZKWarTLgfc
+         Q2OBGRmNX02SxUAiMkWeLnzeq+Vq9Smpw2mvxGAIZh7L3Oe/2pZ4WOJZtIia6kR69+s0
+         H+NRN72gOhL2eYLSuwPL5gKAxgX0YcNs3CMIhs30gwll6GqjusSaOMs44XXomnZ+89Xx
+         N1efa2Ocy3YdBmg4WOaVdpCooi7uf54dob04+hBxz52ZsxQ6U4KBsvmgireI5/GK0ffa
+         F/G/YZq6hZ6wm3TBjktIo9le4rh7p5Wpj5ai+za0zrD2ry6A8gWkC9lQJ9dugrFbGkqF
+         CA9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770129656; x=1770734456;
+        d=1e100.net; s=20230601; t=1770129658; x=1770734458;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJIo7YeM0Ar5YQFxSbzJMlGYj1ttnLmgiT0ZVX95veg=;
-        b=oZVir4Qvsm2wSfdymkJNDpL7COIeSrm1+drNUyKusIxs+hGI2/f1IIPZBOjl8Y0qtK
-         gkEOKoTKcoAlGQ9eKzw3fiIqPEXqTDXMSxcd/cEpcXDGzr77TQqLaGiboU7SA2jNVze/
-         qD8iuamcUdhm9xIgghu9/nk47zd3SbAKlUgeAGyhTjZbHuPMXvGsA7U3OWXberEpLQIH
-         qmpEIHg6VmEEtIaFgeX2jsppYpZH3YJVTuggUTWr8yLzMCugiiIfFp+Wi/dWhImRCb3s
-         MqCWk0ecy2BJXS9JMvl3S7g1pXdXvB7YHg6t83F0Ue29m4jDQpR/OToWs2B7k9w9r4SA
-         3Uaw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkQ78f64LrpCztkGpzh5CBNskzpuDewwkrW3zCaO7wH7fYfQfDHVISlnZ/z41srthwZxbbCr4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCSU/t6VP0yIyIVa0DzG+s2EEMdaOLaaZvVSNv3jFqTq5bET4H
-	1VgMwuO2VNTIJvlmR7MMNBPJ+sHKTYaXYE/tLHF3JsoJMlo4LQavezp+T1ppNzzLUq92dO8S8ux
-	X9FyHThpXQfVovA==
-X-Received: from qknsk10.prod.google.com ([2002:a05:620a:3a4a:b0:8b2:e8b5:a3cf])
+        bh=zlOho2/h05NwpTDmj25mR5j0ETQs3XlRwug7OGIdxRU=;
+        b=wKvj8bLlBlbqrt7K+zv42hFRpCNXoOFNULnQd8LGVf8RvyYg9OnRTTJ9mr5FIRIHS3
+         sBjigiiX6a+/Fw3Jx7LwZSAt6en9UCNh6t2MXleTxa04Qhp2YjKekL5cdbMhDIZa1bC4
+         5HdDMohaS0LTY0LWs0KICOsSpcjEBUY9dVe4++OFbGxR8jKssSal9Tixn6gf/8htBIfN
+         fyyCqZ1XSe1jU3HD36n6qr7du81iBHSKapm7w3+AD9koF8tZacigKhzlZQZBtEl1VnE+
+         LGs6+UbAR27c6lnxlL4/CPwyLM2yKncokm4KbmjpKQyoTSW4HoTme/vc7F6ipyIeBlLJ
+         5uEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqF30mOot8majOnhFBAT4j09+YcgvTSmDPr+/0/R+VoT+Ba5F4GrFiD1DU/GQRp/C9/K/ZvbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDLQKc1oFt32u+sJud5U5FsXOHOLFgcdtCXKd6div5EJ5WIUsk
+	B307KFOGh/nDey5FJOuUHRa2/o7ydxHhgFtZmQZ7HKnAsXxktXW4whKMgAzxTbuN4urKQwqQZGQ
+	LD1lhFlwRI0obVw==
+X-Received: from qkdd6.prod.google.com ([2002:a05:620a:a506:b0:8c7:d9b:8846])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4407:b0:8c0:9cd8:616a with SMTP id af79cd13be357-8ca204a98eemr339580485a.42.1770129656352;
- Tue, 03 Feb 2026 06:40:56 -0800 (PST)
-Date: Tue,  3 Feb 2026 14:40:51 +0000
+ 2002:a05:620a:25d2:b0:8c6:a82e:16ba with SMTP id af79cd13be357-8c9eb32c3b7mr1881320385a.84.1770129657913;
+ Tue, 03 Feb 2026 06:40:57 -0800 (PST)
+Date: Tue,  3 Feb 2026 14:40:52 +0000
 In-Reply-To: <20260203144053.83193-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260203144053.83193-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260203144053.83193-2-edumazet@google.com>
-Subject: [PATCH net-next 1/3] tcp: inline __tcp_v4_send_check()
+Message-ID: <20260203144053.83193-3-edumazet@google.com>
+Subject: [PATCH net-next 2/3] tcp: move tcp_v6_send_check() to tcp_output.c
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256320-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256321-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -112,94 +112,88 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1CDE7DAB6A
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 72A9EDAB71
 X-Rspamd-Action: no action
 
-Inline __tcp_v4_send_check(), like __tcp_v6_send_check().
-
-Move tcp_v4_send_check() to tcp_output.c close to
-its fast path caller (__tcp_transmit_skb()).
+Move tcp_v6_send_check() so that __tcp_transmit_skb() can inline it.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/tcp.h     | 10 +++++++++-
- net/ipv4/tcp_ipv4.c   | 18 ------------------
- net/ipv4/tcp_output.c | 10 +++++++++-
- 3 files changed, 18 insertions(+), 20 deletions(-)
+ include/net/tcp.h     |  3 ++-
+ net/ipv4/tcp_output.c | 20 +++++++++++++++++---
+ net/ipv6/tcp_ipv6.c   |  5 -----
+ 3 files changed, 19 insertions(+), 9 deletions(-)
 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6c12be2cdd4d49360a6d43caa56f2fb327163033..80f84564cb3d2b100e46f85fd9ee33d2c6ffe3c2 100644
+index 80f84564cb3d2b100e46f85fd9ee33d2c6ffe3c2..b9bebf5df4aa6ecf6f421400fb93cefb4104e5aa 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -2368,7 +2368,15 @@ void tcp_gro_complete(struct sk_buff *skb);
- static inline void tcp_gro_complete(struct sk_buff *skb) { }
- #endif
+@@ -1124,7 +1124,8 @@ static inline int tcp_v6_sdif(const struct sk_buff *skb)
  
--void __tcp_v4_send_check(struct sk_buff *skb, __be32 saddr, __be32 daddr);
-+static inline void __tcp_v4_send_check(struct sk_buff *skb, __be32 saddr,
-+				       __be32 daddr)
-+{
-+	struct tcphdr *th = tcp_hdr(skb);
+ extern const struct inet_connection_sock_af_ops ipv6_specific;
+ 
+-INDIRECT_CALLABLE_DECLARE(void tcp_v6_send_check(struct sock *sk, struct sk_buff *skb));
++void tcp_v6_send_check(struct sock *sk, struct sk_buff *skb);
 +
-+	th->check = ~tcp_v4_check(skb->len, saddr, daddr, 0);
-+	skb->csum_start = skb_transport_header(skb) - skb->head;
-+	skb->csum_offset = offsetof(struct tcphdr, check);
-+}
+ INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct sk_buff *skb));
+ void tcp_v6_early_demux(struct sk_buff *skb);
  
- static inline u32 tcp_notsent_lowat(const struct tcp_sock *tp)
- {
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 01fd563472608cc10744d3a5d4fb998b83c4be97..7537adf0846f4fe7e0a1dd1cdec559a982329cc1 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -661,24 +661,6 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 	return 0;
- }
- 
--void __tcp_v4_send_check(struct sk_buff *skb, __be32 saddr, __be32 daddr)
--{
--	struct tcphdr *th = tcp_hdr(skb);
--
--	th->check = ~tcp_v4_check(skb->len, saddr, daddr, 0);
--	skb->csum_start = skb_transport_header(skb) - skb->head;
--	skb->csum_offset = offsetof(struct tcphdr, check);
--}
--
--/* This routine computes an IPv4 TCP checksum. */
--void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
--{
--	const struct inet_sock *inet = inet_sk(sk);
--
--	__tcp_v4_send_check(skb, inet->inet_saddr, inet->inet_daddr);
--}
--EXPORT_IPV6_MOD(tcp_v4_send_check);
--
- #define REPLY_OPTIONS_LEN      (MAX_TCP_OPTION_SPACE / sizeof(__be32))
- 
- static bool tcp_v4_ao_sign_reset(const struct sock *sk, struct sk_buff *skb,
 diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index f44d60d13b9ff4d59b05be76c4c3001142451df7..cc398b7fdcba9ffddf2e43179b89fc5d14be51d7 100644
+index cc398b7fdcba9ffddf2e43179b89fc5d14be51d7..8c1731b544f42cfa1e7629dde128e969b60d2343 100644
 --- a/net/ipv4/tcp_output.c
 +++ b/net/ipv4/tcp_output.c
-@@ -1477,7 +1477,15 @@ static void tcp_rate_skb_sent(struct sock *sk, struct sk_buff *skb)
+@@ -1487,6 +1487,16 @@ void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
+ }
+ EXPORT_IPV6_MOD(tcp_v4_send_check);
  
- INDIRECT_CALLABLE_DECLARE(int ip_queue_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl));
- INDIRECT_CALLABLE_DECLARE(int inet6_csk_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl));
--INDIRECT_CALLABLE_DECLARE(void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb));
++#if IS_ENABLED(CONFIG_IPV6)
++#include <net/ip6_checksum.h>
 +
-+/* This routine computes an IPv4 TCP checksum. */
-+void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
++void tcp_v6_send_check(struct sock *sk, struct sk_buff *skb)
 +{
-+	const struct inet_sock *inet = inet_sk(sk);
-+
-+	__tcp_v4_send_check(skb, inet->inet_saddr, inet->inet_daddr);
++	__tcp_v6_send_check(skb, &sk->sk_v6_rcv_saddr, &sk->sk_v6_daddr);
 +}
-+EXPORT_IPV6_MOD(tcp_v4_send_check);
- 
++EXPORT_IPV6_MOD(tcp_v6_send_check);
++#endif
++
  /* This routine actually transmits TCP packets queued in by
   * tcp_do_sendmsg().  This is used by both the initial
+  * transmission and possible later retransmissions.
+@@ -1648,9 +1658,13 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 	/* BPF prog is the last one writing header option */
+ 	bpf_skops_write_hdr_opt(sk, skb, NULL, NULL, 0, &opts);
+ 
+-	INDIRECT_CALL_INET(icsk->icsk_af_ops->send_check,
+-			   tcp_v6_send_check, tcp_v4_send_check,
+-			   sk, skb);
++#if IS_ENABLED(CONFIG_IPV6)
++	if (likely(icsk->icsk_af_ops->send_check == tcp_v6_send_check))
++		tcp_v6_send_check(sk, skb);
++	else
++#else
++		tcp_v4_send_check(sk, skb);
++#endif
+ 
+ 	if (likely(tcb->tcp_flags & TCPHDR_ACK))
+ 		tcp_event_ack_sent(sk, rcv_nxt);
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index c65a5bfd322a1db5dc3fbc406e577f0ccb044c23..ca01b11c0ac959e4ee18dd388c3d17e8a4c88761 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -2015,11 +2015,6 @@ static struct timewait_sock_ops tcp6_timewait_sock_ops = {
+ 	.twsk_obj_size	= sizeof(struct tcp6_timewait_sock),
+ };
+ 
+-INDIRECT_CALLABLE_SCOPE void tcp_v6_send_check(struct sock *sk, struct sk_buff *skb)
+-{
+-	__tcp_v6_send_check(skb, &sk->sk_v6_rcv_saddr, &sk->sk_v6_daddr);
+-}
+-
+ const struct inet_connection_sock_af_ops ipv6_specific = {
+ 	.queue_xmit	   = inet6_csk_xmit,
+ 	.send_check	   = tcp_v6_send_check,
 -- 
 2.53.0.rc1.225.gd81095ad13-goog
 
