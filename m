@@ -1,173 +1,176 @@
-Return-Path: <netdev+bounces-256353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ID5hE8IggmlIPgMAu9opvQ
-	(envelope-from <netdev+bounces-256353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:22:26 +0100
+	id WI5rJjkigmmQPgMAu9opvQ
+	(envelope-from <netdev+bounces-256355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:28:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298FEDBDAD
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:22:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F77DBF53
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:28:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 250FF3079BF4
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:20:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9330D3172700
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DBB3D331B;
-	Tue,  3 Feb 2026 16:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086043D2FEA;
+	Tue,  3 Feb 2026 16:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sz0cHxFf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BFYkuVt5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C903D330B
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 16:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770135568; cv=none; b=aDSeHuOV3p0t9QD2vxkHaMpk+tXH4JWbsXqVNyTa6hh7e50LUh8fdaTiJs/Z/BGHDBXXdKNIt/pDYUMOa1qsfitYYVePHH0PbELDflEI8aW+kglEHOP0q9h5Edk6GzAoYprH5SPomlkPXU+HQAqqhBIsXHMvX53W7yzvOKB2IDg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770135568; c=relaxed/simple;
-	bh=qQXywwliKiapdNiYt6dNWT6x/lDJ9YflmLKRdBQeGyw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S82VYkfM7C+g8PnIdyvOWyeMqcjEUNyvTAO67bQ1bvXHfgcjUvX0p/dsK86hP0M5/j/9Yfr8l0hNZ3Z9OqZkOpSbZ+zSMaJLFAVws2unyTMuVX2tNJ2dFMGSO6IE2OgwvorYS0PwxRdSzTwDHOASFGbZM00hsLbAfbqKNox0b10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sz0cHxFf; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-481188b7760so39635985e9.0
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 08:19:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A213D2FE4
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 16:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770135595; cv=pass; b=iD5Qo80Kfqf9zwQ+KQs1iGsj13U/1taQ/FVO6tpQzKGkfav3auQHSKssxFQfbof7eqpC9vcJo2ZzahnJQFrevr1tCNIh/1vtYoSWgZYokTODFVH7Dwtct1kqaJ+C6D4aOdjKAJyEyWqY2wJnt3msgIvWZYhpbWNNO0tDNz3Mv1U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770135595; c=relaxed/simple;
+	bh=Tu4rSvNTKOOFw1ToUC6UiNxnVnQZ9GgdV42C9w5CPZA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HkSYVm7HCOdSZgRKawEN+vM5ltC6GaQC9baln/o9udfjPkyWBHOwOAPOgZgMVeWH7ZT1T9jMBteXqFJnHwCbDebK3OMy3/KHn3A8xGwV2iReuN9BHg5L2S+vkOTTWI8LJrFrx2C9Ya8SUi4e1+Qfw880afg0IpEdsfAtz1gW8ks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BFYkuVt5; arc=pass smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64937edbc9eso5166285d50.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 08:19:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770135593; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YO9I5Ypx6bC8ziSbPKR+oqikZuAC7rJhF9MRCSzy1LIwDTDzKBAc0Z8iMccdQOcOil
+         v8xlji+KP+SthaTuDzcMmQIpiMHEfleAx/mqNiCqSW3YorflpabC1sX7wuHsayXzjCdi
+         kEpDy++Cf6mks/CSaZX1BNkgKhRajNHvEoZSDb3SM7Rnuxn7bWn61xBDweIsuhaSW2zl
+         E8KDwJq9PRNTO9ZtVEYtk7TBo8u4rBcc+6IiuFaNv98f3dlnoSRUMzCkoh0OOOvSye7D
+         esIHepjQXcd/P4hEwP81g8NMs1ZmI/uCeDWYJaHet6dt+Gh7k2sZ0lR4kxArmJpa8B8o
+         MkAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wGWKXutvMucFH05YrWha7pPDqCCm/nyM2LYOpcwTIG0=;
+        fh=h5PwfNUUOVN4jpJ+9rMMWOKf3eGExzmujuwPLgMFs34=;
+        b=ArFP0AeGvpVDlTw38v3zHO21D3SPi8diBe/oCCpvvIFz0pfc4qiGeCT8ezCVipZoFO
+         HsGMIQFpQwO1sIq1WQUPsMXnxl5FxgI7A9efZxs3J/28ddqhwZMbpkARhr+z2RfO+RW0
+         SsO5n6eg4Ihhr3PEbaSvQP4beD6Xm609buBQFrBYgl3tAmMLHJkHMQCdlaelXil0WnIz
+         PPJk6RKLjoaFyjvw/A7K3GLzJLQKgscSsL7axOhpt4RkI5WNl77cVEVI3K/VU+4oByPM
+         E/oRFuzBqR7pFgt6BTXb6Jj+h06+D5Bg7C+PgeznN4SKuV9Zq5XoawTMURwrvpoMTs2A
+         /+Vw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770135565; x=1770740365; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1770135593; x=1770740393; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=L5M1ZbJBKUwOtAuomtIJGP1xLtlDmn08RXJLiC0W3qw=;
-        b=sz0cHxFfNl/3CGqWQVtv34vGdT2jimV0+aTwD3AuaVg1FFvAPiqQUiEf/N0I/9e+hp
-         bU4z+9HBhmbZix6aYQJjyrzLknhXdACxUYJ0I3uP2bZJhT0sqayVq51jbsnuYJpGndVO
-         swKwarzj32vbel7EDr01cytgi/Fc4zCKceG3HJw1Y4nIorwhFaLjc8rAwB/BIpBLLb9f
-         +rov7jZCe5YeA+UhXseF6Mc53ZxmCvIO9Ma6VmzHZ0dnNkJcC2vgjG6/d13sNaw0dql1
-         U89uKLjtqJQ9hOW4PKYsL4ZIW2zoOG32Rg/i6xUfUD5xD9nj6J/wVk+Uw3PC6Wr8WELe
-         TlYw==
+        bh=wGWKXutvMucFH05YrWha7pPDqCCm/nyM2LYOpcwTIG0=;
+        b=BFYkuVt5ZAdVXyu3DTkMUfBmRe3WuhPBcfYZhSAlHe0XDw1GAuaPo45rtnMsmpoJlQ
+         rgIkmUwd8nWw7r29KnYhYIV8PX3ODYEy/AAMrkpphuoe2L0U0gIwt6P5tnjDZc89VEz7
+         CuX/NQS5RoyNjhSjf2MQRazazxUj86fv8rBk5E5+mTMU0eJM/CjbGjFBq4Cx2vyfBXfF
+         PsXrYJQqF2XjJ2Ojjc80Tgo3+aWP5lQ6NmIIcw5PixvAFtbJPPIXFEjtf8cDbfgYC0YD
+         KgxT+abbNq2m93rfMuOCa7r3VesYLOFNdUK+KNdtmB300XkLhZxGamb2CDo5x6l6nIzC
+         5nZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770135565; x=1770740365;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1770135593; x=1770740393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=L5M1ZbJBKUwOtAuomtIJGP1xLtlDmn08RXJLiC0W3qw=;
-        b=liJPjhqe06OiPahrja4+30SzpYay9PdrfiHhm4tUU9fo2mSGPlMTMSsjkqeLQvXaSE
-         gdAqb+BvLCyKEcmvKRW8ABvsfxitQTBp75Ydmv5DtlhRBsiWrFK9Fgp38F8A7cW3pOrK
-         7mPeBsnZKvMLgmULLKphk1HcQ0Lo48ZKfYKnLlLYwRi1pbv/PyT0VdGQWRq8nXEpN5lg
-         YG1yw3iONdlld7hHGphhZfT8gFdllUDzPYtro8C0lBXiNXGTR1HLMdb26f52OhCH2Us+
-         DBsvF2kSUdGHd3C4phq/KhoWA6BJvYnduaygGNgtAtrgDq/ZX9IM1d23VoyOJDnnws4O
-         ljyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXpAL7DQvE13jTDqwp/xZEkaDI8y+9PfgOJlqZPO0Y5KWlxRY4MzwubldRalRn2UVUu7qlwXQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDtb55K5dDZXFL7ak6JzRqWaoXNWnsKs6Ix2ZiNcGhphbUAfVE
-	hRbfBqjsUQ6OVnd6VeXwvCl0TSAXYI0nQVJ1ldXxo52mpI8RFStUayaYnEr8CG7e3M0=
-X-Gm-Gg: AZuq6aJrUQ9V70bQyQxEiVhHHp47OM2nN4XF8KwqgsIWoAYrq8JAzlJ2Km94iF0J48J
-	80/D/oCZodtUgLH/AK7xo2AIDh4D5flcgBIn+pE6OLPAtgTcsNKs9pTpfqTPnFhkAf2m/eGkF/l
-	ud/NLg5U3cdLM3GwqACeLBe1531A13+nv4hhdU/L6m6Y+7i+ZodQwRwSMbejDYkcFnFPf13X//h
-	gTIpTFvYtrAb3kNPg6q+gtWS8Yx1fCd+8bC3Y9r6KUm0DgyvJunXG6LL4S1G8downix3/ZpsYrk
-	/zEhJ+vs+MgZaYjG5kywLGPExRgXuBeTsgptIUTfmfd82J0LoTF1mUhRG2eJgQBM2bmV5Ay7bTJ
-	3V3hsd7kf9YeiDb3JH3IR3hdl3xARbyoBW1I+Neg/eHle76Ej29hBEHgj5UkgAbgqvMYJKdprTQ
-	sgsSmbe+4Hq4lEu0mrccw=
-X-Received: by 2002:a05:600c:820e:b0:477:df7:b020 with SMTP id 5b1f17b1804b1-4830e96abaemr2199595e9.18.1770135565342;
-        Tue, 03 Feb 2026 08:19:25 -0800 (PST)
-Received: from vingu-cube.. ([2a01:e0a:f:6020:81d1:b874:c1dc:42e5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbd21f5dsm144120785e9.8.2026.02.03.08.19.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 08:19:24 -0800 (PST)
-From: Vincent Guittot <vincent.guittot@linaro.org>
-To: vkoul@kernel.org,
-	neil.armstrong@linaro.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	ciprianmarian.costea@oss.nxp.com,
-	s32@nxp.com,
-	p.zabel@pengutronix.de,
-	linux@armlinux.org.uk,
-	ghennadi.procopciuc@nxp.com,
-	Ionut.Vicovan@nxp.com,
-	linux-phy@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	horms@kernel.org
-Cc: Frank.li@nxp.com
-Subject: [PATCH 4/4 v2] MAINTAINERS: Add MAINTAINER for NXP S32G Serdes driver
-Date: Tue,  3 Feb 2026 17:19:17 +0100
-Message-ID: <20260203161917.1666696-5-vincent.guittot@linaro.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260203161917.1666696-1-vincent.guittot@linaro.org>
-References: <20260203161917.1666696-1-vincent.guittot@linaro.org>
+        bh=wGWKXutvMucFH05YrWha7pPDqCCm/nyM2LYOpcwTIG0=;
+        b=OW8hbtem1+mZXpFpx4dIpN6pknxpdESLgucUCNhKzPOr3QpOwkNR8bMD7lVz2LnDus
+         KU7FleoV8JYsE0F1i6hiy1LyHLAVZIwA/Jy+ZkDCF8Ef9OiCGxn9kJziUJ0dUqSNd2da
+         eXMf3yeYEnjPPHbDzFKFxjD5pBI1a/Y5dfFiSYH5+wANjpNmExL9VWSOVMublWp5gMvZ
+         3FKeYf7edHJ9z+NkzCklC/dL8lJkQ3qpaKtmypJ65K1DfXQ/LnVempMH69WJgv9JdbzP
+         7xFYRY4fFzWiKCIGmA1cDZs8ipUKVxRGZztMRi8RIs/+KCW/iwhE04zuiaZ+Jvr93QRc
+         cTdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWrRcoQV1QV2AqVPRzGc1GI/0pshGWK1Q1+woKY76C5E2cGvhsX0Y+6raC7BOGgOrsq8ksEsxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4nOdW4NcsraijOHW6DbdLYMuxwv9NfFYQeYo3ixJL7USR1swB
+	ocKR8nTfnI7S2kZNW74niAmupDMzBbFvbFUZdiARNJAcrjBpoFOcoNWP07aRY2KUn34EbeDUFsH
+	0lWXvXkt5du++lI2h7OHamPGWOjiZNns=
+X-Gm-Gg: AZuq6aKKTnyc/R1ziQM0pr8buoV4BIq5m44pX3eTniwkU9tahKuV6VUKsPMCTKg143U
+	dqEhe9WR2y65la53biQRb4oTAkNQ1S90VEpWMRSwLVgilBZkMAUu+/iXVCwPHp5wjK0OfAnxc61
+	0eNgUFRU8fdKcQPW/CtxiPBwG16xh23GBNM5GQCAuld0D0x7vudcGG7EWo0rONQ0i6exvGsJTrg
+	rxNjfPiOHEiNi/Yjat8nZfP1UUjLJJf+3swZmPXzSi0u8Hn8ySpl/yaD5yJDrRHrBfHTlDfdbCL
+	50wE
+X-Received: by 2002:a53:e038:0:b0:649:399c:d964 with SMTP id
+ 956f58d0204a3-649db4bd04emr32126d50.77.1770135593302; Tue, 03 Feb 2026
+ 08:19:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260203080109.2682183-1-sun.jian.kdev@gmail.com>
+ <20260203145511.164485-1-sun.jian.kdev@gmail.com> <aYIOXk55_DRFKCqo@strlen.de>
+In-Reply-To: <aYIOXk55_DRFKCqo@strlen.de>
+From: sun jian <sun.jian.kdev@gmail.com>
+Date: Wed, 4 Feb 2026 00:19:40 +0800
+X-Gm-Features: AZwV_Qjfv0Y1awKscWXbDj4yy-HnV-BM8KoCg4M6DTECxWm-KSh8hCQxRruGgdg
+Message-ID: <CABFUUZG9LnhXc+nsQA28WHiiT33_5wQ82E1bBSBncWkxkXaKZA@mail.gmail.com>
+Subject: Re: [PATCH v2] netfilter: amanda: fix RCU pointer typing for nf_nat_amanda_hook
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>, 
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-256355-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256353-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vincent.guittot@linaro.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[digriz.org.uk:email,nxp.com:email,infradead.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,linaro.org:mid]
-X-Rspamd-Queue-Id: 298FEDBDAD
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 39F77DBF53
 X-Rspamd-Action: no action
 
-Add a new entry for S32G Serdes driver.
+On Tue, Feb 3, 2026 at 11:04=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Sun Jian <sun.jian.kdev@gmail.com> wrote:
+> >  enum amanda_strings {
+> > @@ -98,7 +98,12 @@ static int amanda_help(struct sk_buff *skb,
+> >       u_int16_t len;
+> >       __be16 port;
+> >       int ret =3D NF_ACCEPT;
+> > -     typeof(nf_nat_amanda_hook) nf_nat_amanda;
+> > +     unsigned int (*nf_nat_amanda)(struct sk_buff *skb,
+> > +                                   enum ip_conntrack_info ctinfo,
+> > +                                   unsigned int protoff,
+> > +                                   unsigned int matchoff,
+> > +                                   unsigned int matchlen,
+> > +                                   struct nf_conntrack_expect *exp);
+>
+> Why is that needed?
+Correct. Manual declaration is indeed verbose.
 
-Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
----
- MAINTAINERS | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+The reason I used it was that typeof(nf_nat_amanda_hook) carries over
+the __rcu attribute to the local variable, which triggers a Sparse
+warning when assigning the result of rcu_dereference().
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 67db88b04537..fab748292821 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3206,6 +3206,16 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
- F:	drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
- 
-+ARM/NXP S32G SERDES DRIVER
-+M:	Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-+R:	NXP S32 Linux Team <s32@nxp.com>
-+L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-+F:	drivers/net/pcs/pcs-nxp-s32g-xpcs.c
-+F:	drivers/phy/freescale/phy-nxp-s32g-serdes.c
-+F:	include/linux/pcs/pcs-nxp-s32g-xpcs.h
-+
- ARM/Orion SoC/Technologic Systems TS-78xx platform support
- M:	Alexander Clouter <alex@digriz.org.uk>
- L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
--- 
-2.43.0
+I will switch to typeof(*nf_nat_amanda_hook) *nf_nat_amanda in V3.
+Thanks for the guidance!
 
+Regards,
+
+Sun
 
