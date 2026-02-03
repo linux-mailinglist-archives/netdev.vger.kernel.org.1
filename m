@@ -1,261 +1,310 @@
-Return-Path: <netdev+bounces-256407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256409-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FvRNWM3gmmVQgMAu9opvQ
-	(envelope-from <netdev+bounces-256407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:58:59 +0100
+	id kKjIA1k4gmmVQgMAu9opvQ
+	(envelope-from <netdev+bounces-256409-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:03:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A837DD36C
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:58:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E89BEDD436
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F001308267E
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:54:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C07303017273
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BE335EDAA;
-	Tue,  3 Feb 2026 17:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666C03624BC;
+	Tue,  3 Feb 2026 17:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vhtmqubU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hBWj/lGX";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QFl8BakL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rF+k/XTH"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="NoMtxIpK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hJ9OFM/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1021D5ABA
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8B928134C
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770141296; cv=none; b=LpiFHP/pqo7rtQW/6eUGG4eFbRJQVsNaX2Ma/JF78RovztMLzBpLsofNH2+vyUXnRc4hAF/J9N1pEOGKusr0QMc6dSq1H/OTNrAhyuwfTWXemWn+K+KbyWX0DWO0IO/IQSxJLZDqJUFDMbKbCVvKRFrp4hFMd+Jn2bQDJgA5LiY=
+	t=1770141331; cv=none; b=fxeEsqTQri264t0S9Rkt0ON7Pty2SgnPMMkZX3oT1InV7z8gjFubNOa8kwuqIu85tZ0hxwK6zMEwMZ0tswZ4iivvI/mYkVDatPBB6Gp2wrBa9OJMh1IV+/rVaEXIDhQA0TmnHj95dJSdOddENrGwzPJLisuwxY8GspXYXAniRC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770141296; c=relaxed/simple;
-	bh=fxJ/NyomK1aNHsH8VvjtwkFg+gQGQNL6KRXWgLp24dg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oDiugeeiewnjipZWEHXuImKhNXW7x2iwkWu9svMrtrf1ZDcKDb0q9bwNj1N4f3hoSI882UBhQBAUuk793TuRp99CFyJb00NpF1ztIiZ5oVVEaz2MUaqQsKqYSLDACtEy3yWRKEpkGro+cgQUbGst07ahonL+ZNcGJny3NrtWA5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vhtmqubU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hBWj/lGX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QFl8BakL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rF+k/XTH; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D38905BCC3;
-	Tue,  3 Feb 2026 17:54:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770141293; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=PvsEqPcAr1Ruk25BgvXyWm3UGKGTAHXRP4htfGBnfKs=;
-	b=vhtmqubUiUGk08dGnEXrBI0SmGdQVgoD+wRVokncPyFmeqspDutYaX1rwyUA/XVRIhOJMC
-	W8fjS/fLNt0WhjN+zjDTgeyFhrRO/d7oIy+E7ulO7Im1RygBD2uPq50v2DyhSlC2hs6/8O
-	dUCXpWyfeXUbk510AKfqTaIFNY8/cR8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770141293;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=PvsEqPcAr1Ruk25BgvXyWm3UGKGTAHXRP4htfGBnfKs=;
-	b=hBWj/lGX0RYRL4Q5DASjeY+G3DO0n6v6r+VrvLmD1oJCQKP3s7lG7KbjJhlJB3vYeiNJrP
-	S/9P9YAyxmtUcgDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QFl8BakL;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="rF+k/XTH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770141292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=PvsEqPcAr1Ruk25BgvXyWm3UGKGTAHXRP4htfGBnfKs=;
-	b=QFl8BakLVNcDiNd8b8MosGWZY1EAQjxkfTnw6sD88/78X/2jrlxoRdoHP5XwtWXw/r09cF
-	wU2QXaInwiroFQESjWVqKIWDeiKEr9B7E9v652jU/Q/ck9VSdX6WJuf06eFTlfU2/eNqJ6
-	EkE099+u8uQ6vVfY+11OAVxsqcU1G3s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770141292;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=PvsEqPcAr1Ruk25BgvXyWm3UGKGTAHXRP4htfGBnfKs=;
-	b=rF+k/XTHTcLt18FqKsdaUbjIQSObe9VgLc/XvmPYtJ63TFzgc+LDwOBvMsQOhZ9f7+XS4o
-	LfsvU2ydEC1ayuDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E74843EA62;
-	Tue,  3 Feb 2026 17:54:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9HTuNGs2gmlVdQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 03 Feb 2026 17:54:51 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	dsahern@kernel.org,
-	idosch@nvidia.com,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	Thorsten Toepper <thorsten.toepper@sap.com>
-Subject: [PATCH RFC net-next] inet: add ip_retry_random_port sysctl to reduce sequential port retries
-Date: Tue,  3 Feb 2026 18:54:22 +0100
-Message-ID: <20260203175422.4620-1-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1770141331; c=relaxed/simple;
+	bh=0YmPDh/LChShwwhwAamad7/d0A2oT5Ksa0cHRjr/tF4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=c/nHqaQgIKeoNmyYuDK9ZUaeZajDebZCEK82WhBz+Omez7Gw1FCikp7GMvJtMRTfnUcu6PbhADu+3LxCDY05CaQ7c9WMlwsA/z6kn3Z5IH2Xhz86Iou2QrvFCMlLohdOaSCQ56JONuy32u8HhQtTJQm4mVE+FHmd1/tUogD1XWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=NoMtxIpK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hJ9OFM/H; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id B0D4A7A01B3;
+	Tue,  3 Feb 2026 12:55:26 -0500 (EST)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-10.internal (MEProxy); Tue, 03 Feb 2026 12:55:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1770141326;
+	 x=1770227726; bh=/ItY5gmimiv11sh+7nWpQoJ4dWDev+mDb54ktANl96w=; b=
+	NoMtxIpKJYn652/uyYLn3RcQFTFD03VhFLJ0pBJoeXZcIVTnX5lB9VHxcI9dLnjV
+	zWXMMPqhlduJAcHOsV5UIo+nR67Ek6SHl+huOfMedGVQw0Fj1Je8VmorUuyGXRwj
+	m+voHfgHWnp7FFU2KUdbawy+X4PYJLurwJV2kbVonYZdghWiR12Sv+wENCD6jqaa
+	kvUlqqyvLauEhJHD45Q2J3AeEL+GwINIrgcjkP3gPayotitF5iaFiDg2QNF2fpxE
+	MOPf5wPUJO5PI+TkVE42H/frRuxxNiD5Ja5egUmpv3iGP76pnuuBcHkWIyHYCaEy
+	7pLzAC3ddzo9vMYs7Of5Ew==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770141326; x=
+	1770227726; bh=/ItY5gmimiv11sh+7nWpQoJ4dWDev+mDb54ktANl96w=; b=h
+	J9OFM/HZub7xW97PPJYjbHCAQoPhpEUfsbT+wT/u0EHTjoExAhuk+aUOHNNeP8j/
+	Jz7a3h2lvrVZyPSQxGSKqIV0j2CvTtM5Nhgf8dmITm2d5SISK7pi9FXGq2ypE1Oj
+	Tz2eSZug+j/EmRL7aTuufp5BLyI6v+wWhMYPeFHXZkyhlE+oRC+qCru7KMjSZKdK
+	1Hc6woisVr2nshPPAOMf9rP28+dzkLKWsNNijwfSLPXG2eZmDOeRbH3UXoM5ocJ5
+	w1nd4wJbnN/3ZQch7g0TtjvsABGzQPr9DumnubqFNyo8EF6Ypg8OA05c51rirCcv
+	hnY15JfeqUcm4c4ZBwf/g==
+X-ME-Sender: <xms:jTaCafO-ixy2btwPKszwt11OntgtETVpHcYlTSzxlstTC7IAgB_0-g>
+    <xme:jTaCaUxzoVL0mQS3EOID1gkKw3crnERT4p2Jl1_foQU5YE88_8seVlBr_U4GQf_sC
+    h2HQs_Z113N0EVM8kU7ESv3NWw20KUmnMJ37W__UZMgXpLW9wJTkmI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukedtjedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehlihgt
+    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
+    hilhdrihhmqeenucggtffrrghtthgvrhhnpedvieevheffudffhfefvdfhfeekveelueet
+    gfelgfeigefhheegfeeifeehteevteenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrdhi
+    mhdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepug
+    ifsegurghvihgufigvihdruhhkpdhrtghpthhtohepthhtohhukhgrnhdrlhhinhhugies
+    ghhmrghilhdrtghomhdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnh
+    gvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepghgr
+    lhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepthgrrhhiqhhtsehnvhhiughirgdrtg
+    homhdprhgtphhtthhopeifihhtuhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepnhgv
+    thguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:jTaCaYiJViiCf411FJ37FUHbcEgOMU7T51GCkPM-zNcE05GqjKtqRA>
+    <xmx:jTaCabDcsRqE7PDLiVEedKOD7fQLnF2xO6l_8kKW2yMQHvpHmDi9Cg>
+    <xmx:jTaCaWulf2QaCXLc6_AQz0sya-_070m3NSuLqW5pcOl0nO36jgIYkA>
+    <xmx:jTaCaXeOU6IfzxS6NWciU8cBROdgsZHSOUcoFd2_cu2VdUA7pB2bpA>
+    <xmx:jjaCaYVYYpU0NjomptCSUyKzKlr7CgcIDGuwX07ncrhZaILx3YRqfomB>
+Feedback-ID: i559e4809:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id C2E0E33E0099; Tue,  3 Feb 2026 12:55:25 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+X-ThreadId: At9sFCvdeaDg
+Date: Tue, 03 Feb 2026 19:54:31 +0200
+From: "Alice Mikityanska" <alice.kernel@fastmail.im>
+To: "Tariq Toukan" <ttoukan.linux@gmail.com>,
+ "Daniel Borkmann" <daniel@iogearbox.net>, netdev@vger.kernel.org
+Cc: "William Tu" <witu@nvidia.com>, "Tariq Toukan" <tariqt@nvidia.com>,
+ "David Wei" <dw@davidwei.uk>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Gal Pressman" <gal@nvidia.com>
+Message-Id: <cb1fc819-f761-4d25-8c49-674d72462f95@app.fastmail.com>
+In-Reply-To: <aa78345a-bdb6-4dd9-9db2-3599585f1553@gmail.com>
+References: <20260123223916.361295-1-daniel@iogearbox.net>
+ <85776531-d5fa-4762-90aa-74c8397dc09b@gmail.com>
+ <6188b9f5-ce38-4de9-80b7-c7b1cab48595@iogearbox.net>
+ <421d9b09-a157-4f95-8775-7883ea097038@gmail.com>
+ <2a3bd098-0d88-4c11-8ac3-7b13f8bbbd9f@iogearbox.net>
+ <ae18245c-e4f6-414a-b8d2-de18824c3861@app.fastmail.com>
+ <aa78345a-bdb6-4dd9-9db2-3599585f1553@gmail.com>
+Subject: Re: [PATCH net-next] net/mlx5e: Undo saving per-channel async ICOSQ
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-256409-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256407-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_TO(0.00)[gmail.com,iogearbox.net,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid,sap.com:email]
-X-Rspamd-Queue-Id: 2A837DD36C
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-0.992];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fastmail.im:dkim]
+X-Rspamd-Queue-Id: E89BEDD436
 X-Rspamd-Action: no action
 
-With the current port selection algorithm, ports after a reserved port
-or long time used port are used more often than others. This combines
-with cloud environments blocking connections between the application
-server and the database server if there was a previous connection with
-the same source port. This leads to connectivity problems between
-applications on cloud environments.
+On Tue, Feb 3, 2026, at 16:58, Tariq Toukan wrote:
+> On 03/02/2026 11:20, Alice Mikityanska wrote:
+>> On Mon, Feb 2, 2026, at 18:13, Daniel Borkmann wrote:
+>>> Hi Tariq,
+>>>
+>>> On 2/1/26 1:50 PM, Tariq Toukan wrote:
+>>>> On 26/01/2026 11:23, Daniel Borkmann wrote:
+>>>>> On 1/25/26 9:33 AM, Tariq Toukan wrote:
+>>>>>> On 24/01/2026 0:39, Daniel Borkmann wrote:
+>>>>>>> This reverts the following commits:
+>>>>>>>
+>>>>>>>  =C2=A0=C2=A0 - ea945f4f3991 ("net/mlx5e: Move async ICOSQ lock =
+into ICOSQ struct")
+>>>>>>>  =C2=A0=C2=A0 - 56aca3e0f730 ("net/mlx5e: Use regular ICOSQ for =
+triggering NAPI")
+>>>>>>>  =C2=A0=C2=A0 - 1b080bd74840 ("net/mlx5e: Move async ICOSQ to dy=
+namic allocation")
+>>>>>>>  =C2=A0=C2=A0 - abed42f9cd80 ("net/mlx5e: Conditionally create a=
+sync ICOSQ")
+>>>>>>>
+>>>>>>> There are a couple of regressions on the xsk side I ran into:
+>>>>>>>
+>>>>>>> Commit 56aca3e0f730 triggers an illegal synchronize_rcu() in an =
+RCU read-
+>>>>>>> side critical section via mlx5e_xsk_wakeup() -> mlx5e_trigger_na=
+pi_icosq()
+>>>>>>> -> synchronize_net(). The stack holds RCU read-lock in xsk_poll(=
+).
+>>>>>>>
+>>>>>>> Additionally, this also hits a NULL pointer dereference in mlx5e=
+_xsk_wakeup():
+>>>>>>>
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963735] BUG: kernel NULL pointer deref=
+erence, address: 0000000000000240
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963743] #PF: supervisor read access in=
+ kernel mode
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963746] #PF: error_code(0x0000) - not-=
+present page
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963749] PGD 0 P4D 0
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963752] Oops: Oops: 0000 [#1] SMP
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963756] CPU: 0 UID: 0 PID: 2255 Comm: =
+qemu-system-x86 Not tainted 6.19.0-rc5+ #229 PREEMPT(none)
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963761] Hardware name: [...]
+>>>>>>>  =C2=A0=C2=A0 [=C2=A0 103.963765] RIP: 0010:mlx5e_xsk_wakeup+0x5=
+3/0x90 [mlx5_core]
+>>>>>>>
+>>>>>>> What happens is that c->async_icosq is NULL when in mlx5e_xsk_wa=
+keup()
+>>>>>>> and therefore access to c->async_icosq->state triggers it. (On t=
+he NIC
+>>>>>>> there is an XDP program installed by the control plane where tra=
+ffic
+>>>>>>> gets redirected into an xsk map - there was no xsk pool set up y=
+et.
+>>>>>>> At some later time a xsk pool is set up and the related xsk sock=
+et is
+>>>>>>> added to the xsk map of the XDP program.)
+>>>>>>
+>>>>>> Thanks for your report.
+>>>>>>
+>>>>>>> Reverting the series fixes the problems again.
+>>>>>>
+>>>>>> Revert is too aggressive here. A fix is preferable.
+>>>>>> We're investigating the issue in order to fix it.
+>>>>>> We'll update.
+>>>>> Ok, sounds good. Certainly the kTLS fixes seem independent, from t=
+he cause
+>>>>> of the issues I've hit it just seemed to me that they were quite f=
+undamental
+>>>>> and that perhaps a different approach would be needed (or alternat=
+ively only
+>>>>> kTLS would need fixing, and the xsk optimization left as it was or=
+iginally).
+>>>>> Anyway, I'll keep the revert locally for now, and happy to test pa=
+tches.
+>>>>
+>>>> Please check attached patch.
+>>=20
+>> Hi Tariq,
+>>=20
+>> I also took a glance at the patch: that seems to be correct in XSK pa=
+rts, and mlx5e_trigger_napi_icosq now makes sense to me after your expla=
+nation.=20
+>
+> Great.
+>
+>> Two small comments though:
+>>=20
+>> 1. I'd prefer DEBUG_NET_WARN_ON_ONCE instead of WARN_ON. At least XSK=
+ wakeup is a hot path, called frequently, so we don't want to flood dmes=
+g with the same error, and it would be better to compile out the check i=
+n non-debug builds, hence DEBUG_NET_WARN_ON_ONCE.
+>>=20
+>
+> I tend to totally drop this check.
+>
+>> 2. I see you changed the condition of creating async_icosq to be crea=
+ted when any xdp_prog is attached, even when there are no XSK pools. Is =
+there a case where async_icosq is useful with plain XDP without XSK? If =
+not, I believe this condition should be XDP && XSK.
+>>=20
+>
+> You're right.
+> As you know, the channels are not re-opened on XSK pool events.
+> They are re-opened on XDP program attach/detach.
 
-The situation is that a source tuple is usable again after being closed
-for a maximum lifetime segment of two minutes while in the firewall it's
-still noted as existing for 60 minutes or longer. So in case that the
-port is reused for the same target tuple before the firewall cleans up,
-the connection will fail due to firewall interference which itself will
-reset the activity timeout in its own table. We understand the real
-issue here is that these firewalls cannot cope with standards-compliant
-port reuse. But this is a workaround for such situations and an
-improvement on the distribution of ports selected.
+Ah, that's right, I see. I didn't pay attention to where the check is
+located. If you reorganize the code a little bit, it's possible to
+implement the perfect check (XDP && XSK) || kTLS_RX, to avoid creating
+the unneeded async_icosq with plain XDP.
 
-The proposed solution is instead of incrementing the port number,
-performing a re-selection of a new random port within the remaining
-range. This solution is configured via sysctl new option
-"net.ipv4.ip_retry_random_port".
+(BTW, I see that ktls_rx_was_enabled is never reset to false: is it
+because we can't reliably fence the moment when the driver stops using
+it?)
 
-The test run consists of two processes, a client and a server, and loops
-connect to the server sending some bytes back. The results we got are
-promising:
+Anyway, it's up to you if you'd like to do it or not, but here is my
+suggestion. We don't have to create async_icosq in mlx5e_open_queues.
+Similar to how we separated mlx5e_open_xsk, we can separate
+mlx5e_open_async_icosq, which is where we can check (XDP && XSK) ||
+kTLS_RX.
 
-Executed test: Current algorithm
-ephemeral port range: 9000-65499
-simulated selections: 10000000
-retries during simulation: 14197718
-longest retry sequence: 5202
+Then mlx5e_open_channel will look like:
 
-Executed test: Proposed modified algorithm
-ephemeral port range: 9000-65499
-simulated selections: 10000000
-retries during simulation: 3976671
-longest retry sequence: 12
+mlx5e_open_queues();
+mlx5e_open_async_icosq(); // Checks the condition internally
+if (xsk_pool)
+        mlx5e_open_xsk();
 
-In addition, on graphs generated we can observe that the distribution of
-source ports is more even with the proposed patch.
+mlx5e_xsk_enable_locked will also call mlx5e_open_async_icosq just
+before mlx5e_open_xsk.
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-Tested-by: Thorsten Toepper <thorsten.toepper@sap.com>
----
- .../networking/net_cachelines/netns_ipv4_sysctl.rst        | 1 +
- include/net/netns/ipv4.h                                   | 1 +
- net/ipv4/inet_hashtables.c                                 | 7 ++++++-
- net/ipv4/sysctl_net_ipv4.c                                 | 7 +++++++
- 4 files changed, 15 insertions(+), 1 deletion(-)
+mlx5e_close_async_icosq will close it if it exists.
 
-diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-index beaf1880a19b..c4041fdca01e 100644
---- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-+++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-@@ -47,6 +47,7 @@ u8                              sysctl_tcp_ecn
- u8                              sysctl_tcp_ecn_fallback
- u8                              sysctl_ip_default_ttl                                                                ip4_dst_hoplimit/ip_select_ttl
- u8                              sysctl_ip_no_pmtu_disc
-+u8                              sysctl_ip_retry_random_port
- u8                              sysctl_ip_fwd_use_pmtu                       read_mostly                             ip_dst_mtu_maybe_forward/ip_skb_dst_mtu
- u8                              sysctl_ip_fwd_update_priority                                                        ip_forward
- u8                              sysctl_ip_nonlocal_bind
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 2dbd46fc4734..d04b07e7c935 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -156,6 +156,7 @@ struct netns_ipv4 {
- 
- 	u8 sysctl_ip_default_ttl;
- 	u8 sysctl_ip_no_pmtu_disc;
-+	u8 sysctl_ip_retry_random_port;
- 	u8 sysctl_ip_fwd_update_priority;
- 	u8 sysctl_ip_nonlocal_bind;
- 	u8 sysctl_ip_autobind_reuse;
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index f5826ec4bcaa..f1c79a7d3fd3 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1088,8 +1088,13 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	for (i = 0; i < remaining; i += step, port += step) {
- 		if (unlikely(port >= high))
- 			port -= remaining;
--		if (inet_is_local_reserved_port(net, port))
-+		if (inet_is_local_reserved_port(net, port)) {
-+			if (net->ipv4.sysctl_ip_retry_random_port) {
-+				port = low + get_random_u32_below(remaining);
-+				port = ((port & 1) == step) ? port : (port - 1);
-+			}
- 			continue;
-+		}
- 		head = &hinfo->bhash[inet_bhashfn(net, port,
- 						  hinfo->bhash_size)];
- 		rcu_read_lock();
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index a1a50a5c80dc..5eade7d9e4a2 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -822,6 +822,13 @@ static struct ctl_table ipv4_net_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= ipv4_local_port_range,
- 	},
-+	{
-+		.procname	= "ip_retry_random_port",
-+		.maxlen		= sizeof(u8),
-+		.data		= &init_net.ipv4.sysctl_ip_retry_random_port,
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax,
-+	},
- 	{
- 		.procname	= "ip_local_reserved_ports",
- 		.data		= &init_net.ipv4.sysctl_local_reserved_ports,
--- 
-2.52.0
+With this design, all cases are covered: every mlx5e_open_xsk is paired
+with mlx5e_open_async_icosq; and kTLS RX enable flow reopens channels,
+which also triggers mlx5e_open_async_icosq. The conditional is DRYed in
+mlx5e_open_async_icosq itself, so no code repetition either.
 
+> Hence, as a simple and quick fix, we will check for XDP program and=20
+> create the async ICOSQ accordingly.
+> Currently we won't have create/destroy async ICOSQ when XSK pool is=20
+> activated/deactivated. I will mention this in the commit message.
+>
+> This still prevents the async ICOSQ creation in default.
+>
+>> Thanks,
+>> Alice
+>>=20
+>
+>
+>>>> We were able to repro the issues internally and verify the fix.
+>>>> We're finalizing it before submission.
+>>>>
+>>>> I'd be glad if you can confirm it solves the issues for you.
+>>> That seems to work for me, yes. Feel free to add my Tested-by.
+>>>
+>>> Thanks,
+>>> Daniel
 
