@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-256225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMR8NDnHgWk0JwMAu9opvQ
-	(envelope-from <netdev+bounces-256225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:00:25 +0100
+	id 8Fo1OVLHgWl1JwMAu9opvQ
+	(envelope-from <netdev+bounces-256226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:00:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BED7D7388
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:00:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE00FD73B0
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D282330138B2
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:57:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 388A83063F61
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6E1396B74;
-	Tue,  3 Feb 2026 09:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC547395DB7;
+	Tue,  3 Feb 2026 09:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="D7sKfpOq"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="M7R7wWMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E71393DDE;
-	Tue,  3 Feb 2026 09:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45988312805;
+	Tue,  3 Feb 2026 09:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770112629; cv=none; b=ij+eBuahrOxjploQx1ZG38AHVUmFhaijP3i/KS6vpEZd0245wQ82Ixs+1lNwBaqk9Yjz9HATDewvQjyxfV5rrL3TAJfCfCvet6Jr7VZVhO0xA7o/AqFbMP3PhxtNUCQhmqJmeiAp+zVhGgIswWvhNd5TsOWQrApH1AQux2ZyDQI=
+	t=1770112685; cv=none; b=VdrQrp5PoLmwpci9fA7ejMQKhgziTe8tAA9K+bG18N4OC9BhDMx/JENu46hWQRwiiHLucTI4i1cIhCUaf4R5b4HfjdLupX/e1RTfYJhaJ3sHaIp0R4Ljp1B/VMt6MRi9WkHoa8jL9yjZBebSnWZ1hwmzTfAvN9SQX88Hvu4Kt3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770112629; c=relaxed/simple;
-	bh=EUgy0IAJ5j0P1D+NYztYFmt88gDGQJLI+V2NPdwGXCo=;
+	s=arc-20240116; t=1770112685; c=relaxed/simple;
+	bh=qG5WW1NRpxJBrmekKQ9D5nzRgBn/+vBoWOrdgIPVTwQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fp18vXle/ol9q6vmkzzDW4hA09tGFAvgYxbhaGg4jMxf6J4719XpzUKi/e7yDdo4KtNLWxBmFuYTigw8tKaw91hi3J85kYyvdfac11Lwfci8tOETOLX9u0+dw5cHvcWnTcmc8Wl8MkANgfe0jsgCsCfQgK9MNGcS5JntRoyq8tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=D7sKfpOq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 6131scWZ025324;
-	Tue, 3 Feb 2026 09:56:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ql+DEP
-	lp5fFK9lwAFt31Q1tcqhvjvE7n0PwRkg3SLOA=; b=D7sKfpOqUQ/CQRSTZfcpeB
-	WLiCldmxL7MgLpV9Fmc0N5wvHgbUKrkzKbLinentD7d+GpA/I8XwLYnHTCj3w8ge
-	0DdHB2181Pv2dhsvVg159/OvI3I05ykWQ7YGy8336q2tuEpU7J7RL0C8GWKW/+kN
-	331B5MbuQxrzsRoqn22uNHW543Ra0Mf8Fekv2z5D3HQIGGBNB0n2TrEtlLu1v7O8
-	joUAcGJ7KRjjn6zjIX83x049mXok3JzSafMf3hCkgqgDdPHMN3tSPnhzdVUB7xmV
-	uhKF8THzTckTWLRs+GeJDbzC/5bsl1CZwVlp8gHxKP8lhHBiKffYv75EobK6aGMQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c19f6cq7q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Feb 2026 09:56:53 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6135dlOt025706;
-	Tue, 3 Feb 2026 09:56:52 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c1w2mrkhu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Feb 2026 09:56:52 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6139up6628967628
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 3 Feb 2026 09:56:52 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D2DDE58056;
-	Tue,  3 Feb 2026 09:56:51 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE3E558052;
-	Tue,  3 Feb 2026 09:56:48 +0000 (GMT)
-Received: from [9.109.248.127] (unknown [9.109.248.127])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  3 Feb 2026 09:56:48 +0000 (GMT)
-Message-ID: <007a2100-0913-4a8f-82d3-8118664fc1a7@linux.ibm.com>
-Date: Tue, 3 Feb 2026 15:26:47 +0530
+	 In-Reply-To:Content-Type; b=YTNpHVUFbBIobaVmn+0Vig+iJEb/tR1y4xgShHRWNfgZDvqXH3ZqutqB3GJboeZ+9p6atjbopshe+Y1HCJJThL86F8zMQK2ZvbNYuReg41OTLLqR4v1UodeQc0GbzRpf8Hl+ueyNFk4g3UAmUTJpVY5Y5bHV7MNGKwQSFtcs8PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=M7R7wWMr; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vnDAR-00EX1u-Dt; Tue, 03 Feb 2026 10:57:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=iMfpMkidXJnlb6QlaNpWnVaPHLTtMwpknzZdeH49YR8=; b=M7R7wWMrYcZ7ZgsHV1TuA/Iebu
+	wtd+weKCj4FMW6zJNZENhaYwFqrNRvXGB1CHbmcpEr6ARbNYhRFe+d4yjXeylczwnhkaJTb+dcngk
+	lsF/aro5CuYCWKItTKnjTAIExp1vprEo37Ze9dJh4MRlb/YSM0YatKgiWax1rQBe/uxH1CUoeOQ5Q
+	xNCmBxfgSGkRlKbIhb31xXRePaeUnYbCVQ92CfHdMCMjW3apNR9BwjBrRexVhnn/Z1DmjTgobwV4m
+	X56mK9q38Q2ZXYKg+SMofpA22t1dqTr4YF+V9LCvDr7Dz5UuWGT7q+tH1TrcggQ6bsBkXT/tKaraB
+	uKRf57GQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vnDAQ-00013V-D9; Tue, 03 Feb 2026 10:57:54 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vnDAJ-00G0EU-NP; Tue, 03 Feb 2026 10:57:47 +0100
+Message-ID: <8d055903-fe44-4bbf-a1a5-e0176343bf0b@rbox.co>
+Date: Tue, 3 Feb 2026 10:57:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,134 +64,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH phy] phy: enter drivers/phy/Makefile even without
- CONFIG_GENERIC_PHY
-Content-Language: en-GB
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, linux-phy@lists.infradead.org,
-        Vinod Koul <vkoul@kernel.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>, broonie@kernel.org
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-        =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>,
-        linux-kernel@vger.kernel.org,
-        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-References: <20260123110600.3118561-1-vladimir.oltean@nxp.com>
-From: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-In-Reply-To: <20260123110600.3118561-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
+ update
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+ Kuniyuki Iwashima <kuniyu@google.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260129-unix-proto-update-null-ptr-deref-v1-1-e1daeb7012fd@rbox.co>
+ <3fc5611f-394f-40db-b49d-2f26402e221a@linux.dev>
+ <3362017f-9c3d-46cd-b3ce-cb750b565d5b@rbox.co>
+ <612a9446-252f-4b14-8605-ae1af000cc41@linux.dev>
+ <CAAVpQUAc3S+Ebx2qp-Pbg9qH-Zc=yHdzVJbchCu++V_4XF3DLg@mail.gmail.com>
+ <b98a40e8-1be2-47f0-8238-92dee8f5a204@rbox.co>
+ <6de6f1bf-c8ee-4dfb-9b8c-f89185946630@linux.dev>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <6de6f1bf-c8ee-4dfb-9b8c-f89185946630@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dqa0YwJcz00rU6QBJE95XkQcdrf1Hdkl
-X-Authority-Analysis: v=2.4 cv=drTWylg4 c=1 sm=1 tr=0 ts=6981c665 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=8AirrxEcAAAA:8 a=N9vyIDjvMmDcvu0NZNMA:9
- a=QEXdDO2ut3YA:10 a=ST-jHhOKWsTCqRlWije3:22
-X-Proofpoint-ORIG-GUID: dqa0YwJcz00rU6QBJE95XkQcdrf1Hdkl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAzMDA3OCBTYWx0ZWRfX5lxuQZobrzF0
- eCbpusseL/0WmoRcWzBXw0b9wgfu+DrEZYxUbQMcwhzIh72nyCuO8+w/L6zpQ2IAdL41X4tr4Tt
- rx0RNESdpRuEYRV5AnrEn3mTLNXTYQGAzI8QEpHPB9gteM7B/0Sham54pW+odQowOeNEiSvqv/a
- PTuj90gCFHOs05pqBAIK+NIsh7zNniuOmaR8Pk1yDbZoeurgva6RJi1dN2tDYRvqnmwyL04l6Ym
- TguoaMDOQTG7MPGHabgXUFT3QaRn9ZoHhGILhuisWnbmz5hU5QTIwZhdZy3RFMDKLpNi1hgWe9W
- Zvgx0+7lkS3JdiOInCvo3Yv+rUXZrmtwVZt9zoMZl4tPkETM5A8u5wiINoRAgB7VipHT3AdSS9D
- O7MiyIiELy2l17h+bOmiGJJ+rn5cghn3vZfN0nU8U0Y6OILBb62Mnp5Jzg3eoV4vkvhZs3Z2dYQ
- YItHZLY9pE84wyqZFhA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-03_03,2026-02-02_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 spamscore=0 malwarescore=0 bulkscore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2602030078
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256225-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,nxp.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[venkat88@linux.ibm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-256226-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[rbox.co:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 1BED7D7388
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,rbox.co:mid,rbox.co:dkim]
+X-Rspamd-Queue-Id: CE00FD73B0
 X-Rspamd-Action: no action
 
+On 2/3/26 04:53, Martin KaFai Lau wrote:
+> On 2/2/26 7:10 AM, Michal Luczaj wrote:
+>> In related news, looks like bpf_iter_unix_seq_show() is missing
+>> unix_state_lock(): lock_sock_fast() won't stop unix_release_sock(). E.g.
+>> bpf iterator can grab unix_sock::peer as it is being released.
+> 
+> If the concern is the bpf iterator prog may use a released unix_peer(sk) 
+> pointer, it should be fine. The unix_peer(sk) pointer is not a trusted 
+> pointer to the bpf prog, so nothing bad will happen other than 
+> potentially reading incorrect values.
 
-On 23/01/26 4:36 pm, Vladimir Oltean wrote:
-> Kconfig option CONFIG_PHY_COMMON_PROPS, which builds
-> drivers/phy/phy-common-props.c, was intended to be selectable
-> independently of CONFIG_GENERIC_PHY. Yet it lives in drivers/phy/, which
-> is entered by the Makefile only if CONFIG_GENERIC_PHY is set.
->
-> Allow the Makefile to enter one level deeper, but stop at drivers/phy/
-> if CONFIG_GENERIC_PHY is unselected (i.e. do not enter vendor folders).
-> The other stuff from drivers/phy/Makefile except for CONFIG_PHY_COMMON_PROPS,
-> like CONFIG_PHY_NXP_PTN3222, all depends on CONFIG_GENERIC_PHY.
->
-> Fixes: e7556b59ba65 ("phy: add phy_get_rx_polarity() and phy_get_tx_polarity()")
-> Closes: https://lore.kernel.org/lkml/43ea0202-891d-4582-980b-5cb557b41114@linux.ibm.com/
-> Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-> Debugged-by: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->   drivers/Makefile     | 2 +-
->   drivers/phy/Makefile | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/Makefile b/drivers/Makefile
-> index ccc05f1eae3e..53fbd2e0acdd 100644
-> --- a/drivers/Makefile
-> +++ b/drivers/Makefile
-> @@ -10,7 +10,7 @@ obj-y				+= cache/
->   obj-y				+= irqchip/
->   obj-y				+= bus/
->   
-> -obj-$(CONFIG_GENERIC_PHY)	+= phy/
-> +obj-y				+= phy/
->   
->   # GPIO must come after pinctrl as gpios may need to mux pins etc
->   obj-$(CONFIG_PINCTRL)		+= pinctrl/
-> diff --git a/drivers/phy/Makefile b/drivers/phy/Makefile
-> index 30b150d68de7..93715ea0d010 100644
-> --- a/drivers/phy/Makefile
-> +++ b/drivers/phy/Makefile
-> @@ -15,7 +15,7 @@ obj-$(CONFIG_PHY_SNPS_EUSB2)		+= phy-snps-eusb2.o
->   obj-$(CONFIG_USB_LGM_PHY)		+= phy-lgm-usb.o
->   obj-$(CONFIG_PHY_AIROHA_PCIE)		+= phy-airoha-pcie.o
->   obj-$(CONFIG_PHY_NXP_PTN3222)		+= phy-nxp-ptn3222.o
-> -obj-y					+= allwinner/	\
-> +obj-$(CONFIG_GENERIC_PHY)		+= allwinner/	\
->   					   amlogic/	\
->   					   broadcom/	\
->   					   cadence/	\
+But if the prog passes a released peer pointer to a bpf helper:
 
+BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0x95/0xb0
+Read of size 1 at addr ffff888110654c92 by task test_progs/1936
+Call Trace:
+ dump_stack_lvl+0x5d/0x80
+ print_report+0x170/0x4f3
+ kasan_report+0xe1/0x180
+ bpf_skc_to_unix_sock+0x95/0xb0
+ bpf_prog_382743e45576abd5_dump_unix+0x4a0/0x576
+ bpf_iter_run_prog+0x5b9/0xb00
+ bpf_iter_unix_seq_show+0x1f7/0x2e0
+ bpf_seq_read+0x42c/0x10d0
+ vfs_read+0x171/0xb20
+ ksys_read+0xff/0x200
+ do_syscall_64+0x6b/0x3a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-I still see linux-next build failures with next-20260202. Can we please 
-have this patch merged.
+Allocated by task 1941:
+ kasan_save_stack+0x30/0x50
+ kasan_save_track+0x14/0x30
+ __kasan_slab_alloc+0x63/0x80
+ kmem_cache_alloc_noprof+0x1f7/0x6f0
+ sk_prot_alloc+0x59/0x210
+ sk_alloc+0x34/0x470
+ unix_create1+0x86/0x8a0
+ unix_create+0xd4/0x2d0
+ __sock_create+0x243/0x5a0
+ __sys_socket+0x119/0x1d0
+ __x64_sys_socket+0x72/0xd0
+ do_syscall_64+0x6b/0x3a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-
-Mark, can you please pull this one.
-
-
-Regards,
-
-Venkat.
+Freed by task 1941:
+ kasan_save_stack+0x30/0x50
+ kasan_save_track+0x14/0x30
+ kasan_save_free_info+0x3b/0x70
+ __kasan_slab_free+0x47/0x70
+ kmem_cache_free+0x12c/0x5d0
+ __sk_destruct+0x432/0x6e0
+ unix_release_sock+0x9b3/0xf60
+ unix_release_sock+0x99f/0xf60
+ unix_release+0x8a/0xf0
+ __sock_release+0xb0/0x270
+ sock_close+0x18/0x20
+ __fput+0x36e/0xac0
+ fput_close_sync+0xe5/0x1a0
+ __x64_sys_close+0x7d/0xd0
+ do_syscall_64+0x6b/0x3a0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
 
