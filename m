@@ -1,114 +1,126 @@
-Return-Path: <netdev+bounces-256075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256076-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7oAiK/hTgWngFgMAu9opvQ
-	(envelope-from <netdev+bounces-256075-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:48:40 +0100
+	id UJt7OVRUgWngFgMAu9opvQ
+	(envelope-from <netdev+bounces-256076-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:50:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01201D3783
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:48:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938E0D379D
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32038301410F
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 01:48:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 123B430059A1
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 01:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63E322157E;
-	Tue,  3 Feb 2026 01:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84E922E3E7;
+	Tue,  3 Feb 2026 01:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVJ6iT5t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPg6ayN1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FBD28690;
-	Tue,  3 Feb 2026 01:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C544017BA2
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 01:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770083315; cv=none; b=MfpkrSVDoI8867f8kTwH5b4JO60aVGUOk7wDAP56D4WFEeu09QCDqbMqhgsxqY3MP/SoS5uj842PeZOWC39V5g92o+Jcft2RIlC9x0Uo68iqhD6Vq0ncEv+EOn5dyvQrZIPqDgRJ9vAIvvrpadaYoLvWrBlnWqujHA+pVA6GHVs=
+	t=1770083410; cv=none; b=XHPC8NWtGRGGlFfUC+fPOBpm+/9vPnrprwCIAj2eNA1Xf5RQ2/Wsmzea1DKb+b9lT/yOXesNJkERcCyHTJzBpkDIfRpJHVlmq5E3E22F0b+Y4MNFGji8IdSiBPpkDv8KForc8RqJv7e15lvDcrRLdgcz+oVW0lWUYV5B49vAy64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770083315; c=relaxed/simple;
-	bh=9lzm8SI5baCzlelXKFMWtlw5t0GVxqCRKrOPDGdPFSw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tZ4VSO5R8OBtRbPeHervL4YDqybhjsgA8qqLUWi7kFJiJZ0lUKieVfdq+I/n91cqFIdiHuLkcidrtGOG9PZkwwnOHE2clQnci/QRBS3qUT8ctVwkDXREXQbYNbhmJYZndxoQ/BIdk+ALNulNTXN4I4HhSc6+ers6tNssa517i34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVJ6iT5t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB26CC116C6;
-	Tue,  3 Feb 2026 01:48:34 +0000 (UTC)
+	s=arc-20240116; t=1770083410; c=relaxed/simple;
+	bh=HKaer171I00u6sUib+I72oOcGjhfhP4gdkPr+Q3wVFc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NHX0CIkF16ddeUDvZYLlt5NaxlWVNucTzWqk8C1zpRDlvHHaxK75dkjokMrRl1EBOUv0Ru3gg8IxpGxDzVk+fevLOfqfEDG8TWcR1CYsPjmfwDPZmPmo0uo3UWwCmvYdttmggFiiB4Vw+eAm7K+qGA/e405YlJqjNajtWuQNfI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPg6ayN1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F563C19422;
+	Tue,  3 Feb 2026 01:50:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770083315;
-	bh=9lzm8SI5baCzlelXKFMWtlw5t0GVxqCRKrOPDGdPFSw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pVJ6iT5te8A2jWaV7UIiNClb3Sdrtbju0KzzxJe+aPoIszTbl4/ugZd0Ds8PhVnXw
-	 qUebo9tifhYidps/b/G/nmqyrchIPWkCSHTbycnBDXFQmujBC7IkQro5ok64N+zxpS
-	 wWXtmdoD0BrQ9sfvNjele/1J61gA4i88hLkjap4U5q+nX9u1j6fSv04Absiy1/uEri
-	 WAPid4VDynvaOmTJHWvnKfT1r/40iutw7+M9LAsasVLQwpWB943T931WAWW9sKHSFH
-	 rwafdAcjkq+5Gc3arvWAh3OzeFApxA3W0BuVjTFOOVRBWweFsVMk5La1inYIMyG5GV
-	 HoAYn7T11g69w==
-Date: Mon, 2 Feb 2026 17:48:33 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Hodges <hodgesd@meta.com>
-Cc: Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Ying Xue <ying.xue@windreiver.com>, Tuong Lien
- <tuong.t.lien@dektech.com.au>, <netdev@vger.kernel.org>,
- <tipc-discussion@lists.sourceforge.net>, <linux-kernel@vger.kernel.org>,
- <stable@vger.kernel.org>
-Subject: Re: [PATCH] tipc: fix RCU dereference race in tipc_aead_users_dec()
-Message-ID: <20260202174833.3e0ea821@kernel.org>
-In-Reply-To: <20260201022128.2658251-1-hodgesd@meta.com>
-References: <20260201022128.2658251-1-hodgesd@meta.com>
+	s=k20201202; t=1770083410;
+	bh=HKaer171I00u6sUib+I72oOcGjhfhP4gdkPr+Q3wVFc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pPg6ayN1a0r6LcMD/kJNiWzlDDfCiyfcaQM4deYf/mtZsxVc/DwjxA3PTDr74Ia2J
+	 6BNKSd4xFc2lYWF7KbSGC7H0hnC5FeHoJdGY1F5AQr5/BEBfVN3/nQf7POIPPDICCd
+	 eMPVfMeLCShix11XZDuN+AETydMR+hzFMC2my3sXTLQ7/jIGV2MtiG13v9+loWDASu
+	 G/l8eQ3oSD7JOgF94qZTDyyjWforBf2CAgANpdGIvu1uHVBZ+EDAM2y0jKiGvhrL+M
+	 B3aNx/eWDrsy0v9e0Lree44HGssjVqnmHXuPrhnMrBFkIMyQmUZIdgCzJXQadG1R+J
+	 3LP9GGduPH66w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 53EBA3808200;
+	Tue,  3 Feb 2026 01:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: add a debug check in __skb_push()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177008340713.1270041.12769755810847858576.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Feb 2026 01:50:07 +0000
+References: <20260130160253.2936789-1-edumazet@google.com>
+In-Reply-To: <20260130160253.2936789-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256075-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-256076-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
-X-Rspamd-Queue-Id: 01201D3783
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 938E0D379D
 X-Rspamd-Action: no action
 
-On Sat, 31 Jan 2026 18:21:28 -0800 Daniel Hodges wrote:
-> tipc_aead_users_dec() calls rcu_dereference(aead) twice: once to store
-> in 'tmp' for the NULL check, and again inside the atomic_add_unless()
-> call.
-> 
-> Use the already-dereferenced 'tmp' pointer consistently, matching the
-> correct pattern used in tipc_aead_users_inc() and tipc_aead_users_set().
-> 
-> Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
-> Cc: stable@vger.kernel.org
-> 
-> Signed-off-by: Daniel Hodges <hodgesd@meta.com>
+Hello:
 
-Somehow this didn't reach patchwork, please resend, and while you do
-that please remove the empty line between cc stable and you sob.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 30 Jan 2026 16:02:53 +0000 you wrote:
+> Add the following check, to detect bugs sooner for CONFIG_DEBUG_NET=y
+> builds.
+> 
+> 	DEBUG_NET_WARN_ON_ONCE(skb->data < skb->head);
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: add a debug check in __skb_push()
+    https://git.kernel.org/netdev/net-next/c/dc9fd14bd759
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
