@@ -1,133 +1,149 @@
-Return-Path: <netdev+bounces-256413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDnFGhY5gmmVQgMAu9opvQ
-	(envelope-from <netdev+bounces-256413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:06:14 +0100
+	id 6Bi9FE06gmmVQgMAu9opvQ
+	(envelope-from <netdev+bounces-256414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:11:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D53DEDD4EC
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:06:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC2BDD5DF
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 88270304AACB
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:03:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0977301E3C7
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2803231B10F;
-	Tue,  3 Feb 2026 18:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D239350D4F;
+	Tue,  3 Feb 2026 18:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OZ2GGA42"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BDUPmSHt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058381FE47C;
-	Tue,  3 Feb 2026 18:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A131C84A2
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 18:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770141802; cv=none; b=HnoRXn3poPihQSkHXpMoyDG6M5zqXeXoOHIqHQcuT6ZTRpYQ+ROeaM86SAcdzns1pFYdLxSdlo8W36viu8RPKwWCRbhv0FPTvSYb2IjVRC6vmF+wYvVDboH8MwxpW6P2m+PhNghkaweil8m2nm3VTs4zj8hCc1rn0qADazLhE9k=
+	t=1770142177; cv=none; b=CR1lJILNZxAICTmOIQO4Ylxl+MvdCqLXOY+6hsg9lBns4ls9okX1yo56sWwzXeE9T8V7O4UJTc08uXN6GL8b4Nyw5uL9b7IWZUByLHTgck/xSYwIw7N/D9GaBQLXlwH+FddKQZTLC9MBPIHmp5VslHo/vwxONIK2agMTk7OjQZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770141802; c=relaxed/simple;
-	bh=lKUiG9KG9h4PIORt17H2RiJFXIGKD5PuZeu/zCe3rG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KO38SSKmFZ4/58s/oqMS+afF0xwSizm5hQi8LStQDBQABRv4o/zHha7G5S9Dn7zsit2yTVU3db7zQaJdDnyT7Xh4IPsPp/mmSohCQyuzyd0JeXSMOHMLIwhCHjKzPYz7IlXAaxuL60zaSz//GLpiIWuF9WhnK9HfphrrCi+PmjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OZ2GGA42; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2822FC116D0;
-	Tue,  3 Feb 2026 18:03:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770141801;
-	bh=lKUiG9KG9h4PIORt17H2RiJFXIGKD5PuZeu/zCe3rG0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OZ2GGA42PKOXFhtdiPTf4Q6HAotpprhl8kp10LtZ7k18w2pfLSKiBAAXnYSnZE4Jq
-	 jxnsomp1m+Ivzm++6ddhUbC/b5l9rNMZnIZPpPzflCmC/QB3diKaW5HUqvYNv85e0r
-	 04wUqhKOuWVCqWlk55gm7CInCzBoz5RJUJxPitcaJAbVmPKkZckVKa7Z01NcwMpSCM
-	 xfG84T/cJKwg3DRTT2KzG+j+Nh6KxjLDfgfrNoyr0tLbeVBJWEqudgmAwRFNYGr2V2
-	 WVRwUR6mS4TgK+6L9GrEzGPgFIBi9SifaQ1OYWRzCZr0T9ELRzueLrLDtL553z2nLP
-	 BCQYj6m0t6YEQ==
-From: Simon Horman <horms@kernel.org>
-To: maxime.chevallier@bootlin.com
-Cc: Simon Horman <horms@kernel.org>,
-	davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	edumazet@google.com,
-	o.rempel@pengutronix.de,
-	andrew@lunn.ch,
-	christophe.leroy@csgroup.eu,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	thomas.petazzoni@bootlin.com,
-	nicveronese@gmail.com,
-	kory.maincent@bootlin.com,
-	mwojtas@chromium.org,
-	daniel@makrotopia.org,
-	dimitri.fedrau@liebherr.com,
-	herve.codina@bootlin.com,
-	linux@armlinux.org.uk,
-	vladimir.oltean@nxp.com,
-	kabel@kernel.org,
-	romain.gantois@bootlin.com,
-	f.fainelli@gmail.com,
-	hkallweit1@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [net-next,v3,05/11] net: phy: Create SFP phy_port before registering usptream
-Date: Tue,  3 Feb 2026 18:03:11 +0000
-Message-ID: <20260203180311.2175469-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260201151249.642015-6-maxime.chevallier@bootlin.com>
-References: <20260201151249.642015-6-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1770142177; c=relaxed/simple;
+	bh=GaOJeKxxP/WpuIajStYc3OIVeEcfNxKCGLhqZ8ZN4UM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sv3PjsKCxCQ/FgkncOm1TcqZB2A5KC4KWl2/qNGhCZw/K2XIWkboJkHxSduXGufS4Q1+qyDQeAZ9tZdpQEP6yQ/I6ohe0ls1jhYnSOWzBioFzl6IdV+/1cypGN5w2uaGJEZFv3O1cfxGTl0LGg51JeWozvAJ2PLEcnhHyzwzw9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BDUPmSHt; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id BE1AC4E423E4;
+	Tue,  3 Feb 2026 18:09:34 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 79C4E60728;
+	Tue,  3 Feb 2026 18:09:34 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B66A8119A8888;
+	Tue,  3 Feb 2026 19:09:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1770142173; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=O62isuvLKNo91bhpciiMqvou6yopkPFDMX5oCBp2AOw=;
+	b=BDUPmSHtuUq2bGYeKax3QUBnvdHV42iUDt1R/zkMlUJVAH/h7PIF0dsOZWyxMs43flF8+h
+	N2nV023ZH0kc/e6i4z7dQNN67aWyBEIcHTTD7Y9/zmBNtiQWEH872U3E0QBEEFjQbcK+e9
+	sVaiIQw2NoUAOri8mYdcqm23SJj8daLcoRlcug9x/Dn7sL01Vs4xOwQdmpFGBF0/W1B+Hb
+	cuoAb0JQchyg7FkIFnMgEdvn8ga8FcRLa5L3TLyT2IvyWMaL+lUv4CGasQGgvPlozHfy7e
+	if4pL02AIWEiLaWmiJqK+Vg6NFIe5Ygw2VA26xNqQHxfjMYcLpc2NO+dC9C6ig==
+Message-ID: <7150d811-df6a-488d-a7d8-96aec01365db@bootlin.com>
+Date: Tue, 3 Feb 2026 19:09:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 05/11] net: phy: Create SFP phy_port before
+ registering usptream
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ mwojtas@chromium.org, Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
+ <20260201151249.642015-6-maxime.chevallier@bootlin.com>
+ <aYI1zd6Iddcdt6xc@horms.kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aYI1zd6Iddcdt6xc@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,vger.kernel.org,google.com,pengutronix.de,lunn.ch,csgroup.eu,redhat.com,bootlin.com,gmail.com,chromium.org,makrotopia.org,liebherr.com,armlinux.org.uk,nxp.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-256413-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256414-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D53DEDD4EC
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9FC2BDD5DF
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hi Simon,
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: phy: Create SFP phy_port before registering usptream
+On 03/02/2026 18:52, Simon Horman wrote:
 
-This commit moves the creation of the SFP phy_port to occur before
-registering the SFP upstream ops. This reordering allows passing
-the phy_port along with the upstream information to the SFP bus.
+>> -	if (!ret && phydev->sfp_bus)
+>> -		ret = phy_setup_sfp_port(phydev);
+>> +	ret = sfp_bus_add_upstream(bus, phydev, &sfp_phydev_ops);
+>> +	sfp_bus_put(bus);
+>> +
+>> +	if (ret && port) {
+> 
+> Hi Maxime,
+> 
+> If bus is NULL then port will not be set here.
 
-> net: phy: Create SFP phy_port before registering usptream
+Arg... I though smatch was running in the NIPA ingst-mdir script, but I
+was wrong :(
 
-This isn't a bug, but there's a typo in the subject line: "usptream"
-should be "upstream".
+I'll address that in V5 as the problme is still in V4, thank you for the
+report
+
+Maxime
+
+
+
 
