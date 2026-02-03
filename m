@@ -1,247 +1,192 @@
-Return-Path: <netdev+bounces-256272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256273-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SAu9DQvqgWkFMAMAu9opvQ
-	(envelope-from <netdev+bounces-256272-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:28:59 +0100
+	id 4FX2ClfqgWkFMAMAu9opvQ
+	(envelope-from <netdev+bounces-256273-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:30:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA45D902D
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:28:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 885DED9062
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B42C8309AB16
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:22:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2AD2313629F
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1422E33E37B;
-	Tue,  3 Feb 2026 12:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7163128D2;
+	Tue,  3 Feb 2026 12:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="JrhQbOej";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dGIm5J11"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fyiPcclb"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43DD33DEFC;
-	Tue,  3 Feb 2026 12:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB24433FE0C
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770121329; cv=none; b=vFWFUEbrvDMffKjMtkeasoNig89LvfYjPcfH6bxPC9zM/6GCaJHE8zQU03Dx7F+NzmkUIs9h5yRlyy0XA4AV7nBzOBRCfRYFjCbrJKLJXJXtVIVmsX0vFASky1O1pJ1pU/AFLlzWML94mkn+5ugYzZcW1OEWkUXCHksuko6QeTs=
+	t=1770121444; cv=none; b=DDNSr/kFHDgfVLz+76VOxhSdHvPWDm3CvtU6Ijxv9lgBZu0l/iBQd/aXHAtNY84DDppRVARVo2uub2oDTkscKplLrOB4/dcmhKGM/FpcMb7uJLaHmutcf8fwBJcFRUHCI642jsdZO31qKy+zTk0eo1ZH+1A7nuavagWYSnnHOy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770121329; c=relaxed/simple;
-	bh=8zD4Bvj2cpwqbR8C/vP8Ln3GAO7Ar/bTUXV87Og0liU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=V+v5c1o9mN2oSLjKiVrfUeCVaHjSCyaKtVuLp3AT/onyhQC2oClybhgppo5wwqXvJr4W+JJGljrju+aQ+f5+CHOMHJeBqdm9qEDTOpWnVjZ1SUdPLdF3LDT6iVgS8MtHIXV9bVXuItI2zFWmi+wKwSTBgu4uciBwjZcCNVAnw08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=JrhQbOej; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dGIm5J11; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id EA03E7A0064;
-	Tue,  3 Feb 2026 07:22:03 -0500 (EST)
-Received: from phl-imap-13 ([10.202.2.103])
-  by phl-compute-10.internal (MEProxy); Tue, 03 Feb 2026 07:22:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1770121323;
-	 x=1770207723; bh=fGZzykM2xqfT9vl/Zx59SgBnmWMYXVx1CHV/AglyHZ4=; b=
-	JrhQbOejE5+fMnYu6SLm8h7S8Goh+iSbdbXzTulxVZ32EU6ve0X1WzGVGMD31hSR
-	LdcBqRyZJorqX353n/uVJzuW1GRokF3XtlH55Wxw6fw7/4rSe4fHZnomGF+TdfOT
-	VylrHsf1zIl/3SJK1nZ9Sf6cqACGo8GsF6DVfsMybg5jIVQu/0fGBoNPkJVlivzU
-	RFW08sdMpNNFhEcsdmZ/Qfg1T4SWcFQEFYS1lBFpo25JIKpDiTGcDBKceVRBQtMu
-	cWsHWQHHGytbYuwGskWZHUeH/345ho2Z5dXWTha0tKUofZj6k3vLR1ZMUEToIHpa
-	nc1PhXud/x0OVRWw19o5aA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770121323; x=
-	1770207723; bh=fGZzykM2xqfT9vl/Zx59SgBnmWMYXVx1CHV/AglyHZ4=; b=d
-	GIm5J11Mh0lHqbz/OTcezUxIwUPaYSJRdvMcBGBTL+R9cROnaSpohFsg+mpWQYpS
-	RjwrfGuDh3re5BEEl8tW4DNJRKeXpjCp+f8dYfD7g4t4IcsOpPNfiOgByFcURqE2
-	m1OJBXDDcEqbgHWMy+LH+qU+EI35Y2hAPtBuQp1HdCOdBYxNmmmtQcjgYujuBhQ5
-	EyGLWZEv1Bnn8BNNFHmwkUAZritTJ7ZGWFxRjZmRX79z5noMHtzqvFgTEf19RrJA
-	BRdttz0Zhk5oDsrv5hQBjjL0V8oRKt5Tugens6Cq7vdm7EPh/MLqr+e8y6T0xuYp
-	ZlYeOi/FswV77GDyvJv3g==
-X-ME-Sender: <xms:a-iBaZtWCyOrbRf_y-KxZWVYUwdyyBxKPNB_iKZw1OEVbfEUhsQnWw>
-    <xme:a-iBadT1FTipIQZio5fv-TqruRosSAF5-2pjwbBWwMQqhSVHdK2cfcIydjKzkou4P
-    dVMCkAif6TJDKnklxKgQUTDg6p-KxRM6WUQ1ZdByPrC_wySRE3JpzMh>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukedttdeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
-    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgesfhgrshhtmhgrihhlrdhimheqne
-    cuggftrfgrthhtvghrnhepleevgfefgefgtdfftdeggeeufeekteeigeelffffgeetfeev
-    ueevgfdvkeethfehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhitggvsehfrghsthhm
-    rghilhdrihhmpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrlhgv
-    gigrnhguvghrughuhigtkhesfhgsrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsg
-    hruhhijhhnrdhkvghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlvghonheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:a-iBaQUNXgEChcQqhGjXpdYYKFwQLGmM1mmJpVYq6FwycRURHMsBkQ>
-    <xmx:a-iBaci_UG9bbRVZPZUJ8WzJlYijNV5cmHiNAqstZIdwxMLLSLp6VA>
-    <xmx:a-iBablhtUMINjc_uz-lyQCveVhtjFZBoTMbTeH9PMZm_YADhvQB8A>
-    <xmx:a-iBaVwvdmOkuYgG8lN0UOMtto1Rxe_4XK_TzhDuXMI9S-H20Ny86g>
-    <xmx:a-iBac1F2kgIIRN6cgA4go3Sif-p_9wyBkGbhiMLC7tigncveTfgSdHV>
-Feedback-ID: ice914951:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 0AE8433E009A; Tue,  3 Feb 2026 07:22:03 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1770121444; c=relaxed/simple;
+	bh=JmC3o7t+ZDZfPLPPdFtV+BoPLkKHQN8OC4Lcvdj+DqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oMQitA1MpcJVN/sTCwy/eMo4Z5ocUeHMGh9QqnhgPLLUQ6bGZckehd+CVgXovXPRrR873Hm/WMMJMIkvG63j8tgeQk0pX59SzcNHoNUXjNkIA4B3ayfA3NzwccDzttOqVrIOKsTyTRu2uqweboJbFypNDqd604qEMxZPieRdjRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fyiPcclb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770121441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nydlJhhd54DuyndBF+Yma/53jn9dbImQ+yXAYDAQ1wM=;
+	b=fyiPcclbEE3FBehmnM9y8S16piLLMjZlpHZM+Suea1dlYPdbzVFY+/ASHkNrtl+9SdEL9b
+	v9VYMnrxZD0+p78Jqw22WnpgqUNrAlpe4NULlUuz3o8HW0ZemoeGuyc3qKFQ7/f+gkg8SC
+	9pEFhk+lI7pd0lwKO9QXtPkhKRtOFoI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-GP5TsYLONsC-QScNlYLNQQ-1; Tue,
+ 03 Feb 2026 07:23:58 -0500
+X-MC-Unique: GP5TsYLONsC-QScNlYLNQQ-1
+X-Mimecast-MFC-AGG-ID: GP5TsYLONsC-QScNlYLNQQ_1770121437
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA1C618002C8;
+	Tue,  3 Feb 2026 12:23:56 +0000 (UTC)
+Received: from thinkpad (unknown [10.44.34.184])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3AB33180009E;
+	Tue,  3 Feb 2026 12:23:53 +0000 (UTC)
+Date: Tue, 3 Feb 2026 13:23:50 +0100
+From: Felix Maurer <fmaurer@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
+	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net
+Subject: Re: [PATCH net-next v2 1/9] selftests: hsr: Add ping test for PRP
+Message-ID: <aYHo1uEK2e8Vg4WM@thinkpad>
+References: <cover.1769093335.git.fmaurer@redhat.com>
+ <b54f9225ae39d0d4bd9c8c1b0b98fe47fb7211eb.1769093335.git.fmaurer@redhat.com>
+ <20260129110500.l2jOMEYp@linutronix.de>
+ <aXthMlr6Hpas1LBt@thinkpad>
+ <20260129152149.dKwN1yGM@linutronix.de>
+ <aXucj8L-cBUVIYHX@thinkpad>
+ <aYCPsDZeJvCrJYRH@thinkpad>
+ <20260202155510.C1zpsxnk@linutronix.de>
+ <aYHJ9KHdiBEGfjwA@thinkpad>
+ <20260203115526._PRE3nvY@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A1L92F6ESprk
-Date: Tue, 03 Feb 2026 14:20:16 +0200
-From: "Alice Mikityanska" <alice@fastmail.im>
-To: "Gal Pressman" <gal@nvidia.com>,
- "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>
-Cc: "Igor Russkikh" <irusskikh@marvell.com>,
- "Boris Pismenny" <borisp@nvidia.com>, "Saeed Mahameed" <saeedm@nvidia.com>,
- "Leon Romanovsky" <leon@kernel.org>, "Tariq Toukan" <tariqt@nvidia.com>,
- "Mark Bloch" <mbloch@nvidia.com>, "David Ahern" <dsahern@kernel.org>,
- "Simon Horman" <horms@kernel.org>, "Alexander Duyck" <alexanderduyck@fb.com>,
- linux-rdma@vger.kernel.org, "Dragos Tatulea" <dtatulea@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org
-Message-Id: <fb617b34-7760-4e3f-903f-c7380d28ed40@app.fastmail.com>
-In-Reply-To: <willemdebruijn.kernel.218d53621fba7@gmail.com>
-References: <20260125121649.778086-1-gal@nvidia.com>
- <20260125121649.778086-2-gal@nvidia.com>
- <willemdebruijn.kernel.218d53621fba7@gmail.com>
-Subject: Re: [PATCH net-next 1/3] udp: gso: Use single MSS length in UDP header for
- GSO_PARTIAL
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260203115526._PRE3nvY@linutronix.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[nvidia.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-256273-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-256272-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice@fastmail.im,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,fastmail.im:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,app.fastmail.com:mid]
-X-Rspamd-Queue-Id: 8EA45D902D
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 885DED9062
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026, at 19:53, Willem de Bruijn wrote:
-> Gal Pressman wrote:
->> In GSO_PARTIAL segmentation, set the UDP length field to the single
->> segment size (gso_size + UDP header) instead of the large MSS size.
->> This provides hardware with a template length value for final
->> segmentation, similar to how tunnel GSO_PARTIAL handles outer headers
->> in UDP tunnels.
->> 
->> This will remove the need to manually adjust the UDP header length in
->> the drivers, as can be seen in subsequent patches.
->> 
->> This was suggested by Alex in 2018:
->> https://lore.kernel.org/netdev/CAKgT0UcdnUWgr3KQ=RnLKigokkiUuYefmL-ePpDvJOBNpKScFA@mail.gmail.com/
->> 
->> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
->> Signed-off-by: Gal Pressman <gal@nvidia.com>
+On Tue, Feb 03, 2026 at 12:55:26PM +0100, Sebastian Andrzej Siewior wrote:
+> On 2026-02-03 11:12:36 [+0100], Felix Maurer wrote:
+> > On Mon, Feb 02, 2026 at 04:55:10PM +0100, Sebastian Andrzej Siewior wrote:
+> > > On 2026-02-02 12:51:12 [+0100], Felix Maurer wrote:
+> > > > > Hm, I am not sure? For PRP, it's an explicit requirement to use the same
+> > > > > MAC addresses for both ports. For HSR, I think the standard is less
+> > > > > clear about the MAC addresses. And at least our code seems to assume
+> > > > > that there could be different MACs on the two interfaces of a node? But
+> > > > > yes, the node merging addresses this.
+> > > >
+> > > > I'm still not 100% certain, but I agree that the standard reads more
+> > > > like the MAC addresses should be the same for the two HSR ports. At the
+> > > > moment, the kernel and the test assumes that they can/should be
+> > > > different. Therefore, I think we should fix this across the board in
+> > > > another patchset if we agree that's the right thing to do.
+> > >
+> > > I would suggest to do so. This could serve as bad example and my PTP
+> > > userland patches expect the same MAC on both ports. So ;)
+> >
+> > I'll put it on my list for another patchset :)
+> > But this of course brings up how the MAC addresses should be handled on
+> > the HSR interfaces in general. At the moment, for HSR we copy the MAC of
+> > portA to master. For PRP, the MAC of portA is copied to master and
+> > portB.
+> >
+> > If the MACs should be the same for both ports of an HSR interface,
+> > should we set them when creating the HSR interface, similarly to PRP?
+> We do this?
+
+We didn't always do this, but since b65999e7238e ("net: hsr: sync hw
+addr of slave2 according to slave1 hw addr on PRP"), we are doing this
+for PRP.
+
+> > And does it make sense to copy from portA (feels somewhat arbitrary to
+> > me) or would it be cleaner to copy from master to portA and portB?
 >
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> I do
+> | ip link set $portA down
+> | ip link set $portB down
+> | ip link set dev $portA address $mac
+> | ip link set dev $portB address $mac
+> | ip link add name $if type hsr slave1 $portA slave2 $portB supervision 45 version 1
 >
-> This only affects the udp header value when using GSO_PARTIAL, and
-> these are the only two drivers that adversize USO using GSO_PARTIAL.
+> and then up, up, up to get up the three interfaces functional. $mac is
+> the MAC $portA.
+>
+> On the other hand it shouldn't matter because while adding the HSR tag,
+> the MAC of the hsr interface should be taken but somehow I observed that
+> packets, which originate on the $portB interface have the MAC address of
+> this interface. So I did this and forgot about it later…
+> But then hardware offloading might behave different if it considers the
+> address of the interface so it might required to set the MAC address.
+>
+> I am uncertain what the best practice would be here.
+> Forcing the MAC of portA to portB could be done at setup phase by the
+> stack but would require that the interface is down…
 
-I stumbled upon this patch when I was rebasing my stuff and saw a
-(trivial) conflict. I've got a couple of questions on this change, and
-I'd be glad if you could clarify it for me.
+I think that's a pretty common series of setup steps, yes. But as even
+we are not sure how the MAC addresses should be set, I think we should
+not expect that users will configure this correctly, but do the right
+thing(tm) automatically.
 
->> ---
->>  net/ipv4/udp_offload.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->> 
->> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
->> index 19d0b5b09ffa..89e0b48b60ae 100644
->> --- a/net/ipv4/udp_offload.c
->> +++ b/net/ipv4/udp_offload.c
->> @@ -483,11 +483,11 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->>  	struct sock *sk = gso_skb->sk;
->>  	unsigned int sum_truesize = 0;
->>  	struct sk_buff *segs, *seg;
->> +	__be16 newlen, msslen;
->>  	struct udphdr *uh;
->>  	unsigned int mss;
->>  	bool copy_dtor;
->>  	__sum16 check;
->> -	__be16 newlen;
->>  	int ret = 0;
->>  
->>  	mss = skb_shinfo(gso_skb)->gso_size;
->> @@ -555,6 +555,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->>  		return segs;
->>  	}
->>  
->> +	msslen = htons(sizeof(*uh) + mss);
->> +
->>  	/* GSO partial and frag_list segmentation only requires splitting
->>  	 * the frame into an MSS multiple and possibly a remainder, both
->>  	 * cases return a GSO skb. So update the mss now.
+But like you, I'm uncertain what would be the right thing to do and
+which port should control the MAC for all the others.
 
-What about the frag_list case? The comment says it would be a GSO SKB
-too (as I understand frag_list, it would be a linked list of SKBs
-forming one single packet). Is it appropriate to set UDP len = MSS in
-this case too? I'm not sure which code reads UDP len afterwards, I
-couldn't find any, so maybe its value doesn't matter at all (except for
-hardware, which this patch aims for).
+Thanks,
+   Felix
 
-Is it possible that this GSO_PARTIAL or frag_list packet shows up in
-tcpdump with UDP len set like this? E.g., if the GSO_PARTIAL
-segmentation happens before entering a veth pipe, and tcpdump listens on
-the other end? If so, tcpdump could fail to parse such a packet.
-
-I haven't tried to reproduce any of these yet; I decided to ask first
-because you have more context. I'll appreciate if you can give me a clue
-whether my concerns are valid or not.
-
-Other than that, I think the patch could be made simpler, if you just
-drop mss *= gso_segs below, and stick to newlen, which would be equal to
-msslen (now unneeded), and newlen and mss are not used anywhere else.
-I'll include this simplification in my next series, if you don't mind.
-
->> @@ -584,7 +586,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->>  		if (!seg->next)
->>  			break;
->>  
->> -		uh->len = newlen;
->> +		uh->len = msslen;
->>  		uh->check = check;
->>  
->>  		if (seg->ip_summed == CHECKSUM_PARTIAL)
->> -- 
->> 2.40.1
->>
 
