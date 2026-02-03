@@ -1,122 +1,126 @@
-Return-Path: <netdev+bounces-256243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wL/hOSPNgWl1JwMAu9opvQ
-	(envelope-from <netdev+bounces-256243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:25:39 +0100
+	id kHQcL7zOgWl1JwMAu9opvQ
+	(envelope-from <netdev+bounces-256244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:32:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C3ED78F3
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:25:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A78D7B62
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9AE6B3028506
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 10:25:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3809C3008D12
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 10:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36AC318BAE;
-	Tue,  3 Feb 2026 10:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A6F317709;
+	Tue,  3 Feb 2026 10:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F24AhbSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFA9318BBF;
-	Tue,  3 Feb 2026 10:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7055C3161B3
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 10:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770114334; cv=none; b=J2zxnPf+8CcLVwCJ5wmo7mlHN7TT7jx8OaGrRaF1HzespjgiHUwPqjw1pIWZUgoq5dBe8rvkcfeIHcTY4rK8NQ+PDIlD/+hpq+7xMCi9DdynM9thzdCZl+Y012QsZ6P8PQLXvSVM3gXdn6/5IAj0BJ8VcrAA0nGLALDJVegXPUI=
+	t=1770114554; cv=none; b=HnIh/GO8T3/HJ1Q28fQnBrgGmA/sZ5nG/siAHRinsXpzkopu+4JARcrJBfh9jPrdDdXSOZQ5ILc1bsBlpxka8WmhrGIhJ/CFjhYBoQYqfSRRK66BPI0AP91FW0gUS6dg+Ha5FyORV5msUed+h5XAR4TummFWzWKc03jOIRYwro8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770114334; c=relaxed/simple;
-	bh=nMGX7xeEQFNhbtXWP5GAYHCvliIXmhjiDA4x3qTC8M4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BcYr1RpE7YPWW00Q+dD5sjtQnyKuVZGSn1/Sw8YF03EMQMJe+vDLD65CGQxuz2H6H2Gy6zkt6CUwXdqzxO9YvfbANgzxfBz84k1IHrVAagtR9O7clGlIHmWb2E2NzZmljZZuHDyi5ZeW4Uc1UWMGkC/ovvENacY+QAkLRE8INkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [10.213.18.154] (unknown [210.73.43.101])
-	by APP-01 (Coremail) with SMTP id qwCowADnjmoKzYFpPVoSBw--.2286S2;
-	Tue, 03 Feb 2026 18:25:15 +0800 (CST)
-Message-ID: <140cb690-caa2-4c94-8b4a-75c0d89e2056@iscas.ac.cn>
-Date: Tue, 3 Feb 2026 18:25:14 +0800
+	s=arc-20240116; t=1770114554; c=relaxed/simple;
+	bh=Q+5e9H+HdmW0C0So/yqRSBMoljj7hMcdRxROk+ueplk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fm5QrT38LAUJ82a2f8IIqCf9k0oX0Uw/rWDnLjyPfMc1+qXurMrXmj4IC7/AYLV6V+g4PCOiro0besKnE7ulsc/eQ/lFqmfa4weyRxccl5ZFTkof5I0IF2lkO4V+jfMXW2o8RVJy7ORlSmSShhp3HetsReA+7aljPrujz7iGn0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F24AhbSM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244F1C2BC9E
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 10:29:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770114554;
+	bh=Q+5e9H+HdmW0C0So/yqRSBMoljj7hMcdRxROk+ueplk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=F24AhbSMXSb+bs5HlaRJRtIJQT1DGvnTYTfhcTFseQfrK4Q0qMpeH0KON7R/fMVfm
+	 33d3Bd18TTQthQRyMN/3UDCNJnwugN88QNmNQ5mjltGhVETesETnW+z5Fh1WzhE7uR
+	 dX/zJEw4oZ/G9QFaWzOIbihL1YHrA+eNxzCTJB50t6iykO0z0j8uqK3c7lN6mzRbKo
+	 wSC5ANYviuovTedHoBLnJ4CqLCFxnCw019wmPfteEa8x2IszmNTqyAk2bGYTugYJIY
+	 xr7cO3AvLz1ibsiDYxS7A15S8Iq2anTJqoMA4ytPuzFCQicUHyc9QBHfMQ3sKCDpre
+	 L0bDGRfMsBJvg==
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-382fceabddfso42334301fa.1
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 02:29:14 -0800 (PST)
+X-Gm-Message-State: AOJu0YyTVIewIyR1dTHjuLsoFs5sUg7LYnaNNlabcR6rQRWZjkJ/p+Qc
+	5oh7w37BhRQcKtlk34Y0Nu7dUI/px8P7xx7o4XhEw8XhbZcewkZiMDphJKJ1cKLsgTB1nAuUlnB
+	BCp3ktN0FVsfG+XOc8QTmCAJp+CCg/BLCbgwOW5A9jg==
+X-Received: by 2002:a2e:bc07:0:b0:383:1b75:b9bf with SMTP id
+ 38308e7fff4ca-3864664349fmr58136261fa.28.1770114552731; Tue, 03 Feb 2026
+ 02:29:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: spacemit: k1-emac: fix jumbo frame support:
- manual merge
-To: Matthieu Baerts <matttbe@kernel.org>, Tomas Hlavacek
- <tmshlvck@gmail.com>, netdev@vger.kernel.org
-Cc: linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dlan@kernel.org, stable@vger.kernel.org,
- Mark Brown <broonie@kernel.org>
-References: <20260130102301.477514-1-tmshlvck@gmail.com>
- <4819ec3b-23b4-447b-b10b-0bd93a40dc5a@kernel.org>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <4819ec3b-23b4-447b-b10b-0bd93a40dc5a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qwCowADnjmoKzYFpPVoSBw--.2286S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYh7k0a2IF6F4UM7kC6x804xWl14x267AK
-	xVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGw
-	A2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26r4j
-	6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gc
-	CE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxI
-	r21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87
-	Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7Cj
-	xVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I
-	8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AK
-	xVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcV
-	AFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8I
-	cIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r
-	4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcoqcUUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+References: <20260202214634.72738-1-rosenp@gmail.com>
+In-Reply-To: <20260202214634.72738-1-rosenp@gmail.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Tue, 3 Feb 2026 11:28:59 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MfwuhrUZiFp5v0EjbMJw0fYZTfznqPN_6yuMWxnD4ircQ@mail.gmail.com>
+X-Gm-Features: AZwV_QgLNfV5BZ3zJuOTz-WNprPtSMlLj8pGW6PWOOP1hYOcMu-o4WnUPVCBQ6c
+Message-ID: <CAMRc=MfwuhrUZiFp5v0EjbMJw0fYZTfznqPN_6yuMWxnD4ircQ@mail.gmail.com>
+Subject: Re: [PATCH net 1/3] Revert "net: ag71xx: use devm for register_netdev"
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Chris Snook <chris.snook@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Russell King <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256243-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-256244-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 49C3ED78F3
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 34A78D7B62
 X-Rspamd-Action: no action
 
-Hi Matthieu and Mark,
-
-On 2/3/26 17:39, Matthieu Baerts wrote:
-> [...]
+On Mon, Feb 2, 2026 at 10:48=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wrot=
+e:
 >
-> The conflict has been resolved on our side [1] and the resolution we
-> suggest is attached to this email. Please report any issues linked to
-> this conflict resolution as it might be used by others. If you worked on
-> the mentioned patches, don't hesitate to ACK this conflict resolution.
-> ---------------------------
+> This reverts commit cc20a4791641a1cbd1525695fac0d4725dd72509.
+>
+> register_netdev gets called after phylink_create which has no devm
+> equivalent. phylink_destroy must be called after unregister_netdev and
+> not before.
+>
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
 
-Your merge is correct. Thanks for handling it.
+Can we just use devm_add_action_or_reset() with a callback calling
+phylink_destroy()? It will surely make error handling in probe easier
+and avoid mixing devm and non-managed APIs.
 
-Vivian "dramforever" Wang
-
+Bart
 
