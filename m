@@ -1,65 +1,94 @@
-Return-Path: <netdev+bounces-256153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIvNHgCQgWl/HAMAu9opvQ
-	(envelope-from <netdev+bounces-256153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:04:48 +0100
+	id IO50BO6PgWl/HAMAu9opvQ
+	(envelope-from <netdev+bounces-256154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:04:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2649D4F4E
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:04:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97CDD4F47
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A09C530BF10C
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 05:57:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CFF9A300682F
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 06:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A7036B079;
-	Tue,  3 Feb 2026 05:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A0B36A016;
+	Tue,  3 Feb 2026 06:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESfkPzjv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrQD9smM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4413636829D;
-	Tue,  3 Feb 2026 05:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FC92581
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 06:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770098254; cv=none; b=my/PNRLNAdyCb1vO0ulssGnuQxSc50v2j0uXn5li8tKYOROhjUYWOsaX/LqYvPtG+KCRfr75nWFpVyhELlKB97XjX7G89D8De141IvcdVp57igB7/aJ97MM0TU9GyMblo7UALR5SA/LU5H4+f+4scepjUmxJz/9X7WnE57WlVVY=
+	t=1770098666; cv=none; b=WymwvfY3Ryy1PzXwgvWd2qMx7Fl00pGyG5fon/OwV+ipr4h86upfpaIO6euNPQG8qynuFfamoGIjwkFwd4DoOgl70xtzmrR9aJeQoFZk96de8JBcrNMT9Jx6NeDp4f83kdeDF1Rq49fZIjbjdzPpfBMnFkOAdk0Sd6pw5PriZps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770098254; c=relaxed/simple;
-	bh=Pw6rbe0mSEQN1eT1dTRfk7Y43v49X5iZZOrG8lWq0Ng=;
+	s=arc-20240116; t=1770098666; c=relaxed/simple;
+	bh=RsmIEw4p7De5N9dD7XSk/r0wfcaiLMq0HvvuGze0Ozo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JSC4lOiB/5qTFQKht+eMBVZ4Y1Gv3FfBUHE+Ia9hrtFPvH3wA+LigmQd/LbhmyxWnbUKXLellAS8bHjg7F4t8ymf8MzeEl6cqJsaejF3JdHHHLd8tF0w2RIbWWCC7ZSMTronNXeAqh9BAGwsx56dyAoCGIkeoB05cyDrwhT0OUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESfkPzjv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406A2C2BC86;
-	Tue,  3 Feb 2026 05:57:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770098253;
-	bh=Pw6rbe0mSEQN1eT1dTRfk7Y43v49X5iZZOrG8lWq0Ng=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ESfkPzjvG5Xd/+bzqBK8szu/k6h8AOleFvUCYhewNdqVYz6fKl18tlIRb2bsV34V3
-	 9bGbhwfxlEyhLs+b488caiJxtfBX/6CGh/JeOk5gxmXyc8WuPXFnLluquaw1j7FzA9
-	 Fcb8Z8bHjOkh3dna3k7JSK6c8+qOn/kDBWcsCIsr3d3kLttfojRwQxhN/ycQcwWsm6
-	 8uwZ/lleDMUvFd+QF/34EhGo4vzzunFWh9a5xBj136lth7XC3KUPTql4fk/vi84P7Z
-	 AzFMJsXJwuObUaNjTPbBl0cILiwUzNdBfaedq6V27RGjkV9W/0UFpWcNmT4YBFpU7v
-	 Xhq+t4mJVVZmw==
-From: Allison Henderson <achender@kernel.org>
+	 MIME-Version; b=L+VhGA+skZTgH7piKlqXqCcg8Rc6K48r+18Df7Kh+DhHGlQ6B8YSZdMN4xo8TxOrRInljQ0YV2Okx0zz0+31Vqd1IxLHSERjv9y93lbvsDz+2QvI0V24wfKR+Zm0jJ058HFoDUm8NDJ6kZky9S1brg3i4OHnw+dX5Ua6E5TdzIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrQD9smM; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-352f60d6c2fso3384581a91.1
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 22:04:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770098664; x=1770703464; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uH5PpPVjOvr4AWyQGZSO4TmeYvmDpJCxAxK2ZZbBypw=;
+        b=UrQD9smMUHcgOTb7p89F3/Zok097MVze3BE/2+2h5suPiXpF1Q9JCqFAVEeSLfwH8d
+         qPkGvTSXd3MZciui+JIAIZny9huKQ9KmYNe4rlTdPZne9sf6xulMNSfZoIWgiH3gTg+R
+         L4WrNryq56V4TCpnQPP7cD6NVMM1StZPfrPcJyArgkmxsKNLB5wlzu+YvklS/dvUCias
+         dbUfWcwLfAehh1d6hsK255CGF7dq1th68pQPyktAth2w+olFpyeSOAtb0M9lwjT5IiGo
+         3uFTG15AHn0vKf3Xny2gzsIoBIwlkw7KZf9Lyo2FFCLngFgkBp33fC1VS3cRF0j3wQl5
+         q3+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770098664; x=1770703464;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uH5PpPVjOvr4AWyQGZSO4TmeYvmDpJCxAxK2ZZbBypw=;
+        b=dgoBP68RlMykz8J72txdf5sXj4yqCsUCz9gvMZYO7pQIJEYpLLMXpaEuHaLeqLOhfM
+         cHRDtp7l50P1DNb1eHXlxGuoy8xSMEGjUk4HM7L28u1pDjwjd3h5OCzrufMDLXL5/V5r
+         nz1wVSp78dQV+HbRZg0hHmL57B762t1vbizUAQpfjsDh29sygvqG6YpdrU6xCumrEE7r
+         nDoqKX+XOU2ut3XN1dGgzdboiRg3gnnlhJeSRhWRleTTDDJbr0AwXnJnCK46DnjGAbYW
+         85YTspicpu90N9Rns7R4nTDJhs2rNZwnB6JogESfoaChC/O0nL/78RRHwlhp3+BgVeBo
+         eq1A==
+X-Gm-Message-State: AOJu0Yx8o2prTAUpNeedzo4s3Jdvt+o5OB+Eh0+Fu1YFcqBY5mtqipYg
+	GU/fPv+lOaxYCE9mnBITh+BnFq2uEZmY312yHBKJmH9ji77ye2vMocGJ25BU
+X-Gm-Gg: AZuq6aKW43kbXVnECcenLY/ryWciWF877RbS9vF7ewd1Dya6AkcRom1FBJdJ7Q4BVmq
+	ER1+zE8m+VUSqTK9M779LwLluY53fBoVVaaVFD+KHmUjBt6ESDqgBlTyAkhuvuD0EDQkatcNOW0
+	Gl8DeKsLbEC8ziLza7OMfM9jQPE+gpf3xxH8g57BH1L+9LIclZ4pRx4ZCf4VKgc6AW6u/Q7FajI
+	dyKk/RDhrbO6yPhDKczIVvueISvd8S5qZ6inkEz9LoHB2FX835lMvfTCSXWf/0XCwVSUDgfzuCf
+	mc3bpnxFcdQcpoYSmnKLDqDiJliKQuLBBK+ieMfL05qx9fIXjgumv+wXQGpbIL8m9+Jyl6i8n7n
+	rGb+ijzZh7O/7JN2ctJpsMBm/b10ZPCdFpJpyd2LbsLbXdvRAbb60zTQRvNAOv6y/gpGFkG3cqI
+	nnc5w+3dyFtQvRKEmD35ifZ2YiR/wzUMhL0g6empSc
+X-Received: by 2002:a17:90a:d88b:b0:353:38b3:dccf with SMTP id 98e67ed59e1d1-3543b3941fdmr14103998a91.23.1770098663814;
+        Mon, 02 Feb 2026 22:04:23 -0800 (PST)
+Received: from MURARI-LAPTOP.localdomain ([106.215.148.149])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35477763b81sm1431156a91.10.2026.02.02.22.04.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 22:04:23 -0800 (PST)
+From: Murari Prasad Samal <murariprasadsamal57@gmail.com>
 To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
-	rds-devel@oss.oracle.com,
 	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v5 8/8] net/rds: Trigger rds_send_ping() more than once
-Date: Mon,  2 Feb 2026 22:57:23 -0700
-Message-ID: <20260203055723.1085751-9-achender@kernel.org>
+	pabeni@redhat.com,
+	Murari Prasad Samal <murariprasadsamal57@gmail.com>
+Subject: [PATCH v2] net: ifb: record drop reason when redirect device is missing
+Date: Tue,  3 Feb 2026 06:04:15 +0000
+Message-ID: <20260203060415.886-1-murariprasadsamal57@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260203055723.1085751-1-achender@kernel.org>
-References: <20260203055723.1085751-1-achender@kernel.org>
+In-Reply-To: <20260202191135.7668-1-murariprasadsamal57@gmail.com>
+References: <20260202191135.7668-1-murariprasadsamal57@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,293 +97,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-256153-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256154-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[murariprasadsamal57@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D2649D4F4E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A97CDD4F47
 X-Rspamd-Action: no action
 
-From: Gerd Rausch <gerd.rausch@oracle.com>
+When redirecting packets in ifb_ri_tasklet(), the skb is dropped
+if the original ingress device can no longer be found.
 
-Even though a peer may have already received a
-non-zero value for "RDS_EXTHDR_NPATHS" from a node in the past,
-the current peer may not.
+Use kfree_skb_reason() with SKB_DROP_REASON_DEV_DOWN so the drop
+is properly attributed.
 
-Therefore it is important to initiate another rds_send_ping()
-after a re-connect to any peer:
-It is unknown at that time if we're still talking to the same
-instance of RDS kernel modules on the other side.
+No functional change intended.
 
-Otherwise, the peer may just operate on a single lane
-("c_npaths == 0"), not knowing that more lanes are available.
-
-However, if "c_with_sport_idx" is supported,
-we also need to check that the connection we accepted on lane#0
-meets the proper source port modulo requirement, as we fan out:
-
-Since the exchange of "RDS_EXTHDR_NPATHS" and "RDS_EXTHDR_SPORT_IDX"
-is asynchronous, initially we have no choice but to accept an incoming
-connection (via "accept") in the first slot ("cp_index == 0")
-for backwards compatibility.
-
-But that very connection may have come from a different lane
-with "cp_index != 0", since the peer thought that we already understood
-and handled "c_with_sport_idx" properly, as indicated by a previous
-exchange before a module was reloaded.
-
-In short:
-If a module gets reloaded, we recover from that, but do *not*
-allow a downgrade to support fewer lanes.
-
-Downgrades would require us to merge messages from separate lanes,
-which is rather tricky with the current RDS design.
-Each lane has its own sequence number space and all messages
-would need to be re-sequenced as we merge, all while
-handling "RDS_FLAG_RETRANSMITTED" and "cp_retrans" properly.
-
-Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
-Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
+Signed-off-by: Murari Prasad Samal
 ---
- net/rds/connection.c |  5 +++-
- net/rds/rds.h        |  2 +-
- net/rds/recv.c       |  7 +++++-
- net/rds/send.c       | 18 +++++++++++++++
- net/rds/tcp.h        |  2 +-
- net/rds/tcp_listen.c | 55 +++++++++++++++++++++++++++++++++-----------
- 6 files changed, 72 insertions(+), 17 deletions(-)
+ drivers/net/ifb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index 4b7715eb2111..185f73b01694 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -447,13 +447,16 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
- 	rcu_read_lock();
- 	if (!hlist_unhashed(&conn->c_hash_node)) {
- 		rcu_read_unlock();
-+		if (conn->c_trans->t_mp_capable &&
-+		    cp->cp_index == 0)
-+			rds_send_ping(conn, 0);
- 		rds_queue_reconnect(cp);
- 	} else {
- 		rcu_read_unlock();
- 	}
- 
- 	if (conn->c_trans->conn_slots_available)
--		conn->c_trans->conn_slots_available(conn);
-+		conn->c_trans->conn_slots_available(conn, false);
- }
- 
- /* destroy a single rds_conn_path. rds_conn_destroy() iterates over
-diff --git a/net/rds/rds.h b/net/rds/rds.h
-index 6d9f4a08b0ee..6e0790e4b570 100644
---- a/net/rds/rds.h
-+++ b/net/rds/rds.h
-@@ -549,7 +549,7 @@ struct rds_transport {
- 	 * messages received on the new socket are not discarded when no
- 	 * connection path was available at the time.
- 	 */
--	void (*conn_slots_available)(struct rds_connection *conn);
-+	void (*conn_slots_available)(struct rds_connection *conn, bool fan_out);
- 	int (*conn_path_connect)(struct rds_conn_path *cp);
- 
- 	/*
-diff --git a/net/rds/recv.c b/net/rds/recv.c
-index 889a5b7935e5..4b3f9e4a8bfd 100644
---- a/net/rds/recv.c
-+++ b/net/rds/recv.c
-@@ -209,6 +209,7 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 	bool new_with_sport_idx = false;
- 	u32 new_peer_gen_num = 0;
- 	int new_npaths;
-+	bool fan_out;
- 
- 	new_npaths = conn->c_npaths;
- 
-@@ -248,7 +249,11 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 		spin_lock_irqsave(&cp0->cp_lock, flags);
- 		conn->c_cp0_mprds_catchup_tx_seq = cp0->cp_next_tx_seq;
- 		spin_unlock_irqrestore(&cp0->cp_lock, flags);
-+		fan_out = true;
-+	} else {
-+		fan_out = false;
- 	}
-+
- 	/* if RDS_EXTHDR_NPATHS was not found, default to a single-path */
- 	conn->c_npaths = max_t(int, new_npaths, 1);
- 
-@@ -257,7 +262,7 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 
- 	if (conn->c_npaths > 1 &&
- 	    conn->c_trans->conn_slots_available)
--		conn->c_trans->conn_slots_available(conn);
-+		conn->c_trans->conn_slots_available(conn, fan_out);
- }
- 
- /* rds_start_mprds() will synchronously start multiple paths when appropriate.
-diff --git a/net/rds/send.c b/net/rds/send.c
-index 599c2cfb7a1d..6e96f108473e 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -1339,6 +1339,24 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
- 		cpath = &conn->c_path[0];
- 	}
- 
-+	 /* If we're multipath capable and path 0 is down, queue reconnect
-+	  * and send a ping. This initiates the multipath handshake through
-+	  * rds_send_probe(), which sends RDS_EXTHDR_NPATHS to the peer,
-+	  * starting multipath capability negotiation.
-+	  */
-+	if (conn->c_trans->t_mp_capable &&
-+	    !rds_conn_path_up(&conn->c_path[0])) {
-+		/* Ensures that only one request is queued.  And
-+		 * rds_send_ping() ensures that only one ping is
-+		 * outstanding.
-+		 */
-+		if (!test_and_set_bit(RDS_RECONNECT_PENDING,
-+				      &conn->c_path[0].cp_flags))
-+			queue_delayed_work(conn->c_path[0].cp_wq,
-+					   &conn->c_path[0].cp_conn_w, 0);
-+		rds_send_ping(conn, 0);
-+	}
-+
- 	rm->m_conn_path = cpath;
- 
- 	/* Parse any control messages the user may have included. */
-diff --git a/net/rds/tcp.h b/net/rds/tcp.h
-index b36af0865a07..39c86347188c 100644
---- a/net/rds/tcp.h
-+++ b/net/rds/tcp.h
-@@ -90,7 +90,7 @@ void rds_tcp_state_change(struct sock *sk);
- struct socket *rds_tcp_listen_init(struct net *net, bool isv6);
- void rds_tcp_listen_stop(struct socket *sock, struct work_struct *acceptor);
- void rds_tcp_listen_data_ready(struct sock *sk);
--void rds_tcp_conn_slots_available(struct rds_connection *conn);
-+void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out);
- int rds_tcp_accept_one(struct rds_tcp_net *rtn);
- void rds_tcp_keepalive(struct socket *sock);
- void *rds_tcp_listen_sock_def_readable(struct net *net);
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index b5786227623c..6fb5c928b8fd 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -56,14 +56,8 @@ void rds_tcp_keepalive(struct socket *sock)
- 	tcp_sock_set_keepintvl(sock->sk, keepidle);
- }
- 
--/* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
-- * client's ipaddr < server's ipaddr. Otherwise, close the accepted
-- * socket and force a reconneect from smaller -> larger ip addr. The reason
-- * we special case cp_index 0 is to allow the rds probe ping itself to itself
-- * get through efficiently.
-- */
--static struct rds_tcp_connection *
--rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
-+static int
-+rds_tcp_get_peer_sport(struct socket *sock)
- {
- 	union {
- 		struct sockaddr_storage storage;
-@@ -71,11 +65,9 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 		struct sockaddr_in sin;
- 		struct sockaddr_in6 sin6;
- 	} saddr;
--	int sport, npaths, i_min, i_max, i;
-+	int sport;
- 
--	if (conn->c_with_sport_idx &&
--	    kernel_getpeername(sock, &saddr.addr) >= 0) {
--		/* cp->cp_index is encoded in lowest bits of source-port */
-+	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
- 		switch (saddr.addr.sa_family) {
- 		case AF_INET:
- 			sport = ntohs(saddr.sin.sin_port);
-@@ -90,6 +82,26 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 		sport = -1;
- 	}
- 
-+	return sport;
-+}
-+
-+/* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
-+ * client's ipaddr < server's ipaddr. Otherwise, close the accepted
-+ * socket and force a reconneect from smaller -> larger ip addr. The reason
-+ * we special case cp_index 0 is to allow the rds probe ping itself to itself
-+ * get through efficiently.
-+ */
-+static struct rds_tcp_connection *
-+rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
-+{
-+	int sport, npaths, i_min, i_max, i;
-+
-+	if (conn->c_with_sport_idx)
-+		/* cp->cp_index is encoded in lowest bits of source-port */
-+		sport = rds_tcp_get_peer_sport(sock);
-+	else
-+		sport = -1;
-+
- 	npaths = max_t(int, 1, conn->c_npaths);
- 
- 	if (sport >= 0) {
-@@ -111,10 +123,12 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 	return NULL;
- }
- 
--void rds_tcp_conn_slots_available(struct rds_connection *conn)
-+void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out)
- {
- 	struct rds_tcp_connection *tc;
- 	struct rds_tcp_net *rtn;
-+	struct socket *sock;
-+	int sport, npaths;
- 
- 	if (rds_destroy_pending(conn))
- 		return;
-@@ -124,6 +138,21 @@ void rds_tcp_conn_slots_available(struct rds_connection *conn)
- 	if (!rtn)
- 		return;
- 
-+	sock = tc->t_sock;
-+
-+	/* During fan-out, check that the connection we already
-+	 * accepted in slot#0 carried the proper source port modulo.
-+	 */
-+	if (fan_out && conn->c_with_sport_idx && sock &&
-+	    rds_addr_cmp(&conn->c_laddr, &conn->c_faddr) > 0) {
-+		/* cp->cp_index is encoded in lowest bits of source-port */
-+		sport = rds_tcp_get_peer_sport(sock);
-+		npaths = max_t(int, 1, conn->c_npaths);
-+		if (sport >= 0 && sport % npaths != 0)
-+			/* peer initiated with a non-#0 lane first */
-+			rds_conn_path_drop(conn->c_path, 0);
-+	}
-+
- 	/* As soon as a connection went down,
- 	 * it is safe to schedule a "rds_tcp_accept_one"
- 	 * attempt even if there are no connections pending:
+diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
+index d3dc0914450a..689340ccf9c7 100644
+--- a/drivers/net/ifb.c
++++ b/drivers/net/ifb.c
+@@ -115,7 +115,7 @@ static void ifb_ri_tasklet(struct tasklet_struct *t)
+ 		skb->dev = dev_get_by_index_rcu(dev_net(txp->dev), skb->skb_iif);
+ 		if (!skb->dev) {
+ 			rcu_read_unlock();
+-			dev_kfree_skb(skb);
++			kfree_skb_reason(skb, SKB_DROP_REASON_NO_DEV);
+ 			txp->dev->stats.tx_dropped++;
+ 			if (skb_queue_len(&txp->tq) != 0)
+ 				goto resched;
 -- 
 2.43.0
 
