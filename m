@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-256046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +CU4HWxGgWnNFAMAu9opvQ
-	(envelope-from <netdev+bounces-256046-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:50:52 +0100
+	id EBLWEYlGgWnNFAMAu9opvQ
+	(envelope-from <netdev+bounces-256047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:51:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC7CED3256
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:50:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A51D325D
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:51:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE13D30413B7
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 00:49:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E07C30484CB
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 00:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4F521018A;
-	Tue,  3 Feb 2026 00:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18982217705;
+	Tue,  3 Feb 2026 00:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="ZBfpOojc"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="IlxpN9iP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6BB1F5834
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 00:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B5E1C8626
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 00:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770079766; cv=none; b=cJGeFjSMNIplRd2my67QWAUm65JQCxMaZOpDG6ZdhTOFGaTHGVgwoLJVz8S5c0LcdbXo2rTC6zyyKaKgAQ/iTfDGf7FtVRWvn0SRCaLT82G37PCv27IP6xSd+inGxAo1rG/sj/f+Ji3eJ4fOhghWcIN058VwqbWrQhJebkXDuJ4=
+	t=1770079769; cv=none; b=HkslapRdZTYYqGYhExoCZjlsLvkNGm0aSH7T4UDkQx252T9s5D+lyQDVo6n0btXnPQSlrWl8f7erZLDtN29tIYnj89CcHNBWhULdzwlgOJBTk0pfJxg5v0eL84r6RZRI0zBHeKUTbhnANMCij210+my7h+4y8ZVSvX9CrXGPhoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770079766; c=relaxed/simple;
-	bh=Ch7iIAas2iBnoNI29e0pHhApT6wyENmQjWT8C5tpAzU=;
+	s=arc-20240116; t=1770079769; c=relaxed/simple;
+	bh=Hm7FzUPxdWVVABSX/3Q3cCUaNB3cREv//ASK1B2etfg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tmUsNWKiziAEvInVV9IDlIOjKv3unMwwQaC+oCqB3rViJT1SSqLWatZkvV6xIwjlviTXuSgc6n8SbdAv0gMoD1Yf5fCnXHwi65xlhxLzblJmduVLi1U6hzO+eLr3htqTp54l+R+q2tM5jNgdMYd5+G1+4mNyiQQwgonSh1o5kec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=ZBfpOojc; arc=none smtp.client-ip=74.125.82.178
+	 MIME-Version; b=FzC4NmHDkP4cqxnHaHt6JjKKWEidzX8cR56YJ8Cz6693Ji82dJ4CiPC7UE7fS+plNjIK+7y4w/0LU1+CkW0FkQ5+yYpdqc7nAIjRBKTyobZ+QhA4vBo6MDKibbJQaCZxaUNESfOhvGZVAKSv6OGMgQeOpvqulS68CnIMZ0/Pfhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=IlxpN9iP; arc=none smtp.client-ip=74.125.82.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2b7070acfdcso5642852eec.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 16:49:25 -0800 (PST)
+Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b7da62b487so6458104eec.1
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 16:49:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1770079764; x=1770684564; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1770079767; x=1770684567; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zln3SlFBxMmH0zbpwhckoP2qYDegDEhkAS3nEPrQ8YU=;
-        b=ZBfpOojcnJsuFsqXbE/U3dXwXW7kCZFWfDsOO5UU1mE1Gz8x74X+H980iV0ymhZwA7
-         HjM9znyNCnhA+6D8fkhRnu6C3fb68uwDK1AqAkFm/hkSiGRoy8eakzHDR2kRRb+nQHu/
-         Tha5dusv2hxVXUOUeT3Iy4LDoLNyPvcnbefcgYuHnB98S+CRlz5yWz688b9iQWAbd685
-         VrdwMY8tlqm59JVKjpRvb0Fsz52gmPvJQpuX9k0sCLA3AXttuLQhqDwMhDFqcxyzvhtE
-         DLpzYzI0IvOzI1r7OEaoY+BBlsci6t7JxjDgEQ16BYmzwx63ceTA5mgSui8oBjwbGqp1
-         uA7g==
+        bh=qT1MfSdo7HvQGzo8ZvTZCniairqAvZI3FxEmw7sL3PQ=;
+        b=IlxpN9iPjHt2eafvMYkQmvje3i93KuF3axZ6LDkYKmSOpzOCU6Z1XsSBaaO1tJkwWw
+         U0FEfuV8Ineg1uQOCCuz9gLgcvY8Ieu2jo0YxAPDvjV4U0APtRP2S6Z8hPsd1cPdoHGb
+         zN9C7cl9ob/xSf0Z5arRaXt2AwCSCux7IOPkLX5NaRMXgXg8EedQQx5YoIw0NGs7th4v
+         RoqGpaIpmyuCbay3T7J1tb2+cj33wLKSwGG0aqbW7lVqWwZtlzVP8wE2yWsr46kCuJ9i
+         pKjJqGVyjAtFwM2dkbWRWkm5gInUQPlFLnFOWxAk+kb1xze96d1fLAjpCEEbcMNGWxZP
+         GNXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770079764; x=1770684564;
+        d=1e100.net; s=20230601; t=1770079767; x=1770684567;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=zln3SlFBxMmH0zbpwhckoP2qYDegDEhkAS3nEPrQ8YU=;
-        b=ASfdiduXvsfhPEThF9+Lz4xjSlwshPBaX4YrvOQleKcQyRBQIEFXH/MndXFq/MpUdG
-         3Tx2l4bsAOZ6TyPRF9ZAAl61S8S0tfxHAXR9Is/xDF7mHbA79yO+j6yMfay8JjKmLch5
-         ZHZbEerBErMRFPhM7gtvXXimbgezFfHLk7c+gx/Bc1k1ErYSmUYPiCl3P+cIKXt0qgjW
-         A6tMySMyQltX2dyiQQUI8iq1snE7TgBEfSSiJd9QGwoJhG88ZUaJq8zU6lD9B8/XZHMj
-         XjC9cxxewxrMuJ2oBg+WXdXhHgKMHyLKL8cOACFlZUz21fA1HKDrxq0mWv+xMGL5PpwW
-         Ok5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUke9FVkZhs3uDkDdhwfdsqMyUOdgqfUVudHX4iJDo3lza4ow5Z96HghHGViyMPH2K6VTA7b2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYxzuSGzSjR9+a45fPTWic1oUSja6N0tSgvpD0qEinTXgoDMf4
-	h31bhSZX13BWjlet1VOeWZ0rlb0KGG3uQNsuHHO9YqtxXjGJOk+1fbRuXi/pVlh+6Q==
-X-Gm-Gg: AZuq6aLGEliBBd57xisosVgDKJ1y89PnYIHu6EzaBaTS2GVE9h//dFT4K85c7kl3SlD
-	kyaxQmSnBdROSJuwSyYbqMdGLlmnzYUhlOEZsD+4agsYj7gVbAPrhE73d/VpvkvhceWxPC7Jg+y
-	JsgYHCAnO/KJ1t2c/Rxbx2HisGtYUvO1GAb7y8LVdw+FFef3mKiIVquh59hz1LocpCvi0l/UW34
-	nwUrsYpr2JweAtxvfpBwkmDZo1Rk4JkYwap7el3V8wCo1LW5Qx0Q7Lfpcwo8nz+61e0kEvd59uy
-	mMRCTyjnn72m2bRlDp5sCPGvUO7GvrGp+VhXW+nf0INUJl7n9dbEhHyp2GRPs3XYhzv8ugvFSVY
-	4i8lelhicb0uJa8aTPKs5mLHWBZEZ8m1YMqg3+/CiRSYimZbMGOCCsdynYd9W4p4xR2XZ6YvHQh
-	eW9qkl6idewie6UORLrTz5MgPaLsIiBcydZGJs4AQleJgiOiluaBDAuPjK
-X-Received: by 2002:a05:7300:bc05:b0:2b7:a4b3:ea77 with SMTP id 5a478bee46e88-2b7c89278c9mr4240299eec.34.1770079764451;
-        Mon, 02 Feb 2026 16:49:24 -0800 (PST)
+        bh=qT1MfSdo7HvQGzo8ZvTZCniairqAvZI3FxEmw7sL3PQ=;
+        b=RkrZAppp6zIhL5PvBAmDi7hItvbeAibPDc2X8Loqfj/nG6J14nbqlzj4uMHvQaUbD5
+         5Jvjhjf/L36dz3Lr9FvynGCkPsz1i/0a7HSb+uB5GhfNv0RBEN6tz7432HmVxFbinjoU
+         qHCUh1O2Vj0IuNIzNwvrkQCbDb7sba+jj+VbIio29gqA4Tyv4TXBqSeR/xQQQBFjRMvG
+         DNJgWECzMpikTGUpmhLVUacH55CWLkxBGu4OFuCh1/WfaIL0E6xjwls8P9YB5PQVNk1d
+         dYBd5ht8nJZ4yoKEWfp+E6mITufPAt6nbN10SX68Cwj6wt1z7PlED3PpWrd0PQrG07y1
+         01Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCURUwLc7yBek/mdL1qd3XVndGNVkr36lHTVSjtvG0lZh+JLEJ7cWLSo6ourrYe2w0JJjIPviaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaSTxvowO7+VOmscnW1o0hBjeZG5c1DoaO92H9Jqzp8477WhO1
+	FWEdM0DJMQ3ba0ZoZ9sLuhBNW7DaCbhH53ZHOrFZ9mANFt9NTVZEkQuZWuLQBGArQZlsDYrhT4E
+	l0Q7QRQ==
+X-Gm-Gg: AZuq6aKsj0FyIayKH8gZ4mbpKCjTgfkXPV4unEFgqFvVNJe0EelLda2LLHosTVTAtXQ
+	ARBF0iyMJuxjkpsDrlITUjq94K3Y9Quv3++EHLj0xOTWVIV4K9kM+RimkYPCu14XcvfE+hHta3K
+	106gReA6eYA20CPVdxnP3D7LTwx+47lsx8umaF49APwvZ5PkL555QTroL2t/nIHE/769yLjDxJu
+	ZNThqMkCVKThFfXZySOFe1lnTNyd8UZ4B/Q8eXzHuS5iwSDtHOs/Bm5xvQeFRJ6VfJPRNL2HMHe
+	52UKhxvsKJCd1FAuiw7vz6RaQLLb3D9SIztbilMAHsaCIlyesVxkaycJYGZ61SgJyQRE4O/e31k
+	xayltfuRLUUxdibtBuxIuuUsIdTdIDaHBVMzqD7JTLUBVSFriDPamU5shRlIeqe7AXDw+8Fb0sv
+	u//8uwoTDOhyC0jGBcxYngGtknZPkqycAEmIEc+FOJTM3+2aNcmwXkzVN1
+X-Received: by 2002:a05:7300:bc05:b0:2b7:a3a9:9c2a with SMTP id 5a478bee46e88-2b7c8902b1dmr6485346eec.30.1770079766572;
+        Mon, 02 Feb 2026 16:49:26 -0800 (PST)
 Received: from pong.herbertland.com ([2601:646:8980:b330:d7c2:35ea:5a4f:74f9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe92dsm21017016eec.17.2026.02.02.16.49.23
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe92dsm21017016eec.17.2026.02.02.16.49.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 16:49:24 -0800 (PST)
+        Mon, 02 Feb 2026 16:49:26 -0800 (PST)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -84,9 +85,9 @@ To: davem@davemloft.net,
 	willemdebruijn.kernel@gmail.com
 Cc: Tom Herbert <tom@herbertland.com>,
 	Justin Iurman <justin.iurman@gmail.com>
-Subject: [PATCH net-next v6 04/10] ipv6: Set HBH and DestOpt limits to 2
-Date: Mon,  2 Feb 2026 16:48:47 -0800
-Message-ID: <20260203004853.94438-5-tom@herbertland.com>
+Subject: [PATCH net-next v6 05/10] ipv6: Document defaults for max_{dst|hbh}_opts_number sysctls
+Date: Mon,  2 Feb 2026 16:48:48 -0800
+Message-ID: <20260203004853.94438-6-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260203004853.94438-1-tom@herbertland.com>
 References: <20260203004853.94438-1-tom@herbertland.com>
@@ -104,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -112,11 +113,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[herbertland.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com];
-	TAGGED_FROM(0.00)[bounces-256046-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256047-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[herbertland.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
@@ -128,43 +129,63 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:email,herbertland.com:dkim,herbertland.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CC7CED3256
+X-Rspamd-Queue-Id: A1A51D325D
 X-Rspamd-Action: no action
 
-Set the default limits of non-padding Hop-by-Hop and Destination
-options to 2. This means that if a packet contains more than two
-non-padding options then it will be dropped. The previous limit
-was 8, but that was too liberal considering that the stack only
-support two Destination Options and the most Hop-by-Hop options
-likely to ever be in the same packet are IOAM and JUMBO. The limit
-can be increased via sysctl for private use and experimentation.
+In the descriptions of max_dst_opts_number and max_hbh_opts_number
+sysctls add text about how a zero setting means that a packet with
+any Destination or Hop-by-Hop options is dropped.
+
+Report the defaults for max_dst_opts_number and max_hbh_opts_number
+are 2 which means up to two options may be accepted.
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
 ---
- include/net/ipv6.h | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ Documentation/networking/ip-sysctl.rst | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index cf2203ff2bfd..85d89b27a92c 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -86,9 +86,12 @@ struct ip_tunnel_info;
-  * silently discarded.
-  */
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index bc9a01606daf..5051fe653c96 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2474,20 +2474,26 @@ mld_qrv - INTEGER
+ 	Minimum: 1 (as specified by RFC6636 4.5)
  
--/* Default limits for Hop-by-Hop and Destination options */
--#define IP6_DEFAULT_MAX_DST_OPTS_CNT	 8
--#define IP6_DEFAULT_MAX_HBH_OPTS_CNT	 8
-+/* Default limits for Hop-by-Hop and Destination non-padding options. The
-+ * default value for both is 2. This sets a limit at two non-padding options
-+ * (see sysctl documentation)
-+ */
-+#define IP6_DEFAULT_MAX_DST_OPTS_CNT	 2
-+#define IP6_DEFAULT_MAX_HBH_OPTS_CNT	 2
- #define IP6_DEFAULT_MAX_DST_OPTS_LEN	 INT_MAX /* No limit */
- #define IP6_DEFAULT_MAX_HBH_OPTS_LEN	 INT_MAX /* No limit */
+ max_dst_opts_number - INTEGER
+-	Maximum number of non-padding TLVs allowed in a Destination
+-	options extension header. If this value is less than zero
+-	then unknown options are disallowed and the number of known
+-	TLVs allowed is the absolute value of this number.
++        Maximum number of non-padding TLVs allowed in a Destination
++        options extension header. If this value is zero then receive
++        Destination Options processing is disabled in which case packets
++        with the Destination Options extension header are dropped. If
++        this value is less than zero then unknown options are disallowed
++        and the number of known TLVs allowed is the absolute value of
++        this number.
  
+-	Default: 8
++        Default: 2
+ 
+ max_hbh_opts_number - INTEGER
+ 	Maximum number of non-padding TLVs allowed in a Hop-by-Hop
+-	options extension header. If this value is less than zero
+-	then unknown options are disallowed and the number of known
+-	TLVs allowed is the absolute value of this number.
+-
+-	Default: 8
++	options extension header. If this value is zero then receive
++        Hop-by-Hop Options processing is disabled in which case packets
++        with the Hop-by-Hop Options extension header are dropped.
++        If this value is less than zero then unknown options are disallowed
++        and the number of known TLVs allowed is the absolute value of this
++        number.
++
++        Default: 2
+ 
+ max_dst_opts_length - INTEGER
+ 	Maximum length allowed for a Destination options extension
 -- 
 2.43.0
 
