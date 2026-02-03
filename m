@@ -1,78 +1,94 @@
-Return-Path: <netdev+bounces-256212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFUMJBq9gWm7JAMAu9opvQ
-	(envelope-from <netdev+bounces-256212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:17:14 +0100
+	id IJLFAFu9gWm7JAMAu9opvQ
+	(envelope-from <netdev+bounces-256213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:18:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F57D6AFD
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:17:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56226D6B3E
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:18:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9A8E302268B
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:15:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9C423010DB5
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992AC396D12;
-	Tue,  3 Feb 2026 09:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BD0392C3C;
+	Tue,  3 Feb 2026 09:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lvIBivLS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXpO7yXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9839396D09;
-	Tue,  3 Feb 2026 09:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291762C08D1
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 09:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770110111; cv=none; b=KXE6lThOVA1ObGUY5pBRqN5gho5sjvtbm4O5NBLDl20Ekw9LbW4kYewdQ0+KQki5vmW3VOJS4dxqEpnfMLGyw45JJY/wCk0jKbbsswnbytMnJZogZaNm7mhLhF0xInPWhvgeX456wOaHrt3pPZuNUF5wVKNaGABBL+cOlW+GPTQ=
+	t=1770110295; cv=none; b=cf58pw/de/JBuwAX8FOncBuYob+84+z2fsUNAnj41h0wEqAYEqtZ33QDnRdE/avZr3LvU6ejLkauFxQT7wxY0/qRvoYaxUNWoR/V4X2xqvMOPCYxefi1qbEtX37EFQyhWs6z2JD7gCLwHzNKzmJMcN10ELc88LgiT7MJe63x+H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770110111; c=relaxed/simple;
-	bh=ZC1CA6vrdOzcMrcHn5G00HpXHg18TikDxYVKMBh9tuI=;
+	s=arc-20240116; t=1770110295; c=relaxed/simple;
+	bh=ZzIjBnf+ti8VPOFeSeWlDuWYqWNkAmOz0xMBA/LoqKQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lX4uZwkeU5WTIW3HXzl/cJPqvcbREwQt0ZvgEhzD+M1kQUdcVsoJMm1M3V3/l/J/sG3PzMYngQ+znE3nCvywlY4gtMrhyAKFB5xDa/U78Mpgc5XSObjy9Rv5y1d9DeP1lN7T3gJxwNoIECmXvac/AUMnIoiGURzIMRye7RnTA+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lvIBivLS; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1770110099; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=KV7iB2cX0YsCo/vw3xU3Pyo02q+0048t1T+E30Gigtg=;
-	b=lvIBivLSh9GpQ/9XItSiA5L3Ae5Abhgd3YILZJXyPQApT6jv/boUE3Hb2IC8SoZ58+a26VlUYRi6pGgxBqTIXEPZBFfSFuum5+mKUeAD331FlL00z8ZNIizgZeE9XNN/nZPYS5HRCm17TApalp7+cWnWUI5+1fEpbfNFzRNLYuo=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WySViK7_1770110098 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 03 Feb 2026 17:14:59 +0800
-Date: Tue, 3 Feb 2026 17:14:58 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=fvdWGQt2Cf4N04+pVjmI2IsjkASNXWnfOyAWz4Xh1kXFOVOQj3ozoWDmjCveTNK1FFCzCX9DJP6Edqb2N8u8n/1hMg3aow4nP5RRuu4INegJCRKoYUmJ7P/vygao3gmkxLv3dE5u90nXqL+0OtRgzDPUPy2vzP2PRZdT5UBXw/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXpO7yXp; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4806fd9033bso4903515e9.3
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 01:18:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770110292; x=1770715092; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=L2K0n61IVxE799olq2osB5P7SgqUu0HpI0Bg4ulH97g=;
+        b=AXpO7yXpRBV3xzBOEYgqnQCjXLeuYcXOum5BrgaEi1kq8KUZ98bXk70+HcD+EBVUQl
+         zsGDRjGR+yzAAv+5Kcg+bR1g2NBxWSEXJiUDMNoVdQiyAC9ZaTA/5KHV0jIdH8E+lZc4
+         J/2T/sU6HdomltLd3nTwsdXuDeaGaGWLroJh7hCb45qgTNbox7PBXkKAA+ngLrlPHbZ7
+         LZ40gN1+dzpvbsU0j/AL6N4lZfxJtOKqxj5KaK6eGpnQgkUjYSWBcz1bv8FZ4kbBkP8U
+         mmtLchuaYua7gz1sDwNN6HgZq8kVZATdEBjuhYhS+jrKcxgHzoD4wB5fGGC2tiHP18LK
+         p6Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770110292; x=1770715092;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L2K0n61IVxE799olq2osB5P7SgqUu0HpI0Bg4ulH97g=;
+        b=BOAg7HPxejXEpll9segvz3LcDuwmRPzvAdD6tKxBY6h97sxyouqgr0Rxw/r2ls3eK5
+         ilTu9Ic5eT3qpZLzjutyJZROTWM3YVqbJFRjwz5ukg8d7X2xeFh+E9Eckyh6ObyClLmY
+         /+TUrV+i0laEpyxuHhmcLO920J6dq9TGdl5wUbYcMG8w1g4syvOLx5t/zHvKUVaayrxs
+         16YdjfYuRz0pIsE8oJqQGg3GAGQ/Mc6FCiZvLfX18aW4YII83fClwre8l3C8zJV3qT6Q
+         O7LlvZ4Fat6gtL6lYjgOPuqiWrAG4NL44M8mLlRQ42UQxHFfLb34EVIB8IXH5Qg9CkXt
+         Cnxg==
+X-Gm-Message-State: AOJu0Yx6ouhS+mRbhRDRDPEDGGAXjFMWCxIAzJxFCf0sIffSM2rmxgz3
+	UMjwgoRUY/CpTSrxm0EAH8Kb+SS5E9FkAoeaFJSpVxwviqPR0ANEPnlth/Pz2g==
+X-Gm-Gg: AZuq6aJ0BZZdjV8+bTRHZ0iTwzTpZw7vGCAN7joLJr4QgOYQ0fbYGT+dlE8z5t1Gfn7
+	7wihGH356usQKEL9foiwrc4qsVSESMRS47HFci1x4v7uZ+NS50CCFs/Ow74LATkSjbq1f5fqUY4
+	yx9sjUddSKXSpn5izkdh/NJ5NWVl7ySCZCahcxGfNTx1ymOw+R1beQ70YH0MQnUkhT86p+wXX1N
+	8tSxkFB5BZQ1+It2zusAVaOgPDfUtSe9zhv7zb/cRw00zjfpeZdlZY68pKzbDRskXVbGtLPTSBW
+	cg+d/05NYme/yOZ09gH80HRg/jmV2oip/AelySET7Ji4IK/aPoJgGWwlqM86ZX+I1oUDANrarVj
+	lYIl1dhT6kV/osi6/ySf0cVOW9/PnzUMfT25wq0uBj1itBYDmSPiyqZREvbRP9SyZl1J7swt4rY
+	IlVw==
+X-Received: by 2002:a05:600c:a00a:b0:477:9fa8:bc99 with SMTP id 5b1f17b1804b1-482db492192mr115238265e9.4.1770110292363;
+        Tue, 03 Feb 2026 01:18:12 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:618:ce2e:8316:5a68])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbcf9c3fsm134465165e9.4.2026.02.03.01.18.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 01:18:11 -0800 (PST)
+Date: Tue, 3 Feb 2026 11:18:09 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
-Message-ID: <20260203091458.GA89766@j66a10360.sqa.eu95>
-References: <20260124093505.GA98529@j66a10360.sqa.eu95>
- <aXSjm1DXm6yP62tD@pc636>
- <20260124145754.GA57116@j66a10360.sqa.eu95>
- <20260127133417.GU13967@unreal>
- <20260128034558.GA126415@j66a10360.sqa.eu95>
- <20260128180629.GT1641016@ziepe.ca>
- <20260129113609.GA37734@j66a10360.sqa.eu95>
- <20260129132058.GC2307128@ziepe.ca>
- <20260130085131.GA122673@j66a10360.sqa.eu95>
- <20260130151636.GF2328995@ziepe.ca>
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: sync dsa_mall_policer_tc_entry
+ with FLOW_ACTION_POLICE
+Message-ID: <20260203091809.jpkgpagtodu63eqp@skbuf>
+References: <20260131045821.3451873-1-mmyangfl@gmail.com>
+ <20260202105218.sx5k6ksy5ycpfyxf@skbuf>
+ <CAAXyoMOiLBcS3E8kRFGpxPzhXEtq+BhZRkQNbvcNiG96+LRQqw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,104 +98,62 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260130151636.GF2328995@ziepe.ca>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <CAAXyoMOiLBcS3E8kRFGpxPzhXEtq+BhZRkQNbvcNiG96+LRQqw@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256212-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256213-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,kernel.org,gmail.com,davemloft.net,linux-foundation.org,google.com,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,j66a10360.sqa.eu95:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E8F57D6AFD
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 56226D6B3E
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 11:16:36AM -0400, Jason Gunthorpe wrote:
-> On Fri, Jan 30, 2026 at 04:51:31PM +0800, D. Wythe wrote:
-> > On Thu, Jan 29, 2026 at 09:20:58AM -0400, Jason Gunthorpe wrote:
-> > > On Thu, Jan 29, 2026 at 07:36:09PM +0800, D. Wythe wrote:
-> > > 
-> > > > > From there you can check the resulting scatterlist and compute the
-> > > > > page_size to pass to ib_map_mr_sg().
-> > > 
-> > > I should clarify this is done after DMA mapping the scatterlist. dma
-> > > mapping can improve the page size.
-> > > 
-> > > And maybe the core code should be helping compute the MR's target page
-> > > size for a scatterlist.. We already have code to do this in umem, and
-> > > it is a pretty bit tricky considering the IOVA related rules.
-> > >
-> > 
-> > Hi Jason,
-> > 
-> > After a deep dive into ib_umem_find_best_pgsz(), I have to say it is
-> > much more subtle than it first appears. The IOVA-to-PA relative offset
-> > rules, in particular, make it quite easy to get wrong.
-> > 
-> > While SMC could duplicate this logic, it is certainly not ideal for
-> > maintenance. Are there any plans to refactor this into a generic RDMA
-> > core helper—for instance, one that can determine the best page size
-> > directly from an sg_table or scatterlist?
+On Tue, Feb 03, 2026 at 09:40:02AM +0800, David Yang wrote:
+> On Mon, Feb 2, 2026 at 6:52 PM Vladimir Oltean <olteanv@gmail.com> wrote:
+> >
+> > On Sat, Jan 31, 2026 at 12:58:16PM +0800, David Yang wrote:
+> > > diff --git a/net/dsa/user.c b/net/dsa/user.c
+> > > index f59d66f0975d..2a209b83c701 100644
+> > > --- a/net/dsa/user.c
+> > > +++ b/net/dsa/user.c
+> > > @@ -1497,8 +1497,19 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
+> > >       mall_tc_entry->cookie = cls->cookie;
+> > >       mall_tc_entry->type = DSA_PORT_MALL_POLICER;
+> > >       policer = &mall_tc_entry->policer;
+> > > +     /* until they export the type of act->police in flow_offload.h ... */
+> >
+> > There is no "us" and "them", it's a single git tree. Just submit a patch
+> > to whomever ./scripts/get_maintainer.pl says to.
+> >
+> > Have you tried something like the patch attached (just compile-tested)?
 > 
-> I have not heard of anyone touching this.
-> 
-> It looks like there are only two users in the kernel that pass
-> something other than PAGE_SIZE, so it seems nobody has cared about
-> this till now.
-> 
-> With high order folios being more common it seems like something
-> missing.
-> 
-> However, I wonder what the drivers do with the input page size, 
-> segmenting a scatterlist is a bit hard and we have helpers for that
-> already too.
-> 
-> It is a bigger project but probably the right thing is to remove the
-> page size input, wrap the scatterlist in a umem and fixup the drivers
-> to use the existing umem support for building mtts, splitting
-> scatterlists into blocks and so on.
-> 
-> The kernel side here has been left alone for a long time..
+> Yes, but I was afraid it would be kind of inconsistent not exposing
+> other struct flow_action_*. Nicer and better approach, though.
 
-I am also curious about the original design intent behind requiring the 
-caller to explicitly pass `page_size`. From what I can see, its primary 
-role is to define the memory size per MTTE, but calculating the optimal 
-value is surprisingly complex.
-
-I completely agree that providing an automatic way to optimize or 
-calculate the best page size should be the responsibility of the drivers
-or the RDMA core themselves. Handling such low-level hardware-related 
-details in a ULP like SMC feels misplaced.
-
-Since it appears this isn't a high-priority issue for the community at
-the moment, and a proper fix requires a much larger architectural effort 
-in the RDMA core, I will withdraw this patch series. 
-
-I'll keep an eye on the RDMA subsystem's progress and see if a more 
-generic solution emerges in the future.
-
-Thanks,
-D. Wythe
-
-
+Since it doesn't affect existing users of struct flow_action_entry,
+I don't think it's that big a deal. You can take this patch and submit a
+v3 with it if it helps.
 
