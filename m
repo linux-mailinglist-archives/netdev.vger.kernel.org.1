@@ -1,224 +1,247 @@
-Return-Path: <netdev+bounces-256271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPMzNejogWkFMAMAu9opvQ
-	(envelope-from <netdev+bounces-256271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:24:08 +0100
+	id SAu9DQvqgWkFMAMAu9opvQ
+	(envelope-from <netdev+bounces-256272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:28:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C9FED8F6E
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:24:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA45D902D
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:28:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9612C310C420
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:17:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B42C8309AB16
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D97F33FE0A;
-	Tue,  3 Feb 2026 12:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1422E33E37B;
+	Tue,  3 Feb 2026 12:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2UeWlRe"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="JrhQbOej";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dGIm5J11"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F57B3346B9
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43DD33DEFC;
+	Tue,  3 Feb 2026 12:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770121050; cv=none; b=lGQmOF+Cux+JM9quF7QLh1iwZaepHfiTXwKvUYefkET2hXlCoqaYpE4ep+eCSrRhoVXH3eiBzUvTJG8WmTwyJS8up4F2uKw5S/ga8v4D5a4PkalnrAovxXmZv7hMEvvs7a5IqN6PHK+pemTH0ItYJIbtlkEawnKG+2unmLh0H2w=
+	t=1770121329; cv=none; b=vFWFUEbrvDMffKjMtkeasoNig89LvfYjPcfH6bxPC9zM/6GCaJHE8zQU03Dx7F+NzmkUIs9h5yRlyy0XA4AV7nBzOBRCfRYFjCbrJKLJXJXtVIVmsX0vFASky1O1pJ1pU/AFLlzWML94mkn+5ugYzZcW1OEWkUXCHksuko6QeTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770121050; c=relaxed/simple;
-	bh=gninZlBoLuHNxge4GK5ffuEcWrBCJW7xBMyZoit0cSQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gSuUnOPFOYZMFCz+ku4uNdVJgNSl2RglMAAuDzTPGhvisSKZSnIAndet1o+LKl9sUNTIrA5TkILsjVSSQNvvqWX05tLy59EkMJIIZEAUKoMd8OJgkxLuRR11Btm1M9MbGjKT1YCDrkUh4yQhPhWZF8dRSYv3vhuI9M/xdVWCYmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2UeWlRe; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4806b43beb6so40772005e9.3
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 04:17:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770121046; x=1770725846; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fcy8M4BGhMrAt0/LmVopycDbCegF7gwE/HhYCJa6vg4=;
-        b=l2UeWlReGN5RKajqvFD8OpnPtmrYkmCLDlD2uf0WV3VcsKlWIowdYrObskQA+y735b
-         fd76Mjhh9LExpS4yY5mtrBEKNW7llQBzSu60VGR/hcjurP1AdBcR+yHDUAtdV/tl/eNL
-         uUmozzaVaiKyoHBhn1o722CAs1ReE/6GmszA6PuQgnMM47dFUF7gYeNvb92TrX2eD7bL
-         NAKqPmntTVz8d60vvDXrqW+ASJtQOpgITRxDHCgDBnptK6uT5Dob3BAq3PGD3QZ3a4pv
-         SXJFaSdtyVZvncPfXyMusnNPvPHGNRbET1qZkg+q2GAJ17ggWwo8UqDTuF6m80KYUmD0
-         hjXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770121046; x=1770725846;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fcy8M4BGhMrAt0/LmVopycDbCegF7gwE/HhYCJa6vg4=;
-        b=GChzuIceFWf2hVc1XHEseTSGpd+GkfD95fmJlDPmoPo87WWag0yKBdAEf29T9XDz5G
-         x2XekIXapEYyr1LqdJCh3VjozCzHjyq7hAn001WOvD6TUs/+sDHTzxGBKqpFL1CZ7hjK
-         4yBj4YMxLabY9kpSQ1Pl61E9yh3RjZm9XjcpBm7IEK5PyswDImeinwqzZx4dtgMnjNw5
-         zDZAWesZGb5b5qE+CtQy22qtkFFp0SIYiQnCtXOdJfv4Bb749yEifdPWyWYK6YZcnY/+
-         Vz9bz5feqk9he2BDE0yWHPBIqzI1O6hPFzBVH4VioS8+8hZCweqUbOMh6o8zBKYHmpam
-         2B4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXLXCsafITZN8F0fkviMK1AIQm7J3VVyRiLLPRibCCMnOahoV0lI4IUMRjEeQh81rK9WgcaPF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw8lKgX21bZCwFZYTQLlT/dZQxe4+2b8HJcjej4aShlm5XZ20F
-	xTmL4+mzsUZRuoS0A4Ti2GlmwQR6Y40Yd5dflxelAh3mfkFFnmzILhIc
-X-Gm-Gg: AZuq6aLnHG6wn5lp0XMGqZsVUghfVLDPP05HNReehNjxYvLwPh/TUOnMwd50+nieXzk
-	AM3D8bJXC/TifUpOKRy1XgCam40cSG6VsKPlULu3uOHm3DB1XO2wBQQw3TND8KLyzCPsku0cunV
-	RIm4zyuAydptGyxpytfYaGNA3VYsqGGRhocWrqUpdDA4I5dx41OVznLsEFglmpvvVuUp6d74AEv
-	yiy7FHJ39WfDdjBAbPIvuH6gqKKYUbS5qyjQVyZYxPe35kOWw1TIW3ay3SbTv5zheaVv7hPdwGX
-	i549Zw4bFl9hBE/ftYj/juY5WMM7ew5r6rcGcODmE5hefatkHhrP9doI+zJM2h7hzsu6E0ur/00
-	l54BMHxAQ8D+6q71a9AdyHi71DuZt0IPQsomV+pTrrmhKB9NZjs02R8yscR8Nit5btqF9z60y88
-	uDqahWZ7ahCIl8HMvlCVwB9bPJr9mo
-X-Received: by 2002:a05:600c:4451:b0:477:639d:bca2 with SMTP id 5b1f17b1804b1-482db457724mr217768105e9.4.1770121045688;
-        Tue, 03 Feb 2026 04:17:25 -0800 (PST)
-Received: from biju.lan ([2a00:23c4:a758:8a01:9cd9:f748:166d:55fc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48305129419sm56042495e9.6.2026.02.03.04.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 04:17:25 -0800 (PST)
-From: Biju <biju.das.au@gmail.com>
-X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Biju Das <biju.das.au@gmail.com>,
-	linux-renesas-soc@vger.kernel.org
-Subject: [PATCH net-next] dt-bindings: net: micrel: Fix dtbs compatible too long warnings
-Date: Tue,  3 Feb 2026 12:17:21 +0000
-Message-ID: <20260203121723.312336-1-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1770121329; c=relaxed/simple;
+	bh=8zD4Bvj2cpwqbR8C/vP8Ln3GAO7Ar/bTUXV87Og0liU=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=V+v5c1o9mN2oSLjKiVrfUeCVaHjSCyaKtVuLp3AT/onyhQC2oClybhgppo5wwqXvJr4W+JJGljrju+aQ+f5+CHOMHJeBqdm9qEDTOpWnVjZ1SUdPLdF3LDT6iVgS8MtHIXV9bVXuItI2zFWmi+wKwSTBgu4uciBwjZcCNVAnw08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=JrhQbOej; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dGIm5J11; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id EA03E7A0064;
+	Tue,  3 Feb 2026 07:22:03 -0500 (EST)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-10.internal (MEProxy); Tue, 03 Feb 2026 07:22:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1770121323;
+	 x=1770207723; bh=fGZzykM2xqfT9vl/Zx59SgBnmWMYXVx1CHV/AglyHZ4=; b=
+	JrhQbOejE5+fMnYu6SLm8h7S8Goh+iSbdbXzTulxVZ32EU6ve0X1WzGVGMD31hSR
+	LdcBqRyZJorqX353n/uVJzuW1GRokF3XtlH55Wxw6fw7/4rSe4fHZnomGF+TdfOT
+	VylrHsf1zIl/3SJK1nZ9Sf6cqACGo8GsF6DVfsMybg5jIVQu/0fGBoNPkJVlivzU
+	RFW08sdMpNNFhEcsdmZ/Qfg1T4SWcFQEFYS1lBFpo25JIKpDiTGcDBKceVRBQtMu
+	cWsHWQHHGytbYuwGskWZHUeH/345ho2Z5dXWTha0tKUofZj6k3vLR1ZMUEToIHpa
+	nc1PhXud/x0OVRWw19o5aA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770121323; x=
+	1770207723; bh=fGZzykM2xqfT9vl/Zx59SgBnmWMYXVx1CHV/AglyHZ4=; b=d
+	GIm5J11Mh0lHqbz/OTcezUxIwUPaYSJRdvMcBGBTL+R9cROnaSpohFsg+mpWQYpS
+	RjwrfGuDh3re5BEEl8tW4DNJRKeXpjCp+f8dYfD7g4t4IcsOpPNfiOgByFcURqE2
+	m1OJBXDDcEqbgHWMy+LH+qU+EI35Y2hAPtBuQp1HdCOdBYxNmmmtQcjgYujuBhQ5
+	EyGLWZEv1Bnn8BNNFHmwkUAZritTJ7ZGWFxRjZmRX79z5noMHtzqvFgTEf19RrJA
+	BRdttz0Zhk5oDsrv5hQBjjL0V8oRKt5Tugens6Cq7vdm7EPh/MLqr+e8y6T0xuYp
+	ZlYeOi/FswV77GDyvJv3g==
+X-ME-Sender: <xms:a-iBaZtWCyOrbRf_y-KxZWVYUwdyyBxKPNB_iKZw1OEVbfEUhsQnWw>
+    <xme:a-iBadT1FTipIQZio5fv-TqruRosSAF5-2pjwbBWwMQqhSVHdK2cfcIydjKzkou4P
+    dVMCkAif6TJDKnklxKgQUTDg6p-KxRM6WUQ1ZdByPrC_wySRE3JpzMh>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukedttdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
+    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgesfhgrshhtmhgrihhlrdhimheqne
+    cuggftrfgrthhtvghrnhepleevgfefgefgtdfftdeggeeufeekteeigeelffffgeetfeev
+    ueevgfdvkeethfehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhitggvsehfrghsthhm
+    rghilhdrihhmpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtg
+    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrlhgv
+    gigrnhguvghrughuhigtkhesfhgsrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsg
+    hruhhijhhnrdhkvghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgr
+    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlvghonheskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
+X-ME-Proxy: <xmx:a-iBaQUNXgEChcQqhGjXpdYYKFwQLGmM1mmJpVYq6FwycRURHMsBkQ>
+    <xmx:a-iBaci_UG9bbRVZPZUJ8WzJlYijNV5cmHiNAqstZIdwxMLLSLp6VA>
+    <xmx:a-iBablhtUMINjc_uz-lyQCveVhtjFZBoTMbTeH9PMZm_YADhvQB8A>
+    <xmx:a-iBaVwvdmOkuYgG8lN0UOMtto1Rxe_4XK_TzhDuXMI9S-H20Ny86g>
+    <xmx:a-iBac1F2kgIIRN6cgA4go3Sif-p_9wyBkGbhiMLC7tigncveTfgSdHV>
+Feedback-ID: ice914951:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 0AE8433E009A; Tue,  3 Feb 2026 07:22:03 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: A1L92F6ESprk
+Date: Tue, 03 Feb 2026 14:20:16 +0200
+From: "Alice Mikityanska" <alice@fastmail.im>
+To: "Gal Pressman" <gal@nvidia.com>,
+ "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>
+Cc: "Igor Russkikh" <irusskikh@marvell.com>,
+ "Boris Pismenny" <borisp@nvidia.com>, "Saeed Mahameed" <saeedm@nvidia.com>,
+ "Leon Romanovsky" <leon@kernel.org>, "Tariq Toukan" <tariqt@nvidia.com>,
+ "Mark Bloch" <mbloch@nvidia.com>, "David Ahern" <dsahern@kernel.org>,
+ "Simon Horman" <horms@kernel.org>, "Alexander Duyck" <alexanderduyck@fb.com>,
+ linux-rdma@vger.kernel.org, "Dragos Tatulea" <dtatulea@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org
+Message-Id: <fb617b34-7760-4e3f-903f-c7380d28ed40@app.fastmail.com>
+In-Reply-To: <willemdebruijn.kernel.218d53621fba7@gmail.com>
+References: <20260125121649.778086-1-gal@nvidia.com>
+ <20260125121649.778086-2-gal@nvidia.com>
+ <willemdebruijn.kernel.218d53621fba7@gmail.com>
+Subject: Re: [PATCH net-next 1/3] udp: gso: Use single MSS length in UDP header for
+ GSO_PARTIAL
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-256271-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[bp.renesas.com,gmail.com,vger.kernel.org,glider.be];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[nvidia.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-256272-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[alice@fastmail.im,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C9FED8F6E
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,fastmail.im:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: 8EA45D902D
 X-Rspamd-Action: no action
 
-From: Biju Das <biju.das.jz@bp.renesas.com>
+On Mon, Jan 26, 2026, at 19:53, Willem de Bruijn wrote:
+> Gal Pressman wrote:
+>> In GSO_PARTIAL segmentation, set the UDP length field to the single
+>> segment size (gso_size + UDP header) instead of the large MSS size.
+>> This provides hardware with a template length value for final
+>> segmentation, similar to how tunnel GSO_PARTIAL handles outer headers
+>> in UDP tunnels.
+>> 
+>> This will remove the need to manually adjust the UDP header length in
+>> the drivers, as can be seen in subsequent patches.
+>> 
+>> This was suggested by Alex in 2018:
+>> https://lore.kernel.org/netdev/CAKgT0UcdnUWgr3KQ=RnLKigokkiUuYefmL-ePpDvJOBNpKScFA@mail.gmail.com/
+>> 
+>> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+>> Signed-off-by: Gal Pressman <gal@nvidia.com>
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> This only affects the udp header value when using GSO_PARTIAL, and
+> these are the only two drivers that adversize USO using GSO_PARTIAL.
 
-The KSZ9131 PHY is suitable for IEEE 802.3 applications.
+I stumbled upon this patch when I was rebasing my stuff and saw a
+(trivial) conflict. I've got a couple of questions on this change, and
+I'd be glad if you could clarify it for me.
 
-Fix the below dtbs warning "compatible: ['ethernet-phy-id0022.1640',
-'ethernet-phy-ieee802.3-c22'] is too long" on the below dts:
+>> ---
+>>  net/ipv4/udp_offload.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+>> index 19d0b5b09ffa..89e0b48b60ae 100644
+>> --- a/net/ipv4/udp_offload.c
+>> +++ b/net/ipv4/udp_offload.c
+>> @@ -483,11 +483,11 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>>  	struct sock *sk = gso_skb->sk;
+>>  	unsigned int sum_truesize = 0;
+>>  	struct sk_buff *segs, *seg;
+>> +	__be16 newlen, msslen;
+>>  	struct udphdr *uh;
+>>  	unsigned int mss;
+>>  	bool copy_dtor;
+>>  	__sum16 check;
+>> -	__be16 newlen;
+>>  	int ret = 0;
+>>  
+>>  	mss = skb_shinfo(gso_skb)->gso_size;
+>> @@ -555,6 +555,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>>  		return segs;
+>>  	}
+>>  
+>> +	msslen = htons(sizeof(*uh) + mss);
+>> +
+>>  	/* GSO partial and frag_list segmentation only requires splitting
+>>  	 * the frame into an MSS multiple and possibly a remainder, both
+>>  	 * cases return a GSO skb. So update the mss now.
 
-r8a774b1-beacon-rzg2n-kit.dtb
-r8a774a1-beacon-rzg2m-kit.dtb
-r8a774e1-beacon-rzg2h-kit.dtb
-r9a08g046l48-smarc.dtb
-r9a07g043u11-smarc.dtb
-r9a07g044c2-smarc.dtb
-r9a07g044l2-smarc.dtb
-r9a07g044l2-smarc.dtb
-r9a07g054l2-smarc.dtb
-r9a07g054l2-smarc.dtb
-r9a09g047e57-smarc.dtb
-r9a09g047e57-smarc.dtb
-r9a09g056n48-rzv2n-evk.dtb
-r9a09g056n48-rzv2n-evk.dtb
-r9a09g057h44-rzv2h-evk.dtb
-r9a09g057h44-rzv2h-evk.dtb
-r9a07g043u11-smarc-cru-csi-ov5645.dtb
-r9a07g043u11-smarc-pmod.dtb
-r9a07g043u11-smarc-du-adv7513.dtb
-r9a09g047e57-smarc-cru-csi-ov5645.dtb
-r9a07g044c2-smarc-cru-csi-ov5645.dtb
-r9a09g047e57-smarc-cru-csi-ov5645.dtb
-r9a07g044l2-smarc-cru-csi-ov5645.dtb
-r9a07g044l2-smarc-cru-csi-ov5645.dtb
-r9a07g054l2-smarc-cru-csi-ov5645.dtb
-r9a07g054l2-smarc-cru-csi-ov5645.dtb
-r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
-r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
-r9a09g056n48-rzv2n-evk-cn15-sd.dtb
-r9a09g057h44-rzv2h-evk-cn15-sd.dtb
-r9a09g056n48-rzv2n-evk-cn15-sd.dtb
-r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
-r9a09g057h44-rzv2h-evk-cn15-sd.dtb
-r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
+What about the frag_list case? The comment says it would be a GSO SKB
+too (as I understand frag_list, it would be a linked list of SKBs
+forming one single packet). Is it appropriate to set UDP len = MSS in
+this case too? I'm not sure which code reads UDP len afterwards, I
+couldn't find any, so maybe its value doesn't matter at all (except for
+hardware, which this patch aims for).
 
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
- .../bindings/net/micrel,gigabit.yaml          | 23 +++++++++++--------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+Is it possible that this GSO_PARTIAL or frag_list packet shows up in
+tcpdump with UDP len set like this? E.g., if the GSO_PARTIAL
+segmentation happens before entering a veth pipe, and tcpdump listens on
+the other end? If so, tcpdump could fail to parse such a packet.
 
-diff --git a/Documentation/devicetree/bindings/net/micrel,gigabit.yaml b/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
-index 384b4ea6181e..284c3ba379f3 100644
---- a/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
-+++ b/Documentation/devicetree/bindings/net/micrel,gigabit.yaml
-@@ -17,15 +17,20 @@ description:
- 
- properties:
-   compatible:
--    enum:
--      - ethernet-phy-id0022.1610  # KSZ9021
--      - ethernet-phy-id0022.1611  # KSZ9021RLRN
--      - ethernet-phy-id0022.1620  # KSZ9031
--      - ethernet-phy-id0022.1631  # KSZ9477
--      - ethernet-phy-id0022.1640  # KSZ9131
--      - ethernet-phy-id0022.1650  # LAN8841
--      - ethernet-phy-id0022.1660  # LAN8814
--      - ethernet-phy-id0022.1670  # LAN8804
-+    oneOf:
-+      - items:
-+          - const: ethernet-phy-id0022.1640
-+          - const: ethernet-phy-ieee802.3-c22
-+      - items:
-+          - enum:
-+              - ethernet-phy-id0022.1610  # KSZ9021
-+              - ethernet-phy-id0022.1611  # KSZ9021RLRN
-+              - ethernet-phy-id0022.1620  # KSZ9031
-+              - ethernet-phy-id0022.1631  # KSZ9477
-+              - ethernet-phy-id0022.1640  # KSZ9131
-+              - ethernet-phy-id0022.1650  # LAN8841
-+              - ethernet-phy-id0022.1660  # LAN8814
-+              - ethernet-phy-id0022.1670  # LAN8804
- 
-   micrel,force-master:
-     type: boolean
--- 
-2.43.0
+I haven't tried to reproduce any of these yet; I decided to ask first
+because you have more context. I'll appreciate if you can give me a clue
+whether my concerns are valid or not.
 
+Other than that, I think the patch could be made simpler, if you just
+drop mss *= gso_segs below, and stick to newlen, which would be equal to
+msslen (now unneeded), and newlen and mss are not used anywhere else.
+I'll include this simplification in my next series, if you don't mind.
+
+>> @@ -584,7 +586,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>>  		if (!seg->next)
+>>  			break;
+>>  
+>> -		uh->len = newlen;
+>> +		uh->len = msslen;
+>>  		uh->check = check;
+>>  
+>>  		if (seg->ip_summed == CHECKSUM_PARTIAL)
+>> -- 
+>> 2.40.1
+>>
 
