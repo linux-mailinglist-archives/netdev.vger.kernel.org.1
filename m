@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-256267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKhmFG/mgWl0LwMAu9opvQ
-	(envelope-from <netdev+bounces-256267-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:13:35 +0100
+	id aLJdHtbmgWl0LwMAu9opvQ
+	(envelope-from <netdev+bounces-256268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:15:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCA2BD8DBF
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:13:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A010AD8DED
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:15:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B14BD30C4BA1
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:08:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E77530F3932
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5579C33D6EB;
-	Tue,  3 Feb 2026 12:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE4433DEC9;
+	Tue,  3 Feb 2026 12:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hjGIxiwM";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Dlxj3Vks"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jHtjoUFh";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AlOLPP0q"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4E933D507
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4482B3382F0
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770120498; cv=none; b=NX4G0VuppfoXOUGbVZ3cOr0bQoMSnYpk9Opn1V2pAxkaLHeU9/OLBfTOuxtipOMo8PCsAcojFOGpwRGgpHjL5sjvlrejEds330CpYdT9iYj0hXYjEwpE33pZTkotgApozYG9qVlNK3isv09SjvhBfpOl1f47cl5fXZB9RvyVzxQ=
+	t=1770120574; cv=none; b=J9nLqnSCIVYXvo0bMw8Q3xPbK9/HcQt5jxnnnbugSpzcFw4WbGzBB0JMnlXcbus8I8uREPs51xCUNmZOOzVns0Mu6o8YwM3/GEmm3hfB0UzFXcZSViX4iOoCLBxu32l/4sg4bit5SJDH+PDmUU5QcNmX7ceCUCD1bmMbkxI9gKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770120498; c=relaxed/simple;
-	bh=8bSysvQh9zNKGwuLq+TYG/kdhuPi5MrukSfdlgYfzPI=;
+	s=arc-20240116; t=1770120574; c=relaxed/simple;
+	bh=o9WdklMmUjU6rzAt1Lr+DDa0Tn56ukclRhC4gKXEbIQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGI9fkVb9x5/tYkKZI4AVfWBhxCCDc28KEDKAHxMo6tL2+wfHP713QsljI0OV6ja4FcZm7qYuLUDZdxQN41GPe3qOFarpYdxVUNjb/Ry+FP33QMDhNuaX8sPHAGprdJ3kdezYnK+bo8hcsQj60yGv1GC5iH25E4B3pWx9vAT7wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hjGIxiwM; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Dlxj3Vks; arc=none smtp.client-ip=193.142.43.55
+	 Content-Type:Content-Disposition:In-Reply-To; b=VPtciW1cGRERAAfIFaAD08N9lwczFgBfsJL6TJK9wQlNfK2GFYfr0Rff49SzkHlLfiRwKjzJB28GwHsu9g24wCgJZMNmkinUL6VPrygGZVkRqP25yyJnDsaiGzwLPs6KC06PYDcGNfSpXJv2cKOUFtw3JmtUAvyE1h60n1W5uk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jHtjoUFh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AlOLPP0q; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 3 Feb 2026 13:08:13 +0100
+Date: Tue, 3 Feb 2026 13:09:30 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770120495;
+	s=2020; t=1770120571;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XEZipE0D329CXpQUVmd9S2ilaIWX19xXCTc10NTNPfU=;
-	b=hjGIxiwM8+o/k8ZARcLamjk/DPyxeGOBns80cWDjWLRiWPPbsGuMOMm0NmrJ0N6fAPFaag
-	lPPNwqK6RPk5PVxOz/0B/ana2DnDzyVTkGTgTAnwkBCu0o5RTU+hdaXXQMwJdo5wPRuy6L
-	qnst5GIa2FxnL7BMWnlZ8lqPDmnqOjJWXekJcAaoKbXmXsOr2jJDDq6T+OvWbJgFRjZ2dZ
-	Qo+W79hKBNRMjcyhOqDiKebU5IkwU+RdXesJL4IRI8AX68SomXLraTTgCgvKxBSlXrfgGF
-	Y1MJOI5YkvnfAsFZzhxkRZYgU1Nl+DvoySc4eJ5dQmT7Iq5HlrP2LeyQq8H0wA==
+	bh=o8wiLi93h7s5nrhIswwZYAfTTdER68dWwImPGQeIWAU=;
+	b=jHtjoUFhfRmZAJSEpHEMFw7lEGy+1McDWLnRRqzVIEI6OrRzX5tLg01pubX7I/Hw+j1ZUi
+	hLY0QI8DKEiEua/A/JbgzaCFIiazzis0KcRWc1v/iyP/qftMHIDlkoOzZ12CpKA32fnshA
+	k5bZZMH6fubtUsHaHm0feDAgh5BCXZahpj65oBx4dj6EmoXqLFx3yDoEUyOHQSU/ReCAhh
+	3VEOClsaFNt7ntOMGRT+cX9m85HjtC4S6/FJjwITLUil898TF+eDS6MoDshpuDi2WO+dKE
+	ld4Z7MKsPJuH8UVga4uoQ2K51Rt+n++YmCQaN6JG7qFpQhwYEeka3oyzIwE3Bg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770120495;
+	s=2020e; t=1770120571;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XEZipE0D329CXpQUVmd9S2ilaIWX19xXCTc10NTNPfU=;
-	b=Dlxj3Vks/hoEDOOYITUZ/hSUgtc3yDEZFxRZzNDMJCwH+lTZlw03Tm+wry8Ssz40ktuuNh
-	qUIFSwlCd3y+v1AA==
+	bh=o8wiLi93h7s5nrhIswwZYAfTTdER68dWwImPGQeIWAU=;
+	b=AlOLPP0qaWbhjKN77AjJ21+JTFa5LppiZI1veMMefptE770NBl9ldgZ5s9tXoWoEqTpCes
+	/NfkSPCqAZf0sQCQ==
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To: Felix Maurer <fmaurer@redhat.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
@@ -66,15 +64,13 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
 	Yoann Congal <yoann.congal@smile.fr>
 Subject: Re: [PATCH net-next v2 6/9] hsr: Implement more robust duplicate
  discard for HSR
-Message-ID: <20260203120813.hSgDgi4e@linutronix.de>
+Message-ID: <20260203120930.JjaLfGMy@linutronix.de>
 References: <cover.1769093335.git.fmaurer@redhat.com>
  <07b90a435ed7d3450c1949e3a21910916d8538de.1769093335.git.fmaurer@redhat.com>
  <20260129144348.CIs44m-d@linutronix.de>
  <aXuIAFJ_m6gMUFFO@thinkpad>
- <aXugXpSajp6jzG1o@thinkpad>
- <aXyJTzwJ3x34B-xR@thinkpad>
- <20260202175311.m2Qu8pEp@linutronix.de>
- <aYHg08WMQyQKmgZO@thinkpad>
+ <20260202171123.LkzpiAMv@linutronix.de>
+ <aYHXN1RvUoX6TGXM@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +79,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <aYHg08WMQyQKmgZO@thinkpad>
+In-Reply-To: <aYHXN1RvUoX6TGXM@thinkpad>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -94,7 +89,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256267-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256268-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,64 +107,21 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: CCA2BD8DBF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:mid,linutronix.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A010AD8DED
 X-Rspamd-Action: no action
 
-On 2026-02-03 12:49:39 [+0100], Felix Maurer wrote:
-> I think the duplicates can occur on RedBoxes if they are used to couple
-> the HSR ring and another redundant network (either with a PRP network
-> through HSR-PRP mode or with an HSR network through HSR-HSR mode, which
-> we both don't implement at the moment). In both cases, two RedBoxes are
-> used to maintain redundancy and both independently inject a frame they
-> receive into the HSR ring (see Figure 12 and 16 in the IEC
-> 62439-3:2021). But it's also the RedBoxes that would remove the
-> duplicates, so we would be aware that we should discard duplicates on
-> port A and B.
->=20
-> However, I'm not sure if these are the only cases where duplicates are
-> to be expected in the ring and I don't want to prematurely make the
-> decision to just forward everything within the ring.
+On 2026-02-03 12:08:39 [+0100], Felix Maurer wrote:
+> > I would get rid of it. There the "official" DECLARE_BITMAP(). If this
+> > doesn't work just open code it avoiding the macro.
+> 
+> Alright, I did that in the v3 [1] I sent yesterday. Sorry for not
+> waiting with that until the end of every discussion. I understood your
+> reply to 0/9 as a "go" for sending a new version addressing the small
+> issues (without touching the A/B tracking).
 
-I would have to study the spec first to understand how PRP, HSR mix
-works with the redbox before I can give a statement. But yeah=E2=80=A6
-
-> > If you track duplicates for A and B in a single "bitmap" then this would
-> > mode X.
->=20
-> I think I didn't understand this clearly and I mixed this up in some of
-> my replies, so just to make sure; there are two ideas:
-> 1) Track port A and B together, i.e., don't forward the
->    counter-duplicate, i.e., Mode X (which is optional to implement).
-> 2) Don't track duplicates for port A or B at all. We consider duplicates
->    in the ring as a failure of another node.
->=20
-> We don't consider 1), i.e., Mode X, at the moment. We are only
-> discussing idea 2), right?
-
-correct.
-
-> > I nag here a bit because you allocate 16 + (128 / 8) * 4 * 64 =3D 4112
-> > bytes for this bitmap per node. That is a bit over 4kib. Then adding and
-> > removing sequences got a bit more expensive. Anyway. There is table
-> > F.19+ specifying HSR tests and don't find "forwarding duplicate over
-> > port A". So lets keep it.
->=20
-> I totally understand that. It's quite some memory for each node and I'm
-> very much in for reducing that. But I'd suggest that, for now, we follow
-> what we had before and what the standard explicitly asks, which is to
-> track (and discard) duplicates on port A and B as well. I'm not sure if
-> we should diverge from the standard in one of the few points where it is
-> explicit. If I understand your last sentence correctly, you're okay with
-> that as well?
-
-Yes. Because you reworked the duplicate-detect algorithm and I would
-like to keep the "unrelated" details (tracking A, B, =E2=80=A6) as it was s=
-o if
-it serious regressions get reported we can easily pin point it. So we
-replace just one thing and both multiples. At the expense that more
-memory is now consumed but this is fine I hope.
-So this might be for the future.
+Don't worry, I planned to reply earlier but didn't manage. Hope to
+continue today with your v3.
 
 > Thanks,
 >    Felix
