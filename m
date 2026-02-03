@@ -1,185 +1,191 @@
-Return-Path: <netdev+bounces-256283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKBqEyTvgWlAMwMAu9opvQ
-	(envelope-from <netdev+bounces-256283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:50:44 +0100
+	id oKWNDlzugWlAMwMAu9opvQ
+	(envelope-from <netdev+bounces-256284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:47:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D96D9555
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:50:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BEED944A
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:47:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74B9330E72EA
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:43:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30E4B3031BAD
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D5732E690;
-	Tue,  3 Feb 2026 12:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81222284B2F;
+	Tue,  3 Feb 2026 12:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CEvxVeql"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeez7ONV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9A631A7F2
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E983932E690
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770122582; cv=none; b=OfpNP0X7l5lSFcmu6Q6p+H6J8sFjd8H9kE9nwTLzoABV5WbAnJAxeup4y4KvThbBNXni/gch4QUlbQwWGY3G+BSymyJ4s8R5nxqzaxIlx76p6c6OkG55NFr9b/m9GQ2dtngOPL0LOHUNnADHrf+tGeB2FmRmcUhGI0B/dVZni7c=
+	t=1770122615; cv=none; b=Z+9FAQODh4eEK2nKYBZA+88yuATcU1D7oj/9rEgfa5Ji/qU9K8DRV6pPJXS4KbDp6y08CilB5/QP1Vzhyhv3bwFHOBtgTq+aPBVAWLOvaBH1nilAQabzvW21Tk0wA1aN49/cIFcEgIf1omb8q4yUCpFQj5530dppMhZ5T84KkyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770122582; c=relaxed/simple;
-	bh=u+chm2qe2UaDCOdZTAISqPdNE1lhHXCRqAvQjvQx0WM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rd7EOdKIubDs9rvL23dCeIt0PfKihhLc/G5YwQ4FOBazif1UKiszWkluGxyqo/hjpDXXanp1eHcqII7tZPWozbbkf8/FW2UFRY2+AkDUTMqe/GGxM4kWZo7PkU7NcaUa59dNc9Am3Ym9K4UU1i17KiB86+nAbOPNqBD5C5Asc+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CEvxVeql; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770122580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LF3GRiApzlM2RrKH+kiOvRs8f6wdo1Fn0YQ6vnScJiQ=;
-	b=CEvxVeqlZeITVeE6vpHS31bB+Pk4DlUGinUoLd8u2dVfAr0fOU7NeGTNtN+HT0HsoeB0gC
-	RTXmMFu7OFM0fgrNgsuQ7ePmAMbGkFTcdhtKlNK6Ki8egqwBe+h8jcu9Vwb97b1IcNWCk6
-	7cED9UdYscr2ZPfBSbT+a3jZ2SIKZGo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-moibDoRpM9-yTHg7ZbNy_Q-1; Tue,
- 03 Feb 2026 07:42:57 -0500
-X-MC-Unique: moibDoRpM9-yTHg7ZbNy_Q-1
-X-Mimecast-MFC-AGG-ID: moibDoRpM9-yTHg7ZbNy_Q_1770122575
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E2EC1800365;
-	Tue,  3 Feb 2026 12:42:55 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.34.184])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A6E7180176D;
-	Tue,  3 Feb 2026 12:42:51 +0000 (UTC)
-Date: Tue, 3 Feb 2026 13:42:48 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jkarrenpalo@gmail.com, tglx@linutronix.de,
-	mingo@kernel.org, allison.henderson@oracle.com, petrm@nvidia.com,
-	antonio@openvpn.net, Steffen Lindner <steffen.lindner@de.abb.com>
-Subject: Re: [PATCH net-next v2 4/9] hsr: Implement more robust duplicate
- discard for PRP
-Message-ID: <aYHtSP-Pl1mTpkJC@thinkpad>
-References: <cover.1769093335.git.fmaurer@redhat.com>
- <fe1dbc483482e98fbc286290a2a3e88f555894d4.1769093335.git.fmaurer@redhat.com>
- <20260128163824.GB172540@kernel.org>
- <aXpXY0YSjA-ctoBa@thinkpad>
- <20260202165702.R9PI3JSM@linutronix.de>
- <aYHMvaGiuQSHBevG@thinkpad>
- <20260203115719.cU_6tnal@linutronix.de>
+	s=arc-20240116; t=1770122615; c=relaxed/simple;
+	bh=WBJJb48LvNCLB7eCJx4qgCbJuGlWDejCj8VJq/6cvn0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YAHSnw8Qxy+wss9E0rF2o29nEcFUVhHKs05TiMgcwjmL7EEGXsmFPRW8Jorp/WwlIgCk8dNK8/uZM4llenx4WPIX5J7ElNQd+kzqNgbs/u2m2Og/SH8u0F+Xi2XHAoq+mHInb8WTxER4s3O57piccWwxCohbHP23+JKdAZKhSRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eeez7ONV; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88a367a1dbbso86506246d6.0
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 04:43:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770122613; x=1770727413; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X7TZeF/N6S3YuCMvZLz08GHYLrlP/fgxIlS8hkF8ABw=;
+        b=eeez7ONVYl9c2/NukjBvLCMLM5WKEchJ/7DjA8HalN56S3UDgcBQCO+ecrdMWrrkBO
+         +kGDSmrKayQhIL5UPz8epQKk5nbhoGarvKXpWVJZ1piQ65im1CxE0eO+Eko59C0bXzij
+         HohPYo0g7+VVaPpIiUdepDJhqG3mTwfibiGTzY+W1fv/sr5RfI8qOUgaCIhW1DOU+d4S
+         41nWR0Co0M+ANepxZCughXdcVm45YcQIQ50GjK8Ny8TYF7Y/I+DrheJGvyUSGSjmeo5/
+         Xcz1boQcRzIex1LJtH30x/ko46+8dWnWe5QFakAB+hlJWqToFU27F/0b/LBIiyptw6m1
+         E4mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770122613; x=1770727413;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X7TZeF/N6S3YuCMvZLz08GHYLrlP/fgxIlS8hkF8ABw=;
+        b=oUq9xjmdvHirKVpRINQ4pheJVvhpCfOsEzPi0SfALHSu958PnCbQBfnoiGu2TQFW6Q
+         Eh724K8Yj+F+3N0U2mXICzy7hzZwLCqXBPIjT92R0M1TmTSwRito0ju6DEgztY8siNcA
+         SY7GGI6g9g+IZEvEALsxvNaXF3WzSxSPpkQTFvUzx05GPDH/HnQzx9zi4vyIvr67xBCv
+         f9wJJVuklA1BmDZWdARBRSbPA7vu/nSTbnAP/UFzMmH42KEFIbEfc9ULN6KnQ9xq2hA6
+         RCI7B7SRF5Km3zdugEUdocsJuSa3qVLJPdXpFApoeM7t59rkS2pEoOa/wO7Q3wi8cJAb
+         5iiA==
+X-Gm-Message-State: AOJu0YwoP6gnU7R/tymd/RLbm4SqAbNc8mAYj40rONqiAQXtvgcghN3d
+	4+F8SVMHQRXn8LO8UDbPfU/jmo7W5G/us3zI0mTP3BWeSJsbNeySncmD
+X-Gm-Gg: AZuq6aLRqCtJJqbyqSFd4WLuSk+1aGKMF5ZQyj6j78f0ieMpExhueJqzPgQsRBUR+n0
+	rvhJC2v6y0/XlMp9S0b5D0g5Q75fnMVCKm6WXWGjRW0LExgCojUX3hgB2tuNGMu3gQtnR9ixb/n
+	l4Q+hSv3wLPL88hOevo4FslVDaeWg8T5OCEzyeD4f44uoZ8KxF3r7D0V9dligg5d4e3+TPHy8+h
+	JAI/JY/RAujS9X/028sINwemUl/OXOFuDz2oVm69Fh4gE6EUMMTN661GsCputtwvFnlFopqcW4/
+	KdvvSFJoIsIz8ONw8SdhLYK8eO5yei5YiVO8FQCd8rMQCXjU+qXrQwwoVFvQQl++SALNKtPFq0n
+	62EPIaERpP7flpbztv2RozQvzTriwBAmpbcSvdW+DfAahT0L2mf0z89V3qXLydDBwdQcDGqDBS2
+	qtVJPSCfj2SWUqMezIw0yN
+X-Received: by 2002:ad4:5dee:0:b0:894:2d44:509e with SMTP id 6a1803df08f44-894e9f85e2emr227219146d6.23.1770122612794;
+        Tue, 03 Feb 2026 04:43:32 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-894d36c85b9sm132915776d6.24.2026.02.03.04.43.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 04:43:32 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Date: Tue, 03 Feb 2026 20:43:08 +0800
+Subject: [PATCH net] net: ti: icssg-prueth: Add dependency on HSR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203115719.cU_6tnal@linutronix.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260203-icssg-dep-v1-1-bacaf5234fb3@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAFvtgWkC/x3MQQqAIBBG4avErBPUoKirRIu035qNiRMRSHdPW
+ n7weIUEmSE0NYUybhY+Y4VpG/LHGnco3qrJattrqzvFXmRXG5JyYxiCtw7GgGqfMgI//2umiIu
+ W9/0Akv5yk2AAAAA=
+X-Change-ID: 20260203-icssg-dep-b9f7fc2be11e
+To: netdev@vger.kernel.org
+Cc: Kevin Hao <haokexin@gmail.com>, stable@vger.kernel.org, 
+ MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256283-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,de.abb.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E1D96D9555
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256284-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,davemloft.net:email,lunn.ch:email]
+X-Rspamd-Queue-Id: 52BEED944A
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 12:57:19PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2026-02-03 11:23:57 [+0100], Felix Maurer wrote:
-> > On Mon, Feb 02, 2026 at 05:57:02PM +0100, Sebastian Andrzej Siewior wrote:
-> > > On 2026-01-28 19:37:23 [+0100], Felix Maurer wrote:
-> > > > > > +	if (!block) {
-> > > > > > +		block = &node->block_buf[node->next_block];
-> > > > > > +		hsr_forget_seq_block(node, block);
-> > > > > > +
-> > > > > > +		memset(block, 0, sizeof(*block));
-> > > > > > +		block->time = jiffies;
-> > > > > > +		block->block_idx = block_idx;
-> > > > > > +
-> > > > > > +		res = xa_store(&node->seq_blocks, block_idx, block, GFP_ATOMIC);
-> > > > > > +		if (xa_is_err(res))
-> > > > >
-> > > > > Hi Felix,
-> > > > >
-> > > > > I ran Claude Code over this with review-prompts [1] and it flags
-> > > > > that in the error path above, the following is needed so that the
-> > > > > block can be re-used.
-> > > > >
-> > > > > 			block->time = 0;
-> > > >
-> > > > I agree. It would nonetheless be reused at some point, but not setting
-> > > > time = 0 may lead to an unexpected block getting removed when it is
-> > > > reused (or at least an attempt to do so). I'll fix this in v3.
-> > >
-> > > Not sure I follow. If xa_store() fails then the block is not added to
-> > > the "sequence-blocks" and it will be attempted once the next packet is
-> > > received, right?. Otherwise node->next_block is not updated at which
-> > > point this block will be added twice which sounds worse.
-> >
-> > Yes, it will be attempted again on the next frame that needs a new
-> > block. But every attempt to recycle the next_block starts with calling
-> > hsr_forget_seq_block(), which tries to xa_erase() the block if time!=0.
-> > Generally, time==0 is the marker that a block is not stored in the
-> > xarray. So for consistency it's correct to set time=0 if the block can't
-> > be added to the xarray, even though I don't think it would cause any
-> > trouble at the moment if the time is not reset.
->
-> My point is that the block will not be recycled if it failed to be added
-> here. It remains the "next" block to be used and added to the list if it
-> fails that xa_store().
+Commit 95540ad6747c ("net: ti: icssg-prueth: Add support for HSR frame
+forward offload") introduces support for offloading HSR frame forwarding,
+which relies on functions such as is_hsr_master() provided by the HSR
+module. Therefore, a dependency on HSR should be added for this driver.
+Otherwise, the following build failures will occur when icssg-prueth is
+built-in while HSR is configured as a module:
+  ld.lld: error: undefined symbol: is_hsr_master
+  >>> referenced by icssg_prueth.c:710 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:710)
+  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_del_mcast) in archive vmlinux.a
+  >>> referenced by icssg_prueth.c:681 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:681)
+  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_add_mcast) in archive vmlinux.a
+  >>> referenced by icssg_prueth.c:1812 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:1812)
+  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(prueth_netdevice_event) in archive vmlinux.a
 
-Hm, I'm not sure I follow. Do you argue that the code already in the
-patch is incorrect or that it would be incorrect with Simon's
-suggestion?
+  ld.lld: error: undefined symbol: hsr_get_port_ndev
+  >>> referenced by icssg_prueth.c:712 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:712)
+  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_del_mcast) in archive vmlinux.a
+  >>> referenced by icssg_prueth.c:712 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:712)
+  >>>               drivers/net/etherneteth_hsr_del_mcast) in archive vmlinux.a
+  >>> referenced by icssg_prueth.c:683 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:683)
+  >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_add_mcast) in archive vmlinux.a
+  >>> referenced 1 more times
 
-Yes, in case the xa_store() fails, the current "next" block remains the
-"next" block. But we also definitely erased it from the xarray already.
-With the next frame, we attempt to recycle/insert the block again. I
-don't think that can lead to the same block being used twice?
+Fixes: 95540ad6747c ("net: ti: icssg-prueth: Add support for HSR frame forward offload")
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Cc: stable@vger.kernel.org
+---
+Cc: MD Danish Anwar <danishanwar@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/net/ethernet/ti/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-I understood Simon's suggestion this way: in the error path, *also*
-reset block->time to 0. We'd still return NULL in that case and,
-crucially, don't advance the next_block. IMHO, that only makes the data
-more consistent (blocks in the buffer that are not in the xarray always
-have time=0) and prevents that we try to remove a non-existing entry
-from the xarray on the next frame when we try again to recycle the
-current "next" block.
+diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+index fe5b2926d8ab060d83f5a58d91e749a45c6cea18..48aa3457fd6d7fd99147e4fb1148559d6fcba082 100644
+--- a/drivers/net/ethernet/ti/Kconfig
++++ b/drivers/net/ethernet/ti/Kconfig
+@@ -192,6 +192,7 @@ config TI_ICSSG_PRUETH
+ 	depends on NET_SWITCHDEV
+ 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+ 	depends on PTP_1588_CLOCK_OPTIONAL
++	depends on HSR
+ 	help
+ 	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
+ 	  This subsystem is available starting with the AM65 platform.
 
-Thanks,
-   Felix
+---
+base-commit: 193579fe01389bc21aff0051d13f24e8ea95b47d
+change-id: 20260203-icssg-dep-b9f7fc2be11e
+
+Best regards,
+-- 
+Kevin Hao <haokexin@gmail.com>
 
 
