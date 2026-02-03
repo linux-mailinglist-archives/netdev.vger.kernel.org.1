@@ -1,132 +1,203 @@
-Return-Path: <netdev+bounces-256299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6If0J2r8gWk7NQMAu9opvQ
-	(envelope-from <netdev+bounces-256299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 14:47:22 +0100
+	id WFMOCuH8gWk7NQMAu9opvQ
+	(envelope-from <netdev+bounces-256300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 14:49:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E9FDA1E3
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 14:47:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 814CBDA204
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 14:49:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ECA9B302ACEF
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 13:47:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A8F83045A32
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 13:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25090346A0C;
-	Tue,  3 Feb 2026 13:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57DB39E6F9;
+	Tue,  3 Feb 2026 13:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="45bxZaTl";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0/NqU2Fz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkfPysch"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90C9201113
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 13:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A724C318EEE
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 13:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770126438; cv=none; b=jknaNju8bO++A7YBhA/8lF6ENzLiBYV38x8juPgIXD1BcjDfNhRDtuMztsuEFgs5NaJUHRhTAaaGpqbV5Pz15+RVRY7SVnoHIXDMAgGxay4GRP3vO6GiUteoU5t2pEMNR0Xgha9dB94BuqSMbDpC4RzQuHVKE90QrmvfkkX8cjk=
+	t=1770126556; cv=none; b=ih8uU7GBVYouE2/OeUFJb1uICgShL95Q1SQpOXP33qbPeuP5QfkHEdXri2rSD9s4MU7h4zb5TVdeZ7OTABXlWXtnxy9tGLxYTdPuveFRRjKszigwWD9J9gC5KhBO/Cq8Z8PiftbjcE9vxYfxyBQ26zS7XJBu8XXyu/AoZM1SdZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770126438; c=relaxed/simple;
-	bh=6+kTkjRJbfXiaHW0+AGas7RjaKSk5o8znQIJ3GHIHVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SZQze49XuItVLY6JNPboPJnLoBUVPALenynrdko8yopev3Jyo/rnbw4k6jla+XaS7puLZotOIYTKq0XVmfHlySxFkNaeAfgcZ0NPn22fiFKQWx3Sux14mXYNxz/RyeSxzMOZwHYAHlmFkupC+pauDLvufsV8GsSKi9e0QMKwwSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=45bxZaTl; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0/NqU2Fz; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 3 Feb 2026 14:47:12 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770126434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xM8phpfWBsZwaIYtVkmV50nAWvOzsolS5Jj56q1+LBc=;
-	b=45bxZaTlt+COGLhGQNeqo+M5KE+7Cvgex6Bgbwqjw2JY36X0a8ulnJk9ySJOfNp36MpXpo
-	yr4GiyT8aqRQVRWEBJu3gn9PXdL+znoRcPQDOPbYWXM4saafpbdJBrV8aJXwcRev74ReWB
-	berotZv9FRcrC3wUY4PGPBH3vUc+dPfx+5osN0ai5EOHtSfGagnN81hfBa9B1sz+jB+VgY
-	A1YT5Ro3Dpi3CfCOP19E/zR0zXzAnRn2A6sxSNvyk+DDC++Woo3cLnBOZjGJCXKuYQf+ut
-	lZQEA1BZvxn+rFgt5A7cR8uuOrsnYx8l09zs5H3oKdgANW315RDCKajm72QtJA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770126434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xM8phpfWBsZwaIYtVkmV50nAWvOzsolS5Jj56q1+LBc=;
-	b=0/NqU2FzbUUVFI7nCuml3OvS/tyZ8ViH9muxsCQZqdsbgrcXGehqZbOAOIJuV8XjruL/cZ
-	4UEu8X1s0Uyx3QAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
-	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net
-Subject: Re: [PATCH net-next v2 1/9] selftests: hsr: Add ping test for PRP
-Message-ID: <20260203134712.Q1vJp5UQ@linutronix.de>
-References: <b54f9225ae39d0d4bd9c8c1b0b98fe47fb7211eb.1769093335.git.fmaurer@redhat.com>
- <20260129110500.l2jOMEYp@linutronix.de>
- <aXthMlr6Hpas1LBt@thinkpad>
- <20260129152149.dKwN1yGM@linutronix.de>
- <aXucj8L-cBUVIYHX@thinkpad>
- <aYCPsDZeJvCrJYRH@thinkpad>
- <20260202155510.C1zpsxnk@linutronix.de>
- <aYHJ9KHdiBEGfjwA@thinkpad>
- <20260203115526._PRE3nvY@linutronix.de>
- <aYHo1uEK2e8Vg4WM@thinkpad>
+	s=arc-20240116; t=1770126556; c=relaxed/simple;
+	bh=WcPvYQZ4hPvcxXauhmbhj2zr2Rf9jOKMLrdUrT7AWY4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EVrZV1nfoEqewBn3KClwX9t5wTkPFuSRXN26Gf7fLNH34ggkR24OzGB7d+HVU2VIpcibb3sF7zgVeo/wTPM30bV4iffBXgT3Qg8FuVbGfU1JkLfM2Z0Z+TEhNkPF4lXiJIl5JFuhDEEvv6/G/RnEb06nSFjQDUGkGisNc1Nv4Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KkfPysch; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b8871718b05so905169066b.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 05:49:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770126551; x=1770731351; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O95u82WFtOCqmhhnrx4s8maU221mJSOHdUAd47NdUN0=;
+        b=KkfPysch5AJuvwrcCH//IzQNGwqMGpKhymSQ614R6XX1q4m0H3IhHSIRsdzWd7qExo
+         I8VUFnumqz+VTOtzLSOJVhm2nXI1dXN6hN2p3kZrJs3QA1HVNByvvnMw72UCTxH/70CE
+         gU1FxmgmTjNsNxtGYqtmTLkI5ZJAxbiXeoJTCOsf7LOXaEN/EX08O/lg+K1lzAObeUEZ
+         8V/7B6mOMGySU2wU1ieA9EtYpUR/jfnPCwN9+OzxCWBK4QpztmKMXJKzCBpQcENdCAQ3
+         Wt3oAKGIeEbIidDdAh2tWb9rqI8Bw3kZq6RiC2i/9Ln/P1Ktvxha4ULKPzhGaYsEjLWk
+         GE+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770126551; x=1770731351;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O95u82WFtOCqmhhnrx4s8maU221mJSOHdUAd47NdUN0=;
+        b=S2nGe8Q8+3iZ87bR1BsIylhSp5ajIMjHVdxW2xEobqdZAkeFLb6NBsiB8ZgLR41W/9
+         i6pVlpKUh/hKX4DbtiWBW1klxgsU8R8bynXd4STh16GYRQ1KSiVJj5dTJl7XnRrFwKMT
+         HgPbi3859g7R7qlqoJWssJmfn4B3ZJnIJHk6sZQcwIkRd5kCRUI778KTZ0TjAy44Ra6S
+         KRN4ZfZdh2ybf8faXt+Go5SJ9gFIhiExWe96DCtcJr8iP7tEiIjFwkrJ7o2azdyOp/0B
+         U1tEhrdoY2CtiK0Z8USlm/AiIV4qpdtFT2GF2POms8zwhmyZ0s0mnkjhzUdbMdros/UR
+         5iwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdDxK4mvcoFUw9yCQyHwNL73B33Ht5+cHcVAw9JVodl761s1291fwgnp6eiVdjdoheFDpogdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy22HL3CgMUysZcmPD7nOMzCkBLbYUlCAyADAGbOvf/ExtUIuLF
+	VNNf12P0kIn3XdxhG64u7StTZjkzwVn8hfIYNEold755dGU/GNmi6WpJlPZ8Dg==
+X-Gm-Gg: AZuq6aLDQGZ4RpBqzjg/kDt2zVgQQ0mTzf46xLoDVUavYxKeK0CkhqkAzbwAqz31LTS
+	2CEI7ry7D2n6gCh14k1RMACvxosO4g66upID3kR3PexxY4osyDJ2uN5vD+cqzw0yPJsvPulJQrF
+	ZfCaJBXmnq4oUgRoc2y+jYiklzs0CJcgIS/iBbjsQCZSrpXtLUl5cVjjJvK2d3t6hq2eBOSYX7e
+	GpAtbpnN7LTmlWbddlAKuBoCEhzPm7kmCWKQ3zie5m9kCwY03QrT/n7zW4Uuy/FiwCSB9+M+zlz
+	WuRqof1Etk1T8oTpa4OcgvyAq0GuqtBcQSy0/FLDWvS+y2VNB++vhL7wC1p8fqMCVEwLrIvHyBx
+	l4JQSruOO7SfpaOTchAHZP6YhybbSKwi8tCRDUlhp/RJHL6xtnEAB5k4Kkcd00jVbbXrCAVXU+s
+	LrfBsWe+2tHPKiHg==
+X-Received: by 2002:a17:907:3c93:b0:b7d:3728:7d11 with SMTP id a640c23a62f3a-b8dff6be325mr961499866b.50.1770126551130;
+        Tue, 03 Feb 2026 05:49:11 -0800 (PST)
+Received: from t14.. ([165.85.67.147])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8dbf184e5dsm1058051366b.43.2026.02.03.05.49.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 05:49:10 -0800 (PST)
+From: anders.grahn@gmail.com
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Anders Grahn <anders.grahn@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3] netfilter: nft_counter: Fix reset of counters on 32bit archs
+Date: Tue,  3 Feb 2026 14:48:30 +0100
+Message-ID: <20260203134831.1205444-1-anders.grahn@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aYHo1uEK2e8Vg4WM@thinkpad>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256299-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,netfilter.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-256300-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andersgrahn@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 28E9FDA1E3
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 814CBDA204
 X-Rspamd-Action: no action
 
-On 2026-02-03 13:23:50 [+0100], Felix Maurer wrote:
-> But like you, I'm uncertain what would be the right thing to do and
-> which port should control the MAC for all the others.
+From: Anders Grahn <anders.grahn@gmail.com>
 
-At the very least I need the same MAC on both ends for PTP.
-Now that check the spec, 5.2.1.1 "HSR handling of multicast frames",
-bottom below Figure 10, says it sends the frame over frame A and frame B
-oder the ports. The "src-MAC + sequence number" uniquely identify the
-same frame.
-Now I am certain that the two different MACs are wrong. Let deal with
-this later and then decide what to do about the testsuite.
+nft_counter_reset() calls u64_stats_add() with a negative value to reset
+the counter. This will work on 64bit archs, hence the negative value
+added will wrap as a 64bit value which then can wrap the stat counter as
+well.
 
-> Thanks,
->    Felix
+On 32bit archs, the added negative value will wrap as a 32bit value and
+_not_ wrapping the stat counter properly. In most cases, this would just
+lead to a very large 32bit value being added to the stat counter.
 
-Sebastian
+Fix by introducing u64_stats_sub().
+
+Fixes: 4a1d3acd6ea8 ("netfilter: nft_counter: Use u64_stats_t for statistic.")
+Signed-off-by: Anders Grahn <anders.grahn@gmail.com>
+---
+ include/linux/u64_stats_sync.h | 10 ++++++++++
+ net/netfilter/nft_counter.c    |  4 ++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_stats_sync.h
+index 457879938fc1..3366090a86bd 100644
+--- a/include/linux/u64_stats_sync.h
++++ b/include/linux/u64_stats_sync.h
+@@ -89,6 +89,11 @@ static inline void u64_stats_add(u64_stats_t *p, unsigned long val)
+ 	local64_add(val, &p->v);
+ }
+ 
++static inline void u64_stats_sub(u64_stats_t *p, s64 val)
++{
++	local64_sub(val, &p->v);
++}
++
+ static inline void u64_stats_inc(u64_stats_t *p)
+ {
+ 	local64_inc(&p->v);
+@@ -130,6 +135,11 @@ static inline void u64_stats_add(u64_stats_t *p, unsigned long val)
+ 	p->v += val;
+ }
+ 
++static inline void u64_stats_sub(u64_stats_t *p, s64 val)
++{
++	p->v -= val;
++}
++
+ static inline void u64_stats_inc(u64_stats_t *p)
+ {
+ 	p->v++;
+diff --git a/net/netfilter/nft_counter.c b/net/netfilter/nft_counter.c
+index cc7325329496..0d70325280cc 100644
+--- a/net/netfilter/nft_counter.c
++++ b/net/netfilter/nft_counter.c
+@@ -117,8 +117,8 @@ static void nft_counter_reset(struct nft_counter_percpu_priv *priv,
+ 	nft_sync = this_cpu_ptr(&nft_counter_sync);
+ 
+ 	u64_stats_update_begin(nft_sync);
+-	u64_stats_add(&this_cpu->packets, -total->packets);
+-	u64_stats_add(&this_cpu->bytes, -total->bytes);
++	u64_stats_sub(&this_cpu->packets, total->packets);
++	u64_stats_sub(&this_cpu->bytes, total->bytes);
+ 	u64_stats_update_end(nft_sync);
+ 
+ 	local_bh_enable();
+-- 
+2.43.0
+
 
