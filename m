@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-256089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256090-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MD/9AWRbgWlnFwMAu9opvQ
-	(envelope-from <netdev+bounces-256089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:20:20 +0100
+	id sDQRGTVbgWlnFwMAu9opvQ
+	(envelope-from <netdev+bounces-256090-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:19:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C828D3B49
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:20:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F61D3B22
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 03:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BDBD43015CB4
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 02:19:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60F2F3038F20
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 02:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A272F25F8;
-	Tue,  3 Feb 2026 02:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDE62F28EF;
+	Tue,  3 Feb 2026 02:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwEskGGZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mn8FukeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E361922AE45
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 02:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6798C2F25F8
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 02:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770085150; cv=none; b=Gbjic33kMETYfWLz48tDn7ZCR0Z99nSmFwq39gfoZ0Rz3AjrR93j79VH1bczlKKuetEptjpCZmrn2ZVzmrrKu4LwWQ+W5LvE+8hCKILJDIy7fLpkWuzzQG6uUbDBa5ZrXtw17rPliRCwViA+yI3IDQLq3tzCxw4W/eoafFeFC0A=
+	t=1770085156; cv=none; b=BTP1e6j+taC8ftJ2Zuo+CU4mcZ/EJw9mZ2u7aGWr/YytU0Bv/K+NLjzCxJkRPRzepqsw950dqOyH+GkmC1lE124lb8/mldR+CJquw8bDOaogwvnUaUhPGgXCgcLzxuW2U2/IoJu+sd11WuDCTUMlEdhcVLi7C5x6kGn0L0i6abQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770085150; c=relaxed/simple;
-	bh=PwlO+5tJ1Z658R3+kpEyrC8Bi6r9M0IwKU98dcsWaCU=;
+	s=arc-20240116; t=1770085156; c=relaxed/simple;
+	bh=YFdR/exoj2HPus84yYYEmp5YFMYBWPstIXz2rcdAMDE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=abJjWjPrc06YnlejdO5RIrKUIxol0Xa19iliCcJeL6HvHROO/+JmaAG7OFrBTzMeULv07KKAiwT8ri+mwwhRnqLU/jxgWvtkEVS9UZBzLcFbwRNId8vjyPLY2VQwJt4vDHymH9plweUots12t1T7YCjs6Wly/heaJX+Deow/PUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QwEskGGZ; arc=none smtp.client-ip=209.85.160.175
+	 In-Reply-To:To:Cc; b=E1WD6oZtT5PPghYtIsnleGu/Huiqt75stvPIMsn35xQqH2W6iINA9n73TXn6vcQkghuGVhp4t40L6z48iYQXf8V8fShgwzJjjow+rJALbSCDcUWq/nYJbzZgqO13YCpTPuoHepCD30B/G037sRKxULrXGdPUrhIMJWLp1gcizDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mn8FukeZ; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5014600ad12so38027731cf.2
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 18:19:08 -0800 (PST)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8c5265d06c3so38367485a.1
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 18:19:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770085148; x=1770689948; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770085152; x=1770689952; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ylf/wxb0zUUywRHu+X/57l5JJ2yWVJWbffw9Iqhdass=;
-        b=QwEskGGZMS8r2/Bi6yuZR5NZKU/T6YmWTXXwA+1HBbSqOA/3Ebm24Th8M2hyy0naAh
-         f3ZpRJtUcklhKkTe9Yf4ygI48u4is6Uf+oowsTqWq5C0jQErkGlImqjG6du3CDUTv6Vq
-         qtXbpYdBkGn80prDPF4LUtY1i2Q27peRGMa18Hwqr4zUUAoTZ343yu2Ti0wWje5BaQds
-         TrE+E/TJFVUNJm5bLfTtzEOKm5cy19eLtcaa9B+uSNNfWFs+B3h1rBRoqdPvAwZqPFtp
-         0KJb0G4WUYN+ViM2Kk+G4ImNYBNlM+xcoQaoYyL+XGdGZLP9jj30Llc5oSkZ/g5JuF6O
-         2mLQ==
+        bh=NCLj1WVf/iEPR6Pe1CdNCEP13TWMPR4w0oDQlKVXg8g=;
+        b=mn8FukeZPqXJkTLb85pSXDYyIuoBwMN4PwRo4IZ1++AgivOZxv8s/6dkEnYegsdLlF
+         VfDez3RRPkrfe4dcyhXCJbP7McgbDc5ull6EqoXE8VjIns/evdr604qii/FimQ+gla6y
+         zaILkOXISrNLqYGTWuWaswgeDKE/tZTKkVtRlkv6iYO+vMNsaNIsqDqsAcnI1QOpzxr+
+         +jgStNBn0M9g6NUUF8tbVjlcj0YuEiPEKd4Gbb8dIwXH2lutpm5PUO8DfrARQOimr/y0
+         wp49B7vujurVfkgxfxOW5X3xHsyx6if2/ylEKIaCjsKqmp3gQoew/S3MiVnIR2iF4PH1
+         205Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770085148; x=1770689948;
+        d=1e100.net; s=20230601; t=1770085152; x=1770689952;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ylf/wxb0zUUywRHu+X/57l5JJ2yWVJWbffw9Iqhdass=;
-        b=IL3N5q9SvkpI9eEt6ivdWyWqjdbqTCODr5KSur5uRCGoQA1FNf8jxV77MxMhN9gjms
-         0Qs2WRpb9luHcosLMPGuvgntvv6bZlzki5xIo20HuBu/qqpdpQP2odpIoqe0viEdQYZT
-         c7dW87NiYV+ce0bdiDmife9xQitRJ27AX5RskNZgiRXxVjHQOUgwNsOWpUKj9s5fWF9/
-         DvTS7rx4lQtGPHXtjS5F3UhSCMiL+GFxhBfTxnTsNd5IsmJT3jufH2tg3kaUqmGiFMe6
-         0IitipVyZJ1xTxFazevHcnXbLYECFcrNrjUqSds5Emr8MSJi/aATlWNb+G6XzLUnuN56
-         u7Pg==
-X-Gm-Message-State: AOJu0YzmLD3Qx4XXA7RLQa9nS3RmY5x5udXQPOjjXycFfpF75omrQ4i2
-	V1FWY3Q72Q0dEy+enJJzHF3yprE2i/sBdUrx6mEjs4WpsFkytPczf9mH
-X-Gm-Gg: AZuq6aJSTMu7hJpSCRh0ebeVZwO8NUDb4j1za0mVuAEtFrxCvh8X/aWnWdckg61eGR/
-	boj7YYQ+SJ8Jnb+Vey2d9X3HbQr3Df368WhFYKDyvNhkuNvOw6v63Jpuin0Zvq/kIN/FpzZqD00
-	N46CFQqLKjJMhJ7eXR1IdDabIG/mh4xqQAlU7gZuWAeeSr8pHcg2wv7H3+qdZAw7kAwvHwi7pFZ
-	FjXZJ2lPBVWllMmEyyVwu4+vgM68UN8E5BhpjKz3vm8Vn3QgzMEsJIChVKloXfLZOazpPWW5ZJZ
-	e70+XswlNXLMzBG/2Tr0lS+QZ/8alhoTkANdAHm/D9FvlJLi6hKqr/iiJhfKnTkPl2QeLLq7QRk
-	pF5flpcxrzzzB46Fou5DrBPX7nnQ05Yc6qcvIfYZ2TODnz0cOf8jjnbQkaNCLB4uuI0t67HLGQ4
-	H8yFdZxK0HKaEXOu6X1bpP
-X-Received: by 2002:ac8:5d89:0:b0:501:4701:e9f9 with SMTP id d75a77b69052e-505d2184a51mr174064431cf.26.1770085147611;
-        Mon, 02 Feb 2026 18:19:07 -0800 (PST)
+        bh=NCLj1WVf/iEPR6Pe1CdNCEP13TWMPR4w0oDQlKVXg8g=;
+        b=GtCgx8uAedoBHoUWe0QiXXSMA03FJs2o9j6wilKgckme1qShflvvlkccNy/X0TpkFp
+         DgGtYCjX0zsrg8Gz9UmqOM0eAxbKsu/m+EnnS2BWtF15j4hdS2ZFcXJ2VAUGXIn0BWSz
+         4i4k+cu6ML3b/kSrQshaqcQqReiREcsGfpP0txvauG1JgB56hLWnNqR4RGm6WNEEeeaO
+         FSIuIloHYtscrVRLjdjAPvHxPrmOejDxUbINQd3a9zPhzdc0wpBvMA+AIYbmIcvJ+M+x
+         YPpvXnVXkipzBrPUsvi3aTiesUcTcxq3lI8hGstC21szTj8KIWjw8IiDHpfyWiOAN+f4
+         3hdw==
+X-Gm-Message-State: AOJu0Yzg2vBzXucQQLRwlBIrX5D5j4DYQmmfibL9HUWNI/7iEIO8VX5a
+	opG1lWLGixwfrxQL3PqNh8B29o+nEDJWMpTC86vdUCSwQyJ5+xK6J33V
+X-Gm-Gg: AZuq6aKqwDYCZT/s9gJ6p/UZ/KHz+iKT9t+Zi48AF/XyZmajUYmP56A/XwPp3gYqSxp
+	tKO/2wiWjdbcbUTBC/lMoGgFVpqpN5d4KiRwhLFS+OkzB9ZwtiISl0y0zghvMypshebZyWPEhEt
+	quINH2k1/9SCBnYvk0tKG5stoXL79tsw7tVEj9PcyTZMYoZ4t0EVp7oUME6xeyXMuroImND1KCS
+	qsPgbfNVXcjx8HuUZ/S/PtvQla5pNDndoujkizI+xHBkXDU7bfhmmGcCY+ryzSVk5pl1eLjiXlq
+	vz4TQn2/aAH9qIJBklqSVVYL+xg+sq73yglhIloz0RY0cUPIvNWWT9LN7DqUGVjlAfwI5URC6c3
+	x1LOZotqJ27qkQkbsEuV2SSs55Ts/U/B9AgOi9gSg0BQHx+3GHfsm1PeA4auClulWQK3mGgkOSm
+	k4e0/NyA9eR0bdpbCAqi6P
+X-Received: by 2002:a05:620a:3723:b0:8b2:e9e1:4023 with SMTP id af79cd13be357-8ca20483bc7mr194871785a.27.1770085152190;
+        Mon, 02 Feb 2026 18:19:12 -0800 (PST)
 Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c711d5c34asm1337199885a.50.2026.02.02.18.19.03
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c711d5c34asm1337199885a.50.2026.02.02.18.19.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 18:19:07 -0800 (PST)
+        Mon, 02 Feb 2026 18:19:11 -0800 (PST)
 From: Kevin Hao <haokexin@gmail.com>
-Date: Tue, 03 Feb 2026 10:18:30 +0800
-Subject: [PATCH net v5 1/2] net: cpsw_new: Execute ndo_set_rx_mode callback
- in a work queue
+Date: Tue, 03 Feb 2026 10:18:31 +0800
+Subject: [PATCH net v5 2/2] net: cpsw: Execute ndo_set_rx_mode callback in
+ a work queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260203-bbb-v5-1-ea0ea217a85c@gmail.com>
+Message-Id: <20260203-bbb-v5-2-ea0ea217a85c@gmail.com>
 References: <20260203-bbb-v5-0-ea0ea217a85c@gmail.com>
 In-Reply-To: <20260203-bbb-v5-0-ea0ea217a85c@gmail.com>
 To: netdev@vger.kernel.org
@@ -105,11 +105,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256089-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256090-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -117,7 +117,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -128,18 +128,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,nxp.com:email,davemloft.net:email]
-X-Rspamd-Queue-Id: 7C828D3B49
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
+X-Rspamd-Queue-Id: 24F61D3B22
 X-Rspamd-Action: no action
 
 Commit 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for
 IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.") removed the RTNL lock for
 IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP operations. However, this
 change triggered the following call trace on my BeagleBone Black board:
-  WARNING: net/8021q/vlan_core.c:236 at vlan_for_each+0x120/0x124, CPU#0: rpcbind/496
+  WARNING: net/8021q/vlan_core.c:236 at vlan_for_each+0x120/0x124, CPU#0: rpcbind/481
   RTNL: assertion failed at net/8021q/vlan_core.c (236)
   Modules linked in:
-  CPU: 0 UID: 997 PID: 496 Comm: rpcbind Not tainted 6.19.0-rc6-next-20260122-yocto-standard+ #8 PREEMPT
+  CPU: 0 UID: 997 PID: 481 Comm: rpcbind Not tainted 6.19.0-rc7-next-20260130-yocto-standard+ #35 PREEMPT
   Hardware name: Generic AM33XX (Flattened Device Tree)
   Call trace:
    unwind_backtrace from show_stack+0x28/0x2c
@@ -147,7 +147,7 @@ change triggered the following call trace on my BeagleBone Black board:
    dump_stack_lvl from __warn+0xb8/0x11c
    __warn from warn_slowpath_fmt+0x130/0x194
    warn_slowpath_fmt from vlan_for_each+0x120/0x124
-   vlan_for_each from cpsw_add_mc_addr+0x54/0xd8
+   vlan_for_each from cpsw_add_mc_addr+0x54/0x98
    cpsw_add_mc_addr from __hw_addr_ref_sync_dev+0xc4/0xec
    __hw_addr_ref_sync_dev from __dev_mc_add+0x78/0x88
    __dev_mc_add from igmp6_group_added+0x84/0xec
@@ -157,7 +157,7 @@ change triggered the following call trace on my BeagleBone Black board:
    do_ipv6_setsockopt from ipv6_setsockopt+0x88/0xc8
    ipv6_setsockopt from do_sock_setsockopt+0xe8/0x19c
    do_sock_setsockopt from __sys_setsockopt+0x84/0xac
-   __sys_setsockopt from ret_fast_syscall+0x0/0x5
+   __sys_setsockopt from ret_fast_syscall+0x0/0x54
 
 This trace occurs because vlan_for_each() is called within
 cpsw_ndo_set_rx_mode(), which expects the RTNL lock to be held.
@@ -168,6 +168,11 @@ rtnl_lock() in cpsw_ndo_set_rx_mode() is not a viable solution.
 
 To resolve this issue, we opt to execute the actual processing within
 a work queue, following the approach used by the icssg-prueth driver.
+
+Please note: To reproduce this issue, I manually reverted the changes to
+am335x-bone-common.dtsi from commit c477358e66a3 ("ARM: dts: am335x-bone:
+switch to new cpsw switch drv") in order to revert to the legacy cpsw
+driver.
 
 Fixes: 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.")
 Signed-off-by: Kevin Hao <haokexin@gmail.com>
@@ -184,15 +189,14 @@ Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: linux-omap@vger.kernel.org
 ---
- drivers/net/ethernet/ti/cpsw_new.c  | 34 +++++++++++++++++++++++++++++-----
- drivers/net/ethernet/ti/cpsw_priv.h |  1 +
- 2 files changed, 30 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/ti/cpsw.c | 41 +++++++++++++++++++++++++++++++++++------
+ 1 file changed, 35 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index ab88d4c02cbde76207f89cf433e2b383dcde6a83..21af0a10626aaf0ce6ecb04837899801743f3894 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -248,16 +248,22 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
+diff --git a/drivers/net/ethernet/ti/cpsw.c b/drivers/net/ethernet/ti/cpsw.c
+index 54c24cd3d3be639c90111856efaf154cd77f7ee4..b0e18bdc2c851086d6db6a3d7b9659c23c73b969 100644
+--- a/drivers/net/ethernet/ti/cpsw.c
++++ b/drivers/net/ethernet/ti/cpsw.c
+@@ -305,12 +305,19 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
  	return 0;
  }
  
@@ -203,22 +207,27 @@ index ab88d4c02cbde76207f89cf433e2b383dcde6a83..21af0a10626aaf0ce6ecb04837899801
 +	struct cpsw_priv *priv = container_of(work, struct cpsw_priv, rx_mode_work);
  	struct cpsw_common *cpsw = priv->cpsw;
 +	struct net_device *ndev = priv->ndev;
+ 	int slave_port = -1;
  
 +	rtnl_lock();
 +	if (!netif_running(ndev))
 +		goto unlock_rtnl;
 +
 +	netif_addr_lock_bh(ndev);
- 	if (ndev->flags & IFF_PROMISC) {
++
+ 	if (cpsw->data.dual_emac)
+ 		slave_port = priv->emac_port + 1;
+ 
+@@ -318,7 +325,7 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
  		/* Enable promiscuous mode */
  		cpsw_set_promiscious(ndev, true);
- 		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, priv->emac_port);
+ 		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, slave_port);
 -		return;
 +		goto unlock_addr;
- 	}
- 
- 	/* Disable promiscuous mode */
-@@ -270,6 +276,18 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
+ 	} else {
+ 		/* Disable promiscuous mode */
+ 		cpsw_set_promiscious(ndev, false);
+@@ -331,6 +338,18 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
  	/* add/remove mcast address either for real netdev or for vlan */
  	__hw_addr_ref_sync_dev(&ndev->mc, ndev, cpsw_add_mc_addr,
  			       cpsw_del_mc_addr);
@@ -237,47 +246,50 @@ index ab88d4c02cbde76207f89cf433e2b383dcde6a83..21af0a10626aaf0ce6ecb04837899801
  }
  
  static unsigned int cpsw_rxbuf_total_len(unsigned int len)
-@@ -1398,6 +1416,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
- 		priv->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
- 		priv->emac_port = i + 1;
- 		priv->tx_packet_min = CPSW_MIN_PACKET_SIZE;
-+		INIT_WORK(&priv->rx_mode_work, cpsw_ndo_set_rx_mode_work);
+@@ -1472,6 +1491,7 @@ static int cpsw_probe_dual_emac(struct cpsw_priv *priv)
+ 	priv_sl2->ndev = ndev;
+ 	priv_sl2->dev  = &ndev->dev;
+ 	priv_sl2->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
++	INIT_WORK(&priv_sl2->rx_mode_work, cpsw_ndo_set_rx_mode_work);
  
- 		if (is_valid_ether_addr(slave_data->mac_addr)) {
- 			ether_addr_copy(priv->mac_addr, slave_data->mac_addr);
-@@ -1447,13 +1466,18 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
+ 	if (is_valid_ether_addr(data->slave_data[1].mac_addr)) {
+ 		memcpy(priv_sl2->mac_addr, data->slave_data[1].mac_addr,
+@@ -1653,6 +1673,7 @@ static int cpsw_probe(struct platform_device *pdev)
+ 	priv->dev  = dev;
+ 	priv->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
+ 	priv->emac_port = 0;
++	INIT_WORK(&priv->rx_mode_work, cpsw_ndo_set_rx_mode_work);
  
- static void cpsw_unregister_ports(struct cpsw_common *cpsw)
+ 	if (is_valid_ether_addr(data->slave_data[0].mac_addr)) {
+ 		memcpy(priv->mac_addr, data->slave_data[0].mac_addr, ETH_ALEN);
+@@ -1758,6 +1779,8 @@ static int cpsw_probe(struct platform_device *pdev)
+ static void cpsw_remove(struct platform_device *pdev)
  {
+ 	struct cpsw_common *cpsw = platform_get_drvdata(pdev);
 +	struct net_device *ndev;
 +	struct cpsw_priv *priv;
- 	int i = 0;
+ 	int i, ret;
  
- 	for (i = 0; i < cpsw->data.slaves; i++) {
--		if (!cpsw->slaves[i].ndev)
+ 	ret = pm_runtime_resume_and_get(&pdev->dev);
+@@ -1770,9 +1793,15 @@ static void cpsw_remove(struct platform_device *pdev)
+ 		return;
+ 	}
+ 
+-	for (i = 0; i < cpsw->data.slaves; i++)
+-		if (cpsw->slaves[i].ndev)
+-			unregister_netdev(cpsw->slaves[i].ndev);
++	for (i = 0; i < cpsw->data.slaves; i++) {
 +		ndev = cpsw->slaves[i].ndev;
 +		if (!ndev)
- 			continue;
- 
--		unregister_netdev(cpsw->slaves[i].ndev);
++			continue;
++
 +		priv = netdev_priv(ndev);
 +		unregister_netdev(ndev);
 +		disable_work_sync(&priv->rx_mode_work);
- 	}
- }
++	}
  
-diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
-index 91add8925e235c6cf5542fde11f3383b9234c872..acb6181c5c9e1bf6ed46a7fd14ce422efc0b724e 100644
---- a/drivers/net/ethernet/ti/cpsw_priv.h
-+++ b/drivers/net/ethernet/ti/cpsw_priv.h
-@@ -391,6 +391,7 @@ struct cpsw_priv {
- 	u32 tx_packet_min;
- 	struct cpsw_ale_ratelimit ale_bc_ratelimit;
- 	struct cpsw_ale_ratelimit ale_mc_ratelimit;
-+	struct work_struct rx_mode_work;
- };
- 
- #define ndev_to_cpsw(ndev) (((struct cpsw_priv *)netdev_priv(ndev))->cpsw)
+ 	cpts_release(cpsw->cpts);
+ 	cpdma_ctlr_destroy(cpsw->dma);
 
 -- 
 2.52.0
