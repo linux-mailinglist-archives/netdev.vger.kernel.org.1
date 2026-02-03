@@ -1,53 +1,69 @@
-Return-Path: <netdev+bounces-256104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oI84ActpgWmwGAMAu9opvQ
-	(envelope-from <netdev+bounces-256104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:21:47 +0100
+	id qFLtDZ9qgWmwGAMAu9opvQ
+	(envelope-from <netdev+bounces-256105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:25:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A002ED413B
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:21:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89CC9D41A1
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 692BB306B794
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 03:20:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D26D4304C09F
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 03:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C9531CA6A;
-	Tue,  3 Feb 2026 03:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE182F28E5;
+	Tue,  3 Feb 2026 03:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFr/7be7"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="d66njHCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E7E2F39A1;
-	Tue,  3 Feb 2026 03:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AFA2628D
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 03:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770088817; cv=none; b=rL1BGOVHVjVpMvr7Gmb+wTY/zvZD5ZjjtYIs/DvPVcZkhS0f+3rh9TFH5E/U8bKdsRzzoBB2fxpl2qbLW3tnPr6h+0q+ctPwdmdSIwDSQSjRXMgovyY25UYyG1BZBLohjSJRG6S49IIe5NqFhsV30voW+CT7vW4jT8W9bI3Y/PU=
+	t=1770089035; cv=none; b=Bh03Vg0l0sz72m1gL5DxjK6YjdDjfJNdwpxdeJwvB1TUKdwh4vYVmWnWhuCIbEzfArR49KTNDzgN+v13SD17D4kxZ3Yx2/C0qQ32EK7mMtT40hWZQc6VZg4jrmTYlUfGKA8tBoE8lMZNo7kGn2M4zIElXObT7QhAQ1yBUg/dJzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770088817; c=relaxed/simple;
-	bh=p+FiLRV+y9yrAkTwRKO1Fs+7DQQpdn3ZhTr9uVCv5u0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Om0Nlss7t0ruAm0LBdsmCLU2nkUaKNX41H6idhp2e827BzszrbNRr2vcc3Z7rmVJvnmDERy7NSB4zfpz2je5OQKBoZ/GbRv5MZJ3mkU3vZ8VqOBpcHJhLsuyFVJ0XxlkHoueShpIj+xSy8fC2asdlj7kg5uo0rMdHGWNDyQhhzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFr/7be7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61F46C116D0;
-	Tue,  3 Feb 2026 03:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770088817;
-	bh=p+FiLRV+y9yrAkTwRKO1Fs+7DQQpdn3ZhTr9uVCv5u0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WFr/7be7IU0hP9/394w9OwSBa7mSWQuGh/yeC0BaaQYaNsYilI+9C+oHWuoIYAIB0
-	 /I2eAkeBKSArSS37VUo3nNgSYl1jdV0PtcGFsxxN6H2e41W8DzNeLSUixoGeQJYvds
-	 EXDgBqVqpcWeybo7BszMNVngQr4EwhDTpqCTlWncvWWykU/tAGEkx2x/7gOFnSv41b
-	 T6K4ogCY7Retz8xrCt9jlhMuHhyLiKhGWpbuIMt1iUoCpKB48ywvuqzsF7RWq/G3q8
-	 rJtCyLwXMuEIE5LPdFjXhRwOrSXmdSoiI9qIxFvTFdjUmSeUaA3IRs8F4kf4NL3PNw
-	 YWjL3ZWlVxJKQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 541EE3808200;
-	Tue,  3 Feb 2026 03:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1770089035; c=relaxed/simple;
+	bh=aaC+Qz9A0pJrnNk8jpr6it0T4w/AKeyF+rjeM19giVs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ci9k60KPDoEHqKhfGiVyJch+VrORcifWWbCUDNk11soGp7ysqbdZdlO2ORvgJxw2eTlMZ7Hbrs2SGidRyX5a+RlXb1mWGd4Z1HM5VOrBBIYUvlNfDmgy6MK0XDUvd6JdXvEtUuIEpVA1+O0Ci2UZ7NKPVjq3Pv0kgXhCT0Q4Mbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=d66njHCG; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from ms-a2 (182.51.30.125.dy.iij4u.or.jp [125.30.51.182])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 6133NoIm047314
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 3 Feb 2026 12:23:51 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=r8R9mdHzi1BanaqnL4M8yh0UPiyKYCb+NNWJzWjF+Sw=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:To:Subject:Date:Message-ID;
+        s=rs20251215; t=1770089031; v=1;
+        b=d66njHCGVShvbGRQ+ySH/5sqN0sBG/oUj2nU5hUCNmMhxM1IWjZJEZsQl1PGHdAr
+         XFTvXL7d/+sjRHIgqLH4NqE/oS9lxoqeKj/Pm6Q4QFdFbiu82tQ25vYsnf+Yd17R
+         p6SGkOPXlUYFcPUxO8OyHynb//4vMgAvVLNZvv43O68lfMR+CcoiHpQJMEBX39Lr
+         Vif60gGuZxinMi5PvrhjGeZeEp1A96PS5t/i0PPdqB5+kmDS3RZcWv1MLCOjqRHQ
+         8gRqx65KyZ/qXxRa6hcl96OqdcYzTRnhgo8Nrf/0aWeW1jSH/BbTHOE0iM+l5Abz
+         n8xTh37bqSowjEV0XoN2YA==
+From: Kohei Enju <kohei@enjuk.jp>
+To: jacob.e.keller@intel.com
+Cc: aleksander.lobakin@intel.com, aleksandr.loktionov@intel.com,
+        andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net,
+        edumazet@google.com, intel-wired-lan@lists.osuosl.org,
+        kohei.enju@gmail.com, kohei@enjuk.jp, kuba@kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH v1 iwl-next] ice: fix NULL pointer dereference when
+Date: Tue,  3 Feb 2026 03:23:35 +0000
+Message-ID: <20260203032350.3221-1-kohei@enjuk.jp>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <bcefc3ee-4704-483a-8271-01677e47eb8b@intel.com>
+References: <bcefc3ee-4704-483a-8271-01677e47eb8b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,84 +71,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] Add support for Renesas RZ/G3L GBETH
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177008881412.1295553.10983924810242410033.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Feb 2026 03:20:14 +0000
-References: <20260131161250.5047-1-biju.das.jz@bp.renesas.com>
-In-Reply-To: <20260131161250.5047-1-biju.das.jz@bp.renesas.com>
-To: Biju <biju.das.au@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, richardcochran@gmail.com, geert+renesas@glider.be,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com, magnus.damm@gmail.com,
- biju.das.jz@bp.renesas.com, peppe.cavallaro@st.com, joabreu@synopsys.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256104-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,glider.be,foss.st.com,bp.renesas.com,st.com,synopsys.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,lists.osuosl.org,gmail.com,enjuk.jp,kernel.org,vger.kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	FROM_NO_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256105-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A002ED413B
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:mid,enjuk.jp:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 89CC9D41A1
 X-Rspamd-Action: no action
 
-Hello:
+On Mon, 2 Feb 2026 16:31:39 -0800, Jacob Keller wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 31 Jan 2026 16:12:41 +0000 you wrote:
-> From: Biju Das <biju.das.jz@bp.renesas.com>
+> > I see the Fixes: commit exists in only tnguy/next-queue.git, so I'm
+> > sending this patch to iwl-next, not iwl-net.
+> > 
+> > Also IIUC dev-queue in tnguy/next-queue.git is rebased continuously, so
+> > the commit hash will be stale soon, and I don't know how to handle this.
+> > 
 > 
-> The Renesas RZ/G3L GBETH IP uses Synopsys DesignWare MAC version 5.30
-> compared to other Renesas SoC such as RZ/V2H that use MAC version 5.20.
+> Yea. Including the full subject line should be sufficient for Tony to 
+> find this.
+
+I see :)
+
 > 
-> The RZ/G3L GBETH requires an extra clock compared to RZ/G3E and has pps
-> interrupts. Document the Renesas RZ/G3L GBETH IP in bindings and add
-> support for the RZ/G3L GBETH in dwmac-renesas-gbeth glue driver.
+> > I'd appreciate it if iwl-folks know the way to handle it. Thanks!
 > 
-> [...]
+> Ideally we can squash this in with the implementation patches and 
+> include your Co-developed-by and Signed-off-by tags if you would agree 
+> to that?
 
-Here is the summary with links:
-  - [net-next,v3,1/2] dt-bindings: net: renesas,rzv2h-gbeth: Document Renesas RZ/G3L SoC
-    https://git.kernel.org/netdev/net-next/c/3ac2aa31b489
-  - [net-next,v3,2/2] net: stmmac: dwmac-renesas-gbeth: Add support for RZ/G3L SoC
-    https://git.kernel.org/netdev/net-next/c/1ba377008420
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+That sounds good, and I agree to do so.
+If I need to take some actions, please let me know.
 
