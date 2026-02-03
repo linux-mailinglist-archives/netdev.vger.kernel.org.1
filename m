@@ -1,53 +1,52 @@
-Return-Path: <netdev+bounces-256434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sEGzD/NCgmlHRQMAu9opvQ
-	(envelope-from <netdev+bounces-256434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:48:19 +0100
+	id YBrhA89DgmlHRQMAu9opvQ
+	(envelope-from <netdev+bounces-256435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:51:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D32DDCF5
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:48:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0291DDDCF
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:51:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AED223197E3C
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:43:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7627131A0386
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146D73D522B;
-	Tue,  3 Feb 2026 18:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8845B3D6467;
+	Tue,  3 Feb 2026 18:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8P7yos0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+ehLycx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51E23D4125;
-	Tue,  3 Feb 2026 18:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6482D2F7ACA;
+	Tue,  3 Feb 2026 18:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770144171; cv=none; b=Ln+QkdkodFrDnZzCqyOLf+30lOxmeC2FDTbvsqyO9nLkkcNKlnXRDU9AJgKuG3Ewae/+vbZnxLk3yC2Hy3re6qN+ddB8gXed/Yr5CX14yKTmva4g173acnZgWe9JtMq09sZ0jtiWmXLtcfevc72Y538MuCU2neHribk2pX8Hwmo=
+	t=1770144173; cv=none; b=p2UR8FAr4XcjVmIyJrwPvYYjLgYcX7pBFNXU06Q/9hzlEtCNpsz1yWzxDiBZA4WiPwzC3VaRfi/PvehlCBOdNuh6pY0o2ulqbAMEUve542vA5ZY8POEAtDiaubIBqui9OEM6pHpVHrdSV7XarsAfn1W6i9mNEhaUxqPckg7lnDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770144171; c=relaxed/simple;
-	bh=HbOdXKxLd3ikHw9J38XvsF3R+9nHLf7QVvSnN4x9qaM=;
+	s=arc-20240116; t=1770144173; c=relaxed/simple;
+	bh=wNs70d+EDs+FA7tE+Ft/vNwuMNkXdPc9YBDChO+Ywqo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BwtjEGXFUZurqULJK5hhDK5SRzlpqaG4TLVGPJLZTQ98jOf4UUeN9dAJJj1nLa5RGX9HZ/cCMRB87uijmYi+1Zep+WDex+R62iaZt50sJU9zd8230j/SFDbz7f5fEuiNx0Cb/kFjbZHHy8MGOPCOowt90i0NPTQHtuH9X6MvToc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8P7yos0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B48EC16AAE;
-	Tue,  3 Feb 2026 18:42:48 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MgI+DCHhnFb8KEryXI56C2EsWf2qemrTic3AzmkGXgyCzDYw7EFwgJWF/nEoeaOlfWTiaRD6q79gJoss7bIQAvTS32nCopBsNogTvGIvH8eCNv4b2rYGk7yUD5oykWdc0fcwOlr6yF7qJ432ZG6Ztj8M9drs5PixchfqVOryEXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+ehLycx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB782C19421;
+	Tue,  3 Feb 2026 18:42:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770144170;
-	bh=HbOdXKxLd3ikHw9J38XvsF3R+9nHLf7QVvSnN4x9qaM=;
+	s=k20201202; t=1770144173;
+	bh=wNs70d+EDs+FA7tE+Ft/vNwuMNkXdPc9YBDChO+Ywqo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=k8P7yos0WSnLCJ/tz/TPSPcjB2AO88kvTzynwo9RwL5sMNo96mfa0dO57pX4V9iiz
-	 MbLKoy5WRdUGKUZCpllnvWFKXkaNcQv/nvOzuDrmtw0oy+Tcf6uekixMHgezCKukC2
-	 HlWWYydXphskjH4GdEk0ZI93k7/552Re3uiLrdr4a5AKMM/DRoen2azWEwzAomu42r
-	 7L0sq7wNVTyqa8hM2Mfisw8SgWI4aTYDggfLyLufxOmetYYa5xG4ftm/N63ibMVlK7
-	 WaafO7oE3kCN+6L0tcn3T0bVfesQ6S2Gli6BEzbgWA/YTAMUfklmmjj1yKxIriZfDr
-	 7kSJijSne3h3w==
+	b=K+ehLycxGiQgKe8DSseH6+sNi2n73CbYbjlI3BbxiIhvBHP4ff2E90K+WZ/rrjPb8
+	 MBuwQ9hKhGpdSwjEoZWOTaUMrvRymGOp0U0p89sCX4xJKKPor12NaUKlRvJGj7BIX+
+	 bDZv3NWXq9+IU9Jzpa3H41cwuqyDaGKb0cWkNg9U9UAIf8zUpwbtKcCjqS2vYiGAmt
+	 tITfQKsheogc8z4xZ1cv8Bsy+u1BLcPmsVRbo7UqsZ7wUh2qF0ZeqpvOIUD6NMdjRj
+	 /wa2TWnyta6gL6kuq8lks3FqnmO5LQjnNQJ76Nq6HJYI6hP3/EirsuSRxSDxL/zVXX
+	 83zbIHvFy7RrA==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 03 Feb 2026 19:41:25 +0100
-Subject: [PATCH net-next 09/15] selftests: mptcp: join: wait for estab
- event instead of MPJ
+Date: Tue, 03 Feb 2026 19:41:26 +0100
+Subject: [PATCH net-next 10/15] selftests: mptcp: join: fix wait_mpj helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260203-net-next-mptcp-misc-feat-6-20-v1-9-31ec8bfc56d1@kernel.org>
+Message-Id: <20260203-net-next-mptcp-misc-feat-6-20-v1-10-31ec8bfc56d1@kernel.org>
 References: <20260203-net-next-mptcp-misc-feat-6-20-v1-0-31ec8bfc56d1@kernel.org>
 In-Reply-To: <20260203-net-next-mptcp-misc-feat-6-20-v1-0-31ec8bfc56d1@kernel.org>
 To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
@@ -67,12 +66,12 @@ Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
  linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4072; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=HbOdXKxLd3ikHw9J38XvsF3R+9nHLf7QVvSnN4x9qaM=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKbHHsCr7owcbm15epHntHd8HNjSc0bnYpPf7553Z5S7
- m/BeSixo5SFQYyLQVZMkUW6LTJ/5vMq3hIvPwuYOaxMIEMYuDgFYCI7yhj+F634/1fUfeq12u7K
- d07d0z0LN4XLNO2RSGQyvX9RsE1Qi+F/VK1NX2N/3PutzKyT7yw4X+S3te/o9wzZ89PN/1+LFvP
- gAAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4230; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=wNs70d+EDs+FA7tE+Ft/vNwuMNkXdPc9YBDChO+Ywqo=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKbHHvMhW//qVh1syuSnX0fd5X1oWsbzd7zbTv0Wa5jp
+ V2EitfcjlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgInMXMTI8LXvnNHMpMN1Acaq
+ GfztV8LLPxjd6lPNef3w5ZOd2Yd9khkZdqkfdOK6kKyV5XFE6gBPh534wZaghFn5t47aPzSbK3m
+ WHQA=
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Rspamd-Server: lfdr
@@ -85,7 +84,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256434-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256435-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -102,116 +101,126 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 89D32DDCF5
+X-Rspamd-Queue-Id: A0291DDDCF
 X-Rspamd-Action: no action
 
-'wait_mpj' was used just after having created a background connection,
-but before creating new subflows. So no MPJ were sent. The intention was
-to wait for the connection to be established, which was the same as
-doing a simple sleep with a "random" value.
+It looks like most of the time, this helper was simply waiting a bit
+more than one second: the previous MPJoin counter was often already at
+the expected value. So at the end, it was just checking 10 times for
+the MPJoin counter to change, but it was not happening. For the tests,
+that was time, it was just waiting longer for nothing.
 
-Instead, wait for an "established" event. With this, the tests can
-finish quicker.
+Instead, use 'wait_mpj' with the expected counter: in the tests, the MPJ
+counter can easily be predicted. While at it, stop passing the netns as
+argument: here the received MPJoin ACK is checked, which happens on the
+server side. If later on, this needs to be checked on the client side,
+the helper can be adapted for this case, but better avoid confusions now
+if it is not needed.
+
+While at it, stop using 'i' for the variable if it is not used.
+
+With this, the tests can finish quicker.
 
 Reviewed-by: Geliang Tang <geliang@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 30 ++++++++++++-------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
 
 diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index e70d3420954f..ff20d86ed399 100755
+index ff20d86ed399..6ab568d6b856 100755
 --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
 +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -3999,7 +3999,7 @@ userspace_tests()
- 		{ timeout_test=120 test_linkfail=128 speed=5 \
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
--		wait_mpj $ns1
-+		wait_event ns1 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		userspace_pm_add_addr $ns1 10.0.2.1 10
- 		userspace_pm_add_addr $ns1 10.0.3.1 20
- 		chk_join_nr 2 2 2
-@@ -4032,7 +4032,7 @@ userspace_tests()
- 		{ timeout_test=120 test_linkfail=128 speed=5 \
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
--		wait_mpj $ns2
-+		wait_event ns2 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		userspace_pm_add_sf $ns2 10.0.3.2 20
- 		chk_join_nr 1 1 1
- 		chk_mptcp_info subflows 1 subflows 1
-@@ -4060,7 +4060,7 @@ userspace_tests()
- 		{ timeout_test=120 test_linkfail=128 speed=5 \
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
--		wait_mpj $ns2
-+		wait_event ns2 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		chk_mptcp_info subflows 0 subflows 0
- 		chk_subflows_total 1 1
- 		userspace_pm_add_sf $ns2 10.0.3.2 0
-@@ -4081,7 +4081,7 @@ userspace_tests()
- 		{ timeout_test=120 test_linkfail=128 speed=5 \
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
--		wait_mpj $ns2
-+		wait_event ns2 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		userspace_pm_add_sf $ns2 10.0.3.2 20
- 		chk_join_nr 1 1 1
- 		chk_mptcp_info subflows 1 subflows 1
-@@ -4105,7 +4105,7 @@ userspace_tests()
- 		{ timeout_test=120 test_linkfail=128 speed=5 \
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
--		wait_mpj $ns1
-+		wait_event ns1 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		userspace_pm_add_addr $ns1 10.0.2.1 10
- 		chk_join_nr 1 1 1
- 		chk_add_nr 1 1
-@@ -4158,7 +4158,7 @@ endpoint_tests()
+@@ -631,17 +631,15 @@ wait_rm_sf()
+ 	done
+ }
+ 
++# $1: expected MPJ ACK Rx counter in $ns1
+ wait_mpj()
  {
- 	# subflow_rebuild_header is needed to support the implicit flag
- 	# userspace pm type prevents add_addr
--	if reset "implicit EP" &&
-+	if reset_with_events "implicit EP" &&
- 	   continue_if mptcp_lib_kallsyms_has "subflow_rebuild_header$"; then
- 		pm_nl_set_limits $ns1 2 2
- 		pm_nl_set_limits $ns2 2 2
-@@ -4167,7 +4167,7 @@ endpoint_tests()
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
+-	local ns="${1}"
+-	local cnt old_cnt
++	local exp_cnt="${1}"
++	local cnt
  
--		wait_mpj $ns1
-+		wait_event ns2 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		pm_nl_check_endpoint "creation" \
- 			$ns2 10.0.2.2 id 1 flags implicit
+-	old_cnt=$(mptcp_lib_get_counter ${ns} "MPTcpExtMPJoinAckRx")
+-
+-	local i
+-	for i in $(seq 10); do
+-		cnt=$(mptcp_lib_get_counter ${ns} "MPTcpExtMPJoinAckRx")
+-		[ "$cnt" = "${old_cnt}" ] || break
++	for _ in $(seq 10); do
++		cnt=$(mptcp_lib_get_counter ${ns1} "MPTcpExtMPJoinAckRx")
++		[ "${cnt}" = "${exp_cnt}" ] && break
+ 		sleep 0.1
+ 	done
+ }
+@@ -4207,7 +4205,7 @@ endpoint_tests()
+ 		chk_mptcp_info subflows 0 subflows 0
+ 
+ 		pm_nl_add_endpoint $ns2 10.0.2.2 id 2 dev ns2eth2 flags subflow
+-		wait_mpj $ns2
++		wait_mpj 2
+ 		chk_subflow_nr "after re-add id 2" 2
  		chk_mptcp_info subflows 1 subflows 1
-@@ -4181,6 +4181,7 @@ endpoint_tests()
- 		pm_nl_check_endpoint "modif is allowed" \
- 			$ns2 10.0.2.2 id 1 flags signal
+ 
+@@ -4219,7 +4217,7 @@ endpoint_tests()
+ 		ip netns exec "${ns2}" ${iptables} -D OUTPUT -s "10.0.3.2" -p tcp -j REJECT
+ 		pm_nl_del_endpoint $ns2 3 10.0.3.2
+ 		pm_nl_add_endpoint $ns2 10.0.3.2 id 3 flags subflow
+-		wait_mpj $ns2
++		wait_mpj 3
+ 		chk_subflow_nr "after no reject" 3
+ 		chk_mptcp_info subflows 2 subflows 2
+ 
+@@ -4231,7 +4229,7 @@ endpoint_tests()
+ 			chk_mptcp_info subflows 2 subflows 2 # only decr for additional sf
+ 
+ 			pm_nl_add_endpoint $ns2 10.0.1.2 id 1 dev ns2eth1 flags subflow
+-			wait_mpj $ns2
++			wait_mpj $((3 + i))
+ 			chk_subflow_nr "after re-add id 0 ($i)" 3
+ 			chk_mptcp_info subflows 3 subflows 3
+ 		done
+@@ -4289,7 +4287,7 @@ endpoint_tests()
+ 
+ 		pm_nl_add_endpoint $ns1 10.0.2.1 id 1 flags signal
+ 		pm_nl_add_endpoint $ns1 10.0.3.1 id 2 flags signal
+-		wait_mpj $ns2
++		wait_mpj 3
+ 		chk_subflow_nr "after re-add" 3
+ 		chk_mptcp_info subflows 2 subflows 2
+ 		chk_mptcp_info add_addr_signal 2 add_addr_accepted 2
+@@ -4301,7 +4299,7 @@ endpoint_tests()
+ 		chk_mptcp_info add_addr_signal 2 add_addr_accepted 2
+ 
+ 		pm_nl_add_endpoint $ns1 10.0.1.1 id 99 flags signal
+-		wait_mpj $ns2
++		wait_mpj 4
+ 		chk_subflow_nr "after re-add ID 0" 3
+ 		chk_mptcp_info subflows 3 subflows 3
+ 		chk_mptcp_info add_addr_signal 3 add_addr_accepted 2
+@@ -4313,7 +4311,7 @@ endpoint_tests()
+ 		chk_mptcp_info add_addr_signal 2 add_addr_accepted 2
+ 
+ 		pm_nl_add_endpoint $ns1 10.0.1.1 id 88 flags signal
+-		wait_mpj $ns2
++		wait_mpj 5
+ 		chk_subflow_nr "after re-re-add ID 0" 3
+ 		chk_mptcp_info subflows 3 subflows 3
+ 		chk_mptcp_info add_addr_signal 3 add_addr_accepted 2
+@@ -4362,9 +4360,9 @@ endpoint_tests()
+ 		wait_rm_addr $ns2 0
+ 		ip netns exec "${ns2}" ${iptables} -D OUTPUT -s "10.0.3.2" -p tcp -j REJECT
+ 		pm_nl_add_endpoint $ns2 10.0.3.2 id 3 flags subflow
+-		wait_mpj $ns2
++		wait_mpj 1
+ 		pm_nl_add_endpoint $ns1 10.0.3.1 id 2 flags signal
+-		wait_mpj $ns2
++		wait_mpj 2
  		mptcp_lib_kill_group_wait $tests_pid
-+		kill_events_pids
- 	fi
  
- 	if reset_with_tcp_filter "delete and re-add" ns2 10.0.3.2 REJECT OUTPUT &&
-@@ -4194,7 +4195,7 @@ endpoint_tests()
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
- 
--		wait_mpj $ns2
-+		wait_event ns2 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		pm_nl_check_endpoint "creation" \
- 			$ns2 10.0.2.2 id 2 flags subflow dev ns2eth2
- 		chk_subflow_nr "before delete id 2" 2
-@@ -4272,7 +4273,7 @@ endpoint_tests()
- 			run_tests $ns1 $ns2 10.0.1.1 & } 2>/dev/null
- 		local tests_pid=$!
- 
--		wait_mpj $ns2
-+		wait_event ns2 MPTCP_LIB_EVENT_ESTABLISHED 1
- 		pm_nl_check_endpoint "creation" \
- 			$ns1 10.0.2.1 id 1 flags signal
- 		chk_subflow_nr "before delete" 2
+ 		join_syn_tx=3 join_connect_err=1 \
 
 -- 
 2.51.0
