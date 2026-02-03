@@ -1,159 +1,305 @@
-Return-Path: <netdev+bounces-256213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256214-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJLFAFu9gWm7JAMAu9opvQ
-	(envelope-from <netdev+bounces-256213-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:18:19 +0100
+	id +PxfFJC9gWm7JAMAu9opvQ
+	(envelope-from <netdev+bounces-256214-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:19:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56226D6B3E
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:18:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B597DD6B5C
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9C423010DB5
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:18:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 76A47305C3E9
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BD0392C3C;
-	Tue,  3 Feb 2026 09:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25667396D00;
+	Tue,  3 Feb 2026 09:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXpO7yXp"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="g836fDOj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291762C08D1
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 09:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45724393DCF
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 09:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770110295; cv=none; b=cf58pw/de/JBuwAX8FOncBuYob+84+z2fsUNAnj41h0wEqAYEqtZ33QDnRdE/avZr3LvU6ejLkauFxQT7wxY0/qRvoYaxUNWoR/V4X2xqvMOPCYxefi1qbEtX37EFQyhWs6z2JD7gCLwHzNKzmJMcN10ELc88LgiT7MJe63x+H4=
+	t=1770110308; cv=none; b=cj9PNN8DUd9f85iMjCdxw7aRyhxZCK/+FKI4nmLWwgwFD7dGE7cSepbdMuLwpA8Yo5phr6mCqU7tr39QaS0tQGBGex1e0ue0ua3TBt1P3Q3Oz98tocgQXpg8jEQq4pH3Ey1AJ04/6LwM17l6CJ0RZFoJDeqr2N9iz0DB/XypyoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770110295; c=relaxed/simple;
-	bh=ZzIjBnf+ti8VPOFeSeWlDuWYqWNkAmOz0xMBA/LoqKQ=;
+	s=arc-20240116; t=1770110308; c=relaxed/simple;
+	bh=i2r06awZD9WKdhJiD+pzaN0YGlvAZhUGTNGKk/jK6yk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fvdWGQt2Cf4N04+pVjmI2IsjkASNXWnfOyAWz4Xh1kXFOVOQj3ozoWDmjCveTNK1FFCzCX9DJP6Edqb2N8u8n/1hMg3aow4nP5RRuu4INegJCRKoYUmJ7P/vygao3gmkxLv3dE5u90nXqL+0OtRgzDPUPy2vzP2PRZdT5UBXw/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXpO7yXp; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4806fd9033bso4903515e9.3
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 01:18:13 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=r5DMmhhEare2oci//xiMrwEuhWkPSKXKk5rviMlrIKRFPVL8X8Kqa+2kN2BEZHRJb71aEwjS6fdYqumxyp8KoU4GeXe4SbkuzDMe6JkHn7XpwUJ5ljZhmITw61w865nBgRYduD1/dYXjRKphYAfM1RTQLbjjKaIjcc4Sw/sJ5j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=g836fDOj; arc=none smtp.client-ip=209.85.221.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-42fbc305914so4763043f8f.0
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 01:18:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770110292; x=1770715092; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L2K0n61IVxE799olq2osB5P7SgqUu0HpI0Bg4ulH97g=;
-        b=AXpO7yXpRBV3xzBOEYgqnQCjXLeuYcXOum5BrgaEi1kq8KUZ98bXk70+HcD+EBVUQl
-         zsGDRjGR+yzAAv+5Kcg+bR1g2NBxWSEXJiUDMNoVdQiyAC9ZaTA/5KHV0jIdH8E+lZc4
-         J/2T/sU6HdomltLd3nTwsdXuDeaGaGWLroJh7hCb45qgTNbox7PBXkKAA+ngLrlPHbZ7
-         LZ40gN1+dzpvbsU0j/AL6N4lZfxJtOKqxj5KaK6eGpnQgkUjYSWBcz1bv8FZ4kbBkP8U
-         mmtLchuaYua7gz1sDwNN6HgZq8kVZATdEBjuhYhS+jrKcxgHzoD4wB5fGGC2tiHP18LK
-         p6Yw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1770110304; x=1770715104; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SRTkYnKEKUdOdOQPX63uQ4OPu6CyQTA/ZAE+NHgtQ5U=;
+        b=g836fDOjtPVp6Hc5y2FeE8Whs+n6e8uLNtClTMAXAppacMWE1F8+/3K3gCrpBiCdBe
+         F0MWCUDv7zS4BW9NJgtBWIwVHcdQYFf99L3qVCkn0qwWteTwOsn7HO6rH1ZqUVCwNBVF
+         W7EyD046AnhbJT4O0sD1U7uI9iTE3jT3UPnz07cMks9dm8RlCsunHER51e7O0xcb1URS
+         KXXuBa9GjU5cOTSLrlPdE7SHTe7xEj5GTjqBlrKTmsKWxt3F+sb3WTeKxfouMBvmLZ9M
+         P/8bE8nXB58unH9DzUilmHCE3Y3RqIySawHaiJi+dBt5CJbBU79rt1oLzOp8NiyQmJ25
+         nHFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770110292; x=1770715092;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L2K0n61IVxE799olq2osB5P7SgqUu0HpI0Bg4ulH97g=;
-        b=BOAg7HPxejXEpll9segvz3LcDuwmRPzvAdD6tKxBY6h97sxyouqgr0Rxw/r2ls3eK5
-         ilTu9Ic5eT3qpZLzjutyJZROTWM3YVqbJFRjwz5ukg8d7X2xeFh+E9Eckyh6ObyClLmY
-         /+TUrV+i0laEpyxuHhmcLO920J6dq9TGdl5wUbYcMG8w1g4syvOLx5t/zHvKUVaayrxs
-         16YdjfYuRz0pIsE8oJqQGg3GAGQ/Mc6FCiZvLfX18aW4YII83fClwre8l3C8zJV3qT6Q
-         O7LlvZ4Fat6gtL6lYjgOPuqiWrAG4NL44M8mLlRQ42UQxHFfLb34EVIB8IXH5Qg9CkXt
-         Cnxg==
-X-Gm-Message-State: AOJu0Yx6ouhS+mRbhRDRDPEDGGAXjFMWCxIAzJxFCf0sIffSM2rmxgz3
-	UMjwgoRUY/CpTSrxm0EAH8Kb+SS5E9FkAoeaFJSpVxwviqPR0ANEPnlth/Pz2g==
-X-Gm-Gg: AZuq6aJ0BZZdjV8+bTRHZ0iTwzTpZw7vGCAN7joLJr4QgOYQ0fbYGT+dlE8z5t1Gfn7
-	7wihGH356usQKEL9foiwrc4qsVSESMRS47HFci1x4v7uZ+NS50CCFs/Ow74LATkSjbq1f5fqUY4
-	yx9sjUddSKXSpn5izkdh/NJ5NWVl7ySCZCahcxGfNTx1ymOw+R1beQ70YH0MQnUkhT86p+wXX1N
-	8tSxkFB5BZQ1+It2zusAVaOgPDfUtSe9zhv7zb/cRw00zjfpeZdlZY68pKzbDRskXVbGtLPTSBW
-	cg+d/05NYme/yOZ09gH80HRg/jmV2oip/AelySET7Ji4IK/aPoJgGWwlqM86ZX+I1oUDANrarVj
-	lYIl1dhT6kV/osi6/ySf0cVOW9/PnzUMfT25wq0uBj1itBYDmSPiyqZREvbRP9SyZl1J7swt4rY
-	IlVw==
-X-Received: by 2002:a05:600c:a00a:b0:477:9fa8:bc99 with SMTP id 5b1f17b1804b1-482db492192mr115238265e9.4.1770110292363;
-        Tue, 03 Feb 2026 01:18:12 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:618:ce2e:8316:5a68])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbcf9c3fsm134465165e9.4.2026.02.03.01.18.11
+        d=1e100.net; s=20230601; t=1770110304; x=1770715104;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SRTkYnKEKUdOdOQPX63uQ4OPu6CyQTA/ZAE+NHgtQ5U=;
+        b=JgtP5MJ9ofOZCOQ9zoUzhP3IriYnLwuQTDvRPX0TJ5TX2iVotPpG5RfwF3KgnWgkbj
+         3PzbzhbwgeDZ7FhPnILZ9wngFq5uXhsSLnxPnRb2d5GUAYR25ZspzICAowmuTSelQZaA
+         5LHfmjrTs5IVwjVj3U2iaZ5f/yoIcypsn+FCuW0+VpjtNUlLM8NKjdaOrLmgBc6iGqSl
+         ox3moyG+1tk1lJNmeDwzCT3vrfoim5CGgmayzF6EnhvFf7DNBYtmcoYm7/9UY8HDBNFK
+         Gc3xXpLK2uYI6xp/yvevyZi7jLmXJk9x3T11S/1Ry2KFi4+cIYbtu7sewH8i5ztrkYSQ
+         z4zg==
+X-Forwarded-Encrypted: i=1; AJvYcCWlzZwMoNBdvsmpBntjwId1l+972M9LtcbpiZehkNN4UzR9V6IugAUnvU4VZjLBbpOn6TY0jU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygyNpOL0b/1poRlAxu0/qS7eHMqn5985Q2BGKoO50XLdFet+8m
+	s5BbbF0/zuwmzRAXzBIt4SksGIYsNPdNaesjN1u9d8mgm7l26Uzj0UUFbYwl4Ve+tlk=
+X-Gm-Gg: AZuq6aI4v6OpGqVxYhOfP8xZfl4Z2YS7p/yxkHxEbl5oNUcXNo8r053Vs+h2GU34khX
+	AvvXpQ5qebDK9oGh2rmKkusQM9cFaoM33DHEBieSVDWbQJNq1SmLa/hKUIhFd7XwxZRgEa+a/P2
+	AUPOg23d6PJgO8xlkYTS/l2JF/omowx8oK3MwtaAaB7m1L44BcYzUnOBJHv+mLy5fEo2P2V7Raa
+	U8UaNdVtk+wys+58wiUCdv94wqyJaC+udvE+Yu0KxQgKNLfqVLRZ2o5zOk3r8LzfhCeP/upQeTw
+	e4MaRd2YUDCoSPvFS0gH6BMnZQNSseHLP1L7z26gWzQsfO7ZOn1dDhB9wDpmg+tDTCFz8jl8uUm
+	FiIh09dgNA21BWO82sMfn6p0xDX0xiY4Brhm3PIsP+PRYfb6lJR2wQXRCCIynyEhXB1lUjyU3vF
+	7v/LBwn5T37Q3KAnQGKvE=
+X-Received: by 2002:adf:fdc8:0:b0:436:db8:c4a7 with SMTP id ffacd0b85a97d-4360db8c4b2mr4704705f8f.6.1770110304394;
+        Tue, 03 Feb 2026 01:18:24 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e476dsm49388179f8f.4.2026.02.03.01.18.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 01:18:11 -0800 (PST)
-Date: Tue, 3 Feb 2026 11:18:09 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: dsa: sync dsa_mall_policer_tc_entry
- with FLOW_ACTION_POLICE
-Message-ID: <20260203091809.jpkgpagtodu63eqp@skbuf>
-References: <20260131045821.3451873-1-mmyangfl@gmail.com>
- <20260202105218.sx5k6ksy5ycpfyxf@skbuf>
- <CAAXyoMOiLBcS3E8kRFGpxPzhXEtq+BhZRkQNbvcNiG96+LRQqw@mail.gmail.com>
+        Tue, 03 Feb 2026 01:18:23 -0800 (PST)
+Date: Tue, 3 Feb 2026 10:18:22 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Randy Dunlap <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, 
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next V7 01/14] documentation: networking: add shared
+ devlink documentation
+Message-ID: <u7uicnxkcirhacpzjimss2pqsuhbngg4ticqrz45iqchkk2ha2@t3eem6w6hhur>
+References: <20260128112544.1661250-1-tariqt@nvidia.com>
+ <20260128112544.1661250-2-tariqt@nvidia.com>
+ <20260202194023.412bb454@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAXyoMOiLBcS3E8kRFGpxPzhXEtq+BhZRkQNbvcNiG96+LRQqw@mail.gmail.com>
+In-Reply-To: <20260202194023.412bb454@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256213-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256214-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[nvidia.com,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,kernel.org,vger.kernel.org,infradead.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 56226D6B3E
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,resnulli-us.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: B597DD6B5C
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 09:40:02AM +0800, David Yang wrote:
-> On Mon, Feb 2, 2026 at 6:52 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> >
-> > On Sat, Jan 31, 2026 at 12:58:16PM +0800, David Yang wrote:
-> > > diff --git a/net/dsa/user.c b/net/dsa/user.c
-> > > index f59d66f0975d..2a209b83c701 100644
-> > > --- a/net/dsa/user.c
-> > > +++ b/net/dsa/user.c
-> > > @@ -1497,8 +1497,19 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
-> > >       mall_tc_entry->cookie = cls->cookie;
-> > >       mall_tc_entry->type = DSA_PORT_MALL_POLICER;
-> > >       policer = &mall_tc_entry->policer;
-> > > +     /* until they export the type of act->police in flow_offload.h ... */
-> >
-> > There is no "us" and "them", it's a single git tree. Just submit a patch
-> > to whomever ./scripts/get_maintainer.pl says to.
-> >
-> > Have you tried something like the patch attached (just compile-tested)?
-> 
-> Yes, but I was afraid it would be kind of inconsistent not exposing
-> other struct flow_action_*. Nicer and better approach, though.
+Tue, Feb 03, 2026 at 04:40:23AM +0100, kuba@kernel.org wrote:
+>On Wed, 28 Jan 2026 13:25:31 +0200 Tariq Toukan wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> Document shared devlink instances for multiple PFs on the same chip.
+>
+>> diff --git a/Documentation/networking/devlink/devlink-shared.rst b/Documentation/networking/devlink/devlink-shared.rst
+>> new file mode 100644
+>> index 000000000000..74655dc671bc
+>> --- /dev/null
+>> +++ b/Documentation/networking/devlink/devlink-shared.rst
+>> @@ -0,0 +1,95 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +============================
+>> +Devlink Shared Instances
+>> +============================
+>
+>Shouldn't the length of the ==== lines match the title length?
+>
+>> +Overview
+>> +========
+>> +
+>> +Shared devlink instances allow multiple physical functions (PFs) on the same
+>> +chip to share an additional devlink instance for chip-wide operations. This
+>> +is implemented within individual drivers alongside the individual PF devlink
+>> +instances, not replacing them.
+>> +
+>> +Multiple PFs may reside on the same physical chip, running a single firmware.
+>> +Some of the resources and configurations may be shared among these PFs. The
+>> +shared devlink instance provides an object to pin configuration knobs on.
+>> +
+>> +The shared devlink instance is backed by a faux device and provides a common
+>> +interface for operations that affect the entire chip rather than individual PFs.
+>> +A faux device is used as a backing device for the 'entire chip' since there's no
+>> +additional real device instantiated by hardware besides the PF devices.
+>
+>There needs to be a note here clearly stating the the use of "shared
+>devlink instace" is a hack for legacy drivers, and new drivers should
+>have a single devlink instance for the entire device. The fact that
+>single instance is always preferred, and *more correct* must be made
+>very clear to the reader. Ideally the single instance multiple function
+>implementation would leverage the infra added here for collecting the
+>functions, however.
 
-Since it doesn't affect existing users of struct flow_action_entry,
-I don't think it's that big a deal. You can take this patch and submit a
-v3 with it if it helps.
+How exactly you can have a single devlink instance for multiple PFs of a
+same device? I don't really understand how that could work, considering
+dynamic binds/unbinds of the PFs within single host and/or multiple VMs
+passing PFs to.
+
+
+>
+>> +Implementation
+>> +==============
+>> +
+>> +Architecture
+>> +------------
+>> +
+>> +The implementation uses:
+>> +
+>> +* **Faux device**: Virtual device backing the shared devlink instance
+>
+>"backing"? It isn't backing anything, its just another hack because we
+>made the mistake of tying devlink instances to $bus/$device as an id.
+>Now we need a fake device to have an identifier.
+
+Okay. I originally wanted to use an id, similar to what we have in
+the dpll. However I was forced by community to tie the instance to
+bus/device. It is how it is, any idea how to relax this bond?
+
+
+
+>
+>> +* **Chip identification**: PFs are grouped by chip using a driver-specific identifier
+>> +* **Shared instance management**: Global list of shared instances with reference counting
+>> +
+>> +API Functions
+>> +-------------
+>> +
+>> +The following functions are provided for managing shared devlink instances:
+>> +
+>> +* ``devlink_shd_get()``: Get or create a shared devlink instance identified by a string ID
+>> +* ``devlink_shd_put()``: Release a reference on a shared devlink instance
+>> +* ``devlink_shd_get_priv()``: Get private data from shared devlink instance
+>> +
+>> +Initialization Flow
+>> +-------------------
+>> +
+>> +1. **PF calls shared devlink init** during driver probe
+>> +2. **Chip identification** using driver-specific method to determine device identity
+>
+>This isn't very clear.
+
+Hmm, any suggestion to make it cleaner?
+
+
+>
+>> +3. **Get or create shared instance** using ``devlink_shd_get()``:
+>
+>Just "Call ``devlink_shd_get()`` with the identifier constructed in
+>step 2" (?) and then have the points below explain that it gets or
+>recreates
+
+Okay.
+
+
+>
+>> +   * The function looks up existing instance by identifier
+>> +   * If none exists, creates new instance:
+>> +     - Creates faux device with chip identifier as name
+>> +     - Allocates and registers devlink instance
+>> +     - Adds to global shared instances list
+>> +     - Increments reference count
+>> +
+>> +4. **Set nested devlink instance** for the PF devlink instance using
+>> +   ``devl_nested_devlink_set()`` before registering the PF devlink instance
+>> +
+>> +Cleanup Flow
+>> +------------
+>> +
+>> +1. **Cleanup** when PF is removed
+>
+>"``.remove()`` callback for a PCIe device is called"
+>
+>> +2. **Call** ``devlink_shd_put()`` to release reference (decrements reference count)
+>> +3. **Shared instance is automatically destroyed** when the last PF removes (device list becomes empty)
+>> +
+>> +Chip Identification
+>> +-------------------
+>> +
+>> +PFs belonging to the same chip are identified using a driver-specific method.
+>> +The driver is free to choose any identifier that is suitable for determining
+>> +whether two PFs are part of the same device. Examples include:
+>> +
+>> +* **PCI VPD serial numbers**: Extract from PCI VPD
+>> +* **Device tree properties**: Read chip identifier from device tree
+>> +* **Other hardware-specific identifiers**: Any unique identifier that groups PFs by chip
+>> +
+>> +Locking
+>> +-------
+>> +
+>> +A global mutex (``shd_mutex``) protects the shared instances list during
+>> +registration/deregistration.
+>> +
+>> +Similarly to other nested devlink instance relationships, devlink lock of
+>> +the shared instance should be always taken after the devlink lock of PF.
+>
+>of an instance, not a PF
+
+lock of PF devlink instance. I think that is what the text says, no?
+
+
+>
+>> +
+>> +Reference Counting
+>> +------------------
+>> +
+>> +Each shared devlink instance maintains a reference count (``refcount_t refcount``).
+>> +The reference count is incremented when ``devlink_shd_get()`` is called and
+>> +decremented when ``devlink_shd_put()`` is called. When the reference count
+>> +reaches zero, the shared instance is automatically destroyed.
+>
+>I think AI went too far with the text generation here, this is very
+>obvious from the previous sections.
+>-- 
+>pw-bot: cr
 
