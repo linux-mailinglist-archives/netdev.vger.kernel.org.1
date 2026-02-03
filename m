@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-256180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QHFVNQWrgWn0IQMAu9opvQ
-	(envelope-from <netdev+bounces-256180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 09:00:05 +0100
+	id OAbNOkmrgWn0IQMAu9opvQ
+	(envelope-from <netdev+bounces-256186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 09:01:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6975FD5ED4
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 09:00:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9B2D5F00
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 09:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2D66303D313
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 07:59:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5020E3017242
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 08:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29146392C2A;
-	Tue,  3 Feb 2026 07:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF223921F3;
+	Tue,  3 Feb 2026 08:00:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B525392C48
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 07:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3AB2264DC
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 08:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770105582; cv=none; b=hTAhkl9aKUqSA4u+Z3oWExNusBB414cvg+aNJ0i+ePQKl9O8kJ9/3zpuJOGN61nTP8sk27X9zMPJgY4xY1UfxJ2CMhAnfvGmZsP8JZhc4k7tBRPx0P1T0Po7kJDcKF0JzWcX0dw0haSF7fMKXDpep7wW8QCr6wzgQuNUDHhj1v8=
+	t=1770105612; cv=none; b=HZqp0uCnxrkTwCUEC2y1zz6WnS44w6UvqZ5H7A2BJi15EEzzNdBbD5uVyKk/1po+jmxNUw9K5Dxl+4B+ZDtshLlP8oG9eM94jlQBCB/VKqMwKujTxovg53c/MsQRmDp/rwXhX6QLmD1nvaUNHMChWzV30TW0Mg52NTf+qRfGiqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770105582; c=relaxed/simple;
-	bh=pkba4hsQxsyT2hckqkFZsjyl4itJflTea7rzkrjV0DY=;
+	s=arc-20240116; t=1770105612; c=relaxed/simple;
+	bh=VbW7h1VgAex+Bu/ExpsNtN7phKN/Knq9x/YrXf74G64=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cayKVYpZzjFcA2JHcKqdvXh287MSvsURkuQ466hPKXF+Jh2F9P0ZHHAzlMJIxuUuc74cADnOBcxubGjlAbWkDBW7/VU6RQ3Kqk7BxjIhNuLHB3U6B1Ba6Dkq0ADAhQvHwiIgB84yeJpuxWDK/lMTOMUmPKWZcQ8dtuOaIANFgag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
+	 MIME-Version; b=ZavFslUMirDDrxS5+idFpXRUBKJp8bVOZtb6ag5OUUj90kx6AH3+24aEiZbEqE1fBf4HDI8ZIiEe9MwJGmj8RgudN9m+Wq+S1o4YIAvBzimd8LGZyO+wdtLKbECUO73PVnov2c/YDJFVL5FdvrXBDbOg3PxPr0anwISHRG41xXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz7t1770105507t3b265592
-X-QQ-Originating-IP: fFRouYdSm0e0m7yJ4Fqj/EpOcUrjyuRWFvXoeHxH6cA=
+X-QQ-mid: zesmtpgz7t1770105510ted43ad1b
+X-QQ-Originating-IP: KYD4tUjI24SuOKohqPflP3gdJ9fGhiRAT2vx8ofBTEU=
 Received: from lap-jiawenwu.trustnetic.com ( [36.20.47.234])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 03 Feb 2026 15:58:26 +0800 (CST)
+	id ; Tue, 03 Feb 2026 15:58:28 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7878167116517507610
+X-BIZMAIL-ID: 3809538947437535087
 EX-QQ-RecipientCnt: 9
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ To: netdev@vger.kernel.org,
 	Simon Horman <horms@kernel.org>
 Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v1 4/7] net: txgbe: add power management support
-Date: Tue,  3 Feb 2026 15:57:56 +0800
-Message-Id: <20260203075759.5852-5-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v1 5/7] net: wangxun: move ethtool_ops.set_channels into libwx
+Date: Tue,  3 Feb 2026 15:57:57 +0800
+Message-Id: <20260203075759.5852-6-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20260203075759.5852-1-jiawenwu@trustnetic.com>
 References: <20260203075759.5852-1-jiawenwu@trustnetic.com>
@@ -66,24 +66,24 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Mre+2s01GWHngXSvED7yfeVrjXGcAJWFEWzKcHYUXWjuK/JgMjvlfd4s
-	8LdfBknseBRG9whzG1WHRwuP0a15vOcQi0D5FE/mxbQTw65y7GSloRhrNvnJREByO20fhmD
-	AW/w6FoZ9T49V1gEIIZLYFmdyLt1fSZP9mGGBTlOsudDuU5M3wSbfhWpINQJvx7ZaHPjNzI
-	a6yJ+fbhEgQ0Q+z1kKDSd6yl9MzboRoTpEU1ECwshbrWk8strDB+O42KmhBDs+cn+Yc8KCu
-	seaTduSzJXPqJoXuE9YO1nw+59L9JPXg/Omz1CLJr0irxWLWP1HDBDjvNCioEYiz+y0AL0Q
-	zK752hKG7ELCKs4bqLQZjZgih3LcBDTEEvRiNbPQP3AtdtUDkV7ymloDRj/cSU0gFlFhy27
-	SYGAZqjQcKOSHOLM3xWlzbkV3kwkTE7Glkzebyd6Dvvruff2+4a0PilZeNeuav6SJYNsMiR
-	Qih2Na66MgBhAof0yX4QIMTqN7c2J3fqB0F96GWei6vEQFGgHEQjL0ZKv4Pj822IcQqNvDo
-	gKM6n62mfDDcp8V1ILB+2pzALWi1eBTO8L/lOXT72BMPjRCahSbZLtnk4Ez0xYp+UOQ6q1u
-	bCPBwG+SF20cP25VIts0IBTaI4p2sSmh30FdCjwnZ90NVClOH6XjnL8z63qY1AfVYfcIa99
-	nakhr06IGSJrrgiYKWcwEhy9EzQLecwuHvkE4AN3S2sV/OvAudnc6TThNGLWET9B/6RyUvw
-	Cmqdsc2pshviHfuxP9HNX4f+QnWxNyYi3LFxPWr3VJOEbSPpL0aUD8KYp8b5oZFVZZ3AVpF
-	ZbDjwTFHJqf/s/RzjThBXBUV6i4591By1aA1bh4yO3vOvNG78S8vgZBcnnTt1kTtAvkGxt9
-	XnrhGqVQlby+oveyN4HAQu0EhMHxQkgDgsxVjqhcwvzoINt/Gsc3VQf7gV3K9eTChrEt26Q
-	Dm1NlQMpTXieLVv/WM2rwqJbihRNh4jzEuG5Awhnnf/TRgn/Y2zvIbFSAB6vBGcGiJmvr38
-	M1MXE+zSdMn1eN7+kHiA8SH0c9Y86npK0DtJI4P5sC2wu4DUAh4pye1Pzv2/EYcIJjAXCDn
-	hUD2d5qpr/i
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-XMAILINFO: NGKAM81q4BTs014ffE87QWF0buVMv4O6o8Y3oUNlHXC+m4xS7/NSOg/k
+	LXh9OzcXmeSgnRfR3LFIdqZvqxLLnU5jsLwktxYx69SvI/7rgXfk+DSbPHgKuKiiUIV/3ca
+	jN0UcUUQIVvgbOuowLKxXHlVVABYGupiW8c9ZODIfDfaESKE+J1+iKV4pG2llEQJCZBWkqh
+	y7gIfADTHQGXc5Slmivy0LLNUymMpls8vNcfkAI9VwDYh+c6UIgHFbAiLFXfiKiHlmL19nL
+	UCXrE41JvIo15uLygPoBJxK+pSbMiF9kS+i5O6pARQUICQvSbgtDjfr+xyNwGHNlXgsaV5l
+	BRC0se6hsRXEzLRxmAgMvLBtSyxmJbwcK1LY0cYJbjQ0hISmjgYEuRTQYc7FV1cvOJHKc5p
+	GQ8Ix8I3DnBqyd9qoueDIFIgWlqkfSo4TDHJaShEPan21jo8kcq+gy3vgTgt/Ls39ruAt+S
+	WnnpdsbkjCqC0JA1YnLiPX5iIBP12CB1d/3rh0j+IN2yMrVv/HJcPpUfFJ0VXlcd01xwjAy
+	IR0ENCThvePQMINbMUrljScR0DaEmnyMQ+VznQx05G7mFcU64vybLw0bUwoyqlgyn5hVqGJ
+	EATk0gsHSeENqTH7zrmT8q7T0yz39//ZJ1bnQjZaVBn4ppq0DQvUemafVTfugQCI9b8kauO
+	Q7vkUaH0fIFwFVgIGWEiNNRnKKcKSQk9Z1E90Fq0NMrKEQWBA1lf/pUwe0NF38mUlAiG+so
+	VnIED1zodZLmHX60RAdADb0YRtd8J3BXox5UlmtbXX8PRaMF+jqPx4jvYo5b/kt9yShJx0q
+	n6IFeWOF9Fgl0vARhzUGvOdK78C+aLhSE921hL44RbtV9cBGcj8SHZrk7nwYXQJY1Z0l/9+
+	wu9almbsEXpLwIor2eaHEZM0MJBzCyvl35wwLPj85E5MahKbe9oRXH2vcxXIwiGG2OsFyxY
+	GXbZAMHHjsRVQlZ9dKxhLxm3V68D+waDALB//sW2Wkj05+d3o6jD18zh1M7fSSHkp3cNgtH
+	Es6cE37L+mafbeqkF5lfAq2CTDkcgYs892vRxqN9cJvKub9/8p3VSAFLksvdb9jDHkRmzwR
+	6gZNIDSU1Lc65pjtcRbvxw=
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
 X-QQ-RECHKSPAM: 0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.54 / 15.00];
@@ -91,12 +91,12 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256180-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256186-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[trustnetic.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -104,157 +104,107 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6975FD5ED4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:mid,trustnetic.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6B9B2D5F00
 X-Rspamd-Action: no action
 
-Support .suspend and .resume and Wake-on-LAN.
-
-Implement ethtool ops .get_wol and .set_wol to support Wake-on-LAN
-function. WOL requires hardware board support which is identified by
-subsystem device ID. Magic packets are checked by firmware, and
-currently only WAKE_MAGIC is supported.
-
-And WOL related operations are added to txgbe_shutdown(), it matches the
-implementation of wx_shutdown(). So change to call wx_shutdown()
-directly in txgbe driver.
+Since function ops wx->setup_tc() is set in txgbe and ngbe,
+ethtool_ops.set_channels can be implemented in libwx to reduce
+duplicated code.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  3 +-
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |  2 +
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 49 +++++++------------
- 3 files changed, 21 insertions(+), 33 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_ethtool.c   |  2 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 15 +--------------
+ .../net/ethernet/wangxun/txgbe/txgbe_ethtool.c    | 15 +--------------
+ 3 files changed, 3 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 58b8300e3d2c..2725c6d5d338 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -1313,8 +1313,7 @@ void wx_disable_rx(struct wx *wx)
- 		rxctrl &= ~WX_RDB_PB_CTL_RXEN;
- 		wr32(wx, WX_RDB_PB_CTL, rxctrl);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 9fd8cbe62f0c..27221e259aad 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -556,7 +556,7 @@ int wx_set_channels(struct net_device *dev,
  
--		if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
--		      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP))) {
-+		if (!(wx->ncsi_enabled || wx->wol_hw_supported)) {
- 			/* disable mac receiver */
- 			wr32m(wx, WX_MAC_RX_CFG,
- 			      WX_MAC_RX_CFG_RE, 0);
+ 	wx->ring_feature[RING_F_RSS].limit = count;
+ 
+-	return 0;
++	return wx->setup_tc(dev, netdev_get_num_tc(dev));
+ }
+ EXPORT_SYMBOL(wx_set_channels);
+ 
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+index 1a3082c1d15c..8d23b1b248db 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+@@ -67,19 +67,6 @@ static int ngbe_set_ringparam(struct net_device *netdev,
+ 	return err;
+ }
+ 
+-static int ngbe_set_channels(struct net_device *dev,
+-			     struct ethtool_channels *ch)
+-{
+-	int err;
+-
+-	err = wx_set_channels(dev, ch);
+-	if (err < 0)
+-		return err;
+-
+-	/* use setup TC to update any traffic class queue mapping */
+-	return ngbe_setup_tc(dev, netdev_get_num_tc(dev));
+-}
+-
+ static const struct ethtool_ops ngbe_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ |
+@@ -103,7 +90,7 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
+ 	.get_coalesce		= wx_get_coalesce,
+ 	.set_coalesce		= wx_set_coalesce,
+ 	.get_channels		= wx_get_channels,
+-	.set_channels		= ngbe_set_channels,
++	.set_channels		= wx_set_channels,
+ 	.get_rxfh_fields	= wx_get_rxfh_fields,
+ 	.set_rxfh_fields	= wx_set_rxfh_fields,
+ 	.get_rxfh_indir_size	= wx_rss_indir_size,
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index 59d758acccf0..183ec7f0166a 100644
+index 183ec7f0166a..9e664279be12 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -575,6 +575,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.get_link		= ethtool_op_get_link,
- 	.get_link_ksettings	= txgbe_get_link_ksettings,
- 	.set_link_ksettings	= wx_set_link_ksettings,
-+	.get_wol		= wx_get_wol,
-+	.set_wol		= wx_set_wol,
- 	.get_sset_count		= wx_get_sset_count,
- 	.get_strings		= wx_get_strings,
- 	.get_ethtool_stats	= wx_get_ethtool_stats,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 30f66507809b..ddc7cea9d7c2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -245,8 +245,7 @@ static void txgbe_disable_device(struct wx *wx)
- 		wx_set_all_vfs(wx);
- 	}
+@@ -91,19 +91,6 @@ static int txgbe_set_ringparam(struct net_device *netdev,
+ 	return err;
+ }
  
--	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
--	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP))) {
-+	if (!(wx->ncsi_enabled || wx->wol_hw_supported)) {
- 		/* disable mac transmiter */
- 		wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
- 	}
-@@ -303,6 +302,7 @@ void txgbe_up(struct wx *wx)
- static void txgbe_init_type_code(struct wx *wx)
+-static int txgbe_set_channels(struct net_device *dev,
+-			      struct ethtool_channels *ch)
+-{
+-	int err;
+-
+-	err = wx_set_channels(dev, ch);
+-	if (err < 0)
+-		return err;
+-
+-	/* use setup TC to update any traffic class queue mapping */
+-	return txgbe_setup_tc(dev, netdev_get_num_tc(dev));
+-}
+-
+ static int txgbe_get_ethtool_fdir_entry(struct txgbe *txgbe,
+ 					struct ethtool_rxnfc *cmd)
  {
- 	u8 device_type = wx->subsystem_device_id & 0xF0;
-+	u16 wol_mask, ncsi_mask;
- 
- 	switch (wx->device_id) {
- 	case TXGBE_DEV_ID_SP1000:
-@@ -347,6 +347,11 @@ static void txgbe_init_type_code(struct wx *wx)
- 		wx->media_type = wx_media_unknown;
- 		break;
- 	}
-+
-+	wol_mask = wx->subsystem_device_id & WX_WOL_MASK;
-+	ncsi_mask = wx->subsystem_device_id & WX_NCSI_MASK;
-+	wx->wol_hw_supported = (wol_mask == WX_WOL_SUP) ? 1 : 0;
-+	wx->ncsi_enabled = (ncsi_mask == WX_NCSI_SUP) ? 1 : 0;
- }
- 
- /**
-@@ -534,34 +539,6 @@ static int txgbe_close(struct net_device *netdev)
- 	return 0;
- }
- 
--static void txgbe_dev_shutdown(struct pci_dev *pdev)
--{
--	struct wx *wx = pci_get_drvdata(pdev);
--	struct net_device *netdev;
--
--	netdev = wx->netdev;
--	netif_device_detach(netdev);
--
--	rtnl_lock();
--	if (netif_running(netdev))
--		txgbe_close_suspend(wx);
--	rtnl_unlock();
--
--	wx_control_hw(wx, false);
--
--	pci_disable_device(pdev);
--}
--
--static void txgbe_shutdown(struct pci_dev *pdev)
--{
--	txgbe_dev_shutdown(pdev);
--
--	if (system_state == SYSTEM_POWER_OFF) {
--		pci_wake_from_d3(pdev, false);
--		pci_set_power_state(pdev, PCI_D3hot);
--	}
--}
--
- /**
-  * txgbe_setup_tc - routine to configure net_device for multiple traffic
-  * classes.
-@@ -824,6 +801,14 @@ static int txgbe_probe(struct pci_dev *pdev,
- 	eth_hw_addr_set(netdev, wx->mac.perm_addr);
- 	wx_mac_set_default_filter(wx, wx->mac.perm_addr);
- 
-+	wx->wol = 0;
-+	if (wx->wol_hw_supported)
-+		wx->wol = WX_PSR_WKUP_CTL_MAG;
-+
-+	netdev->ethtool->wol_enabled = !!(wx->wol);
-+	wr32(wx, WX_PSR_WKUP_CTL, wx->wol);
-+	device_set_wakeup_enable(&pdev->dev, wx->wol);
-+
- 	txgbe_init_service(wx);
- 
- 	err = wx_init_interrupt_scheme(wx);
-@@ -975,7 +960,9 @@ static struct pci_driver txgbe_driver = {
- 	.id_table = txgbe_pci_tbl,
- 	.probe    = txgbe_probe,
- 	.remove   = txgbe_remove,
--	.shutdown = txgbe_shutdown,
-+	.suspend  = wx_suspend,
-+	.resume   = wx_resume,
-+	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
- };
- 
+@@ -589,7 +576,7 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
+ 	.get_coalesce		= wx_get_coalesce,
+ 	.set_coalesce		= wx_set_coalesce,
+ 	.get_channels		= wx_get_channels,
+-	.set_channels		= txgbe_set_channels,
++	.set_channels		= wx_set_channels,
+ 	.get_rxnfc		= txgbe_get_rxnfc,
+ 	.set_rxnfc		= txgbe_set_rxnfc,
+ 	.get_rx_ring_count	= txgbe_get_rx_ring_count,
 -- 
 2.48.1
 
