@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-256157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8JptIJiVgWl/HAMAu9opvQ
-	(envelope-from <netdev+bounces-256157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:28:40 +0100
+	id qNI7NfCVgWl/HAMAu9opvQ
+	(envelope-from <netdev+bounces-256158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:30:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29B2D53B4
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:28:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 698D6D53D9
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 07:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 69715304D1F1
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 06:27:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 095B4304439F
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 06:29:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CCB3793D0;
-	Tue,  3 Feb 2026 06:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5F237A49C;
+	Tue,  3 Feb 2026 06:29:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9E0378D8B;
-	Tue,  3 Feb 2026 06:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B083793D7;
+	Tue,  3 Feb 2026 06:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770100046; cv=none; b=LK1jEl0BpYJsrfOG0OxDtJvpiMBd1qLxWIFhztDlIe7kMDl+XgyBnSTcY78MIPSaOCypimHVvLI5C633i1J3iIVZXPmXGm3NGblt8Zsz+ni4z3m7Jf2+ydpWwhT0OvAnfYwv8o8g0rVfafoD5t3WfKBErOnqw/Ew7gIqc3dUVRQ=
+	t=1770100166; cv=none; b=kUO2MlJNstiMPiXkagqNAsNwEQABLEe7HZ68Skzy00DiHNpRf/TK8yxoSFIV1FPcbWKhecyDy8YljkGca40ibCmbC0IAM62Duuw3VrDWdZyqLyuQ95NiMkeH+Ipq6uvdxk9zCBHWhv2EsuAyExRs57IVJfA/7ceWbjOLmxpLt7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770100046; c=relaxed/simple;
-	bh=3N44thLOsJl4A26r2xtzAdcrImAJJC27UdtQIWp8wUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gjGrCw/3gr5igLJ/BtJQSWhodtkPvVec0pWMhk8B/bfpHXwzOH0cGWdLbsWtBnpg1LYM3rWMu7s1evu+l0THTUeQ3KNPrFg7QD9grW/lLKDifjipZsrIcaMbxg+92TJ2EiePIehKHhgn31iJsCaFxEyc8ymrm5sBv7BzRuM0IpU=
+	s=arc-20240116; t=1770100166; c=relaxed/simple;
+	bh=qyir3XDZGU+R2VTvY0p/Q/v/M5CqxKlCPIBDYLiuk6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V+JiIwNUDcTX1nufwvyxLwmSh9flgX2ip+7lXIsN6yeodkE8K2LN+Xj+LPUM1pHxZuPVqOgCdGfSjcR/B/ffgE1qNA4rkOac7EUEQRzFoRVm8li2EaQhziJENgg97jqSjcn9WP15gC2N5721ffz0NwZst6wMJhvcZYo3hcpVkBI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [223.64.69.42])
-	by gateway (Coremail) with SMTP id _____8BxVcFJlYFp+0QPAA--.2503S3;
-	Tue, 03 Feb 2026 14:27:21 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Axz8PAlYFpLkUPAA--.49987S3;
+	Tue, 03 Feb 2026 14:29:20 +0800 (CST)
 Received: from localhost.localdomain (unknown [223.64.69.42])
-	by front1 (Coremail) with SMTP id qMiowJDxhcA8lYFpau4+AA--.18085S2;
-	Tue, 03 Feb 2026 14:27:14 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJBxiuC2lYFpqO4+AA--.28483S2;
+	Tue, 03 Feb 2026 14:29:13 +0800 (CST)
 From: Huacai Chen <chenhuacai@loongson.cn>
 To: Huacai Chen <chenhuacai@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -49,10 +49,12 @@ Cc: Yanteng Si <si.yanteng@linux.dev>,
 	loongarch@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH V2 net-next] net: stmmac: Fix typo from clk_scr_i to clk_csr_i
-Date: Tue,  3 Feb 2026 14:26:58 +0800
-Message-ID: <20260203062658.2156653-1-chenhuacai@loongson.cn>
+	Huacai Chen <chenhuacai@loongson.cn>,
+	stable@vger.kernel.org,
+	Hongliang Wang <wanghongliang@loongson.cn>
+Subject: [PATCH V2 net-next] net: stmmac: dwmac-loongson: Set clk_csr_i to 100-150MHz
+Date: Tue,  3 Feb 2026 14:29:01 +0800
+Message-ID: <20260203062901.2158236-1-chenhuacai@loongson.cn>
 X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -61,24 +63,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxhcA8lYFpau4+AA--.18085S2
+X-CM-TRANSID:qMiowJBxiuC2lYFpqO4+AA--.28483S2
 X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7ZF13Ww1fJr4fAF4kWry3Awc_yoW8WFW3pr
-	sFqr90kw4YkFWxKws7tryrtr13Gayqk3Wqqws0qw4qvF4qyr40qF1j9r98JFyDWaySyryS
-	vr1qgr4ayF97GrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW7CrWDtF13CrW7Jr4UCrW5twc_yoW8XrWxpr
+	WxZa47Ww4ayr12k3Z5Xw1UZFy5ua90gFZ7GFsrJws3WFWvy34jqry5KFZ8uFW7uFWrG3Wa
+	vr4qkr45CFn8CwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
 	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
 	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
 	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
 	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
 	AKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
 	6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
 	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0L0ePUUUUU==
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.54 / 15.00];
@@ -91,13 +93,13 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256157-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256158-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[loongson.cn];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FREEMAIL_CC(0.00)[linux.dev,foss.st.com,synopsys.com,gmail.com,lists.linux.dev,vger.kernel.org,loongson.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -107,47 +109,41 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,loongson.cn:mid,loongson.cn:email]
-X-Rspamd-Queue-Id: F29B2D53B4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,loongson.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 698D6D53D9
 X-Rspamd-Action: no action
 
-In include/linux/stmmac.h clk_csr_i is spelled as clk_scr_i by mistake,
-so correct the typo.
+Current clk_csr_i setting of Loongson STMMAC (including LS7A1000/2000
+and LS2K1000/2000/3000) are copy & paste from other drivers. In fact,
+Loongson STMMAC use 125MHz clocks and need 62 freq division to within
+2.5MHz, meeting most PHY MDC requirement. So fix by setting clk_csr_i
+to 100-150MHz, otherwise some PHYs may link fail.
 
+Cc: stable@vger.kernel.org
+Fixes: 30bba69d7db40e7 ("stmmac: pci: Add dwmac support for Loongson")
+Signed-off-by: Hongliang Wang <wanghongliang@loongson.cn>
 Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
 ---
-V2: Update subject line and remove "Cc stable".
+V2: Add Fixes tag and update commit message.
 
- include/linux/stmmac.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index f1054b9c2d8a..1ba583ef6e03 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -28,14 +28,14 @@
-  * This could also be configured at run time using CPU freq framework. */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 107a7c84ace8..c05e3e7a539c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -91,8 +91,8 @@ static void loongson_default_data(struct pci_dev *pdev,
+ 	/* Get bus_id, this can be overwritten later */
+ 	plat->bus_id = pci_dev_id(pdev);
  
- /* MDC Clock Selection define*/
--#define	STMMAC_CSR_60_100M	0x0	/* MDC = clk_scr_i/42 */
--#define	STMMAC_CSR_100_150M	0x1	/* MDC = clk_scr_i/62 */
--#define	STMMAC_CSR_20_35M	0x2	/* MDC = clk_scr_i/16 */
--#define	STMMAC_CSR_35_60M	0x3	/* MDC = clk_scr_i/26 */
--#define	STMMAC_CSR_150_250M	0x4	/* MDC = clk_scr_i/102 */
--#define	STMMAC_CSR_250_300M	0x5	/* MDC = clk_scr_i/124 */
--#define	STMMAC_CSR_300_500M	0x6	/* MDC = clk_scr_i/204 */
--#define	STMMAC_CSR_500_800M	0x7	/* MDC = clk_scr_i/324 */
-+#define	STMMAC_CSR_60_100M	0x0	/* MDC = clk_csr_i/42 */
-+#define	STMMAC_CSR_100_150M	0x1	/* MDC = clk_csr_i/62 */
-+#define	STMMAC_CSR_20_35M	0x2	/* MDC = clk_csr_i/16 */
-+#define	STMMAC_CSR_35_60M	0x3	/* MDC = clk_csr_i/26 */
-+#define	STMMAC_CSR_150_250M	0x4	/* MDC = clk_csr_i/102 */
-+#define	STMMAC_CSR_250_300M	0x5	/* MDC = clk_csr_i/124 */
-+#define	STMMAC_CSR_300_500M	0x6	/* MDC = clk_csr_i/204 */
-+#define	STMMAC_CSR_500_800M	0x7	/* MDC = clk_csr_i/324 */
+-	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+-	plat->clk_csr = STMMAC_CSR_20_35M;
++	/* clk_csr_i = 100-150MHz & MDC = clk_csr_i/62 */
++	plat->clk_csr = STMMAC_CSR_100_150M;
+ 	plat->core_type = DWMAC_CORE_GMAC;
+ 	plat->force_sf_dma_mode = 1;
  
- /* MTL algorithms identifiers */
- #define MTL_TX_ALGORITHM_WRR	0x0
 -- 
 2.47.3
 
