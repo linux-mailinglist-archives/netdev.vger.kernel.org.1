@@ -1,176 +1,138 @@
-Return-Path: <netdev+bounces-256355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WI5rJjkigmmQPgMAu9opvQ
-	(envelope-from <netdev+bounces-256355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:28:41 +0100
+	id sP+MLM4jgmnPPgMAu9opvQ
+	(envelope-from <netdev+bounces-256356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:35:26 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39F77DBF53
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:28:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D17DC0E8
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:35:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9330D3172700
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:20:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAF9F30DED6D
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086043D2FEA;
-	Tue,  3 Feb 2026 16:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B78E3C199E;
+	Tue,  3 Feb 2026 16:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BFYkuVt5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uNX8DAcb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A213D2FE4
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 16:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770135595; cv=pass; b=iD5Qo80Kfqf9zwQ+KQs1iGsj13U/1taQ/FVO6tpQzKGkfav3auQHSKssxFQfbof7eqpC9vcJo2ZzahnJQFrevr1tCNIh/1vtYoSWgZYokTODFVH7Dwtct1kqaJ+C6D4aOdjKAJyEyWqY2wJnt3msgIvWZYhpbWNNO0tDNz3Mv1U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770135595; c=relaxed/simple;
-	bh=Tu4rSvNTKOOFw1ToUC6UiNxnVnQZ9GgdV42C9w5CPZA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HkSYVm7HCOdSZgRKawEN+vM5ltC6GaQC9baln/o9udfjPkyWBHOwOAPOgZgMVeWH7ZT1T9jMBteXqFJnHwCbDebK3OMy3/KHn3A8xGwV2iReuN9BHg5L2S+vkOTTWI8LJrFrx2C9Ya8SUi4e1+Qfw880afg0IpEdsfAtz1gW8ks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BFYkuVt5; arc=pass smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64937edbc9eso5166285d50.2
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 08:19:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770135593; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YO9I5Ypx6bC8ziSbPKR+oqikZuAC7rJhF9MRCSzy1LIwDTDzKBAc0Z8iMccdQOcOil
-         v8xlji+KP+SthaTuDzcMmQIpiMHEfleAx/mqNiCqSW3YorflpabC1sX7wuHsayXzjCdi
-         kEpDy++Cf6mks/CSaZX1BNkgKhRajNHvEoZSDb3SM7Rnuxn7bWn61xBDweIsuhaSW2zl
-         E8KDwJq9PRNTO9ZtVEYtk7TBo8u4rBcc+6IiuFaNv98f3dlnoSRUMzCkoh0OOOvSye7D
-         esIHepjQXcd/P4hEwP81g8NMs1ZmI/uCeDWYJaHet6dt+Gh7k2sZ0lR4kxArmJpa8B8o
-         MkAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wGWKXutvMucFH05YrWha7pPDqCCm/nyM2LYOpcwTIG0=;
-        fh=h5PwfNUUOVN4jpJ+9rMMWOKf3eGExzmujuwPLgMFs34=;
-        b=ArFP0AeGvpVDlTw38v3zHO21D3SPi8diBe/oCCpvvIFz0pfc4qiGeCT8ezCVipZoFO
-         HsGMIQFpQwO1sIq1WQUPsMXnxl5FxgI7A9efZxs3J/28ddqhwZMbpkARhr+z2RfO+RW0
-         SsO5n6eg4Ihhr3PEbaSvQP4beD6Xm609buBQFrBYgl3tAmMLHJkHMQCdlaelXil0WnIz
-         PPJk6RKLjoaFyjvw/A7K3GLzJLQKgscSsL7axOhpt4RkI5WNl77cVEVI3K/VU+4oByPM
-         E/oRFuzBqR7pFgt6BTXb6Jj+h06+D5Bg7C+PgeznN4SKuV9Zq5XoawTMURwrvpoMTs2A
-         /+Vw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770135593; x=1770740393; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wGWKXutvMucFH05YrWha7pPDqCCm/nyM2LYOpcwTIG0=;
-        b=BFYkuVt5ZAdVXyu3DTkMUfBmRe3WuhPBcfYZhSAlHe0XDw1GAuaPo45rtnMsmpoJlQ
-         rgIkmUwd8nWw7r29KnYhYIV8PX3ODYEy/AAMrkpphuoe2L0U0gIwt6P5tnjDZc89VEz7
-         CuX/NQS5RoyNjhSjf2MQRazazxUj86fv8rBk5E5+mTMU0eJM/CjbGjFBq4Cx2vyfBXfF
-         PsXrYJQqF2XjJ2Ojjc80Tgo3+aWP5lQ6NmIIcw5PixvAFtbJPPIXFEjtf8cDbfgYC0YD
-         KgxT+abbNq2m93rfMuOCa7r3VesYLOFNdUK+KNdtmB300XkLhZxGamb2CDo5x6l6nIzC
-         5nZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770135593; x=1770740393;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wGWKXutvMucFH05YrWha7pPDqCCm/nyM2LYOpcwTIG0=;
-        b=OW8hbtem1+mZXpFpx4dIpN6pknxpdESLgucUCNhKzPOr3QpOwkNR8bMD7lVz2LnDus
-         KU7FleoV8JYsE0F1i6hiy1LyHLAVZIwA/Jy+ZkDCF8Ef9OiCGxn9kJziUJ0dUqSNd2da
-         eXMf3yeYEnjPPHbDzFKFxjD5pBI1a/Y5dfFiSYH5+wANjpNmExL9VWSOVMublWp5gMvZ
-         3FKeYf7edHJ9z+NkzCklC/dL8lJkQ3qpaKtmypJ65K1DfXQ/LnVempMH69WJgv9JdbzP
-         7xFYRY4fFzWiKCIGmA1cDZs8ipUKVxRGZztMRi8RIs/+KCW/iwhE04zuiaZ+Jvr93QRc
-         cTdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrRcoQV1QV2AqVPRzGc1GI/0pshGWK1Q1+woKY76C5E2cGvhsX0Y+6raC7BOGgOrsq8ksEsxg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4nOdW4NcsraijOHW6DbdLYMuxwv9NfFYQeYo3ixJL7USR1swB
-	ocKR8nTfnI7S2kZNW74niAmupDMzBbFvbFUZdiARNJAcrjBpoFOcoNWP07aRY2KUn34EbeDUFsH
-	0lWXvXkt5du++lI2h7OHamPGWOjiZNns=
-X-Gm-Gg: AZuq6aKKTnyc/R1ziQM0pr8buoV4BIq5m44pX3eTniwkU9tahKuV6VUKsPMCTKg143U
-	dqEhe9WR2y65la53biQRb4oTAkNQ1S90VEpWMRSwLVgilBZkMAUu+/iXVCwPHp5wjK0OfAnxc61
-	0eNgUFRU8fdKcQPW/CtxiPBwG16xh23GBNM5GQCAuld0D0x7vudcGG7EWo0rONQ0i6exvGsJTrg
-	rxNjfPiOHEiNi/Yjat8nZfP1UUjLJJf+3swZmPXzSi0u8Hn8ySpl/yaD5yJDrRHrBfHTlDfdbCL
-	50wE
-X-Received: by 2002:a53:e038:0:b0:649:399c:d964 with SMTP id
- 956f58d0204a3-649db4bd04emr32126d50.77.1770135593302; Tue, 03 Feb 2026
- 08:19:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F603A7F56;
+	Tue,  3 Feb 2026 16:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770135855; cv=none; b=ECK1NRyLV/iRcI1OHe2uSR4M1krHBAJIibnQTseq5DV2e2e7Xvm4P0MCM2GBRUBBXVq2FSd73huXPyDgnQYclxWcIGC+mLSEAOLtdoVY6uLUhnHAhq8C1ENf8zSV5p+u3YPbnyggN8Ua3XP9/+ReR5AxxVKPUDyQB10+oQMeT28=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770135855; c=relaxed/simple;
+	bh=UWL63PlrH5dx1YV4/npYBCR6YdRRIjBmFXH2fSR0HVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BxJpUE3qk96OZmZHB8Y2gFfI1k0I9xrem3U0F9WF1idGb5MiUtfFUZNmsLNBOpLWZk8mbChRLk8dGhPwcjuDnQBFpeZGsioKO7l2tzopN3ZaEEGP07DsSXmZMjLtusWjS6ANSdKPR+IPs7enWlJ7iisYYsKBQQagl0aWmY59Jyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uNX8DAcb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E06AC2BC86;
+	Tue,  3 Feb 2026 16:24:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770135854;
+	bh=UWL63PlrH5dx1YV4/npYBCR6YdRRIjBmFXH2fSR0HVk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uNX8DAcb1rZSnpFRIYqJir9PKQomw7yC3fu896hkVqVDNBVNov64QRbyMvoPx8j1P
+	 CbDPmm5Gxi0//DJCgpovRCj8MwIWlQ4Piy0kfRAh6Uk/ca047e7/sbk7qS/qbd+ABG
+	 TfG1RQV1VjDQqg7QTE0W6V1sUWeV9jZ44r2lEbzEltUZ6z9NYQ8/nl/2wnhKySvE25
+	 SvtBWBro/rMQe0x4NTVGhH3HTWQDjb3CUpomCqP0uebOi3G6GeP355aGibu/i4Ltnb
+	 SSdrJDUL2jS2gU8yxs3z3ZDL0GoDEwuntACOWaHIudC1sUmtr2LhWl4RNFE2kjlNKC
+	 QE9X2rUEoCAqA==
+Message-ID: <1cbd0d2e-2002-4685-99eb-97dd8947cf16@kernel.org>
+Date: Tue, 3 Feb 2026 09:24:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260203080109.2682183-1-sun.jian.kdev@gmail.com>
- <20260203145511.164485-1-sun.jian.kdev@gmail.com> <aYIOXk55_DRFKCqo@strlen.de>
-In-Reply-To: <aYIOXk55_DRFKCqo@strlen.de>
-From: sun jian <sun.jian.kdev@gmail.com>
-Date: Wed, 4 Feb 2026 00:19:40 +0800
-X-Gm-Features: AZwV_Qjfv0Y1awKscWXbDj4yy-HnV-BM8KoCg4M6DTECxWm-KSh8hCQxRruGgdg
-Message-ID: <CABFUUZG9LnhXc+nsQA28WHiiT33_5wQ82E1bBSBncWkxkXaKZA@mail.gmail.com>
-Subject: Re: [PATCH v2] netfilter: amanda: fix RCU pointer typing for nf_nat_amanda_hook
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>, 
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] icmp: fix ip_rt_bug race in icmp_route_lookup
+ reverse path
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Jiayuan Chen <jiayuan.chen@linux.dev>,
+ netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+ syzbot+e738404dcd14b620923c@syzkaller.appspotmail.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org
+References: <20260128090523.356953-1-jiayuan.chen@linux.dev>
+ <892557d1-9408-40e3-8e79-587713116b93@redhat.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <892557d1-9408-40e3-8e79-587713116b93@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256355-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256356-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 39F77DBF53
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,e738404dcd14b620923c];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 55D17DC0E8
 X-Rspamd-Action: no action
 
-On Tue, Feb 3, 2026 at 11:04=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Sun Jian <sun.jian.kdev@gmail.com> wrote:
-> >  enum amanda_strings {
-> > @@ -98,7 +98,12 @@ static int amanda_help(struct sk_buff *skb,
-> >       u_int16_t len;
-> >       __be16 port;
-> >       int ret =3D NF_ACCEPT;
-> > -     typeof(nf_nat_amanda_hook) nf_nat_amanda;
-> > +     unsigned int (*nf_nat_amanda)(struct sk_buff *skb,
-> > +                                   enum ip_conntrack_info ctinfo,
-> > +                                   unsigned int protoff,
-> > +                                   unsigned int matchoff,
-> > +                                   unsigned int matchlen,
-> > +                                   struct nf_conntrack_expect *exp);
->
-> Why is that needed?
-Correct. Manual declaration is indeed verbose.
+On 2/3/26 3:41 AM, Paolo Abeni wrote:
+> On 1/28/26 10:05 AM, Jiayuan Chen wrote:
+>> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+>> index 19c9c838967f..dc9dcc799824 100644
+>> --- a/net/ipv4/icmp.c
+>> +++ b/net/ipv4/icmp.c
+>> @@ -559,6 +559,23 @@ static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
+>>  		/* steal dst entry from skb_in, don't drop refcnt */
+>>  		skb_dstref_steal(skb_in);
+>>  		skb_dstref_restore(skb_in, orefdst);
+>> +
+>> +		/*
+>> +		 * At this point, fl4_dec.daddr should NOT be local (we
+>> +		 * checked fl4_dec.saddr above). However, a race condition
+>> +		 * may occur if the address is added to the interface
+>> +		 * concurrently. In that case, ip_route_input() returns a
+>> +		 * LOCAL route with dst.output=ip_rt_bug, which must not
+>> +		 * be used for output.
+>> +		 */
+>> +		if (!err && rt2 && rt2->rt_type == RTN_LOCAL) {
+>> +			net_warn_ratelimited("%s: detected local route for %pI4 "
+>> +					     "during ICMP error handling (src %pI4), "
+>> +					     "possible address race\n",
+>> +					     __func__, &fl4_dec.daddr, &fl4_dec.saddr);
+> 
+> The fix looks correct to me, but this patch should target the 'net' tree
+> and the above warning message is a bit off: the text string should not
+> be broken to fit the 80 chars limit - it need to be greepable - it's
+> probably better to not include the function name.
+> 
+> /P
+> 
 
-The reason I used it was that typeof(nf_nat_amanda_hook) carries over
-the __rcu attribute to the local variable, which triggers a Sparse
-warning when assigning the result of rcu_dereference().
-
-I will switch to typeof(*nf_nat_amanda_hook) *nf_nat_amanda in V3.
-Thanks for the guidance!
-
-Regards,
-
-Sun
+Does the message even provide value? There is nothing a user can do
+about it.
 
