@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-256382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBkmBfAxgml5QQMAu9opvQ
-	(envelope-from <netdev+bounces-256382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:35:44 +0100
+	id 2BBDJJ8xgml5QQMAu9opvQ
+	(envelope-from <netdev+bounces-256380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:34:23 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A198FDCDEF
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:35:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 415EFDCDB8
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:34:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4624F31794A5
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:29:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 48FE2307B81D
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7151A35E544;
-	Tue,  3 Feb 2026 17:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EC430EF8E;
+	Tue,  3 Feb 2026 17:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="0oL+5ezK"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="he/m4SPG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051F8324B16
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5426A2C235D;
+	Tue,  3 Feb 2026 17:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770139744; cv=none; b=e4ueKB8rO7ieL3Czk+9dBRE2uA3jSwpfT5MBNNzbZlZWmUZnXmKuBmK1cvXNezypJ2IJe1dBLy92MbdC8F8Kwj//tqA99hOQ5i6q+fOfBYJsIhxMG2u1RcwPU/6E3AH5r6ckAPAdS+VRq+2knKwuXhOP1thwQeZJqb2o0ORtlpg=
+	t=1770139741; cv=none; b=CSzHkN8idUStdSnxYL+A8XJcytNvbbI8LXk0bqs8MysdGZ7LIHOjXWeLo+XHhEVQuw5yJ71eyoIZRbJiHLHTfctf+5NEho/ceTaK8/3yoc7uyYp5JOpNJ28U7rPzzNv/XH+yl1w/ExkRwC3FIEWp+9L7s4S4vCoL5mrYriRcse8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770139744; c=relaxed/simple;
-	bh=mWyMx4Wb/HCw51vDYbHGsY4S6C9v30+HtBdi1q1SCSQ=;
+	s=arc-20240116; t=1770139741; c=relaxed/simple;
+	bh=OXv41CaCxkIeKEa8hsRowKmYkbdiMm3q+IPpNww8qsQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sa9F41irhjodFU/M27/RZmNtMjgNWI8RwVK7sXvn1+UqF/QgPeosLLNEWzBIrmVM/VFjWWbPRormsJtaE28xKSxbmcnwvkEB/SWvuADsFOPbxNkK2a43GBJ9fEaRrs83e6iloOlF89C5lXCPkzEvnu7PNV1A0de2hx0P/LXAygY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=0oL+5ezK; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version; b=gH9vzuajhJd95nr84wjGYZDH8JsSbIaUP+K1ncihhxuAMPkl1wnQ87wcjNXzNw1BzSZgwdtMRG5yp24i1qWuFH4zuDL441LnfEwbaekP1qUt4doxIL+d0kBUogZuEochrDa5JZnZt0zLCx8C+0HTWisI/evEv2ywAc1JTsEeQic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=he/m4SPG; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 40EAC1A2BC6;
-	Tue,  3 Feb 2026 17:28:56 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 1B2141A2BC7;
+	Tue,  3 Feb 2026 17:28:59 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 10D3160728;
-	Tue,  3 Feb 2026 17:28:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A7D8A119A8891;
-	Tue,  3 Feb 2026 18:28:52 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E4C5B60728;
+	Tue,  3 Feb 2026 17:28:58 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 48D4D119A88F9;
+	Tue,  3 Feb 2026 18:28:55 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1770139734; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1770139737; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=KecJRPe2Bv70TIJpdknGkVxhofD7qopvizBIlkrUTDs=;
-	b=0oL+5ezK79vBEpfRX9ZMmL99O5b7ITFB+focEqMtyIuOjKO0HftypZfxC+GmiV3wGeyUi+
-	cNq6JDVr+wFjGMmGwl2pyzaWGOuUED8TuwlsBkrseEX4/I42tfPlMcqFUy2X2I6q07HGUN
-	ZqunLmyZVgbRNhv17NHnaOXAeR8jHrRzOalZJEJEG6mLwbqo3BJ/JlVu9i00dq1XqjLsUK
-	KS4cE2lX+VAc/prdbkzM1huEoO0bbnzzCCxDoZ4TFJ8EIIyPYtiD7omwqPKT2Tm+KtkLWZ
-	EcVQou92bUb9DOvavoBfUp56qddqW/7RGq90K/MMiRGAN6XN14R4sGtfsogORg==
+	bh=/OC/buRnlLfFzn+BhWblbXGZm2j74ao97s8f0goP980=;
+	b=he/m4SPG6SwfImkVhRBQpI7KhmaWYNu+FaVBgKdu05GezgzzAhw5gWHHOML8LzabWyFEpR
+	i9wyO1wjW9NluRUU4gZaEzjbMMrHyvaLCe4RmIeRY43pPAM+1Wr68orKGf/1NPpnW+hk9a
+	tejbH/GC0+flU8t/uPVbsYWon4r+N0/MNjWlxDFuBoXhsWB5OYCqBdfLb7jiB2+DhFJ+gk
+	ozKEPDOaQCQrEBOTwQqvyOKtLt7WSDF6QgYweDEYG2J50CVE5Umcru/d4Bi3ybk5eLAnIX
+	Nlg9FTf8iXgM1WkdNMi5yFxVfRu7MNWdsrQ1TyoDGzPRSiJAlCJSgQPy9Cbe0A==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -76,9 +76,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next v4 02/13] net: phy: phy_port: Cleanup the of-parsing logic for phy_port
-Date: Tue,  3 Feb 2026 18:28:26 +0100
-Message-ID: <20260203172839.548524-3-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v4 03/13] net: phy: phy_port: Correctly recompute the port's linkmodes
+Date: Tue,  3 Feb 2026 18:28:27 +0100
+Message-ID: <20260203172839.548524-4-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20260203172839.548524-1-maxime.chevallier@bootlin.com>
 References: <20260203172839.548524-1-maxime.chevallier@bootlin.com>
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256382-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256380-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -121,49 +121,75 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A198FDCDEF
+X-Rspamd-Queue-Id: 415EFDCDB8
 X-Rspamd-Action: no action
 
-We don't need to maintain a mediums bitfield, let's drop it and drop a
-bogus check for empty mediums, as we already check it above.
+a PHY-driven phy_port contains a 'supported' field containing the
+linkmodes available on this port. This is populated based on :
+ - The PHY's reported features
+ - The DT representation of the connector
+ - The PHY's attach_mdi() callback
 
+As these different attrbution methods work in conjunction, the helper
+phy_port_update_supported() recomputes the final 'supported' value based
+on the populated mediums, linkmodes and pairs.
+
+However this recompute wasn't correctly implemented, and added more
+modes than necessary by or'ing the medium-specific modes to the existing
+support. Let's fix this and properly filter the modes.
+
+Fixes: 589e934d2735 ("net: phy: Introduce PHY ports representation")
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy_port.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ drivers/net/phy/phy_port.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/phy/phy_port.c b/drivers/net/phy/phy_port.c
-index ec93c8ca051e..a269e9ea12c4 100644
+index a269e9ea12c4..ad2580529842 100644
 --- a/drivers/net/phy/phy_port.c
 +++ b/drivers/net/phy/phy_port.c
-@@ -53,7 +53,7 @@ struct phy_port *phy_of_parse_port(struct device_node *dn)
- 	enum ethtool_link_medium medium;
- 	struct phy_port *port;
- 	const char *med_str;
--	u32 pairs = 0, mediums = 0;
-+	u32 pairs = 0;
- 	int ret;
+@@ -108,16 +108,10 @@ EXPORT_SYMBOL_GPL(phy_of_parse_port);
+  */
+ void phy_port_update_supported(struct phy_port *port)
+ {
+-	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported) = { 0 };
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported) = {0};
+ 	unsigned long mode;
+ 	int i;
  
- 	ret = fwnode_property_read_string(fwnode, "media", &med_str);
-@@ -85,17 +85,12 @@ struct phy_port *phy_of_parse_port(struct device_node *dn)
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	mediums |= BIT(medium);
+-	for_each_set_bit(i, &port->mediums, __ETHTOOL_LINK_MEDIUM_LAST) {
+-		linkmode_zero(supported);
+-		phy_caps_medium_get_supported(supported, i, port->pairs);
+-		linkmode_or(port->supported, port->supported, supported);
+-	}
 -
--	if (!mediums)
--		return ERR_PTR(-EINVAL);
--
- 	port = phy_port_alloc();
- 	if (!port)
- 		return ERR_PTR(-ENOMEM);
+ 	/* If there's no pairs specified, we grab the default number of
+ 	 * pairs as the max of the default pairs for each linkmode
+ 	 */
+@@ -127,6 +121,23 @@ void phy_port_update_supported(struct phy_port *port)
+ 			port->pairs = max_t(int, port->pairs,
+ 					    ethtool_linkmode_n_pairs(mode));
  
- 	port->pairs = pairs;
--	port->mediums = mediums;
-+	port->mediums = BIT(medium);
- 
- 	return port;
- }
++	for_each_set_bit(i, &port->mediums, __ETHTOOL_LINK_MEDIUM_LAST) {
++		pr_info("Adding mode for medium %d pairs %d\n", i, port->pairs);
++		__ETHTOOL_DECLARE_LINK_MODE_MASK(med_supported) = {0};
++
++		phy_caps_medium_get_supported(med_supported, i, port->pairs);
++		linkmode_or(supported, supported, med_supported);
++	}
++
++	/* If port->supported is already populated, filter it out with the
++	 * medium/pair support. Otherwise, let's just use this medium-based
++	 * support as the port's supported list.
++	 */
++	if (linkmode_empty(port->supported))
++		linkmode_copy(port->supported, supported);
++	else
++		linkmode_and(port->supported, supported, port->supported);
++
+ 	/* Serdes ports supported through SFP may not have any medium set,
+ 	 * as they will output PHY_INTERFACE_MODE_XXX modes. In that case, derive
+ 	 * the supported list based on these interfaces
 -- 
 2.49.0
 
