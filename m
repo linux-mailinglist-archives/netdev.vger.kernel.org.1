@@ -1,213 +1,258 @@
-Return-Path: <netdev+bounces-256261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256258-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oAVwOgbfgWmDLQMAu9opvQ
-	(envelope-from <netdev+bounces-256261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:41:58 +0100
+	id SH34AFPegWmDLQMAu9opvQ
+	(envelope-from <netdev+bounces-256258-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:38:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD49D887F
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:41:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76DB6D87C8
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 66B7B3009E03
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 11:41:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B36E9308C253
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 11:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2C9339875;
-	Tue,  3 Feb 2026 11:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6062318B8F;
+	Tue,  3 Feb 2026 11:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="qQ1o68rm";
-	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="knM74zwa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6B0+8qW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tynBgFKy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailhub11-fb.kaspersky-labs.com (mailhub11-fb.kaspersky-labs.com [81.19.104.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA9E274B3A;
-	Tue,  3 Feb 2026 11:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.104.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B802DEA95
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 11:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770118895; cv=none; b=BwD60A2adoXasf3pnRlmpHHlUxgebyOdMQFKTaSqw+9jSqrukN4lLwUfYZlh3h/KdVU5AKdTVW2Zqmqwioy2M0PVCiyj/jhYrbeRIkRrTMmU289y4eCDLAjxtIb7BimC8YO8jt3WWgc8tf7DikNdyYDUQJKSpfVlJT09X/qkSAQ=
+	t=1770118375; cv=none; b=NdBJg7Pb2H9D3yyeY2vRUVAnNbyQpzGusyVre2kud0i58zbYJB9YF3m7hZkmKcCcWAxfm0ZPD2bCnwLDA1atACOaJOy/TvRyCmTBYfQPWmQlKi8ykRCJ75USvVuLAo3oAN8wXS50Qfv3El62/BbrH2mwC4cpXtdquDKmEBCgpCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770118895; c=relaxed/simple;
-	bh=BUiikn3ciRWKGL6zJXbhUy/3/71llULE1nnDlIezANc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RlWZrieJ912r1GZmxquRMOzfnBapDm/nH8k1S4iYqw71kgJQr4Hz7lfkioqJe1hYNs6lu8RW4DT9KMpzEMEj/Q9nyxFfWG8wgsChEbf+FAhID4RPGq+TyovWqV79gDcL8rQYocrpIVSWlfiDqv/Em+bplTRiJcmcFIxvX0njlPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=qQ1o68rm; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=knM74zwa; arc=none smtp.client-ip=81.19.104.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-	s=mail202505; t=1770118334;
-	bh=QgwXDA7y8ElPew3Bm76Ii7abYAwPdkjzXVimtuAJjTA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=qQ1o68rmr5sWm0vlgi7vHdaB3kTi8ZQh2d1m1VNn9Kqd0RWWVfLV+Wr34Bo/YyG1v
-	 R9A7x1nCZAdbAUtoDdcUmgI0FvkBy3U6mWj8SdnbaM2R3N6C16GaoiTHDrIQuV10mA
-	 40yRunjaHdPMVfzERFUEOwHHI+iB/s1XV6Q5IVgtg6AGeinD7daF9v+1ERN1E57h02
-	 t2UJJeo+sFkKL7nqfSt+uqlFATKDVllRG3GOiLhHO04lTPxEj0SKnA1SIaPio0ry0c
-	 vOhF6mCph6dbZAs0snbxHa4Gm8e2t4zA6RGQwRu5UpCBcmrScSR5LOTBwlYA7NXwKV
-	 EfNVwEq5KaDBw==
-Received: from mailhub11-fb.kaspersky-labs.com (localhost [127.0.0.1])
-	by mailhub11-fb.kaspersky-labs.com (Postfix) with ESMTP id B82AEE8394D;
-	Tue,  3 Feb 2026 14:32:14 +0300 (MSK)
-Received: from mx9.kaspersky-labs.com (mx9.kaspersky-labs.com [195.122.169.44])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "mx9.kaspersky-labs.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-	by mailhub11-fb.kaspersky-labs.com (Postfix) with ESMTPS id 9459AE80D14;
-	Tue,  3 Feb 2026 14:32:14 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-	s=mail202505; t=1770118327;
-	bh=QgwXDA7y8ElPew3Bm76Ii7abYAwPdkjzXVimtuAJjTA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=knM74zwazdq53HyT/LWGOqx9pnfGp4ZXQeVe4XD617xzkJ9vKlDZYN4Qxa5bht9QW
-	 8Z9R0WxWpc/k2BOOQX8kFXlFrF22bruzTLZMANvAGO0pgGLSIYQLX4iL0551Cler7G
-	 pmQQZxJWiyJSrdOKw5SU/uRTRB9XL/IRm+Ep94PfnyxAazaGvQMD3YlIyw5OyXzJHf
-	 YbXvQa+erDH0KlFMzI7GqWPOnxg5roGpRNsMB/3S3vfJ59R6/+zfYoHW+eunXGE1rT
-	 m4FQCpNcPTLNrc6242FYNI41Ab9Bh/Yx+cuP0TL69Z2eclbPNPgNhybeEskvtdiZOx
-	 zRrOojsQXyWig==
-Received: from relay9.kaspersky-labs.com (localhost [127.0.0.1])
-	by relay9.kaspersky-labs.com (Postfix) with ESMTP id EAAC38A00CB;
-	Tue,  3 Feb 2026 14:32:06 +0300 (MSK)
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-	by mailhub9.kaspersky-labs.com (Postfix) with ESMTPS id A85898A000F;
-	Tue,  3 Feb 2026 14:32:06 +0300 (MSK)
-Received: from Votokina.avp.ru (10.16.104.187) by HQMAILSRV2.avp.ru
- (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.35; Tue, 3 Feb
- 2026 14:32:05 +0300
-From: Votokina Victoria <Victoria.Votokina@kaspersky.com>
-To: "David S . Miller" <davem@davemloft.net>
-CC: Votokina Victoria <Victoria.Votokina@kaspersky.com>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Thomas Gleixner
-	<tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, Eric Lapuyade
-	<eric.lapuyade@linux.intel.com>, Samuel Ortiz <sameo@linux.intel.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH] nfc: hci: shdlc: Stop timers and work before freeing context
-Date: Tue, 3 Feb 2026 14:31:57 +0300
-Message-ID: <20260203113158.2008723-1-Victoria.Votokina@kaspersky.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1770118375; c=relaxed/simple;
+	bh=fvyV02ZW3kLZ2e5V7ZC1CiXFpmVv76IxX1uzkp0TxLo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iJ4JaMFnSaitcdgW1wfqgGaGFyRAyQDQH73KTuPUUwWwpt9abgzei5vyhp7+TArcur7DFVKy49/O1MiVNlv5LNJRwzmmqUcsuaEl0VkNu/cNNp6fNoSyrwzWdmusQMcEonIbnFWOuvQZg0C3PeDzprD4hH2pd8s9zCMyGh2wjVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F6B0+8qW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tynBgFKy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770118373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WCFzyXHFlPrMBFKkr2XvCqwF53SaNdsFKd3C1yICKWI=;
+	b=F6B0+8qW9t5XaGMLWv62g/c9CWO3ds5hTK+T/uXuMtmcwFoBYdfO651dFIAhFDodgmiRgl
+	vRBptYhUslzm5nX59PWOn8I20by0exhGUofN+BnafJSNeAN6rF8KoM8LMrDAa6U3KVd+IP
+	0ouXlCVqbuVr9wR/zlTZBVxu9weUV5s=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-572-nOzy3ZVTN8C5yQIbuKSfhw-1; Tue, 03 Feb 2026 06:32:52 -0500
+X-MC-Unique: nOzy3ZVTN8C5yQIbuKSfhw-1
+X-Mimecast-MFC-AGG-ID: nOzy3ZVTN8C5yQIbuKSfhw_1770118371
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47ee1fe7b24so54256135e9.1
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 03:32:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770118371; x=1770723171; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WCFzyXHFlPrMBFKkr2XvCqwF53SaNdsFKd3C1yICKWI=;
+        b=tynBgFKy0qAyy7GwXSMkQk0Pv2earhvBOmalSCGZxSY5K1OObbRWoj4VKewai5NYHM
+         gN/6VnDZM9M062r+l8uwmNOBOvcNJFu57agARIWf4fzZbQ4BZLfLWhD/qNS/Bz/bq7rU
+         Q4tNgU7iuIzw/kFtERsKWcoPe6MygtoAwR7Rb6yQYsxWytcZGj200fz2nSKsr+6F2dBr
+         0H48yWHlIMP182Na8VwEK1r00bn22aJCiCJLumTLOAijZOPlzWGuJpcQBNIPOsYFWDWi
+         Mn7Pa1Wy3Q68/DDG62t45WzbpTMTpt8uUD1GawiB40+3WPy7jwzSkT7Sxy0DG2+R48XB
+         ZxIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770118371; x=1770723171;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WCFzyXHFlPrMBFKkr2XvCqwF53SaNdsFKd3C1yICKWI=;
+        b=TaKmU3m5Oces/pBNjkmfu1n5r0z27HN2UNeV7QVBeL7lqxORdoVWjSY/g3fVq9rwY9
+         S7sakjjXylU+oLp0Eu2WkqlQBMQdo7CANHu02S9/y6M8ig6KkXu4ef2cAKAKWMIFIROi
+         3CHUT08BAknHC4DTk8BlPcXYfj7vsz0wx58mg+Lzgduz7AYIt7W5UdEW/3MjymHuJrMO
+         s0j/7mMD6doOlEiVk1gjBz5WlEidJxQoks2WPsauIHmU4aCUpbADx4cdR6u9txu4dxrV
+         p4AntzjXp1nh8+BpuyMEZt3RZrF28UFFZ5p3dIKcoePwaV8RjnzjE9nLajahS6qbHKKN
+         wjKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVITKJc9xqW8ZY5zReTRPsznWW8OKooGXORMGT159CziX9RgNHAGlchmTNNutokXt/TYsE6phc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8Qhs0jjrRsN/km/LwWfsIXZAn4FBm6k4hitde7ME31siPp4rq
+	ehs5ctGjC0+f6YEr5qsQpC9O54cD0L2K/Lllql8gc+LGjo4NSu94ffZXLjAEHyRaIHiooGLIga7
+	E0FdrSwj/+6bBQeILwoDZmeeYYjt84kfRR+T3gleindD6fKhm5RVMNaCS/A==
+X-Gm-Gg: AZuq6aK0o/CTibz++eXlMmhRhMMrA9wXb9gNmxuy1FMwWCo68E1zIAwluauXnEG4SCG
+	wQy3BmyTjezBqpu2f0xJZeO7dw7nTMmyNbKDW0U7o7NUsNPwXvJGZivIreYqO75Gn2l8hwMFFIK
+	PYPvxKYkNVOlnO9D4eCYGwvhagUeSi6t/OMR5am85SpsGfj6Ih8kfCgnh8MBYeoXmw4KtKW1SLf
+	k1JWr8MoEOtHPPYGnpGLDkeM70iSpAF6pcpugQFBQM1Rdws50ZabpJt3Fu5Of1gY3fvXqsPMpBs
+	Um++eIZdlbMGygUpBrYvLv4OLgLE+qMh4Sd3wZTnWxDh6UNe7MCM60Xhpn0HabuC2Q+MRS5DKV2
+	/TxUv102S
+X-Received: by 2002:a05:600c:474d:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-482db44d141mr233861685e9.4.1770118370849;
+        Tue, 03 Feb 2026 03:32:50 -0800 (PST)
+X-Received: by 2002:a05:600c:474d:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-482db44d141mr233861205e9.4.1770118370338;
+        Tue, 03 Feb 2026 03:32:50 -0800 (PST)
+Received: from [192.168.2.83] ([46.175.183.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4360ef9e804sm9385010f8f.41.2026.02.03.03.32.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Feb 2026 03:32:49 -0800 (PST)
+Message-ID: <db1723e3-294d-46b7-aa4c-11a21b0da82f@redhat.com>
+Date: Tue, 3 Feb 2026 12:32:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] iavf: fix deadlock in reset
+ handling
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: ivecera@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+References: <20260202084820.260033-1-poros@redhat.com>
+ <20260202155813.3f8fbc27@kernel.org>
+ <b064ca33-1d94-4c7e-b0d0-78430d8cd0ac@intel.com>
+ <14cb0b22-ec39-43e4-a35b-22ad558b2e34@redhat.com>
+ <7907d42e-4805-48bc-aaf6-16cbe46eb1d2@intel.com>
+Content-Language: en-US
+From: Petr Oros <poros@redhat.com>
+In-Reply-To: <7907d42e-4805-48bc-aaf6-16cbe46eb1d2@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HQMAILSRV5.avp.ru (10.64.57.55) To HQMAILSRV2.avp.ru
- (10.64.57.52)
-X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 02/03/2026 11:16:10
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 200084 [Feb 03 2026]
-X-KSE-AntiSpam-Info: Version: 6.1.1.20
-X-KSE-AntiSpam-Info: Envelope from: Victoria.Votokina@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 86 0.3.86
- 47cb2a3d3f5c7e795bff2d0998e8c196722872ab
-X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
-X-KSE-AntiSpam-Info: {Tracking_black_eng_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:5.0.1,7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {Tracking_white_helo}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/03/2026 11:18:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/3/2026 9:04:00 AM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/02/03 10:20:00 #28174714
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 52
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kaspersky.com,reject];
-	R_DKIM_ALLOW(-0.20)[kaspersky.com:s=mail202505];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256258-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256261-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kaspersky.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Victoria.Votokina@kaspersky.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kaspersky.com:email,kaspersky.com:dkim,kaspersky.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 0CD49D887F
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 76DB6D87C8
 X-Rspamd-Action: no action
 
-llc_shdlc_deinit() purges SHDLC skb queues and frees the llc_shdlc
-structure while its timers and state machine work may still be active.
 
-Timer callbacks can schedule sm_work, and sm_work accesses SHDLC state
-and the skb queues. If teardown happens in parallel with a queued/running
-work item, it can lead to UAF and other shutdown races.
+On 2/3/26 11:19, Przemek Kitszel wrote:
+> On 2/3/26 09:44, Petr Oros wrote:
+>>
+>> On 2/3/26 02:00, Jacob Keller wrote:
+>>>
+>>>
+>>> On 2/2/2026 3:58 PM, Jakub Kicinski wrote:
+>>>> On Mon,  2 Feb 2026 09:48:20 +0100 Petr Oros wrote:
+>>>>> +    netdev_unlock(netdev);
+>>>>> +    ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+>>>>> + !iavf_is_reset_in_progress(adapter),
+>>>>> +                           msecs_to_jiffies(5000));
+>>>>> +    netdev_lock(netdev);
+>>>>
+>>>> Dropping locks taken by the core around the driver callback
+>>>> is obviously unacceptable. SMH.
+>>>
+>>> Right. It seems like the correct fix is to either a) have reset take 
+>>> and hold the netdev lock (now that its distinct from the global RTNL 
+>>> lock) or b) refactor reset so that it can defer any of the netdev 
+>>> related stuff somehow.
+>>>
+>> I modeled this after the existing pattern in iavf_close() (ndo_stop), 
+>> which also temporarily releases the netdev instance lock taken by the 
+>> core to wait for an async operation to complete:
+>
+> First of all, thank you for working on that, I was hit by the very same
+> problem (no series yet), but my local fix is the same as of now.
+>
+> I don't see an easy fix (w/o substantial driver refactor).
+>
+>>
+>> static int iavf_close(struct net_device *netdev)
+>> {
+>>          netdev_assert_locked(netdev);
+>>          ...
+>>          iavf_down(adapter);
+>>          iavf_change_state(adapter, __IAVF_DOWN_PENDING);
+>>          iavf_free_traffic_irqs(adapter);
+>>
+>>          netdev_unlock(netdev);
+>>
+>>          status = wait_event_timeout(adapter->down_waitqueue,
+>>                                      adapter->state == __IAVF_DOWN,
+>>                                      msecs_to_jiffies(500));
+>>          if (!status)
+>>                  netdev_warn(netdev, "Device resources not yet 
+>> released\n");
+>>          netdev_lock(netdev);
+>>          ...
+>> }
+>>
+>> This was introduced by commit 120f28a6f314fe ("iavf: get rid of the 
+>> crit lock"), and ndo_stop is called with netdev instance lock held by 
+>> the core just like ndo_change_mtu is. 
+>
+> technically it was introduced by commmit afc664987ab3 ("eth: iavf:
+> extend the netdev_lock usage")
+>
+>> Could you clarify why the unlock-wait- lock pattern is acceptable in 
+>> ndo_stop but not here?
+>>
+>
+> perhaps just closing netdev is a special kind of operation
+>
+> Other thing is that the lock was added to allow further NAPI
+> development, and one silly driver should not stop that effort.
+> Sadly, we have not managed to re-design the driver yet. I would like to
+> do so personally, but have much work accumulated/pending to free my time
+>
+I agree, the unlock-wait-lock pattern is fundamentally flawed (I now 
+understand
+why it is unacceptable) and should be avoided.
 
-Stop all SHDLC timers and cancel sm_work synchronously before purging the
-queues and freeing the context.
+What can we do now?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+* Eliminating the wait is not an option: As noted in the description of 
+commit
+c2ed2403f12c, this wait was originally added to fix a race condition where
+adding an interface to bonding failed because the device remained in
+__RESETTING state after the callback returned.
+* Passing the lock into reset is impractical: The reset path is 
+triggered from
+numerous contexts, many of which are not under the netdev_lock, making this
+even more complex than a full refactor.
 
-Fixes: 4a61cd6687fc ("NFC: Add an shdlc llc module to llc core")
-Signed-off-by: Votokina Victoria <Victoria.Votokina@kaspersky.com>
----
- net/nfc/hci/llc_shdlc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+If dropping the lock is a no-go, the only viable path forward is to 
+split the
+reset_task so that the waiting portion is decoupled from the netdev_lock
+critical section.
 
-diff --git a/net/nfc/hci/llc_shdlc.c b/net/nfc/hci/llc_shdlc.c
-index 4fc37894860c..08c8aa1530d8 100644
---- a/net/nfc/hci/llc_shdlc.c
-+++ b/net/nfc/hci/llc_shdlc.c
-@@ -762,6 +762,14 @@ static void llc_shdlc_deinit(struct nfc_llc *llc)
- {
- 	struct llc_shdlc *shdlc = nfc_llc_get_data(llc);
- 
-+	timer_shutdown_sync(&shdlc->connect_timer);
-+	timer_shutdown_sync(&shdlc->t1_timer);
-+	timer_shutdown_sync(&shdlc->t2_timer);
-+	shdlc->t1_active = false;
-+	shdlc->t2_active = false;
-+
-+	cancel_work_sync(&shdlc->sm_work);
-+
- 	skb_queue_purge(&shdlc->rcv_q);
- 	skb_queue_purge(&shdlc->send_q);
- 	skb_queue_purge(&shdlc->ack_pending_q);
--- 
-2.43.0
+The fact remains that MTU configuration and ring parameter changes are
+currently broken in iavf. Changing the MTU on a Virtual Function is a
+fundamental configuration not an obscure edge case that can remain 
+non-functional.
+
+I would appreciate any further guidance on how you would prefer...
+
 
 
