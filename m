@@ -1,235 +1,200 @@
-Return-Path: <netdev+bounces-256309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8O8zDwYBgmmYNgMAu9opvQ
-	(envelope-from <netdev+bounces-256309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:07:02 +0100
+	id yAK+NTwCgmmYNgMAu9opvQ
+	(envelope-from <netdev+bounces-256310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:12:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46201DA573
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:07:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB2DDA647
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:12:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0E953300407A
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 14:06:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60E2130EE698
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 14:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0B03A1E60;
-	Tue,  3 Feb 2026 14:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEC13A4F58;
+	Tue,  3 Feb 2026 14:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQQhPhdy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jnEO8uZW"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tFxtwG/j";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="f6W2T6f6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tFxtwG/j";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="f6W2T6f6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F703A1CE5
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 14:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F21D32D7F1
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 14:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770127615; cv=none; b=J5wzjFuRM6/VTMcCOucBiJRfj7pMEqA4/GRv2JrIKZZc4e152HVnlGkSg9cj4pmKa5l1n1YU+0WZRCNj4jnezP6APXQAsgkICoyAt+1wVgQXtT1bVBf0Xv7/8Fx3XMp93DkZqcN0m0Xb8Pdn3icss0FOYMmf4+JEbdit7v5KBow=
+	t=1770127736; cv=none; b=FtvuY8wfudENrx22ZGZWyeNRkcsPvkPrGv+Q0QfFYnKmyqkGbJxTV6BX1yy7FQsbavDiq8sn3ktROqoOEU0GhXktMpIMGyTVrrVRRKGaHIMv7br3gyFTJLiagTQ4/Hdinu8oRKssLAqHZzz64E2klmIO9yCmBUIZKEaJEi0+JXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770127615; c=relaxed/simple;
-	bh=tIlOcpMjb64Af1TfgwUmeDw5SEtHH5pjRN0eW8zbzfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=Qm2p0n2KrKgQ1AM8S/2y0tvQeyZpb5JWmqL7R9/w9E49n5lwyDgU1Dr6h9Ajw2ueC8nCs3APBsdJsWufBXhEz4SnGt8B9uX+A5gNYx0n7QisPII8fOj+wAZ802zKbxIKBxAf4yZ9kzsBPInoqNu62FIkvOxefs74nfxEXXfVr+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MQQhPhdy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jnEO8uZW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770127612;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1770127736; c=relaxed/simple;
+	bh=HGxk4sZA19QD+6m7cggyFeGdYR74UGPBsDZDqHQp+kQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M70KlBp7+qTL9DF5qCq4JN9vhVy7sWR+y1EGnF05YYk1K2E7DpymOjqkzwYVVAdkKvIm9MIffZJf+D3QLmCKBLnD14xfqEWp5TXDgnS3SXJh/AqJDLLxac16qVYlowEZ6Vwr4Mhm6co0ZGgion0dpHO8gouydnkPFksSDd6feXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tFxtwG/j; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=f6W2T6f6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tFxtwG/j; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=f6W2T6f6; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 981795BCC3;
+	Tue,  3 Feb 2026 14:08:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770127733; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BqOENDVrLPVdKFJluj41Yh7xT50IN2VP3lUDw1LUdFc=;
-	b=MQQhPhdyoRIfEBMWjJfFGOvHdZFCcwIeMmViJQcrdRNjpdXFvmNJkw0jTfVyuyWWUrQg2D
-	iq++5A80DFxAN4CRP4/eF+PkO22YYaAcxEgpwohP0yIVskw+c3UgtyGFpO18vz+0Jyz2Gp
-	LvpFHMtmYnnIgmaGlKRWOlQZQkWF/Xk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-eT4kZoOzOSSC7jKbPrckGQ-1; Tue, 03 Feb 2026 09:06:51 -0500
-X-MC-Unique: eT4kZoOzOSSC7jKbPrckGQ-1
-X-Mimecast-MFC-AGG-ID: eT4kZoOzOSSC7jKbPrckGQ_1770127610
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4359e322f30so4136767f8f.2
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 06:06:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770127610; x=1770732410; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:cc:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=BqOENDVrLPVdKFJluj41Yh7xT50IN2VP3lUDw1LUdFc=;
-        b=jnEO8uZWRruANnVxvH7oFmgbtoLwJ5WVFwLFka6AS1ELfvIaP0mjyDV8mP8ObUxuHq
-         Tbtp65Jjt1kH2FgakRMdgf9j7TI7W1F+y5TZC93xj7Lg+oNMspJwzQuWiUs04dOeWLI/
-         JqFxxRAv82gntAbiMwrtXFqUExh+PrwIR+NPjaZQLZAMmqb1Xj/geHhsxTFxss7K1Vlw
-         +GTOhO5lFPEn20Vv86/vIOixnQRjPo/TW3rokWn6yYTQmeMe0batOhCIXnUGdUbAmMu4
-         lFgD1ccIoccdqdXC19ioJh8Uw15glKet9h0lk1ndHC9ciVE2Qz0+o5n9FYxjw88ICl/r
-         e9fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770127610; x=1770732410;
-        h=content-transfer-encoding:in-reply-to:from:cc:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BqOENDVrLPVdKFJluj41Yh7xT50IN2VP3lUDw1LUdFc=;
-        b=dRNsvGZLYs/NaluOmHImXQs7fg9p9VhARRWX+3Nn2tQ+BCfe9B5ytDIJVUpjg2PIgL
-         Dwcr4m5YmN9sgyRkzBLX96b2VHBmWN3QTBuE6bcFq//z9RyNCG3Tw2D3DYEPGnHbK22R
-         et9M9nZAVHK4Vs5Lfo/ZHpyJYTULAxvf5HZHGgO7+5tCWxNDK7N3aTDOiQVGAeP2ADFg
-         AAdjuN1R2MyPzSNtZ9UG6Gtb66kaA/apYMMOg5T1ul06myn9YYIXPtfY1iybCEBWplBe
-         2dEQ9dRaGcFAGV3Fpo6X4JNiPwlv+b+zGotdCd/k57sZLvEmrCa2LltYo6XDSfnYF5dQ
-         h/nw==
-X-Gm-Message-State: AOJu0Yz6FbHTe1QYXu/6MnQgtgkAkqsz+xjMDZ6oLuHHH2demmoUNoTx
-	AL1nZ+pZdIYZQlI8VNExCYkwxiu6n6dJniJgt/sLnOfVVNFAkoD9llW+PepWLA/05pBP8IOFQSg
-	c03t8Fp18xXjFFW2wJzCTUsH+wQQWr2PtFH/U+5CWEZ1zBrEkYpdjFwpJvA==
-X-Gm-Gg: AZuq6aLOpvy5B9rTpxrYUCxnv8omVUAaWDrpQaDPzFLZ/VKD9ZX5C4zOtsfJkaQZJ3K
-	Ta76DQRnWm27YxmSPwsXL2x5Nad3A5IUmzpsy0kRHwt2fWjM9W3nCQI5ZgWld8FrCP75G8OUVzO
-	Cj/gO7hFOULlcxdjFo6t9HHb9FyecOQoWHIA4UPh/J7f1GuRa3w5Lv1AkdLgfYmdnFFkY2cfWBu
-	ZlUP/AxANBzcFR7E8Z7VnbUlUfD8ozElNf2LOgjvyWHiGdx5cWwk8/yvj4z+EM1TGdjdwB0UySy
-	1XCSQY/z9WYGx3HhwCAvEaW1juouJkDrqdJzBX+NVygQ0k6OXsb5UOrqMSUD85klhYoHgE3V8Ny
-	RpO7a+z6Gu7k=
-X-Received: by 2002:a05:6000:2481:b0:435:94c1:3714 with SMTP id ffacd0b85a97d-435f3a0bb4dmr21083130f8f.0.1770127609672;
-        Tue, 03 Feb 2026 06:06:49 -0800 (PST)
-X-Received: by 2002:a05:6000:2481:b0:435:94c1:3714 with SMTP id ffacd0b85a97d-435f3a0bb4dmr21083100f8f.0.1770127609226;
-        Tue, 03 Feb 2026 06:06:49 -0800 (PST)
-Received: from [192.168.88.32] ([150.228.93.21])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1323034sm54728853f8f.35.2026.02.03.06.06.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 06:06:48 -0800 (PST)
-Message-ID: <bce76f46-26cc-4297-952f-4adcdac90c94@redhat.com>
-Date: Tue, 3 Feb 2026 15:06:44 +0100
+	bh=gPSnDBU32LxsJ53VLcxkP8o8jdWVn+BzXix6F2rT9M4=;
+	b=tFxtwG/j9Rif8gYKCwPeg/HeJ4UmqT9ht8EMiPN6QvBGIyuHaASfb8hdIP65pjFFSnFSze
+	CQdEwGdsbSOgssXIc5fdOMZtrLfpod9jkDFmRDDmsCq+jWwIeDjbcvwa7l6ltzjH4f5isa
+	C7NHPBUaI5q8N+nSLrIe9BsxvPMAIgs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770127733;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gPSnDBU32LxsJ53VLcxkP8o8jdWVn+BzXix6F2rT9M4=;
+	b=f6W2T6f6BPjoYLoF1mrI1jZCG8z5PqZfFocMMtIhwloM6LsK03LtyUq1KShj5KJJlHwoEE
+	TLtF3Tijezqq/ZCQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770127733; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gPSnDBU32LxsJ53VLcxkP8o8jdWVn+BzXix6F2rT9M4=;
+	b=tFxtwG/j9Rif8gYKCwPeg/HeJ4UmqT9ht8EMiPN6QvBGIyuHaASfb8hdIP65pjFFSnFSze
+	CQdEwGdsbSOgssXIc5fdOMZtrLfpod9jkDFmRDDmsCq+jWwIeDjbcvwa7l6ltzjH4f5isa
+	C7NHPBUaI5q8N+nSLrIe9BsxvPMAIgs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770127733;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gPSnDBU32LxsJ53VLcxkP8o8jdWVn+BzXix6F2rT9M4=;
+	b=f6W2T6f6BPjoYLoF1mrI1jZCG8z5PqZfFocMMtIhwloM6LsK03LtyUq1KShj5KJJlHwoEE
+	TLtF3Tijezqq/ZCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5EDB73EA62;
+	Tue,  3 Feb 2026 14:08:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id lw4yFnUBgmliZwAAD6G6ig
+	(envelope-from <tbogendoerfer@suse.de>); Tue, 03 Feb 2026 14:08:53 +0000
+Date: Tue, 3 Feb 2026 15:08:46 +0100
+From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: only set speed/duplex to unknown, if
+ getting speed failed
+Message-ID: <20260203150846.5251f62b@samweis>
+In-Reply-To: <aYFqWcyuuN8V71LX@fedora>
+References: <20260130111904.144024-1-tbogendoerfer@suse.de>
+	<aXylwyr2pV0rZAW3@fedora>
+	<20260202151726.36abe1d0@samweis>
+	<aYFqWcyuuN8V71LX@fedora>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v13,net-next,09/15] tcp: accecn: retransmit SYN/ACK without
- AccECN option or non-AccECN SYN/ACK
-To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-References: <20260131222515.8485-10-chia-yu.chang@nokia-bell-labs.com>
- <20260203123556.223388-1-pabeni@redhat.com>
- <AS8PR07MB797366B9A7E163A7B88C13C1A39BA@AS8PR07MB7973.eurprd07.prod.outlook.com>
-Content-Language: en-US
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <AS8PR07MB797366B9A7E163A7B88C13C1A39BA@AS8PR07MB7973.eurprd07.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -2.30
+X-Spam-Level: 
+X-Spam-Flag: NO
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256309-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256310-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[tbogendoerfer@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url,nokia-bell-labs.com:email,nok.it:url]
-X-Rspamd-Queue-Id: 46201DA573
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3FB2DDA647
 X-Rspamd-Action: no action
 
-On 2/3/26 2:56 PM, Chia-Yu Chang (Nokia) wrote:
->> -----Original Message-----
->> From: Paolo Abeni <pabeni@redhat.com>
->> Sent: Tuesday, February 3, 2026 1:36 PM
->> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
->> Subject: Re: [v13,net-next,09/15] tcp: accecn: retransmit SYN/ACK without AccECN option or non-AccECN SYN/ACK
->>
->>
->> CAUTION: This is an external email. Please be very careful when clicking links or opening attachments. See the URL nok.it/ext for additional information.
->>
->>
->>
->> This is an AI-generated review of your patch. The human sending this email has considered the AI review valid, or at least plausible.
->>
->> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
->> ---
->> tcp: accecn: retransmit SYN/ACK without AccECN option or non-AccECN SYN/ACK
->>
->> For Accurate ECN, the first SYN/ACK sent by the TCP server shall set the ACE flag (Table 1 of RFC9768) and the AccECN option to complete the capability negotiation. However, if the TCP server needs to retransmit such a SYN/ACK (for example, because it did not receive an ACK acknowledging its SYN/ACK, or received a second SYN requesting AccECN support), the TCP server retransmits the SYN/ACK without the AccECN option. This is because the SYN/ACK may be lost due to congestion, or a middlebox may block the AccECN option. Furthermore, if this retransmission also times out, to expedite connection establishment, the TCP server should retransmit the SYN/ACK with (AE,CWR,ECE) = (0,0,0) and without the AccECN option, while maintaining AccECN feedback mode.
->>
->> This complies with Section 3.2.3.2.2 of the AccECN spec RFC9768.
->>
->> This commit fixes a bug but lacks a Fixes: tag. Consider adding:
->>
->> Fixes: b40671b5ee58 ("tcp: accecn: AccECN option failure handling")
->>
->>> diff --git a/include/net/tcp_ecn.h b/include/net/tcp_ecn.h index
->>> a709fb1756eb..796c613b5ef3 100644
->>> --- a/include/net/tcp_ecn.h
->>> +++ b/include/net/tcp_ecn.h
->>> @@ -649,12 +649,22 @@ static inline void tcp_ecn_clear_syn(struct sock
->>> *sk, struct sk_buff *skb)  }
->>>
->>>  static inline void
->>> -tcp_ecn_make_synack(const struct request_sock *req, struct tcphdr
->>> *th)
->>> +tcp_ecn_make_synack(const struct request_sock *req, struct tcphdr *th,
->>> +                 enum tcp_synack_type synack_type)
->>>  {
->>> -     if (tcp_rsk(req)->accecn_ok)
->>> -             tcp_accecn_echo_syn_ect(th, tcp_rsk(req)->syn_ect_rcv);
->>> -     else if (inet_rsk(req)->ecn_ok)
->>> -             th->ece = 1;
->>> +     /* Accurate ECN shall retransmit SYN/ACK with ACE=0 if the
->>> +      * previously retransmitted SYN/ACK also times out.
->>> +      */
->>> +     if (!req->num_timeout || synack_type != TCP_SYNACK_RETRANS) {
->>                  ^^^^^^^^^^^^^^^^
->>
->> Does this condition match the intended behavior described in the commit message and code comment?
->>
->> The commit message states the TCP server should first "retransmit the SYN/ACK without the AccECN option" and then "if this retransmission also times out, to expedite connection establishment, the TCP server should retransmit the SYN/ACK with (AE,CWR,ECE) = (0,0,0)."
->>
->> The code comment states "retransmit SYN/ACK with ACE=0 if the previously retransmitted SYN/ACK also times out."
->>
->> Both describe a two-step process:
->> 1. First retransmission (num_timeout=1): without AccECN option, but WITH
->>    ACE flags
->> 2. Second retransmission (num_timeout=2): without AccECN option AND with
->>    ACE=(0,0,0)
->>
->> However, the condition `!req->num_timeout` evaluates to false when num_timeout >= 1, causing ACE flags to be cleared on the FIRST retransmission, not the second:
->>
->> - First retransmission (num_timeout=1): !1 is false, so we skip the if
->>   block and clear ACE flags to (0,0,0) in the else if
->> - Second retransmission (num_timeout=2): !2 is false, same behavior
->>
->> Should the condition be `req->num_timeout < 2` instead to match RFC9768 Section 3.2.3.2.2's requirement that ACE flags are only cleared after the previously retransmitted SYN/ACK times out?
->>
-> Hi Paolo,
-> 
-> This is correct because the increment of num_timeout is done after this block.
-> 
-> There are 2 places doing the retransmissnios:
-> 1. In tcp_timer.c, you can see that the retrnamission is done via "tcp_rtx_synack(sk, req)" and the counter increase via "req->num_timeout++".
-> 
-> 2. In inet_connection_sock.c, the retrnamission is done via "tcp_rtx_synack(sk_listener, req)", and the counter increases via "if (req->num_timeout++ == 0)"
+On Tue, 3 Feb 2026 03:24:09 +0000
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Ok, I suspected I got lost (and the AI with me). No need to resubmit, I
-think we are better of merging as-is.
+> On Mon, Feb 02, 2026 at 03:17:26PM +0100, Thomas Bogendoerfer wrote:
+> > On Fri, 30 Jan 2026 12:36:19 +0000
+> > Hangbin Liu <liuhangbin@gmail.com> wrote:
+> >  =20
+> > > On Fri, Jan 30, 2026 at 12:19:04PM +0100, Thomas Bogendoerfer wrote: =
+=20
+> > > > bond_update_speed_duplex() first set speed/duplex to unknown and
+> > > > then asks slave driver for current speed/duplex. Since getting
+> > > > speed/duplex might take longer there is a race, where this false st=
+ate
+> > > > is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding=
+:   =20
+> > >=20
+> > > The patch looks good to me. But based on your description, I don't th=
+ink
+> > > the fixes tag is correct. =20
+> >=20
+> > the race is old, but it got visible by that commit. Before=20
+> > bond_update_speed_duplex() was only called on enslaving and when bond
+> > is brought up. Now it could also be called during normal operation and
+> > that's what caught attention by customers.
+> >=20
+> > I'm fine changing the fixes tag to whatever we agree to. So which should
+> > I take ? =20
+>=20
+> Maybe
+> 98f41f694f46 ("bonding:update speed/duplex for NETDEV_CHANGE") and
+> 589665f5a600 ("bonding: comparing a u8 with -1 is always false")?
+>=20
+> The 98f41f694f46 set speed/duplex to -1 by default, which could cause the
+> race to show SPEED_UNKNOWN. But (slave->duplex =3D=3D -1) checking is alw=
+ays
+> false, so no possible to show DUPLEX_UNKNOWN. The 589665f5a600 fixed this
+> issue, after that speed/duplex both could be shown as UNKNOWN.
 
-Thanks,
+589665f5a600 only replaces the -1 with defines. So it doesn't introduce
+semantic changes, but 98f41f694f46 did.
 
-Paolo
+Thomas.
 
+--=20
+SUSE Software Solutions Germany GmbH
+HRB 36809 (AG N=C3=BCrnberg)
+Gesch=C3=A4ftsf=C3=BChrer: Jochen Jaser, Andrew McDonald, Werner Knoblich
 
