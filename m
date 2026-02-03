@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-256114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAlhLO9zgWnLGQMAu9opvQ
-	(envelope-from <netdev+bounces-256114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:05:03 +0100
+	id ONdbIfZ0gWnoGQMAu9opvQ
+	(envelope-from <netdev+bounces-256115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:09:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8119D4471
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:05:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFAF5D44D5
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:09:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 99E3F3006D60
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 04:04:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AED773049262
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 04:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE79129D29B;
-	Tue,  3 Feb 2026 04:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515A52F6184;
+	Tue,  3 Feb 2026 04:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jUQEEwoL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t4KoajWe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92491547EE;
-	Tue,  3 Feb 2026 04:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2796B214A64;
+	Tue,  3 Feb 2026 04:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770091491; cv=none; b=ElN6ZigVYQxRh51GMOev0j1WlXA4a9vctnsL5XzObHjhFb/3JxvkA/dAWVCOgGc2Yle2Z3HDGaXB1JkxfItS4rHiP2FIXEaST4vrxve28GjS42BIqEmXpyYdaCaaGBQpOMBUWK+QBuqTBw9fBfoNH8RFdvXLvKVkE93DMx6Zg5s=
+	t=1770091759; cv=none; b=WEImIxbypUWe4F/Ct3ikdEc9vS29yObnYZgRG7DJ4xd+1DNTd7Mxlj7hrCr9BLs5/yt6S5vyb32zGySiZkPPdbqnKKA6qasARpSuWV8M7M1CtMzEI4I6aAVIo49nhDGmLvGv3ZZde5C+9SpD6Mnpz/Aurw97rWw+9j0ImsjLlb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770091491; c=relaxed/simple;
-	bh=vUIb9XltpfKWCkFD7i+hZie5duQHouVl0PZYkTgvvKU=;
+	s=arc-20240116; t=1770091759; c=relaxed/simple;
+	bh=IXDilzVCem2iDthXSKXW8yichEDMzvfMuferk/Hty3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t5NLVNIr4XmxeULNXPZsGhtOBVFMbmbFRizNbkWG5MKrvEF6EwmDBLmCOlciNOc2k/7Eg4VERIXEbVEkAZgJLw905NrsfeLN5y21mzXv+86f2snwJ6qp1IhXKt7m1kz6KQXQlmsECElZQ0u3NJMMERJ3zdE3T4jvUYKxSpLu0h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jUQEEwoL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86F72C19425;
-	Tue,  3 Feb 2026 04:04:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=crnMwpGFP75dYZ6NEYBawx+hWcR5DwPhHzUQZViV7QuN3yZTXt/HcaVd30UGgm2bYdB2IdA34w1K0qqGuT/QfWzRiCreLdNKVPv9MqVn2PUt8HUTNwdCaQxVZRbl2VuUTDA4iIwjWFgZKnzoBD6/oMEqIhHUAP/+rMRZUOsFnXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t4KoajWe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE7CC116D0;
+	Tue,  3 Feb 2026 04:09:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770091491;
-	bh=vUIb9XltpfKWCkFD7i+hZie5duQHouVl0PZYkTgvvKU=;
+	s=k20201202; t=1770091759;
+	bh=IXDilzVCem2iDthXSKXW8yichEDMzvfMuferk/Hty3E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jUQEEwoLc7ewgVTQbtfouaegtLjAyOnje3a0/yW9Sz3Q0QiinVRadQakBaJp43oq5
-	 5BdIblsPd0kPhyTsZKxBh6oCJXue2YPrOtFZCsyWIDglPmS2+1Y7YQTJ9R6L7qd89L
-	 ENjmN3t/qabTr4K26YOFaXv03NI3ybP1farAsD9ZoASkza2Rh/Kse03ZMESIfLpxqE
-	 ys0tccI2WlY5k/rr7WDl3K655ZX72ieWwHmcNMqP6eG6BJEj3pGQnwVdzmJSqbWvd4
-	 U7UvGZFuZJTn9pxtcbn3KMvcEO6gWDGrK6yw4jYjsqUQy3qWiDwDtMU0KufU/Eosiq
-	 1awEIRNU19QxA==
-Date: Mon, 2 Feb 2026 20:04:49 -0800
+	b=t4KoajWevWwa5LfWTbOIjq718jkE5hU4RMhnXxLW9ANadmh8GZ4VmaVeziGrcOODX
+	 db8jmpDFoO5gTh0JhFMW8OFmsW79hfyqUrFeFshLJe1aBsl/W0xH7XinTKU8Y+cyTp
+	 xP/HJVh8nkAdLYUcvMovug+QSi7DypGCnOWlbd43w+y+OsiuM2K3FK2SbIy1TwyRu0
+	 ImYC/DVvZEcyjGaBK5efDxhh475oPZR6CjeXh+wwXfRkRD+dDLsVDyxR2pwB4IU2J2
+	 zJJSDC6/Vsn5wE847REIM9Nis511s752K9cmLuOoTWzbTvp4oZd/FnmXqyaFwott/z
+	 XTR2QZ8s2+9Jg==
+Date: Mon, 2 Feb 2026 20:09:16 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Tariq Toukan <tariqt@nvidia.com>
 Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
@@ -59,12 +59,11 @@ Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
  <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Randy Dunlap
  <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, Krzysztof
  Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next V7 09/14] devlink: Allow rate node parents from
- other devlinks
-Message-ID: <20260202200449.775fabe9@kernel.org>
-In-Reply-To: <20260128112544.1661250-10-tariqt@nvidia.com>
+Subject: Re: [PATCH net-next V7 00/14] devlink and mlx5: Support
+ cross-function rate scheduling
+Message-ID: <20260202200916.2b71ccdc@kernel.org>
+In-Reply-To: <20260128112544.1661250-1-tariqt@nvidia.com>
 References: <20260128112544.1661250-1-tariqt@nvidia.com>
-	<20260128112544.1661250-10-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,11 +78,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256114-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256115-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -101,13 +100,20 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D8119D4471
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DFAF5D44D5
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 13:25:39 +0200 Tariq Toukan wrote:
-> +EXPORT_SYMBOL_GPL(devl_rate_lock);
+On Wed, 28 Jan 2026 13:25:30 +0200 Tariq Toukan wrote:
+> This series by Cosmin and Jiri adds support for cross-function rate
+> scheduling in devlink and mlx5.
+> See detailed explanation by Cosmin below [1].
 
-Why is this exported? There is no caller outside of core..
+I'll apply the trivial patches (3, 5) to avoid the reposts.
+
+Please add driver tests exercising this code, there's high risk 
+of regressions with all this complexity and nested locking.
+
+What devices will support this? Is CX7 enough to test?
 
