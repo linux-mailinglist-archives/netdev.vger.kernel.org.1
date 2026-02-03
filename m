@@ -1,156 +1,124 @@
-Return-Path: <netdev+bounces-256035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256036-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKVPC5c+gWk8FAMAu9opvQ
-	(envelope-from <netdev+bounces-256035-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:17:27 +0100
+	id 2EY/OEg/gWl6FAMAu9opvQ
+	(envelope-from <netdev+bounces-256036-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:20:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED5AD2E01
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:17:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 717CDD2E47
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2F53300DDF9
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 00:17:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55DFC303FFDC
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 00:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263D5125D0;
-	Tue,  3 Feb 2026 00:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9041957E8;
+	Tue,  3 Feb 2026 00:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VHco1eed"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZABljukX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844C6286A7
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 00:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A133EBF20;
+	Tue,  3 Feb 2026 00:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770077844; cv=none; b=CPNU9u17gslY10xFgCaceg/ETZXVFxx4aReVYnQ+mYvmJX5h11YQrVAxQtu9zxbQPm05y9q7NGzRQfKujbvZ7Ao7KhDSXntDDmvknS1loLmvAKhDC8mx5kUkkX1EK1tlHW9cKDSGymq0Zz6f51jyMr81QJq5S1LmDQW4gn1Ao8U=
+	t=1770077959; cv=none; b=B3MM2AhzhxHLIY79v0ot3UhMG61P8MkDvUiol7OuGB0D0DqWydausRue0ZD/0Iy0spt8ALAywcTA+WQEnXQbSrtB33DpgID14QUro8zJxtB6CYkyHULp+vBmhkJ3yqCtoaShrvFwjSFXeUaZQSHstclaWXaQUeHsw3MXkAEjWzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770077844; c=relaxed/simple;
-	bh=Ng135SnaS703nDA7esgIsFfXee++TNvFidYovRMyJnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ALFrnZDkWXPAu64XOKY31PMk41PP57EZTVgvc423ixoXv04B/WVVBO/YNUmu0aPSS44tkhRsNapuN8LLAK6eo99jpAqw9I1v3Rs0nKM8hq74j/abjR9B6V/UjMt1BEzCIZZ2jmkKgSZsDeuOLdz+Ac1buetsLRfnlwJUMJ43X8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VHco1eed; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cnbZIEEYc7qpXnHl4ZHTwHEJ9GmdouAAJMZTX/GpBdE=; b=VHco1eedf+GGw5ftuQkpadN50P
-	7/H8FTN1MGUAxFL0qaQpqSUGBucDqIYDt2U6LLBoiqx7tvKS6VoTTBhrOYlT1RxPCi6HFdsETvIQp
-	sXTZAAPd5royUP8fucUiITv0PgZWrzYozcBefdUuZQOxe2GyOcd6r+F67dWJJ3SFiTt1LB02rYw7V
-	Pfll0qmBlvzg+6CwkRVObhvX8/S3fYitEX1qZyg0Dq3jn83YD/SjpS9v5OJyj6Us0yPmzm9hhgY8a
-	pVqBbhlOEvLVREJxuvD4A86L1kSexJyTYxCFgGMK+cpZoLagFf11xaAlc550PdCWJ+aDfbmBgHihf
-	j7NM+9ZA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52622)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vn46R-000000004UO-08eh;
-	Tue, 03 Feb 2026 00:17:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vn46M-000000003qY-46I1;
-	Tue, 03 Feb 2026 00:17:07 +0000
-Date: Tue, 3 Feb 2026 00:17:06 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Daniel Scally <dan.scally@ideasonboard.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, imx@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kieran Bingham <kieran.bingham@ideasonboard.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Stefan Klug <stefan.klug@ideasonboard.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Subject: Re: [PATCH RFC net-next] net: stmmac: provide flag to disable EEE
-Message-ID: <aYE-gvuZdv7ezm7X@shell.armlinux.org.uk>
-References: <E1vNUjC-0000000FhjR-0h6P@rmk-PC.armlinux.org.uk>
- <f95f73b9-d024-4697-bca1-02fb8bc044af@gmail.com>
- <aYEj8VM5AfvcDHrl@shell.armlinux.org.uk>
+	s=arc-20240116; t=1770077959; c=relaxed/simple;
+	bh=YMNgpnEGjm+gg7Nz6teuJsSe1HjgDqcT2PQKZKmPfyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qK+n6O93Xt/DOwFCrvvZyyNyX0OAlBJ67m1OXvFTG3FPkxrVtCig4cHSO9nsKzztk3KI14lj2Yp2svVSshwqPXarFVfUI4der8HxJ2dLoce7ZjUz8HgZPLAP3EHyRc8y9xAt/YqqU7qp9YX2fCf8TSw8dk1LP/3S002KD2K6JG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZABljukX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F787C19421;
+	Tue,  3 Feb 2026 00:19:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770077959;
+	bh=YMNgpnEGjm+gg7Nz6teuJsSe1HjgDqcT2PQKZKmPfyI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZABljukXIonFYNzVstgw96MQtBL1Ly/75a8BPgmqX3JA7Yw1sl/5FGwJygkia39Zp
+	 nEsS0gkqlZXnLryeXps8HqV/KEGhI7+BnmOcG2aQpH2/6m8RnAYrhIa+Tj0WzKLe9v
+	 lFrtSkqhnllbj8RyWL6WmbJBPPWuxq08YvYJgWWcdlxmv6q71Qwvq3zXQJzJcpCzex
+	 G/JgrwFPl35pYyghUrlcLqDUXW87Bq5uEuZpZiL0fB60AO0JVtQrYGgeFgMQC33KoL
+	 bqFQ92ZRFyWf5Cpj+/8ru9xClDjjLqxjfyLYis4h9wMZDIiqdmbOFtmpSpQnbJn9n4
+	 R3cAcY2Isum2A==
+Date: Mon, 2 Feb 2026 16:19:18 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kevin Hao <haokexin@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ linux-omap@vger.kernel.org
+Subject: Re: [PATCH net v4] net: cpsw_new: Execute ndo_set_rx_mode callback
+ in a work queue
+Message-ID: <20260202161918.54be9315@kernel.org>
+In-Reply-To: <aX6pHiB0tk6xvrCX@pek-khao-d3>
+References: <20260130-bbb-v4-1-2bd000a15c34@gmail.com>
+	<20260131124120.744bd931@kernel.org>
+	<aX6pHiB0tk6xvrCX@pek-khao-d3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYEj8VM5AfvcDHrl@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256035-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256036-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,nxp.com,ideasonboard.com,davemloft.net,gmail.com,google.com,lists.linux.dev,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,pengutronix.de,redhat.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7ED5AD2E01
+X-Rspamd-Queue-Id: 717CDD2E47
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 10:23:45PM +0000, Russell King (Oracle) wrote:
-> On Mon, Feb 02, 2026 at 08:54:52PM +0200, Ovidiu Panait wrote:
-> > If not, maybe this patch could be merged to add the flag that disables
-> > EEE and I will just send a patch to disable EEE on our platforms as well.
-> 
-> We still need the flag to disable EEE for platforms where lpi_intr_o is
-> logically OR'd with the other interrupts, so there's no way to ignore
-> its persistent assertion.
+On Sun, 1 Feb 2026 09:15:10 +0800 Kevin Hao wrote:
+> > > -		unregister_netdev(cpsw->slaves[i].ndev);
+> > > +		priv =3D netdev_priv(ndev);
+> > > +		disable_work_sync(&priv->rx_mode_work);
+> > > +		unregister_netdev(ndev); =20
+> >=20
+> > I understand that this is safe but I think that more logical ordering
+> > would be to shut things down _after_ object is unregistered. =20
+>=20
+> I'm a bit confused=E2=80=94are you suggesting that we move disable_work_s=
+ync() after
+> unregister_netdev()? If that's the case, the scheduled cpsw_ndo_set_rx_mo=
+de_work()
+> could potentially run after the network device has been unregistered, lea=
+ding to
+> a use-after-free issue. Or am I misunderstanding something here?
 
-I'll also state that we need both patches, but there's no point pushing
-my original patch (to allow EEE to be disabled) unless Laurent is going
-to also submit a patch to make use of the flag - the EEE disable and
-Laurent's patch needs to be part of a series. We don't merge stuff that
-adds facilities that have no users, because that's been proven time and
-time again to be a recipe for accumulating cruft.
-
-So, at the moment, "net: stmmac: provide flag to disable EEE" ain't
-going anywhere until there's a patch that makes use of the new flag.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Unregistered device is not freed yet. The netdev is only freed after
+.remove routine returns. Passing unregistered netdev to netif_running()
+is safe and will return false.
 
