@@ -1,96 +1,74 @@
-Return-Path: <netdev+bounces-256405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNACDJk3gmmVQgMAu9opvQ
-	(envelope-from <netdev+bounces-256405-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:59:53 +0100
+	id CNfmEQw3gmmVQgMAu9opvQ
+	(envelope-from <netdev+bounces-256406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:57:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4299BDD391
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:59:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 925B9DD332
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6075F303839C
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:48:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C964930CC69F
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3BB361DAB;
-	Tue,  3 Feb 2026 17:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3441A325738;
+	Tue,  3 Feb 2026 17:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mnmCHRwg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fKuK+QSR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9669A3168F6;
-	Tue,  3 Feb 2026 17:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F8A31B123;
+	Tue,  3 Feb 2026 17:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770140912; cv=none; b=lReFKvXAaZ78A1+KnLOX6kcTjRD2+rz1qs6g7G9qUe9HBnpR0clJGZhFGDwT0UFv35QNOBYK9vatMSuwLqZMjC/5Gvu9+MPlqjqdkT7GCmQucFtpt75Fgi3mBhXolbRF5v6qJ6/rzvhvF5AHsWRxbacsv2xNn+twe8Aydu/cj8o=
+	t=1770141140; cv=none; b=QRmS+KCLReCIhycA3gLPelVQTIb9++n6IeDPdQLAZNOZonqF6tQjt++34vtM7ruoCxt1pt7v5juAeXpSFYYIx7SviPdpj+ZxNQ+DMnv04nzYxgYTDWEcjwzf/8grLz1d9mhSxggM15ebuiSniTbewaoL1dXzhUgzg+730vffwpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770140912; c=relaxed/simple;
-	bh=nT5gqQY1z1axiKnDg1xENUtc5nF991Bpu0PcgekNvUA=;
+	s=arc-20240116; t=1770141140; c=relaxed/simple;
+	bh=BMoqo4Vjj3pjnlIguaSEYKWV1E5G0IXn/SzuqK999qE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nm7AATTK/g9cekvR/IXWgsnCn4zZUssjHVStO7ieQWuHGkfxU9W3GvaDlS2mIHMF7LukOjCFcFqD189PgZveiPOQpSopOzSkT5GOpus8p3G3XD8Q/3iUU/16YJ6HmCQ0q/vsx9rnvyzy3pZV+Ql05o8QvCTQ6ErPLPFCnKZqbDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mnmCHRwg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8+rZdHUALqDXCYWomEbTBBbdF709hbUaxOu7TxGSuck=; b=mnmCHRwgVvO2uVu8vPwzL3jlaQ
-	9e3s28tK2RkxDDz+wudnKFLlMgf8rsID3pS07Xd03nfUi/IOgHTvc4AYPkDSWkg8uZopukn03su/q
-	P7/A9g0eLJSwzR58O0WDaJVRC1VQO83NBE+KNK+wygGw/N/ZhhRad/Ht4honZ9Qc9Qo242neo8wKi
-	PIQ0qpcgMEmUQKrModpz+SkByA7jDdHARbBl5sgvopqaFP2qFctC8BEN+2kBzFlRlhaAMy2i3aCeK
-	DUf9JTguGfJOZXEOyc14Hbq6dAcCcmBDoL+92a34ygVVMMDNOsAfUug0efvdF/PZgHiZpVrcoCea1
-	hbGxnchg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46968)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vnKVS-000000005Pd-2TsJ;
-	Tue, 03 Feb 2026 17:48:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vnKVM-000000004ZO-2y1I;
-	Tue, 03 Feb 2026 17:48:00 +0000
-Date: Tue, 3 Feb 2026 17:48:00 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Yanteng Si <siyanteng@cqsoftware.com.cn>,
-	Yao Zi <ziyao@disroot.org>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Shangjuan Wei <weishangjuan@eswincomputing.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Chen-Yu Tsai <wens@kernel.org>, Zhi Li <lizhi2@eswincomputing.com>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Quentin Schulz <quentin.schulz@cherry.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v4 3/3] net: stmmac: Add glue layer for Spacemit
- K3 SoC
-Message-ID: <aYI00Exytbgbnuzp@shell.armlinux.org.uk>
-References: <20260130022705.1059214-1-inochiama@gmail.com>
- <20260130022705.1059214-4-inochiama@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QvGEoTo5pg1NHJ+KDoUMWEROGlj7/by4ud5UbTSuTH/g7/G6Zms3cJtEv484gf5se5kfR+hVh0i3JGPaFeoD2to4cZ3LyBAXISFjmYTNchHndMhkBHViBRvEawqyl9Bx4yCmRxTzNvsbJTf4Sxyt4nolF6loO2JYfuADmlSzg1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fKuK+QSR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EF4CC116D0;
+	Tue,  3 Feb 2026 17:52:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770141139;
+	bh=BMoqo4Vjj3pjnlIguaSEYKWV1E5G0IXn/SzuqK999qE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fKuK+QSRlz/G16B/A/gIe+Hh7Foxc7NU3ZF3e3QWAoutfFlPAk3o2FGXJcmyY+0Lm
+	 hOIwD8aynydlM45g1qBbAPT3YZIjyj6syEV4CukZ4gR71KtPz1FhnhYEkVSXtGqObP
+	 DNBdR6ppN3wParfoaLUMslebFEDUAqhy+3lKYsbNTU9lkUJbWYRzSIQ/m0lm3gcmPD
+	 AFRqSpO4ox+NC1wTp5lGNzIhuAjaazRIyxInkAnpv53Tf1471VzbDQKjr3kkiGls/G
+	 pD33+io7YIrDClvKqTHkPUuc4zwQfZKBpGcxOcrhr8CuJEGJkXtaWNSCehnaGDgZIK
+	 S4ZDt76g1VSDQ==
+Date: Tue, 3 Feb 2026 17:52:13 +0000
+From: Simon Horman <horms@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
+	mwojtas@chromium.org, Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v3 05/11] net: phy: Create SFP phy_port before
+ registering usptream
+Message-ID: <aYI1zd6Iddcdt6xc@horms.kernel.org>
+References: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
+ <20260201151249.642015-6-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,100 +77,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260130022705.1059214-4-inochiama@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20260201151249.642015-6-maxime.chevallier@bootlin.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256405-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256406-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gentoo.org,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,cqsoftware.com.cn,disroot.org,bp.renesas.com,eswincomputing.com,bootlin.com,altera.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4299BDD391
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 925B9DD332
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 10:27:04AM +0800, Inochi Amaoto wrote:
-> +/* ctrl register bits */
-> +#define CTRL_PHY_INTF_RGMII		BIT(3)
-> +#define CTRL_PHY_INTF_MII		BIT(4)
-> +#define CTRL_WAKE_IRQ_EN		BIT(9)
-> +#define CTRL_PHY_IRQ_EN			BIT(12)
+On Sun, Feb 01, 2026 at 04:12:42PM +0100, Maxime Chevallier wrote:
+> When dealing with PHY-driven SFP, we create a phy_port representing the
+> SFP bus when we know we have such a bus.
+> 
+> We can move the port creation before registering the sfp upstream ops,
+> as long as we know the SFP bus is there. This will allow passing the
+> phy_port along with the upstream information to the SFP bus.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Thanks for updating these.
+...
 
-> +static int spacemit_dwmac_update_ifconfig(struct plat_stmmacenet_data *plat_dat,
-> +					  struct stmmac_resources *stmmac_res,
-> +					  struct regmap *apmu,
-> +					  unsigned int ctrl_offset)
-> +{
-> +	unsigned int mask = CTRL_PHY_INTF_MII | CTRL_PHY_INTF_RGMII | CTRL_WAKE_IRQ_EN;
-> +	unsigned int val = 0;
+> @@ -1698,22 +1700,34 @@ static int phy_setup_sfp_port(struct phy_device *phydev)
+>   */
+>  static int phy_sfp_probe(struct phy_device *phydev)
+>  {
+> +	struct phy_port *port;
+>  	struct sfp_bus *bus;
+> -	int ret = 0;
+> +	int ret;
+>  
+> -	if (phydev->mdio.dev.fwnode) {
+> -		bus = sfp_bus_find_fwnode(phydev->mdio.dev.fwnode);
+> -		if (IS_ERR(bus))
+> -			return PTR_ERR(bus);
+> +	if (!phydev->mdio.dev.fwnode)
+> +		return 0;
 > +
-> +	switch (plat_dat->phy_interface) {
-> +	case PHY_INTERFACE_MODE_MII:
-> +		val = CTRL_PHY_INTF_MII;
-> +		break;
+> +	bus = sfp_bus_find_fwnode(phydev->mdio.dev.fwnode);
+> +	if (IS_ERR(bus))
+> +		return PTR_ERR(bus);
+>  
+> -		phydev->sfp_bus = bus;
+> +	phydev->sfp_bus = bus;
+>  
+> -		ret = sfp_bus_add_upstream(bus, phydev, &sfp_phydev_ops);
+> -		sfp_bus_put(bus);
+> +	if (bus) {
+> +		port = phy_setup_sfp_port(phydev);
+> +		if (IS_ERR(port)) {
+> +			sfp_bus_put(bus);
+> +			return PTR_ERR(port);
+> +		}
+>  	}
+>  
+> -	if (!ret && phydev->sfp_bus)
+> -		ret = phy_setup_sfp_port(phydev);
+> +	ret = sfp_bus_add_upstream(bus, phydev, &sfp_phydev_ops);
+> +	sfp_bus_put(bus);
 > +
-> +	case PHY_INTERFACE_MODE_RMII:
-> +		break;
-> +
-> +	case PHY_INTERFACE_MODE_RGMII:
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> +		val = CTRL_PHY_INTF_RGMII;
-> +		break;
-> +
-> +	default:
-> +		return -EOPNOTSUPP;
+> +	if (ret && port) {
+
+Hi Maxime,
+
+If bus is NULL then port will not be set here.
+
+Flagged by Smatch.
+
+> +		phy_del_port(phydev, port);
+> +		phy_port_destroy(port);
 > +	}
-> +
-> +	if (stmmac_res->wol_irq >= 0)
-> +		val |= CTRL_WAKE_IRQ_EN;
-> +
-> +	return regmap_update_bits(apmu, ctrl_offset, mask, val);
-
-I would suggest that this is split into two parts - first, this is
-renamed and reduced to just controlling CTRL_WAKE_IRQ_EN.
-
-Next, a function hooked into plat_dat->set_phy_intf_sel which sets
-the CTRL_PHY_INTF_RGMII and CTRL_PHY_INTF_MII bits as appropriate.
-Note that this function is passed the dwmac's own phy_intf_sel
-value from common.h which will be PHY_INTF_SEL_GMII_MII,
-PHY_INTF_SEL_RGMII or PHY_INTF_SEL_RMII for you.
-
-It would also be good to have plat_dat->get_interfaces populated
-using phy_interface_set_rgmii(), and __set_bit(PHY_INTERFACE_MODE_MII)
-and __set_bit(PHY_INTERFACE_MODE_RMII) to indicate to phylink which
-interface modes are permissable.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  
+>  	return ret;
+>  }
+> -- 
+> 2.49.0
+> 
 
