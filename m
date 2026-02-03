@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-256051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Fh7BvhGgWnNFAMAu9opvQ
-	(envelope-from <netdev+bounces-256051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:53:12 +0100
+	id sFPmBhhHgWkZFQMAu9opvQ
+	(envelope-from <netdev+bounces-256052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:53:44 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F7C6D327B
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:53:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A372D329A
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 01:53:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8593A3060BD9
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 00:49:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7EC430675B2
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 00:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63750214812;
-	Tue,  3 Feb 2026 00:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CB1217722;
+	Tue,  3 Feb 2026 00:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="DN7/p0hr"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="dAS3JvWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2D621770A
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 00:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6932165EA
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 00:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770079777; cv=none; b=lHGxA9KJ/zr3I6ZUENGij8ANDQuGGMYrtB6+IeW7Z8qTcZKJUA+l3dGL1ne8NQKNAWnnGvTYAkYo3KYdc/KxIPhkoK+4uViNGwVLwEd5utLBkdQR9JYoYhXsT6vvY6hdJJvOmDxvD87kRijM6MdWt7EKdlnoNO+Wx8i6thLfHNM=
+	t=1770079779; cv=none; b=jl6ukPadO+cqOadTmVULFR1EJm2h3Ngm1dmM1qOiSqVkPQqzkSgDzis+JyxB4Jaetk9f9+HISC7bChrGW329WhTkZPlyOj2z1pva9OxWN29I1ZWrP/fNr8dBBJ2gD5WV8hdjB3uHRzzuRyvPBgfhO3oaYzQNfc0vYKCpdf3/3u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770079777; c=relaxed/simple;
-	bh=PoCOl4nYfSo+HtZKtoirhyekgCROZpgS9Vuh3hTFu3g=;
+	s=arc-20240116; t=1770079779; c=relaxed/simple;
+	bh=gioJCSc3E6x/X5AhjxKtgQFKZWZs28mmwv59fWo7dis=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jTBT9DdavYS6Qs1FUy74+JYUVx6JX268X7uGl5cQj+xPp52MXx4lN/zwIQTeTaiD69uLFSm5WHxr9NEDrItXcMbvF1aEkvMmCUG3/4AFoD1JR+UG3vBwO4LNCCv6Jrzyy5ceOCWYbHFuAM8CbIs9DEKWL/ltSGDeVDaMLkPb7L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=DN7/p0hr; arc=none smtp.client-ip=74.125.82.43
+	 MIME-Version; b=nX4qKO9W9xUSoHD3ySf/342z/VwQHgPXmN80WuXKutKn+HmHCuVP6N691qGnUNn54z4xQj3ki/mDD+7RwKmXuGP/eZCxHsdjJPWWkri4gnSL3U8ekbQnA4t5rucsYDuR57mZQlvwrKrF3dC7hn3//IFFUgKODCbuRIklKa0RKy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=dAS3JvWG; arc=none smtp.client-ip=74.125.82.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1248d27f293so931575c88.0
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 16:49:35 -0800 (PST)
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2b4520f6b32so9000315eec.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 16:49:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1770079775; x=1770684575; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1770079776; x=1770684576; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XdWK1lXi2/8U+ODrJcq1ZHPxz8MpW4pBb4PAg3cBaRQ=;
-        b=DN7/p0hrMxgBRuxyAHSQAcMhnZZRKnVIJMxSvlbosIJ0nujtJG/ILUFPUNQtMNfgTX
-         UkJ32VOYuQ0cXcyvrYgKWt9HptvKMLEOa5Ijzp5RWWS7Jz2cAkkWIHNC8qdDFT2J2Aib
-         O3wU7sbmn4GSPWZOabgTpCdqVB5t7PEhFnrUIksZelVI35W8SPP1jCdjxzGtxXouhNSx
-         iUYtAmLw3AuBdURR2xE4uAn/429uz3J8kuAHiP7/KRP0lGVI65YHX6S4DOjAigSew9gn
-         OTJ/AQsx0kkkCEv/mP9Wd0kk00PYOyyrjeyrxD3qh//H+XU1uyMotPlrT4ZG6EO2pGFI
-         H4Ag==
+        bh=DKlBHvvPAzy5iUZFuDcJ9Mk61OjspfAZbOUZM15hj8o=;
+        b=dAS3JvWGz2tlHDqI2aRqZSNEtIhxLFo3TLMowCAg4MmaYRSeAESBMnRUfsviS8qmzH
+         l60RjPY/SNVbpUBP1h65Vd10YpvcvFFsILdqzC7WYltliwqOdzyIwLWXAPZl3BqitIjo
+         LIJl3x2Y8/I+9GrvafaRDWGp9TRlGb+ptrbIAGSBAY9Z+ak52+MxYCyZzcAC40ukPskr
+         X8657xr9QSM+oi6wr7qc2r1aqLHJqrAcLyIu8g3UMuJ+/rd3lP1ZJlU9gAt/+NZZmhNu
+         RE/MdnZFtGnpZNjk+GIi54MZgKzQ6frg30DoGtLTaSEj4Sl5e5bc+KIeeB6fohaDKc24
+         dCZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770079775; x=1770684575;
+        d=1e100.net; s=20230601; t=1770079776; x=1770684576;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=XdWK1lXi2/8U+ODrJcq1ZHPxz8MpW4pBb4PAg3cBaRQ=;
-        b=VuHRZC72nM5qVNzL2j3tOt9Wdz5vsnvjWfhCM9O3uDMJRlvBzEAtcKrs5qilbGu0lM
-         uJTK/nJctmX7FdoWNBG8clh/rdb8gsByCNjPg9msDPP1D8HgwnFhMSxe+LbZnXLb6cq1
-         l/VF9cMFoCR2VcFH3XlRwBsocXzY8e8iV0Sm1KOYFoM7IBhfPC0Ek+OXsG1czBAhfbCM
-         0MWslWT3nAhBfk1wtPnWkn/prmmEy/R0Hii49aaWYy8X6DV1zCNwcOG46a2g0lHxS7GK
-         0REWvihwKdpB5LMR+fHqmpsTgklavmfdeNuTp5QGsRqdMDs4hzkzx7kUQUKgqIPtT3a5
-         u1bw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxS4/SgLMN+VlIzKay3emSmbd3EfkHT0sSBFONHY+PeoXm1Aa5bGQEVHMkbSLt1hdw/9fU/HY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBDOTEZj49GryKxO4Hewn75UdLL7YnoJVlqk9TzUDLI2UPqE++
-	vkYDwSErqAy1qZME5/zMHEpmjzNPx6vuvBqLWFM2fspGAp9J/XgEcIsehLK8ErPU8g==
-X-Gm-Gg: AZuq6aLPaDA+jLCzwEaMJLSfWZLlOd1xFdcvh0REP/lmz7+rd3K7qlG2Z+H2gP6a9aw
-	nrAEFqHFlPbFM7I025ytZTAF+FGZKAm9ynhiJqpSowP5HM4RVhXUrIOqepU/+h7KOe3Wy92LcZH
-	Y5rDtBJ4NV94mZANJbSyH0O0X3cMPgsM0ElpZLK2hJjKRdzUf4nKw62rV/DSFOYHM4HdcB3+N5i
-	mhMoi8N2pzgffS1R0MTV1u6V2nr8R0hWedF+9/UR6ESOJ5m/OXw4tCfxnflrx+XSmkxbfQ9zEkr
-	zvje/LVuP/h7RwpTDDDV+oqqu8yPLzZrY62BllWEnrNJ9MwJRqkDTHbR2yz+dpp6mmbtclJXP4z
-	2pXWMcFnCSfsWZYedeiuGa743i8b959fl1VDXNJ68DxwJi6EWKqjrzI9uDdFw/o6/EZq+ZZLOxS
-	9E2MFHnXGQWP8DscpJz7CrDhMIeVeOdP6gBk7g8Jdq/xg71n64H3Oktyjf
-X-Received: by 2002:a05:7022:6197:b0:123:34f5:bb02 with SMTP id a92af1059eb24-125c0fad4d9mr6795383c88.20.1770079774508;
-        Mon, 02 Feb 2026 16:49:34 -0800 (PST)
+        bh=DKlBHvvPAzy5iUZFuDcJ9Mk61OjspfAZbOUZM15hj8o=;
+        b=PulydTyuHH4QJNpIwBbQvjUKqKh1OFbjNcDiidtdlAAAtp6K5dmyEl6D7PA/czPDpW
+         xo7TMuNd5hO9pR0w9dBt7HIXW8yYRye3ibWIIrUsCAgGJmHaDYXFzKScaceNu02K3Onp
+         m3Oke462Hf8MlCRiFan3fZSOEHla7sxoWgSm7O3JkuniNI4wimCOaRyE8vAgvpMEL4vm
+         OfkL2BzHYpwTsB3khdCf+IUHAI+W6D1ZmXvy77irzSoLagWsY9bBq3/4bjzWNzzvZchP
+         kdlMHUppUfpPELBK3/GLaQnOjVg/UPdXP0TDhZ2b77d+WGthCQdaqjYl01rx68bUqK6/
+         V5ww==
+X-Forwarded-Encrypted: i=1; AJvYcCUEfsDaCxqW9Nypj0NdwzFLw6/Zhy1u4WuekfEoHEYLySCqaLBMgfGFcBOEjSaFpOlKSd4aviE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNuTYqafXkxPY236U4T18QMbd7XnTRn13VLQxjeCnMCqUPWboN
+	OxVuzOkpuvtWLhE5Xgj8Yg5Ji00tonG+25ND/CgWPbKgHsthh2u0Fa4TEX1zuG/Qug==
+X-Gm-Gg: AZuq6aIZgCbU1wLqW+GyukKathmsi1Jq12NRV2AVbL4bDdPZjPqYm95/I4bDO9QGGRG
+	Oh0quE8pb6PYkOGnJV5cRS4nht3zYKh+7RD2JdbGAiomztdOW9V4TOonHfxfk0oQpVYIYztZwnF
+	SNnNG9zcLHPFs9FMDCUHmer+msSaCohd6Xj67bKN8+BBH0HiJo78McINm7C9N5DGaVYJMZGm9Pc
+	OWqFsnJN5xLHbndhxZdkh/ArBnobx1NBoQjes3uSG9EU5M3LKn8F2tJcepyY3vVnn1ioGRUi8U/
+	pnKnLbdVtgEB/uWA3YtEhNzGL87SG2WRR35sjMqfwU2qX/i3SVcabpvEHfs9LZZty5Luvom5mdP
+	UXBp+JR9aB4QxEItmbpuej2OFMICJzx5UuJl3Dglmk2RCv42aqk+bI4AnbdeEYi89aMLC7Bhbtv
+	APg6IhDw0exPFzY5+S/jJ1MbI85+hbipACeMha1MsM3EoU3Ahy8nexuUf+
+X-Received: by 2002:a05:693c:3944:b0:2b0:5929:4d1f with SMTP id 5a478bee46e88-2b7c890281bmr3878217eec.33.1770079776354;
+        Mon, 02 Feb 2026 16:49:36 -0800 (PST)
 Received: from pong.herbertland.com ([2601:646:8980:b330:d7c2:35ea:5a4f:74f9])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe92dsm21017016eec.17.2026.02.02.16.49.33
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe92dsm21017016eec.17.2026.02.02.16.49.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 16:49:33 -0800 (PST)
+        Mon, 02 Feb 2026 16:49:35 -0800 (PST)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -83,9 +83,9 @@ To: davem@davemloft.net,
 	justin.iurman@uliege.be,
 	willemdebruijn.kernel@gmail.com
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v6 09/10] test: Add ext_hdr.py in networking selftests
-Date: Mon,  2 Feb 2026 16:48:52 -0800
-Message-ID: <20260203004853.94438-10-tom@herbertland.com>
+Subject: [PATCH net-next v6 10/10] test: Add networking sefltest for eh limits
+Date: Mon,  2 Feb 2026 16:48:53 -0800
+Message-ID: <20260203004853.94438-11-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260203004853.94438-1-tom@herbertland.com>
 References: <20260203004853.94438-1-tom@herbertland.com>
@@ -113,7 +113,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256051-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256052-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -125,448 +125,640 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:email,herbertland.com:dkim,herbertland.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ext_hdr.py:url]
-X-Rspamd-Queue-Id: 6F7C6D327B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:email,herbertland.com:dkim,herbertland.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lib.sh:url]
+X-Rspamd-Queue-Id: 5A372D329A
 X-Rspamd-Action: no action
 
-Add ext_hdr.py that contains various Extension Header format definitions
-and related helper functions.
+Add a networking selftest for Extension Header limits. The
+limits to test are in systcls:
 
-This includes the Make_EH_Chain function that creates an Extension
-Header chain based on an input list. The input list has the format:
+	net.ipv6.enforce_ext_hdr_order
+	net.ipv6.max_dst_opts_number
+	net.ipv6.max_hbh_opts_number
+	net.ipv6.max_hbh_length
+	net.ipv6.max_dst_opts_length
 
-   [(<type>, <args>), (<type>, <args>), ... (<type>, <args>)]
+The basic idea of the test is to fabricate ICMPv6 Echo Request
+packets with various combinations of Extension Headers. The packets
+are sent to a host in another namespace. If a an ICMPv6 Echo Reply
+is received then the packet wasn't dropped due to a limit being
+exceeded, and if it was dropped then we assume that a limit was
+exceeded. For each test packet we derive an expectation as to
+whether the packet will be dropped or not. Test success depends
+on whether our expectation is matched. i.e. if we expect a reply
+then the test succeeds if we see a reply, and if we don't expect a
+reply then the test succeeds if we don't see a reply.
 
-where <type> is "H" for Hop-by-Hop Options, "D" for Destination
-Options, "R" for Routing Header, "F" for Fragment header, "A" for
-Authentication Header, and "E" for ESP header.
+The test is divided into a frontend bash script (eh_limits.sh) and a
+backend Python script (eh_limits.py).
 
-<args> is specific to the type of extension header. For Hop-by-Hop
-and Destination Options <args> is a list of options in the format:
+The frontend sets up two network namespaces with IPv6 addresses
+configured on veth's. We then invoke the backend to send the
+test packets. This first pass is done with default sysctl settings.
+On a second pass we change the various sysctl settings and run
+again.
 
-   [(<opt_type>, <opt_length>), (<opt_type>, <opt_length>), ...
-					(<opt_type>, <opt_length>)]
+The backend runs through the various test cases described in the
+Make_Test_Packets function. This function calls Make_Packet for
+a test case where arguments provide the Extension Header chain to
+be tested. The Run_Test function loops through the various packets
+and tests if a reply is received versus the expectation. If a test
+case fails then an error status is returned by the backend.
 
-For the Routing Header, <args> is a list of SIDs in the format:
-
-    [IPv6_address, IPv6_address, ... IPv6_address]
-
-For the Fragment Header, <args> is the identifier number
-
-Authentication and ESP are not currently supported by Make_EH_Chain
+The backend script can also be run with the "-w <pcap_file>" to
+write the created packets to a pcap file instead of running the
+test.
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- tools/testing/selftests/net/ext_hdr.py | 400 +++++++++++++++++++++++++
- 1 file changed, 400 insertions(+)
- create mode 100755 tools/testing/selftests/net/ext_hdr.py
+ tools/testing/selftests/net/Makefile     |   1 +
+ tools/testing/selftests/net/eh_limits.py | 352 +++++++++++++++++++++++
+ tools/testing/selftests/net/eh_limits.sh | 205 +++++++++++++
+ 3 files changed, 558 insertions(+)
+ create mode 100755 tools/testing/selftests/net/eh_limits.py
+ create mode 100755 tools/testing/selftests/net/eh_limits.sh
 
-diff --git a/tools/testing/selftests/net/ext_hdr.py b/tools/testing/selftests/net/ext_hdr.py
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index afdea6d95bde..73195a2e8f1e 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -24,6 +24,7 @@ TEST_PROGS := \
+ 	cmsg_time.sh \
+ 	double_udp_encap.sh \
+ 	drop_monitor_tests.sh \
++	eh_limits.sh \
+ 	fcnal-ipv4.sh \
+ 	fcnal-ipv6.sh \
+ 	fcnal-other.sh \
+diff --git a/tools/testing/selftests/net/eh_limits.py b/tools/testing/selftests/net/eh_limits.py
 new file mode 100755
-index 000000000000..1226e31392f0
+index 000000000000..01fcf15c6b94
 --- /dev/null
-+++ b/tools/testing/selftests/net/ext_hdr.py
-@@ -0,0 +1,400 @@
++++ b/tools/testing/selftests/net/eh_limits.py
+@@ -0,0 +1,352 @@
 +#!/usr/bin/env python3
 +# SPDX-License-Identifier: GPL-2.0
 +
-+# Helper functions for creating extension headers using scapy
++# Test of extension header limits
 +
-+import ctypes
-+import os
++import ext_hdr
++import getopt
 +import proto_nums
 +import shlex
-+import socket
-+import sys
-+from enum import Enum
++
 +from scapy.all import *
 +
-+# Read a sysctl
-+def SysctlRead(name):
++# Constants
++
++verbose = False
++source_mac = "00:11:22:33:44:55"
++destination_mac = "AA:BB:CC:DD:EE:FF"
++source_ip = "2001:db8::7"
++destination_ip = "2001:db8::8"
++packet_list = []
++pcap_out=""
++glob_ident = 1111
++ether_frame = Raw()
++with_eth = False
++
++# Parse command line options
++def Cli_Args():
++	global verbose, source_mac, destination_mac, source_ip
++	global destination_ip, pcap_out
++
++	args = sys.argv[1:]
++
 +	try:
-+		# shlex.split helps handle arguments correctly
-+		command = shlex.split("sysctl -n %s" % (name))
-+		# Use check=True to raise an exception if the command fails
-+		result = subprocess.run(command, check=True,
-+					capture_output=True, text=True)
-+		value = result.stdout.strip()
-+	except subprocess.CalledProcessError as e:
-+		print(f"Error reading sysctl: {e.stderr}")
-+	except FileNotFoundError:
-+		print("The 'sysctl' command was not found. "
-+		      "Check your system's PATH.")
++		opts, remainder = getopt.getopt(args, "vw:",
++			["verbose", "src_eth=", "dst_eth", "src_ip=",
++			 "dst_ip=", "pcap_out="])
++	except getopt.GetoptError as err:
++		# Print error message and exit
++		print(err)
++		sys.exit(2)
 +
-+	return int(value)
++	for opt, arg in opts:
++		if opt in ("-v", "--verbose"):
++			verbose = True
++		elif opt in ("--src_eth"):
++			source_mac = arg
++		elif opt in ("--dst_eth"):
++			destination_mac = arg
++		elif opt in ("--src_ip"):
++			source_ip = arg
++		elif opt in ("--dst_ip"):
++			destination_ip = arg
++		elif opt in ("-w", "--pcap_out"):
++			pcap_out = arg
 +
-+# Common definitions for Destination and Hop-by-Hop options
-+
-+# Common Destination and Hop-by-Hop Options header
-+class hbh_dst_options(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("next_hdr", ctypes.c_uint8),
-+		("hdr_ext_len", ctypes.c_uint8)
-+	]
-+
-+# Make a common Destination and Hop-by-Hop Options header
-+def Make_HBHDst_Options(next_hdr, length):
-+	hdr = hbh_dst_options()
-+	hdr.next_hdr = next_hdr
-+	hdr.hdr_ext_len = length
-+
-+	return hdr
-+
-+# Common single Destination and Hop-by-Hop Option header
-+class dst_hbh_option(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("opt_type", ctypes.c_uint8),
-+		("opt_data_len", ctypes.c_uint8),
-+	]
-+
-+# Make common single Destination and Hop-by-Hop Option header
-+def Make_HBHDst_Option(type, length):
-+	hdr = dst_hbh_option()
-+	hdr.opt_type = type
-+	hdr.opt_data_len = length
-+
-+	return hdr
-+
-+# Make PAD1 option
-+def Make_HBHDst_Option_pad1():
-+	bytes = bytearray(1)
-+	bytes[0] = proto_nums.HBHDst_Types.HBHDST_TYPE_PAD1.value
-+	return (Raw(bytes), 1)
-+
-+# Make a full DestOpt or HBH Option with some length
-+def Make_HBHDst_Option_with_Data(type, len):
-+	hdr = Raw(load=Make_HBHDst_Option(type, len))
-+	bytes = Raw(bytearray(len))
-+	allhdr = hdr/bytes
-+	return (allhdr, 2 + len)
-+
-+# Make PADN option
-+def Make_HBHDst_Option_padN(len):
-+	return Make_HBHDst_Option_with_Data(
-+			proto_nums.HBHDst_Types.HBHDST_TYPE_PADN.value, len)
-+
-+# Make a Destination or Hop-by-Hop Options list. Input is list of pairs as
-+# (type, length). Option data is set to zeroes.
-+#
-+# Return value is (hdr, len, outcome) where hdr is the raw bytes and length
-+# is the length of the header including two bytes for the common extension
-+# header (the returned header does not include the two byte common header).
-+# outcome is True or False depending on whether the options are expected to
-+# exceed a sysctl limit and would be dropped
-+def Make_HBHDst_Options_list(list, max_cnt, max_len):
-+	hdr = Raw()
-+	len = 0
-+
-+	num_non_padding_opts = 0
-+	max_consect_pad1 = 0
-+	max_consect_pad_len = 0
-+
-+	consect_padlen = 0
-+
-+	# Create the set of options
-+	for type, jlen in list:
-+		if (type == proto_nums.HBHDst_Types.HBHDST_TYPE_PAD1.value):
-+			# PAD1 is a special case
-+			pair = Make_HBHDst_Option_pad1()
-+			consect_padlen += pair[1]
-+		else:
-+			pair = Make_HBHDst_Option_with_Data(type, jlen)
-+
-+			if (type ==
-+			    proto_nums.HBHDst_Types.HBHDST_TYPE_PADN.value):
-+				consect_padlen += pair[1]
-+			else:
-+				if (consect_padlen > max_consect_pad_len):
-+					max_consect_pad_len = consect_padlen
-+				consect_padlen = 0
-+				num_non_padding_opts += 1
-+
-+		# Append the option, add to cumulative length
-+		hdr = hdr/pair[0]
-+		len += pair[1]
-+
-+	# Add two to length to account for two byte extension header
-+	len += 2
-+
-+	if (len % 8 != 0):
-+		# The extension header length must be a multiple of eight bytes.
-+		# If we're short add a padding option
-+		plen = 8 - (len % 8)
-+		if (plen == 1):
-+			pair = Make_HBHDst_Option_pad1()
-+		else:
-+			pair = Make_HBHDst_Option_padN(plen - 2)
-+
-+		consect_padlen += pair[1]
-+		hdr = hdr/pair[0]
-+		len += plen
-+
-+	if (consect_padlen > max_consect_pad_len):
-+		max_consect_pad_len = consect_padlen
-+
-+	outcome = True
-+	if (num_non_padding_opts > max_cnt):
-+		# The number of options we created is greater then the sysctl
-+		# limit, so we expect the packet to be dropped
-+		outcome = False
-+	if (len > max_len):
-+		# The length of the extension is greater then the sysctl limit,
-+		# so we expect the packet to be dropped
-+		outcome = False
-+	if (max_consect_pad_len > 7):
-+		# The maximum consecutive number of bytes of padding is
-+		# greater than seven, so we expect the packet to be dropped
-+		outcome = False
-+
-+	return (hdr, len - 2, outcome)
-+
-+# Make a full Hop-by-Hop or Destination Options header
-+def Make_Full_HBHDst_Options_list(next_hdr, list, max_cnt, max_len):
-+	pair = Make_HBHDst_Options_list(list, max_cnt, max_len)
-+	len = pair[1] + 2
-+
-+	opts = Make_HBHDst_Options(next_hdr, (len - 1) // 8)
-+	hdr = Raw(load=opts)/pair[0]
-+
-+	return (hdr, len, pair[2])
-+
-+# Routing header definitions
-+
-+# Base Routing Header
-+class routing_hdr(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("next_hdr", ctypes.c_uint8),
-+		("hdr_ext_len", ctypes.c_uint8),
-+		("routing_type", ctypes.c_uint8),
-+		("segments_left", ctypes.c_uint8)
-+	]
-+
-+# SRv6 Routing Header
-+class srv6_routing_hdr(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("rh", routing_hdr),
-+		("last_entry", ctypes.c_uint8),
-+		("flags", ctypes.c_uint8),
-+		("tags", ctypes.c_uint16),
-+		# Variable list
-+		# TLV options
-+   ]
-+
-+# Make a basic Routing header
-+def MakeRouting_Hdr(next_hdr, hdr_ext_len, routing_type, segments_left):
-+	hdr = routing_hdr()
-+	hdr.next_hdr = next_hdr
-+	hdr.hdr_ext_len = hdr_ext_len
-+	hdr.routing_type = routing_type
-+	hdr.segments_left = segments_left
-+
-+	return Raw(load=hdr)
-+
-+# Make an SRv6 Routing Header (with no segments left)
-+def MakeSRv6Routing_Hdr(next_hdr, sids, tlvs):
-+
-+	bhdr = Raw()
-+	num_sids = 0
-+
-+	# Set up each SID in the list
-+	for sid in sids:
-+		bytes = socket.inet_pton(socket.AF_INET6, sid)
-+		bhdr = bhdr/Raw(load=bytes)
-+		num_sids += 1
-+
-+	len = num_sids * 16
-+
-+	hdr = srv6_routing_hdr()
-+
-+	hdr.rh.next_hdr = next_hdr
-+	hdr.rh.hdr_ext_len = len // 8
-+	hdr.rh.routing_type = proto_nums.RoutingTypes.ROUTING_TYPE_SRH.value
-+	hdr.rh.segments_left = 0
-+
-+	hdr.last_entry = num_sids - 1
-+	hdr.flags = 0
-+	hdr.tags = 0
-+
-+	bhdr = Raw(load=hdr)/bhdr
-+
-+	return (bhdr, len + 8, True)
-+
-+# Fragment header
-+
-+# Basic Fragment Header
-+class fragment_hdr(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("next_hdr", ctypes.c_uint8),
-+		("rsvd", ctypes.c_uint8),
-+		("fragment_offset", ctypes.c_uint16, 13),
-+		("rsvd2", ctypes.c_uint16, 2),
-+		("more", ctypes.c_uint16, 1),
-+		("identfication", ctypes.c_uint32),
-+	]
-+
-+# Make Fragment Header
-+def MakeFragment_Hdr(next_hdr, fragment_offset, more, ident):
-+	hdr = fragment_hdr()
-+	hdr.next_hdr = next_hdr
-+	hdr.fragment_offset = fragment_offset
-+	hdr.identfication = ident
-+
-+	return (Raw(load=hdr), 8, True)
-+
-+# Authentication Header
-+
-+# Base Authentication Header
-+class auth_hdr(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("next_hdr", ctypes.c_uint8),
-+                ("payload_len", ctypes.c_uint8),
-+		("spi", ctypes.c_uint32)
-+		# ICV is variable length
-+	]
-+
-+# Make and authenrication Header
-+def MakeAuth_Hdr(next_hdr, payload_len, spi):
-+	hdr = auth_hdr()
-+	hdr.next_hdr = next_hdr
-+	hdr.payload_len = payload_len
-+	hdr.spi = spi
-+
-+	return hdr
-+
-+# ESP
-+
-+# Base ESP header
-+class esp_hdr(ctypes.BigEndianStructure):
-+	_pack_ = 1
-+	_fields_ = [
-+		("spi", ctypes.c_uint32),
-+		("seqno", ctypes.c_uint32)
-+		# Payload data + padding
-+		# ICV is variable length
-+	]
-+
-+# Make an ESP header
-+def MakeESP_Hdr(next_hdr, spi, seqno):
-+	hdr = esp_hdr()
-+	hdr.spi = spi
-+	hdr.seqno = seqno
-+
-+	return hdr
-+
-+# Check if EH list is out of order
-+def Check_EH_Order(list):
-+	# OOO is okay if sysctl is not enforcing in order
-+	do_check = SysctlRead("net.ipv6.enforce_ext_hdr_order")
-+
-+	seen = 0
-+	for type, args in list:
-+		if type == "H":
-+			order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_HOP.value
-+		elif type == "D":
-+			if (seen &
-+			    proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_ROUTING.value):
-+				order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_DEST.value
-+			else:
-+				order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_DEST_BEFORE_RH.value
-+		elif type == "R":
-+			order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_ROUTING.value
-+		elif type == "F":
-+			order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_FRAGMENT.value
-+			if (seen & order != 0):
-+				# Linux stack doesn't allow more than one
-+				# Fragment Header in a packet
-+				return False
-+		elif type == "A":
-+			order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_AUTH.value
-+		elif type == "E":
-+			order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_ESP.value
-+
-+		if (do_check and seen >= order):
-+			return False
-+		seen |= order
-+
-+	return True
-+
-+# Make an extension header chain from a list
-+# The list contains a set of pairs in the form (<eh_type>, <args>)
-+# <eh_type> is:
-+#	"H"-- Hop-by-Hop Options
-+#	"D"-- Destination Options
-+#	"R"-- Routing Header
-+#	"F"-- Fragment Header
-+#	"A"-- Authentication Header
-+#	"E"-- ESP
-+#
-+# <args> is specific to EH type
-+def Make_EH_Chain(next_hdr, list):
-+	nlist = []
-+
-+	# Run through the list in reverse and set the next header up for each
-+	# enty
-+	for type, args in reversed(list):
-+		entry = (type, args, next_hdr)
-+		nlist.insert(0, entry)
-+		if type == "H":
-+			next_hdr = proto_nums.IP_Proto.IP_PROTO_HOPOPT.value
-+		elif type == "D":
-+			next_hdr = proto_nums.IP_Proto.IP_PROTO_IPv6_Opts.value
-+		elif type == "R":
-+			next_hdr = proto_nums.IP_Proto.IP_PROTO_IPv6_Route.value
-+		elif type == "F":
-+			next_hdr = proto_nums.IP_Proto.IP_PROTO_IPv6_Frag.value
-+		elif type == "A":
-+			next_hdr = proto_nums.IP_Proto.IP_PROTO_AH.value
-+		elif type == "E":
-+			next_hdr = proto_nums.IP_Proto.IP_PROTO_ESP.value
-+
-+	outcome = Check_EH_Order(list)
++# Make an ICMP echo request packet with the requested Extension Header chain
++def Make_Packet(text_name, eh_list):
++	global glob_ident,  packet_list, with_eth
 +
 +	hdr = Raw()
 +	len = 0
 +
-+	for type, args, nnext_hdr in reversed(nlist):
-+		if type == "H":
-+			# args is a list of (<opt_type>, <opt_len>) pairs
-+			pair = Make_Full_HBHDst_Options_list(nnext_hdr, args,
-+				SysctlRead("net.ipv6.max_hbh_opts_number"),
-+				SysctlRead("net.ipv6.max_hbh_length"))
-+		elif type == "D":
-+			# args is a list of (<opt_type>, <opt_len>) pairs
-+			pair = Make_Full_HBHDst_Options_list(nnext_hdr, args,
-+				SysctlRead("net.ipv6.max_dst_opts_number"),
-+				SysctlRead("net.ipv6.max_dst_opts_length"))
-+		elif type == "R":
-+			# args is a list of IPv6 address string
-+			pair = MakeSRv6Routing_Hdr(nnext_hdr, args, [])
-+		elif type == "F":
-+			# Arg is (<identifier>)
-+			pair = MakeFragment_Hdr(nnext_hdr, 0, False, args)
-+		elif type == "A":
-+			print("Auth type not supported for test")
-+			sys.exit(1)
-+		elif type == "E":
-+			print("ESP type not supported for test")
-+			sys.exit(1)
-+		else:
-+			print("Unknown EH type character")
-+			sys.exit(1)
++	hdr = ICMPv6EchoRequest(id=glob_ident)/hdr
++	len += 8
 +
-+		hdr = pair[0]/hdr
-+		len += pair[1]
++	pair = ext_hdr.Make_EH_Chain(
++		proto_nums.IP_Proto.IP_PROTO_IPv6_ICMP.value, eh_list)
++	hdr = pair[0]/hdr
++	len += pair[1]
 +
-+		if (pair[2] == False):
-+			outcome = False
++	ipv6_pkt = IPv6(src=source_ip, dst=destination_ip, nh=pair[2], plen=len)
++	hdr = ipv6_pkt / hdr
++	len += 40
 +
-+	return (hdr, len, next_hdr, outcome)
++	if (with_eth):
++		hdr = ether_frame/hdr
++		len += 14
++
++	packet_list.append((hdr, len, glob_ident, pair[3], text_name))
++	glob_ident += 1
++
++# Write a pacp file with all the created packets
++def Write_Pcap(pcap_out):
++	global packet_list, ether_frame, with_eth
++
++	ether_frame = Ether(src=source_mac, dst=destination_mac, type=0x86DD)
++	with_eth = True
++
++	packets=[]
++	for packet in packet_list:
++		packets.append(packet[0])
++	wrpcap(pcap_out, packets)
++
++# Run ping test
++def Run_Test():
++	global packet_list, verbose, source_ip, destination_ip
++
++	# Open raw ICMP socket
++	try:
++	    s = socket.socket(socket.AF_INET6, socket.SOCK_RAW,
++			      socket.IPPROTO_ICMPV6)
++	except PermissionError:
++		print("This script requires root privileges.")
++		return 2
++
++	# Bind to interface by its IP address
++	s.bind((source_ip, 0))
++
++	# Run through eACH PACKET
++	for packet in packet_list:
++		# Send packet
++		send(packet[0], verbose=False)
++
++		s.settimeout(0.100)
++		found_it = False
++
++		# Try to get ICMP echo reply
++		try:
++			while (found_it == False):
++				rpacket, addr = s.recvfrom(1024)
++				x = struct.unpack(">H", rpacket[0:2])
++				icmp_type, icmp_code = struct.unpack("BB",
++								rpacket[0:2])
++				checksum = struct.unpack("H", rpacket[2:4])
++				identifier = struct.unpack(">H", rpacket[4:6])
++				seqno = struct.unpack(">H", rpacket[6:8])
++				if (icmp_type ==
++				    proto_nums.ICMP6_Type.ICMPV6_ECHO_REPLY.value and
++				    identifier[0] == packet[2]):
++					found_it = True
++
++		except socket.timeout:
++			pass
++
++		if (verbose):
++			if (found_it):
++				if (packet[3]):
++					print("TEST: %s: Received as expected" %
++								packet[4])
++				else:
++					print("TEST: %s: Unexpedted receive" %
++								packet[4])
++			else:
++				if (packet[3]):
++					print("TEST: %s: Didn't receive, "
++					      "but receive expected" %
++								packet[4])
++				else:
++					print("TEST: %s: Didn't receive as "
++					      "expected" % packet[4])
++
++
++		if (found_it and packet[3] != True):
++			# We got a reply but weren't expecting one
++			print("FAIL: Receive was unexpected for %s" % packet[4])
++			return 1
++		elif (not found_it and packet[3]):
++			# We didn't get a reply but weret expecting one
++			print("FAIL: Expected to receive for %s" % packet[4])
++			return 1
++
++	return 0
++
++# Make packets for various test cases
++def Make_Test_Packets():
++	global packet_list
++
++	# Two non-padding options in HBH and DestOpt, should succeed
++	# with default sysctls
++	Make_Packet("Two non-padding options in HBH and DestOpts",
++	    [
++		("H", [(11, 4), (0, 0), (0, 0), (12, 3)]),
++		("D", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++		("D", [(1, 4), (12, 3)]),
++	    ])
++
++	# Big destination option, should fail when
++	# net.ipv6.max_dst_opts_length equals 64
++	Make_Packet("Big destination option",
++	    [
++		("H", [(11, 4), (0, 0), (0, 0), (12, 3)]),
++		("D", [(1, 4), (12, 255)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++	    ])
++
++	# Almost Big HBH option should succeed when
++	# net.ipv6.max_hbh_length equals 64
++	Make_Packet("Almost Big HBH option",
++	    [
++		("H", [(11, 53), (1, 0), (12, 3)]),
++		("D", [(1, 4), (12, 1)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++	    ])
++
++	# Big Hop-by-Hop option, should fail when
++	# net.ipv6.max_hbh_length equals 64
++	Make_Packet("Big HBH option",
++	    [
++		("H", [(11, 53), (1, 0), (0, 0), (12, 3)]),
++		("D", [(1, 4), (12, 1)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++	    ])
++
++	# Too much HBH padding, should always fail
++	Make_Packet("Too much HBH padding",
++	    [
++		("H", [(12, 3), (1, 8)]),
++		("D", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++		("D", [(1, 4), (12, 3)]),
++	    ])
++
++	# Too much DestOpt padding, should always fail
++	Make_Packet("Too much DestOpt padding",
++	    [
++		("H", [(12, 3), (1, 8)]),
++		("D", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++		("D", [(1, 4), (12, 3), (0, 0), (1, 6), (0, 0), (12, 3)]),
++	    ])
++
++	# Too much DestOpt padding, should always fail
++	Make_Packet("Too much DestOpt padding #2",
++	    [
++		("H", [(12, 3)]),
++		("D", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++		("D", [(1, 4), (12, 3), (0, 0), (0, 0), (0, 0), (0, 0),
++		       (0, 0), (0, 0), (0, 0), (0, 0), (12, 3)]),
++	    ])
++
++	# Too much DestOpt padding, should always fail
++
++	Make_Packet("Too much DestOpt padding #3",
++	    [
++		("D", [(0, 0), (0, 0), (0, 0), (0, 0),
++		       (0, 0), (0, 0), (0, 0), (0, 0)]),
++	    ])
++
++	# Almost too much DestOpt padding, should succeed with default
++	# sysctl settings
++	Make_Packet("Almost too much DestOpt padding #2",
++	    [
++		("H", [(12, 3)]),
++		("D", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("F", (0x89abcdef)),
++		("D", [(1, 4), (12, 3), (0, 0), (0, 0), (0, 0), (0, 0),
++		       (0, 0), (0, 0), (0, 0), (12, 3)]),
++	    ])
++
++	# Two Dest Ops, should fail unless net.ipv6.enforce_ext_hdr_order
++	# equals 1
++	Make_Packet("Two Dest Ops",
++	    [
++		("D", []),
++		("D", []),
++	    ])
++
++	# OOO Routing headers, should fail unless
++	# net.ipv6.enforce_ext_hdr_order equals 1
++	Make_Packet("OOO Routing header",
++	    [
++		("F", (0x89abcdef)),
++		("R", [ "888::1", "9999::1"]),
++	    ])
++
++	# Two Routing headers, should fail unless
++	# net.ipv6.enforce_ext_hdr_order equals 1
++	Make_Packet("Two Routing headers",
++	    [
++		("R", [ "888::1", "9999::1"]),
++		("R", [ "888::1", "9999::1"]),
++	    ])
++
++	# Two DestOpt headers with Routing header should succeed with default
++	# sysctl settings
++	Make_Packet("Two Destination options okay",
++	    [
++		("D", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3)]),
++	    ])
++
++	# Two DestOpt headers without Routing header should fail unless
++	# net.ipv6.enforce_ext_hdr_order equals 1
++	Make_Packet("Two Destination options",
++	    [
++		("D", [(1, 4), (12, 3)]),
++		("D", [(1, 4), (12, 3)]),
++	    ])
++
++	# Two DestOpt headers after Routing header, should fail unless
++	# net.ipv6.enforce_ext_hdr_order equals 1
++	Make_Packet("Two Destination options after RH",
++	    [
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3)]),
++		("D", [(1, 4), (12, 3)]),
++	    ])
++
++	# Many extension headers, should fail unless
++	# net.ipv6.enforce_ext_hdr_order equals 1
++	Make_Packet("Many EH OOO",
++	    [
++		("H", [(1, 4), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3)]),
++		("D", [(1, 4), (12, 3), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3)]),
++		("F", (0x89abcdef)),
++		("D", [(1, 4), (12, 3), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3), (12, 3)]),
++		("R", [ "888::1", "9999::1"]),
++		("R", [ "888::1", "9999::1"]),
++		("D", [(1, 4), (12, 3), (12, 3)]),
++	    ])
++
++	# Two fragment headers, should always fail due to stack
++	# implementation
++	Make_Packet("Two fragment Headers",
++	    [
++		("F", (0x89abcdef)),
++		("F", (0x89abcdef)),
++	    ])
++
++Cli_Args()
++
++Make_Test_Packets()
++
++if (pcap_out != ""):
++	Write_Pcap(pcap_out)
++	status = 0
++else:
++	status = Run_Test()
++
++exit(status)
+diff --git a/tools/testing/selftests/net/eh_limits.sh b/tools/testing/selftests/net/eh_limits.sh
+new file mode 100755
+index 000000000000..4a101930ab54
+--- /dev/null
++++ b/tools/testing/selftests/net/eh_limits.sh
+@@ -0,0 +1,205 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++# Tests extension header limits.
++#
++# We start by setting up two network namespaces with IPv6 addresses.
++# Then we create ICMPv6 Echo Request packets with various combinations of
++# Extension Headers, and send them from one namespace to the other and
++# check if a reply is received. Based on the sysctl settings certain packets
++# are expected to produce echo replies and others are expected to be drop
++# because an Extension Header related limit is exceeded. If an Echo Reply is
++# received or not received per our expectations then the test passes,
++# otherwise if the result is unexpected that's a test failure.
++# Tests extension header limits.
++
++source lib.sh
++
++ret=0
++
++# all tests in this script. Can be overridden with -t option
++TESTS="eh_limits"
++
++VERBOSE=""
++PAUSE_ON_FAIL=no
++PAUSE=no
++NAME="EH-limits"
++
++IP1="2001:db8::1"
++IP2="2001:db8::2"
++
++log_test()
++{
++	local rc=$1
++	local expected=$2
++	local msg="$3"
++
++	if [ ${rc} -eq ${expected} ]; then
++		printf "    TEST: %-60s  [ OK ]\n" "${msg}"
++		nsuccess=$((nsuccess+1))
++	else
++		ret=1
++		nfail=$((nfail+1))
++		printf "    TEST: %-60s  [FAIL]\n" "${msg}"
++		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
++		echo
++			echo "hit enter to continue, 'q' to quit"
++			read a
++			[ "$a" = "q" ] && exit 1
++		fi
++	fi
++
++	if [ "${PAUSE}" = "yes" ]; then
++		echo
++		echo "hit enter to continue, 'q' to quit"
++		read a
++		[ "$a" = "q" ] && exit 1
++	fi
++}
++
++################################################################################
++# Setup
++
++setup()
++{
++	set -e
++
++	setup_ns ns1 ns2
++
++	NS_EXEC="ip netns exec"
++
++	ip link add veth1 type veth peer name veth2
++
++	ip link set veth1 netns "$ns1"
++	ip link set veth2 netns "$ns2"
++
++	$NS_EXEC "$ns1" ip addr add ${IP1}/64 dev veth1
++	$NS_EXEC "$ns1" ip link set veth1 up
++	$NS_EXEC "$ns1" ip link set lo up
++
++	$NS_EXEC "$ns2" ip addr add ${IP2}/64 dev veth2
++	$NS_EXEC "$ns2" ip link set veth2 up
++	$NS_EXEC "$ns2" ip link set lo up
++
++	# Enable SRv6 on the receiver since that's the type of routing header
++	# used in the test
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.conf.all.seg6_enabled=1 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.conf.veth2.seg6_enabled=1 > /dev/null
++
++	set +e
++
++	# Send a ping to do neighuor discovery
++	$NS_EXEC "$ns1" ping6 -w 2 $IP2 -c 1 > /dev/null
++}
++
++exit_cleanup_all()
++{
++	cleanup_all_ns
++	exit "${EXIT_STATUS}"
++}
++
++eh_limits_test()
++{
++	local ip_addrs="--src_ip $IP1 --dst_ip $IP2"
++
++	if [ "$VERBOSE" = "-v" ]; then
++		echo ">>>>> Default"
++	fi
++
++	# Run the test with default sysctl settings
++	$NS_EXEC "$ns1" python3 ./eh_limits.py $VERBOSE $ip_addrs
++
++	log_test $? 0 "$NAME - default sysctls"
++
++	if [ "$VERBOSE" = "-v" ]; then
++		echo ">>>>> No order enforce, 8 options, 66 length limit"
++	fi
++
++	# Set extension header limit sysctls. We do this on both sides since
++	# the sender reads the sysctl's to determine pass/fail expectations
++
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.enforce_ext_hdr_order=0 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_dst_opts_number=8 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_hbh_opts_number=8 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_hbh_length=64 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_dst_opts_length=64 > /dev/null
++
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.enforce_ext_hdr_order=0 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_dst_opts_number=8 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_hbh_opts_number=8 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_hbh_length=64 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_dst_opts_length=64 > /dev/null
++
++	# Run the test with modified sysctl settings
++	$NS_EXEC "$ns1" python3 ./eh_limits.py $VERBOSE $ip_addrs
++
++	log_test $? 0 "$NAME - modified sysctls"
++}
++
++################################################################################
++# usage
++
++usage()
++{
++	cat <<EOF
++usage: ${0##*/} OPTS
++
++        -t <test>   Test(s) to run (default: all)
++                    (options: $TESTS)
++        -p          Pause on fail
++        -P          Pause after each test before cleanup
++        -v          verbose mode (show commands and output)
++EOF
++}
++
++################################################################################
++# main
++
++while getopts :t:pPhv o
++do
++	case $o in
++		t) TESTS=$OPTARG;;
++		p) PAUSE_ON_FAIL=yes;;
++		P) PAUSE=yes;;
++		v) VERBOSE="-v";;
++		h) usage; exit 0;;
++		*) usage; exit 1;;
++	esac
++done
++
++PEER_CMD="ip netns exec ${PEER_NS}"
++
++# make sure we don't pause twice
++[ "${PAUSE}" = "yes" ] && PAUSE_ON_FAIL=no
++
++if [ "$(id -u)" -ne 0 ];then
++	echo "SKIP: Need root privileges"
++	exit $ksft_skip;
++fi
++
++if [ ! -x "$(command -v ip)" ]; then
++	echo "SKIP: Could not run test without ip tool"
++	exit $ksft_skip
++fi
++
++if [ ! -x "$(command -v socat)" ]; then
++	echo "SKIP: Could not run test without socat tool"
++	exit $ksft_skip
++fi
++
++# start clean
++cleanup &> /dev/null
++
++for t in $TESTS
++do
++	case $t in
++	eh_limits)		setup; eh_limits_test; cleanup_all_ns;;
++
++	help) echo "Test names: $TESTS"; exit 0;;
++	esac
++done
++
++if [ "$TESTS" != "none" ]; then
++	printf "\nTests passed: %3d\n" ${nsuccess}
++	printf "Tests failed: %3d\n"   ${nfail}
++fi
 -- 
 2.43.0
 
