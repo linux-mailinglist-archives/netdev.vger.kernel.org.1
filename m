@@ -1,226 +1,254 @@
-Return-Path: <netdev+bounces-256235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHXeIDjKgWl1JwMAu9opvQ
-	(envelope-from <netdev+bounces-256235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:13:12 +0100
+	id iA7NGQfJgWl1JwMAu9opvQ
+	(envelope-from <netdev+bounces-256233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:08:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCBA1D7618
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:13:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2586D7508
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 11:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D39B300E390
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 10:13:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 848883058A9A
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 10:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC1839C649;
-	Tue,  3 Feb 2026 10:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DA339C658;
+	Tue,  3 Feb 2026 10:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="kIGWXhrH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvydTPGI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KDRIwq+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4C7303CB6;
-	Tue,  3 Feb 2026 10:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EAF39A7EF
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 10:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770113588; cv=none; b=HUPzMeoLZrU4co3LhgyrPIJzpSvKsTJH1H37lYn+c+iGs7jJQceuzUwciPzxxtsChRcqvgxCWLm1HIZklrh6YWCyOjYB74lFwTRtFL4ksk4qV+JMi54RGykiYgeu58Svl3JclsfNOmExwpq8xqLM9Zj6K7Q4iYtuf8NOlX/8p+k=
+	t=1770113279; cv=none; b=cE7n9+6eAT3W34GNX9UjeAlaw7li7Nr7i9lzDEWVRTmCfo5BQByOk9+2VWZYV9jkjbbvBkvjKW2/xNAJ1pR18dga6Umsn35QDSu4cMq1EW1BUO7BOlXADxgDaIjS56N4sMp9T+qT/rysaDgbqRWEh0co5DP/D3jroC/pxpJuUs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770113588; c=relaxed/simple;
-	bh=pJ0goWwKS6MP4ur7vxzRvhXTxeUm60Sw2ceZqjxHz+o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Eo5O9MQI470wJSEdKUvbClkYlKeeWvBzdfusLXDueq2V9e44yGjyEwc6LRHl9hVZUXcUMa1MjF3ftMB0H767BGlYMYCt2Uxr0ooz+1CyhtJdZ0Zsp8Tv7mDYFpqzVjQMuLsk8/KGmfzN5hXzg5u82znYBZ7+9EiGlC1PUATannM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=kIGWXhrH; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4f4zbH658Rz9thY;
-	Tue,  3 Feb 2026 11:03:55 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1770113036;
+	s=arc-20240116; t=1770113279; c=relaxed/simple;
+	bh=GJgu6W5rJwbIyNtNorr8rYsILnJchB4cpfPCSfzgtVM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VSTsDAStxH0KsIzzV4D10/8zBJjAnvdTXAasAVQuTI7lHZqiC+WT0qfabeK6WiHs+Leeufd8uJjfIDXYjh4WyEYU68JS1MUwDWjnRqZCXyX5QsxGFHn48jinP3Yx8PiLUSCY4B3c4t4FrJ6Dig4EHYNN73CAyQvZzHcYK1trD8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SvydTPGI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KDRIwq+O; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770113276;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I/WLesTWjIpwef38SdQ4JX0gdMp0IJsjyMkm8xAgFWc=;
-	b=kIGWXhrH/fv5Z6UEAwBwiKWnU1HgR++qoAwUtaSjL0r2h36xtP6PXwALTo9+2xHpHvNDpX
-	7zzG/igQFe7TZlu/681yxRxR8YlgD6kHLF6QuhXJseIxd0hRuJkjd7lHXb4skFBFEXqdzh
-	jgCyWStCK5A94b3tELO/6fl8zgCGCNMb/s3//jcJUMlZV/K5Pr/H1HM+uH6cHsMNb0K0+p
-	dqlec2zoPzHAwiMB28GejqjFcDd7uK3S7/EQdz1XjIryuXQq9Qs4emeM15JzfeIKdplYVO
-	6p1jwz37A7xjGvN5mW8FZ4tYdhEKjcGECe2yHgo5PKxvwsyUKjSv9jnrfNM/XA==
-Date: Tue, 3 Feb 2026 11:03:41 +0100
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew@lunn.ch, shawnguo@kernel.org, krzk+dt@kernel.org,
- linux-kernel@vger.kernel.org, edumazet@google.com, netdev@vger.kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- conor+dt@kernel.org, horms@kernel.org, richardcochran@gmail.com,
- robh@kernel.org, imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- devicetree@vger.kernel.org, wahrenst@gmx.net, s.hauer@pengutronix.de,
- kernel@pengutronix.de, festevam@gmail.com
-Subject: Re: [net-next,v22,4/7] net: mtip: Add net_device_ops functions to
- the L2 switch driver
-Message-ID: <20260203110341.1ce21455@wsk>
-In-Reply-To: <20260203014247.824561-2-kuba@kernel.org>
-References: <20260131233459.1625279-5-lukasz.majewski@mailbox.org>
-	<20260203014247.824561-2-kuba@kernel.org>
-Organization: mailbox.org
+	bh=IGs2YkYoWlfGHazFM7O3osfPUjK8eaN/zd8OtSRCmyA=;
+	b=SvydTPGIxpvwbowm2bInXGSEREEOkkgTRKV48G/UK0p6+hquFCroVEMihAYO0cxq/Q1vc8
+	6/L0yCmL5/9np6TAzR8SRglZQTZfZTL719jwWveENjML0WHPk5JJPasMgUYVGJ7lFfBcGW
+	Xl+Cnx2eFHZ8h1ls3nPUt6zssf465ic=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-539-5ZAyjsHGNfOdP4tjqvHDOg-1; Tue, 03 Feb 2026 05:07:55 -0500
+X-MC-Unique: 5ZAyjsHGNfOdP4tjqvHDOg-1
+X-Mimecast-MFC-AGG-ID: 5ZAyjsHGNfOdP4tjqvHDOg_1770113274
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4359d70faa2so3325475f8f.1
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 02:07:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770113274; x=1770718074; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IGs2YkYoWlfGHazFM7O3osfPUjK8eaN/zd8OtSRCmyA=;
+        b=KDRIwq+ON8DU8K6jPDKLvdHekKcSdH1ftr4U6UQIv+QGK5l6ZNfw9rtxG6Ceaoy+cJ
+         AWPbrwuoB2kLxwopj/T3POHdi1FOA4nQJOR0rRlMAF3kuBbNyZtMezMBSJUVqkln/fQK
+         R/6qJDG+PQkhj18ogN9wjaRZFCuZN4/ObAbN6cDK7cmzFypwQa+CseNPY6ShxrDzofHI
+         7YDC12V7RmxNhUWwn6WeiomC1oqZc34e66YCB9Z1r7RHq+63N7IQq3EvCrDV3jCDofMh
+         emPJy8YyJgTP5w5tG5ZIYh59H30g/3ObCKW5sFlgezNn/Idq1AmDvkf6dn6JXuq9G5+I
+         2ZFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770113274; x=1770718074;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IGs2YkYoWlfGHazFM7O3osfPUjK8eaN/zd8OtSRCmyA=;
+        b=tB4+sX5eu3B20MKr5/qq+k2cl79XSeT/3vmzLKXE9G5qqKlYrdxQCCyWCkdOaHD1Np
+         2J8OR0Fx2vT6hbcUcXQ3gCZaNs1TaYD3j4DPllpuGgV41KLBeq6qfv06uvVEgvHYA9kx
+         J9zrorXyhLehHt+kiMcznoKPZIV5TNthLpCZGFf6n2IHDp8jsvHlrxnuDZOxv57Q6/gg
+         1wF5UKXlJJ2O85SsF2qbFb2cR4FRidbMRCtcL0XHhLRU2II9EwcaozzrxqCo/Nga5hd1
+         A3ibmd1N8SwdVml4YCO+JpMsVt8AwMKM802VGXxgUHW+g3GH4k+7C+snYFoTzC921wIz
+         SilA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTscsOUKPHZRyMXgrJkkBtUICHhXTr8GUCI/56WVvJAyKQWx93Q9Ck9MK+GEoGrCEew9wQBCU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfNvxr9rIh/4ee1x9beN5MNZNJDKNqNxc9tWqkLXQK/w6DF5T2
+	GBO3RW4nFlE0DT0uIumEXHtptRZ23sBXoFedEbjrv5ZFBy342d6kSFPxkdlWNAadSHTSC2jjKwF
+	PIfh4wMvRIzy8w8HWbjUzlTPKp/idXDlw/64kjyS2+vLVxdaHIJzae23DOQ==
+X-Gm-Gg: AZuq6aLwNJYvA3Kbhs3eyTqYs6BBn+FyZF4bZIvBFBEOfi5ku89kTsmK/iA6PcRap2V
+	x7/mZg1kcbwzDjg+IqwAzzmmn/XQZ8C/WsXnA+DRJfQcPbVQ+ofbqSLlXjmHx23nhz9Hw9+eRoO
+	GvtZ7KNxJ4twoe6dF8HMj0dE2b4hPb6kcRr7EfXpffUohEeb23+XmKcPdSOmOyGVNsyvyQrEFV3
+	CEKDQ1HPVHKPTRCr2qU5z1P/2BrWc+Ptr/yTA7RdUxjkKEhGqCc0TjST2kPapGP2ZFvoYDP6Drc
+	liZ7n4AMSTsS8N0RiZUVcvvRIswCW9JDPX7irx0ahMW3gHxoYqCFGYtQZ/sf9Cok/2xzC6/3hhF
+	fbrV2cdtX3/I=
+X-Received: by 2002:a05:600c:1f14:b0:47e:e807:a05a with SMTP id 5b1f17b1804b1-482db4a6193mr194760605e9.33.1770113273864;
+        Tue, 03 Feb 2026 02:07:53 -0800 (PST)
+X-Received: by 2002:a05:600c:1f14:b0:47e:e807:a05a with SMTP id 5b1f17b1804b1-482db4a6193mr194760295e9.33.1770113273418;
+        Tue, 03 Feb 2026 02:07:53 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.93.21])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e04d168bsm114722155e9.6.2026.02.03.02.07.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Feb 2026 02:07:53 -0800 (PST)
+Message-ID: <e68843a2-632c-4703-8a75-551c56232224@redhat.com>
+Date: Tue, 3 Feb 2026 11:07:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 10/10] test: Add networking sefltest for eh
+ limits
+To: Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, justin.iurman@uliege.be,
+ willemdebruijn.kernel@gmail.com
+References: <20260203004853.94438-1-tom@herbertland.com>
+ <20260203004853.94438-11-tom@herbertland.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260203004853.94438-11-tom@herbertland.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: fe9904b47499ae8f7ea
-X-MBO-RS-META: zwqoyhezb5rx5qmpyzoc4ik3614jqbee
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256235-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,google.com,redhat.com,davemloft.net,gmail.com,lists.linux.dev,lists.infradead.org,gmx.net,pengutronix.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-256233-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
+	FREEMAIL_TO(0.00)[herbertland.com,davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: DCBA1D7618
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[eh_limits.py:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,drop_monitor_tests.sh:url]
+X-Rspamd-Queue-Id: D2586D7508
 X-Rspamd-Action: no action
 
-Hi Jakub,
+On 2/3/26 1:48 AM, Tom Herbert wrote:
+> Add a networking selftest for Extension Header limits. The
+> limits to test are in systcls:
+> 
+> 	net.ipv6.enforce_ext_hdr_order
+> 	net.ipv6.max_dst_opts_number
+> 	net.ipv6.max_hbh_opts_number
+> 	net.ipv6.max_hbh_length
+> 	net.ipv6.max_dst_opts_length
+> 
+> The basic idea of the test is to fabricate ICMPv6 Echo Request
+> packets with various combinations of Extension Headers. The packets
+> are sent to a host in another namespace. If a an ICMPv6 Echo Reply
+> is received then the packet wasn't dropped due to a limit being
+> exceeded, and if it was dropped then we assume that a limit was
+> exceeded. For each test packet we derive an expectation as to
+> whether the packet will be dropped or not. Test success depends
+> on whether our expectation is matched. i.e. if we expect a reply
+> then the test succeeds if we see a reply, and if we don't expect a
+> reply then the test succeeds if we don't see a reply.
+> 
+> The test is divided into a frontend bash script (eh_limits.sh) and a
+> backend Python script (eh_limits.py).
+> 
+> The frontend sets up two network namespaces with IPv6 addresses
+> configured on veth's. We then invoke the backend to send the
+> test packets. This first pass is done with default sysctl settings.
+> On a second pass we change the various sysctl settings and run
+> again.
+> 
+> The backend runs through the various test cases described in the
+> Make_Test_Packets function. This function calls Make_Packet for
+> a test case where arguments provide the Extension Header chain to
+> be tested. The Run_Test function loops through the various packets
+> and tests if a reply is received versus the expectation. If a test
+> case fails then an error status is returned by the backend.
+> 
+> The backend script can also be run with the "-w <pcap_file>" to
+> write the created packets to a pcap file instead of running the
+> test.
+> 
+> Signed-off-by: Tom Herbert <tom@herbertland.com>
+> ---
+>  tools/testing/selftests/net/Makefile     |   1 +
+>  tools/testing/selftests/net/eh_limits.py | 352 +++++++++++++++++++++++
+>  tools/testing/selftests/net/eh_limits.sh | 205 +++++++++++++
+>  3 files changed, 558 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/eh_limits.py
+>  create mode 100755 tools/testing/selftests/net/eh_limits.sh
+> 
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index afdea6d95bde..73195a2e8f1e 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -24,6 +24,7 @@ TEST_PROGS := \
+>  	cmsg_time.sh \
+>  	double_udp_encap.sh \
+>  	drop_monitor_tests.sh \
+> +	eh_limits.sh \
+>  	fcnal-ipv4.sh \
+>  	fcnal-ipv6.sh \
+>  	fcnal-other.sh \
+> diff --git a/tools/testing/selftests/net/eh_limits.py b/tools/testing/selftests/net/eh_limits.py
+> new file mode 100755
+> index 000000000000..01fcf15c6b94
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/eh_limits.py
+> @@ -0,0 +1,352 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# Test of extension header limits
+> +
+> +import ext_hdr
+> +import getopt
+> +import proto_nums
+> +import shlex
+> +
+> +from scapy.all import *
 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see
-> https://netdev-ai.bots.linux.dev/ai-local.html ---
-> net: mtip: Add net_device_ops functions to the L2 switch driver
->=20
-> This patch adds net_device_ops callbacks for the MTIP L2 switch
-> driver, including transmit, multicast configuration, MAC address
-> handling, and timeout recovery functions.
->=20
-> > diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c ---
-> > a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c +++
-> > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c =20
->=20
-> [ ... ]
->=20
-> > +static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
-> > +					struct net_device *dev,
-> > int port) +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	unsigned short status;
-> > +	unsigned int index;
-> > +	struct cbd_t *bdp;
-> > +	void *bufaddr;
-> > +
-> > +	spin_lock_bh(&fep->hw_lock); =20
->=20
-> [ ... ]
->=20
-> > +	/* Save skb pointer. */
-> > +	fep->tx_skbuff[index] =3D skb; =20
->=20
-> mtip_start_xmit_port() stores sk_buffs in fep->tx_skbuff[index] and
-> creates DMA mappings, but mtip_switch_tx() which should complete TX
-> operations is empty:
->=20
-> static void mtip_switch_tx(struct switch_enet_private *fep)
-> {
-> }
->=20
-> The NAPI poll handler mtip_rx_napi() calls mtip_switch_tx() to reclaim
-> transmitted buffers. Since it does nothing, won't every transmitted
-> packet leak the skb and DMA mapping? Also, dirty_tx is never
-> advanced, so the TX ring will fill (cur_tx =3D=3D dirty_tx) and stop
-> accepting packets.
->=20
-> jakub: maybe add a TODO comment transiently here, since later patch
-> implements the cleanup?
+Not a real review yet, but this is causing self-test failure, because
+scapy is not available/installed in our runners.
 
-The mtip_switch_tx() is empty as we have agreed, that I will divide
-this driver to several patches to ease the review.
+To prevent such failures you should add:
 
-Adding TODO seems to only make AI review happy, as:
+require_command scapy
 
-- The patch which adds support for FEC_MTIP_L2SW in Kconfig will be
-  sent after the driver is accepted to net-next
+in the test shell script.
 
-- Those commits are even now bisectable when FEC_MTIP_L2SW is
-  enabled (when I test the setup).
+Also please be aware that CI runs linters vs python and shell code, and
+there are quite a few complains with them. You can use the
+`ingest_mdir.py` tool from:
 
-Anyway, if you still would like to have the TODO comment, then please
-give me a hint how it shall be written to make the AI happy...
+ https://github.com/linux-netdev/nipa/blob/main/ingest_mdir.py
 
+to automate the pre-submit checks.
 
+Thanks,
 
-And maybe a few my thoughts:
-
-1. AI review seems to bring each time different issues - even the
-"grammatic" ones were not provided with the first AI generated review.
-
-2. I have tried to setup claudie> to run the patch set through it -
-however, it requires a paid account on a cloud/AI vendor (and I guess
-that different vendors' AI engines produce different output for the same
-"AI prompt")?
-
-
-Anyway, I do appreciate the AI review - it provides very deep insights
-through the code.
-
->=20
-> > +static void mtip_timeout(struct net_device *dev, unsigned int
-> > txqueue) +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +
-> > +	dev->stats.tx_errors++; =20
->=20
-> Jakub Kicinski noted in v16 review that tx_errors are already counted
-> by the network stack, and the statistic is exposed per-queue in
-> sysfs. Does incrementing tx_errors here double-count timeout events?
->=20
-> https://lore.kernel.org/all/20250725151618.0bc84bdb@kernel.org/
->=20
-
-Yes, this shall been removed.
-
-> > +	DO_ONCE(mtip_print_hw_state, dev);
-> > +
-> > +	schedule_work(&priv->tx_timeout_work);
-> > +} =20
+Paolo
 
 
-
---=20
-Best regards,
-
-=C5=81ukasz Majewski
 
