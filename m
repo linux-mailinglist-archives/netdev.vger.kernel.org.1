@@ -1,258 +1,225 @@
-Return-Path: <netdev+bounces-256258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256259-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SH34AFPegWmDLQMAu9opvQ
-	(envelope-from <netdev+bounces-256258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:38:59 +0100
+	id 2ObjNHPegWkXLgMAu9opvQ
+	(envelope-from <netdev+bounces-256259-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:39:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76DB6D87C8
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:38:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31681D87F6
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B36E9308C253
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 11:32:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9074C3011F0C
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 11:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6062318B8F;
-	Tue,  3 Feb 2026 11:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDDE158535;
+	Tue,  3 Feb 2026 11:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6B0+8qW";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tynBgFKy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jvyTNAoE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B802DEA95
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 11:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD08C2877D6
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 11:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770118375; cv=none; b=NdBJg7Pb2H9D3yyeY2vRUVAnNbyQpzGusyVre2kud0i58zbYJB9YF3m7hZkmKcCcWAxfm0ZPD2bCnwLDA1atACOaJOy/TvRyCmTBYfQPWmQlKi8ykRCJ75USvVuLAo3oAN8wXS50Qfv3El62/BbrH2mwC4cpXtdquDKmEBCgpCc=
+	t=1770118432; cv=none; b=dLQgyUffkLaeiei+RNq4OcFblHoowDtnOtCazCBoXwpsH6PWEr2ig5YiPck/pS5lbpLuVmuL8kKWOTHfr4nesTfV2uI4v/JP6G894wwv4/VQKm2aaSSy/9ir/MI6K3r2n2adsvTjn+inbttxnWf2cdzpo7UyJ89uHsKgq1iMsEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770118375; c=relaxed/simple;
-	bh=fvyV02ZW3kLZ2e5V7ZC1CiXFpmVv76IxX1uzkp0TxLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iJ4JaMFnSaitcdgW1wfqgGaGFyRAyQDQH73KTuPUUwWwpt9abgzei5vyhp7+TArcur7DFVKy49/O1MiVNlv5LNJRwzmmqUcsuaEl0VkNu/cNNp6fNoSyrwzWdmusQMcEonIbnFWOuvQZg0C3PeDzprD4hH2pd8s9zCMyGh2wjVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F6B0+8qW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tynBgFKy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770118373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WCFzyXHFlPrMBFKkr2XvCqwF53SaNdsFKd3C1yICKWI=;
-	b=F6B0+8qW9t5XaGMLWv62g/c9CWO3ds5hTK+T/uXuMtmcwFoBYdfO651dFIAhFDodgmiRgl
-	vRBptYhUslzm5nX59PWOn8I20by0exhGUofN+BnafJSNeAN6rF8KoM8LMrDAa6U3KVd+IP
-	0ouXlCVqbuVr9wR/zlTZBVxu9weUV5s=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-572-nOzy3ZVTN8C5yQIbuKSfhw-1; Tue, 03 Feb 2026 06:32:52 -0500
-X-MC-Unique: nOzy3ZVTN8C5yQIbuKSfhw-1
-X-Mimecast-MFC-AGG-ID: nOzy3ZVTN8C5yQIbuKSfhw_1770118371
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47ee1fe7b24so54256135e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 03:32:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770118371; x=1770723171; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WCFzyXHFlPrMBFKkr2XvCqwF53SaNdsFKd3C1yICKWI=;
-        b=tynBgFKy0qAyy7GwXSMkQk0Pv2earhvBOmalSCGZxSY5K1OObbRWoj4VKewai5NYHM
-         gN/6VnDZM9M062r+l8uwmNOBOvcNJFu57agARIWf4fzZbQ4BZLfLWhD/qNS/Bz/bq7rU
-         Q4tNgU7iuIzw/kFtERsKWcoPe6MygtoAwR7Rb6yQYsxWytcZGj200fz2nSKsr+6F2dBr
-         0H48yWHlIMP182Na8VwEK1r00bn22aJCiCJLumTLOAijZOPlzWGuJpcQBNIPOsYFWDWi
-         Mn7Pa1Wy3Q68/DDG62t45WzbpTMTpt8uUD1GawiB40+3WPy7jwzSkT7Sxy0DG2+R48XB
-         ZxIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770118371; x=1770723171;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WCFzyXHFlPrMBFKkr2XvCqwF53SaNdsFKd3C1yICKWI=;
-        b=TaKmU3m5Oces/pBNjkmfu1n5r0z27HN2UNeV7QVBeL7lqxORdoVWjSY/g3fVq9rwY9
-         S7sakjjXylU+oLp0Eu2WkqlQBMQdo7CANHu02S9/y6M8ig6KkXu4ef2cAKAKWMIFIROi
-         3CHUT08BAknHC4DTk8BlPcXYfj7vsz0wx58mg+Lzgduz7AYIt7W5UdEW/3MjymHuJrMO
-         s0j/7mMD6doOlEiVk1gjBz5WlEidJxQoks2WPsauIHmU4aCUpbADx4cdR6u9txu4dxrV
-         p4AntzjXp1nh8+BpuyMEZt3RZrF28UFFZ5p3dIKcoePwaV8RjnzjE9nLajahS6qbHKKN
-         wjKw==
-X-Forwarded-Encrypted: i=1; AJvYcCVITKJc9xqW8ZY5zReTRPsznWW8OKooGXORMGT159CziX9RgNHAGlchmTNNutokXt/TYsE6phc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8Qhs0jjrRsN/km/LwWfsIXZAn4FBm6k4hitde7ME31siPp4rq
-	ehs5ctGjC0+f6YEr5qsQpC9O54cD0L2K/Lllql8gc+LGjo4NSu94ffZXLjAEHyRaIHiooGLIga7
-	E0FdrSwj/+6bBQeILwoDZmeeYYjt84kfRR+T3gleindD6fKhm5RVMNaCS/A==
-X-Gm-Gg: AZuq6aK0o/CTibz++eXlMmhRhMMrA9wXb9gNmxuy1FMwWCo68E1zIAwluauXnEG4SCG
-	wQy3BmyTjezBqpu2f0xJZeO7dw7nTMmyNbKDW0U7o7NUsNPwXvJGZivIreYqO75Gn2l8hwMFFIK
-	PYPvxKYkNVOlnO9D4eCYGwvhagUeSi6t/OMR5am85SpsGfj6Ih8kfCgnh8MBYeoXmw4KtKW1SLf
-	k1JWr8MoEOtHPPYGnpGLDkeM70iSpAF6pcpugQFBQM1Rdws50ZabpJt3Fu5Of1gY3fvXqsPMpBs
-	Um++eIZdlbMGygUpBrYvLv4OLgLE+qMh4Sd3wZTnWxDh6UNe7MCM60Xhpn0HabuC2Q+MRS5DKV2
-	/TxUv102S
-X-Received: by 2002:a05:600c:474d:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-482db44d141mr233861685e9.4.1770118370849;
-        Tue, 03 Feb 2026 03:32:50 -0800 (PST)
-X-Received: by 2002:a05:600c:474d:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-482db44d141mr233861205e9.4.1770118370338;
-        Tue, 03 Feb 2026 03:32:50 -0800 (PST)
-Received: from [192.168.2.83] ([46.175.183.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4360ef9e804sm9385010f8f.41.2026.02.03.03.32.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 03:32:49 -0800 (PST)
-Message-ID: <db1723e3-294d-46b7-aa4c-11a21b0da82f@redhat.com>
-Date: Tue, 3 Feb 2026 12:32:47 +0100
+	s=arc-20240116; t=1770118432; c=relaxed/simple;
+	bh=xlu7LoTEstWjiNJRTJ9vJS+ZSAuiYIavZPr2kG3hUWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u60PD3W2HUSTYyX+PlAiFQHjNth1XuJxQhmNaI8TDMoRe+s8nNkNNhnZx3aaRf1qpTFjReSuH9mvfKPotKcbZZKHWYPnDg+DISGfH2e+nDz+xVPX++itxL9YhfWSJwi/9HAdHky3Bi6I91c667RbQo/Iey38YUhXm3mZxUM67Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jvyTNAoE; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770118430; x=1801654430;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xlu7LoTEstWjiNJRTJ9vJS+ZSAuiYIavZPr2kG3hUWk=;
+  b=jvyTNAoE9xYMgDBQ3pFYAmVkocvw3HUzhkH4WUlFFmxNohG0Z6DHfS0n
+   8l/UnAjgbKBZiBeCfvWRfTOC5i9zlg526I/a1FOx6TDlDKEPTl5nUc5TS
+   Ec9AxpEt3045XZTjpLMk/32cJtT+1sajNLTWkx165yGsKXc53WPZWSHIP
+   kRoey7rX7i1+kioPIhWvPIKfyv64Ft5Vs/xjVADVvWY/2CarC+qYT2snS
+   JCNCu2Mo35w+U9GE7TozllxxcXdZrFvsSlPZvZx0EIzf/Hi1zqtbi/dgF
+   c/C31Ze+fC/lMCzCxgYev2m+F4/bE3P4mwmDlOJz2IhqAogcUB0N96J5/
+   g==;
+X-CSE-ConnectionGUID: Ti7PSuoZTiuV/FhjPO0sjw==
+X-CSE-MsgGUID: CKaZoVewSv+CfwWoNf6arQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="88862044"
+X-IronPort-AV: E=Sophos;i="6.21,270,1763452800"; 
+   d="scan'208";a="88862044"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 03:33:50 -0800
+X-CSE-ConnectionGUID: DjpZi5DRQvyoB426zvZieQ==
+X-CSE-MsgGUID: Qvqb8fTsQSG2xQtlUdgghA==
+X-ExtLoop1: 1
+Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
+  by fmviesa003.fm.intel.com with ESMTP; 03 Feb 2026 03:33:49 -0800
+Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vnEfB-000000003Mf-3Mda;
+	Tue, 03 Feb 2026 11:33:45 +0000
+Date: Tue, 3 Feb 2026 12:33:19 +0100
+From: kernel test robot <lkp@intel.com>
+To: Murari Prasad Samal <murariprasadsamal57@gmail.com>,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com,
+	Murari Prasad Samal <murariprasadsamal57@gmail.com>
+Subject: Re: [PATCH] net: ifb: record drop reason when redirect device is
+ missing
+Message-ID: <202602031242.kPM0xECv-lkp@intel.com>
+References: <20260202191135.7668-1-murariprasadsamal57@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net] iavf: fix deadlock in reset
- handling
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: ivecera@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20260202084820.260033-1-poros@redhat.com>
- <20260202155813.3f8fbc27@kernel.org>
- <b064ca33-1d94-4c7e-b0d0-78430d8cd0ac@intel.com>
- <14cb0b22-ec39-43e4-a35b-22ad558b2e34@redhat.com>
- <7907d42e-4805-48bc-aaf6-16cbe46eb1d2@intel.com>
-Content-Language: en-US
-From: Petr Oros <poros@redhat.com>
-In-Reply-To: <7907d42e-4805-48bc-aaf6-16cbe46eb1d2@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260202191135.7668-1-murariprasadsamal57@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lists.linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256258-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256259-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 76DB6D87C8
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 31681D87F6
 X-Rspamd-Action: no action
 
+Hi Murari,
 
-On 2/3/26 11:19, Przemek Kitszel wrote:
-> On 2/3/26 09:44, Petr Oros wrote:
->>
->> On 2/3/26 02:00, Jacob Keller wrote:
->>>
->>>
->>> On 2/2/2026 3:58 PM, Jakub Kicinski wrote:
->>>> On Mon,  2 Feb 2026 09:48:20 +0100 Petr Oros wrote:
->>>>> +    netdev_unlock(netdev);
->>>>> +    ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
->>>>> + !iavf_is_reset_in_progress(adapter),
->>>>> +                           msecs_to_jiffies(5000));
->>>>> +    netdev_lock(netdev);
->>>>
->>>> Dropping locks taken by the core around the driver callback
->>>> is obviously unacceptable. SMH.
->>>
->>> Right. It seems like the correct fix is to either a) have reset take 
->>> and hold the netdev lock (now that its distinct from the global RTNL 
->>> lock) or b) refactor reset so that it can defer any of the netdev 
->>> related stuff somehow.
->>>
->> I modeled this after the existing pattern in iavf_close() (ndo_stop), 
->> which also temporarily releases the netdev instance lock taken by the 
->> core to wait for an async operation to complete:
->
-> First of all, thank you for working on that, I was hit by the very same
-> problem (no series yet), but my local fix is the same as of now.
->
-> I don't see an easy fix (w/o substantial driver refactor).
->
->>
->> static int iavf_close(struct net_device *netdev)
->> {
->>          netdev_assert_locked(netdev);
->>          ...
->>          iavf_down(adapter);
->>          iavf_change_state(adapter, __IAVF_DOWN_PENDING);
->>          iavf_free_traffic_irqs(adapter);
->>
->>          netdev_unlock(netdev);
->>
->>          status = wait_event_timeout(adapter->down_waitqueue,
->>                                      adapter->state == __IAVF_DOWN,
->>                                      msecs_to_jiffies(500));
->>          if (!status)
->>                  netdev_warn(netdev, "Device resources not yet 
->> released\n");
->>          netdev_lock(netdev);
->>          ...
->> }
->>
->> This was introduced by commit 120f28a6f314fe ("iavf: get rid of the 
->> crit lock"), and ndo_stop is called with netdev instance lock held by 
->> the core just like ndo_change_mtu is. 
->
-> technically it was introduced by commmit afc664987ab3 ("eth: iavf:
-> extend the netdev_lock usage")
->
->> Could you clarify why the unlock-wait- lock pattern is acceptable in 
->> ndo_stop but not here?
->>
->
-> perhaps just closing netdev is a special kind of operation
->
-> Other thing is that the lock was added to allow further NAPI
-> development, and one silly driver should not stop that effort.
-> Sadly, we have not managed to re-design the driver yet. I would like to
-> do so personally, but have much work accumulated/pending to free my time
->
-I agree, the unlock-wait-lock pattern is fundamentally flawed (I now 
-understand
-why it is unacceptable) and should be avoided.
+kernel test robot noticed the following build errors:
 
-What can we do now?
+[auto build test ERROR on net/main]
+[also build test ERROR on net-next/main linus/master v6.19-rc8 next-20260202]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-* Eliminating the wait is not an option: As noted in the description of 
-commit
-c2ed2403f12c, this wait was originally added to fix a race condition where
-adding an interface to bonding failed because the device remained in
-__RESETTING state after the callback returned.
-* Passing the lock into reset is impractical: The reset path is 
-triggered from
-numerous contexts, many of which are not under the netdev_lock, making this
-even more complex than a full refactor.
+url:    https://github.com/intel-lab-lkp/linux/commits/Murari-Prasad-Samal/net-ifb-record-drop-reason-when-redirect-device-is-missing/20260203-031526
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260202191135.7668-1-murariprasadsamal57%40gmail.com
+patch subject: [PATCH] net: ifb: record drop reason when redirect device is missing
+config: i386-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20260203/202602031242.kPM0xECv-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602031242.kPM0xECv-lkp@intel.com/reproduce)
 
-If dropping the lock is a no-go, the only viable path forward is to 
-split the
-reset_task so that the waiting portion is decoupled from the netdev_lock
-critical section.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602031242.kPM0xECv-lkp@intel.com/
 
-The fact remains that MTU configuration and ring parameter changes are
-currently broken in iavf. Changing the MTU on a Virtual Function is a
-fundamental configuration not an obscure edge case that can remain 
-non-functional.
+All errors (new ones prefixed by >>):
 
-I would appreciate any further guidance on how you would prefer...
+>> drivers/net/ifb.c:118:26: error: use of undeclared identifier 'SKB_DROP_REASON_NO_DEV'; did you mean 'SKB_DROP_REASON_NOMEM'?
+     118 |                         kfree_skb_reason(skb, SKB_DROP_REASON_NO_DEV);
+         |                                               ^~~~~~~~~~~~~~~~~~~~~~
+         |                                               SKB_DROP_REASON_NOMEM
+   ./include/net/dropreason-core.h:446:2: note: 'SKB_DROP_REASON_NOMEM' declared here
+     446 |         SKB_DROP_REASON_NOMEM,
+         |         ^
+   1 error generated.
 
 
+vim +118 drivers/net/ifb.c
+
+    88	
+    89	static void ifb_ri_tasklet(struct tasklet_struct *t)
+    90	{
+    91		struct ifb_q_private *txp = from_tasklet(txp, t, ifb_tasklet);
+    92		struct netdev_queue *txq;
+    93		struct sk_buff *skb;
+    94	
+    95		txq = netdev_get_tx_queue(txp->dev, txp->txqnum);
+    96		skb = skb_peek(&txp->tq);
+    97		if (!skb) {
+    98			if (!__netif_tx_trylock(txq))
+    99				goto resched;
+   100			skb_queue_splice_tail_init(&txp->rq, &txp->tq);
+   101			__netif_tx_unlock(txq);
+   102		}
+   103	
+   104		while ((skb = __skb_dequeue(&txp->tq)) != NULL) {
+   105			/* Skip tc and netfilter to prevent redirection loop. */
+   106			skb->redirected = 0;
+   107	#ifdef CONFIG_NET_CLS_ACT
+   108			skb->tc_skip_classify = 1;
+   109	#endif
+   110			nf_skip_egress(skb, true);
+   111	
+   112			ifb_update_q_stats(&txp->tx_stats, skb->len);
+   113	
+   114			rcu_read_lock();
+   115			skb->dev = dev_get_by_index_rcu(dev_net(txp->dev), skb->skb_iif);
+   116			if (!skb->dev) {
+   117				rcu_read_unlock();
+ > 118				kfree_skb_reason(skb, SKB_DROP_REASON_NO_DEV);
+   119				txp->dev->stats.tx_dropped++;
+   120				if (skb_queue_len(&txp->tq) != 0)
+   121					goto resched;
+   122				break;
+   123			}
+   124			rcu_read_unlock();
+   125			skb->skb_iif = txp->dev->ifindex;
+   126	
+   127			if (!skb->from_ingress) {
+   128				dev_queue_xmit(skb);
+   129			} else {
+   130				skb_pull_rcsum(skb, skb->mac_len);
+   131				netif_receive_skb(skb);
+   132			}
+   133		}
+   134	
+   135		if (__netif_tx_trylock(txq)) {
+   136			skb = skb_peek(&txp->rq);
+   137			if (!skb) {
+   138				txp->tasklet_pending = 0;
+   139				if (netif_tx_queue_stopped(txq))
+   140					netif_tx_wake_queue(txq);
+   141			} else {
+   142				__netif_tx_unlock(txq);
+   143				goto resched;
+   144			}
+   145			__netif_tx_unlock(txq);
+   146		} else {
+   147	resched:
+   148			txp->tasklet_pending = 1;
+   149			tasklet_schedule(&txp->ifb_tasklet);
+   150		}
+   151	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
