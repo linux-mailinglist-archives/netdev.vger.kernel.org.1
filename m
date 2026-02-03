@@ -1,153 +1,188 @@
-Return-Path: <netdev+bounces-256359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADYqNsolgmnPPgMAu9opvQ
-	(envelope-from <netdev+bounces-256359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:43:54 +0100
+	id oOUdEcklgmnPPgMAu9opvQ
+	(envelope-from <netdev+bounces-256360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:43:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E994DC295
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:43:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B17DC28E
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 17:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34A1A31A44E0
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:34:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CCBC3002E1E
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007AD3D3007;
-	Tue,  3 Feb 2026 16:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDFD3D1CA1;
+	Tue,  3 Feb 2026 16:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cxJ2NKhx"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="z2KUZZOx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF12D3D3009;
-	Tue,  3 Feb 2026 16:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F0E318B9E;
+	Tue,  3 Feb 2026 16:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770136452; cv=none; b=pN/dOdVp6LMTU5GSnv+025VbDgVe1Wf5LEBsO9aByuoHD11HrgEGzw15NCl/0aGe63RRDXIyPNq/xRDr/EMdf2s+WIQ+Y7PedbtjnizQ92CsLHO4lbPZksSHrTIS9zTHeJwW3R7HGGphdxyHu43F3rSpSWUg5aWJdSIYzFesYRY=
+	t=1770136673; cv=none; b=Pju/P+eBm4xzzAt+PKPJ83SbuzuNqFCB7WbyokmQAyctKCxixOLiAHHtrq8mUPumGCZEMno8LRcP1fSRG0EdhapX9EEl/gjkpUjP+K3N7zB2l1021OcuRuzMbhtvIqv9QhxI6yp7W3i6si/GiW9I5NDTQ9IP0wZkO9do176C1h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770136452; c=relaxed/simple;
-	bh=zPVP9b32gTmljreSY5oa7bG3eG5t4SD+ESMPgfqDiRs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pj0VR8n9S9AwYyABfkoIjA58A6gTOKp88zPydIyJ8aSN7AqhzPxRl/w/9VUCCruxcb3p7rML2glEvKncce3px6In5hAuGpQ19ewR7/7vOCj7MT1oBnPtmUGrO0y06ITr+oP31Kebl1M0Q4VekDM8I1P15HqpfbOWDwUBU/KbYH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cxJ2NKhx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ECEEC19425;
-	Tue,  3 Feb 2026 16:34:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770136452;
-	bh=zPVP9b32gTmljreSY5oa7bG3eG5t4SD+ESMPgfqDiRs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cxJ2NKhxga7d59tgAw/LuOm4FUPfMQGeBxs3WQibj1x4g7XT6rGANjoIVL0K58Km5
-	 dflTKPxojNPawqPj0iBPdbpodBdzhRfxYgNWm7XQdViwQJ5M+iqamvR1sj95QQiKh3
-	 7v+jjsGDeTKBHw8Gwl12n+sbpHQxJKiLWaDbpJsuzrAOuFuQTT7VgdGnGrMfEXHODH
-	 L14/OalyA1rWKds1riohcIpCOEC5yFi2kbwJbVfzvlitiOULY3dS+LJek5hVbIDeSP
-	 2O8WoYH/PMc+d5oUBi6jx8PccW9AkZmfMSc6I0Xz2GFkucdJyhXRCLCqJWkh0Vy4Dv
-	 lRtalglcFX9xA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Simon Horman <horms@kernel.org>,
-	HarshaVardhana S A <harshavardhana.sa@broadcom.com>,
-	Bobby Eshleman <bobbyeshleman@meta.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH] vmw_vsock: bypass false-positive Wnonnull warning with gcc-16
-Date: Tue,  3 Feb 2026 17:34:00 +0100
-Message-Id: <20260203163406.2636463-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1770136673; c=relaxed/simple;
+	bh=rOKpqdPFYggKJpVAU6wtXwf20Rvom0J8VquNYFXXENc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UOBG3MQZ0c/SbHJaY0MXoIhw7GKR+XxK1mGYRdh9de5ez3++VMTI9xzzyVMxIcWZXXTD1P0LQFWF+s8Ryz9G4WdOmg+AUhVdjkv/mKW46x2q8gwtG+wTziia05pAZOABLB4oDQYayCJ8wwGPqIEsCTVmCs5PmFAn97rEptLOSy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=z2KUZZOx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B318BC116D0;
+	Tue,  3 Feb 2026 16:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1770136673;
+	bh=rOKpqdPFYggKJpVAU6wtXwf20Rvom0J8VquNYFXXENc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=z2KUZZOxKyL/VB8C8JZj8E68RxyNC/hSBr1iHg1KFY2Sd4Zb4YBO8PUAnLkSHPCiJ
+	 7YEW7kTfPZUS5cWkGi1fjm+oZAxOnfUlVy7h4CCetXoYJxzC7F9rxFp6Ioy75omyvI
+	 BcnSBDUkUzakPDT689X4Jw6dpeYXuF8DZfZ9CS3w=
+Date: Tue, 3 Feb 2026 17:37:50 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: David =?iso-8859-1?Q?Nystr=F6m?= <david.nystrom@est.tech>
+Cc: stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+	netdev@vger.kernel.org, Zeng Heng <zengheng4@huawei.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH 5.10] net: mdio: fix unbalanced fwnode reference count in
+ mdio_device_release()
+Message-ID: <2026020318-affected-irritate-cda7@gregkh>
+References: <20260116-backport_cb37617687f2_20260115100804-v1-1-9796615d93ab@est.tech>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260116-backport_cb37617687f2_20260115100804-v1-1-9796615d93ab@est.tech>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256359-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-256360-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 3E994DC295
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 82B17DC28E
 X-Rspamd-Action: no action
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Fri, Jan 16, 2026 at 11:14:45AM +0100, David Nyström wrote:
+> [ Upstream commit cb37617687f2bfa5b675df7779f869147c9002bd ]
+> 
+> There is warning report about of_node refcount leak
+> while probing mdio device:
+> 
+> OF: ERROR: memory leak, expected refcount 1 instead of 2,
+> of_node_get()/of_node_put() unbalanced - destroy cset entry:
+> attach overlay node /spi/soc@0/mdio@710700c0/ethernet@4
+> 
+> In of_mdiobus_register_device(), we increase fwnode refcount
+> by fwnode_handle_get() before associating the of_node with
+> mdio device, but it has never been decreased in normal path.
+> Since that, in mdio_device_release(), it needs to call
+> fwnode_handle_put() in addition instead of calling kfree()
+> directly.
+> 
+> After above, just calling mdio_device_free() in the error handle
+> path of of_mdiobus_register_device() is enough to keep the
+> refcount balanced.
+> 
+> (cherry picked from commit cb37617687f2bfa5b675df7779f869147c9002bd)
+> 
+> Fixes: a9049e0c513c ("mdio: Add support for mdio drivers.")
+> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
+> Reviewed-by: Yang Yingliang <yangyingliang@huawei.com>
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Link: https://lore.kernel.org/r/20221203073441.3885317-1-zengheng4@huawei.com
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: David Nyström <david.nystrom@est.tech>
+> ---
+> This series backports 1 commit(s) to the 5.10 stable tree.
+> ---
+>  drivers/net/mdio/of_mdio.c    | 3 ++-
+>  drivers/net/phy/mdio_device.c | 2 ++
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+> index b254127cea50..355c3ee21cd7 100644
+> --- a/drivers/net/mdio/of_mdio.c
+> +++ b/drivers/net/mdio/of_mdio.c
+> @@ -168,8 +168,9 @@ static int of_mdiobus_register_device(struct mii_bus *mdio,
+>  	/* All data is now stored in the mdiodev struct; register it. */
+>  	rc = mdio_device_register(mdiodev);
+>  	if (rc) {
+> +		device_set_node(&mdiodev->dev, NULL);
+> +		fwnode_handle_put(fwnode);
+>  		mdio_device_free(mdiodev);
+> -		of_node_put(child);
+>  		return rc;
+>  	}
+>  
+> diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+> index 797c41f5590e..f72d18ee2792 100644
+> --- a/drivers/net/phy/mdio_device.c
+> +++ b/drivers/net/phy/mdio_device.c
+> @@ -21,6 +21,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/string.h>
+>  #include <linux/unistd.h>
+> +#include <linux/property.h>
+>  
+>  void mdio_device_free(struct mdio_device *mdiodev)
+>  {
+> @@ -30,6 +31,7 @@ EXPORT_SYMBOL(mdio_device_free);
+>  
+>  static void mdio_device_release(struct device *dev)
+>  {
+> +	fwnode_handle_put(dev->fwnode);
+>  	kfree(to_mdio_device(dev));
+>  }
+>  
+> 
+> ---
+> base-commit: f964b940099f9982d723d4c77988d4b0dda9c165
+> change-id: 20260115-backport_cb37617687f2_20260115100804-bb6cefe39d44
+> 
+> Best regards,
+> --  
+> David Nyström <david.nystrom@est.tech>
+> 
 
-The gcc-16.0.1 snapshot produces a false-positive warning that turns
-into a build failure with CONFIG_WERROR:
+Breaks the build, how did you test this:
 
-In file included from arch/x86/include/asm/string.h:6,
-                 from net/vmw_vsock/vmci_transport.c:10:
-In function 'vmci_transport_packet_init',
-    inlined from '__vmci_transport_send_control_pkt.constprop' at net/vmw_vsock/vmci_transport.c:198:2:
-arch/x86/include/asm/string_32.h:150:25: error: argument 2 null where non-null expected because argument 3 is nonzero [-Werror=nonnull]
-  150 | #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
-  164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-      |                 ^~~~~~
-arch/x86/include/asm/string_32.h:150:25: note: in a call to built-in function '__builtin_memcpy'
-net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
-  164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-      |                 ^~~~~~
-
-This seems relatively harmless, and it so far the only instance of this
-warning I have found. The __vmci_transport_send_control_pkt function
-is called either with wait=NULL or with one of the type values that
-pass 'wait' into memcpy() here, but not from the same caller.
-
-Replacing the memcpy with a struct assignment is otherwise the same
-but avoids the warning.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- net/vmw_vsock/vmci_transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-index 00f6bbdb035a..a64522be1bad 100644
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -161,7 +161,7 @@ vmci_transport_packet_init(struct vmci_transport_packet *pkt,
- 
- 	case VMCI_TRANSPORT_PACKET_TYPE_WAITING_READ:
- 	case VMCI_TRANSPORT_PACKET_TYPE_WAITING_WRITE:
--		memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-+		pkt->u.wait = *wait;
- 		break;
- 
- 	case VMCI_TRANSPORT_PACKET_TYPE_REQUEST2:
--- 
-2.39.5
+drivers/net/mdio/of_mdio.c: In function ‘of_mdiobus_register_device’:
+drivers/net/mdio/of_mdio.c:172:35: error: ‘fwnode’ undeclared (first use in this function); did you mean ‘inode’?
+  172 |                 fwnode_handle_put(fwnode);
+      |                                   ^~~~~~
+      |                                   inode
 
 
