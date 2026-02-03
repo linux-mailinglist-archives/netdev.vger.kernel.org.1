@@ -1,103 +1,98 @@
-Return-Path: <netdev+bounces-256069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAh9FuJQgWmLFgMAu9opvQ
-	(envelope-from <netdev+bounces-256069-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:35:30 +0100
+	id sKcwIuBRgWmLFgMAu9opvQ
+	(envelope-from <netdev+bounces-256070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:39:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A644DD3695
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:35:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023EDD3706
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 02:39:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B43FB300FEDC
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 01:35:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB97D300E25E
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 01:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2203C257824;
-	Tue,  3 Feb 2026 01:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA35273D9A;
+	Tue,  3 Feb 2026 01:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfrBXVhx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFMEtKdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f195.google.com (mail-dy1-f195.google.com [74.125.82.195])
+Received: from mail-dy1-f194.google.com (mail-dy1-f194.google.com [74.125.82.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937CF242D7D
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 01:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABE4261B91
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 01:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770082525; cv=none; b=KavcGNMS9FU0ARr8A7m6OCciSa9LYFPWNMfpy6XrdXmjUjy1pAXq5uy9heawlpozdDglfIM+1Kc49hIc3h8SZNF4j2FPX9oEkf8AsLajf7sCaXBTGLLgrIYBim5SbsrH9EnuQwHpm+VgQsgTigf6n5qXVbsxgtVnXYzWCDw4r8c=
+	t=1770082780; cv=none; b=cQzaB5cUfq1jj/smeWfQYBjZNOLTxxqw0x3ySphND0wbl/pEV4Td0L3t4SUJP4qde+gVn+GAId19/OW00VdcFrwtZeQqHcOuXOtLZHgSX5MMqkE6u3xK7oSzBC8JR4J14o3ueYpp93BxQG9LNebn4+hW4bJxZfe923ZfLinESkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770082525; c=relaxed/simple;
-	bh=ubSZqGD8KRndaDPZhuNufGseCCQS66dakXBWku1wSdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MkF9oCLeX0xxCKZcXNH69/BRIStNXTSOFeo5LOT+HDOX6N/gCs/whnIxQcwtMmg4uv3INlzhmnub4OI+jfsEZe8wNC0FeQepfQowFKktUadZn3g68qqF/VNFJRyBHGNma27HZSkvN87ByxG+QppAB1hwImIah2RVx1B9tQPuL7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YfrBXVhx; arc=none smtp.client-ip=74.125.82.195
+	s=arc-20240116; t=1770082780; c=relaxed/simple;
+	bh=loUI7EgbYb5OeWue2BHmAqWdkjUZ+YRUPFnGs67fTs8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bDihA3TqpYtYPP/YvvMda6idZQ5gYslvlvOq6LJ5Iz9oJToz6N9GKs4pfWL+Quebuxyz0emUsE7lIrE3JzWpiPomF1sxmIw6YKLjOO4QQVk+14xAfm+Cy95mrvjg5b0o75ZakmbLU5n8FMNjxIaCNBwbv0iMKt5QYLCzAnZC7mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFMEtKdB; arc=none smtp.client-ip=74.125.82.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f195.google.com with SMTP id 5a478bee46e88-2b72e49776eso9256013eec.1
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 17:35:23 -0800 (PST)
+Received: by mail-dy1-f194.google.com with SMTP id 5a478bee46e88-2b4520f6b32so9052517eec.0
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 17:39:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770082522; x=1770687322; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770082778; x=1770687578; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L3o1VZHLx2eNSPx1eYPORrlHqiSo63azfjpKSmRzw8U=;
-        b=YfrBXVhxhSDyFYe6LPikB7cxtehhEqHb13QwD/O1pLO+SoCeO7GYLyoiYDMS5VZ3NA
-         JVej8tte6M/XmYaNSeRQyLYBjJAg2IWWyMJH9wyzEnPmJDrIRHU0EqCoKFjTYlZXhz0p
-         xraRzjS+B25l2jEl4OdCazSQUK+eNuebFfBfgP/EH3yAU22AElPmpKcVOjdeiFs8puth
-         LCEGD5lkFTNtFwwidTgiXNe14klRmAWrSj8puybRD7YQu1AeioLjitV2feyfft+dEXIh
-         iZb9KO0AtNDYZWXiZMxzVgAHHtPB9eILaF40ZlG2gCuXABPZI1lto/N1Nm5cpcUDKJZ6
-         7eNQ==
+        bh=oRsmajcOBWi1yis4RiEAOPVLDZ+gafbhmHNH16HP8tI=;
+        b=mFMEtKdBJfdKSF/0oLCCZffy8B52I6C1BcW7o9DKE/IV8vddZpd7GkDcUCQGUq0qO3
+         tjPj8SmbW3hPG02dGVicDEHtoY3HZUBJ4oJ/CHQyFkUsBdz3UDeJRKB5PGnrKunY9Yk8
+         pCrrZyoknt9Hq1gf5KdEIIAWdX1Dwt5iR5WgGRfHu3HGXALbQh3BO84Jgf9mfB2kaGBn
+         iFbjUsW7kHDR89X0NtyNYYovOdzoRj1zB7EkBsloAEM+EaQneFncL2+llfXf+PiRByGL
+         SpzGMYm4N7Jkn3LRXR/5L1AzOHcuVyN13TcNZJy52eSItR3Olcuzd8jOUq3uMUTQiP1D
+         er6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770082522; x=1770687322;
+        d=1e100.net; s=20230601; t=1770082778; x=1770687578;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=L3o1VZHLx2eNSPx1eYPORrlHqiSo63azfjpKSmRzw8U=;
-        b=BH+1oCTBjWbAMxSsN7U9NCP8eW2OmM6KQPpoFWCA5OoQAhSmybNVriSL2lLe2Dl1jm
-         uw9R816T42lPFEUE4vwH+jwklMF78Y/9a1j1oUOhjNv6jKYHMs9j64fpllfpiZqMtYIt
-         EqqjjvKuXcrSrftX4fU2eObVibqWtYC5ZYq0M0zTsLyAFCW3tbcwPR5p1yBMl8d93UTe
-         JhstY0XZK3YEB0AKYzdqsF11I5AIVC+tyKJJA2syf1GATW3Wv49noYBlgNPcoANDdazv
-         QrCJldq9C8IkiWMRh9M7wKTjEvXKQEvkJ254s9T6qbn0rJm8TQuLg4FbEcGe7OSwKcsm
-         ct0w==
-X-Forwarded-Encrypted: i=1; AJvYcCX7+T2iCUv27tPl6tmH+ts2nNz2E4FwHONw314L+ltunEM+gUqi51D19HQJr2LfU235KzpiZlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCxpEpjhsi5Z7S0HKDaufTfHiFNoVB36E900bpk5wbyKioBJ46
-	AvEdR9lX1LaC9P9MN9zRJY5kIrubTZmSVBHrhILLTHm40Iwkt8qzKsHL
-X-Gm-Gg: AZuq6aK87xHMKjorvo9Fv2rbMnA7wS1n95ztDCR3WCEU5jaQx/LWZh+0KBlNOSNNHAn
-	pIwh4eY6rvRvaw//CeOGjCL0oqt4aI+6Z8sjphltZqPKEfBP7w2sMNJWsPGyLDFim55wdD3uCJI
-	e1qqRuofCSCVgVIWfo2iFqGjd0ihrfdZj2rNLd44iynx8Z0Uz2OgX1yPTTKP5pyau+9cJxbfimd
-	OQYMBgIoo0O1tzXyGnJFUvuEruHAUbvPQpr/GDKiL2yur6x3h+99LolN4Isz509TLCBql6fYN2+
-	YmYwmuZsk6OUy446IocSe7z0CsOdXyM7x0s3JKvv9js1RsU7rvtz1R98bGYCzNTJWWKD/obPRBU
-	nDgvXWkHcJnoAV+VtvRR0t1qlDRbuRNAGXB3u2M+SmZPANsunPK+GYorTQ7OcoM2sOC7BnuEEd5
-	awVsvB1TE8YK1lap0SX7H6RuO01AzroDfJabjy1EpTn2NfL1Xrk9uo/ifPM+zMFpDpc2h0ML3hh
-	9a2oOumJij4/OSwaLIg38JVHx2uNtMFycRo8i3LgMabLgYvN6ZBoaeitU0hdEmkgo/0i07hgarJ
-	q9oW
-X-Received: by 2002:a05:7300:fb83:b0:2b7:143a:9a8f with SMTP id 5a478bee46e88-2b7c863b842mr7317354eec.7.1770082522361;
-        Mon, 02 Feb 2026 17:35:22 -0800 (PST)
+        bh=oRsmajcOBWi1yis4RiEAOPVLDZ+gafbhmHNH16HP8tI=;
+        b=F6W05ET1xkodlxkK2As0DGmgW7/kXALL7pbIhoB30anBMkfdTvQsZ4tTPi/+vX72mb
+         HJah3ubJDNINf5H/xeRuX2wPa6K1exZkNxmIRRM126f+3Z1jGYZdGMXZEG5aizbxtxoj
+         QqGbNyJxZwNknbv+v5Dc9cd14U52OFhRQKJ8SNaWu2dEQwV6R5PLJiUk7flVWh/D7FDj
+         yvOUDKJTpLjdrIqvZJE7LTykh1vshRdLaTXJSwWgU6WrVKRxN9RvIVGxReTXoFUk4Y4o
+         mzekvcxP/y0h+Mp+6R3tKYC+YKQdDh2TRRaPsy44WAGr0Z6pOF1+6IpAsNJ4UFa3w0ib
+         BZnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFSEczlWO/QItZXhyWHf3x3QuyikiCxXRqgDeuqwjd9e/f5rh9+gHMQDndxb5d0uIWllCd8wA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyP1yRdlM1RUKp/Bnc7WJcAaNGl7zNDrEnpxBSjUKbSgC2lrOe9
+	O3Oh5uI0ImR7BrHFRju+UKlRM/HOdugUWFQIXaiG5RGn0ypn/Z0VWmqg
+X-Gm-Gg: AZuq6aLTn4cIxRLfWojs03Ue5kAUBH421iGcg13T3bRvKgD9CCT4ekJBLO+lzr51FG9
+	FUCk8LKXyuo2g7exOJbk7zv/dg1rInCDJaMwQs2gFgUX1jKs6PHvT5UUMl64tv69sEkDRW+SyQR
+	0lG4m5ftUAl3ydQmMb3o28a1wAX8sTMQnlhHR6SCob4KLLBo0RKjiq6/Cvk0YFkCjPId3Zyj1SX
+	vgfoEGi7GH8TMuKtxAb9V72ZcKCUrNy5IYSDXm5Std7Fql5+XVhbQf0nX68faK6Fvm8Km1GRIe2
+	x5jvn1g/u9qriyy8izAsns9jM3AWXrcwJii2WSC4B/RBQFhWEIAE3+0R6UIkgAAtRw49zgyIkxX
+	OHFT/tUx1x8ikSH92VzFXlxGq4P4CkIQmbxBbnUfd9qF5LeFP74bc1/cM1Ck7DJ8AC+7raeg1oU
+	z43SxpDHCVunTw38OFAsq6etv9PJlnC+EHWY7O6hB2Hyot5g09r3BFbEBO/Ay0AV6RLG7ojSFOc
+	9SsQGTcRA5ehwTeiEFjIff4EVu1BbRbO9RYth1jK0MQ8JVJFunBPThX3Jy1g2s+OTriJFUQIZpZ
+	ecSF
+X-Received: by 2002:a05:7301:2f95:b0:2b0:4b5b:6820 with SMTP id 5a478bee46e88-2b7c88da4f1mr6045650eec.26.1770082778320;
+        Mon, 02 Feb 2026 17:39:38 -0800 (PST)
 Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abe707sm21613380eec.18.2026.02.02.17.35.21
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abedcasm21162096eec.21.2026.02.02.17.39.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 17:35:22 -0800 (PST)
+        Mon, 02 Feb 2026 17:39:38 -0800 (PST)
 From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 To: linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Andrew Lunn <andrew@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Peter Korsgaard <peter@korsgaard.com>,
-	Steve Glendinning <steve.glendinning@shawell.net>,
-	Oliver Neukum <oneukum@suse.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Max Schulze <max.schulze@online.de>,
-	=?UTF-8?q?Krzysztof=20Ha=C5=82asa?= <khalasa@piap.pl>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v4] net: usb: introduce usbnet_mii_ioctl helper function
-Date: Mon,  2 Feb 2026 17:34:55 -0800
-Message-ID: <20260203013517.26170-1-enelsonmoore@gmail.com>
+	Eric Biggers <ebiggers@google.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Peter Korsgaard <peter@korsgaard.com>
+Subject: [PATCH net-next v3] net: usb: sr9700: remove code to drive nonexistent multicast filter
+Date: Mon,  2 Feb 2026 17:39:09 -0800
+Message-ID: <20260203013924.28582-1-enelsonmoore@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -114,17 +109,17 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,korsgaard.com,shawell.net,suse.com,linuxfoundation.org,pengutronix.de,online.de,piap.pl,linux.intel.com];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,pengutronix.de,armlinux.org.uk,korsgaard.com];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-256069-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-256070-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -132,232 +127,123 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,kernel];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A644DD3695
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 023EDD3706
 X-Rspamd-Action: no action
 
-Many USB network drivers use identical code to pass ioctl
-requests on to the MII layer. Reduce code duplication by
-refactoring this code into a helper function.
+Several registers referenced in this driver's source code do not
+actually exist (they are not writable and read as zero in my testing).
+They exist in this driver because it originated as a copy of the dm9601
+driver. Notably, these include the multicast filter registers - this
+causes the driver to not support multicast packets correctly. Remove
+the multicast filter code and register definitions. Instead, set the
+chip to receive all multicast filter packets when any multicast
+addresses are in the list.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev> (v1)
-Reviewed-by: Andrew Lunn <andrew@lunn.ch> (v3)
+Reviewed-by: Simon Horman <horms@kernel.org> (from v1)
 Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
-Changes in v4:
-Rebase on latest net-next again
+Changes in v2:
+Remove unrelated cleanups; adjust commit message
+Use netdev_mc_empty()
 Changes in v3:
 Rebase on latest net-next
-Add changelog
-Add received Reviewed-by tag
-Changes in v2 (not numbered):
-Resent with maintainer CCs
+Drop now-unused CRC32 Kconfig dependency
 
- drivers/net/usb/asix_devices.c | 11 ++---------
- drivers/net/usb/ax88179_178a.c |  8 +-------
- drivers/net/usb/dm9601.c       |  9 +--------
- drivers/net/usb/mcs7830.c      |  8 +-------
- drivers/net/usb/smsc75xx.c     |  4 +---
- drivers/net/usb/sr9800.c       |  9 +--------
- drivers/net/usb/usbnet.c       |  8 ++++++++
- include/linux/usb/usbnet.h     |  1 +
- 8 files changed, 16 insertions(+), 42 deletions(-)
+ drivers/net/usb/Kconfig  |  1 -
+ drivers/net/usb/sr9700.c | 25 ++++---------------------
+ drivers/net/usb/sr9700.h |  7 +------
+ 3 files changed, 5 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index d8744291d843..7eb6e86adb16 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -97,13 +97,6 @@ static u32 asix_get_phyid(struct usbnet *dev)
- 	return phy_id;
- }
+diff --git a/drivers/net/usb/Kconfig b/drivers/net/usb/Kconfig
+index d050adfe860a..52a5c0922c79 100644
+--- a/drivers/net/usb/Kconfig
++++ b/drivers/net/usb/Kconfig
+@@ -319,7 +319,6 @@ config USB_NET_DM9601
+ config USB_NET_SR9700
+ 	tristate "CoreChip-sz SR9700 based USB 1.1 10/100 ethernet devices"
+ 	depends on USB_USBNET
+-	select CRC32
+ 	help
+ 	  This option adds support for CoreChip-sz SR9700 based USB 1.1
+ 	  10/100 Ethernet adapters.
+diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
+index 49764bcf0912..937e6fef3ac6 100644
+--- a/drivers/net/usb/sr9700.c
++++ b/drivers/net/usb/sr9700.c
+@@ -17,7 +17,6 @@
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
+ #include <linux/usb.h>
+-#include <linux/crc32.h>
+ #include <linux/usb/usbnet.h>
  
--static int asix_ioctl (struct net_device *net, struct ifreq *rq, int cmd)
--{
--	struct usbnet *dev = netdev_priv(net);
--
--	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
--}
--
- /* We need to override some ethtool_ops so we require our
-    own structure so we don't interfere with other usbnet
-    devices that may be connected at the same time. */
-@@ -190,7 +183,7 @@ static const struct net_device_ops ax88172_netdev_ops = {
- 	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_set_mac_address 	= eth_mac_addr,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_eth_ioctl		= asix_ioctl,
-+	.ndo_eth_ioctl		= usbnet_mii_ioctl,
- 	.ndo_set_rx_mode	= ax88172_set_multicast,
- };
- 
-@@ -1269,7 +1262,7 @@ static const struct net_device_ops ax88178_netdev_ops = {
- 	.ndo_set_mac_address 	= asix_set_mac_address,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_rx_mode	= asix_set_multicast,
--	.ndo_eth_ioctl		= asix_ioctl,
-+	.ndo_eth_ioctl		= usbnet_mii_ioctl,
- 	.ndo_change_mtu 	= ax88178_change_mtu,
- };
- 
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index b034ef8a73ea..0e9ae89b840e 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -847,12 +847,6 @@ static int ax88179_set_eee(struct net_device *net, struct ethtool_keee *edata)
- 	return ret;
- }
- 
--static int ax88179_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
--{
--	struct usbnet *dev = netdev_priv(net);
--	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
--}
--
- static const struct ethtool_ops ax88179_ethtool_ops = {
- 	.get_link		= ethtool_op_get_link,
- 	.get_msglevel		= usbnet_get_msglevel,
-@@ -998,7 +992,7 @@ static const struct net_device_ops ax88179_netdev_ops = {
- 	.ndo_change_mtu		= ax88179_change_mtu,
- 	.ndo_set_mac_address	= ax88179_set_mac_addr,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_eth_ioctl		= ax88179_ioctl,
-+	.ndo_eth_ioctl		= usbnet_mii_ioctl,
- 	.ndo_set_rx_mode	= ax88179_set_multicast,
- 	.ndo_set_features	= ax88179_set_features,
- };
-diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
-index 9e5649cefcbc..c8e0f8868210 100644
---- a/drivers/net/usb/dm9601.c
-+++ b/drivers/net/usb/dm9601.c
-@@ -259,13 +259,6 @@ static void dm9601_mdio_write(struct net_device *netdev, int phy_id, int loc,
- 	dm_write_shared_word(dev, 1, loc, res);
- }
- 
--static int dm9601_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
--{
--	struct usbnet *dev = netdev_priv(net);
--
--	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
--}
--
- static const struct ethtool_ops dm9601_ethtool_ops = {
- 	.get_drvinfo	= usbnet_get_drvinfo,
- 	.get_link	= usbnet_get_link,
-@@ -337,7 +330,7 @@ static const struct net_device_ops dm9601_netdev_ops = {
- 	.ndo_change_mtu		= usbnet_change_mtu,
- 	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_eth_ioctl		= dm9601_ioctl,
-+	.ndo_eth_ioctl		= usbnet_mii_ioctl,
- 	.ndo_set_rx_mode	= dm9601_set_multicast,
- 	.ndo_set_mac_address	= dm9601_set_mac_address,
- };
-diff --git a/drivers/net/usb/mcs7830.c b/drivers/net/usb/mcs7830.c
-index 3a551ad363d0..d6698f30218d 100644
---- a/drivers/net/usb/mcs7830.c
-+++ b/drivers/net/usb/mcs7830.c
-@@ -325,12 +325,6 @@ static void mcs7830_mdio_write(struct net_device *netdev, int phy_id,
- 	mcs7830_write_phy(dev, location, val);
- }
- 
--static int mcs7830_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
--{
--	struct usbnet *dev = netdev_priv(net);
--	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
--}
--
- static inline struct mcs7830_data *mcs7830_get_data(struct usbnet *dev)
+ #include "sr9700.h"
+@@ -231,31 +230,15 @@ static const struct ethtool_ops sr9700_ethtool_ops = {
+ static void sr9700_set_multicast(struct net_device *netdev)
  {
- 	return (struct mcs7830_data *)&dev->data;
-@@ -468,7 +462,7 @@ static const struct net_device_ops mcs7830_netdev_ops = {
- 	.ndo_change_mtu		= usbnet_change_mtu,
- 	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_eth_ioctl		= mcs7830_ioctl,
-+	.ndo_eth_ioctl		= usbnet_mii_ioctl,
- 	.ndo_set_rx_mode	= mcs7830_set_multicast,
- 	.ndo_set_mac_address	= mcs7830_set_mac_address,
- };
-diff --git a/drivers/net/usb/smsc75xx.c b/drivers/net/usb/smsc75xx.c
-index fbc9d796f605..1a61a8bcf5d3 100644
---- a/drivers/net/usb/smsc75xx.c
-+++ b/drivers/net/usb/smsc75xx.c
-@@ -743,12 +743,10 @@ static const struct ethtool_ops smsc75xx_ethtool_ops = {
+ 	struct usbnet *dev = netdev_priv(netdev);
+-	/* We use the 20 byte dev->data for our 8 byte filter buffer
+-	 * to avoid allocating memory that is tricky to free later
+-	 */
+-	u8 *hashes = (u8 *)&dev->data;
+ 	/* rx_ctl setting : enable, disable_long, disable_crc */
+ 	u8 rx_ctl = RCR_RXEN | RCR_DIS_CRC | RCR_DIS_LONG;
  
- static int smsc75xx_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
- {
--	struct usbnet *dev = netdev_priv(netdev);
+-	memset(hashes, 0x00, SR_MCAST_SIZE);
+-	/* broadcast address */
+-	hashes[SR_MCAST_SIZE - 1] |= SR_MCAST_ADDR_FLAG;
+-	if (netdev->flags & IFF_PROMISC) {
++	if (netdev->flags & IFF_PROMISC)
+ 		rx_ctl |= RCR_PRMSC;
+-	} else if (netdev->flags & IFF_ALLMULTI ||
+-		   netdev_mc_count(netdev) > SR_MCAST_MAX) {
+-		rx_ctl |= RCR_RUNT;
+-	} else if (!netdev_mc_empty(netdev)) {
+-		struct netdev_hw_addr *ha;
 -
- 	if (!netif_running(netdev))
- 		return -EINVAL;
+-		netdev_for_each_mc_addr(ha, netdev) {
+-			u32 crc = ether_crc(ETH_ALEN, ha->addr) >> 26;
+-			hashes[crc >> 3] |= 1 << (crc & 0x7);
+-		}
+-	}
++	else if (netdev->flags & IFF_ALLMULTI || !netdev_mc_empty(netdev))
++		/* The chip has no multicast filter */
++		rx_ctl |= RCR_ALL;
  
--	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
-+	return usbnet_mii_ioctl(netdev, rq, cmd);
+-	sr_write_async(dev, SR_MAR, SR_MCAST_SIZE, hashes);
+ 	sr_write_reg_async(dev, SR_RCR, rx_ctl);
  }
  
- static void smsc75xx_init_mac_address(struct usbnet *dev)
-diff --git a/drivers/net/usb/sr9800.c b/drivers/net/usb/sr9800.c
-index e3f6233e5866..6fd33a5b2279 100644
---- a/drivers/net/usb/sr9800.c
-+++ b/drivers/net/usb/sr9800.c
-@@ -469,13 +469,6 @@ static int sr_get_eeprom(struct net_device *net,
- 	return 0;
- }
+diff --git a/drivers/net/usb/sr9700.h b/drivers/net/usb/sr9700.h
+index 5c04ea0306c7..d1663cb1e8cd 100644
+--- a/drivers/net/usb/sr9700.h
++++ b/drivers/net/usb/sr9700.h
+@@ -101,9 +101,7 @@
+ #define		WCR_LINKEN		(1 << 5)
+ /* Physical Address Reg */
+ #define	SR_PAR			0x10	/* 0x10 ~ 0x15 6 bytes for PAR */
+-/* Multicast Address Reg */
+-#define	SR_MAR			0x16	/* 0x16 ~ 0x1D 8 bytes for MAR */
+-/* 0x1e unused */
++/* 0x16 --> 0x1E unused */
+ /* Phy Reset Reg */
+ #define	SR_PRR			0x1F
+ #define		PRR_PHY_RST		(1 << 0)
+@@ -158,9 +156,6 @@
+ /* parameters */
+ #define	SR_EEPROM_TIMEOUT	1000
+ #define	SR_EEPROM_LEN		256
+-#define	SR_MCAST_SIZE		8
+-#define	SR_MCAST_ADDR_FLAG	0x80
+-#define	SR_MCAST_MAX		64
+ #define	SR_TX_OVERHEAD		2	/* 2bytes header */
+ #define	SR_RX_OVERHEAD		7	/* 3bytes header + 4crc tail */
  
--static int sr_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
--{
--	struct usbnet *dev = netdev_priv(net);
--
--	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
--}
--
- static int sr_set_mac_address(struct net_device *net, void *p)
- {
- 	struct usbnet *dev = netdev_priv(net);
-@@ -668,7 +661,7 @@ static const struct net_device_ops sr9800_netdev_ops = {
- 	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_set_mac_address	= sr_set_mac_address,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_eth_ioctl		= sr_ioctl,
-+	.ndo_eth_ioctl		= usbnet_mii_ioctl,
- 	.ndo_set_rx_mode        = sr_set_multicast,
- };
- 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 9280ef544bbb..41b95b04143d 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1085,6 +1085,14 @@ int usbnet_nway_reset(struct net_device *net)
- }
- EXPORT_SYMBOL_GPL(usbnet_nway_reset);
- 
-+int usbnet_mii_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
-+{
-+	struct usbnet *dev = netdev_priv(net);
-+
-+	return generic_mii_ioctl(&dev->mii, if_mii(rq), cmd, NULL);
-+}
-+EXPORT_SYMBOL_GPL(usbnet_mii_ioctl);
-+
- void usbnet_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info)
- {
- 	struct usbnet *dev = netdev_priv(net);
-diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
-index 2945923a8a95..b0e84896e6ac 100644
---- a/include/linux/usb/usbnet.h
-+++ b/include/linux/usb/usbnet.h
-@@ -290,6 +290,7 @@ extern u32 usbnet_get_msglevel(struct net_device *);
- extern void usbnet_set_msglevel(struct net_device *, u32);
- extern void usbnet_set_rx_mode(struct net_device *net);
- extern void usbnet_get_drvinfo(struct net_device *, struct ethtool_drvinfo *);
-+extern int usbnet_mii_ioctl(struct net_device *net, struct ifreq *rq, int cmd);
- extern int usbnet_nway_reset(struct net_device *net);
- 
- extern int usbnet_manage_power(struct usbnet *, int);
 -- 
 2.43.0
 
