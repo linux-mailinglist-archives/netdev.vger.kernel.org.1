@@ -1,155 +1,431 @@
-Return-Path: <netdev+bounces-256489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCOFO7aCgmneVgMAu9opvQ
-	(envelope-from <netdev+bounces-256489-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 00:20:23 +0100
+	id 2K42BhOJgmn/VwMAu9opvQ
+	(envelope-from <netdev+bounces-256490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 00:47:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B9BDFADC
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 00:20:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8A6DFD60
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 00:47:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 32A3C30E68E3
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 23:19:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 065D73015B8E
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 23:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD5137756E;
-	Tue,  3 Feb 2026 23:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E0031195B;
+	Tue,  3 Feb 2026 23:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="ASL6uVy+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HX2bguJJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DD37E792
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 23:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770160718; cv=none; b=KufQeT5N0T5MFbiIdLivBp2YbbUsdNKFAO5CXVeGCKeSHTS4LZhd4tMS/upMZ2YDLp/WfAvJ364J03crgDAI2z+1+i7uZaFBeHjuWd7nEeJSDvWt/mIV3rEt2yOD5NBUGPMWaMpeDhUVo009hC8115ysogr3AtcpZjequyAr0fA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770160718; c=relaxed/simple;
-	bh=JLvdn8c+w8EK175ZjsQD8328a8YMf7HlLS6KIMPD2J4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CIkighoU8bsmtKS7Cli26xohmvoAViH5D+HC1PqlX+RqkmKRVTx9tppSqLZISNkRuzNWpL+R2TiIpDJRjQzTV/Lulx0rCWBjI7DiY152UZI2uUHv5JJntCq2i4EYC3lxHVo3zYJfW+xytdEk9RQ0BazB/Z3gQYSpAY+vvPjgWNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=ASL6uVy+; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from killaraus.ideasonboard.com (2001-14ba-703d-e500--ff4.rev.dnainternet.fi [IPv6:2001:14ba:703d:e500::ff4])
-	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id 27D023A4;
-	Wed,  4 Feb 2026 00:17:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1770160672;
-	bh=JLvdn8c+w8EK175ZjsQD8328a8YMf7HlLS6KIMPD2J4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ASL6uVy+l61WXBOcb/BAGP2WpnImm1KBztFatWHrjlPrp5EkvorBDCbcku7zqjwop
-	 AS5akvYHIoKc3VE5nO19wH3wf1tj+HSNhtWvqe6bYM5YFz2B25I6JDCCCHR/dV+0at
-	 eULHhmqTSHDuz/Eg2ZidnMrO34VtKMJpevIqWB7I=
-Date: Wed, 4 Feb 2026 01:18:32 +0200
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Ovidiu Panait <ovidiu.panait.oss@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Daniel Scally <dan.scally@ideasonboard.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, imx@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kieran Bingham <kieran.bingham@ideasonboard.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Stefan Klug <stefan.klug@ideasonboard.com>,
-	Wei Fang <wei.fang@nxp.com>
-Subject: Re: [PATCH RFC net-next] net: stmmac: provide flag to disable EEE
-Message-ID: <20260203231832.GB133801@killaraus>
-References: <E1vNUjC-0000000FhjR-0h6P@rmk-PC.armlinux.org.uk>
- <f95f73b9-d024-4697-bca1-02fb8bc044af@gmail.com>
- <aYEj8VM5AfvcDHrl@shell.armlinux.org.uk>
- <aYE-gvuZdv7ezm7X@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A97D285C98;
+	Tue,  3 Feb 2026 23:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770162448; cv=fail; b=NRmkpJNNXm0TscPBE5iQ8Dl4DiTpIOYWsJ5A2e/KT/QW12w5ZC1UpjrAU1bd7ikzy0BcfFWelKPo3qNAy57yZFMuQTryw6cE2VyrnzmRHEsuc2nWlIbAoalXALoCHabGAjA6tWsnQDzkB64yuwQRXnY57kCCI35AG5tVjnbD64U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770162448; c=relaxed/simple;
+	bh=SZrtuiihcek4S6wYZOcoznb714mLfD/k+QCICfUs104=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=np6Booi+LBb0DGq3AljncnnA5Z4Fg281idSs2ePRsyaCfhKGXdNaG8Y8KIAecvNDGRiJOwG93zgBEMJRbjrGEKEiB+E2OJ9+WlmvmcgCHcKYedEwkOWpbB7GLCKlyNGTQYR6zYyUb5bF/QKLy7HYsk49/CM0mF7DD+CxNAbNsQY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HX2bguJJ; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770162448; x=1801698448;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=SZrtuiihcek4S6wYZOcoznb714mLfD/k+QCICfUs104=;
+  b=HX2bguJJ0X/c4pqLMHyPngdicWiKKCuK63Ni5sEFgFswJGZIUKQ7N93L
+   Q4YbCdC2tInUjJE92htJQsPZ6EUMOQPHNO9yyCpEFYcScMUAqQAnuCzwl
+   cDXAuS+JCeq5FTWPJluY9c2bB3l3yONNw1NvEBXcvSXmave2FToH3lMZz
+   6YM+7qFCJG04GwE03y24qllxMUPtORieeefzV7ZOQeKlMU1IXeHZ+sENm
+   +JD3RjvwE1vy0kku+sBxucxvJdtVCo7veYWUqi9o9mXpyBnsicGuaeZzK
+   W/3VPXR/H3XwRGc70YQup0uDuCXLttw0gH488pBaY5cGtiGp3G2OAug4p
+   g==;
+X-CSE-ConnectionGUID: MIyRNh1WQ+SYmCGEo+6kCw==
+X-CSE-MsgGUID: ocaE70FXRG2MaYDWqV8XRQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71505328"
+X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
+   d="scan'208";a="71505328"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 15:47:27 -0800
+X-CSE-ConnectionGUID: JQyU0batRea+Hba2oKmJZw==
+X-CSE-MsgGUID: Ny/L5ADuQQud4a2kON+z3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
+   d="scan'208";a="210030428"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 15:47:26 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 3 Feb 2026 15:47:25 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Tue, 3 Feb 2026 15:47:25 -0800
+Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.17) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 3 Feb 2026 15:47:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dWz2JPDix6mRymzDAVzFpPMSSf1ZGD9CV+GkJ3zDy4zarJiqXcJocBFm5w64ygdgZsKXanv3bWIBT45Cq5XNbHAGfGLXT5Yfb+5Kh/LaaSWnBkXJTS9xEHkzShqjAT1AKAqox5LYIJDbqZDMzNKDfWOfuEZjJs+zAoW0NTU6mHv0XERHEF2whhY2EnneY7P8M65gtagxFmq6UvRzYvBJFMckB9dibMfkDWZG3RmsQAeszB6R9S4z5z7N8X7suum+spOy7eu+m7CZKo/UsucQM3rVzO9NDRhMHBhS4EVRG35JdPbZdrj80gYXNwfQ1wYpwGuIV5BW23tyLpsGIAznwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PtUBGrX2QvOa0szJOrOqrarXUj2//uPPJWzwrLaTWxw=;
+ b=ddddExhIAISU3TBhojsrNVOprTt/aNRNqf5ckSO3lMadDZ4wXBfvdJ3WT9Lj4BtzqZOEcITXb1lC5RMVB2JUVAxUwOS0aovTv9YsqinU1e2cl2XaRkfsTgsOuofkzN5MJPj8LGRPPQ0q9q5G6KXZDylqym6yGRqs6EmZJ3W/r4gFKT/DDRxCG4AuKgCXZ2K7KduJrYya/FBQLdvtJ2tO/MQUN50DfrerfkpKP+kQiAQiZMebXYmKqEqy/bm5q7A7iEFhjGigTy4XgDCOxJfYxK60NhOyD95G6oUdT6oTv8QR8OSInlfyRbWkLdu7oLc/8aoX+WArU1luzXQZrIxcpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7579.namprd11.prod.outlook.com (2603:10b6:8:14d::5) by
+ DS4PPFE99BD3AEE.namprd11.prod.outlook.com (2603:10b6:f:fc02::5d) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.12; Tue, 3 Feb
+ 2026 23:47:23 +0000
+Received: from DS0PR11MB7579.namprd11.prod.outlook.com
+ ([fe80::4199:4cb5:cf88:e79e]) by DS0PR11MB7579.namprd11.prod.outlook.com
+ ([fe80::4199:4cb5:cf88:e79e%5]) with mapi id 15.20.9587.010; Tue, 3 Feb 2026
+ 23:47:22 +0000
+Message-ID: <79960c2a-26ea-4472-bebb-4657fcca2255@intel.com>
+Date: Tue, 3 Feb 2026 15:47:18 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] iavf: fix deadlock in reset
+ handling
+To: Petr Oros <poros@redhat.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Jakub Kicinski <kuba@kernel.org>
+CC: <ivecera@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "Eric
+ Dumazet" <edumazet@google.com>, Stanislav Fomichev <sdf@fomichev.me>, "Tony
+ Nguyen" <anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+References: <20260202084820.260033-1-poros@redhat.com>
+ <20260202155813.3f8fbc27@kernel.org>
+ <b064ca33-1d94-4c7e-b0d0-78430d8cd0ac@intel.com>
+ <14cb0b22-ec39-43e4-a35b-22ad558b2e34@redhat.com>
+ <7907d42e-4805-48bc-aaf6-16cbe46eb1d2@intel.com>
+ <db1723e3-294d-46b7-aa4c-11a21b0da82f@redhat.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <db1723e3-294d-46b7-aa4c-11a21b0da82f@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR04CA0109.namprd04.prod.outlook.com
+ (2603:10b6:303:83::24) To DS0PR11MB7579.namprd11.prod.outlook.com
+ (2603:10b6:8:14d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aYE-gvuZdv7ezm7X@shell.armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7579:EE_|DS4PPFE99BD3AEE:EE_
+X-MS-Office365-Filtering-Correlation-Id: c9be0368-f01b-44f4-cfbb-08de637e936d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WlQ2YUU3ZEpsWGt3Z2NYUHNBd0UrUVk3LzRpN2U5QWFEQTVHM2NCbDZSNmNB?=
+ =?utf-8?B?V3l3YnpVNFp4SGliYU4wK0VlSWVkOTJpQUtLdjVBcWFPaHZmVUZtbFZkZmFI?=
+ =?utf-8?B?NWd2UkRHR0R3bFBhNmxqOTZ3WlZHaXYxaDYzYWdXUEZRaHhtSGJ5TmJOWXBq?=
+ =?utf-8?B?cE5jOXd0WEFobzhtWmpGY3VSanQrY3pjL01adVlRUjlXRWwzcXRIWWJVWEN4?=
+ =?utf-8?B?Qlo2OE5wTjZoazJiRS9ZdHpzengxK3Fqdmw2T1k4Yk5XSUV3SEV3eGVCQkt2?=
+ =?utf-8?B?cXBCUWJMcGF5RGgrSFNkdFNsQUJwcVMxalJVY0hiUXE4MWJ3VVJrbnh0a2ky?=
+ =?utf-8?B?QmIveHdTbzIxaFVZc0s0YkgvZEY5ZUxKM1p1YzkzQXlsNElkNXJFSlQxVnV1?=
+ =?utf-8?B?OTgzeHZ3bkc0MURIR1Z4UWQvOWNMbklIWkpSV040eTVMYzlZekpNYWFHVnV4?=
+ =?utf-8?B?M3g1dkhqamQ0ZmovOGpqRndEQ2FOKysxR1R3QzRCMFZPQ3lwekwrODdJTzgr?=
+ =?utf-8?B?NENWT1NVVTI2aEVQQlcwRGdQclRYOEZKc0hMeHBOamt6R05WaG5zcjFPdDA3?=
+ =?utf-8?B?QW1OTm0zNWNZOEpSV25EYWFNVmFBa3pxZTAzV1JKdTZjWjVPRXVwZlV2RkZn?=
+ =?utf-8?B?S2VqcjZRRURrMkIxUkQ3TWQ0S1psSmY2bUQ2WVRTK1IrenlpdlpOQ1JPSThI?=
+ =?utf-8?B?ZkQvTzJmYXExUm1Fc09nVlpuMVpFUGFTZVkwQWcvamxncEUzMmRDZmZjZmc5?=
+ =?utf-8?B?Tk95Zzh4WjhkUGgzeUszSFJqT3NSbFpBRDJ6bmdTa3F4K1pXcTVSNEVza1Qx?=
+ =?utf-8?B?TFN6bkp6NEpHWkZHTDhURmFHa3ZuTjNvMDVtbld4N1dlS0ZycWJUckJxblZB?=
+ =?utf-8?B?WUQ4VU1lTmxGak5sS2orclZxbEUrb1hTNmJJVWw5QThZbVI1Y2YxN1lFekNr?=
+ =?utf-8?B?L0VUcllOUmVmbXJIU01vaGowQ0FNODZ1Yk1ZaHBRR3pqTzJmdUhxVXdzTytO?=
+ =?utf-8?B?TWRpOGlIZjEwakM5VGxmdDh0RUZLYmZMVmZwMlVTbEVGNjdRYXBoOXV1YTUr?=
+ =?utf-8?B?eW9nL2JxN3ZIUkVpSHFpdEo4eTJZY3pWL2cwcXdmNnJzZlF5bGNXMVdiek8v?=
+ =?utf-8?B?S2dNbEVLcUtVbmlrNGUwY2h5RFFYT0xWaGM0MWtaWHowemdicVh1b2crWWR0?=
+ =?utf-8?B?NG44bzArQStuaVczMjZvL0wwQkdSRlgrODhPQS94QUhRMXNPYVdKUUFuWDNq?=
+ =?utf-8?B?SW5KeHd2SHJISWhRRkwydkl4amk1ejE4b1dQOEIzTEMzWEw2UlVRWmc2WUZv?=
+ =?utf-8?B?eGF3UXNGWWwrRlZaS2JMY0ZFZC9VK0orNWNUTUF3bmpPOWtnWm0yQUlEWXhl?=
+ =?utf-8?B?Q2diZjJhWXFkeXo5dEMvZEJ2ZEZ0MnNoSEd4cDFsNFIvb1k2RGZmOURYZGp5?=
+ =?utf-8?B?ZE9SR0xxK3hNeGUzN2FqRGlEeWhmbStCa2gyR3RKc2hjMVplZkV4ZWR4Q0Nt?=
+ =?utf-8?B?cDRDOTVhMFgzWk0yWmk0VVh5TW9tVFZ4NnpMUmZtR2R3T0lnK2ZXdjMwQ2Rl?=
+ =?utf-8?B?c3NKQlJicWx3eUxDb3J5cURZTEdicDZHOFBHTEtIR3JnNUR4VzRDMGphRG5v?=
+ =?utf-8?B?TFR0VC9SS1l4SVVtdE9iS0U5Q3dOR094akFMU2hlZjVaRVVmTXl2bWdhZXF3?=
+ =?utf-8?B?VlVMaDRSa1YyekY5bE12SURwTDFMenZUN24xRmxWQk11aE4xa29xOGxCcE5Q?=
+ =?utf-8?B?Wk1OdW40OHZnVXJkaW9XL29CUEFTNmdSbEplNzVLVzQ4ZVJoUDZQbmNMR3dD?=
+ =?utf-8?B?ZDRJbkV1TWU1SXQybFAyWXhwRzJraVNzR1VZQ01lK1lOdmJpTUt6M1J6MkE1?=
+ =?utf-8?B?SkltR1hDNHhyK21vNmdHQWFLMU1WV1NzTGYxa1IrT3plellHZm9OdU5GWVVK?=
+ =?utf-8?B?bXVwMjVuSmV0RVNnMU5qRjhWNXNIcUI5bnFFQ2poQm9PM1dpZ0NOR3dNOWdn?=
+ =?utf-8?B?K0RxM1BtOHYyS3lmUTd4d2lKVzREMzljUjBqTWZQMFJWbWNEUkNXR25jTHFh?=
+ =?utf-8?B?dnBpSVdGZ3hYN2pGTTFuTlBlREc4Nng5aE4rTmg5bHdLNEFXSUNwM2pPbmNO?=
+ =?utf-8?Q?vDL0=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7579.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aWZPaGJxcHZCWGhINTNuKzhQL1RJSmhYSzVEaVNOSDBQRDgyZUZKNkFaNi90?=
+ =?utf-8?B?NEowaHdxMkkyME02NENpMGNZTHpRK2R6RnhacS9pMWxGMFUvWkROSkJMemZ3?=
+ =?utf-8?B?WEhWVTI3dEJ0ODQ0VGtjV0VJVnd1SElFWmFvWGRqZzdhYWdDS3NweS9Hb0Jm?=
+ =?utf-8?B?RjhRcXBOMXphcWNFZmxRRkpvUmhiQkRGQlovWGhTSjY5eit5ZTJzUE5qd2U4?=
+ =?utf-8?B?L2xwRGFyaGdnV0plcDM4OVNtelpXYURITUdLRnBvckNsT3JKUDlhL1p1RVJL?=
+ =?utf-8?B?ZkZRdnhPZHZwc3NJVzNWMWFkejFVNkI3YkNFU3lscDFFcDIwRVZ3SS9EYmMy?=
+ =?utf-8?B?N1h4cnRtUjhuQjRyQnJNVE52dlVKL3I0VUNzOU8vYXFyWVV6ZDdPamszbHNt?=
+ =?utf-8?B?ZDkyVlN6VE9DZGxJZ084bmV1MjRXWHR4b3NQQ3VZcUVGMGJ5T2lYdk0xVGhp?=
+ =?utf-8?B?T3d3UTcxZnNLNXh1M2Z1bitEM3BJbFpuV3pNbXg3NEwxR2w4bTV6WlluV0ky?=
+ =?utf-8?B?WmVDRDRJaSt0b1A3eXFxdWdLd2dNcWVoWmQxdGlic0c1eHpvOXdjcEUybEMy?=
+ =?utf-8?B?SGJxZmdCM29rV0J0RWtPbENSQWtVWng0YnZiNFo1T0xyL3lzcWNFcFFwVFFY?=
+ =?utf-8?B?VGJ1b0RHTDlrV29xalY0NXVWdi9kMlh3TGh5ZHBtejUxVTRpdWoxTS8xSVA0?=
+ =?utf-8?B?SVFZei90azY0VktjOVBwU0pvT0VYd1hzazdhcCtmRnJSV2d5MGdSUlNFZ0l2?=
+ =?utf-8?B?REZBZEt0UU9zODZQZXM2WlQzZ1luNzl6Z3FDRmVyU0hoS2FoTDBSQXpURm45?=
+ =?utf-8?B?aU5URllJSlZlTDBQUllwQWdBY2RKWXF1WlhVY1phdk11dE9Sby9qSlJVM0My?=
+ =?utf-8?B?WTJocllHeVlqZ0JxUHE0dndETEFMZ1pZQzl0V05pLzN2VG5wazh6Um1kU3lL?=
+ =?utf-8?B?dlJSMjhpU0tBWlhFT0oxVHVLazVXcWNTZzFHM053WXFUeXFTYzczbXJIMDYv?=
+ =?utf-8?B?VE9NblVTejlzMmIybjdNdVh5OTBHc3ZjczRlZW1RWVJBc3ErWlhnek5ham1C?=
+ =?utf-8?B?MTBtczdZUHRWdE1waXYzS21VS3NhTytjYnU3S2hzcEhKVDZRVFN1MlhlNC9X?=
+ =?utf-8?B?TUkrZU5jZkYzS1JKZThwVDVpT25EU2g3b09pbTdCZ25HeGJIYjY2eVBubkNE?=
+ =?utf-8?B?Sm5xVk9YWFF2akdKSXJHbXBpK3NxbjRnYllBSkkySzJ0dlZXdDRWbGN1Q1BW?=
+ =?utf-8?B?eEtyZHZVdTdVWEhTaXVDand5SjdMbTVUU0ZKZUdSSDlyQ2JGS0I5WXdlOURU?=
+ =?utf-8?B?Qk1nS295UkJRMXNKOEFBT0VZZ0ZrLzNxRGlIb3hIdVhSVlErMmNlQ2hMeGVI?=
+ =?utf-8?B?NlRRZkd3NkVuSDhuWHd1bE5qTXBxbldlNjJSM1lJVk5PN2FRNVFxL2Rhbzlo?=
+ =?utf-8?B?T045bXQ1TjBhdjg0ZFVWMUloN0U4Zk9YR0ljTGJ6V1lrdmw3dGFGOEU3YTlD?=
+ =?utf-8?B?ZjJXdUdmVnF0L3RDeG9kSk5qRVF1dXlncnZ4NlIwbFRCYmpqaGxjZEFPY3BM?=
+ =?utf-8?B?WVFmQmZ5b0N5Sjl4WUpjb0FTaXJnWXhnbVhwY1h2MVJDOG5LYzdNVFpVN3Bo?=
+ =?utf-8?B?M21jMnkwOUk4T3hqbVBiWlluZjEzK3BnNmVQT0xtdnJTUDBuQkRVbHdEQklS?=
+ =?utf-8?B?Q2pGZm9vK01VTVlNV3lZY3VwMjBoNTc1OGVKb1FLR0V5aTVMbENZbHZWbFNR?=
+ =?utf-8?B?dGVGV041YWIxMWlaa3JTZllkak1BcEU4RlA3ZW1RbElTRnNYQ0pTNTFwNTJ2?=
+ =?utf-8?B?c2prUTF2RE1zNGh3Tld2c1BaWjNZaSs0ZkVuZ3pGR1RJMFhwNlEzZlBHWGZU?=
+ =?utf-8?B?R2VwLzVFcGxpdHh4VVkrbjBYU0ZmTVV1akZNaEJNQ1ZJQ0JiMVBCdmExNE1q?=
+ =?utf-8?B?WkplY01mMCsvNjZ4UUMxTlNkWFoyUURHMGlXR2dZTGNhL3hXYytlRW9nb0lZ?=
+ =?utf-8?B?bWVYTUk2WmJpNHQvZ0R5elZ0VURPQUxjK3hIczF1OGVESXVVa085aG01WUkr?=
+ =?utf-8?B?VHptYzVYQnc1MDRMblRpNy9VUmJnMVFrVGpwOWRZUGh5a3FhUENjSEhFMkFR?=
+ =?utf-8?B?a1BjNys3MkxXd1FKeFJQdGErN3YySnQ0SnRqQUxMcXJjVlNuSkRIWU5iR0NM?=
+ =?utf-8?B?Q2s0alYra3FiZUFiYTZQWEpWaGtOR21Rd2hlRGxESkZibFM0eTF3Y3VSWjNQ?=
+ =?utf-8?B?MnhPZ2NzQTVUSnFYOWN3RFhlUXNzWTZFTXJaUjEzVXk4dnpGT0orcldmbDMv?=
+ =?utf-8?B?YWxUMEJCNmEwWmNRZ3M2RHpDTlhSZlY1UmNKdW5hclJUZ04zeUs0dz09?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9be0368-f01b-44f4-cfbb-08de637e936d
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7579.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2026 23:47:22.8071
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wuDxiRZducut2H0JZVcYg6UbyqXxdWSdfSE1YsTJ2iXhgdHPABJjnyTIPU7h47fSz78j9PNHGACRYmJXk+LLiNKhqmsF93S7DfQEsHjyWMw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPFE99BD3AEE
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ideasonboard.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[ideasonboard.com:s=mail];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256489-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-256490-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ideasonboard.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[laurent.pinchart@ideasonboard.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,foss.st.com,lunn.ch,nxp.com,ideasonboard.com,davemloft.net,google.com,lists.linux.dev,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,pengutronix.de,redhat.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ideasonboard.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 57B9BDFADC
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: AE8A6DFD60
 X-Rspamd-Action: no action
 
-Hi Russell,
 
-On Tue, Feb 03, 2026 at 12:17:06AM +0000, Russell King (Oracle) wrote:
-> On Mon, Feb 02, 2026 at 10:23:45PM +0000, Russell King (Oracle) wrote:
-> > On Mon, Feb 02, 2026 at 08:54:52PM +0200, Ovidiu Panait wrote:
-> > > If not, maybe this patch could be merged to add the flag that disables
-> > > EEE and I will just send a patch to disable EEE on our platforms as well.
-> > 
-> > We still need the flag to disable EEE for platforms where lpi_intr_o is
-> > logically OR'd with the other interrupts, so there's no way to ignore
-> > its persistent assertion.
+
+On 2/3/2026 3:32 AM, Petr Oros wrote:
 > 
-> I'll also state that we need both patches, but there's no point pushing
-> my original patch (to allow EEE to be disabled) unless Laurent is going
-> to also submit a patch to make use of the flag - the EEE disable and
-> Laurent's patch needs to be part of a series. We don't merge stuff that
-> adds facilities that have no users, because that's been proven time and
-> time again to be a recipe for accumulating cruft.
+> On 2/3/26 11:19, Przemek Kitszel wrote:
+>> On 2/3/26 09:44, Petr Oros wrote:
+>>>
+>>> On 2/3/26 02:00, Jacob Keller wrote:
+>>>>
+>>>>
+>>>> On 2/2/2026 3:58 PM, Jakub Kicinski wrote:
+>>>>> On Mon,  2 Feb 2026 09:48:20 +0100 Petr Oros wrote:
+>>>>>> +    netdev_unlock(netdev);
+>>>>>> +    ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+>>>>>> + !iavf_is_reset_in_progress(adapter),
+>>>>>> +                           msecs_to_jiffies(5000));
+>>>>>> +    netdev_lock(netdev);
+>>>>>
+>>>>> Dropping locks taken by the core around the driver callback
+>>>>> is obviously unacceptable. SMH.
+>>>>
+>>>> Right. It seems like the correct fix is to either a) have reset take 
+>>>> and hold the netdev lock (now that its distinct from the global RTNL 
+>>>> lock) or b) refactor reset so that it can defer any of the netdev 
+>>>> related stuff somehow.
+>>>>
+>>> I modeled this after the existing pattern in iavf_close() (ndo_stop), 
+>>> which also temporarily releases the netdev instance lock taken by the 
+>>> core to wait for an async operation to complete:
+>>
+>> First of all, thank you for working on that, I was hit by the very same
+>> problem (no series yet), but my local fix is the same as of now.
+>>
+>> I don't see an easy fix (w/o substantial driver refactor).
+>>
+>>>
+>>> static int iavf_close(struct net_device *netdev)
+>>> {
+>>>          netdev_assert_locked(netdev);
+>>>          ...
+>>>          iavf_down(adapter);
+>>>          iavf_change_state(adapter, __IAVF_DOWN_PENDING);
+>>>          iavf_free_traffic_irqs(adapter);
+>>>
+>>>          netdev_unlock(netdev);
+>>>
+>>>          status = wait_event_timeout(adapter->down_waitqueue,
+>>>                                      adapter->state == __IAVF_DOWN,
+>>>                                      msecs_to_jiffies(500));
+>>>          if (!status)
+>>>                  netdev_warn(netdev, "Device resources not yet 
+>>> released\n");
+>>>          netdev_lock(netdev);
+>>>          ...
+>>> }
+>>>
+>>> This was introduced by commit 120f28a6f314fe ("iavf: get rid of the 
+>>> crit lock"), and ndo_stop is called with netdev instance lock held by 
+>>> the core just like ndo_change_mtu is. 
+>>
+>> technically it was introduced by commmit afc664987ab3 ("eth: iavf:
+>> extend the netdev_lock usage")
+>>
+>>> Could you clarify why the unlock-wait- lock pattern is acceptable in 
+>>> ndo_stop but not here?
+>>>
 
-Sorry for having dropped the ball on this. Your patch arrived just when
-I travelled to Japan for a month, and then it got burried in my inbox.
-Now that it has resurfaced, and that an issue that prevented i.MX8MP
-from booting with v6.19-rc has been fixed, I'll rebase my kernel and
-finally fix that problem.
+It may simply be that no one spotted it in ndo_stop.
 
-Once again, thank you for all your help with this issue, you have been
-extremely helpful and I'm very grateful.
+>>
+>> perhaps just closing netdev is a special kind of operation
+>>
+>> Other thing is that the lock was added to allow further NAPI
+>> development, and one silly driver should not stop that effort.
+>> Sadly, we have not managed to re-design the driver yet. I would like to
+>> do so personally, but have much work accumulated/pending to free my time
+>>
+> I agree, the unlock-wait-lock pattern is fundamentally flawed (I now 
+> understand
+> why it is unacceptable) and should be avoided.
+> > What can we do now?
+> 
+> * Eliminating the wait is not an option: As noted in the description of 
+> commit
+> c2ed2403f12c, this wait was originally added to fix a race condition where
+> adding an interface to bonding failed because the device remained in
+> __RESETTING state after the callback returned.
+> * Passing the lock into reset is impractical: The reset path is 
+> triggered from
+> numerous contexts, many of which are not under the netdev_lock, making this
+> even more complex than a full refactor.
+Hm. I was thinking we could just hold the netdev lock for the reset, 
+but... we already take the netdev lock there as of commit ef490bbb2267 
+("iavf: Add net_shaper_ops support").
 
-> So, at the moment, "net: stmmac: provide flag to disable EEE" ain't
-> going anywhere until there's a patch that makes use of the new flag.
+That's actually what causes the deadlock: prior to that change reset 
+didn't hold the netdev lock for the duration. This is what gets us 
+stuck. We are waiting for reset to finish while holding the lock that 
+blocks the reset.
 
--- 
-Regards,
+But I am not really sure how to fix this: We want change MTU to only 
+return once reset is complete.. but reset is dependent on the very lock 
+that we're holding. And there's no way to communicate this fact to the 
+reset handler...
 
-Laurent Pinchart
+
+> 
+> If dropping the lock is a no-go, the only viable path forward is to 
+> split the
+> reset_task so that the waiting portion is decoupled from the netdev_lock
+> critical section.
+> 
+We used to do this back before the netdev shaper ops. We didn't acquire 
+either netdev lock or RTNL during reset.
+
+I thought we had some code in the past that would handle netdev stuff 
+outside of reset.. but I don't really know and git blame is not making 
+it easy to find this information.
+
+Perhaps we don't actually need to hold the netdev lock over the reset 
+task.. except Przemek's refactor to remove the critical lock now makes 
+us fully dependent on the netdev lock in this case for reset :(
+
+> The fact remains that MTU configuration and ring parameter changes are
+> currently broken in iavf. Changing the MTU on a Virtual Function is a
+> fundamental configuration not an obscure edge case that can remain non- 
+> functional.
+> 
+
+Agreed. This needs a resolution. It is just very tricky to figure out 
+what the solution should be.
+
+We need to hold the netdev lock during reset, and we need to have our 
+handlers wait for reset to complete in order to be certain their task is 
+done... but reset is a separate thread so we can't really communicate to 
+it that we're holding the lock, and attempts to do that would be a huge 
+problem.
+
+We don't want to go back to the critical lock and all of its horrible 
+problems either. The commit that removed it is here: 120f28a6f314 
+("iavf: get rid of the crit lock")
+
+> I would appreciate any further guidance on how you would prefer...
+> 
+
+I wish I had some better ideas..
+
+Bad ideas I've thought about so far:
+
+1) this patch with its drop lock and wait, which we discussed as 
+problematic before. It creates a lot of issues since it means the 
+operations are no longer atomic and we could potentially get stuck with 
+some other operation in the event of another thread starting some core 
+netdev task. No good.
+
+2) not holding netdev_lock in reset, which is now a nogo since we 
+removed the crit_lock, and apparently we held netdev_lock prior to that 
+too anyways...
+
+3) we could maybe do some sort of ref counting dance where we take some 
+reference in threads that queue a reset, and the reset task would know 
+if that reference was non-zero then another driver thread is holding 
+netdev_lock so its safe to go into reset without locking... but this 
+feels extremely ugly and error prone to me...
+
+4) convert reset handling to a separate function that depends on the 
+netdev_lock, and call that directly from within the threads that 
+currently "wait for reset" while holding the netdev lock. Thus, we 
+basically move this entire call chain into the thread already holding 
+the lock, and call it from the context of the function like the MTU 
+change, etc. This feels like its also a huge issue, and could 
+potentially lead to some sort of issue where we need to still block the 
+reset thread from going if we reset at the end of the netdev_lock thread..
+
+I don't really like any of these solutions, even if (3) and (4) aren't 
+fully ruled out as completely broken... they probably have all kinds of 
+issues...
 
