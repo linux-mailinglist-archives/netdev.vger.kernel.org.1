@@ -1,189 +1,251 @@
-Return-Path: <netdev+bounces-256215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOdJMba9gWm7JAMAu9opvQ
-	(envelope-from <netdev+bounces-256215-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:19:50 +0100
+	id IGQwKC++gWm7JAMAu9opvQ
+	(envelope-from <netdev+bounces-256216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:21:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D4BD6B88
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:19:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B98FBD6BC4
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:21:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9631305420D
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:19:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CA6BD3007B1F
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C66395DB7;
-	Tue,  3 Feb 2026 09:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2499396D2A;
+	Tue,  3 Feb 2026 09:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GiFTRx3T";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lf7zKLgU"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="JZuToZBJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="h9WuaJSc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50D22EC08C
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 09:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9428285C91
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 09:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770110361; cv=none; b=oQyAMZsfxd5DkPUjW+ashU2gf2bljsMuWqwSXB5mWFPHsYUs/HXoxJmV2zNi5H9cZziJo7hT4IGJi1bibXzhNDm6nHB1sGOgW67XJLgD7J52CAupE0kjjVCDzCU3sNgaLgKZz1gW8lm+n7anaVp/ypNTcR3QcNHJ/+XYSgopxjg=
+	t=1770110499; cv=none; b=ZQV6NrCYzFqHL8h5lMfw8jseH2ig91i+rB/hBPJzCbdOR+lLq0F/anXdv8NS+9C1ASgZwafzhAVmaebHD4rV+gJPsJjxO1dfntMOTSho/bxSwsLrSZZxZliwLRuVKjgJpyTSZU/OchGK7GzBczzw3zU35ODIeGFIe7SH/LS8LCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770110361; c=relaxed/simple;
-	bh=JxpEZ5tbLRwPZDvaOIBEHKKckKzdOtkFQm5l5V5uiLs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MH3ykUfXI28iSygiUNbLmtsOmb4RJd5mX8KcGYdfF9SxVvYcyuHt7JuH8DqAlpBzh5Te95GfqTdqi2BnPGM1l+86Uada9qK4H3IONVX+pdxbNG4dNZyDQUsqpHjzyah2+f7hgEHBhLV3322dkkdr8fZUuCYt51iclm+ZNhatohM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GiFTRx3T; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lf7zKLgU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770110358;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Jpk8ObAb0wujGpkASRD1s52R/DYhqpf5NMLaAUU7Vs=;
-	b=GiFTRx3TVU5IHjqvizL0da8CskqET9HXXXdJfJq3M9Vp2S9rbJkDVkxUfl27Ie7oMuo/gR
-	IZGabi5Yq6m37UK6GdHElUcMpB2y53GoPA/GTKqipyb1el5KzpWpuIS5isoIbU4LqpXx/c
-	91bZ4W6+F/oH+ofg4GB7WRtdr0GhYO4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-77-27wu4zxuOMqGTAt7iHYdLQ-1; Tue, 03 Feb 2026 04:19:17 -0500
-X-MC-Unique: 27wu4zxuOMqGTAt7iHYdLQ-1
-X-Mimecast-MFC-AGG-ID: 27wu4zxuOMqGTAt7iHYdLQ_1770110356
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4806b12ad3fso46022485e9.0
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 01:19:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770110355; x=1770715155; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0Jpk8ObAb0wujGpkASRD1s52R/DYhqpf5NMLaAUU7Vs=;
-        b=Lf7zKLgU0BESW9ko15HRt1UImHexqnAaZWfOa5JKsWI9mKS5QyHBwga8G6JhnDstHO
-         0OcTUZ6OYvGlxs04PWjOW32LOL+5BMfmHbWukIaqGU/lNKLNlJoakTvXaPGCrK5fW+5c
-         L3E1qdYMv9TfRcCW1zMYE41MseS9hr97V7jPnPcHdCCIg/AEtczWOfeOiTSgBrvD4Ohz
-         Wf+ZXhJCEYHg3m0TTxEn6zfAxd+52CHXcYxraSfIizTw5xTXJHgABp7ljzN+TvO9yasp
-         rKeqbvmbhRCfVpox+wCiE4b9hqw7rAR1GfVxadMp7+stpYrNnWH9nnV17u7SMJXKoXFh
-         YdNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770110356; x=1770715156;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0Jpk8ObAb0wujGpkASRD1s52R/DYhqpf5NMLaAUU7Vs=;
-        b=bIAbYsnbe8b2BqhYrfxJ78VloRYHQVH8dderMXzWsHSbEyk13wa8AXkTkq3/K1odWT
-         eB7GIl7MPyJC4wrCV5/5mIsAnGxWE0CIukucSLp4+Z3Nx/orFX27k0KsBfPmDUpDxmhd
-         MSFbdhm+SODFNJxBHdxOF39EENa1iFsyQh5/BOl3X7YrVdXDUhLxfsyONAqb3qrwFl1o
-         BKYcAeBSNE4isdfZcCksbdQhgN0rbyjR8t1ACVT10Oijt2SbtlIMWnbLNFY6wyKmDqbX
-         5Y6zb2yI5Zyo0LLk60G4g4SOPx3u49XsQ/s0NSYKNAlQvQOlEAcVAZYgF6U3mZ54PJps
-         D57A==
-X-Forwarded-Encrypted: i=1; AJvYcCXGI9dAYez+j1KmbIf+VE8NwpKhfTRPM2PhOHWnpBrtafDHZRMijJPTQzXywI+CyKeytVqF5as=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC0KkbohBmL0NMVLazR5TVSVMfAAgvCyD6wfsBfgLHALAUN2+s
-	mBS4hN/4kEKuXEAZfu260rHETWr/XrqfE8GmV5bCY2HIgKx+Vfsq+9WI4BGYWbjOqPjFEKInSqf
-	B22od4nngLYml7pnyKr7uU/a2fganH9oGfswh65FUj3G6DKkIpjJkJRmviSt5hAzL+w==
-X-Gm-Gg: AZuq6aLjPkDSU7xodefGc37r+Q3YxvRPVvZf8pyU15EHYWhKeNHqvlmJcOOFEJrm9U6
-	8Yboi5e94HSVk2D8pvZ+MoMx9hf0+y9H0659R2/iJ2asr/SWDikl87rsYm4cc23b2vQ4N0C4eh/
-	JDU3y+DJT5GmpiwhiVXmLkB/howmcS0aECIs6/h8UzV5DtoE1x0Qlr/OoySsvpht+bVuNJ58WV7
-	t43nXdsuTYlMeBEY9/ybT1cVMP5QEThIpQTPhA+H705ICsdtkaIwGcXVl2qnJ3uz0UErLyscOgr
-	y2WZT8F1bXNthsDe6Wjos65eTsGvsn80T78hJ6B1xZEDZQU0qdY8wR+25Gaklj6Jf0PkSEkr84J
-	vi2JEMkx7KEo=
-X-Received: by 2002:a05:600c:8b2f:b0:480:1d0b:2d15 with SMTP id 5b1f17b1804b1-482db486e65mr192394395e9.27.1770110355631;
-        Tue, 03 Feb 2026 01:19:15 -0800 (PST)
-X-Received: by 2002:a05:600c:8b2f:b0:480:1d0b:2d15 with SMTP id 5b1f17b1804b1-482db486e65mr192393995e9.27.1770110355153;
-        Tue, 03 Feb 2026 01:19:15 -0800 (PST)
-Received: from [192.168.88.32] ([150.228.93.21])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482da6bcad7sm157523385e9.0.2026.02.03.01.19.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 01:19:14 -0800 (PST)
-Message-ID: <90017867-2649-4632-8497-96e2592c73c3@redhat.com>
-Date: Tue, 3 Feb 2026 10:19:10 +0100
+	s=arc-20240116; t=1770110499; c=relaxed/simple;
+	bh=0jde5CFghNAu7uERR/9qGvtypksjazu8lZO8WvnobzE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=cWnLqvPKGPzxksQ+dK+Xo/hAr6tCQkbTUgqpEJdUUeXeDBe4G/RSDpjTPrt/qNTFyfuf8L2x6UZqpcBZLOhMKbQ1i6MJ5S4PLU1FaqmiHpS+KKAj+P4sJOzmGnrdAwK2nzKblATur1ApKHRx6u3eoFn8NDg3qe3QDorDSntnWSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=JZuToZBJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=h9WuaJSc; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id 95AC91D00010;
+	Tue,  3 Feb 2026 04:21:36 -0500 (EST)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-10.internal (MEProxy); Tue, 03 Feb 2026 04:21:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1770110496;
+	 x=1770196896; bh=0jde5CFghNAu7uERR/9qGvtypksjazu8lZO8WvnobzE=; b=
+	JZuToZBJ24x6lagHRxZm1K66WJRzPBSUul/pgci25vJmMOr7c8Qd78RgE7eTzhJV
+	ijuIAv3kja5zjKLg1AimKgtzNZq86x9P7yM/KLNiPSXr0FlwjlcJTgoIGUjBeOhd
+	ogI8etbfS6kiZYrrBjSToXzilZ45RP2rSDQCyQDvaxho5JiFYgw9dCPjzD0IoONW
+	WII1cRP3gKcpL6DlcLIlxGbqxb5JDaD1B69eriJsI+ud09BbFiC0k4AGkEmyo3Ou
+	6jOHBaZWeA1UPiQiMmUxwKN+2VXWdJMmuskBkP1i3YY6vRzk9FbKxaz0/7kW80o0
+	fbZ0pNUp5PV+LPVpXSA1Uw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770110496; x=
+	1770196896; bh=0jde5CFghNAu7uERR/9qGvtypksjazu8lZO8WvnobzE=; b=h
+	9WuaJScfgfLA6RTu1sTySoyvHpDFjV85Cy8pjvpyf9iRhEdcqL3jsR9s8ndLvoPt
+	hCoG7NBy7EXgZYoo2G1QJfG6uTAzRsudzfiP61JNKAF5LeGhfFPIX0e5WRJ+fOLE
+	xW/captOVG9P2gDOMK4mj3KauznqDinregqox+Ql8GmR2nMre3rOuhovp4K5g+9V
+	50ZfcnszEoaUdqrqJDigLGzoGS9mdBq5uIdV7UFNqRE4MnLGfJHX55hHG4jmZ3uw
+	M4qZEt0lvUuqEzWrhlUbEZ6IuctPwCy7uEADNpEB9LnaX8k/X0tX0VFuVIazsTHF
+	NgzVKtHkSaiPv6PeO8m2Q==
+X-ME-Sender: <xms:H76Baa6UWfki9sFa2EHANuK4qUMn-2pC3F5TogbDuS4yYQchTS7NtQ>
+    <xme:H76Baet1r3a5a7EqxrHNV0TIpdbKPS0Rdo0sIERDmv7bzt3qxpJl7qycVGMhTzVlN
+    3lGj_okk2Zbb2mfJU6zrA_4jDPjdCehes7sG8G-vFueOGtUaHr4z7YC>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeelleeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehlihgt
+    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
+    hilhdrihhmqeenucggtffrrghtthgvrhhnpedvieevheffudffhfefvdfhfeekveelueet
+    gfelgfeigefhheegfeeifeehteevteenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrdhi
+    mhdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepug
+    ifsegurghvihgufigvihdruhhkpdhrtghpthhtohepthhtohhukhgrnhdrlhhinhhugies
+    ghhmrghilhdrtghomhdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnh
+    gvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepghgr
+    lhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepthgrrhhiqhhtsehnvhhiughirgdrtg
+    homhdprhgtphhtthhopeifihhtuhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepnhgv
+    thguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:H76BaTOCZi10p8xAe1_x67H0qgINSAHF9rs3gLq6BWW7ZLb_zfqWmg>
+    <xmx:H76BaX9fjCPdumDGS_Vis9jPuCNwJEQNIDLQoR9H1QpNcZuI56ACUw>
+    <xmx:H76BaY5R45MtC4rsGJpqvCDgItVbe6Z9gORdr2qP8TUshFdUsOwZiA>
+    <xmx:H76BaV5Lr2YvLtZvXMH4Dbs2kfJoK-PbM5C0V3GSDE7_RFGLw389-Q>
+    <xmx:IL6BafSdFTehsL_H_11xIqlfQIEbnMiHmnG9M6XXOFFqjeJXa6wJ44Xz>
+Feedback-ID: i559e4809:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id CFD9A33E0099; Tue,  3 Feb 2026 04:21:35 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v17 07/12] virtio_net: Implement layer 2 ethtool
- flow rules
-To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
- mst@redhat.com, jasowang@redhat.com
-Cc: virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
- yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org, andrew+netdev@lunn.ch,
- edumazet@google.com
-References: <20260202170518.9076-1-danielj@nvidia.com>
- <20260202170518.9076-8-danielj@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260202170518.9076-8-danielj@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-ThreadId: At9sFCvdeaDg
+Date: Tue, 03 Feb 2026 11:20:30 +0200
+From: "Alice Mikityanska" <alice.kernel@fastmail.im>
+To: "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Tariq Toukan" <ttoukan.linux@gmail.com>, netdev@vger.kernel.org
+Cc: "William Tu" <witu@nvidia.com>, "Tariq Toukan" <tariqt@nvidia.com>,
+ "David Wei" <dw@davidwei.uk>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Gal Pressman" <gal@nvidia.com>
+Message-Id: <ae18245c-e4f6-414a-b8d2-de18824c3861@app.fastmail.com>
+In-Reply-To: <2a3bd098-0d88-4c11-8ac3-7b13f8bbbd9f@iogearbox.net>
+References: <20260123223916.361295-1-daniel@iogearbox.net>
+ <85776531-d5fa-4762-90aa-74c8397dc09b@gmail.com>
+ <6188b9f5-ce38-4de9-80b7-c7b1cab48595@iogearbox.net>
+ <421d9b09-a157-4f95-8775-7883ea097038@gmail.com>
+ <2a3bd098-0d88-4c11-8ac3-7b13f8bbbd9f@iogearbox.net>
+Subject: Re: [PATCH net-next] net/mlx5e: Undo saving per-channel async ICOSQ
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256215-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-256216-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[iogearbox.net,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[fastmail.im];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 44D4BD6B88
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fastmail.im:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: B98FBD6BC4
 X-Rspamd-Action: no action
 
-Hi,
+On Mon, Feb 2, 2026, at 18:13, Daniel Borkmann wrote:
+> Hi Tariq,
+>
+> On 2/1/26 1:50 PM, Tariq Toukan wrote:
+>> On 26/01/2026 11:23, Daniel Borkmann wrote:
+>>> On 1/25/26 9:33 AM, Tariq Toukan wrote:
+>>>> On 24/01/2026 0:39, Daniel Borkmann wrote:
+>>>>> This reverts the following commits:
+>>>>>
+>>>>> =C2=A0=C2=A0 - ea945f4f3991 ("net/mlx5e: Move async ICOSQ lock int=
+o ICOSQ struct")
+>>>>> =C2=A0=C2=A0 - 56aca3e0f730 ("net/mlx5e: Use regular ICOSQ for tri=
+ggering NAPI")
+>>>>> =C2=A0=C2=A0 - 1b080bd74840 ("net/mlx5e: Move async ICOSQ to dynam=
+ic allocation")
+>>>>> =C2=A0=C2=A0 - abed42f9cd80 ("net/mlx5e: Conditionally create asyn=
+c ICOSQ")
+>>>>>
+>>>>> There are a couple of regressions on the xsk side I ran into:
+>>>>>
+>>>>> Commit 56aca3e0f730 triggers an illegal synchronize_rcu() in an RC=
+U read-
+>>>>> side critical section via mlx5e_xsk_wakeup() -> mlx5e_trigger_napi=
+_icosq()
+>>>>> -> synchronize_net(). The stack holds RCU read-lock in xsk_poll().
+>>>>>
+>>>>> Additionally, this also hits a NULL pointer dereference in mlx5e_x=
+sk_wakeup():
+>>>>>
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963735] BUG: kernel NULL pointer derefere=
+nce, address: 0000000000000240
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963743] #PF: supervisor read access in ke=
+rnel mode
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963746] #PF: error_code(0x0000) - not-pre=
+sent page
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963749] PGD 0 P4D 0
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963752] Oops: Oops: 0000 [#1] SMP
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963756] CPU: 0 UID: 0 PID: 2255 Comm: qem=
+u-system-x86 Not tainted 6.19.0-rc5+ #229 PREEMPT(none)
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963761] Hardware name: [...]
+>>>>> =C2=A0=C2=A0 [=C2=A0 103.963765] RIP: 0010:mlx5e_xsk_wakeup+0x53/0=
+x90 [mlx5_core]
+>>>>>
+>>>>> What happens is that c->async_icosq is NULL when in mlx5e_xsk_wake=
+up()
+>>>>> and therefore access to c->async_icosq->state triggers it. (On the=
+ NIC
+>>>>> there is an XDP program installed by the control plane where traff=
+ic
+>>>>> gets redirected into an xsk map - there was no xsk pool set up yet.
+>>>>> At some later time a xsk pool is set up and the related xsk socket=
+ is
+>>>>> added to the xsk map of the XDP program.)
+>>>>
+>>>> Thanks for your report.
+>>>>
+>>>>> Reverting the series fixes the problems again.
+>>>>
+>>>> Revert is too aggressive here. A fix is preferable.
+>>>> We're investigating the issue in order to fix it.
+>>>> We'll update.
+>>> Ok, sounds good. Certainly the kTLS fixes seem independent, from the=
+ cause
+>>> of the issues I've hit it just seemed to me that they were quite fun=
+damental
+>>> and that perhaps a different approach would be needed (or alternativ=
+ely only
+>>> kTLS would need fixing, and the xsk optimization left as it was orig=
+inally).
+>>> Anyway, I'll keep the revert locally for now, and happy to test patc=
+hes.
+>>=20
+>> Please check attached patch.
 
-The AI review reported a possible issue that looks valid to me.
-Reporting the feedback manually because I think only one to the AI
-remarks is valid, see below.
+Hi Tariq,
 
-On 2/2/26 6:05 PM, Daniel Jurgens wrote:
-> +static bool validate_eth_mask(const struct virtnet_ff *ff,
-> +			      const struct virtio_net_ff_selector *sel,
-> +			      const struct virtio_net_ff_selector *sel_cap)
-> +{
-> +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
-> +	struct ethhdr *cap, *mask;
-> +	struct ethhdr zeros = {};
-> +
-> +	cap = (struct ethhdr *)&sel_cap->mask;
-> +	mask = (struct ethhdr *)&sel->mask;
+I also took a glance at the patch: that seems to be correct in XSK parts=
+, and mlx5e_trigger_napi_icosq now makes sense to me after your explanat=
+ion. Two small comments though:
 
-This function casts sel_cap->mask to struct ethhdr * and accesses fields
-at offsets 0, 6, and 12. Shouldn't there be validation that
-sel_cap->length is at least sizeof(struct ethhdr) = 14 bytes?
+1. I'd prefer DEBUG_NET_WARN_ON_ONCE instead of WARN_ON. At least XSK wa=
+keup is a hot path, called frequently, so we don't want to flood dmesg w=
+ith the same error, and it would be better to compile out the check in n=
+on-debug builds, hence DEBUG_NET_WARN_ON_ONCE.
 
-Looking at virtnet_ff_init() at line 6291, it only checks that
-sel->length <= MAX_SEL_LEN (40 bytes) but doesn't enforce a minimum
-length for the ETH selector type. If a device provides an ETH selector
-capability with length < 14 bytes, won't validate_eth_mask() read beyond
-the allocated mask array?
----
+2. I see you changed the condition of creating async_icosq to be created=
+ when any xdp_prog is attached, even when there are no XSK pools. Is the=
+re a case where async_icosq is useful with plain XDP without XSK? If not=
+, I believe this condition should be XDP && XSK.
 
-Note that the AI review additionally reported a possible leak on xarray,
-but I think it got confused possibly because it run out of token and
-mixed-up the patch context.
+Thanks,
+Alice
 
-/P
-
+>> We were able to repro the issues internally and verify the fix.
+>> We're finalizing it before submission.
+>>=20
+>> I'd be glad if you can confirm it solves the issues for you.
+> That seems to work for me, yes. Feel free to add my Tested-by.
+>
+> Thanks,
+> Daniel
 
