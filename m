@@ -1,119 +1,129 @@
-Return-Path: <netdev+bounces-256115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256116-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONdbIfZ0gWnoGQMAu9opvQ
-	(envelope-from <netdev+bounces-256115-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:09:26 +0100
+	id EL5NKnt3gWkyGgMAu9opvQ
+	(envelope-from <netdev+bounces-256116-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:20:11 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFAF5D44D5
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:09:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24646D4613
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 05:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AED773049262
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 04:09:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C80CE3015728
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 04:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515A52F6184;
-	Tue,  3 Feb 2026 04:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE1B45948;
+	Tue,  3 Feb 2026 04:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t4KoajWe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UKGh6I5Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2796B214A64;
-	Tue,  3 Feb 2026 04:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2921943AA4;
+	Tue,  3 Feb 2026 04:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770091759; cv=none; b=WEImIxbypUWe4F/Ct3ikdEc9vS29yObnYZgRG7DJ4xd+1DNTd7Mxlj7hrCr9BLs5/yt6S5vyb32zGySiZkPPdbqnKKA6qasARpSuWV8M7M1CtMzEI4I6aAVIo49nhDGmLvGv3ZZde5C+9SpD6Mnpz/Aurw97rWw+9j0ImsjLlb4=
+	t=1770092409; cv=none; b=kghyMtYBI5AtflZUtCDvG9Mh2smG3aFWJNMgY+MN4WGTDbRbC1N8s3j6WSUX6NzOUiFX/UwhSGb8jIFbfhSWwX/5LXemzET+apCmUl/W94sw5O8koPyUIJq658cauGYUVcQhta+loG/zRFTwCN65x9jVlaK7Qhvf8UHA3EqiI+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770091759; c=relaxed/simple;
-	bh=IXDilzVCem2iDthXSKXW8yichEDMzvfMuferk/Hty3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=crnMwpGFP75dYZ6NEYBawx+hWcR5DwPhHzUQZViV7QuN3yZTXt/HcaVd30UGgm2bYdB2IdA34w1K0qqGuT/QfWzRiCreLdNKVPv9MqVn2PUt8HUTNwdCaQxVZRbl2VuUTDA4iIwjWFgZKnzoBD6/oMEqIhHUAP/+rMRZUOsFnXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t4KoajWe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE7CC116D0;
-	Tue,  3 Feb 2026 04:09:17 +0000 (UTC)
+	s=arc-20240116; t=1770092409; c=relaxed/simple;
+	bh=0YAWDIS+eysLPVl7yK0G0fnhNv1PM/4TCL5u/TuVNpI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tNzTm0ZKuaAR55nlBFhI/Ac7+IkfQIysIytr+xksM997z7saXHvMtsDeH4Biebuwwb/diOP5rooj+zGcNv/rUyh70qjiPNT2qqnjVrnq/rA6Mbl3CByGYuG8hB3FZc+aSUHS26jFHTYggQTOjhT2siIIXwdjHZSg8e1CAYMaJ1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UKGh6I5Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9611C116D0;
+	Tue,  3 Feb 2026 04:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770091759;
-	bh=IXDilzVCem2iDthXSKXW8yichEDMzvfMuferk/Hty3E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t4KoajWevWwa5LfWTbOIjq718jkE5hU4RMhnXxLW9ANadmh8GZ4VmaVeziGrcOODX
-	 db8jmpDFoO5gTh0JhFMW8OFmsW79hfyqUrFeFshLJe1aBsl/W0xH7XinTKU8Y+cyTp
-	 xP/HJVh8nkAdLYUcvMovug+QSi7DypGCnOWlbd43w+y+OsiuM2K3FK2SbIy1TwyRu0
-	 ImYC/DVvZEcyjGaBK5efDxhh475oPZR6CjeXh+wwXfRkRD+dDLsVDyxR2pwB4IU2J2
-	 zJJSDC6/Vsn5wE847REIM9Nis511s752K9cmLuOoTWzbTvp4oZd/FnmXqyaFwott/z
-	 XTR2QZ8s2+9Jg==
-Date: Mon, 2 Feb 2026 20:09:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
- <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Randy Dunlap
- <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, Krzysztof
- Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next V7 00/14] devlink and mlx5: Support
- cross-function rate scheduling
-Message-ID: <20260202200916.2b71ccdc@kernel.org>
-In-Reply-To: <20260128112544.1661250-1-tariqt@nvidia.com>
-References: <20260128112544.1661250-1-tariqt@nvidia.com>
+	s=k20201202; t=1770092408;
+	bh=0YAWDIS+eysLPVl7yK0G0fnhNv1PM/4TCL5u/TuVNpI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UKGh6I5ZSbFuQyF6DyfPCFHB9zdBfTUzUeJCejaTBm/dpEDVsBM9akcfz3ux8mjSN
+	 V1GGYH7vDQuV6SIe/LPBTMFw0tV7KFHHMj74U1Nl1DEZATxxV+Apfi1UU2R4TPvm81
+	 p586sz5MMkfS8KUKTGZFF2vHVgfyJ01+ADhtSsbgPWPVUT2XYTGX8oChOUyQg4LhjC
+	 fANHZLY9Px53Wst1UDYbFQNpV3xWQ+XSv+K975fxhQ5ENsHYcY7aRzFc0qzYUQPV68
+	 caRRSkpontpG4cOKKEKWy/Wl2kId12Yd2BtpjqbnnxUTwhqVo8h7Qzr5O0Rqz9T7Z7
+	 DG0+ZRQWAJRKQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9104D3808200;
+	Tue,  3 Feb 2026 04:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: spacemit: k1-emac: fix jumbo frame support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177009240524.1309272.13521907862288181709.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Feb 2026 04:20:05 +0000
+References: <20260130102301.477514-1-tmshlvck@gmail.com>
+In-Reply-To: <20260130102301.477514-1-tmshlvck@gmail.com>
+To: Tomas Hlavacek <tmshlvck@gmail.com>
+Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dlan@kernel.org, wangruikang@iscas.ac.cn,
+ stable@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256115-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,nvidia.com,kernel.org,vger.kernel.org,infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256116-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DFAF5D44D5
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 24646D4613
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 13:25:30 +0200 Tariq Toukan wrote:
-> This series by Cosmin and Jiri adds support for cross-function rate
-> scheduling in devlink and mlx5.
-> See detailed explanation by Cosmin below [1].
+Hello:
 
-I'll apply the trivial patches (3, 5) to avoid the reposts.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Please add driver tests exercising this code, there's high risk 
-of regressions with all this complexity and nested locking.
+On Fri, 30 Jan 2026 11:23:01 +0100 you wrote:
+> The driver never programs the MAC frame size and jabber registers,
+> causing the hardware to reject frames larger than the default 1518
+> bytes even when larger DMA buffers are allocated.
+> 
+> Program MAC_MAXIMUM_FRAME_SIZE, MAC_TRANSMIT_JABBER_SIZE, and
+> MAC_RECEIVE_JABBER_SIZE based on the configured MTU. Also fix the
+> maximum buffer size from 4096 to 4095, since the descriptor buffer
+> size field is only 12 bits. Account for double VLAN tags in frame
+> size calculations.
+> 
+> [...]
 
-What devices will support this? Is CX7 enough to test?
+Here is the summary with links:
+  - [net,v3] net: spacemit: k1-emac: fix jumbo frame support
+    https://git.kernel.org/netdev/net/c/3125fc170169
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
