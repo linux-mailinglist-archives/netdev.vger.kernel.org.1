@@ -1,165 +1,243 @@
-Return-Path: <netdev+bounces-256106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256107-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDkUEWZqgWnHGAMAu9opvQ
-	(envelope-from <netdev+bounces-256106-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:24:22 +0100
+	id MKyYNflqgWmwGAMAu9opvQ
+	(envelope-from <netdev+bounces-256107-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:26:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77310D417C
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:24:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC59D41BE
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F2B4030055D2
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 03:24:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFA3E3055E65
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 03:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2432F1FE4;
-	Tue,  3 Feb 2026 03:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFD5313E2C;
+	Tue,  3 Feb 2026 03:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qn9d+Gta"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nn/nFrDK";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsKrYu/Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DB62628D
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 03:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770089057; cv=none; b=U0rrOSV4LwCRwgvG7loeOkn4M+qNIChD4JV3uGRRbXhSySpzpFbLKqqq6G8TKmM8PoJtVxxZrwpazbBIo/TQjBVFzBz7f5+FsLRsf8QuEA/isSuY/fpNGOuqcWjTaqCQ9bIt4eVyppHtlAI6FL7nk+Atz8nGzi9GXMUjc8kaAh0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770089057; c=relaxed/simple;
-	bh=s2/NiPRF8pByV42uHHuUV6Cd8yTO4MG04MmcjvnU9cU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qdzur3Ekd54Ga/Im0FzpOqjrWVZbWSWNpUdh1O8FRUfljGqbxRONQfaKJYs/Ts0cn6Igj/ckqKocpEfNCKrOhNrfJzqbnjYK4v5EpjXBTtHucfrHu8lEZT+5zezsr1bmeXsNkl89DFQ41UrEUAc7QoIkbEeVnMPXv44qxaLjQD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qn9d+Gta; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a78e381fc1so24570955ad.3
-        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 19:24:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6100A2F1FE4
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 03:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770089071; cv=pass; b=shuDyaYvPNtK+/KsOg/g9U7/1Pgd6I5s1m/kLCbJXgkUVx/CZJ8GrJndWtfCIlBbsJESnoPhoeoWvbyW2ZGhiB0q/5jZ19/uydo1dsGR4JtHOF0yv7mddVnqaQtd1ScG/AIUmDn7+8c5ZfEd2XGiqhVXG4dGJLcp+XL6FeeY/wc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770089071; c=relaxed/simple;
+	bh=nTjC77z6SKIcEhOAzNzeuTxSi1KokoyynKOgNszG5yk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uDvnO6XSRtczxGrq6AuOZy4mrG611iAJmFMmIgpsPVVMZGdUklXnHHWVdoE7aCZxGoh4+9NRsmlO7NdY6scGOKzTq9aX82qCdxO/1hadvkRT8JDceGpt1ArjNehlX0dvB4IyC4eXRByfM0tSqbmjlyBFv/+2+q+J0IFNa9RTd0o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nn/nFrDK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hsKrYu/Y; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770089068;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uJzVEzc6/YoB4RVHbPB+0q1BuvrVMg3+v8T2N9Qqszg=;
+	b=Nn/nFrDKfVLCX/fY/KS9JHAR5bPpIaBCN+oReyYhWfbZd1IMRfsRQPPDvOKIeYhXmCX+E1
+	jOaCppGYzWNWujPb8C3Bopn+ypnuUpNzyDyRbaC8kyU/QUVbOEK62WvkAnRDA4qRjrvw3+
+	3s09+m66IHCyCaT/jAAv+7ZIC1RQbyk=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-622-Sq2nP7iPPdCjT-Uc521xxw-1; Mon, 02 Feb 2026 22:24:26 -0500
+X-MC-Unique: Sq2nP7iPPdCjT-Uc521xxw-1
+X-Mimecast-MFC-AGG-ID: Sq2nP7iPPdCjT-Uc521xxw_1770089065
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-354490889b6so6141329a91.3
+        for <netdev@vger.kernel.org>; Mon, 02 Feb 2026 19:24:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770089065; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kMvEQOS8g5Mt9yqSpvG2qexhepqnE4rVwcBo7i7tC5x7SVO47FWO+GEgwKe6Blb1Cr
+         zv21r4cm06REp8IrmGTprkmlgZRaNw20LiU9tfONPDuzYutKiwYEY2b5Q7zCC9l4kqVK
+         IEeGVGM8UxXcd9RakCnnbXycznwP23NoCGAKD+bnqD91MxXrR/0XiIQALhX+xeoQy5fk
+         R1I4jIcolgkTX65De9vRqqZkWYwua1x0fYKvWE2p2Hc+cq7jx3jo9QsjLRK0BR8VOFDy
+         HJCCLbP4d8xZQBFu+i6mknJkKOx625wb9WGIoeTF6nACNyQzzY+pfbHcRvSofsz/6k3S
+         6GLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=uJzVEzc6/YoB4RVHbPB+0q1BuvrVMg3+v8T2N9Qqszg=;
+        fh=JNqAgJbePyV7QW0fDNK5k+9gB4oil1tprEDVID9bG8Y=;
+        b=BbREqyocARzzAeeZ0I2XuvC74hnk0c1SPJY9tv7J1tTZyR/IyT222MaH/U9OIdVp1B
+         gs19P6c3Gbprj/MBPxfUoLnvdvI5T/CTI5gd+xVaa+9GaCFlhWhWgwfCRXH6OwEhXlHl
+         YkIc6AYnmuPXDVsouBPYF5ihkZvFP3KwaIYBOQKZNAa7y1EFmkzGKeUIRg0YshiGCwu5
+         U+kXdpV9an/lTY40JpdbxBXYCiPTtlAyAxTYPCPgGX9OtSStWWB/o4xhXN49iZzvY5O7
+         2sVOeNvRbUR2o7g6iF4Zu8SoPRM3wnJ/x3cBGxtg1/T50Rf/78rAFxQThnNwlzLz/6sm
+         7VoA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770089056; x=1770693856; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iHSPOirFIFdpbKmf5I0OdBd45CTjYQzdFrAVFSsykfE=;
-        b=Qn9d+Gta1W/CLBKd4m3e3jaiOg3oacEuN7tLI0WvuqzmfCrswsQKos7iDATbRlvYXl
-         /mNXpU3vLGKu4dTgS2ZCrKS1Gkrnok2EnRYY5P3YCENu8rp7LY7nh0AOyYjO9bEN1Uyo
-         20G6sgZ6QqGC9MR7zZA8sMgx/p7OSDFFM0wqLduHTMz6Xer1I0heSEFGcER3owVHnTpa
-         4r9PNw5CpSiMomxT2BQtukf171aLpHgTjxZf+8ZLGIe2F/RpfqD1opMDtnC02oQuBPaO
-         N6IckaXb/87E67QDxPghc6G8Bni3l63odc759Aj9YEBPbtKgMVJ4u03JjDQRRgoLZYAH
-         koBQ==
+        d=redhat.com; s=google; t=1770089065; x=1770693865; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uJzVEzc6/YoB4RVHbPB+0q1BuvrVMg3+v8T2N9Qqszg=;
+        b=hsKrYu/YRvKVdwOrYHhoVQyQu+nniKITFE9lGZUaePuuABNt6Fvg9Y+ixj6Q5pHM3H
+         XLd37Jjyrqxh9+iuNRft1QyY/xRO3hGNOBRk0sIj63qyAyJ/AANl0AQJj1OQRAMCgAAW
+         4YtwX6eyuLSYEgqYc+fp1a5ibWizhZvx5+hZ+oPN1lYieCF65hfDDDAfEFcprIyzYoFQ
+         rgaeTgwKF8P+jrx6/d8S5nGpAb87TyF4DyeuBg3EkafdtBivGs1qtqnXHPIxrrvN8DwM
+         6mpdJ0GOxNVL0g18Njws3cCq+SRsaTIaLJlpwwGAZUORU5a7K62v886ixygQjYXQwtQT
+         2vzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770089056; x=1770693856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iHSPOirFIFdpbKmf5I0OdBd45CTjYQzdFrAVFSsykfE=;
-        b=m3uvAOK4v6WNmIZHgLIAyl0juYqcmoUrBPg4p8LvoiJGBzoFtN5GL+HlHsL93NZJ18
-         v98m2SrQpVm0s+TXARcjNtiH//prF7zsQ+OKNqIs374F2N72Th1m8CN6p643bICV5v9a
-         t1kecJFwCER4iyUfbn0xUz0ngnh+W+BqdLQI5wVXD00b8BRhBAkm/wWBiPQ8ybWPQXN2
-         Uj7q+sZR8zS7Uok1X06MYbRYgZvtH3awe05QinwlxeZtDqI8YR7O1ETvtCbDLCkpoh0f
-         fybHymoele+E3vrXlMTJQpn9bvDTYJq8OEByVXtv4VPPdkTJLLh/fzb2Ze54UvUJaequ
-         CfUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXrdTZa4rUnkSjmnlBlPzFG7HOGeDH3VjAJcb+JL6H+8V7l57a6GQCtL1iuiBpu3DGvfAdBMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRMShS4TCvETVo18aQbZyqWeK/+Y90H4Q9tU27kEdws8wiEl3J
-	UI/9uviE4pN29M9qkTLejgWm0L4AVfbN/6ckcSRb0ISWJ/gz4tdO6ETv
-X-Gm-Gg: AZuq6aL6i0uAlDtQyvN67Laouzf2g9JXbDXDfF+SXLgyrzVzmNnXKVxHDXiE+TuPYnW
-	xTrnegDzCmLiWCPqKP2+dZeJeZA7rGGGLU93r4tXUt5LCc0/wFR8XX2CwDzuYqr4y0bV0D5DIT0
-	cJFEG0TTiJiWJdE5QseYfgDvLTUG2OSqQVSvlix6LgMQEFOwgF9vCAm3D26qVBKNJ3+zTY3S03t
-	XxBZCHdtHI0/U4b3s+iWbcdODwx0g+PAmcpehvft8SdmqM7Vt6ZYqdzY4b/tOBBmKex65dmTK2e
-	PQE+yYdOXaCI3iTEw2X3o/nljjIRHtvkd+Xulj1w39Gjpd7uiFdG83wvW3h6f9KgsbQaawfgW8g
-	rcAJk96MoiS2AXGcdO5+Z/E2lDA7RxBfEqLETz7fSTdbxnb2WC0q3jOfpJCGTG85BPQSL+KGcH/
-	aTnWGFKg3ZjFJkvoc=
-X-Received: by 2002:a17:902:e886:b0:2a9:2858:19ad with SMTP id d9443c01a7336-2a928581f05mr3998675ad.49.1770089055954;
-        Mon, 02 Feb 2026 19:24:15 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a9295c2ee6sm1283485ad.2.2026.02.02.19.24.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 19:24:15 -0800 (PST)
-Date: Tue, 3 Feb 2026 03:24:09 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] bonding: only set speed/duplex to unknown, if
- getting speed failed
-Message-ID: <aYFqWcyuuN8V71LX@fedora>
-References: <20260130111904.144024-1-tbogendoerfer@suse.de>
- <aXylwyr2pV0rZAW3@fedora>
- <20260202151726.36abe1d0@samweis>
+        d=1e100.net; s=20230601; t=1770089065; x=1770693865;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uJzVEzc6/YoB4RVHbPB+0q1BuvrVMg3+v8T2N9Qqszg=;
+        b=ZMVXm8ZjE1mW6ySRKPC/VZFAWucWIq3gXIBDi3T5rx0BJe2wUXmhVWwFHDscx1V5oy
+         cHH/1Naxly2TeQIcBvZKOIsfpdfAKWDMqY2p+mjr73xviXO89u/vkJM522TN/JdQc1jy
+         JqGOdD2jC5DB1kaJHZidF9fG6pvGVT4YUnxGsYYwyQAhf4aDYGq1E44PUNL9ClaSh/++
+         yX6u7accDsS/koWmZscEsYdeaPDiuCKQJTOFPMQPHh5Q5pvdpzXDq6YWZeKkv9OafIoh
+         hT91peRXHVsYNte0ihhQbfqMCCOIwswqK0Pe+7SdV7rjm8Aie1iPaQ9P5szFNVJohz+K
+         4pYg==
+X-Forwarded-Encrypted: i=1; AJvYcCXY04ElSrau7lAJGyIeov5qt6uDrGTikrRN0eQhbrDe+ldRey0C3YpjN/4HhEIa2lIAb3tBbOY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywy2NFcijQTmhLyspz43TRD7tiTaYkSwWod9bZJEpynfiGMT8dM
+	+HE6yYmZvWg+Yd2F6+PoylgpwC46AgYIUq0JCdMVNU+B5enS8s1RK+Vj6iMnYgC+w4gUANQvz3B
+	j/sIh7zztgjaTObHbccSWgG/5RCDUVX8YRwrjw9ExCv6KN/wOIre8Y65Csljh9GNaS23LYQzwkW
+	DoN6fM32WVzA0JRKaYZ/oBB3Lqx1QTCXsc
+X-Gm-Gg: AZuq6aL/vcTbC2kaJF9kZI92CJKhyF8MMQ6pjh62vMKfLNWmBGrPSwqn6cC6Kaw2bDj
+	+vn7OUUGyHDroNZhfqOwLmKlHrVBN0AWsVDYov8OIqp53CsnXb3Y7ObGtzRE97ZOV52nnVQx+Ec
+	hkBdsHYk9xNvtyU+XDZ7+v9TSNcxrAzOkKTSOy0mnd2o3CWyywYMRLaDuvXao2Q3LzyFU=
+X-Received: by 2002:a17:90b:1e02:b0:340:ad5e:cb with SMTP id 98e67ed59e1d1-3543b2dc6cbmr11785538a91.8.1770089065407;
+        Mon, 02 Feb 2026 19:24:25 -0800 (PST)
+X-Received: by 2002:a17:90b:1e02:b0:340:ad5e:cb with SMTP id
+ 98e67ed59e1d1-3543b2dc6cbmr11785518a91.8.1770089064982; Mon, 02 Feb 2026
+ 19:24:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260202151726.36abe1d0@samweis>
+References: <20260129-v6-7-topic-virtio-net-ptp-v2-0-30a27dc52760@pengutronix.de>
+ <20260129-v6-7-topic-virtio-net-ptp-v2-2-30a27dc52760@pengutronix.de> <willemdebruijn.kernel.37516e24f10fa@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.37516e24f10fa@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 3 Feb 2026 11:24:13 +0800
+X-Gm-Features: AZwV_Qi7FlBzxKew1vHDwolkROsAaYvuxcledhe6oJ_RgZX3godh2kx2XLbJePY
+Message-ID: <CACGkMEsqobRMhtz3LUuWu3O1njK9jU7oQ65OOyy9vHcZ_QLz4A@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 2/2] virtio-net: support receive timestamp
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256106-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-256107-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[pengutronix.de,redhat.com,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com,lunn.ch,lists.linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 77310D417C
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3AC59D41BE
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 03:17:26PM +0100, Thomas Bogendoerfer wrote:
-> On Fri, 30 Jan 2026 12:36:19 +0000
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
-> 
-> > On Fri, Jan 30, 2026 at 12:19:04PM +0100, Thomas Bogendoerfer wrote:
-> > > bond_update_speed_duplex() first set speed/duplex to unknown and
-> > > then asks slave driver for current speed/duplex. Since getting
-> > > speed/duplex might take longer there is a race, where this false state
-> > > is visible by /proc/net/bonding. With commit 691b2bf14946 ("bonding:  
-> > 
-> > The patch looks good to me. But based on your description, I don't think
-> > the fixes tag is correct.
-> 
-> the race is old, but it got visible by that commit. Before 
-> bond_update_speed_duplex() was only called on enslaving and when bond
-> is brought up. Now it could also be called during normal operation and
-> that's what caught attention by customers.
-> 
-> I'm fine changing the fixes tag to whatever we agree to. So which should
-> I take ?
+On Mon, Feb 2, 2026 at 5:06=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Steffen Trumtrar wrote:
+> > Add optional hardware rx timestamp offload for virtio-net.
+> >
+> > Introduce virtio feature VIRTIO_NET_F_TSTAMP. If negotiated, the
+> > virtio-net header is expanded with room for a timestamp.
+> >
+> > To get and set the hwtstamp the functions ndo_hwtstamp_set/get need
+> > to be implemented. This allows filtering the packets and only time stam=
+p
+> > the packets where the filter matches. This way, the timestamping can
+> > be en/disabled at runtime.
+> >
+> > Tested:
+> >   guest: ./timestamping eth0 \
+> >           SOF_TIMESTAMPING_RAW_HARDWARE \
+> >           SOF_TIMESTAMPING_RX_HARDWARE
+> >   host: nc -4 -u 192.168.1.1 319
+> >
+> > Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> >
+> > --
+> >   Changes to last version:
+> >   - rework series to use flow filters
+> >   - add new struct virtio_net_hdr_v1_hash_tunnel_ts
+> >   - original work done by: Willem de Bruijn <willemb@google.com>
+> > ---
+> >  drivers/net/virtio_net.c        | 136 ++++++++++++++++++++++++++++++++=
+++++----
+> >  include/uapi/linux/virtio_net.h |   9 +++
+> >  2 files changed, 133 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 1bb3aeca66c6e..4e8d9b20c1b34 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -429,6 +429,9 @@ struct virtnet_info {
+> >       struct virtio_net_rss_config_trailer rss_trailer;
+> >       u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+> >
+> > +     /* Device passes time stamps from the driver */
+> > +     bool has_tstamp;
+> > +
+> >       /* Has control virtqueue */
+> >       bool has_cvq;
+> >
+> > @@ -475,6 +478,8 @@ struct virtnet_info {
+> >
+> >       struct control_buf *ctrl;
+> >
+> > +     struct kernel_hwtstamp_config tstamp_config;
+> > +
+> >       /* Ethtool settings */
+> >       u8 duplex;
+> >       u32 speed;
+> > @@ -511,6 +516,7 @@ struct virtio_net_common_hdr {
+> >               struct virtio_net_hdr_mrg_rxbuf mrg_hdr;
+> >               struct virtio_net_hdr_v1_hash hash_v1_hdr;
+> >               struct virtio_net_hdr_v1_hash_tunnel tnl_hdr;
+> > +             struct virtio_net_hdr_v1_hash_tunnel_ts ts_hdr;
+>
+> Jason, Michael: creating a new struct for every field is not very
+> elegant. Is it time to find a more forward looking approach to
+> expanding with new fields? Like a TLV, or how netlink structs like
+> tcp_info are extended with support for legacy users that only use
+> a truncated struct?
 
-Maybe
-98f41f694f46 ("bonding:update speed/duplex for NETDEV_CHANGE") and
-589665f5a600 ("bonding: comparing a u8 with -1 is always false")?
-
-The 98f41f694f46 set speed/duplex to -1 by default, which could cause the race
-to show SPEED_UNKNOWN. But (slave->duplex == -1) checking is always false, so
-no possible to show DUPLEX_UNKNOWN. The 589665f5a600 fixed this issue, after
-that speed/duplex both could be shown as UNKNOWN.
+I fully agree, we need somebody to work on this.
 
 Thanks
-Hangbin
+
 
