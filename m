@@ -1,122 +1,164 @@
-Return-Path: <netdev+bounces-256364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPTdLskpgmnFPwMAu9opvQ
-	(envelope-from <netdev+bounces-256364-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:00:57 +0100
+	id WPC1ENwsgmlFQAMAu9opvQ
+	(envelope-from <netdev+bounces-256365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:14:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 934ACDC6B4
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:00:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F84DC93E
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:14:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 99B2E3033232
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 16:59:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E5AD3062270
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A849B3D3333;
-	Tue,  3 Feb 2026 16:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC903AA1B1;
+	Tue,  3 Feb 2026 17:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rfchg3Dp"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6380318B9E;
-	Tue,  3 Feb 2026 16:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB51B3112DD
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770137972; cv=none; b=UNO7JfkCgdzIiEGv3lH1sCqJGMJoe62boc1/5ANEg0b57D4v0pwAGPY5WyczpDK/uxsYCAaluQw2U3uVzZmBBXwrBpG+zFNTGqPKKYI99Km+5LW0+NDXyIjmmOxSbMgnwWAoKmELcp5MxRPPlEkHJfNGjN4SYo228kKXZ43HqUs=
+	t=1770138509; cv=none; b=iGvlmlzxT7cFMDo6ks/pI/mcWOi4Qfxj8hOD0Dh2tCTCgwmIAqRN8eU3zprglb3/H3PFxOD63H51kBDeGbHlgf4jzVLhr9atDHnfCA1Cv5g+1BuXmXFG7+LdWv5Qw695GeuE84gDS9VxqnbrCgUOao96TxgcRGMcR3xvdywdfko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770137972; c=relaxed/simple;
-	bh=gsK9eh3/Ap3QzALZiIhqbj7KY1hIztJ1M9Xdd3pfZvA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jy3+cZqFP+CRpKptJ/+L8d4u01hMrXHXpyX3Zs0zAKWiaNYwSx5ghCFpoJ8lcJrPKfjIzlYUHVPjm4/AKNScle74+jNT7JQtNuW18fBUG0FsFQmCwuNxfZ26JG7f4E4u3N92HaQjDwQsyQvEwufgV2r9s2REUEa3nT5+rXzh3kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 95F5960345; Tue, 03 Feb 2026 17:59:28 +0100 (CET)
-Date: Tue, 3 Feb 2026 17:59:28 +0100
-From: Florian Westphal <fw@strlen.de>
-To: sun jian <sun.jian.kdev@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] netfilter: amanda: fix RCU pointer typing for
- nf_nat_amanda_hook
-Message-ID: <aYIpcHBufnxrcv5O@strlen.de>
-References: <20260203080109.2682183-1-sun.jian.kdev@gmail.com>
- <20260203145511.164485-1-sun.jian.kdev@gmail.com>
- <aYIOXk55_DRFKCqo@strlen.de>
- <CABFUUZG9LnhXc+nsQA28WHiiT33_5wQ82E1bBSBncWkxkXaKZA@mail.gmail.com>
+	s=arc-20240116; t=1770138509; c=relaxed/simple;
+	bh=CJw53SBH6XoGayXbPlKjDAs1ctzRcBCG/jxmprupStE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dq5IbVNv3/qjD9zU/FfDzE1H5R5eOlF6D1GyktDiveg8Z2rOXm8dMRTz2YlU2LNwwB8nhu/Jl2t9Hw6+VjMIhkJ1aKL454rln/5bYvXoOb6d7g2gugErXymbILJE8kfaBM7rrNTVXTco5Wsxzxuab3U8bm8/zCGskPSjOxIl1aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rfchg3Dp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770138507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1RcqX9khIwUR/91ez7NLW9xW23Ib+VX9iSsMAWPU9Og=;
+	b=Rfchg3Dp/4tERB0kZPp6QB+4HAmEnoRCBvPqh24ceAIpRuQ8bKa0vo/F/gKvzBuDnoJpve
+	0VwwP03A2FjiBo3Lsrh6SQjt98OKszwCrT+FEKO2mo2dL7AES1Dy16N3hf0ieT9/oyN/ie
+	Xy5BZxkOtCj6LnH8Bf3SczWJfZvd3DA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-370-VFWEBYhiOHOgNIjn6uCsUQ-1; Tue,
+ 03 Feb 2026 12:08:23 -0500
+X-MC-Unique: VFWEBYhiOHOgNIjn6uCsUQ-1
+X-Mimecast-MFC-AGG-ID: VFWEBYhiOHOgNIjn6uCsUQ_1770138499
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE2491956068;
+	Tue,  3 Feb 2026 17:08:18 +0000 (UTC)
+Received: from [10.45.224.28] (unknown [10.45.224.28])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0994F1956048;
+	Tue,  3 Feb 2026 17:08:11 +0000 (UTC)
+Message-ID: <fe7f81a4-281b-473b-8d0b-d04ff042d471@redhat.com>
+Date: Tue, 3 Feb 2026 18:08:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABFUUZG9LnhXc+nsQA28WHiiT33_5wQ82E1bBSBncWkxkXaKZA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,v4,7/9] dpll: Add reference count tracking support
+To: Simon Horman <horms@kernel.org>
+Cc: richardcochran@gmail.com, arkadiusz.kubalewski@intel.com,
+ przemyslaw.kitszel@intel.com, aleksandr.loktionov@intel.com,
+ andrew+netdev@lunn.ch, pabeni@redhat.com, saeedm@nvidia.com,
+ kuba@kernel.org, tariqt@nvidia.com, netdev@vger.kernel.org,
+ grzegorz.nitka@intel.com, poros@redhat.com, davem@davemloft.net,
+ vadim.fedorenko@linux.dev, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, aleksander.lobakin@intel.com,
+ jonathan.lemon@gmail.com, jiri@resnulli.us, anthony.l.nguyen@intel.com,
+ intel-wired-lan@lists.osuosl.org, Prathosh.Satish@microchip.com,
+ leon@kernel.org, edumazet@google.com, mbloch@nvidia.com
+References: <20260202171638.17427-8-ivecera@redhat.com>
+ <20260203161102.1894146-1-horms@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260203161102.1894146-1-horms@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256364-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,intel.com,lunn.ch,redhat.com,nvidia.com,kernel.org,vger.kernel.org,davemloft.net,linux.dev,resnulli.us,lists.osuosl.org,microchip.com,google.com];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256365-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-0.974];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 934ACDC6B4
+X-Rspamd-Queue-Id: 90F84DC93E
 X-Rspamd-Action: no action
 
-sun jian <sun.jian.kdev@gmail.com> wrote:
-> > Sun Jian <sun.jian.kdev@gmail.com> wrote:
-> > >  enum amanda_strings {
-> > > @@ -98,7 +98,12 @@ static int amanda_help(struct sk_buff *skb,
-> > >       u_int16_t len;
-> > >       __be16 port;
-> > >       int ret = NF_ACCEPT;
-> > > -     typeof(nf_nat_amanda_hook) nf_nat_amanda;
-> > > +     unsigned int (*nf_nat_amanda)(struct sk_buff *skb,
-> > > +                                   enum ip_conntrack_info ctinfo,
-> > > +                                   unsigned int protoff,
-> > > +                                   unsigned int matchoff,
-> > > +                                   unsigned int matchlen,
-> > > +                                   struct nf_conntrack_expect *exp);
-> >
-> > Why is that needed?
-> Correct. Manual declaration is indeed verbose.
+
+
+On 2/3/26 5:11 PM, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > 
-> The reason I used it was that typeof(nf_nat_amanda_hook) carries over
-> the __rcu attribute to the local variable, which triggers a Sparse
-> warning when assigning the result of rcu_dereference().
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> dpll: Add reference count tracking support
+> 
+> This commit adds REF_TRACKER infrastructure support to the DPLL subsystem,
+> allowing developers to track and debug reference counting leaks for
+> dpll_device and dpll_pin objects via debugfs.
+> 
+>> diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+>> --- a/include/linux/dpll.h
+>> +++ b/include/linux/dpll.h
+> 
+> [ ... ]
+> 
+>> @@ -223,16 +231,17 @@ dpll_netdev_add_pin_handle(struct sk_buff *msg, const struct net_device *dev)
+>>   }
+>>
+>>   static inline struct dpll_pin *
+>> -fwnode_dpll_pin_find(struct fwnode_handle *fwnode)
+>> +fwnode_dpll_pin_find(struct fwnode_handle *fwnode, dpll_tracker *tracker);
+>>   {
+>>   	return NULL;
+>>   }
+> 
+> There appears to be a stray semicolon at the end of the function signature
+> on the line with the tracker parameter. This would cause a compile error
+> when CONFIG_DPLL is disabled since the function body follows what looks
+> like a forward declaration.
+> 
+> Should the semicolon be removed so the stub function compiles correctly?
 
-sparse doesn't generate such a warning for me.
+Definitely. Will fix as I mentioned previously.
 
-Also, this pattern you are changing here isn't specific to amanda, it
-exists elsewhere as well:
+Thanks,
+Ivan
 
-net/netfilter/nf_conntrack_snmp.c:42:23: error: incompatible types in comparison expression (different address spaces):
-net/netfilter/nf_conntrack_tftp.c:78:31: error: incompatible types in comparison expression (different address spaces):
-net/netfilter/nf_conntrack_irc.c:242:38: error: incompatible types in comparison expression (different address spaces):
-net/netfilter/nf_conntrack_ftp.c:521:22: error: incompatible types in comparison expression (different address spaces):
-
-so why only fix this annotation for amanda?
 
