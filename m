@@ -1,167 +1,369 @@
-Return-Path: <netdev+bounces-256447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGUFC8JEgmlHRQMAu9opvQ
-	(envelope-from <netdev+bounces-256447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:56:02 +0100
+	id +GFqE2NKgmmGRwMAu9opvQ
+	(envelope-from <netdev+bounces-256448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 20:20:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5B6DDEB5
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 19:56:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DDC2DE1DE
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 20:20:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C885A30013BD
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 18:55:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1D42F3007B10
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 19:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91D63002B6;
-	Tue,  3 Feb 2026 18:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC67B31AF17;
+	Tue,  3 Feb 2026 19:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Y++HTROo"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="F4xiqoXv";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="rfX7FFgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D8430DD0A
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 18:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF0623D2B1;
+	Tue,  3 Feb 2026 19:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770144947; cv=pass; b=Fi5ny5heThPbj1Lx+AP9JIviQ8GkahxnxtJ9T2fkh5eJp6+mSpbrl6/MtTj1ihqvhqptwmIUSyJ92VytS4PGeJvP/uVks3RUFnAnF3b2IaKWB9qUhgokJCj1xzSK9BodGElgqg5nWsCMkdqO4rrmnOvcqFcovtHsQsBCmqJ6PPU=
+	t=1770146396; cv=pass; b=Zcdc0o7ba/EmplgqtuH0cXbq/FKU3lLxvA61jI/0B/AYc3EWdh5DILRb1nYVCb8VZxRJF3zW1pP7GVnuKHanE5YNbARfGmO2ykVaY4a3xAz4JTQkXRjR7QEhl7F6PgSTdctHrx9KLfGHVUQKzJvxLj7Gl6NWE+U+KSSDo+RpUuM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770144947; c=relaxed/simple;
-	bh=fOSoB3PlF4gVQZwL8YtzxZGdoeRvGK1XhSxyBdXZKE4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MSyAJ46BFHKs+1CUNfJcCYwmjm2J4WshnWYSpwqbQ3yVpBp7naJf6qayq5lGt0JNmNmDuyfWz/rxOMRvurUFoVVBZNLaczupL5oj/mSCWOjPePCd+SfKXuOVy1D4ZToeyECNZHyNnyg4kXrXBDtpOQIJKM2PNo9RhLaGRL8c0Ns=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Y++HTROo; arc=pass smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-566360cab02so4400314e0c.2
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 10:55:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770144945; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UNnB6ha7B4mqlFL2XlOyvsOaGX1lV1GuqulG7Bn4NIPBKCKlF2VLjPbcEO8vjfh2Xd
-         uKo8CaQ04ZBaBEfuP8Mnf4KaJ+QtxwYKli7lc82Dx+tBvDdujm2osTSE7K6SGcn5wI67
-         STlDHyQ6sofS+eo/rPNOcFaipYPcZgdTM4RZwp3iU+EMsqX1dVsdfvdyilP4ZuadqVhj
-         r6JHJsRBwYDFcKNtYepEHZOIOWtxPFQgqZI13ka/q803OqDHE3qUINVC0EiLkpx7N7Rt
-         IBIOCJDjMM/Oibf13Q0o5WySGwznHe4ZiklyHf3ps7MtYFjjLiX5IFDslOXJIo6Nbj3o
-         GaZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fOSoB3PlF4gVQZwL8YtzxZGdoeRvGK1XhSxyBdXZKE4=;
-        fh=6NL+27sIBxvB5wwZ0ZBQmTcL/aD2DfokudLcOu/BOqg=;
-        b=cRQvvisHmNRhcxMyQV5uQn+SZuMO43HP7iRcwpRLAlVU4NEeblLIJroXKFnMKh+ppY
-         exTj9iHsCG2lBNOoaEB2wOSIR9sqEqhYB+96CApMb/2yFjzrmu9M2C7VANu0z9gd+9j+
-         zSGA7puNWATMstDRIJBovw/I6m9QIQdBpy2B2BEuxXZGt14CfOlsSRBb+XBYOLB0dwnk
-         Yoh5LWkMrRKhiHCQyR4ncHXdttixbrK7usr8yE1EyvfVYUyQE5V/5PkstB+7HbJ72KIS
-         /9cRjRFhnp2WW5Zb9d2984cVYeHloFAarhUOSupkk2aUViBBuKbyHBwPyQos3zd2GXmb
-         GDTQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1770144945; x=1770749745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fOSoB3PlF4gVQZwL8YtzxZGdoeRvGK1XhSxyBdXZKE4=;
-        b=Y++HTROoapweM1PG+rbqk6w/0UVz1Bd1e9mnoLXBqSwdZ7nAMlsGiEMS/Q74NsZFiy
-         I42EBOc8DIxgKu+r7Oa2dhJOACeoslyJ1Xvi1VoHhvV6jPoLmbTMyvQ9I+OH+/suUkp+
-         jHy/n+gnb9AJ/2xJdE/iG8Omf+XWE3T9WXlHoLt5xnO7CIURf27k+ufDrj+zNivvEW/q
-         XtqmA+A+E8/LqOUwBr6ij5HYQ20qERvpdFeaghWqcB3LfONRpKhTA4ui/faY8DjVloWn
-         Qa2LU1aNgDqCNIyUpci0OBsE9+MEcL1d5AVrq2llEkI5f1NcGftyui5odyITitVAhve9
-         TxDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770144945; x=1770749745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fOSoB3PlF4gVQZwL8YtzxZGdoeRvGK1XhSxyBdXZKE4=;
-        b=kCIt/Ff88xhIIaL7uJA0VmyBSh0nrotfitQrHqG4w8rmSMfoBuZGmNGxZnMNni5xzM
-         IJ5UOB9Qlng+iJHZZ2+GwhpmlPPfqpKtW9sq8Ktxo7NOnSfcxHniYic70c4N+RHo8qoJ
-         xAuXKl44ND8P/XGymIUgEj+Cl1/WFDcCtJBCum7nhldPBdsvI8DJY66hiYA+IaMUI6/8
-         hhIRBiThCrd5q3PNLkLFbA/TYpN0h4qg0ypyXNp0NIxj6MOMf4/P3dwc2bIGj/aq1ZGF
-         dO9tAbsDRkof5CHVkCa9JgR5ey4rwQvMNqp7HN5KQoA46npAyKgtoa0DCLd4ZZWRbJN/
-         xudQ==
-X-Gm-Message-State: AOJu0YyIDoTfr8I0cU5NKrml4BCV6EgRG+oyXZoAEG0Fimp2WREG5ldh
-	dbk1a6wnWS/DlvQGiEUB6Z0/piQcaUIJ1jFgRW3zAybmGGNbTZHlubQ+WJ/vtO41/3jeilcMu3L
-	gVZw17/gzO7/6LByW1axDlNxPftL+JGsg9ukdBxfhmQ==
-X-Gm-Gg: AZuq6aIwHoqDxADNHxWEEd2qf2Yh0r4/CmawWtwb6o/nBb3zYtYa5AkLZEHPiWz4DqJ
-	9Ny/v0pS8b99w8vAHhNy8cyHix0RHT+TnanYsgiMSJ/4g+vnNCx+R8Frs2OUyrMStWHjhpwkx+x
-	sLNafeWG768cqjnF85wel7zfesGDUNinvg7ogrk6ojKoWCGBy6oHxyGTEDdVEY78P7nfGpiyIUe
-	Ir3yBfQlw0jnu4ckE/ffiAc9UQnq5S/3w9MkMmzE82SMzygMQHv6JZBQeM+FG5YoxORJaCp
-X-Received: by 2002:a05:6122:e46b:b0:559:dc01:8cd9 with SMTP id
- 71dfb90a1353d-566e80d5690mr190607e0c.12.1770144945139; Tue, 03 Feb 2026
- 10:55:45 -0800 (PST)
+	s=arc-20240116; t=1770146396; c=relaxed/simple;
+	bh=Eu32B2kTrLqGd8xnvrrM3BNC67bXjwiwiB/WLW42Wc8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=UO2S1Iv9O2MaZPBVB1maU0l0LUwCrznF4Jiwp5jNMkmcWJSJiMsX0MEnbilWHgCswJxeAs8d6OZdnLxoANOAsEW/BMYBB8K6k/TVCeX3uKgVQkfaENQZTPerf43OpmKNQ5ffMHiDzhhesey415KcG8Gt1JZoZIiGdK6o0u1e1eY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hartkopp.net; spf=fail smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=F4xiqoXv; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=rfX7FFgs; arc=pass smtp.client-ip=81.169.146.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1770146380; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=a1TlrfctBhyp3PACtFwVbpgDyATKdQ4RXez+vewnUIp13E40AjwAsKinI2bHKyz+7Y
+    SMl1n8LLBYcU+umZfHwfecPSZWZQXB4jZ3LTb618PWJg1dfc6UCyBK3v0QBqQE4/BACH
+    Pruw3FvyJYUwIg768uBdLkRS9LJLa2KNOsmvWHBUFDUzZNYxngllaCNmQacxxXcN7ncF
+    itMHQoK8akPnPGIZonVhm78jVn3ISobZte09FpwXrxQH0ycGdNBTjePKnY06YTIOjOm2
+    AFoF4tfgUbBVmcCUjbLrJnwOPW48MKMve59wiXmF5arvTwMuOhKr37g+xSw18Ami2JFJ
+    dKBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1770146380;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Cc:To:Subject:From:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=F5jFldpNkmwZqtNurvra9cofNKkaRsKmUCDCcCnHqNc=;
+    b=TfBEYXZ2d5/wTpR4EZf/+MJbhhujtMXzy5SxXWD+WS6pijqJVOvkHPWmy8MTAZTf+U
+    XeNwrZdH1xpcTHCxYGfyK0BsRmcXm80umxqzYYjoncH6tnKXF/0s5wqPolkOntTkYz4M
+    AmqCKaC7/fLVaB9XOkatXRXCfv0eRyJfZ07ealIco878o8VGv+TDMsftZrfFKBfaAY6t
+    P19wKlgjVs6pLAhVh3XS2qIQwA0GOBWsR2dkjVnGAs7mOst8c0FZNVuqHKpNps4mURDN
+    qU6zDBPZ2vYSRTXiyGfiJ/Bvo5XnYiuZtqSX/YrXUBPYcMzQFjUo/f7EMLuPCMQNt/+E
+    OwlQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1770146380;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:Subject:From:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=F5jFldpNkmwZqtNurvra9cofNKkaRsKmUCDCcCnHqNc=;
+    b=F4xiqoXvgXXDuFw0EVfApOSSh9iLWtZ6d1tSGjanmMvTHF7DQP0/xhTzHDjYuMWjrJ
+    Rk/z001mwonh4ZTXSdQxLo2G9ApE52vR+3cP0/2gdpM56qovG7tdW4UJ5Ctuf5s94bQN
+    V9XBcNDEE5MMfYC+yKamoHRGv05S4rBm4B+R/19Y5bDlCszmZ5gwjkpwFJpte2Bsltdp
+    IsSe0+LZWnRu8knf6/2GzuzXx9REZvqeUS2oNN8a/CBFpVEgiWl1mo+Fu6iMANa7xIgX
+    sFHw/xa1JcVxCs4hpKWjAXP24vhtj1CtZ2MYrHsruraQgXHvEhGY5y+zDyI7NHuk70Qw
+    u4lg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1770146380;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:Subject:From:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=F5jFldpNkmwZqtNurvra9cofNKkaRsKmUCDCcCnHqNc=;
+    b=rfX7FFgsBvHFnsvxr1Pkaw+S0xjleRooWxZBdHgomV9TfOlrHtXGBJLl/B9NOMfoRA
+    uhs6l5dLCw6oj9lLA+Dw==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7tnMDLztswwlyqon4XDpA0w0c7HaA=="
+Received: from [IPV6:2a00:6020:4a38:6810:ae1c:f386:228b:f98a]
+    by smtp.strato.de (RZmta 55.0.1 AUTH)
+    with ESMTPSA id Ka8610213JJcRT6
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 3 Feb 2026 20:19:38 +0100 (CET)
+Message-ID: <c5929461-8da5-4c77-bf3d-796c7645d7f9@hartkopp.net>
+Date: Tue, 3 Feb 2026 20:19:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122192851.86670-1-rjethwani@purestorage.com>
- <20260122174821.70553ffc@kernel.org> <CAKaoeS0f7z_pjJhij8dFpgPPJfiWGsn25k6rgBUMUM4wiFHurA@mail.gmail.com>
- <CAKaoeS3ZLtiXNLNoJXGyTRp_-4yywdmDdCbNtjA-Q_w6mT_oaQ@mail.gmail.com> <20260126161601.1c2f18ec@kernel.org>
-In-Reply-To: <20260126161601.1c2f18ec@kernel.org>
-From: Rishikesh Jethwani <rjethwani@purestorage.com>
-Date: Tue, 3 Feb 2026 10:55:33 -0800
-X-Gm-Features: AZwV_Qg8_M_GYmMkPhzBRR0VMqO_HQfjafDrfeLFUKPZm3G2_jZZ2EHMb6GQfd4
-Message-ID: <CAKaoeS29J7bONONKF8mjyuW3zkW1=hrNx6oFCyPOvv+s=i5pAA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/3] tls: Add TLS 1.3 hardware offload support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
-	sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com, 
-	edumazet@google.com, leon@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Subject: Re: [PATCH net-next v8 0/6] move CAN skb headroom content to skb
+ extensions
+To: Paolo Abeni <pabeni@redhat.com>, Florian Westphal <fw@strlen.de>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
+ <mailhol@kernel.org>, Robin van der Gracht <robin@protonic.nl>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kernel test robot <lkp@intel.com>
+References: <20260201-can_skb_ext-v8-0-3635d790fe8b@hartkopp.net>
+ <7d544645-8699-409f-89c0-6fc606113627@redhat.com>
+Content-Language: en-US
+In-Reply-To: <7d544645-8699-409f-89c0-6fc606113627@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
+	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256447-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256448-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,queasysnail.net,davemloft.net,redhat.com,google.com,kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[hartkopp.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[purestorage.com:+];
+	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,purestorage.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C5B6DDEB5
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,hartkopp.net:mid,hartkopp.net:dkim]
+X-Rspamd-Queue-Id: 4DDC2DE1DE
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 4:16=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 26 Jan 2026 14:07:52 -0800 Rishikesh Jethwani wrote:
-> > > > Selftests are a hard requirement, I already shared a link with more
-> > > > info with you.
-> > >
-> > > I will run the existing TLS selftests to verify no regressions.
-> >
-> > I ran the TLS selftests - all 898 tests pass:
-> > linux-kselftest/tools/testing/selftests/net# ./tls 2>&1 | tee tls_test.=
-log
-> > # PASSED: 898 / 898 tests passed.
-> > # Totals: pass:898 fail:0 xfail:0 xpass:0 skip:0 error:0
->
-> I am asking you to implement selftests that will test the HW.
+Hello Paolo,
 
-v6 introduces a selftest to verify hardware offload functionality
-https://lore.kernel.org/netdev/20260203184835.3619101-1-rjethwani@purestora=
-ge.com/
+On 03.02.26 15:40, Paolo Abeni wrote:
+> On 2/1/26 3:33 PM, Oliver Hartkopp via B4 Relay wrote:
+>> CAN bus related skbuffs (ETH_P_CAN/ETH_P_CANFD/ETH_P_CANXL) simply contain
+>> CAN frame structs for CAN CC/FD/XL of skb->len length at skb->data. Those
+>> CAN skbs do not have network/mac/transport headers nor other such
+>> references for encapsulated protocols like ethernet/IP protocols.
+>>
+>> To store data for CAN specific use-cases all CAN bus related skbuffs are
+>> created with a 16 byte private skb headroom (struct can_skb_priv). Using
+>> the skb headroom and accessing skb->head for this private data led to
+>> several problems in the past likely due to "The struct can_skb_priv
+>> business is highly unconventional for the networking stack." [1]
+>>
+>> This patch set aims to remove the unconventional skb headroom usage for CAN
+>> bus related skbuffs and use the common skb extensions instead.
+>>
+>> [1] https://lore.kernel.org/linux-can/20260104074222.29e660ac@kernel.org/
+> 
+> Could you please share how skb_ext size change with this series?
+> (possibly breaking down the actual size to each separate extension).
+> 
+> Ideally/hopefully the  skbuff_ext_cache size is not going to change, and
+> that would ensure that this change will not cause any indirect regressions.
+> 
+> /P
+
+I'm not really sure what your question is about and how I could actively 
+change the impact of this series.
+
+When CONFIG_CAN is enabled the skbuff_ext_cache element would increase 
+in size by 8 bytes (sizeof(struct can_skb_ext)) on my machine (see 
+pahole output below).
+
+So when everything is enabled it would be
+
+CONFIG_SKB_EXTENSIONS
+8  bytes sizeof(struct skb_ext)
+CONFIG_BRIDGE_NETFILTER
+32 bytes sizeof(struct nf_bridge_info)
+CONFIG_XFRM
+88 bytes sizeof(struct sec_path)
+CONFIG_NET_TC_SKB_EXT
+16 bytes sizeof(struct tc_skb_ext)
+CONFIG_MPTCP
+32 bytes sizeof(struct mptcp_ext)
+CONFIG_MCTP_FLOWS
+8  bytes sizeof(struct mctp_flow)
+CONFIG_INET_PSP
+8  bytes sizeof(struct psp_skb_ext)
+CONFIG_CAN
+8  bytes sizeof(struct can_skb_ext)
+---------
+200 bytes total skbuff_ext_cache element size
+(255 * 8 = 2040 bytes max space for skb extension users).
+
+Does this answer your question?
+
+Best regards,
+Oliver
+
+static const u8 skb_ext_type_len[] = {
+#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+         [SKB_EXT_BRIDGE_NF] = SKB_EXT_CHUNKSIZEOF(struct nf_bridge_info),
+#endif
+#ifdef CONFIG_XFRM
+         [SKB_EXT_SEC_PATH] = SKB_EXT_CHUNKSIZEOF(struct sec_path),
+#endif
+#if IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
+         [TC_SKB_EXT] = SKB_EXT_CHUNKSIZEOF(struct tc_skb_ext),
+#endif
+#if IS_ENABLED(CONFIG_MPTCP)
+         [SKB_EXT_MPTCP] = SKB_EXT_CHUNKSIZEOF(struct mptcp_ext),
+#endif
+#if IS_ENABLED(CONFIG_MCTP_FLOWS)
+         [SKB_EXT_MCTP] = SKB_EXT_CHUNKSIZEOF(struct mctp_flow),
+#endif
+#if IS_ENABLED(CONFIG_INET_PSP)
+         [SKB_EXT_PSP] = SKB_EXT_CHUNKSIZEOF(struct psp_skb_ext),
+#endif
+#if IS_ENABLED(CONFIG_CAN)
+         [SKB_EXT_CAN] = SKB_EXT_CHUNKSIZEOF(struct can_skb_ext),
+#endif
+};
+
+CONFIG_SKB_EXTENSIONS
+struct skb_ext {
+         refcount_t                 refcnt;               /*     0     4 */
+         u8                         offset[3];            /*     4     3 */
+         u8                         chunks;               /*     7     1 */
+         char                       data[] 
+__attribute__((__aligned__(8))); /*     8     0 */
+
+         /* size: 8, cachelines: 1, members: 4 */
+         /* forced alignments: 1 */
+         /* last cacheline: 8 bytes */
+} __attribute__((__aligned__(8)));
+
+CONFIG_BRIDGE_NETFILTER
+struct nf_bridge_info {
+         enum {
+                 BRNF_PROTO_UNCHANGED = 0,
+                 BRNF_PROTO_8021Q     = 1,
+                 BRNF_PROTO_PPPOE     = 2,
+         } orig_proto:8;                                    /*     0: 0 
+4 */
+
+         /* Bitfield combined with next fields */
+
+         u8                         pkt_otherhost:1;      /*     1: 0  1 */
+         u8                         in_prerouting:1;      /*     1: 1  1 */
+         u8                         bridged_dnat:1;       /*     1: 2  1 */
+         u8                         sabotage_in_done:1;   /*     1: 3  1 */
+
+         /* XXX 4 bits hole, try to pack */
+
+         __u16                      frag_max_size;        /*     2     2 */
+         int                        physinif;             /*     4     4 */
+         struct net_device *        physoutdev;           /*     8     8 */
+         union {
+                 __be32             ipv4_daddr;           /*    16     4 */
+                 struct in6_addr    ipv6_daddr;           /*    16    16 */
+                 char               neigh_header[8];      /*    16     8 */
+         };                                               /*    16    16 */
+
+         /* size: 32, cachelines: 1, members: 9 */
+         /* sum members: 30 */
+         /* sum bitfield members: 12 bits, bit holes: 1, sum bit holes: 
+4 bits */
+         /* last cacheline: 32 bytes */
+};
+
+CONFIG_XFRM
+struct sec_path {
+         int                        len;                  /*     0     4 */
+         int                        olen;                 /*     4     4 */
+         int                        verified_cnt;         /*     8     4 */
+
+         /* XXX 4 bytes hole, try to pack */
+
+         struct xfrm_state *        xvec[6];              /*    16    48 */
+         /* --- cacheline 1 boundary (64 bytes) --- */
+         struct xfrm_offload        ovec[1];              /*    64    24 */
+
+         /* size: 88, cachelines: 2, members: 5 */
+         /* sum members: 84, holes: 1, sum holes: 4 */
+         /* last cacheline: 24 bytes */
+};
+
+CONFIG_NET_TC_SKB_EXT
+struct tc_skb_ext {
+         union {
+                 u64                act_miss_cookie;      /*     0     8 */
+                 __u32              chain;                /*     0     4 */
+         };                                               /*     0     8 */
+         __u16                      mru;                  /*     8     2 */
+         __u16                      zone;                 /*    10     2 */
+         u8                         post_ct:1;            /*    12: 0  1 */
+         u8                         post_ct_snat:1;       /*    12: 1  1 */
+         u8                         post_ct_dnat:1;       /*    12: 2  1 */
+         u8                         act_miss:1;           /*    12: 3  1 */
+         u8                         l2_miss:1;            /*    12: 4  1 */
+
+         /* size: 16, cachelines: 1, members: 8 */
+         /* padding: 3 */
+         /* bit_padding: 3 bits */
+         /* last cacheline: 16 bytes */
+};
+
+CONFIG_MPTCP
+struct mptcp_ext {
+         union {
+                 u64                data_ack;             /*     0     8 */
+                 u32                data_ack32;           /*     0     4 */
+         };                                               /*     0     8 */
+         u64                        data_seq;             /*     8     8 */
+         u32                        subflow_seq;          /*    16     4 */
+         u16                        data_len;             /*    20     2 */
+         __sum16                    csum;                 /*    22     2 */
+         u8                         use_map:1;            /*    24: 0  1 */
+         u8                         dsn64:1;              /*    24: 1  1 */
+         u8                         data_fin:1;           /*    24: 2  1 */
+         u8                         use_ack:1;            /*    24: 3  1 */
+         u8                         ack64:1;              /*    24: 4  1 */
+         u8                         mpc_map:1;            /*    24: 5  1 */
+         u8                         frozen:1;             /*    24: 6  1 */
+         u8                         reset_transient:1;    /*    24: 7  1 */
+         u8                         reset_reason:4;       /*    25: 0  1 */
+         u8                         csum_reqd:1;          /*    25: 4  1 */
+         u8                         infinite_map:1;       /*    25: 5  1 */
+
+         /* size: 32, cachelines: 1, members: 16 */
+         /* padding: 6 */
+         /* bit_padding: 2 bits */
+         /* last cacheline: 32 bytes */
+};
+
+CONFIG_MCTP_FLOWS
+struct mctp_flow {
+         struct mctp_sk_key *       key;                  /*     0     8 */
+
+         /* size: 8, cachelines: 1, members: 1 */
+         /* last cacheline: 8 bytes */
+};
+
+CONFIG_INET_PSP
+struct psp_skb_ext {
+         __be32                     spi;                  /*     0     4 */
+         u16                        dev_id;               /*     4     2 */
+         u8                         generation;           /*     6     1 */
+         u8                         version;              /*     7     1 */
+
+         /* size: 8, cachelines: 1, members: 4 */
+         /* last cacheline: 8 bytes */
+};
+
+CONFIG_CAN
+struct can_skb_ext {
+         int                        can_iif;              /*     0     4 */
+         u16                        can_framelen;         /*     4     2 */
+         u8                         can_gw_hops;          /*     6     1 */
+         u8                         can_ext_flags;        /*     7     1 */
+
+         /* size: 8, cachelines: 1, members: 4 */
+         /* last cacheline: 8 bytes */
+};
 
