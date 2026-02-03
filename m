@@ -1,283 +1,228 @@
-Return-Path: <netdev+bounces-256377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KMUHJMsvgmlFQAMAu9opvQ
-	(envelope-from <netdev+bounces-256377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:26:35 +0100
+	id GGv7HPovgml5QQMAu9opvQ
+	(envelope-from <netdev+bounces-256372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:27:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 310BDDCC2D
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:26:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C113DCC6F
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 36780305F672
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:25:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9EEE1301FE39
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688323AE713;
-	Tue,  3 Feb 2026 17:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C247931D37B;
+	Tue,  3 Feb 2026 17:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ksiHnGVP"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="OId2dtKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04317325711
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0441D5ABA;
+	Tue,  3 Feb 2026 17:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770139491; cv=none; b=g7YxZhEcRpgf35X+m2I0X7HS9xK5qEQBORmmN1coZ1iFeXQRH+Z6joRBhHBLcetegie48k2xfjaqC+7VISzRqKGZan5910G7RO68URBHc0018oz0y2ZFbEvkLL1VgeAoCUQXAmtGTF7UEEp/i2S670n9Y+f8cCM0n5LFwxl2Tr0=
+	t=1770139474; cv=none; b=GR0QKEBPoNb/O/H/e44UPPSzPMaKnCxYxREMlHKXgPWAUEJj1t5nj/Socx8S2tRD4NdlUKcy1iK8qt2liEfc6SgtXupi0wvILrjbqDqWBgjGL6hxMCaaHlxz4R3Kk3DlkhFDleLpEQFlo6XHy2KFrGj6iO72eff58U5gLI3Vcvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770139491; c=relaxed/simple;
-	bh=NwQadxIsbAVicBdlN5JoSnhWAwdMRsWYGibuwLb2uqw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gCw96I6VdKTP4auL5Dy8khQfqGTmu8UWsW92tOj9b2s6fcSx2UGUYg3sFgzrn69p9PKFUt3xWeXtefiQb8YbhtBxdDyMGHJd5ztRz+JlDFQy6OA5hZBm4/ZSe8cIt22iU2K0LZ96SMB/E4D8YZSnSPkpCjSe3fu2H4oDlPT25UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ksiHnGVP; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a8a7269547so56963565ad.0
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 09:24:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770139489; x=1770744289; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LF/dpo4BeQSytcLLWoC5FgkTqSqyB60iXXH6RwLfoVg=;
-        b=ksiHnGVPU3C4rLF57d2ord97g3XGYtyds1LuQFPD1dTYgVmPn9u8Hhkx1pBel8P+Db
-         47qB0tetJINtuIoAee7tuQUBp/zLBsOAMgdlWoB5VAWKqqe3DmgiZaG2+lvDn0xh28gX
-         Qg2veIOHW7xEIveCjxMG4BjhZepdj4wOJ31m9Rgu1GNlem+X7ut+Zyw6nZI+yEGkQI1A
-         6SFkeWr0IRNw5Z7x8qTpAFvO2RfOhsZjrL/CcEMFRaluaMWWMNGLJkEjpwdy61XdRPz1
-         qTvW0u369Zo0xSV00FDFmdxtG/dC7GntccY4RpFfECwNvTbUsh3Nisy4TsKvg0/3rIVj
-         3lqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770139489; x=1770744289;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LF/dpo4BeQSytcLLWoC5FgkTqSqyB60iXXH6RwLfoVg=;
-        b=Vfpp0GnYVi9KNQM7glGNLAIPrKsHKrf8yuDT8xrRQuqg5FPjl8Cvf5o4KnrcyMRDWh
-         7woKQLV0Ev2UTQ1ZeQaWIGZ86gqNfI3Cp8V9FlkckFdAe1zga8X636v7iiq6Noc4JtEq
-         ryqEcY1rA3EbcKagFTp/kOYYN/rfDVxehsIkmhg7yAUBFG5OdzFdT3YOgH02dfm6iOQR
-         siXQExRnc4HDCuznzFA0BSwJMhgV/2qTtSyWXe1+B/zZlP9bZv/DQK5rJNYX9JFiX2lH
-         zlFO3e1bsCawGfenNtqyCWUQtzxHcvKU0dTjkx6TIVSKlaTM4kWW2RgENrKw/FSNqATS
-         Fnlg==
-X-Gm-Message-State: AOJu0Yy5lVNMblbu6S1jcdrcoX18OOEJ2mUgOPp77UsjjhDV6dbbuENU
-	397uV4FNYDBKoPvKEUfY9Ysi8evauKMkYGgzqM31RgBK15tbZCBmlq+rP+DMBPw2
-X-Gm-Gg: AZuq6aJbKrEFeYHpeCOVqTgALum4vpsgycrhlH2H6GtstarXmM+0ynvKHBkT2KRu1r9
-	w4slJ6VhOSeaVBS9nbuG3pDqLo5UOFb451uQvjJsG+P3Kt8cSaId6yosk/pyI+UY0BSyqcfc6EH
-	FSVp8MCGq645PLi9kC2A4GBop1wcWfhXKx9JLhZhlaDeNsngFohvdlXUb9sIuIcngHYQMUipFmm
-	GkLB72d3T+Z828raPW7x66WUf8tMdmUpRPXSybJL49J8tgipINju+zVXEED844Wa0yoWVQ0a10a
-	4r4cPt6uKFdsR8Jv4Ej7+xO+bhvktVWvhoCMvt17KNcmlA7RCQhPZJWgHH4jFhlVN9qvBrlfoyU
-	f+oWDPvMTdNdJgmVAsCyiaQItF8F1uhvwjQHZVkjZyhkkyJBUqQ8aUwvL0ssXCjbQKmudjVZktb
-	mD8hWOHy6HBjXCA+tt7/PzCXH1nzsLQ25tx9bY6aDOA6ifQqtEtx3vowem8lT+9u9qzOn3OvnHd
-	qEDm4Kw4YZqPaV/Oe+EzDg=
-X-Received: by 2002:a17:902:d585:b0:2a9:2942:e15d with SMTP id d9443c01a7336-2a933cdbaa3mr472525ad.5.1770139489167;
-        Tue, 03 Feb 2026 09:24:49 -0800 (PST)
-Received: from d.home.mmyangfl.win (tunnel997320-pt.tunnel.tserv3.fmt2.ipv6.he.net. [2001:470:1f04:2c7::2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a933966f12sm506025ad.76.2026.02.03.09.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 09:24:48 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	David Yang <mmyangfl@gmail.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3] net: dsa: eliminate local type for tc policers
-Date: Wed,  4 Feb 2026 01:22:02 +0800
-Message-ID: <20260203172207.98533-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1770139474; c=relaxed/simple;
+	bh=EXVzYIkb1ujewKXqi19rPswvAVNTy/OSkqy9SEyu5zE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IQR9jnhXXqMTERC8pM1D2yA3l+c0WsLXV+YQ6VB+t4d+t7bkiW8TWuvQVP0moDo7AdlspakTZ3fh3ptrd7HlOjc508aPbcQSqYDQCnmC4d3H67ajpaNFM0dCp3L2dWP+68+MMh2us93xGMXUzWMUr0Ojx2kFVjwnIPbOWvAG3O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=OId2dtKR; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=pGo/bVwRRzzDTEL6tmGB8mNjA/zMc2P3BfZOOCY6Bmg=; b=OId2dtKRfjb1LZHrT4rjihi3pz
+	OWiUBKNt/0AJK+Lps4gz9CMG0eBEkZgnHQPXno18jkkrtNitrq7W6MGtoemzCpTn0iaG4j43y57J2
+	ChYP00ll2R7c/YhHwuSfEJic+8imE8DC3S9eKeuZxo6VrYsHDPay6D1+jdSJfvI7HPSdBlbo8e5cU
+	DJD07LG3VsgNl1oCa0meVB6uBqhasCiwxRKZGiH8/jJrdUg9f2rW99zG4WbiWAWnv127nKop3FPqX
+	78n9iQrAzTx2bVULmcT1hXrRhIJxqPZPL72Wn2Lp/JdfnMrVkRJjssmX7dSjAEQc8ZQa6RPLKUJTV
+	J7/Hz/Yg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vnK8V-004z5H-KJ; Tue, 03 Feb 2026 17:24:24 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v6 0/4] net: netconsole: convert to NBCON console
+ infrastructure
+Date: Tue, 03 Feb 2026 09:23:51 -0800
+Message-Id: <20260203-nbcon-v6-0-985f3bdb3267@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACgvgmkC/2XNzWqEMBSG4VsJZ+0pJyd/6qr3McwiiclMNrGoy
+ JTBey9ILRbXH8/7vWFOU0kz9OINU1rLXMYKvbCNgPj09ZGwDNALYGIjpXRYQxwrZtbauei7rBI
+ 0Ar6mlMtr79ygpgVrei1wbwQ8y7yM0/d+sMp931vM/NtaJRJaE7SK1LWO2s8hheLrxzg99sTKB
+ 7MkmQ7GSBiszJ0l0zp/ZerM/t4UEnrHnDnTkL25MH1m6mAaCbX1JmZjXcf2wsyZtQczSNipoIc
+ hRNlK/49t2/YDkA7q8oEBAAA=
+X-Change-ID: 20251117-nbcon-f24477ca9f3e
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ pmladek@suse.com, john.ogness@linutronix.de
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+ gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, 
+ mpdesouza@suse.com, kernel-team@meta.com, Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.15-dev-f4305
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4262; i=leitao@debian.org;
+ h=from:subject:message-id; bh=EXVzYIkb1ujewKXqi19rPswvAVNTy/OSkqy9SEyu5zE=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpgi9C9LpjWG3jxQbV3bhP9GtfK5h0KqtIF705y
+ ymf4BzJJOGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaYIvQgAKCRA1o5Of/Hh3
+ bfmfD/sGwL+svysHp7M0sRpIstH9O6d/EYpPufB8kXTn8ebTQ4URzfb/Nk4VRH9if5b1ekmSvMK
+ kbdHGEh8+BxsQc9qc2h6MEc/mW7mwsBy3w1jdOQ6yQKEDm9Sf/p22bp25QQZamyzU6tR6sFkdGl
+ vvfTrz3mZyaddbGlakc44xk679vstQRMmwGU33J7zHNLkAuHhAjCVysFHXxFqWbM2+C4vDd6lCQ
+ 5aUiZBh4qEP/Q5txQ0d9H0AsHbBpNc+igw06ILFbe+XGBSVNqZdb+kknP5nP9NyTWnJAR17Ts0P
+ KIfvQBpQ7V3/d/XNsAeRw/a7od23vRf2Xg9/zyXiuw6AIbQbIkxKMLnSO4CF818iCh2110Hvb4k
+ MdGsgso2mDfaJ9F5KDewwCKoiLrWbQAbG4Y/H0ilesbcnSFDCITOw37/riBkP6xFO8xSj6QVIPR
+ Ch4VuaBnD2SoLchz40Ns7E8QD7eBv+8p4HcyjTG3Uq1KX2GY2poY3UyNBJgfvleERrIryDmU/Ox
+ u5TbeXZqvTpdYwOt5HCSbTQ2Q6o475saskVCZUckAuINDP8mMJ/z3SEm9p4gci/Ni2cuoF1WjiP
+ MQUoMy5gBiswYd7v5NYWrZ0EzV8X6Qpkt9nBgk6ihBP7sIYPgPNn7P61Ps5mz3IU0oT4lFfWINi
+ 36KLwKCZ8pssE6A==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nxp.com,gmail.com,bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-256377-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-256372-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[debian.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com,kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 310BDDCC2D
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 8C113DCC6F
 X-Rspamd-Action: no action
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+This series adds support for the nbcon (new buffer console) infrastructure
+to netconsole, enabling lock-free, priority-based console operations that
+are safer in crash scenarios.
 
-David Yang is saying that struct flow_action_entry in
-include/net/flow_offload.h has gained new fields and DSA's struct
-dsa_mall_policer_tc_entry, derived from that, isn't keeping up.
-This structure is passed to drivers and they are completely oblivious to
-the values of fields they don't see.
+The implementation is introduced in three steps:
 
-This has happened before, and almost always the solution was to make the
-DSA layer thinner and use the upstream data structures. Here, the reason
-why we didn't do that is because struct flow_action_entry :: police is
-an anonymous structure.
+0) Extend printk to expose CPU and taskname (task->comm) where the
+   printk originated from. (Thanks John and Petr for the support in
+   getting this done)
+1) Refactor the message fragmentation logic into a reusable helper function
+2) Extend nbcon support to non-extended (basic) consoles using the same
+   infrastructure.
 
-That is easily enough fixable, just name those fields "struct
-flow_action_police" and reference them from DSA.
+The initial discussion about it appeared a while ago in [1], in order to
+solve Mike's HARDIRQ-safe -> HARDIRQ-unsafe lock order warning, and the root
+cause is that some hosts were calling IRQ unsafe locks from inside console
+lock.
 
-Make the according transformations to the two users (sja1105 and felix):
-"rate_bytes_per_sec" -> "rate_bytes_ps".
+At that time, we didn't have the CON_NBCON_ATOMIC_UNSAFE yet. John
+kindly implemented CON_NBCON_ATOMIC_UNSAFE in 187de7c212e5 ("printk:
+nbcon: Allow unsafe write_atomic() for panic"), and now we can
+implement netconsole on top of nbcon.
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Co-developed-by: David Yang <mmyangfl@gmail.com>
-Signed-off-by: David Yang <mmyangfl@gmail.com>
+Important to note that netconsole continues to call netpoll and the
+network TX helpers with interrupt disable, given the TX are called with
+target_list_lock.
+
+Netdev maintainers, Petr suggested that this patchset goes through netdev[2]
+
+Link: https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/ [1]
+Link: https://lore.kernel.org/all/aW9D5M0o9_8hdVvt@pathway.suse.cz/ [2]
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+
 ---
-v2: https://lore.kernel.org/r/20260131045821.3451873-1-mmyangfl@gmail.com
-  - use Oltean's version and export struct flow_action_police
-v1: https://lore.kernel.org/r/20260126061340.757543-1-mmyangfl@gmail.com
-  - fix DSA core only
- drivers/net/dsa/ocelot/felix.c         |  4 ++--
- drivers/net/dsa/sja1105/sja1105_main.c |  4 ++--
- include/net/dsa.h                      | 10 ++--------
- include/net/flow_offload.h             |  2 +-
- net/dsa/user.c                         |  5 ++---
- 5 files changed, 9 insertions(+), 16 deletions(-)
+Changes in v6:
+- Do not select PRINTK_EXECUTION_CTX in NETCONSOLE_DYNAMIC (Jakub)
+- Do not make PRINTK_EXECUTION_CTX user visible (Jakub)
+- Link to v5: https://patch.msgid.link/20260128-nbcon-v5-0-93b4ddbc181a@debian.org
 
-diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-index 9e5ede932b42..5d34eb82e639 100644
---- a/drivers/net/dsa/ocelot/felix.c
-+++ b/drivers/net/dsa/ocelot/felix.c
-@@ -2003,11 +2003,11 @@ static int felix_cls_flower_stats(struct dsa_switch *ds, int port,
- }
- 
- static int felix_port_policer_add(struct dsa_switch *ds, int port,
--				  struct dsa_mall_policer_tc_entry *policer)
-+				  const struct flow_action_police *policer)
- {
- 	struct ocelot *ocelot = ds->priv;
- 	struct ocelot_policer pol = {
--		.rate = div_u64(policer->rate_bytes_per_sec, 1000) * 8,
-+		.rate = div_u64(policer->rate_bytes_ps, 1000) * 8,
- 		.burst = policer->burst,
- 	};
- 
-diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index 2a4a0fe20dae..71a817c07a90 100644
---- a/drivers/net/dsa/sja1105/sja1105_main.c
-+++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -2841,7 +2841,7 @@ static void sja1105_mirror_del(struct dsa_switch *ds, int port,
- }
- 
- static int sja1105_port_policer_add(struct dsa_switch *ds, int port,
--				    struct dsa_mall_policer_tc_entry *policer)
-+				    const struct flow_action_police *policer)
- {
- 	struct sja1105_l2_policing_entry *policing;
- 	struct sja1105_private *priv = ds->priv;
-@@ -2852,7 +2852,7 @@ static int sja1105_port_policer_add(struct dsa_switch *ds, int port,
- 	 * the value of RATE bytes divided by 64, up to a maximum of SMAX
- 	 * bytes.
- 	 */
--	policing[port].rate = div_u64(512 * policer->rate_bytes_per_sec,
-+	policing[port].rate = div_u64(512 * policer->rate_bytes_ps,
- 				      1000000);
- 	policing[port].smax = policer->burst;
- 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 6b2b5ed64ea4..656990365798 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -216,12 +216,6 @@ struct dsa_mall_mirror_tc_entry {
- 	bool ingress;
- };
- 
--/* TC port policer entry */
--struct dsa_mall_policer_tc_entry {
--	u32 burst;
--	u64 rate_bytes_per_sec;
--};
--
- /* TC matchall entry */
- struct dsa_mall_tc_entry {
- 	struct list_head list;
-@@ -229,7 +223,7 @@ struct dsa_mall_tc_entry {
- 	enum dsa_port_mall_action_type type;
- 	union {
- 		struct dsa_mall_mirror_tc_entry mirror;
--		struct dsa_mall_policer_tc_entry policer;
-+		struct flow_action_police policer;
- 	};
- };
- 
-@@ -1110,7 +1104,7 @@ struct dsa_switch_ops {
- 	void	(*port_mirror_del)(struct dsa_switch *ds, int port,
- 				   struct dsa_mall_mirror_tc_entry *mirror);
- 	int	(*port_policer_add)(struct dsa_switch *ds, int port,
--				    struct dsa_mall_policer_tc_entry *policer);
-+				    const struct flow_action_police *policer);
- 	void	(*port_policer_del)(struct dsa_switch *ds, int port);
- 	int	(*port_setup_tc)(struct dsa_switch *ds, int port,
- 				 enum tc_setup_type type, void *type_data);
-diff --git a/include/net/flow_offload.h b/include/net/flow_offload.h
-index 596ab9791e4d..a2b1b752958a 100644
---- a/include/net/flow_offload.h
-+++ b/include/net/flow_offload.h
-@@ -275,7 +275,7 @@ struct flow_action_entry {
- 			u32			trunc_size;
- 			bool			truncate;
- 		} sample;
--		struct {				/* FLOW_ACTION_POLICE */
-+		struct flow_action_police {		/* FLOW_ACTION_POLICE */
- 			u32			burst;
- 			u64			rate_bytes_ps;
- 			u64			peakrate_bytes_ps;
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index f59d66f0975d..df25a8891c01 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1459,8 +1459,8 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
- 	struct netlink_ext_ack *extack = cls->common.extack;
- 	struct dsa_port *dp = dsa_user_to_port(dev);
- 	struct dsa_user_priv *p = netdev_priv(dev);
--	struct dsa_mall_policer_tc_entry *policer;
- 	struct dsa_mall_tc_entry *mall_tc_entry;
-+	struct flow_action_police *policer;
- 	struct dsa_switch *ds = dp->ds;
- 	struct flow_action_entry *act;
- 	int err;
-@@ -1497,8 +1497,7 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
- 	mall_tc_entry->cookie = cls->cookie;
- 	mall_tc_entry->type = DSA_PORT_MALL_POLICER;
- 	policer = &mall_tc_entry->policer;
--	policer->rate_bytes_per_sec = act->police.rate_bytes_ps;
--	policer->burst = act->police.burst;
-+	memcpy(policer, &act->police, sizeof(*policer));
- 
- 	err = ds->ops->port_policer_add(ds, dp->index, policer);
- 	if (err) {
--- 
-2.51.0
+Changes in v5:
+- Replace the memcpy size from TASK_COMM_LEN to sizeof(wctxt->comm)
+  (John)
+- Add some compilation time asserts (John)
+- Change the implementation of printk_info_get_cpu()
+- Link to v4: https://patch.msgid.link/20260123-nbcon-v4-0-46a5cf567926@debian.org
+
+Changes in v4:
+- Added __acquires/__releases compiler annotations (Simon)
+- Rebased on top of net-next, which included changes from Andre
+- Netconsole Dynamic now selects PRINTK_EXECUTION_CTX and
+  CONSOLE_HAS_EXECUTION_CTX
+- Link to v3: https://patch.msgid.link/20260122-nbcon-v3-0-a722f2f0dfa5@debian.org
+
+Changes in v3:
+- Fixed netconsole selection (s/CONSOLE_HAS_EXECUTION_CTX/PRINTK_EXECUTION_CTX)
+- Removed unnecessary "inline" in C file.
+- Tried to shrink the get the lines to fit 80-columns
+- Link to v2: https://patch.msgid.link/20260120-nbcon-v2-0-b61f960587a8@debian.org
+
+Changes in v2:
+- Return if not able to nbcon_enter_unsafe() instead of retrying on
+  a different target (Marcos)
+- Add printk that supports context information, which will be used later
+  by netconsole sysdata. (John, Petr)
+- An extra patch to bring symmetry to send_msg_udp()
+- Link to v1: https://patch.msgid.link/20251222-nbcon-v1-0-65b43c098708@debian.org
+
+Changes in V1 from RFC:
+  * Removed the extra CONFIG for NBCON, given we don't want to support
+    both console. Move to nbcon as the only console framework supported
+  * Incorporated the changes from Petr.
+  * Some renames to make the code more consistent.
+  * RFC Link: https://lore.kernel.org/all/20251121-nbcon-v1-0-503d17b2b4af@debian.org/
+
+---
+Breno Leitao (4):
+      printk: Add execution context (task name/CPU) to printk_info
+      netconsole: extract message fragmentation into send_msg_udp()
+      netconsole: convert to NBCON console infrastructure
+      netconsole: Use printk context for CPU and task information
+
+ drivers/net/Kconfig               |   1 +
+ drivers/net/netconsole.c          | 153 +++++++++++++++++++++++---------------
+ include/linux/console.h           |   8 ++
+ kernel/printk/internal.h          |   8 ++
+ kernel/printk/nbcon.c             |  16 ++++
+ kernel/printk/printk.c            |  54 +++++++++++++-
+ kernel/printk/printk_ringbuffer.h |   5 ++
+ lib/Kconfig.debug                 |  20 +++++
+ 8 files changed, 205 insertions(+), 60 deletions(-)
+---
+base-commit: bf2e36c9dab95e41516fbcf7b1cc804539b2d021
+change-id: 20251117-nbcon-f24477ca9f3e
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
