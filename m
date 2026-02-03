@@ -1,244 +1,150 @@
-Return-Path: <netdev+bounces-256323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAcxFosLgmmCOQMAu9opvQ
-	(envelope-from <netdev+bounces-256323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:51:55 +0100
+	id +OwgGAILgmmCOQMAu9opvQ
+	(envelope-from <netdev+bounces-256324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:49:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7669DAD1F
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:51:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B567FDACAE
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 15:49:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52CC4311344E
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 14:46:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68028308DAB5
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 14:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C13394486;
-	Tue,  3 Feb 2026 14:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C19394481;
+	Tue,  3 Feb 2026 14:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTK4R+js"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MhI9Q245";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="63+Wz9yq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3ED2E92C3;
-	Tue,  3 Feb 2026 14:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523E5393DD2
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 14:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770130003; cv=none; b=d/65f30ZuxYmlk7KtYVJw22TWaNvDjj5s6s6ulvafsvMAp23D6gU3kqX91Kd0Uc0k2HQZWedQCuVRSMyNhpTX3/dLg1r+qyDHMGnZ2yRyJAIWNJFPYJauZct8BKrVy1GtVRiZ3MngD3fpuyolhiKomH/XAXeJFqFXCNXDs3y/7A=
+	t=1770130148; cv=none; b=HZJd2xarEOuHtPuvCBYkIPAlIOmFHrNpl7oKEtA0oKMfE1yJQMiW6Y5A70cHFjkplaeW0OpjyNgYFxqqQr651F6P2pv/1WUtKdDy+fSmBODUS6JqSny9I0gGmIchEnqGElyIxlN13VxysGwJpNL+eZjCwnuTuYk09SHyUNO7F0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770130003; c=relaxed/simple;
-	bh=+I4EbU5H2CwfCr+HfX4PmdXBArW7/Kor7ez70HR28NM=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=uXEC4nvzRMJ43ZAjRItR86nVbgY4FjnTB6dbP42rQ0TUp7qCKn6d7w4GpIBB+Cg2SoWxvOtmClxhK1B1wX5OOR1R8nLUK05J81+BTCjD+nHBXknvNYGvjJbAriwVyCj4tRtmw7pEx9hvzW0DVi7E7oNZCRV2ZueKH60LG+hCL0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTK4R+js; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27441C116D0;
-	Tue,  3 Feb 2026 14:46:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770130003;
-	bh=+I4EbU5H2CwfCr+HfX4PmdXBArW7/Kor7ez70HR28NM=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=mTK4R+jseB79bDOwofKnoc4O4HqwYbCEuyE7zvExIlNoOxkBe6KGHJcE8OEfxACqw
-	 v6Yhrbz9oSp/1/25hZ5GNEOaIIP3QhzIAr8AA4qBk8B8yGs260eSsbvL3jvSIUlCqt
-	 vaVXG6uKKe4kG/vs4cQ5K4R0RLcjvVP6vdnofQ3q+l0o49ntm9hxUBJRtnCI9F/kq/
-	 A6Y3TrPQP9EN4G3nUMIKouuU6D2Yh+Z3o1Ii5P5v+PArDM5JaMn4drGRbkdLnEOLZ+
-	 o38xynNt7FyAx7b9+HqPV9xWkptL34X/EQl9bbOIZUSqba5m9GSO5k85WLj23vfjAA
-	 b4XFgC9F38d7A==
-Date: Tue, 03 Feb 2026 08:46:42 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1770130148; c=relaxed/simple;
+	bh=ZP5/z287tsXmpn7kDb4nzRa5n56zkOAr+S55eYggzJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JzdRxBdtCZPH+zmVESJvGoA5gVDUJyvaPUO6mUquxcPjs9ULWJfylu4UwILoO6qj6U+U5C/ygdM4VEg8U41OiCbxvVEiehKR+nDUrfLB18kmKd9WFmKIJEHQ/VUWJ9ctJmDE02PGW4oQD5kiXNGDKtuJUT3BEiWiOsF0JqL26ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MhI9Q245; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=63+Wz9yq; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 3 Feb 2026 15:49:03 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1770130145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HabIfHSGhqKfFMi4gVBPIyt5UQ6Yj9bfjp1I8GtxH9g=;
+	b=MhI9Q245JThbRrlR3N6EbEfkHCfzHWVWXRJsos3caKQnLMYN+BLD5yLsKR49Vqssy0e4EM
+	GBdU0GuxTzzrDhV9EbQmiWSdQpn6hz7QcECNAryCEZ6A/Hofm7Jk7cUcN9FhYs3BGIPula
+	CVJZXqYlM3JOPgNkzNytaH47qvWKxOmm/wWzZdWoZf5d/3hnZblrxshOi0IF6DQwEAKWIb
+	HPViAGZzXp9Ct5fhz2AZ73rqSBoPzX42DvQBltfzN4t36iR/q+lBJsCJfNtCwzO7MEXFE4
+	1x4+emDf3MjjnjPg4A3dnGVN6EG0SpjNshoGUT3ZjIKBxRXVptBkSn99vutWXA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1770130145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HabIfHSGhqKfFMi4gVBPIyt5UQ6Yj9bfjp1I8GtxH9g=;
+	b=63+Wz9yqppnxDEinNWFKps23A4xapJOQNWazatIAwh4aXe2Whne5+KxoKUslZ7izR9hZ/J
+	X9uHL+JhYUoXJ7Cw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
+	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net
+Subject: Re: [PATCH net-next v2 5/9] selftests: hsr: Add tests for more link
+ faults with PRP
+Message-ID: <20260203144903.ifAQ9Yh4@linutronix.de>
+References: <cover.1769093335.git.fmaurer@redhat.com>
+ <774d7a2327d1c05b78ee30ac21297794bfcb0245.1769093335.git.fmaurer@redhat.com>
+ <20260129133217.xNoDm9nn@linutronix.de>
+ <aYCK5Dczg_0tbuEA@thinkpad>
+ <20260202164550.1TDNCEe_@linutronix.de>
+ <aYHlhKiSh8YrXjT1@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Biju Das <biju.das.jz@bp.renesas.com>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org, 
- Geert Uytterhoeven <geert+renesas@glider.be>, 
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
- devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Stefan Eichenberger <eichest@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-To: Biju <biju.das.au@gmail.com>
-In-Reply-To: <20260203121723.312336-1-biju.das.jz@bp.renesas.com>
-References: <20260203121723.312336-1-biju.das.jz@bp.renesas.com>
-Message-Id: <177013000212.2528321.6355698211808393488.robh@kernel.org>
-Subject: Re: [PATCH net-next] dt-bindings: net: micrel: Fix dtbs compatible
- too long warnings
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aYHlhKiSh8YrXjT1@thinkpad>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256323-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,bp.renesas.com,kernel.org,vger.kernel.org,glider.be,google.com,davemloft.net,lunn.ch,gmail.com];
+	TAGGED_FROM(0.00)[bounces-256324-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.0.8:email];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devicetree.org:url,0.0.0.4:email,renesas.com:email,0.0.0.1:email,0.0.0.0:email]
-X-Rspamd-Queue-Id: E7669DAD1F
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:mid,linutronix.de:dkim]
+X-Rspamd-Queue-Id: B567FDACAE
 X-Rspamd-Action: no action
 
+On 2026-02-03 13:09:40 [+0100], Felix Maurer wrote:
+> I agree, the reboot case is safe because of the 500ms quiet period. But
+> I kinda fear a situation where a node sends a lot of packets (making
+> it's sequence number wrap within the 400ms), but only a small fraction
 
-On Tue, 03 Feb 2026 12:17:21 +0000, Biju wrote:
-> From: Biju Das <biju.das.jz@bp.renesas.com>
+wrap? A lot of packets means you force-recycle the oldest block. This
+doesn't have an impact on timing.
+
+> of that to us, so that we don't clear blocks because of a full buffer.
+
+Why does this make a difference? Are you describing it from PRP
+perspective? From HSR point of view, each node sees all frames. If you
+have HW support for de-duplication then you don't see duplicates.
+
+> That could make a block live pretty long, when we hit it multiple times,
+> which could in turn lead to valid, new frames being dropped. I'd say
+
+The block covers up to 128 frames and you have 64 blocks. This covers
+8192 incremental seq-numbers and every block gets recycled 8 times until
+the seq-number overflow.
+
+I think you are afraid if a node sends 65536 packets in less than 400ms
+and the receiving node observes only a fraction of it (less than 8192)
+so it does not expire blocks by force. This may indeed lead to dropping
+"new" packets.
+But this should be only a PRP problem or also a HSR problem if the used
+sequence number has "random" increments.
+
+> it's a somewhat artificial scenario, but not impossible in reality
+> (especially considering that I'd expect a good chunk of the traffic in
+> HSR and PRP networks being periodic, which may lead to reliably hitting
+> the same blocks over and over).
 > 
-> The KSZ9131 PHY is suitable for IEEE 802.3 applications.
-> 
-> Fix the below dtbs warning "compatible: ['ethernet-phy-id0022.1640',
-> 'ethernet-phy-ieee802.3-c22'] is too long" on the below dts:
-> 
-> r8a774b1-beacon-rzg2n-kit.dtb
-> r8a774a1-beacon-rzg2m-kit.dtb
-> r8a774e1-beacon-rzg2h-kit.dtb
-> r9a08g046l48-smarc.dtb
-> r9a07g043u11-smarc.dtb
-> r9a07g044c2-smarc.dtb
-> r9a07g044l2-smarc.dtb
-> r9a07g044l2-smarc.dtb
-> r9a07g054l2-smarc.dtb
-> r9a07g054l2-smarc.dtb
-> r9a09g047e57-smarc.dtb
-> r9a09g047e57-smarc.dtb
-> r9a09g056n48-rzv2n-evk.dtb
-> r9a09g056n48-rzv2n-evk.dtb
-> r9a09g057h44-rzv2h-evk.dtb
-> r9a09g057h44-rzv2h-evk.dtb
-> r9a07g043u11-smarc-cru-csi-ov5645.dtb
-> r9a07g043u11-smarc-pmod.dtb
-> r9a07g043u11-smarc-du-adv7513.dtb
-> r9a09g047e57-smarc-cru-csi-ov5645.dtb
-> r9a07g044c2-smarc-cru-csi-ov5645.dtb
-> r9a09g047e57-smarc-cru-csi-ov5645.dtb
-> r9a07g044l2-smarc-cru-csi-ov5645.dtb
-> r9a07g044l2-smarc-cru-csi-ov5645.dtb
-> r9a07g054l2-smarc-cru-csi-ov5645.dtb
-> r9a07g054l2-smarc-cru-csi-ov5645.dtb
-> r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
-> r9a09g056n48-rzv2n-evk-cn15-emmc.dtb
-> r9a09g056n48-rzv2n-evk-cn15-sd.dtb
-> r9a09g057h44-rzv2h-evk-cn15-sd.dtb
-> r9a09g056n48-rzv2n-evk-cn15-sd.dtb
-> r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
-> r9a09g057h44-rzv2h-evk-cn15-sd.dtb
-> r9a09g057h44-rzv2h-evk-cn15-emmc.dtb
-> 
-> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-> ---
->  .../bindings/net/micrel,gigabit.yaml          | 23 +++++++++++--------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
+> Thanks,
+>    Felix
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.example.dtb: ethernet-phy@0 (ethernet-phy-id0007.0772): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-id0007.0772', 'ethernet-phy-ieee802.3-c22'] is too long
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-id0007.0772' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.example.dtb: ethernet-phy@0 (ethernet-phy-id0007.0772): Unevaluated properties are not allowed ('load-save-gpios', 'vsc8531,edge-slowdown', 'vsc8531,led-0-mode', 'vsc8531,led-1-mode', 'vsc8531,vddmac' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/faraday,ftgmac100.example.dtb: ethernet-phy@1 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,ethqos.example.dtb: phy@4 (ethernet-phy-ieee802.3-c22): $nodename:0: 'phy@4' does not match '^ethernet-phy(@[a-f0-9]+)?$'
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,ethqos.example.dtb: phy@4 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,ethqos.example.dtb: phy@4 (ethernet-phy-ieee802.3-c22): Unevaluated properties are not allowed ('#phy-cells', 'device_type', 'reg' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/brcm,unimac-mdio.example.dtb: ethernet-phy@0 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,etheravb.example.dtb: ethernet-phy@0 (ethernet-phy-id0022.1622): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-id0022.1622', 'ethernet-phy-ieee802.3-c22'] is too long
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-id0022.1622' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,etheravb.example.dtb: ethernet-phy@0 (ethernet-phy-id0022.1622): Unevaluated properties are not allowed ('rxc-skew-ps' was unexpected)
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/socionext,synquacer-netsec.example.dtb: ethernet-phy@1 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,g12a-mdio-mux.example.dtb: ethernet-phy@8 (ethernet-phy-id0180.3301): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-id0180.3301', 'ethernet-phy-ieee802.3-c22'] is too long
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-id0180.3301' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.example.dtb: ethernet-phy@0 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,fec.example.dtb: ethernet-phy@0 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/brcm,bcmgenet.example.dtb: ethernet-phy@1 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/brcm,bcmgenet.example.dtb: ethernet-phy@0 (ethernet-phy-ieee802.3-c22): compatible: 'oneOf' conditional failed, one must be fixed:
-	['ethernet-phy-ieee802.3-c22'] is too short
-	'ethernet-phy-id0022.1640' was expected
-	'ethernet-phy-ieee802.3-c22' is not one of ['ethernet-phy-id0022.1610', 'ethernet-phy-id0022.1611', 'ethernet-phy-id0022.1620', 'ethernet-phy-id0022.1631', 'ethernet-phy-id0022.1640', 'ethernet-phy-id0022.1650', 'ethernet-phy-id0022.1660', 'ethernet-phy-id0022.1670']
-	from schema $id: http://devicetree.org/schemas/net/micrel,gigabit.yaml
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.kernel.org/project/devicetree/patch/20260203121723.312336-1-biju.das.jz@bp.renesas.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Sebastian
 
