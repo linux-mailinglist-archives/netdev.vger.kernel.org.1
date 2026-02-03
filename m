@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-256372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256373-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GGv7HPovgml5QQMAu9opvQ
-	(envelope-from <netdev+bounces-256372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:27:22 +0100
+	id yE2AHjowgml5QQMAu9opvQ
+	(envelope-from <netdev+bounces-256373-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:28:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C113DCC6F
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:27:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2B9DCC97
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9EEE1301FE39
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:24:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4FDD030E8A01
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C247931D37B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA368325711;
 	Tue,  3 Feb 2026 17:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="OId2dtKR"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="sUpKgjq/"
 X-Original-To: netdev@vger.kernel.org
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0441D5ABA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0C63033D8;
 	Tue,  3 Feb 2026 17:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770139474; cv=none; b=GR0QKEBPoNb/O/H/e44UPPSzPMaKnCxYxREMlHKXgPWAUEJj1t5nj/Socx8S2tRD4NdlUKcy1iK8qt2liEfc6SgtXupi0wvILrjbqDqWBgjGL6hxMCaaHlxz4R3Kk3DlkhFDleLpEQFlo6XHy2KFrGj6iO72eff58U5gLI3Vcvo=
+	t=1770139474; cv=none; b=VRt72vmup9qzKGmSTk1bE9jjjXLGlwGui1o6pM/eJPvg3a/Y/N71jMQtMQ95/FUUPb1J5qjdopgcOiRA6xZmWCoLO96c6bhnu0sgARNJ/YaZooUIvE92qVGt6LblqoRzuL++cUMhdFq6W2heiDww+QqLPIXGJic7t4DCKXxq9k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770139474; c=relaxed/simple;
-	bh=EXVzYIkb1ujewKXqi19rPswvAVNTy/OSkqy9SEyu5zE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IQR9jnhXXqMTERC8pM1D2yA3l+c0WsLXV+YQ6VB+t4d+t7bkiW8TWuvQVP0moDo7AdlspakTZ3fh3ptrd7HlOjc508aPbcQSqYDQCnmC4d3H67ajpaNFM0dCp3L2dWP+68+MMh2us93xGMXUzWMUr0Ojx2kFVjwnIPbOWvAG3O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=OId2dtKR; arc=none smtp.client-ip=82.195.75.108
+	bh=YW6T6corvYXvJqvQzvitkQL9TeapEvUtc5oj+Na3RSM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=TdCHDEMIV0X1EAxj0zSEmsw99Usu4F/sOG01wcWm9zhNgw0vacT6WpAqXHFwamfnvyeFyokdfLz6Y3SRbeFxU+a8dH55WbJAmjoN11melEGjTEEO1Q8hh/wfXyWbK+ZKWEeyt+PHOy/4a1FI6tfkpZrRMjmKjsm2Z26ho/aKy4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=sUpKgjq/; arc=none smtp.client-ip=82.195.75.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=pGo/bVwRRzzDTEL6tmGB8mNjA/zMc2P3BfZOOCY6Bmg=; b=OId2dtKRfjb1LZHrT4rjihi3pz
-	OWiUBKNt/0AJK+Lps4gz9CMG0eBEkZgnHQPXno18jkkrtNitrq7W6MGtoemzCpTn0iaG4j43y57J2
-	ChYP00ll2R7c/YhHwuSfEJic+8imE8DC3S9eKeuZxo6VrYsHDPay6D1+jdSJfvI7HPSdBlbo8e5cU
-	DJD07LG3VsgNl1oCa0meVB6uBqhasCiwxRKZGiH8/jJrdUg9f2rW99zG4WbiWAWnv127nKop3FPqX
-	78n9iQrAzTx2bVULmcT1hXrRhIJxqPZPL72Wn2Lp/JdfnMrVkRJjssmX7dSjAEQc8ZQa6RPLKUJTV
-	J7/Hz/Yg==;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
+	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
+	From:Reply-To:Content-ID:Content-Description;
+	bh=pSKJ1yzY2SZrxK97G6vs4bf2Lq4Zd0Es8GeF/sYwarA=; b=sUpKgjq//r9Gf7s7gaknDGxSPk
+	rlpafCZvCaek5Ky2nxYYVP4fxFFC0OzQDK/jblOr6P2rgKt3fZsBYO5WLSOLYzDH+GWma3CLS09Eb
+	DB/KnFmf0xcOuso7+vJYutMH8du8VsciAUUprRTt6t6DwDetWPe3ai6DzqmEG2woguuhYbMOYosS9
+	xEtmYFGRX2Kd3fT7rtVbnjKxECDimJ1qAexPBCkaP1H0tKGiGl3lO8Naa85R0UEsi7HlBZcZlxioS
+	JRHjcUIZfDO8u4s+SOGVemw5qdZ057txIDdRGhYTtqStEnNM1nf+CnEZf3MRCid165MWePczij5xF
+	ckDmH61w==;
 Received: from authenticated user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.94.2)
 	(envelope-from <leitao@debian.org>)
-	id 1vnK8V-004z5H-KJ; Tue, 03 Feb 2026 17:24:24 +0000
+	id 1vnK8b-004z5K-Lz; Tue, 03 Feb 2026 17:24:30 +0000
 From: Breno Leitao <leitao@debian.org>
-Subject: [PATCH net-next v6 0/4] net: netconsole: convert to NBCON console
- infrastructure
-Date: Tue, 03 Feb 2026 09:23:51 -0800
-Message-Id: <20260203-nbcon-v6-0-985f3bdb3267@debian.org>
+Date: Tue, 03 Feb 2026 09:23:52 -0800
+Subject: [PATCH net-next v6 1/4] printk: Add execution context (task
+ name/CPU) to printk_info
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,12 +61,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIACgvgmkC/2XNzWqEMBSG4VsJZ+0pJyd/6qr3McwiiclMNrGoy
- JTBey9ILRbXH8/7vWFOU0kz9OINU1rLXMYKvbCNgPj09ZGwDNALYGIjpXRYQxwrZtbauei7rBI
- 0Ar6mlMtr79ygpgVrei1wbwQ8y7yM0/d+sMp931vM/NtaJRJaE7SK1LWO2s8hheLrxzg99sTKB
- 7MkmQ7GSBiszJ0l0zp/ZerM/t4UEnrHnDnTkL25MH1m6mAaCbX1JmZjXcf2wsyZtQczSNipoIc
- hRNlK/49t2/YDkA7q8oEBAAA=
-X-Change-ID: 20251117-nbcon-f24477ca9f3e
+Message-Id: <20260203-nbcon-v6-1-985f3bdb3267@debian.org>
+References: <20260203-nbcon-v6-0-985f3bdb3267@debian.org>
+In-Reply-To: <20260203-nbcon-v6-0-985f3bdb3267@debian.org>
 To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -77,22 +74,22 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
  gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, 
- mpdesouza@suse.com, kernel-team@meta.com, Simon Horman <horms@kernel.org>
+ mpdesouza@suse.com, kernel-team@meta.com
 X-Mailer: b4 0.15-dev-f4305
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4262; i=leitao@debian.org;
- h=from:subject:message-id; bh=EXVzYIkb1ujewKXqi19rPswvAVNTy/OSkqy9SEyu5zE=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpgi9C9LpjWG3jxQbV3bhP9GtfK5h0KqtIF705y
- ymf4BzJJOGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaYIvQgAKCRA1o5Of/Hh3
- bfmfD/sGwL+svysHp7M0sRpIstH9O6d/EYpPufB8kXTn8ebTQ4URzfb/Nk4VRH9if5b1ekmSvMK
- kbdHGEh8+BxsQc9qc2h6MEc/mW7mwsBy3w1jdOQ6yQKEDm9Sf/p22bp25QQZamyzU6tR6sFkdGl
- vvfTrz3mZyaddbGlakc44xk679vstQRMmwGU33J7zHNLkAuHhAjCVysFHXxFqWbM2+C4vDd6lCQ
- 5aUiZBh4qEP/Q5txQ0d9H0AsHbBpNc+igw06ILFbe+XGBSVNqZdb+kknP5nP9NyTWnJAR17Ts0P
- KIfvQBpQ7V3/d/XNsAeRw/a7od23vRf2Xg9/zyXiuw6AIbQbIkxKMLnSO4CF818iCh2110Hvb4k
- MdGsgso2mDfaJ9F5KDewwCKoiLrWbQAbG4Y/H0ilesbcnSFDCITOw37/riBkP6xFO8xSj6QVIPR
- Ch4VuaBnD2SoLchz40Ns7E8QD7eBv+8p4HcyjTG3Uq1KX2GY2poY3UyNBJgfvleERrIryDmU/Ox
- u5TbeXZqvTpdYwOt5HCSbTQ2Q6o475saskVCZUckAuINDP8mMJ/z3SEm9p4gci/Ni2cuoF1WjiP
- MQUoMy5gBiswYd7v5NYWrZ0EzV8X6Qpkt9nBgk6ihBP7sIYPgPNn7P61Ps5mz3IU0oT4lFfWINi
- 36KLwKCZ8pssE6A==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9303; i=leitao@debian.org;
+ h=from:subject:message-id; bh=YW6T6corvYXvJqvQzvitkQL9TeapEvUtc5oj+Na3RSM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpgi9CwrgWmI9d3eZ/H8D5M+9wn5slujvfBb3H7
+ Is7PTPc5FqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaYIvQgAKCRA1o5Of/Hh3
+ bTmBD/94iveYF3y7pbFIj2sEnyVKo/wHnjNU+pkDyoAd73ami9Mx/Y6ULUIHJIG/LXDHX+XhSGb
+ mKm3JJIG/dy6PWEfalDdaDIx70mfxQ+Wu3JJHNljpSLkICUhFE2+GaO3dgzgyzN4ub13xrkEiAx
+ qR4r+HaBLsiqaD5Hnn+pkp821mKdJBsPv5rghqgCF+sgvsVPZ24twPndcpV7zROGDZnLu8wm0Fp
+ lVwAsebF3mqW5oyOho5vEPmWDL4XAV2hTlymgwG3ymmMk1VoCbIS9wsGUng9ArYcDkE8PF3r9T4
+ 9ql8XJFpFQNGbH/FY0aZxsbPNAutrhIJqeSimZuoS6FHnWFYAz9wxfWP/oKHNeaJWcNbCAeefbK
+ w9H6jK0YeOqqitJda5GbCy9b1ueyVUgawd7relGCoD5P8BJM9GRWbfktsTbeLEbYwFB1wZB+UqK
+ xPGmyx02MHlLIakzVlbWR//yordQLUuL2kFvcicEokx03gBUT0u4W4y5ovRzWuEz1HNnBim6A0m
+ 2vKPAUD5mBVwS55WyVcNq4vYZmiFum7WEz0dYUYJ+PXkkCfeVnkwyh2zjOZ4rHy+smLAMwotf+i
+ 5ad2ZYbs1jDFb1E5anWZ1C5LLE488dl/22oVWcZfDxs4k3LUO1ZcyjssJgNSCXBl/Rs8jpY+mOi
+ lga4KLF8bdVudrw==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
@@ -100,129 +97,294 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256372-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256373-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[debian.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com,kernel.org];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8C113DCC6F
+X-Rspamd-Queue-Id: EC2B9DCC97
 X-Rspamd-Action: no action
 
-This series adds support for the nbcon (new buffer console) infrastructure
-to netconsole, enabling lock-free, priority-based console operations that
-are safer in crash scenarios.
+Extend struct printk_info to include the task name, pid, and CPU
+number where printk messages originate. This information is captured
+at vprintk_store() time and propagated through printk_message to
+nbcon_write_context, making it available to nbcon console drivers.
 
-The implementation is introduced in three steps:
+This is useful for consoles like netconsole that want to include
+execution context in their output, allowing correlation of messages
+with specific tasks and CPUs regardless of where the console driver
+actually runs.
 
-0) Extend printk to expose CPU and taskname (task->comm) where the
-   printk originated from. (Thanks John and Petr for the support in
-   getting this done)
-1) Refactor the message fragmentation logic into a reusable helper function
-2) Extend nbcon support to non-extended (basic) consoles using the same
-   infrastructure.
+The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+the helper functions compile to no-ops with no overhead.
 
-The initial discussion about it appeared a while ago in [1], in order to
-solve Mike's HARDIRQ-safe -> HARDIRQ-unsafe lock order warning, and the root
-cause is that some hosts were calling IRQ unsafe locks from inside console
-lock.
-
-At that time, we didn't have the CON_NBCON_ATOMIC_UNSAFE yet. John
-kindly implemented CON_NBCON_ATOMIC_UNSAFE in 187de7c212e5 ("printk:
-nbcon: Allow unsafe write_atomic() for panic"), and now we can
-implement netconsole on top of nbcon.
-
-Important to note that netconsole continues to call netpoll and the
-network TX helpers with interrupt disable, given the TX are called with
-target_list_lock.
-
-Netdev maintainers, Petr suggested that this patchset goes through netdev[2]
-
-Link: https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/ [1]
-Link: https://lore.kernel.org/all/aW9D5M0o9_8hdVvt@pathway.suse.cz/ [2]
-
+Suggested-by: John Ogness <john.ogness@linutronix.de>
 Signed-off-by: Breno Leitao <leitao@debian.org>
-
+Signed-off-by: Petr Mladek <pmladek@suse.com>
 ---
-Changes in v6:
-- Do not select PRINTK_EXECUTION_CTX in NETCONSOLE_DYNAMIC (Jakub)
-- Do not make PRINTK_EXECUTION_CTX user visible (Jakub)
-- Link to v5: https://patch.msgid.link/20260128-nbcon-v5-0-93b4ddbc181a@debian.org
+ drivers/net/Kconfig               |  1 +
+ include/linux/console.h           |  8 ++++++
+ kernel/printk/internal.h          |  8 ++++++
+ kernel/printk/nbcon.c             | 16 ++++++++++++
+ kernel/printk/printk.c            | 54 ++++++++++++++++++++++++++++++++++++++-
+ kernel/printk/printk_ringbuffer.h |  5 ++++
+ lib/Kconfig.debug                 | 20 +++++++++++++++
+ 7 files changed, 111 insertions(+), 1 deletion(-)
 
-Changes in v5:
-- Replace the memcpy size from TASK_COMM_LEN to sizeof(wctxt->comm)
-  (John)
-- Add some compilation time asserts (John)
-- Change the implementation of printk_info_get_cpu()
-- Link to v4: https://patch.msgid.link/20260123-nbcon-v4-0-46a5cf567926@debian.org
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index 9c7953f8e6377..2af4d2ef5437c 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
+ 	bool "Dynamic reconfiguration of logging targets"
+ 	depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
+ 			!(NETCONSOLE=y && CONFIGFS_FS=m)
++	select CONSOLE_HAS_EXECUTION_CTX
+ 	help
+ 	  This option enables the ability to dynamically reconfigure target
+ 	  parameters (interface, IP addresses, port numbers, MAC addresses)
+diff --git a/include/linux/console.h b/include/linux/console.h
+index fc9f5c5c1b04c..cc5dc3bf58b60 100644
+--- a/include/linux/console.h
++++ b/include/linux/console.h
+@@ -298,12 +298,20 @@ struct nbcon_context {
+  * @outbuf:		Pointer to the text buffer for output
+  * @len:		Length to write
+  * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
++ * @cpu:		CPU on which the message was generated
++ * @pid:		PID of the task that generated the message
++ * @comm:		Name of the task that generated the message
+  */
+ struct nbcon_write_context {
+ 	struct nbcon_context	__private ctxt;
+ 	char			*outbuf;
+ 	unsigned int		len;
+ 	bool			unsafe_takeover;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	int			cpu;
++	pid_t			pid;
++	char			comm[TASK_COMM_LEN];
++#endif
+ };
+ 
+ /**
+diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
+index 5f5f626f42794..5fdea56827564 100644
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -281,12 +281,20 @@ struct printk_buffers {
+  *		nothing to output and this record should be skipped.
+  * @seq:	The sequence number of the record used for @pbufs->outbuf.
+  * @dropped:	The number of dropped records from reading @seq.
++ * @cpu:	CPU on which the message was generated.
++ * @pid:	PID of the task that generated the message
++ * @comm:	Name of the task that generated the message.
+  */
+ struct printk_message {
+ 	struct printk_buffers	*pbufs;
+ 	unsigned int		outbuf_len;
+ 	u64			seq;
+ 	unsigned long		dropped;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	int			cpu;
++	pid_t			pid;
++	char			comm[TASK_COMM_LEN];
++#endif
+ };
+ 
+ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
+index 32fc12e536752..f6d22510fdc3a 100644
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -946,6 +946,20 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
+ }
+ EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
+ 
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++static void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
++				     struct printk_message *pmsg)
++{
++	wctxt->cpu = pmsg->cpu;
++	wctxt->pid = pmsg->pid;
++	memcpy(wctxt->comm, pmsg->comm, sizeof(wctxt->comm));
++	static_assert(sizeof(wctxt->comm) == sizeof(pmsg->comm));
++}
++#else
++static void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
++				     struct printk_message *pmsg) {}
++#endif
++
+ /**
+  * nbcon_emit_next_record - Emit a record in the acquired context
+  * @wctxt:	The write context that will be handed to the write function
+@@ -1048,6 +1062,8 @@ static bool nbcon_emit_next_record(struct nbcon_write_context *wctxt, bool use_a
+ 	/* Initialize the write context for driver callbacks. */
+ 	nbcon_write_context_set_buf(wctxt, &pmsg.pbufs->outbuf[0], pmsg.outbuf_len);
+ 
++	wctxt_load_execution_ctx(wctxt, &pmsg);
++
+ 	if (use_atomic)
+ 		con->write_atomic(con, wctxt);
+ 	else
+diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+index 1d765ad242b82..cf6b528610366 100644
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -2131,11 +2131,39 @@ static inline void printk_delay(int level)
+ 	}
+ }
+ 
++#define CALLER_ID_MASK 0x80000000
++
+ static inline u32 printk_caller_id(void)
+ {
+ 	return in_task() ? task_pid_nr(current) :
+-		0x80000000 + smp_processor_id();
++		CALLER_ID_MASK + smp_processor_id();
++}
++
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++/* Store the opposite info than caller_id. */
++static u32 printk_caller_id2(void)
++{
++	return !in_task() ? task_pid_nr(current) :
++		CALLER_ID_MASK + smp_processor_id();
++}
++
++static pid_t printk_info_get_pid(const struct printk_info *info)
++{
++	u32 caller_id = info->caller_id;
++	u32 caller_id2 = info->caller_id2;
++
++	return caller_id & CALLER_ID_MASK ? caller_id2 : caller_id;
++}
++
++static int printk_info_get_cpu(const struct printk_info *info)
++{
++	u32 caller_id = info->caller_id;
++	u32 caller_id2 = info->caller_id2;
++
++	return ((caller_id & CALLER_ID_MASK ?
++		 caller_id : caller_id2) & ~CALLER_ID_MASK);
+ }
++#endif
+ 
+ /**
+  * printk_parse_prefix - Parse level and control flags.
+@@ -2213,6 +2241,28 @@ static u16 printk_sprint(char *text, u16 size, int facility,
+ 	return text_len;
+ }
+ 
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++static void printk_store_execution_ctx(struct printk_info *info)
++{
++	info->caller_id2 = printk_caller_id2();
++	get_task_comm(info->comm, current);
++}
++
++static void pmsg_load_execution_ctx(struct printk_message *pmsg,
++				    const struct printk_info *info)
++{
++	pmsg->cpu = printk_info_get_cpu(info);
++	pmsg->pid = printk_info_get_pid(info);
++	memcpy(pmsg->comm, info->comm, sizeof(pmsg->comm));
++	static_assert(sizeof(pmsg->comm) == sizeof(info->comm));
++}
++#else
++static void printk_store_execution_ctx(struct printk_info *info) {}
++
++static void pmsg_load_execution_ctx(struct printk_message *pmsg,
++				    const struct printk_info *info) {}
++#endif
++
+ __printf(4, 0)
+ int vprintk_store(int facility, int level,
+ 		  const struct dev_printk_info *dev_info,
+@@ -2320,6 +2370,7 @@ int vprintk_store(int facility, int level,
+ 	r.info->caller_id = caller_id;
+ 	if (dev_info)
+ 		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
++	printk_store_execution_ctx(r.info);
+ 
+ 	/* A message without a trailing newline can be continued. */
+ 	if (!(flags & LOG_NEWLINE))
+@@ -3002,6 +3053,7 @@ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+ 	pmsg->seq = r.info->seq;
+ 	pmsg->dropped = r.info->seq - seq;
+ 	force_con = r.info->flags & LOG_FORCE_CON;
++	pmsg_load_execution_ctx(pmsg, r.info);
+ 
+ 	/*
+ 	 * Skip records that are not forced to be printed on consoles and that
+diff --git a/kernel/printk/printk_ringbuffer.h b/kernel/printk/printk_ringbuffer.h
+index 4ef81349d9fbe..1651b53ece34f 100644
+--- a/kernel/printk/printk_ringbuffer.h
++++ b/kernel/printk/printk_ringbuffer.h
+@@ -23,6 +23,11 @@ struct printk_info {
+ 	u8	flags:5;	/* internal record flags */
+ 	u8	level:3;	/* syslog level */
+ 	u32	caller_id;	/* thread id or processor id */
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	u32	caller_id2;	/* caller_id complement */
++	/* name of the task that generated the message */
++	char	comm[TASK_COMM_LEN];
++#endif
+ 
+ 	struct dev_printk_info	dev_info;
+ };
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index ba36939fda79b..fd54b54dc2230 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -35,6 +35,26 @@ config PRINTK_CALLER
+ 	  no option to enable/disable at the kernel command line parameter or
+ 	  sysfs interface.
+ 
++config CONSOLE_HAS_EXECUTION_CTX
++	bool
++	help
++	  Selected by console drivers that support execution context
++	  (task name/CPU) in their output. This enables PRINTK_EXECUTION_CTX
++	  to provide the necessary infrastructure.
++
++config PRINTK_EXECUTION_CTX
++	bool
++	depends on PRINTK && CONSOLE_HAS_EXECUTION_CTX
++	default CONSOLE_HAS_EXECUTION_CTX
++	help
++	  This option extends struct printk_info to include extra execution
++	  context in printk, such as task name and CPU number from where the
++	  message originated. This is useful for correlating printk messages
++	  with specific execution contexts.
++
++	  This is automatically enabled when a console driver that supports
++	  execution context is selected.
++
+ config STACKTRACE_BUILD_ID
+ 	bool "Show build ID information in stacktraces"
+ 	depends on PRINTK
 
-Changes in v4:
-- Added __acquires/__releases compiler annotations (Simon)
-- Rebased on top of net-next, which included changes from Andre
-- Netconsole Dynamic now selects PRINTK_EXECUTION_CTX and
-  CONSOLE_HAS_EXECUTION_CTX
-- Link to v3: https://patch.msgid.link/20260122-nbcon-v3-0-a722f2f0dfa5@debian.org
-
-Changes in v3:
-- Fixed netconsole selection (s/CONSOLE_HAS_EXECUTION_CTX/PRINTK_EXECUTION_CTX)
-- Removed unnecessary "inline" in C file.
-- Tried to shrink the get the lines to fit 80-columns
-- Link to v2: https://patch.msgid.link/20260120-nbcon-v2-0-b61f960587a8@debian.org
-
-Changes in v2:
-- Return if not able to nbcon_enter_unsafe() instead of retrying on
-  a different target (Marcos)
-- Add printk that supports context information, which will be used later
-  by netconsole sysdata. (John, Petr)
-- An extra patch to bring symmetry to send_msg_udp()
-- Link to v1: https://patch.msgid.link/20251222-nbcon-v1-0-65b43c098708@debian.org
-
-Changes in V1 from RFC:
-  * Removed the extra CONFIG for NBCON, given we don't want to support
-    both console. Move to nbcon as the only console framework supported
-  * Incorporated the changes from Petr.
-  * Some renames to make the code more consistent.
-  * RFC Link: https://lore.kernel.org/all/20251121-nbcon-v1-0-503d17b2b4af@debian.org/
-
----
-Breno Leitao (4):
-      printk: Add execution context (task name/CPU) to printk_info
-      netconsole: extract message fragmentation into send_msg_udp()
-      netconsole: convert to NBCON console infrastructure
-      netconsole: Use printk context for CPU and task information
-
- drivers/net/Kconfig               |   1 +
- drivers/net/netconsole.c          | 153 +++++++++++++++++++++++---------------
- include/linux/console.h           |   8 ++
- kernel/printk/internal.h          |   8 ++
- kernel/printk/nbcon.c             |  16 ++++
- kernel/printk/printk.c            |  54 +++++++++++++-
- kernel/printk/printk_ringbuffer.h |   5 ++
- lib/Kconfig.debug                 |  20 +++++
- 8 files changed, 205 insertions(+), 60 deletions(-)
----
-base-commit: bf2e36c9dab95e41516fbcf7b1cc804539b2d021
-change-id: 20251117-nbcon-f24477ca9f3e
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+-- 
+2.47.3
 
 
