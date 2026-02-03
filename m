@@ -1,281 +1,213 @@
-Return-Path: <netdev+bounces-256250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256261-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AI6UFEragWlBLQMAu9opvQ
-	(envelope-from <netdev+bounces-256250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:21:46 +0100
+	id oAVwOgbfgWmDLQMAu9opvQ
+	(envelope-from <netdev+bounces-256261-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:41:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC974D833D
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:21:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD49D887F
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 12:41:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5C41630B909F
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 11:19:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 66B7B3009E03
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 11:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049F7334685;
-	Tue,  3 Feb 2026 11:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2C9339875;
+	Tue,  3 Feb 2026 11:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPK7J5bo";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kd7HBfSD"
+	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="qQ1o68rm";
+	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="knM74zwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailhub11-fb.kaspersky-labs.com (mailhub11-fb.kaspersky-labs.com [81.19.104.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C10732FA34
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 11:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA9E274B3A;
+	Tue,  3 Feb 2026 11:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.104.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770117545; cv=none; b=dvf4k9K4WUL9AXYwcUOWlYU7n4mpmTZtpN6F5gIoZRWIQLZu0wj7X8iewu6TRC7rKuO5ZTyCpQEE9Y2OxXrRSMNkaIw0UIdysqwplebAGXQPaGg6AKaOPfGuSSnHfLTRbLFpZMwFzvIs95Omfkwa56OhYQu6tB4v8k+YHEPh6A8=
+	t=1770118895; cv=none; b=BwD60A2adoXasf3pnRlmpHHlUxgebyOdMQFKTaSqw+9jSqrukN4lLwUfYZlh3h/KdVU5AKdTVW2Zqmqwioy2M0PVCiyj/jhYrbeRIkRrTMmU289y4eCDLAjxtIb7BimC8YO8jt3WWgc8tf7DikNdyYDUQJKSpfVlJT09X/qkSAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770117545; c=relaxed/simple;
-	bh=O8KJekQh9FS/0oopKwm+g0QsiWOT6WSJ2NbPIfVUrDM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tD03DmIFFxEf3bA+CAPigOnI7QR/eFkK//1fh5UNtp6X2WwtsCyBSuBzoabvsHOS21Kwt7VGyXv+9jojjW+YaIvtwVltHBIpmA85bErnKS/gPGAlBw1ZdYrtBrKA82F7tukZLsZkoS7yYB1MvweTAVmwxEhanwoIQVbhr7Ue4aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SPK7J5bo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kd7HBfSD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770117543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2WnKseKgzuDEwEZ2TxAar2LzO8o7OZlfDBwq/L+OXzI=;
-	b=SPK7J5boZRP8L6xLuwUZBZHzncrT0hBtqcErHjGeqw/ZpYpmsfsNcLrPBuN7jBiSgAVsky
-	UAEhQk6aN1aC0ymO284r0EUwV6HgiI4qxSqB4yL9MenJfvLXtqkphWu24H/iQSe3U7ypHo
-	MZGFLZoTIrWEpmU7HR231djFaNDlbH4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-391-tmg_p-4uNheyliZdoDmkgg-1; Tue, 03 Feb 2026 06:19:02 -0500
-X-MC-Unique: tmg_p-4uNheyliZdoDmkgg-1
-X-Mimecast-MFC-AGG-ID: tmg_p-4uNheyliZdoDmkgg_1770117541
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-430fcb6b2ebso4422668f8f.2
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 03:19:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770117541; x=1770722341; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2WnKseKgzuDEwEZ2TxAar2LzO8o7OZlfDBwq/L+OXzI=;
-        b=Kd7HBfSDF9A7FiWvpuJvfmP/kmMrWPMqqlJOefOvEMGfofNSSMjb9eTX4lKyaH8BLV
-         3HTjvcSS7oBAJW1VE8Jfht2+qepsk8UC/KKvLj1uFXsReQ4NWR1T4DcjCgHx9sRrqwej
-         Xbag6X8VNnvVplYDan6JFL5Oa/fWv7muMhdHZBngPKW6SmlOeNvzKOwl+osfSyoadt+F
-         BlBrWfjxeqwUTZGslAj5Tf6+eZ3aD7H2Ag5lt3sumeeTr+qltTgyV1npBvmfOTEO4Uzh
-         N/vbLQ/pqSZoWqYrXoSnmBJT+z9Ve1K4FzQrRZqy9Ae969jvhFpFBM9fYNJUfogm0ayD
-         3dQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770117541; x=1770722341;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2WnKseKgzuDEwEZ2TxAar2LzO8o7OZlfDBwq/L+OXzI=;
-        b=hMX1KV9Gv+cKBrlqdCZILo0x3DtKeN5QzUfBuSI+bJkS4svecgj+4wDioe13zjkNEu
-         oekQx3D/9sKOJTQBx0yG3oT0LX+XQQGGh6VzQHLLbcT101/v8hZjuAP/jWySurluP/L4
-         gGAERcRdIB+znTtLYmWtFZh+3v6jcrYa+hGRz1Oboc0GZNdHqGQ6OoNr72288k9Ge6rN
-         ieDByMdXpqCdN7znQSVptvqiCJDHrdHSUAdoWf00DXXULp3ExbIX4nw9mAV0FOe/mWNz
-         pfPryueKrx317LRZARJLOJlvnExjc3zTTanY8ZO1D5kp6ZtdDKnBnxWnXqmqX/21ndUi
-         CSbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSSWG05fz/GJOuURI5ZLY7pNmvtJm0378jsRBK1S0Aksy8wCVskIwSJeectFD4bgY4Ma8Hd2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL5A0ZfOjRE5wr2vViAtTIqv4al3b5JgA7QmxEhrM1MHCrRjiV
-	TomXznzWxGJcwbfEsXbxcX0FgIwpSiHTJ2XDgS8nq5/ihaGapWG66cO7i9H7Yj+/Kow20ouHRNK
-	zUGD1tw20ZCp149MloWRqZlrbCm0QEG9zxy8aEPxRccGqgDkrCUMv7VZ3oA==
-X-Gm-Gg: AZuq6aIcuqDZVi8RtmKr/3BpqZlauCaCvOfuT1S1QDVdTmoPs3BFm29z9RBdDFuWF3H
-	j2Xrm3fW9wyoDPUgioMNfxHaGdAtkjAbwFZBx9lcvwSOwyvCY9GpqtHJw/udq90QpiP5dHqRy0U
-	rU+ui2weM3NNdLTdu98Uyaj5S3m3cWzI/YB+CSub2MBcFiQqq58jHLqJ9YfF6X2qSfjV8vCWvnQ
-	cn1vsXh54GbUmWi5MFxbn/FRvkdNGSZkQiuAEc6teOsgyjxcJRw5Gez5GwxgQ6LvgaikREoDdMD
-	Vga+0fvLRD3vyqEyY8aZxJ3Ta4D7nB4KWLvbm4beUJmrmR7kj6OIc2hjkO4PONqZi5eY/rUhOqt
-	lLpN3kTHcRWs=
-X-Received: by 2002:a05:600c:a087:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-482db48f2ccmr209555325e9.30.1770117541299;
-        Tue, 03 Feb 2026 03:19:01 -0800 (PST)
-X-Received: by 2002:a05:600c:a087:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-482db48f2ccmr209554895e9.30.1770117540850;
-        Tue, 03 Feb 2026 03:19:00 -0800 (PST)
-Received: from [192.168.88.32] ([150.228.93.21])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbc7f580sm149384895e9.2.2026.02.03.03.18.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 03:19:00 -0800 (PST)
-Message-ID: <bdb7cd69-7dcd-4e8a-b04a-14a2eb902311@redhat.com>
-Date: Tue, 3 Feb 2026 12:18:54 +0100
+	s=arc-20240116; t=1770118895; c=relaxed/simple;
+	bh=BUiikn3ciRWKGL6zJXbhUy/3/71llULE1nnDlIezANc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RlWZrieJ912r1GZmxquRMOzfnBapDm/nH8k1S4iYqw71kgJQr4Hz7lfkioqJe1hYNs6lu8RW4DT9KMpzEMEj/Q9nyxFfWG8wgsChEbf+FAhID4RPGq+TyovWqV79gDcL8rQYocrpIVSWlfiDqv/Em+bplTRiJcmcFIxvX0njlPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=qQ1o68rm; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=knM74zwa; arc=none smtp.client-ip=81.19.104.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+	s=mail202505; t=1770118334;
+	bh=QgwXDA7y8ElPew3Bm76Ii7abYAwPdkjzXVimtuAJjTA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=qQ1o68rmr5sWm0vlgi7vHdaB3kTi8ZQh2d1m1VNn9Kqd0RWWVfLV+Wr34Bo/YyG1v
+	 R9A7x1nCZAdbAUtoDdcUmgI0FvkBy3U6mWj8SdnbaM2R3N6C16GaoiTHDrIQuV10mA
+	 40yRunjaHdPMVfzERFUEOwHHI+iB/s1XV6Q5IVgtg6AGeinD7daF9v+1ERN1E57h02
+	 t2UJJeo+sFkKL7nqfSt+uqlFATKDVllRG3GOiLhHO04lTPxEj0SKnA1SIaPio0ry0c
+	 vOhF6mCph6dbZAs0snbxHa4Gm8e2t4zA6RGQwRu5UpCBcmrScSR5LOTBwlYA7NXwKV
+	 EfNVwEq5KaDBw==
+Received: from mailhub11-fb.kaspersky-labs.com (localhost [127.0.0.1])
+	by mailhub11-fb.kaspersky-labs.com (Postfix) with ESMTP id B82AEE8394D;
+	Tue,  3 Feb 2026 14:32:14 +0300 (MSK)
+Received: from mx9.kaspersky-labs.com (mx9.kaspersky-labs.com [195.122.169.44])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "mx9.kaspersky-labs.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+	by mailhub11-fb.kaspersky-labs.com (Postfix) with ESMTPS id 9459AE80D14;
+	Tue,  3 Feb 2026 14:32:14 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+	s=mail202505; t=1770118327;
+	bh=QgwXDA7y8ElPew3Bm76Ii7abYAwPdkjzXVimtuAJjTA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=knM74zwazdq53HyT/LWGOqx9pnfGp4ZXQeVe4XD617xzkJ9vKlDZYN4Qxa5bht9QW
+	 8Z9R0WxWpc/k2BOOQX8kFXlFrF22bruzTLZMANvAGO0pgGLSIYQLX4iL0551Cler7G
+	 pmQQZxJWiyJSrdOKw5SU/uRTRB9XL/IRm+Ep94PfnyxAazaGvQMD3YlIyw5OyXzJHf
+	 YbXvQa+erDH0KlFMzI7GqWPOnxg5roGpRNsMB/3S3vfJ59R6/+zfYoHW+eunXGE1rT
+	 m4FQCpNcPTLNrc6242FYNI41Ab9Bh/Yx+cuP0TL69Z2eclbPNPgNhybeEskvtdiZOx
+	 zRrOojsQXyWig==
+Received: from relay9.kaspersky-labs.com (localhost [127.0.0.1])
+	by relay9.kaspersky-labs.com (Postfix) with ESMTP id EAAC38A00CB;
+	Tue,  3 Feb 2026 14:32:06 +0300 (MSK)
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+	by mailhub9.kaspersky-labs.com (Postfix) with ESMTPS id A85898A000F;
+	Tue,  3 Feb 2026 14:32:06 +0300 (MSK)
+Received: from Votokina.avp.ru (10.16.104.187) by HQMAILSRV2.avp.ru
+ (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.35; Tue, 3 Feb
+ 2026 14:32:05 +0300
+From: Votokina Victoria <Victoria.Votokina@kaspersky.com>
+To: "David S . Miller" <davem@davemloft.net>
+CC: Votokina Victoria <Victoria.Votokina@kaspersky.com>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Thomas Gleixner
+	<tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, Eric Lapuyade
+	<eric.lapuyade@linux.intel.com>, Samuel Ortiz <sameo@linux.intel.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH] nfc: hci: shdlc: Stop timers and work before freeing context
+Date: Tue, 3 Feb 2026 14:31:57 +0300
+Message-ID: <20260203113158.2008723-1-Victoria.Votokina@kaspersky.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/3] s32g: Use a syscon for GPR
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Chester Lin <chester62515@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Conor Dooley <conor+dt@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>,
- Frank Li <Frank.Li@nxp.com>,
- Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, imx@lists.linux.dev,
- Jakub Kicinski <kuba@kernel.org>, Jan Petrous <jan.petrous@oss.nxp.com>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Matthias Brugger <mbrugger@suse.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- NXP S32 Linux Team <s32@nxp.com>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Rob Herring <robh@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- linaro-s32@linaro.org
-References: <cover.1769764941.git.dan.carpenter@linaro.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <cover.1769764941.git.dan.carpenter@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: HQMAILSRV5.avp.ru (10.64.57.55) To HQMAILSRV2.avp.ru
+ (10.64.57.52)
+X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 02/03/2026 11:16:10
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 200084 [Feb 03 2026]
+X-KSE-AntiSpam-Info: Version: 6.1.1.20
+X-KSE-AntiSpam-Info: Envelope from: Victoria.Votokina@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 86 0.3.86
+ 47cb2a3d3f5c7e795bff2d0998e8c196722872ab
+X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
+X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
+X-KSE-AntiSpam-Info: {Tracking_black_eng_exceptions}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:5.0.1,7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {Tracking_white_helo}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/03/2026 11:18:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/3/2026 9:04:00 AM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/02/03 10:20:00 #28174714
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 52
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kaspersky.com,reject];
+	R_DKIM_ALLOW(-0.20)[kaspersky.com:s=mail202505];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256250-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[linaro.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,kernel.org,davemloft.net,vger.kernel.org,google.com,gmail.com,nxp.com,oss.nxp.com,lists.linux.dev,lists.infradead.org,st-md-mailman.stormreply.com,suse.com,pengutronix.de,linaro.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256261-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kaspersky.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: BC974D833D
+	FROM_NEQ_ENVFROM(0.00)[Victoria.Votokina@kaspersky.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kaspersky.com:email,kaspersky.com:dkim,kaspersky.com:mid];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 0CD49D887F
 X-Rspamd-Action: no action
 
-On 1/30/26 2:19 PM, Dan Carpenter wrote:
-> The s32g devices have a GPR register region which holds a number of
-> miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
-> anything from there and we just add a line to the device tree to
-> access that GMAC_0_CTRL_STS register:
-> 
->                         reg = <0x4033c000 0x2000>, /* gmac IP */
->                               <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> 
-> I have included the whole list of registers below.
-> 
-> We still have to maintain backwards compatibility to this format,
-> of course, but it would be better to access these registers through a
-> syscon.  Putting all the registers together is more organized and shows
-> how the hardware actually is implemented.
-> 
-> Secondly, in some versions of this chipset those registers can only be
-> accessed via SCMI.  It's relatively straight forward to handle this
-> by writing a syscon driver and registering it with of_syscon_register_regmap()
-> but it's complicated to deal with if the registers aren't grouped
-> together.
-> 
-> Changes since v5:
-> * Fix O vs 0 typo in yaml file
-> * Add Jan Petrous's Reviewed-by tag
-> 
-> Changes since v4:
-> * Return an error if regmap_write() fails
-> * Add Rob's Reviewed-by tag to the yaml patch
-> 
-> Changes since v3:
-> * Fix the yaml file format
-> * Add netdev to the CC list on all emails so the CI triggers
-> 
-> Changes since v2:
-> * Improve the documentation in .../bindings/net/nxp,s32-dwmac.yaml
-> * "[PATCH v2 2/4] dt-bindings: mfd: syscon: Document the GPR syscon
->   for the NXP S32 SoCs" was applied so drop it.
-> 
-> Changes since v1:
-> * Add imx@lists.linux.dev to the CC list.
-> * Fix forward porting bug.  s/PHY_INTF_SEL_RGMII/S32_PHY_INTF_SEL_RGMII/
-> * Use the correct SoC names nxp,s32g2-gpr and nxp,s32g3-gpr instead of
->   nxp,s32g-gpr which is the SoC family.
-> * Fix the phandle name by adding the vendor prefix
-> * Fix the documentation for the phandle
-> * Remove #address-cells and #size-cells from the syscon block
-> 
-> Here is the whole list of registers in the GPR region
-> 
-> Starting from 0x4007C000
-> 
-> 0  Software-Triggered Faults (SW_NCF)
-> 4  GMAC Control (GMAC_0_CTRL_STS)
-> 28 CMU Status 1 (CMU_STATUS_REG1)
-> 2C CMUs Status 2 (CMU_STATUS_REG2)
-> 30 FCCU EOUT Override Clear (FCCU_EOUT_OVERRIDE_CLEAR_REG)
-> 38 SRC POR Control (SRC_POR_CTRL_REG)
-> 54 GPR21 (GPR21)
-> 5C GPR23 (GPR23)
-> 60 GPR24 Register (GPR24)
-> CC Debug Control (DEBUG_CONTROL)
-> F0 Timestamp Control (TIMESTAMP_CONTROL_REGISTER)
-> F4 FlexRay OS Tick Input Select (FLEXRAY_OS_TICK_INPUT_SELECT_REG)
-> FC GPR63 Register (GPR63)
-> 
-> Starting from 0x4007CA00
-> 
-> 0  Coherency Enable for PFE Ports (PFE_COH_EN)
-> 4  PFE EMAC Interface Mode (PFE_EMACX_INTF_SEL)
-> 20 PFE EMACX Power Control (PFE_PWR_CTRL)
-> 28 Error Injection on Cortex-M7 AHB and AXI Pipe (CM7_TCM_AHB_SLICE)
-> 2C Error Injection AHBP Gasket Cortex-M7 (ERROR_INJECTION_AHBP_GASKET_CM7)
-> 40 LLCE Subsystem Status (LLCE_STAT)
-> 44 LLCE Power Control (LLCE_CTRL)
-> 48 DDR Urgent Control (DDR_URGENT_CTRL)
-> 4C FTM Global Load Control (FLXTIM_CTRL)
-> 50 FTM LDOK Status (FLXTIM_STAT)
-> 54 Top CMU Status (CMU_STAT)
-> 58 Accelerator NoC No Pending Trans Status (NOC_NOPEND_TRANS)
-> 90 SerDes RD/WD Toggle Control (PCIE_TOGGLE)
-> 94 SerDes Toggle Done Status (PCIE_TOGGLEDONE_STAT)
-> E0 Generic Control 0 (GENCTRL0)
-> E4 Generic Control 1 (GENCTRL1)
-> F0 Generic Status 0 (GENSTAT0)
-> FC Cortex-M7 AXI Parity Error and AHBP Gasket Error Alarm (CM7_AXI_AHBP_GASKET_ERROR_ALARM)
-> 
-> Starting from 4007C800
-> 
-> 4  GPR01 Register (GPR01)
-> 30 GPR12 Register (GPR12)
-> 58 GPR22 Register (GPR22)
-> 70 GPR28 Register (GPR28)
-> 74 GPR29 Register (GPR29)
-> 
-> Starting from 4007CB00
-> 
-> 4 WKUP Pad Pullup/Pulldown Select (WKUP_PUS)
-> 
-> Dan Carpenter (3):
->   net: stmmac: s32: use a syscon for S32_PHY_INTF_SEL_RGMII
->   dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
->   dts: s32g: Add GPR syscon region
+llc_shdlc_deinit() purges SHDLC skb queues and frees the llc_shdlc
+structure while its timers and state machine work may still be active.
 
-It looks like patch 3/3 depends on 1/3 but it should land in a different
-tree, as patches 1 && 2 looks suitable for 'net-next' and 3/3 should
-probably go via the arm/freescale tree.
+Timer callbacks can schedule sm_work, and sm_work accesses SHDLC state
+and the skb queues. If teardown happens in parallel with a queued/running
+work item, it can lead to UAF and other shutdown races.
 
-We either need explicit ack from freescale maintainers or this should be
-split across subtrees, right?
+Stop all SHDLC timers and cancel sm_work synchronously before purging the
+queues and freeing the context.
 
-Thanks,
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Paolo
+Fixes: 4a61cd6687fc ("NFC: Add an shdlc llc module to llc core")
+Signed-off-by: Votokina Victoria <Victoria.Votokina@kaspersky.com>
+---
+ net/nfc/hci/llc_shdlc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/nfc/hci/llc_shdlc.c b/net/nfc/hci/llc_shdlc.c
+index 4fc37894860c..08c8aa1530d8 100644
+--- a/net/nfc/hci/llc_shdlc.c
++++ b/net/nfc/hci/llc_shdlc.c
+@@ -762,6 +762,14 @@ static void llc_shdlc_deinit(struct nfc_llc *llc)
+ {
+ 	struct llc_shdlc *shdlc = nfc_llc_get_data(llc);
+ 
++	timer_shutdown_sync(&shdlc->connect_timer);
++	timer_shutdown_sync(&shdlc->t1_timer);
++	timer_shutdown_sync(&shdlc->t2_timer);
++	shdlc->t1_active = false;
++	shdlc->t2_active = false;
++
++	cancel_work_sync(&shdlc->sm_work);
++
+ 	skb_queue_purge(&shdlc->rcv_q);
+ 	skb_queue_purge(&shdlc->send_q);
+ 	skb_queue_purge(&shdlc->ack_pending_q);
+-- 
+2.43.0
 
 
