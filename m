@@ -1,65 +1,53 @@
-Return-Path: <netdev+bounces-256102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QA0lJEFpgWmwGAMAu9opvQ
-	(envelope-from <netdev+bounces-256102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:19:29 +0100
+	id ICCnHZBpgWmvGAMAu9opvQ
+	(envelope-from <netdev+bounces-256103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:20:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0977FD40DB
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:19:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB908D411E
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 04:20:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44FE730495F6
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 03:19:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C8D3E3022912
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 03:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EED8229B1F;
-	Tue,  3 Feb 2026 03:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70B22E972B;
+	Tue,  3 Feb 2026 03:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UF1oV/I9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZfBRAww"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3248721FF26;
-	Tue,  3 Feb 2026 03:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8466F175D53
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 03:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770088748; cv=none; b=ovm8HBZMhWLgKMAvWfSBW5o4atfE8LT+NYaCq2TIDilAzLHDvvMxUMHsRaIYYFYdNlcoB3AuxzJKw6XVEFn1KTZ4LtMQonX+owecBoVmRTaXHWkShdgti2Jz6XkzkNzTsMQ8BRdXeYguBDKBjrqyqyKNUnuOzF+rNQv0Yo7MKrc=
+	t=1770088816; cv=none; b=DVBHZ1G6CX6M5Z2CPa7S/4AC538xNb9rpvVtLPadHtUmMs8+3xS3lzNZhsdWNx9t+zEw49E65Lv2x54b8W0M7CZHWjz3BTzkAaGNMDnXOAKiWCUwSrQYmj2Z4LQxsQzLyCj94C1KIHLCha6QvV9kuZTNLIhXkmeY+/UUo623U6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770088748; c=relaxed/simple;
-	bh=nuqozKrDAIqLwoXajcEmvhVdQw4xPEyDlPCONhRnhSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sCgevnZVo0SMzHo7/b4h/lnGpFzgN05gmVPIBmcl/v5TyrDPwAlmKr+RCMF/cHs0CSOEZrFB/KZO65ZHqSzbH5kxbktY2UK32OsEdOWN11fBERJZTFuJVpChW03QvsHFqh24sScT2rL8EXxJo8fpihxMvCjLUHPpzGn6rceRoI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UF1oV/I9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 131E0C16AAE;
-	Tue,  3 Feb 2026 03:19:06 +0000 (UTC)
+	s=arc-20240116; t=1770088816; c=relaxed/simple;
+	bh=s3JCSBIzTmNuGCJD/5jI8VEjBvBh01FRCXRjgvKtYSs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=l9fTYo3HoRSVmRHnrkbcAk3WIv70v0UkFHkAkMcSQ6AAyfw3/DodrHEd5PLH4/gnkMSZkYI3qLD3V02NZrwbER47RbNk9pQgJTeviSkzrdaA8Eb55AfCldUwkQsS2wZigI54Pei7OJgPOLZhoUUo+EULgHMIzQW797kDfTbmhRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZfBRAww; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 232B6C116D0;
+	Tue,  3 Feb 2026 03:20:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770088747;
-	bh=nuqozKrDAIqLwoXajcEmvhVdQw4xPEyDlPCONhRnhSY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UF1oV/I9GrJ6Crma6aGPU7I2UWJPd5C6hRlTy/I9FW3FBRziWeEmNMpKU6+8giLi6
-	 0G6HdMo3HwDbo1WSwDR5McV8FVwjyPUs2FterWtR7wqfEV3K2gXouArwB+DkbQvG74
-	 qj739DLTrBq6QdsM5nX0400CLPtHKBzVaoao0+ILROsMlM9mDiiLt0T95hn2FGYfdM
-	 84gxsXqBiEXeOIYq2W6bNt2G3FqQHtThW8EB6PP2Sqcd6OlzxaOCzmO3i8biImwwZB
-	 gMrHP336J5An/b7/FaiEZPWdxv1UXgGJKbD7p3qER/IouCrYwhe1DiDWDYiblXgq6P
-	 kGKwR3dVg/2GA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: one-d-wide@protonmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	phil@nwl.cc,
-	netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pablo@netfilter.org,
-	coreteam@netfilter.org,
-	fw@strlen.de,
-	donald.hunter@gmail.com
-Subject: Re: [net-next,v7,5/5] doc/netlink: nftables: Fill out operation attributes
-Date: Mon,  2 Feb 2026 19:19:05 -0800
-Message-ID: <20260203031905.934693-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260202093928.742879-6-one-d-wide@protonmail.com>
-References: <20260202093928.742879-6-one-d-wide@protonmail.com>
+	s=k20201202; t=1770088816;
+	bh=s3JCSBIzTmNuGCJD/5jI8VEjBvBh01FRCXRjgvKtYSs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PZfBRAww5iTqwTfzWKc1ZpiXM8dsP6EZvLuhd6/8ir78k6TBj8UfMCSOT+mm2b6db
+	 CThEcJQ+PqaqUiUSrzU4MOlvHCPsqLEPB6fT7yVag4dhux/yzqndDN5YUH74gpqbgw
+	 41Rwuo8iGvmIV0oSoXAcEMtJq8gdeml2VOMfX3NpaPaVbvXvZOzuV33CFhmwqhnxkg
+	 Jd7BXmt1MgyFw/rf5vbP5M7ItcVHtJg9DEryuWb+p2OiwbNjnUL9SITILgsyJzTM9C
+	 k2Ip7bcWA3w80nI+Frz5uPzTI06uVFgOLEtnYAtgWhk32GHJpCtE+rowjXGcbi5mGd
+	 fhOea7ogcAqIw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 16DE43808200;
+	Tue,  3 Feb 2026 03:20:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,126 +55,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] net: stmmac: pcs preparation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177008881287.1295553.6986810799216029120.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Feb 2026 03:20:12 +0000
+References: <aXyRlFw7ZuhRPiKo@shell.armlinux.org.uk>
+In-Reply-To: <aXyRlFw7ZuhRPiKo@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,nwl.cc,vger.kernel.org,netfilter.org,strlen.de,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256102-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[protonmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256103-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 0977FD40DB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DB908D411E
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hello:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-doc/netlink: nftables: Fill out operation attributes
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This commit fills out the operation attributes for 31 nftables netlink
-operations, documenting which attributes are used in request and reply
-messages based on kernel implementation.
+On Fri, 30 Jan 2026 11:10:12 +0000 you wrote:
+> Hi,
+> 
+> These three patches prepare for the PCS changes, which, subject to
+> Qualcomm testing, should be coming in the next cycle.
+> 
+>  .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  2 --
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 31 +++++++++++++++++++---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   | 24 ++---------------
+>  4 files changed, 44 insertions(+), 31 deletions(-)
 
-> diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
-> index ced567e7a521..5a9d8727a8cb 100644
-> --- a/Documentation/netlink/specs/nftables.yaml
-> +++ b/Documentation/netlink/specs/nftables.yaml
+Here is the summary with links:
+  - [net-next,1/3] net: stmmac: clear half-duplex caps where unsupported
+    https://git.kernel.org/netdev/net-next/c/83957d6cae5b
+  - [net-next,2/3] net: stmmac: move most PCS register definitions to stmmac_pcs.c
+    https://git.kernel.org/netdev/net-next/c/eb4a1fda2c2f
+  - [net-next,3/3] net: stmmac: handle integrated PCS phy_intf_sel separately
+    https://git.kernel.org/netdev/net-next/c/69a586e8866b
 
-[ ... ]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> @@ -1612,7 +1626,23 @@ operations:
->          request:
->            value: 0xa03
->            attributes:
-> +            # Mentioned in nf_tables_newchain()
-> +            - table
-> +            - handle
-> +            - policy
-> +            - flags
-> +            # Mentioned in nf_tables_updchain()
-> +            - hook
->              - name
-> +            - counters
-> +            - policy
-> +            # Mentioned in nf_tables_addchain()
-> +            - hook
-> +            - name
-> +            - counters
-> +            - userdata
-> +            # Mentioned in nft_chain_parse_hook()
-> +            - type
 
-Does this attribute list contain duplicates? The list shows:
-- 'policy' twice (lines 1632 and 1638)
-- 'hook' twice (lines 1635 and 1640)
-- 'name' twice (lines 1636 and 1641)
-- 'counters' twice (lines 1637 and 1642)
-
-While the comments indicate these attributes are referenced by different
-kernel functions, the YAML specification should document the unified netlink
-interface where each attribute appears at most once per message. Having
-duplicates may confuse code generation tools that parse this specification.
-
-Should each attribute be listed only once, with implementation details
-documented separately if needed?
-
-[ ... ]
-
-> @@ -1717,7 +1798,24 @@ operations:
->          request:
->            value: 0xa09
->            attributes:
-> +            # Mentioned in nf_tables_newset()
-> +            - table
->              - name
-> +            - key-len
-> +            - id
-> +            - key-type
-> +            - key-len
-> +            - flags
-> +            - data-type
-> +            - data-len
-> +            - obj-type
-> +            - timeout
-> +            - gc-interval
-> +            - policy
-> +            - desc
-> +            - table
-> +            - name
-> +            - userdata
-
-Are there duplicates in this attribute list? Looking at the newset
-operation's request attributes:
-- 'table' appears twice (lines 1802 and 1816)
-- 'name' appears twice (lines 1803 and 1817)
-- 'key-len' appears twice (lines 1804 and 1807)
-
-In netlink messages, attributes are identified by their type ID, and each
-should appear at most once in the specification. Should these duplicates
-be removed?
 
