@@ -1,162 +1,197 @@
-Return-Path: <netdev+bounces-256452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256453-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7/V5LwJTgmliSQMAu9opvQ
-	(envelope-from <netdev+bounces-256452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 20:56:50 +0100
+	id UKZTLiJTgmliSQMAu9opvQ
+	(envelope-from <netdev+bounces-256453-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 20:57:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA59DE4A6
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 20:56:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A636DE4AF
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 20:57:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75DFC305B961
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 19:56:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE2FA30584BC
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 19:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A3366821;
-	Tue,  3 Feb 2026 19:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035C6366DD7;
+	Tue,  3 Feb 2026 19:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fHkJp5yV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4V5NPVW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26DD7261C
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 19:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D473B7261C;
+	Tue,  3 Feb 2026 19:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770148607; cv=none; b=eu7v8dGoPQw0lwXuXM66TQgUkeHl575/Cud2qAKTwhkLPjE6GV08jt1kh8Tre8NiAlYZ2fgCgj8kLPCB5TM3+2Ce7GpcHnLNEeZ/CoGeSJzITPv/FP7RugavjwF04dJINLCTul5RaarLVAtrVc6+tpwKkup1TLThLK2j4lH6C1w=
+	t=1770148639; cv=none; b=Sz+4VNySOYySebs4bwbts3D2tLhnC16fBkMWcU/ZeR10P9e78l+wHr2op0Fe3XIDttZckSeyr5AjuqxaSpMFLtNnCtty6p/JJEqUZS25cb0uYqys+SEjXN7yrhZaSoqn/alD+dAgdwcLXjAWoXq4HKOnm1saAEn7aHmN1KtYsk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770148607; c=relaxed/simple;
-	bh=3DAmJvymplUSG8aFnz2n3IcxS57MankGaOrbX7ux0vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A2TbJSNnAXE1RyBKlfZvJqtEkU4RI5SyqV7OOtwQq7cFv+kYARvxPuLoLjCgm5K8VcP/JgvIULrCaMQlmnQNlGFJKsKmE0B+zKSlpUvy2Q1FjYq/VIKpy88PbZXKECsWyBC+6dTzbOYyy56avGyioDnEMzi8F7Z2/D+hDYa/iEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fHkJp5yV; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770148604; x=1801684604;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3DAmJvymplUSG8aFnz2n3IcxS57MankGaOrbX7ux0vc=;
-  b=fHkJp5yVOG+sFmVixejmOZL/kmGya96CdlISoQzdvCCnAu7u6OhQBjX2
-   4GjAsCl6dP0XOPFKw9hLkOnujGKgeuOY/7IT8+B9o1JzTB12vf3/5OFB9
-   p4fb8TIzD9lyHaTsyw4JE8kr1Ut8p3+voM2gpSRhxIpWIml9gOsCVxyjh
-   lbc6/ifgj4vsQ6+4yZkl2T0x7LNy5gqCxJv1ImuV1NdJ4Hvy0VhwFKSZJ
-   g1LaQBGWXw0buMv413lpTI4nkfPh3TtXxhZAPDZ845p99NCM2WKjqH48Y
-   X6+Tmz2hR1E2yAd0hoIzMJwnU+KVf9nKlpLBqEA5SxyQ0ZXK4bmAdr8Hk
-   g==;
-X-CSE-ConnectionGUID: vQj2qbd6RTOcV1ls0WokMQ==
-X-CSE-MsgGUID: eCizxXlFQOuSDgnc1UzcxA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="58908422"
-X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
-   d="scan'208";a="58908422"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 11:56:43 -0800
-X-CSE-ConnectionGUID: SyQrICe4TtOXIje4E+inhw==
-X-CSE-MsgGUID: Se+NOMuwSwOP7HfAbn5Utg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
-   d="scan'208";a="210068125"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 03 Feb 2026 11:56:41 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vnMVq-00000000h2S-3VsN;
-	Tue, 03 Feb 2026 19:56:38 +0000
-Date: Wed, 4 Feb 2026 03:55:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 3/3] tcp: make tcp_v{4,6}_send_check() static
-Message-ID: <202602040323.jUZrgY0y-lkp@intel.com>
-References: <20260203144053.83193-4-edumazet@google.com>
+	s=arc-20240116; t=1770148639; c=relaxed/simple;
+	bh=WjRWiSP6xdJFHmnQYRZlsn+5o27f57toaWDOn5TrWwQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qYciIBmDgsCHtiqLTaYvF//W+PM50CEWAYfakGk1LfG0cTjf77HS6UkhBZ7lCqv83akbJhNZqLamnLYRgih34veIPTEfViU7M0uEBARjX8wz3stEp4dspSc+NLOL0494UXf0qDxYMS4O/rRw9Cfnn9l2LVTAiCS54weRa9jk2e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4V5NPVW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FCD5C116D0;
+	Tue,  3 Feb 2026 19:57:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770148639;
+	bh=WjRWiSP6xdJFHmnQYRZlsn+5o27f57toaWDOn5TrWwQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=P4V5NPVWz1tOisW/7qD1uox5NDQSepBcyBwbeGxQUWvkyc8leMXBIJuUMnBy+08fr
+	 9nT/X5iS76wXJ0xGnouQyb7vgKUhnHt5WFgVT13BNOEBAFva4IGPL/lYlkTmAYdbuH
+	 C2VqhgHZ/tx27qWR92o+0dqCKODmRHCmX/fFM8ySu0t1gmGRY3aLIcL1hy+JkW/69F
+	 TZJljVCqx+pW/ixPw3n1LLAmkZ3NWGqJhwqjNo0HQf0BJg1cWzEG1PA1P7qmrhsvI7
+	 mQYoYUgtz6PUe6U3mSX8Y0adNM2nM38jXiy2lIYkKrbyNP2XpjFbpighujYIlKHlzU
+	 FgpDX4su+23oQ==
+From: Simon Horman <horms@kernel.org>
+To: maxime.chevallier@bootlin.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	nicveronese@gmail.com,
+	kory.maincent@bootlin.com,
+	f.fainelli@gmail.com,
+	o.rempel@pengutronix.de,
+	kuba@kernel.org,
+	mwojtas@chromium.org,
+	daniel@makrotopia.org,
+	davem@davemloft.net,
+	dimitri.fedrau@liebherr.com,
+	edumazet@google.com,
+	romain.gantois@bootlin.com,
+	vladimir.oltean@nxp.com,
+	kabel@kernel.org,
+	christophe.leroy@csgroup.eu,
+	thomas.petazzoni@bootlin.com,
+	herve.codina@bootlin.com,
+	linux@armlinux.org.uk,
+	hkallweit1@gmail.com
+Subject: Re: [net-next,v3,06/11] net: phy: Represent PHY-less SFP modules with phy_port
+Date: Tue,  3 Feb 2026 19:57:10 +0000
+Message-ID: <20260203195710.2176606-1-horms@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260201151249.642015-7-maxime.chevallier@bootlin.com>
+References: <20260201151249.642015-7-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203144053.83193-4-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,google.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256452-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,redhat.com,gmail.com,bootlin.com,pengutronix.de,chromium.org,makrotopia.org,davemloft.net,liebherr.com,google.com,nxp.com,csgroup.eu,armlinux.org.uk];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-256453-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: EAA59DE4A6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1A636DE4AF
 X-Rspamd-Action: no action
 
-Hi Eric,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-kernel test robot noticed the following build warnings:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: phy: Represent PHY-less SFP modules with phy_port
 
-[auto build test WARNING on net-next/main]
+Now that the SFP bus infrastructure notifies when PHY-less modules are
+connected, we can create a phy_port to represent it. Instead of letting
+the SFP subsystem handle that, the Bus' upstream is in charge of
+maintaining that phy_port and register it to the topology, as the
+upstream (in this case a phy device) is directly interacting with the
+underlying net_device.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/tcp-inline-__tcp_v4_send_check/20260203-224938
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260203144053.83193-4-edumazet%40google.com
-patch subject: [PATCH net-next 3/3] tcp: make tcp_v{4,6}_send_check() static
-config: parisc-defconfig (https://download.01.org/0day-ci/archive/20260204/202602040323.jUZrgY0y-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260204/202602040323.jUZrgY0y-lkp@intel.com/reproduce)
+Add a phy_caps helper to get the achievable modes on this module based
+on what the phy_port representing the bus supports.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602040323.jUZrgY0y-lkp@intel.com/
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
 
-All warnings (new ones prefixed by >>):
+[ ... ]
 
->> net/ipv4/tcp_output.c:1482:13: warning: 'tcp_v4_send_check' defined but not used [-Wunused-function]
-    1482 | static void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
-         |             ^~~~~~~~~~~~~~~~~
+> @@ -1609,6 +1613,74 @@ static void phy_sfp_link_down(void *upstream)
+> +static int phy_add_sfp_mod_port(struct phy_device *phydev)
+> +{
+> +	const struct sfp_module_caps *caps;
+> +	struct phy_port *port;
+> +	int ret = 0;
+> +
+> +	/* Create mod port */
+> +	port = phy_port_alloc();
+> +	if (!port)
+> +		return -ENOMEM;
+> +
+> +	port->active = true;
+> +
+> +	caps = sfp_get_module_caps(phydev->sfp_bus);
+> +
+> +	phy_caps_linkmode_filter_ifaces(port->supported, caps->link_modes,
+> +					phydev->sfp_bus_port->interfaces);
 
+At line 1638, phy_add_sfp_mod_port() dereferences phydev->sfp_bus_port
+without checking for NULL. Can this be NULL here?
 
-vim +/tcp_v4_send_check +1482 net/ipv4/tcp_output.c
+Looking at the initialization in phy_sfp_probe(), when sfp_bus_add_upstream()
+fails, the error path frees the port but then unconditionally stores it in
+phydev->sfp_bus_port:
 
-  1480	
-  1481	/* This routine computes an IPv4 TCP checksum. */
-> 1482	static void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
-  1483	{
-  1484		const struct inet_sock *inet = inet_sk(sk);
-  1485	
-  1486		__tcp_v4_send_check(skb, inet->inet_saddr, inet->inet_daddr);
-  1487	}
-  1488	
+> @@ -1700,7 +1774,7 @@ static struct phy_port *phy_setup_sfp_port(struct phy_device *phydev)
+>  static int phy_sfp_probe(struct phy_device *phydev)
+>  {
+> -	struct phy_port *port;
+> +	struct phy_port *port = NULL;
+>  	struct sfp_bus *bus;
+>  	int ret;
+>
+> @@ -1729,6 +1803,8 @@ static int phy_sfp_probe(struct phy_device *phydev)
+>  		phy_port_destroy(port);
+>  	}
+>
+> +	phydev->sfp_bus_port = port;
+> +
+>  	return ret;
+>  }
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If sfp_bus_add_upstream() returns an error at line 1800, the cleanup path at
+line 1802 checks 'ret && port', then calls phy_del_port() and
+phy_port_destroy() to free the port. However, line 1806 still executes
+'phydev->sfp_bus_port = port', which assigns the freed pointer to the
+phydev structure.
+
+When phy_sfp_probe() returns an error, probe fails and the PHY device is not
+properly initialized. Later, if a PHY-less SFP module is inserted, the SFP
+subsystem calls phy_sfp_module_start(), which calls phy_add_sfp_mod_port(),
+which dereferences phydev->sfp_bus_port->interfaces at line 1638.
+
+Should the assignment at line 1806 be conditional, or should port be set to
+NULL after freeing?
 
