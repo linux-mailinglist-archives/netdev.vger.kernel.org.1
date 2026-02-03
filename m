@@ -1,314 +1,150 @@
-Return-Path: <netdev+bounces-256221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256222-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKdxMSjEgWnZJgMAu9opvQ
-	(envelope-from <netdev+bounces-256221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:47:20 +0100
+	id gN3EDxfFgWnZJgMAu9opvQ
+	(envelope-from <netdev+bounces-256222-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:51:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28001D70F2
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:47:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B72C9D71B7
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 10:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D2D0307D011
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:44:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 20EA4306E83C
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 09:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0EE39900A;
-	Tue,  3 Feb 2026 09:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD7F39902A;
+	Tue,  3 Feb 2026 09:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XLNtWRHP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RwGYWHD3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EA4399002
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 09:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63CE30FF1E;
+	Tue,  3 Feb 2026 09:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770111863; cv=none; b=uaSCczfjNzHxRLQnhnMzj97FhNxfVuBvLsBHZ6DsyyLdiUkwdsn5qz6r66J/M2+R43JYm+dLo2gl2DGd7H+LyA2nlEGkYflCGRhjAf+fJO+GDLmBTz+GC4+aoZ6+rcn8KPjqpchZEimT6cMFOJEst2wuuleb+ZeVg42MfPvpWKg=
+	t=1770112175; cv=none; b=cLE8xB0I6HZQf8MpZURgyBCdIFGcwT56C9rjDZfg4iFKIXhihXf7HmialQ1TpqltzCVTVOUeq0ur5aEIFeQ6mCu1sT25YF+4Y2/nT9E7tt0vfZ1/W49A0FOqluHALGVIJvdbA7yQlAnPnVsIrRgbEGvtYnAMSH/ZSwVW4SC7KRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770111863; c=relaxed/simple;
-	bh=+LoK5vMPKAT4d7HNt+4rYvxY6d0PqQkC7S4nBXL7pQU=;
+	s=arc-20240116; t=1770112175; c=relaxed/simple;
+	bh=Yvv8PdiJk4vferQPdXd1xsgzuanXzMbWFOfsBrfoLOM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tbHwkvjaQnKEEIkU779yUoDb37jiJz6G2G36ozfd6jnMV65Nt8/K3oCkqdHBMjyX4wvEfbbSX9zE3PixAPdf2GI7Pud0S3v6czfoRJrn64vFEzgsvxPumBan3uf8bfm7Uuyn153fi78Hf27MSckhMxAqX8+2H41P/r6FKsTveNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XLNtWRHP; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4359108fd24so3279985f8f.2
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 01:44:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1770111860; x=1770716660; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mmJhBHP/2MQgA56LecZqFvpbK/EEvY+icUfVMGut74=;
-        b=XLNtWRHPQYSZVfrHI+VqXUFHrGZhLu1vFVp/9VLdOdSJpYpgkqv3eXNAdbrJTAv3hs
-         8bQo2vGOpf20bI2zqLEAkiHe48erDDBrZhsh+tasKB/U5wiiToiPfeLGjYWp6Uq8tKGo
-         +9zmHb81094Ss2S/tnfjBJ0u1gw/9jNv7TItFVFhHUCU33mP6H2CzT7+wV1d8eW23Nk4
-         1DtOBY4x1r81rIu078oQJoD0YTMkYbqgUlpdgM9LL77V2V62Jr1J9NvVM4Bhr4N4Rx2m
-         NuW1uGDHnbRizg+YdshHKIkbJY8Rwo1NDL9VQ/emxuxksC0KBU+/PFVuVJtx64M3Zkjv
-         zjKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770111860; x=1770716660;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+mmJhBHP/2MQgA56LecZqFvpbK/EEvY+icUfVMGut74=;
-        b=K7cxEEfnfUvIj8qgnruleomy9orNgXu0VJGN2plEG2RjyDK2Fin/JNwRNkM/mItNLl
-         qfuFnkBwuOAcJuAZqoawxeYRZ7qGfPlo0lsiPYFS/GmuMtQKMaTLnkT3e7Ywo8lN03ok
-         GcefiJztRm1aEkTvZmlWwsh0WfAW9A5QXn1042K0Fk65hqw4UrKUAc+6ha9O6W+44MKA
-         x6KsY5KjOghCyoyuKlsLTZ+oSo9Q8+aosQGBJv/r/RSX8/nPWBOoXE7NLWSgFqjkV+zw
-         yYV31DJi44FIouEYEYEQ4HdzcY45EW3Grk1KEwVeriPu0AMKDjmQBiMbHZA+3Km5I0p5
-         X46A==
-X-Forwarded-Encrypted: i=1; AJvYcCViTfcvVOFEK9zT9C+t5q3CSTCuv8muAL5ePZNjp4dKTo7fnEWPrNUDZhLxrrGtmtHh+AJPdOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDyODgAS+z1Jz3U1gv/sDMGIGLh3wf0I0RC2DtZmU8OY8KLYyX
-	MVXH2uJmv0dzw5pc6A8ER5EwZo0aBW1ceyZrltj5Z7OKL5M08g9iCNc62NUAT/+PW2w=
-X-Gm-Gg: AZuq6aJ4X4J7DpjtLb8ujX+aL9b1DyrMX4Xs8K2hsuMuR3ddKEwJ/DkwAOo7PpzeW+F
-	gH5JiO/wTgyTgRbThAc6dAkcj2WxP6OroH+XdLEeIYp04v5p2CY9/ptXurD0KE8qXBaFedNzv2F
-	JjzO0lu5sRfDWIasqR3cebXwi0mo2MIlkSkveUB+3uZ237ltwNPcpy+Pky9O12o+AiHOVv8ihtq
-	u8xolZkTY3xfhKRDbyxld2IZs6Slq6UBOAjRoypLCi1fccVQ2zlCmJ8L1eaSp5TvRmoeMY6EROE
-	ruWOLSf3S5tia4Q7uBmno1QyUquXf6lRg9aBHl4YBkjRS53UmBQ3Nj/eKpPdPjcprtKIyniY8q7
-	9ZwmzXuOAk1i8bo4c9yDr2iSqHpRWeH4Wy/mG+VtQ3Hri12PDSEMV/n9+d/EMRZxwx4ix1eJP1p
-	QyoBeDbUjD9/OGfjwbV8XydAZDLKzlhA==
-X-Received: by 2002:adf:f7cc:0:b0:436:143c:c000 with SMTP id ffacd0b85a97d-436143cc130mr1101812f8f.45.1770111859982;
-        Tue, 03 Feb 2026 01:44:19 -0800 (PST)
-Received: from FV6GYCPJ69 ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436142de842sm2407305f8f.30.2026.02.03.01.44.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 01:44:19 -0800 (PST)
-Date: Tue, 3 Feb 2026 10:44:16 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
-	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
-	Randy Dunlap <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, 
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next V7 02/14] devlink: introduce shared devlink
- instance for PFs on same chip
-Message-ID: <wdkd7yelgosii7bklmahxf5t6xnn2vydnwiiruiwqpyue722dj@yjnkcdctzeav>
-References: <20260128112544.1661250-1-tariqt@nvidia.com>
- <20260128112544.1661250-3-tariqt@nvidia.com>
- <20260202194946.64555356@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VsIneYq/A3jHhRRifOa9B4vIaLBjNSqZfqGP6ZzcEGdEtb0SU0KP3X4UeiP/NWHxMlubpeDbXJ4DtgqkJt8lLm6zfCct0L3zJgR5wHl7NrySvNw1q4Jgo4nEmHOsLYNizgjNnexP+TJN/uOJgIIDkQeEvTv0pa2yFsmTRYeQgS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RwGYWHD3; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770112174; x=1801648174;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=Yvv8PdiJk4vferQPdXd1xsgzuanXzMbWFOfsBrfoLOM=;
+  b=RwGYWHD3p4M8FuP4t0+vNRw5G5jEV+xh9vXqhmgUy/cXJ4Sdo4yFuOPa
+   L7vVjJeu3vn7Un+JjHUwQT18Lrn/w3rHDVzCwGtkkg7nUsG2LvdIIhbV5
+   LSKDkIqRTQJby/OXJS4s9nPSx7bpFQWs2wJZZCBHXxeJyzWvDLDeSik7U
+   u+5NhbxfC24np5+3HUVdTFbvEtqs0HZONPx9tlFazWotJsUsMgl/KINdO
+   /FaI/vMvOvyEGwD8Cve4U8pltebk5CMv9Rd7bkkzpWH6QzY8G6GVIpbRN
+   hOXEnVCSc5rpdE7qyseoIFqBLjiX1CBvKzEoO2RWSVr2PeWDp9nmXpsgB
+   g==;
+X-CSE-ConnectionGUID: WkrSdiQtTBKvXc9hs5InSw==
+X-CSE-MsgGUID: Zh+znDpTSHWx3dW/IabATA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="71185739"
+X-IronPort-AV: E=Sophos;i="6.21,270,1763452800"; 
+   d="scan'208";a="71185739"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 01:49:33 -0800
+X-CSE-ConnectionGUID: xOfB06JITtCoOp841Qer0w==
+X-CSE-MsgGUID: wVyZksmhT5GQwaBw3xZcoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,270,1763452800"; 
+   d="scan'208";a="247406072"
+Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.99])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 01:49:29 -0800
+Date: Tue, 3 Feb 2026 11:49:26 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Korsgaard <peter@korsgaard.com>,
+	Steve Glendinning <steve.glendinning@shawell.net>,
+	Oliver Neukum <oneukum@suse.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Max Schulze <max.schulze@online.de>,
+	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>
+Subject: Re: [PATCH net-next v4] net: usb: introduce usbnet_mii_ioctl helper
+ function
+Message-ID: <aYHEplTvRrfhCRQu@smile.fi.intel.com>
+References: <20260203013517.26170-1-enelsonmoore@gmail.com>
+ <aYGw80IvE0TG7WOx@smile.fi.intel.com>
+ <CADkSEUgmX1tk-qJ7ee=P3EYcvriW91nVJZ6AFDpVEVjj7O8pJg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260202194946.64555356@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADkSEUgmX1tk-qJ7ee=P3EYcvriW91nVJZ6AFDpVEVjj7O8pJg@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-256222-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256221-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[nvidia.com,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,kernel.org,vger.kernel.org,infradead.org];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,resnulli-us.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 28001D70F2
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,smile.fi.intel.com:mid]
+X-Rspamd-Queue-Id: B72C9D71B7
 X-Rspamd-Action: no action
 
-Tue, Feb 03, 2026 at 04:49:46AM +0100, kuba@kernel.org wrote:
->On Wed, 28 Jan 2026 13:25:32 +0200 Tariq Toukan wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Multiple PFs may reside on the same physical chip, running a single
->> firmware. Some of the resources and configurations may be shared among
->> these PFs. Currently, there is no good object to pin the configuration
->> knobs on.
->> 
->> Introduce a shared devlink instance, instantiated upon probe of the
->> first PF and removed during remove of the last PF. The shared devlink
->> instance is backed by a faux device, as there is no PCI device related
->> to it. The implementation uses reference counting to manage the
->> lifecycle: each PF that probes calls devlink_shd_get() to get or create
->> the shared instance, and calls devlink_shd_put() when it removes. The
->> shared instance is automatically destroyed when the last PF removes.
->
->> diff --git a/include/net/devlink.h b/include/net/devlink.h
->> index cb839e0435a1..c453faec8ebf 100644
->> --- a/include/net/devlink.h
->> +++ b/include/net/devlink.h
->> @@ -1644,6 +1644,12 @@ void devlink_register(struct devlink *devlink);
->>  void devlink_unregister(struct devlink *devlink);
->>  void devlink_free(struct devlink *devlink);
->>  
->> +struct devlink *devlink_shd_get(const char *id,
->> +				const struct devlink_ops *ops,
->> +				size_t priv_size);
->> +void devlink_shd_put(struct devlink *devlink);
->> +void *devlink_shd_get_priv(struct devlink *devlink);
->
->Would Cosmin or someone else be willing to take on co-maintainership 
->of this API (including reviews of other drivers using it)?
->We could add a maintainers entry with:
->
->K:	devlink_shd_
->
->So y'all get CCed.
->
->> +#include <linux/device/faux.h>
->> +#include <net/devlink.h>
->
->> +/* This structure represents a shared devlink instance,
->> + * there is one created per identifier (e.g., serial number).
->> + */
->> +struct devlink_shd {
->> +	struct list_head list; /* Node in shd list */
->> +	const char *id; /* Identifier string (e.g., serial number) */
->
->Why does this have to be a string? The identifier should be irrelevant,
->and if something like serial number exists it can be reported in dev
->info for the shared instance?
+On Tue, Feb 03, 2026 at 12:49:57AM -0800, Ethan Nelson-Moore wrote:
+> On Tue, Feb 3, 2026 at 12:25 AM Andy Shevchenko
+> <andriy.shevchenko@linux.intel.com> wrote:
+> > > +extern int usbnet_mii_ioctl(struct net_device *net, struct ifreq *rq, int cmd);
+> >
+> > Do we still need to populate 'extern'? Can we get rid of this redundancy?
+> In my opinion, while you're right that it isn't necessary because all
+> functions (unlike variables) are implied to be extern, the use of
+> extern to indicate functions that are exported/intended to be part of
+> the API is a good idea.
 
-String gives drivers flexibility to use anything. Perhaps I'm missing
-your point. Are you againts free-form or just string and buf+buf_len
-would be fine?
+I'm not sure. This makes it harder to read for no benefit. All non-static
+functions are part of the API.
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
->
->> +	struct faux_device *faux_dev; /* Related faux device */
->> +	refcount_t refcount; /* Reference count */
->> +	char priv[] __aligned(NETDEV_ALIGN); /* Driver private data */
->
->size member annotated with __counted_by() is missing here
-
-Will add.
-
-
->
->> +};
->
->> +static struct devlink_shd *devlink_shd_create(const char *id,
->> +					      const struct devlink_ops *ops,
->> +					      size_t priv_size)
->> +{
->> +	struct faux_device *faux_dev;
->> +	struct devlink_shd *shd;
->> +	struct devlink *devlink;
->> +
->> +	/* Create faux device - probe will be called synchronously */
->> +	faux_dev = faux_device_create(id, NULL, NULL);
->> +	if (!faux_dev)
->> +		return NULL;
->> +
->> +	devlink = devlink_alloc(ops, sizeof(struct devlink_shd) + priv_size,
->> +				&faux_dev->dev);
->> +	if (!devlink)
->> +		goto err_devlink_alloc;
->
->error labels should be named after the target not the source in new code
-
-Okay. Tried to be consistent with the rest of the code. But as you wish.
-
-
->
->> +	shd = devlink_priv(devlink);
->> +
->> +	shd->id = kstrdup(id, GFP_KERNEL);
->> +	if (!shd->id)
->> +		goto err_kstrdup_id;
->> +	shd->faux_dev = faux_dev;
->> +	refcount_set(&shd->refcount, 1);
->> +
->> +	devl_lock(devlink);
->> +	devl_register(devlink);
->> +	devl_unlock(devlink);
->> +
->> +	list_add_tail(&shd->list, &shd_list);
->> +
->> +	return shd;
->> +
->> +err_kstrdup_id:
->> +	devlink_free(devlink);
->> +
->> +err_devlink_alloc:
->> +	faux_device_destroy(faux_dev);
->> +	return NULL;
->> +}
->
->> +struct devlink *devlink_shd_get(const char *id,
->> +				const struct devlink_ops *ops,
->> +				size_t priv_size)
->> +{
->> +	struct devlink_shd *shd;
->> +
->> +	if (WARN_ON(!id || !ops))
->> +		return NULL;
->
->Seems a little too defensive to check input attrs against NULL.
->Let the kernel crash if someone is foolish enough..
-
-Okay.
-
-
->
->> +	mutex_lock(&shd_mutex);
->> +
->> +	shd = devlink_shd_lookup(id);
->> +	if (!shd)
->> +		shd = devlink_shd_create(id, ops, priv_size);
->> +	else
->> +		refcount_inc(&shd->refcount);
->> +
->> +	mutex_unlock(&shd_mutex);
->> +	return shd ? priv_to_devlink(shd) : NULL;
->> +}
->> +EXPORT_SYMBOL_GPL(devlink_shd_get);
->> +
->> +/**
->> + * devlink_shd_put - Release a reference on a shared devlink instance
->> + * @devlink: Shared devlink instance
->> + *
->> + * Release a reference on a shared devlink instance obtained via
->> + * devlink_shd_get().
->> + */
->> +void devlink_shd_put(struct devlink *devlink)
->> +{
->> +	struct devlink_shd *shd;
->> +
->> +	if (WARN_ON(!devlink))
->> +		return;
->
->ditto
-
-Okay.
-
-
->
->> +	mutex_lock(&shd_mutex);
->> +	shd = devlink_priv(devlink);
->> +	if (refcount_dec_and_test(&shd->refcount))
->> +		devlink_shd_destroy(shd);
->> +	mutex_unlock(&shd_mutex);
->> +}
->> +EXPORT_SYMBOL_GPL(devlink_shd_put);
 
