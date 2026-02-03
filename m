@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-256367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKB5DiItgmlFQAMAu9opvQ
-	(envelope-from <netdev+bounces-256367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:15:14 +0100
+	id yDUeL0MtgmlFQAMAu9opvQ
+	(envelope-from <netdev+bounces-256368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:15:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A923BDC98A
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:15:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D39DDC9BF
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 18:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5926D301A7EC
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:15:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B0953304A07A
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 17:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2A83D522B;
-	Tue,  3 Feb 2026 17:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE662798ED;
+	Tue,  3 Feb 2026 17:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXohSfEB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYb3jnGy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172CC31A7E2
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AC13D646F
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 17:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770138909; cv=none; b=FRIUPab9U2kPS2I1TgvPsUedzeal0ONOwORHCtYz9+Gqc1joemxW4XxYMlblPXDeA5hQTfJ3tsvkQI2raOkkqCDDfCgXE10I5deZ7jA6r5RgZaQ2Ciygr1t4KrJDWYE6xiSDJNFAjhyvOIoRVUDTYXqnty83Ue504I+XPHS8tek=
+	t=1770138912; cv=none; b=ChZffAFw5ZdbCjA9lSPv/cm+U1YxoPKZTx0EddB2Tl0STMba7HQqlAVbDfmaAOxht261gvQg8w5EiAHyQqlzWo7f4xnHzrfVQygR+LK6Oq4zZdEE2L1EATvT8nmRqXyOPwIxI/xtMqK5P/4iNmacCh7T6crGzl/ZkFs7fJofAK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770138909; c=relaxed/simple;
-	bh=9IRD2kMQDNXo3gixVBTLfiMAznF+A3SRJbEHyG0LaeY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r5mn4EuLZQVp6H8NUR23SOim5Z2A0+PEZ4cqOI4B7BJyXOohFRn0gsLqhb8Irw+L8pZLWE/gxRevofJVpawMtBR7BEzhR17dh7dMVbJfuaEk/JJFDry7KATqPVtMsCcQHKaHCVDGFZxz4RMWMvNuHhyY2t5V3rxzIfP+r/l7xeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BXohSfEB; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1770138912; c=relaxed/simple;
+	bh=wY5gLEBdKCu10zTPiFjklZ3sRYW/DJSl0/z4N13a/iY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ozA9CKabT4FBlMViAeXq67Px9N/m2QsoDH169zJObMHYRYHixp19lKJNCcn1eOBPHovk7cFZToodVG49O+2PDTz6QQ6rc5ryY1dXqlK+4Y+pwR2Gd4kmb6IuRQ8yhqp9zdWuzsxj48RugIhcMohZmuHXXZ0fIV8/C6VdCFstvKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYb3jnGy; arc=none smtp.client-ip=209.85.210.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8230c2d3128so3172213b3a.0
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 09:15:07 -0800 (PST)
+Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-81e93c5961cso4875210b3a.0
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 09:15:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770138907; x=1770743707; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vKGteedOEAarJEDtZ9dOVRR/FRBxzionNgqCYXsQ6tE=;
-        b=BXohSfEBRzkU/ZLxmtYQqZ8Z/cAD1t5MdqdzEs463w9nAGk674w4WQPcBnSr8UcI53
-         CzQj3H7x4T2Anj5RZDEzzDCb2KsRVNk1yc4XGfnQ5hl3O6htWNqty8A8bcAg3iKD+JlO
-         BMokOF2xABpv+FFHNtV6DQ7S7IuRpjCy5DwaBUgHcV2rc9t6iI2CPEU3Itrm/q3C8OBO
-         v2yZWCkmpLbEDxownbpQdXfI/HztFTF5rlkb6nawE9o1+UkH5QnIndH5F0occe1ISUsi
-         7lYtRLrbJglRKF09zRb0gy6wDqnA/kHZQ+Yo1Oa7ldq2TSdacJwML8RY0OjL/Igrcz1G
-         JRdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770138907; x=1770743707;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1770138911; x=1770743711; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vKGteedOEAarJEDtZ9dOVRR/FRBxzionNgqCYXsQ6tE=;
-        b=qlqS/+zjn+06Fn/D9B2VwnrIYw61WjlTTdXwgfpyTNA2U+ArhG9EGkLDhEDurK4grl
-         NeqBUQi53S/MioPlHPEsYiRxAN5FX7o93flqUNwLaYriqrT+7OoIm1azIycEtksQhp1T
-         qXhaGgf6mLpuwDgWARNzUb9cCgkg8qi5lkhGWqICLcRUfuGxd/4ZG33tJ5bnd8DnVf9G
-         W25Y+MIjVdMwKP5YwrLAcCngw3++w5XRMRwDkS5QLx/O7BZ7VQbnQnJNzxL07b4bi0QX
-         pzlJjvmk2bNRJjneroHw1z8BbMY6LcVZvbiogUI5RplJKMtYphJrMjHgzCR3w38sDapV
-         pB1A==
-X-Gm-Message-State: AOJu0Yym3n4DgHowfSSh4GjGowIVRwHBgN55PE2BVMFPBml34jo8K7zH
-	KfmsWzD1HOmfP9qtWt6SNOr9wFjyhqnoxwIJXvZyNbdYq0P0W1UDEswwnMHyOyOn
-X-Gm-Gg: AZuq6aI9LQ/z36uzuSMgRE38w+ZA6fW/TbJ08QwA35Uc5FraWXB6k1xHNnDA5V2cM2u
-	G8+MfE0FzeryNnlk7z8xKP5GKZAuDe+neaxbn3gm1xf1nm+zzwkTD2ZtRYBNPKg4CbodrTW/Qyb
-	m0ygtj7G2O6RYmNdt7Q9Xnvhc2G2/F6Av1OGGurPXU50WO8CnX5ZXMq6/ECjj+td7LBQzouKbgI
-	aDvCYsoUvQFpoNrHlvfi4ThxL9qMOUjDavgZDTDlIptjxWDoXUL3LQd+EiO8yOm+80xuKYVnY7K
-	R1m7OEQpdk64QOvkaWQV0DPLHqtkNudfg+WDbrPL9JofZmbIPJ8EytLYm9wHFSegwUklOPP29H5
-	aw6k465+PXxg8MU8GTTGW1svrp3RdlnXdaprY8IU7yo1OBR1WSP+Nlix8QjSmsmy2G3UMfLqj8Y
-	ElQjWuwR4zwFw7bLafrl9dB7xN5gUeF32FRd9qrrgZXphM5+UeDPVnUhagF9lUC5K6NhqLCXQv3
-	MCNgskXae9+
-X-Received: by 2002:a05:6a00:bd11:b0:7e8:43f5:bd4c with SMTP id d2e1a72fcca58-8241c67da15mr105990b3a.56.1770138907037;
-        Tue, 03 Feb 2026 09:15:07 -0800 (PST)
+        bh=aGUSc9pyB8YlMmUCPEWlPuLgiaZvDHITFMXzeMkPLPU=;
+        b=iYb3jnGy/7DV1+tKmaKjTY/Vz5E2Mg+2sAr+ZxHGrn4UcnnVs8tfQ7jwMyWy99GIUa
+         FovFlZgh3iZ5I4lVRxOIjnXEl0JD3ds9dnfJTvYBh12J++9pgIaaeu8g9jqmwM1LXrDy
+         vcI2JkHJ7myqn90fdoz9kavMdiqUkJfrUUL9lqdCHqThhf0d2I2yC9JtEzJzG8Xjx2h9
+         bootczBaJY2S9QnPvhaLub/HTspJxEUMNcajnrCfBG/KgCctFgaluO/tNJEOEAQbfD32
+         m77L4V5oqTXgBhBC8w5mCIL76yho2ylE8a0WBgeSthR9tqpyWsZXSN5YINzA/bxELCQF
+         zUnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770138911; x=1770743711;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aGUSc9pyB8YlMmUCPEWlPuLgiaZvDHITFMXzeMkPLPU=;
+        b=clP+PXObOItTIZd9r+fZThZtFtV4EEabG/YTmyex20j28Yvh/H7uGPzNrKL1jBEjBR
+         gpHfKRgAvfjgWQ6sjUnrMRX9MDDu74C+FYd3EQxdA9t6iaii8LIJRQwPpgnjdqerGqtk
+         4TCT9to6rA4hmBVQDrdVNu557etHEr3pSq2alVmp/UI7OlauPqUPkN+9C1c314bDIvk0
+         95kuA/tb2rAPYby5ePrWOAPwk/0KGsVHaPjgIWJf7yGJn3eu6xqCy5YK8IQqB3KmyjTM
+         LUPrIqNrhgqQQBqmAhnab0ekWKKUGr6CZKQTkeO0VJARwKIiNg1R+dJ6XnigdfyFKT06
+         hgCg==
+X-Gm-Message-State: AOJu0YwT+3xbDRSQiwVQtwQZ1ZE4xVwEuuSvWScYaeujc2wK5EavPiMh
+	NHP4GQtaK1oL1+k7cyW/P08faIsCUXETA8tS2XODr9JllbW58ZiaNIAwZQzCOpmMEQw=
+X-Gm-Gg: AZuq6aLZ5sslZaxBYFzIuVisoIp+MskGUDshUugJNI4OHfi/Fu5lIOPqPoKdKvvKq5X
+	qZY57Typa1DQJwzLNkG236+MyQnqv52bPpHL2zFOGzGBOd/nHP3+6w9O3T5ZHz5LDXaHnVTpeUA
+	0dmVWuu3AE1i2QHMQD4yKUCRgdmF1NDDbvNHQhmGdK+2oDKIvM05ZHgdmKaNNjvzLZBf4+xtWxz
+	QIi3b4v35FYnAfxAyJdneTSFAN1TxqIV/NCdFmEWbGgX6yar7y+NfF5BS+M43iiu0GkMVqDTmb+
+	HVHgFZtmiDZ+LvcG5DzR4PtQcfikZYpJEUNv3HBhvmyM2Qu4JC8heTtFos1VwCLSXo9FlTy7ybe
+	DQR2Ru2GKssSMBghq4LFer85uuiCAG63tSO5jvU0S7qpGT+fafMrumw78uonTUNLGqINUmDPbrC
+	UGZYYRejbpciSveIIFg8XqDnW3+YXve/occ5WvSgwaaiHIMrx/CYVNB6sintoFGXNPfTt1YQrVq
+	L498RgQY7rl
+X-Received: by 2002:a05:6a00:1143:b0:7ff:d378:98f with SMTP id d2e1a72fcca58-8241c4c4a57mr118370b3a.37.1770138910953;
+        Tue, 03 Feb 2026 09:15:10 -0800 (PST)
 Received: from d.home.mmyangfl.win (tunnel997320-pt.tunnel.tserv3.fmt2.ipv6.he.net. [2001:470:1f04:2c7::2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-823cdf6fa26sm11075817b3a.58.2026.02.03.09.15.03
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-823cdf6fa26sm11075817b3a.58.2026.02.03.09.15.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 09:15:06 -0800 (PST)
+        Tue, 03 Feb 2026 09:15:10 -0800 (PST)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -84,10 +86,12 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/3] net: dsa: yt921x: Use u64_stats_t for MIB stats
-Date: Wed,  4 Feb 2026 01:12:40 +0800
-Message-ID: <20260203171305.95085-1-mmyangfl@gmail.com>
+Subject: [PATCH net-next 1/3] net: dsa: yt921x: Refactor port error message
+Date: Wed,  4 Feb 2026 01:12:41 +0800
+Message-ID: <20260203171305.95085-2-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260203171305.95085-1-mmyangfl@gmail.com>
+References: <20260203171305.95085-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,7 +105,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -111,9 +115,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256367-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256368-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -124,24 +128,112 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A923BDC98A
+X-Rspamd-Queue-Id: 3D39DDC9BF
 X-Rspamd-Action: no action
 
-Avoid load/store tearing of 64-bit values on 32-bit architectures.
+Sometimes we might get error from the underlying bus, but the return
+type of the function is void, so an error message is desired. There are
+many instances of the same pattern, refactor it.
 
-v0:
-  - Sending remaining part of
-    https://lore.kernel.org/r/20260118013019.1078847-1-mmyangfl@gmail.com
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ drivers/net/dsa/yt921x.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-David Yang (3):
-  net: dsa: yt921x: Refactor port error message
-  net: dsa: yt921x: Return early for failed MIB read
-  net: dsa: yt921x: Use u64_stats_t for MIB stats
-
- drivers/net/dsa/yt921x.c | 270 +++++++++++++++++++++++----------------
- drivers/net/dsa/yt921x.h | 114 +++++++++--------
- 2 files changed, 221 insertions(+), 163 deletions(-)
-
+diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
+index 98e8915dd6c2..ce2878ef9b24 100644
+--- a/drivers/net/dsa/yt921x.c
++++ b/drivers/net/dsa/yt921x.c
+@@ -185,6 +185,9 @@ struct yt921x_reg_mdio {
+ #define to_yt921x_priv(_ds) container_of_const(_ds, struct yt921x_priv, ds)
+ #define to_device(priv) ((priv)->ds.dev)
+ 
++#define print_port_err(dev, port, res, action) dev_err( \
++	(dev), "Failed to %s port %d: %i\n", (action), (port), (res))
++
+ static int yt921x_reg_read(struct yt921x_priv *priv, u32 reg, u32 *valp)
+ {
+ 	WARN_ON(!mutex_is_locked(&priv->reg_lock));
+@@ -721,8 +724,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
+ 			mib->tx_jumbo;
+ 
+ 	if (res)
+-		dev_err(dev, "Failed to %s port %d: %i\n", "read stats for",
+-			port, res);
++		print_port_err(dev, port, res, "read stats for");
+ 	return res;
+ }
+ 
+@@ -1102,8 +1104,7 @@ yt921x_dsa_port_mirror_del(struct dsa_switch *ds, int port,
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dev, "Failed to %s port %d: %i\n", "unmirror",
+-			port, res);
++		print_port_err(dev, port, res, "unmirror");
+ }
+ 
+ static int
+@@ -1690,8 +1691,7 @@ static void yt921x_dsa_port_fast_age(struct dsa_switch *ds, int port)
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dev, "Failed to %s port %d: %i\n", "clear FDB for",
+-			port, res);
++		print_port_err(dev, port, res, "clear FDB for");
+ }
+ 
+ static int
+@@ -2266,8 +2266,7 @@ yt921x_dsa_port_bridge_leave(struct dsa_switch *ds, int port,
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dev, "Failed to %s port %d: %i\n", "unbridge",
+-			port, res);
++		print_port_err(dev, port, res, "unbridge");
+ }
+ 
+ static int
+@@ -2399,8 +2398,7 @@ yt921x_dsa_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dev, "Failed to %s port %d: %i\n", "set STP state for",
+-			port, res);
++		print_port_err(dev, port, res, "set STP state for");
+ }
+ 
+ static int __maybe_unused
+@@ -2738,8 +2736,7 @@ yt921x_phylink_mac_link_down(struct phylink_config *config, unsigned int mode,
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dp->ds->dev, "Failed to %s port %d: %i\n", "bring down",
+-			port, res);
++		print_port_err(dp->ds->dev, port, res, "bring down");
+ }
+ 
+ static void
+@@ -2759,8 +2756,7 @@ yt921x_phylink_mac_link_up(struct phylink_config *config,
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dp->ds->dev, "Failed to %s port %d: %i\n", "bring up",
+-			port, res);
++		print_port_err(dp->ds->dev, port, res, "bring up");
+ 
+ 	schedule_delayed_work(&priv->ports[port].mib_read, 0);
+ }
+@@ -2779,8 +2775,7 @@ yt921x_phylink_mac_config(struct phylink_config *config, unsigned int mode,
+ 	mutex_unlock(&priv->reg_lock);
+ 
+ 	if (res)
+-		dev_err(dp->ds->dev, "Failed to %s port %d: %i\n", "config",
+-			port, res);
++		print_port_err(dp->ds->dev, port, res, "config");
+ }
+ 
+ static void
 -- 
 2.51.0
 
