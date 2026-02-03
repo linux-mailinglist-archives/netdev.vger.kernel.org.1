@@ -1,211 +1,162 @@
-Return-Path: <netdev+bounces-256276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eAP/AlrqgWkFMAMAu9opvQ
-	(envelope-from <netdev+bounces-256276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:30:18 +0100
+	id sEmxHczrgWkFMAMAu9opvQ
+	(envelope-from <netdev+bounces-256277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:36:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D78ED9069
-	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:30:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C515FD9156
+	for <lists+netdev@lfdr.de>; Tue, 03 Feb 2026 13:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0160430576A3
-	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:30:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A38F63038500
+	for <lists+netdev@lfdr.de>; Tue,  3 Feb 2026 12:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C415A342144;
-	Tue,  3 Feb 2026 12:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59E733C53F;
+	Tue,  3 Feb 2026 12:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7jB5I46"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="JvlHXk2u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19677342CAE
-	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B957A3218DD
+	for <netdev@vger.kernel.org>; Tue,  3 Feb 2026 12:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770121814; cv=none; b=ftSRzI1ym+wPhUMgYmqoix0F3kBnZ0s2mRl0Cf4QQ2bGoHoFxLdCvFNV3jA/PlCvZ33AgGzDkK01SxRf2uQPXQqQD+WOwwq0BOINESamKRmuxUKIlTKk2Uq1KabdM2QKfIyyBVu0TvIEzSIkU1dOIeSs+1FFFCy4N/VqYcahxiU=
+	t=1770121925; cv=none; b=uLyQehLJoAvjF1Z7ULQPCzm5xsk16KTinwDdDuJqQlwtp0fAM4dhPTZg+6ASQ7GA+HeVW3VuWaVoGMqFpvtuOND5wrAc+VZAf92sRuxywPPCIHjXsCY2OFeU9jzb2ovong1Dcy3oq5AuA6yYTrh2BY3Xndb48F1swF0qgmKsbtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770121814; c=relaxed/simple;
-	bh=DvNpsvDjHOGousMp4DkIQZtEWldoexLDjSNwjBGuBPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MLWq+ROU6of47tZtv/+iV+DcGrVR/O5enGATIOHxmsOmlmLT0c8tuTtD8caXZUWcZMexQxPC8I5+yeP64JohMShwPteXzqqpOB3lUBjZ5y1PDbV+nCSuI0M5qAKeYSM+N67okNO3IpkKiU61np7Zp9ntkIki3qXPATJF+nhpmbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7jB5I46; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4806cc07ce7so56014715e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 04:30:12 -0800 (PST)
+	s=arc-20240116; t=1770121925; c=relaxed/simple;
+	bh=la6c6rMnlkGUrU1jddUnUIgHhotHUjpybhZoP6Grrgw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HR0zSC6SAAVYR02+tJNUfuMzNSGJmEMqMZAD1XO5S9dtNybUB1zy55tW0g9lfLTbw0iNOP+8NuA0khHTDCw5IGNFjr5mmf3NfrEaGy6e5jP3O4BXCqTUb1GdEYlD++bLTWDVMGAvZNRFuMm4JYRR74gvvDMhbkxqlY68aOto5ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=JvlHXk2u; arc=none smtp.client-ip=44.245.243.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770121811; x=1770726611; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mb3hrAjNF4z6/67h17AzLKBdGCEa9ohJ4atwIZ6Fh3w=;
-        b=P7jB5I46SPhwJw3ayHFqkfT4Zo74Sz2P4B5gbWbXfZQKz3ROARom6wnjR1lPP3Sdbu
-         a9G8THKtNDRoJ3k3yvnIPhN3w88ByII85qIok6a0bQi9aLz2f3KQI+uAwLpIAFRBoM+X
-         5Tm6B/QyDEEn5viV/Gxryb+LHnmcAjBOORSykT45LE8NPVTHHyOnbNaT8+rmz/4arp3i
-         gMbIZmQCTrPuOvtF/jE9ztPSBgwU7hlVZAUdt/6RLrqGpHiT6MYaZeXAXaJuaulB6HP7
-         Rtex8kx8z/YvM/m0dbxM03sY5yV3asO+HvTJsUv1bJHj3uTbEzcDBBtnmMD7DXfOYgz/
-         MxVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770121811; x=1770726611;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mb3hrAjNF4z6/67h17AzLKBdGCEa9ohJ4atwIZ6Fh3w=;
-        b=WP2YGn+HfTGDK4pciIUSUq2gx8lFhLE2qRWFfu91g0nPUX7jz5kll9SwzSx1m4msFD
-         HhXRquNeu8bSdV7h0D3lg8T0CrIHAfMsrPhA5JT+x7lkvJ0JNnif6oFUqXzxl6gssLNQ
-         5LSj9kz2lsT8snxdnZK1AfCIq5g1r56oqgnVBj8HEsW8hm1mkBk2KVSVOINJP3Y0a+Hx
-         A9hHYCYaVlY9wDNPO8vr7PlY04wemMYY5CMe2mc2Kvx+7XnSh+xkq9RIei9ZNJP+vpsN
-         1UXNdV6y71kEqieGL5YYwlQ6z8HKHLXnJEkyQ68WaTq64CJK+gnTy7Asa5S2QKX0gYdP
-         kSlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUP/7B30uQURiDcOg4XmTLqXlw3+7gM0A/VzddMiioFFTlMKVCzz526YQfn0LSYlJaJAO42xX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzISQ4mSTZjn1bTSZMVAZGmOJPS2CwvYU+U8oVdOFQ9oVVpLI+c
-	gi2dmkdhlsMcso+9ewqBm/nsWG/geI7JncBFdlapouieRHKAEUHfvZFa
-X-Gm-Gg: AZuq6aLBKjFypoUR3P0bg7uLLB1Lj/dz4uYz0jbeD9kR4XnAImYr2voI2/h1052nebG
-	gLUf+OFfmg7Uc7OzgtNBUI06D0lUhPE+Z6Ln5Of/63A94gQfa5/+bEb2hxOkLzQQ6zRZKY0ARqB
-	1bCe8zzoIo1NS2pBKFhPryGrgtyk11d0ZgEJGjQcGDnNh7nhASCpZSuz1KnZWxrLDh2BJq+LpRA
-	k7F8V+NDz2SEVTuZhIWO+I9vKmcUmlRi2xEj+Bdugre+Qef+At0+RQevLUtM60TQSuB8S4q4DDj
-	zIc01JqZxdBdB3jXuzLCC5q76M3ieqoiBMSg6gMD6nDUgJYet27MwxpO+RKbaR0RT+ImcCmv/3r
-	39u9WlzBYtM+mODLpLFuUXBKwbF1KzJeFcfy3C+kC2XLl+Mi6fcDAUqn/WBml0KilKwtrmB5vbr
-	SUfXbHGSEtN5ptFKlEOmq/Be81REGnWbumeK0=
-X-Received: by 2002:a05:600c:4f48:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-482db013b90mr233949785e9.0.1770121811137;
-        Tue, 03 Feb 2026 04:30:11 -0800 (PST)
-Received: from [10.221.207.115] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4830511cc93sm70917185e9.2.2026.02.03.04.30.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 04:30:10 -0800 (PST)
-Message-ID: <b7d310da-a993-4274-bd16-673a58a9625c@gmail.com>
-Date: Tue, 3 Feb 2026 14:30:09 +0200
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1770121924; x=1801657924;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YK+bZeD1IngcPgHtfql6I8NxnQg7t/nPSsV5E5pb1xA=;
+  b=JvlHXk2ujp2FO5ckBREDGjRrBqUEJPdMnYv5ko6jsxtFBT63SEY973S8
+   M7K2Xuiqmtlxah0NvPHMDyuVzpufc36skbXVGy2XfCBnUBh5/Sylfoctp
+   vRRQnyedBmzjFh3Kh9gNGOPGdJ3XkSTQdBc021vFIrsu8ZPLf/t+eo+rQ
+   fp3pCPspWb2Ny2CRFVjCaYA96FipOODWaSxEDS9JJQhv0e0vTe3OmcYmX
+   3iTmlqjF5vDhJ2cZdJx2wQy6k2TQyeYxr1D0lniya4A1Puh0ihibc/uhz
+   /WCtpjIc9SHofL6CL2o5jdArViQUth/YUZkQNOxgZvzKQebQHXrGXWFNW
+   w==;
+X-CSE-ConnectionGUID: ijPDJUUnTpihbynFQV8Ucw==
+X-CSE-MsgGUID: OjHxnn3nRYGjAN+BswH95w==
+X-IronPort-AV: E=Sophos;i="6.21,270,1763424000"; 
+   d="scan'208";a="11722026"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 12:31:46 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:12976]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.123:2525] with esmtp (Farcaster)
+ id cbe99331-cf46-4e56-8c05-78cc3949b188; Tue, 3 Feb 2026 12:31:46 +0000 (UTC)
+X-Farcaster-Flow-ID: cbe99331-cf46-4e56-8c05-78cc3949b188
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Tue, 3 Feb 2026 12:31:46 +0000
+Received: from 603e5f7bc1fe.amazon.com (10.37.245.7) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Tue, 3 Feb 2026 12:31:44 +0000
+From: Takashi Kozu <takkozu@amazon.com>
+To: <horms@kernel.org>
+CC: <aleksandr.loktionov@intel.com>, <andrew+netdev@lunn.ch>,
+	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<enjuk@amazon.com>, <intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <piotr.kwapulinski@intel.com>,
+	<pmenzel@molgen.mpg.de>, <przemyslaw.kitszel@intel.com>, <takkozu@amazon.com>
+Subject: Re: [Intel-wired-lan] [iwl-next, v5, 3/3] igb: allow configuring RSS key via ethtool set_rxfh
+Date: Tue, 3 Feb 2026 21:31:37 +0900
+Message-ID: <20260203123136.25423-2-takkozu@amazon.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20260202102520.1844644-1-horms@kernel.org>
+References: <20260202102520.1844644-1-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5e: Undo saving per-channel async ICOSQ
-To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Cc: William Tu <witu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
- Gal Pressman <gal@nvidia.com>, alice.kernel@fastmail.im
-References: <20260123223916.361295-1-daniel@iogearbox.net>
- <85776531-d5fa-4762-90aa-74c8397dc09b@gmail.com>
- <6188b9f5-ce38-4de9-80b7-c7b1cab48595@iogearbox.net>
- <421d9b09-a157-4f95-8775-7883ea097038@gmail.com>
- <2a3bd098-0d88-4c11-8ac3-7b13f8bbbd9f@iogearbox.net>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <2a3bd098-0d88-4c11-8ac3-7b13f8bbbd9f@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nvidia.com,davidwei.uk,kernel.org,fastmail.im];
-	TAGGED_FROM(0.00)[bounces-256276-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256277-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,osuosl.org:email,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpg.de:email,linux.dev:url];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[takkozu@amazon.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7D78ED9069
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: C515FD9156
 X-Rspamd-Action: no action
 
-
-
-On 02/02/2026 18:13, Daniel Borkmann wrote:
-> Hi Tariq,
+> From: Simon Horman <horms@kernel.org>
+> To: takkozu@amazon.com
+> Cc: Simon Horman <horms@kernel.org>,
+> anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch,
+> davem@davemloft.net, aleksandr.loktionov@intel.com,
+> przemyslaw.kitszel@intel.com, kuba@kernel.org,
+> netdev@vger.kernel.org, enjuk@amazon.com, pabeni@redhat.com,
+> intel-wired-lan@lists.osuosl.org, edumazet@google.com,
+> piotr.kwapulinski@intel.com, pmenzel@molgen.mpg.de
+> Subject: Re: [iwl-next,v5,3/3] igb: allow configuring RSS key via ethtool set_rxfh
+> Date: Mon, 2 Feb 2026 10:25:20 +0000 [thread overview]
+> Message-ID: <20260202102520.1844644-1-horms@kernel.org> (raw)
+> In-Reply-To: <20260127085410.79645-8-takkozu@amazon.com>
 > 
-> On 2/1/26 1:50 PM, Tariq Toukan wrote:
->> On 26/01/2026 11:23, Daniel Borkmann wrote:
->>> On 1/25/26 9:33 AM, Tariq Toukan wrote:
->>>> On 24/01/2026 0:39, Daniel Borkmann wrote:
->>>>> This reverts the following commits:
->>>>>
->>>>>    - ea945f4f3991 ("net/mlx5e: Move async ICOSQ lock into ICOSQ 
->>>>> struct")
->>>>>    - 56aca3e0f730 ("net/mlx5e: Use regular ICOSQ for triggering NAPI")
->>>>>    - 1b080bd74840 ("net/mlx5e: Move async ICOSQ to dynamic 
->>>>> allocation")
->>>>>    - abed42f9cd80 ("net/mlx5e: Conditionally create async ICOSQ")
->>>>>
->>>>> There are a couple of regressions on the xsk side I ran into:
->>>>>
->>>>> Commit 56aca3e0f730 triggers an illegal synchronize_rcu() in an RCU 
->>>>> read-
->>>>> side critical section via mlx5e_xsk_wakeup() -> 
->>>>> mlx5e_trigger_napi_icosq()
->>>>> -> synchronize_net(). The stack holds RCU read-lock in xsk_poll().
->>>>>
->>>>> Additionally, this also hits a NULL pointer dereference in 
->>>>> mlx5e_xsk_wakeup():
->>>>>
->>>>>    [  103.963735] BUG: kernel NULL pointer dereference, address: 
->>>>> 0000000000000240
->>>>>    [  103.963743] #PF: supervisor read access in kernel mode
->>>>>    [  103.963746] #PF: error_code(0x0000) - not-present page
->>>>>    [  103.963749] PGD 0 P4D 0
->>>>>    [  103.963752] Oops: Oops: 0000 [#1] SMP
->>>>>    [  103.963756] CPU: 0 UID: 0 PID: 2255 Comm: qemu-system-x86 Not 
->>>>> tainted 6.19.0-rc5+ #229 PREEMPT(none)
->>>>>    [  103.963761] Hardware name: [...]
->>>>>    [  103.963765] RIP: 0010:mlx5e_xsk_wakeup+0x53/0x90 [mlx5_core]
->>>>>
->>>>> What happens is that c->async_icosq is NULL when in mlx5e_xsk_wakeup()
->>>>> and therefore access to c->async_icosq->state triggers it. (On the NIC
->>>>> there is an XDP program installed by the control plane where traffic
->>>>> gets redirected into an xsk map - there was no xsk pool set up yet.
->>>>> At some later time a xsk pool is set up and the related xsk socket is
->>>>> added to the xsk map of the XDP program.)
->>>>
->>>> Thanks for your report.
->>>>
->>>>> Reverting the series fixes the problems again.
->>>>
->>>> Revert is too aggressive here. A fix is preferable.
->>>> We're investigating the issue in order to fix it.
->>>> We'll update.
->>> Ok, sounds good. Certainly the kTLS fixes seem independent, from the 
->>> cause
->>> of the issues I've hit it just seemed to me that they were quite 
->>> fundamental
->>> and that perhaps a different approach would be needed (or 
->>> alternatively only
->>> kTLS would need fixing, and the xsk optimization left as it was 
->>> originally).
->>> Anyway, I'll keep the revert locally for now, and happy to test patches.
->>
->> Please check attached patch.
->> We were able to repro the issues internally and verify the fix.
->> We're finalizing it before submission.
->>
->> I'd be glad if you can confirm it solves the issues for you.
-> That seems to work for me, yes. Feel free to add my Tested-by.
+> This is an AI-generated review of your patch. The human sending this
+> email says "I'm releasing this report for completeness. And while I
+> do think it is correct. I don't think it needs to block progress"
 > 
-> Thanks,
-> Daniel
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> igb: allow configuring RSS key via ethtool set_rxfh
+> 
+> This patch adds support for configuring the RSS key via ethtool's
+> set_rxfh interface. The change accepts a userspace-provided RSS key,
+> stores it in the adapter structure, and writes it to hardware registers.
+> 
+> > Change igc_set_rxfh() to accept and save a userspace-provided
+> > RSS key.
+> 
+> This isn't a code bug, but the commit message references "igc_set_rxfh()"
+> when the function being modified is actually igb_set_rxfh() in
+> drivers/net/ethernet/intel/igb/igb_ethtool.c. This typo was noted by
+> Aleksandr Loktionov in the v1 review:
+> https://lore.kernel.org/intel-wired-lan/IA3PR11MB89860A16782937C7E8C2E2DEE5A7A@IA3PR11MB8986.namprd11.prod.outlook.com/
+> 
+> Should this be corrected to igb_set_rxfh() to match the actual code?
 
-Great! Thanks for testing it.
+Thank you for pointing out.
+I'll fix it and send it as v6.
 
