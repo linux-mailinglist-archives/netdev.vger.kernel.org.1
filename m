@@ -1,148 +1,185 @@
-Return-Path: <netdev+bounces-256675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EUPBUcrg2kxigMAu9opvQ
-	(envelope-from <netdev+bounces-256675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:19:35 +0100
+	id 0PIbMKUsg2kxigMAu9opvQ
+	(envelope-from <netdev+bounces-256676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:25:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C7CE5033
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:19:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E61BE50D3
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:25:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 18E3F3004401
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 11:19:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C1A47300E3ED
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 11:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082473E9F6A;
-	Wed,  4 Feb 2026 11:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3DC3E9F78;
+	Wed,  4 Feb 2026 11:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UOLJHWxN"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4jZqaN9Q";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NbyrnLjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA882F2905
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 11:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D37D3E9F70
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 11:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770203964; cv=none; b=FkPid2EJl0GnP5fpH4YAlv3vg3ZpruWwNFBBxNP33CDmQD0IUenwy4l35M9yi9bsFAudUP+5yb7tYT6SWtqHxfIspIX/iiWQ9+d4y4u/TUm3CtnIM4Fhe0S7sl/bk4kgpgctSjDn7KIk8u8Oiq9UKcnEyIOfGUjIsMxULIqA3xU=
+	t=1770204295; cv=none; b=meIMHs2K08NxJj7uiMjTzWrJGFqLTz6xtb+8WMS0L0DP4Vy0PGWdmbsIxaddBeFKbOLTZB0zbSZs1IA3QjNnIkdNOa/YJlE2LTOjCdpnbU7odUUqvZgBg7hWI9+OK5dPJmcFaKtK/ZOZ3O2G/KhKPcs0ZCe4XLV44fQS8Xbux+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770203964; c=relaxed/simple;
-	bh=hU1NmMIbpza6IvYi/eawnBfChN1LUcce9O3t3QADs5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MuSdczUUaN0mST4l8z4OwEAMWLxbe+CjTuyk1VIBY0wAzgnmHNvbLOKGQosyqIIsPNekGAYBveCDlsMBmAtb44aB4ALlXA/3S91RYi11PyL679Ya2t3Clu55qWbzqpJ9UMysan9JeCV8W3EFrUgAECLb3931bwIWL1nrCtKoqFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UOLJHWxN; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770203964; x=1801739964;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hU1NmMIbpza6IvYi/eawnBfChN1LUcce9O3t3QADs5Q=;
-  b=UOLJHWxNd1aaRt2LE3yNxL5SRmW2tTO01+8Bbxwz2wJzDLuBciFGIgsM
-   If31qPi3XGRl+jbckXpmPcYyWKGmWcjff+PUUNxSNcAwq7n9ZKuNYE3nw
-   qoSGtdzhAmUW+AREx2377kw7eaS47tYsx6XGORVOtGwCuzVaHPjfjisUv
-   14ffUT8yrg74S+SUyqtAPkC/SipPh6XK5E7vj0txAflOhV1jWB3opmNGU
-   FWoS4LIw9tbLHz4/TwWgGSYpn4Vbw3EI2S2JV0/9M2f+oveb1IeBdU5VD
-   LnjpsXhpcMddInsrkO2MSTjhE79y/SDc8AymRn9yplqrVfcXbGV+uOF22
-   w==;
-X-CSE-ConnectionGUID: qvV/QHGeQr2u217uJHcDGw==
-X-CSE-MsgGUID: FbNZtKm2QzOcxG+XB1C8Kw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="75240511"
-X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
-   d="scan'208";a="75240511"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 03:19:20 -0800
-X-CSE-ConnectionGUID: S9o9F0zgQB2NFJ9l6hkr+Q==
-X-CSE-MsgGUID: cBGuI30cQBuf/5Gq3nYu7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
-   d="scan'208";a="233059381"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 04 Feb 2026 03:19:18 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vnaui-00000000hjI-03S3;
-	Wed, 04 Feb 2026 11:19:16 +0000
-Date: Wed, 4 Feb 2026 19:18:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1770204295; c=relaxed/simple;
+	bh=Ng3MTrMtfEc9+RJTan1hOr86PjA0SWgXi/++1KH3TvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ot1ajACwv3WAbMxfj1APIyYJsMXCIlB/+/Hm+LnxKHNZDHG3P6/kZb6q7ch9ecjD9tWM/ngbMcNzAdOp52ObDYBRJe+1/AtnLLd5SFPDqbsqBoWTe8l1Pu7VpD3P0P2DalEYu0oZ2/DYOIWPNn1oXQDI4Yv9o1dYHifUYo8rHHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4jZqaN9Q; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NbyrnLjL; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1770204293;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i/gSYPcmL+O3A8MX4SmXmYxtnR5pB+0fha1HhHgjDPg=;
+	b=4jZqaN9Qs6hDwGTGsbUKfDEfw4KieZJsnhI/fMi48qOm42SO+wQRPAKA7kkHWvWul1eAQ3
+	rBS6+Me4RBfwNjoM1K292yCq0vTcMdDYiUTteBpDlI/bdtoH17goE+WMm+u7Yvnnxc37nk
+	7b/PH4zawiUtwDeq4MT87EC1mquVEYvvsIOZCcuXkWY1w2tX5xcEjsrbSYBFcNqEYNiEfx
+	gtUJv7JTFRUx47czbmcZohKZ0u7xk3bcUtlobKkd5xY8C0AFXdTxuT1EbsGxvNh1PIkXCl
+	ab3sYddJI7BoUdZjtYf6AU9ucuVI1TrE1uPyHKuGUKHzrG4elRnDCb9DM7yBOQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1770204293;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i/gSYPcmL+O3A8MX4SmXmYxtnR5pB+0fha1HhHgjDPg=;
+	b=NbyrnLjL0PMuOVkzKMa7r9sbS4fmYkJplPI/GGHs2+ijn4jq2GylNhawndvh/OvRvJHVCI
+	hXbWgUjpVKnk7bDw==
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: Re: [PATCH net-next v1 7/7] net: wangxun: add pcie error handler
-Message-ID: <202602041942.kNt5G253-lkp@intel.com>
-References: <20260203075759.5852-8-jiawenwu@trustnetic.com>
+	Felix Maurer <fmaurer@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH RFC net-next 0/2] hsr: Add additional info to send/ receive skbs
+Date: Wed,  4 Feb 2026 12:24:02 +0100
+Message-ID: <20260204-hsr_ptp-v1-0-b421c69a77da@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203075759.5852-8-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20260204-hsr_ptp-1f6380f1d35f
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,linutronix.de];
+	TAGGED_FROM(0.00)[bounces-256676-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256675-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,01.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 41C7CE5033
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:email,linutronix.de:dkim,linutronix.de:mid]
+X-Rspamd-Queue-Id: 3E61BE50D3
 X-Rspamd-Action: no action
 
-Hi Jiawen,
+I am trying to extend linuxptp to support PTP over a HSR network. The
+user space for linuxptp are still under discussion, the thread starts at
+	https://lists.nwtime.org/sympa/arc/linuxptp-devel/2025-11/msg00013.html
 
-kernel test robot noticed the following build errors:
+the posted patches are also available at git repository for convenience
+	https://git.kernel.org/pub/scm/linux/kernel/git/bigeasy/linuxptp-hsr.git h=
+sr_v2
 
-[auto build test ERROR on net-next/main]
+This is the kernel side of the changes. In short PTP over HSR sends its
+packets to multicast address and every node needs to forward the PTP
+packet (SYNC and FOLLOW-UP for instance) within the HSR ring.
+In order to achieve this, the HSR stack must not duplicate and forward
+the PTP packets as it would with other packets. The delay caused by the
+duplication and forwarding adds overhead which in turn makes the timing
+information within the PTP packet inaccurate.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jiawen-Wu/net-ngbe-move-the-WOL-functions-to-libwx/20260203-160343
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260203075759.5852-8-jiawenwu%40trustnetic.com
-patch subject: [PATCH net-next v1 7/7] net: wangxun: add pcie error handler
-config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20260204/202602041942.kNt5G253-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260204/202602041942.kNt5G253-lkp@intel.com/reproduce)
+My current approach is to open the hsr0 device from userland and send
+and receive the PTP packets individually on both slave interfaces. I
+added additional hints to the af_packet interface, which is used by
+linuxptp, to be able send a packet on a specific interface (A or B) and
+also to have the information recorded for received packets.
+Additionally, the PTP-timestamps which arrive on the slave interface are
+forwarded to the hsr interface.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602041942.kNt5G253-lkp@intel.com/
+This solves the following:
+- Forwarding a SYNC and a FOLLOW_UP packet.
+  Userland receives a SYNC, FOLLOW_UP and timestamp packet from port A.
+  The received port is known and recorded. The SYNC sync packet and the
+  updated FOLLOW_UP packet can then be forwarded on port B. The update
+  is based on the time spent during the forward so the forwarding delay
+  is accounted for.
+  In this scenario the HSR header is used from the original sender of
+  the SYNC and FOLLOW_UP header and the stack must not prepand the
+  system's HSR header nor replace the provided header.
 
-All errors (new ones prefixed by >>):
+- Sending PDELAY_REQ and PDELAY_RESP*
+  These packets are only exchanged between the two nodes directly
+  connected and they must not be forwarded within the HSR ring.
+  These packets are sent as PTP packets and the HSR stack must prepand
+  system's HSR header including a sequence number.
+  This logic is also used for SYNC packet if the node acts as a GM.
 
-   s390-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_err.o: in function `wx_pcie_do_recovery':
->> wx_err.c:(.text.unlikely+0x214): undefined reference to `aer_recover_queue'
+This has been tested in a pure software environment and in an HW-assited
+environment where the HW is able to duplicate and deduplicate packets
+but does not do it for PTP packets.
+It has not been tested within an enviroment where the HW is able to
+forward the PTP packet and correctly update the timming information.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+This series will clash with Felix's sequence number/ deduplication
+rework.
+
+---
+Sebastian Andrzej Siewior (2):
+      hsr: Allow to send a specific port and with HSR header
+      af_packet: Add port specific handling for HSR
+
+ include/linux/if_hsr.h         |   2 +
+ include/linux/skbuff.h         |   1 +
+ include/uapi/linux/if_packet.h |   9 ++++
+ net/hsr/hsr_device.c           |   7 +++
+ net/hsr/hsr_forward.c          | 114 +++++++++++++++++++++++++++++++++++++=
++---
+ net/hsr/hsr_slave.c            |  16 ++++++
+ net/packet/af_packet.c         | 103 +++++++++++++++++++++++++++++++++++++
+ net/packet/internal.h          |   1 +
+ 8 files changed, 246 insertions(+), 7 deletions(-)
+---
+base-commit: 4ff7d63728ef2315d402a608cef1376248aa5c56
+change-id: 20260204-hsr_ptp-1f6380f1d35f
+
+Best regards,
+--=20
+Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
