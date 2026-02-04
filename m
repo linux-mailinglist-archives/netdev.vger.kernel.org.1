@@ -1,159 +1,169 @@
-Return-Path: <netdev+bounces-256562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCAaBAnUgml5cQMAu9opvQ
-	(envelope-from <netdev+bounces-256562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:07:21 +0100
+	id OJClKJHYgmnkcwMAu9opvQ
+	(envelope-from <netdev+bounces-256563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:26:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EE99E1AB8
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:07:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7659E1F04
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:26:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3820E3045667
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:07:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ABA1A301C952
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBC3352943;
-	Wed,  4 Feb 2026 05:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GFvAyJWP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE723590BB;
+	Wed,  4 Feb 2026 05:26:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4B92DECA1
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 05:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770181622; cv=pass; b=FtpWXi7/rZ8KGWKFmz1jICUqGM2gLICSzifWV5+RZMiCobVSVsT70i6zPfUL2iB0vZPfsHc+iCSsePaC2Bo7cmIJfoYt0aqdVgdI+Yhp7U8bHSSLRET3NDcsOWRh/E7CXDN70eseSzKPgrUZU0Ew2YIsh+fGLX2wI5RZ41evoAA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770181622; c=relaxed/simple;
-	bh=uYblh75sinfOELc2Du3NVGGCgB+ks7J9IkBiNZ3OyzQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hh7m956/veEEUF+vjBt4J078YhmdSX+RZLkxfP3PkeNepVuH7pQivSIPGgFEp4FzgLZeOnEZQVyuAStpvQvEakus0w+v1FCYUkby2VCHes9ic3rRfV62SgLXO0w00O3GjhHgW7Nslg2HrF6c9fSpshqnHCR4IVMUVuH8Cj6yqYw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GFvAyJWP; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-505e2e4c35fso31351361cf.3
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 21:07:02 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770181621; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FWVrkons9C3DWiVHvVSuHI1427IRn3JyPFZM67MiueuViQ5uDXB2Y0hqudGveMpdMu
-         vmEo5bnMzhRlf5QA3xKRngUf9mw0nFXfVFRGjcMKflBzESw7mGbYh0Gmw6BeOCM7m7UY
-         bmeTGk2d0Twd/BGvI3mLdxb97oN1J6mRZfEHBzsfLglV+kCqYY2LwndRPJDmAzXtA3RF
-         Ktj8pReQw5+WzmMpMs9BYpqq5fvQLaPQuIYKf2Wy7btPJ/A8Du4xundCU+qEuSoPLRMv
-         dYUBqJzA5jFqYtVSgC3LYoMkZwmyEojtM99Vs1SrXutJDUv5bgtyTKZUWF/QNY+R28yg
-         4p+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7klJ34bE5c21vIGvZtifvnvADyVovGFGjq67k+fGEJo=;
-        fh=KDDcXEseCp2EEqiBfdyADjVo5PsNWdRUQwVy0DUavXc=;
-        b=dCUWCIOwPCbAMSlf61/NGjC3xFvswoG5JEk/ps0szLNT0xMFQLsJyD1pwOG+KmznU6
-         3c+5Me9i2OTKuko5uy16iGac68/zJ1bFPVRqHi1BpNHiqfcvwIRHDejJeV3s8FjmGIt5
-         lePTa5xA8XZxSLFqKYRc2d43/FwEsY/gKma3jBqywcjm3mQesGsHl59vyqT1EJxkFPBD
-         WfgZmSNgo+XrPX5ogytBhLLJVzJMtrGi5qNb9Jy4fbUP4Js0WvFDRpIgIPSwN/SEtu11
-         SnbeaI2Es2//VBE02laAqYVE8US+M1ThjXO3CFTsNz/qONZzH2siZj4S2e/G9D1RTSp6
-         h4sA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770181621; x=1770786421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7klJ34bE5c21vIGvZtifvnvADyVovGFGjq67k+fGEJo=;
-        b=GFvAyJWPl4KadtMS5DhEuFtk/Kf+nDyiewlAtSAjMNxENXP7S3/H5aScjYzIU2oez9
-         v0Nt7Q40v/8PGcn+vB8W8b8S4rbhw/c0LU5n0zbHLn4x2ErQEhKVD0vBGnCAAAVZgl8x
-         Feq8vywttFtNh8G3cIi7hqYxvU85LzMgS/11t8A8HTrdQ5cJf04yLC7Jc9+NZiHvOPHL
-         SM12+01HH1Rn+QW1qAEFrMVOw9HsMK+Nu1R88lcPRrf7J/bZIb7XmTNGDaHqMuhaWNDb
-         N8EXMNBgJ4AyYOPYryobP6EJCPfeZ6g/4JD4kCWXi8COOAZNYX1+IQWo28cOj21cH/CD
-         zlsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770181621; x=1770786421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7klJ34bE5c21vIGvZtifvnvADyVovGFGjq67k+fGEJo=;
-        b=MeAUtLaBYr/B0SgzRnE1CZkh0rr5hcwTVHzyCsskfsv1Q77garF56rgUcjz0DlpS7v
-         VZ6kly+C9zo/qbzQRWZ8TR5EI6uI8qGWQmx92JV52YEtbgVF6A8q8Je1TLW6IoiHDeM4
-         riAdkqCw8iYTfbEDiWIspLyp11aJiRmlIEOrboSxRBGUfIidu69ZaYQ9Oitf78fVBy6d
-         nD4Uch92Hn5cEn/2+uIKDyp0tUaqluCHF6n/TPtt3pBsiohPIKK2JX24bmd2PKD9f9z8
-         WQebSUuyq+slCZTEDsveHSJ8CPktIhgF59uIrcDy2ywEk/1SgndddxULi2KwdJIyoA1U
-         Dy7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUrD3rgyFOQLcI5+XX+dJxmRtpnH7qn0sXjPM2Tc3RXpiYYjjrcWjWyd+rvuD81KVOA5g6ujmg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTP3gNWqnAFRJXZ/JBkhFRiPGKZIVcqZZPtDZbSICZIiWpMsXN
-	1aLbRINBdeJsgo9zGF+ekYQJ9XqfxSFIT9mCPxUDwW6EKDwoPElkfkhoDFPkZS/iEtKRIRPV7fG
-	9AMoxjLyv2yjlU7G8RogFbI1WNOEcxLzPMlpX4WCl
-X-Gm-Gg: AZuq6aIgXX92nueCSIL64qQpqZzuagreryzGJ/iLUDRIM6AriHezxAlQbGVGT6/UxiW
-	yEuhmR4nbZy39G1Oe3Lrf/UtjNDag1lnCdBQcJk/uGM9IB9/VaB8PBG8jSgmKBp0t2hpPa1ymDN
-	e0LSRfIcuqCQjmvtacQyx9OQ+9uGIszQxefboMSBHQ3upiNiVQgbpDmOiSq+Fw+CBcWMPssW84L
-	zaRfX+JfbOsdeFKebL6l44FMJkSReQPJ3Zhu6pmNjWvtNkPWVdWnB0qC1xwmbSZK3U8Yg==
-X-Received: by 2002:a05:622a:1108:b0:4f1:caed:da6b with SMTP id
- d75a77b69052e-5061c12da73mr23296981cf.35.1770181621141; Tue, 03 Feb 2026
- 21:07:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E928A8460;
+	Wed,  4 Feb 2026 05:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770182798; cv=none; b=BPCfmQ89+Fz+SagNz1+Jryrx4CHNoOBq71Z24nrCDk/GMDJ/IZ0HVAo+y4jLjTx/UKpVsDSeudZmiaFhT4n8CfeXgAIJskPZltalSzeeBFJgi08s5Uqs/7L3VTlUbgjTIXT2lf+osjR2w70yOr8KP5zGJzMaq3LZfVfOafaRRL4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770182798; c=relaxed/simple;
+	bh=W7F3cwVRQvPPcCpPC5iXd7t2V1p3TDDeh7EhvhGNK80=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=Wjy6Vc9hxWaikx4je5vcu49X87Bvkdh/mtOvfI6FDoKLfcnVw2gI1rfvtrg8VAIvfXwwlR3UdFYmXqnxmcEw1CpxNo/8qBCHoT8Lknu7w/F6HdzhJcqswME9XC7xiiRz4FmlkdUEWTX4xZOSM1Oyw0/hCmCPn2/DL2cJAX/OZlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Wed, 4 Feb
+ 2026 13:26:30 +0800
+Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Wed, 4 Feb 2026 13:26:30 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+Subject: [PATCH net-next v4 00/15] net: ftgmac100: Various probe cleanups
+Date: Wed, 4 Feb 2026 13:26:26 +0800
+Message-ID: <20260204-ftgmac-cleanup-v4-0-b7f379939b76@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260202082200.650516-1-edumazet@google.com> <20260203191740.2404d44c@kernel.org>
-In-Reply-To: <20260203191740.2404d44c@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 4 Feb 2026 06:06:50 +0100
-X-Gm-Features: AZwV_QhKuzLFHAAni2Vyj1EmZwzokJ-BwGDOaquuXn-LiBD0RVndVQ3SDsaYBsE
-Message-ID: <CANn89iKCHZVdKynuYbWfV1Qjq4FTjvb+KFAS7fpnQcPCTm-t8w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: add vlan_get_protocol_offset_inline() helper
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAILYgmkC/23NQQrCMBAF0KtI1kYy0zQEV95DXEzTiQ1oWppYK
+ tK7G7pRrJuBz+e/eYnEY+AkjruXGHkKKfSxBL3fCddRvLIMbckCFdaAykqfr3dy0t2Y4mOQqBr
+ EqvHaWBBlNIzsw7yCZxE5y8hzFpfSdCHlfnyunyZY+4IaBar+RSeQSjbGsqaqtb7hE6WBuc3su
+ oPr76s34ZcBZmNgMSx4DV6BR7J/jepjlLMxqmIYMmRbXaNVtDGWZXkD4P1zc0MBAAA=
+X-Change-ID: 20251208-ftgmac-cleanup-20b223bf4681
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
+	<horms@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1770182790; l=2672;
+ i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
+ bh=W7F3cwVRQvPPcCpPC5iXd7t2V1p3TDDeh7EhvhGNK80=;
+ b=T0WejHB1sVF3Emb9bGvaUcKGWJX0Wwfa8BjiR8yD0uDm6a7Iv4Xc1GliegWAmu6VmiwM893Rz
+ jxUn3i7NqbJCz0bolcnPIDQhisGScAJ3YpxJ+LNqRgEAOo4lHmPxGWo
+X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
+ pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[aspeedtech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-256562-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-256563-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacky_chou@aspeedtech.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 7EE99E1AB8
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B7659E1F04
 X-Rspamd-Action: no action
 
-On Wed, Feb 4, 2026 at 4:17=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon,  2 Feb 2026 08:22:00 +0000 Eric Dumazet wrote:
-> > +struct type_depth {
-> > +     __be16 type;
-> > +     u16 depth;
-> > +};
->
-> Should we prefix the struct name with vlan_
-> Seeing type_depth made me think the function is returning some compiler
-> metadata :S Maybe it's just me.
+The probe function of the ftgmac100 is rather complex, due to the way
+it has evolved over time, dealing with poor DT descriptions, and new
+variants of the MAC.
 
-Sure thing, I will incorporate in V2 your suggestion, thanks !
+Make use of DT match data to identify the MAC variant, rather than
+looking at the compatible string all the time.
+
+Make use of devm_ calls to simplify cleanup. This indirectly fixes
+inconsistent goto label names.
+
+Always probe the MDIO bus, when it exists. This simplifies the logic a
+bit.
+
+Move code into helpers to simply probe.
+
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+---
+Changes in v4:
+- [08/15] Add err lable to ncsi_unregister_dev() or
+  fixed_phy_unregister() when getting any fail in ftgmac100_probe_ncsi()
+- Link to v3: https://lore.kernel.org/r/20260202-ftgmac-cleanup-v3-0-6a6a8d45280a@aspeedtech.com
+
+Changes in v3:
+- [06/15] Add check for devm_clk_get_optional_enabled().
+- [09/15] Directly return status from ftgmac100_setup_mdio(). That is
+  [13/15] patch behavior, so delete [13/15].
+- [09/15] Adjust err lable.
+- Add a new patch to make use of devm_ methods for mdiobus to simplify
+  cleanup.
+- Link to v2: https://lore.kernel.org/r/20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com
+
+Changes in v2:
+- Add net-next prefix.
+- [08/15] Updated commit message.
+- [04/15] Deleted {}.
+- Link to v1: https://lore.kernel.org/r/20260105-ftgmac-cleanup-v1-0-b68e4a3d8fbe@aspeedtech.com
+
+---
+Andrew Lunn (14):
+      net: ftgmac100: List all compatibles
+      net: ftgmac100: Add match data containing MAC ID
+      net: ftgmac100: Replace all of_device_is_compatible()
+      net: ftgmac100: Use devm_alloc_etherdev()
+      net: ftgmac100: Use devm_request_memory_region/devm_ioremap
+      net: ftgmac100: Use devm_clk_get_enabled
+      net: ftgmac100: Simplify error handling for ftgmac100_initial_mac
+      net: ftgmac100: Move NCSI probe code into a helper
+      net: ftgmac100: Always register the MDIO bus when it exists
+      net: ftgmac100: Simplify legacy MDIO setup
+      net: ftgmac100: Move DT probe into a helper
+      net: ftgmac100: Remove redundant PHY_POLL
+      net: ftgmac100: Simplify condition on HW arbitration
+      net: ftgmac100: Fix wrong netif_napi_del in release
+
+Jacky Chou (1):
+      net: ftgmac100: Use devm_mdiobus_alloc/devm_of_mdiobus_register
+
+ drivers/net/ethernet/faraday/ftgmac100.c | 350 +++++++++++++++++--------------
+ 1 file changed, 188 insertions(+), 162 deletions(-)
+---
+base-commit: a22f57757f7e88c890499265c383ecb32900b645
+change-id: 20251208-ftgmac-cleanup-20b223bf4681
+
+Best regards,
+-- 
+Jacky Chou <jacky_chou@aspeedtech.com>
+
 
