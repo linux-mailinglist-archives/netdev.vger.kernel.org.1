@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-256876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qLskNrTUg2kHuwMAu9opvQ
-	(envelope-from <netdev+bounces-256876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 00:22:28 +0100
+	id eMtNKNHUg2kHuwMAu9opvQ
+	(envelope-from <netdev+bounces-256879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 00:22:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16784ED36F
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 00:22:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB93ED393
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 00:22:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5757C3002F64
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 23:22:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 36A60301D32A
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 23:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0724E39A800;
-	Wed,  4 Feb 2026 23:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EB139E6ED;
+	Wed,  4 Feb 2026 23:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="oc7177yj";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="sZThBjE8"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ON7XMawZ";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="vly9i8DZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6D039A7F3;
-	Wed,  4 Feb 2026 23:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E86539E6CA;
+	Wed,  4 Feb 2026 23:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770247343; cv=none; b=hzzL6VizcN71bCpaVeeLzVW/TMDQehyFPuSlSBBBZNHN/3f9nfHAhWApdt2NFBu/JjOF0sQMmV6ndkZ+NzoF5YBzhbqPlww+PwaR5LmEn5HHwdBvI8RiEjyzZwhI3Daygh/jWmlaN9eanPAs7gH8km5I7HHNHSpMcBLSrFgW1pY=
+	t=1770247354; cv=none; b=UzCos13JB1NBxMuRTx6Id4OtXbTjSarXNxeH2ulKyLPc6hAfaMq/MuMIiiOazy8gAkDEX1/oD52smkTlG94U50MVncuvn2PcFWdH+9Jnp8lH9uJf7KtqOYkQ6NgsgkqBVopdxrXcPuE8T5OeLAY7fBKfw+rUfdJ9M34O0IdZBXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770247343; c=relaxed/simple;
-	bh=3IIW+m/ksEl4ryoxqU9MOS9jyZf9bHkRhbs1FBUg/Rc=;
+	s=arc-20240116; t=1770247354; c=relaxed/simple;
+	bh=H0PrKqrX6wEMzjoRa4StlagFpRMAhjAg5XCzNFVEDSU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IHMJ1wL6+sVubzPvjDhbKqvR9nvk+nCA417orpPSqqEJnOkFvIHwb0OwbeuTMPbaVftP90m+R1zhcFwKAQZbgiwpHK4CL1VoCqENBa/NA6c35XTO3PqAvQ924qMpFEV2Gsnn7xfghxoXsVDNnLTkK891j0PBDamvQKXQ7dmHnUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=oc7177yj; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=sZThBjE8; arc=none smtp.client-ip=80.241.56.171
+	 MIME-Version; b=D+SzSqh3wJg4lRqdvTIN7eGJ99idKenOwZt/RP7gYkDcT5QBivwZwSGithXOlIj4J8oJIsVuJXlTm0gUkO105/KETCIJ1mY25iWc+XdaU3n0usn2hT2l6yyEgTSdxWZjTMG4v4kgf6PzKx2E8sP46ZXVO2TyeuliMQFNCzGoHHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ON7XMawZ; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=vly9i8DZ; arc=none smtp.client-ip=80.241.56.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4f5xG562LFz9th0;
-	Thu,  5 Feb 2026 00:22:21 +0100 (CET)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4f5xGB0MHwz9tPW;
+	Thu,  5 Feb 2026 00:22:26 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1770247341;
+	t=1770247346;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=itW1FyUB8h6k7+09zTJ1SECAQLv4YsVGdyRI0o2fSoA=;
-	b=oc7177yjXASVeTD9Oc0yM5wV5CuuqSNJ3rGDb9uZtslqhvUGYNGkhWEcUTtvz1v7HQ8tqG
-	ts1IWUiHwJd0waRhlCDHS6e8Wr4rvjcmpT5y5RLiyQBHmM+KloRrWA5eUFkwqvoxqKYw3G
-	ijrOH4UHWOECrTk13MsFJlGsvwxgA3xpGTtpf5u8uhj8x5TFYbqpkDwy3+vTj+814DVRG9
-	o+WGZOUYE9ioYxrtmhlFT7qFkZ+pKJ0f5D7yTgjzjn2+fD6Y6CDji7AFM8YRrG1uEfDgi9
-	RfI87+nsepFzy14G5PV7fgJLw5CbQyBpZmcrzbcbufdHVSkbulKJOCkdEhUu+A==
+	bh=+BMs23o+nrKKl0bwOGhCa3GJfpZWdrRD2GN5eAqbbXw=;
+	b=ON7XMawZLJcTn/vaniK8ApOIxH3FtkLW2m7WlsBwiKrIX6vz5i0hHgTKrnvu67yLgXsmdY
+	SPkn72GtGVoAvA8P8gvudlBzaYRPZsZWahDzXSDITNiK/Bp8OynXmw3GfaJCFCfG2Lttlw
+	iP+SEWUxyoYnFWH3eQubD6PDiKWc33O88q0iPEEsWuYtrGLiRXAJGO+Z+txKflkbeh/Qo9
+	CpD2jc0z7R/9u/XOca4KcKxwLtNJqeo/vWWyeAG4F1WpGmTV/NjynMIorwHv7e/IgHElPl
+	Cc7FH21PBFnNgHU0FSJs9TNndImSQIGH4SxES7E7dNa+3goci9DdZpFk1U/F9g==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=vly9i8DZ;
+	spf=pass (outgoing_mbo_mout: domain of lukasz.majewski@mailbox.org designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=lukasz.majewski@mailbox.org
 From: Lukasz Majewski <lukasz.majewski@mailbox.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1770247340;
+	t=1770247344;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=itW1FyUB8h6k7+09zTJ1SECAQLv4YsVGdyRI0o2fSoA=;
-	b=sZThBjE8PmY2vTjErp4lZL+1nztc2Ajd2OQFdisIOA5cH5N6ZCJGsk8qiZSrl5mv8NgoxJ
-	zYDShct98BiV+bLc3QcWmXZzzIaDpP7egomkPeLRHfAE5IIBNFn4MtmE3olF4jSO+aGzz4
-	4teSKn4YHbajhglStLPuI/ihxUtpuONqTslF5hgWpNxU/lq/lhFkxRojCVZ3JqUu/B5UPl
-	nvkB5C22/GQAKgJ9tOK67+XpDSrhet4qMZ2eLX3KKRvrCBqC503RQDQzvDwjgDhLvcY29X
-	NkxoQf/BxH0TvKq1FPiK/Cdyn9sHJrHBvKSjSm5cJxy2vcu18VnFHa6HZnya5A==
+	bh=+BMs23o+nrKKl0bwOGhCa3GJfpZWdrRD2GN5eAqbbXw=;
+	b=vly9i8DZUAy1GAII305DzDEY1NBbZGBJiuFBt/k+8wvtJUREy+ACSk4ToX603vPkY+nl/F
+	BN0K7hFsnapxM1kk4zFUwZBohtjHzvrvcnICFxvvK+060DXbyZZZ8JIPf8c4u9qh56jN2i
+	VfjrcQ0+/jyv45+zd2+vCqfZkNTuAs+4fPd5qU/I6XB+cROSep2Cg9Zhm5qC+0qCX6kW4V
+	smXdvjKwOcQt+gjVi6qitOt1jrKAIkDoGuySyPI5IKDDjiQ7L6xuykfz+8ou5X7ecKMF98
+	EMtCxPKi0jUEpuHxHupU3FFGxls9wFvbDR+DJPet+4V/XxNEaT/rPJZIoF8RNw==
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
@@ -87,9 +90,9 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	Stefan Wahren <wahrenst@gmx.net>,
 	Simon Horman <horms@kernel.org>,
 	Lukasz Majewski <lukasz.majewski@mailbox.org>
-Subject: [net-next v23 3/7] net: mtip: Add buffers management functions to the L2 switch driver
-Date: Thu,  5 Feb 2026 00:21:31 +0100
-Message-Id: <20260204232135.1024665-4-lukasz.majewski@mailbox.org>
+Subject: [net-next v23 4/7] net: mtip: Add net_device_ops functions to the L2 switch driver
+Date: Thu,  5 Feb 2026 00:21:32 +0100
+Message-Id: <20260204232135.1024665-5-lukasz.majewski@mailbox.org>
 In-Reply-To: <20260204232135.1024665-1-lukasz.majewski@mailbox.org>
 References: <20260204232135.1024665-1-lukasz.majewski@mailbox.org>
 Precedence: bulk
@@ -99,8 +102,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: xixtm75scsgmxyz1rebngd9tkshe7d6t
-X-MBO-RS-ID: 1323bb323bcf88f108b
+X-MBO-RS-ID: b92ff179665043daafb
+X-MBO-RS-META: 8hp6t61kbs3cmxrfdthiodm33gpjmz1g
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -109,14 +112,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net,kernel.org,mailbox.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-256876-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256879-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -127,143 +130,408 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[mailbox.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mailbox.org:email,mailbox.org:dkim,mailbox.org:mid]
-X-Rspamd-Queue-Id: 16784ED36F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:email,mailbox.org:dkim,mailbox.org:mid]
+X-Rspamd-Queue-Id: 5EB93ED393
 X-Rspamd-Action: no action
 
-This patch provides buffers management funcions' content for MTIP
+This patch provides callbacks for struct net_device_ops for MTIP
 L2 switch.
 
 Signed-off-by: Lukasz Majewski <lukasz.majewski@mailbox.org>
----
-Changes for v14:
-- New patch - created by excluding some code from large (i.e. v13
-  and earlier) MTIP driver
 
-Changes for v15 - v20:
+---
+Changes for v13:
+- New patch - created by excluding some code from large (i.e. v12 and
+  earlier) MTIP driver
+
+Changes for v14:
+- Add read memory barier (rmb) before reading current descriptor
+- Use proper locking primitives
+
+Changes for v15 - v15:
 - None
 
-Changes for v21:
-- Add check if fep->page[i] is not NULL before returning it to page pool
+Changes for v16:
+- Enable MTIP ports to support bridge offloading
+- Use dev_err_ratelimited() instead of plain dev_err()
+- Move skb storage and tx ring buffer modifications after
+  dma mapping code.
+- Do not increase tx_errors when frames are dropped after
+  failed dma_mapping.
+- Refactor the code for better readability
+- Remove legacy call to netif_trans_update()
+- Remove not needed rmb() - synchronized data read already assured by
+  coherent DMA allocation
+- Replace spin_{un}lock() with _bh variant
 
-Changes for v22:
-- Add fep->tx_bounce[i] = NULL; in the mtip_free_buffers
+Changes for v17:
+- Add missing _bh() variant of spin_unlock
+- Avoid reverse christmas tree in swap_buffer()
+- Print error message after unlock
+- Add DO_ONCE() and a separate function to print state of switch HW
+- Remove dev->stats.tx_errors++
+
+Changes for v18 - v19:
+- None
+
+Changes for v20:
+- Perform data swap on SKB data only when it is copied to a separate
+  buffer.
+- Clean up the comment
+- Stop both network interfaces' TX queues when no resources for
+  transmission available (uDMA0 descriptors)
+- Do not use fep->skb_cur and fep->tx_full
+
+Changes for v21 - v22:
+- None
 
 Changes for v23:
-- None
+- Move cancel_work_sync(&priv->tx_timeout_work); to where it is handled
+- Remove dev->stats.tx_errors++; as errors are already noted in net stack
 ---
- .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 90 +++++++++++++++++++
- 1 file changed, 90 insertions(+)
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 284 ++++++++++++++++++
+ 1 file changed, 284 insertions(+)
 
 diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-index 0a193a12e160..d209501a99b0 100644
+index d209501a99b0..4c64681602d6 100644
 --- a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
 +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-@@ -893,11 +893,101 @@ static void mtip_get_drvinfo(struct net_device *dev,
+@@ -43,6 +43,15 @@
  
- static void mtip_free_buffers(struct net_device *dev)
- {
-+	struct mtip_ndev_priv *priv = netdev_priv(dev);
-+	struct switch_enet_private *fep = priv->fep;
+ #include "mtipl2sw.h"
+ 
++static void swap_buffer(void *bufaddr, int len)
++{
++	unsigned int *buf = bufaddr;
 +	int i;
 +
-+	for (i = 0; i < RX_RING_SIZE; i++) {
-+		if (!fep->page[i])
-+			continue;
-+
-+		page_pool_put_full_page(fep->page_pool,
-+					fep->page[i], false);
-+		fep->page[i] = NULL;
-+	}
-+
-+	page_pool_destroy(fep->page_pool);
-+	fep->page_pool = NULL;
-+
-+	for (i = 0; i < TX_RING_SIZE; i++) {
-+		kfree(fep->tx_bounce[i]);
-+		fep->tx_bounce[i] = NULL;
-+	}
++	for (i = 0; i < len; i += 4, buf++)
++		swab32s(buf);
 +}
 +
-+static int mtip_create_page_pool(struct switch_enet_private *fep, int size)
-+{
-+	struct page_pool_params pp_params = {
-+		.order = 0,
-+		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-+		.pool_size = size,
-+		.nid = dev_to_node(&fep->pdev->dev),
-+		.dev = &fep->pdev->dev,
-+		.dma_dir = DMA_FROM_DEVICE,
-+		.offset = 0,
-+		.max_len = MTIP_SWITCH_RX_FRSIZE,
-+	};
-+	int ret = 0;
-+
-+	fep->page_pool = page_pool_create(&pp_params);
-+	if (IS_ERR(fep->page_pool)) {
-+		ret = PTR_ERR(fep->page_pool);
-+		fep->page_pool = NULL;
-+	}
-+
-+	return ret;
+ /* Set the last buffer to wrap */
+ static void mtip_set_last_buf_to_wrap(struct cbd_t *bdp)
+ {
+@@ -463,6 +472,120 @@ static void mtip_config_switch(struct switch_enet_private *fep)
+ 	       fep->hwp + ESW_IMR);
  }
  
- static int mtip_alloc_buffers(struct net_device *dev)
++static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
++					struct net_device *dev, int port)
++{
++	struct mtip_ndev_priv *priv = netdev_priv(dev);
++	struct switch_enet_private *fep = priv->fep;
++	unsigned short status;
++	unsigned int index;
++	struct cbd_t *bdp;
++	void *bufaddr;
++
++	spin_lock_bh(&fep->hw_lock);
++
++	if (!fep->link[0] && !fep->link[1]) {
++		/* Link is down or autonegotiation is in progress. */
++		mtip_netif_stop_queues(fep);
++		spin_unlock_bh(&fep->hw_lock);
++		return NETDEV_TX_BUSY;
++	}
++
++	/* Fill in a Tx ring entry */
++	bdp = fep->cur_tx;
++	status = bdp->cbd_sc;
++
++	if (status & BD_ENET_TX_READY) {
++		/* All transmit buffers are full. Bail out. */
++		mtip_netif_stop_queues(fep);
++		spin_unlock_bh(&fep->hw_lock);
++		dev_err_ratelimited(&fep->pdev->dev, "%s: tx queue full!.\n",
++				    dev->name);
++		return NETDEV_TX_BUSY;
++	}
++
++	/* Clear all of the status flags */
++	status &= ~BD_ENET_TX_STATS;
++
++	/* Set buffer length and buffer pointer */
++	bufaddr = skb->data;
++	bdp->cbd_datlen = skb->len;
++
++	index = bdp - fep->tx_bd_base;
++	/* On some FEC implementations data must be aligned on
++	 * 4-byte boundaries. Use bounce buffers to copy data
++	 * and get it aligned.
++	 */
++	if ((unsigned long)bufaddr & MTIP_ALIGNMENT ||
++	    fep->quirks & FEC_QUIRK_SWAP_FRAME) {
++		memcpy(fep->tx_bounce[index], skb->data, skb->len);
++		bufaddr = fep->tx_bounce[index];
++
++		if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
++			swap_buffer(bufaddr, skb->len);
++	}
++
++	/* Push the data cache so the CPM does not get stale memory
++	 * data.
++	 */
++	bdp->cbd_bufaddr = dma_map_single(&fep->pdev->dev, bufaddr,
++					  MTIP_SWITCH_TX_FRSIZE,
++					  DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(&fep->pdev->dev, bdp->cbd_bufaddr))) {
++		dev_err(&fep->pdev->dev,
++			"Failed to map descriptor tx buffer\n");
++		dev->stats.tx_dropped++;
++		dev_kfree_skb_any(skb);
++		goto err;
++	}
++
++	/* Save skb pointer. */
++	fep->tx_skbuff[index] = skb;
++
++	/* Send it on its way.  Tell FEC it's ready, interrupt when done,
++	 * it's the last BD of the frame, and to put the CRC on the end.
++	 */
++
++	status |= (BD_ENET_TX_READY | BD_ENET_TX_INTR | BD_ENET_TX_LAST |
++		   BD_ENET_TX_TC);
++
++	/* Synchronize all descriptor writes */
++	wmb();
++	bdp->cbd_sc = status;
++
++	skb_tx_timestamp(skb);
++
++	dev->stats.tx_bytes += skb->len;
++	/* If this was the last BD in the ring,
++	 * start at the beginning again.
++	 */
++	if (status & BD_ENET_TX_WRAP)
++		bdp = fep->tx_bd_base;
++	else
++		bdp++;
++
++	fep->cur_tx = bdp;
++	/* When TX descriptors' ring buffer is full stop both interfaces */
++	if (fep->cur_tx == fep->dirty_tx)
++		mtip_netif_stop_queues(fep);
++
++	/* Trigger transmission start */
++	writel(MCF_ESW_TDAR_X_DES_ACTIVE, fep->hwp + ESW_TDAR);
++
++ err:
++	spin_unlock_bh(&fep->hw_lock);
++
++	return NETDEV_TX_OK;
++}
++
++static netdev_tx_t mtip_start_xmit(struct sk_buff *skb,
++				   struct net_device *dev)
++{
++	struct mtip_ndev_priv *priv = netdev_priv(dev);
++
++	return mtip_start_xmit_port(skb, dev, priv->portnum);
++}
++
+ static void mtip_configure_enet_mii(struct switch_enet_private *fep, int port)
  {
+ 	struct phy_device *phydev = fep->phy_dev[port - 1];
+@@ -618,6 +741,73 @@ static void mtip_switch_restart(struct net_device *dev, int duplex0,
+ 	mtip_config_switch(fep);
+ }
+ 
++static void mtip_print_hw_state(struct net_device *dev)
++{
 +	struct mtip_ndev_priv *priv = netdev_priv(dev);
 +	struct switch_enet_private *fep = priv->fep;
 +	struct cbd_t *bdp;
-+	struct page *page;
-+	int i, ret;
++	bool tx_full;
++	int i;
 +
-+	ret = mtip_create_page_pool(fep, RX_RING_SIZE);
-+	if (ret < 0) {
-+		dev_err(&fep->pdev->dev, "Failed to create page pool\n");
-+		return ret;
++	spin_lock_bh(&fep->hw_lock);
++	tx_full = fep->dirty_tx == fep->cur_tx &&
++		mtip_netif_queues_stopped(fep);
++
++	dev_info(&dev->dev, "%s: transmit timed out.\n", dev->name);
++	dev_info(&dev->dev,
++		 "Ring data: cur_tx 0x%p%s, dirty_tx 0x%p cur_rx: 0x%p\n",
++		 fep->cur_tx, tx_full ? " (full)" : "", fep->dirty_tx,
++		 fep->cur_rx);
++
++	bdp = fep->tx_bd_base;
++	dev_info(&dev->dev, " tx: %u buffers\n", TX_RING_SIZE);
++	for (i = 0; i < TX_RING_SIZE; i++) {
++		dev_info(&dev->dev, "  0x%p: %04x %04x %08x\n",
++			 bdp, bdp->cbd_sc, bdp->cbd_datlen,
++			 (int)bdp->cbd_bufaddr);
++		bdp++;
 +	}
 +
 +	bdp = fep->rx_bd_base;
-+	for (i = 0; i < RX_RING_SIZE; i++) {
-+		page = page_pool_dev_alloc_pages(fep->page_pool);
-+		if (!page) {
-+			dev_err(&fep->pdev->dev,
-+				"Failed to allocate page for rx buffer\n");
-+			goto err;
-+		}
-+
-+		bdp->cbd_bufaddr = page_pool_get_dma_addr(page);
-+		fep->page[i] = page;
-+
-+		bdp->cbd_sc = BD_ENET_RX_EMPTY;
++	dev_info(&dev->dev, " rx: %lu buffers\n", RX_RING_SIZE);
++	for (i = 0 ; i < RX_RING_SIZE; i++) {
++		dev_info(&dev->dev, "  0x%p: %04x %04x %08x\n",
++			 bdp, bdp->cbd_sc, bdp->cbd_datlen,
++			 (int)bdp->cbd_bufaddr);
 +		bdp++;
 +	}
++	spin_unlock_bh(&fep->hw_lock);
++}
 +
-+	mtip_set_last_buf_to_wrap(bdp);
++static void mtip_timeout(struct net_device *dev, unsigned int txqueue)
++{
++	struct mtip_ndev_priv *priv = netdev_priv(dev);
 +
-+	bdp = fep->tx_bd_base;
-+	for (i = 0; i < TX_RING_SIZE; i++) {
-+		fep->tx_bounce[i] = kmalloc(MTIP_SWITCH_TX_FRSIZE, GFP_KERNEL);
-+		if (!fep->tx_bounce[i])
-+			goto err;
++	DO_ONCE(mtip_print_hw_state, dev);
 +
-+		bdp->cbd_sc = 0;
-+		bdp->cbd_bufaddr = 0;
-+		bdp++;
++	schedule_work(&priv->tx_timeout_work);
++}
++
++static void mtip_timeout_work(struct work_struct *work)
++{
++	struct mtip_ndev_priv *priv =
++		container_of(work, struct mtip_ndev_priv, tx_timeout_work);
++	struct switch_enet_private *fep = priv->fep;
++	struct net_device *dev = priv->dev;
++
++	rtnl_lock();
++	if (netif_device_present(dev) || netif_running(dev)) {
++		napi_disable(&fep->napi);
++		netif_tx_lock_bh(dev);
++		mtip_switch_restart(dev, fep->full_duplex[0],
++				    fep->full_duplex[1]);
++		netif_tx_wake_all_queues(dev);
++		netif_tx_unlock_bh(dev);
++		napi_enable(&fep->napi);
 +	}
++	rtnl_unlock();
++}
 +
-+	mtip_set_last_buf_to_wrap(bdp);
-+
+ static irqreturn_t mtip_interrupt(int irq, void *ptr_fep)
+ {
+ 	struct switch_enet_private *fep = ptr_fep;
+@@ -1096,6 +1286,92 @@ static int mtip_close(struct net_device *dev)
  	return 0;
-+
-+ err:
-+	mtip_free_buffers(dev);
-+	return -ENOMEM;
  }
  
- static int mtip_rx_napi(struct napi_struct *napi, int budget)
++#define FEC_HASH_BITS	6		/* #bits in hash */
++static void mtip_set_multicast_list(struct net_device *dev)
++{
++	struct mtip_ndev_priv *priv = netdev_priv(dev);
++	unsigned int hash_high = 0, hash_low = 0, crc;
++	struct switch_enet_private *fep = priv->fep;
++	void __iomem *enet_addr = fep->enet_addr;
++	struct netdev_hw_addr *ha;
++	unsigned char hash;
++
++	if (priv->portnum == 2)
++		enet_addr += MCF_ESW_ENET_PORT_OFFSET;
++
++	if (dev->flags & IFF_PROMISC) {
++		/* Promisc mode is required for switch - it is
++		 * already enabled during driver's probe.
++		 */
++		dev_dbg(&dev->dev, "%s: IFF_PROMISC\n", __func__);
++		return;
++	}
++
++	if (dev->flags & IFF_ALLMULTI) {
++		dev_dbg(&dev->dev, "%s: IFF_ALLMULTI\n", __func__);
++
++		/* Allow all multicast addresses */
++		writel(0xFFFFFFFF, enet_addr + MCF_FEC_GRP_HASH_TABLE_HIGH);
++		writel(0xFFFFFFFF, enet_addr + MCF_FEC_GRP_HASH_TABLE_LOW);
++
++		return;
++	}
++
++	netdev_for_each_mc_addr(ha, dev) {
++		/* Calculate crc32 value of mac address */
++		crc = ether_crc_le(dev->addr_len, ha->addr);
++
++		/* Only upper 6 bits (FEC_HASH_BITS) are used
++		 * which point to specific bit in the hash registers
++		 */
++		hash = (crc >> (32 - FEC_HASH_BITS)) & 0x3F;
++
++		if (hash > 31)
++			hash_high |= 1 << (hash - 32);
++		else
++			hash_low |= 1 << hash;
++	}
++
++	writel(hash_high, enet_addr + MCF_FEC_GRP_HASH_TABLE_HIGH);
++	writel(hash_low, enet_addr + MCF_FEC_GRP_HASH_TABLE_LOW);
++}
++
++static int mtip_set_mac_address(struct net_device *dev, void *p)
++{
++	struct mtip_ndev_priv *priv = netdev_priv(dev);
++	struct switch_enet_private *fep = priv->fep;
++	void __iomem *enet_addr = fep->enet_addr;
++	struct sockaddr *addr = p;
++
++	if (!is_valid_ether_addr(addr->sa_data))
++		return -EADDRNOTAVAIL;
++	eth_hw_addr_set(dev, addr->sa_data);
++
++	if (priv->portnum == 2)
++		enet_addr += MCF_ESW_ENET_PORT_OFFSET;
++
++	writel(dev->dev_addr[3] | (dev->dev_addr[2] << 8) |
++	       (dev->dev_addr[1] << 16) | (dev->dev_addr[0] << 24),
++	       enet_addr + MCF_FEC_PALR);
++	writel((dev->dev_addr[5] << 16) | (dev->dev_addr[4] << 24),
++	       enet_addr + MCF_FEC_PAUR);
++
++	return mtip_update_atable_static((unsigned char *)dev->dev_addr,
++					 7, 7, fep);
++}
++
++static int mtip_get_port_parent_id(struct net_device *ndev,
++				   struct netdev_phys_item_id *ppid)
++{
++	struct mtip_ndev_priv *priv = netdev_priv(ndev);
++	struct switch_enet_private *fep = priv->fep;
++
++	ppid->id_len = sizeof(fep->mac[0]);
++	memcpy(&ppid->id, &fep->mac[0], ppid->id_len);
++
++	return 0;
++}
++
+ static const struct ethtool_ops mtip_ethtool_ops = {
+ 	.get_link_ksettings     = phy_ethtool_get_link_ksettings,
+ 	.set_link_ksettings     = phy_ethtool_set_link_ksettings,
+@@ -1107,6 +1383,11 @@ static const struct ethtool_ops mtip_ethtool_ops = {
+ static const struct net_device_ops mtip_netdev_ops = {
+ 	.ndo_open		= mtip_open,
+ 	.ndo_stop		= mtip_close,
++	.ndo_start_xmit	= mtip_start_xmit,
++	.ndo_set_rx_mode	= mtip_set_multicast_list,
++	.ndo_tx_timeout	= mtip_timeout,
++	.ndo_set_mac_address	= mtip_set_mac_address,
++	.ndo_get_port_parent_id	= mtip_get_port_parent_id,
+ };
+ 
+ bool mtip_is_switch_netdev_port(const struct net_device *ndev)
+@@ -1165,6 +1446,7 @@ static void mtip_ndev_cleanup(struct switch_enet_private *fep)
+ 	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
+ 		if (fep->ndev[i]) {
+ 			priv = netdev_priv(fep->ndev[i]);
++			cancel_work_sync(&priv->tx_timeout_work);
+ 
+ 			unregister_netdev(fep->ndev[i]);
+ 			free_netdev(fep->ndev[i]);
+@@ -1210,6 +1492,8 @@ static int mtip_ndev_init(struct switch_enet_private *fep,
+ 			goto cleanup_created_ndev;
+ 		}
+ 
++		INIT_WORK(&priv->tx_timeout_work, mtip_timeout_work);
++
+ 		dev_dbg(&fep->ndev[i]->dev, "%s: MTIP eth L2 switch %pM\n",
+ 			fep->ndev[i]->name, fep->ndev[i]->dev_addr);
+ 	}
 -- 
 2.39.5
 
