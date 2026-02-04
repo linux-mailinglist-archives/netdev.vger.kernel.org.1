@@ -1,129 +1,146 @@
-Return-Path: <netdev+bounces-256711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oBVGCQtPg2lrlAMAu9opvQ
-	(envelope-from <netdev+bounces-256711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 14:52:11 +0100
+	id gETTMLJRg2mJlQMAu9opvQ
+	(envelope-from <netdev+bounces-256712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 15:03:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34321E6ACB
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 14:52:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED031E6CCD
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 15:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B12AB300533B
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 13:52:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 22E24302AE0F
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 13:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3AA407576;
-	Wed,  4 Feb 2026 13:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Cnq1KaNE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818BE40B6EE;
+	Wed,  4 Feb 2026 13:57:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52E53A0E8C;
-	Wed,  4 Feb 2026 13:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EA223EAB0
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 13:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770213122; cv=none; b=ua4GneV7sNhhcyVkPRRfqq54WI6hxoJywVuUvRgvzrjPZzzVX7kULBoe86bTFiLgz4I8qHFZiyIr3M1Iqleb+sEFkD3lHGgbJ05vjEDfO3MevdUiG1BlwaRUeoDgxIJHnpdY224Hd9MakhIYio1hQeOE72VfzFFvn3hxFbaiSok=
+	t=1770213453; cv=none; b=ARfO+dwsdyzgqmE6ABmDnRtvzDf0scnc8+m1Mw8cBBIkIfiFR9y+8Dc/h7gv1WCUyDEWwcJSWoA/7wFpBr/9XW5G8Qn+XBLivQc9X1b8SCcoVqegqrevg5wd9nu9n5SW8bnZMGg7GAM6ngvAtpxxEGkx63fJSgpfcjva3EUpg3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770213122; c=relaxed/simple;
-	bh=AsQa8W6KnKJ7vVh4W36ji+1sTPnT2pkn89GFbzErC2o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aOHicCokLe1X7q389h6PPdQ9kJqi6oxb65JmdrVWUcXhCjUEWc4TryqspUj7bLU1Gf2clJEZHplcRNmVOSGVKo79p5VztKtPXAwKotOZuhvw20n9d3m4U7CiUvjj+cDJkU6K+BT7uihihDmxwhnALyULAQlUQ5Bp6tV3UYGzJIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Cnq1KaNE; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=AsQa8W6KnKJ7vVh4W36ji+1sTPnT2pkn89GFbzErC2o=;
-	t=1770213122; x=1771422722; b=Cnq1KaNEv9DG6pjQw9+/F4NStAE2iOPkSZWL8jLWwnu5xdz
-	n/+kOnIGJaQ5ld8zrQ42woDOs2Uf5sx3GXF9SOvrwfJxcpD4Y4Tn922sSZh4ivbq0zBp1BZ7iqKIr
-	DNinJCpvF6xZGeqaugkkaSBWBLLbWrqhA7MjS0om7pRGoZ8JvQfJLsvc+T79i8XzEYPqO/HrDwvmx
-	1NH96rDca5AK5TpoMXqjrRmiREyOD2hxacADWRSnu7x0rHD3RnMPXX2MQNuPeE1fUXBA6jDWUDKbA
-	46Dgg+zP5/xyyaz2qrt6a9cETVVRkIpIYjNH1tsCqo1Tp5J6j5LUsArHUg78R8Sg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vndIR-0000000EPxD-1SEs;
-	Wed, 04 Feb 2026 14:51:55 +0100
-Message-ID: <f3ef31b332a5f28a20054d5e55e6024421f14dd1.camel@sipsolutions.net>
-Subject: Re: PCI ID conflict between ipw2x00 and i40e
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel	
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Stanislav
- Yakovlev <stas.yakovlev@gmail.com>
-Date: Wed, 04 Feb 2026 14:51:54 +0100
-In-Reply-To: <CADkSEUhXO-01yaNUawo58MQ=xOC5bCDHWCFrCwe6TX2D+WVR=w@mail.gmail.com>
-References: 
-	<CADkSEUhXO-01yaNUawo58MQ=xOC5bCDHWCFrCwe6TX2D+WVR=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1770213453; c=relaxed/simple;
+	bh=1NY8xj1oVBOa9QdXJ3gXRwK8an5wtbxELhV+G98rDA8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZAAEvDF9MutU0lkzoSDSZl6P/GcSnA+dEjzMHtItuOToXaQY4t/I5iLkiIKdAxhTYh2HQvxsFstscmdfxevnALnZj8ZyPt60tnps1fz9bZ+lAgVdhU2kfd/Qg7SkFhycAxy5Q21Ntmf1GbMMR7LJMnXE2EY3TrPFIgUOTISVfVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 614DvVf5022147;
+	Wed, 4 Feb 2026 22:57:31 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 614DvUCt022144
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 4 Feb 2026 22:57:30 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <7ef21dab-3805-4eae-80d7-9779aeff3f58@I-love.SAKURA.ne.jp>
+Date: Wed, 4 Feb 2026 22:57:30 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp>
+ <CAHC9VhQikhv+qCyQdnJguvy-qTkGXB+NU7=QZjw5d+WfyVxZhw@mail.gmail.com>
+ <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
+ <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
+ <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
+ <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com>
+ <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
+ <CAHC9VhQPKU5DqG-ryZsiCV2vZeGGf_a-JStR_LVVCCn03C4usQ@mail.gmail.com>
+ <f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp>
+ <CAHC9VhRzRAR+hhn4TFADnHWpzjOxjmh0S_Hg_HktkPkKQ35ycg@mail.gmail.com>
+ <74a70504-8ff8-4d97-b35f-774364779889@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <74a70504-8ff8-4d97-b35f-774364779889@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav205.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256711-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lists.osuosl.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-256712-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sipsolutions.net:mid,sipsolutions.net:dkim]
-X-Rspamd-Queue-Id: 34321E6ACB
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ED031E6CCD
 X-Rspamd-Action: no action
 
-On Wed, 2026-02-04 at 02:15 -0800, Ethan Nelson-Moore wrote:
-> I have written a script to find device IDs that are claimed by
-> multiple drivers in the kernel. It has found that the PCI ID 8086:104f
-> is supported by both drivers/net/wireless/intel/ipw2x00 and
-> drivers/net/ethernet/intel/i40e. I assume the i40e one is correct,
-> since that's what the ID is assigned to in the pci.ids database. Can
-> anyone at Intel confirm this?
+On 2026/02/04 19:15, Tetsuo Handa wrote:
+> On 2026/02/04 7:40, Paul Moore wrote:
+>>         This is not an unusual request for such a proposed change, and
+>> is something that I would expect a LSM maintainer to do without much
+>> hesitation.  If you are unwilling to investigate this, can you explain
+>> why?
+> 
+> Because I'm not familiar with how XFRM works; I'm not a user of LSM XFRM hooks.
+> 
+> I can't judge whether the current code is COMPREHENSIVELY GATING;
+> I can't imagine what the state you call COMPREHENSIVELY GATING is.
 
-FWIW, I wouldn't be surprised if both are correct, and we just forgot
-about an almost 30 year (I think) old device ID assignment ... I'll try
-to figure out who even does these assignments etc., I don't know right
-now. Let's see if I can figure out anything for the ancient WiFi IDs,
-but I'm not very hopeful.
+Steffen Klassert worried that killing xfrm_dev_state_flush_secctx_check() and
+xfrm_dev_policy_flush_secctx_check() might violate a LSM policy and you agreed
+( https://lkml.kernel.org/r/CAHC9VhQ54LRD7k_x6tUju2kPVBEHcdgBh46_hBN8btG0vhfy_w@mail.gmail.com ),
+but the reality is that nobody in the world has enforced an LSM policy for almost 9 years
+that makes xfrm_dev_{state,policy}_flush() no-op. That is, xfrm_dev_state_flush_secctx_check()
+and xfrm_dev_policy_flush_secctx_check() had been effectively unused.
 
-If we knew the subdevice IDs we could perhaps match on that, or add some
-code to have ipw2x00 reject PCIe devices, and i40e reject PCI devices,
-or something like that ...
+Killing xfrm_dev_state_flush_secctx_check() and xfrm_dev_policy_flush_secctx_check()
+increases "system's stability" without sacrificing "authorization".
 
-johannes
+It is up to SELinux developers to discuss what actions to take as a compensation for
+killing xfrm_dev_state_flush_secctx_check() and xfrm_dev_policy_flush_secctx_check().
+The compensation might be to add LSM hooks to immediately before the point of no return.
+But I wonder why you want to authorize deleting resources which are going to be "deleted by
+cascade" due to deleting a dependent resource...
+
+> 
+> 
+> 
+> P.S. For your investigation, I attach a new report that syzbot found today, and
+> I'll drop "xfrm: always fail xfrm_dev_{state,policy}_flush_secctx_check()"
+> because these three reports will be sufficient for people to understand that
+> we need to kill xfrm_dev_{state,policy}_flush_secctx_check() calls.
+
 
