@@ -1,174 +1,183 @@
-Return-Path: <netdev+bounces-256593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EI7HF23wgmmWfQMAu9opvQ
-	(envelope-from <netdev+bounces-256593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:08:29 +0100
+	id OBsIO+rwgmmWfQMAu9opvQ
+	(envelope-from <netdev+bounces-256594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:10:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09830E288D
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:08:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D679E28AB
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 975AA303746E
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 07:08:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9CB72301E3FB
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 07:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE9838947C;
-	Wed,  4 Feb 2026 07:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADB435A943;
+	Wed,  4 Feb 2026 07:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1whEmtu"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="w25Q6ktj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E2A37F11F
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 07:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EF6261B96;
+	Wed,  4 Feb 2026 07:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770188897; cv=none; b=QaM/33v5BzJIinSdiKmMqhK7Xy/b/GshfiaOj+8AU2CBPq4Zb+X6mjmz1zffQLSkfC9w61Aa2hGY0iemnn2kLynzNLHrzHwNDV3fPvLCqHrUR8NFYBmMbvZ3CCyenU2OTdZY+AFtdrGgceeQSLCnbAqCjDVBCMnvPwCtEoDxpTI=
+	t=1770189031; cv=none; b=uCJpxD2t7CYRKv0mMhJBoBbBNa7fdsHokfTc70QDBBkJwH6HYnbWwCCLizpZHYHhccSoLAtAfZFKay+95FMopO39VwR1IourJ7BbTI9s1uwlL2pn7XQZuHgWc7PHKHNmZd++SmKeKel69vZ/kaNskGL6WBa2mpEFIyAACAiHw1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770188897; c=relaxed/simple;
-	bh=nZc2xi5zdfE0k9aodqhuuyxCv5YS9Ogmy++z4WwGvlA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZFIryj0VbMNUNd3xJSNwbGhp5RQNuPbZloma1JQuzw9A761Flb8oYClXC0U/42hhIxMS1X6d33gKLIvvayK/dZhvt5yDAy82rFDmpffIDG1lFty2CrUpRa4yTHECzUzZOK5tXzXYWUkJwJIh69wXK8brrS+K0kMPREBjZrIWUBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1whEmtu; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-432d28870ddso206054f8f.3
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 23:08:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770188895; x=1770793695; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kqnpITCCQiIQonzXq9ScSS11b9xv/CuzslKyMe7TLdE=;
-        b=e1whEmtun5UfQZIiU3dL0el4NLpHcA6q7nJ9jVU3drGNTu/II5icMGTQrmlseujkh8
-         /WpdCBKYX5A17RO+yOPUdPEUu+l9ho+fpYEyI3/eJZHCUPAoU+DRvpOYTy6lLU7BNFVI
-         ZYq1+hHv1LpC5s5fXpAGZK4pD+pWfgDR/ROL4rMjBY7W7V7AuoJW6cyL3dO00Qxy+A5q
-         gouWd3js2G56adcwcC1D6bwFESyzmX7F2mZ1xF1RRz+L0HRzCUQRxz+/oBx1uCZ5KRpn
-         c9G0hifSfNtNOOqTip7goKYOkvrsPoTK7Ipzngxg5G/I43webNNsljdrHS2ZTide7vTA
-         r1SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770188895; x=1770793695;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kqnpITCCQiIQonzXq9ScSS11b9xv/CuzslKyMe7TLdE=;
-        b=lnEuQmZO9ceNyrrI55qkIYD1+J051zoLQrikVD0op9qavksh11LwH3FxqDg/GkoNNq
-         plzUyhzKcLswsrOQrEBARiKWEu6BnnWZfjnLbXzd1Jp24YROs4/H6ZWacGpdo1iqVyWx
-         ggbJOY3Emp5eKx2f3iAl+0xPGlhIMYQPJi79jLwAbCOXTKmsNnqr1tLBvnZPiMya5E3b
-         TpzHdWHrodMUC3wA56+suf5J26NxYU4BWtkIGnqXudMncS+5l9OjH78T9xKgNj6/MiDw
-         THqdkKriBA3aoKTcBdWwKXzuudTFTWsV79O3AhX93xvAjimklZBHKEUoOe0kQ6CW5vaU
-         QzLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDDRyJKY5DJCDcQOUEaSYh3fCv6U9xG4ERelhWV2OT+aCkowDIb5uZK88gpPmcvPbT1dpMxPQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlG2rRhua2kwodRB88Y01A+JcMUo38HVai5XD2pnJNIQOwUAMt
-	SczEgJcxFOJhvPDOYbl2gWEt30a6XpIkJm5m9B3i7KIgJE0jNAjIqRRE
-X-Gm-Gg: AZuq6aL5w/9ssyvFrrVLEKh2G4jFQCNXa0Q+EmmqqwixmlO5VsNUsykFDm2Ejszdbtx
-	Ay2vzUNWIcEH7Oplk4jDfURy2XlOF7Il7R4K/0lg/zGyS9qEeo9/biQe63+F0JgsM6H8LXFRjRl
-	E3QVND6E5dHAn0Hl/cLqlm0BePufeEt2IdTor9EuAGz7QrP6LLvDHClv1Qhq1CrQlxX4AtFxvwJ
-	Pa3kMINj34NWBG3fUwwd0DyzqlZy9YiXiw07xxQ54BroCDMnbpploFIrvaxom5nbpCTU6PiPrNw
-	fD3AvCWth3cz0n99qNW81uayAKU3EFLCTmMN1o/gfc8f/k+zi5J8lIRfAigutmpjpv1FNvwqLku
-	5YYI9KBh705vturUjLvi5PmpdBoBlukSNAUoDzBa9vaN0Z+dtucd/YfL2714D5bzs9zcjQY9ZE7
-	DxMxFr5WH5NqeGR0H9zHhTj3VbZ3D6
-X-Received: by 2002:a05:6000:2888:b0:435:8d02:b9cd with SMTP id ffacd0b85a97d-43617e3d500mr2536235f8f.26.1770188894959;
-        Tue, 03 Feb 2026 23:08:14 -0800 (PST)
-Received: from [10.80.1.200] ([72.25.96.16])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617e38fbbsm4578360f8f.13.2026.02.03.23.08.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 23:08:14 -0800 (PST)
-Message-ID: <f3e5ef08-c073-4f96-b874-8fcf8c72af2a@gmail.com>
-Date: Wed, 4 Feb 2026 09:08:13 +0200
+	s=arc-20240116; t=1770189031; c=relaxed/simple;
+	bh=i4eVoECIVUB5i06EYRcLvDDUR0F0teIfziDI2VSoKaw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HLqsz/u8xppCIZpe5kPSZlNV8RRqFrC3m3A/bfSsv4PmBcAPF/FllWmlNhn4wgAixfiFGJCryzd0fF1UJBbizKtZyLlJ50DKeHJK4pegMVgs0z+j9JpvMaXIpo0khu5XtVdKdkQabSa6Th2FmkTU8DrjQqVrR0Po4PmH3MFNH0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=w25Q6ktj; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 61479tJfA2605405, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1770188996;
+	bh=i4eVoECIVUB5i06EYRcLvDDUR0F0teIfziDI2VSoKaw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=w25Q6ktjaUOQoBdfP7rMOuiex1eYfoEANOvyOcVnXz2xU5Jc6t4IyHHHmueeH66cV
+	 svCYKXGH646YehNj4i5EJb9BI+R31emK9BfX7zyV1pE6SK3/ENr0Dl2XibZv187ZqQ
+	 ysv+UxW8C/3nIEpfH/9SDYP66ZoCgBptO9v8hwdzYlmNM4cX+Gpvtx/u66La0kPMqc
+	 GewIRJ9AcQfG0SJGJb5s/I4luhBcjVHHmIhlCqt4PQtlQGnZcsPp8g3CzWgZcKyPwY
+	 D8SpDzg590fOczBsGCvN3OWUTQSyHopUmOPhgg4YabRty7IB8kSB37+hpjyc23nk+v
+	 Qm7q7aAfS3w9w==
+Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
+	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 61479tJfA2605405
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 4 Feb 2026 15:09:56 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.39; Wed, 4 Feb 2026 15:09:56 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
+ Transport; Wed, 4 Feb 2026 15:09:56 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <hkallweit1@gmail.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <javen_xu@realsil.com.cn>, <kuba@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <nic_swsd@realtek.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v3] r8169: add support for RTL8125cp
+Date: Wed, 4 Feb 2026 15:09:55 +0800
+Message-ID: <20260204070955.1473-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
+In-Reply-To: <81407a61-1e6a-436c-83f3-fc403a706af6@gmail.com>
+References: <81407a61-1e6a-436c-83f3-fc403a706af6@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/5] selftest: netdevsim: Add devlink port
- resource test
-To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>, Shay Drori <shayd@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>
-References: <20260203071033.1709445-1-tariqt@nvidia.com>
- <20260203071033.1709445-5-tariqt@nvidia.com>
- <ce09e17d-2b74-4bda-a8ec-352c92659a6e@redhat.com>
- <20260203182652.39a3620d@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260203182652.39a3620d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256593-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,google.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,nvidia.com,kernel.org,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-256594-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 09830E288D
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid]
+X-Rspamd-Queue-Id: 1D679E28AB
 X-Rspamd-Action: no action
 
-
-
-On 04/02/2026 4:26, Jakub Kicinski wrote:
-> On Tue, 3 Feb 2026 11:16:45 +0100 Paolo Abeni wrote:
->> # Error: netdevsim: Exceeded number of supported fib entries.
->> # Error: netdevsim: Exceeded number of supported fib entries.
->> # kernel answers: Operation not permitted
->> # TEST: resource test                                                 [ OK ]
->> # Command "resource" not found
->> # Command "resource" not found
->> # TEST: port resource test                                            [FAIL]
->> # Failed to show port resource for netdevsim/netdevsim10/0
->> # TEST: dev_info test                                                 [ OK ]
->> # TEST: empty reporter test                                           [ OK ]
->> # kernel answers: Success
->> # kernel answers: Success
->> # ./devlink.sh: line 614: echo: write error: Invalid argument
->> # Error: netdevsim: User setup the recover to fail for testing purposes.
-> 
-> I suppose this is because iproute2 needs patching. Tariq, could you
-> post the user space bits or share a link where we can pull them from?
-> I'll revive this in PW once we have CLI updated..
-> 
-
-Right. I'll include a pointer in the next submission.
-We're fixing the code to fail gracefully (i.e. skip) if userspace 
-doesn't have the needed support.
-
-
+>On 2/3/2026 8:58 AM, javen wrote:=0D
+>>>> On 2/2/2026 11:58 AM, javen wrote:=0D
+>>=0D
+>>>> From: Javen Xu <javen_xu@realsil.com.cn>=0D
+>>=0D
+>>>>=0D
+>>=0D
+>>>> This patch adds support for chip RTL8125cp. Its XID is 0x708. We apply=
+=0D
+>>=0D
+>>>> different and firmware for RTL8125cp.=0D
+>>=0D
+>>>>=0D
+>>=0D
+>>>> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>=0D
+>>=0D
+>>>>=0D
+>>=0D
+>>>> ---=0D
+>>=0D
+>>>> v2: This patch fix one mistake on phy_modify_paged(phydev, 0xa43,=0D
+>>=0D
+>>>> 0x10, 0x0000, 0x1001) which is phy_modify_paged(phydev, 0xa43, 0x00, 0=
+x0000, 0x1001) on patch v1.=0D
+>>=0D
+>>>>=0D
+>>=0D
+>>>> v3: Set phy_modify_paged(phydev, 0xa43, 0x10, 0x0000, 0x0003), bit 0=0D
+>>=0D
+>>>> means 'link speed 10m PLL OFF', bit 1 means 'ALDPS PLL OFF', bit 2=0D
+>>=0D
+>>>> means 'ENABLE ALDPS', bit 12 means 'ALDPS XTAL OFF'.=0D
+>>=0D
+>>>=0D
+>>=0D
+>>> ALDPS is disabled two lines later in rtl8125cp_hw_phy_config().=0D
+>>=0D
+>>> So why bother with ALDPS settings if ALDPS is disabled anyway?=0D
+>>=0D
+>>=0D
+>>=0D
+>> Bit 2 means 'ENABLE ALDPS', we prefer to treat it as a master switch tha=
+t controls=0D
+>>=0D
+>> some sub-features like bit 1(ALDPS PLL OFF) and bit 12(ALDPS XTAL OFF), =
+instead of=0D
+>>=0D
+>> controlling these sub-features individually. And bit 0(link speed 10m PL=
+L OFF)=0D
+>>=0D
+>> has noting to do with aldps.=0D
+>>=0D
+>I see, you changed the value of a43/10 to 0x0003 in v3. Then just this que=
+stion:=0D
+>Few lines later ALDPS gets disabled, so is it beneficial to set bit 1 here=
+?=0D
+>Thanks for mentioning that bit 0 isn't related to ALDPS.=0D
+>=0D
+Bit 2 acts like a lock that controls bit 1. If bit 2 =3D 0, bit 1 has no ef=
+fect even if set,=0D
+so pre-setting bit 1 causes no side effects. The reason why we set bit 1 he=
+re is that If we =0D
+need to enable bit1(aldps pll off) later, just set bit 2 to enable aldps wi=
+thout any additional=0D
+bits write(means we do not need to set bit 1 again). =0D
+Alternatively, you can view this as initialization related to aldps. if ald=
+ps(bit 2) is enabled later,=0D
+these related functions will be enabled at the same time(like bit 1).=0D
+=0D
+Thanks,=0D
+Javen Xu=
 
