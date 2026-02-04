@@ -1,211 +1,280 @@
-Return-Path: <netdev+bounces-256560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256561-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BgXOabPgmk8cAMAu9opvQ
-	(envelope-from <netdev+bounces-256560-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 05:48:38 +0100
+	id wLgjCS3Tgml5cQMAu9opvQ
+	(envelope-from <netdev+bounces-256561-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:03:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51905E19A6
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 05:48:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DF7E1A59
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:03:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A27A300D446
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 04:48:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6C0313018293
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D2C34DB56;
-	Wed,  4 Feb 2026 04:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D47352943;
+	Wed,  4 Feb 2026 05:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bG8DyhSj"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="DWoIrFX5";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="CjYUvQll"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7DF215055
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 04:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B50350D55
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 05:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770180515; cv=none; b=Hg2k2bE9ny9CsByQIEr6pOIp3HCe7XA+EsTNqA99pL4HMsIlI7vlnwGgTlLB+m4YHHZCbXSVuVPoAxlKeUI1hbVsXB7JdaRh9rqMYUA/BqwXgXcEggMqnmfJKXCnbFmPlQ4yqwdrq+FfNZ8y4mu6Db5L/GAw9WxzRTMcRgdVYvI=
+	t=1770181418; cv=none; b=jQws59jT5Yq9WCQqNG6HcN6yjIuk5BmCIOBXtZHlLHRzrQD8S32bo1Dy6clJ28aX9J0/Fp2dzSHLvkgWOhsS+W0uwCDdQEa8hCHTky5RKaEGVJC37Ff9oyWW7xdEmKFs7RHGnGoRWg5v/yTxS8GH9rmJnA5inHsu+Pj0Mj5nDgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770180515; c=relaxed/simple;
-	bh=d2PrAAugKOvjohQLQ0kRYqr9Ix9J5GuNTH3BD6g+OBo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jYJvjrfT3K0KHqG8Lgu6hcdOBDu059rmSMtObK+3nkJzMAkNwkuN+qQg57PmiTid1RaSVDQLHBvc7EUFf3coFibhiDUAATXOJw0IJDdAF8tmhNtBski4EiqwZZLWqnTOtinCznyVU8RRVmzL9pWPAj4Juv+jmyHlgaKS+dvHxls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bG8DyhSj; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a79998d35aso2895265ad.0
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 20:48:35 -0800 (PST)
+	s=arc-20240116; t=1770181418; c=relaxed/simple;
+	bh=k99C9FE5ISObnsVu+gs/HeUvfmWmzcZd++zK+3hMPGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uvGDTzwqPiKZsEw6VQaPAITdfI9Esms42y4qwXPUbTzmxPYunuQIA+I5AwGn/VV0/ZgteAMVKgG8AX12yWfS+Y/QksOxsyUoaVRB9DE/KItfh7XXaxNlIzan85cmT7sQ7Y0tzjnpvZ5luQGIMEj+W245m6q4hnSnbFbyM5rAKr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=DWoIrFX5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=CjYUvQll; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6144eZS52154655
+	for <netdev@vger.kernel.org>; Wed, 4 Feb 2026 05:03:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	3S1EWXoW5T8s5YGrNj6koiV6KanW9zF/vJ6e3niouj4=; b=DWoIrFX53M9r19Gs
+	Gr8F+SZhoiBBTo01DOe/aKIz8MNnRYAGeXjPO+vnKgWhVn6YhxMIbgRWb17mi/Sq
+	zsRn0xX5hA2OYSfNFoK7k2EV9pkGcziHX1YUlxVr6Ip32NLQOKj63ZFAkGUNiGHX
+	9eNdrA9kmV0cNlHO4SjhCcGFAxp2rs6rp2c15mbqglXbGtPgNjWCZxyJavjvZyqN
+	a5/MrbYLpyPOA55A9wHr+VOmsg64ZQHnKknGNwsXdMKPQnH+0Z7PtqYsDdZRfp/l
+	tsx/frnCYti12asTVxYOvT1Mg6+V6ArUXJvPTpCE9V+n2DwMndWtiBhL6k/Elvvs
+	luC/Fw==
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c3dutkh62-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 05:03:37 +0000 (GMT)
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-81d9b88caf2so5851664b3a.1
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 21:03:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770180515; x=1770785315; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Z2IM4Z35Vn6qnneQ2FOXC3Xxl6YzIbYQR2DMfu8vCY=;
-        b=bG8DyhSj1tIOOS8OsDdOWV7GXRQZkOgG/E5+av/7ml9i4gYMuzqGpmqs++dYyAay3D
-         hf6ed9deokW2Xn3J2LFamIzXyhpqwXmDFAuLpTK4x/mjZ2NtPs0lsxB6jN98A2mMu17D
-         q+lYPn2tYB0PKOYSyGJ60KPvKtRbiezAH1L+fJ8coKEWqa7T0jDbpYEE/FwPNscxcfrm
-         USLkcylyTthQpoKTvcjK+EgshE//+Ty/bYOjCZk/AYXRjytqZq6hw21A1PHuTz5ERdaB
-         BGbrQyU3OYXSLCl7NG5fy4pkD0vKnpqdYC0dj2Di/mkeDpRyVe9Wo3tmZ/1awnGWb6lP
-         DZOw==
+        d=oss.qualcomm.com; s=google; t=1770181416; x=1770786216; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3S1EWXoW5T8s5YGrNj6koiV6KanW9zF/vJ6e3niouj4=;
+        b=CjYUvQll2tBsDqtXdzvs0KRBU9w6m8DXNcWm7zcAuL7byEU44xvCzZA7845as66Bxo
+         xAPX2oXZXUfnbpEt6j4BEUcBhLlm6JaYjOK8z3SbNODRmRlcPcJGeNZ5a5X8BVXcz/ji
+         xT87s0afzAU35eSSama8eS9kDW+8/aWMB3M6K8ZMDXpr7Ro/fLHKqfCfWPC2AsXIVN4q
+         Yd0F7JO++qq5e6k/DeoACtDdVZTTDT+xzOleOJHUefQQsJlRy9K7M7rpSfd871Y1D9Ft
+         FzLiZhnGVVJUyi8e9uYoJhYsSkOCSPu/kNhOeLT2T5LhD5ub94/xbnK/5p9OkkXaFhNO
+         ow9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770180515; x=1770785315;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Z2IM4Z35Vn6qnneQ2FOXC3Xxl6YzIbYQR2DMfu8vCY=;
-        b=chCjd6dF4Gju4wQedf7LC1+7fm2+G60f1cm9hR9XHBGoSAF1ebVve+0CxhrMrAdtb7
-         dKCjnRaHz5Rarpcguf7NDF/axegmC2rzonId9KdjGUJAh6eu1u3BVjGU712Pb0muxrQ5
-         YG8KuUsxRHc8tsEqkUZzK9z4rZMY9iF2XcnHiggZSyLFEC3I0hKARv9jgrDS8ceq7+M/
-         it0KYr1E8yMyv2+ApGbL40MxaNn5kLb9bkU0+yb6oLhTRr7KS1pK9EZaaf1olYNVcDUs
-         Twk0A3ZqbkEcb2ChC9unMNwbHLOFMtLyh9hGyoeguwXLkJTF4XXT8z466MJuDeUoYI1V
-         ZcLw==
-X-Gm-Message-State: AOJu0Yw3A8t9c43JJ1PGG+gjtjDmZF820X0pPxNndtnAnxBTPYUEAOjy
-	05iP5OdEVfUfz5J6uDB4D/HCE96JzGQ/ATFcxHvnFcxSnZJwUOiBWy1cAKGDmtTE
-X-Gm-Gg: AZuq6aKgnzrWDKz15EsvEeCxYQMWatTqD+KIdGtn3wg3ZlDbKqoQl7IL0h5wNT3UP2T
-	ovbhxmfR/lRKrbe7uFuoXj3SkXjeTxPByiF9/GP+MiMfBZ3lO588FLiTWfIYr8Vm85nT8xTrq1/
-	yupGasOXP6SfpUILs88ruV0Lhaa44qoP5DHir1mEEEe2EEZtr5lz2PfiUBYTViQX/dsCzbCLiRR
-	SIEVzbmYhGsZw0aAJd3E/dVvprecCMPvqjQlPXIAUjTZpwKYki+OgHc5y/fCtWGKUYqO8kyrXfF
-	FPcP0ktNtMaL0vyH9DT0qixkn/Dz1IbH2TL35zjGDCqDXHpSJ+nUy7XG8aHkXbMdfYqCJYkiEwJ
-	970ZARE215BFsP4cQiULu29xiQVXx96+pJtl2Lw6wLcBWU9ACvfzB3zuIA13IbPwGstxi2dTihb
-	nInwR+HVLpFj8Ix7zDrEtFVwRiK8rtd+zDzx/oh4T+cTofBnsz+AW6GuIChYSVvwb3vj/kaAwR
-X-Received: by 2002:a17:902:e54c:b0:29e:facd:7c02 with SMTP id d9443c01a7336-2a933e68cf0mr20042835ad.28.1770180514780;
-        Tue, 03 Feb 2026 20:48:34 -0800 (PST)
-Received: from dpc2500057.. (fsb6a9315e.tkyc502.ap.nuro.jp. [182.169.49.94])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a933977e8bsm9503835ad.85.2026.02.03.20.48.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 20:48:34 -0800 (PST)
-From: Keita Morisaki <kmta1236@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	Keita Morisaki <kmta1236@gmail.com>
-Subject: [PATCH] ice: fix race condition in TX timestamp ring cleanup
-Date: Wed,  4 Feb 2026 13:48:22 +0900
-Message-Id: <20260204044822.2754803-1-kmta1236@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1770181416; x=1770786216;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3S1EWXoW5T8s5YGrNj6koiV6KanW9zF/vJ6e3niouj4=;
+        b=BoaiJiFr5+BExY63nFZoG1Xxjjnsm2XuNNvRPvtvrIRPrvV+D3gp+npVznCwvZ23FY
+         0JWNKaQykRb9ZPu0LiUxFZPi1YPWOx9aw71oAQivQXgAx/SBapQ6sBz0s1Gll7/PukWC
+         y+/V1SjsVBiJaPEjRFk6SbCEsTHKn6VSQzY9nX6j6m37GExNW24WOMSrx62ykEHwsLUZ
+         /Fyt1UxU4fM5bXIQPOItjAolBicdVmo6fCFRofUW9kjo+PPcSEWj+6E8aIrE9tx+Nm/2
+         j94/s7Vl7KebBOWF/I34a1rb6S8OL+4+nW9mkjQjnvZYVc4WN80C5dJiLKhQ2a/RwKfb
+         RoyA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0PJeyHqELz+L/Eq4+219EEfiKpDbpZleLGdE6zay7MSKVwgvII8EzPGAYN1rp1+6+HZXxuRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJBLgjqnRyA/gh3G03D7OdIGIIQMRo8JUVWGYsFr1AV0fZEZCi
+	Jzzeoh3QTKwaGuui9dlTUDOD9KrwwliUwVbOylNHHI3Q8d7VTDDIstYm8b5//V8PmaOIsgRzJKJ
+	uZdwu2c0Wtfu2HpFO0dSE/bPayk67DJXsV0g7jZMCUCfG5bbdljcc35jWD0c=
+X-Gm-Gg: AZuq6aLT9fqSKbyMCYMe2ykpvPLh274RaD7hEa8wdlhaUu+Af+ytbkXifoi0K6CGZW8
+	jdpVXD85WKDjuyvEtAvjhRHeqJI0hH8/TXiS4bd354vkblA4NMOxLr/fIVWbuKYn1kLPimBtWpJ
+	1eFxC2h9fitND36W9M7P+pgb8akbSQAzjvo8PeUpUn3Zu6CBFI6j4A7O4wg/HezlQpNX5BcRWZR
+	pOsaEXAfnzEZ198hOKzJOEUkoB8JSm9r2XZjn06ELUadQpI/yb6hbfcCHuNOIPzPfWMQgPDOe9T
+	Y8SqfbYE7k3oDoEThLaJNU/Nd214Wb3UGse0bOEGfU+fR66RLqv7+LH8iiz/3TlxcNzPwLeYgL5
+	T5DfVjv4CtaJnyv8tJVywJ0WDUQKYR+eDnHmDx8W1X2GS
+X-Received: by 2002:a05:6a00:39a7:b0:81e:af19:34b8 with SMTP id d2e1a72fcca58-8241c5f6184mr1753681b3a.43.1770181416023;
+        Tue, 03 Feb 2026 21:03:36 -0800 (PST)
+X-Received: by 2002:a05:6a00:39a7:b0:81e:af19:34b8 with SMTP id d2e1a72fcca58-8241c5f6184mr1753653b3a.43.1770181415529;
+        Tue, 03 Feb 2026 21:03:35 -0800 (PST)
+Received: from [10.217.219.53] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8241d48789dsm1008320b3a.58.2026.02.03.21.03.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Feb 2026 21:03:35 -0800 (PST)
+Message-ID: <d9313606-6a8c-4109-ae3f-dbcb46f54019@oss.qualcomm.com>
+Date: Wed, 4 Feb 2026 10:33:30 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/2] net: mhi: Add support to enable ethernet interface
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
+        linux-arm-msm@vger.kernel.org
+References: <20251209-vdev_next-20251208_eth_v6-v6-0-80898204f5d8@quicinc.com>
+ <2sx75x2v24o23hlhvl3cfem4npzejt4k3dmwnaqgxykzrr7kyg@g7k5fp4nr4wy>
+Content-Language: en-US
+From: vivek pernamitta <vivek.pernamitta@oss.qualcomm.com>
+In-Reply-To: <2sx75x2v24o23hlhvl3cfem4npzejt4k3dmwnaqgxykzrr7kyg@g7k5fp4nr4wy>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA0MDAzNCBTYWx0ZWRfX4nYkIFfQIIU1
+ EA1mW7DsY4PsIujRJXFORWJCMBbaCnHWaaZCymgsUqi1WyI38MAj9mVUGEKw1FyqPqzinflUHNS
+ i0U0hNuaVsBYvuxv8dubIh9+scVjIdJalORGr6voLh7ge1GA1Q+3mQNNtH3c3gw4tMRRk2cQQp2
+ T3oQBUC/893WVP4X4snAGGL90WBOGsueRNi/UG/b1YrWSaDDAAqkA/4SZWqhzjwNTP4Uz35K+E/
+ 52VPxsbSzeEMSUUW7m2AUwSB5csypCnuAZR6r9vAOgO6U69w7SC/dbBCHILNM8YwqNu6L4Fd2Rh
+ PgOEpSsTgVJkdyAX1iVNaQcNY3Xs+q1ytSMK7vK2DRW1pw1NXixnrVdc3awPKF+Y9YazqQHX7aW
+ elXo0Czq1fPX6CCH3efMrEqK+LddfciOkkXBfW3K/ZEQTwwEQCwfaTCJts9FUilO5b2z+tjrmaM
+ cBKedzLlZFAGt9Q17Xw==
+X-Authority-Analysis: v=2.4 cv=FrgIPmrq c=1 sm=1 tr=0 ts=6982d329 cx=c_pps
+ a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
+ a=BYBcVbb2VMsx0zYavC8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=OpyuDcXvxspvyRM73sMx:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: WCQ8AZvmTALrshRwGpsSXx4NUYR5gjSJ
+X-Proofpoint-GUID: WCQ8AZvmTALrshRwGpsSXx4NUYR5gjSJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-03_07,2026-02-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 suspectscore=0 phishscore=0 impostorscore=0 bulkscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602040034
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-256560-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:mid,oss.qualcomm.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-256561-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kmta1236@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 51905E19A6
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vivek.pernamitta@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 91DF7E1A59
 X-Rspamd-Action: no action
 
-Fix a race condition between ice_free_tx_tstamp_ring() and ice_tx_map()
-that can cause a NULL pointer dereference.
 
-ice_free_tx_tstamp_ring currently clears the ICE_TX_FLAGS_TXTIME flag
-after NULLing the tstamp_ring. This could allow a concurrent ice_tx_map
-call on another CPU to dereference the tstamp_ring, which could lead to
-a NULL pointer dereference.
 
-  CPU A:ice_free_tx_tstamp_ring() | CPU B:ice_tx_map()
-  --------------------------------|---------------------------------
-  tx_ring->tstamp_ring = NULL     |
-                                  | ice_is_txtime_cfg() -> true
-                                  | tstamp_ring = tx_ring->tstamp_ring
-                                  | tstamp_ring->count  // NULL deref!
-  flags &= ~ICE_TX_FLAGS_TXTIME   |
+On 12/24/2025 11:33 AM, Manivannan Sadhasivam wrote:
+> On Tue, Dec 09, 2025 at 04:55:37PM +0530, Vivek Pernamitta wrote:
+>> Add support to configure a new client as Ethernet type over MHI by
+>> setting "mhi_device_info.ethernet_if = true". Create a new Ethernet
+>> interface named eth%d. This complements existing NET driver support.
+>>
+>> Introduce IP_SW1, ETH0, and ETH1 network interfaces required for
+>> M-plane, NETCONF, and S-plane components.
+>>
+> 
+> You did not even mention the MHI channels added in this series.
+> 
+>> M-plane:
+>> Implement DU M-Plane software for non-real-time O-RAN management
+>> between O-DU and O-RU using NETCONF/YANG and O-RAN WG4 M-Plane YANG
+>> models. Provide capability exchange, configuration management,
+>> performance monitoring, and fault management per O-RAN.WG4.TS.MP.0-
+>> R004-v18.00.
+>>
+>> Netconf:
+>> Use NETCONF protocol for configuration operations such as fetching,
+>> modifying, and deleting network device configurations.
+>>
+>> S-plane:
+>> Support frequency and time synchronization between O-DUs and O-RUs
+>> using Synchronous Ethernet and IEEE 1588. Assume PTP transport over
+>> L2 Ethernet (ITU-T G.8275.1) for full timing support; allow PTP over
+>> UDP/IP (ITU-T G.8275.2) with reduced reliability. as per ORAN spec
+>> O-RAN.WG4.CUS.0-R003-v12.00.
+>>
+> 
+> Sorry, this is just AI slop. Please describe how the newly created interfaces
+> are supposed to be used, relevant tools etc...
+> 
+> - Mani
+> 
+M-plane:
+YANG model based interface aligned with O‑RAN WG4 M‑Plane specifications
+over TCP between the OAM application on the host and the DU M‑Plane
+software running on the X100 platform
 
-Fix by
-1. ice_free_tx_tstamp_ring: Clear the flag before NULLing the pointer.
-   Use WRITE_ONCE() to prevent store tearing, and smp_wmb() to
-   prevent re-ordering.
-2. ice_tx_map: Add smp_rmb() after the flag check to order the flag
-   read before the pointer read, use READ_ONCE() for the pointer, and
-   add a NULL check. If tstamp_ring is NULL, fall through to the
-   regular TX ring kick to avoid leaving packets stuck in the ring.
+Netconf:
+This interface is used for IETF Netconf communication, enabling a
+Netconf server on the ORU to interact with a Netconf client running on
+the host.
 
-Fixes: ccde82e90946 ("ice: add E830 Earliest TxTime First Offload support")
-Signed-off-by: Keita Morisaki <kmta1236@gmail.com>
----
- drivers/net/ethernet/intel/ice/ice_txrx.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+S-plane:
+To support accurate phase and time synchronization between the host (L2) 
+and device (L1‑High), the system must exchange PTP messages as raw 
+Layer‑2 Ethernet frames, because the ITU‑T G.8275.1 profile operates 
+strictly over Ethernet multicast and not over IP networks. This means 
+the device’s PTP stack can only send and receive PTP Announce, Sync, 
+Follow‑Up, and Delay messages in native Ethernet format, not as 
+IPv4/IPv6 packets. However, the host and device communicate only through 
+MHI/PCIe, which provides no native Ethernet interface. Therefore, the 
+system must implement a virtual Ethernet interface over MHI on both 
+sides. This virtual Layer‑2 link enables true Ethernet‑frame transport, 
+ensuring the device’s PTP implementation remains fully compliant with 
+the G.8275.1 Ethernet‑based timing model
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index ad76768a42323..d48740f2b626a 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -190,9 +190,10 @@ void ice_free_tstamp_ring(struct ice_tx_ring *tx_ring)
- void ice_free_tx_tstamp_ring(struct ice_tx_ring *tx_ring)
- {
- 	ice_free_tstamp_ring(tx_ring);
-+	WRITE_ONCE(tx_ring->flags, tx_ring->flags & ~ICE_TX_FLAGS_TXTIME);
-+	smp_wmb();	/* order flag clear before pointer NULL; pairs with ice_tx_map() */
- 	kfree_rcu(tx_ring->tstamp_ring, rcu);
--	tx_ring->tstamp_ring = NULL;
--	tx_ring->flags &= ~ICE_TX_FLAGS_TXTIME;
-+	WRITE_ONCE(tx_ring->tstamp_ring, NULL);
- }
- 
- /**
-@@ -1519,13 +1520,20 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
- 		return;
- 
- 	if (ice_is_txtime_cfg(tx_ring)) {
--		struct ice_tstamp_ring *tstamp_ring = tx_ring->tstamp_ring;
--		u32 tstamp_count = tstamp_ring->count;
--		u32 j = tstamp_ring->next_to_use;
-+		struct ice_tstamp_ring *tstamp_ring;
-+		u32 tstamp_count, j;
- 		struct ice_ts_desc *ts_desc;
- 		struct timespec64 ts;
- 		u32 tstamp;
- 
-+		smp_rmb();	/* order flag read before pointer read */
-+		tstamp_ring = READ_ONCE(tx_ring->tstamp_ring);
-+		if (unlikely(!tstamp_ring))
-+			goto ring_kick;
-+
-+		tstamp_count = tstamp_ring->count;
-+		j = tstamp_ring->next_to_use;
-+
- 		ts = ktime_to_timespec64(first->skb->tstamp);
- 		tstamp = ts.tv_nsec >> ICE_TXTIME_CTX_RESOLUTION_128NS;
- 
-@@ -1553,6 +1561,7 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
- 		tstamp_ring->next_to_use = j;
- 		writel_relaxed(j, tstamp_ring->tail);
- 	} else {
-+ring_kick:
- 		writel_relaxed(i, tx_ring->tail);
- 	}
- 	return;
+-Vivek
 
-base-commit: 18f7fcd5e69a04df57b563360b88be72471d6b62
--- 
-2.34.1
+>> Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+>> ---
+>> patchset link for V5 : https://lore.kernel.org/all/20251106-vdev_next-20251106_eth-v5-0-bbc0f7ff3a68@quicinc.com/
+>> patchset link for V1 (first post) : https://lore.kernel.org/all/20250724-b4-eth_us-v1-0-4dff04a9a128@quicinc.com/
+>>
+>> changes to v6:
+>> - Removed interm variable useage as per comments from Simon and Dmirty.
+>> - Squashed gerrits 1 and 2 in single gerrit.
+>> - Added more description for M-plane, Netconf and S-plane.
+>>
+>> changes to v5:
+>> - change in email ID from "quic_vpernami@quicinc.com" to "vivek.pernamitta@oss.qualcomm.com"
+>> - Renamed to patch v5 as per comments from Manivannan
+>> - Restored to original name as per comments from Jakub
+>> - Renamed the ethernet interfce to eth%d as per Jakub
+>> ---
+>>
+>> ---
+>> Vivek Pernamitta (2):
+>>        net: mhi: Enable Ethernet interface support
+>>        bus: mhi: host: pci: Enable IP_SW1, IP_ETH0 and IP_ETH1 channels for QDU100
+>>
+>>   drivers/bus/mhi/host/pci_generic.c |  8 ++++
+>>   drivers/net/mhi_net.c              | 75 +++++++++++++++++++++++++++++++-------
+>>   2 files changed, 70 insertions(+), 13 deletions(-)
+>> ---
+>> base-commit: 82bcd04d124a4d84580ea4a8ba6b120db5f512e7
+>> change-id: 20251209-vdev_next-20251208_eth_v6-c405aed13fed
+>>
+>> Best regards,
+>> -- 
+>> Vivek Pernamitta <<quic_vpernami@quicinc.com>>
+>>
+> 
 
 
