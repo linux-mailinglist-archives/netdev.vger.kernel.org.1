@@ -1,177 +1,244 @@
-Return-Path: <netdev+bounces-256519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOKqEoqugmliYAMAu9opvQ
-	(envelope-from <netdev+bounces-256519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:27:22 +0100
+	id UFKpIq6vgmn/YAMAu9opvQ
+	(envelope-from <netdev+bounces-256520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:32:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D900AE0D5D
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:27:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A07E0E15
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:32:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2D8A030268E9
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 02:27:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CB71301DC2A
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 02:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0F128853A;
-	Wed,  4 Feb 2026 02:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925B12D46A1;
+	Wed,  4 Feb 2026 02:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GfbnYhey"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWDOn9b9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5AA272E6A
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 02:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770172038; cv=none; b=Z1JAoMis2Bo258W3S78XC4/kJoyvVwyFClDc2LffHhEnp7nswyW4CLrYaK54uliU12RLbPy3+yD4DyiNEV6xaImZvyWUCD3VlT93kf4zI2/VFOR/KrnLb4nbde+HtfyMV0DCNrhdSoTDsjGflM/SMp+ZtQwY+QL2gWsFZmOZARA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770172038; c=relaxed/simple;
-	bh=eMjdcO6WEUJaANcvfNBEjOv+3qT7BlPDF3beudvM02A=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=DaxlUUhoMlI3463nB+sEjQ1QvaijrxuAGviQvrKIvtQNEDK5snSn38Zl9LlSe02kubtGzIDWdBlwXZWdwBmJY5wd+K5WWB+6dt4x9xujsU1oLnY/Uefk0gKoP4vsqK8kyvLH88/AWj8jJcfoerJLxVArExipFoyaSVAe+OKwSMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GfbnYhey; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E20285404
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 02:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770172329; cv=pass; b=PqWB8OOm/I0ldC83MRe8i1oZXr/3c537uD3EA+7IkyX/P4SVyONJdK5VAwamXrQ4YHmqqmpTJYfX9fN/+WfChKs5kZ1JVBBWg2l2Q/ot8d9+WDQEXAPkDJP17r5YQVo8z/1Hbws0Xned8QzjotK9qjlV/Iy9lVxvfj/Fr3ZsoGg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770172329; c=relaxed/simple;
+	bh=AEXY2ZozylvPlcmUxZcRERRjpaPjiU3Q0qvMx4BNRVU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i1ucgYxz6SAyvod8CZv+mBWfT1imbE8arakMW3Q4nQQIUgrlRD/6IUTw1F7RWVHExp7VctYO3kImOyg4NtkGapMdPnWDreXTuZ62R6dwxXQiu8IC0OqnfEPc6/+hGnUE4c0PUAbj1103fPTeKVyqpD5s3XlogTgQC+6c5rW3vgw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MWDOn9b9; arc=pass smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-649bff225d4so2906926d50.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 18:32:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770172326; cv=none;
+        d=google.com; s=arc-20240605;
+        b=O++dOICCeVL9FjNnp/oeU0X2itU/GLGM8WXHMtWkrxDbVwhZQT9MJSISQaCcx73rrr
+         5xmE5r1Nk3XXPn8mHFE7Vitt/bLnhCi4C+ATyXfwnMcJyiAfWx8qsYo3/ZLB41wVAe4j
+         /vhhvU93klEQv/DCt6modI073MIhGRXH5jdzpErCceiUSBoX5zsMLkmwUDvEjOc625BG
+         1YayCyv10tgtAjisHM8kiiN6AQv2MsTXw9YwVY6LtJyKERNDRS1xPcKwWD12YoGgPJSa
+         L50LHX3JlsCvcTsAlkjjxRfCXX9uWdr2bWwRIDNe7B5e7+Clc0Czwcmz5qfh0A+3EGZI
+         pNwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bIjyPXX1IIp15cL3fUQqHYHhSaht5nuIKZ8C06CfsMY=;
+        fh=yFqN/KtY818WJA2nfxHilbBcuTe+Np7UKvROLjPKKnc=;
+        b=VBRk9tVZs0jjMVpw/NbkZi754QUoZiLU/q1PSaxOPxXVLcYkO91CaoaU1ZvTdbLz9v
+         tbdKqnzk7117QHy0bcl5jhIrHLpdqnXWOnxK6dgW+tI+7l0QbLz4o1YR1YZ9B8VSO/ed
+         XPI6clRI8LwJmJ692bd0/KGP8L2m1fAJQ5zS8o9hNvfnWG4mZRqVPrKHOh8Kjeom707C
+         twmyiHEf3W/iJvj6ayKnxPe7ufP39naBbaL70IvvEzbFbSzwzD9fY46EUPXVCGHGg7vh
+         sX3tj3s7Hv5bGO8cAElK3f2nGg9shi3wQtxR4AnR5Yp+0r+AxlgmPo6iwRnT3eN0IXlj
+         r2ng==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770172326; x=1770777126; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bIjyPXX1IIp15cL3fUQqHYHhSaht5nuIKZ8C06CfsMY=;
+        b=MWDOn9b9q6fCDH/FZaGfi3ICMQ1a4Ndkk0/KAjNFvtGXNauDYEY8XqnVO87n2FXOL/
+         BrAHNucUJhZHjowerRhOMAi+PY2at8eyHrmgHAr2rjwB0ch3fC/JS8Cy3OcCIGYbsK8D
+         OBFEYSOBxTZW2uHaB535GHs2W7q3/2Z/kCBZA22Fdb09terYyRJTfSqdOgziq+S1u19s
+         eNK+PXwgiLNS0Q7Fzpfzm6KD8itVo+xMSvfZUw2QovQIuD9gIFk17USmLthEOwrsqdYG
+         C6uoTE9MjiVgI9Euwz2SloVuGDjtF822x8b2FTGarBDhpFNyYl2c0T6HKOCle/jLgFjo
+         YEQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770172326; x=1770777126;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bIjyPXX1IIp15cL3fUQqHYHhSaht5nuIKZ8C06CfsMY=;
+        b=SQWCUGrtK1NC+mgBt4giWUGP61zImgssmzeC8/VW2+AYycU45hCN3/7jOe9RT0ifk3
+         EMHTPKgx8iL98JBb8cZBhI8bc2NWHz/0ZBULnvNgrHVYIk92BLSTgzwbOxkhTjj6AwME
+         Y7y+n+nIrdjdIM21animD63OU11297/DFm5aXmst4/r21YKVelSUs86rOVo40cJKDVji
+         KLRBr0q2dBFDCs8pRDarkWYKOHLzYGx9ZScrbqvolo1BVYJyFpqM7hkD1clwJ6DbIdtr
+         lk/2ewFcKC+J4AJbLDfvkrHqedc/3THkBJ6pIdK4QkuzAuL6LJSo1+eBM0+1zlH93AFk
+         cyHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWnFW7y8c8BMzw23z9cVAEQn4IaSEaPjJbMInMOfdcpdfwB8CuQDxZQfbbyodtfqhTH/EWo/4k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFtRZB/EeRDhrj5pGjbrH7Lr6fFiuRQgJl6O+A4MkSjP2VjZ44
+	k+GhPfp5sw+EQf+DRZWU0vYpvBghyhfb0q6RWHMhPkRiF0wz5kFSf1GpC2c12+mwcvwDD5b0oV9
+	BuPbH8G7mXIw4sLznxDwL7OsF3uonjmk=
+X-Gm-Gg: AZuq6aLBAgdlLmZV6PmNkZN3AzT+GswIqNSThwO79wUvdWUNeh6BlDSBwB1OainiFtH
+	luo7VKfjJrri0gCE9WhhbFxK13fN9TGR8pEU2IpsBUPM8Axrmxnl6sbBabYTOAvGgZo9i11zgyB
+	fNrRT0BLzKklWpWl5iUJuovaTcFAlDsLRLV+P6boE1cLu2Vt61irMy6IeCYe5gdUB/w3bnHijJ8
+	gV6jSbaJl81FAs6eSWl8pgX/+6F5jStCsqzFZLpsXUaXn2y1NjhiTYnO1q5vxMlwL5jSQ==
+X-Received: by 2002:a05:690e:d49:b0:644:ca2b:b659 with SMTP id
+ 956f58d0204a3-649db49ed41mr1329604d50.64.1770172325964; Tue, 03 Feb 2026
+ 18:32:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770172035;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=voRhHdv8SbG/gEkcRiC7sWssgtqh8oKxge1QYhttiFI=;
-	b=GfbnYhey3f3hzO+LvLUCNngmoCp3hAffSx91HZ199qbHUag2/X8zt6Z2qXL6UApbWGuv8C
-	0B9wJuhuD5md64M+07wErc24J+JmAI/cXQbWV1bbyMzB3I4KqZ/zbZ85uJYeMJVIY3eHIh
-	2LvI6eMnYOQpcJMYXp0wUSflmJ8cGqA=
-Date: Wed, 04 Feb 2026 02:27:12 +0000
-Content-Type: text/plain; charset="utf-8"
+References: <20260203080109.2682183-1-sun.jian.kdev@gmail.com>
+ <20260203145511.164485-1-sun.jian.kdev@gmail.com> <aYIOXk55_DRFKCqo@strlen.de>
+ <CABFUUZG9LnhXc+nsQA28WHiiT33_5wQ82E1bBSBncWkxkXaKZA@mail.gmail.com>
+ <aYIpcHBufnxrcv5O@strlen.de> <CABFUUZELXbEKyjMxOBfoL246dmtBSS_oe0zeWwnkmrXXpyv3Yg@mail.gmail.com>
+In-Reply-To: <CABFUUZELXbEKyjMxOBfoL246dmtBSS_oe0zeWwnkmrXXpyv3Yg@mail.gmail.com>
+From: sun jian <sun.jian.kdev@gmail.com>
+Date: Wed, 4 Feb 2026 10:31:55 +0800
+X-Gm-Features: AZwV_Qj16-gQnWy1oA1jIq5usmdDABqO_QGkIrnjFEl_tMb1KtPYhDutKkh28Vo
+Message-ID: <CABFUUZFgXooeCgKGypByzePBsHpcPWqnY-Ea0qv4Vd7=yMOk+A@mail.gmail.com>
+Subject: Re: [PATCH v2] netfilter: amanda: fix RCU pointer typing for nf_nat_amanda_hook
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>, 
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <985568ea543b05f52c453427a6125200bcff0aaf@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next v1] icmp: fix ip_rt_bug race in
- icmp_route_lookup reverse path
-To: "David Ahern" <dsahern@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- netdev@vger.kernel.org
-Cc: "Jiayuan Chen" <jiayuan.chen@shopee.com>,
- syzbot+e738404dcd14b620923c@syzkaller.appspotmail.com, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Simon Horman" <horms@kernel.org>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org
-In-Reply-To: <1cbd0d2e-2002-4685-99eb-97dd8947cf16@kernel.org>
-References: <20260128090523.356953-1-jiayuan.chen@linux.dev>
- <892557d1-9408-40e3-8e79-587713116b93@redhat.com>
- <1cbd0d2e-2002-4685-99eb-97dd8947cf16@kernel.org>
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256519-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-256520-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,e738404dcd14b620923c];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D900AE0D5D
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F0A07E0E15
 X-Rspamd-Action: no action
 
-February 4, 2026 at 24:24, "David Ahern" <dsahern@kernel.org mailto:dsahe=
-rn@kernel.org?to=3D%22David%20Ahern%22%20%3Cdsahern%40kernel.org%3E > wro=
-te:
+Hi Florian,
 
+One quick clarification to my previous email regarding the change at line 1=
+01.
 
->=20
->=20On 2/3/26 3:41 AM, Paolo Abeni wrote:
->=20
->=20>=20
->=20> On 1/28/26 10:05 AM, Jiayuan Chen wrote:
-> >=20
->=20> >=20
->=20> > diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> > >  index 19c9c838967f..dc9dcc799824 100644
-> > >  --- a/net/ipv4/icmp.c
-> > >  +++ b/net/ipv4/icmp.c
-> > >  @@ -559,6 +559,23 @@ static struct rtable *icmp_route_lookup(struc=
-t net *net, struct flowi4 *fl4,
-> > >  /* steal dst entry from skb_in, don't drop refcnt */
-> > >  skb_dstref_steal(skb_in);
-> > >  skb_dstref_restore(skb_in, orefdst);
-> > >  +
-> > >  + /*
-> > >  + * At this point, fl4_dec.daddr should NOT be local (we
-> > >  + * checked fl4_dec.saddr above). However, a race condition
-> > >  + * may occur if the address is added to the interface
-> > >  + * concurrently. In that case, ip_route_input() returns a
-> > >  + * LOCAL route with dst.output=3Dip_rt_bug, which must not
-> > >  + * be used for output.
-> > >  + */
-> > >  + if (!err && rt2 && rt2->rt_type =3D=3D RTN_LOCAL) {
-> > >  + net_warn_ratelimited("%s: detected local route for %pI4 "
-> > >  + "during ICMP error handling (src %pI4), "
-> > >  + "possible address race\n",
-> > >  + __func__, &fl4_dec.daddr, &fl4_dec.saddr);
-> > >=20
->=20>=20=20
->=20>  The fix looks correct to me, but this patch should target the 'net=
-' tree
-> >  and the above warning message is a bit off: the text string should n=
-ot
-> >  be broken to fit the 80 chars limit - it need to be greepable - it's
-> >  probably better to not include the function name.
-> >=20=20
->=20>  /P
-> >=20
->=20Does the message even provide value? There is nothing a user can do
-> about it.
+While line 101 itself doesn't trigger a Sparse warning, using
+typeof(nf_nat_amanda_hook)
+causes the local variable to inherit the __rcu attribute. This
+"attribute inheritance"
+is what leads to the "different address spaces" error during
+assignment at line 158
+when using rcu_dereference().
+
+To keep the code concise while stripping the RCU attribute, I'll use
+the typeof(*hook) * pattern
+as discussed. I am currently preparing the v4 patch series which will
+apply this refined fix to all
+affected helpers (amanda, ftp, irc, snmp, and tftp) to clean up these
+Sparse warnings across
+the subsystem.
+
+Sorry for the confusion in the earlier thread.
+
+Regards,
+
+Sun
+
+On Wed, Feb 4, 2026 at 9:56=E2=80=AFAM sun jian <sun.jian.kdev@gmail.com> w=
+rote:
 >
-
-Hi Paolo, David,
-
-Thanks for the review.
-
-Paolo, I'll fix it in newer version.
-
-Regarding David's question about whether the message provides value:
-I think it could still be useful for debugging. If a user's configuration
-change causes ICMP packets to be silently dropped, there's currently no c=
-ounter
-or indication of what happened. Adding a dedicated counter for this rare =
-race
-condition seems overkill, so a rate-limited warning at least gives some v=
-isibility
-into the failure.
-
-That said, I'm open to dropping the message entirely if you both think si=
-lent handling
-is preferred. Let me know and I'll send a new version either way.
-
-Thanks,
-Jiayuan
+> On Wed, Feb 4, 2026 at 12:59=E2=80=AFAM Florian Westphal <fw@strlen.de> w=
+rote:
+> >
+> > sun jian <sun.jian.kdev@gmail.com> wrote:
+> > > > Sun Jian <sun.jian.kdev@gmail.com> wrote:
+> > > > >  enum amanda_strings {
+> > > > > @@ -98,7 +98,12 @@ static int amanda_help(struct sk_buff *skb,
+> > > > >       u_int16_t len;
+> > > > >       __be16 port;
+> > > > >       int ret =3D NF_ACCEPT;
+> > > > > -     typeof(nf_nat_amanda_hook) nf_nat_amanda;
+> > > > > +     unsigned int (*nf_nat_amanda)(struct sk_buff *skb,
+> > > > > +                                   enum ip_conntrack_info ctinfo=
+,
+> > > > > +                                   unsigned int protoff,
+> > > > > +                                   unsigned int matchoff,
+> > > > > +                                   unsigned int matchlen,
+> > > > > +                                   struct nf_conntrack_expect *e=
+xp);
+> > > >
+> > > > Why is that needed?
+> > > Correct. Manual declaration is indeed verbose.
+> > >
+> > > The reason I used it was that typeof(nf_nat_amanda_hook) carries over
+> > > the __rcu attribute to the local variable, which triggers a Sparse
+> > > warning when assigning the result of rcu_dereference().
+> >
+> > sparse doesn't generate such a warning for me.
+>
+> I re-verified this with GCC 13.3.0 and Sparse v0.6.4-73-gfbdde312.
+> Even without LLVM=3D1, Sparse still reports the "different address spaces=
+"
+> error for amanda on my machine:
+>
+> net/netfilter/nf_conntrack_amanda.c:158:33: error: incompatible types
+> in comparison expression (different address spaces):
+> net/netfilter/nf_conntrack_amanda.c:158:33: unsigned int ( [noderef]
+> __rcu * )( ... ) net/netfilter/nf_conntrack_amanda.c:158:33: unsigned
+> int ( * )( ... )
+>
+> It seems newer Sparse versions are more strict about RCU attributes on
+> function pointers.
+> To avoid manual declaration while stripping the __rcu attribute, I
+> will switch to:
+> typeof(*nf_nat_amanda_hook) *nf_nat_amanda;
+>
+> >
+> > Also, this pattern you are changing here isn't specific to amanda, it
+> > exists elsewhere as well:
+> >
+> > net/netfilter/nf_conntrack_snmp.c:42:23: error: incompatible types in c=
+omparison expression (different address spaces):
+> > net/netfilter/nf_conntrack_tftp.c:78:31: error: incompatible types in c=
+omparison expression (different address spaces):
+> > net/netfilter/nf_conntrack_irc.c:242:38: error: incompatible types in c=
+omparison expression (different address spaces):
+> > net/netfilter/nf_conntrack_ftp.c:521:22: error: incompatible types in c=
+omparison expression (different address spaces):
+> >
+> > so why only fix this annotation for amanda?
+> Ack, I will prepare a V4 patch series to fix it for  amanda, snmp,
+> tftp, irc, and ftp together.
+>
+> Regards,
+>
+> Sun
 
