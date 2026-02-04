@@ -1,178 +1,300 @@
-Return-Path: <netdev+bounces-256688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256690-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MBs3I902g2kwjAMAu9opvQ
-	(envelope-from <netdev+bounces-256688-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 13:09:01 +0100
+	id CK2lHcU4g2ngjwMAu9opvQ
+	(envelope-from <netdev+bounces-256690-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 13:17:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C47CE5963
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 13:09:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8A86E5B1F
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 13:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 96647300490B
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 12:09:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBFEB304ADB2
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 12:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B2D3ED11A;
-	Wed,  4 Feb 2026 12:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEEE3ED139;
+	Wed,  4 Feb 2026 12:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpT9SBxm"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="PiwPHlZh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E56C3ED11F
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 12:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2BD3ED135;
+	Wed,  4 Feb 2026 12:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770206938; cv=none; b=jX1v/ciesoPaK0q7EyfW2xLYpVR89h4ka1DN4iJ0oSVlOQKDZpVjqcel5esXDdSqFC6iR8wsOs6XnPft6YqbjX5rkxaiutSmFqfGftysK/cWhSPi0VaeJmvwFunibpjQgH4lh0uEdbvl/p+MC/BPIKwscJEphpEgQolHScoCS/8=
+	t=1770207109; cv=none; b=tsUoPQb8Ls7HuqQDy3otKwmtDcETuZqLAlMb0B2i9H9xb+O6+WNgGcj1iB1wyLIsD4oYuncd4aYHg9xvbKLjTmEvIXwH1Lf52v3siS0JZUtNtZfPyUBYK2ULdPTb7I7hIdfNpWAhQ/N/7hml3bg2yvllOcaMmTj3KlQxQ3lGy+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770206938; c=relaxed/simple;
-	bh=UUviRPGbzzkQIB3bfEJMdwX3h0vP0qCfzC2iQvSakNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VT9PXEac5o27Vs5sa/LV6C1nHswInTdV4WBDe1EFU6JbnQ7exNRRELgLzgZjteOp2iiJdqMT9UqoKRet7T7DetSjwsGygh+cDgyqFPdqjkSvECyLcuxdHkYBces4ebwxbaVXHJJIHY5YZ0Nnh+Tg90ImUhfW5nvSmBKhVls2NsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpT9SBxm; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-501488a12cbso81542551cf.3
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 04:08:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770206937; x=1770811737; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UUviRPGbzzkQIB3bfEJMdwX3h0vP0qCfzC2iQvSakNA=;
-        b=DpT9SBxm4QHMs3xEjMvQDY4zQI52NWnWeFEkb3Hh5iUEroDNniek5sEf29M/IDfLFN
-         s8oK96nXmjh9flID8RYtVDnPgSbAZhFBEPdqg5c5kG+cNtGf0scvgnyMGIG4ssDH4/gP
-         aNXGtdFEvAucnMNVQ56npOOmfkRt+0iKq4iZ4VjFeVeEdy+yQeeRtu2ap9A7BT//eNdn
-         D/F1RsJFSs+fM2oxQpZuM84qd9jDLcb8v1DCKo6diQhW2+a/V4zhX/vo22+7Tj3syTog
-         4OYk8W+OsDhFIuaax2x22FQBgU+1MOscldmJNHuwk8RllOc103LXWNGScUZcMFeGDXku
-         9v4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770206937; x=1770811737;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UUviRPGbzzkQIB3bfEJMdwX3h0vP0qCfzC2iQvSakNA=;
-        b=aRp+wuCPLr0yxG74oXguR5qxto07ro4IRSrNH50V+rc5VBPoidv9lAFOJipXJzzxFU
-         A2e53NIV5B7hzYyQ3svJJ1wIB0cpJc98gpZOLJe+k6R8VRz5zxpWtnUbragdWGYqOJp0
-         pbs8L7NXH273SD7HZA1ye2R3ZAQrY7ga7/9s49z/OTA+PewxB5fq8KtizSHBKhvC4mo+
-         PCRuKwHKC3j5E4dgAymdHp/bDOepN3hy8P9fIFlStj3rR5QEg4i/2lXTG72SCEoPMuSY
-         t25F2KQ+KZ578N51Ym/Vu0YI8GbXAs9enzBlUFJZXSDPUbfV2CrPweKdrV38hsaxEfaW
-         w3pQ==
-X-Gm-Message-State: AOJu0Yy0bFgdFwlKfX+upV5GNEbnLIe1mDvUV1W2DohZkNObAtjGaVLd
-	mcOLztXPHrq8NBdP2JUi/Jh4eE1orOLJJg2mfVd108nVABodWoBcZqOh
-X-Gm-Gg: AZuq6aJJXjzuVgX6vx7XcabC8M99TSAYLmmvT4UyCPRUEtW+8wROcGZtLgHpG0puB9w
-	GTAq5VzFKXmwvJoUxeYZYO60gj4eO+OoxaZL9YQozUrla6iPfqeHHs1BILyxBIKEB1CpvVCCRXZ
-	a4iS4S88fRxzEkO1p9Kq8LQJCcGWCKyheeBtbtNZVLs6zM9IrqN5MvN1I6gsz1ADVfQAb0eHv3G
-	I72UoRc4SysR3jKoCYYJ8B/bkvjRxW6hQK47YIFahdUZCaQaCCVEOSLtqDWKSNs3LOcqaQuLRjq
-	c6HIgDYTAZaoGc84fVffEUcfbQniDGIuvSKw39t85FtrzG0tcwI/CgYzC4FDi0GfAfmUrTWOdr1
-	lUAP2dx5zpRR1w3frDpJWxBR+9J5xQeez2fLfE9sDG+tf3DjH7MPJ+0K4zuXEcqBu7p6sIsT+Ct
-	jy4pNApok=
-X-Received: by 2002:ac8:5847:0:b0:4ff:a40d:d2b2 with SMTP id d75a77b69052e-5061c0dd361mr33710771cf.16.1770206936812;
-        Wed, 04 Feb 2026 04:08:56 -0800 (PST)
-Received: from pek-khao-d3 ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5061c21e75fsm16408671cf.34.2026.02.04.04.08.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 04:08:56 -0800 (PST)
-Date: Wed, 4 Feb 2026 20:08:48 +0800
-From: Kevin Hao <haokexin@gmail.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Byungchul Park <byungchul@sk.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Himanshu Mittal <h-mittal1@ti.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Meghana Malladi <m-malladi@ti.com>, Paolo Abeni <pabeni@redhat.com>,
-	Roger Quadros <rogerq@kernel.org>, Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH net-next 1/2] net: ti: icssg-prueth-sr1: Remove unused
- workqueue
-Message-ID: <aYM20LhFdizztfrH@pek-khao-d3>
-References: <20260204-icssg-prueth-workqueue-v1-0-9a892f4b293d@gmail.com>
- <20260204-icssg-prueth-workqueue-v1-1-9a892f4b293d@gmail.com>
- <b81fc1cb-066a-43be-8cb4-90a45bfc4b06@web.de>
+	s=arc-20240116; t=1770207109; c=relaxed/simple;
+	bh=E72lRfffrbjsoxsZ1ANDr7CC2jDG0kCBzSXD6YjGVBM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PzqkiLg/6/U7LpJgfkncqdni+x1M0sy64qaq0IbwvI2U/tXD9kpN3LhKV1GBk9kCAL76Dueo5/9DR9z3rYGKoHALgMSUwMDpqJVqvkmxtgchz+VKwlboK2EvFneYmJ4nEh085nMXoUGanh6aCCA7lOUsEXRyHoycdZhoAR/fFfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=PiwPHlZh; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=hBGO24IpX+uijpFKMhhUsPdedoPYdDk1kxAezgTwd3M=; t=1770207108; x=1771416708; 
+	b=PiwPHlZhjwlwCWoA4dvWcufeuAtpEHFsbL0qW8rlhy8FmznWaf9pCw/Frojh/dlvpiYgABKidmW
+	BiOJiC0rLP8o+tkC2tm2jn/khjn4mtL5iHHtkIjLoTpkghewwjDt3KZ3EO4lp44oBQEZn1WbVpzCU
+	OXdAXqFVDHZw+g5PtjPGbBeMCf4EO8QNFieRLCmtzpgHMq1MyQXr0hRbw8BD5xVwOfRGCotywflOH
+	LZ8nGxWUzjpp4ReFPCOrsAR36WtoHOd5jvJs8F+6vJvtIyXw1PkCwD7nK6J/YOnu6E7sjyaq7+g0O
+	VmUZMzFqBLxueg1tHxrekm4nVHbcA66y2Q3A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vnbjW-0000000ELjN-2DhJ;
+	Wed, 04 Feb 2026 13:11:46 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-next-2026-02-04
+Date: Wed,  4 Feb 2026 13:09:51 +0100
+Message-ID: <20260204121143.181112-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0eorNAEsC7mvlorp"
-Content-Disposition: inline
-In-Reply-To: <b81fc1cb-066a-43be-8cb4-90a45bfc4b06@web.de>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256688-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FREEMAIL_TO(0.00)[web.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-256690-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C47CE5963
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E8A86E5B1F
 X-Rspamd-Action: no action
 
+Hi,
 
---0eorNAEsC7mvlorp
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+And here's a final set of changes for the -next tree.
+rtw seems to have the biggest changes, refactoring to
+support a new device.
 
-On Wed, Feb 04, 2026 at 11:38:37AM +0100, Markus Elfring wrote:
-> > The dedicated workqueue emac->cmd_wq is not utilized in this driver and
-> > can be safely removed.
->=20
-> Wording suggestion:
-> Remove the work queue =E2=80=9Cemac->cmd_wq=E2=80=9D because it is not ut=
-ilized in this driver.
-
-Will update.
+Please pull and let us know if there's any problem.
 
 Thanks,
-Kevin
+johannes
 
---0eorNAEsC7mvlorp
-Content-Type: application/pgp-signature; name=signature.asc
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEHc6qFoLCZqgJD98Zk1jtMN6usXEFAmmDNtAACgkQk1jtMN6u
-sXGLFQf+Pl6kC5qcHNXnjVLfsBQrMlYCKCtl/+iv4YRYbnlIpgpc8njzuKjpuVxL
-OHEyryLo0Mf+ctNsh0kDa5P8UHdSueT+A1E9VMc+aSABopzF42Pm1neUEurT7ILg
-v9mkrQo4KFwa0Pil7WhOh+lgqRuxB/8UIYwSnu+fnPTdo6kaBclDCF4t32Rzl0td
-UE8m4fOrIHsDu2821TqsFIBYjX2393NiVp4R4sjxoqcA7MxAZNvlvu66IJEERwE9
-x52Eh+Y3QRA62eIqpjeik8qKrymMaZKKZXMdmO+sFNOA77Lo2IR+zJn/tGZONKt9
-oH44+CFhLBW1WGj0uStrPn8x5fXvaA==
-=U//q
------END PGP SIGNATURE-----
+The following changes since commit 303c1a66a22068517793284524dd1d24b7316d1b:
 
---0eorNAEsC7mvlorp--
+  Merge tag 'wireless-next-2026-01-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next (2026-01-29 19:17:43 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2026-02-04
+
+for you to fetch changes up to 9825fa8f49905275acef6c8e7fcd017d04616311:
+
+  wifi: brcmsmac: phy: Remove unreachable error handling code (2026-02-03 13:11:12 +0100)
+
+----------------------------------------------------------------
+Some more changes, including pulls from drivers:
+ - ath drivers: small features/cleanups
+ - rtw drivers: mostly refactoring for rtw89 RTL8922DE support
+ - mac80211: use hrtimers for CAC to avoid too long delays
+ - cfg80211/mac80211: some initial UHR (Wi-Fi 8) support
+
+----------------------------------------------------------------
+Aaradhana Sahu (4):
+      wifi: ath12k: Fix index decrement when array_len is zero
+      wifi: ath12k: Add support RX PDEV stats
+      wifi: ath12k: Add support TX hardware queue stats
+      wifi: ath12k: clear stale link mapping of ahvif->links_map
+
+Amith A (1):
+      wifi: mac80211: use wiphy_hrtimer_work for CAC timeout
+
+Chih-Kang Chang (1):
+      wifi: rtw89: wow: disable interrupt before swapping FW for 8922D
+
+Dian-Syuan Yang (1):
+      wifi: rtw89: pci: restore LDO setting after device resume
+
+Dmitry Baryshkov (1):
+      wifi: ath10k: snoc: support powering on the device via pwrseq
+
+Eric Huang (5):
+      wifi: rtw89: phy: extend register to read history 2 of PHY env_monitor
+      wifi: rtw89: phy: update bb wrapper TPU init
+      wifi: rtw89: phy: handle C2H event for PS mode report
+      wifi: rtw89: phy: add H2C command to send detail RX gain and link parameters for PS mode
+      wifi: rtw89: phy: update edcca log parsing for RTL8922D
+
+Ingyu Jang (1):
+      wifi: brcmsmac: phy: Remove unreachable error handling code
+
+Johannes Berg (5):
+      Merge tag 'rtw-next-2026-01-30' of https://github.com/pkshih/rtw
+      wifi: ieee80211: add some initial UHR definitions
+      wifi: cfg80211: add initial UHR support
+      wifi: mac80211: add initial UHR support
+      Merge tag 'ath-next-20260202' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+
+Lachlan Hodges (1):
+      wifi: mac80211: correct ieee80211-{s1g/eht}.h include guard comments
+
+Lorenzo Bianconi (1):
+      wifi: mac80211: Add eMLSR/eMLMR action frame parsing support
+
+Marco Crivellari (1):
+      wifi: rtw88: add WQ_PERCPU to alloc_workqueue users
+
+Miaoqing Pan (2):
+      wifi: ath11k: add usecase firmware handling based on device compatible
+      dt-bindings: net: wireless: ath11k-pci: deprecate 'firmware-name' property
+
+Ping-Ke Shih (22):
+      wifi: rtw89: mac: clear global interrupt right after power-on
+      wifi: rtw89: phy: add {read,write}_rf_v3 for RTL8922D
+      wifi: rtw89: phy: add ops rtw89_phy_gen_be_v1 for RTL8922D
+      wifi: rtw89: phy: abstract start address and EHT of PHY status bitmap
+      wifi: rtw89: phy: abstract BB wrap registers to share initial flow
+      wifi: rtw89: phy: update BB wrapper RFSI
+      wifi: rtw89: phy: write BB wrapper registers with flush
+      wifi: rtw89: phy: refine initial flow of BB wrapper
+      wifi: rtw89: phy: add chip_ops to calculate RX gain from efuse to support PS mode
+      wifi: rtw89: phy: add firmware element of digital TX power compensation
+      wifi: rtw89: mac: clear DTOP disable excluding CID7090 variant for RTL8922D
+      wifi: rtw89: mac: set force MBA duration to 0
+      wifi: rtw89: rfk: add firmware command to do TX IQK
+      wifi: rtw89: rfk: add to print debug log of TX IQK
+      wifi: rtw89: rfk: add firmware command to do CIM3K
+      wifi: rtw89: rfk: add to print debug log of CIM3K
+      wifi: rtw89: rfk: update RFK report format of IQK, DACK and TXGAPK
+      wifi: rtw89: fw: correct content of DACK H2C command
+      wifi: rtw89: phy: add PHY C2H event dummy handler for func 1-7 and 2-10
+      wifi: rtw89: pci: validate release report content before using for RTL8922DE
+      wifi: rtw89: mac: set MU group membership and position to registers
+      wifi: rtw89: pci: warn if SPS OCP happens for RTL8922DE
+
+Po-Hao Huang (3):
+      wifi: rtw89: phy: fix incorrect power limit by mac_id
+      wifi: rtw89: fix unable to receive probe responses under MLO connection
+      wifi: rtw89: 8922a: add digital compensation for 2GHz
+
+Shin-Yi Lin (1):
+      wifi: rtw89: Add default ID 28de:2432 for RTL8832CU
+
+Wei Zhang (2):
+      wifi: ath12k: add WMI support for spatial reuse parameter configuration
+      wifi: ath12k: support OBSS PD configuration for AP mode
+
+Zilin Guan (1):
+      wifi: rtw89: debug: Fix memory leak in __print_txpwr_map()
+
+Ziyi Guo (2):
+      wifi: ath10k: fix lock protection in ath10k_wmi_event_peer_sta_ps_state_chg()
+      wifi: ath10k: sdio: add missing lock protection in ath10k_sdio_fw_crashed_dump()
+
+Zong-Zhe Yang (6):
+      wifi: rtw89: phy: update TSSI flow for RTL8922D
+      wifi: rtw89: 8922a: configure FW version for SIM_SER_L0L1_BY_HALT_H2C
+      wifi: rtw89: get designated link to replace link instance 0
+      wifi: rtw89: regd: update regulatory map to R73-R54
+      wifi: rtw89: debug: rename mac/ctrl error to L0/L1 error
+      wifi: rtw89: debug: tweak Wi-Fi 7 SER L0/L1 simulation methods
+
+ .../bindings/net/wireless/qcom,ath11k-pci.yaml     |   1 +
+ drivers/net/wireless/ath/ath10k/sdio.c             |   6 +
+ drivers/net/wireless/ath/ath10k/snoc.c             |  53 +-
+ drivers/net/wireless/ath/ath10k/snoc.h             |   3 +
+ drivers/net/wireless/ath/ath10k/wmi.c              |   4 +-
+ drivers/net/wireless/ath/ath11k/core.c             |  27 +
+ drivers/net/wireless/ath/ath11k/core.h             |   4 +
+ .../net/wireless/ath/ath12k/debugfs_htt_stats.c    | 197 ++++++-
+ .../net/wireless/ath/ath12k/debugfs_htt_stats.h    |  81 +++
+ drivers/net/wireless/ath/ath12k/mac.c              | 174 ++++++-
+ drivers/net/wireless/ath/ath12k/mac.h              |   3 +
+ drivers/net/wireless/ath/ath12k/wmi.c              | 142 ++++++
+ drivers/net/wireless/ath/ath12k/wmi.h              |  47 ++
+ .../broadcom/brcm80211/brcmsmac/phy/phy_lcn.c      |   9 +-
+ drivers/net/wireless/realtek/rtw88/usb.c           |   3 +-
+ drivers/net/wireless/realtek/rtw89/chan.c          |  31 +-
+ drivers/net/wireless/realtek/rtw89/core.h          |  40 +-
+ drivers/net/wireless/realtek/rtw89/debug.c         |  99 +++-
+ drivers/net/wireless/realtek/rtw89/debug.h         |   1 +
+ drivers/net/wireless/realtek/rtw89/fw.c            | 297 ++++++++++-
+ drivers/net/wireless/realtek/rtw89/fw.h            | 188 ++++++-
+ drivers/net/wireless/realtek/rtw89/mac.c           |  23 +-
+ drivers/net/wireless/realtek/rtw89/mac.h           |  23 +
+ drivers/net/wireless/realtek/rtw89/mac80211.c      |   4 +-
+ drivers/net/wireless/realtek/rtw89/mac_be.c        |  23 +-
+ drivers/net/wireless/realtek/rtw89/pci.c           |  17 +-
+ drivers/net/wireless/realtek/rtw89/pci.h           |   1 +
+ drivers/net/wireless/realtek/rtw89/pci_be.c        |   2 +
+ drivers/net/wireless/realtek/rtw89/phy.c           | 381 ++++++++++++--
+ drivers/net/wireless/realtek/rtw89/phy.h           |  36 +-
+ drivers/net/wireless/realtek/rtw89/phy_be.c        | 563 ++++++++++++++++++++-
+ drivers/net/wireless/realtek/rtw89/ps.c            |   2 +
+ drivers/net/wireless/realtek/rtw89/reg.h           | 368 +++++++++++++-
+ drivers/net/wireless/realtek/rtw89/regd.c          |  20 +-
+ drivers/net/wireless/realtek/rtw89/rtw8851b.c      |   1 +
+ drivers/net/wireless/realtek/rtw89/rtw8852a.c      |   1 +
+ drivers/net/wireless/realtek/rtw89/rtw8852b.c      |   1 +
+ drivers/net/wireless/realtek/rtw89/rtw8852bt.c     |   1 +
+ drivers/net/wireless/realtek/rtw89/rtw8852c.c      |   1 +
+ drivers/net/wireless/realtek/rtw89/rtw8852cu.c     |   2 +
+ drivers/net/wireless/realtek/rtw89/rtw8922a.c      |  58 ++-
+ drivers/net/wireless/realtek/rtw89/wow.c           |   6 +-
+ include/linux/ieee80211-eht.h                      |  13 +-
+ include/linux/ieee80211-s1g.h                      |   2 +-
+ include/linux/ieee80211-uhr.h                      | 220 ++++++++
+ include/linux/ieee80211.h                          |  39 +-
+ include/net/cfg80211.h                             |  58 ++-
+ include/net/mac80211.h                             |  67 ++-
+ include/uapi/linux/nl80211.h                       |  30 ++
+ net/mac80211/Makefile                              |   2 +-
+ net/mac80211/cfg.c                                 |  24 +-
+ net/mac80211/driver-ops.h                          |  21 +
+ net/mac80211/eht.c                                 | 175 +++++++
+ net/mac80211/ieee80211_i.h                         |  23 +-
+ net/mac80211/iface.c                               |  12 +-
+ net/mac80211/link.c                                |   4 +-
+ net/mac80211/main.c                                |  15 +-
+ net/mac80211/mlme.c                                | 115 ++++-
+ net/mac80211/parse.c                               |  22 +-
+ net/mac80211/rx.c                                  |  34 ++
+ net/mac80211/sta_info.c                            |  13 +-
+ net/mac80211/sta_info.h                            |  80 ++-
+ net/mac80211/trace.h                               |  32 ++
+ net/mac80211/uhr.c                                 |  30 ++
+ net/mac80211/util.c                                |  38 +-
+ net/wireless/nl80211.c                             | 102 +++-
+ net/wireless/reg.c                                 |   4 +-
+ net/wireless/util.c                                | 101 +++-
+ 68 files changed, 3973 insertions(+), 247 deletions(-)
+ create mode 100644 include/linux/ieee80211-uhr.h
+ create mode 100644 net/mac80211/uhr.c
 
