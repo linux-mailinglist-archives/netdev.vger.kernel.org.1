@@ -1,223 +1,179 @@
-Return-Path: <netdev+bounces-256764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIW/HtN1g2mFmwMAu9opvQ
-	(envelope-from <netdev+bounces-256764-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:37:39 +0100
+	id cMUKONR0g2mFmwMAu9opvQ
+	(envelope-from <netdev+bounces-256766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:33:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6408EA595
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:37:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF4BEA4A4
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCD863051855
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 16:30:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 74056300CA32
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 16:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617042F068C;
-	Wed,  4 Feb 2026 16:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7832F25EB;
+	Wed,  4 Feb 2026 16:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o3BG/bUE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUyGXZd7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141582D061B
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 16:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5F62D061B;
+	Wed,  4 Feb 2026 16:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770222638; cv=none; b=KZr7VQ5yoRPqTYZFTNGQlU13S/pvy1Jqz+2QH8zL742j0AyfR3eL39vDwAPvUTh6G2eXNYxXnSVSm5Gai7cJLCzgUFDUcym2xMMNtM0in6IIjIgJka2kBMhnSvhm/tSvuFIHPL/09Pu/s5a7pdq8KjKAqNuCICBFQKQhUHNzbzw=
+	t=1770222797; cv=none; b=VUgVG8yc2CHFjVebaMKfZeORw/vVOnD7Qzx5JkxWuEoHqUVsrbVJ5HjbIwZjpwWvVYPduiWm5VqRuA8fkJ5wB/AaIrNZJSALNQc5cUZk2b0E9aIkly4aXVq3di9WdP0OfoCJygukJvM4/qd2QM05t09IyzBHJB0kfPn/NwNnLYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770222638; c=relaxed/simple;
-	bh=ljusHhYew9UX9U88QokVmA3WLr60lUQyhJuT/P1++Lk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=K0FzpEP36i1fwukLAGTL2z8CyRr2qBVeXLbbCW284n/MXBT1yxZW0aySaOFORCB4KYy2GyvL9GIaV8derwyvzCAwskny9QL21871v/wkRQjDwirNKTZzgOh/wUnzwmvoIGexGNP47nESOdQG0GMuipthdCuVC+6qwBr1BHcBUD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o3BG/bUE; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-5014b22d678so405331cf.0
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 08:30:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770222637; x=1770827437; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vI6nAk9GKIRaCIG/V3pg1epMkn+/SqlNMe8sYio9wEM=;
-        b=o3BG/bUEQ//nbjZKGU/LLXxml6wIm5XEPbKFZ0k+XAP8aZ4lbv2N+N+epajtav/B5i
-         ElxlBaa2TwCHaAmhu8KiYkVlc/JFiOTbD9wwptgtaNwVAQnABjM1ppbf/sVNxvvSMzUc
-         H6h6WHNY08UG5KV96XOfRO1GF46t0btwcJgxzFj0Z8H/GlbLUqpOTPGeRFDAV8itQsQc
-         LtCljGev5LGkVkI09iByJMUAaDz0MieoJwVYLgMcjIbPpzyHgf81lRdgbZjF/X8bL3Tp
-         rNHNLTMTUEsQZDr3FqtF9eOdlH2MmF7Dq/aPKT4zWIB2cKaHDsUWsNgSOX7ErvGv77s8
-         gsVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770222637; x=1770827437;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vI6nAk9GKIRaCIG/V3pg1epMkn+/SqlNMe8sYio9wEM=;
-        b=Ta0GGJLTjZmxtQuY3QCmELE6HRBdLEFonbmWGlPbPmxoKIYN/XZK3H2UEGRAT+oH11
-         SB3tMX6q3eadekGYnbFHV+DV+tkwxI0jBeaOVwWSiSmV1PZhtJskzHsx3yBFekNM4bdK
-         SVLaxmFYqTju6pRI1YQ9Dv8qGe6pVLdA2vgmyZPhYpwEN4SL5+8U8JZ4suYIecCEoN9R
-         4PTwNyj88aec10lZKacFmVpQigmGND9vBnc3DmwQQo0gXgjg9zPKMqIj85rRNumbass7
-         jaAxSuXWie7or7uxBS/SuU0S1IqeRUQVRt08mo1gHCtb1Uc2kOIfMYQE8Hmmp0pc/LT3
-         qixA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ90RrDAZqgMr4yMjwI4j4umciEo4MeoGLzuNP+vaHNEr3zpWuoQkc579aD3GOl6z0Wi/udtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHP1KU5BDNFLccJ5ePSD2U3Da7JsfWDsIgxlIAX/DsWeTElRS4
-	/ug8Xtvx3gyNFTG40JgFrHuW078O7YA4EVqYVV/QwW1XV9CFjx8uvchbrewLfGzOKKVdZlhfdGH
-	4Hmad1aTsEWVceA==
-X-Received: from qtg27.prod.google.com ([2002:a05:622a:d1b:b0:501:45c9:19d7])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5a0e:0:b0:4ee:428e:bf0f with SMTP id d75a77b69052e-5061c0c7563mr45094781cf.2.1770222636930;
- Wed, 04 Feb 2026 08:30:36 -0800 (PST)
-Date: Wed,  4 Feb 2026 16:30:34 +0000
+	s=arc-20240116; t=1770222797; c=relaxed/simple;
+	bh=vGUdrP9f8bzyMrk2MhQOk5OCdnX7t/LoR9oHraUNTvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=husK6nVJSYMq1k53T/7DNnARmoxQjiyysjJmuQi25nXFgjt0SuHHFcTpYp+WhhNZpGFMmgW2l+1p920M87FrYBztSn9e/k/eJ3IXUJUsml2H4xLCFGq/NZ6gDRHKDEj7cEm97k3MJ7YlipWGnsJU3GrHKkIho8iSfyBYZf7fj1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUyGXZd7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE50C116C6;
+	Wed,  4 Feb 2026 16:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770222796;
+	bh=vGUdrP9f8bzyMrk2MhQOk5OCdnX7t/LoR9oHraUNTvs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oUyGXZd7nCw58nsV+VJcuJ9CM9+gbjOJU3fst9huZsh/834chl7BkBj5HPNHFqKfb
+	 jDg5wH48KKBHUPkhgHo+Odf0QG0EyF+bjlXCQR7wM9HZeI00Pqxe+5RVUZlhZfQ1Px
+	 EwvNOQlLo42iPZECRVvCjNIsflWzbso/dNRe1RLId2oVJ9psUKeIUwdc3TAcMjPuTM
+	 F04A2ALyINa9fTVD0/X+L5P+UzjYEU0KmMjTsfhW8bHAvNI+vRxnIckerIGu75/wDz
+	 EPVsadjDBXdbxtrwP1yPThPoS9Sda8CmE7xagMaJJrxGBeBVeF0xw/qo/BFzOhdqqq
+	 iosHNhxhmZ52g==
+Date: Wed, 4 Feb 2026 16:33:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Parvathi Pudi <parvathi@couthit.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
+	rogerq@kernel.org, pmohan@couthit.com, basharath@couthit.com,
+	afd@ti.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, alok.a.tiwari@oracle.com,
+	pratheesh@ti.com, j-rameshbabu@ti.com, vigneshr@ti.com,
+	praneeth@ti.com, srk@ti.com, rogerq@ti.com, krishna@couthit.com,
+	mohan@couthit.com
+Subject: Re: [PATCH net-next v13 0/3] STP/RSTP SWITCH support for PRU-ICSSM
+ Ethernet driver
+Message-ID: <aYN0xmOIaHeAvWNI@horms.kernel.org>
+References: <20260130124559.1182780-1-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260204163035.4123817-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: change inet6_sk_rebuild_header() to use inet->cork.fl.u.ip6
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Matthieu Baerts <matttbe@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260130124559.1182780-1-parvathi@couthit.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256766-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256764-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E6408EA595
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 8AF4BEA4A4
 X-Rspamd-Action: no action
 
-TCP v6 spends a good amount of time rebuilding a fresh fl6 at each
-transmit in inet6_csk_xmit()/inet6_csk_route_socket().
+On Fri, Jan 30, 2026 at 06:13:42PM +0530, Parvathi Pudi wrote:
+> Hi,
+> 
+> The DUAL-EMAC patch series for Megabit Industrial Communication Sub-system
+> (ICSSM), which provides the foundational support for Ethernet functionality
+> over PRU-ICSS on the TI SOCs (AM335x, AM437x, and AM57x), was merged into
+> net-next recently [1].
+> 
+> This patch series enhances the PRU-ICSSM Ethernet driver to support bridge
+> (STP/RSTP) SWITCH mode, which has been implemented using the "switchdev"
+> framework and interacts with the "mstp daemon" for STP and RSTP management
+> in userspace.
+> 
+> When the  SWITCH mode is enabled, forwarding of Ethernet packets using
+> either the traditional store-and-forward mechanism or via cut-through is
+> offloaded to the two PRU based Ethernet interfaces available within the
+> ICSSM. The firmware running on the PRU inspects the bridge port states and
+> performs necessary checks before forwarding a packet. This improves the
+> overall system performance and significantly reduces the packet forwarding
+> latency.
+> 
+> Protocol switching from Dual-EMAC to bridge (STP/RSTP) SWITCH mode can be
+> done as follows.
+> 
+> Assuming eth2 and eth3 are the two physical ports of the ICSS2 instance:
+> 
+> >> brctl addbr br0
+> >> ip maddr add 01:80:c2:00:00:00 dev br0
+> >> ip link set dev br0 address $(cat /sys/class/net/eth2/address)
+> >> brctl addif br0 eth2
+> >> brctl addif br0 eth3
+> >> mstpd
+> >> brctl stp br0 on
+> # STP to RSTP mode
+> >> mstpctl setforcevers br0 rstp
+> >> ip link set dev br0 up
+> 
+> To revert back to the default dual EMAC mode, the steps are as follows:
+> 
+> >> ip link set dev br0 down
+> >> brctl delif br0 eth2
+> >> brctl delif br0 eth3
+> >> brctl delbr br0
+> 
+> The patches presented in this series have gone through the patch verification
+> tools and no warnings or errors are reported.
+> 
+> Sample test logs obtained from AM33x, AM43x and AM57x verifying the
+> functionality on Linux next kernel are available here:
+> 
+> [Interface up Testing](https://gist.github.com/ParvathiPudi/91b05f4e6d69d72f55ddd4e95301ab20)
+> 
+> [Ping Testing](https://gist.github.com/ParvathiPudi/9e7573ea85ef72a3ebcbdb4c902f3b8a)
+> 
+> [Iperf Testing](https://gist.github.com/ParvathiPudi/30abedf115aba19542e0156486766553)
+> 
+> [1] https://lore.kernel.org/all/20250912104741.528721-1-parvathi@couthit.com/
+> 
+> This is the v13 of the patch series [v1]. This version of the patchset
+> addresses the comments made on [v12] of the series.
+> 
+> Changes from v12 to v13:
+> 
+> *) Reverted the use of kmalloc_obj() and kzalloc_obj() back to kmalloc() and kzalloc(),
+> since the corresponding changes are not reflected in the net-next branch.
+> *) Addressed AI review warnings on patch 3 of the series.
+> *) Rebased the series on latest net-next.
 
-TCP v4 caches the information in inet->cork.fl.u.ip4 instead.
+Thanks,
 
-This patch is a first step converting IPv6 to the same strategy:
+I notice that this series has been marked as Changes Requested in
+Patchwork. But overall it looks good to me.
 
-Before this patch inet6_sk_rebuild_header() only validated/rebuilt
-a dst. Automatic variable @fl6 content was lost.
-
-After this patch inet6_sk_rebuild_header() also initializes
-inet->cork.fl.u.ip6, which can be reused in the future.
-
-This makes inet6_sk_rebuild_header() very similar to
-inet_sk_rebuild_header().
-
-Also remove the EXPORT_SYMBOL_GPL(), inet6_sk_rebuild_header()
-is not called from any module.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-CC: Matthieu Baerts <matttbe@kernel.org>
----
- net/ipv6/af_inet6.c | 57 +++++++++++++++++++++------------------------
- 1 file changed, 27 insertions(+), 30 deletions(-)
-
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index bd29840659f34b5754a182303d2871c5f884dfce..0476dbc8edb2b8273fd337b15c8196e9597753ef 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -824,45 +824,42 @@ EXPORT_SYMBOL(inet6_unregister_protosw);
- int inet6_sk_rebuild_header(struct sock *sk)
- {
- 	struct ipv6_pinfo *np = inet6_sk(sk);
-+	struct inet_sock *inet = inet_sk(sk);
-+	struct in6_addr *final_p, final;
- 	struct dst_entry *dst;
-+	struct flowi6 *fl6;
- 
- 	dst = __sk_dst_check(sk, np->dst_cookie);
-+	if (dst)
-+		return 0;
-+
-+	fl6 = &inet->cork.fl.u.ip6;
-+	memset(fl6, 0, sizeof(*fl6));
-+	fl6->flowi6_proto = sk->sk_protocol;
-+	fl6->daddr = sk->sk_v6_daddr;
-+	fl6->saddr = np->saddr;
-+	fl6->flowlabel = np->flow_label;
-+	fl6->flowi6_oif = sk->sk_bound_dev_if;
-+	fl6->flowi6_mark = sk->sk_mark;
-+	fl6->fl6_dport = inet->inet_dport;
-+	fl6->fl6_sport = inet->inet_sport;
-+	fl6->flowi6_uid = sk_uid(sk);
-+	security_sk_classify_flow(sk, flowi6_to_flowi_common(fl6));
- 
--	if (!dst) {
--		struct inet_sock *inet = inet_sk(sk);
--		struct in6_addr *final_p, final;
--		struct flowi6 fl6;
--
--		memset(&fl6, 0, sizeof(fl6));
--		fl6.flowi6_proto = sk->sk_protocol;
--		fl6.daddr = sk->sk_v6_daddr;
--		fl6.saddr = np->saddr;
--		fl6.flowlabel = np->flow_label;
--		fl6.flowi6_oif = sk->sk_bound_dev_if;
--		fl6.flowi6_mark = sk->sk_mark;
--		fl6.fl6_dport = inet->inet_dport;
--		fl6.fl6_sport = inet->inet_sport;
--		fl6.flowi6_uid = sk_uid(sk);
--		security_sk_classify_flow(sk, flowi6_to_flowi_common(&fl6));
--
--		rcu_read_lock();
--		final_p = fl6_update_dst(&fl6, rcu_dereference(np->opt),
--					 &final);
--		rcu_read_unlock();
--
--		dst = ip6_dst_lookup_flow(sock_net(sk), sk, &fl6, final_p);
--		if (IS_ERR(dst)) {
--			sk->sk_route_caps = 0;
--			WRITE_ONCE(sk->sk_err_soft, -PTR_ERR(dst));
--			return PTR_ERR(dst);
--		}
-+	rcu_read_lock();
-+	final_p = fl6_update_dst(fl6, rcu_dereference(np->opt), &final);
-+	rcu_read_unlock();
- 
--		ip6_dst_store(sk, dst, false, false);
-+	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, final_p);
-+	if (IS_ERR(dst)) {
-+		sk->sk_route_caps = 0;
-+		WRITE_ONCE(sk->sk_err_soft, -PTR_ERR(dst));
-+		return PTR_ERR(dst);
- 	}
- 
-+	ip6_dst_store(sk, dst, false, false);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(inet6_sk_rebuild_header);
- 
- bool ipv6_opt_accepted(const struct sock *sk, const struct sk_buff *skb,
- 		       const struct inet6_skb_parm *opt)
--- 
-2.53.0.rc2.204.g2597b5adb4-goog
+Feel free to add the following for the series:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
