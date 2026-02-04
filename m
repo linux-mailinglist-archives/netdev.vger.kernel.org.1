@@ -1,108 +1,130 @@
-Return-Path: <netdev+bounces-256533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +5zyM1q6gmmYZQMAu9opvQ
-	(envelope-from <netdev+bounces-256533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 04:17:46 +0100
+	id NWFzGe66gmnLZQMAu9opvQ
+	(envelope-from <netdev+bounces-256534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 04:20:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB9DE134D
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 04:17:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE67E135A
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 04:20:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABD0D303C527
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 03:17:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02ECC30BBD89
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 03:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F08289E06;
-	Wed,  4 Feb 2026 03:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043A3299948;
+	Wed,  4 Feb 2026 03:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQP9sxCO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UY2TEKYO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872E01CAA78
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 03:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C343BB5A;
+	Wed,  4 Feb 2026 03:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770175062; cv=none; b=FureKByQGigI7CHH45w1aQEVjEIeiOfniRgWQBHQDjD2kaSZApEeVj8COnvcJ+BLQkOCq0lryJtQzYDkz1Aqv+QIkEdLJab968fagc3xzSgBc7majPqf7+kTPheP2U7z94swaj1NRhgzkywbjF006h4BcRzXXAGJbnOJHrpaTiE=
+	t=1770175209; cv=none; b=eb3SUwAlQ56UnZa/vS+Vjbt5/kCS6D6ORHbcS2/s61dLXcVoFJECkNRtLlkTI2zYw+ihPJ/9Eqqq1z+1A4TYL7pEOMSs52hY3Helkix+loNVTJdzh9Ha5zkpZVZQ2C6dDFeB6KitxfpzZoWinf3gevKv8aFgpQe/12UuGqzA8Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770175062; c=relaxed/simple;
-	bh=l0F7Ms9ZqYA86BYadsP1gpUptbU4m0N3ul42adQfls0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mwoUGPT3oEPR3v3U5a39vndH1G/nY0NJnMcLOT198ywn6OHTKWpf0zpCeXQtTKKmUNN4B4Msni3a7OYa0L4eSMYLtlF0Ac1jc/Z6ho+mGyd7QlepjPXDoHWwDvlYcPm9ZTAcCuQP+dtEJM4s7NPkKr0wVhEAmZ5yA0Xq8ByLqI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQP9sxCO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0CACC116D0;
-	Wed,  4 Feb 2026 03:17:41 +0000 (UTC)
+	s=arc-20240116; t=1770175209; c=relaxed/simple;
+	bh=Wi11qSXLkjp1rMgO4esIkVs4uZpWAHv8qcssbxXX480=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FLTFZlJsdxoxhi6vzu+A7J66B5EuvEwRKSTmj+FAzmdUAZc4WGrQrHuJIQ7N+5eAIv9fwj8H7R/DxoAOgweXDeMXMXrfX1JbKBSTTfSZXB57b/Suhr7bFnTzZKZLWeUknqLCgFp96l7uxKoKLXsyh0zVN+Bk7Mou9NjsDkLGraE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UY2TEKYO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B25C116D0;
+	Wed,  4 Feb 2026 03:20:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770175062;
-	bh=l0F7Ms9ZqYA86BYadsP1gpUptbU4m0N3ul42adQfls0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pQP9sxCOyC6sPpYpzvSkqKilD+xQajqkXZ/QKu+xAEFoZQD98wulnTYuvfC+iy0DP
-	 OFCYEIhs42OYuduzgRNymym6wmyrSxRwDicm+s7pWMi9+WlNi4lPWddwp4L+Lqo1i4
-	 olbUoqB82aRY//JaYdEtGG6QqpL0uoPVveXGhVXVXeFRG/wZL7Z733HDoqvyj6qaj/
-	 LeR5MhbYAWcIeRg038cGudjXagj5YJjO0yptBv0cNTS+tUfVx/rAHGzyXDJz5VXmBP
-	 WHzmnkELt+2rGas4g1gX1n0juaUjeo7GNUQPtbok0p1qO07PRZfODeabC0uKi67xHS
-	 axJi8G5RJaoqw==
-Date: Tue, 3 Feb 2026 19:17:40 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: add vlan_get_protocol_offset_inline()
- helper
-Message-ID: <20260203191740.2404d44c@kernel.org>
-In-Reply-To: <20260202082200.650516-1-edumazet@google.com>
-References: <20260202082200.650516-1-edumazet@google.com>
+	s=k20201202; t=1770175209;
+	bh=Wi11qSXLkjp1rMgO4esIkVs4uZpWAHv8qcssbxXX480=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UY2TEKYOgJTVj/V2jhWLqr8HnRK3iB1MKu0xDRLWBMQJAx60QH9/8NVSBNbMYC3Ah
+	 Wc8Be+cTHAQ2bl4rq1QW2DUcuj+6uonCIw9VCPeufvlI+LE47C7d1Tan/s9AbQyZn0
+	 HgsyVYHyPAn6z0CnYujA8suLlhgOj9xxeh2z4jac+c87iik+41gjvn+CUsoR35TXFX
+	 T+zqdw7EHHz1Z89WwSzeFZUJo8+Ad/Yo8WKq4HhSs8ByyheMXeS7A7BHcnJQJ/s+PG
+	 5wyT3E8DASLi4yfJFpEs7AGXwxJfbKZuakLgwtCb+wL4xeNVs3D7aNtTbQnXMhzdPm
+	 GxcQq6AEwVGRA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id CE0223808200;
+	Wed,  4 Feb 2026 03:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ethernet: adi: adin1110: Check return value
+ of
+ devm_gpiod_get_optional() in adin1110_check_spi()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177017520563.2163463.7076254684537955937.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Feb 2026 03:20:05 +0000
+References: <20260202040228.4129097-1-nichen@iscas.ac.cn>
+In-Reply-To: <20260202040228.4129097-1-nichen@iscas.ac.cn>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, kuniyu@google.com,
+ nicolas.dichtel@6wind.com, alexandru.tachici@analog.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-256533-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256534-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5DB9DE134D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ADE67E135A
 X-Rspamd-Action: no action
 
-On Mon,  2 Feb 2026 08:22:00 +0000 Eric Dumazet wrote:
-> +struct type_depth {
-> +	__be16 type;
-> +	u16 depth;
-> +};
+Hello:
 
-Should we prefix the struct name with vlan_
-Seeing type_depth made me think the function is returning some compiler
-metadata :S Maybe it's just me.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  2 Feb 2026 12:02:28 +0800 you wrote:
+> The devm_gpiod_get_optional() function may return an ERR_PTR in case of
+> genuine GPIO acquisition errors, not just NULL which indicates the
+> legitimate absence of an optional GPIO.
+> 
+> Add an IS_ERR() check after the call in adin1110_check_spi(). On error,
+> return the error code to ensure proper failure handling rather than
+> proceeding with invalid pointers.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: ethernet: adi: adin1110: Check return value of devm_gpiod_get_optional() in adin1110_check_spi()
+    https://git.kernel.org/netdev/net/c/78211543d2e4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
