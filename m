@@ -1,250 +1,173 @@
-Return-Path: <netdev+bounces-256803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id /PiVFQ+gg2kDqgMAu9opvQ
-	(envelope-from <netdev+bounces-256803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 20:37:51 +0100
+	id UF8OOHOfg2kLqQMAu9opvQ
+	(envelope-from <netdev+bounces-256804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 20:35:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6AAEC203
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 20:37:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3EC6EC193
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 20:35:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9DDB2307ACCF
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 19:34:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 478AD30055C4
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 19:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175613F23BD;
-	Wed,  4 Feb 2026 19:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB340427A1C;
+	Wed,  4 Feb 2026 19:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kCVFBSl7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fkjqhAjz"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010065.outbound.protection.outlook.com [52.101.46.65])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7BA3A900B;
-	Wed,  4 Feb 2026 19:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770233670; cv=fail; b=MCiiLIWHQzw6kol6bXnCi+yZ1zsrkRd9RoGpQPy2qXMjFNSpz9CmEVrR1uCyESvMRmuvdCtci5GWy42yIn1AnODsz8C+nj9N4RgJqDYnCoH9Ktm9X6KbtJIE4a0FZy7U/rR9jkiF2Ov/NaR7KOI0arzJ/qHqDSYYJPhA4wOgLgc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770233670; c=relaxed/simple;
-	bh=MWiYf9IIbpu4cQbiRZXMls+mHoHyrJb83ywWeuvfoJA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ANT3DoOn2rRhfwWydHJZSz3kvM97/2mfy6Vd5VbnDaBVyQW0GTeMv2siFgmX+y/v0z0MrL5Uw7PCvy9pwnNK9xzCUcP9eHmidWsht3qKd1d70TFtY0b2w+q/TUBehMFTxyHeyvmEVJk23SKlbySNG9fR02YCZ5HxChFFWqJWLNk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kCVFBSl7; arc=fail smtp.client-ip=52.101.46.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=joTDgjeYiJ/x+Amjg4xjqSirL+c5xyVpTO88N7UYci3Xt+XbF2w4b6HyiX619EY+6uGNezRkB+V6HH04QWJlpXqRbJoKjI8HPmrpwJMhqhCJW+iBz5bFlmUmQMDnVRdKMN1Mzl/J7SHC9hIYthhQ9uWUUciYZim0tZVcv+4HENcYiSsQ/0NGKHplMCRKzx8vSNl3kJToZp2zKwVHdBdEI+4JR/gK9M/QxP0+TAbXs4R55hNMUcaQUsqlQSasDiVVHBdHq4dqPwML2yM5W6lSnoS4/jCyXrIblLCj1jpgaNZj5dNUyyxfK/FYb2se9ikOrXlHdoAFkD6qR+Fzyyb/sQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X1R40vLBuMU/jcBKdTuukHEclQRzSBHjpNxinHLF/hs=;
- b=aBc/3EoTg/auOS4ZcYf/Rnhm8o/qJ9pGe1TbxJutg4G2khCVrBfr7vUfW707iDP67GY0b0KrAoa52/KmlfcxCS5ad9kYMKBpTcEJUSwjtGLPKL+gAzNAmleGChV3PPFeBXNl70OUYUiQ1juU2OwVlCY8yaecGR6lhbfacPjlCkPqcC10Zw3u89Wgt2s6opGEDwawHxYtaXF++/6WrUh+A+8Q7fovCAU94FhWzjtP3YaRW91uU8vCtGO0U+DSWKadX9SEH9AcpE0O2NGB5G1Xz/D1yt57sJCNw3LIKPytE4tbpUxwmyHkkwKRDSLPoOfCuTwmH1+0FHs1yWyPpTUwHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X1R40vLBuMU/jcBKdTuukHEclQRzSBHjpNxinHLF/hs=;
- b=kCVFBSl7aoGoKfBlgMidRrqBqf7h1xOHIXePxQekmm4j7P6ZCI0lQHCzH0jJoIugIqhtnL5McsC8g9ncBdpMFNyJimp6PPTnOEIoVlko902Ib+2jrWCjNHqeIAn/6C3FJQYupFQapghjDZRXYyH0xiKIfVkQK5Sio2kWUfxq+3u02m+wAJZCRC3hrVDQEwv23OwFunYIfu4UcnYki85Z2/edjKH1tzGJhfhISdTockid5Zb+p+iWAThvUruY8M033LoM+sgKLjGPtwGGGyayT+i1T8AVbbllvrssgV2mtERjSRciLX738q6urE6TvJ7iWRGp28svP9FrEY6xzobzzQ==
-Received: from PH7P220CA0058.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:32b::9)
- by BL4PR12MB9723.namprd12.prod.outlook.com (2603:10b6:208:4ed::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Wed, 4 Feb
- 2026 19:34:24 +0000
-Received: from CY4PEPF0000EE3C.namprd03.prod.outlook.com
- (2603:10b6:510:32b:cafe::7f) by PH7P220CA0058.outlook.office365.com
- (2603:10b6:510:32b::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9587.13 via Frontend Transport; Wed,
- 4 Feb 2026 19:34:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE3C.mail.protection.outlook.com (10.167.242.13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9587.10 via Frontend Transport; Wed, 4 Feb 2026 19:34:24 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 4 Feb
- 2026 11:34:00 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 4 Feb
- 2026 11:33:59 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Wed, 4 Feb
- 2026 11:33:56 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	"Mark Bloch" <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
-	<moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net-next 5/5] net/mlx5e: Report stop and wake TX queue stats
-Date: Wed, 4 Feb 2026 21:33:15 +0200
-Message-ID: <20260204193315.1722983-6-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260204193315.1722983-1-tariqt@nvidia.com>
-References: <20260204193315.1722983-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2D132BF51
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 19:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770233710; cv=none; b=YE5V0sMPTF6T8nokCvmFotO5AxoekRS1Dq8A/niphgWHDnMA3JetoMEuC/i5IstkVKi5Hhe5c0UtTeoCxaI6JDKQH62Kh8ZxWVDPRBizQR7zvaWqoBcyH8wrLpVHWtNc5pmZ2JYPvIrgWcVrUYXpKAE/lvNrf25JlpaMkci9+Mc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770233710; c=relaxed/simple;
+	bh=oRXL6nJqlL2yTdNv84UikPOBNAJklykc8eInyHmn0B8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=btXGmCHyeslczwa9TVgl/+GPGMTUwKM9Ro5HQJ2x8usZIlY+HS3KNHx4BtG7yGYARR14MAu2z/5Ghu6DijbnTamZP+CngQDqeygyfbhjSOufzQ0MSK8zoGXq8IhzFMRFLqWo/+KcORwC3jcCNdBxitVzZT7pYQEDF8yQ35Lv/qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fkjqhAjz; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0f8ec4c7-5de4-4e0b-a50e-cf4f8d59709b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770233705;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Tq5IxtlfEzqqlPKZNOU5fTXTvEnREFrUTM8jWKZxzVU=;
+	b=fkjqhAjzpyy2TyxX004b5T/c/TlM/IfSQ3EavqFi1IDDfK87IeZdroetvE63Yvugus+lHk
+	hu56G+/VkyRwIX6YM2T2z/NiO9No6LHHCke5XpUfMih6DJDO4Jzi0CVU4T7DdaM28wRJco
+	eUaK+Q8mOPJgw7R0NQYHQYPmHeEbCFQ=
+Date: Wed, 4 Feb 2026 11:34:55 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3C:EE_|BL4PR12MB9723:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a35c564-6f19-47d1-28f2-08de6424672f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FI1Ge6rrcso0NlHwqohAcP7RDp+AavMCEDh1xLNMTs/H8F+pcU2+vmwxFv6l?=
- =?us-ascii?Q?zkCmEops4oYbQy8B6JTCr1BNcqHNTbu2mVzsZhjwpYBzvh9MslOcZ8FY9Fpy?=
- =?us-ascii?Q?cv1OVfxBuUfQu/UDSfvMXu4F9vnUORh+NJLl8UphzUzKN7J/14TMUmM61Q45?=
- =?us-ascii?Q?ycc69kyQPClO3/hC5Ydm4aZO8hlw/HUKCDbd+N2yuKRfrqWsEr03pUF4d/bQ?=
- =?us-ascii?Q?4XdwwL3aL/UeB62S/kJL7q+WZvtT99ErW8yvDX8M1jL9le/srrXX0SES7HD/?=
- =?us-ascii?Q?lq2FB9jauyd3iueWV8VRgwGvCBrC5j2D34ILOSef8ZcZ9WfuFwsl92HolRxz?=
- =?us-ascii?Q?D01oFb3FauKXkt1EY6zGYUEDquuUmPCyea6kHc0QK2mQ4MOQRNn6px+q9eEl?=
- =?us-ascii?Q?n4UIpl68Xh0Fqb99+H0NW2u4ww+UP/voYtXivIv38edYLdqTulYnUNmuVev8?=
- =?us-ascii?Q?HC8PRb4pzicfJzA8PMYvbzupI4OG5dFV+LOFrmMlK0uF+O/Z2Y2oinvpVn/+?=
- =?us-ascii?Q?kv75N5Ur7mEiVXmxRgU0noNye7fIsj+zwqLW/JiOpR4+FWoKFtQ05ltURpSW?=
- =?us-ascii?Q?0mYytAkZU8tZYZ1uGiw5L4Ji2IMsTR361/ossdYeQbL2cJUkcmV/oKGqyoPL?=
- =?us-ascii?Q?8ngEQhRRjwZR9QlF3MEvJWOEZ3AEFYkJR23XM54E/EtJgiAwWUGwqy5qX6CB?=
- =?us-ascii?Q?M8UQFi7v/NBGm97YCdMInOeVBp9ng7I9iWT1E9JopT+OI7zmrO614WTOczVD?=
- =?us-ascii?Q?zQ0awFzsYk9Bz6PfwBxv7DBjnhT29dO7BYfAaObbyhKggPgs6fY6N96HxFkz?=
- =?us-ascii?Q?6v4JSWEImLaHOqV72aMPJIpsVFvh/VfpDizPIlE5ohzhZXg5+AUIctYGTiJm?=
- =?us-ascii?Q?82KdnFK4XihD1/ZOpfNS3k+I7Zu8ZHPcEG0QmeTTlz3GRi7bdr/Baq1ikYge?=
- =?us-ascii?Q?aP1Ukb4krTc1CO2BbL48ak5YzNebEFZ0C22uKtiDHRxLlDcslGvsQKN73WOV?=
- =?us-ascii?Q?iDtPFAfF6EF7B7jOoq85bmxl9SjJaeoAh0/1KV3d21aZDcaKePBxyV4lIGEO?=
- =?us-ascii?Q?OpOWu8JcTQ837tBaJ8pMG/S4BWmtTq3Qzf+VRjHpgD5Zh0jtHv11LD/U57wD?=
- =?us-ascii?Q?saCzwAVDElirI/6olrH6CK2nbIj2coROlUwBRHhLUZ/xR2jD/uCjhf3X0LtC?=
- =?us-ascii?Q?G/QSHi1LJlsNI1Gi3cVE+3bU5cMwTIPJKvbfDOpHjtTYRLrpE+AB5yupwBB0?=
- =?us-ascii?Q?t82DQ9TWCQZUDVRfcwEG4QbFfRMbvJ7heRQK/Zk39nGzarCNY8gbt4IbW3cG?=
- =?us-ascii?Q?IVGQEOXYr+UyNV/osBQvdBHGvaLiTR2y/+j2Wf/QATsut3C6OWjrrpcQEdrD?=
- =?us-ascii?Q?Zf35mSrtawa5ueKO+yAfO9DHMdIN18PA9SLSp2J0fi3Sxd0fF8OIcXu636i1?=
- =?us-ascii?Q?oGtEfbxIaWFwvWbrKBRwSTP6s9smo35ihpm2NNFsWXcoJo6Gl6YL30LxE39D?=
- =?us-ascii?Q?HVjHWxtNgmQKVFDTV/PfK6qYUXGybnpaQfmZByyr7AyBwgWKEkkMDBQuFV15?=
- =?us-ascii?Q?441yMn8fikm/M+G4KSE+bqmZT2a1HaXzFta005cnljmOHKweAxN2hkwueDX2?=
- =?us-ascii?Q?EyWKqJVBu2VlU+xy0qNMLNBmHT2vt3fGGezy6QxUITYDJ8ytjE1yIhjLrXwJ?=
- =?us-ascii?Q?Y6ACQw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	RxuWMWbfhQrmafj6H7Z0qVnGWp32+EOdEEk9L9KQ44jiTaCUIje8elLqnBSAMD+RNM+sI3j68g3Xqa9/z5h+ODrDy1CFrIhfN0UY9PV512X247tq7awP2AGURL3tiYiu7U6gDRCKVPBhnZPzeFB+qIdV0Z5VE7m4mLsNhEY+Yt92SqQ7735kRUmCRl/uLnQwYaI9uWQj3YAtSXMSZTI8ffD0/P7ES9XG9ib2b3SEN6gkPF2F/gidKTpPZEMwDYAADFMET3sC5gyH+AjsQZDSihALoSnzx0zn9By9Cfhos53mBTlU7YRBh/cXQFp3wsomz/b0QxoUvwfh9yQ6f6P/L5076r9Mhi8+T/SCEFAEIlkMNywLaQ5lMaOOkGizMUSMqq5NBDRNDvySUDXbTWjJnrI7YrvMUtJVUNZ8jU8VdA9DRha3umNxvtXJmPBZmNIK
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2026 19:34:24.4819
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a35c564-6f19-47d1-28f2-08de6424672f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3C.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9723
+Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
+ update
+To: Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuniyu@google.com>
+Cc: bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, jakub@cloudflare.com,
+ john.fastabend@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com
+References: <8d055903-fe44-4bbf-a1a5-e0176343bf0b@rbox.co>
+ <20260203200242.404131-1-kuniyu@google.com>
+ <80865b12-7786-4787-81c8-08b754716a5d@linux.dev>
+ <CAAVpQUCshzAAHZQQ7sVE+3UdKmBV42bKudcdDR0KtaTcTqn5gA@mail.gmail.com>
+ <408569e7-2b82-4eff-b767-79ce6ef6cae0@rbox.co>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <408569e7-2b82-4eff-b767-79ce6ef6cae0@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-256804-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,iogearbox.net,davemloft.net,google.com,kernel.org,cloudflare.com,gmail.com,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-256803-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: AE6AAEC203
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F3EC6EC193
 X-Rspamd-Action: no action
 
-From: Gal Pressman <gal@nvidia.com>
+On 2/4/26 7:41 AM, Michal Luczaj wrote:
+>>>>>> If the concern is the bpf iterator prog may use a released unix_peer(sk)
+>>>>>> pointer, it should be fine. The unix_peer(sk) pointer is not a trusted
+>>>>>> pointer to the bpf prog, so nothing bad will happen other than
+>>>>>> potentially reading incorrect values.
 
-Report TX queue stop and wake statistics via the netdev queue stats API
-by mapping the existing stopped and wake counters to the stop and wake
-fields.
+I misremembered that following unix->peer would be marked as 
+(PTR_TO_BTF_ID | PTR_UNTRUSTED). I forgot there are some legacy supports 
+on the PTR_TO_BTF_ID (i.e. without PTR_UNTRUSTED marking).
 
-Signed-off-by: Gal Pressman <gal@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+>>>>>
+>>>>> But if the prog passes a released peer pointer to a bpf helper:
+>>>>>
+>>>>> BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0x95/0xb0
+>>>>> Read of size 1 at addr ffff888110654c92 by task test_progs/1936
+>>>
+>>> hmm... bpf_skc_to_unix_sock is exposed to tracing. bpf_iter is a tracing
+>>> bpf prog.
+>>>
+>>>>
+>>>> Can you cook a patch for this ? probably like below
+>>>
+>>> This can help the bpf_iter but not the other tracing prog such as fentry.
+>>
+>> Oh well ... then bpf_skc_to_unix_sock() can be used even
+>> with SEQ_START_TOKEN at fentry of bpf_iter_unix_seq_show() ??
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 036587123a6a..4ed0449a27bd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5570,6 +5570,9 @@ static void mlx5e_get_queue_stats_tx(struct net_device *dev, int i,
- 	stats->csum_none = sq_stats->csum_none;
- 	stats->needs_csum =
- 		sq_stats->csum_partial + sq_stats->csum_partial_inner;
-+
-+	stats->stop = sq_stats->stopped;
-+	stats->wake = sq_stats->wake;
- }
- 
- static void mlx5e_get_base_stats(struct net_device *dev,
-@@ -5630,6 +5633,8 @@ static void mlx5e_get_base_stats(struct net_device *dev,
- 	tx->hw_gso_bytes = 0;
- 	tx->csum_none = 0;
- 	tx->needs_csum = 0;
-+	tx->stop = 0;
-+	tx->wake = 0;
- 
- 	for (i = 0; i < priv->stats_nch; i++) {
- 		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
-@@ -5663,6 +5668,8 @@ static void mlx5e_get_base_stats(struct net_device *dev,
- 			tx->csum_none += sq_stats->csum_none;
- 			tx->needs_csum += sq_stats->csum_partial +
- 					  sq_stats->csum_partial_inner;
-+			tx->stop += sq_stats->stopped;
-+			tx->wake += sq_stats->wake;
- 		}
- 	}
- 
-@@ -5688,6 +5695,8 @@ static void mlx5e_get_base_stats(struct net_device *dev,
- 			tx->csum_none += sq_stats->csum_none;
- 			tx->needs_csum += sq_stats->csum_partial +
- 					  sq_stats->csum_partial_inner;
-+			tx->stop += sq_stats->stopped;
-+			tx->wake += sq_stats->wake;
- 		}
- 	}
- }
--- 
-2.44.0
+It is fine. The type is void.
+
+>>
+>> How about adding notrace to all af_unix bpf iterator functions ?
+
+but right, other functions taking [unix_]sock pointer could be audited. 
+I don't know af_unix well enough to assess the blast radius or whether 
+some useful functions may become untraceable.
+
+>>
+>> The procfs iterator holds a spinlock of the hashtable from
+>> ->start/next() to ->stop() to prevent the race with unix_release_sock().
+>>
+>> I think other (non-iterator) functions cannot do such racy
+>> access with tracing prog.
+> 
+> But then there's SOCK_DGRAM where you can drop unix_peer(sk) without
+> releasing sk; see AF_UNSPEC in unix_dgram_connect(). I think Martin is
+> right, we can crash at many fentries.
+> 
+> BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0xa4/0xb0
+> Read of size 2 at addr ffff888147d38890 by task test_progs/2495
+> Call Trace:
+>   dump_stack_lvl+0x5d/0x80
+>   print_report+0x170/0x4f3
+>   kasan_report+0xe1/0x180
+>   bpf_skc_to_unix_sock+0xa4/0xb0
+>   bpf_prog_564a1c39c35d86a2_unix_shutdown_entry+0x8a/0x8e
+>   bpf_trampoline_6442564662+0x47/0xab
+>   unix_shutdown+0x9/0x880
+>   __sys_shutdown+0xe1/0x160
+>   __x64_sys_shutdown+0x52/0x90
+>   do_syscall_64+0x6b/0x3a0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+This probably is the first case where reading a sk pointer requires a 
+lock. I think it will need to be marked as PTR_UNTRUSTED in the verifier 
+for the unix->peer access, so that it cannot be passed to a helper. 
+There is a BTF_TYPE_SAFE_TRUSTED list. afaik, there is no untrusted one now.
 
 
