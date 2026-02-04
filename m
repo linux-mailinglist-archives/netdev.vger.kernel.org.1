@@ -1,164 +1,206 @@
-Return-Path: <netdev+bounces-256668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJ63MPoig2nWhwMAu9opvQ
-	(envelope-from <netdev+bounces-256668-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:44:10 +0100
+	id wGoLJHYjg2nWhwMAu9opvQ
+	(envelope-from <netdev+bounces-256669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:46:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3E0BE4B7D
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:44:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4F9E4B9C
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6F3203002D2F
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 10:44:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2D0203003717
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 10:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DF13E8C64;
-	Wed,  4 Feb 2026 10:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7439B30F921;
+	Wed,  4 Feb 2026 10:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TgdN5U6Y"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="eqGBhOE0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F723A7855
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 10:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770201844; cv=pass; b=gOnrZ1WaTrG/nhIw9UbTjuCQCXFfu7jBfrxY984S8I5ed/S0HAlLfkulQ9jWoYhXy8WVqE2Yhui8hPPXjip57d4ZBPBEHbIu5N/FoB0m9LW/+ApYuM8J1F1OwdCUQDboGz3xkn7qTJaOecSXiItQuF0weX+Dx5HUAiy9C/OO2As=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770201844; c=relaxed/simple;
-	bh=oyWFIMBOaDxU2t8WoC2FuxQuP5QZs4PVnysnh3yu70E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=drY4gGgP7s9ewKfdzp5v+qxtFpYOrGHACIdZ374DAAJk3NP8PeS0rANJWYA7cJ21jlbS5+vq8gY5sVp3v4kzH2Jj8FPoKJjFJ4CEPEWpBTG63Ktd76a1Qhi5QgFA4ZVwwYhCOhzaUcTIezTZyjZ6iPNTYTRkZx+KQIUaRi3nmpA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TgdN5U6Y; arc=pass smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-59ddb31ddcaso7710325e87.2
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 02:44:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770201843; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZwSuYaykDqqymhesX4TTRdcE0tPkRFnMN/NxO+gNFItMHUbs0A7lcIOXSK4DcyU/zF
-         iHtpTxLl9pJC//3EWFalehHtq0637sfvy2pPzdud0jJAjdDPeb6BhRo69LOcUcT020FN
-         Qeic0hPh5qxEu5xsoMNzkshdN4tmY6bqEBGMrXH4tLMrgbCTHhuf+i7e0E9auuZn4Rar
-         vaA+jGdbPH+RhCo+ZYOgUXPpISBz8YJzFYRN/3RNEdad6e0i3wOlERo/B4mt6m+52F+Z
-         Lgtax9MlnRqNVPuzqht7J2yXTc76YxQpDbhHja7AdI5JSY/6Yz1Ps+g4I7/25rqjhJfY
-         oftQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6GBRTxiaIHYDP0h1M81feHYn0hLowCqghpq/KV73Qic=;
-        fh=MQ+82iB7Nx2YR+ChOv84zOqDb2xWWerqRJN7RAKsiZU=;
-        b=AUvtJmynWXNftbncZhEojkzJ8vrHssA1OkpYaVAfzZ45/Crste5fvHejP1wf8nopfz
-         T1mtp9F7AHF8UlBykTH8XNbU62bCptKmAMJ3JHHFTnyLgZ7d64zBR/InTvpNARJ38nMU
-         mbH23m2xtzj09cZZr17SoiiH+V2fOUwSAVugUfuKj1uiHFxqQvKoQg5X3j0YRhyklf1C
-         TC6JK7u9w9Gvx+Ytlt6ULJXI2A58uqkgDks4e9FTKHokMIoo60kzIfP/fVp9pUkS7BLK
-         cnUxl/XwZz1RGjA22sJKadwerPMC47oNE37UNisEGQUQUjhzYNJ0WjGa/GzRB7bONM0B
-         cOLg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1770201843; x=1770806643; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6GBRTxiaIHYDP0h1M81feHYn0hLowCqghpq/KV73Qic=;
-        b=TgdN5U6YNgMSWVpTdY5E99rQjj8fxIgO9rU8oel7zVABSrB+6RVMuh+iJpLmpcXCeV
-         EbP1D/En7GLT4HerPPYbOIKXWP4wuPQpsg/rTZOXyjqmd7ILS/UqClAkhfsqJHJVBE+Y
-         aG9HY6DHTLMmF0mOrVT/KjYS+15i57vWzTSkh2ozkmMrwSbb4mwQR/z/CJCrlgJjSMi8
-         CSw0FGSlwmWtHmlYSaehYdnqH+FPZh6PfM8C3w1TFrwdqRIQ5K9eQjKw/aT/hRE1dHvQ
-         NO/VqXh5k3rWWB+y6SKmknfbcCLlsDbBjGbCpIltDaMI6iwZ2SD17zcDZC0kzHzmhr12
-         533A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770201843; x=1770806643;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6GBRTxiaIHYDP0h1M81feHYn0hLowCqghpq/KV73Qic=;
-        b=JQoE7I2j1UOpNtP1Be73cz8tuqVg03m/Ghmtrfr1qb1Xz0lth7u4DKaezLwnpWzTDq
-         VT+yMbXMfzeZIncl3ae34zJYl+YTeTFymmlJnmu/yE2zv4iR+WNJRNSxOiNgEWeXMsf9
-         MTsxT9CCUSpE16BMiVYrDITCHfnUzyRcw1HEzASJ3yO6HbzbRJbD9tJrAo3E1M3gN+Pf
-         9PgtsDM4AYvDp7LucoNhddwijRvMoyyzLCYW+0oUWAfefydMGPYmcquAZzf44e0I5VYY
-         XWdiYs5TCbb0wSMKDY0SUPX9iRlZVsWY/y1uIVxMkotkNg8USlTdVwLMoAcblC4iirjg
-         BZpg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnNdvC1WitT6y70RvveRQLGTp3Dsogj2LrtV2yNwYUVN6UnOcmd+lXnOqI+e770KQLEgaxX38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuxpQ0hIhfssu3IMGDEb71Qwn4WvyAXt9eZRUcaCn+9DGDiwhq
-	AWVDFucRLGy7rdBHSeWhhCek/QYlZCyTPO3sjB+cU1jkpLwU9Lv7K1wh1a4d8sbCMjMKwxGxGgi
-	PizZD0rf1Vog6vAJ+rSisrU8BIosn6/3TFXBxDc0V9g==
-X-Gm-Gg: AZuq6aI9eBdIcVuyk7qbbeDRurtHHbLBVWu9ny9T0UR4cJ+90WLGxBLKEpbWJXlrN/K
-	reaz0K3wjkRfCl2jL86EUYN2ebLDG81R6Qrm7TlRGSfc0m+iOFWwDiFiFRSgBHBc0sl0EzQSJ3+
-	DftiTtLlftfLh0TWs/ZduFjJntPK150rn0ccn6z73QJTNZvme4dPbAjJBGtrPfRCkF6Y+sznkJV
-	ZkNAgzaKem+WUMQsAxkAzFTdyTg9LyccZMGWBl4/gUJ9vn0VC5WJJiE9yHAE8eaZFppFj1A6RpB
-	X4kt40EvTHhkpocqJj5Mn60Krzak
-X-Received: by 2002:a05:6512:3a8a:b0:59d:ea7c:d93a with SMTP id
- 2adb3069b0e04-59e38c2bac9mr967478e87.37.1770201842606; Wed, 04 Feb 2026
- 02:44:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB2927456;
+	Wed,  4 Feb 2026 10:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770201968; cv=none; b=E8TlREqTi89HHsWSMW8bkpmEtmI9ysGSiEQfb+L3nokae7omlVLIMLHd6W/ukkLcu7PAeSBnJXK1ASInU1DYFf01bpDysrTMfJWDH+w2rRd1MIy55xWNo6X+Vl2u5AcARw2RLOEcnn6t6skQTIciJyRyL9g7JuyQvXslUEChCHQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770201968; c=relaxed/simple;
+	bh=nE5AQxfl8D2D0mS+A6xy6L0RiK2Y7/zsPPe18durZqA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HHELCUlXbtTgKIs/aUbiezbWQrobbvAWA7CAUbumzI0i2xHLoCJNz6Bfmt//a1+sbwkegZ8VuFuzq17GaPENviylnt8mQ0Pp15L+4VMuS5+J4TaR4Y0xQOGaFN76bb1hPbQNevaxKc45C+Xi5JQXgi21GdYDuQ+0jrCFON8Bs6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=eqGBhOE0; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1770201929; x=1770806729; i=markus.elfring@web.de;
+	bh=Qh6EGGAuZMfJEqySr8dKIzgzjjzaJf6wwJmEg6oCsfI=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=eqGBhOE0UDOd/hBFWtt6TZ8EuTD3FawnGknUVS8MsFa2eAs9FPt/CWOrxD14g3at
+	 7WugL2Aq4PSjyUZ5oEKqfLA/GHagZkgUbhRuOJdfz3ZIqPHSRI6ftyIRqCXQeR+LF
+	 noBl5TLp+PW6MqBL28LZfKtYKi02F/pjADtWZL80mcYyXipjT2ar3EOdXrM0UB4Hi
+	 9JEXndmWESA/B9+UlIIyUe1RNhVaKb4OXZ4dDO88Oh38NrBlGMGf4BPlCl4uaYKln
+	 FvrZW0pdXOUQ4HsJSMDtAos+1yH4SdfCs3kjG0gaCWrDMZRvGzMzuK4i+7jBkVpQJ
+	 u+FQOF1q0IZKSgnCsw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.224]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MTvvy-1wDSyR2daU-00Pjn4; Wed, 04
+ Feb 2026 11:45:29 +0100
+Message-ID: <ead52d66-b594-4dd8-91a7-9baa88230728@web.de>
+Date: Wed, 4 Feb 2026 11:45:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251224155006.114824-1-marco.crivellari@suse.com>
-In-Reply-To: <20251224155006.114824-1-marco.crivellari@suse.com>
-From: Marco Crivellari <marco.crivellari@suse.com>
-Date: Wed, 4 Feb 2026 11:43:51 +0100
-X-Gm-Features: AZwV_QgV6hgH85WqGpfdI5zwj42b46k5TE9V4UYkPQGAoIIS3m202Do7qW27gok
-Message-ID: <CAAofZF4BaifjL_Tn+oRUhAupvydJuUUo9vXf6dOCqhzR6pA7GA@mail.gmail.com>
-Subject: Re: [PATCH] ovpn: Replace use of system_wq with system_percpu_wq
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Michal Hocko <mhocko@suse.com>, Antonio Quartulli <antonio@openvpn.net>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: ti: icssg-prueth: Use system default
+ workqueue in ndo_set_rx_mode callback
+To: Kevin Hao <haokexin@gmail.com>, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Byungchul Park <byungchul@sk.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Himanshu Mittal <h-mittal1@ti.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, MD Danish Anwar
+ <danishanwar@ti.com>, Jakub Kicinski <kuba@kernel.org>,
+ Meghana Malladi <m-malladi@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+ Roger Quadros <rogerq@kernel.org>, Simon Horman <horms@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+References: <20260204-icssg-prueth-workqueue-v1-0-9a892f4b293d@gmail.com>
+ <20260204-icssg-prueth-workqueue-v1-2-9a892f4b293d@gmail.com>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260204-icssg-prueth-workqueue-v1-2-9a892f4b293d@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:dlNPm9i/F9r3OoEmHApQAee0R65ZhuWrKuOcV7xU3kq0eWGj/01
+ oveit5oPZoRXjp71+yvtkCQIqy9jgvz+sXQQDcB9vUjjoLGU6uGq3kSPi/6AmibGyfTomMn
+ pcEaPwlGGELm58LlLJntMU8z99Te+xDgOPLWer/8zgwwdAaMfL105P5E8UbDV9ikPXJ63fh
+ hsDGu+ed+sS8FMFKR1ybg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:x+nQq753Mo0=;GeSmyJAETiQuLkkLbZvj6nTscic
+ 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
+ ncJRHjplVjDYDapZEbG4XKb3snwaC
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-256669-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256668-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,openvpn.net,queasysnail.net,lunn.ch,davemloft.net,google.com,redhat.com];
+	FREEMAIL_FROM(0.00)[web.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[web.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:dkim,mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E3E0BE4B7D
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE4F9E4B9C
 X-Rspamd-Action: no action
 
-On Wed, Dec 24, 2025 at 4:50=E2=80=AFPM Marco Crivellari
-<marco.crivellari@suse.com> wrote:
-> [...]
->  drivers/net/ovpn/peer.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Currently, the actual processing of ndo_set_rx_mode is executed in a wor=
+k.
 
-Gentle ping.
+                                                                          =
+  queue?
 
-Thanks!
 
---=20
+> However, there is no need to create a dedicated workqueue for =E2=80=A6
 
-Marco Crivellari
 
-L3 Support Engineer
+Regards,
+Markus
 
