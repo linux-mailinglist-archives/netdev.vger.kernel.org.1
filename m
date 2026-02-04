@@ -1,396 +1,354 @@
-Return-Path: <netdev+bounces-256589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mtZ4HxHjgmnXeAMAu9opvQ
-	(envelope-from <netdev+bounces-256589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 07:11:29 +0100
+	id ME7qI5TjgmnXeAMAu9opvQ
+	(envelope-from <netdev+bounces-256590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 07:13:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7CEE233F
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 07:11:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E528AE23B5
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 07:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1588D300A62F
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 06:11:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21764305F3EA
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 06:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E145C37416D;
-	Wed,  4 Feb 2026 06:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E842378D82;
+	Wed,  4 Feb 2026 06:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ub0jF222"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF6E21ADA4
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 06:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770185484; cv=none; b=IGhSHILinMuTANeMTyvRBIC/+InZG7xYS2goXiuJiYq2jMB7DXoaohBt7tOQjE53RP/ssf7AU3sitcAbAwXinGMHV5DXHzfPIvuNfgZpnzgTk/8kSALvqme/9M3ZUcZVaWia3EVoTZ1HugqGzGOsfy+Mc/rt8Iof+4T7VXXnD+E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770185484; c=relaxed/simple;
-	bh=gMfPcmOEGO3dTyXENGot+hkigQgIMegRgneUxq6h4iw=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=r+g6BeCUuVGUJ00BY4nimg5MvNbgEFKUw6ELrQL5KRK8m9w0r7KGDAvg2Rne/xjAGIarrl9fZVuByIGIskbDcjHc06A4qOD5Ww7FCYUFH8R0JKq6a3xlEtTxWD23hATx2+WBbTyQo/Bj9RwOMru3gA50BlLfCjfzJILf2wYz1LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas3t1770185413t261t32344
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.47.234])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 16790881139121144632
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: <mengyuanlou@net-swift.com>,
-	<horms@kernel.org>,
-	<netdev@vger.kernel.org>,
-	<edumazet@google.com>,
-	<davem@davemloft.net>,
-	<andrew+netdev@lunn.ch>,
-	<pabeni@redhat.com>,
-	<mengyuanlou@net-swift.com>,
-	<horms@kernel.org>,
-	<netdev@vger.kernel.org>,
-	<edumazet@google.com>,
-	<davem@davemloft.net>,
-	<andrew+netdev@lunn.ch>,
-	<pabeni@redhat.com>
-References: <20260203075759.5852-8-jiawenwu@trustnetic.com> <20260204022249.1573252-1-kuba@kernel.org>
-In-Reply-To: <20260204022249.1573252-1-kuba@kernel.org>
-Subject: RE: [net-next,v1,7/7] net: wangxun: add pcie error handler
-Date: Wed, 4 Feb 2026 14:10:12 +0800
-Message-ID: <06f201dc959c$ec2b74e0$c4825ea0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8616376BE5;
+	Wed,  4 Feb 2026 06:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770185558; cv=fail; b=uDMdlwUaXxQtr5YHhQLYGNWm+zOP8c9+87FYfVkbIUpoIIAj7UOwRl1msc6KesurMEm++tVJmFHiO+LZPs9ibx4OlASIXKK9MmSJ/DVew7H4VUTPlx2X7tf8EzLuoUuc+dfGAKjv+JIwJicLT6sX2lgG6xYTj0tT+TitE03s1v0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770185558; c=relaxed/simple;
+	bh=5Beh2mmrO1uURztvhnxsFcMk9zQo+iKisdQFbPQpJsc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Qnbb8WQ0ZYJnaCadRlUz9/PdaooscltcpumbMjHR0kvKEL4EnkP0vhD7VtznhaVuUdu1YuFNwnTUYM2ax/yt9GyvhsQdqDC+tnvT55+ZUoZ3BXY5ZodlVBfBptA0cN5rpFv42qLh1KL7PtrxCCX38fMQ4lOYbU+sXaRkzLfD5QE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ub0jF222; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770185557; x=1801721557;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=5Beh2mmrO1uURztvhnxsFcMk9zQo+iKisdQFbPQpJsc=;
+  b=Ub0jF222IRTk8npGJrWSBsaRQ+a+MZ3AF/4KpzoeWn3chssN74qQd5Ze
+   quZWyTrMOc8zNjrdqqb+3w+CIHV5M0CIBBo+a1rGKXkGFsQkusPFSC3dE
+   vXRofA4r8j8t/bIYIWOF8pJO4NbOT0PB+LrW+X4K3K4Aa36isH45DJl/t
+   3HixYxYbc8pJJCyV0QT2jLnpIpGvEY5Gemk3Jfb63+sg94UqkV1ms93u4
+   KNGsQK0PkqD0VMCgVFR1WkBjvdfxrTSxG2y8xjb0agkO7csJcygKPQ2iP
+   p6r8gVEvw2zJ0OITYHmSq8iLUUHrZmwx7eaWhXON4ppT5LfPIudZvXume
+   w==;
+X-CSE-ConnectionGUID: F391wruPQI6i8YdW/LDrRA==
+X-CSE-MsgGUID: yTvdLd/RQaKzK0UXEgM35Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71090895"
+X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
+   d="scan'208";a="71090895"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 22:12:37 -0800
+X-CSE-ConnectionGUID: K5oJMyu8RZiX6nWiGO6LHQ==
+X-CSE-MsgGUID: ECtDqo3uQZWQ+mPKMAqwww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
+   d="scan'208";a="247667463"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 22:12:36 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 3 Feb 2026 22:12:35 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Tue, 3 Feb 2026 22:12:35 -0800
+Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.45) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 3 Feb 2026 22:12:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gaXaPmFPH6qaoAhBUrl86ByHwm+opcHqfast12gRY2g8MTQ1OoBKlzESrmv3lJhOKHULOlZBPE5FY+zrFznZ7YccwGl3fzT9zW5Ko+xUDtaNqQ0n6L1WUiriIFDtEH0nI1cdLCEeQxM8ZaRBuSyy30ca4bIqRjnxNvBxHmkPBKObYBTMMHw3xLqiGydAfGr5PMlQJCn6UsTJfxhjZgZ6il1u4YaWCBdFH7qVGDe6x/JoEmu6gLLDPBM9cJrDkB37l72KAmJN/68Nxxlvne3qKjBdkzrrgWfMBXYLusU5al0kczWcuXseh/JTSWTCsr7J4xoHpsazMGJNUOjR6rdO7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5ZeK3jD3KtOQpD06+laTz+IY70CSYD+QAms+tlpyT4g=;
+ b=kNvZGiesa4dnHa4VAewLP6GVSTxVY3n4pLSt3Bw+8ThWfJf2JPiVuwoJttwQzxb7RbQcr60mPYjQfH1lnSM4Ca89Y2XRZuhyqClipDGKxiy8IM7JqdVhjV8d0M3eyNYdvFmkzmIaprzJtp/ni3evn9sDz2nZEc36t9CkcdaFZBsnV0hndcKA014UuCRylowmqFsPtyXA6wkvgXWnlXdJTHwEjLVvOnj5YcC1Z1bfPPxLfVI0l0iv4o+RSKtAPPQopAKJuq7jEfWiIBxnQXz6i/eYC4J1IEXPKFltz7JYK5F/CVm2yJHE7RO7NJkcqYaDs5dsfXvi2iC2uNEZXt7VXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DM4PR11MB5326.namprd11.prod.outlook.com (2603:10b6:5:391::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.14; Wed, 4 Feb
+ 2026 06:12:26 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9587.010; Wed, 4 Feb 2026
+ 06:12:26 +0000
+Message-ID: <0e17cadc-5cab-44f2-8998-67ecde033a06@intel.com>
+Date: Wed, 4 Feb 2026 07:12:19 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] iavf: fix deadlock in reset
+ handling
+To: Jacob Keller <jacob.e.keller@intel.com>, Petr Oros <poros@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>
+CC: <ivecera@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "Eric
+ Dumazet" <edumazet@google.com>, Stanislav Fomichev <sdf@fomichev.me>, "Tony
+ Nguyen" <anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+References: <20260202084820.260033-1-poros@redhat.com>
+ <20260202155813.3f8fbc27@kernel.org>
+ <b064ca33-1d94-4c7e-b0d0-78430d8cd0ac@intel.com>
+ <14cb0b22-ec39-43e4-a35b-22ad558b2e34@redhat.com>
+ <7907d42e-4805-48bc-aaf6-16cbe46eb1d2@intel.com>
+ <db1723e3-294d-46b7-aa4c-11a21b0da82f@redhat.com>
+ <79960c2a-26ea-4472-bebb-4657fcca2255@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <79960c2a-26ea-4472-bebb-4657fcca2255@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DB8PR04CA0030.eurprd04.prod.outlook.com
+ (2603:10a6:10:110::40) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQKPat9jSedrtKLh0tR0z/2qWgGxxwHDrDINs/5DS8A=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MvyKdZyVtFx3CDHJzTucclEQcIP4e+VPrER/UK+LlBDgXaDt3MguqxAl
-	D9m8E3pZkxjVN/AUzXrFRUV2CLa9FfR0Ndr6Dwqxd7DQxlArw/ZoGi+9K/DAK+cVdh3yScU
-	r4hwL3m/FIFNgGhQlw0tJFJmPNr/CHR9fvJdVfF7XsJ0rGhOV4JNQ7ftE0F5ZTLG5ljAabi
-	zbniFCBC2IBpoXg7G+AcVWlDy3TbDM2pK7d+sEhvKP9/51faGDicr3jx7RlsEVYwJW+KP+4
-	iwvhVuqbZTUoNCaB/oN41QK+T2BkjMoNRktNyRmZga/XZd1QFIPkxAtFuyWBAj0njTgAPbJ
-	wowyMOj9oabjle/uVehNlwC3+JpnyRChJ/k/NwQZ6K9fq1WO2U9pVwvzPxE5I+trMt4T/ZW
-	C3z1abR7ZKZn8AGdK2WcLm08sJz0V0N+9XQJsOHpRxKssb8lw0qkaFo7P/0zP5HHoZ/c3v6
-	9j/gm4GkAS2NyoWtdSLb0WARBFBXs5qWWFALg6mk32r/KuuoyeSnvQ43DcVBsmKxOcCdVzJ
-	NU5dVmK2NDdJl+4SC3ygKAiyYtQD/L4UUW/2/glnEBAVg+xtdnJKC0jVTHgIXuK+EXK9o2N
-	iqVmL5iPxj3r9VkIkN+llNOmuxaHL1tpawSi80EGXGfCILuHc+SGAmeoso8klW91dEvTVZE
-	kkGCYMgKieyiyeXDmk5NrCYiDD81E59XPG8rfK9pSUIYouVGbkzrAwFfGjZYMY12CXB5QIL
-	4BMkgXjtM6wd+fVynz9LxJzoRo3RgJPNuFmOJ3G39nQvyqM9KxpRYteph0fo+h7nKOKPN+C
-	NySdT7csVP/A535WPbh3YoLecnQSyvcdvagCo/ZZSIHIo8a8V3CdW2GA6IHe3sDY3p0pEPT
-	H5bK99MNmUlncGlTk44Cof/AS0q5e/ajBN2NLWZZisJcUxCAxxwGGrRJ9DQ5WHamc4ghm+2
-	v5jEqh8XvGx3Ss4DfW/Y6CgcKyz8h3a+lj0SkXyYQ/WyumKYQRL+g0JkoOQuTIrsSGZR71m
-	ImeB6vN5I1LUSXMbLSfB48VGuYiInsc9vyAiaRz+iZAF2kPt2p4+hdspCWRfCVq6dSEaV4g
-	PkLeKmHyXXF
-X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
-X-QQ-RECHKSPAM: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM4PR11MB5326:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f37d71d-58cf-41bc-0d5a-08de63b45dff
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?STl6WGRNeXdSbmVNRFZJNG9QVElVVG4xRm5GZzgwdUxYY1dWV3hqUFhVRHJC?=
+ =?utf-8?B?TVdOQ0tDVE0yUEU0bGV2bEoyd24yQTl2cGU4aFRMRjFWb1NwSndOcUJsVGRB?=
+ =?utf-8?B?NExqU2FKa3l3b2E3T0kvdXlRS1d4MXczVWoyZTFOcjVDWFJYNGQvK1JvbndN?=
+ =?utf-8?B?Kys3TFpkYUVJSmFqSHhTRHZubXBIY3pFVHFtQnBHNTc2bHRRSjBxVEI1QkNU?=
+ =?utf-8?B?bk1FblI2b29kVjJqc3FEQ3cyTmV4Q3hkcUllcUJ6MEJDdVk1YmUxODBWenVa?=
+ =?utf-8?B?UlBLVjBmeGdRc2lvaUFGQ1ZLWVROY1h3RXZqbzVpMWRaVWRFK0VHSVU0Y2JT?=
+ =?utf-8?B?UDduVEsyZGlzaWhBcWtuUU9sb3hCdW10cWhQM3dVb1dvQnVGdSsreWV0d0kr?=
+ =?utf-8?B?ZWFqQVN2OFNWa2VKUU1jcWI2WWdNQ2g1NUU4Rk92RlA0ZGp3QWZ4d0tlcXph?=
+ =?utf-8?B?QUYxWlVDT2JSblo2WFZSWDdoL1NrYUJKSlhrNWhWQU1FakdHbmh5dzUvSHBR?=
+ =?utf-8?B?Z25IMFZjdzdjck8vUHBFZGlBS0l4bWFBVThyN0lFNS9hSm5yZ1hqRW14R2tl?=
+ =?utf-8?B?SVR3MTFKZ2pFMDJEbE93S2VTSmsrdVZGekl5TU9wbkExZ0tJYVVDYnJaQlVE?=
+ =?utf-8?B?eDVrOTRta3lTUVlNV2RNTjhIZVlZYys0S3F2UDZQWmxtbzNCdTJzZmVlZXhX?=
+ =?utf-8?B?Nms0NW0rMUg3NHg1c1J4bTVyVG11SFFDNkZCOGo3SmRpdU1UM1VqaHBRS0Zy?=
+ =?utf-8?B?Z2ZnaDQ2TFZqencvYmlMK1RCZERPZTJ0cjlHNVpaK2lNK1lvb01Zcjk3SUNi?=
+ =?utf-8?B?K2hpV0g4N0RiZEhTblhMVmo2aXRCbGxZMHBLNk1Gd1FLZ1J5TnhjT2hneEJo?=
+ =?utf-8?B?VHhQSHNLQjJ4aWRFakQvQ1o3OVFscEFwV1h4cFNLS1FBc3VwUU5MbUV5N2or?=
+ =?utf-8?B?alFsUjMrUmdrY1RzdC8rQzljTmRsREthdUgyanZXa2N2ZU5rL1Y0dlJJd2tU?=
+ =?utf-8?B?RlhDdHZoZFJCM3p1Rkt1cDRzWUdtOHF4RXp2S2F0L05EUlpSUWdFMDJmY21Z?=
+ =?utf-8?B?M1BlUmlJNVJOUWFISW1wNmVBVjFFYXJmQmoxMGNURWN3T1E1Q3AzS2lRMlRR?=
+ =?utf-8?B?Vkk2T1lFZTVWamN4eXJOSnVHWFVFNXdTSnVPMHNuWk5veEJKKzNzNFR0S3BY?=
+ =?utf-8?B?TCtDY1JEVW5uVTduU0lCUTJ2KzZ0QXY5QXhucmpHQU16UFJTdDF0aFlpN1hU?=
+ =?utf-8?B?VXk3RnAzTm9EaWVzdXFNY3NKNXN0YUEwL2NPTUxpcjlwZy9VQ0JzOFYrOGcz?=
+ =?utf-8?B?eVUwUE5WVGZhaC9RN3lBaWVwdFkxdjJxN08vVjhHZGZFcEVWM0c2OS81enRh?=
+ =?utf-8?B?THJkNTJUeU94T3VwbzdId2pDTXJrb3pCZllmd29uVXBFTmxqQ1IzNVlrQjRB?=
+ =?utf-8?B?YmNLZlJIVzBVdDlxeUhOZVRDYWx2cG5OZHpwTUhaV2J1UnR3YS81VGc5RVlO?=
+ =?utf-8?B?ZTBsbEpMWkZUdXlIeldlN1pycTk3YVE0Tk5VbjZ2VnE2OG5wdTFrK3o3c2tk?=
+ =?utf-8?B?VTJMOGttYTJ4SE5sYThrblhEaldXOTgvZHg5WFNxYjdURmdCTmUwNm1qeEt1?=
+ =?utf-8?B?bE1jOXM5RWVyQ29VUlZzVUNGZFhLL05BS2NoYjRyYWQrcFJNbnN5UGdjVXo3?=
+ =?utf-8?B?TTk2UVBHOXFSODh3dy8zRHZRYUNUVHFMenFNWXVpOWYyNFd4UU1BTlN4QjZF?=
+ =?utf-8?B?V0ZhR2lxTUF3RWtkQ2I0SmttS0JYZHZRRCtnUE9vc1EyRDBCbVRLNVRyQlpl?=
+ =?utf-8?B?WWw5WXU4MTZVV1VvZDBVTTl5WUk1cHJQVitXazhHQVlrUCtUVERicnY5Z1BT?=
+ =?utf-8?B?OHJ4QUhGUWh1c2s1M3FieHhoK3R6UFZRTmpQOCtEdlBnayswaEwyNlRPK3hu?=
+ =?utf-8?B?TTE3YkhKcm44VXhON0JYNjlyOXBNYksrRnFDeXpYWENkT0NJbi8rbEFydjkv?=
+ =?utf-8?B?L2JuQ204bWhia2ZrODhTeXhWRkJtdjd1K3dmYU5scE1rNHZ5T0FrR2FnVGVY?=
+ =?utf-8?Q?ZM+Pcn?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?KzFoTG5wN28rcFdOck9ERlFaMHdJRXdMYXIvZWZQeGNGb2J5bkpCbDI1THZH?=
+ =?utf-8?B?YlJ3eVAxQ1llZjhQcFdrRjE1dDZqejZqcmMxMkxKc0JPM0NUaDBoU1ZQSTU4?=
+ =?utf-8?B?QzhzcXdYVnJUNXFSRG90aUEwMkFmVHMxamQrLzNTVGluQ1g1YmdLZUlBc09X?=
+ =?utf-8?B?Qk9wcVBKc2xsS1dqdEpyN3pIL1JIZGM4WXVwSmM2QWs4eWxkUytHRk1vYTJU?=
+ =?utf-8?B?a09JMGRrNDFIa2dBWkhLWnlLUEpxR0VNTFJZTVIyWUd0dmI5UjJhc05oQU1F?=
+ =?utf-8?B?QUs4bGY0RUNtTWtjTTNNTXYyWW5GNjFYYUhVY05CSThaOEQzN1N0NDFZd2Rs?=
+ =?utf-8?B?bmV0UC9KWVRUbGVzRldlbWxEbGdVajM2NzI0VmcrQWZPU1lqbkNEdERGRHo1?=
+ =?utf-8?B?bU1TWTRKYXR5VkpUb2Rac2x4L0pEdFNvN1NxUm00YnFIdGtjNnRIQkVoV29X?=
+ =?utf-8?B?b0xZZjJRZk1GZE1PZ2hpeFJrSHRORkEzbGlKOXRHQ2UvbFpubU0vTzllbmlY?=
+ =?utf-8?B?NTlyWmduM3RBcm1xNjVJWUhIVnpBTDJxLzRsVDJHbkNQR1MydWkvTGhtRjdn?=
+ =?utf-8?B?eGJZZ2FwYThwT2Qzc2xQRkRMS1IycVB1Tlk3aTF2UGtJUmVONWM3ZDBTc3h2?=
+ =?utf-8?B?Kzk0ZytIWW45ckFTb2dlaUxnMWltZEVuL0xFR2VuZ0U4eHI4R1lMTkErVlZr?=
+ =?utf-8?B?b05IRTNuektDbFU5TkZsWWl3VkY1UlVDV3g0Ymp5azF2cGo2NlVFZ1UwSmpV?=
+ =?utf-8?B?K3paZmVSYW0zZzNBSXJjZXYxWUtSazFBQ0NvdjUwTUVLeEQ3YVFzNGQyZ0sx?=
+ =?utf-8?B?dXA2OWtuSU13OGFmM014RW9MeTJDWHFHRXdBNnJMS1FvQmhWSmlBa20wMVI0?=
+ =?utf-8?B?ZWxlcGRVQnptLzR0eDR2Y0FYdU5IbDNiSUxneUNTRThISDVZU083bVo2MDlv?=
+ =?utf-8?B?YVIxbE1zZXNHU2g2bDYxUzZsY0NtbmJrRFZZZWMweHVLUHkyRDlwT3RUMTg0?=
+ =?utf-8?B?dGlJVFgxaHdJWEpaUWlUK3g0WW1URkJUZjJ1OVJFa0kzNDJkR3ZZOVdGcFhC?=
+ =?utf-8?B?d0oxNUxwZ0dpaCtMczZvSG5aZkpLb1VWeElEeGhrdU45RzBRNEZxZDMrYmdB?=
+ =?utf-8?B?eG5zTCtrS3A3SjBxUi84TXdZZ3hia2E1TzgvOE9hUnBjT0piSWZvV3ZET3di?=
+ =?utf-8?B?Rkd1aUFOaHdSMzQrU1hOWDRseTJkb1NtR2JCL3EyekRPTytIT3JsS2ZOeDlT?=
+ =?utf-8?B?ZnJpS2ZPV1VDV2xyUlB4MTRZZWhXcG5ZNEgydzhyQmV1bnpIbjdHa1U2cTU0?=
+ =?utf-8?B?eERzMVk0K3lIdmZTWDZENG41VlIxV2lxNUJNZVNsMDlWbGJVZHU0NjI3Q2px?=
+ =?utf-8?B?WXlSUlhrZVVENGFCUm9ncnNRWTN5YTYwNGpKZnl2MTc3VWx3aEtrbnJQZUxh?=
+ =?utf-8?B?d2VwVlRLVWJSOGkzT2IvZmdxNm92eUVULzZPUjFQU09GUGVZeFI1YldoWEhQ?=
+ =?utf-8?B?ZjNqS04xVWJyOFNpcVg1NXM3TXA2d0U5WjRmREpEOEVqdHZCRi80TG1HUUpE?=
+ =?utf-8?B?NXNMc1AxWUdYL05kZVA1Z0VUMWNNeXlRVnQvd0V5YTA4cmY2ZXl0cnVrUjRp?=
+ =?utf-8?B?U1BvbFhETmx4MDVNZ244SkNxM0h5aU9rbVZ0L0NBT0FSVTZNVW1CRVQrUDJP?=
+ =?utf-8?B?RGVFYWtza0YyTmhqSDFoRldzMi9KM3hudkNzOWloOUJHWm9xcU1na3I5b284?=
+ =?utf-8?B?Q0ZsZWVkQnpNM1E2VEdGUmJLOWIvUGJEWk5vZEJDR2V3MUsrZWVkc1R0TjQr?=
+ =?utf-8?B?aDh1R00rM0k0dU5kYW1rN29ZNG5ITGlpN3d3SDYwNERBQUlEMTRRandkOXBZ?=
+ =?utf-8?B?cFZsbmdyN2piUjIzTWR6OW5uSnF0UndMSCs4VE4rRXZ4YWhIaG1TcW04c2Vz?=
+ =?utf-8?B?cmt3TjhEUU8xb2kvVGJCKzErejFqMTNhdWR4SXY2Vyt3WDVCbWR5NzUvdWVk?=
+ =?utf-8?B?c255WHRCVjU1RXhLdHdtdzZMK09jRzdCSVV5SnlMRlFvUEFDMllLZ25TTVZ1?=
+ =?utf-8?B?SWdXVVZNL0F6bGdFaG0wVDZyakRWc0NpQTQ3Q3JjV09tbS94UjkxMGtZNFFT?=
+ =?utf-8?B?ZXdTNjA3TjNVMndLNDZJSVErWHVsUVVMN3VFZ2NtV1JRdWdvbWNHdStpelZC?=
+ =?utf-8?B?cFQrc1VSb2s0dmZmeWJjVGcxYjZMSnZZM2ZoTmVqeDhrVE9LdHdTM1Fwellv?=
+ =?utf-8?B?Z3c5bjdldGt0aXprVnE4OU1kZUQvRmw4aHBWRU9uaUU4TlpENmh2NXpncno5?=
+ =?utf-8?B?ZWJhcktZRnQ1U09obXpvMzZ2a2l3aXBnYjl1UzlUVmxUbnZpdThBckczeU9L?=
+ =?utf-8?Q?HzHJjaL5Cw845HHs=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f37d71d-58cf-41bc-0d5a-08de63b45dff
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2026 06:12:25.7998
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YcTLJFh5lsxzRZXOaxu0QowntfrJtbBlYQXEJoLrcnfbCvjNvzPQ22Fa2RAXAA59kh63a1Fzo+w1BPZYJ7U7MNSwYh82XeUXsQIYug0P3CM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5326
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	FROM_EXCESS_BASE64(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256589-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-256590-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.993];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,trustnetic.com:mid]
-X-Rspamd-Queue-Id: 7C7CEE233F
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: E528AE23B5
 X-Rspamd-Action: no action
 
-On Wed, Feb 4, 2026 10:23 AM, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email says "Sending this out without checking since you have to
-> repost. Please note that the AI code review may be wrong especially
-> around defensive programming (which we recommend against)."
-> 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net: wangxun: add pcie error handler
-> 
-> Support to check pcie error and invoke aer driver to recover pcie.
-> 
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> > index bb77bdce69d2..36eb06bd1798 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> 
-> [ ... ]
-> 
-> > @@ -3,10 +3,228 @@
-> >
-> >  #include <linux/netdevice.h>
-> >  #include <linux/pci.h>
-> > +#include <linux/aer.h>
-> >
-> >  #include "wx_type.h"
-> >  #include "wx_lib.h"
-> >  #include "wx_err.h"
-> > +#include "wx_hw.h"
-> > +
-> > +/**
-> > + * wx_io_error_detected - called when PCI error is detected
-> > + * @pdev: Pointer to PCI device
-> > + * @state: The current pci connection state
-> > + *
-> > + * This function is called after a PCI bus error affecting
-> > + * this device has been detected.
-> > + */
-> > +static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-> > +					     pci_channel_state_t state)
-> > +{
-> > +	struct wx *wx = pci_get_drvdata(pdev);
-> > +	struct net_device *netdev;
-> > +
-> > +	netdev = wx->netdev;
-> > +	if (!netif_device_present(netdev))
-> > +		return PCI_ERS_RESULT_DISCONNECT;
-> > +
-> > +	rtnl_lock();
-> > +	netif_device_detach(netdev);
-> > +
-> > +	wx->io_err = true;
-> > +	if (netif_running(netdev))
-> > +		wx->close_suspend(wx);
-> > +
-> > +	if (state == pci_channel_io_perm_failure) {
-> > +		rtnl_unlock();
-> > +		return PCI_ERS_RESULT_DISCONNECT;
-> > +	}
-> > +
-> > +	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-> > +		pci_disable_device(pdev);
-> > +	rtnl_unlock();
-> > +
-> > +	/* Request a slot reset. */
-> > +	return PCI_ERS_RESULT_NEED_RESET;
-> > +}
-> > +
-> > +/**
-> > + * wx_io_slot_reset - called after the pci bus has been reset.
-> > + * @pdev: Pointer to PCI device
-> > + *
-> > + * Restart the card from scratch, as if from a cold-boot.
-> > + */
-> > +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-> > +{
-> > +	struct wx *wx = pci_get_drvdata(pdev);
-> > +	pci_ers_result_t result;
-> > +
-> > +	if (pci_enable_device_mem(pdev)) {
-> > +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-> > +		result = PCI_ERS_RESULT_DISCONNECT;
-> > +	} else {
-> > +		/* make all bar access done before reset. */
-> > +		smp_mb__before_atomic();
-> > +		clear_bit(WX_STATE_DISABLED, wx->state);
-> > +		pci_set_master(pdev);
-> > +		pci_restore_state(pdev);
-> > +		pci_save_state(pdev);
-> > +		pci_wake_from_d3(pdev, false);
-> > +
-> > +		wx->do_reset(wx->netdev, false);
-> > +		result = PCI_ERS_RESULT_RECOVERED;
-> > +	}
-> > +
-> > +	pci_aer_clear_nonfatal_status(pdev);
-> > +
-> > +	return result;
-> > +}
-> > +
-> > +/**
-> > + * wx_io_resume - called when traffic can start flowing again.
-> > + * @pdev: Pointer to PCI device
-> > + *
-> > + * This callback is called when the error recovery driver tells us that
-> > + * its OK to resume normal operation.
-> > + */
-> > +static void wx_io_resume(struct pci_dev *pdev)
-> > +{
-> > +	struct wx *wx = pci_get_drvdata(pdev);
-> > +	struct net_device *netdev;
-> > +
-> > +	netdev = wx->netdev;
-> > +	rtnl_lock();
-> > +	if (netif_running(netdev))
-> > +		netdev->netdev_ops->ndo_open(netdev);
-> > +
-> > +	wx->io_err = false;
-> > +	netif_device_attach(netdev);
-> > +	rtnl_unlock();
-> > +}
-> > +
-> > +const struct pci_error_handlers wx_err_handler = {
-> > +	.error_detected = wx_io_error_detected,
-> > +	.slot_reset = wx_io_slot_reset,
-> > +	.resume = wx_io_resume,
-> > +};
-> > +EXPORT_SYMBOL(wx_err_handler);
-> > +
-> > +static bool wx_check_pcie_error(struct wx *wx)
-> > +{
-> > +	u16 vid, pci_cmd, devctl2;
-> > +	u32 value;
-> > +
-> > +	pci_read_config_word(wx->pdev, PCI_VENDOR_ID, &vid);
-> > +	wx_warn(wx, "PCI vendor id is 0x%x\n", vid);
-> > +	pci_read_config_word(wx->pdev, PCI_COMMAND, &pci_cmd);
-> > +	wx_warn(wx, "PCI command reg is 0x%x\n", pci_cmd);
-> > +	pcie_capability_read_word(wx->pdev, PCI_EXP_DEVCTL2, &devctl2);
-> > +	wx_warn(wx, "Device Control2 Register: 0x%04x\n", devctl2);
-> > +
-> > +	value = rd32(wx, WX_MIS_PWR);
-> > +	wx_warn(wx, "MIS_PWR value is 0x%08x\n", value);
-> > +	value = rd32(wx, WX_PX_IMS(0));
-> > +	wx_warn(wx, "PX_IMS0 value is 0x%08x\n", value);
-> > +	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
-> > +		value = rd32(wx, WX_PX_IMS(1));
-> > +		wx_warn(wx, "PX_IMS1 value is 0x%08x\n", value);
-> > +	}
-> > +	value = rd32(wx, WX_TDB_TFCS);
-> > +	wx_warn(wx, "Tx flow control Status[TDB_TFCS 0xCE00]: 0x%x\n", value);
-> > +
-> > +	/* PCIe link loss or memory space can't access */
-> > +	if (vid == WX_FAILED_READ_CFG_WORD || !(pci_cmd & 0x2))
-> > +		return true;
-> > +
-> > +	return false;
-> > +}
-> > +
-> > +static void wx_check_error_subtask(struct wx *wx)
-> > +{
-> > +	u32 sm;
-> > +
-> > +	if (test_bit(WX_FLAG_ERROR_CHECK, wx->flags)) {
-> > +		/* get PF semaphore */
-> > +		wr32(wx, WX_MIS_PF_SM, 1);
-> > +		clear_bit(WX_FLAG_ERROR_CHECK, wx->flags);
-> > +	}
-> > +
-> > +	sm = rd32(wx, WX_MIS_PF_SM);
-> > +	/* PCIe memory space access error */
-> > +	if (sm == U32_MAX)
-> > +		goto out;
-> > +
-> > +	/* PCIe error may be occurred in another port */
-> > +	if ((sm == 1 && wx_check_first_lan_up(wx)))
-> > +		goto out;
-> > +
-> > +	return;
-> > +out:
-> > +	set_bit(WX_FLAG_NEED_PCIE_RECOVER, wx->flags);
-> > +	wx_warn(wx, "Set PCIe recover on LAN %d\n", wx->bus.func);
-> > +}
-> > +
-> > +static bool wx_check_recovery_capability(struct pci_dev *dev)
-> > +{
-> > +#if defined(__i386__) || defined(__x86_64__)
-> > +	return true;
-> > +#else
-> > +	/* check upstream bridge is root or PLX bridge,
-> > +	 * or if CPU is kunpeng 920
-> > +	 */
-> > +	if (dev->bus->self->vendor == PCI_VENDOR_ID_PLX ||
-> > +	    dev->bus->self->vendor == PCI_VENDOR_ID_HUAWEI)
-> 
-> Can this dereference dev->bus->self without checking if it's NULL first?
-> 
-> When the PCI device is directly attached to the root bus, dev->bus->self
-> is NULL. On non-x86 platforms, this code checks the upstream bridge
-> vendor without verifying that an upstream bridge exists.
-> 
-> The function comment states "check upstream bridge is root or PLX bridge"
-> but the code doesn't actually check for the root bus case. The x86 path
-> returns true unconditionally, but the non-x86 path assumes dev->bus->self
-> is non-NULL.
 
-I think the comment here should be revised. On the non-x86 path, it should
-returns true only when the upstream bridge is PLX or CPU is Kunpeng 920.
-When dev->bus->self is null, it is necessary to return false. Although in reality,
-it is not null either when device is directly attached to the root bus.
+[...]
+
+>> If dropping the lock is a no-go, the only viable path forward is to 
+>> split the
+>> reset_task so that the waiting portion is decoupled from the netdev_lock
+>> critical section.
+>>
+> We used to do this back before the netdev shaper ops. We didn't acquire 
+> either netdev lock or RTNL during reset.
+> 
+> I thought we had some code in the past that would handle netdev stuff 
+> outside of reset.. but I don't really know and git blame is not making 
+> it easy to find this information.
+
+IIRC it was iavf_config_task that is used to complete stuff requested
+under RTNL but later
 
 > 
-> > +		return true;
-> > +	else
-> > +		return false;
-> > +#endif
-> > +}
+> Perhaps we don't actually need to hold the netdev lock over the reset 
+> task.. except Przemek's refactor to remove the critical lock now makes 
+> us fully dependent on the netdev lock in this case for reset :(
 > 
-> [ ... ]
+>> The fact remains that MTU configuration and ring parameter changes are
+>> currently broken in iavf. Changing the MTU on a Virtual Function is a
+>> fundamental configuration not an obscure edge case that can remain 
+>> non- functional.
+>>
 > 
-> > diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> > index 3171a98d81a6..653a98d9835b 100644
-> > --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> > +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> > @@ -234,6 +234,12 @@ static irqreturn_t __ngbe_msix_misc(struct wx *wx, u32 eicr)
-> >  	if (eicr & NGBE_PX_MISC_IC_VF_MBOX)
-> >  		wx_msg_task(wx);
-> >
-> > +	if (eicr & NGBE_PX_MISC_PCIE_REQ_ERR) {
-> > +		wx_warn(wx, "PCIe Request Error founded on Lan %d\n",
-> > +			wx->bus.func);
+> Agreed. This needs a resolution. It is just very tricky to figure out 
+> what the solution should be.
 > 
-> This isn't a bug, but there's a typo: 'founded' should be 'found'.
+> We need to hold the netdev lock during reset, and we need to have our 
+> handlers wait for reset to complete in order to be certain their task is 
+> done... but reset is a separate thread so we can't really communicate to 
+> it that we're holding the lock, and attempts to do that would be a huge 
+> problem.
 > 
-> > +		wx_pcie_error_handler(wx);
-> > +	}
-> > +
-> >  	if (unlikely(eicr & NGBE_PX_MISC_IC_TIMESYNC))
-> >  		wx_ptp_check_pps_event(wx);
-> >
+> We don't want to go back to the critical lock and all of its horrible 
+> problems either. The commit that removed it is here: 120f28a6f314 
+> ("iavf: get rid of the crit lock")
 > 
-> [ ... ]
+>> I would appreciate any further guidance on how you would prefer...
+>>
 > 
-> > diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> > index aa14958d439a..c832100bcb61 100644
-> > --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> > +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> > @@ -6,6 +6,7 @@
-> >
-> >  #include "../libwx/wx_type.h"
-> >  #include "../libwx/wx_lib.h"
-> > +#include "../libwx/wx_err.h"
-> >  #include "../libwx/wx_ptp.h"
-> >  #include "../libwx/wx_hw.h"
-> >  #include "../libwx/wx_sriov.h"
-> > @@ -178,6 +179,12 @@ static irqreturn_t txgbe_misc_irq_thread_fn(int irq, void *data)
-> >  		handle_nested_irq(sub_irq);
-> >  		nhandled++;
-> >  	}
-> > +	if (eicr & TXGBE_PX_MISC_PCIE_REQ_ERR) {
-> > +		wx_warn(wx, "PCIe Request Error founded on Lan %d\n",
-> > +			wx->bus.func);
+> I wish I had some better ideas..
 > 
-> This isn't a bug, but there's a typo: 'founded' should be 'found'.
+> Bad ideas I've thought about so far:
 > 
-> > +		wx_pcie_error_handler(wx);
-> > +		nhandled++;
-> > +	}
-> >  	if (unlikely(eicr & TXGBE_PX_MISC_IC_TIMESYNC)) {
-> >  		wx_ptp_check_pps_event(wx);
-> >  		nhandled++;
+> 1) this patch with its drop lock and wait, which we discussed as 
+> problematic before. It creates a lot of issues since it means the 
+> operations are no longer atomic and we could potentially get stuck with 
+> some other operation in the event of another thread starting some core 
+> netdev task. No good.
 > 
+> 2) not holding netdev_lock in reset, which is now a nogo since we 
+> removed the crit_lock, and apparently we held netdev_lock prior to that 
+> too anyways...
+> 
+> 3) we could maybe do some sort of ref counting dance where we take some 
+> reference in threads that queue a reset, and the reset task would know 
+> if that reference was non-zero then another driver thread is holding 
+> netdev_lock so its safe to go into reset without locking... but this 
+> feels extremely ugly and error prone to me...
+> 
+> 4) convert reset handling to a separate function that depends on the 
+> netdev_lock, and call that directly from within the threads that 
+> currently "wait for reset" while holding the netdev lock. Thus, we 
+> basically move this entire call chain into the thread already holding 
+> the lock, and call it from the context of the function like the MTU 
+> change, etc. 
 
+reset_thread() {
+	while (!stopped) {
+		netdev_lock();
+		reset_step();
+		netdev_unlock();
+	}
+}
+
+looks cool, IIRC I did something similar with the "after crit lock
+removal refactor continuation", but I've put it on hold
+https://github.com/pkitszel/linux/commits/undeadlock/
+The linked code went even further and merged all of our admin-worker 
+threads into one and the whole was protected by the netdev_lock :)
+
+This feels like its also a huge issue, and could
+> potentially lead to some sort of issue where we need to still block the 
+> reset thread from going if we reset at the end of the netdev_lock thread..
+
+that should queue on the "do later stuff queue", which we don't have
+right now (and keep some of such stuff in the state machine), but would
+be useful for many other actions too (like virtchnl messages, for which
+we have queue-of-1 right now
+
+> 
+> I don't really like any of these solutions, even if (3) and (4) aren't 
+> fully ruled out as completely broken... they probably have all kinds of 
+> issues...
 
