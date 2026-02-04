@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-256865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256866-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADT8GojOg2kFugMAu9opvQ
-	(envelope-from <netdev+bounces-256865-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:56:08 +0100
+	id kEE1DebNg2kFugMAu9opvQ
+	(envelope-from <netdev+bounces-256866-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:53:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BF8ED1F3
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:56:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCBEBED1A8
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:53:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0DD4630210D7
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 22:53:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CA4453008246
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 22:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2F7396B66;
-	Wed,  4 Feb 2026 22:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E97396B88;
+	Wed,  4 Feb 2026 22:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="Vus+XugV"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="ApnvLzEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764BF37AA7F
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 22:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF90396B6D
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 22:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770245601; cv=none; b=a5awc5SElrknNFg+5rxVcJqY4hZfzgrCmxl8SJ26H7j7El2BEs8+Rn10QgMy61pZ4vyKkDVe2uOgL8i2x5uSAx2lX9lm53aWPwLCie+g07XjaQ8fODtltp9Zs0M0O16pQTC/CoQHgXGT/UjuaTWMUrts0Flnyj2VBTowe8ajksE=
+	t=1770245603; cv=none; b=sk9blVeYvGONk3r+4XtMQEjyCDA2eC+WMu6Eis8wGqeYC1/ty21At5mUn2Chlm0qQvdMpnzpiPQwc8E6jZ2EYv26PmjJCNo+ApUGcTU+8om7eDOu25kjX6UDpCPgzc7j77JrgMhwZKjiYt1Dga/cGqriBPxYTq4Vlx8q0Askgv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770245601; c=relaxed/simple;
-	bh=Cw+g5v3qix+K2odnskbDKUaL7BsivFlPIFkwMw+imrU=;
+	s=arc-20240116; t=1770245603; c=relaxed/simple;
+	bh=tAp/O3bEeMV0iUDq/Wiq2PbIBCLHQKAo5YEvTeB7v1g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AtJA/hsGWOcWLG1ys47jLTk8wSb1nHn9jTzBAEYnlTKalO/U6nSRU98XdcEzVAuU858PaToIjLAu2gjLU2JlsacqHOuf1jjQoBoELJEOHk7Hy6OFMyqjlos7uMaUOykJzJsznF6t8htOiTOidWrU1JzgZi8eKEmc6M/qU/WC1FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=Vus+XugV; arc=none smtp.client-ip=74.125.82.196
+	 MIME-Version; b=u9FsGlHB7qQg1wg4oiCGG242Helkd0gaN5DpQFiKn2A1o9tXhhowDlipyOmtYTMQvTNx6jc9c+awaBs4/UuyAOezB1RIDx578ilkHuVX3jB3043F4E30baJScYa1Xr/Yb55Bm05A8tj8CGl3MjF1iVEFW/0Oy9s77I9WV0oOUgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=ApnvLzEB; arc=none smtp.client-ip=74.125.82.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b71515d8adso241694eec.1
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 14:53:21 -0800 (PST)
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2b71557299dso256047eec.1
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 14:53:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1770245600; x=1770850400; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1770245602; x=1770850402; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lNcjs1Gb3OyQsrNzp9lhT3Tf4SZm991wAEQLanHnlzI=;
-        b=Vus+XugVfusJNcMsuYhIBoZ1muVinRqtEpDTN45QHdlxlqbCPArY45XcLCOe4lZz5T
-         u7E4CfEeqj1uOxPyTx2sOhpKhoLKLaeqm07E5NogPhGraot9MyaPa6L0BV00MDyNXl2I
-         ni4KLruBTY++xzMVNfcp7EER34g2QAx1jfIO7an20n4ZhfHF+Hlt3mBlwqO8U0ntCl/V
-         9KXCwQmSv4K3tHGabfE9rKTZ2T2xKRwuxPrNTbJdUPbp8hOeC7BeFkHiiryK8VrDyssy
-         mOw8n933JOwCt7vxo+HhNgQIJCkYf42RYfTAx168YzHAzp8DPntsaeiu1bw+KUqMzq3w
-         Wk6g==
+        bh=gknWCUbu4rGCx2qSBonrFvur9BBT38u1zHM4kwic0d8=;
+        b=ApnvLzEBU4/gW7ZPTWxu92Juw38e6p7ANDZP66Dh9l46lFM9vkz7Nx8eKzxhWBpdEL
+         UNFctVoavK5N0k5iIvgRQpzT9d4x7FNUmh5CubQkIJP9lIJfV6pr57hDeDC+aoaINyRO
+         F4LLlrURYHSCFFL25DeZmpfrkHpLseWbZGH/iSkW+d150E4ZnTWWvNGVN8hTsC1mor8/
+         pG5O/WhflDJ4iqLwrV+xGihWldZfZni/oV0Rrh6sbd6dYxUPqI82C091kiHohIzcq1w9
+         vJVLwKurX+LpyLb08j0KYOLji4w9VypHhZ3OVZKLqfPM5mwMbVixn8sGgQ/DkO8zci2L
+         iP/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770245600; x=1770850400;
+        d=1e100.net; s=20230601; t=1770245602; x=1770850402;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lNcjs1Gb3OyQsrNzp9lhT3Tf4SZm991wAEQLanHnlzI=;
-        b=Zeb54w6KsaJ/RCN+39LRR7SDfBaz8km+ipzxv0SJwn8aVXUMQQgvi2CKKCL3R417TF
-         suD9R+5t7waJifbTNZgIDulJqkqT7IojT+iOKGQZDdYJgjspjUIShWjfU5Fy2TxIR5Oe
-         ZUO4DYbsZhHFZRF7Rd6qVqlIgRkGlgZvSiwBUFXQKK6mw/Xu3eFtW1LhjaFrEWgSUOSi
-         hsZq4CIzRk9suLHo6bjl9S97zyEkfRDCZVQfrDbm7/Nw+fdXdWMluWewUN55eY/j8GCX
-         F9hwoFC2gLWmBbqdxnszg2cyHWi8emLzPBZT4c+OopB4AHr0ZM03S8NzVKR9q4JGcS0k
-         UzYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGLAtGcCYKl0uwaUc6B7G08LYMeFc6SGOcfj6qx+FFwUM+OXLFW7In2f/Lw9KoloTFJbSoVCQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5YcvrqfnTPCJkDxQ9RwNRDKT0Gs6dKzqSMMZyZPs8vKHzrq32
-	oBAfeSafr25YQ+IRftvsIyxh/SfbpCbF3QX1OngbivRDCbdXi7js0252NXpxE6HDZMfeDOTGWhg
-	Jft8lUQ==
-X-Gm-Gg: AZuq6aKOQ9R6AoRYpRvbSGONsqB6t8BsCRooh7TmMiZbPB1rDNpjNHECZlnnAmxTFCP
-	udziT+DS47CcEssbgk6vOakvIlBlP/6K4NZfNKjtyEBZAYNxTzZx2UtC5X/fy94RHBnRi0L4V9B
-	h4kpYpemo7A6ucPgh8YdeEr8PSTYWS7vCl5w39S0MhezwO0266BxpwqM9hskK6PYrHjLJAKat5c
-	LTABd+YW7KCK3bKVtA3VOS0EEmrCeA8cXWMSqDpcJ50agpeQ4Lfrd57PdS+bHgPqqftpggVrd5J
-	2HtcDM10DKVhdxFVxf+5tk70F4or+Z3htlkvUbuL9GuaHxfIxdCHC6poJJ7Zh5zALumjvUAWkXs
-	6x3L5p3gbWWJI8ltkSJjh41Yaq8cPB6b2DgC52BuTzb2zbOVo9uK2JrEZNqdZnVEUu/SaMpU5eT
-	V6YGOrhHYxpQNM4xtPFpVv57DKK0Gw8xBA3ClKZUTCQa2PD2LncuAGQZqK
-X-Received: by 2002:a05:7301:9f16:b0:2b8:2fd8:21c1 with SMTP id 5a478bee46e88-2b83291cb4emr1736520eec.10.1770245600309;
-        Wed, 04 Feb 2026 14:53:20 -0800 (PST)
+        bh=gknWCUbu4rGCx2qSBonrFvur9BBT38u1zHM4kwic0d8=;
+        b=V9j1mB8/uLmZslVxpPmtxq0MmwkNXN11w2ES1X0m4kyM+lSDdY3JPNXas/H537PfzK
+         k+QSCNMx3hrcNTRTHslKv1xW59didWV0UpGMz0RlnkNFdebM+JRhmrGS9SqZ6PtZTfD0
+         lpgN9Nb3kAnoF+4jSPqtk9hpDN9BeKqoX38aH1tkHAK1g0zyrGPEnaFyV6qGkN4n+0fF
+         fRGCAmtJnSC3vT6YtUkMq/MZOeHMYAxXyhXSs2T6W0+W7m9biA3AGwmBa0+paP92Gi0M
+         0B2FweQG3nmBVm9Tn5NPer2wkbW2puskP77m8kOwRGTUHWRxl6yTD61mLj0JXBvtumvf
+         c6sA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxK3uWnSbVOnqSw34/5Oi4F/IDRk3RLs0IwaJGPTKHMwAsBBK+EZ0O0CU9qu4zl1bxkZ0imK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuIFvmTNMQyuB1hg2J0P6ovYexUr2/XASQW5EwepDcR+HaAm9i
+	D3kgH45nOzMYMgV3qlvQyYK/fpKzyaS/w1LLgrRks8RnniJvQqji8houwfQcAtn/4w==
+X-Gm-Gg: AZuq6aKXPOyuNNu4AmuIWC/NlR4zUOsUclTOY6KKmqufE91w6dZkQC3rs74db90gTJe
+	s87momJMPSoaN2n01v2SRn0aul7UhQ9a5gssgqiB+5Ds7/jeGMrR5SYtkXcHZtEw4pHc4OsmGvM
+	3zdFu39u0fLfqLwSkPOPO5MKGHRp8Igc6hcio7/jk828iUFko+tL9rFRTEOK+EI0rfamzswi3kt
+	JxfTtYKBSjMhznNIR5fZKrCslNxs/Wu2Hx8j7knrLdXJOg9dVkDAozYfjekSPD5pWUeH7cnYgR9
+	clTuUxltdDGneYGUYeJ3MgPTCqpYu06rpT+FQDusVWXN8Zy//bDPeeZKEkxX4jSwFHxIcmTSJH1
+	CSkEiuM6JZKy3aEO1GBQTU2uAQ9efuxeoFLGaTSDJf7zFR37AKbiOrcnsqwOJTKi+EubPmzN0VS
+	T9gk6+/aosFzBD+BmYQkVpiSema9NWF9GHv8pX/djnZzzOwqouc6t3zTUA
+X-Received: by 2002:a05:7300:2382:b0:2b0:5028:bafd with SMTP id 5a478bee46e88-2b832876655mr2090851eec.8.1770245602190;
+        Wed, 04 Feb 2026 14:53:22 -0800 (PST)
 Received: from pong.herbertland.com ([2601:646:8980:b330:5ee7:5720:1d16:9b50])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b832feacc6sm2587040eec.35.2026.02.04.14.53.18
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b832feacc6sm2587040eec.35.2026.02.04.14.53.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 14:53:19 -0800 (PST)
+        Wed, 04 Feb 2026 14:53:21 -0800 (PST)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -85,9 +84,9 @@ To: davem@davemloft.net,
 	willemdebruijn.kernel@gmail.com,
 	pabeni@redhat.com
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v7 07/10] ipv6: Document enforce_ext_hdr_order sysctl
-Date: Wed,  4 Feb 2026 14:51:51 -0800
-Message-ID: <20260204225154.58245-8-tom@herbertland.com>
+Subject: [PATCH net-next v7 08/10] test: Add proto_nums.py in networking selftests
+Date: Wed,  4 Feb 2026 14:51:52 -0800
+Message-ID: <20260204225154.58245-9-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260204225154.58245-1-tom@herbertland.com>
 References: <20260204225154.58245-1-tom@herbertland.com>
@@ -105,13 +104,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-256865-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256866-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -126,71 +125,257 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:email,herbertland.com:dkim,herbertland.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E9BF8ED1F3
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,proto_nums.py:url]
+X-Rspamd-Queue-Id: BCBEBED1A8
 X-Rspamd-Action: no action
 
-Document the enforce_ext_hdr_order sysctl that controls whether
-Extension Header order is enforced on receive.
+Add proto_nums.py that contains various python definitions of
+common protocol constants
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- Documentation/networking/ip-sysctl.rst | 34 ++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/proto_nums.py | 231 ++++++++++++++++++++++
+ 1 file changed, 231 insertions(+)
+ create mode 100644 tools/testing/selftests/net/proto_nums.py
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index bafb2ab08d0e..ce783551b687 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2487,8 +2487,8 @@ max_dst_opts_number - INTEGER
-         Default: 2
- 
- max_hbh_opts_number - INTEGER
--	Maximum number of non-padding TLVs allowed in a Hop-by-Hop
--	options extension header. If this value is zero then receive
-+        Maximum number of non-padding TLVs allowed in a Hop-by-Hop
-+        options extension header. If this value is zero then receive
-         Hop-by-Hop Options processing is disabled in which case packets
-         with the Hop-by-Hop Options extension header are dropped.
-         If this value is less than zero then unknown options are disallowed
-@@ -2583,6 +2583,36 @@ ioam6_id_wide - LONG INTEGER
- 
-         Default: 0xFFFFFFFFFFFFFF
- 
-+enforce_ext_hdr_order - BOOLEAN
-+	Enforce recommended Extension Header ordering in RFC8200.
-+	If the sysctl is set to 1 then the ordering is enforced in
-+	received packets and each Extension Header may be present
-+	at most once per packet (except for Destination Options that
-+	may occur twice). If the sysctl is set to 0 then ordering is
-+	not enforced and Extension Headers may be present in any
-+	order and have any number of occurrences per packet (except
-+	for Hop-by-Hop Options that must always be the first Extension
-+	Header and occur at most once in a packet)).
+diff --git a/tools/testing/selftests/net/proto_nums.py b/tools/testing/selftests/net/proto_nums.py
+new file mode 100644
+index 000000000000..dc775164dacc
+--- /dev/null
++++ b/tools/testing/selftests/net/proto_nums.py
+@@ -0,0 +1,231 @@
++# SPDX-License-Identifier: GPL-2.0
 +
-+	The Extension Header order is:
++# Various protocol constant definitions
 +
-+	    IPv6 header
-+	    Hop-by-Hop Options header
-+	    Destination Options before the Routing header
-+	    Routing header
-+	    Fragment header
-+	    Authentication header
-+	    Encapsulating Security Payload header
-+	    Destination Options header
-+	    Upper-Layer header
++from enum import Enum
 +
-+	Possible values:
++# IP protocol numbers
++class IP_Proto(Enum):
++    IP_PROTO_HOPOPT = 0
++    IP_PROTO_ICMP = 1
++    IP_PROTO_IGMP = 2
++    IP_PROTO_GGP = 3
++    IP_PROTO_IPv4 = 4
++    IP_PROTO_ST = 5
++    IP_PROTO_TCP = 6
++    IP_PROTO_CBT = 7
++    IP_PROTO_EGP = 8
++    IP_PROTO_IGP = 9
++    IP_PROTO_BBN_RCC_MON = 10
++    IP_PROTO_NVP_II = 11
++    IP_PROTO_PUP = 12
++    IP_PROTO_ARGUS = 13
++    IP_PROTO_EMCON = 14
++    IP_PROTO_XNET = 15
++    IP_PROTO_CHAOS = 16
++    IP_PROTO_UDP = 17
++    IP_PROTO_MUX = 18
++    IP_PROTO_DCN_MEAS = 19
++    IP_PROTO_HMP = 20
++    IP_PROTO_PRM = 21
++    IP_PROTO_XNS_IDP = 22
++    IP_PROTO_TRUNK_1 = 23
++    IP_PROTO_TRUNK_2 = 24
++    IP_PROTO_LEAF_1 = 25
++    IP_PROTO_LEAF_2 = 26
++    IP_PROTO_RDP = 27
++    IP_PROTO_IRTP = 28
++    IP_PROTO_ISO_TP4 = 29
++    IP_PROTO_NETBLT = 30
++    IP_PROTO_MFE_NSP = 31
++    IP_PROTO_MERIT_INP = 32
++    IP_PROTO_DCCP = 33
++    IP_PROTO_3PC = 34
++    IP_PROTO_IDPR = 35
++    IP_PROTO_XTP = 36
++    IP_PROTO_DDP = 37
++    IP_PROTO_IDPR_CMTP = 38
++    IP_PROTO_TP_PLUS_PLUS = 39
++    IP_PROTO_IL = 40
++    IP_PROTO_IPv6 = 41
++    IP_PROTO_SDRP = 42
++    IP_PROTO_IPv6_Route = 43
++    IP_PROTO_IPv6_Frag = 44
++    IP_PROTO_IDRP = 45
++    IP_PROTO_RSVP = 46
++    IP_PROTO_GRE = 47
++    IP_PROTO_DSR = 48
++    IP_PROTO_BNA = 49
++    IP_PROTO_ESP = 50
++    IP_PROTO_AH = 51
++    IP_PROTO_I_NLSP = 52
++    IP_PROTO_SWIPE = 53
++    IP_PROTO_NARP = 54
++    IP_PROTO_Min_IPv4 = 55
++    IP_PROTO_TLSP = 56
++    IP_PROTO_SKIP = 57
++    IP_PROTO_IPv6_ICMP = 58
++    IP_PROTO_IPv6_NoNxt = 59
++    IP_PROTO_IPv6_Opts = 60
++    IP_PROTO_any_1 = 61
++    IP_PROTO_CFTP = 62
++    IP_PROTO_any_2 = 63
++    IP_PROTO_SAT_EXPAK = 64
++    IP_PROTO_KRYPTOLAN = 65
++    IP_PROTO_RVD = 66
++    IP_PROTO_IPPC = 67
++    IP_PROTO_any_3 = 68
++    IP_PROTO_SAT_MON = 69
++    IP_PROTO_VISA = 70
++    IP_PROTO_IPCV = 71
++    IP_PROTO_CPNX = 72
++    IP_PROTO_CPHB = 73
++    IP_PROTO_WSN = 74
++    IP_PROTO_PVP = 75
++    IP_PROTO_BR_SAT_MON = 76
++    IP_PROTO_SUN_ND = 77
++    IP_PROTO_WB_MON = 78
++    IP_PROTO_WB_EXPAK = 79
++    IP_PROTO_ISO_IP = 80
++    IP_PROTO_VMTP = 81
++    IP_PROTO_SECURE_VMTP = 82
++    IP_PROTO_VINES = 83
++    IP_PROTO_IPTM = 84
++    IP_PROTO_NSFNET_IGP = 85
++    IP_PROTO_DGP = 86
++    IP_PROTO_TCF = 87
++    IP_PROTO_EIGRP = 88
++    IP_PROTO_OSPFIGP = 89
++    IP_PROTO_Sprite_RPC = 90
++    IP_PROTO_LARP = 91
++    IP_PROTO_MTP = 92
++    IP_PROTO_AX_25 = 93
++    IP_PROTO_IPIP = 94
++    IP_PROTO_MICP = 95
++    IP_PROTO_SCC_SP = 96
++    IP_PROTO_ETHERIP = 97
++    IP_PROTO_ENCAP = 98
++    IP_PROTO_any_4 = 99
++    IP_PROTO_GMTP = 100
++    IP_PROTO_IFMP = 101
++    IP_PROTO_PNNI = 102
++    IP_PROTO_PIM = 103
++    IP_PROTO_ARIS = 104
++    IP_PROTO_SCPS = 105
++    IP_PROTO_QNX = 106
++    IP_PROTO_A_N = 107
++    IP_PROTO_IPComp = 108
++    IP_PROTO_SNP = 109
++    IP_PROTO_Compaq_Peer = 110
++    IP_PROTO_IPX_in_IP = 111
++    IP_PROTO_VRRP = 112
++    IP_PROTO_PGM = 113
++    IP_PROTO_any_5 = 114
++    IP_PROTO_L2TP = 115
++    IP_PROTO_DDX = 116
++    IP_PROTO_IATP = 117
++    IP_PROTO_STP = 118
++    IP_PROTO_SRP = 119
++    IP_PROTO_UTI = 120
++    IP_PROTO_SMP = 121
++    IP_PROTO_SM = 122
++    IP_PROTO_PTP = 123
++    IP_PROTO_ISIS = 124
++    IP_PROTO_FIRE = 125
++    IP_PROTO_CRTP = 126
++    IP_PROTO_CRUDP = 127
++    IP_PROTO_SSCOPMCE = 128
++    IP_PROTO_IPLT = 129
++    IP_PROTO_SPS = 130
++    IP_PROTO_PIPE = 131
++    IP_PROTO_SCTP = 132
++    IP_PROTO_FC = 133
++    IP_PROTO_RSVP_E2E_IGNORE = 134
++    IP_PROTO_Mobility = 135
++    IP_PROTO_UDPLite = 136
++    IP_PROTO_MPLS_in_IP = 137
++    IP_PROTO_manet = 138
++    IP_PROTO_HIP = 139
++    IP_PROTO_Shim6 = 140
++    IP_PROTO_WESP = 141
++    IP_PROTO_ROHC = 142
++    IP_PROTO_Ethernet = 143
++    IP_PROTO_AGGFRAG = 144
++    IP_PROTO_NSH = 145
++    IP_PROTO_Homa = 146
++    IP_PROTO_BIT_EMU = 147
 +
-+	- 0 (disabled)
-+	- 1 (enabled)
++# Hop-by-Hop and Destination Options numbers
++class HBHDst_Types(Enum):
++    HBHDST_TYPE_PAD1 = 0x0
++    HBHDST_TYPE_PADN = 0x1
++    HBHDST_TYPE_JUMBO = 0xc2
++    HBHDST_TYPE_RPL = 0x23
++    HBHDST_TYPE_RPL_DEPRECATED = 0x63
++    HBHDST_TYPE_TNL_ENCAP_LIMIT = 0x4
++    HBHDST_TYPE_ROUTER_ALERT = 0x5
++    HBHDST_TYPE_QUICK_START = 0x26
++    HBHDST_TYPE_CALIPSO = 0x7
++    HBHDST_TYPE_SMF_DPD = 0x8
++    HBHDST_TYPE_HAO = 0xc9
++    HBHDST_TYPE_ENDPOINT_ID = 0x8a
++    HBHDST_TYPE_ILNP_NONCE = 0x8b
++    HBHDST_TYPE_LINE_ID = 0x8c
++    HBHDST_TYPE_DEPRECATED = 0x4d
++    HBHDST_TYPE_MPL = 0x6d
++    HBHDST_TYPE_DFF = 0xee
++    HBHDST_TYPE_PDM = 0x0f
++    HBHDST_TYPE_MIN_PATH_MTU = 0x30
++    HBHDST_TYPE_IOAM_NO_CHNG = 0x11
++    HBHDST_TYPE_IOAM_CHNG = 0x31
++    HBHDST_TYPE_ALT_MARK = 0x12
++    HBHDST_TYPE_RFC3692_1 = 0x1e
++    HBHDST_TYPE_RFC3692_2 = 0x3e
++    HBHDST_TYPE_RFC3692_3 = 0x5e
++    HBHDST_TYPE_RFC3692_4 = 0x7e
++    HBHDST_TYPE_RFC3692_5 = 0x9e
++    HBHDST_TYPE_RFC3692_6 = 0xbe
++    HBHDST_TYPE_RFC3692_7 = 0xde
 +
-+	Default: 1 (enabled)
++# Routing header types
++class RoutingTypes(Enum):
++    ROUTING_TYPE_SRC_RT = 0
++    ROUTING_TYPE_NIMROD = 1
++    ROUTING_TYPE_2 = 2
++    ROUTING_TYPE_RPL = 3
++    ROUTING_TYPE_SRH = 4
++    ROUTING_TYPE_CRH16 = 5
++    ROUTING_TYPE_CRH32 = 6
++    ROUTING_TYPE_RFC3692_1 = 253
++    ROUTING_TYPE_RFC3692_2 = 254
 +
- IPv6 Fragmentation:
- 
- ip6frag_high_thresh - INTEGER
++# Canonical extension header order
++class EH_Order(Enum):
++    IPV6_EXT_HDR_ORDER_HOP = 1 << 0
++    IPV6_EXT_HDR_ORDER_DEST_BEFORE_RH = 1 << 1
++    IPV6_EXT_HDR_ORDER_ROUTING = 1 << 2
++    IPV6_EXT_HDR_ORDER_FRAGMENT = 1 << 3
++    IPV6_EXT_HDR_ORDER_AUTH = 1 << 4
++    IPV6_EXT_HDR_ORDER_ESP = 1 << 5
++    IPV6_EXT_HDR_ORDER_DEST = 1 << 6
++
++# ICMPv6 types
++class ICMP6_Type(Enum):
++    ICMPV6_DEST_UNREACH = 1
++    ICMPV6_PKT_TOOBIG = 2
++    ICMPV6_TIME_EXCEED = 3
++    ICMPV6_PARAMPROB = 4
++    ICMPV6_ECHO_REQUEST = 128
++    ICMPV6_ECHO_REPLY = 129
++    ICMPV6_MGM_QUERY = 130
++    ICMPV6_MGM_REPORT = 131
++    ICMPV6_MGM_REDUCTION = 132
++    ICMPV6_NI_QUERY = 139
++    ICMPV6_NI_REPLY = 140
++    ICMPV6_MLD2_REPORT = 143
++    ICMPV6_DHAAD_REQUEST = 144
++    ICMPV6_DHAAD_REPLY = 145
++    ICMPV6_MOBILE_PREFIX_SOL = 146
++    ICMPV6_MOBILE_PREFIX_ADV = 147
++    ICMPV6_MRDISC_ADV = 151
++    ICMPV6_MRDISC_SOL = 152
 -- 
 2.43.0
 
