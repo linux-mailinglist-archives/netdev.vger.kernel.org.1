@@ -1,171 +1,132 @@
-Return-Path: <netdev+bounces-256645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OAAcLqERg2kPhQMAu9opvQ
-	(envelope-from <netdev+bounces-256645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:30:09 +0100
+	id KL9jANYUg2nihQMAu9opvQ
+	(envelope-from <netdev+bounces-256646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:43:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EEB1E3DAA
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:30:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D81DE4012
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:43:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9DEE63015EF7
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:28:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 93B503009145
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C673A9D82;
-	Wed,  4 Feb 2026 09:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E543A1E94;
+	Wed,  4 Feb 2026 09:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AFSx54P8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wvDQQR6D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8FD3A7F4C;
-	Wed,  4 Feb 2026 09:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857C338F225
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 09:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770197323; cv=none; b=aAS8da+0NHqKH0QnBotC6/OvaPb+xM6mRgzU8Oq8oR34U+wFr9zJNU7796OI3DGW+RsxXV9vDrihPC425u4z5IORjlC4tWkMcI7HnVVpaUEeqRhdGOD/nnW9fn9Bi2wBB9o5KUGcBCh7NxcsCLsliHYokn7knqo7l6jrTRMKif0=
+	t=1770197996; cv=none; b=HAnX68OJBKLfemlx3J8Xz4Kkhe3rhPOZr8JHsZznubJEvRN5xEC2gkqrzdvb71sRHy/jRdX0Dmg1w13qp3t7Qfev2lRWtFZKI0kdHmYT9lOps3Od906V9Xr/zHtNr0s2KK1nE+g7DW6anA8oWtcX8HkY6feTZV8k1rwf3eTkyNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770197323; c=relaxed/simple;
-	bh=wNmreD1B96IJwY1XBdvP/FHXcUDoGKx185+NrO65AHU=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=NMHNgkg2wGxjjGyhj+N9q/tksSBzcHJ/KFcK1z4FM8nFBYnSbiORhqDKDJqtzUIMehhQLlJfGi3r/GbsTDMZUTAj33+6E4xiq1l4VCS3RPcHr3plnWRvZ4n+twk00/MuXvDpIaLyc33x32NRklm2DOHvwA/nXq4/sevfn8wgILQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AFSx54P8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF48BC4CEF7;
-	Wed,  4 Feb 2026 09:28:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770197323;
-	bh=wNmreD1B96IJwY1XBdvP/FHXcUDoGKx185+NrO65AHU=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=AFSx54P8bWsWcKCo3dw/7CAusa6aLI+b4yMUNsGB4Ux5ceAOJBU7zoi3JUNOzBbYc
-	 9oHVWnYgY/WmA1CVyAo0UI6r+m3rYBgu3W9dUg0jiGqByoxz4+zHhbhueezyHgh6t7
-	 kKrOxA9zuxkC5AOu5T8QDqCr828iKaIkn73q4V8BGl+VVWT73YZ47tyXsrSYlefftl
-	 zmZmIw8ea/zJ1+/dLVH7dhbnqMImPbd486nAd7rnw4lMfwqC0nlSTceXptUMhXQ8HR
-	 Ry8/jNQ4ib598H8RXm17+FE1TUvAWp3tT0Ae+bA6ETEpGYjkcZBZRVdsUVhSyIPShf
-	 Q93mDkPKVXg9g==
-Content-Type: multipart/mixed; boundary="===============6939426097549955783=="
+	s=arc-20240116; t=1770197996; c=relaxed/simple;
+	bh=C+CMoSHbsVVkKpQx4qWlMSQu8EpXpFjp4jsH5u0O0/s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k63eqGdTZti3CaAq0ycQgiPtruG4bL4NXOvB4EWd2ULugS+bCX5KxgiY1s5NMST9CgqfEvjCePHDmiIEDWyfBIQs2cVlCPK85WaHbKos7+7rSM+aDbseH9hNu42YPXF9Qqfw7DLxHqSmGlz6BahKiu+0whCWeN71BsnL3h2PgH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wvDQQR6D; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 1849E1A2BE7;
+	Wed,  4 Feb 2026 09:39:54 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CAE3F60745;
+	Wed,  4 Feb 2026 09:39:53 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 383D8119A865B;
+	Wed,  4 Feb 2026 10:39:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1770197992; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=AI/nHMuupilMGKzkZo1RxmEdDDqp05ziOca4mFkFe7Y=;
+	b=wvDQQR6D3NBroTTsWxi26R4kPW+9aio4FhNW0rwmIim2KruxF+sPRmVT4VjQMLunA4Ibib
+	ltTV/uFCBVhpL8x4kz4gfGY9u0v4AW9gpqgOrDWYYHIlnOqYqtvKuftqQUS4RbjYmT/yK0
+	YjU+xglnARFA//o6JyluxbffW0afooKLZrSdVH7axblBGwwbUMOzMgg9CjdpiVdF6S7CvI
+	zrFis9TzJqvk9ldNxb6CWAZ3dOGtzx2YkTil1S5YBWp65e4hwT9gARCalzPhbxqHTyeRru
+	eilPDcA5AuI3ynI3GOD37z3IgND0dxrW21HaURKjOwfIbAc5H0v3nSodWyPhow==
+Message-ID: <5935c13a-04cc-45a7-9b71-3ebd821f2043@bootlin.com>
+Date: Wed, 4 Feb 2026 10:39:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <bec784d0d78a505dfbfbd17ffe95840dc356c80ceec2a96f9659b442b64c92c6@mail.kernel.org>
-In-Reply-To: <8b9d7d9485c627dc05cdeb6863abd5a1c81c95ec.1770194182.git.zhuhui@kylinos.cn>
-References: <8b9d7d9485c627dc05cdeb6863abd5a1c81c95ec.1770194182.git.zhuhui@kylinos.cn>
-Subject: Re: [RFC PATCH bpf-next v6 05/12] libbpf: introduce bpf_map__attach_struct_ops_opts()
-From: bot+bpf-ci@kernel.org
-To: hui.zhu@linux.dev,akpm@linux-foundation.org,hannes@cmpxchg.org,mhocko@kernel.org,roman.gushchin@linux.dev,shakeel.butt@linux.dev,muchun.song@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,peterz@infradead.org,ojeda@kernel.org,nathan@kernel.org,kees@kernel.org,tj@kernel.org,jeffxu@chromium.org,mkoutny@suse.com,kernel@jfarr.cc,brauner@kernel.org,rdunlap@infradead.org,brgerst@gmail.com,masahiroy@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org,inwardvessel@gmail.com,willemb@google.com,kerneljasonxing@gmail.com,paul.chaignon@gmail.com,a.s.protopopov@gmail.com,ameryhung@gmail.com,chenridong@huaweicloud.com,lance.yang@linux.dev,jiayuan.chen@linux.dev,linux-kernel@vger.kernel.org,linux-mm@kvack.org,cgroups@vger.kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linu
- x-kselftest@vger.kernel.org
-Cc: ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Wed,  4 Feb 2026 09:28:42 +0000 (UTC)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/6] net: stmmac: rk: introduce flags indicating
+ support for RGMII/RMII
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aYMN2gZMfLPKuukG@shell.armlinux.org.uk>
+ <E1vnYxl-00000007hol-3XiH@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vnYxl-00000007hol-3XiH@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
-	TAGGED_FROM(0.00)[bounces-256645-lists,netdev=lfdr.de,bpf-ci];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-256646-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
-	FREEMAIL_TO(0.00)[linux.dev,linux-foundation.org,cmpxchg.org,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	NEURAL_SPAM(0.00)[0.980];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCPT_COUNT_GT_50(0.00)[58];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 9EEB1E3DAA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email]
+X-Rspamd-Queue-Id: 7D81DE4012
 X-Rspamd-Action: no action
 
---===============6939426097549955783==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index 0c8bf0b5c..70a00da54 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
+On 04/02/2026 10:14, Russell King (Oracle) wrote:
+> Introduce two boolean flags into struct rk_priv_data indicating
+> whether RGMII and/or RMII is supported for this instance. Use these
+> to configure the supported_interfaces mask for phylink, validate the
+> interface mode. Initialise these from equivalent flags in the
+> rk_gmac_ops or depending on the presence of the ops->set_to_rgmii and
+> ops->set_to_mii methods. Finally, make ops->set_to_* optional.
+> 
+> This will allow us to get rid of empty set_to_rmii() methods.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-[ ... ]
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-> @@ -13503,7 +13510,9 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
->  		return &link->link;
->  	}
->
-> -	fd = bpf_link_create(map->fd, 0, BPF_STRUCT_OPS, NULL);
-> +	link_opts.cgroup.relative_fd = OPTS_GET(opts, relative_fd, 0);
-> +
-> +	fd = bpf_link_create(map->fd, 0, BPF_STRUCT_OPS, &link_opts);
+Maxime
 
-The expected_revision field from bpf_struct_ops_opts is defined in the public
-API but doesn't appear to be forwarded here. bpf_link_create() reads
-opts->cgroup.expected_revision for BPF_STRUCT_OPS, and similar functions like
-bpf_program__attach_cgroup_opts() forward all fields including expected_revision.
-
-Was the expected_revision field intentionally left unused, or should there be a
-line here like:
-
-    link_opts.cgroup.expected_revision = OPTS_GET(opts, expected_revision, 0);
-
-Note: A later commit in this series (e83943e72 "libbpf: Support passing
-user-defined flags for struct_ops") adds forwarding for the flags field, but
-expected_revision remains unused through the end of the series.
-
-> diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
-> index dfc37a615..5aef44bcf 100644
-> --- a/tools/lib/bpf/libbpf.h
-> +++ b/tools/lib/bpf/libbpf.h
-> @@ -920,6 +920,20 @@ bpf_program__attach_cgroup_opts(const struct bpf_program *prog, int cgroup_fd,
->  struct bpf_map;
->
->  LIBBPF_API struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map);
-> +
-> +struct bpf_struct_ops_opts {
-> +	/* size of this struct, for forward/backward compatibility */
-> +	size_t sz;
-> +	__u32 flags;
-> +	__u32 relative_fd;
-> +	__u64 expected_revision;
-                ^^^^^^^^^^^^^^^^^
-The expected_revision field is defined here but is not read by
-bpf_map__attach_struct_ops_opts() in libbpf.c, so any value set by users
-will be silently ignored.
-
-> +	size_t :0;
-> +};
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21665371660
-
-AI-authorship-score: low
-AI-authorship-explanation: The commit follows standard libbpf API extension patterns with consistent naming and structure typical of experienced kernel developers.
-issues-found: 1
-issue-severity-score: low
-issue-severity-explanation: The expected_revision field in the public API struct is silently ignored, which could confuse users but does not cause system instability or crashes.
-
---===============6939426097549955783==--
 
