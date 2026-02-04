@@ -1,244 +1,183 @@
-Return-Path: <netdev+bounces-256775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256778-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMyYE+96g2nyngMAu9opvQ
-	(envelope-from <netdev+bounces-256775-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:59:27 +0100
+	id oJFtBpJ7g2nyngMAu9opvQ
+	(envelope-from <netdev+bounces-256778-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 18:02:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F35EAAC1
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:59:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F700EAB60
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 18:02:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C38CF3023004
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 16:58:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 52BD6303AB4E
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 16:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5809A341657;
-	Wed,  4 Feb 2026 16:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99873340DB9;
+	Wed,  4 Feb 2026 16:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/CWkuKD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ksyb/Mwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3509134107A;
-	Wed,  4 Feb 2026 16:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4322833F390;
+	Wed,  4 Feb 2026 16:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770224271; cv=none; b=GQl450Iu3bQ1vMQtgUHN/FvWuu1Rd0cLbW1EicpiwjBQq6R38Mkpus+ZenByQHhY0YzeMSATPDPx63Q5+p1v+I2Hg/gzipxDmgoT8zurTLxeaGnmB+Zw8CEnEND+OLY8EQJ4NmRHMdIGaIx9TikHmb+lyKlUOvCFlJ3fL2Tj6fM=
+	t=1770224340; cv=none; b=iZCiZuwkXAokt6s2i4bSL8aHBcNLQvL8N57JWm5jfKSpTMGMQVhRO4UFINDn9voAo5BTDF5EMlyUKpbAMacMtVzZTXcL/hZACU1LZzzM/euDBGiV0dcu/tU+uJJ8+X0Ud/nBbecROmJ+zDgmnl3QNfdSh0UvlVZyAm08fJwehuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770224271; c=relaxed/simple;
-	bh=HlMlVnTgmkL7tsK9Wwfic2VfIH66MBM/lH/WwbwuTZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bFPzgCkLYNs+Fsnh9zVAqoXv1wKblGSJDHo8jSAky66tvRgFaQhklk6mhd3ndnrvXbeyssPdxGkyXL0ht1wslUWiWUolQ1zTXO7PGtir3IrEFFRCFT7sBJLw/LzIAKGrQ4APj8TjFWz0pB8idA0LbGTVqtdlORNJNq0Nv05rwFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z/CWkuKD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A39DC19425;
-	Wed,  4 Feb 2026 16:57:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770224270;
-	bh=HlMlVnTgmkL7tsK9Wwfic2VfIH66MBM/lH/WwbwuTZI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z/CWkuKDjl0ikFJVKXNmZvvbFK/4Bzk5LnxCWEiyz0IZ4sNfkFp+PId1EsiZMDdQl
-	 qtdTQzsO+r91SPgig0Gk0cWaDfud4EOJtqnOX22WQND7+LHExMMOScdN9V9VETjXv+
-	 ftzXkMffEcxKBGzZpzS01mVQ0UXYTtXCVa2Qipiy6hdNACSo8P8LqB6OhHCap9y44u
-	 xJ6jrBPTSDneS4KpwMGHcMPPzuAzYem9ZqZQ/v5CuiGDL3g1dH4DUHqQzIEDBAKO8l
-	 7trosr0WaIvdOKW5MtLpEB6DWJROrsQQkdwl3FhlNmQsOaLTNJVWgVDhihj3BLSlNF
-	 9sIMQyhKx0Z7A==
-From: Simon Horman <horms@kernel.org>
-To: rkannoth@marvell.com
-Cc: Simon Horman <horms@kernel.org>,
-	sumang@marvell.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	sbhatta@marvell.com,
-	sgoutham@marvell.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v8,01/13] octeontx2-af: npc: cn20k: Index management
-Date: Wed,  4 Feb 2026 16:57:39 +0000
-Message-ID: <20260204165740.2184444-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260202074607.2535569-2-rkannoth@marvell.com>
-References: <20260202074607.2535569-2-rkannoth@marvell.com>
+	s=arc-20240116; t=1770224340; c=relaxed/simple;
+	bh=5p4eUAg3z+8rWM3HHAefWU2eIILWHVSOg4eCtv94Be8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YYQ2Q5gRfTRGZovQYsQ3wkevuJpnR4KabuBbGFuWCmb5fwPWXMIaPvXIy+3UbLDDJALcyygLWEYRgtKAyDzYfJnxNNv0pHVARH20s7FNyyGhSYIqUheivsYvfHqkHDNqJvKx2oWilxv4SRReTcwwI8GLcplgKsxuZPf0DIvHEj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ksyb/Mwb; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770224340; x=1801760340;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5p4eUAg3z+8rWM3HHAefWU2eIILWHVSOg4eCtv94Be8=;
+  b=Ksyb/Mwbs19SoWAkhfAS5GmljW8bNWZ1cEWDEHDBrb4Z6SDfmDFgtJ1/
+   M8Z2TeOPW0K0xl4YvgEgelj1WT+iIcD8wQu0ZTvuOOtcWx4hsxS9267D+
+   +8ak3XE59GvsxMiV6qaZbBQZWg0cTQhpraUx1UiGjnY5PEzk4lJRjxfxx
+   N/FUQKxQPLLOu4eAw5GD/DmtH2eEOZbD6gZJnxe5vuBKIUDzQ2z3JvTZY
+   2pEqyC3ZMGbNvqsq0iarG2iEruCpjtrC0AZO9rLdihd22t5ZDHHKCuJnw
+   IKdyarISivPSrsZJOX58BNyuP69c5oigolKa9glp1O4rALMQyBEUSj2kx
+   A==;
+X-CSE-ConnectionGUID: jZA7+tuISp6pMP32jyus5g==
+X-CSE-MsgGUID: 5vScNTRMR1aLToSafRv6gw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="82047809"
+X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
+   d="scan'208";a="82047809"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 08:58:59 -0800
+X-CSE-ConnectionGUID: Bw+BDVbtRHK1sm+swOUD+w==
+X-CSE-MsgGUID: +/Lw7ZhnRkaIdrvvE/BVmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
+   d="scan'208";a="214748988"
+Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.188])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 08:58:54 -0800
+Date: Wed, 4 Feb 2026 18:58:52 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
+	Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: Re: [PATCH v2 3/3] sunrpc: Fix compilation error (`make W=1`) when
+ dprintk() is no-op
+Message-ID: <aYN6zA79q6yOLFmA@smile.fi.intel.com>
+References: <20260204094500.2443455-1-andriy.shevchenko@linux.intel.com>
+ <20260204094500.2443455-4-andriy.shevchenko@linux.intel.com>
+ <aYN35agQMKaIGZA0@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aYN35agQMKaIGZA0@smile.fi.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-256775-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,oracle.com,talpey.com,davemloft.net,google.com,gmail.com,glider.be];
+	TAGGED_FROM(0.00)[bounces-256778-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:url,npc_priv.sb:url]
-X-Rspamd-Queue-Id: E4F35EAAC1
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,lkml,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,smile.fi.intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: 9F700EAB60
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Wed, Feb 04, 2026 at 06:46:36PM +0200, Andy Shevchenko wrote:
+> On Wed, Feb 04, 2026 at 10:41:23AM +0100, Andy Shevchenko wrote:
+> > Clang compiler is not happy about set but unused variables:
+> > 
+> > .../flexfilelayout/flexfilelayoutdev.c:56:9: error: variable 'ret' set but not used [-Werror,-Wunused-but-set-variable]
+> > .../flexfilelayout/flexfilelayout.c:1505:6: error: variable 'err' set but not used [-Werror,-Wunused-but-set-variable]
+> > .../nfs4proc.c:9244:12: error: variable 'ptr' set but not used [-Werror,-Wunused-but-set-variable]
+> > 
+> > Fix these by forwarding parameters of dprintk() to no_printk().
+> > The positive side-effect is a format-string checker enabled even for the cases
+> > when dprintk() is no-op.
+> 
+> I'm afraid this is not end of story...
+> I received a dozen of minutes ago a new report and now I'm investigating.
+> 
+> Patches 1 & 2 though are ready to go.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-octeontx2-af: npc: cn20k: Index management
+Okay, if I'm not mistaken the only leftover is the missing tk_pid field due to
+conditional inclusion. However, if we do that unconditionally the data structure
+won't be expanded (there is a gap of 3 bytes. (Dunno about m68k, there may be
+actually +2 bytes due to 2-byte alignment.) The rest of the conditionally included
+members seem not being used in dprintk().
 
-This patch adds MCAM index allocation and management for CN20K silicon.
-The implementation supports contiguous and non-contiguous allocation
-schemes with reference, limit, and priority parameters.
+That said, removing ifdeffery around tk_pid in struct rpc_task should fix that
+problem.
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-> new file mode 100644
-> index 000000000000..eb1f54d2bfce
-> --- /dev/null
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
+If you can fold this to the patch 3, would be nice:
 
-[ ... ]
+diff --git a/include/linux/sunrpc/sched.h b/include/linux/sunrpc/sched.h
+index ccba79ebf893..0dbdf3722537 100644
+--- a/include/linux/sunrpc/sched.h
++++ b/include/linux/sunrpc/sched.h
+@@ -95,10 +95,7 @@ struct rpc_task {
+ 	int			tk_rpc_status;	/* Result of last RPC operation */
+ 	unsigned short		tk_flags;	/* misc flags */
+ 	unsigned short		tk_timeouts;	/* maj timeouts */
+-
+-#if IS_ENABLED(CONFIG_SUNRPC_DEBUG) || IS_ENABLED(CONFIG_TRACEPOINTS)
+ 	unsigned short		tk_pid;		/* debugging aid */
+-#endif
+ 	unsigned char		tk_priority : 2,/* Task priority */
+ 				tk_garb_retry : 2,
+ 				tk_cred_retry : 2;
 
-> + * MCAM resource is divided horizontally into mutltiple subbanks and
+Otherwise I can send a new version.
 
-This isn't a bug, but "mutltiple" should be "multiple".
+-- 
+With Best Regards,
+Andy Shevchenko
 
-[ ... ]
 
-> + * @xa_pf2idx_map:	PF to mcam index map.
-> + * @xa_idx2pf_map:	Mcam index to PF map.
-> + * @xa_pf_map:		Pcifunc to index map.
-> + * @pf_cnt:		Number of PFs.A
-
-This isn't a bug, but there's a spurious trailing 'A' after "PFs." in
-the kernel-doc comment.
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> new file mode 100644
-> index 000000000000..9b5da2665b54
-> --- /dev/null
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-
-[ ... ]
-
-> +int npc_cn20k_ref_idx_alloc(struct rvu *rvu, int pcifunc, int key_type,
-> +			    int prio, u16 *mcam_idx, int ref, int limit,
-> +			    bool contig, int count)
-> +{
-
-[ ... ]
-
-> +add2map:
-> +	for (i = 0; i < count; i++) {
-> +		rc = npc_add_to_pf_maps(rvu, mcam_idx[i], pcifunc);
-> +		if (rc)
-> +			return rc;
-> +	}
-> +
-> +	return 0;
-> +}
-
-If npc_add_to_pf_maps() fails partway through the loop (when i > 0), does
-this leak the MCAM indexes that were previously allocated?
-
-The allocators (npc_subbank_ref_alloc, npc_subbank_noref_alloc,
-npc_multi_subbank_ref_alloc) have already claimed the MCAM entries before
-reaching add2map. When the loop fails at iteration i, the function returns
-rc without freeing the allocated MCAM indexes or removing the map entries
-that were successfully added in iterations 0 through i-1.
-
-[ ... ]
-
-> +static int
-> +npc_priv_init(struct rvu *rvu)
-> +{
-
-[ ... ]
-
-> +	if (num_subbanks & (num_subbanks - 1)) {
-> +		dev_err(rvu->dev,
-> +			"subbanks cnt(%u) should be a multiple of 2\n",
-> +			num_subbanks);
-> +		return -EINVAL;
-> +	}
-
-The error message says "multiple of 2" but the check
-(num_subbanks & (num_subbanks - 1)) tests for power of 2. For example,
-6 is a multiple of 2 but not a power of 2. Should the message say
-"power of 2" instead?
-
-[ ... ]
-
-> +	npc_priv.xa_pf2idx_map = kcalloc(npc_priv.pf_cnt,
-> +					 sizeof(struct xarray),
-> +					 GFP_KERNEL);
-> +	if (!npc_priv.xa_pf2idx_map)
-> +		goto fail2;
-
-[ ... ]
-
-> +fail2:
-> +	kfree(subbank_srch_order);
-> +
-> +fail1:
-> +	xa_destroy(&npc_priv.xa_sb_used);
-> +	xa_destroy(&npc_priv.xa_sb_free);
-> +	xa_destroy(&npc_priv.xa_idx2pf_map);
-> +	xa_destroy(&npc_priv.xa_pf_map);
-> +	kfree(npc_priv.sb);
-> +	return -ENOMEM;
-> +}
-> +
-> +void npc_cn20k_deinit(struct rvu *rvu)
-> +{
-> +	int i;
-> +
-> +	xa_destroy(&npc_priv.xa_sb_used);
-> +	xa_destroy(&npc_priv.xa_sb_free);
-> +	xa_destroy(&npc_priv.xa_idx2pf_map);
-> +	xa_destroy(&npc_priv.xa_pf_map);
-> +
-> +	for (i = 0; i < npc_priv.pf_cnt; i++)
-> +		xa_destroy(&npc_priv.xa_pf2idx_map[i]);
-> +
-> +	kfree(npc_priv.xa_pf2idx_map);
-> +	/* No need to destroy mutex lock as it is
-> +	 * part of subbank structure
-> +	 */
-> +	kfree(npc_priv.sb);
-> +	kfree(subbank_srch_order);
-> +}
-
-Can npc_cn20k_deinit() be called when npc_priv_init() fails at fail2?
-
-When kcalloc for xa_pf2idx_map fails, fail2 frees subbank_srch_order
-and npc_priv.sb. Then rvu_npc_freemem() calls npc_cn20k_deinit() which:
-
-1. Iterates over npc_priv.xa_pf2idx_map[i] when xa_pf2idx_map is NULL
-2. Calls kfree() on already-freed npc_priv.sb and subbank_srch_order
-
-Should npc_cn20k_deinit() check npc_priv.init_done before cleanup, or
-should fail2 set the freed pointers to NULL?
 
