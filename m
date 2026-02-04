@@ -1,136 +1,167 @@
-Return-Path: <netdev+bounces-256814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yPgaC5upg2m6sQMAu9opvQ
-	(envelope-from <netdev+bounces-256814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:18:35 +0100
+	id aBOpNRarg2lvsgMAu9opvQ
+	(envelope-from <netdev+bounces-256815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:24:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E3C0EC659
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DF6EC6BC
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 714E03016500
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 20:18:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 26B913016C90
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 20:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB3434A3DA;
-	Wed,  4 Feb 2026 20:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307F842B75A;
+	Wed,  4 Feb 2026 20:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J9a0Wb5S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mAXpVD0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BFC27456
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 20:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC6D42982B;
+	Wed,  4 Feb 2026 20:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770236310; cv=none; b=cAqhPietT4TVhjhD43k9njZqxjguDYWvcM73oAefemXi7Vnr4uQHfRYAoZwnRTOxm8kqM4zuF7xZWL1DlLEU5iktfFWDjd6dYkEaHjEsHlvd7gL4/j4OX9rxRB5GEvAOk1vSZl5kakj7qoTof60hAVLngClTV6POsZn5digxEXw=
+	t=1770236690; cv=none; b=LcJkr4n7TMRAzrR1uWcyBpV8XjOowh/3VvFord6M/PkxfYXiIaTa8rQtG4rW8uY1jJkdLc54BUV365GLEG4L1Ok+wLYuMRA4tR7cDg/RFQEiGNop/pqWhUqd0gN/6UKB1r26FsoGeXYyo7ocYtt/l2E+QC3NaaNtFz371kgd6tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770236310; c=relaxed/simple;
-	bh=RodW8yBOZz6ysYNkDfsRd3/P3tfnOzkO8UycEqe9Pj4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IaEJBjLRu3QzTocSfmnpyRwa1INzpcf9vzIJhtVECbF6UpOdrYbKWOFEjxugB/hvP9tXt5PRDL1iWNXfy7QQLNmHSEGJiOAmF1a5dt+yqFNAweBB9Jx+6hJAp5xXIzPsuxjAjsEkQ/BC7uDcbEcorUMXlffvugAL1Pn2Zn26CUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J9a0Wb5S; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <99bfc3be-0517-4e17-b7a5-e504b751d8bf@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770236297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gi9XIaCgaA1g0K/V/rmmDYgDSWtNyYGCbYjZKLA8l/A=;
-	b=J9a0Wb5S2SXd5lZR8awLV2bTVZZ0LLvWJbp/NgnKQAMm5ZNARbR0CWGgMGpz2KqwutBeO0
-	vGxEJjuUdu1RRZ6SjxwKYFJkQYNFsruhHAfpe74VMAoLVSlXggyMvGQJePbVEUrp0KMfHs
-	6V8iCpMr7q57BMeOx8tcMF6AE22sA1U=
-Date: Wed, 4 Feb 2026 12:18:12 -0800
+	s=arc-20240116; t=1770236690; c=relaxed/simple;
+	bh=T/dcOdL7PdKPM1aTApTKDAXOtzj4TI4M3Q4ie+c+VSQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nnjon9VUrqcR/Y7S6TvlP22IkvWDyUCMx93CfrIVUDXVx0NPeq0rGDg+TtbYAoWhu/9gBClKNwkxFPCtkdLEpXaNwyfH2R/dkIJo+YNKLNeB611Y5MpZRLLnXSDW6GBaaImxK90M4S7V5wzVaoi8HyjXYy1oOOkcyy1d6+yv2Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mAXpVD0Z; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770236690; x=1801772690;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T/dcOdL7PdKPM1aTApTKDAXOtzj4TI4M3Q4ie+c+VSQ=;
+  b=mAXpVD0ZON+4i0lLMWkJrSBzttOuZkPClo2B+9DNb7FZqm7LyuBKaDK2
+   7PRCr52RhEsWWDvs/wiEJZW32sgWTBsJozwVxsKZiOCovKpCTuQu1c4Hn
+   ioMDx3Bh/4Hb1WvfiO4LaztscMk6l8AzEepCRZuYWMqCjNKdwHNX6k8fs
+   WxuNs7QcqCTS8aL9VF70og4o3MNSaHfU74N12oqbjHUOmZxticdXuQ6nV
+   1j0vQDsjqVYhFwb4I1f9Ak7vMXridYrM+cHv8RXXVKK8XVkMgt6fyVH4J
+   hMyt8wwOg94TWU7SS88ZjrY1hmwkBnFZVbbi/5IaDOUY34EinKsXOmfXB
+   w==;
+X-CSE-ConnectionGUID: 4sWStrhyR/GV6Bt3lgReqw==
+X-CSE-MsgGUID: evKBdHrcQ1+iFO9UY35ryw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71335489"
+X-IronPort-AV: E=Sophos;i="6.21,273,1763452800"; 
+   d="scan'208";a="71335489"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 12:24:49 -0800
+X-CSE-ConnectionGUID: +A/vSLIwQaeyrCWARic52Q==
+X-CSE-MsgGUID: AgJQ4IMgQBGw2VwgkEsHAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,273,1763452800"; 
+   d="scan'208";a="210051957"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by orviesa009.jf.intel.com with ESMTP; 04 Feb 2026 12:24:45 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id 794E595; Wed, 04 Feb 2026 21:24:43 +0100 (CET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v3 0/3] sunrpc: Fix `make W=1` build issues
+Date: Wed,  4 Feb 2026 21:21:48 +0100
+Message-ID: <20260204202437.2762161-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
- update
-To: Kuniyuki Iwashima <kuniyu@google.com>, Michal Luczaj <mhal@rbox.co>
-Cc: bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org, jakub@cloudflare.com,
- john.fastabend@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <8d055903-fe44-4bbf-a1a5-e0176343bf0b@rbox.co>
- <20260203200242.404131-1-kuniyu@google.com>
- <80865b12-7786-4787-81c8-08b754716a5d@linux.dev>
- <CAAVpQUCshzAAHZQQ7sVE+3UdKmBV42bKudcdDR0KtaTcTqn5gA@mail.gmail.com>
- <408569e7-2b82-4eff-b767-79ce6ef6cae0@rbox.co>
- <CAAVpQUDrC1rO2diM3gVg5GV5CTVAUS2RbLP+SpHBGqKcUT0iMA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAAVpQUDrC1rO2diM3gVg5GV5CTVAUS2RbLP+SpHBGqKcUT0iMA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256814-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,iogearbox.net,davemloft.net,google.com,kernel.org,cloudflare.com,gmail.com,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,oracle.com,talpey.com,davemloft.net,google.com,gmail.com,linux.intel.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256815-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6E3C0EC659
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 23DF6EC6BC
 X-Rspamd-Action: no action
 
-On 2/4/26 11:16 AM, Kuniyuki Iwashima wrote:
-> For example, inet_sock(sk)->inet_opt could be freed by
-> setsockopt(IP_OPTIONS) even after fentry prog verifies
-> that it's not NULL.
+Compiler is not happy about unused variables (especially when
+dprintk() call is defined as no-op). Here is the series to
+address the issues.
 
-This one should be fine because of rcu.
+Changelog v3:
+- removed ifdeffery to have struct rpc_task::tk_pid available (LKP)
+- collected more tags (Anna, Jeff)
 
-> 
-> I'm not sure if bpf_core_cast() etc allows such access, but
-> if it's allowed, I think there is no general solution.
+v2: 20260204094500.2443455-1-andriy.shevchenko@linux.intel.com
 
-bpf_core_cast (i.e. the "kfunc" bpf_rdonly_cast) does not use the 
-pointer argument, so should be fine. Its return value is marked as 
-PTR_UNTRUSTED. iirc, PTR_UNTRUSTED cannot be passed to helper, so 
-bpf_core_cast should be fine overall.
+Changelog v2:
+- added patch to kill RPC_IFDEBUG() macro (LKP, Geert)
+- united separate patches in the series
+- collected tags (Geert)
 
-> 
-> Fortunately that's not null-deref nor oob-write, and it just reads
-> stale info as Martin mentioned... so probably this is WAI for
-> tracing prog ?
+v1: 20260204010402.2149563-1-andriy.shevchenko@linux.intel.com
+v1: 20260204010415.2149607-1-andriy.shevchenko@linux.intel.com
 
-afaik, the tracing radius is large, so the prog cannot expect much 
-guarantee.
+Andy Shevchenko (3):
+  nfs/blocklayout: Fix compilation error (`make W=1`) in
+    bl_write_pagelist()
+  sunrpc: Kill RPC_IFDEBUG()
+  sunrpc: Fix compilation error (`make W=1`) when dprintk() is no-op
 
-Reading in the bpf prog is fine. The exception is handled.
+ fs/lockd/svclock.c                       |  5 +++++
+ fs/nfs/blocklayout/blocklayout.c         |  4 +---
+ fs/nfsd/nfsfh.c                          |  9 +++++---
+ include/linux/sunrpc/debug.h             | 10 +++++----
+ include/linux/sunrpc/sched.h             |  3 ---
+ net/sunrpc/xprtrdma/svc_rdma_transport.c | 27 ++++++++++++------------
+ 6 files changed, 32 insertions(+), 26 deletions(-)
 
-The problem here is passing it to a helper (not kfunc) that depends on 
-the arg being valid.
+-- 
+2.50.1
 
 
