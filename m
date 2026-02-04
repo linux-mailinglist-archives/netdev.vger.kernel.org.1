@@ -1,738 +1,152 @@
-Return-Path: <netdev+bounces-256627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJ4pC2wLg2k+hAMAu9opvQ
-	(envelope-from <netdev+bounces-256627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:03:40 +0100
+	id gHQOEeMLg2k+hAMAu9opvQ
+	(envelope-from <netdev+bounces-256621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:05:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAAFE381A
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:03:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9CE2E38AD
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 85A14302EA56
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:02:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0CD93304AAC8
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C28439E6C6;
-	Wed,  4 Feb 2026 09:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFF3395265;
+	Wed,  4 Feb 2026 09:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bQCrR7X2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bU4dwAQU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BE83A0E8E
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 09:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770195710; cv=none; b=jBxThnvR+yhQoYOoP8JBCXCEmMbt9qMnYen1Nv00KIairoqsVZZ3sDoriMPvBjNevk/S7xffhj+L3Nv7UcXYfGPt6rfxZjncn++yjpa590znIZD4RydFBDg6WaeunJTtDVb+FlajeJy7YUaZeS3JwP6dxiqzEeIdFA44/kJ1D2c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770195710; c=relaxed/simple;
-	bh=rSELx/yGAtIEiQZKzWnq0QaCaJUPJvz7cKvLECa8iSE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IBPSnezvp9ppX5X53N2+s03ExRo1LNeQXisAQFRJ7X7HFB1AnhTq4YHQTbpHcKmYYmAozrMGK4exMxvh/nqtX2+btJF322UvHr7+F6e2czxF14/CUD3g1qfpr4s8AyxDYRE/2ryhFwwXlqeaROYKNVYSeycCC8z+iTmbJSArMzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bQCrR7X2; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770195707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rv/fHxt4+X3oWhp4filMRhQl39d1cdrW/sfgMsICQzE=;
-	b=bQCrR7X2r1KY38L6/IQKxYBfiDuKDtwn8zePZYYGVObft9dokGTHhq00IwOtCQOBzXAy0E
-	3go5mBFxuE3UJGHhTlaHiMvm0tBMLeRTw40+mBYvuelnAfblGCQ9aHZUb5343daZa9L+VK
-	LAjM8u3aYrM/2yP9ACSLMHTyTQmH9pE=
-From: Hui Zhu <hui.zhu@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Jeff Xu <jeffxu@chromium.org>,
-	mkoutny@suse.com,
-	Jan Hendrik Farr <kernel@jfarr.cc>,
-	Christian Brauner <brauner@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	davem@davemloft.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paul Chaignon <paul.chaignon@gmail.com>,
-	Anton Protopopov <a.s.protopopov@gmail.com>,
-	Amery Hung <ameryhung@gmail.com>,
-	Chen Ridong <chenridong@huaweicloud.com>,
-	Lance Yang <lance.yang@linux.dev>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	cgroups@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Hui Zhu <zhuhui@kylinos.cn>,
-	Geliang Tang <geliang@kernel.org>
-Subject: [RFC PATCH bpf-next v6 12/12] samples/bpf: Add memcg priority control example
-Date: Wed,  4 Feb 2026 17:00:08 +0800
-Message-ID: <d3e3dba90cf47c7da97a8a4142e7e816c5c1ace5.1770194182.git.zhuhui@kylinos.cn>
-In-Reply-To: <cover.1770194182.git.zhuhui@kylinos.cn>
-References: <cover.1770194182.git.zhuhui@kylinos.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAAC2264CA
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 09:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770195650; cv=pass; b=m+r4BYTJhsLVMMhuO5YM5iyy4eehivR+4CdVXDXbdel22GE/aI2GDrCtFQid71NbzXMc/rvshPyzTHZR+RI+jCunAy91PuHVTuUTfmuwSWceHeXI1456L9z3D3S1F+xtCv/k4V5AXLM8/g4fa2c2ViHAZQM1xyh8MV3pImQKYio=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770195650; c=relaxed/simple;
+	bh=Ls1D+yxmbY6bYCTOk0C6MSrbomU6CnAzVv656Mw/4fQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z8/zbXf9TUnvolyRviBVk0e1JRTsRyg0IB71Tb2sdrmMV4I23doc+IM7h5Vil1X/8JOGEzked7z6qac5xt6m9Y/LOlsQQdgs5OGKAczFSnv8FWZR4QHwimkL4DnGscx/yriGRzEVSUYiWKNvxcKUzVnEs9sOYKaL9eH/0PFQ55Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bU4dwAQU; arc=pass smtp.client-ip=209.85.219.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-894770e34afso87512216d6.0
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 01:00:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770195649; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gBTlccV0ZyTH9mxf12hAzo2R7ehwFzPQsjNPEpqc82I8Wb7yB3SVdgA8guJsDLU07n
+         rl12nEAamPWGT7BIOxQ9aePvF0D27bsAiUVUu6BsXRBZ5PMjzjPDbraXCr/w2vURpD7Y
+         VweZQKC/Rfk4FNuUO4BozvJmqa2Wi8DqVbbO4bZESo+SLwnZZrtM4FlrLdOgwfuwAFFd
+         E4XGnTmiVVc9w6hmxeDFF7lC1hn246oeDHm6VRvKoGXNpyXwoFhTR9JbJRvmMBFZVekp
+         3w7OXzGMyW6O/mzjMkKwMfulUyL3IYQpYBEPkDNfIPj9Ek0cKlUJi4EG+lJe362JF3OR
+         rO/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Ls1D+yxmbY6bYCTOk0C6MSrbomU6CnAzVv656Mw/4fQ=;
+        fh=qJR1M71IQO3jjQz/0ilccUDTsaZYro5NQcCgk5LYiiw=;
+        b=XpPH2eGbwFavyE1cqM0JKjHgFkdbxGJBd3InkV0IIJ8FOYJpPl0cRBtrFIB6tNRIpc
+         USLO9nvWmCPZB8c55VO6IsysNSwm2RmVF/IKWEhTFBAKLJz6pF1/+yicIc/wH6Q9Gtlh
+         TaGMrwNR016pwokA4raKi+bOLU3LpIgNBvXeawXyB1FbaFYOH2y/3q96puU97AIlVaqc
+         g46VnIVSLp1yzujGILzwOVPVqemFO1JNlhpDdyKivuEWCFraq0CrMHUThQkZSwGIbGt3
+         XUybm8kyra3JC3/jdPxeIvV6ZLdzp8NwwHrxJYo7BGbDVRdJ5W+evT6fkOmkFb0cP3Rf
+         Lv/g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770195649; x=1770800449; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ls1D+yxmbY6bYCTOk0C6MSrbomU6CnAzVv656Mw/4fQ=;
+        b=bU4dwAQU9oTDP+tZVWb6cS1lDuhhR0ALS2C8Rw1SJ3PQAB3DxD6O3UA3pDBbI1W9B2
+         jl7G/MIJzfQ14Cd0J3agYiJrP3IgQ8tF2IjApR0dXHZPt2RLkIva7R8N8xOARQXcHpxf
+         s6jKwNFAUYj3X4N/WMDU7nNDgHf61GsDZ37sle7djWIUrtPJViR2fqnYOkZ0X3IC9dgt
+         AwZ0mhUUDIOEBCJGZVMAnOO4iWA3TAdzPEJbmAHFL/aSe7RwfcD7uP4nUhXU4ZEmXE4b
+         vPJTtzuWdVaBaqmyJM1eavzsOoe0U66f7WnZSIAycY8OAfCSPNshz7d7cfJHhd5FkT67
+         gdAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770195649; x=1770800449;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ls1D+yxmbY6bYCTOk0C6MSrbomU6CnAzVv656Mw/4fQ=;
+        b=hCIVgVaNBEOug1HnFiNCj4afwvm2sCw4hri0kR0ba8yPgoAAG3oPSe2j1mw0Hp7ZiC
+         /VUK3FObt8PZz9rD4YKyEMPs27X6/V3xFN5oNLYtDiNamGPR3bA49lBG1VuXkJRp4DME
+         ZPy8tA2b4EqGt4RyoNyIhG7zOu2SY51ieIn6sAWBbIHrd28rTSrzVCUoXLe2BY4IQLsn
+         cBW06KPd1y9oBCV+TsKOH1J0U1hGEwS92YyuCgMWBZoM9TIMvTnwouzSjAz8Zwe7jBuA
+         Up6yyJgS+lAhWl1Rxif4WJSTKKpFYDj0E1Le87NViNns3TBqDVhnzzOVTVY01fZJ/zAX
+         sH3w==
+X-Gm-Message-State: AOJu0YwU4y3Dj5+dmkKgIItSi0koLD3bqHrghYtLcN84EIFQBisRaMq5
+	h89KCAYrzJc2mdowUjC6ZBbEuqsVM2I5+VJ9gsKVxeH6yWAFV9R3YPuXmW3vUjapMscOH5AB60H
+	lvEVPsShyNKP8hG2uvHVGdV7XRVsYuvFTXI8R
+X-Gm-Gg: AZuq6aI6gtCcc2Mz0UaWb2S/bGTq0qfD0bMYAUxYQe5gscUY3INq8CVYqT6zqgFl6CV
+	/OhmawMfA2wvJUbV0bRJFuMIFiTmZ2CiMvzupFo2coAW72mfs8H4/Q6lyVMz/vfdTsMw06pF+mX
+	aXuuc/IDKILA1gRXsrF0Dc7SWj3JyWvKxl7Q4Qj6vZtibntCMc7cW6GnNfSGwHUHb8v31hJIkut
+	nTP/QRQzuQ19LVB7cSZ+xFEO8ofXA0WuJFQkaLw15/uyKsz4u/CfiOYxbwQ1D/zbYdFrVrEzSWp
+	EjVjasN9UnkHmVKrq35kvBDPdN9WO8jcLbAeUoSLDssOb0FYYryKEItK
+X-Received: by 2002:a05:6214:27ef:b0:88a:568b:f4af with SMTP id
+ 6a1803df08f44-895221019c8mr32165666d6.23.1770195648713; Wed, 04 Feb 2026
+ 01:00:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <CADkSEUjsT8OW9QVa-U4PQMG+8c1tjjxk7tNJu3U+6yoC82Y7FQ@mail.gmail.com>
+In-Reply-To: <CADkSEUjsT8OW9QVa-U4PQMG+8c1tjjxk7tNJu3U+6yoC82Y7FQ@mail.gmail.com>
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Wed, 4 Feb 2026 01:00:38 -0800
+X-Gm-Features: AZwV_QiUBEYt9Z4YPvvCmmjZlvxL9F7JYPI99S5U1hMZ9MhB000fgNB3ionh72c
+Message-ID: <CADkSEUhCgkMFrGxJ_ov9MHxF1xakSvb1HJyKisS2LQxPGhgkGQ@mail.gmail.com>
+Subject: Re: PCI ID 10ec:8129 is in both 8139too and r8169
+To: netdev@vger.kernel.org
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256627-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256621-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kylinos.cn:mid,kylinos.cn:email,linux.dev:dkim]
-X-Rspamd-Queue-Id: ECAAFE381A
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A9CE2E38AD
 X-Rspamd-Action: no action
 
-From: Hui Zhu <zhuhui@kylinos.cn>
+1186:4302 is also in both r8169 and
+drivers/net/ethernet/marvell/skge.c; it is labeled "D-Link DGE-530T
+Rev C1" in skge.
 
-Add a sample program to demonstrate a practical use case for the
-`memcg_bpf_ops` feature: priority-based memory throttling.
-
-The sample consists of a BPF program and a userspace loader:
-
-1. memcg.bpf.c: A BPF program that monitors PGFAULT events on a
-   high-priority cgroup. When activity exceeds a threshold, it uses
-   the `get_high_delay_ms`, `below_low`, or `below_min` hooks to
-   apply pressure on a low-priority cgroup.
-
-2. memcg.c: A userspace loader that configures and attaches the BPF
-   program. It takes command-line arguments for the high and low
-   priority cgroup paths, a pressure threshold, and the desired
-   throttling delay (`over_high_ms`).
-
-This provides a clear, working example of how to implement a dynamic,
-priority-aware memory management policy. A user can create two
-cgroups, run workloads of different priorities, and observe the
-low-priority workload being throttled to protect the high-priority one.
-
-Example usage:
-  # ./memcg --low_path /sys/fs/cgroup/low \
-  #         --high_path /sys/fs/cgroup/high \
-  #         --threshold 100 --over_high_ms 1024
-
-Signed-off-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Hui Zhu <zhuhui@kylinos.cn>
----
- MAINTAINERS             |   2 +
- samples/bpf/.gitignore  |   1 +
- samples/bpf/Makefile    |   8 +-
- samples/bpf/memcg.bpf.c | 130 +++++++++++++++
- samples/bpf/memcg.c     | 343 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 483 insertions(+), 1 deletion(-)
- create mode 100644 samples/bpf/memcg.bpf.c
- create mode 100644 samples/bpf/memcg.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7e07bb330eae..819ef271e011 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6470,6 +6470,8 @@ F:	mm/memcontrol-v1.c
- F:	mm/memcontrol-v1.h
- F:	mm/page_counter.c
- F:	mm/swap_cgroup.c
-+F:	samples/bpf/memcg.bpf.c
-+F:	samples/bpf/memcg.c
- F:	samples/cgroup/*
- F:	tools/testing/selftests/bpf/prog_tests/memcg_ops.c
- F:	tools/testing/selftests/bpf/progs/memcg_ops.c
-diff --git a/samples/bpf/.gitignore b/samples/bpf/.gitignore
-index 0002cd359fb1..0de6569cdefd 100644
---- a/samples/bpf/.gitignore
-+++ b/samples/bpf/.gitignore
-@@ -49,3 +49,4 @@ iperf.*
- /vmlinux.h
- /bpftool/
- /libbpf/
-+memcg
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 95a4fa1f1e44..b00698bdc53b 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -37,6 +37,7 @@ tprogs-y += xdp_fwd
- tprogs-y += task_fd_query
- tprogs-y += ibumad
- tprogs-y += hbm
-+tprogs-y += memcg
- 
- # Libbpf dependencies
- LIBBPF_SRC = $(TOOLS_PATH)/lib/bpf
-@@ -122,6 +123,7 @@ always-y += task_fd_query_kern.o
- always-y += ibumad_kern.o
- always-y += hbm_out_kern.o
- always-y += hbm_edt_kern.o
-+always-y += memcg.bpf.o
- 
- COMMON_CFLAGS = $(TPROGS_USER_CFLAGS)
- TPROGS_LDFLAGS = $(TPROGS_USER_LDFLAGS)
-@@ -289,6 +291,8 @@ $(obj)/hbm_out_kern.o: $(src)/hbm.h $(src)/hbm_kern.h
- $(obj)/hbm.o: $(src)/hbm.h
- $(obj)/hbm_edt_kern.o: $(src)/hbm.h $(src)/hbm_kern.h
- 
-+memcg: $(obj)/memcg.skel.h
-+
- # Override includes for xdp_sample_user.o because $(srctree)/usr/include in
- # TPROGS_CFLAGS causes conflicts
- XDP_SAMPLE_CFLAGS += -Wall -O2 \
-@@ -347,11 +351,13 @@ $(obj)/%.bpf.o: $(src)/%.bpf.c $(obj)/vmlinux.h $(src)/xdp_sample.bpf.h $(src)/x
- 		-I$(LIBBPF_INCLUDE) $(CLANG_SYS_INCLUDES) \
- 		-c $(filter %.bpf.c,$^) -o $@
- 
--LINKED_SKELS := xdp_router_ipv4.skel.h
-+LINKED_SKELS := xdp_router_ipv4.skel.h memcg.skel.h
- clean-files += $(LINKED_SKELS)
- 
- xdp_router_ipv4.skel.h-deps := xdp_router_ipv4.bpf.o xdp_sample.bpf.o
- 
-+memcg.skel.h-deps := memcg.bpf.o
-+
- LINKED_BPF_SRCS := $(patsubst %.bpf.o,%.bpf.c,$(foreach skel,$(LINKED_SKELS),$($(skel)-deps)))
- 
- BPF_SRCS_LINKED := $(notdir $(wildcard $(src)/*.bpf.c))
-diff --git a/samples/bpf/memcg.bpf.c b/samples/bpf/memcg.bpf.c
-new file mode 100644
-index 000000000000..97c5897933c7
---- /dev/null
-+++ b/samples/bpf/memcg.bpf.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+#define ONE_SECOND_NS	1000000000
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+struct AggregationData {
-+	u64 sum;
-+	u64 window_start_ts;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, struct AggregationData);
-+} aggregation_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, u64);
-+} trigger_ts_map SEC(".maps");
-+
-+SEC("tp/memcg/count_memcg_events")
-+int
-+handle_count_memcg_events(struct trace_event_raw_memcg_rstat_events *ctx)
-+{
-+	u32 key = 0;
-+	struct AggregationData *data;
-+	u64 current_ts;
-+
-+	if (ctx->id != local_config.high_cgroup_id ||
-+	    (ctx->item != PGFAULT))
-+		goto out;
-+
-+	data = bpf_map_lookup_elem(&aggregation_map, &key);
-+	if (!data)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - data->window_start_ts < ONE_SECOND_NS) {
-+		data->sum += ctx->val;
-+	} else {
-+		data->window_start_ts = current_ts;
-+		data->sum = ctx->val;
-+	}
-+
-+	if (data->sum > local_config.threshold) {
-+		bpf_map_update_elem(&trigger_ts_map, &key, &current_ts,
-+				    BPF_ANY);
-+		data->sum = 0;
-+		data->window_start_ts = current_ts;
-+	}
-+
-+out:
-+	return 0;
-+}
-+
-+static bool need_threshold(void)
-+{
-+	u32 key = 0;
-+	u64 *trigger_ts;
-+	bool ret = false;
-+	u64 current_ts;
-+
-+	trigger_ts = bpf_map_lookup_elem(&trigger_ts_map, &key);
-+	if (!trigger_ts || *trigger_ts == 0)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - *trigger_ts < ONE_SECOND_NS)
-+		ret = true;
-+
-+out:
-+	return ret;
-+}
-+
-+SEC("struct_ops/below_low")
-+bool below_low_impl(struct mem_cgroup *memcg)
-+{
-+	if (!local_config.use_below_low)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/below_min")
-+bool below_min_impl(struct mem_cgroup *memcg)
-+{
-+	if (!local_config.use_below_min)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/get_high_delay_ms")
-+unsigned int get_high_delay_ms_impl(struct mem_cgroup *memcg)
-+{
-+	if (local_config.over_high_ms && need_threshold())
-+		return local_config.over_high_ms;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops high_mcg_ops = {
-+	.below_low = (void *)below_low_impl,
-+	.below_min = (void *)below_min_impl,
-+};
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops low_mcg_ops = {
-+	.get_high_delay_ms = (void *)get_high_delay_ms_impl,
-+};
-+
-+char LICENSE[] SEC("license") = "GPL";
-diff --git a/samples/bpf/memcg.c b/samples/bpf/memcg.c
-new file mode 100644
-index 000000000000..0ed174608a15
---- /dev/null
-+++ b/samples/bpf/memcg.c
-@@ -0,0 +1,343 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <signal.h>
-+#include <stdbool.h>
-+#include <getopt.h>
-+#include <bpf/bpf.h>
-+#include <bpf/libbpf.h>
-+
-+#ifndef __MEMCG_RSTAT_SIMPLE_BPF_SKEL_H__
-+#define u64 uint64_t
-+#endif
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+#include "memcg.skel.h"
-+
-+static bool exiting;
-+
-+static void sig_handler(int sig)
-+{
-+	exiting = true;
-+}
-+
-+static void usage(const char *name)
-+{
-+	fprintf(stderr,
-+		"Usage: %s --low_path=<path> --high_path=<path> \\\n"
-+		"          --threshold=<value> [OPTIONS]\n\n",
-+		name);
-+	fprintf(stderr, "Required arguments:\n");
-+	fprintf(stderr,
-+		"  -l, --low_path=PATH    Low priority memcgroup path\n");
-+	fprintf(stderr,
-+		"  -g, --high_path=PATH   High priority memcgroup path\n");
-+	fprintf(stderr,
-+		"  -t, --threshold=VALUE  The sum of 'val' PGFAULT of\n");
-+	fprintf(stderr,
-+		"                         high priority memcgroup in\n");
-+	fprintf(stderr,
-+		"                         1 sec to trigger low priority\n");
-+	fprintf(stderr,
-+		"                         cgroup over_high\n\n");
-+	fprintf(stderr, "Optional arguments:\n");
-+	fprintf(stderr, "  -o, --over_high_ms=VALUE\n");
-+	fprintf(stderr,
-+		"                         Low_path over_high_ms value\n");
-+	fprintf(stderr,
-+		"                         (default: 0)\n");
-+	fprintf(stderr, "  -L, --use_below_low    Enable use_below_low flag\n");
-+	fprintf(stderr, "  -M, --use_below_min    Enable use_below_min flag\n");
-+	fprintf(stderr,
-+		"  -O, --allow_override   Enable BPF_F_ALLOW_OVERRIDE\n");
-+	fprintf(stderr,
-+		"                         flag\n");
-+	fprintf(stderr, "  -h, --help             Show this help message\n\n");
-+	fprintf(stderr, "Examples:\n");
-+	fprintf(stderr, "  # Using long options:\n");
-+	fprintf(stderr, "  %s --low_path=/sys/fs/cgroup/low \\\n", name);
-+	fprintf(stderr, "     --high_path=/sys/fs/cgroup/high \\\n");
-+	fprintf(stderr, "     --threshold=1000 --over_high_ms=500 \\\n"
-+			"     --use_below_low\n\n");
-+	fprintf(stderr, "  # Using short options:\n");
-+	fprintf(stderr, "  %s -l /sys/fs/cgroup/low \\\n"
-+			"     -g /sys/fs/cgroup/high \\\n",
-+		name);
-+	fprintf(stderr, "     -t 1000 -o 500 -L -M\n");
-+}
-+
-+static uint64_t get_cgroup_id(const char *cgroup_path)
-+{
-+	struct stat st;
-+
-+	if (cgroup_path == NULL) {
-+		fprintf(stderr, "Error: cgroup_path is NULL\n");
-+		return 0;
-+	}
-+
-+	if (stat(cgroup_path, &st) < 0) {
-+		fprintf(stderr, "Error: stat(%s) failed: %d\n",
-+			cgroup_path, errno);
-+		return 0;
-+	}
-+
-+	return (uint64_t)st.st_ino;
-+}
-+
-+static uint64_t parse_u64(const char *str, const char *name)
-+{
-+	uint64_t value;
-+
-+	errno = 0;
-+	value = strtoull(str, NULL, 10);
-+
-+	if (errno != 0) {
-+		fprintf(stderr,
-+			"ERROR: strtoull '%s' failed: %d\n",
-+			str, errno);
-+		usage(name);
-+		exit(-errno);
-+	}
-+
-+	return value;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int low_cgroup_fd = -1, high_cgroup_fd = -1;
-+	uint64_t threshold = 0, high_cgroup_id;
-+	unsigned int over_high_ms = 0;
-+	bool use_below_low = false, use_below_min = false;
-+	__u32 opts_flags = 0;
-+	const char *low_path = NULL;
-+	const char *high_path = NULL;
-+	const char *bpf_obj_file = "memcg.bpf.o";
-+	struct bpf_object *obj = NULL;
-+	struct bpf_program *prog = NULL;
-+	struct bpf_link *link = NULL, *link_low = NULL, *link_high = NULL;
-+	struct bpf_map *map;
-+	struct memcg__bss *bss_data;
-+	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-+	int err = -EINVAL;
-+	int map_fd;
-+	int opt;
-+	int option_index = 0;
-+
-+	static struct option long_options[] = {
-+		{"low_path",       required_argument, 0, 'l'},
-+		{"high_path",      required_argument, 0, 'g'},
-+		{"threshold",      required_argument, 0, 't'},
-+		{"over_high_ms",   required_argument, 0, 'o'},
-+		{"use_below_low",  no_argument,       0, 'L'},
-+		{"use_below_min",  no_argument,       0, 'M'},
-+		{"allow_override", no_argument,       0, 'O'},
-+		{"help",           no_argument,       0, 'h'},
-+		{0,                0,                 0,  0 }
-+	};
-+
-+	while ((opt = getopt_long(argc, argv, "l:g:t:o:LMOh",
-+				  long_options, &option_index)) != -1) {
-+		switch (opt) {
-+		case 'l':
-+			low_path = optarg;
-+			break;
-+		case 'g':
-+			high_path = optarg;
-+			break;
-+		case 't':
-+			threshold = parse_u64(optarg, argv[0]);
-+			break;
-+		case 'o':
-+			over_high_ms = (unsigned int)parse_u64(optarg, argv[0]);
-+			break;
-+		case 'L':
-+			use_below_low = true;
-+			break;
-+		case 'M':
-+			use_below_min = true;
-+			break;
-+		case 'O':
-+			opts_flags = BPF_F_ALLOW_OVERRIDE;
-+			break;
-+		case 'h':
-+			usage(argv[0]);
-+			return 0;
-+		default:
-+			usage(argv[0]);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (!low_path || !high_path || !threshold) {
-+		fprintf(stderr,
-+			"ERROR: Missing required arguments\n\n");
-+		usage(argv[0]);
-+		goto out;
-+	}
-+
-+	low_cgroup_fd = open(low_path, O_RDONLY);
-+	if (low_cgroup_fd < 0) {
-+		fprintf(stderr,
-+			"ERROR: open low cgroup '%s' failed: %d\n",
-+			low_path, errno);
-+		err = -errno;
-+		goto out;
-+	}
-+
-+	high_cgroup_id = get_cgroup_id(high_path);
-+	if (!high_cgroup_id)
-+		goto out;
-+	high_cgroup_fd = open(high_path, O_RDONLY);
-+	if (high_cgroup_fd < 0) {
-+		fprintf(stderr,
-+			"ERROR: open high cgroup '%s' failed: %d\n",
-+			high_path, errno);
-+		err = -errno;
-+		goto out;
-+	}
-+
-+	obj = bpf_object__open_file(bpf_obj_file, NULL);
-+	err = libbpf_get_error(obj);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: opening BPF object file '%s' failed: %d\n",
-+			bpf_obj_file, err);
-+		goto out;
-+	}
-+
-+	map = bpf_object__find_map_by_name(obj, ".bss");
-+	if (!map) {
-+		fprintf(stderr, "ERROR: Failed to find .bss map\n");
-+		err = -ESRCH;
-+		goto out;
-+	}
-+
-+	err = bpf_object__load(obj);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: loading BPF object file failed: %d\n",
-+			err);
-+		goto out;
-+	}
-+
-+	map_fd = bpf_map__fd(map);
-+	bss_data = calloc(1, bpf_map__value_size(map));
-+	if (bss_data) {
-+		__u32 key = 0;
-+
-+		bss_data->local_config.high_cgroup_id = high_cgroup_id;
-+		bss_data->local_config.threshold = threshold;
-+		bss_data->local_config.over_high_ms = over_high_ms;
-+		bss_data->local_config.use_below_low = use_below_low;
-+		bss_data->local_config.use_below_min = use_below_min;
-+
-+		err = bpf_map_update_elem(map_fd, &key, bss_data, BPF_EXIST);
-+		free(bss_data);
-+		if (err) {
-+			fprintf(stderr,
-+				"ERROR: update config failed: %d\n",
-+				err);
-+			goto out;
-+		}
-+	} else {
-+		fprintf(stderr,
-+			"ERROR: allocate memory failed\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	prog = bpf_object__find_program_by_name(obj,
-+						"handle_count_memcg_events");
-+	if (!prog) {
-+		fprintf(stderr,
-+			"ERROR: finding a prog in BPF object file failed\n");
-+		goto out;
-+	}
-+
-+	link = bpf_program__attach(prog);
-+	err = libbpf_get_error(link);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: bpf_program__attach failed: %d\n",
-+			err);
-+		goto out;
-+	}
-+
-+	if (over_high_ms) {
-+		map = bpf_object__find_map_by_name(obj, "low_mcg_ops");
-+		if (!map) {
-+			fprintf(stderr,
-+				"ERROR: Failed to find low_mcg_ops map\n");
-+			err = -ESRCH;
-+			goto out;
-+		}
-+		LIBBPF_OPTS_RESET(opts,
-+			.flags = opts_flags,
-+			.relative_fd = low_cgroup_fd,
-+		);
-+		link_low = bpf_map__attach_struct_ops_opts(map, &opts);
-+		err = libbpf_get_error(link_low);
-+		if (err) {
-+			fprintf(stderr,
-+				"Failed to attach struct ops low_mcg_ops: %d\n",
-+				err);
-+			goto out;
-+		}
-+	}
-+
-+	if (use_below_low || use_below_min) {
-+		map = bpf_object__find_map_by_name(obj, "high_mcg_ops");
-+		if (!map) {
-+			fprintf(stderr,
-+				"ERROR: Failed to find high_mcg_ops map\n");
-+			err = -ESRCH;
-+			goto out;
-+		}
-+		LIBBPF_OPTS_RESET(opts,
-+			.flags = opts_flags,
-+			.relative_fd = high_cgroup_fd,
-+		);
-+		link_high = bpf_map__attach_struct_ops_opts(map, &opts);
-+		err = libbpf_get_error(link_high);
-+		if (err) {
-+			fprintf(stderr,
-+				"Failed to attach struct ops high_mcg_ops: %d\n",
-+				err);
-+			goto out;
-+		}
-+	}
-+
-+	printf("Successfully attached!\n");
-+
-+	signal(SIGINT, sig_handler);
-+	signal(SIGTERM, sig_handler);
-+
-+	while (!exiting)
-+		pause();
-+
-+	printf("Exiting...\n");
-+
-+out:
-+	bpf_link__destroy(link);
-+	bpf_link__destroy(link_low);
-+	bpf_link__destroy(link_high);
-+	bpf_object__close(obj);
-+	close(low_cgroup_fd);
-+	close(high_cgroup_fd);
-+	return err;
-+}
--- 
-2.43.0
-
+I wrote a script to find these ID collisions, but it currently has too
+many false positives to be broadly useful. I can share it once that is
+fixed, if anyone is interested.
 
