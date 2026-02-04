@@ -1,126 +1,159 @@
-Return-Path: <netdev+bounces-256647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2C7MNh0Ug2nBhQMAu9opvQ
-	(envelope-from <netdev+bounces-256647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:40:45 +0100
+	id 0DzcB1kWg2nihQMAu9opvQ
+	(envelope-from <netdev+bounces-256650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:50:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 688D6E3F85
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:40:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93AE2E410F
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:50:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CD1FF3006793
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:40:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2CA57308937A
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988C13A9DA8;
-	Wed,  4 Feb 2026 09:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1A03B531F;
+	Wed,  4 Feb 2026 09:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YcEfykjX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gIi3MIpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DF82DF716
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 09:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197EE3B8BA6;
+	Wed,  4 Feb 2026 09:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770198043; cv=none; b=lXTLHmfr0Amh0eIMDAZK2JWCbppSA7wAcQsnnu9IHWE78r96zvzWgi+8QoR2S791X6b+ORiNq3Q/bkMx0NdGSP4mZoswSLdf0RGRk8zWsINVMM7y7ufxbqXrbxK8W5tLLtJqNqbFJgAh+z3K1x6PHK8nVIDEJreHKLlc7rE65OM=
+	t=1770198317; cv=none; b=XOR6YB/ucUQlPB4uVvZQQ9DJHOZP2QPGXzfS41XCkg2bOQ7cB5CCVu6RAZjFoEvmWMv2YR6nrJ1XN8+pn4qBTaoRxVZBpHhmCYnJvMdoTHXnsbyqO3X9Cw6H1ccuNq7DyAa4rTRjohv9j7/PKwIzAtSCvTYdWYe+VTGaDbQyHrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770198043; c=relaxed/simple;
-	bh=uHW78qfhdeL0wkW3eo7UHbN0sHcO8qzdL/fqq2sd4qA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y4/+MrU+gSp9Wskz6FQgyEVH+m+xHEBiRnFHH6Pzi5ZextpYCH0mLY9GqBAHn8i3xAZANiqvf5/8e9zroG7kQjz5k4XjTVkotPJL7zGISjfpd1JIc/UZmWmAYXLp2GaopwU3NY++nQCHtTnXYAl39UKLPiDKjkxQtSnySPEyZsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YcEfykjX; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A61901A2BE4;
-	Wed,  4 Feb 2026 09:40:41 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7B2EF60745;
-	Wed,  4 Feb 2026 09:40:41 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3CB8A119A8891;
-	Wed,  4 Feb 2026 10:40:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1770198040; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=CbZ3/1BB0R3fIOnjdn9+/O/4gxYQSf4wBm/5qZB9Ab4=;
-	b=YcEfykjXjfUnEj/V+GCSXXATK+5n6pkoQakgNrClBQ4O24EbmZrdGgjSobKehGYAPt3cyN
-	qbm6DNCohk8Z9HgIC7XIt+TWiu1Fsg8V6Rttwpki9Z2F/dD4xG1vaY0n3BH/T5sFCcTATy
-	DkbVWks0R8EAvlJgmlCEslxeYQeOV8EHB6lwR1p3hrhTOb9GsJ21btWLIiU7XXGGdAdhKY
-	6oJKhtSCIXEWth1iZKyVvv3xjBYRTikTNkRHZaF0uNH09JiKSunVutfwHBr47dhSCxqE/h
-	dsn+UYeV74i7kGH8LRrcyUaWgcjnV4sS8x1YZ4hL3v0isvmXXTOb8Ws1J+o8pA==
-Message-ID: <8f1d4def-6a15-4573-9ee6-15300a63447a@bootlin.com>
-Date: Wed, 4 Feb 2026 10:40:38 +0100
+	s=arc-20240116; t=1770198317; c=relaxed/simple;
+	bh=2e9s9fwPW3oN675uLAdbz6Qx4muyla7Q5cCEmFZSCqY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gMMUG6p6Y5hv3bNO5ewC8uI5JJ0jyCkxEqYpBbApf8TtsUP5UKeqQZsDoQr8sbQdskrXTMrRTwvsFgxWTWbpw5XwOBy8XApRzy5CdxF+CyM84PBBCHdyTlARAlp/t/QeUcLwlOkJUeNcr0GxRZrNPNnS+f6pXnLLlk60ymt4NxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gIi3MIpf; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770198317; x=1801734317;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2e9s9fwPW3oN675uLAdbz6Qx4muyla7Q5cCEmFZSCqY=;
+  b=gIi3MIpfw1tElGsgscxsD394wxft9gN1B9lqMyFz6tTMc/WiIfFQAHGk
+   G0QmOg3f3jHKSqXQZ5upjb9XPwoIjUr/rsuNVzSwHBIHcJMXpTNFLvhnR
+   2c/6jwsnpKGz47HzrDcykyLEcZa0VeBnUDt9JToSSoi3eHgN33ecp5zsx
+   e/9M9UugQXvHu3vVOZ+I1P6QjaKNMjCYkQLz8pE8WVm1mbHs3T4hAVrje
+   6L+4mv49/O9O7MHH36OrKtVCc0//a6SwZLPybcSYTbg4R2+t6BKxNnhlC
+   rhkJgHkYGaa77cF3pmWO0N7xpDlHXaqDyaXJC537g/p2zyS8Y9UtYdNQS
+   Q==;
+X-CSE-ConnectionGUID: qX2/Fc/GSPGlBFN4ZTBGdw==
+X-CSE-MsgGUID: APc6AromRMmpWIW0El0C/Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71110482"
+X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
+   d="scan'208";a="71110482"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 01:45:16 -0800
+X-CSE-ConnectionGUID: a2SnfuewQrm27diOooRnXA==
+X-CSE-MsgGUID: d4jwL7IhR9eToI60hx0RmQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
+   d="scan'208";a="214597137"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa005.fm.intel.com with ESMTP; 04 Feb 2026 01:45:12 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id 0F5B495; Wed, 04 Feb 2026 10:45:11 +0100 (CET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Chuck Lever <chuck.lever@oracle.com>,
+	NeilBrown <neil@brown.name>,
+	Jeff Layton <jlayton@kernel.org>,
+	linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v2 0/3] sunrpc: Fix `make W=1` build issues
+Date: Wed,  4 Feb 2026 10:41:20 +0100
+Message-ID: <20260204094500.2443455-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/6] net: stmmac: rk: replace empty set_to_rmii()
- with supports_rmii
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aYMN2gZMfLPKuukG@shell.armlinux.org.uk>
- <E1vnYxq-00000007hor-3yXt@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vnYxq-00000007hor-3yXt@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256647-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,oracle.com,talpey.com,davemloft.net,google.com,gmail.com,linux.intel.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-256650-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,lkml];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 688D6E3F85
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.intel.com:mid,intel.com:email,intel.com:dkim]
+X-Rspamd-Queue-Id: 93AE2E410F
 X-Rspamd-Action: no action
 
-Hi Russell,
+Compiler is not happy about unused variables (especially when
+dprintk() call is defined as no-op). Here is the series to
+address the issues.
 
-On 04/02/2026 10:14, Russell King (Oracle) wrote:
-> Rather than providing a now-empty set_to_rmii() method to indicate
-> that RMII is supported, switch to setting ops->supports_rmii instead.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Changelog v2:
+- added patch to kill RPC_IFDEBUG() macro (LKP, Geert)
+- united separate patches in the series
+- collected tags (Geert)
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+v1: 20260204010402.2149563-1-andriy.shevchenko@linux.intel.com
+v1: 20260204010415.2149607-1-andriy.shevchenko@linux.intel.com
 
-Maxime
+Andy Shevchenko (3):
+  nfs/blocklayout: Fix compilation error (`make W=1`) in
+    bl_write_pagelist()
+  sunrpc: Kill RPC_IFDEBUG()
+  sunrpc: Fix compilation error (`make W=1`) when dprintk() is no-op
+
+ fs/lockd/svclock.c                       |  5 +++++
+ fs/nfs/blocklayout/blocklayout.c         |  4 +---
+ fs/nfsd/nfsfh.c                          |  9 +++++---
+ include/linux/sunrpc/debug.h             | 10 +++++----
+ net/sunrpc/xprtrdma/svc_rdma_transport.c | 27 ++++++++++++------------
+ 5 files changed, 32 insertions(+), 23 deletions(-)
+
+-- 
+2.50.1
 
 
