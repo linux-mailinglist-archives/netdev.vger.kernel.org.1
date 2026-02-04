@@ -1,197 +1,201 @@
-Return-Path: <netdev+bounces-256584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256588-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6In0IIXegmnfdgMAu9opvQ
-	(envelope-from <netdev+bounces-256584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:52:05 +0100
+	id GKocNfbegmnfdgMAu9opvQ
+	(envelope-from <netdev+bounces-256588-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:53:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C61E21BF
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:52:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FD34E221B
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68F7F3045016
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:51:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7B47630976DE
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF99352946;
-	Wed,  4 Feb 2026 05:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC789369979;
+	Wed,  4 Feb 2026 05:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mH1c+uNa";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="d6ZMtz0u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZR3uxsbt"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D405A350A00;
-	Wed,  4 Feb 2026 05:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85672364E81
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 05:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770184311; cv=none; b=DfNGdCpErIqkxD8AnfDMSyt21id1UwKZc8+eCC3Y4kryu6MJdy5EqW7RYstnG1sfz/T4SCztuGaNWJbVQ0gKBsWkZcJ5MWczTTJRmLRxhw9RU6Jud0ebcK3Tq74DOIZw3cGk6aOw3/n8Bt3L3HhLZWrbuRkOHA1o9qL5i5/A5Rk=
+	t=1770184316; cv=none; b=KSxDD+AI74m+0lfjgUvBvpyRxCTheOhceOlzClzZWesQ0bl1qRsXQDAFL/DPSBFQ6wcHsNXK77GRxDQRUTChH6PZgWwsi+sozrLAd9OOYbgJpOE0f76Qjg4ugm/3Mg1+p46ChAiOK8nmp0efWJsPVupEUKgMjbQAB6IrB0o9qLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770184311; c=relaxed/simple;
-	bh=WyeMu1AkwqKC5I7WTqh9UrxM26rqyj+dwIwTtP2n/uA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OyTpPnMVPJmVRzfW4eAZ1gmzg1ckR0JF4Z8Iia4QBQu/5JdxmUmwamOFdsfBH8xpaQE2OTh1234tVWiIhTB2ETgIpCb3aH2nX8uV7hjL++DtAj1cyzumAqUlugu72FNInSFquMTtomJT5A/WJqDyKr+g9blfFIFiZCXDPp71vlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mH1c+uNa; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=d6ZMtz0u; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 4 Feb 2026 06:51:46 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770184308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZHCk7fKGvf7QzEKyi64QeW2Liq4IP/rnnD/aBkMl5c=;
-	b=mH1c+uNacxWRUNxmS4+KhnW02S+ScCNg0PSMrRBV3jl5Y9gLNvMzn2wKTFE119EqwrHZVK
-	0Xs2BQCwy0xLs2a7+gdd8+UIN1NJkFxmfKrvCWu8BRowAICffN4IDMn7nvd5n8pRhGlOTI
-	/lcoeDTVwx4C/5arPqxl4Pr1DwVM/XXISPy+Ud/+o5dE+3KjyDGBJawYLfFhBLuzKlHeEe
-	Jjaaa07nXgXxFL74kUd+x+t5iZVGeWcu8qhM/QlOyI3o3mdtjH2S9THZPgLNdLZakBJJlE
-	ZR3GP0J25NhG4p4mppsRJ+sb9ftJwtMZWzQmpngxhxJY0va5sW06twgDzT0yog==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770184308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZHCk7fKGvf7QzEKyi64QeW2Liq4IP/rnnD/aBkMl5c=;
-	b=d6ZMtz0uUl3VOFryIOVmf39EYhSjv1iRpyzj0W6e5d3GCAZeC1TF0aBjXeboj7tm1lJ6gw
-	gmXb8/M6hAEDp/DQ==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, linux-kselftest@vger.kernel.org, 
-	mptcp@lists.linux.dev, linux-security-module@vger.kernel.org, bpf@vger.kernel.org, 
-	libc-alpha@sourceware.org, Carlos O'Donell <carlos@redhat.com>, 
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>, Rich Felker <dalias@libc.org>, klibc@zytor.com, 
-	Florian Weimer <fweimer@redhat.com>
-Subject: Re: [PATCH net-next v2 0/4] net: uapi: Provide an UAPI definition of
- 'struct sockaddr'
-Message-ID: <20260204064248-d9c4ab78-f6d4-4ac6-8d55-e939bc1df6d2@linutronix.de>
-References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
- <20260121192729.2095aa25@kernel.org>
- <20260130112309-28f2645b-e756-4173-96da-cf5c59191520@linutronix.de>
- <20260130081741.425a92e0@kernel.org>
- <3c46fc49-b41b-44a2-b42a-669cc7e6bb02@linutronix.de>
- <20260131092517.6639d84c@kernel.org>
- <20260203122715-eeb304f9-4b42-4fc6-a527-658182a92ba5@linutronix.de>
- <20260203144011.32d5b223@kernel.org>
+	s=arc-20240116; t=1770184316; c=relaxed/simple;
+	bh=TYocO0iWR8ddhnCV0zsSA6YVJros6WN5ONFPDaMZeg0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=D15XL1saaFcRhxH6qoxBNoN8Laaxe/u9NTw0TvK1wasfP8JQ4H6fO+c4vd1Tu6y8mCu44NTrblfEszQDrIrSnJYYvIjcTvQodOYnkHhFG7r6dZxDFBtWeK/G08yK7sVUkvY145elKtGPiEX+PNXx0Wo4r3SOH6RHIA/tY9nJ/S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZR3uxsbt; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-894709fbae5so17451686d6.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 21:51:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770184315; x=1770789115; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DSGo5iNIcVr0PGkKrx31zzloJYeN7vq/RahMJPcWwQo=;
+        b=ZR3uxsbtHj7vi6OzopvzvdhE2JBtTz3QjDaxoBxMxdU7HAh3yQ5yaytUek48M/ZTNs
+         /BTHUNUAbxeLvsCC/UkCmJZ6hkU8fkp+u5DWBneSl9NzEl6zQk5QY0OVFdBE+yOLdLBN
+         cDVX/jjRKy4ezXWobaTs9rN08pltPaEP6PqRP5x5siBV5GFA8ZbSzZkTj0QWRzSfriuA
+         e/Q2tCEw3N+DcN/1OwLEBxnblbKrPrURoIDqbMtjwf0T+2tWb7X9S2k8A31VthCJ3eST
+         nqCGLzuxhwtlZ4mYDRcg1mlAvWLuVekXrxm10ZqgjKPRc5eMOx8rwsaz2B27VBhxsbzZ
+         DA8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770184315; x=1770789115;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DSGo5iNIcVr0PGkKrx31zzloJYeN7vq/RahMJPcWwQo=;
+        b=lGj9XwO8/7FwXhWQi3miAYvR2WOZRJiQ3GOMw1eEQgy0VXCOzP4A95qVT1V2l3SB0b
+         cOYKyFcm+d63ap8B0T6o63oOJH6k6ZUSEqATcxNesww0QsnmbN8Rj8ssLxyzeLJqHSyz
+         n3uFdbeD/Z6ZF/rgpHVUfSQBLCNS8c4GsdSf/Y0HMgzfoYHustLGiPXPJyKLv152eoEO
+         rWkyvZ9IXF55PHRRJaPlZRpJ2sw4b6qkmn4vTS5EEb0TKZuz2KIFybxiW5j7ePEnjd89
+         f4z3nWYUjs9WwT6MpLyQm5V9lZpAri2z7LlKFWFmY9/DohifpH+8Cr34CqydvqYnK8Sh
+         a+xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmLoZHozvXHTYbLaRJMeYTz4uRpvJ7rbqdfX/smtVogi2xpabVpDdHdRVoAaX/ovNiYT49CTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpZfBHHVefhwpjld0kSWFfNg1oen38AyV3l14mjBnUq47TfdmZ
+	unxMXdP9vb9T7Tv64qXAmfaecGAfeew4CcqtrancJr2UDSoYuNdUtmRbBelySroPidr7ByT/Rm7
+	hDh7/4P2iwQBOVA==
+X-Received: from qva10.prod.google.com ([2002:a05:6214:800a:b0:894:4b2f:fa75])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:495:b0:895:1cbb:5d53 with SMTP id 6a1803df08f44-89522189114mr24960076d6.40.1770184315525;
+ Tue, 03 Feb 2026 21:51:55 -0800 (PST)
+Date: Wed,  4 Feb 2026 05:51:47 +0000
+In-Reply-To: <20260204055147.1682705-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260203144011.32d5b223@kernel.org>
+Mime-Version: 1.0
+References: <20260204055147.1682705-1-edumazet@google.com>
+X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
+Message-ID: <20260204055147.1682705-5-edumazet@google.com>
+Subject: [PATCH v2 net-next 4/4] tcp: move __reqsk_free() out of line
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256584-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,davemloft.net,kernel.org,digikod.net,iogearbox.net,gmail.com,fomichev.me,linux.dev,vger.kernel.org,arndb.de,lists.linux.dev,sourceware.org,linaro.org,libc.org,zytor.com];
-	RCPT_COUNT_TWELVE(0.00)[40];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256588-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 41C61E21BF
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vmlinux.new:url]
+X-Rspamd-Queue-Id: 4FD34E221B
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 02:40:11PM -0800, Jakub Kicinski wrote:
-> On Tue, 3 Feb 2026 12:42:22 +0100 Thomas Weißschuh wrote:
-> > > FWIW the typelimits change broke compilation of ethtool, we'll see if
-> > > anyone "outside kernel community itself" complains.  
-> > 
-> > Can you point me to that breakage? I was unable to find it.
-> 
-> Not reported on the ML, and it's kinda annoying to repro because 
-> the uAPI header sync script isn't committed :/ You have to check 
-> this out
-> 
->  https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/
-> 
-> and run a script like this to sync headers from the kernel (then build):
-> 
-> #!/bin/bash -e
-> 
-> sn="${0##*/}"
-> export ARCH="x86_64"
-> 
-> if [ ! -d "$LINUX_GIT" ]; then
->     echo "${sn}: LINUX_GIT not set" >&2
->     exit 1
-> fi
-> 
-> pushd "$LINUX_GIT"
-> if [ -n "$1" ]; then
->     git checkout "$1"
-> fi
-> desc=$(git describe --exact-match 2>/dev/null \
->        || git show -s --abbrev=12 --pretty='commit %h')
-> kobj=$(mktemp -d)
+Inlining __reqsk_free() is overkill, let's reclaim 2 Kbytes of text.
 
-> make -j16 O="$kobj" allmodconfig
-> make -j16 O="$kobj" prepare
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 2/4 grow/shrink: 2/14 up/down: 225/-2338 (-2113)
+Function                                     old     new   delta
+__reqsk_free                                   -     114    +114
+sock_edemux                                   18      82     +64
+inet_csk_listen_start                        233     264     +31
+__pfx___reqsk_free                             -      16     +16
+__pfx_reqsk_queue_alloc                       16       -     -16
+__pfx_reqsk_free                              16       -     -16
+reqsk_queue_alloc                             46       -     -46
+tcp_req_err                                  272     177     -95
+reqsk_fastopen_remove                        348     253     -95
+cookie_bpf_check                             157      62     -95
+cookie_tcp_reqsk_alloc                       387     290     -97
+cookie_v4_check                             1568    1465    -103
+reqsk_free                                   105       -    -105
+cookie_v6_check                             1519    1412    -107
+sock_gen_put                                 187      78    -109
+sock_pfree                                   212      82    -130
+tcp_try_fastopen                            1818    1683    -135
+tcp_v4_rcv                                  3478    3294    -184
+reqsk_put                                    306      90    -216
+tcp_get_cookie_sock                          551     318    -233
+tcp_v6_rcv                                  3404    3141    -263
+tcp_conn_request                            2677    2384    -293
+Total: Before=24887415, After=24885302, chg -0.01%
 
-These are not necessary.
-The UAPI generation does not need a kernel configuration.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+v2: use EXPORT_SYMBOL_GPL() instead of EXPORT_IPV6_MOD_GPL for
+    __reqsk_free (Kuniyuki)
 
-> make -j16 O="$kobj" INSTALL_HDR_PATH="${kobj}/hdr" headers_install
-> popd
-> 
-> pushd uapi
-> find . -type f -name '*.h' -exec cp -v "${kobj}/hdr/include/{}" {} \;
+ include/net/request_sock.h      |  9 +--------
+ net/ipv4/inet_connection_sock.c | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-Here only those headers which already exist in ethtool's uapi/ directory
-are copied. As linux/typelimits.h is new, it is now missing.
-Honestly, if a user fiddles with the internals of the UAPI headers like
-this, it is on them to update their code if the internal structure
-changes. In your case a simple 'touch uapi/linux/typelimits.h'
-before running the script will be enough. Also internal.h now requires
-an explicit inclusion of <limits.h>, as that is not satisfied by the
-UAPI anymore.
+diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+index 23bb909771fbacbbd31f614b1754f0c24e602645..5a9c826a7092ddfdbe5a6450a1b01677cb7e670b 100644
+--- a/include/net/request_sock.h
++++ b/include/net/request_sock.h
+@@ -123,14 +123,7 @@ static inline struct sock *skb_steal_sock(struct sk_buff *skb,
+ 	return sk;
+ }
+ 
+-static inline void __reqsk_free(struct request_sock *req)
+-{
+-	req->rsk_ops->destructor(req);
+-	if (req->rsk_listener)
+-		sock_put(req->rsk_listener);
+-	kfree(req->saved_syn);
+-	kmem_cache_free(req->rsk_ops->slab, req);
+-}
++void __reqsk_free(struct request_sock *req);
+ 
+ static inline void reqsk_free(struct request_sock *req)
+ {
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 60f2ee039c05f46bdb95f6211a8f9eafbedb9610..5dfac6ce1110b3276fa8aaa02440c774c6a58176 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -919,6 +919,16 @@ struct request_sock *inet_reqsk_alloc(const struct request_sock_ops *ops,
+ }
+ EXPORT_SYMBOL(inet_reqsk_alloc);
+ 
++void __reqsk_free(struct request_sock *req)
++{
++	req->rsk_ops->destructor(req);
++	if (req->rsk_listener)
++		sock_put(req->rsk_listener);
++	kfree(req->saved_syn);
++	kmem_cache_free(req->rsk_ops->slab, req);
++}
++EXPORT_SYMBOL_GPL(__reqsk_free);
++
+ static struct request_sock *inet_reqsk_clone(struct request_sock *req,
+ 					     struct sock *sk)
+ {
+-- 
+2.53.0.rc2.204.g2597b5adb4-goog
 
-> popd
-> rm -rf "$kobj"
-> 
-> git add uapi
-> git commit -s -F - <<EOT
-> update UAPI header copies
-> 
-> Update to kernel ${desc}.
-> 
-> EOT
 
