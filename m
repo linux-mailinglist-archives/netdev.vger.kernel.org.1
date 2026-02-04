@@ -1,210 +1,142 @@
-Return-Path: <netdev+bounces-256679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EA77BMUtg2kwjAMAu9opvQ
-	(envelope-from <netdev+bounces-256679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:30:13 +0100
+	id yJ/NARwvg2kwjAMAu9opvQ
+	(envelope-from <netdev+bounces-256680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:35:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F97E521E
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:30:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9ABE5322
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 12:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 657EC300EAAE
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 11:29:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9E103013259
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 11:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819A83E9F8D;
-	Wed,  4 Feb 2026 11:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA53D330C;
+	Wed,  4 Feb 2026 11:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V2YqY09F";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gf9X3Jv7"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Rb0tlSQR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0846F3E9F79
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 11:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96AB325727;
+	Wed,  4 Feb 2026 11:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770204596; cv=none; b=djsXYv2+bCZVu7f1YyC/FfJYOzDcUtCWrJGrYvOtqBtT6zWGoBeHbakbltsQ6MGUe1TtB8VhE/QnjaPTdgNYS/M7QsJ6nIds0d8DH9CzH7jWcN4tlF4QbVXkpRuwLnnHUFMUMryg5bsIRLqvAyY2pRNDoiOTobFbWf/zcrgNNeI=
+	t=1770204953; cv=none; b=DzUKotO/yjT77UUzOYzF/h1m2vIgAdDrHO4DgYqyNj81ab1V/eZJvejAFtfDdTR0vXRvG0rB3WV+ZWqlxQkLIExw+9dxFkOWpvsq10RqPPmxlWTstjuAdFoX8X9mAQGqZcPxEdGw9tKiZKp1XfiRc2uXtK4ezmol2Epo2swq3gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770204596; c=relaxed/simple;
-	bh=ShwI4jCjSP8+m7Os2djvrxNO/fA9bUZq/Yv5KhSFlvA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GHOq5xbvuad3f2msTmcJOWJyAX1jiTLh5kVjtX0QXzRw/0fKv8HluW/sPK4hAVqnuqvuAsqgUkeDJYfh1oJQ4N3Y6KlawHVE/PD7ysjYRN5ySdQW+eoHxnt9JN77SDofyzIS9Bmvw2UkNnYNQn/o+Zy8E6WWfFQ+/Ia1eUIm3ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V2YqY09F; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gf9X3Jv7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770204595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zqOiwAx1+q0FKyReAOUgZRpz2E1HnCP+W30z4rd0Qx0=;
-	b=V2YqY09FtnfjqepMkYJRHTgJimMpvbyLSe9a3u4+0ksKxEwMeJbvVw2VowxA/KBZhNCb2m
-	oZGQo3LDLKM1Vs7a6qhli2NQM4yYNMuzMnnuk2TCAuij8A2fHIZ7mv2XREwrh9VGSz6QLN
-	Cd+kG9PzVqaIGzXdPJilNLT10SjG0dQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-533-S0fHzIy6NpSZaQZN0OiAtQ-1; Wed, 04 Feb 2026 06:29:54 -0500
-X-MC-Unique: S0fHzIy6NpSZaQZN0OiAtQ-1
-X-Mimecast-MFC-AGG-ID: S0fHzIy6NpSZaQZN0OiAtQ_1770204593
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-435a2de6ec0so4163696f8f.0
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 03:29:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770204593; x=1770809393; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zqOiwAx1+q0FKyReAOUgZRpz2E1HnCP+W30z4rd0Qx0=;
-        b=gf9X3Jv7fhiuOUmepNhbiaGAZgkeQ+v/SlFxuLNajgjPXQGPl0RhUF4Pcnbl23E7Ft
-         JC2CsEWLlkuBUUsHhE1Todr8N5lfLrTzQjPzRTaunn5pIq67nt9pR3K9Pnu21blsuxjW
-         Mp5na/pMww1CsVP0YO7h4Jz7rTs+E1prBQkFoi/85hWr51gS8UdVyqwxy9xEUEb7m4AG
-         rdX56sYMN3c7MVlcOfZ9mIpMCURYXx+vuQAIeGpbVnZutJrPjRMlINDFTt+wvBnuNBqI
-         XAj7hEQms0bL6/pq3zfV1MB5ptF9eAKKoyt9kQMYLuuXvkOK0nNC9Yd0CZOcptZZ+XP7
-         icoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770204593; x=1770809393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zqOiwAx1+q0FKyReAOUgZRpz2E1HnCP+W30z4rd0Qx0=;
-        b=ThSG2ltXNb5qpm/dKHg4ONXXztg61HXLDmFYgiAkBA9j0PhnhutCYi4fEa0n98l1Te
-         BQ0WgCCMCSWRaTmL16HxFjgj046CabIEs0MW29RfM+qSa7zwGS/NbopyCgFUKfzE5Lv1
-         TuF1cNsll40XjihL6eOrjGy2vnLSvZSiM8dNJRHPEweosDeO+P1w+uKMHEMLVESceGrp
-         XroHGgEb9w1H0Ga341o0wuo+OOAOYVEljANEDqhWtfb4ObHEcdkUHAOX2qm/alNku1o/
-         vS31MNc3D0buqVQNafR8VOZrWcDLYxiopyiHNqOZjz289VDGfXlVz3PTcp3Iw5SZaUzt
-         4e7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUpY9D5JfKl4Kl3QoqyaYfPOQreONe3UJ8/FPYrH11b1wlCjRnqk5CJTii16cJKIg17YZCHOjM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEYh64vNGAnekBjByEkoCYziVVltoTDTZ7RQXEoUdeoYHs5L/x
-	IAPeMOkd9slnsw6yJO1Fk1zwcTDgB4+phGpicJbnF5g96uaq4G4gH6rIU0Qtk7iQg0hplA1D2Ph
-	HPmI9RioRHG1MHZbbt3LyrxYiM0VU/ELfRqzKl+583AEsnuL7voz/JVIqhg==
-X-Gm-Gg: AZuq6aLQmVgfXC+T8V3R74vGEcW4Q+lER6Aiyw1dqdCCLTC2vFoH1kGMbS15894ITZI
-	pnyXCL4pxySntjTcHJko9MzobIa2phbsaokj/Df2yj1pE1OK6vpGDxlVVQyIkm04txzlEG+lDLe
-	YmFSQhsX/xYW1+RpG+GvEal27j4FfN2W94vAv3Q5U2NpbQt4n8bavXzWkmKV95xjcB56iCpTW5a
-	jXrQQU4TaXYsrmerU/YiFmtJ3fYmpfhUNti5uLixD8WS+VLmzlad+5+OCS6ZghPxVJl8rVmDrEa
-	xEwmQOUcOOl0aS5sFMQnovTtiN7QW+QKPp9Lt+E4af5e4LuQvivaLEbYmBg8h0n1AE/l9GJPAFO
-	1xFV6810V2WkOeAz2mxlRZSN7Iiao52jkESIcVbs9VK9xMJZsGN1ipy9F7cI=
-X-Received: by 2002:a5d:4573:0:b0:436:1989:46b7 with SMTP id ffacd0b85a97d-436198946c7mr2085555f8f.15.1770204592610;
-        Wed, 04 Feb 2026 03:29:52 -0800 (PST)
-X-Received: by 2002:a5d:4573:0:b0:436:1989:46b7 with SMTP id ffacd0b85a97d-436198946c7mr2085507f8f.15.1770204592143;
-        Wed, 04 Feb 2026 03:29:52 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43618057f87sm6371139f8f.21.2026.02.04.03.29.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 03:29:51 -0800 (PST)
-Date: Wed, 4 Feb 2026 12:29:44 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Simon Horman <horms@kernel.org>, 
-	HarshaVardhana S A <harshavardhana.sa@broadcom.com>, Bobby Eshleman <bobbyeshleman@meta.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] vmw_vsock: bypass false-positive Wnonnull warning with
- gcc-16
-Message-ID: <aYMqw2HbtKi50b1e@sgarzare-redhat>
-References: <20260203163406.2636463-1-arnd@kernel.org>
+	s=arc-20240116; t=1770204953; c=relaxed/simple;
+	bh=HLFqF8w4YB18f2T/EMhFOWb+Sn2L0IXoXGA+El73BA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MrPh1id7yejeXuMz8j31bB+uKvOiR7T2b9EJZUEIbD2Dq6xsGx3QkQs7iVlKKtKIh0S+y2Ots09KSsJ8mrUtyYsKnGcwUfeOGIx+A41tyJJlEEr2kb+KgZH7roQ1IcL/i2ETEeXoHceRXMMLFvmJCk3jd7/mDJIq4hYNsJd0jzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Rb0tlSQR; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=pLNdq1aylyyBkW3ltLdMWYah6GHBbB3gFYGxGKA7BKI=; t=1770204952; x=1771414552; 
+	b=Rb0tlSQRD/qtTVYaV7FS41zaKc7/7AYEc+pMyuoA3hVABhB+WcVPXIccdYWhxR26w3/H2AHs9YG
+	b/S9AccrwT5yU4q8+ushm+2Q6127wL2J5s9/UUg1ISLh7UbTuNXI3wLaXAF9Bi/XnKUVRZnF/IzVE
+	Mce1sxyzpdSxNqq6Tthm21gGzMhmD6UoEYYzjsfbwHBPukhzqmz1vpa2JalHhOvsn8r8NFM9rczlh
+	TqRi8GyK7tfHR5Q4yu5QI+s6xsXP+VUB5NNDK3QTwro16d9o+5hJBXPyNklLXC/zAU4+R7n3A/Qf3
+	iHNPLdOXeixS827HpGDjHVEACl2118P+5/cQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vnbAk-0000000EJrQ-1qqK;
+	Wed, 04 Feb 2026 12:35:50 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-02-04
+Date: Wed,  4 Feb 2026 12:35:20 +0100
+Message-ID: <20260204113547.159742-4-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260203163406.2636463-1-arnd@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256679-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256680-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E4F97E521E
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:mid,sipsolutions.net:dkim]
+X-Rspamd-Queue-Id: 9C9ABE5322
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 05:34:00PM +0100, Arnd Bergmann wrote:
->From: Arnd Bergmann <arnd@arndb.de>
->
->The gcc-16.0.1 snapshot produces a false-positive warning that turns
->into a build failure with CONFIG_WERROR:
->
->In file included from arch/x86/include/asm/string.h:6,
->                 from net/vmw_vsock/vmci_transport.c:10:
->In function 'vmci_transport_packet_init',
->    inlined from '__vmci_transport_send_control_pkt.constprop' at net/vmw_vsock/vmci_transport.c:198:2:
->arch/x86/include/asm/string_32.h:150:25: error: argument 2 null where non-null expected because argument 3 is nonzero [-Werror=nonnull]
->  150 | #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
->      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
->net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
->  164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
->      |                 ^~~~~~
->arch/x86/include/asm/string_32.h:150:25: note: in a call to built-in function '__builtin_memcpy'
->net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
->  164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
->      |                 ^~~~~~
->
->This seems relatively harmless, and it so far the only instance of this
->warning I have found. The __vmci_transport_send_control_pkt function
->is called either with wait=NULL or with one of the type values that
->pass 'wait' into memcpy() here, but not from the same caller.
->
->Replacing the memcpy with a struct assignment is otherwise the same
->but avoids the warning.
->
->Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->---
-> net/vmw_vsock/vmci_transport.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi,
 
-Not sure if it's net or net-next material, maybe net to avoid the 
-warning/error on v6.19 too ?
+So famous last words and all that, but two bugs in
+iwlwifi were reported and fixed in the last week or
+so, and here we have those fixes.
 
-Anyway LGTM and thanks for the fix!
+Please pull and let us know if there's any problem.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Thanks,
+johannes
 
->
->diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
->index 00f6bbdb035a..a64522be1bad 100644
->--- a/net/vmw_vsock/vmci_transport.c
->+++ b/net/vmw_vsock/vmci_transport.c
->@@ -161,7 +161,7 @@ vmci_transport_packet_init(struct vmci_transport_packet *pkt,
->
-> 	case VMCI_TRANSPORT_PACKET_TYPE_WAITING_READ:
-> 	case VMCI_TRANSPORT_PACKET_TYPE_WAITING_WRITE:
->-		memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
->+		pkt->u.wait = *wait;
-> 		break;
->
-> 	case VMCI_TRANSPORT_PACKET_TYPE_REQUEST2:
->-- 
->2.39.5
->
 
+
+The following changes since commit 1cac38910ecb881b09f61f57545a771bbe57ba68:
+
+  Merge tag 'net-6.19-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-01-29 10:21:52 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-02-04
+
+for you to fetch changes up to 45a66b75bf10c84060c9948e3be664e03454515d:
+
+  Merge tag 'iwlwifi-fixes-2026-02-03' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2026-02-04 12:31:58 +0100)
+
+----------------------------------------------------------------
+Two last-minute iwlwifi fixes:
+ - cancel mlo_scan_work on disassoc to avoid
+   use-after-free/init-after-queue issues
+ - pause TCM work on suspend to avoid crashing
+   the FW (and sometimes the host) on resume
+   with traffic
+
+----------------------------------------------------------------
+Johannes Berg (1):
+      Merge tag 'iwlwifi-fixes-2026-02-03' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+Miri Korenblit (2):
+      wifi: iwlwifi: mld: cancel mlo_scan_start_wk
+      wifi: iwlwifi: mvm: pause TCM on fast resume
+
+ drivers/net/wireless/intel/iwlwifi/mld/iface.c    | 2 --
+ drivers/net/wireless/intel/iwlwifi/mld/mac80211.c | 2 ++
+ drivers/net/wireless/intel/iwlwifi/mvm/d3.c       | 6 +++++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
