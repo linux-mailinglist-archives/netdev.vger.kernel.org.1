@@ -1,206 +1,199 @@
-Return-Path: <netdev+bounces-256669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGoLJHYjg2nWhwMAu9opvQ
-	(envelope-from <netdev+bounces-256669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:46:14 +0100
+	id WCAYKbsjg2nWhwMAu9opvQ
+	(envelope-from <netdev+bounces-256670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:47:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE4F9E4B9C
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:46:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47356E4BD5
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 11:47:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2D0203003717
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 10:46:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D2DD300E719
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 10:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7439B30F921;
-	Wed,  4 Feb 2026 10:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F78399012;
+	Wed,  4 Feb 2026 10:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="eqGBhOE0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c5XUfZfG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB2927456;
-	Wed,  4 Feb 2026 10:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F62372B3F;
+	Wed,  4 Feb 2026 10:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770201968; cv=none; b=E8TlREqTi89HHsWSMW8bkpmEtmI9ysGSiEQfb+L3nokae7omlVLIMLHd6W/ukkLcu7PAeSBnJXK1ASInU1DYFf01bpDysrTMfJWDH+w2rRd1MIy55xWNo6X+Vl2u5AcARw2RLOEcnn6t6skQTIciJyRyL9g7JuyQvXslUEChCHQ=
+	t=1770202039; cv=none; b=eIfC3uycOkG4SElkM1YWti0MybWF6JocGTLAk+EAuPTgPpAVJtcP9C2o6LwAVkF/zqxbm4SIHHy8bon0SYV/v2PxWc2KOJ2WQ9EAaelEcQEdbBmF8meaAaMWxF/63Te6vZM7oSeJowKp7sst676lvMG6jNh8kqZLByTyNbMg+10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770201968; c=relaxed/simple;
-	bh=nE5AQxfl8D2D0mS+A6xy6L0RiK2Y7/zsPPe18durZqA=;
+	s=arc-20240116; t=1770202039; c=relaxed/simple;
+	bh=D/vdlnLyzaN0QF3n8GIGTjf2NTZ9bLWnm071K/SuhDM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HHELCUlXbtTgKIs/aUbiezbWQrobbvAWA7CAUbumzI0i2xHLoCJNz6Bfmt//a1+sbwkegZ8VuFuzq17GaPENviylnt8mQ0Pp15L+4VMuS5+J4TaR4Y0xQOGaFN76bb1hPbQNevaxKc45C+Xi5JQXgi21GdYDuQ+0jrCFON8Bs6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=eqGBhOE0; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1770201929; x=1770806729; i=markus.elfring@web.de;
-	bh=Qh6EGGAuZMfJEqySr8dKIzgzjjzaJf6wwJmEg6oCsfI=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=eqGBhOE0UDOd/hBFWtt6TZ8EuTD3FawnGknUVS8MsFa2eAs9FPt/CWOrxD14g3at
-	 7WugL2Aq4PSjyUZ5oEKqfLA/GHagZkgUbhRuOJdfz3ZIqPHSRI6ftyIRqCXQeR+LF
-	 noBl5TLp+PW6MqBL28LZfKtYKi02F/pjADtWZL80mcYyXipjT2ar3EOdXrM0UB4Hi
-	 9JEXndmWESA/B9+UlIIyUe1RNhVaKb4OXZ4dDO88Oh38NrBlGMGf4BPlCl4uaYKln
-	 FvrZW0pdXOUQ4HsJSMDtAos+1yH4SdfCs3kjG0gaCWrDMZRvGzMzuK4i+7jBkVpQJ
-	 u+FQOF1q0IZKSgnCsw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.224]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MTvvy-1wDSyR2daU-00Pjn4; Wed, 04
- Feb 2026 11:45:29 +0100
-Message-ID: <ead52d66-b594-4dd8-91a7-9baa88230728@web.de>
-Date: Wed, 4 Feb 2026 11:45:24 +0100
+	 In-Reply-To:Content-Type; b=cOEemx5xKb7HZCuYK57lVRDW/2+XqScS+O0eQ9C5+D09LsWav2uJe+0PAeFXYQN44WRXO0BmJobMMZJX7LTC5BTrIyTUFv39aV8K2l9BvPEmG7KKF5Eb/DmV2vtVdacbwVFInX4ZOW2tiA4DP5TZo0bLLzpBYYU2UlhSkKUNEuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c5XUfZfG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 171DDC4CEF7;
+	Wed,  4 Feb 2026 10:47:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770202038;
+	bh=D/vdlnLyzaN0QF3n8GIGTjf2NTZ9bLWnm071K/SuhDM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=c5XUfZfG0nTUy6F//9h+mGVevHuruLKwgme7sYOi6qFt3r+x3At/ugswNtwXh3fld
+	 PP9eAL6BKHQ7JsywLqLNEDYVeMJoLWeaVOj8fsKPOWG2Wd0v6/jEkzKmlISLNSYa2C
+	 YE76uPzLSk1WdR148Um037IgxF/DfHq3BGEpnv7W2bIqeJwWPsmZe9KpcpG/vuGcBi
+	 +AaarvCrp+eB85pIfjFvT77x1hrj+qlOJc6A9SZ5+55+swp7bRrqDJ6cYGc0kyX1Vf
+	 xZdwSUih5daDseFZ2WmlEJkfDm1YIRfgBEWlwGJVFTU8iePEoOD3u+3fw5I2K8o3mE
+	 hcaNwtVVKrTqg==
+Message-ID: <8037fb73-4e18-4ed1-9eaf-e4cd8b2c9d53@kernel.org>
+Date: Wed, 4 Feb 2026 11:47:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: ti: icssg-prueth: Use system default
- workqueue in ndo_set_rx_mode callback
-To: Kevin Hao <haokexin@gmail.com>, netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Byungchul Park <byungchul@sk.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Himanshu Mittal <h-mittal1@ti.com>,
- Jacob Keller <jacob.e.keller@intel.com>, MD Danish Anwar
- <danishanwar@ti.com>, Jakub Kicinski <kuba@kernel.org>,
- Meghana Malladi <m-malladi@ti.com>, Paolo Abeni <pabeni@redhat.com>,
- Roger Quadros <rogerq@kernel.org>, Simon Horman <horms@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-References: <20260204-icssg-prueth-workqueue-v1-0-9a892f4b293d@gmail.com>
- <20260204-icssg-prueth-workqueue-v1-2-9a892f4b293d@gmail.com>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20260204-icssg-prueth-workqueue-v1-2-9a892f4b293d@gmail.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next 07/15] mptcp: allow overridden write_space to be
+ invoked
+Content-Language: en-GB, fr-BE
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Gang Yan <yangang@kylinos.cn>
+References: <20260203-net-next-mptcp-misc-feat-6-20-v1-0-31ec8bfc56d1@kernel.org>
+ <20260203-net-next-mptcp-misc-feat-6-20-v1-7-31ec8bfc56d1@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260203-net-next-mptcp-misc-feat-6-20-v1-7-31ec8bfc56d1@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:dlNPm9i/F9r3OoEmHApQAee0R65ZhuWrKuOcV7xU3kq0eWGj/01
- oveit5oPZoRXjp71+yvtkCQIqy9jgvz+sXQQDcB9vUjjoLGU6uGq3kSPi/6AmibGyfTomMn
- pcEaPwlGGELm58LlLJntMU8z99Te+xDgOPLWer/8zgwwdAaMfL105P5E8UbDV9ikPXJ63fh
- hsDGu+ed+sS8FMFKR1ybg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:x+nQq753Mo0=;GeSmyJAETiQuLkkLbZvj6nTscic
- JC5dSPKphOIntELiUem99Hg1hkRzRHllXjaLhkAV3LlHKV6+n3X+cAD+ZAw5uKccgmGYHjZks
- b5IK0SylFCuZmUf0syJGagSubLaauGIB1TIzSUmQGoh16/5QYHh3DxtdRvUks41rnm7nDCAiT
- MeA4jIwyo09ZV3a3ofWD4MTfkWJwGVDlZ7PmR8Yt+8Pu1AdSXzTvXygnFeJjmLCcNJ+oRbEX3
- RYxM8qNSb7IgIpQogEoEfvRZ4ViG7d+fVwh7FaHWb9JnHO0SYVqi65NPcOqFyJnsqU9GuJetl
- ll1QfjU76CT6ENwrwXvbRu0odIis5ZHIu7YAipXXmHJohJx7rbgU1mZm90AcjM3nKIIHcA2ye
- Cgd7pE3fTNWZxQptxen0JbBfTs4PVST2WzLSAaf1BsxA1863i1FizaJOQTNRYvGXZOaJVkryK
- CTVREDpSiVNpf+Bp4ioII3fHlAYdWCR5RQQT425qvhEwkzvZP8kkoLZcbTTjEqhzmtmd63QYA
- /gPEizhRA9R/u3vZwGLXtvlNYoaX1xR3bORG4gTOudzFb7phfj/cvmP2ZSojVpKoJEB0/yGUR
- 31wv6qEShZvXllijTdhhNZjOVRMsM7hFNaafbBQLmI8hW1RQD22G8+RQR6UzQoq9DlUjH//01
- zSxIgRa5rZMcqOZQheuLSLemCQtzU4Kygceb3yqMdz3UuKBMlatWLTlNojJkzOr4WJRQk8mb4
- l/YZkp5xQ478OTizqq2aTUKG21guTVVjIolZqmvnl0uL6hIxp4IenAqx/UPSG4ZkZFZxG23Q8
- hRSKW8V+c9Xb/ZUJrnLFhB2hUhfNE/QVJiItJTqt9mzT0Du8O89Ynaa5bSYUNQcuGgnnGRo8x
- Fgu5vkmwWNXnCwLBJiockRQIe2Rl2760GZUVNrpCb6cWJxEIqhaUfIm9wVZyIRECb+RDU/8NJ
- TepvPbLJNKsfEpgQYkpQJMOvuPUOr3BgVJQEGwkDPUvM0WVsj4+NG7d1i+uPNzE8rXIZ48Wqi
- Ie2rFfYeDYoMmSaiERlm3+cLAZ7JUX7YCqWVVsqBB0CfLhm7NPT3Vxf+LY07WBkjQb5VKqonz
- QzIsYz56ByGdoCIcnBrVFC2O8FLuN67TMtQPrlj/Lk9VjHaM8840C2NREXArtlc86SvuHB8aQ
- B26JrXCY/vQNhrI2Y3x9DRNMReB5g2pBCDWKNDumTqeAT0eqbLhLrUW5OkfNUyAiWfZvmLrsA
- zTsxa6KS+2MQQHKIjbiiMoKkWzlTk9tmTIR3Y65ycPvAcN+6mCmtgzS11/ZBYhCySznNpJAN+
- dABAzi4p2vZp5Tqo3iZ/UAk18rspRMa+gcsX1Qij7Y4yNiNMMsChbIrrUp6krYWWO2PGjJ6sQ
- Q7Bsm+ndKCZvYVLTwna6HV6NIshRXSQUwfyIJPbt7DFexOwxTJZHe5wAMUKLDf8fMNvUnqT5l
- 2q9QSSJcnnAcebuqBy1+LvwEuXhIj7EnjrkBhY2KBmQIOPziTPPTAFNBip9N4S1f5OmnkGzES
- LGACxxDf2ClIGeaRGqHeFunZiejY+CldkKsI4K6x3V08iMzrStDoNaBiuETToYcxhHmlbgyEj
- KoIs7o6qLyU+mEUz6AStINGWEwR9lyVYotq6kIIZGq1R1J+wktId1ZPm4/CSD27Qd4iwtIUJh
- 00aqcdECZvIRtNasqSIiCz2UhasVRkuN6zlLlh0WHSOxTxcRp0SmtUk3/lYTRFvPWZfzCCTj5
- M8bGJfqLAzPv/aIfo5wuuYS+FgC+Op/9RYxiourWhPzX0xfDxWKtxZgKXPa5itnsLu3VJuwu7
- UZyV1FK3M1iDbvbXzd4emCZjXhFaNck8zZxepQlOKka7LQuzIZQmLoxsy3Ll9+vMueCmBp68L
- /LTdMmWtJN7E6KECZxGCiyinb6AHwQWhG7WtY/YI+DXn/BhnrmSD+RKazuSqUlCFkGxbHtl1D
- 2eeDzyDA1L+ErvPSwntuthgAEDqfDUjE+qK1zDwTSCo0U6W8HApxPQWQpv0/tOflpTwj+X6ki
- 6FC36p8+25u7SKhNuhKETeVfqqXfm2fnSTWnWoSP5mvl7kMw+ufTjQ8oyanXOYawHmeelsIE6
- sroWqbx0ErwIkamNDAn0Miz+AxDGZsfTqZ/UKxGu/JpPOJerWjk902dOxuCKAK1jBvr81+PtV
- f5Z28Xwxn7HjhtEoAaKMFdPBGskIfHZr9WMWHOleWHJpTILXDbDBJnXY03k+L9q4VYON5fiq5
- 8633QnWlOOT/H9S+Jol8p/iVEk8Zj+t1BoKZ7yEzCP+Yh6BZgYPpU4bHuLCCLT6mJKR8/0Ja6
- PYNZWCOSTlNnsNwpSDhVU1+xC7yj2oXH+qfP0aQSkIm9+euSfO7Ph0AYSAMR0tzEaEexT6kFy
- czpYB/H4PKIJwOj7xp0n/aO648dQnkH3ahXqMa8zgsyNkS5PAUxCGli0zbrL+xBfHfDzObyxk
- CyMrESWoC2PExk1AQUNCU5dhQj9Ss8AdQ6CEmkRgddZ7bdXMTHZZf9KSbvny61poMXASmTVWn
- a6ArAUBXV9uIvg2+ZiSFjIgIuQbW0esdPzg1mb+c8NjobtSvdhNI52DEK7cCb0TgEFcQ+ta19
- 1uI9yIYKBP/1fvp3bG0H3I/QEfwKTOc8CY5Bu+QIqdNXK3G9hcX0xXK5dXwXeDI5EBjuSQ+aA
- TPH4U1cOM/iNpnm5vTTVdb0cpThgibmU6qctFjUoy8/yRCiV1AvRqP1rV8pR+J3S5lNO3vuqD
- xXTAXlE4aes4+mXAT39DvgWWgIWifhJneNjKCp1OQT5oqc7qMq5DVOBl4uNC2u7WMFvZsPAUD
- Q0Kn1MejxmCOfn+6LgnCh8kfIqf7DB7/CurGYmZnECp3cgxbATgPMlglN3+oOjDHoN+9IPkK7
- C0WfVgL4ePdX0DgoIKnUz/QjqQYjKxJYeCLoBAdqV6ZExsYdWb3RaQcroxp+VLBJqBvvVat9L
- 8AGFkK7IbYacE6dlk15mfpzmv1SD6YyJdXjP3mouZGUgis6gN1ekW4LeZFBsVYnJnxNzWwjMZ
- 6+aJo1k/ZC6CVE5ncxRs/9WFuHkkiH7ssbARge24HGeBkAYPTztpDUs7AhApNWEc2o6K5kkuD
- DA56IcD7ksK9nhbRm8OQ/7MTISLbL8iNLS5+cA6bFbqAFKe7CsUGaQTpfY4B0koqWquFBlaB0
- 98EQx5LipTYR8DD5X2bCccqcBMcrf8V40/bScOS90qEoI7wB5VPnad1JgX5VijcefWEn2lA5b
- eyjoqSWJTOEvNQbC7KCF4lLA4qObIJm9ItN2ziTkcPJHETZ270KLMPZkJ1q4k0A+Iv8deNkFB
- e5gF08eh8pbbTYenUqNFzG26iYAf6qYLjIk9YVEfKf8sDmSfipVaBHLyvhMoYHwJXTjSUfEew
- 4W2ZZVheNgUWjddLSllJ68ouZKXg6JMXtg6dNj1C2SA2rwwWV+yrUBcBJDbu8W1NNaNhelG6G
- yjcfXiCfaS8KGQoWF9SRCP6gppw1ib+wrjxaSTHtkGl5Vaht1gz2Rfz9kkGIjMqOEi1CXK1BC
- pq0+IO5PckhmFA/rlsU72MXW9Pu+2FNjjy9nAJOlrpz6cKSiGWZsSaBH6psdghAWHjHEvMnrX
- K6B3IltsmpdyCRulh5rclJS2g69raYaIS5qY77KYvAH3T3emUkG1/3EmqooxdwtP+LJbx0Cb4
- nA77XWoQ12CU8GefQ7ievSe2pDpZ6UlUoWIX2Pan13/JcwlReBIxkfMi257Lx5dRN/ZgyRT1Y
- 3Jf/PNQb/PCQGu17JEjZ01UMWHZzcgTNrABmMwO/w+zDwjyclhHrguACQZdcBLIhvToRuL6oG
- Qms30hxpJBHz6jexhWgXahWWJBRw1ehT9ntw/F+GuT2YrVJH+NA5nwIHYkw6VQDnS4+f6uOEG
- zDG0UMZk9cYYNvariZ7mvHY5UK7yhPa1tRMk+isU939kGaZ4BOhFaHyU9zatKoAbUa+tG+alX
- vP+eHj8Nuhx1cWulgoNi9r+djqbeWLGP3rD3quVKzS8qGHyHAuOhfVv/YpTwegdZPq2DQvaCd
- QUpaefBiMgqrl/vJyy5pszxZyP7urrGWXuTcgHOJ//9ZloU0eJ736pofKxvJsvuLnmonHjk0h
- bG+74xchrZnTth3phG5mjHoJIKa5xfn0Ft6T8x/ipUrhkKpAV1U8auckdH+URqyk3Zm4uDm90
- C4b/wDGDcYqTktjxw8HnSWMHXB0Uc+KwpVYb7sJlJyeMivR/y6HVgPzD3L6Id4wN4xrZR402l
- rqMglT5MgVAtrQmgyHqkcp1czbBixd4tuo8uzGtc42sWesxpMyCyzWT7lMq+D8AeXUs/6G9Wd
- ahRpQmcqDO/vtu0oVfRE5JJIDp1JER37E7/e5+6jXQ1B4XB7zMg3NnDanwMaCgMvk/ngshJHJ
- 1+GNeZHKVblyFeWprHukAsyOogSN/fkAvqeAcqHKF80WB/FYpJieq2ZoTDSkqI2GAXBrHjCBO
- V3lbSopfMswYIdAFnKStcJKtSiakyl5GOWm4/RBHm89SIm798z/Kuyz6nnneY6nV9RPbm6fgp
- 1nvL4S71qJS1nvfJxtJYEUY7iYh03/3uyihNUIilWAaShwjFBYD9vmxk3bJb7iKistlPjxGl2
- Iq1/QOE7/Boc2bzURmp3c6zI3faSjNYddoU5x75yQB1NybhZgcdQdX/AnKQCZO/udeph4plrf
- J+zwvQlTXeN9D5RgX1vaWooY1XPlFuv+ZXIwoVXeNkMdUrSjotdGChPYxHIY39QZRP4QzdERc
- k0lEw2AWMdNeooR+3yMXgbbUcG5ToxAJbrhPysa6A07nQo3MdAgtseFn+ALePXfiWbWCpNBA+
- vSa+kdNt5ZQOG16q0ad2E16NX1zuRk999jDa1Gnu8DmYurxxZe90bDTzgXndwMQXprhNCb5vu
- Nw8v4/a8bvu14PGIxSWknCo/LDFjEwbkRUJwd0tRaMEkC0J2wdorA+lWpSATNylePkYbqD04z
- PMtTUsaRYIXDNgPA74bxH1EewyMl+46EMuA3SOH2o5V0hN5juMIW5fr9m8ToHEuyHRM6Ws77f
- 9ZVuQtRZe4Yi1aO7qmrR9qPwwfYRS1IXlHMRqK1UhjCc1rxYBP/Bhq3Ts8l8l4jSouZGki3dP
- uhnJHqz523zLcKYFI9icfrb2cB/levHgQRL7cuWeUbyYravhmcEPX5zBZiGpm3sh4OhTx3aoD
- ncJRHjplVjDYDapZEbG4XKb3snwaC
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256669-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256670-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[web.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[web.de:+];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AE4F9E4B9C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47356E4BD5
 X-Rspamd-Action: no action
 
-> Currently, the actual processing of ndo_set_rx_mode is executed in a wor=
-k.
+Hello,
 
-                                                                          =
-  queue?
+On 03/02/2026 19:41, Matthieu Baerts (NGI0) wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+> 
+> Future extensions with psock will override their own sk->sk_write_space
+> callback. This patch ensures that the overridden sk_write_space can be
+> invoked by MPTCP.
+> 
+> INDIRECT_CALL is used to keep the default path optimised.
+> 
+> This patch is shared early to ease discussions around future RFC and
+> avoid confusions with this "fix" that is needed for different future
+> extensions.
+> 
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> Co-developed-by: Gang Yan <yangang@kylinos.cn>
+> Signed-off-by: Gang Yan <yangang@kylinos.cn>
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+>  net/mptcp/protocol.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+> index f4bfe91ca7f9..0bd1ee860316 100644
+> --- a/net/mptcp/protocol.h
+> +++ b/net/mptcp/protocol.h
+> @@ -975,7 +975,7 @@ static inline void mptcp_write_space(struct sock *sk)
+>  	/* pairs with memory barrier in mptcp_poll */
+>  	smp_mb();
+>  	if (mptcp_stream_memory_free(sk, 1))
+> -		sk_stream_write_space(sk);
+> +		INDIRECT_CALL_1(sk->sk_write_space, sk_stream_write_space, sk);
 
+Is it possible to drop only this patch from this series? It is
+independent of the rest, and the AI review tool spotted that
+sk->sk_write_space is not sk_stream_write_space by default.
 
-> However, there is no need to create a dedicated workqueue for =E2=80=A6
+I can send a v2 without this patch if preferred.
 
+>  }
+>  
+>  static inline void __mptcp_sync_sndbuf(struct sock *sk)
+> 
 
-Regards,
-Markus
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
