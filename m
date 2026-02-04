@@ -1,174 +1,160 @@
-Return-Path: <netdev+bounces-256839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256840-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCnAB6LHg2k/uQMAu9opvQ
-	(envelope-from <netdev+bounces-256839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:26:42 +0100
+	id wNcaG93Hg2k/uQMAu9opvQ
+	(envelope-from <netdev+bounces-256840-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:27:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A53CECFB5
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:26:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C630BECFCB
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32C24300EFA2
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 22:26:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CB6A300F9EC
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 22:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBE8318ED3;
-	Wed,  4 Feb 2026 22:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD65B36997D;
+	Wed,  4 Feb 2026 22:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jOu0LD/B"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cNkCVy31"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357E627F163
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 22:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CBA35F8AE
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 22:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770243999; cv=none; b=pAESHf5NWNj8jpXScrHlm0VeKDjgHAVYPheLrLSZr/d4WdWJiWPFrM93Sp6EhNVEb9dC8ntK9CLf3pX1/Ki8fcGML6msZ7QFdo5UEOM2m8V+4hPTZd6FcGIGv3ZwmEsdAj9QD5yiE24LV0wAg+P9dLXz+KtiEkQrqI9gr5tgg4E=
+	t=1770244058; cv=none; b=g4dYcIKVZ1e6Ww3o1FfkRa7/108KXuqaHh+OdzPPObjbE7GLc/ooWFvsmJYnwsjWGnK//9FLimTqLNLYh7gj6prdu25CCBquZy2tmvsumqSpLOHyyhxCono9HUx40m1M+umRgf8tfeykzhmLNcfwOrDihwygDjfHwU6yan+vfjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770243999; c=relaxed/simple;
-	bh=3YsRs7pmH0OKV5SVBmZ3QMvXXaZdZ5j8pzZikqy0B8k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lkVEaOp/MulE0ObEhXScn4zgEMmiaE5a5U+8Jo7txhIBwirf1o1XKBqtRhT1FvOuMGf/uP8GTkeDjs09jzC2RmGsuEAvrwRRcmc2WAwxPTMtmqwP4u+Y13NHGiTnG6+NuyoJMX2fGdKs1F9AXg+E3zdFu2hhS7Si+4Y4OGYmhuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jOu0LD/B; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YBb76XbTs10K5UGRcrXyjymL5gOXGKQMYpuyBZHPFXk=; b=jOu0LD/BkldhAJq+u9wKjguWef
-	ZFm0IBCkNyDdOBVt1B85H0vb/6JVrJokFjjKGrVtPS/tf0atzMvL338oM4gQxhlDjOYN4k5YSa9it
-	qxkGwKlGFdcYmCQob7xbVtFvLgf+peJ7cXRsXHKfNckjQJ4PJcyCFhfeiHsaM9HXVPdWMXwLEoldk
-	E7wl/EHPCIf274H7XC+Iz6Po0crHg96G/2YPm0m8wIsEfidXx2p/ewWAFyEKxZmbmzySZ/fizE2eC
-	/7jxc8HtUx2VLYG0C/wBm8mJKrGoNVUl1mcZDBVYXwGFtNrrmdqzGAkR2pFUxEJEpaUVoee6VHk2J
-	ZlsAPnUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56420)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vnlKN-000000006kE-07W2;
-	Wed, 04 Feb 2026 22:26:27 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vnlKI-000000005kv-0AB7;
-	Wed, 04 Feb 2026 22:26:22 +0000
-Date: Wed, 4 Feb 2026 22:26:21 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 5/6] net: stmmac: rk: use rk_encode_wm16() for
- clock selection
-Message-ID: <aYPHjS0wrtXlRb1a@shell.armlinux.org.uk>
-References: <aYMN2gZMfLPKuukG@shell.armlinux.org.uk>
- <E1vnYy6-00000007hp9-1AJM@rmk-PC.armlinux.org.uk>
- <20297648.sWSEgdgrri@diego>
+	s=arc-20240116; t=1770244058; c=relaxed/simple;
+	bh=wZZ/SeQyb+jbaasVwUURB5k+BXkw3yx4fwjfmMYXfzk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WyJbM3qsbcrZI+offG1ZQUB2KVRY8BphoMJYdnVtkugccytNrIIzBXoySES8/7gcckgsTkwl21zY43obl19wQDS3+C0wZVXCjsNorjHXcbjSlk2KwgdaPYSkY1tLiWpVHwzBVrm96FkpzaCVleEtX/MrxJVmgI34eDEUwMy+bjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cNkCVy31; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <917eadc0-9341-48d5-a795-8a7d5318886c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770244046;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IpHQHK9ByhXjOMLtKt5IA11owJ/tFaX0XM7vmCRxYqk=;
+	b=cNkCVy31xTsJNCh2BvARgaCcHZ+Vj23CgpcBd321pKayWHu/qZAQDj5lVGQ8o9yhzQgIxN
+	mOO4I4MZ5LylIA/8wcRV/i+NAq4WlqzBSnoHP2Cmej5wwwEXNu8xamtbc33Ptcugi0SIxq
+	xbRKyBO9BfISXwf7FLEums4kmzAC+lE=
+Date: Wed, 4 Feb 2026 14:27:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20297648.sWSEgdgrri@diego>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Subject: Re: [PATCH bpf-next] bpf: Allow bpf_tcp_sock() helper in XDP
+To: afabre@cloudflare.com
+Cc: daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me,
+ ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@cloudflare.com, wferguson@cloudflare.com, martin.lau@kernel.org,
+ clm@meta.com, ihor.solodrai@linux.dev, bot+bpf-ci@kernel.org
+References: <20260204-afabre-bpf_tcp_sock-v1-1-a22b40c630c0@cloudflare.com>
+ <167a8f4235973cd42372884aa66182a10fd17e50c70626b1fa0e659933e82b4e@mail.kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <167a8f4235973cd42372884aa66182a10fd17e50c70626b1fa0e659933e82b4e@mail.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256839-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,google.com,davemloft.net,redhat.com,vger.kernel.org,cloudflare.com,meta.com];
+	TAGGED_FROM(0.00)[bounces-256840-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sntech.de:email,armlinux.org.uk:url,armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A53CECFB5
+	RCPT_COUNT_TWELVE(0.00)[26];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C630BECFCB
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026 at 11:03:51PM +0100, Heiko Stübner wrote:
-> Am Mittwoch, 4. Februar 2026, 10:14:38 Mitteleuropäische Normalzeit schrieb Russell King (Oracle):
-> > Use rk_encode_wm16() for RMII clock gating control, and also for the
-> > io_clksel bit used to select the transmit clock between CRU-derived
-> > and IO-derived clock sources.
-> > 
-> > Both of these were configured via the "set_clock_selection" method in
-> > the SoC specific operations, but there is no requirement to change the
-> > io_clksel except when enabling clocks.
-> > 
-> > It is also possible that we don't need to ungate the RMII clock if we
-> > are operating in RGMII mode, but this commit makes no change there.
-> > 
-> > Split up the configuration of these as separate functions, and remove
-> > the set_clock_selection() method. Since these clocking bits are in the
-> > same register that we call the "speed" register, move the logic for
-> > writing that register into rk_write_speed_grf_reg().
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 174 ++++++++----------
-> >  1 file changed, 75 insertions(+), 99 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> > index 4099cbc5d0de..ed9adac70f0a 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> > @@ -27,8 +27,17 @@
-> >  struct rk_priv_data;
-> >  
-> >  struct rk_clock_fields {
-> > +	/* io_clksel_cru_mask - io_clksel bit in clock GRF register which,
-> > +	 * when set, selects the tx clock from CRU.
-> > +	 */
-> > +	u16 io_clksel_cru_mask;
-> > +	/* io_clksel_io_mask - io_clksel bit in clock GRF register which,
-> > +	 * when set, selects the tx clock from IO.
-> > +	 */
+
+
+On 2/4/26 5:04 AM, bot+bpf-ci@kernel.org wrote:
+>>      But the TCP TIME-WAIT state needs special handling for this: packets
+>>      received for a TIME-WAIT socket can either belong to the current
+>>      incarnation of the connection, or a new incarnation. The only way to
+>>      determine this is to compare the sequence numbers.
+>>
+>>      Add the bpf_tcp_sock() helper in XDP to allow the socket sequence
+>>      numbers to be read.
 > 
-> nit: comment stile does not seem to follow the kernel coding style
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst#n622
+> Can this approach work for TIME-WAIT sockets? Looking at bpf_tcp_sock() in
+> net/core/filter.c:
+> 
+>      if (sk_fullsock(sk) && sk->sk_protocol == IPPROTO_TCP)
+>          return (unsigned long)sk;
+>      return (unsigned long)NULL;
+> 
+> And sk_fullsock() in include/net/sock.h:
+> 
+>      static inline bool sk_fullsock(const struct sock *sk)
+>      {
+>          return (1 << sk->sk_state) & ~(TCPF_TIME_WAIT | TCPF_NEW_SYN_RECV);
+>      }
+> 
+> TIME-WAIT sockets are explicitly excluded by sk_fullsock(), so bpf_tcp_sock()
+> returns NULL for them. The sequence numbers stored in TIME-WAIT sockets
+> (skc_tw_rcv_nxt and skc_tw_snd_nxt in sock_common) would not be accessible
+> through this helper.
+> 
+> The change itself is useful for accessing tcp_sock fields from established
+> connections in XDP, but the commit message implies this solves the TIME-WAIT
+> sequence number problem described, which doesn't appear to be the case.
 
-netdev has historically had this style which is separate from the rest
-of the kernel. The file already uses this comment style, so it is
-entirely correct to keep to the style which already exists in this
-file, rather than mixing styles and turning it into a mess.
+or use "tp = bpf_core_cast(sk, struct tcp_sock /* or tcp_timewait_sock 
+*/);". The bpf prog can also read all members of the kernel struct 
+instead of a subset defined in bpf_tcp_sock.
 
-> Reviewed-by: Heiko Stuebner <heiko@sntech.de>
-> Tested-by: Heiko Stuebner <heiko@sntech.de> #px30,rk3328,rk3568,rk3588
+pw-bot: cr
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21671977729
+> 
+> AI-authorship-score: low
+> AI-authorship-explanation: The commit message style is consistent with human-written kernel patches, with natural technical language and standard formatting; the technical error is more likely human oversight than AI hallucination.
+> issues-found: 1
+> issue-severity-score: low
+> issue-severity-explanation: The issue is a misleading commit message that claims the change enables TIME-WAIT socket sequence number reading, but the bpf_tcp_sock() helper explicitly returns NULL for TIME-WAIT sockets.
+
 
