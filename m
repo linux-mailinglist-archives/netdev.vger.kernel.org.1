@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-256636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CP/sAWAPg2kPhQMAu9opvQ
-	(envelope-from <netdev+bounces-256636-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:20:32 +0100
+	id aJnmNRQOg2k+hAMAu9opvQ
+	(envelope-from <netdev+bounces-256637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:15:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 574E9E3C1F
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:20:31 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88BD8E3A7A
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 10:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3551309C495
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:14:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 19BE130041FE
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 09:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3078D3A1CE8;
-	Wed,  4 Feb 2026 09:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8103A1D00;
+	Wed,  4 Feb 2026 09:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MpeKsPOH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="O2Q3jVKe"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE9F221FAC
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 09:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572C73A1CE8
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 09:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770196494; cv=none; b=AwFnsQkq3YtVKlwQkhgkUJW+vHrK3HxluXJKSrVkscepYdVm+iRnIKy395GNaz/qak99ahIktv/A2Lf6Crua/qo0uswXSHvEUmLiUaPWjj+/ze+PxNdQ0WDK6+jo2tQ0bcV0Z/4BKcGO4vuqm/S9LXmXF4OuI0n47zvnKHlpQrQ=
+	t=1770196496; cv=none; b=Iec9OkDg0z165en1fhW1cRllVmdPno0+ZN3s/sCTFxxLerB78CTdA6WeWLn38p2fCXmdZfATXaqyQycANTkzMQVLpv0ogduMDEBarI/OlZQRpzV7+2Bif3PCXhaqo7ZfcMaK6U4oA041QE7mygQNbUsqnghIEdHbXPg3OgpanWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770196494; c=relaxed/simple;
-	bh=CthkjCvk2GkANmMOX0JArzqkLBIBoNuk5aZMDeDgerg=;
+	s=arc-20240116; t=1770196496; c=relaxed/simple;
+	bh=DzSwMNnzTZttyqJrqT5WhSuWzbLNY2hH1uC5tIdckKk=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=AmcB2dMtdsHaV6OFfDuGjrbv8wBlHf9pQWAXWoL/gmDF376l3soTi+NQq6dLKkXjSid5Pr+R4prJHvFCUbSoQ8LKL9HeWoaSWtOLKw8YMwDrLxYeqgOAD3n/JfXiqiCiBiPvGaKP6cjAAB8HZB/yxPuimDDkXmTG4tnTgH1h3sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MpeKsPOH; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=cGvMQVTX4ncXetkoSYL/Bh0RsQ9xAhRxy74uzC5P0yKlRwlMRo21ju5HyFc92YwlJrF+66POoezpEpwFhgz9GczzznF0ux5nTlv0b31ijlk53DFLvR69bEQfg5V3A7xiQCWqlX4MpP1fRxZ8k6gaZNwVu9Urut+zwwC1w9kSHmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=O2Q3jVKe; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OWWH8V+ZlDttYyvxxWRefOl5hl45kTZOOVOki6AL2l8=; b=MpeKsPOHsTZyc9PxJJFhPTUafA
-	9NtHEh2M9OhwCaTdUeptY17IlJZ6vcLcaQr7XL47CMw5nryXwWtIKZcPLchz0NbQFIBEJ4wzOWvnp
-	7+TtDUAoZw4GBmYAMtnctnQhX528iiWuyQhlJoIKYjS4YUg4xAaeFM7CMX7/a2MuDnX3DF+bPcgjc
-	Xr8RWxOvE0Wy6+oR9TFcTEoEKuCq+y0laXNxBUsqRIK/7ycltogVN9OB5TJq/2OcFBmqFXQjZM2I1
-	eaLp8uHC8Tq+ItxrgHMro+t2p+W4ftitTKpqmgQy4oRKyayHoB0R13JlksBsGUnL6ADaby3yRWUf3
-	371Ac3+Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33842 helo=rmk-PC.armlinux.org.uk)
+	bh=Y6dlgoRHjx66lgZqNMuli3rgvrxz6BUSIrWxPeT/c5s=; b=O2Q3jVKeL/jgZ8S120Os91RI91
+	4gEw8lqRQMCx6E6ZfDfbYslapbH680WdHMur0zF+bFtPR2aLSztWy7h0UJci9UvwGCaEMgcUZ6C+r
+	Hk5zenUfAh6EBBgAp3dSaGPN3zYtcoDRm+9ZCGbbGBzKXxuQL1Eaiis43w4Cg7wRDJPQMITexhohH
+	qjsnK+ABTA9MbzkeVqBW4bsh6LK/9HfnamfVWjJkhRRPCQ/jgNQpBdJZJyFZlcqbwbyXlhPGV1Sb5
+	txyZJm4Ea0w0ycFKisFq6GWwF2z0fpyg2iB/64+J2t+Sj2W2VV/yG+E9v6IvrH7fZbBE9sv5Z3P6r
+	djRfqaQA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33844 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vnYy7-0000000067X-2rRi;
-	Wed, 04 Feb 2026 09:14:39 +0000
+	id 1vnYyD-0000000067o-0stw;
+	Wed, 04 Feb 2026 09:14:45 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vnYy6-00000007hp9-1AJM;
-	Wed, 04 Feb 2026 09:14:38 +0000
+	id 1vnYyB-00000007hpF-1dwK;
+	Wed, 04 Feb 2026 09:14:43 +0000
 In-Reply-To: <aYMN2gZMfLPKuukG@shell.armlinux.org.uk>
 References: <aYMN2gZMfLPKuukG@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -71,8 +71,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 5/6] net: stmmac: rk: use rk_encode_wm16() for clock
- selection
+Subject: [PATCH net-next 6/6] net: stmmac: rk: rk3506, rk3528 and rk3588 have
+ rmii_mode in clock register
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,20 +82,20 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vnYy6-00000007hp9-1AJM@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vnYyB-00000007hpF-1dwK@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 04 Feb 2026 09:14:38 +0000
+Date: Wed, 04 Feb 2026 09:14:43 +0000
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256636-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-256637-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCPT_COUNT_TWELVE(0.00)[12];
@@ -103,368 +103,217 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-0.978];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 574E9E3C1F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 88BD8E3A7A
 X-Rspamd-Action: no action
 
-Use rk_encode_wm16() for RMII clock gating control, and also for the
-io_clksel bit used to select the transmit clock between CRU-derived
-and IO-derived clock sources.
+rk3506, rk3528 and rk3588 have the rmii_mode bit in the clock GRF
+register rather than the gmac GRF register. Provide a mask for this
+field in the clock register, and convert these SoCs to use this.
+Add the necessary code in rk_gmac_powerup() to write this field.
 
-Both of these were configured via the "set_clock_selection" method in
-the SoC specific operations, but there is no requirement to change the
-io_clksel except when enabling clocks.
-
-It is also possible that we don't need to ungate the RMII clock if we
-are operating in RGMII mode, but this commit makes no change there.
-
-Split up the configuration of these as separate functions, and remove
-the set_clock_selection() method. Since these clocking bits are in the
-same register that we call the "speed" register, move the logic for
-writing that register into rk_write_speed_grf_reg().
+This allows us to get rid of these SoCs set_to_rmii() function. As
+such, we need to mark these SoCs as supporting RMII mode.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 174 ++++++++----------
- 1 file changed, 75 insertions(+), 99 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 64 +++++++------------
+ 1 file changed, 24 insertions(+), 40 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 4099cbc5d0de..ed9adac70f0a 100644
+index ed9adac70f0a..b0441a368cb1 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -27,8 +27,17 @@
- struct rk_priv_data;
- 
- struct rk_clock_fields {
-+	/* io_clksel_cru_mask - io_clksel bit in clock GRF register which,
-+	 * when set, selects the tx clock from CRU.
-+	 */
-+	u16 io_clksel_cru_mask;
-+	/* io_clksel_io_mask - io_clksel bit in clock GRF register which,
-+	 * when set, selects the tx clock from IO.
-+	 */
-+	u16 io_clksel_io_mask;
+@@ -38,6 +38,7 @@ struct rk_clock_fields {
  	u16 gmii_clk_sel_mask;
  	u16 rmii_clk_sel_mask;
-+	u16 rmii_gate_en_mask;
+ 	u16 rmii_gate_en_mask;
++	u16 rmii_mode_mask;
  	u16 mac_speed_mask;
  };
  
-@@ -39,8 +48,6 @@ struct rk_gmac_ops {
- 	void (*set_to_rmii)(struct rk_priv_data *bsp_priv);
- 	int (*set_speed)(struct rk_priv_data *bsp_priv,
- 			 phy_interface_t interface, int speed);
--	void (*set_clock_selection)(struct rk_priv_data *bsp_priv, bool input,
--				    bool enable);
- 	void (*integrated_phy_powerup)(struct rk_priv_data *bsp_priv);
- 	void (*integrated_phy_powerdown)(struct rk_priv_data *bsp_priv);
- 
-@@ -171,6 +178,54 @@ static int rk_write_clock_grf_reg(struct rk_priv_data *bsp_priv, u32 val)
- 	return regmap_write(regmap, bsp_priv->clock_grf_reg, val);
+@@ -708,21 +709,15 @@ static int rk3506_init(struct rk_priv_data *bsp_priv)
+ 	}
  }
  
-+static int rk_set_rmii_gate_en(struct rk_priv_data *bsp_priv, bool state)
-+{
-+	u32 val;
-+
-+	if (!bsp_priv->clock.rmii_gate_en_mask)
-+		return 0;
-+
-+	val = rk_encode_wm16(state, bsp_priv->clock.rmii_gate_en_mask);
-+
-+	return rk_write_clock_grf_reg(bsp_priv, val);
-+}
-+
-+static int rk_ungate_rmii_clock(struct rk_priv_data *bsp_priv)
-+{
-+	return rk_set_rmii_gate_en(bsp_priv, false);
-+}
-+
-+static int rk_gate_rmii_clock(struct rk_priv_data *bsp_priv)
-+{
-+	return rk_set_rmii_gate_en(bsp_priv, true);
-+}
-+
-+static int rk_configure_io_clksel(struct rk_priv_data *bsp_priv)
-+{
-+	bool io, cru;
-+	u32 val;
-+
-+	if (!bsp_priv->clock.io_clksel_io_mask &&
-+	    !bsp_priv->clock.io_clksel_cru_mask)
-+		return 0;
-+
-+	io = bsp_priv->clock_input;
-+	cru = !io;
-+
-+	/* The io_clksel configuration can be either:
-+	 *  0=CRU, 1=IO (rk3506, rk3520, rk3576) or
-+	 *  0=IO, 1=CRU (rk3588)
-+	 * where CRU means the transmit clock comes from the CRU and IO
-+	 * means the transmit clock comes from IO.
-+	 *
-+	 * Handle this by having two masks.
-+	 */
-+	val = rk_encode_wm16(io, bsp_priv->clock.io_clksel_io_mask) |
-+	      rk_encode_wm16(cru, bsp_priv->clock.io_clksel_cru_mask);
-+
-+	return rk_write_clock_grf_reg(bsp_priv, val);
-+}
-+
- static int rk_set_clk_mac_speed(struct rk_priv_data *bsp_priv,
- 				phy_interface_t interface, int speed)
- {
-@@ -637,12 +692,6 @@ static const struct rk_gmac_ops rk3399_ops = {
- 
- #define RK3506_GMAC_RMII_MODE		GRF_BIT(1)
- 
--#define RK3506_GMAC_CLK_SELECT_CRU	GRF_CLR_BIT(5)
--#define RK3506_GMAC_CLK_SELECT_IO	GRF_BIT(5)
--
--#define RK3506_GMAC_CLK_RMII_GATE	GRF_BIT(2)
--#define RK3506_GMAC_CLK_RMII_NOGATE	GRF_CLR_BIT(2)
--
- static int rk3506_init(struct rk_priv_data *bsp_priv)
- {
- 	switch (bsp_priv->id) {
-@@ -667,26 +716,13 @@ static void rk3506_set_to_rmii(struct rk_priv_data *bsp_priv)
- 	regmap_write(bsp_priv->grf, offset, RK3506_GMAC_RMII_MODE);
- }
- 
--static void rk3506_set_clock_selection(struct rk_priv_data *bsp_priv,
--				       bool input, bool enable)
+-static void rk3506_set_to_rmii(struct rk_priv_data *bsp_priv)
 -{
--	unsigned int value, offset, id = bsp_priv->id;
+-	unsigned int id = bsp_priv->id, offset;
 -
 -	offset = (id == 1) ? RK3506_GRF_SOC_CON11 : RK3506_GRF_SOC_CON8;
--
--	value = input ? RK3506_GMAC_CLK_SELECT_IO :
--			RK3506_GMAC_CLK_SELECT_CRU;
--	value |= enable ? RK3506_GMAC_CLK_RMII_NOGATE :
--			  RK3506_GMAC_CLK_RMII_GATE;
--	regmap_write(bsp_priv->grf, offset, value);
+-	regmap_write(bsp_priv->grf, offset, RK3506_GMAC_RMII_MODE);
 -}
 -
  static const struct rk_gmac_ops rk3506_ops = {
  	.init = rk3506_init,
- 	.set_to_rmii = rk3506_set_to_rmii,
--	.set_clock_selection = rk3506_set_clock_selection,
+-	.set_to_rmii = rk3506_set_to_rmii,
  
-+	.clock.io_clksel_io_mask = BIT_U16(5),
+ 	.clock.io_clksel_io_mask = BIT_U16(5),
  	.clock.rmii_clk_sel_mask = BIT_U16(3),
-+	.clock.rmii_gate_en_mask = BIT_U16(2),
+ 	.clock.rmii_gate_en_mask = BIT_U16(2),
++	.clock.rmii_mode_mask = BIT_U16(1),
++
++	.supports_rmii = true,
  
  	.regs_valid = true,
  	.regs = {
-@@ -714,27 +750,22 @@ static const struct rk_gmac_ops rk3506_ops = {
- #define RK3528_GMAC1_PHY_INTF_SEL_RGMII	GRF_CLR_BIT(8)
- #define RK3528_GMAC1_PHY_INTF_SEL_RMII	GRF_BIT(8)
+@@ -746,10 +741,6 @@ static const struct rk_gmac_ops rk3506_ops = {
+ #define RK3528_GMAC_CLK_RX_DL_CFG(val)	GRF_FIELD(15, 8, val)
+ #define RK3528_GMAC_CLK_TX_DL_CFG(val)	GRF_FIELD(7, 0, val)
  
--#define RK3528_GMAC1_CLK_SELECT_CRU	GRF_CLR_BIT(12)
--#define RK3528_GMAC1_CLK_SELECT_IO	GRF_BIT(12)
--
--#define RK3528_GMAC0_CLK_RMII_GATE	GRF_BIT(2)
--#define RK3528_GMAC0_CLK_RMII_NOGATE	GRF_CLR_BIT(2)
--#define RK3528_GMAC1_CLK_RMII_GATE	GRF_BIT(9)
--#define RK3528_GMAC1_CLK_RMII_NOGATE	GRF_CLR_BIT(9)
+-#define RK3528_GMAC0_PHY_INTF_SEL_RMII	GRF_BIT(1)
+-#define RK3528_GMAC1_PHY_INTF_SEL_RGMII	GRF_CLR_BIT(8)
+-#define RK3528_GMAC1_PHY_INTF_SEL_RMII	GRF_BIT(8)
 -
  static int rk3528_init(struct rk_priv_data *bsp_priv)
  {
  	switch (bsp_priv->id) {
- 	case 0:
+@@ -757,6 +748,7 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
  		bsp_priv->clock_grf_reg = RK3528_VO_GRF_GMAC_CON;
  		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(3);
-+		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(2);
+ 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(2);
++		bsp_priv->clock.rmii_mode_mask = BIT_U16(1);
  		bsp_priv->supports_rgmii = false;
  		return 0;
  
- 	case 1:
- 		bsp_priv->clock_grf_reg = RK3528_VPU_GRF_GMAC_CON5;
-+		bsp_priv->clock.io_clksel_io_mask = BIT_U16(12);
+@@ -766,6 +758,7 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
  		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(11, 10);
  		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(10);
-+		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(9);
+ 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(9);
++		bsp_priv->clock.rmii_mode_mask = BIT_U16(8);
  		return 0;
  
  	default:
-@@ -766,24 +797,6 @@ static void rk3528_set_to_rmii(struct rk_priv_data *bsp_priv)
- 			     RK3528_GMAC0_PHY_INTF_SEL_RMII);
+@@ -776,9 +769,6 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
+ static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
+ 				int tx_delay, int rx_delay)
+ {
+-	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
+-		     RK3528_GMAC1_PHY_INTF_SEL_RGMII);
+-
+ 	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
+ 		     DELAY_ENABLE(RK3528, tx_delay, rx_delay));
+ 
+@@ -787,16 +777,6 @@ static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
+ 		     RK3528_GMAC_CLK_TX_DL_CFG(tx_delay));
  }
  
--static void rk3528_set_clock_selection(struct rk_priv_data *bsp_priv,
--				       bool input, bool enable)
+-static void rk3528_set_to_rmii(struct rk_priv_data *bsp_priv)
 -{
--	unsigned int val;
--
--	if (bsp_priv->id == 1) {
--		val = input ? RK3528_GMAC1_CLK_SELECT_IO :
--			      RK3528_GMAC1_CLK_SELECT_CRU;
--		val |= enable ? RK3528_GMAC1_CLK_RMII_NOGATE :
--				RK3528_GMAC1_CLK_RMII_GATE;
--		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5, val);
--	} else {
--		val = enable ? RK3528_GMAC0_CLK_RMII_NOGATE :
--			       RK3528_GMAC0_CLK_RMII_GATE;
--		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON, val);
--	}
+-	if (bsp_priv->id == 1)
+-		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
+-			     RK3528_GMAC1_PHY_INTF_SEL_RMII);
+-	else
+-		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON,
+-			     RK3528_GMAC0_PHY_INTF_SEL_RMII);
 -}
 -
  static void rk3528_integrated_phy_powerup(struct rk_priv_data *bsp_priv)
  {
  	rk_gmac_integrated_fephy_powerup(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-@@ -798,7 +811,6 @@ static const struct rk_gmac_ops rk3528_ops = {
+@@ -810,9 +790,11 @@ static void rk3528_integrated_phy_powerdown(struct rk_priv_data *bsp_priv)
+ static const struct rk_gmac_ops rk3528_ops = {
  	.init = rk3528_init,
  	.set_to_rgmii = rk3528_set_to_rgmii,
- 	.set_to_rmii = rk3528_set_to_rmii,
--	.set_clock_selection = rk3528_set_clock_selection,
+-	.set_to_rmii = rk3528_set_to_rmii,
  	.integrated_phy_powerup = rk3528_integrated_phy_powerup,
  	.integrated_phy_powerdown = rk3528_integrated_phy_powerdown,
++
++	.supports_rmii = true,
++
  	.regs_valid = true,
-@@ -896,12 +908,6 @@ static const struct rk_gmac_ops rk3568_ops = {
- #define RK3576_GRF_GMAC_CON0			0X0020
- #define RK3576_GRF_GMAC_CON1			0X0024
+ 	.regs = {
+ 		0xffbd0000, /* gmac0 */
+@@ -988,9 +970,6 @@ static const struct rk_gmac_ops rk3576_ops = {
+ #define RK3588_GRF_GMAC_CON0			0X0008
+ #define RK3588_GRF_CLK_CON1			0X0070
  
--#define RK3576_GMAC_CLK_SELECT_IO		GRF_BIT(7)
--#define RK3576_GMAC_CLK_SELECT_CRU		GRF_CLR_BIT(7)
--
--#define RK3576_GMAC_CLK_RMII_GATE		GRF_BIT(4)
--#define RK3576_GMAC_CLK_RMII_NOGATE		GRF_CLR_BIT(4)
--
- static int rk3576_init(struct rk_priv_data *bsp_priv)
- {
- 	switch (bsp_priv->id) {
-@@ -943,31 +949,16 @@ static void rk3576_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 		     RK3576_GMAC_CLK_RX_DL_CFG(rx_delay));
- }
- 
--static void rk3576_set_clock_selection(struct rk_priv_data *bsp_priv, bool input,
--				       bool enable)
--{
--	unsigned int val = input ? RK3576_GMAC_CLK_SELECT_IO :
--				   RK3576_GMAC_CLK_SELECT_CRU;
--	unsigned int offset_con;
--
--	val |= enable ? RK3576_GMAC_CLK_RMII_NOGATE :
--			RK3576_GMAC_CLK_RMII_GATE;
--
--	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
--					 RK3576_GRF_GMAC_CON0;
--
--	regmap_write(bsp_priv->grf, offset_con, val);
--}
--
- static const struct rk_gmac_ops rk3576_ops = {
- 	.init = rk3576_init,
- 	.set_to_rgmii = rk3576_set_to_rgmii,
--	.set_clock_selection = rk3576_set_clock_selection,
- 
- 	.gmac_rmii_mode_mask = BIT_U16(3),
- 
-+	.clock.io_clksel_io_mask = BIT_U16(7),
- 	.clock.gmii_clk_sel_mask = GENMASK_U16(6, 5),
- 	.clock.rmii_clk_sel_mask = BIT_U16(5),
-+	.clock.rmii_gate_en_mask = BIT_U16(4),
- 
- 	.supports_rmii = true,
- 
-@@ -1000,25 +991,23 @@ static const struct rk_gmac_ops rk3576_ops = {
- #define RK3588_GMAC_CLK_RMII_MODE(id)		GRF_BIT(5 * (id))
- #define RK3588_GMAC_CLK_RGMII_MODE(id)		GRF_CLR_BIT(5 * (id))
- 
--#define RK3588_GMAC_CLK_SELECT_CRU(id)		GRF_BIT(5 * (id) + 4)
--#define RK3588_GMAC_CLK_SELECT_IO(id)		GRF_CLR_BIT(5 * (id) + 4)
--
--#define RK3588_GMAC_CLK_RMII_GATE(id)		GRF_BIT(5 * (id) + 1)
--#define RK3588_GMAC_CLK_RMII_NOGATE(id)		GRF_CLR_BIT(5 * (id) + 1)
+-#define RK3588_GMAC_CLK_RMII_MODE(id)		GRF_BIT(5 * (id))
+-#define RK3588_GMAC_CLK_RGMII_MODE(id)		GRF_CLR_BIT(5 * (id))
 -
  static int rk3588_init(struct rk_priv_data *bsp_priv)
  {
  	switch (bsp_priv->id) {
- 	case 0:
- 		bsp_priv->gmac_phy_intf_sel_mask = GENMASK_U16(5, 3);
-+		bsp_priv->clock.io_clksel_cru_mask = BIT_U16(4);
+@@ -1000,6 +979,7 @@ static int rk3588_init(struct rk_priv_data *bsp_priv)
  		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(3, 2);
  		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(2);
-+		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(1);
+ 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(1);
++		bsp_priv->clock.rmii_mode_mask = BIT_U16(0);
  		return 0;
  
  	case 1:
- 		bsp_priv->gmac_phy_intf_sel_mask = GENMASK_U16(11, 9);
-+		bsp_priv->clock.io_clksel_cru_mask = BIT_U16(9);
+@@ -1008,6 +988,7 @@ static int rk3588_init(struct rk_priv_data *bsp_priv)
  		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(8, 7);
  		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(7);
-+		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(6);
+ 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(6);
++		bsp_priv->clock.rmii_mode_mask = BIT_U16(5);
  		return 0;
  
  	default:
-@@ -1052,23 +1041,10 @@ static void rk3588_set_to_rmii(struct rk_priv_data *bsp_priv)
- 		     RK3588_GMAC_CLK_RMII_MODE(bsp_priv->id));
+@@ -1023,9 +1004,6 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
+ 	offset_con = bsp_priv->id == 1 ? RK3588_GRF_GMAC_CON9 :
+ 					 RK3588_GRF_GMAC_CON8;
+ 
+-	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1,
+-		     RK3588_GMAC_CLK_RGMII_MODE(id));
+-
+ 	regmap_write(bsp_priv->grf, RK3588_GRF_GMAC_CON7,
+ 		     RK3588_GMAC_RXCLK_DLY_ENABLE(id) |
+ 		     RK3588_GMAC_TXCLK_DLY_ENABLE(id));
+@@ -1035,16 +1013,9 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
+ 		     RK3588_GMAC_CLK_TX_DL_CFG(tx_delay));
  }
  
--static void rk3588_set_clock_selection(struct rk_priv_data *bsp_priv, bool input,
--				       bool enable)
+-static void rk3588_set_to_rmii(struct rk_priv_data *bsp_priv)
 -{
--	unsigned int val = input ? RK3588_GMAC_CLK_SELECT_IO(bsp_priv->id) :
--				   RK3588_GMAC_CLK_SELECT_CRU(bsp_priv->id);
--
--	val |= enable ? RK3588_GMAC_CLK_RMII_NOGATE(bsp_priv->id) :
--			RK3588_GMAC_CLK_RMII_GATE(bsp_priv->id);
--
--	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1, val);
+-	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1,
+-		     RK3588_GMAC_CLK_RMII_MODE(bsp_priv->id));
 -}
 -
  static const struct rk_gmac_ops rk3588_ops = {
  	.init = rk3588_init,
  	.set_to_rgmii = rk3588_set_to_rgmii,
- 	.set_to_rmii = rk3588_set_to_rmii,
--	.set_clock_selection = rk3588_set_clock_selection,
+-	.set_to_rmii = rk3588_set_to_rmii,
  
  	.gmac_grf_reg_in_php = true,
  	.gmac_grf_reg = RK3588_GRF_GMAC_CON0,
-@@ -1216,19 +1192,15 @@ static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
- 			if (ret)
- 				return ret;
+@@ -1052,6 +1023,8 @@ static const struct rk_gmac_ops rk3588_ops = {
+ 	.clock_grf_reg_in_php = true,
+ 	.clock_grf_reg = RK3588_GRF_CLK_CON1,
  
--			if (bsp_priv->ops && bsp_priv->ops->set_clock_selection)
--				bsp_priv->ops->set_clock_selection(bsp_priv,
--					       bsp_priv->clock_input, true);
-+			rk_configure_io_clksel(bsp_priv);
-+			rk_ungate_rmii_clock(bsp_priv);
- 
- 			mdelay(5);
- 			bsp_priv->clk_enabled = true;
- 		}
- 	} else {
- 		if (bsp_priv->clk_enabled) {
--			if (bsp_priv->ops && bsp_priv->ops->set_clock_selection) {
--				bsp_priv->ops->set_clock_selection(bsp_priv,
--					      bsp_priv->clock_input, false);
--			}
-+			rk_gate_rmii_clock(bsp_priv);
- 
- 			clk_bulk_disable_unprepare(bsp_priv->num_clks,
- 						   bsp_priv->clks);
-@@ -1395,6 +1367,10 @@ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
++	.supports_rmii = true,
++
+ 	.php_grf_required = true,
+ 	.regs_valid = true,
+ 	.regs = {
+@@ -1432,6 +1405,17 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
  		}
  	}
  
-+	if (bsp_priv->clock.io_clksel_cru_mask &&
-+	    bsp_priv->clock.io_clksel_io_mask)
-+		dev_warn(dev, "both CRU and IO io_clksel masks should not be populated - driver may malfunction\n");
++	if (bsp_priv->clock.rmii_mode_mask) {
++		val = rk_encode_wm16(intf == PHY_INTF_SEL_RMII,
++				     bsp_priv->clock.rmii_mode_mask);
 +
- 	return bsp_priv;
- }
- 
++		ret = rk_write_clock_grf_reg(bsp_priv, val);
++		if (ret < 0) {
++			gmac_clk_enable(bsp_priv, false);
++			return ret;
++		}
++	}
++
+ 	/*rmii or rgmii*/
+ 	switch (bsp_priv->phy_iface) {
+ 	case PHY_INTERFACE_MODE_RGMII:
 -- 
 2.47.3
 
