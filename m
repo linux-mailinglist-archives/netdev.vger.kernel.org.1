@@ -1,183 +1,210 @@
-Return-Path: <netdev+bounces-256594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256595-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBsIO+rwgmmWfQMAu9opvQ
-	(envelope-from <netdev+bounces-256594-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:10:34 +0100
+	id MD8BK0jxgmmWfQMAu9opvQ
+	(envelope-from <netdev+bounces-256595-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:12:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D679E28AB
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:10:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C01DE28D0
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 08:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9CB72301E3FB
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 07:10:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D377F301C5A4
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 07:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADB435A943;
-	Wed,  4 Feb 2026 07:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2DE37F728;
+	Wed,  4 Feb 2026 07:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="w25Q6ktj"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="nrCTIdAB"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EF6261B96;
-	Wed,  4 Feb 2026 07:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3659A359FB8
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 07:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770189031; cv=none; b=uCJpxD2t7CYRKv0mMhJBoBbBNa7fdsHokfTc70QDBBkJwH6HYnbWwCCLizpZHYHhccSoLAtAfZFKay+95FMopO39VwR1IourJ7BbTI9s1uwlL2pn7XQZuHgWc7PHKHNmZd++SmKeKel69vZ/kaNskGL6WBa2mpEFIyAACAiHw1E=
+	t=1770189124; cv=none; b=cE9tROhS094x1wOY00QsjNQD2HLF12C6CKEwf5KbsFn19UYVKj8BXYvbN1xqfUqf898JINf9AQ2QAP5rO7hwPmX6dlrarc/yXg6qOJAFubZ1p6Pvi90zndQONqRrmlF0FyZMh0f53qZ15v5EaZGVp5iOtHNfvzb2g19/hMpDVGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770189031; c=relaxed/simple;
-	bh=i4eVoECIVUB5i06EYRcLvDDUR0F0teIfziDI2VSoKaw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HLqsz/u8xppCIZpe5kPSZlNV8RRqFrC3m3A/bfSsv4PmBcAPF/FllWmlNhn4wgAixfiFGJCryzd0fF1UJBbizKtZyLlJ50DKeHJK4pegMVgs0z+j9JpvMaXIpo0khu5XtVdKdkQabSa6Th2FmkTU8DrjQqVrR0Po4PmH3MFNH0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=w25Q6ktj; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 61479tJfA2605405, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1770188996;
-	bh=i4eVoECIVUB5i06EYRcLvDDUR0F0teIfziDI2VSoKaw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=w25Q6ktjaUOQoBdfP7rMOuiex1eYfoEANOvyOcVnXz2xU5Jc6t4IyHHHmueeH66cV
-	 svCYKXGH646YehNj4i5EJb9BI+R31emK9BfX7zyV1pE6SK3/ENr0Dl2XibZv187ZqQ
-	 ysv+UxW8C/3nIEpfH/9SDYP66ZoCgBptO9v8hwdzYlmNM4cX+Gpvtx/u66La0kPMqc
-	 GewIRJ9AcQfG0SJGJb5s/I4luhBcjVHHmIhlCqt4PQtlQGnZcsPp8g3CzWgZcKyPwY
-	 D8SpDzg590fOczBsGCvN3OWUTQSyHopUmOPhgg4YabRty7IB8kSB37+hpjyc23nk+v
-	 Qm7q7aAfS3w9w==
-Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 61479tJfA2605405
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 4 Feb 2026 15:09:56 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Wed, 4 Feb 2026 15:09:56 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Wed, 4 Feb 2026 15:09:56 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <horms@kernel.org>, <javen_xu@realsil.com.cn>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <nic_swsd@realtek.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3] r8169: add support for RTL8125cp
-Date: Wed, 4 Feb 2026 15:09:55 +0800
-Message-ID: <20260204070955.1473-1-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <81407a61-1e6a-436c-83f3-fc403a706af6@gmail.com>
-References: <81407a61-1e6a-436c-83f3-fc403a706af6@gmail.com>
+	s=arc-20240116; t=1770189124; c=relaxed/simple;
+	bh=i2gmBapXr7BeRcHIh6yZN89wQPgVWerFuKcVi5666t4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZOzKEBxRRCge2sUJYf+4f9gBNWLgBe0FkBfCW+a+G5n/lOSxSdeH4ekAEp/3k/TXOoV02vHLQu6dJnbZNCYeJ9Mr7b4S3fOgCZ20QEwUd4eSmS3P13l8qPXT4CruSjZd/D8xPLnP6FFozTGhT6zd4HcKeTQUjw0egxOVwCWCBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=nrCTIdAB; arc=none smtp.client-ip=209.85.128.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso3487795e9.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 23:12:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1770189122; x=1770793922; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sRhtrQ9/jhzrEfyf0zU6+VS4W6Vs4vnnpMJiEJhAMj4=;
+        b=nrCTIdABlWzStCVMICGz7awLjOO+9UZnyaadW3I1z2UFc7Qg++Ql4kotKvZ3TU8BLB
+         JhrTNOnjdFe++8hMp5uvfUU6H2HT24jRMLT8fPoRch4QdQz8yVe58F0jjIz7i3Wt33oN
+         23jPohArNx1cRghEm+UEkz7baPSQ2JEJVn7JFqsUyy1w2XoH0TlaK0gH4wByDSatc/mB
+         fUjwaUt+40Lgvdo4a7p2uK51zApMYCs2sRFtKi2PqG5tUInlrIECT/XaA0Zi1qM/J8Ef
+         yeqxNSLulBoar3+VgdqMSdDhY2NDpJkQuGyxO3AMESaHfVBRSO+ilwpZqW6eK5p2bmU1
+         IuIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770189122; x=1770793922;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sRhtrQ9/jhzrEfyf0zU6+VS4W6Vs4vnnpMJiEJhAMj4=;
+        b=LVhplKqtjuVyZxUh1A/pbn+RbbDweOXy8q/mm/JtDjMvZ57T3RW0Gx+p5n6gEaNbY7
+         XLOmb4OOFwrVbaBAbluGmFt+IX4r0uBHJrGoh2nO/3XGRstChN7XWuZAFDowmgWC3q8i
+         jTVY4pcq3aL2lDxqY7WybzsDX6xYyQOS0UA8davO2H1XFHTqsvYvkOCcWTfbaKTo/ZnO
+         +R4Yd0ZSkMFQYDez94ufigLzqTXRigTpcLCnG2vbOEaUfB7US9fjoUJF175XQSR7mFPF
+         AtLnnWGJLDynUBt62kqOCD9qBiciBCe6dDAq4K99J/zkr4D2juvUlaGzHKL5vnKFp9qQ
+         WaVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjnTfBGckaxp3t1yRbJphMMISR1CX4ezl2ey8ws7OY5n/lKihY+sQoYE7JyrK29gTCseBtjdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgEi5mmzHVQqH89+6KMOxc/ih7wTuS7dRXLlzQ3jsF1JTW9/1K
+	Ps+3Uv1XrXNaA4WVE8pQTR/qGgCmOEktr7bPsmkE7Z5cEju+UAzli4+rdySFLeHS+0g=
+X-Gm-Gg: AZuq6aL1runuB/vi6xknpFVFChlk323wwxAStuTFKMO2irB4WBJ52PlN1ovZEIpd+RF
+	28ib0gQmzMrzEs1C2EPZ5GnNg2oFKqsJZJlPPBowdn//JPnDiazmvJVM0wGuTzE+lu2CTVAka+b
+	u5YGwwuwIn/2Cj+UD/dNv8XIh5uKIwPoYvybloBvNFlL2PuAKZxOapvLovYmBbjLy+OMl1LFagS
+	YkhKXbu8mb7/jOi0PwwD4iyX9eLe1tPlOihksjIRxaBfSpV7HhfugoZsjNY4ZI2lnP1xuHd0wvI
+	LCshQcwXZkiJ+Ej5H0rLwjjedIEi5LdEZzWouiie+AH7DodX7EDtyE8JyZ29O7AGh/dR60doIwQ
+	HATeMCqEULXZJpgvSgU0dZVu9+M83JaP5OS3dniAphCY1ambS338XkhWy732W6VcdjRLzbfClxZ
+	0ya3YN2qZQ1WwVZ3dBD0uRF3tfZCcYSKs=
+X-Received: by 2002:a05:600c:8b30:b0:47d:264e:b435 with SMTP id 5b1f17b1804b1-4830e96ada6mr26786065e9.22.1770189122438;
+        Tue, 03 Feb 2026 23:12:02 -0800 (PST)
+Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:9519:b02d:f49f:3f52])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617e38ec5sm4645607f8f.14.2026.02.03.23.12.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 23:12:02 -0800 (PST)
+Date: Wed, 4 Feb 2026 08:12:00 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Randy Dunlap <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, 
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next V7 01/14] documentation: networking: add shared
+ devlink documentation
+Message-ID: <3edheaanzxgutuyryorfzlfjvizlorpj4y3ard5js7mp44hfii@4a36de6wazfd>
+References: <20260128112544.1661250-1-tariqt@nvidia.com>
+ <20260128112544.1661250-2-tariqt@nvidia.com>
+ <20260202194023.412bb454@kernel.org>
+ <u7uicnxkcirhacpzjimss2pqsuhbngg4ticqrz45iqchkk2ha2@t3eem6w6hhur>
+ <20260203190105.2cc28e71@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260203190105.2cc28e71@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256594-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256595-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid]
-X-Rspamd-Queue-Id: 1D679E28AB
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[nvidia.com,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,kernel.org,vger.kernel.org,infradead.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0C01DE28D0
 X-Rspamd-Action: no action
 
->On 2/3/2026 8:58 AM, javen wrote:=0D
->>>> On 2/2/2026 11:58 AM, javen wrote:=0D
->>=0D
->>>> From: Javen Xu <javen_xu@realsil.com.cn>=0D
->>=0D
->>>>=0D
->>=0D
->>>> This patch adds support for chip RTL8125cp. Its XID is 0x708. We apply=
-=0D
->>=0D
->>>> different and firmware for RTL8125cp.=0D
->>=0D
->>>>=0D
->>=0D
->>>> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>=0D
->>=0D
->>>>=0D
->>=0D
->>>> ---=0D
->>=0D
->>>> v2: This patch fix one mistake on phy_modify_paged(phydev, 0xa43,=0D
->>=0D
->>>> 0x10, 0x0000, 0x1001) which is phy_modify_paged(phydev, 0xa43, 0x00, 0=
-x0000, 0x1001) on patch v1.=0D
->>=0D
->>>>=0D
->>=0D
->>>> v3: Set phy_modify_paged(phydev, 0xa43, 0x10, 0x0000, 0x0003), bit 0=0D
->>=0D
->>>> means 'link speed 10m PLL OFF', bit 1 means 'ALDPS PLL OFF', bit 2=0D
->>=0D
->>>> means 'ENABLE ALDPS', bit 12 means 'ALDPS XTAL OFF'.=0D
->>=0D
->>>=0D
->>=0D
->>> ALDPS is disabled two lines later in rtl8125cp_hw_phy_config().=0D
->>=0D
->>> So why bother with ALDPS settings if ALDPS is disabled anyway?=0D
->>=0D
->>=0D
->>=0D
->> Bit 2 means 'ENABLE ALDPS', we prefer to treat it as a master switch tha=
-t controls=0D
->>=0D
->> some sub-features like bit 1(ALDPS PLL OFF) and bit 12(ALDPS XTAL OFF), =
-instead of=0D
->>=0D
->> controlling these sub-features individually. And bit 0(link speed 10m PL=
-L OFF)=0D
->>=0D
->> has noting to do with aldps.=0D
->>=0D
->I see, you changed the value of a43/10 to 0x0003 in v3. Then just this que=
-stion:=0D
->Few lines later ALDPS gets disabled, so is it beneficial to set bit 1 here=
-?=0D
->Thanks for mentioning that bit 0 isn't related to ALDPS.=0D
->=0D
-Bit 2 acts like a lock that controls bit 1. If bit 2 =3D 0, bit 1 has no ef=
-fect even if set,=0D
-so pre-setting bit 1 causes no side effects. The reason why we set bit 1 he=
-re is that If we =0D
-need to enable bit1(aldps pll off) later, just set bit 2 to enable aldps wi=
-thout any additional=0D
-bits write(means we do not need to set bit 1 again). =0D
-Alternatively, you can view this as initialization related to aldps. if ald=
-ps(bit 2) is enabled later,=0D
-these related functions will be enabled at the same time(like bit 1).=0D
-=0D
-Thanks,=0D
-Javen Xu=
+Wed, Feb 04, 2026 at 04:01:05AM +0100, kuba@kernel.org wrote:
+>On Tue, 3 Feb 2026 10:18:22 +0100 Jiri Pirko wrote:
+>> Tue, Feb 03, 2026 at 04:40:23AM +0100, kuba@kernel.org wrote:
+>> >There needs to be a note here clearly stating the the use of "shared
+>> >devlink instace" is a hack for legacy drivers, and new drivers should
+>> >have a single devlink instance for the entire device. The fact that
+>> >single instance is always preferred, and *more correct* must be made
+>> >very clear to the reader. Ideally the single instance multiple function
+>> >implementation would leverage the infra added here for collecting the
+>> >functions, however.  
+>> 
+>> How exactly you can have a single devlink instance for multiple PFs of a
+>> same device? I don't really understand how that could work, considering
+>> dynamic binds/unbinds of the PFs within single host and/or multiple VMs
+>> passing PFs to.
+>
+>The same way you currently gather up the devlink instances to create
+>the shared instance.
+
+What's the backing device / handle (busname/devname)? Best would be to
+draw a picture, as always :)
+
+
+>
+>> >> +The implementation uses:
+>> >> +
+>> >> +* **Faux device**: Virtual device backing the shared devlink instance  
+>> >
+>> >"backing"? It isn't backing anything, its just another hack because we
+>> >made the mistake of tying devlink instances to $bus/$device as an id.
+>> >Now we need a fake device to have an identifier.  
+>> 
+>> Okay. I originally wanted to use an id, similar to what we have in
+>> the dpll. However I was forced by community to tie the instance to
+>> bus/device. It is how it is, any idea how to relax this bond?
+>
+>Interesting! I was curious to research how we ended up here, found this:
+>https://lore.kernel.org/netdev/20160225225803.GA2191@nanopsycho.orion/
+>My reading is that Hannes was arguing against the _NAME attribute but
+>both _NAME and _INDEX were deleted? I think there's nothing wrong with
+>an index.
+
+He argues for "stable topology indentifiers", which randomly assigned
+index is not.
+
+
+>
+>FWIW using devlink day to day, the bus/device is not at all useful as
+>an identifier. Most of code touching devlink at Meta either matches
+>on devlink dev info or assumes there's one instance on the system.
+
+Okay, what's your suggestion going foreward then?
+
+
+>
+>> >> +Similarly to other nested devlink instance relationships, devlink lock of
+>> >> +the shared instance should be always taken after the devlink lock of PF.  
+>> >
+>> >of an instance, not a PF  
+>> 
+>> lock of PF devlink instance. I think that is what the text says, no?
+>
+>Sorry, I was trying to flag that using PF is not necessary great cause
+>we may support this on other functions in the future.
+
+You are right, will fix this.
+
+Thanks!
+
 
