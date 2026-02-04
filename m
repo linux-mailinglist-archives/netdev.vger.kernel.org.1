@@ -1,152 +1,197 @@
-Return-Path: <netdev+bounces-256819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256820-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMANMt2rg2lvsgMAu9opvQ
-	(envelope-from <netdev+bounces-256819-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:28:13 +0100
+	id oJ+gCwiwg2l1swMAu9opvQ
+	(envelope-from <netdev+bounces-256820-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:46:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 497D5EC737
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:28:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83AEBEC8BF
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 21:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75DA530210C1
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 20:25:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C75F300DF62
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 20:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C775042DFE3;
-	Wed,  4 Feb 2026 20:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A680438B98D;
+	Wed,  4 Feb 2026 20:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bKQTrs57"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PX/x6/pB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B14B42982B;
-	Wed,  4 Feb 2026 20:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE55214A64
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 20:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770236735; cv=none; b=jJVwOaHVX44gAwDBk9ZFGTOp7klPsRcSRqMX2QoaD9LcOi9FeoIniAbxVlmR1dSgW+tE+9fDCXWnEBOr2RQDpaRDZNzxCzXpJNNJzZ3aaYUhxiFRfnhMhZmhXGksbJXCiMYA37cfGu5VIbHX6JWgsu5Xy0FyVuYmj1tsPFgCEBU=
+	t=1770237957; cv=none; b=AGDeSZFfnsdDmkOuELxZhzmVCpbLrNS0IAYg4KrhMtGE61QL/mknXVXLnFj0M/tq6+uLJLlhXPMtk/NMy0h+uqh/fYcaBFf9ZpAecBrl1mEE/2Yqb2f4Bz+OZ2qsWccCTj41gNalaEb8wAoNSSJ94c1HDKl/DQFsYhsi7tqQDLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770236735; c=relaxed/simple;
-	bh=Mu7rUnAG7sN1Zo07pAjayKdb+6XBVjosqS2rDV+LOGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K0dXB3BGBwGXg8kXUjWg+BzgvqYLpgH6pXfcE0J6tM3J3D/63+1BEvOuLl3A71MlBq5YO9gfpS7JMZakdBhEZhYU0/0CzdeRnIRshVuufKTJ1QVIOHXPWYXoMj6HQxbzPpeI4d+Z3ajgtx5KChkoAlIzW3QS3uHuT+x2BNtQI84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bKQTrs57; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770236736; x=1801772736;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Mu7rUnAG7sN1Zo07pAjayKdb+6XBVjosqS2rDV+LOGA=;
-  b=bKQTrs57EaRoTZblV+kpfVionqTRZqaJF/x4YQSD5trux0QSZrrN36M/
-   ZfUJK6clttW2I+aP/7y6+1UiUoEd5k5Gn5r4UWu/yF9M7iXtiOO92N+hV
-   2iHDyEz7BhZZMWXgV64/tvugp2pPJt3MJnuTDWb1Yh7KGBPMjvv7OYzTp
-   wtod3H86xOjoCAdJyBfVenSXbJN9fq+yeWVvkywnb4wIM8vcRDv/+PEUX
-   nJ2vG5uJNMGtqpfpBSt50q2za3ryKN9hZr5E7Iy1rR358+kbQM2xmMFBP
-   R8qRH6qn/VZzs2q5zpNUZq5CooCS9PF+JgE4q5unWSDwq05ge2xvvsnAw
-   g==;
-X-CSE-ConnectionGUID: ZBsPG+tZSo2YhhlGn0mW8g==
-X-CSE-MsgGUID: iHDYbuofSt+EYwQ7yatvqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="82064591"
-X-IronPort-AV: E=Sophos;i="6.21,273,1763452800"; 
-   d="scan'208";a="82064591"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 12:25:35 -0800
-X-CSE-ConnectionGUID: jHmYirvsSl+AuzN3plx2qQ==
-X-CSE-MsgGUID: OeuJ0L8uQz+PHdJHGlAI5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,273,1763452800"; 
-   d="scan'208";a="210308305"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.188])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 12:25:30 -0800
-Date: Wed, 4 Feb 2026 22:25:27 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: NeilBrown <neil@brown.name>, Jeff Layton <jlayton@kernel.org>,
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: Re: [PATCH v2 3/3] sunrpc: Fix compilation error (`make W=1`) when
- dprintk() is no-op
-Message-ID: <aYOrN-C6R0Hniwxl@smile.fi.intel.com>
-References: <20260204094500.2443455-1-andriy.shevchenko@linux.intel.com>
- <20260204094500.2443455-4-andriy.shevchenko@linux.intel.com>
- <aYN35agQMKaIGZA0@smile.fi.intel.com>
- <aYN6zA79q6yOLFmA@smile.fi.intel.com>
- <c0af23c2-bdf1-456b-a82a-0f224d640473@oracle.com>
+	s=arc-20240116; t=1770237957; c=relaxed/simple;
+	bh=+ZPlCLyFbv56EWcS4ecmR/INDwI/6I9mXAdIgZj9ob8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=uxg3C7zwi/j6IV0IIkGYANTf0S1KZwkUGFQ6b3/mNH3+V7az8kIqezn0R1+dnBKZSoyev54MDr4Gtlzd2B7J09gkmyg+HKXv+iG6oCjh63BVwKxMi0dHVQHzKXALAxkjIs1fPF7Ep+Iu88u+AaGq93ggP7KNMchx+Bo2nUFuCtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PX/x6/pB; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7950afac0ffso9000657b3.1
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 12:45:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770237956; x=1770842756; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BmhmeFhOmptzVfU8Ket2zRg/1yOdaQIeRxT7DL1GOYw=;
+        b=PX/x6/pBMHut4DD9SVXKYhgECFLfzhOyMpGjAB287Bmag2kptOsbFFG7FzadD4UGB9
+         v+ei0TYEOoh/VV/uTREH6QKuxD7jP+Iiy+E4P2CVxiw29qp4qogNOb/JHkYs2oiwtkxR
+         BJ3iZEavABcNmrRZgM3m5SwQmHNDMzaZUYSFWOTMTCRT0WkVvPh/5iSTjJRnINqJNFXV
+         C2ZflabbN/pVckd1k2p01dymvLHbV6VR3lTIjg6oSwWncRv6m9JXOlHaR+GTw2t1NxoS
+         sFZUsf4EMkca9NXpOXmunug0dkluTni+yHmfAX7hZnbpVACRYTq6KzU1BWrTJWwAQ7mp
+         vaIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770237956; x=1770842756;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BmhmeFhOmptzVfU8Ket2zRg/1yOdaQIeRxT7DL1GOYw=;
+        b=OhUadvyz2jShU1lQlva42m8K4jBFC45gvHQzxz3/3GIY5d5l+dbb6Fa3ulE/dDhiwo
+         92T8WkPoXJyYhO5l6pvaH6M0TfMm599ysLggOCoqw91cExI5V10y0p4NY8EvJteZDgSb
+         gnXlsj3GrPJSB4DN8yLhz79GetJrNhsrF0AV4HBYcEvJwCRNkNniNlAn46P6jJVlYe/A
+         SYXAHpCECZp0jgWtZrPddUfK9NqGxc9Fe62ie7XLpBj/Nrh/4PN6dBIQhkdDp6G+8Ttc
+         GsMcckr4TMVh/4BjxOt4iAoa6bw9Jv0OnAChfIrSR7ZB28hLtixAX38i/IDn/F0OxvTs
+         gQpA==
+X-Gm-Message-State: AOJu0YyY9p5fbPW5Ca4Emkgn+wQMod8lc/lH3etlCiPc6TIxVNOy/VRt
+	3QQd6v6QmbDxNrzY1Je32MY2vP9dfu+3tEhwErEycnTbPV0mh7wV8gUY
+X-Gm-Gg: AZuq6aJ0bnnGrtr6a++OLl/hwbwHhs8zZ1mONNtzqpbEizgGjvsCu9N7EBlAHH8k1dh
+	p0tpA6e0OSqXXJdLAts5Fv3ItlwpuWqhezW7GGWKplTV7YDaFtQM0VdN6+EDEfEeInj05/OoXLA
+	qU76icRAOTyUn23dEwGqLu2F8Cf6gnA75SSB6LUTvBv5ci55gRn6YdCoFBoGZb1cCM2iSXZ5H+R
+	1iZLcTz4ZBDnQqybZp+sdzpMdzLYqnF/wlLmAWnAENhJayo/jeTQIokJSwk5ihvm1VV+DX4zH+4
+	Co4rkF3/SjtMgqwon+d96kozDawRUuhTWRsDg0FDR45j0h2vr8SFywtYcFZk9fGhb0gipZKagHF
+	S3nT1+I3yN/6A8FLI1flNc8MZwvU15fN2KCCkhB+6gLc2jEMMp9DO+cMwQjwYmbleJ3REPaJC3o
+	0GUh/l+ONgmkTeeX/1jhs0FCwO0XDXOupr+MqGJ+w/U0kNWoyve2vfKImSqKs=
+X-Received: by 2002:a05:690c:c50d:b0:794:d9f0:2375 with SMTP id 00721157ae682-7951501ef63mr5799507b3.0.1770237956288;
+        Wed, 04 Feb 2026 12:45:56 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-794fee8294csm30725247b3.2.2026.02.04.12.45.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Feb 2026 12:45:55 -0800 (PST)
+Date: Wed, 04 Feb 2026 15:45:54 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ Saeed Mahameed <saeedm@nvidia.com>, 
+ Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Mark Bloch <mbloch@nvidia.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Daniel Zahka <daniel.zahka@gmail.com>
+Message-ID: <willemdebruijn.kernel.37bf21c78aadd@gmail.com>
+In-Reply-To: <20260204-psp-v1-0-5f034e2dfa36@gmail.com>
+References: <20260204-psp-v1-0-5f034e2dfa36@gmail.com>
+Subject: Re: [PATCH net-next 0/9] psp: support rekeying psp protected tcp
+ connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0af23c2-bdf1-456b-a82a-0f224d640473@oracle.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[brown.name,kernel.org,vger.kernel.org,lists.linux.dev,redhat.com,oracle.com,talpey.com,davemloft.net,google.com,gmail.com,glider.be];
-	TAGGED_FROM(0.00)[bounces-256819-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-256820-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,lunn.ch];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,lkml,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,smile.fi.intel.com:mid]
-X-Rspamd-Queue-Id: 497D5EC737
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 83AEBEC8BF
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026 at 01:29:48PM -0500, Chuck Lever wrote:
-> On 2/4/26 11:58 AM, Andy Shevchenko wrote:
-> > On Wed, Feb 04, 2026 at 06:46:36PM +0200, Andy Shevchenko wrote:
-
-...
-
-> > Otherwise I can send a new version.
+Daniel Zahka wrote:
+> The PSP architecture spec specifies the need for rekeying connections
+> in the event of a device key rotation. After a device key rotation has
+> occurred, a new rx derived key needs to be generated and sent out to
+> the other end of the connection sometime before the next device key
+> rotation occurs.
 > 
-> Please send a full series respin, thanks.
+> Because PSP connections involve two different keys at each endpoint,
+> one for decrypting ingress traffic, and one for encrypting egress
+> traffic, there are two types of rekeying events that need to be
+> supported. From the perspective of one endpoint of the connection:
+> 
+> 1. rx rekey: we need to allocate a new spi and decryption key on the
+> current device key to provide to our peer.
+> 
+> 2. tx rekey: our peer has provided us with a new spi + encryption key
+> pair which we should use for encrypting traffic immediately.
+> 
+> In the case of rx rekeying, there is a period where it makes sense to
+> accept packets authenticated from either the previous or current
+> spi. To deal with that we allow a socket to keep a chain of a max of
+> two psp assocs at any time. If authentication state does not match the
+> most recent assoc, the previous one will be tried.
+> 
+> In the case of tx rekeying, as soon as we install the new tx key, we
+> have no use for the previous one, and it can be disposed of
+> immediately.
 
-v3 has been sent.
+So this defines a rekey event as an instant in time. An alternative
+choice is to rekey at a specific seqno.
 
--- 
-With Best Regards,
-Andy Shevchenko
+The difference matters only for retransmits.
 
+Not sure there is a strong reason for either. But probably good to
+state the choice explicitly.
 
+> The only catch, is in the case where hw uses a key handle
+> in tx descriptor state (as opposed to inlining the key directly). If
+> this is the case, psp core needs to be sure that any of these
+> unaccounted for references to key state are gone by the time it tries
+> to sync a deleted key to hw.
+> 
+> To deal with this race condition, the series includes a driver api for
+> implementing deferred tx key deletion, where the driver can signal
+> back to the core when it is safe to dispose of old tx keys.
+> 
+> Lastly, some test cases for rekeying are included that go through key
+> rotations and rekeying.
+
+Still reading the code, first pass only.
 
