@@ -1,180 +1,141 @@
-Return-Path: <netdev+bounces-256832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2KYrD1bCg2mbuAMAu9opvQ
-	(envelope-from <netdev+bounces-256832-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:04:06 +0100
+	id 0EARBrjCg2mouAMAu9opvQ
+	(envelope-from <netdev+bounces-256833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:05:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 910B9ECEA1
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:04:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61675ECEB0
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 23:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0340B300D155
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 22:04:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 557C1300DF48
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 22:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5105C2EA168;
-	Wed,  4 Feb 2026 22:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8812633A717;
+	Wed,  4 Feb 2026 22:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="QX8FJnsw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9hJonF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EAF262A6
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 22:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594482AD10;
+	Wed,  4 Feb 2026 22:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770242643; cv=none; b=nqFQtNzC08IXIdKWK/+9BFcba937V3QjQBAf3oDNlV3Csp+B2G2rYw/9Sd0aIZ6z8ecl/UgfBABPhblgOXGJEj0x57TGTcn6mVcMCoNXbbEVf22b/wpMKZOqFoBHeufpQCxGLSXWG9GUqKkVbKb6Hj3pv/iQTJsKC4t4jl1vS+o=
+	t=1770242740; cv=none; b=Zgf9rMM0+lbH1Jz1tPdefwD3Z4fenB4Yk5DPuewNVY8Sq7pJH41KbHu6bbXpoj/yrm+MyP+LvOrfVVFUaFRbcwsg0T+QLkiS4ywr4aG6fq+rXjjlrNDaoHNVnZW5tQZFWWmlzd0lVWdxJlexuSO8I7dTLUUj0SRIzGpWwCoaRtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770242643; c=relaxed/simple;
-	bh=jDFqO+g2OcpArkcwt6C1iHwflk+ZmD+tFdd5a1y0Tn4=;
+	s=arc-20240116; t=1770242740; c=relaxed/simple;
+	bh=LBh3yZrxTbV+Nik3y8NVWmrFxuD/4ne8LGXSYzVBtmU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MWxxfsMsPsqleOCJBVqNPxnr3eIEZwPOpP/5G3xkGH3doCu0k1AQNOD++N604XtK6EK74ux5czMZlniTKHI8PH7mO5hL7S73Gftgl3tIjEvxYUPHmGY6iZwUf889m68fYgOgQWBksBveaxfpyZ1KAo27jDyM0x4YbpUp9e27QL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=QX8FJnsw; arc=none smtp.client-ip=185.11.138.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
-	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Reply-To;
-	bh=sjPwyNGA9xy8POgiuW0Tq0QzH0cSNVPVKMgCL48PxsA=; b=QX8FJnswsoHYefLJ2uxQ9cSJdv
-	Ct7M/Ce3CQEZOx/pMyy8ZhYfHLFD5QUUNGFRvi3xXcRIFiN1o8D0V1cOhCKgfc31bzbLOxMRiM0cv
-	rNEgb3KmbBBE+QrZtzh6+pVAoW5d43BCoKPCc+dni1OQfT7Kd+/jro0rbIt8ZNSvrebbDjIyVVX6y
-	Q9MpyLZo95PnPlSFE3bePul4W5Uo+DZ0v+3AQqyIXgkGYpclY4FgxQBEMkhQOj5hjQ/Gi7NvaKneT
-	FKh93TtRfz00xQZY6kCekx9qcI3QW/pyqyCtMRvNX3jtbc+5AC5+LPgtv7LGGYj9B+M0Ouq+2Nu47
-	pTQ5b9FQ==;
-Received: from i53875ac7.versanet.de ([83.135.90.199] helo=diego.localnet)
-	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <heiko@sntech.de>)
-	id 1vnkyV-0071Wm-Sl; Wed, 04 Feb 2026 23:03:52 +0100
-From: Heiko =?UTF-8?B?U3TDvGJuZXI=?= <heiko@sntech.de>
-To: Andrew Lunn <andrew@lunn.ch>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-Subject:
- Re: [PATCH net-next 5/6] net: stmmac: rk: use rk_encode_wm16() for clock
- selection
-Date: Wed, 04 Feb 2026 23:03:51 +0100
-Message-ID: <20297648.sWSEgdgrri@diego>
-In-Reply-To: <E1vnYy6-00000007hp9-1AJM@rmk-PC.armlinux.org.uk>
-References:
- <aYMN2gZMfLPKuukG@shell.armlinux.org.uk>
- <E1vnYy6-00000007hp9-1AJM@rmk-PC.armlinux.org.uk>
+	 MIME-Version:Content-Type; b=kQ8d8MgRw/e+C53Xc7LB4qgNIHHY174jYoBRWfMX1OsfN1qaJP/0RfsPeiD2Vk2K4cHyOCJzGQb1gu1LgPl94B7FKTKl1XJ6THDZ+ICY6gtXHr/3uCu6UMYPTFeZZHHksejaDBznU/Ixzc+umijKvHPW+H2XaQe5RZlAwOadO+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9hJonF2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24BF6C4CEF7;
+	Wed,  4 Feb 2026 22:05:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770242739;
+	bh=LBh3yZrxTbV+Nik3y8NVWmrFxuD/4ne8LGXSYzVBtmU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=d9hJonF28c+UKC8ECjTyGoNn3tuyVfS/FBMi/AEv0nGT/aj292ptmxLXt7+dA6XAd
+	 FEu/QeNZiiZvYz92C+tLqAuWmXRRZUkiwnY0XdqgP/Fw86okwEK2250/QgzV5MLnD9
+	 x5RozvylBba8Rz6KpJ6+8V/qbw42th/onoPQK2qlaOI3H02AuYh+txaBilwJ+t2cRl
+	 Ckf4zev8EjZcLCo0NKDHBYv8lG7MXWmvN3eCoCkHN/OMVVQQt537170bWrAT4mmPjP
+	 rGM/um/EiCcGLw7002lKyC7Y+nRhxGUI/POkmpA2uqygTPlFHylm1xVqhlkXgTtbsI
+	 PKf+ytyjFbb3Q==
+From: Chuck Lever <cel@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH v3 0/3] sunrpc: Fix `make W=1` build issues
+Date: Wed,  4 Feb 2026 17:05:35 -0500
+Message-ID: <177024270291.126397.9981743455921781902.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260204202437.2762161-1-andriy.shevchenko@linux.intel.com>
+References: <20260204202437.2762161-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[sntech.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[sntech.de:s=gloria202408];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256832-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256833-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[oracle.com,kernel.org,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[heiko@sntech.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sntech.de:+];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sntech.de:email,sntech.de:dkim,armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 910B9ECEA1
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:mid,oracle.com:email]
+X-Rspamd-Queue-Id: 61675ECEB0
 X-Rspamd-Action: no action
 
-Am Mittwoch, 4. Februar 2026, 10:14:38 Mitteleurop=C3=A4ische Normalzeit sc=
-hrieb Russell King (Oracle):
-> Use rk_encode_wm16() for RMII clock gating control, and also for the
-> io_clksel bit used to select the transmit clock between CRU-derived
-> and IO-derived clock sources.
->=20
-> Both of these were configured via the "set_clock_selection" method in
-> the SoC specific operations, but there is no requirement to change the
-> io_clksel except when enabling clocks.
->=20
-> It is also possible that we don't need to ungate the RMII clock if we
-> are operating in RGMII mode, but this commit makes no change there.
->=20
-> Split up the configuration of these as separate functions, and remove
-> the set_clock_selection() method. Since these clocking bits are in the
-> same register that we call the "speed" register, move the logic for
-> writing that register into rk_write_speed_grf_reg().
->=20
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 174 ++++++++----------
->  1 file changed, 75 insertions(+), 99 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net=
-/ethernet/stmicro/stmmac/dwmac-rk.c
-> index 4099cbc5d0de..ed9adac70f0a 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> @@ -27,8 +27,17 @@
->  struct rk_priv_data;
-> =20
->  struct rk_clock_fields {
-> +	/* io_clksel_cru_mask - io_clksel bit in clock GRF register which,
-> +	 * when set, selects the tx clock from CRU.
-> +	 */
-> +	u16 io_clksel_cru_mask;
-> +	/* io_clksel_io_mask - io_clksel bit in clock GRF register which,
-> +	 * when set, selects the tx clock from IO.
-> +	 */
+From: Chuck Lever <chuck.lever@oracle.com>
 
-nit: comment stile does not seem to follow the kernel coding style
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Doc=
-umentation/process/coding-style.rst#n622
+On Wed, 04 Feb 2026 21:21:48 +0100, Andy Shevchenko wrote:
+> Compiler is not happy about unused variables (especially when
+> dprintk() call is defined as no-op). Here is the series to
+> address the issues.
+> 
+> Changelog v3:
+> - removed ifdeffery to have struct rpc_task::tk_pid available (LKP)
+> - collected more tags (Anna, Jeff)
+> 
+> [...]
 
-> +	u16 io_clksel_io_mask;
->  	u16 gmii_clk_sel_mask;
->  	u16 rmii_clk_sel_mask;
-> +	u16 rmii_gate_en_mask;
->  	u16 mac_speed_mask;
->  };
+Applied to nfsd-testing, thanks!
 
-[...]
+[1/3] nfs/blocklayout: Fix compilation error (`make W=1`) in bl_write_pagelist()
+      commit: 5ea3d8c52742bc3fef3b1399ecb6d750fa94b11c
+[2/3] sunrpc: Kill RPC_IFDEBUG()
+      commit: 69998e1a90d71181df815570a89e972a8bde2b0e
+[3/3] sunrpc: Fix compilation error (`make W=1`) when dprintk() is no-op
+      commit: d5a6213462466a15cecb601896eb4df81aa13b9f
 
-> +	/* The io_clksel configuration can be either:
-> +	 *  0=3DCRU, 1=3DIO (rk3506, rk3520, rk3576) or
-> +	 *  0=3DIO, 1=3DCRU (rk3588)
-> +	 * where CRU means the transmit clock comes from the CRU and IO
-> +	 * means the transmit clock comes from IO.
-> +	 *
-> +	 * Handle this by having two masks.
-> +	 */
-
-nit: same as above
-
-Other than these 2 nits, this looks good to me.
-
-Reviewed-by: Heiko Stuebner <heiko@sntech.de>
-Tested-by: Heiko Stuebner <heiko@sntech.de> #px30,rk3328,rk3568,rk3588
-
-
+--
+Chuck Lever
 
 
