@@ -1,208 +1,143 @@
-Return-Path: <netdev+bounces-256744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256745-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uETmIX1wg2mFmwMAu9opvQ
-	(envelope-from <netdev+bounces-256744-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:14:53 +0100
+	id OMZcCQFxg2mFmwMAu9opvQ
+	(envelope-from <netdev+bounces-256745-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:17:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D80EA077
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:14:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 493CBEA10C
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 17:17:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9CFA732508AD
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 15:41:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4710630C2B91
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 15:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBC341B342;
-	Wed,  4 Feb 2026 15:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1123940F8ED;
+	Wed,  4 Feb 2026 15:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="XJ49bUqs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjO2UtoH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D7241C2EE;
-	Wed,  4 Feb 2026 15:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DB53EDAC3;
+	Wed,  4 Feb 2026 15:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770219701; cv=none; b=s6rbK3WtRskoI58ADpIarB7eWD5zQEJyFHmSlq91VJDfzb1elGc1zuAInxImt1C4ciAvxtW4MbnEDqWoUS/ONFlDn1b8DeyE3UrfSDmsQNlErULIYINiOliwJ+mnSmhRaKzjy9iulNOMs/F4cSnuFxVWoLP0LRRvgJuhwhzLYgE=
+	t=1770219732; cv=none; b=VXe/y1OEAO+EibdYRoJ2oBaOIDNxkGcpEiXgBPuw8ie85sQH6r21Eavv1ka526B/aU4UIK0wFH0+nGZAJnoetTwjZQMXSZSRrgEi067URdtPTPEO6n1OJBEgN8LjPCGnJzemWkiBooG3whCZGMugzh+mgPHlxn07CnBrV0alaYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770219701; c=relaxed/simple;
-	bh=y+VfXyZfEv/iLTKOZwxeeQmhfZehJ6ewL2y08ntJHMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HP927FL0hOm8Bv5fnmt2b1N/brIMxJPBZJA6Mzal3x/T/sSAv8UiOC0gRfAgKkDFuNfAypH6UrZBwS4pWg6yp2AB5Pnm7EeSWQg0Ehfp69s6W0GVmUJ6J9U1av7lgLVVzPVWell6cxxUpu5NFxZGC4t+jHnpOUbTG+8VZvYG8pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=XJ49bUqs; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vnf0R-001HOM-Oa; Wed, 04 Feb 2026 16:41:27 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=yy+pfXDm9B5saBKTpihytUhl3OzuXowP2Q77KQkJhnU=; b=XJ49bUqsIwmLRJmMTrY7Hgn3IB
-	x0hPLvwIniiuy5QCOcU5BOjXgph4Q9kcl1ckH8tDqEsWpDBdl1QHp/VFW1rMYoou3GyIiF/z56xk5
-	EzS8M17Cv4q7LDUoooV+r4cpOWYV3ysV8wg/iIwCjAu0vnw6wS103rlswl6+EmRyoiUWzlnsK4i9x
-	RKj5JMae3Q3pQDyntOvfNIXArl/vXogS3Hz9PnH0yjMHRkvYWPzVhWCagOZGADzhgoTIJ8ZG/shwk
-	qMBCQDxxpRCl14y0X2a35lmXg5RPY+JVHYRqqgLmi7NZ+DrWfaKN8LTD4FovJKeSYG5wNHN7P3BzK
-	KTKeAwLw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vnf0R-0005dh-55; Wed, 04 Feb 2026 16:41:27 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vnf0P-002MxR-0s; Wed, 04 Feb 2026 16:41:25 +0100
-Message-ID: <408569e7-2b82-4eff-b767-79ce6ef6cae0@rbox.co>
-Date: Wed, 4 Feb 2026 16:41:23 +0100
+	s=arc-20240116; t=1770219732; c=relaxed/simple;
+	bh=j16DCHzTYFhgMNNXLWUYmmV1peJOwGFCMDbhW4/8pRw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=USGDb7pZ2kKCbp8t2Z6UXirINZuASQYrEPsHaSVD30RzJ1v9yqvF3X3ukEj4dm6bkll/xWSbBiQvIcoAGVY/z/8oupNd4TUT/1RdybeBqBcTD2Ep4+qFRdt7ilzWRGfIoyOmU4isfqct6D8hend/XD5CnYbDGucTxHEKAmiodig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjO2UtoH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C308CC4CEF7;
+	Wed,  4 Feb 2026 15:42:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770219731;
+	bh=j16DCHzTYFhgMNNXLWUYmmV1peJOwGFCMDbhW4/8pRw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LjO2UtoHfMVRTkEXdQMDTZA0npLozUQoJ5DanPKFbBK42cLSd5UsaH8ySBAFAXvXn
+	 UvfTcwUFFvTu1CZNvAc5yDVjMDG8NtbI1yvWudI7sKKOLwChlIDR9BVUlu0MgBsRIz
+	 s+hf5MhmMbI2exexvhO1bblf5KC5Pqsv1bdF2ExoQoBeppDUByDo4K81KWacp3vwWT
+	 5QVH2NFVPeTmqJdkKLqoSJE0uq4KTFajuE1wFhwlZUG5Da5UhdLRo6kqf79oeKIrpK
+	 DZZfOJ1B3acvcb1h7Z/HWinh4WAZ/518G1p+rNmecyAn2UgIFl2ZEcSMPsWGK2uNmr
+	 u72U6Gx2frP/Q==
+From: Chuck Lever <cel@kernel.org>
+To: NeilBrown <neil@brown.name>,
+	Jeff Layton <jlayton@kernel.org>,
+	linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH v2 0/3] sunrpc: Fix `make W=1` build issues
+Date: Wed,  4 Feb 2026 10:42:06 -0500
+Message-ID: <177021968762.97318.15008544066362314853.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260204094500.2443455-1-andriy.shevchenko@linux.intel.com>
+References: <20260204094500.2443455-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf] bpf, sockmap: Fix af_unix null-ptr-deref in proto
- update
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org, jakub@cloudflare.com,
- john.fastabend@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <8d055903-fe44-4bbf-a1a5-e0176343bf0b@rbox.co>
- <20260203200242.404131-1-kuniyu@google.com>
- <80865b12-7786-4787-81c8-08b754716a5d@linux.dev>
- <CAAVpQUCshzAAHZQQ7sVE+3UdKmBV42bKudcdDR0KtaTcTqn5gA@mail.gmail.com>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <CAAVpQUCshzAAHZQQ7sVE+3UdKmBV42bKudcdDR0KtaTcTqn5gA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,iogearbox.net,davemloft.net,google.com,kernel.org,cloudflare.com,gmail.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-256744-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-256745-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[rbox.co:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[oracle.com,kernel.org,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,rbox.co:email,rbox.co:dkim,rbox.co:mid]
-X-Rspamd-Queue-Id: 96D80EA077
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,oracle.com:mid,oracle.com:email]
+X-Rspamd-Queue-Id: 493CBEA10C
 X-Rspamd-Action: no action
 
-On 2/4/26 08:58, Kuniyuki Iwashima wrote:
-> On Tue, Feb 3, 2026 at 11:15 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 2/3/26 11:47 AM, Kuniyuki Iwashima wrote:
->>> From: Michal Luczaj <mhal@rbox.co>
->>> Date: Tue, 3 Feb 2026 10:57:46 +0100
->>>> On 2/3/26 04:53, Martin KaFai Lau wrote:
->>>>> On 2/2/26 7:10 AM, Michal Luczaj wrote:
->>>>>> In related news, looks like bpf_iter_unix_seq_show() is missing
->>>>>> unix_state_lock(): lock_sock_fast() won't stop unix_release_sock(). E.g.
->>>>>> bpf iterator can grab unix_sock::peer as it is being released.
->>>>>
->>>>> If the concern is the bpf iterator prog may use a released unix_peer(sk)
->>>>> pointer, it should be fine. The unix_peer(sk) pointer is not a trusted
->>>>> pointer to the bpf prog, so nothing bad will happen other than
->>>>> potentially reading incorrect values.
->>>>
->>>> But if the prog passes a released peer pointer to a bpf helper:
->>>>
->>>> BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0x95/0xb0
->>>> Read of size 1 at addr ffff888110654c92 by task test_progs/1936
->>
->> hmm... bpf_skc_to_unix_sock is exposed to tracing. bpf_iter is a tracing
->> bpf prog.
->>
->>>
->>> Can you cook a patch for this ? probably like below
->>
->> This can help the bpf_iter but not the other tracing prog such as fentry.
-> 
-> Oh well ... then bpf_skc_to_unix_sock() can be used even
-> with SEQ_START_TOKEN at fentry of bpf_iter_unix_seq_show() ??
-> 
-> How about adding notrace to all af_unix bpf iterator functions ?
-> 
-> The procfs iterator holds a spinlock of the hashtable from
-> ->start/next() to ->stop() to prevent the race with unix_release_sock().
-> 
-> I think other (non-iterator) functions cannot do such racy
-> access with tracing prog.
+From: Chuck Lever <chuck.lever@oracle.com>
 
-But then there's SOCK_DGRAM where you can drop unix_peer(sk) without
-releasing sk; see AF_UNSPEC in unix_dgram_connect(). I think Martin is
-right, we can crash at many fentries.
-
-BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0xa4/0xb0
-Read of size 2 at addr ffff888147d38890 by task test_progs/2495
-Call Trace:
- dump_stack_lvl+0x5d/0x80
- print_report+0x170/0x4f3
- kasan_report+0xe1/0x180
- bpf_skc_to_unix_sock+0xa4/0xb0
- bpf_prog_564a1c39c35d86a2_unix_shutdown_entry+0x8a/0x8e
- bpf_trampoline_6442564662+0x47/0xab
- unix_shutdown+0x9/0x880
- __sys_shutdown+0xe1/0x160
- __x64_sys_shutdown+0x52/0x90
- do_syscall_64+0x6b/0x3a0
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
+On Wed, 04 Feb 2026 10:41:20 +0100, Andy Shevchenko wrote:
+> Compiler is not happy about unused variables (especially when
+> dprintk() call is defined as no-op). Here is the series to
+> address the issues.
 > 
->>
->>>
->>> ---8<---
->>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
->>> index 02ebad6afac7..9c7e9fbde362 100644
->>> --- a/net/unix/af_unix.c
->>> +++ b/net/unix/af_unix.c
->>> @@ -3740,8 +3740,9 @@ static int bpf_iter_unix_seq_show(struct seq_file *seq, void *v)
->>>               return 0;
->>>
->>>       slow = lock_sock_fast(sk);
->>> +     unix_state_lock(sk);
->>>
->>> -     if (unlikely(sk_unhashed(sk))) {
->>> +     if (unlikely(sock_flag(other, SOCK_DEAD))) {
->>>               ret = SEQ_SKIP;
->>>               goto unlock;
->>>       }
->>> @@ -3751,6 +3752,7 @@ static int bpf_iter_unix_seq_show(struct seq_file *seq, void *v)
->>>       prog = bpf_iter_get_info(&meta, false);
->>>       ret = unix_prog_seq_show(prog, &meta, v, uid);
->>>   unlock:
->>> +     unix_staet_unlock(sk);
->>>       unlock_sock_fast(sk, slow);
->>>       return ret;
->>>   }
->>> ---8<---
->>>
->>> Thanks!
->>
+> Changelog v2:
+> - added patch to kill RPC_IFDEBUG() macro (LKP, Geert)
+> - united separate patches in the series
+> - collected tags (Geert)
+> 
+> [...]
+
+Applied to nfsd-testing, thanks!
+
+Acks from the NFS client maintainers on 1/3 are welcome.
+
+[1/3] nfs/blocklayout: Fix compilation error (`make W=1`) in bl_write_pagelist()
+      commit: b2e8b11ff47d3ba5075844ac4fb806296b3c4859
+[2/3] sunrpc: Kill RPC_IFDEBUG()
+      commit: 85acbbcb4127f635c062cb52e5dbc62b0635b3f8
+[3/3] sunrpc: Fix compilation error (`make W=1`) when dprintk() is no-op
+      commit: 380f84a3c8fc3809b614a6765c2fb0acc3e8674b
+
+--
+Chuck Lever
 
 
