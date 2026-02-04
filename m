@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-256785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256786-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIOEH6KCg2llowMAu9opvQ
-	(envelope-from <netdev+bounces-256785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 18:32:18 +0100
+	id yE2XLx2Eg2llowMAu9opvQ
+	(envelope-from <netdev+bounces-256786-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 18:38:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF5FEB021
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 18:32:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22535EB0A1
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 18:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59BAA30305F4
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 17:30:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 040DA30075F3
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 17:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35DA634AAF7;
-	Wed,  4 Feb 2026 17:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CD631B107;
+	Wed,  4 Feb 2026 17:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFrkW+wL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHnoabir"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8E4349AF5
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 17:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDB6258CD0
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 17:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770226251; cv=none; b=OYvCj2mB55/PTZsMXKrUAc/KYbij3UgW57chkOnzbX7hQO+e9bGFvLOnvhuMaecXhK2Tcr3TCG6WGSbbdoJPfdRFV1C89q4c2U3xzLVf/+aU/qg8rrofwaXYkPykd46tFUDLpOhdsMRCLDAH/YVcsqpF8C630P9M+WTVkrchY2w=
+	t=1770226599; cv=none; b=nB1n9CkMHj8TL0GVBu8z4+4PvXcP2Q7XKwa2SJ6Fhwp5krrxtSd6T3dCvgUqpa2gEIlIcszfdoHpBNeacmugTqy03CSQeHRHK5VXFyGQ63mKYlXRJ12qmm5I3pGUgSqOhpxg3fUK+6e8eL1GB89tkvYN87i04NkrsPJ3K5Gy6Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770226251; c=relaxed/simple;
-	bh=MDU5QO/Tn+WPiQlwRtuHo6iLlQ4fMKYFMHh7UOwEXdI=;
+	s=arc-20240116; t=1770226599; c=relaxed/simple;
+	bh=BOALPNWP3nm/4vIE4J1UGb6Zj/KBLz6fjJlAVGH5Rm0=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CVA3M40G8LI3WVh5GVyaX3vVIro+4EsRXVa/0Ys3B/6g/8Km4ZuGfkTY1xo9pADsFyDkd2lieo+SubvkraKAE2Q2UaesxF1PwyJ0D4x/p01nWgmSxIL/YnYVT6n+QKgQTvdJ/K6g0HIEHQ27we/oPFu2K2rWSmk+RNpRrxv/zo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFrkW+wL; arc=none smtp.client-ip=209.85.128.181
+	 Mime-Version:Content-Type; b=n9opC6EHr9QjeVM7Qz1kEK9qL4TKYLKiYM9Sf64FIqQPLfaDBhT95r47jrqKKy/2jfnkyCKcrnc8rCqZ6zAA4OLQBg0YrBC/CDTAgdo/ckA30C3iKJJTXqQdpbTFtGL/Vh7zczwleVIoZzvcO/pGnU4lULkpo/A7Vx4WV7zd2p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHnoabir; arc=none smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79456d5ebf9so71466597b3.2
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 09:30:50 -0800 (PST)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-795055a17a3so146857b3.0
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 09:36:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770226250; x=1770831050; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770226598; x=1770831398; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GDRlBfoRYtGK+4GBi1eow20sQAIRQFdvRCCoMgcrxo4=;
-        b=UFrkW+wLyUtS1nFLbsO55FTR55NIpOvH4PiyRVPd+gC++MHzrzbYdUJvW7rb0ogOe0
-         sRCmJmnaCpru0cKzT7v4fPgqCy/OGx5JARUz0AnJYTUsHGDKNMbXiaYRXC31bQmN+pW2
-         VJe8IHAVe77XC1jn5kZNyWt2t8hcK6T47YkD30gLfsloevzC8Cxdoml5aYQH6cVHb2xk
-         izQdeXpoMyAs+hqAvutmb1lxN87nfnIJq5QE284kShZjbDweUmVhwSn8T1k7KX6K0zGr
-         oVGixXSWczzcbqfrc5/sjkGoeHhpvWfgAiTRp02l3zPuCwkXjQGvXe66MaiVyRBpUB87
-         YmTQ==
+        bh=GhVN7wQ08Kv6eyYz6NmjxKDvl1VfG4pfNI4T9ZdOIeQ=;
+        b=kHnoabirFlRIasuaPhX4PQU2DmT4A+51Tp9tslcz8RhhKo1Wdyu2hGJiuh75sfpNHG
+         fbki3xvFcMfV8ISh9xNsH3W7BaSwOmCL0IIXbNz1iO5Qmic8vhhzByhx7E3igSqk3fH+
+         vdsCj+jK549bmXaEZ8DmyxL3nYLSKva86kGA9xmmTUFT3dmRrw3JsM1etftk78BuDneo
+         VP70syhu13MXAMG7Y4wFhhWn6cn2crq5wRDzRynqMZGF0dtO5EDrTyF+X1GeaKhUkmEx
+         Jp4ffWkSfmX60E4K4DnWzJ+9uDmQsjqk/mvrTxt9Q4Tu4bouHLvY1pT2NosdB8Nr5cEY
+         Uc2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770226250; x=1770831050;
+        d=1e100.net; s=20230601; t=1770226598; x=1770831398;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=GDRlBfoRYtGK+4GBi1eow20sQAIRQFdvRCCoMgcrxo4=;
-        b=lTuKPX9jwrFbJeW7Xv28tMVd/DUZMPYNW3pFv6P2lZ3xgsO8GdBBvex2QcZNEHcHu/
-         hi9amO3RmMYRNTi2EcndaEX/+0w31Mdx/WUKKl1kVJjCiJsJ3iflCPYMH3spYc3JUXU8
-         2vuwOgGfhcJy0QnobS2SFjjLRXiMxDyQR5fHaKb+DwOcXEeYQSKIy2x7jB7gT1W4UpVQ
-         aDMiHltf70BQbNrndIii/v0g24J55rO+fdF43YFIYFtpeGTjUrf8HOn6HUNI4DBGTd/R
-         2IdXCVPTtxLRJ1aYlpyAoIQki83hWy6uoFXVOlCjSiijbQKYW6rr5c+5P231ZYHv+KYb
-         6qvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZfdg5Kbvl1MqA+9IDCv14+OQoX8m8nBgRQhTpgIT89B7E49CwAWG6eib9/ZmM1dhF0YePq9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh+40jSrySz0MuO+wwQDeXLQlB9jEW/HgDA9ussm9y5uzqYzI3
-	w6TfkvjoZfTf8RJW9U0uY4R6l8SG47FoYFsUUoVoi6JZ/YNtI/2tzORu
-X-Gm-Gg: AZuq6aJNuzljjEkWCFD6eoNtXx+5JVgPLNOhNsPQFTIrJhL+wV0bgNFzqgvnmTUUs+f
-	dhQMjQVa2vJi9pTFlYlo+6EaQtn25th7HIjvyA00kY/mms0LRtcrvRwWtuAxsVqvRoSpw4Af0Am
-	T8ClWbzwsvZ7AIyB98t9qHA+uIZmgXuWOoZ1WU/EfGXm9LVRwcuKzLWun1mdEdNqEFP8rSsaUoN
-	kG1HTGG3vU6n3Il5yOV6QlutjNSciQRxIbxtjYRUmYi7oXh1GewN1nnC6O/H4ggFdGktCnmVKLy
-	3FXb/l3r3U0JygRKvpcNt/kGdRPmqh4VbK3mbmfKJJPCr488yatU4xFcVprOEt2Yoj37DGhfXZ5
-	4SuL3UcUdkpcqVf/0TH1DFK6jAMym3j9y8aFyHuaTN//mO9wyjLAmiH1fD15t4Se8dzg61rLiKf
-	Pqte+ttIu7PN5IEpHwqrcxyKtEAfYtQ00wDmA2biIq1sqGtVeZocSXWZq8jXB89naZVfUdXQ==
-X-Received: by 2002:a05:690c:91:b0:794:e839:ad75 with SMTP id 00721157ae682-794fe73f8bdmr35874807b3.42.1770226249676;
-        Wed, 04 Feb 2026 09:30:49 -0800 (PST)
+        bh=GhVN7wQ08Kv6eyYz6NmjxKDvl1VfG4pfNI4T9ZdOIeQ=;
+        b=QCqnJVWPuB5XGNlpqwFJWF4H817t/bR1Le2kaBnI0lKIzc8ypL3oZ3RYyZjfxHwRbt
+         /8/BN17q/PiihJDe+Ll5RWjuPtPouFF/nQ6dmnmb982t7gm+JOT0A2kgSNLSC62/ZJBQ
+         anq900/RzESQKx08g0w1jllCaId5Te7DU6q9F5Jnr4zhCf7fj6lkpIue+7FwZNtbtp/V
+         E5qVxUOFzw7DZ49VYRkwgAPgMNY8jCiEH1XiU9454RKCblTLfYyNRhSM49VYQogH0oV2
+         FRmVtGwGTo2LH7LOogTW0JocBEq7fL2MulntW6/7RunwmZEGdandlXRFa3VeYA5QpBIG
+         h/gg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBT132UILbZqrcTlnp/+50t+iGO/ogaVEdTOOdOfWHRS33UrTGpPb5Br8EDoxmbaLiJDaZ31I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxywxW72BhcK0FFkI8eyMDhZ9a5qVqihquJZo5fqdPNimzL2gc6
+	Mrq7poCIT1aXgKg1RSC0kyp6U8/WjYZOy8/xqDIohKjXGnXPkHlbshq0
+X-Gm-Gg: AZuq6aI2zvZSWlHiHKtwFWx5qxvZdIrPP6Fi1gGU1q6tR5Hdn4wlZboMkFHi1YCnMOv
+	U7PW8xPYEmxi85eMRJv9eHNBPFM282f71eJJElcgTwYBCGbCTvgfIfqEMDC/eMU3+YE67w+FMbB
+	J3jw9oYLlkpcPjz0q+v4OzyoXFAfV9tMRuonphPYxT/bvqiReRcl8Ww4pFH0jH/o92LkyBF2obo
+	bcXYLn9mEaO0QBVPARNplnjlAngQnN8yNsqpUUPlUsi2Bzzap2zpI6KZrBIvazzf/sdbVH+6aAV
+	1t9o4JN6g0hT5q6Sy8uK89JsgbcwWEiE8O4jH1SB0RLwh1BGxmvZlI5IBlma7qBdy3Txuokvh9a
+	lXUOaKnj3YHS1Ef59t4hhbg3iHLezSRrIJ1nidPegS1MGGizL2u0J9ifqiWqNBDBMkbF6PmvmHX
+	Bv87KP4Qi7mzxmyqYi0HX/Jfe7xsdru8mrQz1oGn0fDBEZvKw3CUppMytDgVQ=
+X-Received: by 2002:a05:690c:ec9:b0:794:26a9:f9c3 with SMTP id 00721157ae682-794fe83c7e0mr36696117b3.63.1770226597688;
+        Wed, 04 Feb 2026 09:36:37 -0800 (PST)
 Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-794fefe86e2sm25958327b3.45.2026.02.04.09.30.48
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-794feff5cc7sm26353707b3.52.2026.02.04.09.36.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 09:30:48 -0800 (PST)
-Date: Wed, 04 Feb 2026 12:30:47 -0500
+        Wed, 04 Feb 2026 09:36:37 -0800 (PST)
+Date: Wed, 04 Feb 2026 12:36:36 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
  netdev@vger.kernel.org
@@ -90,12 +90,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
  Simon Horman <horms@kernel.org>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
  Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Message-ID: <willemdebruijn.kernel.2d4b5c08dd442@gmail.com>
-In-Reply-To: <20260204-hsr_ptp-v1-1-b421c69a77da@linutronix.de>
+Message-ID: <willemdebruijn.kernel.2a1e4d7240fd4@gmail.com>
+In-Reply-To: <20260204-hsr_ptp-v1-2-b421c69a77da@linutronix.de>
 References: <20260204-hsr_ptp-v1-0-b421c69a77da@linutronix.de>
- <20260204-hsr_ptp-v1-1-b421c69a77da@linutronix.de>
-Subject: Re: [PATCH RFC net-next 1/2] hsr: Allow to send a specific port and
- with HSR header
+ <20260204-hsr_ptp-v1-2-b421c69a77da@linutronix.de>
+Subject: Re: [PATCH RFC net-next 2/2] af_packet: Add port specific handling
+ for HSR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,98 +109,233 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,linutronix.de];
-	TAGGED_FROM(0.00)[bounces-256785-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256786-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,linutronix.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: CAF5FEB021
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:email]
+X-Rspamd-Queue-Id: 22535EB0A1
 X-Rspamd-Action: no action
 
 Sebastian Andrzej Siewior wrote:
-> HSR forwards all packets it received on slave port A to slave port B and
-> one of the possible two copies to the user (master) interface.
-> In terms of PTP this is not good because the latency introduced by
-> forwarding makes the timestamp in the PTP packet inaccurate.
+> linuxptp/ ptp4l uses a AF_PACKET with a RAW socket to send and receive
+> PTP packets. Extend the interface with the ability to bind the socket to
+> one of the two HSR ports and add a flag for sendmsg() to indicate that
+> the packet already contains a HSR header.
 > 
-> Introduce a hsr_ptp field to struct skb_shared_info which can be used to
-> store HSR specific information for sending and receiving skbs.
+> Once PACKET_HSR_BIND_PORT is set, the socket will be bound to requested
+> slave port. All incoming packets without a set port will be discarded.
+> This limits receiving packet to PTP only packets. The packet will be
+> forwarded to userland with the HSR header.
 > 
-> Receive (slave ports):
-> - HSR_PT_SLAVE_A/ HSR_PT_SLAVE_B to denote the port which received the
->   packet. This information is only added to PTP packets.
-> 
-> Send (master port):
-> - HSR_PT_SLAVE_A/ HSR_PT_SLAVE_B to denote the port on which the packet
->   has to be sent.
-> - HSR_SKB_INCLUDES_HEADER to denote that the packet already contains a
->   HSR header and the stack must not add the system's header to it.
-> 
-> HSR_SKB_INCLUDES_HEADER is used to allow forwarding a PTP packet and
-> preserving the HSR header by the sender.
-> Cloning skbs requires to preserve the socket information so that a PTP
-> timestamp can be associated with the socket.
+> For control messages used by sendmsg(), PACKET_HSR_INFO is added with
+> PACKET_HSR_INFO_HAS_HDR as the only option. This option sets
+> HSR_SKB_INCLUDES_HEADER on the outgoing skb to indicate that the packet
+> already contains a HSR header. This requires that the socket is bound to
+> a specific HSR port so that the packet is sent only on one of the two
+> ports.
 > 
 > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 > ---
->  include/linux/if_hsr.h |   2 +
->  include/linux/skbuff.h |   1 +
->  net/hsr/hsr_device.c   |   7 +++
->  net/hsr/hsr_forward.c  | 114 ++++++++++++++++++++++++++++++++++++++++++++++---
->  net/hsr/hsr_slave.c    |  16 +++++++
->  5 files changed, 133 insertions(+), 7 deletions(-)
+>  include/uapi/linux/if_packet.h |   9 ++++
+>  net/packet/af_packet.c         | 103 +++++++++++++++++++++++++++++++++++++++++
+>  net/packet/internal.h          |   1 +
+>  3 files changed, 113 insertions(+)
 > 
-> diff --git a/include/linux/if_hsr.h b/include/linux/if_hsr.h
-> index f4cf2dd36d193..1463ddbc8cddf 100644
-> --- a/include/linux/if_hsr.h
-> +++ b/include/linux/if_hsr.h
-> @@ -22,6 +22,8 @@ enum hsr_port_type {
->  	HSR_PT_PORTS,	/* This must be the last item in the enum */
->  };
+> diff --git a/include/uapi/linux/if_packet.h b/include/uapi/linux/if_packet.h
+> index 6cd1d7a41dfb7..3443eeac8470e 100644
+> --- a/include/uapi/linux/if_packet.h
+> +++ b/include/uapi/linux/if_packet.h
+> @@ -60,6 +60,7 @@ struct sockaddr_ll {
+>  #define PACKET_FANOUT_DATA		22
+>  #define PACKET_IGNORE_OUTGOING		23
+>  #define PACKET_VNET_HDR_SZ		24
+> +#define PACKET_HSR_BIND_PORT		25
 >  
-> +#define HSR_SKB_INCLUDES_HEADER		(1 << 4)
+>  #define PACKET_FANOUT_HASH		0
+>  #define PACKET_FANOUT_LB		1
+> @@ -74,6 +75,14 @@ struct sockaddr_ll {
+>  #define PACKET_FANOUT_FLAG_IGNORE_OUTGOING     0x4000
+>  #define PACKET_FANOUT_FLAG_DEFRAG	0x8000
+>  
+> +/* For HSR, bind port */
+> +#define PACKET_HSR_BIND_PORT_AB		0
+> +#define PACKET_HSR_BIND_PORT_A		1
+> +#define PACKET_HSR_BIND_PORT_B		2
+> +/* HSR, CMSG */
+> +#define PACKET_HSR_INFO			1
+> +#define PACKET_HSR_INFO_HAS_HDR		1
 > +
->  /* HSR Tag.
->   * As defined in IEC-62439-3:2010, the HSR tag is really { ethertype = 0x88FB,
->   * path, LSDU_size, sequence Nr }. But we let eth_header() create { h_dest,
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 86737076101d4..52c847e490ee8 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -605,6 +605,7 @@ struct skb_shared_info {
->  	};
->  	unsigned int	gso_type;
->  	u32		tskey;
-> +	u32		hsr_ptp;
+>  struct tpacket_stats {
+>  	unsigned int	tp_packets;
+>  	unsigned int	tp_drops;
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index 494d628d10a51..cd7c4ad034bc5 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -82,6 +82,7 @@
+>  #include <linux/module.h>
+>  #include <linux/init.h>
+>  #include <linux/mutex.h>
+> +#include <linux/if_hsr.h>
+>  #include <linux/if_vlan.h>
+>  #include <linux/virtio_net.h>
+>  #include <linux/errqueue.h>
+> @@ -1938,6 +1939,36 @@ static void packet_parse_headers(struct sk_buff *skb, struct socket *sock)
+>  	skb_probe_transport_header(skb);
+>  }
+>  
+> +static int packet_cmsg_send(struct msghdr *msg, struct packet_sock *po,
+> +			    unsigned int *hsr_setting)
+> +{
+> +	struct cmsghdr *cmsg;
+> +	int ret = -EINVAL;
+> +	u32 val;
+> +
+> +	for_each_cmsghdr(cmsg, msg) {
+> +		if (!CMSG_OK(msg, cmsg))
+> +			goto out;
+> +		if (cmsg->cmsg_level != SOL_PACKET)
+> +			continue;
+> +		if (cmsg->cmsg_type != PACKET_HSR_INFO)
+> +			continue;
+> +		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+> +			goto out;
+> +
+> +		val = *(u32 *)CMSG_DATA(cmsg);
+> +		if (val != PACKET_HSR_INFO_HAS_HDR)
+> +			goto out;
+> +		if (!po->hsr_bound_port)
+> +			goto out;
+> +
+> +		*hsr_setting = HSR_SKB_INCLUDES_HEADER;
+> +	}
+> +	ret = 0;
+> +out:
+> +	return ret;
+> +}
+> +
+>  /*
+>   *	Output a raw packet to a device layer. This bypasses all the other
+>   *	protocol layers and you must therefore supply it with a complete frame
+> @@ -1947,6 +1978,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+>  			       size_t len)
+>  {
+>  	struct sock *sk = sock->sk;
+> +	struct packet_sock *po = pkt_sk(sk);
+>  	DECLARE_SOCKADDR(struct sockaddr_pkt *, saddr, msg->msg_name);
+>  	struct sk_buff *skb = NULL;
+>  	struct net_device *dev;
+> @@ -1954,6 +1986,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+>  	__be16 proto = 0;
+>  	int err;
+>  	int extra_len = 0;
+> +	u32 hsr_setting = 0;
+>  
+>  	/*
+>  	 *	Get and verify the address.
+> @@ -2044,6 +2077,9 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+>  		err = sock_cmsg_send(sk, msg, &sockc);
+>  		if (unlikely(err))
+>  			goto out_unlock;
+> +		err = packet_cmsg_send(msg, po, &hsr_setting);
+> +		if (unlikely(err))
+> +			goto out_unlock;
 
-skb_shared_info cannot easily be expanded.
+packet_sendmsg_spkt is legacy. No need to extend that.
 
-This is too specific a use-case to warrant fields in every packet.
+>  	}
+>  
+>  	skb->protocol = proto;
+> @@ -2052,6 +2088,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+>  	skb->mark = sockc.mark;
+>  	skb_set_delivery_type_by_clockid(skb, sockc.transmit_time, sk->sk_clockid);
+>  	skb_setup_tx_timestamp(skb, &sockc);
+> +	skb_shinfo(skb)->hsr_ptp = hsr_setting | po->hsr_bound_port;
+>  
+>  	if (unlikely(extra_len == 4))
+>  		skb->no_fcs = 1;
+> @@ -2131,6 +2168,13 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
+>  	if (!net_eq(dev_net(dev), sock_net(sk)))
+>  		goto drop;
+>  
+> +	if (po->hsr_bound_port) {
+> +		struct skb_shared_info *si = skb_shinfo(skb);
+> +
+> +		if (po->hsr_bound_port != si->hsr_ptp)
+> +			goto drop;
+> +	}
+> +
 
-I'm not super familiar with High-availability Seamless Redundancy
-(HSR). Perhaps you can use either an skb_extension. Or the skb->cb[]
-field if this data is only needed within the HSR protocol logic, so
-can be assured to not be overwritten by other users of the control
-block.
+Similar to the high level comment to patch 1/2: this is quite a rare
+use case, but this implementation imposes cost on every user. By
+adding branches in the hot path, among others.
+
+It is simply not scalable to extend core infra in this way for every
+use case. The cross product of features is too great. We'll have to
+find a way that is less HSR specific.
+
+There are existing mechanisms for binding to a specific interface or
+port, such as SO_BINDTOIFINDEX and packet bind().
+
+>  	skb->dev = dev;
+>  
+>  	if (dev_has_header(dev)) {
+> @@ -2260,6 +2304,13 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  	if (!net_eq(dev_net(dev), sock_net(sk)))
+>  		goto drop;
+>  
+> +	if (po->hsr_bound_port) {
+> +		struct skb_shared_info *si = skb_shinfo(skb);
+> +
+> +		if (po->hsr_bound_port != si->hsr_ptp)
+> +			goto drop;
+> +	}
+> +
+>  	if (dev_has_header(dev)) {
+>  		if (sk->sk_type != SOCK_DGRAM)
+>  			skb_push(skb, skb->data - skb_mac_header(skb));
+> @@ -2731,6 +2782,7 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+>  	int len_sum = 0;
+>  	int status = TP_STATUS_AVAILABLE;
+>  	int hlen, tlen, copylen = 0;
+> +	u32 hsr_setting = 0;
+>  	long timeo;
+>  
+>  	mutex_lock(&po->pg_vec_lock);
+> @@ -2775,6 +2827,10 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+>  		err = sock_cmsg_send(&po->sk, msg, &sockc);
+>  		if (unlikely(err))
+>  			goto out_put;
+> +
+> +		err = packet_cmsg_send(msg, po, &hsr_setting);
+> +		if (unlikely(err))
+> +			goto out_put;
+>  	}
+>  
+>  	if (po->sk.sk_socket->type == SOCK_RAW)
+
+
 
