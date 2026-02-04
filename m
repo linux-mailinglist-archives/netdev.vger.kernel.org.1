@@ -1,81 +1,83 @@
-Return-Path: <netdev+bounces-256583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULS8KnregmnfdgMAu9opvQ
-	(envelope-from <netdev+bounces-256583-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:51:54 +0100
+	id UBLGGJLegmnfdgMAu9opvQ
+	(envelope-from <netdev+bounces-256585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:52:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22AFDE21A1
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:51:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC63E21CF
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 06:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 14F8230205E1
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:51:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 04BBA3019D52
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 05:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E30935028C;
-	Wed,  4 Feb 2026 05:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B92C35C190;
+	Wed,  4 Feb 2026 05:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="stl8KIuq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IfKCOP69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FBE34D911
-	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 05:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58BB350A20
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 05:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770184310; cv=none; b=jm58FctMOvRUysV1Ch4ui20LsGEUr7S2S2cf09zBX6jq3xqWobYkb6BowkGjaQp13C92rcP5A1IIfrHrQZoG5vYfBcHwwnnQ1vDb56U2Qj5VLlniwg+FPj7C0IkskR3MiEGtsUjX/iQKUVe97YWcLYXq4LcfKQrms/2vj/jypLM=
+	t=1770184312; cv=none; b=aA8+081Q2dY5gJBCLdN5EU7Iah07vkOklrACBN2jAMxGIVm0OtKprqBq4A6IfT/xtXBjDY0dvUJB5KBGW/LufZ+M/0Exm6dISILh3sXgOJ2XcNYjBwRsDftcBDZIavJk/h7dmWy5BM9NrvULuTFUXq+rPzJ09gnzcAXdyHpAM00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770184310; c=relaxed/simple;
-	bh=HAj1x4/x7EaWdEMVHOrvZvP6qEK01zdI9sDM1k3aNYo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=buHsiHeTIoM2gjl+aGrZfmrqcosta6XbNkao5nGEXPzQLDYHH7yxICdAR/Xcz0kZLnVtAwaA1taTenOvFkcURCvAYma+jtsFeRkE03M4wqIjep2YPtWHtcVO9+WZX19bD8ZSCBuVDQ4iGdxJ1qVWlpY1qyZqh1ErTfDE7J3v19c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=stl8KIuq; arc=none smtp.client-ip=209.85.222.202
+	s=arc-20240116; t=1770184312; c=relaxed/simple;
+	bh=Gz9dxOEtTB/t72TOkZpUekQ16KUQ6ZK9+WHQjUyvhNw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ktVLtzCiVKpCSlWNXY6zwHxslwCxIwO1xDXa3VQdHINJpidNbJ4B451YEfvV+8bV31Ui72Rf1uvgXK4ypAdzaX8MVICW4AXHq8GHSGp6kdbpDCJp2MhVI8jM+ud2KKbDeVv3YvaoFA3UoyHTrFie8XVCb7TN20ZQ5CSSNPumEFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IfKCOP69; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8bb9f029f31so2062733985a.2
-        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 21:51:50 -0800 (PST)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-502a26ccb20so88506051cf.2
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 21:51:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770184309; x=1770789109; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gOcMhld+vwK7cF8G1o7Xvr4flUuWe87iLrDhQ0cNXI4=;
-        b=stl8KIuqCN2hOCVdNd5QMbMb1G6DJJanqpj8UgBmwnrVM63CU8tbqBYpmpDhzzbA56
-         Y0OMuwgrBEjzF+xrtyFcCgEHvDDeu08ZQiu+NY5Ci3vS2IAf6FKOLrJChZayxRtWzrz8
-         aUK+kHu/CF4mUDULXqulcZy20XSUCaTyb5g/bkLr3eKywEurqmM7xNQWpUXY2aQpqEY+
-         fswlJZQxrsKmsBUMTOSnPhYkKyjpR4IhJ6s4mIaXy4rSJK8inPj/Nw5J5C416aecj2Qp
-         4o4cjM79Jul9Tn0nmx4mX3aVoMWbUipwnjoNQhyaSlPtLVnRb/svGfd1RiEMnloBPOnv
-         3g9g==
+        d=google.com; s=20230601; t=1770184311; x=1770789111; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZknvYAgmnJjAhBFiF7RW0zJwBxnxfXK9Qw+kg2Ccf3E=;
+        b=IfKCOP69Cu0oB/3AiMBYPT3rMWsE5uujodOx97A2DZS5zcuJN0Qxp75+KR1ExL/YPF
+         /aVkxdGndsYnM48QO3daA1pnmUDkLCGE1keBvuGLkIxt0JrrgcFEwjPCyU0tSgCUh52t
+         Oka05VqdRJhhN1+UlXGnCjqxxIuTXVQjTkD7XBGxfQMitz/l7kkP+nbzOL89wUrJwgfV
+         YLlzhVihKQKgYcQcYq5reW92DtisSwD4IaIJV7BpmkYLLhiiotqgNnDY8HI/iF0mlvJ8
+         pJ+RjC/hIvjU+y8BO4VHXfcMMGOko8GRXJS0+XjO+7O9vh91TD7hAEx7Zr67Mqk8lwdI
+         tWmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770184309; x=1770789109;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gOcMhld+vwK7cF8G1o7Xvr4flUuWe87iLrDhQ0cNXI4=;
-        b=MdDnE8Hu0ZrJ5gcKFTl3bch95zYJkOsdpOIa/lhx1V5ASH1YD2GCtyh2aPwbUCkQEW
-         QHMwmi+L2L7/jfXBcoYYumMHYxJOlBHDSHcESlNueJao6U5LSMGWhNeGSBu+n4xoMyBr
-         ycZJhyRRiF/K2EMav0MNpDk/Q87tckXF9wucCOzlf/prVqxOOt6GMLgDrLM5V7mzqHQe
-         TMyzeDz4Nq9HJwtl/KPNtBkuugWhUHUyZ4HfNz0qtz+2qhnfa/wPVxKrBfcDO1VhoMzk
-         BhRaJA+1qvVSzx7L6U+v7c7nswWA7qJVrOIJRqIV7SLUfk1D4Dli/AWn4OY/34mpvYLu
-         4NEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWfkSNMsSVh92RDZPUQpTVMBlchTfXiYvZmsxOmM2e4GCpGPg33ZbO6UM4LWPdTsbGLKdpVhw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwKRw7cxf8DJ10U7docnFjzbolPcBIVx6FwW3nk9z8SfG4TNry
-	V11Ocby0v/Jd0kNLN28UAp5rZFchg6GK6Q9AoSvWnjsPjejO34O4vfKhUkrFyyhJs6XfwxPt7TN
-	pQlZEbcAsTOlT0g==
-X-Received: from qkbbi5.prod.google.com ([2002:a05:620a:3185:b0:8ca:3170:e839])
+        d=1e100.net; s=20230601; t=1770184311; x=1770789111;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZknvYAgmnJjAhBFiF7RW0zJwBxnxfXK9Qw+kg2Ccf3E=;
+        b=caOtT0NbnLz1arnLNs6MtOakktE1XHlZxFe6wn0d97n1eJrjHS+TXzwqDY4mhbHGEr
+         oFUwgLt80G5YS+sNtRUg8nvSMtCnL+4sX99HNHL06CJ5dgUygcQE+4nXishl99YYTtH0
+         kSAGGmeMY8KalJGvjMve6/CfJZ2i5oNOlwMeJ2I3H7PJnECV/f/3L/ZecicLSdnNGrcX
+         E5cyaUV1/lkGiPd4jpgxAZDSCCBt/enF2iGDp/QWCJiUZ55OOsQYSYdyBdSocHMUD5z4
+         FwdnRs/lCSxA8IrESOKNuVzh5L3vFkEHGRYy7Y/YhsPpidizWsA3v3y8Vd/rOaikTui9
+         +NJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXg0oReNwPw7LMFNkTrU2RVlCQitopglKAtjuLKDmekpeEpQ24FGtNEEQwyZItZfOOjP9z3eUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMOc4hw9Rg87HkcF+ypmrs538ne/lbSOTZAl0hIXtZBb1TzHbj
+	8nYnnj81Zgrjgi5kARMm/pT2a4w9PGG/RzU3mYzf60tWYtSuAIX1EtUwhQLi8BZnETdRaPEiCu4
+	fXlRc5u3H/lrz6Q==
+X-Received: from qvblv2.prod.google.com ([2002:a05:6214:5782:b0:888:8810:4181])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:f11:b0:8b2:db27:4270 with SMTP id af79cd13be357-8ca2f9b71e6mr265608285a.48.1770184309128;
- Tue, 03 Feb 2026 21:51:49 -0800 (PST)
-Date: Wed,  4 Feb 2026 05:51:43 +0000
+ 2002:ac8:5801:0:b0:501:50a6:962d with SMTP id d75a77b69052e-5061c1d84ddmr20922041cf.77.1770184310920;
+ Tue, 03 Feb 2026 21:51:50 -0800 (PST)
+Date: Wed,  4 Feb 2026 05:51:44 +0000
+In-Reply-To: <20260204055147.1682705-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260204055147.1682705-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260204055147.1682705-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 0/4] tcp: remove net/core/request_sock.c and no
- longer inline __reqsk_free()
+Message-ID: <20260204055147.1682705-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 1/4] inet: move reqsk_queue_alloc() to net/ipv4/inet_connection_sock.c
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -89,7 +91,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -99,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256583-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256585-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -109,34 +111,89 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 22AFDE21A1
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0CC63E21CF
 X-Rspamd-Action: no action
 
-After DCCP removal, net/core/request_sock.c makes no more sense.
+Only called once from inet_csk_listen_start(), it can be static.
 
-Move reqsk_queue_alloc() and reqsk_fastopen_remove() to TCP files.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ include/net/request_sock.h      |  2 --
+ net/core/request_sock.c         | 24 ------------------------
+ net/ipv4/inet_connection_sock.c |  9 +++++++++
+ 3 files changed, 9 insertions(+), 26 deletions(-)
 
-Then put __reqsk_free() out of line to save ~2 Kbytes of text.
-
-v2: use EXPORT_SYMBOL_GPL() instead of EXPORT_IPV6_MOD_GPL for
-    __reqsk_free (Kuniyuki)
-
-Eric Dumazet (4):
-  inet: move reqsk_queue_alloc() to net/ipv4/inet_connection_sock.c
-  tcp: move reqsk_fastopen_remove to net/ipv4/tcp_fastopen.c
-  net: get rid of net/core/request_sock.c
-  tcp: move __reqsk_free() out of line
-
- include/net/request_sock.h      |  11 +--
- net/core/Makefile               |   2 +-
- net/core/request_sock.c         | 127 --------------------------------
- net/ipv4/inet_connection_sock.c |  19 +++++
- net/ipv4/tcp_fastopen.c         |  86 +++++++++++++++++++++
- 5 files changed, 107 insertions(+), 138 deletions(-)
- delete mode 100644 net/core/request_sock.c
-
+diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+index 9b9e04f6bb8931088d9bb2fa7d4420fecf235895..23bb909771fbacbbd31f614b1754f0c24e602645 100644
+--- a/include/net/request_sock.h
++++ b/include/net/request_sock.h
+@@ -196,8 +196,6 @@ struct request_sock_queue {
+ 					     */
+ };
+ 
+-void reqsk_queue_alloc(struct request_sock_queue *queue);
+-
+ void reqsk_fastopen_remove(struct sock *sk, struct request_sock *req,
+ 			   bool reset);
+ 
+diff --git a/net/core/request_sock.c b/net/core/request_sock.c
+index 897a8f01a67b4e09197da2241bc5c33ea3d90c29..31389f875b19b56592e81576b8812359017daac9 100644
+--- a/net/core/request_sock.c
++++ b/net/core/request_sock.c
+@@ -16,30 +16,6 @@
+ 
+ #include <net/request_sock.h>
+ 
+-/*
+- * Maximum number of SYN_RECV sockets in queue per LISTEN socket.
+- * One SYN_RECV socket costs about 80bytes on a 32bit machine.
+- * It would be better to replace it with a global counter for all sockets
+- * but then some measure against one socket starving all other sockets
+- * would be needed.
+- *
+- * The minimum value of it is 128. Experiments with real servers show that
+- * it is absolutely not enough even at 100conn/sec. 256 cures most
+- * of problems.
+- * This value is adjusted to 128 for low memory machines,
+- * and it will increase in proportion to the memory of machine.
+- * Note : Dont forget somaxconn that may limit backlog too.
+- */
+-
+-void reqsk_queue_alloc(struct request_sock_queue *queue)
+-{
+-	queue->fastopenq.rskq_rst_head = NULL;
+-	queue->fastopenq.rskq_rst_tail = NULL;
+-	queue->fastopenq.qlen = 0;
+-
+-	queue->rskq_accept_head = NULL;
+-}
+-
+ /*
+  * This function is called to set a Fast Open socket's "fastopen_rsk" field
+  * to NULL when a TFO socket no longer needs to access the request_sock.
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 018e8ffc07176dd4f6ecbaae5697b90b67cb1294..60f2ee039c05f46bdb95f6211a8f9eafbedb9610 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1314,6 +1314,15 @@ static int inet_ulp_can_listen(const struct sock *sk)
+ 	return 0;
+ }
+ 
++static void reqsk_queue_alloc(struct request_sock_queue *queue)
++{
++	queue->fastopenq.rskq_rst_head = NULL;
++	queue->fastopenq.rskq_rst_tail = NULL;
++	queue->fastopenq.qlen = 0;
++
++	queue->rskq_accept_head = NULL;
++}
++
+ int inet_csk_listen_start(struct sock *sk)
+ {
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
 -- 
 2.53.0.rc2.204.g2597b5adb4-goog
 
