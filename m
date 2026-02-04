@@ -1,109 +1,183 @@
-Return-Path: <netdev+bounces-256522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCx3Nz6xgmn/YAMAu9opvQ
-	(envelope-from <netdev+bounces-256522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:38:54 +0100
+	id qNg2DPKxgmn/YAMAu9opvQ
+	(envelope-from <netdev+bounces-256523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:41:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5D7E0EC5
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:38:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C476AE0EF6
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 03:41:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49C92307B08D
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 02:38:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C5D1C301B488
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 02:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFB32BD02A;
-	Wed,  4 Feb 2026 02:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACF22C3255;
+	Wed,  4 Feb 2026 02:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sC/AsGzx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVkCouwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8800F231842;
-	Wed,  4 Feb 2026 02:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E15B16CD33
+	for <netdev@vger.kernel.org>; Wed,  4 Feb 2026 02:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770172698; cv=none; b=rJ70LQd3cmeoNKNVORV7tun1p2QqF2GHNFq8XkWVem2UUnsY0Pd8WUm9ZNEUHsIZ+TB05MuZTbrVJ+dCTaoaDOpI3OJBKf0ab8sMgaxdeIeUNLNbC2VSZy9wipsFBnOBlxy5cQU43qBvdl+y5kGcXgs/7gBBOiLC0Y1NfcTzPXU=
+	t=1770172911; cv=none; b=kF1T3R6Gemx8W6svWE+W347hOe/uGGDLpCGUK8wx4ucGNlg32TV3h3ZWKJf7NJc8oKn7MB5CbtT3S0Z4lOa1HAIDMjVdtoj2daNEqSy2LE+HPvCPKFFp6SIae9k0keOgNxolcZDXp+TKqDoUlrLswSNfwV2oZH+suHb1UBW+Rrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770172698; c=relaxed/simple;
-	bh=G2VSSNpwXmf7g1sFP46ogxcG7BeVML6goWr8A13QQ10=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l+aSvqND4YAzaRge3Hu2LCRyKFyBD/8Ldd5v0BGO6Dgq74C/ybrR6uac5bIumDXun2KE+NBG6cR5dju+jF85jdR91xjfJDTBByv37PplsQEl73tJOWgfLnOpX66pkgekXsNsaC3wKa7nixn4u+MCjtZHrYQ6eQTkn8XsNAXYhHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sC/AsGzx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B664C116D0;
-	Wed,  4 Feb 2026 02:38:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770172698;
-	bh=G2VSSNpwXmf7g1sFP46ogxcG7BeVML6goWr8A13QQ10=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sC/AsGzx1hH/xiUDBh6Gga9FpRcqSs7pvPu7rU7Sa7GZ52mP9xJUUdcsV5la7E6fa
-	 +/t96hTNVQzWj4l1NdrJy+hhPQ8qLkUpSFYFtOkT4ne2HZGpm2bruCIlclABxM1JXx
-	 qTLvBDnD8vqpLMDDHn9An8GvI0odkE4TdFSU8Z2NG+jgFFMzVFccp+hkqFnloaLy+J
-	 i98Mhwgx1EYuyhVi24SXI1EwFwTgyyt4QTI4DUMkmwwBepLJd2sEjCLk5qejdQ1Z+7
-	 29PlRhyjuo4P9s9jQV8UDYPeEts3ZNqyvfaTgtd3vK8Bsp/qka00yakUIFQlU9KBgz
-	 3X6qCZ8Q9BHgA==
-Date: Tue, 3 Feb 2026 18:38:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
- <liuyonglong@huawei.com>, <chenhao418@huawei.com>, <lantao5@huawei.com>,
- <huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
- <jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: hns3: fix double free issue for tx spare
- buffer
-Message-ID: <20260203183816.3bb02543@kernel.org>
-In-Reply-To: <20260202105837.1909444-1-shaojijie@huawei.com>
-References: <20260202105837.1909444-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1770172911; c=relaxed/simple;
+	bh=LG7P9WWS39GmLizb+bvVuuvNilWmmIs1lUnqEX9eW0s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=naUWYEKcVZrsb1lBIzPC9e6NMnMQROuQqY2S0APuvYgcpzLwmsZyEay4sC8sGhpft00vM5kB1DE7KrS/Axv1LFb3GNZhEGx3G/qFTq7Ab+EJQP9hoWT6SgkQcAoWrIkwtsTLjlcmvGSHG4F6b+wr0u9ANcxqzVvPXe8UntOdR4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PVkCouwv; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8ca01dc7d40so373762785a.1
+        for <netdev@vger.kernel.org>; Tue, 03 Feb 2026 18:41:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770172909; x=1770777709; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fLLVnUeMcHe+anVZJS0e73J9aVhLKDKkhp0vgm9svnU=;
+        b=PVkCouwvKGL8MCOS43W9UMC/oh+TmJt92SZzi1c8fZfEwnzodZIMzDkO0pkIqb2n5r
+         SziSLzr0CRH8q73XzDgnw4Wtu0nl/iI10f4DRzupIL9U+JNkBa71pR9xu+7iVfwzt/DF
+         KRieUd6hjIGQ8Qf+gI/wYYe5GpobeLUAY+XQv9X84Tu8Qm/ky6PNKI1xLoBVehryKpoZ
+         cNV8CugXlBU4/XSYNuBVbm25jAhYcyn6r1fscsRsYAsa16aGoXplIXeu3PryFTM7gWOG
+         IbOx3taxB1I+yh6rzJPlVD35kJ+20wsBu9eaj2AFLHjEAieCyfZ2teipbYAtzHxzccHl
+         mLvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770172909; x=1770777709;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fLLVnUeMcHe+anVZJS0e73J9aVhLKDKkhp0vgm9svnU=;
+        b=eaBbFgJYsL32KuNqnx2XrxX8/Z/3YI1WDBJW4zETt0oJyEfsYLr+4WjBOiWtnVjBX2
+         Efg6qKjjFy7XV3Jfje2ZVFw9KplmFUS3ta3147r5D48ktbLTXoUa6SBuBSTXvxsC9pUR
+         N25nnVoxUBbPHi2/FV5z80kJfczuypP6YzCCaxT2/83naNbhXGRl/gpkypH1U/OnA9Dj
+         YPPLCQGKceaxCnQZcXKDRBbHdWEXhpm9zWmIwkWnSXUtyqkFiKvHQrs6nyzHppUs2mgm
+         zgM3PHfBmZd1CIVgR2ig0HHejC+1LM7tSeR94uG7fRqlHdo3D9Ds66DJOmlLbdTKMbwl
+         DpRg==
+X-Gm-Message-State: AOJu0YzguL+KfAy2HO4XPXtJI/V0JIHLa30ZqyjFhubxZIgWrAzmae5N
+	ZhMY9xMk2FWGb/VuOdVaKx/3I41Pi+kjp/k6d9VMM71oAIxxpa5uiJpw
+X-Gm-Gg: AZuq6aKbaH6w6iMQ6tCd9eqpsbFaC8VQECDJdb0yab0hBQ1WJe24nEU2i6KmwwLpmhk
+	aboH1mPJ/L+S6H0KCInHaeUfdqXoDxnepA8I8n88HvnNnoVCY5PtQP6cacsiNuNTxq6RQ/pqbfT
+	uk9vBcg78q/cAMv4zNKnTdWUMfZfXUQTTqLaSbGW6Rz3VGMGiwqYmEsM0tTMoAIPcZyZVqmUIJB
+	b5UU5pj44x5WcMIyxSWtmMZlTt11t4ZMjNHHHnPeH1oEenJiCzLMhCeJfAnAvv/1xpfePI4utXx
+	i2e3FgbOE63o7SvitauWTUOuqGwo3gJMGdzImkb+hZXyEgVUofWMCb0o7R8ebTu3jv/FRXkgNr3
+	HF+AZ5VJwNmzuk13AdbynkuUDlINCScNU7KSJxizYi2DcyfcQYEkvbbs0xw5NYIJRYjyQ3GuVME
+	PoUof5X8xFujF0vZzLJQAW
+X-Received: by 2002:a05:620a:4450:b0:8c7:e64:3daf with SMTP id af79cd13be357-8ca2fa90031mr205823685a.82.1770172908850;
+        Tue, 03 Feb 2026 18:41:48 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8ca2fd40f9asm94762485a.41.2026.02.03.18.41.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 18:41:48 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Subject: [PATCH net-next 0/2] net: ti: icssg: Remove dedicated workqueue
+ for ndo_set_rx_mode callback
+Date: Wed, 04 Feb 2026 10:41:09 +0800
+Message-Id: <20260204-icssg-prueth-workqueue-v1-0-9a892f4b293d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMWxgmkC/x3MQQqDQAxG4atI1g2MUSz0KqULa381FEabzLSCe
+ HeHLr/Fezs5TOF0q3YyfNV1iQX1paJh7uME1lcxSZAuSGhYB/eJV8tIM/8We38yMnhsu4Bnf5W
+ 6ESrxahh1+4/vFJE4Ykv0OI4TNitXnXIAAAA=
+X-Change-ID: 20260203-icssg-prueth-workqueue-f460eba72132
+To: netdev@vger.kernel.org
+Cc: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Meghana Malladi <m-malladi@ti.com>, Jacob Keller <jacob.e.keller@intel.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Himanshu Mittal <h-mittal1@ti.com>, Simon Horman <horms@kernel.org>, 
+ Byungchul Park <byungchul@sk.com>, 
+ Markus Elfring <elfring@users.sourceforge.net>, 
+ Kevin Hao <haokexin@gmail.com>
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256522-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256523-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,linux.dev,sk.com,users.sourceforge.net,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D5D7E0EC5
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,linux.dev:email,lunn.ch:email]
+X-Rspamd-Queue-Id: C476AE0EF6
 X-Rspamd-Action: no action
 
-On Mon, 2 Feb 2026 18:58:37 +0800 Jijie Shao wrote:
-> The driver missed to clear ring->tx_spare to NULL when
-> fail to initialize tx spare buffer. And it will try to
-> free the tx spare buffer in hns3_fini_ring() if tx_spare
-> is not NULL. So it may cause double free issue.
+While addressing an issue in the cpsw driver, I based my fix on the
+implementation of the emac_ndo_set_rx_mode() function in icssg. During review,
+Jakub pointed out that the dedicated workqueue for the ndo_set_rx_mode
+callback might be unnecessary. I subsequently used the system workqueue for
+this purpose in the cpsw driver, and it performed as expected. Therefore,
+I believe the same approach can be applied to the icssg driver. These two
+patches aim to remove this dedicated workqueue for icssg drivers.
 
-Please update this commit message so that reviewers don't have 
-to do as much research. 
+Please note: I do not have access to a board that supports the CSSG PRU
+Ethernet controller, so this change has only been build-tested.
+
+---
+Cc: MD Danish Anwar <danishanwar@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Meghana Malladi <m-malladi@ti.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Himanshu Mittal <h-mittal1@ti.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Byungchul Park <byungchul@sk.com>
+Cc: Markus Elfring <elfring@users.sourceforge.net>
+
+---
+Kevin Hao (2):
+      net: ti: icssg-prueth-sr1: Remove unused workqueue
+      net: ti: icssg-prueth: Use system default workqueue in ndo_set_rx_mode callback
+
+ drivers/net/ethernet/ti/icssg/icssg_common.c     |  1 -
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c     | 13 ++++---------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h     |  1 -
+ drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c |  9 +--------
+ 4 files changed, 5 insertions(+), 19 deletions(-)
+---
+base-commit: 5c009020744fe129e4728e71c44a6c7816c9105e
+change-id: 20260203-icssg-prueth-workqueue-f460eba72132
+
+Best regards,
+-- 
+Kevin Hao <haokexin@gmail.com>
+
 
