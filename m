@@ -1,129 +1,220 @@
-Return-Path: <netdev+bounces-256718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKDrLiNYg2mJlQMAu9opvQ
-	(envelope-from <netdev+bounces-256718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 15:30:59 +0100
+	id KHNnOTNYg2mJlQMAu9opvQ
+	(envelope-from <netdev+bounces-256719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 15:31:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14677E71DF
-	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 15:30:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69243E7205
+	for <lists+netdev@lfdr.de>; Wed, 04 Feb 2026 15:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C77E302A53E
-	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 14:25:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4AA053030B2B
+	for <lists+netdev@lfdr.de>; Wed,  4 Feb 2026 14:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D8440FD99;
-	Wed,  4 Feb 2026 14:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A10410D35;
+	Wed,  4 Feb 2026 14:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ttg/iyo9"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="x8Hx6jhU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CA4410D30;
-	Wed,  4 Feb 2026 14:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFE2283FD6;
+	Wed,  4 Feb 2026 14:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770215149; cv=none; b=fbS4ISSFFlaa1P0crty4+ldMwtcNc3d/A1psnqK1UybQXImulgyQuErLP6+YG30J0va64wRF1BVLEl/W5wnTbrQ/8ZYXi8HlanVN7QPu2Q7XSR+stHqFRVVrdnurRFS2k3cfaXKf1hPIH2ujtqWxCA3HwADjLUtR4tjASgKm4nM=
+	t=1770215164; cv=none; b=NJO5KLPXnq590NMdMsYYAWKNlPpyuZ/YbcAP5cCoKCKS7OgYn3mIoVmBx6vH2V6MmV6+ilEmmMQiwpLxNCHr2TDsjb5QNu4mWcW73d5lWa/VSBswuzug+ZWi/oGoqXDpNJ4Cjj+SK2QYtiuVlUCE5wcTDD4Qa1k1/9vpUnZsrWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770215149; c=relaxed/simple;
-	bh=UKQ7n5eRMKm18Jsr0H3xh1Q4lAY3MboBngp44b5vomM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NTLp4y5cBu7Jr3hNGGN10RiOOQmHjU80HOWnleG5HDnMWPdaJ4LhgcARUe6XjY1EySSfpCKPBkECr3E6HOU/fD+6QTOLPVcSm/Zo4E9d+S6EKToT1s6Gv83obpEKhZ0m7sryIzXuyJWeWg0qAgB5rabFnEVJqYVUPw8/MiQaXPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ttg/iyo9; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4f5jLq1gKZz9tfs;
-	Wed,  4 Feb 2026 15:25:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1770215139;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SVuLn4uEJ9+UsDMLkQEqxans2v9GDBjUZCsTXAt53cY=;
-	b=ttg/iyo9PKoY4uTtGqrtVSI/gvHqZR74i0dYPfH+lQ+50ydE0WKZ4mzx7SAKb1syeTd82D
-	W6IXW0CE7oVFhdHaWDnV93kowIja5GtEj6H8YnZksqrMHxHQSOBVeIjpg3PQZbkuK2JiOv
-	bengvoH61IiQJkYhPvhVDyJNJ/BFJ418cdYfXndRmLO9DeHWhBOVBKgSQeK5cAhYiwbkpp
-	p2H8Hpb8h6QY8XwDaK9RxWT3McxYQZ0ugyZX2Fxga+5FkLmgaNyDfeWLygusv8RNuflKGI
-	KgzVWM8+qBHMmaoafIlce/bnjp1eJhkingoF7D/+5o+wi/wLubl2G+nSRQwtpA==
-Message-ID: <a37be87a-e1aa-443a-9005-da62e4f51d63@mailbox.org>
-Date: Wed, 4 Feb 2026 15:25:34 +0100
+	s=arc-20240116; t=1770215164; c=relaxed/simple;
+	bh=aO9C4enZgFwRjSDXJQT/T36xFU8GX2K4g6cPeT60mQs=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ALzky7PW7QLMUDUPcqLdswmClM8h/lywSvNCQ34gHJUjnr8Oln4IRlCCtOaigOrAr09Tfojcs52YRWzRMmMQMi9b/Mo5p50Pl2Up0DHagy7tYeIUhMnvTdlLJy7cyCUbNu5T5/rdPt9nbpFfV/aO80xVUanI/LUHTzKpHaW+ShM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=x8Hx6jhU; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=vS0dTna8RwjEXu2oVjoPyGWZr5bJ1YMbsCQ7vRVTBJU=;
+	b=x8Hx6jhUC3yub4BQW5KxkovnLNCYNME5g8gF0qSyswtLWd+snnpFRTn6QppYwHjfSxuYWlMqQ
+	zDQmf0xhfRGhfNFz/VOwV2FwLdSJ1PrEplHAYPcUTRR2quz+rBW+ujM/ccgVfRIESfOmLgaAeuE
+	Z+a3Y3TARDe3DSW8z0eQRu0=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4f5jFn14jCz1prLm;
+	Wed,  4 Feb 2026 22:21:17 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E91BC40363;
+	Wed,  4 Feb 2026 22:25:53 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 4 Feb 2026 22:25:53 +0800
+Message-ID: <81f552d6-fc53-4aa0-8c7d-d098a3bb6f04@huawei.com>
+Date: Wed, 4 Feb 2026 22:25:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next,PATCH v3 3/3] net: phy: realtek: Add property to enable
- SSC
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Aleksander Jan Bajkowski <olek2@wp.pl>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Ivan Galkin <ivan.galkin@axis.com>,
- Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
-References: <20251218173718.12878-1-marek.vasut@mailbox.org>
- <20251218173718.12878-3-marek.vasut@mailbox.org>
-Content-Language: en-US
-From: Marek Vasut <marek.vasut@mailbox.org>
-In-Reply-To: <20251218173718.12878-3-marek.vasut@mailbox.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: bx97ksdkggcwqo5zkieas9s1xnz73be6
-X-MBO-RS-ID: cd8ea292a1d590c7a53
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <lantao5@huawei.com>,
+	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
+	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: hns3: fix double free issue for tx spare buffer
+To: Jacob Keller <jacob.e.keller@intel.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <horms@kernel.org>
+References: <20260202105837.1909444-1-shaojijie@huawei.com>
+ <2b7049bd-1b85-4e6a-be3e-0f3efe3b809a@intel.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <2b7049bd-1b85-4e6a-be3e-0f3efe3b809a@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256718-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,wp.pl,lunn.ch,kernel.org,google.com,gmail.com,axis.com,fossekall.de,redhat.com,armlinux.org.uk,nxp.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-256719-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marek.vasut@mailbox.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mailbox.org:email,mailbox.org:dkim,mailbox.org:mid]
-X-Rspamd-Queue-Id: 14677E71DF
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 69243E7205
 X-Rspamd-Action: no action
 
-On 12/18/25 6:36 PM, Marek Vasut wrote:
-> Add support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
-> RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. The implementation
-> follows EMI improvement application note Rev. 1.2 for these PHYs.
-> 
-> The current implementation enables SSC for both RXC and SYSCLK clock
-> signals. Introduce DT properties 'realtek,clkout-ssc-enable',
-> 'realtek,rxc-ssc-enable' and 'realtek,sysclk-ssc-enable' which control
-> CLKOUT, RXC and SYSCLK SSC spread spectrum clocking enablement on these
-> signals.
-> 
-> Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
-Is there anything that should be adjusted in these patches ?
+
+on 2026/2/4 9:30, Jacob Keller wrote:
+>
+>
+> On 2/2/2026 2:58 AM, Jijie Shao wrote:
+>> From: Jian Shen <shenjian15@huawei.com>
+>>
+>> The driver missed to clear ring->tx_spare to NULL when
+>> fail to initialize tx spare buffer. And it will try to
+>> free the tx spare buffer in hns3_fini_ring() if tx_spare
+>> is not NULL. So it may cause double free issue.
+>>
+>> Fixes: 907676b130711 ("net: hns3: use tx bounce buffer for small 
+>> packets")
+>> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>> ---
+>>   drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 11 +++++++++--
+>>   1 file changed, 9 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c 
+>> b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>> index 7a9573dcab74..e879b04e21b0 100644
+>> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>> @@ -1048,13 +1048,13 @@ static void hns3_init_tx_spare_buffer(struct 
+>> hns3_enet_ring *ring)
+>>       int order;
+>>         if (!alloc_size)
+>> -        return;
+>> +        goto not_init;
+>>         order = get_order(alloc_size);
+>>       if (order > MAX_PAGE_ORDER) {
+>>           if (net_ratelimit())
+>>               dev_warn(ring_to_dev(ring), "failed to allocate tx 
+>> spare buffer, exceed to max order\n");
+>> -        return;
+>> +        goto not_init;
+>>       }
+>>         tx_spare = devm_kzalloc(ring_to_dev(ring), sizeof(*tx_spare),
+>> @@ -1092,6 +1092,13 @@ static void hns3_init_tx_spare_buffer(struct 
+>> hns3_enet_ring *ring)
+>>       devm_kfree(ring_to_dev(ring), tx_spare);
+>
+>
+>>   devm_kzalloc_error:
+>>       ring->tqp->handle->kinfo.tx_spare_buf_size = 0;
+>> +not_init:
+>> +    /* When driver init or reset_init, the ring->tx_spare is always 
+>> NULL;
+>> +     * but when called from hns3_set_ringparam, it's usually not 
+>> NULL, and
+>> +     * will be restored if hns3_init_all_ring() failed. So it's safe 
+>> to set
+>> +     * ring->tx_spare to NULL here.
+>> +     */
+>> +    ring->tx_spare = NULL;
+>
+> This feels weird. If it was already NULL there's no reason to write a 
+> NULL to it. And if it isn't NULL, we should have released and 
+> overwritten it previously by whatever caller was going to free it, 
+> otherwise you'd just have a different kind of memory leak...
+>
+> It looks like the only places that call devm_kfree on the tx_spare is 
+> hns3_fini_ring. It sets the value to NULL after freeing it. I am not 
+> following how it can ever be non-NULL where setting this to NULL and 
+> overwriting it would not lead to a memory leak (aside from the fact 
+> that this is devm memory and will be released on removing the device)
+>
+> Is it because the ring memory isn't zero-initialized?? But that 
+> wouldn't be a double-free that would be a freeing a bad address...
+>
+> Hmm. You create a copy of the ring parameters in hns3_set_ringparam. 
+> Then if that fails, you copy things back. Otherwise you release the 
+> tmp_rings... but the new rings didn't get cleared memory.. So the 
+> issue is that your ring structures effectively have garbage memory in 
+> them when initialized in set_ringparam.
+>
+> You can't just check the old tx_spare and release it here because 
+> doing so would corrupt the memory pointed by the temporary copy made 
+> when changing ring paramters (as it would no longer be valid), and you 
+> can't assume it was zero initialized because your new rings were built 
+> in place on top of the old ring structures.
+>
+> Ok. The fix makes sense but it does take a bit to understand why. You 
+> effectively have to treat the memory in tx_spare as "uninitialized 
+> garbage".
+>
+> Other solutions would require more significant refactoring. You could 
+> memset or otherwise zero out the ring array structures entirely when 
+> allocating new rings in hns3_init_all_ring() for example. Not sure 
+> that is any easier to follow, and its not my driver so:
+>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Thank you for your careful review, I apologize for the trouble this patch has caused you.
+
+We considered the logic to be quite complex, so we added comments in the code to explain it.
+However, for reviewers who are not familiar with our driver, these comments might be a bit unclear.
+I will add more detailed explanations in the commit message for v2.
+
+Thanks,
+Jijie Shao
+
+
+>
+>>   }
+>>     /* Use hns3_tx_spare_space() to make sure there is enough buffer
+>
+>
 
