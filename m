@@ -1,248 +1,228 @@
-Return-Path: <netdev+bounces-257292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257293-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCCnAXPphGkj6gMAu9opvQ
-	(envelope-from <netdev+bounces-257292-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:03:15 +0100
+	id 8PIuL5XphGkj6gMAu9opvQ
+	(envelope-from <netdev+bounces-257293-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:03:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A31CCF6AA4
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:03:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37809F6AB4
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 211D23018BE8
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 19:03:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 324AD30205D5
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 19:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A5930DD37;
-	Thu,  5 Feb 2026 19:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA9A30DD37;
+	Thu,  5 Feb 2026 19:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LUKrkkTd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fK4lD3Ew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C7030CDAE
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 19:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770318191; cv=pass; b=gILo43G30E59j9ijKzXimnkZQw648SCIeyqUwKUK0vNFN/wNG1VGTEBAop3Jcx4q7Z1F/GSrtr3kH6TYTVDmXUoFIAqwfYI1g9YaPLmWn+j9bULMxe4VKBAUceh3tFbuCGlGSA/9f1DRYqt+jxThbzccTsG5eI0jS2yfTVVy1eo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770318191; c=relaxed/simple;
-	bh=Sv7j14ymtGLHlmTqP+BoOPCTX/cQqHoGUXoIMpAvOkA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TFyORZ2d8+D/GLByDItoIcXE4hKdIw74OB8C81ENTYvl0goISZ32XBO1nAjLaOZ45uYvEASOMKkQxv9du+wwPJvJ6WX2np/ej2+yefKOFSEtW6gHzS2YvOaB/nLuLcWyhzUwEEipPg0Ho/yobct8fXnwY8jyapK+XWh7p6by/ac=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LUKrkkTd; arc=pass smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5361DF258
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 19:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770318223; cv=none; b=ju/BR86LyUC2DXptrNZ+8o2yqyLmmNKTqN9oSdH3Yt74n1nynYF6XvmIKKcUrap0uWttqDfIq8Zkh2BgE9S3JecXzmZissisAXOhZQhqmKsU1A0vU2cgmQtKxOx5MXrKG5VPtj9C8c5vhghbDWGddubVHVDGFJ2HXMxQFbNmoFE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770318223; c=relaxed/simple;
+	bh=mTvvcXgDBvcbR8q3T6BKAKNhHRfSg1JBnMWu7iWUrgE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=u8G92CP9CtX/+FvS2jeKMpB30Og8AEVp82guNrMaFiwlUxJ+rwrwPnNlZsWuYWNIdjM/Z0vG4uLLUgNrcKgxCVaILmxkAURGGVYEBiOl3IQLXr9hjfMvxPBp3Nvn4TKR9FX0/2CRHV50cRhKa4fE+hCOcJgCW1eInskBe4/hS0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fK4lD3Ew; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c5513f598c0so473685a12.0
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 11:03:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770318191; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Wxkuv+ZLUAuc5m7Te524L0x0+qqrRvBiu7TI+YkZi4Gnd7y2AGu0rUqySfOnRRMaz3
-         LMzxMnQu9af9I/+kR/W/QPSi0pen3TZzyCHq84aa37Qmt73/DzSnDhzurcT5Juw9M8FI
-         1N8eNNB29YwgnRqu/Y2o6Xp7G69Rx0IiyBF0BkjqUMKP4WHyN8STQ6mmrenxPXdHyGet
-         27/9oWqEZefs5s0HDgJCYPefYugoD0WUP7AJ7KqiA0nX9if5t1NKcsir628hCB5TA+oW
-         vhcmu4XYFAFEA9s2VO/tTzK3Rhda9T8bRLzZISdi9w1JEZg40PDBNpypBF3DnQMwNe5M
-         lq4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wMq2czingLs1wcNHuupFAGOHUrKeCMVUSnWEEmpxoVE=;
-        fh=ONMdBrMzHbY9Mvjk8J3LfndvfOA1sgemPQ1QGkUQA2o=;
-        b=Jan/TrqkVUYRrUWOXIwAHdstJTko4iFuVpDinW5fpz8TS4Gzte9krSbRqelyjLiByJ
-         XoYUdFM6wOwb/hvhxbIPv16mG9nqYmLRRF9HPMLI+ND1gpx4AKvzZfzL4OAaI5zzgt2+
-         QKZ4sLAwI13ANDCwJWpBaJOMcGEYg9zdh0s+c9sV2f/HGvuyujC62QHw568yd347XZVL
-         QCDorEK0ch5UUNYRhawivK//YVWKm0lhEffP7nZdSLyi51+dikBylbgQ1bBCzvpDUugf
-         +Pi0wb7mFdxl6j73hvpqcQP8GO0tVgoBVY0swVzWoLJff1RF6diD3N/M+oOs+XCMoc+d
-         52rA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-4359249bbacso1544690f8f.0
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 11:03:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770318191; x=1770922991; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wMq2czingLs1wcNHuupFAGOHUrKeCMVUSnWEEmpxoVE=;
-        b=LUKrkkTdaUKhoVrqnePTJHYYIUfa+gb1niw+MpsIPqA92saT4XjtO3gZsXtV5NBxJj
-         +Ayt7uPHrCdwSp44o+VXbJcoj0SqoyVVx6uQ5SGMXgsS3Zx+xWIb+EVMixaD+hZTUyqb
-         2w6Bn/h5eD9aIyJ9h8kvniPLFigHwCJoD7ya5LT28WY7sKgTC/rskkw3pgDvuPagfQeF
-         8PVqYM67CBJFwMKKdmcLQoWJp/ga1ihxCyFEM7ktW0DjuoYddCNtvfn9vNrLgojiki0a
-         YThcs42zzL0IVnXiNryAQSrsQrPZrm2gYOszfcuiFF6VTxkevoPmtS5zNmaam+lGFaX8
-         nw1w==
+        d=gmail.com; s=20230601; t=1770318221; x=1770923021; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GtNGjTQpUi+skXrIS19K/ys+bSMRdS9DMijYI8S5F3k=;
+        b=fK4lD3EwIiiK2/QUVPnYjNHV9gCm6zN48hBR3/s5jrQPxsDEl+47PJW9RBIj2dXOfm
+         WuV6MQaGKlulMIm8KGHMAKrlv407WMDDFcTAb7IJrf7PXH4JgGiffXWrLkgf3uLIBKo/
+         NQaw0IdVxr1TFP9HXo7S5ruEhgpgRi1+eIGDIzaX2A0tR8r4veyipocTnoc34FfiwMBQ
+         nYHJsFunr8AGio61NCC00PFIigz9+8RweCBtXhDh/FHxq8kLTP0Cxm6ede2tHxZ9cKFZ
+         GMCqrCPOS7b1iqziYOyh6pCNqa+v3Wh+jSy8gRcZRJ+uJ6igwPYi+yKa006aUFl02Yhr
+         e/lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770318191; x=1770922991;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wMq2czingLs1wcNHuupFAGOHUrKeCMVUSnWEEmpxoVE=;
-        b=vKqcoc24qMP/+M2VwkSKCxJgp1o+HKeFEDtaRTvjw78gtWPfGaB9yi0QhkdNmUouR4
-         oqT7gJOGViIz13EYaHeuX/IVOhKOiyGKmvYzRuRfBWZfhD4eu+Ctuwe3yCAEu+MmyJW9
-         jZ0LzvWBT9Ae4S1ryh0r46VywiRjHByzQxF9ff6lUuB871UByXnrhaWstuB03cQr6kSH
-         wmB1hvpYiyBdig/joj67XcHhfEHBvf0jELn1Hj+SRfr4B9N0srn5dsKea3TVJ0mbqIWE
-         GLFD7DRUJ1GqSRQVfwb0vQsCOaaGy1WynlWy52b83GqzwGgO5eKlqJhbVbt5LwBewx08
-         /NhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbUdjj0UPx5MWy9vggUghraUWHj+dEk274oFvgP6MX4bCY0X2uaE3R5LwgoBsXBv9v6puMU4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGVkW0mV+KQs3u9FAtltCHsZtxiNjrQeCRCitHhBycF16CDS9x
-	N87R73xGYdONL45scVdpat+gygz9l9g9X3sa9gcll+RybNB8Kqrsw1hXYeOLusBN5p7K63ypbHe
-	l3jitux3xJVxRP5ZlS5/E3HjxLv+yglg=
-X-Gm-Gg: AZuq6aJsyofmambELYlFGeG6u5TYQX3Vu+c/7jPVWe0QnEfXeUs7iWxdAS+fG9YbtLm
-	nH1EKxn6aRQifNEdX7ih6Z+yLBKm0xiJiSj7l21h7zqw4q8oHWXRl0W91bqZrUgjuXAd+zyugnr
-	AhAIHNUiRI+4fXkN7uLlPuDQ9uRJBfsI1vMj09mKoFOB+9pdqIj3AbFEoQ7jVALzsZD/op9qF0h
-	tB0MVTPNOv5X2Nz97Pe9Dly4uDJJthdJ9GONA3lYngkhr3sDStmIq2eWFZapZN0/S7lL9d8h3aG
-	8vhgmX2t4bACQmRGnwOlC0G/vdVl
-X-Received: by 2002:a17:90a:dfcd:b0:352:d59a:b28 with SMTP id
- 98e67ed59e1d1-354b3cae091mr42496a91.19.1770318190665; Thu, 05 Feb 2026
- 11:03:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770318221; x=1770923021;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GtNGjTQpUi+skXrIS19K/ys+bSMRdS9DMijYI8S5F3k=;
+        b=lfLoTveqp7eJOttPHmxkbADw+qQrStVh7Tw52qT7sXVKLC9YeqRpkwprfqa6z5sAJb
+         LjuAZsoQf/eTnt+Wa/GB8MnX3HDiFBvesBJ/HhLDLhpnOcxluO6z8NM90NLGxxXgXIFF
+         jTJDk+Wfvs4ddX1OsMIDuGcF71N6xvROA0IR8zMchZ/xiIpoRUllHdgF9p55o5Dpfc5L
+         sO+yLFH6DfHEEwBSaxmHh6UM7LcZsEfcOk5oCMEdFR9KuGKLGUdMo1Pud6RSdamSL6QS
+         ckTd84gTm+QbGiLSpQ9jOzNM6vCxnczXPObp3S5qlnGAy8vajp3mJyWBKm1jvlnnhFep
+         x4GA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUZlxYXqqziNJ9DJckUQ66is0qUytzCIv69XXAiZrqPVgFdydIndX3b4sjHzQWYz3KK4LuV2E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLFko5753fLM26QJWnkM7PeIcbYcsmnTrR4M4YLgRGUBZPNPg9
+	Key+CXvV2qz5ByYiKNkXNofg4l47y9VRFgsF0RaivrPe02udz+BbAovR
+X-Gm-Gg: AZuq6aK0b8lqPkL39PNOQBk6nIGgN/PrFnhbnZPtdBGq5lva7Amm/DAFZTkW5b8fzR8
+	kTEJO6x6dpWWwdUdujpWNx4+1EQ/e2HCsx54GNvFio8241fWjyrSk91xoXknrZOGgYCEFNxm+/H
+	7wPAKLdusbP30ET4zNlEHxHIBckoiILTm34LzoIxV6lP0EXnRBTtHSaf9ydhTsXPMVP1FIh5xZw
+	+1nyUYGk6XO+oYM9GXxahHYE4tHe7dtn6eGkQ9PDxTDsIgnb+qKS8d9uNn0ee0Yd+U7ZuN+yjjC
+	qhVxJ/qUXA1g/dpjGmPsgljdzl3RXizgaBrGOqoZJB+C05pGaSCHlLfwEP6LZfSHoc6lQ6FHTze
+	w29zr/IHyZrvlfxxtr/nHeZ6451PHngJUO2dlDj1klFQWJ3exRaV8xbxm57CuteNW7WXL8AHbLn
+	3A0QooOPuyQLWUQ0wg+80pAkON+jeq
+X-Received: by 2002:a05:6000:2210:b0:435:96a1:ee4d with SMTP id ffacd0b85a97d-4362933f3e9mr435562f8f.14.1770318221215;
+        Thu, 05 Feb 2026 11:03:41 -0800 (PST)
+Received: from giga-mm.home ([2a02:1210:8642:2b00:82ee:73ff:feb8:99e3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436296bd4desm239733f8f.18.2026.02.05.11.03.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 11:03:40 -0800 (PST)
+Message-ID: <a7bd135730919a8a5c5d4b2ccaae945c76c7376e.camel@gmail.com>
+Subject: Re: [PATCH net 1/2] net: cpsw_new: Fix unnecessary netdev
+ unregistration in cpsw_probe() error path
+From: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+To: Kevin Hao <haokexin@gmail.com>, netdev@vger.kernel.org
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros
+ <rogerq@kernel.org>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Saeed Mahameed	 <saeedm@nvidia.com>,
+ Daniel Zahka <daniel.zahka@gmail.com>, Lorenzo Bianconi	
+ <lorenzo@kernel.org>, Nicolas Dichtel <nicolas.dichtel@6wind.com>, Murali
+ Karicheri <m-karicheri2@ti.com>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Grygorii Strashko	
+ <grygorii.strashko@ti.com>, linux-omap@vger.kernel.org,
+ stable@vger.kernel.org
+Date: Thu, 05 Feb 2026 20:03:40 +0100
+In-Reply-To: <20260205-cpsw-error-path-v1-1-6e58bae6b299@gmail.com>
+References: <20260205-cpsw-error-path-v1-0-6e58bae6b299@gmail.com>
+	 <20260205-cpsw-error-path-v1-1-6e58bae6b299@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <431335747d3604c46f2e57a32d839a73aa8a8536.1770042461.git.lucien.xin@gmail.com>
- <20260205115542.2195362-1-horms@kernel.org>
-In-Reply-To: <20260205115542.2195362-1-horms@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 5 Feb 2026 14:02:58 -0500
-X-Gm-Features: AZwV_QhI8OwuLRWeiqC_GNUtx69lACcTHyYZmGGt6r8v7RB2RzBMyspqQrCybPk
-Message-ID: <CADvbK_e8Sbm8Q3KVR=uZZDYuQLTdprRskN=jgompaSeYDkmhFw@mail.gmail.com>
-Subject: Re: [net-next,v9,15/15] quic: add packet parser base
-To: Simon Horman <horms@kernel.org>
-Cc: steved@redhat.com, marcelo.leitner@gmail.com, aahringo@redhat.com, 
-	alibuda@linux.alibaba.com, jbaron@akamai.com, hare@suse.de, kuba@kernel.org, 
-	tom@talpey.com, linux-cifs@vger.kernel.org, daniel@haxx.se, 
-	quic@lists.linux.dev, jlayton@kernel.org, tfanelli@redhat.com, 
-	dhowells@redhat.com, linkinjeon@kernel.org, hepengtao@xiaomi.com, 
-	pc@manguebit.com, kernel-tls-handshake@lists.linux.dev, 
-	illiliti@protonmail.com, xiyou.wangcong@gmail.com, 
-	andrew.gospodarek@broadcom.com, mail@johnericson.me, edumazet@google.com, 
-	pabeni@redhat.com, matttbe@kernel.org, netdev@vger.kernel.org, 
-	smfrench@gmail.com, metze@samba.org, mbuhl@openbsd.org, 
-	chuck.lever@oracle.com, dreibh@simula.no, davem@davemloft.net, 
-	sd@queasysnail.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-257293-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257292-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,linux.alibaba.com,akamai.com,suse.de,kernel.org,talpey.com,vger.kernel.org,haxx.se,lists.linux.dev,xiaomi.com,manguebit.com,protonmail.com,broadcom.com,johnericson.me,google.com,samba.org,openbsd.org,oracle.com,simula.no,davemloft.net,queasysnail.net];
+	FREEMAIL_CC(0.00)[ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,nxp.com,nvidia.com,gmail.com,6wind.com,linaro.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[alexandersverdlin@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: A31CCF6AA4
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 37809F6AB4
 X-Rspamd-Action: no action
 
-On Thu, Feb 5, 2026 at 6:55=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
+On Thu, 2026-02-05 at 10:47 +0800, Kevin Hao wrote:
+> The current error handling in cpsw_probe() has two issues:
+> - cpsw_unregister_ports() may be called before cpsw_register_ports() has
+> =C2=A0 been executed.
+>=20
+> - cpsw_unregister_ports() is already invoked within cpsw_register_ports()
+> =C2=A0 in case of a register_netdev() failure, but the error path would c=
+all
+> =C2=A0 it again.
+>=20
+> Fixes: ed3525eda4c4 ("net: ethernet: ti: introduce cpsw switchdev based d=
+river part 1 - dual-emac")
+> Signed-off-by: Kevin Hao <haokexin@gmail.com>
+
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+
+> Cc: stable@vger.kernel.org
 > ---
-> quic: add packet parser base
->
-> This patch uses 'quic_packet' to handle packing of QUIC packets on the
-> receive (RX) path. It introduces mechanisms to parse the ALPN from client
-> Initial packets to determine the correct listener socket, routes received
-> packets accordingly, and adds support for ICMP-based MTU updates by
-> locating the relevant socket and updating the stored PMTU.
->
-> > diff --git a/net/quic/packet.c b/net/quic/packet.c
-> > index cf64a6aaa795..16a7db6ccd87 100644
-> > --- a/net/quic/packet.c
-> > +++ b/net/quic/packet.c
->
-> [ ... ]
->
-> > @@ -14,6 +14,637 @@
-> >
-> >  #define QUIC_HLEN            1
-> >
-> > +/* Handle ICMP Toobig packet and update QUIC socket path MTU. */
-> > +static int quic_packet_rcv_err(struct sock *sk, struct sk_buff *skb)
-> > +{
-> > +     union quic_addr daddr, saddr;
-> > +     u32 info;
-> > +
-> > +     /* All we can do is lookup the matching QUIC socket by addresses.=
- */
-> > +     quic_get_msg_addrs(skb, &saddr, &daddr);
-> > +     sk =3D quic_sock_lookup(skb, &daddr, &saddr, sk, NULL);
->
-> Are the address arguments swapped in quic_packet_rcv_err()? Looking at
-> other call sites in this file, quic_get_msg_addrs is consistently called
-> with &daddr first, then &saddr:
->
->   Line 476 in quic_packet_get_listen_sock():
->     quic_get_msg_addrs(skb, &daddr, &saddr);
->
->   Line 513 in quic_packet_get_sock():
->     quic_get_msg_addrs(skb, &daddr, &saddr);
->
->   Line 536 in quic_packet_get_sock():
->     quic_get_msg_addrs(skb, &daddr, &saddr);
->
-> But here quic_packet_rcv_err() passes &saddr first, then &daddr.
->
-> Looking at the implementation of quic_v4_get_msg_addrs() in
-> net/quic/family.c, the function extracts addresses from the packet as:
->
->   sa->v4.sin_port =3D uh->source;
->   sa->v4.sin_addr.s_addr =3D ip_hdr(skb)->saddr;
->   da->v4.sin_port =3D uh->dest;
->   da->v4.sin_addr.s_addr =3D ip_hdr(skb)->daddr;
->
-> So sa gets the packet's source address (remote), and da gets the packet's
-> destination address (local).
->
-> Then quic_sock_lookup() in net/quic/socket.c expects:
->
->   if (quic_cmp_sk_addr(tmp, quic_path_saddr(paths, 0), sa) &&
->       quic_cmp_sk_addr(tmp, quic_path_daddr(paths, 0), da) &&
->
-> This compares the socket's local address with sa and the socket's remote
-> address with da, meaning sa should be the local (packet dest) address and
-> da should be the remote (packet source) address.
->
-> With the swapped arguments, quic_packet_rcv_err() would pass the remote
-> address where the local is expected and vice versa, causing the socket
-> lookup to fail. This would prevent ICMP Packet Too Big messages from bein=
-g
-> processed correctly, breaking Path MTU Discovery.
->
-The code is correct, I may add a comment for the explanation:
+> =C2=A0drivers/net/ethernet/ti/cpsw_new.c | 12 +++++-------
+> =C2=A01 file changed, 5 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti=
+/cpsw_new.c
+> index 21af0a10626aaf0ce6ecb04837899801743f3894..b9fc31eb06134dae33427eaba=
+06341c39eb4b41c 100644
+> --- a/drivers/net/ethernet/ti/cpsw_new.c
+> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> @@ -2003,7 +2003,7 @@ static int cpsw_probe(struct platform_device *pdev)
+> =C2=A0	/* setup netdevs */
+> =C2=A0	ret =3D cpsw_create_ports(cpsw);
+> =C2=A0	if (ret)
+> -		goto clean_unregister_netdev;
+> +		goto clean_cpts;
+> =C2=A0
+> =C2=A0	/* Grab RX and TX IRQs. Note that we also have RX_THRESHOLD and
+> =C2=A0	 * MISC IRQs which are always kept disabled with this driver so
+> @@ -2017,14 +2017,14 @@ static int cpsw_probe(struct platform_device *pde=
+v)
+> =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0, dev_name(dev), cpsw);
+> =C2=A0	if (ret < 0) {
+> =C2=A0		dev_err(dev, "error attaching irq (%d)\n", ret);
+> -		goto clean_unregister_netdev;
+> +		goto clean_cpts;
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	ret =3D devm_request_irq(dev, cpsw->irqs_table[1], cpsw_tx_interru=
+pt,
+> =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0, dev_name(dev), cpsw);
+> =C2=A0	if (ret < 0) {
+> =C2=A0		dev_err(dev, "error attaching irq (%d)\n", ret);
+> -		goto clean_unregister_netdev;
+> +		goto clean_cpts;
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	if (!cpsw->cpts)
+> @@ -2034,7 +2034,7 @@ static int cpsw_probe(struct platform_device *pdev)
+> =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0, dev_name(&pdev->dev), cp=
+sw);
+> =C2=A0	if (ret < 0) {
+> =C2=A0		dev_err(dev, "error attaching misc irq (%d)\n", ret);
+> -		goto clean_unregister_netdev;
+> +		goto clean_cpts;
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	/* Enable misc CPTS evnt_pend IRQ */
+> @@ -2043,7 +2043,7 @@ static int cpsw_probe(struct platform_device *pdev)
+> =C2=A0skip_cpts:
+> =C2=A0	ret =3D cpsw_register_notifiers(cpsw);
+> =C2=A0	if (ret)
+> -		goto clean_unregister_netdev;
+> +		goto clean_cpts;
+> =C2=A0
+> =C2=A0	ret =3D cpsw_register_devlink(cpsw);
+> =C2=A0	if (ret)
+> @@ -2065,8 +2065,6 @@ static int cpsw_probe(struct platform_device *pdev)
+> =C2=A0
+> =C2=A0clean_unregister_notifiers:
+> =C2=A0	cpsw_unregister_notifiers(cpsw);
+> -clean_unregister_netdev:
+> -	cpsw_unregister_ports(cpsw);
+> =C2=A0clean_cpts:
+> =C2=A0	cpts_release(cpsw->cpts);
+> =C2=A0	cpdma_ctlr_destroy(cpsw->dma);
 
-
-        /* ICMP embeds the original outgoing QUIC packet, so
-saddr/daddr are reversed when
-         * parsed. Only address-based socket lookup is possible in this cas=
-e.
-         */
-
-Thanks.
+--=20
+Alexander Sverdlin.
 
