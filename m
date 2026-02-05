@@ -1,172 +1,404 @@
-Return-Path: <netdev+bounces-257040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mM7PCmJShGkx2gMAu9opvQ
-	(envelope-from <netdev+bounces-257040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:18:42 +0100
+	id 6DBHJ3xShGkx2gMAu9opvQ
+	(envelope-from <netdev+bounces-257041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:19:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86A01EFCD9
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:18:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18F7EFCEA
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F94E300CE77
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:18:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 291A1302592E
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93DC360756;
-	Thu,  5 Feb 2026 08:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077CC35CB76;
+	Thu,  5 Feb 2026 08:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WJPTJ9oj"
+	dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b="TKB834v+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f196.google.com (mail-qt1-f196.google.com [209.85.160.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail2.anonaddy.me (mail2.anonaddy.me [185.70.196.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8255235C182
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.196
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770279503; cv=pass; b=AmOUUqaN2mPPUv7SZWEsFY+si8OjC/azUh7dahFMQ4/eGzltcXAhlOvTsEecBoR/yyDq2LrNiemNv9t/I3AA91C78+I28OvoKC5HOa2HfB3qvsvaq1jRk8iaP/AvhtakyxTIPffGBdMezKJqQkRhH/fFNgiy8QcXYjJyY6yJWhE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770279503; c=relaxed/simple;
-	bh=dEHmEZtfljzeKDJhyqfkp2NPnFNEfyMYV12kR3/lE68=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l1ktDM2bwKCT+FdG59Jqjz+IgNoM0xhwzEIj+9R2XJtW9KeYHrbQp2JVHhbcCVyxMrIyMzEfcCH2VdEWsAwS30BNorzfX/z6J7wjatVJdWEBqXQvVD7LWSBmsJeNDow/XTj3qSoenw639/ScfejYNXF3O80koeQEs9f8Ihnj7Sg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WJPTJ9oj; arc=pass smtp.client-ip=209.85.160.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f196.google.com with SMTP id d75a77b69052e-50145d27b4cso8040481cf.2
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 00:18:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770279502; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Ql6Wz6V+BfBO2yUswUAZFMDSI9p4ASDPaIiLjO4cW98Ubdc/RHJqknVy7JlDbweoTx
-         rQJxQdGFzZ4PVS5yzW01BjlBdj1t9aEA6uzyUkquUHMagkbceOxWtIqgFqTcTqc5Cz5B
-         Y3/lAGJ79G7nCMlkmbxdbIP5p7N9Z0Libv569nZRjkUJe76c8lxdopHbu292PV78juIW
-         mqx1gMblQoebubYgALg25SjZj+Kp3/BLUWMC08jWcnZXv49Uu+lAeqtSGKKISGiQk/ET
-         yNeTwz1KoUYDvbWbUli+E1bnbA42jouybQ3sFFToGmbeQHdrmsZUrIxdEkw07+BOKR7g
-         aoBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dEHmEZtfljzeKDJhyqfkp2NPnFNEfyMYV12kR3/lE68=;
-        fh=6r1yaKmaaqDKbk0mz3sX1toFerxBue79AEimE3QZ9VI=;
-        b=isMDFoMjrIU/5VnM8AMBn8EN9o5iB21BMYW4SF5Js9f8AtBPe0VqjPGDDKwRR0FIS5
-         8ei1AWyWg8u66Jx4Aitt1aGRaegii0QGfFXT6p/uiYbKFcv3l70ZbCiD3nfaWSkXiCAI
-         65dayBvBqo95LpZ9UO7bX4VYWHkahqdoSmv8LEpyW+NR69v2S+WWJEum4m+PhJVRaRI3
-         FCyQy85PH0r63BaloVXmdnIebEeTj8A1v1JEDl2XpamAxF0+60eyAoAL+OC3vkE6s4jZ
-         WU2Ao/1rpAF6Sn0NjNova1+UA3GKBskFx4asrFLOr4NEyyhMNC3cjcVUrBwT1JmXoMRG
-         Jx5w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770279502; x=1770884302; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dEHmEZtfljzeKDJhyqfkp2NPnFNEfyMYV12kR3/lE68=;
-        b=WJPTJ9ojBzj6DNngLToHBl2X0/oGQkvDV4kjObfvklfHyT6N6h42fRgzVndYvLmvvE
-         1rEDuviD0PcCOtMDJRCz/1YrrLSHJYDy0Vg0Q+5bqs002Y2yabAg5l+XRHhBtH6Uv1gk
-         yjLtOZRkfMLvk6FV7qMH9Rl1q0kjQPcDZEIFVOTdqduBtrCrxBAjFm6t5FrfEzirSkPC
-         Kp96uWeR+YJbgO05CABaas7bqUluLGO9Wc9LQxVs82P+UH+SoUDq4iEK78B+6NdgOnSh
-         11J4ueohKbX4T53An8eflVAqPzWb52/3AkBa/1tZeF+Yfcb8Y5Z6P5ONJYwL1lGHWtef
-         BKxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770279502; x=1770884302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dEHmEZtfljzeKDJhyqfkp2NPnFNEfyMYV12kR3/lE68=;
-        b=qq8ASRK/KGXG2DuPqPoqSqbvB/F7W094vPsEfXnaADJq2VQYuuziSQaj8kW3uPOtjL
-         erbz0bZ9/yD7KkozYYYClWP+J8zeARZaxU1v65jWoB5P//Sh6f0g78UjcyoN1Z9tcOMS
-         NLDddpVPSnjAbocq2Rtvz9EHEpeKi6JSDOXvSyG0vw+hZohIgde6Yxhad45LgTMwGMn/
-         5lLoyJcZ/C0j3jDTY440lmNojbMCTTNRYDfp4s8fJS1I4ZoPPfnb8kJZjiO3+Hh6Mwlc
-         1Z9N04FTvdZJPqts5REbu9O2jD/HPEQEN9O/10DxqerXXyXmbMow0ediATQ16DSiOcEe
-         Rvdg==
-X-Gm-Message-State: AOJu0YzDiI4ov/zRl3xIJvLjX3pimVunfI8yMzplsd/EUClwu+HhKrcM
-	vplcXZggivGrfADjLfEpKcisMVPN+V0IjtrJXdws0vITHGC/jcFumjqEE7DBfxJnWWKxrPyvCXS
-	Nnpmxy/b70bhsDNSx1EGaSwMDRWZbEJ0=
-X-Gm-Gg: AZuq6aITpGHRvNrdcjzo/IAY3N4o+vNAYZ5M81uL3c+C/2uRrShF2BXmQqkKRn91/QT
-	HI1KrLmuSfWUgk9bpGl1ZEGeHzNA5w9uhU7cmtLdLm0dU0y19iXeG6MS4HmKB+5nO52zjqJqV1S
-	lViA8cAkxgSXcEqo0ITJsMxA7ryOxUXCLTPVLtQwMAGahh/Z+yV0MNZ3EsA4W2nOCIdO1F67ErZ
-	6vGFQE+zqNJMr3yjDO1UpO8zHeN7UR2sIlV4BFNCdyZkdLxkrPqmwtNRpJO8UXttFN+BLiLO31P
-	EpsxwYfRRw/CnLlyrk++DFs4fhW04uzWmg6kWm9IgNa3lOih2hS9PWUwOH6FAcDSojM=
-X-Received: by 2002:ac8:5942:0:b0:4ee:275c:28d7 with SMTP id
- d75a77b69052e-5061c1e24dcmr70234931cf.75.1770279502432; Thu, 05 Feb 2026
- 00:18:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C75B35C182
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.196.149
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770279505; cv=none; b=SRSHFDR1iYGeOFzodpf3bp7r6l4hVw3/G8qKIJ1chzxkvAI4dZPS0xELc1+XNDpcChjh2npkAw32jKfRiETDk5w8AkDGI8G+pZt2iI7/DtXQSRwU31m027q2EbNKUqxAYPNCcqwX75sNXz7WwTTzUQZaD7F9PyhJXjpM48O6s7I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770279505; c=relaxed/simple;
+	bh=voxuiANRapyhEKlWRapxmS3AbzE9OhdbsL3mO57YfYc=;
+	h=From:To:Subject:Message-ID:MIME-Version:Date:Content-Type; b=NjhVz7gJL1vJZ2BQQ8EEBg0mDb1tihSlBNjdTE1WqRCE0fjGaxQoppNemXFJZnBElaauwZnGcist9oFRfoweBa2nhqmWv8Bp1dL1HdzgpqRppn8/MOmnBJcUxa5qDsf2LoBYrT1IowVQ2cK5mbhY5KrwPuCtrGkKqseR6I7cunQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me; spf=pass smtp.mailfrom=anonaddy.me; dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b=TKB834v+; arc=none smtp.client-ip=185.70.196.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anonaddy.me
+Received: from mail2.anonaddy.me (mail2.anonaddy.me [127.0.0.1])
+	by mail2.anonaddy.me (Postfix) with ESMTPS id A8FF91001F1
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:18:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anonaddy.me; s=default2;
+	t=1770279503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=voxuiANRapyhEKlWRapxmS3AbzE9OhdbsL3mO57YfYc=;
+	b=TKB834v+vCfdIoQw8nWiAqMSBduLxN1BY/0GS2XkHj+15zKWcs9RVg4AoGoVnqMeJ8bUIO
+	OrXe4dWLHwFuZEGpY/wEbXo+mfspjadRtWmZPaftlwC9QSFO45Se0q5owgWDqa69mo7Mnk
+	YY5P65G6j2n5mSIUq85C0RB+IM3fxShP7BOAb31EIrkWjUznXKMHIApLCM/aGcFHHqj6LE
+	9ed4zgSCpiNl6y2onYak2pnuUKby6GJmOqilPCl4vCKPepx4hDZOc35OQvtzZCokoo2tYy
+	bI5NxYhe6dUqONu7d/XZ57wMMYEF50RIKCaUsA8IRJ/7rtFF7w0N2JADkMLhSw==
+From: agpn1b92@anonaddy.me
+To: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ sgarzare@redhat.com
+Subject: [BUG] vsock: poll() not waking on data arrival, causing
+ multi-second SSH delays
+Feedback-ID: S:d17f588e-5717-4190-ab1e-7db474f4dce6:anonaddy
+Message-ID: <69215650a498621d099254e359e0b464@anonaddy.me>
+X-Complaints-To: abuse@help.addy.io
+X-Report-Abuse: abuse@help.addy.io
+X-Report-Abuse-To: abuse@help.addy.io
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260205075445.43347-1-enelsonmoore@gmail.com> <IA3PR11MB89868B6110780F90795E4ED7E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
-In-Reply-To: <IA3PR11MB89868B6110780F90795E4ED7E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Thu, 5 Feb 2026 00:18:11 -0800
-X-Gm-Features: AZwV_Qi279RFUb8dryBzOPG7K4OPVJ4GK9tbcGC43GVruOveblEFmaOLVgoO04w
-Message-ID: <CADkSEUiNrMCGzECO2t+Stx7Xnk=bCAp+mk=99FrMZFq4wOmgFQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: intel: fix PCI device ID conflict between
- i40e and ipw2200
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, Johannes Berg <johannes@sipsolutions.net>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stanislav Yakovlev <stas.yakovlev@gmail.com>, Alice Michael <alice.michael@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 05 Feb 2026 08:18:23 +0000
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[anonaddy.me,reject];
+	R_DKIM_ALLOW(-0.20)[anonaddy.me:s=default2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[anonaddy.me:+];
+	FROM_NEQ_ENVFROM(0.00)[agpn1b92@anonaddy.me,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257040-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,sipsolutions.net,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-257041-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 86A01EFCD9
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[anonaddy.me:mid,anonaddy.me:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vsock:email]
+X-Rspamd-Queue-Id: F18F7EFCEA
 X-Rspamd-Action: no action
 
-Hi, Alexandr,
+Hi,
 
-On Thu, Feb 5, 2026 at 12:13=E2=80=AFAM Loktionov, Aleksandr
-<aleksandr.loktionov@intel.com> wrote:
-> Commit message could be more detailed.
-> - Why the PCI ID is being reused (if known) Is this actually a reuse afte=
-r EOL, or is there a misunderstanding? The commit message hand-waves this c=
-ritical detail.
-> - Whether this is documented in hardware datasheets
-> - If there are bug reports of the conflict in the wild
-I don't know any of this information. I found this conflict via a
-script I was motivated to write by noticing an ID conflict between
-r8169 and 8139too.
+I'm experiencing a bug where SSH sessions over vsock take 2-20+ se=
+conds
+to establish due to poll() not signaling POLLIN when data is availa=
+ble.
+The bug does NOT occur on the first connection after VM boot, but af=
+fects
+all subsequent connections.
 
-> If it's quite critical fix why not to send it to [PATCH net] ?
-I used that prefix because the patch is against net-next. It will make
-it into stable versions regardless.
+* Summary
 
-Ethan
+- vsock poll() fail=
+s to return POLLIN when data is in the receive buffer
+- sshd-session's pp=
+oll() times out every ~20ms instead of waking on data
+- First SSH connect=
+ion after guest boot works instantly
+- All subsequent connections experie=
+nce 2-20+ second delays
+- Non-PTY commands (ssh -T ... 'echo test') work =
+instantly
+- TCP connections to the same VM work instantly
+
+* Environm=
+ent
+
+Host:
+- OS: Arch Linux
+- Kernel: 6.18.2-arch2-1
+- QEMU: syst=
+em package (latest)
+
+Guest:
+- OS: Debian trixie
+- Kernel: 6.17.13+d=
+eb13-amd64 (also tested on 6.12.57, same issue)
+- OpenSSH: 10.0p2
+
+QE=
+MU command (relevant parts):
+ =C2=A0 qemu-system-x86_64 -enable-kvm -smp =
+8 \
+ =C2=A0 =C2=A0 -object memory-backend-memfd,id=3Dmem,size=3D20G,share=
+=3Don \
+ =C2=A0 =C2=A0 -machine memory-backend=3Dmem \
+ =C2=A0 =C2=
+=A0 -device vhost-vsock-pci,guest-cid=3D5 \
+ =C2=A0 =C2=A0 ...
+
+Conne=
+ction method: ssh user@vsock/5 (via systemd-ssh-proxy)
+
+* Symptoms
+=
+
+Interactive SSH (PTY) - SLOW:
+ =C2=A0 $ time ssh user@vsock/5
+ =
+=C2=A0 # Takes 2-20+ seconds before shell prompt appears
+
+Non-interacti=
+ve SSH - FAST:
+ =C2=A0 $ time ssh user@vsock/5 'echo test'
+ =C2=A0 test=
+
+ =C2=A0 real=C2=A0 =C2=A0 0m0.156s
+
+TCP to same VM - FAST:
+ =C2=
+=A0 $ time ssh -p 33594 user@127.0.0.1
+ =C2=A0 # Instant
+
+* Key obser=
+vation: First connection after boot is fast
+
+After guest reboot:
+ =
+=C2=A0 $ ssh user@vsock/5=C2=A0 =C2=A0 =C2=A0 # INSTANT (< 1 second)
+ =
+=C2=A0 $ exit
+ =C2=A0 $ ssh user@vsock/5=C2=A0 =C2=A0 =C2=A0 # SLOW (2-20=
+ seconds)
+ =C2=A0 $ ssh user@vsock/5=C2=A0 =C2=A0 =C2=A0 # SLOW
+ =C2=
+=A0 ...
+
+This suggests the bug involves state that accumulates or isn't=
+ properly
+cleaned up between connections.
+
+** bpftrace evidence
+
+=
+Using syscall tracepoints on guest during slow connection:
+
+ =C2=A0 =3D=
+=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D
+ =C2=A0 [=C2=A0 =C2=A029 ms] ss=
+hd-session: ppoll() duration=3D19 ms ret=3D1
+ =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIMEOUT pattern detected!
+ =C2=A0 [=
+=C2=A0 =C2=A050 ms] sshd-session: ppoll() duration=3D20 ms ret=3D1
+ =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIMEOUT pattern de=
+tected!
+ =C2=A0 [=C2=A0 =C2=A070 ms] sshd-session: ppoll() duration=3D18 =
+ms ret=3D1
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIME=
+OUT pattern detected!
+ =C2=A0 ... (continues for ~2 seconds) ...
+
+ =
+=C2=A0 [ 5000 ms] --- 5s stats: ppoll=3D455, timeouts=3D103, recv=3D0 (0 by=
+tes) ---
+
+ =C2=A0 [19432 ms] sshd: recvmsg() =3D 308 bytes [4 =C2=B5s]=
+
+ =C2=A0 [19442 ms] sshd-session: recvmsg() =3D 308 bytes [4 =C2=B5s]
+=
+
+Pattern analysis:
+- ppoll() returns ret=3D1 (1 fd ready) but takes exa=
+ctly ~20ms (timeout)
+- The ready fd is the PTY, NOT the vsock socket
+- =
+recv=3D0 during the timeout phase: vsock data not being read
+- recvmsg() =
+finally succeeds after ~19 seconds
+- When recvmsg() runs, it completes in=
+ 4 microseconds (data WAS there)
+
+This proves: data is sitting in the v=
+sock receive buffer, but poll()
+is not returning POLLIN, so sshd doesn't =
+know to read it.
+
+* 30-second summary from bpftrace
+
+ =C2=A0 Total =
+ppoll calls: 488
+ =C2=A0 Timeouts (20ms pattern): 103
+ =C2=A0 Successfu=
+l recvmsg: 6 (984 bytes)
+ =C2=A0 Timeout rate: 21%
+
+* Why PTY-specifi=
+c?
+
+PTY sessions require bidirectional traffic:
+1. Server sends shell=
+ prompt =E2=86=92 client must receive it
+2. Client sends keypress =
+=E2=86=92 server must receive it
+3. Server sends echo =E2=86=92 client mu=
+st receive it
+
+Each exchange relies on poll() waking on POLLIN. The bug=
+ causes poll()
+to miss the wakeup, forcing sshd to wait for its 20ms time=
+out fallback.
+
+Non-PTY commands do request-response-exit quickly before=
+ the bug
+manifests significantly.
+
+## Additional context
+
+I previ=
+ously encountered the identical issue on WSL2's Hyper-V vsock
+implementat=
+ion, suggesting this may be a fundamental issue with how
+vsock transports=
+ handle poll/wakeup semantics, not specific to virtio.
+
+## Hypothesis=
+
+
+Based on the evidence, this appears to be a lost wakeup race conditio=
+n:
+1. Host sends packet to guest
+2. Packet is enqueued to socket's rx_q=
+ueue
+3. sk_data_ready() is called but poll waiters aren't properly woken=
+
+4. vsock_poll() returns 0 (no POLLIN) despite data being available
+5. =
+ppoll() times out after 20ms, sshd retries
+6. Eventually succeeds through=
+ timeout-based retry
+
+The "first connection works" pattern suggests the=
+ race involves
+existing state from previous connections - possibly worker=
+ threads,
+interrupt handlers, or virtqueue state that isn't properly rese=
+t.
+
+## Reproducer
+
+1. Start QEMU VM with vhost-vsock-pci device
+2=
+. Boot guest, ensure sshd is running
+3. From host: ssh user@vsock/<CID>=
+=C2=A0 # First connection is fast
+4. Exit and reconnect: ssh user@vsock/<=
+CID>=C2=A0 # Now slow
+
+## Request
+
+Could someone familiar with the =
+vsock/virtio poll implementation
+review the wakeup path? Specifically:
+=
+- virtio_transport_recv_pkt() -> sk_data_ready() path
+- vsock_poll() -> p=
+oll_wait() registration timing
+- Any state that persists between connecti=
+ons
+
+Happy to provide additional traces or test patches.
+
+Thanks,=
+
+[Your Name]
+
+---
+bpftrace script used (runs on guest):
+
+#!/usr=
+/bin/env bpftrace
+BEGIN {
+ =C2=A0 =C2=A0 @start =3D nsecs;
+ =C2=A0 =
+=C2=A0 printf("=3D=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D\n");
+}
+trac=
+epoint:syscalls:sys_enter_ppoll {
+ =C2=A0 =C2=A0 if (comm =3D=3D "sshd-se=
+ssion" || comm =3D=3D "sshd") {
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 @ppoll_enter=
+[tid] =3D nsecs;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 @ppoll_count++;
+ =C2=
+=A0 =C2=A0 }
+}
+tracepoint:syscalls:sys_exit_ppoll {
+ =C2=A0 =C2=A0 if=
+ (@ppoll_enter[tid]) {
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 $ms =3D (nsecs - @sta=
+rt) / 1000000;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 $dur =3D (nsecs - @ppoll_ente=
+r[tid]) / 1000000;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ($dur > 10) {
+ =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf("[%5lld ms] %s: ppoll() du=
+ration=3D%lld ms ret=3D%d\n",
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$ms, comm, $dur, args->ret);
+ =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ($dur >=3D 18 && $dur <=3D 25) {
+ =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf("=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIMEOUT pattern detected!\n");=
+
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 @timeout_count+=
++;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+ =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 }
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 delete(@ppoll_enter[tid]);
+ =
+=C2=A0 =C2=A0 }
+}
+tracepoint:syscalls:sys_exit_recvmsg {
+ =C2=A0 =
+=C2=A0 if (comm =3D=3D "sshd-session" || comm =3D=3D "sshd") {
+ =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 if (args->ret > 0) {
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 $ms =3D (nsecs - @start) / 1000000;
+ =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 printf("[%5lld ms] %s: recvmsg() =3D %lld bytes\n"=
+, $ms,=20
+comm, args->ret);
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 @r=
+ecv_count++;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 @recv_bytes +=3D =
+args->ret;
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+ =C2=A0 =C2=A0 }
+}
+interv=
+al:s:5 {
+ =C2=A0 =C2=A0 printf("\n[%5lld ms] --- 5s stats: ppoll=3D%d, ti=
+meouts=3D%d, recv=3D%d=20
+(%d bytes) ---\n\n",
+ =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0(nsecs - @start) / 1000000, @ppoll_count, @timeout_coun=
+t,=20
+@recv_count, @recv_bytes);
+}
+
+
 
