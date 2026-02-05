@@ -1,389 +1,235 @@
-Return-Path: <netdev+bounces-257034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGaaK2hPhGkE2gMAu9opvQ
-	(envelope-from <netdev+bounces-257034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:06:00 +0100
+	id AKBhHMhMhGm82QMAu9opvQ
+	(envelope-from <netdev+bounces-257028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:54:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D248EFB88
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:06:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E3FEFA0C
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:54:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5F4D302B3A1
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:02:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 54A0E30041FA
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 07:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707C335FF5A;
-	Thu,  5 Feb 2026 08:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4787C35F8DE;
+	Thu,  5 Feb 2026 07:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b="l6Jwg4DO"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="EqIPxl8N";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="D5m16N4j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2.anonaddy.me (mail2.anonaddy.me [185.70.196.149])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1116823D7D4
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.196.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EAF2405EC;
+	Thu,  5 Feb 2026 07:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770278575; cv=none; b=Yi2bWOhEE9kLkSp3LcsDu4Ot9021kzPKDB5zTQ1xVyYozADNtnxPZLsNtJfK3f01hsj8eHME/cW0T92gHD5mXi3fSdcaUlfLnu7OgfOrkWILnnmZDNI5ez6ekVd0KtBAzIVzSCk+ZcLFfzOmNJqW/Lr5A5WgrHpKit6TbMR+jBQ=
+	t=1770278086; cv=none; b=s7vqQ4/JV5F5J8XmgAWk4jz/Wc1j02y0b5hdVzh7PCe+l3nvWhLJFKReKNSEALHsSIbFFIw+oIgQuO6zFbQtaZUVXFes2gCt/VQ0XNnYcGXB3MvbUXQsqKIG+hSxEoWyrp0dwVJBE7cz7ZvMdlqoNgK2sRX187GbPVfDdMo6s5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770278575; c=relaxed/simple;
-	bh=5AaoRbBNAPkNC4SsGLg3KZJ0Aa//TunCotCzsupFYZ4=;
-	h=From:To:Subject:Message-ID:Cc:MIME-Version:Date:Content-Type; b=jPCLpV3gRinKyNsjx7gJImEiN76ix5XGSOi4U7x2RLnnTOJO0jllrq+Rr1ieyrUIGYovElu+Dko2WD0SfSF6DGKslNIb+kZQ17e6pfpvKhMahgP5Kz92KV5FglYe1KZz71YgR04LR/+H1iEi6fFrz5dx+72VJ4ZntjzybgHUoWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me; spf=pass smtp.mailfrom=anonaddy.me; dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b=l6Jwg4DO; arc=none smtp.client-ip=185.70.196.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anonaddy.me
-Received: from mail2.anonaddy.me (mail2.anonaddy.me [127.0.0.1])
-	by mail2.anonaddy.me (Postfix) with ESMTPS id 8B18BFA9D1
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 07:53:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anonaddy.me; s=default2;
-	t=1770278013;
+	s=arc-20240116; t=1770278086; c=relaxed/simple;
+	bh=YqkYuVD6B8ingjypZapGuxYX1HIAg0y6MvAOvzuLs6Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OUNpjWWqtmfodu+Ljv5oQTPFonvEgt/dd514+O/K7nSFiWiepjE/vD06Z6Q574YWqJs3RHwE1yv6sstUB8Kg2WutL3I6ShcvfeGF1/yIgJLuv2nHksnBbo1h71kSwK3mwUE+l5+cnap/uKh57wqxdxmhXHq9SQK2HJHYuviBLUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=EqIPxl8N; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=D5m16N4j; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1770278083;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=apxmgs+L7pLGJzl95x0JK/zDZ8qpoMIhjhbsuOYRGR4=;
-	b=l6Jwg4DOiQaSMiwWwGJH3LC0ccr6wnZssIRIXG+OWMsgFSVyli+Gk7G0XFSnkmfsMK9n4f
-	/hMyM7YEg2mRwZUTdfs/eFyDsj80K6UbRyu5uSF+Aw4MAdeUmdAAQzumxhIboCo8Dbb75F
-	2Bbz5sxPeU0rYmNNRA6MXkeJTfBEAUfXQxGBtusM7GglnkEEFPMvZcDvAU7f6PshrKF8D5
-	0qUdvgw4Fgdv7TAxvcYI/BABnYw6Gi5P9pFUK5bgeLosWW+o/Qaxus/0foTcCb9luJTzrj
-	/4MuOvpmLCFjNH+Hk51ujmA265bbtLzt9V9gFtJblxUxwZ6VzzPaoeORZJINVw==
-From: agpn1b92@anonaddy.me
-To: virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: [BUG] vsock: poll() not waking on data arrival, causing
- multi-second SSH delays
-Feedback-ID: S:d17f588e-5717-4190-ab1e-7db474f4dce6:anonaddy
-Message-ID: <f3a801a1a32670294d5d703cad8ab609@anonaddy.me>
-X-Complaints-To: abuse@help.addy.io
-X-Report-Abuse: abuse@help.addy.io
-X-Report-Abuse-To: abuse@help.addy.io
-Cc: sgarzare@redhat.com
+	bh=YI75SligFceTjZw1yfKwWA/UrX3Yc7oaVqN88ExO2XQ=;
+	b=EqIPxl8NJcb5hBz/DrlS9vH/GYZnvDZ4UuLxFpgZmJXi78iJ5zTXXuP/N8LOB6IXh38Qem
+	s5Y9jb70GBj5gVpIzGTfPg+jyVNNsLj8GDTx3u9SUeO2BcmHlzlu2CSTnUmIveV1c7T4i3
+	LGBtGFply5RZr7HhM2NOSSUEaiRv9i+6rmhwgNgGe/pESLNFE8OOfqHehgvkwn2cLWbyjS
+	HjjjXjzoxGIqLLNPiF1oVzOoiSRbB2H/ze1XvxHGgpVslBcu1DHqpJDHfpNxwa0LUcE81S
+	5jqS3bWbPm4kr25462KHT57ZpkiH0m9sqZ7evn5jNKPn6AA3ZeVl7oRXL8sXfw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1770278083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YI75SligFceTjZw1yfKwWA/UrX3Yc7oaVqN88ExO2XQ=;
+	b=D5m16N4jsfXnocitENkWPThOOadmmtN+AyrVSy44krWO7h37RMVVyhUV//WSMLwW2bVnkq
+	BEpQN3NlKu5dZmCg==
+Date: Thu, 05 Feb 2026 08:54:34 +0100
+Subject: [PATCH iwl-next v3] igb: Retrieve Tx timestamp directly from
+ interrupt for i210
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 05 Feb 2026 07:53:33 +0000
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIALlMhGkC/12N0Q6CIBhGX8VxHQ1+NFxXvUdrDhH13xwWENmc7
+ x5jXViXZ9/O+VbijUPjyblYiTMRPc42gTgURI/KDoZil5gAg4rVXFAc2gbdowmecqWk1Fq2pW5
+ JEu7O9Ljk2JXga6LWLIHc0jKiD7N755fI8/4NVvtg5JTTWp96zUQlSoDLhPYZ3GxxOXYmpyLsd
+ IAfHZLOlRaSyVpJVf7r27Z9AIW5aenxAAAA
+X-Change-ID: 20250813-igb_irq_ts-1aa77cc7b4cb
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Miroslav Lichvar <mlichvar@redhat.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3568; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=YqkYuVD6B8ingjypZapGuxYX1HIAg0y6MvAOvzuLs6Q=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBphEzCiI2A689V5++B//pI9fgMWXXaArRkMXPVj
+ 3VH4/bTuOSJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCaYRMwgAKCRDBk9HyqkZz
+ gv4NEACQ8pejkbuLsnYEsrckwAJrabuIvthZIhfNOAGJFgcxq2XB3D+WnwgSGtxtjbDFvop5FZ4
+ aNrhHqoM7AkxSkFppXvtlsp1Z+RDC71rEp58uKSP0b5P+HHpfyC9Neo7VwJVoJAqC6pv/WJK9ra
+ aKjpTFEZutyMuvWYKfPSPl5H4RB9vVjSdKE4cLUTONX9N5rB9VjqXIm4b+11+nvTp/wBJ9ehlI/
+ tKLB25Mvw0DMt3lNzAa0wM3L+T7tm7iRPkyT6NmfMrNnFFJ+6A/+We8sO/22QzSCvLCoFKw37DS
+ iBYOkCHzGrXDwrygPNwdut+mJXLr9tvVYmrrcxlfea2tblWIbNZbuzZXB+UkJ4wCAAidP8y8N19
+ Gr5vbfWSls3j0d0Zg0tFsgAGlyC9gzGoLRSOkDRXkMt+ovFuUWu0Qdab1oDBF4FW7nP4zRkF3s1
+ r6PuMNppUDp41oBlIc/DqjhO/IJcUNeG65oGnl9u9bnC7BlXz2fq7k88GDuiFsPOzLBEhMrk+ww
+ ys+rmbPl8yk3JYI1F8o6Q7Ez1XJe7Wz/k04fmKf2cucxkZ+pAWmSaxkWUR+pDl3OCydwTrjXOry
+ g/a7KtPYNBtW9Op/w6xzG0AvWgJsgvyjqpZP4S0Nf4+Uhagg/NyBw2a/5KZU989w20uT1VwEzdQ
+ ArarhMmXOyR1OKA==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[anonaddy.me,reject];
-	R_DKIM_ALLOW(-0.20)[anonaddy.me:s=default2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[anonaddy.me:+];
-	FROM_NEQ_ENVFROM(0.00)[agpn1b92@anonaddy.me,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-257034-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257028-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,intel.com,linutronix.de,molgen.mpg.de,linux.dev,lists.osuosl.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[anonaddy.me:mid,anonaddy.me:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vsock:email]
-X-Rspamd-Queue-Id: 1D248EFB88
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 16E3FEFA0C
 X-Rspamd-Action: no action
 
-Hi,
+Retrieve Tx timestamp directly from interrupt handler for i210.
 
-I'm experiencing a bug where SSH sessions over vsock take 2-20+ se=
-conds
-to establish due to poll() not signaling POLLIN when data is availa=
-ble.
-The bug does NOT occur on the first connection after VM boot, but af=
-fects
-all subsequent connections.
+The current implementation uses schedule_work() which is executed by the
+system work queue to retrieve Tx timestamps. This increases latency and can
+lead to timeouts in case of heavy system load. i210 is often used in
+industrial systems, where timestamp timeouts can be fatal.
 
-* Summary
+Therefore, fetch the timestamp directly from the interrupt handler.
 
-- vsock poll() fail=
-s to return POLLIN when data is in the receive buffer
-- sshd-session's pp=
-oll() times out every ~20ms instead of waking on data
-- First SSH connect=
-ion after guest boot works instantly
-- All subsequent connections experie=
-nce 2-20+ second delays
-- Non-PTY commands (ssh -T ... 'echo test') work =
-instantly
-- TCP connections to the same VM work instantly
+The work queue code stays for all other NICs supported by igb.
 
-* Environm=
-ent
+Tested on Intel i210 and i350.
 
-Host:
-- OS: Arch Linux
-- Kernel: 6.18.2-arch2-1
-- QEMU: syst=
-em package (latest)
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+---
+Changes in v3:
+- Switch back to IRQ, but for i210 only
+- Keep kworker for all other NICs like i350 (Miroslav)
+- Link to v2: https://lore.kernel.org/r/20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de
 
-Guest:
-- OS: Debian trixie
-- Kernel: 6.17.13+d=
-eb13-amd64 (also tested on 6.12.57, same issue)
-- OpenSSH: 10.0p2
+Changes in v2:
+- Switch from IRQ to PTP aux worker due to NTP performance regression (Miroslav)
+- Link to v1: https://lore.kernel.org/r/20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de
+---
+ drivers/net/ethernet/intel/igb/igb.h      |  1 +
+ drivers/net/ethernet/intel/igb/igb_main.c |  5 ++++-
+ drivers/net/ethernet/intel/igb/igb_ptp.c  | 22 ++++++++++++++++++++++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
 
-QE=
-MU command (relevant parts):
-  qemu-system-x86_64 -enable-kvm -smp 8 \
-=
-    -object memory-backend-memfd,id=3Dmem,size=3D20G,share=3Don \
-    -ma=
-chine memory-backend=3Dmem \
-    -device vhost-vsock-pci,guest-cid=3D5 \=
-
-    ...
-
-Connection method: ssh user@vsock/5 (via systemd-ssh-proxy)=
-
-
-* Symptoms
-
-Interactive SSH (PTY) - SLOW:
-  $ time ssh user@vso=
-ck/5
-  # Takes 2-20+ seconds before shell prompt appears
-
-Non-interac=
-tive SSH - FAST:
-  $ time ssh user@vsock/5 'echo test'
-  test
-  real =
-   0m0.156s
-
-TCP to same VM - FAST:
-  $ time ssh -p 33594 user@127.0.=
-0.1
-  # Instant
-
-* Key observation: First connection after boot is fa=
-st
-
-After guest reboot:
-  $ ssh user@vsock/5      # INSTANT (< 1 seco=
-nd)
-  $ exit
-  $ ssh user@vsock/5      # SLOW (2-20 seconds)
-  $ ssh =
-user@vsock/5      # SLOW
-  ...
-
-This suggests the bug involves state =
-that accumulates or isn't properly
-cleaned up between connections.
-
-*=
-* bpftrace evidence
-
-Using syscall tracepoints on guest during slow con=
-nection:
-
-  =3D=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D
-  [   29 ms]=
- sshd-session: ppoll() duration=3D19 ms ret=3D1
-             ^^^ 20ms TIM=
-EOUT pattern detected!
-  [   50 ms] sshd-session: ppoll() duration=3D20 m=
-s ret=3D1
-             ^^^ 20ms TIMEOUT pattern detected!
-  [   70 ms] =
-sshd-session: ppoll() duration=3D18 ms ret=3D1
-             ^^^ 20ms TIME=
-OUT pattern detected!
-  ... (continues for ~2 seconds) ...
- =20
-  [ 500=
-0 ms] --- 5s stats: ppoll=3D455, timeouts=3D103, recv=3D0 (0 bytes) ---
- =
-=20
-  [19432 ms] sshd: recvmsg() =3D 308 bytes [4 =C2=B5s]
-  [19442 ms] s=
-shd-session: recvmsg() =3D 308 bytes [4 =C2=B5s]
-
-Pattern analysis:
--=
- ppoll() returns ret=3D1 (1 fd ready) but takes exactly ~20ms (timeout)
--=
- The ready fd is the PTY, NOT the vsock socket
-- recv=3D0 during the time=
-out phase: vsock data not being read
-- recvmsg() finally succeeds after ~=
-19 seconds
-- When recvmsg() runs, it completes in 4 microseconds (data WA=
-S there)
-
-This proves: data is sitting in the vsock receive buffer, but=
- poll()
-is not returning POLLIN, so sshd doesn't know to read it.
-
-* =
-30-second summary from bpftrace
-
-  Total ppoll calls: 488
-  Timeouts =
-(20ms pattern): 103
-  Successful recvmsg: 6 (984 bytes)
-  Timeout rate:=
- 21%
-
-* Why PTY-specific?
-
-PTY sessions require bidirectional traff=
-ic:
-1. Server sends shell prompt =E2=86=92 client must receive it
-2. Cl=
-ient sends keypress =E2=86=92 server must receive it
-3. Server sends echo=
- =E2=86=92 client must receive it
-
-Each exchange relies on poll() wakin=
-g on POLLIN. The bug causes poll()
-to miss the wakeup, forcing sshd to wa=
-it for its 20ms timeout fallback.
-
-Non-PTY commands do request-response=
--exit quickly before the bug
-manifests significantly.
-
-## Additional =
-context
-
-I previously encountered the identical issue on WSL2's Hyper-V=
- vsock
-implementation, suggesting this may be a fundamental issue with ho=
-w
-vsock transports handle poll/wakeup semantics, not specific to virtio.=
-
-
-## Hypothesis
-
-Based on the evidence, this appears to be a lost w=
-akeup race condition:
-1. Host sends packet to guest
-2. Packet is enqueu=
-ed to socket's rx_queue
-3. sk_data_ready() is called but poll waiters are=
-n't properly woken
-4. vsock_poll() returns 0 (no POLLIN) despite data bei=
-ng available
-5. ppoll() times out after 20ms, sshd retries
-6. Eventuall=
-y succeeds through timeout-based retry
-
-The "first connection works" pa=
-ttern suggests the race involves
-existing state from previous connections=
- - possibly worker threads,
-interrupt handlers, or virtqueue state that i=
-sn't properly reset.
-
-## Reproducer
-
-1. Start QEMU VM with vhost-vs=
-ock-pci device
-2. Boot guest, ensure sshd is running
-3. From host: ssh =
-user@vsock/<CID>  # First connection is fast
-4. Exit and reconnect: ssh u=
-ser@vsock/<CID>  # Now slow
-
-## Request
-
-Could someone familiar wit=
-h the vsock/virtio poll implementation
-review the wakeup path? Specifical=
-ly:
-- virtio_transport_recv_pkt() -> sk_data_ready() path
-- vsock_poll(=
-) -> poll_wait() registration timing
-- Any state that persists between co=
-nnections
-
-Happy to provide additional traces or test patches.
-
-Tha=
-nks,
-[Your Name]
+diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
+index 0fff1df81b7b..1de29670784e 100644
+--- a/drivers/net/ethernet/intel/igb/igb.h
++++ b/drivers/net/ethernet/intel/igb/igb.h
+@@ -776,6 +776,7 @@ int igb_ptp_hwtstamp_get(struct net_device *netdev,
+ int igb_ptp_hwtstamp_set(struct net_device *netdev,
+ 			 struct kernel_hwtstamp_config *config,
+ 			 struct netlink_ext_ack *extack);
++void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter);
+ void igb_set_flag_queue_pairs(struct igb_adapter *, const u32);
+ unsigned int igb_get_max_rss_queues(struct igb_adapter *);
+ #ifdef CONFIG_IGB_HWMON
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index dbea37269d2c..d0d9245e6d72 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -7078,7 +7078,10 @@ static void igb_tsync_interrupt(struct igb_adapter *adapter)
+ 
+ 	if (tsicr & E1000_TSICR_TXTS) {
+ 		/* retrieve hardware timestamp */
+-		schedule_work(&adapter->ptp_tx_work);
++		if (hw->mac.type == e1000_i210)
++			igb_ptp_tx_tstamp_event(adapter);
++		else
++			schedule_work(&adapter->ptp_tx_work);
+ 	}
+ 
+ 	if (tsicr & TSINTR_TT0)
+diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+index bd85d02ecadd..8c8f2b8615f7 100644
+--- a/drivers/net/ethernet/intel/igb/igb_ptp.c
++++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+@@ -796,6 +796,28 @@ static int igb_ptp_verify_pin(struct ptp_clock_info *ptp, unsigned int pin,
+ 	return 0;
+ }
+ 
++/**
++ * igb_ptp_tx_tstamp_event
++ * @adapter: pointer to igb adapter
++ *
++ * This function checks the TSYNCTXCTL valid bit and stores the Tx hardware
++ * timestamp at the current skb.
++ **/
++void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter)
++{
++	struct e1000_hw *hw = &adapter->hw;
++	u32 tsynctxctl;
++
++	if (!adapter->ptp_tx_skb)
++		return;
++
++	tsynctxctl = rd32(E1000_TSYNCTXCTL);
++	if (WARN_ON_ONCE(!(tsynctxctl & E1000_TSYNCTXCTL_VALID)))
++		return;
++
++	igb_ptp_tx_hwtstamp(adapter);
++}
++
+ /**
+  * igb_ptp_tx_work
+  * @work: pointer to work struct
 
 ---
-bpftrace script used (runs on guest):
+base-commit: e07d0d30939990da377672ef49ca09763b4fbc79
+change-id: 20250813-igb_irq_ts-1aa77cc7b4cb
 
-#!=
-/usr/bin/env bpftrace
-BEGIN {
-    @start =3D nsecs;
-    printf("=3D=
-=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D\n");
-}
-tracepoint:syscalls:sy=
-s_enter_ppoll {
-    if (comm =3D=3D "sshd-session" || comm =3D=3D "sshd")=
- {
-        @ppoll_enter[tid] =3D nsecs;
-        @ppoll_count++;
-    }=
-
-}
-tracepoint:syscalls:sys_exit_ppoll {
-    if (@ppoll_enter[tid]) {=
-
-        $ms =3D (nsecs - @start) / 1000000;
-        $dur =3D (nsecs - =
-@ppoll_enter[tid]) / 1000000;
-        if ($dur > 10) {
-            prin=
-tf("[%5lld ms] %s: ppoll() duration=3D%lld ms ret=3D%d\n",
-              =
-     $ms, comm, $dur, args->ret);
-            if ($dur >=3D 18 && $dur <=
-=3D 25) {
-                printf("           ^^^ 20ms TIMEOUT pattern det=
-ected!\n");
-                @timeout_count++;
-            }
-        }=
-
-        delete(@ppoll_enter[tid]);
-    }
-}
-tracepoint:syscalls:sys=
-_exit_recvmsg {
-    if (comm =3D=3D "sshd-session" || comm =3D=3D "sshd")=
- {
-        if (args->ret > 0) {
-            $ms =3D (nsecs - @start) / =
-1000000;
-            printf("[%5lld ms] %s: recvmsg() =3D %lld bytes\n", =
-$ms, comm, args-
->ret);
-            @recv_count++;
-            @recv_=
-bytes +=3D args->ret;
-        }
-    }
-}
-interval:s:5 {
-    printf=
-("\n[%5lld ms] --- 5s stats: ppoll=3D%d, timeouts=3D%d, recv=3D%d (%d bytes=
-)
----\n\n",
-           (nsecs - @start) / 1000000, @ppoll_count, @timeo=
-ut_count,
-@recv_count, @recv_bytes);
-}
-
-
+Best regards,
+--  
+Kurt Kanzenbach <kurt@linutronix.de>
 
 
