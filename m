@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-257290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0EZJO8/nhGlf6QMAu9opvQ
-	(envelope-from <netdev+bounces-257290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 19:56:15 +0100
+	id uBZ3GeHohGnb6QMAu9opvQ
+	(envelope-from <netdev+bounces-257291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:00:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5481CF69D9
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 19:56:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA067F6A75
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9EC13010142
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 18:56:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6CF1B302496F
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 19:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500973093AD;
-	Thu,  5 Feb 2026 18:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6A630B528;
+	Thu,  5 Feb 2026 19:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lMv3Zw2a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gT/8/tKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E173093A6
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 18:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897961DF258
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 19:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.181
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770317773; cv=pass; b=rTPlKqbvi92tkxY4ve0am6Tn3n//xKCQEPBL/FQmIdvOB6HDM/ejxLtp8AcskrBCDAvlZEyBIY7C0ernOPg63FClMU4aK2rqUw7vpsUr2S0TohOnXufBI9swkgIZ/+BpzQn/1lOkwYW9388VmxKeukf4xMfzi7QJkSL5sPQdobI=
+	t=1770318046; cv=pass; b=Ly6S6hbHYQzhhcXYZTB1SnHQZaeFfIV+HTuPSNhjd7FKVSFjYeNN2fH7Niv2EgBX3VjzX4LzhfjhbB0tALeCra0QFztElNee2pKk0hlsTH5i2uL11fhtMQifJ//R1wy9+QwCXj4CiDgwymLOUycq1EDi9Y+IKVEoHtkKZJ2w/hY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770317773; c=relaxed/simple;
-	bh=UTAeTogqMPOzWsl43rYalxijcnMd4QsYh0uYCJzTId8=;
+	s=arc-20240116; t=1770318046; c=relaxed/simple;
+	bh=AuskjtNOz6nZ0G+yrh6WViA45fpVm0rg4c0PZaDjONg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nz1sGU5clD8KZ3KqvuWwsgDXG9wiI8ZbQKAcGJ1Ot4s6ZtoFY4eAUjUWObSPZvzomATC2TtKr4gIIjNAcJYrYRnaZi4AuE/sqhhJF4knhiGi2x/aH9mmGdeidSYuOtQ5jRZIZWoqYfQvdxnoCD1HrLbjRJN8s8efaTsG4hJX71o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lMv3Zw2a; arc=pass smtp.client-ip=209.85.216.41
+	 To:Cc:Content-Type; b=hK/1VhHLHvOvJ3xrNyZL+tc2GXX3jIWGJJ8DMwcGJmTolONSgzG/JYXb84hOJtfu76a58L2FIE2Tpy0rw4WzS+wRTTsAaUd5sj4PUGGGamx6G7AC62DAU0VhPe6JGWWTrM07vq8Xeh7xGfu/p2RSVpJK6TscaCy0gD3JALrNdyk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gT/8/tKO; arc=pass smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34be2be4b7cso687041a91.3
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 10:56:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770317772; cv=none;
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-8231061d234so1366516b3a.1
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 11:00:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770318046; cv=none;
         d=google.com; s=arc-20240605;
-        b=BjY1/By78+aVRq3fpVB+o1ffiXWs3rHaORwKSu2M195mX958i0zYu44SVcciCWhX3r
-         6Ov4qY+6PhJ7pp2lHvw3Xi+OMIV1KeVh0OTVLvKETIZm+erb1QTGMb9E4zqFQD+j53se
-         oQyLq+2mfa65Eep1mohUol3s3LI2t72wGdYSEPcCTzki1i5h+pLtGyEkxNFPreQHep6a
-         kytlsSw1Q00IAOmgr1hDMqo/HwxoqcOzNbZhDCoyOp2HzO73StjeQNw8j0UZX01p9fm+
-         wmKQ+Wx9hlNk7weAyS9rCbUFSkU2cFUA6X2+bxFlBiQqc+goM+poXrMaFj912FsEA9L5
-         IRHQ==
+        b=TlfB12J3eh4+A9FlsHBQD7ziT/TvO+xCxQevIrUm1TCt4v/GJdlLPLvkD3x/ykvNhV
+         4kzjdj6ob1AHtk99ZqK5jPHaQ0BqvUxBm98MJnLLzD0yxNwyKkCNuIRwGbqw7j3BuL51
+         0/Zi8fS4ji2WXQYL5FaxqzkZhTcExKOsRqlhw15aUwcmEJyblT+NYkuEpm/4BIBK/uMw
+         IFVoH5cVx2HybQdKSoJgFa2Q1da/53utVBZaNUGE7VhH+9hePdA6s2rGbt6es3ffcuFL
+         wwN3MvHNN/goclYKFmGKy//EB0PcFmsaOGsWetAvNiGX9NiKXqpABnLhxm0d4MkyG4w3
+         fF1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=80WFsFgkgPBLtk7OvSKjFaYy+3cWwSZUPkBNVljL2Sk=;
-        fh=Og8+GYJxQS3UHQoSJmo5a1kiEAxrFF0MZgXzFvNY2w8=;
-        b=cqh9k3drASIVmRB4XOQ/pvesbLXHpOtoLvMs64/aoTI039NXXNnqzNamwT61YB+tX/
-         tHEdytXrNo2GHRmBDyhwLGDsELR9vb6sFLI+go64weVWJQejGd5mF0PaqdKUI6AaQSfp
-         gyoRZ297VAWFg+xeKbGfaOdMjY81MwoMNatOhQug4mjotCvBzBJ1R4Etb5+D/DqFQCrY
-         B7bb5BwD9tadbo15HzZpDIXLksnLCvCjMSZfCy19/pJTcrtQksBCBmx6npqYHJXGhzxB
-         2OcuHdmePsBl9XVb80YW4DLvqbcBarTtJA5RqzVhmWQFfs2b9WmCdzWgknGiaXNollIc
-         EfcQ==;
+        bh=CzWk8gLvE9O246b4A2vdYNLzmmHIUhQKe38cf0ISaC8=;
+        fh=B/8sOLO1/nsEvDfP3+8lUZyZtHGloSZkIKeBh5oDmxQ=;
+        b=ae/42WIEC16lUQfQz+EiC02x/xn6LhkkCA7fYOYsvmqiqqddztpDxsQ5K0DmdLIsjX
+         mRM1rYJIcgg5QQSGcYe0C/7/ZVPzrKDgPNR32u/62wwLsdJrc64eEiwE+hED99gUAsw9
+         bjrgqavr/j2GE/+2HPFOSp2EbWptsNwp/9H2DBaQsdMEARX2W5S2OYtZwq9+hdgXivRN
+         SQUoxa1n0f7vj4HVnIiCcw5ntwDaruXlPfhYxtDBhLJXjEfn6BExnfB8Wf3wgx9z2Wa6
+         JSEalmrzYnhejWQa1PyLLy/cJ8XXnjGf04KQfTsWpxBWmwqtPzBshjFsSMBUjX3huGsI
+         TFeQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770317772; x=1770922572; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770318046; x=1770922846; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=80WFsFgkgPBLtk7OvSKjFaYy+3cWwSZUPkBNVljL2Sk=;
-        b=lMv3Zw2a+QeA2cN8eABE/FT4y6vVlCp7pT3IoxX+Bg2ldQLofHOWSVw3WGKQk9i4ht
-         nDuvNL/00V/K+mDNEzQ6XapgzytpieQk8+hxXxNudzjLBQHDUhM1d4olkBLORw2H06qK
-         CMU1aaCnO1V6pQBfSB8dIdWR6HsP0kXkn/96LuwlMjftJxTnR1OvRdQPJh9b912lenyp
-         JpZ1rsxigAdJO5tBdhaKWZ9HfOIdkGbkDhBEoe8mxl/iEyNjaul36l375PlvxuIwr0D7
-         MZ81Q/xyWp6seSAdKhPeFCfAISKtQbhIKrtGd6OTzQXsqL4DlL1rcS8ZHtzCa56V4OZ3
-         fD/g==
+        bh=CzWk8gLvE9O246b4A2vdYNLzmmHIUhQKe38cf0ISaC8=;
+        b=gT/8/tKOSOVMsz6n9OZMC2rrdO2BqPLRFDyZZsc+jFnSA0y3QlfPHWb0oIkvwU6G2k
+         RNdfQ5Bigi6EEHo6VJNrgcT2ozHzbjniFWs+rv4e4PvyMCSPiFO61CAivsSaMEdKonOv
+         PE9hnuU8lVqj4gBxcMg9vRTLp4Be2GiKJA32EENTQy9YlY8qVqb4gHc6Nsh7ETZ0uJ51
+         JNT5ArXbNkdIBMRUK9kdPyw3daY/upi5v0gEt/DIdyMgYgkG3ZDIT755YPUn3Qc605w3
+         54+hDQ2yta2BUNYaH53PT9wGspIGGqiUQp4eCaoanQN9+bcovFzg8Uc0r/1hSBaq7MJg
+         a9oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770317772; x=1770922572;
+        d=1e100.net; s=20230601; t=1770318046; x=1770922846;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=80WFsFgkgPBLtk7OvSKjFaYy+3cWwSZUPkBNVljL2Sk=;
-        b=rrWqzepj+JekhxGfGHGTt+hW08/QDtvcYSV+ar+bmtjbioQ1hf49+ZKdCPzlnAb3nI
-         EtYSP8rHK1mOsCFKc+FG11l+Zwlc1Anep/jARCvcQRaKghuqLKC02G/4rojfMzL+U8o3
-         q7dFaMizEReculKzF0x/ek3CL3UsZQXD/LtAitg+wOYioAQ5iLwdaonrF1io6u5wQ1Pp
-         PNBexd85XrowuITXChOQ3+HMbRKvQazAcMlm5b167BChdPGvP8Y02lndhKraQ569hvMR
-         fyIuID+wjYpfRICovJpt68bE31Hh+m5QHQQDDuDRpaHUoe0LgDnYoyKYjgS+Zqmxw/zf
-         UA1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWXuRZ+J8F2TEo1LQEgSPrpB/ofxluE7nPyxu9mMKqEo8Zj/C7kXK3WqAT3XHe9kN4M6EW1Z5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydEEuz+v3eF7V3LtL60AcyK4CGakO8xzhhFeS1on6VR24hPVdE
-	jNCVm8/nZOQQj+d0XPgqC2o+d2VRs42cQxsDdOBKTA0o2gHpESnrMRoz7N85x0LCAz8sOfeGzSs
-	kvg/eOTKOg+sQhPr0q08qP/6Lfqv5YqQ=
-X-Gm-Gg: AZuq6aKSYGV4wbYkyG6K5iOIkaexcbPYia7RL2CY98K1uX5eM1RDxvN9+IAoHl6HxN+
-	k7F9VAwaggrdlWiX8MDfo6tqSPH79L0MGJgA1ploxsFShhxX94bAkYiykLJyjik0UlE9BS05zVA
-	4ykyCmqKFaYJfl23gOLle30dOpCHLiRqRbvsZsKL0sFPgnbOIDqJE+A5hjrfoqotK3wb8wE4nGi
-	WeE14E6neJOFC7jkiI7Xjjr3YCQCOS0FIsUerYRX1vdQy96Rk96kwXhfnaAvesRvvJI8EfcTlVi
-	emdvjCL6vUrM6yv77SiqGLBURkvD
-X-Received: by 2002:a17:90b:3d89:b0:34c:2db6:57a7 with SMTP id
- 98e67ed59e1d1-354b3c50bcdmr29630a91.8.1770317772303; Thu, 05 Feb 2026
- 10:56:12 -0800 (PST)
+        bh=CzWk8gLvE9O246b4A2vdYNLzmmHIUhQKe38cf0ISaC8=;
+        b=Cx+E+Kg+TQS4wHcO7OD+T3B9g2f07P2E0BDkv/hFCHxr1JZ6ODWKal3icTgpoyzIDV
+         mWggcRZTw999mgGhagNAgp4O03elp/6OeClto5bAa0ZmNUpvA2eYAmtdX1erdbt3RPo2
+         H4qp6aw0M9a4CQv3hyCHei6QQIFtRAIWyla406QdLgBNq0NGFfQkiVxsiF2bPeTMiIkQ
+         gffnfas0nnOWt9p0Zv21PdWizpyq87/YmNCXLFnBZTSpMu3+HzIpv320iubHESH70k23
+         lfhOIaK75iYIKqmXWahcQRWkod9XdKPHHWt6obcTQYX5gmKvmmzHeDLllszKD4LC8Kdz
+         hB0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXvk1pFJa4dwHy9PSrsbRMWbHRbCLqU1PzfI3gOpip67GZnuEiV0MbjTFhaZuI577h9IkiA2PQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywrxb1mzoCb3E+DZeE4hP75eBnKkkdrngMEHr6UOrorDDsNMyZZ
+	/puFNnQqj7Adt2AnxDWXljdG07jtmCcwGZxPDHFWAx0NLLFaxzxhoUD/8dojvJa1wz1ukpqbz4p
+	dItjopmWfcScx/AbTUsLJHEjYXYRCiLY=
+X-Gm-Gg: AZuq6aLtokwjNJSllJmYkpXzU26FX8rYHL94SYfjlshaEtZa/hIvOhs3dWrC0eywFK8
+	dPlxe4YOENeg5hlH1DDpp1Y3RVRkWmfjA2ElTHQfYigvhTNQUtOyjoDcgIfuk3RYGquqtazXO8j
+	szknu+m1o2EKIEgiMUnARmDgPqQfjHqL1Fd8rIlGeNLSlsLRU+2kz3AEY/3KdMwFQp28LKqApax
+	zvF6+01yR5cIO2mOrU3YGAMEh+xjeJroXSLwFqNsIKagKSJCcvWkEjZ+PwfwQyWOTOJObir8iuH
+	ObjGkgGWDNJv5mdFPy70F89RHSy5
+X-Received: by 2002:a05:6a00:2e07:b0:81e:711d:b26f with SMTP id
+ d2e1a72fcca58-824416f7a4bmr51256b3a.43.1770318045758; Thu, 05 Feb 2026
+ 11:00:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d3a376cf555e7740330a50d83e6201c9084bff01.1770042461.git.lucien.xin@gmail.com>
- <20260205115518.2195328-1-horms@kernel.org>
-In-Reply-To: <20260205115518.2195328-1-horms@kernel.org>
+References: <a872188a6e4d7b39d6d6d0f6fad7e5077bce4bae.1770042461.git.lucien.xin@gmail.com>
+ <20260205115532.2195345-1-horms@kernel.org>
+In-Reply-To: <20260205115532.2195345-1-horms@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 5 Feb 2026 13:56:01 -0500
-X-Gm-Features: AZwV_QhMX6JEvl213fgLGN4KP_FM-9zVeYTAxoLTMPmESDUtW4x9IOxJ01wxKVg
-Message-ID: <CADvbK_fsXE6MkgF9KMVThTgsid9Tgkyjrvwyek9NM1jd0KZ4Vg@mail.gmail.com>
-Subject: Re: [net-next,v9,06/15] quic: add stream management
+Date: Thu, 5 Feb 2026 14:00:34 -0500
+X-Gm-Features: AZwV_QhKP_xJtDWc386RLFvCIecEAqeBpy1wdehizIZr3NTnLt_Pak2USLctFus
+Message-ID: <CADvbK_cHtubdKv4PbYf0vG=3EPMrYw_Jo=_qqNvVb6+SoDvB3w@mail.gmail.com>
+Subject: Re: [net-next,v9,09/15] quic: add congestion control
 To: Simon Horman <horms@kernel.org>
 Cc: steved@redhat.com, marcelo.leitner@gmail.com, aahringo@redhat.com, 
 	alibuda@linux.alibaba.com, jbaron@akamai.com, hare@suse.de, kuba@kernel.org, 
@@ -133,7 +133,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257290-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257291-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -152,7 +152,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5481CF69D9
+X-Rspamd-Queue-Id: BA067F6A75
 X-Rspamd-Action: no action
 
 On Thu, Feb 5, 2026 at 6:55=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
@@ -164,54 +164,69 @@ e:
 > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
 l.html
 > ---
-> quic: add stream management
+> quic: add congestion control
 >
-> This patch introduces stream management infrastructure for the QUIC
-> protocol, including a hash table for tracking active streams, functions
-> for acquiring and releasing streams, and logic for detecting stream
-> ID limits.
+> This patch introduces quic_cong for RTT measurement and congestion contro=
+l,
+> implementing a state machine with slow start, congestion avoidance, and
+> recovery phases using the New Reno algorithm.
 >
-> > diff --git a/net/quic/socket.c b/net/quic/socket.c
-> > index b86989080184..d6f25669c693 100644
-> > --- a/net/quic/socket.c
-> > +++ b/net/quic/socket.c
-> > @@ -41,6 +41,9 @@ static int quic_init_sock(struct sock *sk)
-> >       sk->sk_write_space =3D quic_write_space;
-> >       sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
-> >
-> > +     if (quic_stream_init(quic_streams(sk)))
-> > +             return -ENOMEM;
->
-> If quic_stream_init() fails here, the function returns before calling
-> sk_sockets_allocated_inc() and sock_prot_inuse_add() below. However,
-> when initialization fails, inet_create() calls sk_common_release() which
-> invokes quic_destroy_sock():
->
-> quic_init_sock()
->     quic_stream_init() fails
->     return -ENOMEM
->         -> sk_common_release()
->             -> quic_destroy_sock()
->                 -> sk_sockets_allocated_dec()  // underflow
->                 -> sock_prot_inuse_add(..., -1)  // underflow
->
-> Can this cause counter underflow since the increments never executed but
-> the decrements in quic_destroy_sock() are unconditional?
-This is a good catch, will fix it.
-
-Thanks.
->
-> > +
-> >       WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sysctl_quic_wmem[1]));
-> >       WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sysctl_quic_rmem[1]));
-> >
-> > @@ -52,6 +55,8 @@ static int quic_init_sock(struct sock *sk)
-> >
-> >  static void quic_destroy_sock(struct sock *sk)
-> >  {
-> > +     quic_stream_free(quic_streams(sk));
-> > +
-> >       quic_data_free(quic_ticket(sk));
+> > diff --git a/net/quic/cong.c b/net/quic/cong.c
+> > --- /dev/null
+> > +++ b/net/quic/cong.c
 >
 > [ ... ]
+>
+> > +static int quic_cong_check_persistent_congestion(struct quic_cong *con=
+g, u64 time)
+> > +{
+> > +     u32 ssthresh;
+> > +
+> > +     /* rfc9002#section-7.6.1:
+> > +      *   (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay)=
+ *
+> > +      *      kPersistentCongestionThreshold
+> > +      */
+> > +     ssthresh =3D cong->smoothed_rtt + max(4 * cong->rttvar, QUIC_KGRA=
+NULARITY);
+> > +     ssthresh =3D (ssthresh + cong->max_ack_delay) * QUIC_KPERSISTENT_=
+CONGESTION_THRESHOLD;
+> > +     if (cong->time - time <=3D ssthresh)
+> > +             return 0;
+>
+> [ ... ]
+>
+> > +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> > +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_de=
+lay)
+> > +{
+> > +     u32 adjusted_rtt, rttvar_sample;
+> > +
+> > +     /* Ignore RTT sample if ACK delay is suspiciously large. */
+> > +     if (ack_delay > cong->max_ack_delay * 2)
+> > +             return;
+> > +
+> > +     /* rfc9002#section-5.1: latest_rtt =3D ack_time - send_time_of_la=
+rgest_acked */
+> > +     cong->latest_rtt =3D cong->time - time;
+>
+> The field cong->time is described as "Cached current timestamp" in struct
+> quic_cong, but where is it written? The socket struct is zero-initialized=
+,
+> so cong->time will always be 0.
+>
+> When computing RTT with a positive packet send timestamp in the time
+> parameter, does this cause unsigned integer underflow? For example, if th=
+e
+> packet was sent at time 12345, computing 0 - 12345 wraps to a very large
+> value.
+>
+> The same issue appears in quic_cong_check_persistent_congestion() where
+> cong->time - time is compared against ssthresh, and in quic_reno_on_packe=
+t_lost()
+> and quic_reno_on_process_ecn() where recovery_time is set to cong->time.
+This is not a problem, cong->time will always be set before processing
+the packet on the TX path in the next patch series.
+
+Thanks.
 
