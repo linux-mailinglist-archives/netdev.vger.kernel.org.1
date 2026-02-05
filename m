@@ -1,170 +1,267 @@
-Return-Path: <netdev+bounces-256976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id xRO4K4AvhGk90gMAu9opvQ
-	(envelope-from <netdev+bounces-256976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:49:52 +0100
+	id OJENKZAvhGk90gMAu9opvQ
+	(envelope-from <netdev+bounces-256977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:50:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C0F1EECCE
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:49:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A178EECD7
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D684300EF90
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:49:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2BAC7300EF87
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCE421A92F;
-	Thu,  5 Feb 2026 05:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B13631B108;
+	Thu,  5 Feb 2026 05:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7ZBk17P"
+	dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b="Iyauq83N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D79835975
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 05:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770270589; cv=none; b=mqX0e8xoa7/SxhuxtEdcXhruxhN5KEd2bTR0hzd7ekTaTyEf+JgkpEolnG/DKt3534tJlRrE+29ERlG3S5LqoFBFCpF5mkaXpDLqzADobW5EGqDJdqtgvJ5x3XVZH3NBvdYhb5OncFRjth7wsQYV7V0xVhs4OYjl7BhxfTfIwyQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770270589; c=relaxed/simple;
-	bh=oigW+r2ll17N/8vVOo2Tasnmrl3lMwqxfoKQSEDokYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SXRbUnHNo1WnLVJkcMUe82yl58gd8lxHhsXwOrfke/OBfWf+JveGgNa0tVjquZzf6rYcM9rHDAgZX4SCBaGNNTLqMKRB9AGD+O5AW9i31eP0NbHsAtvQU7xzhncXz+o10JK0t1meO/OMEMekiNIanqe7vCMOYaeaYH21ZQHMGOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7ZBk17P; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8c5384ee23fso53849085a.1
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 21:49:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D952F99B8
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 05:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770270601; cv=pass; b=AI6ojWnu40jjvBdGOsUsIPG0crBlapy1+aFvXwZB/H1LlszAKpZas+91Kfw8mLYnOGi6EaTGd9bMTNyi6XZ21ooZgwreFBFuCeKuv18MV08k9yJ6+uj/u3K2QwYIReIQOWYrLiBXTaR9a/SjoylXN+i2KQiZVW2zbCkw/+AFFb4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770270601; c=relaxed/simple;
+	bh=wUrUSVOAOBRw8sN2+GSWIDqv+OT6sTgR0/Ilx8HyQr0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i96w/PAPOl7jbY6v/hw+A/ZwuVka/IeV25DDXE0YR0tPPwA8c9GOPYZY/3Krs8k6Xk0olQkraFCmSp8c1JMynC4bEo7vvgy5ig7w0jN3MkBJF1jca/Atqi6MAsQT0WyRylOg/OUW+iDKpef0wlxiEpISC04pvF2sAKbbuJsMUUI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu; spf=pass smtp.mailfrom=u.northwestern.edu; dkim=pass (2048-bit key) header.d=u-northwestern-edu.20230601.gappssmtp.com header.i=@u-northwestern-edu.20230601.gappssmtp.com header.b=Iyauq83N; arc=pass smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=u.northwestern.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=u.northwestern.edu
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d44b2df00aso237003a34.3
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 21:50:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770270600; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QMbywS4yDXYfAPe9pOdXsJCCetV6bZcLpZfjX2nc0qD7JJ/7hwMUHlI2WkB8zM/2IC
+         /wefMGKtbffkVCEW76kKz1zViSXI1LbqBF5pFh3khuMY4omDPWxjZNCUUlGfF0fidb5s
+         M+wJfJWNNNTNLjwSICVtWyy5myuTMBNGZsRHPUPXWAHvkmbshFMx3YfV1X9e1oVi34v8
+         L5alfoJ0LYYMuFbpfNWwkGZmXvtU5oz4c7wbN52EBzp5VpqzTOPnvpZQMHWErTx4ai/Z
+         RpMtQYPKLIA6Z0RqIl2QWRipgmp0DHQoQDH+SP3n0H/kJfn1RhBYPlXvZV2jxQWpDgvQ
+         aS2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HUEVKuQ+WKi68vf3E7dfkg+LP5Mp/3JbWtuaF2f8NtI=;
+        fh=IP52XDEWB8x+LXnMTvF4LuPL+i/cwmv9Di+2BtbDeoU=;
+        b=bN9jSYr0AgKQADeOa+IXBYLp+xLiTTWHqT9QJC80LWbZ1pOjQa12w2U/O4TC0OdpBa
+         oIuxOzfTgsy7Ki7FVftUgj7Iqf6H1huPAwpTvbVXZ9mVxT4idQZW6z402VVtNjc4IRYG
+         l6/Y6uVnx6UzbaIfpWXQAc/hi1WtRrR4RgaBM2XRDqDi+88HQKcqY96G/tJqNCRh+E3D
+         LbRCUAm5qnBARnrmmdVNaHip7c0xY/9wnWkiMgaGPDKwWhJV+7d/lbhV780a1Vw0lhJB
+         D/68VZpleB5X+43imNEkDM5IEAuNzRMLe6EJniJcjfsgCui2TOalozbOZ4obfD5DubhD
+         WQAw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770270588; x=1770875388; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oigW+r2ll17N/8vVOo2Tasnmrl3lMwqxfoKQSEDokYU=;
-        b=W7ZBk17PRrLlBpMLPfmhnHdJ1dKWcZSPsV2FI4AcVK6hPKJ+4VyMmSpYn/dIB5WxvG
-         s6rVif5Cts4D0K/16vieK1o4YBKD0EI3W5hpH44FFRdI5lMUoiQhdtVdea3CQIDQoh+I
-         jYKbhszYNVktBTCysjuK/AZlgXAu6GnJMNW1omPDmxq77pDJywSuaRMbuuRvPXhFXp9v
-         cfZFre46xon4sVSbKPiMb3h4hiCm61jOTxOY0pcyG+KacAhZ9QlKAodsG8VXH4rhVxAR
-         dwVU5lmR1hQEhBcixiANottWoo8pPu5a0iy6sJaxyXts4urqvrZKphzrZRyBeajBmlfQ
-         UNtQ==
+        d=u-northwestern-edu.20230601.gappssmtp.com; s=20230601; t=1770270600; x=1770875400; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HUEVKuQ+WKi68vf3E7dfkg+LP5Mp/3JbWtuaF2f8NtI=;
+        b=Iyauq83NdCU0CLlFRBP25gF9FP2TBLxw64kbwPDwuzGp5tIomo+uxAtISEJpjSPnIL
+         RRIPICQtolNaVyyAblWnuUnpkEAi1zx8H1hy9oMJvLVshA6Oya4NYlxy5b/q/oP+GRwa
+         NomVEi1TnPNMgh1tdv1VmTImuwlc4hMXWex2q5GDbcw1PicuXvPLgti/6U9Q4NpB6w5d
+         EU59Xzzx8AqD7/2DsnI+Z8zhollWOM8c5jB/zAUknAOV4BDbLibb4pOVaQzi+Om7pbZ0
+         L9RiGRQ2DMCSHqkMYRXTCEEy3TXoe8Ym5OH7q/3I8kYV17Z7UW2SJqVoR3ssd83Q39Ug
+         VcQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770270588; x=1770875388;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oigW+r2ll17N/8vVOo2Tasnmrl3lMwqxfoKQSEDokYU=;
-        b=pY9E20fauaNK4HTE4/frRqY9BGs5D4g6YZQOJIA6QSY+wrwrkmvkLvgX3zzijktY7u
-         4NaW2c7AYko3UTSls2Ni+Fs4XZro/Jg3aMHcPD4/KSYqPUGgVYyNAZY/C629nqmM7nsi
-         A8D1t4zYsC//QDZUSx8UvsnRpnZTO8P7Dh3DqPYg0N00XZbZpmaIb8TiFhy77YxMJQqR
-         CYewXYsnT8hgADS0S6gERiZQVaVKHzNZGfk66iq7wQlFBJXRKBrj/fdjgmlu5CIFF9RI
-         45+y+gcNbLLwhajA37WQTTSVKjcmZXacKqzDPOWL1sFpd3juPJRacwQ/YTzj/dKw2RAw
-         PCvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXD5MDNFKRFU0I4o147RNCO2gNXdFCrw/NNRNdwE8oqYuETQm6pMRU78gSH9nNqlA0BVze4ZQY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhvZzJForeuNruJzkMb9FTDjnSNwAcmMMqgV6CdUmW11GqiUW8
-	NZ3Qg//bux/sk3i3myiweLMSgtUexGhuXgAiY4rCgKkDKKzhKw6+1K/e
-X-Gm-Gg: AZuq6aLjwBowC0jNYOKHJeCl8pXZC1at6WVR3LDCwpcRKGQpPyNSBTJCbE8WUkBGvLF
-	mDdyJUiJRxmamtTvoc2Irw001ijW2yB+EPAl1iVhqK/5lBn62UNpYmLhELb1e10daLLvzQomeil
-	/C5gOu/VoTzTgQKKaoKAp4qBRVLRIWehGM3naHA8kVrGfhfasDMsYCA5f9OynmI0MWCsTEonYM1
-	4jaKAJ3PoyTVHZFmSvJEftdw5EFRA6CxJq/Z1uDZJci2uz4Yql8XG3d0tp9sTPsC1B1niAxGdL6
-	mmPIpaalljEwJ6wn3au2s9dKCNSFmuuQ3QJoxShUvIj/lWXUs1DkKzjonv8lF3eZzwss7H7/ot+
-	SLheJ3M5it5J86JAXV/iYYwodtUIlwgKLTWGsn3Kkbn2Nif+WSYp7N1mgGT9xI+emZw35JLlbE6
-	rSgmzKZpY=
-X-Received: by 2002:a05:620a:4623:b0:8b1:adfd:f850 with SMTP id af79cd13be357-8ca2f83bfe5mr655910985a.18.1770270587966;
-        Wed, 04 Feb 2026 21:49:47 -0800 (PST)
-Received: from pek-khao-d3 ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89521c1a04fsm34592876d6.18.2026.02.04.21.49.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 21:49:47 -0800 (PST)
-Date: Thu, 5 Feb 2026 13:49:40 +0800
-From: Kevin Hao <haokexin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: horms@kernel.org, edumazet@google.com, davem@davemloft.net,
-	netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	elfring@users.sourceforge.net, byungchul@sk.com,
-	andrew+netdev@lunn.ch, h-mittal1@ti.com, danishanwar@ti.com,
-	pabeni@redhat.com, m-malladi@ti.com, jacob.e.keller@intel.com,
-	rogerq@kernel.org
-Subject: Re: [net-next,1/2] net: ti: icssg-prueth-sr1: Remove unused workqueue
-Message-ID: <aYQvdKUIcMdAUnuB@pek-khao-d3>
-References: <20260204-icssg-prueth-workqueue-v1-1-9a892f4b293d@gmail.com>
- <20260205041702.2354424-1-kuba@kernel.org>
- <20260204201914.73fec717@kernel.org>
+        d=1e100.net; s=20230601; t=1770270600; x=1770875400;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HUEVKuQ+WKi68vf3E7dfkg+LP5Mp/3JbWtuaF2f8NtI=;
+        b=R2Yv532Ine2l9u0wORI74GxWDxwjioKfFxp2XnOYciLQ2/s8EL+WtrQbfzs5Ss6aKA
+         0IGNcxgSEa+Rmn+FqTFhUOZb/HFPNvAhiwQfMZknEMv741otoUHMSMu/kJs8TDsj0whU
+         Dv1VdGMQ+vHcnLM0M+7tXxo5kHQVFU5nhXjCscebK77NWWS/1MBm1WmbWPfxxV/PKqT7
+         4lFll0SeXCsUu+7nXHEPojDZodRMyt6hC+xpkK55VxsmhCMIXPTXvpJJVNIDqvkmP4WN
+         wq3sO7UJ804BkSTiDylSKxsvn86NpGT20H2av9wsrgw4DVF0WWQKOBkGJkrbGxPBDIud
+         E2BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ4BrmLhcXWVqWxMV9vOS/UjAlKp/mmVmrtn3TUoAk0K1/oZbfkvEXRTz15688SIVJ5ummvvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/iZHI5mQ/EvktX4o/ThA5wM0HQs0RAIju9fDtVWBigTtdFZ8d
+	bJ+m3pWMXSQD9ameJm+8MHSN476f12U2qHNpRQ1T0eh4bxKCPkvST6DXxFYPXf0uomVt1u8lPyj
+	BOJK1QXogVRQSV6aqnLvIek+uNJSLj6Vzc7xWNRdYkg==
+X-Gm-Gg: AZuq6aIV/2CqJqagJNyS4xk+TSffl1pIOlQ7O5GzDbB1TogfpxmWjYyEtInePXApcX+
+	WNAgYeEYulHqEXgrTcoL5TlsHzn7erjwWp+rmC0cdU5ekOa9VKJQa1sNeTomrM6YGcqcHAWJiPp
+	CZrdbh2u8TWSjo0onj6p0p4hQKzw4hJz71nGqlZs4zIw/c4EgWoGLhpSJBbvqChx9KMdT9M0rkp
+	iT1uQ8h70kQ4WVQqdG0T2FSIbmKoc2qSDEA/fzxbyEgRXOH0Y5bfgIeLxHL5L27WeIwZxIRf0LU
+	ZS3uoiukm2Kx42udOscrkQf68vN4ohM/2h68OrG2v9M1rMhO/p77r7UDIUUtFRdMez6y+ks=
+X-Received: by 2002:a05:6830:3c87:b0:7c7:2d7d:5d0f with SMTP id
+ 46e09a7af769-7d448ab77dbmr3345174a34.20.1770270599837; Wed, 04 Feb 2026
+ 21:49:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4Jv5M08LD+MQV4go"
-Content-Disposition: inline
-In-Reply-To: <20260204201914.73fec717@kernel.org>
+References: <20260131044911.2257072-1-n7l8m4@u.northwestern.edu> <cc23a37e-3b12-4dd5-89a9-ed8977601379@redhat.com>
+In-Reply-To: <cc23a37e-3b12-4dd5-89a9-ed8977601379@redhat.com>
+From: Ziyi Guo <n7l8m4@u.northwestern.edu>
+Date: Wed, 4 Feb 2026 23:49:49 -0600
+X-Gm-Features: AZwV_QiWVFoRm0kb1zkOD00gl9Y5kfR_qRHmONDUvLacQCfpQEtpwIOH2i-50gY
+Message-ID: <CAMFT1=Y=FbjyqC6vr6fV74t8AmGVcecKw+YjX6V_iA7XgZtotA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: mscc: ocelot: add missing lock protection in ocelot_port_xmit()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, UNGLinuxDriver@microchip.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[u-northwestern-edu.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[northwestern.edu : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256976-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256977-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[u-northwestern-edu.20230601.gappssmtp.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0C0F1EECCE
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n7l8m4@u.northwestern.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,u-northwestern-edu.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 0A178EECD7
 X-Rspamd-Action: no action
 
+On Tue, Feb 3, 2026 at 5:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> I'm under the impression this static_branch_unlikely() usage is racy,
+> i.e. on CONFIG_PREEMPT kernel execution could enter this branch but not
+> the paired lock.
+>
+> What about moving the 'Check timestamp' block in a separate helper and
+> use a single static_branch_unlikely() branch? something alike the
+> following, completely untested and unfinished:
+>
+>         if (!static_branch_unlikely(&ocelot_fdma_enabled)) {
+>                 int ret =3D NETDEV_TX_OK;
+>
+>                 ocelot_lock_inj_grp(ocelot, 0);
+>
+>                 if (!ocelot_can_inject(ocelot, 0)) {
+>                         ret =3D NETDEV_TX_BUSY;
+>                         goto unlock;
+>                 }
+>
+>                 if (!ocelot_timestamp_check())
+>                         goto unlock;
+>
+>
+>                 ocelot_port_inject_frame(ocelot, port, 0, rew_op, skb);
+>                 consume_skb(skb);
+> unlock:
+>                 ocelot_unlock_inj_grp(ocelot, 0);
+>                 return ret;
+>         }
+>
+>         if (!ocelot_timestamp_check())
+>                 return NETDEV_TX_OK;
+>         ocelot_fdma_inject_frame(ocelot, port, rew_op, skb, dev);
+>         return NETDEV_TX_OK;
+>
+> Well, after scratching the above, I noted it would probably better to
+> invert the two branches...
 
---4Jv5M08LD+MQV4go
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Wed, Feb 04, 2026 at 08:19:14PM -0800, Jakub Kicinski wrote:
-> Maybe it's not worth separating the removal into two patches if there
-> are surprising dependencies here?
+Hi Paolo,
 
-Definitely.
+Thank you very much for your review and comments!
 
-> Squash them into one for v2 perhaps?
+How about we use a new separate helper function like this for previous
+'Check timestamp' block:
 
-Will do.
+```
+  static bool ocelot_xmit_timestamp(struct ocelot *ocelot, int port,
+                                   struct sk_buff *skb, u32 *rew_op)
+  {
+        if (ocelot->ptp && (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
+                struct sk_buff *clone =3D NULL;
 
-Thanks,
-Kevin
+                if (ocelot_port_txtstamp_request(ocelot, port, skb, &clone)=
+) {
+                        kfree_skb(skb);
+                        return false;
+                }
 
---4Jv5M08LD+MQV4go
-Content-Type: application/pgp-signature; name=signature.asc
+                if (clone)
+                        OCELOT_SKB_CB(skb)->clone =3D clone;
 
------BEGIN PGP SIGNATURE-----
+                *rew_op =3D ocelot_ptp_rew_op(skb);
+        }
 
-iQEzBAEBCgAdFiEEHc6qFoLCZqgJD98Zk1jtMN6usXEFAmmEL3QACgkQk1jtMN6u
-sXGhxQf/VPEQ1+n0i5WJwMNoKnmYzjC+oR6X/EGKlYQeRHazBn9DH10JxDsEv1MP
-rLc/fndeNia8H1+Mm8PvyRloGYulGXHtLpy9hM4fk08/VYi/QxUOOsaMqokEVc94
-wblzvVQ5oMhsmgLMeXQX5Hgc/9U1cD4b6fhn1DIHOgvAw8DtAxWIR6oeflWMdm09
-QuWsF+R7q4+DEnNZsSHPpapNLJ6nR+N1CUl5G9liBGypIi0X3ylFbsg36RxYZYi7
-kUYY5ahPf0jNUkvuvWQrPvVO2fBAnJu8Ck/iRDm/GAgweUGRjosUZo0D/yTJ8xrO
-R3db9kOjxQEmc85cYWBhLoFti1+IRA==
-=hkZu
------END PGP SIGNATURE-----
+        return true;
+  }
+```
 
---4Jv5M08LD+MQV4go--
+So for the function ocelot_port_xmit()
+
+it will be:
+
+```
+  static netdev_tx_t ocelot_port_xmit(struct sk_buff *skb, struct
+net_device *dev)
+  {
+        struct ocelot_port_private *priv =3D netdev_priv(dev);
+        struct ocelot_port *ocelot_port =3D &priv->port;
+        struct ocelot *ocelot =3D ocelot_port->ocelot;
+        int port =3D priv->port.index;
+        u32 rew_op =3D 0;
+
+        /* FDMA path: uses its own locking, handle separately */
+        if (static_branch_unlikely(&ocelot_fdma_enabled)) {
+                if (!ocelot_xmit_timestamp(ocelot, port, skb, &rew_op))
+                        return NETDEV_TX_OK;
+
+                ocelot_fdma_inject_frame(ocelot, port, rew_op, skb, dev);
+                return NETDEV_TX_OK;
+        }
+
+        /* Register injection path: needs inj_lock held throughout */
+        ocelot_lock_inj_grp(ocelot, 0);
+
+        if (!ocelot_can_inject(ocelot, 0)) {
+                ocelot_unlock_inj_grp(ocelot, 0);
+                return NETDEV_TX_BUSY;
+        }
+
+        if (!ocelot_xmit_timestamp(ocelot, port, skb, &rew_op)) {
+                ocelot_unlock_inj_grp(ocelot, 0);
+                return NETDEV_TX_OK;
+        }
+
+        ocelot_port_inject_frame(ocelot, port, 0, rew_op, skb);
+
+        ocelot_unlock_inj_grp(ocelot, 0);
+
+        consume_skb(skb);
+
+        return NETDEV_TX_OK;
+  }
+```
+
+Feel free to let me know your thoughts!
+
+I can send a v3 version patch once we're aligned.
 
