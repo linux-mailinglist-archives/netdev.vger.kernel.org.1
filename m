@@ -1,217 +1,167 @@
-Return-Path: <netdev+bounces-257144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257145-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHEUOWKFhGl43QMAu9opvQ
-	(envelope-from <netdev+bounces-257144-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:56:18 +0100
+	id uDPyHDKGhGl43QMAu9opvQ
+	(envelope-from <netdev+bounces-257145-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:59:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8548EF21B7
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:56:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9CBDF224E
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A58DE30036EE
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 11:55:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FE01300A3A1
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 11:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B9D3AEF29;
-	Thu,  5 Feb 2026 11:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2FF3B8D7A;
+	Thu,  5 Feb 2026 11:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E8TAesqi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tWjgK1GY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE37F38B7BF;
-	Thu,  5 Feb 2026 11:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3733ACA51
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 11:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770292553; cv=none; b=fijMnllBwilKXBHfVJo9+9hLOaNDIAYMWuiMwiqO+gY0UoLD8T0GPb7HOH1jxkwkq0fuz7sxfYu88ZYmZydENBufTFh7OMMPkVqrCsWFQrl3EvEu+iTGXIs9JLMS0IAjwX9fYrT2bmPiUHjNWw4IZIHiCvpv6YUJ3V2C0mct0TY=
+	t=1770292612; cv=none; b=UvaHdjlleTH0b8C0JLLP598uNLc08G6HEnHmPhDCnmJbraUdz0D+WnLcuXKjQ9YKf/dwM7/KDekdufUrTSbV2XA8i6f9RVuV1HvtUxJL1UBpm6Us2+0AQEVoW6nOK+sQmvGwj11/lzIluM/IpNAkp660GeLLgJ8jbXkflU42P/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770292553; c=relaxed/simple;
-	bh=/WDmwFhXb2jXaRmYe0iGQmf5ISXkCS9JwDb/iMvVvv8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HighDj7Ai9Yn02e23o5p9EBeUNHP97xCB+M2b6+DOBcsVEKilKlhUcCKxgOfC2xY52ajqUA7LtlB4IPS6m0XprwOo+OvO3/uGaMsmrh04/6Zd1gLWsEdboHwjH1f8ZyFJeRBFj9gwgphgpiq/Ma9yYXHtDcG71L1WqXAwCgfGW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E8TAesqi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8233AC4CEF7;
-	Thu,  5 Feb 2026 11:55:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770292553;
-	bh=/WDmwFhXb2jXaRmYe0iGQmf5ISXkCS9JwDb/iMvVvv8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=E8TAesqiDYdX817ZT9CgpJmx1Zww+daXstoDCcBCVaJn6CsuOJ6MuOMM2APivYzbx
-	 YHoyGuPHoE4TPUOFyQh0Yf/fotn2lOii+KNV6idJqKbx4k7cd3Xmym1UqEq3m2XsHr
-	 JlcemS17SUdjyVS8VRqOgFdQ1tOv3j1VzgjVzLxldzgyMViADvziMbrQ810U4ZgxL3
-	 6DouWY6KgK3bEQ7lQQZf5K7yIeh0B1R/lqKhnBrZKjZ5rfAFB4SeWsFFNZ8YvZxoab
-	 2VHH6fthufoejKLqbGOj0xGEJQrynB1qCWN5nnnOqt0zwSlaFtqjfGvsGvKU4t/aGG
-	 WvAbXDr+8dekg==
-From: Simon Horman <horms@kernel.org>
-To: lucien.xin@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	steved@redhat.com,
-	marcelo.leitner@gmail.com,
-	aahringo@redhat.com,
-	alibuda@linux.alibaba.com,
-	jbaron@akamai.com,
-	hare@suse.de,
-	kuba@kernel.org,
-	tom@talpey.com,
-	linux-cifs@vger.kernel.org,
-	daniel@haxx.se,
-	quic@lists.linux.dev,
-	jlayton@kernel.org,
-	tfanelli@redhat.com,
-	dhowells@redhat.com,
-	linkinjeon@kernel.org,
-	hepengtao@xiaomi.com,
-	pc@manguebit.com,
-	kernel-tls-handshake@lists.linux.dev,
-	illiliti@protonmail.com,
-	xiyou.wangcong@gmail.com,
-	andrew.gospodarek@broadcom.com,
-	mail@johnericson.me,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	matttbe@kernel.org,
-	netdev@vger.kernel.org,
-	smfrench@gmail.com,
-	metze@samba.org,
-	mbuhl@openbsd.org,
-	chuck.lever@oracle.com,
-	dreibh@simula.no,
-	davem@davemloft.net,
-	sd@queasysnail.net
-Subject: Re: [net-next,v9,15/15] quic: add packet parser base
-Date: Thu,  5 Feb 2026 11:55:42 +0000
-Message-ID: <20260205115542.2195362-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <431335747d3604c46f2e57a32d839a73aa8a8536.1770042461.git.lucien.xin@gmail.com>
-References: <431335747d3604c46f2e57a32d839a73aa8a8536.1770042461.git.lucien.xin@gmail.com>
+	s=arc-20240116; t=1770292612; c=relaxed/simple;
+	bh=ybbc+auNCktSq3UPFidjhvKH+YsOZgK6tem0lS+yldA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KNrX+t+/kgQwXWLjwH2yVNF9NRZM3WzUCGmQOivK0WWVO2colqz5NP/VwczHpT7tTa33ZwBxbIDbzZJDqZtJW+aM+NEOhN+sIbLpT0fmb+pJPznbMbtPX8cc2FBdEHSnG8AwGPmaAMt+ZGN6pX2vaeeDD2qSdh/8ehNYyO2aFYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tWjgK1GY; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6a0f4cbb-e8b3-4f0e-b7f1-7f9ca5cba97d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770292608;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YWd1t7s8OVCzkHAhm4N5l/L4ZD0CWDELd1TJlLAt68U=;
+	b=tWjgK1GYjSewCFxQBoXE6X/4NUyrFwcikDUcmUkvHi15VclE2tLCZgaKnKapRe007LcxlF
+	rm4ZcLBv9tiWAxt/q8yJrSc/tXpDJ7+1c6SmxIi2i5CsKS61MjwsAs6V72ZT/x00fGNgWn
+	ep18WFCopxHrV2i7BZD7AffQdCzj9to=
+Date: Thu, 5 Feb 2026 11:56:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
+ directly from interrupt for i210
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+ Paul Menzel <pmenzel@molgen.mpg.de>,
+ "Gomes, Vinicius" <vinicius.gomes@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
+ <IA3PR11MB898652699383BA265C5747A5E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
+ <20260205100347.ssTBDAI_@linutronix.de>
+ <IA3PR11MB89865B46DCBEB496BE28703BE599A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <IA3PR11MB89865B46DCBEB496BE28703BE599A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257144-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257145-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[linutronix.de,intel.com,molgen.mpg.de,vger.kernel.org,gmail.com,lunn.ch,google.com,lists.osuosl.org,kernel.org,redhat.com,davemloft.net];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,linux.alibaba.com,akamai.com,suse.de,talpey.com,vger.kernel.org,haxx.se,lists.linux.dev,xiaomi.com,manguebit.com,protonmail.com,broadcom.com,johnericson.me,google.com,samba.org,openbsd.org,oracle.com,simula.no,davemloft.net,queasysnail.net];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8548EF21B7
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:url,osuosl.org:email,mpg.de:email,linux.dev:email,linux.dev:dkim,linux.dev:mid,linutronix.de:email,intel.com:email]
+X-Rspamd-Queue-Id: B9CBDF224E
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On 05/02/2026 10:37, Loktionov, Aleksandr wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+>> Sent: Thursday, February 5, 2026 11:04 AM
+>> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+>> Cc: Kurt Kanzenbach <kurt@linutronix.de>; Nguyen, Anthony L
+>> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+>> <przemyslaw.kitszel@intel.com>; Paul Menzel <pmenzel@molgen.mpg.de>;
+>> Vadim Fedorenko <vadim.fedorenko@linux.dev>; Gomes, Vinicius
+>> <vinicius.gomes@intel.com>; netdev@vger.kernel.org; Richard Cochran
+>> <richardcochran@gmail.com>; linux-kernel@vger.kernel.org; Andrew Lunn
+>> <andrew+netdev@lunn.ch>; Eric Dumazet <edumazet@google.com>; intel-
+>> wired-lan@lists.osuosl.org; Keller, Jacob E
+>> <jacob.e.keller@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+>> Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.net>
+>> Subject: Re: RE: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve
+>> Tx timestamp directly from interrupt for i210
+>>
+>> On 2026-02-05 09:47:14 [+0000], Loktionov, Aleksandr wrote:
+>> …
+>>>> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
+>>>> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+>>>> @@ -796,6 +796,28 @@ static int igb_ptp_verify_pin(struct
+>> …
+>>>> +	igb_ptp_tx_hwtstamp(adapter); <-Calls existing function
+>> designed for work queue!
+>>>
+>>> skb_tstamp_tx() can sleep
+>>> Smells like sleep-in-atomic isn't it?
+>>
+>> How or where can it sleep?
+>>
+>> Sebastian
+> 
+> igb_ptp_tx_hwtstamp() -> https://elixir.bootlin.com/linux/v6.19-rc5/C/ident/skb_tstamp_tx -> https://elixir.bootlin.com/linux/v6.19-rc5/C/ident/__skb_complete_tx_timestamp -> https://elixir.bootlin.com/linux/v6.19-rc5/C/ident/sock_queue_err_skb -> https://elixir.bootlin.com/linux/v6.19-rc5/C/ident/skb_queue_tail -> https://elixir.bootlin.com/linux/v6.19-rc5/source/net/core/skbuff.c#L4075
+> 
+> spin_lock_irqsave(&wq_head->lock, flags);  <- RT mutex can sleep
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-quic: add packet parser base
+Hmm... that actually means we have some drivers broken for RT kernels if
+they are processing TX timestamps within a single irq vector:
+- hisilicon/hns3
+- intel/i40e (and ice probably)
+- marvell/mvpp2
 
-This patch uses 'quic_packet' to handle packing of QUIC packets on the
-receive (RX) path. It introduces mechanisms to parse the ALPN from client
-Initial packets to determine the correct listener socket, routes received
-packets accordingly, and adds support for ICMP-based MTU updates by
-locating the relevant socket and updating the stored PMTU.
+For igb/igc/i40e it's still OK to process TX timestamps directly in
+MSI-X configuration, as ring processing has separate vector, right?
 
-> diff --git a/net/quic/packet.c b/net/quic/packet.c
-> index cf64a6aaa795..16a7db6ccd87 100644
-> --- a/net/quic/packet.c
-> +++ b/net/quic/packet.c
-
-[ ... ]
-
-> @@ -14,6 +14,637 @@
->
->  #define QUIC_HLEN		1
->
-> +/* Handle ICMP Toobig packet and update QUIC socket path MTU. */
-> +static int quic_packet_rcv_err(struct sock *sk, struct sk_buff *skb)
-> +{
-> +	union quic_addr daddr, saddr;
-> +	u32 info;
-> +
-> +	/* All we can do is lookup the matching QUIC socket by addresses. */
-> +	quic_get_msg_addrs(skb, &saddr, &daddr);
-> +	sk = quic_sock_lookup(skb, &daddr, &saddr, sk, NULL);
-
-Are the address arguments swapped in quic_packet_rcv_err()? Looking at
-other call sites in this file, quic_get_msg_addrs is consistently called
-with &daddr first, then &saddr:
-
-  Line 476 in quic_packet_get_listen_sock():
-    quic_get_msg_addrs(skb, &daddr, &saddr);
-
-  Line 513 in quic_packet_get_sock():
-    quic_get_msg_addrs(skb, &daddr, &saddr);
-
-  Line 536 in quic_packet_get_sock():
-    quic_get_msg_addrs(skb, &daddr, &saddr);
-
-But here quic_packet_rcv_err() passes &saddr first, then &daddr.
-
-Looking at the implementation of quic_v4_get_msg_addrs() in
-net/quic/family.c, the function extracts addresses from the packet as:
-
-  sa->v4.sin_port = uh->source;
-  sa->v4.sin_addr.s_addr = ip_hdr(skb)->saddr;
-  da->v4.sin_port = uh->dest;
-  da->v4.sin_addr.s_addr = ip_hdr(skb)->daddr;
-
-So sa gets the packet's source address (remote), and da gets the packet's
-destination address (local).
-
-Then quic_sock_lookup() in net/quic/socket.c expects:
-
-  if (quic_cmp_sk_addr(tmp, quic_path_saddr(paths, 0), sa) &&
-      quic_cmp_sk_addr(tmp, quic_path_daddr(paths, 0), da) &&
-
-This compares the socket's local address with sa and the socket's remote
-address with da, meaning sa should be the local (packet dest) address and
-da should be the remote (packet source) address.
-
-With the swapped arguments, quic_packet_rcv_err() would pass the remote
-address where the local is expected and vice versa, causing the socket
-lookup to fail. This would prevent ICMP Packet Too Big messages from being
-processed correctly, breaking Path MTU Discovery.
-
-> +	if (!sk)
-> +		return -ENOENT;
-> +
-> +	if (quic_get_mtu_info(skb, &info)) {
-> +		sock_put(sk);
-> +		return 0;
-> +	}
-> +
-> +	/* Success: update socket path MTU info. */
-> +	bh_lock_sock(sk);
-> +	quic_paths(sk)->mtu_info = info;
-
-[ ... ]
+But in general skb_tstamp_tx should be moved to BH processing (NAPI poll
+callback).
 
