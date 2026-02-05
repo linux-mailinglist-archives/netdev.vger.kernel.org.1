@@ -1,60 +1,83 @@
-Return-Path: <netdev+bounces-257081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257082-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCfmGmVihGkK2wMAu9opvQ
-	(envelope-from <netdev+bounces-257081-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:27:01 +0100
+	id CMdMOYpihGkK2wMAu9opvQ
+	(envelope-from <netdev+bounces-257082-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:27:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87CBF0AA9
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:27:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63D4BF0ADE
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:27:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 32BCF3009556
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 09:23:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 28A18300E143
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 09:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E56B38F943;
-	Thu,  5 Feb 2026 09:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAE338F948;
+	Thu,  5 Feb 2026 09:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HYC1fRc4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CgMHJCY8"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE558361672;
-	Thu,  5 Feb 2026 09:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D5938BF7C;
+	Thu,  5 Feb 2026 09:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770283395; cv=none; b=AtKLqof1+Mqp2m2zubhxdSn6AcC/QLSO6t3JQCLeNeZsErnqI9Nt8pDpj5BXEQIFN3EmwJNNkOkbQ9qSsUXZ+P3egz49/8VxYnHlsgMDU8ZbkkxPPwjRclQr5AzCn3AkgCrCYLI3Da5LOfn2pq6AKFmIH43b9MFakSO47YQlvK0=
+	t=1770283418; cv=none; b=NFFBTiieYQUnnINm+EGgv4A5UcYT1yQ2dRoJIAUiIr/dSyNiD69/rIHAaeV/cWkZC4ThsXdjAbxEOovQ/30YwyDmL3P7i+prKpEOEgrqtkE6zTX2PtKuo4ITUuGUyMWf3GpYEX+8UvFfHf8C3Rq2bNEMpsZ7HF56G7BzTiRq40I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770283395; c=relaxed/simple;
-	bh=ASFscKfQZNTqdX/nIkBWTYyfKL3Xxu/c8YcFqW2TIRg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GyZGSmwGJkv0Rq/Os2pQFx1KSB+G1NadCy1pJPWw59reNMpF6UxWrTlqPXpVpq4BJeeaZz1aW89JZsBDvUDTTXKxxuIZNZkZ3z7Mx+FFYEOZf60E8MFOyej2CY97EOMZ3delfV1LpL4mSe1qM28lo7KcJQerTpCHwX8BIhg+24k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HYC1fRc4; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Hb
-	ZLkhI9yayHaUp7I8gdb9rZtco+zUFIDWHACs6Uq6Q=; b=HYC1fRc4lWnpdZjEOB
-	zef9RiVm1ulu9ToGu0CmDfGK0A1H7EXDPvsW25ZAAuhibnGE+dEUUwfi2Ri/XVja
-	mkL3TgK5lDRX55Ayj4AJETRRj4f7IY3o6XSqj7yuhVg7tX3kLeJw1q7P/SD24Axy
-	rwi+WEuyoodzaBTk8ieetrmW8=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAX_mlTYYRpN2GXKQ--.9587S2;
-	Thu, 05 Feb 2026 17:22:29 +0800 (CST)
-From: Feng Yang <yangfeng59949@163.com>
+	s=arc-20240116; t=1770283418; c=relaxed/simple;
+	bh=3l3YTQBS+kWVMd7C5R2KSLy797uSnVPlNbsGpHwaiSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gf3awNMpXot688FAMfGeJQISXDVocM+dI0J14arFBptgTVKRboOQogV7vTbZMdiJH3R+IHOsCr0e2118lgeSTT4nrsmR4OMdyeX6Ggk72Xq5aMODVNlWouICMe5zTXS5c3J9gmer/2q3RLNLbbYBffXFPnivYnW105Udja9hhzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CgMHJCY8; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 4350BC243A6;
+	Thu,  5 Feb 2026 09:23:41 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 34997606FD;
+	Thu,  5 Feb 2026 09:23:35 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 27DDA119A865B;
+	Thu,  5 Feb 2026 10:23:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1770283413; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=DyKERQn8dtBR8tq3wq0PDNLhS1GPkXkR0iW4ympBXjU=;
+	b=CgMHJCY8Xn9Fd1yhBIOcXGWQuCuN3Gi3EIeBkbPtIGp7zXEL6f9p2ZpRjS19o+qUKJZKFb
+	9cjWqQtEMcMNEdOTUFUnYOVlEvDpH198z8B2aC04k/tckV3YNLPUe826DMAXYCR1sc5NlD
+	P8WtlBaUDm2dwonh/SBzzWFrL5wN3hVIMQTE5yE+ZqZBUkeJpfb48BjI0BacJJFXx4EpaN
+	RR9Qy4nREuFZPUOVIv+1pCoiTgtT2zYDSTWKtvK1Urr6mkArai9CqC/97yo7J1pTYV/P4E
+	3hTQ+Z/00lKywc8Czq+Qt8a1procwM8sGE8aVq/6OHbcWD1U46sVZCBN8OQpFQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: bpf@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] bpf: test_run: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
-Date: Thu,  5 Feb 2026 17:22:27 +0800
-Message-Id: <20260205092227.126665-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.25.1
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: [PATCH net-next v5 00/13] net: phy_port: SFP modules representation and phy_port listing
+Date: Thu,  5 Feb 2026 10:23:03 +0100
+Message-ID: <20260205092317.755906-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,130 +85,232 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAX_mlTYYRpN2GXKQ--.9587S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAF4UWFy5ZF1Utr1UWryfZwb_yoWrWw4fpF
-	1UtrW09rs5J340qF48Jr4UJw1aqFWqvFW5Jryavw1jqF1jqw1xXr1ftF4jgrZ8Ar4ruw47
-	J34UKFn2qw1UJaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jY89tUUUUU=
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/xtbC8RboYWmEYVZuyQAA3T
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-257082-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257081-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[163.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[163.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yangfeng59949@163.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D87CBF0AA9
+X-Rspamd-Queue-Id: 63D4BF0ADE
 X-Rspamd-Action: no action
 
-From: Feng Yang <yangfeng@kylinos.cn>
+Hello everyone,
 
-The bpf_lwt_xmit_push_encap helper needs to access skb_dst(skb)->dev to
-calculate the needed headroom:
+Here's V5 of the second phy_port series, this time bringing support for
+more phy_port use especially for SFP, as well as the begining of a
+ethnl uAPI.
 
-	err = skb_cow_head(skb,
-			   len + LL_RESERVED_SPACE(skb_dst(skb)->dev));
+V5 doesn't contain a lot of changes, only a doc formatting fix as well
+as a fix for a potentially un-initialized pointer.
 
-But skb->_skb_refdst may not be initialized when the skb is set up by
-bpf_prog_test_run_skb function. Executing bpf_lwt_push_ip_encap function
-in this scenario will trigger null pointer dereference, causing a kernel
-crash as Yinhao reported:
+It builds on the recent addition of phy_port representation to enable
+listing the front-facing ports of an interface. For now, we don't control
+these ports, we merely list their presence and their capabilities.
 
-[  105.186365] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  105.186382] #PF: supervisor read access in kernel mode
-[  105.186388] #PF: error_code(0x0000) - not-present page
-[  105.186393] PGD 121d3d067 P4D 121d3d067 PUD 106c83067 PMD 0
-[  105.186404] Oops: 0000 [#1] PREEMPT SMP NOPTI
-[  105.186412] CPU: 3 PID: 3250 Comm: poc Kdump: loaded Not tainted 6.19.0-rc5 #1
-[  105.186423] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[  105.186427] RIP: 0010:bpf_lwt_push_ip_encap+0x1eb/0x520
-[  105.186443] Code: 0f 84 de 01 00 00 0f b7 4a 04 66 85 c9 0f 85 47 01 00 00 31 c0 5b 5d 41 5c 41 5d 41 5e c3 cc cc cc cc 48 8b 73 58 48 83 e6 fe <48> 8b 36 0f b7 be ec 00 00 00 0f b7 b6 e6 00 00 00 01 fe 83 e6 f0
-[  105.186449] RSP: 0018:ffffbb0e0387bc50 EFLAGS: 00010246
-[  105.186455] RAX: 000000000000004e RBX: ffff94c74e036500 RCX: ffff94c74874da00
-[  105.186460] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff94c74e036500
-[  105.186463] RBP: 0000000000000001 R08: 0000000000000002 R09: 0000000000000000
-[  105.186467] R10: ffffbb0e0387bd50 R11: 0000000000000000 R12: ffffbb0e0387bc98
-[  105.186471] R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000002
-[  105.186484] FS:  00007f166aa4d680(0000) GS:ffff94c8b7780000(0000) knlGS:0000000000000000
-[  105.186490] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  105.186494] CR2: 0000000000000000 CR3: 000000015eade001 CR4: 0000000000770ee0
-[  105.186499] PKRU: 55555554
-[  105.186502] Call Trace:
-[  105.186507]  <TASK>
-[  105.186513]  bpf_lwt_xmit_push_encap+0x2b/0x40
-[  105.186522]  bpf_prog_a75eaad51e517912+0x41/0x49
-[  105.186536]  ? kvm_clock_get_cycles+0x18/0x30
-[  105.186547]  ? ktime_get+0x3c/0xa0
-[  105.186554]  bpf_test_run+0x195/0x320
-[  105.186563]  ? bpf_test_run+0x10f/0x320
-[  105.186579]  bpf_prog_test_run_skb+0x2f5/0x4f0
-[  105.186590]  __sys_bpf+0x69c/0xa40
-[  105.186603]  __x64_sys_bpf+0x1e/0x30
-[  105.186611]  do_syscall_64+0x59/0x110
-[  105.186620]  entry_SYSCALL_64_after_hwframe+0x76/0xe0
-[  105.186649] RIP: 0033:0x7f166a97455d
+As the most common use-case of multi-port interfaces is combo-ports that
+provide both RJ45 and SFP connectors on a single MAC, there's a lot of
+SFP stuff in this series.
 
-Temporarily add the setting of skb->_skb_refdst before bpf_test_run to resolve the issue.
+This series is in 2 main parts. The first one aims at representing the
+SFP cages and modules using phy_port, as combo-ports with RJ45 + SFP are
+by far the most common cases for multi-connector setups.
 
-Fixes: 52f278774e79 ("bpf: implement BPF_LWT_ENCAP_IP mode in bpf_lwt_push_encap")
-Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-Signed-off-by: Yun Lu <luyun@kylinos.cn>
-Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
----
-Changes in v2:
-- Link to v1: https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/ 
----
- net/bpf/test_run.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+The second part is the netlink interface to list those ports, now that
+most use-cases are covered.
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 178c4738e63b..c05b31cd1741 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -982,6 +982,7 @@ static struct proto bpf_dummy_proto = {
- 	.obj_size = sizeof(struct sock),
- };
- 
-+struct dst_entry bpf_test_run_lwt_xmit_dst;
- int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
- 			  union bpf_attr __user *uattr)
- {
-@@ -1156,7 +1157,13 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
- 		skb->ip_summed = CHECKSUM_COMPLETE;
- 	}
- 
-+	if (prog->type == BPF_PROG_TYPE_LWT_XMIT) {
-+		bpf_test_run_lwt_xmit_dst.dev = dev;
-+		skb_dst_set(skb, &bpf_test_run_lwt_xmit_dst);
-+	}
- 	ret = bpf_test_run(prog, skb, repeat, &retval, &duration, false);
-+	if (prog->type == BPF_PROG_TYPE_LWT_XMIT)
-+		skb_dst_set(skb, NULL);
- 	if (ret)
- 		goto out;
- 	if (!is_l2) {
+Let's see what we can do with some examples of the new ethtool API :
+
+- Get MII interfaces supported by an empty SFP cage :
+
+# ethtool --show-ports eth3
+
+Port for eth3:
+	Port id: 1
+	Vacant: yes
+	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
+	Port type: sfp
+
+- Get Combo-ports supported modes, on each port :
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Vacant: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Vacant: yes
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+- Get Achievable linkmodes on a SFP module (combo port with a DAC in the
+SFP cage)
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Vacant: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Vacant: no
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+Port for eth1:
+	Port id: 3
+	Vacant: no
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+
+Note that here, we have 3 ports :
+ - The Copper port
+ - The SFP Cage itself, marked as 'occupied'
+ - The SFP module
+
+This series builds on top of phy_port and phy_link_topology to allow
+tracking the ports of an interface. We maintain a list of supported
+linkmodes/interfaces on each port, which allows for fine-grained
+reporting of each port's capability.
+
+What this series doesn't do :
+ - We don't support selecting which port is active. This is the next step.
+ - We only support PHY-driven combo ports. The end-goal of this whole
+   journey that started with phy_link_topology is to get support for MII
+   muxes, such as the one we have on the Turris Omnia. This will eventually
+   be upstreamed as well.
+
+If you want to play around with it, here's [1] the patched ethtool that I've
+been using to produce the outputs above.
+
+Thanks !
+
+Maxime
+
+[1] : https://github.com/minimaxwell/ethtool/tree/mc/ethtool_port
+
+Changelog :
+
+Changes in V5:
+ - Fixed a check on a potentially un-initialized pointer, reported by
+   Simon
+ - Fixed a documentation formatting issue
+ - Remove a stray pr_info
+ - Rebased on net-next
+
+Changes in V4:
+V4 : https://lore.kernel.org/netdev/20260203172839.548524-1-maxime.chevallier@bootlin.com/
+ - Add a cleanup patch for the of port parsing
+ - Added a match to sync the port's linkmodes with the PHY's for OF
+   ports
+ - Added RTNL assert in the port_get topo helper
+ - nullify the bus port for phylink support
+ - Fix some typos
+
+Changes in V3:
+V3: https://lore.kernel.org/netdev/20260201151249.642015-1-maxime.chevallier@bootlin.com/
+ - Remove the sfp bus ops for nophy, and use .module_start() as
+   suggested by Russell
+ - Added missing cleanup for the topology, as per AI review
+ - Fixed a few typos as per Romain's review
+ - Changed "occupied" to "vacant" as per Romain's review
+ - Added missing checks for null ports, per AI review
+
+Changes in V2:
+V2: https://lore.kernel.org/netdev/20260128204526.170927-1-maxime.chevallier@bootlin.com/
+ - Fix the cleanup path of phy_link_topo_add_phy, as per AI review
+ - Fix the cleanup path of phy_sfp_probe, as per AI review
+ - Fix the call-site of the disconnect_nophy sfp bus ops, per AI review
+ - Fix the netdev-less case uin phylink, per AI review
+ - Fix the prototype of phy_link_topo_get_port for the stubs
+ - Dropped patch 11. It ended-up breaking 'allnoconfig', so instead we
+   built a phy_interface_names array in net/ethtool/netlink.c
+ - Fix an ethool-netlink spec discrepancy with the type of an attribute
+ - Fix the size computation in the netlink port API
+ - Fix the cleanup path in the netlink port API
+
+V1: https://lore.kernel.org/netdev/20260127134202.8208-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (13):
+  net: phy: initialize the port support based on the PHY's for OF ports
+  net: phy: phy_port: Cleanup the of-parsing logic for phy_port
+  net: phy: phy_port: Correctly recompute the port's linkmodes
+  net: phy: phy_link_topology: Add a helper for opportunistic alloc
+  net: phy: phy_link_topology: Track ports in phy_link_topology
+  net: phylink: Register a phy_port for MAC-driven SFP busses
+  net: phy: Create SFP phy_port before registering upstream
+  net: phy: Represent PHY-less SFP modules with phy_port
+  net: phylink: Represent PHY-less SFP modules with phy_port
+  net: phy: phy_port: Store information about a MII port's vacant state
+  net: phy: phy_link_topology: Add a helper to retrieve ports
+  netlink: specs: Add ethernet port listing with ethtool
+  net: ethtool: Introduce ethtool command to list ports
+
+ Documentation/netlink/specs/ethtool.yaml      |  50 +++
+ Documentation/networking/ethtool-netlink.rst  |  35 ++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/phy-caps.h                    |   2 +
+ drivers/net/phy/phy_caps.c                    |  26 ++
+ drivers/net/phy/phy_device.c                  | 148 ++++++-
+ drivers/net/phy/phy_link_topology.c           |  82 +++-
+ drivers/net/phy/phy_port.c                    |  33 +-
+ drivers/net/phy/phylink.c                     | 132 ++++++
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  39 ++
+ include/linux/phy_port.h                      |   6 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  19 +
+ net/core/dev.c                                |   1 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/netlink.c                         |  26 ++
+ net/ethtool/netlink.h                         |   8 +
+ net/ethtool/port.c                            | 376 ++++++++++++++++++
+ 18 files changed, 951 insertions(+), 41 deletions(-)
+ create mode 100644 net/ethtool/port.c
+
 -- 
-2.43.0
+2.49.0
 
 
