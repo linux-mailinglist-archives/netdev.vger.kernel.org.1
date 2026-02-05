@@ -1,265 +1,389 @@
-Return-Path: <netdev+bounces-257027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257034-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBQuIQ1MhGm82QMAu9opvQ
-	(envelope-from <netdev+bounces-257027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:51:41 +0100
+	id OGaaK2hPhGkE2gMAu9opvQ
+	(envelope-from <netdev+bounces-257034-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:06:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E347EF9A8
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:51:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D248EFB88
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:06:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7ED83300788F
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 07:51:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5F4D302B3A1
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E00635FF5A;
-	Thu,  5 Feb 2026 07:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707C335FF5A;
+	Thu,  5 Feb 2026 08:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="NHTS1dal"
+	dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b="l6Jwg4DO"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011034.outbound.protection.outlook.com [52.101.125.34])
+Received: from mail2.anonaddy.me (mail2.anonaddy.me [185.70.196.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA8D35F8C5;
-	Thu,  5 Feb 2026 07:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770277898; cv=fail; b=Lxcfc0Sp97DJOsrftJ8Wc5IFXdo4urE9lKbG43PLuziNWJ2OZZmR/IXdpNw0/ALfCz4/vbNkLCgzTaS/tIYf/xs/y34/3XOi1AmNHHPcfLqcVrygHVsW7N5TbqQoF1wiNAuT1ZVj3GaA5pKDQm17nSFatDAnejU3pmSQTDylFD4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770277898; c=relaxed/simple;
-	bh=fyGbYhMsJ18VQnRtKJYco+sZ82CkSgZsMCq1SG1p+6k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PNC9TwiYFQFKWp33yOTMsb7ecZsDOMYEmxx1eB+x3R7Rp6gZY6cwL8mPp+5DUoFk2z+y/3WfEU1K6FhA0AXIc2wuPJ+RTV+YOxuPwsJNjLLfsnV17x7lva/roqujdzqTwQenMcWyAofbEIDnpRtHXhTaiEbSptO3k1R6u+PceOs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=NHTS1dal; arc=fail smtp.client-ip=52.101.125.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SosGs6QnRBi1jOZpzDHkXflhsEfiGdmcwbBFHcUGEDEp+dqud+qPj5q4GSC5kVZRB7Ha0VtIGgU7mA0OV2lvrHV5SjSiJmh9qCO82nW3sz70kj5c4yxx2ATmMPGudb7Jbc4L4YXX7JqCf3ZH9FgP088zVPYdB8CBH7djmHlovIVV8YFNa0VgocCJFdlhZq4YAyVpumiRMXm8JdtrTshK9Qo0M1HqqRThV10rg4jO1d/yAO+DPvoJeGa9HUvb9dQWfw4ITEHryy8jzI8BHybNTcoHJMvXGnXz8gHk+N6Pc8RStd9b8iwIiSYBg1EFvXqhxOou8DQjnvZjtJlSqUmEwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fyGbYhMsJ18VQnRtKJYco+sZ82CkSgZsMCq1SG1p+6k=;
- b=QuVSW6P5dzScJcKEQP6qUo/itkH4aPU0PoNyc6xijitU0yNYvSF+M/u8aw4sv/amQG6xI/mZRFhglBlHDEytTy8lYfJqea6+kyfzsgSNh7xG6dbBgVdVMkzXGMXGqQpojWzMI/3d+Mwah5zsHtU3dNi8iZxkzXOr5jM+S2g2ik8ZphmW/P6ewhmTz6nKP8y3m8OrxsSZglH6m4CK6Q/U3Cq+A5cOv0TXhFSABXrutQ8GKguf/SmNCmmOMHCY8EFW4LL633Kl23k0tAjqV/hU1A/31LFQHdCQ2yrNkEJ9f8yNv43wePCoBdX4vIcj2gS3q2CV/Xeq5k+d0q5kH8QSCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fyGbYhMsJ18VQnRtKJYco+sZ82CkSgZsMCq1SG1p+6k=;
- b=NHTS1dalfcV11vWKZd2fDxwUOFe35y6AZT3jqA7T3EkuKBS6Z3zkpOQD2NpHNEXlDlKYcrO067ikqq5fZCpc/VRI1NTjzUxU9PABrLENkxpmNK1JqFS9x21sfwK5wWM6XnveYXgnDCA7yZjytpGh+spV8Vh4rGy4TpYjj+nihD0=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by OS3PR01MB8796.jpnprd01.prod.outlook.com (2603:1096:604:17e::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.12; Thu, 5 Feb
- 2026 07:51:34 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a%6]) with mapi id 15.20.9587.013; Thu, 5 Feb 2026
- 07:51:33 +0000
-From: Michael Dege <michael.dege@renesas.com>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net] net: renesas: rswitch: fix forwarding offload
- statemachine
-Thread-Topic: [PATCH net] net: renesas: rswitch: fix forwarding offload
- statemachine
-Thread-Index: AQHclm8qD3lunnbaf0uAuh27IRHtALVzunqAgAAAwJA=
-Date: Thu, 5 Feb 2026 07:51:33 +0000
-Message-ID:
- <TY4PR01MB142828D6A83F85B08D85D3EB98299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References:
- <20260205-fix-offloading-statemachine-v1-1-640224a531d0@renesas.com>
- <3b1405cd-6c7f-4883-95fb-151cab223a68@cogentembedded.com>
-In-Reply-To: <3b1405cd-6c7f-4883-95fb-151cab223a68@cogentembedded.com>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|OS3PR01MB8796:EE_
-x-ms-office365-filtering-correlation-id: 73c3e164-0304-468c-02e9-08de648b61e9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?UHQ2VXMxdHpWQWMzb1EwS3dsVlptRGcxZ1Bld3hHMUlIMEoyc2RlM21tRjEw?=
- =?utf-8?B?elFLTFA2YmRPc2hTYkRBcFYzeG5kVVAwVkhZWXJleVJLYnkralJtYW5Ea05R?=
- =?utf-8?B?Y1c1ZVdhN1h3bHNrL21QeUhYZjIzaXpKeE15b1cvNEZNSUw3am1NV0piTnhI?=
- =?utf-8?B?QVFmaVQ1UHZmb0tBMncwd21pdXZ2RlpYZ1h6MkVVUWk2elBNeitHOWFoWmox?=
- =?utf-8?B?bEs0SmdEbGhxZHE3YnVKTDVkL2lpTXFnOUR3TSthWlFYNVZ4TXRSK05wQnF2?=
- =?utf-8?B?LzN0MTVvQlozenp1V2ZZVDRiVnRTdTlKK24zKzRrbE4wbnFIbjZrQkNQek5t?=
- =?utf-8?B?YU9aRWp3bnlQL1dCa1VKbm5naHJrQjlDRHVZTnluU01IQmdZQ3FBMENvbnBU?=
- =?utf-8?B?WmttSWR2RVJDalZFSEIwb25WMG5LQkthRFRCeFRyOVZwUldTSWR4dmE0RnZt?=
- =?utf-8?B?dVdOMDdNb2NUS0RIRk5XZjJ1RVNYd1c2VlpLVnBiUFpyaXhvMFlNSTNia3Np?=
- =?utf-8?B?VVZhTFpNMnhLRkxLcFJTRHZZTllMUkZnUmdzWGtKREk3dUViUUt0R3AwZHVV?=
- =?utf-8?B?WEpQMXo5aWVzblV4V3lRcE5kbDFtMkdvUFlMdEc0N0loRVRxVXMvTXdCUG9s?=
- =?utf-8?B?U01qT0p2bWZYaE5pUEZ4bjRvUkk4NEltU0tCdWNJVURlaldwWVNlNnhTMldO?=
- =?utf-8?B?Y0V1M3NZNXFPTTh2b3p3NUJ0QlJ0cW1vREhkYUZDUDFwSnNiWEF5NkxxSlF4?=
- =?utf-8?B?WmZoK2dtd3lPSEFkTlkyT2ZGRGdSdmwzam4vRDRkQStLcjAvSXAvTDhESVZQ?=
- =?utf-8?B?TjlUekVucUhVTmlkdzl0RUNOb0tuQitSTnpQRXMxdkdxUGxEWHRhQU8rUnF2?=
- =?utf-8?B?K1JWZEFCSWg4TU9BWWs4ZGtFTTZpaDEyT2dnQm1qVnFDQWtoSjJhdVh3eGM3?=
- =?utf-8?B?Uzd2STNQZGhQcm9UTEtDZ05LMGFGRlRJRVQvOHpGaVA5STUySGRjaWJTa1Ba?=
- =?utf-8?B?L2p4Z2RReHYvcXdVTi8vMDZYMXB4MTFCMW1GdnlSOUZ0allqN1FBaklRYnRu?=
- =?utf-8?B?bkZFdEpIRE9TVGVCQk9oVWM5Z2FSY3I3RVM1U2FuZW0xUXE0SXV0WjBkT2J6?=
- =?utf-8?B?Nng1MXBXOWdEd3Vwc2MzbDZWdGducWZpV0lHa3ZQQVdOaXRjUlc3dTZUWXpR?=
- =?utf-8?B?ekhWQjFwbVgzaStKMC84MFF3NzVscW9EQ1Z5WTg3WExnYmpIZ3lSNXB4bGRm?=
- =?utf-8?B?aEFNS1BiZzJ6cThaNkFqS1BTMkJUQWh1cDlpMGcwV0NBZ3JRdjhVYTZqU0Fj?=
- =?utf-8?B?bGhBR2tBSlhZakwvakd0S2NKcThMWUwwRU11aEVqT1ZUOFBtQkR1eE5EajBh?=
- =?utf-8?B?Y1IyaEVsSzlUcUIxRHFxR0d0VVpDL3pxUitnQnlXak5nVy9iYU1hMlkrVHVS?=
- =?utf-8?B?Q3lJQVVJYXFtT2E5T01sZ244eUFRbUFRL29MQzZMQjlBN3M0RXpTVlBYOU12?=
- =?utf-8?B?ZUVsWnBiV1VSS3E0dlJia2pWZjI2VXoxMDExSWxOcUZIWTJnVmpmaWgyWGN1?=
- =?utf-8?B?RmdabVhNSzNLMzEyWnlycHlwQ2h0ZVN4ZklaVERrZU9RYjF1Njg0aW1kd0c1?=
- =?utf-8?B?VVUydlRBeld3OFVKVlVjYkFXOHkxYm8wMjFDUzdpbG9RZWlrWXVoVTE4cEQ0?=
- =?utf-8?B?WnJyZWN1dkE1TWowSlpoejRDU2srbVNNaUZIQzU5VVlYWlF4dTk4SCszTjU0?=
- =?utf-8?B?V2hBa2RnQU1yQnBRSmx1K1lQbkYvdy9pakwwcG1GY1E2MUM1bUlGdzJLU1dR?=
- =?utf-8?B?NFdwbG5XeWVQT0dCbDA0Z3hvNDBjZVY2UW5icFc5d3dlc2J4Sm9hcjl6RXh2?=
- =?utf-8?B?VGNFdXpJTnU4Tnhub0tRV0pMVzV3WUxMLzlramNUQkVUWUdrYldUN1dMSVRN?=
- =?utf-8?B?Ky9BcFVTbU13UWN6K3JDcjRrZG00bXcwb3BadThXS0oyb3Nmemp0TE1rZkFB?=
- =?utf-8?B?SmtUZWU4MkkybytCZmlaTTFRV0xpeFBVd3h1aEg2NmdpdHVwWUV1K1l5NmM5?=
- =?utf-8?B?bDNsMU51M2FmSmw5Z3FiMDhKRk01NXYrZjYrMlJ0MGlXaElOMjh6dk0yNWZH?=
- =?utf-8?B?YTN1TW5seVJQMXVpQ1p1RW9QNUEvS1p6ZzQ4My85Y2oxQnBRUzd2L1NJZ3Zp?=
- =?utf-8?Q?PrHnAOdfFcgiQFGJdI7QzCM=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WisreTk0ZlcreFo3Y3VoVVFuUGlVUTRQN3lwMVp0UjZhMTJKck1ScnYvQklv?=
- =?utf-8?B?VmJCMGEvUC9HUStFMy9vano2UHNnNG9zMHpSb2FOTlZVdmpZTnlaTTlzOGFS?=
- =?utf-8?B?WWREbGVadTJLVXhQMFZ1QjBGMmM5NytzbTRhOW05SXk0YWx5cjc3M1E3UEV5?=
- =?utf-8?B?SEdsa3E5YWRLTDdheFAvM2VNNWFEWUJJbll0NWYxY0VWTmE2YWIvMmZwZEx3?=
- =?utf-8?B?Tk9tQUFLRkNRbXowdDBwL3ZpRUdBaEFZOTl4UTRqTXdjNWhCeGdMMmJsTGFD?=
- =?utf-8?B?TWFYeDBiM2VDQzREQkVDRkdvVjlTQ2JYcld1TkFLMXhCNzAreElBbnVmcHdi?=
- =?utf-8?B?UkhabnNJR2ZrMmdsRGtUM0MrT1g3dHVNNi8zQlE5aFZNSXk1TVJQNEZ5Y3pI?=
- =?utf-8?B?enRRQ0ZUNkJoUmRJRTFPMmQxWk1SQTVWVnltL3dGZVlwOVc0b2FBN2hML2pl?=
- =?utf-8?B?Y0hvYm1HNFAzaHY0R0pSbHl1V0l0MXhnUHFYbUdua2hWSTU0OWJqOXJJQ1FT?=
- =?utf-8?B?QzFWTEVrenVzcE9YbGNkUERhNkJ6Vmx2ckxKTzA4TVVWdk9lYlN5bXVLMGVq?=
- =?utf-8?B?N1dJanB5R1JiM3laY2NYczZGQ05iY1g0Z3puQXFsblVZK2NZYTB4TnFsbnhz?=
- =?utf-8?B?TmUzUk53OVlBZ05zZUMwQ29FR2xnWFJPaUdZaDVFd2RITWFTVHZyTWpobUxi?=
- =?utf-8?B?MnNHaDJFL1dSd3c3V3RDcWp5bldlcERDeithZUZCS3FHZ1k5U3dBdmFNVjlD?=
- =?utf-8?B?SEQ4ZThrTjBMV2NyaGtpdXZiYng2T0dlZmVwZWQzQTA1NFdsb0JnOVMrMjRO?=
- =?utf-8?B?Vm5LTzNNcDBhS0NNZ0NOL2ZNQ1l2Vm12L0p6dE83OWp2akZESnJZQ2xEdHZx?=
- =?utf-8?B?Y0RETTdBSEdDUExVVzRhL1pyWWRWOGpiL0ltK2ZTVGp6NjA0N1ZMMGJVQXc1?=
- =?utf-8?B?M2dLNlBaWU9iVnc2elQvbExrUGl4czZhZTU4OS9KRkJaZWh1TnN4ZTZidXJi?=
- =?utf-8?B?Y25wVGxSc0VGZVI4SFpXL0d5d0s2aWJmL0V1Um5ybDNPb1VPWks4T3hoVGtB?=
- =?utf-8?B?L09rc1hLVFUzdWlzMWZCVThudDN1bzFUUzZNSkJGRG53b08zSit6YVRERFcr?=
- =?utf-8?B?WmNVdU45ODkyVVNOSDBXR3c2QjVxYnJJWEhTMVVsZVVHZGxTNFh2aUl5UG1X?=
- =?utf-8?B?dEZXeExpSWtmOUdlV0FFbEF3NU9oT3QwM2FMc3pUMUZNYWNNTkxwTWRFUDRn?=
- =?utf-8?B?SVhjSkxyUjM1c3F0NUZwTHZVVHRIeE5EQ3JjaUxWOTRINE5IS0I1cEhpMEFS?=
- =?utf-8?B?Smk3S2plNHN5dks3d2VFY09qT2YwWEN4OTdoZm50b0JERkMxaG1maFNROXZZ?=
- =?utf-8?B?NGFEcUtJUUF1UVRMMDlzQ3gwb1ZyQndmN0ZwRHpMcnNIOFR4SVFWN1dTSVlh?=
- =?utf-8?B?ZjJ5ZWppYTZtWXE0VEZVSURVWUx4QlNMVWg0TFNJVnpFS0sxekg4Qm82ZWRp?=
- =?utf-8?B?MmRUOEpoWnVENzRadzU1eWE2cXNkRE5NNzJYbm1ZNTJhNnppNmlMazZMbkNW?=
- =?utf-8?B?S1orbVZXbjBwVzZmRjZJcWpTSFMzcDJWMTRWN3lrRmJBcXNhSHcvdDVxd3Ix?=
- =?utf-8?B?Q1dHbVVXazdhQnJOSXN0TjZacEpxNnJ5NzZXVG1PbWlGRXJ3VVdDbU0yUWc0?=
- =?utf-8?B?YXNudHR1N2lhaXZxekd6dzNXVkdrVG5qZWJTaTdNaGxTL1JwNUtDWkMvb0Rk?=
- =?utf-8?B?YjIvaTZuT0llWHd6OUFMYjM3dTMvUi9RN3dPOHd4TlNSazVPa2MwOWhscDlD?=
- =?utf-8?B?YmtIdGM0aWtjdno1N1R2SGtPLzduZ2FwOFR4eUhoMGRBRThGY0xvQ2FqMmF6?=
- =?utf-8?B?YUo3eTgvaURKRjAzNGM0SXVYUksrRzZ5bkNEU2lzeWxmSDFPc0JFZC9oZktT?=
- =?utf-8?B?YktNV3gra1dVYjhGOHhhWVI4alhvMkpVd044VSt2d1ZkWWREWjNoN3hVeGEr?=
- =?utf-8?B?TXlUSTJuZnNUcGNnOEJ1c0xUc25FR2hHdjM2RWtHMWk2QmlLTzJwZ1FQSElV?=
- =?utf-8?B?RU1Jb1pQY3dxM2VzdkNtQlpjSmZSK0d2c3FBUTI2aU90ejVUZ2xhSGw2bW1l?=
- =?utf-8?B?d0kvZnVhV1BKcnBDSVgyTFM1SDVKT2xBaklhVkJOSy9xSGIweGZqV3c3SWsw?=
- =?utf-8?B?SzBhSHNSQXBhRlVaOXFEaHZxR0JhZ3ByWEhES09pZ2E2VitLOUM5WjhDK1pa?=
- =?utf-8?B?NDhKWDFtZXNLYlNaMUZXTVNTODRxRlhva0dFWUdyNk9vNkdWK1VpclpFUy9S?=
- =?utf-8?B?aHVmSm01K2lNL3gvTmpmRFVTbC9TQUM5NWFCMTNwNHpHQjRCOUwrUT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1116823D7D4
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.196.149
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770278575; cv=none; b=Yi2bWOhEE9kLkSp3LcsDu4Ot9021kzPKDB5zTQ1xVyYozADNtnxPZLsNtJfK3f01hsj8eHME/cW0T92gHD5mXi3fSdcaUlfLnu7OgfOrkWILnnmZDNI5ez6ekVd0KtBAzIVzSCk+ZcLFfzOmNJqW/Lr5A5WgrHpKit6TbMR+jBQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770278575; c=relaxed/simple;
+	bh=5AaoRbBNAPkNC4SsGLg3KZJ0Aa//TunCotCzsupFYZ4=;
+	h=From:To:Subject:Message-ID:Cc:MIME-Version:Date:Content-Type; b=jPCLpV3gRinKyNsjx7gJImEiN76ix5XGSOi4U7x2RLnnTOJO0jllrq+Rr1ieyrUIGYovElu+Dko2WD0SfSF6DGKslNIb+kZQ17e6pfpvKhMahgP5Kz92KV5FglYe1KZz71YgR04LR/+H1iEi6fFrz5dx+72VJ4ZntjzybgHUoWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me; spf=pass smtp.mailfrom=anonaddy.me; dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b=l6Jwg4DO; arc=none smtp.client-ip=185.70.196.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anonaddy.me
+Received: from mail2.anonaddy.me (mail2.anonaddy.me [127.0.0.1])
+	by mail2.anonaddy.me (Postfix) with ESMTPS id 8B18BFA9D1
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 07:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anonaddy.me; s=default2;
+	t=1770278013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=apxmgs+L7pLGJzl95x0JK/zDZ8qpoMIhjhbsuOYRGR4=;
+	b=l6Jwg4DOiQaSMiwWwGJH3LC0ccr6wnZssIRIXG+OWMsgFSVyli+Gk7G0XFSnkmfsMK9n4f
+	/hMyM7YEg2mRwZUTdfs/eFyDsj80K6UbRyu5uSF+Aw4MAdeUmdAAQzumxhIboCo8Dbb75F
+	2Bbz5sxPeU0rYmNNRA6MXkeJTfBEAUfXQxGBtusM7GglnkEEFPMvZcDvAU7f6PshrKF8D5
+	0qUdvgw4Fgdv7TAxvcYI/BABnYw6Gi5P9pFUK5bgeLosWW+o/Qaxus/0foTcCb9luJTzrj
+	/4MuOvpmLCFjNH+Hk51ujmA265bbtLzt9V9gFtJblxUxwZ6VzzPaoeORZJINVw==
+From: agpn1b92@anonaddy.me
+To: virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: [BUG] vsock: poll() not waking on data arrival, causing
+ multi-second SSH delays
+Feedback-ID: S:d17f588e-5717-4190-ab1e-7db474f4dce6:anonaddy
+Message-ID: <f3a801a1a32670294d5d703cad8ab609@anonaddy.me>
+X-Complaints-To: abuse@help.addy.io
+X-Report-Abuse: abuse@help.addy.io
+X-Report-Abuse-To: abuse@help.addy.io
+Cc: sgarzare@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73c3e164-0304-468c-02e9-08de648b61e9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Feb 2026 07:51:33.8831
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vy8c3VhDiNfmhlTs/THfA5beUcjZqOLA6zFNlQ32e2n2SkJqgMcxYK/tDkVK9ItlC+Po0exOfJJTVgJvI6ldmPu32peZdPIAt+U1ZrSaUNs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS3PR01MB8796
+Date: Thu, 05 Feb 2026 07:53:33 +0000
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[anonaddy.me,reject];
+	R_DKIM_ALLOW(-0.20)[anonaddy.me:s=default2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257027-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[anonaddy.me:+];
+	FROM_NEQ_ENVFROM(0.00)[agpn1b92@anonaddy.me,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-257034-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[renesas.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cogentembedded.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,davemloft.net:email]
-X-Rspamd-Queue-Id: 9E347EF9A8
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[anonaddy.me:mid,anonaddy.me:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vsock:email]
+X-Rspamd-Queue-Id: 1D248EFB88
 X-Rspamd-Action: no action
 
-SGVsbG8gTmlraXRhLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE5p
-a2l0YSBZdXNoY2hlbmtvIDxuaWtpdGEueW91c2hAY29nZW50ZW1iZWRkZWQuY29tPg0KPiBTZW50
-OiBUaHVyc2RheSwgRmVicnVhcnkgNSwgMjAyNiA4OjQ3IEFNDQo+IFRvOiBNaWNoYWVsIERlZ2Ug
-PG1pY2hhZWwuZGVnZUByZW5lc2FzLmNvbT47IFlvc2hpaGlybyBTaGltb2RhIDx5b3NoaWhpcm8u
-c2hpbW9kYS51aEByZW5lc2FzLmNvbT47DQo+IEFuZHJldyBMdW5uIDxhbmRyZXcrbmV0ZGV2QGx1
-bm4uY2g+OyBEYXZpZCBTLiBNaWxsZXIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+OyBFcmljIER1bWF6
-ZXQNCj4gPGVkdW1hemV0QGdvb2dsZS5jb20+OyBKYWt1YiBLaWNpbnNraSA8a3ViYUBrZXJuZWwu
-b3JnPjsgUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPg0KPiBDYzogbmV0ZGV2QHZnZXIu
-a2VybmVsLm9yZzsgbGludXgtcmVuZXNhcy1zb2NAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJu
-ZWxAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggbmV0XSBuZXQ6IHJlbmVz
-YXM6IHJzd2l0Y2g6IGZpeCBmb3J3YXJkaW5nIG9mZmxvYWQgc3RhdGVtYWNoaW5lDQo+IA0KPiBI
-ZWxsbyBNaWNoYWVsDQo+IA0KPiA+IC0JCX0gZWxzZSBpZiAocmRldi0+Zm9yd2FyZGluZ19vZmZs
-b2FkZWQpIHsNCj4gPiArCQl9IGVsc2UgaWYgKHJkZXYtPmZvcndhcmRpbmdfb2ZmbG9hZGVkICYm
-DQo+ID4gKwkJCSAgICFyZGV2LT5mb3J3YXJkaW5nX3JlcXVlc3RlZCkgew0KPiA+ICAgCQkJcnN3
-aXRjaF9jaGFuZ2VfbDJfaHdfb2ZmbG9hZGluZyhyZGV2LCBmYWxzZSwgZmFsc2UpOw0KPiA+ICAg
-CQl9DQo+IA0KPiBBbHRob3VnaCBpbmRlZWQgdGhlIGNvbmRpdGlvbiBpbiB0aGUgY3VycmVudCBj
-b2RlIGlzIG5vdCBjb3JyZWN0LCBJJ20gbm90IHN1cmUgY29tZm9ydGFibGUgd2l0aCB0aGlzDQo+
-IGZpeC4NCj4gDQo+IEZ1bGwgY29uZGl0aW9uIGZvciBhIHBvcnQgdG8gYmUgYSB2YWxpZCBjYW5k
-aWRhdGUgZm9yIGhhcmR3YXJlIGZvcndhcmRpbmcgaXMNCj4gDQo+ICAgIHJkZXZfZm9yX2wyX29m
-ZmxvYWQoKSAmJiByZGV2LT5mb3J3YXJkaW5nX3JlcXVlc3RlZA0KPiANCj4gSXQgaXMgbm90IG9i
-dmlvdXMgaWYgYXQgdGhpcyBwb2ludCByZGV2X2Zvcl9sMl9vZmZsb2FkKCkgY291bGQgZ2V0IGNo
-YW5nZWQgZnJvbSB0aGUgbGFzdCBjYWxsIHRvDQo+IHJzd2l0Y2hfY2hhbmdlX2wyX2h3X29mZmxv
-YWRpbmcoKSwgc28gdXNpbmcgb25seSB0aGUgcGFydGlhbCBjb25kaXRpb24gYXQgdGhpcyBwb2lu
-dCBkb2VzIG5vdCBsb29rDQo+IGdvb2QgZm9yIG1lLg0KPiANCj4gSSdkIHN1Z2dlc3QgdG8gZWl0
-aGVyIGNoYW5nZSB0byBzb21ldGhpbmcgbGlrZQ0KPiANCj4gaWYgKHJkZXZfZm9yX2wyX29mZmxv
-YWQoKSAmJiByZGV2LT5mb3J3YXJkaW5nX3JlcXVlc3RlZCAmJiAhcmRldi0+Zm9yd2FyZGluZ19v
-ZmZsb2FkZWQpDQo+IAlyc3dpdGNoX2NoYW5nZV9sMl9od19vZmZsb2FkaW5nKHJkZXYsIHRydWUs
-IGZhbHNlKTsgaWYgKCEocmRldl9mb3JfbDJfb2ZmbG9hZCgpICYmIHJkZXYtDQo+ID5mb3J3YXJk
-aW5nX3JlcXVlc3RlZCkgJiYgcmRldi0+Zm9yd2FyZGluZ19vZmZsb2FkZWQpDQo+IAlyc3dpdGNo
-X2NoYW5nZV9sMl9od19vZmZsb2FkaW5nKHJkZXYsIGZhbHNlLCBmYWxzZSk7DQo+IA0KPiBPciBt
-YXliZSBqdXN0DQo+IA0KPiBpZiAocmRldl9mb3JfbDJfb2ZmbG9hZCgpICYmIHJkZXYtPmZvcndh
-cmRpbmdfcmVxdWVzdGVkKQ0KPiAJcnN3aXRjaF9jaGFuZ2VfbDJfaHdfb2ZmbG9hZGluZyhyZGV2
-LCB0cnVlLCBmYWxzZSk7IGVsc2UNCj4gCXJzd2l0Y2hfY2hhbmdlX2wyX2h3X29mZmxvYWRpbmco
-cmRldiwgZmFsc2UsIGZhbHNlKTsNCj4gDQo+IHNpbmNlIHJzd2l0Y2hfY2hhbmdlX2wyX2h3X29m
-ZmxvYWRpbmcoKSBoYXMgaW50ZXJuYWwgY2hlY2sgZm9yIHRoZSBjdXJyZW50IHN0YXRlIGFuZCBy
-ZXR1cm5zIGVhcmx5IGlmDQo+IHRoZSByZXF1ZXN0ZWQgY2hhbmdlIGlzIGFscmVhZHkgYXBwbGll
-ZC4NCj4gDQo+IE5pa2l0YQ0KDQpUaGFuayB5b3UgZm9yIHlvdXIgY29tbWVudC4NCg0KTGV0IG1l
-IHN0dWR5IGFuZCB0ZXN0IHlvdXIgc3VnZ2VzdGlvbi4NCg0KQmVzdCByZWdhcmRzLA0KDQpNaWNo
-YWVsDQo=
+Hi,
+
+I'm experiencing a bug where SSH sessions over vsock take 2-20+ se=
+conds
+to establish due to poll() not signaling POLLIN when data is availa=
+ble.
+The bug does NOT occur on the first connection after VM boot, but af=
+fects
+all subsequent connections.
+
+* Summary
+
+- vsock poll() fail=
+s to return POLLIN when data is in the receive buffer
+- sshd-session's pp=
+oll() times out every ~20ms instead of waking on data
+- First SSH connect=
+ion after guest boot works instantly
+- All subsequent connections experie=
+nce 2-20+ second delays
+- Non-PTY commands (ssh -T ... 'echo test') work =
+instantly
+- TCP connections to the same VM work instantly
+
+* Environm=
+ent
+
+Host:
+- OS: Arch Linux
+- Kernel: 6.18.2-arch2-1
+- QEMU: syst=
+em package (latest)
+
+Guest:
+- OS: Debian trixie
+- Kernel: 6.17.13+d=
+eb13-amd64 (also tested on 6.12.57, same issue)
+- OpenSSH: 10.0p2
+
+QE=
+MU command (relevant parts):
+  qemu-system-x86_64 -enable-kvm -smp 8 \
+=
+    -object memory-backend-memfd,id=3Dmem,size=3D20G,share=3Don \
+    -ma=
+chine memory-backend=3Dmem \
+    -device vhost-vsock-pci,guest-cid=3D5 \=
+
+    ...
+
+Connection method: ssh user@vsock/5 (via systemd-ssh-proxy)=
+
+
+* Symptoms
+
+Interactive SSH (PTY) - SLOW:
+  $ time ssh user@vso=
+ck/5
+  # Takes 2-20+ seconds before shell prompt appears
+
+Non-interac=
+tive SSH - FAST:
+  $ time ssh user@vsock/5 'echo test'
+  test
+  real =
+   0m0.156s
+
+TCP to same VM - FAST:
+  $ time ssh -p 33594 user@127.0.=
+0.1
+  # Instant
+
+* Key observation: First connection after boot is fa=
+st
+
+After guest reboot:
+  $ ssh user@vsock/5      # INSTANT (< 1 seco=
+nd)
+  $ exit
+  $ ssh user@vsock/5      # SLOW (2-20 seconds)
+  $ ssh =
+user@vsock/5      # SLOW
+  ...
+
+This suggests the bug involves state =
+that accumulates or isn't properly
+cleaned up between connections.
+
+*=
+* bpftrace evidence
+
+Using syscall tracepoints on guest during slow con=
+nection:
+
+  =3D=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D
+  [   29 ms]=
+ sshd-session: ppoll() duration=3D19 ms ret=3D1
+             ^^^ 20ms TIM=
+EOUT pattern detected!
+  [   50 ms] sshd-session: ppoll() duration=3D20 m=
+s ret=3D1
+             ^^^ 20ms TIMEOUT pattern detected!
+  [   70 ms] =
+sshd-session: ppoll() duration=3D18 ms ret=3D1
+             ^^^ 20ms TIME=
+OUT pattern detected!
+  ... (continues for ~2 seconds) ...
+ =20
+  [ 500=
+0 ms] --- 5s stats: ppoll=3D455, timeouts=3D103, recv=3D0 (0 bytes) ---
+ =
+=20
+  [19432 ms] sshd: recvmsg() =3D 308 bytes [4 =C2=B5s]
+  [19442 ms] s=
+shd-session: recvmsg() =3D 308 bytes [4 =C2=B5s]
+
+Pattern analysis:
+-=
+ ppoll() returns ret=3D1 (1 fd ready) but takes exactly ~20ms (timeout)
+-=
+ The ready fd is the PTY, NOT the vsock socket
+- recv=3D0 during the time=
+out phase: vsock data not being read
+- recvmsg() finally succeeds after ~=
+19 seconds
+- When recvmsg() runs, it completes in 4 microseconds (data WA=
+S there)
+
+This proves: data is sitting in the vsock receive buffer, but=
+ poll()
+is not returning POLLIN, so sshd doesn't know to read it.
+
+* =
+30-second summary from bpftrace
+
+  Total ppoll calls: 488
+  Timeouts =
+(20ms pattern): 103
+  Successful recvmsg: 6 (984 bytes)
+  Timeout rate:=
+ 21%
+
+* Why PTY-specific?
+
+PTY sessions require bidirectional traff=
+ic:
+1. Server sends shell prompt =E2=86=92 client must receive it
+2. Cl=
+ient sends keypress =E2=86=92 server must receive it
+3. Server sends echo=
+ =E2=86=92 client must receive it
+
+Each exchange relies on poll() wakin=
+g on POLLIN. The bug causes poll()
+to miss the wakeup, forcing sshd to wa=
+it for its 20ms timeout fallback.
+
+Non-PTY commands do request-response=
+-exit quickly before the bug
+manifests significantly.
+
+## Additional =
+context
+
+I previously encountered the identical issue on WSL2's Hyper-V=
+ vsock
+implementation, suggesting this may be a fundamental issue with ho=
+w
+vsock transports handle poll/wakeup semantics, not specific to virtio.=
+
+
+## Hypothesis
+
+Based on the evidence, this appears to be a lost w=
+akeup race condition:
+1. Host sends packet to guest
+2. Packet is enqueu=
+ed to socket's rx_queue
+3. sk_data_ready() is called but poll waiters are=
+n't properly woken
+4. vsock_poll() returns 0 (no POLLIN) despite data bei=
+ng available
+5. ppoll() times out after 20ms, sshd retries
+6. Eventuall=
+y succeeds through timeout-based retry
+
+The "first connection works" pa=
+ttern suggests the race involves
+existing state from previous connections=
+ - possibly worker threads,
+interrupt handlers, or virtqueue state that i=
+sn't properly reset.
+
+## Reproducer
+
+1. Start QEMU VM with vhost-vs=
+ock-pci device
+2. Boot guest, ensure sshd is running
+3. From host: ssh =
+user@vsock/<CID>  # First connection is fast
+4. Exit and reconnect: ssh u=
+ser@vsock/<CID>  # Now slow
+
+## Request
+
+Could someone familiar wit=
+h the vsock/virtio poll implementation
+review the wakeup path? Specifical=
+ly:
+- virtio_transport_recv_pkt() -> sk_data_ready() path
+- vsock_poll(=
+) -> poll_wait() registration timing
+- Any state that persists between co=
+nnections
+
+Happy to provide additional traces or test patches.
+
+Tha=
+nks,
+[Your Name]
+
+---
+bpftrace script used (runs on guest):
+
+#!=
+/usr/bin/env bpftrace
+BEGIN {
+    @start =3D nsecs;
+    printf("=3D=
+=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D\n");
+}
+tracepoint:syscalls:sy=
+s_enter_ppoll {
+    if (comm =3D=3D "sshd-session" || comm =3D=3D "sshd")=
+ {
+        @ppoll_enter[tid] =3D nsecs;
+        @ppoll_count++;
+    }=
+
+}
+tracepoint:syscalls:sys_exit_ppoll {
+    if (@ppoll_enter[tid]) {=
+
+        $ms =3D (nsecs - @start) / 1000000;
+        $dur =3D (nsecs - =
+@ppoll_enter[tid]) / 1000000;
+        if ($dur > 10) {
+            prin=
+tf("[%5lld ms] %s: ppoll() duration=3D%lld ms ret=3D%d\n",
+              =
+     $ms, comm, $dur, args->ret);
+            if ($dur >=3D 18 && $dur <=
+=3D 25) {
+                printf("           ^^^ 20ms TIMEOUT pattern det=
+ected!\n");
+                @timeout_count++;
+            }
+        }=
+
+        delete(@ppoll_enter[tid]);
+    }
+}
+tracepoint:syscalls:sys=
+_exit_recvmsg {
+    if (comm =3D=3D "sshd-session" || comm =3D=3D "sshd")=
+ {
+        if (args->ret > 0) {
+            $ms =3D (nsecs - @start) / =
+1000000;
+            printf("[%5lld ms] %s: recvmsg() =3D %lld bytes\n", =
+$ms, comm, args-
+>ret);
+            @recv_count++;
+            @recv_=
+bytes +=3D args->ret;
+        }
+    }
+}
+interval:s:5 {
+    printf=
+("\n[%5lld ms] --- 5s stats: ppoll=3D%d, timeouts=3D%d, recv=3D%d (%d bytes=
+)
+---\n\n",
+           (nsecs - @start) / 1000000, @ppoll_count, @timeo=
+ut_count,
+@recv_count, @recv_bytes);
+}
+
+
+
 
