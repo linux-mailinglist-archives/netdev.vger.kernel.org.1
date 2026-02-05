@@ -1,125 +1,179 @@
-Return-Path: <netdev+bounces-257161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257162-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +F0XGquThGk43gMAu9opvQ
-	(envelope-from <netdev+bounces-257161-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:57:15 +0100
+	id WKoZJU+ZhGmh3gMAu9opvQ
+	(envelope-from <netdev+bounces-257162-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:21:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3021F2DE3
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:57:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA8A8F32AD
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:21:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6517302C6F0
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 12:54:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C17E930086D2
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4084A3D4132;
-	Thu,  5 Feb 2026 12:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2564A3D330A;
+	Thu,  5 Feb 2026 13:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQCpLh6g"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B2BcCQOy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D43813AA2F;
-	Thu,  5 Feb 2026 12:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770296096; cv=none; b=ukD8ySUxZTOtp63dcKGo+YT75s9PkqmTW5KtHDqrTwGdW4/Q2/uugd5ZXsK4bDxYUJtj/JjNknzxZTCCx1BAlT+0TksQp3zkqyuic5fox9Ms79e3Rpq7RpRwcQL2dys8NqElCTwA71toyyumrELcBn7kLBQ2ka4hvOxblmGzR0A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770296096; c=relaxed/simple;
-	bh=rd7IcAxI7KXXPqJTRS37PUB7IUPkaSG1cqSOfe+KXUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VsdmN6ai5IKKZjyZLfU+xBfD+K/n4QH4txyp0YichMpmV+8lYHDsEx+m+nDd/DebtRi7i2cOCZXN22KMHy/1dqk7GJgYo/sgoHvpF4D6iy8u9BNpmi8Qe7WuJwB/46YudLzsaXd3DEAlXseGL9FVR3lYriD3Zl9K0k0wmhCGJfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQCpLh6g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCFEAC4CEF7;
-	Thu,  5 Feb 2026 12:54:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770296095;
-	bh=rd7IcAxI7KXXPqJTRS37PUB7IUPkaSG1cqSOfe+KXUE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VQCpLh6gd+PBKTfgShfaD6r24q4QHW21CwfekwoWm3SWRaFV47nio3OctX7I1bYa/
-	 QWZjWf/Ml/xfDmaIw4Mlqft4eIopKkQRwQ0bdWAT5jsmwH7ykh/NLS0KZK4OUJEcsU
-	 OKklMe+mL+PyOMLOpE0I2wTtl/9hDUqYx+phuXii5eXDltlhUDw4a8oqQXQ2cUHMif
-	 0V9zoW2f8Ja+nJZKCNHl63K3UKggMDQpWR3j9zEPUjnn5/dUxPorCweEOGwuGTlod7
-	 dSfy+tO5YUg184/uDRiryjUzVIAhSPh+TN2Z+zdXAlDHnJWalnJ/LCiXJQ9SH+0MIp
-	 2EUe5ISYGabjw==
-Date: Thu, 5 Feb 2026 14:54:51 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed <saeedm@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
-	Yael Chemla <ychemla@nvidia.com>,
-	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	Shahar Shitrit <shshitrit@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlx5: Fix 1600G link mode enum naming
-Message-ID: <20260205125451.GE12824@unreal>
-References: <20260204194324.1723534-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76814414
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 13:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770297632; cv=pass; b=rWYcslLcclZ2nsskrKn+HYRB3ZcCrNnvK3kq41VkYxMwbWE8uyxEeHijL8JSREczM9uPWrCkkhXyjjDhMXjvVdkmxHXZEqXwlFLdvl96Xp5S3Lw3lfGaj3FlDYVxfD058MT9P1JsFiCCJlgf09wsimTrfS13l5UJHaHApuoVeZc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770297632; c=relaxed/simple;
+	bh=+0qD3481OxJx/GzPxCze8mEUjrwmVraEw0kqw6Nb+Ak=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pd2tWN4W3EnmsQFimo8Aa5Eh7kgI++3wL2aZx0Cisflb7zBsCcm9egEWX3QIqSbxcJLnPMuDX0OUszhVZSyXW9f0IJInXYnHiUkq0upHMEXUAXrSNakzSNMZLIs+1zHkhwrJPsMLl8PONYT/hykVLXVc9QMl6JQVr8UOnqpEntA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B2BcCQOy; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50299648ae9so421291cf.1
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 05:20:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770297630; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RFB/81gMvj/vDt7MThtJDHH2zSKWMCVc4KZu22AT0dtXzB3KK83OTSo37i8GmwLWkM
+         bYuwrYFNxUJmbLjlxCmNPWxtP/VVtoggZXb7z9zSie8I7jMAujlyz1z6zPOQyPh2nGUM
+         1o5mbBfDN8rTyHjqdqzDvma+qre/X7qpP8yE4Dl7ZtLoUvTIrlqJrsVFfhwNbGiyzP+W
+         pNqzoqkhl+drcnzptsMw68AlXUzQf2sePre2g45FZYqz5CwVEiWZ75Q1z6VkI7eT6Ufj
+         fJO45Uh7IseuKljAwNoXJRobL8T+Avct5z3bEusLSKBkRpaVQgvgzp70u8qKTsvcQMGQ
+         bgzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=nUxzn6tyMigJh/FRYg1m34qD7OVTrxYvrqfI67oJIC8=;
+        fh=vAjP76cOv87YgZUBgN3byGSUb3LJ5jWpnCMY7bVHaSg=;
+        b=lV+4wjg4oKecCOLcG5rq8PQoBvWhHHb+kqjj7ymwAvuGfggp6wnSNgI9zofXlQNFbt
+         Zv23St2GD+rwnmb3gPGsCsoMPtemJ+ysqMtkYtHubYSJDJxWxaKk5xtLfuFPStCdyBlc
+         qMFT8Pfy/VD2VF7GmM962O60Gl7eQhWCNDrjrfWGYaIcEyO0KmfMrand9rqNdvV7IHkA
+         T0VA7URDNxMwZuBvAN7W59Sw5GjqesjYiC/sRr4jZDQ8O9hbhD01+Yy85+e+PZHtLnV2
+         HGjKKPZCbxaqtbzr7qopkS8QUfZuBBhVTB/ERyav6PFwlWadI/iBhVDjjnb5Dvli8VJS
+         Xd2w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770297630; x=1770902430; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nUxzn6tyMigJh/FRYg1m34qD7OVTrxYvrqfI67oJIC8=;
+        b=B2BcCQOy4Ztpc4d2HMMwqy7nPYW/R6GeI7fxmq+WaykAcWlEGYNdKdR7JfdsT7nS7B
+         twAJFb03QPFI7rnhPCQKK6gHpBt6TbDAzlUGjQenZ94NnceBTcuFZdNLaiBJ10/44+n9
+         Ck+m2uHR25+GEdDXS0t+Oi0QC6SY6xnefa7P/jyMCtdbiM3sEqzJEMVFM2pyj9z3CaB3
+         tZJYkntfdAKYX3Nb5gN59/vDOqoSz74hoqDVBDvDhpguiIfYujOpJHB0gzveW0DmPg1O
+         K6r0XoOBbMxTiFnm7k/zzIfJ7qr8yysIRKcsuRUfCn+L+2l2X9oyLik11V7FhCu48+Io
+         xgHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770297630; x=1770902430;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nUxzn6tyMigJh/FRYg1m34qD7OVTrxYvrqfI67oJIC8=;
+        b=RIsit7ORWagAJWERAex/s/gILJbO5khRv0qjMP+oE5cOtEj9AO1y8YAsd/dV9iXY33
+         fQRpRfixDKbZwlbgXLQsllB23c/0L8cGRkrU9Paf2+89O+B6fqmXMIxlgbvwgrZtq6sH
+         G+YHAGlB11v/xdSoUIXpunZvAuVA9lZDb1RGYi219tTREtBz1PJ7srvJtl1z3A1+TCq6
+         +CP0YaJH+FVh5xsVJ7WqdghkiZaew56XTObadcfHhoGnrIzLnk25N6irzPSJMobVT54L
+         zgZOKXtx5Xte6PeeBFxmKlRvghl0bOWtFPgvAo3gLPB34jskcQcSsozn2K3yKBRG4LlF
+         1g3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXYjo44J9/bvonu8SsnU98WoCi+m/+uA92SGv3buurpivsFT6iPy1JuQNZpyK8VuHey80322T4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUXzp1PcQOtC14YT6Smq7Ti8GG37M69u4AvmvlxSs/sgnCsTuB
+	G1f6yQeKgjUDZ5sswNxQ2VCsihn5CDsHZvzsem8yj13fxQbMWDHcWc7gRosSRSIfqonoFLg2C7M
+	j7ysrawopVQ+vwgPexEKap9yz5QsPEx+41ZGQ9f30
+X-Gm-Gg: AZuq6aLToHlY/Z8iKTqytPGfgPlavO1hkNBTbAqXq8E/dGfu6Os8qC5mZLzRGKAmUB7
+	2P3No5kh7BzEVSnzwI3w11OpUt4chX+zrNfQWfubVegSuqPE7+dpTiLWStoCwHMi9Ed77Vc55bu
+	ae0qSd2xa3luqZbKroewjJp1Q2W7W274kFZV8kEqR/zY/eyiWVWL8TrG6j8636M2ITsU57c34tA
+	svM0yY2IJElyjhCs5/i7nTQuXcmTBApntKWqZd89559Sg/++K9yp5mPoCTNa+Nt7fPgvMU3OpUl
+	ZShcur/aPDcg5487qAYlk4NcsjhilhDI8OVUAX7DTC4ly8yWkieOKLyoj9Q=
+X-Received: by 2002:ac8:5d04:0:b0:4f3:54eb:f26e with SMTP id
+ d75a77b69052e-5062c7a7717mr7406091cf.1.1770297630215; Thu, 05 Feb 2026
+ 05:20:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260204194324.1723534-1-tariqt@nvidia.com>
+References: <20260202101454.89445-1-kelmenhorst@uni-osnabrueck.de>
+ <CADVnQykLpW+GV6sSG5py1J+WTZFM-=JObhYS7Pwd=9ut1GY1BQ@mail.gmail.com>
+ <f1137fcf-1778-4811-9211-4beb95db3a32@uni-osnabrueck.de> <CADVnQy=u4zQjC6A9WBvnZOvRFAVzi=0rSzbSs_4kujB2u0U2EQ@mail.gmail.com>
+ <e0e3738e-c01f-4c2e-a782-3e7c99d8b647@uni-osnabrueck.de>
+In-Reply-To: <e0e3738e-c01f-4c2e-a782-3e7c99d8b647@uni-osnabrueck.de>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 5 Feb 2026 08:20:13 -0500
+X-Gm-Features: AZwV_QhnxEZWYY4PyKDaD8wxhkrh0hRBc34ZsogNCGNG_dmDwksiSK7pHM1MoGY
+Message-ID: <CADVnQymv0063ymyWbwof3wn9WuQANhX8B_oR4Tv_YcRHMZXpDg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: tcp_bbr: use high pacing gain when the
+ sender fails to put enough data inflight
+To: Kathrin Elmenhorst <kelmenhorst@uni-osnabrueck.de>
+Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-257162-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257161-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[google.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,nvidia.com:email]
-X-Rspamd-Queue-Id: B3021F2DE3
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EA8A8F32AD
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026 at 09:43:24PM +0200, Tariq Toukan wrote:
-> From: Yael Chemla <ychemla@nvidia.com>
-> 
-> Rename TAUI/TBASE to GAUI/GBASE in 1600G link mode identifier and its
-> usage in ethtool and link-info tables.
-> 
-> Reported-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Signed-off-by: Yael Chemla <ychemla@nvidia.com>
-> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/infiniband/hw/mlx5/main.c                    | 2 +-
->  drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 2 +-
->  drivers/net/ethernet/mellanox/mlx5/core/port.c       | 2 +-
->  include/linux/mlx5/port.h                            | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
-> 
+On Thu, Feb 5, 2026 at 3:30=E2=80=AFAM Kathrin Elmenhorst
+<kelmenhorst@uni-osnabrueck.de> wrote:
+>
+> On 2/3/26 15:29, Neal Cardwell wrote:
+>
+> > The "or is reset to" part is an incorrect reading of the code; BBR
+> > does not reset itself to STARTUP when the connection is app-limited.
+> > :-)
+> > Please note that in bbr_cwnd_event() when an app-limited connection in
+> > BBR_PROBE_BW restarts from idle, BBR sets the pacing rate to 1.0x the
+> > estimated bandwidth. This is the common case for long-lived BBR
+> > connections with application-limited behavior. Your proposed patch
+> > makes the behavior much more aggressive in this case.
+>
+> Got you, so the high pacing gain for app-limited sockets only applies
+> at the start, before BBR thinks that the full bandwidth has been
+> reached for the first time.
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+I think that is still a misleading way to frame the dynamics. The high
+pacing gain in STARTUP applies to all connections, whether app-limited
+or not. And then if a connection meets the conditions for exiting
+startup (3 non-app-limited round-trips without the estimated bandwidth
+growing 1.25x) then the connection exits STARTUP, and stops using the
+high pacing gain.
+
+> Thanks! I will check out the patches and test them with CUBIC and fq
+> on our setup.
+
+Great, thanks! Looking forward to hearing what impacts you find from a
+len_ns  patch like that, for both BBR and paced CUBIC!
+
+best regards,
+neal
 
