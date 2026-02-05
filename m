@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-257132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257133-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKFlKEp7hGlU3AMAu9opvQ
-	(envelope-from <netdev+bounces-257132-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:13:14 +0100
+	id 0BopCqh6hGlU3AMAu9opvQ
+	(envelope-from <netdev+bounces-257133-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:10:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B451F1B9E
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:13:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42819F1B1B
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 12:10:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9BE633034B1E
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 11:10:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BC9F63002F45
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 11:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307AD3ACA5B;
-	Thu,  5 Feb 2026 11:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41AC33ACA79;
+	Thu,  5 Feb 2026 11:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BW6pTi1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71853ACA6C;
-	Thu,  5 Feb 2026 11:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D82C3ACA72;
+	Thu,  5 Feb 2026 11:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770289804; cv=none; b=Dlr3hB8X0t+RjRaXIW8lPelYOFFZHsYTps2GPkSlEVKAjaG2pz6V7FFztj7uiw9zoj5+xfrlenF3vuFKGhC8gZ7xsCQVUWx2d8hFweoHZle9CjwLiX0tjxE9UTI2AX3Q/3QbrkSRVMAnYKE43Uo3Iv/67mUiKlxLgXe1st/4bOM=
+	t=1770289827; cv=none; b=RGLi5mCwK4qtlYXlPRTvGLBRCXtI+xGMkXngha1G4Lx4XRsyFojD1BBx8Xtawvxwso0Uy2STwjUBNxZ3F3X9kZmEVEBBuNI4MPwMrhffJ4jTi4YCzuBiKY0uog0K2DAE8KFZV+6OPnG5CzRQcwTg89/p+TFm2WXd1n6wtxrSjFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770289804; c=relaxed/simple;
-	bh=eOwPMXuSN3Uvd0pghwDe/+QshT9FsZzUGwrs9iN0ikU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MmFudFoLijeInv6ciz06xjTg2qvSYBvCG9G/2ubyLTvNDpoPvVLm1rq31Wesh6r0LzcbxwI+gPuWmhDTtd879T8/Wt2FzKxHgEaq4nM9hVCYltVZ1DnmWdywnDo8bgxbeYQlj3TO6/yO9jgRWOMGnv/ZNACcXMzNj+1Gofxt6Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 918376092F; Thu, 05 Feb 2026 12:10:02 +0100 (CET)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net-next 11/11] netfilter: nft_counter: fix reset of counters on 32bit archs
-Date: Thu,  5 Feb 2026 12:09:05 +0100
-Message-ID: <20260205110905.26629-12-fw@strlen.de>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260205110905.26629-1-fw@strlen.de>
-References: <20260205110905.26629-1-fw@strlen.de>
+	s=arc-20240116; t=1770289827; c=relaxed/simple;
+	bh=9N6OLcjFLijwEHSq6VmHGslxJx06zjs534/5sp/VNHU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MpYo4wsWPp6xbvWe/MjdBj78LWY8EqSCq4HGpae2/oWzC7ActjAGjVLtotlxC9hWsZpshM7UKMOloPdGIWMUkT8vYgxxYskT6YFEyYGRevxvefgNMHZZ0QWve11FmntuZvqUoLus5yPJb/IDkseiG5K1WcGYs8wdAvuE3xC5OhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BW6pTi1y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E70C4CEF7;
+	Thu,  5 Feb 2026 11:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770289826;
+	bh=9N6OLcjFLijwEHSq6VmHGslxJx06zjs534/5sp/VNHU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BW6pTi1yibviPUiENX2NZKKrlZsAMIhX4RBE9xGU48VeDsi3V4cAnfEqcq2L9/HXj
+	 QCDyXxJQu1bhEUL2tJppcHprZEsSYLpPmRlndbym+75AX0Ylxp3Iy+askJ2gRp/d/6
+	 PqnvYsB6Un36Wrex5VRXrLXsTrAtVVJneMiGG1Spi6sQzS0Gzx90TpAoWfLD7sk5cp
+	 6T/3Urnby3K8dDFYtILCB+0fJAY8aWnWCK0iv38SqSfO0Zjyz6m9ys/qutbmjVrn6+
+	 HG4o+MH9HOVV8RF5iu5l96aBpVyewT2pMmXrTdSrRmReHZ6L9s+/T1YD/NH7nhxNbC
+	 OWSvLb9JsvZ8A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C23913808200;
+	Thu,  5 Feb 2026 11:10:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,100 +55,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 0/6] move CAN skb headroom content to skb
+ extensions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177028982443.276579.4263605959311895217.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Feb 2026 11:10:24 +0000
+References: <20260201-can_skb_ext-v8-0-3635d790fe8b@hartkopp.net>
+In-Reply-To: <20260201-can_skb_ext-v8-0-3635d790fe8b@hartkopp.net>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: mkl@pengutronix.de, mailhol@kernel.org, robin@protonic.nl,
+ o.rempel@pengutronix.de, kernel@pengutronix.de, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, lkp@intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257132-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257133-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:mid,strlen.de:email]
-X-Rspamd-Queue-Id: 0B451F1B9E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 42819F1B1B
 X-Rspamd-Action: no action
 
-From: Anders Grahn <anders.grahn@gmail.com>
+Hello:
 
-nft_counter_reset() calls u64_stats_add() with a negative value to reset
-the counter. This will work on 64bit archs, hence the negative value
-added will wrap as a 64bit value which then can wrap the stat counter as
-well.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 32bit archs, the added negative value will wrap as a 32bit value and
-_not_ wrapping the stat counter properly. In most cases, this would just
-lead to a very large 32bit value being added to the stat counter.
+On Sun, 01 Feb 2026 15:33:15 +0100 you wrote:
+> CAN bus related skbuffs (ETH_P_CAN/ETH_P_CANFD/ETH_P_CANXL) simply contain
+> CAN frame structs for CAN CC/FD/XL of skb->len length at skb->data. Those
+> CAN skbs do not have network/mac/transport headers nor other such
+> references for encapsulated protocols like ethernet/IP protocols.
+> 
+> To store data for CAN specific use-cases all CAN bus related skbuffs are
+> created with a 16 byte private skb headroom (struct can_skb_priv). Using
+> the skb headroom and accessing skb->head for this private data led to
+> several problems in the past likely due to "The struct can_skb_priv
+> business is highly unconventional for the networking stack." [1]
+> 
+> [...]
 
-Fix by introducing u64_stats_sub().
+Here is the summary with links:
+  - [net-next,v8,1/6] can: use skb hash instead of private variable in headroom
+    https://git.kernel.org/netdev/net-next/c/d4fb6514ff8e
+  - [net-next,v8,2/6] can: add CAN skb extension infrastructure
+    https://git.kernel.org/netdev/net-next/c/96ea3a1e2d31
+  - [net-next,v8,3/6] can: move ifindex to CAN skb extensions
+    (no matching commit)
+  - [net-next,v8,4/6] can: move frame_len to CAN skb extensions
+    https://git.kernel.org/netdev/net-next/c/d2d9179751e6
+  - [net-next,v8,5/6] can: remove private CAN skb headroom infrastructure
+    https://git.kernel.org/netdev/net-next/c/9f10374bb024
+  - [net-next,v8,6/6] can: gw: use can_gw_hops instead of sk_buff::csum_start
+    https://git.kernel.org/netdev/net-next/c/3ffecc14ec7e
 
-Fixes: 4a1d3acd6ea8 ("netfilter: nft_counter: Use u64_stats_t for statistic.")
-Signed-off-by: Anders Grahn <anders.grahn@gmail.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/linux/u64_stats_sync.h | 10 ++++++++++
- net/netfilter/nft_counter.c    |  4 ++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_stats_sync.h
-index 849ff6e159c6..f47cf4d78ad7 100644
---- a/include/linux/u64_stats_sync.h
-+++ b/include/linux/u64_stats_sync.h
-@@ -97,6 +97,11 @@ static inline void u64_stats_add(u64_stats_t *p, unsigned long val)
- 	local64_add(val, &p->v);
- }
- 
-+static inline void u64_stats_sub(u64_stats_t *p, s64 val)
-+{
-+	local64_sub(val, &p->v);
-+}
-+
- static inline void u64_stats_inc(u64_stats_t *p)
- {
- 	local64_inc(&p->v);
-@@ -145,6 +150,11 @@ static inline void u64_stats_add(u64_stats_t *p, unsigned long val)
- 	p->v += val;
- }
- 
-+static inline void u64_stats_sub(u64_stats_t *p, s64 val)
-+{
-+	p->v -= val;
-+}
-+
- static inline void u64_stats_inc(u64_stats_t *p)
- {
- 	p->v++;
-diff --git a/net/netfilter/nft_counter.c b/net/netfilter/nft_counter.c
-index cc7325329496..0d70325280cc 100644
---- a/net/netfilter/nft_counter.c
-+++ b/net/netfilter/nft_counter.c
-@@ -117,8 +117,8 @@ static void nft_counter_reset(struct nft_counter_percpu_priv *priv,
- 	nft_sync = this_cpu_ptr(&nft_counter_sync);
- 
- 	u64_stats_update_begin(nft_sync);
--	u64_stats_add(&this_cpu->packets, -total->packets);
--	u64_stats_add(&this_cpu->bytes, -total->bytes);
-+	u64_stats_sub(&this_cpu->packets, total->packets);
-+	u64_stats_sub(&this_cpu->bytes, total->bytes);
- 	u64_stats_update_end(nft_sync);
- 
- 	local_bh_enable();
+You are awesome, thank you!
 -- 
-2.52.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
