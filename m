@@ -1,191 +1,160 @@
-Return-Path: <netdev+bounces-257167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPTlGpKdhGmI3wMAu9opvQ
-	(envelope-from <netdev+bounces-257167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:39:30 +0100
+	id gDiUJlOfhGmI3wMAu9opvQ
+	(envelope-from <netdev+bounces-257182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:46:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95615F363E
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:39:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E826AF37EC
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:46:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C8BC305366D
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:35:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA1193030127
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBF42253EF;
-	Thu,  5 Feb 2026 13:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D0E23D297;
+	Thu,  5 Feb 2026 13:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b="UaLIrKvp"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB833B2BA;
-	Thu,  5 Feb 2026 13:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from mail-108-mta27.mxroute.com (mail-108-mta27.mxroute.com [136.175.108.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D3622DA1C
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 13:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770298548; cv=none; b=H5SEpDVXpVsAzWKGKrnVN4pZ3j8HaNHx+Rm2LRyT/cF7ZMy1wolDkZ6hRn8cJWqtAmk2JJdXtU7dRmNbQEHet8aoPtzVONP3wZ2W0FiZ278hC6fRkyzv//qncFrPgA3FZIxbGOnhiU32kXetPfkAyAgLh+ka0KhWpRI54y3fang=
+	t=1770298844; cv=none; b=bB/TXV4T6JdGqQBqI4EwLvlwoSu1Ti9xIKfixDS0K6lXQazHj+E4sw5UBvw6DijNwzEDOiGCMZiIambIcYUPRUPugR7UYVilXU1L+JP4DV9fRXZhJU3rnYWO0MWGcURXdFf6pVzoBsmqBETld2cbg9Mo6vjfSFo78UGkLbWIyp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770298548; c=relaxed/simple;
-	bh=dD/HTcR9V7UPhs+GBDDGvQ7kDxPOqqSZVrvRKS7V1Ko=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=oBAJ/OfAoQC4Zp468JZqEOJh4xI1c4yawJEpmouSeCwEQGg2BsqjEVnlCj30ioBBcfCqRyaDBELkJbkz0s4hZRA1VcMsMDPe5qDN7C03IU/2QTfWP/ZlU4WdW5Mv/icNaX3ljg6ytCHWrsGOXn5wB8zt2ZFsKOJI/K7VMq39rhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-X-CSE-ConnectionGUID: tgbu/h+NQUGxTpd4o1IU7w==
-X-CSE-MsgGUID: boqrwSudRNuHRjL0DRTFRw==
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 05 Feb 2026 22:35:45 +0900
-Received: from [127.0.1.1] (unknown [10.226.78.135])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 81B25425CDD0;
-	Thu,  5 Feb 2026 22:35:42 +0900 (JST)
-From: Michael Dege <michael.dege@renesas.com>
-Date: Thu, 05 Feb 2026 14:35:21 +0100
-Subject: [PATCH net v2] net: renesas: rswitch: fix forwarding offload
- statemachine
+	s=arc-20240116; t=1770298844; c=relaxed/simple;
+	bh=yroxCojQdGBi/aKWMoFi35tE5WwZxtA2iHWwNG4lflg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gtEpDF3KuTiSSRdUGlxBCL5zClb/GMP7Fg8WrdVRDGFBrtoVZDzXHOR5F/kr0WkuBV1+UZuYyJzTGJombN/5N1M0m+RcXRGMlSBT6EGckDj2ogJAvXq9pNgnKzrFU240/BO3CpF+7yrFbsQlXiWplzawaIsED+XBNhEWomv+AUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com; spf=pass smtp.mailfrom=mboxify.com; dkim=pass (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b=UaLIrKvp; arc=none smtp.client-ip=136.175.108.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mboxify.com
+Received: from filter006.mxroute.com ([136.175.111.3] filter006.mxroute.com)
+ (Authenticated sender: mN4UYu2MZsgR)
+ by mail-108-mta27.mxroute.com (ZoneMTA) with ESMTPSA id 19c2e03e83a0009140.00d
+ for <netdev@vger.kernel.org>
+ (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+ Thu, 05 Feb 2026 13:35:33 +0000
+X-Zone-Loop: 773210ac25befeb4fc4d540fd2bbc84d9193257abf92
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mboxify.com
+	; s=x; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:
+	Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=WeW8iiZRN8HHaCuf1senWk7tSGOueZmex5nL4o7MqUY=; b=UaLIrKvpsoq0aumI1XVF6fFl2z
+	MhOcf8JihR+TpX17oYuhEcEQVRRNF61E6PIPfNFGguDa7DUBg1LtJ73BD8C0FJ2ug3ZNZN5y/lMd9
+	QpmrU9W5hOcE3KMiZJQZOj/qy9uYo+QwJvmrnrW2sOKlJJXsz39GXvbUVlSllkRl/jiV8Dbm89QK1
+	Z8LydfN8kDIw90qe9oygqdsD12YSGgNw5X2W7pMs2qvV8jgm8uSSBMpxwEHO4FG93WVsLEGhNdwtK
+	M0+zLrFHvL3IpF4OlUkVIgivrYmVrrkvO/SkSwICcnJAapc2LI3BWuyZ9K5u9qwmW02ME9JmneyRB
+	i2sqK5xw==;
+Message-ID: <ba2c3143-0761-4903-ac0e-88ca502b4e50@mboxify.com>
+Date: Thu, 5 Feb 2026 21:35:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/1] octeontx2-af: CGX: fix bitmap leaks
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: pabeni@redhat.com, sgoutham@marvell.com, lcherian@marvell.com,
+ gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
+ sbhatta@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20251020143112.357819-1-bo@mboxify.com>
+ <20251020143112.357819-2-bo@mboxify.com> <20251022182226.00967149@kernel.org>
+Content-Language: en-US
+From: Bo Sun <bo@mboxify.com>
+In-Reply-To: <20251022182226.00967149@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260205-fix-offloading-statemachine-v2-1-fafcf0c6eb1d@renesas.com>
-X-B4-Tracking: v=1; b=H4sIAJichGkC/42NTQrCQAxGryJZG8lMfxBX3kO6CJ20DdgZmZSil
- N7dsSdw+R4f79vAJKsY3E4bZFnVNMUC/nyCfuI4CmooDJ58S54aHPSNaRieiYPGEW3hRWbuJ42
- CLlTk2oqYrgFK4ZWlzI/6oys8qS0pf46z1f3sf93VocO2Ju9rbioX6J4lirFd+jRDt+/7FxKWE
- IPIAAAA
-X-Change-ID: 20260205-fix-offloading-statemachine-1d301630a08d
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Michael Dege <michael.dege@renesas.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1770298541; l=3394;
- i=michael.dege@renesas.com; s=20251023; h=from:subject:message-id;
- bh=dD/HTcR9V7UPhs+GBDDGvQ7kDxPOqqSZVrvRKS7V1Ko=;
- b=HZovnlAcJL5HpmhL2DNGIgLLC4Droel1AEuSaO/D55pklPt3uBq2IsRdLxQ2fsA6VAJ57FK9f
- 5eQVoGLQWeiCt7zH8Z2lU1XZVeweV+qhbGioAc2nhCpIPIw25i73E92
-X-Developer-Key: i=michael.dege@renesas.com; a=ed25519;
- pk=gu1rwIcCrAxNMv2I8fIfiQvt51xzZwnQy4Ua/DscQt8=
+X-Authenticated-Id: bo@mboxify.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [3.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[mboxify.com : SPF not aligned (strict),reject];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[mboxify.com:s=x];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-257167-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-257182-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_NEQ_ENVFROM(0.00)[bo@mboxify.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.984];
+	DKIM_TRACE(0.00)[mboxify.com:-];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:mid,renesas.com:email,davemloft.net:email,cogentembedded.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email]
-X-Rspamd-Queue-Id: 95615F363E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mboxify.com:mid,mboxify.com:email]
+X-Rspamd-Queue-Id: E826AF37EC
 X-Rspamd-Action: no action
 
-A change of the port state of one port, caused the state of another
-port to change. This behvior was unintended.
+On 10/23/2025 9:22 AM, Jakub Kicinski wrote:
+> On Mon, 20 Oct 2025 22:31:12 +0800 Bo Sun wrote:
+>> The RX/TX flow-control bitmaps (rx_fc_pfvf_bmap and tx_fc_pfvf_bmap)
+>> are allocated by cgx_lmac_init() but never freed in cgx_lmac_exit().
+>> Unbinding and rebinding the driver therefore triggers kmemleak:
+>>
+>>      unreferenced object (size 16):
+>>          backtrace:
+>>            rvu_alloc_bitmap
+>>            cgx_probe
+>>
+>> Free both bitmaps during teardown.
+>>
+>> Fixes: e740003874ed ("octeontx2-af: Flow control resource management")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Bo Sun <bo@mboxify.com>
+> 
+> Looks like rvu_free_bitmap() exists. We should probably use it?
 
-Signed-off-by: Michael Dege <michael.dege@renesas.com>
----
-A change of the port state of one port, caused the state of another
-port to change. This behvior was unintended.
+Apologies for the late reply.
+You're right that rvu_free_bitmap() exists. I stayed with direct kfree()
+for consistency with the existing code in cgx_lmac_exit(), because which
+already uses kfree(lmac->mac_to_index_bmap.bmap).
 
-Fixes: b7502b1043de86967ff341819d05e09a8dbe8b2b ("net: renesas: rswitch: add offloading for L2 switching")
+That said, I'm OK with either way:
+1. Keep kfree() to match the existing pattern in this function
+2. Switch all three bitmap frees (including mac_to_index_bmap) to use
+rvu_free_bitmap() for consistency with the alloc/free API pairing
 
-Changes in v2:
-- Implemented suggested improvements to the function.
-- Addded missing condition to an if statement.
-- introduced bool variable, to reduce the the logic in the if
-  statements.
-- Link to v1: https://lore.kernel.org/r/20260205-fix-offloading-statemachine-v1-1-640224a531d0@renesas.com
----
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-To: David S. Miller <davem@davemloft.net>
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-To: Michael Dege <michael.dege@renesas.com>
-Cc: netdev@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- drivers/net/ethernet/renesas/rswitch_l2.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+What's your preference?
 
-diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c b/drivers/net/ethernet/renesas/rswitch_l2.c
-index 4a69ec77d69c..9433cd8adced 100644
---- a/drivers/net/ethernet/renesas/rswitch_l2.c
-+++ b/drivers/net/ethernet/renesas/rswitch_l2.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Renesas Ethernet Switch device driver
-  *
-- * Copyright (C) 2025 Renesas Electronics Corporation
-+ * Copyright (C) 2025 - 2026 Renesas Electronics Corporation
-  */
- 
- #include <linux/err.h>
-@@ -60,6 +60,7 @@ static void rswitch_update_l2_hw_learning(struct rswitch_private *priv)
- static void rswitch_update_l2_hw_forwarding(struct rswitch_private *priv)
- {
- 	struct rswitch_device *rdev;
-+	bool new_forwarding_offload;
- 	unsigned int fwd_mask;
- 
- 	/* calculate fwd_mask with zeroes in bits corresponding to ports that
-@@ -73,8 +74,9 @@ static void rswitch_update_l2_hw_forwarding(struct rswitch_private *priv)
- 	}
- 
- 	rswitch_for_all_ports(priv, rdev) {
--		if ((rdev_for_l2_offload(rdev) && rdev->forwarding_requested) ||
--		    rdev->forwarding_offloaded) {
-+		new_forwarding_offload = (rdev_for_l2_offload(rdev) && rdev->forwarding_requested);
-+
-+		if (new_forwarding_offload || rdev->forwarding_offloaded) {
- 			/* Update allowed offload destinations even for ports
- 			 * with L2 offload enabled earlier.
- 			 *
-@@ -84,13 +86,10 @@ static void rswitch_update_l2_hw_forwarding(struct rswitch_private *priv)
- 				  priv->addr + FWPC2(rdev->port));
- 		}
- 
--		if (rdev_for_l2_offload(rdev) &&
--		    rdev->forwarding_requested &&
--		    !rdev->forwarding_offloaded) {
-+		if (new_forwarding_offload && !rdev->forwarding_offloaded)
- 			rswitch_change_l2_hw_offloading(rdev, true, false);
--		} else if (rdev->forwarding_offloaded) {
-+		else if (!new_forwarding_offload && rdev->forwarding_offloaded)
- 			rswitch_change_l2_hw_offloading(rdev, false, false);
--		}
- 	}
- }
- 
+Thanks,
+Bo
 
----
-base-commit: f14faaf3a1fb3b9e4cf2e56269711fb85fba9458
-change-id: 20260205-fix-offloading-statemachine-1d301630a08d
-
-Best regards,
--- 
-Michael Dege <michael.dege@renesas.com>
+> 
+>> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+>> index ec0e11c77cbf..f56e6782c4de 100644
+>> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+>> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+>> @@ -1823,6 +1823,8 @@ static int cgx_lmac_exit(struct cgx *cgx)
+>>   		cgx->mac_ops->mac_pause_frm_config(cgx, lmac->lmac_id, false);
+>>   		cgx_configure_interrupt(cgx, lmac, lmac->lmac_id, true);
+>>   		kfree(lmac->mac_to_index_bmap.bmap);
+>> +		kfree(lmac->rx_fc_pfvf_bmap.bmap);
+>> +		kfree(lmac->tx_fc_pfvf_bmap.bmap);
+>>   		kfree(lmac->name);
+>>   		kfree(lmac);
+>>   	}
 
 
