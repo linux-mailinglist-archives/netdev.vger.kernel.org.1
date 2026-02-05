@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-256917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBMpM6H/g2nYwgMAu9opvQ
-	(envelope-from <netdev+bounces-256917-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:25:37 +0100
+	id 0LMMFab/g2nYwgMAu9opvQ
+	(envelope-from <netdev+bounces-256918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:25:42 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B0AEDF40
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:25:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4646EDF47
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8F8F83004066
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:25:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D5F4030055C5
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD2B2BDC26;
-	Thu,  5 Feb 2026 02:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A8D2BCF68;
+	Thu,  5 Feb 2026 02:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lw6xA3ij"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPn5RuWG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86C829D267;
-	Thu,  5 Feb 2026 02:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7C29B8EF;
+	Thu,  5 Feb 2026 02:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770258327; cv=none; b=rZVV2XqgfFvMwRNECLOLZHVRzqJPidgS4sDjWhEH6JwWWoTykjGQyUYlP+T6J4Wlx6x1ak/8CL+OL/q+YFWekGts8XSjX2bpbM+F6vNsqJaYX11UTrkCiMb2QEchCDu+rA5MWPzR2YBnb9BIAkjAPFL+A22I0NoO8XH3AF8Dccw=
+	t=1770258330; cv=none; b=ku6EaWm7/Uaa6XCjrWVO6/YeU0TpFrF6JSu1bWcKWDSywBY7/4QeiK+Hka0rHMxZcnf/zitN5qjVz2f+Xya6IsBvmjkxY0+B6e7TrRzghvexZQKlAGFRKZU/gFh/LXK2uBq6uxkcFkK/AhC+f7nq44lu1QRsFIZ/CmrIzXduKSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770258327; c=relaxed/simple;
-	bh=2XOAWPq+a+3oseEshFy3G7zv1TiFMP52u0Tn8dNxv3Y=;
+	s=arc-20240116; t=1770258330; c=relaxed/simple;
+	bh=S9IHfYvk4HbMCAhqeJLhPoSUHhMVZR+8G/5Qacx8TJ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UMCJ6aS6DtLcdmQ6wVc4YJxZ8Z46d1eh0eZHnrfy5N51dAmiYF9EXHshifCk0rGAn0LVCIh5sj9QuLAVHLsrm9XBVOHa6gyGEOsIY7PF4UlUSZxSTscCIvCxivnuu5phI1K0YXg8+RgbiT7N8P5Rrmo32Z8tnxtg+DjhYZEqJ4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lw6xA3ij; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAF48C116C6;
-	Thu,  5 Feb 2026 02:25:26 +0000 (UTC)
+	 MIME-Version; b=iv3OAItB9CnXWAbUgJ32mYThqtjYxJU2ITO9Fh6FES6/LqaG2qHd3ga69NLkTBpO1UozDrhkPkFFjKwXKmOt1zg30kPlMpNYsKAOJvh0A5QuFuE7T/Zmos+QfD9ZBlgf2KVJnWTH4IO0GfzO2N1vbNRqT1wWWlKi4r3qPYZgCKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPn5RuWG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D836C4CEF7;
+	Thu,  5 Feb 2026 02:25:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770258327;
-	bh=2XOAWPq+a+3oseEshFy3G7zv1TiFMP52u0Tn8dNxv3Y=;
+	s=k20201202; t=1770258329;
+	bh=S9IHfYvk4HbMCAhqeJLhPoSUHhMVZR+8G/5Qacx8TJ8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Lw6xA3ijKCggXBHPWZ9y+q6oRKnU46Wb7ljtgsGcjWnuREnI8RUzk7+44Rz3waM/0
-	 NxN+vQ7SMqk7CA4zZUHbTQyKiIauFxmpLpvhH5jR9GWAOxIhRl0A+thDmz5PeDQ5So
-	 aMvQcEqvQPl0FbPVtnzc1iNM1n+cmuV+CCiCujIwvoHL2CxjCBWxKXIR/4xobUwnEJ
-	 OQtYfgoPi5DDiMRcDjPL/u8gfKtxiLNP4DvgF0dIP7iWdJ09pGG1M84wvA7bMiwkt5
-	 IyF+D01DI32VjFaT7Txeo1Xpylt7a4X4Boy4aJwbMm0O48VR5R4CqrrRJOkBsvOgmE
-	 4S7fLzDW1rJBg==
+	b=gPn5RuWG8LguHrM/v3C2q96RuJdWN4VkaNuIcRBp9vyb6vXaexBrGbLVvb1pgQ2D5
+	 ItoTBTL/yBJt5hKS2cZZYpwTCYN01h1Fg2EmLsmVHxwuAz+DfLn3kYVUXWQA8NfHZq
+	 KoM3F5WlxxN2HdmvS91jUFpzrdx+7cpHEVT2YqS2GMizL5sWwusOvn+NzI5TKIiQ0k
+	 eZA3XpWpjIgYZuDfD9qrtGMGIEhIQ309TIHZV74FbCPO9R0kWALsYlNJUtDTht84X0
+	 /66/U2yhgaziGejAAlNA68Ln7H1nDJvA0ivRB1qIK2g854EEWujKx9GquGoEGiHHft
+	 dMhY4ljR6DNlw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: rkannoth@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -56,12 +56,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	sumang@marvell.com,
 	sbhatta@marvell.com,
 	davem@davemloft.net
-Subject: Re: [net-next,v8,09/13] octeontx2-af: npc: cn20k: virtual index support
-Date: Wed,  4 Feb 2026 18:25:25 -0800
-Message-ID: <20260205022525.2271130-1-kuba@kernel.org>
+Subject: Re: [net-next,v8,10/13] octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
+Date: Wed,  4 Feb 2026 18:25:27 -0800
+Message-ID: <20260205022527.2271205-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260202074607.2535569-10-rkannoth@marvell.com>
-References: <20260202074607.2535569-10-rkannoth@marvell.com>
+In-Reply-To: <20260202074607.2535569-11-rkannoth@marvell.com>
+References: <20260202074607.2535569-11-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256917-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256918-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -97,8 +97,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: F3B0AEDF40
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C4646EDF47
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -106,191 +106,295 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-octeontx2-af: npc: cn20k: virtual index support
+octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
 
-This patch adds support for virtual MCAM index allocation and improves
-CN20K MCAM defragmentation handling. Virtual indexes allow the hardware
-to move mapped MCAM entries internally, enabling defragmentation and
-preventing scattered allocations across subbanks.
+In CN20K, the PF/VF driver is unaware of the NPC MCAM entry type (x2/x4)
+required for a particular TC rule when the user installs rules through the
+TC command. This forces the PF/VF driver to first query the AF driver for
+the rule size, then allocate an entry, and finally install the flow. This
+sequence requires three mailbox request/response exchanges from the PF. To
+speed up the installation, the `install_flow` mailbox request message is
+extended with additional fields that allow the AF driver to determine the
+required NPC MCAM entry type, allocate the MCAM entry, and complete the
+flow installation in a single step.
 
 > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> index 7306414d1cf2..237e6f606fc1 100644
 > --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
 > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
 
 [ ... ]
 
-> +static int npc_vidx_maps_modify(struct rvu *rvu, u16 vidx, u16 new_midx)
-> +{
-> +	u16 old_midx;
-> +	void *map;
-> +	int rc;
+> @@ -1412,9 +1453,11 @@ int rvu_mbox_handler_npc_cn20k_read_base_steer_rule(struct rvu *rvu,
+>  		mutex_unlock(&mcam->lock);
+>  		goto out;
+>  	}
 > +
+> +	rl_type = rvu_npc_get_base_steer_rule_type(rvu, pcifunc);
+> +
+>  	/* Read the default ucast entry if there is no pkt steering rule */
+> -	index = npc_get_nixlf_mcam_index(mcam, pcifunc, nixlf,
+> -					 NIXLF_UCAST_ENTRY);
+> +	index = npc_get_nixlf_mcam_index(mcam, pcifunc, nixlf, rl_type);
+>  read_entry:
+>  	/* Read the mcam entry */
+>  	npc_cn20k_read_mcam_entry(rvu, blkaddr, index,
+
+The new function rvu_npc_get_base_steer_rule_type() returns
+NIXLF_PROMISC_ENTRY for loopback VFs, but npc_get_nixlf_mcam_index() can
+return negative error codes when it cannot find the requested entry.
+Should there be an error check after calling npc_get_nixlf_mcam_index()
+at line 1460?
+
+When the promisc MCAM entry is not configured, npc_cn20k_dft_rules_idx_get()
+returns -ESRCH, which causes npc_get_nixlf_mcam_index() to return -EFAULT.
+Without an error check, this negative value gets cast to u16 when passed to
+npc_cn20k_read_mcam_entry(), converting -14 to 65522 and potentially
+causing an out-of-bounds hardware register read.
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> index bff190ba95e2..b9572de1d175 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
 
 [ ... ]
 
-> +fail3:
-> +	if (xa_insert(&npc_priv.xa_idx2vidx_map, old_midx,
-> +		      xa_mk_value(vidx), GFP_KERNEL))
-> +		dev_err(rvu->dev,
-> +			"%s: Error to roll back idx2vidx old_midx=%u vidx=%u\n",
-> +			__func__, old_midx, vidx);
-> +fail2:
-> +	if (xa_erase(&npc_priv.xa_vidx2idx_map, vidx))
-> +		dev_err(rvu->dev,
-> +			"%s: Failed to roll back vidx2idx vidx=%u\n",
-> +			__func__, vidx);
+> @@ -1549,6 +1549,7 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
+>  	cn20k_wreq.intf = req->intf;
+>  	cn20k_wreq.enable_entry = (u8)enable;
+>  	cn20k_wreq.hw_prio = req->hw_prio;
+> +	cn20k_wreq.req_kw_type = req->req_kw_type;
+>
+>  update_rule:
 
-At fail2, xa_erase() returns the erased entry on success (non-NULL) and NULL
-on failure. The error message is printed when xa_erase() succeeds, which
-appears inverted from the intended behavior.
+Looking at npc_install_flow(), req->req_kw_type is copied to
+cn20k_wreq.req_kw_type, but is req->req_kw_type ever initialized with the
+computed kw_type value?
 
-Should the condition check for NULL to detect failure instead?
+In rvu_mbox_handler_npc_install_flow(), the function
+rvu_npc_alloc_entry_for_flow_install() computes the correct kw_type based
+on the flow requirements and stores it in the local variable 'kw_type' at
+line 1746. However, this computed value is never assigned to
+req->req_kw_type before calling npc_install_flow() at line 1887.
 
+As a result, npc_install_flow() uses either a zero-initialized value or
+whatever the PF driver sent, instead of the AF-computed value. This seems
+inconsistent with the commit message stating "the AF driver determine the
+required NPC MCAM entry type." The incorrect req_kw_type is then passed to
+npc_cn20k_config_mcam_entry() which uses it for hardware configuration
+mismatch handling in npc_cn20k_config_kw_x2() at lines 956-960.
+
+> @@ -1642,6 +1643,79 @@ static int npc_install_flow(struct rvu *rvu, int blkaddr, u16 target,
+>  	return 0;
+>  }
+>
+> +static int
+> +rvu_npc_free_entry_for_flow_install(struct rvu *rvu, u16 pcifunc,
+> +				    bool free_entry, int mcam_idx)
+> +{
+> +	struct npc_mcam_free_entry_req free_req;
+> +	struct msg_rsp rsp;
+> +	int rc;
 > +
-> +fail1:
-> +	if (xa_insert(&npc_priv.xa_vidx2idx_map, vidx,
-> +		      xa_mk_value(old_midx), GFP_KERNEL))
-> +		dev_err(rvu->dev,
-> +			"%s: Faled to roll back vidx2idx to old_midx=%u, vidx=%u\n",
-> +			__func__, old_midx, vidx);
-
-This isn't a bug, but there's a typo: "Faled" should be "Failed".
-
-Also, at fail1, the rollback attempts to insert into xa_vidx2idx_map to
-restore old_midx. However, looking at the control flow, fail1 is reached when
-xa_insert() to xa_vidx2idx_map fails. At that point, xa_vidx2idx_map has
-already been erased, so the rollback target is correct.
-
-But fail2 rolls back using xa_erase() on xa_vidx2idx_map, which was just
-inserted successfully. The rollback at fail1 should restore xa_idx2vidx_map
-instead, since that's the only map modified when fail1 is reached via direct
-return.
-
-Could the error path rollback logic be reviewed?
-
+> +	if (!free_entry)
+> +		return 0;
 > +
+> +	free_req.hdr.pcifunc = pcifunc;
+> +	free_req.entry = mcam_idx;
+> +	rc = rvu_mbox_handler_npc_mcam_free_entry(rvu, &free_req, &rsp);
 > +	return rc;
 > +}
 
+In rvu_npc_free_entry_for_flow_install(), the free_req structure is
+declared on the stack without initialization. Only the hdr.pcifunc and
+entry fields are explicitly set, leaving the 'all' field uninitialized.
+
+When rvu_mbox_handler_npc_mcam_free_entry() is called, it checks
+'if (req->all)' to decide whether to free a single entry or all entries
+for the PF/VF. If the uninitialized 'all' field contains non-zero stack
+garbage, could this cause the function to incorrectly call
+npc_mcam_free_all_entries(), freeing ALL MCAM entries instead of just the
+intended single entry?
+
+In the same source file, the function rvu_npc_alloc_entry_for_flow_install()
+correctly zero-initializes entry_req and entry_rsp structures using memset.
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> index 052d989f2d9a..23372f30dcc2 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+
 [ ... ]
 
-> +static int npc_vidx_maps_del_entry(struct rvu *rvu, u16 vidx, u16 *old_midx)
+> +static int otx2_mcam_pfl_info_get(struct otx2_nic *pfvf, bool *is_x2,
+> +				  u16 *x4_slots)
 > +{
-> +	u16 mcam_idx;
-> +	void *map;
+> +	struct npc_get_pfl_info_rsp *rsp;
+> +	struct msg_req *req;
+> +	static struct {
+> +		bool is_set;
+> +		bool is_x2;
+> +		u16 x4_slots;
+> +	} pfl_info;
 > +
-> +	if (!npc_is_vidx(vidx)) {
-> +		dev_err(rvu->dev,
-> +			"%s: vidx(%u) does not map to proper mcam idx\n",
-> +			__func__, vidx);
-
-The format string says "mcam idx" but the code passes vidx. Should this
-say "vidx" for consistency?
-
-[ ... ]
-
-> +static
-> +int npc_defrag_move_vdx_to_free(struct rvu *rvu,
-> +				struct npc_defrag_node *f,
-> +				struct npc_defrag_node *v,
-> +				int cnt, u16 *save)
-> +{
-> +	struct npc_mcam *mcam = &rvu->hw->mcam;
-
-[ ... ]
-
-> +		/* Remove from mcam maps */
-> +		mcam->entry2pfvf_map[old_midx] = NPC_MCAM_INVALID_MAP;
-> +		mcam->entry2cntr_map[old_midx] = NPC_MCAM_INVALID_MAP;
-> +		npc_mcam_clear_bit(mcam, old_midx);
+> +	/* Avoid sending mboxes for constant information
+> +	 * like x4_slots
+> +	 */
+> +	if (pfl_info.is_set) {
+> +		*is_x2 = pfl_info.is_x2;
+> +		*x4_slots = pfl_info.x4_slots;
+> +		return 0;
+> +	}
 > +
-> +		mcam->entry2pfvf_map[new_midx] = pcifunc;
-> +		mcam->entry2cntr_map[new_midx] = new_midx;
+> +	mutex_lock(&pfvf->mbox.lock);
 
-Should entry2cntr_map[new_midx] be assigned the counter index from the
-old entry rather than new_midx? The entry2cntr_map is used to track which
-counter is mapped to an entry, and during defragmentation the counter
-association should be preserved from entry2cntr_map[old_midx].
+In otx2_mcam_pfl_info_get(), the static pfl_info structure is used as a
+cache to avoid repeated mailbox queries. However, the cache check at line
+54 reads pfl_info.is_set without holding the mutex, while lines 88-90
+write to the same static variables with the mutex held.
 
-[ ... ]
+Could this create a race condition between concurrent threads? For example:
 
-> @@ -2214,14 +2444,15 @@ static int npc_idx_free(struct rvu *rvu, u16 *mcam_idx, int count,
-> 			bool maps_del)
->  {
->  	struct npc_subbank *sb;
-> -	int idx, i;
-> +	u16 vidx, midx;
-> +	int sb_off, i;
->  	bool ret;
->  	int rc;
->
->  	/* Check if we can dealloc indexes properly ? */
->  	for (i = 0; i < count; i++) {
->  		rc =  npc_mcam_idx_2_subbank_idx(rvu, mcam_idx[i],
-> -						 &sb, &idx);
-> +						 &sb, &sb_off);
->  		if (rc) {
->  			dev_err(rvu->dev,
->  				"Failed to free mcam idx=%u\n", mcam_idx[i]);
+Thread A: Reads pfl_info.is_set (false) at line 54
+Thread B: Reads pfl_info.is_set (false) at line 54
+Thread A: Acquires mutex, queries AF, writes pfl_info at lines 88-90
+Thread B: Acquires mutex, queries AF again (redundant operation)
 
-The first validation loop passes mcam_idx[i] directly to
-npc_mcam_idx_2_subbank_idx() without converting virtual indexes first.
-Virtual indexes are defined as vidx >= bank_depth * 2, but
-npc_mcam_idx_2_subbank_idx() returns -EINVAL for any index >= bank_depth * 2:
+Or in a scenario with partial reads:
 
-npc_mcam_idx_2_key_type():
-    if (mcam_idx >= npc_priv.bank_depth * 2) {
-        dev_err(rvu->dev, "%s: bad params\n", __func__);
-        return -EINVAL;
-    }
+Thread A: Reads pfl_info.is_set (false)
+Thread B: Reads pfl_info.is_set (false), starts to read the cache
+Thread A: Sets pfl_info.is_set = true at line 90
+Thread B: Re-reads and sees is_set==true, reads is_x2 and x4_slots
+         (but Thread A may not have finished writing these values)
 
-This means all virtual index free operations will fail at the first validation
-loop, even though the second loop has correct vidx handling code.
-
-Should the first validation loop convert virtual indexes using
-npc_cn20k_vidx2idx() before calling npc_mcam_idx_2_subbank_idx()?
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
+Would it be safer to perform the cache check inside the mutex?
 
 [ ... ]
 
-> +static int rvu_af_npc_defrag(struct devlink *devlink, u32 id,
-> +			     struct devlink_param_gset_ctx *ctx,
-> +			     struct netlink_ext_ack *extack)
-> +{
-> +	struct rvu_devlink *rvu_dl = devlink_priv(devlink);
-> +	struct rvu *rvu = rvu_dl->rvu;
-> +
-> +	npc_cn20k_defrag(rvu);
-> +
-> +	return 0;
-> +}
-
-The return value of npc_cn20k_defrag() is discarded. npc_cn20k_defrag() can
-fail with -ENOMEM when kcalloc() fails for node or vidx arrays, or with errors
-propagated from npc_defrag_process().
-
-Should this be "return npc_cn20k_defrag(rvu);" instead?
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-
-[ ... ]
-
-> @@ -3256,7 +3266,7 @@
->  	/* If shift has failed then report the failed index */
->  	if (index != req->shift_count) {
->  		rc = NPC_MCAM_PERM_DENIED;
-> -		rsp->failed_entry_idx = index;
-> +		rsp->failed_entry_idx = npc_cn20k_idx2vidx(index);
+> @@ -86,6 +181,22 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
+>  		return -ENOMEM;
 >  	}
+>
+> +	if (is_cn20k(pfvf->pdev)) {
+> +		rc = otx2_mcam_pfl_info_get(pfvf, &is_x2, &x4_slots);
+> +		if (rc) {
+> +			netdev_err(pfvf->netdev, "Error to retrieve profile info\n");
+> +			return rc;
+> +		}
+> +
+> +		rc = otx2_get_dft_rl_idx(pfvf, &dft_idx);
+> +		if (rc) {
+> +			netdev_err(pfvf->netdev,
+> +				   "Error to retrieve ucast mcam idx for pcifunc %#x\n",
+> +				   pfvf->pcifunc);
+> +			return -EFAULT;
+> +		}
+> +	}
 
-The variable "index" here is a loop counter (0 to shift_count-1), not an MCAM
-entry index. The failed_entry_idx field indicates which position in the request
-arrays failed.
+In otx2_alloc_mcam_entries(), when otx2_get_dft_rl_idx() fails, the
+function returns -EFAULT. However, otx2_get_dft_rl_idx() can return
+-ENOMEM (from otx2_mbox_alloc_msg_npc_get_dft_rl_idxs failure), -EINVAL
+(from otx2_sync_mbox_msg failure), or -EFAULT (from IS_ERR(rsp) check).
+Should the function return rc instead of hardcoding -EFAULT to preserve
+the actual error code?
 
-Should this remain as "rsp->failed_entry_idx = index;" without the conversion?
+This is inconsistent with line 188 which correctly returns rc for a
+similar error from otx2_mcam_pfl_info_get().
+
+[ ... ]
+
+> @@ -163,8 +287,24 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
+>  	struct npc_get_field_status_rsp *frsp;
+>  	struct npc_mcam_alloc_entry_req *req;
+>  	struct npc_mcam_alloc_entry_rsp *rsp;
+> -	int vf_vlan_max_flows;
+> -	int ent, count;
+> +	int vf_vlan_max_flows, count;
+> +	int rc, ref, prio, ent;
+> +	u16 dft_idx;
+> +
+> +	ref = 0;
+> +	prio = 0;
+> +	if (is_cn20k(pfvf->pdev)) {
+> +		rc = otx2_get_dft_rl_idx(pfvf, &dft_idx);
+> +		if (rc) {
+> +			netdev_err(pfvf->netdev,
+> +				   "Error to retrieve ucast mcam idx for pcifunc %#x\n",
+> +				   pfvf->pcifunc);
+> +			return -EFAULT;
+> +		}
+> +
+> +		ref = dft_idx;
+> +		prio = NPC_MCAM_HIGHER_PRIO;
+> +	}
+
+Same issue in otx2_mcam_entry_init() at line 302. When
+otx2_get_dft_rl_idx() fails, the function returns -EFAULT, losing the
+actual error code. Should this return rc instead?
+
+[ ... ]
+
+> @@ -973,12 +1168,41 @@ static int otx2_is_flow_rule_dmacfilter(struct otx2_nic *pfvf,
+>
+>  static int otx2_add_flow_msg(struct otx2_nic *pfvf, struct otx2_flow *flow)
+>  {
+> +	struct otx2_flow_config *flow_cfg = pfvf->flow_cfg;
+> +	struct npc_install_flow_req *req, treq = { 0 };
+>  	u64 ring_cookie = flow->flow_spec.ring_cookie;
+>  #ifdef CONFIG_DCB
+>  	int vlan_prio, qidx, pfc_rule = 0;
+>  #endif
+> -	struct npc_install_flow_req *req;
+> -	int err, vf = 0;
+> +	int err, vf = 0, off, sz;
+> +	bool modify = false;
+> +	u8 kw_type = 0;
+> +	u8 *src, *dst;
+> +	u16 x4_slots;
+> +	bool is_x2;
+> +
+> +	if (is_cn20k(pfvf->pdev)) {
+> +		err = otx2_mcam_pfl_info_get(pfvf, &is_x2, &x4_slots);
+> +		if (err) {
+> +			netdev_err(pfvf->netdev,
+> +				   "Error to retrieve ucast mcam idx for pcifunc %#x\n",
+> +				   pfvf->pcifunc);
+> +			return -EFAULT;
+> +		}
+
+This isn't a bug, but the error message at lines 1187-1189 says "Error to
+retrieve ucast mcam idx" but the failing function is
+otx2_mcam_pfl_info_get(), which retrieves profile information (is_x2 and
+x4_slots), not the unicast MCAM index. The unicast MCAM index is retrieved
+by otx2_get_dft_rl_idx(). Would it be clearer to say "Error to retrieve
+profile info" instead?
+
+[ ... ]
+
+> +static int otx2_get_kw_type(struct otx2_nic *pfvf,
+> +			    struct npc_install_flow_req *fl_req,
+> +			    u8 *kw_type)
+> +{
+> +	struct npc_get_num_kws_req *req;
+> +	struct npc_get_num_kws_rsp *rsp;
+> +	u8 *src, *dst;
+> +	int off, err;
+> +	int kw_bits;
+> +
+> +	off = offsetof(struct npc_install_flow_req, packet);
+> +
+> +	mutex_lock(&pfvf->mbox.lock);
+> +
+> +	req = otx2_mbox_alloc_msg_npc_get_num_kws(&pfvf->mbox);
+> +	if (!req) {
+> +		mutex_unlock(&pfvf->mbox.lock);
+> +		return -EINVAL;
+> +	}
+
+This isn't a bug, but when otx2_mbox_alloc_msg_npc_get_num_kws() fails at
+line 1120, the function returns -EINVAL. Memory allocation failures
+typically return -ENOMEM per kernel convention. For consistency with line
+177 in otx2_alloc_mcam_entries() which returns -ENOMEM for
+devm_kmalloc_array failure, should this return -ENOMEM instead of -EINVAL?
 
