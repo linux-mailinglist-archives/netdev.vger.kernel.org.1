@@ -1,139 +1,131 @@
-Return-Path: <netdev+bounces-256920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256921-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2AQJLrUAhGkbwwMAu9opvQ
-	(envelope-from <netdev+bounces-256920-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:30:13 +0100
+	id MEalDBUBhGkbwwMAu9opvQ
+	(envelope-from <netdev+bounces-256921-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:31:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B34EEDF95
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:30:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2F1AEDFB5
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2148300FB56
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:30:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 046AD300334F
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514692BE657;
-	Thu,  5 Feb 2026 02:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6262836A0;
+	Thu,  5 Feb 2026 02:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lSJZ1K8p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/v6TQrV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9302BE051;
-	Thu,  5 Feb 2026 02:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC30227F18B
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 02:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770258610; cv=none; b=llnN0HeV8s4NZPl7Hs2Oqlaa+xste9mVVI5mt5mArkqi0dTOxLrwBkSaJxBCOpdmlfILl6J9Ag9WKhm50o/SdGQi8dpbDqIVh97FKbr5WzZCVwzkkd5wuBLNsozNYOIpjm/JG5VoAadCVH2ZGgJufzz/zFMpvWkW8Oer8HTEoIw=
+	t=1770258706; cv=none; b=JP0XO7RSQu+cKDVq/913zEzFB7mIhfFngoAOl66oQBo0nCxjvN6XaofGGdNgdm5I4XGldJQqKIpskM+CJLUJXj/H5uZqURPkPSrvfQ7xE6/8O4+VFIsG2r+w8LuiHoPb54NBcg51YvJ92ySuZ4nR79WU0V7fkFaKbcBjr/F1tOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770258610; c=relaxed/simple;
-	bh=1wc5PdUchyOEUz6O/c6N92zSn0zymMQmvEmSPDBdI3Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SkYVV7aQPGk25lPaz/TKS+o73FyzNX3XLljlKVeOwbB58NiU0Oc5P4CxYKarjz5DcFhleqRVg0z35bzYAvqjxlraLn/maRLt42jj+0GZDTz1KkMpWNuPWI4/SR6k9pK0qqEosWG2PthidB2JXtD6HAbzrRDE35GuSCqrho9aFlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lSJZ1K8p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07902C4CEF7;
-	Thu,  5 Feb 2026 02:30:10 +0000 (UTC)
+	s=arc-20240116; t=1770258706; c=relaxed/simple;
+	bh=w7KERoN540cx3QqhBuSU2wfOEQkv9V8bg8zZv6YIxl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hPeb6vYBhT5uACI/x8NBY/UxvkaDjzbdyLd8W+t7IeARhre6iT6oPu3YPpvYfgkW9w81eXhKhy8HaLUkF0yo6au4AyV8HDyPbuynAVfQvNTU+QMoqACri9yoeqY3/n1cH/VKhIbY5n9MiaaBeeCMFR+KVeF9A5mrerLeHkcoH7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/v6TQrV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B084C4CEF7;
+	Thu,  5 Feb 2026 02:31:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770258610;
-	bh=1wc5PdUchyOEUz6O/c6N92zSn0zymMQmvEmSPDBdI3Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lSJZ1K8pWyoZfCz15uTLU2VKgg/HklYNXvSckVy89SHs4Ke0gd/rqOnMWLH6e4uEU
-	 M+yyKOGwy4C+KVeYO3/gb8iIusHcsmpGf6KJVqCTwGilMtJXzs25w6v3vIzCnWhSMb
-	 K8ks0kcuSEO06vUoNHxbeSKuCsVl9bqYwLbVjJXjQ18zlaxLBYYDXP4LweAhmvo6q2
-	 /omtSTMAsW2MvKvE8egqpYrUQoopmHK6ruX2zn9PFWXaIrDGh/NWivab2WmntryQeD
-	 DMJ46ue5kztpaMwCcMskTfbvi9IFNt7knjYvbutm3eCgB86/L6CcyfAqRjFbzo1yVg
-	 Zbxe81BUO/Ing==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4838E3808200;
-	Thu,  5 Feb 2026 02:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1770258706;
+	bh=w7KERoN540cx3QqhBuSU2wfOEQkv9V8bg8zZv6YIxl8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D/v6TQrVjo1iceQxGgXGFCLTbxBycB8ilOVmis+MjwwERxt+lVM49ZHKTfbuMwi40
+	 bKxkn89OYruGmyEOCSVs7uyp+gIM2iGvu8e3iZdHKqlV6F/svCC3KponicMCcPJQsp
+	 CebhXnrwyuPsXolro41fTeo5rVVklP0VBzwKyH+TILQZXqstJCnh41dWms7xEnNn5A
+	 gs9sjXDNv1W1XyQMgVug+acgF6XGqzmMkVnzxcCX+Jk0aPqlcuyNOkSr28AUyr5o5P
+	 O9C3VodycfEitKNCmtiI2gFGYBv1pf4pgHEPbNChbd5myLp4pPooQZ/kMsw+FxtJGi
+	 KOC6CDkghpcZw==
+Date: Wed, 4 Feb 2026 18:31:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: lorenzo@kernel.org, andrew+netdev@lunn.ch, pabeni@redhat.com,
+ vadim.fedorenko@linux.dev, davem@davemloft.net, guwen@linux.alibaba.com,
+ lulie@linux.alibaba.com, hkallweit1@gmail.com, edumazet@google.com,
+ lukas.bulwahn@redhat.com, andrew@lunn.ch, dong100@mucse.com,
+ dust.li@linux.alibaba.com, netdev@vger.kernel.org
+Subject: Re: [net-next,v25,4/6] eea: create/destroy rx,tx queues for
+ netdevice open and stop
+Message-ID: <20260204183144.5c5941ed@kernel.org>
+In-Reply-To: <1770205572.2731752-1-xuanzhuo@linux.alibaba.com>
+References: <20260202090638.46836-1-xuanzhuo@linux.alibaba.com>
+	<20260202090638.46836-5-xuanzhuo@linux.alibaba.com>
+	<20260204040054.1698677-2-kuba@kernel.org>
+	<20260203201237.35c5f756@kernel.org>
+	<1770205572.2731752-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 0/3] s32g: Use a syscon for GPR
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177025860808.131667.13084016124799705995.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Feb 2026 02:30:08 +0000
-References: <cover.1769764941.git.dan.carpenter@linaro.org>
-In-Reply-To: <cover.1769764941.git.dan.carpenter@linaro.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: chester62515@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
- devicetree@vger.kernel.org, edumazet@google.com, festevam@gmail.com,
- Frank.Li@nxp.com, ghennadi.procopciuc@oss.nxp.com, imx@lists.linux.dev,
- kuba@kernel.org, jan.petrous@oss.nxp.com, krzk+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, mbrugger@suse.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, s32@nxp.com,
- pabeni@redhat.com, kernel@pengutronix.de, robh@kernel.org,
- s.hauer@pengutronix.de, linaro-s32@linaro.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256920-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[gmail.com,foss.st.com,lunn.ch,kernel.org,davemloft.net,vger.kernel.org,google.com,nxp.com,oss.nxp.com,lists.linux.dev,lists.infradead.org,st-md-mailman.stormreply.com,suse.com,redhat.com,pengutronix.de,linaro.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256921-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,redhat.com,linux.dev,davemloft.net,linux.alibaba.com,gmail.com,google.com,mucse.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3B34EEDF95
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C2F1AEDFB5
 X-Rspamd-Action: no action
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 30 Jan 2026 16:19:35 +0300 you wrote:
-> The s32g devices have a GPR register region which holds a number of
-> miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
-> anything from there and we just add a line to the device tree to
-> access that GMAC_0_CTRL_STS register:
+On Wed, 4 Feb 2026 19:46:12 +0800 Xuan Zhuo wrote:
+> > I think AI is slightly confused here but so am I. I don't get where you
+> > free he previous resources in this flow. The "bind_new_q_and_cfg" just
+> > overrides stuff, who frees the old set of rings?  
 > 
->                         reg = <0x4033c000 0x2000>, /* gmac IP */
->                               <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
 > 
-> [...]
+> 	err = eea_alloc_rxtx_q_mem(ctx);
+> 	if (err) {
+> 		netdev_warn(enet->netdev,
+> 			    "eea reset: alloc q failed. stop reset. err %d\n",
+> 			    err);
+> 		return err;
+> 	}
+> 
+> 	eea_netdev_stop(enet->netdev); <---- here call eea_free_rxtx_q_mem
 
-Here is the summary with links:
-  - [v6,1/3] net: stmmac: s32: use a syscon for S32_PHY_INTF_SEL_RGMII
-    https://git.kernel.org/netdev/net-next/c/b0eeeb1b70c0
-  - [v6,2/3] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
-    https://git.kernel.org/netdev/net-next/c/0d9588039543
-  - [v6,3/3] dts: s32g: Add GPR syscon region
-    (no matching commit)
+Ah, thanks for explaining.
+FWIW when I write this sort of logic I use _stop() as "stop the HW"
+hence the confusion. Should have read the code..
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+That said freeing the resources here will prevent you from going 
+back to the old config. For instance the sysfs handling
+(netif_set_real_num_queues()) could fail during increase.
 
-
+Best way to implement this is to "swap" the resources between enet 
+and ctx, so that you can go back.
 
