@@ -1,194 +1,283 @@
-Return-Path: <netdev+bounces-256943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256944-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8N66NPwShGkTyAMAu9opvQ
-	(envelope-from <netdev+bounces-256943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:48:12 +0100
+	id 6HPVCtoUhGnQyAMAu9opvQ
+	(envelope-from <netdev+bounces-256944-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:56:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB43EE65C
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:48:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2A1EE6EB
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:56:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 224D03012C76
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 03:48:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70208301BCF0
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 03:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365002E7BB5;
-	Thu,  5 Feb 2026 03:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7512E7F38;
+	Thu,  5 Feb 2026 03:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zvUqzBm6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LywEHK66";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qx9IvcNk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FDF2E7167
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 03:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770263287; cv=none; b=BXM1vWTHaMW3xGZIr7XQfBRePKx5XY1LGlBqmLlV/C2t4wBqOxKTQvtJNjDkxnpEjGJx3Q7yJwBi5kUGx9sMJTFQjsLbLdp8TRIUy+qZm4WwBivE3DWfZZRUjhc8uwtw5YZ92T5mX5oID7BSmSzllttYp/lEJg3ONvHExb4Iio8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770263287; c=relaxed/simple;
-	bh=7y9Hk6JlXCrERWliXg/TQZ3X+/C2SnPJyTWz26+wDdA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rFyRNFlonyCoKzwRr3YVIPZ18M102e2phEedUFFh/GuXAiAJWQzFdoKyAIeH/jEI2IJQepu8PuOcapcwNyYBkzGvvf3M5jnRTH6ydXtReXc4xxaGprMIKrzCk3jmIdQGsQ8W0q55AHKnxVRjQiWGI+tNlvhMyWuATV+tMCyYA1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zvUqzBm6; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d18dd2adf7so292406a34.1
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 19:48:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB812DB78A
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 03:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770263711; cv=pass; b=u+PwvPaAY4Co98vjCRbPhJB0rMAbFcsRuZPAqwzB5YX8cofYbN6a+CdB4nKQjDgRK0Rvnpl5Dhj06XiIxBiZ0iP0MnO80RqxWlfBQwmrb9kpd3jMwKd5jG4865hEAoVFrIsTWW1mHjaSRnBKXm4rBSl9CJbnuBaa+71/lJPZIPc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770263711; c=relaxed/simple;
+	bh=yQ+/qIdsSrnwbr6nE+vWLrH8Nj+O4Y7hs/EbVrwH9Og=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hjyn1OH90IvjRmaOl/oZfzV7n52iug/G8B+Ee1pHk+q1uG+/6qsnwl5Jt1+mg5HaL1nQ7xtYe/6f6v/evR14ucYM7e2E/Ooq1gtAlrbJkwRHutfCMIMQXED7wFzr/gIdbStT0Hfah80Qab37pBjiPqogwJGLF7xbN16CwI9/SQs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LywEHK66; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qx9IvcNk; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770263710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3I4wiHK4vuKnP4ath3SaZ9xx45LrwQZ1CCNfZkbkb7c=;
+	b=LywEHK66+RqmFpG5zgtkTNy7rVo4pkIPRxiiSSrwpeXL9o+oP7Lxw/SO8hDuCabah7jZKS
+	Pou+hySym6esgekSkdUwjmFlek2rWQJmBZcKoWB1DfiEsO/75Bqe78OzTbR6m0dHKeJrT/
+	X3WY81qPRg2YOC9sDMq2NOCZsvLL63k=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-442-C2usOfb0PxCsEby1FJMaTw-1; Wed, 04 Feb 2026 22:55:09 -0500
+X-MC-Unique: C2usOfb0PxCsEby1FJMaTw-1
+X-Mimecast-MFC-AGG-ID: C2usOfb0PxCsEby1FJMaTw_1770263708
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2a76f2d7744so5183005ad.3
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 19:55:09 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770263708; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dpEg/3MjakpBscDRk8znDFlVodveE1H+UYoUz0QgtllNzD9tbkOinfvrOBs4qn8rep
+         Cu3091MNUp+K5eX2vBeLmQSJ7TSejpXntXgy2Wzpx8tnN8GUdw8mXhWEnM8DCReLEw4S
+         h13RGY+Kh7ogu/vWO51vUgTid5pCDg8eLglUNOS+fk6vbNVqSq3Gz0+14HQWZID3x94u
+         OiW/erInCoPO8PvBRgWXOm3NPMXPAeOIYo0PjH+dTbNvD9zwbMz6L/BmvajRKdwHqBZB
+         mJ24X2hCf/+ZnaRUaft5p1Iiwv7vNZLDT22682bxhkxwcPO783FxX7SA0L4ugv1MElux
+         nCoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3I4wiHK4vuKnP4ath3SaZ9xx45LrwQZ1CCNfZkbkb7c=;
+        fh=uuJloCIEP3kvE7GoNLgdLRfXmsC+QQ2+UM+0ZKRhoaQ=;
+        b=lEX6Dtjd36jDwZuKLUuN0sgzqMG2mhZ5JOF19BOtP3eygGZSJ31lhpaVsYHFyZrrgt
+         Z9DDdnEQCmcllT9y381ep1xl1knflUz/dX1+pr0h5hZ+LKk7sS4v05x7yOBvWV+OFoBy
+         RJQhZ97IJ/6CPVC8bkKbamTKwPpgiO112EBfjyMwo7iDpi5VhOC1KWEyvuB2cbYElHiu
+         DOwuVGxcM0t4LYn+BiAxjkHhzIWRGpJ8E1wz6URqKn+Y8Jr0HM0yiRpP/Z94K6242n3/
+         LQaPRLbcjaPp2ud2mswNc4lTm6CsRTdidvhwmiajUOFUpE84FuCM54lpwS4d0wS4oKaI
+         KY1g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770263286; x=1770868086; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QofIONG1uzBkxrXk9BfqK0VXCGMliXskB+p+bTvurvE=;
-        b=zvUqzBm65B1vzoarWWF4Hxh+tJQomRWyeL860QlOQlGrnN/7L+9aIlgHt4+Sgo9fTx
-         UWH+VUahrhmzC9uaMgmDQfwygwkwV4UniCDkBKe1Ygew4kd9vx5olhGa1ZUBLsODQlR2
-         hMP1Yxan/By/ZSoDM6zpDN0U1FxG8xC+pYUHjWqWv2b/fnxnAzfFM/dnc1+G9rwwZrTN
-         gS7chibU+9uS460RhWb24oo6nueO4nb1QNmjtDVM9u5Jswqf+3edpgqmpu03/QlWk2ky
-         j5F/AHTIP1fRAmnqU2C+skRTeH2g8GDRkcjcdY6yfWynkly5XpowYGk3bz10aV6drc9q
-         lsBA==
+        d=redhat.com; s=google; t=1770263708; x=1770868508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3I4wiHK4vuKnP4ath3SaZ9xx45LrwQZ1CCNfZkbkb7c=;
+        b=Qx9IvcNkEeVIyOYJPIzuAZvDKnOHnw/sW4xEQauvU9ZJdlofnSh7U6mcfVQoQ+5is0
+         XMVuZqbO8+vXq7lamT7tsrIkmUrQ/auz4mjH1tmiEsJt30o0wSSJPtdbkQsS4T/VPAnL
+         NndmJiCHJ1jbhajVfZYEcned67auwyRJGYFbV2RT340G57FT24w9rjTcJTUBU6IubVQp
+         AD29tw5+daA0G4zlkB5U+wm7lGHcJI7OG73NNFkJB0DLH/iGu4An+tKSLOVyQltn0lrO
+         GVoqytchbm+Hm2yEooOdK5BcnuAHXPCs2eR5Cy6FYH7Wl1gI2JVLWKxdrd+osb5lL42g
+         7mjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770263286; x=1770868086;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QofIONG1uzBkxrXk9BfqK0VXCGMliXskB+p+bTvurvE=;
-        b=jcna7138RLQZm3MXvRD0DAuFE58vo2NEq33BKNqaDaBwwcFkE097BvGO1mY72EnpJ9
-         gezpmn9mpjIDKQMEiRfkwpd/ZrbXaiCB9WoWDL8EMgKZ5vxPr8ynuiJ/0HLULfEKrcar
-         1d3EciUtr8+HTLBTTJl4BYQ9tIfE4juHHoHsoS6EY4drLucLqiazwILG79yC6g9XIMVa
-         g3p9UiE9ffPRMe1nMokJG5RKR/xnPe8hivWm8UGasJb1mjyE6zhXu4I8fiTs1OHmlHxt
-         0AWyF8jqI4ghrKzzdKmgNTs+It7B3MYBnAqV1dYtcZjZ+WiYVxvEYVvA/VK2ycgFPj7P
-         yiEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaDuY4EDECBioiIqe4MgjbckmbGTsMWOv2Df6kFvhhhu4iXWe8mGMm0IM00xF52KuElXHp11g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbWbGo8pMgShCW5o7YisxAWnsDLeTWl+zFcyT1kIhXNlLVReww
-	VWpKO3GnJh1yYaq877NExtnqXf7HVtTjPz4YaAwD6fzNApyW5qNhn4xa651prsqpaGI=
-X-Gm-Gg: AZuq6aJvejIopAJ8EyydO8e/1TDzkeyDHPT41PhHw/UGZ5sQYL/bWo3u4uQJnGX4g4T
-	mC465yu4FiHY2DEiLFw3VJpYhLttzJtoCAOJO+ioJBrZRH2pu/X/+jGzaz3NbxCMkL9eD+L/84I
-	3CiYyIB7DTNGzr2ycwNnqGvrq/bwm5HRq+nVDf+9DJsgZQQWL42Fia22UNbUVG2nsA7vcXtKgtf
-	NmNC/tl1/cGcuNYaRD6asGt7E7ED8vL17MsCH6j8uxA2A+5mZLsMSWhn/91uV4bxe+aS6R2am0H
-	YHLSFptfXUGxH3uR+j8jMYfnHuyxyOvOXdshnNzQ8w63Oxrjh2WhN7xoKYc7aSReFTO7cQcyi2X
-	8kUdhUlo9qAHvdBRl9FArEuNH10F3wVb9Mg2rrS1ZCaxYrLGb2XZQIg2s8dtb+lLE6CvCsR0tqs
-	Ovbbwr6qITacnssIDjCD09ZaJ1Es+0ZY/S2xDWNiW0llk0N0HNQILlsQKeI2KvQXftFnb1wA==
-X-Received: by 2002:a05:6830:6181:b0:7c6:cd24:6392 with SMTP id 46e09a7af769-7d448c1fffemr3274000a34.34.1770263285661;
-        Wed, 04 Feb 2026 19:48:05 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d44922a33csm2799317a34.25.2026.02.04.19.48.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Feb 2026 19:48:05 -0800 (PST)
-Message-ID: <55108bac-9edf-439c-ba54-ee25a1901d6c@kernel.dk>
-Date: Wed, 4 Feb 2026 20:48:03 -0700
+        d=1e100.net; s=20230601; t=1770263708; x=1770868508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3I4wiHK4vuKnP4ath3SaZ9xx45LrwQZ1CCNfZkbkb7c=;
+        b=qIiJkR1SrsMcGc3X1JlWaxTamKcvSwmhnQdBEsVVQBZ89bv3QR1tob3cIsK+AOU3YX
+         UXrtdo7KVWAEeLve7kUaKag13inTgJ95qiCDCCcJ5QzUn/Ed3XqU22PjrE/hHvUD48lQ
+         A1rCLlZrMByXpkPFh5leribN25qaxTH/kBCc+5Dll47gjbQIbG0pT436gzD9pUgLMppm
+         0omrMXx6CMjqftGbh0U2BO9RBMiURK02sefIPfJxFrllkm6BjA+ZL53IJIBg/i15VO/i
+         jgxHZdNlK4zdp66woajPatxO/mI/n56Ppmsqw0h+I/T0XvcdpsuZwhNbNuS454nV6PYj
+         nzpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUu5ur7Yr2JT+qKLosQTXtgyzgkRueIYb7MQkjsTmqPYaPlCeVUsoWS1s6Cuuxuk8HUi+ODZNU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHgB1xK/tBQeQzj3iQKdrn9qnlvwqks4K/cUrC/IKZ7BEGr7Bj
+	nyPYTyHhs+bDDDg4ukAOtlDnTlljDIKKoZk+QOPmHuAgHNFoaessZldLcvlteAhxsPnYVac2C45
+	d0yGtdBXjbhj7f2jHLDHCwSddqs6CWyJuvrhKxG8uKylHxOmT4pRuV6AfDNbfBlm+o9+AQ/1VFd
+	BNxeOgbJO/238ecukBeE6QKW13Tk+2C6EH
+X-Gm-Gg: AZuq6aI7DWBxTJGZ3yBO9gvXw/9gteNRcdkO126I/2tHPkcUWELdQ3oKFYg37Q6ssJ1
+	qMQjYfYVLqZsuSJSbP2urzsd29t4r142cpXh2ltAhUI/z/EtO+HDfXizNAFgA995I40OmjJY1ch
+	M94RzpUtSdEGWQTk/JnMwdEQUfC4W/n1tN6pF5qRGXNBVeoG8JPzLnCAHc6A4ZOjuzBA==
+X-Received: by 2002:a17:902:ef07:b0:2a1:3e15:380e with SMTP id d9443c01a7336-2a933fbb91bmr55345425ad.34.1770263708209;
+        Wed, 04 Feb 2026 19:55:08 -0800 (PST)
+X-Received: by 2002:a17:902:ef07:b0:2a1:3e15:380e with SMTP id
+ d9443c01a7336-2a933fbb91bmr55341925ad.34.1770263702958; Wed, 04 Feb 2026
+ 19:55:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 0/5] net: devmem: improve cpu cost of RX
- token management
-To: Pavel Begunkov <asml.silence@gmail.com>,
- Bobby Eshleman <bobbyeshleman@gmail.com>,
- Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, Neal Cardwell <ncardwell@google.com>,
- David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Shuah Khan <shuah@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
- matttbe@kernel.org, skhawaja@google.com,
- Bobby Eshleman <bobbyeshleman@meta.com>
-References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
- <20260120170749.101e8bcc@kernel.org>
- <CAHS8izMZxM6rcF+7Lfw=KFv4dmbHGSUrQBPmxO+sYj=V3TRuwQ@mail.gmail.com>
- <aXe2QhzL4DoVbesQ@devvm11784.nha0.facebook.com>
- <20260126173124.1f0bb98e@kernel.org> <aXhUfC7ZyYge1jti@mini-arch>
- <CAKB00G3p9_VUTEW_KQvS1JAd+Ju_pjrU5r-v_p+K8Y=vH__mTQ@mail.gmail.com>
- <c37ae03d-2b0e-4179-ac22-7d0c01ff601d@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <c37ae03d-2b0e-4179-ac22-7d0c01ff601d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260204193617.1200752-1-vishs@meta.com> <20260204193617.1200752-2-vishs@meta.com>
+In-Reply-To: <20260204193617.1200752-2-vishs@meta.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 5 Feb 2026 11:54:51 +0800
+X-Gm-Features: AZwV_QiGiEnnkcU-RVALFrf_34MIEhko_WcvnVlIybPAOQb-EXjvuh7K8OffMaM
+Message-ID: <CACGkMEuJ1LXg+WOryC9Fnk3NRJVhvzy+h8p5-fJFWUu1z8Yqtg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/2] virtio_net: add page_pool support for
+ buffer allocation
+To: Vishwanath Seshagiri <vishs@meta.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	David Wei <dw@davidwei.uk>, Matteo Croce <technoboy85@gmail.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256943-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256944-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,davemloft.net,redhat.com,arndb.de,lwn.net,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,meta.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel-dk.20230601.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kernel.dk:mid]
-X-Rspamd-Queue-Id: 7CB43EE65C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 8A2A1EE6EB
 X-Rspamd-Action: no action
 
-On 1/30/26 4:13 AM, Pavel Begunkov wrote:
-> On 1/27/26 06:48, Bobby Eshleman wrote:
->> On Mon, Jan 26, 2026 at 10:00?PM Stanislav Fomichev
->> <stfomichev@gmail.com> wrote:
->>>
->>> On 01/26, Jakub Kicinski wrote:
->>>> On Mon, 26 Jan 2026 10:45:22 -0800 Bobby Eshleman wrote:
->>>>> I'm onboard with improving what we have since it helps all of us
->>>>> currently using this API, though I'm not opposed to discussing a
->>>>> redesign in another thread/RFC. I do see the attraction to locating the
->>>>> core logic in one place and possibly reducing some complexity around
->>>>> socket/binding relationships.
->>>>>
->>>>> FWIW regarding nl, I do see it supports rtnl lock-free operations via
->>>>> '62256f98f244 rtnetlink: add RTNL_FLAG_DOIT_UNLOCKED' and routing was
->>>>> recently made lockless with that. I don't see / know of any fast path
->>>>> precedent. I'm aware there are some things I'm not sure about being
->>>>> relevant performance-wise, like hitting skb alloc an additional time
->>>>> every release batch. I'd want to do some minimal latency comparisons
->>>>> between that path and sockopt before diving head-first.
->>>>
->>>> FTR I'm not really pushing Netlink specifically, it may work it
->>>> may not. Perhaps some other ioctl-y thing exists. Just in general
->>>> setsockopt() on a specific socket feels increasingly awkward for
->>>> buffer flow. Maybe y'all disagree.
->>>>
->>>> I thought I'd clarify since I may be seen as "Mr Netlink Everywhere" :)
->>>
->>>  From my side, if we do a completely new uapi, my preference would be on
->>> an af_xdp like mapped rings (presumably on a netlink socket?) to completely
->>> avoid the user-kernel copies.
->>
->> I second liking that approach. No put_cmsg() and or token alloc
->> overhead (both jump up in my profiling).
-> 
-> Hmm, makes me wonder why not use zcrx instead of reinventing it? It
+On Thu, Feb 5, 2026 at 3:36=E2=80=AFAM Vishwanath Seshagiri <vishs@meta.com=
+> wrote:
+>
+> Use page_pool for RX buffer allocation in mergeable and small buffer
+> modes to enable page recycling and avoid repeated page allocator calls.
+> skb_mark_for_recycle() enables page reuse in the network stack.
+>
+> Big packets mode is unchanged because it uses page->private for linked
+> list chaining of multiple pages per buffer, which conflicts with
+> page_pool's internal use of page->private.
+>
+> Implement conditional DMA premapping using virtqueue_dma_dev():
+> - When non-NULL (vhost, virtio-pci): use PP_FLAG_DMA_MAP with page_pool
+>   handling DMA mapping, submit via virtqueue_add_inbuf_premapped()
+> - When NULL (VDUSE, direct physical): page_pool handles allocation only,
+>   submit via virtqueue_add_inbuf_ctx()
+>
+> This preserves the DMA premapping optimization from commit 31f3cd4e5756b
+> ("virtio-net: rq submits premapped per-buffer") while adding page_pool
+> support as a prerequisite for future zero-copy features (devmem TCP,
+> io_uring ZCRX).
+>
+> Page pools are created in probe and destroyed in remove (not open/close),
+> following existing driver behavior where RX buffers remain in virtqueues
+> across interface state changes.
+>
+> Signed-off-by: Vishwanath Seshagiri <vishs@meta.com>
+> ---
+>  drivers/net/Kconfig      |   1 +
+>  drivers/net/virtio_net.c | 351 ++++++++++++++++++++++-----------------
+>  2 files changed, 201 insertions(+), 151 deletions(-)
+>
 
-Was thinking the same throughout most of this later discussion... We
-already have an API for this.
+Looks good overall, just one spot.
 
--- 
-Jens Axboe
+> -static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, =
+u32 len)
+> -{
+> -       struct virtnet_info *vi =3D rq->vq->vdev->priv;
+> -       struct virtnet_rq_dma *dma;
+> -       dma_addr_t addr;
+> -       u32 offset;
+> -       void *head;
+> -
+> -       BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+> -
+> -       head =3D page_address(rq->alloc_frag.page);
+> -
+> -       offset =3D buf - head;
+> -
+> -       dma =3D head;
+> -
+> -       addr =3D dma->addr - sizeof(*dma) + offset;
+> -
+> -       sg_init_table(rq->sg, 1);
+> -       sg_fill_dma(rq->sg, addr, len);
+> -}
+> -
+> -static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t =
+gfp)
+> -{
+> -       struct page_frag *alloc_frag =3D &rq->alloc_frag;
+> -       struct virtnet_info *vi =3D rq->vq->vdev->priv;
+> -       struct virtnet_rq_dma *dma;
+> -       void *buf, *head;
+> -       dma_addr_t addr;
+>
+>         BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>
+> -       head =3D page_address(alloc_frag->page);
+> -
+> -       dma =3D head;
+> -
+> -       /* new pages */
+> -       if (!alloc_frag->offset) {
+> -               if (rq->last_dma) {
+> -                       /* Now, the new page is allocated, the last dma
+> -                        * will not be used. So the dma can be unmapped
+> -                        * if the ref is 0.
+> -                        */
+> -                       virtnet_rq_unmap(rq, rq->last_dma, 0);
+> -                       rq->last_dma =3D NULL;
+> -               }
+> -
+> -               dma->len =3D alloc_frag->size - sizeof(*dma);
+> -
+> -               addr =3D virtqueue_map_single_attrs(rq->vq, dma + 1,
+> -                                                 dma->len, DMA_FROM_DEVI=
+CE, 0);
+> -               if (virtqueue_map_mapping_error(rq->vq, addr))
+> -                       return NULL;
+> -
+> -               dma->addr =3D addr;
+> -               dma->need_sync =3D virtqueue_map_need_sync(rq->vq, addr);
+> -
+> -               /* Add a reference to dma to prevent the entire dma from
+> -                * being released during error handling. This reference
+> -                * will be freed after the pages are no longer used.
+> -                */
+> -               get_page(alloc_frag->page);
+> -               dma->ref =3D 1;
+> -               alloc_frag->offset =3D sizeof(*dma);
+> -
+> -               rq->last_dma =3D dma;
+> -       }
+> -
+> -       ++dma->ref;
+
+This patch still uses virtnet_rq_unmap() for free_receive_page_frags()
+which looks like a bug.
+
+Thanks
+
 
