@@ -1,175 +1,324 @@
-Return-Path: <netdev+bounces-257149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BLYMFOLhGl43QMAu9opvQ
-	(envelope-from <netdev+bounces-257149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:21:39 +0100
+	id YAovLw+LhGl43QMAu9opvQ
+	(envelope-from <netdev+bounces-257150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:20:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21517F25B6
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:21:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3687BF2591
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBE89302336A
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 12:18:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9768C300C256
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 12:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54ED3B9618;
-	Thu,  5 Feb 2026 12:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F73B3ACEE6;
+	Thu,  5 Feb 2026 12:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Nbenqm+z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tu+Kl4ft"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9486C34CFAF;
-	Thu,  5 Feb 2026 12:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770293923; cv=none; b=Ft3eUPAlam5qKZxsMHcTkivAduUsfEFe7hybiETZDgImCcGF1twbhjWMlJTpoX7K+4znE7yrp1DfMdRukVDcU/7NU7s5hI2muMzYHvn3e5qlpRhSZTGkJnhCekCuRMJj6+RWlgwNE1k6TThrUrIm6rFeMTKbcBFWOW0sh+tTudU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770293923; c=relaxed/simple;
-	bh=ptP2t2pMIYG1ra3PoZzEkp4X0a9shHKVhCPGgyrKwEE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m8FOXl1ZeaxtG5rkhnsiDfykK6TqHNPh4l8wKtbEvh61KMViP7yqwBS08Nto7cWnhZiXlmbKwL7157RlBxlXo5eMEug1Y3oFO6Fy5WCdi0gYpc51BbJttrpnkqQysA4NqThD+0P1uDQHXyQAS3KTTudYSGqIJ1F8Spnw5Mdk874=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Nbenqm+z; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=XCmgJslFgz2pKH+mZm9wj/ooAUI908xgVtyxwrSO2qI=;
-	b=Nbenqm+zaNkhUgMyWxWSbtcrN9znk8UQwyI+dYr9jra8w+i3sNUhE4CcZcGdpFeIeRuwvAM1E
-	H5l2vFZ9S1BQwkIJSptarmQp1DKUg1BzSvggPYGdLNm/GQSagcAV9j9byHsFKo3wRBBQemkdrtd
-	GQ5tnNhYByIFmBsrV/GFFz0=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4f6GNb3Yg9z1K96b;
-	Thu,  5 Feb 2026 20:14:07 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E849A40565;
-	Thu,  5 Feb 2026 20:18:39 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E551F63CD;
+	Thu,  5 Feb 2026 12:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770294017; cv=fail; b=ZISk6NEy3cZseDcE8TYMNRmkvLyePAh3t/CPjHKP2p93wj1tOOuN5aYKBcFjfcHYimD1/yV+vOkPDVrq4q1L5Y5urfANrIWPG1M8gU6dXjCasuGc2B74uNo5HJ4CeaR6uBtTGtga0rlrSMUPq6/PbHCZub1jtHtnL30M/2uY0IY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770294017; c=relaxed/simple;
+	bh=eUCw6hrn5BSvBHhZT2HxcyoIPXyTan+YzIXO5DkBwdc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=UmcbLaWT8sE6vYFBQ57Gk5e8Cd7qOECo78gD/JIIyD59oan2LytZWryNKebxfEEnTd10g4V2TvR+EP9+w/JZ7ixDsKLuwjDArAr6414Z4jh/ugyqU5kEbV6RLSDPCMHm6zq3WPWIiS8V9M1foVZMVjgotirTONd0mazPWDTvgqo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tu+Kl4ft; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770294016; x=1801830016;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=eUCw6hrn5BSvBHhZT2HxcyoIPXyTan+YzIXO5DkBwdc=;
+  b=Tu+Kl4ft0esrq41/30f0JpJdSlikLhLGkXk1OT7W/QEawh459Yl29L7g
+   lBjfsJOL4mmXSd+Uocj6yYtShaStTwb0P3JrBwFrMQPGXpt1M40oVFjpR
+   d9EXCL61LD/M2Ekwni7iPCJmP3OTiYCWeIhW0Uj7fAFHgVnrzFM9Y46HO
+   umccaRCb428NvBq3GFW5FtYXflWKTpRaige5qZdqJf1JnTeQKtpZD2mNc
+   WyfPsHbQDsVE5dAnRilBJcPHENQaM+Ha+UAOaT0y0WyDCgASqQk/mw29Z
+   RHm6sJFdHC1XeeQ3Nl25V5GlxAKOddNiLRfBociYybX0BoU32tk8RqZAn
+   w==;
+X-CSE-ConnectionGUID: 01xCerUmTQy6Z7oCqinMpg==
+X-CSE-MsgGUID: TBpLYNzFTs2YST5KLl4qhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71553085"
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="71553085"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 04:20:15 -0800
+X-CSE-ConnectionGUID: xiw5wBP0SfOCQ4vRUQn1kg==
+X-CSE-MsgGUID: grQtI31ES1iN3xhwq6AeCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="209594593"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 04:20:15 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 5 Feb 2026 20:18:39 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <lantao5@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
-	<jacob.e.keller@intel.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V2 net] net: hns3: fix double free issue for tx spare buffer
-Date: Thu, 5 Feb 2026 20:17:19 +0800
-Message-ID: <20260205121719.3285730-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+ 15.2.2562.35; Thu, 5 Feb 2026 04:20:14 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Thu, 5 Feb 2026 04:20:14 -0800
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.65) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 5 Feb 2026 04:20:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hqjvYD+BYOGUMhQ7aDo5b37j2eXMChiCVFbMzEgVgHaLxtiBLzrgO/3h0NIQ+Knfc6mfCrcjyhc3eGGrgozuJK8U2qlcmp+v+Zh3hvr/ytTNq9cm3MJnopj0X5B9lNt2a2TacoglpPFZKVnpXnOqx9VBU/NYsMH1dg8g3R21td5CT62/pGGD1cTQaFzLda0IcVclgalFXu5Ab/b52nIqd1LhlT/a1dkjsT8IuLrWNmOMiyNU21t+gc51sGTUQKzNxkTQiae7DcepNStuPmqAR8NJq3yKahPI4jrcF7TAqjtKaL9ZIUp/X3WsvlGNoHFIPlJDD0AD01cX2x/sTYEXNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1Lk7LpulnqdjQcY5RWQDe2pgFyfCTni6M0VYdx2fHGQ=;
+ b=dn08XAMBZpKSXE4giV2thERTuavwOhXYTSplchfPYtk5SMqu1TbLD38FtMXHgREUdzV+bMfkQQhLsczew+RhFzOfOXMuqM+wCgUyKlhHwAI1/HuTURPzke/NsdhN9zEdBsV6zD9vB4t83H2m3L19/ZlbRomaxCOsn/B4u4axlmYNUJrstENkOq2kuPMgKPi08qzxw0aEZpHhdRLKcJO0E7OkXdFyBXfybK2Iu1KPzTrIpl0l5gkJl5RXPiF7b97xXEbbENfBm/Gxp+yGi7jNrCQmSn3eCEiQ4vV6ytz4XYw/6QwSxsyqOJLj1crbkkaN1EnkEmqvUiqWbnIVw8V+Jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by DM3PPF78DCB3A49.namprd11.prod.outlook.com (2603:10b6:f:fc00::f30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.15; Thu, 5 Feb
+ 2026 12:20:12 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9587.010; Thu, 5 Feb 2026
+ 12:20:11 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+CC: Paul Menzel <pmenzel@molgen.mpg.de>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, "Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Richard Cochran
+	<richardcochran@gmail.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "Eric
+ Dumazet" <edumazet@google.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, "Sebastian
+ Andrzej Siewior" <bigeasy@linutronix.de>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
+ directly from interrupt for i210
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
+ directly from interrupt for i210
+Thread-Index: AQHclnYXhLud46uHAE25c+QBK+gWd7Vz204ggAAlOwCAAAPL0A==
+Date: Thu, 5 Feb 2026 12:20:11 +0000
+Message-ID: <IA3PR11MB898682AE39689F854F3BA178E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
+ <IA3PR11MB898652699383BA265C5747A5E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
+ <87ikcbwgf3.fsf@jax.kurt.home>
+In-Reply-To: <87ikcbwgf3.fsf@jax.kurt.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DM3PPF78DCB3A49:EE_
+x-ms-office365-filtering-correlation-id: b432c97f-dbd4-49f4-92e5-08de64b0e8fc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?i9agROeAvqmyMquDPStyFh9p+1ZKaUY9IdS4IaevxXkFfkx4TtLdpGCTCnzK?=
+ =?us-ascii?Q?mTxc+k6H52fEHtrKxandyB7uTOkwtG+H4NDqK0SyQsib+n/gFcUf3lgtpc41?=
+ =?us-ascii?Q?q0CZiZbCYQpKWiNYVeQ9t1PgSCkpQ1FJE4Ea+6CzI95sfHH1AuxbNs/foYT/?=
+ =?us-ascii?Q?oveGKfim6P9ORibmiP+F2rQ+Ek85mD8TSXpN2JHvcYXYndy/ImuH0X7H0vhQ?=
+ =?us-ascii?Q?WxJ+xlvC5/9VUqixAuC0dovr2S3aKOJAmdQnSAb8bugatM0gW32rt76jeQru?=
+ =?us-ascii?Q?LkmM433KowlBiQiapbwaGFzTvnVhLxD8Y1quY76JHKAy/P6WbuABh6VAxT4Z?=
+ =?us-ascii?Q?mKswIuTiQlUc2xM3JiDyyDzRv1iV7zIsi0ozMc6gf6OTr5eOWd4cDGyHpNY/?=
+ =?us-ascii?Q?XbbLNC/k8fAkZTnJ5xWjNBkGeRonVRV9XQPWHxeGNWFXxdoF3/aIzSCWG+Mz?=
+ =?us-ascii?Q?laaBpRWR+YKX7261WSk3CofnIPm9vv3f/0ei/7B0NCT2ej3zGA8cfTqk7/Gx?=
+ =?us-ascii?Q?hpB6IU+5+ZiqmbGl1j+xHLN5/wJQFvq9+aM31XlAt9N7bShYZNDibBlX6p2H?=
+ =?us-ascii?Q?rWiEeT18bWfcjMN3MfBE9LnhwdKLwkHvHsuctj9dPwVG7pKa4OeSbnydsPtW?=
+ =?us-ascii?Q?GxG87RUtVyCzWYmUXbBP5XYywgsg8ZIxkSrQ4rk1OWFC4+cymmsVNGPd97dM?=
+ =?us-ascii?Q?xU8b+cXM4K/DslYxyPDa7LrUN1tR/i0cQmgaOCecQDlDhLv9fPWDUC1EbJHZ?=
+ =?us-ascii?Q?sXPIKx4BgfsHkstV9wp6H8wHEoamDS+X0DWzQ2xmRaBdwPAeaFJ3rq0j7GNM?=
+ =?us-ascii?Q?nb/QyDpZY3m/KT+jRS7+B4pSotBqxxrWKfYAh9hMG19VIMBB40Nfh+7WhZFR?=
+ =?us-ascii?Q?/MNypl1U0Q1YMRrNO4qbstC9q+Gz/cGb01Aa4sqckgeWK1h8EQ/vs03nI4Uf?=
+ =?us-ascii?Q?/KY9mP3Yzd4RfFCXSYOrW1EkSv9aStwT3OV3GkTL0Jq9YEyvnBAD4VBeC4v3?=
+ =?us-ascii?Q?EbpxGhM6ycxJLCXofhX0riMgK7z0U/3w1be4+yhrhjuGvaVjk6lj6kx0qyDW?=
+ =?us-ascii?Q?IRZn9mZSmHhDBaYVnRa/nnxJ3bvwUWDVjTQ9VzY5Vew7wKdS97WwNvLHn71K?=
+ =?us-ascii?Q?ItL3njPUbz2ejUYQdQuZVnvL0Lvw195z3TPtn556BrjDdjz6aPBHpuYCVVbR?=
+ =?us-ascii?Q?/lV5R+uF8R04GjvEKbnbvXQOFURHCGFrl9noSPeadgPLjt7MnA+DpoaMlmcR?=
+ =?us-ascii?Q?2jV0GLHmiaHmf3eguhTdwWYjJqsksu0DLZFNzZnyVwqqDK2te4M3WxK56wiR?=
+ =?us-ascii?Q?BrLsJXOxDK7h5bKtDtnC+GgC8Cpo7v5Smx2iToPU4KZogImRJWuUxT/scasO?=
+ =?us-ascii?Q?6wiOuJHX4zgqVXcnFaT8Z52MKv0d/j8zMAm/lS3u0ZVITaxUzVsrjmHyifah?=
+ =?us-ascii?Q?1UhwWbjbZqyS5ZyDVb0Ya2nCgSv3JdJ8IyzlCZhjzf2JT49+chW8cx4Cbru6?=
+ =?us-ascii?Q?cyHkfHd3qREAIg/tDwG2c8O8aKjSwWPBLE9vXacz1+kLbsqR71pT0xFtof0t?=
+ =?us-ascii?Q?1l0ueOmVk6WZiC6wA8ZiHIr60pG6nR4Hs0QSxSH05KsMpkvSmFaMaOBHv76R?=
+ =?us-ascii?Q?9nifc7cNh/X0dDTds4mRpgQ=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?4ndEeTzsHwBmaAJu5VMPd2oTUNsaNSIiPGH4AT3QyW7C7atidC886EZygMae?=
+ =?us-ascii?Q?bd7Bb77Mx/8kNJvHr8EaL+ikUTb0bXRRdCzapy1OchY5Z9DnzvLKMeiiwfP2?=
+ =?us-ascii?Q?jN2aZ6LfvJI2LV+G4B3wXebXJZm2PgrDsRxMCAS5pr7UUDA8AGljktjnGkIV?=
+ =?us-ascii?Q?SfmAFuEmR2aL9L+Rl9NaF53uq74zQRxIWtEOm07sQMxBbENFWwkRAsgxCQzh?=
+ =?us-ascii?Q?xBD+uGj8szVh4hySz3jSkqKz42/Uq4+TZPkQ9InOqjda6PAqjL9uz5y3w8hu?=
+ =?us-ascii?Q?ss2KqT3rqEQrMJW3j4KX6E8QyWkibooKgZJ/AkPmLpxQ5xOEe6amf5Bcfezv?=
+ =?us-ascii?Q?ghppobVjmbQrTmQwiFmWADJnm4QOSYJE+O+GAtB9nnAE6Ua/x9RRYpoRqJF+?=
+ =?us-ascii?Q?cAY/dXVaQnSaqDz0i0U4vuzjP6/F0cXWla2wNJ4m4C9OCC8BcLYrueg+uWo0?=
+ =?us-ascii?Q?yJz38D73URjD7KwfPhZ7SQ7yacU7AB/PWCZK+JPmjLuaga8Wfsy92+Zaq0gY?=
+ =?us-ascii?Q?21/jaonwvoXuG5Ok/5W1rUumlRvMRybzQGoJphAHear9yo4OLS/T0hrxwN1G?=
+ =?us-ascii?Q?cUJiTKd5RwLIIIz95EoY7/0Y1TH0UHi7WjFazwJRfOJ8mX1g8toaESkIleSY?=
+ =?us-ascii?Q?0rvgc3JeU2uzvuoSn1KMsilONMCC9hwVRhOsbfgo0cdnhJTFEUOOvAIhMUpy?=
+ =?us-ascii?Q?wCg2b4PhsOwXrpeAIjaE91BcKIjROqohZ9f69py2Qo9RfldQpMn4QCQLEFLw?=
+ =?us-ascii?Q?2mYfgvZ3PuKwO/jesIM4TIHBC24fWI1w6c+yQKz4sQT4OedPEwImBGfjtnO7?=
+ =?us-ascii?Q?oP6aB4KRtONF0NNdD30AqvqF7SqFUkZOJPOj1OHDy1lcpF32oriyexZCJ2c1?=
+ =?us-ascii?Q?bQKoNKVousljp2jNm9OW4PNPwG73cRYXZfXCljyv+pvw61+Lq6yJ0BgWMtiZ?=
+ =?us-ascii?Q?jjwaSSmVClqL9LvAsJd+m9Ws8YHYbpi/Upy/VUEhbqPTWuy+5O/IUTs4A1gZ?=
+ =?us-ascii?Q?BRf7HGAuJwB+cWDhEIrvWeEt4Uo6eZ94ydcgEiLnHI/iUPlE0444KTPpu0cR?=
+ =?us-ascii?Q?1SW2XFZRUwr0VGqPRBv5T6Y7JaKMmlKTnoZnL3hKtDsBlbZ/NHo1OPwzLV/U?=
+ =?us-ascii?Q?Zl9EeMo99PJBSTvaCe79u45FSlges8a6Ejb98bE8vfd718vNJ/nSMyrofXRv?=
+ =?us-ascii?Q?B8UiVBnrLFCNPiB04g211Om+92iSiZbXum8cU8TJkSei/mjx22WBlp3cDfT+?=
+ =?us-ascii?Q?8ZnHtUKxa63C4BSnQk9fm8vMgQgBfrex3P1VrOoQI444pMAbhYK9D0R1KQkq?=
+ =?us-ascii?Q?MVuG0nGDSyLnwCj4X219HTx4m8lE3cF34CBCtkybyvuxZPHa/Jhmsezi3l/T?=
+ =?us-ascii?Q?/ieq9dIQamF9FQE7nOrFczTVj9LrFM7JMm8xZkdNrG+BN0EuRnUZLVy4nJ+Q?=
+ =?us-ascii?Q?djG11NQatanWKfaDpnjenha5oMgaUd9TQmBOTpkhY7wvvjsmGM5FuWvkJlZI?=
+ =?us-ascii?Q?rfPBCcCWz67LLC94A8Uhy7szQbOdgbDjVfg8zM6g2MHoKf2holgGCDyE4GXv?=
+ =?us-ascii?Q?7CAXDgWlJ7MhDgM6yiUwdXbkBXG1z0r9/sCT7/0oVOsV/qtGMPACLBcTOj2r?=
+ =?us-ascii?Q?LgqwbCjZDfSzEgNH6JWaAkFRHCRDbIGa2kBgE+yqQPe49GK2JiTjG8GXBwC1?=
+ =?us-ascii?Q?3dhrU1HgQd0nEMlgKQB+0UknDv1sD4TsKsWz1S4MAMA8GvGo5jZWkvVliok4?=
+ =?us-ascii?Q?vxSlldpAbofi3F9eEuGqR68649DXyWo=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b432c97f-dbd4-49f4-92e5-08de64b0e8fc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Feb 2026 12:20:11.8221
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: clPIZTLshlgBmW45AnVKhaYHCuSa/7HO0AEOVAQzDN1sjGme4qTIew98fhF7KwuoMIzSnnHUMLgcXLGe5/o7l9gQDpJDHVLrZ3EWZKA87uw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF78DCB3A49
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257149-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257150-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[molgen.mpg.de,linux.dev,intel.com,vger.kernel.org,gmail.com,lunn.ch,google.com,lists.osuosl.org,kernel.org,redhat.com,davemloft.net,linutronix.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,davemloft.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,linux.dev:email,mpg.de:email,intel.com:email,intel.com:dkim,osuosl.org:email];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 21517F25B6
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 3687BF2591
 X-Rspamd-Action: no action
 
-From: Jian Shen <shenjian15@huawei.com>
 
-In hns3_set_ringparam(), a temporary copy (tmp_rings) of the ring structure
-is created for rollback. However, the tx_spare pointer in the original
-ring handle is incorrectly left pointing to the old backup memory.
 
-Later, if memory allocation fails in hns3_init_all_ring() during the setup,
-the error path attempts to free all newly allocated rings. Since tx_spare
-contains a stale (non-NULL) pointer from the backup, it is mistaken for
-a newly allocated buffer and is erroneously freed, leading to a double-free
-of the backup memory.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Kurt Kanzenbach
+> Sent: Thursday, February 5, 2026 12:58 PM
+> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; Nguyen,
+> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>
+> Cc: Paul Menzel <pmenzel@molgen.mpg.de>; Vadim Fedorenko
+> <vadim.fedorenko@linux.dev>; Gomes, Vinicius
+> <vinicius.gomes@intel.com>; netdev@vger.kernel.org; Richard Cochran
+> <richardcochran@gmail.com>; linux-kernel@vger.kernel.org; Andrew Lunn
+> <andrew+netdev@lunn.ch>; Eric Dumazet <edumazet@google.com>; intel-
+> wired-lan@lists.osuosl.org; Keller, Jacob E
+> <jacob.e.keller@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.net>;
+> Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx
+> timestamp directly from interrupt for i210
+>=20
+> On Thu Feb 05 2026, Loktionov, Aleksandr wrote:
+> >> +/**
+> >> + * igb_ptp_tx_tstamp_event
+> >> + * @adapter: pointer to igb adapter
+> >> + *
+> >> + * This function checks the TSYNCTXCTL valid bit and stores the Tx
+> >> +hardware
+> >> + * timestamp at the current skb.
+> >> + **/
+> >> +void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter) {
+> >> +	struct e1000_hw *hw =3D &adapter->hw;
+> >> +	u32 tsynctxctl;
+> >> +
+> >> +	if (!adapter->ptp_tx_skb)
+> >> +		return;
+> >> +
+> >> +	tsynctxctl =3D rd32(E1000_TSYNCTXCTL);
+> >> +	if (WARN_ON_ONCE(!(tsynctxctl & E1000_TSYNCTXCTL_VALID)))
+> >> +		return;
+> >> +
+> >> +	igb_ptp_tx_hwtstamp(adapter); <-Calls existing function
+> designed for work queue!
+> >
+> > skb_tstamp_tx() can sleep
+> > Smells like sleep-in-atomic isn't it?
+>=20
+> AFAICS skb_tstamp_tx() is safe to call here.
+>=20
+> > spin_lock_irqsave(&wq_head->lock, flags);  <- RT mutex can sleep
+>=20
+> In case you're worried about PREEMPT_RT: On -RT the IRQ runs a
+> dedicated thread. BTW I've tested this with and without -RT and with
+> CONFIG_DEBUG_ATOMIC_SLEEP.
+>=20
+> Thanks,
+> Kurt
 
-The root cause is that the tx_spare field was not cleared after its value
-was saved in tmp_rings, leaving a dangling pointer.
+Thank you, Kurt for sharing your experience. I don't have so many experienc=
+e with RT Linux.
+For me calling a function, not designed to be called from IRQ context is a =
+SUS.
+So, I rose the question about sleeping.
 
-Fix this by setting tx_spare to NULL in the original ring structure
-when the creation of the new `tx_spare` fails. This ensures the
-error cleanup path only frees genuinely newly allocated buffers.
+But there is also a question about non-RT Kernels with Shared IRQ Vectors..=
+.
+I.e. regular packet processing (NAPI poll in softirq) and PTP timestamp eve=
+nts (in hardirq).
 
-Fixes: 907676b130711 ("net: hns3: use tx bounce buffer for small packets")
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
----
-v1 -> v2:
-  - Update this commit message, suggested by Jake and Jakub.
-  v1: https://lore.kernel.org/all/20260202105837.1909444-1-shaojijie@huawei.com/
----
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+I suspect we have potentially broken drivers with shared vectors (MSI-X sho=
+uld be safe I hope).
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 7a9573dcab74..e879b04e21b0 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -1048,13 +1048,13 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- 	int order;
- 
- 	if (!alloc_size)
--		return;
-+		goto not_init;
- 
- 	order = get_order(alloc_size);
- 	if (order > MAX_PAGE_ORDER) {
- 		if (net_ratelimit())
- 			dev_warn(ring_to_dev(ring), "failed to allocate tx spare buffer, exceed to max order\n");
--		return;
-+		goto not_init;
- 	}
- 
- 	tx_spare = devm_kzalloc(ring_to_dev(ring), sizeof(*tx_spare),
-@@ -1092,6 +1092,13 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- 	devm_kfree(ring_to_dev(ring), tx_spare);
- devm_kzalloc_error:
- 	ring->tqp->handle->kinfo.tx_spare_buf_size = 0;
-+not_init:
-+	/* When driver init or reset_init, the ring->tx_spare is always NULL;
-+	 * but when called from hns3_set_ringparam, it's usually not NULL, and
-+	 * will be restored if hns3_init_all_ring() failed. So it's safe to set
-+	 * ring->tx_spare to NULL here.
-+	 */
-+	ring->tx_spare = NULL;
- }
- 
- /* Use hns3_tx_spare_space() to make sure there is enough buffer
--- 
-2.33.0
+I'd like the comment to be added:
+/* Safe to call from IRQ: dedicated misc vector + RT-safe on PREEMPT_RT */
+igb_ptp_tx_hwtstamp(adapter);
 
+But in long term perspective prefer to refactor moving to NAPI is the safer=
+, more maintainable pattern.
+
+What do you think?
+Alex
 
