@@ -1,206 +1,215 @@
-Return-Path: <netdev+bounces-257239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMO+GMe8hGnG4wMAu9opvQ
-	(envelope-from <netdev+bounces-257239-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:52:39 +0100
+	id oMDrCDW9hGnG4wMAu9opvQ
+	(envelope-from <netdev+bounces-257240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:54:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09DCF4CBD
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:52:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCA2DF4D0B
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A63A2302BBB9
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 15:49:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 640D03022943
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 15:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BAC42981B;
-	Thu,  5 Feb 2026 15:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16134426EDE;
+	Thu,  5 Feb 2026 15:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Z5AQtUex"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="NsdhnNmZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB33429818
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 15:49:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A590C426D05
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 15:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770306593; cv=none; b=U/VI26nYtoGsa1p40KNV74GXT3S0kY0JkTEETeQiZJCqUzpADwXfCtZsoB/fIi/fqamRSeCRAMJl+9nhNMzzPumMKEvTwDkn1XQMprNHIXecP9RgMp0S/ps+tzpC5Fcbj6OJMWEvT4cQoit+2UP+kQY1GLG6rBQd/VZiok8BF3Q=
+	t=1770306752; cv=none; b=T/4z8N6J/sTSo4iaHWlDGz6LiErYfVqLSDrMGMLpis598mvReXl4Vdxqd6lEG9Rr2aPAqQUUk5YoO2nEe7KG1okmJNobCXI4G8wA5of6n4r/FEd3UXJxwqY0VLLzmDfFQCCRqhCjNZwwFkDATYSOr2aBh9oNfMP7twxkbkAoJdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770306593; c=relaxed/simple;
-	bh=6CJQ+M31O8EVOiXo21e+ShRZ0u6bO9nTVmOBgZ2GIio=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZHPuALtoORU/KTvuhdUsE2Los2wLYy8hUPqTvJjLeP2XtSyTUEJTYhyHzScoLY3o1r7Af8vU+mXgTpCcjx8im9IfPUzL7MU95MYhPz5fiuHLokjk7lOwijJp/sG2MHk0cKkj+XqO0vFij8hGniQBye6HmomvOWUNmnAIQ04XH5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Z5AQtUex; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (182.51.30.125.dy.iij4u.or.jp [125.30.51.182])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 615Fnh3S027695
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 6 Feb 2026 00:49:44 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=mbHqqpvf1EsyENiG3xgpDiZNiWcRfgRHeO49XVCu+yQ=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1770306584; v=1;
-        b=Z5AQtUexhixK+Evq42B8d88+dTevYkDrD7m1v+MP4Jt9tmDqwJG0wED8E0kmMWIj
-         PTFFjGjlvaOqrZIBoDWKjILFsh+T+NRwhvfMvFLCt51ewz40oos1n4lyS/qYhvyk
-         tt4dr+XX9nrkwx0J7+eYfifdQoHYp+TcBrK0QeUQ0ktTIiGRG0xkUkoLe2wlyMzS
-         RkiSMcQxQB/B+eaQq6VirsZx55l94TyXXR+gfXOuNfCODP1ARKVCBzzkQuGwupwm
-         hZh3gdCzwnOxbQWlIVG5+LHzsyGWXQNit23NsCmc3y8IDYfuux2mMYEMD4pd62qE
-         /M7J1cWoO6/88HrM5TNonw==
-From: Kohei Enju <kohei@enjuk.jp>
-To: vitaly.lifshits@intel.com
-Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net,
-        edumazet@google.com, intel-wired-lan@lists.osuosl.org,
-        kohei.enju@gmail.com, kohei@enjuk.jp, kuba@kernel.org,
-        netdev@vger.kernel.org, pabeni@redhat.com,
-        przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v1 iwl-net] igc: fix null pointer dereference in
-Date: Thu,  5 Feb 2026 15:49:43 +0000
-Message-ID: <20260205154943.20985-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <3b481682-5a64-412e-a085-8d3c6323dd4e@intel.com>
-References: <3b481682-5a64-412e-a085-8d3c6323dd4e@intel.com>
+	s=arc-20240116; t=1770306752; c=relaxed/simple;
+	bh=FNFL0/+E2aKnOvoNT9LImHUIIlRjvKZVxcmxb7yxYDI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Za4TWhpFe6hsNWxi3QOM8eOjavtnr6bQ2CSOCv/yK1EoOwOHxipq2YHUYiXExTvV6lfsJFmyUjh6anEterKoWv2FsOABw2wTnfHyw7wLJUNj5TyVtWRW9Y+iFxSANz9eDtebeIA4C3kv5G1cczRkSWYryf+zKfiiLGXCODH2c3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=NsdhnNmZ; arc=none smtp.client-ip=209.85.128.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-47ee3a63300so11995625e9.2
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 07:52:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1770306750; x=1770911550; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UTu7qU8UN7vo13iwk65Itm5Hd0Cv+O0GXDEO+OULSSA=;
+        b=NsdhnNmZZ+or54k3tuyagYkH2oSUJVSQZusPjtXF0o9co4Yavd9/67+CVje6lfG2GH
+         Imm7ruzWxwyorDgaPrNf8XDPNEE5ga3JGo2ASBTBTjhKyJcfNnvRvwRtN5SuGLyuhabv
+         S9o+pymxhEWJBc7Xkt7vYF+Nvd1YmnaIv3dEfm6XCXyFjvBRocdIRwxwJQdJOb4nAr76
+         DJJ/6AdIYYeNxkfSL4nn2cwmbfJRP3SydAlttMcCVmbksCdxZ1/Pd5e1k/W9xcIghZRZ
+         dKglZ5nT67KNqyF7e0tLcJn6w/3Eq6yiXiGxV7e777R8p8qgwuGOZvSil5zYcQLet7ar
+         cCWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770306750; x=1770911550;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UTu7qU8UN7vo13iwk65Itm5Hd0Cv+O0GXDEO+OULSSA=;
+        b=u3//MpkPUll8XRBqjoM7Rfe7BWLpK17pNVuiwSpZhYSXsnGm3+QvFBoa5Bar7uOIRu
+         EpyaMmU7CgbY9JGqZBha37XTmADZH85kLHYazUtaUUOw6AdQPg8z0Y1v+E6W7lc6kFI6
+         CvL5ElnBfXuSEKxKejYv5W+bn6R4oNP7WiU3Qxrp1xtMolcgwUl5Zv8J1RgJtkQzZPkO
+         /YWD4uBk2IEYJ+AZAiQsdBmAbPn82Y/ft1zMIdME9fnvTSUzba5ArsDC5jafWbB5rp2+
+         +oBrmLe/gtkBqZm/JVMiuFJIqxp46Dyl1fN9HrbvRzhYUOaNQVZSL308aMdRwEyJ9HfI
+         e5sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3PSXSqNy1Eb1A9Y3WImohy5NZY8MBf4p+N4/7K8/frRuJnbPqcL+sSQMh/qrgp423dr2cXs8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3+mdC7m4O3w+w9OnRoc+7ZZfNS+BU64puFgkicdLr7GJjJKsg
+	26qdVOD33N6p9EFEJKpHkHOJpV8bWkgbWeKKaoim2DJ5L6s+05Dddzkn0fC6Out0ejU=
+X-Gm-Gg: AZuq6aJw5BDV+hiRQZkRjpIcJZ/hBdRi10pc8nrilzxAN46ykPFOHScu+PWITieRjfk
+	vNYsDx4/6i2BTqar7atkIVq9nnl8zaRcwHIpSE5c9RUI1C7B7tvKoNHtQ96K0tcPpBxy6rmM5Sg
+	0WrX9GU2a1al5g+bu08e13SKlgE22MYjKPTlh8Vfp5vh46CJS7ux3UrEPyrUuCpk3DoV+ck1XLe
+	ow+BbNJG9rGClgZO3p7KYsfzRC8nIE/3cV9vpbqW6PxIXJErAQ7eKA3wbC/k9591yl5baOlCOeM
+	xWz40nE5bmD/7md4ebw+p1f9BIUap9jSre4hS24K2PnHtjWQhnP2PqWNYPGkTRzgZOLa0Mg/vZ4
+	tRs6DiQSLbrT36h6ONRRnYSVBym9hjyTSlo0XGTBtgesLxHmpOF71bFJDNXVgTagzu+z87flDeQ
+	==
+X-Received: by 2002:a05:600c:810b:b0:480:4a90:1af2 with SMTP id 5b1f17b1804b1-4830e979f7bmr95259165e9.35.1770306750051;
+        Thu, 05 Feb 2026 07:52:30 -0800 (PST)
+Received: from localhost ([2a09:bac5:327b:2541::3b6:79])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436234781fbsm5263375f8f.15.2026.02.05.07.52.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Feb 2026 07:52:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 05 Feb 2026 16:52:27 +0100
+Message-Id: <DG75D8PWP35E.2MD9TYHOCQO9V@cloudflare.com>
+Cc: <daniel@iogearbox.net>, <john.fastabend@gmail.com>, <sdf@fomichev.me>,
+ <ast@kernel.org>, <andrii@kernel.org>, <eddyz87@gmail.com>,
+ <song@kernel.org>, <yonghong.song@linux.dev>, <kpsingh@kernel.org>,
+ <haoluo@google.com>, <jolsa@kernel.org>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <horms@kernel.org>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <kernel-team@cloudflare.com>,
+ <wferguson@cloudflare.com>, <martin.lau@kernel.org>, <clm@meta.com>,
+ <ihor.solodrai@linux.dev>, <bot+bpf-ci@kernel.org>
+Subject: Re: [PATCH bpf-next] bpf: Allow bpf_tcp_sock() helper in XDP
+From: "Arthur Fabre" <afabre@cloudflare.com>
+To: "Martin KaFai Lau" <martin.lau@linux.dev>
+X-Mailer: aerc 0.17.0
+References: <20260204-afabre-bpf_tcp_sock-v1-1-a22b40c630c0@cloudflare.com>
+ <167a8f4235973cd42372884aa66182a10fd17e50c70626b1fa0e659933e82b4e@mail.kernel.org> <917eadc0-9341-48d5-a795-8a7d5318886c@linux.dev>
+In-Reply-To: <917eadc0-9341-48d5-a795-8a7d5318886c@linux.dev>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.34 / 15.00];
-	BROKEN_CONTENT_TYPE(1.50)[];
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257240-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,google.com,davemloft.net,redhat.com,vger.kernel.org,cloudflare.com,meta.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,intel.com,davemloft.net,google.com,lists.osuosl.org,gmail.com,enjuk.jp,kernel.org,vger.kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257239-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[afabre@cloudflare.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:mid,enjuk.jp:dkim]
-X-Rspamd-Queue-Id: B09DCF4CBD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:mid,cloudflare.com:dkim]
+X-Rspamd-Queue-Id: BCA2DF4D0B
 X-Rspamd-Action: no action
 
-On Thu, 5 Feb 2026 12:16:06 +0200, "Lifshits, Vitaly" wrote:
-
-> >> Hi Kohei,
+On Wed Feb 4, 2026 at 11:27 PM CET, Martin KaFai Lau wrote:
+>
+>
+> On 2/4/26 5:04 AM, bot+bpf-ci@kernel.org wrote:
+> >>      But the TCP TIME-WAIT state needs special handling for this: pack=
+ets
+> >>      received for a TIME-WAIT socket can either belong to the current
+> >>      incarnation of the connection, or a new incarnation. The only way=
+ to
+> >>      determine this is to compare the sequence numbers.
 > >>
-> >> Thank you for your patch.
-> >>
-> >> Since there are no NVM-less devices I suggest removing the flash-less
-> >> code entirely from the init flow.
-> > 
-> > Oh, I see there're no NVM-less devices. Then removing sounds good to me.
-> > 
-> > Could you clarify what you mean by "init flow"? Do you mean removing
-> > only the flash-less branch in igc_init_nvm_params_i225(), or removing
-> > all flash-less related code including igc_get_flash_presence_i225() and
-> > its callers?
-> > 
-> > After clarification, I'd love to work on it. Thank you for taking a
-> > look!
-> 
-> No, you shouldn’t remove this function.
-> 
-> However, if for any reason the flash is not present, the driver should 
-> fail initialization.
+> >>      Add the bpf_tcp_sock() helper in XDP to allow the socket sequence
+> >>      numbers to be read.
+> >=20
+> > Can this approach work for TIME-WAIT sockets? Looking at bpf_tcp_sock()=
+ in
+> > net/core/filter.c:
+> >=20
+> >      if (sk_fullsock(sk) && sk->sk_protocol =3D=3D IPPROTO_TCP)
+> >          return (unsigned long)sk;
+> >      return (unsigned long)NULL;
+> >=20
+> > And sk_fullsock() in include/net/sock.h:
+> >=20
+> >      static inline bool sk_fullsock(const struct sock *sk)
+> >      {
+> >          return (1 << sk->sk_state) & ~(TCPF_TIME_WAIT | TCPF_NEW_SYN_R=
+ECV);
+> >      }
+> >=20
+> > TIME-WAIT sockets are explicitly excluded by sk_fullsock(), so bpf_tcp_=
+sock()
+> > returns NULL for them. The sequence numbers stored in TIME-WAIT sockets
+> > (skc_tw_rcv_nxt and skc_tw_snd_nxt in sock_common) would not be accessi=
+ble
+> > through this helper.
+> >=20
+> > The change itself is useful for accessing tcp_sock fields from establis=
+hed
+> > connections in XDP, but the commit message implies this solves the TIME=
+-WAIT
+> > sequence number problem described, which doesn't appear to be the case.
+>
+> or use "tp =3D bpf_core_cast(sk, struct tcp_sock /* or tcp_timewait_sock=
+=20
+> */);". The bpf prog can also read all members of the kernel struct=20
+> instead of a subset defined in bpf_tcp_sock.
 
-I see. I understand we should fail igc_probe() for NVM-less devices.
+Brilliant, that works! Thanks Martin.
 
-> 
-> There are two related places that need to be updated to enforce this:
-> 
-> igc_probe() in igc_main.c
-> igc_init_nvm_params_i225() in igc_i225.c
-> 
-> This way we avoid supporting a configuration that doesn’t exist, and we 
-> prevent the driver from partially initializing in an invalid state.
+>
+> pw-bot: cr
+>
+> >=20
+> >=20
+> > ---
+> > AI reviewed your patch. Please fix the bug or email reply why it's not =
+a bug.
+> > See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/REA=
+DME.md
+> >=20
+> > CI run summary: https://github.com/kernel-patches/bpf/actions/runs/2167=
+1977729
+> >=20
+> > AI-authorship-score: low
+> > AI-authorship-explanation: The commit message style is consistent with =
+human-written kernel patches, with natural technical language and standard =
+formatting; the technical error is more likely human oversight than AI hall=
+ucination.
+> > issues-found: 1
+> > issue-severity-score: low
+> > issue-severity-explanation: The issue is a misleading commit message th=
+at claims the change enables TIME-WAIT socket sequence number reading, but =
+the bpf_tcp_sock() helper explicitly returns NULL for TIME-WAIT sockets.
 
-As far as I've skimmed the code, the only call trace is:
-
-igc_probe()
-  ei->get_invariants() (always igc_get_invariants_base())
-    igc_init_nvm_params_i225()
-
-so modifying igc_init_nvm_params_i225() is sufficient and IIUC we don't
-have to modify igc_probe().
-
-igc_init_nvm_params_i225() returns -EIO when there is no NVM, and its
-caller igc_get_invariants_base() propagates the error back to
-igc_probe().
-Note that igc_get_invariants_base() currently ignores the return value
-of igc_init_nvm_params_i225(), so I added that check as well.
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
-index 1613b562d17c..e4200279e15f 100644
---- a/drivers/net/ethernet/intel/igc/igc_base.c
-+++ b/drivers/net/ethernet/intel/igc/igc_base.c
-@@ -235,6 +235,9 @@ static s32 igc_get_invariants_base(struct igc_hw *hw)
-                break;
-        }
-
-+       if (ret_val)
-+               goto out;
-+
-        /* setup PHY parameters */
-        ret_val = igc_init_phy_params_base(hw);
-        if (ret_val)
-diff --git a/drivers/net/ethernet/intel/igc/igc_i225.c b/drivers/net/ethernet/intel/igc/igc_i225.c
-index 5226d10cc95b..ee1a8eeed9d5 100644
---- a/drivers/net/ethernet/intel/igc/igc_i225.c
-+++ b/drivers/net/ethernet/intel/igc/igc_i225.c
-@@ -476,21 +476,17 @@ s32 igc_init_nvm_params_i225(struct igc_hw *hw)
- {
-        struct igc_nvm_info *nvm = &hw->nvm;
-
-+       /* fail initialization for NVM-less devices */
-+       if (!igc_get_flash_presence_i225(hw))
-+               return -EIO;
-+
-        nvm->ops.acquire = igc_acquire_nvm_i225;
-        nvm->ops.release = igc_release_nvm_i225;
-+       nvm->ops.read = igc_read_nvm_srrd_i225;
-+       nvm->ops.write = igc_write_nvm_srwr_i225;
-+       nvm->ops.validate = igc_validate_nvm_checksum_i225;
-+       nvm->ops.update = igc_update_nvm_checksum_i225;
-
--       /* NVM Function Pointers */
--       if (igc_get_flash_presence_i225(hw)) {
--               nvm->ops.read = igc_read_nvm_srrd_i225;
--               nvm->ops.write = igc_write_nvm_srwr_i225;
--               nvm->ops.validate = igc_validate_nvm_checksum_i225;
--               nvm->ops.update = igc_update_nvm_checksum_i225;
--       } else {
--               nvm->ops.read = igc_read_nvm_eerd;
--               nvm->ops.write = NULL;
--               nvm->ops.validate = NULL;
--               nvm->ops.update = NULL;
--       }
-        return 0;
- }
-
-Does this diff make sense to you?
 
