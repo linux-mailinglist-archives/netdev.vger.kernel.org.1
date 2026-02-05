@@ -1,447 +1,993 @@
-Return-Path: <netdev+bounces-257288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDMsFE/mhGlf6QMAu9opvQ
-	(envelope-from <netdev+bounces-257288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 19:49:51 +0100
+	id KCEuKYfmhGlf6QMAu9opvQ
+	(envelope-from <netdev+bounces-257289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 19:50:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9B94F6924
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 19:49:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E89F6945
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 19:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7516B3047E65
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 18:48:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 165C1301BCE6
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 18:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50957301024;
-	Thu,  5 Feb 2026 18:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF665303A18;
+	Thu,  5 Feb 2026 18:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="gbmieBj8"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RbE/xXnv"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013044.outbound.protection.outlook.com [40.93.196.44])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A8CEACE;
-	Thu,  5 Feb 2026 18:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60F42ED844;
+	Thu,  5 Feb 2026 18:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.145.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770317283; cv=fail; b=TYwBZjbB/btxOXWP9zsyC1mq9UQ5ZVmh1K342TyrGCWngG53xIAago8UyQvgGGmC1soo1QL5bpZTU1VGpzvc1EOFM6wh8gwSE2sS4ax+NwumSpmHdqIKhtXdcLf+WHy3J0QwtjV+SN3rrSXPLEmehZdMa7EeZ0TimCvLojuDWZw=
+	t=1770317335; cv=fail; b=QNj2fIO7dMadYAyI+XyXkyRvntAvLwO9T06PzHU8vRJ0ID+ZEsUYjR9huJ1lgVuFdn3h5NYS1ERfNS8xI4laMQAoDqtyuDLUCP4YXRmcHFyMam1EVqpBxngFo9krUl5Sg0/szRnE22JbWNRjuFDJzwaGgWxt01yZwZjXZTAvwpQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770317283; c=relaxed/simple;
-	bh=oD+jpQqwhG5OiaygLBZ7VpNT4QQYldd41oRbPY9GHSo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UMj85MblMo4sCXQ+Xd4kgu/NiUlIredYBK709ozPF1l1oeKrAu8K/IZZSV48yT9vV1HrdIEnss+8W7OyuoRmrMSB7hac8VIaRQdHQc3W12DLFDEXtoyHrb81JP4ImG+aMGwgdpktBkRMizM7eehHfV/49cSRGtxDbyRossc+VK8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=gbmieBj8; arc=fail smtp.client-ip=40.93.196.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1770317335; c=relaxed/simple;
+	bh=e+zgGmGr76klzj3J96ZtQ4ucW/ZIyn2I8BglnQXdS9U=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=p+OAS0DeXaTzh5Mb5RP8WEWSBv5bTMJ8ekSstzTGCkbgM+qEaLrahqyzQVKgyHeyXEDXznx1FTKCMypJ0R0lcVxn3WvNkS2J97imUfA/QUJaktHMW8dEpq9LCjARxp1QaYQjV7Yy97/6fZJAOHW3wXNL8pfc+FkGg+IJKk848Xs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RbE/xXnv; arc=fail smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 615FfTEA2704363;
+	Thu, 5 Feb 2026 10:48:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=6IkBo399Aaj67acvNzzJjK0Kzpa5uFsU8couwEhpWxc=; b=RbE/xXnv7Zqr
+	LeD9hmf01xxfbEWaq+OWrjPb4orOK063TCb56/jzd8pkTtNML3U/WsNfR+ny99KZ
+	JZJvVqFdot9T7HrOcPYYtLTHFI7/9jk0F4dJnE9kOYJLbE26cmJ2C+n96WceDmBs
+	gbsg5gPnSUZ7L0frKYDXqSiJT3C3Qt+KEzuCnZXDidaC7KjZxpdSKdzHjp4bP+ht
+	1CUu0R5+2h84IshInYfQw8y3whwcW4WPuG56qlCzBG/ATASv29xonmilBL+A8Xsr
+	f+YY1pTjc5u+yq2wZqPL/waVu29sOXAUjFP8gMUFQDFG5PXr5aimpo68UlvoGz4/
+	vVZvdlcAog==
+Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11012006.outbound.protection.outlook.com [52.101.43.6])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c4x2sjhah-2
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 05 Feb 2026 10:48:41 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O2TrPhhNpHt7rf1dhLn4eCBmv3CIU/RQjvAyes9OS8vtu3n8gRL95dbkWWTI8aNhYp0khoXYNRWFGwgC2+15TuZnByDWRSWoFjAvISA3VI376puM3IqbvpykD4wNjuEv1thhsaNasIODCPVA9yHYUVYWPQyua9mNgGRWZIjdWgT+CgFlJewDNrG8CokJu3a2nOvABVy/8p1YK5CjrESxM0cH09HS5t3zRKIT2MrS83iEghZ3IXe4ueEGk8mG2nFhia8/bJNkeCokCsDPGMnW8aIWnTiL4jUfhk4P3oE1IDgmN75pcx+ZyaCGJL6iHWt0C9azBaraFTal5Dt/igCXSQ==
+ b=DaeZz3PSuUVbmhPXkA03QVpn2ple73jResyumBfa+2sX9tU3TgQtb/FGosaoTVEhy59Q7v51sZeRHsSeB6Beqm58Y+aTFmFdu+daLn6IpJJMQh6AyPP8G4ZBuYUnC8zfUH5VU3pPmRJ5OIiA/EoNFfxBs1zj8qycVAKBJ9F9qGsvoO8J3kB6cxjl0KjE9TMDFdR4r7F3yqUsOs6M+U2+k8kYftPSVks9ybIATSbYGxTtzgPJQwaDnM2n9VB2jmn5DAI+WH6JFoHpDPsLddiWEKIp2vHw6Mp1CHOyxN79KtzfaTMHCoZiRwjuzRg9Zcnz3PMWfRoFHaVyH4dm5kkxmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6KITCf7MerN31744upCXntDMHW1AnR5ZC0XJZtL1dl0=;
- b=qZYgHwVmJqq8pV4DgmrTq9W13qHyLIQP3m/a+vWMg48JAEyXL6bp3g/jy/SZK6qZDHheGT0nmuXSmnQl0c3jsuhasXHnm8SbcmL8Xrw6VhokUHJ+Pn7IZGjKKOf0SGDQXQfdGRRwc/3J7ngHvY7O+s3OGU6r8FZmlmtcscucYwEF9S979EhsOhHvwIBU0PBgZj38nbw7ZG3GivnqKad8mnMGzb9ubogh/OL5Wdlv1Q64UrLk/tNU9zFwUFqL+HiSwn7iUQKtBC0/jAWdcvicZ1gSPMGBI1C3Tu/v5jZobg5qNptXHP1yfA8TEsAiOqary6cgCSJUgpugke68NsLakw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6KITCf7MerN31744upCXntDMHW1AnR5ZC0XJZtL1dl0=;
- b=gbmieBj8chIdctuEl6UdY/dymIkEpcJDIofrLLpCH6fUbN4Sno+AG7mJVjABP38bSLTtOsMntyU6vYp/Lf3efCqMOi4btw/3++XydoxTKX/epP6rtERNgDZQURoFnVFE7d2Kb8yThHR52fE7m+QWJoRybrRkPfINn+QgKUoJQBE=
-Received: from BYAPR04CA0018.namprd04.prod.outlook.com (2603:10b6:a03:40::31)
- by SA1PR10MB6613.namprd10.prod.outlook.com (2603:10b6:806:2be::20) with
+ bh=6IkBo399Aaj67acvNzzJjK0Kzpa5uFsU8couwEhpWxc=;
+ b=K7ZQrurwoIc/bxp7M5W5fKLOnzZBCv+VB3004hcuJFpnAVKHoObLDKQ+bST1KPrnys6qMalARH4O0oSGWngiOxjFXGy5aeNkUs4Ro8xQkFJXCzeAKZlOUK1l3OvEYNsQE/n4GpzHdIFr+9epXVOLwAPLA+6COsno2NNru7fkpIXUMDF/kdUGMYiaR1rOP6g0JldvPRNhPHDKZDisBJ7hHm6D1r7b+Cm9MvurTm7M8h9Phm0vV3rsF1dgvc7yAbyCTpjzxjFjqU5OY6Xsw3obwgDCV/luyNH+ql8E1wZkhhtjEzMCyY65FxMox53SV2L0+o+0lEqnn4Eys4tAuh7dNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
+ dkim=pass header.d=meta.com; arc=none
+Received: from BLAPR15MB3889.namprd15.prod.outlook.com (2603:10b6:208:27a::11)
+ by DS4PPFDD0B461C1.namprd15.prod.outlook.com (2603:10b6:f:fc00::9c7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Thu, 5 Feb
- 2026 18:48:00 +0000
-Received: from CO1PEPF000066EA.namprd05.prod.outlook.com
- (2603:10b6:a03:40:cafe::53) by BYAPR04CA0018.outlook.office365.com
- (2603:10b6:a03:40::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9587.14 via Frontend Transport; Thu,
- 5 Feb 2026 18:47:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- CO1PEPF000066EA.mail.protection.outlook.com (10.167.249.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9587.10 via Frontend Transport; Thu, 5 Feb 2026 18:47:57 +0000
-Received: from DFLE201.ent.ti.com (10.64.6.59) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 5 Feb
- 2026 12:47:57 -0600
-Received: from DFLE213.ent.ti.com (10.64.6.71) by DFLE201.ent.ti.com
- (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 5 Feb
- 2026 12:47:56 -0600
-Received: from fllvem-mr07.itg.ti.com (10.64.41.89) by DFLE213.ent.ti.com
- (10.64.6.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 5 Feb 2026 12:47:56 -0600
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvem-mr07.itg.ti.com (8.18.1/8.18.1) with ESMTP id 615Ilu8h694413;
-	Thu, 5 Feb 2026 12:47:56 -0600
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 615IltrX028686;
-	Thu, 5 Feb 2026 12:47:56 -0600
-From: Meghana Malladi <m-malladi@ti.com>
-To: <vadim.fedorenko@linux.dev>, <jacob.e.keller@intel.com>,
-	<horms@kernel.org>, <m-malladi@ti.com>, <basharath@couthit.com>,
-	<parvathi@couthit.com>, <afd@ti.com>, <vladimir.oltean@nxp.com>,
-	<rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
-	<kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-	<andrew+netdev@lunn.ch>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <srk@ti.com>, Vignesh Raghavendra
-	<vigneshr@ti.com>
-Subject: [PATCH net-next v3 2/2] net: ti: icssg-prueth: Add ethtool ops for Frame Preemption MAC Merge
-Date: Fri, 6 Feb 2026 00:17:47 +0530
-Message-ID: <20260205184747.2451816-3-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260205184747.2451816-1-m-malladi@ti.com>
-References: <20260205184747.2451816-1-m-malladi@ti.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.13; Thu, 5 Feb
+ 2026 18:48:39 +0000
+Received: from BLAPR15MB3889.namprd15.prod.outlook.com
+ ([fe80::d5d7:f18c:a916:6044]) by BLAPR15MB3889.namprd15.prod.outlook.com
+ ([fe80::d5d7:f18c:a916:6044%5]) with mapi id 15.20.9587.010; Thu, 5 Feb 2026
+ 18:48:39 +0000
+Message-ID: <15c57879-f759-4bd6-8ac6-3f466567a33a@meta.com>
+Date: Thu, 5 Feb 2026 10:48:29 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/2] virtio_net: add page_pool support for
+ buffer allocation
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>,
+        Matteo Croce <technoboy85@gmail.com>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kernel-team@meta.com
+References: <20260204193617.1200752-1-vishs@meta.com>
+ <20260204193617.1200752-2-vishs@meta.com>
+ <20260205000916-mutt-send-email-mst@kernel.org>
+ <efa1f22b-eabc-4602-8886-b7cf5e3c057e@meta.com>
+ <20260205013640-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Vishwanath Seshagiri <vishs@meta.com>
+In-Reply-To: <20260205013640-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0087.namprd05.prod.outlook.com
+ (2603:10b6:a03:332::32) To BLAPR15MB3889.namprd15.prod.outlook.com
+ (2603:10b6:208:27a::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000066EA:EE_|SA1PR10MB6613:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80971913-0e41-4195-7e08-08de64e71488
-X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
+X-MS-TrafficTypeDiagnostic: BLAPR15MB3889:EE_|DS4PPFDD0B461C1:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4875c6be-68e2-44f3-fb9a-08de64e72d05
+X-LD-Processed: 8ae927fe-1255-47a7-a2af-5f3a069daaa2,ExtAddr
+X-FB-Source: Internal
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|36860700013|376014|82310400026|1800799024|921020;
+ BCL:0;ARA:13230040|1800799024|7416014|376014|10070799003|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?G4fpzkdRWDF6q1xA4qDQT+WXR8HtgedX416SnSY+lNFGMqX83SbjqZn4cob0?=
- =?us-ascii?Q?2NN51xYSDM17+mMNw8XNY0p+bV35xG1v3RvhTnTzMvREhbp6gNdrENzODc59?=
- =?us-ascii?Q?xwgMv7wvbsSNW1K5eQu8S0Jk84WRLhuPeuLDmTm2JO9HH11JE3nro1BWAcnY?=
- =?us-ascii?Q?HunrI8pIoa/rcdMSuuoJfJy/0PrwNOdjOvyFggFchRxx7AbnxsPrvOWvbwsZ?=
- =?us-ascii?Q?8yxVoS0LhPjZ2mQa3L5VY0YDRJsYbS932rphTzFrvBLkGmZJZcSWtaXMrNmg?=
- =?us-ascii?Q?EZKLeQoORZyTY/zVM+dW1HByw/AvFEbh+1S0Tq+0DhPiV7sH0jFBf9NrDvoY?=
- =?us-ascii?Q?1mWcaRSSOraGGLi6Ek1HCb2992ZSmqvcQoPHEScQHCwBUkJOGweeBgvuh7JE?=
- =?us-ascii?Q?/Tw0KprJc+DOfl4J59+DCOMC0Lx0Xr9Q/lkVMg6vXgNg7hTTcQUAEAfGwP/V?=
- =?us-ascii?Q?rZx5jkMJD9gT3Xh+Cq8Ka4nOxxYXO8zEBmhfdbd00v4wEEieIY6Oy6QG+/5I?=
- =?us-ascii?Q?ECQBTSd5ODHd8F5blzPHIvY+xHBqt3JYrxmyuoiDbhBnXrMGtIb7bUN2bfHE?=
- =?us-ascii?Q?YRr14BFr4ULRRNtRYKVsd/pv4R1zxoJS5SUA/vvsW/i4cpjpGPNufnpRGwuM?=
- =?us-ascii?Q?G2WSztGgHx7sr1ybcvLf+wfJTjXdm2v4aXE0DNrpLnqTCY9Jk7Ym893YcN0q?=
- =?us-ascii?Q?j+yGI0DP1tEmYkdVLhDpt/vQjjNp1pkqLLIuNsoir4VmoT9hqUYIJa/Q1rAM?=
- =?us-ascii?Q?SOXZEjeawWGLFNRhXK/tk/vz0wLkHDvAr814u+/G9Q5ZqpSqp7JWOMJNm+H5?=
- =?us-ascii?Q?sMGvliOCkyqk0N8m/bBel0TZRz4MBDVicE450gQSuUS3zoTZv4yM8CSK+hoX?=
- =?us-ascii?Q?nPCobtFC3DCIASCBiXtbmJrg2J3m8ihDyX8uF1o8yOdQlXJivuctYcOF3zPa?=
- =?us-ascii?Q?ElLdrGz6+nx8ekXqXiHfzJLZw2hm5qCv+ie3GpAzNjSZC2rBHiZhVTSd2fW8?=
- =?us-ascii?Q?pw4UuLzJ7V1dUFkA+7Mt5B2Ye1fSDy7RYy0W00Uvs60CmfyFbfNxtgq7AS3H?=
- =?us-ascii?Q?JesqyzYSRUFp6k7mkdTspGXomCCALw5VCWMuOfe4JPqdTwwFTs0hBW82z8Nv?=
- =?us-ascii?Q?6vAcgVNnfNAGn97Budj1tvZMB+yGe1hFgnuwGDi1NBpDyuzgsF1Ee68/qZEq?=
- =?us-ascii?Q?gOl3tLlW4lQhZe6rUS8pXiroGiusvHyA2L+emcqYy8YCcq1TW43PUP6oKEVT?=
- =?us-ascii?Q?Ru/pSiDcPuq9kAQ55oG0sfikDeFSDKxP9zWaVwRROA5SeVAa/cgL5yRDeChp?=
- =?us-ascii?Q?ByVfVVUwrAYXt71VSZvdnZ2yrsilTTFDqRg2E3xgRmGWsob5JmNWg0jqNwoa?=
- =?us-ascii?Q?mqoXuR9vmFItbxow6h7ii4+O7pP/eE7xdyZmnnjBsPyFMsY2lPXTRdhS5ujP?=
- =?us-ascii?Q?lEnuKLnFfBLVJ1v53sjeJVoUzdkbrhgmtgrAVT0Mn67R6dRj+fP+1MMnsLvk?=
- =?us-ascii?Q?L/vYboC5JJFJJQbzHNYPjbLO8AuUo1Z7e1cQg+WGOwGehfNhAdMWfzbWgh5G?=
- =?us-ascii?Q?dKnc1FBb0ETuiaO87h5uZAZcPw8bQbrGLlWKnnR2nJ2315XK3iQOyTCO1PJf?=
- =?us-ascii?Q?vEH5AdTEYYMUNk/hvKFWpiJoGjzBn4/wgSiFJMJ3grbTsXlJtMqKRPpuuseY?=
- =?us-ascii?Q?/+h40CfcLI1R9X4E2Y9PI8Trf3M=3D?=
+ =?utf-8?B?SzI3bnhWekY5b3JQRWMyOStSVG43TnAxNmx4QmxIOEt1TU1oUDdmYStRK0Nj?=
+ =?utf-8?B?dUxCVVBxZmJDdVF5MWhVNlBwMGhqSnVBcVVnSG1wQVEwem50RUNabjRUWlc3?=
+ =?utf-8?B?SnBqdnRHY1dieGhZdTE4MFJiVllsaE96cm5JU3gyK2xaNmdEREoyYVdDOXZJ?=
+ =?utf-8?B?UVFiM1B4SCt4VEpHRVZzank4RnNFdkowV0pQbUozUk5NcnNBRHJhNkNUd2JN?=
+ =?utf-8?B?Z3ExdlZydmMvemtPekEvZXdscGFtS1BWNkNNOUJWcTZQRzV2cXJmUUtISzVv?=
+ =?utf-8?B?YXgyWVlUd3AxZlo2V0M5ZURTdkM3Q2lTSEdjdWRuRmZRcG5IT04rNFhjYjBM?=
+ =?utf-8?B?WE0zWm1qL2NPVTFGMVdhYkNyME9sNDdHYVh0MEVQZUJRRWVFazJhTW1VR0FO?=
+ =?utf-8?B?RmUxeEt5VStiRjVtTlVCN0hVY0dEOTdDYS9QL0NvWC9TaklkZGNpUnJwc3dU?=
+ =?utf-8?B?T0VUVFVxakhwSyt3b1c4RG5pNml1YkFTL25nK1VJRThFRUlJSEpVSU1tekZT?=
+ =?utf-8?B?RVRoeER0T2Y1a1lhQ1lSdmY4VmNkVFg4WFFOMzQzYytPN3BVRjBrUURxTTRS?=
+ =?utf-8?B?aGRyTEVEczQxNTZ3c2FtQjl5VG9LR3dSYkQ2MVNWRlhzSSs4ZnVxMDZVSjdO?=
+ =?utf-8?B?YlZQQzU3Y0VMRjMrVUNDZU50ZXBlaWN5NS85N2tKQTJ2S09QSzF3dWFJV2xk?=
+ =?utf-8?B?cjVGNXJHWE5Xa3kwc0Z6TDBsMm8wc2RPb0VLbk10VTM4aWphUXlKT1N4NmxF?=
+ =?utf-8?B?Uno1MERmVHpic3RrbGxaTnRNbXREVVJjcFlBMDlUeU9NUHJ1TzhQMEdJTUJE?=
+ =?utf-8?B?KzZINWFNejlQYlBlaXlsWlRqTDlha0xxSTFmWWtncXpkT1laUW5pQkhQUjdI?=
+ =?utf-8?B?RER4ZGRRc1pDaHZGelNwUHZ0UWxtODI0YU8xOXlRNkpaTjM2dmtVRU5lRTZC?=
+ =?utf-8?B?WStlZmhiMWQ2OTlQUHhUTEY5bEx6WlU0NjhONjJuY2E4VFIxcjY3OUppWS9a?=
+ =?utf-8?B?SHRoV0RKU2ROVUFxOHpkZ0lFaGc2Vm5BNU9hTU9yNFQrbmtjejc5djdVbmt6?=
+ =?utf-8?B?UmhrMWcrQ2laUDFqNTVRdGhKTXk1aHl0bDlkS2ZVczFqYUF2V2YzSXdEUUUr?=
+ =?utf-8?B?dk44NW5ZSjNKVlJjeHhWOGlSQWEySzQwbCtGMHlPdTRBRVlIQW82TjdXcDNI?=
+ =?utf-8?B?cDdMRFp4aEh4dXRqOFNyemFrSUpqRURhNWpKQ0hCMGRyOXM4K0ZrV01XMUtE?=
+ =?utf-8?B?aE5DaFVNa1ZoVm81cGtoU0RhZzBnajJZVHlmOGFuUTZzTDQyUHliNnY2UnZR?=
+ =?utf-8?B?NE1XbHNhU2lkU3dkVmlrUkZCVWlrYjN4WUZpaEQ4blJXQ3B4bHlvOUtDbTV0?=
+ =?utf-8?B?NWNwQ1Rtd0xPbE1CYVA1WVF3U3VNMk42U2txckFyQWFTTFlsOTVkZDlwSHpP?=
+ =?utf-8?B?MVlDSHExbzZrZ0VVY0FxWmRVS1dIWU94N0orSm16MjFnbzNNSHpWTVJxVy9V?=
+ =?utf-8?B?azE1Vy9UQ2tFMmtUMDVVR0dHVTZ6UXdrUVJZaTcwVWZCelhKVGpSMitMM0l6?=
+ =?utf-8?B?cmRlamxveUFXWlBlaUQ5TzVtY0JsY2NOY0VDeW9WNzNjeExnSk9FRHFwRzh6?=
+ =?utf-8?B?ZXJsOGVvaDNWTk05cnhYREdVbjV3dUhsajM3MC9QUk1NWHlzYUZGeVp3SXhQ?=
+ =?utf-8?B?QnVpcEF4NnNzQ0xSU0ZTYlprUUFoVFdMbFFKTDVRSk82eVNuWGRMNWhKSzFr?=
+ =?utf-8?B?Z3huWGVmb0pBSlI5SUU0S0Y0M002aVplc0FTSFNxWk5tZW90bVhsQmdHbktG?=
+ =?utf-8?B?aTR0ek1ySFZhRks1SmxienBIT1NEN2cyVzR0amdUU1h5ZVJjL29VN2lDaGsr?=
+ =?utf-8?B?QUNBdFh4WEg5blFZMDk0Y2dCR3RnYldNTzdyRjNXRm1VdjlNbXN6S0Y3S3Y3?=
+ =?utf-8?B?eXVWVEpXNk12a0tMN3dvVHJPQ250TW5JaGRPdWZ2Ni9JbXpDcWwzbzBEWVVa?=
+ =?utf-8?B?ZlpKVVZnU2o1V01FT2ZsTTlqcW1qdFBCbHovU3RBZlhsblNhTTN2cUVtUVRJ?=
+ =?utf-8?B?WnB3RW1vVVk2c3lKMm8zeFNvbXpYbFVqZEhIZUV0SmxYK3dLaFdybnpicnlp?=
+ =?utf-8?Q?tqQ4=3D?=
 X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(7416014)(36860700013)(376014)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR15MB3889.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(10070799003)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	qPmHbTekEHMyv2hLjEabDLuhyMnIdwM7WnyWKQ0piZ0JBVa488MMFnD5CwXn2+aoUnc98Gbckn0bexbNlaPjyOoXhvFgSE827vrdgGaYCsGziGukWXM0sKmFTAw859gDj/BaesLQfM6hPUTDGakScbT2bd7WMdT/oWF2eNIQ4xpC77prwtdTx92wUUgqvneoKqu2iDKgLhmiTKuSAFB/x0fsL0dWHK6NuJYvwVKH0UXHL5HtKOTxNVF0Kmg09SVL/RuPYFgP4smstPK3/a4yqizfT1xxUJwo+CKF9QE6+2rgyWQKRfUIaw93YBnc5yUxHZOH2960GwYprf1qT/X//jWM4zDWQVBv4ReOM2ftLevNhuChllaoB+wPW81Px8PPrQPisv43QmTONCbdiSgTGeLD5143CWByTdNiRTunZNhKf0MwYkD13Tn83nsdN0QP
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2026 18:47:57.6586
+ =?utf-8?B?bkpEZjdESkdLSjNFVzVqWE53bm9valhib0oyKzdXcVhCMUtzdGgycUUrUmxF?=
+ =?utf-8?B?YWtqYkVoWmdWVU5QL3NIaVEvNm5kbjU1eEhjbHlnUGFEWDExVytRY0pyc0J3?=
+ =?utf-8?B?eVBZS2RCT1p6TG9xOUpZdTJIOUJvaDNISHRaMTBQalU2ZE8xMlJpSEpMZE9T?=
+ =?utf-8?B?ZGRyMzg3UnBMckdCVXBTdElKcW8xbGdyclV4RnhGQzBZT2V1dHNIT1Ewd09w?=
+ =?utf-8?B?b0NpR3dZMWVSNngyQ2x0ajVPclhQVHZEQ01NWUVnWnZDM2NKQkUvWE5Ccmlt?=
+ =?utf-8?B?TEozUU5nUTJGZjVqTnpzeFg5NVVjMEV0WldjSXh4V0U0OWR2TGMvdm1WQjVu?=
+ =?utf-8?B?ZThieHdDTEdobmczQmVoZC93eXdTUlF2VEQ0c3RZbFo0bnF3S1pCc2lVSElZ?=
+ =?utf-8?B?SHMzYjg3TDU4RWYrVkd1SGJqdmNRR3ZRczVmR3hobCtGdG1YY1JwSURnd0NN?=
+ =?utf-8?B?K0lCcWE5ZlhuNDdQWmdEbTNvMUxoRGhhWlRFK0JQaEJMRUxtZFJJRndyWDcz?=
+ =?utf-8?B?UFpRN0orcHpNTnRkbitBZDRmZmpBMlJRVWhqTFFMTzRLamd4Z1c1RStVbE1T?=
+ =?utf-8?B?TUlUUDcxZnB3VUlZaUxXbFdHd1JidFNGb2g3MWtueXpNS0xRbGNNczdXUVlD?=
+ =?utf-8?B?QVVjWllBK3V0RHoyRy8xMzJXcUtZR3IvNjN3TjhHRm1aaFZxY0xtTkZVdzdY?=
+ =?utf-8?B?V1hSTDFYVmhFWklSWHlOSUMzOWFUeE4zaEFKejFYSTJKSFFvTnIydVcxV083?=
+ =?utf-8?B?OW1MSWVFc0NjTzgreDF5VkYwVHBvN2ROZWV5UWlLN3luSXlCaVVzUGkzRE9B?=
+ =?utf-8?B?Wk5TcStOWEt4WHZ6allNZ1pCcUFMc1haZFZkQjBVWENHVFNWWVEyT0tNOTZR?=
+ =?utf-8?B?ZFg2eVZsMTdpdXYrM3ptMEFqZmc0TGt4QVMxZFRjRTJGS0RpT0ZTTC9WeEtx?=
+ =?utf-8?B?K0dHYzRscXBJRWxRVUZPRWJkT3poMHJCUlB1am91WU9ITkRaOXlhLzRvbFRm?=
+ =?utf-8?B?Y1hBc2VjdW0yZndUK2hOemZyNHh6bEN6a0lLbktwYy8yU0xjTGU5OVpnWmFF?=
+ =?utf-8?B?cEoyRXFVNXUwRE9sOGthb1huQUVmMHNyZ3VWVGlORVdvWWkzd2V2NWlGeUdI?=
+ =?utf-8?B?b0htRy9HVGd2bndSUXgyMjhvaHJ2UGsveFZUVnVSd0ZQYmdZV3dySnB0OFU0?=
+ =?utf-8?B?WUh3d2tuUnY5RkVhVTVKcUkzdTgvYW1hRURFb0hKUFVWR0V5STJkY25QYnZY?=
+ =?utf-8?B?ZmVGMTc5TXJKNEQ0ajAvZFBTWTV4YzNpWG9rdDFkbkR3QTVZVFFCeDRkZE5L?=
+ =?utf-8?B?V2xTWVJnbVM2YW9CYnphRi9ZN3NIMzBFckZKeUZ6dUFjbGtmbXd2R21tWnpx?=
+ =?utf-8?B?OU5pUmpVU2JhZlBuTG9SUW9BcGN3aDhGa3NVN1diZjB5K3lEMUVlWVlCei9D?=
+ =?utf-8?B?V1BtQjdjWHpYU3dRZGhFYlVvR1ZIdmRBS3FiVW5BWEN0TnZPcGJZb053ZkRO?=
+ =?utf-8?B?Uy84RTVMcDFuVzJ1dDRBajZCa0tnQW0vdXRDNUg3OXRzV2Y5a2VVVkEyKzlX?=
+ =?utf-8?B?M2c1aGhLTXRsREhNSkdMdEhLenBCSFkzTEFhY0NOaEhUWTlrbU5tQld4VEUx?=
+ =?utf-8?B?RWRrLzhjZEVUcFlHdUcwK2pWNFBJSFpISlhHY1llaTgvdzd3OG1uZ01ldFFS?=
+ =?utf-8?B?L201ajdYSVllUTkyVmtzZ3VoNnVFVEJhT3RodlhtNlhOenlkeHVaL0JrU2VC?=
+ =?utf-8?B?VnhvRGwwSkZ0NmFUYWNOaXpSOGoyUWRjR1lFTmo2U3kxMk5ndGhxZUppR0w1?=
+ =?utf-8?B?WXREYlFHekE5MzFCdGozMUVuL1VERUx2aElYUS9tT21hSUdTMFBLbCtJNHQ2?=
+ =?utf-8?B?VGFkZ1lBTVF2WHZDV2NrazJ6R1FCamhrVGN4ODQ1ZU9OZmUzMGJaekJpL0J6?=
+ =?utf-8?B?OVYxWW9sTzQwVnRjcG9tVzJhZS81dFNWNnpwdGFSZVE4dlUzR3l1T08vZmhx?=
+ =?utf-8?B?NzRoUElCTGdXaGRXaU5XV0trTWhUcytwazJveFg2bFB6VW9Wc2JtZTdOQUEv?=
+ =?utf-8?B?R3pQL1pJc1pPaEVyUWw3bFlFN2pLYnZNcXFiVmFSUkdvZ0lFRm1ma3lRckM2?=
+ =?utf-8?B?RlA3VnB6RzJQQlRLcmpqV3dRUUZTUUw0ZEZrbXR0aFJOUG82SEJyNnR4aFRF?=
+ =?utf-8?B?WU5nSzE3N0dIQ0hzbExHMHFxbEd5VWFUZ3lySDRCNVZ0ODRhSHlLMkFWZ1Vz?=
+ =?utf-8?B?SnVSQU8xN1A4TFEvN1AzdVFvQ3pSSVIwY0psTFFValhpelNDWEY0UW5iNVNG?=
+ =?utf-8?B?aWRrSStucS90bFNpY3NSNWROOGh3VzRZaVM2ekI3VnRPMlNDbU5yNExJcjQ2?=
+ =?utf-8?Q?RZbcDHt7fXE2q5II=3D?=
+X-OriginatorOrg: meta.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4875c6be-68e2-44f3-fb9a-08de64e72d05
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR15MB3889.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2026 18:48:39.1986
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80971913-0e41-4195-7e08-08de64e71488
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000066EA.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6613
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CPVAdjf4XMVle0YTeCZJTwd9qK2FaxfOFRsCRKUYnvcnJtgS0AHfwTZr+i1fUA0t
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPFDD0B461C1
+X-Proofpoint-GUID: kccYb0LPK9igERfFVJp8XfkCOtUnQYay
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA1MDE0MyBTYWx0ZWRfX1FSCSEDYgpvH
+ kePvFGmBM3MUTDypYVFFdQjI6eXyLrGNcNYLZlTeXHPlW2FCHOrSTgj58gC9cIVqmQ2nO/i+004
+ A49q6JTrvde53bmsbea6wDiImuWTwgOq1fEmLDQcxcuTdcto5AHVTTgCUCnl1C9rRjDXAWvu3Lq
+ s0zzTx3e34z6S8PvSGI/Rw3pdJIYF/LuYk7S4SMKUeVBH3B2GxEeRSceOoL3BDeDAnxh9bXSWUP
+ RbNYuHo694kPIP0CQd4nsFxkFY1WeP26Eq+xe5wSZBZqwgYnK1mPGi6YmC0gPdh0CoCrJGWRdnu
+ yT17rmx8VINMZ0+r2SU99M0dYa3m8qlEwI+eedm4GVm5YkWK47yjzWxhd9Wx+I19RLRyEoGB4Dd
+ NCA5eJcMlFwUqvwngI7TcP0TpSn/iKKgtNLZP9kfJeN+VD3sWBtnj1xORtajH6M1ACTD1f2rNC4
+ mT/LFI45h15y+0qEvhg==
+X-Authority-Analysis: v=2.4 cv=aPz9aL9m c=1 sm=1 tr=0 ts=6984e609 cx=c_pps
+ a=JXicDZ6CVi74U63V4YFJkg==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VabnemYjAAAA:8 a=p_itvfGdbNRI2ye1EpMA:9
+ a=QEXdDO2ut3YA:10 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-ORIG-GUID: kccYb0LPK9igERfFVJp8XfkCOtUnQYay
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-05_04,2026-02-05_03,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257288-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ti.com:+];
+	TAGGED_FROM(0.00)[bounces-257289-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pp_params.dev:url,meta.com:email,meta.com:dkim,meta.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email,ti.com:dkim,ti.com:mid,nxp.com:email];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vishs@meta.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[meta.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: A9B94F6924
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: E7E89F6945
 X-Rspamd-Action: no action
 
-From: MD Danish Anwar <danishanwar@ti.com>
 
-Add driver support for viewing / changing the MAC Merge sublayer
-parameters and dump the Mac Merge stats via ethtool ops: .set_mm(),
-.get_mm() and .get_mm_stats().
 
-The minimum size of non-final mPacket fragments supported by the firmware
-without leading errors is 64 Bytes (in octets). Add a check to ensure
-user passed tx_min_frag_size argument via ethtool, honors this .
-Add pa stats registers to check statistics for preemption, which can be
-dumped using ethtool ops.
+On 2/4/26 10:40 PM, Michael S. Tsirkin wrote:
+> On Wed, Feb 04, 2026 at 10:34:38PM -0800, Vishwanath Seshagiri wrote:
+>>
+>>
+>> On 2/4/26 9:30 PM, Michael S. Tsirkin wrote:
+>>> On Wed, Feb 04, 2026 at 11:36:16AM -0800, Vishwanath Seshagiri wrote:
+>>>> Use page_pool for RX buffer allocation in mergeable and small buffer
+>>>> modes to enable page recycling and avoid repeated page allocator calls.
+>>>> skb_mark_for_recycle() enables page reuse in the network stack.
+>>>>
+>>>> Big packets mode is unchanged because it uses page->private for linked
+>>>> list chaining of multiple pages per buffer, which conflicts with
+>>>> page_pool's internal use of page->private.
+>>>>
+>>>> Implement conditional DMA premapping using virtqueue_dma_dev():
+>>>> - When non-NULL (vhost, virtio-pci): use PP_FLAG_DMA_MAP with page_pool
+>>>>     handling DMA mapping, submit via virtqueue_add_inbuf_premapped()
+>>>> - When NULL (VDUSE, direct physical): page_pool handles allocation only,
+>>>>     submit via virtqueue_add_inbuf_ctx()
+>>>>
+>>>> This preserves the DMA premapping optimization from commit 31f3cd4e5756b
+>>>> ("virtio-net: rq submits premapped per-buffer") while adding page_pool
+>>>> support as a prerequisite for future zero-copy features (devmem TCP,
+>>>> io_uring ZCRX).
+>>>>
+>>>> Page pools are created in probe and destroyed in remove (not open/close),
+>>>> following existing driver behavior where RX buffers remain in virtqueues
+>>>> across interface state changes.
+>>>>
+>>>> Signed-off-by: Vishwanath Seshagiri <vishs@meta.com>
+>>>> ---
+>>>>    drivers/net/Kconfig      |   1 +
+>>>>    drivers/net/virtio_net.c | 351 ++++++++++++++++++++++-----------------
+>>>>    2 files changed, 201 insertions(+), 151 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+>>>> index ac12eaf11755..f1e6b6b0a86f 100644
+>>>> --- a/drivers/net/Kconfig
+>>>> +++ b/drivers/net/Kconfig
+>>>> @@ -450,6 +450,7 @@ config VIRTIO_NET
+>>>>    	depends on VIRTIO
+>>>>    	select NET_FAILOVER
+>>>>    	select DIMLIB
+>>>> +	select PAGE_POOL
+>>>>    	help
+>>>>    	  This is the virtual network driver for virtio.  It can be used with
+>>>>    	  QEMU based VMMs (like KVM or Xen).  Say Y or M.
+>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>>> index db88dcaefb20..74c51e597c3f 100644
+>>>> --- a/drivers/net/virtio_net.c
+>>>> +++ b/drivers/net/virtio_net.c
+>>>> @@ -26,6 +26,7 @@
+>>>>    #include <net/netdev_rx_queue.h>
+>>>>    #include <net/netdev_queues.h>
+>>>>    #include <net/xdp_sock_drv.h>
+>>>> +#include <net/page_pool/helpers.h>
+>>>>    static int napi_weight = NAPI_POLL_WEIGHT;
+>>>>    module_param(napi_weight, int, 0444);
+>>>> @@ -359,6 +360,11 @@ struct receive_queue {
+>>>>    	/* Page frag for packet buffer allocation. */
+>>>>    	struct page_frag alloc_frag;
+>>>> +	struct page_pool *page_pool;
+>>>> +
+>>>> +	/* True if page_pool handles DMA mapping via PP_FLAG_DMA_MAP */
+>>>> +	bool use_page_pool_dma;
+>>>> +
+>>>>    	/* RX: fragments + linear part + virtio header */
+>>>>    	struct scatterlist sg[MAX_SKB_FRAGS + 2];
+>>>> @@ -521,11 +527,13 @@ static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_buff *xdp,
+>>>>    			       struct virtnet_rq_stats *stats);
+>>>>    static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>    				 struct sk_buff *skb, u8 flags);
+>>>> -static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_skb,
+>>>> +static struct sk_buff *virtnet_skb_append_frag(struct receive_queue *rq,
+>>>> +					       struct sk_buff *head_skb,
+>>>>    					       struct sk_buff *curr_skb,
+>>>>    					       struct page *page, void *buf,
+>>>>    					       int len, int truesize);
+>>>>    static void virtnet_xsk_completed(struct send_queue *sq, int num);
+>>>> +static void free_unused_bufs(struct virtnet_info *vi);
+>>>>    enum virtnet_xmit_type {
+>>>>    	VIRTNET_XMIT_TYPE_SKB,
+>>>> @@ -706,15 +714,24 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
+>>>>    	return p;
+>>>>    }
+>>>> +static void virtnet_put_page(struct receive_queue *rq, struct page *page,
+>>>> +			     bool allow_direct)
+>>>> +{
+>>>> +	if (page_pool_page_is_pp(page))
+>>>> +		page_pool_put_page(rq->page_pool, page, -1, allow_direct);
+>>>> +	else
+>>>> +		put_page(page);
+>>>> +}
+>>>> +
+>>>>    static void virtnet_rq_free_buf(struct virtnet_info *vi,
+>>>>    				struct receive_queue *rq, void *buf)
+>>>>    {
+>>>>    	if (vi->mergeable_rx_bufs)
+>>>> -		put_page(virt_to_head_page(buf));
+>>>> +		virtnet_put_page(rq, virt_to_head_page(buf), false);
+>>>>    	else if (vi->big_packets)
+>>>>    		give_pages(rq, buf);
+>>>>    	else
+>>>> -		put_page(virt_to_head_page(buf));
+>>>> +		virtnet_put_page(rq, virt_to_head_page(buf), false);
+>>>>    }
+>>>>    static void enable_rx_mode_work(struct virtnet_info *vi)
+>>>> @@ -877,9 +894,12 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+>>>>    		if (unlikely(!skb))
+>>>>    			return NULL;
+>>>> -		page = (struct page *)page->private;
+>>>> -		if (page)
+>>>> -			give_pages(rq, page);
+>>>> +		if (!rq->page_pool) {
+>>>
+>>> I think this is ok because big_packets is exactly when this happens.
+>>> but it is confusing that the conditions on free and alloc are
+>>> written differently. A comment with an explanation, at least?
+>>
+>> I will add a comment here in v5.
+> 
+> Would be better to also unify the way we test on alloc and free paths,
+> if possible.
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
+Yeah, I can unify the checks wherever possible, and will add a comment
+when I cannot make the changes.
 
-v3-v2:
-- Fixed build warning raised by kernel test bot
-v2-v1:
-- Following changes have been done as suggested by Vladimir Oltean <vladimir.oltean@nxp.com>
-* Add sanity check to ensure valid min_frag_size is requested by the user.
-* Add comments wherever applicable w.r.t min_frag_size.
-* Make it uniform to return all valures from the driver for .get_mm()
-* Use ETHTOOL_MM_MAX_VERIFY_TIME_MS macro for 128
-* Use NL_SET_ERR_MSG_MOD() wherever applicable
-* Re-schedule the iet work thread whenever there .set_mm() get called
-based on fpe_enabled flag.
+> 
+> 
+>>>
+>>>
+>>>> +			page = (struct page *)page->private;
+>>>> +			if (page)
+>>>> +				give_pages(rq, page);
+>>>> +		}
+>>>> +
+>>>>    		goto ok;
+>>>>    	}
+>>>> @@ -925,7 +945,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+>>>>    	hdr = skb_vnet_common_hdr(skb);
+>>>>    	memcpy(hdr, hdr_p, hdr_len);
+>>>>    	if (page_to_free)
+>>>> -		put_page(page_to_free);
+>>>> +		virtnet_put_page(rq, page_to_free, true);
+>>>>    	return skb;
+>>>>    }
+>>>> @@ -965,93 +985,10 @@ static void virtnet_rq_unmap(struct receive_queue *rq, void *buf, u32 len)
+>>>>    static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
+>>>>    {
+>>>>    	struct virtnet_info *vi = rq->vq->vdev->priv;
+>>>> -	void *buf;
+>>>> -
+>>>> -	BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>>> -
+>>>> -	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
+>>>> -	if (buf)
+>>>> -		virtnet_rq_unmap(rq, buf, *len);
+>>>> -
+>>>> -	return buf;
+>>>> -}
+>>>> -
+>>>> -static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
+>>>> -{
+>>>> -	struct virtnet_info *vi = rq->vq->vdev->priv;
+>>>> -	struct virtnet_rq_dma *dma;
+>>>> -	dma_addr_t addr;
+>>>> -	u32 offset;
+>>>> -	void *head;
+>>>> -
+>>>> -	BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>>> -
+>>>> -	head = page_address(rq->alloc_frag.page);
+>>>> -
+>>>> -	offset = buf - head;
+>>>> -
+>>>> -	dma = head;
+>>>> -
+>>>> -	addr = dma->addr - sizeof(*dma) + offset;
+>>>> -
+>>>> -	sg_init_table(rq->sg, 1);
+>>>> -	sg_fill_dma(rq->sg, addr, len);
+>>>> -}
+>>>> -
+>>>> -static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+>>>> -{
+>>>> -	struct page_frag *alloc_frag = &rq->alloc_frag;
+>>>> -	struct virtnet_info *vi = rq->vq->vdev->priv;
+>>>> -	struct virtnet_rq_dma *dma;
+>>>> -	void *buf, *head;
+>>>> -	dma_addr_t addr;
+>>>>    	BUG_ON(vi->big_packets && !vi->mergeable_rx_bufs);
+>>>> -	head = page_address(alloc_frag->page);
+>>>> -
+>>>> -	dma = head;
+>>>> -
+>>>> -	/* new pages */
+>>>> -	if (!alloc_frag->offset) {
+>>>> -		if (rq->last_dma) {
+>>>> -			/* Now, the new page is allocated, the last dma
+>>>> -			 * will not be used. So the dma can be unmapped
+>>>> -			 * if the ref is 0.
+>>>> -			 */
+>>>> -			virtnet_rq_unmap(rq, rq->last_dma, 0);
+>>>> -			rq->last_dma = NULL;
+>>>> -		}
+>>>> -
+>>>> -		dma->len = alloc_frag->size - sizeof(*dma);
+>>>> -
+>>>> -		addr = virtqueue_map_single_attrs(rq->vq, dma + 1,
+>>>> -						  dma->len, DMA_FROM_DEVICE, 0);
+>>>> -		if (virtqueue_map_mapping_error(rq->vq, addr))
+>>>> -			return NULL;
+>>>> -
+>>>> -		dma->addr = addr;
+>>>> -		dma->need_sync = virtqueue_map_need_sync(rq->vq, addr);
+>>>
+>>> it gives me pause that this patch never does sync.
+>>> don't you need page_pool_dma_sync_for_cpu somewhere?
+>>
+>> I missed the page_pool_dma_sync_for_cpu in the receive path before
+>> reading the buffer data. I will add it in v5.
+>>
+>>>
+>>>
+>>>
+>>>> -
+>>>> -		/* Add a reference to dma to prevent the entire dma from
+>>>> -		 * being released during error handling. This reference
+>>>> -		 * will be freed after the pages are no longer used.
+>>>> -		 */
+>>>> -		get_page(alloc_frag->page);
+>>>> -		dma->ref = 1;
+>>>> -		alloc_frag->offset = sizeof(*dma);
+>>>> -
+>>>> -		rq->last_dma = dma;
+>>>> -	}
+>>>> -
+>>>> -	++dma->ref;
+>>>> -
+>>>> -	buf = head + alloc_frag->offset;
+>>>> -
+>>>> -	get_page(alloc_frag->page);
+>>>> -	alloc_frag->offset += size;
+>>>> -
+>>>> -	return buf;
+>>>> +	return virtqueue_get_buf_ctx(rq->vq, len, ctx);
+>>>>    }
+>>>>    static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
+>>>> @@ -1067,9 +1004,6 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
+>>>>    		return;
+>>>>    	}
+>>>> -	if (!vi->big_packets || vi->mergeable_rx_bufs)
+>>>> -		virtnet_rq_unmap(rq, buf, 0);
+>>>> -
+>>>>    	virtnet_rq_free_buf(vi, rq, buf);
+>>>>    }
+>>>> @@ -1335,7 +1269,7 @@ static int xsk_append_merge_buffer(struct virtnet_info *vi,
+>>>>    		truesize = len;
+>>>> -		curr_skb  = virtnet_skb_append_frag(head_skb, curr_skb, page,
+>>>> +		curr_skb  = virtnet_skb_append_frag(rq, head_skb, curr_skb, page,
+>>>>    						    buf, len, truesize);
+>>>>    		if (!curr_skb) {
+>>>>    			put_page(page);
+>>>> @@ -1771,7 +1705,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
+>>>>    	return ret;
+>>>>    }
+>>>> -static void put_xdp_frags(struct xdp_buff *xdp)
+>>>> +static void put_xdp_frags(struct receive_queue *rq, struct xdp_buff *xdp)
+>>>>    {
+>>>>    	struct skb_shared_info *shinfo;
+>>>>    	struct page *xdp_page;
+>>>> @@ -1781,7 +1715,7 @@ static void put_xdp_frags(struct xdp_buff *xdp)
+>>>>    		shinfo = xdp_get_shared_info_from_buff(xdp);
+>>>>    		for (i = 0; i < shinfo->nr_frags; i++) {
+>>>>    			xdp_page = skb_frag_page(&shinfo->frags[i]);
+>>>> -			put_page(xdp_page);
+>>>> +			virtnet_put_page(rq, xdp_page, true);
+>>>>    		}
+>>>>    	}
+>>>>    }
+>>>> @@ -1873,7 +1807,7 @@ static struct page *xdp_linearize_page(struct net_device *dev,
+>>>>    	if (page_off + *len + tailroom > PAGE_SIZE)
+>>>>    		return NULL;
+>>>> -	page = alloc_page(GFP_ATOMIC);
+>>>> +	page = page_pool_alloc_pages(rq->page_pool, GFP_ATOMIC);
+>>>>    	if (!page)
+>>>>    		return NULL;
+>>>> @@ -1897,7 +1831,7 @@ static struct page *xdp_linearize_page(struct net_device *dev,
+>>>>    		off = buf - page_address(p);
+>>>>    		if (check_mergeable_len(dev, ctx, buflen)) {
+>>>> -			put_page(p);
+>>>> +			virtnet_put_page(rq, p, true);
+>>>>    			goto err_buf;
+>>>>    		}
+>>>> @@ -1905,21 +1839,21 @@ static struct page *xdp_linearize_page(struct net_device *dev,
+>>>>    		 * is sending packet larger than the MTU.
+>>>>    		 */
+>>>>    		if ((page_off + buflen + tailroom) > PAGE_SIZE) {
+>>>> -			put_page(p);
+>>>> +			virtnet_put_page(rq, p, true);
+>>>>    			goto err_buf;
+>>>>    		}
+>>>>    		memcpy(page_address(page) + page_off,
+>>>>    		       page_address(p) + off, buflen);
+>>>>    		page_off += buflen;
+>>>> -		put_page(p);
+>>>> +		virtnet_put_page(rq, p, true);
+>>>>    	}
+>>>>    	/* Headroom does not contribute to packet length */
+>>>>    	*len = page_off - XDP_PACKET_HEADROOM;
+>>>>    	return page;
+>>>>    err_buf:
+>>>> -	__free_pages(page, 0);
+>>>> +	page_pool_put_page(rq->page_pool, page, -1, true);
+>>>>    	return NULL;
+>>>>    }
+>>>> @@ -1996,7 +1930,7 @@ static struct sk_buff *receive_small_xdp(struct net_device *dev,
+>>>>    			goto err_xdp;
+>>>>    		buf = page_address(xdp_page);
+>>>> -		put_page(page);
+>>>> +		virtnet_put_page(rq, page, true);
+>>>>    		page = xdp_page;
+>>>>    	}
+>>>> @@ -2028,13 +1962,15 @@ static struct sk_buff *receive_small_xdp(struct net_device *dev,
+>>>>    	if (metasize)
+>>>>    		skb_metadata_set(skb, metasize);
+>>>> +	skb_mark_for_recycle(skb);
+>>>> +
+>>>>    	return skb;
+>>>>    err_xdp:
+>>>>    	u64_stats_inc(&stats->xdp_drops);
+>>>>    err:
+>>>>    	u64_stats_inc(&stats->drops);
+>>>> -	put_page(page);
+>>>> +	virtnet_put_page(rq, page, true);
+>>>>    xdp_xmit:
+>>>>    	return NULL;
+>>>>    }
+>>>> @@ -2082,12 +2018,14 @@ static struct sk_buff *receive_small(struct net_device *dev,
+>>>>    	}
+>>>>    	skb = receive_small_build_skb(vi, xdp_headroom, buf, len);
+>>>> -	if (likely(skb))
+>>>> +	if (likely(skb)) {
+>>>> +		skb_mark_for_recycle(skb);
+>>>>    		return skb;
+>>>> +	}
+>>>>    err:
+>>>>    	u64_stats_inc(&stats->drops);
+>>>> -	put_page(page);
+>>>> +	virtnet_put_page(rq, page, true);
+>>>>    	return NULL;
+>>>>    }
+>>>> @@ -2142,7 +2080,7 @@ static void mergeable_buf_free(struct receive_queue *rq, int num_buf,
+>>>>    		}
+>>>>    		u64_stats_add(&stats->bytes, len);
+>>>>    		page = virt_to_head_page(buf);
+>>>> -		put_page(page);
+>>>> +		virtnet_put_page(rq, page, true);
+>>>>    	}
+>>>>    }
+>>>> @@ -2253,7 +2191,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
+>>>>    		offset = buf - page_address(page);
+>>>>    		if (check_mergeable_len(dev, ctx, len)) {
+>>>> -			put_page(page);
+>>>> +			virtnet_put_page(rq, page, true);
+>>>>    			goto err;
+>>>>    		}
+>>>> @@ -2272,7 +2210,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
+>>>>    	return 0;
+>>>>    err:
+>>>> -	put_xdp_frags(xdp);
+>>>> +	put_xdp_frags(rq, xdp);
+>>>>    	return -EINVAL;
+>>>>    }
+>>>> @@ -2337,7 +2275,7 @@ static void *mergeable_xdp_get_buf(struct virtnet_info *vi,
+>>>>    		if (*len + xdp_room > PAGE_SIZE)
+>>>>    			return NULL;
+>>>> -		xdp_page = alloc_page(GFP_ATOMIC);
+>>>> +		xdp_page = page_pool_alloc_pages(rq->page_pool, GFP_ATOMIC);
+>>>>    		if (!xdp_page)
+>>>>    			return NULL;
+>>>> @@ -2347,7 +2285,7 @@ static void *mergeable_xdp_get_buf(struct virtnet_info *vi,
+>>>>    	*frame_sz = PAGE_SIZE;
+>>>> -	put_page(*page);
+>>>> +	virtnet_put_page(rq, *page, true);
+>>>>    	*page = xdp_page;
+>>>> @@ -2393,6 +2331,8 @@ static struct sk_buff *receive_mergeable_xdp(struct net_device *dev,
+>>>>    		head_skb = build_skb_from_xdp_buff(dev, vi, &xdp, xdp_frags_truesz);
+>>>>    		if (unlikely(!head_skb))
+>>>>    			break;
+>>>> +
+>>>> +		skb_mark_for_recycle(head_skb);
+>>>>    		return head_skb;
+>>>>    	case XDP_TX:
+>>>> @@ -2403,10 +2343,10 @@ static struct sk_buff *receive_mergeable_xdp(struct net_device *dev,
+>>>>    		break;
+>>>>    	}
+>>>> -	put_xdp_frags(&xdp);
+>>>> +	put_xdp_frags(rq, &xdp);
+>>>>    err_xdp:
+>>>> -	put_page(page);
+>>>> +	virtnet_put_page(rq, page, true);
+>>>>    	mergeable_buf_free(rq, num_buf, dev, stats);
+>>>>    	u64_stats_inc(&stats->xdp_drops);
+>>>> @@ -2414,7 +2354,8 @@ static struct sk_buff *receive_mergeable_xdp(struct net_device *dev,
+>>>>    	return NULL;
+>>>>    }
+>>>> -static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_skb,
+>>>> +static struct sk_buff *virtnet_skb_append_frag(struct receive_queue *rq,
+>>>> +					       struct sk_buff *head_skb,
+>>>>    					       struct sk_buff *curr_skb,
+>>>>    					       struct page *page, void *buf,
+>>>>    					       int len, int truesize)
+>>>> @@ -2446,7 +2387,7 @@ static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_skb,
+>>>>    	offset = buf - page_address(page);
+>>>>    	if (skb_can_coalesce(curr_skb, num_skb_frags, page, offset)) {
+>>>> -		put_page(page);
+>>>> +		virtnet_put_page(rq, page, true);
+>>>>    		skb_coalesce_rx_frag(curr_skb, num_skb_frags - 1,
+>>>>    				     len, truesize);
+>>>>    	} else {
+>>>> @@ -2499,6 +2440,8 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+>>>>    	if (unlikely(!curr_skb))
+>>>>    		goto err_skb;
+>>>> +
+>>>> +	skb_mark_for_recycle(head_skb);
+>>>>    	while (--num_buf) {
+>>>>    		buf = virtnet_rq_get_buf(rq, &len, &ctx);
+>>>>    		if (unlikely(!buf)) {
+>>>> @@ -2517,7 +2460,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+>>>>    			goto err_skb;
+>>>>    		truesize = mergeable_ctx_to_truesize(ctx);
+>>>> -		curr_skb  = virtnet_skb_append_frag(head_skb, curr_skb, page,
+>>>> +		curr_skb  = virtnet_skb_append_frag(rq, head_skb, curr_skb, page,
+>>>>    						    buf, len, truesize);
+>>>>    		if (!curr_skb)
+>>>>    			goto err_skb;
+>>>> @@ -2527,7 +2470,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+>>>>    	return head_skb;
+>>>>    err_skb:
+>>>> -	put_page(page);
+>>>> +	virtnet_put_page(rq, page, true);
+>>>>    	mergeable_buf_free(rq, num_buf, dev, stats);
+>>>>    err_buf:
+>>>> @@ -2666,32 +2609,42 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>    static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>    			     gfp_t gfp)
+>>>>    {
+>>>> -	char *buf;
+>>>>    	unsigned int xdp_headroom = virtnet_get_headroom(vi);
+>>>>    	void *ctx = (void *)(unsigned long)xdp_headroom;
+>>>>    	int len = vi->hdr_len + VIRTNET_RX_PAD + GOOD_PACKET_LEN + xdp_headroom;
+>>>> +	unsigned int offset;
+>>>> +	struct page *page;
+>>>> +	dma_addr_t addr;
+>>>> +	char *buf;
+>>>>    	int err;
+>>>>    	len = SKB_DATA_ALIGN(len) +
+>>>>    	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>>>> -	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+>>>> -		return -ENOMEM;
+>>>> -
+>>>> -	buf = virtnet_rq_alloc(rq, len, gfp);
+>>>> -	if (unlikely(!buf))
+>>>> +	page = page_pool_alloc_frag(rq->page_pool, &offset, len, gfp);
+>>>> +	if (unlikely(!page))
+>>>>    		return -ENOMEM;
+>>>> +	buf = page_address(page) + offset;
+>>>>    	buf += VIRTNET_RX_PAD + xdp_headroom;
+>>>> -	virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
+>>>> +	if (rq->use_page_pool_dma) {
+>>>> +		addr = page_pool_get_dma_addr(page) + offset;
+>>>> +		addr += VIRTNET_RX_PAD + xdp_headroom;
+>>>> -	err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx, gfp);
+>>>> -	if (err < 0) {
+>>>> -		virtnet_rq_unmap(rq, buf, 0);
+>>>> -		put_page(virt_to_head_page(buf));
+>>>> +		sg_init_table(rq->sg, 1);
+>>>> +		sg_fill_dma(rq->sg, addr, vi->hdr_len + GOOD_PACKET_LEN);
+>>>> +		err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1,
+>>>> +						    buf, ctx, gfp);
+>>>> +	} else {
+>>>> +		sg_init_one(rq->sg, buf, vi->hdr_len + GOOD_PACKET_LEN);
+>>>> +		err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1,
+>>>> +					      buf, ctx, gfp);
+>>>>    	}
+>>>> +	if (err < 0)
+>>>> +		page_pool_put_page(rq->page_pool, virt_to_head_page(buf),
+>>>> +				   -1, false);
+>>>>    	return err;
+>>>>    }
+>>>> @@ -2764,13 +2717,15 @@ static unsigned int get_mergeable_buf_len(struct receive_queue *rq,
+>>>>    static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>>>>    				 struct receive_queue *rq, gfp_t gfp)
+>>>>    {
+>>>> -	struct page_frag *alloc_frag = &rq->alloc_frag;
+>>>>    	unsigned int headroom = virtnet_get_headroom(vi);
+>>>>    	unsigned int tailroom = headroom ? sizeof(struct skb_shared_info) : 0;
+>>>>    	unsigned int room = SKB_DATA_ALIGN(headroom + tailroom);
+>>>>    	unsigned int len, hole;
+>>>> -	void *ctx;
+>>>> +	unsigned int offset;
+>>>> +	struct page *page;
+>>>> +	dma_addr_t addr;
+>>>>    	char *buf;
+>>>> +	void *ctx;
+>>>>    	int err;
+>>>>    	/* Extra tailroom is needed to satisfy XDP's assumption. This
+>>>> @@ -2779,18 +2734,14 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>>>>    	 */
+>>>>    	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+>>>> -	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+>>>> -		return -ENOMEM;
+>>>> -
+>>>> -	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+>>>> -		len -= sizeof(struct virtnet_rq_dma);
+>>>> -
+>>>> -	buf = virtnet_rq_alloc(rq, len + room, gfp);
+>>>> -	if (unlikely(!buf))
+>>>> +	page = page_pool_alloc_frag(rq->page_pool, &offset, len + room, gfp);
+>>>> +	if (unlikely(!page))
+>>>>    		return -ENOMEM;
+>>>> +	buf = page_address(page) + offset;
+>>>>    	buf += headroom; /* advance address leaving hole at front of pkt */
+>>>> -	hole = alloc_frag->size - alloc_frag->offset;
+>>>> +
+>>>> +	hole = PAGE_SIZE - (offset + len + room);
+>>>>    	if (hole < len + room) {
+>>>>    		/* To avoid internal fragmentation, if there is very likely not
+>>>>    		 * enough space for another buffer, add the remaining space to
+>>>> @@ -2800,18 +2751,27 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>>>>    		 */
+>>>>    		if (!headroom)
+>>>>    			len += hole;
+>>>> -		alloc_frag->offset += hole;
+>>>
+>>> Hmm. All these allocations are tricky.
+>>> So we used to advance offset by hole but with page pool api
+>>> what advances pool->frag_offset? If nothing will not the next
+>>> small allocation reuse the space and overlap the buffer?
+>>
+>> I tested with debug tracing and confirmed the issue triggers with
+>> typical 1536-byte allocations. When len += hole extends the buffer into
+>> 3072-4096, page_pool's internal frag_offset stays at 3072, so a
+>> subsequent smaller allocation could overlap.
+>> Since page_pool manages frag_offset internally and there's no API to
+>> advance it past the hole, the fix is to remove the if (hole < len +
+>> room) block entirely.
+> 
+> Well... but this means that fragmentation can waste memory
+> which is not accounted for anywhere. Just add an API for this?
 
- drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 86 ++++++++++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  5 +-
- drivers/net/ethernet/ti/icssg/icssg_qos.h     | 20 +++++
- drivers/net/ethernet/ti/icssg/icssg_stats.c   |  1 -
- drivers/net/ethernet/ti/icssg/icssg_stats.h   |  5 ++
- .../net/ethernet/ti/icssg/icssg_switch_map.h  |  5 ++
- 6 files changed, 118 insertions(+), 4 deletions(-)
+I will add a page_pool_frag_offset_add() api in v5 and send the patch.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-index b715af21d23a..3c4ff154f6d1 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-@@ -6,7 +6,6 @@
-  */
- 
- #include "icssg_prueth.h"
--#include "icssg_stats.h"
- 
- static void emac_get_drvinfo(struct net_device *ndev,
- 			     struct ethtool_drvinfo *info)
-@@ -294,6 +293,88 @@ static int emac_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
- 	return 0;
- }
- 
-+static int emac_get_mm(struct net_device *ndev, struct ethtool_mm_state *state)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+
-+	state->tx_enabled = iet->fpe_enabled;
-+	state->pmac_enabled = true;
-+	state->tx_min_frag_size = iet->tx_min_frag_size;
-+	/* 64Bytes is the minimum fragment size supported
-+	 * by the firmware. <64B leads to min frame errors
-+	 */
-+	state->rx_min_frag_size = 64;
-+	state->tx_active = iet->fpe_active;
-+	state->verify_enabled = iet->mac_verify_configure;
-+	state->verify_time = iet->verify_time_ms;
-+
-+	switch (iet->verify_status) {
-+	case ICSSG_IETFPE_STATE_DISABLED:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-+		break;
-+	case ICSSG_IETFPE_STATE_SUCCEEDED:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
-+		break;
-+	case ICSSG_IETFPE_STATE_FAILED:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
-+		break;
-+	default:
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_UNKNOWN;
-+		break;
-+	}
-+
-+	/* 802.3-2018 clause 30.14.1.6, says that the aMACMergeVerifyTime
-+	 * variable has a range between 1 and 128 ms inclusive. Limit to that.
-+	 */
-+	state->max_verify_time = ETHTOOL_MM_MAX_VERIFY_TIME_MS;
-+
-+	return 0;
-+}
-+
-+static int emac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
-+		       struct netlink_ext_ack *extack)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth_qos_iet *iet = &emac->qos.iet;
-+	int err;
-+
-+	if (!cfg->pmac_enabled)
-+		NL_SET_ERR_MSG_MOD(extack, "preemptible MAC is always enabled");
-+
-+	err = icssg_qos_frag_size_min_to_add(cfg->tx_min_frag_size, extack);
-+	if (err)
-+		return err;
-+
-+	iet->verify_time_ms = cfg->verify_time;
-+	iet->tx_min_frag_size = cfg->tx_min_frag_size;
-+
-+	iet->fpe_enabled = cfg->tx_enabled;
-+	iet->mac_verify_configure = cfg->verify_enabled;
-+
-+	/* Re-trigger the state machine to incorporate the updated configuration */
-+	if (iet->fpe_enabled)
-+		atomic_set(&iet->enable_fpe_config, 1);
-+	else
-+		atomic_set(&iet->enable_fpe_config, 0);
-+
-+	schedule_work(&iet->fpe_config_task);
-+
-+	return 0;
-+}
-+
-+static void emac_get_mm_stats(struct net_device *ndev,
-+			      struct ethtool_mm_stats *s)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+
-+	s->MACMergeFrameAssOkCount = emac_get_stat_by_name(emac, "FW_PREEMPT_ASSEMBLY_OK");
-+	s->MACMergeFrameAssErrorCount = emac_get_stat_by_name(emac, "FW_PREEMPT_ASSEMBLY_ERR");
-+	s->MACMergeFragCountRx = emac_get_stat_by_name(emac, "FW_PREEMPT_FRAG_CNT_RX");
-+	s->MACMergeFragCountTx = emac_get_stat_by_name(emac, "FW_PREEMPT_FRAG_CNT_TX");
-+	s->MACMergeFrameSmdErrorCount = emac_get_stat_by_name(emac, "FW_PREEMPT_BAD_FRAG");
-+}
-+
- const struct ethtool_ops icssg_ethtool_ops = {
- 	.get_drvinfo = emac_get_drvinfo,
- 	.get_msglevel = emac_get_msglevel,
-@@ -317,5 +398,8 @@ const struct ethtool_ops icssg_ethtool_ops = {
- 	.set_eee = emac_set_eee,
- 	.nway_reset = emac_nway_reset,
- 	.get_rmon_stats = emac_get_rmon_stats,
-+	.get_mm = emac_get_mm,
-+	.set_mm = emac_set_mm,
-+	.get_mm_stats = emac_get_mm_stats,
- };
- EXPORT_SYMBOL_GPL(icssg_ethtool_ops);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 7a586038adf8..5271a013df64 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -45,6 +45,7 @@
- #include "icss_iep.h"
- #include "icssg_switch_map.h"
- #include "icssg_qos.h"
-+#include "icssg_stats.h"
- 
- #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
- #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
-@@ -58,8 +59,8 @@
- 
- #define ICSSG_MAX_RFLOWS	8	/* per slice */
- 
--#define ICSSG_NUM_PA_STATS	32
--#define ICSSG_NUM_MIIG_STATS	60
-+#define ICSSG_NUM_PA_STATS	ARRAY_SIZE(icssg_all_pa_stats)
-+#define ICSSG_NUM_MIIG_STATS	ARRAY_SIZE(icssg_all_miig_stats)
- /* Number of ICSSG related stats */
- #define ICSSG_NUM_STATS (ICSSG_NUM_MIIG_STATS + ICSSG_NUM_PA_STATS)
- #define ICSSG_NUM_STANDARD_STATS 31
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.h b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-index 8aa79b68ad54..b18a93f9181a 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_qos.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-@@ -55,4 +55,24 @@ void icssg_qos_link_up(struct net_device *ndev);
- void icssg_qos_link_down(struct net_device *ndev);
- int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
- 			   void *type_data);
-+static inline int icssg_qos_frag_size_min_to_add(u32 min_frag_size,
-+						 struct netlink_ext_ack *extack)
-+{
-+	/* The minimum size of the non-final mPacket supported
-+	 * by the firmware is 64B and multiples of 64B.
-+	 */
-+	if (min_frag_size < 64) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "tx_min_frag_size must be at least 64 bytes");
-+		return -EINVAL;
-+	}
-+
-+	if (min_frag_size % (ETH_ZLEN + ETH_FCS_LEN)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "tx_min_frag_size must be a multiple of 64 bytes");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
- #endif /* __NET_TI_ICSSG_QOS_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index 7159baa0155c..d27e1c48976f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -6,7 +6,6 @@
-  */
- 
- #include "icssg_prueth.h"
--#include "icssg_stats.h"
- #include <linux/regmap.h>
- 
- #define ICSSG_TX_PACKET_OFFSET	0xA0
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-index 5ec0b38e0c67..f35ae1b4f846 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-@@ -189,6 +189,11 @@ static const struct icssg_pa_stats icssg_all_pa_stats[] = {
- 	ICSSG_PA_STATS(FW_INF_DROP_PRIOTAGGED),
- 	ICSSG_PA_STATS(FW_INF_DROP_NOTAG),
- 	ICSSG_PA_STATS(FW_INF_DROP_NOTMEMBER),
-+	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
-+	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
-+	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
-+	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
-+	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),
- 	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
- 	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
- 	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-index 7e053b8af3ec..855fd4ed0b3f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-@@ -256,6 +256,11 @@
- #define FW_INF_DROP_PRIOTAGGED		0x0148
- #define FW_INF_DROP_NOTAG		0x0150
- #define FW_INF_DROP_NOTMEMBER		0x0158
-+#define FW_PREEMPT_BAD_FRAG		0x0160
-+#define FW_PREEMPT_ASSEMBLY_ERR		0x0168
-+#define FW_PREEMPT_FRAG_CNT_TX		0x0170
-+#define FW_PREEMPT_ASSEMBLY_OK		0x0178
-+#define FW_PREEMPT_FRAG_CNT_RX		0x0180
- #define FW_RX_EOF_SHORT_FRMERR		0x0188
- #define FW_RX_B0_DROP_EARLY_EOF		0x0190
- #define FW_TX_JUMBO_FRM_CUTOFF		0x0198
--- 
-2.43.0
+> 
+> 
+>>>
+>>>
+>>>>    	}
+>>>> -	virtnet_rq_init_one_sg(rq, buf, len);
+>>>> -
+>>>>    	ctx = mergeable_len_to_ctx(len + room, headroom);
+>>>> -	err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx, gfp);
+>>>> -	if (err < 0) {
+>>>> -		virtnet_rq_unmap(rq, buf, 0);
+>>>> -		put_page(virt_to_head_page(buf));
+>>>> +
+>>>> +	if (rq->use_page_pool_dma) {
+>>>> +		addr = page_pool_get_dma_addr(page) + offset;
+>>>> +		addr += headroom;
+>>>> +
+>>>> +		sg_init_table(rq->sg, 1);
+>>>> +		sg_fill_dma(rq->sg, addr, len);
+>>>> +		err = virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1,
+>>>> +						    buf, ctx, gfp);
+>>>> +	} else {
+>>>> +		sg_init_one(rq->sg, buf, len);
+>>>> +		err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1,
+>>>> +					      buf, ctx, gfp);
+>>>>    	}
+>>>> +	if (err < 0)
+>>>> +		page_pool_put_page(rq->page_pool, virt_to_head_page(buf),
+>>>> +				   -1, false);
+>>>>    	return err;
+>>>>    }
+>>>> @@ -3128,7 +3088,10 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+>>>>    		return err;
+>>>>    	err = xdp_rxq_info_reg_mem_model(&vi->rq[qp_index].xdp_rxq,
+>>>> -					 MEM_TYPE_PAGE_SHARED, NULL);
+>>>> +					 vi->rq[qp_index].page_pool ?
+>>>> +						MEM_TYPE_PAGE_POOL :
+>>>> +						MEM_TYPE_PAGE_SHARED,
+>>>> +					 vi->rq[qp_index].page_pool);
+>>>>    	if (err < 0)
+>>>>    		goto err_xdp_reg_mem_model;
+>>>> @@ -3168,6 +3131,81 @@ static void virtnet_update_settings(struct virtnet_info *vi)
+>>>>    		vi->duplex = duplex;
+>>>>    }
+>>>> +static int virtnet_create_page_pools(struct virtnet_info *vi)
+>>>> +{
+>>>> +	int i, err;
+>>>> +
+>>>> +	if (!vi->mergeable_rx_bufs && vi->big_packets)
+>>>> +		return 0;
+>>>> +
+>>>> +	for (i = 0; i < vi->max_queue_pairs; i++) {
+>>>> +		struct receive_queue *rq = &vi->rq[i];
+>>>> +		struct page_pool_params pp_params = { 0 };
+>>>> +		struct device *dma_dev;
+>>>> +
+>>>> +		if (rq->page_pool)
+>>>> +			continue;
+>>>> +
+>>>> +		if (rq->xsk_pool)
+>>>> +			continue;
+>>>> +
+>>>> +		pp_params.order = 0;
+>>>> +		pp_params.pool_size = virtqueue_get_vring_size(rq->vq);
+>>>> +		pp_params.nid = dev_to_node(vi->vdev->dev.parent);
+>>>> +		pp_params.netdev = vi->dev;
+>>>> +		pp_params.napi = &rq->napi;
+>>>> +
+>>>> +		/* Check if backend supports DMA API (e.g., vhost, virtio-pci).
+>>>> +		 * If so, use page_pool's DMA mapping for premapped buffers.
+>>>> +		 * Otherwise (e.g., VDUSE), page_pool only handles allocation.
+>>>> +		 */
+>>>> +		dma_dev = virtqueue_dma_dev(rq->vq);
+>>>> +		if (dma_dev) {
+>>>> +			pp_params.dev = dma_dev;
+>>>> +			pp_params.flags = PP_FLAG_DMA_MAP;
+>>>> +			pp_params.dma_dir = DMA_FROM_DEVICE;
+>>>> +			rq->use_page_pool_dma = true;
+>>>> +		} else {
+>>>> +			pp_params.dev = vi->vdev->dev.parent;
+>>>> +			pp_params.flags = 0;
+>>>> +			rq->use_page_pool_dma = false;
+>>>> +		}
+>>>> +
+>>>> +		rq->page_pool = page_pool_create(&pp_params);
+>>>> +		if (IS_ERR(rq->page_pool)) {
+>>>> +			err = PTR_ERR(rq->page_pool);
+>>>> +			rq->page_pool = NULL;
+>>>> +			goto err_cleanup;
+>>>> +		}
+>>>> +	}
+>>>> +	return 0;
+>>>> +
+>>>> +err_cleanup:
+>>>> +	while (--i >= 0) {
+>>>> +		struct receive_queue *rq = &vi->rq[i];
+>>>> +
+>>>> +		if (rq->page_pool) {
+>>>> +			page_pool_destroy(rq->page_pool);
+>>>> +			rq->page_pool = NULL;
+>>>> +		}
+>>>> +	}
+>>>> +	return err;
+>>>> +}
+>>>> +
+>>>> +static void virtnet_destroy_page_pools(struct virtnet_info *vi)
+>>>> +{
+>>>> +	int i;
+>>>> +
+>>>> +	for (i = 0; i < vi->max_queue_pairs; i++) {
+>>>> +		struct receive_queue *rq = &vi->rq[i];
+>>>> +
+>>>> +		if (rq->page_pool) {
+>>>> +			page_pool_destroy(rq->page_pool);
+>>>> +			rq->page_pool = NULL;
+>>>> +		}
+>>>> +	}
+>>>> +}
+>>>> +
+>>>>    static int virtnet_open(struct net_device *dev)
+>>>>    {
+>>>>    	struct virtnet_info *vi = netdev_priv(dev);
+>>>> @@ -6441,10 +6479,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>>>>    		vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi->rq[i].vq);
+>>>>    		vi->sq[i].vq = vqs[txq2vq(i)];
+>>>>    	}
+>>>> -
+>>>>    	/* run here: ret == 0. */
+>>>> -
+>>>>    err_find:
+>>>>    	kfree(ctx);
+>>>>    err_ctx:
+>>>> @@ -6945,6 +6981,14 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>>>    			goto free;
+>>>>    	}
+>>>> +	/* Create page pools for receive queues.
+>>>> +	 * Page pools are created at probe time so they can be used
+>>>> +	 * with premapped DMA addresses throughout the device lifetime.
+>>>> +	 */
+>>>> +	err = virtnet_create_page_pools(vi);
+>>>> +	if (err)
+>>>> +		goto free_irq_moder;
+>>>> +
+>>>>    #ifdef CONFIG_SYSFS
+>>>>    	if (vi->mergeable_rx_bufs)
+>>>>    		dev->sysfs_rx_queue_group = &virtio_net_mrg_rx_group;
+>>>> @@ -6958,7 +7002,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>>>    		vi->failover = net_failover_create(vi->dev);
+>>>>    		if (IS_ERR(vi->failover)) {
+>>>>    			err = PTR_ERR(vi->failover);
+>>>> -			goto free_vqs;
+>>>> +			goto free_page_pools;
+>>>>    		}
+>>>>    	}
+>>>> @@ -7075,7 +7119,10 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>>>    	unregister_netdev(dev);
+>>>>    free_failover:
+>>>>    	net_failover_destroy(vi->failover);
+>>>> -free_vqs:
+>>>> +free_page_pools:
+>>>> +	virtnet_destroy_page_pools(vi);
+>>>> +free_irq_moder:
+>>>> +	virtnet_free_irq_moder(vi);
+>>>>    	virtio_reset_device(vdev);
+>>>>    	free_receive_page_frags(vi);
+>>>>    	virtnet_del_vqs(vi);
+>>>> @@ -7104,6 +7151,8 @@ static void remove_vq_common(struct virtnet_info *vi)
+>>>>    	free_receive_page_frags(vi);
+>>>> +	virtnet_destroy_page_pools(vi);
+>>>> +
+>>>>    	virtnet_del_vqs(vi);
+>>>>    }
+>>>> -- 
+>>>> 2.47.3
+>>>
+> 
 
 
