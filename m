@@ -1,167 +1,204 @@
-Return-Path: <netdev+bounces-257219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257220-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHBmOr6thGk14QMAu9opvQ
-	(envelope-from <netdev+bounces-257219-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 15:48:30 +0100
+	id +IIBLhquhGk14QMAu9opvQ
+	(envelope-from <netdev+bounces-257220-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 15:50:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B18F43AA
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 15:48:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D97FF43E6
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 15:50:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E87C30796F5
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 14:44:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3D31E302AE28
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 14:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E97D40F8D1;
-	Thu,  5 Feb 2026 14:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CD041C2FD;
+	Thu,  5 Feb 2026 14:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="2vEPCYcK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dVko8npW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qc89RXCN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB975407593
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 14:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE97286D60
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 14:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770302694; cv=none; b=cZPKawkZoS1xkBppjdOY9Dga/VSxJRfpTwM8ZpAFVe6uvVhyLLWvJAX+WUvPG+gNeHoawXhEeySiTqLXyThhUAyI5qnuvTrHqFos2MPcgLNn1Gzim8KEIwUrqDlOdF0bMfzInfgk82zYUArylEN7jiR0mmW0GSwadIzkSiDDypw=
+	t=1770302796; cv=none; b=W0t1PHpvFxIbsWm1uMGWBV01jKMgjB9RO7IDhSwFdmXBXZpBWXKm16iHMGI24Jnu/kMcbjSRu9+v88yn+MWdPLOj0XTVSs8fNpiNwulmU0ZjpGygzzrrPKnFSM16HMCgl6swVtEc5exdzxB2T+lZUWucGn85bcU5W8wwGiap8WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770302694; c=relaxed/simple;
-	bh=Ip8egWymmNIZRQpL/yLSLzyJGyXIDWQvB7EnInDwlQw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nJRRLXaa+hqraxf9Ah6jnlD1qAT/pcX0yUA8CvUjKJjEc7dTNJ7Q23m5VyFop9+j6SD0unXiRH0h0DrL0xAr4VNFXmE7ebjPNO3XrLSw2ZMGnirEKbPT9FZY7v4sK2kMZ0L442qCq+DaHkCgA5L61Y1yXkBtRACED5O9gMk1ooY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=2vEPCYcK; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-64b92abe63aso2059997a12.0
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 06:44:53 -0800 (PST)
+	s=arc-20240116; t=1770302796; c=relaxed/simple;
+	bh=MGLs4AHeGuuUiwrTtFVMTK1hvgbi9j+AlpfLaMkfR7I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=U2uBJ+fczeXZzuSSIgAiyFVnha3210GKv5pmW0aQZy1MHXk7gfuEgHbTJDjcS+05bLHm7GgvfvP6fJKFPmUJr5yVhKMXmWqQ4jZJgPpc9XKb4ArEMunCyhMPEvg3BHOGUGpR+6vF8qAZYt5SULn82TXsePuHODxTJDjlPHUH3Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dVko8npW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qc89RXCN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770302795;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oFOMQPyw5rr74qw2CeOtYNKg1tyNBe5jr7LotboMons=;
+	b=dVko8npWVyqtj8tEPlq7V+gGcovm1Yj0e8Uiv22cEV0ltRhdnqc1urDULbvmK6Uo5aIbuy
+	Mt371tg6e5OS9Q+jD8RRcgqJ4Eq3wKZUHNTcJLRR8f6DPQDhrn9ukAmwh9TARYj0u5dYsp
+	uA1ajEDZsHg6Jzllqbv6GwwrChBFD48=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-99-esIsZGvVPEaZko5-JK0FYQ-1; Thu, 05 Feb 2026 09:46:32 -0500
+X-MC-Unique: esIsZGvVPEaZko5-JK0FYQ-1
+X-Mimecast-MFC-AGG-ID: esIsZGvVPEaZko5-JK0FYQ_1770302791
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47ee432070aso7216285e9.1
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 06:46:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1770302692; x=1770907492; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yGuGV1Rjxy0b39caRNbzTsFTwfMEJia85m6jesueSeQ=;
-        b=2vEPCYcK1Py+VhyJltVRdjpNoH0RgQmPypEbfBTnBITFsspwaG5RCzqwoUR1gCLGF5
-         I+jqr7fcYUQP8KC74QnbKGD5d6FTHwyzYq29a1QZzVwHamlaW93gwxbwDnzXQmMhsE4c
-         LUcp9HauZjUz9C/uvoBxIOVVh3L7MNIqNjLchouV5+7N1VxYiOB56GfMRXZpXlQSarDh
-         FbGfzjx5ROLLd1smPaxH1eBontPSHsOLhOVNfe/IKnGdfUpfqp9OO9UQhBj3G3CDjxfU
-         OC/D8q2sNS6Hbfbshydj+0w/jeWJZx3sT21qiyh1g1GphK+KCFww6lkdMPTbR/YlGvr6
-         Y/zg==
+        d=redhat.com; s=google; t=1770302791; x=1770907591; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oFOMQPyw5rr74qw2CeOtYNKg1tyNBe5jr7LotboMons=;
+        b=qc89RXCNMdyZauyKr5wOv4Wp28KRb1T5evrLNdxZky2oX8wflJEX21vFG/7KhXrtHN
+         1r9e2ChPaAT5V0acrce6JDPEuW2yL0lwLrACi3vnVUKUsD61nRjtO9aCp8VO41aBvkDK
+         QsTX+uouqNdNBSKqfBl6nc6UQkZtWKUTMDctseP3YHMcyuLGrAF65rcITeoEEvH7RrD7
+         IR17/I9OzO8bCa/IMRbSh+P7HKZRM+GQ86SYiaJNdxY9IpmTtgsPUWNjU1IvSgVKI+ET
+         939j7dj89wR7NP3eVW8cP9dDKm3MiO4T/gvNie+MJIkzUHVOYL065RoU2SYz7Qo++dmA
+         oFqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770302692; x=1770907492;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yGuGV1Rjxy0b39caRNbzTsFTwfMEJia85m6jesueSeQ=;
-        b=I94xTMvPanI8VTheoWSeIKbhNvCunBVPMa8Xy8Hx7v0ievKEMcKIxuzLUSaIDPt1Vg
-         Ij6QPm5+gfM9YAxxzQLneRU1OJuuHCXqaidtZPnU0Zt85PNgeMdo6d1Qz6NOkpftDTzy
-         Ez9RLPbgqXJ8gdIX0tuPU+ZAqf2FXfvKxamzGzZKpTMhGl7HaAjvOedenAkuDtOUGzH9
-         7zfduB6CTHyMEar2iHTvE+O1UT1I+Nq8mH8A2pXoyC+ugaTqqD46n6AGavMZuaxIRfVD
-         GC0YYThFrDqfmOfKFQ5EwWx7uzrDlj5IERZdL7P3SBXf9ErewwWUPlbJQrC1L9TcZfKj
-         JmQg==
-X-Gm-Message-State: AOJu0YwmEW2OEB83q/HXRbRLm9ECxFPM5EDJWEJ6DZChF9H0RRLIdYpM
-	egljt6ZvLEeAm50h0tfN5E3+nqww1nZgaVV9l/KQzuXdvcCSM16St3I47l1SePMrJ2A=
-X-Gm-Gg: AZuq6aJHri0sgrURTMMe0oWj9RXcU6hnvtNRqF14L+KI6aGX2oGM67ROGxSoIU4vrGR
-	KAVabSnpOm8/krUQOhGPu02I69OttjxyGknwWG/0F7H1utqRjl8jrNZpj98yaOJ+8AxLdYgG+fG
-	2jzngXOvk2N8xGYpFA8SBCX+vRHahDTIMJlKr1mEg5Lz64GP1WFF/KhdzVYDDAN1MKpmt9iFFnE
-	6hsUYt2N/kcfzEBIl5twNvbhO6plxLg8G0IhHtrx5dMKdSyyEsVVUe1Viz1M1AGoIG3g81sQ1v4
-	xo3Yf4QhtlF2xkOPBvjO39w6sOwhPv0f3vgFucKOIglGytegWplQbuwvQH1tViRh/xIrkYMMxyC
-	zJocgCg7LFzpEw8pYyLAZFpsMADSBahkxeGjaqheay98FiGgBIwKfF8lODA346l9R7L9WBiaZuz
-	6NORLTYxG9xIZhKX3j/ubMxhfH967t0B4EwJmv
-X-Received: by 2002:a17:907:928e:b0:b86:f194:9eec with SMTP id a640c23a62f3a-b8e9f063ademr467878766b.18.1770302691747;
-        Thu, 05 Feb 2026 06:44:51 -0800 (PST)
-Received: from ?IPV6:2a02:810a:b98:a000::159a? ([2a02:810a:b98:a000::159a])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8ea00455adsm236432166b.60.2026.02.05.06.44.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Feb 2026 06:44:51 -0800 (PST)
-Message-ID: <5b8bcf37-5cd0-4c32-b0ba-3386142b7795@cogentembedded.com>
-Date: Thu, 5 Feb 2026 15:44:50 +0100
+        d=1e100.net; s=20230601; t=1770302791; x=1770907591;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oFOMQPyw5rr74qw2CeOtYNKg1tyNBe5jr7LotboMons=;
+        b=Wuf45YOYWJlEQB3Hd3C1Xe9BmhQUXLGls4h/0Hv2zDdRw+bpsRnDBJX+7HIS3ijYio
+         ygTwUuElhdB4TlzoMRngzPG6E8AQkAha+L6NyiqH1yJ2qa7HbYy8B72yb5WG98t9gshN
+         g5GYL8LHyf477WJG77flDxRoefnRb3uvmd2ao5Fmkw/CbQlVUWtDBFaLn2mfdoBWkaw2
+         UtvRqOngmweDQhQioQW3BNTPCow+ikj2dKptD+OcIAruJXtxIMl4AD+lkK63056ZFDU/
+         4IkZNAwuy63I63+NSXGl7G0V8bXp7EJD3EwfWj8sZi5kFNA24FLOtAnqivfwh7cQUB2Z
+         jP4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXm+HGc+JQ7/hN4pvEG9WetIk5nWf23TvhpQ1WEPw2EyInr0ij3rGt6AF1a8yMLmcg+dP21/G0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjlOAf7MnD9iowreJBUmWiOi+Fx2oF74Z07tGKPrlvZ+Hj8LvO
+	lj8+Ig4QnbEm7qPOl7eetqdK2vWECAt9TsyNNho2yQvF8QKqWVWTQyCMjFy8UlJ0EiHuarUPgrh
+	S58sPgHmyTFVP7989Qjp+HA1jGtvhMAXpmU4CVo7BOTOVVVGjyqTrJ6Sb0A==
+X-Gm-Gg: AZuq6aLhO7gu/zQjKIxMuRZSt1A/hGKfOpowInImLFKC3ZjM4ovTeWLLrGg0H8Tphzj
+	ecmY74SN0BOkzroPwhod2+1n8umadtAAqvKfGz8i8PRuEv6jsYWeQCzcYX7GOniDjze8pIjN7y0
+	yR2gfdEoWrk0ip/8gS80t/qG8jeCQHeTj4YTUpxH68h9gTBqTUpNcDkyNQgJ7g+nRTm75JLgkZY
+	8O2Og5IdThaK1HmkylrdhUbcgVcf2u29Hj4hmFgcn8QCr7nf0NdYNexy1O/sFWGnJChxJCf1E+n
+	sMdS+CEKhUwryROvVlc4uKI1JvhiRHQdzBjvzlBQLAlBfjJW5aqhGNO9kxAG2Tuy5zsy3hZCMOz
+	qyZ9n4eXHQ+zf3FNKE/hE/wrdP4WxpX6fYOns
+X-Received: by 2002:a05:600c:4e41:b0:480:1c10:5633 with SMTP id 5b1f17b1804b1-4830e990b54mr88589015e9.26.1770302791161;
+        Thu, 05 Feb 2026 06:46:31 -0800 (PST)
+X-Received: by 2002:a05:600c:4e41:b0:480:1c10:5633 with SMTP id 5b1f17b1804b1-4830e990b54mr88588315e9.26.1770302790517;
+        Thu, 05 Feb 2026 06:46:30 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4361805f8c1sm12112640f8f.37.2026.02.05.06.46.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 06:46:30 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 419834D1165; Thu, 05 Feb 2026 15:46:29 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Antoine Tenart <atenart@redhat.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, bpf@vger.kernel.org, horms@kernel.org,
+ jiri@resnulli.us, edumazet@google.com, xiyou.wangcong@gmail.com,
+ jhs@mojatatu.com, carges@cloudflare.com, kernel-team@cloudflare.com,
+ Antoine Tenart <atenart@redhat.com>
+Subject: Re: [PATCH net-next RFC v1 0/3] net: sched: refactor qdisc drop
+ reasons into dedicated tracepoint
+In-Reply-To: <CADCXZ1yMkZbRd7ioGw5QQ61OdmYp6misUDoj-s-g7wuoiCHKbg@mail.gmail.com>
+References: <177022452988.1827734.5121740962985640333.stgit@firesoul>
+ <20260204190417.110f5498@kernel.org>
+ <2e1eb11c-cd47-4772-baff-45d43d4fa539@kernel.org> <877bsr1l1h.fsf@toke.dk>
+ <CADCXZ1yMkZbRd7ioGw5QQ61OdmYp6misUDoj-s-g7wuoiCHKbg@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 05 Feb 2026 15:46:29 +0100
+Message-ID: <87v7gbz1ru.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: renesas: rswitch: fix forwarding offload
- statemachine
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-To: Michael Dege <michael.dege@renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20260205-fix-offloading-statemachine-v1-1-640224a531d0@renesas.com>
- <3b1405cd-6c7f-4883-95fb-151cab223a68@cogentembedded.com>
- <d6a9356d-6fd4-459b-9c5a-2f3e20368bbd@cogentembedded.com>
- <TY4PR01MB142829D9748A483ECAF19FD3D8299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <25ff0841-545b-433a-8e88-6e463ea718e7@cogentembedded.com>
- <TYRPR01MB14284CB75C7DCD35381BD17EE8299A@TYRPR01MB14284.jpnprd01.prod.outlook.com>
- <237bee8b-a7cf-4c14-9946-8bf72dbddde5@cogentembedded.com>
- <TY4PR01MB142829EB0EDDE13B588F949298299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <a4cfeba2-23da-4fdd-870b-6533b5ce267c@cogentembedded.com>
-Content-Language: en-US, ru-RU
-In-Reply-To: <a4cfeba2-23da-4fdd-870b-6533b5ce267c@cogentembedded.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[cogentembedded-com.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[cogentembedded-com.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-257219-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[cogentembedded.com];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257220-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,davemloft.net,redhat.com,resnulli.us,google.com,mojatatu.com,cloudflare.com];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikita.yoush@cogentembedded.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 47B18F43AA
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 1D97FF43E6
 X-Rspamd-Action: no action
 
+Antoine Tenart <atenart@redhat.com> writes:
 
-
-WBR,
-Nikita Yushchenko,
-System Software Engineer @ Cogent Embedded
-
-05.02.2026 15:41, Nikita Yushchenko wrote:
->>> The driver was originally designed to enable hardware forwarding when not less than two ports are in
->>> forwarding state. When only one port has hw forwarding, there is no destination to forward.
->>>
->>> Nikita
->>>
+> On Thu, Feb 05, 2026 at 12:34:18PM +0100, Toke H=C3=B8iland-J=C3=B8rgense=
+n wrote:
+>> Jesper Dangaard Brouer <hawk@kernel.org> writes:
+>> > On 05/02/2026 04.04, Jakub Kicinski wrote:
+>> >
+>> >> It will presumably require existing users to migrate over
+>> >> but sooner we do it the fewer users that have to move?
+>> >
+>> > I agree. Existing users will loose some details, but the patchset
+>> > results in fallback to SKB_DROP_REASON_QDISC_DROP as a drop reason,
+>> > which existing tools/users will still handle.
+>> > (The more specific drop reason is now avail via trace_qdisc_drop).
+>> >
+>> > Eric and Toke is this acceptable for your users?
 >>
->> The current driver allows Linux to use the bridge port as local port to the bridge. The offloading
->> Also supports switching traffic to Linux through the bridge port. Therefore, the offloading shouldn't
->> Be dropped if only one external port is up on the bridge.
-> 
-> "Offloading" means - forward a frame from one hw port to other hw port without inserting it into CPU 
-> queue. Offloaded frame is never visible to software bridge.
-> 
-> There is code that allows offload only if the linux bridge device used to connect rswitch ports does not 
-> have anything else.  If it has something else, offloading is disabled (because there is no way to know 
-> when a frame can be processed within rswitch hw without sending it to cpu).
+>> I like it! My only concern is that drop monitor tools will see two
+>> events for each qdisc drop. I guess that could be relatively
+>> straight-forwardly deduplicated in the tool, though? +Antoine who works
+>> on Retis to give him a chance to complain if not :)
+>
+> Thanks for the heads up. We'll have to add support for the new enum
+> (pretty straightforward), other than that things should just work.
+>
+> I'm wondering why not using the drop reason subsys logic to combine the
+> qdisc specific enum while not conflicting with drop reasons and allowing
+> to inject the qdisc reasons into drop reason enabled helpers as well?
 
-A frame being received by bridge device itself is not a subject for offload, ever.
+See this prior discussion for how the proposal came to be:
+
+https://lore.kernel.org/all/6be17a08-f8aa-4f91-9bd0-d9e1f0a92d90@kernel.org/
+
+Basically, figuring out which qdisc a drop came from is not possible
+with the current drop_reason code.
+
+So it's not just new drop reasons, it's a separate tracepoint with more
+information available (qdisc handle, name, etc). So you'll get two
+events for qdisc drops with this series (from patch 1):
+
++		trace_qdisc_drop(q, txq, dev, skb, reason);
++		kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_DROP);
+
+
+-Toke
+
 
