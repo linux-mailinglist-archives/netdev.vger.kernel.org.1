@@ -1,290 +1,324 @@
-Return-Path: <netdev+bounces-256982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256984-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EClXKbc3hGn51AMAu9opvQ
-	(envelope-from <netdev+bounces-256982-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 07:24:55 +0100
+	id CIuwKhM4hGn51AMAu9opvQ
+	(envelope-from <netdev+bounces-256984-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 07:26:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B3AEF00C
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 07:24:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A35EF039
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 07:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E431430071CF
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 06:24:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40B03301FFA6
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 06:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38667350D6E;
-	Thu,  5 Feb 2026 06:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1831D35292B;
+	Thu,  5 Feb 2026 06:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ibrkM/IM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="m3IhX9zp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fiNs2e+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D714934A796
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 06:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8FC334696
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 06:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770272686; cv=none; b=XOPnkwPWGeZzuIV1OkJiCcuoJEwVbGQizOOSLg89Bmf+RbWBfxKdjo+hVNEsLa6vAzfIQMDPWLcNrE30tMYZuZKSt3SVC5ZgC4nFg3uALK1ya+xerAI5CL2jcP8PYO37/yKf4fKGLUzAG29QduzRMEkQKnTeNFwzM+yS8Ko9H+A=
+	t=1770272733; cv=none; b=VmJObdUi5nS9JwjT5hweQv+LPtFW/Pgd3e+v1R+WmCl27uGuTyPVdQ0Q7KRqnLDYBEiSVksJkApQiCfBTf9ZrqkoKS813pMHVdkR7bIfri8Y3vfwklG94/gK/iH1hRl+Kz7Y4PkqXj655frkFd6RkNH5UewKaExVSDPcPkJfAcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770272686; c=relaxed/simple;
-	bh=Mh730ABqeOHc+soxt/YN15a26Ao35FZi4KBbK5G8SHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VxRvW4qHCCA5Rl1A38sBq1qOthQNGZ/z46u24MCH68FDsK5mNrwzpDZXpmtfbfw1slFVoOLYMRnuMXJWqux1YlIiWhRtDWPc3lY8ltHJ8tMl8E1TRMz6eL4YIQtPXunofHi+5ebcclmyzWyazOxE89HWh8bqnLrVrIq7MDV1pCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ibrkM/IM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=m3IhX9zp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770272684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=18afiwTs2Q1K1O6pkKB+aeDkBjoxoyzyrBart1C+0Rw=;
-	b=ibrkM/IMY7f5gV7ftjT0mpVtgI5Nn9u21gayKf6HVwjrg+3WgfHxDI+uWTk9VCqG5g2CJ+
-	OQYo3wNPvN7I7YOa+63xd9EF7rHqqdyjt3A0B05hMqzLvs2UEGRDEs0h7uxDxBpBTV/rHg
-	/wvQagSD+IX2T21d/lpHanlpoza9jlU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-442-EFxbbSL1NGOWZALPS5w_Cw-1; Thu, 05 Feb 2026 01:24:43 -0500
-X-MC-Unique: EFxbbSL1NGOWZALPS5w_Cw-1
-X-Mimecast-MFC-AGG-ID: EFxbbSL1NGOWZALPS5w_Cw_1770272682
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4801d21c280so6460365e9.1
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 22:24:43 -0800 (PST)
+	s=arc-20240116; t=1770272733; c=relaxed/simple;
+	bh=/B3kX9Jyefw/laVvlQXiBllCLeIh1NtvYVNiIh7k0+U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fhW6KMi/MUaRgioHjMnsygWiWK5MDlGANhRHQQipYm0zekhy6tJW3S2WRYF/DmhRQ8jqqie69uPPT4swrxjMmzEF1N9y7qWPIqWjNzZpEBgGdBmY0Qlm2rVVqDcMkUEbAhuRw6/8roQl7PALmfw09X94lN87U370FxhtlP3Glhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fiNs2e+z; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c5389c3cd2so55770285a.0
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 22:25:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770272682; x=1770877482; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=18afiwTs2Q1K1O6pkKB+aeDkBjoxoyzyrBart1C+0Rw=;
-        b=m3IhX9zpxYz0WcnMrYcSyPjz14f8NH9vAONV33bLuV9pJw8oKZqt6QXB+JPNO0Zptz
-         Xm+43fNiSJ8TuL6meENRrLT1qu06ZCRtu9ulgLz5iXS3d5vHRqulHOq0ZpOXZLTjU/cr
-         XXRXgtfaZKRbaQ53cATuzc0JNtWhccnoDygitvmaEvJLYqmZ6X7SG1buYJSqUnUPbBKK
-         4Bi8nYWVR3jtxXj+NZ3/C9l3N4lJUwxjSqc+WuFjAWu+5l/7LBjRBBwr0UfAyunsCSB5
-         hvPHhcxLCm1cIGsAqnubAmaC5w3HFEncBVWfDgK1dhC8ztgr4HGnxOT+v/AKeXDmidgV
-         jaGw==
+        d=gmail.com; s=20230601; t=1770272732; x=1770877532; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F9Zw0XzlsqtrFcnvP0xl+A5lBqr0v+6APGOlL8zpJrQ=;
+        b=fiNs2e+zqKth5p3fFbY4EtXourUAJ1MfPuo3lIgcVV1cGa+jc9cjn5TQT93TRS9/Ue
+         pWO7w6SsrysKyF5nI8sbB/uII0/ksoz+fbc6Li1sPkHgkUsE0DbokLax9KWSm08KgZbt
+         QzidcpnCGWbBn41XbmwOjU8VNdzURUMhmhAsRXwKkmY9hZSH5DmtkZorDgLcDMfa6Q9Z
+         8vy3N1/aVhFrYYsjRqjTG6U/meE72GiE+6nyFPudlR8TtzkbaPCDLVFZtBN9nJCt0mKC
+         b4lUUus939WqXlpaVvSVattYKofpZ458CuE+ukiBzvlGxbWOm5hciJY5RQ3y+ZZiKRhM
+         uqqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770272682; x=1770877482;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=18afiwTs2Q1K1O6pkKB+aeDkBjoxoyzyrBart1C+0Rw=;
-        b=B02sZLcuSHZjX6fjJw5Q6ZXUmN+c+3cEmU0rNWdqmDoMSlDi68Af1SrxYB4/HquuIs
-         Bf1NUkHWJUrQXMRAqrMq7Ujso5SHqK9Ykq0mtDjyn2JDA4NEy+qF9l9q38mskiAVarQV
-         /UvaRKoILHcP35b4PsJirdVl5ift334HJTI3TPRnfIjcWyAIv75OAvxqbgjW+FSrUGEi
-         Hz5s2d6WefLX6mlLJqSpvyYAinHfX7D+je50hE+UBuCctxU3zLzm5cbxqJ5QA2iNl/e8
-         56/vRfO7jPUPDBhJVM8kUCAQs0sZBQjlHPIMsvJ92w3PAlXx5xMqXIezXgq3Ic0wnMU9
-         5+ug==
-X-Forwarded-Encrypted: i=1; AJvYcCWiAUItirsDzla2AjBFG7CScEybsZSm/WrUN0HEoGV3IAf1YDNA5EcAnkvW98vtUIu2Xqsc24E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX5u0JNvt0897Hegn6V9uNNAIzBO76l8HUplJ8gEgyX3TjJ4DD
-	QqcgGzVeqsmD/ThhC8TjD1s4aeyYCEQklA19ZfAlCWZKRuG3BDFswB4G8gZvHgrNypprW9nQKXC
-	rlsVkgfHCn+CuQdjzsu0Qi3inc1RrpgyyCo53zToEj9x/4naBuMXjTiJ9+Q==
-X-Gm-Gg: AZuq6aKzCVrlhJxAcgFOPs5c2yZFTJjiPMPMq1SCghfm2UmNGnZzE9QH+AJKERO72Ek
-	Ks00BCBYNoRAU5MDJoQ4odEPyBavcFsxK5VJQXLEaqmpyfjhi2eOkKY7y8TVZ4G+j5kYg0yeg4F
-	OQaxHu/7oiCCApqLNaJQwgUqsyibrnRBX5TYp75W8r0zmRO1hABbO47/KIOQquWn/shZOd1w6Xm
-	W1fuwAbWBgLhOfN33FhExk6VCHpDtwTDtN6v6qRM7jlV6i9I67q3DA7dE5jGPFi7S+qwWyYNrFf
-	umoQXKWKLknVilHh3p/o18UteC6tE91SWno5hqk0kxwgxkACDUlJg5mTdP87fxcddcaTz9lff0n
-	fhCP0QKXc2tj73Q/xombECK96Jw6NTNMczQ==
-X-Received: by 2002:a05:600c:8b30:b0:47d:264e:b435 with SMTP id 5b1f17b1804b1-4830e96ada6mr75710965e9.22.1770272682168;
-        Wed, 04 Feb 2026 22:24:42 -0800 (PST)
-X-Received: by 2002:a05:600c:8b30:b0:47d:264e:b435 with SMTP id 5b1f17b1804b1-4830e96ada6mr75710645e9.22.1770272681559;
-        Wed, 04 Feb 2026 22:24:41 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48317d299bfsm31921785e9.2.2026.02.04.22.24.39
+        d=1e100.net; s=20230601; t=1770272732; x=1770877532;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F9Zw0XzlsqtrFcnvP0xl+A5lBqr0v+6APGOlL8zpJrQ=;
+        b=qNAthBs+Yk+xq38t/OQxRZsOk9QNBZTc6Lx8zqg+4hRofQQB1vcEugPxk+HdjI3DZo
+         ABu9hjQOhCxzQ88n96QHujIfOYISBVnK7VcA/yKM3Ge+NFoPjkDYtlHpGQRqmr63Ghki
+         bIaqWCY/VSPq2cNA0K/qB9mDt/5yvYrSqqVgLAXQSzawTgwRQTlw+RVVlYbK6/cXY+Rs
+         2ho1Npodgro4fRrVfzbq3uZbucvXgPng+bun1FNkn3/4CoY3iyXyG38yJaIMAVJT6MDd
+         62mHBkQnTB3VGV5vWWAyRGK/cdLlyUdlZtNh8TZXLhW8peVR/P0//O17qcXoMyRnfwYx
+         In+Q==
+X-Gm-Message-State: AOJu0YyV7gF8uDf+yURBiQ6zdILa9/EaK5xaxAMz25r/uf3cS2/LEmJ5
+	oB5Q1qeLJPzNQOkcMyjhgvgiPJ0QC+Xue+RNfj+EKMDYz6BxLhQIeIYe
+X-Gm-Gg: AZuq6aJv1N/ESctviLjg63y0f8FYyQq4JFuRo2iGgl5u7K2lB3f1eFFM51CXCc5RS0u
+	8SYj9KZOmkPInPla8luAJupPdt9kqHuDvkaP0yT/Wvejlb5QszflNdFLLN+bko7ONcag2PijaF/
+	gOviI/84y+cDzTzuciA/BPg1Rq/sibgto29xDnf2nVxvEuVji7O6FqInOfBSg+d6wpiyUNISXTc
+	bRANXQBZZOxP6VNwUF8UUtZ/rIbJd3Jf7zfqsHOma5hDU3S3k1yU6FjJffsEB2yzJ5A/mbNul6f
+	YInKX7UDtVr52Z1FCB+urA33ioaXPsYky+hYxXZAZgStjOMUy40ws3OyZ+GqOIvS5z3MeB6wSmD
+	HgXYa0/QLkqE0UJJyDtOeiOJ49wKPsQ7LpsOprI0ghtxpqInLH+qT90qc395oWYeT7Z13mBkAO8
+	s87NnCZ3yvdz0VHU/4bKGfM06lYomxDfI=
+X-Received: by 2002:a05:620a:857:b0:8ca:407a:c331 with SMTP id af79cd13be357-8ca407ac3c3mr188804185a.84.1770272731372;
+        Wed, 04 Feb 2026 22:25:31 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89521d36589sm34824116d6.53.2026.02.04.22.25.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 22:24:41 -0800 (PST)
-Date: Thu, 5 Feb 2026 01:24:37 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Vishwanath Seshagiri <vishs@meta.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Wei <dw@davidwei.uk>, Matteo Croce <technoboy85@gmail.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v4 2/2] selftests: virtio_net: add buffer
- circulation test
-Message-ID: <20260205012145-mutt-send-email-mst@kernel.org>
-References: <20260204193617.1200752-1-vishs@meta.com>
- <20260204193617.1200752-3-vishs@meta.com>
+        Wed, 04 Feb 2026 22:25:31 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Date: Thu, 05 Feb 2026 14:25:09 +0800
+Subject: [PATCH net-next v2] net: ti: icssg: Remove dedicated workqueue for
+ ndo_set_rx_mode callback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260204193617.1200752-3-vishs@meta.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260205-icssg-prueth-workqueue-v2-1-cf5cf97efb37@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAMQ3hGkC/3WNQQ6CMBBFr0Jm7ZgyEBRX3sOwKDDARG2xLYgh3
+ N2GuHX58vLfX8GzE/ZwSVZwPIsXayLQIYFm0KZnlDYykKJCkcpQGu97HN3EYcC3dffXxBNjlxe
+ Ka32iNCOI49FxJ8sevoHhgIaXAFU0g/hg3Wd/nNPd/+L5v/icosJSn0vq8prKrL32Ty2PY2OfU
+ G3b9gWnlNJxxgAAAA==
+X-Change-ID: 20260203-icssg-prueth-workqueue-f460eba72132
+To: netdev@vger.kernel.org
+Cc: Kevin Hao <haokexin@gmail.com>, MD Danish Anwar <danishanwar@ti.com>, 
+ Roger Quadros <rogerq@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Meghana Malladi <m-malladi@ti.com>, Jacob Keller <jacob.e.keller@intel.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Himanshu Mittal <h-mittal1@ti.com>, Simon Horman <horms@kernel.org>, 
+ Byungchul Park <byungchul@sk.com>, 
+ Markus Elfring <elfring@users.sourceforge.net>, 
+ linux-arm-kernel@lists.infradead.org
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256982-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256984-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[gmail.com,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,linux.dev,sk.com,users.sourceforge.net,lists.infradead.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email,virtio_net_common.sh:url]
-X-Rspamd-Queue-Id: 04B3AEF00C
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,linux.dev:url,linux.dev:email]
+X-Rspamd-Queue-Id: 16A35EF039
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026 at 11:36:17AM -0800, Vishwanath Seshagiri wrote:
-> Add iperf3-based test to verify RX buffer handling under load.
-> Optionally logs page_pool tracepoints when available.
+Currently, both the icssg-prueth and icssg-prueth-sr1 drivers create
+a dedicated 'emac->cmd_wq' workqueue.
 
-but it doesn't verify/validate them - it's just a generic throughput
-test. so what is the value add here?
+In the icssg-prueth-sr1 driver, this workqueue is not utilized at all.
 
+In the icssg-prueth driver, the workqueue is only used to execute the
+actual processing of ndo_set_rx_mode. However, creating a dedicated
+workqueue for such a simple use case is unnecessary. To simplify the
+code, switch to using the system default workqueue instead.
 
-> Signed-off-by: Vishwanath Seshagiri <vishs@meta.com>
-> ---
->  .../drivers/net/virtio_net/basic_features.sh  | 86 +++++++++++++++++++
->  1 file changed, 86 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh b/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
-> index cf8cf816ed48..fa98505c4674 100755
-> --- a/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
-> +++ b/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
-> @@ -6,6 +6,7 @@
->  ALL_TESTS="
->  	initial_ping_test
->  	f_mac_test
-> +	buffer_circulation_test
->  "
->  
->  source virtio_net_common.sh
-> @@ -16,6 +17,8 @@ source "$lib_dir"/../../../net/forwarding/lib.sh
->  h1=${NETIFS[p1]}
->  h2=${NETIFS[p2]}
->  
-> +IPERF_SERVER_PID=""
-> +
->  h1_create()
->  {
->  	simple_if_init $h1 $H1_IPV4/24 $H1_IPV6/64
-> @@ -83,6 +86,84 @@ f_mac_test()
->  	log_test "$test_name"
->  }
->  
-> +buffer_circulation_test()
-> +{
-> +	RET=0
-> +	local test_name="buffer circulation"
-> +	local tracefs="/sys/kernel/tracing"
-> +
-> +	if ! check_command iperf3; then
-> +		log_test_skip "$test_name" "iperf3 not installed"
-> +		return 0
-> +	fi
-> +
-> +	setup_cleanup
-> +	setup_prepare
-> +
-> +	ping -c 1 -I "$h1" "$H2_IPV4" >/dev/null
-> +	if [ $? -ne 0 ]; then
-> +		check_err 1 "Ping failed"
-> +		log_test "$test_name"
-> +		return
-> +	fi
-> +
-> +	local rx_start=$(cat /sys/class/net/"$h2"/statistics/rx_packets)
-> +	local tx_start=$(cat /sys/class/net/"$h1"/statistics/tx_packets)
-> +
-> +	if [ -d "$tracefs/events/page_pool" ]; then
-> +		echo > "$tracefs/trace"
-> +		echo 1 > "$tracefs/events/page_pool/enable"
-> +	fi
-> +
-> +	local port=$(shuf -i 49152-65535 -n 1)
-> +
-> +	iperf3 -s -1 --bind-dev "$h2" -p "$port" &>/dev/null &
-> +	IPERF_SERVER_PID=$!
-> +	sleep 1
-> +
-> +	if ! kill -0 "$IPERF_SERVER_PID" 2>/dev/null; then
-> +		IPERF_SERVER_PID=""
-> +		if [ -d "$tracefs/events/page_pool" ]; then
-> +			echo 0 > "$tracefs/events/page_pool/enable"
-> +		fi
-> +		check_err 1 "iperf3 server died"
-> +		log_test "$test_name"
-> +		return
-> +	fi
-> +
-> +	iperf3 -c "$H2_IPV4" --bind-dev "$h1" -p "$port" -t 5 >/dev/null 2>&1
-> +	local iperf_ret=$?
-> +
-> +	if [ -n "$IPERF_SERVER_PID" ]; then
-> +		kill "$IPERF_SERVER_PID" 2>/dev/null || true
-> +		wait "$IPERF_SERVER_PID" 2>/dev/null || true
-> +		IPERF_SERVER_PID=""
-> +	fi
-> +
-> +	if [ -d "$tracefs/events/page_pool" ]; then
-> +		echo 0 > "$tracefs/events/page_pool/enable"
-> +		local trace="$tracefs/trace"
-> +		local hold=$(grep -c "page_pool_state_hold" "$trace" 2>/dev/null)
-> +		local release=$(grep -c "page_pool_state_release" "$trace" 2>/dev/null)
-> +		log_info "page_pool events: hold=${hold:-0}, release=${release:-0}"
-> +	fi
-> +
-> +	local rx_end=$(cat /sys/class/net/"$h2"/statistics/rx_packets)
-> +	local tx_end=$(cat /sys/class/net/"$h1"/statistics/tx_packets)
-> +	local rx_delta=$((rx_end - rx_start))
-> +	local tx_delta=$((tx_end - tx_start))
-> +
-> +	log_info "Circulated TX:$tx_delta RX:$rx_delta"
-> +
-> +	if [ "$iperf_ret" -ne 0 ]; then
-> +		check_err 1 "iperf3 failed"
-> +	elif [ "$rx_delta" -lt 10000 ]; then
-> +		check_err 1 "Too few packets: $rx_delta"
-> +	fi
-> +
-> +	log_test "$test_name"
-> +}
-> +
->  setup_prepare()
->  {
->  	virtio_device_rebind $h1
-> @@ -113,6 +194,11 @@ setup_cleanup()
->  
->  cleanup()
->  {
-> +	if [ -n "$IPERF_SERVER_PID" ]; then
-> +		kill "$IPERF_SERVER_PID" 2>/dev/null || true
-> +		wait "$IPERF_SERVER_PID" 2>/dev/null || true
-> +	fi
-> +
->  	pre_cleanup
->  	setup_cleanup
->  }
-> -- 
-> 2.47.3
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
+---
+While addressing an issue in the cpsw driver, I based my fix [1] on the
+implementation of the emac_ndo_set_rx_mode() function in icssg. During review,
+Jakub pointed out that the dedicated workqueue for the ndo_set_rx_mode
+callback might be unnecessary [2]. I subsequently used the system workqueue for
+this purpose in the cpsw driver, and it performed as expected. Therefore,
+I believe the same approach can be applied to the icssg driver. This
+patch aim to remove this dedicated workqueue for icssg drivers.
+
+Please note: I do not have access to a board that supports the CSSG PRU
+Ethernet controller, so this change has only been build-tested.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=c0b5dc73a38f954e780f93a549b8fe225235c07a
+[2] https://lore.kernel.org/all/20260127190836.6a420768@kernel.org/
+---
+Cc: MD Danish Anwar <danishanwar@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Meghana Malladi <m-malladi@ti.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Himanshu Mittal <h-mittal1@ti.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Byungchul Park <byungchul@sk.com>
+Cc: Markus Elfring <elfring@users.sourceforge.net>
+Cc: linux-arm-kernel@lists.infradead.org
+---
+Changes in v2:
+- Given the issue identified by the AI [3], squash these two patches into
+  one as suggested by Jakub.
+
+- Include the cpsw fix link and the link to Jakub's email in the cover letter,
+  as requested by Meghana.
+
+- Link to v1: https://lore.kernel.org/r/20260204-icssg-prueth-workqueue-v1-0-9a892f4b293d@gmail.com
+
+[3] https://netdev-ai.bots.linux.dev/ai-review.html?id=02da18ab-455d-4d98-88bb-d8a975623c3f
+---
+ drivers/net/ethernet/ti/icssg/icssg_common.c     |  1 -
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c     | 13 ++++---------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h     |  1 -
+ drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c |  9 +--------
+ 4 files changed, 5 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 090aa74d3ce7257ae52158b2ff9a2a1239bfcfc8..0cf9dfe0fa362b4ff986b6815952f95b79cb476d 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -1720,7 +1720,6 @@ void prueth_netdev_exit(struct prueth *prueth,
+ 	netif_napi_del(&emac->napi_rx);
+ 
+ 	pruss_release_mem_region(prueth->pruss, &emac->dram);
+-	destroy_workqueue(emac->cmd_wq);
+ 	free_netdev(emac->ndev);
+ 	prueth->emac[mac] = NULL;
+ }
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index f65041662173c1968f7e70dc4a3d897523f24095..0939994c932f5322eebbaa1b2fe43e20d3dca5ae 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -1099,7 +1099,7 @@ static void emac_ndo_set_rx_mode(struct net_device *ndev)
+ {
+ 	struct prueth_emac *emac = netdev_priv(ndev);
+ 
+-	queue_work(emac->cmd_wq, &emac->rx_mode_work);
++	schedule_work(&emac->rx_mode_work);
+ }
+ 
+ static netdev_features_t emac_ndo_fix_features(struct net_device *ndev,
+@@ -1451,11 +1451,6 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 	emac->port_id = port;
+ 	emac->xdp_prog = NULL;
+ 	emac->ndev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+-	emac->cmd_wq = create_singlethread_workqueue("icssg_cmd_wq");
+-	if (!emac->cmd_wq) {
+-		ret = -ENOMEM;
+-		goto free_ndev;
+-	}
+ 	INIT_WORK(&emac->rx_mode_work, emac_ndo_set_rx_mode_work);
+ 
+ 	INIT_DELAYED_WORK(&emac->stats_work, icssg_stats_work_handler);
+@@ -1467,7 +1462,7 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 	if (ret) {
+ 		dev_err(prueth->dev, "unable to get DRAM: %d\n", ret);
+ 		ret = -ENOMEM;
+-		goto free_wq;
++		goto free_ndev;
+ 	}
+ 
+ 	emac->tx_ch_num = 1;
+@@ -1566,8 +1561,6 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 
+ free:
+ 	pruss_release_mem_region(prueth->pruss, &emac->dram);
+-free_wq:
+-	destroy_workqueue(emac->cmd_wq);
+ free_ndev:
+ 	emac->ndev = NULL;
+ 	prueth->emac[mac] = NULL;
+@@ -2236,6 +2229,7 @@ static int prueth_probe(struct platform_device *pdev)
+ 			prueth->emac[i]->ndev->phydev = NULL;
+ 		}
+ 		unregister_netdev(prueth->registered_netdevs[i]);
++		disable_work_sync(&prueth->emac[i]->rx_mode_work);
+ 	}
+ 
+ netdev_exit:
+@@ -2295,6 +2289,7 @@ static void prueth_remove(struct platform_device *pdev)
+ 		phy_disconnect(prueth->emac[i]->ndev->phydev);
+ 		prueth->emac[i]->ndev->phydev = NULL;
+ 		unregister_netdev(prueth->registered_netdevs[i]);
++		disable_work_sync(&prueth->emac[i]->rx_mode_work);
+ 	}
+ 
+ 	for (i = 0; i < PRUETH_NUM_MACS; i++) {
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index 10eadd35665045a98a0c0a639606b7c2691195de..3d94fa5a7ac10992d35fdb63458f8cb6eb3a5a22 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -236,7 +236,6 @@ struct prueth_emac {
+ 	/* Mutex to serialize access to firmware command interface */
+ 	struct mutex cmd_lock;
+ 	struct work_struct rx_mode_work;
+-	struct workqueue_struct	*cmd_wq;
+ 
+ 	struct pruss_mem_region dram;
+ 
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+index 7bb4f0d850cc72d997e5ead38cf56f1dbc2355a1..b8115ca47082f9676067bb65c6eb3a441290fd7c 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+@@ -783,11 +783,6 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 	emac->prueth = prueth;
+ 	emac->ndev = ndev;
+ 	emac->port_id = port;
+-	emac->cmd_wq = create_singlethread_workqueue("icssg_cmd_wq");
+-	if (!emac->cmd_wq) {
+-		ret = -ENOMEM;
+-		goto free_ndev;
+-	}
+ 
+ 	INIT_DELAYED_WORK(&emac->stats_work, icssg_stats_work_handler);
+ 
+@@ -798,7 +793,7 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 	if (ret) {
+ 		dev_err(prueth->dev, "unable to get DRAM: %d\n", ret);
+ 		ret = -ENOMEM;
+-		goto free_wq;
++		goto free_ndev;
+ 	}
+ 
+ 	/* SR1.0 uses a dedicated high priority channel
+@@ -883,8 +878,6 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 
+ free:
+ 	pruss_release_mem_region(prueth->pruss, &emac->dram);
+-free_wq:
+-	destroy_workqueue(emac->cmd_wq);
+ free_ndev:
+ 	emac->ndev = NULL;
+ 	prueth->emac[mac] = NULL;
+
+---
+base-commit: 0f8a890c4524d6e4013ff225e70de2aed7e6d726
+change-id: 20260203-icssg-prueth-workqueue-f460eba72132
+
+Best regards,
+-- 
+Kevin Hao <haokexin@gmail.com>
 
 
