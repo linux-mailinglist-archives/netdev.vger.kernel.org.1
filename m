@@ -1,171 +1,129 @@
-Return-Path: <netdev+bounces-257035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iEd5G3dQhGkE2gMAu9opvQ
-	(envelope-from <netdev+bounces-257035-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:10:31 +0100
+	id aLotClBRhGkp2gMAu9opvQ
+	(envelope-from <netdev+bounces-257037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:14:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5879EFC01
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:10:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9741EEFC5E
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F26630268A1
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:09:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F841301BCF2
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261A135A95B;
-	Thu,  5 Feb 2026 08:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE076361DD0;
+	Thu,  5 Feb 2026 08:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gDVH4XyZ"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="ojLoxq2A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4128327BF5
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77345361676;
+	Thu,  5 Feb 2026 08:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770278995; cv=none; b=G/Q43LDW0zaAV0Amm4pJEhO1d2rKx6uJk9Ay6PnKjV+IWDNGuQP+R4asWLMMf+ea4QScYQwQGCLKtJrE+/1J8JTwbhZQSAKzvpNG9eurlQLUD0quxK66VXwxCgQEjjGePNVDdAADdtUr7/JOyBeLcuW9WmQa6v+P1eQ3MZeHCZs=
+	t=1770279224; cv=none; b=oRPfPQ0sx9SFXNvPtgAHMzsyAz4aoal4L5RahRE+Z3T+YDcBInfuMhK6xaPCg43Gsh4oHPQ8VlIXIIFUObNAnED56nGu+QkBjDjyFCQFjHRPhSiYiUDCIH1R7TVdgI8D+Izqi7K6wRxbn2mfAPdPRYyWscL6Dm2gV50uSSuMZiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770278995; c=relaxed/simple;
-	bh=gzjhJm876283frA6S33u24yM/1DfsgTqaYPRCcVjPrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cNrjt6yTO8Fm2QUhvs4s2acWw5lF3bFQNxm6vj5xv7s93Q1clfYhYjoP/U/bAmfZto9O7waqPmtxz16iCnsRThGljf/0F8tKZVqwE5nn7wKWjWx+eIkcEuinXhRqyE6Js892b/C6ETnykw0v/+M5qLD7k9QDDhkt/5RvkFQ7+f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gDVH4XyZ; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4801eb2c0a5so5249205e9.3
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 00:09:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1770278993; x=1770883793; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3hanDd2YbvQ15Sy0DixMpocIzNH3MgOOyRQnrSACh/U=;
-        b=gDVH4XyZAh9ElsPeqfI7cVPGA5THwkXvIti9VCVm/wPEKlTscTqCiewRg6uahdwT5m
-         OJUqNvwF/oyVLxR9zXgHr7OlVye5v5Q5RSoFqSaNqOEtZmesXJHcQ3IM9W7YR+fCp+dE
-         TH9+EFNP7j2xAGlYh4uuqCY5NWGCXnizHttw8Or1f+BqVM2B2odon2ptUdMO4AM+mQ1G
-         9lZPlDAW59XrNHdWlkoEiGOk85wNH5MEbKofwTe5T17X0dufCceyZ/gCc8UVGpg4gARi
-         kDCUkd7SZ3V351oc6MlncPWOqq9nTPBbXvr5cDDBTCj+iBXS6ja8i7+aGJF1b71SPX2F
-         pbEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770278993; x=1770883793;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3hanDd2YbvQ15Sy0DixMpocIzNH3MgOOyRQnrSACh/U=;
-        b=any1C6q0dl71JWx4iSkCEQPZj4iVB3r4ZsRqhR1l4k9YbD1eOUreWBENPAk0dAfvop
-         M8Zk8DBeBNUEboOeHqJ9Z6X6q8Y3UVxfmYpVrqxIe8vkRQ3r4VDMHysDWi46san5EDof
-         nck1Hl1EeGiAs3FnRBntQD8qXCDlanFFTC0+p5jk2PrFaTjB8UvtvqdkYLLuczvjq2k2
-         bsaGbQUXZEyYOS4nRkxn37dGHdQUMCDaxxucN3pbH/anWj3CIBnoxfRdiq9VR+NRM3pr
-         JDyKLCfpsCVVnI4VQL2LYeQGbZWtE6ZJTwC3HF0tJN42cAgM9r08RVoj29KCPHge+xLf
-         Hyyw==
-X-Forwarded-Encrypted: i=1; AJvYcCW8tGREmn2Gy/nruzR9tH5nB/N0gG+j2NRiICjJvVYggtSXJmjqlBngSZW+YNIqcCD+Jqhi+Fk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweQK2aVJqRSC4dtDrdmAOvMnpN1dmmAxD6KDV5MyXxGPunWn0Z
-	uvl9eoLcmXLP4tn/B7+7pt2dj066OEZvrEgN7iYcBxcOvPw5wQjdg4NXOIbdnN6496E=
-X-Gm-Gg: AZuq6aLH+Ix7mF8qniUVOcK6hS724sglj4EDGYjZ/Cec1PvjeUL8NyhOrml9A3MuDtK
-	hdALhbC8IF4lkPqXA4iRCrvnoB83NB4KE8i+lYH+/c5oB0kM2Gk5M+DggHmn1wedHoDVp2q44n5
-	nIQKNCWXAkfuNNhEyyWRcOA3i6fW4DvHynflZxqFujPpm+qxnatgabyo8oDLn8MnbapXf3v58ud
-	oxkooUIlVmddZkIeSTc0T+QFmDx9XeQryf7Othd1p9Aqjaq6R4OrP0Y/aibDEQ6WWJqWmSpJTGZ
-	M1NMJDBhHrp+efEfUukd5DpyIyBhcFyFqUj+gzDCuvhFzg3KKvJ53Fw/0SNDddlEsBq51xzrX5J
-	gF10b3YLvc4RKAbuq6UvAoreZiMUlrD8f7nRQOYDrkfQeXbxi+aNqWOAKyIiga0QCyfZcLzGejU
-	f0eC2VpV0gHYQBnw==
-X-Received: by 2002:a05:600c:34c3:b0:47d:5e02:14e5 with SMTP id 5b1f17b1804b1-4830e9347f6mr70746215e9.5.1770278992895;
-        Thu, 05 Feb 2026 00:09:52 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617e250b2sm13408502f8f.8.2026.02.05.00.09.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 00:09:52 -0800 (PST)
-Date: Thu, 5 Feb 2026 09:09:49 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	john.ogness@linutronix.de,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
-	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
-	mpdesouza@suse.com, kernel-team@meta.com
-Subject: Re: [PATCH net-next v6 1/4] printk: Add execution context (task
- name/CPU) to printk_info
-Message-ID: <aYRQTdNrzqRwClpQ@pathway.suse.cz>
-References: <20260203-nbcon-v6-0-985f3bdb3267@debian.org>
- <20260203-nbcon-v6-1-985f3bdb3267@debian.org>
+	s=arc-20240116; t=1770279224; c=relaxed/simple;
+	bh=ZVZZnrGyRFU9pXby7/w7kj32iynDsjpVEBz6ZNgmbgY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jZC2qVpDjb28PAmHdQ6GId9eIw3KXJDdySa4kBzZNBmOe2f/DfJYzcQdVVIxGBvlSaOb1I7UzbMYnfw6WOfeG6G2tGl1tZQTrL/sFBaBScw3FRmMhap7sZQjE1bjq7pNAaZtpnYeC9TX5AJmFCEqA3Wlhoc/OZt2MKjtRhRzJV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=ojLoxq2A; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=ZVZZnrGyRFU9pXby7/w7kj32iynDsjpVEBz6ZNgmbgY=;
+	t=1770279224; x=1771488824; b=ojLoxq2Az1cXxtg28E7SVfHITDB1RyKBCxnZsFDl12l8hP3
+	8m0DcvfjNCy0jfXDvHG1YbaC0Qca2jfzSKXidHNmMrMbLv1gV+l4suZlFSfDc91PUoqp3SRNZNaJH
+	BeSQmd3ZfZSPzgDbgJQLUnGTGGWo2nayEfkbYURHpjgzTgnWzoCZia1OAQWTqjxBqBbJXTqzBf5NG
+	Hacse+SJzZ0Dtpbz7ZMIamHeqHj8egvwotyoSLNISnJcS8oRCYjXAxVqhhjJjMVy3VpSG9xTfgOd8
+	OY+xNECIE1YDSeSnhWWqvKYYO5MhflwzmO8Gak03e9AuHq89RmMM5qeyG43O32zQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vnuUT-0000000FNQY-066d;
+	Thu, 05 Feb 2026 09:13:30 +0100
+Message-ID: <b7a1e57d6bfde3ea5c9204323341a74325a63ab8.camel@sipsolutions.net>
+Subject: Re: [PATCH net-next] net: intel: fix PCI device ID conflict between
+ i40e and ipw2200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org
+Cc: stable@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller"	 <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Stanislav Yakovlev	 <stas.yakovlev@gmail.com>,
+ Alice Michael <alice.michael@intel.com>,  Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>
+Date: Thu, 05 Feb 2026 09:13:25 +0100
+In-Reply-To: <20260205075445.43347-1-enelsonmoore@gmail.com> (sfid-20260205_085458_002902_CD48D5DB)
+References: <20260205075445.43347-1-enelsonmoore@gmail.com>
+	 (sfid-20260205_085458_002902_CD48D5DB)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203-nbcon-v6-1-985f3bdb3267@debian.org>
+X-malware-bazaar: not-scanned
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
-	TAGGED_FROM(0.00)[bounces-257035-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.105.105.114:from];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-257037-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[176.114.240.130:received,100.90.174.1:received,209.85.128.46:received];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.com:email,suse.com:dkim]
-X-Rspamd-Queue-Id: E5879EFC01
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sipsolutions.net:email,sipsolutions.net:dkim,sipsolutions.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9741EEFC5E
 X-Rspamd-Action: no action
 
-On Tue 2026-02-03 09:23:52, Breno Leitao wrote:
-> Extend struct printk_info to include the task name, pid, and CPU
-> number where printk messages originate. This information is captured
-> at vprintk_store() time and propagated through printk_message to
-> nbcon_write_context, making it available to nbcon console drivers.
-> 
-> This is useful for consoles like netconsole that want to include
-> execution context in their output, allowing correlation of messages
-> with specific tasks and CPUs regardless of where the console driver
-> actually runs.
-> 
-> The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
-> automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
-> the helper functions compile to no-ops with no overhead.
-> 
-> Suggested-by: John Ogness <john.ogness@linutronix.de>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Signed-off-by: Petr Mladek <pmladek@suse.com>
+On Wed, 2026-02-04 at 23:54 -0800, Ethan Nelson-Moore wrote:
+> The ID 8086:104f is matched by both i40e and ipw2200. The same device
+> ID should not be in more than one driver, because in that case, which
+> driver is used is unpredictable. Fix this by taking advantage of the
+> fact that i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
+> devices use PCI_CLASS_NETWORK_OTHER to differentiate the devices.
 
-This version version works as advertized. Feel free to use:
+Right, good solution. How did you figure out that ipw2200 uses OTHER?
+I'd thought about this but was afraid it'd also just use ETHERNET.
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+Acked-by: Johannes Berg <johannes@sipsolutions.net>
 
-But feel free to remove CONSOLE_HAS_EXECUTION_CTX completely
-as suggested by John. It is true that it is not that useful
-at the moment. And I am not sure if it would ever have any
-good use.
+(FWIW, I've found the database internally, but not who maintains it nor
+any historic information in it ... still digging I guess, if only to
+avoid this happening again in the future)
 
-Best Regards,
-Petr
+johannes
 
