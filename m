@@ -1,145 +1,175 @@
-Return-Path: <netdev+bounces-257148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OWtJzaKhGl43QMAu9opvQ
-	(envelope-from <netdev+bounces-257148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:16:54 +0100
+	id +BLYMFOLhGl43QMAu9opvQ
+	(envelope-from <netdev+bounces-257149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:21:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFA5BF24DB
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:16:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21517F25B6
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 13:21:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D74EE304D978
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 12:12:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBE89302336A
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 12:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5F73A9D96;
-	Thu,  5 Feb 2026 12:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54ED3B9618;
+	Thu,  5 Feb 2026 12:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZQPf6a6y";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="PgYUZHNk"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Nbenqm+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F4335CBAF;
-	Thu,  5 Feb 2026 12:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9486C34CFAF;
+	Thu,  5 Feb 2026 12:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770293553; cv=none; b=g8DxEMedtQaxCjs5yWKKcJOe1lO3zKEY2acvWcH450d9e4TIijq8rzHNXKz30aXK07ZdS+26j3Mulesd5IQ9Qxnd9crzHNnfxjfoq6oFGAkvU0mitKtjC1+M8QRPoQbs4v8CVT8cKGsSzxjDWDyYyww0TzeslPcr4xPurBF1jbQ=
+	t=1770293923; cv=none; b=Ft3eUPAlam5qKZxsMHcTkivAduUsfEFe7hybiETZDgImCcGF1twbhjWMlJTpoX7K+4znE7yrp1DfMdRukVDcU/7NU7s5hI2muMzYHvn3e5qlpRhSZTGkJnhCekCuRMJj6+RWlgwNE1k6TThrUrIm6rFeMTKbcBFWOW0sh+tTudU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770293553; c=relaxed/simple;
-	bh=ORAOeIJ6mq47EDXOG7LquwoajELnCjdFAwjFw7s31Ko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NP8ou8+2GSG/KmJMixOWTy3Bd8GV0+cdlsdG4AC3URdoyka2Et29NnHNwiEOiBtMinOTX1NOnhm9zWOnocfkpc5HjqZxCer0W6KgPqLE1RpSPdnC8dTxOShpqrfX/riDCe8J8RGGro96knrEsILZgyWzW+NJrZWcW2KWtzwH+XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZQPf6a6y; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=PgYUZHNk; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 5 Feb 2026 13:12:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770293551;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7PelbcnS3xUMscOsvh2ZeX/gyBEvi2+xKP1rvNjD0C8=;
-	b=ZQPf6a6yM+MN8oWcb8D/hbpJDAPU5eQClQGr/bAQeReS94O/EkUOlrrvm+Y5BQkFcE/Fin
-	xsPHTaZLbJCrxVqYEH2qlXYPyy6y6vR7Jqg3GLgHHFbKuANwi/pQTK9ZH951Uc9xh3x54a
-	r5jjdxcHJdZdAYDJ/U8QZ1akFmO9fNihVjG87eg4uXkR8d3pSSoUXe15kgrLhhDjm9ti3e
-	udq4klY7jPgyfNuSK/DjCCyT2Aztzf+CmEIJdx2IXyFehCsCTLNTZrz1vcZrht7PwDUQnI
-	kMLEaFNgdT+dCDunkdhaJ4pHmZ7rNMigRWl0GlqdYbOgTnO1LswqwDV6ShC7Mg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770293551;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7PelbcnS3xUMscOsvh2ZeX/gyBEvi2+xKP1rvNjD0C8=;
-	b=PgYUZHNktT88QYXXPu7EIYbh4Rp3lqX4vzxGT81vpxAupALs1NelX9ES3lsjbJXxZZmBC6
-	mm8buKh0B+D8XLAQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Miroslav Lichvar <mlichvar@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-next v3] igb: Retrieve Tx timestamp directly from
- interrupt for i210
-Message-ID: <20260205121229.AwxNfEl_@linutronix.de>
-References: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
+	s=arc-20240116; t=1770293923; c=relaxed/simple;
+	bh=ptP2t2pMIYG1ra3PoZzEkp4X0a9shHKVhCPGgyrKwEE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m8FOXl1ZeaxtG5rkhnsiDfykK6TqHNPh4l8wKtbEvh61KMViP7yqwBS08Nto7cWnhZiXlmbKwL7157RlBxlXo5eMEug1Y3oFO6Fy5WCdi0gYpc51BbJttrpnkqQysA4NqThD+0P1uDQHXyQAS3KTTudYSGqIJ1F8Spnw5Mdk874=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Nbenqm+z; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=XCmgJslFgz2pKH+mZm9wj/ooAUI908xgVtyxwrSO2qI=;
+	b=Nbenqm+zaNkhUgMyWxWSbtcrN9znk8UQwyI+dYr9jra8w+i3sNUhE4CcZcGdpFeIeRuwvAM1E
+	H5l2vFZ9S1BQwkIJSptarmQp1DKUg1BzSvggPYGdLNm/GQSagcAV9j9byHsFKo3wRBBQemkdrtd
+	GQ5tnNhYByIFmBsrV/GFFz0=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4f6GNb3Yg9z1K96b;
+	Thu,  5 Feb 2026 20:14:07 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E849A40565;
+	Thu,  5 Feb 2026 20:18:39 +0800 (CST)
+Received: from localhost.localdomain (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 5 Feb 2026 20:18:39 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <lantao5@huawei.com>,
+	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
+	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
+	<jacob.e.keller@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH V2 net] net: hns3: fix double free issue for tx spare buffer
+Date: Thu, 5 Feb 2026 20:17:19 +0800
+Message-ID: <20260205121719.3285730-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257148-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-257149-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,molgen.mpg.de,linux.dev,lists.osuosl.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DFA5BF24DB
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 21517F25B6
 X-Rspamd-Action: no action
 
-On 2026-02-05 08:54:34 [+0100], Kurt Kanzenbach wrote:
-> Retrieve Tx timestamp directly from interrupt handler for i210.
-> 
-> The current implementation uses schedule_work() which is executed by the
-> system work queue to retrieve Tx timestamps. This increases latency and can
-> lead to timeouts in case of heavy system load. i210 is often used in
-> industrial systems, where timestamp timeouts can be fatal.
-> 
-> Therefore, fetch the timestamp directly from the interrupt handler.
-> 
-> The work queue code stays for all other NICs supported by igb.
-> 
-> Tested on Intel i210 and i350.
-> 
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+From: Jian Shen <shenjian15@huawei.com>
 
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+In hns3_set_ringparam(), a temporary copy (tmp_rings) of the ring structure
+is created for rollback. However, the tx_spare pointer in the original
+ring handle is incorrectly left pointing to the old backup memory.
 
-IMHO this is a compromise with Miroslav where he observed less PTP
-timestamps on the i350. While testing I did not get near Miroslav's
-difference but there was a small change. I don't understand *why*
-because the current workqueue usage reads the timestamp on the same CPU
-on which the interrupt occurred. Doing it directly just avoids the
-context switch. This feels beneficial.
+Later, if memory allocation fails in hns3_init_all_ring() during the setup,
+the error path attempts to free all newly allocated rings. Since tx_spare
+contains a stale (non-NULL) pointer from the backup, it is mistaken for
+a newly allocated buffer and is erroneously freed, leading to a double-free
+of the backup memory.
 
-Sebastian
+The root cause is that the tx_spare field was not cleared after its value
+was saved in tmp_rings, leaving a dangling pointer.
+
+Fix this by setting tx_spare to NULL in the original ring structure
+when the creation of the new `tx_spare` fails. This ensures the
+error cleanup path only frees genuinely newly allocated buffers.
+
+Fixes: 907676b130711 ("net: hns3: use tx bounce buffer for small packets")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+v1 -> v2:
+  - Update this commit message, suggested by Jake and Jakub.
+  v1: https://lore.kernel.org/all/20260202105837.1909444-1-shaojijie@huawei.com/
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index 7a9573dcab74..e879b04e21b0 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -1048,13 +1048,13 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
+ 	int order;
+ 
+ 	if (!alloc_size)
+-		return;
++		goto not_init;
+ 
+ 	order = get_order(alloc_size);
+ 	if (order > MAX_PAGE_ORDER) {
+ 		if (net_ratelimit())
+ 			dev_warn(ring_to_dev(ring), "failed to allocate tx spare buffer, exceed to max order\n");
+-		return;
++		goto not_init;
+ 	}
+ 
+ 	tx_spare = devm_kzalloc(ring_to_dev(ring), sizeof(*tx_spare),
+@@ -1092,6 +1092,13 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
+ 	devm_kfree(ring_to_dev(ring), tx_spare);
+ devm_kzalloc_error:
+ 	ring->tqp->handle->kinfo.tx_spare_buf_size = 0;
++not_init:
++	/* When driver init or reset_init, the ring->tx_spare is always NULL;
++	 * but when called from hns3_set_ringparam, it's usually not NULL, and
++	 * will be restored if hns3_init_all_ring() failed. So it's safe to set
++	 * ring->tx_spare to NULL here.
++	 */
++	ring->tx_spare = NULL;
+ }
+ 
+ /* Use hns3_tx_spare_space() to make sure there is enough buffer
+-- 
+2.33.0
+
 
