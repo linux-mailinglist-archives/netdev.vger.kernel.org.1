@@ -1,194 +1,309 @@
-Return-Path: <netdev+bounces-257029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257030-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJZ4OGdNhGm82QMAu9opvQ
-	(envelope-from <netdev+bounces-257029-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:57:27 +0100
+	id iDJ4O0pNhGm82QMAu9opvQ
+	(envelope-from <netdev+bounces-257030-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:56:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD86EFA55
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:57:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004DBEFA4D
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16B2C301ECCE
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 07:54:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6366D3002539
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 07:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5B42405EC;
-	Thu,  5 Feb 2026 07:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5896B35FF6B;
+	Thu,  5 Feb 2026 07:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1GjaFyx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r5XXDQd1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3688B35FF4F
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 07:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770278096; cv=none; b=XSSXqqIn4YPtILk4M17fGII3EJK4U78YJCaeY5aFzIL6glsLfwfPqBCqJD76cZ2MoNtsSzSfk0JvD1yV+D/AItHMX+BBT6DegCYlOBcB9Mhg91yuBjHCL8oVa19f/S2j7OlDQ3i5kPk3H8VnPJAKS3xA/C6+U/99BVs9E0HfhxI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770278096; c=relaxed/simple;
-	bh=0QPmD3khOolAd8Pn3PVfrdLjo36wnyy1/CNnpQc+9/U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J/T9QKXeZ5OJ5PdqE7zl7WypgIzyhhn0/L6ORNItZb/0U0Z2A4vLXP8xYNnRS2PG3QtPhYu+29CPknHOoPlHQ56+yvfbjab6IocUDEnXIEnnbt1sIsh8kyuduNnoJunviB3eJubvEHBsgFGQclG5iTNOfnNhhtmbnm1v9MdNIOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1GjaFyx; arc=none smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-12460a7caa2so910920c88.1
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 23:54:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8C8334C14
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 07:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770278214; cv=pass; b=T1jPuRxFR8/KEKk0mtVXTuuwrqeBXrKMSMToI+dEDX3BM8Q2e5RqofXZW2nH/aEaWe+yjx7sO4OwCd9pHyO6K2Xk9q7ATWce8ecGxce2/l/6sG2SjVvrnPcq5LxUtgAnAABcHYHFQmLxa/oWw8g1TZBxHNwkuVAJviTANesk4mM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770278214; c=relaxed/simple;
+	bh=3axIOJP3cA6W/bgLcYT/tOluzJyeAKi8O7IHrZk7QbQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HOTUgQSqoAl9cCEvzn973BsoSACM1X0etYM7VN9vqx0K9vKrVYEgs7J1pB/mDjTxkFWkA6D3+XPfUWhuNNPls6fWS/yPdsEljEmQbQvG8E2B1UD0PBYWMucFI8yMWwzma9wB8gKp0RAtKdgYabXP8wMjAHrmVyzEplT0U+G97EM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r5XXDQd1; arc=pass smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-126ea4b77adso730693c88.1
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 23:56:53 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770278213; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a0vShR4sX1ZU6JxvZaVZZ+bq+KjfjyKZL88swlPR8OeDhi6OumU+vMclyuv7X87IBO
+         ypjnDL/lHLKZtSaV9hv08bsfLfmh7FMR4WmKDchVHZ+ov4FQFxfEnUp6nk4YDYwH6QDo
+         rOanGhjvFPuDi7ZEzDkGLJa7Fwyp2sXCIENhCJS5dht/qvzmfWhg5vHY/257x+cpieqy
+         ZfqvUIX6BVGsX0ZQziJli6MlIjZcYFuYK62ZqE5ZNff5oU/PpHaqp8qYJdxqEKmNwzbq
+         OLOovOj0jVhQQPwbWioCMQ83t0WuRx/tatLMay7BNpKC1egKu0SrXsS/2m51jES6o903
+         GKKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hX8+ASaHY+dtMLrTvu6CdgPKXZVrjgvfnrh6PI7a3uA=;
+        fh=7gvD13qojv3btEmh4GSkUBJ4c0FS5tLyy/7S39mBnnw=;
+        b=hHMSFNzxbKOoR52ix0vNUdWSJXOpVlV29FB/cIPQF8tT6xLFJX6x4vYM6cFtHF//hQ
+         01s6VgpY4P2k19+FozZsL2jVUCoejNxfJxQszzFfnWLU77mU6n4caWNPyEqTVbF+QzoW
+         hpQ889CzlyUn9hLMFFobvoGQ/kvo6r92XN4tZPxznnYHYX98/G/Ux8vKKf/RMeCNM6yH
+         SMkxOCGzipY7GAtUopJL19JDaPQwbbhT8nJ3byikaJ95Y6F4MQ6xtXD6ZX23SeX9OTMJ
+         YWKPBv1jjElzaZLCAlUHiheNisIutlMkkiKWsVLv2yAwyyOX4uedlu2NDjMLkUMkLvVs
+         5/PQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770278095; x=1770882895; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBBtBB/edst42TJYyd/52k6/BJT8oZp8WOZjI5v+niI=;
-        b=U1GjaFyxz667KWALHbxvEBqm7+KBwkhxn17k3vKfnCJGD5+2IFzFku7WgKg7rjr1uX
-         tipYHVksbun5YboKWycLlNUTgzP8RwakDVaLJ9DEeEXKt2ZRto6qVPNSx4ArE3qruVdO
-         hblI/i6pIFQq/hYYTO23WZR7inwB5aHPhxqOiDoNnZ7DJj/NBd98xbpzIlRonTegd2BA
-         OLOnc/IvF0V1LlRJXJh2Tr7D4ZY1jjVQDXATQD0PXpFY46FNJbN41XNQAJUh8UkasbAQ
-         SwxG8MqY5HlvxYnFWRBimdPJziJjhYBPDQxyENm4FPQpkHF5f+UWTKc9HA0Rfqb1m9pl
-         m2Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770278095; x=1770882895;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1770278213; x=1770883013; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WBBtBB/edst42TJYyd/52k6/BJT8oZp8WOZjI5v+niI=;
-        b=XkYMI5DANzl/FZY8D1yeh7uFUMuTSpR7BpROJcMujR2yYQRiwrZw16qsdlWmibIkuF
-         1k7NEw6Qfo1F8CTQmkObXF0bZedR7ct0fFn0kKhJYqGVb2Y3mToCzkmGDALaa9q27zsY
-         krwiQBL9hEKQKNJe6HtyN9AZTLR17eEwgpH6FXUlkwMPJOdAVFFpTACoIikHL+QbNF4J
-         T7znrtPgJDe+mMgfvaSo8nY0wL91gxdyU6zwaaWhCNVQlprsxILvE6GPaaOzkdwW7Uha
-         Y7Kv2eK+sac47VFSgx088Qgv0sDPOXnJTB4871Lq+uo1gP9OlH84jgcL4i13+1hSrNzY
-         sNwA==
-X-Gm-Message-State: AOJu0YzcUM7AMV0seaB3kvIzhsPQCw3C8YAsYQp1tYMn6CKE+aex3O0E
-	hDHvUb6/qDx2WQo6no8glU8msVLr78XCrPIfl7azfKtagcL4X79BcG+ZVRc0St0+
-X-Gm-Gg: AZuq6aKOH1/ieRFDaIFFmRGiEdJG+3eijUQEU8QoLlRQ8VcYhSkhRG5woXqIPrG4toi
-	aXIEH5Zm1jKSO0NkS6fGohjG9alPYvgbdIoTSAfwEzN7dFntjKJW/3seAkym11SbTEJ8Jt6JiHV
-	75Golvfiaq02haPcUoargYSG/TIhPUViYamksJSREIN9o6vcusA/5qKvHipzzo78QDlw0atP1Qu
-	Zhu4iuZAfuvrTXCNFU4WnN3ZTmSd8vs5xSCf0JLWVsZ1XpnXEgfJPDBUdc0WYrZZxuV69BTOPiv
-	rXDQl/l3bxgA2LucqcpCFFJi54couIzUs1IM9Tf5qUNFbwzeG87wCgLNzqQx/PAB9VipWdTY8cw
-	+8+nKaUQPnfdiT1GuTHAo/TLUna/LqpqdOpzjTSWNfi0HgDz1kib4Y/u8AyNYokQM652UNq3Aow
-	LBlsoiTu7ztQ7Qem19s0hcoH9ITojXl3ivcppwBS2eGnOCbt/RtXchlZo5W4EWtfVw88AZtCB5Z
-	hXjXYamWMCk1V53p2FMn+ZE6aHVrKh6yQd/GtDk37IYx7jFsbhBQ2NEpoqupsmSFQwAIKDps98e
-	2bs+
-X-Received: by 2002:a05:7022:252c:b0:11b:9386:826b with SMTP id a92af1059eb24-126f48ea569mr2767700c88.48.1770278095077;
-        Wed, 04 Feb 2026 23:54:55 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-126f4bb8b02sm4007563c88.0.2026.02.04.23.54.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 23:54:54 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	stable@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stanislav Yakovlev <stas.yakovlev@gmail.com>,
-	Alice Michael <alice.michael@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net-next] net: intel: fix PCI device ID conflict between i40e and ipw2200
-Date: Wed,  4 Feb 2026 23:54:44 -0800
-Message-ID: <20260205075445.43347-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=hX8+ASaHY+dtMLrTvu6CdgPKXZVrjgvfnrh6PI7a3uA=;
+        b=r5XXDQd1BT1xpgGM/hCD5lDgkOqRCCCkdHs/fk5nDU8LxqQiuMp0mMys6ndipTL2N7
+         3EflQIeVdRdVihGKelXgRWW4EAPJL210xmeAqBcJFXSpPbv5OGk6JD58jx5k+tqhBwQ4
+         o6s5nB6boVg3Yh6HrFcbEMTNF+KBZ4OXfycGuPJk5CE9dilANwTObeejCnE1iM9hcuqs
+         Og7aEJKyrg7WlKIc5SyVZXi7pc35orWG2OMAgcgwaNiBseuxpXvrJh1VytTadaiuT1ce
+         StXhRWPiNHl6hRl3TicGkyCanYO2Z/VQgXYS1w+d0xOXBRUmtVqyQ4OjNH7XZiDZgfgq
+         295Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770278213; x=1770883013;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hX8+ASaHY+dtMLrTvu6CdgPKXZVrjgvfnrh6PI7a3uA=;
+        b=Cmg5k6CqWnI3Mf4GU1JwiQ9L+tQsfGBCwEAs8VX+3c7KecC8t+SNBbMMLYxxG7lniD
+         4iUcJgOxOSLyqd9vKneO2RfzdkxYhJzhBMIf3tBYAwN8vZoxJyzFzbIMNxs09kytA/IE
+         /dS/3ibBApd/Ugt2HrY6PK3/+HVGmMaH0vknTDrolXhkNmMpHqLkvsbECNtwoZ6xT0Tx
+         xCA9U7AYCxz1x7KzckIE4dCd/N1cHsw3oTimc+pir5vIMILdxyo0kygntwHvgGDq9k5u
+         t0AoIZa7NGVlm6zPIIEhRLJdkXao9PZ6iDFRtKtKB3SRzT3rBvEW8orozUj8n/+zZ818
+         m2Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKXnnaLzXtZjxP5rZlWdOkngg8V9sFOkTvpVxa+so5Nf7aptxes645/HHpKRoAqBDVPTJZKJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdIn9xtxTrlOxidlvaCzIQDw2CjPAXqgjK3/zqx3RSxbDkTcR/
+	ova4fo60mMyOXsC/Odft2hN2z2Jaj1S5OAWvzipydV3J9/XTyjA8Snns2DAkRQoNCVnMUOEL/Mw
+	UEvgVSxbqTYgm+//Wrv2U9DA34tzOC/Cg0wNXkMO7
+X-Gm-Gg: AZuq6aK+snesGRwKwenRGAy7fGu5iJOSVM0uPqdS+bZ9ZXOyH3NY314GdvzniIPoBMy
+	HuXv0gOtVNVd/vcMGh5rBg1b7wUyscWqRzCoRCnZnzyAPErMhJTYFo+Fd9uzrvFf7bOQaHzq+QU
+	VazozalHv383osxuoNm60+ai5Py3EWrwFtCj7r8y6/9nm++3IYTtE5GOGO+QJ2kAggYv4PF/Z9t
+	15snUP7MAWXkx2Pow4Teo9aq4IN3IzkM28rtR+W0RXL8yhO61HKU/1Yb2GHtuBXM0vn2gwOYAGD
+	BU7guTBKgZZYJjS18Pq5I9Ak86hcyv+MTLWX84+erIka0LO7RDkWgEtn9KY=
+X-Received: by 2002:a05:7022:e98c:b0:126:fddf:3d86 with SMTP id
+ a92af1059eb24-126fddf422cmr468424c88.39.1770278212822; Wed, 04 Feb 2026
+ 23:56:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260204074854.3506916-1-realwujing@gmail.com>
+In-Reply-To: <20260204074854.3506916-1-realwujing@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 4 Feb 2026 23:56:41 -0800
+X-Gm-Features: AZwV_QjRPyxxWp88yHur3pWexc_GfN9BwDe8I9cKMvGJLkZJrRihYP2TQ6uiu6M
+Message-ID: <CAAVpQUD=_UX0ZqwQQ6hdACC43AKX0xt__4fR_+XQO=fWgymWyw@mail.gmail.com>
+Subject: Re: [PATCH v6] netns: optimize netns cleaning by batching unhash_nsid calls
+To: Qiliang Yuan <realwujing@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Jeff Layton <jlayton@kernel.org>, 
+	Qiliang Yuan <yuanql9@chinatelecom.cn>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[sipsolutions.net,gmail.com,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257030-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-257029-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5FD86EFA55
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,chinatelecom.cn:email]
+X-Rspamd-Queue-Id: 004DBEFA4D
 X-Rspamd-Action: no action
 
-The ID 8086:104f is matched by both i40e and ipw2200. The same device
-ID should not be in more than one driver, because in that case, which
-driver is used is unpredictable. Fix this by taking advantage of the
-fact that i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
-devices use PCI_CLASS_NETWORK_OTHER to differentiate the devices.
+On Tue, Feb 3, 2026 at 11:49=E2=80=AFPM Qiliang Yuan <realwujing@gmail.com>=
+ wrote:
+>
+> Currently, unhash_nsid() scans the entire system for each netns being
+> killed, leading to O(M_dying_net * N_alive_net * N_id) complexity, as
 
-Fixes: 2e45d3f4677a ("i40e: Add support for X710 B/P & SFP+ cards")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c  | 8 +++++++-
- drivers/net/wireless/intel/ipw2x00/ipw2200.c | 8 +++++++-
- 2 files changed, 14 insertions(+), 2 deletions(-)
+Sorry I should've used L_dying_net, M_alive_net .. as N is not
+the same here.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 0b1cc0481027..2c8f449ad659 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -75,7 +75,13 @@ static const struct pci_device_id i40e_pci_tbl[] = {
- 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_BASE_T4), 0},
- 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_BASE_T_BC), 0},
- 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_SFP), 0},
--	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_B), 0},
-+	/*
-+	 * This ID conflicts with ipw2200, but the devices can be differentiated
-+	 * because i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
-+	 * devices use PCI_CLASS_NETWORK_OTHER.
-+	 */
-+	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, I40E_DEV_ID_10G_B),
-+		PCI_CLASS_NETWORK_ETHERNET << 8, 0xffff00, 0},
- 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_KX_X722), 0},
- 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_QSFP_X722), 0},
- 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_SFP_X722), 0},
-diff --git a/drivers/net/wireless/intel/ipw2x00/ipw2200.c b/drivers/net/wireless/intel/ipw2x00/ipw2200.c
-index 09035a77e775..b0e769da9415 100644
---- a/drivers/net/wireless/intel/ipw2x00/ipw2200.c
-+++ b/drivers/net/wireless/intel/ipw2x00/ipw2200.c
-@@ -11387,7 +11387,13 @@ static const struct pci_device_id card_ids[] = {
- 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2754, 0, 0, 0},
- 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2761, 0, 0, 0},
- 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2762, 0, 0, 0},
--	{PCI_VDEVICE(INTEL, 0x104f), 0},
-+	/*
-+	 * This ID conflicts with i40e, but the devices can be differentiated
-+	 * because i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
-+	 * devices use PCI_CLASS_NETWORK_OTHER.
-+	 */
-+	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x104f),
-+		PCI_CLASS_NETWORK_OTHER << 8, 0xffff00, 0},
- 	{PCI_VDEVICE(INTEL, 0x4220), 0},	/* BG */
- 	{PCI_VDEVICE(INTEL, 0x4221), 0},	/* BG */
- 	{PCI_VDEVICE(INTEL, 0x4223), 0},	/* ABG */
--- 
-2.43.0
 
+> __peernet2id() also performs a linear search in the IDR.
+>
+> Optimize this to O(N_alive_net * N_id) by batching unhash operations. Mov=
+e
+> unhash_nsid() out of the per-netns loop in cleanup_net() to perform a
+> single-pass traversal over survivor namespaces.
+>
+> Identify dying peers by an 'is_dying' flag, which is set under net_rwsem
+> write lock after the netns is removed from the global list. This batches
+> the unhashing work and eliminates the O(M_dying_net) multiplier.
+>
+> To minimize the impact on struct net size, 'is_dying' is placed in an
+> existing hole after 'hash_mix' in struct net.
+>
+> Use a restartable idr_get_next() loop for iteration. This avoids the
+> unsafe modification issue inherent to idr_for_each() callbacks and allows
+> dropping the nsid_lock to safely call sleepy rtnl_net_notifyid().
+>
+> Clean up redundant nsid_lock and simplify the destruction loop now that
+> unhashing is centralized.
+>
+> Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
+
+Code-wise, looks good to me:
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+> ---
+> v6:
+>  - Use M_dying_net and N_alive_net terminology for clarity.
+>  - Correct complexity analysis: __peernet2id() performs a linear search.
+>  - Move 'is_dying' to a structural hole after 'hash_mix' to save memory.
+>  - Scope 'id' variable locally within the traversal loop.
+>  - Simplify IDR traversal logic with unconditional increment.
+> v5:
+>  - Use idr_get_next() for restartable iteration safely handling removals.
+>  - Drop unhash_nsid_callback() to avoid context safety issues.
+> v4:
+>  - Move unhash_nsid() out of the batch loop to reduce complexity from O(M=
+*N) to O(N).
+>  - Use idr_for_each() for efficient, single-pass IDR traversal.
+>  - Mark 'is_dying' under net_rwsem to safely identify and batch unhashing=
+.
+>  - Simplify destruction loop by removing redundant locking and per-netns =
+unhash logic.
+> v3:
+>  - Update target tree to net-next.
+>  - Post as a new thread instead of a reply.
+> v2:
+>  - Move 'is_dying' setting to __put_net() to eliminate the O(M_batch) loo=
+p.
+>  - Remove redundant initializations in preinit_net().
+> v1:
+>  - Initial implementation of batch unhash_nsid().
+>
+>  include/net/net_namespace.h |  1 +
+>  net/core/net_namespace.c    | 34 +++++++++++++++++++++-------------
+>  2 files changed, 22 insertions(+), 13 deletions(-)
+>
+> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+> index cb664f6e3558..db291cc7afe3 100644
+> --- a/include/net/net_namespace.h
+> +++ b/include/net/net_namespace.h
+> @@ -120,6 +120,7 @@ struct net {
+>          * it is critical that it is on a read_mostly cache line.
+>          */
+>         u32                     hash_mix;
+> +       bool                    is_dying;
+>
+>         struct net_device       *loopback_dev;          /* The loopback *=
+/
+>
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index a6e6a964a287..aef44e617361 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -624,9 +624,10 @@ void net_ns_get_ownership(const struct net *net, kui=
+d_t *uid, kgid_t *gid)
+>  }
+>  EXPORT_SYMBOL_GPL(net_ns_get_ownership);
+>
+> -static void unhash_nsid(struct net *net, struct net *last)
+> +static void unhash_nsid(struct net *last)
+>  {
+> -       struct net *tmp;
+> +       struct net *tmp, *peer;
+> +
+>         /* This function is only called from cleanup_net() work,
+>          * and this work is the only process, that may delete
+>          * a net from net_namespace_list. So, when the below
+> @@ -634,22 +635,26 @@ static void unhash_nsid(struct net *net, struct net=
+ *last)
+>          * use for_each_net_rcu() or net_rwsem.
+>          */
+>         for_each_net(tmp) {
+> -               int id;
+> +               int id =3D 0;
+>
+>                 spin_lock(&tmp->nsid_lock);
+> -               id =3D __peernet2id(tmp, net);
+> -               if (id >=3D 0)
+> -                       idr_remove(&tmp->netns_ids, id);
+> -               spin_unlock(&tmp->nsid_lock);
+> -               if (id >=3D 0)
+> -                       rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
+> +               while ((peer =3D idr_get_next(&tmp->netns_ids, &id))) {
+> +                       int curr_id =3D id;
+> +
+> +                       id++;
+> +                       if (!peer->is_dying)
+> +                               continue;
+> +
+> +                       idr_remove(&tmp->netns_ids, curr_id);
+> +                       spin_unlock(&tmp->nsid_lock);
+> +                       rtnl_net_notifyid(tmp, RTM_DELNSID, curr_id, 0, N=
+ULL,
+>                                           GFP_KERNEL);
+> +                       spin_lock(&tmp->nsid_lock);
+> +               }
+> +               spin_unlock(&tmp->nsid_lock);
+>                 if (tmp =3D=3D last)
+>                         break;
+>         }
+> -       spin_lock(&net->nsid_lock);
+> -       idr_destroy(&net->netns_ids);
+> -       spin_unlock(&net->nsid_lock);
+>  }
+>
+>  static LLIST_HEAD(cleanup_list);
+> @@ -674,6 +679,7 @@ static void cleanup_net(struct work_struct *work)
+>         llist_for_each_entry(net, net_kill_list, cleanup_list) {
+>                 ns_tree_remove(net);
+>                 list_del_rcu(&net->list);
+> +               net->is_dying =3D true;
+>         }
+>         /* Cache last net. After we unlock rtnl, no one new net
+>          * added to net_namespace_list can assign nsid pointer
+> @@ -688,8 +694,10 @@ static void cleanup_net(struct work_struct *work)
+>         last =3D list_last_entry(&net_namespace_list, struct net, list);
+>         up_write(&net_rwsem);
+>
+> +       unhash_nsid(last);
+> +
+>         llist_for_each_entry(net, net_kill_list, cleanup_list) {
+> -               unhash_nsid(net, last);
+> +               idr_destroy(&net->netns_ids);
+>                 list_add_tail(&net->exit_list, &net_exit_list);
+>         }
+>
+> --
+> 2.51.0
+>
 
