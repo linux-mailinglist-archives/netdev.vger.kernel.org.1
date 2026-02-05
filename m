@@ -1,122 +1,191 @@
-Return-Path: <netdev+bounces-257080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257081-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QF5KJiRkhGkK2wMAu9opvQ
-	(envelope-from <netdev+bounces-257080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:34:28 +0100
+	id eCfmGmVihGkK2wMAu9opvQ
+	(envelope-from <netdev+bounces-257081-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:27:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A1AF0D86
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:34:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D87CBF0AA9
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 10:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4B5A6303ABE9
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 09:20:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 32BCF3009556
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 09:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A509538F944;
-	Thu,  5 Feb 2026 09:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E56B38F943;
+	Thu,  5 Feb 2026 09:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ez1qzQtT"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HYC1fRc4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8187F35F8A6;
-	Thu,  5 Feb 2026 09:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE558361672;
+	Thu,  5 Feb 2026 09:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770283253; cv=none; b=IOLt4GO7kHj2GobRXdUm2lN1ydF5YGw+0DRrNArxJl4ow2dm9U1AAlbcW7gEzZVVTuARuYqT/t5umPh9QAHbt82jzOVnDoZkDnMM4ljBEx/n/krw5hjt2SaxjAIjPDUKOxJbZ84geL3iq8EsI6vpYPzJzkV+GTu5FniREdV0F5Q=
+	t=1770283395; cv=none; b=AtKLqof1+Mqp2m2zubhxdSn6AcC/QLSO6t3JQCLeNeZsErnqI9Nt8pDpj5BXEQIFN3EmwJNNkOkbQ9qSsUXZ+P3egz49/8VxYnHlsgMDU8ZbkkxPPwjRclQr5AzCn3AkgCrCYLI3Da5LOfn2pq6AKFmIH43b9MFakSO47YQlvK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770283253; c=relaxed/simple;
-	bh=NRd5oHFvHBd6W3hDw0oXwMkQXN1d4sUNHl26Lk8tCEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g/NhnK/bU1TWPMsR+EUYktgxW5MvAe4BU2g1VJ0Uo/4ORX+BoSwr3YvB08MPC4jlRP0Rt5lIduN+59si0jmabKcaykU/MFg8oBJrnKRWfkfS/T2hpABJwyw/ZisS33YjBVIzohWh+Fd7LLRuc4hes11A5mkZhH61BDPlqChC4sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ez1qzQtT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EAFBC4CEF7;
-	Thu,  5 Feb 2026 09:20:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770283253;
-	bh=NRd5oHFvHBd6W3hDw0oXwMkQXN1d4sUNHl26Lk8tCEY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ez1qzQtTp6tu3mb1Ub20jyWGn7go7h/4yIexj4UGZgLB67tk6Gwl8kWZT+HPQp3uk
-	 rYszlsTGDnAoNuWwirmh/3mO4R9F5w1zeS58t683G+Bjuk+WDWlTV814/k04lv9HMu
-	 FLzuuwisxULTORI2i8G1ol2JBopn0pt9+F3C+GdhoEdi2At1eS6q1bmFsnZSz/JY8M
-	 q1DOEsLfMx8utTbBoVtxTNsZgAmkNYq9s0VxsARK9PfGMTSR5HPxdpUTMaeHKMKs4z
-	 5ARGxy/aS3yOL6oG4CjKYib1vdoBquN1VzidvBxMhjMoYW/1TgJO4O4RwUpK6L9ix+
-	 j6CtcKlz2BBMw==
-Date: Thu, 5 Feb 2026 10:20:50 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Chen-Yu Tsai <wenst@chromium.org>, 
-	Miles Chen <miles.chen@mediatek.com>, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	Project_Global_Chrome_Upstream_Group@mediatek.com, Qiqi Wang <qiqi.wang@mediatek.com>, sirius.wang@mediatek.com, 
-	vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-Subject: Re: [PATCH v5 01/18] dt-bindings: clock: Add MediaTek MT8189 clock
-Message-ID: <20260205-garnet-okapi-of-experience-dd7f84@quoll>
-References: <20260202062840.342707-1-irving-ch.lin@mediatek.com>
- <20260202062840.342707-2-irving-ch.lin@mediatek.com>
+	s=arc-20240116; t=1770283395; c=relaxed/simple;
+	bh=ASFscKfQZNTqdX/nIkBWTYyfKL3Xxu/c8YcFqW2TIRg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GyZGSmwGJkv0Rq/Os2pQFx1KSB+G1NadCy1pJPWw59reNMpF6UxWrTlqPXpVpq4BJeeaZz1aW89JZsBDvUDTTXKxxuIZNZkZ3z7Mx+FFYEOZf60E8MFOyej2CY97EOMZ3delfV1LpL4mSe1qM28lo7KcJQerTpCHwX8BIhg+24k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HYC1fRc4; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Hb
+	ZLkhI9yayHaUp7I8gdb9rZtco+zUFIDWHACs6Uq6Q=; b=HYC1fRc4lWnpdZjEOB
+	zef9RiVm1ulu9ToGu0CmDfGK0A1H7EXDPvsW25ZAAuhibnGE+dEUUwfi2Ri/XVja
+	mkL3TgK5lDRX55Ayj4AJETRRj4f7IY3o6XSqj7yuhVg7tX3kLeJw1q7P/SD24Axy
+	rwi+WEuyoodzaBTk8ieetrmW8=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAX_mlTYYRpN2GXKQ--.9587S2;
+	Thu, 05 Feb 2026 17:22:29 +0800 (CST)
+From: Feng Yang <yangfeng59949@163.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] bpf: test_run: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
+Date: Thu,  5 Feb 2026 17:22:27 +0800
+Message-Id: <20260205092227.126665-1-yangfeng59949@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260202062840.342707-2-irving-ch.lin@mediatek.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAX_mlTYYRpN2GXKQ--.9587S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxAF4UWFy5ZF1Utr1UWryfZwb_yoWrWw4fpF
+	1UtrW09rs5J340qF48Jr4UJw1aqFWqvFW5Jryavw1jqF1jqw1xXr1ftF4jgrZ8Ar4ruw47
+	J34UKFn2qw1UJaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jY89tUUUUU=
+X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/xtbC8RboYWmEYVZuyQAA3T
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-257080-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,gmail.com,collabora.com,chromium.org,mediatek.com,vger.kernel.org,lists.infradead.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-257081-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[163.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[163.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E0A1AF0D86
+	FROM_NEQ_ENVFROM(0.00)[yangfeng59949@163.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: D87CBF0AA9
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 02:28:08PM +0800, irving.ch.lin wrote:
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> 
-> Add dt schema and IDs for the clocks of MediaTek MT8189 SoC.
-> The MT8189 clock IP provide clock control for main system
-> (apmixedsys, topcksys and vlpcksys) and
-> subsys (eg. peri, mfg, venc/vdec ...).
-> 
-> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> (cherry picked from commit e2402a4f2db8db0ef3cf8613f42397aaa199ad29)
+From: Feng Yang <yangfeng@kylinos.cn>
 
-Drop...
+The bpf_lwt_xmit_push_encap helper needs to access skb_dst(skb)->dev to
+calculate the needed headroom:
 
-Best regards,
-Krzysztof
+	err = skb_cow_head(skb,
+			   len + LL_RESERVED_SPACE(skb_dst(skb)->dev));
+
+But skb->_skb_refdst may not be initialized when the skb is set up by
+bpf_prog_test_run_skb function. Executing bpf_lwt_push_ip_encap function
+in this scenario will trigger null pointer dereference, causing a kernel
+crash as Yinhao reported:
+
+[  105.186365] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  105.186382] #PF: supervisor read access in kernel mode
+[  105.186388] #PF: error_code(0x0000) - not-present page
+[  105.186393] PGD 121d3d067 P4D 121d3d067 PUD 106c83067 PMD 0
+[  105.186404] Oops: 0000 [#1] PREEMPT SMP NOPTI
+[  105.186412] CPU: 3 PID: 3250 Comm: poc Kdump: loaded Not tainted 6.19.0-rc5 #1
+[  105.186423] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[  105.186427] RIP: 0010:bpf_lwt_push_ip_encap+0x1eb/0x520
+[  105.186443] Code: 0f 84 de 01 00 00 0f b7 4a 04 66 85 c9 0f 85 47 01 00 00 31 c0 5b 5d 41 5c 41 5d 41 5e c3 cc cc cc cc 48 8b 73 58 48 83 e6 fe <48> 8b 36 0f b7 be ec 00 00 00 0f b7 b6 e6 00 00 00 01 fe 83 e6 f0
+[  105.186449] RSP: 0018:ffffbb0e0387bc50 EFLAGS: 00010246
+[  105.186455] RAX: 000000000000004e RBX: ffff94c74e036500 RCX: ffff94c74874da00
+[  105.186460] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff94c74e036500
+[  105.186463] RBP: 0000000000000001 R08: 0000000000000002 R09: 0000000000000000
+[  105.186467] R10: ffffbb0e0387bd50 R11: 0000000000000000 R12: ffffbb0e0387bc98
+[  105.186471] R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000002
+[  105.186484] FS:  00007f166aa4d680(0000) GS:ffff94c8b7780000(0000) knlGS:0000000000000000
+[  105.186490] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  105.186494] CR2: 0000000000000000 CR3: 000000015eade001 CR4: 0000000000770ee0
+[  105.186499] PKRU: 55555554
+[  105.186502] Call Trace:
+[  105.186507]  <TASK>
+[  105.186513]  bpf_lwt_xmit_push_encap+0x2b/0x40
+[  105.186522]  bpf_prog_a75eaad51e517912+0x41/0x49
+[  105.186536]  ? kvm_clock_get_cycles+0x18/0x30
+[  105.186547]  ? ktime_get+0x3c/0xa0
+[  105.186554]  bpf_test_run+0x195/0x320
+[  105.186563]  ? bpf_test_run+0x10f/0x320
+[  105.186579]  bpf_prog_test_run_skb+0x2f5/0x4f0
+[  105.186590]  __sys_bpf+0x69c/0xa40
+[  105.186603]  __x64_sys_bpf+0x1e/0x30
+[  105.186611]  do_syscall_64+0x59/0x110
+[  105.186620]  entry_SYSCALL_64_after_hwframe+0x76/0xe0
+[  105.186649] RIP: 0033:0x7f166a97455d
+
+Temporarily add the setting of skb->_skb_refdst before bpf_test_run to resolve the issue.
+
+Fixes: 52f278774e79 ("bpf: implement BPF_LWT_ENCAP_IP mode in bpf_lwt_push_encap")
+Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+Signed-off-by: Yun Lu <luyun@kylinos.cn>
+Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+---
+Changes in v2:
+- Link to v1: https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/ 
+---
+ net/bpf/test_run.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 178c4738e63b..c05b31cd1741 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -982,6 +982,7 @@ static struct proto bpf_dummy_proto = {
+ 	.obj_size = sizeof(struct sock),
+ };
+ 
++struct dst_entry bpf_test_run_lwt_xmit_dst;
+ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 			  union bpf_attr __user *uattr)
+ {
+@@ -1156,7 +1157,13 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 		skb->ip_summed = CHECKSUM_COMPLETE;
+ 	}
+ 
++	if (prog->type == BPF_PROG_TYPE_LWT_XMIT) {
++		bpf_test_run_lwt_xmit_dst.dev = dev;
++		skb_dst_set(skb, &bpf_test_run_lwt_xmit_dst);
++	}
+ 	ret = bpf_test_run(prog, skb, repeat, &retval, &duration, false);
++	if (prog->type == BPF_PROG_TYPE_LWT_XMIT)
++		skb_dst_set(skb, NULL);
+ 	if (ret)
+ 		goto out;
+ 	if (!is_l2) {
+-- 
+2.43.0
 
 
