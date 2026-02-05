@@ -1,116 +1,114 @@
-Return-Path: <netdev+bounces-257183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257184-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PvgEAuehGmI3wMAu9opvQ
-	(envelope-from <netdev+bounces-257183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:41:31 +0100
+	id kP4AG4WehGmI3wMAu9opvQ
+	(envelope-from <netdev+bounces-257184-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:43:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48124F36E3
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:41:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04381F3758
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:43:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 825D530028CF
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:41:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 63CEE3004616
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6775B2475CB;
-	Thu,  5 Feb 2026 13:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC73283FDB;
+	Thu,  5 Feb 2026 13:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="C9m4c5Ow"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iouvOC7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013059.outbound.protection.outlook.com [52.101.72.59])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B352253EF;
-	Thu,  5 Feb 2026 13:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C5827F75F
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 13:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770298859; cv=fail; b=St+s2WmpzJPKb8P9AsMfpAoO0YMaNRCgZO8dALwJ4HkYtfdqOWXfOm6FAKpHqN9dITApZ/yU63HeogRSrS+2aY34meFO7zzU0V+VyiO/q+TjjhIrfWgjw1M4NRLwDTPyJGecie6LJh0VuHNCLkuoYD+Jllby+dHJfNtNebtufBE=
+	t=1770299011; cv=fail; b=lowX0ckDuJRDxRQrgjeDe+17Ihd5neg8D96jdQIpsGrU1KD8KMn08pZvVplXp3pkr3s3gQFmIjaS9ACkwYXdyTnGrEf7LzP8FQyc+xdJyrFRr04PIkgUujKx/pYoWXVUZKoX56XipWW4HG8j75bQfhtfHLhIbh0VMCqWNqoex/s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770298859; c=relaxed/simple;
-	bh=iHWGAsYaLYqjpce37sqXkjLoeCmTayaUpI6zF/MA2ys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=OkGHxp73cd4L3BKOwbK1UkkiDjaLaqxuSK80pj0KuOxE/iJLAzHi/24y1lLh3+R3jOn7s3uVd1Qm/67UID8r1H+4SQIsS8oowke3siTnxanndAnDSDf6SL026krcSDrtxNwMOmsvSINE0Qx6eSB2R75rxwEcSKMJNDteV59VecM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=C9m4c5Ow; arc=fail smtp.client-ip=52.101.72.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1770299011; c=relaxed/simple;
+	bh=AYeJ+T8x51PtDnhmjECl6NgKdnsTUzPwbWv6F7pImTs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nRdbOPGnj9Oik4vdDt7WAjBfGJl7NTvNvIUjyfSwdAVgfUhibF9nFRKV9T0fXmk2qfLtqOeGfrfDP/nvSb2uMZ9IQYvNmhI5SAZ3WwjVpPtgaaxa3B421ut/i1XF84Jx2I67ipsgGGH3bCJQQtCxIpbMToYyZYc2OvdG9VHbT6k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iouvOC7m; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770299010; x=1801835010;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=AYeJ+T8x51PtDnhmjECl6NgKdnsTUzPwbWv6F7pImTs=;
+  b=iouvOC7mBdf6OkbPvkC1bgM6cm6ifz2Xcvc+3RecwNdRzxgYqAwY2pgd
+   sSnSiGKUu//kIyqTVEN4h1IvygCBa/J4T1V10AsMzXfuKKI4e2AXLo9vB
+   DjGqJdf5TSGGKApG/qsd9d3Cs+W/sZfXVA0zOvJr4wlsMNwj8RGqf5VXs
+   zEToaFRtbZmgQw7Ja43vqbPGA789PdYx+26O5A6fbCsvpirp0MCISVT3e
+   DAyQlvdiwtEVp6Lgr1ZOr3R8H3zmeBOdZ8cS8Gxie7d/Hdn9dPhuUzj7z
+   7U1c+gExJhG/DtHbF4IXkURJpzPkP4VFyLa43W1jOUrMEIuQcbXCk2v49
+   Q==;
+X-CSE-ConnectionGUID: M9KEWGqHRXGchw0vaRvjew==
+X-CSE-MsgGUID: IZtWbv7/RO+jjxgWVAvEag==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71670917"
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="71670917"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 05:43:30 -0800
+X-CSE-ConnectionGUID: vAsza4vmQ5GIIHz9rn14YA==
+X-CSE-MsgGUID: fvpNYumFTs+9jYIDOdt/dQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="210564357"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 05:43:29 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 5 Feb 2026 05:43:28 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Thu, 5 Feb 2026 05:43:28 -0800
+Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.52) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 5 Feb 2026 05:43:28 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SNR2JHLeQKTq70PivarG3+TEA3Tbnnf3TX0qhlKeL+0/3nPxKa4PUHX5x4tpxTnEDbiZd6ifD6tKMZvrb26uRfvKx1nU5hGzWrBUL6as2MRLUMAJ4ZGdxJPkA8oHmSbXfnQzVsmgeIwrJIO+kTDZ/KhNBbj1P5j+1H81Xb60s/gu8YJAFHSV8yC3nc6i4mWRVLkvhUmvl6Sf0eUkHOJ4MiQnaftZAlinypQHLXH8aLY4Vqlz/+OZHNtQMqi7bJGNk05fCFRprJgeUhWjYOfpDxgTbDZguVYBqGiqy2Ekr98CBOScCm+9X+3ByGpfHtHAWRhF4zxebbSNqcQo8JXIOg==
+ b=SIOAQ/zeSgRKLGT2EiHZ7G852hdZuOjMSp4yajx0sk4qAJIB9fROgv4pWAPokyt+xrv513kuxAZTVREHr0S5PpgaRCuu4IpLUDBtDqUJ+fPnBJK8r45Ta8czDSnY3RbTm8XE7wO/CIpXYT1k3FbR7K9MF1HXANOxRS8m9dY8VquQ1O1IRCadRQoIuE5cNj7CLy2S4VtNzY4c/MJ0mXGaO1p9M5iHQWFkxQxejADks+502doB8qPJXn6Yw4r/i6lAoB/hjsY3shzf/z8GcGLEF4ReMlr9tH3fB/GlMTJxWEgkhLAY4zoxIX2+gs4CQB1DwQJHugCPJo85Rg7AStVvBw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iMNzhGghf6eVc8eDGWAkHCnxgiSU3RzkEqHzYFdDEm0=;
- b=MdW9UV4aAAT49fcK30Up0VOjQS2Le9wFgAzomX9/Wd1jcii9GL/v44+ETa02CbdLIkpnzcS55jDzRYOqysZxmgMbSLcVMtDEFykHg3S5BsvW98oAh2dlbT6FbMo9pkluG5SFmY5efc6johaMv3MAsWYhUzKyKtcRM0XHlacXVl/ckMFkTTe0H24FELH+AUNxs+nrbuTnEMBNSxaJDI32+DmxXyrsViVyKOEi2pZ+ckecnskMukszbDcsfXiYc68QzucM0+L4YeddW+yA1quw8qOvaQ5CWvRL+h3Cq5mRrNYszLYXhc1aZpCRksK5wFhDKamRR2YelPLgPDI+B8mkqQ==
+ bh=Bd5y7wVNd30RNQHWTvsGPsnTlQneOH5xY9wmj/l24ZM=;
+ b=tSOyFdKwTV66k8HKw7kN43SztXBr5Y93Cjiarv0u2SIk77Jh0V9BJ6fJUW57t6EN3tNcXiqk/SkKEflXpySxf8k20olR1HCO01e++2uQ7NjjTXwnvYdy+K+0fICpxzECa8DkFo3/P9MukDqVwxYfMKWA7l3hcGaDKBOIszNrVuzyq+8d9stxoFxBqHTPJDR3cBsQIwO4PxdC8UCgHtp4uNdM+vzCz7zYpC814p45h5vctcneoXJ43IRFj+BIpCAyEZ1cyQkaEyeSJOvn/a2oJKjXrAWTKD7erroVWwzK+mOukqzITYwHnzqIY2vCoLXFpgEVvummXkMrwYJyeItDmw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iMNzhGghf6eVc8eDGWAkHCnxgiSU3RzkEqHzYFdDEm0=;
- b=C9m4c5OwrWqUqi7sXqaHJnQt+VtoOIzet3swHNbptU8gbJQENapGUHUqrmjCAttBpaAeQ2vn2S6gT2F0+7xr4Lkc8RY9GrjlbzSgfHRJ6/F0gbvRyuLVFio0LUiKX5D+zoQBEvKwu3OPZal0PmINnuYn7LV2cH2gP9a0jcS3shsjAvdtcn9BCFXiClMBtWILW7PJ754jderJGhv51421dXdpB24F7f5q1Rc1yJMQ0+bM8cmjbIh65TlPxQfRjH3K64KTF5u4IrytDGQ2hDw/ZXcn5Ka7zqieTzIjg2KUhmVPCtrd0of2C56yC8lkNdr9fAiO/N9GbNJUmsQ4M2i/+Q==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by GV1PR04MB10478.eurprd04.prod.outlook.com (2603:10a6:150:1d2::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Thu, 5 Feb
- 2026 13:40:52 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9564.016; Thu, 5 Feb 2026
- 13:40:51 +0000
-Date: Thu, 5 Feb 2026 15:40:46 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	"Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>,
-	Tushar Vyavahare <tushar.vyavahare@intel.com>,
-	Jason Xing <kernelxing@tencent.com>,
-	Ricardo =?utf-8?B?Qi4gTWFybGniiJrCrnJl?= <rbm@suse.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Toke Hoiland-Jorgensen <toke@redhat.com>, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH bpf 6/6] net: enetc: use truesize as XDP RxQ info
- frag_size
-Message-ID: <20260205134046.pggwyosutj7ggi4i@skbuf>
-References: <20260203105417.2302672-1-larysa.zaremba@intel.com>
- <20260203105417.2302672-7-larysa.zaremba@intel.com>
- <20260205005901.gnju3zmqimtgeu2b@skbuf>
- <20260204173401.282899d0@kernel.org>
- <20260205122953.lscemcctayrvszdu@skbuf>
- <aYSP344FT-JlylwY@soc-5CG4396X81.clients.intel.com>
- <20260205124638.hxzvjiocephzlrk3@skbuf>
- <aYSZw4wbd-nvLTuD@soc-5CG4396X81.clients.intel.com>
-Content-Type: text/plain; charset=us-ascii
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ DS0PR11MB6470.namprd11.prod.outlook.com (2603:10b6:8:c2::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9587.12; Thu, 5 Feb 2026 13:43:26 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d9b3:e942:2686:3cdd]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d9b3:e942:2686:3cdd%6]) with mapi id 15.20.9587.013; Thu, 5 Feb 2026
+ 13:43:26 +0000
+Date: Thu, 5 Feb 2026 14:43:11 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Keita Morisaki <kmta1236@gmail.com>
+CC: <tony.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <paul.greenwalt@intel.com>,
+	<aleksandr.loktionov@intel.com>, <alice.michael@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2] ice: fix race condition in TX timestamp ring cleanup
+Message-ID: <aYSeb42KRzlc4SbA@boxer>
+References: <20260205024327.233346-1-kmta1236@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aYSZw4wbd-nvLTuD@soc-5CG4396X81.clients.intel.com>
-X-ClientProxiedBy: VI1PR08CA0239.eurprd08.prod.outlook.com
- (2603:10a6:802:15::48) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+In-Reply-To: <20260205024327.233346-1-kmta1236@gmail.com>
+X-ClientProxiedBy: TL2P290CA0006.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::6)
+ To DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -118,214 +116,342 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|GV1PR04MB10478:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27692714-31ed-4984-4629-08de64bc2d2a
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DS0PR11MB6470:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47fe888e-e727-4385-7dea-08de64bc898d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|19092799006|1800799024|366016|10070799003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OcpjA/lGwKtmXTgaOGJGDELocES41U2Pu5YfbQwbuKVA7Z19PhG/GSE/h2AC?=
- =?us-ascii?Q?TEy700yZahgNBKC/7DgauIMVThrezhg8AqINXtVtv7GNcLUA5QxBWHSAhKMN?=
- =?us-ascii?Q?Vv5pU8doKv8NK+cGDwB8HXsuhn+4NPPZOmzw9bHecI2fDDlKNzHjtyl0F0Jy?=
- =?us-ascii?Q?Y5K0pEDkzRmQlbqOoGRSh1KF8tlTZ1t1gDjNCqqd1DiBS6dm5tQF1mRK/E5Q?=
- =?us-ascii?Q?uYWje7HzHCbwSu/+iEDMP8JubcDynprayUcsGbj7XKGR5kELXd4K1pShF+jJ?=
- =?us-ascii?Q?IiOLwXn2SxpON0XB0lHrZQUnTvJ/Jgrva1zmRuJQn8N90FItHbg61GK5mm9h?=
- =?us-ascii?Q?0W6lC5mleJCXN+KRbJJlGTwPSG3FguuyIWSeS//DX6Q84OmFOYxegE9NldQN?=
- =?us-ascii?Q?p1XRckOVJTpf37X70mTXkZCekybXcyqZERVar0SaNRa+fX8ZIjaYXtFFt6Zp?=
- =?us-ascii?Q?+5TuXregQK+d5GZ6tAAMuXlYoUH/LS27qq6cIZHcwboU/1i+Qgw7Mm1W0zWL?=
- =?us-ascii?Q?NXteNB4zIrZHZW+/Ij0lqV6HSxt8uoEBWYFs7cx5rOyqBCJ9VPGUkkRvcONk?=
- =?us-ascii?Q?n6a9fJiqQUH+pcnPxsS76aGtXiyM5oEuBJAhAE7dQPmf2xT18PG8v5QWJJV8?=
- =?us-ascii?Q?WxcjeVHMq9Pz6HnFknNA5MQpdlJj3/mBcnck9RjFyO/ow8j7cnMGqPOYbX9/?=
- =?us-ascii?Q?TjIU5DjCNu5oWV2ewMrTgQ+rLgsOC/B+TPHosX9r4aXL2Nf+Ewjt4ksE4N1d?=
- =?us-ascii?Q?IvgpGKkOZ+uI4qCc7dlHhmvhwBIRA/SHj9mYIFbInV53LmpdskxQNy6QRdEA?=
- =?us-ascii?Q?eNSCstiX/mBfoznT6h5QMzNvo3H17aPPf4wjUJYtFyEmuD0UQih5acuDOMqh?=
- =?us-ascii?Q?a61+4uPudPOOlJ8WHZAZWw5NIZNqO3KRShFqj+lFRl6al1DyJiYzf0zCkqS6?=
- =?us-ascii?Q?z7xb0vXneY59Yp/mLyux65zBKm/Odqp/uyM0ZU4xwIbb8HPHhlDJnAzeqd6w?=
- =?us-ascii?Q?prRleESOZ26sTETj+0Hn8jZjD8A/KFWTZOIIOzxahnFxHceB0QeZP8j2e93K?=
- =?us-ascii?Q?fRsg5RHdDxAgEU+D+RHXo6qR1ypXdbmJhiNZoHHx+COKgRulBlR9hmtZHVZd?=
- =?us-ascii?Q?AOD2OQeDmD0KAzyewjZ6+6Co0AjU+7rs12MHcqCK0i+8Aiwvbi6nsx04GX3d?=
- =?us-ascii?Q?w9JaUx4s1xL6Qzg/uhrbSwWHze7NRuAFjVAEzWOis+sdHX2JC9bERyfEIDF6?=
- =?us-ascii?Q?rVpVIhxHCrQcxUhoPVASh3DLcFxO3IGUuycldNBrhl+sNCsw+wjOmeqc/lSK?=
- =?us-ascii?Q?aT2rRFOxScvubIpIQKz2mF1aUsHZRoSinHbOJQ2u7MXsqCOYsAJXye0Wv+ph?=
- =?us-ascii?Q?0WREKn3RWHHUzUllJ3ecK4hKO3wXH79oyGKQV221M9rbDVASxBvhwIL/sbu3?=
- =?us-ascii?Q?Ca7uPuPoY1j79j1uCES3NvUN3m8BIUr8bSSl3fJVqNnwzDR1DPK96KffSG4q?=
- =?us-ascii?Q?UVzUUM8ZUb4+fLjbLIGoy3v29oxaD8E3D0HnNGCfvgiKxlqOCWgfKJ6TOsD6?=
- =?us-ascii?Q?wyL0KbPmQLSXTGnOAhE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(19092799006)(1800799024)(366016)(10070799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?owbVyTug8VyosgvjIMJQyrLaYFfrZw6YeCjflw9QeySndAktFp6kNaYH+1df?=
- =?us-ascii?Q?7u69o3PK3fw5JXTvXiNldjwujkY75ZsIzcZPxS8k7ytYjUP+EBYg+pW+ite4?=
- =?us-ascii?Q?BOnOQFoJF50sT5NrL0eydEqD2vdGiF23EoDNO6JPAJcHvHwABjWlv1lIDxau?=
- =?us-ascii?Q?Zc7OM+Od4fMNs03e1vKRdyuK/58NWwX4IpbYornz5WV71EAAVSmAEMWc12Lv?=
- =?us-ascii?Q?WFt2auzTizXb9iaEp2EVuuGyE5yWL+IxvbEGA4c5eClORIKZjuRDSfUHzB0S?=
- =?us-ascii?Q?7366bJ+xFz8WvqWLMjaYyVG5O7No86dquLQcLe24C74Vny/xdDQDETu6uOLB?=
- =?us-ascii?Q?GsauCuYkgKNzJDxv1mAZ1fOVznp0e2u+m4jx4bGXDrjNgMbx4b2kt5bGqlzK?=
- =?us-ascii?Q?kW4a2zELqpSwLV6vzWHl4Bs9LA1sajjAWrAEG7ZqGmNa4qtT9QA/Wk4M2TA3?=
- =?us-ascii?Q?oMZPqatRVN8wvZ4hWhlbDV5Cf6i5j0A2IUifPJrJNEChkbdua/uXD+Rxwtdl?=
- =?us-ascii?Q?kjpIvAyfHQ6jaMwQOTRc+wGD5F5L+X/jdJGagaJcDvtnfAHUj0Y9QS87Gmpz?=
- =?us-ascii?Q?OQjwpd9bvNWpNDOlG5DyeqO2x/TfpRY2rbRmW2DkCJoqUdlP84j9hPf5PHJz?=
- =?us-ascii?Q?LbrAMXAu2dDrrtEsjI++ZEa+sc9iaI+QTuOV3Lt7zLAwy12c97QTKOrqCitK?=
- =?us-ascii?Q?/D1iG5gaIPXOc8AHpe2FNOgopse9e3pE+jGsjVQItv39vrPuoXMOyGQhccWj?=
- =?us-ascii?Q?mrym1VnJrmPBOt1bu9pRxOHAspIZmTUWAay6DEtY4s/kaRjxaVAOl4cKT37k?=
- =?us-ascii?Q?wG4b5Om6fcvcz7SfCUXpfX8TI+UXbhE0D4/Rip5F1jzfOOT6pMbdWugh0fY0?=
- =?us-ascii?Q?RnaUveSh1/+0345kyzTEXBmaFD2foi0wPHOuDKA/jfznHdKd/YoTFjNNpd3f?=
- =?us-ascii?Q?DG17Zuz/sIxcTpilH/UA+fo8v2XPgJhn/y1OWxPRCDfhJOaWuCnS+A7UjYWs?=
- =?us-ascii?Q?bK+dW2xQyeyRRe4y1p06EBukr0p+QpZkAmbc99jrr635OKz2iUIsAVpLoV1o?=
- =?us-ascii?Q?SYtX6h/HghA/OATZ+45jzUETXPp9Si5cJQtFWMTmw7j43IOwvnb1tdxtXcNk?=
- =?us-ascii?Q?rC8hULqgwFR6CYzvIA3Vlb7YyUWyI4UeH0XQyaJgPsjJ+d+LBi/k+vbtcNmd?=
- =?us-ascii?Q?ionLaiDuMHbRZB4Vty7IMyAimW9eekFIeq/JDf8r3FtpnOFWKOB15jVRSeAX?=
- =?us-ascii?Q?K7LGJ3QqqbSi3hg7ZqmOFBByiYA2d7+miDBScwR2I+6nzzqfUvuwH4tDbj5O?=
- =?us-ascii?Q?qGtoqz6m/oLY35Vi4a1Du2vt8p9obVGEzeLsgcc2/PXsE7bdqEZ73acMwQ1e?=
- =?us-ascii?Q?ZI99/pooQNPzQoduRP4eNJc3+06Po5awq9l5sc5X4eD4tw5oeuYPJtYGTcMW?=
- =?us-ascii?Q?y4Vp/XR+orm08jFDkkQF16w6fvEHr296o+yBdaLwX+EAhDsjQFNYVVjnOdnY?=
- =?us-ascii?Q?tFH3D8eZgfaiEgGCHDOhRXRx0aLKrknPxCud0sTvzxk2wPLni3KvWUmY0BcW?=
- =?us-ascii?Q?wT/dxvWgyLsWaD3SFYRs7Ht0cBSgiKVX46KRAFbTvwSAkfZLAcyINUuXfXB3?=
- =?us-ascii?Q?J72l2DO7ZePE7bqzr48OpyG3BKnSoniVRTzpPf1exR64oijPOXv1ckdWzIvd?=
- =?us-ascii?Q?MY7brz0SrUxcxwtnuC44Q/tNnM+axnTzj+16MXDiHEpJPYIk3PwLgLvd1p7c?=
- =?us-ascii?Q?j9flgr0WN29UsvG6sIWwol5wWUb6c7uh8cSrrIMCv8P4DK0FPamV4fz3fBFr?=
-X-MS-Exchange-AntiSpam-MessageData-1: R70149CyZNn8z/Q9ExY+mlua9c7GChNe88o=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27692714-31ed-4984-4629-08de64bc2d2a
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?PH9rIh5e57E7pl6hI/hBD+LhyPvwL6sv5JeioTGCx0aLaG/o2RI2SGLX8YEF?=
+ =?us-ascii?Q?LQrK5brXxyW5+ckKPTFpxtys/qN+NAS4B69H3HlUHCrJDrYG8Cy7laBwnuI2?=
+ =?us-ascii?Q?ZBHypM8NC/riRjkusI6kwxiGJKoQA/4TwwYOCYtP5v31/igp1l6DMJ2nWVmn?=
+ =?us-ascii?Q?zocmgnjHwlkYVaGoPebhAzxqHvqPci02+xHSk8iSAHRMhf0YraPwv4qV85Pu?=
+ =?us-ascii?Q?LDF8J3/2uqLi4IcvE14pq/5LQSOKPCgkv2/LgOaGQwUYa0Cyz7dZAuyuhjr2?=
+ =?us-ascii?Q?WNWiGO4k4XvEuu9TQafOpX7F1a2YM9RByv1+x2zoYzL9ABSmgVYnOzmsmDZQ?=
+ =?us-ascii?Q?QlaxTUWxEP8U7d23NU7PE+mB1K8gd4uaLLTAWWuptrqCHY8kvwf8CWalL043?=
+ =?us-ascii?Q?S5b9WO87FgSI91CVDOh8Zn3kfkKbyPYmbFtqBjOvNa3rUFTZalV5h/tGjIj9?=
+ =?us-ascii?Q?TukqEgUeTqpe3cRzBElB4IfoPNZlx6wx72PXGSg0Xmovii/e+IMcbkS+RBmP?=
+ =?us-ascii?Q?FfMU37Oe5mDeFL4a1pYx0HW7bR2MtSsWtCEL9X9HZ7fiTFR8ZJihA4BgKITe?=
+ =?us-ascii?Q?o3oWhsiMlunJDEwd1uu/Z0cfANMhlAom0HmjS48gBADdCpuk2uMqyuORDmG7?=
+ =?us-ascii?Q?ytNm40mAge6SAXcDvDyiulo3o9PZ58dqyi/W7ZfHK2dlf0RVBTnTGbuPE9Jl?=
+ =?us-ascii?Q?+F/QCA1VtKZ/6LrpbUOSEHmXMN+wvKH8+sP9Q7OQVDljD8i5sH8ZnqdJZutI?=
+ =?us-ascii?Q?VIksLxgUqF0njPgp43cicBwXLN5Z9O6Imzb5YiqclL/DO9r/1Tthi2yQos+x?=
+ =?us-ascii?Q?cJKS8gRiSYLfwhgx9tCquWr1eVjv3g7bYZALgXfw+26kM+GqZ/MQlYG/fsCm?=
+ =?us-ascii?Q?skFNF0+8uQ3W6A+T1/ddjAMMS4ruuP3qCbaw8QFt3TlATIY3gd0uN+2G06j9?=
+ =?us-ascii?Q?xY1QNt+IoYe/nE+TB7NE7cA103rOUZEbU9JUP4ZlQn/aIfH3+peoZij2Itr7?=
+ =?us-ascii?Q?DgivC99JUphwf57nKNARrATEdpLee9T8niB1tfL+55ck6hGfeviDUYAJVTuj?=
+ =?us-ascii?Q?vpOX+0NX7FinIVBzsUtivJer9VPgne8ZddVtmSTgjJ732qNTHURmUYdsIltA?=
+ =?us-ascii?Q?oMV8SCDNnzGWHq/+gkhjoXHTonXn1XY8we6HdTPKFFbxIjxqpFHJn/AD/c/h?=
+ =?us-ascii?Q?f0o1Igy9mgRi+1ivvzlX785HSRKP8X/Sy9xXhgCQgl1X4LHKain8vlCbSWG0?=
+ =?us-ascii?Q?Gs1YGH8ZreQjAptZNcHsRq5ftOHq9Zw9R37BzwOszLcose15bnof9RMYOhCx?=
+ =?us-ascii?Q?yupmLPpiwlwTgRlELtRff0/2SgvoP+30Lw6DlWoMlSK4jrrDwakntU1Kp/qQ?=
+ =?us-ascii?Q?cSU2ROri9UvP6ISHV0i5IfSznYapGJO6NNHZqb99DuCyp5W5Rf8BcR02WVaO?=
+ =?us-ascii?Q?0d7tgJyb+r7aCbmuiULVN7fU2mwuAjC7zWMd512T7utGUl6BSqCvDtkuBjj/?=
+ =?us-ascii?Q?tt0NwlWZ4qd+R03VH87Rgpt+fvokEthozbdToOcj1KWXp5cUx51NLoyyDpf0?=
+ =?us-ascii?Q?Ap88PjEOH1+dd75vfLw=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RMdIzv4yqDZLeOYbNkLaI96yZKp9RPz7GrCUXaCuTtYZcA1gV4Op1ewJGRri?=
+ =?us-ascii?Q?2tqyJMDkSzn4znyJBTNm8Z/AyLJxcddZJ5IPvJN2QqX6bX9CdTb/hDU1oFxY?=
+ =?us-ascii?Q?WKlDr/oTKefSNHBQEDQXJXY5UxLAmYZFp/9OkltaddcyFIoNO5pI9sbRgIkL?=
+ =?us-ascii?Q?qo3BJoIXJM/iK/3HE66gExATIc6esHVYgiLmvQJIvlKCWploQEWCrMIyRwzn?=
+ =?us-ascii?Q?7RGun6ktMxu3HZUoLiX2oFTxw1hYBtHKE7zK4m+R+6qy5xVC3jV0HngF6rg1?=
+ =?us-ascii?Q?/gnXN68f/XjcSQPSKFzDqUe1xtrnPUvWIS0S8+RzcmvH05JXQ3UQQeLDJy8l?=
+ =?us-ascii?Q?3WwwMEOSCnyd5+G+5g2OePZL5yTt1ZsXfREcWL+focD+Iz6cJYb8B5kqhxrQ?=
+ =?us-ascii?Q?nRQHig5xd8vN5mYTsUVVDoi52u+HE6HS77/oE1fROB9IpwqzJZOQ8/3W4VLn?=
+ =?us-ascii?Q?HCC4xFQltW6f9L1B2C7/gY8gYg7B3E68GbFQarSx2TdrrLWjHwt4DoOH3m3R?=
+ =?us-ascii?Q?hoWVRmf09ixyNMkrGIOej3mI0RwkKfqhusUAHIoR/PWjPP5hU2JXgEpiI5DY?=
+ =?us-ascii?Q?pOfD8X9u0c/Mdv5jYRUwkldAWI7oWIqquu/ucC9AXAziexcY1n/hzsVAMGsH?=
+ =?us-ascii?Q?DtTtQT5urumHnvlo2kwaQErS9lZffLLNE9R81yBGAneKrTRqS1scEN1GoT04?=
+ =?us-ascii?Q?ltg6DXvMBZlikeWAYYlMYxJFmDB+xfnixqqmOTtabR5UrgAyKKHXI5xzcBtP?=
+ =?us-ascii?Q?svCbk1EAULv8xQt4Wpf81QLnRWm9DU9veOnYdCVtHgxoy/4nDgGoDTnDbuaK?=
+ =?us-ascii?Q?7AmBREHhIkEjA1StnO3WV0HmMt2ENx/khIf73LZgE4ZBjRbaVWztpOk/aukj?=
+ =?us-ascii?Q?9VPyTP6+aMXphugs9KL3lxFe6UTQ2VbGksSLsk7rQ2ypbyHUaRQkbgEq0+Dk?=
+ =?us-ascii?Q?rQ8kWUIbeAq6eqr45ebWos3jQ7uG56shCfFecBEhwQ6+0G9hbgvjI9+Y8c/w?=
+ =?us-ascii?Q?DUyO/MRww0zSQN08p4Y1T2cttXESw0LggelzoaYpMErbmRm7JyKkLbjbojx3?=
+ =?us-ascii?Q?XDZEsxIcIF2mXv9Dyp/Om69g5YATk/UPr2yHKP8aqDilLBL+0GvQyQN6pwin?=
+ =?us-ascii?Q?O5nKqmomFjR72uEsPg1YQ5AYHdYya7mO/JmjkTzX2ihjZfDTBYDJDNuB6Lo1?=
+ =?us-ascii?Q?VBtpm7c+2J8hokUsJyhccYlI4Zekn8CRf6cKIYxlNEZgF47Ok9qnH6PwJ82C?=
+ =?us-ascii?Q?LT0igb6/dBYrENvlJYCzHK+5z7HRoUtqYzNjJan6gltStnOa3ZuLyYf6YDbJ?=
+ =?us-ascii?Q?edFYXrnX9ScFUmNliGkL8FDrjOTvT6MhH6e5sUzYnJz5qj0SPNxMcCbmI1lp?=
+ =?us-ascii?Q?YGpHm6Q+cbQt3UUqLNzTAe1hdC/4xZVcCGTfYbWes9TMPs56UOlYsQ4NLMm2?=
+ =?us-ascii?Q?vNDKezgBFN1vrnabcIwRI6WCgHrYwxKzDTydQ1JxC236Bn+v4NQHjOqDxg4r?=
+ =?us-ascii?Q?CF55UvYxns5crppNTdUQzxAeoWoixGEUoA5tx288IKrMSNT2/B739OZYcdB8?=
+ =?us-ascii?Q?KnzRKcheLDkp0EsDHPgWdOOd7sguiC6VMBGem9nB/IwXzTMszTKX0lEBKcyh?=
+ =?us-ascii?Q?GCv62VWsmLuMDycWvZaX3Kb8iPOZEz9qznEI/bU1iCb9NUMegCGL/3tXzo1u?=
+ =?us-ascii?Q?/ZbO8J3qiHs3DBe+EvFB0kLfvdKXN8TDrwEMBe9g3xzoDPgp3yzBpRJhFyWp?=
+ =?us-ascii?Q?abxYbIiLEb0ba6b7+wGpBSKkG7RsQ2A=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47fe888e-e727-4385-7dea-08de64bc898d
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2026 13:40:50.9954
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2026 13:43:25.9016
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NyKYHxXyaxGsdh5rzLWG2XbvBVgDEr4BosE/6r/isdUmgAzFPX77CBDYBekDp+mO/s5zrXaeA8N4lvCYvj/Gfg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10478
+X-MS-Exchange-CrossTenant-UserPrincipalName: AZZioVkVvFU2phiNBlHKI5/PMNppvukp7b2NWBQJf7pWPD48ZbdtCuHlk5XDgtw7TI/JkiWreKP+YYKatmBOt+guj85o+1+9hMSP79Ag6x8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6470
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257183-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257184-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[42];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org];
-	DKIM_TRACE(0.00)[nxp.com:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,intel.com:dkim];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nxp.com:dkim]
-X-Rspamd-Queue-Id: 48124F36E3
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 04381F3758
 X-Rspamd-Action: no action
 
-On Thu, Feb 05, 2026 at 02:23:15PM +0100, Larysa Zaremba wrote:
-> On Thu, Feb 05, 2026 at 02:46:38PM +0200, Vladimir Oltean wrote:
-> > On Thu, Feb 05, 2026 at 01:41:03PM +0100, Larysa Zaremba wrote:
-> > > On Thu, Feb 05, 2026 at 02:29:53PM +0200, Vladimir Oltean wrote:
-> > > > On Wed, Feb 04, 2026 at 05:34:01PM -0800, Jakub Kicinski wrote:
-> > > > > On Thu, 5 Feb 2026 02:59:01 +0200 Vladimir Oltean wrote:
-> > > > > > Thanks! This is an extremely subtle corner case. I appreciate the patch
-> > > > > > and explanation.
-> > > > > > 
-> > > > > > I did run tests on the blamed commit (which I still have), but to catch
-> > > > > > a real issue in a meaningful way it would have been required to have a
-> > > > > > program which calls bpf_xdp_adjust_tail() with a very large offset.
-> > > > > > I'm noting that I'm seeing the WARN_ON() much easier after your fix, but
-> > > > > > before, it was mostly inconsequential for practical cases.
-> > > > > > 
-> > > > > > Namely, the ENETC truesize is 2048, and XDP_PACKET_HEADROOM is 256.
-> > > > > > First buffers also contain the skb_shared_info (320 bytes), while
-> > > > > > subsequent buffers don't.
-> > > > > 
-> > > > > I can't wrap my head around this series, hope you can tell me where I'm
-> > > > > going wrong. AFAICT enetc splits the page into two halves for small MTU.
-> > > > > 
-> > > > > So we have 
-> > > > > 
-> > > > >  |                 2k          |             2k              |
-> > > > >   ----------------------------- ----------------------------- 
-> > > > >  | hroom | data | troom/shinfo | hroom | data | troom/shinfo |
-> > > > >   ----------------------------- ----------------------------- 
-> > > > > 
-> > > > > If we attach the second chunk as frag well have:
-> > > > >   offset = 2k + hroom
-> > > > >   size = data.len
-> > > > > But we use
-> > > > >   truesize / frag_size = 2k
-> > > > > so
-> > > > >   tailroom = rxq->frag_size - skb_frag_size(frag) - skb_frag_off(frag);
-> > > > >   tailroom = 2k - data.len - 2k
-> > > > >   tailroom = -data.len
-> > > > >   WARN(tailroom < 0) -> yes
-> > > > > 
-> > > > > The frag_size thing is unusable for any driver that doesn't hand out
-> > > > > full pages to frags?
-> > > > 
-> > > > This is an excellent question.
-> > > > 
-> > > > Yes, you're right, bpf_xdp_frags_increase_tail() only has a 50% chance
-> > > > of working - the paged data has to be in the first half of the page,
-> > > > otherwise the tailroom calculations are not correct due to rxq->frag_size,
-> > > > and the WARN_ON() will trigger.
-> > > > 
-> > > > The reason why I didn't notice this during my testing is stupid. I was
-> > > > attaching the BPF program to the interface and then detaching it after
-> > > > each test, and each test was sending less than the RX ring size (2048)
-> > > > worth of packets. So all multi-buffer frames were using buffers which
-> > > > were fresh out of enetc_setup_rxbdr() -> ... -> enetc_new_page() (first
-> > > > halves) and never out of flipped pages (enetc_bulk_flip_buff()).
-> > > > 
-> > > > This seems to be a good reason to convert this driver to use page pool,
-> > > > which I can look into. I'm not sure that there's anything that can be
-> > > > done to make the rxq->frag_size mechanism compatible with the current
-> > > > buffer allocation scheme.
-> > > 
-> > > I was just about to send an answer.
-> > > 
-> > > Seems like my mistake here. I actually think adjusting the tail should work, if 
-> > > we set rxq->frag_size to PAGE_SIZE in enetc and i40e_rx_pg_size() in i40e, and 
-> > > not to (PAGE_SIZE / 2), as I did at first, but in such case naming this 
-> > > frag_size is just utterly wrong. Glad Jakub has pointed this out.
-> > 
-> > I mean, it should "work" given the caveat that calling bpf_xdp_adjust_tail()
-> > on a first-half page buffer with a large offset risks leaking into the
-> > second half, which may also be in use, and this will go undetected, right?
-> > Although the practical chances of that happening are low, the requested
-> > offset needs to be in the order of hundreds still.
+On Thu, Feb 05, 2026 at 11:43:27AM +0900, Keita Morisaki wrote:
+> Fix a race condition between ice_free_tx_tstamp_ring() and ice_tx_map()
+> that can cause a NULL pointer dereference.
 > 
-> Oh, I did get carried away there...
-> Well, one thing is shared page memory model in enetc and i40e, another thing is
-> xsk_buff_pool, where chunk size can be between 2K and PAGE_SIZE. What about
+> ice_free_tx_tstamp_ring currently clears the ICE_TX_FLAGS_TXTIME flag
+> after NULLing the tstamp_ring. This could allow a concurrent ice_tx_map
+> call on another CPU to dereference the tstamp_ring, which could lead to
+> a NULL pointer dereference.
 > 
-> tailroom = rxq->frag_size - skb_frag_size(frag) -
->            (skb_frag_off(frag) % rxq->frag_size);
+>   CPU A:ice_free_tx_tstamp_ring() | CPU B:ice_tx_map()
+>   --------------------------------|---------------------------------
+>   tx_ring->tstamp_ring = NULL     |
+>                                   | ice_is_txtime_cfg() -> true
+>                                   | tstamp_ring = tx_ring->tstamp_ring
+>                                   | tstamp_ring->count  // NULL deref!
+>   flags &= ~ICE_TX_FLAGS_TXTIME   |
 > 
-> When frag_size is set to 2K, headroom is let's say 256, so aligned DMA write
-> size is 1420.
-> last frag at the start of the page: offset=256, size<=1420
->     tailroom >= 2K - 1420 - 256 = 372
-> last frag in the middle of the page: offset=256+2K, size<=1420
->     tailroom >= 2K - 1420 - ((256 + 2K) % 2K) = 372
-> 
-> And for drivers that do not fragment pages for multi-buffer packets, nothing
-> changes, since offset is always less than rxq->frag_size.
-> 
-> This brings us back to rxq->frag_size being half of a page for enetc and i40e,
-> and seems like in ZC mode it should be pool->chunk_size to work properly.
+> Fix by:
+> 1. Reordering ice_free_tx_tstamp_ring() to clear the flag before
+>    NULLing the pointer, with smp_wmb() to ensure proper ordering.
+> 2. Adding smp_rmb() in ice_tx_map() after the flag check to order the
+>    flag read before the pointer read, using READ_ONCE() for the
+>    pointer, and adding a NULL check as a safety net.
+> 3. Converting tx_ring->flags from u8 to DECLARE_BITMAP() and using
+>    atomic bitops (set_bit(), clear_bit(), test_bit()) for all flag
+>    operations throughout the driver:
+>    - ICE_TX_RING_FLAGS_XDP
+>    - ICE_TX_RING_FLAGS_VLAN_L2TAG1
+>    - ICE_TX_RING_FLAGS_VLAN_L2TAG2
+>    - ICE_TX_RING_FLAGS_TXTIME
 
-With skb_frag_off() taken into account modulo 2K for the tailroom
-calculation, I can confirm bpf_xdp_frags_increase_tail() works well for
-ENETC. I haven't fully considered the side effects, though.
+Hi Keita,
+
+am I reading this right or you only modified flags to be bitmap on Tx side
+and Rx is left as-is?
+
+Would be nice to reflect this on Rx side as well, but I know it is out of
+the scope for this patch.
+
+Would you like to do a follow-up patch for that which would be sent to
+-next tree?
+
+Also your patch should contain the tree you are dedicating your work:
+[PATCH net v2] ice: fix race condition in TX timestamp ring cleanup
+
+As for rest of the stuff it makes sense to me, however best if Paul could
+give his ack here.
+
+> 
+> Fixes: ccde82e909467 ("ice: add E830 Earliest TxTime First Offload support")
+> Signed-off-by: Keita Morisaki <kmta1236@gmail.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> Changes in v2:
+> - Convert tx_ring->flags from u8 to DECLARE_BITMAP() and use atomic
+>   bitops (set_bit(), clear_bit(), test_bit()) for all flag operations
+>   instead of WRITE_ONCE() for flag updates
+> - Rename flags from ICE_TX_FLAGS_RING_* to ICE_TX_RING_FLAGS_* to
+>   distinguish from per-packet flags (ICE_TX_FLAGS_*)
+> 
+>  drivers/net/ethernet/intel/ice/ice.h         |  4 ++--
+>  drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.c     |  4 ++--
+>  drivers/net/ethernet/intel/ice/ice_txrx.c    | 23 ++++++++++++++------
+>  drivers/net/ethernet/intel/ice/ice_txrx.h    | 16 +++++++++-----
+>  5 files changed, 31 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> index 00f75d87c73f9..5baeca824cd99 100644
+> --- a/drivers/net/ethernet/intel/ice/ice.h
+> +++ b/drivers/net/ethernet/intel/ice/ice.h
+> @@ -753,7 +753,7 @@ static inline bool ice_is_xdp_ena_vsi(struct ice_vsi *vsi)
+>  
+>  static inline void ice_set_ring_xdp(struct ice_tx_ring *ring)
+>  {
+> -	ring->flags |= ICE_TX_FLAGS_RING_XDP;
+> +	set_bit(ICE_TX_RING_FLAGS_XDP, ring->flags);
+>  }
+>  
+>  /**
+> @@ -778,7 +778,7 @@ static inline bool ice_is_txtime_ena(const struct ice_tx_ring *ring)
+>   */
+>  static inline bool ice_is_txtime_cfg(const struct ice_tx_ring *ring)
+>  {
+> -	return !!(ring->flags & ICE_TX_FLAGS_TXTIME);
+> +	return test_bit(ICE_TX_RING_FLAGS_TXTIME, ring->flags);
+>  }
+>  
+>  /**
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
+> index 9fc8681cc58ea..bd74344271f3f 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
+> @@ -943,7 +943,7 @@ ice_tx_prepare_vlan_flags_dcb(struct ice_tx_ring *tx_ring,
+>  		/* if this is not already set it means a VLAN 0 + priority needs
+>  		 * to be offloaded
+>  		 */
+> -		if (tx_ring->flags & ICE_TX_FLAGS_RING_VLAN_L2TAG2)
+> +		if (test_bit(ICE_TX_RING_FLAGS_VLAN_L2TAG2, tx_ring->flags))
+>  			first->tx_flags |= ICE_TX_FLAGS_HW_OUTER_SINGLE_VLAN;
+>  		else
+>  			first->tx_flags |= ICE_TX_FLAGS_HW_VLAN;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index d47af94f31a99..55ff0708d136e 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -1412,9 +1412,9 @@ static int ice_vsi_alloc_rings(struct ice_vsi *vsi)
+>  		ring->count = vsi->num_tx_desc;
+>  		ring->txq_teid = ICE_INVAL_TEID;
+>  		if (dvm_ena)
+> -			ring->flags |= ICE_TX_FLAGS_RING_VLAN_L2TAG2;
+> +			set_bit(ICE_TX_RING_FLAGS_VLAN_L2TAG2, ring->flags);
+>  		else
+> -			ring->flags |= ICE_TX_FLAGS_RING_VLAN_L2TAG1;
+> +			set_bit(ICE_TX_RING_FLAGS_VLAN_L2TAG1, ring->flags);
+>  		WRITE_ONCE(vsi->tx_rings[i], ring);
+>  	}
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> index ad76768a42323..564e4e33ecbc3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> @@ -190,9 +190,10 @@ void ice_free_tstamp_ring(struct ice_tx_ring *tx_ring)
+>  void ice_free_tx_tstamp_ring(struct ice_tx_ring *tx_ring)
+>  {
+>  	ice_free_tstamp_ring(tx_ring);
+> +	clear_bit(ICE_TX_RING_FLAGS_TXTIME, tx_ring->flags);
+> +	smp_wmb();	/* order flag clear before pointer NULL */
+>  	kfree_rcu(tx_ring->tstamp_ring, rcu);
+> -	tx_ring->tstamp_ring = NULL;
+> -	tx_ring->flags &= ~ICE_TX_FLAGS_TXTIME;
+> +	WRITE_ONCE(tx_ring->tstamp_ring, NULL);
+>  }
+>  
+>  /**
+> @@ -405,7 +406,7 @@ static int ice_alloc_tstamp_ring(struct ice_tx_ring *tx_ring)
+>  	tx_ring->tstamp_ring = tstamp_ring;
+>  	tstamp_ring->desc = NULL;
+>  	tstamp_ring->count = ice_calc_ts_ring_count(tx_ring);
+> -	tx_ring->flags |= ICE_TX_FLAGS_TXTIME;
+> +	set_bit(ICE_TX_RING_FLAGS_TXTIME, tx_ring->flags);
+>  	return 0;
+>  }
+>  
+> @@ -1519,13 +1520,20 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
+>  		return;
+>  
+>  	if (ice_is_txtime_cfg(tx_ring)) {
+> -		struct ice_tstamp_ring *tstamp_ring = tx_ring->tstamp_ring;
+> -		u32 tstamp_count = tstamp_ring->count;
+> -		u32 j = tstamp_ring->next_to_use;
+> +		struct ice_tstamp_ring *tstamp_ring;
+> +		u32 tstamp_count, j;
+>  		struct ice_ts_desc *ts_desc;
+>  		struct timespec64 ts;
+>  		u32 tstamp;
+>  
+> +		smp_rmb();	/* order flag read before pointer read */
+> +		tstamp_ring = READ_ONCE(tx_ring->tstamp_ring);
+> +		if (unlikely(!tstamp_ring))
+> +			goto ring_kick;
+> +
+> +		tstamp_count = tstamp_ring->count;
+> +		j = tstamp_ring->next_to_use;
+> +
+>  		ts = ktime_to_timespec64(first->skb->tstamp);
+>  		tstamp = ts.tv_nsec >> ICE_TXTIME_CTX_RESOLUTION_128NS;
+>  
+> @@ -1553,6 +1561,7 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
+>  		tstamp_ring->next_to_use = j;
+>  		writel_relaxed(j, tstamp_ring->tail);
+>  	} else {
+> +ring_kick:
+>  		writel_relaxed(i, tx_ring->tail);
+>  	}
+>  	return;
+> @@ -1812,7 +1821,7 @@ ice_tx_prepare_vlan_flags(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first)
+>  	 */
+>  	if (skb_vlan_tag_present(skb)) {
+>  		first->vid = skb_vlan_tag_get(skb);
+> -		if (tx_ring->flags & ICE_TX_FLAGS_RING_VLAN_L2TAG2)
+> +		if (test_bit(ICE_TX_RING_FLAGS_VLAN_L2TAG2, tx_ring->flags))
+>  			first->tx_flags |= ICE_TX_FLAGS_HW_OUTER_SINGLE_VLAN;
+>  		else
+>  			first->tx_flags |= ICE_TX_FLAGS_HW_VLAN;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index e440c55d9e9f0..d35ffdc3dc84d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -181,6 +181,14 @@ enum ice_rx_dtype {
+>  	ICE_RX_DTYPE_SPLIT_ALWAYS	= 2,
+>  };
+>  
+> +enum ice_tx_ring_flags {
+> +	ICE_TX_RING_FLAGS_XDP,
+> +	ICE_TX_RING_FLAGS_VLAN_L2TAG1,
+> +	ICE_TX_RING_FLAGS_VLAN_L2TAG2,
+> +	ICE_TX_RING_FLAGS_TXTIME,
+> +	ICE_TX_RING_FLAGS_NBITS,
+> +};
+> +
+>  struct ice_pkt_ctx {
+>  	u64 cached_phctime;
+>  	__be16 vlan_proto;
+> @@ -333,11 +341,7 @@ struct ice_tx_ring {
+>  	u32 txq_teid;			/* Added Tx queue TEID */
+>  	/* CL4 - 4th cacheline starts here */
+>  	struct ice_tstamp_ring *tstamp_ring;
+> -#define ICE_TX_FLAGS_RING_XDP		BIT(0)
+> -#define ICE_TX_FLAGS_RING_VLAN_L2TAG1	BIT(1)
+> -#define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
+> -#define ICE_TX_FLAGS_TXTIME		BIT(3)
+> -	u8 flags;
+> +	DECLARE_BITMAP(flags, ICE_TX_RING_FLAGS_NBITS);
+>  	u8 dcb_tc;			/* Traffic class of ring */
+>  	u16 quanta_prof_id;
+>  } ____cacheline_internodealigned_in_smp;
+> @@ -349,7 +353,7 @@ static inline bool ice_ring_ch_enabled(struct ice_tx_ring *ring)
+>  
+>  static inline bool ice_ring_is_xdp(struct ice_tx_ring *ring)
+>  {
+> -	return !!(ring->flags & ICE_TX_FLAGS_RING_XDP);
+> +	return test_bit(ICE_TX_RING_FLAGS_XDP, ring->flags);
+>  }
+>  
+>  enum ice_container_type {
+> 
+> base-commit: 18f7fcd5e69a04df57b563360b88be72471d6b62
+> -- 
+> 2.34.1
+> 
 
