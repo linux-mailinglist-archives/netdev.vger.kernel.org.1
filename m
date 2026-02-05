@@ -1,179 +1,352 @@
-Return-Path: <netdev+bounces-257162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKoZJU+ZhGmh3gMAu9opvQ
-	(envelope-from <netdev+bounces-257162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:21:19 +0100
+	id CA4RBgiahGmh3gMAu9opvQ
+	(envelope-from <netdev+bounces-257164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:24:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA8A8F32AD
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:21:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9078F333B
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 14:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C17E930086D2
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:20:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 417633028819
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 13:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2564A3D330A;
-	Thu,  5 Feb 2026 13:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058F63D669D;
+	Thu,  5 Feb 2026 13:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B2BcCQOy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RgTz4RRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76814414
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 13:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9383D668C;
+	Thu,  5 Feb 2026 13:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770297632; cv=pass; b=rWYcslLcclZ2nsskrKn+HYRB3ZcCrNnvK3kq41VkYxMwbWE8uyxEeHijL8JSREczM9uPWrCkkhXyjjDhMXjvVdkmxHXZEqXwlFLdvl96Xp5S3Lw3lfGaj3FlDYVxfD058MT9P1JsFiCCJlgf09wsimTrfS13l5UJHaHApuoVeZc=
+	t=1770297814; cv=fail; b=bO8Tedl0/bGl5D1KscAoCYinMQJ0dTlQpCytlkcfF2H2oX1I4wnsTMptoWRjglEA4B9EdrrgUkyZOZXqT0bHJWMBUmWFZitO8Xzds1J26IZrxsOvXG+/Ny3zDnLNtcTbLaJRxavbNSxSvhQtSMfQodB26ITHOTOTdlNFuLsQ0HM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770297632; c=relaxed/simple;
-	bh=+0qD3481OxJx/GzPxCze8mEUjrwmVraEw0kqw6Nb+Ak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pd2tWN4W3EnmsQFimo8Aa5Eh7kgI++3wL2aZx0Cisflb7zBsCcm9egEWX3QIqSbxcJLnPMuDX0OUszhVZSyXW9f0IJInXYnHiUkq0upHMEXUAXrSNakzSNMZLIs+1zHkhwrJPsMLl8PONYT/hykVLXVc9QMl6JQVr8UOnqpEntA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B2BcCQOy; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50299648ae9so421291cf.1
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 05:20:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770297630; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RFB/81gMvj/vDt7MThtJDHH2zSKWMCVc4KZu22AT0dtXzB3KK83OTSo37i8GmwLWkM
-         bYuwrYFNxUJmbLjlxCmNPWxtP/VVtoggZXb7z9zSie8I7jMAujlyz1z6zPOQyPh2nGUM
-         1o5mbBfDN8rTyHjqdqzDvma+qre/X7qpP8yE4Dl7ZtLoUvTIrlqJrsVFfhwNbGiyzP+W
-         pNqzoqkhl+drcnzptsMw68AlXUzQf2sePre2g45FZYqz5CwVEiWZ75Q1z6VkI7eT6Ufj
-         fJO45Uh7IseuKljAwNoXJRobL8T+Avct5z3bEusLSKBkRpaVQgvgzp70u8qKTsvcQMGQ
-         bgzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=nUxzn6tyMigJh/FRYg1m34qD7OVTrxYvrqfI67oJIC8=;
-        fh=vAjP76cOv87YgZUBgN3byGSUb3LJ5jWpnCMY7bVHaSg=;
-        b=lV+4wjg4oKecCOLcG5rq8PQoBvWhHHb+kqjj7ymwAvuGfggp6wnSNgI9zofXlQNFbt
-         Zv23St2GD+rwnmb3gPGsCsoMPtemJ+ysqMtkYtHubYSJDJxWxaKk5xtLfuFPStCdyBlc
-         qMFT8Pfy/VD2VF7GmM962O60Gl7eQhWCNDrjrfWGYaIcEyO0KmfMrand9rqNdvV7IHkA
-         T0VA7URDNxMwZuBvAN7W59Sw5GjqesjYiC/sRr4jZDQ8O9hbhD01+Yy85+e+PZHtLnV2
-         HGjKKPZCbxaqtbzr7qopkS8QUfZuBBhVTB/ERyav6PFwlWadI/iBhVDjjnb5Dvli8VJS
-         Xd2w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770297630; x=1770902430; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nUxzn6tyMigJh/FRYg1m34qD7OVTrxYvrqfI67oJIC8=;
-        b=B2BcCQOy4Ztpc4d2HMMwqy7nPYW/R6GeI7fxmq+WaykAcWlEGYNdKdR7JfdsT7nS7B
-         twAJFb03QPFI7rnhPCQKK6gHpBt6TbDAzlUGjQenZ94NnceBTcuFZdNLaiBJ10/44+n9
-         Ck+m2uHR25+GEdDXS0t+Oi0QC6SY6xnefa7P/jyMCtdbiM3sEqzJEMVFM2pyj9z3CaB3
-         tZJYkntfdAKYX3Nb5gN59/vDOqoSz74hoqDVBDvDhpguiIfYujOpJHB0gzveW0DmPg1O
-         K6r0XoOBbMxTiFnm7k/zzIfJ7qr8yysIRKcsuRUfCn+L+2l2X9oyLik11V7FhCu48+Io
-         xgHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770297630; x=1770902430;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nUxzn6tyMigJh/FRYg1m34qD7OVTrxYvrqfI67oJIC8=;
-        b=RIsit7ORWagAJWERAex/s/gILJbO5khRv0qjMP+oE5cOtEj9AO1y8YAsd/dV9iXY33
-         fQRpRfixDKbZwlbgXLQsllB23c/0L8cGRkrU9Paf2+89O+B6fqmXMIxlgbvwgrZtq6sH
-         G+YHAGlB11v/xdSoUIXpunZvAuVA9lZDb1RGYi219tTREtBz1PJ7srvJtl1z3A1+TCq6
-         +CP0YaJH+FVh5xsVJ7WqdghkiZaew56XTObadcfHhoGnrIzLnk25N6irzPSJMobVT54L
-         zgZOKXtx5Xte6PeeBFxmKlRvghl0bOWtFPgvAo3gLPB34jskcQcSsozn2K3yKBRG4LlF
-         1g3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXYjo44J9/bvonu8SsnU98WoCi+m/+uA92SGv3buurpivsFT6iPy1JuQNZpyK8VuHey80322T4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUXzp1PcQOtC14YT6Smq7Ti8GG37M69u4AvmvlxSs/sgnCsTuB
-	G1f6yQeKgjUDZ5sswNxQ2VCsihn5CDsHZvzsem8yj13fxQbMWDHcWc7gRosSRSIfqonoFLg2C7M
-	j7ysrawopVQ+vwgPexEKap9yz5QsPEx+41ZGQ9f30
-X-Gm-Gg: AZuq6aLToHlY/Z8iKTqytPGfgPlavO1hkNBTbAqXq8E/dGfu6Os8qC5mZLzRGKAmUB7
-	2P3No5kh7BzEVSnzwI3w11OpUt4chX+zrNfQWfubVegSuqPE7+dpTiLWStoCwHMi9Ed77Vc55bu
-	ae0qSd2xa3luqZbKroewjJp1Q2W7W274kFZV8kEqR/zY/eyiWVWL8TrG6j8636M2ITsU57c34tA
-	svM0yY2IJElyjhCs5/i7nTQuXcmTBApntKWqZd89559Sg/++K9yp5mPoCTNa+Nt7fPgvMU3OpUl
-	ZShcur/aPDcg5487qAYlk4NcsjhilhDI8OVUAX7DTC4ly8yWkieOKLyoj9Q=
-X-Received: by 2002:ac8:5d04:0:b0:4f3:54eb:f26e with SMTP id
- d75a77b69052e-5062c7a7717mr7406091cf.1.1770297630215; Thu, 05 Feb 2026
- 05:20:30 -0800 (PST)
+	s=arc-20240116; t=1770297814; c=relaxed/simple;
+	bh=m6S9Ue8dNFm6DzrWiddytObovDjo2gjOdZgp0LOFU9U=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=isdcGRslaDVirv3wa0q9niKxB2EesOrJtUscn87P9CrIMRrHkOD579C2OjNFfLgfYIHmJQdekidVEFkcDHEqjzWNqcDuyaE9jdBjKsGnGz/3irg7V0pdYdAslbVcYxCHNETOH4AuNOkI57CL3/QeHPY2wx6cto3DPTIlX056Usk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RgTz4RRY; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770297814; x=1801833814;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=m6S9Ue8dNFm6DzrWiddytObovDjo2gjOdZgp0LOFU9U=;
+  b=RgTz4RRYMIocQjtFBLj0xnLeUS1Tsb2BmRiS24HKUOYE1vdF6Bo44Lxh
+   Qq6hDBsEGLACUc6glY6DHKu0u1F+8Y0J6P968TsP+Th1V8UflVHk2WIPw
+   lGkuxcDe3YXXzwUnyNK35eY698v7RgA3M176WnpGjzy/1d3epbbWURDcG
+   gVmw4gRrLNNsWSSTI/TrKr0Mod+vNWIg4p+9hDx90xTp/lT/iuXy1vvd7
+   kfqQgMx5CdBgy+ZKlp1iz8NA9z8tNAB31CRj3Iki7rxruHw2pyniGbHsb
+   6Km6ViJTEx63HZJjRPTMYm5IKxFMt2rCvsyjER0CPC0NPkccoBNXkt7kN
+   A==;
+X-CSE-ConnectionGUID: NsKL/w8qS56F+Vs7M10LMw==
+X-CSE-MsgGUID: 6AvU/lBIQYaVVkE01OkrgQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="74096069"
+X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
+   d="scan'208";a="74096069"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 05:23:32 -0800
+X-CSE-ConnectionGUID: HTN/bUj1QLqwkIHcHZZEeg==
+X-CSE-MsgGUID: BhlQbaYgQb2zTS2tiCW0/Q==
+X-ExtLoop1: 1
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 05:23:30 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 5 Feb 2026 05:23:32 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Thu, 5 Feb 2026 05:23:32 -0800
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.50) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Thu, 5 Feb 2026 05:23:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yMCespKyyO0+IHvSzlq0rqii2a8V5P58s+angYdTV46dr/cwl7ioMvduXN/F6PjkyZrLrgMTTh79n3tkls85YXfcBw2UV4RUXuyFUZWxMpIHdleUSeBWv51lssOpdQD3hDPcPT4Ydv3CobYswC9Oh/UPVdzFvZz6QblZ71oIiJsVq0D9JIUhRNMyPYm+DVwxH5HgLYO55bE6BAnmxV0IomI6z64vZVvRSZvdtfxOeD1LVLJfwddzIJAj1Ca5aJ+mSOdA1mTfxZEvzr2lnx1bGx3onM7pHTXgdxefsRNe7FmUT5SrK8vQ2aahEVG+Gowp7BOvx7XhPL2dyBkQweQraA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zvM4ml8HBjw4sQj6EZh9CZkVOn/uKR6EZFs7m7+g35I=;
+ b=pPyhHYqvM9vdEjg426skXLIGQPOMOULdWDgyx5CN28gFf4vRQOr14Ld8qD5as8B2lfivZo0kveEAwXjYZwOEGxJwu9IyygjNO+J7sy+l1QwZCBZXIZv6VbnXxPV1LqKxc/iCHmZIWTXQPQd075Nl39zGdxfcHDm8HIwQie5YRU/v6EHh2J2omUTUTGgHbphucA/EblyWYrSh0TOrrdgRUt42QmBOPRN/9zT9lDdiaXXt+gEGAHt7RyypjCC8o2kscOtBmFMOcTOdGjvcZi6afK4Y48xbLWVYJrxX/WJDTpCLpSbxuhzluveUY8jSSzTeYQx+p1z6CIibFO/G+shlnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by PH0PR11MB7586.namprd11.prod.outlook.com (2603:10b6:510:26e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Thu, 5 Feb
+ 2026 13:23:29 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2edd:5c6d:169c:389b%4]) with mapi id 15.20.9564.016; Thu, 5 Feb 2026
+ 13:23:28 +0000
+Date: Thu, 5 Feb 2026 14:23:15 +0100
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, Jakub Kicinski
+	<kuba@kernel.org>
+CC: <bpf@vger.kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>, Wei Fang
+	<wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "Andrii
+ Nakryiko" <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+	"Eduard Zingerman" <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
+ Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Simon Horman
+	<horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, "Bastien Curutchet (eBPF Foundation)"
+	<bastien.curutchet@bootlin.com>, Tushar Vyavahare
+	<tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>, Ricardo
+ =?utf-8?B?Qi4gTWFybGniiJrCrnJl?= <rbm@suse.com>, Eelco Chaudron
+	<echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, "Toke
+ Hoiland-Jorgensen" <toke@redhat.com>, <imx@lists.linux.dev>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-kselftest@vger.kernel.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH bpf 6/6] net: enetc: use truesize as XDP RxQ info
+ frag_size
+Message-ID: <aYSZw4wbd-nvLTuD@soc-5CG4396X81.clients.intel.com>
+References: <20260203105417.2302672-1-larysa.zaremba@intel.com>
+ <20260203105417.2302672-7-larysa.zaremba@intel.com>
+ <20260205005901.gnju3zmqimtgeu2b@skbuf>
+ <20260204173401.282899d0@kernel.org>
+ <20260205122953.lscemcctayrvszdu@skbuf>
+ <aYSP344FT-JlylwY@soc-5CG4396X81.clients.intel.com>
+ <20260205124638.hxzvjiocephzlrk3@skbuf>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260205124638.hxzvjiocephzlrk3@skbuf>
+X-ClientProxiedBy: VI1PR02CA0073.eurprd02.prod.outlook.com
+ (2603:10a6:802:14::44) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260202101454.89445-1-kelmenhorst@uni-osnabrueck.de>
- <CADVnQykLpW+GV6sSG5py1J+WTZFM-=JObhYS7Pwd=9ut1GY1BQ@mail.gmail.com>
- <f1137fcf-1778-4811-9211-4beb95db3a32@uni-osnabrueck.de> <CADVnQy=u4zQjC6A9WBvnZOvRFAVzi=0rSzbSs_4kujB2u0U2EQ@mail.gmail.com>
- <e0e3738e-c01f-4c2e-a782-3e7c99d8b647@uni-osnabrueck.de>
-In-Reply-To: <e0e3738e-c01f-4c2e-a782-3e7c99d8b647@uni-osnabrueck.de>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 5 Feb 2026 08:20:13 -0500
-X-Gm-Features: AZwV_QhnxEZWYY4PyKDaD8wxhkrh0hRBc34ZsogNCGNG_dmDwksiSK7pHM1MoGY
-Message-ID: <CADVnQymv0063ymyWbwof3wn9WuQANhX8B_oR4Tv_YcRHMZXpDg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: tcp_bbr: use high pacing gain when the
- sender fails to put enough data inflight
-To: Kathrin Elmenhorst <kelmenhorst@uni-osnabrueck.de>
-Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|PH0PR11MB7586:EE_
+X-MS-Office365-Filtering-Correlation-Id: 35afce3c-a2e6-4918-d364-08de64b9bffa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?IyiB5SZNhrJC6S8kadwWyBqC3RUYgWrtYufaWVMLo4gVx8Vu3qLWw4rx6PbE?=
+ =?us-ascii?Q?wqDyMz+pRd7TYupLSlz/MAIuBi7qQMem3SGSc6qhPYHcJUTl8yzKjt0CvjFh?=
+ =?us-ascii?Q?YWblVNq1tcWVdYGT069tQ48o/C0CXK3BSYV7eBCWlqTTZkh9/DBR/oBxusQO?=
+ =?us-ascii?Q?+WTgCYrzEoGkYUT2KgLlia8WcN3zpsGtd3i5WE2nOgvdv75a/EYCl1JZyFFS?=
+ =?us-ascii?Q?WoguB5tNmnzOZ0PHGYrZD+wwOMj7Z32M4kmuXfjdhaH5rDg7tNrYJ4c3/o1f?=
+ =?us-ascii?Q?r+Yoyg/NC3nId/k1xHETAuxxzWWh0v9EjjI5tVc435JOVj7+F2rR3vfr7R92?=
+ =?us-ascii?Q?wv7gBbhHt7VKWMMef8o44+huEUu33af9ZZBXKdzdsqIgDYMQpGn7G2MeOMy0?=
+ =?us-ascii?Q?MIM1DPBpQqxE4rs2/mw0CojPzM+Sfc/oMMMxO3//LTzBSTWTc2/4Td552g/O?=
+ =?us-ascii?Q?86MFT5D2ojo+AK11x4TQfkQZ79uvEnVa38X76lnI/nguMSbx104F4SIwWmYg?=
+ =?us-ascii?Q?DyJ1qYxDzCCUHEl+ARzDANRXZMLkk/WWnCV4DSv8sGNdwmg8LERFJG9KoFXf?=
+ =?us-ascii?Q?XQaSKyxIsjKaVdVrYOWSHA0zzso4S/diIGnLj/+b+w2bddMx9FwB4msO+glk?=
+ =?us-ascii?Q?CsM6HqZSBcfamwgQWyHylZ6TN7VpjWinRb64tCDaHiF8H+u1Z5OcNEBa8l/7?=
+ =?us-ascii?Q?nECS96w43PbOzLlM0QNj/65Yru/1ftPJ7zSrvETZ3qiftbV0kqp4ehSET5BR?=
+ =?us-ascii?Q?8qIMhEop6qfNyq1KCZwFVOq1KXa1y0COiHopSab+7JsWsGuIsK9UYh8yP3wb?=
+ =?us-ascii?Q?saFboIGxdfuNQika31vtcc9HTfMpCmbtF7j2xLMhFnk2Uo8o7SC83ZJ0QYPL?=
+ =?us-ascii?Q?iuO3SS8/9zCh3HcgXxbZzcKDyRAyopyK9RL/q/SrPYVS7YcifFx7pl/RV0XA?=
+ =?us-ascii?Q?GfyIAzVwYPJV1c//evI8yqDCvE/jFmzifbyG9tHd2oaECQrNl/iG0z8MoGk2?=
+ =?us-ascii?Q?DriwRt3G5l6Vqe3IrUNSJqdq9XXIHWdveKC4kUw2798kU+3FfMMWdEwruczw?=
+ =?us-ascii?Q?e1tLNJ+zOXtYQKPORBNK3bIv7Ica9niNEWIElep5b27DZkSwidUi9lhjVP8i?=
+ =?us-ascii?Q?LHdiE0sZUrGIDJriiLx6D4ejmhTcIMZq4Rxvr2YErAGMdE86MviENxHrR+Ev?=
+ =?us-ascii?Q?P6qUYjSybPZ3utVJ3ePHnb9XZgjlX4VPQCYfog6hZUr8v8neP/jJ14b9vJh0?=
+ =?us-ascii?Q?AfxdHbIqO6TT4jvYqfAo/2XCH1tfgWHAf5/WyzJPRthHQTPAmJ/ikmFH3KOp?=
+ =?us-ascii?Q?9ecvb5szOxBkrA2wIJ7+1FFNkHtjlg0wqcGHUUPS8CYqUPMtpWTarWwMF/iE?=
+ =?us-ascii?Q?PchbjYCT481EVQsbUd8MrBmOPeqKFRzURn7H1glRaTomzXpC5t/N5ja2xQHz?=
+ =?us-ascii?Q?8wfXxxpj2DiChIRmD3+lg+50WmQ6+AHhbZelpteRRHYsdNrlCpsxDz8+7GbY?=
+ =?us-ascii?Q?4SrQJYM3tLUTpAYcn9PcY1xtrpu5DQDiFqkq4jpLsfluq6C35R6tfle1a1ub?=
+ =?us-ascii?Q?POK+y+wphuKQMLQ7jf0=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2lw0SlnUEg4RmHybd2IsNNNa6xI/0r3E0yGuvt5meajIfw2wKmPiagrbDIoq?=
+ =?us-ascii?Q?f/wUdSleqV3gFUeHWkj+z+OvV9Sq8jT5lIURzZSOf1kdKU6pdrixr2H2GfnH?=
+ =?us-ascii?Q?A8FiJVBZArd8YsYu7T2vSFDBuQPvneTmGuYa+uAg3HfIi2arCeRjnb2rBPkO?=
+ =?us-ascii?Q?sA7Huc2ETmIoVN93uwh4VBBbGWejXCV6x6BJfa/tCAXtZ1ro9Nc3+iWuoz2n?=
+ =?us-ascii?Q?rdjx/V8IWZBSR1LF0EsXpjZP16O2/e3BNebGvzqmpUaaSOGyMse9OMAYGPhn?=
+ =?us-ascii?Q?wBtSqCsSpr/3l/gFytb35FzNorI9nN+c5PUOv3/k/+uMh2geIdsNNyJQpJ2d?=
+ =?us-ascii?Q?gV3q9sidGtoiJfzoiZvY5fVys32tZFwGPBg8GZMqeFM5up0X/FDwMERIPFDe?=
+ =?us-ascii?Q?SdUNhCIL2iH/QbB5hFoYXZF+PyAzUslu7I0ca+pbDZ9O0dz+gT0+m+14YbQq?=
+ =?us-ascii?Q?9NB3n62vqCPArhNee1F3PsVANdKvSam5VdGkVb9iZrj5MPO79TO5QdElvRki?=
+ =?us-ascii?Q?9XrgwfSQXr7o2xsaMRPdsuXzVGSylWkxtBJ4uyI3GrHlVdhztviBDd+1c9pH?=
+ =?us-ascii?Q?hvhmfUf4UaBBMxEH3N1mSsdBthfBHklvBUFR9I3qyVYamogQUDXVzRgkYY4h?=
+ =?us-ascii?Q?6A7cH0GJy3wOJlDDTy5nSDohi60TfJOmXv0tJ1dj+3P3cBOvK0s2dSBEewZw?=
+ =?us-ascii?Q?jJLcN3oqzdbManPKtbEDQ1aCQHjsTvg0kGNXJLVZyr54Irm6Ihvo/ZS13a4S?=
+ =?us-ascii?Q?5ANLgY83KfNFyV1wf0WE/hu+x2OrtZ3O+ZgCLLopK6SEVeWxUIhf33qiirnM?=
+ =?us-ascii?Q?9TZuXmq0urflB3u3dAl0MG9Pkpz+tVpHhvHFdHDtwNwOgegA6p4XzUQU/IOo?=
+ =?us-ascii?Q?NneRom+lU/VwZKnG0WxTg//70hthotnD/fNMM06dM/MbTJ4wUowccLaE7iUe?=
+ =?us-ascii?Q?62ZQKMaldtMkbOwKbB7VF3mkv/vyk2EQCylmY2T9/LOdW3JHVhazdL5tDAhb?=
+ =?us-ascii?Q?cu3R3ylJXkAAK423z1VGAhTCkUp6KIT39i3vx8bzH1H544LHmwhMbUEPijFn?=
+ =?us-ascii?Q?8vyBVRwTtmm4dWQ6axCC/SIxcEKRCve08tfIuN9mS21S8yC3uA6zKHI+IAZI?=
+ =?us-ascii?Q?5+o/GHjry2zUZD6T6pqxzecAmflYcDS7utu2kwjr1p45VdvOK1APUwbj21Y4?=
+ =?us-ascii?Q?FwoSz5ZueJOvDrKk5+CrgFxXKLfxedjYc8dDj/l+MXxGLkvkhRDr2a0PrtqT?=
+ =?us-ascii?Q?+f9j35L+oMhniicvG0pem4CgMvAOtByaequC7eRYm13oKvnBNN33DfS3p6ea?=
+ =?us-ascii?Q?D2K7dvd0J4NN34ohLKTUStEwzTUrk0ZUwgEyQbT3CY291pVXgZ7HZalU8WHJ?=
+ =?us-ascii?Q?SMHuwrHAmzmfT24qeqIHXeC/UFuR2qex9zpuxCnBD/xG9HVtALaWIrGNh3r3?=
+ =?us-ascii?Q?zh8a3ze7QSIb7XKsrXRKvwdhjwfN883up3asD0+Rt7utyoCqcPdvjXu+jKHr?=
+ =?us-ascii?Q?9AO2IZWWAQOE1eg+gX9m9NRKZeO3L5/3vkc454tvKaPopBITfr7eFqcrcrXm?=
+ =?us-ascii?Q?cso18wL9AELG7OCFO17S+un9uQmqWX4d13rWhBWXgd4+xRURmFCxls6jtz/2?=
+ =?us-ascii?Q?4PYg632sMUZCEKUy3QX1IIdJR1wLwQHZtZO9Vo1/dHpogaixbAfF8TbM5j27?=
+ =?us-ascii?Q?0b5uMBKrAEJXM+pGt4cPP0Y3GGadRiD3lYg8a/hYV7nJB1Ab8V1Op71g3FKu?=
+ =?us-ascii?Q?xW0clinX8YjgQiifrj/blXdffut9kOqLWTkZV7avAYRIsSk2QahKagNMZmjm?=
+X-MS-Exchange-AntiSpam-MessageData-1: VpzxRz4QSi9ayZSxXFvIf3ixp+sO8+pPBHg=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35afce3c-a2e6-4918-d364-08de64b9bffa
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2026 13:23:28.8481
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mGhuwnZvafQwX3J7tGx7ovFdPI6V9gJtzJLfYQKl/4I9WDNSw9ScHXIv0XePnzZbY1wCgt6Z0qE8L8YD9c23QiGOQuhN5kW8MZPe7JoQZuE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7586
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257162-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257164-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EA8A8F32AD
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: A9078F333B
 X-Rspamd-Action: no action
 
-On Thu, Feb 5, 2026 at 3:30=E2=80=AFAM Kathrin Elmenhorst
-<kelmenhorst@uni-osnabrueck.de> wrote:
->
-> On 2/3/26 15:29, Neal Cardwell wrote:
->
-> > The "or is reset to" part is an incorrect reading of the code; BBR
-> > does not reset itself to STARTUP when the connection is app-limited.
-> > :-)
-> > Please note that in bbr_cwnd_event() when an app-limited connection in
-> > BBR_PROBE_BW restarts from idle, BBR sets the pacing rate to 1.0x the
-> > estimated bandwidth. This is the common case for long-lived BBR
-> > connections with application-limited behavior. Your proposed patch
-> > makes the behavior much more aggressive in this case.
->
-> Got you, so the high pacing gain for app-limited sockets only applies
-> at the start, before BBR thinks that the full bandwidth has been
-> reached for the first time.
+On Thu, Feb 05, 2026 at 02:46:38PM +0200, Vladimir Oltean wrote:
+> On Thu, Feb 05, 2026 at 01:41:03PM +0100, Larysa Zaremba wrote:
+> > On Thu, Feb 05, 2026 at 02:29:53PM +0200, Vladimir Oltean wrote:
+> > > On Wed, Feb 04, 2026 at 05:34:01PM -0800, Jakub Kicinski wrote:
+> > > > On Thu, 5 Feb 2026 02:59:01 +0200 Vladimir Oltean wrote:
+> > > > > Thanks! This is an extremely subtle corner case. I appreciate the patch
+> > > > > and explanation.
+> > > > > 
+> > > > > I did run tests on the blamed commit (which I still have), but to catch
+> > > > > a real issue in a meaningful way it would have been required to have a
+> > > > > program which calls bpf_xdp_adjust_tail() with a very large offset.
+> > > > > I'm noting that I'm seeing the WARN_ON() much easier after your fix, but
+> > > > > before, it was mostly inconsequential for practical cases.
+> > > > > 
+> > > > > Namely, the ENETC truesize is 2048, and XDP_PACKET_HEADROOM is 256.
+> > > > > First buffers also contain the skb_shared_info (320 bytes), while
+> > > > > subsequent buffers don't.
+> > > > 
+> > > > I can't wrap my head around this series, hope you can tell me where I'm
+> > > > going wrong. AFAICT enetc splits the page into two halves for small MTU.
+> > > > 
+> > > > So we have 
+> > > > 
+> > > >  |                 2k          |             2k              |
+> > > >   ----------------------------- ----------------------------- 
+> > > >  | hroom | data | troom/shinfo | hroom | data | troom/shinfo |
+> > > >   ----------------------------- ----------------------------- 
+> > > > 
+> > > > If we attach the second chunk as frag well have:
+> > > >   offset = 2k + hroom
+> > > >   size = data.len
+> > > > But we use
+> > > >   truesize / frag_size = 2k
+> > > > so
+> > > >   tailroom = rxq->frag_size - skb_frag_size(frag) - skb_frag_off(frag);
+> > > >   tailroom = 2k - data.len - 2k
+> > > >   tailroom = -data.len
+> > > >   WARN(tailroom < 0) -> yes
+> > > > 
+> > > > The frag_size thing is unusable for any driver that doesn't hand out
+> > > > full pages to frags?
+> > > 
+> > > This is an excellent question.
+> > > 
+> > > Yes, you're right, bpf_xdp_frags_increase_tail() only has a 50% chance
+> > > of working - the paged data has to be in the first half of the page,
+> > > otherwise the tailroom calculations are not correct due to rxq->frag_size,
+> > > and the WARN_ON() will trigger.
+> > > 
+> > > The reason why I didn't notice this during my testing is stupid. I was
+> > > attaching the BPF program to the interface and then detaching it after
+> > > each test, and each test was sending less than the RX ring size (2048)
+> > > worth of packets. So all multi-buffer frames were using buffers which
+> > > were fresh out of enetc_setup_rxbdr() -> ... -> enetc_new_page() (first
+> > > halves) and never out of flipped pages (enetc_bulk_flip_buff()).
+> > > 
+> > > This seems to be a good reason to convert this driver to use page pool,
+> > > which I can look into. I'm not sure that there's anything that can be
+> > > done to make the rxq->frag_size mechanism compatible with the current
+> > > buffer allocation scheme.
+> > 
+> > I was just about to send an answer.
+> > 
+> > Seems like my mistake here. I actually think adjusting the tail should work, if 
+> > we set rxq->frag_size to PAGE_SIZE in enetc and i40e_rx_pg_size() in i40e, and 
+> > not to (PAGE_SIZE / 2), as I did at first, but in such case naming this 
+> > frag_size is just utterly wrong. Glad Jakub has pointed this out.
+> 
+> I mean, it should "work" given the caveat that calling bpf_xdp_adjust_tail()
+> on a first-half page buffer with a large offset risks leaking into the
+> second half, which may also be in use, and this will go undetected, right?
+> Although the practical chances of that happening are low, the requested
+> offset needs to be in the order of hundreds still.
 
-I think that is still a misleading way to frame the dynamics. The high
-pacing gain in STARTUP applies to all connections, whether app-limited
-or not. And then if a connection meets the conditions for exiting
-startup (3 non-app-limited round-trips without the estimated bandwidth
-growing 1.25x) then the connection exits STARTUP, and stops using the
-high pacing gain.
+Oh, I did get carried away there...
+Well, one thing is shared page memory model in enetc and i40e, another thing is
+xsk_buff_pool, where chunk size can be between 2K and PAGE_SIZE. What about
 
-> Thanks! I will check out the patches and test them with CUBIC and fq
-> on our setup.
+tailroom = rxq->frag_size - skb_frag_size(frag) -
+           (skb_frag_off(frag) % rxq->frag_size);
 
-Great, thanks! Looking forward to hearing what impacts you find from a
-len_ns  patch like that, for both BBR and paced CUBIC!
+When frag_size is set to 2K, headroom is let's say 256, so aligned DMA write
+size is 1420.
+last frag at the start of the page: offset=256, size<=1420
+    tailroom >= 2K - 1420 - 256 = 372
+last frag in the middle of the page: offset=256+2K, size<=1420
+    tailroom >= 2K - 1420 - ((256 + 2K) % 2K) = 372
 
-best regards,
-neal
+And for drivers that do not fragment pages for multi-buffer packets, nothing
+changes, since offset is always less than rxq->frag_size.
+
+This brings us back to rxq->frag_size being half of a page for enetc and i40e,
+and seems like in ZC mode it should be pool->chunk_size to work properly.
+
+> 
+> > ice and idpf are fine, since they use libeth for Rx buffers, so mbuf packets
+> > always reside in 3K+ buffers. But for xsk_buff_pool seems like all drivers 
+> > should have PAGE_SIZE as frag_size? I will let the discussion go on for at least
+> > a day and then will send v2 with patches reordered and those sizes corrected, 
+> > maybe add ZC fixes on top.
 
