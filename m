@@ -1,269 +1,271 @@
-Return-Path: <netdev+bounces-257296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sEvyIPfshGkj6gMAu9opvQ
-	(envelope-from <netdev+bounces-257296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:18:15 +0100
+	id YHYqGCnuhGkU6wMAu9opvQ
+	(envelope-from <netdev+bounces-257297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:23:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4FFF6C55
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:18:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D9BF6CC2
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:23:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FA0D3011BDD
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 19:18:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CD47C300460C
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 19:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D243832572A;
-	Thu,  5 Feb 2026 19:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0533326951;
+	Thu,  5 Feb 2026 19:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wsf1j6w9"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="VH182sKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B843242D2
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 19:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E11312824
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 19:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770319092; cv=pass; b=rLTaAS/LwY4t8n/5p/F9VJjLllhzy7O6bPI2TXGMt8hSXJh3C15l1kS7fgRRETdvCEa153cFLFGDcoLA8Z6KmW+IyYrX1PZJo8eQLmcLfXOV2ZV7wr+Ee6yafeg5kEdX0qYE4zJTFV4QURoE8WLgflmzPOEJ1u+KfSHkR/tB8BE=
+	t=1770319394; cv=pass; b=jA0zvsmYUgCpTmDpEpDKkrHIUNhpb73tL7VJL6LB/aCmv1mvGttpEiHDVHUR9g+R4LoMADKTTHaYNuJlvvxiJ8c7YgBleMleg7xegqYkMrVGeiv1zVlzrm3M88ov4591E2Y8n2Cx7+n2HRHtl7UaVKGgYZlvxEljTidukT16ZjY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770319092; c=relaxed/simple;
-	bh=QRhy0aaIatw5X2ingQ3dP6bzvBtQ67P0/48x91gmp1w=;
+	s=arc-20240116; t=1770319394; c=relaxed/simple;
+	bh=+KB/WCww5GZe9+8e64zaqbMUUHUcBCDBPQsWTUw/JD0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XVZ7gf88Iv8vDTQ6qHt/DI5nAC214Cigx5CnWjX8m37340e2PzJpM10Dxqd1ajG5hqUjA6tMiKfvpWE/iP6V48Aj0u+p2CK8SKwzTTc+/i7ucOB15dA0b/mZlInsW7mrrMEccJgspFl6FuMQyseIhyUXmNIGMdyzxT4Nx/4GEYI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wsf1j6w9; arc=pass smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3530f597ea3so528496a91.1
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 11:18:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770319092; cv=none;
+	 To:Cc:Content-Type; b=pb5ZVMiHFlDfoLMkBBjIk3xc9b+82RNvHAlFxcxp7uDQHscBbSUsgtU5k4QWdBz/HRQVps1hAQVtXqdACNRX+kTAx1m08pnrYGkKhDnPwmwJl/FfogDjLoneVateiWmGbvrybv9s4XHC58MAcTXNLFRKYJv4dFJBLUFXcv4nypM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=VH182sKz; arc=pass smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-bc29d64b39dso423436a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 11:23:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770319394; cv=none;
         d=google.com; s=arc-20240605;
-        b=I/n38Wu6nJWssiZhpZa5sA7pM+t06BjZDSDDU2gogWV2IFtel3cDD2x8ILtuFEfJGj
-         FWA3CE3H2JZlezMZ8B30HFLQmKI/mJRKjUxGFIkchdC895xqtqG8oaa6lIOJp2W6BT/g
-         8wpwglHjh0OkVKJmqjx+XlhG6GcilOs9ypRSFyvdPe9XH2n89qZoliSlwVNyd8zlpFZn
-         Oiiiqs92BvLpqAq2bc8urDmMdUUWLDzOXjZbrfRwlVqTbl+ysa0jP8VgachV6OIdRRgH
-         v1r1V1ZngugLG/ZnXojpUSLSngbD407+66P7dWMSvFrvayO2xnLRRJBvXSWrxQVm1PzJ
-         9v3w==
+        b=eoOXSrH3JVIaePwEgUDKyooMkeYwiUSbtJ3Xr5BKJ2o51lU7BYEUxKVlJalaIqAhyC
+         E1f5Wes8f161LG2xfYse2FmXWDkcUr0PanpbPo0Mc7SQF41q8b3Iw35FZgzDOXVegUsU
+         YmltS6NYoPsC+Fv/A28UzgYF67mPCwGYBkHiXpx21UjG0kkup9T2ndTw3tKW+CbaCI0E
+         UOF1wSI04AZIlJ8YX7J7vkeMqMIOrwvITm9f0AEZd/POvFDLYRNcWr6yw2frtaZ4VRCm
+         DWbTosE0yvKMetkzYuqo3EGqG1q0oBjuyFTYoDjE3mU6Jz3B7UMpmE47bnna2iWBy6Rz
+         9vIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Vp6eSjM8r19A+ldOLHO2Ln5yqplokvRmWPI5a2FR3lU=;
-        fh=G3xFl1aQrHw5TcVuUYIHOW/EDBUi3Mt1hFNxF/nCi3c=;
-        b=ljCsCqn3ExUyutKdQ7txqC4OpJZM3k8w3c/mYJkeETbK1uOzq5NVYEBtopyWM0JjiC
-         pByOe+s5LERs63QB+HVgFM0zDp9Hmyt+Z1UuMF/LtYG7g6dH+THLpOE4NxdIuigWZyA8
-         XIDuzl+88v1Py2LkFsz12ZQZ6y4WsgcIsHCQqjZvCOSsX7Y5nlkC5/AUV4XZOMJl6taq
-         4gGvBBDlSwWo5grU4hECAXD92mN7NFmaIj0EE6fMJLozEl36ZDjeGlMLFuluHZB6DkvQ
-         18WolPPVpTQccuZ7otH3O180vT44liF8+Hmi2eDnqavsqeOXkhoEXrmSRWA8mXh0AlWO
-         EpPw==;
+        bh=diGxg2jNY0j0oExl7OtnTEe5rd9LU0VFb3TqIX2FO8I=;
+        fh=d4E0/JGLb7cqop87rtoTr9jMnmRekyVhyLEvye5WE60=;
+        b=dRosu+I3+f0Rz8/aPttJn2EKiP2RPrAwmVqH/uB1QbfudtA3bfhCiPnWeONnzNnY2j
+         F46F0G5OeQCIxuUYXQPRsTLjskYLkOJllKmLpwcl6kpyM47ER9yNLdeeif7t9Vz5FOA3
+         DlrebW3Z8m9rQaaoaSOtuLKX+601pmyQKPM9rPDihOGe8Co+Ep62LeqpHVwBirBU30i1
+         IWgIebJWmHVRxxusjcxHbwrhu9okhql4B990IqlwX0V6p/BxS0FSvv83g/yaAycr9Bs9
+         fl6QTttpMCstQD1detgZgPUtaIWFcdL2FFBCTxEv/W7cD78fFiqcYV3VsHG+PentD2wR
+         G3IQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770319092; x=1770923892; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1770319394; x=1770924194; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vp6eSjM8r19A+ldOLHO2Ln5yqplokvRmWPI5a2FR3lU=;
-        b=Wsf1j6w97UwfEIyFwzWGNa28q28GTq8e5u7+D9V0xLKQ+VxTPI92JUmWyu6J5eGYzA
-         38gyAL998O3UNabkmGuN9uHMuB1yCt0//NAyG97Awd52lE7MXle3JvDYP6GpArFhjpXb
-         X5NdEJkuhITXNXdocoHPOVVSw/T/0PaMgAuXT05rwdm9CIJPDwLM/WHlD9G/spr/u9CB
-         gNr2LMBdBzsCc1m0e4YF6MSW6xaITa9jCXEoE4Olep54/nqmsXgprbacF+PoA/rRvAMA
-         0mAkQ7z+GmjiRo0zc2b+J/FaX8T37McF9ooscprY1tziTW5Iq32GRiR4M/RwFzVu2WQR
-         bp0A==
+        bh=diGxg2jNY0j0oExl7OtnTEe5rd9LU0VFb3TqIX2FO8I=;
+        b=VH182sKzXUq3p6+8qYqcFPd3Cb1ixpeShIm2s4CjPKQdrFwiGaxtBSGgDIxJyk1+yV
+         vesVO8u9/0a8EnVwhpDtIxE9XqhUfeVYQ6MpypRsHPinWXBg2VxLqU8UZ/aRCaRErKwr
+         Ea/+26KbzRVMN4OhEnWAqThVr6kV18Hv0Aea5kSLtysZ1VEwIzgmBXeTt2PFw6kL9lBK
+         qyGAdfN6dPkTYVS3URyhU3Ht1cQJrexw2URIKDXP4OlPtTkDC03TbKyAyPX4aqRhm+I3
+         52+6eGifVJhfDYZjhOdUT4emyDRdYImsDXYWwidqeyH7/aG9xwha4wJEHWgdvgTz6le5
+         1ejA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770319092; x=1770923892;
+        d=1e100.net; s=20230601; t=1770319394; x=1770924194;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Vp6eSjM8r19A+ldOLHO2Ln5yqplokvRmWPI5a2FR3lU=;
-        b=nY3zJ0KfmrNjsKG4sEKK05muNR4TS8ujOrKtvVgjcD+nFnWukH5gvVGd0ke1AoGqRh
-         B5UYFsKSngMyeayxsdMdOdCX10oxI6foQGbOvzaprS74k91irE008PaGMfx0kBBcQC1H
-         lwkJwxWw9VygGxVjGepBPfjbIQeNwZ4axetAmam5nO6CQcOpfbLa26xCKf5xWzKOoEsf
-         070/6Ql/WrS/Bi4JcDFo4TpCi6/Wbd8yWXb2AtH16m1AEWDM/dFdFRNOw5FOy88F6Gqt
-         Z5YSNB/5wSFimamhPyk0Pg3JjQCFuxS1fYklfRaInnubKLnR7qhGzZYBJbZRm9BdemrX
-         jAeA==
-X-Forwarded-Encrypted: i=1; AJvYcCURb9DRG4T4gf2uHEiq0CzvObtzYuhoV5mvhi1/OmPHPOABe+lxeWmG9Fns3MMFppGLcrLSVxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLbBeSh08NWdgXOuHX+JKF2FqBbnS5adlaXNGShWZKZH4QzaC3
-	Awf+5vUniAT7BUYBgCs/j00Vu+MrSqdtst7sqwvtzIqaGvzee5ruL7M9j3kg79Tt8J9nnKiEhkl
-	NA3iXn6T+lXcqkkEf2/PbWbLQy0KsIn8=
-X-Gm-Gg: AZuq6aJ4eM6lnUZqlB9SL4U7vih/wZJUl4jF3yiVKX+3PRRizbiz6/yEPoPi8pZsU5x
-	TGgG180IGOaoaMAEif3FkAkjYjMBeCWV3kzmx75yq/IyG3UWih+iwZou0HgBRs57Z6e5YpGbTfM
-	+2RKbSDVrTtHf0rqGoC0qbm1K6rvxkcVLOlhIy4UlV+OxybW3vQOW2c68dtSF/4fbv0DeqWcMIK
-	tENdqDSMwzagLHKi6BFRlR9euVItqYgiq2KVDZcIDbsQgOG+VqOQGL5g86Dh/EJr23bUXibvYin
-	V0Oo1CX0/CzwZP8sfhdV9xkYMsJv
-X-Received: by 2002:a17:90b:268b:b0:34f:63b7:a1f5 with SMTP id
- 98e67ed59e1d1-354b3e2f135mr64355a91.21.1770319091958; Thu, 05 Feb 2026
- 11:18:11 -0800 (PST)
+        bh=diGxg2jNY0j0oExl7OtnTEe5rd9LU0VFb3TqIX2FO8I=;
+        b=V0lbWgxKJ9dy8pNJeChJrVg5hp71SC+UMumqn64pqqWhEAiCOzAM+uH/tEAme1ZVx9
+         gHADg7Jygg47mBBOd10fobub4l3YAWbdMFDi9e+dzLisdgn5TdvjUkAxZaTEGi9fGGId
+         9KYxNhazHw67ZEkS5ahERxO3tRD1vbdtAC8o01UKSZRt4ySUJeHUOqXVCkyMonWd+Xkp
+         15luKOBiaAvnfBYJ9G5m3vFRHHMBDzIK1SBBDq2/5LkRgIoAliYejcvgUVdHBZajZlUj
+         qeARfItFF3s4DqavQ1+/sNzJnYZXQ5qsajGgevp41dRyTXmG23yI6sJMiKYLgJdVmQym
+         M5Dg==
+X-Gm-Message-State: AOJu0YwSHpFf1NeusOUVqyimOmvP1+J6MI+LhS2JWJXCBusi1K/QtjUf
+	IYlyKOH0gcIyC8lL8/kk87EyDRfExYrR05mO/lcqATYHwuJ/fziLWN9ntK1Gx+/GspQScJcXBV4
+	jHqKxjgs9cNFdvs1WWIiv55NTUGh96lZmkxQYJg9X
+X-Gm-Gg: AZuq6aIVCc/sA+V63VBqyVmaeVM4Sp197+0+oFqKgtMBvTBeW6/YGp868d1fUNKSxHp
+	sE+Lh4Nm1T0dIw+N1xNnoZs4cnbGDAb3qE7/YGr/EQ1UUn+ZNn3BL6ZdDrRCICFbmOP/FImw3PQ
+	jglz9fWOC95NkcngK8bQQHR+yc9dEpEnPIgcPUMEt0DCrupCMc9fdaoBsVds5NGhY4IAPs9J7Q1
+	4x8alN05BPtXkewcEULD8bZv7DxNkCdnC96ShLwfaMwBm/wwM/vDX93YSuFjb/FeHtUu+XaxOkI
+	PzM=
+X-Received: by 2002:a17:903:32c1:b0:2a9:4c2:e51 with SMTP id
+ d9443c01a7336-2a9519734ebmr2625475ad.55.1770319393945; Thu, 05 Feb 2026
+ 11:23:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <74174c085fb11b8a63e72a7df730b6f4a7479c5c.1770042461.git.lucien.xin@gmail.com>
- <20260205115449.2195294-1-horms@kernel.org> <1bcfe20e-0103-44a5-82b5-90cba7ba5a60@redhat.com>
-In-Reply-To: <1bcfe20e-0103-44a5-82b5-90cba7ba5a60@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 5 Feb 2026 14:18:00 -0500
-X-Gm-Features: AZwV_Qh_mc3jaIOzqDW1hY_eOgDZvqz5PolYvBWVQrjtRoVkuvNydWMH3Z6Pil0
-Message-ID: <CADvbK_eLJ2HWxx5G8PBwePCUZ7dXdDw6X8pryWWyn7SRx1NdDg@mail.gmail.com>
-Subject: Re: [net-next,v9,03/15] quic: provide common utilities and data structures
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, steved@redhat.com, marcelo.leitner@gmail.com, 
-	aahringo@redhat.com, alibuda@linux.alibaba.com, jbaron@akamai.com, 
-	hare@suse.de, kuba@kernel.org, tom@talpey.com, linux-cifs@vger.kernel.org, 
-	daniel@haxx.se, quic@lists.linux.dev, jlayton@kernel.org, tfanelli@redhat.com, 
-	dhowells@redhat.com, linkinjeon@kernel.org, hepengtao@xiaomi.com, 
-	pc@manguebit.com, kernel-tls-handshake@lists.linux.dev, 
-	illiliti@protonmail.com, xiyou.wangcong@gmail.com, 
-	andrew.gospodarek@broadcom.com, mail@johnericson.me, edumazet@google.com, 
-	matttbe@kernel.org, netdev@vger.kernel.org, smfrench@gmail.com, 
-	metze@samba.org, mbuhl@openbsd.org, chuck.lever@oracle.com, dreibh@simula.no, 
-	davem@davemloft.net, sd@queasysnail.net
+References: <20260130134220.305757-1-p@1g4.org> <CAM0EoMmY-v0HWAkB5EgSYhpca8fXVX7SQ1SpVbUBcFpbvuTd1g@mail.gmail.com>
+ <pXV1wsavqcYDq5HfAVaW_gMoTITR9M0PBWKhnz9n6VHYxhW56DQU7qfCEoaYcCixz4iqrj31Mt9vL9bHqTNGygLK5pYvyw1z3san5ndlkkQ=@1g4.org>
+ <CAM0EoMkBb+d_5dn6vdtSxPJ-HuUUL9uei65euSQfX3bXYm9RAw@mail.gmail.com>
+ <CAM0EoMnseQw6H+a4wzhg7BkPJraFwN-=2x4FOSOUp5f7=XbyaQ@mail.gmail.com>
+ <tuZof6471icLlkjecTuMCBxpZ5zJVhOeUv7lAK7MFwt3g7LfrH7ZFlbE5odrcbTFUukV6J8Dywy9daCrLI-kiY-_vpiABXStvdudLw-HXDI=@1g4.org>
+ <CAM0EoMkD=3aRFq=tXijcop5tYsD4X_Ki0REcnj3x+w_C69MaFw@mail.gmail.com>
+ <tRA-1eVt0Av_cRCmND6povnCqYiBpaOoilgpCM2qNbo3GIe6szAEIN1mI20gRjgf215ODBQJBfolBlBzyJ4en67AQVHhLt6QmtWlQUjLqfc=@1g4.org>
+ <CAM0EoM=T4QiGB+_3jqWKYze_OrcsjYBy0UvckTiGtHkxSm6BDQ@mail.gmail.com>
+ <JLZxnCN_V32FjW6UUERYLlLtbbzDCDUmB3LOJ8ovdzV5pbUuGMRKi8K7ebh1j2yDt1u3A0pc1y4Zjjsw6-c7zucKHasFnfvYjnZ7hvT7aR4=@1g4.org>
+ <mFDC5blKe5Rmv7qtNQvSSWDJsCdSd_lgeq681gEcHlSg-i8Q3-ZJSDqZfQV4xWFou75jYXgndoO-OE_4-_JNxPtT8rOdAguM_Xwl-qX8B6A=@1g4.org>
+In-Reply-To: <mFDC5blKe5Rmv7qtNQvSSWDJsCdSd_lgeq681gEcHlSg-i8Q3-ZJSDqZfQV4xWFou75jYXgndoO-OE_4-_JNxPtT8rOdAguM_Xwl-qX8B6A=@1g4.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 5 Feb 2026 14:23:00 -0500
+X-Gm-Features: AZwV_QiDWszgQ3VqVTw6cQ8o75fZbyqNiHDSRaKBnIbbESVUQ0uYsNPySDFhAqU
+Message-ID: <CAM0EoMk75BJYQUXm7FDW=ZmRsUqib3L+9tEAL90q_+DreroeXQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
+To: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257296-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,linux.alibaba.com,akamai.com,suse.de,talpey.com,vger.kernel.org,haxx.se,lists.linux.dev,xiaomi.com,manguebit.com,protonmail.com,broadcom.com,johnericson.me,google.com,samba.org,openbsd.org,oracle.com,simula.no,davemloft.net,queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-257297-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,nxp.com,intel.com];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url]
-X-Rspamd-Queue-Id: CE4FFF6C55
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 75D9BF6CC2
 X-Rspamd-Action: no action
 
-On Thu, Feb 5, 2026 at 7:51=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+On Thu, Feb 5, 2026 at 10:13=E2=80=AFAM Paul Moses <p@1g4.org> wrote:
 >
-> On 2/5/26 12:54 PM, Simon Horman wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> >
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-lo=
-cal.html
-> > ---
-> > quic: provide common utilities and data structures
-> >
-> > This patch provides foundational data structures and utilities for
-> > the QUIC stack, including hash tables for socket lookup, connection
-> > ID management, and helpers for encoding/decoding transport parameters.
-> >
-> >> diff --git a/net/quic/common.c b/net/quic/common.c
-> >> new file mode 100644
-> >> index 000000000000..94321f3f213d
-> >> --- /dev/null
-> >> +++ b/net/quic/common.c
-> >
-> > [ ... ]
-> >
-> >> +/* Reads a QUIC transport parameter value. */
-> >> +u8 quic_get_param(u64 *pdest, u8 **pp, u32 *plen)
-> >> +{
-> >> +    u64 valuelen;
-> >> +
-> >> +    if (!quic_get_var(pp, plen, &valuelen))
-> >> +            return 0;
-> >> +
-> >> +    if (*plen < valuelen)
-> >> +            return 0;
-> >> +
-> >> +    if (!quic_get_var(pp, plen, pdest))
-> >> +            return 0;
-> >> +
-> >> +    return (u8)valuelen;
-> >> +}
-> >
-> > Does quic_get_param() need to verify that quic_get_var() consumed exact=
-ly
-> > valuelen bytes?
-> >
-> > The function reads valuelen at the first quic_get_var() call, then deco=
-des
-> > the value with the second quic_get_var(). However, quic_get_var() deter=
-mines
-> > how many bytes to consume based on the varint prefix in the data, not f=
-rom
-> > valuelen.
-> >
-> > If a malformed packet has valuelen=3D2 but the varint encoding requires=
- 4 bytes,
-> > quic_get_var() will consume 4 bytes while the function returns valuelen=
-=3D2.
-> > This could desynchronize parsing of subsequent parameters since the cal=
-ler
-> > expects the buffer to have advanced by valuelen bytes based on the retu=
-rn
-> > value.
+> Looks like pedit might also affected. Hopefully this makes it more clear.=
+ Going to wait on more input before doing anything else with this.
 >
-> Hard to tell without any caller for this function. Possibly you could
-> drop it? IDK if enforcing such check would be correct/safe from an
-> interoperability PoV.
-I kind of forgot why I didn't validate it, I will decide if it should be
-added after interop testing with those userland implementations.
+> NLMSG_GOODSIZE =3D SKB_WITH_OVERHEAD(min(PAGE_SIZE, 8192))
+> SKB_WITH_OVERHEAD(X) =3D X - SKB_DATA_ALIGN(sizeof(struct skb_shared_info=
+))
+> nla_total_size(payload) =3D NLA_ALIGN(NLA_HDRLEN + payload), with NLA_HDR=
+LEN =3D 4 and 4 byte alignment
+>
+> Per entry size for the gate list:
+>
+> Each entry is a nested TCA_GATE_ONE_ENTRY plus five attributes:
+>
+> TCA_GATE_ONE_ENTRY (nest, no payload) -> 4
+> INDEX (u32) -> 8
+> GATE (flag, no payload) -> 4
+> INTERVAL (u32) -> 8
+> MAX_OCTETS (s32) -> 8
+> IPV (s32) -> 8
+>
+> So one entry is:
+>
+> entry_sz =3D 4 + 8 + 4 + 8 + 8 + 8 =3D 40 bytes
+>
+> Fixed overhead for one act_gate dump:
+>
+> 1. Action wrapper (RTM_GETACTION):
+>
+> NLMSG_HDRLEN + sizeof(struct tcamsg) + nla_total_size(0)
+> =3D 16 + 4 + 4 =3D 24 bytes
+>
+> 2. Action shared attributes emitted by tcf_action_dump_1, baseline only
+>    (no cookie, no HW stats, no flags):
+>
+> TCA_ACT_KIND (IFNAMSIZ) =3D 20
+> TCA_ACT_STATS nest =3D 4
+> TCA_STATS_BASIC =3D 20
+> TCA_STATS_PKT64 =3D 12
+> TCA_STATS_QUEUE =3D 24
+> TCA_ACT_OPTIONS nest =3D 4
+> TCA_GACT_TM =3D 36
+> TCA_ACT_IN_HW_COUNT =3D 8
+> action number nest =3D 4
+>
+> Total shared baseline =3D 156 bytes
+>
+> Optional shared attributes, only if present:
+>
+> TCA_ACT_HW_STATS =3D +12
+> TCA_ACT_USED_HW_STATS =3D +12
+> TCA_ACT_FLAGS =3D +12
+> TCA_ACT_COOKIE =3D +nla_total_size(cookie_len)
+>
+> 3. Gate specific attributes inside options, fixed part including TM:
+>
+> TCA_GATE_PARMS =3D 24
+> BASE_TIME =3D 12
+> CYCLE_TIME =3D 12
+> CYCLE_TIME_EXT =3D 12
+> CLOCKID =3D 8
+> FLAGS =3D 8
+> PRIORITY =3D 8
+> ENTRY_LIST nest =3D 4
+> TCA_GATE_TM =3D 36
+>
+> Total gate baseline =3D 124 bytes
+>
+> 4. 64 bit alignment padding, only when
+>    !CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+>
+> There are 7 attributes that trigger the 64 bit padding:
+> -three stats blocks, three time values and the gate TM
+> -Each adds 4 bytes, so add 28 bytes in that case
+>
+> Putting it together:
+>
+> fixed =3D 24 (wrapper) + 156 (shared baseline) + 124 (gate baseline)
+> fixed =3D 304 bytes
+>
+> opt =3D nla_total_size(cookie_len)
+> + 12 for each of HW_STATS, USED_HW_STATS and FLAGS if present
+> + 28 if unaligned access padding is required
+>
+> The maximum number of entries that fit in a single skb is:
+>
+> Nmax =3D floor((NLMSG_GOODSIZE - fixed - opt) / 40)
+>
+> If PAGE_SIZE =3D 4096 and sizeof(struct skb_shared_info) =3D 320:
+>
+> NLMSG_GOODSIZE =3D 4096 - 320 =3D 3776
+> Nmax =3D floor((3776 - 304) / 40) =3D 86
+>
+> 8192:
+>
+> NLMSG_GOODSIZE =3D 8192 - 320 =3D 7872
+> Nmax =3D floor((7872 - 304) / 40) =3D 189
+>
 
->
-> >> diff --git a/net/quic/common.h b/net/quic/common.h
-> >> new file mode 100644
-> >> index 000000000000..bfec0aaf2907
-> >> --- /dev/null
-> >> +++ b/net/quic/common.h
-> >
-> > [ ... ]
-> >
-> >> +#define QUIC_CONN_ID_MAX_LEN        20
-> >
-> > [ ... ]
-> >
-> >> +struct quic_conn_id {
-> >> +    u8 data[QUIC_CONN_ID_MAX_LEN];
-> >> +    u8 len;
-> >> +};
-> >> +
-> >> +static inline void quic_conn_id_update(struct quic_conn_id *conn_id, =
-u8 *data, u32 len)
-> >> +{
-> >> +    memcpy(conn_id->data, data, len);
-> >> +    conn_id->len =3D (u8)len;
-> >> +}
-> >
-> > Should quic_conn_id_update() validate that len does not exceed
-> > QUIC_CONN_ID_MAX_LEN before the memcpy?
-> >
-> > The destination buffer conn_id->data is a 20-byte array, but the len
-> > parameter is u32 with no bounds check. If a caller passes len > 20, the
-> > memcpy would overflow the buffer.
->
-> It looks like the check responsibility is on the callers. I guess it
-> would make things more robust and simpler move the check here.
->
-Parsing the connid from incoming packets will always check its length,
-not good to move the check here then return an error for coding.
+Seems arbitrary and I was hoping you dont have to change iproute2
+which restricts the total size to 1KB.
+Earlier, unless i misread, you said you are looking at IEEE - what
+does the spec say?
+If i am not mistaken, the spec is   IEEE 802.1Qbv which unfortunately
+is behind a paywall.
+The closest i could find was a vendor talking about it here:
+https://onlinedocs.microchip.com/oxy/GUID-82119957-1E11-4B69-84AC-EF0EA08F5=
+595-en-US-5/GUID-7E7509A4-351E-4D82-8266-967681BA2644.html
 
-I will only leave a comment here. like:
+And they seem to indicate you can only have _one_ off and one timer
+per queue, for a max of 8 queues.
+Since Po is AWOL, +Cc the taprio folks (Vinicius, Vladmir).
 
-/* Caller must ensure len does not exceed QUIC_CONN_ID_MAX_LEN. */
-
-Thanks.
+cheers,
+jamal
 
