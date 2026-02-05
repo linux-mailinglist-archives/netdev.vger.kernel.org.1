@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-256957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCq9KewjhGnKzgMAu9opvQ
-	(envelope-from <netdev+bounces-256957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:00:28 +0100
+	id INEbJQkkhGnKzgMAu9opvQ
+	(envelope-from <netdev+bounces-256958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:00:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB850EE9A0
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:00:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4994EE9C6
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D428300C004
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:00:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4910C301CCF2
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22142163B2;
-	Thu,  5 Feb 2026 05:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07FDA2D7DE4;
+	Thu,  5 Feb 2026 05:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzxqKLxm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddpFw7J3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE228168BD;
-	Thu,  5 Feb 2026 05:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C9C2D6E78
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 05:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770267625; cv=none; b=HfM+D4Xfd+ZvlsJtm4gOFZIS2W2w+igNSkP7QnuknKMWboDsQ4tFGRzCvaBTb6zpGuZhgqrubvbBaXaHvbu1BH+gsBVC0XO0J490waFi08uhIYZQ5A1qzNnCmFwDEdWvaj09hkge4euepKvVOgturTHtDh6ZPEXj9zU+aD3TizE=
+	t=1770267626; cv=none; b=bm5MoxwS5J3z1HlxElzl+Pl6Mj5qm34r/o76Djhybu+wtlcDaK/upd6aW3V+E79o0MO61EQdw94gMiOMjBfLEz6rS5RFzNB7ZS90elv+N2RgXM7L6gQslB62oF8Jae4sMq0Hkn8COOgvszByqDr1RV9KlMjBLcK52fY8C+Jj+pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770267625; c=relaxed/simple;
-	bh=u0ucK9KnTdbKPPfUH0M6A9QcdAgEnXMvsatR63D2NCI=;
+	s=arc-20240116; t=1770267626; c=relaxed/simple;
+	bh=tYHUc0qOX64BQ1IJlSdjRln/EKpaQ440UZi6+G7w4mw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lSd9q0UgqWqBwDf74Dlk9Sir0FuwgKj74SafFTrM37HLTw1LAk90mfC4rbVjliqFN7SRYsAk56lKA0f+wOnlEWSibALHkVc16VaeP+280d9v/HhD3g15TGQXiLsY2XmWRKPwL+o83hNOq8Pe9h3WwMYGPYmL8eyTYe84bdz6Y3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzxqKLxm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52143C4CEF7;
-	Thu,  5 Feb 2026 05:00:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=snG1zvV31nQJwsGDOs3LFF9cDwBjLUGihvJx5e+WSlGWsp8g6xCxp5QYHHE7zYHFsZJ7fWO+yAtczHc5LnvdiJXKAcJdUVDGPDC9Pco+jPIoxESSe4VzQPRBpuABVw/rSSj95qmKzeSA8NiNdT8SQhWorfNceDTaLE4VLsHjdbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddpFw7J3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B68AC4CEF7;
+	Thu,  5 Feb 2026 05:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770267625;
-	bh=u0ucK9KnTdbKPPfUH0M6A9QcdAgEnXMvsatR63D2NCI=;
+	s=k20201202; t=1770267626;
+	bh=tYHUc0qOX64BQ1IJlSdjRln/EKpaQ440UZi6+G7w4mw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OzxqKLxmYe3SIXqGKP3oZumOUf0EQBeZaQy5GsSXQ3O1J0l8suAbbxqWiTYESobIg
-	 9UDE1VqXiWiwOnaxJl60kyo4W9SDie4RzIujCRE6hVKurhIaJdrYL3ZbYJeiVzxlEF
-	 vLMxVSwytzKLxnC2RWvIiOL6HzAaUfK6VbxogvgEFGmXr1KkjNZ2NU60v1J7oxiPaL
-	 QYlW4MisAx0tvjC7dd8HXTAoNiRKIUO645ZfTcWrNWx7vmqrVZGij+7YVVIqeHOV9g
-	 FplHMhJQ/Bx1ylzFP3vGqZl2i3qTjDRcKnSBmOxhTordyufVGSPmQqr9erXUcwMC0+
-	 UoBhl66DRyDhQ==
+	b=ddpFw7J3on4isMCOt3H2lue5WuIcQR2SPQyCjWoZHpcNo1ZOTj+0PEi8E25EEkr8i
+	 yBMJnQGVARjtPRf9ef7LOw5vY/yM+9Y2z+ek1oOnVhhcPy7Lqh8R/kctmeagk57hxB
+	 J7O+Kj9pbl2a5JZU2QKOYIXxHBXHap+mc+VDMlo0wQQv5W2syvn5fsdPkfORbPJ1+S
+	 u+UUHFuQCX/dMT7rAwUxM2xANHv47aMRkTTr+88v+1jSOwGN6JqosnkOj0HydENAgR
+	 MHTZTCGLy25XnN2BhGDmzmOxgcKX3xyJbmTZnqJI3QUxi77k/zaWdow5KMAS1trpuU
+	 0849KzwxQ7hRQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8542F3808200;
-	Thu,  5 Feb 2026 05:00:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C27A63808200;
+	Thu,  5 Feb 2026 05:00:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,84 +55,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/8] net/rds: RDS-TCP protocol and extension
- improvements
+Subject: Re: [PATCH net-next] net: stmmac: remove support for lpi_intr_o
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177026762333.167759.12194069820318825126.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Feb 2026 05:00:23 +0000
-References: <20260203055723.1085751-1-achender@kernel.org>
-In-Reply-To: <20260203055723.1085751-1-achender@kernel.org>
-To: Allison Henderson <achender@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pabeni@redhat.com, edumazet@google.com, rds-devel@oss.oracle.com,
- kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
- allison.henderson@oracle.com
+ <177026762457.167759.15871089841650371979.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Feb 2026 05:00:24 +0000
+References: <E1vnJbt-00000007YYN-28nm@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vnJbt-00000007YYN-28nm@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ ovidiu.panait.oss@gmail.com, pabeni@redhat.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256957-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-256958-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[lunn.ch,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,gmail.com,redhat.com];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DB850EE9A0
+X-Rspamd-Queue-Id: C4994EE9C6
 X-Rspamd-Action: no action
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  2 Feb 2026 22:57:15 -0700 you wrote:
-> From: Allison Henderson <allison.henderson@oracle.com>
-> 
-> Hi all,
-> 
-> This is subset 3 of the larger RDS-TCP patch series I posted last
-> Oct.  The greater series aims to correct multiple rds-tcp issues that
-> can cause dropped or out of sequence messages.  I've broken it down into
-> smaller sets to make reviews more manageable.
+On Tue, 03 Feb 2026 16:50:41 +0000 you wrote:
+> The dwmac databook for v3.74a states that lpi_intr_o is a sideband
+> signal which should be used to ungate the application clock, and this
+> signal is synchronous to the receive clock. The receive clock can run
+> at 2.5, 25 or 125MHz depending on the media speed, and can stop under
+> the control of the link partner. This means that the time it takes to
+> clear is dependent on the negotiated media speed, and thus can be 8,
+> 40, or 400ns after reading the LPI control and status register.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v5,1/8] net/rds: new extension header: rdma bytes
-    https://git.kernel.org/netdev/net-next/c/46f257ee6904
-  - [net-next,v5,2/8] net/rds: Encode cp_index in TCP source port
-    https://git.kernel.org/netdev/net-next/c/a20a6992558f
-  - [net-next,v5,3/8] net/rds: rds_tcp_conn_path_shutdown must not discard messages
-    https://git.kernel.org/netdev/net-next/c/826c1004d4ae
-  - [net-next,v5,4/8] net/rds: Kick-start TCP receiver after accept
-    https://git.kernel.org/netdev/net-next/c/aa0cd656f032
-  - [net-next,v5,5/8] net/rds: Clear reconnect pending bit
-    https://git.kernel.org/netdev/net-next/c/b89fc7c2523b
-  - [net-next,v5,6/8] net/rds: Update struct rds_statistics to use u64 instead of uint64_t
-    https://git.kernel.org/netdev/net-next/c/9d30ad8a8bc0
-  - [net-next,v5,7/8] net/rds: Use the first lane until RDS_EXTHDR_NPATHS arrives
-    https://git.kernel.org/netdev/net-next/c/a1f53d5fb6b2
-  - [net-next,v5,8/8] net/rds: Trigger rds_send_ping() more than once
-    https://git.kernel.org/netdev/net-next/c/9d27a0fb122f
+  - [net-next] net: stmmac: remove support for lpi_intr_o
+    https://git.kernel.org/netdev/net-next/c/14eb64db8ff0
 
 You are awesome, thank you!
 -- 
