@@ -1,225 +1,190 @@
-Return-Path: <netdev+bounces-257110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6AolC35yhGnh2wMAu9opvQ
-	(envelope-from <netdev+bounces-257110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 11:35:42 +0100
+	id UK4FH7lyhGnI2wMAu9opvQ
+	(envelope-from <netdev+bounces-257111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 11:36:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AEB7F1613
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 11:35:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C79F1637
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 11:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A3F17302D0F9
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 10:35:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8A3313005590
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 10:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62213A7F7E;
-	Thu,  5 Feb 2026 10:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4119F3A784C;
+	Thu,  5 Feb 2026 10:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GCOgMNh7";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JtTEqW0u"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="XJiuvuGN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43093A7F45
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 10:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AC03A1E9F
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 10:36:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770287695; cv=none; b=tEcFWQfkGgJSi1C4ChbSbzk1Osguu1mYjOZDrsRkV1HmC1k0yNpUo7tjzkgZrQigLiAMb53ddswlD5Ohj9YeUlJA+Ut9rWff+8B4NB3tjz/68hMcDPM8eptGC1RRKkp+N1XtmR+a5h2NEwOAcXQkuUuLEBzcv9nuwstIml69Tto=
+	t=1770287798; cv=none; b=lHMxVA58UIM/5YzusdSvCp40YPrjIcDdkPAcuzf/G0BOYEmXkrj13ZWtI45trY/7ilD4vSnudFx0H0NutUGDTz14HeX41P/r6y6bJmq7tzq7gc/C1SpzwSzceuitnuDCa3vGXjv0vkJNiWbQkDCUjI4VRrz4nB+XT34ZcRynjgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770287695; c=relaxed/simple;
-	bh=Pp2grdy0HGvxTDX/hIeiquPXDauTvrRjkXfG0y5tgGM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ALM8q8xlSySXOuakCo7djubi1QHGFKtktg3ih/yqzzvyHS+QWeHyz1QGnb3VXULOTgem+TNg+6deJvBiDZvfrWNvtH2Bk+Nb5SjDco0K89QhJ4iK+w8b+tDiGZ/S/7Vpz618TI+p0CgZRxruwMCJh/7znpbhLsRQksav5hTW5A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GCOgMNh7; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JtTEqW0u; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6157Mi36890365
-	for <netdev@vger.kernel.org>; Thu, 5 Feb 2026 10:34:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	0pDwIFMOmIHXKjSM/iN19GndmiqDGOze1XVUOoV9B2w=; b=GCOgMNh7efuVs+98
-	9moa17eJiYyL83XDjUq4BOAOWrwj5RtstAHVeo1sX4gvODJczrWzafi/TeP3fMMA
-	hTCKtajZRr/cN7RPT6Q0aNI7GYE6w4ID1SCHnY9/1HLwoWoDSZl3mEi+e3qadoZg
-	wsYv+8Z7YcrsZqr+XK5IPZwvX6I+IlnFZexCc1ukK7QgApqylxo4PfFcthI95N7F
-	8gfTEgt/Xwt51+iYqvisEWzDcKy/v9eFQ8u+9loz9Qf+h3Sdh+UrcVaGTuVViOmu
-	alhXWIKnIt1LrqdGSRg/IAqrUcgws0AfLqE952YDwJv9REmh+rslVPazsMLWpnxD
-	hBuHBA==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c4prx8m4h-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 10:34:55 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2a76f2d7744so9104865ad.3
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 02:34:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1770287694; x=1770892494; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0pDwIFMOmIHXKjSM/iN19GndmiqDGOze1XVUOoV9B2w=;
-        b=JtTEqW0uLTY8Ywu5Sv+4h4Cun81xfmIESBt70Dt1cQOvBye6xXbxKj94N/2wKfd7ZR
-         wAZbvjMuShDOEApguc7l1GpGPlOw0zGXrkhHaBbKrjQLlzAaHW/Le2TZ0LvpP3b2TOGC
-         Bjtr7Y7FhjyvZgHTlwayR12rvLDXDXZ6M/907L4YphZPDpOoyg8RElsVXYqCXsTPdxi/
-         gyMBE9iiWdotqetkVTeGmNwTuv/pKypZrhFj02F+xmeFyZI+Guiw7msf8dugjd6vvcPM
-         AN/pEyJzPUi++LzwbkBTvN1C9gzGVIzESZaT8uF38M75QLr9lcLgbvKnlBhHVlPXdQm/
-         mZWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770287694; x=1770892494;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0pDwIFMOmIHXKjSM/iN19GndmiqDGOze1XVUOoV9B2w=;
-        b=NNblgkCJWf36VFaFC9S4AKA9eN5sVOgJA97JdsrAnGDjPmCEo7kp2aQzBiguf4HKd7
-         iEJ1qEH0OgVx0MNkd8ot9gsYnJjYFl/h2bkf1Ef+7KvFmR+kd23ZsGsBx6idJEuOm8Z2
-         o6dzZqNMXOlMk6R3bOGZQGGP8pEgwV5GYxQpqO51rHsjncqvcHnPaCSe+1TFo5vGKM3o
-         lP7tJJOlwzhWZDZq5tbWHGewvw2V8IsfCngqJW3Li8uNCHs4/h+UWGgGNyoezPxKl7cS
-         E9H90Rsl+TmOPC7OOowjZw/XQBwGvqvQmRVpmtnpOMUIA74INOwXDCxwxAhZL4zev6LF
-         TJYQ==
-X-Gm-Message-State: AOJu0Yw0aJ1QSzoesXWj1P1zE9IsNEKDTk7XOzrUHXV5VtCIBh0BikXz
-	pGbfaGX4EkOFTSVhwCaw7EMIHRucQKwLruiYvWwgk4ZOTHNaTvPo2F0ThkLqV54a68BPmRiKxl7
-	eOTMe9vyvhVDdQPvyA9y9f/R2ZMEkP+KovJXNcqjrgNGHqJ9RFrYgyxlucxQ=
-X-Gm-Gg: AZuq6aLxd/4sUezTmsoXbtI1Dl3g3YUmJqe6zBZks6KgQHFxgi8sfv4WOKKVmY0gN+G
-	6Su0YA6/16sk29HfqB9yDQuB5zDmjSCYHVk1wnzreYG99rydbO1jLIJAqBBpCA7t3fYr0Fpd08A
-	+kbZC1VQnv8I3i6gXLH7ryq9HjsykKxgs0NsYYaYGjjaIYpA8V75rV6en3SUsD6vDcNT2lYj138
-	paa4LDZSE2bNyQgwtwrFU0ycTuCdRtVAKkcSDMd30MEVO5/F2dEXuaPPn3qI4+QcgfXcz1hW2WR
-	YuCyZHFievl6doGfQZwr8JTvhlKdIgn402GA0Uj1WeyRotpdT6eXkPt8AOweMwAKdG5gho0q4US
-	0Zr220E1cHWnt/zkEzR3tfvyf/dnMkd0wmjR/
-X-Received: by 2002:a17:902:e742:b0:2a9:33ab:e46a with SMTP id d9443c01a7336-2a933fbac63mr72094395ad.36.1770287694354;
-        Thu, 05 Feb 2026 02:34:54 -0800 (PST)
-X-Received: by 2002:a17:902:e742:b0:2a9:33ab:e46a with SMTP id d9443c01a7336-2a933fbac63mr72094125ad.36.1770287693886;
-        Thu, 05 Feb 2026 02:34:53 -0800 (PST)
-Received: from hu-vpernami-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a933851341sm50539255ad.4.2026.02.05.02.34.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 02:34:53 -0800 (PST)
-From: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
-X-Google-Original-From: Vivek Pernamitta <vpernami@qti.qualcomm.com>
-Date: Thu, 05 Feb 2026 16:04:41 +0530
-Subject: [PATCH v7 2/2] bus: mhi: host: pci: Enable IP_SW1, IP_ETH0 and
- IP_ETH1 channels for QDU100
+	s=arc-20240116; t=1770287798; c=relaxed/simple;
+	bh=y/A4tFVlBW3ZJcy56s5nncs6uStpUsxS6iRVhc8oAqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sPGOX4w9YZ8iBPWmISupdylIWrZcH3LTby/yBpAuBwTRn/UoNPBhaotRP57lI1+A3JgKscc25feFt/UO8BJA55nwmbpTeHomequM4aLIXBmeF2K3IlJbsvs1m1JodkcCTigI6vTdN5R2YHWmgSF813AvFC+EmMS5cbYcrVG6+s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=XJiuvuGN; arc=none smtp.client-ip=84.16.66.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4f6DCx3CWLzZFm;
+	Thu,  5 Feb 2026 11:36:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1770287789;
+	bh=nEf6GU3LWdcnwpRWt5dUL719B6VELwFtsTVttnNmWTQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XJiuvuGN6JORohBjKUfQCn1gN8ShIyyKNh4a0lTXVcQrCQbqsFUxjeo1gD1xAkFNB
+	 veUQvPkOEv60PmoPo+FM6oWCHvsdEwYtxTEu4HBnypd+rCuxjr9eXgJ4/OTZs6nSiV
+	 PLwRJYrtKilyRsoN2sF1siAIy+1NGwq4lD2gqREs=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4f6DCv6Jcjzk4g;
+	Thu,  5 Feb 2026 11:36:27 +0100 (CET)
+Date: Thu, 5 Feb 2026 11:36:26 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
+	Paul Moore <paul@paul-moore.com>, John Johansen <john.johansen@canonical.com>, 
+	Tingmao Wang <m@maowtm.org>, James Morris <jmorris@namei.org>, 
+	"Serge E . Hallyn" <serge@hallyn.com>, Justin Suess <utilityemal77@gmail.com>, 
+	linux-security-module@vger.kernel.org, Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, 
+	Matthieu Buffet <matthieu@buffet.re>, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
+	konstantin.meskhidze@huawei.com, Demi Marie Obenour <demiobenour@gmail.com>, 
+	Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
+	Tahera Fahimi <fahimitahera@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v3 1/5] lsm: Add hook security_unix_find
+Message-ID: <20260205.gah7Dimu1tho@digikod.net>
+References: <20260119203457.97676-2-gnoack3000@gmail.com>
+ <20260119203457.97676-4-gnoack3000@gmail.com>
+ <aYMenaSmBkAsFowd@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260205-eth_vdev_next-20260204_eth-v7-2-f85645210f81@qti.qualcomm.com>
-References: <20260205-eth_vdev_next-20260204_eth-v7-0-f85645210f81@qti.qualcomm.com>
-In-Reply-To: <20260205-eth_vdev_next-20260204_eth-v7-0-f85645210f81@qti.qualcomm.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Manivannan Sadhasivam <mani@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
-        linux-arm-msm@vger.kernel.org,
-        Vivek Pernamitta <vpernami@qti.qualcomm.com>,
-        Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1770287681; l=1454;
- i=vpernami@qti.qualcomm.com; s=20241114; h=from:subject:message-id;
- bh=fXCaUq7DjiO3Pq6d/1jvpSm3bp5ZFTxYXJXZa9U8DDM=;
- b=1xn9CEuu91jQ6i4jgrM4k/C0PILnlK7O23NbhkkI5mW0xlMRgcokLmovr3vM/HZ80L2D+EFF5
- 5uVz4XjYlYeAAg59ASEGAIKpRXTXKLROzoKsj84yUIYlBLgTJYMwe3j
-X-Developer-Key: i=vpernami@qti.qualcomm.com; a=ed25519;
- pk=HDwn8xReb8K52LA6/CJc6S9Zik8gDCZ5LO4Cypff71Y=
-X-Proofpoint-GUID: FvvahO3lQMgFHJqv3XOcWDc7QhNHkvd3
-X-Proofpoint-ORIG-GUID: FvvahO3lQMgFHJqv3XOcWDc7QhNHkvd3
-X-Authority-Analysis: v=2.4 cv=eLkeTXp1 c=1 sm=1 tr=0 ts=6984724f cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=Vo5YzJSDI_NEo2NC7oIA:9
- a=QEXdDO2ut3YA:10 a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA1MDA3NyBTYWx0ZWRfX7SxWpx/Ulamv
- eeSZtsyHVFrWA1uxlP5L8zjoPalubzJDH2rwKkVIrUqRIE6uOIftX6mNpXG3QWFImmVaxx8boU/
- fED3AL+KpOIyZm8d+9HeQ72RricNATLjh6T5082fIvcmbCho2ez7G+IEqJlaMh5yac21RkrmtcB
- Okjt6qJLiWJcIPM/KJZOixK+u64DXfs4JWCcrXoS1sTsdAQC5onz+Mlrtjx/szY6/pr1eNl09iQ
- 0uPtu6oLXmt531dwB1NWSCwRnz2aXlMe60c/pigK8+sxr2RPHcmvodaPuzTtVbNM9EbD4UnbCpO
- EMAfW1fly687kAe3uii6wgdZazCFGKxNFkMtzKS3AVB+QU+9ZYrOGJ9ETMb5YhS63QLrouPLc6v
- M//wXP/qlSgHneud4zNI4LhzZylnOA8dacQ5cbmAdu82q0u8adj/RnXObBDjY9aXTHlCL8h4osr
- 1109USWneD0pUtA5C5Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-05_02,2026-02-05_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 clxscore=1015 bulkscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 spamscore=0 malwarescore=0 phishscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602050077
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aYMenaSmBkAsFowd@google.com>
+X-Infomaniak-Routing: alpha
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.83 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_MIXED_CHARSET(0.83)[subject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-257111-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,paul-moore.com,canonical.com,maowtm.org,namei.org,hallyn.com,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,kernel.org,zeniv.linux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257110-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[digikod.net];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[digikod.net:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qualcomm.com:email,qualcomm.com:dkim,qti.qualcomm.com:mid];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vivek.pernamitta@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 9AEB7F1613
+	DBL_BLOCKED_OPENRESOLVER(0.00)[digikod.net:mid,digikod.net:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 24C79F1637
 X-Rspamd-Action: no action
 
-From: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+On Wed, Feb 04, 2026 at 11:25:33AM +0100, Günther Noack wrote:
+> Hello!
+> 
+> 
+> John:
+> 
+> Friendly ping; as Paul said in [1], we would appreciate a look from
+> the AppArmor side whether this path-based LSM hook makes sense for
+> you.
 
-Enable IP_SW1, IP_ETH0 and IP_ETH1 channels for M-plane, NETCONF and
-S-plane interface for QDU100.
+FYI, we plan to merge this patch series with another one where this new
+LSM hook will be used as Günther explained:
 
-Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
----
- drivers/bus/mhi/host/pci_generic.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> 
+> 
+> Everyone:
+> 
+> In [2], we are currently discussing how the UNIX restriction feature
+> would work in the bigger scheme in Landlock, and the current plan is
+> that long-term we would like to support semantics where a UNIX
+> connection attempt is allowed if EITHER:
+> 
+>  (a) the path is allow-listed in the policy, OR
+>  (b) the server side we connect to is part of the same Landlock
+>      sandbox ("domain")
+> 
+> 
+> With the currently proposed hook, (a) can be checked in the
+> security_unix_find() hook, and (b) can be checked in the
+> security_hook_socket_connect() hook.  Unfortunately, it also would
+> mean that if the (a) check fails, we would have to store that
+> information on the side (struct sock LSM blob?), return 0 from (a) and
+> then later use that information in hook (b), so that we can check
+> whether maybe the second possible condition is met.
+> 
+> Q: The passing of information across multiple LSM hooks is slightly
+> more complicated than I had hoped; is this an approach that is
+> recommended?
+> 
+> Therefore, in [2], Tingmao is suggesting that we change the
+> security_unix_find() hook and pass the "other" struct sock instead of
+> the type.
 
-diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-index 0884a384b77fc3f56fa62a12351933132ffc9293..6affef34ffc449eb48cd254bf3d8d69a49aeafdb 100644
---- a/drivers/bus/mhi/host/pci_generic.c
-+++ b/drivers/bus/mhi/host/pci_generic.c
-@@ -253,6 +253,13 @@ static const struct mhi_channel_config mhi_qcom_qdu100_channels[] = {
- 	MHI_CHANNEL_CONFIG_DL(41, "MHI_PHC", 32, 4),
- 	MHI_CHANNEL_CONFIG_UL(46, "IP_SW0", 256, 5),
- 	MHI_CHANNEL_CONFIG_DL(47, "IP_SW0", 256, 5),
-+	MHI_CHANNEL_CONFIG_UL(48, "IP_SW1", 256, 6),
-+	MHI_CHANNEL_CONFIG_DL(49, "IP_SW1", 256, 6),
-+	MHI_CHANNEL_CONFIG_UL(50, "IP_ETH0", 256, 7),
-+	MHI_CHANNEL_CONFIG_DL(51, "IP_ETH0", 256, 7),
-+	MHI_CHANNEL_CONFIG_UL(52, "IP_ETH1", 256, 8),
-+	MHI_CHANNEL_CONFIG_DL(53, "IP_ETH1", 256, 8),
-+
- };
- 
- static struct mhi_event_config mhi_qcom_qdu100_events[] = {
-@@ -268,6 +275,7 @@ static struct mhi_event_config mhi_qcom_qdu100_events[] = {
- 	MHI_EVENT_CONFIG_SW_DATA(5, 512),
- 	MHI_EVENT_CONFIG_SW_DATA(6, 512),
- 	MHI_EVENT_CONFIG_SW_DATA(7, 512),
-+	MHI_EVENT_CONFIG_SW_DATA(8, 512),
- };
- 
- static const struct mhi_controller_config mhi_qcom_qdu100_config = {
+This new approach is much more generic and should please any LSM wishing
+to use it.
 
--- 
-2.34.1
+> 
+> There is obviously a balance between hooks that are very generic and
+> usable across multiple LSMs and hooks that are convenient to use for
+> every LSM.  
+> 
+> Paul:
+> 
+> You have previously said that you would like hooks to be generic and
+> ideally reflect the arguments of the same function that they are
+> called from [3].
+> 
+> Q: Would it be acceptable to change the hook arguments, if we can then
+> avoid passing additional data between hooks through that side-storage?
+> You can see Tingmao's proposal for that in [2].  TL;DR: It moves the
+> call to security_unix_find() just after the place where the sk
+> variable ("other"-side socket) is looked up and then calls the hook
+> with the sk as argument instead of with the type.  That way, we can do
+> both check (a) and (b) from above in the same hook and do not need to
+> store data on the side.  Is that an acceptable trade-off for the LSM
+> interface?
 
+I think it's a good interface because it let any LSM check both the
+resolved path and the resolved socket (without race condition), which
+makes sense and align with most other hooks.
+
+> 
+> Thanks,
+> —Günther
+> 
+> [1] https://lore.kernel.org/all/CAHC9VhQZ_J9316Us0squV_f-MjYXPcex34BnJ14vEBxS9Jyjbg@mail.gmail.com/
+> [2] https://lore.kernel.org/all/e6b6b069-384c-4c45-a56b-fa54b26bc72a@maowtm.org/
+> [3] https://lore.kernel.org/all/CAHC9VhQ234xihpndTs4e5ToNJ3tGCsP7AVtXuz8GajG-_jn3Ow@mail.gmail.com/
+> 
 
