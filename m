@@ -1,213 +1,113 @@
-Return-Path: <netdev+bounces-257275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLpDObfXhGlo5gMAu9opvQ
-	(envelope-from <netdev+bounces-257275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 18:47:35 +0100
+	id iK71AM/XhGlo5gMAu9opvQ
+	(envelope-from <netdev+bounces-257277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 18:47:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67B50F6270
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 18:47:35 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C259F628F
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 18:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 110E03007892
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 17:47:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 12E7B301287E
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 17:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDED2FFFBE;
-	Thu,  5 Feb 2026 17:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EF63002A6;
+	Thu,  5 Feb 2026 17:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1SWEf6f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PnwUUeRP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F6D2FD694
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 17:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B335D2FF65F;
+	Thu,  5 Feb 2026 17:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770313616; cv=none; b=q+uhJ6RwYziWt1fJErKbRfm0/YfkhS8YCw/fKSonumwVLbnqx9ZnuESXXuLruxbrHbz/VhqN1h7HEQ+fn8UDN9piRXxOvLnhlbxsYJWgGlBDqWI39WShgbV0x5qRpyPNfAXbEPTdbp9Tr491R0vGYXzpljXCqXHRXh8TTSwyLpg=
+	t=1770313649; cv=none; b=uwVvlhsjAgpaiLqi9D0ROrgAnbxnqgdSFooxRosRJKeiM28/Cxh+jTEjk3EyawkVOsezp53YPOLvRr8IzyWZ3Y+4XKHClbg11OJGSy19p3ZWsQ9rsynWZ1srw1kNEnJI4JA+dg/cC0cQ0ZtiHRca2lX5n8ft4ZU4fwycdNHf3QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770313616; c=relaxed/simple;
-	bh=wnjtBBK0iqB1VvqUAEVJlOibMNEC4vdMhgnCkZgThn4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dd1KJ8AJlhdUkidT5zMsBQt0a24efj5v2sfxBQzJlA2AfoVtVEgOehYpY25h09hfr0QA9BTQkQhwKXSUvj+fMAre7BQg/t6B0SYAT0Oc5rFx0Uj3dNDQnI3C3tGg8Vo4TJeANSJOpXjQZeO9qN3riIqqYRpxHx8rdDEZto1SVfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1SWEf6f; arc=none smtp.client-ip=74.125.82.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1249b9f5703so1956564c88.0
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 09:46:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770313615; x=1770918415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=knM2pU/+KZzHJ5cQexzMehGAL415Q9KWhsuFhvbNK0A=;
-        b=k1SWEf6f+dgqM7ER+/qK/Q/rGo16QQDaicchHm4Ot9ZpSzHbYT+lgLQU3WNScz1bz9
-         toeAlLsh+Gx43O2C6IP3WKuFvubDK7yfr/bVUKu29JPl9Z3GOw1bUlIK/cU4xahNp3yQ
-         f09YivlRorLc5b3Ty/IhHR3OC1aREYGx0FNJABeyuogwhNVYtG8rfREaX7R3TJ/AwsKF
-         rfEQwaexWqKri9N4HKvouNhVrNEo8/2uKqVjajHNNza05ltyn7S5joaLA4zGMO2xLZN/
-         GaH0cfKs2FEWMNJwRs4TX6kEIVEeM8DRAgsRoZbSLKvhCG0Qj0RcDhgfh7mcBwHjT+iG
-         duTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770313615; x=1770918415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=knM2pU/+KZzHJ5cQexzMehGAL415Q9KWhsuFhvbNK0A=;
-        b=CrD90yca7Z/OCdRs0XTx1yDqL9gvadIL0pru/qmY+wU2WA14P6OkKup3uWGXEo8j+g
-         acG428a8RIxqxQdjMB1pFjHbtei4GUEaEu0dqsAsMEBfgesCEtT85RZViNDRws0IaTap
-         7iH/4gX0nhoYur8haiQoR+YrNoAwZWFvwMAn7+LpnK35WHFCEGXCZ8czHYDYQ3dpQahG
-         4ewPeufAaNfCviaesf6jmhrJZCmuSD/qqaW9jIFiNShzmtvkqsKPY3Qi3cFJfH1bYZzu
-         m4T5Un3z/q9eVQjELWvx/Fb3cJlMQB6DmpzIpZQixIwvv1aETNVVA/nfIl3FXDvbghU0
-         cwMA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3BohO4fwgmR1ZQgBIkw2/mZB5PkJeOvcv8HyJbLaOb+XREMbniHBAzGDlvYpSSPaL4gcMH1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDlCNSquYxwaTazugxx7tE7/EMY0HY0dKzXIN3BCI33gdwRSym
-	qw9MIxZ9ECvc8WNtpSDVeD7OIpf4kK2Magq3hvOYgGyAQLtsBenQSKdV
-X-Gm-Gg: AZuq6aIawFj/ErigcrCneMiZlyf700WU+1X96fb1JP1hS0eYqy8nHRGLLyAd3cgqcbL
-	ScpRxZp2k3oSgsnvjrEtJhZN9fJryP0XdICfHzlRQnCzkc5m9q/GLKNHnRH5TTbBmLAyBhAV1Zn
-	fUTv0N5lWOZUTDfwWQfpFWonhti+4vM0WCSdSaXEayHDwbDhWHlUB0/5dKCMvdyVFPtm0I8yJR6
-	IivWr70iwZcivtfox2YFZh9NF48cDr1B9NZ4aatnQwQJc6jx+8mqUSbgxinu9m7RhVknAmIcyyr
-	+A6iwQwqHezT9hFYZvotOMN1IY5aB0/AdkJg4Kv50bdzBcDGCNMVKE+7tWrKxTv/PFtBHGKOd0o
-	7jGmYRLYBzX4yJkNe3hLjlrovc2i9AkT/rui9otGo1QRJx4bXrAyl1Nkxji696i0PfBUlSXG2/r
-	RL7pY3tyHfX+PHL1CTFg==
-X-Received: by 2002:a05:7022:a86:b0:123:330b:398 with SMTP id a92af1059eb24-12703f51b55mr30556c88.19.1770313615063;
-        Thu, 05 Feb 2026 09:46:55 -0800 (PST)
-Received: from deathstar ([2600:1700:22f5:908f:1457:7499:d258:358f])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-126f4e04467sm4152626c88.2.2026.02.05.09.46.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 09:46:54 -0800 (PST)
-Date: Thu, 5 Feb 2026 09:46:52 -0800
-From: Matthew Wood <thepacketgeek@gmail.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>, 
-	Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	hch@infradead.org, jlbec@evilplan.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org, 
-	kernel-team@meta.com
-Subject: Re: [PATCH RFC 0/2] configfs: enable kernel-space item registration
-Message-ID: <aYTWbElo_U_neJZi@deathstar>
-References: <fdieWSRrkaRJDRuUJYwp6EBe1NodHTz3PpVgkS662Ja0JcX3vfDbNo_bs1BM7zIkVsHmxHjeDi6jmq4sPKOCIw==@protonmail.internalid>
- <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
- <878qfgx25r.fsf@t14s.mail-host-address-is-not-set>
- <-6hh70JX5nq4ruTMbNQPMoUi6wz8vmM2MQxqB3VNK3Zt97c-oxWOo3y0cQ7_h6BSfcp78fR9GmzxcTQb_WB-XA==@protonmail.internalid>
- <ineirxyguevlbqe7j4qpkcooqstpl5ogvzhg2bqutkic4lxwu5@vgtygbngs242>
- <875xakwwvz.fsf@t14s.mail-host-address-is-not-set>
+	s=arc-20240116; t=1770313649; c=relaxed/simple;
+	bh=xwl0WuTnfOZ/MCKNV/acsDN1ZWbJA58gs2gtWOStIzA=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=l/utxNheGKHzcNOtikogtwtVjDjjbF0n0JWfMWucf9kvDkgYYQrIqoHR67zJre3/1gvBCDXrMxdKyl7saVc4p5o0rXWv591DKwNUoTavn6vp+JWoHQeF6Klkawye4EIpqPWCTrFKhE1bFBGn7tBsAvW5mrh9KWvYYHY9g7OyLKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PnwUUeRP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F1B1C4CEF7;
+	Thu,  5 Feb 2026 17:47:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770313649;
+	bh=xwl0WuTnfOZ/MCKNV/acsDN1ZWbJA58gs2gtWOStIzA=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=PnwUUeRPyqj/tctHN5yDckIsFllr/4ojtIaMj/+CXn5XCcI82CJPcnmiDeq8rF+jM
+	 Pi4KK9Kr1PcnMPBNo/VbDkFkB8cemLkVdHEptGbdd5Ku/wDkju9E1BYbiEw0Wl/9QQ
+	 Zd3cb5h3Eg8VUcplC+KakopuFy+BLA18NNuKXfJgbhPUJg23J9pj44eVv9fvbrGJGS
+	 ikd6Gxc8r+KOHgbm7bljycQMz4ZFgaMX9b8txDEcskNraY/D30e4iajsLIObwx3kNz
+	 zUQIkgb8WXuVu6SA1NQxrhd2qdD88l/h3kycym7HADp3aXnxL0YxMT0RCxt1mHMIrI
+	 dGA4ftE7wCItg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 484C33808200;
+	Thu,  5 Feb 2026 17:47:28 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.19-rc9/final
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260205171831.1944818-1-kuba@kernel.org>
+References: <20260205171831.1944818-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260205171831.1944818-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.19-rc9
+X-PR-Tracked-Commit-Id: bbf4a17ad9ffc4e3d7ec13d73ecd59dea149ed25
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8fdb05de0e2db89d8f56144c60ab784812e8c3b7
+Message-Id: <177031364685.509822.7533650509276870343.pr-tracker-bot@kernel.org>
+Date: Thu, 05 Feb 2026 17:47:26 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875xakwwvz.fsf@t14s.mail-host-address-is-not-set>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257275-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,infradead.org,evilplan.org,gmail.com,wbinvd.org,meta.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257277-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thepacketgeek@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 67B50F6270
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9C259F628F
 X-Rspamd-Action: no action
 
-Hi Breno and Andreas,
+The pull request you sent on Thu,  5 Feb 2026 09:18:31 -0800:
 
-I'm in favor of this RFC as I think the current flow of needing to
-create the cmdline0 dir in the netconsole configfs (when DYNAMIC config
-is enabled) prior to modifying the values is not ideal.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.19-rc9
 
-I think there are good points shared about sysfs vs. configfs being used
-for the cmdline target modification and wanted to add my thoughts.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8fdb05de0e2db89d8f56144c60ab784812e8c3b7
 
-On Fri, Dec 05, 2025 at 08:29:04PM +0100, Andreas Hindborg wrote:
-> "Breno Leitao" <leitao@debian.org> writes:
-> 
-> > Hello Andreas,
-> >
-> > On Fri, Dec 05, 2025 at 06:35:12PM +0100, Andreas Hindborg wrote:
-> >> "Breno Leitao" <leitao@debian.org> writes:
-> >>
-> >> > This series introduces a new kernel-space item registration API for configfs
-> >> > to enable subsystems to programmatically create configfs items whose lifecycle
-> >> > is controlled by the kernel rather than userspace.
-> >> >
-> >> > Currently, configfs items can only be created via userspace mkdir operations,
-> >> > which limits their utility for kernel-driven configuration scenarios such as
-> >> > boot parameters or hardware auto-detection.
-> >>
-> >> I thought sysfs would handle this kind of scenarios?
-> >
-> > sysfs has gaps as well, to manage user-create items.
-> >
-> > Netconsole has two types of "targets". Those created dynamically
-> > (CONFIG_NETCONSOLE_DYNAMIC), where user can create and remove as many
-> > targets as it needs, and netconsole would send to it. This fits very
-> > well in configfs.
-> >
-> >   mkdir /sys/kernel/config/netconsole/mytarget
-> >   .. manage the target using configfs items/files
-> >   rmdir /sys/kernel/config/netconsole/mytarget
-> >
-> > This is a perfect fit for configfs, and I don't see how it would work
-> > with sysfs.
-> 
-> Right, these go in configfs, we are on the same page about that.
-> 
-> >
-> > On top of that, there are netconsole targets that are coming from
-> > cmdline (basically to cover while userspace is not initialized). These
-> > are coming from cmdline and its life-cycle is managed by the kernel.
-> > I.e, the kernel knows about them, and wants to expose it to the user
-> > (which can even disable them later). This is the problem I this patch
-> > addresses (exposing them easily).
-> 
-> I wonder if these entries could be exposed via sysfs? You could create
-> the same directory structure as you have in configfs for the user
-> created devices, so the only thing user space has to do is to point at a
-> different directory.
-> 
-Although technically feasible, this approach leads to an inconsistent
-and confusing management of the netconsole targets. A configfs path for
-user-space created targets and a sysfs path for the cmdline initiated
-target that can also be modified from userspace (e.g. to update
-remote_ip or userdata fields).
+Thank you!
 
-I think Breno's approach sets up for the most intuitive user experience.
-The cmdline config for netconsole is also user-provided, so it seems
-like it should behave as a pre-populated configfs target that happens to
-pass from cmdline through netconsole module init to the current configfs
-interface. The initial values are not determined by the kernel itself.
-
-> 
-> Best regards,
-> Andreas Hindborg
-> 
-> 
-> 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
