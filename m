@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-257323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2IPmFyUVhWkh8QMAu9opvQ
-	(envelope-from <netdev+bounces-257323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 23:09:41 +0100
+	id oPR2IS4VhWkh8QMAu9opvQ
+	(envelope-from <netdev+bounces-257324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 23:09:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F30B1F7F8E
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 23:09:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1C4F7F96
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 23:09:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56B9130479CC
+	by sea.lore.kernel.org (Postfix) with ESMTP id CFA7230495C4
 	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 22:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C7A336EF8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A2233554B;
 	Thu,  5 Feb 2026 22:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+fnN2gP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAdwSOIq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A15335559;
-	Thu,  5 Feb 2026 22:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7522D3358B0;
+	Thu,  5 Feb 2026 22:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770329247; cv=none; b=P1qeNscLpYQmFlTVonxM93NL81XtO2rjo+/nKQU+ufjZzgrIyKk1iQmDOu22yZhjzG4r7wexG3EXXjZj2KtDjycUTnpOB6CMpOwWuBJhwr5wTs+6ZiztgtZw0062GodLGxBYrXtubOS+3ZG5iBtdYVIB9K2oD1vbZIiBhFynQl4=
+	t=1770329247; cv=none; b=mF/LkJRTQEOWKkZO0guaHJiiAsGOEqE9PZS9V/lLsNxxN/gf/NR2WFxaQ+BQ4pzB7AvIY+cFzeRTT1ryA4r4N+8p8METJlPwb8LlP1JKHn51H92JPjeGmsdEFOxS/vCEUCio/LwGS6ZY8upP3iZj5343wMX1HF2m4CCIIUNE2Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770329247; c=relaxed/simple;
-	bh=8G88Ko4ouQ2aWmswodYrv0Uhf3Ik0AV1zldV5eU/+cM=;
+	bh=vrKmapDKVFUNawVdemJagrQcA18lZGaXtDwlwlwLev8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fix3E3DYqvxKMVoip8Q6MfYSUKNW8MdRS4TOTAHwOgmFelG5gTJam/yXT2yF18WYeiY9obFk5sx0SOk4N+AM+TnIgDnQtwy+7S4Sl1P3cQiWSu2eJunknN6O7EuNInyDjwvI54m1j2bN6H0AfUoorSj300l2lNi/hqKdPA3cZNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+fnN2gP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0367C2BC87;
-	Thu,  5 Feb 2026 22:07:25 +0000 (UTC)
+	 MIME-Version; b=lQc4cDUDALxIpX/Zk3X0bPjxzDKHzr4nrHo9G09fGfqDSNymM0TLySLg939ZCT4Tyrl2rpBAeVQ5TR7Cu8UOZWVnS5sz/cxqdHva6+Z3TgPdqDmTzwhOOa5uSTf+A8ccMH5pL7hHNmMqybtg3t8y3Y8/De52mJ48Qfl83H+vjQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BAdwSOIq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B308FC19424;
+	Thu,  5 Feb 2026 22:07:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770329246;
-	bh=8G88Ko4ouQ2aWmswodYrv0Uhf3Ik0AV1zldV5eU/+cM=;
+	s=k20201202; t=1770329247;
+	bh=vrKmapDKVFUNawVdemJagrQcA18lZGaXtDwlwlwLev8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A+fnN2gPs2qTlpvlFMHMdtR/DNYZNYBAe7jjm01V3ghG9iKnr55jDOLG3BHKz9Mh1
-	 Y/NnIhpZljVKa247IoP5yKr5KOeb9SHGbQFnhT49O+wHYtUfReSfnItxf1EX1bgisD
-	 Frg030MnoMysjqCRe1rtmSgLSq0U/5mbhn2L5eev3kT1MzQp+72qa/GI13yf4i+3UK
-	 7KOFYUGjn7FpWMq9UdCkFskmwuq38Z1pykvLODu6icGrqUFLlBfuT2HE14bXsSg8k9
-	 WAeUl+/tXhxGo6fUSrwA6iL3xEf3FQAEPtJlCfmewJeq0gwbLAXpp/jiuN+/0wW1ht
-	 2AYn3UCqu1Baw==
+	b=BAdwSOIq/e33Oyfo9W8PlwmL37Mv3LszcElGEwrMMdJONHVA5jTYHGfKaXC/+1tBb
+	 YBdr54L3F4+E9u2ySsRgJUxAYD46YhZO7gKccl4Q3rBiIjpWZ0OBR0F3/+IpgrVAMN
+	 DAXDfyIUbiJLw8QCzystPjElZDaw9dA3R4Eh2vPP23IGrJU/LsIjzR86KXNfpzSA0f
+	 rHoKrVU6vjTXMCjsPX2glgbtIbhoBSgBGIsEajy3NNqcUsm9949ZZS8PwPGWwTSZF+
+	 Dk9za8k/zATr/Br5V+b8ZZx90z/NsuMklDuZocHWcagAc9zoZFeOxqM18y2s1zB+eW
+	 iS2+p73NMvFgw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 7/9] selftests: drv-net: gro: test GRO stats
-Date: Thu,  5 Feb 2026 14:05:39 -0800
-Message-ID: <20260205220541.2992807-8-kuba@kernel.org>
+Subject: [PATCH net-next 8/9] selftests: drv-net: gro: add test for packet ordering
+Date: Thu,  5 Feb 2026 14:05:40 -0800
+Message-ID: <20260205220541.2992807-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260205220541.2992807-1-kuba@kernel.org>
 References: <20260205220541.2992807-1-kuba@kernel.org>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com,broadcom.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-257323-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257324-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -101,549 +101,174 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.py:url,gro_hw.py:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F30B1F7F8E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lib.py:url]
+X-Rspamd-Queue-Id: DF1C4F7F96
 X-Rspamd-Action: no action
 
-Test accuracy of GRO stats. We want to cover two potentially tricky
-cases:
- - single segment GRO
- - packets which were eligible but didn't get GRO'd
-
-The first case is trivial, teach gro.c to send on packet, and check
-GRO stats didn't move.
-
-Second case requires gro.c to send a lot of flows expecting the NIC
-to run out of GRO flow capacity.
-
-To avoid system traffic noise we steer the packets to a dedicated
-queue and operate on qstat.
+Add a test to check if the NIC reorders packets if the hit GRO.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- tools/testing/selftests/net/lib/gro.c         | 161 ++++++++++-
- .../selftests/drivers/net/hw/gro_hw.py        | 271 ++++++++++++++++++
- 3 files changed, 432 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/drivers/net/hw/gro_hw.py
+ tools/testing/selftests/net/lib/gro.c         | 38 +++++++++++++++++--
+ .../selftests/drivers/net/hw/gro_hw.py        | 29 ++++++++++++--
+ 2 files changed, 61 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index a64140333a46..19e5ca223273 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -26,6 +26,7 @@ TEST_PROGS = \
- 	ethtool_extended_state.sh \
- 	ethtool_mm.sh \
- 	ethtool_rmon.sh \
-+	gro_hw.py \
- 	hw_stats_l3.sh \
- 	hw_stats_l3_gre.sh \
- 	iou-zcrx.py \
 diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-index 832edf3e1290..d37676c009e8 100644
+index d37676c009e8..3d3312b37248 100644
 --- a/tools/testing/selftests/net/lib/gro.c
 +++ b/tools/testing/selftests/net/lib/gro.c
-@@ -43,6 +43,10 @@
-  *   - large_max: exceeding max size
-  *   - large_rem: remainder handling
-  *
-+ * single, capacity:
-+ *  Boring cases used to test coalescing machinery itself and stats
-+ *  more than protocol behavior.
-+ *
-  * MSS is defined as 4096 - header because if it is too small
-  * (i.e. 1500 MTU - header), it will result in many packets,
-  * increasing the "large" test case's flakiness. This is because
-@@ -126,6 +130,9 @@ static int total_hdr_len = -1;
- static int ethhdr_proto = -1;
+@@ -131,6 +131,7 @@ static int ethhdr_proto = -1;
  static bool ipip;
  static uint64_t txtime_ns;
-+static int num_flows = 4;
-+
-+#define CAPACITY_PAYLOAD_LEN 200
+ static int num_flows = 4;
++static bool order_check;
  
- #define TXTIME_DELAY_MS 5
+ #define CAPACITY_PAYLOAD_LEN 200
  
-@@ -387,6 +394,45 @@ static void create_packet(void *buf, int seq_offset, int ack_offset,
- 	fill_datalinklayer(buf);
- }
+@@ -1134,6 +1135,7 @@ static void check_capacity_pkts(int fd)
+ 	static char buffer[IP_MAXPACKET + ETH_HLEN + 1];
+ 	struct iphdr *iph = (struct iphdr *)(buffer + ETH_HLEN);
+ 	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + ETH_HLEN);
++	int num_pkt = 0, num_coal = 0, pkt_idx;
+ 	const char *fail_reason = NULL;
+ 	int flow_order[num_flows * 2];
+ 	int coalesced[num_flows];
+@@ -1142,8 +1144,6 @@ static void check_capacity_pkts(int fd)
+ 	int total_data = 0;
+ 	int pkt_size = -1;
+ 	int data_len = 0;
+-	int num_pkt = 0;
+-	int num_coal = 0;
+ 	int flow_id;
+ 	int sport;
  
-+static void create_capacity_packet(void *buf, int flow_id, int pkt_idx, int psh)
-+{
-+	int seq_offset = pkt_idx * CAPACITY_PAYLOAD_LEN;
-+	struct tcphdr *tcph;
-+
-+	create_packet(buf, seq_offset, 0, CAPACITY_PAYLOAD_LEN, 0);
-+
-+	/* Customize for this flow id */
-+	memset(buf + total_hdr_len, 'a' + flow_id, CAPACITY_PAYLOAD_LEN);
-+
-+	tcph = buf + tcp_offset;
-+	tcph->source = htons(SPORT + flow_id);
-+	tcph->psh = psh;
-+	tcph->check = 0;
-+	tcph->check = tcp_checksum(tcph, CAPACITY_PAYLOAD_LEN);
-+}
-+
-+/* Send a capacity test, 2 packets per flow, all first packets then all second:
-+ *  A1 B1 C1 D1 ... A2 B2 C2 D2 ...
-+ */
-+static void send_capacity(int fd, struct sockaddr_ll *daddr)
-+{
-+	static char buf[MAX_HDR_LEN + CAPACITY_PAYLOAD_LEN];
-+	int pkt_size = total_hdr_len + CAPACITY_PAYLOAD_LEN;
-+	int i;
-+
-+	/* Send first packet of each flow (no PSH) */
-+	for (i = 0; i < num_flows; i++) {
-+		create_capacity_packet(buf, i, 0, 0);
-+		write_packet(fd, buf, pkt_size, daddr);
-+	}
-+
-+	/* Send second packet of each flow (with PSH to flush) */
-+	for (i = 0; i < num_flows; i++) {
-+		create_capacity_packet(buf, i, 1, 1);
-+		write_packet(fd, buf, pkt_size, daddr);
-+	}
-+}
-+
- #ifndef TH_CWR
- #define TH_CWR 0x80
- #endif
-@@ -1083,6 +1129,93 @@ static void check_recv_pkts(int fd, int *correct_payload,
- 	printf("Test succeeded\n\n");
- }
+@@ -1201,6 +1201,34 @@ static void check_capacity_pkts(int fd)
+ 		total_data += data_len;
+ 	}
  
-+static void check_capacity_pkts(int fd)
-+{
-+	static char buffer[IP_MAXPACKET + ETH_HLEN + 1];
-+	struct iphdr *iph = (struct iphdr *)(buffer + ETH_HLEN);
-+	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buffer + ETH_HLEN);
-+	const char *fail_reason = NULL;
-+	int flow_order[num_flows * 2];
-+	int coalesced[num_flows];
-+	struct tcphdr *tcph;
-+	int ip_ext_len = 0;
-+	int total_data = 0;
-+	int pkt_size = -1;
-+	int data_len = 0;
-+	int num_pkt = 0;
-+	int num_coal = 0;
-+	int flow_id;
-+	int sport;
++	/* Check flow ordering. We expect to see all non-coalesced first segs
++	 * then interleaved coalesced and non-coalesced second frames.
++	 */
++	pkt_idx = 0;
++	for (flow_id = 0; order_check && flow_id < num_flows; flow_id++) {
++		bool coaled = coalesced[flow_id] > CAPACITY_PAYLOAD_LEN;
 +
-+	memset(coalesced, 0, sizeof(coalesced));
-+	memset(flow_order, -1, sizeof(flow_order));
-+
-+	while (total_data < num_flows * CAPACITY_PAYLOAD_LEN * 2) {
-+		ip_ext_len = 0;
-+		pkt_size = recv(fd, buffer, IP_MAXPACKET + ETH_HLEN + 1, 0);
-+		if (pkt_size < 0)
-+			recv_error(fd, errno);
-+
-+		if (iph->version == 4)
-+			ip_ext_len = (iph->ihl - 5) * 4;
-+		else if (ip6h->version == 6 && ip6h->nexthdr != IPPROTO_TCP)
-+			ip_ext_len = MIN_EXTHDR_SIZE;
-+
-+		tcph = (struct tcphdr *)(buffer + tcp_offset + ip_ext_len);
-+
-+		/* FIN packet terminates reception */
-+		if (tcph->fin)
-+			break;
-+
-+		sport = ntohs(tcph->source);
-+		flow_id = sport - SPORT;
-+
-+		if (flow_id < 0 || flow_id >= num_flows) {
-+			vlog("Invalid flow_id %d from sport %d\n",
-+			     flow_id, sport);
-+			fail_reason = fail_reason ?: "invalid packet";
++		if (coaled)
 +			continue;
++
++		if (flow_order[pkt_idx] != flow_id) {
++			vlog("Flow order mismatch (non-coalesced) at position %d: expected flow %d, got flow %d\n",
++			     pkt_idx, flow_id, flow_order[pkt_idx]);
++			fail_reason = fail_reason ?: "bad packet order (1)";
 +		}
++		pkt_idx++;
++	}
++	for (flow_id = 0; order_check && flow_id < num_flows; flow_id++) {
++		bool coaled = coalesced[flow_id] > CAPACITY_PAYLOAD_LEN;
 +
-+		/* Calculate payload length */
-+		if (pkt_size == ETH_ZLEN && iph->version == 4) {
-+			data_len = ntohs(iph->tot_len)
-+				- sizeof(struct tcphdr) - sizeof(struct iphdr);
-+		} else {
-+			data_len = pkt_size - total_hdr_len - ip_ext_len;
++		if (flow_order[pkt_idx] != flow_id) {
++			vlog("Flow order mismatch at position %d: expected flow %d, got flow %d, coalesced: %d\n",
++			     pkt_idx, flow_id, flow_order[pkt_idx], coaled);
++			fail_reason = fail_reason ?: "bad packet order (2)";
 +		}
-+
-+		flow_order[num_pkt] = flow_id;
-+		coalesced[flow_id] = data_len;
-+
-+		if (data_len == CAPACITY_PAYLOAD_LEN * 2) {
-+			num_coal++;
-+		} else {
-+			vlog("Pkt %d: flow %d, sport %d, len %d (expected %d)\n",
-+			     num_pkt, flow_id, sport, data_len,
-+			     CAPACITY_PAYLOAD_LEN * 2);
-+			fail_reason = fail_reason ?: "not coalesced";
-+		}
-+
-+		num_pkt++;
-+		total_data += data_len;
++		pkt_idx++;
 +	}
 +
-+	if (!fail_reason) {
-+		vlog("All %d flows coalesced correctly\n", num_flows);
-+		printf("Test succeeded\n\n");
-+	} else {
-+		printf("FAILED\n");
-+	}
-+
-+	/* Always print stats for external validation */
-+	printf("STATS: received=%d wire=%d coalesced=%d\n",
-+	       num_pkt, num_pkt + num_coal, num_coal);
-+
-+	if (fail_reason)
-+		error(1, 0, "capacity test failed %s", fail_reason);
-+}
-+
- static void gro_sender(void)
- {
- 	struct sock_txtime so_txtime = { .clockid = CLOCK_MONOTONIC, };
-@@ -1242,6 +1375,19 @@ static void gro_sender(void)
- 
- 		send_large(txfd, &daddr, remainder + 1);
- 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+
-+	/* machinery sub-tests */
-+	} else if (strcmp(testname, "single") == 0) {
-+		static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
-+
-+		create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
-+		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
-+		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+	} else if (strcmp(testname, "capacity") == 0) {
-+		send_capacity(txfd, &daddr);
-+		usleep(fin_delay_us);
-+		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+
- 	} else {
- 		error(1, 0, "Unknown testcase: %s", testname);
- 	}
-@@ -1437,6 +1583,15 @@ static void gro_receiver(void)
- 		correct_payload[2] = remainder + 1;
- 		printf("last segment sent individually: ");
- 		check_recv_pkts(rxfd, correct_payload, 3);
-+
-+	/* machinery sub-tests */
-+	} else if (strcmp(testname, "single") == 0) {
-+		printf("single data packet: ");
-+		correct_payload[0] = PAYLOAD_LEN;
-+		check_recv_pkts(rxfd, correct_payload, 1);
-+	} else if (strcmp(testname, "capacity") == 0) {
-+		check_capacity_pkts(rxfd);
-+
- 	} else {
- 		error(1, 0, "Test case error: unknown testname %s", testname);
- 	}
-@@ -1454,6 +1609,7 @@ static void parse_args(int argc, char **argv)
- 		{ "ipv4", no_argument, NULL, '4' },
- 		{ "ipv6", no_argument, NULL, '6' },
- 		{ "ipip", no_argument, NULL, 'e' },
-+		{ "num-flows", required_argument, NULL, 'n' },
- 		{ "rx", no_argument, NULL, 'r' },
+ 	if (!fail_reason) {
+ 		vlog("All %d flows coalesced correctly\n", num_flows);
+ 		printf("Test succeeded\n\n");
+@@ -1614,12 +1642,13 @@ static void parse_args(int argc, char **argv)
  		{ "saddr", required_argument, NULL, 's' },
  		{ "smac", required_argument, NULL, 'S' },
-@@ -1463,7 +1619,7 @@ static void parse_args(int argc, char **argv)
+ 		{ "test", required_argument, NULL, 't' },
++		{ "order-check", no_argument, NULL, 'o' },
+ 		{ "verbose", no_argument, NULL, 'v' },
+ 		{ 0, 0, 0, 0 }
  	};
  	int c;
  
--	while ((c = getopt_long(argc, argv, "46d:D:ei:rs:S:t:v", opts, NULL)) != -1) {
-+	while ((c = getopt_long(argc, argv, "46d:D:ei:n:rs:S:t:v", opts, NULL)) != -1) {
+-	while ((c = getopt_long(argc, argv, "46d:D:ei:n:rs:S:t:v", opts, NULL)) != -1) {
++	while ((c = getopt_long(argc, argv, "46d:D:ei:n:rs:S:t:ov", opts, NULL)) != -1) {
  		switch (c) {
  		case '4':
  			proto = PF_INET;
-@@ -1487,6 +1643,9 @@ static void parse_args(int argc, char **argv)
- 		case 'i':
- 			ifname = optarg;
+@@ -1658,6 +1687,9 @@ static void parse_args(int argc, char **argv)
+ 		case 't':
+ 			testname = optarg;
  			break;
-+		case 'n':
-+			num_flows = atoi(optarg);
++		case 'o':
++			order_check = true;
 +			break;
- 		case 'r':
- 			tx_socket = false;
+ 		case 'v':
+ 			verbose = true;
  			break;
 diff --git a/tools/testing/selftests/drivers/net/hw/gro_hw.py b/tools/testing/selftests/drivers/net/hw/gro_hw.py
-new file mode 100755
-index 000000000000..3bca19e8f339
---- /dev/null
+index 3bca19e8f339..18a3b1bceefd 100755
+--- a/tools/testing/selftests/drivers/net/hw/gro_hw.py
 +++ b/tools/testing/selftests/drivers/net/hw/gro_hw.py
-@@ -0,0 +1,271 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+HW GRO tests focusing on device machinery like stats, rather than protocol
-+processing.
-+"""
-+
-+import glob
-+import re
-+
-+from lib.py import ksft_run, ksft_exit, ksft_pr
-+from lib.py import ksft_eq, ksft_ge
-+from lib.py import NetDrvEpEnv, NetdevFamily
-+from lib.py import KsftSkipEx
-+from lib.py import bkg, cmd, defer, ethtool, ip
-+
-+
-+# gro.c uses hardcoded DPORT=8000
-+GRO_DPORT = 8000
-+
-+
-+def _get_queue_stats(cfg, queue_id):
-+    """Get stats for a specific Rx queue."""
-+    cfg.wait_hw_stats_settle()
-+    data = cfg.netnl.qstats_get({"ifindex": cfg.ifindex, "scope": ["queue"]},
-+                                dump=True)
-+    for q in data:
-+        if q.get('queue-type') == 'rx' and q.get('queue-id') == queue_id:
-+            return q
-+    return {}
-+
-+
-+def _resolve_dmac(cfg, ipver):
-+    """Find the destination MAC address for sending packets."""
-+    attr = "dmac" + ipver
-+    if hasattr(cfg, attr):
-+        return getattr(cfg, attr)
-+
-+    route = ip(f"-{ipver} route get {cfg.addr_v[ipver]}",
-+               json=True, host=cfg.remote)[0]
-+    gw = route.get("gateway")
-+    if not gw:
-+        setattr(cfg, attr, cfg.dev['address'])
-+        return getattr(cfg, attr)
-+
-+    cmd(f"ping -c1 -W0 -I{cfg.remote_ifname} {gw}", host=cfg.remote)
-+    neigh = ip(f"neigh get {gw} dev {cfg.remote_ifname}",
-+               json=True, host=cfg.remote)[0]
-+    setattr(cfg, attr, neigh['lladdr'])
-+    return getattr(cfg, attr)
-+
-+
-+def _setup_isolated_queue(cfg):
-+    """Set up an isolated queue for testing using ntuple filter.
-+
-+    Remove queue 1 from the default RSS context and steer test traffic to it.
+@@ -10,7 +10,7 @@ import glob
+ import re
+ 
+ from lib.py import ksft_run, ksft_exit, ksft_pr
+-from lib.py import ksft_eq, ksft_ge
++from lib.py import ksft_eq, ksft_ge, ksft_variants
+ from lib.py import NetDrvEpEnv, NetdevFamily
+ from lib.py import KsftSkipEx
+ from lib.py import bkg, cmd, defer, ethtool, ip
+@@ -78,7 +78,8 @@ GRO_DPORT = 8000
+     return test_queue
+ 
+ 
+-def _run_gro_test(cfg, test_name, num_flows=None, ignore_fail=False):
++def _run_gro_test(cfg, test_name, num_flows=None, ignore_fail=False,
++                  order_check=False):
+     """Run gro binary with given test and return output."""
+     if not hasattr(cfg, "bin_remote"):
+         cfg.bin_local = cfg.net_lib_dir / "gro"
+@@ -98,6 +99,8 @@ GRO_DPORT = 8000
+     ]
+     if num_flows:
+         base_args.append(f"--num-flows {num_flows}")
++    if order_check:
++        base_args.append("--order-check")
+ 
+     args = " ".join(base_args)
+ 
+@@ -257,13 +260,33 @@ def _check_gro_stats(cfg, test_queue, stats_before,
+                      expect_wire=gro_coalesced * 2)
+ 
+ 
++@ksft_variants([4, 32, 512])
++def test_gro_order(cfg, num_flows):
 +    """
-+    test_queue = 1
++    Test that HW GRO preserves packet ordering between flows.
 +
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftSkipEx(f"Need at least 2 queues, have {qcnt}")
++    Packets may get delayed until the aggreate is released,
++    but reordering between aggregates and packet terminating
++    the aggregate and normal packets should not happen.
 +
-+    # Remove queue 1 from default RSS context by setting its weight to 0
-+    weights = ["1"] * qcnt
-+    weights[test_queue] = "0"
-+    ethtool(f"-X {cfg.ifname} weight " + " ".join(weights))
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    # Set up ntuple filter to steer our test traffic to the isolated queue
-+    flow  = f"flow-type tcp{cfg.addr_ipver} "
-+    flow += f"dst-ip {cfg.addr} dst-port {GRO_DPORT} action {test_queue}"
-+    output = ethtool(f"-N {cfg.ifname} {flow}").stdout
-+    ntuple_id = int(output.split()[-1])
-+    defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
-+
-+    return test_queue
-+
-+
-+def _run_gro_test(cfg, test_name, num_flows=None, ignore_fail=False):
-+    """Run gro binary with given test and return output."""
-+    if not hasattr(cfg, "bin_remote"):
-+        cfg.bin_local = cfg.net_lib_dir / "gro"
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+
-+    ipver = cfg.addr_ipver
-+    protocol = f"--ipv{ipver}"
-+    dmac = _resolve_dmac(cfg, ipver)
-+
-+    base_args = [
-+        protocol,
-+        f"--dmac {dmac}",
-+        f"--smac {cfg.remote_dev['address']}",
-+        f"--daddr {cfg.addr}",
-+        f"--saddr {cfg.remote_addr_v[ipver]}",
-+        f"--test {test_name}",
-+    ]
-+    if num_flows:
-+        base_args.append(f"--num-flows {num_flows}")
-+
-+    args = " ".join(base_args)
-+
-+    rx_cmd = f"{cfg.bin_local} {args} --rx --iface {cfg.ifname}"
-+    tx_cmd = f"{cfg.bin_remote} {args} --iface {cfg.remote_ifname}"
-+
-+    with bkg(rx_cmd, ksft_ready=True, exit_wait=True, fail=False) as rx_proc:
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+    if not ignore_fail:
-+        ksft_eq(rx_proc.ret, 0)
-+        if rx_proc.ret != 0:
-+            ksft_pr(rx_proc)
-+
-+    return rx_proc.stdout
-+
-+
-+def _require_hw_gro_stats(cfg, queue_id):
-+    """Check if device reports HW GRO stats for the queue."""
-+    stats = _get_queue_stats(cfg, queue_id)
-+    required = ['rx-packets', 'rx-hw-gro-packets', 'rx-hw-gro-wire-packets']
-+    for stat in required:
-+        if stat not in stats:
-+            raise KsftSkipEx(f"Driver does not report '{stat}' via qstats")
-+
-+
-+def _set_ethtool_feat(cfg, current, feats):
-+    """Set ethtool features with defer to restore original state."""
-+    s2n = {True: "on", False: "off"}
-+
-+    new = ["-K", cfg.ifname]
-+    old = ["-K", cfg.ifname]
-+    no_change = True
-+    for name, state in feats.items():
-+        new += [name, s2n[state]]
-+        old += [name, s2n[current[name]["active"]]]
-+
-+        if current[name]["active"] != state:
-+            no_change = False
-+            if current[name]["fixed"]:
-+                raise KsftSkipEx(f"Device does not support {name}")
-+    if no_change:
-+        return
-+
-+    eth_cmd = ethtool(" ".join(new))
-+    defer(ethtool, " ".join(old))
-+
-+    # If ethtool printed something kernel must have modified some features
-+    if eth_cmd.stdout:
-+        ksft_pr(eth_cmd)
-+
-+
-+def _setup_hw_gro(cfg):
-+    """Enable HW GRO on the device, disabling SW GRO."""
-+    feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+
-+    # Try to disable SW GRO and enable HW GRO
-+    _set_ethtool_feat(cfg, feat,
-+                      {"generic-receive-offload": False,
-+                       "rx-gro-hw": True,
-+                       "large-receive-offload": False})
-+
-+    # Some NICs treat HW GRO as a GRO sub-feature so disabling GRO
-+    # will also clear HW GRO. Use a hack of installing XDP generic
-+    # to skip SW GRO, even when enabled.
-+    feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+    if not feat["rx-gro-hw"]["active"]:
-+        ksft_pr("Driver clears HW GRO when SW GRO is cleared, using generic XDP workaround")
-+        prog = cfg.net_lib_dir / "xdp_dummy.bpf.o"
-+        ip(f"link set dev {cfg.ifname} xdpgeneric obj {prog} sec xdp")
-+        defer(ip, f"link set dev {cfg.ifname} xdpgeneric off")
-+
-+        # Attaching XDP may change features, fetch the latest state
-+        feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+
-+        _set_ethtool_feat(cfg, feat,
-+                          {"generic-receive-offload": True,
-+                           "rx-gro-hw": True,
-+                           "large-receive-offload": False})
-+
-+
-+def _check_gro_stats(cfg, test_queue, stats_before,
-+                     expect_rx, expect_gro, expect_wire):
-+    """Validate GRO stats against expected values."""
-+    stats_after = _get_queue_stats(cfg, test_queue)
-+
-+    rx_delta = (stats_after.get('rx-packets', 0) -
-+                stats_before.get('rx-packets', 0))
-+    gro_delta = (stats_after.get('rx-hw-gro-packets', 0) -
-+                 stats_before.get('rx-hw-gro-packets', 0))
-+    wire_delta = (stats_after.get('rx-hw-gro-wire-packets', 0) -
-+                  stats_before.get('rx-hw-gro-wire-packets', 0))
-+
-+    ksft_eq(rx_delta, expect_rx, comment="rx-packets")
-+    ksft_eq(gro_delta, expect_gro, comment="rx-hw-gro-packets")
-+    ksft_eq(wire_delta, expect_wire, comment="rx-hw-gro-wire-packets")
-+
-+
-+def test_gro_stats_single(cfg):
-+    """
-+    Test that a single packet doesn't affect GRO stats.
-+
-+    Send a single packet that cannot be coalesced (nothing to coalesce with).
-+    GRO stats should not increase since no coalescing occurred.
-+    rx-packets should increase by 2 (1 data + 1 FIN).
++    Note that this test is stricter than truly required.
++    Reordering packets between flows should not cause issues.
++    This test will also fail if traffic is run over an ECMP fabric.
 +    """
 +    _setup_hw_gro(cfg)
++    _setup_isolated_queue(cfg)
 +
-+    test_queue = _setup_isolated_queue(cfg)
-+    _require_hw_gro_stats(cfg, test_queue)
-+
-+    stats_before = _get_queue_stats(cfg, test_queue)
-+
-+    _run_gro_test(cfg, "single")
-+
-+    # 1 data + 1 FIN = 2 rx-packets, no coalescing
-+    _check_gro_stats(cfg, test_queue, stats_before,
-+                     expect_rx=2, expect_gro=0, expect_wire=0)
++    _run_gro_test(cfg, "capacity", num_flows=num_flows, order_check=True)
 +
 +
-+def test_gro_stats_full(cfg):
-+    """
-+    Test GRO stats when overwhelming HW GRO capacity.
-+
-+    Send 500 flows to exceed HW GRO flow capacity on a single queue.
-+    This should result in some packets not being coalesced.
-+    Validate that qstats match what gro.c observed.
-+    """
-+    _setup_hw_gro(cfg)
-+
-+    test_queue = _setup_isolated_queue(cfg)
-+    _require_hw_gro_stats(cfg, test_queue)
-+
-+    num_flows = 500
-+    stats_before = _get_queue_stats(cfg, test_queue)
-+
-+    # Run capacity test - will likely fail because not all packets coalesce
-+    output = _run_gro_test(cfg, "capacity", num_flows=num_flows,
-+                           ignore_fail=True)
-+
-+    # Parse gro.c output: "STATS: received=X wire=Y coalesced=Z"
-+    match = re.search(r'STATS: received=(\d+) wire=(\d+) coalesced=(\d+)',
-+                      output)
-+    if not match:
-+        raise KsftSkipEx(f"Could not parse gro.c output: {output}")
-+
-+    rx_frames = int(match.group(2))
-+    gro_coalesced = int(match.group(3))
-+
-+    ksft_ge(gro_coalesced, 1,
-+            comment="At least some packets should coalesce")
-+
-+    # received + 1 FIN, coalesced super-packets, coalesced * 2 wire packets
-+    _check_gro_stats(cfg, test_queue, stats_before,
-+                     expect_rx=rx_frames + 1,
-+                     expect_gro=gro_coalesced,
-+                     expect_wire=gro_coalesced * 2)
-+
-+
-+def main() -> None:
-+    """ Ksft boiler plate main """
-+
-+    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
-+        cfg.netnl = NetdevFamily()
-+        ksft_run([test_gro_stats_single,
-+                  test_gro_stats_full], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
+ def main() -> None:
+     """ Ksft boiler plate main """
+ 
+     with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
+         cfg.netnl = NetdevFamily()
+         ksft_run([test_gro_stats_single,
+-                  test_gro_stats_full], args=(cfg,))
++                  test_gro_stats_full,
++                  test_gro_order], args=(cfg,))
+     ksft_exit()
+ 
+ 
 -- 
 2.53.0
 
