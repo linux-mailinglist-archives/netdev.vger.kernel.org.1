@@ -1,140 +1,139 @@
-Return-Path: <netdev+bounces-256919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONk+CkUAhGnYwgMAu9opvQ
-	(envelope-from <netdev+bounces-256919-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:28:21 +0100
+	id 2AQJLrUAhGkbwwMAu9opvQ
+	(envelope-from <netdev+bounces-256920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:30:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75BDDEDF7E
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:28:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B34EEDF95
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D697E300B451
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:28:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D2148300FB56
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37CD29D268;
-	Thu,  5 Feb 2026 02:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514692BE657;
+	Thu,  5 Feb 2026 02:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaJBaWuL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lSJZ1K8p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C180F299A82
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 02:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9302BE051;
+	Thu,  5 Feb 2026 02:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770258479; cv=none; b=b9IMnUS1K+L8ylFUn24HrQ8GulhtMPfgzmC1PdtUfOQkvYKSpSLjbVdU88Eflgo9JNcA64DpI1o8+tC+LE7sj8lm74tpq8PMldvdqNkPSKbR7kCp75GHKFJdcwth0At8EhFxXeuaGSnifWtulUuBNn3GZG73ssSHvQDWN/0TUR8=
+	t=1770258610; cv=none; b=llnN0HeV8s4NZPl7Hs2Oqlaa+xste9mVVI5mt5mArkqi0dTOxLrwBkSaJxBCOpdmlfILl6J9Ag9WKhm50o/SdGQi8dpbDqIVh97FKbr5WzZCVwzkkd5wuBLNsozNYOIpjm/JG5VoAadCVH2ZGgJufzz/zFMpvWkW8Oer8HTEoIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770258479; c=relaxed/simple;
-	bh=8RQFU63Untu7iD5Aw0yaVzta2YjEmi1wgLKCZeXdKM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hQSb7vCv+hdL7yHlnkLwdFx7k+hX3O5IyDpQ0N40mIPYykrx26YKNGhfvDdwF/mj37ULJVDdK6JNQvoZct/RG1hyOUD3whnwhI+fG10PU4bfi5a4xfuqRQUBhMR2vCzCCa9DFELmeTH0hbGNDxq7yM0Cjr+NA9Y2wrnPDQAEu3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaJBaWuL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 157C6C4CEF7;
-	Thu,  5 Feb 2026 02:27:59 +0000 (UTC)
+	s=arc-20240116; t=1770258610; c=relaxed/simple;
+	bh=1wc5PdUchyOEUz6O/c6N92zSn0zymMQmvEmSPDBdI3Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SkYVV7aQPGk25lPaz/TKS+o73FyzNX3XLljlKVeOwbB58NiU0Oc5P4CxYKarjz5DcFhleqRVg0z35bzYAvqjxlraLn/maRLt42jj+0GZDTz1KkMpWNuPWI4/SR6k9pK0qqEosWG2PthidB2JXtD6HAbzrRDE35GuSCqrho9aFlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lSJZ1K8p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07902C4CEF7;
+	Thu,  5 Feb 2026 02:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770258479;
-	bh=8RQFU63Untu7iD5Aw0yaVzta2YjEmi1wgLKCZeXdKM8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VaJBaWuLF/Y+VPwQYxB3lGhZMPgtp9hhJADbdIQcSB6TxR7OXntSuLQyDnpJd7h8O
-	 jKnCcnInLKu5kE/JK1kOB8CNPiOLWI5dw1mJzyMv7tupuRi59fk8ZghvNZYz/VfU21
-	 XzC2UK2kqnuRDu9vPSv494yPIcuQ7QSKOjzrkC9HACVNqgclQQCNAqsADrcl/k8wYS
-	 hubbFF0UHIVdud+a0PMCwGknslfrC7AI/VhW7eAknwrnh3cUKdRNxarQu8Ovz6QNvQ
-	 NkHXvnhB9rlLALlPs0tiUG6sLJJ89BaxFsw6hRhGNLRiGDfQfe+I1rtfNuGPSJjBuN
-	 cbKD7Rr5YNZyQ==
-Date: Wed, 4 Feb 2026 18:27:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Elad Nachman <enachman@marvell.com>, Alok Tiwari
- <alok.a.tiwari@oracle.com>
-Cc: Jonas Gorski <jonas.gorski@gmail.com>, "Taras Chornyi [C]"
- <tchornyi@marvell.com>, "Volodymyr Mytnyk [C]" <vmytnyk@marvell.com>,
- Yevhen Orlov <yevhen.orlov@plvision.eu>, "Vadym Kochan [C]"
- <vkochan@marvell.com>, Taras Chornyi <taras.chornyi@plvision.eu>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
- <edumazet@google.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "alok.a.tiwarilinux@gmail.com"
- <alok.a.tiwarilinux@gmail.com>
-Subject: Re: [EXTERNAL] Re: [PATCH net-next] net: marvell: prestera: fix FEC
- error message for SFP ports
-Message-ID: <20260204182758.7ba3fd43@kernel.org>
-In-Reply-To: <BL1PR18MB4248EFE8E7D182A5601927E1DB98A@BL1PR18MB4248.namprd18.prod.outlook.com>
-References: <20260202052816.28191-1-alok.a.tiwari@oracle.com>
-	<795c3351-d65b-4a9a-83dc-b530177b9d28@gmail.com>
-	<20260203191517.024dab80@kernel.org>
-	<BL1PR18MB4248EFE8E7D182A5601927E1DB98A@BL1PR18MB4248.namprd18.prod.outlook.com>
+	s=k20201202; t=1770258610;
+	bh=1wc5PdUchyOEUz6O/c6N92zSn0zymMQmvEmSPDBdI3Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lSJZ1K8pWyoZfCz15uTLU2VKgg/HklYNXvSckVy89SHs4Ke0gd/rqOnMWLH6e4uEU
+	 M+yyKOGwy4C+KVeYO3/gb8iIusHcsmpGf6KJVqCTwGilMtJXzs25w6v3vIzCnWhSMb
+	 K8ks0kcuSEO06vUoNHxbeSKuCsVl9bqYwLbVjJXjQ18zlaxLBYYDXP4LweAhmvo6q2
+	 /omtSTMAsW2MvKvE8egqpYrUQoopmHK6ruX2zn9PFWXaIrDGh/NWivab2WmntryQeD
+	 DMJ46ue5kztpaMwCcMskTfbvi9IFNt7knjYvbutm3eCgB86/L6CcyfAqRjFbzo1yVg
+	 Zbxe81BUO/Ing==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4838E3808200;
+	Thu,  5 Feb 2026 02:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v6 0/3] s32g: Use a syscon for GPR
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177025860808.131667.13084016124799705995.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Feb 2026 02:30:08 +0000
+References: <cover.1769764941.git.dan.carpenter@linaro.org>
+In-Reply-To: <cover.1769764941.git.dan.carpenter@linaro.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: chester62515@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
+ devicetree@vger.kernel.org, edumazet@google.com, festevam@gmail.com,
+ Frank.Li@nxp.com, ghennadi.procopciuc@oss.nxp.com, imx@lists.linux.dev,
+ kuba@kernel.org, jan.petrous@oss.nxp.com, krzk+dt@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, mbrugger@suse.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, s32@nxp.com,
+ pabeni@redhat.com, kernel@pengutronix.de, robh@kernel.org,
+ s.hauer@pengutronix.de, linaro-s32@linaro.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,marvell.com,plvision.eu,redhat.com,google.com,davemloft.net,lunn.ch,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-256919-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256920-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[gmail.com,foss.st.com,lunn.ch,kernel.org,davemloft.net,vger.kernel.org,google.com,nxp.com,oss.nxp.com,lists.linux.dev,lists.infradead.org,st-md-mailman.stormreply.com,suse.com,redhat.com,pengutronix.de,linaro.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 75BDDEDF7E
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B34EEDF95
 X-Rspamd-Action: no action
 
-On Wed, 4 Feb 2026 13:13:31 +0000 Elad Nachman wrote:
-> > > I'm pretty sure that the condition here is wrong, not the error message.
-> > >
-> > > AFAIK it doesn't make sense to configure FEC on ethernet/copper ports,
-> > > but for SFP ports, it may be required depending on the transceiver or
-> > > cable used, especially for fiber modules.
-> > >
-> > > I may be wrong though.
-> > >
-> > > This check was introduced with bb5dbf2cc64d ("net: marvell: prestera:
-> > > add firmware v4.0 support"), but that commit does not offer any
-> > > explanation for it in the commit message.  
-> > 
-> > Elad, could you clarify this? A bit hard to tell whether CR is included
-> > in "SFP" from glancing at the code.  
-> 
-> Basically, the supported devices have FEC on 10G-BASE-KR and upwards
-> (CR: from 40G-BASE-CR), and for USXGMII SERDES, which drives multiple
-> copper PHYs.
-> 
-> Judging based on all of the above,
-> I think it is best to remove this check (plus said error message)
-> altogether and let the firmware return an error if the mode/speed/FEC
-> combination is invalid.
+Hello:
 
-SG, thanks for explaining
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Alok, pls respin as suggested.
+On Fri, 30 Jan 2026 16:19:35 +0300 you wrote:
+> The s32g devices have a GPR register region which holds a number of
+> miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
+> anything from there and we just add a line to the device tree to
+> access that GMAC_0_CTRL_STS register:
+> 
+>                         reg = <0x4033c000 0x2000>, /* gmac IP */
+>                               <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
+> 
+> [...]
+
+Here is the summary with links:
+  - [v6,1/3] net: stmmac: s32: use a syscon for S32_PHY_INTF_SEL_RGMII
+    https://git.kernel.org/netdev/net-next/c/b0eeeb1b70c0
+  - [v6,2/3] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
+    https://git.kernel.org/netdev/net-next/c/0d9588039543
+  - [v6,3/3] dts: s32g: Add GPR syscon region
+    (no matching commit)
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
