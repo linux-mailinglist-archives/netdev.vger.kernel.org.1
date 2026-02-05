@@ -1,100 +1,93 @@
-Return-Path: <netdev+bounces-257006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257008-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGz4C/JAhGng1wMAu9opvQ
-	(envelope-from <netdev+bounces-257006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:04:18 +0100
+	id +JrUH7ZBhGng1wMAu9opvQ
+	(envelope-from <netdev+bounces-257008-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:07:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D80EF3DF
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:04:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCEFEF461
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 08:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 473F83006446
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 07:03:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E3F430125F1
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 07:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC89B35E556;
-	Thu,  5 Feb 2026 07:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E65B35581F;
+	Thu,  5 Feb 2026 07:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IB5yJ9D8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="an596wB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-oo1-f68.google.com (mail-oo1-f68.google.com [209.85.161.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F19D35E554
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 07:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF6933469C
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 07:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770274949; cv=none; b=Oq5WL6UpwnHA5m/HWWqzW72554QAZ0tTSH+9no12572/qezaPzay+KZ0FjI582BMfApx1xDFAvwoyTCMB2g4aKTsEO6dIgF1RaGkNT8NPNpk39hjqL2Rt2t09/ts1kqhKBio0yBdDsynvuje9kqlj9bM4aMvySTD0NLEaDtL7no=
+	t=1770275240; cv=none; b=hDl8Elf4iog1eHXbiW+XpGQ72pr5moz8FOFEHwxGunBWmfW0RTD7Os1JXB/ezTJlDeD0yAGsT8myDhxmTeFOGFjS05e9PMlaaqqFu3jl3wsBVWU0qKLAWLN7ljl78wQGLbYVL4aei7wfnO4fssrq4tQLtr8YLB95Xm0//hW7TjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770274949; c=relaxed/simple;
-	bh=CVxHcuu4T8HZtXjKX+jdBS7ybmzluxXd8M00RABLQKU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s6FpLbkmCIp27LM4uMA6+urshgUh3ch2mJHeisJbgwBBccVXrux176a+X9dvmGvnxL0SieYjG0FYciSNANCpdTXvaVwLZLD3CZELn/V0EWv4KOB6pkCjNINqPzb2USRO1jqjKL5GgrdD6T/VHoae3rBlrMfkNjPXHpWZFbbFMb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IB5yJ9D8; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1770275240; c=relaxed/simple;
+	bh=54UTACEIjljOknDSR1Mgr8Jy/qUh0kuCz7srLk5rgkA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E8KAb3xhzmQ2zAunoD2wH9OZ2Fb0w4c3dFX7npxuLJ5/il3lrIPle64Ks31hu0LiqlovfBHh/zX3TEP7quTfjBMflrkVVx11lGOIxu/BXAyUtRq0YgSQOezaV9hDzz+OkYeyojrHGbBabY7t84ulXtPjtzdZhZhF/mil6a/kehc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=an596wB0; arc=none smtp.client-ip=209.85.161.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-81f4ba336b4so521844b3a.1
-        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 23:02:29 -0800 (PST)
+Received: by mail-oo1-f68.google.com with SMTP id 006d021491bc7-66a12c77a2cso356174eaf.3
+        for <netdev@vger.kernel.org>; Wed, 04 Feb 2026 23:07:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770274949; x=1770879749; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ID1Rr5u4A781GTWL8cwP+lTOIhWrnwgmB+FcQHGuf5U=;
-        b=IB5yJ9D8cjwJuzWup4Fc7c79KFe3PAfG+p3U3wGBOYfCHqTEQhMjb9W4BX3ZHUbaRk
-         y2VEChUnoJgbkeDJqCrkMFbxEm6utAVEnRx7dSaC2J7QDi/qMBUWN3rL60ypC3Q625aU
-         KMH2hRUHJcFK8iiyy4mKVbWgGRpVoZ/FPrD/iWHcjT0bS+CPegX4x7RERa3vaY/uSZLN
-         Wz6cNH2cqwoU3EcHspEq50NQOwb65Ot1aCrj8/ZTnF3UXZQrMUsonETQ7cYTfi8GMS+a
-         RsHdGMYSzG8exoac9jVPTBZlTmXqYD9W5WE00sd8CcLlVDoKlI6H4dqmuD0q4uBzU+RU
-         kEEA==
+        d=gmail.com; s=20230601; t=1770275239; x=1770880039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ldSsh8AqrwVd7W7U3ShnZ3QwgoeeXWHBddwGz0cGoaY=;
+        b=an596wB0CHSw3PvGAfrlpg9R9nkrPLBue72APzED1n3K2moytYvPLumMZCReofxjaQ
+         a+9cxALjQ23GbdBGh3n9JD2PxN7OeW9IE5D/AKN5mYDEAhPRnXy35c0YB8bfH03xCDuS
+         WVuU2npKioACU0rZ/qB07tnkGiWqeIEQPUFlAY8seWehZ8hHTv1YQFxkiebed+Ypi+gB
+         HhbAJWeJNv25vP0dqHK1WsUPIx0SdUfylGnDuoe5LMuRN1NbF8rkQNitiKcAOAFq79FD
+         Mwtm5CXPScwhOLrq7x/jrs9qQCZyGw4VhWoXajv6rqNqq/LXMqKJjrgQjuu1BX3X0T0Q
+         Z7WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770274949; x=1770879749;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ID1Rr5u4A781GTWL8cwP+lTOIhWrnwgmB+FcQHGuf5U=;
-        b=CAz+H+TYrWot3aQuJGzjPgu23/MJi7qvSVuGgT1r7fc6nW7GDyGaKN++14WYqHbsp+
-         tJmUeIu9zGPbkdjEtKvvB3W2pyUhrAJNnvuncewyQgc/Mg9SEoM2jSRCcQklflt9ArDN
-         TC06lp59+AWcd4woYyjq54+XeyOhzAu/xMci8q3EwGsGtjmnB5Xb6Dbb2Pl6zcLUSzYh
-         FQVs1UCQEp21D0lIVUP8wKqoMvLbHu0bmL3vTSy+y2J2wabrIScbpkGGAI8+EmqKwbHJ
-         csV5ljFKZmlS/cDYbTL9IhWXOkPGTuYQPkAivMBlF/veklUa80QTBPQjDjHrtue5l4vv
-         OUiQ==
-X-Gm-Message-State: AOJu0YwcpLHPSIqh+bxKacEZgeM/WzEXtkDZr5X/7XuUE2ipWbAh6WA5
-	1jwX01MfG2EVVfPkQQ6aNQ3DJORcfUD3zb/PYeLIU8DUbOC3ojL9EC8T
-X-Gm-Gg: AZuq6aJtnqqhOHY1wcEKiO/X1Ca7JNVfg87ggaOSd9Vd0uC2OyMSdVkil13tDOe0R1P
-	1SjjYmjenbfxWyglkoKXcQVgLs5hzMZxaW5uP7991468xOSL+LPW1d51g39mH9bOFyFmGPcVskC
-	sMGazjJjlfApi/Q9sA4J6OK6p6OFOLp55CQQdJI3gUjXVNLHWXm2RrTYohtYbSLSvI6r4ag5V3l
-	sZEPWNnrAhdBY0wXuzBT+Dsfw5FvZ5oDQbWdd2g7Mllcv2c/bb74lkxGsZDVIBzirW3Mi3cc7mY
-	IglMd9Le2pAokosmGYKqR7luvaet28/TPL5qiaW81KQ1LW+SLS1VHfsilFMddg84G5gGf0r7+CO
-	Ksjkt6mpAw4Ge9IkgJB1qAk7uCmc1mBxCMIKS/EFOkbwK89jyXKAtkqp1NIvAVh1Hb5XXJQxzao
-	sp
-X-Received: by 2002:a05:6a00:4104:b0:823:998:95b0 with SMTP id d2e1a72fcca58-8241c5f5db9mr4906578b3a.35.1770274949074;
-        Wed, 04 Feb 2026 23:02:29 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:1::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8241d1c08e8sm4834802b3a.22.2026.02.04.23.02.28
+        d=1e100.net; s=20230601; t=1770275239; x=1770880039;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ldSsh8AqrwVd7W7U3ShnZ3QwgoeeXWHBddwGz0cGoaY=;
+        b=hkzI1IfEEZnoNXJXHAXfx3NLOj7973HrW50bV4BvnyQ7UXWrxHN2LdnCtNA6c7vwbe
+         j1uSn6QneTvmsgksfo+tKXk+U/4Ea7NeEq+cntBOFgoCThu2ViDfoGlmzAtrUtXqftA0
+         2OJJ2XdlftneE0OWYZTcRG5IHMTiRR3EBpU1Imzl6SG0bsrioNc4gwp5Dw8nvX73XU5t
+         EkSS3au5g5QTOJygRYcR6QYOggR/9H50c5HIerHDPt6abdg8+qn5OsGCeP0qYmJHw9sr
+         /KeDAgj29j1nfqo9eL7L+SYbYcG/2xKFz7vmm9x32w7tM4/GJKzsosz4LFauYhXW10Ey
+         DZWA==
+X-Gm-Message-State: AOJu0YzvfnCGiD5bDntxCAcblpXOjnVazHvPgtrWPfJO6JzQkrLGZNI4
+	zJj89CIfuOLrYPx2Gc/lV66etP4YJGpDpbGPto5eSUd1/wGHEVN2zbnoThzr6G0D
+X-Gm-Gg: AZuq6aI6zcVPcwFVHEiI8OjgUahv69AUC1YLVOiQ01oS5d+b4NRGKTX6EqyL1wU5lsj
+	wD8z7XcenwDvuLH+K/RB+9ndIxIj4evhhzLF9q89wtzKo2TFJW2sIieEARtEtNzHiclFoPMzDFK
+	Xt6luZidye5jQ0l9ZY8E8faH6l1P2V96da16eUFaQ5BskR+oQdOcgaBA4QzLJGG00OsgysP9Lxu
+	IkTuBKxm44Qm/jGYYta266cmaOdwzG28CHgBvAwG/dbgAKIsyjH5BKFaee4oLlvMf03BxkVUkXp
+	5RaXCx1k1AGfP69Il9DpK875uMNUHAfJh9cKyr4g0U793wVVpgBNInqww2do+9KDt1ypf2/kdrD
+	ScpeW4xHmopbZidooaCQ3PrQ5V82uutYdlYBBxkySOMw5HQtM/zvaJkj/YTYgiyUdc1AzVRfYbB
+	Cj0nFBd1ob4svi/puuFJaB9UDknWmINizIA0Z04jkhWkrQvny74GbvMJ9DLYclnimN419+2ltsn
+	NGi6RDf7qnAXNzRpJ7nMkKDN6g5cVs9GD5BzXjkn4yG9Un07azinB3aspADkMfGzVswayBRnGgp
+	n29g
+X-Received: by 2002:a05:6820:4987:b0:662:f9f7:153a with SMTP id 006d021491bc7-66a202aa633mr2217140eaf.1.1770275239054;
+        Wed, 04 Feb 2026 23:07:19 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-66a354bdd76sm2660002eaf.11.2026.02.04.23.07.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 23:02:28 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	kpsingh@kernel.org,
-	yonghong.song@linux.dev,
-	song@kernel.org,
-	haoluo@google.com,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v6 17/17] selftests/bpf: Fix outdated test on storage->smap
-Date: Wed,  4 Feb 2026 23:02:06 -0800
-Message-ID: <20260205070208.186382-18-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260205070208.186382-1-ameryhung@gmail.com>
-References: <20260205070208.186382-1-ameryhung@gmail.com>
+        Wed, 04 Feb 2026 23:07:18 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Michael Grzeschik <m.grzeschik@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: arcnet: com20020-pci: use module_pci_driver
+Date: Wed,  4 Feb 2026 23:06:31 -0800
+Message-ID: <20260205070632.37516-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,99 +98,71 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257006-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257008-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A8D80EF3DF
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EDCEFEF461
 X-Rspamd-Action: no action
 
-bpf_local_storage_free() already does not rely on local_storage->smap
-since switching to kmalloc_nolock(). As local_storage->smap is removed,
-fix the outdated test by dropping the local_storage->smap check. Keep
-the second map in task local storage map test to test that multiple
-elements can be added to the storage similar to sk storage test.
+The only thing this driver's init/exit functions do is call
+pci_register/unregister_driver, and in the case of the init function,
+print an unnecessary message. Replace them with module_pci_driver to
+simplify the code.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- .../selftests/bpf/progs/local_storage.c       | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+ drivers/net/arcnet/com20020-pci.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/progs/local_storage.c b/tools/testing/selftests/bpf/progs/local_storage.c
-index 637e75df2e14..d0be77011a84 100644
---- a/tools/testing/selftests/bpf/progs/local_storage.c
-+++ b/tools/testing/selftests/bpf/progs/local_storage.c
-@@ -62,7 +62,6 @@ SEC("lsm/inode_unlink")
- int BPF_PROG(unlink_hook, struct inode *dir, struct dentry *victim)
- {
- 	__u32 pid = bpf_get_current_pid_tgid() >> 32;
--	struct bpf_local_storage *local_storage;
- 	struct local_storage *storage;
- 	struct task_struct *task;
- 	bool is_self_unlink;
-@@ -88,15 +87,10 @@ int BPF_PROG(unlink_hook, struct inode *dir, struct dentry *victim)
- 	if (!storage || storage->value)
- 		return 0;
+diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
+index 0472bcdff130..19e411b2e3a7 100644
+--- a/drivers/net/arcnet/com20020-pci.c
++++ b/drivers/net/arcnet/com20020-pci.c
+@@ -618,17 +618,4 @@ static struct pci_driver com20020pci_driver = {
+ 	.remove		= com20020pci_remove,
+ };
  
--	if (bpf_task_storage_delete(&task_storage_map, task))
-+	if (bpf_task_storage_delete(&task_storage_map2, task))
- 		return 0;
- 
--	/* Ensure that the task_storage_map is disconnected from the storage.
--	 * The storage memory should not be freed back to the
--	 * bpf_mem_alloc.
--	 */
--	local_storage = task->bpf_storage;
--	if (!local_storage || local_storage->smap)
-+	if (bpf_task_storage_delete(&task_storage_map, task))
- 		return 0;
- 
- 	task_storage_result = 0;
-@@ -164,18 +158,9 @@ int BPF_PROG(socket_bind, struct socket *sock, struct sockaddr *address,
- 	if (bpf_sk_storage_delete(&sk_storage_map2, sk))
- 		return 0;
- 
--	storage = bpf_sk_storage_get(&sk_storage_map2, sk, 0,
--				     BPF_LOCAL_STORAGE_GET_F_CREATE);
--	if (!storage)
--		return 0;
+-static int __init com20020pci_init(void)
+-{
+-	if (BUGLVL(D_NORMAL))
+-		pr_info("%s\n", "COM20020 PCI support");
+-	return pci_register_driver(&com20020pci_driver);
+-}
 -
- 	if (bpf_sk_storage_delete(&sk_storage_map, sk))
- 		return 0;
- 
--	/* Ensure that the sk_storage_map is disconnected from the storage. */
--	if (!sk->sk_bpf_storage || sk->sk_bpf_storage->smap)
--		return 0;
+-static void __exit com20020pci_cleanup(void)
+-{
+-	pci_unregister_driver(&com20020pci_driver);
+-}
 -
- 	sk_storage_result = 0;
- 	return 0;
- }
+-module_init(com20020pci_init)
+-module_exit(com20020pci_cleanup)
++module_pci_driver(com20020pci_driver);
 -- 
-2.47.3
+2.43.0
 
 
