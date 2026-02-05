@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-256965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJqhD1sphGna0AMAu9opvQ
-	(envelope-from <netdev+bounces-256965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:23:39 +0100
+	id kLYSGr0phGna0AMAu9opvQ
+	(envelope-from <netdev+bounces-256966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:25:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABC08EEB0E
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:23:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03D8EEB35
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:25:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8A3493013705
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:23:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08A913011C47
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C61E31A81C;
-	Thu,  5 Feb 2026 05:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4964531AAA8;
+	Thu,  5 Feb 2026 05:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0cMBLpO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="otZ6UgEc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498A32367AC;
-	Thu,  5 Feb 2026 05:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262BF1F471F;
+	Thu,  5 Feb 2026 05:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770269016; cv=none; b=E9fF6Kcj4rj7g7c+ZFOhZLWoAacPi750hwEr1jTbJGfcFMU8CCRoV0VV5oXHR2wPBO5Kh8DY1dFAGlTgTOQusQQTGBqjGeoXiM9X6qsP580vcA2sAU6J/AtAyc6M1Ws7IkgN8T1brkvKXoomTiD/RqJQ5tTeyWgV+3/9nIOwzAw=
+	t=1770269113; cv=none; b=d7Kqt/7NyPLIJmATiYHNrY43A1eyH3hLJ0jEoqWGGc5VtH1lKYrfjJJ6vv7TeZG8j8uCNX2+MdHgjqy0uAOeXDcdd9iaI22hCJJCB0wquO6j0zamNoe8wLN6hMKiCwsIe4QlcUmHJb05hf3vwdrhO24e1BfqNSyx4JLbqQXhOZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770269016; c=relaxed/simple;
-	bh=rpQgaMbYOmoPSA+lSQAE3dsBM1LM68YW/eZGMaQU2BA=;
+	s=arc-20240116; t=1770269113; c=relaxed/simple;
+	bh=yGdsgCTf1QDzagy1MDmADcs/xYLOANpJBIngoj1gkM0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nWJ4sx1gjqhyVxlMcrrXDtmAKeh0kgkaDISwEe0YTTqM5VLu65kiJMqeo3JLYy3gQs1zI+cYRXDCv1m5KXUdGCozv44XnMh5tpCOCFXf9EOdm1Ux3u9qb8w8hGFtO9ACvYJvaxdUBlzpyjEy368Hzzd7/azP7vTK8qbmLcJfUo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0cMBLpO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714C4C4CEF7;
-	Thu,  5 Feb 2026 05:23:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gUJCFDCXYHNUliqHCTsozZaZLQvGJFoaQYF0sTUS7J3rDhQiK6GpSpelgJ7LE5aOl/kg75mdFEbApO7sGtBAZCTDjG4R5rx8DWLW0uaOlu0njZjQZMXKol57Ejn0i0RNd9JFR1b5Jp86vZV3ZCLMMvmedByTnRa/woF35p3k5BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=otZ6UgEc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FFD3C4CEF7;
+	Thu,  5 Feb 2026 05:25:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770269016;
-	bh=rpQgaMbYOmoPSA+lSQAE3dsBM1LM68YW/eZGMaQU2BA=;
+	s=k20201202; t=1770269113;
+	bh=yGdsgCTf1QDzagy1MDmADcs/xYLOANpJBIngoj1gkM0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i0cMBLpO5CB0sXlAtjWjv/4YsBOYhiXX7/geSoUpEVRX0WKsd5TpTsNGxoX3s7sZr
-	 1uDIqBoNTjbaG2VIipFUoCd6TCLqAb+x1Ri7gQfDRC7RTbjCxi2xK8zDwQO3FLcXuE
-	 wFOzzOqDUcn4R6rSKdfWT2NcGYmgQjDo5iPoPxvjNN1v77PMd3d9Imjr8gXIe/ekC5
-	 kdCj9GN747pDAiBqpS20PZIDghzQfn5UKGej2zmKgek1UosLWsFD7xx9waxw55nn2R
-	 +XYt1OwG8CFsiNSXRVGtGLJmL2fTxL1o/t6ZNkL0dUT5oddbZZX9vlC2aWEgKeC/mt
-	 xaC3i2kIRD9SQ==
-Date: Wed, 4 Feb 2026 21:23:34 -0800
+	b=otZ6UgEcQaXANvWbc/+4y7DpYVVXlME57f/FfVI4OXTkjmbdbw6ixPbJKwOuFFUCB
+	 ulkZiRgmc/HXBm9HhxVJr4zE1PVmuAj7MuaorztuF0yfjCXRE3WLX7pomnXkch8OWk
+	 He9zqfThzs8i+Ph6kqTEHn8jkMji3B2wshA3O/5sNuOzgZEGCthdrm5u75Ru68PSd4
+	 ciFV14yeyhrcsaJr+7pxnVxIkzQ1W6jQmS+ApmcpRkSFR379U+vGpExvG2bsCakiZK
+	 Ctt8iadUOjO+Zp7HpzMWnQcplEpz6NcPRO0553sfaRpeL+CXYBekYcLR099hwEEZ3u
+	 AWf9yCnbd7Cbw==
+Date: Wed, 4 Feb 2026 21:25:11 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, "Mark Bloch"
- <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe
- Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next 2/5] net/mlx5e: Report hw_gro_packets and
- hw_gro_bytes netdev stats
-Message-ID: <20260204212334.72b392af@kernel.org>
-In-Reply-To: <20260204193315.1722983-3-tariqt@nvidia.com>
-References: <20260204193315.1722983-1-tariqt@nvidia.com>
-	<20260204193315.1722983-3-tariqt@nvidia.com>
+To: Vishwanath Seshagiri <vishs@meta.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang
+ <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Wei
+ <dw@davidwei.uk>, Matteo Croce <technoboy85@gmail.com>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+ <virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+ <kernel-team@meta.com>
+Subject: Re: [PATCH net-next v4 2/2] selftests: virtio_net: add buffer
+ circulation test
+Message-ID: <20260204212511.017153cd@kernel.org>
+In-Reply-To: <20260204193617.1200752-3-vishs@meta.com>
+References: <20260204193617.1200752-1-vishs@meta.com>
+	<20260204193617.1200752-3-vishs@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,70 +76,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256965-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-256966-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,davidwei.uk,gmail.com,linaro.org,vger.kernel.org,lists.linux.dev,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ABC08EEB0E
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C03D8EEB35
 X-Rspamd-Action: no action
 
-On Wed, 4 Feb 2026 21:33:12 +0200 Tariq Toukan wrote:
-> +	stats->hw_gro_packets =
-> +		rq_stats->gro_packets + xskrq_stats->gro_packets;
-> +	stats->hw_gro_bytes = rq_stats->gro_bytes + xskrq_stats->gro_bytes;
+On Wed, 4 Feb 2026 11:36:17 -0800 Vishwanath Seshagiri wrote:
+> Add iperf3-based test to verify RX buffer handling under load.
+> Optionally logs page_pool tracepoints when available.
 
-Doesn't look right.. 
+TBH I wouldn't bother with this.
 
-mlx5e_shampo_flush_skb(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe, bool match) 
-{                                                                               
-        struct sk_buff *skb = rq->hw_gro_data->skb;                             
-        struct mlx5e_rq_stats *stats = rq->stats;                               
-        u16 gro_count = NAPI_GRO_CB(skb)->count;                                
-                                                                                
-        if (likely(skb_shinfo(skb)->nr_frags))                                  
-                mlx5e_shampo_align_fragment(skb, rq->mpwqe.log_stride_sz);      
-        if (gro_count > 1) {                                                    
-                stats->gro_skbs++;                                              
-                stats->gro_packets += gro_count;       
-
-And:
-      -
-        name: rx-hw-gro-packets
-        doc: |
-          Number of packets that were coalesced from smaller packets by the
-          device. Counts only packets coalesced with the HW-GRO netdevice
-          feature, LRO-coalesced packets are not counted.
-
-      -
-        name: rx-hw-gro-wire-packets
-        doc: |
-          Number of packets that were coalesced to bigger packetss with the
-          HW-GRO netdevice feature. LRO-coalesced packets are not counted.
-        type: uint
-
-Your gro_packets are "gro-wire-packets" and "gro-packets" are your
-gro_skbs.
-
-I really wish the AI was clever enough to catch uAPI mis-reading :(
+We run full battery of driver tests in netdev CI, there's not much
+value in a dedicated virtio test that just runs iperf...
 -- 
 pw-bot: cr
 
