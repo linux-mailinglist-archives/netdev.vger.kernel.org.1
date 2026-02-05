@@ -1,151 +1,113 @@
-Return-Path: <netdev+bounces-256940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256941-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0N6FEaYIhGnhxAMAu9opvQ
-	(envelope-from <netdev+bounces-256940-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:04:06 +0100
+	id iInfHbcIhGnvxAMAu9opvQ
+	(envelope-from <netdev+bounces-256941-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:04:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 677C4EE2D2
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:04:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96DC2EE2EF
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 04:04:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FC7D300EA80
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 03:03:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 62369300383B
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 03:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA98220DD72;
-	Thu,  5 Feb 2026 03:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D5423A562;
+	Thu,  5 Feb 2026 03:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1juI19I"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BEE1F181F;
-	Thu,  5 Feb 2026 03:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E27189BB6;
+	Thu,  5 Feb 2026 03:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770260627; cv=none; b=RLDdMkhLHOQWSzN9v0wf1VonN6xBFE4hZNqHbNoTTzv6eXcI/ZlVjTMnlr6CQV2Fku3wORjdWQKAqg9pOsgLYP+8Hnw2TB3xUBHsrRa5h965Zim/AorWL7viE/BWaydQRWHYyNrdZ4CTHOt4C8Tz4mQtpshpemFJEmTSGr3SsXw=
+	t=1770260659; cv=none; b=dHUHHnqPHA9Lb342UTM6eMpQw+tSE2ePnclAeMmGSvMH7u979FPD8rL4s8pLOGfNY02O61AQPCcDtrf2hX73TMPdXIK5tHOU3UWJU03M7SfeZSHOU8MjjPivCb4ADR+BUoHnNcohfd2lyAqCmRhuvlt6Ye8IFCsnjtP0Upl2UHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770260627; c=relaxed/simple;
-	bh=7snZf3xWO7w7qme4Nvs/uKYHO7QsUP2wle692tObmsM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y66CJ4aOFotJdpfloQkggDjYL+tzzkDePdy+TrvOFZ/xozTi2hZK5JWMtC3v2P8LRmIQy56RlPXuwetL9klN8TSANCQmzVaKmhdyDHtreBAToPt0PrEhzo09hN+0keGVzjkZEcBL+ltfC61ltK6guL/6jv3IYjs1wz07NB/JGaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=fail smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [218.12.17.60])
-	by mtasvr (Coremail) with SMTP id _____wDX34eCCIRp1MGBAA--.17594S3;
-	Thu, 05 Feb 2026 11:03:30 +0800 (CST)
-Received: from ubuntu.localdomain (unknown [218.12.17.60])
-	by mail-app1 (Coremail) with SMTP id yy_KCgAHgdp3CIRp5OIHBg--.13127S2;
-	Thu, 05 Feb 2026 11:03:21 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: linux-atm-general@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	3chas3@gmail.com,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH net] atm: fore200e: fix use-after-free in tasklets during device removal
-Date: Thu,  5 Feb 2026 11:03:17 +0800
-Message-Id: <20260205030317.39190-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1770260659; c=relaxed/simple;
+	bh=itAwqI/HnZEER01Cdd5m/gLyxM9oIubnur5BPHr4LLo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XsaASGgYg+FJi4gN39NUJHQLlDAyyB0wjTCkYd8UbnKCd60r8NN1am/vNt4kJjdmStrIwF4aW2bLGXPyCC72iMx905keyrbQjvvFDwRVJzSdEY6UWJEfpVH4w4grRSPsyfnTa3JkHiHZZ680y1lV6WO56kSrUxV1sOXzY4YaLJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1juI19I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B7E8C19424;
+	Thu,  5 Feb 2026 03:04:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770260658;
+	bh=itAwqI/HnZEER01Cdd5m/gLyxM9oIubnur5BPHr4LLo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K1juI19ILsIB0sw+mrYDKS9iCmXLe5RPoT+X0C3A/9gzsfFXwNK7qKNekai2EU6do
+	 N0RXR5bu3jpmQnKUQVoU3boqaSpy5ESHelYoqz0GsWHLHImlB/6xo2XuIZSSEx/BDy
+	 SvKGYs8zFoG1LaUEqYyhiRwZIBb2tiznXqhli1bVFJxWhsWFKjrmOWeUUDShBj3aNV
+	 mgRMGHyQ2dZDjawS4sg+IYGhHOEkb3e6X32JI3U0MwgahqYoFngRaQWh+L+kEVcZD6
+	 76IhDiWVVg9GeCjswk2HSQQcYbecf+ByBmlgnXOcawdwCLFxvxaBV/duG9GjyEHqqd
+	 jy9EgYE165icw==
+Date: Wed, 4 Feb 2026 19:04:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>,
+ bpf@vger.kernel.org, horms@kernel.org, jiri@resnulli.us,
+ edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
+ carges@cloudflare.com, kernel-team@cloudflare.com
+Subject: Re: [PATCH net-next RFC v1 0/3] net: sched: refactor qdisc drop
+ reasons into dedicated tracepoint
+Message-ID: <20260204190417.110f5498@kernel.org>
+In-Reply-To: <177022452988.1827734.5121740962985640333.stgit@firesoul>
+References: <177022452988.1827734.5121740962985640333.stgit@firesoul>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:yy_KCgAHgdp3CIRp5OIHBg--.13127S2
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwQNAWmDoQcK+AAUsh
-X-CM-DELIVERINFO: =?B?B/17KAXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
-	CR1+U8zldnsn1nDMavq5TA/0qMhglio51OpoBZ7f5d8y3jxNiXI00LvtFLlZQBfsLiHk8P
-	j9RQOd6DkVROwuLHMpaY4g0S53FMlCyUPdKkU+k48qgyEkEwrQ2siKb3+6U3tA==
-X-Coremail-Antispam: 1Uk129KBj93XoW7KF1Dtw43Xr4UJrWrJr45XFc_yoW8WFy8p3
-	y7Cw47Cry8JrWj9w17Jw1UWr1ruFn3ZFWYkwsrK3y2qF1FvF10vr15tF4DWFWjk347ZFZ2
-	kr1ktF13G34DJFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvvb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7V
-	AKI48G6xCjnVAKz4kxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I
-	3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxV
-	WUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8I
-	cVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aV
-	AFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuY
-	vjxU72NtDUUUU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-256941-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256940-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[zju.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk,kernel.org,resnulli.us,google.com,mojatatu.com,cloudflare.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lists.sourceforge.net,vger.kernel.org,gmail.com,zju.edu.cn];
-	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[duoming@zju.edu.cn,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.981];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 677C4EE2D2
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 96DC2EE2EF
 X-Rspamd-Action: no action
 
-When the PCA-200E or SBA-200E adapters is being detached, the fore200e
-is deallocated. However, the tx_tasklet or rx_tasklet may still be running
-or pending, leading to use-after-free bug when the already freed fore200e
-is accessed again in fore200e_tx_tasklet() or fore200e_rx_tasklet().
+On Wed, 04 Feb 2026 18:02:49 +0100 Jesper Dangaard Brouer wrote:
+> RFC: Seeking feedback on this refactoring approach.
+> 
+> This series refactors qdisc drop reason handling by introducing a dedicated
+> enum qdisc_drop_reason and trace_qdisc_drop tracepoint, providing qdisc
+> layer drop diagnostics with direct qdisc context visibility.
 
-One of the race conditions can occur as follows:
+I like this!
 
-CPU 0 (cleanup)           | CPU 1 (tasklet)
-fore200e_pca_remove_one() | fore200e_interrupt()
-  fore200e_shutdown()     |   tasklet_schedule()
-    kfree(fore200e)       | fore200e_tx_tasklet()
-                          |   fore200e-> // UAF
-
-Fix this by ensuring tx_tasklet or rx_tasklet is properly canceled before
-the fore200e is released. Add tasklet_kill() in fore200e_shutdown() to
-synchronize with any pending or running tasklets.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- drivers/atm/fore200e.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-index f62e3857144..7470daf9469 100644
---- a/drivers/atm/fore200e.c
-+++ b/drivers/atm/fore200e.c
-@@ -358,7 +358,12 @@ fore200e_shutdown(struct fore200e* fore200e)
-     printk(FORE200E "removing device %s at 0x%lx, IRQ %s\n",
- 	   fore200e->name, fore200e->phys_base, 
- 	   fore200e_irq_itoa(fore200e->irq));
--    
-+
-+#ifdef FORE200E_USE_TASKLET
-+	tasklet_kill(&fore200e->tx_tasklet);
-+	tasklet_kill(&fore200e->rx_tasklet);
-+#endif
-+
-     if (fore200e->state > FORE200E_STATE_RESET) {
- 	/* first, reset the board to prevent further interrupts or data transfers */
- 	fore200e_reset(fore200e, 0);
--- 
-2.34.1
-
+It will presumably require existing users to migrate over 
+but sooner we do it the fewer users that have to move?
 
