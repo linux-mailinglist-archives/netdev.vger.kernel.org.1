@@ -1,53 +1,73 @@
-Return-Path: <netdev+bounces-256956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ACz4DcQhhGkDzgMAu9opvQ
-	(envelope-from <netdev+bounces-256956-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 05:51:16 +0100
+	id MIgDOr8lhGlRzwMAu9opvQ
+	(envelope-from <netdev+bounces-256961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:08:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5971CEE955
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 05:51:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C95EEEA0A
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 06:08:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E05C3300BE01
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 04:50:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 33B6930067BE
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 05:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021E02EBBA2;
-	Thu,  5 Feb 2026 04:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9442D5C7A;
+	Thu,  5 Feb 2026 05:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpWhmrDD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EV/pSR8H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F352652B6;
-	Thu,  5 Feb 2026 04:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA35F29DB8F;
+	Thu,  5 Feb 2026 05:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770267022; cv=none; b=J0S3XpeCauuUoNLpv5/7GTbgr/FtH4VRSkzv8/C8RN42eURbnsEZz9B1iTnoPImAB4uvE90Cdesdfmg4LLSXxH6FLkixzQM9vd3qVzd6tYWacDZ1z3XnKT194jPnRhs93y5Vdhg76i75Ts7dk/TckhefERv5tkDv7hSPlLxaMYs=
+	t=1770268090; cv=none; b=jgjgVf11TzECCzcTsKviukmAfCShDkBKSTForU0+kFiWJxpKHjpP5IZzaWadgKTNPbAkQ7RtnDJo6xqOuuEGBY6oHJBJ5KcLOul3WzIrv3x7rrooiHf5Jszn+p7Ri70unfQBWXGRd+Cqs52WpjYTpriY5C5YBt5hSppQ10nW03E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770267022; c=relaxed/simple;
-	bh=fH87LTU4sipG80JEbjtRCAh1ElxM7xzqJYLKrjvK7l8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G+X3TH3OeemKDBLgR8gwzi3C4GlmxXOTW/Ajo+1anS0wmEufbsEpWe4VYdxXJOuJ1/FijRvjF52pz8j6l+oTxJBp5slva5b/5g5mqVIgo/JJFHQfJ8JfuuMetC4xAuXcoDYnUUoinDx4Y3mviU7w+JzTmvbxIv74cGT8ZipHh2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpWhmrDD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8754FC4CEF7;
-	Thu,  5 Feb 2026 04:50:22 +0000 (UTC)
+	s=arc-20240116; t=1770268090; c=relaxed/simple;
+	bh=O+iJ1V2YqJOaU1IvKchZMyjR8w/3OwWdvGA4b2nG988=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OJx/cRVHGLZG/VfFAOHDDUxkY2iQEyo615C2F3rsCG+Oqey5yvoKLWr6c5I+i/yDR5E5u48C6IDQfWOiEHM3pZjFcHTFKu5dGvZcxQS6/V3KA6X37mQolrFxqE+V6km9rBND3phA5yjM+AlkpgSJ+MUHs+7UuttC0O32IOk2yb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EV/pSR8H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D32F9C4CEF7;
+	Thu,  5 Feb 2026 05:08:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770267022;
-	bh=fH87LTU4sipG80JEbjtRCAh1ElxM7xzqJYLKrjvK7l8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JpWhmrDD697OxjpiE03GT+TldrsJwV0es5DGr5A2NozBZF7tzmk6EVlvQ2Qcgt4by
-	 spilMuGu0StcHCxkXFaqj3jr6SQB6kFHbabmdu4IzIuBkonqpzjLaQ4sXMbHHNg2C2
-	 do4Qz7b/rCj5CAaSeLtD/GI+ZmOn4tST43bYUto8X6c7BljYfEzGkR1yzA1Kom66uk
-	 jN+kgJCvXOVMQV2rP1OlW35JINzjG+Y69hwPD+TUA57OOu0A2S6MRP9hs3rWJ+jGmr
-	 sScnjBc6Zk5ldrGYeNj+fexbYH6EE49i0j3GlDqn1EIZvCNRPCmonamj0wYhJcenLO
-	 X8LIUl+h4MC5g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C24E63808200;
-	Thu,  5 Feb 2026 04:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1770268090;
+	bh=O+iJ1V2YqJOaU1IvKchZMyjR8w/3OwWdvGA4b2nG988=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=EV/pSR8HUKAhrWo3tvbbvVz8Sz9uPla6R4axYd9ImHLQsjQ+alrsj83nThPgCW5zQ
+	 yhX/d6Jn6pGHU+tgoosvQtgNA8hPHLPdDPX+onGYgDo/THqMaOXuYuR7MFquAr9aST
+	 HQFOe2QU1a3mfTWE0/QZCiLcq/EQ95Tb2PEJyq62fiihhA+N+BE45O8LiwaIf4BinZ
+	 FOwBHR847A3ZxdAU/LkRQXMKZE2nHsk2FjWkWqaW8VOW8WxAOQ3ujbx10lqKKUQDtk
+	 EFgef6/KyICMYqOla9ZnTekfh3zbtVGR19hPIkTxp0RIB+4nqDNG6ZX0ShoLsw16Sw
+	 ji5aQ/24tpjVg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: arnd@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	jeff@garzik.org,
+	bhelgaas@google.com,
+	davem@davemloft.net,
+	tglx@kernel.org,
+	lukas@wunner.de,
+	linux-kernel@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	giovanni.cabiddu@intel.com,
+	netdev@vger.kernel.org,
+	gallatin@myri.com,
+	arnd@arndb.de,
+	brice@myri.com,
+	mingo@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: Re: [2/2,v3] myri10ge: avoid uninitialized variable use
+Date: Wed,  4 Feb 2026 20:57:43 -0800
+Message-ID: <20260205045743.2412516-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260203230501.832872-2-arnd@kernel.org>
+References: <20260203230501.832872-2-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,76 +75,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V2 net-next] net: stmmac: Fix typo from clk_scr_i to
- clk_csr_i
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177026702032.165764.4026219262923266957.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Feb 2026 04:50:20 +0000
-References: <20260203062658.2156653-1-chenhuacai@loongson.cn>
-In-Reply-To: <20260203062658.2156653-1-chenhuacai@loongson.cn>
-To: Huacai Chen <chenhuacai@loongson.cn>
-Cc: chenhuacai@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- si.yanteng@linux.dev, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- fancer.lancer@gmail.com, loongarch@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256956-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.dev,foss.st.com,synopsys.com,gmail.com,lists.linux.dev,vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-256961-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:email]
-X-Rspamd-Queue-Id: 5971CEE955
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 8C95EEEA0A
 X-Rspamd-Action: no action
 
-Hello:
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+myri10ge: avoid uninitialized variable use
 
-On Tue,  3 Feb 2026 14:26:58 +0800 you wrote:
-> In include/linux/stmmac.h clk_csr_i is spelled as clk_scr_i by mistake,
-> so correct the typo.
-> 
-> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
-> ---
-> V2: Update subject line and remove "Cc stable".
-> 
-> [...]
+This patch fixes uninitialized variable warnings found by gcc-10 on s390
+by initializing cmd.data0, cmd.data1, and cmd.data2 before calls to
+myri10ge_send_cmd() across multiple functions.
 
-Here is the summary with links:
-  - [V2,net-next] net: stmmac: Fix typo from clk_scr_i to clk_csr_i
-    https://git.kernel.org/netdev/net-next/c/42a940ef1845
+> diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+> --- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+> +++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
 
-You are awesome, thank you!
+[ ... ]
+
+> @@ -2238,6 +2250,8 @@ static int myri10ge_get_txrx(struct myri10ge_priv *mgp, int slice)
+>  	status = 0;
+>  	if (slice == 0 || (mgp->dev->real_num_tx_queues > 1)) {
+>  		cmd.data0 = slice;
+> +		cmd.data1 = 0;
+> +		cmd.data2 = 0;
+>  		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_OFFSET,
+>  					   &cmd, 0);
+>  		ss->tx.lanai = (struct mcp_kreq_ether_send __iomem *)
+>  			    (mgp->sram + cmd.data0);
+>  	}
+>  	cmd.data0 = slice;
+>  	status |= myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SMALL_RX_OFFSET,
+>  				    &cmd, 0);
+
+The initialization of cmd.data1 and cmd.data2 is inside the conditional
+block. When slice > 0 and real_num_tx_queues <= 1, does the subsequent
+myri10ge_send_cmd() call for MXGEFW_CMD_GET_SMALL_RX_OFFSET use
+uninitialized data1/data2 values?
+
+Simon Horman pointed this out in his review of v2:
+https://lore.kernel.org/all/20250622162715.GA297140@horms.kernel.org/
+
+He provided a diff showing that the second cmd.data0 = slice assignment
+also needs cmd.data1 and cmd.data2 initialization. This feedback does
+not appear to have been addressed in v3.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
