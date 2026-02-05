@@ -1,211 +1,200 @@
-Return-Path: <netdev+bounces-257306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257307-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AM65E1EJhWmj7gMAu9opvQ
-	(envelope-from <netdev+bounces-257306-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:19:13 +0100
+	id wFWaLNsJhWmj7gMAu9opvQ
+	(envelope-from <netdev+bounces-257307-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:21:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5216F78CF
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:19:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C8C6F7941
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 539F43003346
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 21:19:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 34BB7300DA78
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 21:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2B632AAC7;
-	Thu,  5 Feb 2026 21:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8290E32ED54;
+	Thu,  5 Feb 2026 21:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cIZ8XITM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XvhXWuSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E381F5858
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 21:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC4A1F1304;
+	Thu,  5 Feb 2026 21:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770326351; cv=none; b=HQuvZ5KO+OoDPAswYIMa7D2XItHnyReR2zd6ce6AU3yuTU6RiRucn72dw4Hmv4Rny9c4hLnYCn9sFzwFa6Tp7jZAhIWjd4StRciIg2gfOYN4MLjQoVCuiETpwXU9lvzArLK4WVnaidrVaZ4UvChMAg3rCEn/eurCkPtyEkH9wdo=
+	t=1770326489; cv=none; b=cfVPzL/31IOt91Yd1NPYdiaQjUwWUL+T9UKIT1l1QFYQfx5fDJrtCPfX9mZH0H+1Ia72ygJRsR6O6Q46DMkF+ptWt/cK/jwzs8LgcyasW2fueDyulJs/BlfM3MuCgJtyvDCSlQ6DnjGlwfZ48opzJanUOKsx6yucpP5gXYL0kwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770326351; c=relaxed/simple;
-	bh=J2ko4X9z2DZJzYwQDhffd5vnVXbKe1+M1QXJED1b8PE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ODIF7DUHlDWz5sJZWMUTWhXiGfnQy5HJ1alSSyzBsgplBenY7Xs/FgxgDbiITaIWhJcbzcYt7r+ynVN8qUU5LwEUxln5Nj9WI/2Pq7JJIyZa5TEdD9XVHgkJiVPdd3JMPNRLSufXn77I0EpNNy0Jseqo+VGxUykierX4fCepqxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cIZ8XITM; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c70ab7f67fso566856885a.3
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 13:19:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770326350; x=1770931150; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7myZG3j2CU7LaFpg4p0P2j0Ms0MQemPHTxkEePH7mSM=;
-        b=cIZ8XITMukmzC4dOws6GoA0Zy71DrahOb95kuSjp17qm6PZWebTztxqZ1iKbEHnY5I
-         FPE13G89pO+Pfx2NYBbHpsGh/+/VOXZ2R4s1zSuTZQQF/RKfkSagTPOvHlYaZw1+s/pa
-         u7m+3uSX/dcVoYyaxv/RGp9s0h7cysirH8RbfYXTz5c0efyBFv8zWTnu9GXg+p6OgZCU
-         XvgloKqSvg4wfxmQ5btfzP2R577P82z028pbDTO5ssey5YVarzYyVP28cHFqTd9lqLj1
-         yk6ciAX98khyDBIbuQHG3eoxO9SVsu76Ly8dJloPZWrW4gSXRSVtXaTD7vpEHBsUXjIf
-         2NJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770326350; x=1770931150;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7myZG3j2CU7LaFpg4p0P2j0Ms0MQemPHTxkEePH7mSM=;
-        b=U5aMZ8qzgA9EvvPTyHqfqvyapoOsSeDLejs7hlqLQeT7rogHN6PhvUTvGX5KznMMeJ
-         EcoaVELknhpGxjBp+c8oYa5O9Hgu+ZY0rZiOU7WZzCfhv8e21RJdKw4FR6PvMVWMFuRK
-         HyyLDxKa1ADsu3HNu4lVwewzei/JTgMBn+QDn7Spue2uZ1I36Qx6DevuqvZ/lQmcKgaj
-         tHIYPTn+Ftp/nhx15bgLmpAlsiU0YpGG35vh3k8s/mAc1+oY+aRjbjgj1f1b5yXmR57F
-         CJhDUaWr7CjPNUqFgy0u5gYgALabTtoDsvvp+Kz7NI8GAKMtZqVNVY/iNXjpk0kolezD
-         QyHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5E2kWCeKmcowQhVowThJZ4fzmCsOendQDYno74o2WLW7GbbSJSKnebmpIdHT1bELX3JSN2kk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyxoLnQjT2YjrQE0UykRvZGqkiJT8q68TKffr87UgGH8xUVcm7
-	FfPH2tiSOmviTAUsa98/30ctTX1pRCSFV9rYCFjgh+vxh19uR7WM+aBr7eyIAE3DziY5VdphatM
-	Bsukf/D2AUPovWg==
-X-Received: from qkbbl7.prod.google.com ([2002:a05:620a:1a87:b0:8b2:e8b8:3d8a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3942:b0:8ca:4438:b8ef with SMTP id af79cd13be357-8caf16ec4f4mr66153085a.69.1770326349893;
- Thu, 05 Feb 2026 13:19:09 -0800 (PST)
-Date: Thu,  5 Feb 2026 21:19:09 +0000
+	s=arc-20240116; t=1770326489; c=relaxed/simple;
+	bh=1PNoI7bhktvM3wzSSWLbzCTxNetyB5vQXkVo4AJLmGA=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=PwR0JBlroDnWzBAeaFGPi1DZLHR3Inkp5lVK5ED0ao40TRXQTkmh7U0C8qTiFsmDCOB6FSpvb8s5zFb3EkmsZyfFZvV8/qVffA9wjRuFBxiMY6G0bpr2+KKbDdpQ2D5C8W2MDwYFrgdVEZHvXl5y/Ge+C2ccvapNpKwPHrhbY7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XvhXWuSM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B72B7C4CEF7;
+	Thu,  5 Feb 2026 21:21:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770326488;
+	bh=1PNoI7bhktvM3wzSSWLbzCTxNetyB5vQXkVo4AJLmGA=;
+	h=Subject:From:To:Cc:Date:From;
+	b=XvhXWuSM4iLXI/sGecOkj5C2Xcyd4+Bzdk0j9D6SzMSxXC68vesg6XOV2RHJBuGun
+	 Ls9wlGOMU01L+ggB/N6NmPQj+WpThfHlYgyrNQSGebMtFBB+cEFrfBZ1zvh6xqOQez
+	 O3k/LS2y1A4lv3Ztj1AipNzG2RN+2gXe4e6NfhnVNZtlghE0vIzo55WEzQshOBxG8o
+	 UokP/U2MJdu2CQ4ld4tLF3lT/e9P4D4L3Omu9uP4gE3IqcpCud/hUitQgq8LVCEZi9
+	 E9NErAg4bQeVzNmQuEJIUfFuwbtk0tiJg4lQUri6CnvNDKXlXMvmmOjeR4RA0csIc5
+	 8/0TIQD1iKnIQ==
+Subject: [PATCH net-next v2 0/6] net: sched: refactor qdisc drop reasons into
+ dedicated tracepoint
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, horms@kernel.org, jiri@resnulli.us,
+ edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
+ atenart@redhat.com, carges@cloudflare.com, kernel-team@cloudflare.com
+Date: Thu, 05 Feb 2026 22:21:23 +0100
+Message-ID: <177032644012.1975497.16411100029657607833.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260205211909.4115285-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: do not use skb_header_pointer() in icmpv6_filter()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257306-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257307-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vmlinux.new:url]
-X-Rspamd-Queue-Id: E5216F78CF
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3C8C6F7941
 X-Rspamd-Action: no action
 
-Prefer pskb_may_pull() to avoid a stack canary in raw6_local_deliver().
+This series refactors qdisc drop reason handling by introducing a dedicated
+enum qdisc_drop_reason and trace_qdisc_drop tracepoint, providing qdisc
+layer drop diagnostics with direct qdisc context visibility.
 
-Note: skb->head can change, hence we reload ip6h pointer in
-ipv6_raw_deliver()
+Background:
+-----------
+Identifying which qdisc dropped a packet via skb_drop_reason is difficult.
+Normally, the kfree_skb tracepoint caller "location" hints at the dropping
+code, but qdisc drops happen at a central point (__dev_queue_xmit), making
+this unusable. As a workaround, commits 5765c7f6e317 ("net_sched: sch_fq:
+add three drop_reason") and a42d71e322a8 ("net_sched: sch_cake: Add drop
+reasons") encoded qdisc names directly in the drop reason enums.
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-86 (-86)
-Function                                     old     new   delta
-raw6_local_deliver                           780     694     -86
-Total: Before=24889784, After=24889698, chg -0.00%
+This series provides a cleaner solution by creating a dedicated qdisc
+tracepoint that naturally includes qdisc context (handle, parent, kind).
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Solution:
+---------
+Create a new tracepoint trace_qdisc_drop that builds on top of existing
+trace_qdisc_enqueue infrastructure. It includes qdisc handle, parent,
+qdisc kind (name), and device information directly.
+
+The existing SKB_DROP_REASON_QDISC_DROP is retained for backwards
+compatibility via kfree_skb_reason(). The qdisc-specific drop reasons
+(QDISC_DROP_*) provide fine-grained detail via the new tracepoint.
+The enum uses subsystem encoding (offset by SKB_DROP_REASON_SUBSYS_QDISC)
+to catch type mismatches for debugging purposes.
+
+This implements the alternative approach described in:
+https://lore.kernel.org/all/6be17a08-f8aa-4f91-9bd0-d9e1f0a92d90@kernel.org/
+
+Changes since RFC v1:
+---------------------
+- Renamed QDISC_DROP_CAKE_FLOOD to QDISC_DROP_FLOOD_PROTECTION (Toke)
+- Renamed QDISC_DROP_FQ_BAND_LIMIT to QDISC_DROP_BAND_LIMIT
+- Renamed QDISC_DROP_FQ_HORIZON_LIMIT to QDISC_DROP_HORIZON_LIMIT
+- Added SKB_DROP_REASON_SUBSYS_QDISC subsystem encoding for enum debugging
+- Added WARN_ON_ONCE to catch wrong enum type (skb vs qdisc drop reason)
+- Updated SKB_DROP_REASON_QDISC_DROP doc to reference qdisc:qdisc_drop
+- Split rename changes into separate patches for clarity
+
+Series overview:
+----------------
+Patch 1: Introduce the qdisc drop reason infrastructure
+  - New enum qdisc_drop_reason with subsystem encoding
+  - New trace_qdisc_drop tracepoint with qdisc context
+  - WARN_ON_ONCE to catch enum type mismatches
+  - Convert FQ, FQ_CoDel, CoDel, SFB, pfifo_fast to use new infrastructure
+
+Patch 2: Convert SFQ as example for reviewers
+  - Demonstrates how to convert a flow-based qdisc
+  - Adds QDISC_DROP_MAXFLOWS for flow table exhaustion
+
+Patch 3: Fix CAKE to use enum qdisc_drop_reason
+  - Change cobalt_should_drop() return type for type correctness
+
+Patch 4: Rename QDISC_DROP_CAKE_FLOOD to QDISC_DROP_FLOOD_PROTECTION
+  - Generic name without embedding qdisc name
+
+Patch 5: Rename QDISC_DROP_FQ_* to generic names
+  - QDISC_DROP_FQ_BAND_LIMIT -> QDISC_DROP_BAND_LIMIT
+  - QDISC_DROP_FQ_HORIZON_LIMIT -> QDISC_DROP_HORIZON_LIMIT
+
+Patch 6: DualPI2 use qdisc_dequeue_drop() for dequeue drops
+  - Demonstrates dequeue-time drop handling with trace_qdisc_drop
+
 ---
- net/ipv6/raw.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index ee6beba03e9b498c8ea5b9e5834e26251f81e958..27a2680591684eb2cad011e63cdaf396e79c0d77 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -90,23 +90,24 @@ EXPORT_SYMBOL_GPL(raw_v6_match);
-  *	0 - deliver
-  *	1 - block
-  */
--static int icmpv6_filter(const struct sock *sk, const struct sk_buff *skb)
-+static int icmpv6_filter(const struct sock *sk, struct sk_buff *skb)
- {
--	struct icmp6hdr _hdr;
- 	const struct icmp6hdr *hdr;
-+	const __u32 *data;
-+	unsigned int type;
- 
- 	/* We require only the four bytes of the ICMPv6 header, not any
- 	 * additional bytes of message body in "struct icmp6hdr".
- 	 */
--	hdr = skb_header_pointer(skb, skb_transport_offset(skb),
--				 ICMPV6_HDRLEN, &_hdr);
--	if (hdr) {
--		const __u32 *data = &raw6_sk(sk)->filter.data[0];
--		unsigned int type = hdr->icmp6_type;
-+	if (!pskb_may_pull(skb, ICMPV6_HDRLEN))
-+		return 1;
- 
--		return (data[type >> 5] & (1U << (type & 31))) != 0;
--	}
--	return 1;
-+	hdr = (struct icmp6hdr *)skb->data;
-+	type = hdr->icmp6_type;
-+
-+	data = &raw6_sk(sk)->filter.data[0];
-+
-+	return (data[type >> 5] & (1U << (type & 31))) != 0;
- }
- 
- #if IS_ENABLED(CONFIG_IPV6_MIP6)
-@@ -141,15 +142,13 @@ EXPORT_SYMBOL(rawv6_mh_filter_unregister);
- static bool ipv6_raw_deliver(struct sk_buff *skb, int nexthdr)
- {
- 	struct net *net = dev_net(skb->dev);
--	const struct in6_addr *saddr;
--	const struct in6_addr *daddr;
-+	const struct ipv6hdr *ip6h;
- 	struct hlist_head *hlist;
--	struct sock *sk;
- 	bool delivered = false;
-+	struct sock *sk;
- 	__u8 hash;
- 
--	saddr = &ipv6_hdr(skb)->saddr;
--	daddr = saddr + 1;
-+	ip6h = ipv6_hdr(skb);
- 
- 	hash = raw_hashfunc(net, nexthdr);
- 	hlist = &raw_v6_hashinfo.ht[hash];
-@@ -157,7 +156,7 @@ static bool ipv6_raw_deliver(struct sk_buff *skb, int nexthdr)
- 	sk_for_each_rcu(sk, hlist) {
- 		int filtered;
- 
--		if (!raw_v6_match(net, sk, nexthdr, daddr, saddr,
-+		if (!raw_v6_match(net, sk, nexthdr, &ip6h->daddr, &ip6h->saddr,
- 				  inet6_iif(skb), inet6_sdif(skb)))
- 			continue;
- 
-@@ -171,6 +170,7 @@ static bool ipv6_raw_deliver(struct sk_buff *skb, int nexthdr)
- 		switch (nexthdr) {
- 		case IPPROTO_ICMPV6:
- 			filtered = icmpv6_filter(sk, skb);
-+			ip6h = ipv6_hdr(skb);
- 			break;
- 
- #if IS_ENABLED(CONFIG_IPV6_MIP6)
--- 
-2.53.0.rc2.204.g2597b5adb4-goog
+Jesper Dangaard Brouer (6):
+      net: sched: introduce qdisc-specific drop reason tracing
+      net: sched: sfq: convert to qdisc drop reasons
+      net: sched: sch_cake: use enum qdisc_drop_reason for cobalt_should_drop
+      net: sched: rename QDISC_DROP_CAKE_FLOOD to QDISC_DROP_FLOOD_PROTECTION
+      net: sched: rename QDISC_DROP_FQ_* to generic names
+      net: sched: sch_dualpi2: use qdisc_dequeue_drop() for dequeue drops
+
+
+ include/net/dropreason-core.h  |  48 ++-------------
+ include/net/dropreason-qdisc.h | 106 +++++++++++++++++++++++++++++++++
+ include/net/dropreason.h       |   6 ++
+ include/net/sch_generic.h      |  36 +++++++----
+ include/trace/events/qdisc.h   |  51 ++++++++++++++++
+ net/core/dev.c                 |   8 +--
+ net/sched/sch_cake.c           |  26 ++++----
+ net/sched/sch_codel.c          |   5 +-
+ net/sched/sch_dualpi2.c        |  17 +++---
+ net/sched/sch_fq.c             |   7 +--
+ net/sched/sch_fq_codel.c       |   4 +-
+ net/sched/sch_fq_pie.c         |   4 +-
+ net/sched/sch_generic.c        |  22 ++++++-
+ net/sched/sch_gred.c           |   4 +-
+ net/sched/sch_pie.c            |   4 +-
+ net/sched/sch_red.c            |   4 +-
+ net/sched/sch_sfb.c            |   4 +-
+ net/sched/sch_sfq.c            |   8 +--
+ 18 files changed, 256 insertions(+), 108 deletions(-)
+ create mode 100644 include/net/dropreason-qdisc.h
+
+--
 
 
