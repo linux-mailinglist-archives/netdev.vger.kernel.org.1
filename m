@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-257309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEdWKOkJhWmj7gMAu9opvQ
-	(envelope-from <netdev+bounces-257309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:21:45 +0100
+	id AME7F+8JhWmj7gMAu9opvQ
+	(envelope-from <netdev+bounces-257310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:21:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F8BF794F
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:21:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE71F795F
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 22:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 97DF7300381C
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 21:21:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9EA53300231B
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 21:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1253533065B;
-	Thu,  5 Feb 2026 21:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55D633065B;
+	Thu,  5 Feb 2026 21:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K5xdXtEr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYrIMf/Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E427230DD37;
-	Thu,  5 Feb 2026 21:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829BE329E46;
+	Thu,  5 Feb 2026 21:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770326503; cv=none; b=i78JWtq1ZGOTRfQ0PxsIq2Fd6dA8m70Rx+tEFqFidI0kk8jD47y/syF+6ioSN1rkB/CczrThkARIWRhxn4nsDtu56nzN4vxylNDO9NCuUZFjih+OESLel7m3mSS24D4/lWFUVYg5Ol742XPTibafbHUJpzdczAQySvNXMqNsaOg=
+	t=1770326509; cv=none; b=D+7kvlzyn6MmeZT30a9Ne748wcHJhuxFPapXU854yFFta+gDdxGJtBBEBRNrNW2sWCOZUAfxEG6fLysg2MqjoNlO8untqD4FtsbMoswpXBYO2yZsIldT0BBYtpftZnnj1JRNbUouU/8s7E1rLwBxNX/fUmh1k/eXMC1KiyerhaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770326503; c=relaxed/simple;
-	bh=BFm8GrpgneY7ExnYWDL1gydFCDSLiNR1ymlyLN3fIPM=;
+	s=arc-20240116; t=1770326509; c=relaxed/simple;
+	bh=Bup6bqy51nLskK4r7e6B2aiti4ZAaB1Rsbevgd7k5i4=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l5xNGlB2Tl7SEbYflZk2nCc3dncBhL+OLvtFwTBPrKd44q71hABzjGx0S5qFLT4yNSzuC48xnNHZOTu3fTfeyfx27kCslA21Gwjgp3r4JhDkAMPajG1t6eVGTlgYNJPznFzdzenjx2ek+plzgbuJPX3+azzoyf9inr0jYw6qqCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K5xdXtEr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49682C19421;
-	Thu,  5 Feb 2026 21:21:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kyw/9rQNFYJwKRjI//vlqaPNI8ygALEweNuo7+kT2aLROhjSej4w1zmzE+OahasX//5of09BtHn4TdPaOntW396TCMT/BK4fpVhxbO/NqcN/2Lbt097sdhlOTM+XyT+UNq8G+mzOZmIU7Bx1VXKhbViNKPjuZy4UpUx9F9JidrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYrIMf/Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED29FC4CEF7;
+	Thu,  5 Feb 2026 21:21:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770326502;
-	bh=BFm8GrpgneY7ExnYWDL1gydFCDSLiNR1ymlyLN3fIPM=;
+	s=k20201202; t=1770326509;
+	bh=Bup6bqy51nLskK4r7e6B2aiti4ZAaB1Rsbevgd7k5i4=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=K5xdXtErBCVXCrOrvtcO32d5KEr9IRQhXx4pqmQd97X85xm3WUy3PGkSlyM+xCGj+
-	 3jxu8BPsQ+X4E561Kr46dElxfZcHRSSIceV9lKPAApwn/TQbOJ6PVDwiL0yrXLol1J
-	 BtI5lXppBjGRVlkorqr7gmhCRigz+VyqHqrpG1SB1A++zdh/vx2vYON2pL7h8raTXo
-	 IB2YLpG+OxJahYdelJgVSxtXj+BSZezWfRPjK9iQj1yFaWmPGZDLADHBIDhqArJ2wh
-	 ZQ8a8oh1zg1lSj3C0NfVLxtSGK9JPHx2EWXQ5mdg3IJw8xKooSRNVTrNzdy3IqnpM6
-	 WBHkAxRpHks0A==
-Subject: [PATCH net-next v2 2/6] net: sched: sfq: convert to qdisc drop
- reasons
+	b=tYrIMf/QfebQ94RXURtsaX0NgpWK4ZUdneZeMYfvLyaeBE2PbXJc6h8OyRf8v5f/J
+	 A3FPWwAko1uJyi7IMMNZEpOaLkxluabdyKx4SSeS3h465HtlrFe4XWxzrpPQAtYzUi
+	 XJB06TlVCjP3RSY9hC+0jHl9lyvcQhu9SXy018kHak57qXmaFEqVApTj79/O5gzzLu
+	 ciHmyNOctjFZs8x1Wqjp0FgaPtD6mHsl0CpQQ8MQ1Bl1O5X95CXqG8Oi9nJBL3KktX
+	 Ec+4zBmqI04GBRlD0YJhEdRSLkV6diN/4Tv3n/QmP3yHy0lJxUY5YcbncgWEmNVrgP
+	 VItk3418pZs+w==
+Subject: [PATCH net-next v2 3/6] net: sched: sch_cake: use enum
+ qdisc_drop_reason for cobalt_should_drop
 From: Jesper Dangaard Brouer <hawk@kernel.org>
 To: netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
@@ -54,8 +54,8 @@ Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
  Jakub Kicinski <kuba@kernel.org>, horms@kernel.org, jiri@resnulli.us,
  edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
  atenart@redhat.com, carges@cloudflare.com, kernel-team@cloudflare.com
-Date: Thu, 05 Feb 2026 22:21:37 +0100
-Message-ID: <177032649708.1975497.4728420557650108955.stgit@firesoul>
+Date: Thu, 05 Feb 2026 22:21:43 +0100
+Message-ID: <177032650389.1975497.10621533594128432316.stgit@firesoul>
 In-Reply-To: <177032644012.1975497.16411100029657607833.stgit@firesoul>
 References: <177032644012.1975497.16411100029657607833.stgit@firesoul>
 User-Agent: StGit/1.5
@@ -74,7 +74,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257309-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257310-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk];
 	FROM_HAS_DN(0.00)[];
@@ -93,135 +93,84 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 38F8BF794F
+X-Rspamd-Queue-Id: 3FE71F795F
 X-Rspamd-Action: no action
 
-Convert SFQ to use the new qdisc-specific drop reason infrastructure.
+Change cobalt_should_drop() return type from enum skb_drop_reason to
+enum qdisc_drop_reason to fix implicit enum conversion warnings.
 
-This patch demonstrates how to convert a flow-based qdisc to use the
-new enum qdisc_drop_reason. As part of this conversion:
-
-- Add QDISC_DROP_MAXFLOWS for flow table exhaustion
-- Rename FQ_FLOW_LIMIT to generic FLOW_LIMIT, now shared by FQ and SFQ
-- Use QDISC_DROP_OVERLIMIT for sfq_drop() when overall limit exceeded
-- Use QDISC_DROP_FLOW_LIMIT for per-flow depth limit exceeded
-
-The FLOW_LIMIT reason is now a common drop reason for per-flow limits,
-applicable to both FQ and SFQ qdiscs.
+Use QDISC_DROP_UNSPEC as the 'not dropped' sentinel instead of
+SKB_NOT_DROPPED_YET. Both have the same compiled value (0), so the
+comparison logic remains semantically equivalent.
 
 Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 ---
- include/net/dropreason-qdisc.h |   22 ++++++++++++++++------
- net/sched/sch_fq.c             |    2 +-
- net/sched/sch_sfq.c            |    8 ++++----
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ net/sched/sch_cake.c |   20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/dropreason-qdisc.h b/include/net/dropreason-qdisc.h
-index e1a902e782ef..f70fe06213b0 100644
---- a/include/net/dropreason-qdisc.h
-+++ b/include/net/dropreason-qdisc.h
-@@ -9,10 +9,11 @@
- 	FN(GENERIC)			\
- 	FN(OVERLIMIT)			\
- 	FN(CONGESTED)			\
-+	FN(FLOW_LIMIT)			\
-+	FN(MAXFLOWS)			\
- 	FN(CAKE_FLOOD)			\
- 	FN(FQ_BAND_LIMIT)		\
- 	FN(FQ_HORIZON_LIMIT)		\
--	FN(FQ_FLOW_LIMIT)		\
- 	FNe(MAX)
- 
- #undef FN
-@@ -58,6 +59,20 @@ enum qdisc_drop_reason {
- 	 * congestion to the sender and prevent bufferbloat.
- 	 */
- 	QDISC_DROP_CONGESTED,
-+	/**
-+	 * @QDISC_DROP_FLOW_LIMIT: packet dropped because an individual flow
-+	 * exceeded its per-flow packet/depth limit. Used by FQ and SFQ qdiscs
-+	 * to enforce per-flow fairness and prevent a single flow from
-+	 * monopolizing queue resources.
-+	 */
-+	QDISC_DROP_FLOW_LIMIT,
-+	/**
-+	 * @QDISC_DROP_MAXFLOWS: packet dropped because the qdisc's flow
-+	 * tracking table is full and no free slots are available to allocate
-+	 * for a new flow. This indicates flow table exhaustion in flow-based
-+	 * qdiscs that maintain per-flow state (e.g., SFQ).
-+	 */
-+	QDISC_DROP_MAXFLOWS,
- 	/**
- 	 * @QDISC_DROP_CAKE_FLOOD: CAKE qdisc dropped packet due to flood
- 	 * protection mechanism (BLUE algorithm). This indicates potential
-@@ -76,11 +91,6 @@ enum qdisc_drop_reason {
- 	 * packets with unreasonable future timestamps from blocking the queue.
- 	 */
- 	QDISC_DROP_FQ_HORIZON_LIMIT,
--	/**
--	 * @QDISC_DROP_FQ_FLOW_LIMIT: FQ dropped packet because an individual
--	 * flow exceeded its per-flow packet limit.
--	 */
--	QDISC_DROP_FQ_FLOW_LIMIT,
- 	/**
- 	 * @QDISC_DROP_MAX: the maximum of qdisc drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 058801fefca1..ca615d5433db 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -580,7 +580,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		if (unlikely(f->qlen >= q->flow_plimit)) {
- 			q->stat_flows_plimit++;
- 			return qdisc_drop_reason(skb, sch, to_free,
--						 QDISC_DROP_FQ_FLOW_LIMIT);
-+						 QDISC_DROP_FLOW_LIMIT);
- 		}
- 
- 		if (fq_flow_is_detached(f)) {
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 96eb2f122973..efb796976a5b 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -302,7 +302,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 		sfq_dec(q, x);
- 		sch->q.qlen--;
- 		qdisc_qstats_backlog_dec(sch, skb);
--		qdisc_drop(skb, sch, to_free);
-+		qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_OVERLIMIT);
- 		return len;
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index a2d1b292600d..da3c347574d2 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -497,13 +497,13 @@ static bool cobalt_queue_empty(struct cobalt_vars *vars,
+ /* Call this with a freshly dequeued packet for possible congestion marking.
+  * Returns true as an instruction to drop the packet, false for delivery.
+  */
+-static enum skb_drop_reason cobalt_should_drop(struct cobalt_vars *vars,
+-					       struct cobalt_params *p,
+-					       ktime_t now,
+-					       struct sk_buff *skb,
+-					       u32 bulk_flows)
++static enum qdisc_drop_reason cobalt_should_drop(struct cobalt_vars *vars,
++						 struct cobalt_params *p,
++						 ktime_t now,
++						 struct sk_buff *skb,
++						 u32 bulk_flows)
+ {
+-	enum skb_drop_reason reason = SKB_NOT_DROPPED_YET;
++	enum qdisc_drop_reason reason = QDISC_DROP_UNSPEC;
+ 	bool next_due, over_target;
+ 	ktime_t schedule;
+ 	u64 sojourn;
+@@ -571,14 +571,14 @@ static enum skb_drop_reason cobalt_should_drop(struct cobalt_vars *vars,
  	}
  
-@@ -363,7 +363,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (x == SFQ_EMPTY_SLOT) {
- 		x = q->dep[0].next; /* get a free slot */
- 		if (x >= SFQ_MAX_FLOWS)
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_MAXFLOWS);
- 		q->ht[hash] = x;
- 		slot = &q->slots[x];
- 		slot->hash = hash;
-@@ -420,14 +420,14 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (slot->qlen >= q->maxdepth) {
- congestion_drop:
- 		if (!sfq_headdrop(q))
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_FLOW_LIMIT);
+ 	/* Simple BLUE implementation.  Lack of ECN is deliberate. */
+-	if (vars->p_drop && reason == SKB_NOT_DROPPED_YET &&
++	if (vars->p_drop && reason == QDISC_DROP_UNSPEC &&
+ 	    get_random_u32() < vars->p_drop)
+ 		reason = QDISC_DROP_CAKE_FLOOD;
  
- 		/* We know we have at least one packet in queue */
- 		head = slot_dequeue_head(slot);
- 		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
- 		sch->qstats.backlog -= delta;
- 		slot->backlog -= delta;
--		qdisc_drop(head, sch, to_free);
-+		qdisc_drop_reason(head, sch, to_free, QDISC_DROP_FLOW_LIMIT);
+ 	/* Overload the drop_next field as an activity timeout */
+ 	if (!vars->count)
+ 		vars->drop_next = ktime_add_ns(now, p->interval);
+-	else if (ktime_to_ns(schedule) > 0 && reason == SKB_NOT_DROPPED_YET)
++	else if (ktime_to_ns(schedule) > 0 && reason == QDISC_DROP_UNSPEC)
+ 		vars->drop_next = now;
  
- 		slot_queue_add(slot, skb);
- 		qdisc_tree_reduce_backlog(sch, 0, delta);
+ 	return reason;
+@@ -2004,7 +2004,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+ {
+ 	struct cake_sched_data *q = qdisc_priv(sch);
+ 	struct cake_tin_data *b = &q->tins[q->cur_tin];
+-	enum skb_drop_reason reason;
++	enum qdisc_drop_reason reason;
+ 	ktime_t now = ktime_get();
+ 	struct cake_flow *flow;
+ 	struct list_head *head;
+@@ -2225,7 +2225,7 @@ static struct sk_buff *cake_dequeue(struct Qdisc *sch)
+ 					     !!(q->config->rate_flags &
+ 						CAKE_FLAG_INGRESS)));
+ 		/* Last packet in queue may be marked, shouldn't be dropped */
+-		if (reason == SKB_NOT_DROPPED_YET || !flow->head)
++		if (reason == QDISC_DROP_UNSPEC || !flow->head)
+ 			break;
+ 
+ 		/* drop this packet, get another one */
 
 
 
