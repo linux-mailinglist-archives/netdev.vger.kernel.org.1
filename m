@@ -1,159 +1,252 @@
-Return-Path: <netdev+bounces-257248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mA5BJ+3EhGk45QMAu9opvQ
-	(envelope-from <netdev+bounces-257248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:27:25 +0100
+	id GAZjC3zFhGk45QMAu9opvQ
+	(envelope-from <netdev+bounces-257249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:29:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BB4F5361
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:27:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433F1F5405
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3748D301A515
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 16:27:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C8B7F3003802
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 16:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D6A426D05;
-	Thu,  5 Feb 2026 16:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0CE438FE5;
+	Thu,  5 Feb 2026 16:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BeTe8UR1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtHeHwmc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31957426D0B
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 16:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494FB3242CA;
+	Thu,  5 Feb 2026 16:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770308840; cv=none; b=RzwFKO4/zr1OdZjpS/TfHJgYHT0gNS+scOQ9weGVf/LKa2zNxssQzhFfYWORCoj7iw8rRP7TQa1bCBrsIFfo3kGyBPDdRhd/lHhI++42g6aOXMfJTs/EFNUh/TVjPTf1sEKKNU8HktQ9hVSmxQYM6d1eg3sYA1MZz5KB1lrFDds=
+	t=1770308982; cv=none; b=cFERjksyIsZBMSucYoFaHW3H3QZRLzT8mtNznoo5QI+UyPEw2oBiEGoqEWOqUhpjdcxEEuZXUdgmGakGZL+oqhZ0BlE9WMdjGvogZaRW1sV5IKeNQVNJcPXBxxePddObHJ2xMkhLFQJXCIipIOCL7+FuBL/HXNhCCm7a6L2TBig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770308840; c=relaxed/simple;
-	bh=e3Mh4cqPyjgeMUHDkKjgumrwqhe3d4J1EQPV/2Qpmlg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pVbd4s938cmiYJKTIE4/YbL9MNkCbDUIpcs5T5IgBwgtnYpHMVIZWlQVTZUQU4qaIKaoVMReXdsjQiQ8Onk1zPy+/WQy36hpRKYREPtyXmp6hgtCq0qJ1WCuFs9nYuAXtfV/7CdhypsvUdEG7dwDbBsq0Ea7q5ZKJZHx6TU0Xmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BeTe8UR1; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <66925f09-ef9f-4401-baec-7d4c82a68ce3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770308828;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ET/qeIEpwmI/Es2elWLSYLqXMVH7pqog+cxAo+h7unM=;
-	b=BeTe8UR1CL3v7CzRECCoz4879yHxH8spUWym3MIX+VYLz/P/y3rXxHSDBxMVnCyGqA+Ix8
-	g9Fh+B4lgqMmtuIOQiSsruwLH48OsRuEUzzrnRm8D03KbfoO3qlP+2z6RjOIWZ5o4LZ08r
-	q5ewL6Vp32VAGbWCY7l5UM3+34J9F/w=
-Date: Thu, 5 Feb 2026 16:27:03 +0000
+	s=arc-20240116; t=1770308982; c=relaxed/simple;
+	bh=se9z/Rx6urcZzEtFxPaxv3F+3lAPdn51/037pyhOCjY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lW51+UGS5EcSLOkH+ojTAerbp7rdoJQXVU2sQF/NP/cCnmMPJygg+iuZf+WgFr80d/8msmWcbTqKNSS1ha+FtgXxo33/xZ1BpstCLTK4lioGgRMF8j8HSiSAJewqpGcCxjfJzqTjv8oAP5zNdaq787Coh1RLnPtMJjh3Q7qFQj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtHeHwmc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07EF5C4CEF7;
+	Thu,  5 Feb 2026 16:29:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770308981;
+	bh=se9z/Rx6urcZzEtFxPaxv3F+3lAPdn51/037pyhOCjY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TtHeHwmcs6wrjMTeeCCDrEaKkJf4aktcaE9m3xEG7ns14BJypYmQZ11SYNHlz6NAO
+	 9L6640DsbaXwHm6Ydwk+4WPv188PWL89v6RGuS9Mb34BynXYDWnAtRrFlJYGb+p1OE
+	 wsEKAKyIMqOJM3jTxVcGrNuR0IptjxT06RK+xvvxTnvaGzWBU7Zxlty43KEd2kUBj2
+	 Zm/m1RLVxs54W7Q+Jt/2kgAcCWylc1oRwUoC8VAu7depfR3/UjIhwnYnhlSJbPzyab
+	 0C0guo2zcfY7lM9ejwoBUh60PQfqEqmRtkLvNgONfgcfOgV7B6IWYrUcyBC/GGDDLD
+	 U6OM7ucOSL0hg==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] [v4] myri10ge: avoid uninitialized variable use
+Date: Thu,  5 Feb 2026 17:28:09 +0100
+Message-Id: <20260205162935.2126442-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
- directly from interrupt for i210
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
- Paul Menzel <pmenzel@molgen.mpg.de>,
- "Gomes, Vinicius" <vinicius.gomes@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-References: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
- <IA3PR11MB898652699383BA265C5747A5E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <20260205100347.ssTBDAI_@linutronix.de>
- <IA3PR11MB89865B46DCBEB496BE28703BE599A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <6a0f4cbb-e8b3-4f0e-b7f1-7f9ca5cba97d@linux.dev>
- <20260205145104.iWinkXHv@linutronix.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260205145104.iWinkXHv@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257248-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,linutronix.de,molgen.mpg.de,vger.kernel.org,gmail.com,lunn.ch,google.com,lists.osuosl.org,kernel.org,redhat.com,davemloft.net];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257249-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 27BB4F5361
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arndb.de:email]
+X-Rspamd-Queue-Id: 433F1F5405
 X-Rspamd-Action: no action
 
-On 05/02/2026 14:51, Sebastian Andrzej Siewior wrote:
-> On 2026-02-05 11:56:44 [+0000], Vadim Fedorenko wrote:
->> On 05/02/2026 10:37, Loktionov, Aleksandr wrote:
->>> spin_lock_irqsave(&wq_head->lock, flags);  <- RT mutex can sleep
->>
->> Hmm... that actually means we have some drivers broken for RT kernels if
->> they are processing TX timestamps within a single irq vector:
->> - hisilicon/hns3
->> - intel/i40e (and ice probably)
->> - marvell/mvpp2
->>
->> For igb/igc/i40e it's still OK to process TX timestamps directly in
->> MSI-X configuration, as ring processing has separate vector, right?
-> 
-> The statement made above is not accurate. Each and every driver does
-> request_irq() and here on PREEMPT_RT you can freely acquire spinlock_t.
-> 
-> But !RT looks problematic…
-> 
-> __skb_tstamp_tx() invokes skb_may_tx_timestamp() which should exit early
-> most of the time due to the passed bool (which is true) or
-> sysctl_tstamp_allow_data which is true. However, should both be false
-> then it tries to
-> 	read_lock_bh(&sk->sk_callback_lock);
-> 
-> where lockdep will complain because this lock is now acquired with
-> disabled interrupts.
-> 
-> The function will attempt do free the fresh/ cloned skb in error case
-> via kfree_skb(). Since it is fresh skb, sk_buff::destructor is NULL and
-> the warning in skb_release_head_state() won't trigger.
-> 
-> So the only thing that bothers me is the read_lock_bh() in
-> skb_may_tx_timestamp() which deadlocks if the socket is write-locked on
-> the same CPU.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Alright. Now you make me think whether we should enforce OPT_TSONLY
-option on socket which doesn't have CAP_NET_RAW? Then we can get rid of 
-this check, and in case sysctl was flipped off - drop TX timestamps as
-it's done now?
+While compile testing on less common architectures, I noticed that gcc-10 on
+s390 finds a bug that all other configurations seem to miss:
+
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_set_multicast_list':
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:391:25: error: 'cmd.data0' is used uninitialized in this function [-Werror=uninitialized]
+  391 |  buf->data0 = htonl(data->data0);
+      |                         ^~
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:25: error: '*((void *)&cmd+4)' is used uninitialized in this function [-Werror=uninitialized]
+  392 |  buf->data1 = htonl(data->data1);
+      |                         ^~
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_allocate_rings':
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:13: error: 'cmd.data1' is used uninitialized in this function [-Werror=uninitialized]
+  392 |  buf->data1 = htonl(data->data1);
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data1' was declared here
+ 1939 |  struct myri10ge_cmd cmd;
+      |                      ^~~
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:393:13: error: 'cmd.data2' is used uninitialized in this function [-Werror=uninitialized]
+  393 |  buf->data2 = htonl(data->data2);
+drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data2' was declared here
+ 1939 |  struct myri10ge_cmd cmd;
+
+It would be nice to understand how to make other compilers catch this as
+well, but for the moment I'll just shut up the warning by fixing the
+undefined behavior in this driver.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+v2..v4: address more instances of the same bug
+---
+ .../net/ethernet/myricom/myri10ge/myri10ge.c  | 28 ++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+index cea28aa971cc..25b46d8c49e6 100644
+--- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
++++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+@@ -688,6 +688,9 @@ static int myri10ge_get_firmware_capabilities(struct myri10ge_priv *mgp)
+ 
+ 	/* probe for IPv6 TSO support */
+ 	mgp->features = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_TSO;
++	cmd.data0 = 0,
++	cmd.data1 = 0,
++	cmd.data2 = 0,
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_MAX_TSO6_HDR_SIZE,
+ 				   &cmd, 0);
+ 	if (status == 0) {
+@@ -806,6 +809,7 @@ static int myri10ge_update_mac_address(struct myri10ge_priv *mgp,
+ 		     | (addr[2] << 8) | addr[3]);
+ 
+ 	cmd.data1 = ((addr[4] << 8) | (addr[5]));
++	cmd.data2 = 0;
+ 
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_SET_MAC_ADDRESS, &cmd, 0);
+ 	return status;
+@@ -817,6 +821,9 @@ static int myri10ge_change_pause(struct myri10ge_priv *mgp, int pause)
+ 	int status, ctl;
+ 
+ 	ctl = pause ? MXGEFW_ENABLE_FLOW_CONTROL : MXGEFW_DISABLE_FLOW_CONTROL;
++	cmd.data0 = 0,
++	cmd.data1 = 0,
++	cmd.data2 = 0,
+ 	status = myri10ge_send_cmd(mgp, ctl, &cmd, 0);
+ 
+ 	if (status) {
+@@ -834,6 +841,9 @@ myri10ge_change_promisc(struct myri10ge_priv *mgp, int promisc, int atomic)
+ 	int status, ctl;
+ 
+ 	ctl = promisc ? MXGEFW_ENABLE_PROMISC : MXGEFW_DISABLE_PROMISC;
++	cmd.data0 = 0;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, ctl, &cmd, atomic);
+ 	if (status)
+ 		netdev_err(mgp->dev, "Failed to set promisc mode\n");
+@@ -1946,6 +1956,8 @@ static int myri10ge_allocate_rings(struct myri10ge_slice_state *ss)
+ 	/* get ring sizes */
+ 	slice = ss - mgp->ss;
+ 	cmd.data0 = slice;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_RING_SIZE, &cmd, 0);
+ 	tx_ring_size = cmd.data0;
+ 	cmd.data0 = slice;
+@@ -2238,12 +2250,16 @@ static int myri10ge_get_txrx(struct myri10ge_priv *mgp, int slice)
+ 	status = 0;
+ 	if (slice == 0 || (mgp->dev->real_num_tx_queues > 1)) {
+ 		cmd.data0 = slice;
++		cmd.data1 = 0;
++		cmd.data2 = 0;
+ 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SEND_OFFSET,
+ 					   &cmd, 0);
+ 		ss->tx.lanai = (struct mcp_kreq_ether_send __iomem *)
+ 		    (mgp->sram + cmd.data0);
+ 	}
+ 	cmd.data0 = slice;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status |= myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_SMALL_RX_OFFSET,
+ 				    &cmd, 0);
+ 	ss->rx_small.lanai = (struct mcp_kreq_ether_recv __iomem *)
+@@ -2312,6 +2328,7 @@ static int myri10ge_open(struct net_device *dev)
+ 	if (mgp->num_slices > 1) {
+ 		cmd.data0 = mgp->num_slices;
+ 		cmd.data1 = MXGEFW_SLICE_INTR_MODE_ONE_PER_SLICE;
++		cmd.data2 = 0;
+ 		if (mgp->dev->real_num_tx_queues > 1)
+ 			cmd.data1 |= MXGEFW_SLICE_ENABLE_MULTIPLE_TX_QUEUES;
+ 		status = myri10ge_send_cmd(mgp, MXGEFW_CMD_ENABLE_RSS_QUEUES,
+@@ -2414,6 +2431,8 @@ static int myri10ge_open(struct net_device *dev)
+ 
+ 	/* now give firmware buffers sizes, and MTU */
+ 	cmd.data0 = dev->mtu + ETH_HLEN + VLAN_HLEN;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_SET_MTU, &cmd, 0);
+ 	cmd.data0 = mgp->small_bytes;
+ 	status |=
+@@ -2472,7 +2491,6 @@ static int myri10ge_open(struct net_device *dev)
+ static int myri10ge_close(struct net_device *dev)
+ {
+ 	struct myri10ge_priv *mgp = netdev_priv(dev);
+-	struct myri10ge_cmd cmd;
+ 	int status, old_down_cnt;
+ 	int i;
+ 
+@@ -2491,8 +2509,13 @@ static int myri10ge_close(struct net_device *dev)
+ 
+ 	netif_tx_stop_all_queues(dev);
+ 	if (mgp->rebooted == 0) {
++		struct myri10ge_cmd cmd;
++
+ 		old_down_cnt = mgp->down_cnt;
+ 		mb();
++		cmd.data0 = 0;
++		cmd.data1 = 0;
++		cmd.data2 = 0;
+ 		status =
+ 		    myri10ge_send_cmd(mgp, MXGEFW_CMD_ETHERNET_DOWN, &cmd, 0);
+ 		if (status)
+@@ -2956,6 +2979,9 @@ static void myri10ge_set_multicast_list(struct net_device *dev)
+ 
+ 	/* Disable multicast filtering */
+ 
++	cmd.data0 = 0;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	err = myri10ge_send_cmd(mgp, MXGEFW_ENABLE_ALLMULTI, &cmd, 1);
+ 	if (err != 0) {
+ 		netdev_err(dev, "Failed MXGEFW_ENABLE_ALLMULTI, error status: %d\n",
+-- 
+2.39.5
 
 
