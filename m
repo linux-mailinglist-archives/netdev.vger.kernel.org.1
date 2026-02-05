@@ -1,192 +1,133 @@
-Return-Path: <netdev+bounces-256895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qO7xCJ7tg2l7vwMAu9opvQ
-	(envelope-from <netdev+bounces-256895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 02:08:46 +0100
+	id sObDJxPxg2k8wAMAu9opvQ
+	(envelope-from <netdev+bounces-256896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 02:23:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D076ED925
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 02:08:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B8FFEDA1D
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 02:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D7D2A3012BEF
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 01:08:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0FCCE3013A4D
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 01:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274182609C5;
-	Thu,  5 Feb 2026 01:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1945E287503;
+	Thu,  5 Feb 2026 01:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mmgeZqJz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uy6IkTgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8182F1C2324
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 01:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA57574BE1;
+	Thu,  5 Feb 2026 01:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770253723; cv=none; b=oBOk9snG35bTBhcJEDP7+gUO4X8Jsv+WVOjw1g1BygFz4985Tcb4KbzTK8iavd+XUAZQwbWoLNb4WYc+79mPOEr9U7rNX0RqEjO3qYsr0F+zTzz82DPFKWZbbjfDrvogHG3Hrm9BJ8ATW/8L5tbGCCd7N1yIiHFo2U//YU7xc3k=
+	t=1770254604; cv=none; b=YeE76Z9QVCsfN+HRHdzS/KXc5JWxIHiE98567zz7eifrHIpxIS+dgwLwtnfeRUedMzaFi6lcX0vG4/5L/DO3v7uyHUFYdVwkATQXNgGwgSZYwmirORGOAsXUntAmq0HUcE0ItnHSAI5Tcl1sfiEvCtnYspyE7pFwfVf09v3uf08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770253723; c=relaxed/simple;
-	bh=lUpzawT/cI2Hl2egFbTnG2HOixMPZMnXe5mWldvCM5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QU4RBjMLc1SnVcMK7qjiyBR9CzsOB1mkZJSpddI6x3g6VNOhA/f7kV58RBSEBIIeJdZnVhS5jW5mh4WOVvyg7qEgmAJFExdAX0cX5LzS82SqWlS98u84CtGTOiS6hL1QQ6EMXsqBjaZWYIuvTn5g9AXepPU2XnNo4h1JT85ctDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mmgeZqJz; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4c125283-b5a4-47f2-be84-a932b50312ab@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770253710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f4P/A1lPY4sEdG9P6sQm+3NNXntitfvg5YGleJyTfow=;
-	b=mmgeZqJzHX2fPGB6T1DgvLDN7j4Yx42TRkQ9GjYVoKneXxTpKlLgpTj9/mIqagnm5eWHEw
-	RSOpCIVXEp3OFrWyhyPPpRzB2PDWWbzv6pR11tr1gAMNpKh0J7xmprFx2VSEE3OQxor06L
-	bJoTZNjw4AWSOh/jHuqP8IwYvfk2K28=
-Date: Wed, 4 Feb 2026 17:08:23 -0800
+	s=arc-20240116; t=1770254604; c=relaxed/simple;
+	bh=dbbWH00AN9nxQSpcSlC8OhEK9W93kMW4Kq/rZuG81/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kew+BVKq//Gvu82zB1JeTfEfeg6yUFJcUeI7jpqpK1PxaXAFlrdEE0h7kl6lqC5Hdjye6rYgfEhnUgOPTLQT21FQl2wpwtqzb07JocWCYMzWhzK85fGGpDURMtMPoTfR5JOWagrxTWo0bgOjJsXiOsK/43unYyl67wtOWU9PD7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uy6IkTgR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B535EC4CEF7;
+	Thu,  5 Feb 2026 01:23:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770254603;
+	bh=dbbWH00AN9nxQSpcSlC8OhEK9W93kMW4Kq/rZuG81/E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Uy6IkTgR8XWjTCd6f2j73ACmERhNylK2D/W1b8L3PcvbVq3lMwSx5aHO9+WtsRFeC
+	 4BcINPYnCAyOYJt6dKizKPlRAocw9j8KABcmEHvf5m64XbnIRcZfaY24uXIYDLyiU/
+	 1MpcO2NLy4X2BUbrXtWyUox0LjVskACBUNwA7vMRFfQr14i5lEvTtzRW4V7ttZdSBD
+	 40K8I+B0x7mIol1mtAUvWCtBH4U4MwSOpf4Um5wObb37pb7TmO29OEd5H15Xfa9IFj
+	 34rIBWL/KXZC6AgrVAWnBTQP4kXztdUCLqqux9Qi3sbaL20bM6AEcLFboL+n2iSnqa
+	 WtRPy8pzOAgDA==
+Date: Wed, 4 Feb 2026 17:23:20 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, bpf@vger.kernel.org, Claudiu
+ Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, "Bastien Curutchet (eBPF Foundation)"
+ <bastien.curutchet@bootlin.com>, Tushar Vyavahare
+ <tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>, "Ricardo
+ B. =?UTF-8?B?TWFybGnDqHJl?=" <rbm@suse.com>, Eelco Chaudron
+ <echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Toke
+ Hoiland-Jorgensen <toke@redhat.com>, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH bpf 0/6] Address XDP frags having negative tailroom
+Message-ID: <20260204172320.0cf0259c@kernel.org>
+In-Reply-To: <e7d4ff92-232c-4683-b235-aa1d75374be1@linux.dev>
+References: <20260203105417.2302672-1-larysa.zaremba@intel.com>
+	<e7d4ff92-232c-4683-b235-aa1d75374be1@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v5 10/16] bpf: Support lockless unlink when
- freeing map or local storage
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
- kpsingh@kernel.org, yonghong.song@linux.dev, song@kernel.org,
- haoluo@google.com, kernel-team@meta.com, bpf@vger.kernel.org
-References: <20260201175050.468601-1-ameryhung@gmail.com>
- <20260201175050.468601-11-ameryhung@gmail.com>
- <d512e9fd-eb04-4194-ab75-b1d2e775461a@linux.dev>
- <CAMB2axPMJe6hGeyaAXvzHKyap+9uoH=q66dtCTD-C4zioJa5DA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axPMJe6hGeyaAXvzHKyap+9uoH=q66dtCTD-C4zioJa5DA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-256896-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-256895-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[linux.dev,vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org];
+	RCPT_COUNT_TWELVE(0.00)[42];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 8D076ED925
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4B8FFEDA1D
 X-Rspamd-Action: no action
 
-On 2/4/26 3:14 PM, Amery Hung wrote:
-> On Tue, Feb 3, 2026 at 9:39 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 2/1/26 9:50 AM, Amery Hung wrote:
->>> +/*
->>> + * Unlink an selem from map and local storage with lockless fallback if callers
->>> + * are racing or rqspinlock returns error. It should only be called by
->>> + * bpf_local_storage_destroy() or bpf_local_storage_map_free().
->>> + */
->>> +static void bpf_selem_unlink_nofail(struct bpf_local_storage_elem *selem,
->>> +                                 struct bpf_local_storage_map_bucket *b)
->>> +{
->>> +     struct bpf_local_storage *local_storage;
->>> +     struct bpf_local_storage_map *smap;
->>> +     bool in_map_free = !!b;
->>> +     unsigned long flags;
->>> +     int err, unlink = 0;
->>> +
->>> +     local_storage = rcu_dereference_check(selem->local_storage, bpf_rcu_lock_held());
->>> +     smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
->>> +
->>> +     /*
->>> +      * Prevent being called twice from the same caller on the same selem.
->>> +      * map_free() and destroy() each holds a link_cnt on an selem.
->>> +      */
->>> +     if ((!smap && in_map_free) || (!local_storage && !in_map_free))
->>> +             return;
->>> +
->>> +     if (smap) {
->>> +             b = b ? : select_bucket(smap, local_storage);
->>> +             err = raw_res_spin_lock_irqsave(&b->lock, flags);
->>> +             if (!err) {
->>> +                     /*
->>> +                      * Call bpf_obj_free_fields() under b->lock to make sure it is done
->>> +                      * exactly once for an selem. Safe to free special fields immediately
->>> +                      * as no BPF program should be referencing the selem.
->>> +                      */
->>> +                     if (likely(selem_linked_to_map(selem))) {
->>> +                             hlist_del_init_rcu(&selem->map_node);
->>> +                             bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
->>> +                             unlink++;
->>> +                     }
->>> +                     raw_res_spin_unlock_irqrestore(&b->lock, flags);
->>> +             }
->>> +             /*
->>> +              * Highly unlikely scenario: resource leak
->>> +              *
->>> +              * When map_free(selem1), destroy(selem1) and destroy(selem2) are racing
->>> +              * and both selem belong to the same bucket, if destroy(selem2) acquired
->>> +              * b->lock and block for too long, neither map_free(selem1) and
->>> +              * destroy(selem1) will be able to free the special field associated
->>> +              * with selem1 as raw_res_spin_lock_irqsave() returns -ETIMEDOUT.
->>> +              */
->>> +             WARN_ON_ONCE(err && in_map_free);
->>> +             if (!err || in_map_free)
->>> +                     RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
->>> +     }
->>> +
->>> +     if (local_storage) {
->>> +             err = raw_res_spin_lock_irqsave(&local_storage->lock, flags);
->>> +             if (!err) {
->>> +                     /*
->>> +                      * Normally, map_free() can call mem_uncharge() if destroy() is
->>> +                      * not about to return to the owner, which can then go away
->>> +                      * immediately. Otherwise, the charge of the selem will stay
->>> +                      * accounted in local_storage->selems_size and uncharged during
->>> +                      * destroy().
->>> +                      */
->>> +                     if (likely(selem_linked_to_storage(selem))) {
->>> +                             hlist_del_init_rcu(&selem->snode);
->>> +                             if (smap && in_map_free &&
->>
->> I think the smap non-null check is not needed.
-> 
-> While smap is still valid in map_free(), SDATA(selem)->smap could have
-> been init to NULL, and then mem_uncharge() will dereference a null
-> pointer.
+On Wed, 4 Feb 2026 14:57:13 -0800 Martin KaFai Lau wrote:
+> On 2/3/26 2:53 AM, Larysa Zaremba wrote:
+> > Larysa Zaremba (6):
+> >    xdp: produce a warning when calculated tailroom is negative
+> >    ice: fix rxq info registering in mbuf packets
+> >    ice: change XDP RxQ frag_size from DMA write length to truesize
+> >    i40e: use truesize as XDP RxQ info frag_size
+> >    idpf: use truesize as XDP RxQ info frag_size
+> >    net: enetc: use truesize as XDP RxQ info frag_size
+>
+> Jakub, can you help to take it to the net tree? Thanks.
 
-hmm... there is a "if ((!smap && in_map_free) || ...)) return;" at the 
-beginning of the function, but may be the next revision will need this 
-check though if it does not depend on "!smap" to decide the second visit.
-
-
->>
->>
-
+Will do. I think I also have some questions, first, tho :)
 
