@@ -1,194 +1,131 @@
-Return-Path: <netdev+bounces-257299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GwFEJ7xhGne6wMAu9opvQ
-	(envelope-from <netdev+bounces-257299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:38:06 +0100
+	id SDd6EDP9hGl47QMAu9opvQ
+	(envelope-from <netdev+bounces-257300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 21:27:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F8EF6E61
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 20:38:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A33CCF7217
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 21:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50C2A302256D
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 19:38:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F24BA3023E09
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 20:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54F2327C1C;
-	Thu,  5 Feb 2026 19:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12FF32C924;
+	Thu,  5 Feb 2026 20:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ngjppiUe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A7kMgie1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936CF288AD
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 19:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770320279; cv=pass; b=Dnqw/WrIJR1kgAsqes1NRj9ZNHEZStSK8kViTiGPK8d4pmufRuTYNuEL1YzE/iSZ96SYzTxQBn/2hOuwtrkjnMB7ewq0KMBpon1RtrW6c2kzgXjbDqJj7rdFSk8H6gQPzGZ7Vay/lLe5GX7y/kfsAAmXXxDIXUp0C6kaxLRq4/g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770320279; c=relaxed/simple;
-	bh=sKPzMs6ZiMMSTfcnvFTaywQRGHtQmYcHtLPKvcXf5PU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SwVPuckJiJ4xLI2zmQIWzO9+8HfM3ch95jv3D7vyAbf4TMp79NdAOCGQEONsUiCpxVdRTSSQTWGTWNA+ZBOJq/xAIKqLrIYIzQAos5IevBFI+GGYLR33v+NJTOXZbjPhbd8/RlL52jeg5bSOsQlj8sjQFsuGMWOivNiBAM7EREY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ngjppiUe; arc=pass smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a09d981507so10966145ad.1
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 11:37:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770320279; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Pd5OucvhjgqeuQzuH290gNIuGQoI1iAcsrXrWQggfeUZLeT3q4Xr7tkPsQmWDwstEX
-         3gwObTf0Pxm0/k6ePYa534LEcjWwH0zWuv1d0aWU/2+kMFt/cA6vNEWh5cHk3c9soBCB
-         ujB4MDeCPuzkRvAm2Wy20GqBTp0ro1GBMn2Pw+4XQSN4abKmz5Igju288OYzMoLTrfnW
-         +ymJDdhPuuKe+5QabwSXhLlc6D9vnD5HUcQZgfBTvkuYdy+lAndnWHOY38Q67oPybKgH
-         M8Y5mshNsphkPB/pwTcVe7a56juywUr58TBjamxFtMcXE4ZjxHaGZY8DEVVDtt27MBhn
-         ww1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dfrsfyhAmd8GwoduMxGfN4+1FY51xPnUMNNk+QbL/6k=;
-        fh=b/AoZj8b4K6/lHGvuxMqkOrWnVlGvojjzLYdQXeb2ZA=;
-        b=Nx7J2Zf8QWUpbjP2J+Du7+nhGOeOdDu7Ph6/fIJSriwMFuaom6r1vADnUKfW4abbUp
-         p9pvnTeId5HlQ70kuP+m6duJyRg1SUV1tSLdqwuMJ3WYPK3yjVORbvr2tFfxpcPglGRT
-         O1XggcmK6CPvzr7vlMW13QOXG+3+mhWwKtLW+BQiEqAjrkyK5VR2MP03ukbYsoXd59+N
-         Op83aducFNZVsDq910Id/geUJBP7e4by8ruVFlbYXyzrgyBFk0BE6LMFv43Xu7V3QAvO
-         L0g2paAk2CU9n1ruGZijqF0vQ2iHoqI7A04pl9nQUfNEMhkWI6QRaGIG4ooND/fMuBxn
-         FFfg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770320279; x=1770925079; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dfrsfyhAmd8GwoduMxGfN4+1FY51xPnUMNNk+QbL/6k=;
-        b=ngjppiUetb7dvnAURd4dglInQP2ezE7u4purLgANHge+xgPNHEpfakEPQd6isWduED
-         1iTvzoudHvqiOipqvHbjkNgelPvVbuBdaknwdcYMuHhw8LoXa6DdSx8V0eeLv+Ag6XN/
-         ujcC8alodbswtPqRDyhNNAgjU+Q3XE2koGmiztXUUnlgnyPSwpt9LXUIep0P5wP2EVex
-         PTG/SLn+Ov1+559ww0n6UfLjgahoySTY7gNbhyn3mRqmhcVS4Cn7c1u5JBEBhBZMLYhv
-         4uceXj6ksYCRnyceWack/n2CSoutSpGX5onx11Eryr9aj0wIhFBoX9ZFpKIHFLVva1w1
-         k7NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770320279; x=1770925079;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dfrsfyhAmd8GwoduMxGfN4+1FY51xPnUMNNk+QbL/6k=;
-        b=EOF8r1bP/EEnO8wcuoMYfqi8b2CrgNKgv5AD24yZyuAlMRXPr+cD0CRL3Xm9kBNU61
-         tw6cynHqsD5NUfyyKEMmyVMa3jV+OiqEuW6M1dP+UsMbC60U7tmK0NwHy7eKN/vu6PRJ
-         A9W9fyTrCWNrU4iYWzqhpa2KkFK+qUcxjDlkiZ9VtBKT1an9kHmWg6d9iO0kKnAhGilR
-         me8+lA5oTsFZ3pBtazvDEWlbrS5YtmnC4jVFWrgbiF92AEq33Vih7KVEoKg7iaYm8cib
-         Mi5Q83aCuY00QuZZm0bCVu2S4MkNwyCjLUw87vY8tpRoxO6mwQdInbdANPItA3bOY06v
-         TP2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVrm9nFUIbvcdyYSjbmuHvJCILc21MhdoqUdPuJJTXGh1qS6vdcBmr7oZKZQ45xpelJKURSZZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPYUuosAubmWrR2sv4gO5gquiKYQYzlQsIvwuGi2iEFak73P85
-	ZWwqgJPGcybTg4TwJAQSLG+VZMorEvJ8ajdCrALrYFcqpK8vxloqaZ92x85aoBf9y8xZETBguYV
-	6C0FGfhSZHjpbJchIBOV6cAFcqUG6f2c=
-X-Gm-Gg: AZuq6aLf2StLa8KCh2amjpuAtq6lvPyfDYbEgqyhFhQ7jqnzASmhHu3r5/8tsKI1vSs
-	UTugPOv1O1Z7BwIxVBUPoMT7bn8SXMs0+Tc2Q27rTUUc9BQghwtyC8vqZmx4lSsGvehEPwH1W2T
-	rrZkPNoyMbQDw7z11aWmn2gK4a6lx5Ww4CflVBGrgR/ezGZsOk7UV0DkcLy3BB3oser+IIu76fw
-	UAPpwZpHYOFRt28UsPPOOy5hLbTjxPPN+qni5rO1E4saU39BzTY39ETbT0vlkQ1wqs5ZIvn0dPv
-	IVJyyCd7vv74Q+x02mMbQy4V8/Ll
-X-Received: by 2002:a17:903:3d0c:b0:2a0:b432:4a6 with SMTP id
- d9443c01a7336-2a951948829mr3889045ad.15.1770320278896; Thu, 05 Feb 2026
- 11:37:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0816B86353
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 20:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770323238; cv=none; b=pXKNPTTkZDPdNJYXYTQ5p+IA9AJaM2APnxjqntFH8ZS1YY+1bhSiU3jj0eg14+eQHlc7DANzSpws//l15k8Hgix4A72pBtk1HVnrxXtcBMXlolfTGDbvE5ZOTCLafLibvBfoWMkakeYHjRpQP1Hd/B/0e8paXdvAKXJffrtzO9I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770323238; c=relaxed/simple;
+	bh=I0IHd4S7QajLDAhLSaWeccoK7pbT2TRd+HbpqIWUqpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nMIL47I+touVZw7T5cRyWBLZUYO/lxe8JDoGVaeGWoImjNL6moBTVas55vfA9Ie6Y3V8vkbw3IoRD4CZ9TEAjjXs27h9jeHiYCoxx0agY+XN4VnZzbCQ3ZxZoRm88U6pev4+Yw5UEDH6ASPaOIM4Odu88zGCwwxkCv0OAjDpyvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A7kMgie1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vmFlqkIkNu6xvUvAqEBq231tObXuQzPEymlXsN9NeUA=; b=A7kMgie1OeBmxHx9znE47EBgVz
+	E6Z1ET2DAGRgWJnDTIDeXAKmrDR9Q5RNUYKb3AIt0X2MqwfJfvpp0wfJwO2sdjKS8h8paQLyx9Bhk
+	y9CTtWgDbWTtiMh0lrZJaFtNJ4JUOyMAgSgIopsnQ/6kE5rtVmpg6iJ1J4Qq4H569JSM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vo5HK-006Hey-3K; Thu, 05 Feb 2026 20:44:38 +0100
+Date: Thu, 5 Feb 2026 20:44:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net-next] net: stmmac: add documentation about clocks
+Message-ID: <0ddd8a12-2c24-4730-9cf3-893ad4db0c6a@lunn.ch>
+References: <E1vo47h-00000007l0I-3rzN@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b3e81a27cc3e4c03fa8357c2c77b238997e48610.1770042461.git.lucien.xin@gmail.com>
- <20260205115506.2195311-1-horms@kernel.org>
-In-Reply-To: <20260205115506.2195311-1-horms@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 5 Feb 2026 14:37:47 -0500
-X-Gm-Features: AZwV_QgKmhAvyahpdZdywI3F6DO1BC_0r2LG19n44OMuBxjTNkYftoQ43Qsj1cY
-Message-ID: <CADvbK_eTE-eRDpUQ0bLcJOTyveEYusBSqGZTYBYuujuABvm6jw@mail.gmail.com>
-Subject: Re: [net-next,v9,05/15] quic: provide quic.h header files for kernel
- and userspace
-To: Simon Horman <horms@kernel.org>
-Cc: steved@redhat.com, marcelo.leitner@gmail.com, aahringo@redhat.com, 
-	alibuda@linux.alibaba.com, jbaron@akamai.com, hare@suse.de, kuba@kernel.org, 
-	tom@talpey.com, linux-cifs@vger.kernel.org, daniel@haxx.se, 
-	quic@lists.linux.dev, jlayton@kernel.org, tfanelli@redhat.com, 
-	dhowells@redhat.com, linkinjeon@kernel.org, hepengtao@xiaomi.com, 
-	pc@manguebit.com, kernel-tls-handshake@lists.linux.dev, 
-	illiliti@protonmail.com, xiyou.wangcong@gmail.com, 
-	andrew.gospodarek@broadcom.com, mail@johnericson.me, edumazet@google.com, 
-	pabeni@redhat.com, matttbe@kernel.org, netdev@vger.kernel.org, 
-	smfrench@gmail.com, metze@samba.org, mbuhl@openbsd.org, 
-	chuck.lever@oracle.com, dreibh@simula.no, davem@davemloft.net, 
-	sd@queasysnail.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1vo47h-00000007l0I-3rzN@rmk-PC.armlinux.org.uk>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257299-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257300-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,linux.alibaba.com,akamai.com,suse.de,kernel.org,talpey.com,vger.kernel.org,haxx.se,lists.linux.dev,xiaomi.com,manguebit.com,protonmail.com,broadcom.com,johnericson.me,google.com,samba.org,openbsd.org,oracle.com,simula.no,davemloft.net,queasysnail.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: E5F8EF6E61
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A33CCF7217
 X-Rspamd-Action: no action
 
-On Thu, Feb 5, 2026 at 6:55=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
+On Thu, Feb 05, 2026 at 06:30:37PM +0000, Russell King (Oracle) wrote:
+> Add documentation covering stmmac_clk, pclk, clk_ptp_ref and clk_tx_i
+> in the hope that this will help understand what each of these clocks
+> are for.
+> 
+> There is confusion around stmmac_clk and pclk which can't be easily
+> resolved today as the Imagination Technologies Pistachio board that
+> pclk was introduced for has no public documentation and is likely now
+> obsolete. So the origins of pclk are lost to the winds of time.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
-> quic: provide quic.h header files for kernel and userspace
->
-> This commit adds quic.h header files in include/uapi/linux and
-> include/linux to provide the necessary definitions for the QUIC
-> socket API.
->
-> > diff --git a/include/uapi/linux/quic.h b/include/uapi/linux/quic.h
-> > --- /dev/null
-> > +++ b/include/uapi/linux/quic.h
->
-> [ ... ]
->
-> > +enum quic_msg_flags {
-> > +     /* flags for stream_flags */
-> > +     MSG_QUIC_STREAM_NEW             =3D MSG_SYN,
-> > +     MSG_QUIC_STREAM_FIN             =3D MSG_FIN,
-> > +     MSG_QUIC_STREAM_UNI             =3D MSG_CONFIRM,
-> > +     MSG_QUIC_STREAM_DONTWAIT        =3D MSG_WAITFORONE,
-> > +     MSG_QUIC_STREAM_SNDBLOCK        =3D MSG_ERRQUEUE,
-> > +
-> > +     /* extented flags for msg_flags */
->
-> This isn't a bug, but there's a typo: "extented" should be "extended".
-Cool, I actually asked my local AI to find all typos but got nothing.
+> 
+> Is this worth documenting, despite the vagueness of stmmac_clk vs pclk?
+> Too verbose? Or not sufficient information? What do people think?
 
-Thanks.
+I think it is worth documenting.
+
+I also wounder how many DT authors will look here, and be able to
+translate the named used here to what snps,dwmac.yaml has:
+
+  clock-names:
+    minItems: 1
+    maxItems: 10
+    additionalItems: true
+    contains:
+      enum:
+        - stmmaceth
+        - pclk
+        - ptp_ref
+
+Maybe it is worth repeating this as comments here?
+
+      Andrew
 
