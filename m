@@ -1,77 +1,73 @@
-Return-Path: <netdev+bounces-256937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-256938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPfpCOoFhGn+wwMAu9opvQ
-	(envelope-from <netdev+bounces-256937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:52:26 +0100
+	id UMQfIQkGhGn+wwMAu9opvQ
+	(envelope-from <netdev+bounces-256938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:52:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907A5EE24A
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:52:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 230BCEE25B
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 03:52:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 00EB83038FC8
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:50:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F0F6C3015481
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 02:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B915A2DFA46;
-	Thu,  5 Feb 2026 02:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D2B2D5922;
+	Thu,  5 Feb 2026 02:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3moVlF6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AHByAGmO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964302DF156;
-	Thu,  5 Feb 2026 02:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED71292B44
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 02:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770259831; cv=none; b=aVdtuY0rk24JEfBHtDOQVgHhFFnyyd2xfkZiMWILXHLBRDb0KiW+lcTesy4eoe4G8CTOms9ljYO5ejoPaMbPuRbh0lWrxGGZZfOU42tNqqEAN58vvGycWFf4oaCFrO/0a6k1NxoHkkdJlS1H7AahX8I02OdElD30idldyO36nb4=
+	t=1770259941; cv=none; b=XRHR5ot6oZabJ4VpzifYW16LGLDWVW/Fw7VRVHbqYHMpXXRBaot+krb9M9gvSLcvwZ036I7TjDawi5kDNuh+3PYRmdQtl5XNW7Ow9GevlJZzW70IxrrrOKUlTZzVbSPc7rup5LNIc3Wdwwa7BQed38vqujzecm56j7eXjIZGTek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770259831; c=relaxed/simple;
-	bh=Yr5O/kTN7gs+BF4zJ7kYPtZFJe+JJH/94kDKNeOwhR0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B2oZtLmfT6fiMXLxB1Dh4PMarC8tT2QOGWqEcTIqBjtav6Qm17zs8+z7qb0sP51YtMY3rDTNkukT+UqZS1qO7UfRxkZp4zik5Aw/fHJgXi2VtZuU++M4Em93R+GTWf8P6vKu5zoejZCYCl/j1EXbKmdgPLHpQuiawBjU04Lfsw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3moVlF6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458D2C19422;
-	Thu,  5 Feb 2026 02:50:31 +0000 (UTC)
+	s=arc-20240116; t=1770259941; c=relaxed/simple;
+	bh=xBksNd+11EkDc/wBpvcDrPzbR2fvjDgIQxoGo/vEOcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WZsuMMgbwUoHRpOB90aZFybfq4nOPbNzkbqrZgP6ATVZbwewo8jyOleg7MaF2CRQp34nFgfc/+n2J7hXzggznxzAnqx0wE6EcXmdrhh6HYTGxlps5XqxyFdd0Z5QGJNKsX6XL5K7SZ8fXf172KXts5lWy2ambReO5+YZ4eyGnoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AHByAGmO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07065C4CEF7;
+	Thu,  5 Feb 2026 02:52:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770259831;
-	bh=Yr5O/kTN7gs+BF4zJ7kYPtZFJe+JJH/94kDKNeOwhR0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m3moVlF6reS7dT5sNptnD3SlXATsLW11rfz0nLN/7UtkDxjDFlMFHZrlzIOrNRYD3
-	 8kgnMvaU++R6V9SDM8JM7c6H4l7n7Nr8pyUKBwNS9YlPvqmrlW6e31ef0q5ujP/Itu
-	 1OP6iL+auFO85HpWAtrpJ21YEfK9ZlsYS7DKDVuuAxuS86//G5rjF6suqwzb9kvLMp
-	 +5z6K6eLJKSRXzmLEDFnqYycANL2z1+xr/DwJe6yw2YB3NegV5fkZwhArtNNcUAwUd
-	 S+UO2yLrsxOOb3Bv4RSosCzcNYCuvdCVFdc7oacTfSR7ilEtUhCQRsUl0C7/Kg/K6i
-	 hHmLdUs4axrLQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 852ED3808200;
-	Thu,  5 Feb 2026 02:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1770259941;
+	bh=xBksNd+11EkDc/wBpvcDrPzbR2fvjDgIQxoGo/vEOcU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AHByAGmOGAZAdY8HkcbSp6BTNey9nZiAhPqYIK24UAaajk+nhhk8ycp5qJu54oPhl
+	 EtJ2b5fK0yVmaT2lHk+hFMe+S35bVjdqEUlPjrgEzXY5hk0eO/6eASVEHW2vKmUaq5
+	 9XUL+ge6BZXTSoCCAqJfN2jROecqf+j/Fqw2y2UtvbCRQSsxLBV3ZqplmZC0JtLDgJ
+	 ct6EOUi5LdNJAM610AKhjUX4DKvuo5xChfSxENadW2S1fspGHPqfDtSjf0wxc3MV9S
+	 r3HUvf0nb0ZyAe1JET1z8okmahw46RjbKpxvdzS6ESYnHcrErucOWR10a6il5qKabB
+	 SZc3YdVqF9c+g==
+Date: Wed, 4 Feb 2026 18:52:20 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rishikesh Jethwani <rjethwani@purestorage.com>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
+ sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, leon@kernel.org
+Subject: Re: [PATCH v6 4/4] selftests: tls: add two-node hardware offload
+ test
+Message-ID: <20260204185220.0ef1aed9@kernel.org>
+In-Reply-To: <20260203184835.3619101-5-rjethwani@purestorage.com>
+References: <20260203184835.3619101-1-rjethwani@purestorage.com>
+	<20260203184835.3619101-5-rjethwani@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] vmw_vsock: bypass false-positive Wnonnull warning with
- gcc-16
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177025982907.136386.5748786579112411957.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Feb 2026 02:50:29 +0000
-References: <20260203163406.2636463-1-arnd@kernel.org>
-In-Reply-To: <20260203163406.2636463-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com, sgarzare@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com, horms@kernel.org,
- harshavardhana.sa@broadcom.com, bobbyeshleman@meta.com, mst@redhat.com,
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
@@ -79,64 +75,54 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-256937-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-256938-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,queasysnail.net,davemloft.net,redhat.com,google.com,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:email]
-X-Rspamd-Queue-Id: 907A5EE24A
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 230BCEE25B
 X-Rspamd-Action: no action
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  3 Feb 2026 17:34:00 +0100 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Tue,  3 Feb 2026 11:48:35 -0700 Rishikesh Jethwani wrote:
+> Add tls_hw_offload, a test program for validating TLS hardware offload
+> functionality across two physical nodes. Unlike existing selftests that
+> use loopback or veth pairs, this test requires separate server and
+> client machines to trigger actual NIC hardware offload.
 > 
-> The gcc-16.0.1 snapshot produces a false-positive warning that turns
-> into a build failure with CONFIG_WERROR:
+> Features:
+>   - Server/client mode for two-node testing
+>   - TLS 1.2 and TLS 1.3 support
+>   - AES-GCM-128 and AES-GCM-256 cipher selection
+>   - TLS 1.3 KeyUpdate (rekey) testing with configurable count
+>   - Verification of /proc/net/tls_stat counters
+>   - Echo protocol with data integrity verification
+>   - Configurable buffer sizes (fixed or random)
 > 
-> In file included from arch/x86/include/asm/string.h:6,
->                  from net/vmw_vsock/vmci_transport.c:10:
-> In function 'vmci_transport_packet_init',
->     inlined from '__vmci_transport_send_control_pkt.constprop' at net/vmw_vsock/vmci_transport.c:198:2:
-> arch/x86/include/asm/string_32.h:150:25: error: argument 2 null where non-null expected because argument 3 is nonzero [-Werror=nonnull]
->   150 | #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
->       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-> net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
->   164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
->       |                 ^~~~~~
-> arch/x86/include/asm/string_32.h:150:25: note: in a call to built-in function '__builtin_memcpy'
-> net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
->   164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
->       |                 ^~~~~~
-> 
-> [...]
+> The test validates that TLS connections use hardware offload by checking
+> TlsTxDevice/TlsRxDevice counters, and verifies rekey operations through
+> TlsTxRekeyOk/TlsRxRekeyOk counters. It accepts both hardware and software
+> TLS paths, reporting which was used.
 
-Here is the summary with links:
-  - vmw_vsock: bypass false-positive Wnonnull warning with gcc-16
-    https://git.kernel.org/netdev/net-next/c/e25dbf561e03
+I appreciate the LLM tokens spent on this. Please get this rewritten 
+to use our existing driver test setup instead of creating your own.
+See tools/testing/selftests/drivers/net/README.rst and the existing
+tests under tools/testing/selftests/drivers/net/hw/
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Please switch to posting as RFC until we get a review from Sabrina,
+the merge window is soon, anyways..
 
