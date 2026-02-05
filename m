@@ -1,125 +1,206 @@
-Return-Path: <netdev+bounces-257238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YD+EDom8hGnG4wMAu9opvQ
-	(envelope-from <netdev+bounces-257238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:51:37 +0100
+	id OMO+GMe8hGnG4wMAu9opvQ
+	(envelope-from <netdev+bounces-257239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:52:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 852B9F4C91
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:51:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B09DCF4CBD
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E07E304D95D
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 15:49:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A63A2302BBB9
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 15:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869DA42980A;
-	Thu,  5 Feb 2026 15:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BAC42981B;
+	Thu,  5 Feb 2026 15:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dT8oAQQj"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Z5AQtUex"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B15429801;
-	Thu,  5 Feb 2026 15:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB33429818
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 15:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770306541; cv=none; b=b7KKx0t+kKauIvH5Z4c70QvwanARDSa3nVeHjVVAtapa6S6LTID2qs9FDRtty9uxRym27z0RoWHyuwjzOhRBS09IsWyYlJcEiQexK7zpddsuEiiI8SpYux29H6o7TIZEp10YCuUlG4lT5cWn1oFgAtG28041KituJnLoJ4lZ4/Q=
+	t=1770306593; cv=none; b=U/VI26nYtoGsa1p40KNV74GXT3S0kY0JkTEETeQiZJCqUzpADwXfCtZsoB/fIi/fqamRSeCRAMJl+9nhNMzzPumMKEvTwDkn1XQMprNHIXecP9RgMp0S/ps+tzpC5Fcbj6OJMWEvT4cQoit+2UP+kQY1GLG6rBQd/VZiok8BF3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770306541; c=relaxed/simple;
-	bh=t8Qq7n3GBnTkkcRxUptPvkwYXSftlw+UTn4NgWQJVRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O3I5i7WPZvor1Sn2SbMUOj2MeuK2dPN5oIZ6IaWAgtIk8HdWKpXc6txyvMcHqWrvVizZK8kMPlEqCJ+HqiMj5GDBnt/qemIKPf7VrD3ok1yV3P5IcJJt/b+IJUWuGzFrHNKjQ8rF3Yud1+TFhlVZs51hGt92RgywTVcKI34o4C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dT8oAQQj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 605DDC4CEF7;
-	Thu,  5 Feb 2026 15:49:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770306540;
-	bh=t8Qq7n3GBnTkkcRxUptPvkwYXSftlw+UTn4NgWQJVRI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dT8oAQQjBRumDKEXiaiAXR9ZiL6YWgA9SGoPGAvrz54iDCRk5ChA17Xz4x/0mIMWc
-	 HyW42z/+EOLSUcXT/H66ZKEvz1uiHY8XgxeSC/ls9LQvsC2wQ9w096drncwG+vWKcz
-	 S2W6C7yZQMhuWCE8QgavFGrWQahdmFAuoBjuewpuBmh2t0OjrXY7NT+y4Dmp/O9voo
-	 Y9o1wfhp9UP2rA/+9JuJyXdU1rc3Mu6hIRe1KkV5qNHaixiuyhnK2fmA+IYqlmwj+N
-	 QQSdgERFM7reK8lmF+4bpOkabKoXRUcYtyCfdlzJsWFyeUztpN60iuRLsNLhYnKwl7
-	 YMPeHWtI/VapQ==
-Date: Thu, 5 Feb 2026 07:48:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bo Sun <bo@mboxify.com>
-Cc: pabeni@redhat.com, sgoutham@marvell.com, lcherian@marvell.com,
- gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
- sbhatta@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net 1/1] octeontx2-af: CGX: fix bitmap leaks
-Message-ID: <20260205074859.27392792@kernel.org>
-In-Reply-To: <ba2c3143-0761-4903-ac0e-88ca502b4e50@mboxify.com>
-References: <20251020143112.357819-1-bo@mboxify.com>
-	<20251020143112.357819-2-bo@mboxify.com>
-	<20251022182226.00967149@kernel.org>
-	<ba2c3143-0761-4903-ac0e-88ca502b4e50@mboxify.com>
+	s=arc-20240116; t=1770306593; c=relaxed/simple;
+	bh=6CJQ+M31O8EVOiXo21e+ShRZ0u6bO9nTVmOBgZ2GIio=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZHPuALtoORU/KTvuhdUsE2Los2wLYy8hUPqTvJjLeP2XtSyTUEJTYhyHzScoLY3o1r7Af8vU+mXgTpCcjx8im9IfPUzL7MU95MYhPz5fiuHLokjk7lOwijJp/sG2MHk0cKkj+XqO0vFij8hGniQBye6HmomvOWUNmnAIQ04XH5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Z5AQtUex; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from ms-a2 (182.51.30.125.dy.iij4u.or.jp [125.30.51.182])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 615Fnh3S027695
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 6 Feb 2026 00:49:44 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=mbHqqpvf1EsyENiG3xgpDiZNiWcRfgRHeO49XVCu+yQ=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:To:Subject:Date:Message-ID;
+        s=rs20251215; t=1770306584; v=1;
+        b=Z5AQtUexhixK+Evq42B8d88+dTevYkDrD7m1v+MP4Jt9tmDqwJG0wED8E0kmMWIj
+         PTFFjGjlvaOqrZIBoDWKjILFsh+T+NRwhvfMvFLCt51ewz40oos1n4lyS/qYhvyk
+         tt4dr+XX9nrkwx0J7+eYfifdQoHYp+TcBrK0QeUQ0ktTIiGRG0xkUkoLe2wlyMzS
+         RkiSMcQxQB/B+eaQq6VirsZx55l94TyXXR+gfXOuNfCODP1ARKVCBzzkQuGwupwm
+         hZh3gdCzwnOxbQWlIVG5+LHzsyGWXQNit23NsCmc3y8IDYfuux2mMYEMD4pd62qE
+         /M7J1cWoO6/88HrM5TNonw==
+From: Kohei Enju <kohei@enjuk.jp>
+To: vitaly.lifshits@intel.com
+Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net,
+        edumazet@google.com, intel-wired-lan@lists.osuosl.org,
+        kohei.enju@gmail.com, kohei@enjuk.jp, kuba@kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH v1 iwl-net] igc: fix null pointer dereference in
+Date: Thu,  5 Feb 2026 15:49:43 +0000
+Message-ID: <20260205154943.20985-1-kohei@enjuk.jp>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <3b481682-5a64-412e-a085-8d3c6323dd4e@intel.com>
+References: <3b481682-5a64-412e-a085-8d3c6323dd4e@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	BROKEN_CONTENT_TYPE(1.50)[];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257238-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,intel.com,davemloft.net,google.com,lists.osuosl.org,gmail.com,enjuk.jp,kernel.org,vger.kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-257239-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TO_DN_NONE(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 852B9F4C91
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:mid,enjuk.jp:dkim]
+X-Rspamd-Queue-Id: B09DCF4CBD
 X-Rspamd-Action: no action
 
-On Thu, 5 Feb 2026 21:35:29 +0800 Bo Sun wrote:
-> >> Fixes: e740003874ed ("octeontx2-af: Flow control resource management")
-> >> Cc: stable@vger.kernel.org
-> >> Signed-off-by: Bo Sun <bo@mboxify.com>  
-> > 
-> > Looks like rvu_free_bitmap() exists. We should probably use it?  
-> 
-> Apologies for the late reply.
-> You're right that rvu_free_bitmap() exists. I stayed with direct kfree()
-> for consistency with the existing code in cgx_lmac_exit(), because which
-> already uses kfree(lmac->mac_to_index_bmap.bmap).
-> 
-> That said, I'm OK with either way:
-> 1. Keep kfree() to match the existing pattern in this function
-> 2. Switch all three bitmap frees (including mac_to_index_bmap) to use
-> rvu_free_bitmap() for consistency with the alloc/free API pairing
-> 
-> What's your preference?
+On Thu, 5 Feb 2026 12:16:06 +0200, "Lifshits, Vitaly" wrote:
 
-3. do what I implied, just use rvu_free_bitmap() in this single case
-for the fix. Follow up separately with a patch to remaining sites if
-any to convert from kfree() to rvu_free_bitmap(). We want the fix
-itself to be small, the cleanup should be separate.
+> >> Hi Kohei,
+> >>
+> >> Thank you for your patch.
+> >>
+> >> Since there are no NVM-less devices I suggest removing the flash-less
+> >> code entirely from the init flow.
+> > 
+> > Oh, I see there're no NVM-less devices. Then removing sounds good to me.
+> > 
+> > Could you clarify what you mean by "init flow"? Do you mean removing
+> > only the flash-less branch in igc_init_nvm_params_i225(), or removing
+> > all flash-less related code including igc_get_flash_presence_i225() and
+> > its callers?
+> > 
+> > After clarification, I'd love to work on it. Thank you for taking a
+> > look!
+> 
+> No, you shouldn’t remove this function.
+> 
+> However, if for any reason the flash is not present, the driver should 
+> fail initialization.
+
+I see. I understand we should fail igc_probe() for NVM-less devices.
+
+> 
+> There are two related places that need to be updated to enforce this:
+> 
+> igc_probe() in igc_main.c
+> igc_init_nvm_params_i225() in igc_i225.c
+> 
+> This way we avoid supporting a configuration that doesn’t exist, and we 
+> prevent the driver from partially initializing in an invalid state.
+
+As far as I've skimmed the code, the only call trace is:
+
+igc_probe()
+  ei->get_invariants() (always igc_get_invariants_base())
+    igc_init_nvm_params_i225()
+
+so modifying igc_init_nvm_params_i225() is sufficient and IIUC we don't
+have to modify igc_probe().
+
+igc_init_nvm_params_i225() returns -EIO when there is no NVM, and its
+caller igc_get_invariants_base() propagates the error back to
+igc_probe().
+Note that igc_get_invariants_base() currently ignores the return value
+of igc_init_nvm_params_i225(), so I added that check as well.
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
+index 1613b562d17c..e4200279e15f 100644
+--- a/drivers/net/ethernet/intel/igc/igc_base.c
++++ b/drivers/net/ethernet/intel/igc/igc_base.c
+@@ -235,6 +235,9 @@ static s32 igc_get_invariants_base(struct igc_hw *hw)
+                break;
+        }
+
++       if (ret_val)
++               goto out;
++
+        /* setup PHY parameters */
+        ret_val = igc_init_phy_params_base(hw);
+        if (ret_val)
+diff --git a/drivers/net/ethernet/intel/igc/igc_i225.c b/drivers/net/ethernet/intel/igc/igc_i225.c
+index 5226d10cc95b..ee1a8eeed9d5 100644
+--- a/drivers/net/ethernet/intel/igc/igc_i225.c
++++ b/drivers/net/ethernet/intel/igc/igc_i225.c
+@@ -476,21 +476,17 @@ s32 igc_init_nvm_params_i225(struct igc_hw *hw)
+ {
+        struct igc_nvm_info *nvm = &hw->nvm;
+
++       /* fail initialization for NVM-less devices */
++       if (!igc_get_flash_presence_i225(hw))
++               return -EIO;
++
+        nvm->ops.acquire = igc_acquire_nvm_i225;
+        nvm->ops.release = igc_release_nvm_i225;
++       nvm->ops.read = igc_read_nvm_srrd_i225;
++       nvm->ops.write = igc_write_nvm_srwr_i225;
++       nvm->ops.validate = igc_validate_nvm_checksum_i225;
++       nvm->ops.update = igc_update_nvm_checksum_i225;
+
+-       /* NVM Function Pointers */
+-       if (igc_get_flash_presence_i225(hw)) {
+-               nvm->ops.read = igc_read_nvm_srrd_i225;
+-               nvm->ops.write = igc_write_nvm_srwr_i225;
+-               nvm->ops.validate = igc_validate_nvm_checksum_i225;
+-               nvm->ops.update = igc_update_nvm_checksum_i225;
+-       } else {
+-               nvm->ops.read = igc_read_nvm_eerd;
+-               nvm->ops.write = NULL;
+-               nvm->ops.validate = NULL;
+-               nvm->ops.update = NULL;
+-       }
+        return 0;
+ }
+
+Does this diff make sense to you?
 
