@@ -1,404 +1,239 @@
-Return-Path: <netdev+bounces-257041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DBHJ3xShGkx2gMAu9opvQ
-	(envelope-from <netdev+bounces-257041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:19:08 +0100
+	id UOh5ETVThGkx2gMAu9opvQ
+	(envelope-from <netdev+bounces-257042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:22:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18F7EFCEA
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:19:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED38AEFD3D
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 09:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 291A1302592E
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:18:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE4603013014
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 08:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077CC35CB76;
-	Thu,  5 Feb 2026 08:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE0936212B;
+	Thu,  5 Feb 2026 08:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b="TKB834v+"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="IUohQ3tT";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="MSvfKGnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2.anonaddy.me (mail2.anonaddy.me [185.70.196.149])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C75B35C182
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.196.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3AB361DCE
+	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770279505; cv=none; b=SRSHFDR1iYGeOFzodpf3bp7r6l4hVw3/G8qKIJ1chzxkvAI4dZPS0xELc1+XNDpcChjh2npkAw32jKfRiETDk5w8AkDGI8G+pZt2iI7/DtXQSRwU31m027q2EbNKUqxAYPNCcqwX75sNXz7WwTTzUQZaD7F9PyhJXjpM48O6s7I=
+	t=1770279721; cv=none; b=NL16td2/cgs/3AT47trSQdzm8hzmfXBzGYy/aDqMqyFvxEVPyHLF1oN+YJEBQqrZ2ifYc8VDdaI8Mp69GUgNZGWla8DnR5ZMWRMX8ZqaFio4McLXeLb8I3MH9bKrRfuVZkSv1qrKDwSPvcLy78T42yRBrmdo7xDVmnB4dNPS7tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770279505; c=relaxed/simple;
-	bh=voxuiANRapyhEKlWRapxmS3AbzE9OhdbsL3mO57YfYc=;
-	h=From:To:Subject:Message-ID:MIME-Version:Date:Content-Type; b=NjhVz7gJL1vJZ2BQQ8EEBg0mDb1tihSlBNjdTE1WqRCE0fjGaxQoppNemXFJZnBElaauwZnGcist9oFRfoweBa2nhqmWv8Bp1dL1HdzgpqRppn8/MOmnBJcUxa5qDsf2LoBYrT1IowVQ2cK5mbhY5KrwPuCtrGkKqseR6I7cunQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me; spf=pass smtp.mailfrom=anonaddy.me; dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b=TKB834v+; arc=none smtp.client-ip=185.70.196.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anonaddy.me
-Received: from mail2.anonaddy.me (mail2.anonaddy.me [127.0.0.1])
-	by mail2.anonaddy.me (Postfix) with ESMTPS id A8FF91001F1
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 08:18:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anonaddy.me; s=default2;
-	t=1770279503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=voxuiANRapyhEKlWRapxmS3AbzE9OhdbsL3mO57YfYc=;
-	b=TKB834v+vCfdIoQw8nWiAqMSBduLxN1BY/0GS2XkHj+15zKWcs9RVg4AoGoVnqMeJ8bUIO
-	OrXe4dWLHwFuZEGpY/wEbXo+mfspjadRtWmZPaftlwC9QSFO45Se0q5owgWDqa69mo7Mnk
-	YY5P65G6j2n5mSIUq85C0RB+IM3fxShP7BOAb31EIrkWjUznXKMHIApLCM/aGcFHHqj6LE
-	9ed4zgSCpiNl6y2onYak2pnuUKby6GJmOqilPCl4vCKPepx4hDZOc35OQvtzZCokoo2tYy
-	bI5NxYhe6dUqONu7d/XZ57wMMYEF50RIKCaUsA8IRJ/7rtFF7w0N2JADkMLhSw==
-From: agpn1b92@anonaddy.me
-To: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- sgarzare@redhat.com
-Subject: [BUG] vsock: poll() not waking on data arrival, causing
- multi-second SSH delays
-Feedback-ID: S:d17f588e-5717-4190-ab1e-7db474f4dce6:anonaddy
-Message-ID: <69215650a498621d099254e359e0b464@anonaddy.me>
-X-Complaints-To: abuse@help.addy.io
-X-Report-Abuse: abuse@help.addy.io
-X-Report-Abuse-To: abuse@help.addy.io
+	s=arc-20240116; t=1770279721; c=relaxed/simple;
+	bh=jiW3ZXnEOZX76PllSYO8HYRBw83unl7LOEgietEhHhA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=F9zXa4Ndnq8jV5scCincKKFT3ENlmEXpxOPaHmMSZmCRwAagG7+0O4lLRyshy7K+LLkMgEUJJokcVLRizVw0+NfmdQg8BbJTQuUjlz0siGiwUu+Kq0hJU3/8rOjlCZ7abwLT/qkryIXClp/mlV9zJC7ybCoFMYkVHYzTDyljR6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=IUohQ3tT; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=MSvfKGnO; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6157nLMi2946144
+	for <netdev@vger.kernel.org>; Thu, 5 Feb 2026 08:22:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=y9i4TwIvWEN8PiR9U1wcY1
+	KcMyRCSyGRU8II9XqOB7U=; b=IUohQ3tT/WPmwGy2mHsGCxvfHFBO8M0cSGetZ6
+	4WkMPvr99rYnkDz8WxIf2if4ts4phyMgGuimDxhaN0rqOcdkZ417ebQL6ZhpdI2Z
+	VLoxGrtfNSyKoCQhWUGc3orPMESmuMS42lGhhDxyH3yYPKw8ZifrMVNf3fR0DRlf
+	DNEOEXanyVjuFMY4v1XIuzjKycBH/VU7VxCWWVA51nvtb2OOg86bNpyf8y+VAD2a
+	mD9UIW02JflKpOTGr2sLDshb1iM4rRTvHZfkJQ3lHdWvZBRNIZ/Tp5YuDZ4ydg9B
+	ddWFknO155mK0m2EU79g+eEnd5vdFeVCgAGBpwRHL2zhAqgg==
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c4q55r3ds-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 08:22:00 +0000 (GMT)
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-81ed3e6b917so641059b3a.1
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 00:22:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1770279719; x=1770884519; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y9i4TwIvWEN8PiR9U1wcY1KcMyRCSyGRU8II9XqOB7U=;
+        b=MSvfKGnO8R2T4tI48Oj5rDMQYSZwtoy6EddpixK803FzA87hidRBQbCcxmIdqWS/eW
+         PHBJSrqrOATzIU5uZyz9g0MJrveAbJoltLYejbDLjSSDwLngnxgRAAAu7YrPT5QGVaVU
+         Qyg+IquHzpqy9i7VbCKnKrMUuPGhE/NRY5/ifstEx3t4Dz0+H8gHODFkoeC3dHyYCXFj
+         NdWGtYRW29Pc3Rui8M8RDJPAikNOjZEhBhehZnV6x9cV1CBOAdg7GDshWwcIWgcfbxYy
+         LZWo/xveV2z+77t1JQ0FMrE2leNnRjWxRyZMoP7O6DfY5+b7A0Z0iT7I5d/vBGoW8PcS
+         xqMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770279719; x=1770884519;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y9i4TwIvWEN8PiR9U1wcY1KcMyRCSyGRU8II9XqOB7U=;
+        b=CXJrUY9oTgm9g3mKL7i5xsXRUoxSAiNWR2zIp1NsH3TsHIS6wc/3ayeF4bTszv/LRy
+         2w/4MPCQoX8NK5YHkIi4OsO5LFbF7XNJ+3yrzXtnp1pofP7Xsr0p81jJ4H7vVJimeVzU
+         8+aMmwuNgJLLWP2SfPreRY2/xp2f9H81lAXCv1LY7kTRxRgihsrMOTJvdGg0UaIBv0je
+         z9Yi87eqw3dC4Arp0QYifsOpyg2RY0MCS8HrPWEoUq11jSf545FE+Dd8tdCk/s+VMeTY
+         WIYOpVbsjH9sMCbsPCoBBuZAY2tXrv7AZ9POKCqLe+5GH7OzXNOVpKAMJoTXYFaBjiaQ
+         rxtg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBap1kz2LLsphnkcd1QwxnfB8+Cyx/DCnUlCARtx70YTcMZaIg91Yy2zCcWlUnB7bwnf5v8ds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHvwMRfuKHG36qfuibMTVmtTvXyMKrLjdJmC/sLeh325XTew2E
+	0AytyIWQh2zfcG/U2IpVZM4ypsrcNv4JmcIm3mEKejPF96Fjwu3MM/T80rENefI2SASkWYqMumR
+	Er3c2sBUE47QTA/K6AMwN4cZOGGiSL8fBoTssP04Cfh21lbkijZGMy8d+V2s=
+X-Gm-Gg: AZuq6aKNgoUon2WSifPsWGKtZXObmnhwO+ud5DdrOo0PSgYpXMN0GLAfvQKYFW4xWux
+	SJzuVqYiQf29fA9MTRIpx/ckxSNosEXZwvCEDc9RIMrtm/25jTz1ztbCavJTh8xueufJDzckRbu
+	j6ls++XnPO4CLGncOIBtWtjn4f9ImjqKaMtjU9kfckOFFUQaOmPA/JSQ06gS07legOw63vHNopB
+	xLUYac4I6EH26nstgb1uLR8D2pUFBhhdL4nHST92s31+LTlFOXw57i/2cj3Q0sGe9BSfDIRb5jt
+	AgBSg+CHH8IG0SV5JPx+VDOFvYBinaKBR+H2DtKcN/MipypgWdNIcbQlpRAXqkLfUSbLlWHah87
+	yNPboXJ//0OChJiETeHAzzXpvY12vZNpgVyMWI8CR66EE5A==
+X-Received: by 2002:a05:6a00:66c4:b0:824:374a:1425 with SMTP id d2e1a72fcca58-824374a1791mr406231b3a.53.1770279719519;
+        Thu, 05 Feb 2026 00:21:59 -0800 (PST)
+X-Received: by 2002:a05:6a00:66c4:b0:824:374a:1425 with SMTP id d2e1a72fcca58-824374a1791mr406207b3a.53.1770279719018;
+        Thu, 05 Feb 2026 00:21:59 -0800 (PST)
+Received: from hu-vishsant-hyd.qualcomm.com ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8241d49e0e4sm5251224b3a.61.2026.02.05.00.21.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 00:21:58 -0800 (PST)
+From: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+Date: Thu, 05 Feb 2026 13:51:31 +0530
+Subject: [PATCH] net: qrtr: Expand control port access to root
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 05 Feb 2026 08:18:23 +0000
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260205-qrtr-control-port-access-permission-v1-1-e900039e92d5@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAApThGkC/x2NQQqDMBAAvyJ77kIMKqZfKT3EdNUFTdLdIAXx7
+ 017nMPMnKAkTAr35gShg5VTrNDeGgirjwshvyqDNXYw1vT4liIYUiySNsxJCvoQSBUzyc7683G
+ aybfOuc73I9RSFpr58788ntf1Beq1Umd1AAAA
+X-Change-ID: 20260205-qrtr-control-port-access-permission-bfea19994a58
+To: Manivannan Sadhasivam <mani@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bjorn.andersson@oss.qualcomm.com,
+        chris.lew@oss.qualcomm.com,
+        Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>,
+        Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1770279714; l=2228;
+ i=vishnu.santhosh@oss.qualcomm.com; s=20251203; h=from:subject:message-id;
+ bh=jiW3ZXnEOZX76PllSYO8HYRBw83unl7LOEgietEhHhA=;
+ b=5BVvID3XLuTRLyEgXb+XszDuvwbNTM3oC1gXx8dhkJlTlJm0kwqDY/ibd4sRk7S3g+Kw96bV+
+ EdvKsYi+vGiCdiz8t/S/2rbbW2R5XvSv1cbc1J6thwJRqb5OPgN9Jwv
+X-Developer-Key: i=vishnu.santhosh@oss.qualcomm.com; a=ed25519;
+ pk=G8/AJPecB1feGI7wxArGWGN0PPGQS0GUaD4THQCbdis=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA1MDA1OSBTYWx0ZWRfX3gVSYVYNp5no
+ xSlv09ztZNm7rba32e9Uwug+NBCB3cJxWKwMJIpU9RKQjE9+8/dkydnqK6wL9A4yZ4fEQ4ji5Kq
+ OEKwEXKX1RPmbu47jTYpyh28x4ynKbXMlXbNiFvJh083KqsdW9tEY26V0qwI8GB50XrXau+ibo9
+ Y+qxTEyfjjP9zVUeQJd9kV/aq1M0+Hz90q7SkDT0IK6i0GNYuy/PiWcbLMRgE1bSq8V7gh/z+Kp
+ fwOUTD5fHoWspurqHqhuy8laHJv3XvEXKl+21uBEMDhqPVWmWPCej1+lpuq3lzE6kaQUL+dyY/L
+ gARbsQ769eue73umRoOVYvcC9F/Ji9CAueZbFOUoyTvNhwPXShlYNMLYYCHiKzJieDZGPTuCokG
+ QlIMlutztMg3Y49m92LcIk4mZko+ygl0l+ibF+8W9Zi965qVO5YDmsJh7doMaU/gTKl4RYSrp5D
+ d+sC0kMcuNyiws+Rn7g==
+X-Proofpoint-ORIG-GUID: 0TqKFHDWWaOpAruupRwklK4CIk2t5BUB
+X-Proofpoint-GUID: 0TqKFHDWWaOpAruupRwklK4CIk2t5BUB
+X-Authority-Analysis: v=2.4 cv=Z6zh3XRA c=1 sm=1 tr=0 ts=69845328 cx=c_pps
+ a=m5Vt/hrsBiPMCU0y4gIsQw==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=1Fy8072LN9Nq9XkES_AA:9
+ a=QEXdDO2ut3YA:10 a=IoOABgeZipijB_acs4fv:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-05_01,2026-02-05_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0 clxscore=1011 priorityscore=1501 malwarescore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602050059
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[anonaddy.me,reject];
-	R_DKIM_ALLOW(-0.20)[anonaddy.me:s=default2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[anonaddy.me:+];
-	FROM_NEQ_ENVFROM(0.00)[agpn1b92@anonaddy.me,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-257041-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-257042-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,qualcomm.com:email,qualcomm.com:dkim];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vishnu.santhosh@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[anonaddy.me:mid,anonaddy.me:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vsock:email]
-X-Rspamd-Queue-Id: F18F7EFCEA
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: ED38AEFD3D
 X-Rspamd-Action: no action
 
-Hi,
+When qrtr is loaded as module, qrtr-ns runs from SELinux kmod_t
+domain. On targets using upstream SELinux policies, this domain
+does not receive CAP_NET_ADMIN, which prevents it from binding
+control port even though qrtr-ns is a trusted system component.
 
-I'm experiencing a bug where SSH sessions over vsock take 2-20+ se=
-conds
-to establish due to poll() not signaling POLLIN when data is availa=
-ble.
-The bug does NOT occur on the first connection after VM boot, but af=
-fects
-all subsequent connections.
+Granting kmod_t the CAP_NET_ADMIN capability in policy is possible,
+but not desirable, as kmod_t is not expected to perform networking
+operations and widening its capability set is discouraged.
 
-* Summary
+To address this in a contained way within qrtr, extend the control
+port permission check to allow binding when either:
 
-- vsock poll() fail=
-s to return POLLIN when data is in the receive buffer
-- sshd-session's pp=
-oll() times out every ~20ms instead of waking on data
-- First SSH connect=
-ion after guest boot works instantly
-- All subsequent connections experie=
-nce 2-20+ second delays
-- Non-PTY commands (ssh -T ... 'echo test') work =
-instantly
-- TCP connections to the same VM work instantly
+  - the process has CAP_NET_ADMIN, or
+  - the process belongs to GLOBAL_ROOT_GID (root-equivalent tasks)
 
-* Environm=
-ent
+This permits qrtr-ns to successfully bind its control port in
+kmod_t restricted environments without broadening SELinux capability
+assignments.
 
-Host:
-- OS: Arch Linux
-- Kernel: 6.18.2-arch2-1
-- QEMU: syst=
-em package (latest)
+Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+---
+ net/qrtr/af_qrtr.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Guest:
-- OS: Debian trixie
-- Kernel: 6.17.13+d=
-eb13-amd64 (also tested on 6.12.57, same issue)
-- OpenSSH: 10.0p2
-
-QE=
-MU command (relevant parts):
- =C2=A0 qemu-system-x86_64 -enable-kvm -smp =
-8 \
- =C2=A0 =C2=A0 -object memory-backend-memfd,id=3Dmem,size=3D20G,share=
-=3Don \
- =C2=A0 =C2=A0 -machine memory-backend=3Dmem \
- =C2=A0 =C2=
-=A0 -device vhost-vsock-pci,guest-cid=3D5 \
- =C2=A0 =C2=A0 ...
-
-Conne=
-ction method: ssh user@vsock/5 (via systemd-ssh-proxy)
-
-* Symptoms
-=
-
-Interactive SSH (PTY) - SLOW:
- =C2=A0 $ time ssh user@vsock/5
- =
-=C2=A0 # Takes 2-20+ seconds before shell prompt appears
-
-Non-interacti=
-ve SSH - FAST:
- =C2=A0 $ time ssh user@vsock/5 'echo test'
- =C2=A0 test=
-
- =C2=A0 real=C2=A0 =C2=A0 0m0.156s
-
-TCP to same VM - FAST:
- =C2=
-=A0 $ time ssh -p 33594 user@127.0.0.1
- =C2=A0 # Instant
-
-* Key obser=
-vation: First connection after boot is fast
-
-After guest reboot:
- =
-=C2=A0 $ ssh user@vsock/5=C2=A0 =C2=A0 =C2=A0 # INSTANT (< 1 second)
- =
-=C2=A0 $ exit
- =C2=A0 $ ssh user@vsock/5=C2=A0 =C2=A0 =C2=A0 # SLOW (2-20=
- seconds)
- =C2=A0 $ ssh user@vsock/5=C2=A0 =C2=A0 =C2=A0 # SLOW
- =C2=
-=A0 ...
-
-This suggests the bug involves state that accumulates or isn't=
- properly
-cleaned up between connections.
-
-** bpftrace evidence
-
-=
-Using syscall tracepoints on guest during slow connection:
-
- =C2=A0 =3D=
-=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D
- =C2=A0 [=C2=A0 =C2=A029 ms] ss=
-hd-session: ppoll() duration=3D19 ms ret=3D1
- =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIMEOUT pattern detected!
- =C2=A0 [=
-=C2=A0 =C2=A050 ms] sshd-session: ppoll() duration=3D20 ms ret=3D1
- =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIMEOUT pattern de=
-tected!
- =C2=A0 [=C2=A0 =C2=A070 ms] sshd-session: ppoll() duration=3D18 =
-ms ret=3D1
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIME=
-OUT pattern detected!
- =C2=A0 ... (continues for ~2 seconds) ...
-
- =
-=C2=A0 [ 5000 ms] --- 5s stats: ppoll=3D455, timeouts=3D103, recv=3D0 (0 by=
-tes) ---
-
- =C2=A0 [19432 ms] sshd: recvmsg() =3D 308 bytes [4 =C2=B5s]=
-
- =C2=A0 [19442 ms] sshd-session: recvmsg() =3D 308 bytes [4 =C2=B5s]
-=
-
-Pattern analysis:
-- ppoll() returns ret=3D1 (1 fd ready) but takes exa=
-ctly ~20ms (timeout)
-- The ready fd is the PTY, NOT the vsock socket
-- =
-recv=3D0 during the timeout phase: vsock data not being read
-- recvmsg() =
-finally succeeds after ~19 seconds
-- When recvmsg() runs, it completes in=
- 4 microseconds (data WAS there)
-
-This proves: data is sitting in the v=
-sock receive buffer, but poll()
-is not returning POLLIN, so sshd doesn't =
-know to read it.
-
-* 30-second summary from bpftrace
-
- =C2=A0 Total =
-ppoll calls: 488
- =C2=A0 Timeouts (20ms pattern): 103
- =C2=A0 Successfu=
-l recvmsg: 6 (984 bytes)
- =C2=A0 Timeout rate: 21%
-
-* Why PTY-specifi=
-c?
-
-PTY sessions require bidirectional traffic:
-1. Server sends shell=
- prompt =E2=86=92 client must receive it
-2. Client sends keypress =
-=E2=86=92 server must receive it
-3. Server sends echo =E2=86=92 client mu=
-st receive it
-
-Each exchange relies on poll() waking on POLLIN. The bug=
- causes poll()
-to miss the wakeup, forcing sshd to wait for its 20ms time=
-out fallback.
-
-Non-PTY commands do request-response-exit quickly before=
- the bug
-manifests significantly.
-
-## Additional context
-
-I previ=
-ously encountered the identical issue on WSL2's Hyper-V vsock
-implementat=
-ion, suggesting this may be a fundamental issue with how
-vsock transports=
- handle poll/wakeup semantics, not specific to virtio.
-
-## Hypothesis=
-
-
-Based on the evidence, this appears to be a lost wakeup race conditio=
-n:
-1. Host sends packet to guest
-2. Packet is enqueued to socket's rx_q=
-ueue
-3. sk_data_ready() is called but poll waiters aren't properly woken=
-
-4. vsock_poll() returns 0 (no POLLIN) despite data being available
-5. =
-ppoll() times out after 20ms, sshd retries
-6. Eventually succeeds through=
- timeout-based retry
-
-The "first connection works" pattern suggests the=
- race involves
-existing state from previous connections - possibly worker=
- threads,
-interrupt handlers, or virtqueue state that isn't properly rese=
-t.
-
-## Reproducer
-
-1. Start QEMU VM with vhost-vsock-pci device
-2=
-. Boot guest, ensure sshd is running
-3. From host: ssh user@vsock/<CID>=
-=C2=A0 # First connection is fast
-4. Exit and reconnect: ssh user@vsock/<=
-CID>=C2=A0 # Now slow
-
-## Request
-
-Could someone familiar with the =
-vsock/virtio poll implementation
-review the wakeup path? Specifically:
-=
-- virtio_transport_recv_pkt() -> sk_data_ready() path
-- vsock_poll() -> p=
-oll_wait() registration timing
-- Any state that persists between connecti=
-ons
-
-Happy to provide additional traces or test patches.
-
-Thanks,=
-
-[Your Name]
+diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+index dab839f61ee93b876021d904ae6b8dca8ed43745..b0e252c16f156c05973988fbdf317a149ad9840d 100644
+--- a/net/qrtr/af_qrtr.c
++++ b/net/qrtr/af_qrtr.c
+@@ -8,6 +8,7 @@
+ #include <linux/qrtr.h>
+ #include <linux/termios.h>	/* For TIOCINQ/OUTQ */
+ #include <linux/spinlock.h>
++#include <linux/uidgid.h>
+ #include <linux/wait.h>
+ 
+ #include <net/sock.h>
+@@ -738,7 +739,8 @@ static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
+ 	if (!*port) {
+ 		rc = xa_alloc(&qrtr_ports, port, ipc, QRTR_EPH_PORT_RANGE,
+ 				GFP_KERNEL);
+-	} else if (*port < QRTR_MIN_EPH_SOCKET && !capable(CAP_NET_ADMIN)) {
++	} else if (*port < QRTR_MIN_EPH_SOCKET && !(capable(CAP_NET_ADMIN) ||
++						   in_egroup_p(GLOBAL_ROOT_GID))) {
+ 		rc = -EACCES;
+ 	} else if (*port == QRTR_PORT_CTRL) {
+ 		rc = xa_insert(&qrtr_ports, 0, ipc, GFP_KERNEL);
 
 ---
-bpftrace script used (runs on guest):
+base-commit: f14faaf3a1fb3b9e4cf2e56269711fb85fba9458
+change-id: 20260205-qrtr-control-port-access-permission-bfea19994a58
 
-#!/usr=
-/bin/env bpftrace
-BEGIN {
- =C2=A0 =C2=A0 @start =3D nsecs;
- =C2=A0 =
-=C2=A0 printf("=3D=3D=3D MINIMAL VSOCK DIAGNOSTIC =3D=3D=3D\n");
-}
-trac=
-epoint:syscalls:sys_enter_ppoll {
- =C2=A0 =C2=A0 if (comm =3D=3D "sshd-se=
-ssion" || comm =3D=3D "sshd") {
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 @ppoll_enter=
-[tid] =3D nsecs;
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 @ppoll_count++;
- =C2=
-=A0 =C2=A0 }
-}
-tracepoint:syscalls:sys_exit_ppoll {
- =C2=A0 =C2=A0 if=
- (@ppoll_enter[tid]) {
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 $ms =3D (nsecs - @sta=
-rt) / 1000000;
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 $dur =3D (nsecs - @ppoll_ente=
-r[tid]) / 1000000;
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ($dur > 10) {
- =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf("[%5lld ms] %s: ppoll() du=
-ration=3D%lld ms ret=3D%d\n",
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$ms, comm, $dur, args->ret);
- =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ($dur >=3D 18 && $dur <=3D 25) {
- =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf("=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^ 20ms TIMEOUT pattern detected!\n");=
-
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 @timeout_count+=
-+;
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
- =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 }
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 delete(@ppoll_enter[tid]);
- =
-=C2=A0 =C2=A0 }
-}
-tracepoint:syscalls:sys_exit_recvmsg {
- =C2=A0 =
-=C2=A0 if (comm =3D=3D "sshd-session" || comm =3D=3D "sshd") {
- =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 if (args->ret > 0) {
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 $ms =3D (nsecs - @start) / 1000000;
- =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 printf("[%5lld ms] %s: recvmsg() =3D %lld bytes\n"=
-, $ms,=20
-comm, args->ret);
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 @r=
-ecv_count++;
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 @recv_bytes +=3D =
-args->ret;
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
- =C2=A0 =C2=A0 }
-}
-interv=
-al:s:5 {
- =C2=A0 =C2=A0 printf("\n[%5lld ms] --- 5s stats: ppoll=3D%d, ti=
-meouts=3D%d, recv=3D%d=20
-(%d bytes) ---\n\n",
- =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0(nsecs - @start) / 1000000, @ppoll_count, @timeout_coun=
-t,=20
-@recv_count, @recv_bytes);
-}
-
+Best regards,
+-- 
+Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
 
 
