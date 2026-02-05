@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-257255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kEk5Gs3JhGk45QMAu9opvQ
-	(envelope-from <netdev+bounces-257255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:48:13 +0100
+	id OLlHOkjKhGk45QMAu9opvQ
+	(envelope-from <netdev+bounces-257256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:50:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAADAF56E3
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:48:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27B7F5787
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 17:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D7AE4300E254
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 16:48:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8B19B300533A
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 16:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D92423A9D;
-	Thu,  5 Feb 2026 16:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE57438FE7;
+	Thu,  5 Feb 2026 16:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NAqYauyO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoAA+4iI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120B342189D
-	for <netdev@vger.kernel.org>; Thu,  5 Feb 2026 16:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B06355030;
+	Thu,  5 Feb 2026 16:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770310089; cv=none; b=dFY+2fevJZtL66pkiMRoBmdwMcFmWSclDYksr8S7I3WDW/aHz/CaEn0XGs28G4adEFvLHmT0/tgbclKw3DNN48CfguVHxa34zTEBbwfS3k8Qbwg0gqOM/L7cx01mt2kGCE3Vi6y3bIP93rzBhPtG6alQacOiN6I6BDH2PssyWf4=
+	t=1770310209; cv=none; b=UKNkHjI18Ar0Dc9R6rP0oLp/VZAECcQAtuHhjNeL5DcRcW4kOpH1f3OmRGOFSVIqat+arKcOcHTedM3AEiQw7ZV0F15YaQS443tVxKLjjRA8HvEIZ4p+tzrNIweqP+Ltw/CtVT80lJHGM/jly4dC52fMJDdJKg7/+wflBsfzATQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770310089; c=relaxed/simple;
-	bh=9s6rlN72umPfzcvftwhUbiWHkEa7FIIwy3ERv4yK7EU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fgQBb7Kc/pk7Z99nqUEngFHamK7O7azvZXWuw5D9UUmDc0h1K1UIrkjPZEOMlWdTVpu5zdNHj18+X3U5RuYS2qDvFRB1w0C5EtckVdSivdbCIcMTDwjbJsTjdouL8ruRvuEQPAJ1EnS21Pc5CoOUAFM8QPzwPuRrEqAXYYWkAp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NAqYauyO; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <76acd5cc-eb6f-4c56-a5e6-f6413736afbb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770310085;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vSwoma4O2xrgSZMEnOzQ9SyuZba4dI6P6unZjdIT0ZA=;
-	b=NAqYauyOnOdnTPlNxN2yN8J2WrIwnB8RffBEJyunEHPilpcgkGbKlVr6ZuZrNxdvba0nQc
-	EBsIkWkdC0ykONGwon5Q1UPmJ9vh7l5KnKOxjyc1kvoydAGGINbY5kN93lunt/XSJWR2P7
-	atytxicDFNqOPgQM1rBcSU7eFs3zqxc=
-Date: Thu, 5 Feb 2026 16:48:01 +0000
+	s=arc-20240116; t=1770310209; c=relaxed/simple;
+	bh=+lqJkPRlZVrNbFLDywMJUxiG2RrzMjYqH0TlN3zmDHU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YtKh1iU4sLJxbuqB1WXcXtylYbP4ewNMVqRUVb+yIzBidXCO8Fhum+ypMZ3RASs8w4hjHdp6atVu7UgpwGm4HOiRcCHK3Eg26ddEsPxFgiVRA8mhmQGgyFeG3P1Qh/8QuuqN63clBAU/gdniRMJLJ4TiuUomcTnodLa2mu9uo28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoAA+4iI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82B8EC4CEF7;
+	Thu,  5 Feb 2026 16:50:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770310208;
+	bh=+lqJkPRlZVrNbFLDywMJUxiG2RrzMjYqH0TlN3zmDHU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YoAA+4iIeEDMstoKQVsLQwwdo3c5ef9EAxj1i6TL2tLEWSlwsbvMhhhfz4VYkZT4B
+	 dSS+e1EeXMOsD19zQig67MQAbvKPVluk1Ab+quU6lZJ2NlZpUI42X3tFL2JJOWddYs
+	 rPbyo3UClPJbiY69Cg7zFiZU0PwX9MtI3QoITK9or9p8nTVvKzsUN97Opz0Oo7E49j
+	 aoX8OvCadFKLA9E2g6pKVJFVleSPm15Kvg4fdzEw3ZTjiRjFkbKm58xqEXPR7WG+iB
+	 /Y1DZoZJj2wEsKCP3HEMcSFHVvh4figxpdouYxd+dHiDULbjPK/3u2TvVwdLyv5qaA
+	 qoRBdOhmUBjTQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 853253808200;
+	Thu,  5 Feb 2026 16:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
- directly from interrupt for i210
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>
-Cc: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
- Paul Menzel <pmenzel@molgen.mpg.de>,
- "Gomes, Vinicius" <vinicius.gomes@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>
-References: <20260205-igb_irq_ts-v3-1-2efc7bc4b885@linutronix.de>
- <IA3PR11MB898652699383BA265C5747A5E599A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <20260205100347.ssTBDAI_@linutronix.de>
- <IA3PR11MB89865B46DCBEB496BE28703BE599A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <6a0f4cbb-e8b3-4f0e-b7f1-7f9ca5cba97d@linux.dev>
- <20260205145104.iWinkXHv@linutronix.de>
- <66925f09-ef9f-4401-baec-7d4c82a68ce3@linux.dev>
- <20260205164341.pJvni8kA@linutronix.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260205164341.pJvni8kA@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH net 1/1] netfilter: nf_tables: fix inverted genmask check
+ in
+ nft_map_catchall_activate()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177031020633.485120.17507212737106778136.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Feb 2026 16:50:06 +0000
+References: <20260205074450.3187-2-fw@strlen.de>
+In-Reply-To: <20260205074450.3187-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257255-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,linutronix.de,molgen.mpg.de,vger.kernel.org,gmail.com,lunn.ch,lists.osuosl.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257256-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: EAADAF56E3
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,strlen.de:email,nist.gov:email]
+X-Rspamd-Queue-Id: F27B7F5787
 X-Rspamd-Action: no action
 
-On 05/02/2026 16:43, Sebastian Andrzej Siewior wrote:
-> On 2026-02-05 16:27:03 [+0000], Vadim Fedorenko wrote:
->>> So the only thing that bothers me is the read_lock_bh() in
->>> skb_may_tx_timestamp() which deadlocks if the socket is write-locked on
->>> the same CPU.
->>
->> Alright. Now you make me think whether we should enforce OPT_TSONLY
->> option on socket which doesn't have CAP_NET_RAW? Then we can get rid of this
->> check, and in case sysctl was flipped off - drop TX timestamps as
->> it's done now?
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Florian Westphal <fw@strlen.de>:
+
+On Thu,  5 Feb 2026 08:44:50 +0100 you wrote:
+> From: Andrew Fasano <andrew.fasano@nist.gov>
 > 
-> This would "fix" this problem for all users which do deliver the
-> timestamp from their IRQ handler instead of napi. There are a few of
-> those…
-> This would be considered stable material, right? (despite the fact that
-> we have it for quite some time and nobody complained so far).
+> nft_map_catchall_activate() has an inverted element activity check
+> compared to its non-catchall counterpart nft_mapelem_activate() and
+> compared to what is logically required.
+> 
+> nft_map_catchall_activate() is called from the abort path to re-activate
+> catchall map elements that were deactivated during a failed transaction.
+> It should skip elements that are already active (they don't need
+> re-activation) and process elements that are inactive (they need to be
+> restored). Instead, the current code does the opposite: it skips inactive
+> elements and processes active ones.
+> 
+> [...]
 
-cc: Willem as he is the author of the check introduced back in 2015.
+Here is the summary with links:
+  - [net,1/1] netfilter: nf_tables: fix inverted genmask check in nft_map_catchall_activate()
+    https://git.kernel.org/netdev/net/c/f41c5d151078
 
-But it's more like a question to maintainers whether it is acceptable
-way of "fixing" drivers or it's no-go solution
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
