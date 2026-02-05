@@ -1,155 +1,118 @@
-Return-Path: <netdev+bounces-257224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBoPHQ60hGk54wMAu9opvQ
-	(envelope-from <netdev+bounces-257224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:15:26 +0100
+	id gAs0GFa0hGk54wMAu9opvQ
+	(envelope-from <netdev+bounces-257225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:16:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31CBF47E2
-	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:15:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE174F4807
+	for <lists+netdev@lfdr.de>; Thu, 05 Feb 2026 16:16:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75B3830440A6
-	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 15:10:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9193B302E922
+	for <lists+netdev@lfdr.de>; Thu,  5 Feb 2026 15:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E097B41324C;
-	Thu,  5 Feb 2026 15:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC01741C317;
+	Thu,  5 Feb 2026 15:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNsEOqd/"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="e73av8Cl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-4318.protonmail.ch (mail-4318.protonmail.ch [185.70.43.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAEA1ACED5;
-	Thu,  5 Feb 2026 15:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9D03EF0B1;
+	Thu,  5 Feb 2026 15:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770304219; cv=none; b=EMg7NI8Y6Cp54AEtucGvtequBYPtjk8ZLIaL7BJJfqaHZTTz/dHkGjTF2G7Bv8zMy02DmsZ23sRHi03D7HNwzGOnkm5OmnUxw/B0TDKlxdy6xEAGWIWD5G3KEk+1wFg30Gmrh0HJ99wwImkqQgqkNybPexFUSafowiPuedLSdzk=
+	t=1770304240; cv=none; b=NcOJztmvbIwf+GKSJ6iaA2XU/t5/3qRXXv/3CxnR2gI1cj7NgjuAmtsWl5wWcPLeD55SMbCpZ7zD+DxstPaoNT16xIgt0UnqHb4Uaes01FsGmyaVQmse7GY7b46sNEqTppZKB4pFC+ce6Yp5a/6kTq5tS5LC8kMGs6to13ZYwN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770304219; c=relaxed/simple;
-	bh=VeYMHdnKfPv54A8U9mPwiib6zhPfIcEkcUaDZYvk7xQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cvRw2fX6uORWSnykMyAUYYifzBqCSzjj1wCJaJ+Z4mSuD+F4vqyaCFqvsqodvPdTxEI0Fz6cE1cAeCANS4kJQrzq8pURCxmIELs7vEEFqviz4K1HPw2QY4hpInJMro9t46jD2VYBDzj0aiN8ApgSbTCyxZA2orbeyRnvmJc0iLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNsEOqd/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F532C4CEF7;
-	Thu,  5 Feb 2026 15:10:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770304219;
-	bh=VeYMHdnKfPv54A8U9mPwiib6zhPfIcEkcUaDZYvk7xQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bNsEOqd/D0WbPvbvhpNW8Oi8MvEVrx0k7s8eCItOfz3WEHl/YBnrOIyVQoR2TC2fk
-	 JxS1oPlrwZj5YQREz5cDlRbfUvg2sy7HDDEkOYZJkB/Y8swytDxUsBPTrIG8jSpXJo
-	 I5ZsWtKcNgv+whp2eVYoGrTXx5NPB8h3j5KVy99Ud9ZMlKRAKOSlQqxQDw2pEdamYh
-	 5Ol9Ve9ORYMFCjmn5nwo28POQqYswmuP8Bta4LIAGY6UIJVdARqVgDQ/ViIkZv5scD
-	 4GKt+Ng7ubfci9POrdU72wYksAypsZbJMHZmHeFdnr2sOou1Da3MShZqPsvzGnGB5j
-	 5Nq7vqDPmp38A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 486033808200;
-	Thu,  5 Feb 2026 15:10:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1770304240; c=relaxed/simple;
+	bh=+/oooh7MkEq7+wpFfViAxh7pOdpoD2uyi0gMO2YAsJo=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=FS6l89eOVj0rZ/oirDDfXRc8CY0hw2+WsPbKjc/w95/bDv5hJCkXVfua8evtfk/4xBc0XmbVUrfOoC01IALI0tstLWuN6foCAt3FIyWS9UrCT+Ez1A8T2LX5gfL2WWgJizamzn0+RC14cZ/NnAfRPPg/b3u9TmXOhfiCHRLoNJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=e73av8Cl; arc=none smtp.client-ip=185.70.43.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1770304230; x=1770563430;
+	bh=IUi/TmfOR7R158ie7wFHBTdZ1FO3LNQ2s6W4AfG5OYM=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=e73av8ClCmO0qRd/gV+KttCiaMym4uCRynYrv4fE/RLOsQT22qH12+PEc80f+s4hq
+	 q8q+5KEd7vABGdIKuFHM3gt+SXT3KTpnUAbvnipk2YjrohKyySKc2mtp6Yhgp00zk9
+	 TqDD+b5CXDenmRbjoySpavn/WRETBMebCu8SzUXhhPr0EHCV/rZv7kj+86bRDvdFH/
+	 d8epxRSpMm4NzgCEYU5ZhXWR5dFv5LfAF41ZeJizUhM44f6/frRGZ+Z4aVQoAuvUnE
+	 VXyg3TYgZzPdfQdl99d4OlKef64YOW+HVA6Eq/UXAxEc3R1D+PHsV3epgdkjCc/QX8
+	 rnD6oIDDMLapw==
+Date: Thu, 05 Feb 2026 15:10:23 +0000
+To: Victor Nogueira <victor@mojatatu.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+From: Paul Moses <p@1g4.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>
+Subject: [PATCH net v5 0/1] net/sched: act_gate: snapshot parameters with RCU on replace
+Message-ID: <20260205150958.412278-1-p@1g4.org>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 5f8e9bb3f7058715a9a8b10173b59934561778d3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/9] dpll: Core improvements and ice E825-C
- SyncE
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177030421708.447604.18321209785815350003.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Feb 2026 15:10:17 +0000
-References: <20260203174002.705176-1-ivecera@redhat.com>
-In-Reply-To: <20260203174002.705176-1-ivecera@redhat.com>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, aleksander.lobakin@intel.com,
- andrew+netdev@lunn.ch, arkadiusz.kubalewski@intel.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, jiri@resnulli.us,
- jonathan.lemon@gmail.com, leon@kernel.org, mbloch@nvidia.com,
- pabeni@redhat.com, Prathosh.Satish@microchip.com,
- przemyslaw.kitszel@intel.com, richardcochran@gmail.com, saeedm@nvidia.com,
- tariqt@nvidia.com, anthony.l.nguyen@intel.com, vadim.fedorenko@linux.dev,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,resnulli.us,gmail.com,nvidia.com,redhat.com,microchip.com,linux.dev,lists.osuosl.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257225-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-257224-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[mojatatu.com,gmail.com,resnulli.us];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[1g4.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C31CBF47E2
+X-Rspamd-Queue-Id: AE174F4807
 X-Rspamd-Action: no action
 
-Hello:
+This series fixes a schedule lifetime race in `act_gate` between the
+control-plane replace path and the running hrtimer callback (gate_timer_fun=
+c).
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Changes since v4:
+- Drop the gate_clockid_to_offset helper, validate clockid once, and set
+  tk_offset in one place.
+- Seed missing attrs from the old params when entries are replaced
+- Reimplemented the timer cancel from RCU snapshot and cancel before taking=
+ tcf_lock.
+- Reuse a single protected deref under tcf_lock
+- Compare old/new values directly in gate_timer_needs_cancel()
+- Cleanup no longer assumes rtnl_lock
 
-On Tue,  3 Feb 2026 18:39:53 +0100 you wrote:
-> This series introduces Synchronous Ethernet (SyncE) support for the Intel
-> E825-C Ethernet controller. Unlike previous generations where DPLL
-> connections were implicitly assumed, the E825-C architecture relies
-> on the platform firmware (ACPI) to describe the physical connections
-> between the Ethernet controller and external DPLLs (such as the ZL3073x).
-> 
-> To accommodate this, the series extends the DPLL subsystem to support
-> firmware node (fwnode) associations, asynchronous discovery via notifiers,
-> and dynamic pin management. Additionally, a significant refactor of
-> the DPLL reference counting logic is included to ensure robustness and
-> debuggability.
-> 
-> [...]
+Paul Moses (1):
+  net/sched: act_gate: snapshot parameters with RCU on replace
 
-Here is the summary with links:
-  - [net-next,v5,1/9] dpll: Allow associating dpll pin with a firmware node
-    https://git.kernel.org/netdev/net-next/c/d0f4771e2bef
-  - [net-next,v5,2/9] dpll: zl3073x: Associate pin with fwnode handle
-    https://git.kernel.org/netdev/net-next/c/e6dc7727b608
-  - [net-next,v5,3/9] dpll: Add notifier chain for dpll events
-    https://git.kernel.org/netdev/net-next/c/2be467588d6b
-  - [net-next,v5,4/9] dpll: Support dynamic pin index allocation
-    https://git.kernel.org/netdev/net-next/c/711696b3e168
-  - [net-next,v5,5/9] dpll: zl3073x: Add support for mux pin type
-    https://git.kernel.org/netdev/net-next/c/fdad05ed4ec2
-  - [net-next,v5,6/9] dpll: Enhance and consolidate reference counting logic
-    https://git.kernel.org/netdev/net-next/c/729f5e0153bd
-  - [net-next,v5,7/9] dpll: Add reference count tracking support
-    https://git.kernel.org/netdev/net-next/c/3c0da1030c58
-  - [net-next,v5,8/9] drivers: Add support for DPLL reference count tracking
-    https://git.kernel.org/netdev/net-next/c/085ca5d20171
-  - [net-next,v5,9/9] ice: dpll: Support E825-C SyncE and dynamic pin discovery
-    https://git.kernel.org/netdev/net-next/c/ad1df4f2d591
+ include/net/tc_act/tc_gate.h |  33 ++++-
+ net/sched/act_gate.c         | 266 ++++++++++++++++++++++++++---------
+ 2 files changed, 228 insertions(+), 71 deletions(-)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+--=20
+2.52.GIT
 
 
