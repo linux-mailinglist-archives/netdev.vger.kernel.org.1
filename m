@@ -1,186 +1,166 @@
-Return-Path: <netdev+bounces-257579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257580-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HYXD4YHhmkRJQQAu9opvQ
-	(envelope-from <netdev+bounces-257579-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:23:50 +0100
+	id MAMRKkAJhmkRJQQAu9opvQ
+	(envelope-from <netdev+bounces-257580-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:31:12 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9203FFFB2C
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:23:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2FCFFBFE
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:31:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32419301412B
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 15:23:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBD94301D324
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 15:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D113ECBF3;
-	Fri,  6 Feb 2026 15:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K/uXAkMD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF911D90DF;
+	Fri,  6 Feb 2026 15:31:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFC926ED41
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 15:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2240B125A0;
+	Fri,  6 Feb 2026 15:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770391427; cv=none; b=BBe47VvfRaWaUJxkZa4toHBs5QiWzZ9jLbEad95WJriWoqiAWjq3hDexewyfUaGkIEAt2wiSwZCWEAqyJuGb2jOZPlklL7JbeVsnGx+3+uZtHZRNmibmmYFtfXYJgrizeVystMIh0xcwpy6RnPobc4wOfT54UfjZBtUieutyOWA=
+	t=1770391860; cv=none; b=uqWuIPSRsojPpyNBkUeCZhWmjNJo+5NqBAW1LPl3VZiiy14uVaK4Y3lty77fX9CNoi/vRnEYLPVo1RWG14oX+uC4LvWIUSKS56iW8r40KU/oY/A3k4CDcxEG0wtRGG3YYuxaaOpkWspAJ6nFd7vzffhzjVnDACrixYpUw+UaYYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770391427; c=relaxed/simple;
-	bh=+O1Ls5mJN2w86ohgl0FWaLhpMAN9yWArFMvJtTQfTl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHZi+bg3VkhIZgxOiyEFYHIy3BLbD/71u2ZtgYzPoBpnaJDHxLhQ8u1S/djyuAKw1y2BNgmu9RQQoB/BfUob8yen1qiq5Kz+iUf2p7cuHn5xzz5OvbHEGG2v4gmsrHcwmCBuWO79k7bG/f3bI7zJhPbPu4GxUU63Oyq7fen93Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K/uXAkMD; arc=none smtp.client-ip=209.85.128.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso24279845e9.2
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 07:23:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770391425; x=1770996225; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vmk3i2Xic+N6h+88mYHjXnA3IoHoaC3fj4TmXWw7rGg=;
-        b=K/uXAkMDWvGQxodUUir939WxLkYqVCxvkC6umuDuKPQ+bl/LrMa2xTRS1g6wpO5zSe
-         FubY9ilhu3RR3GIfEql69EVwOmXbdN2OBTEb1C7o8NQ6P8bwMP4U/PnmTYRHix/Hpb7u
-         6lzE3KZtcPQNtId6S3uuJ4FqV4YG8ueqltz0stLJRSbi9yDRLq0v4H01SwDTerxTzXeA
-         dQrKivfRuOxhNeU3pxDWMbpV/zkO3nu6FtwgPAzcRJZFvF9ZfgM+kmiKR8g8wVPhU1mR
-         XLKpNnOBu1LsthkmCoiQxd9VJ8XIAUQ6XnLXvlswQ8R+DP6aJTeomLsiqZ8W7JXLSlVp
-         ETTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770391425; x=1770996225;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vmk3i2Xic+N6h+88mYHjXnA3IoHoaC3fj4TmXWw7rGg=;
-        b=MUFn6A+CXa8fvSsBhHp/kGMjgEe7YKv7aEPwwOpPH4attBgTguqAsjxq7C23lBXC4M
-         f4Ws8N0mg1ECfLAkx4ibtdBUx5CXjJ7no87vP/Y0iYLPI9Fj2+xEvva/RESHl8Q7F4nq
-         LdVmL0rAdeeQIKBlYmm1fhag3Lncl2th1Za+f3XxhmbZbS9lYETZrjgJZrN9FGZNb9NH
-         THoitICqNlPOUQ8gNy3KGje8TPLvVkfeus9c2cM/7bh0gD8NKrcRhZFG1sDNBa4uEy35
-         Gf6B9OjMs9vYhaXEPq+J6EEwBt0kHdhKFunaMhJJubKCNyMwqKef5S5OBh4GDR+k7y7f
-         O+2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWIZX8wPLWPmZb0EF228uABxT3Tfr5T/+NzmMLwyA/mbdj9OrYsSEbZCSxBfsbI0gXhkOlSUuk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIIurLcs8rnZCuXoiHLrD4klA3HJxY+w5OcAGyOWaqZF5altq9
-	bB7TsaHuBzWXfQmFGXw2TCYEgWREJ9V/pny5upl/4u5nlcDiyOGYmfIujM76WLfVx3M=
-X-Gm-Gg: AZuq6aJkCOHIXQAeSJracJXCIJpphFeqe/TawbQHIZa2yU+PtwC1qFZaKM9MDGb5gJy
-	u71r2kTiwF+Y6eTjiYfxu0ex6Bc/5h0rvOX60GKYN4v1o9T0Sg+Zvb9FErly1f04gjvZNm7HRYC
-	KOg6RaicKAB8h8yNY/NAekZH1GEZJTxX5/B/gp81kHlFiRsPY4bOCIY3KzbgzmZ6ladprf6hi2T
-	8FK58RTEshjjgQDOwXhX3PTYgHIhAc0f6e8w96VGknuku7XIoeGf6SgvhGNfkZ+1Lk0ELh1J0L8
-	A9LI80kRg5XyrrU7ADkOFM4YQNdjW6NxMn8j2kSUJm81ynZa3vyZjsaA9BXF5ez5v1ulWv5VMtb
-	tSDwFiSdHezLqIxDN820/Gb7ufteVdMB2nrzL1VX2ZJkVuJVyOZvpqc52B4G+IhFdEV0vEnR7Y5
-	8QOPJMLKA5YV6wFdy5khmdFbSRd34=
-X-Received: by 2002:a05:600c:3b87:b0:477:df7:b020 with SMTP id 5b1f17b1804b1-48320966a0cmr42152645e9.18.1770391425272;
-        Fri, 06 Feb 2026 07:23:45 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48317d7a924sm202077135e9.10.2026.02.06.07.23.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 07:23:44 -0800 (PST)
-Date: Fri, 6 Feb 2026 18:23:41 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Stephan Gerhold <stephan.gerhold@linaro.org>
-Cc: Stephan Gerhold <stephan@gerhold.net>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [bug report] net: wwan: Add Qualcomm BAM-DMUX WWAN network driver
-Message-ID: <aYYHfapZdjGYCGLI@stanley.mountain>
-References: <caa37f28-a2e8-4e0a-a9ce-a365ce805e4b@stanley.mountain>
- <aYXu1uXRG1KHrKej@stanley.mountain>
- <aYYE0SBR6V-HWcPr@linaro.org>
+	s=arc-20240116; t=1770391860; c=relaxed/simple;
+	bh=RjN4438puDtRLzc8SKUip/QTEtNvWbOl76UPOqfDivs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WE9/3A9uoKh5O0wvZoTf7DUZjdKN/xhUBjMgWUFyOB1zBSDo7iCu+N5GXqdIm91d6mkV2VLNWve7gSOOFGtw+dOoh38xDlB2yZZPn7i8fmwtyEVbk6WW1WOzNBG3+Ac3JCiHvfDEL1gs5gGcJDcBdANeUWoBeENr7rlyRYO3U98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id CA3AB60345; Fri, 06 Feb 2026 16:30:57 +0100 (CET)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH v2 net-next 00/11] netfilter: updates for net-next
+Date: Fri,  6 Feb 2026 16:30:37 +0100
+Message-ID: <20260206153048.17570-1-fw@strlen.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYYE0SBR6V-HWcPr@linaro.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257579-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257580-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.977];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:dkim]
-X-Rspamd-Queue-Id: 9203FFFB2C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0B2FCFFBFE
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 04:12:17PM +0100, Stephan Gerhold wrote:
-> Hi Dan,
-> 
-> On Fri, Feb 06, 2026 at 04:38:30PM +0300, Dan Carpenter wrote:
-> > [ Smatch checking is paused while we raise funding.  #SadFace
-> >   https://lore.kernel.org/all/aTaiGSbWZ9DJaGo7@stanley.mountain/ -dan ]
-> > 
-> > Hello Stephan Gerhold,
-> > 
-> > Commit 21a0ffd9b38c ("net: wwan: Add Qualcomm BAM-DMUX WWAN network
-> > driver") from Nov 27, 2021 (linux-next), leads to the following
-> > Smatch static checker warning:
-> > 
-> > 	drivers/net/wwan/qcom_bam_dmux.c:505 bam_dmux_cmd_data()
-> > 	error: buffer overflow 'dmux->netdevs' 8 <= 255 user_rl='0-255' uncapped
-> > 
-> > drivers/net/wwan/qcom_bam_dmux.c
-> >     500 static void bam_dmux_cmd_data(struct bam_dmux_skb_dma *skb_dma)
-> >     501 {
-> >     502         struct bam_dmux *dmux = skb_dma->dmux;
-> >     503         struct sk_buff *skb = skb_dma->skb;
-> >     504         struct bam_dmux_hdr *hdr = (struct bam_dmux_hdr *)skb->data;
-> > --> 505         struct net_device *netdev = dmux->netdevs[hdr->ch];
-> >                                                           ^^^^^^^
-> > Smatch thinks skb->data is untrusted.  This is the rx path.
-> > 
-> 
-> Thanks a lot for the report!
-> 
-> I believe this is not a problem in practice, since there is an existing
-> check for this in bam_dmux_rx_callback() (which is the only function
-> that calls bam_dmux_cmd_data()):
-> 
-> 	if (hdr->ch >= BAM_DMUX_NUM_CH) {
-> 		dev_dbg(dmux->dev, "Unsupported channel: %u\n", hdr->ch);
-> 		goto out;
-> 	}
-> 
-> 	switch (hdr->cmd) {
-> 	case BAM_DMUX_CMD_DATA:
-> 		bam_dmux_cmd_data(skb_dma);
-> 		break;
-> 
-> Is that something Smatch should be able to detect?
-> 
+The following patchset contains Netfilter updates for *net-next*:
 
-Ah, you are right.  Thanks.
+1) Fix net-next-only use-after-free bug in nf_tables rbtree set:
+   Expired elements cannot be released right away after unlink anymore
+   because there is no guarantee that the binary-search blob is going to
+   be updated.  Spotted by syzkaller.
 
-The problem is that skb->data is a buffer of u8 data.  Smatch does cross
-function analysis, but it treats a buffer like that as opaque data.
+2) Fix esoteric bug in nf_queue with udp fraglist gro, broken since
+   6.11. Patch 3 adds extends the nfqueue selftest for this.
 
-Btw, I see that this code is actually from five years ago so I don't know
-why it's showing up as a warning now.  :/  Sorry about that.
+4) Use dedicated slab for flowtable entries, currently the -512 cache
+   is used, which is wasteful.  From Qingfang Deng.
 
-regards,
-dan carpenter
+5) Recent net-next update extended existing test for ip6ip6 tunnels, add
+   the required /config entry.  Test still passed by accident because the
+   previous tests network setup gets re-used, so also update the test so
+   it will fail in case the ip6ip6 tunnel interface cannot be added.
+
+6) Fix 'nft get element mytable myset { 1.2.3.4 }' on big endian
+   platforms, this was broken since code was added in v5.1.
+
+7) Fix nf_tables counter reset support on 32bit platforms, where counter
+   reset may cause huge values to appear due to wraparound.
+   Broken since reset feature was added in v6.11.  From Anders Grahn.
+
+8-11) update nf_tables rbtree set type to detect partial
+   operlaps.  This will eventually speed up nftables userspace: at this
+   time userspace does a netlink dump of the set content which slows down
+   incremental updates on interval sets.  From Pablo Neira Ayuso.
+
+Please, pull these changes from:
+The following changes since commit 24cf78c738318f3d2b961a1ab4b3faf1eca860d7:
+
+  net/mlx5e: SHAMPO, Switch to header memcpy (2026-02-05 18:36:06 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-26-02-06
+
+for you to fetch changes up to 648946966a08e4cb1a71619e3d1b12bd7642de7b:
+
+  netfilter: nft_set_rbtree: validate open interval overlap (2026-02-06 13:36:07 +0100)
+
+----------------------------------------------------------------
+netfilter pull request nf-next-26-02-06
+
+----------------------------------------------------------------
+Anders Grahn (1):
+  netfilter: nft_counter: fix reset of counters on 32bit archs
+
+Florian Westphal (5):
+  netfilter: nft_set_rbtree: don't gc elements on insert
+  netfilter: nfnetlink_queue: do shared-unconfirmed check before segmentation
+  selftests: netfilter: nft_queue.sh: add udp fraglist gro test case
+  selftests: netfilter: add IPV6_TUNNEL to config
+  netfilter: nft_set_hash: fix get operation on big endian
+
+Pablo Neira Ayuso (4):
+  netfilter: nft_set_rbtree: fix bogus EEXIST with NLM_F_CREATE with null interval
+  netfilter: nft_set_rbtree: check for partial overlaps in anonymous sets
+  netfilter: nft_set_rbtree: validate element belonging to interval
+  netfilter: nft_set_rbtree: validate open interval overlap
+
+Qingfang Deng (1):
+  netfilter: flowtable: dedicated slab for flow entry
+
+ include/linux/u64_stats_sync.h                |  10 +
+ include/net/netfilter/nf_queue.h              |   1 +
+ include/net/netfilter/nf_tables.h             |   4 +
+ net/netfilter/nf_flow_table_core.c            |  12 +-
+ net/netfilter/nf_tables_api.c                 |  26 +-
+ net/netfilter/nfnetlink_queue.c               | 123 +++---
+ net/netfilter/nft_counter.c                   |   4 +-
+ net/netfilter/nft_set_hash.c                  |   9 +-
+ net/netfilter/nft_set_rbtree.c                | 377 ++++++++++++++----
+ tools/testing/selftests/net/netfilter/config  |   1 +
+ .../selftests/net/netfilter/nft_flowtable.sh  |  19 +-
+ .../selftests/net/netfilter/nft_queue.sh      | 142 ++++++-
+ 12 files changed, 580 insertions(+), 148 deletions(-)
+
+-- 
+2.52.0
 
