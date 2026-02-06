@@ -1,65 +1,70 @@
-Return-Path: <netdev+bounces-257398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257399-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOrELnFRhWmV/wMAu9opvQ
-	(envelope-from <netdev+bounces-257398-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:26:57 +0100
+	id YJdRGxxRhWmV/wMAu9opvQ
+	(envelope-from <netdev+bounces-257399-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:25:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E082F947F
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:26:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0301BF9407
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:25:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E37C306EA63
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:24:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 606AC3008300
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8689626E6F4;
-	Fri,  6 Feb 2026 02:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A0525A655;
+	Fri,  6 Feb 2026 02:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2MCWaS/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6Vz8SXh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6376126CE2D;
-	Fri,  6 Feb 2026 02:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0096124EAB1;
+	Fri,  6 Feb 2026 02:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770344663; cv=none; b=MtRGkI7w6L2kBAn7P4YAjujTmyaUkHauoVSA3sRW04KyOu2y+heDGhS54Wts9Y/ahBMbhUrXF/e4yAT/QNOMqK4BO6An2kj948hfvkaZ9Iat/JWASjCQbZHB07YPHb9BGCOkXg2LACc3x2VWawFtwYP6mNno7lQu3OkWjsA1mE0=
+	t=1770344729; cv=none; b=Quu1wpLsdwxqVpYqOFQihb2EPrLSeD+I0AUtTVBm5FfB4Sk4G4nRsn7EYQ+g7ye8Fn67KU8XNikSYsttYLdM113kuj+vYvUYBMEOOSUWFCCO2ABWVvML+7TkMlAB7W/9vN/WdcndSGtqII0zNDMsqThiZszCM7oUoHXufG+CXt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770344663; c=relaxed/simple;
-	bh=TUGZs3VCsG3R3upJb5hZDjDQh0S2r6zsbhzPDbzbjhM=;
+	s=arc-20240116; t=1770344729; c=relaxed/simple;
+	bh=7TYnW5LHLTJMU8pfUwNFQAsIPO1pYWlPEJCyFKvlZd4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j97jriuqIlfhikeTWQXAbtyY8gVjSW+TSIdwqqdXSnYqClJyW9D0V/jBjSpXosAHOvTQbb8FElPm7F4MiF3i/ilDtlPoewdTqxmpTA9Ji+ZqKyKtyl1gR9kzpRv2P9dOMiW6JC/6QXx+CYihy3Q3KlG96ErsFke1mrWMlbK8jCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2MCWaS/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7A73C19423;
-	Fri,  6 Feb 2026 02:24:22 +0000 (UTC)
+	 MIME-Version; b=qvUX+hlwhLLQIybouJ+BL8XqFF42TQYG5xTHpn9C2kx3fyGVPToLCMKvGVMy6smMo4sgnFdbOiHGI/vUZBRXBqhuLp/QoPOm2mKGjYII42iWg4vgw7gGqqC5tjXPZ+JaHDWyKkI64l18W2aQDWlgxAgk4adwonUzAo0K7FC+E6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6Vz8SXh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04D14C19423;
+	Fri,  6 Feb 2026 02:25:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770344663;
-	bh=TUGZs3VCsG3R3upJb5hZDjDQh0S2r6zsbhzPDbzbjhM=;
+	s=k20201202; t=1770344728;
+	bh=7TYnW5LHLTJMU8pfUwNFQAsIPO1pYWlPEJCyFKvlZd4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e2MCWaS/4d2v5jy/otnmBzgH5ONueOJ3Z//Wltf7fEUAx+nLfkY+gAl8wZ3x6beig
-	 Wjk6aiBdCykDnzhnpop3nZ/LHREUTNjsqrX/EJ/ExPG+37Gk7eKDHnf8loaMk19Nh7
-	 XISe2uF10wEUU7edyLX+5Uat8zloELP+Vc6/a6Wmxhk8ssdkNglNIuk4LAIP1wCcOg
-	 dB07rMu0dpbtXNOjZ5hapQk9ziQY2L00epk5WB8xJpcRdu3ijlD1ar1UiS9+aySHrX
-	 PhCdjUXwQRMenSCIJ3X85CVnIeaA1R6yOatXYvub7qKwY+YwNrhf23JxbpFgvs4GLi
-	 7Clu4Wq6NQlYg==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
+	b=O6Vz8SXht8wyrUkYJXLD50y/76G6JUIwmBfvexxVPq2m4/1Z7Anb8cTuPAz4yJSyI
+	 z0r+Bt6xDOJVoD43NWhJjy1oBmP+JgSdurWH6jTNrjfjcKAfnjG1eiWfHEf4P+8Zql
+	 fdQACA7TKJnFwHBncBP/tDQHhzREhOTH9prG3ngbjfCVKKsboppBCD0yQU1q/pd/lh
+	 t77gNkNUe3YSPLdFnU3/n6XeGySh/wEogWoFCNUvSSVSDqKcCyW9psWl9sVUfbIKS1
+	 CwfkwWXMfppJEmB19olWnelUn7SFplt3xq7BYOEcCD2SbZ1DJgYMhCl8UgcYas/fJG
+	 5nXnlsXV1qfEg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: jiayuan.chen@linux.dev
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew+netdev@lunn.ch,
 	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v1 3/3] net/rds: rds_sendmsg should not discard payload_len
-Date: Thu,  5 Feb 2026 19:24:19 -0700
-Message-ID: <20260206022419.1357513-4-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260206022419.1357513-1-achender@kernel.org>
-References: <20260206022419.1357513-1-achender@kernel.org>
+	jiayuan.chen@shopee.com,
+	pabeni@redhat.com,
+	jirislaby@kernel.org,
+	sjur.brandeland@stericsson.com,
+	gregkh@linuxfoundation.org,
+	netdev@vger.kernel.org,
+	syzbot+827272712bd6d12c79a4@syzkaller.appspotmail.com,
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com
+Subject: Re: [net,v1] serial: caif: fix use-after-free in caif_serial ldisc_close()
+Date: Thu,  5 Feb 2026 18:25:26 -0800
+Message-ID: <20260206022526.3191971-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260204081939.237738-1-jiayuan.chen@linux.dev>
+References: <20260204081939.237738-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,72 +73,166 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-257398-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-257399-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:email]
-X-Rspamd-Queue-Id: 5E082F947F
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,827272712bd6d12c79a4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0301BF9407
 X-Rspamd-Action: no action
 
-From: Allison Henderson <allison.henderson@oracle.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Commit 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with
-connection teardown") modifies rds_sendmsg to avoid enqueueing work
-while a tear down is in progress. However, it also changed the return
-value of rds_sendmsg to that of rds_send_xmit instead of the
-payload_len. This means the user may incorrectly receive errno values
-when it should have simply received a payload of 0 while the peer
-attempts a reconnections.  So this patch corrects the teardown handling
-code to only use the out error path in that case, thus restoring the
-original payload_len return value.
-
-Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
- net/rds/send.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+serial: caif: fix use-after-free in caif_serial ldisc_close()
 
-diff --git a/net/rds/send.c b/net/rds/send.c
-index 6e96f108473e..a1039e422a38 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -1431,9 +1431,11 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
- 		else
- 			queue_delayed_work(cpath->cp_wq, &cpath->cp_send_w, 1);
- 		rcu_read_unlock();
-+
-+		if (ret)
-+			goto out;
- 	}
--	if (ret)
--		goto out;
-+
- 	rds_message_put(rm);
- 
- 	for (ind = 0; ind < vct.indx; ind++)
+This commit fixes a use-after-free bug in the CAIF serial driver by
+moving the tty_kref_put() call from ldisc_close() to ser_release(),
+ensuring the tty reference is held as long as the network device exists.
+
+Closes: https://lore.kernel.org/all/000000000000a4a7550611e234f5@google.com/T/
+
+> serial: caif: fix use-after-free in caif_serial ldisc_close()
+>
+> There is a use-after-free bug in caif_serial where handle_tx() may
+> access ser->tty after the tty has been freed.
+>
+> The race condition occurs between ldisc_close() and packet transmission:
+>
+>     CPU 0 (close)                     CPU 1 (xmit)
+>     -------------                     ------------
+>     ldisc_close()
+>       tty_kref_put(ser->tty)
+>       [tty may be freed here]
+>                      <-- race window -->
+>                                       caif_xmit()
+>                                         handle_tx()
+>                                           tty = ser->tty  // dangling ptr
+>                                           tty->ops->write() // UAF!
+>       schedule_work()
+>         ser_release()
+>           unregister_netdevice()
+>
+> The root cause is that tty_kref_put() is called in ldisc_close() while
+> the network device is still active and can receive packets.
+>
+> Since ser and tty have a 1:1 binding relationship with consistent
+> lifecycles (ser is created/destroyed in ldisc_open/close, and each ser
+> binds exactly one tty), we can safely defer the tty reference release
+
+The statement "ser is created/destroyed in ldisc_open/close" isn't quite
+accurate. While ser is created in ldisc_open() via alloc_netdev(), it's
+not actually destroyed in ldisc_close(). Instead, ldisc_close() only moves
+ser to the release list via list_move(&ser->node, &ser_release_list).
+The actual destruction happens in ser_release() when unregister_netdevice()
+is called, which eventually frees the netdev and embedded ser via
+netdev_run_todo() invoked by rtnl_unlock(). Would it be more accurate to
+say ser is destroyed in ser_release()?
+
+> to ser_release() where the network device is unregistered.
+>
+> Fix this by moving tty_kref_put() from ldisc_close() to ser_release(),
+> after unregister_netdevice(). This ensures the tty reference is held
+> as long as the network device exists, preventing the UAF.
+>
+> Note: We save ser->tty before unregister_netdevice() because ser is
+> embedded in netdev's private data and will be freed along with netdev
+> (needs_free_netdev = true).
+>
+> How to reproduce: Add mdelay(500) at the beginning of ldisc_close()
+> to widen the race window, then run the reproducer program [1].
+>
+> Note: There is a separate deadloop issue in handle_tx() when using
+> PORT_UNKNOWN serial ports (e.g., /dev/ttyS3 in QEMU without proper
+> serial backend). This deadloop exists even without this patch,
+> and is caused by an independent bug: inconsistency between
+> uart_write_room() and uart_write() in serial core. It has been
+> addressed in a separate patch [2].
+
+The claim about the deadloop being caused by inconsistency between
+uart_write_room() and uart_write() couldn't be fully verified without
+examining the referenced patch [2]. While the claim is plausible (if
+uart_write_room() reports available space but uart_write() returns 0
+bytes written, the deadloop would occur in handle_tx()), this appears
+to be presented as fact rather than hypothesis. Could this be clarified
+or softened to indicate it's the suspected cause pending verification?
+
+[ ... ]
+
+> Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
+
+The Fixes: tag appears to reference the wrong commit. The bug was actually
+introduced by commit 56e0ef527b18 ("drivers/net: caif: fix wrong
+rtnl_is_locked() usage"). The original commit 9b27105b4a44 didn't have any
+tty_kref operations. Commit e31d5a05948e added tty_kref_get/put, but at
+that time tty_kref_put was called in ldisc_close() which directly
+unregistered the netdevice, so there was no race. Commit 56e0ef527b18
+moved dev_close/unregister_netdevice to a work queue (ser_release) but
+left tty_kref_put in ldisc_close, creating the race window. Should the
+Fixes: tag be updated to:
+
+Fixes: 56e0ef527b18 ("drivers/net: caif: fix wrong rtnl_is_locked() usage")
+
+> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
+> --- a/drivers/net/caif/caif_serial.c
+> +++ b/drivers/net/caif/caif_serial.c
+> @@ -284,6 +284,7 @@ static void ser_release(struct work_struct *work)
+>  {
+>  	struct list_head list;
+>  	struct ser_device *ser, *tmp;
+> +	struct tty_struct *tty;
+>
+>  	spin_lock(&ser_lock);
+>  	list_replace_init(&ser_release_list, &list);
+> @@ -292,9 +293,11 @@ static void ser_release(struct work_struct *work)
+>  	if (!list_empty(&list)) {
+>  		rtnl_lock();
+>  		list_for_each_entry_safe(ser, tmp, &list, node) {
+> +			tty = ser->tty;
+>  			dev_close(ser->dev);
+>  			unregister_netdevice(ser->dev);
+>  			debugfs_deinit(ser);
+> +			tty_kref_put(tty);
+>  		}
+>  		rtnl_unlock();
+>  	}
+
+[ ... ]
+
+> @@ -354,8 +357,6 @@ static int ldisc_open(struct tty_struct *tty)
+>  static void ldisc_close(struct tty_struct *tty)
+>  {
+>  	struct ser_device *ser = tty->disc_data;
+> -
+> -	tty_kref_put(ser->tty);
+>
+>  	spin_lock(&ser_lock);
+>  	list_move(&ser->node, &ser_release_list);
 -- 
-2.43.0
-
+pw-bot: cr
 
