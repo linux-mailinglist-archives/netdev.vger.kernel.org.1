@@ -1,214 +1,146 @@
-Return-Path: <netdev+bounces-257653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EklHZhPhmlpLwQAu9opvQ
-	(envelope-from <netdev+bounces-257653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:31:20 +0100
+	id IHU9FClShmnQLwQAu9opvQ
+	(envelope-from <netdev+bounces-257654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:42:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDEFE103216
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:31:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA2871032F8
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:42:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D81430053BB
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 20:31:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38B08303A25A
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 20:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA55E302CBA;
-	Fri,  6 Feb 2026 20:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D6630F54B;
+	Fri,  6 Feb 2026 20:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ueVs8yE3"
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="F6TjauNH";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="LXfdjBI5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A152DE6E6;
-	Fri,  6 Feb 2026 20:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A4B2EC0A7;
+	Fri,  6 Feb 2026 20:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770409868; cv=none; b=oJf6WxXtO6+iu/wOz7oAgQADBUxySKmXwEF3C/TLVC5+8eLbvCyvU0/erUNjh6evg9N/4H2xcykkUc5l5DKv5zLEf8Ue6WJHg/92g16NvE3uk2k3ReDTpRxRafCJwOAhtXqT8e8Qim0w/s5A3h/atu+S4LG3JzBHeQ0kLfI7rq8=
+	t=1770410515; cv=none; b=AU3CPNYJnae74U2ypgE5YUhH+8ZsSxAJOy7tIFm9QVFhSA7wDAPUs9G7hIvyTmM8X+SBFIIi2phoZ9vWyTrfRy8mCI+K0Yc6ViLhck1WKR11f52z1e35L7jHD1Ukl0TjLU/9E+sP6uWcgtRdLtpYajpCxfh1rNBF2QPf+zPjP0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770409868; c=relaxed/simple;
-	bh=NiVSPEoZOAR35n9OsGdpe9NzkVmd4acJpqFyu/UduSA=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=EbR3UzNeo28a+f6r1F0R95mu6SKJLLYgHa+lbdRnki/KCi8qIBnN3E+vWDAzXK/v2PMeMrfc1/rHUgQe93YNu6CZ4exRZHr/oCsSnpaSGCZ/DM8oEnDirYcjUjtCFoTyD23ODvzNc/UdDDFlmP6gJmR7PQJVCT/qvINNJFLkFyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ueVs8yE3; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dWmLCHSX/zl5TXT9/CAx8lBKbFhSqb8YTbzRq8kmEq0=; b=ueVs8yE3A44c9vupcFdGhLYxOh
-	ROPCEf6Z4FYw076aNt16760QLDmoc/fa/pSwLM8l7pOXvQfsNMX4DiVon41rGE4ZHpLGt31e7fwNm
-	v3uqcrTSEJm9ycSNe5rrecAB3jO4/xgnVgT0QFQ9MQ+KFL6GsDhzY0NF36mAyEMpBRb98eRBLgAdh
-	Tpz0pD7lzWi6bUEg3RBPbSZT7DVUtj/TATmLvfOG3N7tW1ecFuSkDHUOaJsNJ5LBbFgMUmDHWyVEs
-	NMhX/3fwnQr+ZUAYLbrAVmtGOdHnF1vWGmuyP0L+QBrjqfnFDeuGlNi4B6Zotw0b6pv6rmWSYA8Ov
-	1CQdvJrA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44050 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1voSTm-000000008P8-3Fkf;
-	Fri, 06 Feb 2026 20:31:03 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1voSTm-000000087qO-04ua;
-	Fri, 06 Feb 2026 20:31:02 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
+	s=arc-20240116; t=1770410515; c=relaxed/simple;
+	bh=mtIS6L7p5weFzGrtJCr2iaB11dBNt2cH07r6/GTGfd8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c6pIq4him+oG1V6zaHBI+MyGMLRfSiveyrBQCNnuLeUs6BTX74K/ehiGKMcU0kbJecgQIqxxS/1xmrxLfFff7tkuxVGJl2Vktsmepy4/ciJnuEuW9Bc53DY9gyzDRsU6HqQsDhDewUtOEwOjV/9Ahx+eJWO7Yv5gMf9cs4AuvjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=F6TjauNH; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=LXfdjBI5; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1770410506; bh=WwAnzenkq1Xn7RsL/ac0kPI
+	OggL6T09Nc3LDc7PsTmM=; b=F6TjauNHBoJdFIzFzdVSDaqM4p64bZIiEik3ZdtjYUx4tPndRZ
+	5SQYcOxGYO4n2sffH0AMdjkMyR5P5qK22cNsGKpzI1MeVZxlkaycZRijPRrQMFsUP1yMV8cEBVV
+	dM9RH05MlUBEnG1Cic8H/Enkq14aCpIfgsW57S0tvHkd4n0QbfG2dL4FcWjyObwE5chGfutqcHU
+	0jdZ/C2zg3ujoN9+6MBBG5YRWPti3nV9FkHpOdACJM0hTC07kblwCBcP4zaiXysMMLRdZl1D/AD
+	VBAT9BiMRtQTrmVZpdQP+oUet5oitvLWA7YzQHEOKUO1yyoFW339Y5V1F7880xg8r9A==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1770410506; bh=WwAnzenkq1Xn7RsL/ac0kPI
+	OggL6T09Nc3LDc7PsTmM=; b=LXfdjBI5DUaW0Nn5AQNI0OEYjQY6oV0HvFlPDv55L9QLtKcGk7
+	RT9W6RBZ6MWwJFhFveNONZAe36rH/D1/cDDQ==;
+From: Daniel Hodges <git@danielhodges.dev>
+To: chuck.lever@oracle.com,
+	anna@kernel.org,
+	trondmy@kernel.org
+Cc: linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH RFC net-next] net: stmmac: qcom-ethqos: convert register field
- updates
+	linux-kernel@vger.kernel.org,
+	jlayton@kernel.org,
+	neil@brown.name,
+	okorniev@redhat.com,
+	Daniel Hodges <git@danielhodges.dev>,
+	stable@vger.kernel.org
+Subject: [PATCH] SUNRPC: fix gss_auth kref leak in gss_alloc_msg error path
+Date: Fri,  6 Feb 2026 15:41:46 -0500
+Message-ID: <20260206204146.21093-1-git@danielhodges.dev>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1voSTm-000000087qO-04ua@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 06 Feb 2026 20:31:02 +0000
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[danielhodges.dev,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[danielhodges.dev:s=202510r,danielhodges.dev:s=202510e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257653-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257654-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[danielhodges.dev:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[git@danielhodges.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.845];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EDEFE103216
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,danielhodges.dev:email,danielhodges.dev:dkim,danielhodges.dev:mid]
+X-Rspamd-Queue-Id: CA2871032F8
 X-Rspamd-Action: no action
 
-Convert the register field update values to something more recognisable
-to a human.
+Commit 5940d1cf9f42 ("SUNRPC: Rebalance a kref in auth_gss.c") added
+a kref_get(&gss_auth->kref) call to balance the gss_put_auth() done
+in gss_release_msg(), but forgot to add a corresponding kref_put()
+on the error path when kstrdup_const() fails.
 
-For example, using (BIT(29) | BIT(27)) to update a register field that
-consists of bits 29:27 is just a way of obfuscating the constant so
-the bare constant doesn't attract review comments.
+If service_name is non-NULL and kstrdup_const() fails, the function
+jumps to err_put_pipe_version which calls put_pipe_version() and
+kfree(gss_msg), but never releases the gss_auth reference. This leads
+to a kref leak where the gss_auth structure is never freed.
 
-Worse still is BIT(12) | GENMASK(9, 8), which is used to hide the
-decimal value 19 for the bitfield 16:8.
+Add a forward declaration for gss_free_callback() and call kref_put()
+in the err_put_pipe_version error path to properly release the
+reference taken earlier.
 
-Fix these, and a few others by using FIELD_PREP(). Yes, it means we
-have bare numeric constants, but that's way more preferable than
-having them obfuscated away.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Fixes: 5940d1cf9f42 ("SUNRPC: Rebalance a kref in auth_gss.c")
+Cc: stable@vger.kernel.org
+Signed-off-by: Daniel Hodges <git@danielhodges.dev>
 ---
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 23 ++++++++++++-------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ net/sunrpc/auth_gss/auth_gss.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index af8204c0e188..5ee2a6ee5840 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -361,10 +361,12 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
- 			      SDCC_HC_REG_DLL_CONFIG2);
+diff --git a/net/sunrpc/auth_gss/auth_gss.c b/net/sunrpc/auth_gss/auth_gss.c
+index 5c095cb8cb20..bb3c3db2713b 100644
+--- a/net/sunrpc/auth_gss/auth_gss.c
++++ b/net/sunrpc/auth_gss/auth_gss.c
+@@ -39,6 +39,8 @@ static const struct rpc_authops authgss_ops;
+ static const struct rpc_credops gss_credops;
+ static const struct rpc_credops gss_nullops;
  
- 		rgmii_updatel(ethqos, SDCC_DLL_CONFIG2_MCLK_FREQ_CALC,
--			      0x1A << 10, SDCC_HC_REG_DLL_CONFIG2);
-+			      FIELD_PREP(SDCC_DLL_CONFIG2_MCLK_FREQ_CALC, 26),
-+			      SDCC_HC_REG_DLL_CONFIG2);
++static void gss_free_callback(struct kref *kref);
++
+ #define GSS_RETRY_EXPIRED 5
+ static unsigned int gss_expired_cred_retry_delay = GSS_RETRY_EXPIRED;
  
- 		rgmii_updatel(ethqos, SDCC_DLL_CONFIG2_DDR_TRAFFIC_INIT_SEL,
--			      BIT(2), SDCC_HC_REG_DLL_CONFIG2);
-+			      FIELD_PREP(SDCC_DLL_CONFIG2_DDR_TRAFFIC_INIT_SEL,
-+					 1), SDCC_HC_REG_DLL_CONFIG2);
- 
- 		rgmii_setmask(ethqos, SDCC_DLL_CONFIG2_DDR_TRAFFIC_INIT_SW,
- 			      SDCC_HC_REG_DLL_CONFIG2);
-@@ -425,11 +427,13 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- 		if (ethqos->has_emac_ge_3) {
- 			/* 0.9 ns */
- 			rgmii_updatel(ethqos, SDCC_DDR_CONFIG_PRG_RCLK_DLY,
--				      115, SDCC_HC_REG_DDR_CONFIG);
-+				      FIELD_PREP(SDCC_DDR_CONFIG_PRG_RCLK_DLY,
-+						 115), SDCC_HC_REG_DDR_CONFIG);
- 		} else {
- 			/* 1.8 ns */
- 			rgmii_updatel(ethqos, SDCC_DDR_CONFIG_PRG_RCLK_DLY,
--				      57, SDCC_HC_REG_DDR_CONFIG);
-+				      FIELD_PREP(SDCC_DDR_CONFIG_PRG_RCLK_DLY,
-+						 57), SDCC_HC_REG_DDR_CONFIG);
- 		}
- 		rgmii_setmask(ethqos, SDCC_DDR_CONFIG_PRG_DLY_EN,
- 			      SDCC_HC_REG_DDR_CONFIG);
-@@ -451,7 +455,8 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- 		rgmii_updatel(ethqos, RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN,
- 			      phase_shift, RGMII_IO_MACRO_CONFIG2);
- 		rgmii_updatel(ethqos, RGMII_CONFIG_MAX_SPD_PRG_2,
--			      BIT(6), RGMII_IO_MACRO_CONFIG);
-+			      FIELD_PREP(RGMII_CONFIG_MAX_SPD_PRG_2, 1),
-+			      RGMII_IO_MACRO_CONFIG);
- 		rgmii_clrmask(ethqos, RGMII_CONFIG2_RSVD_CONFIG15,
- 			      RGMII_IO_MACRO_CONFIG2);
- 
-@@ -464,7 +469,8 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- 
- 		/* Write 0x5 to PRG_RCLK_DLY_CODE */
- 		rgmii_updatel(ethqos, SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY_CODE,
--			      (BIT(29) | BIT(27)), SDCC_HC_REG_DDR_CONFIG);
-+			      FIELD_PREP(SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY_CODE,
-+					 5), SDCC_HC_REG_DDR_CONFIG);
- 		rgmii_setmask(ethqos, SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY,
- 			      SDCC_HC_REG_DDR_CONFIG);
- 		rgmii_setmask(ethqos, SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY_EN,
-@@ -487,7 +493,7 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- 		rgmii_updatel(ethqos, RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN,
- 			      phase_shift, RGMII_IO_MACRO_CONFIG2);
- 		rgmii_updatel(ethqos, RGMII_CONFIG_MAX_SPD_PRG_9,
--			      BIT(12) | GENMASK(9, 8),
-+			      FIELD_PREP(RGMII_CONFIG_MAX_SPD_PRG_9, 19),
- 			      RGMII_IO_MACRO_CONFIG);
- 		rgmii_clrmask(ethqos, RGMII_CONFIG2_RSVD_CONFIG15,
- 			      RGMII_IO_MACRO_CONFIG2);
-@@ -499,7 +505,8 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- 				      RGMII_IO_MACRO_CONFIG2);
- 		/* Write 0x5 to PRG_RCLK_DLY_CODE */
- 		rgmii_updatel(ethqos, SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY_CODE,
--			      (BIT(29) | BIT(27)), SDCC_HC_REG_DDR_CONFIG);
-+			      FIELD_PREP(SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY_CODE,
-+					 5), SDCC_HC_REG_DDR_CONFIG);
- 		rgmii_setmask(ethqos, SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY,
- 			      SDCC_HC_REG_DDR_CONFIG);
- 		rgmii_setmask(ethqos, SDCC_DDR_CONFIG_EXT_PRG_RCLK_DLY_EN,
+@@ -551,6 +553,7 @@ gss_alloc_msg(struct gss_auth *gss_auth,
+ 	}
+ 	return gss_msg;
+ err_put_pipe_version:
++	kref_put(&gss_auth->kref, gss_free_callback);
+ 	put_pipe_version(gss_auth->net);
+ err_free_msg:
+ 	kfree(gss_msg);
 -- 
-2.47.3
+2.52.0
 
 
