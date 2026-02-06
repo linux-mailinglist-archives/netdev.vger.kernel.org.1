@@ -1,184 +1,195 @@
-Return-Path: <netdev+bounces-257493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIlWG3GshWkRFAQAu9opvQ
-	(envelope-from <netdev+bounces-257493-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:55:13 +0100
+	id 8C55IeuvhWkRFAQAu9opvQ
+	(envelope-from <netdev+bounces-257494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 10:10:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CFC4FBB09
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:55:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92EB3FBD9A
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 10:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0A9130072B9
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 08:55:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76DF73008A72
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 09:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB4E34DCEE;
-	Fri,  6 Feb 2026 08:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E2B355021;
+	Fri,  6 Feb 2026 09:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gjSjQicO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="ZL1hlCT1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from exactco.de (exactco.de [176.9.10.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38875314B95
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 08:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE30F352C4D
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 09:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770368108; cv=none; b=DcDAJCnjv3W0vkWZh5gNNQqhdcompL4EPYLxYFl1kwfniTpWA8o4/E/ZK5icH3UXW0bXACPUgIWNVdq3yXuDXThgSvPpGGs94u0KOQROiIlDUrSPKUXKICEp0q/f7i9vC08h7oqEirytiXiuCHq+f7P/witk05dDWri2UwimZwQ=
+	t=1770368664; cv=none; b=bcMTia3P4JoIRzEsQuCGTjoVWlpSe+N5KrHqwzgM4rRosm0N5pInUkIPNERzhbV2FVBKtl50kX8fE5cLtLA7TC7SmmXkKEsEay0PSVzKkh2DRNzSPDjwGOLPHS1OyG+ZrqIle/uJo75J9DRV0JQoVqXU8ccuepsXBzoeU7vrruo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770368108; c=relaxed/simple;
-	bh=8gJloZSI1GQcrUYIaj8I3nBQOZEH48jxJXr5qkX/U14=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WzxqB8igtmUx7Wmcey0eZCVGx9scrNEmERPm/Mf0lMkqxxl0F40nqMHDIMU47jSD+nFiVzJLp+Z2+tIrPp0zdTFCqtF19FaWOhyW/2qRoS/pHLALJcrV1WpWTy6YlwpTXg+l7cjZNSHKzDCVV6poSARoYhu54bHRIeNnKmkh6RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gjSjQicO; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47ee66dab14so732405e9.3
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 00:55:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770368106; x=1770972906; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=H4CfwKcayH4xDR1+iMb7IfsfcQiFBuBvxK6Im43iVvY=;
-        b=gjSjQicO5T3W/iqPuXAXKIxzqqgcdFdaQMz1jXcI6cGcv/qsXESXyfVwl2zJ0+WXIs
-         LrVhLZjAm5NZ/J6AlDKm4aJIU3NcIuha8o8k4eBBQQjXlIcu8+P8BCCRverJplUylxC0
-         eFQLb2mfnqd46takk8AklbPgxqcQGX4+H+F+MpKZlyCdJvwoX3SZjhyF7OqKpObLx/PH
-         dqZiJ0YF3YaHFdx5GQJyIqhvpNqen5BhpcIDTfwzXBzHQuLZIt4f78brZu/iqMOiu66Q
-         TqP/Xsd0/GrMP53Xi9DvXCmOCRYWfGBR/eYOWc51tU/UVvcwiDp4HPgOikkk9+L5/jFL
-         bIug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770368106; x=1770972906;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H4CfwKcayH4xDR1+iMb7IfsfcQiFBuBvxK6Im43iVvY=;
-        b=bnWBvDPuKTYCeXHm4oRmscE+XJgy16xOFr/H4+P/47Rr2KvCWaO0Gp3hfoIOJpu3Q+
-         G7OgOutsv1SUBT9udsGk3jr5STy9Pc9LU560yrQgEviMlJ8gc1LnWLYxauFtajLwRwfe
-         8NA7DPsRwH/dk+afU00QDD7kl/bmZqfiUKoYzx87sHNZhRfcxlFF+rkRT+UDl7tarNiq
-         HxTh62bmn9BXFgG3N/0EpCsn30rEU3e0qs2MzTjgwKDI7eG8UkbHgotmvAP5g+Ak6Kva
-         qrM7TmKkfoI5rL4YkUXMt+/vvmnntNj8MdP05HP/ezOBy2XSO0AxuavfpB6Hjq4rh3AQ
-         fRcA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZEDVM5pZZBde5SuMyFX3Irupvq7OUfi/0ywJj8mR45mv1U1t1UrgWg1COPcakh9ZM2HElrmA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywxvm+aiSp0ClLuVWIqaZlAFHoJCWZ8aRrDQtmrlYdUJlCAyWQR
-	w4q7+t1ws2cjnMsi6KNdCRJ8UtJX0KeDEtDyuW+okDOpIxX/2IevgvKr
-X-Gm-Gg: AZuq6aLmAIOrM8UyCg34Jhg1bmWvk3Lj4YD9043vqu+ei9cdf1bxUYSyWDZYPFPaj0e
-	n/Zsm+Cyz2VcmDvO0r0SeJRvEFCxrYaYet9EKZmoElOiVEIPgE3y+y+DbiaXP386j9L4RqYIk09
-	qv6DTuXWtLmESvW/ptKbuMh4sKnj47LISvdPk3ZJq/eZbW/kpZWoTeoxABxcftQc9qsaOzqwMyy
-	j9ggPgGcW/LnSERml4TxBCKMAryLfY1tED+/7xsVNelait8srJQuwOziBF+rEDtvmm/IiErmle0
-	XS8nKZ383iN6I6NscHAxJOwL7uNPr9DSZZhAPnZBCuyqJqAT+ajL7tAlYSpLBlnmm/MD6G224JI
-	vvTWQhH3phGAaM2D20a5GMK0M+rvORVqO1Vbhbg1GM2nkWf0g8XcFTDsotP9WMMhjVwc9F5PItD
-	SJGRmxSRXSuccjLZsxrIwK9jHRvZcgfcUjkyN40S8VdRIPSaMmaYm/msBz5H2vMWpbZul7JFHZY
-	EwzWJZX
-X-Received: by 2002:a05:6000:22c4:b0:431:8f8:7f2a with SMTP id ffacd0b85a97d-4362933ec57mr1767057f8f.1.1770368106350;
-        Fri, 06 Feb 2026 00:55:06 -0800 (PST)
-Received: from thomas-precision3591.paris.inria.fr (wifi-pro-83-213.paris.inria.fr. [128.93.83.213])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-43629744ec6sm4878270f8f.35.2026.02.06.00.55.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 00:55:05 -0800 (PST)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	stable@vger.kernel.org,
-	Zhao Qiang <qiang.zhao@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net,v2] net: wan/fsl_ucc_hdlc: Fix dma_free_coherent() in uhdlc_memclean()
-Date: Fri,  6 Feb 2026 09:53:33 +0100
-Message-ID: <20260206085334.21195-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1770368664; c=relaxed/simple;
+	bh=AB6d9l1yIdG4NDk9kfKMD6kDBLagwQfDi0FTPUgZfCc=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=WmJalyczl1axr5X1n+Leh8YPEPZc+22w/fWreQxLR5AKovBNsaxL88XyvRPBnFKSeHU4HZUhQpngm2MtcEPI0jk2kh1Wmmc8K6qVf9Yu8b012b07AHYwWBg8e1fJBeQYb3wMALSEsSHQBWPMA7TWfdfp4XVKez3zcFO+UVAL2XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=ZL1hlCT1; arc=none smtp.client-ip=176.9.10.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
+	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:References:
+	In-Reply-To:From:Subject:Cc:To:Message-Id:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Wo5rtwWA+fxTOlC1JLIKn6B1LO6yH0YPj5NB9h/LCHI=; b=ZL1hlCT1JEmEX2xB2lOsRtQzI3
+	bY/Q1QJHpEiAX/TVR0cA8phCN0YsANgXVT/Nex8t7+wJfmwWX70Nm2HrvY0RIDB9UvfdOcCgbNodC
+	j76NcGE2BiyLahLbmmxO5WjlzfEVgvndGenr3L7xqLokdMoIHeliaZVPemCYQ/jZINSk+tSL8RwwW
+	uq/pMQiAE2XaW/PxPpxNOi6sOoa46Y0xefgssZAgYmPO/q8jHO460lVPjCi4LoqItD0Crgz4LY4ot
+	/xQNRL22iT/hn44SQVV0bGETxXq6/oCljiCWMO6yFL7+ldlmfd0GGEAw5JoXVdXH1b14ba9OTL+MH
+	uQzX1r3g==;
+Date: Fri, 06 Feb 2026 10:05:14 +0100 (CET)
+Message-Id: <20260206.100514.85172532893288505.rene@exactco.de>
+To: seanga2@gmail.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: sunhme: Fix sbus regression
+From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
+In-Reply-To: <cc269d9f-9a06-6623-e412-d04ecb7b4f74@gmail.com>
+References: <20260205.170959.89574674688839340.rene@exactco.de>
+	<cc269d9f-9a06-6623-e412-d04ecb7b4f74@gmail.com>
+X-Mailer: Mew version 6.10 on Emacs 30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [2.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[exactco.de:s=x];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,lists.ozlabs.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257493-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fourierthomas@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257494-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[exactco.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rene@exactco.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[exactco.de:-];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9CFC4FBB09
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.2:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,t2linux.com:url,patreon.com:url,1f:email]
+X-Rspamd-Queue-Id: 92EB3FBD9A
 X-Rspamd-Action: no action
 
-The priv->rx_buffer and priv->tx_buffer are alloc'd together as
-contiguous buffers in uhdlc_init() but freed as two buffers in
-uhdlc_memclean().
+On Thu, 5 Feb 2026 20:41:11 -0500, Sean Anderson <seanga2@gmail.com> wrote:
 
-Change the cleanup to only call dma_free_coherent() once on the whole
-buffer.
+> On 2/5/26 11:09, René Rebe wrote:
+> > Commit cc216e4b44ce ("net: sunhme: Switch SBUS to devres") changed
+> > explicit sized of_ioremap with BMAC_REG_SIZEs to
+> > devm_platform_ioremap_resource mapping all the resource. However,
+> > this does not work on my Sun Ultra 2 with SBUS HMEs:
+> > hme f0072f38: error -EBUSY: can't request region for resource [mem
+> > 0x1ffe8c07000-0x1ffe8c0701f]
+> > hme f0072f38: Cannot map TCVR registers.
+> > hme f0072f38: probe with driver hme failed with error -16
+> > hme f007ab44: error -EBUSY: can't request region for resource [mem
+> > 0x1ff28c07000-0x1ff28c0701f]
+> > hme f007ab44: Cannot map TCVR registers.
+> > hme f007ab44: probe with driver hme failed with error -16
+> > Turns out the open-firmware resources overlap, at least on this
+> > machines and PROM version:
+> > hexdump /proc/device-tree/sbus@1f,0/SUNW,hme@2,8c00000/reg:
+> > 00 00 00 02 08 c0 00 00  00 00 01 08
+> > 00 00 00 02 08 c0 20 00  00 00 20 00
+> > 00 00 00 02 08 c0 40 00  00 00 20 00
+> > 00 00 00 02 08 c0 60 00  00 00 20 00
+> > 00 00 00 02 08 c0 70 00  00 00 00 20
+> > And the driver previously explicitly mapped way smaller mmio regions:
+> > /proc/iomem:
+> > 1ff28c00000-1ff28c00107 : HME Global Regs
+> > 1ff28c02000-1ff28c02033 : HME TX Regs
+> > 1ff28c04000-1ff28c0401f : HME RX Regs
+> > 1ff28c06000-1ff28c0635f : HME BIGMAC Regs
+> > 1ff28c07000-1ff28c0701f : HME Tranceiver Regs
+> > Quirk this specific issue by truncating the previous resource to not
+> > overlap into the TCVR registers.
+> > Fixes: cc216e4b44ce ("net: sunhme: Switch SBUS to devres")
+> > Signed-off-by: René Rebe <rene@exactco.de>
+> > ---
+> > Tested on Sun Ultra 2 running T2/Linux.
+> > Alternatively we could explicitly size all regions, or check overlap
+> > in startup code (I also already have a patch for that, too).
+> 
+> What does this look like?
 
-Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
-Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
-v1->v2:
-  - Cleanup priv->tx_buffer and priv->dma_tx_addr
-  - Fix buffer name in commit message
+This only checks for "sorted" overlaps w/ the previous res, but given
+they probably usually are and it catches this case, ...
 
- drivers/net/wan/fsl_ucc_hdlc.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+The downside is, it may break other devices, I only test booted this
+on an Ultra 2 and Ultra 30. On the U2 it fixes the hme ethernet,
+too. On the U30 it causes an eprom region to be truncated. I probably
+should investiage that and test boot on all my SPARC systems before we
+consider this. That's why I sent the trivial hme driver hotfix first.
+Alternatively we could also overwrite all sbus res in the hme driver
+with the previously used known good sizes. I can send a patch for
+that, too if you like:
 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-index f999798a5612..dff84731343c 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -790,18 +790,14 @@ static void uhdlc_memclean(struct ucc_hdlc_private *priv)
- 
- 	if (priv->rx_buffer) {
- 		dma_free_coherent(priv->dev,
--				  RX_BD_RING_LEN * MAX_RX_BUF_LENGTH,
-+				  (RX_BD_RING_LEN + TX_BD_RING_LEN) * MAX_RX_BUF_LENGTH,
- 				  priv->rx_buffer, priv->dma_rx_addr);
- 		priv->rx_buffer = NULL;
- 		priv->dma_rx_addr = 0;
--	}
- 
--	if (priv->tx_buffer) {
--		dma_free_coherent(priv->dev,
--				  TX_BD_RING_LEN * MAX_RX_BUF_LENGTH,
--				  priv->tx_buffer, priv->dma_tx_addr);
- 		priv->tx_buffer = NULL;
- 		priv->dma_tx_addr = 0;
+diff --git a/arch/sparc/kernel/of_device_64.c b/arch/sparc/kernel/of_device_64.c
+index f53092b07b9e..8bd405cbc04f 100644
+--- a/arch/sparc/kernel/of_device_64.c
++++ b/arch/sparc/kernel/of_device_64.c
+@@ -412,6 +412,15 @@ static void __init build_device_resources(struct platform_device *op,
+ 			r->start = result;
+ 			r->end = result + size - 1;
+ 			r->flags = flags;
 +
++			/* check for and correct simple bogusly overlapping resources */
++			if (index > 0 &&
++			    op->resource[index-1].start <= r->end &&
++			    op->resource[index-1].end > r->start) {
++				printk(KERN_WARNING "%pOF: prev regs overlap (%x), limiting %x.\n",
++				       op->dev.of_node, op->resource[index-1].end, r->start - 1);
++				op->resource[index-1].end = r->start - 1;
++			}
+ 		}
+ 		r->name = op->dev.of_node->full_name;
  	}
- }
- 
--- 
-2.43.0
 
+
+> > ---
+> > --- linux-6.18/drivers/net/ethernet/sun/sunhme.c.vanilla 2026-02-05
+> > --- 11:50:33.288906134 +0100
+> > +++ linux-6.18/drivers/net/ethernet/sun/sunhme.c 2026-02-05
+> > 11:55:22.541384377 +0100
+> > @@ -2551,6 +2551,9 @@
+> >   		goto err_out_clear_quattro;
+> >   	}
+> >   +	/* BIGMAC may have bogus sizes */
+> > + if ((op->resource[3].end - op->resource[3].start) >= BMAC_REG_SIZE)
+> > + op->resource[3].end = op->resource[3].start + BMAC_REG_SIZE - 1;
+> >   	hp->bigmacregs = devm_platform_ioremap_resource(op, 3);
+> >   	if (IS_ERR(hp->bigmacregs)) {
+> >   		dev_err(&op->dev, "Cannot map BIGMAC registers.\n");
+> > 
+> 
+> Reviewed-by: Sean Anderson <seanga2@gmail.com>
+
+-- 
+René Rebe, ExactCODE GmbH, Berlin, Germany
+https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
 
