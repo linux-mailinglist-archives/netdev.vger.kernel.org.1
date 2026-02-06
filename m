@@ -1,243 +1,151 @@
-Return-Path: <netdev+bounces-257658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OBLJt9ihmlyMgQAu9opvQ
-	(envelope-from <netdev+bounces-257658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 22:53:35 +0100
+	id iNarJwRohmm4MwQAu9opvQ
+	(envelope-from <netdev+bounces-257659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 23:15:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CA4103995
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 22:53:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B62ED103B03
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 23:15:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E82A13013B64
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 21:53:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CB0E3052341
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 22:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2899B312826;
-	Fri,  6 Feb 2026 21:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766F930E856;
+	Fri,  6 Feb 2026 22:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDoe48c/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HWGEoAqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF84031280C
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 21:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3E030E821
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 22:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770414811; cv=none; b=SW2UErEf2Kql48iErcegopsjqRTc9L2L8O2R60XGplvL1hLfbzwVc3evFYL/90JntFh1+HmfutqBNBAm8ySDC4VKYXovyH4rs33IDoj67XGJW4jjhoZS9zWx4DEtv0P0zrm35QYwwis6G4p8Ms789nXO1L6HW32cMzucJG9YDfQ=
+	t=1770416096; cv=none; b=fCsMGAmFhC4dLvHYrTm3awfCxFnwSth8t6Ue+zbYLkvUfEjNMgWDxupceOtYBx9wiRem4f5Hr3qR8f39pJ9sBmJY7SfOS+SzRu32BqCfBiv6U59+d8+18KUx6Vb/fpmQRu28ZjYhghYk8S0Jz4PoEJBXFhd+9mlr7At6P/8ggG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770414811; c=relaxed/simple;
-	bh=N+K+u5vfKMyiGUx+T0sMrtyHfAeD78DEAek8Bx0L4zA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=kFR85HBt5OtcoBOOxIxFhq18BCgfF9LiOLSnc+ZZyVPOvEF1IF4Mc28BIvBVxVK8VVSzNgtciZIbAluQacku+NSY8nHxigXR96sn9Lj1WYc7n61LhywjBycFQsGL1AsOq3FyAFIJcXosZWLZbBin/ewezXYSXr3nEE/Ls4BLr44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HDoe48c/; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4359249bbacso2194473f8f.0
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 13:53:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770414809; x=1771019609; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zAl16RgQK7YFCIKgzNT/s5NyKcYOEtIJSgcBAHgZb7s=;
-        b=HDoe48c/Sh/GixgFeEhGiXRICOx/j7IdK1TgdROkAVUiFzmZiKwPaOGucohEEZSIW9
-         +QZBPkrNJ6HB1228kCdkxQ3NR2y4hFNoYRRcRkkoNU8PWuv8mfkaWJ0WFQTLJ1WTdy9I
-         C3qKVUohU/mSRW/i5vrd8wfyNvkd9sWupz5yI28YlMlUgTPbInWJJD3b+M4l/HBCn7DA
-         aP/+TnW/RKOaUZH8BI4XJ1S2MMKpqoz1R4vd/CaNN2MwOswMbsB4tkj8BbwMFnFHzuWV
-         XPwW/eW19gbwFjY8ZxZ+JQm6WLtsKAq8WgfIW8Gvq9x9DvN8jV6cChFOs8FBjywdwOwe
-         6m2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770414809; x=1771019609;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zAl16RgQK7YFCIKgzNT/s5NyKcYOEtIJSgcBAHgZb7s=;
-        b=MavktfUqyBHQkjxScHNy7CFx5Aaw7DxYzz/IC/O0EDEYgzY61IB+mB31IYInn7Bmnp
-         tplixDDxJH/sZrMzcIXRlXdyy9phznNZFvy61qQzfrFBNok1iw8S2Nx8ick+rXkOnXbk
-         ByIAtXY7scwQ48Xh8bokufAzw3Nafb6fwoBHsSOnBufTuguA2RwF2VCdvYq3D+L87JMB
-         CroSpu6L43g9WJAZ3gKf2jvOGWK74uYjFSd12ybTwh/uyS7GHHfiCB2w6j6dh7sX6JPO
-         FY8LnodcpS+cxRdz7GyL4GdV0j30n1r7HW/tu/P3O4DmPVxOuQBXYfcz3QTFrnpULDh3
-         93bw==
-X-Gm-Message-State: AOJu0Yz3W/TU9gyWrOIYS7rAj9RRFI+YeGCy1FUuGMMv967sPTCtgbcc
-	OBgkIr6BhEzLro9VS0ORVPJQfnMeBwR4x4XJ8+qXChArbmHNoxciLGc7
-X-Gm-Gg: AZuq6aLWauBCPHx6siYehhBbNeGa9PJqbKun2YJe21M08yyEU6yR80Zy1EGvpz5EYuf
-	jl3w5zvrdJNPQmiQXq2ZPdIWTGJf74tMr8dFsZqRpM02lKAHqbR9TMUUzU8gNb2cpgN8uqMbFPy
-	v4G/HdRwJs5dpn0oKM9WGDtDgojxCTBLUwRodz219smyT0M6juZHe4BcXUXiozTCQri5jYIh3W8
-	ag9RB+MJYClFHWvQZWVwldd90naYEBpES4ir/6DvyeHWQfIQ5LvcYB5GvxWsMaRUe7k+ACsqkk8
-	tkJn9u5qhKgm/nz1bUkhXLxuU4qLjUG7ynkR0xiaxNyjyQR54GYm+6xT2NAtVeGsP7vQgAyGpXX
-	xJvBP3JM1wkZLOQAY+zT70qz2VuyuDaLlMiiy/8AC2zxkgTIflxD/paM/MKEDJzfuxqVgMejmsn
-	zLrWWK8Ht5GvJrBpTqg/2i40MguZCwNjYyA5xniXcYD+L53YoZU70gCs2j05E++lc0cO43E6/jT
-	F12VdNrhwuT4HquqBZrGTymNa7QHUXhsUMoS1F6GRcdnlAsZU9clA==
-X-Received: by 2002:a5d:5f55:0:b0:435:8dd5:ad4f with SMTP id ffacd0b85a97d-436209964d4mr12103443f8f.9.1770414808890;
-        Fri, 06 Feb 2026 13:53:28 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f15:8200:e142:60ff:2daa:1023? (p200300ea8f158200e14260ff2daa1023.dip0.t-ipconnect.de. [2003:ea:8f15:8200:e142:60ff:2daa:1023])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43629664632sm8463498f8f.0.2026.02.06.13.53.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 13:53:28 -0800 (PST)
-Message-ID: <5bc19909-0fc7-485c-a573-4819eeea5b5d@gmail.com>
-Date: Fri, 6 Feb 2026 22:53:26 +0100
+	s=arc-20240116; t=1770416096; c=relaxed/simple;
+	bh=uh56Ld9r8AlvRahEXfLHL1h+qo6PypS4yomZDOxd6Lc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pWOmiWUC/RRrC4n43ao01LctN4Vv864qmbJnjP7kRFVXLrKbpIorynfhmCbUXvSJsjNkl/XxQngeEnc6408o47phNcS0yMMQvOuURKBiyfFu3SOHVTKzXLS+w09Ek+JTxqi/Dyf+MwM2nkY+chkw12+kqWevMvJxh2v/QFpJt1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HWGEoAqD; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770416096; x=1801952096;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uh56Ld9r8AlvRahEXfLHL1h+qo6PypS4yomZDOxd6Lc=;
+  b=HWGEoAqDE9DiT+MvJyBpXMEeeBtnSGWpPPjJV09dFsnKB7BfzHtU/aNp
+   j22JER303vYmvC8I5NAL5uOWbOlObXNbejsFR88eilkMx4Oaab+LKK0kr
+   FqsXb7L+HlbDleLJbmociyguJzeKpomBCNuPTKj46g+xfe9xYu9rSSUhC
+   lYzo9eF7/9FYj3UhRq9PAZgVVeFZ0heOS6xtGRi57ta7WNM5yIPRMj3iE
+   8XByFitFzezwZChsfZfh9Qs9UqhKGvAV2Ffnz1oQlOfoQKaVIKmdpFgux
+   lBOz4it2KsDU+a/X1gYaB1Vtb086ZQEIgzyBGKNtmBpl094DYIwtlh4DT
+   w==;
+X-CSE-ConnectionGUID: T3e4W/obTzKTnjFwattvZw==
+X-CSE-MsgGUID: JcaNHFmvS9qpxo9bSlGbxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11693"; a="71810296"
+X-IronPort-AV: E=Sophos;i="6.21,277,1763452800"; 
+   d="scan'208";a="71810296"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2026 14:14:55 -0800
+X-CSE-ConnectionGUID: kAf8gZC2Tui2/R+mVQeRxA==
+X-CSE-MsgGUID: O9MtuTLWQIemjHxFGGIiVg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,277,1763452800"; 
+   d="scan'208";a="233939442"
+Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
+  by fmviesa002.fm.intel.com with ESMTP; 06 Feb 2026 14:14:52 -0800
+Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1voU6D-000000004j3-14lf;
+	Fri, 06 Feb 2026 22:14:49 +0000
+Date: Fri, 6 Feb 2026 23:14:46 +0100
+From: kernel test robot <lkp@intel.com>
+To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, virtualization@lists.linux.dev,
+	parav@nvidia.com, shshitrit@nvidia.com, yohadt@nvidia.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, jgg@ziepe.ca,
+	kevin.tian@intel.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+	edumazet@google.com, Daniel Jurgens <danielj@nvidia.com>
+Subject: Re: [PATCH net-next v20 05/12] virtio_net: Query and set flow filter
+ caps
+Message-ID: <202602062314.1P5VPlUN-lkp@intel.com>
+References: <20260205224707.16995-6-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Walleij <linus.walleij@linaro.org>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Roger Quadros <rogerq@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- linux-omap@vger.kernel.org
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: ethernet: ti: davinci_emac: remove member
- phy_id from struct emac_platform_data
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260205224707.16995-6-danielj@nvidia.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257658-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257659-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.988];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.961];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 18CA4103995
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: B62ED103B03
 X-Rspamd-Action: no action
 
-b4aed01de486 ("ARM: davinci: Delete DM646x board files") removed the
-last user of member phy_id. So let's remove phy_id.
+Hi Daniel,
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/ti/davinci_emac.c | 24 ++++++++++--------------
- include/linux/davinci_emac.h           |  9 ---------
- 2 files changed, 10 insertions(+), 23 deletions(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/ti/davinci_emac.c b/drivers/net/ethernet/ti/davinci_emac.c
-index ed8116fb05e..df51441a2b8 100644
---- a/drivers/net/ethernet/ti/davinci_emac.c
-+++ b/drivers/net/ethernet/ti/davinci_emac.c
-@@ -329,7 +329,6 @@ struct emac_priv {
- 	u32 mac_hash2;
- 	u32 multicast_hash_cnt[EMAC_NUM_MULTICAST_BITS];
- 	u32 rx_addr_type;
--	const char *phy_id;
- 	struct device_node *phy_node;
- 	spinlock_t lock;
- 	/*platform specific members*/
-@@ -1418,6 +1417,7 @@ static int emac_dev_open(struct net_device *ndev)
- 	struct emac_priv *priv = netdev_priv(ndev);
- 	struct phy_device *phydev = NULL;
- 	struct device *phy = NULL;
-+	const char *phy_id = NULL;
- 
- 	ret = pm_runtime_resume_and_get(&priv->pdev->dev);
- 	if (ret < 0) {
-@@ -1502,8 +1502,8 @@ static int emac_dev_open(struct net_device *ndev)
- 		}
- 	}
- 
--	/* use the first phy on the bus if pdata did not give us a phy id */
--	if (!phydev && !priv->phy_id) {
-+	/* use the first phy on the bus */
-+	if (!phydev) {
- 		/* NOTE: we can't use bus_find_device_by_name() here because
- 		 * the device name is not guaranteed to be 'davinci_mdio'. On
- 		 * some systems it can be 'davinci_mdio.0' so we need to use
-@@ -1513,20 +1513,19 @@ static int emac_dev_open(struct net_device *ndev)
- 		phy = bus_find_device(&mdio_bus_type, NULL, NULL,
- 				      match_first_device);
- 		if (phy) {
--			priv->phy_id = dev_name(phy);
--			if (!priv->phy_id || !*priv->phy_id)
-+			phy_id = dev_name(phy);
-+			if (!phy_id || !*phy_id)
- 				put_device(phy);
- 		}
- 	}
- 
--	if (!phydev && priv->phy_id && *priv->phy_id) {
--		phydev = phy_connect(ndev, priv->phy_id,
--				     &emac_adjust_link,
-+	if (!phydev && phy_id && *phy_id) {
-+		phydev = phy_connect(ndev, phy_id, &emac_adjust_link,
- 				     PHY_INTERFACE_MODE_MII);
- 		put_device(phy);	/* reference taken by bus_find_device */
- 		if (IS_ERR(phydev)) {
- 			dev_err(emac_dev, "could not connect to phy %s\n",
--				priv->phy_id);
-+				phy_id);
- 			ret = PTR_ERR(phydev);
- 			goto err;
- 		}
-@@ -1761,10 +1760,8 @@ davinci_emac_of_get_pdata(struct platform_device *pdev, struct emac_priv *priv)
- 	pdata->no_bd_ram = of_property_read_bool(np, "ti,davinci-no-bd-ram");
- 
- 	priv->phy_node = of_parse_phandle(np, "phy-handle", 0);
--	if (!priv->phy_node) {
--		if (!of_phy_is_fixed_link(np))
--			pdata->phy_id = NULL;
--		else if (of_phy_register_fixed_link(np) >= 0)
-+	if (!priv->phy_node && of_phy_is_fixed_link(np)) {
-+		if (!of_phy_register_fixed_link(np))
- 			priv->phy_node = of_node_get(np);
- 	}
- 
-@@ -1846,7 +1843,6 @@ static int davinci_emac_probe(struct platform_device *pdev)
- 
- 	/* MAC addr and PHY mask , RMII enable info from platform_data */
- 	memcpy(priv->mac_addr, pdata->mac_addr, ETH_ALEN);
--	priv->phy_id = pdata->phy_id;
- 	priv->rmii_en = pdata->rmii_en;
- 	priv->version = pdata->version;
- 	priv->int_enable = pdata->interrupt_enable;
-diff --git a/include/linux/davinci_emac.h b/include/linux/davinci_emac.h
-index 28e6cf1356d..c1482557d3e 100644
---- a/include/linux/davinci_emac.h
-+++ b/include/linux/davinci_emac.h
-@@ -25,15 +25,6 @@ struct emac_platform_data {
- 	u32 ctrl_ram_offset;
- 	u32 hw_ram_addr;
- 	u32 ctrl_ram_size;
--
--	/*
--	 * phy_id can be one of the following:
--	 *   - NULL		: use the first phy on the bus,
--	 *   - ""		: force to 100/full, no mdio control
--	 *   - "<bus>:<addr>"	: use the specified bus and phy
--	 */
--	const char *phy_id;
--
- 	u8 rmii_en;
- 	u8 version;
- 	bool no_bd_ram;
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Jurgens/virtio_pci-Remove-supported_cap-size-build-assert/20260206-065356
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260205224707.16995-6-danielj%40nvidia.com
+patch subject: [PATCH net-next v20 05/12] virtio_net: Query and set flow filter caps
+config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260206/202602062314.1P5VPlUN-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260206/202602062314.1P5VPlUN-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602062314.1P5VPlUN-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+>> ./usr/include/linux/virtio_net_ff.h:9:10: fatal error: uapi/linux/stddef.h: No such file or directory
+       9 | #include <uapi/linux/stddef.h>
+         |          ^~~~~~~~~~~~~~~~~~~~~
+   compilation terminated.
+
 -- 
-2.53.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
