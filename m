@@ -1,133 +1,186 @@
-Return-Path: <netdev+bounces-257578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aH0iERIHhmkRJQQAu9opvQ
-	(envelope-from <netdev+bounces-257578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:21:54 +0100
+	id 4HYXD4YHhmkRJQQAu9opvQ
+	(envelope-from <netdev+bounces-257579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:23:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E208FFAE5
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:21:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9203FFFB2C
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:23:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 139173002D23
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 15:21:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32419301412B
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 15:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3BE366079;
-	Fri,  6 Feb 2026 15:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D113ECBF3;
+	Fri,  6 Feb 2026 15:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8JPupPL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K/uXAkMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD4826ED40;
-	Fri,  6 Feb 2026 15:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFC926ED41
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 15:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770391304; cv=none; b=pFDt8JpbFuZIoLj6lBw2a7B+eLt7w3gYedH8RHDrt9I6PPd33PA+IsiavgjqES2XF6npPcIPWqyi/N1fL1caYfH10S6lFLnoNvsOouYxzqXDKF+8mzhKZ8zRH6+/YAjJ+yn55EqLpy777NNb3TA6cTaW1b4CqamrJpcGZYVNKVA=
+	t=1770391427; cv=none; b=BBe47VvfRaWaUJxkZa4toHBs5QiWzZ9jLbEad95WJriWoqiAWjq3hDexewyfUaGkIEAt2wiSwZCWEAqyJuGb2jOZPlklL7JbeVsnGx+3+uZtHZRNmibmmYFtfXYJgrizeVystMIh0xcwpy6RnPobc4wOfT54UfjZBtUieutyOWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770391304; c=relaxed/simple;
-	bh=TUuctS5iACsWdKHAPpxd3q5N9pvKwPqGOSSMlfwtrP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UB/qLNLU2tXnc/z0zRu+Qt9cW8Alp+WwUf2XpnZECixBtuNdYJDg03uvBZc2n2UA2e96q1hgtlnrgDDJJNtF4fUNjbVhTIrFl45dqCvvCB2HkFRTzLYmgLbQgQM/cwoBmkKfiQqsSMn2JkQcNW0WKQONCdYn6nhUQ1Kxupczh1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8JPupPL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD56CC116C6;
-	Fri,  6 Feb 2026 15:21:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770391303;
-	bh=TUuctS5iACsWdKHAPpxd3q5N9pvKwPqGOSSMlfwtrP0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=C8JPupPLdctogUO0DG858/BnV3dU9UDerbef9V4Xq7nfzNFRYIaMI2j0cpINidzzv
-	 Pk1RnIuh/2ALunTiE3vSe1I3LUK+PvjGM+UBwi4k45RXRUbcrDQ9ewTFIUFEsMyOnB
-	 JJ2MG+aaUWp3NkY03nCG4AQ8xjU4DbtOBGleDNnCebGA/x0KMTsXJiDmyzt0nn5Tx6
-	 vQv33Lvu84QRplRhLE9XeQoM1TfTv7npUj2/+Pb8MC38mdufCZKSjCQ9qNzQtkZzez
-	 VzxOO2/TyrBq2NWzbhJ5walzS9N21AS6nykFUkxp9vkvUzgMzTs1mZqf7owwxM/3tE
-	 e3zwQfM/xxfJQ==
-Message-ID: <007e93e8-ab52-45b3-8e06-107f1b02af0c@kernel.org>
-Date: Fri, 6 Feb 2026 16:21:38 +0100
+	s=arc-20240116; t=1770391427; c=relaxed/simple;
+	bh=+O1Ls5mJN2w86ohgl0FWaLhpMAN9yWArFMvJtTQfTl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHZi+bg3VkhIZgxOiyEFYHIy3BLbD/71u2ZtgYzPoBpnaJDHxLhQ8u1S/djyuAKw1y2BNgmu9RQQoB/BfUob8yen1qiq5Kz+iUf2p7cuHn5xzz5OvbHEGG2v4gmsrHcwmCBuWO79k7bG/f3bI7zJhPbPu4GxUU63Oyq7fen93Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K/uXAkMD; arc=none smtp.client-ip=209.85.128.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso24279845e9.2
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 07:23:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1770391425; x=1770996225; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vmk3i2Xic+N6h+88mYHjXnA3IoHoaC3fj4TmXWw7rGg=;
+        b=K/uXAkMDWvGQxodUUir939WxLkYqVCxvkC6umuDuKPQ+bl/LrMa2xTRS1g6wpO5zSe
+         FubY9ilhu3RR3GIfEql69EVwOmXbdN2OBTEb1C7o8NQ6P8bwMP4U/PnmTYRHix/Hpb7u
+         6lzE3KZtcPQNtId6S3uuJ4FqV4YG8ueqltz0stLJRSbi9yDRLq0v4H01SwDTerxTzXeA
+         dQrKivfRuOxhNeU3pxDWMbpV/zkO3nu6FtwgPAzcRJZFvF9ZfgM+kmiKR8g8wVPhU1mR
+         XLKpNnOBu1LsthkmCoiQxd9VJ8XIAUQ6XnLXvlswQ8R+DP6aJTeomLsiqZ8W7JXLSlVp
+         ETTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770391425; x=1770996225;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vmk3i2Xic+N6h+88mYHjXnA3IoHoaC3fj4TmXWw7rGg=;
+        b=MUFn6A+CXa8fvSsBhHp/kGMjgEe7YKv7aEPwwOpPH4attBgTguqAsjxq7C23lBXC4M
+         f4Ws8N0mg1ECfLAkx4ibtdBUx5CXjJ7no87vP/Y0iYLPI9Fj2+xEvva/RESHl8Q7F4nq
+         LdVmL0rAdeeQIKBlYmm1fhag3Lncl2th1Za+f3XxhmbZbS9lYETZrjgJZrN9FGZNb9NH
+         THoitICqNlPOUQ8gNy3KGje8TPLvVkfeus9c2cM/7bh0gD8NKrcRhZFG1sDNBa4uEy35
+         Gf6B9OjMs9vYhaXEPq+J6EEwBt0kHdhKFunaMhJJubKCNyMwqKef5S5OBh4GDR+k7y7f
+         O+2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWIZX8wPLWPmZb0EF228uABxT3Tfr5T/+NzmMLwyA/mbdj9OrYsSEbZCSxBfsbI0gXhkOlSUuk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIIurLcs8rnZCuXoiHLrD4klA3HJxY+w5OcAGyOWaqZF5altq9
+	bB7TsaHuBzWXfQmFGXw2TCYEgWREJ9V/pny5upl/4u5nlcDiyOGYmfIujM76WLfVx3M=
+X-Gm-Gg: AZuq6aJkCOHIXQAeSJracJXCIJpphFeqe/TawbQHIZa2yU+PtwC1qFZaKM9MDGb5gJy
+	u71r2kTiwF+Y6eTjiYfxu0ex6Bc/5h0rvOX60GKYN4v1o9T0Sg+Zvb9FErly1f04gjvZNm7HRYC
+	KOg6RaicKAB8h8yNY/NAekZH1GEZJTxX5/B/gp81kHlFiRsPY4bOCIY3KzbgzmZ6ladprf6hi2T
+	8FK58RTEshjjgQDOwXhX3PTYgHIhAc0f6e8w96VGknuku7XIoeGf6SgvhGNfkZ+1Lk0ELh1J0L8
+	A9LI80kRg5XyrrU7ADkOFM4YQNdjW6NxMn8j2kSUJm81ynZa3vyZjsaA9BXF5ez5v1ulWv5VMtb
+	tSDwFiSdHezLqIxDN820/Gb7ufteVdMB2nrzL1VX2ZJkVuJVyOZvpqc52B4G+IhFdEV0vEnR7Y5
+	8QOPJMLKA5YV6wFdy5khmdFbSRd34=
+X-Received: by 2002:a05:600c:3b87:b0:477:df7:b020 with SMTP id 5b1f17b1804b1-48320966a0cmr42152645e9.18.1770391425272;
+        Fri, 06 Feb 2026 07:23:45 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48317d7a924sm202077135e9.10.2026.02.06.07.23.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Feb 2026 07:23:44 -0800 (PST)
+Date: Fri, 6 Feb 2026 18:23:41 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Stephan Gerhold <stephan.gerhold@linaro.org>
+Cc: Stephan Gerhold <stephan@gerhold.net>,
+	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [bug report] net: wwan: Add Qualcomm BAM-DMUX WWAN network driver
+Message-ID: <aYYHfapZdjGYCGLI@stanley.mountain>
+References: <caa37f28-a2e8-4e0a-a9ce-a365ce805e4b@stanley.mountain>
+ <aYXu1uXRG1KHrKej@stanley.mountain>
+ <aYYE0SBR6V-HWcPr@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next RFC v1 0/3] net: sched: refactor qdisc drop
- reasons into dedicated tracepoint
-To: Antoine Tenart <atenart@redhat.com>
-Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org, horms@kernel.org,
- jiri@resnulli.us, edumazet@google.com, xiyou.wangcong@gmail.com,
- jhs@mojatatu.com, carges@cloudflare.com, kernel-team@cloudflare.com
-References: <177022452988.1827734.5121740962985640333.stgit@firesoul>
- <20260204190417.110f5498@kernel.org>
- <2e1eb11c-cd47-4772-baff-45d43d4fa539@kernel.org> <877bsr1l1h.fsf@toke.dk>
- <CADCXZ1yMkZbRd7ioGw5QQ61OdmYp6misUDoj-s-g7wuoiCHKbg@mail.gmail.com>
- <87v7gbz1ru.fsf@toke.dk>
- <CADCXZ1z-gg_VsN4kjf325HvWRxL1irhUC76B_erggm5+A7qQ7g@mail.gmail.com>
- <41da26a6-4024-461f-8254-ac5dcf231397@kernel.org>
- <CADCXZ1wMxCN3B-c+x4SgqC7H-Wap=e_sJ_hu-2B+96b=ip9OVQ@mail.gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CADCXZ1wMxCN3B-c+x4SgqC7H-Wap=e_sJ_hu-2B+96b=ip9OVQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aYYE0SBR6V-HWcPr@linaro.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257578-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257579-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,gmail.com,vger.kernel.org,davemloft.net,resnulli.us,google.com,mojatatu.com,cloudflare.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4E208FFAE5
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:dkim]
+X-Rspamd-Queue-Id: 9203FFFB2C
 X-Rspamd-Action: no action
 
-
-
-On 06/02/2026 16.04, Antoine Tenart wrote:
-> On Fri, Feb 06, 2026 at 03:41:23PM +0100, Jesper Dangaard Brouer wrote:
->> On 05/02/2026 17.24, Antoine Tenart wrote:
->>
->> Can you point me at the OVS userspace code that consume these subsys
->> drop_reason's?
+On Fri, Feb 06, 2026 at 04:12:17PM +0100, Stephan Gerhold wrote:
+> Hi Dan,
 > 
-> I think this was mostly added for debugging utilities and not consumed
-> by OvS directly but I don't know the OvS userspace code tbf. Anything
-> you're looking for specifically?
+> On Fri, Feb 06, 2026 at 04:38:30PM +0300, Dan Carpenter wrote:
+> > [ Smatch checking is paused while we raise funding.  #SadFace
+> >   https://lore.kernel.org/all/aTaiGSbWZ9DJaGo7@stanley.mountain/ -dan ]
+> > 
+> > Hello Stephan Gerhold,
+> > 
+> > Commit 21a0ffd9b38c ("net: wwan: Add Qualcomm BAM-DMUX WWAN network
+> > driver") from Nov 27, 2021 (linux-next), leads to the following
+> > Smatch static checker warning:
+> > 
+> > 	drivers/net/wwan/qcom_bam_dmux.c:505 bam_dmux_cmd_data()
+> > 	error: buffer overflow 'dmux->netdevs' 8 <= 255 user_rl='0-255' uncapped
+> > 
+> > drivers/net/wwan/qcom_bam_dmux.c
+> >     500 static void bam_dmux_cmd_data(struct bam_dmux_skb_dma *skb_dma)
+> >     501 {
+> >     502         struct bam_dmux *dmux = skb_dma->dmux;
+> >     503         struct sk_buff *skb = skb_dma->skb;
+> >     504         struct bam_dmux_hdr *hdr = (struct bam_dmux_hdr *)skb->data;
+> > --> 505         struct net_device *netdev = dmux->netdevs[hdr->ch];
+> >                                                           ^^^^^^^
+> > Smatch thinks skb->data is untrusted.  This is the rx path.
+> > 
+> 
+> Thanks a lot for the report!
+> 
+> I believe this is not a problem in practice, since there is an existing
+> check for this in bam_dmux_rx_callback() (which is the only function
+> that calls bam_dmux_cmd_data()):
+> 
+> 	if (hdr->ch >= BAM_DMUX_NUM_CH) {
+> 		dev_dbg(dmux->dev, "Unsupported channel: %u\n", hdr->ch);
+> 		goto out;
+> 	}
+> 
+> 	switch (hdr->cmd) {
+> 	case BAM_DMUX_CMD_DATA:
+> 		bam_dmux_cmd_data(skb_dma);
+> 		break;
+> 
+> Is that something Smatch should be able to detect?
 > 
 
-I'm just trying to making sure that I/we don't break any userspace code.
+Ah, you are right.  Thanks.
 
-Yes, looks like debugging tools are the consumer. E.g. The Red Hat
-NetObserv[1] tool mentions OVS decoding drop reason.
+The problem is that skb->data is a buffer of u8 data.  Smatch does cross
+function analysis, but it treats a buffer like that as opaque data.
 
-[1] 
-https://www.redhat.com/en/blog/network-observability-real-time-per-flow-packets-drop
+Btw, I see that this code is actually from five years ago so I don't know
+why it's showing up as a warning now.  :/  Sorry about that.
 
---Jesper
+regards,
+dan carpenter
 
