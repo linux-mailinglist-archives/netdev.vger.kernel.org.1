@@ -1,251 +1,176 @@
-Return-Path: <netdev+bounces-257526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICArCJDIhWnAGAQAu9opvQ
-	(envelope-from <netdev+bounces-257526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 11:55:12 +0100
+	id INo1FgrLhWlWGgQAu9opvQ
+	(envelope-from <netdev+bounces-257527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 12:05:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7088DFCDD0
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 11:55:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8CF3FCFEA
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 12:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CF4A30547EE
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 10:52:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8BA9308A5C4
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 11:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9558738F92B;
-	Fri,  6 Feb 2026 10:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NpQSTGU/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6ED3793A0;
+	Fri,  6 Feb 2026 11:02:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377B438F25E
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 10:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBADE363C4F
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 11:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770375148; cv=none; b=oCCXS7Sk6QtWb06Oamde/Q/jUamzOn/vsdYXdEURYZh3Ob+pFSfaxn75dPt2PLbqDBL0E/whhn/nd1cOG6/QV2c5LMWELeRqc5HRJRsUWkw7idUHS3whNzFQRgyLzZ+HgsUrRQK25WA6yaicnON+49MBzYNps/3zg3W5NtJR87I=
+	t=1770375771; cv=none; b=Kj5/a+XUZVvYtDByIBC8pNnKYvCMPSCxTTGUJHAhmKskGLkjBXok/p0L0xa1MMlUbwCWifZeWiNqLiOBNSWi4FKBs/A1zEp2diLZ/ZPgRsYq5Jqix7ixq2YcaGt/Nxq5AV3C+8eJRZeY7tBaPBs1NDur0py+BgeL5Y8npolMTX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770375148; c=relaxed/simple;
-	bh=6o6KR7nghgzkDxl1nkVVieT0SH1rzwovWzzo4qPtUjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BSfkkS/UaTyGfOxIOzm0EXwL7F77T2Qn2SeIA7gsMHkTPjsgDbsd479rfbf9Z6klT/qCLiaSYRxihCt2zLIbv8x31/vnS6hmGQVzNWDEPaVHC9cb4E7ZoJCOE+Hq8ztob+bWxeZ+opkQGddIQx/s3akaH5j+YgQYqL37kIUTQAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NpQSTGU/; arc=none smtp.client-ip=209.85.221.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-4359249bbacso1881538f8f.0
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 02:52:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1770375145; x=1770979945; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cWdOoqfAHgDZZ2fSkAIYLWT6yGlK8Y5I4AE6a0ezGSY=;
-        b=NpQSTGU/G3clR2EbpmRJmkTCCpS/1EhKXyVpKv7apmUyI7pZbkNSn/FLx4XhAy7ZqX
-         16X8g94P7ER8FuvfRazlY7efGyO4+O4CI4b3UHbR47DLAUaxKcwtsRw6stF5jonpNNH8
-         08QfgGyrIxTN722H7fPdljbtwkpTL5163eSwa2+gDjXr6630o1xvutBDkFmAICmjWMkd
-         CnspGzLOzlF9Qn8txDr9rMiV/AoqXmq8k+xXsxHzC8PGpP7bo+vtNq1MEKNoG48b3rBL
-         jazS8l9F7cGTzkPuSXmkec0mw6ULBOQd4UHMuQe5pIf+FG0PI7t6LUIGFXZ1Pmn8wuRF
-         2mrA==
+	s=arc-20240116; t=1770375771; c=relaxed/simple;
+	bh=c/HL+hLMk1S54ZdP/yEhYQJxVhG8qWcHT5w266q1DZo=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=gU+lqubxpZawT7933T2LL4scSxpTLwPEHNeN2KLQrFxasW9W63VzWNVIpFdefY/QcwOYUa4k6Fh076iF84C/F9MexCL9kyLY5D1ntF5ChL/J+fTxekzYMaP8CB4xJeA4kNVJEEscsyH9Jln5bEA3UdFZ9Qx3VBH9Myg3dRUkNY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-663118d3eb2so8660189eaf.1
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 03:02:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770375145; x=1770979945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cWdOoqfAHgDZZ2fSkAIYLWT6yGlK8Y5I4AE6a0ezGSY=;
-        b=rddU6iSsnWqkTVFdQ1VmD/TzYyNjVn4gOMAR9m9W0Pvar8GY9OXzaA66lGsjdttGOo
-         Yyept5nQJYjmHweE+AB3aXeSvcnvfIhAawAko1OyvSdJArEXcMRUNGLIAT02jUXGk/GB
-         EsVc1yuBs5ITZmF7k/IzD71t4jfurQW5boykvBMqtfdbpCUI05NF92SRbNyoNzqovQo0
-         EJba/uvDkDdWb7NsQEh0BJ6tGPZq6O+nGEvH89xvEiPHNyU7gs0H4R2V92SBwRzPv8Gc
-         /VXXmKv/FMd8C4H7zYmwFGutEoCIdF/bPZFAReu49nqLzi2XW0Q2uLKpx6Z+p2xngbo4
-         JnHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWBz4hfQOuKffKK+NZ/U9f0Crx7EeF1nbIedlzsrtIpdlJwvd8LnYDvEqjiBabRLteVqwigJM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmFZ99uqv7qUMp6v+g48LfTupJDNmjyurXIjbaO7aVw1oy7yDZ
-	3aNM+zqXqtAgNl2kNwoCJhD44W3OjV5mFLaCSqKIJ+zlpt6bz2JdbTtUlB6nFTOsROA=
-X-Gm-Gg: AZuq6aLj9B0w71eg15o+QhZ3qNNc0G0n7YGNXwGXN2iieWr7Mu9m3IEWbQtOZhq8T0G
-	suG9qQuFPYqAwJKU1xJdtYK5sdpsT173MAtLstTT4XakwZhQVpYWEsPBW9uy2pUcJEu5xR3fqcq
-	TLwRJ5veUHXZe6DNtDATP/SuhYGoNdE9sVSK5xHI88MDeeqUd8zkNVADkqVy8ndmdQuQNOo5OO9
-	uCotDKIcLAtwMhQeAf89yfdvy4/hctNuOm5fFwwa9uEuW/NNtcY5Z01/TL06R2P+fYriGqOgm/F
-	RmxGoXl2AiPfH30ozpOyN5Do0p2RpdOdZQFLpMb9/t28ht/cclJHoCGnjQwuNKqom21jObTA7bb
-	MCDi+YBi5V89rn24LpDNq32T6C6UIk7yZuk6GO7HRDtmF2cQ1fJMtXSJ6rmPgGBzIoR0O+CLmUx
-	XPcvr+2hl/CzB7OaaQnQo=
-X-Received: by 2002:a05:6000:18a4:b0:432:dcb1:68bc with SMTP id ffacd0b85a97d-436209c9896mr10061860f8f.23.1770375145422;
-        Fri, 06 Feb 2026 02:52:25 -0800 (PST)
-Received: from FV6GYCPJ69 ([208.127.45.21])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362972faaasm4698415f8f.27.2026.02.06.02.52.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 02:52:24 -0800 (PST)
-Date: Fri, 6 Feb 2026 11:52:21 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
-	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
-	Randy Dunlap <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>, 
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next V7 01/14] documentation: networking: add shared
- devlink documentation
-Message-ID: <khee3ri33uvtp4ssaqu7a6vy4mkbrp2zq6nghpbmyyc5pup6rq@hyryulfrhfl6>
-References: <20260128112544.1661250-1-tariqt@nvidia.com>
- <20260128112544.1661250-2-tariqt@nvidia.com>
- <20260202194023.412bb454@kernel.org>
- <u7uicnxkcirhacpzjimss2pqsuhbngg4ticqrz45iqchkk2ha2@t3eem6w6hhur>
- <20260203190105.2cc28e71@kernel.org>
- <3edheaanzxgutuyryorfzlfjvizlorpj4y3ard5js7mp44hfii@4a36de6wazfd>
- <20260204180256.1476f537@kernel.org>
+        d=1e100.net; s=20230601; t=1770375770; x=1770980570;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l9VdhVgIGjmOOKTCWSn/jv6x+s4k2P/EWeOh2kleuP4=;
+        b=icLqpHpoDji5tcfCnWaL5NLDuslAJwYVSzMUvo7aVtq2tkB4Yvxxj7y9b7W+E+4E8O
+         PajW3eCRoNqzLPfry6V3OHYx2iakX196gyzgEWqzZuCbAzf6PZMeDm3LHmoFV0MUcQCq
+         BND2YQ4IFBbhjQ6HjiACItP1nRJqkp//3ZJ20Db9ZpmXvElmS5cuElUpstHbHGaaENJW
+         SsbMFI/y50FZDVrBEVeTCrVrqygi1+wJEkuuddXaMAhMZdJu9sAWfYiNrSZ1iHQPE8/8
+         ac/kLWnBSZloGYABrVFa0poWnYsBEPEQc4o4s7i5o0GwArJyeIAVImkGB2I3McrtTQd2
+         BXCg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0AFN2BPrPSB2AoaN7TfDvRflJ1xKoq1AERtWan9dRCCyU79ZK1TjHOmtaDMcXVSSIamT2Fsg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJbJxGPhaRTc5brBKIYzkfL8cdJvNzA5kXyJXd8J4/95rj5ziF
+	rdgPp/rceKbx8LypCJgcHDaxx0+P2ZoEAAI8ti5YLr4H6XtZMVLiSKjtJoRUtntqZUslQ3Rxcrm
+	u0rnA0+n7JOm4HsJD6d4i0sIfQ0ZGe2mtBt+lt1hTUykEbJDhPCE8MjwJVQY=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260204180256.1476f537@kernel.org>
+X-Received: by 2002:a05:6820:2107:b0:66b:2d47:a773 with SMTP id
+ 006d021491bc7-66ba7d810c4mr2942377eaf.36.1770375769897; Fri, 06 Feb 2026
+ 03:02:49 -0800 (PST)
+Date: Fri, 06 Feb 2026 03:02:49 -0800
+In-Reply-To: <20260206055113.63476-1-yangfeng59949@163.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6985ca59.050a0220.3b3015.003c.GAE@google.com>
+Subject: [syzbot ci] Re: bpf: test_run: Fix the null pointer dereference issue
+ in bpf_lwt_xmit_push_encap
+From: syzbot ci <syzbot+ci413db63641e7571b@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, yangfeng59949@163.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257526-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[nvidia.com,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,kernel.org,vger.kernel.org,infradead.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257527-lists,netdev=lfdr.de,ci413db63641e7571b];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,163.com];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 7088DFCDD0
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email,syzbot.org:url,googlesource.com:url]
+X-Rspamd-Queue-Id: A8CF3FCFEA
 X-Rspamd-Action: no action
 
-Thu, Feb 05, 2026 at 03:02:56AM +0100, kuba@kernel.org wrote:
->On Wed, 4 Feb 2026 08:12:00 +0100 Jiri Pirko wrote:
->> Wed, Feb 04, 2026 at 04:01:05AM +0100, kuba@kernel.org wrote:
->> >On Tue, 3 Feb 2026 10:18:22 +0100 Jiri Pirko wrote:  
->> >> How exactly you can have a single devlink instance for multiple PFs of a
->> >> same device? I don't really understand how that could work, considering
->> >> dynamic binds/unbinds of the PFs within single host and/or multiple VMs
->> >> passing PFs to.  
->> >
->> >The same way you currently gather up the devlink instances to create
->> >the shared instance.  
->> 
->> What's the backing device / handle (busname/devname)? Best would be to
->> draw a picture, as always :)
->
->Either the bus/dev that shows up first or we go back to index.
+syzbot ci has tested the following series
 
-That may be tricky in case you bind/unbind the PFs randomly. You may and
-up with devlink handle of PF1 with only member PF2. Confusing at least.
-You need to expose the members to the user anyway somehow. That is
-exactly the list of nested instances these patchset is adding.
+[v3] bpf: test_run: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
+https://lore.kernel.org/all/20260206055113.63476-1-yangfeng59949@163.com
+* [PATCH v3] bpf: test_run: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
+
+and found the following issue:
+WARNING in skb_dst_set_noref
+
+Full report is available here:
+https://ci.syzbot.org/series/ebdff606-6251-4db9-ab50-448f5433094a
+
+***
+
+WARNING in skb_dst_set_noref
+
+tree:      bpf-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/bpf/bpf-next.git
+base:      1ace9bac1ad2bc6a0a70baaa16d22b7e783e88c5
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/673700c1-fa90-4aa2-8342-e6b397961829/config
+C repro:   https://ci.syzbot.org/findings/ad5a5f81-3d84-45ac-90ec-9a169eb16405/c_repro
+syz repro: https://ci.syzbot.org/findings/ad5a5f81-3d84-45ac-90ec-9a169eb16405/syz_repro
+
+------------[ cut here ]------------
+!rcu_read_lock_held() && !rcu_read_lock_bh_held()
+WARNING: ./include/linux/skbuff.h:1235 at skb_dst_set_noref+0x14a/0x1a0 include/linux/skbuff.h:1235, CPU#1: syz.0.17/5979
+Modules linked in:
+CPU: 1 UID: 0 PID: 5979 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:skb_dst_set_noref+0x14a/0x1a0 include/linux/skbuff.h:1235
+Code: 5d 00 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 9b 80 e9 01 cc e8 95 58 30 f8 90 0f 0b 90 e9 2f ff ff ff e8 87 58 30 f8 90 <0f> 0b 90 e9 5d ff ff ff 44 89 e1 80 e1 07 38 c1 0f 8c 76 ff ff ff
+RSP: 0018:ffffc90004487a20 EFLAGS: 00010293
+RAX: ffffffff89923f99 RBX: ffffc90004487ba0 RCX: ffff888103713a80
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffc90004487be3 R09: 1ffff92000890f7c
+R10: dffffc0000000000 R11: fffff52000890f7d R12: 0000000000000000
+R13: ffff88817331d858 R14: 1ffff1102e663b0b R15: ffff88817331d800
+FS:  0000555590ae6500(0000) GS:ffff8882a9928000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2fb63fff CR3: 00000001139cc000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ bpf_prog_test_run_skb+0xed8/0x1eb0 net/bpf/test_run.c:1164
+ bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4721
+ __sys_bpf+0x643/0x950 kernel/bpf/syscall.c:6246
+ __do_sys_bpf kernel/bpf/syscall.c:6341 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6339 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6339
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f21c579acb9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff4c8461d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f21c5a15fa0 RCX: 00007f21c579acb9
+RDX: 0000000000000050 RSI: 0000200000000780 RDI: 000000000000000a
+RBP: 00007f21c5808bf7 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f21c5a15fac R14: 00007f21c5a15fa0 R15: 00007f21c5a15fa0
+ </TASK>
 
 
->(My main point being that the single instance is strictly better
->than shared, ie. no problem exists in single instance multi func
->which does not exist in multi instance + extra instance multi func.
->But some problems do exist in multi instance which do not in single
->like the locking)
+***
 
-I think that my shared and your shared are basically the same as far as
-the nested PF instances are not really used for anything except the
-modelling purposes. That should be up to the driver how he wants to play
-it, shouldn't it?
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
-
->
->> >> Okay. I originally wanted to use an id, similar to what we have in
->> >> the dpll. However I was forced by community to tie the instance to
->> >> bus/device. It is how it is, any idea how to relax this bond?  
->> >
->> >Interesting! I was curious to research how we ended up here, found this:
->> >https://lore.kernel.org/netdev/20160225225803.GA2191@nanopsycho.orion/
->> >My reading is that Hannes was arguing against the _NAME attribute but
->> >both _NAME and _INDEX were deleted? I think there's nothing wrong with
->> >an index.  
->> 
->> He argues for "stable topology indentifiers", which randomly assigned
->> index is not.
->
->Agreed, I love me a stable identifier myself! :) That does not mean 
->we can't have ID _as well_ as the identifiers. Which lets us add
->more stable identifiers and/or making some optional.
-
-Got it.
-
->
->I think I was trying to sell you on "more stable identifiers" 
->as a alternative to ALT_NAMEs for netdevs at some point ;)
-
-I don't recall that. Anyway, everyone loves ALT_NAMEs at this point :)
-
-
-
->Maybe I'm projecting that conversation onto what Hannes said.
->
->> >FWIW using devlink day to day, the bus/device is not at all useful as
->> >an identifier. Most of code touching devlink at Meta either matches
->> >on devlink dev info or assumes there's one instance on the system.  
->> 
->> Okay, what's your suggestion going foreward then?
->
->Add the ID back, make bus/dev optional, forgo the faux dev?
->Would that work? Would exiting CLI become very unhappy? :S
-
-Ha, that would break so many things, everything is based on
-bus/dev on UAPI level :/
-
-I was thinking about having some sort of *special-bus-name* for indexes,
-like:
-
-none/1
-none/2
-or
-devlink_id/1
-devlink_id/2
-or something like that.
-
-But it would be either that or original bus/dev, not both :/
-
-Perhaps we can add ID attr as optional/alternative handle? Then legacy
-userspace can use existing bus/dev handle and new can use the ID attr?
-Then the example output would look something like:
-
-$ devlink dev
-pci/0000:08:00.0: id 1
-  nested_devlink:
-    auxiliary/mlx5_core.eth.0
-devlink_id/2: id 2
-  nested_devlink:
-    pci/0000:08:00.0
-    pci/0000:08:00.1
-auxiliary/mlx5_core.eth.0: id 3
-pci/0000:08:00.1: id 4
-  nested_devlink:
-    auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.1: id 5
-
-Makes sense?
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
