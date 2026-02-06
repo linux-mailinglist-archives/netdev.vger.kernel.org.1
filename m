@@ -1,122 +1,117 @@
-Return-Path: <netdev+bounces-257557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257558-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KC8IKPP0hWnHIgQAu9opvQ
-	(envelope-from <netdev+bounces-257557-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 15:04:35 +0100
+	id +H2+IK31hWnHIgQAu9opvQ
+	(envelope-from <netdev+bounces-257558-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 15:07:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B89C7FE976
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 15:04:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FE6FEA0E
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 15:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CBC4F3001598
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 14:04:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6A5A3046534
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 14:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6783D9034;
-	Fri,  6 Feb 2026 14:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fWPksgV5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB313EDAC8;
+	Fri,  6 Feb 2026 14:06:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAE33B8BB2
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 14:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985643D9034;
+	Fri,  6 Feb 2026 14:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770386670; cv=none; b=Nzd0nzJfQH+yuDvjnyq0n2RqIAy/K+uxiCi4YPBbyRpiACS4/EoZueu1aNA1oBGaepTahJa6tXQbfmcfHbTCwxwJz7ltJSPX94TSFQ3rvjgy0QkLiwIYqrRc0pwAuy3nZYSfiMKhIYj6RwhDSRUoEK/vgl+Mlig38YhNJZR37r8=
+	t=1770386773; cv=none; b=SzZAv7xdEXRPPeRXFfy5XB0SNx+fpI1eN/Ew94ZperQi2fLkfQCi/XdtLJucjy04qN1VnVNl5duJ8M9qjwPjhiALV6m1B0lSe6CfqCytQQpgH+i83ayWL9c/D+Ce06/VtU+Tr13mV5bSUtQSO2kTTqhwIKHTn9pyCzoQs7af8y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770386670; c=relaxed/simple;
-	bh=z4GNuMRZct0KcMBQZOFElH6rK3k1LgWIOdpyLUXQ8Zw=;
+	s=arc-20240116; t=1770386773; c=relaxed/simple;
+	bh=yeVgh5DgW1P7phMpPhwU62TlEbERZo+j+US4u+On67Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=APu+3u4fgGSbMWs4gGGgyCvpnI+7g624qcUzDvBFJJTqRmUxADshy/mBaKz52u9tkMUjLW8Mz6qnq/30RzNNs85D7DLjrcCCqyqNd9FXdrE/9TXETjkdEhW6SVTywHvvF/ijNkklVh3vHnHi62Rq+KgmyzlldBVGdO0htB9/dSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fWPksgV5; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d3f6c71c-133d-443a-adee-3430936ff8c5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770386668;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TR+sNHwRto6X97gwyNZ0eglR840iij69ujYUHSFBO8s=;
-	b=fWPksgV5qmy0XKWUaSpnfstNbJxpx4If3eBbfXsWnD2dzDwIehAVQtOz4BSiGSAx6ZCyrr
-	jSPxq7GfX/w6Iwq1f4Ozq2Tc4bH4DIadz3vKSQA74+cQtc9yCuIGtPT6ayVZwN4h8r2ZCd
-	LXqXhU5HbWWJYnwsUYqsQE9kjR8cmPg=
-Date: Fri, 6 Feb 2026 14:04:24 +0000
+	 In-Reply-To:Content-Type; b=EGdjgVS/rqlatZ21JCSn3bJ8jZfBTKDV243aFq/l5/TqE6AFC3DAVCIKwV9jjJFUWcjZw28OSu9KSpdatR0oEQ9U6dNTaRL6ksoPvAO+AcXpUR2XDYiceTZ397fS/hZh/X4Idjk97GlRw+d7SSZEQMZm+DCFIi/LSA/bD3LuYsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 616E5rM5029633;
+	Fri, 6 Feb 2026 23:05:54 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 616E5reu029630
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 6 Feb 2026 23:05:53 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <7cd9c017-c3bc-4ea2-80a1-90f39cacded6@I-love.SAKURA.ne.jp>
+Date: Fri, 6 Feb 2026 23:05:52 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] dpll: zl3073x: Fix output pin phase adjustment sign
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org
-References: <20260205181055.129768-1-ivecera@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] xfrm: always fail
+ xfrm_dev_{state,policy}_flush_secctx_check()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <aYXvliWTCzC9IIVS@stanley.mountain>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260205181055.129768-1-ivecera@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <aYXvliWTCzC9IIVS@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Anti-Virus-Server: fsav301.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257557-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-257558-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.949];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: B89C7FE976
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D3FE6FEA0E
 X-Rspamd-Action: no action
 
-On 05/02/2026 18:10, Ivan Vecera wrote:
-> The output pin phase adjustment functions incorrectly negate the phase
-> compensation value.
+On 2026/02/06 22:41, Dan Carpenter wrote:
+> [ Smatch checking is paused while we raise funding.  #SadFace
+>   https://lore.kernel.org/all/aTaiGSbWZ9DJaGo7@stanley.mountain/ -dan ]
 > 
-> Per the ZL3073x datasheet, the output phase compensation register is
-> simply a signed two's complement integer where:
->   - Positive values move the phase later in time
->   - Negative values move the phase earlier in time
+> Hello Tetsuo Handa,
 > 
-> No negation is required. The erroneous negation caused phase adjustments
-> to be applied in the wrong direction.
+> Commit 638361ad7ab2 ("xfrm: always fail
+> xfrm_dev_{state,policy}_flush_secctx_check()") from Feb 2, 2026
+> (linux-next), leads to the following Smatch static checker warning:
 > 
-> Note that input pin phase adjustment correctly uses negation because the
-> hardware has an inverted convention for input references (positive moves
-> phase earlier, negative moves phase later).
+> 	net/xfrm/xfrm_state.c:898 xfrm_dev_state_flush_secctx_check()
+> 	warn: was '== (-1)' instead of '='
 
-Is it common for DPLLs to act this way?
+Thank you, but this change is intended for demonstrating to SELinux people that
+making xfrm_dev_{state,policy}_flush() no-op results in hung task bug
+( https://lkml.kernel.org/r/f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp ).
 
-> 
-> Fixes: 6287262f761e ("dpll: zl3073x: Add support to adjust phase")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+That change is already removed, and we are waiting for
+https://lkml.kernel.org/r/2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp
+to be applied.
 
-Anyways, with datasheet info being correctly read, the change LGTM
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
