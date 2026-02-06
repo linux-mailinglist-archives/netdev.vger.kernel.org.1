@@ -1,189 +1,316 @@
-Return-Path: <netdev+bounces-257491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257492-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CywClqnhWmYEgQAu9opvQ
-	(envelope-from <netdev+bounces-257491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:33:30 +0100
+	id uHGzCSuohWnUEgQAu9opvQ
+	(envelope-from <netdev+bounces-257492-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:36:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FEB8FB8C4
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:33:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C107FB957
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 25BE8300FEE9
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 08:32:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8356F3010DBA
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 08:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EA4349B1D;
-	Fri,  6 Feb 2026 08:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BCE34B40F;
+	Fri,  6 Feb 2026 08:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i2CA5PzC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE6D349B11
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 08:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770366764; cv=none; b=I40lFafYyMgccTUm4A1S4aNUo+ZfLGuS/M6EmV8+WGx7DRXiMMYNj9AhLIZP+PyiJziHC+p3v7fZXZHtPmtD7zwysjwZ/xYzPiJOB4y6H64pE2mGVC0zMkq+dl+/WnrUA/hC+lHOBspMhwhFln0QCFxe9zOtocR7kyUvCF9Garg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770366764; c=relaxed/simple;
-	bh=yZcU9zqmWydFOpKqECr31syO3KL5FI1L7fu+fuKt0V0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=D6fP+l4EPIP1pse8G+fw73YRRv/JUFUWIIqN8xGtlQNIff0Yql9sLyfvWRBRqt9QbLxxhwE3RZS3/qUPOml2UBgtJZvr/YGY02jAT4Cf7Xe4m58r7EE638MrzvbP0rkvuwKHYPLtOb6LMT7O38NxU1mRFVJxNaZyUpXXO92+7dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-66ad91bd85bso7472703eaf.3
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 00:32:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770366763; x=1770971563;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HGcULbifs2XydNzYSTlCyu/fOsNa5SM6If0TWsmBnX0=;
-        b=r54+QwWBh+WrrJjNF2QhydfnC2VquyWJWq6ENapwoIJuwKbsx9YJU2zRauc1x8vHGc
-         LIvH7v9w3qHTG5mFbr+TiU6ljWmxvN2DiW4xiyyJOTbyIAzFmLTnsQunVKCpHlli1uvM
-         Ys1ESKiDmcQ9V5Un8T/pWUHMRP5jj5Iez5orMU2e95VR0YcqBm5mMFVppAAl4SpHQYIy
-         QVFiaROMZbb8RQz54t5eknR940VaJx07u57NYi6ebkTYi52NWijysYXV7lUpwIcTWJxb
-         qL+YjRybVUQpn/W4FGue/DOy+Fssu3dZOqif0RzlsslFckNYYGcazvWWMKia0flD0jO/
-         Y+xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWVoTf1T0O1OrAwmrWrWFaQr3GI71jk5nzAhrbXz4nwihV3ZAPBQYeeFaPG4peaWy4RWmbhrQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoGG51FNdpRvioFSdfZ/sUd6xGhHHCRNV3+AbDAEWdZwCfipTG
-	wqoFQV6UrXuelGOKuS8I6dAdlax1du/18uJlJEhbL37pPxuVWbbGz3NgxM3i0L8Nw4vcWJKMkwT
-	4aObg4YPlE18LrQ66l2+cI75CjY/l+6ePXTEkc55DDJ0LyUff/m0O4vwhFRE=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F1F3B28D;
+	Fri,  6 Feb 2026 08:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770367002; cv=fail; b=MqvMV0jmPHp5+m9ajnLAypBkhphSZV2H9IVIGoZkLGzeIXSCDol7svneGgelnvPFWIl7lLiAEZdrVS7ZFaKb6N08k4fagHW+Wwx5Lgjx0/LmBul0UjpPQyz2nDiQB/jw0LBAAfNxXJBdn2/BqKSM0+kHjO0839INz08am+VS1B0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770367002; c=relaxed/simple;
+	bh=ta7GzHFHB2yuQt6ypWv43VSGCAt699EObcZYk1m0RAc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=osnM2QGXesXht+IaisHn22cl7e1WFX+Sik/2E18BVQyEJjBHuTl1qyrqtPWPlWCy41stVS/zxgMjvc3ctXjcRbof6YWr3favs5PlE+QQ/Q7PlxOwAg0WnHpQB/mW/RFRqRtCXaMwX+mOlrBzVN2pqSqTitNx3ebhTyAOm3OX0so=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i2CA5PzC; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770367002; x=1801903002;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ta7GzHFHB2yuQt6ypWv43VSGCAt699EObcZYk1m0RAc=;
+  b=i2CA5PzCWP18dLK2fsK4l7OFI9C7AfNCShwlFpqEkkGurhqZ038+EuKb
+   p0T1MTECqxZhs16IKTcLxcqWKXTfHBWUoDiVOEFbOrS413TVr87gDzylK
+   JiSbtXFRI46dDvlXTDuAxs9dkZL4VXdMbyevEFfqJCOPLv1IXGuyqmcCG
+   vRoKo/ecPG/JKq7VaMG1Xg5RtoeZ9Wtd3WiZ1r9OX0BQOybOWTQTsER8Z
+   qHKTd/eLBfpWnNEL4PT9cV/olmrpTOLP80DF5iMA/qqlDnHEn19woUg29
+   j97DtNOkFE2Xbp9Z0MKLGIkasyAqgfWO4vCIhkAV0FiaHVnMV01Rc9YU5
+   Q==;
+X-CSE-ConnectionGUID: v7mzYoKqSsuUvoZsLe8ljQ==
+X-CSE-MsgGUID: 4wcE002MQCuDd6eATVgvzg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11692"; a="82310217"
+X-IronPort-AV: E=Sophos;i="6.21,276,1763452800"; 
+   d="scan'208";a="82310217"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2026 00:36:41 -0800
+X-CSE-ConnectionGUID: rhQmhHl1QYeQoRXF2+RzTA==
+X-CSE-MsgGUID: 0ZQajFNVQOC4PZXrr7AQ5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,276,1763452800"; 
+   d="scan'208";a="241300502"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2026 00:36:40 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 6 Feb 2026 00:36:39 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Fri, 6 Feb 2026 00:36:39 -0800
+Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.23) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 6 Feb 2026 00:36:39 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ExsPs4GI+eh5li+TQn9WmSv7QXxGsTJypRvbFDuPnj1XetSJRyupEeWKB3BuqNmjfa1gYElOFNT1bPm8PCv3mevu1yEyMEQ2uzmXfzEqyhfc8B0wFjvn4DGDd6A3MEKGOcOwv17SeLnO2QKhm2Ysf4Kfe4dnaEWB6BSPFRT7BOb/32lppKIzKmiGdtauPOvs8mFVj6Hq+KgxETMghJ79pSvNAmCKTAzm3SQl0Kibi3RYNk0kxq6Fq0ytjtUSM+mGEpHQYMT+xoJPg/6atTNwlo2/eQFK8LWXhDwysfc7LGiXyPwJ9Fj+I73dSkKFNznFNdRYxr7DJEQd9aixdx85VQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oaRp100IJCMXfd4ZDPAes7SJr3iKF3KHcJV9ioK8xhc=;
+ b=p0aH3OinFHs1DDetigQgwZ/y/iYHAvMPaX4P6Kr8WtaRCHZUiot9Rommnn1DkZ8rGyp1Ym6NpdmFRKK8HsieSH1xhCSWUPw9Ry0HBqSjfCqnVlBkSY97Xc4tW+ivVEpHuFTqgzPcgx1CLvFWWaSsVIEYHefBkfOq/c+NsmBsxcpL+Y1NYIZ1g6fNaJG6Ly6DvpPNSrWHJH/DWPCPzpmQPCydMDapxUhs3okkPczLrTUXeIBQJYboJC76QRA6Tzmxd9o7JcOuLW/9T5fyfhJaPMkmmKmucj8OKtgcC/YVmrnThiIQf01AVpiF2XeBt3MZHY65yYKHRyBFo4fficcgcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by LV8PR11MB8582.namprd11.prod.outlook.com (2603:10b6:408:1f7::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Fri, 6 Feb
+ 2026 08:36:36 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2edd:5c6d:169c:389b]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::2edd:5c6d:169c:389b%4]) with mapi id 15.20.9587.013; Fri, 6 Feb 2026
+ 08:36:36 +0000
+Date: Fri, 6 Feb 2026 09:36:21 +0100
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Vladimir Oltean <vladimir.oltean@nxp.com>, <bpf@vger.kernel.org>, "Claudiu
+ Manoil" <claudiu.manoil@nxp.com>, Wei Fang <wei.fang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"Przemek Kitszel" <przemyslaw.kitszel@intel.com>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	"Stanislav Fomichev" <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>,
+	"Martin KaFai Lau" <martin.lau@linux.dev>, Eduard Zingerman
+	<eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Simon Horman
+	<horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, "Maciej Fijalkowski"
+	<maciej.fijalkowski@intel.com>, "Bastien Curutchet (eBPF Foundation)"
+	<bastien.curutchet@bootlin.com>, Tushar Vyavahare
+	<tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>, Ricardo
+ =?utf-8?B?Qi4gTWFybGniiJrCrnJl?= <rbm@suse.com>, Eelco Chaudron
+	<echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, "Toke
+ Hoiland-Jorgensen" <toke@redhat.com>, <imx@lists.linux.dev>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-kselftest@vger.kernel.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH bpf 6/6] net: enetc: use truesize as XDP RxQ info
+ frag_size
+Message-ID: <aYWoBRmt-lcM_JkG@soc-5CG4396X81.clients.intel.com>
+References: <20260203105417.2302672-1-larysa.zaremba@intel.com>
+ <20260203105417.2302672-7-larysa.zaremba@intel.com>
+ <20260205005901.gnju3zmqimtgeu2b@skbuf>
+ <20260204173401.282899d0@kernel.org>
+ <20260205122953.lscemcctayrvszdu@skbuf>
+ <aYSP344FT-JlylwY@soc-5CG4396X81.clients.intel.com>
+ <20260205124638.hxzvjiocephzlrk3@skbuf>
+ <aYSZw4wbd-nvLTuD@soc-5CG4396X81.clients.intel.com>
+ <20260205134046.pggwyosutj7ggi4i@skbuf>
+ <20260205175408.30ab72a1@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260205175408.30ab72a1@kernel.org>
+X-ClientProxiedBy: VI1P195CA0086.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:802:59::39) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:f02a:b0:659:9a49:8efe with SMTP id
- 006d021491bc7-66d09cb2ff0mr939322eaf.15.1770366763404; Fri, 06 Feb 2026
- 00:32:43 -0800 (PST)
-Date: Fri, 06 Feb 2026 00:32:43 -0800
-In-Reply-To: <20260206022419.1357513-1-achender@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6985a72b.050a0220.3b3015.0035.GAE@google.com>
-Subject: [syzbot ci] Re: net/rds: RDS-TCP reconnect and fanout improvements
-From: syzbot ci <syzbot+ci858e84e8400d24b3@syzkaller.appspotmail.com>
-To: achender@kernel.org, allison.henderson@oracle.com, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	rds-devel@oss.oracle.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|LV8PR11MB8582:EE_
+X-MS-Office365-Filtering-Correlation-Id: ff9a766c-50a5-4b96-8165-08de655ad731
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ZqdpDkpbDEsdsyhSkopD/i3EtcnE7m8AnJa9Dq+RgqpvGnCNOOpDub6Z4hDI?=
+ =?us-ascii?Q?Czgj0eAgPrLNRFtI/YAgwgIQxBshxkGGDo/IJUHUJkYDcbc2hoCZTPrJi/xb?=
+ =?us-ascii?Q?r6tUz+A5106C+477lL011C9j8BPvlx6NehLzObekJnsg7nlKAZ009zvbKtVu?=
+ =?us-ascii?Q?Xz66+LbgmgPCO8lUlJ/4UrrY4lBJADC/6evDDunConuTL/uHq3344zcf0+Ab?=
+ =?us-ascii?Q?FSROeZXMaKX5NyuRxJO2qvdVemVNlrzV1bCczqxDT2hc5+Etx3nIG9mAQVL6?=
+ =?us-ascii?Q?QIjK8VAk7x0r0IwiF/jlHk6kXbjLjZMl7kMwfnsSAVW5vQhET372kN81WYg1?=
+ =?us-ascii?Q?zO5VP+XFJYfhXpBHypZnZosg4duNDjM59AcX4LtPKYtAp5AESj6tWqvnf+0N?=
+ =?us-ascii?Q?0lxltjidtGDvUVgSkbHP4XdWnz3RBCsJeYX91De2+cU4ycIjD0YBj15Q18lb?=
+ =?us-ascii?Q?dvxH0Ag0lFhLh8oNnHFF8FXoXGxtRA9Hqp2rPMx7qVBFaLlVGeo3XlSoEYEn?=
+ =?us-ascii?Q?k8g+lWLU5k+JEe2JUthglPpf4gMhW0bkQtWpOwJy0Yk9LKB9Difcz8fl5Zbl?=
+ =?us-ascii?Q?++REx4ei3VwRefN5HbJrebmLsVkLC1u89JxjwUsCJtg0KXXa8AwRJ5KaJmOr?=
+ =?us-ascii?Q?j7+iIBx/0MV9A159Ye9GDQfANEBh0Wchi8Gwu8DmtfvTQEZM8gKYceqt6iwX?=
+ =?us-ascii?Q?bue20yJGfS2xx5Dh2CH1tqJgsR1vx0TQjpcVyMPOoheWMj9rhqSMY5EBxZmH?=
+ =?us-ascii?Q?fURXqunqCxrqHuu4GVWqHttrUry1xT/mCgxwvz3XuqoIA6K/A0Gdudd6ltA7?=
+ =?us-ascii?Q?otEsT+bR4P9ezAvGPLCg9kTVDAC9D8Y4JEMM8lU5QL3lotjZ/YBoqeAC5mig?=
+ =?us-ascii?Q?v93UQyDAI67DiTspLvrQ4pEJ/QPSbCzlgbqKOR5D51o46hP+7p8klFeDbTnK?=
+ =?us-ascii?Q?Z8q3mBmPxOSUHLN5Kb+IqH+z3pM6IVhDUtVotjxnpDFg9i2f49fGDxSmVcqT?=
+ =?us-ascii?Q?susTQ01BCHRPrDMsirbYS4/v+KHKLXOB4qO5azQ53KpeS0IVIrRVS0Fh78IF?=
+ =?us-ascii?Q?kUVuq79H4AsmanLzAdnL9irFxk4DEXEm/909HrnvTLr+MuP3AD4DNWc/nrUP?=
+ =?us-ascii?Q?5wy5SzkJ+8vdfwownRzfvdLUg2DnXRfuW1H3lMkFMCIOmZbYysNxeduZ4QBD?=
+ =?us-ascii?Q?ugABSW3Oy2rUHJzA10wDVLZUOXQrhetrt98JVCYkOOA2Fks48NfjrvIs7oOi?=
+ =?us-ascii?Q?s/U7NBTpP6ukh3ORxnZSOrh5eBexRSLWYlMlhqVUe1jmly9YDufLdWFnMmgk?=
+ =?us-ascii?Q?mOPNHjnbXyeCMwmytuG/Y+HtM7CGYF2LY+IvhWB6FnEYxdt9bAoRNk0ZPIZt?=
+ =?us-ascii?Q?MVbPXh5nWG1ytkPG0/q70GJ28BfhZF8cFHKP8KhL69cXIo9FH2eKGggeXE25?=
+ =?us-ascii?Q?DQXAsHoT6D/JXY+C5eLadvxxzGA9PkFQ0jL5/BtzjnkN6s8nzykFimgmcTrT?=
+ =?us-ascii?Q?psqqaIikeNEK16cNFfhxplfjdzVb6xZxFGMOhr5McN+63g7mRD4KM86oS/dy?=
+ =?us-ascii?Q?Zy7DK7oObLu0PRSx6pk=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5u6dh2zHKfjWhUdgJ9GzEgLH5VvjcpD5u7A18jVlAjaDkE/5UH3UBGEhQ9ii?=
+ =?us-ascii?Q?6hJF/R2EK2pgs0MqyGXJkipnxbGKRmZ47FMp6qGJw8wXH7fleI0rhaMqvRXR?=
+ =?us-ascii?Q?4NQfEQI96luXXt71BSMYTYnAIzVGDrGqZwZFcHTJRR2EmeoR8hDTKcY+UY9i?=
+ =?us-ascii?Q?005H5UhgQACafxqsqOmO9F+pvaBj6zZUGI5JIiUWddncLmxIcfuYuNWWpE+K?=
+ =?us-ascii?Q?SmxuPY0fwLxqZE9BttpVoJdZgNIFUQbbTjvUUml6Rl7Y/nXc/oX74y5TOVW2?=
+ =?us-ascii?Q?UfQLpJJaXcGmFxFw7fxBqcm9raaSEBm36NlQsrR89dIDjRztInUv4+0bmyiQ?=
+ =?us-ascii?Q?R4MATAV4vqsZsCyq56PEf97VLWULR3G19ZIaJ+zTlYEjFSLVp0bQiHsTPQsh?=
+ =?us-ascii?Q?L6kXvqTbHcwyBpuc4+25CvXLHbAY4S7yzZ9mK7i6abv/Nttd9TBkZsQmbkgH?=
+ =?us-ascii?Q?XV5WfOyXpSdEFwWCQTzKcj4Bvtnr5XOIo8ZtdZJcIOH2xu58A4MX6UaQQ85/?=
+ =?us-ascii?Q?486P90NZhw7V6/nvyok4NeRM5tn0NkXlgNlwsCyxJYk1H2EAUMOv/vhrDahz?=
+ =?us-ascii?Q?KOOxQDQiyeUHs2L5HcJQBVbC1177PXUX1fYnXMc9h4Q+RDhUnEyFq6LoI/QG?=
+ =?us-ascii?Q?W7tb61jbukrHZd1cxfge5eoV9OXWStR8ss3bQirjOZ6FePGdOHzQk/G6Jbfp?=
+ =?us-ascii?Q?r4ONmsmLTZTJs1T5cCGvi4dTu8DquT4RU1klhvCtpV6rd1S2s3GtiB309HjR?=
+ =?us-ascii?Q?hXKqai8ixeeKeqN4mwcZW4J1Y8jPpAY4h+t99VpV9gGkZe7uwrLzpsUTr96C?=
+ =?us-ascii?Q?ft+JyLXxJ5eTwZX4mH7QpSYzxMDFuRKcGnO2UnekLa9b8uTZxAwNJuNQivcX?=
+ =?us-ascii?Q?xMhUQQdg95qczV+2kc45tgaglAtVLkBnE/QDg8UxFj39h8siLmZVnwyYC4qf?=
+ =?us-ascii?Q?t1unxnzgdFxCsQaHJ0/msrBkoYA+uzHf155xYQJYqj5Ya7RcepfJHoSBRhky?=
+ =?us-ascii?Q?kYIXFJEft4WT2GNST7H0oztlAv0KUIrCGDHkSmz4Y37bQ58C0fTGuGnZjRed?=
+ =?us-ascii?Q?tdOD1bdkU8PIARyh2TpHskWoemjQt4ZNIj+wh5nZ22XnDm6PnG1Qa1b+BSI/?=
+ =?us-ascii?Q?w0vtZK0Hutpbsplolt67ajSLPNfIztXngA5fPTLeaicE2gZKkVnxsg8gRCrK?=
+ =?us-ascii?Q?A4umCFomYMpV1SRo1cZszE8tyx9GBJaxlQvWB5emBXJuyX3NN8XwGGABIBJQ?=
+ =?us-ascii?Q?/8Om5BTFjmJmuM5q8lSl16emTXGnOLlUFl5c1cAMUXRJctV6aXPpapDcwxgm?=
+ =?us-ascii?Q?fQXEDH56/I38otXhjD7X//tPosHUJaZrXOurZ72JRyXkXYY+z+4LUw836jcY?=
+ =?us-ascii?Q?fuUZ7sQXh4nBgLu47iMZgle/Uy8Z8v+CG0bee3bKNOFeMNtLWQMA2XtZ+qDr?=
+ =?us-ascii?Q?Z29j5goRZMED4/3S81sJIM9mRh1GJlC2YbgwtS6RuzkwZgUejr+gkgv1zTte?=
+ =?us-ascii?Q?X+TjwXz82+hYQExLBIUo0CrDgaMxZKn+CxptAuABiFPsGG2XfCcGq6sWxIBu?=
+ =?us-ascii?Q?zqKcMU8O/2RmH3jrpAtKSEAT6F6D6ly8fihHSJIXpI/z5GO7JlM+3gQ663U8?=
+ =?us-ascii?Q?lpGkptiL3+LnX/OI1A5/wNB4KAK1NUsENqAzHiupXG3vAEwoA9ONL/CQ6gCd?=
+ =?us-ascii?Q?la3d+XTZOh6wkAm9/XgaGIG3kDx03Gi3P+yhGMDRDFy1BOF+w6cwrdEgqmwj?=
+ =?us-ascii?Q?9uHBQZ2LZbXIj3kFfOz7VVDP+M+QO6dxgJiKmzrnGRT1Oo4m5x9aU0nQfSFz?=
+X-MS-Exchange-AntiSpam-MessageData-1: XZO0SZUSoJFd5tPyLg15bRlu9xonZc+Ud9E=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff9a766c-50a5-4b96-8165-08de655ad731
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2026 08:36:36.7780
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qyRGQf5P2RfJhXu1yousINPJ6Tw9zy7KiKSGtW3nqANAeaza6khYxO/pvzyUd6FfVO3BIusjK0uDvvJo6fnCp4dA/bkX9emC04bf/Ca4E28=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8582
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,googlegroups.com:email,googlesource.com:url,syzbot.org:url];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257491-lists,netdev=lfdr.de,ci858e84e8400d24b3];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257492-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nxp.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 7FEB8FB8C4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[larysa.zaremba@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 7C107FB957
 X-Rspamd-Action: no action
 
-syzbot ci has tested the following series
+On Thu, Feb 05, 2026 at 05:54:08PM -0800, Jakub Kicinski wrote:
+> On Thu, 5 Feb 2026 15:40:46 +0200 Vladimir Oltean wrote:
+> > > > I mean, it should "work" given the caveat that calling bpf_xdp_adjust_tail()
+> > > > on a first-half page buffer with a large offset risks leaking into the
+> > > > second half, which may also be in use, and this will go undetected, right?
+> > > > Although the practical chances of that happening are low, the requested
+> > > > offset needs to be in the order of hundreds still.  
+> > > 
+> > > Oh, I did get carried away there...
+> > > Well, one thing is shared page memory model in enetc and i40e, another thing is
+> > > xsk_buff_pool, where chunk size can be between 2K and PAGE_SIZE. What about
+> > > 
+> > > tailroom = rxq->frag_size - skb_frag_size(frag) -
+> > >            (skb_frag_off(frag) % rxq->frag_size);
+> > > 
+> > > When frag_size is set to 2K, headroom is let's say 256, so aligned DMA write
+> > > size is 1420.
+> > > last frag at the start of the page: offset=256, size<=1420
+> > >     tailroom >= 2K - 1420 - 256 = 372
+> > > last frag in the middle of the page: offset=256+2K, size<=1420
+> > >     tailroom >= 2K - 1420 - ((256 + 2K) % 2K) = 372
+> > > 
+> > > And for drivers that do not fragment pages for multi-buffer packets, nothing
+> > > changes, since offset is always less than rxq->frag_size.
+> > > 
+> > > This brings us back to rxq->frag_size being half of a page for enetc and i40e,
+> > > and seems like in ZC mode it should be pool->chunk_size to work properly.  
+> > 
+> > With skb_frag_off() taken into account modulo 2K for the tailroom
+> > calculation, I can confirm bpf_xdp_frags_increase_tail() works well for
+> > ENETC. I haven't fully considered the side effects, though.
+> 
+> +1, also seems to me like it would work tho I haven't thought thru all 
+> the cases. We do need to document and name things well, tho, 'cause
+> subtleties are piling up ;) Maybe it's time for an ASCII art
+> for xdp layout?
+>
 
-[v1] net/rds: RDS-TCP reconnect and fanout improvements
-https://lore.kernel.org/all/20260206022419.1357513-1-achender@kernel.org
-* [PATCH net-next v1 1/3] net/rds: Delegate fan-out to a background worker
-* [PATCH net-next v1 2/3] net/rds: Use proper peer port number even when not connected
-* [PATCH net-next v1 3/3] net/rds: rds_sendmsg should not discard payload_len
+Yeah, for AF_XDP mbuf in i40e we actually recently discovered another 
+buffer-size-calculation-related issue, so some visual aid would be useful. I 
+will think about how it should look.
+ 
+> FWIW my feeling is that instead of nickel and diming leftover space 
+> in the frags if someone actually cared about growing mbufs we should
+> have the helper allocate a new page from the PP and append it to the
+> shinfo. Much simpler, "infinite space", and works regardless of the
+> driver. I don't mean that to suggest you implement it, purely to point
+> out that I think nobody really uses positive offsets.. So we can as
+> well switch more complicated drivers back to xdp_rxq_info_reg().
+> 
 
-and found the following issue:
-BUG: sleeping function called from invalid context in rds_tcp_conn_free
+As Vladimir has mentioned, if the driver does not use header split, frags will 
+have a tailroom of a size of skb_shared_info, so tail growing does work in 
+practice.
 
-Full report is available here:
-https://ci.syzbot.org/series/1a5ef180-c02c-401d-9df7-670b18570a55
-
-***
-
-BUG: sleeping function called from invalid context in rds_tcp_conn_free
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      7a4cd71fa4514cd85df39b3cf99da8142660cdcd
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/77f47047-43cb-4c25-b0b6-73b8746cea2a/config
-syz repro: https://ci.syzbot.org/findings/49698f1e-4f36-4446-9dd1-c409366e6296/syz_repro
-
-BUG: sleeping function called from invalid context at kernel/workqueue.c:4390
-in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 6005, name: syz.2.19
-preempt_count: 1, expected: 0
-RCU nest depth: 1, expected: 0
-2 locks held by syz.2.19/6005:
- #0: ffffffff8e35a360 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8e35a360 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:867 [inline]
- #0: ffffffff8e35a360 (rcu_read_lock){....}-{1:3}, at: __rds_conn_create+0x2e4/0x22d0 net/rds/connection.c:177
- #1: ffffffff8fa00a98 (rds_conn_lock){....}-{3:3}, at: __rds_conn_create+0x18e2/0x22d0 net/rds/connection.c:304
-irq event stamp: 752
-hardirqs last  enabled at (751): [<ffffffff8b7cc843>] __raw_spin_unlock_irq include/linux/spinlock_api_smp.h:159 [inline]
-hardirqs last  enabled at (751): [<ffffffff8b7cc843>] _raw_spin_unlock_irq+0x23/0x50 kernel/locking/spinlock.c:202
-hardirqs last disabled at (752): [<ffffffff8b7cc61a>] __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:108 [inline]
-hardirqs last disabled at (752): [<ffffffff8b7cc61a>] _raw_spin_lock_irqsave+0x1a/0x60 kernel/locking/spinlock.c:162
-softirqs last  enabled at (32): [<ffffffff8ac0cd59>] rds_sendmsg+0x7b9/0x2150 net/rds/send.c:1266
-softirqs last disabled at (30): [<ffffffff89463a1f>] spin_lock_bh include/linux/spinlock.h:356 [inline]
-softirqs last disabled at (30): [<ffffffff89463a1f>] release_sock+0x2f/0x1f0 net/core/sock.c:3793
-Preemption disabled at:
-[<0000000000000000>] 0x0
-CPU: 0 UID: 0 PID: 6005 Comm: syz.2.19 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- __might_resched+0x378/0x4d0 kernel/sched/core.c:8829
- __cancel_work_sync+0x6d/0x110 kernel/workqueue.c:4390
- rds_tcp_conn_free+0x2c/0x170 net/rds/tcp.c:361
- __rds_conn_create+0x1bfb/0x22d0 net/rds/connection.c:334
- rds_conn_create_outgoing+0x43/0x60 net/rds/connection.c:377
- rds_sendmsg+0xff5/0x2150 net/rds/send.c:1321
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x4d7/0x810 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f5b6bf9acb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f5b6cd8b028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f5b6c216090 RCX: 00007f5b6bf9acb9
-RDX: 0000000000000000 RSI: 0000200000000480 RDI: 0000000000000004
-RBP: 00007f5b6c008bf7 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f5b6c216128 R14: 00007f5b6c216090 R15: 00007ffc17760058
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Allocating a page_pool buffer (given XDP queue has one attached) is certainly an 
+option, although I am not sure if anyone needs it. Furthermore, growing tail 
+would still fail for a single-buf case.
 
