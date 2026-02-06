@@ -1,369 +1,192 @@
-Return-Path: <netdev+bounces-257489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOiqNZGjhWmSEQQAu9opvQ
-	(envelope-from <netdev+bounces-257489-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:17:21 +0100
+	id 4LNiJy6nhWmYEgQAu9opvQ
+	(envelope-from <netdev+bounces-257490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:32:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EB0FFB5AB
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:17:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5D2FB8A7
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4A4543020EB2
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 08:17:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8567300D300
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 08:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EC433F395;
-	Fri,  6 Feb 2026 08:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIJpk2s3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47030349AF9;
+	Fri,  6 Feb 2026 08:32:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEA230ACEE
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 08:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009DF31B124
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 08:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770365837; cv=none; b=CjFL0fru17feJjpUEp6qhAmb2g3f+lnJAMkz+sjYU89lhzX2QtSNYBd/q2HGUbI5s1CnMubvi3gmwdkQG6iAcFfp2EeYhks7IbMSKhCKuIWUE1y4To90CMERGNEezIq88q1Mpt6E6NC2I9DZUYTHWUP0hFT7ZyV8GwJ/RmGkUyA=
+	t=1770366734; cv=none; b=bbzqanq7yKYcLcT+0Qt5L1qnxJoHRGZhV9dnHz1EXlTPjkXRoizWBP5mZTVz4TBZ0PXyIlk2LWbfbkCIZ3hIJIOgOHrdob+lNwi2OprRuXuK+nL8vAxfYFQW/JCXqdGEmPOwVUkS4BpP8JRMb7Lf13bkt0pLiw+kVVCKD4drfd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770365837; c=relaxed/simple;
-	bh=c7PQOE0iMHjHxkRzpLy5wyWcpXy4hEdVWeuqSuOUeEI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ODahTZiZFbpqM/dQyJmwfDQY2EpsIEzBU9Z2W3s/GyW7CqqlMZKnnaP7/TnPIQMDDa9J2M8+4aYVIjdYqb/pAEy0JPHgY4FgNCW09SyTuIIIGtolSRymetMmMMMxJC4o29jeABPI9h96OyS1V04UFQXnjiDEYbHi36uYC4jb8tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NIJpk2s3; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-35456fcb79cso1048537a91.3
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 00:17:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770365837; x=1770970637; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JCT2HUHLs8OeyVWtYlHn7qjboQomP4IpKbaE1KAoCHE=;
-        b=NIJpk2s3BuWEugfJ3uNVac7Z1peetzh4UaiRtalaUgYRqOehJX2+WQfNZ6HNVict5X
-         ZoBktA9aDwE0Suoz7OMFX3uqdEQp+ackhi4SRNveEKICqOqwOsPe8JYoTVXE5eLE90BX
-         HABzf47ZuR4+tB0k9TaWSb+sm1tHz3Qnc8plEt56fQoWNe3USqMVc7mq7GFHjURM9rwW
-         91uvLj8LAn4GmAaZcpcp/D4624E8JyS4SkYLnvN9abRjHSACVSP9NpB/fyVqa4FotZf7
-         u71Heus0UUw3YT3W9l3z4ppRvc1LoRYFB09OSfNPXjlEZl4dHcxvrF5QAVMilTQBcibP
-         EYJw==
+	s=arc-20240116; t=1770366734; c=relaxed/simple;
+	bh=L5b8qOVQgNvhOSD+v+84L84qH7uRefmcsqF3UxEZMpE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=Lea7Dl68u23skt9Ljo+8kzqykpkzN1WB+G0lX2kzNh6Ihdk10jPfu5APr5TbFpdgb+N/mgkPFdOvZ0luEitIjveyVRNKGyLnJkP5UjjJbQt3evivtYWIjX5diBEW967E8KmbEoEbjJxNgZdAJJnfUh9E26/+H7rW1R9Trz0kHrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-66308f16e13so580890eaf.0
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 00:32:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770365837; x=1770970637;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JCT2HUHLs8OeyVWtYlHn7qjboQomP4IpKbaE1KAoCHE=;
-        b=YhpYolX7PvQ+svlCjUpLi+jB84z0aW3gexwy9gBSvwUdpzfmppo2hMUni7YQOMDyhZ
-         SjFiCRhTXqcZN136/75Chc7kf1Nu00lyuHm7cQn6h6vD9dk7XoFbOmaWOra9+4y3JP/I
-         5zn5gnnJfnFnAxUaCWEcdeU5QRO9rAwkHvQl24ulsTvwXux9WBHJWMEynnAmDIEtD1xI
-         PS0JKAACnuS2O9VPNFwuTdgcDKpDBwc828zDsQ9YPqYynG7LpwJDSg+/fFx6/+RAJ4qD
-         2PWYGjYf7N9M/3O3fBmTr/B9QrpOzXoDM9Ej2lDjm5GHc+nNDtcwxMy05ShqY8l6Shdl
-         Q9VA==
-X-Forwarded-Encrypted: i=1; AJvYcCXBlG0zATfxhPyMnD4kv3C8exYBFyHSzKQI+Tm57CiBbsdIOJNM220HsRd4JffQ67HVH4zHBCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgIvqi4Q/NQCoAVe4f5L6RR66pXX2ljQynyWGevvRjSsNtCrwK
-	DqZpHj5sH8YTct2BglDtgfx81KIb2WNhZIEODMbVuLQ0QZd+zF3MhAJs
-X-Gm-Gg: AZuq6aLc8F5S1VL13WJOq3InRo4wgr3YUtih5bLvZ83o+uOsanxLFDPkSGW8dI3okBb
-	GhfoDmF3Df6zOAvyLO5T8mzq2b89KrdzWvJO5JqlHhvP6PQ2fGE4bdjfOc/LK2mo8pgQX8vNO5X
-	ut5oLPoNODQc7XPGfVMb570IyPWucOLSgbF5yAX6PM17Rms4SfXZeDVceDkd6/WRqlR8zoT6q1x
-	HnBoD/WobPn3dSP9yWMZeMxElQR/6aNTZDtfBbCFisYNKXEeBq5ELWzk2oxPBG2jIJh7gDNGRJS
-	QVD6+Twg08KFnTmFVcpAC/CBfL/D8FgZo58lWk3Bs9RXlDoKJDUPcdKhH6AH7lmdqit/WQ2zhed
-	wtO5e3XGUE6v/oAeVBaZon7n7tmgJn93gQCL4ksYdfgVTxUn0nTFSm99OYHq6MRq8phOX1bS9f4
-	ZlLWD3fDcysvm3r08=
-X-Received: by 2002:a17:90b:2fc3:b0:354:a1bc:f99b with SMTP id 98e67ed59e1d1-354b3e15243mr1655063a91.37.1770365836747;
-        Fri, 06 Feb 2026 00:17:16 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-354b4686dfesm755671a91.11.2026.02.06.00.17.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 00:17:15 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: linux-kselftest@vger.kernel.org
-Cc: Shuah Khan <shuah@kernel.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	netdev@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH selftests] selftests: Use ktap helpers for runner.sh
-Date: Fri,  6 Feb 2026 08:17:04 +0000
-Message-ID: <20260206081704.53215-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20230601; t=1770366733; x=1770971533;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dPmTo2ri7jG36KtEfZNF+L2qJMQS+9NuLWlVMlY7PME=;
+        b=BWsPdtoOhloFkeuPuJolzoVZOWZZ0n+B+KvA9scVzkzDjQa8TR13H+nfkliHj0B2Dd
+         knNAoQGH7rY9g1iaJpy2TfLj+NxIC/T2vlbErQhLf6kwuyzQItHK+uzWiMnYUXI7sT4x
+         yP5PUJqPNcED8cM9olJjWM5cGV92co5j0T0ev938QR2vINp7X9G8s906+ZnTRSCGd1aA
+         J8+6k6r2MX4xaFJKdQgcwOp8Gn7eKOg4Uc4EoOcBMPp8z0QyURtUxmwQY+IiTSrp/a3H
+         K+u2mseG0QI5QQxo6a6ieVGDl1ufUlXrqgafEnxfL+aGqIqXzvZOc7I4Ir21ZX/HseC2
+         Wi2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWexYVAem23iW6co84zKhvG+A+XLk86X0x+QCo9U4MPAGwPOh/nMMqwQJqdTYQP37xZ/31rYk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFTIuGSoM5iSIoZjpRF80nZSBtHK2DFW6CICGDD0awQx9ZLSOZ
+	1JoA5Kw2cSd5t0W71qEIY44x2mvOD3FRB+B5JVsDT0kANhj2dIEwWLjvk7UPsu7P+TwwSoksi2V
+	B/hUDt1ynilSAR7DvTpgqj3qlpsAbTAOabZ68COHBIcB6lDJTJsUerDrWnus=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6820:3093:b0:663:8c6:978c with SMTP id
+ 006d021491bc7-66d0c75d6a8mr1083916eaf.65.1770366732936; Fri, 06 Feb 2026
+ 00:32:12 -0800 (PST)
+Date: Fri, 06 Feb 2026 00:32:12 -0800
+In-Reply-To: <177032644012.1975497.16411100029657607833.stgit@firesoul>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6985a70c.050a0220.3b3015.0034.GAE@google.com>
+Subject: [syzbot ci] Re: net: sched: refactor qdisc drop reasons into
+ dedicated tracepoint
+From: syzbot ci <syzbot+ci335f183b8446659a@syzkaller.appspotmail.com>
+To: atenart@redhat.com, bpf@vger.kernel.org, carges@cloudflare.com, 
+	davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
+	hawk@kernel.org, horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
+	kernel-team@cloudflare.com, kuba@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, toke@toke.dk, xiyou.wangcong@gmail.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257489-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257490-lists,netdev=lfdr.de,ci335f183b8446659a];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[redhat.com,vger.kernel.org,cloudflare.com,davemloft.net,google.com,gmail.com,kernel.org,mojatatu.com,resnulli.us,toke.dk];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[runner.sh:url,run_kselftest.sh:url]
-X-Rspamd-Queue-Id: 4EB0FFB5AB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,googlegroups.com:email,googlesource.com:url,syzbot.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0D5D2FB8A7
 X-Rspamd-Action: no action
 
-This has been on my todo list for a long time. We should use ktap
-helpers in runner.sh. I saw Brendan did some work in d9e6269e3303
-("selftests/run_kselftest.sh: exit with error if tests fail") to make
-run_kselftest.sh exit with the correct return value. But we still use a
-custom solution in runner.sh. Let's convert all the print messages to use
-formal ktap helpers. Here’s what I changed:
+syzbot ci has tested the following series
 
-  1. Move TAP header from runner.sh to run_kselftest.sh, since run_kselftest.sh
-     is the only caller of run_many().
-  2. In run_kselftest.sh, call run_many() in main process to count the
-     pass/fail numbers.
-  3. In run_kselftest.sh, do not generate kselftest_failures_file; just
-     use ktap_print_totals to report the result.
-  4. In runner.sh run_one(), get the return value and use ktap helpers for
-     all pass/fail reporting. This allows counting pass/fail numbers in the
-     main process.
-  5. In runner.sh run_in_netns(), also return the correct rc, so we can
-     count results during wait.
+[v2] net: sched: refactor qdisc drop reasons into dedicated tracepoint
+https://lore.kernel.org/all/177032644012.1975497.16411100029657607833.stgit@firesoul
+* [PATCH net-next v2 1/6] net: sched: introduce qdisc-specific drop reason tracing
+* [PATCH net-next v2 2/6] net: sched: sfq: convert to qdisc drop reasons
+* [PATCH net-next v2 3/6] net: sched: sch_cake: use enum qdisc_drop_reason for cobalt_should_drop
+* [PATCH net-next v2 4/6] net: sched: rename QDISC_DROP_CAKE_FLOOD to QDISC_DROP_FLOOD_PROTECTION
+* [PATCH net-next v2 5/6] net: sched: rename QDISC_DROP_FQ_* to generic names
+* [PATCH net-next v2 6/6] net: sched: sch_dualpi2: use qdisc_dequeue_drop() for dequeue drops
 
-After the change, the printed result looks like:
+and found the following issue:
+WARNING in __dev_queue_xmit
 
-  not ok 4 4 selftests: clone3: clone3_cap_checkpoint_restore # exit=1
-  # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
+Full report is available here:
+https://ci.syzbot.org/series/51381d54-6fc9-4542-a8cd-eac656a11965
 
-  ]# echo $?
-  1
+***
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+WARNING in __dev_queue_xmit
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      7a4cd71fa4514cd85df39b3cf99da8142660cdcd
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/17bc5e9e-8ccc-4afb-a291-312bbc43df20/config
+C repro:   https://ci.syzbot.org/findings/20939160-05e8-4589-a6d5-6a253d5e39b0/c_repro
+syz repro: https://ci.syzbot.org/findings/20939160-05e8-4589-a6d5-6a253d5e39b0/syz_repro
+
+syzkaller0: entered promiscuous mode
+syzkaller0: entered allmulticast mode
+------------[ cut here ]------------
+reason && reason < __QDISC_DROP_REASON
+WARNING: net/sched/sch_generic.c:50 at tcf_kfree_skb_list+0xd6/0x100 net/sched/sch_generic.c:50, CPU#0: syz.0.17/5949
+Modules linked in:
+CPU: 0 UID: 0 PID: 5949 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:tcf_kfree_skb_list+0xd6/0x100 net/sched/sch_generic.c:50
+Code: 89 e8 e8 5d 00 00 00 31 ff 4c 89 e6 ba 40 00 00 00 e8 be e6 d6 ff 4c 8b 24 24 4d 85 e4 74 27 e9 6e ff ff ff e8 1b f3 50 f8 90 <0f> 0b 90 eb c4 44 89 e9 80 e1 07 80 c1 03 38 c1 7c 96 4c 89 ef e8
+RSP: 0018:ffffc90003e67360 EFLAGS: 00010293
+RAX: ffffffff89718645 RBX: ffff8881133cc000 RCX: ffff8881738b9d40
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 000000000002ffff
+RBP: 0000000000000001 R08: ffff88811571195b R09: 1ffff11022ae232b
+R10: dffffc0000000000 R11: ffffed1022ae232c R12: ffff88810a9bca80
+R13: 0000000000000002 R14: ffff888109569400 R15: ffff888115711800
+FS:  000055558d217500(0000) GS:ffff88818e31a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000001410 CR3: 0000000166b9c000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ __dev_xmit_skb net/core/dev.c:4272 [inline]
+ __dev_queue_xmit+0x18e5/0x3180 net/core/dev.c:4797
+ packet_snd net/packet/af_packet.c:3077 [inline]
+ packet_sendmsg+0x3eb6/0x50f0 net/packet/af_packet.c:3109
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x4d7/0x810 net/socket.c:2592
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6544b9acb9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc871586c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f6544e15fa0 RCX: 00007f6544b9acb9
+RDX: 0000000000000004 RSI: 00002000000000c0 RDI: 0000000000000008
+RBP: 00007f6544c08bf7 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6544e15fac R14: 00007f6544e15fa0 R15: 00007f6544e15fa0
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
- tools/testing/selftests/kselftest/runner.sh | 83 ++++++++++++---------
- tools/testing/selftests/run_kselftest.sh    | 21 ++++--
- 2 files changed, 62 insertions(+), 42 deletions(-)
-
-diff --git a/tools/testing/selftests/kselftest/runner.sh b/tools/testing/selftests/kselftest/runner.sh
-index 3a62039fa621..f3307f2d1f48 100644
---- a/tools/testing/selftests/kselftest/runner.sh
-+++ b/tools/testing/selftests/kselftest/runner.sh
-@@ -1,8 +1,8 @@
--#!/bin/sh
-+#!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- #
- # Runs a set of tests in a given subdirectory.
--export skip_rc=4
-+. $(dirname "$(readlink -e "${BASH_SOURCE[0]}")")/ktap_helpers.sh
- export timeout_rc=124
- export logfile=/dev/stdout
- export per_test_logging=
-@@ -44,17 +44,11 @@ tap_timeout()
- 	fi
- }
- 
--report_failure()
--{
--	echo "not ok $*"
--	echo "$*" >> "$kselftest_failures_file"
--}
--
- run_one()
- {
- 	DIR="$1"
- 	TEST="$2"
--	local test_num="$3"
-+	local rc test_num="$3"
- 
- 	BASENAME_TEST=$(basename $TEST)
- 
-@@ -102,16 +96,17 @@ run_one()
- 	# Command line timeout overrides the settings file
- 	if [ -n "$kselftest_override_timeout" ]; then
- 		kselftest_timeout="$kselftest_override_timeout"
--		echo "# overriding timeout to $kselftest_timeout" >> "$logfile"
-+		ktap_print_msg "overriding timeout to $kselftest_timeout" >> "$logfile"
- 	else
--		echo "# timeout set to $kselftest_timeout" >> "$logfile"
-+		ktap_print_msg "timeout set to $kselftest_timeout" >> "$logfile"
- 	fi
- 
- 	TEST_HDR_MSG="selftests: $DIR: $BASENAME_TEST"
- 	echo "# $TEST_HDR_MSG"
- 	if [ ! -e "$TEST" ]; then
--		echo "# Warning: file $TEST is missing!"
--		report_failure "$test_num $TEST_HDR_MSG"
-+		ktap_print_msg "Warning: file $TEST is missing!"
-+		ktap_test_fail "$test_num $TEST_HDR_MSG"
-+		rc=$KSFT_FAIL
- 	else
- 		if [ -x /usr/bin/stdbuf ]; then
- 			stdbuf="/usr/bin/stdbuf --output=L "
-@@ -122,33 +117,37 @@ run_one()
- 		elif [ -x "./ksft_runner.sh" ]; then
- 			cmd="$stdbuf ./ksft_runner.sh ./$BASENAME_TEST"
- 		else
--			echo "# Warning: file $TEST is not executable"
-+			ktap_print_msg "Warning: file $TEST is not executable"
- 
- 			if [ $(head -n 1 "$TEST" | cut -c -2) = "#!" ]
- 			then
- 				interpreter=$(head -n 1 "$TEST" | cut -c 3-)
- 				cmd="$stdbuf $interpreter ./$BASENAME_TEST"
- 			else
--				report_failure "$test_num $TEST_HDR_MSG"
--				return
-+				ktap_test_fail "$test_num $TEST_HDR_MSG"
-+				return $KSFT_FAIL
- 			fi
- 		fi
- 		cd `dirname $TEST` > /dev/null
--		((((( tap_timeout "$cmd" 2>&1; echo $? >&3) |
-+		(((( tap_timeout "$cmd" 2>&1; echo $? >&3) |
- 			tap_prefix >&4) 3>&1) |
--			(read xs; exit $xs)) 4>>"$logfile" &&
--		echo "ok $test_num $TEST_HDR_MSG") ||
--		(rc=$?;	\
--		if [ $rc -eq $skip_rc ]; then	\
--			echo "ok $test_num $TEST_HDR_MSG # SKIP"
--		elif [ $rc -eq $timeout_rc ]; then \
--			echo "#"
--			report_failure "$test_num $TEST_HDR_MSG # TIMEOUT $kselftest_timeout seconds"
-+			(read xs; exit $xs)) 4>>"$logfile"
-+		rc=$?
-+		if [ "$rc" -eq "$KSFT_PASS" ]; then
-+			ktap_test_pass "$test_num $TEST_HDR_MSG"
-+		elif [ "$rc" -eq "$KSFT_SKIP" ]; then
-+			ktap_test_skip "$test_num $TEST_HDR_MSG"
-+		elif [ "$rc" -eq "$KSFT_XFAIL" ]; then
-+			ktap_test_xfail "$test_num $TEST_HDR_MSG"
-+		elif [ "$rc" -eq "$timeout_rc" ]; then
-+			ktap_test_fail "$test_num $TEST_HDR_MSG # TIMEOUT $kselftest_timeout seconds"
- 		else
--			report_failure "$test_num $TEST_HDR_MSG # exit=$rc"
--		fi)
-+			ktap_test_fail "$test_num $TEST_HDR_MSG # exit=$rc"
-+		fi
- 		cd - >/dev/null
- 	fi
-+
-+	return $rc
- }
- 
- in_netns()
-@@ -164,27 +163,34 @@ in_netns()
- 
- run_in_netns()
- {
--	local netns=$(mktemp -u ${BASENAME_TEST}-XXXXXX)
- 	local tmplog="/tmp/$(mktemp -u ${BASENAME_TEST}-XXXXXX)"
-+	local netns=$(mktemp -u ${BASENAME_TEST}-XXXXXX)
-+	local rc
-+
- 	ip netns add $netns
- 	if [ $? -ne 0 ]; then
--		echo "# Warning: Create namespace failed for $BASENAME_TEST"
--		echo "not ok $test_num selftests: $DIR: $BASENAME_TEST # Create NS failed"
-+		ktap_print_msg "Warning: Create namespace failed for $BASENAME_TEST"
-+		ktap_test_fail "$test_num selftests: $DIR: $BASENAME_TEST # Create NS failed"
- 	fi
- 	ip -n $netns link set lo up
-+
- 	in_netns $netns &> $tmplog
-+	rc=$?
-+
- 	ip netns del $netns &> /dev/null
-+	# Cat the log at once to avoid parallel netns logs.
- 	cat $tmplog
- 	rm -f $tmplog
-+	return $rc
- }
- 
- run_many()
- {
--	echo "TAP version 13"
- 	DIR="${PWD#${BASE_DIR}/}"
- 	test_num=0
--	total=$(echo "$@" | wc -w)
--	echo "1..$total"
-+	local rc
-+	pids=()
-+
- 	for TEST in "$@"; do
- 		BASENAME_TEST=$(basename $TEST)
- 		test_num=$(( test_num + 1 ))
-@@ -194,10 +200,19 @@ run_many()
- 		fi
- 		if [ -n "$RUN_IN_NETNS" ]; then
- 			run_in_netns &
-+			pids+=($!)
- 		else
- 			run_one "$DIR" "$TEST" "$test_num"
- 		fi
- 	done
- 
--	wait
-+	# Handle the return values when running in netns.
-+	for pid in "${pids[@]}"; do
-+		wait "$pid"
-+		rc=$?
-+		[ "$rc" -eq "$KSFT_PASS" ] && KTAP_CNT_PASS=$((KTAP_CNT_PASS+1))
-+		[ "$rc" -eq "$KSFT_FAIL" ] && KTAP_CNT_FAIL=$((KTAP_CNT_FAIL+1))
-+		[ "$rc" -eq "$KSFT_SKIP" ] && KTAP_CNT_SKIP=$((KTAP_CNT_SKIP+1))
-+		[ "$rc" -eq "$KSFT_XFAIL" ] && KTAP_CNT_XFAIL=$((KTAP_CNT_XFAIL+1))
-+	done
- }
-diff --git a/tools/testing/selftests/run_kselftest.sh b/tools/testing/selftests/run_kselftest.sh
-index d4be97498b32..10930d09f2a5 100755
---- a/tools/testing/selftests/run_kselftest.sh
-+++ b/tools/testing/selftests/run_kselftest.sh
-@@ -110,18 +110,23 @@ if [ -n "$TESTS" ]; then
- 	available="$(echo "$valid" | sed -e 's/ /\n/g')"
- fi
- 
--kselftest_failures_file="$(mktemp --tmpdir kselftest-failures-XXXXXX)"
--export kselftest_failures_file
--
-+curdir=$(pwd)
-+total=$(echo "$available" | wc -w)
- collections=$(echo "$available" | cut -d: -f1 | sort | uniq)
-+
-+ktap_print_header
-+ktap_set_plan "$total"
-+
- for collection in $collections ; do
- 	[ -w /dev/kmsg ] && echo "kselftest: Running tests in $collection" >> /dev/kmsg
- 	tests=$(echo "$available" | grep "^$collection:" | cut -d: -f2)
--	($dryrun cd "$collection" && $dryrun run_many $tests)
-+	$dryrun cd "$collection" && $dryrun run_many $tests
-+	$dryrun cd "$curdir"
- done
- 
--failures="$(cat "$kselftest_failures_file")"
--rm "$kselftest_failures_file"
--if "$ERROR_ON_FAIL" && [ "$failures" ]; then
--	exit 1
-+ktap_print_totals
-+if "$ERROR_ON_FAIL" && [ "$KTAP_CNT_FAIL" -ne 0 ]; then
-+	exit "$KSFT_FAIL"
-+else
-+	exit "$KSFT_PASS"
- fi
--- 
-2.50.1
-
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
