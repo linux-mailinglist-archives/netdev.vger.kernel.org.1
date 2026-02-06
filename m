@@ -1,102 +1,64 @@
-Return-Path: <netdev+bounces-257465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257466-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mA7bNyN0hWlzBwQAu9opvQ
-	(envelope-from <netdev+bounces-257465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 05:54:59 +0100
+	id iKPnFKt3hWngBwQAu9opvQ
+	(envelope-from <netdev+bounces-257466-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 06:10:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A86BFA2C3
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 05:54:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD872FA4B8
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 06:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CDFB83006835
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 04:54:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DCA663063B80
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 05:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9699336EF8;
-	Fri,  6 Feb 2026 04:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D97A33A9CF;
+	Fri,  6 Feb 2026 05:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxkOTaw/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EdSBbsax"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38EC2E62C3
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 04:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CA32459C9
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 05:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770353697; cv=none; b=j2UM+W5FVj8tjp1T6U/1rXgWLrU4ND2mEE8SI7h0HDC2RcP438jSU6rtFH3IElwesiogeZRD/T0urwec0awieDszO0oP7ZarIJANAgfznfcSgeMmh1MwzEXb7GrP42m/VJ6H2tsXOkHAJ547lo96Nz5BNmWVRupkZs6k8XAs3O8=
+	t=1770354158; cv=none; b=cCnCpAd87qAIUH/dwpj4IfBF7SFG8xMwt8hZ0Kj2Ltgc6ZGM+WcuksT8/rl/t6qy0t2Kb6ZAoDgW5bmagCUB2LMod0CF5c+HR3j+4Gd/nRLThzutsQ7FYOv96yFWZ7YWAbYeKGHiUr81y22wE5vOeaD/xI66XQ4XA/LIBdRUXG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770353697; c=relaxed/simple;
-	bh=PlHFFdGueYam39J3KxtGgbJHGJBfEpbJWejTsKCw03Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YmdMqkq0vnp/kR4SzqtG+4Prv8Te6wd6PpITJQHSis0tVnHYxP3UzZ92uAdq5Ba8rlzHqh1g+nPFAIoBW/la180hBmyycSVc5booZtgcw27ssh6titvi8iDR1rr+A9QtnKWuc3ZwJ5UEBwdBF+6rDJ2CgvBN9bq+eT/HORS+Id4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BxkOTaw/; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29efd139227so1864695ad.1
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 20:54:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770353697; x=1770958497; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PlHFFdGueYam39J3KxtGgbJHGJBfEpbJWejTsKCw03Q=;
-        b=BxkOTaw/x+snswsBuyhCo7GMpvOnv2+E9h0B46YwX37s4bvbGpZGutUD8EtH7wk386
-         RZJAWnI7AB80eFvVTtsZ9gm570SQ+KESw1YA71Jju6Uodh39VVv33egWR+lkmeHeQsoY
-         KnOpUtNO5YT0dlmikRhKhf7nvsio/jVERSCvXG4hrKa1w6J2LYCDFx+3In7IPH2rds9F
-         6N2zEbwg2ByJjy4wpieuEiyvXK6eQKmDkitehEJsxIkHW26aDzBteCoq1Cdr2aK0kwVC
-         q9mEwgxSdJQL/fXrJpk0CgYHfknscGCNPQRZ1ivfW/LreLl2H8cxH23mm7h390aVKpFm
-         upaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770353697; x=1770958497;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PlHFFdGueYam39J3KxtGgbJHGJBfEpbJWejTsKCw03Q=;
-        b=Lsiuvlzc+9d66dNU0e+qb9J2CsEyQtd1igeM1gp1bcv2xCB64UhHKqF7u2okIB/PKi
-         rAp69MRgvFprv9siZUqm6Pjf/7bgaItQr0OGqkFuFkbeWV29dtYqaAJV1vpvhnWRWf36
-         9rOOEh5sq12S3eMOaab7H6zf6CA8mXALyMrcy5El++PaOaqlWFs8nbtw1b93QMf3LwIQ
-         WDWLZVhADB1KjP1M0C+m31aLZDiuHV9ferADIM9ynuUHonNLtX7BSZoMdLinRsNj054d
-         Gt1J3o+Fd2h5BaJxbrtNbH0CfblMdbo1sFMe/zkDVSJDGu/UqcFT2bvJUeXFm668I/rx
-         ZDKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLGIxmsASFSKcbDEWgQ83NuwCNxypfszWVVPukVRcPLwOGJ19z26Ea3V1kncBj3OL+zWC9Hmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDQTiTJOitIS6YXFoxINFl9KqEF8l9pBA7YPZq8x/mYbPZrcyK
-	kF0bR4LqaEhcXfARlTKocXU6WyVzMfKrsuKTx+AcHS9XKfRwWYM3xusG
-X-Gm-Gg: AZuq6aI5FasmdC2QKEtGagrNivODkiC65VaojY82A75E4PlLbWSMn1FFVto4UaiDx8Y
-	S9SuHDBlYtNK9Md2m0axMxakVMaamGO8lZPSIFLb2jTOIe2SV0UXy4m9pltFULFlXYLQK6ox0UV
-	GrfEdbQL80QVYz80riBJv6B2ng3vrJs1B9cMzmxGTFn1l9+9n5nykycuoqs9CW6YnaWOZGzSJuW
-	UXhdXSmKxLAf3RCv8SURqxQIREqDrYDYQdW7hQR0lB4Bq1FzVW7j8BJryXeRmh1EN7lesZ4rYqV
-	at55tvmI1nnvLjokY19IRnJYoa/43rmU+dIGeC2XKSb2RVNyy9M1QhhGv+Pq3BqlbG6yl2TBNw5
-	98t6PIi8VourdGu1fz4pSHP3adhzKfMBJFAaMES/XqWIxQYPVITl2gDEJRvP5JDQG9loKiKCIsE
-	OQ20o4lfLA9uTPTrilb8dHwiHGuMwbT1KTGheOmeriCrKjgOWJjLRgp/6HEv0oxcBbFw4rWSH/
-X-Received: by 2002:a17:903:b4e:b0:2a0:fe9f:1884 with SMTP id d9443c01a7336-2a95194aaeamr13854855ad.55.1770353696910;
-        Thu, 05 Feb 2026 20:54:56 -0800 (PST)
-Received: from dpc2500057.. (fsb6a9315e.tkyc502.ap.nuro.jp. [182.169.49.94])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a952217ffdsm11599825ad.88.2026.02.05.20.54.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 20:54:56 -0800 (PST)
-From: Keita Morisaki <kmta1236@gmail.com>
-To: maciej.fijalkowski@intel.com
-Cc: aleksandr.loktionov@intel.com,
-	alice.michael@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	intel-wired-lan@lists.osuosl.org,
-	kmta1236@gmail.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	paul.greenwalt@intel.com,
-	przemyslaw.kitszel@intel.com,
-	tony.nguyen@intel.com
-Subject: Re: [PATCH v2] ice: fix race condition in TX timestamp ring cleanup
-Date: Fri,  6 Feb 2026 13:54:26 +0900
-Message-Id: <20260206045426.3547398-1-kmta1236@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <aYSeb42KRzlc4SbA@boxer>
-References: <aYSeb42KRzlc4SbA@boxer>
+	s=arc-20240116; t=1770354158; c=relaxed/simple;
+	bh=/3VHPhMfZjxQuCHW+zNeXKxUhTZMH3vDhteY8WCQL+4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G2Um9RIw8ZU+dEhkEvFknGFtHChk5FL6y/ynx+s3n81G3IpU9PgZRfeS6dx2v930dzilGYwtlOpqwSR0hrxLuw4rkPnYrgX/ik+wz11CDuGQ1A99Tq0EgWtOhWxtwpURw0qJxkUtawzSky8/BLK/GBWwqgU7S9aXJzD/8nbHmvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EdSBbsax; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770354155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/E9bYcTpTNhHUI5bPdqFh/Okn31mO0JEye2h6D2+XOI=;
+	b=EdSBbsaxhkYLrz+y/e4RhJVzjVP+8O6m6WcpdUD4DwgNxw23qInxCulh/UIxlNUUFhfGkC
+	V+jFZpJAoig4Asebh9N6AYNxDwnOvUgMMzPcUzMEheToQTnP8bAO7lffrZDZL5ScsFSZdz
+	+luQHmDTKOojH0plvvsGpsSEWy6eibo=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+e738404dcd14b620923c@syzkaller.appspotmail.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v4] xfrm: fix ip_rt_bug race in icmp_route_lookup reverse path
+Date: Fri,  6 Feb 2026 13:02:19 +0800
+Message-ID: <20260206050220.59642-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,61 +66,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-257466-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,lists.osuosl.org,gmail.com,kernel.org,vger.kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257465-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kmta1236@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A86BFA2C3
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,e738404dcd14b620923c];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: BD872FA4B8
 X-Rspamd-Action: no action
 
-> am I reading this right or you only modified flags to be bitmap on Tx side
-> and Rx is left as-is?
->
-> Would be nice to reflect this on Rx side as well, but I know it is out of
-> the scope for this patch.
->
-> Would you like to do a follow-up patch for that which would be sent to
-> -next tree?
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-Yes, I intentionally left RX side as is because it seems less obviously that
-rx flags are touched concurrently than tx ones.
+icmp_route_lookup() performs multiple route lookups to find a suitable
+route for sending ICMP error messages, with special handling for XFRM
+(IPsec) policies.
 
-But sure, it's a good idea to make the handling more defensive on the rx side as well.
-I think it can be a follow-up patch as TX has more obvious race condition.
+The lookup sequence is:
+1. First, lookup output route for ICMP reply (dst = original src)
+2. Pass through xfrm_lookup() for policy check
+3. If blocked (-EPERM) or dst is not local, enter "reverse path"
+4. In reverse path, call xfrm_decode_session_reverse() to get fl4_dec
+   which reverses the original packet's flow (saddr<->daddr swapped)
+5. If fl4_dec.saddr is local (we are the original destination), use
+   __ip_route_output_key() for output route lookup
+6. If fl4_dec.saddr is NOT local (we are a forwarding node), use
+   ip_route_input() to simulate the reverse packet's input path
+7. Finally, pass rt2 through xfrm_lookup() with XFRM_LOOKUP_ICMP flag
 
-> Also your patch should contain the tree you are dedicating your work:
-> [PATCH net v2] ice: fix race condition in TX timestamp ring cleanup
+The bug occurs in step 6: ip_route_input() is called with fl4_dec.daddr
+(original packet's source) as destination. If this address becomes local
+between the initial check and ip_route_input() call (e.g., due to
+concurrent "ip addr add"), ip_route_input() returns a LOCAL route with
+dst.output set to ip_rt_bug.
 
-Didn't know that! Thank you for the comment. I will follow this in future
-(I'm also happy to resend the V2 patch with the updated subject if you think it's).
+This route is then used for ICMP output, causing dst_output() to call
+ip_rt_bug(), triggering a WARN_ON:
 
-> As for rest of the stuff it makes sense to me, however best if Paul could
-> give his ack here.
+ ------------[ cut here ]------------
+ WARNING: net/ipv4/route.c:1275 at ip_rt_bug+0x21/0x30, CPU#1
+ Call Trace:
+  <TASK>
+  ip_push_pending_frames+0x202/0x240
+  icmp_push_reply+0x30d/0x430
+  __icmp_send+0x1149/0x24f0
+  ip_options_compile+0xa2/0xd0
+  ip_rcv_finish_core+0x829/0x1950
+  ip_rcv+0x2d7/0x420
+  __netif_receive_skb_one_core+0x185/0x1f0
+  netif_receive_skb+0x90/0x450
+  tun_get_user+0x3413/0x3fb0
+  tun_chr_write_iter+0xe4/0x220
+  ...
+
+Fix this by checking rt2->rt_type after ip_route_input(). If it's
+RTN_LOCAL, the route cannot be used for output, so treat it as an error.
+
+The reproducer requires kernel modification to widen the race window,
+making it unsuitable as a selftest. It is available at:
+
+  https://gist.github.com/mrpre/eae853b72ac6a750f5d45d64ddac1e81
+
+Reported-by: syzbot+e738404dcd14b620923c@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000b1060905eada8881@google.com/T/
+Closes: https://lore.kernel.org/r/20260128090523.356953-1-jiayuan.chen@linux.dev
+Fixes: 8b7817f3a959 ("[IPSEC]: Add ICMP host relookup support")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+---
+v3 -> v4:
+    Don't break string literals across lines to fit 80 columns
+    v3: https://lore.kernel.org/netdev/20260205070203.61560-1-jiayuan.chen@linux.dev/
+v1 -> v3:
+    Suggested by Paolo Abeni:
+      - Resend it using net tree and using xfrm prefix
+      - Fix text string over 80 chars limit.
+      - Simplify commit message.
+    v1: https://lore.kernel.org/r/20260128090523.356953-1-jiayuan.chen@linux.dev
+    v2: https://lore.kernel.org/netdev/20260203063449.44737-1-jiayuan.chen@linux.dev/
+---
+ net/ipv4/icmp.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index 4abbec2f47ef..5559b9ae379a 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -554,6 +554,21 @@ static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
+ 		/* steal dst entry from skb_in, don't drop refcnt */
+ 		skb_dstref_steal(skb_in);
+ 		skb_dstref_restore(skb_in, orefdst);
++
++		/*
++		 * At this point, fl4_dec.daddr should NOT be local (we
++		 * checked fl4_dec.saddr above). However, a race condition
++		 * may occur if the address is added to the interface
++		 * concurrently. In that case, ip_route_input() returns a
++		 * LOCAL route with dst.output=ip_rt_bug, which must not
++		 * be used for output.
++		 */
++		if (!err && rt2 && rt2->rt_type == RTN_LOCAL) {
++			net_warn_ratelimited("detected local route for %pI4 during ICMP sending, src %pI4\n",
++					     &fl4_dec.daddr, &fl4_dec.saddr);
++			dst_release(&rt2->dst);
++			err = -EINVAL;
++		}
+ 	}
+ 
+ 	if (err)
+-- 
+2.43.0
+
 
