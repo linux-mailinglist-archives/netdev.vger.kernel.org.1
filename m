@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-257374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uOc0DYY1hWlf+AMAu9opvQ
-	(envelope-from <netdev+bounces-257374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 01:27:50 +0100
+	id cIpPAbE1hWlf+AMAu9opvQ
+	(envelope-from <netdev+bounces-257375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 01:28:33 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CEFF89DE
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 01:27:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D587F8A04
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 01:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 279A43019803
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 00:27:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7201C303428B
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 00:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067FA20C023;
-	Fri,  6 Feb 2026 00:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C368207A20;
+	Fri,  6 Feb 2026 00:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="SeD3739q"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="lYtpQLRi"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863C420A5C4;
-	Fri,  6 Feb 2026 00:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EBD205E25;
+	Fri,  6 Feb 2026 00:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770337653; cv=none; b=sdRTOGz7vomJnAQTUGaZpOpYut/WZMmqp2mqpwiYSJT1pHh0fr84mDcPV8+tp735juf7gD3uBA6Je0OBYJgcWmF5NEb0pDOJYrq37PpHNibb96E+ZaKx7gVUxv/uvrYH3UgbmCLDwWTqlQ7J2FVW94wmOpnG1cF8Hrhe+wNctB4=
+	t=1770337657; cv=none; b=aRthKYBxPGoTAHhgoUTRljvlHGUF86777b/DfWYACnKOTItwF5b79FA+3OfxmuMHWsEFVq7V9DByI52T14+S+AMfuYkeTlzJR17jfzPF+boa+Pu5M9RBZvFw50TGJ9WziqNp6+vRL/W5IHMrkqrXDO79K68AWT/N+FryxN7HpLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770337653; c=relaxed/simple;
-	bh=tVj3lVpI4aZ8TTqpaoJEkZkIZWuFzIADrc4Fv61YUk4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jNdaiE4zUI+vYoX0tNkQSmm49aN3omXMoh3vbuxfar5sswhwIkJamU/5qhEXDKDYdNdeJx1CECO/UccIrQi6hPQpD5/3sXHZoFhipZ/NovEWCm2f3fHuElFio338MIXp0v49x5G5Pe3BHZHh42gDqkGb7p3wIDV274cgwTHun6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=SeD3739q; arc=none smtp.client-ip=67.231.145.42
+	s=arc-20240116; t=1770337657; c=relaxed/simple;
+	bh=1RARk+ZNBucupua7AOknp++jAAXf65IB9iVB1hXUpEs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mDhHZAn7eZZdLGTwYsbG5hB85qEuwJnFv/zVQOFyFGy1ulpWsVDIiwd0WdfL1o5eVf8dKZ8r+AapKByz4rfHZ7wBFtgBtZyrPwAqzAYeyM/ZIretmjC6cZZvhdqhwOpgBIFVBZM+aH38SpZv8yUR0TPahNAQhzmPyjCkYH5yP64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=lYtpQLRi; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6160Q1rO2205305;
-	Thu, 5 Feb 2026 16:27:17 -0800
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 615JBT7b3292284;
+	Thu, 5 Feb 2026 16:27:23 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=cKGXC2X/BXA5kwBSPS
-	+rFIN4yR6cEyfWv739MJ0i1j0=; b=SeD3739q1fTOUVsAYeESvCdZetH2SxM//I
-	UH8bx34ueZBp7gizVDUOfX2Ikl0XJ2VfBJD6Ke2DbDK3JyUPYzsVMKJ+Aiemrzso
-	iKqz+sz52Rhau4p5sPxfm2P36Jc5np87qiTe8SY2jkPZemfUHXZQ7MVMNL8iDI2S
-	oP3UgzTZ33RPWUyGlckQ5ZVLhoHgELVsgy/EKNh7h6fQRtWTtk0JV+ZU7LQHyqV3
-	eoBp4Gg7HdH9l7z6+xFcMslQWJUrexBtmqprPYdXsxEm3i5K6/R4jr877kpFWgQx
-	hmroKeC4APRaQAr+Qvg4qeeRQWGmB3wWW7+87huhPXo1qARiPgkA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c506gvdch-1
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=zWt8nkIjO0eKVZt1rqRs+WhnwVduqp4MDpiVTgTyz1E=; b=lYtpQLRiFFm1
+	e7/ELFefKlhPqRhRORh239hXyj7CZszXX+9LA9nmXqvhoo87MDZVBMScjtNBA3Aq
+	DvmJL9oOs5EI/R4nRB35uwz+5ADOauC01AOWV7UUHqulCY3lS5/PjvMSKodXTqTV
+	cNS6EaTuzvc9ulGOdfckyUnRPB+99mA+Az+pIiqBoZpw9zdXBN+gg5/IhvxpIrD2
+	spg6CJZavBBhHK7AbTzkNTVWR0zMu8o85Pa9x894o82TH2h1R0AiWKZb5rn2nnpk
+	BQbwsPsNIYGyiaoeuLDug6ZZL+JtqaOxYxyu6WFqto1TqswzNuc2lFDAdovucSb2
+	qtgAbIXxUA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c4x2spd6f-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 05 Feb 2026 16:27:16 -0800 (PST)
-Received: from localhost (2620:10d:c085:208::7cb7) by mail.thefacebook.com
- (2620:10d:c08b:78::c78f) with Microsoft SMTP Server (version=TLS1_2,
+	Thu, 05 Feb 2026 16:27:23 -0800 (PST)
+Received: from localhost (2620:10d:c0a8:1c::1b) by mail.thefacebook.com
+ (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.35; Fri, 6 Feb
- 2026 00:27:15 +0000
+ 2026 00:27:21 +0000
 From: Vishwanath Seshagiri <vishs@meta.com>
 To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
@@ -70,10 +72,12 @@ CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	<ilias.apalodimas@linaro.org>,
         <netdev@vger.kernel.org>, <virtualization@lists.linux.dev>,
         <linux-kernel@vger.kernel.org>, <kernel-team@meta.com>
-Subject: [PATCH net-next v5 0/2] virtio_net: add page_pool support
-Date: Thu, 5 Feb 2026 16:27:13 -0800
-Message-ID: <20260206002715.1885869-1-vishs@meta.com>
+Subject: [PATCH net-next v5 1/2] page_pool: add page_pool_frag_offset_add() helper
+Date: Thu, 5 Feb 2026 16:27:14 -0800
+Message-ID: <20260206002715.1885869-2-vishs@meta.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260206002715.1885869-1-vishs@meta.com>
+References: <20260206002715.1885869-1-vishs@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,21 +86,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: aWyzu9vMtefQS6sadZuxXAPjbO5fQeMO
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA2MDAwMiBTYWx0ZWRfX+YsmuxyynF5W
- fWT0yaQlCBXsiJH+HNhGKXGvvNUaofqBGCA0v7iY+MU/xJr5h7cIeuEgT/D+LzXOBnjXpgUDYFm
- p0EzIgn8vRZOJMk5P+gUFfZpcwS/jcBt6Y1rJMtbXQbZ+q3gt/41KWHSmCPsCcrywqsJZ8xeazw
- xw+BNmrb3fken608fUHMsfHGA5GIewNoThRoX3IhbryQ6NJLmsZAcP7zNvLlwXIXNeTVsd4+VqF
- WIwahC3U31QlaWVJL2OOaUKwbkjwFI4+Gh5IW3RxxXBfJ6BpEzXVU0ugL9VGuKUAg4QqR2Pe3DN
- NsXrK5+0Oo6/9lzVwbAiyv6sI7gNg1XtkF3n8ZrTB1U40ltCPmn6d+hIiw8jAEe3eNn/fjv/XAd
- JtMj43Qo9wrlsmB1vFu5u0MYowAct20Ey2vFnpB3ET4wm/T8BXEu+gSVcOQEj2km9Dh4cvtF302
- 03KsAnIWOZXpHwE1OZA==
-X-Proofpoint-GUID: aWyzu9vMtefQS6sadZuxXAPjbO5fQeMO
-X-Authority-Analysis: v=2.4 cv=EZ7FgfmC c=1 sm=1 tr=0 ts=69853564 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+X-Proofpoint-GUID: YjZH3TCYAu4GQR4IyH0Gx9wr3UozoqWe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA2MDAwMiBTYWx0ZWRfXw2AM5Nk23L6C
+ coQ8dqF2Mf07vJVAlpeDHYcxQlduRREi5d7Wl13y6JkafyU9VAEUT67qo4iy+eCGxRvC3hS3Mxl
+ j9CzNsIBAjZ/C28wUKA+KVVgn/9gg8qFhWxLOtec0EWUAzJxrqhd0qyJ0pYtCEm0r6t5VtmLC+d
+ 2/W3HbvzZpN/i6C4ozJEO5/n9j6Snxu3DkVdCgV+GSK3BSKg3tP9HO5ln2rW4C5I7kx/5YmrpfY
+ mjvdtZBSTH+ymJwBFV7b+4nBSEmRx4OrJyE6maKd3Pl5gOn7RHlRXIMU28CiGVhmW0qoZPoSYv2
+ kZkySvCjETl39Y4xRXSKLf3z/z00v4V9DfJNt1s9aeo15GocSf/ciQXRQpEc0RzpFJpWZ0PWed+
+ duLRoO97mISYqy7y0ecn8pptGOnjuaOK6+96Cbz09//Jzxfdws76ST2FuVSxR0ZR4FOuu1Tnx/y
+ qybG2c0mYdaRC2fn/9g==
+X-Authority-Analysis: v=2.4 cv=aPz9aL9m c=1 sm=1 tr=0 ts=6985356b cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
  a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
- a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8
- a=db6x6iqHiqAGgYmq6KwA:9 a=gKebqoRLp9LExxC7YDUY:22
+ a=GgsMoib0sEa3-_RKJdDe:22 a=VabnemYjAAAA:8 a=rozs98Jf37xvrOoLKDoA:9
+ a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-ORIG-GUID: YjZH3TCYAu4GQR4IyH0Gx9wr3UozoqWe
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-05_06,2026-02-05_03,2025-10-01_01
@@ -117,7 +121,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257374-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257375-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -129,154 +133,59 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:mid,meta.com:dkim]
-X-Rspamd-Queue-Id: A8CEFF89DE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email,meta.com:dkim,meta.com:mid]
+X-Rspamd-Queue-Id: 6D587F8A04
 X-Rspamd-Action: no action
 
-Introduce page_pool support in virtio_net driver to enable page
-recycling in RX buffer allocation and avoid repeated page allocator
-calls. This applies to mergeable and small buffer modes.
+Add a helper function to advance the fragment offset without performing
+an allocation. This is needed by drivers that extend a buffer to consume
+unused space at the end of a page fragment to avoid internal fragmentation.
 
-Beyond performance improvements, this patch is a prerequisite for
-enabling memory provider-based zero-copy features in virtio_net,
-specifically devmem TCP and io_uring ZCRX, which require drivers to
-use page_pool for buffer management.
+When a driver uses page_pool_alloc_frag() and determines that the
+remaining space in the page is too small for another buffer, it may
+extend the current buffer to include that space. However, page_pool's
+internal frag_offset is not aware of this extension, which could cause
+the next allocation to overlap with the extended buffer.
 
-The implementation preserves the DMA premapping optimization introduced
-in commit 31f3cd4e5756 ("virtio-net: rq submits premapped per-buffer")
-by conditionally using PP_FLAG_DMA_MAP when the virtio backend supports
-standard DMA API (vhost, virtio-pci), and falling back to
-allocation-only mode for backends with custom DMA mechanisms (VDUSE).
+page_pool_frag_offset_add() allows drivers to advance frag_offset to
+match the actual consumed space.
 
-================================================================================
-                      VIRTIO-NET PAGE POOL BENCHMARK RESULTS
-================================================================================
+Signed-off-by: Vishwanath Seshagiri <vishs@meta.com>
+---
+ include/net/page_pool/helpers.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-CONFIGURATION
--------------
-- Host: pktgen TX -> tap interface -> vhost-net
-- Guest: virtio-net RX -> XDP_DROP
-- Packet sizes: small buffers - 64; merge receivable 64, 1500
-
-SMALL PACKETS (64 bytes)
-==================================================
-Queues | Base (pps)  | Page Pool (pps) | Improvement | Base (Gb/s) |PP (Gb/s)
--------|-------------|-----------------|-------------|-------------|----------
-  1Q   |    853,493  |      868,923    |   +1.8%     |    0.44     | 0.44
-  2Q   |  1,655,793  |    1,696,707    |   +2.5%     |    0.85     | 0.87
-  4Q   |  3,143,375  |    3,302,511    |   +5.1%     |    1.61     | 1.69
-  8Q   |  6,082,590  |    6,156,894    |   +1.2%     |    3.11     | 3.15
-
-
-RECEIVE MERGEABLE (64 bytes)
-======================================================
-Queues | Base (pps)  | Page Pool (pps) | Improvement | Base (Gb/s) |PP (Gb/s)
--------|-------------|-----------------|-------------|-------------|----------
-   1Q  |    766,168  |      814,493    |   +6.3%     |    0.39     | 0.42
-   2Q  |  1,384,871  |    1,670,639    |  +20.6%     |    0.71     | 0.86
-   4Q  |  2,773,081  |    3,080,574    |  +11.1%     |    1.42     | 1.58
-   8Q  |  5,600,615  |    6,043,891    |   +7.9%     |    2.87     | 3.10
-
-
-RECEIVE MERGEABLE (1500 bytes)
-========================================================
-Queues | Base (pps)  | Page Pool (pps) | Improvement | Base (Gb/s) |PP (Gb/s)
--------|-------------|-----------------|-------------|-------------|----------
-  1Q   |    741,579  |      785,442    |   +5.9%     |    8.90     | 9.43
-  2Q   |  1,310,043  |    1,534,554    |  +17.1%     |   15.72     | 18.41
-  4Q   |  2,748,700  |    2,890,582    |   +5.2%     |   32.98     | 34.69
-  8Q   |  5,348,589  |    5,618,664    |   +5.0%     |   64.18     | 67.42
-
-The page_pool implementation showed consistent performance improvements
-by eliminating per packet overhead of allocating and deallocating
-memory. When running the performance benchmarks, I noticed that
-page_pool also had a consistent throughput performance compared to the
-base patch where performance variability was due to accessing free_list
-for getting the next set of pages.
-
-
-Changes in v5
-=============
-
-Addressing reviewer feedback from v4:
-
-- Add page_pool_frag_offset_add() helper to page_pool API to advance
-  fragment offset when drivers extend buffers to consume unused page
-  space (hole optimization). (Michael S. Tsirkin)
-- Unify big_packets condition checks and added an  explanatory comment 
-  (Michael S. Tsirkin)
-- Add page_pool_dma_sync_for_cpu() calls in receive paths before
-  reading buffer data when using PP_FLAG_DMA_MAP
-  (Michael S. Tsirkin)
-- Remove virtnet_rq_unmap() and free_receive_page_frags() entirely,
-  replacing with page_pool lifecycle management (Jason Wang)
-- Dropped selftests patch from the series
-- v4 link: https://lore.kernel.org/virtualization/20260204193617.1200752-1-vishs@meta.com/ 
-
-Changes in v4
-=============
-
-Addressing reviewer feedback from v3:
-
-- Remove unnecessary !rq->page_pool check in page_to_skb()
-- Reorder put_xdp_frags() parameters
-- Remove unnecessary xdp_page = NULL initialization in receive_small_xdp()
-- Move big_packets mode check outside the loop in virtnet_create_page_pools()
-  for efficiency
-- Remove unrelated whitespace changes
-- v3 link: https://lore.kernel.org/virtualization/20260203231021.1331392-1-vishs@meta.com/
-
-Changes in v3
-=============
-
-Addressing reviewer feedback from v2:
-
-- Fix CI null-ptr-deref crash: use max_queue_pairs instead of
-  curr_queue_pairs in virtnet_create_page_pools() to ensure page pools
-  are created for all queues (Jason Wang, Jakub Kicinski)
-- Preserve big_packets mode page->private chaining in page_to_skb() with
-  conditional checks (Jason Wang)
-- Use page_pool_alloc_pages() in xdp_linearize_page() and
-  mergeable_xdp_get_buf() to eliminate xdp_page tracking logic and simplify
-  skb_mark_for_recycle() calls (Jason Wang)
-- Add page_pool_page_is_pp() check in virtnet_put_page() to safely
-  handle both page_pool and non-page_pool pages (Michael S. Tsirkin)
-- Remove unrelated rx_mode_work_enabled changes (Jason Wang)
-- Selftest: use random ephemeral port instead of hardcoded port to avoid
-  conflicts when running tests in parallel (Michael S. Tsirkin)
-- v2 link: https://lore.kernel.org/virtualization/20260128212031.1431746-1-vishs@meta.com/
-
-Changes in v2
-=============
-
-Addressing reviewer feedback from v1:
-
-- Add "select PAGE_POOL" to Kconfig (Jason Wang)
-- Move page pool creation from ndo_open to probe for device lifetime
-  management (Xuan Zhuo, Jason Wang)
-- Implement conditional DMA strategy using virtqueue_dma_dev():
-  - When non-NULL: use PP_FLAG_DMA_MAP for page_pool-managed DMA
-    premapping
-  - When NULL (VDUSE): page_pool handles allocation only
-- Use page_pool_get_dma_addr() + virtqueue_add_inbuf_premapped() to
-  preserve DMA premapping optimization from commit 31f3cd4e5756
-  ("virtio-net: rq submits premapped per-buffer") (Jason Wang)
-- Remove dual allocation code paths - page_pool now always used for
-  small/mergeable modes (Jason Wang)
-- Remove unused virtnet_rq_alloc/virtnet_rq_init_one_sg functions
-- Add comprehensive performance data (Michael S. Tsirkin)
-- v1 link:
-  https://lore.kernel.org/virtualization/20260106221924.123856-1-vishs@meta.com/
-
-Vishwanath Seshagiri (2):
-  page_pool: add page_pool_frag_offset_add() helper
-  virtio_net: add page_pool support for buffer allocation
-
- drivers/net/Kconfig             |   1 +
- drivers/net/virtio_net.c        | 430 ++++++++++++++++----------------
- include/net/page_pool/helpers.h |  20 ++
- 3 files changed, 241 insertions(+), 210 deletions(-)
-
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 3247026e096a..14907c3badae 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -96,6 +96,26 @@ static inline struct page *page_pool_dev_alloc_pages(struct page_pool *pool)
+ 	return page_pool_alloc_pages(pool, gfp);
+ }
+ 
++/**
++ * page_pool_frag_offset_add() - advance fragment offset without allocation
++ * @pool: pool to update
++ * @bytes: number of bytes to skip
++ *
++ * Advance the fragment offset by @bytes without performing an allocation.
++ * This is useful when a driver extends a buffer to consume unused space
++ * at the end of a page fragment (to avoid internal fragmentation), and
++ * needs to ensure the next allocation doesn't overlap.
++ *
++ * Must be called in the same context as page_pool_alloc_frag() to avoid
++ * racing with fragment allocations.
++ *
++ */
++static inline void page_pool_frag_offset_add(struct page_pool *pool,
++					     unsigned int bytes)
++{
++	pool->frag_offset += bytes;
++}
++
+ /**
+  * page_pool_dev_alloc_frag() - allocate a page fragment.
+  * @pool: pool from which to allocate
 -- 
 2.47.3
 
