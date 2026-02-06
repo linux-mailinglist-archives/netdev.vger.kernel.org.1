@@ -1,103 +1,87 @@
-Return-Path: <netdev+bounces-257551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNa9FkLuhWnSIQQAu9opvQ
-	(envelope-from <netdev+bounces-257551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:36:02 +0100
+	id OLBZGNruhWlvIQQAu9opvQ
+	(envelope-from <netdev+bounces-257552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:38:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE4D1FE368
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:36:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CEEFE41D
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0ACAC302495B
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 13:34:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B7AEE3002E2C
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 13:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822A539E6F6;
-	Fri,  6 Feb 2026 13:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D3E3783CF;
+	Fri,  6 Feb 2026 13:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kj1RJvvg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tFD1foL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A41D14A8B
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 13:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59403367F56
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 13:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770384864; cv=none; b=MmKEsPmSLtspRsyT5eahY0cS0aB3tGnCKIRgqZPFT+/TlncpWmg53HkiTdzz0YBIKQn+Vs5dYzSiUQb9OAQYmRHRcRzctbr4HiYzGw/39e+IfP+XmrO5kb4a+nCMukaAx+p7m2J7T820l7ASCXz5YZAvPsJ8QLoLspOgz2cFqEQ=
+	t=1770385111; cv=none; b=jMz9BlRbEnWWIhctqScxEv+5YP87mmJg7bbZ/H4uH2j3aJJ6xwTq2rdxllJy2pWkYgkX/8xNV3/c78WPLhiWGfSk8TUMQIfgvU4ozbITxWLbeTxnm+NiDrAYV3s6SH0ihzjSoXIqrC0V4CrnlpRSzn4glqyL0x/1DjrQbgt81xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770384864; c=relaxed/simple;
-	bh=IuMyMRvNZUCfTkMLA4Wc42ZkPQ9Vq8ETpzgm2iGt9Ts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=as4+x4C2U9f4Jw9eAbYR2VAvrgpMD4BAAw9oTkrxFDXuMePDg0FTaKjMOKKGZXZBrJYzrYA3gKS2WVWi0kMhpLRsavfU9UEY/fv+rNdngeNnTGwIJ60N3l3rNbKV1wMXTGc1mPtbTtcJi6MIRhiBmRIkPb92+lHL8BTFsrBwDZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kj1RJvvg; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43614c6afacso298482f8f.0
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 05:34:23 -0800 (PST)
+	s=arc-20240116; t=1770385111; c=relaxed/simple;
+	bh=hsqFLfrKMouFzTSXNnXx7ePhR2BO9rhhD05fciUjj0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=aj+3FPikvdhLobqP3Za5UDWhQanRq/zfMn2s+IvMj9Agr1WXvHZ5yItEL6Qf+Gxr+mv5Yid3ubkCJWHh8WaIxBnYCWjTkzsEhwQ5KKNKw7d/26QSh+2UwG82ihLefJ3SzBWrLvTGHnztBqvfXenmIl4Dm/Ta1McQyJMr4bFwp3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tFD1foL4; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4806f9e61f9so13159005e9.1
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 05:38:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770384862; x=1770989662; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lXkwLOFRlIih17A8fA8wgWqc3R7cmaWgMUZ9oqwSoYc=;
-        b=Kj1RJvvg2hZMTalbRjhB809HVri53KgZrLtKVI6IS0v+R8NGrax4oP8K1zp34MXsHE
-         kO69FyJFSBleSRI+1snYIFzYRLMimpwP8glRdTnuy2mqJL9xbVe7aRmHo4ESDOAuGbIm
-         8EP9EVz7fz7kv77IcLFg0eeea66eIDIoyscSGoDKIl29Tkr4uwA9fqx5XYwmt226/oiM
-         elS29fJ3KQ28IIqXRWwvFuTo9KA/y2Y4w44rdGlFEB0dV4rDOgpCRdaGcRuwFNrRiQd9
-         41yd+fuOutPDcXMoE9mwipcbmzL7FGbXXmnbdcUHi6jY0WYJcA8tFvwi9+7ClIDKswXC
-         EZ7w==
+        d=linaro.org; s=google; t=1770385110; x=1770989910; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=p8pssK1B+mX1mgchY1BRzpKL9soTjhoWyGFGipUXMJU=;
+        b=tFD1foL4e4KWXgK3SICjGelSJY74Ls//wOyXswHAy4ONR7jQN52zC3nkbzzdUwxR8Y
+         wPyyZV9aYvS8gKkTEpHDIF3KIm/XoyP87jMfs42cCmZdrOgQS5CBdCQJBLTrg4CNtQGg
+         KiLgfJKmQAYYb5c7H8nZDPUAQNzW2U8GfJ7c6HR0mkzXWbwhjo5iOlSlRfRDaRUA0qTg
+         1+o0jSewVA5e2On++uc+PuAFNATsEbBNAk3tr1fFH8MopHEoC3AhC2SWC9rxV7zFLQ8z
+         fRew1+yFLCTRerlXuv9AEMZbveeU21GseFyM08yuy7JCHPS76ogjnTl64p/eTl0jmJXw
+         OyFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770384862; x=1770989662;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lXkwLOFRlIih17A8fA8wgWqc3R7cmaWgMUZ9oqwSoYc=;
-        b=QBQDogvS+1uEUG5Zz9ax8/L3L8WikD+AaPWpTXTx7uu6ars6fcXnNK/QjXxdbo6ht2
-         96lWDAHxpW3A6M3Tgg5kbP06/SRi4UuU/TfhC5dF8PVM9Wwod6dBAxIlMaP9wisqjGHJ
-         oIl/suJxCrcuUvFvef8dsyUAjpM8xvm1SwMtTwVu3Mq6oJktwEGY2DqMfhqGZfL35pus
-         3MsFDixXZXfbRXGd2gmPPZvib1w+YIDQZHNt3E6RamrW6u8YvTv0VM5JhMorJ0xSyjic
-         wHeFBTxNRV7v0557BhKGNp4CqyB5LqU5dkqDV9hqGnGPPBiwuvGaAEeKD8SdqEIlBuPd
-         vP6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXYDon9VxW10C3/KXmFcxVorYAdhebWSAOt1lMXz/GCH6VfH8pm5xhbJTeKw66NZys1TKstMQg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgRWHeSF9CHWgVgbPjMbpy7Fl8kzb6vRCa3gl4U8uG6xGN1m1e
-	lKVAk/eIgaFSt6GZ351YV1Tb/MEaMG6DXrJvMaGgvj68gCCN8E88Ne9h
-X-Gm-Gg: AZuq6aJcGDBOYDAzsq1XFRcnC+7qftkCpIOZKb9moMRoSZT3XAmfaEGerbMan+73I3M
-	xO3BMrx9r3RycCvOxWecrgpdzGC8+HXlB/pJ76qIUDaxO8DBiSmtSruOUBEY2CeEv8VllXb3hG5
-	YpOZbg+XRBJu45hhhK/Paj+ddBchLsXJu8w0/G3DyPJNjGYdg0xnSZReHfh0JKTqgYVt0MFXPTu
-	etFMiKdsp6YIk0Jv5oCN8YE9xkksQ35vDPFWVawnR+cV909nGjfpNZiXZ3OoTl+J/WOsyItWPs/
-	JDK6hGBaTzpHCdCYqvW0ES1kKCc3QfYJ2oqWzSqFUdsAAasSdp/ljWXOdsBrmzBiJ5+7zAz5Jx6
-	gaD3DokJSh4yjycO5eBfTisDsugwREgzsNjfVgwBRkRcnsmjQULzd/Dk8/bhRzmc9lnctmZtXSG
-	uBVeU=
-X-Received: by 2002:a05:600c:4f49:b0:477:9a4d:b92d with SMTP id 5b1f17b1804b1-4832033a019mr26258435e9.5.1770384862226;
-        Fri, 06 Feb 2026 05:34:22 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:6d6c:e4d6:4ec4:ebd7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362974527fsm6382837f8f.31.2026.02.06.05.34.19
+        d=1e100.net; s=20230601; t=1770385110; x=1770989910;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p8pssK1B+mX1mgchY1BRzpKL9soTjhoWyGFGipUXMJU=;
+        b=A7gSvI0dr4sdAIgVN6k4Cnvb6TcA11YtyQbdvz8vAmiH/TuikLBzOwJrAO/zLrxDK2
+         henC9iBFMsbSLYpgvOvcdqAWcJcGvITqxKeZ460sJfsndUBOdrundH3UG6ZbLd4eNMdA
+         5oKhUxFbXqTzxbPhd/QAvWWwlBRbfej+Pmqvpn3IBXBczdGFws/PknJHOEeBsEXzeErL
+         rh17KOIqtbYG02oMnMWXb93ix4W8wd3IXObiSTRNpKPNm0F6lpi5yMtX9TsWzGorJFAm
+         Rg584dnZgl19kdegHDEd29JlFtBRN0xRx/KeEMk5Y51MgHMmsjZzpHkIXbeZIor6v0Xb
+         T4tA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2ADjDQYcU8MbE7qr9HbwE44TpAX6VD3r885cOKdgPbBMoAZDxlWfxwdPYEejZ/57YFDSu+R0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGn2YabMY4JWodxyaEih4xJpbSO6SCpJuC1bHCJH4QpmqaDEyy
+	Aer9tNgOUfQHyFwNQA9rEe3Wp7tZ7998JaVv7WPqRhNIvlxklVmAfCW8jn+seUkFtDk=
+X-Gm-Gg: AZuq6aLBekMttbzo6ykZPMRt21Vv2CkeD/03XHMF7WnG1zwv4vRqk3Yd/Vq2/o5DvU8
+	gIyCADrw5Ys0qDKr97VogKSJBnGIleMW0QPBKpjDI0uD8KyEAV0kZGtBwiR6lua3qsPl+U7GNCO
+	gflbkCBnhuk1oxVBoDGlFPHeHlbcRI1UfIbxhT7NzegHt2gW+rkETr1ifPQAccW6mEWmgHAu0dw
+	Q1Czo+nvf60siFyaFzs7Hzdih1MwJu22ahP/zLvnwU8dRqbo3M3Tot9HSztv6zTuVPK9TRdbN+z
+	0P2eue+f5lxg7HkwwQ9GpfLsO7qaz7Chm9Kh0E6n3MUcsDZSOM1Ko27xR/EsAo9rN77L5/LVc4k
+	Ph9zeMMHsmxXVLwUExXJZmTBlOJn6jUE45GeC6FMJWV6rbMdkKLDf9tjgvc5k2nE3E/m4QS3GGd
+	pNJNvKgqoxqSnfHmk6
+X-Received: by 2002:a05:600c:154b:b0:477:7925:f7fb with SMTP id 5b1f17b1804b1-483201e3e8amr36945165e9.10.1770385109505;
+        Fri, 06 Feb 2026 05:38:29 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4832096c438sm31229905e9.3.2026.02.06.05.38.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 05:34:21 -0800 (PST)
-Date: Fri, 6 Feb 2026 15:34:18 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Liang Xu <lxu@maxlinear.com>, John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v13 4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <20260206133418.vxui223u4d6jdpql@skbuf>
-References: <cover.1770211259.git.daniel@makrotopia.org>
- <2da8267175bfe7b8ff92d67ba5aa88755fab1710.1770211259.git.daniel@makrotopia.org>
- <20260205182117.41618f8d@kernel.org>
- <aYVckqToPwzR75EO@makrotopia.org>
+        Fri, 06 Feb 2026 05:38:29 -0800 (PST)
+Date: Fri, 6 Feb 2026 16:38:25 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: [bug report] net: ethtool: Introduce per-PHY DUMP operations
+Message-ID: <aYXu0esD_wSjGTZm@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,122 +90,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYVckqToPwzR75EO@makrotopia.org>
+In-Reply-To: <caa37f28-a2e8-4e0a-a9ce-a365ce805e4b@stanley.mountain>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-257552-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257551-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BE4D1FE368
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,stanley.mountain:mid,linaro.org:dkim]
+X-Rspamd-Queue-Id: C4CEEFE41D
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 03:14:26AM +0000, Daniel Golle wrote:
-> Hi Jakub,
-> 
-> thank you for looking into this driver another time.
-> 
-> On Thu, Feb 05, 2026 at 06:21:17PM -0800, Jakub Kicinski wrote:
-> > On Wed, 4 Feb 2026 13:33:19 +0000 Daniel Golle wrote:
-> > > +/* The switch firmware expects all structs to be byte-aligned */
-> > > +#pragma pack(push, 1)
-> > 
-> > "Byte-aligned" means..? Generally aligned means that it starts
-> > at an address which is multiple of X. All addresses are multiple of 1
-> 
-> In case fo the firmware running on this switch it means that data types
-> used in structures used as input and output parameters for firmware
-> functions should be aligned to 8 bits, without any additional padding in
-> between.
-> 
-> struct foo {
-> 	u8	var1;
-> 	__le16	var2;
-> 	__le32	var3;
-> } __packed;
-> 
-> It's size is 7 bytes and it looks like this:
-> 
-> .||||||||.||||||||.||||||||.||||||||.||||||||.||||||||.||||||||.
-> |  var1  |       var2      |                var3               |
-> .        .   LSB  .   MSB  .  LSB                         MSB  .
-> 
-> 
-> This is what the firmware on the other end expects, from all data sent
-> to it and what the Linux host has to expect from all data received from
-> it.
-> 
-> > We used you push back against blanket __packed because it's forcing
-> > all *host* accesses to also assume that the structures are unaligned.
-> 
-> Understand that in general, and of course know that using packed structs
-> without a hardware requirement of doing so needlessly wastes CPU cycles
-> on each access to struct members.
-> 
-> However, in this case this is a header file which exclusively defines
-> structs which are only used to communicate with the firmware running on
-> the switch. Using them for anything else, such as storing or processing
-> data the driver deals with internally is, very inconvenient because all
-> types are also defined as little-endian, so not only unaligned access,
-> but also endian conversion burdens every access (in the sense that it
-> burdens the programmer on little-endian machines, but the CPU as well on
-> big-endian machines).
-> 
-> tl;dr: This whole file is only API definition. And this is how the
-> firmware API is defined, and that's the only way to deal with that
-> switch.
-> 
-> (I would have preferred if they just exposed the internal 16-bit
-> registers of the switch via MDIO, and have asked MxL for that several
-> times, without success)
-> 
-> > The best practice is to pack only specific structs which need it
-> > and add compile_assert()s to make sure that the compiler doesn't add
-> > any padding.
-> 
-> Imho checking whether each of these structs is naturally packed (ie.
-> 8-bit aligned without padding between 8-bit aligned members) is prone to
-> human errors which only become visible when testing on the real
-> hardware, and hence complicates maintainance.
-> 
-> Other drivers which operate on similar APIs (many GPU drivers, for
-> example) also use #pragma pack(push, 1) in header files defining
-> external API. Also there all external API definitions are kept in a
-> separate file, away from any of the datastructures used by the driver
-> internally at runtime.
-> 
-> Anyway, if you really really want me to set individual __packed for each
-> struct which isn't naturally packed in this whole file, please tell me
-> clearly that this is what you would like, and I will of course do it
-> despite disagreeing with the reasoning.
+[ Smatch checking is paused while we raise funding.  #SadFace
+  https://lore.kernel.org/all/aTaiGSbWZ9DJaGo7@stanley.mountain/ -dan ]
 
-When I created the pack_fields() API it was exactly for situations like
-this. It helps you keep naturally aligned structures in native CPU
-endianness while adapting to whatever quirks the peripheral you're
-talking to has.
+Hello Maxime Chevallier,
+
+Commit 172265b44cd3 ("net: ethtool: Introduce per-PHY DUMP
+operations") from May 2, 2025 (linux-next), leads to the following
+Smatch static checker warning:
+
+	net/ethtool/netlink.c:714 ethnl_perphy_start()
+	error: buffer overflow 'ethnl_default_requests' 52 <= 255 user_rl='0-255' uncapped
+
+net/ethtool/netlink.c
+    700 static int ethnl_perphy_start(struct netlink_callback *cb)
+    701 {
+    702         struct ethnl_perphy_dump_ctx *phy_ctx = ethnl_perphy_dump_context(cb);
+    703         const struct genl_dumpit_info *info = genl_dumpit_info(cb);
+    704         struct ethnl_dump_ctx *ctx = &phy_ctx->ethnl_ctx;
+    705         struct ethnl_reply_data *reply_data;
+    706         const struct ethnl_request_ops *ops;
+    707         struct ethnl_req_info *req_info;
+    708         struct genlmsghdr *ghdr;
+    709         int ret;
+    710 
+    711         BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
+    712 
+    713         ghdr = nlmsg_data(cb->nlh);
+--> 714         ops = ethnl_default_requests[ghdr->cmd];
+
+Smatch thinks nlmsg_data() is untrusted data, so it could be out of bounds.
+It's a u8, but there are only 52 elements in the ethnl_default_requests[]
+array.
+
+    715         if (WARN_ONCE(!ops, "cmd %u has no ethnl_request_ops\n", ghdr->cmd))
+    716                 return -EOPNOTSUPP;
+    717         req_info = kzalloc(ops->req_info_size, GFP_KERNEL);
+    718         if (!req_info)
+    719                 return -ENOMEM;
+    720         reply_data = kmalloc(ops->reply_data_size, GFP_KERNEL);
+    721         if (!reply_data) {
+    722                 ret = -ENOMEM;
+    723                 goto free_req_info;
+    724         }
+    725 
+    726         /* Unlike per-dev dump, don't ignore dev. The dump handler
+    727          * will notice it and dump PHYs from given dev. We only keep track of
+    728          * the dev's ifindex, .dumpit() will grab and release the netdev itself.
+    729          */
+    730         ret = ethnl_default_parse(req_info, &info->info, ops, false);
+    731         if (ret < 0)
+    732                 goto free_reply_data;
+    733         if (req_info->dev) {
+    734                 phy_ctx->ifindex = req_info->dev->ifindex;
+    735                 netdev_put(req_info->dev, &req_info->dev_tracker);
+    736                 req_info->dev = NULL;
+    737         }
+    738 
+    739         ctx->ops = ops;
+    740         ctx->req_info = req_info;
+    741         ctx->reply_data = reply_data;
+    742         ctx->pos_ifindex = 0;
+    743 
+    744         return 0;
+    745 
+    746 free_reply_data:
+    747         kfree(reply_data);
+    748 free_req_info:
+    749         kfree(req_info);
+    750 
+    751         return ret;
+    752 }
+
+regards,
+dan carpenter
 
