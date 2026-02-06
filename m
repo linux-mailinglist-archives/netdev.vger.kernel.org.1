@@ -1,198 +1,164 @@
-Return-Path: <netdev+bounces-257464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257465-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id N96qKWhzhWlzBwQAu9opvQ
-	(envelope-from <netdev+bounces-257464-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 05:51:52 +0100
+	id mA7bNyN0hWlzBwQAu9opvQ
+	(envelope-from <netdev+bounces-257465-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 05:54:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE744FA29C
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 05:51:51 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A86BFA2C3
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 05:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBD3E3016C9F
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 04:51:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CDFB83006835
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 04:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7B2336EC2;
-	Fri,  6 Feb 2026 04:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9699336EF8;
+	Fri,  6 Feb 2026 04:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SSZyDbnS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxkOTaw/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D9A32573C;
-	Fri,  6 Feb 2026 04:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38EC2E62C3
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 04:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770353508; cv=none; b=ruXC4F7n2TxCwSbc290MSzCmZ+Y5Luu4U/5W7wLeacjcnYM+uarFGpKFQ1xkFXCtKXXr9X8hAPnfXJaBNS6ZAwvHkcSHjZ33icWk3mVAUoi2LvX7R3KL+R4GrQghum6G88l8iwVenWbO+frXshlP/LxHHFTSEufIY1LaaF5LxNg=
+	t=1770353697; cv=none; b=j2UM+W5FVj8tjp1T6U/1rXgWLrU4ND2mEE8SI7h0HDC2RcP438jSU6rtFH3IElwesiogeZRD/T0urwec0awieDszO0oP7ZarIJANAgfznfcSgeMmh1MwzEXb7GrP42m/VJ6H2tsXOkHAJ547lo96Nz5BNmWVRupkZs6k8XAs3O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770353508; c=relaxed/simple;
-	bh=XoYD41piRQAsj7drwNYcIFc+f2x2sYboM5dSb+18cPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WYJkFORKA4cCRbgvr6gaPmIR+B6uKz3N4/ah4nhKbxb4lIe9o2HSGzR0baxtvJojB8d518bCEikPsERcM4ObODMkqMZHQId9Srfjr30M2sTLi4aShDvA8bVrX3Q5UbLCzgunJptjV3TJa3LQBfGPHjoyg52oYoSH/pFPyflc3Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SSZyDbnS; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770353508; x=1801889508;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XoYD41piRQAsj7drwNYcIFc+f2x2sYboM5dSb+18cPQ=;
-  b=SSZyDbnSfeEDPAnoWW8mYv0aDJiKrNE9rkNa/53GvDL4qfRdHkO6amLb
-   RTywinqngk1PMTUFaohvz0ZNK3vumfq7+nIop4/7d1LhYq2tYnVHGC32S
-   ZOhQ3Bu3dDyntBskQTZ96uzqROw5gXxMSiOrmk7+2e6094NL7c71zZrlT
-   Ju0ktf4EM4OeDYL/ZCuWD+siPnHZ30YbUGcHqoa+vg9NFYsUe6xbK1Xv0
-   6DNn/NcfeaHv9jgr+MatbuwDU0C9Jdnmi+93VC+u9DnX6UoyzVr2J+vD8
-   woHiCClRcPrnWIFB9LruWbytWIbiUtZjyQumEPxyM/+p5s/lI7pcTGBwy
-   w==;
-X-CSE-ConnectionGUID: j9NvvvS9TxeLXrgarSQ6mA==
-X-CSE-MsgGUID: tZrm3BoZSRi0/c483wgVMg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11692"; a="82999976"
-X-IronPort-AV: E=Sophos;i="6.21,275,1763452800"; 
-   d="scan'208";a="82999976"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 20:51:47 -0800
-X-CSE-ConnectionGUID: v2AKH+1DSfuVfv26FuZ+jA==
-X-CSE-MsgGUID: 4CWYJQDOSvSACue4p6WBSg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,275,1763452800"; 
-   d="scan'208";a="210690212"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 05 Feb 2026 20:51:43 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1voDoj-00000000kQu-0Zkp;
-	Fri, 06 Feb 2026 04:51:41 +0000
-Date: Fri, 6 Feb 2026 12:50:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>
-Cc: oe-kbuild-all@lists.linux.dev, Jesper Dangaard Brouer <hawk@kernel.org>,
-	bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	horms@kernel.org, jiri@resnulli.us, edumazet@google.com,
-	xiyou.wangcong@gmail.com, jhs@mojatatu.com, atenart@redhat.com,
-	carges@cloudflare.com, kernel-team@cloudflare.com
-Subject: Re: [PATCH net-next v2 6/6] net: sched: sch_dualpi2: use
- qdisc_dequeue_drop() for dequeue drops
-Message-ID: <202602061245.hvInrQwP-lkp@intel.com>
-References: <177032652354.1975497.2269771162710918590.stgit@firesoul>
+	s=arc-20240116; t=1770353697; c=relaxed/simple;
+	bh=PlHFFdGueYam39J3KxtGgbJHGJBfEpbJWejTsKCw03Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=YmdMqkq0vnp/kR4SzqtG+4Prv8Te6wd6PpITJQHSis0tVnHYxP3UzZ92uAdq5Ba8rlzHqh1g+nPFAIoBW/la180hBmyycSVc5booZtgcw27ssh6titvi8iDR1rr+A9QtnKWuc3ZwJ5UEBwdBF+6rDJ2CgvBN9bq+eT/HORS+Id4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BxkOTaw/; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29efd139227so1864695ad.1
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 20:54:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770353697; x=1770958497; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PlHFFdGueYam39J3KxtGgbJHGJBfEpbJWejTsKCw03Q=;
+        b=BxkOTaw/x+snswsBuyhCo7GMpvOnv2+E9h0B46YwX37s4bvbGpZGutUD8EtH7wk386
+         RZJAWnI7AB80eFvVTtsZ9gm570SQ+KESw1YA71Jju6Uodh39VVv33egWR+lkmeHeQsoY
+         KnOpUtNO5YT0dlmikRhKhf7nvsio/jVERSCvXG4hrKa1w6J2LYCDFx+3In7IPH2rds9F
+         6N2zEbwg2ByJjy4wpieuEiyvXK6eQKmDkitehEJsxIkHW26aDzBteCoq1Cdr2aK0kwVC
+         q9mEwgxSdJQL/fXrJpk0CgYHfknscGCNPQRZ1ivfW/LreLl2H8cxH23mm7h390aVKpFm
+         upaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770353697; x=1770958497;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PlHFFdGueYam39J3KxtGgbJHGJBfEpbJWejTsKCw03Q=;
+        b=Lsiuvlzc+9d66dNU0e+qb9J2CsEyQtd1igeM1gp1bcv2xCB64UhHKqF7u2okIB/PKi
+         rAp69MRgvFprv9siZUqm6Pjf/7bgaItQr0OGqkFuFkbeWV29dtYqaAJV1vpvhnWRWf36
+         9rOOEh5sq12S3eMOaab7H6zf6CA8mXALyMrcy5El++PaOaqlWFs8nbtw1b93QMf3LwIQ
+         WDWLZVhADB1KjP1M0C+m31aLZDiuHV9ferADIM9ynuUHonNLtX7BSZoMdLinRsNj054d
+         Gt1J3o+Fd2h5BaJxbrtNbH0CfblMdbo1sFMe/zkDVSJDGu/UqcFT2bvJUeXFm668I/rx
+         ZDKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLGIxmsASFSKcbDEWgQ83NuwCNxypfszWVVPukVRcPLwOGJ19z26Ea3V1kncBj3OL+zWC9Hmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDQTiTJOitIS6YXFoxINFl9KqEF8l9pBA7YPZq8x/mYbPZrcyK
+	kF0bR4LqaEhcXfARlTKocXU6WyVzMfKrsuKTx+AcHS9XKfRwWYM3xusG
+X-Gm-Gg: AZuq6aI5FasmdC2QKEtGagrNivODkiC65VaojY82A75E4PlLbWSMn1FFVto4UaiDx8Y
+	S9SuHDBlYtNK9Md2m0axMxakVMaamGO8lZPSIFLb2jTOIe2SV0UXy4m9pltFULFlXYLQK6ox0UV
+	GrfEdbQL80QVYz80riBJv6B2ng3vrJs1B9cMzmxGTFn1l9+9n5nykycuoqs9CW6YnaWOZGzSJuW
+	UXhdXSmKxLAf3RCv8SURqxQIREqDrYDYQdW7hQR0lB4Bq1FzVW7j8BJryXeRmh1EN7lesZ4rYqV
+	at55tvmI1nnvLjokY19IRnJYoa/43rmU+dIGeC2XKSb2RVNyy9M1QhhGv+Pq3BqlbG6yl2TBNw5
+	98t6PIi8VourdGu1fz4pSHP3adhzKfMBJFAaMES/XqWIxQYPVITl2gDEJRvP5JDQG9loKiKCIsE
+	OQ20o4lfLA9uTPTrilb8dHwiHGuMwbT1KTGheOmeriCrKjgOWJjLRgp/6HEv0oxcBbFw4rWSH/
+X-Received: by 2002:a17:903:b4e:b0:2a0:fe9f:1884 with SMTP id d9443c01a7336-2a95194aaeamr13854855ad.55.1770353696910;
+        Thu, 05 Feb 2026 20:54:56 -0800 (PST)
+Received: from dpc2500057.. (fsb6a9315e.tkyc502.ap.nuro.jp. [182.169.49.94])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a952217ffdsm11599825ad.88.2026.02.05.20.54.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 20:54:56 -0800 (PST)
+From: Keita Morisaki <kmta1236@gmail.com>
+To: maciej.fijalkowski@intel.com
+Cc: aleksandr.loktionov@intel.com,
+	alice.michael@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org,
+	kmta1236@gmail.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	paul.greenwalt@intel.com,
+	przemyslaw.kitszel@intel.com,
+	tony.nguyen@intel.com
+Subject: Re: [PATCH v2] ice: fix race condition in TX timestamp ring cleanup
+Date: Fri,  6 Feb 2026 13:54:26 +0900
+Message-Id: <20260206045426.3547398-1-kmta1236@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <aYSeb42KRzlc4SbA@boxer>
+References: <aYSeb42KRzlc4SbA@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <177032652354.1975497.2269771162710918590.stgit@firesoul>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-257464-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,lists.osuosl.org,gmail.com,kernel.org,vger.kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk];
+	TAGGED_FROM(0.00)[bounces-257465-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kmta1236@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EE744FA29C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7A86BFA2C3
 X-Rspamd-Action: no action
 
-Hi Jesper,
+> am I reading this right or you only modified flags to be bitmap on Tx side
+> and Rx is left as-is?
+>
+> Would be nice to reflect this on Rx side as well, but I know it is out of
+> the scope for this patch.
+>
+> Would you like to do a follow-up patch for that which would be sent to
+> -next tree?
 
-kernel test robot noticed the following build errors:
+Yes, I intentionally left RX side as is because it seems less obviously that
+rx flags are touched concurrently than tx ones.
 
-[auto build test ERROR on net-next/main]
+But sure, it's a good idea to make the handling more defensive on the rx side as well.
+I think it can be a follow-up patch as TX has more obvious race condition.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jesper-Dangaard-Brouer/net-sched-introduce-qdisc-specific-drop-reason-tracing/20260206-052816
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/177032652354.1975497.2269771162710918590.stgit%40firesoul
-patch subject: [PATCH net-next v2 6/6] net: sched: sch_dualpi2: use qdisc_dequeue_drop() for dequeue drops
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260206/202602061245.hvInrQwP-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260206/202602061245.hvInrQwP-lkp@intel.com/reproduce)
+> Also your patch should contain the tree you are dedicating your work:
+> [PATCH net v2] ice: fix race condition in TX timestamp ring cleanup
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602061245.hvInrQwP-lkp@intel.com/
+Didn't know that! Thank you for the comment. I will follow this in future
+(I'm also happy to resend the V2 patch with the updated subject if you think it's).
 
-All errors (new ones prefixed by >>):
-
-   net/sched/sch_dualpi2.c: In function 'dualpi2_qdisc_dequeue':
->> net/sched/sch_dualpi2.c:600:53: error: 'QDISC_DROP_STEP_DROP' undeclared (first use in this function); did you mean 'QDISC_DROP_GENERIC'?
-     600 |                         drop_and_retry(q, skb, sch, QDISC_DROP_STEP_DROP);
-         |                                                     ^~~~~~~~~~~~~~~~~~~~
-         |                                                     QDISC_DROP_GENERIC
-   net/sched/sch_dualpi2.c:600:53: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +600 net/sched/sch_dualpi2.c
-
-   581	
-   582	static struct sk_buff *dualpi2_qdisc_dequeue(struct Qdisc *sch)
-   583	{
-   584		struct dualpi2_sched_data *q = qdisc_priv(sch);
-   585		struct sk_buff *skb;
-   586		int credit_change;
-   587		u64 now;
-   588	
-   589		now = ktime_get_ns();
-   590	
-   591		while ((skb = dequeue_packet(sch, q, &credit_change, now))) {
-   592			if (!q->drop_early && must_drop(sch, q, skb)) {
-   593				drop_and_retry(q, skb, sch,
-   594					       QDISC_DROP_CONGESTED);
-   595				continue;
-   596			}
-   597	
-   598			if (skb_in_l_queue(skb) && do_step_aqm(q, skb, now)) {
-   599				qdisc_qstats_drop(q->l_queue);
- > 600				drop_and_retry(q, skb, sch, QDISC_DROP_STEP_DROP);
-   601				continue;
-   602			}
-   603	
-   604			q->c_protection_credit += credit_change;
-   605			qdisc_bstats_update(sch, skb);
-   606			break;
-   607		}
-   608	
-   609		if (q->deferred_drops_cnt) {
-   610			qdisc_tree_reduce_backlog(sch, q->deferred_drops_cnt,
-   611						  q->deferred_drops_len);
-   612			q->deferred_drops_cnt = 0;
-   613			q->deferred_drops_len = 0;
-   614		}
-   615		return skb;
-   616	}
-   617	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> As for rest of the stuff it makes sense to me, however best if Paul could
+> give his ack here.
 
