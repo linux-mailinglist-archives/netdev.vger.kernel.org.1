@@ -1,200 +1,366 @@
-Return-Path: <netdev+bounces-257601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257602-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJ5qI8sThmk1JgQAu9opvQ
-	(envelope-from <netdev+bounces-257601-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:16:11 +0100
+	id +MAWDasVhmk1JgQAu9opvQ
+	(envelope-from <netdev+bounces-257602-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:24:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49001001F0
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:16:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65954100348
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72BCD305C8D5
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 16:10:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A40EB300F5E9
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 16:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9726F30C635;
-	Fri,  6 Feb 2026 16:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46965326D79;
+	Fri,  6 Feb 2026 16:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="JjCatdgx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FShOCqs3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bxqy0iJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC092737EB
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 16:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08F332573E
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 16:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770394229; cv=none; b=bp68LfkKxAy/XtnVz+cA4y5OFG4nfTRG+N90bxdQFlRoa99Zl3DCnT3SawpGBEFdWPCAt7TD0Ol75Sjd9255tMpA5A/XvUw/TLJ07HSisupacstUDzUgimXCFP7opYtN6Z3TpOjSggtETMsC22NIHq59qapvOu5sEnwvQ7hOJ34=
+	t=1770395045; cv=none; b=n/932Wo6Fogr9rHKKYtFLi1H3GEQpP0pL0mieUVr01cla6mQ4bzW+8EHCsmzEVVsqkElPAk0uWQT/l74X5xSha0LU7WsRHGLQ+EMaY+jvOFucjD+qIu4XdWsJg4zSrhxDw1jrsh36hUHb8F0YRfQX2RmO3f6lkI96mnkbmGSxCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770394229; c=relaxed/simple;
-	bh=wTO4w0jGGKNWWyVRPeBBuZHYWyGfWSj0HikzN1o1OD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uDC16G1X+5BwvB2/LPg7Q2Gc5i9A9h+0JWTdO3a3t3h5VF24iEHz6BrBHEqEy3vM/VU987yQoTGm35oIjWn6gKbpNuJkk/ZdKTqamg8TL2CsaMqwHHYkJ0GAOBX9lI0+o9AOzYeEo/16SfhIlvir15feh5iCyNMR6OeX733MMV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=JjCatdgx; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48327b8350dso5829395e9.1
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 08:10:29 -0800 (PST)
+	s=arc-20240116; t=1770395045; c=relaxed/simple;
+	bh=eoZQP6Pw5nf5m7F2meipgxmbmle6wXNPF6+XfM6ec8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J20E2oKNErEddC13id+ikTm/juQdsZ7W06TsRN8SUqt3vE4jCH0N8U1GnyKWa6Gh5jQrZckpxMzBtbSyGIoiapcD4tJQpCtMSkHKqb0hjr5QjJtM61cOE9ct9GnA4hGt0DVinjW96ooNsPES2Sh5eVnwIQSqJqkyZ4T3rrUWgms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FShOCqs3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bxqy0iJL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770395044;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3SixDUkQfbGW/CySUSPTvhYKmVPlXZV2VssvRFKjxUY=;
+	b=FShOCqs3cXLpKwqzeSPKOaeFNzrNAwYxEj2w58h2TkoQ8yKsS8rXRy5wQdLZZWAl93hmLl
+	Vn9PZpV46wLKi0AbXmm4dne/1f/hHC4DMZjLR4lUf0igDaCOF0lOQSXVwPsLKR7Ka9gSLF
+	MbJzQEV2LspS8xNBp7t/16Y4bgyCqb4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-563-QFXXXcvZPpOu6PqZeAG0iQ-1; Fri, 06 Feb 2026 11:24:02 -0500
+X-MC-Unique: QFXXXcvZPpOu6PqZeAG0iQ-1
+X-Mimecast-MFC-AGG-ID: QFXXXcvZPpOu6PqZeAG0iQ_1770395042
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4802bb29400so23104735e9.0
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 08:24:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1770394228; x=1770999028; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ctwbS8EWesRYrg5+xa1qLeZZuWqYJMD4QKuaVTduh68=;
-        b=JjCatdgxWSXHY7iBex4yusKaYTlB83pDJzowjSrhludaQ+AH94JnpcRNRgRxtiPMPC
-         69DaRDYAkyO3LycwxJNsGpGvId2zb6m+PkC0ROGx7sZH2GqF7Erb6TrnVUDtZfyVQH5s
-         eAb/42+TEXmW8iPx09cO16IyY3GaBpLuswcTpwhEIkmjanWO9lOw3yCKrNz3Xf6mOKlV
-         2TmRxNYZ9UvmkJnffcQH+fkpLLWQLMQOkv4xnV5Y5SzCbxjhQjd+/WRhgnF8/bwPNkTB
-         JvSEthfYTz4Ac3+WfYNWeTaMwQDdoVQSn9vXkWktlWfg5kCY2+urcNrxFjEgQgEmj3Eo
-         nTfw==
+        d=redhat.com; s=google; t=1770395041; x=1770999841; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3SixDUkQfbGW/CySUSPTvhYKmVPlXZV2VssvRFKjxUY=;
+        b=Bxqy0iJLRffiqfRub2XDqT0fGS03Dnw6HdfouMC31Jp1QiGW9Z7KH/25Lfe84il73t
+         AFyMiO7gbWsobMeYife5wFCWB6V9DDsXm69g9JYxVj0gYqxoOaiUyx1ewM+LefXFZyZf
+         A6OEQXJb/RqTqPYzQMUD30QSIzvg5T9G0Px4h8mjoOn1zt5Ql8lXJSrUoqu3uf3v0Mis
+         XVfniKJs+PJ6Kzks+rN+e3LBuC1MOYFz2548ITdcsuhurjKsvqU6ii+6d6z3g1YrEdVJ
+         VnI70GIgvCuK6IEsZ2wKMTI1cuTQkYrm2YRdMmeNIOz68foaOklpMKaj3y3wYbG+EmtF
+         bonA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770394228; x=1770999028;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ctwbS8EWesRYrg5+xa1qLeZZuWqYJMD4QKuaVTduh68=;
-        b=WkQpkiaVu1OUl4ToO+kkQPkW0kPkBcGB/qY2YRX+UgFljVKcBA5Snc0WYls9kYZ2wd
-         32STqkyZhpQk+JV57GEyNkD5+9+n5JUhOeSpkzz/2+j3bE7UeOc+haI+cFPy7tLOKRER
-         SfTviSmTdRLa8VIdYabjsUO4qzZY4eTbcfjDjAWh+AmDDSkKJWl0ROoViYV7wDAY0fwq
-         XgpPBMxHb4HKqV7ozNrdlVgjAtuKoHXYHEcO21h5YAYhd7fUpewDY6cnd5fTPaEfHP4X
-         gTrvPV4cPdvkg/Wzr+UBtyob+x0GU8ucoLGRyic/aEGUK9P+Xe21szttrsmMbIuuHCZw
-         aX2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW7X2Zxl/7eZW8epXG34FNQ6pwmcPUIqeLsCQurB6TE3JChd63sFVZvDXcJltdFRqKgee7ND5c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaqLZWbjnGCNYJtPJyHzrjgc5CuLvwQJWVBSPAuIh/aLv5F05Z
-	Q5jzKeYkUA/Se5zBCNPIW46En+6Kp93oCB4brqC+jIWWh5fL2v153oErdtflY/pNEaI=
-X-Gm-Gg: AZuq6aL1YIxXgZN2+iVKoHMVcVjIR3fo7m79hnEpgYlnbFv8ZqOwwH9YRl6m1sHwVJo
-	BsSBJ+y10lJMVFsl/cAvB4TzeBM1LhyaqkLAJ/fU+29EUs435y2P1294h4XzBMh4iw3SfPQSfuZ
-	ew7oln7d0d2FHoMK6tacKNmkHWGyUdulxnXsw/JvQtEE8oxE/hyrci4IC+i1qg2e5Cc5zUnFlDo
-	vA/boFa8yeI5Y6hAaO0+DWKV5nGbu/juI9hmiG9CKLF5Zgfgq7cGkwBL1vyGRzEnUjOvAQFvWYM
-	9qc36GmPRhYhfrAUSquTxkg/xJXLXeUgcolJj+Hm2KcD9WDvzXLz+rznwJQaCXN4AiywrZKlKDY
-	Nmd+UuWxmYRBhYnubs6/vsds5RI3fn7Z1/4Pv3ymkfXS471pydyW0BDOauP69sBAzi6HOEYAFJI
-	wJO2fCQ77CBgvwAZLI8aVZN8DTT+yh+FKm2qCH2RY7HZs1G2s=
-X-Received: by 2002:a05:600c:19c7:b0:45d:dc85:c009 with SMTP id 5b1f17b1804b1-483201e160dmr43791245e9.10.1770394227499;
-        Fri, 06 Feb 2026 08:10:27 -0800 (PST)
-Received: from ?IPV6:2a02:810a:b98:a000::159a? ([2a02:810a:b98:a000::159a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43629754c62sm6271284f8f.38.2026.02.06.08.10.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 08:10:27 -0800 (PST)
-Message-ID: <da7edbbd-5a31-46a3-a091-b06ca4fee683@cogentembedded.com>
-Date: Fri, 6 Feb 2026 17:10:26 +0100
+        d=1e100.net; s=20230601; t=1770395041; x=1770999841;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3SixDUkQfbGW/CySUSPTvhYKmVPlXZV2VssvRFKjxUY=;
+        b=F8+kfU0jjv0O2mFEH21t8Y49YnsCHkR1oQASeh5OrK5fX0hYz9HPCj6e0UqRAoVGyF
+         e+KEZFAj4CHvugVdHTsTdfFmUpmXkzcgKnTJKM+TUK3SbGRP/NliT+8ovgHL6Q6zGAs+
+         vbZS4vKt6Uc4P5fRQUULVjLfPOGshMjkxHp0Wg50zHcWqC1AjBs1SovCFqvc78LJdpGC
+         WAvhDPk8zbIZU7NmsUjXU8Lz8uQdPvUCIF5AZhETLCrEKqoJMWNGL8K/dip93CA/MCo0
+         wG/sN0F1ZjS7s6A38HFOcQDR/Q2PjhbO3eKjcYWM1cBaWcpFKFjdBZNq1QAR0SyyPerw
+         yXtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUT/q+1ihCftaJ9ZqbN2p3eAK+nXLb9UKe1FwLNQEJaq0S0jQGBXn0+wAOymymIW58EN4s8sTY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJHFJ5yZNi46qM8trniY29VnHtoIe636y6LLCyLJmHeE+Ye6be
+	5e31mtQeQfUcYfoAY1+5jSf/28paqi7vhT7cio8ZoQn4OvUAmxA/eauy6aNScFocHUPp2m603Co
+	D1bO7chHL773d0MkcWgvXeIDyzNK0Uy9nus/Fua0d595bxe9uqUnHdaniQJC2VU78uw==
+X-Gm-Gg: AZuq6aL00+XxLwtXq+mGY77HfXeknDzZlm3q2K5UAc8ANx3JIjjl/W5hcvOk3gHWJll
+	BsTIGUMdYYplmtYYBG21KpbvJr2u5JO0bjr3dJ5bj85jg3TkXdy9pNARQRjj0YmsQMFGOQqM5S8
+	V3oUdJZpK2HCAaAZKc65OC/0L2CHFMMagZ7yRZ+xQWRFFbqd0/+bo3xGy4ly3Lcawy61j6ruMlQ
+	QjiYVcCe4LJ7vF9IeZxeSiZkisJXtdGhvq38nH06uRF8u8pVm1//1m74gzCwEVUcpnVkU9Uw1eB
+	2sXucRJ4mktE90xw7guGV6ix2jCqvIWEcZVgA0eQ8lERq+xhjCZvJfaRYPVLr0OC4A+akgmKyDO
+	pvXpwNz2kU9AkEyp4mUuo020IGDbvGnliMz33irN8TNawCTV4u/zRE7LRY0I=
+X-Received: by 2002:a05:600c:34c7:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-483201dc3ebmr47795785e9.3.1770395040983;
+        Fri, 06 Feb 2026 08:24:00 -0800 (PST)
+X-Received: by 2002:a05:600c:34c7:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-483201dc3ebmr47795425e9.3.1770395040442;
+        Fri, 06 Feb 2026 08:24:00 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48320728774sm57584915e9.14.2026.02.06.08.23.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Feb 2026 08:23:59 -0800 (PST)
+Date: Fri, 6 Feb 2026 17:23:52 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: agpn1b92@anonaddy.me
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [BUG] vsock: poll() not waking on data arrival, causing
+ multi-second SSH delays
+Message-ID: <aYYTder4-zvgOfV7@sgarzare-redhat>
+References: <f3a801a1a32670294d5d703cad8ab609@anonaddy.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: renesas: rswitch: fix forwarding offload
- statemachine
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Michael Dege <michael.dege@renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>
-References: <d6a9356d-6fd4-459b-9c5a-2f3e20368bbd@cogentembedded.com>
- <TY4PR01MB142829D9748A483ECAF19FD3D8299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <25ff0841-545b-433a-8e88-6e463ea718e7@cogentembedded.com>
- <TYRPR01MB14284CB75C7DCD35381BD17EE8299A@TYRPR01MB14284.jpnprd01.prod.outlook.com>
- <237bee8b-a7cf-4c14-9946-8bf72dbddde5@cogentembedded.com>
- <TY4PR01MB142829EB0EDDE13B588F949298299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <a4cfeba2-23da-4fdd-870b-6533b5ce267c@cogentembedded.com>
- <5b8bcf37-5cd0-4c32-b0ba-3386142b7795@cogentembedded.com>
- <TY4PR01MB142820FC29E751D8C7F0B7C348266A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <1aa615e2-1297-40a9-b7c4-beb943996721@cogentembedded.com>
- <38e09d91-c514-4090-8e31-1709073b237a@lunn.ch>
-Content-Language: en-US, ru-RU
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-In-Reply-To: <38e09d91-c514-4090-8e31-1709073b237a@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f3a801a1a32670294d5d703cad8ab609@anonaddy.me>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[cogentembedded-com.20230601.gappssmtp.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-257601-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DMARC_NA(0.00)[cogentembedded.com];
-	DKIM_TRACE(0.00)[cogentembedded-com.20230601.gappssmtp.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikita.yoush@cogentembedded.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257602-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cogentembedded-com.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E49001001F0
+	NEURAL_HAM(-0.00)[-0.995];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[anonaddy.me:email]
+X-Rspamd-Queue-Id: 65954100348
 X-Rspamd-Action: no action
 
-> 
-> DSA switches handle the CPU port in a few different ways:
-> 
-> * They do address learning, so learn what MAC addresses are in the
->    direction of the CPU from the traffic sent by the CPU.
+On Thu, Feb 05, 2026 at 07:53:33AM +0000, agpn1b92@anonaddy.me wrote:
+>Hi,
 
-rswitch does not support hardware learning on CPU port.
+Hi [Your Name],
 
-To make use of L2 forwarding to CPU port, one has to add destinations to MAC table manually.
+>
+>I'm experiencing a bug where SSH sessions over vsock take 2-20+ seconds
+>to establish due to poll() not signaling POLLIN when data is available.
+>The bug does NOT occur on the first connection after VM boot, but affects
+>all subsequent connections.
+>
+>* Summary
+>
+>- vsock poll() fails to return POLLIN when data is in the receive buffer
+>- sshd-session's ppoll() times out every ~20ms instead of waking on data
+>- First SSH connection after guest boot works instantly
+>- All subsequent connections experience 2-20+ second delays
+>- Non-PTY commands (ssh -T ... 'echo test') work instantly
 
-> * All frames with a destination MAC address not in the address
->    translation unit get sent to the CPU. This is sometimes implicit,
->    the CPU is included in the flood for unknown MAC addresses, or there
->    is an explicit bit to enable this.  The software bridge will then
->    handle the frame. The reply, if there is one, should then trigger
->    address learning.
+mm, so not sure if it's related to the kernel or the user space proxy, 
+etc. Would be nice to replicate without ssh.
 
-rswitch does not do anything implicitly, each frame is processed by trying in order:
-- match it against "streams" in L3 table,
-- match it against destination addresses in L2 table,
-- match it against VLAN table (VLAN id only),
-- try port-based forwarding (i.e. common rule for anything coming from particular ingress port)
+I tried with 6.18 on both guest and host and I'm not able to reproduce 
+it.
 
-At each of this level, it is possible to configure one or several destinations to forward frame to.
-Flooding can be implemented e.g. by configuring "port based" for each port to forward to all other 
-ports, so if a frame is matched at earlier stages then it is processed per what is defined there, and if 
-not then it is flooded.
+Can you try to write a simple reproducer without ssh involved?
 
-> * The switch driver taps into the events the software bridge issues as
->    it does address learning. This allows the switch to setup its
->    address translation tables to mirror the software switch.
+Thanks,
+Stefano
 
-For rswitch there is no easy way to sync hardware-learned L2 entries to software.
-There are no notifications of hardware updates.
+>- TCP connections to the same VM work instantly
+>
+>* Environment
+>
+>Host:
+>- OS: Arch Linux
+>- Kernel: 6.18.2-arch2-1
+>- QEMU: system package (latest)
+>
+>Guest:
+>- OS: Debian trixie
+>- Kernel: 6.17.13+deb13-amd64 (also tested on 6.12.57, same issue)
+>- OpenSSH: 10.0p2
+>
+>QEMU command (relevant parts):
+>  qemu-system-x86_64 -enable-kvm -smp 8 \
+>    -object memory-backend-memfd,id=mem,size=20G,share=on \
+>    -machine memory-backend=mem \
+>    -device vhost-vsock-pci,guest-cid=5 \
+>    ...
+>
+>Connection method: ssh user@vsock/5 (via systemd-ssh-proxy)
+>
+>* Symptoms
+>
+>Interactive SSH (PTY) - SLOW:
+>  $ time ssh user@vsock/5
+>  # Takes 2-20+ seconds before shell prompt appears
+>
+>Non-interactive SSH - FAST:
+>  $ time ssh user@vsock/5 'echo test'
+>  test
+>  real    0m0.156s
+>
+>TCP to same VM - FAST:
+>  $ time ssh -p 33594 user@127.0.0.1
+>  # Instant
+>
+>* Key observation: First connection after boot is fast
+>
+>After guest reboot:
+>  $ ssh user@vsock/5      # INSTANT (< 1 second)
+>  $ exit
+>  $ ssh user@vsock/5      # SLOW (2-20 seconds)
+>  $ ssh user@vsock/5      # SLOW
+>  ...
+>
+>This suggests the bug involves state that accumulates or isn't properly
+>cleaned up between connections.
+>
+>** bpftrace evidence
+>
+>Using syscall tracepoints on guest during slow connection:
+>
+>  === MINIMAL VSOCK DIAGNOSTIC ===
+>  [   29 ms] sshd-session: ppoll() duration=19 ms ret=1
+>             ^^^ 20ms TIMEOUT pattern detected!
+>  [   50 ms] sshd-session: ppoll() duration=20 ms ret=1
+>             ^^^ 20ms TIMEOUT pattern detected!
+>  [   70 ms] sshd-session: ppoll() duration=18 ms ret=1
+>             ^^^ 20ms TIMEOUT pattern detected!
+>  ... (continues for ~2 seconds) ...
+>
+>  [ 5000 ms] --- 5s stats: ppoll=455, timeouts=103, recv=0 (0 bytes) ---
+>
+>  [19432 ms] sshd: recvmsg() = 308 bytes [4 µs]
+>  [19442 ms] sshd-session: recvmsg() = 308 bytes [4 µs]
+>
+>Pattern analysis:
+>- ppoll() returns ret=1 (1 fd ready) but takes exactly ~20ms (timeout)
+>- The ready fd is the PTY, NOT the vsock socket
+>- recv=0 during the timeout phase: vsock data not being read
+>- recvmsg() finally succeeds after ~19 seconds
+>- When recvmsg() runs, it completes in 4 microseconds (data WAS there)
+>
+>This proves: data is sitting in the vsock receive buffer, but poll()
+>is not returning POLLIN, so sshd doesn't know to read it.
+>
+>* 30-second summary from bpftrace
+>
+>  Total ppoll calls: 488
+>  Timeouts (20ms pattern): 103
+>  Successful recvmsg: 6 (984 bytes)
+>  Timeout rate: 21%
+>
+>* Why PTY-specific?
+>
+>PTY sessions require bidirectional traffic:
+>1. Server sends shell prompt → client must receive it
+>2. Client sends keypress → server must receive it
+>3. Server sends echo → client must receive it
+>
+>Each exchange relies on poll() waking on POLLIN. The bug causes poll()
+>to miss the wakeup, forcing sshd to wait for its 20ms timeout fallback.
+>
+>Non-PTY commands do request-response-exit quickly before the bug
+>manifests significantly.
+>
+>## Additional context
+>
+>I previously encountered the identical issue on WSL2's Hyper-V vsock
+>implementation, suggesting this may be a fundamental issue with how
+>vsock transports handle poll/wakeup semantics, not specific to virtio.
+>
+>## Hypothesis
+>
+>Based on the evidence, this appears to be a lost wakeup race condition:
+>1. Host sends packet to guest
+>2. Packet is enqueued to socket's rx_queue
+>3. sk_data_ready() is called but poll waiters aren't properly woken
+>4. vsock_poll() returns 0 (no POLLIN) despite data being available
+>5. ppoll() times out after 20ms, sshd retries
+>6. Eventually succeeds through timeout-based retry
+>
+>The "first connection works" pattern suggests the race involves
+>existing state from previous connections - possibly worker threads,
+>interrupt handlers, or virtqueue state that isn't properly reset.
+>
+>## Reproducer
+>
+>1. Start QEMU VM with vhost-vsock-pci device
+>2. Boot guest, ensure sshd is running
+>3. From host: ssh user@vsock/<CID>  # First connection is fast
+>4. Exit and reconnect: ssh user@vsock/<CID>  # Now slow
+>
+>## Request
+>
+>Could someone familiar with the vsock/virtio poll implementation
+>review the wakeup path? Specifically:
+>- virtio_transport_recv_pkt() -> sk_data_ready() path
+>- vsock_poll() -> poll_wait() registration timing
+>- Any state that persists between connections
+>
+>Happy to provide additional traces or test patches.
+>
+>Thanks,
+>[Your Name]
+>
+>---
+>bpftrace script used (runs on guest):
+>
+>#!/usr/bin/env bpftrace
+>BEGIN {
+>    @start = nsecs;
+>    printf("=== MINIMAL VSOCK DIAGNOSTIC ===\n");
+>}
+>tracepoint:syscalls:sys_enter_ppoll {
+>    if (comm == "sshd-session" || comm == "sshd") {
+>        @ppoll_enter[tid] = nsecs;
+>        @ppoll_count++;
+>    }
+>}
+>tracepoint:syscalls:sys_exit_ppoll {
+>    if (@ppoll_enter[tid]) {
+>        $ms = (nsecs - @start) / 1000000;
+>        $dur = (nsecs - @ppoll_enter[tid]) / 1000000;
+>        if ($dur > 10) {
+>            printf("[%5lld ms] %s: ppoll() duration=%lld ms ret=%d\n",
+>                   $ms, comm, $dur, args->ret);
+>            if ($dur >= 18 && $dur <= 25) {
+>                printf("           ^^^ 20ms TIMEOUT pattern detected!\n");
+>                @timeout_count++;
+>            }
+>        }
+>        delete(@ppoll_enter[tid]);
+>    }
+>}
+>tracepoint:syscalls:sys_exit_recvmsg {
+>    if (comm == "sshd-session" || comm == "sshd") {
+>        if (args->ret > 0) {
+>            $ms = (nsecs - @start) / 1000000;
+>            printf("[%5lld ms] %s: recvmsg() = %lld bytes\n", $ms, comm, args-
+>>ret);
+>            @recv_count++;
+>            @recv_bytes += args->ret;
+>        }
+>    }
+>}
+>interval:s:5 {
+>    printf("\n[%5lld ms] --- 5s stats: ppoll=%d, timeouts=%d, recv=%d (%d bytes)
+>---\n\n",
+>           (nsecs - @start) / 1000000, @ppoll_count, @timeout_count,
+>@recv_count, @recv_bytes);
+>}
+>
+>
+>
+>
 
-Options are:
-- either periodically scan hardware table, or
-- disable hardware learning at all and send any unknown frames to software bridge, so it learns, and 
-then handle notifications about that and manually update hardware table.
-
-The existing implementation does not try to sync sw and hw tables at all.
-
-> The overall result is that having just one switch port in the bridge
-> is no different to having multiple switch ports in the bridge.
-
-In my original driver, I enabled L2 forwarding only when at least two ports have been participating.
-I don't see rationale for doing differently on this hardware.
-But Renesas can have a different view on this.
-
-Nikita
 
