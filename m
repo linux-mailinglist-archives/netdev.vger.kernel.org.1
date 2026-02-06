@@ -1,70 +1,78 @@
-Return-Path: <netdev+bounces-257399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJdRGxxRhWmV/wMAu9opvQ
-	(envelope-from <netdev+bounces-257399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:25:32 +0100
+	id QMBZBaZRhWmV/wMAu9opvQ
+	(envelope-from <netdev+bounces-257400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:27:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0301BF9407
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:25:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83EB7F94BC
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 606AC3008300
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:25:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED36E303102D
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A0525A655;
-	Fri,  6 Feb 2026 02:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF88261B70;
+	Fri,  6 Feb 2026 02:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6Vz8SXh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfpNsewM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0096124EAB1;
-	Fri,  6 Feb 2026 02:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AEC25FA29;
+	Fri,  6 Feb 2026 02:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770344729; cv=none; b=Quu1wpLsdwxqVpYqOFQihb2EPrLSeD+I0AUtTVBm5FfB4Sk4G4nRsn7EYQ+g7ye8Fn67KU8XNikSYsttYLdM113kuj+vYvUYBMEOOSUWFCCO2ABWVvML+7TkMlAB7W/9vN/WdcndSGtqII0zNDMsqThiZszCM7oUoHXufG+CXt4=
+	t=1770344803; cv=none; b=jPzktJqId46AZlyWclNWRI/3GUsMeOnU+FMacqllgCINESpVpuiwfBSoojxyz3lsW4u1kAPApsW8ABy22fL486+tC7Y3knwZmRT93OHnJG/CX1uMytRwZVto3iEaLsFvxs1xWyiI4gsrIj1fCab1oTIL30Z6TAR5JovGfqTkeZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770344729; c=relaxed/simple;
-	bh=7TYnW5LHLTJMU8pfUwNFQAsIPO1pYWlPEJCyFKvlZd4=;
+	s=arc-20240116; t=1770344803; c=relaxed/simple;
+	bh=BGxa4AkQjOf9KjNL+3M9JW6M3qf5DIia81SBTdQjZEs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qvUX+hlwhLLQIybouJ+BL8XqFF42TQYG5xTHpn9C2kx3fyGVPToLCMKvGVMy6smMo4sgnFdbOiHGI/vUZBRXBqhuLp/QoPOm2mKGjYII42iWg4vgw7gGqqC5tjXPZ+JaHDWyKkI64l18W2aQDWlgxAgk4adwonUzAo0K7FC+E6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6Vz8SXh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04D14C19423;
-	Fri,  6 Feb 2026 02:25:27 +0000 (UTC)
+	 MIME-Version; b=Ie1XvUaaPhE5yxDVJ8HF2ymbuG9F7mjpADSEu/4RRUCZqdKeCJ25x9CrcWOiwwSwevhggabA6Ng0AaJWIdBzl4VxJeP8Ml2vddGyW/3prl2p3oiUgnxVxACS36csQs7PYp3LVQ5odOD6CrH6AW4UeUyrHprm35fQKF691pGp2lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfpNsewM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9857C4CEF7;
+	Fri,  6 Feb 2026 02:26:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770344728;
-	bh=7TYnW5LHLTJMU8pfUwNFQAsIPO1pYWlPEJCyFKvlZd4=;
+	s=k20201202; t=1770344802;
+	bh=BGxa4AkQjOf9KjNL+3M9JW6M3qf5DIia81SBTdQjZEs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O6Vz8SXht8wyrUkYJXLD50y/76G6JUIwmBfvexxVPq2m4/1Z7Anb8cTuPAz4yJSyI
-	 z0r+Bt6xDOJVoD43NWhJjy1oBmP+JgSdurWH6jTNrjfjcKAfnjG1eiWfHEf4P+8Zql
-	 fdQACA7TKJnFwHBncBP/tDQHhzREhOTH9prG3ngbjfCVKKsboppBCD0yQU1q/pd/lh
-	 t77gNkNUe3YSPLdFnU3/n6XeGySh/wEogWoFCNUvSSVSDqKcCyW9psWl9sVUfbIKS1
-	 CwfkwWXMfppJEmB19olWnelUn7SFplt3xq7BYOEcCD2SbZ1DJgYMhCl8UgcYas/fJG
-	 5nXnlsXV1qfEg==
+	b=sfpNsewMoN7NeiErvzWr4YM0gimRQzHAzsFtl0FtyddxtbpHaim1GNN+9lzxfabgW
+	 GyfINDqZa20XmUVpjvxy+B2XGeXYvWa4xJwyRh0WcINTGu6De1eHKpd6ZjA/mYYpWL
+	 w2/cVjD9V9/WJ9MFQbofhTr+k+U+CrU9y8GAhAuENocSvKY8qIR0SdD/7sUbMAZhxl
+	 xRfpM9OYyf/8vmxBvGm6c8eKQ4RTRl2xLn3JYct2jlOJ53ZAc/nTzW5UBdwoEt3s1Q
+	 dhsQd8qtVu9VwwBU7l7nW5dLXLOItnJx5RsTiR6Yq/I59aoJKJYuPCOKPDfVEY3ipN
+	 k1KLv2n5GtU1w==
 From: Jakub Kicinski <kuba@kernel.org>
-To: jiayuan.chen@linux.dev
+To: lukasz.majewski@mailbox.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
+	imx@lists.linux.dev,
 	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	jiayuan.chen@shopee.com,
-	pabeni@redhat.com,
-	jirislaby@kernel.org,
-	sjur.brandeland@stericsson.com,
-	gregkh@linuxfoundation.org,
-	netdev@vger.kernel.org,
-	syzbot+827272712bd6d12c79a4@syzkaller.appspotmail.com,
-	davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
-	edumazet@google.com
-Subject: Re: [net,v1] serial: caif: fix use-after-free in caif_serial ldisc_close()
-Date: Thu,  5 Feb 2026 18:25:26 -0800
-Message-ID: <20260206022526.3191971-1-kuba@kernel.org>
+	krzk+dt@kernel.org,
+	davem@davemloft.net,
+	kernel@pengutronix.de,
+	devicetree@vger.kernel.org,
+	horms@kernel.org,
+	festevam@gmail.com,
+	andrew@lunn.ch,
+	conor+dt@kernel.org,
+	pabeni@redhat.com,
+	shawnguo@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	wahrenst@gmx.net,
+	richardcochran@gmail.com,
+	s.hauer@pengutronix.de,
+	netdev@vger.kernel.org,
+	edumazet@google.com,
+	robh@kernel.org
+Subject: Re: [net-next,v23,2/7] net: mtip: The L2 switch driver for imx287
+Date: Thu,  5 Feb 2026 18:26:40 -0800
+Message-ID: <20260206022640.3197138-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260204081939.237738-1-jiayuan.chen@linux.dev>
-References: <20260204081939.237738-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260204232135.1024665-3-lukasz.majewski@mailbox.org>
+References: <20260204232135.1024665-3-lukasz.majewski@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,19 +85,20 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-257399-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,lists.linux.dev,lunn.ch,vger.kernel.org,davemloft.net,pengutronix.de,gmail.com,redhat.com,lists.infradead.org,gmx.net,google.com];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-257400-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -98,10 +107,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,827272712bd6d12c79a4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0301BF9407
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 83EB7F94BC
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -109,130 +118,166 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-serial: caif: fix use-after-free in caif_serial ldisc_close()
+net: mtip: The L2 switch driver for imx287
 
-This commit fixes a use-after-free bug in the CAIF serial driver by
-moving the tty_kref_put() call from ldisc_close() to ser_release(),
-ensuring the tty reference is held as long as the network device exists.
+This patch provides support for More Than IP L2 switch embedded in the
+imx287 SoC, a two port switch placed between uDMA[01] and MAC-NET[01]
+for offloading network traffic.
 
-Closes: https://lore.kernel.org/all/000000000000a4a7550611e234f5@google.com/T/
+> diff --git a/drivers/net/ethernet/freescale/mtipsw/Kconfig b/drivers/net/ethernet/freescale/mtipsw/Kconfig
+> new file mode 100644
+> index 000000000000..7767bd7c707b
+> --- /dev/null
+> +++ b/drivers/net/ethernet/freescale/mtipsw/Kconfig
+> @@ -0,0 +1,13 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +config FEC_MTIP_L2SW
+> +	tristate "MoreThanIP L2 switch support to FEC driver"
 
-> serial: caif: fix use-after-free in caif_serial ldisc_close()
->
-> There is a use-after-free bug in caif_serial where handle_tx() may
-> access ser->tty after the tty has been freed.
->
-> The race condition occurs between ldisc_close() and packet transmission:
->
->     CPU 0 (close)                     CPU 1 (xmit)
->     -------------                     ------------
->     ldisc_close()
->       tty_kref_put(ser->tty)
->       [tty may be freed here]
->                      <-- race window -->
->                                       caif_xmit()
->                                         handle_tx()
->                                           tty = ser->tty  // dangling ptr
->                                           tty->ops->write() // UAF!
->       schedule_work()
->         ser_release()
->           unregister_netdevice()
->
-> The root cause is that tty_kref_put() is called in ldisc_close() while
-> the network device is still active and can receive packets.
->
-> Since ser and tty have a 1:1 binding relationship with consistent
-> lifecycles (ser is created/destroyed in ldisc_open/close, and each ser
-> binds exactly one tty), we can safely defer the tty reference release
+This isn't a bug, but the vendor name formatting is inconsistent between
+the description line ("MoreThanIP") and the help text below ("MoreThan
+IP"). The vendor should be consistently named throughout the file.
 
-The statement "ser is created/destroyed in ldisc_open/close" isn't quite
-accurate. While ser is created in ldisc_open() via alloc_netdev(), it's
-not actually destroyed in ldisc_close(). Instead, ldisc_close() only moves
-ser to the release list via list_move(&ser->node, &ser_release_list).
-The actual destruction happens in ser_release() when unregister_netdevice()
-is called, which eventually frees the netdev and embedded ser via
-netdev_run_todo() invoked by rtnl_unlock(). Would it be more accurate to
-say ser is destroyed in ser_release()?
+> +	depends on OF
+> +	depends on NET_SWITCHDEV
+> +	depends on BRIDGE
+> +	depends on SOC_IMX28 || COMPILE_TEST
+> +	help
+> +	  This enables support for the MoreThan IP L2 switch on i.MX
+> +	  SoCs (e.g. iMX287). It offloads bridging to this IP block's
 
-> to ser_release() where the network device is unregistered.
->
-> Fix this by moving tty_kref_put() from ldisc_close() to ser_release(),
-> after unregister_netdevice(). This ensures the tty reference is held
-> as long as the network device exists, preventing the UAF.
->
-> Note: We save ser->tty before unregister_netdevice() because ser is
-> embedded in netdev's private data and will be freed along with netdev
-> (needs_free_netdev = true).
->
-> How to reproduce: Add mdelay(500) at the beginning of ldisc_close()
-> to widen the race window, then run the reproducer program [1].
->
-> Note: There is a separate deadloop issue in handle_tx() when using
-> PORT_UNKNOWN serial ports (e.g., /dev/ttyS3 in QEMU without proper
-> serial backend). This deadloop exists even without this patch,
-> and is caused by an independent bug: inconsistency between
-> uart_write_room() and uart_write() in serial core. It has been
-> addressed in a separate patch [2].
+The SoC name "iMX287" should be "i.MX287" to match NXP's standard naming
+convention used throughout the kernel for i.MX SoCs.
 
-The claim about the deadloop being caused by inconsistency between
-uart_write_room() and uart_write() couldn't be fully verified without
-examining the referenced patch [2]. While the claim is plausible (if
-uart_write_room() reports available space but uart_write() returns 0
-bytes written, the deadloop would occur in handle_tx()), this appears
-to be presented as fact rather than hypothesis. Could this be clarified
-or softened to indicate it's the suspected cause pending verification?
+> diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+> new file mode 100644
+> index 000000000000..0a193a12e160
+> --- /dev/null
+> +++ b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
 
 [ ... ]
 
-> Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
+> +static void mtip_mgnt_timer(struct timer_list *t)
+> +{
+> +	struct switch_enet_private *fep = timer_container_of(fep, t,
+> +							     timer_mgnt);
 
-The Fixes: tag appears to reference the wrong commit. The bug was actually
-introduced by commit 56e0ef527b18 ("drivers/net: caif: fix wrong
-rtnl_is_locked() usage"). The original commit 9b27105b4a44 didn't have any
-tty_kref operations. Commit e31d5a05948e added tty_kref_get/put, but at
-that time tty_kref_put was called in ldisc_close() which directly
-unregistered the netdevice, so there was no race. Commit 56e0ef527b18
-moved dev_close/unregister_netdevice to a work queue (ser_release) but
-left tty_kref_put in ldisc_close, creating the race window. Should the
-Fixes: tag be updated to:
+Does this code cause undefined behavior? The timer_container_of macro
+expands to container_of(t, typeof(*fep), timer_mgnt), which dereferences
+the uninitialized 'fep' variable in the typeof() expression. This is the
+first statement in the function where 'fep' is being declared and assigned
+simultaneously.
 
-Fixes: 56e0ef527b18 ("drivers/net: caif: fix wrong rtnl_is_locked() usage")
+Looking at how other timer callbacks use this macro, shouldn't this be:
 
-> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-> --- a/drivers/net/caif/caif_serial.c
-> +++ b/drivers/net/caif/caif_serial.c
-> @@ -284,6 +284,7 @@ static void ser_release(struct work_struct *work)
->  {
->  	struct list_head list;
->  	struct ser_device *ser, *tmp;
-> +	struct tty_struct *tty;
->
->  	spin_lock(&ser_lock);
->  	list_replace_init(&ser_release_list, &list);
-> @@ -292,9 +293,11 @@ static void ser_release(struct work_struct *work)
->  	if (!list_empty(&list)) {
->  		rtnl_lock();
->  		list_for_each_entry_safe(ser, tmp, &list, node) {
-> +			tty = ser->tty;
->  			dev_close(ser->dev);
->  			unregister_netdevice(ser->dev);
->  			debugfs_deinit(ser);
-> +			tty_kref_put(tty);
->  		}
->  		rtnl_unlock();
->  	}
+	struct switch_enet_private *fep = container_of(t,
+		struct switch_enet_private, timer_mgnt);
+
+This will cause a crash when the timer fires at the mod_timer() call site
+in mtip_config_switch().
 
 [ ... ]
 
-> @@ -354,8 +357,6 @@ static int ldisc_open(struct tty_struct *tty)
->  static void ldisc_close(struct tty_struct *tty)
->  {
->  	struct ser_device *ser = tty->disc_data;
-> -
-> -	tty_kref_put(ser->tty);
->
->  	spin_lock(&ser_lock);
->  	list_move(&ser->node, &ser_release_list);
+> +static void mtip_switch_tx(struct switch_enet_private *fep)
+> +{
+> +}
+> +
+> +static int mtip_switch_rx(struct net_device *dev, int budget)
+> +{
+> +	return -ENOMEM;
+> +}
+
+Can the driver actually send or receive packets with these implementations?
+
+Looking at the call chain:
+  mtip_interrupt() schedules NAPI on RX interrupt ->
+  mtip_rx_napi() calls mtip_switch_rx() ->
+  mtip_switch_rx() always returns -ENOMEM
+
+This means all receive interrupts are treated as out-of-memory conditions
+and no packets are ever delivered to the network stack. Similarly,
+mtip_switch_tx() is an empty stub that does nothing.
+
+The commit message states "It can be used interchangeably with current
+FEC driver" which suggests a functional driver, but the network interface
+cannot actually send or receive packets. Should the commit message clarify
+this is an incomplete implementation, or are these functions missing their
+implementation?
+
+[ ... ]
+
+> +static int mtip_parse_of(struct switch_enet_private *fep,
+> +			 struct device_node *np)
+> +{
+> +	struct device_node *p;
+> +	unsigned int port_num;
+> +	int ret = 0;
+> +
+> +	p = of_get_child_by_name(np, "ethernet-ports");
+> +
+> +	for_each_available_child_of_node_scoped(p, port) {
+> +		if (of_property_read_u32(port, "reg", &port_num))
+> +			continue;
+> +
+> +		if (!(port_num == 1 || port_num == 2)) {
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: The switch supports up to %d ports!\n",
+> +				__func__, SWITCH_EPORT_NUMBER);
+> +			goto of_get_err;
+> +		}
+> +
+> +		fep->n_ports = port_num;
+> +		ret = of_get_mac_address(port, &fep->mac[port_num - 1][0]);
+> +		if (ret)
+> +			dev_dbg(&fep->pdev->dev,
+> +				"of_get_mac_address(%pOF) failed (%d)!\n",
+> +				port, ret);
+> +
+> +		ret = of_property_read_string(port, "label",
+> +					      &fep->ndev_name[port_num - 1]);
+> +		if (ret < 0) {
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: Cannot get ethernet port name (%d)!\n",
+> +				__func__, ret);
+> +			goto of_get_err;
+> +		}
+> +
+> +		ret = of_get_phy_mode(port, &fep->phy_interface[port_num - 1]);
+> +		if (ret < 0) {
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: Cannot get PHY mode (%d)!\n", __func__,
+> +				ret);
+> +			goto of_get_err;
+> +		}
+> +
+> +		fep->phy_np[port_num - 1] = of_parse_phandle(port,
+> +							     "phy-handle", 0);
+
+Can this code leak OF node references?
+
+If the first port (port_num=1) successfully obtains its PHY handle via
+of_parse_phandle() and stores the reference in phy_np[0], but a
+subsequent port fails during of_property_read_string() for the 'label'
+property or of_get_phy_mode(), the error path jumps to of_get_err which
+only releases the parent node 'p'. The PHY handle reference obtained for
+the first port is never released.
+
+The error path returns to mtip_sw_probe() which returns error without
+calling mtip_parse_of_cleanup(), leaking the phy_np[0] reference. Note
+that line 1191 correctly calls mtip_parse_of_cleanup(fep) before goto,
+showing the cleanup is needed for these earlier error paths too.
+
+> +		if (!fep->phy_np[port_num - 1]) {
+> +			mtip_parse_of_cleanup(fep);
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: PHY handle not defined!\n", __func__);
+> +			ret = -ENODEV;
+> +			goto of_get_err;
+> +		}
+> +	}
+> +
+> + of_get_err:
+> +	of_node_put(p);
 -- 
 pw-bot: cr
 
