@@ -1,226 +1,151 @@
-Return-Path: <netdev+bounces-257572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257564-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCYBGggDhmmyJAQAu9opvQ
-	(envelope-from <netdev+bounces-257572-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:04:40 +0100
+	id kPG5AKT9hWnUIwQAu9opvQ
+	(envelope-from <netdev+bounces-257564-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 15:41:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07547FF6C1
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 16:04:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF629FF1CA
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 15:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A0AAD3048E0C
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 15:03:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 64C2E300337E
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 14:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2452773C1;
-	Fri,  6 Feb 2026 15:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D5E41322B;
+	Fri,  6 Feb 2026 14:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="s6ziI3wI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NruK1uiJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011010.outbound.protection.outlook.com [52.101.52.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8A02765F8;
-	Fri,  6 Feb 2026 15:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770390187; cv=fail; b=B7T4jcP8Hn8Cariyqz477xGbVMr9gf8ssh1RxAcXZI9VDySoGiaqp44HrpGZRol3lKuWQQTfsIg/ym/hhxiXPvIa/2+HkHGhQO/XxxP2KVff4+MdfXQ5WiYScwWlwwN5br6esdiODBrNV5UPObZZhigExg8grarRl0wOfE9h59A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770390187; c=relaxed/simple;
-	bh=q+w8vLxYNyKjX7Es27XNXzenv1dicxTs5STWE8Yi0zE=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=of02+T+HkBL3cUlQNH7QecmRk0X1N/PligbOJKSN+p8Bqk4Gj9hHuE62HL/fvpc8ZcbYFFIuhssfZOY7IAncYt0KlVi0D8wtiLKCHiqCleF7kTjOR5l/TRXkwkW8x/taeSX+U1Rl18RsTxIe7+cRqnxnM/kMxG/jCrm+LR7ckUw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=s6ziI3wI; arc=fail smtp.client-ip=52.101.52.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Nb/b3Y/t+6ovB7TOE7kgqBsX3NT2E4R8lPeQdgdQr7zFut0FZsBOZeK68mSar0cqudKGAv7hJEcV+aYJdsC+Q8IuwjDiC6wY4VrpdGpqWvx/fnUO2GXs4EepCoJdLAc2pIB2u+9CmGY7fVoMenh+0oRKQ4M9+JpL3myl/qF74DRqo1SV7r18YdApD6vTY6yEB4Xg2Z8/L+H9BgBFIlShbeqqD1sebVOvr5GkvEweZn5ufOR4PUyZ1QRTnxI1wa2xBkG/G+DXJzqsjmkkXIGUy5kf3HSsIHWyNctn+yrtCnsJ452ajbT/hfWvOeT5tVRpUNiwhazGv4zyhV2oJ6SR7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xOuSLoQQL7jtMguh6UIM1yGrivZzpBPPULJHXlDBxl8=;
- b=FEzA1oYvrXdAhka721q0kTodKBCVrMBMOLryhTx6sBxJ8BEkWkJip9y47APJCn14h265HDwkit2fJDGQ4djof9p4bX7HZGw1OUHTV4+dONi/kHngKXkNuUOW7pO89fXFK5YfvAkqCZ8pASrkV1fLdt6MbcTvtUr6gz4bJtUx4gNZDGOpIRiRX2UCo9JvJjL7fltG7VBoB0EYbAmhBnNGTUBmc5gAVlQbDumAea9c7HUTBJ5tAD/iOlwHRP6YhpDKLtYVxE5izigXeBzvqGM1Xjp0WdClvWHPNjFRD2SMWamIEVu1G/Hh64oLrQR/7ODKhqC2pw8cMNWmsl8MMUNjew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xOuSLoQQL7jtMguh6UIM1yGrivZzpBPPULJHXlDBxl8=;
- b=s6ziI3wIv9q1p4/J3WYpGcX/CTn+SK6UV6fOvJ3WEUifSrBvqCqb5OkhNj/E5HB4alIsW255gwkH22o4TGDKsuu9RwFbJw8KaNEatSwVEKBHSb9/OI4mM8C+5lMchPz0pQ7bRtrtnq7OqTvLYaE1MqkQcBDJJ36n5nZmdyNkiVDq0mt50KLKwE383mJfxP8nXlu1+aq1C5oz/VqNSc3DiymNS+e3CguhtXczcvR6Riv8LuZ3tmcFTAdJHbnF83WOsL1Qf8SkcIH0xV23qSsOlt+5CP8ZwdbLfdzrSST3BS0r5AEcIIgCWTHpCY1OoTfZaAdfy28GjG75NkZiRPq4pg==
-Received: from DS7PR03CA0033.namprd03.prod.outlook.com (2603:10b6:5:3b5::8) by
- DS0PR12MB999106.namprd12.prod.outlook.com (2603:10b6:8:301::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.13; Fri, 6 Feb
- 2026 15:03:04 +0000
-Received: from CH3PEPF00000012.namprd21.prod.outlook.com
- (2603:10b6:5:3b5:cafe::89) by DS7PR03CA0033.outlook.office365.com
- (2603:10b6:5:3b5::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9587.15 via Frontend Transport; Fri,
- 6 Feb 2026 15:03:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH3PEPF00000012.mail.protection.outlook.com (10.167.244.117) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.0 via Frontend Transport; Fri, 6 Feb 2026 15:03:03 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 6 Feb
- 2026 07:02:40 -0800
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 6 Feb
- 2026 07:02:34 -0800
-References: <20260205220541.2992807-1-kuba@kernel.org>
- <20260205220541.2992807-6-kuba@kernel.org>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shuah@kernel.org>, <willemb@google.com>, <petrm@nvidia.com>,
-	<donald.hunter@gmail.com>, <michael.chan@broadcom.com>,
-	<pavan.chebbi@broadcom.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 5/9] selftests: drv-net: give HW stats sync
- time extra 25% of margin
-Date: Fri, 6 Feb 2026 15:40:30 +0100
-In-Reply-To: <20260205220541.2992807-6-kuba@kernel.org>
-Message-ID: <87cy2h29vj.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8BE36CE17;
+	Fri,  6 Feb 2026 14:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770388888; cv=none; b=KKiX4SAGNXR163n1dEsRtWmwYhw9AgDMomthJk9PNuu2M0NOT1FmXfTCwb+Sr1EJFH++1ZwVKTR0A1nY6diQIrZI44j3J7RHFohmeG1d+VrTM+ZZ5hzcIDDFyOHC78xk1/iB9DTVEvZEu//aIJCTX2JghMNhWgh7aXemqZkRNh8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770388888; c=relaxed/simple;
+	bh=IVpOrbiMnZuCcqYATf6ZbRJh0Zwts1wEucCBbV6v/LQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NUSDW0reVDNf+Ng1xce1S3EdAS4WTMF4hGBfpHE78zdVCxJTeD7zOdqh+hTYB3UDcdATwJ6CxBQuYGdZXP+6/5soW7D+jZHyzTlTyY2ZEEJCtJUmYGlKvKqOwTf6SDr2WG0aRXyAu9zBSieBTGOQxWVvmZOFWUcDxgwogR+ltpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NruK1uiJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03CCCC116C6;
+	Fri,  6 Feb 2026 14:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770388888;
+	bh=IVpOrbiMnZuCcqYATf6ZbRJh0Zwts1wEucCBbV6v/LQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NruK1uiJWPEpEOfzz4WdAqh2Rb3RcGd1mswYVlLNg8ZrKz5GYOp6omkJCbSV1bnDZ
+	 m6qzVkBmLZw4wpFP/byCAkmW1d7IpnphBOOuR3IU3Nnbdh9J27yb+zkzkI/0wD2Al4
+	 e/ADqv1foUEK3DEJTKKBvUGj0jNFoKI7rWI3oW4OWsL8D3AibhJiSuwNQggxelYO45
+	 urqW04tnDI+Se00dfxSud6IGmEvC/Oo2FdXy0VX64YW0Mkw83yedKHB40AaO42WOM9
+	 aS4UnX1a6X9yyhW15lhYVvWIAcP7g/byExg+P48CqiyQ6+GwpdTo/G8ePxYTcxYD56
+	 W5C8ruY3I4x0w==
+Message-ID: <41da26a6-4024-461f-8254-ac5dcf231397@kernel.org>
+Date: Fri, 6 Feb 2026 15:41:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000012:EE_|DS0PR12MB999106:EE_
-X-MS-Office365-Filtering-Correlation-Id: f35a2b9a-fbd5-4f82-9937-08de6590d409
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?C4LFKmYlntpds2FPRcFrwRCi8EgCqL4skAaztYD1/Ip18ne0QC9GUgrevmgJ?=
- =?us-ascii?Q?B88gZjhsAsbbIHLjzYC9HfrZYFD9p0rg5zi+J8eRFAJX5O94Nd73wya561ev?=
- =?us-ascii?Q?0eTu2t897BYg+cSH5kGW2WUxORS3MH+34dVbx7zxwabWiiuYe7YMGfr5Ldvb?=
- =?us-ascii?Q?qCZ0xyXQ6kbpJel9pv8L9XSEscrSIxHQN9vBuSjXw5/QFWpG4QPux9te7IhR?=
- =?us-ascii?Q?+VOabEgXTMoBanPpb4JDR7bJGPSB8KhCpt3a+C7yOHo6zB4awn9kOyVJgTMT?=
- =?us-ascii?Q?SqKJB7WBs1kz+DnSLwad5Qzaxg1TWpbSEX27qNw+DNO28cZOIWROKlHX7IA1?=
- =?us-ascii?Q?B2syTQWJzVSo7pnKj/j7d8ffI9R8LJgh3eXAukd0+x+OX7ynFx6YAfSOMBjT?=
- =?us-ascii?Q?YWqw069aXHyZ74TobgYi8fzM6vhKMl7wfHFo9mlNdThDH0wDOXkDBN4a9fiV?=
- =?us-ascii?Q?0h1HogtWsOwBIqChs96TxkE4uiK6+Kk3VPbzUE3G24nbSvZVwVnM+ChdYkz5?=
- =?us-ascii?Q?83yT9RYJ8KVllBKvX9vSJnFql3x/hsVEqgNPs8NTT6u1H2M4RxVJROyxmswj?=
- =?us-ascii?Q?9ZQs0E0HH+fo4Vb2BI7VXiPZX7e6HT+m7a8btxf4s3I2GANW/Z4Xc041wAlj?=
- =?us-ascii?Q?UzMk/17NN7ezj1ZJ3e+co3Ds0PVwNt8gwJ+VDdpz6+49L8O0XEBqQFOJu9I2?=
- =?us-ascii?Q?Dx410YAtaFXnw5xHRxJhl5iMim+WmKmzG/qroqRBAwQ90MkvdWG3h/ZB/PSG?=
- =?us-ascii?Q?+j38PsK2umXwNTp9GLJHI4/3QttHu7r7i2lADeBuvriwBTQ2AhIWJsZRCDmA?=
- =?us-ascii?Q?1FRJQ3uWNr6sWVRXwIJC1A2DegvALUJCDb3KaB/obXfWJ1+VED8ggeJTj3oM?=
- =?us-ascii?Q?wE0LxKr+gIdkA4Wd0V0B4mjq2rtYdFFxhd53HbwS6/OTLZVqA6gE9y2cO1R/?=
- =?us-ascii?Q?DJbMY1ItLXCLepEJNcKptvAjSmtZ+B+b1+VS4g2QKIBkCfW/IdHe0bcqCNik?=
- =?us-ascii?Q?ovNK3rq1F+4AP9WL82kRQj36HYAI16ujQb+IZJzD3TIFa+nTVIC4AZs7E/uF?=
- =?us-ascii?Q?1eFBL5OcoorQt/EF6KrlLKCf4/FuuunMbvUr5x4w4YNRUE1g3yMULgLn6LeQ?=
- =?us-ascii?Q?Oa/t71dYXjMklOoKGdGYGG0EZOE2JM4I2yj+1M59+1DX3fPpqlkbbhqf9cI5?=
- =?us-ascii?Q?DKg+/qNUeENJI7KJhq0oVy/VEOZw9iiHPktN2Kb1zPHy3gYgYwX2/dvw6O0I?=
- =?us-ascii?Q?uVwMwn+zHQSQzfK23X0RXvmnh/NcLFReKj8WAEyD3sGeTwIgARf77/Q7yGVh?=
- =?us-ascii?Q?Y5ZYVdQ9gYQ8jeo+svt+LF0cdyxIvF8G8Bcx/c3LHOPmKWwlaHyVVfHB4wqF?=
- =?us-ascii?Q?tD0HmuluBe38wqQJwpo1C1L4h0i2gPJNICznIJcsqZNiK32EpQJMewIs9GgL?=
- =?us-ascii?Q?w1GdottaOPEuzUeDgNPg/iOuMS2omcpsNI2yDdiDLPbUIt/B/UySF2hrqfuw?=
- =?us-ascii?Q?TgN25FYAs9TxBOJaZSNsaJoQWwjI5x3PEqqm4/oL0u+opbz/dEAHOS56Ax+b?=
- =?us-ascii?Q?+hY/f39dZo87yWjzNkrfoCOcBd281NDFDnxCZNQSoxCU9Q+yCotLhvLDS50Z?=
- =?us-ascii?Q?XoqpwFkriVH7kmqjjILRvvs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	WJf/0u5bdfDA8b37UQ43Fq0uvSCtR/M95NqEAqNjoAJMk5TaWF9Or4lU+n3nIcLuTqaxKJKk9joUtwO/XHhq3UE2FQqeo3e1EDxyvj8huAm1iif3pNZ2DvpRKh+6o2SVimf4WUyTBXs5ykEdSHM6pmNrZ3+QMjrMDRSEVJDCyl15jNWdvLJ1kp6IIqsb0nM3v76rHUFDU8P7WR56kuQaxADkcbrI4674skw7k8+yuFNlj4lN3uxXC4dziuxie0/x3JlAIz1FqBqVyG48ynkirmCuB79MZK4DnZkbwzkBbzMgauW657IiiUam2C+Uea15xXpxN2QGMUdqkUVRL7fg49lc8u8n8No9DFpENw2esHFsxXKMFvweC1BuKMBsw7TXhOn1PHvqkm8vSBkaDj4Pxu9HWUEMo5c77BBP0hodCQA0kyPXd7GULMmgNr8mqGIj
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2026 15:03:03.8637
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f35a2b9a-fbd5-4f82-9937-08de6590d409
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000012.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB999106
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next RFC v1 0/3] net: sched: refactor qdisc drop
+ reasons into dedicated tracepoint
+To: Antoine Tenart <atenart@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org, horms@kernel.org,
+ jiri@resnulli.us, edumazet@google.com, xiyou.wangcong@gmail.com,
+ jhs@mojatatu.com, carges@cloudflare.com, kernel-team@cloudflare.com
+References: <177022452988.1827734.5121740962985640333.stgit@firesoul>
+ <20260204190417.110f5498@kernel.org>
+ <2e1eb11c-cd47-4772-baff-45d43d4fa539@kernel.org> <877bsr1l1h.fsf@toke.dk>
+ <CADCXZ1yMkZbRd7ioGw5QQ61OdmYp6misUDoj-s-g7wuoiCHKbg@mail.gmail.com>
+ <87v7gbz1ru.fsf@toke.dk>
+ <CADCXZ1z-gg_VsN4kjf325HvWRxL1irhUC76B_erggm5+A7qQ7g@mail.gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CADCXZ1z-gg_VsN4kjf325HvWRxL1irhUC76B_erggm5+A7qQ7g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com,broadcom.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-257564-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257572-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,davemloft.net,redhat.com,resnulli.us,google.com,mojatatu.com,cloudflare.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 07547FF6C1
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF629FF1CA
 X-Rspamd-Action: no action
 
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> There are transient failures for devices which update stats
-> periodically, especially if it's the FW DMA'ing the stats
-> rather than host periodic work querying the FW. Wait 25%
-> longer than strictly necessary.
->
-> For devices which don't report stats-block-usecs we retain
-> 25 msec as the default wait time.
+On 05/02/2026 17.24, Antoine Tenart wrote:
+> On Thu, Feb 05, 2026 at 03:46:29PM +0100, Toke Høiland-Jørgensen wrote:
+>> Antoine Tenart <atenart@redhat.com> writes:
+>>
+>>> I'm wondering why not using the drop reason subsys logic to combine the
+>>> qdisc specific enum while not conflicting with drop reasons and allowing
+>>> to inject the qdisc reasons into drop reason enabled helpers as well?
+>>
+>> See this prior discussion for how the proposal came to be:
+>>
+>> https://lore.kernel.org/all/6be17a08-f8aa-4f91-9bd0-d9e1f0a92d90@kernel.org/
+>>
+>> Basically, figuring out which qdisc a drop came from is not possible
+>> with the current drop_reason code.
+>>
+>> So it's not just new drop reasons, it's a separate tracepoint with more
+>> information available (qdisc handle, name, etc). So you'll get two
+>> events for qdisc drops with this series (from patch 1):
+>>
+>> +		trace_qdisc_drop(q, txq, dev, skb, reason);
+>> +		kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_DROP);
+> 
+> Right and that's fine. Using the drop reason subsys logic you could turn
+> the above into:
+> 
+>   +		trace_qdisc_drop(q, txq, dev, skb, reason);
+>   +		kfree_skb_reason(skb, (u32)reason);
+> 
+> You can look at enum skb_drop_reason_subsys and how that is used within
+> OvS (net/openvswitch/drop.h) for example.
+> 
 
-Right, because now the default is 0.2, and we apply the 1.25 multiplier.
+Thanks for the input Antoine, I've adapted V2 to use skb_drop_reason_subsys.
 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Can you point me at the OVS userspace code that consume these subsys 
+drop_reason's?
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-
-> ---
->  tools/testing/selftests/drivers/net/lib/py/env.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-> index 41cc248ac848..39a98eb2592e 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-> @@ -285,7 +285,7 @@ from .remote import Remote
->                  if "Operation not supported" not in e.cmd.stderr:
->                      raise
->  
-> -            self._stats_settle_time = 0.025 + \
-> -                data.get('stats-block-usecs', 0) / 1000 / 1000
-> +            self._stats_settle_time = \
-> +                1.25 * data.get('stats-block-usecs', 20000) / 1000 / 1000
->  
->          time.sleep(self._stats_settle_time)
+--Jesper
+[V2] 
+https://lore.kernel.org/all/177032644012.1975497.16411100029657607833.stgit@firesoul/
 
 
