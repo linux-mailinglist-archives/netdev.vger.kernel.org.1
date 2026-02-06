@@ -1,227 +1,148 @@
-Return-Path: <netdev+bounces-257605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257614-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6P4aDckVhmk1JgQAu9opvQ
-	(envelope-from <netdev+bounces-257605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:24:41 +0100
+	id EO/oNfQZhmlNJwQAu9opvQ
+	(envelope-from <netdev+bounces-257614-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:42:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4441810036C
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:24:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7737A10076D
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 17:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4300C3002B70
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 16:24:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE69F304DE8D
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 16:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C85327209;
-	Fri,  6 Feb 2026 16:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0973732861E;
+	Fri,  6 Feb 2026 16:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sxnBBhHu"
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="PhTESns2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0798C2DF132;
-	Fri,  6 Feb 2026 16:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276B730F950;
+	Fri,  6 Feb 2026 16:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770395075; cv=none; b=WV4v3MWXSRY2NBG/3rnnH6DJ0buZZytvd9+zIiJKiy10UlZ/QJ3j16AvInsqFmM2/WG13EesU+ebG8yA0Hr/Lx9QnGwW/o3GUjqXmI/NQWiqLQ6Seo4ljh0qozrip4rW+Kr0Z2ZxgH+J6Ue8avKuaULCEUrJE6XkV2GUxy/uZEQ=
+	t=1770395488; cv=none; b=Uj7XE4xnWft3b5oCpsJiyjTHF8fW9+1oUA3R8ILqTBfN9LDc3gRnVeG8zP2HyuxYqbXu6aLWZWE7kyFzTq/5vDCcARECwZ9H4Dx+34jWnb4/WYz5rdv7cH0BHsLVIJMdSasLOEdXrBFzxo8qxa9tIRvY7hfn9ftRL6Ro8HMg19A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770395075; c=relaxed/simple;
-	bh=zgebKyL0uzcvJEp7bf09ffJFJuVNdOLocqXxpzS72WU=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A8QZCpXGm2pe3AMX9V4FQY+yeSKIcQbSdWEzLoBSSD8+hOkV259kSXAmWr9Kb+kILb83d22vNbDPgGvIva8Afr03KcUhdyOKjCKBbbgpBMRyrv/X1iLXd7GwTp51OQBF7UQ5y124suGIKkBvhoJnrmC49nImT6AZKYLj3stlQ88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sxnBBhHu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 740A0C116C6;
-	Fri,  6 Feb 2026 16:24:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770395074;
-	bh=zgebKyL0uzcvJEp7bf09ffJFJuVNdOLocqXxpzS72WU=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=sxnBBhHuMBfsMtFygAaHvujgtLuYa77VyCDsORO4yGkKHDnhsmcBAT7+YeXVkZN31
-	 QyVUCG9NFNgUv1gaR18MbSAdBsKh6MPRJja53/EXK0zGdnWFCt2zg7QZozfHFM0KjK
-	 chnNKXBTcTQPt5otUJkTkMJQ5rbzswOVCIsS5kCs2gU+lxiPt1tDqoPEU5+GOpO6vS
-	 etqcxYiW4D3oI+C1cTmjMHfq8qVI482zsRbPn7nsFCSgozFZ0oncdymFw2E0ttJZ41
-	 d+4FFWUqfFWNq9JEymMG+UDCm3HCDx4uFgFU9JQEtEIDkDJRFFIT/gRQI0zhbyaR7M
-	 DOI8h/WafiCGA==
-Subject: [PATCH net-next v3 2/6] net: sched: sfq: convert to qdisc drop
- reasons
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, horms@kernel.org, jiri@resnulli.us,
- edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
- atenart@redhat.com, carges@cloudflare.com, kernel-team@cloudflare.com
-Date: Fri, 06 Feb 2026 17:24:29 +0100
-Message-ID: <177039506943.2258217.14978587773203412149.stgit@firesoul>
-In-Reply-To: <177039500964.2258217.2989656069254156812.stgit@firesoul>
-References: <177039500964.2258217.2989656069254156812.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1770395488; c=relaxed/simple;
+	bh=CA0zXufTVCu8yovgyhZqUdx10x8GwI/gpxsU3x47Wok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jdiQVC8s8941AW2WibzUARLugb6lpV1pKwUAoV0OuXvATrEphplUM+9jC3KJuB6OJyJYMVG4C9a+nMLJNzDD5TlT5VVeede0JjWOotmv/1HBN+vfKEO+95Cvn3x33ClXhf0YQW9ta2auA0/EsHyU51dzsMSslmEK3rn9n1at+eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=PhTESns2; arc=none smtp.client-ip=188.68.63.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Received: from mors-relay-8202.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4f6zvB1ZM9z46k0;
+	Fri,  6 Feb 2026 17:24:38 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1770395078;
+	bh=CA0zXufTVCu8yovgyhZqUdx10x8GwI/gpxsU3x47Wok=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PhTESns2XqhoUnZ+MpXxGrdPz917NASiisM+uIIgqM8qT6RVPmoji5W0WrJX93n5N
+	 VEOqczFbTqrmZphL/6WLrbHR0Y13o5xLpSjG9KGaWIdRI0zqjudyHekaKF7r3x4N7l
+	 D0kDgjb7B8NDxuvO1Akwu2cbzpVYoA+DMY7LhxUWVJrbJk2IJ7L6sOMcT2IachGpEK
+	 1KZQiIO0LP/j0ugHHdcAakAmnjsRF5notollQQhkvK27JIil/YbZF+YXRgp6tpqEnG
+	 4iwkMkgWnel5A7svtlKq1K2efI0OQOpPlrZzEfJFlWn6APHBWgh6n9UXSIg/CjJQGP
+	 rtn+IzeRYkdIg==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4f6zvB0rPzz46hm;
+	Fri,  6 Feb 2026 17:24:38 +0100 (CET)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4f6zv91G4Kz8sWT;
+	Fri,  6 Feb 2026 17:24:36 +0100 (CET)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id EF9BF66F47;
+	Fri,  6 Feb 2026 17:24:35 +0100 (CET)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <b82d8cc1-2124-417d-95f8-5fed429e2d0e@leemhuis.info>
+Date: Fri, 6 Feb 2026 17:24:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] NFC broken on Thinkpad T14 Gen since 9c328f5
+To: "Lukas K." <kernel@0x83.eu>, linux-kernel@vger.kernel.org, krzk@kernel.org
+Cc: regressions@lists.linux.dev, netdev@vger.kernel.org,
+ Michael Thalmeier <michael.thalmeier@hale.at>
+References: <11b7567e-b9a4-4546-9b1c-bb9820bead0c@0x83.eu>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <11b7567e-b9a4-4546-9b1c-bb9820bead0c@0x83.eu>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <177039507652.2809654.1894967214230795230@mxe9fb.netcup.net>
+X-NC-CID: Bt98CjVrTXu9MdKvxaR1V7auDVmS08codIbbXfbktlRIwkJOQ3M=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257605-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257614-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[leemhuis.info];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[leemhuis.info:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4441810036C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,leemhuis.info:mid,leemhuis.info:dkim];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 7737A10076D
 X-Rspamd-Action: no action
 
-Convert SFQ to use the new qdisc-specific drop reason infrastructure.
+On 2/6/26 16:15, Lukas K. wrote:
+> 
+> from 6.17.2 to 6.17.3, the integrated NFC reader (driver: nxp-nci_i2c)
+> in the Thinkpad T14 Gen 4 (AMD) stopped detecting tags. This can be
+> tested by running
+> 
+> sudo nfctool -1 -p -d nfc0
+> 
+> Looking at the commits between 6.17.2 and 6.17.3, 9c328f5 (net: nfc:
+> nci: Add parameter validation for packet data) was the only one related
+> to NFC.
+> 
+> To see if that commit indeed was the culprit, I reverted it on 6.18.7
+> and nfctool is detecting tags again.
+> 
+> Since the offending commit merely adds some bounds checks, the root
+> cause may very well be in another driver in the NFC stack.
 
-This patch demonstrates how to convert a flow-based qdisc to use the
-new enum qdisc_drop_reason. As part of this conversion:
+Thx for the report. Seems Michael (now CCed) also ran into problems and
+tried to fix them, but looks like that effort stalled; but might be good
+to know if this fixes your problem, too:
 
-- Add QDISC_DROP_MAXFLOWS for flow table exhaustion
-- Rename FQ_FLOW_LIMIT to generic FLOW_LIMIT, now shared by FQ and SFQ
-- Use QDISC_DROP_OVERLIMIT for sfq_drop() when overall limit exceeded
-- Use QDISC_DROP_FLOW_LIMIT for per-flow depth limit exceeded
+https://lore.kernel.org/all/20260112124819.171028-1-michael.thalmeier@hale.at/
 
-The FLOW_LIMIT reason is now a common drop reason for per-flow limits,
-applicable to both FQ and SFQ qdiscs.
+Anyway: Given that the regressions seems to be known for a weeks now
+without a fix forthcoming I wonder if we should revert the culprit, as
+we are way past what Linus wants to see in a situation like this (see
+the "within a week" part in
+https://lore.kernel.org/all/CAHk-=wi86AosXs66-yi54+mpQjPu0upxB8ZAfG+LsMyJmcuMSA@mail.gmail.com/
+).
 
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- include/net/dropreason-qdisc.h |   22 ++++++++++++++++------
- net/sched/sch_fq.c             |    2 +-
- net/sched/sch_sfq.c            |    8 ++++----
- 3 files changed, 21 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/dropreason-qdisc.h b/include/net/dropreason-qdisc.h
-index db81b3471a65..b019a3a0a59b 100644
---- a/include/net/dropreason-qdisc.h
-+++ b/include/net/dropreason-qdisc.h
-@@ -9,10 +9,11 @@
- 	FN(GENERIC)			\
- 	FN(OVERLIMIT)			\
- 	FN(CONGESTED)			\
-+	FN(FLOW_LIMIT)			\
-+	FN(MAXFLOWS)			\
- 	FN(CAKE_FLOOD)			\
- 	FN(FQ_BAND_LIMIT)		\
- 	FN(FQ_HORIZON_LIMIT)		\
--	FN(FQ_FLOW_LIMIT)		\
- 	FNe(MAX)
- 
- #undef FN
-@@ -59,6 +60,20 @@ enum qdisc_drop_reason {
- 	 * congestion to the sender and prevent bufferbloat.
- 	 */
- 	QDISC_DROP_CONGESTED,
-+	/**
-+	 * @QDISC_DROP_FLOW_LIMIT: packet dropped because an individual flow
-+	 * exceeded its per-flow packet/depth limit. Used by FQ and SFQ qdiscs
-+	 * to enforce per-flow fairness and prevent a single flow from
-+	 * monopolizing queue resources.
-+	 */
-+	QDISC_DROP_FLOW_LIMIT,
-+	/**
-+	 * @QDISC_DROP_MAXFLOWS: packet dropped because the qdisc's flow
-+	 * tracking table is full and no free slots are available to allocate
-+	 * for a new flow. This indicates flow table exhaustion in flow-based
-+	 * qdiscs that maintain per-flow state (e.g., SFQ).
-+	 */
-+	QDISC_DROP_MAXFLOWS,
- 	/**
- 	 * @QDISC_DROP_CAKE_FLOOD: CAKE qdisc dropped packet due to flood
- 	 * protection mechanism (BLUE algorithm). This indicates potential
-@@ -77,11 +92,6 @@ enum qdisc_drop_reason {
- 	 * packets with unreasonable future timestamps from blocking the queue.
- 	 */
- 	QDISC_DROP_FQ_HORIZON_LIMIT,
--	/**
--	 * @QDISC_DROP_FQ_FLOW_LIMIT: FQ dropped packet because an individual
--	 * flow exceeded its per-flow packet limit.
--	 */
--	QDISC_DROP_FQ_FLOW_LIMIT,
- 	/**
- 	 * @QDISC_DROP_MAX: the maximum of qdisc drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 1ae254971326..d36da3918b55 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -580,7 +580,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		if (unlikely(f->qlen >= q->flow_plimit)) {
- 			q->stat_flows_plimit++;
- 			return qdisc_drop_reason(skb, sch, to_free,
--						 QDISC_DROP_FQ_FLOW_LIMIT);
-+						 QDISC_DROP_FLOW_LIMIT);
- 		}
- 
- 		if (fq_flow_is_detached(f)) {
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 96eb2f122973..efb796976a5b 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -302,7 +302,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 		sfq_dec(q, x);
- 		sch->q.qlen--;
- 		qdisc_qstats_backlog_dec(sch, skb);
--		qdisc_drop(skb, sch, to_free);
-+		qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_OVERLIMIT);
- 		return len;
- 	}
- 
-@@ -363,7 +363,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (x == SFQ_EMPTY_SLOT) {
- 		x = q->dep[0].next; /* get a free slot */
- 		if (x >= SFQ_MAX_FLOWS)
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_MAXFLOWS);
- 		q->ht[hash] = x;
- 		slot = &q->slots[x];
- 		slot->hash = hash;
-@@ -420,14 +420,14 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (slot->qlen >= q->maxdepth) {
- congestion_drop:
- 		if (!sfq_headdrop(q))
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_FLOW_LIMIT);
- 
- 		/* We know we have at least one packet in queue */
- 		head = slot_dequeue_head(slot);
- 		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
- 		sch->qstats.backlog -= delta;
- 		slot->backlog -= delta;
--		qdisc_drop(head, sch, to_free);
-+		qdisc_drop_reason(head, sch, to_free, QDISC_DROP_FLOW_LIMIT);
- 
- 		slot_queue_add(slot, skb);
- 		qdisc_tree_reduce_backlog(sch, 0, delta);
-
-
+Ciao, Thorsten
 
