@@ -1,190 +1,227 @@
-Return-Path: <netdev+bounces-257550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIavEg/uhWlvIQQAu9opvQ
-	(envelope-from <netdev+bounces-257550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:35:11 +0100
+	id oNa9FkLuhWnSIQQAu9opvQ
+	(envelope-from <netdev+bounces-257551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:36:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938FBFE2FD
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:35:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4D1FE368
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 14:36:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33C793055809
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 13:33:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0ACAC302495B
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 13:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69F63B8D65;
-	Fri,  6 Feb 2026 13:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822A539E6F6;
+	Fri,  6 Feb 2026 13:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="hOlhUdAE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kj1RJvvg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B574F3AEF4E
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 13:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770384838; cv=pass; b=d9yUsZcb4gRXSr7RTIMVyprOpvX62O96bsEUzeK6QGsg02ZqsgFgDwQhuHF6DggRApQmySPODqV1gg9cIAkWGpQLvJjo9Jo0MUDxG4y0XgLQ2bemWSw3SaiTaE3Pv/TxXE0vSuQt+wiU5CwLHIa5KbRsIroGOr+H31VjM1i/ZeM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770384838; c=relaxed/simple;
-	bh=36cAPXabIy/gLJhlRddUDA/lfFlJQdABCEPa/lxdOmc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OrlGjUh7WAM04cKuJF31ZXSvuqolR5e+lHD6GHRtUGjXGiWq7qePJWLID61i/K998BWmflU7mH1oChoOIvOn8iJVRW0maTZcICVukPblQlekJdfE2osN0KbYhIxwLQhe6UUXP2HeuCgdOoKtHiB+Cu7PCUF5lz4EbroCDQpAako=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=hOlhUdAE; arc=pass smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-81ecbdfdcebso508084b3a.1
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 05:33:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770384838; cv=none;
-        d=google.com; s=arc-20240605;
-        b=USpovhKxYl0ZwqMB5QEwIGtZOpMQaaPDBwrzE/3JbjHsG2Ls8pcQdPRjJ+zIrpcChu
-         9GIWk7gIQpnA9awwWR2Nw+mnuoF6A+uauvGtrE3mn60IMM5sWOI+Oyo4pxiLh1i0yhA2
-         cM9isl8ubDb7OpFKwvpKK5LwHzYUp0snL6BJXQ5amkhJnhIEGipOoc1Ybi/HilQdvkU6
-         pI4Nw9LeE0WbD/5bBgQRBJG47WuB56hU5bZDXPcBPUtgLb+Ojnm/9Dte2svfSIidhqlh
-         nAkJoDEu7ekm8Zrc4f+kwku9R4xAquDWTqGWZWJKdBTemBqybwzETaxAOBdQ0ZAii5bu
-         UwWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fBe47Hk5EXbn4cDbFpXmEVaFo4OhNBIsCpV63PIxSw8=;
-        fh=d+3f6aETxEoXe+mwwhE8QsEfm34ShqD7PJEAElCPobM=;
-        b=H3iHprl84XP1HcNwfpI0H3w3+G96mhbFKybyHDUKf/XCEZdPVe4LE0QuT082k7Zkul
-         g2n+GRdkjpEa8ivNvOo6NnONh3qSfnkRN1BUHE0OWo8a2eCLTEnPdS25Jy1O9Hm0MCEg
-         1jHJMWZ7smERC+yGfnf3Yw13bvroJvna5YJTxOkcmknCO6Am8Eh6OO341sZYAoeI8e1P
-         nxuF0lefwGH2WMwtu/qYSYRoOhEpLrxmLZTuXtxZCUwV8BEh43yhDMdvpB02RcLIPEnM
-         mAt4lBrRBXRAXDEgMtuos/mdM9UGfXjmx5oBsbtT8UUOjc7kbqHXhKkYoRrbl8DTAwoe
-         az2Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A41D14A8B
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 13:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770384864; cv=none; b=MmKEsPmSLtspRsyT5eahY0cS0aB3tGnCKIRgqZPFT+/TlncpWmg53HkiTdzz0YBIKQn+Vs5dYzSiUQb9OAQYmRHRcRzctbr4HiYzGw/39e+IfP+XmrO5kb4a+nCMukaAx+p7m2J7T820l7ASCXz5YZAvPsJ8QLoLspOgz2cFqEQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770384864; c=relaxed/simple;
+	bh=IuMyMRvNZUCfTkMLA4Wc42ZkPQ9Vq8ETpzgm2iGt9Ts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=as4+x4C2U9f4Jw9eAbYR2VAvrgpMD4BAAw9oTkrxFDXuMePDg0FTaKjMOKKGZXZBrJYzrYA3gKS2WVWi0kMhpLRsavfU9UEY/fv+rNdngeNnTGwIJ60N3l3rNbKV1wMXTGc1mPtbTtcJi6MIRhiBmRIkPb92+lHL8BTFsrBwDZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kj1RJvvg; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43614c6afacso298482f8f.0
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 05:34:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1770384838; x=1770989638; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fBe47Hk5EXbn4cDbFpXmEVaFo4OhNBIsCpV63PIxSw8=;
-        b=hOlhUdAEnDFFZCxjAoGXt5tJCNhjypcmFRNb4hmCdxsrIpVK9C+s1+T9AKcaAbJThw
-         aliejpOrvsZkFMI8/0xuzsDbYDbSX3Vtmkag/FRzw3HDtTm/3pQJNh63hztBlw/+mN9J
-         +Wnmx0pHc8IrujrFaPyGx2fv7NeoWcUMt7rVR6YA7hOrol6FMt7Ewt7yqUED+MR0ZvP4
-         Bg5PdsIawgR/1AFkVgHcYr5fWq8jDItM8nd1b4Kt1rJez6k5V96tpyNr5ui6zh+9+zAm
-         29nL0svFbUhDRfvm7xO7WU1CMXOL3PKtbYQu56OCTAuq0B0KqX7IJGIN/ijneVT/UtuT
-         HQ4w==
+        d=gmail.com; s=20230601; t=1770384862; x=1770989662; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lXkwLOFRlIih17A8fA8wgWqc3R7cmaWgMUZ9oqwSoYc=;
+        b=Kj1RJvvg2hZMTalbRjhB809HVri53KgZrLtKVI6IS0v+R8NGrax4oP8K1zp34MXsHE
+         kO69FyJFSBleSRI+1snYIFzYRLMimpwP8glRdTnuy2mqJL9xbVe7aRmHo4ESDOAuGbIm
+         8EP9EVz7fz7kv77IcLFg0eeea66eIDIoyscSGoDKIl29Tkr4uwA9fqx5XYwmt226/oiM
+         elS29fJ3KQ28IIqXRWwvFuTo9KA/y2Y4w44rdGlFEB0dV4rDOgpCRdaGcRuwFNrRiQd9
+         41yd+fuOutPDcXMoE9mwipcbmzL7FGbXXmnbdcUHi6jY0WYJcA8tFvwi9+7ClIDKswXC
+         EZ7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770384838; x=1770989638;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fBe47Hk5EXbn4cDbFpXmEVaFo4OhNBIsCpV63PIxSw8=;
-        b=uZvJ4WPn7AKFFx4fj+hA83UU+2f/7jbIFtYIGS7kUajR380r1zaGr5UTeshOrRLmen
-         xCLyecTyyjAQq7xIe3hC1aEvlYY+NgEK4a7x8arh9MsLvUAaJF+NTPGKaeA7XgpwVdAj
-         en2ZD1YdyzQ+d4p/sEjxDBMTZS6gEl2rUjKkaOJXO2Efuc7I11wtfub886b8dyCzCXpu
-         kfmw5dRuuI7vhwH2VPyzOl1CBG9cdajKwC1YzLuVMEV5Bg60UBhXvWgo14FL5wc+uzmt
-         DaIz5nz1d7JZ5DnUxaVC2nnt0mDoEoUWm9mRmjB1LvcMAhVKipRSKHtOtSJVlfMiiPAh
-         SDyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1BzrmDTZ8U3u6McTaBUw7B76MNI8JVR6djygtFo94+3CC+HL/1dUKM3CtRVeq+QEd7wCIiKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxODUGHFv5hYk/VlCzL/sbIuXZ2LUI6JspjlPuJJgFXjj/ZAb2R
-	fF9svWq0IMTQKprJ1M+M947/2lE12Nm3VI5nP+J8MlPFXjbWYzqNHNA0Y4c6F1A/ZmOZz3Ar2DD
-	TtL/H4zfwHaAHS6RFrDGnp73yGvJbzw7rltqrKqua
-X-Gm-Gg: AZuq6aI7xvj/wiT0SW4kzbBRhTjZGtA8a6tPMr+lsKmVoF99ZtmvwIrqn8V0hKAxPVK
-	PMAa3HX07QaGP11uZa+R6pkk7IeaTU+USLzD4j7xEh1nvqGtbzWbSyjpVWuhLjOWLTu5Dsy3kh4
-	yzq6X73Op9DVuVpn6tzcgvrAMnB99OtNf3Uchqa1UShTyjAQpWmxG4+89Fpdh2f2BZRKf9l+C7h
-	Tzbxc62FvHCmjp2jw7s+tXiBc792JGYpJGLxTvrsShAE88qTOqcJ4tJ/noGRF4KRTOW+LUPgiDs
-	o1U=
-X-Received: by 2002:a05:6a20:734f:b0:352:220d:e5fe with SMTP id
- adf61e73a8af0-393ad33a9f2mr2780918637.50.1770384838036; Fri, 06 Feb 2026
- 05:33:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770384862; x=1770989662;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lXkwLOFRlIih17A8fA8wgWqc3R7cmaWgMUZ9oqwSoYc=;
+        b=QBQDogvS+1uEUG5Zz9ax8/L3L8WikD+AaPWpTXTx7uu6ars6fcXnNK/QjXxdbo6ht2
+         96lWDAHxpW3A6M3Tgg5kbP06/SRi4UuU/TfhC5dF8PVM9Wwod6dBAxIlMaP9wisqjGHJ
+         oIl/suJxCrcuUvFvef8dsyUAjpM8xvm1SwMtTwVu3Mq6oJktwEGY2DqMfhqGZfL35pus
+         3MsFDixXZXfbRXGd2gmPPZvib1w+YIDQZHNt3E6RamrW6u8YvTv0VM5JhMorJ0xSyjic
+         wHeFBTxNRV7v0557BhKGNp4CqyB5LqU5dkqDV9hqGnGPPBiwuvGaAEeKD8SdqEIlBuPd
+         vP6w==
+X-Forwarded-Encrypted: i=1; AJvYcCXYDon9VxW10C3/KXmFcxVorYAdhebWSAOt1lMXz/GCH6VfH8pm5xhbJTeKw66NZys1TKstMQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgRWHeSF9CHWgVgbPjMbpy7Fl8kzb6vRCa3gl4U8uG6xGN1m1e
+	lKVAk/eIgaFSt6GZ351YV1Tb/MEaMG6DXrJvMaGgvj68gCCN8E88Ne9h
+X-Gm-Gg: AZuq6aJcGDBOYDAzsq1XFRcnC+7qftkCpIOZKb9moMRoSZT3XAmfaEGerbMan+73I3M
+	xO3BMrx9r3RycCvOxWecrgpdzGC8+HXlB/pJ76qIUDaxO8DBiSmtSruOUBEY2CeEv8VllXb3hG5
+	YpOZbg+XRBJu45hhhK/Paj+ddBchLsXJu8w0/G3DyPJNjGYdg0xnSZReHfh0JKTqgYVt0MFXPTu
+	etFMiKdsp6YIk0Jv5oCN8YE9xkksQ35vDPFWVawnR+cV909nGjfpNZiXZ3OoTl+J/WOsyItWPs/
+	JDK6hGBaTzpHCdCYqvW0ES1kKCc3QfYJ2oqWzSqFUdsAAasSdp/ljWXOdsBrmzBiJ5+7zAz5Jx6
+	gaD3DokJSh4yjycO5eBfTisDsugwREgzsNjfVgwBRkRcnsmjQULzd/Dk8/bhRzmc9lnctmZtXSG
+	uBVeU=
+X-Received: by 2002:a05:600c:4f49:b0:477:9a4d:b92d with SMTP id 5b1f17b1804b1-4832033a019mr26258435e9.5.1770384862226;
+        Fri, 06 Feb 2026 05:34:22 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:6d6c:e4d6:4ec4:ebd7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362974527fsm6382837f8f.31.2026.02.06.05.34.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Feb 2026 05:34:21 -0800 (PST)
+Date: Fri, 6 Feb 2026 15:34:18 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>, John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v13 4/4] net: dsa: add basic initial driver for
+ MxL862xx switches
+Message-ID: <20260206133418.vxui223u4d6jdpql@skbuf>
+References: <cover.1770211259.git.daniel@makrotopia.org>
+ <2da8267175bfe7b8ff92d67ba5aa88755fab1710.1770211259.git.daniel@makrotopia.org>
+ <20260205182117.41618f8d@kernel.org>
+ <aYVckqToPwzR75EO@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAM0EoMnseQw6H+a4wzhg7BkPJraFwN-=2x4FOSOUp5f7=XbyaQ@mail.gmail.com>
- <tuZof6471icLlkjecTuMCBxpZ5zJVhOeUv7lAK7MFwt3g7LfrH7ZFlbE5odrcbTFUukV6J8Dywy9daCrLI-kiY-_vpiABXStvdudLw-HXDI=@1g4.org>
- <CAM0EoMkD=3aRFq=tXijcop5tYsD4X_Ki0REcnj3x+w_C69MaFw@mail.gmail.com>
- <tRA-1eVt0Av_cRCmND6povnCqYiBpaOoilgpCM2qNbo3GIe6szAEIN1mI20gRjgf215ODBQJBfolBlBzyJ4en67AQVHhLt6QmtWlQUjLqfc=@1g4.org>
- <CAM0EoM=T4QiGB+_3jqWKYze_OrcsjYBy0UvckTiGtHkxSm6BDQ@mail.gmail.com>
- <JLZxnCN_V32FjW6UUERYLlLtbbzDCDUmB3LOJ8ovdzV5pbUuGMRKi8K7ebh1j2yDt1u3A0pc1y4Zjjsw6-c7zucKHasFnfvYjnZ7hvT7aR4=@1g4.org>
- <mFDC5blKe5Rmv7qtNQvSSWDJsCdSd_lgeq681gEcHlSg-i8Q3-ZJSDqZfQV4xWFou75jYXgndoO-OE_4-_JNxPtT8rOdAguM_Xwl-qX8B6A=@1g4.org>
- <CAM0EoMk75BJYQUXm7FDW=ZmRsUqib3L+9tEAL90q_+DreroeXQ@mail.gmail.com>
- <20260205203615.t3n3bbqmjscp2cnz@skbuf> <CAM0EoMnUm497YUZYbrYeqecF6JYzFbjauV8ACf-h8pjgOd2jdg@mail.gmail.com>
- <20260205221155.na4qrsuuuzpqo4hg@skbuf>
-In-Reply-To: <20260205221155.na4qrsuuuzpqo4hg@skbuf>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 6 Feb 2026 08:33:46 -0500
-X-Gm-Features: AZwV_Qj4ABtjS1zJ68_MjgmGn89Qhf8UaoYA4aONrd9mGUf4Vx6K6XiiqIvJQBs
-Message-ID: <CAM0EoMk8nd2XVCvKmakqN0fPsz3rYWfUwL7cJVW8rhntP5turQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: act_api: size RTM_GETACTION reply by fill size
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Paul Moses <p@1g4.org>, netdev@vger.kernel.org, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aYVckqToPwzR75EO@makrotopia.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257550-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-257551-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[1g4.org,vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,intel.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 938FBFE2FD
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BE4D1FE368
 X-Rspamd-Action: no action
 
-On Thu, Feb 5, 2026 at 5:12=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nxp=
-.com> wrote:
->
-> On Thu, Feb 05, 2026 at 04:30:06PM -0500, Jamal Hadi Salim wrote:
-> > Yes, this kinda answers the question: we are looking for something
-> > that serves as an upper bound for the control list.
-> > Does the standard explicitly specify that it is arbitrary - or is that
-> > deduced by lack of mention of an upper bound.
-> > Either way imo  we need to have a "reasonable" upper bound in the code.
-> >
-> > cheers,
-> > jamal
->
-> It doesn't specifically use the word "arbitrary" but it describes a
-> mechanism to indicate what the arbitrarily chosen upper bound is, if
-> there is one.
->
-> Specifically, clause 12.31.1.4 talks of a managed object for PSFP called
-> SupportedListMax. This is supposed to report the maximum values that the
-> AdminControlListLength and OperControlListLength parameters can hold in
-> this particular implementation.
->
+On Fri, Feb 06, 2026 at 03:14:26AM +0000, Daniel Golle wrote:
+> Hi Jakub,
+> 
+> thank you for looking into this driver another time.
+> 
+> On Thu, Feb 05, 2026 at 06:21:17PM -0800, Jakub Kicinski wrote:
+> > On Wed, 4 Feb 2026 13:33:19 +0000 Daniel Golle wrote:
+> > > +/* The switch firmware expects all structs to be byte-aligned */
+> > > +#pragma pack(push, 1)
+> > 
+> > "Byte-aligned" means..? Generally aligned means that it starts
+> > at an address which is multiple of X. All addresses are multiple of 1
+> 
+> In case fo the firmware running on this switch it means that data types
+> used in structures used as input and output parameters for firmware
+> functions should be aligned to 8 bits, without any additional padding in
+> between.
+> 
+> struct foo {
+> 	u8	var1;
+> 	__le16	var2;
+> 	__le32	var3;
+> } __packed;
+> 
+> It's size is 7 bytes and it looks like this:
+> 
+> .||||||||.||||||||.||||||||.||||||||.||||||||.||||||||.||||||||.
+> |  var1  |       var2      |                var3               |
+> .        .   LSB  .   MSB  .  LSB                         MSB  .
+> 
+> 
+> This is what the firmware on the other end expects, from all data sent
+> to it and what the Linux host has to expect from all data received from
+> it.
+> 
+> > We used you push back against blanket __packed because it's forcing
+> > all *host* accesses to also assume that the structures are unaligned.
+> 
+> Understand that in general, and of course know that using packed structs
+> without a hardware requirement of doing so needlessly wastes CPU cycles
+> on each access to struct members.
+> 
+> However, in this case this is a header file which exclusively defines
+> structs which are only used to communicate with the firmware running on
+> the switch. Using them for anything else, such as storing or processing
+> data the driver deals with internally is, very inconvenient because all
+> types are also defined as little-endian, so not only unaligned access,
+> but also endian conversion burdens every access (in the sense that it
+> burdens the programmer on little-endian machines, but the CPU as well on
+> big-endian machines).
+> 
+> tl;dr: This whole file is only API definition. And this is how the
+> firmware API is defined, and that's the only way to deal with that
+> switch.
+> 
+> (I would have preferred if they just exposed the internal 16-bit
+> registers of the switch via MDIO, and have asked MxL for that several
+> times, without success)
+> 
+> > The best practice is to pack only specific structs which need it
+> > and add compile_assert()s to make sure that the compiler doesn't add
+> > any padding.
+> 
+> Imho checking whether each of these structs is naturally packed (ie.
+> 8-bit aligned without padding between 8-bit aligned members) is prone to
+> human errors which only become visible when testing on the real
+> hardware, and hence complicates maintainance.
+> 
+> Other drivers which operate on similar APIs (many GPU drivers, for
+> example) also use #pragma pack(push, 1) in header files defining
+> external API. Also there all external API definitions are kept in a
+> separate file, away from any of the datastructures used by the driver
+> internally at runtime.
+> 
+> Anyway, if you really really want me to set individual __packed for each
+> struct which isn't naturally packed in this whole file, please tell me
+> clearly that this is what you would like, and I will of course do it
+> despite disagreeing with the reasoning.
 
-Very helpful details - Thanks Vladmir.
-Paul, maybe a nice number like 512 for something analogous to
-AdminControlListLength?
-The analogous OperControlListLength can be derived from counting the
-list elements.
-
-cheers,
-jamal
-
-> There is no intrinsic or universally reasonable limit on their count.
-> It depends on the required schedule complexity.
+When I created the pack_fields() API it was exactly for situations like
+this. It helps you keep naturally aligned structures in native CPU
+endianness while adapting to whatever quirks the peripheral you're
+talking to has.
 
