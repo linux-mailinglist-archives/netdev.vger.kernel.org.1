@@ -1,97 +1,66 @@
-Return-Path: <netdev+bounces-257484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLceILiVhWk7DwQAu9opvQ
-	(envelope-from <netdev+bounces-257484-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 08:18:16 +0100
+	id +HjOGiichWmUDwQAu9opvQ
+	(envelope-from <netdev+bounces-257486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 08:45:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6336FAE56
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 08:18:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA9AFB1A6
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 08:45:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D8E473001F80
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 07:18:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1A06A3002934
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 07:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C256E2EBB90;
-	Fri,  6 Feb 2026 07:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DF7342534;
+	Fri,  6 Feb 2026 07:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VqsTypsa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WttI+oYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8663E266B72
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 07:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E84334251A
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 07:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770362291; cv=none; b=i7oB0doPe8Qn6jli7qH6MxZb3fog7XfeustahxQ8Qg00bfhag4PQd4UG7Gt/SBe1bwyDHZ7HZgLAllvCCU57kNQ8IULFxO+quYAPEbeu3bKkU9ob5MdCc2oVE4jsVg4oUYZoYBPYD2LvNUBdl5WRyoNKOUpqOCOLWUnmaQAGGUU=
+	t=1770363940; cv=none; b=CmzzV0lMHPEOxFCxOiFvfSN4SNbLa3HVKGu0hS1QjkLhy8S4F1fFjaow5LsweD1lX/34Hzccq1Jg/nmxxk5OuQTWBmLfgsS0Vuc4p19SJuQQoEVWPWy5pbtyk02H1K8ALeWFBRok1G5P15Ipf/pCQOBlleyNHl5XBMlb3zcjla8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770362291; c=relaxed/simple;
-	bh=D1NGpPueV5ikgZjAQhEwikv1d6XuL86z97qEh4blo9g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S7huZRpoLna1EJyfcJMCEYCXdlAX8fJW7nZDDmdC9rEiPYywSRlsh18YeNBvrTCw7KlJIXabmyB0QpwEUs95R2qA/psiesfkk3Bd0tjXDQv/mMgH4zXaTawtaB8K2T4X7Bup6HK5ApYvC1xUxFJPpVRUl2YO0Mfn7wGAMmOFKFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VqsTypsa; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b81ebac5d6so2356556eec.1
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 23:18:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770362291; x=1770967091; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uAcAS6itCCUdJZBNZ7FOwqjOX6f/eCKZuoH9k6MbHEI=;
-        b=VqsTypsaSw7d9Dh7VjDOiV1Vp2x4rKUIon5aoaf4Ow3FZ+aaXEHe+mjynhxLFUnDMU
-         9y+Dr6sMGrcZQ91NNOIDJIDonLQDSDx17UyOkwNawVwLaLUjAQJ9djre0U2297YqaKCu
-         ZYcqXPOEH4ZF2WjZgS4ZMR9924qhDB4uofSqHd4Cma5FHxvPkzQ6oK0eScpxfdR5PCd4
-         PEeWyOk+NH1xTaf/MjA2QU6bA8HHp8dmfZ2Kwo96EQ+LhGtIEBsV7h3nZzxZYV7w28us
-         fYRVnGzRdU7E+9AW1aJZq7fFtKLFESvY+9oerqs+bX0Xns+F+e3aI07eA2TwSQbRvYhM
-         rrPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770362291; x=1770967091;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uAcAS6itCCUdJZBNZ7FOwqjOX6f/eCKZuoH9k6MbHEI=;
-        b=HbMg6IF5bS4BSQPDY41jj3joe9zEI7D77LpWChs1wrYMWx4wtXm5wsYtF3Gy7Lqgy4
-         +FmJ2JC0GiK4gtiYu2+hkFq3OlBx8/IdsY0jfz6JwqpwMa8d055qK3FuuSFzYCHIbLjK
-         2msv0ojcqRt+b+mawzZjI7EDLQi8jD61FI2RwlmTpyqPBIilAJiR0SY3lbi4HNIR50bj
-         gWoypbctx0KFVaL4/4u36KLEcWkn+DKHbYbtRukSIETmVPPS0sfU2xQiN9HMx3JQdO5i
-         jQWAZ1cRlMkSNgHMVtYHNPZ2Ubn8wrA0cJmY3ygeZsk9wQBGI+TKjUKfRH+KIElwY4ii
-         e7GQ==
-X-Gm-Message-State: AOJu0YxjgyhwnYSyIYJITvKQo/K14N7AhfI2uSgO7xyjsrx6fE+Tp35c
-	e2oNbKI5zVfZ7IL3MxVIX2m6gcdu7bSCIcIIdn6VpcC/GE/xpTDmnAtbsBM9+/b7
-X-Gm-Gg: AZuq6aLOBvJmUta+CLzUU9FqCdNdNjBwkDFBnD8FHUv9U048H4MivsIDNsdV58WM39u
-	DRTtP+C3BQfOktEin+rbpIOHonJnKfey3Fp6rwqSNZK3bPSxdxa1Wn3Hniw+BLJHTrZ+XALYxnT
-	PTc6OiNvjX/0JrT3YuyM4exWc7wmHQAAffrAG5aAo9tZ2nUu9JHfQ8XXUDi75YQUmUfTX/DAsHu
-	gP3uZy3ntCb7exRmP5ODt+xt0M2RvVPZ8+zMOkouygDHL3ZRACPRGzQ+Oh1JPiXn4La0CdN78QG
-	TpN4T0L341RTKpC9H9TO9iq3F6xWQvaUpbVNO9OJI4D3wWIn9ec1RjE1Qlo4HaHuzYtMSU+as+v
-	3BsnPGJqXnzsz6F2BH8ACuUOpOAKMpNxC9QnMI8vkOfU/vSeJzu4osZjNEUla+eV8VPU3ncyd02
-	29lXPic1VwzRT3M3hJEFOqpESbn0yxhhLle2GrT4DG+D5SFAb29InHIkwm3Zwffz2OmIZ1Y0UrV
-	vdRodrp7QDGifofPGMlwii6by1CRKto6wUxnB+MzC+KsipB+C57eE87JTiS8xf6tB20JClJImil
-	4jYJ
-X-Received: by 2002:a05:7300:d51a:b0:2b8:31e5:91b with SMTP id 5a478bee46e88-2b856830c4bmr889249eec.32.1770362290531;
-        Thu, 05 Feb 2026 23:18:10 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b855c7f5fcsm1107052eec.29.2026.02.05.23.18.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 23:18:10 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+	s=arc-20240116; t=1770363940; c=relaxed/simple;
+	bh=li9wXsAM0OTnT0JrucsW7xDzklW6/dn3tZgwrrukFME=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UmaJHw20FL1QlUc5SCpqUQZFNzl/oFfi++oMHyIPY32D/xR9snrzcYI6FRCvI+H+JXzEwyfd2CPDZt7JRbmfgrR67X0SesZ1/ZKmZfsChEoR05E2IifwbFxzEQA48bi/sliC23uKstVSdjnl072dXD/YJUhZIOm8Eps8phPmUSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WttI+oYS; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770363937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ThWMHpHlGFAEuR+nP5ko+S0h4veLJlnU4bBXy2Bf6qo=;
+	b=WttI+oYS/78hJcbBVaLTs8BKYJXaN+8igTQduKj9MDgqWIpWtj1kR2Ry/iaSEBYfMiYHkT
+	MX/s/1vfGihQX2Xf9ZVJks+vdoQ20zkAozXFWMBZPfuanCdS4FnncuW9o0m++e05Jl3R9H
+	yQdiTR16UxYKkpOHNzAuOit6KkMLlwI=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	stable@vger.kernel.org,
-	Mirko Lindner <mlindner@marvell.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
+Cc: jiayuan.chen@linux.dev,
+	Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+827272712bd6d12c79a4@syzkaller.appspotmail.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@kernel.org>
-Subject: [PATCH] net: ethernet: marvell: skge: remove incorrect conflicting PCI ID
-Date: Thu,  5 Feb 2026 23:17:14 -0800
-Message-ID: <20260206071724.15268-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Simon Horman <horms@kernel.org>,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Konstantin Khlebnikov <khlebnikov@openvz.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] serial: caif: fix use-after-free in caif_serial ldisc_close()
+Date: Fri,  6 Feb 2026 15:44:44 +0800
+Message-ID: <20260206074450.154267-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,73 +68,183 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,marvell.com,networkplumber.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-257486-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-257484-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A6336FAE56
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,827272712bd6d12c79a4];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email,shopee.com:email,linuxfoundation.org:email]
+X-Rspamd-Queue-Id: 7CA9AFB1A6
 X-Rspamd-Action: no action
 
-The ID 1186:4302 is matched by both r8169 and skge. The same device ID
-should not be in more than one driver, because in that case, which
-driver is used is unpredictable. I downloaded the latest drivers for
-all hardware revisions of the D-Link DGE-530T from D-Link's website,
-and the only drivers which contain this ID are Realtek drivers.
-Therefore, remove this device ID from skge.
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-In the kernel bug report which requested addition of this device ID,
-someone created a patch to add the ID to skge. Then, it was pointed
-out that this device is an "r8169 in disguise", and a patch was created
-to add it to r8169. Somehow, both of these patches got merged. See the
-link below.
+There is a use-after-free bug in caif_serial where handle_tx() may
+access ser->tty after the tty has been freed.
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=38862
-Fixes: c074304c2bcf ("add pci-id for DGE-530T")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+The race condition occurs between ldisc_close() and packet transmission:
+
+    CPU 0 (close)                     CPU 1 (xmit)
+    -------------                     ------------
+    ldisc_close()
+      tty_kref_put(ser->tty)
+      [tty may be freed here]
+                     <-- race window -->
+                                      caif_xmit()
+                                        handle_tx()
+                                          tty = ser->tty  // dangling ptr
+                                          tty->ops->write() // UAF!
+      schedule_work()
+        ser_release()
+          unregister_netdevice()
+
+The root cause is that tty_kref_put() is called in ldisc_close() while
+the network device is still active and can receive packets.
+
+Since ser and tty have a 1:1 binding relationship with consistent
+lifecycles (ser is allocated in ldisc_open and freed in ser_release
+via unregister_netdevice, and each ser binds exactly one tty), we can
+safely defer the tty reference release to ser_release() where the
+network device is unregistered.
+
+Fix this by moving tty_kref_put() from ldisc_close() to ser_release(),
+after unregister_netdevice(). This ensures the tty reference is held
+as long as the network device exists, preventing the UAF.
+
+Note: We save ser->tty before unregister_netdevice() because ser is
+embedded in netdev's private data and will be freed along with netdev
+(needs_free_netdev = true).
+
+How to reproduce: Add mdelay(500) at the beginning of ldisc_close()
+to widen the race window, then run the reproducer program [1].
+
+Note: There is a separate deadloop issue in handle_tx() when using
+PORT_UNKNOWN serial ports (e.g., /dev/ttyS3 in QEMU without proper
+serial backend). This deadloop exists even without this patch,
+and is likely caused by inconsistency between uart_write_room() and
+uart_write() in serial core. It has been addressed in a separate
+patch [2].
+
+KASAN report:
+
+==================================================================
+BUG: KASAN: slab-use-after-free in handle_tx+0x5d1/0x620
+Read of size 1 at addr ffff8881131e1490 by task caif_uaf_trigge/9929
+
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x10e/0x1f0
+ print_report+0xd0/0x630
+ kasan_report+0xe4/0x120
+ handle_tx+0x5d1/0x620
+ dev_hard_start_xmit+0x9d/0x6c0
+ __dev_queue_xmit+0x6e2/0x4410
+ packet_xmit+0x243/0x360
+ packet_sendmsg+0x26cf/0x5500
+ __sys_sendto+0x4a3/0x520
+ __x64_sys_sendto+0xe0/0x1c0
+ do_syscall_64+0xc9/0xf80
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f615df2c0d7
+
+Allocated by task 9930:
+
+Freed by task 64:
+
+Last potentially related work creation:
+
+The buggy address belongs to the object at ffff8881131e1000
+ which belongs to the cache kmalloc-cg-2k of size 2048
+The buggy address is located 1168 bytes inside of
+ freed 2048-byte region [ffff8881131e1000, ffff8881131e1800)
+
+The buggy address belongs to the physical page:
+page_owner tracks the page as allocated
+page last free pid 9778 tgid 9778 stack trace:
+
+Memory state around the buggy address:
+ ffff8881131e1380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881131e1400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff8881131e1480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                         ^
+ ffff8881131e1500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881131e1580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+[1]: https://gist.github.com/mrpre/f683f244544f7b11e7fa87df9e6c2eeb
+[2]: https://lore.kernel.org/linux-serial/20260204074327.226165-1-jiayuan.chen@linux.dev/T/#u
+
+Reported-by: syzbot+827272712bd6d12c79a4@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000a4a7550611e234f5@google.com/T/
+Fixes: 56e0ef527b18 ("drivers/net: caif: fix wrong rtnl_is_locked() usage")
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+
 ---
- drivers/net/ethernet/marvell/skge.c | 1 -
- 1 file changed, 1 deletion(-)
+v1 -> v2:
+Add Reviewed-by tag.
+Use correct Fixes tag.
+v1: https://lore.kernel.org/netdev/20260204081939.237738-1-jiayuan.chen@linux.dev/
+---
+ drivers/net/caif/caif_serial.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/skge.c b/drivers/net/ethernet/marvell/skge.c
-index 05349a0b2db1..cf4e26d337bb 100644
---- a/drivers/net/ethernet/marvell/skge.c
-+++ b/drivers/net/ethernet/marvell/skge.c
-@@ -78,7 +78,6 @@ static const struct pci_device_id skge_id_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_SYSKONNECT, 0x4320) }, /* SK-98xx V2.0 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4b01) },	  /* D-Link DGE-530T (rev.B) */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4c00) },	  /* D-Link DGE-530T */
--	{ PCI_DEVICE(PCI_VENDOR_ID_DLINK, 0x4302) },	  /* D-Link DGE-530T Rev C1 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4320) },	  /* Marvell Yukon 88E8001/8003/8010 */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x5005) },	  /* Belkin */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_CNET, 0x434E) }, 	  /* CNet PowerG-2000 */
+diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
+index c398ac42eae9..b90890030751 100644
+--- a/drivers/net/caif/caif_serial.c
++++ b/drivers/net/caif/caif_serial.c
+@@ -284,6 +284,7 @@ static void ser_release(struct work_struct *work)
+ {
+ 	struct list_head list;
+ 	struct ser_device *ser, *tmp;
++	struct tty_struct *tty;
+ 
+ 	spin_lock(&ser_lock);
+ 	list_replace_init(&ser_release_list, &list);
+@@ -292,9 +293,11 @@ static void ser_release(struct work_struct *work)
+ 	if (!list_empty(&list)) {
+ 		rtnl_lock();
+ 		list_for_each_entry_safe(ser, tmp, &list, node) {
++			tty = ser->tty;
+ 			dev_close(ser->dev);
+ 			unregister_netdevice(ser->dev);
+ 			debugfs_deinit(ser);
++			tty_kref_put(tty);
+ 		}
+ 		rtnl_unlock();
+ 	}
+@@ -355,8 +358,6 @@ static void ldisc_close(struct tty_struct *tty)
+ {
+ 	struct ser_device *ser = tty->disc_data;
+ 
+-	tty_kref_put(ser->tty);
+-
+ 	spin_lock(&ser_lock);
+ 	list_move(&ser->node, &ser_release_list);
+ 	spin_unlock(&ser_lock);
 -- 
 2.43.0
 
