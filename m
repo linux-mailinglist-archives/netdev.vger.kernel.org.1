@@ -1,180 +1,170 @@
-Return-Path: <netdev+bounces-257377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id zY/pC71GhWkN/QMAu9opvQ
-	(envelope-from <netdev+bounces-257377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 02:41:17 +0100
+	id iNdINMVJhWkN/QMAu9opvQ
+	(envelope-from <netdev+bounces-257378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 02:54:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79A3DF8FE4
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 02:41:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DA47F918D
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 02:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4539300F9E3
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 01:41:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A18330058E8
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 01:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A0D223DE9;
-	Fri,  6 Feb 2026 01:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFEE2550D5;
+	Fri,  6 Feb 2026 01:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CL69HGfy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JuOxFJ+4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DD41C84B8
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 01:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2827822068A;
+	Fri,  6 Feb 2026 01:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770342074; cv=none; b=VhEbJMW9dIRauSBm6p1fQmnL/RVinFJtPIQfFbgut1NbrBKrMW0e3VaLSGrcXgIvZ+Vrs5jsc/65/Illgm41ia4gPM1RQrYn67vqJ1A/fhdp4Jzh0T/zirPXFL1eu+ktxQQUQlSCiiK2UEumOLFVGNbBycwUsNo0qNqPlC3hqbk=
+	t=1770342851; cv=none; b=V7yybiSfSntVw+jsI5VL90i7UMhBmO2ftTz1N7O6wXeL68wipXnlUkcUph+f9N4yJIgxyuBTGxad0iyZwaKF+QljgTzeTmo8P07VLhUD9OkkMllhTEcWvxy7C7jJFpjlKk8itutyKv51+hikXBwHCeThaYuw7mNSkdGwM/mB6Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770342074; c=relaxed/simple;
-	bh=auq3YOW6Gc7GYmZn0/XGBUgGR+YC0M2tkeQ3yc1BTaA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QCfpZCSukOM2Dou8OoSIOlA+2p9AdEl8PyzO15jIjwZf0nXqnKSsrHWxLD6jhn/EWptPoeoOScpocETv+fP+GlfGGmHIg4BPHnC/WqNFioP7yQUjBoDPEBM8KciHP90Ph4F2KSfSZROUH5JLjo2Oqx7y1Rt4UssItHsRBIP/CKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CL69HGfy; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8887d6d237fso3185156d6.3
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 17:41:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770342073; x=1770946873; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=auq3YOW6Gc7GYmZn0/XGBUgGR+YC0M2tkeQ3yc1BTaA=;
-        b=CL69HGfyCNPftdJ/TxHJHQo5x39gjmb8WYJXPM57ut+mrHlsz5WFbT6HEuPpA+YHDU
-         mCdJqJ/3JKtJN9f63DXVaqicbMkoroNUyrEwDcTPGY1lgp7ITBrFdPDE+UqPwDZlaFpe
-         bTAK0g6K6RN245DEaaJNoW5zZE4Val1OMJ4msH8M7+9x1el8TrpwjKu4ejouSy/dG4Jn
-         /DVGBmPXybt0u6wFOSWQjBD4u1JhsBa0NcWQ5l9UAtQs3kbBQYEZ9TbHf22bEgmnxeA7
-         zVOLdpNUYuarEo2bZK8AdG6WtLSeg0v/zfLnCHnSS6KCXewz4hkgKHTuOWoZM4TQop8T
-         C0Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770342073; x=1770946873;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=auq3YOW6Gc7GYmZn0/XGBUgGR+YC0M2tkeQ3yc1BTaA=;
-        b=qYWmq/EIfjhPoxWR1UC/Yu+IhjHHuvqxuXmbvK/krV0Aaj62q3h8RaJD1fUj3etCUz
-         9hlDc0BJSSrnU+CrmVni3TyKeAqQJVu6qZCzgWE5yIhRznyYNmfRrk2GcFi2kpVeD+d4
-         4qwQHXxt5sZeUqSrlUggDT19VjmJiRyz+hS/4ElGkpnQ7apiq9y7nS1D0yPfV9IO5GwP
-         lSUTcY20NVZVXVTruzC8E77CYm0dVam5HW2u3XmvXKRgQiiQDxQ46MqwetVRX22n8ARZ
-         AhjrqLG24AgqSIclOeW8NQQOFt71Y/srS5bq72noEsz3HXMm9VVIyedJQ3aTtLk/4XSu
-         CZMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrrkFgluOYcoa+bBsWM47aD1c7fyUkcDU4v7riB52r9J1iQsvGl7TYMmQwbXScoWapBVSpW+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+xW3m3CFhYxqk1+RGn/DIAXm2RnaVAiSAYchTp7v+Y/dverAN
-	m+ReS3UJ1g5Bo5+7tc59VJ4vuq3Jri5Yuzew5IJICtNBxtoZsaKSXaZD
-X-Gm-Gg: AZuq6aIuevMiSpJ2+ytmlBStlQi8ga1roNooZyKQCiQNo8Mo296g9Iwix6d0u689TD5
-	hl54dP2YSnEiRP7dC10IwVFjIXDrY3tUOi4+Rd3ad5Ruswhy7yfhI5oEE5OeyxL5UMcjixXcKkt
-	wWR2xX67lzBUrGBQgjV8KZx88UkgaGuAbUpf6P4jDPav2X/yFM/xsFm5f7PGytDItv//SQ/fQom
-	/PJqVHhTfT6OcStHMQLFabdKCtgdCmEiixqq/p3ehwmE0NGQVilchSq2FqRJRXd1TUTGrQ7z2fd
-	3U5Mw5soUHdgOxQyOxiIViGVj34PDDtQMQ3KQx380vUkNyZhkprHxMAwzA2W8AWwLp3pnqmB3tz
-	L0M/gmOxD4m62vhv/cSs9oVJ+dz1rN5ZlDMsYqZMqCL4mw4f9JKPhs+ZZPmikNgOPH8Wb+IbxNc
-	I43MUo09uYMGYnOyC7g1oBXIjokPby2pXAv5/Aea+gKAfZMEogBhhs2Ts=
-X-Received: by 2002:a0c:e019:0:b0:894:f706:a5f2 with SMTP id 6a1803df08f44-8953cd8f0dfmr11937866d6.3.1770342072826;
-        Thu, 05 Feb 2026 17:41:12 -0800 (PST)
-Received: from ?IPV6:2600:4040:4476:3800:2d8:61ff:fe7c:5d59? ([2600:4040:4476:3800:2d8:61ff:fe7c:5d59])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8953bf38457sm8198896d6.4.2026.02.05.17.41.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Feb 2026 17:41:12 -0800 (PST)
-Message-ID: <cc269d9f-9a06-6623-e412-d04ecb7b4f74@gmail.com>
-Date: Thu, 5 Feb 2026 20:41:11 -0500
+	s=arc-20240116; t=1770342851; c=relaxed/simple;
+	bh=5J3kMshGAuQBNb43c32R/D42M6M9n/bqmLxIbWEwyAg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LfDOZMRpbX3ZqVENGd9cy26Qxz3hiDN19EtJHNwJb27s8d05pxpfLMOtQXcCV5wEIW3mAv/xVu8B5RCRInPfCZyv9mCOj3IJPcrwGZ7TIJEwFMhMcrGkZd1DjjSO451UOXcCBEPROgu2Xokq+Vhh8rqp7qbEntyE2PvGWZQeUWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JuOxFJ+4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E1E8C4CEF7;
+	Fri,  6 Feb 2026 01:54:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770342851;
+	bh=5J3kMshGAuQBNb43c32R/D42M6M9n/bqmLxIbWEwyAg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JuOxFJ+4wxUl1w911PrccY2p3Vmohj2BvL9fBMt1cWe/0L4OK4QPqbUd3fy94/Mcf
+	 6V43l4m0aLTlQSxxUxPf4hj17JW7JZD9P1/iHdt5D7QkKC1BGyK9z65SH09Z3oTCDa
+	 ljqWhIuXiDyG8kEJ3beU5HL6/T2d5rVuFWHTe1BLMi1zBxYS1LkEggFv9V4VuzlXnQ
+	 5t161dfkh7E3JuMKyLaOredWzSUQTmlQR2/7C1kgO0oycAUgZmLy1xr4hNfP8f7DWg
+	 haIZ33cCUoa8VVXPp6gxDSZhasWB8pxbjqzmfd+Irqyx6BD/kOUM6nRYyEwXYUqsHw
+	 xw2DRGYeSIzKA==
+Date: Thu, 5 Feb 2026 17:54:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, Larysa Zaremba
+ <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, Claudiu Manoil <claudiu.manoil@nxp.com>, Wei Fang
+ <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+ <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Simon Horman <horms@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, "Bastien Curutchet (eBPF
+ Foundation)" <bastien.curutchet@bootlin.com>, Tushar Vyavahare
+ <tushar.vyavahare@intel.com>, Jason Xing <kernelxing@tencent.com>, "Ricardo
+ B. =?UTF-8?B?TWFybGniiJrCrnJl?=" <rbm@suse.com>, Eelco Chaudron
+ <echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Toke
+ Hoiland-Jorgensen <toke@redhat.com>, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH bpf 6/6] net: enetc: use truesize as XDP RxQ info
+ frag_size
+Message-ID: <20260205175408.30ab72a1@kernel.org>
+In-Reply-To: <20260205134046.pggwyosutj7ggi4i@skbuf>
+References: <20260203105417.2302672-1-larysa.zaremba@intel.com>
+	<20260203105417.2302672-7-larysa.zaremba@intel.com>
+	<20260205005901.gnju3zmqimtgeu2b@skbuf>
+	<20260204173401.282899d0@kernel.org>
+	<20260205122953.lscemcctayrvszdu@skbuf>
+	<aYSP344FT-JlylwY@soc-5CG4396X81.clients.intel.com>
+	<20260205124638.hxzvjiocephzlrk3@skbuf>
+	<aYSZw4wbd-nvLTuD@soc-5CG4396X81.clients.intel.com>
+	<20260205134046.pggwyosutj7ggi4i@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] net: sunhme: Fix sbus regression
-Content-Language: en-US
-To: =?UTF-8?Q?Ren=c3=a9_Rebe?= <rene@exactco.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, netdev@vger.kernel.org
-References: <20260205.170959.89574674688839340.rene@exactco.de>
-From: Sean Anderson <seanga2@gmail.com>
-In-Reply-To: <20260205.170959.89574674688839340.rene@exactco.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.56 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257377-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257378-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,linux.dev,bootlin.com,tencent.com,suse.com,lists.linux.dev,lists.osuosl.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanga2@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[42];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,exactco.de:email,0.0.0.2:email,1f:email]
-X-Rspamd-Queue-Id: 79A3DF8FE4
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 3DA47F918D
 X-Rspamd-Action: no action
 
-T24gMi81LzI2IDExOjA5LCBSZW7DqSBSZWJlIHdyb3RlOg0KPiBDb21taXQgY2MyMTZlNGI0
-NGNlICgibmV0OiBzdW5obWU6IFN3aXRjaCBTQlVTIHRvIGRldnJlcyIpIGNoYW5nZWQNCj4g
-ZXhwbGljaXQgc2l6ZWQgb2ZfaW9yZW1hcCB3aXRoIEJNQUNfUkVHX1NJWkVzIHRvDQo+IGRl
-dm1fcGxhdGZvcm1faW9yZW1hcF9yZXNvdXJjZSBtYXBwaW5nIGFsbCB0aGUgcmVzb3VyY2Uu
-IEhvd2V2ZXIsDQo+IHRoaXMgZG9lcyBub3Qgd29yayBvbiBteSBTdW4gVWx0cmEgMiB3aXRo
-IFNCVVMgSE1FczoNCj4gDQo+IGhtZSBmMDA3MmYzODogZXJyb3IgLUVCVVNZOiBjYW4ndCBy
-ZXF1ZXN0IHJlZ2lvbiBmb3IgcmVzb3VyY2UgW21lbSAweDFmZmU4YzA3MDAwLTB4MWZmZThj
-MDcwMWZdDQo+IGhtZSBmMDA3MmYzODogQ2Fubm90IG1hcCBUQ1ZSIHJlZ2lzdGVycy4NCj4g
-aG1lIGYwMDcyZjM4OiBwcm9iZSB3aXRoIGRyaXZlciBobWUgZmFpbGVkIHdpdGggZXJyb3Ig
-LTE2DQo+IGhtZSBmMDA3YWI0NDogZXJyb3IgLUVCVVNZOiBjYW4ndCByZXF1ZXN0IHJlZ2lv
-biBmb3IgcmVzb3VyY2UgW21lbSAweDFmZjI4YzA3MDAwLTB4MWZmMjhjMDcwMWZdDQo+IGht
-ZSBmMDA3YWI0NDogQ2Fubm90IG1hcCBUQ1ZSIHJlZ2lzdGVycy4NCj4gaG1lIGYwMDdhYjQ0
-OiBwcm9iZSB3aXRoIGRyaXZlciBobWUgZmFpbGVkIHdpdGggZXJyb3IgLTE2DQo+IA0KPiBU
-dXJucyBvdXQgdGhlIG9wZW4tZmlybXdhcmUgcmVzb3VyY2VzIG92ZXJsYXAsIGF0IGxlYXN0
-IG9uIHRoaXMNCj4gbWFjaGluZXMgYW5kIFBST00gdmVyc2lvbjoNCj4gDQo+IGhleGR1bXAg
-L3Byb2MvZGV2aWNlLXRyZWUvc2J1c0AxZiwwL1NVTlcsaG1lQDIsOGMwMDAwMC9yZWc6DQo+
-IDAwIDAwIDAwIDAyIDA4IGMwIDAwIDAwICAwMCAwMCAwMSAwOA0KPiAwMCAwMCAwMCAwMiAw
-OCBjMCAyMCAwMCAgMDAgMDAgMjAgMDANCj4gMDAgMDAgMDAgMDIgMDggYzAgNDAgMDAgIDAw
-IDAwIDIwIDAwDQo+IDAwIDAwIDAwIDAyIDA4IGMwIDYwIDAwICAwMCAwMCAyMCAwMA0KPiAw
-MCAwMCAwMCAwMiAwOCBjMCA3MCAwMCAgMDAgMDAgMDAgMjANCj4gDQo+IEFuZCB0aGUgZHJp
-dmVyIHByZXZpb3VzbHkgZXhwbGljaXRseSBtYXBwZWQgd2F5IHNtYWxsZXIgbW1pbyByZWdp
-b25zOg0KPiANCj4gL3Byb2MvaW9tZW06DQo+IDFmZjI4YzAwMDAwLTFmZjI4YzAwMTA3IDog
-SE1FIEdsb2JhbCBSZWdzDQo+IDFmZjI4YzAyMDAwLTFmZjI4YzAyMDMzIDogSE1FIFRYIFJl
-Z3MNCj4gMWZmMjhjMDQwMDAtMWZmMjhjMDQwMWYgOiBITUUgUlggUmVncw0KPiAxZmYyOGMw
-NjAwMC0xZmYyOGMwNjM1ZiA6IEhNRSBCSUdNQUMgUmVncw0KPiAxZmYyOGMwNzAwMC0xZmYy
-OGMwNzAxZiA6IEhNRSBUcmFuY2VpdmVyIFJlZ3MNCj4gDQo+IFF1aXJrIHRoaXMgc3BlY2lm
-aWMgaXNzdWUgYnkgdHJ1bmNhdGluZyB0aGUgcHJldmlvdXMgcmVzb3VyY2UgdG8gbm90DQo+
-IG92ZXJsYXAgaW50byB0aGUgVENWUiByZWdpc3RlcnMuDQo+IA0KPiBGaXhlczogY2MyMTZl
-NGI0NGNlICgibmV0OiBzdW5obWU6IFN3aXRjaCBTQlVTIHRvIGRldnJlcyIpDQo+IFNpZ25l
-ZC1vZmYtYnk6IFJlbsOpIFJlYmUgPHJlbmVAZXhhY3Rjby5kZT4NCj4gLS0tDQo+IFRlc3Rl
-ZCBvbiBTdW4gVWx0cmEgMiBydW5uaW5nIFQyL0xpbnV4Lg0KPiBBbHRlcm5hdGl2ZWx5IHdl
-IGNvdWxkIGV4cGxpY2l0bHkgc2l6ZSBhbGwgcmVnaW9ucywgb3IgY2hlY2sgb3ZlcmxhcA0K
-PiBpbiBzdGFydHVwIGNvZGUgKEkgYWxzbyBhbHJlYWR5IGhhdmUgYSBwYXRjaCBmb3IgdGhh
-dCwgdG9vKS4NCg0KV2hhdCBkb2VzIHRoaXMgbG9vayBsaWtlPw0KDQo+IC0tLQ0KPiANCj4g
-LS0tIGxpbnV4LTYuMTgvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3VuL3N1bmhtZS5jLnZhbmls
-bGEJMjAyNi0wMi0wNSAxMTo1MDozMy4yODg5MDYxMzQgKzAxMDANCj4gKysrIGxpbnV4LTYu
-MTgvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3VuL3N1bmhtZS5jCTIwMjYtMDItMDUgMTE6NTU6
-MjIuNTQxMzg0Mzc3ICswMTAwDQo+IEBAIC0yNTUxLDYgKzI1NTEsOSBAQA0KPiAgIAkJZ290
-byBlcnJfb3V0X2NsZWFyX3F1YXR0cm87DQo+ICAgCX0NCj4gICANCj4gKwkvKiBCSUdNQUMg
-bWF5IGhhdmUgYm9ndXMgc2l6ZXMgKi8NCj4gKwlpZiAoKG9wLT5yZXNvdXJjZVszXS5lbmQg
-LSBvcC0+cmVzb3VyY2VbM10uc3RhcnQpID49IEJNQUNfUkVHX1NJWkUpDQo+ICsJCW9wLT5y
-ZXNvdXJjZVszXS5lbmQgPSBvcC0+cmVzb3VyY2VbM10uc3RhcnQgKyBCTUFDX1JFR19TSVpF
-IC0gMTsNCj4gICAJaHAtPmJpZ21hY3JlZ3MgPSBkZXZtX3BsYXRmb3JtX2lvcmVtYXBfcmVz
-b3VyY2Uob3AsIDMpOw0KPiAgIAlpZiAoSVNfRVJSKGhwLT5iaWdtYWNyZWdzKSkgew0KPiAg
-IAkJZGV2X2Vycigmb3AtPmRldiwgIkNhbm5vdCBtYXAgQklHTUFDIHJlZ2lzdGVycy5cbiIp
-Ow0KPiANCg0KUmV2aWV3ZWQtYnk6IFNlYW4gQW5kZXJzb24gPHNlYW5nYTJAZ21haWwuY29t
-Pg0K
+On Thu, 5 Feb 2026 15:40:46 +0200 Vladimir Oltean wrote:
+> > > I mean, it should "work" given the caveat that calling bpf_xdp_adjust_tail()
+> > > on a first-half page buffer with a large offset risks leaking into the
+> > > second half, which may also be in use, and this will go undetected, right?
+> > > Although the practical chances of that happening are low, the requested
+> > > offset needs to be in the order of hundreds still.  
+> > 
+> > Oh, I did get carried away there...
+> > Well, one thing is shared page memory model in enetc and i40e, another thing is
+> > xsk_buff_pool, where chunk size can be between 2K and PAGE_SIZE. What about
+> > 
+> > tailroom = rxq->frag_size - skb_frag_size(frag) -
+> >            (skb_frag_off(frag) % rxq->frag_size);
+> > 
+> > When frag_size is set to 2K, headroom is let's say 256, so aligned DMA write
+> > size is 1420.
+> > last frag at the start of the page: offset=256, size<=1420
+> >     tailroom >= 2K - 1420 - 256 = 372
+> > last frag in the middle of the page: offset=256+2K, size<=1420
+> >     tailroom >= 2K - 1420 - ((256 + 2K) % 2K) = 372
+> > 
+> > And for drivers that do not fragment pages for multi-buffer packets, nothing
+> > changes, since offset is always less than rxq->frag_size.
+> > 
+> > This brings us back to rxq->frag_size being half of a page for enetc and i40e,
+> > and seems like in ZC mode it should be pool->chunk_size to work properly.  
+> 
+> With skb_frag_off() taken into account modulo 2K for the tailroom
+> calculation, I can confirm bpf_xdp_frags_increase_tail() works well for
+> ENETC. I haven't fully considered the side effects, though.
+
++1, also seems to me like it would work tho I haven't thought thru all 
+the cases. We do need to document and name things well, tho, 'cause
+subtleties are piling up ;) Maybe it's time for an ASCII art
+for xdp layout?
+
+FWIW my feeling is that instead of nickel and diming leftover space 
+in the frags if someone actually cared about growing mbufs we should
+have the helper allocate a new page from the PP and append it to the
+shinfo. Much simpler, "infinite space", and works regardless of the
+driver. I don't mean that to suggest you implement it, purely to point
+out that I think nobody really uses positive offsets.. So we can as
+well switch more complicated drivers back to xdp_rxq_info_reg().
 
