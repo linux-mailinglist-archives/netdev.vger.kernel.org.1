@@ -1,109 +1,132 @@
-Return-Path: <netdev+bounces-257410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eENxCrxVhWmnAAQAu9opvQ
-	(envelope-from <netdev+bounces-257410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:45:16 +0100
+	id 4bvpGuhWhWkhAQQAu9opvQ
+	(envelope-from <netdev+bounces-257411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:50:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B229BF96A2
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:45:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82439F9706
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBCA63017079
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:45:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0BC11300461D
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023B9286405;
-	Fri,  6 Feb 2026 02:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C2C28D82F;
+	Fri,  6 Feb 2026 02:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1RLiyrN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFkUVksn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42C028507E
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 02:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6A91E3DCD;
+	Fri,  6 Feb 2026 02:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770345913; cv=none; b=cvtvg7C6my63lWdjlnJZ/pEdsM0UvTHU999Is/IRfytV2dKJJB2U/8OxQ3cBZ5HTHMYKZmKauc2UaExTTAu+Ad7aiJ4tNLk5mbkPh5F1RVaVCJF86YVCf9PDCC0n+9oj9uutn82K1I0eRTpYjuXViKZyd+v8WRmEHkjH4SKwymg=
+	t=1770346209; cv=none; b=Np0iBP5xCVmIjQ4pUGXHSL0R8rwBZV5IVF8yx9e9sHaWw7KDOrICJjLBpK1lhA8ZWwUvDAvKccYQG0d15rcspCYNfhR1uwWPnGh6uxVKRJR2tlHA8YxSMB+1O2i7pCwg+xX1FSU5woiUj/XDlDDYKSZD87OdRzpVHXtQcqYiKIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770345913; c=relaxed/simple;
-	bh=8CNFS45Oc0fm3+DqsFHXkg7W7FjbbaNCYL0QqeshuS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XypIGub1uD5KbOO2cg/NFX1lwbw9AKxR+z+SYRBhu3SgxGfJ43UP0I83toxLEHmtU/KC5MLQJT9+nuy5tUM1Ev1EO+iXX/lnBFCxa5jd+IpKyz+s1Fu/Ofl0uLV3Zi9EOtAcZF2NYcdFuRFS9PAOrFXbm7G5h7mf22MeOf621ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1RLiyrN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2263BC4CEF7;
-	Fri,  6 Feb 2026 02:45:13 +0000 (UTC)
+	s=arc-20240116; t=1770346209; c=relaxed/simple;
+	bh=RY/V4OENDXhQhj6d8j5wSyJo8Hi2YdIokwwYUY5c3WM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QrUbROp6JMacgnJgORIuSLjHZdZPfzj8EzkUKmF4Pk/B5eYNAwCBVGW//737p6EhcH5DMeIGvS0FW23B8W/21SV6PmF3T5FN+nfQ2f5mK1JJas03x8lqAWhYr76YgvwdBdA3gIs+bMXf/F19vx1OcuCelrRjJ70o5W4cF952Uq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFkUVksn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D2E3C4CEF7;
+	Fri,  6 Feb 2026 02:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770345913;
-	bh=8CNFS45Oc0fm3+DqsFHXkg7W7FjbbaNCYL0QqeshuS4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q1RLiyrNgSnu1Q5+gv9Dn4jjsdHtP4v53m7UmZDAOkqmPa16oaOgOcbjiV9wmMC6d
-	 qleJtbFbppNPT4jrn8b62II1SDA8guyxOkTJiqw7FxEOmjoXS4pNMD9aq7zjH+Oxo7
-	 qImlNiwobT3WSWO4I4XdtHHTsR6JEzVz7DxnctYzxqPGw0W074XoUSGbBijTto0+j5
-	 QqaNkb+1XBCnVlWwCYNvkwhOKIKlpROEIQfT+aS7lyG2cDs+o06zVbAFPa0Nj4DLnf
-	 VFI/ia35nhFB2+rqtXXCyqDTH3xJhHHPwrCmlzdkfcneEW396RVvdi22rLduemHSa3
-	 suxSCKKxtstxA==
-Date: Thu, 5 Feb 2026 18:45:12 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tom Herbert <tom@herbertland.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, justin.iurman@uliege.be,
- willemdebruijn.kernel@gmail.com, pabeni@redhat.com
-Subject: Re: [PATCH net-next v7 00/10] ipv6: Address ext hdr DoS
- vulnerabilities
-Message-ID: <20260205184512.306ec46b@kernel.org>
-In-Reply-To: <20260204225154.58245-1-tom@herbertland.com>
-References: <20260204225154.58245-1-tom@herbertland.com>
+	s=k20201202; t=1770346209;
+	bh=RY/V4OENDXhQhj6d8j5wSyJo8Hi2YdIokwwYUY5c3WM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jFkUVksnLypSjiYfU37J3LCSA7MM8qm+stk0VCris7P0DNgigv+mDuxSXzFnw55QK
+	 j2JzEhyzgonm8ZVhNhRd2YQtlAscnG7FLN3uzWDSGxiv5nnNEJGW6syBL8ATdYOdsG
+	 dU2Go4YpvikfpM4wlwG06TTs94Ikeb7ZrV5V33VSsNdw77LcjOw8rA9Sg7ko3UEBao
+	 ESXRB3JTXV0er7tvoKrI1qGdZPQgUqxwWKFp/4wJwBlkzMbJ4UH+1e0DrNsld1WRNU
+	 lxO58Gkfm7lJdv74UNDU1Ts5QkNOIKRQPeE1EqGUd8R8LJurJ+Imq7Q9EvL9g8SQO6
+	 APM4NFryblHXA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B1723808200;
+	Fri,  6 Feb 2026 02:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net/mlx5: Fix 1600G link mode enum naming
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177034620683.657894.2565367947070195735.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Feb 2026 02:50:06 +0000
+References: <20260204194324.1723534-1-tariqt@nvidia.com>
+In-Reply-To: <20260204194324.1723534-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, leon@kernel.org, jgg@ziepe.ca,
+ saeedm@nvidia.com, mbloch@nvidia.com, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, gal@nvidia.com,
+ moshe@nvidia.com, ychemla@nvidia.com, dawid.osuchowski@linux.intel.com,
+ shshitrit@nvidia.com
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257410-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,uliege.be,gmail.com,redhat.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257411-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B229BF96A2
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 82439F9706
 X-Rspamd-Action: no action
 
-On Wed,  4 Feb 2026 14:51:44 -0800 Tom Herbert wrote:
-> IPv6 extension headers are defined to be quite open ended with few
-> limits. For instance, RFC8200 requires a receiver to process any
-> number of extension headers in a packet in any order. This flexibility
-> comes at the cost of a potential Denial of Service attack. The only
-> thing that might mitigate the DoS attacks is the fact that packets
-> with extension headers experience high drop rates on the Internet so
-> that a DoS attack based on extension wouldn't be very effective at
-> Internet scale.
+Hello:
 
-Patch 10 never arrived..
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 4 Feb 2026 21:43:24 +0200 you wrote:
+> From: Yael Chemla <ychemla@nvidia.com>
+> 
+> Rename TAUI/TBASE to GAUI/GBASE in 1600G link mode identifier and its
+> usage in ethtool and link-info tables.
+> 
+> Reported-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+> Signed-off-by: Yael Chemla <ychemla@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net/mlx5: Fix 1600G link mode enum naming
+    https://git.kernel.org/netdev/net-next/c/215b53099b60
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
