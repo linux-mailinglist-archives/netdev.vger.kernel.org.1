@@ -1,262 +1,191 @@
-Return-Path: <netdev+bounces-257477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2M2ZBo2ChWnpCgQAu9opvQ
-	(envelope-from <netdev+bounces-257477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 06:56:29 +0100
+	id iDBFDEmHhWmdDAQAu9opvQ
+	(envelope-from <netdev+bounces-257478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 07:16:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D340FA7DF
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 06:56:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2830FA991
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 07:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1991E3001CF8
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 05:56:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4E423026585
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 06:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298A12EA732;
-	Fri,  6 Feb 2026 05:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="pbmIxOGH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6882ECE9B;
+	Fri,  6 Feb 2026 06:16:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011028.outbound.protection.outlook.com [40.107.74.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2CB2E9757;
-	Fri,  6 Feb 2026 05:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.28
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770357383; cv=fail; b=doC0XmgaTPmJ+sjoAXmNe2PTcuNtNWjBw3NGwxvd31D6HxjnYmZnF9I33k5QJwCWqzKg1oj6uTbpaDd5Z4slyszqIDY0qI1to4B0VbKzAvuWNAnInjrwPnGS3ySa+DI6qivLiZR+tMMXT3AplVhibQyRvxcHMQem2dS81ObOUIA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770357383; c=relaxed/simple;
-	bh=QyTPDbdeWDGB7CmjQI0WjBiUC5fOpxrjOagG6/MKsp8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KLuI+/WeWrcebcFpCm3QfIZ65lZENXku9GTjx3bFRgQqjEBMjNULh2jVdwzpIifKSXbV5h0/KWO5UUsDnVxKKC4e6/tHYaWedvE/JHta2B9IhX/2HnQHGi1DT2Q/rsRwU0DAJ3thojia/HJKL9U8CKmuW5zHqfuHO4s4a3xQbEA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=pbmIxOGH; arc=fail smtp.client-ip=40.107.74.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SwWvMrjOeraWSAJT3yJgOgKtHZuHLZD+sLsj6zTB/69Uc1gTQrSz/x1II4TU3qccn2IEfqP0Gy4nGUs/WIeD9tDVNuofMIrqOjxUoePMST+T5seIdsAVR2Jf7XVl+z1PVa5XtFCClqb8aD/mhGxKtb+Kxws+C5frpH/2rMSN9bOooGL6m9n9b1u8CuN6WyOSEA8nTGGtOC7hy8dmm4w1AyYk7pGWoUZkHzsTFP0dmyHUuD09QsXRF24RL0F2h5S6rldAG2UmcEsXMLw0kskVJVCGDNWAuhVqQ2DQxqtYfMtDz/cMVFjJug4PV8pUoIz9HeMY/UaiHcluKGhXha0a+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QyTPDbdeWDGB7CmjQI0WjBiUC5fOpxrjOagG6/MKsp8=;
- b=I3eMDREgPXEZg6ygdhzdxOiXomJdPWz7zc31BDoRbi67Erh/WrTObz7bmNLLp5ltpMLZ4AvQiD6K4EwhmQkE6Vg0vRbCPpzTEB/Jo2jl2bdYziLLHXQ7xxoXx0UNBSNdBirVnDRkr79mYOAlGPBtevNOc4ujRsChxAI8eHi3bh5Upi4KYcnrio4XznQqT1RnPw8P79r9VOWTH+FsOpekNJZ70LZfZ4pkIj2rrWMCR+svlIvzecdHzLF5fjgPowQaRtgdiaTNP0NgBo04gge414+RwmhzE7M6NIoiU9vLEMqliZSOt8EUxowyTAqb1UvJtwnZsLf6HYZSKGJQRBnwBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QyTPDbdeWDGB7CmjQI0WjBiUC5fOpxrjOagG6/MKsp8=;
- b=pbmIxOGHzsyqo1xbaBm7hu+RzbdKk8xkPGymwdIpwuGxXXUQ1Jjh2dHJwlvRiNJrT8R7XQ3fUOa18MmjTZrX9+sYtS9AzNSUTUlZAQGgo63Pbpz6/aB9K//BiiwWiTtdoY66zD4eOcGimRLNNaWPWBkiM2/WM0ufjxf+Lrfy39s=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by TYWPR01MB9709.jpnprd01.prod.outlook.com (2603:1096:400:231::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.15; Fri, 6 Feb
- 2026 05:56:17 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a%6]) with mapi id 15.20.9587.013; Fri, 6 Feb 2026
- 05:56:17 +0000
-From: Michael Dege <michael.dege@renesas.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikita
- Yushchenko <nikita.yoush@cogentembedded.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net v2] net: renesas: rswitch: fix forwarding offload
- statemachine
-Thread-Topic: [PATCH net v2] net: renesas: rswitch: fix forwarding offload
- statemachine
-Thread-Index: AQHclqRWEu5tfvE8tkWGA8MYssbwd7V0RboAgADnI/A=
-Date: Fri, 6 Feb 2026 05:56:17 +0000
-Message-ID:
- <TY4PR01MB1428209D62D2C8D38DE0C4C898266A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References:
- <20260205-fix-offloading-statemachine-v2-1-fafcf0c6eb1d@renesas.com>
- <20260205080720.7d59ef82@kernel.org>
-In-Reply-To: <20260205080720.7d59ef82@kernel.org>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|TYWPR01MB9709:EE_
-x-ms-office365-filtering-correlation-id: dc773763-d15a-4bb3-5021-08de6544720a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|1800799024|38070700021|7142099003;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?5XLPxo5GLou7Wx3P5OSUpEZNlsgUXLElKv2DOFEmpZ0Bk8vN8N8N+D2LI9vJ?=
- =?us-ascii?Q?NotZlMExjWNfzffQiS+xe0KUanmgUdiHlangsjalgyEv6KrTMEc/1g2bSg8y?=
- =?us-ascii?Q?JfmBb3RN62cpeFs40VfoIIAlpYHtDEeTpIPWRR403jaBiJwQcaEkOqfloMZi?=
- =?us-ascii?Q?xWcjzC+xsy4kx8XjF0hR4s5Tebubs34aT3sV1Y7P7p9t2RNiCn7L1XMOAsSw?=
- =?us-ascii?Q?XMwXTc6EER5jFu+T2oKrw9F5Xfr4K7XUbxl8zyGVP57fjr9fsJc5pdidg6sb?=
- =?us-ascii?Q?5GwtVKXRnt2A338sBrer9v4bZuHrlVOFYWCIp6gu5+A1Ln6cZL7U/U8priDf?=
- =?us-ascii?Q?OhqUUI3zm9hj5ukmaRwQ/hjMX7z8dkKLVIMlvRAr1JstnoCpEbPuq+oGpUj3?=
- =?us-ascii?Q?0h2XripJ0E+442LOPPVOfGjFJCsoZtE2ytbPDlcdhJXrBnM4cBMP6tZtEafg?=
- =?us-ascii?Q?wANOpVi8zZQChaYfK8QO/tMRhC0wPglc1waUM7xc5S99woDobqkYdfCNW1jA?=
- =?us-ascii?Q?xatxxxeKP1XZs3oQz3ymfkBLhgbhxgDTO0H+tlFANDf1ABrMvQd3SCGUlaob?=
- =?us-ascii?Q?Lfg/idFXqe3JGsQauP8N1yFVrNzC9HSg2ssacy/fH9NdvdWpmcCC6b4/fYiw?=
- =?us-ascii?Q?XwcIlGWsm1Jeimz3eP6CeEJ99cKf9A76etKMiDOBr8uwbXIV5vqDqvo2fQps?=
- =?us-ascii?Q?ficO9CdRJhkO6rffKIoUGohFdlWj4zU1YMpxornwhWwvtpku3kqzNUfMZakJ?=
- =?us-ascii?Q?Ej/wU+SXKE39WOJdZry4i2Enp9hYsf+xtjhJJ2bV9Ou6tBtxwrufZHgUYgxz?=
- =?us-ascii?Q?2v3FRKqVD+vFf5uJsp7aaLXXFxuP71pCxibK5dagSomtR4JPFHtdim5vWXKz?=
- =?us-ascii?Q?D/tU45QlbYHaieuTPnAVSwiMk+3NxO0q4An6F433gIol/vbXcRVSZhRaJexu?=
- =?us-ascii?Q?kOGyhVUtS3PZ9eaZl597ozHe0IeuOZqKtPir1a3Sqq8+FtesWNlr34KZTVxq?=
- =?us-ascii?Q?CE7FxlychjThIbWqGSni+0vTaxTZLx9kdrCjqPuUwX3w7mSGIpoUzik5Kjvx?=
- =?us-ascii?Q?VpAVKi27SItPguIf6TvwEw/sq+O62a5hueL0cWyuRsqZZUUk77AOmtqHSHM9?=
- =?us-ascii?Q?xkkJT11lXI0jXl1rB6AyyDXkhnj8RcGPnLnIpKTBAjsv1v1dGT+I8JSlAZ0t?=
- =?us-ascii?Q?1/sUi35+eLn4VvhMvyjUkb0QjItiUdy2xtv0Dqd1gFCPFn14crDVSKWc20YT?=
- =?us-ascii?Q?CDmtrZCV0TZz9DzNPBmMdQCXtKABnU01a5KMHkBqPB2COz9G46ndRoHursHD?=
- =?us-ascii?Q?QLqVEOa4XafHO5ZXPQrfkgEiQroKo59u+Ngl0NaN5aRWkn75GhBrhZoHWJTM?=
- =?us-ascii?Q?BPjukMJd48ohZa2JSNZQ6pLQcNMxM9y/0Er0UmvcXvYs5yEjALXOiXZgOFH0?=
- =?us-ascii?Q?ZbDXMk4OM1SYqG3JVMVgi67o/LFehEAFn7dpXghuWqOk7A9aiGmygDuPyElI?=
- =?us-ascii?Q?g32KriZsK+xaUxZlPXCK+HLbcQ9JkHNCeSn8sc3qyKUT4Hxczp/B5v5NlwU7?=
- =?us-ascii?Q?+I4Q3FUT9RSwQ/MmrpuTV8fYyWSJUukETotGQbkB2xXNzcV4bGyHMMeBWldB?=
- =?us-ascii?Q?g08pwpss/cZ0xxpcHIzoPG8=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021)(7142099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Rg+r8a2yzou+Mm7JeebvynkGVTIc28IACfDolTw6Xq6YZInc1fYFNn1YoHpV?=
- =?us-ascii?Q?t4M/vnRIk/oDW4XPLVEPTsEtjlGw0JaOofNtyAYZT9yBtHgxMTiXl1eIKhgF?=
- =?us-ascii?Q?NxNywkWcqFG3DYJEzyhB0ZTmexxNkgSyUWfPLLhSaqec3HU6w/cdy5d/g98l?=
- =?us-ascii?Q?r7Q88yB6zpc4IuYFTfBF/9wlGUalK9pUYNppS5128vCfGs7yYTda0j7o1ALu?=
- =?us-ascii?Q?+gahpNnOMrtSIABorKkD820ZVEFrubpbPJjUNCnbH16H8tl9VwzmXjx3OmIu?=
- =?us-ascii?Q?ooEi/w5NWl7r6xMU0xgvmXYRkRxChhHKbI8w7Ru/IHMtFipE/fkdBzFs8Nq7?=
- =?us-ascii?Q?y4T4kM3Cf1rGnSjaYwYi62kjgYECfB1mKKYBfqnAF0aqVgq7JFRBA/NLDeka?=
- =?us-ascii?Q?hoiEzm3UGUY0I+DR5ZmZqppuzGaw63LRBUBR5wapKuAUG/7YHC0i3+GEHI9z?=
- =?us-ascii?Q?iSH/uxjP6NKPPD4QhmOeAxxTyYP2O0tegXApyVUbS3C1xDn1jqsbvcsuvmVQ?=
- =?us-ascii?Q?I7UgMWuqCOFRxlUyABlZNtPV0G+1Sn4vxW0BcwMHH2MP7T2rBCcShLN6fHbO?=
- =?us-ascii?Q?xJ6U0CNAlYi8HA1gh42YHtaguszUDzxXz/SqV6AShJ70lMgFFsCC/i+cauB3?=
- =?us-ascii?Q?dEz6Ky+N7/iSmy0mMLstVG6pGgBkq6qwBpT0h9qVvhlfR3g06XW2VvaF/4ch?=
- =?us-ascii?Q?DrYDuBrILlPnt3hYc8gumaHJL6+sRjLQWd/Xx9i70QRZTjpdsD8ULipdSrOR?=
- =?us-ascii?Q?kG1xFdXT6R2xQfyueEnRUKiYCuADCsOcEhiHko6+Dr8j6/WzSOckOs5qQZ66?=
- =?us-ascii?Q?+6ssMKF4u84+NFv3/3FHJYMc41uJFVSkaHlJtgy7AaMflX+/6JESoxTmpf6f?=
- =?us-ascii?Q?OXMIjcmNdISa6YHx/PMEK+/aQg7gAD0uRd8yWV1JEJ9rlmgjvIO+17FUf6Mz?=
- =?us-ascii?Q?gcUlCjhaRpSvNNWVGyMQAanKaoKBRhyHYjGCT5dF6qcOvKbiO49e43olTT71?=
- =?us-ascii?Q?XY+g0ZiIhg730rGTWJXd3qXqUjgUgL+GQ91EaROs+KX9I4JduOoEu+To65aj?=
- =?us-ascii?Q?/VVdBnRlpd4Mh4wJQEsjeZN4jmqET2jnjFNv54ItAk2SpFJibN7wv1SwscV4?=
- =?us-ascii?Q?0MNQ2U31+ViBXDqhA9+jb10CQ42xOwATMaYNDYejRBMr9OM9aUEJpPJ8E6ax?=
- =?us-ascii?Q?3p9J+SvVEUa2JmDc2VarcpspnHcqkmbagHBCoX1lvVte3vL9mcXKBJ82Mu/+?=
- =?us-ascii?Q?z5wAAUE6u9Le8aS/wyPu/ABtj5ar7asEwBiqkI9+HtwhcTUQaDLm4IJchPvy?=
- =?us-ascii?Q?Dqucow/CPxqfw+Cpz5QZiXHoGvJqJ1XvcHnyVP7N3IranzHaCs27cRocQJIA?=
- =?us-ascii?Q?tTu5x0yQO2iFORzvg/JNlXFmLuAAzK21WXNlK3pBCTBN2c0dsUXU7X59IOGQ?=
- =?us-ascii?Q?p2aZSjbd925SkdOyUrhSQNs5frllDzL/HAW7pHY+qUQm8wL8xX0U7sb19A9z?=
- =?us-ascii?Q?s+nIDno5ZUf2RdbTrpwrtOaWd50eg40WPzZd/B7BTolEKH3n5fngltDWzhGW?=
- =?us-ascii?Q?8Yb9SkeSQ8mTu1s++S8qGRTl50gswzShrrm0zm5VwfFIZx4gJjouDQaFeP2m?=
- =?us-ascii?Q?6foRnlZXAHJH44Nl5hgrcowNKtuVcwPmVnM9QjgYkdn/9Fk49ro3NWFEUWAJ?=
- =?us-ascii?Q?ivKjlz2Beg4OdM/AF8UccDZwqljfLSW7UdKHGXAOnyM2xKXEhw4t8cCBN6wu?=
- =?us-ascii?Q?7GjEkE/TZQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB93A239E9B
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 06:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770358586; cv=none; b=XjxSWgAuWir6RPXjYsbLbDnU99o7qYOaUvVjafo9G0dMgijI9MNqLcrGY78xHIKIp5hste0kgeJ20gLykVsf8yILgqxchlfHEc7wi0B5M3yQu390oXySbXw4aztxi07Gv5vZ4ueT+mzi3CCjjtHIp9xlII8DzzThyHJr83r/dDM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770358586; c=relaxed/simple;
+	bh=4sW91DONuEZ2nAmyynltCSmDCpZ5X/Jb4bSRstGCYfM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Tjkvl3j3nmK/BadYZcjyaliw9d5XGa9fzNrp9UoDfhQ580ifD+ZPvEUu7n2e/fsSusrzmRQjGFri4RSPhTm6uh5e8HR4nHjjS+94EPBqYxMyzSBCwJZgvwana0soxeZgIkC+59LXUSR6kXp4CrJwHQlKwq/wXld8yinBfI1+7Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-66b70fffe1dso7248536eaf.2
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 22:16:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770358585; x=1770963385;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qix4/FgbsiFhyzHPSg9byFXxtny+dN9gBCfI2BW8FMY=;
+        b=fMd5qIzPQPKCkjUljnDFEY5Lj2UBb0r2w5sAOKYoU+8xQVXNKRhitkS+2X7x4SVk0o
+         uiV6yuoEIHOJ39o9ugZ6Rvs/7hLRkVPlrWQY2M1rmvaBMC/2qLVi4tVDz4munaTHp84+
+         PeO9PaebPING5jj4VAo1E8sCmgpQZVMaz57LIG886zDNnCmxkj34v5WUpNVCN81tds/m
+         8hHuafLT4a+3/LmUBKqdi6EqdPXS8qMmCenzexfsy1RCA4MunnjtZWqC9F/kmKqZs31l
+         mfQxz8RnYIuejEVW/Deqh+14V/LvR9Sr29aiWTztsU2o7NPH8jVtlgAqOD5TrhmYo/To
+         E8Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7MV6/7WUzgVEmx6BK7hNRkWmPuR96j1kTJ8vEhb3dCtk0/Pug0xmXV0vTreHNW+A+XuFIbqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEG3O2MBoobiE/O+Q/azDNM87QrYNLnVR/na4M96L/Z9LmPXTF
+	WvwOsBhPw3unhos8YTWFNwS24hqAbw7hgeCUr0wfHG+ZZaQ2Ytj61dUV6OCAIGHGu7Cm/U8d0Qq
+	OUBP2Kac2HDK2up2877oA508z6IE6Kmw3T6ySbWhe+pQTtvl7LgexO1ELXY8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc773763-d15a-4bb3-5021-08de6544720a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2026 05:56:17.8505
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: F2LOPhmd1uFB34hdwFXuskz7s+riQ8TssWCyeovGW5FM8OlGHRGgS+tG1gjNMjlrN2XqLTcqmjRO+qtN7ve6k7zEQ3zSVQ8V4kjzm6kdhgY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWPR01MB9709
+X-Received: by 2002:a05:6820:4de8:b0:659:9a49:8eaa with SMTP id
+ 006d021491bc7-66d0bf9e128mr808995eaf.46.1770358584945; Thu, 05 Feb 2026
+ 22:16:24 -0800 (PST)
+Date: Thu, 05 Feb 2026 22:16:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69858738.050a0220.3b3015.002e.GAE@google.com>
+Subject: [syzbot] [smc?] KCSAN: data-race in smc_switch_to_fallback /
+ sock_poll (2)
+From: syzbot <syzbot+198c20fde37cb9f6b0ac@syzkaller.appspotmail.com>
+To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
+	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sidraya@linux.ibm.com, syzkaller-bugs@googlegroups.com, 
+	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=8e27f4588a0f2183];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257477-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[renesas.com:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-257478-lists,netdev=lfdr.de,198c20fde37cb9f6b0ac];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,TY4PR01MB14282.jpnprd01.prod.outlook.com:mid,renesas.com:email,renesas.com:dkim,lunn.ch:email]
-X-Rspamd-Queue-Id: 4D340FA7DF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email,goo.gl:url,storage.googleapis.com:url]
+X-Rspamd-Queue-Id: C2830FA991
 X-Rspamd-Action: no action
 
-Hello Jakub,
+Hello,
 
-Thank you for your comment.
+syzbot found the following issue on:
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Thursday, February 5, 2026 5:07 PM
-> To: Michael Dege <michael.dege@renesas.com>
-> Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>; Andrew Lunn <an=
-drew+netdev@lunn.ch>; David
-> S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Paol=
-o Abeni <pabeni@redhat.com>;
-> Nikita Yushchenko <nikita.yoush@cogentembedded.com>; netdev@vger.kernel.o=
-rg; linux-renesas-
-> soc@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH net v2] net: renesas: rswitch: fix forwarding offload=
- statemachine
->
-> On Thu, 05 Feb 2026 14:35:21 +0100 Michael Dege wrote:
-> > A change of the port state of one port, caused the state of another
-> > port to change. This behvior was unintended.
-> >
-> > Signed-off-by: Michael Dege <michael.dege@renesas.com>
-> > ---
-> > A change of the port state of one port, caused the state of another
-> > port to change. This behvior was unintended.
-> >
-> > Fixes: b7502b1043de86967ff341819d05e09a8dbe8b2b ("net: renesas:
-> > rswitch: add offloading for L2 switching")
->
-> Please wait 24h before posting a next version of a patch per:
->
-> https://www.kernel.org/doc/html/next%252
-> Fprocess%2Fmaintainer-netdev.html%23tl-
-> dr&data=3D05%7C02%7Cmichael.dege%40renesas.com%7C22dc6b8fb523473170cc08de=
-64d0a6b3%7C53d82571da1947e49cb4
-> 625a166a4a2a%7C0%7C0%7C639059044486368599%7CUnknown%7CTWFpbGZsb3d8eyJFbXB=
-0eU1hcGkiOnRydWUsIlYiOiIwLjAu
-> MDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sda=
-ta=3DWN7Lp3B4q2jOl9REKdbaoVtL1o
-> Nr7%2FVME%2BPCJQxoPg4%3D&reserved=3D0
->
-> The Fixes tag is not in the right place here, it should be above your SoB=
- and the hash is too long
-> (consult the Documentation/ for exact
-> format)
-> --
-> pw-bot: cr
+HEAD commit:    5fd0a1df5d05 Merge tag 'v6.19rc8-smb3-client-fixes' of git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1070aa5a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8e27f4588a0f2183
+dashboard link: https://syzkaller.appspot.com/bug?extid=198c20fde37cb9f6b0ac
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-I will fix the issues.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Best regards,
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a09cd69509c3/disk-5fd0a1df.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f218ec1eb157/vmlinux-5fd0a1df.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8549229eee91/bzImage-5fd0a1df.xz
 
-Michael
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+198c20fde37cb9f6b0ac@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in smc_switch_to_fallback / sock_poll
+
+write to 0xffff888127398c18 of 8 bytes by task 14369 on cpu 1:
+ smc_switch_to_fallback+0x4ea/0x7e0 net/smc/af_smc.c:933
+ smc_sendmsg+0xce/0x2f0 net/smc/af_smc.c:2797
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x5af/0x600 net/socket.c:2592
+ ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0xd4/0x160 net/socket.c:2681
+ x64_sys_call+0x17ba/0x3000 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+read to 0xffff888127398c18 of 8 bytes by task 14367 on cpu 0:
+ sock_poll+0x27/0x240 net/socket.c:1427
+ vfs_poll include/linux/poll.h:82 [inline]
+ __io_arm_poll_handler+0x1ee/0xb80 io_uring/poll.c:581
+ io_poll_add+0x69/0xf0 io_uring/poll.c:899
+ __io_issue_sqe+0xfd/0x2d0 io_uring/io_uring.c:1793
+ io_issue_sqe+0x20b/0xc20 io_uring/io_uring.c:1816
+ io_queue_sqe io_uring/io_uring.c:2043 [inline]
+ io_submit_sqe io_uring/io_uring.c:2321 [inline]
+ io_submit_sqes+0x78a/0x11b0 io_uring/io_uring.c:2435
+ __do_sys_io_uring_enter io_uring/io_uring.c:3285 [inline]
+ __se_sys_io_uring_enter+0x1bf/0x1c70 io_uring/io_uring.c:3224
+ __x64_sys_io_uring_enter+0x78/0x90 io_uring/io_uring.c:3224
+ x64_sys_call+0x27e4/0x3000 arch/x86/include/generated/asm/syscalls_64.h:427
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+value changed: 0xffff88811a6056c0 -> 0xffff88811a606080
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 UID: 0 PID: 14367 Comm: syz.8.3658 Not tainted syzkaller #0 PREEMPT(voluntary) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
