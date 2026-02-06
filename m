@@ -1,222 +1,189 @@
-Return-Path: <netdev+bounces-257651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257652-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yP06CfFJhmmdLgQAu9opvQ
-	(envelope-from <netdev+bounces-257651-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:07:13 +0100
+	id +HKlIW5PhmlpLwQAu9opvQ
+	(envelope-from <netdev+bounces-257652-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:30:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77DF6103087
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:07:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B2F61031F9
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 21:30:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 886FA301DAC2
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 20:06:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AB5893013706
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 20:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3D62F6184;
-	Fri,  6 Feb 2026 20:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0097730EF67;
+	Fri,  6 Feb 2026 20:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="BNJVKLcB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cUM2ujHW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4529A2BEFFE
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 20:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEE32E3360;
+	Fri,  6 Feb 2026 20:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770408400; cv=none; b=nc1TJFoM6C6mw+zXBNIn67HBBC4GzfOaopxeSWRg6HpEkRB6MA1kp23ChdiP8n3Y+QMp4tYmeiBzwB/XM2h5JtTF4839dwQVW4pfoFpytWtZceU928GcqMMIJeW9K4sAZ2nkNRqtijL9rcNWi4UL25UAhrPIaSngIVTMnN8ctvc=
+	t=1770409824; cv=none; b=kxDwKJvhUbVndJipTKSlspHZig/h9MIPZ8X4VFHc0+LlhV3ULLY/PF8JY0NfPQWl00+4GIep6NgmIoGwptkzWxvsbviloLGrVYYvaQemqYyb+13ydYMxCIcrWychJDN+3plLy3wDRWXz9X6zuq3dlUOgeV6zug+kXzlldJx16d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770408400; c=relaxed/simple;
-	bh=ULUa21GO2iklmjg31M9THX5fuA3oUFiMhKC3xON5Faw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CNa77Nj3OAEFx3w1939BxUq0XNtJkBgI8QNkN5l7Os3ZICeK4VNGf/WPGczCQoFn6BiNyRs5L/aiYc5G29LSSjCAbxlgH7/1NMGZeaubyYDpbBzuHWpbQ29BY6vfpWaJcGLzCkg9XpoLaYD/8pLPzcebhywZiOQtVmHxsWq41uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=BNJVKLcB; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-48069a48629so22936325e9.0
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 12:06:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1770408398; x=1771013198; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PaNaMffxjIXphx0AHXkWa5X4Z3VPaJLNxZNxYe6XY2k=;
-        b=BNJVKLcBtiMgOQoZ6xdGQSiCI9uDDjuiCWxEd/kMdeAhZnd1VFDF2zGp2xHkxnbGKJ
-         Qrq7hncj0fMk1rSZ//hD8jdJEDXFXa4qWOHVQJqZrobl3MbqT24hclybLQdF1vOdeg5I
-         g4BXryFi5N8e5vFgAXBEo+7CSULqbBDR9GGiRudsFz91J1SNZF++elJ1chWD4xJCxBn/
-         B9FlWFtqCJmkzGB2lDHSiLdkyIFPDD9srFSLsZmJHUimx8Hz/QSJk7t1PilfhK+SUymQ
-         sFinoZNg0m/xwLUrnn/XQsWDR17+DKGmJS3euhQxz8xE5yMYVulLGib9E1pDMTJtU53d
-         tDSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770408398; x=1771013198;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PaNaMffxjIXphx0AHXkWa5X4Z3VPaJLNxZNxYe6XY2k=;
-        b=OZaDgyHNVSTkC/SIuMROIIfExR5v33xZgp6aBI0ds15/zg8WdQf6re2aeX4S6U+6zx
-         OO4zlHz4udCXkHj+NYnU2Sxih4xTwh22jtx58XUUtsWaAAFfE5XhLBagnfLdV453d6Pv
-         W4L4mr1m9TWTRDXASkUAqsiJyueeKvtamPjm3CRjQpBG7F4ebTqzuVhTdv0aJujtHgQj
-         MjfJZx0SqR8xkB7ll0AtjdG1nRkGPACq94QX130QaLqIler72g7IuIiEnn7J7rSyyTYw
-         YTPm4pwAhqjBNqbvq8yu/d4wFFjR+sBaI2EjEio347TRwxYue3UV3zUJIa40GfYkjzNx
-         E1gw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbAxZf5Yxjk/5O0cWXTG36nuoNaawpNQPOof/C0yHKTwoc8b5w13+8J/f9z1UXzZIAmcnxb0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKmZGMw7S4cc0AhbT592lFHOZAM/NzNOX/WN/O1XRkcV842RNz
-	OVkaI9X96tlYPiaXtH65892Uaan5H1hd+4O+fO9oSgz8zvHWuYjqjopUbfau559d5YNX6j+T4/F
-	gFzr1OSrTZPSBQUWGecWRBz82KEWmR9/TPFK6vp7gZNA5c3PU1Ic=
-X-Gm-Gg: AZuq6aImMFbqTPKRQkf/5biYyEuaQqmgt4bvHTTXTP9OhIVgecyuupfHeWvuFrnPt6T
-	NgsqBDpx4KYgGKzt1+DoFriThof+k8YuBs6oHUbOVsiM4B3Ge0ydROaHUhjbQyCo0q01hG9DT/3
-	pYhXO4sbt2cfuQRW15N0MB1NAuuoYr/kGWK2PNMKP0oRfJSHDavq7qBauL6/MjjJtYS9z6toTYz
-	+cRNgTp6F0tG6ei3574BVZfD/JbUc6cXDUf4yPCTB2rF0xkpcLGDpigHc6Pjorzr2urzj5KNOGJ
-	G3HvrNacRnaEgvljGe4jcgJmFaUOQN4FHoaikqn9iZRMJGBWeA0S0FubciPh+vRh7cj3yJCmIYW
-	zP1Ty19gN+d5n5Kjfr8H+rRqUnfKzvmb1aUHNOw3uhLu3XUKYRAU9XTNEgovWRaZX9QuEUmYyIm
-	HrQ5jdVgCHa6MWlIB/8fdXHippJT1Zipg8EU82J25sUeqKxsWwtg==
-X-Received: by 2002:a05:600c:34c7:b0:47e:e414:b915 with SMTP id 5b1f17b1804b1-483201dc5afmr58864775e9.2.1770408398550;
-        Fri, 06 Feb 2026 12:06:38 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:c364:c475:2c68:30fd? ([2001:67c:2fbc:1:c364:c475:2c68:30fd])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436296b25d5sm8626759f8f.2.2026.02.06.12.06.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 12:06:37 -0800 (PST)
-Message-ID: <9d240ea8-7e55-4be2-b99b-3f2657c5f8c8@openvpn.net>
-Date: Fri, 6 Feb 2026 21:06:35 +0100
+	s=arc-20240116; t=1770409824; c=relaxed/simple;
+	bh=F6qiAd1W7b6pCHC2KsNYFfi1Jkwo0gHfRQ7KZJeYncM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fos9hL8TKxhe5s21wjhuOwNzxhtTFqJ0hsKj7yzYE8WIW4NAuCqnXZCgGcIte7VYxOfRMD4v0brApZMhJHDDaLkg3mWceDfI+yvIcU5KGprcEIExDQdxIrFdeJNSuP8oXg6AbnDJ6u6P5+yr/qBwnmLIN33cRnZCRWopvMs0Fqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cUM2ujHW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4YHH0YAMAHnJ5UGh8pphcs9yAuxrmD7yQeFh/XrEM1k=; b=cUM2ujHWceUzMbW20cIxqA4llS
+	NkE8BDAwqzDmYlfweI9LHAUpWYlxzdrvLA5m1wdr0Z8+TZA5w10hCD+WxkQyEgPtUUEnq6GnJiU4O
+	wvjdWjQJfmNXBJtzVpEL8q07G8B+obm9lIEThmhNkdCtmQZUAGs0j8PRgQtQcGwV6VHukgdN4P25b
+	euMdVvZOmk2Z3Ol28RZgeWSFM2HOIFBjngDcaebtXbfDdzeloV790c2+Bj9G7f+PMqOWXBQQtPlVu
+	z9kyVPyVhCuw6ZoRtG+Uj33nOwDBjz95xY11XTce8Ny/irboMl+80x5OPmDmfd34eHK2NLxH/3c40
+	Rz9IKV0w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42876)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1voST3-000000008Oi-39Cq;
+	Fri, 06 Feb 2026 20:30:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1voSSy-000000007cx-01gv;
+	Fri, 06 Feb 2026 20:30:12 +0000
+Date: Fri, 6 Feb 2026 20:30:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jie Zhang <jzhang918@gmail.com>
+Cc: netdev@vger.kernel.org, jie.zhang@analog.com, horms@kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: stmmac: fix oops when split header is enabled
+Message-ID: <aYZPUx2WrIkPmvIU@shell.armlinux.org.uk>
+References: <20260206195643.11333-1-jie.zhang@analog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bug#1126499: linux-image-6.17.13+deb14-amd64: ovpn NULL pointer
- dereference and lockup under heavy load
-To: Salvatore Bonaccorso <carnil@debian.org>
-Cc: Jon Penn <jpenn@bentonvillek12.org>, Sabrina Dubroca
- <sd@queasysnail.net>, 1126499@bugs.debian.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ralf Lici <ralf@mandelbit.com>
-References: <4be2e796-77ba-4864-a288-e6edf3b7de12@bentonvillek12.org>
- <176996279620.3109699.15382994681575380467@eldamar.lan>
- <be2d036e-42eb-4d3a-be1d-60c49801b884@openvpn.net>
- <aYYwvGbStTFvof4E@eldamar.lan>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <aYYwvGbStTFvof4E@eldamar.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260206195643.11333-1-jie.zhang@analog.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257652-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257651-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[vger.kernel.org,analog.com,kernel.org,intel.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,bootlin.com,nxp.com,synopsys.com,st-md-mailman.stormreply.com,lists.infradead.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.988];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,openvpn.net:dkim,openvpn.net:url,openvpn.net:mid]
-X-Rspamd-Queue-Id: 77DF6103087
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[analog.com:email,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B2F61031F9
 X-Rspamd-Action: no action
 
-Hi Salvatore,
-
-On 06/02/2026 19:19, Salvatore Bonaccorso wrote:
-> Hi Antonio,
+On Fri, Feb 06, 2026 at 02:56:38PM -0500, Jie Zhang wrote:
+> For GMAC4, when split header is enabled, in some rare cases, the
+> hardware does not fill buf2 of the first descriptor with payload.
+> Thus we cannot assume buf2 is always fully filled if it is not
+> the last descriptor. Otherwise, the length of buf2 of the second
+> descriptor will be calculated wrong and cause an oops:
 > 
-> On Mon, Feb 02, 2026 at 09:26:16AM +0100, Antonio Quartulli wrote:
->> On 01/02/2026 17:23, Salvatore Bonaccorso wrote:
->>> Control: forwarded -1 https://lore.kernel.org/netdev/176996279620.3109699.15382994681575380467@eldamar.lan
->>>
->>> Hi Antonio and all,
->>>
->>> In Debian we got the following report from Jon Penn using ovpn,
->>> reported at https://bugs.debian.org/1126499
->>
->> Hi all,
->>
->> Thanks a lot for the report!
->> We have a fix for this issue in our pipe already - I'll forward it to net
->> ASAP.
+> Unable to handle kernel paging request at virtual address ffff00019246bfc0
+> ...
+> x2 : 0000000000000040 x1 : ffff00019246bfc0 x0 : ffff00009246c000
+> Call trace:
+>  dcache_inval_poc+0x28/0x58 (P)
+>  dma_direct_sync_single_for_cpu+0x38/0x6c
+>  __dma_sync_single_for_cpu+0x34/0x6c
+>  stmmac_napi_poll_rx+0x8f0/0xb60
+>  __napi_poll.constprop.0+0x30/0x144
+>  net_rx_action+0x160/0x274
+>  handle_softirqs+0x1b8/0x1fc
+> ...
 > 
-> Do you have patch already which you would appreciate if Jon Penn could
-> test and maybe add a Tested-by or is that not needed at this point as
-> things setting already?
+> To fix this, the PL bit-field in RDES3 register is used for all
+> descriptors, whether it is the last descriptor or not.
+> 
+> Fixes: ec222003bd94 ("net: stmmac: Prepare to add Split Header support")
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jie Zhang <jie.zhang@analog.com>
+> ---
+> v2:
+> 1. Update for the latest net HEAD
+> 2. Reduce crash dump message in commit message
+> 3. Add Fixes tag
+> v1 link: https://lore.kernel.org/all/20251202025421.4560-1-jie.zhang@analog.com/
 
-This is the patch:
+I was trying to work out whether this was a re-post of a patch that had
+already been merged and it was the result of someone inappropriately
+re-posting old patches, or whether it was something to take seriously.
 
-https://patchwork.openvpn.net/project/openvpn2/patch/20260202132309.567382-1-ralf@mandelbit.com/
+That is because of this in the patch:
 
-Jon can definitely test the patch and give us his feedback.
+> +	/* Not GMAC4 and not last descriptor */
+> +	if (!priv->plat->has_gmac4 && (status & rx_not_ls))
 
-However, being this part of the code very critical for socket handling, 
-I am still spending some time with Ralf and Sabrina to make sure we are 
-not introducing any subtle bug/side effect.
+Commit 26ab9830beab ("net: stmmac: replace has_xxxx with core_type"):
 
-In any case, please feel free to test so we can confirm that the problem 
-you reported is truly the same as the one we were already investigating.
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 99022620457a..151c81c560c8 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+...
++       enum dwmac_core_type core_type;
+...
+-       int has_gmac4;
 
-Thanks a lot.
+So, has_gmac4 no longer exists, and hasn't done since October last
+year.
 
-Regards,
+Thus, it seems your patch has been generated against an old kernel.
+As you are submitting for netdev, it is a good idea to ensure that
+patches apply to the net-next tree and/or net tree depending on
+which one you are targetting, and have been tested against that
+tree.
+
+Thanks.
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
