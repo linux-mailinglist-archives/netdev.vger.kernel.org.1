@@ -1,173 +1,288 @@
-Return-Path: <netdev+bounces-257519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8MgdM8LDhWnAGAQAu9opvQ
-	(envelope-from <netdev+bounces-257519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 11:34:42 +0100
+	id 4NXTL0XEhWnAGAQAu9opvQ
+	(envelope-from <netdev+bounces-257520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 11:36:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C771FCB00
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 11:34:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D5DEFCB3D
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 11:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 13A43301243F
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 10:34:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A15F23011F1B
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 10:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C697376BE1;
-	Fri,  6 Feb 2026 10:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F8F377550;
+	Fri,  6 Feb 2026 10:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="ZxYieJ6t"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="IoGE6Iz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8850537649D
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 10:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770374067; cv=none; b=li0HWw2/sr0jOTGrbm8lgXwp6vgqoCpgBJsTpatub4WZvZ1tp4EjWqJPBgW5SaDVI2sHriO23XGX1LmmnmZKTEHMr8bvFGnTFv1j9qawSrm8rmzNStPX7jwANmVh3bCBL06ruqmBVq6WfUOq2Rak+FDgGODeqYClxZ0AcusNn8I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770374067; c=relaxed/simple;
-	bh=6OnxLe8EyUUzTBtYYOFz/C0thedtH48VjMALAeoKO+Q=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=sNcJATWy68thlDFwuRe1SYMlZTmhXFiSEDs09dGtgLpnf0/OL6ypxw2irXM1yFGohbBy9av1lvVi+IEKzaSdhmtkJaA4Jm7+T372juDdyrG06fvKUMAnSExIAfgPnov3q9ooiR8PTaoWyPt39tlmwi9mKSh+n+RnTPd0Tl0tJG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=ZxYieJ6t; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4362cdf1d5aso309312f8f.0
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 02:34:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBE8376BF4
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 10:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770374209; cv=pass; b=nnujj5EhSaeFGGON9nZWuniBXc8hkZqOnpfYxIqVmLaD0TZoirDD2djEoWKa73JH2y3JXDt9r3uX4AenS3x206Bwr8brP33ZxvoLElfrVbTESaJJ1lG4Znxux4ygABNA7PBT8AdzF3d+dWGef0d3b+5gNZpo4rc2BL4UWyowMpQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770374209; c=relaxed/simple;
+	bh=GwsZMQ3i1go4w0scHZ+m1mBsqJNxv0WunqabD0BSZyU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tttDI5UGH2CWIkuQ9+1SZvUwc8LM2sg3kuKMG1ILoO9EmSXMdCN31AFq4DSGXRS3qdHWaanLrzqVltIoT0981ItMOKebKpNSgJKzH+OJx87tSkLKnHIY8sBwt14T+3i0+xaMEUulE97zQxAJ1SXctY2N6N4DqQReqfNh1awHKxk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=IoGE6Iz3; arc=pass smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64ad019bbd4so201756d50.0
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 02:36:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770374208; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hBqM4l8lt1btPLgbn6u2esxUFQMwO3/1BDX1JLu86odjGiZ+y5AMHHiiPvn0OQhNZv
+         tMYF6QhpZzy3NQ4ebN+exrIpaTw4XAvQXL9moKW+yDZmsZme5QS8UlNDq+ltTG9mgqA9
+         k4Qvg7992bjRDTjzoNwLQvl4veuHtfYFcgaJmlGW7uJIDAbNXEsHJObrPlwTR1W/edYm
+         UsoExVRZILWSGo2wrhfSoUkqosADtV537+lbnfGYPO4+vuIQyzcqKJIoBbwNNW7SwV8m
+         vbXaWR8cpaQZO7dDKjS+x/xUYE7LPASHe8DPGKhTFrVgCKhUom+Nn8pjb9FwQgZ/44Xj
+         KIHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=PzGmXVQk3J2sigNGOODPHGi+on8K6hw6Su0XUOZ0YCk=;
+        fh=L6cwG5bHTvf5KLOpODUXH7JF1/MLiDXrne5T87+y8as=;
+        b=imHgK1BSy09Gk2lig7O9bm7u16zS7PT7tu0JLMKwSlHM5R3i6igLLawjyZUtzIc1zX
+         y/jeCVo8K9MlhrwkqMKxdh9IjdkTELlJafgLemMVX6M9Utkqhl8NSfYjfafy5i+9a0vY
+         auQ98+6NgGYb+JjjTXqMq8aVHEWZoo14i6gVF4ld/UCb6bAbrx9+7i+Q3zppDV683tPC
+         +vKsmU/EQD5XHQwVlMOc3SGYBP3Bi2oa/hmLgU5gkv0Dx4lLSj67P9qH2Eti0oxGLiTX
+         Z+o+iOJlFxL80Kw4l62YKccsL7KEzEyyoMXm5GkseovbFzN4OKqZDXzoSDn6TUdYUUA+
+         AuXA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1770374066; x=1770978866; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LHMkTXnKnNt0ryQWtQStRCNfgK5XQzWzGDoLk6H5Ljo=;
-        b=ZxYieJ6t9/kKFV9cSCpsBnpD/AjNohF2pqdWq8gNE+6SAftrNeRe1wgkU57a6caobi
-         7ei0MucCaK6rGA4SBne2eAwJAB6/hUcO1nYrCtEzusI3YUsOE17kE7cLG2HhyEIx/bcU
-         AUjyKwp0Ja1+he387ixfQHzLZwUnKLXAPsL7o8fnRL3ejORObukWtQtI2CFyhm46G+RO
-         /qrZxlTifatGzg2Q5C2hLRVHIQK/EZ+jdYAIcMLRJuREovcPu+/c6cBo8dls7S3T1TsG
-         n06hpngRDy8FAvSbYEt/fUHAWg851d6fCFqursDW1e/E7GpRN2KxPVlHaGdiOw1I/KrG
-         VO6A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1770374208; x=1770979008; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=PzGmXVQk3J2sigNGOODPHGi+on8K6hw6Su0XUOZ0YCk=;
+        b=IoGE6Iz39HIcqxPJkxs72Xo6G1dxaxsbmYq+DxPMgNjCUzVO6S9uarwHMTVx05NqZ8
+         e5H/oWiVwQk1mc3+h2pLIJI4O0jXcAL5BaXphVHTIFMwckagUfR2zeY1or8jOed7Drgf
+         qzAqkByF2Io20Xy6MOvU91q7VZBOkn/2Xuo4G74UCArPXWhfYITGBOxa5RlD5VE1YY7l
+         40Y23CwkglFURxOh9XOqdTd9oMIbcvSVd15l+P0byOpKYEycQztBSUM/BQW1Cl1w2QKE
+         9BVFECa+ZlGa9mGqAN2Mp4JmK+ieUt7+tfgReOrUKuZ95RJqN36zLuveX2h/UYfdjpD1
+         +r5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770374066; x=1770978866;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHMkTXnKnNt0ryQWtQStRCNfgK5XQzWzGDoLk6H5Ljo=;
-        b=HFQkdJslgCvyAD7Rf/XUEK0zmXuKW29xYRiCTz4elbqAqDQOc507CF/7oJ2IDom67g
-         33SlnfymNmk3RomIlk5U/Wiy5nrpQPO6+hY2nOygSQE1dKI5cDXiFbzroIQEobzcOX+3
-         3fPcBhqwebRh1tERP1sTjbLbc1Q6XoriNZbzE0i+wtfZTaO/I0EAbDU4NQ7DS061pHpz
-         vEOoaxjLUmnsT9ow7gme4jfDhx/ROYZghOR/ybfe+SbSLh9I1IJwz7fSuSVXNUNMONtr
-         IYzJlcLqmD/3b+pDPEqTC0dDXrP4X6n/DSTZHcqQ3SZkkbyS5bT/99FAfm3ocFUpLdXo
-         q4Qg==
-X-Gm-Message-State: AOJu0YyFphAqjX7fRUE2l/jLqdxa+01EvljoQa/pRewnrrDp6yKiR0Nx
-	KsSo0jwqLXBCGCTx9tQm2pFyqnOah3hc3W04McfKlwgIAjrmd0/ImTG3joHLJUQ8wvbIQcNdGZY
-	bi9fW
-X-Gm-Gg: AZuq6aJXnyaqkko2PrYljK0lVEK6CeNBdJEZCVar+ylCipb5uR1trZA+s0pDXrOw5i4
-	OTaw/CbkYvyH2swPf06zgx5sD7OZBK8oOScknzcGp33EmXkpbUY44QjDV0aE0Kcd1GcNKBJJbDr
-	ZhDciULrRR/vdUPcSHWlDChl1GCABmstPAk/S0Q3ecIzyxVCe3W/dDYd23riQiiqAAlYAGwrBSM
-	RnzHhExKaNEE9XPTSFcH4836zmNXBrlxBmzY6kaC55vae3K48hc7sIMTjO/64hkMEY3cxJMUgHy
-	ttLDtoB/FP9Kfbi95iA08/T6Jg9mQuHxUaHnMTorJbEpiJ0J+23TcDkXX6szdRrCe9TTtGjGqSh
-	IffMH/vRulUaFFICqx+ESLZ7njdM77pJP2ShrfEFLqiYQzytdXT6jdDNHtSUobhNa06yfa2zA0j
-	niWljwXw963sk3b6gE3tolnofGLP57SDSJY17A
-X-Received: by 2002:a05:600c:348c:b0:480:462e:d640 with SMTP id 5b1f17b1804b1-4832022f781mr35081625e9.36.1770374065755;
-        Fri, 06 Feb 2026 02:34:25 -0800 (PST)
-Received: from ?IPV6:2a02:810a:b98:a000::159a? ([2a02:810a:b98:a000::159a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436296bd1c9sm4602013f8f.15.2026.02.06.02.34.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 02:34:25 -0800 (PST)
-Message-ID: <1aa615e2-1297-40a9-b7c4-beb943996721@cogentembedded.com>
-Date: Fri, 6 Feb 2026 11:34:24 +0100
+        d=1e100.net; s=20230601; t=1770374208; x=1770979008;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PzGmXVQk3J2sigNGOODPHGi+on8K6hw6Su0XUOZ0YCk=;
+        b=wvFzIcGvyvQUWOBuHSXbLlHsSt3FE0sXX4nRaWv19B/KtUtwwewMxJ1c8Vr2xNEEId
+         iVFozbI17a+Q/NNn6wK0KDmERSCvo2zPiLCMktB82GD85L7AS+wvY1GeGCF/ZNO0fWan
+         GhqCDu6DvIHIgnEwYuff38U0IXPsle89uw9NpkDkSMVDIe61sP6SogSkouTRti0Jn48M
+         sYEsBVdS6mNQ+KhxzZFIODpeoZHSRMWAmRtoPM62/rE5Un9Yyf3oXXLlC8/Rsb7EawzF
+         6dQNAhaC/v+zE02/9lzqxgb8TOqgTQByaP8Tj99vn1Br2+HaIYDBgfNQeCx0Kcjo68qV
+         tuZA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7YSS0Pf3SeZHj2D6M1QPeP8LWVNcxC6gzl/kOlMaRkIX3znxAewEBqk+R4NevUFsflOVu23A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRMOJTMjmyQLvfI5qzAPGN0DCu6U4xhiiJvAPyMWUKEiYKnQ5t
+	jYT7jt7338rKPx/jkt3bjA3Xbg+ps7ThmJwin1JmUC9G3/6TkNGZtHSWUHBGUJuw8/ah/XA9nEH
+	uNJCdLYbFgq5p8DNvGaVJRqqGns36uUTqBl2eviGC
+X-Gm-Gg: AZuq6aJVIo3DZpEKvQZ1hLQpFv8Hh6iqQht+3CJYFyiQ1e7U2cp5tkRsoTC+qVN5di5
+	8Enc3xx2gFqRyHikJkBKWc0qZnjPxEl+U9LOxLAAYOSbq/2TbiOze/fjxBE/GhKTYjDcwHe0EDA
+	s8CtG0ZOkfAeMRgf4ngsd6zKGP4Sc5VSA/L39mKntlOb0wn9jdEm8jv0gxa8Rizx5MoRLGBs9j6
+	L9EwFgWoyeTt3OgHPNiawmM958C9sjKswNBrQDiE1guT+WUOUJjFBLWykahG9kJ1bARH5cz8I20
+	vPGUkXrNUA==
+X-Received: by 2002:a05:690e:1659:b0:649:3bd8:22b0 with SMTP id
+ 956f58d0204a3-649f217bb98mr1518481d50.83.1770374208195; Fri, 06 Feb 2026
+ 02:36:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: Re: [PATCH net] net: renesas: rswitch: fix forwarding offload
- statemachine
-To: Michael Dege <michael.dege@renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Christian Mardmoeller <christian.mardmoeller@renesas.com>,
- Dennis Ostermann <dennis.ostermann@renesas.com>
-References: <20260205-fix-offloading-statemachine-v1-1-640224a531d0@renesas.com>
- <3b1405cd-6c7f-4883-95fb-151cab223a68@cogentembedded.com>
- <d6a9356d-6fd4-459b-9c5a-2f3e20368bbd@cogentembedded.com>
- <TY4PR01MB142829D9748A483ECAF19FD3D8299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <25ff0841-545b-433a-8e88-6e463ea718e7@cogentembedded.com>
- <TYRPR01MB14284CB75C7DCD35381BD17EE8299A@TYRPR01MB14284.jpnprd01.prod.outlook.com>
- <237bee8b-a7cf-4c14-9946-8bf72dbddde5@cogentembedded.com>
- <TY4PR01MB142829EB0EDDE13B588F949298299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <a4cfeba2-23da-4fdd-870b-6533b5ce267c@cogentembedded.com>
- <5b8bcf37-5cd0-4c32-b0ba-3386142b7795@cogentembedded.com>
- <TY4PR01MB142820FC29E751D8C7F0B7C348266A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-Content-Language: en-US, ru-RU
-In-Reply-To: <TY4PR01MB142820FC29E751D8C7F0B7C348266A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260205150958.412278-1-p@1g4.org> <20260205150958.412278-2-p@1g4.org>
+In-Reply-To: <20260205150958.412278-2-p@1g4.org>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Fri, 6 Feb 2026 07:36:37 -0300
+X-Gm-Features: AZwV_QiYtWaWMP5EdtymmE2V4jK-w8k2i3KrgkWKLrY_WU-3x2CuPcl5QVsU4yI
+Message-ID: <CA+NMeC_v8bQo2tFUYiD1faMJ0Gd9FFbqmPHCvBUD7HW_yoCx0A@mail.gmail.com>
+Subject: Re: [PATCH net v5 1/1] net/sched: act_gate: snapshot parameters with
+ RCU on replace
+To: Paul Moses <p@1g4.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[cogentembedded-com.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-257519-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DMARC_NA(0.00)[cogentembedded.com];
-	DKIM_TRACE(0.00)[cogentembedded-com.20230601.gappssmtp.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikita.yoush@cogentembedded.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257520-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,cogentembedded-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 4C771FCB00
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1D5DEFCB3D
 X-Rspamd-Action: no action
 
-> Unfortunately, your argumentation is very _academic_. There is _no_practical_reason_, not to
-> forward the traffic to the SW bridge via the HW bridge, even if only one link is currently up.
+> The gate action can be replaced while the hrtimer callback or dump path is
+> walking the schedule list.
+>
+> Convert the parameters to an RCU-protected snapshot and swap updates under
+> tcf_lock, freeing the previous snapshot via call_rcu(). When REPLACE omits
+> the entry list, preserve the existing schedule so the effective state is
+> unchanged.
+> [...]
+> diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
+> index c1f75f2727576..4a1a10bfe3e62 100644
+> [...]
+> -static void gate_setup_timer(struct tcf_gate *gact, u64 basetime,
+> -                            enum tk_offsets tko, s32 clockid,
+> -                            bool do_init)
+> [...]
+> +static void gate_timer_setup(struct tcf_gate *gact, s32 clockid,
+> +                            enum tk_offsets tko)
+> [...]
 
-The very practical reason not to forward packet to SW when it can be handled in HW is - reduce SW load. 
-SW cores have no chance to handle the load if you forward everything to SW at the channel speed.
+I don't believe you need to change the function name here.
 
-The very thing I was trying to achieve when working on this offload support was - detect the case when a 
-frame can be processed correctly in HW, and let it process it in HW, without notifying SW. And send 
-frame to SW if and only if it is not possible to provide correct processing without that.
+> [...]
+> @@ -323,20 +370,11 @@ static int tcf_gate_init(struct net *net, struct nlattr *nla,
+>
+>         if (tb[TCA_GATE_CLOCKID]) {
+>                 clockid = nla_get_s32(tb[TCA_GATE_CLOCKID]);
+> -               switch (clockid) {
+> -               case CLOCK_REALTIME:
+> -                       tk_offset = TK_OFFS_REAL;
+> -                       break;
+> -               case CLOCK_MONOTONIC:
+> -                       tk_offset = TK_OFFS_MAX;
+> -                       break;
+> -               case CLOCK_BOOTTIME:
+> -                       tk_offset = TK_OFFS_BOOT;
+> -                       break;
+> -               case CLOCK_TAI:
+> -                       tk_offset = TK_OFFS_TAI;
+> -                       break;
+> -               default:
+> +               clockid_provided = true;
+> +               if (clockid != CLOCK_REALTIME &&
+> +                   clockid != CLOCK_MONOTONIC &&
+> +                   clockid != CLOCK_BOOTTIME &&
+> +                   clockid != CLOCK_TAI) {
+>                         NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
+>                         return -EINVAL;
+>                 }
 
-But this does not directly affect the case being discussed.
+This is better than what you had before, however it still
+is redundant given that you do the switch statement later
+and perform the same validation again. If there's no reason to
+keep this code, you probably can also get rid of "clockid_provided".
 
-When there is only one port with enabled HW forwarding, there is no effect of keeping HW forwarding 
-enabled, because the allowed destination mask computed nearby does not contain any destinations. 
-Forwarding to CPU port was never handled via L2 forwarding (*), because L2 forwarding on rswitch 
-requires explicit adding any possible destination MAC to the L2 table - which is problematic for CPU 
-port, in generic case your software bridge device can be a part of a higher level construct, and you 
-will have hard times to dynamically catch and process any changes in the list of possible destination 
-MACs for the CPU port. For exact this reason, I implemented forwarding to SW port using "port based" 
-thing, that is actually a fallback that rswitch uses when L3/L2 forwarding fails due to no table match.
+> @@ -366,6 +404,37 @@ static int tcf_gate_init(struct net *net, struct nlattr *nla,
+> [...]
+> +
+> +       if (ret != ACT_P_CREATED) {
+> +               rcu_read_lock();
+> +               old_p = rcu_dereference(gact->param);
+> +               if (old_p) {
 
-(*) when virtual ports come into scope, a case for L2 forwarding to CPU port appears.  But still, 
-"default" forwarding to SW is never handled as L2 forwarding.
+When do you believe old_p might be NULL here?
+From what I understand, you can't arrive here while
+a delete for the same action instance is happening in parallel.
+Were you able to create such scenario when testing gate?
 
-Nikita
+> [...]
+> +       if (use_old_entries) {
+> +               err = tcf_gate_copy_entries(p, old_p, extack);
+> +               if (err)
+> +                       goto unlock;
+> +
+> +               if (!tb[TCA_GATE_CYCLE_TIME])
+> +                       cycletime = old_p->tcfg_cycletime;
+
+Why did you keep this one as in v4?
+You don't want to reuse the old "cycletime" if the user
+specified new entries?
+Not saying you are necessarily wrong.
+Just trying to understand your logic.
+
+> [...]
+> -chain_put:
+> +unlock:
+>         spin_unlock_bh(&gact->tcf_lock);
+>
+>         if (goto_ch)
+>                 tcf_chain_put_by_act(goto_ch);
+> +       release_entry_list(&p->entries);
+> +       kfree(p);
+
+The 4 lines above look exactly like what you
+do in err_free. Can't you label them as err_free
+and remove the lines below?
+
+> [...]
+> +err_free:
+> +       if (goto_ch)
+> +               tcf_chain_put_by_act(goto_ch);
+> +       release_entry_list(&p->entries);
+> +       kfree(p);
+> +       goto release_idr;
+> +}
+> [...]
+>  static void tcf_gate_cleanup(struct tc_action *a)
+> @@ -458,9 +594,10 @@ static void tcf_gate_cleanup(struct tc_action *a)
+>         struct tcf_gate *gact = to_gate(a);
+>         struct tcf_gate_params *p;
+>
+> -       p = &gact->param;
+>         hrtimer_cancel(&gact->hitimer);
+> -       release_entry_list(&p->entries);
+> +       p = rcu_replace_pointer(gact->param, NULL, 1);
+> +       if (p)
+> +               call_rcu(&p->rcu, tcf_gate_params_free_rcu);
+>  }
+
+Sorry, I think I lacked precision in my last comment.
+I meant that you should've removed the rtnl requirement
+(which you did), but also use rcu_dereference_protected as
+act_vlan does. This relates to my previous comment on "old_p"
+being NULL. I don't believe you need to set this to NULL
+unless you were able to reproduce the scenario I described
+earlier.
+
+>  static int dumping_entry(struct sk_buff *skb,
+> @@ -512,7 +649,8 @@ static int tcf_gate_dump(struct sk_buff *skb, struct tc_action *a,
+>         spin_lock_bh(&gact->tcf_lock);
+>         opt.action = gact->tcf_action;
+>
+> -       p = &gact->param;
+> +       p = rcu_dereference_protected(gact->param,
+> +                                     lockdep_is_held(&gact->tcf_lock));
+
+You could've kept the rcu_read_lock approach here.
+One of the main advantages of making the params rcu
+is being able to dump without the tcf_lock.
+
+cheers,
+Victor
 
