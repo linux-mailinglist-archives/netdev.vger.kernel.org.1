@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-257629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257630-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SP1HE5UmhmlSKAQAu9opvQ
-	(envelope-from <netdev+bounces-257629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:36:21 +0100
+	id aBK/IFAmhmlSKAQAu9opvQ
+	(envelope-from <netdev+bounces-257630-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:35:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC7AD10128E
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:36:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C0710121C
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 88C93304D12F
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 17:34:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5FE0A3010788
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 17:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5FE423A63;
-	Fri,  6 Feb 2026 17:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914903D6693;
+	Fri,  6 Feb 2026 17:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xk3PlAwY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fSVM9Z6c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99FF425CD0
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 17:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639041B34B
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 17:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770399285; cv=none; b=X2q0pnjBoLmPnyfyuKnbAhd5YL1dNpvcDvGuDghyL2CJwmBBVaBTN58qS83+JgLSBo8jtJ1OI/PUv0ZiV1GOIcCFvrYoD7O2yzFSsXaVYjqE+wDltzMVazqM9P10ZL3LiGdUCxKxLnYs4NjGsY8IEBlAzSJO/hR++J9LQvhy/Nk=
+	t=1770399286; cv=none; b=OKcxLiVm9GAO6+Y8nUzUmAPFFSde8izWbXXgQrIedgpIbaoLLQ8fxhcX9Agz5ReOShdlEEMgEg7FjC0gk0hi6tMW5+eyUyFZCICmj5TfZlTz3gbqgyTpqnqBxmHSclad5gTtQbd1WlhR/3Q4y37qBOjyLLs2RBnUSP+q0F+vN48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770399285; c=relaxed/simple;
-	bh=e/4VRMswnbHVHbY6NBIGBfvj1UzmdH/lGRaQCNzSQ9M=;
+	s=arc-20240116; t=1770399286; c=relaxed/simple;
+	bh=O6zek/vcHbxcywmjQ1Y+LlmcWYQBoMlM2hvDx/ehVPM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cBSXxjahyxoTFiJTkhwjJRGcAHDcIr/W9Ha6Hn16kzAyNPouNp/V5YWlA5eE8Oh+ioh/DhK/I2dx4fD7GTX+3urKwRAsULPj+tIkNJz7jiG8TklD0duUl5CvStmnPB12Ar+boEfO0r1N1RO7gHhF4Fudsc6I4NGOOKd6oi95uk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xk3PlAwY; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=Ma4xY+oyeS9yb10mfnuMU6NvUjneaTA3mc5AYA4tQcuDvkQHFaavYnAf7G+8JWgrHrlRM6v6UM4dlKGByes0cpGmZgWw4hhrNazMJcW9CUKWyk9WIIb6jKwaWjSFtLx76L2rKI8E3WSBjHzbiLP3/CdEKRGs2xTkk76GtyC/xwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fSVM9Z6c; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-502a8fa0a28so46051411cf.2
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 09:34:44 -0800 (PST)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-89493622b50so43526496d6.1
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 09:34:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770399284; x=1771004084; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770399285; x=1771004085; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1gZAJXima9yvxaj0x2/I7pJ4bzdcaXBi20T8Kj130+0=;
-        b=Xk3PlAwYyBrRqvBdiLlS54Qb6OhrZltFxIMq2zGMX3JZquOXIm/AJNOP8+l3e3fz4q
-         IOMyTq4raabEnIsykA5kb4WoHLWTyGnD+9FZiKT8mynEbOWjpMGUCo6evjs+iBnRQUA7
-         DHQPEW/IfA+FjeWQBsYMpdkeHYBxmwxvouDp7Bov2Wsx5zMWDlndaezArnzbnagC89Yr
-         FIRvx3aYAdpxuyKxRKtcGso9uKllEfdUlDMsOJ/pokqnV9O2wlKcphUhKtdtqbwufM95
-         A1BTT61+MeSy67x2bJ5vsB6Ma3ioaIvX2jjjPSa9kSWEGnQg93Oh/0xTXVnBmELlQj82
-         8LVA==
+        bh=xQNRGb5LrRBR2hLmX4+e0dFyqq/5wDyWfM0ofpjSq4g=;
+        b=fSVM9Z6cap20FgTJjR2qSHtFu6lKU1n1016F7i+pIcSy0xjTg819hAkOvxUIzg6mki
+         Vgu0GgPC5Qf4bdqLYxm5cSk/gI+fYBMa4GmtN84FR3my3dqsubbaUYKloswPftqvMQok
+         dFu+Han4M4vxC+xoz8nbyxfIAr66zolMLAsac/3RrUC4t7tdiJ4UHNNfBS3iKXHedxKq
+         EkJZaMQQwnCvB3A6ZW1eDMeTrj5Q8bSB/bg2RHHYrqLD1cZ929azRP27B2TugnPtH9aH
+         fm0odSsnw1vaBqH0nnl3gFQqscLlw9DsMRZWwtkq9pu/SGH4AuHETjbCloIppKgCklrR
+         8pFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770399284; x=1771004084;
+        d=1e100.net; s=20230601; t=1770399285; x=1771004085;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1gZAJXima9yvxaj0x2/I7pJ4bzdcaXBi20T8Kj130+0=;
-        b=PyxBaJZLp1feqZpCwmZmzDdGKzRfbNlCSUUDHd2FqhaNBqOuY3OKfmqteY8BM/V2Zg
-         jnwvjE/ghuqGeEvQHIHerFyaX1nPeJzpXA4vgJKatUJzB++Fk5iyp4phJC9IYUhk5rcZ
-         grIwTRgkKX0X05SBIZjTJhPikwC1xrkZ5E9k7tftfLssiTA4IBt6ZTzj/UQL78fKWUqG
-         b2bA3QpZpZ/OdnMN9qf4ZfdMEKWfzjUtN86IPWsh2nk5eWCUr1Meiu5WAijpe2576uDF
-         XEPZ03iJNB8eLWv4n6PYWDD1LqYbVbfV0L/TRPT1RDtFQhuK2Qq3QO0rkc3Fk8FwOKJR
-         ox7w==
-X-Forwarded-Encrypted: i=1; AJvYcCU7OkCFJIaE5nYNzZ4thKgZnuZVSSVxj+qWvHXf9S8QBGxz56ATauWXbzSBS7v94rm+2H1MfYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmEu+YO4VbkoBMhQvX5qhvGb7bU7eFjzXfEcrJfa6DPMSO4yAl
-	fBYsDCxoIamsc/LPlfkPi34zCxzxirG0ySfK11BKqztfcaRdfzeo+1NtBRGTfq2Qv6Ecd+ZXXj2
-	Q3vSPYaucyQp3ug==
-X-Received: from qtc12.prod.google.com ([2002:a05:622a:8e0c:b0:501:42ca:45fa])
+        bh=xQNRGb5LrRBR2hLmX4+e0dFyqq/5wDyWfM0ofpjSq4g=;
+        b=WE9DqRJbJsTDIZ4cAVG+DiPkjRh1JvPK/P21inNCc+yxDFkX5jBYMnTuRArWvt4ssu
+         /oNwyXk34tHixZnd45wsNhNuaeQjK7pECKdOVkLX5Z3AueV5+ko/TgM1wk7cF+ncwxLV
+         /B3HUIBFWKJVLTk7nS8SSBAgvRLKpsNX/JSbMYLmY8W9PUkNXya2BYbdtpc6XDVY65dQ
+         xI2h69iqEjJvK/8Qk+8UKX8xAzQ1bNjjsPzQln99gNg0igongtQ4cOzCeaLQiK3+LhVY
+         feLFTr3iVYv4SwZOAOyfNfdu0mLpV9TeQ1V9nEVQ94d3drHVCx//rDSowTeX6pKKSPoI
+         sVCA==
+X-Forwarded-Encrypted: i=1; AJvYcCW17I6G4ChbXrYhrQyrDM+Ks0+nzSgK33KiPgf6GYlBEmIvJYJT+RBRruPb7JWlXdgPDp6EC7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiM1Sb+eebxb9q1LPJa5GSprcSYuWJBYZUHCtrfEtfYHV2m4m5
+	2NzIwmxJXqMaz1vcO1ltsLm3rjwviOnCNwShvRA19n4yTZN2js0Yj0v0bZJtCwUylyix9k0Q/02
+	yIb1LDcXILAWB1g==
+X-Received: from qvkj11.prod.google.com ([2002:a0c:e00b:0:b0:894:9756:bcb1])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5903:0:b0:501:3b8c:7d58 with SMTP id d75a77b69052e-50639846b60mr42345111cf.7.1770399283726;
- Fri, 06 Feb 2026 09:34:43 -0800 (PST)
-Date: Fri,  6 Feb 2026 17:34:20 +0000
+ 2002:ad4:4ea1:0:b0:894:3d7d:b488 with SMTP id 6a1803df08f44-8953d0dee0emr47548536d6.66.1770399285011;
+ Fri, 06 Feb 2026 09:34:45 -0800 (PST)
+Date: Fri,  6 Feb 2026 17:34:21 +0000
 In-Reply-To: <20260206173426.1638518-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260206173426.1638518-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260206173426.1638518-2-edumazet@google.com>
-Subject: [PATCH net-next 1/7] ipv6: add daddr/final storage in struct ipv6_pinfo
+Message-ID: <20260206173426.1638518-3-edumazet@google.com>
+Subject: [PATCH net-next 2/7] ipv6: use np->final in inet6_sk_rebuild_header()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257629-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257630-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -112,37 +112,41 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BC7AD10128E
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 48C0710121C
 X-Rspamd-Action: no action
 
-After commit b409a7f7176b ("ipv6: colocate inet6_cork in
-inet_cork_full") we have room in ipv6_pinfo to hold daddr/final
-in case they need to be populated in fl6_update_dst() calls.
-
-This will allow stack canary removal in IPv6 tx fast paths.
+Instead of using an automatic variable, use np->final
+to get rid of the stack canary in inet6_sk_rebuild_header().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/ipv6.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/ipv6/af_inet6.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 20aae8357dd151e8c7d6972f41e77cebf1379177..75b98d4849d66b167376769a25bb752d8979c8b5 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -209,6 +209,10 @@ struct ipv6_fl_socklist;
- struct ipv6_pinfo {
- 	/* Used in tx path (inet6_csk_route_socket(), ip6_xmit()) */
- 	struct in6_addr 	saddr;
-+	union {
-+		struct in6_addr daddr;
-+		struct in6_addr final;
-+	};
- 	__be32			flow_label;
- 	u32			dst_cookie;
- 	struct ipv6_txoptions __rcu	*opt;
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 0476dbc8edb2b8273fd337b15c8196e9597753ef..31ba677d0442a861fc87e163b43a0aa1df88d8d4 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -825,7 +825,7 @@ int inet6_sk_rebuild_header(struct sock *sk)
+ {
+ 	struct ipv6_pinfo *np = inet6_sk(sk);
+ 	struct inet_sock *inet = inet_sk(sk);
+-	struct in6_addr *final_p, final;
++	struct in6_addr *final_p;
+ 	struct dst_entry *dst;
+ 	struct flowi6 *fl6;
+ 
+@@ -847,7 +847,7 @@ int inet6_sk_rebuild_header(struct sock *sk)
+ 	security_sk_classify_flow(sk, flowi6_to_flowi_common(fl6));
+ 
+ 	rcu_read_lock();
+-	final_p = fl6_update_dst(fl6, rcu_dereference(np->opt), &final);
++	final_p = fl6_update_dst(fl6, rcu_dereference(np->opt), &np->final);
+ 	rcu_read_unlock();
+ 
+ 	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, final_p);
 -- 
 2.53.0.rc2.204.g2597b5adb4-goog
 
