@@ -1,195 +1,157 @@
-Return-Path: <netdev+bounces-257494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257495-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8C55IeuvhWkRFAQAu9opvQ
-	(envelope-from <netdev+bounces-257494-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 10:10:03 +0100
+	id sKeDKcmyhWmbFQQAu9opvQ
+	(envelope-from <netdev+bounces-257495-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 10:22:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EB3FBD9A
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 10:10:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AF1FBF88
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 10:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76DF73008A72
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 09:04:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 634F230125C3
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 09:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E2B355021;
-	Fri,  6 Feb 2026 09:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1B735C1AE;
+	Fri,  6 Feb 2026 09:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="ZL1hlCT1"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tGNdjA6m"
 X-Original-To: netdev@vger.kernel.org
-Received: from exactco.de (exactco.de [176.9.10.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE30F352C4D
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 09:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44B02E1EE0
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 09:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770368664; cv=none; b=bcMTia3P4JoIRzEsQuCGTjoVWlpSe+N5KrHqwzgM4rRosm0N5pInUkIPNERzhbV2FVBKtl50kX8fE5cLtLA7TC7SmmXkKEsEay0PSVzKkh2DRNzSPDjwGOLPHS1OyG+ZrqIle/uJo75J9DRV0JQoVqXU8ccuepsXBzoeU7vrruo=
+	t=1770369578; cv=none; b=D5DFCEnP3cNi4kju/y/IFN1l5pjcDFpHD54KiCFZ0goo/ab/bfD12ubyHlVZdnCkshapPrG/SCHVJ73E2dvnOJpmbWMmkIe4H2TcY7hfrWJukgqbrCpyHyX/e7Who+kxB61p/C4PUU27cx6krdzaTYY/sq+SiV4Rsfwy256Qh2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770368664; c=relaxed/simple;
-	bh=AB6d9l1yIdG4NDk9kfKMD6kDBLagwQfDi0FTPUgZfCc=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=WmJalyczl1axr5X1n+Leh8YPEPZc+22w/fWreQxLR5AKovBNsaxL88XyvRPBnFKSeHU4HZUhQpngm2MtcEPI0jk2kh1Wmmc8K6qVf9Yu8b012b07AHYwWBg8e1fJBeQYb3wMALSEsSHQBWPMA7TWfdfp4XVKez3zcFO+UVAL2XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=ZL1hlCT1; arc=none smtp.client-ip=176.9.10.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
-	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:References:
-	In-Reply-To:From:Subject:Cc:To:Message-Id:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Wo5rtwWA+fxTOlC1JLIKn6B1LO6yH0YPj5NB9h/LCHI=; b=ZL1hlCT1JEmEX2xB2lOsRtQzI3
-	bY/Q1QJHpEiAX/TVR0cA8phCN0YsANgXVT/Nex8t7+wJfmwWX70Nm2HrvY0RIDB9UvfdOcCgbNodC
-	j76NcGE2BiyLahLbmmxO5WjlzfEVgvndGenr3L7xqLokdMoIHeliaZVPemCYQ/jZINSk+tSL8RwwW
-	uq/pMQiAE2XaW/PxPpxNOi6sOoa46Y0xefgssZAgYmPO/q8jHO460lVPjCi4LoqItD0Crgz4LY4ot
-	/xQNRL22iT/hn44SQVV0bGETxXq6/oCljiCWMO6yFL7+ldlmfd0GGEAw5JoXVdXH1b14ba9OTL+MH
-	uQzX1r3g==;
-Date: Fri, 06 Feb 2026 10:05:14 +0100 (CET)
-Message-Id: <20260206.100514.85172532893288505.rene@exactco.de>
-To: seanga2@gmail.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: sunhme: Fix sbus regression
-From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
-In-Reply-To: <cc269d9f-9a06-6623-e412-d04ecb7b4f74@gmail.com>
-References: <20260205.170959.89574674688839340.rene@exactco.de>
-	<cc269d9f-9a06-6623-e412-d04ecb7b4f74@gmail.com>
-X-Mailer: Mew version 6.10 on Emacs 30.2
+	s=arc-20240116; t=1770369578; c=relaxed/simple;
+	bh=NOjMrvXLnxubIJ98sxIqIaFk16kAXp6BZ67WoBvZ684=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lwd/234q7wNjzzAa8G2CiMRSFv+dw4plybKxh50xRx6pdDf8pv2WT+YBQjnFosCWocRcXDICD4ySgdrLbRC3RQi5tEgeqqq3NFNRU439AFbqNOIgy2/D+SCe7n28wkJpf+vcsDrQ6cOXLe0ZVuNHvvweC5Bh2GO2o1bC+j35oE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=tGNdjA6m; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-482f454be5bso23616755e9.0
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 01:19:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1770369575; x=1770974375; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NOjMrvXLnxubIJ98sxIqIaFk16kAXp6BZ67WoBvZ684=;
+        b=tGNdjA6mjSn1RcZh6sOY3d4GJU3BT5sSZ4BcgHgairWhCv0eS3vXcD0Dbehjh78ipl
+         618Qfv1FxWjfvqsVZdaSy+/sUzOznx5sLmRNyBVeVHYSxUBgmrMoCsvkeAhqJyfYf9Bg
+         ZR7bRpPHQ7jKNsmueVoWYDPb1Aiom9Fw52D3OBLbV01fCoc6ok5WZtJGyMbvf9YcVOVI
+         4WJf1GPk9XMeAzFtTXWzph+9XDoGYOtEj1rq6hR3f9fFhcpoKCdKcXJ9/37MWPZY5/+1
+         tuLDrmhBR//mGNosouBCLR7dFeEJDwDUxwN4ost0VDE/aFBaiQIxladGo/WiQhgJI2Pu
+         uz7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770369575; x=1770974375;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NOjMrvXLnxubIJ98sxIqIaFk16kAXp6BZ67WoBvZ684=;
+        b=gSRWqbtTPBZGfLTfgrdfUkPckwVZtXxIW/u01xy/Ftlckbap1UslWb8vQv8ROIfiBS
+         QOFcvmrCV0oZOVxYBS8sRCAH9HyhuhgVlXqRffFqXwC4GTNWr5sga/m2HmIPzHREtCrW
+         1i0RpO1cNw/vQrtp65LSGs9tvyJRWwM5NULPadnbu8pw0kzCtaMX9eNbw/C21+WAb7Pe
+         xVYDt2YcMyRFbOqzsmkK7tYxoKmiaSwg18lXr7dVLkhN+VTAtzN4eCFgDm3m5bzw8meG
+         qqGezhs8mpby6sSrd0/AND7dmjbY7NMy2kW4hClx/Ju7iQEJqtsJcfKljqd4ICTj33Mt
+         TukQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0fvignVb36b6zzWkeM28mUNe4o8dunuOJi/p726kkkM+nvtb52rygAi+hrg88h75XealU32k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKNsfxC1mcWXXAtJb3pvR6dvjE0cu08GYSkJrJSz5gEASOteax
+	iDG6z9sB0u16qZERoMNV43iAmdYi26N/ij6e+uC8G9KG+FLJezWXwUsXfIJTkoCQD5M=
+X-Gm-Gg: AZuq6aIaqdV5+ao4iBpo+RVde0lOVeOTQwOkXr3dvHRAS0dIqIUUqbJMCeAY/KMO+dM
+	j44N/fASCqT/ms1Vq7DxyyrWBRss+Fp21DTgItSqq2c9ai/XbkN+VeBPRf1oPuATyUWzf68ReQN
+	kTpo7SxpoikQcq92mBB90ny/JLCl68/xhKW8rDclaQfeHyoFpIEfwMTl+cwTPEFq3R0AL+rnGCQ
+	Cryqd0ZUkxJSRkV7vNZLYkGH/NkRqhMbWUs/hkjuTh2KMeb/ShNAKJdBHHGoghEd7JXu6Xqarrs
+	I2Ix7g9RUO32nun5X3CzpIEyRfpNM+NVvPHq2B39XbrVBnoRD9IOt8LrzGNeT63RQyxVj6/N0Yl
+	8joZ5ukHLEpbCNfarUs9/JWwMjHsTadVx0IloJSf63iDnDm0MKidnRoX7A1Y7GIQz1eJJZJV7cs
+	P4utfx+6+dn3DzwzIEr+M=
+X-Received: by 2002:a7b:c3d5:0:b0:47e:e38b:a83 with SMTP id 5b1f17b1804b1-483178ebf8emr52443975e9.7.1770369574701;
+        Fri, 06 Feb 2026 01:19:34 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48317d8e8d4sm112369355e9.15.2026.02.06.01.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Feb 2026 01:19:33 -0800 (PST)
+Date: Fri, 6 Feb 2026 10:19:30 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
+	Moshe Shemesh <moshe@nvidia.com>, Shay Drori <shayd@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Or Har-Toov <ohartoov@nvidia.com>
+Subject: Re: [PATCH net-next V2 1/7] devlink: Refactor resource functions to
+ be generic
+Message-ID: <f56e4xngd6byd5gta2hcvfzwwntqbybpbbqv3nw2i7734cc5kx@vwaqvacwxiyp>
+References: <20260205142833.1727929-1-tariqt@nvidia.com>
+ <20260205142833.1727929-2-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260205142833.1727929-2-tariqt@nvidia.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[exactco.de:s=x];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257494-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[exactco.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-257495-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,gmail.com,lwn.net,nvidia.com,vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rene@exactco.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[exactco.de:-];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.2:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,t2linux.com:url,patreon.com:url,1f:email]
-X-Rspamd-Queue-Id: 92EB3FBD9A
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20230601.gappssmtp.com:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 08AF1FBF88
 X-Rspamd-Action: no action
 
-On Thu, 5 Feb 2026 20:41:11 -0500, Sean Anderson <seanga2@gmail.com> wrote:
+Thu, Feb 05, 2026 at 03:28:27PM +0100, tariqt@nvidia.com wrote:
+>From: Or Har-Toov <ohartoov@nvidia.com>
+>
+>Currently the resource functions take devlink pointer as parameter
+>and take the resource list from there.
+>Allows the resource functions to work with other resource lists
 
-> On 2/5/26 11:09, René Rebe wrote:
-> > Commit cc216e4b44ce ("net: sunhme: Switch SBUS to devres") changed
-> > explicit sized of_ioremap with BMAC_REG_SIZEs to
-> > devm_platform_ioremap_resource mapping all the resource. However,
-> > this does not work on my Sun Ultra 2 with SBUS HMEs:
-> > hme f0072f38: error -EBUSY: can't request region for resource [mem
-> > 0x1ffe8c07000-0x1ffe8c0701f]
-> > hme f0072f38: Cannot map TCVR registers.
-> > hme f0072f38: probe with driver hme failed with error -16
-> > hme f007ab44: error -EBUSY: can't request region for resource [mem
-> > 0x1ff28c07000-0x1ff28c0701f]
-> > hme f007ab44: Cannot map TCVR registers.
-> > hme f007ab44: probe with driver hme failed with error -16
-> > Turns out the open-firmware resources overlap, at least on this
-> > machines and PROM version:
-> > hexdump /proc/device-tree/sbus@1f,0/SUNW,hme@2,8c00000/reg:
-> > 00 00 00 02 08 c0 00 00  00 00 01 08
-> > 00 00 00 02 08 c0 20 00  00 00 20 00
-> > 00 00 00 02 08 c0 40 00  00 00 20 00
-> > 00 00 00 02 08 c0 60 00  00 00 20 00
-> > 00 00 00 02 08 c0 70 00  00 00 00 20
-> > And the driver previously explicitly mapped way smaller mmio regions:
-> > /proc/iomem:
-> > 1ff28c00000-1ff28c00107 : HME Global Regs
-> > 1ff28c02000-1ff28c02033 : HME TX Regs
-> > 1ff28c04000-1ff28c0401f : HME RX Regs
-> > 1ff28c06000-1ff28c0635f : HME BIGMAC Regs
-> > 1ff28c07000-1ff28c0701f : HME Tranceiver Regs
-> > Quirk this specific issue by truncating the previous resource to not
-> > overlap into the TCVR registers.
-> > Fixes: cc216e4b44ce ("net: sunhme: Switch SBUS to devres")
-> > Signed-off-by: René Rebe <rene@exactco.de>
-> > ---
-> > Tested on Sun Ultra 2 running T2/Linux.
-> > Alternatively we could explicitly size all regions, or check overlap
-> > in startup code (I also already have a patch for that, too).
-> 
-> What does this look like?
-
-This only checks for "sorted" overlaps w/ the previous res, but given
-they probably usually are and it catches this case, ...
-
-The downside is, it may break other devices, I only test booted this
-on an Ultra 2 and Ultra 30. On the U2 it fixes the hme ethernet,
-too. On the U30 it causes an eprom region to be truncated. I probably
-should investiage that and test boot on all my SPARC systems before we
-consider this. That's why I sent the trivial hme driver hotfix first.
-Alternatively we could also overwrite all sbus res in the hme driver
-with the previously used known good sizes. I can send a patch for
-that, too if you like:
-
-diff --git a/arch/sparc/kernel/of_device_64.c b/arch/sparc/kernel/of_device_64.c
-index f53092b07b9e..8bd405cbc04f 100644
---- a/arch/sparc/kernel/of_device_64.c
-+++ b/arch/sparc/kernel/of_device_64.c
-@@ -412,6 +412,15 @@ static void __init build_device_resources(struct platform_device *op,
- 			r->start = result;
- 			r->end = result + size - 1;
- 			r->flags = flags;
-+
-+			/* check for and correct simple bogusly overlapping resources */
-+			if (index > 0 &&
-+			    op->resource[index-1].start <= r->end &&
-+			    op->resource[index-1].end > r->start) {
-+				printk(KERN_WARNING "%pOF: prev regs overlap (%x), limiting %x.\n",
-+				       op->dev.of_node, op->resource[index-1].end, r->start - 1);
-+				op->resource[index-1].end = r->start - 1;
-+			}
- 		}
- 		r->name = op->dev.of_node->full_name;
- 	}
+s/Allows/Allow/ ?
 
 
-> > ---
-> > --- linux-6.18/drivers/net/ethernet/sun/sunhme.c.vanilla 2026-02-05
-> > --- 11:50:33.288906134 +0100
-> > +++ linux-6.18/drivers/net/ethernet/sun/sunhme.c 2026-02-05
-> > 11:55:22.541384377 +0100
-> > @@ -2551,6 +2551,9 @@
-> >   		goto err_out_clear_quattro;
-> >   	}
-> >   +	/* BIGMAC may have bogus sizes */
-> > + if ((op->resource[3].end - op->resource[3].start) >= BMAC_REG_SIZE)
-> > + op->resource[3].end = op->resource[3].start + BMAC_REG_SIZE - 1;
-> >   	hp->bigmacregs = devm_platform_ioremap_resource(op, 3);
-> >   	if (IS_ERR(hp->bigmacregs)) {
-> >   		dev_err(&op->dev, "Cannot map BIGMAC registers.\n");
-> > 
-> 
-> Reviewed-by: Sean Anderson <seanga2@gmail.com>
+>that will be added in next patches and not only with the devlink's
+>resource list.
+>
+>Signed-off-by: Or Har-Toov <ohartoov@nvidia.com>
+>Reviewed-by: Shay Drori <shayd@nvidia.com>
+>Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
--- 
-René Rebe, ExactCODE GmbH, Berlin, Germany
-https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
+Otherwise, the code looks fine to me:
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
