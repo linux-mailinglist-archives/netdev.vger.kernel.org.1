@@ -1,175 +1,157 @@
-Return-Path: <netdev+bounces-257626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2J6ACDYihmm/JwQAu9opvQ
-	(envelope-from <netdev+bounces-257626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:17:42 +0100
+	id MJlfBNQihmklKAQAu9opvQ
+	(envelope-from <netdev+bounces-257627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:20:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7602C100DA9
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:17:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEBEC100E2C
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F6B93011070
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 17:17:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C11F5301DC26
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 17:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F79394481;
-	Fri,  6 Feb 2026 17:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCB73AA197;
+	Fri,  6 Feb 2026 17:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hBohwdmD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cGN2Nra3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2564352FB7;
-	Fri,  6 Feb 2026 17:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BA432B98A;
+	Fri,  6 Feb 2026 17:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770398257; cv=none; b=poErP+rSOccfTITf+szRhNUvLD4wy3+vQFSgZTTMNLt3vtjCCw1qgHkhiR4BkmLrkbEQxfv4NRqg9zDCfhn5jCJ6nSeKHafHLClLnonhIaI/Jo/1e4tcSRDf4CbXIl2lKMscoWKC666qRYS3zd3JxGbNy+/R6kCdosMfoqPO/1c=
+	t=1770398380; cv=none; b=TT0gpcTeZQbtpdMeS/Lsq34wKvUk7QIyVF8e8R5g6ueGIL+ARU4t+GE4ALinOtnbYZPJJgfKMUXK0giu46gAL3s8HsQptMxCxjAM/nz9w2ntoT8WGE/MZwna2Q8H2g4ZgHGyv84XoIsjEVdWsBa7tCgpXyYgfcmfh1TOp9pqDFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770398257; c=relaxed/simple;
-	bh=sTEb/e7pAGdnj0Lle8dENGCcDlwrF+BHV/spyQAZrkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IpEwPL/sPlm2npAu0UYaIQZ9VXphXk5JP39uc6rhB7Rcl9FSblH59tYL5KeOk1fKQhu8rGGx1Rsfx9miwZiP8V+lar6l3+lO/zwlXC6gzU1HJo+OG0M6q0t9o/7mGrXOeZLUovMzY3ujeFlOfv6oZkqI3s5ZRpdsDxdv+BQ5HoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hBohwdmD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lV15MDu97rxiDNJIhwBcLG3FZ3YE/GmtyjhEBWXOLiQ=; b=hBohwdmDGjbTHO+ojHERGhQTVr
-	X3EyOJBt20CEF/Xx6HbQuGGMG4iDTPuSA5/262VdLf9d7MPuiPylMOyyj8dgj+xvCR97RFX82VELQ
-	ZxRjkppZYU3CBHpJgBIIXZoOr6rwU+zE+R7H4dHTnWnIaGFVAi1hZXsCs+sZLOa+5Kd4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1voPSQ-006PHB-Ux; Fri, 06 Feb 2026 18:17:26 +0100
-Date: Fri, 6 Feb 2026 18:17:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: Michael Dege <michael.dege@renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	s=arc-20240116; t=1770398380; c=relaxed/simple;
+	bh=XExDwSKRcKUYCaurSZBzZB3KGPRU6urEzDTjIv4vouU=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=qmjlDiWOuX96msgxu6XLQLdbOD0QgRHNyA8EaydBWJnifZAPyLV1Vd0wc/IiKcutCGoRj3tsVTPL3NeNUthjUkfXA8nigzRvQGhziGC3hV3wpZvB2yq5EeDm5WSaNihZAXDw/QNp7CPWfugu32BlBApBoa4HQn/WAVyFX0UPMTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cGN2Nra3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hBz1B1ch3uij2mP5ItPRrEZrt2hOKNjok2/Z3SVVwAE=; b=cGN2Nra3VKLwUUCu1C3ru68F7Q
+	430jBi13WUXglaqY7kKbPJYZW98oMB4ViXQ5DgjUo/P7nmDlc998GGuGK1J1DqCM5bAZUt49dq6AL
+	dpQ0rhg8Ja4WRD+0ArK/I1JbIugABP2uLpWzbder7O1IyIJ8SlTAB38hyofgs877cXt0gUPxhGOV0
+	VugmV3sWVWRk7iWzUcRJfFV5hh4ghVGUJXUyCxdaMLAxIgAsapt4X4xATqC7WRld0UUcbU0yWOH7Z
+	/mRNSV50+Ku0SB4w7klqAuhoots6cSVBn4YBUwMJwbyvmIEHnE9V+lSAm3RYWySwAOlFwcYoTgi1S
+	sCHa0wFA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54818 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1voPUI-000000008Hl-1fh0;
+	Fri, 06 Feb 2026 17:19:22 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1voPUH-000000083ji-25FH;
+	Fri, 06 Feb 2026 17:19:21 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>
-Subject: Re: [PATCH net] net: renesas: rswitch: fix forwarding offload
- statemachine
-Message-ID: <59c7e214-8fbe-42bb-9da0-df41b1794d37@lunn.ch>
-References: <25ff0841-545b-433a-8e88-6e463ea718e7@cogentembedded.com>
- <TYRPR01MB14284CB75C7DCD35381BD17EE8299A@TYRPR01MB14284.jpnprd01.prod.outlook.com>
- <237bee8b-a7cf-4c14-9946-8bf72dbddde5@cogentembedded.com>
- <TY4PR01MB142829EB0EDDE13B588F949298299A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <a4cfeba2-23da-4fdd-870b-6533b5ce267c@cogentembedded.com>
- <5b8bcf37-5cd0-4c32-b0ba-3386142b7795@cogentembedded.com>
- <TY4PR01MB142820FC29E751D8C7F0B7C348266A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
- <1aa615e2-1297-40a9-b7c4-beb943996721@cogentembedded.com>
- <38e09d91-c514-4090-8e31-1709073b237a@lunn.ch>
- <da7edbbd-5a31-46a3-a091-b06ca4fee683@cogentembedded.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sneh Shah <quic_snehshah@quicinc.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH net-next] net: stmmac: qcom-ethqos: fix
+ qcom_ethqos_serdes_powerup()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <da7edbbd-5a31-46a3-a091-b06ca4fee683@cogentembedded.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1voPUH-000000083ji-25FH@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 06 Feb 2026 17:19:21 +0000
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257626-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257627-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.954];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.854];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7602C100DA9
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AEBEC100E2C
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 05:10:26PM +0100, Nikita Yushchenko wrote:
-> > 
-> > DSA switches handle the CPU port in a few different ways:
-> > 
-> > * They do address learning, so learn what MAC addresses are in the
-> >    direction of the CPU from the traffic sent by the CPU.
-> 
-> rswitch does not support hardware learning on CPU port.
-> 
-> To make use of L2 forwarding to CPU port, one has to add destinations to MAC table manually.
+Add cleanup for failure paths in qcom_ethqos_serdes_powerup(). This
+was missing calling phy_exit() and phy_power_off() at appropriate
+failure points.
 
-O.K. That helps explain a few things.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c  | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-> > * All frames with a destination MAC address not in the address
-> >    translation unit get sent to the CPU. This is sometimes implicit,
-> >    the CPU is included in the flood for unknown MAC addresses, or there
-> >    is an explicit bit to enable this.  The software bridge will then
-> >    handle the frame. The reply, if there is one, should then trigger
-> >    address learning.
-> 
-> rswitch does not do anything implicitly, each frame is processed by trying in order:
-> - match it against "streams" in L3 table,
-> - match it against destination addresses in L2 table,
-> - match it against VLAN table (VLAN id only),
-> - try port-based forwarding (i.e. common rule for anything coming from particular ingress port)
-> 
-> At each of this level, it is possible to configure one or several destinations to forward frame to.
-> Flooding can be implemented e.g. by configuring "port based" for each port
-> to forward to all other ports, so if a frame is matched at earlier stages
-> then it is processed per what is defined there, and if not then it is
-> flooded.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 869f924f3cde..af8204c0e188 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -659,10 +659,18 @@ static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
+ 		return ret;
+ 
+ 	ret = phy_power_on(ethqos->serdes_phy);
+-	if (ret)
++	if (ret) {
++		phy_exit(ethqos->serdes_phy);
+ 		return ret;
++	}
+ 
+-	return phy_set_speed(ethqos->serdes_phy, ethqos->serdes_speed);
++	ret = phy_set_speed(ethqos->serdes_phy, ethqos->serdes_speed);
++	if (ret) {
++		phy_power_off(ethqos->serdes_phy);
++		phy_exit(ethqos->serdes_phy);
++	}
++
++	return ret;
+ }
+ 
+ static void qcom_ethqos_serdes_powerdown(struct net_device *ndev, void *priv)
+-- 
+2.47.3
 
-So it sounds like you could flood to the CPU port?
-
-> > * The switch driver taps into the events the software bridge issues as
-> >    it does address learning. This allows the switch to setup its
-> >    address translation tables to mirror the software switch.
-> 
-> For rswitch there is no easy way to sync hardware-learned L2 entries to software.
-> There are no notifications of hardware updates.
-
-I was meaning the other way around. The software L2 entries can be
-placed into the switch, to make up for the switches inability to
-perform learning on the CPU port.
-
-If you flood unknown destinations to the CPU, the CPU will do address
-learning. The software bridge will flood the frame to its other ports,
-and when there is a reply, it will add an entry to its table. You can
-then mirror that to the hardware, so you gain address learning on the
-CPU port.
-
-> In my original driver, I enabled L2 forwarding only when at least two ports have been participating.
-> I don't see rationale for doing differently on this hardware.
-> But Renesas can have a different view on this.
-
-So there argument is that it simplifies the code. We might want to see
-the patchset, see how much code they manage to delete.
-
-    Andrew
 
