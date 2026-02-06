@@ -1,320 +1,369 @@
-Return-Path: <netdev+bounces-257488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257489-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFwrJtqfhWlKEAQAu9opvQ
-	(envelope-from <netdev+bounces-257488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:01:30 +0100
+	id KOiqNZGjhWmSEQQAu9opvQ
+	(envelope-from <netdev+bounces-257489-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:17:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112AAFB35A
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:01:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EB0FFB5AB
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 09:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3204D30A4B16
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 07:56:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A4543020EB2
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 08:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE27346780;
-	Fri,  6 Feb 2026 07:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EC433F395;
+	Fri,  6 Feb 2026 08:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYEYAbHZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIJpk2s3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF501346765
-	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 07:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEA230ACEE
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 08:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770364551; cv=none; b=k4n97m/VxWI8+CChs79xHWo4O35gK5vs0dEQGxKNCC5Z9RJLoHb/5BiuuvPzScJclcD+FKrZ69aIo4GiLcFLGh9z7Y4vhLPlRxcA4dq6w5aZ3YmR5/xO2GXEv+w4yqey+nz1RrkXJirYHs/MNucIFmFVbxs6W2ktaVjBzg5F7/4=
+	t=1770365837; cv=none; b=CjFL0fru17feJjpUEp6qhAmb2g3f+lnJAMkz+sjYU89lhzX2QtSNYBd/q2HGUbI5s1CnMubvi3gmwdkQG6iAcFfp2EeYhks7IbMSKhCKuIWUE1y4To90CMERGNEezIq88q1Mpt6E6NC2I9DZUYTHWUP0hFT7ZyV8GwJ/RmGkUyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770364551; c=relaxed/simple;
-	bh=v2d1blaGRcf8ijbWbljWEUVT02oGtckSRGq8JJ6vdwo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kFkAhWn6QqJ8DXKLxI3J2qBMxyia7uGEPuuaSd6rTNqhcD9KKzDEB6XdbgV3XKsec3C/a+4HNFlslPJA6Gpkc4Q/Q6xqcQPBp0poovSCV3eGgywdcEkW8p+Vo4aIrMr5F+eKD7P8NtrtFgYDZ0KP6a1eSSPEPDKflQPvT/N/toQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYEYAbHZ; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1770365837; c=relaxed/simple;
+	bh=c7PQOE0iMHjHxkRzpLy5wyWcpXy4hEdVWeuqSuOUeEI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ODahTZiZFbpqM/dQyJmwfDQY2EpsIEzBU9Z2W3s/GyW7CqqlMZKnnaP7/TnPIQMDDa9J2M8+4aYVIjdYqb/pAEy0JPHgY4FgNCW09SyTuIIIGtolSRymetMmMMMxJC4o29jeABPI9h96OyS1V04UFQXnjiDEYbHi36uYC4jb8tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NIJpk2s3; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-81f4ba336b4so1524885b3a.1
-        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 23:55:50 -0800 (PST)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-35456fcb79cso1048537a91.3
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 00:17:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770364550; x=1770969350; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770365837; x=1770970637; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ye++DxatwQlokJ3JNJAjWad+kly5kE+X16yBsy9Mh4=;
-        b=WYEYAbHZxO8uUwgFazqD6CBgeTIh2xv2DpcqTfZ2WLX+ue5Ss3uTMbnYMOfGWUYDln
-         AXyd6gu2QzhH0qClVBl8J7zupWUwBXYn21VDf2HfIBDfBsGXVTDuoFNG0BnQJ1kjHOmQ
-         fs5zmBS6Pab47JUghQnBdUK2n0W63zebQIkwZsx/7XtgURXjOe47yy1cuNN5Tkxu5cTP
-         V3ZNJRj8AbfeU9Cwr/LTfsEsGrLEYDidjB7hwaglt8MFS6sdgrSTzzG0As48Pewt/0if
-         HSC+GX3rvvEpbNyDNzPuCYnrXy0nynlctdySde7HvgBPEM1YDuNa1ErjpZHiUtdRCwRW
-         t5bA==
+        bh=JCT2HUHLs8OeyVWtYlHn7qjboQomP4IpKbaE1KAoCHE=;
+        b=NIJpk2s3BuWEugfJ3uNVac7Z1peetzh4UaiRtalaUgYRqOehJX2+WQfNZ6HNVict5X
+         ZoBktA9aDwE0Suoz7OMFX3uqdEQp+ackhi4SRNveEKICqOqwOsPe8JYoTVXE5eLE90BX
+         HABzf47ZuR4+tB0k9TaWSb+sm1tHz3Qnc8plEt56fQoWNe3USqMVc7mq7GFHjURM9rwW
+         91uvLj8LAn4GmAaZcpcp/D4624E8JyS4SkYLnvN9abRjHSACVSP9NpB/fyVqa4FotZf7
+         u71Heus0UUw3YT3W9l3z4ppRvc1LoRYFB09OSfNPXjlEZl4dHcxvrF5QAVMilTQBcibP
+         EYJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770364550; x=1770969350;
+        d=1e100.net; s=20230601; t=1770365837; x=1770970637;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3ye++DxatwQlokJ3JNJAjWad+kly5kE+X16yBsy9Mh4=;
-        b=J4/tndTkUySgRazABgteepVPYDMVxAmFO0BTpeozCui9fa2Mq27dpZboBI45Xn6vB2
-         1xs7vUCR6LPizPTJHWfuA5dlS36f0Gqdwi/OjX2Ji6zJHNAdPTn4qngBeqpc7Mf787k6
-         //ji24kH200Y3p1ZNiGZWHgq6SBbgqHFxIgUqDeTxgeJxEzbyO99VU+BliT5rOlGrvuJ
-         RLLGYRN/83b2HUPBRg/GHkqBkrrlnefEjJrSnla+/o3T9HAOKxss8WZtD/pDVN8SC18g
-         I8uKC4C/mj0D5zxSnWABKxIq1kQR4arAAtrHIuJjsZmjVjrNMG/Yfj77tZGmX1DYxFj/
-         SbhQ==
-X-Gm-Message-State: AOJu0Yz+TqzF/j3WVrX9J8Fb+snKjUZ4xUy1X93PX6kLK8OEIyewvx8V
-	Ebubg9FW5oWwbCvqg4XK87+lIFMx4PB2kXrQ+M8pDqS0QayNELg/ETFArAXAMFlq
-X-Gm-Gg: AZuq6aKK/ga8QhiTZeO5kLEs6neUJCaBOree+85JzCu9z0iWXTeyLfIaRhhPUyQK+Hr
-	Z+JFTOwNhiC4iKPxpko7Dd+aCqtIKShlP7rhbRamlhb9C8GBeihcjCLBjOLwRjhj+LrpI/EcOu2
-	Wb/eIQ7cjEwTm2BVaLwd0A1GTCQJdPGeDiHgO3WoV7ir7q6qyRi6JNlYdr6TlYmTCZNosurSezs
-	few/5Efa85QmT9hwMtSBW/GNVAHU7C6WUZehXksCq8ZlgbhXmwHb0w8LJ5YpPeq5Sib9qNPQ8Iz
-	1AYpVK+S75xE15TILD8KjaRAyo4ZX48OgG+mWUqtcsDUToR+ZlR5SMT+PHzwOb8s3jTzGdP7B89
-	jBEN6o/+t9sYKVocwZNt+VqIYjftWHSNcnv3zgbaPi6xiw85EnlkAK7b4ygUTBvX1P/twmUwtFT
-	x/+M1SIBM1KrMbKLsS8Jgfja15Bw3rnwrytksBPA==
-X-Received: by 2002:a05:6a21:138f:b0:38d:f623:f876 with SMTP id adf61e73a8af0-393ad41a179mr1704979637.79.1770364550083;
-        Thu, 05 Feb 2026 23:55:50 -0800 (PST)
-Received: from d.home.yangfl.dn42 ([2a09:bac5:6619:1250::1d3:c3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6dcb5249a0sm1391881a12.11.2026.02.05.23.55.43
+        bh=JCT2HUHLs8OeyVWtYlHn7qjboQomP4IpKbaE1KAoCHE=;
+        b=YhpYolX7PvQ+svlCjUpLi+jB84z0aW3gexwy9gBSvwUdpzfmppo2hMUni7YQOMDyhZ
+         SjFiCRhTXqcZN136/75Chc7kf1Nu00lyuHm7cQn6h6vD9dk7XoFbOmaWOra9+4y3JP/I
+         5zn5gnnJfnFnAxUaCWEcdeU5QRO9rAwkHvQl24ulsTvwXux9WBHJWMEynnAmDIEtD1xI
+         PS0JKAACnuS2O9VPNFwuTdgcDKpDBwc828zDsQ9YPqYynG7LpwJDSg+/fFx6/+RAJ4qD
+         2PWYGjYf7N9M/3O3fBmTr/B9QrpOzXoDM9Ej2lDjm5GHc+nNDtcwxMy05ShqY8l6Shdl
+         Q9VA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBlG0zATfxhPyMnD4kv3C8exYBFyHSzKQI+Tm57CiBbsdIOJNM220HsRd4JffQ67HVH4zHBCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgIvqi4Q/NQCoAVe4f5L6RR66pXX2ljQynyWGevvRjSsNtCrwK
+	DqZpHj5sH8YTct2BglDtgfx81KIb2WNhZIEODMbVuLQ0QZd+zF3MhAJs
+X-Gm-Gg: AZuq6aLc8F5S1VL13WJOq3InRo4wgr3YUtih5bLvZ83o+uOsanxLFDPkSGW8dI3okBb
+	GhfoDmF3Df6zOAvyLO5T8mzq2b89KrdzWvJO5JqlHhvP6PQ2fGE4bdjfOc/LK2mo8pgQX8vNO5X
+	ut5oLPoNODQc7XPGfVMb570IyPWucOLSgbF5yAX6PM17Rms4SfXZeDVceDkd6/WRqlR8zoT6q1x
+	HnBoD/WobPn3dSP9yWMZeMxElQR/6aNTZDtfBbCFisYNKXEeBq5ELWzk2oxPBG2jIJh7gDNGRJS
+	QVD6+Twg08KFnTmFVcpAC/CBfL/D8FgZo58lWk3Bs9RXlDoKJDUPcdKhH6AH7lmdqit/WQ2zhed
+	wtO5e3XGUE6v/oAeVBaZon7n7tmgJn93gQCL4ksYdfgVTxUn0nTFSm99OYHq6MRq8phOX1bS9f4
+	ZlLWD3fDcysvm3r08=
+X-Received: by 2002:a17:90b:2fc3:b0:354:a1bc:f99b with SMTP id 98e67ed59e1d1-354b3e15243mr1655063a91.37.1770365836747;
+        Fri, 06 Feb 2026 00:17:16 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-354b4686dfesm755671a91.11.2026.02.06.00.17.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 23:55:49 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	David Yang <mmyangfl@gmail.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4] net: dsa: eliminate local type for tc policers
-Date: Fri,  6 Feb 2026 15:54:21 +0800
-Message-ID: <20260206075427.44733-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        Fri, 06 Feb 2026 00:17:15 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: linux-kselftest@vger.kernel.org
+Cc: Shuah Khan <shuah@kernel.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	netdev@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH selftests] selftests: Use ktap helpers for runner.sh
+Date: Fri,  6 Feb 2026 08:17:04 +0000
+Message-ID: <20260206081704.53215-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[nxp.com,gmail.com,bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-257488-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257489-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 112AAFB35A
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[runner.sh:url,run_kselftest.sh:url]
+X-Rspamd-Queue-Id: 4EB0FFB5AB
 X-Rspamd-Action: no action
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+This has been on my todo list for a long time. We should use ktap
+helpers in runner.sh. I saw Brendan did some work in d9e6269e3303
+("selftests/run_kselftest.sh: exit with error if tests fail") to make
+run_kselftest.sh exit with the correct return value. But we still use a
+custom solution in runner.sh. Let's convert all the print messages to use
+formal ktap helpers. Here’s what I changed:
 
-David Yang is saying that struct flow_action_entry in
-include/net/flow_offload.h has gained new fields and DSA's struct
-dsa_mall_policer_tc_entry, derived from that, isn't keeping up.
-This structure is passed to drivers and they are completely oblivious to
-the values of fields they don't see.
+  1. Move TAP header from runner.sh to run_kselftest.sh, since run_kselftest.sh
+     is the only caller of run_many().
+  2. In run_kselftest.sh, call run_many() in main process to count the
+     pass/fail numbers.
+  3. In run_kselftest.sh, do not generate kselftest_failures_file; just
+     use ktap_print_totals to report the result.
+  4. In runner.sh run_one(), get the return value and use ktap helpers for
+     all pass/fail reporting. This allows counting pass/fail numbers in the
+     main process.
+  5. In runner.sh run_in_netns(), also return the correct rc, so we can
+     count results during wait.
 
-This has happened before, and almost always the solution was to make the
-DSA layer thinner and use the upstream data structures. Here, the reason
-why we didn't do that is because struct flow_action_entry :: police is
-an anonymous structure.
+After the change, the printed result looks like:
 
-That is easily enough fixable, just name those fields "struct
-flow_action_police" and reference them from DSA.
+  not ok 4 4 selftests: clone3: clone3_cap_checkpoint_restore # exit=1
+  # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
 
-Make the according transformations to the two users (sja1105 and felix):
-"rate_bytes_per_sec" -> "rate_bytes_ps".
+  ]# echo $?
+  1
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Co-developed-by: David Yang <mmyangfl@gmail.com>
-Signed-off-by: David Yang <mmyangfl@gmail.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-v3: https://lore.kernel.org/r/20260203172207.98533-1-mmyangfl@gmail.com
-  - move struct flow_action_police standalone
-v2: https://lore.kernel.org/r/20260131045821.3451873-1-mmyangfl@gmail.com
-  - use Oltean's version and export struct flow_action_police
-v1: https://lore.kernel.org/r/20260126061340.757543-1-mmyangfl@gmail.com
-  - fix DSA core only
- drivers/net/dsa/ocelot/felix.c         |  4 ++--
- drivers/net/dsa/sja1105/sja1105_main.c |  4 ++--
- include/net/dsa.h                      | 10 ++-------
- include/net/flow_offload.h             | 30 ++++++++++++++------------
- net/dsa/user.c                         |  5 ++---
- 5 files changed, 24 insertions(+), 29 deletions(-)
+ tools/testing/selftests/kselftest/runner.sh | 83 ++++++++++++---------
+ tools/testing/selftests/run_kselftest.sh    | 21 ++++--
+ 2 files changed, 62 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-index 9e5ede932b42..5d34eb82e639 100644
---- a/drivers/net/dsa/ocelot/felix.c
-+++ b/drivers/net/dsa/ocelot/felix.c
-@@ -2003,11 +2003,11 @@ static int felix_cls_flower_stats(struct dsa_switch *ds, int port,
+diff --git a/tools/testing/selftests/kselftest/runner.sh b/tools/testing/selftests/kselftest/runner.sh
+index 3a62039fa621..f3307f2d1f48 100644
+--- a/tools/testing/selftests/kselftest/runner.sh
++++ b/tools/testing/selftests/kselftest/runner.sh
+@@ -1,8 +1,8 @@
+-#!/bin/sh
++#!/bin/bash
+ # SPDX-License-Identifier: GPL-2.0
+ #
+ # Runs a set of tests in a given subdirectory.
+-export skip_rc=4
++. $(dirname "$(readlink -e "${BASH_SOURCE[0]}")")/ktap_helpers.sh
+ export timeout_rc=124
+ export logfile=/dev/stdout
+ export per_test_logging=
+@@ -44,17 +44,11 @@ tap_timeout()
+ 	fi
  }
  
- static int felix_port_policer_add(struct dsa_switch *ds, int port,
--				  struct dsa_mall_policer_tc_entry *policer)
-+				  const struct flow_action_police *policer)
- {
- 	struct ocelot *ocelot = ds->priv;
- 	struct ocelot_policer pol = {
--		.rate = div_u64(policer->rate_bytes_per_sec, 1000) * 8,
-+		.rate = div_u64(policer->rate_bytes_ps, 1000) * 8,
- 		.burst = policer->burst,
- 	};
- 
-diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index 2a4a0fe20dae..71a817c07a90 100644
---- a/drivers/net/dsa/sja1105/sja1105_main.c
-+++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -2841,7 +2841,7 @@ static void sja1105_mirror_del(struct dsa_switch *ds, int port,
- }
- 
- static int sja1105_port_policer_add(struct dsa_switch *ds, int port,
--				    struct dsa_mall_policer_tc_entry *policer)
-+				    const struct flow_action_police *policer)
- {
- 	struct sja1105_l2_policing_entry *policing;
- 	struct sja1105_private *priv = ds->priv;
-@@ -2852,7 +2852,7 @@ static int sja1105_port_policer_add(struct dsa_switch *ds, int port,
- 	 * the value of RATE bytes divided by 64, up to a maximum of SMAX
- 	 * bytes.
- 	 */
--	policing[port].rate = div_u64(512 * policer->rate_bytes_per_sec,
-+	policing[port].rate = div_u64(512 * policer->rate_bytes_ps,
- 				      1000000);
- 	policing[port].smax = policer->burst;
- 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 6b2b5ed64ea4..656990365798 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -216,12 +216,6 @@ struct dsa_mall_mirror_tc_entry {
- 	bool ingress;
- };
- 
--/* TC port policer entry */
--struct dsa_mall_policer_tc_entry {
--	u32 burst;
--	u64 rate_bytes_per_sec;
--};
+-report_failure()
+-{
+-	echo "not ok $*"
+-	echo "$*" >> "$kselftest_failures_file"
+-}
 -
- /* TC matchall entry */
- struct dsa_mall_tc_entry {
- 	struct list_head list;
-@@ -229,7 +223,7 @@ struct dsa_mall_tc_entry {
- 	enum dsa_port_mall_action_type type;
- 	union {
- 		struct dsa_mall_mirror_tc_entry mirror;
--		struct dsa_mall_policer_tc_entry policer;
-+		struct flow_action_police policer;
- 	};
- };
+ run_one()
+ {
+ 	DIR="$1"
+ 	TEST="$2"
+-	local test_num="$3"
++	local rc test_num="$3"
  
-@@ -1110,7 +1104,7 @@ struct dsa_switch_ops {
- 	void	(*port_mirror_del)(struct dsa_switch *ds, int port,
- 				   struct dsa_mall_mirror_tc_entry *mirror);
- 	int	(*port_policer_add)(struct dsa_switch *ds, int port,
--				    struct dsa_mall_policer_tc_entry *policer);
-+				    const struct flow_action_police *policer);
- 	void	(*port_policer_del)(struct dsa_switch *ds, int port);
- 	int	(*port_setup_tc)(struct dsa_switch *ds, int port,
- 				 enum tc_setup_type type, void *type_data);
-diff --git a/include/net/flow_offload.h b/include/net/flow_offload.h
-index 5637747019c1..70a02ee14308 100644
---- a/include/net/flow_offload.h
-+++ b/include/net/flow_offload.h
-@@ -231,6 +231,21 @@ struct flow_action_cookie *flow_action_cookie_create(void *data,
- 						     gfp_t gfp);
- void flow_action_cookie_destroy(struct flow_action_cookie *cookie);
+ 	BASENAME_TEST=$(basename $TEST)
  
-+struct flow_action_police {
-+	u32 burst;
-+	u64 rate_bytes_ps;
-+	u64 peakrate_bytes_ps;
-+	u32 avrate;
-+	u16 overhead;
-+	u64 burst_pkt;
-+	u64 rate_pkt_ps;
-+	u32 mtu;
-+	struct {
-+		enum flow_action_id act_id;
-+		u32 extval;
-+	} exceed, notexceed;
-+};
+@@ -102,16 +96,17 @@ run_one()
+ 	# Command line timeout overrides the settings file
+ 	if [ -n "$kselftest_override_timeout" ]; then
+ 		kselftest_timeout="$kselftest_override_timeout"
+-		echo "# overriding timeout to $kselftest_timeout" >> "$logfile"
++		ktap_print_msg "overriding timeout to $kselftest_timeout" >> "$logfile"
+ 	else
+-		echo "# timeout set to $kselftest_timeout" >> "$logfile"
++		ktap_print_msg "timeout set to $kselftest_timeout" >> "$logfile"
+ 	fi
+ 
+ 	TEST_HDR_MSG="selftests: $DIR: $BASENAME_TEST"
+ 	echo "# $TEST_HDR_MSG"
+ 	if [ ! -e "$TEST" ]; then
+-		echo "# Warning: file $TEST is missing!"
+-		report_failure "$test_num $TEST_HDR_MSG"
++		ktap_print_msg "Warning: file $TEST is missing!"
++		ktap_test_fail "$test_num $TEST_HDR_MSG"
++		rc=$KSFT_FAIL
+ 	else
+ 		if [ -x /usr/bin/stdbuf ]; then
+ 			stdbuf="/usr/bin/stdbuf --output=L "
+@@ -122,33 +117,37 @@ run_one()
+ 		elif [ -x "./ksft_runner.sh" ]; then
+ 			cmd="$stdbuf ./ksft_runner.sh ./$BASENAME_TEST"
+ 		else
+-			echo "# Warning: file $TEST is not executable"
++			ktap_print_msg "Warning: file $TEST is not executable"
+ 
+ 			if [ $(head -n 1 "$TEST" | cut -c -2) = "#!" ]
+ 			then
+ 				interpreter=$(head -n 1 "$TEST" | cut -c 3-)
+ 				cmd="$stdbuf $interpreter ./$BASENAME_TEST"
+ 			else
+-				report_failure "$test_num $TEST_HDR_MSG"
+-				return
++				ktap_test_fail "$test_num $TEST_HDR_MSG"
++				return $KSFT_FAIL
+ 			fi
+ 		fi
+ 		cd `dirname $TEST` > /dev/null
+-		((((( tap_timeout "$cmd" 2>&1; echo $? >&3) |
++		(((( tap_timeout "$cmd" 2>&1; echo $? >&3) |
+ 			tap_prefix >&4) 3>&1) |
+-			(read xs; exit $xs)) 4>>"$logfile" &&
+-		echo "ok $test_num $TEST_HDR_MSG") ||
+-		(rc=$?;	\
+-		if [ $rc -eq $skip_rc ]; then	\
+-			echo "ok $test_num $TEST_HDR_MSG # SKIP"
+-		elif [ $rc -eq $timeout_rc ]; then \
+-			echo "#"
+-			report_failure "$test_num $TEST_HDR_MSG # TIMEOUT $kselftest_timeout seconds"
++			(read xs; exit $xs)) 4>>"$logfile"
++		rc=$?
++		if [ "$rc" -eq "$KSFT_PASS" ]; then
++			ktap_test_pass "$test_num $TEST_HDR_MSG"
++		elif [ "$rc" -eq "$KSFT_SKIP" ]; then
++			ktap_test_skip "$test_num $TEST_HDR_MSG"
++		elif [ "$rc" -eq "$KSFT_XFAIL" ]; then
++			ktap_test_xfail "$test_num $TEST_HDR_MSG"
++		elif [ "$rc" -eq "$timeout_rc" ]; then
++			ktap_test_fail "$test_num $TEST_HDR_MSG # TIMEOUT $kselftest_timeout seconds"
+ 		else
+-			report_failure "$test_num $TEST_HDR_MSG # exit=$rc"
+-		fi)
++			ktap_test_fail "$test_num $TEST_HDR_MSG # exit=$rc"
++		fi
+ 		cd - >/dev/null
+ 	fi
 +
- struct flow_action_entry {
- 	enum flow_action_id		id;
- 	u32				hw_index;
-@@ -275,20 +290,7 @@ struct flow_action_entry {
- 			u32			trunc_size;
- 			bool			truncate;
- 		} sample;
--		struct {				/* FLOW_ACTION_POLICE */
--			u32			burst;
--			u64			rate_bytes_ps;
--			u64			peakrate_bytes_ps;
--			u32			avrate;
--			u16			overhead;
--			u64			burst_pkt;
--			u64			rate_pkt_ps;
--			u32			mtu;
--			struct {
--				enum flow_action_id	act_id;
--				u32			extval;
--			} exceed, notexceed;
--		} police;
-+		struct flow_action_police police;	/* FLOW_ACTION_POLICE */
- 		struct {				/* FLOW_ACTION_CT */
- 			int action;
- 			u16 zone;
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index f59d66f0975d..5697291d43cf 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1459,8 +1459,8 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
- 	struct netlink_ext_ack *extack = cls->common.extack;
- 	struct dsa_port *dp = dsa_user_to_port(dev);
- 	struct dsa_user_priv *p = netdev_priv(dev);
--	struct dsa_mall_policer_tc_entry *policer;
- 	struct dsa_mall_tc_entry *mall_tc_entry;
-+	struct flow_action_police *policer;
- 	struct dsa_switch *ds = dp->ds;
- 	struct flow_action_entry *act;
- 	int err;
-@@ -1497,8 +1497,7 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
- 	mall_tc_entry->cookie = cls->cookie;
- 	mall_tc_entry->type = DSA_PORT_MALL_POLICER;
- 	policer = &mall_tc_entry->policer;
--	policer->rate_bytes_per_sec = act->police.rate_bytes_ps;
--	policer->burst = act->police.burst;
-+	*policer = act->police;
++	return $rc
+ }
  
- 	err = ds->ops->port_policer_add(ds, dp->index, policer);
- 	if (err) {
+ in_netns()
+@@ -164,27 +163,34 @@ in_netns()
+ 
+ run_in_netns()
+ {
+-	local netns=$(mktemp -u ${BASENAME_TEST}-XXXXXX)
+ 	local tmplog="/tmp/$(mktemp -u ${BASENAME_TEST}-XXXXXX)"
++	local netns=$(mktemp -u ${BASENAME_TEST}-XXXXXX)
++	local rc
++
+ 	ip netns add $netns
+ 	if [ $? -ne 0 ]; then
+-		echo "# Warning: Create namespace failed for $BASENAME_TEST"
+-		echo "not ok $test_num selftests: $DIR: $BASENAME_TEST # Create NS failed"
++		ktap_print_msg "Warning: Create namespace failed for $BASENAME_TEST"
++		ktap_test_fail "$test_num selftests: $DIR: $BASENAME_TEST # Create NS failed"
+ 	fi
+ 	ip -n $netns link set lo up
++
+ 	in_netns $netns &> $tmplog
++	rc=$?
++
+ 	ip netns del $netns &> /dev/null
++	# Cat the log at once to avoid parallel netns logs.
+ 	cat $tmplog
+ 	rm -f $tmplog
++	return $rc
+ }
+ 
+ run_many()
+ {
+-	echo "TAP version 13"
+ 	DIR="${PWD#${BASE_DIR}/}"
+ 	test_num=0
+-	total=$(echo "$@" | wc -w)
+-	echo "1..$total"
++	local rc
++	pids=()
++
+ 	for TEST in "$@"; do
+ 		BASENAME_TEST=$(basename $TEST)
+ 		test_num=$(( test_num + 1 ))
+@@ -194,10 +200,19 @@ run_many()
+ 		fi
+ 		if [ -n "$RUN_IN_NETNS" ]; then
+ 			run_in_netns &
++			pids+=($!)
+ 		else
+ 			run_one "$DIR" "$TEST" "$test_num"
+ 		fi
+ 	done
+ 
+-	wait
++	# Handle the return values when running in netns.
++	for pid in "${pids[@]}"; do
++		wait "$pid"
++		rc=$?
++		[ "$rc" -eq "$KSFT_PASS" ] && KTAP_CNT_PASS=$((KTAP_CNT_PASS+1))
++		[ "$rc" -eq "$KSFT_FAIL" ] && KTAP_CNT_FAIL=$((KTAP_CNT_FAIL+1))
++		[ "$rc" -eq "$KSFT_SKIP" ] && KTAP_CNT_SKIP=$((KTAP_CNT_SKIP+1))
++		[ "$rc" -eq "$KSFT_XFAIL" ] && KTAP_CNT_XFAIL=$((KTAP_CNT_XFAIL+1))
++	done
+ }
+diff --git a/tools/testing/selftests/run_kselftest.sh b/tools/testing/selftests/run_kselftest.sh
+index d4be97498b32..10930d09f2a5 100755
+--- a/tools/testing/selftests/run_kselftest.sh
++++ b/tools/testing/selftests/run_kselftest.sh
+@@ -110,18 +110,23 @@ if [ -n "$TESTS" ]; then
+ 	available="$(echo "$valid" | sed -e 's/ /\n/g')"
+ fi
+ 
+-kselftest_failures_file="$(mktemp --tmpdir kselftest-failures-XXXXXX)"
+-export kselftest_failures_file
+-
++curdir=$(pwd)
++total=$(echo "$available" | wc -w)
+ collections=$(echo "$available" | cut -d: -f1 | sort | uniq)
++
++ktap_print_header
++ktap_set_plan "$total"
++
+ for collection in $collections ; do
+ 	[ -w /dev/kmsg ] && echo "kselftest: Running tests in $collection" >> /dev/kmsg
+ 	tests=$(echo "$available" | grep "^$collection:" | cut -d: -f2)
+-	($dryrun cd "$collection" && $dryrun run_many $tests)
++	$dryrun cd "$collection" && $dryrun run_many $tests
++	$dryrun cd "$curdir"
+ done
+ 
+-failures="$(cat "$kselftest_failures_file")"
+-rm "$kselftest_failures_file"
+-if "$ERROR_ON_FAIL" && [ "$failures" ]; then
+-	exit 1
++ktap_print_totals
++if "$ERROR_ON_FAIL" && [ "$KTAP_CNT_FAIL" -ne 0 ]; then
++	exit "$KSFT_FAIL"
++else
++	exit "$KSFT_PASS"
+ fi
 -- 
-2.51.0
+2.50.1
 
 
