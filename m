@@ -1,211 +1,177 @@
-Return-Path: <netdev+bounces-257429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257413-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEApOvNZhWnNAQQAu9opvQ
-	(envelope-from <netdev+bounces-257429-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 04:03:15 +0100
+	id yPVfCoNYhWkhAQQAu9opvQ
+	(envelope-from <netdev+bounces-257413-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:57:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97D5F9832
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 04:03:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B6BF97AE
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 03:57:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A4C873012861
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 03:02:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6AA5C300FB40
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 02:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14BB2D0618;
-	Fri,  6 Feb 2026 03:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CCD299923;
+	Fri,  6 Feb 2026 02:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ARm6MA9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC1B2D0602;
-	Fri,  6 Feb 2026 03:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC3A2A1AA
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 02:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770346913; cv=none; b=vBaGRhTDljIjJyNpmas5VPVdDLsZdRChLinfQqkm9DavV2Su155JG6AD4XG4XqDLAmgi/6hDV57dKMsBOUdvh3lhwf0X8Mnu7+WHAC/85IbC3VX21y9JZP5tQeG+5Ump6BYznM1OkbccAPESWWArvpArVv57bZysuwP6lz+C0uE=
+	t=1770346623; cv=none; b=l7gnZMvjtNiG1OIoCjecu02PUmQ44rlY4sVuZP7+CZnhcKDQxhnJUg+sgi8KULlYI7O3HYhmU4ocjvvIENr3vUfDrTxr7hqUEcHcVGU/PnJZLWoKswlLkAQUyq3oVbbrpEzBKDXC0O22cBqMB9KXja9kJI3SMFpLEPHKcngtcsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770346913; c=relaxed/simple;
-	bh=frhcBkgkTFKwzX3pWSel+U+buO3DsSct1uWmviR1Bsk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e/qPDvj7aOJtQ0AColteGhb5crVvfTfV3+O7H5sJG1w+wXPlOvuLR40HE0V9NU9CEDIDshTAOTaQX4h9pr77V0dyhjH6eOmSEud5EZseS3k5EstCy7zf70ReuoAw4OVoDRgdVtgEojY1Deh4Q6ZhdAUO8tX5xEV+wN2tk+FMiBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9AC6554C9F3;
-	Fri,  6 Feb 2026 04:01:51 +0100 (CET)
-From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-To: bridge@lists.linux.dev
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
+	s=arc-20240116; t=1770346623; c=relaxed/simple;
+	bh=btvddpMCo+POrysRwjiHNzityRdAyxgMpjYo/qxXATk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ot7JsSEi/ub7kALZlmdmFghH70kCkqHggGxDE84dYnzshrm37iFDs0hhOTjwJR3TT//R/AGKTSyqnNclmLL01bKWbohZoLS32plquqQUdq3PqsPmBCxnnMv59x7zSw0renywD7Dj+MP8mBQo+Xnt7PVB56JO1OwrWmve5Jrbbn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ARm6MA9w; arc=none smtp.client-ip=74.125.82.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2b7da62b487so3104623eec.1
+        for <netdev@vger.kernel.org>; Thu, 05 Feb 2026 18:57:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770346622; x=1770951422; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1TO5bxIMT3fTMREZKwhQ6bquMxzdY7Tp+3iN2NbRfN0=;
+        b=ARm6MA9wQsBHvhsNdm7PR8z3/Kz7nl/sf+dVC0axS1ED0PGZ++ODtOU+zZz05cN+Ym
+         WzVwihSJ93keHtnj0hdO1Za2/BCQ6TJPMkIxObdyNfprQ9t+6UbyG2fase6rWAoseX8l
+         +bPNhWJnPkjLPc87meSWyQh+PTTnp9oEvoik0ZMdE+B+CY7Bpp1Twzzz5vfHt9CZLBUG
+         B7ZQv5l2wwwiFv3YCq3gwEzev5/LSbLyYzc2ytm14DVHFq93SitjJRGzog6f+TdUQg6V
+         0cHb0pVtai0Js6Yi4wS3MLd1JCxTZZyaJB/2K7Szx/ofjUz3sxBBa4g9MdL5gEKe/J/R
+         5TiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770346622; x=1770951422;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1TO5bxIMT3fTMREZKwhQ6bquMxzdY7Tp+3iN2NbRfN0=;
+        b=KxNR9goj5NjHL9lL+Na/CyiExZalWMlt4EJUUHtSlcskFOCldO5Kx8+GzYdWHYY7oz
+         9utp2njvBdv/lawvIf7DhpfwLPP34JoiqEYvdRz7uQL6bX6JwoPLFXa2ZERVMK455WaF
+         uzBZVP0QUwwXKijNh3Ql3FTK7nqahe7MbaUm2P4GyeHxU0Eh4oLEGiKvxgF0NiA6bITe
+         amfcZZYc7mnAd5XEDdxX/yQE7t2EKXdnRCrseMXhodCvNsTOGcgaqUtLfg3TfDvy59VW
+         lDFgvtIFWz6KsYMTGfOkJ63eB2/5KAchdfPpi/64R12qaFLlYr/fh2fhk+M/+AfrfWZz
+         2cfw==
+X-Gm-Message-State: AOJu0YzqZhfzqyqrddvKtbZAiznW4s+fmeHUz6H9yYSJIce68BoJedks
+	RIVOI3A2xsHw8dXH7VRh1ITye9WUwZbYg2tL6hw/WuV5aVgrbf+dR6vy
+X-Gm-Gg: AZuq6aKRb/HfMoPvYcadg6oZittaRMVFyy/7Rrb67iTFaqljnZwaaF/BxHrYeDvU9wK
+	wtAGSQpY7scz9DM6g/7i6F5q2wY6yDKHSWC/Xgyw59u85shXSFHBVpP6qw+JofWPmm1Ar5oKBU4
+	2NHF9JXQd1UpkVue1tkeeMSfM4mouRT4PHip/vFlKkTlSGX4o/HQXBXoexxZ3salffXwi4rWYxa
+	3PmCVVp/Bt+ylll6lKnNmfSrhAQKbsO6zityMIbGS/OJl2X2D7WJftJA3HRTQ4NCOKjD7K626wQ
+	ZSgvHIHYJTOMR1wV9hO1kShpeVpszMhqz14APafKQj9qbSksJJwm6iBPmfpKbjanBLt7sxq+cbB
+	+qjHwiehmMiYnKB1CVpAxQIFZRxIXkT+qruJIlsFxqQoG2N9yOTc/rDaVrc6pEUkU4IAr8UP6yr
+	geDGb0f7Y=
+X-Received: by 2002:a05:7300:230a:b0:2a4:3593:9697 with SMTP id 5a478bee46e88-2b8564cd5famr649623eec.20.1770346621920;
+        Thu, 05 Feb 2026 18:57:01 -0800 (PST)
+Received: from pek-khao-d3 ([128.224.246.2])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b855ad8da2sm981019eec.5.2026.02.05.18.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 18:57:01 -0800 (PST)
+Date: Fri, 6 Feb 2026 10:56:54 +0800
+From: Kevin Hao <haokexin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net-next v2 14/14] net: bridge: mcast: add inactive state assertions
-Date: Fri,  6 Feb 2026 03:52:20 +0100
-Message-ID: <20260206030123.5430-15-linus.luessing@c0d3.blue>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260206030123.5430-1-linus.luessing@c0d3.blue>
-References: <20260206030123.5430-1-linus.luessing@c0d3.blue>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Add dependency on HSR
+Message-ID: <aYVYdqmyzBnTOZAV@pek-khao-d3>
+References: <20260203-icssg-dep-v1-1-bacaf5234fb3@gmail.com>
+ <20260205100315.134766d7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="c9cg0aXFcFFRHxpa"
+Content-Disposition: inline
+In-Reply-To: <20260205100315.134766d7@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257429-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[c0d3.blue];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-257413-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.969];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linus.luessing@c0d3.blue,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,blackwall.org,nvidia.com,lunn.ch,kernel.org,redhat.com,google.com,davemloft.net,fomichev.me,gmail.com,c0d3.blue];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[c0d3.blue:mid,c0d3.blue:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C97D5F9832
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 95B6BF97AE
 X-Rspamd-Action: no action
 
-To avoid packetloss and as it is very hard from a user's perspective to
-debug multicast snooping related issues it is even more crucial to properly
-switch from an active to an inactive multicast snooping state than the
-other way around.
 
-Therefore adding a few kernel warnings if any of our assertions to be in
-an inactive state would fail.
+--c9cg0aXFcFFRHxpa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
----
- net/bridge/br_multicast.c | 43 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
+On Thu, Feb 05, 2026 at 10:03:15AM -0800, Jakub Kicinski wrote:
+> Looks like there are appropriate static inlines in place to handle
+> HSR=3Dn in the driver the only problematic case is if HSR is m and
+> drivers is y, no?
+>=20
+> 	depends on HSR || HSR=3Dn
+>=20
+> is likely more suitable.
 
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 8ad1b8fec3c5..5c6c00776dee 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -1418,10 +1418,29 @@ static struct sk_buff *br_multicast_alloc_query(struct net_bridge_mcast *brmctx,
- 	return NULL;
- }
- 
-+static void br_ip4_multicast_assert_inactive(struct net_bridge_mcast *brmctx)
-+{
-+	WARN_ON(br_multicast_snooping_active(brmctx, htons(ETH_P_IP), NULL));
-+}
-+
-+static void br_ip6_multicast_assert_inactive(struct net_bridge_mcast *brmctx)
-+{
-+	WARN_ON(br_multicast_snooping_active(brmctx, htons(ETH_P_IPV6), NULL));
-+}
-+
-+static void br_multicast_assert_inactive(struct net_bridge_mcast *brmctx)
-+{
-+	br_ip4_multicast_assert_inactive(brmctx);
-+	br_ip6_multicast_assert_inactive(brmctx);
-+}
-+
- static void br_multicast_toggle_enabled(struct net_bridge *br, bool on)
- {
- 	br_opt_toggle(br, BROPT_MULTICAST_ENABLED, on);
- 	br_multicast_update_active(&br->multicast_ctx);
-+
-+	if (!on)
-+		br_multicast_assert_inactive(&br->multicast_ctx);
- }
- 
- struct net_bridge_mdb_entry *br_multicast_new_group(struct net_bridge *br,
-@@ -1891,9 +1910,7 @@ static void br_multicast_querier_expired(struct net_bridge_mcast *brmctx,
- 					 struct bridge_mcast_own_query *query,
- 					 struct timer_list *timer)
- {
--	spin_lock(&brmctx->br->multicast_lock);
--	if (br_multicast_stopping(brmctx->br, timer) ||
--	    br_multicast_ctx_vlan_global_disabled(brmctx) ||
-+	if (br_multicast_ctx_vlan_global_disabled(brmctx) ||
- 	    !br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED))
- 		goto out;
- 
-@@ -1904,7 +1921,6 @@ static void br_multicast_querier_expired(struct net_bridge_mcast *brmctx,
- 	 * if our own querier is disabled, too
- 	 */
- 	br_multicast_update_active(brmctx);
--	spin_unlock(&brmctx->br->multicast_lock);
- }
- 
- static void br_ip4_multicast_querier_expired(struct timer_list *t)
-@@ -1912,7 +1928,16 @@ static void br_ip4_multicast_querier_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip4_other_query.timer);
- 
-+	spin_lock(&brmctx->br->multicast_lock);
-+	if (br_multicast_stopping(brmctx->br, t))
-+		goto out;
-+
- 	br_multicast_querier_expired(brmctx, &brmctx->ip4_own_query, t);
-+
-+	if (!brmctx->multicast_querier)
-+		br_ip4_multicast_assert_inactive(brmctx);
-+out:
-+	spin_unlock(&brmctx->br->multicast_lock);
- }
- 
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -1921,7 +1946,16 @@ static void br_ip6_multicast_querier_expired(struct timer_list *t)
- 	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
- 							     ip6_other_query.timer);
- 
-+	spin_lock(&brmctx->br->multicast_lock);
-+	if (br_multicast_stopping(brmctx->br, t))
-+		goto out;
-+
- 	br_multicast_querier_expired(brmctx, &brmctx->ip6_own_query, t);
-+
-+	if (!brmctx->multicast_querier)
-+		br_ip6_multicast_assert_inactive(brmctx);
-+out:
-+	spin_unlock(&brmctx->br->multicast_lock);
- }
- #endif
- 
-@@ -4499,6 +4533,7 @@ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
- 
- 	/* bridge interface is down, set multicast state to inactive */
- 	br_multicast_update_active(brmctx);
-+	br_multicast_assert_inactive(brmctx);
- }
- 
- void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
--- 
-2.51.0
+Yes, the icssg-prueth driver can still be built with HSR disabled. Therefor=
+e,
+this should be an optional dependency. I will update it to:
 
+  depends on HSR if HSR
+
+as this is the recommended way to express optional dependencies according to
+kconfig-language.rst.
+
+Thanks,
+Kevin
+
+--c9cg0aXFcFFRHxpa
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEHc6qFoLCZqgJD98Zk1jtMN6usXEFAmmFWHYACgkQk1jtMN6u
+sXHZkwf/SByWh1vNr3xcUG8JWzd31gxjuA758RZefHCoIca3s+pQw92UbkUzZFdv
+UphvBbiHqnGetSg6JuwOIEVg+GDvYo5WWZQoRkufJ3qz7RHeiHVYnVutf1pthjYn
+nIl5IyE64H4J8iiec7YCVcLs0Fjqy3zkfFSKoQe2uynDsxIMBVFWGW4saWoVznvo
+iIxpD8s6XLGrKBfdIgpWQR7KdHJ0niv5PmUwozH//Tzr2IXqX6q1y3ZPTKF929Bi
+ce05orKnLxvHT1v7CS8K9oKyp8a6dxS4MMRBnnEeLXSAOSb0bw4sZEvTozJgo+3c
+FKdy5mq7L2wdIGn3Day4tvq1YDN2Bw==
+=jZyM
+-----END PGP SIGNATURE-----
+
+--c9cg0aXFcFFRHxpa--
 
