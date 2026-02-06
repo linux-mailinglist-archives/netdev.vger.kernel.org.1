@@ -1,242 +1,194 @@
-Return-Path: <netdev+bounces-257624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CwzGFMhhmm/JwQAu9opvQ
-	(envelope-from <netdev+bounces-257624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:13:55 +0100
+	id iKJVG7ghhmm/JwQAu9opvQ
+	(envelope-from <netdev+bounces-257625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:15:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F56100CD1
-	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:13:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87BEE100D48
+	for <lists+netdev@lfdr.de>; Fri, 06 Feb 2026 18:15:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 363953005A94
-	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 17:13:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7D7343006837
+	for <lists+netdev@lfdr.de>; Fri,  6 Feb 2026 17:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021C3395247;
-	Fri,  6 Feb 2026 17:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCC83A1E72;
+	Fri,  6 Feb 2026 17:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pp+u/PbV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5tG2MhE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D194D36C0C7;
-	Fri,  6 Feb 2026 17:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678CD29AAFA
+	for <netdev@vger.kernel.org>; Fri,  6 Feb 2026 17:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770398030; cv=none; b=IreBVSST62V7XmGjrdvJgUZqp+/W3WpH1DipWnUY+8HBoBwIbe27bJr4jDzJtHT9QRd3C6Zu0ucLh5je/gPYTiT7NWhxS9x78zAL4NT1m7XtuKmATwSJ8oin03zAFloWp0EQR85oW8JoKwz7+NXcxiMggrk3ZWjwYzt6GZnl1W0=
+	t=1770398129; cv=none; b=tLVYAbv/xo6v+8+8URdRkACPD2uCku1uafBu60wxwv+98fQEsYYWLgTtsHjOeWmd8ych/TmYYRETeFCQEoyZikeD6ETCch0xlFf91h0s2wOG7HZiR1Dp1EPIV2qfbkLSetXM8XLs8A5QKgonc+lY3ojHhhA7HZ0yXoPhHQgZies=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770398030; c=relaxed/simple;
-	bh=GLzNiltKbkC1Pow+qhGIJkVK+++Chfm8SxgjlZAIaN4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fBr0DNLnLE7QXwz9nSy3aiw2WPOY7U4KqBIQKexikmOY0YVhQqhdb7jtD++mkNLMGL9eXAPqi7ZXH0vTmpDeRwk1FqfVwQ5/jc5JTpYrwbYbgBqcHPTOWKj72HImcQWx6xukw6AoYiBX0cdIDORrtZFO2e4XjHrgsVS0BkyZJVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pp+u/PbV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF1BC19423;
-	Fri,  6 Feb 2026 17:13:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770398030;
-	bh=GLzNiltKbkC1Pow+qhGIJkVK+++Chfm8SxgjlZAIaN4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pp+u/PbVSWQA84fO+VdvbGB/pOEKDgdosJkXeD0tCqvEV90UhoYRHKLTzUHj8E8nX
-	 YQV+xGkSD/dw/IsCbKVBx9lXoSmiNHZFCKt8Jlvg0oJw1eeTZOzbmvt/M1ohftVvKI
-	 EV60JNljbvlJRoMM7KMY7gW2wRhqcGyGShr+9dOweHsc4g9SriZVo/+C6oaeKoPA92
-	 mntzdpAZkd3B4mM1cznnn5AXOd3XUvtWNQ1xe96fO02TABaj7jjhoK9RvOVOgkpYKj
-	 uM9xgJPcp/Uc1QH+gg7OeHpbKjR+IaYYRVJQ7Nuw8wd84UeS2TdMwCPgpehYxDndzY
-	 3BCnL1Uco332g==
-Message-ID: <d7724321-3e04-4fc3-be64-e19a6103de64@kernel.org>
-Date: Fri, 6 Feb 2026 18:13:44 +0100
+	s=arc-20240116; t=1770398129; c=relaxed/simple;
+	bh=HkElroGZVk3RRscduN3Kmk506Ncb/7nmteEuajK1CPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZadyZsAPC8qZ8rI1S0pwBQy7hT+uNHPj8g8Hr+fmZCjlrjb7uLpLctFXMqc2EHe8wX1fYnaSWqT0w2k2/iOwGVBOeEblJyLvVxHtYj48eLzsSfJwT2vC5c6i1dhVZJwe6418wnQsFXCxpwFQbp59ZCTw2y63g5D9wrzOJHjqlGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z5tG2MhE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770398128;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=k5Fx3pdcilBHfzUSMjvyCmeVm379Jrzk5/xcce1yxgk=;
+	b=Z5tG2MhEc8IS78pCLznjpams7bKotpk5770fanzWkWibOsvdcK9wy6RE5uINAtwm21qa7J
+	2Z4JY5CU4l88yhBN8j4hXAaxUrbQTHsfNqPKbP15idGTMXR9xb4HhvAWfzAhx3Bm/MZlzi
+	21M3++8U9bWVikyma+5dhGOsLtItXfM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-214-Zpe13dnFN7KvQ6EHjYtUIQ-1; Fri,
+ 06 Feb 2026 12:15:25 -0500
+X-MC-Unique: Zpe13dnFN7KvQ6EHjYtUIQ-1
+X-Mimecast-MFC-AGG-ID: Zpe13dnFN7KvQ6EHjYtUIQ_1770398123
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A5111955F20;
+	Fri,  6 Feb 2026 17:15:23 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.33.134])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1CBD118003F6;
+	Fri,  6 Feb 2026 17:15:19 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net-next] xfrm: reduce struct sec_path size
+Date: Fri,  6 Feb 2026 18:14:36 +0100
+Message-ID: <83846bd2e3fa08899bd0162e41bfadfec95e82ef.1770398071.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <aYYWQHiu8j_Zlu3v@sgarzare-redhat>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <aYYWQHiu8j_Zlu3v@sgarzare-redhat>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257624-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257625-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mptcp.dev:url]
-X-Rspamd-Queue-Id: 06F56100CD1
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87BEE100D48
 X-Rspamd-Action: no action
 
-Hi Stefano,
+The mentioned struct has an hole and uses unnecessary wide type to
+store MAC length and indexes of very small arrays.
 
-Thank you for your reply!
+It's also embedded into the skb_extensions, and the latter, due
+to recent CAN changes, may exceeds the 192 bytes mark (3 cachelines
+on x86_64 arch) on some reasonable configurations.
 
-On 06/02/2026 17:38, Stefano Garzarella wrote:
-> On Fri, Feb 06, 2026 at 12:54:13PM +0100, Matthieu Baerts wrote:
->> Hi Stefan, Stefano, + VM, RCU, sched people,
-> 
-> Hi Matt,
-> 
->>
->> First, I'm sorry to cc a few MLs, but I'm still trying to locate the
->> origin of the issue I'm seeing.
->>
->> Our CI for the MPTCP subsystem is now regularly hitting various stalls
->> before even starting the MPTCP test suite. These issues are visible on
->> top of the latest net and net-next trees, which have been sync with
->> Linus' tree yesterday. All these issues have been seen on a "public CI"
->> using GitHub-hosted runners with KVM support, where the tested kernel is
->> launched in a nested (I suppose) VM. I can see the issue with or without
-> 
-> Just to be sure I'm on the same page, the issue is in the most nested
-> guest, right? (the last VM started)
+Reordering and the sec_path fields, shrinking xfrm_offload.orig_mac_len
+to 16 bits and xfrm_offload.{len,olen,verified_cnt} to u8, we can save
+16 bytes and keep skb_extensions size under control.
 
-That's correct. From what I see [1], each GitHub-hosted runner is a new
-VM, and I'm launching QEmu from there.
+Before:
 
-[1]
-https://docs.github.com/en/actions/concepts/runners/github-hosted-runners
+struct sec_path {
+	int                        len;
+	int                        olen;
+	int                        verified_cnt;
 
->> debug.config. According to the logs, it might have started around
->> v6.19-rc0, but I was unavailable for a few weeks, and I couldn't react
->> quicker, sorry for that. Unfortunately, I cannot reproduce this locally,
->> and the CI doesn't currently have the ability to execute bisections.
->>
->> The stalls happen before starting the MPTCP test suite. The init program
->> creates a VSOCK listening socket via socat [1], and different hangs are
->> then visible: RCU stalls followed by a soft lockup [2], only a soft
->> lockup [3], sometimes the soft lockup comes with a delay [4] [5], or
->> there is no RCU stalls or soft lockups detected after one minute, but VM
->> is stalled [6]. In the last case, the VM is stopped after having
->> launched GDB to get more details about what was being executed.
->>
->> It feels like the issue is not directly caused by the VSOCK listening
->> socket, but the stalls always happen after having started the socat
->> command [1] in the background.
->>
->> One last thing: I thought my issue was linked to another one seen on XFS
->> side and reported by Shinichiro Kawasaki [7], but apparently not.
->> Indeed, Paul McKenney mentioned Shinichiro's issue is probably fixed by
->> Thomas Gleixner's series called "sched/mmcid: Cure mode transition woes"
->> [8]. I applied these patches from Peter Zijlstra's tree from
->> tip/sched/urgent [9], and my issue is still present.
->>
->> Any idea what could cause that, where to look at, or what could help to
->> find the root cause?
-> 
-> Mmm, nothing comes to mind at the vsock side :-(
+	/* XXX 4 bytes hole, try to pack */$
+	struct xfrm_state *        xvec[6];
+	struct xfrm_offload ovec[1];
 
-That's OK, thank you for having checked! I hope someone else in CC can
-help me finding the root cause!
+	/* size: 88, cachelines: 2, members: 5 */
+	/* sum members: 84, holes: 1, sum holes: 4 */
+	/* last cacheline: 24 bytes */
+};
 
-> I understand that bisection can't be done in the CI env, but can you
-> confirm in some way that 6.18 is working right with the same userspace?
+After:
 
-Yes, I can confirm that. We run the tests on both the dev ("export") and
-fixes ("export-net") branches, but also on stable versions:
+struct sec_path {
+	struct xfrm_state *        xvec[6];
+	struct xfrm_offload        ovec[1];
+	/* typedef u8 -> __u8 */ unsigned char              len;
+	/* typedef u8 -> __u8 */ unsigned char              olen;
+	/* typedef u8 -> __u8 */ unsigned char              verified_cnt;
 
-  https://ci-results.mptcp.dev/flakes.html
+	/* size: 72, cachelines: 2, members: 5 */
+	/* padding: 1 */
+	/* last cacheline: 8 bytes */
+};
 
-(The "critical issues" have their headers red)
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+RFC -> v1:
+  - shrink lens fields - thanks Florian
+- RFC: https://lore.kernel.org/netdev/a2552992ca2fa29754340eaa05b1a185fca7a381.1770309837.git.pabeni@redhat.com/
+---
+ include/net/xfrm.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-We don't see such issues in v6.18 and old kernels.
-
-> That could help to try to identify at least if there is anything in
-> AF_VSOCK we merged recently that can trigger that.
-
-Our dev branch is on top of net-next, I guess I would have seen issues
-directly related to AF_VSOCK earlier than after the net-next freeze in
-January. Here, it looks like the first issues came during Linus' merge
-window from the beginning of December, e.g. [2] is from the 4th of
-December, on top of 'net' which was at commit 8f7aa3d3c732 ("Merge tag
-'net-next-6.19' of
-git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next") from
-Linus tree.
-
-[2]
-https://github.com/multipath-tcp/mptcp_net-next/actions/runs/19919313666/job/57104626001#step:7:5052
-
-Cheers,
-Matt
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 0a14daaa5dd4..10d3edde6b2f 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1156,19 +1156,19 @@ struct xfrm_offload {
+ #define CRYPTO_INVALID_PROTOCOL			128
+ 
+ 	/* Used to keep whole l2 header for transport mode GRO */
+-	__u32			orig_mac_len;
++	__u16			orig_mac_len;
+ 
+ 	__u8			proto;
+ 	__u8			inner_ipproto;
+ };
+ 
+ struct sec_path {
+-	int			len;
+-	int			olen;
+-	int			verified_cnt;
+-
+ 	struct xfrm_state	*xvec[XFRM_MAX_DEPTH];
+ 	struct xfrm_offload	ovec[XFRM_MAX_OFFLOAD_DEPTH];
++
++	u8			len;
++	u8			olen;
++	u8			verified_cnt;
+ };
+ 
+ struct sec_path *secpath_set(struct sk_buff *skb);
 -- 
-Sponsored by the NGI0 Core fund.
+2.52.0
 
 
