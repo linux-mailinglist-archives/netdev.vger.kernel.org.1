@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-257716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257717-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OHnMDG9hmkrQgQAu9opvQ
-	(envelope-from <netdev+bounces-257716-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:18:57 +0100
+	id zQirNI29hmkzQgQAu9opvQ
+	(envelope-from <netdev+bounces-257717-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:20:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631A0104DED
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:18:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B2E104DF7
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D7B13303CEA5
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 04:18:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 602F63008310
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 04:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550492853F8;
-	Sat,  7 Feb 2026 04:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02FC02BDC0B;
+	Sat,  7 Feb 2026 04:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ee0d4BmY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udXyDYAv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DD417A2F0;
-	Sat,  7 Feb 2026 04:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E5F17A2F0;
+	Sat,  7 Feb 2026 04:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770437911; cv=none; b=UfFwV+Iz1nj+xgQAxtzhY5HyxoqslXH0iu58WgsLxTswZsLXxKirOOSV5DwRctdnv9uHVEEhkwAmPEB0Ju0g/bmkjkF0hHGKPnS8OSwyK7BMiGk8/86NTY5UuteR8SFlkI2vxUgeSdq2KwCWgwJGF++2hwzCGS3TsGsbI+v3MVM=
+	t=1770438024; cv=none; b=OQ8NncwbfpjaoSV1m+BL+oRSBlm94/JZd8btK/fzA3HGtcy9/Q/cxnPh+THMdE5NRzmhdQ7SAyknIgNCKxVdBN++jmTyOMyoz5qOlnT8iAaKq2x1ZhvUwFJ+WtfEiBEEYANv3TmAqMoNnTat096XTSjZBzHSEt0eFn15eS6GxzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770437911; c=relaxed/simple;
-	bh=I/XPaaMl7qmHyAIo/RZRkeko4OP/CUjaw/tpKV60tgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TbnXo1HuL+F0HP9+euJ0n4mG+MqF+bMSU0Oea8M2nCX0em1R8oLQFSl8mntJtALbYFF2UaIhdd4CreXKBkFa5YMvBWDHTzeA1NdEdc+JCB+nCA6HXT7TVyR+lZ8S8IHCAaZYW3RlgnsXRS7hhvzWRKvZtTIEBgO5x69woevhKmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ee0d4BmY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C9C1C116D0;
-	Sat,  7 Feb 2026 04:18:30 +0000 (UTC)
+	s=arc-20240116; t=1770438024; c=relaxed/simple;
+	bh=s2fnzSSbfVz3F9An5frwxiKGXeWg4nVdDhrnju2Xia4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZqBJby0O5uIl8kOb/AKvjIehqdmz249aj0vxjRW6bql37YiEaRsO7Luum4M/Ae4tsMA/W6Wyyoy+Fk0onD4Xiqs4dMtvMiff5FN+8PH4IzUrTpEEJiHXUofUjiGDTLxxK3EuVwPnL8i91Qw762vG85B8KrKnwbqxrSnQZgDiEJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udXyDYAv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ACBFC116D0;
+	Sat,  7 Feb 2026 04:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770437910;
-	bh=I/XPaaMl7qmHyAIo/RZRkeko4OP/CUjaw/tpKV60tgo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ee0d4BmYWWvHV3GWMPuWrxlk6Fv7lKCcva6DL6ccSKmQ0OumJuPry1IQD2N8GsgJt
-	 n3JfVn0hD3Ejno9RqYXG88Itr+1F0W9NzayXXTMBIWRxZAyKTYEmC9Az8zDhXobtvI
-	 5dH3Zv4lcDVn4Av1RrLSrsizD6eKGWpz4eOEt9j2NcdZYXGq3h27liJMzAUprMIamG
-	 ffEqdpHoWfFu57Vttw0L7V78zFtp6NTfA6t68oKObIGDKd6XGX6icWm6zVvRY5cWtc
-	 9qz1SRh1FDdeg3cBhNJhIcUAxv8C+np/7eqVwYUiYurZKO8nlhNHZWGXwYOclbHDVr
-	 C6BlbeWHnwEiQ==
-Date: Fri, 6 Feb 2026 20:18:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Boris Pismenny <borisp@nvidia.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
- Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 0/9] psp: support rekeying psp protected tcp
- connections
-Message-ID: <20260206201829.45fd9675@kernel.org>
-In-Reply-To: <f3560398-d6fa-4f05-9496-f0e59a5c0fd2@gmail.com>
-References: <20260204-psp-v1-0-5f034e2dfa36@gmail.com>
-	<willemdebruijn.kernel.37bf21c78aadd@gmail.com>
-	<f3560398-d6fa-4f05-9496-f0e59a5c0fd2@gmail.com>
+	s=k20201202; t=1770438024;
+	bh=s2fnzSSbfVz3F9An5frwxiKGXeWg4nVdDhrnju2Xia4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=udXyDYAv11zL+/qzFCIbPXOYGjFHA8UCVVRvrWFOF5KWvy/hEHPe5ncPUrqq666uz
+	 CSc1+u/M9GyDyA7HJ2PX4zgjv7QleEQHA24fqBXbcXUAIOFvMj5iXX5L0muBplf0SC
+	 IGS8ccnl7nsynf2gQTIyeLI7ATKJZ4EOckv2+/hzYZ/RO2fiace1oMBr9ifN72n5KQ
+	 XqDxqd/smT5+ZiiFzEy5BSkewAqoMBKHdWQpnCgQTlcprO0IezEmuoAUHGkRNCSUYk
+	 G85hGLK0WdKx8fKo4c0uQh47pElUBF0xHd4tion5kAO0UwOCVUU7NHxiQQ4B43zAy0
+	 RMqaRgQ+hfW0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C23743809A1A;
+	Sat,  7 Feb 2026 04:20:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] [v4] myri10ge: avoid uninitialized variable use
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177043802159.1183264.4531591321232273015.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Feb 2026 04:20:21 +0000
+References: <20260205162935.2126442-1-arnd@kernel.org>
+In-Reply-To: <20260205162935.2126442-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, arnd@arndb.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257716-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,nvidia.com,lunn.ch,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-257717-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 631A0104DED
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.984];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 65B2E104DF7
 X-Rspamd-Action: no action
 
-On Wed, 4 Feb 2026 16:43:46 -0500 Daniel Zahka wrote:
-> On 2/4/26 3:45 PM, Willem de Bruijn wrote:
-> > Daniel Zahka wrote:  
-> >> In the case of tx rekeying, as soon as we install the new tx key, we
-> >> have no use for the previous one, and it can be disposed of
-> >> immediately.  
-> > So this defines a rekey event as an instant in time. An alternative
-> > choice is to rekey at a specific seqno.
-> >
-> > The difference matters only for retransmits.
-> >
-> > Not sure there is a strong reason for either. But probably good to
-> > state the choice explicitly.  
-> 
-> I suppose if we think about a rekey as occurring at a seqno we could do 
-> away with the deferred key deletion, and instead just wait for data sent 
-> before that seqno to be ack'd before deleting the key. I would say if 
-> nothing else that would be a significant improvement over what I have 
-> right now.
+Hello:
 
-If you mean the driver xmit problem - not sure this changed much,
-a (spurious) retransmission may theoretically still be queued on 
-the driver ring when data is acked.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  5 Feb 2026 17:28:09 +0100 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> While compile testing on less common architectures, I noticed that gcc-10 on
+> s390 finds a bug that all other configurations seem to miss:
+> 
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_set_multicast_list':
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:391:25: error: 'cmd.data0' is used uninitialized in this function [-Werror=uninitialized]
+>   391 |  buf->data0 = htonl(data->data0);
+>       |                         ^~
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:25: error: '*((void *)&cmd+4)' is used uninitialized in this function [-Werror=uninitialized]
+>   392 |  buf->data1 = htonl(data->data1);
+>       |                         ^~
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c: In function 'myri10ge_allocate_rings':
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:392:13: error: 'cmd.data1' is used uninitialized in this function [-Werror=uninitialized]
+>   392 |  buf->data1 = htonl(data->data1);
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data1' was declared here
+>  1939 |  struct myri10ge_cmd cmd;
+>       |                      ^~~
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:393:13: error: 'cmd.data2' is used uninitialized in this function [-Werror=uninitialized]
+>   393 |  buf->data2 = htonl(data->data2);
+> drivers/net/ethernet/myricom/myri10ge/myri10ge.c:1939:22: note: 'cmd.data2' was declared here
+>  1939 |  struct myri10ge_cmd cmd;
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4] myri10ge: avoid uninitialized variable use
+    https://git.kernel.org/netdev/net-next/c/fd24173439c0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
