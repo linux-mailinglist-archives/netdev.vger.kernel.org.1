@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-257677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOEsGuSPhmlwOwQAu9opvQ
-	(envelope-from <netdev+bounces-257677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 02:05:40 +0100
+	id MHbjKkmphmkEPwQAu9opvQ
+	(envelope-from <netdev+bounces-257704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:54:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37615104665
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 02:05:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D047104B6A
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8503B300D4DD
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 01:05:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B3303015465
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 02:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE7E23C4F4;
-	Sat,  7 Feb 2026 01:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD555309DB1;
+	Sat,  7 Feb 2026 02:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WEZJgR3I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AB/Dz9CY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B6C234964
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 01:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E3038FA3
+	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 02:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770426337; cv=none; b=s7c1ZzdA7P2aB8cy6EceRnpI3GwLdhm1/K8YL+rVE/poAVnt37OtVR9DOslMVXmWfj159W6gfk4Y9cFSiN/DMH7f5HP7JqjJtK1r5xmWTV5AYOnTi7tg13j4TMsM0th/bdwhxanJtfpoBL9A2ACtAi6TCnjwnDre5gQhh6e0v3I=
+	t=1770432838; cv=none; b=m1hoa/uKXNqOVOXsudq6J9WE2RvOwTHFYVq7WAA65Bb0+J9C6/bTUH0l1p2NLSffZo5m+WRwuXwwAdsn7JUULNmbe6vuRFuTJiwNSnZo2PmHgBFV53tDB94hBg9o8+JUGFSOIPjByVq5guVrxZ123bAPtgPA9MxJeYfvZ82gDEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770426337; c=relaxed/simple;
-	bh=4c97E3l1fDx5rP31BJdStxGgz1jks7S0fHhu8URAe6A=;
+	s=arc-20240116; t=1770432838; c=relaxed/simple;
+	bh=qx1Jl8fKbXVfQo+2LlM1C8vtQEmuPtK1SLpDqKvAMRM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=szgpMPjL/vL919VPirv/QipazG1xnzkHn8uZ8ibCedoLfo6yJWpJ1InWOOOf6FcBvupXypj/AR4CVLJHhzZdW8bucoCDXU37aaMcctaZdzUFNlwEogRRn2q2bYDp2ONUphhfvhi9GOi2wIC8TyZmb8E+ROrz5dYTmcKH6uHmFKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WEZJgR3I; arc=none smtp.client-ip=209.85.221.49
+	 MIME-Version; b=FKy84v67S3B4fHQ4/3w6igiDFBdGFN/IXM1z1oETiCW3l0DhI2MP6RhO5vwbXBAFStM8rxje0T9jsM4jxPAczOamAc9xwnulELiXkZ4Qrzan/q51DwODIeNe6A/ex4XpVnQnG6G6lXJLYJ7Hu9uVXNj0bFgHKjKNbHj1kgJYBR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AB/Dz9CY; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4362ab556f5so875735f8f.3
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 17:05:36 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b8876d1a39bso193576266b.1
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 18:53:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770426335; x=1771031135; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770432837; x=1771037637; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5h0Bl07+wUVkPYukWTkRgRpTRDTreTtiujhSkbJvfK8=;
-        b=WEZJgR3IMgaZgVrA129f8Fv0CIkLDYJmZBTNGBNWTeRAbszKBLspOvb3OYujlkQG0k
-         f76ZyG1DmGal4yTb6w3dLtZsBys8QlTObrqILVy25xK9cd8g8hBBy15CIvH0zp6qpYC2
-         w+O7hKr/fuG2rGaJgpcSMLArXRKHkZzFIXjasA+wzMzP3cc1vmwocdJw12zLq90bEPZk
-         VldvUJmyJdolXwECLeqw0b74G0J9fXjxlQv9m7PVl4i5KrYWzs0mYBGEaxenSoFGB09Y
-         Xuovh8u0O1NbG3qotPZGWsRkX4zHb8mLLPptdXCodK9Y9PDItImSTQHOEMspW/U1CyIa
-         rxqg==
+        bh=ML3AMg0Eja+zFme5wRXmPhd9dcxAi42x3kc/admjyJc=;
+        b=AB/Dz9CYFXwnM0RtBIOLdmLKa30KH8Y9Xuw+7iBfXoU91LdCPN0vvGKSj9v6Drs/lE
+         AqrkcbSj9mS/Zh7dWfW0ZVSdx6PWXaRq9f4HHl+cQ+7ZGiyK4xbn0z1sAd4XNSpMS48a
+         Up9Ts1rlgBgVpXZmFhPdwTe6cOH+F28k1o0Bq5DVfP8w86ru6o6b3ecsj4xM7F2J0EHR
+         N8rt1xb2hoKLCCM3rB1R3PkUvclAowRUuexdPGOR/cX9ywkjCdeX76Lx+uuR/+rpRulS
+         4zEMWJ646h9SCb7PdOvchrwu2n/axXkvcnXPDkg6pmfhPhlw66OgeioX6Vb4XHgt5mFs
+         5Yxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770426335; x=1771031135;
+        d=1e100.net; s=20230601; t=1770432837; x=1771037637;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=5h0Bl07+wUVkPYukWTkRgRpTRDTreTtiujhSkbJvfK8=;
-        b=mkl7XWBJExnCet2qmX6wiJprdPv4hw9lop3xAq1ahe163pRtapapGstL7AEyqf258S
-         z7WvZ0/NY06pnJuE2H/tS6B5XKMBzeqkjx7O85PCTrU2IWqzdA7oMJECJ+98Kup/ow7C
-         aeMZFVoW+dbLBRU3EKsemXh0ag6RbXmO/1A4B8H56+SaBhYgPNhJuCuZovyR29bCWiEZ
-         7EaxZYYbaTMKSU4jupux9p+jONlb5oLngk/dnWNBDevs6rbzHoyUN8CuzGrx9SxgX33u
-         IGFCqvPSL93VXFfboN9Bzh7+qzACgnBDb3lJVLH8jnloTzjIY2U121pxbT3Xr4HAE8Og
-         B5+g==
-X-Gm-Message-State: AOJu0Yw5D3YWNBtdFLjca0AhyYuxvsC7Gcv3aZTtO+X0PLsykUSamGWf
-	ajFQ6njMtGNXIzkkgoaJLWS98rfQ9MvNbyXe4yMKMHonXi89NpFO2RRr8CZBUvL9
-X-Gm-Gg: AZuq6aKc09wZxYGRZSJsDwF5Xa3SzxEJCd2MFU9D/V3XaVAGnBUtItYemo81gorEUwa
-	nt1BFS4v2ZlWVzeFmi3u2+AT2XdruckQ1ulkt8nhKxMDSNGGau+apAQFzzd+21P67vNGgdYGZn3
-	xl9fzfDxtfUYWRvixFNPnZRxlD+UVSxxYpF7yy0iMPl/MXcJt9LFfadP+mGle7/vHPN9VDK2XQm
-	ktyZn8FRBPYgC0QJ3SyVP32lVdqToic5YkwyW7qT1/GM8xFgtQG32nYQKDI/DtlFyoaKiojZntl
-	NVEyChSqqZF3Vxy3/cCezgzEVZsQpov1ccZHf+OojrfrJTTFy103NI9VY884hP57LJvcFr/iXkJ
-	KXUqB7vGcT8RyPfMrDPE2NMjbcUqSL0gyFSrxUJQ8/jPILK8Vt3z6Uw2a/ifE85MESDKCfAf+v8
-	JMwmHTrkwPNNPAfyM8xA==
-X-Received: by 2002:a05:6000:288b:b0:435:975d:33b0 with SMTP id ffacd0b85a97d-4362967e068mr6267345f8f.35.1770426335035;
-        Fri, 06 Feb 2026 17:05:35 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:8::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362974b230sm10555280f8f.36.2026.02.06.17.05.31
+        bh=ML3AMg0Eja+zFme5wRXmPhd9dcxAi42x3kc/admjyJc=;
+        b=sJGFiuyG65yY37EG1JmU9vGbY4bTeD9ZzZe4jBap6Lyc2SHHz7VDjW1PBuphc9yB4k
+         Mcn1hkcuFzvaQjbqkfFivLyII5Qdp8BuBV3phb5Y8g3NzKjIi1WJ3ntmTMUn8IQVFZDb
+         TL3J5R/MOXmJzjHkYaHarGy/E3aB2JHum5ELkZTzQG+UnAB69yvNBOMNtHNnG8FT8zdS
+         JaYVykZyL83yB9H4cYE89YyI1lRTj1JORRbKgp1s7u4c/vg7jjgl9FNyX3AYTOuWwhTa
+         3/3mUSwfV2BCE8pPCOumBcg8qptgj4lkRkz7WIZIEgc6e1t3rjoWybsW1Ia8uUP1V4xx
+         crQQ==
+X-Gm-Message-State: AOJu0YydSCXCj16p239QILaJ8eHR8cI9W8kWCyKKFTUgt2WDq+Cg5gyB
+	2TDoS+1ihtP9J+p36Ogedy7NsDXEBwzCNIblaqHoXMAPtHEpkdKrEJMlmu3IzJnM
+X-Gm-Gg: AZuq6aL/+fNTzo+Csww69p7zLaa0yQz8rZ/19AygrbeD5O6WdgEZzqGiQ5Dq9ZiAwzK
+	ZdAWWUwXZgzPQM5h77Iz1Yyntk3D9EAI/IAV+RxnCU09K75oYI8dCRkHYdvMn4w/OFB+qNCmyIn
+	/IOBiCFk9sRWcT/aTxax+DHVj66CnJ4cCX2xL6Iohz6kccRcXbsXvRecVFOFBWwsSm7kh4gUMx0
+	l0Xfpr41A2IJR6R3BCf1kzdxeEOXvDb6TE/GyrIv4uzBztrd/ieFOaOaVyShesRPGpzkNoLIJ0C
+	fGUCgPb998VI6FRc6+yeG58K7DiE+N6hV0iwJXmgNvV5fS52fdgVN8IEbs7gbTRmEsncMgf76rq
+	Zj04gRjNTiyA9hVGaYIBN9vfozinGWGKsAacAObxzBdZA2PAa362lKkoF21KOJKt+8U1lrSyyq/
+	DgaInpNKo=
+X-Received: by 2002:a05:6000:1788:b0:431:16d:63d7 with SMTP id ffacd0b85a97d-436293bab38mr7154758f8f.47.1770426341018;
+        Fri, 06 Feb 2026 17:05:41 -0800 (PST)
+Received: from localhost ([2a03:2880:31ff:5::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362972fb81sm10293381f8f.20.2026.02.06.17.05.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 17:05:32 -0800 (PST)
+        Fri, 06 Feb 2026 17:05:39 -0800 (PST)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: alexanderduyck@fb.com,
@@ -101,9 +101,9 @@ Cc: alexanderduyck@fb.com,
 	saeedm@nvidia.com,
 	tariqt@nvidia.com,
 	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next V2 1/5] net: ethtool: Track pause storm events
-Date: Fri,  6 Feb 2026 17:05:21 -0800
-Message-ID: <20260207010525.3808842-2-mohsin.bashr@gmail.com>
+Subject: [PATCH net-next V2 2/5] net: ethtool: Update doc for tunable
+Date: Fri,  6 Feb 2026 17:05:22 -0800
+Message-ID: <20260207010525.3808842-3-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260207010525.3808842-1-mohsin.bashr@gmail.com>
 References: <20260207010525.3808842-1-mohsin.bashr@gmail.com>
@@ -120,13 +120,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257677-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257704-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -144,96 +144,40 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 37615104665
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0D047104B6A
 X-Rspamd-Action: no action
 
-With TX pause enabled, if a device is unable to pass packets up to the
-stack (e.g., CPU is hanged), the device can cause pause storm. Given
-that devices can have native support to protect the neighbor from such
-flooding, such events need some tracking. This support is to track TX
-pause storm events for better observability.
+ETHTOOL_PFC_PREVENTION_TOUT enables the configuration of timeout value
+for PFC storm prevention. This can also be used to configure storm
+detection timeout for global pause settings. In fact some existing
+drivers are already using it for the said purpose.
 
+Highlight that the knob can formally be used to configure timeout
+value for pause storm prevention mechanism. The update to the ethtool
+man page will follow afterwards.
+
+Link: https://lore.kernel.org/aa5f189a-ac62-4633-97b5-ebf939e9c535@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 ---
- Documentation/netlink/specs/ethtool.yaml       | 13 +++++++++++++
- include/linux/ethtool.h                        |  2 ++
- include/uapi/linux/ethtool_netlink_generated.h |  1 +
- net/ethtool/pause.c                            |  4 +++-
- 4 files changed, 19 insertions(+), 1 deletion(-)
+ include/uapi/linux/ethtool.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 0a2d2343f79a..4707063af3b4 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -879,6 +879,19 @@ attribute-sets:
-       -
-         name: rx-frames
-         type: u64
-+      -
-+        name: tx-pause-storm-events
-+        type: u64
-+        doc: >-
-+            TX pause storm event count. Increments each time device
-+            detects that its pause assertion condition has been true
-+            for too long for normal operation. As a result, the device
-+            has temporarily disabled its own Pause TX function to
-+            protect the network from itself.
-+            This counter should never increment under normal overload
-+            conditions; it indicates catastrophic failure like an OS
-+            crash. The rate of incrementing is implementation specific.
-+
-   -
-     name: pause
-     attr-cnt-name: __ethtool-a-pause-cnt
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 798abec67a1b..83c375840835 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -512,12 +512,14 @@ struct ethtool_eth_ctrl_stats {
-  *
-  *	Equivalent to `30.3.4.3 aPAUSEMACCtrlFramesReceived`
-  *	from the standard.
-+ * @tx_pause_storm_events: TX pause storm event count (see ethtool.yaml).
-  */
- struct ethtool_pause_stats {
- 	enum ethtool_mac_stats_src src;
- 	struct_group(stats,
- 		u64 tx_pause_frames;
- 		u64 rx_pause_frames;
-+		u64 tx_pause_storm_events;
- 	);
- };
- 
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index 556a0c834df5..114b83017297 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -381,6 +381,7 @@ enum {
- 	ETHTOOL_A_PAUSE_STAT_PAD,
- 	ETHTOOL_A_PAUSE_STAT_TX_FRAMES,
- 	ETHTOOL_A_PAUSE_STAT_RX_FRAMES,
-+	ETHTOOL_A_PAUSE_STAT_TX_PAUSE_STORM_EVENTS,
- 
- 	__ETHTOOL_A_PAUSE_STAT_CNT,
- 	ETHTOOL_A_PAUSE_STAT_MAX = (__ETHTOOL_A_PAUSE_STAT_CNT - 1)
-diff --git a/net/ethtool/pause.c b/net/ethtool/pause.c
-index 0f9af1e66548..5d28f642764c 100644
---- a/net/ethtool/pause.c
-+++ b/net/ethtool/pause.c
-@@ -130,7 +130,9 @@ static int pause_put_stats(struct sk_buff *skb,
- 	if (ethtool_put_stat(skb, pause_stats->tx_pause_frames,
- 			     ETHTOOL_A_PAUSE_STAT_TX_FRAMES, pad) ||
- 	    ethtool_put_stat(skb, pause_stats->rx_pause_frames,
--			     ETHTOOL_A_PAUSE_STAT_RX_FRAMES, pad))
-+			     ETHTOOL_A_PAUSE_STAT_RX_FRAMES, pad) ||
-+	    ethtool_put_stat(skb, pause_stats->tx_pause_storm_events,
-+			     ETHTOOL_A_PAUSE_STAT_TX_PAUSE_STORM_EVENTS, pad))
- 		goto err_cancel;
- 
- 	nla_nest_end(skb, nest);
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index b74b80508553..1cdfb8341df2 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -225,7 +225,7 @@ enum tunable_id {
+ 	ETHTOOL_ID_UNSPEC,
+ 	ETHTOOL_RX_COPYBREAK,
+ 	ETHTOOL_TX_COPYBREAK,
+-	ETHTOOL_PFC_PREVENTION_TOUT, /* timeout in msecs */
++	ETHTOOL_PFC_PREVENTION_TOUT, /* both pause and pfc, see man ethtool */
+ 	ETHTOOL_TX_COPYBREAK_BUF_SIZE,
+ 	/*
+ 	 * Add your fresh new tunable attribute above and remember to update
 -- 
 2.47.3
 
