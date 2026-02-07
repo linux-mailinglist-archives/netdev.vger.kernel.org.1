@@ -1,83 +1,62 @@
-Return-Path: <netdev+bounces-257752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENiWK5ASh2mtTQQAu9opvQ
-	(envelope-from <netdev+bounces-257752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 11:23:12 +0100
+	id aGEUIm4Th2nBTQQAu9opvQ
+	(envelope-from <netdev+bounces-257753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 11:26:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF6910577E
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 11:23:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D49131057B5
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 11:26:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D13A7301453B
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 10:23:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8BBB13019915
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 10:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DCE33555B;
-	Sat,  7 Feb 2026 10:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6601332902;
+	Sat,  7 Feb 2026 10:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XaD3CQBc"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="ilP49gaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from outbound.st.icloud.com (p-east2-cluster2-host7-snip4-10.eps.apple.com [57.103.78.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3989332902
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 10:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98464311596
+	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 10:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770459790; cv=none; b=Pc1sh2hRjKYOqdNK3Au6pXj+67cm7TLHzsvmGB8KdewUr4ao6FcjWyDV6zoBh7fravBfbggPLymV2HE0440/P/GhgmO97T5MId51sObhiiqxp67zeiS2JKUb2E5L20xI454ugCNImXvumzs5KP6fLtkw02oSTUZSMA+CXzgC+uU=
+	t=1770460011; cv=none; b=M6ws71KHfmjnDQTgqLu+KbqXuZ9klCD4oojYTLeXtL/YGOqahkQGc18alUxO2ak0k6xURzWN/t7ipPtXzOlMBN3Y5gj1Xv3QKYcin+2yJDJPBcYZJbhKyiPLtEs+a3KEANd+TK0okcIv/Lr/bv25kT3WgK9Kzb4PA5yXiIyEc3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770459790; c=relaxed/simple;
-	bh=6TLMRM4k2rNiWkg98X85+09KqUUba8skG+X7sv9mDio=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P2gQIk+g/5Dq2XEW510EhNC/UJ343/I2T2n+KOvjBVjnVqhtYVB5J6Ef2c1FHuU7vl2IeJO36HC6diujy2tmXLU6dfVAQKUoW5ycccwqFjtqe5f6YkhotW+iiq7/PiNXycN5136PkBPSCM2H7RDQT5VecD3Dd97qO+kt5Lo/+84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XaD3CQBc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770459789;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Thyxn2x8GwemcetTaIDmag0sXUro2/XLqu/zb3JPMFI=;
-	b=XaD3CQBc5pWOC2ZCtXzSps7KqOi/fX/gNplilWpoPXeyh0Fc8knf5e3MyhfhYWThTQpl45
-	U+9HyAMNnDJhzw2IKkb4HVWybPaF/XYyoP1LLXQIQZHMUZUcizI5FfxAZkGZUuXw0YJm6p
-	352YF7V8OxcwkYZQmQCEM4RwfCQKLNA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-381-PzplIJJsOyeGzHzKmK9iOA-1; Sat,
- 07 Feb 2026 05:23:04 -0500
-X-MC-Unique: PzplIJJsOyeGzHzKmK9iOA-1
-X-Mimecast-MFC-AGG-ID: PzplIJJsOyeGzHzKmK9iOA_1770459782
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 219C5195608A;
-	Sat,  7 Feb 2026 10:23:02 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.44.34.231])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5E7C630001A8;
-	Sat,  7 Feb 2026 10:22:57 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: ivecera@redhat.com,
-	aleksandr.loktionov@intel.com,
-	shaojijie@huawei.com,
-	Petr Oros <poros@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1770460011; c=relaxed/simple;
+	bh=SYReqYzN9g7HyjPHt5FNWTeMblt8T2P8zOvkbF3FP1A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IM+8InzSItpi1ErG6ik8uGfUvK48FQblYG12LZWeqHjYkSIm+4zouSsvBuyUYLYuDmsU2EaiXHXNKhrk+9U5/4DWjJ2KIBSUpTXwqp8n221/hGTul+aAe0yyxxXIx/1TtIcViSM/ctAUow8FOH+TeQern3WPCJe/MR/kiddcNCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=ilP49gaW reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-10-percent-2 (Postfix) with ESMTPS id 18C29180021A;
+	Sat,  7 Feb 2026 10:26:43 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; t=1770460010; x=1773052010; bh=cQGHVERe2JrIHTNqkTzWQuO6ddheMIUb3WX/j0qEZ1U=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=ilP49gaWzaDOtRQgLipgJu5LQTCO2+wv3z+F87CNewe+j6JIf04xDDWvJp5yZd6gyWvDAh2tzSKn4hpomYSjtaZCSbAexe724/XFOgTWSWn1VbZOpaOUPztWjuiBjOGrGefUlzxXWfWDN1XfsgNlrS+4HlrlurL7+U4g4PpP1237OPoxDqcfFTX7Kg1rEboaFXbyqukMe6+UktnbIuLaiNOW+Y/qplPtuPskn6ijkAODci86P2EGrkmQgg26XDSJCSLVq88eDIZHm//X9K+PR/jqdwIY8lAPwQcLDHfcPt6gNj/YYMAwR95vCI6TknwDHIXMZbqflM2W+BvHpr+WiA==
+mail-alias-created-date: 1719758601013
+Received: from desktop.tail809fd.ts.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-10-percent-2 (Postfix) with ESMTPSA id 33C251800181;
+	Sat,  7 Feb 2026 10:26:41 +0000 (UTC)
+From: Yohei Kojima <yk@y-koj.net>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	intel-wired-lan@lists.osuosl.org,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Yohei Kojima <yk@y-koj.net>,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] iavf: fix deadlock in reset handling
-Date: Sat,  7 Feb 2026 11:22:45 +0100
-Message-ID: <20260207102245.812795-1-poros@redhat.com>
+Subject: [PATCH net-next v2] docs: ethtool: clarify the bit-by-bit bitset format description
+Date: Sat,  7 Feb 2026 19:25:38 +0900
+Message-ID: <f43999612ed9d17fb7fe8f21e777e1c784f23c46.1770457868.git.yk@y-koj.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,315 +64,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Proofpoint-ORIG-GUID: Mqbar9JL4VbLz1s7dUakO2EX_9hbXxmY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA3MDA4MyBTYWx0ZWRfXy+ZYrwEUqa+O
+ CZuwiQ2Gim5h5pPN9Cux4OY4lBWGeXLFP+G+P8Fw3shOPWoKzdMwQT0FiUgZ6TlKFF+X1a0YZb9
+ 0T8R3VphdcoYWR6lgYtht7o7DtknhXE8EpyLx3Z/AvQ3a9fXhoAChxVbcJHeMkLX6RLZPbmoyzL
+ GVxvJgl4e18bsLbJFPez4O5tAJqFZu9+LsOWH5hOfEp0bisKNslAIBBn1OwUtUHk9sHfS0O+SE4
+ Kae4EnGu++oYufVPihpdKHPFTkQNp2rHJx83EMFhOgDDPWrTS5Urtpt+x9fhVW9R/eltpmu4jIv
+ 1MUxfy88MJ2T/mQHuj5kNQJWigZgtF70e3kWOajjEkOIBbDtILd5PcX+plLOVk=
+X-Authority-Info-Out: v=2.4 cv=V8ZwEOni c=1 sm=1 tr=0 ts=69871368
+ cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
+ a=YrL12D//S6tul8v/L+6tKg==:17 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8
+ a=jnl5ZKOAAAAA:8 a=8WQVRTqVWvD3vaqRZeAA:9 a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-GUID: Mqbar9JL4VbLz1s7dUakO2EX_9hbXxmY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-06_05,2026-02-05_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0
+ malwarescore=0 phishscore=0 adultscore=0 clxscore=1030 classifier=spam
+ authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602070083
+X-JNJ: AAAAAAABGHk5IeaOfqEE4TOa8Bgt2yzos2vaKW59OL1bb4lWodT7wLi7lvIhEUH7mtchNN6HsNm2W8UjWeyz8KhRc8ITtRb+66/oau7def/gDBkFklDQawQRClwTPg/lwdY82ZCWqe3N3PHGJ6vK3lzlYo1C2vTHkIaLEBQJ+3R4icdymwFFeuucox7T14B3fo7rl1wPnpHJybiW0KrndeERVdhKyIpBEqqnv3U9jR7WCjL0oya3okBMpb9Ga/xS3jm1mbGCGExW6BvPZ6K+g1EprZq5+YMQTyz11sAlqV9cCUYGoawF140vAU/G1xGJygXtqAQCqLLMfhNORP/KbV9oN2cFO8cfzHlCIdCL9VBQYiJnIgEcxeKF3Ot+kpBrXnjOQqTLlNzLeqkkm6luyEj7prpUsELyYwkxFwNXd1lvOQutq+FPsuCVdNQAmzoy1TanM0zMmkic4q9s58DGWmeEcIp4/Op6yvBuEdU43szJTCOUkiKwSR/1jdkSvI+sFiQQx4lXeaMgJT0bm70J7SjaC4ZR6sby2TV0H9Ury9iTl/ANuGP+Driy+ot8w+ZB80W7YOzsMdoIGjlUgHnXHhbrbfL/c/p5ul7u5v9U++LA4o/wHoOwwouY39aGvwcWJqkg9ue9pTkslQdRxnSZwSvwvfpd6cV2SgGAMSLtu0BJslEox9nSIYTYdUE05FtfBFVplFNt2ynY32nmUVSRJ5SDfa9B/Q2Qux7FyFQ5Ef1D5mLuj4jLzReT4UanXbLu/aDjnS0gf4P9reVl+4V/uihlkEnCR3b5R4iK4pJAmbMtxO21Z8s/H3Ye8gOYr8ZK
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-257752-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-0.976];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-257753-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[y-koj.net];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_PERMFAIL(0.00)[y-koj.net:s=sig1];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[yk@y-koj.net,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[y-koj.net:~];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.962];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: EBF6910577E
+X-Rspamd-Queue-Id: D49131057B5
 X-Rspamd-Action: no action
 
-Three driver callbacks schedule a reset and wait for its completion:
-ndo_change_mtu(), ethtool set_ringparam(), and ethtool set_channels().
+Clarify the bit-by-bit bitset format's behavior around mandatory
+attributes and bit identification. More specifically, the following
+changes are made:
 
-Waiting for reset in ndo_change_mtu() and set_ringparam() was added by
-commit c2ed2403f12c ("iavf: Wait for reset in callbacks which trigger
-it") to fix a race condition where adding an interface to bonding
-immediately after MTU or ring parameter change failed because the
-interface was still in __RESETTING state. The same commit also added
-waiting in iavf_set_priv_flags(), which was later removed by commit
-53844673d555 ("iavf: kill "legacy-rx" for good").
+* Rephrase a misleading sentence which implies name and index are
+  mutually exclusive
+* Describe that ETHTOOL_A_BITSET_BITS nest is mandatory
+* Describe that a request fails if inconsistent identifiers are given
 
-Waiting in set_channels() was introduced earlier by commit 4e5e6b5d9d13
-("iavf: Fix return of set the new channel count") to ensure the PF has
-enough time to complete the VF reset when changing channel count, and to
-return correct error codes to userspace.
-
-Commit ef490bbb2267 ("iavf: Add net_shaper_ops support") added
-net_shaper_ops to iavf, which required reset_task to use _locked NAPI
-variants (napi_enable_locked, napi_disable_locked) that need the netdev
-instance lock.
-
-Later, commit 7e4d784f5810 ("net: hold netdev instance lock during
-rtnetlink operations") and commit 2bcf4772e45a ("net: ethtool: try to
-protect all callback with netdev instance lock") started holding the
-netdev instance lock during ndo and ethtool callbacks for drivers with
-net_shaper_ops.
-
-Finally, commit 120f28a6f314 ("iavf: get rid of the crit lock")
-replaced the driver's crit_lock with netdev_lock in reset_task, making
-the deadlock manifest: the callback holds netdev_lock and waits for
-reset_task, but reset_task needs the same lock:
-
-  Thread 1 (callback)               Thread 2 (reset_task)
-  -------------------               ---------------------
-  netdev_lock()                     [blocked on workqueue]
-  ndo_change_mtu() or ethtool op
-    iavf_schedule_reset()
-    iavf_wait_for_reset()           iavf_reset_task()
-      waiting...                      netdev_lock() <- DEADLOCK
-
-Fix this by extracting the reset logic from iavf_reset_task() into a new
-iavf_reset_step() function that expects netdev_lock to be already held.
-The three callbacks now call iavf_reset_step() directly instead of
-scheduling the work and waiting, performing the reset synchronously in
-the caller's context which already holds netdev_lock. This eliminates
-both the deadlock and the need for iavf_wait_for_reset(), which is
-removed.
-
-The workqueue-based iavf_reset_task() becomes a thin wrapper that
-acquires netdev_lock and calls iavf_reset_step(), preserving its use
-for PF-initiated resets.
-
-The callbacks may block for several seconds while iavf_reset_step()
-polls hardware registers, but this is acceptable since netdev_lock is a
-per-device mutex and only serializes operations on the same interface.
-
-Fixes: 120f28a6f314 ("iavf: get rid of the crit lock")
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Petr Oros <poros@redhat.com>
+Signed-off-by: Yohei Kojima <yk@y-koj.net>
 ---
- drivers/net/ethernet/intel/iavf/iavf.h        |  2 +-
- .../net/ethernet/intel/iavf/iavf_ethtool.c    | 21 +++---
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 72 +++++++------------
- 3 files changed, 33 insertions(+), 62 deletions(-)
+Current ethtool-netlink documentation doesn't describe several behavior
+around bit-by-bit bitset, which makes it hard to develop a ethtool
+library without digging into the kernel code. This patch eases the gap
+between the kernel behavior and the documentation by adding descriptions
+around the mandatory attribute and bit identification.
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index d552f912e8a947..0c3844b3ff1c86 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -625,5 +625,5 @@ void iavf_add_adv_rss_cfg(struct iavf_adapter *adapter);
- void iavf_del_adv_rss_cfg(struct iavf_adapter *adapter);
- struct iavf_mac_filter *iavf_add_filter(struct iavf_adapter *adapter,
- 					const u8 *macaddr);
--int iavf_wait_for_reset(struct iavf_adapter *adapter);
-+void iavf_reset_step(struct iavf_adapter *adapter);
- #endif /* _IAVF_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 2cc21289a70779..9b0f47f9340942 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -492,7 +492,6 @@ static int iavf_set_ringparam(struct net_device *netdev,
- {
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
- 	u32 new_rx_count, new_tx_count;
--	int ret = 0;
+ChangeLog
+=========
+v2 (this version):
+* Minimize the diff for ease of review
+v1: https://lore.kernel.org/lkml/e9ea0fe8bf7935d6439e4dc883414b685afbaf58.1770045398.git.yk@y-koj.net/
+
+---
+ Documentation/networking/ethtool-netlink.rst | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index af56c304cef4..32179168eb73 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -96,7 +96,7 @@ For short bitmaps of (reasonably) fixed length, standard ``NLA_BITFIELD32``
+ type is used. For arbitrary length bitmaps, ethtool netlink uses a nested
+ attribute with contents of one of two forms: compact (two binary bitmaps
+ representing bit values and mask of affected bits) and bit-by-bit (list of
+-bits identified by either index or name).
++bits identified by index or name).
  
- 	if ((ring->rx_mini_pending) || (ring->rx_jumbo_pending))
- 		return -EINVAL;
-@@ -537,13 +536,11 @@ static int iavf_set_ringparam(struct net_device *netdev,
- 	}
+ Verbose (bit-by-bit) bitsets allow sending symbolic names for bits together
+ with their values which saves a round trip (when the bitset is passed in a
+@@ -156,12 +156,16 @@ Bit-by-bit form: nested (bitset) attribute contents:
+  | | | ``ETHTOOL_A_BITSET_BIT_VALUE`` | flag   | present if bit is set       |
+  +-+-+--------------------------------+--------+-----------------------------+
  
- 	if (netif_running(netdev)) {
--		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
--		ret = iavf_wait_for_reset(adapter);
--		if (ret)
--			netdev_warn(netdev, "Changing ring parameters timeout or interrupted waiting for reset");
-+		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
-+		iavf_reset_step(adapter);
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- /**
-@@ -1723,7 +1720,6 @@ static int iavf_set_channels(struct net_device *netdev,
- {
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
- 	u32 num_req = ch->combined_count;
--	int ret = 0;
- 
- 	if ((adapter->vf_res->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_ADQ) &&
- 	    adapter->num_tc) {
-@@ -1745,13 +1741,12 @@ static int iavf_set_channels(struct net_device *netdev,
- 
- 	adapter->num_req_queues = num_req;
- 	adapter->flags |= IAVF_FLAG_REINIT_ITR_NEEDED;
--	iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
--
--	ret = iavf_wait_for_reset(adapter);
--	if (ret)
--		netdev_warn(netdev, "Changing channel count timeout or interrupted waiting for reset");
-+	if (netif_running(netdev)) {
-+		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
-+		iavf_reset_step(adapter);
-+	}
- 
--	return ret;
-+	return 0;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 8aa6e92c16431f..9c8d6125106f5a 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -185,31 +185,6 @@ static bool iavf_is_reset_in_progress(struct iavf_adapter *adapter)
- 	return false;
- }
- 
--/**
-- * iavf_wait_for_reset - Wait for reset to finish.
-- * @adapter: board private structure
-- *
-- * Returns 0 if reset finished successfully, negative on timeout or interrupt.
-- */
--int iavf_wait_for_reset(struct iavf_adapter *adapter)
--{
--	int ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
--					!iavf_is_reset_in_progress(adapter),
--					msecs_to_jiffies(5000));
--
--	/* If ret < 0 then it means wait was interrupted.
--	 * If ret == 0 then it means we got a timeout while waiting
--	 * for reset to finish.
--	 * If ret > 0 it means reset has finished.
--	 */
--	if (ret > 0)
--		return 0;
--	else if (ret < 0)
--		return -EINTR;
--	else
--		return -EBUSY;
--}
--
- /**
-  * iavf_allocate_dma_mem_d - OS specific memory alloc for shared code
-  * @hw:   pointer to the HW structure
-@@ -3100,18 +3075,16 @@ static void iavf_reconfig_qs_bw(struct iavf_adapter *adapter)
- }
- 
- /**
-- * iavf_reset_task - Call-back task to handle hardware reset
-- * @work: pointer to work_struct
-+ * iavf_reset_step - Perform the VF reset sequence
-+ * @adapter: board private structure
-  *
-- * During reset we need to shut down and reinitialize the admin queue
-- * before we can use it to communicate with the PF again. We also clear
-- * and reinit the rings because that context is lost as well.
-- **/
--static void iavf_reset_task(struct work_struct *work)
-+ * Requests a reset from PF, polls for completion, and reconfigures
-+ * the driver. Caller must hold the netdev instance lock.
-+ *
-+ * This can sleep for several seconds while polling HW registers.
-+ */
-+void iavf_reset_step(struct iavf_adapter *adapter)
- {
--	struct iavf_adapter *adapter = container_of(work,
--						      struct iavf_adapter,
--						      reset_task);
- 	struct virtchnl_vf_resource *vfres = adapter->vf_res;
- 	struct net_device *netdev = adapter->netdev;
- 	struct iavf_hw *hw = &adapter->hw;
-@@ -3122,7 +3095,7 @@ static void iavf_reset_task(struct work_struct *work)
- 	int i = 0, err;
- 	bool running;
- 
--	netdev_lock(netdev);
-+	netdev_assert_locked(netdev);
- 
- 	iavf_misc_irq_disable(adapter);
- 	if (adapter->flags & IAVF_FLAG_RESET_NEEDED) {
-@@ -3167,7 +3140,6 @@ static void iavf_reset_task(struct work_struct *work)
- 		dev_err(&adapter->pdev->dev, "Reset never finished (%x)\n",
- 			reg_val);
- 		iavf_disable_vf(adapter);
--		netdev_unlock(netdev);
- 		return; /* Do not attempt to reinit. It's dead, Jim. */
- 	}
- 
-@@ -3179,7 +3151,6 @@ static void iavf_reset_task(struct work_struct *work)
- 		iavf_startup(adapter);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(30));
--		netdev_unlock(netdev);
- 		return;
- 	}
- 
-@@ -3321,7 +3292,6 @@ static void iavf_reset_task(struct work_struct *work)
- 	adapter->flags &= ~IAVF_FLAG_REINIT_ITR_NEEDED;
- 
- 	wake_up(&adapter->reset_waitqueue);
--	netdev_unlock(netdev);
- 
- 	return;
- reset_err:
-@@ -3331,10 +3301,21 @@ static void iavf_reset_task(struct work_struct *work)
- 	}
- 	iavf_disable_vf(adapter);
- 
--	netdev_unlock(netdev);
- 	dev_err(&adapter->pdev->dev, "failed to allocate resources during reinit\n");
- }
- 
-+static void iavf_reset_task(struct work_struct *work)
-+{
-+	struct iavf_adapter *adapter = container_of(work,
-+						      struct iavf_adapter,
-+						      reset_task);
-+	struct net_device *netdev = adapter->netdev;
+-Bit size is optional for bit-by-bit form. ``ETHTOOL_A_BITSET_BITS`` nest can
++For bit-by-bit form, ``ETHTOOL_A_BITSET_SIZE`` is optional, and
++``ETHTOOL_A_BITSET_BITS`` is mandatory. ``ETHTOOL_A_BITSET_BITS`` nest can
+ only contain ``ETHTOOL_A_BITSET_BITS_BIT`` attributes but there can be an
+ arbitrary number of them.  A bit may be identified by its index or by its
+ name. When used in requests, listed bits are set to 0 or 1 according to
+-``ETHTOOL_A_BITSET_BIT_VALUE``, the rest is preserved. A request fails if
+-index exceeds kernel bit length or if name is not recognized.
++``ETHTOOL_A_BITSET_BIT_VALUE``, the rest is preserved.
 +
-+	netdev_lock(netdev);
-+	iavf_reset_step(adapter);
-+	netdev_unlock(netdev);
-+}
-+
- /**
-  * iavf_adminq_task - worker thread to clean the admin queue
-  * @work: pointer to work_struct containing our data
-@@ -4600,22 +4581,17 @@ static int iavf_close(struct net_device *netdev)
- static int iavf_change_mtu(struct net_device *netdev, int new_mtu)
- {
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
--	int ret = 0;
++A request fails if index exceeds kernel bit length or if name is not
++recognized. If both name and index are set, the request will fail if they
++point to different bits.
  
- 	netdev_dbg(netdev, "changing MTU from %d to %d\n",
- 		   netdev->mtu, new_mtu);
- 	WRITE_ONCE(netdev->mtu, new_mtu);
- 
- 	if (netif_running(netdev)) {
--		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
--		ret = iavf_wait_for_reset(adapter);
--		if (ret < 0)
--			netdev_warn(netdev, "MTU change interrupted waiting for reset");
--		else if (ret)
--			netdev_warn(netdev, "MTU change timed out waiting for reset");
-+		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
-+		iavf_reset_step(adapter);
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- /**
+ When ``ETHTOOL_A_BITSET_NOMASK`` flag is present, bitset is interpreted as
+ a simple bitmap. ``ETHTOOL_A_BITSET_BIT_VALUE`` attributes are not used in
 -- 
 2.52.0
 
