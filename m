@@ -1,174 +1,200 @@
-Return-Path: <netdev+bounces-257771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJUTDAaIh2lEZQQAu9opvQ
-	(envelope-from <netdev+bounces-257771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 19:44:22 +0100
+	id GKe6OvuKh2lgZgQAu9opvQ
+	(envelope-from <netdev+bounces-257772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 19:56:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9EF106E63
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 19:44:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5464A106E90
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 19:56:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4353301CFED
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 18:44:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD695301174D
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 18:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1769F33B6E3;
-	Sat,  7 Feb 2026 18:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8002F745C;
+	Sat,  7 Feb 2026 18:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="NvTzWzAJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gJdGqezU"
+	dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b="JGKBezFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from mail2.anonaddy.me (mail2.anonaddy.me [185.70.196.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25EA5FDA7;
-	Sat,  7 Feb 2026 18:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A507D23EAB7
+	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 18:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.196.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770489844; cv=none; b=t77XYw/LtCJ2ZhNcBILEw5A9e9CxqPQC/cDaktjkjw588k4SyyR1MFlhz9EFHLQqmxFqacV5IwL3mMYPggU6BdrNzo7hCzKDaM1n2PKfyp+PZE8Qz2zo0+5J/n0azai2dWUBjxHd95L9QDiAyKb8LxIztbf1A8gF5XM5htTwkVU=
+	t=1770490617; cv=none; b=aMXm46riMM5nhlw64M+vaYBn3+XwZSe6B3NO/qhRbJXFt99nH4gvObKRmQfDDWyERo1J/OxNF22BAH2W7BrALf/GNywm3cqaqec3X+hLnyFddYpwyfz9rofurn5cbPwm3Sun8g32RgePRq+BM+NPqOaqedflMx9rAEtIFxzO904=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770489844; c=relaxed/simple;
-	bh=WFvKf39DNga0t2yUxjABuGRvNafww1scxKilpXFCtgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oQULzV+qCJAEwlfy+Z8Gy8gDRho2R04XX2QWReySbqRw6uLTcS0KlEMz0ruVzhLO8X+dlTSrGMYvcTiWGPfVA8kFEeVNlprICumJJktLr2xEDoZCZpKMbJeTrkunFSmSYchWcXk9xniKBnJ2XA0RXUqGN4wVCYUJdHTUCQ4pBtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=NvTzWzAJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gJdGqezU; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 3A4CC1D000A7;
-	Sat,  7 Feb 2026 13:44:02 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Sat, 07 Feb 2026 13:44:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm2; t=1770489842; x=1770576242; bh=6E
-	2PvIz6cEFL6euP0z+38KTbuOnimhD8xDjIx3rD+PU=; b=NvTzWzAJiNlOsJBvvZ
-	WlXuzdYKg3DkSSDNo+UFSHt/foai7gwts4xfjzSOcwQp92ujVBdaQA16ECRC3k58
-	KaSBzNqM9Otz36x87RbTnRB6vc2wxvULesumARRdJPKNcTcOoqfK4rHHqqo1fTGp
-	4biYi6i5cxuQdvHX/ocxeEF6H5GDTvlntH+IXUoPGvgCG5Na9jI8dzqf3Yi7ijN3
-	GGsyjqRmQ1uL00bKUgrk1HiYVZHzJ/Dd9feIpbPPjiXUyTGm3lXryVrjPA3pIoFF
-	uy2w5r4kxur+hSUUu6ZWuo10/rULpBf/B4QTiVF4joR+sEsC32Gmhn5mzXm2msnj
-	8RdQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1770489842; x=1770576242; bh=6E2PvIz6cEFL6euP0z+38KTbuOni
-	mhD8xDjIx3rD+PU=; b=gJdGqezUcz8N2dWRNGIROxT/Qq5flsQmRH4jT4avkkoH
-	uvn202WAqysU+vgJK3Gy7EvSolFFXwJYi92K8ypENVSTHTqyFoK014OMYRJbZ9Jg
-	Cg/xFE8ehypkU9g/3jC8KRqyUmXJNxVayvDJPP0Br+9JYaqTqGXq5+u4w2GUObvZ
-	hH4b6lQXm9w6fF6Lw9Ir6P/o676483vbp+5DOcJwb1XWfTkKwA1Fyq1gUThiK8TH
-	uDP1/ulGO8Dv5S5joP2r5EEwvfISVgE2OxxtLBIvqoEg8Ri7T+K61z4OPWq+V27m
-	dhTnQAp4tG7vjQdHfl9RgGaYc8B1gIYV7sf3arovWw==
-X-ME-Sender: <xms:8IeHaYYOPXW0x38RIbQ1BBxah8ZGqyrgd6e4Nd601tAYx4C4rttoKA>
-    <xme:8IeHaWeUCI59JUFoX8m0BO2PFOxtgUZUThbELLQHZcBnzYi_7YQonquYkqF2WvpI-
-    WaBAv9xRz5g_fZLg8DZUHHk7QCkNznMj6PZyrdzdc3XId884DoOwVEv>
-X-ME-Received: <xmr:8IeHadmRDazrOW-ElaoL6LACy2JMbT5Hb3hZRcXhEr3UZT7nvQbu36LYyeoDjInUMHy1oWnqsh7W0HL-1VSNEDtn>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduledukedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgrshcu
-    ufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrsh
-    esrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeehudelteetkefgffef
-    udefuedvjeeivdekhfevieefgeffheeltddvvefhfeetgeenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhluhhn
-    ugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmh
-    htphhouhhtpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehr
-    vghnvghsrghsrdgtohhmpdhrtghpthhtohepphgruhhlsehpsggrrhhkvghrrdguvghvpd
-    hrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthho
-    pegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivg
-    htsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvg
-    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhr
-    vghnvghsrghsqdhsohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:8IeHae2G3u0JglXjexgP593bpCJKNgSCyTOLmu0DHzZKWm0sGmC1Xw>
-    <xmx:8YeHaefJNLHMXD9RumCzfbskBo8d_TJ8BWQ9T_2w8BoeFA4fJM231g>
-    <xmx:8YeHaQaSRRYQkaU2si5igjwWQfpJ9KJ5acGsTZLTsJ4fDG1ED9zPlQ>
-    <xmx:8YeHabFS01c58FVn6WLPKvCwz_2M5A3qcevyYwlaRgXH10f_ay00Ng>
-    <xmx:8oeHabofWSNTdmguUyw9B87hJpGqFp_y_xvyTDqigoBBrhIBUj_WO_Jy>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 7 Feb 2026 13:44:00 -0500 (EST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Paul Barker <paul@pbarker.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [net-next] net: ethernet: ravb: Disable interrupts when closing device
-Date: Sat,  7 Feb 2026 19:43:28 +0100
-Message-ID: <20260207184328.2427679-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1770490617; c=relaxed/simple;
+	bh=1aAyQJcOKpZDGOatk9b9nQPWTt5XNCehrKz9upPAILg=;
+	h=From:To:Subject:Message-ID:In-Reply-To:References:Cc:MIME-Version:
+	 Date:Content-Type; b=LT7x0Cewu5apnzvr5XiF6W7d/oixJRZcW2LMgYEem48kn/GjtDeBnqLnlIIWi00Y1rH3u+LyKfaRwkI6Fm6w2mglowi0zyHfhZ8XiKJzDEv7JeO5NtHoc70U1XTtzaqv4oDBDXnMFgiAN9PU2GIBft+ECuK6kUojkQRptveIvmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me; spf=pass smtp.mailfrom=anonaddy.me; dkim=pass (2048-bit key) header.d=anonaddy.me header.i=@anonaddy.me header.b=JGKBezFk; arc=none smtp.client-ip=185.70.196.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=anonaddy.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anonaddy.me
+Received: from mail2.anonaddy.me (mail2.anonaddy.me [127.0.0.1])
+	by mail2.anonaddy.me (Postfix) with ESMTPS id 16D06FA469
+	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 18:56:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anonaddy.me; s=default2;
+	t=1770490609;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1aAyQJcOKpZDGOatk9b9nQPWTt5XNCehrKz9upPAILg=;
+	b=JGKBezFkUespYbcalD8Hc1rSLO+X51BwWeUgryMaBewaDyM4meHgapyYbS0slDtX7pzQ7z
+	+6O3AOsSUnGWnWYz85L0l6cVRWP4XV3A3chs6liRthj8kiKbSAKJm2U46xp1E1K+EISpxQ
+	cBTBZFE+6RNm5i0alwpbYhKUAn354h8xS9uPzl194oKMBKRykI7CnuGnne8Nwybk/+duac
+	77LBH3Y6/kI197mMxDNbVd5D/+WVl/8mdpzcMk1+qUtbvggGl1UtZcuMtElg3zN7Sqk6yP
+	LsVBkeQKEKX0fl5ewF/KGcsb8bp80CuO0Q3AWQAbwWwIdcRDGBsVR8NcAK+9WA==
+From: agpn1b92@anonaddy.me
+To: sgarzare@redhat.com
+Subject: Re: [BUG] vsock: poll() not waking on data arrival, causing
+ multi-second SSH delays
+Feedback-ID: R:d17f588e-5717-4190-ab1e-7db474f4dce6:anonaddy
+Message-ID: <833d4550f9f6436ac8d61919e05272ba@anonaddy.me>
+In-Reply-To: <aYYTder4-zvgOfV7@sgarzare-redhat>
+References: <f3a801a1a32670294d5d703cad8ab609@anonaddy.me>
+ <aYYTder4-zvgOfV7@sgarzare-redhat>
+X-Complaints-To: abuse@help.addy.io
+X-Report-Abuse: abuse@help.addy.io
+X-Report-Abuse-To: abuse@help.addy.io
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Sat, 07 Feb 2026 18:56:49 +0000
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
-	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm2,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[anonaddy.me,reject];
+	R_DKIM_ALLOW(-0.20)[anonaddy.me:s=default2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[anonaddy.me:+];
+	FROM_NEQ_ENVFROM(0.00)[agpn1b92@anonaddy.me,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-257772-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257771-lists,netdev=lfdr.de,renesas];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.982];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ragnatech.se:email,ragnatech.se:dkim,ragnatech.se:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim,renesas.com:email]
-X-Rspamd-Queue-Id: AC9EF106E63
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,openssh.org:url,anonaddy.me:mid,anonaddy.me:dkim]
+X-Rspamd-Queue-Id: 5464A106E90
 X-Rspamd-Action: no action
 
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Hi Stefano and all,
 
-Disable interrupts when closing the device.
+Thank you Stefano for your response and skepticism=
+ about whether this was
+a kernel issue - you were absolutely right to que=
+stion it!
 
-Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-[Niklas: Rebase from BSP and reword commit message]
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
- drivers/net/ethernet/renesas/ravb_main.c | 1 +
- 1 file changed, 1 insertion(+)
+After extensive debugging with strace on both guest and host=
+, I've
+determined this was NOT a kernel bug at all, but rather an OpenSSH=
+ issue
+specific to vsock connections.
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 57b0db314fb5..d56b71003585 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2368,6 +2368,7 @@ static int ravb_close(struct net_device *ndev)
- 	ravb_write(ndev, 0, RIC0);
- 	ravb_write(ndev, 0, RIC2);
- 	ravb_write(ndev, 0, TIC);
-+	ravb_write(ndev, 0, ECSIPR);
- 
- 	/* PHY disconnect */
- 	if (ndev->phydev) {
--- 
-2.52.0
+Root Cause:
+-----------
+Th=
+e 10-20 second delay was caused by OpenSSH's sshd attempting DNS lookups
+=
+on the literal string "UNKNOWN" (the placeholder hostname used for vsock
+=
+connections where no IP address exists). This triggered two 5-second DNS
+=
+timeouts during login recording and audit subsystem operations, totaling
+=
+~10 seconds of delay.
+
+The strace showed:
+ =C2=A0 17:11:14.465 sendmm=
+sg(13, DNS query for "UNKNOWN")
+ =C2=A0 17:11:14.465 poll([{fd=3D13, even=
+ts=3DPOLLIN}], 1, 5000) =3D 0 (Timeout)=20
+<5.005s>
+ =C2=A0 17:11:19.472 =
+sendmmsg(13, DNS query for "UNKNOWN") [RETRY]
+ =C2=A0 17:11:19.472 poll([=
+{fd=3D13, events=3DPOLLIN}], 1, 5000) =3D 0 (Timeout)=20
+<5.005s>
+
+Why =
+I Initially Thought It Was a Kernel Issue:
+------------------------------=
+----------------
+- bpftrace showed ppoll() timeouts while data appeared t=
+o be queued
+- The pattern looked like a classic lost wakeup race conditio=
+n
+
+However, the vsock kernel modules were working perfectly. The delay=
+
+happened in userspace during sshd's session setup, specifically when
+m=
+m_record_login() tried to resolve the peer hostname for logging.
+
+The F=
+ix:
+--------
+OpenSSH 10.1 and 10.2 include fixes to prevent passing "UN=
+KNOWN" to
+subsystems that would attempt DNS resolution:
+
+- 10.1: Skip=
+ audit logging for UNKNOWN hostnames
+- 10.2: Don't set PAM_RHOST when rem=
+ote host is "UNKNOWN"
+
+References:
+- https://github.com/openssh/opens=
+sh-portable/pull/388
+-=20
+https://gitlab.archlinux.org/archlinux/packagin=
+g/packages/openssh/-/issues/16
+- https://www.openssh.org/releasenotes.htm=
+l
+
+Workaround for older OpenSSH versions:
+Add to /etc/hosts: 127.0.0.=
+1 UNKNOWN
+
+Apologies for the noise on netdev - the vsock kernel impleme=
+ntation is
+working correctly. The misleading symptoms (PTY-specific, ppol=
+l timeouts,
+state between connections) made it appear kernel-related when=
+ it was
+actually sshd's login recording code hitting DNS timeouts.
+
+T=
+hanks again for your help and for maintaining the vsock subsystem!
+
+Bes=
+t regards,
+[Your name - don't forget to update it this time or you'll loo=
+k even=20
+more stupid]
+
 
 
