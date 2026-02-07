@@ -1,139 +1,118 @@
-Return-Path: <netdev+bounces-257767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICZxEaJVh2kRWwQAu9opvQ
-	(envelope-from <netdev+bounces-257767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 16:09:22 +0100
+	id CF9IBfZYh2lnXAQAu9opvQ
+	(envelope-from <netdev+bounces-257768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 16:23:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 633A210650F
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 16:09:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8621065AF
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 16:23:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE87F3009537
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 15:09:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD3883013A4B
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 15:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483B0352C52;
-	Sat,  7 Feb 2026 15:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EA93542DA;
+	Sat,  7 Feb 2026 15:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UmkD79nb"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WN8M8Irn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548283502A7
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 15:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F792BB13;
+	Sat,  7 Feb 2026 15:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770476959; cv=none; b=UkSO+epQ8WoUaAiQoIH3HNMQKY97YqFkrUE53JILtZa05X4keCgRyO3GTwRQQXdMjCbjonqFXzityoKuLneTt52NvwjqPdVFrRxj3wQq1RAyBm4Jh0d4TgsgzgDvJr06PtWvU6HSK59/F4IShzbLVLQyCziPjgg1Q6gQX1djJFA=
+	t=1770477810; cv=none; b=mw8KM/S0F0qdseKSWtRuKUlTjX80E17wUdKY0Xi6f3NPQj1uwQYa5WPoRZ7UjpptA4j9l+3eEXhExSZ/0PN4fNdwD0UXoH5dNtw8TKG9NCY1+/0gfSQyFo2O27Z8mm7Zvbz4HWkcMhwW0sAUCdaHRcPvsxmQYO3ThB+DlUtTWVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770476959; c=relaxed/simple;
-	bh=Hkcji6X7dANRJFePNTF8fuTjG+u+9X2zCf5od8CIuZc=;
+	s=arc-20240116; t=1770477810; c=relaxed/simple;
+	bh=yb0vu3inmeFuOijnyY/2ABRIYBMbEedwtQP0k/x11NM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R22CugteVHQ5K6sfQ2YSN8Krv0sIkw82H16nSnbv/TTBC4p86svy6uAjq432ezBd/ARBwLB7Ppz73vS5pcSildVcUiYLjL9iLsB4jXoaJyYu+DEPe2I5pw601uKr3/ExSSCNoEDU9HLHNn1relR9fYgXK+AZxhgiw62U8L43Hqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UmkD79nb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=EBAawNMpPD+jhTBS4ytBoeJeAWdNCu3nLbpDofNg1bw=; b=Um
-	kD79nbuUcN72L/ILQbwryFoRENdXLCIKnldoAgteIK3nrkzoglwF7fESJj1qnoi1h6QaLfwpRvlRa
-	SK/morP8zadOuQIElYB8rYGC8b+Dzcfp1mJxJeR8eYC0MwiA9jUB0IhXJc4QAAtC9gGj3J9phDTwU
-	58QW7RuGBAagCSE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vojvt-006TyZ-Cy; Sat, 07 Feb 2026 16:09:13 +0100
-Date: Sat, 7 Feb 2026 16:09:13 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Deren Teo <deren.teo@outlook.com>
-Cc: "jhs@mojatatu.com" <jhs@mojatatu.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [tc] Invalid JSON output from hfsc qdisc
-Message-ID: <8698fad4-c406-4bd8-bfe3-33e5fda641e2@lunn.ch>
-References: <SI2PPF4F82E9256898C9826AF17C3AE8AD9F467A@SI2PPF4F82E9256.apcprd04.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BVUHrE56CkhmYZtRBdMTbRT3OCq3g5W7mLmEoLpajpJlNrSa4gLdxGIakFTp4NQTzKXqZa/ckq7rzLeiMexSylZiWxGC8QRgLbaeqMPXtrvX2jck/xBQHoKbGbia0UzgL/c85lWq9gfc2lb9xkhotPNPX7uZmL6m5UQ0aRjbgkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WN8M8Irn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B740C116D0;
+	Sat,  7 Feb 2026 15:23:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1770477810;
+	bh=yb0vu3inmeFuOijnyY/2ABRIYBMbEedwtQP0k/x11NM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WN8M8IrnsS+GXNtOXULaKpy2m5v2nEI4Dugpo+HU0dmrOo+BA0iHNmvKEHMjgiJMC
+	 f+6wi0Mm7iGqKL0CgA1nH1IC92srH/UNYAVmg7WmDhqOfHQZTKbk4G70FKHCCiHLqh
+	 qbg/6MSLeN014ASA6lq6asNHxyvKFvYT0OjWEjys=
+Date: Sat, 7 Feb 2026 16:23:27 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Cc: stable@vger.kernel.org, davem@davemloft.net, yoshfuji@linux-ipv6.org,
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kafai@fb.com, weiwan@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com, yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com, Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH v6.1-v6.12 ] ipv6: use RCU in ip6_xmit()
+Message-ID: <2026020719-gone-renewably-f94b@gregkh>
+References: <20260205074722.2091297-1-keerthana.kalyanasundaram@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <SI2PPF4F82E9256898C9826AF17C3AE8AD9F467A@SI2PPF4F82E9256.apcprd04.prod.outlook.com>
+In-Reply-To: <20260205074722.2091297-1-keerthana.kalyanasundaram@broadcom.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257767-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[outlook.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-257768-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 633A210650F
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,linuxfoundation.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B8621065AF
 X-Rspamd-Action: no action
 
-On Sat, Feb 07, 2026 at 02:01:01AM +0000, Deren Teo wrote:
-> Dear Jamal,
+On Thu, Feb 05, 2026 at 07:47:22AM +0000, Keerthana K wrote:
+> From: Eric Dumazet <edumazet@google.com>
 > 
-> I apologise if you have received this email twice. My first attempt mistakenly contained an HTML part and so was not delivered to the netdev mailing list. The original content follows.
+> [ Upstream commit 9085e56501d93af9f2d7bd16f7fcfacdde47b99c ]
 > 
+> Use RCU in ip6_xmit() in order to use dst_dev_rcu() to prevent
+> possible UAF.
 > 
-> The JSON output for the hfsc qdisc is not parseable when a default class is specified; `hfsc_print_opt` uses `fprintf` to print the default class.
->  
-> 
-> Environment:
-> 
-> - Fedora 42
-> - Linux 6.19.0-rc4+
-> - iproute-tc-6.12.0-3.fc42.x86_64
-> 
-> Reproduce:
-> 
-> 1. Add a hfsc qdisc with any default class. For example, from the tc-hfsc man page:
->     # tc qdisc add dev eth0 root handle 1:0 hfsc default 1
-> 
-> 2. Show the qdisc with the `-j` flag:
->     # tc -j qdisc show dev eth0
-> 
-> Actual results:
-> 
-> [{"kind":"hfsc","handle":"1:","root":true,"refcnt":17,"options":{default 1 }}]
-> 
-> Expected results:
-> 
-> [{"kind":"hfsc","handle":"1:","root":true,"refcnt":17,"options":{"default":1}}]
+> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+> Link: https://patch.msgid.link/20250828195823.3958522-4-edumazet@google.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+> ---
+>  net/ipv6/ip6_output.c | 35 +++++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 14 deletions(-)
 
-Just an idea...
-
-Could the self tests in tools/testing/selftests/tc-testing/tc-tests be
-extended to dump the configuration in json and test the output is at
-least readable by the python json parser? That should catch simple
-formatting errors like this.
-
-     Andrew
-
+Does not apply to 6.12.y :(
 
