@@ -1,159 +1,223 @@
-Return-Path: <netdev+bounces-257787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4A7bDcOzh2mRcAQAu9opvQ
-	(envelope-from <netdev+bounces-257787-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 22:50:59 +0100
+	id qtT3DbC1h2k6cQQAu9opvQ
+	(envelope-from <netdev+bounces-257788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 22:59:12 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826301073B3
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 22:50:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 766651073D9
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 22:59:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FFE53011BCE
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 21:50:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE1963014655
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 21:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3C233A9F1;
-	Sat,  7 Feb 2026 21:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390533559D0;
+	Sat,  7 Feb 2026 21:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HV8lL6fs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVdE++4e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0403002D8
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 21:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770501056; cv=pass; b=T36apFBGXbFdmwRVFJGx5M2XXKM4rdvUPatc1lSYlm/oADBBQ5PmKwUSuF7bth6q9+Wc7moa1J3glIHk0V/BQaXVkvge2oT8gfJUPLD81zkvjKmatm2bB38vZRWqI4xDZlEWGxvbffJtZM5bNkn4/jBY3wXoXRGStW4t6Zm6i8w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770501056; c=relaxed/simple;
-	bh=95gSqWJc+Ti12m1jJURD7KFONvPd9eDs7+qSuO/OEvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qvvc6na13VAJHJwypIS9rZM6MsUYUpQAwV44eeGEwUO04OCMvkfJMUNGFO5t6Xj8fn+j9z4ytgu3GIbSW32AEC/GswmLGyfHvYbIcogOW20/1BMIWFsvC4OuCHcI+Jq7wwVkR7zYB+7LsRoImkVF+mAEek4a/Q4rcIj7n7+b7Rc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HV8lL6fs; arc=pass smtp.client-ip=74.125.82.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-1248d27f2b9so3798110c88.0
-        for <netdev@vger.kernel.org>; Sat, 07 Feb 2026 13:50:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770501055; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AGZtew5TlcZb5aSNDXJfHatVWyb8IOX1yb4rra6GcpOU1XpMRwomNeai1YtNk3ioNt
-         9wBrXjVMYo8uLqO5LA+JCeUU5gV7BS4qyKNwfEorTCXMFsFVwS5olytQbB4ppPX1lly9
-         CLGvAZaRVVkNsxpllzD1sf5XeKcjpP+k+dJ0P6dxH7Spd8XXtmCCnHkbAEbk3tBT2cS6
-         XMwJ7HQqyQz5iUdB2QJFSotrLuR5vivKJQ56pvFfs3Jix45xbCRkblmZUboXM1BTQA5K
-         koHQzEKL7dYhqHiUotfZpj7h5U6F3QVuk68HJUxGXng7RrSsZAARgqzRxv/XyI1vsb2G
-         pBrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=95gSqWJc+Ti12m1jJURD7KFONvPd9eDs7+qSuO/OEvs=;
-        fh=p7B9e8B3xiIiCkCGjtzt46m0S1aFeR9jDBM26st+Bss=;
-        b=QTfYg/a2kHSpXLTcVAGG7fnrCpvwDjTtHf6kh8q7wps3aefWEyuwHCt+w2f3/OrNTH
-         QbNfS8p1jNsTn/HRJvmP8PYhEyZh1tLqbRleaOJZYP0R21qy5+i/zwslVSi5SC/kM/1y
-         3caa3BQNebYVpu7dXlsPLS3+eKJsvMcjAvFJfFXv7Z2dKxnihnPZXH49xZChI+edMgGC
-         y+mG/8HdTNboAzSmSBkttn6x1ayadCWdgFIWqBk3tBrBFXTHRij3hJckFm28XUdGLAaE
-         3P0i0vi9vYb2SI9d0MQXS1rlrHx5TsZkPy3couT7fh2itPv+uzezBgmBVvSYrS7dNU38
-         pjbA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC75E12CD8B
+	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 21:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770501549; cv=none; b=i4YpGX/8bexK6PoXqXJ8FJYwgL3ITPx5gd6lrto5DHR9hjLrTsBmdwVwgR8zDC/dj1udLFmKozWD2bM2+wrBnKbIfKx4BG8N1n7ToVni4vMDN94lFSbLi8wcR43hwQvBuT9lk1ILxEpgaCefC+H3il2GGX7RDo/aBURgJYiq4/o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770501549; c=relaxed/simple;
+	bh=gHIdSTck+mUS1CWOypJzkEpccfiExm0hMmFwCsNtkDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cAu8MZgwXMDLPGua90/eER9gObNfkMXOeDAQ5Po0sbvb/swRHscsRx/XJVe6PY3aCMB0IdzqVv+wcf3fwqxQdAuA2O9NABxLtLpZz8+Xn2Yv3EpdStjQcx1ZZvCro0ea8i4NxtMzPa9Gmiv/1xayacY/im5LfR0Ahk7zQDdaP7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVdE++4e; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43595901036so452157f8f.2
+        for <netdev@vger.kernel.org>; Sat, 07 Feb 2026 13:59:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770501055; x=1771105855; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=95gSqWJc+Ti12m1jJURD7KFONvPd9eDs7+qSuO/OEvs=;
-        b=HV8lL6fs3huo0TyvXcgpuEgAsoA5bZBEFWoF81Ilowrku34w8FjpKdgshoJjYDR7DM
-         WBpDLMljqNeL11ec7Y9vIwW9wuOBfOvNb+QKqo8EcBlA6vNUhLpm5h4pkS2xubweC3v7
-         Ci/jOZfWJL/fOsaERMTYr/EBtXHmyaIY1CNZWy0kRCFfV9+Q2WsqmcJ7jWEbaT44k36M
-         jqkQEOOEvny/SvvCSzc1WJPCxZCCqBpetURo9hF2sM+A2mkkPI5IMgjXVWZuPu35GknM
-         ibCM08A9z1q3Oly5dfl5w4hIug6ceF9Bz0QlStJGO6ZyXrB5bez057teSorQHxEftc1S
-         4WdQ==
+        d=gmail.com; s=20230601; t=1770501547; x=1771106347; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ofIU57zT38LFRzwk3Gh7Fvbzm+NL2eJIHdBTKuqEZD8=;
+        b=TVdE++4ewXqb9DxhYHcQte943MK5RFQ/+Ren3GbTmKotgaD5Pyq9cPFdFEVRIl7Km5
+         vFdYnX/zB6qlcyKdwet8FQB+TtIVk9SEqVfXsO3Men3V6TrhTTNs0YxH3xs0aLbGoi9x
+         BVtVxeWXnQ9XSmI2695hJacyrMe9PrmO0gCFVjM18SIF0alCYN+P29UPM90ZAsJzxKrE
+         6xxiiVdkU1BEOtqwHnjZeVLHzCb3Igd6kmOvi2zi+C2Kh4Fn/VLWx1MF2+oMOAzNV9df
+         oujMYxM/HpO+Eou1as2YzZ09ibpq4uGOb9O4ZFaYc8LlZ4YDfLsa6sLBALZxd6SKjeki
+         5Xgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770501055; x=1771105855;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=95gSqWJc+Ti12m1jJURD7KFONvPd9eDs7+qSuO/OEvs=;
-        b=msxmWVguZSX+aJP3eBA17Ivl0hI5YLWhSIIlEYWOeXl3gstkBkbv+d8m2iok+rMNzp
-         gYL7NFhrhdxW6GZOm5++RHAYCc5wmO3Wa7Ea7SrtfUAVYb0s33PMpB3XtiZEZ8EhI2Rp
-         8FlKTrERAx+lHJZJITMzrU44BiFG+JtGtmcSW7pAKlZzqa3JZ1uVcYcdckyyKqG1R5Qj
-         lkFZt2CePZzdX2B8vJIoVyDAIZpd5n4rOQU/+BSD8oiccWP5rkSKuxStSeNDwymV4SEB
-         GyizaQQeO8OidzS/dYjg6KNAv7wH7FC+4g1FCI23wvA2TsiwJsi1yaePCfHZ8+XksGuo
-         p5Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCWXMlZl97EOQ8dc0YClYUxmIYY41v7VkwXAtbdaQEKj9zGXpuSNVBMvYcIM5xAYj35kIdu3NQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZIjTz11N+PyoBBZfWWzv0PSWR7SGM6N7WeUKzngkyt+Os2ufF
-	iUU4gZNej0p2rgfl6SXoY8Bos+BlsH0ImqiC/0gTCReXSIZZwTiH39kUGlm3gpN7+fhju7iHen2
-	qxVB6UieI6r2CSszJUF0XElZ2ylza7kZlt7bQ/xXe
-X-Gm-Gg: AZuq6aJEKXvA5YTHaNmk9zgvK8PwzcqrWQrvS43VQGISXvVX8uVJUWKxgcaNajwhO4S
-	8YQsxENo2L4kf+M/QSRgC7K/k1gFwTPPfqsCExMVZbkjyfR4tH4TGUJLAsbbs5D1A9MTtPaFkRK
-	f6dJs/YOAsNdiSJTNyJp3piKpQV3GDkXD8BwMeSwvggJgMREGkxGaJ6a6bT0/UcskEC9kXOnmGc
-	IKg0uPk4XiaXEq5TC84oszeBqAwddJHvBpiz3hkqJMyRS70CzReLw+Tci1Q/1/H0bwH7epSKH5b
-	KHRKhSraqdPlW1855CzyvpxulFeIMB0+WFQXuVdCMZmQbdTY65FED8Fz9s5B
-X-Received: by 2002:a05:7022:fa6:b0:11d:f44d:1863 with SMTP id
- a92af1059eb24-12703f858e9mr3980148c88.11.1770501054788; Sat, 07 Feb 2026
- 13:50:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770501547; x=1771106347;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ofIU57zT38LFRzwk3Gh7Fvbzm+NL2eJIHdBTKuqEZD8=;
+        b=TIYnc8Hg6V5hPeCZRKZQODctCRjZBsIYh5eMHSDEOYMBhvR0SVktqtY23zoji8ZGpg
+         PxloIOlbTgELd9xvO1vZCCVuK5m6a5doWNAUJeVKTuogfR+QaGBbcemvUTAMW3c13gUD
+         +GvlI8Eloyaoj/cb3cLnSDnI6PIAepvACtBD1R5QYNUnTkd05oM9nyo+mDICqkZEQyz+
+         +0e6unFaJ45IIqPNYyiTh69N3lNiUKAun5DVq72vzZW7J37dkPu7Jz4AWou4JCGz+ZkD
+         vT7iRJD+ORRzFF0USc0NNiel3uhnkhuTzSHH7vqSB/rWYTbkcQ48xCjKGLN4OEE78ZH3
+         zb9g==
+X-Forwarded-Encrypted: i=1; AJvYcCU4mqn9qs2P7Dx034jZQsMJErd7tDY5HWWj/wwWmiwwGPjgPH3SJOTeD8Vggr4Na7tMjn72Kes=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFaXVYkprfX27eWRiDgao040vq/DmkyP6Xn9lz1h9V1RykTiLE
+	4MMwBz7tIEP/jhXE7Pbs+t9c0kWaYiOYL7gRIzPqBQXV+SvCM+VQ+Ykz
+X-Gm-Gg: AZuq6aJ5s0VyFe2yZQQp6rXQL8hQp/4t7FXZL8wL8ue+t0jT8qwpA/QDK8yOIw9DdKQ
+	VcmIeuFKTUzJyrkyiZ0V0VHdykl79Esko1NTHkvmIjOIdJQVFWfUrm4dA8Vou5DEBFoanihNyZz
+	V2MJLxZNOjdT/jJZv8GZHyYtFPCZH704Qr1+mM+5scJ2K8+nmlHjx5MVqRTGnSQzmLpA/rWZgw+
+	Vv9VaR4iH3FFjWu2ZFTPdlqg7UKmPvgjveUw543/JVnwdwR+/RWSd+eyfp9cfp5ANwOmHJlVAyF
+	BCMCnoTUGk2tz76f2N0fncvXPiL2BYfT/tXrfY4dCDg3WzQ2klEbUyI0g7yPByb/AMbyWlUtZIB
+	LWpd9uw5O3jMnJ7OUomd2/uea8L/gAwpETWt1RrWBO7xSXQm153C3O/Ro+pb7huPbxnHI/WzYxY
+	GYWXE=
+X-Received: by 2002:a05:600c:4f8a:b0:47d:3ffa:9838 with SMTP id 5b1f17b1804b1-483201d865bmr61882315e9.1.1770501547139;
+        Sat, 07 Feb 2026 13:59:07 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:c705:d6fa:62de:90a5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436296b2d43sm15165951f8f.8.2026.02.07.13.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Feb 2026 13:59:05 -0800 (PST)
+Date: Sat, 7 Feb 2026 23:59:02 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>, John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v14 4/4] net: dsa: add basic initial driver for
+ MxL862xx switches
+Message-ID: <20260207215902.mtsg43zeoadqqfz5@skbuf>
+References: <cover.1770433307.git.daniel@makrotopia.org>
+ <ccde07e8cf33d8ae243000013b57cfaa2695e0a9.1770433307.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206173426.1638518-1-edumazet@google.com> <20260206173426.1638518-8-edumazet@google.com>
-In-Reply-To: <20260206173426.1638518-8-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sat, 7 Feb 2026 13:50:43 -0800
-X-Gm-Features: AZwV_QjnERkcxGYF7tM1AhAPZjSgeIygMUAAdOEMLu5ImhJw9m0_5DQkmdolhoI
-Message-ID: <CAAVpQUAmYiXb=UHLQp2h9pTzGHyrH+ni8kk+2FqkN7dAvJ4dzw@mail.gmail.com>
-Subject: Re: [PATCH net-next 7/7] tcp: inet6_csk_xmit() optimization
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ccde07e8cf33d8ae243000013b57cfaa2695e0a9.1770433307.git.daniel@makrotopia.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257788-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-257787-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 826301073B3
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[param.data:url,0.0.0.5:email,0.0.0.6:email]
+X-Rspamd-Queue-Id: 766651073D9
 X-Rspamd-Action: no action
 
-On Fri, Feb 6, 2026 at 9:34=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> After prior patches, inet6_csk_xmit() can reuse inet->cork.fl.u.ip6
-> if __sk_dst_check() returns a valid dst.
->
-> Otherwise call inet6_csk_route_socket() to refresh inet->cork.fl.u.ip6
-> content and get a new dst.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Sat, Feb 07, 2026 at 03:07:27AM +0000, Daniel Golle wrote:
+> +/* PHY access via firmware relay */
+> +static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
+> +				 int devadd, int reg)
+> +{
+> +	struct mdio_relay_data param = {
+> +		.phy = port,
+> +		.mmd = devadd,
+> +		.reg = cpu_to_le16(reg),
+> +	};
+> +	int ret;
+> +
+> +	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return le16_to_cpu(param.data);
+> +}
+> +
+> +static int mxl862xx_phy_write_mmd(struct mxl862xx_priv *priv, int port,
+> +				  int devadd, int reg, u16 data)
+> +{
+> +	struct mdio_relay_data param = {
+> +		.phy = port,
+> +		.mmd = devadd,
+> +		.reg = cpu_to_le16(reg),
+> +		.data = cpu_to_le16(data),
+> +	};
+> +
+> +	return MXL862XX_API_WRITE(priv, INT_GPHY_WRITE, param);
+> +}
+> +
+> +static int mxl862xx_phy_read_mii_bus(struct mii_bus *bus, int port, int regnum)
+> +{
+> +	return mxl862xx_phy_read_mmd(bus->priv, port, 0, regnum);
+> +}
+> +
+> +static int mxl862xx_phy_write_mii_bus(struct mii_bus *bus, int port,
+> +				      int regnum, u16 val)
+> +{
+> +	return mxl862xx_phy_write_mmd(bus->priv, port, 0, regnum, val);
+> +}
+> +
+> +static int mxl862xx_phy_read_c45_mii_bus(struct mii_bus *bus, int port,
+> +					 int devadd, int regnum)
+> +{
+> +	return mxl862xx_phy_read_mmd(bus->priv, port, devadd, regnum);
+> +}
+> +
+> +static int mxl862xx_phy_write_c45_mii_bus(struct mii_bus *bus, int port,
+> +					  int devadd, int regnum, u16 val)
+> +{
+> +	return mxl862xx_phy_write_mmd(bus->priv, port, devadd, regnum, val);
+> +}
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+You took inspiration from the wrong place with the mii_bus ops prototypes,
+specifically with the "int port" argument.
+
+The second argument does not hold the port, it holds the PHY address.
+I.e. in this case:
+                port@6 {
+                    reg = <6>;
+                    phy-handle = <&phy5>;
+                    phy-mode = "internal";
+                };
+                phy5: ethernet-phy@5 {
+                    reg = <5>;
+                };
+
+"int port" is 5, not 6.
+
+Your source of inspiration are the prototypes of an mii_bus used as
+ds->user_mii_bus. We have a different set of requirements there, because
+ds->user_mii_bus exists for the case where the PHY is not described in
+the device tree, so the port index is given as argument and the
+user_mii_bus is responsible for internally translating the port index to
+a PHY address.
+
+So while the use of "int port" as argument name for these operations is
+justifiable in some cases, it is not applicable to this driver, and will
+be a pitfall for anyone who has to modify or debug this code.
 
