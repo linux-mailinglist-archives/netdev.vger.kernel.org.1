@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-257666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257667-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iAQvA+OIhmmOOgQAu9opvQ
-	(envelope-from <netdev+bounces-257666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:35:47 +0100
+	id MJ3+GvSIhmmNOgQAu9opvQ
+	(envelope-from <netdev+bounces-257667-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:36:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACCB104507
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:35:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B0B104535
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AAB1302BE03
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 00:35:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31BB630500FE
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 00:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7F221D5AF;
-	Sat,  7 Feb 2026 00:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8633F225390;
+	Sat,  7 Feb 2026 00:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MNFMxypA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ENpFDFSz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C0F21ABD7;
-	Sat,  7 Feb 2026 00:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A952236FA;
+	Sat,  7 Feb 2026 00:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770424517; cv=none; b=IcTZzEHgmbLbABvVLCjpbqGFXWU3Mon0T7dF/rw4o8jBuSw+ItulI6tJ0I0G+LtrpdMitpDLXImTHUE1HO9epTx9tZ2blLaxtGmE8tvyCk/Gk2R0bg19qrBYYzUSfkkFAlPGONi0rNALlvtJ/PKFpfCmfxy/+3HVY/cclUvdtA8=
+	t=1770424518; cv=none; b=CRGsoN6MYjn/RRaOpXIcBelFCj6SArHxmI8SLVTN1jxn3RXGdjKzgXU8d/uN++PljDHf9XW/6l8td7ty2NwbfPQlN/I3ZX0D7wFRcjGO4811UTgsa7w0BPVq1GgKayvpNayMzRWYFd0pn3CpzSopaGKgk5uWtgA/EegCPRS+Tf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770424517; c=relaxed/simple;
-	bh=bRY2BHHqZekiUXzi9An4H1EIwUlBR0yf3lMGwHx+Qas=;
+	s=arc-20240116; t=1770424518; c=relaxed/simple;
+	bh=pXz9WzBNXTn+31EkTBeAmI67/47Z3TMxUfgQzPA4j+0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BlIR+DwCEap0XIU8h1+v1KWLXVWdAMZWU4g6s1RDfK8DTw8TC4B1MQvy0rW7/WkCZBdbXYwlV/roZxTlWQn3kRgQsMuTfsP0jBFtnw2RMWzKFcvYmUJCLxA1/FRP5+DhJafwaX0UOgwREzyMlYN/uwydRKU1Dgcntcx5NB4bbr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MNFMxypA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B18EC116C6;
-	Sat,  7 Feb 2026 00:35:16 +0000 (UTC)
+	 MIME-Version; b=BbYAY0o3wjaUIHbplzCErSwWSt0Bo2IgeCuVIK382ojvJbtBXkdYCENj4oRsM5xYQb1ZFxyyxnHDk/1qytFRmQkYpqmBxGLZPPR0R1ZWGluK91UuhLx79gQ7PZm46XuG/mCbcakSK6qQzyc0KU7ydPFETDDslbuZWNjQDHI9RSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ENpFDFSz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F082C19424;
+	Sat,  7 Feb 2026 00:35:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770424517;
-	bh=bRY2BHHqZekiUXzi9An4H1EIwUlBR0yf3lMGwHx+Qas=;
+	s=k20201202; t=1770424518;
+	bh=pXz9WzBNXTn+31EkTBeAmI67/47Z3TMxUfgQzPA4j+0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MNFMxypAN2GaUHbqB7vQOTAdB0RbCa6PZbucwT7YGHP3NfFfHsnLeQrsnawyQY6Ut
-	 I+6v0bh/8WXl4nBBaNwJAj9h7BX2eB8/KXF2PdjLcxI6bbI18Xov5fOTh61StIsZHT
-	 yO7ci0spf/XS9M3198r4qOl1WfjwxnhDFRbgtP1Z+JDRJYSeOLt2si5Fg+FuntEEAj
-	 to/uJ9Dyq+2GM0etbtLljlZHlRZGN0KcVB4V+0thx8D9eBns6mKgoevhPYlXo5+1w2
-	 xD26cyZXkIH8G4f2otB/UJrHs6RPwXHiMg89sopFO/tk0Bx57oyW+g2pXj4apkQ4DL
-	 yYUrpNMvBLNsg==
+	b=ENpFDFSzSQVQL77qH3rR5KtpFwsCKL8WEEv362fcaQQU5dhOABfRel00KYqRiSp92
+	 /i14C48CJHDdGRtshl/fN9+Ffl4r1XyGT0EK0UnDOIVGcIKmp/mHf2/JTk3GS7hJXh
+	 6koiaRdlppTNP02RtFsEC0iOz87r0hD/OsrE3X5Wj+62OSuARw701hnp+qr4q7vjze
+	 BS4WCJWt8oG+GowCAUm6D3rJqx3zdD638wUjYe+qmba8tQuHMwzqS3jrei4XRP7z3B
+	 hWtdrJ7q2GA7uitKfiLUL2psZT/Vx81aSQjKdld+4RIu4oPdxLVO33GIiiIA8nCw9A
+	 ffJpRD0ulJt1w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/9] tools: ynltool: factor out qstat dumping
-Date: Fri,  6 Feb 2026 16:35:02 -0800
-Message-ID: <20260207003509.3927744-3-kuba@kernel.org>
+Subject: [PATCH net-next v2 3/9] tools: ynltool: add qstats analysis for HW-GRO efficiency / savings
+Date: Fri,  6 Feb 2026 16:35:03 -0800
+Message-ID: <20260207003509.3927744-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260207003509.3927744-1-kuba@kernel.org>
 References: <20260207003509.3927744-1-kuba@kernel.org>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com,broadcom.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-257666-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257667-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -97,174 +97,164 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7ACCB104507
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E3B0B104535
 X-Rspamd-Action: no action
 
-The logic to open a socket and dump the queues is the same
-across sub-commands. Factor it out, we'll need it again.
+Extend ynltool to compute HW GRO savings metric - how many
+packets has HW GRO been able to save the kernel from seeing.
 
-No functional changes intended.
+Note that this definition does not actually take into account
+whether the segments were or weren't eligible for HW GRO.
+If a machine is receiving all-UDP traffic - new metric will show
+HW-GRO savings of 0%. Conversely since the super-packet still
+counts as a received packet, savings of 100% is not achievable.
+Perfect HW-GRO on a machine with 4k MTU and 64kB super-frames
+would show ~93.75% savings. With 1.5k MTU we may see up to
+~97.8% savings (if my math is right).
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+Example after 10 sec of iperf on a freshly booted machine
+with 1.5k MTU:
+
+  $ ynltool qstats show
+  eth0     rx-packets:  40681280               rx-bytes:   61575208437
+        rx-alloc-fail:         0      rx-hw-gro-packets:       1225133
+                                 rx-hw-gro-wire-packets:      40656633
+  $ ynltool qstats hw-gro
+  eth0: 96.9% savings
+
+None of the NICs I have access to can report "missed" HW-GRO
+opportunities so computing a true "effectiveness" metric
+is not possible. One could also argue that effectiveness metric
+is inferior in environments where we control both senders and
+receivers, the savings metrics will capture both regressions
+in receiver's HW GRO effectiveness but also regressions in senders
+sending smaller TSO trains. And we care about both. The main
+downside is that it's hard to tell at a glance how well the NIC
+is doing because the savings will be dependent on traffic patterns.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/ynltool/qstats.c | 95 +++++++++++++++-------------------
- 1 file changed, 41 insertions(+), 54 deletions(-)
+v2:
+ - use %1$s
+v1: https://lore.kernel.org/20260205220541.2992807-4-kuba@kernel.org
+---
+ tools/net/ynl/ynltool/qstats.c | 76 +++++++++++++++++++++++++++++++---
+ 1 file changed, 71 insertions(+), 5 deletions(-)
 
 diff --git a/tools/net/ynl/ynltool/qstats.c b/tools/net/ynl/ynltool/qstats.c
-index 31fb45709ffa..d19acab0bf2a 100644
+index d19acab0bf2a..a6c28ba4f25c 100644
 --- a/tools/net/ynl/ynltool/qstats.c
 +++ b/tools/net/ynl/ynltool/qstats.c
-@@ -237,13 +237,47 @@ static void print_plain_qstats(struct netdev_qstats_get_list *qstats)
- 	}
- }
- 
--static int do_show(int argc, char **argv)
-+static struct netdev_qstats_get_list *
-+qstats_dump(enum netdev_qstats_scope scope)
- {
- 	struct netdev_qstats_get_list *qstats;
- 	struct netdev_qstats_get_req *req;
- 	struct ynl_error yerr;
- 	struct ynl_sock *ys;
--	int ret = 0;
-+
-+	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!ys) {
-+		p_err("YNL: %s", yerr.msg);
-+		return NULL;
-+	}
-+
-+	req = netdev_qstats_get_req_alloc();
-+	if (!req) {
-+		p_err("failed to allocate qstats request");
-+		goto err_close;
-+	}
-+
-+	if (scope)
-+		netdev_qstats_get_req_set_scope(req, scope);
-+
-+	qstats = netdev_qstats_get_dump(ys, req);
-+	netdev_qstats_get_req_free(req);
-+	if (!qstats) {
-+		p_err("failed to get queue stats: %s", ys->err.msg);
-+		goto err_close;
-+	}
-+
-+	ynl_sock_destroy(ys);
-+	return qstats;
-+
-+err_close:
-+	ynl_sock_destroy(ys);
-+	return NULL;
-+}
-+
-+static int do_show(int argc, char **argv)
-+{
-+	struct netdev_qstats_get_list *qstats;
- 
- 	/* Parse options */
- 	while (argc > 0) {
-@@ -268,29 +302,9 @@ static int do_show(int argc, char **argv)
- 		}
- 	}
- 
--	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
--	if (!ys) {
--		p_err("YNL: %s", yerr.msg);
-+	qstats = qstats_dump(scope);
-+	if (!qstats)
- 		return -1;
--	}
--
--	req = netdev_qstats_get_req_alloc();
--	if (!req) {
--		p_err("failed to allocate qstats request");
--		ret = -1;
--		goto exit_close;
--	}
--
--	if (scope)
--		netdev_qstats_get_req_set_scope(req, scope);
--
--	qstats = netdev_qstats_get_dump(ys, req);
--	netdev_qstats_get_req_free(req);
--	if (!qstats) {
--		p_err("failed to get queue stats: %s", ys->err.msg);
--		ret = -1;
--		goto exit_close;
--	}
- 
- 	/* Print the stats as returned by the kernel */
- 	if (json_output)
-@@ -299,9 +313,7 @@ static int do_show(int argc, char **argv)
- 		print_plain_qstats(qstats);
- 
- 	netdev_qstats_get_list_free(qstats);
--exit_close:
--	ynl_sock_destroy(ys);
--	return ret;
-+	return 0;
- }
- 
- static void compute_stats(__u64 *values, unsigned int count,
-@@ -406,10 +418,7 @@ static int cmp_ifindex_type(const void *a, const void *b)
- static int do_balance(int argc, char **argv __attribute__((unused)))
- {
- 	struct netdev_qstats_get_list *qstats;
--	struct netdev_qstats_get_req *req;
- 	struct netdev_qstats_get_rsp **sorted;
--	struct ynl_error yerr;
--	struct ynl_sock *ys;
- 	unsigned int count = 0;
- 	unsigned int i, j;
- 	int ret = 0;
-@@ -419,29 +428,9 @@ static int do_balance(int argc, char **argv __attribute__((unused)))
- 		return -1;
- 	}
- 
--	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
--	if (!ys) {
--		p_err("YNL: %s", yerr.msg);
-+	qstats = qstats_dump(NETDEV_QSTATS_SCOPE_QUEUE);
-+	if (!qstats)
- 		return -1;
--	}
--
--	req = netdev_qstats_get_req_alloc();
--	if (!req) {
--		p_err("failed to allocate qstats request");
--		ret = -1;
--		goto exit_close;
--	}
--
--	/* Always use queue scope for balance analysis */
--	netdev_qstats_get_req_set_scope(req, NETDEV_QSTATS_SCOPE_QUEUE);
--
--	qstats = netdev_qstats_get_dump(ys, req);
--	netdev_qstats_get_req_free(req);
--	if (!qstats) {
--		p_err("failed to get queue stats: %s", ys->err.msg);
--		ret = -1;
--		goto exit_close;
--	}
- 
- 	/* Count and sort queues */
- 	ynl_dump_foreach(qstats, qs)
-@@ -576,8 +565,6 @@ static int do_balance(int argc, char **argv __attribute__((unused)))
- 	free(sorted);
- exit_free_qstats:
- 	netdev_qstats_get_list_free(qstats);
--exit_close:
--	ynl_sock_destroy(ys);
+@@ -568,6 +568,65 @@ static int do_balance(int argc, char **argv __attribute__((unused)))
  	return ret;
  }
  
++static int do_hw_gro(int argc, char **argv __attribute__((unused)))
++{
++	struct netdev_qstats_get_list *qstats;
++
++	if (argc > 0) {
++		p_err("hw-gro command takes no arguments");
++		return -1;
++	}
++
++	qstats = qstats_dump(0);
++	if (!qstats)
++		return -1;
++
++	if (json_output)
++		jsonw_start_array(json_wtr);
++
++	ynl_dump_foreach(qstats, qs) {
++		char ifname[IF_NAMESIZE];
++		const char *name;
++		double savings;
++
++		if (!qs->_present.rx_packets ||
++		    !qs->_present.rx_hw_gro_packets ||
++		    !qs->_present.rx_hw_gro_wire_packets)
++			continue;
++
++		if (!qs->rx_packets)
++			continue;
++
++		/* How many skbs did we avoid allocating thanks to HW GRO */
++		savings = (double)(qs->rx_hw_gro_wire_packets -
++				   qs->rx_hw_gro_packets) /
++			qs->rx_packets * 100.0;
++
++		name = if_indextoname(qs->ifindex, ifname);
++
++		if (json_output) {
++			jsonw_start_object(json_wtr);
++			jsonw_uint_field(json_wtr, "ifindex", qs->ifindex);
++			if (name)
++				jsonw_string_field(json_wtr, "ifname", name);
++			jsonw_float_field(json_wtr, "savings", savings);
++			jsonw_end_object(json_wtr);
++		} else {
++			if (name)
++				printf("%s", name);
++			else
++				printf("ifindex:%u", qs->ifindex);
++			printf(": %.1f%% savings\n", savings);
++		}
++	}
++
++	if (json_output)
++		jsonw_end_array(json_wtr);
++
++	netdev_qstats_get_list_free(qstats);
++	return 0;
++}
++
+ static int do_help(int argc __attribute__((unused)),
+ 		   char **argv __attribute__((unused)))
+ {
+@@ -577,9 +636,10 @@ static int do_help(int argc __attribute__((unused)),
+ 	}
+ 
+ 	fprintf(stderr,
+-		"Usage: %s qstats { COMMAND | help }\n"
+-		"       %s qstats [ show ] [ OPTIONS ]\n"
+-		"       %s qstats balance\n"
++		"Usage: %1$s qstats { COMMAND | help }\n"
++		"       %1$s qstats [ show ] [ OPTIONS ]\n"
++		"       %1$s qstats balance\n"
++		"       %1$s qstats hw-gro\n"
+ 		"\n"
+ 		"       OPTIONS := { scope queue | group-by { device | queue } }\n"
+ 		"\n"
+@@ -588,9 +648,14 @@ static int do_help(int argc __attribute__((unused)),
+ 		"       show scope queue      - Display per-queue statistics\n"
+ 		"       show group-by device  - Display device-aggregated statistics (default)\n"
+ 		"       show group-by queue   - Display per-queue statistics\n"
+-		"       balance               - Analyze traffic distribution balance.\n"
++		"\n"
++		"  Analysis:\n"
++		"       balance               - Traffic distribution between queues.\n"
++		"       hw-gro                - HW GRO effectiveness analysis\n"
++		"                               - savings - delta between packets received\n"
++		"                                 on the wire and packets seen by the kernel.\n"
+ 		"",
+-		bin_name, bin_name, bin_name);
++		bin_name);
+ 
+ 	return 0;
+ }
+@@ -598,6 +663,7 @@ static int do_help(int argc __attribute__((unused)),
+ static const struct cmd qstats_cmds[] = {
+ 	{ "show",	do_show },
+ 	{ "balance",	do_balance },
++	{ "hw-gro",	do_hw_gro },
+ 	{ "help",	do_help },
+ 	{ 0 }
+ };
 -- 
 2.53.0
 
