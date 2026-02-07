@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-257693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PErHOaihmkPPgQAu9opvQ
-	(envelope-from <netdev+bounces-257693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:26:46 +0100
+	id QBCwLBCjhmkPPgQAu9opvQ
+	(envelope-from <netdev+bounces-257694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:27:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A37104A26
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:26:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CBB104A36
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E91C330715CE
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 02:24:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A003C3082659
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 02:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D1B33122F;
-	Sat,  7 Feb 2026 02:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0D6331A6F;
+	Sat,  7 Feb 2026 02:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1xQ4pFI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCz6CKCU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DEF30DD2A;
-	Sat,  7 Feb 2026 02:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325E93314DF;
+	Sat,  7 Feb 2026 02:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770431095; cv=none; b=ncRuR2E/RyXhKdit1Ra+CgQ2Wl/IIsr/5QfWkgMkDox1+ntxGFEZySZTqgulz+GL7QlVj4rFUkTlRaqvS/QiUH5FB6P91dIN1L0iHGiVGRMBT0xIERvQSKgpr+Xd+b6o7kbpdaE+9nhfhU2Rv4gFuu8xWG134C8qxwbCZ9stzBE=
+	t=1770431097; cv=none; b=cUDtSWH3z0r8GWeJn9ZJ/L9pcXUfCTUK5g2GLxSpdPgzAFkgxB9FzVBaMCDSbK0RQG9q5m+QsHQzNDu4W/O9Kz/IFO/rtNXgmYJepDRCGe9bWVVGSM59htvNHjcfevvKMpna2M83yAGS+CVAqon3SsrawcM+N9acUAvUo4BtG6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770431095; c=relaxed/simple;
-	bh=IK1W2W3NT83LjBDjfeXp/DldGqNJvONFIqb7hoWKyWs=;
+	s=arc-20240116; t=1770431097; c=relaxed/simple;
+	bh=gR3zIaXjR3aBLX0hhwuBF993RceLsaFGYPgieGadOnw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VQwKSzv5FUv1Mi6ZOrJCR00hfjim/2ZkZ1f5hlH/M4TIFRh/zQ/YH838toW/Eth5nc6QEwSPOzNoqFKG/HhjH7Ht6ijLHAOVFNgufD9upUGTicueHDoyA9dB8cxr4mLteSUtomgk9KN9iIhsR8eR1G+6aox0kh/o1K5X70fZ0pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1xQ4pFI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C07C19423;
-	Sat,  7 Feb 2026 02:24:54 +0000 (UTC)
+	 MIME-Version; b=Jv0qcJPhSz5b8jFxepxT3BPxfoVjJBudiwUHHKpOJ7151zBXIvoSR08GlF8/8m1+Kif7nSs/t9Fqz8rJ+oHmeu3ZpOaOsWjDtr1JGVu1NGzFG7T3QCC1qv/s3Y3EJosXQGM/fg/fu1mR32XOAtq8wxa3U0IvpNaFizT6YKRDZkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCz6CKCU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 641A0C16AAE;
+	Sat,  7 Feb 2026 02:24:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770431095;
-	bh=IK1W2W3NT83LjBDjfeXp/DldGqNJvONFIqb7hoWKyWs=;
+	s=k20201202; t=1770431097;
+	bh=gR3zIaXjR3aBLX0hhwuBF993RceLsaFGYPgieGadOnw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P1xQ4pFIZdqmfJasp+848pgoIqV7m+jlMvHEnrjE8yNxJC1wDuXJ2d88y6HibOnXu
-	 6WrFXsY+FlhAGnw+Pcz9eh6008yHgkthfnphMGv200M/CrA8br0f1qOjIxrBBMZ/xZ
-	 Wqt/46XXjdKjTj7XiG8Qp8Ji1TQAFyaEIPpQhw7rMR6zhmhSn/w4iuHkkSAf/1yb0J
-	 HEv14E4jrW3Rb5gKvPAYQAxmCqtZB7KfGdHc4fKYhqQfx05HFh5yG9b3ItYLDVSgas
-	 hFkauZmM03zVNRq0JksfRJ92peSSh3GqajewVnYCXE+cXMybow/IO1ApPgu1ndkV1F
-	 hjbwObNZr/RAQ==
+	b=nCz6CKCUs4I4lyd7SrtegpAd3v+72fclOBxiqCEZgaj9bKrw5USPNcsKHnwDmvrYU
+	 C5J0RILuHM7BTtDFFZAjVOap21qU0sSs2ETbh+1dJVn9FsqjvPonuM7busEkGhvlKv
+	 plaX4AasPgUCoGS23ddJp9h2ZstxKpQQ0Deo00r0KxJDYmGJH48+iG4KGxj+3hFzZf
+	 xRdcwacYo/pMD2uCgDY3FXrzk2oKkWANcRZjOzmL9V+jsrGDcZyZVleh21ygxC1P1S
+	 ki5Y9zk0ZiETpXviiQXaK1q7ju2YuHe/UKlFxNkX0m66C0hipJnRb8Ou3SDbsS7q99
+	 oWs+SsmivLXAA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: illusion.wang@nebula-matrix.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -61,12 +61,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	horms@kernel.org
-Subject: Re: [v4,net-next,05/11] net/nebula-matrix: add channel layer
-Date: Fri,  6 Feb 2026 18:24:53 -0800
-Message-ID: <20260207022453.4017863-1-kuba@kernel.org>
+Subject: Re: [v4,net-next,06/11] net/nebula-matrix: add common resource implementation
+Date: Fri,  6 Feb 2026 18:24:55 -0800
+Message-ID: <20260207022455.4017894-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260206021608.85381-6-illusion.wang@nebula-matrix.com>
-References: <20260206021608.85381-6-illusion.wang@nebula-matrix.com>
+In-Reply-To: <20260206021608.85381-7-illusion.wang@nebula-matrix.com>
+References: <20260206021608.85381-7-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-257693-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257694-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -98,12 +98,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nebula-matrix.com:email,linux.dev:url,illusion.wang:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C2A37104A26
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 13CBB104A36
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -112,110 +112,103 @@ it says with a grain of salt."
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-Commit: cd2f89c6d9811cbe52e9e20513431e156bba29be
-Author: illusion.wang <illusion.wang@nebula-matrix.com>
-Subject: net/nebula-matrix: add channel layer
+net/nebula-matrix: add common resource implementation
 
-This commit adds a channel management layer for communication between PFs
-including message handling framework, queue management, and hardware
-abstraction.
+This patch adds the common resource layer for the nebula-matrix network
+driver, implementing conversion relationships among vsi_id, func_id,
+eth_id, and pf_id.
 
-================================================================================
-HIGH SEVERITY ISSUES
-================================================================================
+> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
+> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
+> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
 
-1. Buffer overflow risk in nbl_chan_recv_ack_msg
-   File: drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
-   Function: nbl_chan_recv_ack_msg
+[ ... ]
 
-   The ack_msgid.info.loc field is a 10-bit value with range 0-1023, but
-   it's used directly as an array index into wait[] which only has 256
-   entries (NBL_CHAN_QUEUE_LEN). Can you add bounds checking before using
-   this value as an array index?
+> +static void nbl_res_get_eth_id(struct nbl_resource_mgt *res_mgt, u16 vsi_id,
+> +			       u8 *eth_mode, u8 *eth_id, u8 *logic_eth_id)
+> +{
+> +	struct nbl_eth_info *eth_info = NBL_RES_MGT_TO_ETH_INFO(res_mgt);
+> +	u16 pf_id = nbl_res_vsi_id_to_pf_id(res_mgt, vsi_id);
+> +
+> +	*eth_mode = eth_info->eth_num;
+> +	if (pf_id < eth_info->eth_num) {
+> +		*eth_id = eth_info->eth_id[pf_id];
+> +		*logic_eth_id = pf_id;
+> +		/* if pf_id > eth_num, use eth_id 0 */
+> +	} else {
 
->	wait_head = &chan_info->wait[ack_msgid.info.loc];
+This isn't a bug, but the comment appears to be misplaced. It describes
+what happens in the else branch but is located inside the if branch. Should
+it be moved above the else?
 
-   Consider adding:
-   if (ack_msgid.info.loc >= NBL_CHAN_QUEUE_LEN) {
-       /* handle error */
-       return;
-   }
+[ ... ]
 
+> +static int nbl_res_ctrl_dev_setup_eth_info(struct nbl_resource_mgt *res_mgt)
+> +{
 
-2. Use-after-free in nbl_chan_delete_msg_handler
-   File: drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
-   Function: nbl_chan_delete_msg_handler
+[ ... ]
 
-   The hash node is freed before calling flush_work(), but the work
-   function (chan_info->clean_task) may still be accessing this memory.
-   Should the flush_work() call be moved before freeing the hash node?
+> +	for (i = 0; i < NBL_RES_MGT_TO_PF_NUM(res_mgt); i++) {
+> +		/* if pf_id <= eth_num, the pf relate corresponding eth_id*/
+> +		if (i < eth_num) {
 
->	nbl_common_free_hash_node(chan_mgt->handle_hash_tbl, &msg_type);
->	[ ... ]
->	flush_work(chan_info->clean_task);
+This isn't a bug, but the comment says "pf_id <= eth_num" while the code
+checks "i < eth_num". Should the comment say "<" instead of "<="?
 
-   The work function could be reading from the freed hash node, causing
-   a use-after-free condition.
+> +			eth_id = eth_info->eth_id[i];
+> +			eth_info->pf_bitmap[eth_id] |= BIT(i);
+> +		}
+> +		/* if pf_id > eth_num, the pf relate eth 0*/
+> +		else
 
+Similarly, the comment says "pf_id > eth_num" but the else handles the case
+where "i >= eth_num". Should the comment say ">=" instead of ">"?
 
-================================================================================
-MEDIUM SEVERITY ISSUES
-================================================================================
+> +			eth_info->pf_bitmap[0] |= BIT(i);
+> +	}
 
-3. Inconsistent error handling in nbl_chan_send_msg
-   File: drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
-   Function: nbl_chan_send_msg
+[ ... ]
 
-   In polling mode, when a timeout occurs, the function sets the status
-   to NBL_MBX_STATUS_TIMEOUT, logs an error, but returns 0 (success).
-   This is inconsistent with interrupt mode which returns -EFAULT on
-   timeout. Should polling mode also return an error code?
+> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
+> --- /dev/null
+> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
 
->	wait_head->status = NBL_MBX_STATUS_TIMEOUT;
->	dev_err(dev, "Channel polling ack failed...");
->	return 0;
+[ ... ]
 
-   Consider returning -ETIMEDOUT or -EFAULT instead of 0.
+> +static int vsi_id_to_pf_id(struct nbl_resource_mgt *res_mgt, u16 vsi_id)
+> +{
+> +	struct nbl_vsi_info *vsi_info = NBL_RES_MGT_TO_VSI_INFO(res_mgt);
+> +	struct nbl_common_info *common = res_mgt->common;
+> +	bool vsi_find = false;
+> +	u32 pf_id = U32_MAX;
+> +	int i, j;
+> +
+> +	for (i = 0; i < vsi_info->num; i++) {
+> +		for (j = 0; j < NBL_VSI_SERV_MAX_TYPE; j++)
+> +			if (vsi_id >= vsi_info->serv_info[i][j].base_id &&
+> +			    (vsi_id < vsi_info->serv_info[i][j].base_id +
+> +					      vsi_info->serv_info[i][j].num)) {
+> +				vsi_find = true;
+> +				break;
+> +			}
+> +
+> +		if (vsi_find)
+> +			break;
+> +	}
+> +
+> +	if (vsi_find) {
+> +		/* if pf_id < eth_num */
+> +		if (j >= NBL_VSI_SERV_PF_DATA_TYPE &&
+> +		    j <= NBL_VSI_SERV_PF_DATA_TYPE)
 
+This isn't a bug, but the comment says "if pf_id < eth_num" while the code
+checks if j equals NBL_VSI_SERV_PF_DATA_TYPE (which is 0). The comment does
+not seem to describe the actual condition being tested. Could it be updated
+to reflect what the code is checking?
 
-4. Resource leak in nbl_common_alloc_hash_node
-   File: drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
-   Function: nbl_common_alloc_hash_node
-
-   On error paths, the function uses devm_kzalloc but doesn't free the
-   allocated memory before returning. While devm_kzalloc memory is freed
-   on device removal, this can cause memory to accumulate if this function
-   fails repeatedly. Should the error paths explicitly free the allocated
-   memory?
-
->alloc_data_failed:
->alloc_key_failed:
->	return -1;
-
-   Consider using devm_kfree() or switching to regular kzalloc/kfree if
-   early cleanup is needed.
-
-
-================================================================================
-LOW SEVERITY ISSUES
-================================================================================
-
-5. Comment inaccuracy in nbl_common_calc_hash_key
-   File: drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
-   Function: nbl_common_calc_hash_key
-
-   The comment states "if bucket size little than 1" but the code checks
-   for equality to 1, not less than 1. Should the comment be updated to
-   match the actual check?
-
->	/* if bucket size little than 1, the hash value always 0 */
->	if (bucket_size == NBL_HASH_TBL_LIST_BUCKET_SIZE)
-
-   Perhaps the comment should read "if bucket size equals 1" or the check
-   should be "bucket_size < 1" if that was the intent?
-
-
-================================================================================
-END OF REVIEW
-================================================================================
+> +			pf_id = i + common->mgt_pf;
+> +	}
+> +
+> +	return pf_id;
+> +}
 
