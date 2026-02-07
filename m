@@ -1,129 +1,170 @@
-Return-Path: <netdev+bounces-257725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFddCOm/hmlUQgQAu9opvQ
-	(envelope-from <netdev+bounces-257725-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:30:33 +0100
+	id GGpdJVDAhmlUQgQAu9opvQ
+	(envelope-from <netdev+bounces-257726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:32:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66C2104E85
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:30:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3243E104E91
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 05:32:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 86B6D30162B0
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 04:30:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 340613006818
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 04:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE8D248886;
-	Sat,  7 Feb 2026 04:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851A52D0602;
+	Sat,  7 Feb 2026 04:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dyydyThB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1qmUMAM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC5817C77;
-	Sat,  7 Feb 2026 04:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F2E1D9346;
+	Sat,  7 Feb 2026 04:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770438628; cv=none; b=pddrQ/aa5faWYFrw09R2+96Ys+9swPquMSxormtl2qi5m8COg3dra323CICHcnILPnH5VD30aecWnPij/pgpPXkZfQqLHBMp5dSPJK/1gwOCKqyZGcTFf+9tdupnwZkOAC7WVvYLt/iDrvfbdUJ/S5b3sVnx101lwsITkFfSazA=
+	t=1770438732; cv=none; b=dBvxWUUFhy3ISkpp9fLIT5QXIcLf3zSlJYi30EQuxdb5q/Od9TXSIaHGWKWgFd21IYPzAglhIp2JmnZbYQJlnmiB1BzyUMMhX9eSwSICYXiN9gJ9kVrZ7/jeIgBcwm0t78+ySd4U01KADBo0C08scFftxqKqAANjfixPDY2uDgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770438628; c=relaxed/simple;
-	bh=yc1QvtSmrzihVgBJi8fSvWwj0z6hSGeFt2ybPbzQi2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RQKpRsDYXf/HdqYEtK70kReKq2672qIdy/uLCK6W9oqm3x0w5MoluU3N4N+RwYyJffKOffj4Hn1pQYlZuvhwqBarPpGuh1IqbDFk9dzJRIL6BGbvAZxjSzJwMdiQW0LEkEU0I9lw9JL4+paK0ZUcFixHkj3RoDdYqfsYjw2cXGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dyydyThB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C3B9C116D0;
-	Sat,  7 Feb 2026 04:30:26 +0000 (UTC)
+	s=arc-20240116; t=1770438732; c=relaxed/simple;
+	bh=qGVCSV2IfW5Vg2/Uq3T47VtFpJpS3z9wY7+EumtLnWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mFso9lvR38VcRTra5QpGelmyHPci9XfbVno09wPE/Ak4LDqNGMSQ23wULK7Ztmnyqiivu/5+otlCFPFb2eGbvjvGUNafoJ2ZFsRftX7yjO3qcPQvrNWv6VohozLXy0tGZ1URDiqQM4qYoQE3S/fjTNxtFNxGbTo5PSCdN/l2qJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1qmUMAM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD02C116D0;
+	Sat,  7 Feb 2026 04:32:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770438627;
-	bh=yc1QvtSmrzihVgBJi8fSvWwj0z6hSGeFt2ybPbzQi2o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dyydyThBsi/9eUcex1HssHeDJUdjJEQW4yYhLUZGT6yUk3BOt1/8TEzuLecKzQN4Z
-	 ha22SSBRERfiSGe7WI5rWpLyx5ey5Yk2ESWjDVFl+Yt8xWOd+nYIEficD9zZcnPT5O
-	 zM8wlwWK/KOaxDiIoVXtaqNulNiiKEJ2l8vos+jhkXIiPCVwuAsXBlOQKwgRwndMro
-	 FRB259JjcKw78+uPDhi70QglLi0rG64UT18JFDAwWywS040j+AIEgn4FpomZtDw3oZ
-	 /9qD6oYEk+lZoBvHMO3Hj4+jyixo3MqAjEZ8C33UtaaSFxC3MPZD/W3GyQQ8HbHKF2
-	 bVxf1Ia0BCGIA==
-Date: Fri, 6 Feb 2026 20:30:26 -0800
+	s=k20201202; t=1770438731;
+	bh=qGVCSV2IfW5Vg2/Uq3T47VtFpJpS3z9wY7+EumtLnWk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=L1qmUMAM2b1uanE6MHbCFZ4tqKXIrmcRMYPfjxk6k7C8fM5JhlnwRAQl6Bsj3o2vg
+	 2XkwJg49l4ftg5LJ6q/lxRdXoFvvKtzSzP/PPgs8bF0TbVD1EY32iy8Qi2ibQa9O1s
+	 3ktsA2SECpor74v4qESTUK4CuS0BeN+OApUgTanh0ar1Xvb34cJTnEYZx2od8+OOBH
+	 j9m8moA8JcsefyU9I+ZTxX07dPDBHF2o36JRUGp8PBlen04nz2df15593+x3FL+R4O
+	 +7cGEnf+OFc/k7TCGZ8I3hCIIhGMzDSLKyZNj5D+W7F4/mhA8gjMu+89buO52XxIKR
+	 S579wMcz1oQsw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Boris Pismenny
- <borisp@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
- <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan
- <shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 7/9] mlx5: psp: implement deferred tx key
- deletion
-Message-ID: <20260206203026.2bb64661@kernel.org>
-In-Reply-To: <20260204-psp-v1-7-5f034e2dfa36@gmail.com>
-References: <20260204-psp-v1-0-5f034e2dfa36@gmail.com>
-	<20260204-psp-v1-7-5f034e2dfa36@gmail.com>
+To: daniel.zahka@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	tariqt@nvidia.com,
+	shuah@kernel.org,
+	borisp@nvidia.com,
+	leon@kernel.org,
+	davem@davemloft.net,
+	horms@kernel.org,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org,
+	saeedm@nvidia.com,
+	edumazet@google.com,
+	willemdebruijn.kernel@gmail.com,
+	donald.hunter@gmail.com,
+	pabeni@redhat.com,
+	mbloch@nvidia.com
+Subject: Re: [net-next,1/9] psp: support rx rekey operation
+Date: Fri,  6 Feb 2026 20:32:09 -0800
+Message-ID: <20260207043209.4129667-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260204-psp-v1-1-5f034e2dfa36@gmail.com>
+References: <20260204-psp-v1-1-5f034e2dfa36@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-257726-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257725-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,gmail.com,nvidia.com,lunn.ch,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,nvidia.com,davemloft.net,lunn.ch,google.com,gmail.com,redhat.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D66C2104E85
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 3243E104E91
 X-Rspamd-Action: no action
 
-On Wed, 04 Feb 2026 07:20:11 -0800 Daniel Zahka wrote:
-> Implement the deferred tx key deletion api. In the case of mlx5,
-> mlx5e_psp_tx_grace_begin() records the number of wqes retired on each
-> tx queue, and then mlx5e_psp_tx_grace_end() returns 0 only if
-> all tx queues have advanced a full ring cycle past the point where
-> they were snapshotted.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Either Friday night enlightenment or I'm very tired -- but I wonder if
-we can do with BQL, without touching the driver at all?
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+psp: support rx rekey operation
 
-struct dql {
-	/* Fields accessed in enqueue path (dql_queued) */
-	unsigned int	num_queued;		/* Total ever queued */
+This patch adds support for rx-assoc netlink operation on an already keyed
+socket, enabling rx rekey by splicing a new psp_assoc object with newly
+generated rx state and reused tx state.
 
-...
+> diff --git a/net/psp/psp_sock.c b/net/psp/psp_sock.c
+> index f785672b7df6..3a8abd023f99 100644
+> --- a/net/psp/psp_sock.c
+> +++ b/net/psp/psp_sock.c
 
-	/* Fields accessed only by completion path (dql_completed) */
-	unsigned int	num_completed;		/* Total ever completed */
-...
-};
+[ ... ]
 
-These are free running counters of how many bytes were queued to 
-the driver and how many driver finished xmit'ing.
+> @@ -129,30 +130,42 @@ void psp_sk_assoc_free(struct sock *sk)
+>  	psp_assoc_put(pas);
+>  }
+>
+> -int psp_sock_assoc_set_rx(struct sock *sk, struct psp_assoc *pas,
+> -			  struct psp_key_parsed *key,
+> -			  struct netlink_ext_ack *extack)
+> +static void psp_sock_rx_rekey(struct psp_assoc *pas, struct psp_assoc *prev)
+>  {
+> -	int err;
+> +	lockdep_assert_held(&pas->psd->lock);
+> +
+> +	pas->peer_tx = prev->peer_tx;
+> +	pas->upgrade_seq = prev->upgrade_seq;
+> +
+> +	/* steal refcount from sk->psp_assoc */
+> +	pas->prev = prev;
+> +
+> +	memcpy(&pas->tx, &prev->tx, sizeof(pas->tx));
+> +	memcpy(pas->drv_data, prev->drv_data, pas->psd->caps->assoc_drv_spc);
+
+Is there a check that prev->psd == pas->psd before this memcpy?
+
+The psp_assoc_device_get_locked() pre_doit handler obtains the PSP device from
+the socket's current destination route via psp_dev_get_for_sock(), but this
+may differ from the device used when the existing association (prev) was
+created if the route changed.
+
+The memcpy copies pas->psd->caps->assoc_drv_spc bytes from prev->drv_data, but
+if prev->psd has a smaller assoc_drv_spc, this could read beyond the bounds of
+prev->drv_data.
+
+For comparison, psp_sock_assoc_set_tx() has explicit device validation:
+
+    if (pas->psd != psd)
+        NL_SET_ERR_MSG(extack, "Rx key from different device");
+
+Should psp_sock_rx_rekey() have a similar check?
+
+> +	prev->tx_moved = true;
 
