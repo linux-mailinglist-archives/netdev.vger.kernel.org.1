@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-257665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMm1C9OIhmmOOgQAu9opvQ
-	(envelope-from <netdev+bounces-257665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:35:31 +0100
+	id iAQvA+OIhmmOOgQAu9opvQ
+	(envelope-from <netdev+bounces-257666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:35:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDDA61044EA
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:35:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ACCB104507
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 01:35:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C42CD30378AD
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 00:35:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AAB1302BE03
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 00:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848742153EA;
-	Sat,  7 Feb 2026 00:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7F221D5AF;
+	Sat,  7 Feb 2026 00:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJzjC+EI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MNFMxypA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6119C1FFC48;
-	Sat,  7 Feb 2026 00:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C0F21ABD7;
+	Sat,  7 Feb 2026 00:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770424516; cv=none; b=sk+cWWdS6ugDsMD8VBsIgHxSBxY0sGlNE3Bj+X23af9XhvOnr50Z3ACFccpwcRNnhMZJT8OYC0VSr78ab9BYPSWpQ6Petd07pd5sTv5GMgJEaZgdddWJUgj/NsysTS3OrbCzDIhsxyGPVGz3kI+ShV8k0TJCREa90fSNLdGmfio=
+	t=1770424517; cv=none; b=IcTZzEHgmbLbABvVLCjpbqGFXWU3Mon0T7dF/rw4o8jBuSw+ItulI6tJ0I0G+LtrpdMitpDLXImTHUE1HO9epTx9tZ2blLaxtGmE8tvyCk/Gk2R0bg19qrBYYzUSfkkFAlPGONi0rNALlvtJ/PKFpfCmfxy/+3HVY/cclUvdtA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770424516; c=relaxed/simple;
-	bh=vqjEwTJ0kd4Z8DCHsPVpUeFzqgsLQubEsf/Kidgojvc=;
+	s=arc-20240116; t=1770424517; c=relaxed/simple;
+	bh=bRY2BHHqZekiUXzi9An4H1EIwUlBR0yf3lMGwHx+Qas=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YoQ2weoYAxuOZNXMLUcTNUlrfkCVkuy4Yhxs/ZT8FDWBNzNCvJO2I3Zi2hMWjgZu58lEnwc2tBNkarrw37j+JU0GhhstJSZe83wIDVwnKM1bK7h7b2Y7qngpEYTGOryj7Ot5KUgi4GcBZ6kM10DAjv0N4Nfq1YuUhdIyiuYAFnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJzjC+EI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75C85C2BC86;
-	Sat,  7 Feb 2026 00:35:15 +0000 (UTC)
+	 MIME-Version; b=BlIR+DwCEap0XIU8h1+v1KWLXVWdAMZWU4g6s1RDfK8DTw8TC4B1MQvy0rW7/WkCZBdbXYwlV/roZxTlWQn3kRgQsMuTfsP0jBFtnw2RMWzKFcvYmUJCLxA1/FRP5+DhJafwaX0UOgwREzyMlYN/uwydRKU1Dgcntcx5NB4bbr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MNFMxypA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B18EC116C6;
+	Sat,  7 Feb 2026 00:35:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770424516;
-	bh=vqjEwTJ0kd4Z8DCHsPVpUeFzqgsLQubEsf/Kidgojvc=;
+	s=k20201202; t=1770424517;
+	bh=bRY2BHHqZekiUXzi9An4H1EIwUlBR0yf3lMGwHx+Qas=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HJzjC+EI3gcj/5Jsu9ZbT5+TVKxafifFhzqzrenEU/TW30jra+Ox/Id3qsIBHJdQQ
-	 6IPIW+uEZ9j3/OPBupN7sAoocxHs/I4fZp269sKYQfybpms8bRyHDK33yWxfcI6nTU
-	 iOejgymXkvqHHFujEQCgSOKTAYFpVKuVqgAzBAeXc8r9lS5QpJvqEqH2tLACP/SERB
-	 zUpEeYZEAOvV32mQdAG0v5ALL6BXoQhBfaKKCKhhVNOUNsoLt9JVUQVRj+P7p4c9Cr
-	 H2QzZNTdm9Q07QHoVv4QHuwKznio+hbyCaM34A3Yjq6lu8otWo6xUBfd2Ob8kGpUrW
-	 wAe2Nwuzx68PA==
+	b=MNFMxypAN2GaUHbqB7vQOTAdB0RbCa6PZbucwT7YGHP3NfFfHsnLeQrsnawyQY6Ut
+	 I+6v0bh/8WXl4nBBaNwJAj9h7BX2eB8/KXF2PdjLcxI6bbI18Xov5fOTh61StIsZHT
+	 yO7ci0spf/XS9M3198r4qOl1WfjwxnhDFRbgtP1Z+JDRJYSeOLt2si5Fg+FuntEEAj
+	 to/uJ9Dyq+2GM0etbtLljlZHlRZGN0KcVB4V+0thx8D9eBns6mKgoevhPYlXo5+1w2
+	 xD26cyZXkIH8G4f2otB/UJrHs6RPwXHiMg89sopFO/tk0Bx57oyW+g2pXj4apkQ4DL
+	 yYUrpNMvBLNsg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/9] eth: bnxt: gather and report HW-GRO stats
-Date: Fri,  6 Feb 2026 16:35:01 -0800
-Message-ID: <20260207003509.3927744-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/9] tools: ynltool: factor out qstat dumping
+Date: Fri,  6 Feb 2026 16:35:02 -0800
+Message-ID: <20260207003509.3927744-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260207003509.3927744-1-kuba@kernel.org>
 References: <20260207003509.3927744-1-kuba@kernel.org>
@@ -84,131 +84,187 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com,broadcom.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-257666-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257665-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com,broadcom.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: CDDA61044EA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7ACCB104507
 X-Rspamd-Action: no action
 
-Count and report HW-GRO stats as seen by the kernel.
-The device stats for GRO seem to not reflect the reality,
-perhaps they count sessions which did not actually result
-in any aggregation. Also they count wire packets, so we
-have to count super-frames, anyway.
+The logic to open a socket and dump the queues is the same
+across sub-commands. Factor it out, we'll need it again.
 
+No functional changes intended.
+
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - remove unnecessary condition for feature check (Michael)
- - move the stats to the end of array to avoid messing up
-   ethtool -S output (AI)
-v1: https://lore.kernel.org/20260205220541.2992807-2-kuba@kernel.org
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  6 ++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 15 +++++++++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ tools/net/ynl/ynltool/qstats.c | 95 +++++++++++++++-------------------
+ 1 file changed, 41 insertions(+), 54 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index f036ef60230b..9a41b9e0423c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1126,8 +1126,11 @@ struct bnxt_rx_sw_stats {
- 	u64			rx_l4_csum_errors;
- 	u64			rx_resets;
- 	u64			rx_buf_errors;
-+	/* end of ethtool -S stats */
- 	u64			rx_oom_discards;
- 	u64			rx_netpoll_discards;
-+	u64			rx_hw_gro_packets;
-+	u64			rx_hw_gro_wire_packets;
- };
+diff --git a/tools/net/ynl/ynltool/qstats.c b/tools/net/ynl/ynltool/qstats.c
+index 31fb45709ffa..d19acab0bf2a 100644
+--- a/tools/net/ynl/ynltool/qstats.c
++++ b/tools/net/ynl/ynltool/qstats.c
+@@ -237,13 +237,47 @@ static void print_plain_qstats(struct netdev_qstats_get_list *qstats)
+ 	}
+ }
  
- struct bnxt_tx_sw_stats {
-@@ -1154,6 +1157,9 @@ struct bnxt_total_ring_err_stats {
- 	u64			tx_total_resets;
- 	u64			tx_total_ring_discards;
- 	u64			total_missed_irqs;
-+	/* end of ethtool -S stats */
-+	u64			rx_total_hw_gro_packets;
-+	u64			rx_total_hw_gro_wire_packets;
- };
- 
- struct bnxt_stats_mem {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 466e0fc6141f..44c46bac92d9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -1804,7 +1804,8 @@ static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
- 					   struct bnxt_tpa_info *tpa_info,
- 					   struct rx_tpa_end_cmp *tpa_end,
- 					   struct rx_tpa_end_cmp_ext *tpa_end1,
--					   struct sk_buff *skb)
-+					   struct sk_buff *skb,
-+					   struct bnxt_rx_sw_stats *rx_stats)
+-static int do_show(int argc, char **argv)
++static struct netdev_qstats_get_list *
++qstats_dump(enum netdev_qstats_scope scope)
  {
- #ifdef CONFIG_INET
- 	int payload_off;
-@@ -1814,6 +1815,9 @@ static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
- 	if (segs == 1)
- 		return skb;
- 
-+	rx_stats->rx_hw_gro_packets++;
-+	rx_stats->rx_hw_gro_wire_packets += segs;
+ 	struct netdev_qstats_get_list *qstats;
+ 	struct netdev_qstats_get_req *req;
+ 	struct ynl_error yerr;
+ 	struct ynl_sock *ys;
+-	int ret = 0;
 +
- 	NAPI_GRO_CB(skb)->count = segs;
- 	skb_shinfo(skb)->gso_size =
- 		le32_to_cpu(tpa_end1->rx_tpa_end_cmp_seg_len);
-@@ -1987,7 +1991,8 @@ static inline struct sk_buff *bnxt_tpa_end(struct bnxt *bp,
++	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
++	if (!ys) {
++		p_err("YNL: %s", yerr.msg);
++		return NULL;
++	}
++
++	req = netdev_qstats_get_req_alloc();
++	if (!req) {
++		p_err("failed to allocate qstats request");
++		goto err_close;
++	}
++
++	if (scope)
++		netdev_qstats_get_req_set_scope(req, scope);
++
++	qstats = netdev_qstats_get_dump(ys, req);
++	netdev_qstats_get_req_free(req);
++	if (!qstats) {
++		p_err("failed to get queue stats: %s", ys->err.msg);
++		goto err_close;
++	}
++
++	ynl_sock_destroy(ys);
++	return qstats;
++
++err_close:
++	ynl_sock_destroy(ys);
++	return NULL;
++}
++
++static int do_show(int argc, char **argv)
++{
++	struct netdev_qstats_get_list *qstats;
+ 
+ 	/* Parse options */
+ 	while (argc > 0) {
+@@ -268,29 +302,9 @@ static int do_show(int argc, char **argv)
+ 		}
  	}
  
- 	if (gro)
--		skb = bnxt_gro_skb(bp, tpa_info, tpa_end, tpa_end1, skb);
-+		skb = bnxt_gro_skb(bp, tpa_info, tpa_end, tpa_end1, skb,
-+				   &cpr->sw_stats->rx);
+-	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
+-	if (!ys) {
+-		p_err("YNL: %s", yerr.msg);
++	qstats = qstats_dump(scope);
++	if (!qstats)
+ 		return -1;
+-	}
+-
+-	req = netdev_qstats_get_req_alloc();
+-	if (!req) {
+-		p_err("failed to allocate qstats request");
+-		ret = -1;
+-		goto exit_close;
+-	}
+-
+-	if (scope)
+-		netdev_qstats_get_req_set_scope(req, scope);
+-
+-	qstats = netdev_qstats_get_dump(ys, req);
+-	netdev_qstats_get_req_free(req);
+-	if (!qstats) {
+-		p_err("failed to get queue stats: %s", ys->err.msg);
+-		ret = -1;
+-		goto exit_close;
+-	}
  
- 	return skb;
+ 	/* Print the stats as returned by the kernel */
+ 	if (json_output)
+@@ -299,9 +313,7 @@ static int do_show(int argc, char **argv)
+ 		print_plain_qstats(qstats);
+ 
+ 	netdev_qstats_get_list_free(qstats);
+-exit_close:
+-	ynl_sock_destroy(ys);
+-	return ret;
++	return 0;
  }
-@@ -13492,6 +13497,8 @@ static void bnxt_get_one_ring_err_stats(struct bnxt *bp,
- 	stats->rx_total_netpoll_discards += sw_stats->rx.rx_netpoll_discards;
- 	stats->rx_total_ring_discards +=
- 		BNXT_GET_RING_STATS64(hw_stats, rx_discard_pkts);
-+	stats->rx_total_hw_gro_packets += sw_stats->rx.rx_hw_gro_packets;
-+	stats->rx_total_hw_gro_wire_packets += sw_stats->rx.rx_hw_gro_wire_packets;
- 	stats->tx_total_resets += sw_stats->tx.tx_resets;
- 	stats->tx_total_ring_discards +=
- 		BNXT_GET_RING_STATS64(hw_stats, tx_discard_pkts);
-@@ -15931,6 +15938,8 @@ static void bnxt_get_queue_stats_rx(struct net_device *dev, int i,
- 	stats->bytes += BNXT_GET_RING_STATS64(sw, rx_bcast_bytes);
  
- 	stats->alloc_fail = cpr->sw_stats->rx.rx_oom_discards;
-+	stats->hw_gro_packets = cpr->sw_stats->rx.rx_hw_gro_packets;
-+	stats->hw_gro_wire_packets = cpr->sw_stats->rx.rx_hw_gro_wire_packets;
+ static void compute_stats(__u64 *values, unsigned int count,
+@@ -406,10 +418,7 @@ static int cmp_ifindex_type(const void *a, const void *b)
+ static int do_balance(int argc, char **argv __attribute__((unused)))
+ {
+ 	struct netdev_qstats_get_list *qstats;
+-	struct netdev_qstats_get_req *req;
+ 	struct netdev_qstats_get_rsp **sorted;
+-	struct ynl_error yerr;
+-	struct ynl_sock *ys;
+ 	unsigned int count = 0;
+ 	unsigned int i, j;
+ 	int ret = 0;
+@@ -419,29 +428,9 @@ static int do_balance(int argc, char **argv __attribute__((unused)))
+ 		return -1;
+ 	}
+ 
+-	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
+-	if (!ys) {
+-		p_err("YNL: %s", yerr.msg);
++	qstats = qstats_dump(NETDEV_QSTATS_SCOPE_QUEUE);
++	if (!qstats)
+ 		return -1;
+-	}
+-
+-	req = netdev_qstats_get_req_alloc();
+-	if (!req) {
+-		p_err("failed to allocate qstats request");
+-		ret = -1;
+-		goto exit_close;
+-	}
+-
+-	/* Always use queue scope for balance analysis */
+-	netdev_qstats_get_req_set_scope(req, NETDEV_QSTATS_SCOPE_QUEUE);
+-
+-	qstats = netdev_qstats_get_dump(ys, req);
+-	netdev_qstats_get_req_free(req);
+-	if (!qstats) {
+-		p_err("failed to get queue stats: %s", ys->err.msg);
+-		ret = -1;
+-		goto exit_close;
+-	}
+ 
+ 	/* Count and sort queues */
+ 	ynl_dump_foreach(qstats, qs)
+@@ -576,8 +565,6 @@ static int do_balance(int argc, char **argv __attribute__((unused)))
+ 	free(sorted);
+ exit_free_qstats:
+ 	netdev_qstats_get_list_free(qstats);
+-exit_close:
+-	ynl_sock_destroy(ys);
+ 	return ret;
  }
  
- static void bnxt_get_queue_stats_tx(struct net_device *dev, int i,
-@@ -15966,6 +15975,8 @@ static void bnxt_get_base_stats(struct net_device *dev,
- 	rx->packets = bp->net_stats_prev.rx_packets;
- 	rx->bytes = bp->net_stats_prev.rx_bytes;
- 	rx->alloc_fail = bp->ring_err_stats_prev.rx_total_oom_discards;
-+	rx->hw_gro_packets = bp->ring_err_stats_prev.rx_total_hw_gro_packets;
-+	rx->hw_gro_wire_packets = bp->ring_err_stats_prev.rx_total_hw_gro_wire_packets;
- 
- 	tx->packets = bp->net_stats_prev.tx_packets;
- 	tx->bytes = bp->net_stats_prev.tx_bytes;
 -- 
 2.53.0
 
