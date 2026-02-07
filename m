@@ -1,142 +1,174 @@
-Return-Path: <netdev+bounces-257770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YE+dOhZ4h2nYYQQAu9opvQ
-	(envelope-from <netdev+bounces-257770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 18:36:22 +0100
+	id UJUTDAaIh2lEZQQAu9opvQ
+	(envelope-from <netdev+bounces-257771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 19:44:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E07106B9F
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 18:36:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC9EF106E63
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 19:44:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E11A43004F04
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 17:36:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B4353301CFED
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 18:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AEA33A9E5;
-	Sat,  7 Feb 2026 17:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1769F33B6E3;
+	Sat,  7 Feb 2026 18:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J8FxDoBL"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="NvTzWzAJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gJdGqezU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B472723EABC
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 17:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25EA5FDA7;
+	Sat,  7 Feb 2026 18:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770485779; cv=none; b=HmG2sCSp0OT6cY4mh1yGNxqILdo0mYePgJih66Fer0nVxUF7cDNzJr3jQqsr5EGDmlGH2EhDcl3xMMwwquc6nhMuk//5ZK80V5bPBYCXoS06+3wcBzWAX/uN9zLIgpYPuacnw2eU3a1P77jXy8JDuyV1ux8gdOFNiaw8XMmgpto=
+	t=1770489844; cv=none; b=t77XYw/LtCJ2ZhNcBILEw5A9e9CxqPQC/cDaktjkjw588k4SyyR1MFlhz9EFHLQqmxFqacV5IwL3mMYPggU6BdrNzo7hCzKDaM1n2PKfyp+PZE8Qz2zo0+5J/n0azai2dWUBjxHd95L9QDiAyKb8LxIztbf1A8gF5XM5htTwkVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770485779; c=relaxed/simple;
-	bh=2jVwicLOGfmENXm+CDhrMjWP+ogh/zuv8Upiygrf4RM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=MQ+6UzeutQ4PyJzzay02uD1+5ntfKdkcPWf4BwCOs32SkQKg8nAZ8WcBIflX1U4+lQhKkCIBWwxUhRsy1Iuhj+7WMo327OOKk0RLamZLcrYhkwi+w49FSoNH3PCqGvv0+Xy/OY/KcxczDcBFAJ9eERJyoxruaiFqWWekq303zBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J8FxDoBL; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Iy2b3cVVjU6U6f7MW7RiPPlWlY70Br9fWBbdYmSTN6w=; b=J8FxDoBL+rJk6dsmeQySgEYcUx
-	sYjl/b9OLVE2pe4yrVF+NMKOeEUrPf1t4dJmAVJ0flIn4ryYLOERodn85U5gZwGTBoc5tJGScMiED
-	9q0OXxsDkW7e0pOkL6rrKRE9s/7oCXC2Q7S2cGDRamazAmo/x+VtvHKY6vo1oJoyRMN+LU4jNvoX2
-	7nAsWlI//tCBgwY/IsSlufGvkOKBdoYL5kJTbyPSTADlRaSCQAm1s/E1QS/JdfzNoYlLt9pX/3+ls
-	b5L6CA1KLrdQs/r/6A1AaloRtnS8IVZ490rLoAwjbQJF3/v3iarvnUyRA9S61ZNcvwqo6kTuqS3FR
-	23XJervw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40810)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vomE4-000000000T7-4APF;
-	Sat, 07 Feb 2026 17:36:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vomE2-000000008TH-2hRJ;
-	Sat, 07 Feb 2026 17:36:06 +0000
-Date: Sat, 7 Feb 2026 17:36:06 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Thierry Reding <treding@nvidia.com>,
-	Paritosh Dixit <paritoshd@nvidia.com>
-Subject: RFC: stmmac RSS support
-Message-ID: <aYd4BkAeNW6d0iIC@shell.armlinux.org.uk>
+	s=arc-20240116; t=1770489844; c=relaxed/simple;
+	bh=WFvKf39DNga0t2yUxjABuGRvNafww1scxKilpXFCtgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oQULzV+qCJAEwlfy+Z8Gy8gDRho2R04XX2QWReySbqRw6uLTcS0KlEMz0ruVzhLO8X+dlTSrGMYvcTiWGPfVA8kFEeVNlprICumJJktLr2xEDoZCZpKMbJeTrkunFSmSYchWcXk9xniKBnJ2XA0RXUqGN4wVCYUJdHTUCQ4pBtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=NvTzWzAJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gJdGqezU; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 3A4CC1D000A7;
+	Sat,  7 Feb 2026 13:44:02 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Sat, 07 Feb 2026 13:44:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1770489842; x=1770576242; bh=6E
+	2PvIz6cEFL6euP0z+38KTbuOnimhD8xDjIx3rD+PU=; b=NvTzWzAJiNlOsJBvvZ
+	WlXuzdYKg3DkSSDNo+UFSHt/foai7gwts4xfjzSOcwQp92ujVBdaQA16ECRC3k58
+	KaSBzNqM9Otz36x87RbTnRB6vc2wxvULesumARRdJPKNcTcOoqfK4rHHqqo1fTGp
+	4biYi6i5cxuQdvHX/ocxeEF6H5GDTvlntH+IXUoPGvgCG5Na9jI8dzqf3Yi7ijN3
+	GGsyjqRmQ1uL00bKUgrk1HiYVZHzJ/Dd9feIpbPPjiXUyTGm3lXryVrjPA3pIoFF
+	uy2w5r4kxur+hSUUu6ZWuo10/rULpBf/B4QTiVF4joR+sEsC32Gmhn5mzXm2msnj
+	8RdQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1770489842; x=1770576242; bh=6E2PvIz6cEFL6euP0z+38KTbuOni
+	mhD8xDjIx3rD+PU=; b=gJdGqezUcz8N2dWRNGIROxT/Qq5flsQmRH4jT4avkkoH
+	uvn202WAqysU+vgJK3Gy7EvSolFFXwJYi92K8ypENVSTHTqyFoK014OMYRJbZ9Jg
+	Cg/xFE8ehypkU9g/3jC8KRqyUmXJNxVayvDJPP0Br+9JYaqTqGXq5+u4w2GUObvZ
+	hH4b6lQXm9w6fF6Lw9Ir6P/o676483vbp+5DOcJwb1XWfTkKwA1Fyq1gUThiK8TH
+	uDP1/ulGO8Dv5S5joP2r5EEwvfISVgE2OxxtLBIvqoEg8Ri7T+K61z4OPWq+V27m
+	dhTnQAp4tG7vjQdHfl9RgGaYc8B1gIYV7sf3arovWw==
+X-ME-Sender: <xms:8IeHaYYOPXW0x38RIbQ1BBxah8ZGqyrgd6e4Nd601tAYx4C4rttoKA>
+    <xme:8IeHaWeUCI59JUFoX8m0BO2PFOxtgUZUThbELLQHZcBnzYi_7YQonquYkqF2WvpI-
+    WaBAv9xRz5g_fZLg8DZUHHk7QCkNznMj6PZyrdzdc3XId884DoOwVEv>
+X-ME-Received: <xmr:8IeHadmRDazrOW-ElaoL6LACy2JMbT5Hb3hZRcXhEr3UZT7nvQbu36LYyeoDjInUMHy1oWnqsh7W0HL-1VSNEDtn>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduledukedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgrshcu
+    ufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrsh
+    esrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeehudelteetkefgffef
+    udefuedvjeeivdekhfevieefgeffheeltddvvefhfeetgeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhluhhn
+    ugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmh
+    htphhouhhtpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehr
+    vghnvghsrghsrdgtohhmpdhrtghpthhtohepphgruhhlsehpsggrrhhkvghrrdguvghvpd
+    hrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthho
+    pegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivg
+    htsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvg
+    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhr
+    vghnvghsrghsqdhsohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:8IeHae2G3u0JglXjexgP593bpCJKNgSCyTOLmu0DHzZKWm0sGmC1Xw>
+    <xmx:8YeHaefJNLHMXD9RumCzfbskBo8d_TJ8BWQ9T_2w8BoeFA4fJM231g>
+    <xmx:8YeHaQaSRRYQkaU2si5igjwWQfpJ9KJ5acGsTZLTsJ4fDG1ED9zPlQ>
+    <xmx:8YeHabFS01c58FVn6WLPKvCwz_2M5A3qcevyYwlaRgXH10f_ay00Ng>
+    <xmx:8oeHabofWSNTdmguUyw9B87hJpGqFp_y_xvyTDqigoBBrhIBUj_WO_Jy>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 7 Feb 2026 13:44:00 -0500 (EST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Paul Barker <paul@pbarker.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next] net: ethernet: ravb: Disable interrupts when closing device
+Date: Sat,  7 Feb 2026 19:43:28 +0100
+Message-ID: <20260207184328.2427679-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm2,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257770-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.993];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257771-lists,netdev=lfdr.de,renesas];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 70E07106B9F
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.982];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ragnatech.se:email,ragnatech.se:dkim,ragnatech.se:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim,renesas.com:email]
+X-Rspamd-Queue-Id: AC9EF106E63
 X-Rspamd-Action: no action
 
-Hi,
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
-While looking at the possibilities of minimising the memory that
-struct plat_stmmacenet_data consumes (880 bytes presently on
-aarch64), I came across the RSS feature in stmmac.
+Disable interrupts when closing the device.
 
-In commit 76067459c686 ("net: stmmac: Implement RSS and enable it in
-XGMAC core"), support was added for RSS to the core stmmac driver for
-the dwxgmac2 core. I can only find socfpga and tegra as the two
-platform glues that use the dwxgmac2 core.
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+[Niklas: Rebase from BSP and reword commit message]
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-RSS support is only enabled when both the core supports it, and the
-platform glue sets priv->plat->rss_en.
-
-However, the stmmac-related results of grepping for this member do not
-show any platform glues which set this flag:
-
-$ git grep '\<rss_en\>'
-Documentation/networking/device_drivers/ethernet/stmicro/stmmac.rst:        int rss_en;
-drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:      if (!priv->dma_cap.rssen || !priv->plat->rss_en) {
-drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:      if (priv->dma_cap.rssen && priv->plat->rss_en)
-
-So, as no one has decided to enable this feature during the intervening
-six years, is there any benefit to having this code in the mainline
-kernel, or should this feature be dropped?
-
-If a user appears, the code will remain in git history and could be
-restored.
-
-Thoughts?
-
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 57b0db314fb5..d56b71003585 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -2368,6 +2368,7 @@ static int ravb_close(struct net_device *ndev)
+ 	ravb_write(ndev, 0, RIC0);
+ 	ravb_write(ndev, 0, RIC2);
+ 	ravb_write(ndev, 0, TIC);
++	ravb_write(ndev, 0, ECSIPR);
+ 
+ 	/* PHY disconnect */
+ 	if (ndev->phydev) {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.52.0
+
 
