@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-257679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGaFLCeQhmlwOwQAu9opvQ
-	(envelope-from <netdev+bounces-257679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 02:06:47 +0100
+	id gGyHBDeQhmlwOwQAu9opvQ
+	(envelope-from <netdev+bounces-257680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 02:07:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB84610468C
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 02:06:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1BB10469A
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 02:07:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4175D305EC2D
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 01:05:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9CD8304E0E1
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 01:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2009B23E358;
-	Sat,  7 Feb 2026 01:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F07D23EAB3;
+	Sat,  7 Feb 2026 01:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtDr9vkH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hl5WQ7Mq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68BD23C8A0
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 01:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBAB23B62B
+	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 01:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770426349; cv=none; b=KVlf2iSC3tRW4j7rWwCaOtszhhNEW5sEEd6JR6KWZOAYbyXR2dZ738fvqn4A59Dpd4AywEs8CSTSKHr0+OdCY2yFWoufXboI9s49IgpB43xvK60C8XBT26nKtHYdQ6F2bj8q5AR3d6Phk8K7/B3LAaLZ02GqRxVZVWU1DMfb6fw=
+	t=1770426351; cv=none; b=TwwYOQ45vDk7LbcSCE2gcNMUO7yPkPm6kKuooXdLeP05ZwuGs3aixbfuJb1Ue2dUCSdln0oO0VnS+PBEi+w/Ww51eTTCp4VWhUAYFCtasZPZ6CBb2B7+6CVeepAtAagRL5ZfvoPlmI6rx2xfvD9O9VXJNq1afYBgG2NaWcdD5oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770426349; c=relaxed/simple;
-	bh=bcCx6HvBn0+chH2BkVmgtrY08qINfxUdLSUwj8yhhhQ=;
+	s=arc-20240116; t=1770426351; c=relaxed/simple;
+	bh=S4lPJ+iQ6cr7r0HHk+6ImMlHSzuyYglfEyCilMTXMl8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f2YW9hS8aEFs6jfVx/jBQvxd2Dxdw3o2tc4O1QgrNpVlGGhAriAKSZnibKozBKmLkPa01lOkTMEuGcbpY/pXwUgixkk18aCiB1cewbMWQWqpE6iScNsZTCwSib3UmghPoefLU48CsaI8C2ltIMxIkE9pPDK6ncsGNvABGjC1J1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtDr9vkH; arc=none smtp.client-ip=209.85.221.47
+	 MIME-Version; b=lecprdd02uvR+ZIRj9W/rzWU6OXya4GvrfglY69LWaWGkot0nRGRgvElriWGLWMMO4hVDQz3ngOO7FDwFvxHcdJHaIVQ0VXduqllSqSUaU77qKkoAYTeZGCRss33tHir/d16U3gA0NQ5WRD6QJSZJJqjniPJLKQapL1tH/GXuhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hl5WQ7Mq; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43624d7256bso1621213f8f.1
-        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 17:05:48 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47f5c2283b6so24478155e9.1
+        for <netdev@vger.kernel.org>; Fri, 06 Feb 2026 17:05:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770426346; x=1771031146; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770426349; x=1771031149; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A6SIRr3fzUj0Hk1tRyParUBPPpIXg889DTrd52bS/88=;
-        b=RtDr9vkHduqjyu2vfUGnB92UTSgwg9hbx6gTrU7te0cxbuFnkzFRTAFrntzP4OCKlz
-         GacROgmu5unFIwYq+NVNxUhp59pxAnkI8tr4T/gnslBjqX/FGAhrHiPqRnFRW22aiRDB
-         PQi6FuvLMIk52P5b+6tbmEVzYscBJlCFK6Wb8a3u9TtWosEnfOmfx8VI+vgEhTJsicxN
-         lqnGj2UaF5fXIz14GD8H7wNFNKnmApZZwzgv0e8gFSkFtmmbupM1cSrxMucq5WmRWLht
-         3CgdvDuVlYhr0H38E2ViO7ehvktanMUi/eHH3pc91pAvfkzzKoCT5EYmcCiJKn8tasVF
-         1ATA==
+        bh=6WAb0jC5Pe9hgQVEU9ZMU3ZkVCoRfT6/PkrPXHX5Zeg=;
+        b=hl5WQ7Mq5MDrXSz+/SPPMxikUJCCyaG1H6VYyH5tmbQ3xqdHXXL7+S49IDZxL1qfGA
+         MtX2qZsht9EErFL9qilIwxnDI6cKe5yPwxECm0KrBQB/068M/AhP66rZUm/G+1dggfll
+         RCAW0ptsMe5kU34Et7GDdT/C3mRue+mQBP7NZZQB8Ln+Qg5LBrEghG5sxmAKFEufrzvR
+         zf/8HksQeslqaef+tw1jMUTQsjW+epSd1h7warqaqSuV+XPuRwkuh1L8ZrN0aER1B6GG
+         oe0qgkc0x8SYdKvNqSqJrBGi9lc38HWUkOa7m1B5KQFmKkc7cX8cmhXjR6dCrFVibDuK
+         RBOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770426346; x=1771031146;
+        d=1e100.net; s=20230601; t=1770426349; x=1771031149;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=A6SIRr3fzUj0Hk1tRyParUBPPpIXg889DTrd52bS/88=;
-        b=vQ3WwBrSI5n29lN6N6MLx3yDP27daaV15uGt9qI1ifo9Bi4Kj6qsbHBOQ6inWk35oq
-         sWovYjFg4Ugd5ywRdWzQM3E8Y7Yaed5aZYxkWg1PDn7qrJ8xn8WI6lv/8GekpA1WGeqy
-         SRfxblzaC35+y2q4MdLwureHpbNqMwWlMALY+dqIJx9bTq4g+Z7eceSZDOBqJorruAXW
-         285UabL0o2jlDph96jjdXIcqGG48XGe3V2jb6VhzQ2Og9edU4T49eNNX26rw1RlMqyuK
-         6u6Rf7ZhhiuKAqz9da4uQXCO/z/OhWdUgZN5LHY3+waFEko2oFDiDxbYJpswdmu2Qmdc
-         XAQQ==
-X-Gm-Message-State: AOJu0YxVybLCEApjJMtZ9rM09p5+ogkA0wBsSSPfOeqtxsr2Mio+H9eO
-	P13WQvWaw2jMCr9uy3RQABO+BSVVjyN41+wB6HSQ/UoTWLX03UqkGd0MZpsS61cb
-X-Gm-Gg: AZuq6aJidFzMx6VAfyqf1kmMunnZNyJ+i3swormM8kOzi9nhcXVjj443/x7B8Qmfwbe
-	kQRnXeP2ghbeHkW9YJCYxfYznWXMAt+jIEC2+dyvzH8D445MS8BsvP1Y2iV8Abwss6ICOJ2LTkL
-	5SpW9EtQiY3Vgf+ILpDaZlxGKXtVVbV3SNyszvM4HGhr+tbn3nRtK3+THfWJlxgtS08YMrSKOHL
-	Vi+wYngJrcE1xzA/IKOelr6MSIxHaA/O9rtjBNmXXD8VYOJ6j3T92EBknACd/yi8LpMkW99P8lR
-	CzM/nRm3JDPXM28AyksGii/e2Yf0g4YcyLYks//OPQgCC+kUnHe4yWEcMo3EobKo9ijRwkpFdiV
-	+xYT+c6w/Ten6+AJFx1qaEPgXg9LtxKiZQiXzAzIX1SYKWr1zQ19KrYb0FFBYH6eiwK6jg2UvWg
-	7dODBhwFVi
-X-Received: by 2002:a05:6000:2411:b0:436:1946:c186 with SMTP id ffacd0b85a97d-4362933cb20mr6948634f8f.10.1770426346312;
-        Fri, 06 Feb 2026 17:05:46 -0800 (PST)
+        bh=6WAb0jC5Pe9hgQVEU9ZMU3ZkVCoRfT6/PkrPXHX5Zeg=;
+        b=p/J741i5dLU+8VdIDy0i/gzYAWUT3E5rLynPHfZX2BX1fERF5D6/vwVO7ZYFZ5o05V
+         /nj1ilzdlzoRQE5DFW5JTy6gVvGIB7p5OuLS0D2YOEBAAOCzFQE+tuR3Q1Uhx1OIoEuo
+         7+1noudZ5q7MzDdSKFOYopXz7B1RiJ4qbc58Zb2bXWaV6YoJqkq+BkpoDnGbz1ms3wG2
+         Z0+12ESwjx+vK4lzdKbRWP6LA7bm/ViOtN4IOZX5K6MfS/KuWUsUQio6n9l0YNck+KNc
+         RZs/9mhdx5zdBEkdQp2kIvEsikHytKfffZJawCn6qsbQhFQftV+GGq1r3Lvs0FTUezHR
+         E45w==
+X-Gm-Message-State: AOJu0Ywf7DoCiicR7rBn+P8+Ao7MaSlNh90ACMmxmCdtEsRVZfmlcYLl
+	KR6cwq44dj838CDuflaC8FqPug0eG3iOzzB596J0f7TQmMbKFqR7EoNy68q0bW9d
+X-Gm-Gg: AZuq6aIzvx75IcuquC4fdCxfXaFQtZ7utOuTCWWNcRn6gcHcAmcGYZ6Gy2kFbIUeiCZ
+	KSU+J6JJ9yflTjJtRlDfmV3Bt3QVdrnVCI2kp5Xd6fbM5/73eqmuAn5LdU4qo15pxoVSXyP/dtu
+	3cfQEsMcfHfn1zoZ12pCR1nlGxOuHPOzhg1Zuou98iNfAtQ9g8i/NIRgQeDoTNpnAdPKy9I1EcV
+	c5MSgbxzWb8YikOTrOG1JgrJSyO909F3pGkXk4Vs2OkYrcDE/LSLrNdBun6OUp4vMzACufToA9W
+	ViFnJTZOP9ZFSQDzUAcF+GqtGuCUltM60rl0bh3BmgHN5mny2eaiHwh4GSZvQ5IjugSx5Cq9SBi
+	+4wK2gTMW1wKJg+vS+82u2AYFBJpncJVxn6aJlvkEkQfBMLRvWz7BTgoJYIY42GdpWi5oATL3aZ
+	h28XCIYyin
+X-Received: by 2002:a05:600c:c4a7:b0:47f:b737:5ce0 with SMTP id 5b1f17b1804b1-48320231161mr57802305e9.23.1770426348870;
+        Fri, 06 Feb 2026 17:05:48 -0800 (PST)
 Received: from localhost ([2a03:2880:31ff:5f::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436297450b4sm9990741f8f.34.2026.02.06.17.05.45
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48320961505sm58442315e9.4.2026.02.06.17.05.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 17:05:45 -0800 (PST)
+        Fri, 06 Feb 2026 17:05:48 -0800 (PST)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: alexanderduyck@fb.com,
@@ -101,9 +101,9 @@ Cc: alexanderduyck@fb.com,
 	saeedm@nvidia.com,
 	tariqt@nvidia.com,
 	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next V2 4/5] eth: fbnic: Fetch TX pause storm stats
-Date: Fri,  6 Feb 2026 17:05:24 -0800
-Message-ID: <20260207010525.3808842-5-mohsin.bashr@gmail.com>
+Subject: [PATCH net-next V2 5/5] eth: mlx5: Move pause storm errors to pause stats
+Date: Fri,  6 Feb 2026 17:05:25 -0800
+Message-ID: <20260207010525.3808842-6-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260207010525.3808842-1-mohsin.bashr@gmail.com>
 References: <20260207010525.3808842-1-mohsin.bashr@gmail.com>
@@ -126,7 +126,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257679-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257680-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -146,110 +146,63 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CB84610468C
+X-Rspamd-Queue-Id: 9A1BB10469A
 X-Rspamd-Action: no action
 
-With pause storm protection in place, track the occurrence of pause
-storm events. Since there is a one-to-one mapping between pause storm
-interrupts and events, use the interrupt count to track this metric.
-
-./ethtool -I -a eth0
-Pause parameters for eth0:
-Autonegotiate:	off
-RX:		off
-TX:		on
-Statistics:
-  tx_pause_frames: 759657
-  rx_pause_frames: 0
-  tx_pause_storm_events: 219
+Report device_stall_critical_watermark_cnt as tx_pause_storm_events in
+the ethtool_pause_stats struct. This counter tracks pause storm error
+events which indicate the NIC has been sending pause frames for an
+extended period due to a stall.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h      |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c  |  3 +++
- drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c      | 15 +++++++++++++++
- 4 files changed, 20 insertions(+)
+ .../ethernet/mellanox/mlx5/core/en_stats.c    | 25 +++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index e68c56237b61..72eb22a52572 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -627,6 +627,7 @@ enum {
- 	FBNIC_RXB_ENQUEUE_INDICES	= 4
- };
- 
-+#define FBNIC_RXB_INTR_PS_COUNT(n)	(0x080e9 + (n))	/* 0x203a4 + 4*n */
- #define FBNIC_RXB_DRBO_FRM_CNT_SRC(n)	(0x080f9 + (n))	/* 0x203e4 + 4*n */
- #define FBNIC_RXB_DRBO_BYTE_CNT_SRC_L(n) \
- 					(0x080fd + (n))	/* 0x203f4 + 4*n */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index dc57519ebbe5..15d3162ab186 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -1751,6 +1751,7 @@ fbnic_get_pause_stats(struct net_device *netdev,
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_mac_stats *mac_stats;
- 	struct fbnic_dev *fbd = fbn->fbd;
-+	u64 tx_ps_events;
- 
- 	mac_stats = &fbd->hw_stats.mac;
- 
-@@ -1758,6 +1759,8 @@ fbnic_get_pause_stats(struct net_device *netdev,
- 
- 	pause_stats->tx_pause_frames = mac_stats->pause.tx_pause_frames.value;
- 	pause_stats->rx_pause_frames = mac_stats->pause.rx_pause_frames.value;
-+	tx_ps_events = mac_stats->pause.tx_pause_storm_events.value;
-+	pause_stats->tx_pause_storm_events = tx_ps_events;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+index a8af84fc9763..2fe779c164e4 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+@@ -916,6 +916,23 @@ static int mlx5e_stats_get_ieee(struct mlx5_core_dev *mdev,
+ 				    sz, MLX5_REG_PPCNT, 0, 0);
  }
  
- static void
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-index aa3f429a9aed..caea4be46762 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-@@ -54,6 +54,7 @@ struct fbnic_rmon_stats {
- struct fbnic_pause_stats {
- 	struct fbnic_stat_counter tx_pause_frames;
- 	struct fbnic_stat_counter rx_pause_frames;
-+	struct fbnic_stat_counter tx_pause_storm_events;
- };
- 
- struct fbnic_eth_mac_stats {
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index be834983e981..8e6b589c25b8 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -418,6 +418,18 @@ static void __fbnic_mac_stat_rd64(struct fbnic_dev *fbd, bool reset, u32 reg,
- 	stat->reported = true;
- }
- 
-+static void fbnic_mac_stat_rd32(struct fbnic_dev *fbd, bool reset, u32 reg,
-+				struct fbnic_stat_counter *stat)
++static int mlx5e_stats_get_per_prio(struct mlx5_core_dev *mdev,
++				    u32 *ppcnt_per_prio)
 +{
-+	u32 new_reg_value;
++	u32 in[MLX5_ST_SZ_DW(ppcnt_reg)] = {};
++	int sz = MLX5_ST_SZ_BYTES(ppcnt_reg);
 +
-+	new_reg_value = rd32(fbd, reg);
-+	if (!reset)
-+		stat->value += new_reg_value - stat->u.old_reg_value_32;
-+	stat->u.old_reg_value_32 = new_reg_value;
-+	stat->reported = true;
++	if (!(MLX5_CAP_PCAM_FEATURE(mdev, pfcc_mask) &&
++	      MLX5_CAP_DEBUG(mdev, stall_detect)))
++		return -EOPNOTSUPP;
++
++	MLX5_SET(ppcnt_reg, in, local_port, 1);
++	MLX5_SET(ppcnt_reg, in, grp, MLX5_PER_PRIORITY_COUNTERS_GROUP);
++	MLX5_SET(ppcnt_reg, in, prio_tc, 0);
++	return mlx5_core_access_reg(mdev, in, sz, ppcnt_per_prio, sz,
++				    MLX5_REG_PPCNT, 0, 0);
 +}
 +
- #define fbnic_mac_stat_rd64(fbd, reset, __stat, __CSR) \
- 	__fbnic_mac_stat_rd64(fbd, reset, FBNIC_##__CSR##_L, &(__stat))
- 
-@@ -812,6 +824,9 @@ fbnic_mac_get_pause_stats(struct fbnic_dev *fbd, bool reset,
- 			    MAC_STAT_TX_XOFF_STB);
- 	fbnic_mac_stat_rd64(fbd, reset, pause_stats->rx_pause_frames,
- 			    MAC_STAT_RX_XOFF_STB);
-+	fbnic_mac_stat_rd32(fbd, reset,
-+			    FBNIC_RXB_INTR_PS_COUNT(FBNIC_RXB_INTF_NET),
-+			    &pause_stats->tx_pause_storm_events);
+ void mlx5e_stats_pause_get(struct mlx5e_priv *priv,
+ 			   struct ethtool_pause_stats *pause_stats)
+ {
+@@ -933,6 +950,14 @@ void mlx5e_stats_pause_get(struct mlx5e_priv *priv,
+ 		MLX5E_READ_CTR64_BE_F(ppcnt_ieee_802_3,
+ 				      eth_802_3_cntrs_grp_data_layout,
+ 				      a_pause_mac_ctrl_frames_received);
++
++	if (mlx5e_stats_get_per_prio(mdev, ppcnt_ieee_802_3))
++		return;
++
++	pause_stats->tx_pause_storm_events =
++		MLX5E_READ_CTR64_BE_F(ppcnt_ieee_802_3,
++				      eth_per_prio_grp_data_layout,
++				      device_stall_critical_watermark_cnt);
  }
  
- static void
+ void mlx5e_stats_eth_phy_get(struct mlx5e_priv *priv,
 -- 
 2.47.3
 
