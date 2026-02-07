@@ -1,122 +1,137 @@
-Return-Path: <netdev+bounces-257756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257757-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PqEDvgYh2nBTQQAu9opvQ
-	(envelope-from <netdev+bounces-257756-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 11:50:32 +0100
+	id +JVyLIIth2kyUwQAu9opvQ
+	(envelope-from <netdev+bounces-257757-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 13:18:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0AC105A47
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 11:50:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B20105D79
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 13:18:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D98CD3014C49
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 10:50:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BA9263004D36
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 12:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673CE2DE701;
-	Sat,  7 Feb 2026 10:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D7521773D;
+	Sat,  7 Feb 2026 12:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3KOAyK3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UdW5glPZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447F51F4181
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 10:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B020E3033F5;
+	Sat,  7 Feb 2026 12:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770461427; cv=none; b=Pcq7oq29kzGcLAha5e7PIDkxJZV9s9Yy/sFhFqV9Q2KJ0Dmoll28FjQdll+6jz5ORrKaqlgMx0NYcWHB00JHDYf3wC+77pi7gFYypLyUpsji/MfALyKn1KVaE4PxzNFkopasQVPXRyZkr0v1EukYIdrryaCbJWZwZNEg0+BR1mU=
+	t=1770466679; cv=none; b=tMsYw/MVChlZvXPzggPXlDYRRNSCydR8MNQBqs6c7ECG1ePGGLexEG/Gx70SZv/sSju8D1b3rS9iixuS1DFkH1CzvF79CoNjYQcUlHlqkMJZgRd+jcVP4Vb4ToI12vWUtRDw9mKjTRUC6KqeQEcm6z9ZPlaU06mLzXwTW84r4Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770461427; c=relaxed/simple;
-	bh=6OZX7EKogGNAZsj0RNloLVy4u0hDyHPuVJ6PiQoyoFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LkN1MkB8iWExUul2dIRRyCXGiU8b6ZeXkpFidhVEjScGg1IWhldZhuhrYjuorN/NvYW74Uuul4KLNI5Y2Kjr5hyaj7sMpV5RO6vVFhp2itLFupP88ROBE+ZkvZjGM06QtuSVxH6QHuGOcdEUpLOWewIqX5lSogkFW3Fvy5DRBjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T3KOAyK3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88BF4C116D0;
-	Sat,  7 Feb 2026 10:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770461427;
-	bh=6OZX7EKogGNAZsj0RNloLVy4u0hDyHPuVJ6PiQoyoFM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=T3KOAyK3mZst5PAQO0GLwVxw2hHoLOlvJTwpPyVaPh9LEafu24czTJMdXYWSlRtC9
-	 xJkbuO0/CEn3F9R4zrAT+LUh4Ma+OZ+FFd/FtKcXscXoLP+iWkmKuwT7hsV5AzdIbA
-	 nYvJV5dirxKCQ5ORQC+F9tL8x5GD6M6ug9yl69R2b8/+uK3owKXmI3uBvxN6wGXx5C
-	 bqijkUOk1JlwNZW0Z0odJ/1q7iUeApUJ94vFsyb+Xv9Q9AnAUOfPoYzW39aZ+dSjz7
-	 v54TaNYEamaaqZepoTFJmIer+SpmFSiggncj6NPbhKWq83eg4EvcFzMsbrDVxkxvTS
-	 Ac0ZlSFjFy9KA==
-From: Thomas Gleixner <tglx@kernel.org>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
-Subject: i40e: Fix preempt count leak in napi poll tracepoint
-Date: Sat, 07 Feb 2026 11:50:23 +0100
-Message-ID: <87v7g8zv2o.ffs@tglx>
+	s=arc-20240116; t=1770466679; c=relaxed/simple;
+	bh=6RTlPCjN3ZYJVpREsa2236B4aKYYqjHN+TyJxs3yUIs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KD6k63NZA7AEPfEHgGV92Ks6P9M69hsBv6bFC99q3FlX7YsTgurOntkHtHw0ygD0iDy1I6I28NjvZ/9O1dlLiz0Q3yEWHJxRgfbTftx+NENly93GmDrOWgjU32WYpLY8WcG2beN+xa6wt5VMvYCoRcnNO3GeV1oaSoTXIwniwxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UdW5glPZ; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <34f1cf21-fe1c-444e-a773-c6e639f0c618@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770466666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+cKtIWuSfWUtLorzNWZSkOBuigYD76NOh/+Tg/mc3cE=;
+	b=UdW5glPZnjsaFwyuJhaIyYN15pybiPkJR+BhHKsNG8Iv2Ei33PtqshGQUNqJl3vX5Hpgol
+	mdCF8zy3iyyUxt+XiUwlggW96WN8zYpzBwga8QUhuJV7BG03THKtuten/TSg3y2KvhuWzs
+	H9dcSpTbXNmuNk15gXnoyVvTrabYC14=
+Date: Sat, 7 Feb 2026 12:17:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH net v2 1/2] octeontx2-af: CGX: fix bitmap leaks
+To: Bo Sun <bo@mboxify.com>, kuba@kernel.org, pabeni@redhat.com
+Cc: gakula@marvell.com, sgoutham@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, horms@kernel.org, bbhushan2@marvell.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ sumang@marvell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20260206130925.1087588-1-bo@mboxify.com>
+ <20260206130925.1087588-2-bo@mboxify.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260206130925.1087588-2-bo@mboxify.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257756-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257757-lists,netdev=lfdr.de];
+	URIBL_MULTI_FAIL(0.00)[mboxify.com:query timed out];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 9E0AC105A47
+	NEURAL_HAM(-0.00)[-0.972];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mboxify.com:email,linux.dev:email,linux.dev:dkim,linux.dev:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F3B20105D79
 X-Rspamd-Action: no action
 
-Using get_cpu() in the tracepoint assignment causes an obvious preempt
-count leak because nothing invokes put_cpu() to undo it:
+On 06/02/2026 13:09, Bo Sun wrote:
+> The RX/TX flow-control bitmaps (rx_fc_pfvf_bmap and tx_fc_pfvf_bmap)
+> are allocated by cgx_lmac_init() but never freed in cgx_lmac_exit().
+> Unbinding and rebinding the driver therefore triggers kmemleak:
+> 
+>      unreferenced object (size 16):
+>          backtrace:
+>            rvu_alloc_bitmap
+>            cgx_probe
+> 
+> Free both bitmaps during teardown.
+> 
+> Fixes: e740003874ed ("octeontx2-af: Flow control resource management")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Bo Sun <bo@mboxify.com>
+> ---
+>   drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> index 42044cd810b1..fd4792e432bf 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> @@ -1823,6 +1823,8 @@ static int cgx_lmac_exit(struct cgx *cgx)
+>   		cgx->mac_ops->mac_pause_frm_config(cgx, lmac->lmac_id, false);
+>   		cgx_configure_interrupt(cgx, lmac, lmac->lmac_id, true);
+>   		kfree(lmac->mac_to_index_bmap.bmap);
+> +		rvu_free_bitmap(&lmac->rx_fc_pfvf_bmap);
+> +		rvu_free_bitmap(&lmac->tx_fc_pfvf_bmap);
+>   		kfree(lmac->name);
+>   		kfree(lmac);
+>   	}
 
-  softirq: huh, entered softirq 3 NET_RX with preempt_count 00000100, exited with 00000101?
-
-This clearly has seen a lot of testing in the last 3+ years...
-
-Use smp_processor_id() instead.
-
-Fixes: 6d4d584a7ea8 ("i40e: Add i40e_napi_poll tracepoint")
-Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org
----
- drivers/net/ethernet/intel/i40e/i40e_trace.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/drivers/net/ethernet/intel/i40e/i40e_trace.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_trace.h
-@@ -88,7 +88,7 @@ TRACE_EVENT(i40e_napi_poll,
- 		__entry->rx_clean_complete = rx_clean_complete;
- 		__entry->tx_clean_complete = tx_clean_complete;
- 		__entry->irq_num = q->irq_num;
--		__entry->curr_cpu = get_cpu();
-+		__entry->curr_cpu = smp_processor_id();
- 		__assign_str(qname);
- 		__assign_str(dev_name);
- 		__assign_bitmask(irq_affinity, cpumask_bits(&q->affinity_mask),
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
