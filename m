@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-257694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBCwLBCjhmkPPgQAu9opvQ
-	(envelope-from <netdev+bounces-257694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:27:28 +0100
+	id QGEwCzejhmkPPgQAu9opvQ
+	(envelope-from <netdev+bounces-257695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:28:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13CBB104A36
-	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:27:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC40104A4C
+	for <lists+netdev@lfdr.de>; Sat, 07 Feb 2026 03:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A003C3082659
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 02:24:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21D29308D6F9
+	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 02:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0D6331A6F;
-	Sat,  7 Feb 2026 02:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E82533123C;
+	Sat,  7 Feb 2026 02:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCz6CKCU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nuja61Yp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325E93314DF;
-	Sat,  7 Feb 2026 02:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE6533031B;
+	Sat,  7 Feb 2026 02:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770431097; cv=none; b=cUDtSWH3z0r8GWeJn9ZJ/L9pcXUfCTUK5g2GLxSpdPgzAFkgxB9FzVBaMCDSbK0RQG9q5m+QsHQzNDu4W/O9Kz/IFO/rtNXgmYJepDRCGe9bWVVGSM59htvNHjcfevvKMpna2M83yAGS+CVAqon3SsrawcM+N9acUAvUo4BtG6c=
+	t=1770431100; cv=none; b=TEYghbLQAIaYke2pNgeNwhsDJQI5sCya+fgVswXK77WOdLii/JWQSZbYvvCYxfSdy02tSM6I6GXOEORh2Hbc60roij9ZLOb0sl6/sZQQAqy2fKZ6QQ9DEYcSCJosRCMcO6/cQvrAe1by2EvmRLKsvR1wNSbRbJSIg8qoBVtS1UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770431097; c=relaxed/simple;
-	bh=gR3zIaXjR3aBLX0hhwuBF993RceLsaFGYPgieGadOnw=;
+	s=arc-20240116; t=1770431100; c=relaxed/simple;
+	bh=UWyz92SM9j8GKc8i9gyancApaVWtLnLFmPnadTcYtL4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Jv0qcJPhSz5b8jFxepxT3BPxfoVjJBudiwUHHKpOJ7151zBXIvoSR08GlF8/8m1+Kif7nSs/t9Fqz8rJ+oHmeu3ZpOaOsWjDtr1JGVu1NGzFG7T3QCC1qv/s3Y3EJosXQGM/fg/fu1mR32XOAtq8wxa3U0IvpNaFizT6YKRDZkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCz6CKCU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 641A0C16AAE;
-	Sat,  7 Feb 2026 02:24:56 +0000 (UTC)
+	 MIME-Version; b=gHGuIouZGD6/P7VfWf9kUE6Ktnhj6FAlKgcvKVJ6BLfqmtmxHsTekg7Z+1gVDbPsWlagyB/P+bJelNVlD13iMGzTiFBcqTTFllRTZcnFwqw1O29Lc2LK39bh4CbhSyuTuRiBwrvVSwLPW2Fh91D2P+Rihfj+blYqH/YM1HYIPY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nuja61Yp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E07DBC116C6;
+	Sat,  7 Feb 2026 02:24:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770431097;
-	bh=gR3zIaXjR3aBLX0hhwuBF993RceLsaFGYPgieGadOnw=;
+	s=k20201202; t=1770431099;
+	bh=UWyz92SM9j8GKc8i9gyancApaVWtLnLFmPnadTcYtL4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nCz6CKCUs4I4lyd7SrtegpAd3v+72fclOBxiqCEZgaj9bKrw5USPNcsKHnwDmvrYU
-	 C5J0RILuHM7BTtDFFZAjVOap21qU0sSs2ETbh+1dJVn9FsqjvPonuM7busEkGhvlKv
-	 plaX4AasPgUCoGS23ddJp9h2ZstxKpQQ0Deo00r0KxJDYmGJH48+iG4KGxj+3hFzZf
-	 xRdcwacYo/pMD2uCgDY3FXrzk2oKkWANcRZjOzmL9V+jsrGDcZyZVleh21ygxC1P1S
-	 ki5Y9zk0ZiETpXviiQXaK1q7ju2YuHe/UKlFxNkX0m66C0hipJnRb8Ou3SDbsS7q99
-	 oWs+SsmivLXAA==
+	b=nuja61YpActlL7SYOeuN4bRX06K/wprRCPDNSitcuvhFi6EEanxTcuXihjT3VaKPE
+	 k2ul1quwphaQYud6k8ncZm4gQ0mr+zsg5izH9EhhL0vqaWbbR31Q+/PwLjKlnULT/7
+	 WSiPFvffSwv6RTbW3gllHo45K53g3LyZiHXTsHxdB+4dmrpLh+QbcE7GneXXcwStvV
+	 v+UJkM/9jZ5FirbsOJF2ay5OOAU0gA1uRolp/BIE0lbwrYbVrmo2UI40hhTarV7Int
+	 fjA92Da5lTN+ns1Q3GYVhsKXgkR6trGuoHPPyb8QLFAIh6wQDedjoC/JDeJWdpB0nQ
+	 t99Isd+a1pDNg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: illusion.wang@nebula-matrix.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -61,12 +61,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	horms@kernel.org
-Subject: Re: [v4,net-next,06/11] net/nebula-matrix: add common resource implementation
-Date: Fri,  6 Feb 2026 18:24:55 -0800
-Message-ID: <20260207022455.4017894-1-kuba@kernel.org>
+Subject: Re: [v4,net-next,07/11] net/nebula-matrix: add intr resource implementation
+Date: Fri,  6 Feb 2026 18:24:57 -0800
+Message-ID: <20260207022457.4017922-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260206021608.85381-7-illusion.wang@nebula-matrix.com>
-References: <20260206021608.85381-7-illusion.wang@nebula-matrix.com>
+In-Reply-To: <20260206021608.85381-8-illusion.wang@nebula-matrix.com>
+References: <20260206021608.85381-8-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-257694-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257695-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 13CBB104A36
+X-Rspamd-Queue-Id: CAC40104A4C
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -112,103 +112,54 @@ it says with a grain of salt."
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net/nebula-matrix: add common resource implementation
+net/nebula-matrix: add intr resource implementation
 
-This patch adds the common resource layer for the nebula-matrix network
-driver, implementing conversion relationships among vsi_id, func_id,
-eth_id, and pf_id.
+This commit adds MSI-X interrupt resource management for the Nebula Matrix
+network driver, including interrupt vector allocation, mapping table
+maintenance, and hardware interrupt enable/disable operations.
 
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
-> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
-
-[ ... ]
-
-> +static void nbl_res_get_eth_id(struct nbl_resource_mgt *res_mgt, u16 vsi_id,
-> +			       u8 *eth_mode, u8 *eth_id, u8 *logic_eth_id)
-> +{
-> +	struct nbl_eth_info *eth_info = NBL_RES_MGT_TO_ETH_INFO(res_mgt);
-> +	u16 pf_id = nbl_res_vsi_id_to_pf_id(res_mgt, vsi_id);
-> +
-> +	*eth_mode = eth_info->eth_num;
-> +	if (pf_id < eth_info->eth_num) {
-> +		*eth_id = eth_info->eth_id[pf_id];
-> +		*logic_eth_id = pf_id;
-> +		/* if pf_id > eth_num, use eth_id 0 */
-> +	} else {
-
-This isn't a bug, but the comment appears to be misplaced. It describes
-what happens in the else branch but is located inside the if branch. Should
-it be moved above the else?
-
-[ ... ]
-
-> +static int nbl_res_ctrl_dev_setup_eth_info(struct nbl_resource_mgt *res_mgt)
-> +{
-
-[ ... ]
-
-> +	for (i = 0; i < NBL_RES_MGT_TO_PF_NUM(res_mgt); i++) {
-> +		/* if pf_id <= eth_num, the pf relate corresponding eth_id*/
-> +		if (i < eth_num) {
-
-This isn't a bug, but the comment says "pf_id <= eth_num" while the code
-checks "i < eth_num". Should the comment say "<" instead of "<="?
-
-> +			eth_id = eth_info->eth_id[i];
-> +			eth_info->pf_bitmap[eth_id] |= BIT(i);
-> +		}
-> +		/* if pf_id > eth_num, the pf relate eth 0*/
-> +		else
-
-Similarly, the comment says "pf_id > eth_num" but the else handles the case
-where "i >= eth_num". Should the comment say ">=" instead of ">"?
-
-> +			eth_info->pf_bitmap[0] |= BIT(i);
-> +	}
-
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
+> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c
 > --- /dev/null
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
+> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c
 
 [ ... ]
 
-> +static int vsi_id_to_pf_id(struct nbl_resource_mgt *res_mgt, u16 vsi_id)
+> +static int nbl_res_intr_configure_msix_map(struct nbl_resource_mgt *res_mgt,
+> +					   u16 func_id, u16 num_net_msix,
+> +					   u16 num_others_msix,
+> +					   bool net_msix_mask_en)
 > +{
-> +	struct nbl_vsi_info *vsi_info = NBL_RES_MGT_TO_VSI_INFO(res_mgt);
+> +	struct nbl_interrupt_mgt *intr_mgt = res_mgt->intr_mgt;
+> +	struct nbl_hw_ops *hw_ops = res_mgt->hw_ops_tbl->ops;
 > +	struct nbl_common_info *common = res_mgt->common;
-> +	bool vsi_find = false;
-> +	u32 pf_id = U32_MAX;
-> +	int i, j;
+> +	struct nbl_msix_map_table *msix_map_table;
+> +	struct nbl_msix_map *msix_map_entries;
+> +	struct device *dev = common->dev;
+> +	u16 requested, intr_index;
+> +	u8 bus, devid, function;
+> +	bool msix_mask_en;
+> +	u16 *interrupts;
+> +	int ret = 0;
+> +	u16 i;
 > +
-> +	for (i = 0; i < vsi_info->num; i++) {
-> +		for (j = 0; j < NBL_VSI_SERV_MAX_TYPE; j++)
-> +			if (vsi_id >= vsi_info->serv_info[i][j].base_id &&
-> +			    (vsi_id < vsi_info->serv_info[i][j].base_id +
-> +					      vsi_info->serv_info[i][j].num)) {
-> +				vsi_find = true;
-> +				break;
-> +			}
+> +	if (intr_mgt->func_intr_res[func_id].interrupts)
+> +		nbl_res_intr_destroy_msix_map(res_mgt, func_id);
 > +
-> +		if (vsi_find)
-> +			break;
-> +	}
-> +
-> +	if (vsi_find) {
-> +		/* if pf_id < eth_num */
-> +		if (j >= NBL_VSI_SERV_PF_DATA_TYPE &&
-> +		    j <= NBL_VSI_SERV_PF_DATA_TYPE)
+> +	nbl_res_func_id_to_bdf(res_mgt, func_id, &bus, &devid, &function);
 
-This isn't a bug, but the comment says "if pf_id < eth_num" while the code
-checks if j equals NBL_VSI_SERV_PF_DATA_TYPE (which is 0). The comment does
-not seem to describe the actual condition being tested. Could it be updated
-to reflect what the code is checking?
+Should the return value of nbl_res_func_id_to_bdf() be checked here?
 
-> +			pf_id = i + common->mgt_pf;
-> +	}
+Looking at nbl_res_func_id_to_bdf(), it returns U32_MAX when func_id is invalid:
+
+    if (func_id >= NBL_RES_MGT_TO_PF_NUM(res_mgt) + ...)
+        return U32_MAX;
+
+When that happens, the output parameters bus, devid, and function are not
+written, leaving them uninitialized. These values are then passed to
+hw_ops->configure_msix_info() further down in the function.
+
 > +
-> +	return pf_id;
-> +}
+> +	msix_map_table = &intr_mgt->func_intr_res[func_id].msix_map_table;
+
+[ ... ]
 
