@@ -1,184 +1,199 @@
-Return-Path: <netdev+bounces-257797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257798-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iF9KNzzQh2mSdQQAu9opvQ
-	(envelope-from <netdev+bounces-257797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 00:52:28 +0100
+	id sBnRGajTh2mTdgQAu9opvQ
+	(envelope-from <netdev+bounces-257798-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 01:07:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468461076D8
-	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 00:52:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7F91076FF
+	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 01:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B5AAD302A2D6
-	for <lists+netdev@lfdr.de>; Sat,  7 Feb 2026 23:51:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B65D30160E1
+	for <lists+netdev@lfdr.de>; Sun,  8 Feb 2026 00:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCDA2EA473;
-	Sat,  7 Feb 2026 23:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YoWUmwZ9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D4A4C9D;
+	Sun,  8 Feb 2026 00:06:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8A522301
-	for <netdev@vger.kernel.org>; Sat,  7 Feb 2026 23:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689471FD4;
+	Sun,  8 Feb 2026 00:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770508311; cv=none; b=e01jf4rbq7sbbuzguaCcE6BZpkWEsQ8oXz0cbNzbSnoNlVAeV7/oGZnOCYYzuzZpMrB/7AJtBSV9FGAp/rrMLrAsB6BygdZGYSVUgkFUqcZ6DSNrQDLZ4wfajKPsuiJw+fLxlXd9v7zIz+Mp999nmj26PexWpjMtw7kXQyvPwCw=
+	t=1770509218; cv=none; b=Nek9jznZ4TqlBjVVNedrfLDQ1ycr6o2J6KzGNPZscvwkwUFYtMcIY6uhnbFIo9jgH4jWmNccR0E6UwIn9kRCi5x+soWOGn9btsrWXGmvkOdX4MoRLa/2B44CI6WqDIU23iZrZTqRuNK4/6ajhkX5glaVv56zcG2pgEz21tpbtww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770508311; c=relaxed/simple;
-	bh=H3E9stVAr6v88+2z0wBe+59xKlqqjfdH10QTWIEXe5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nEne2i+xyxZIqwhWTysWHPjbhve64wbkbLCpgAO/I/l4lG5fYWbssOLu1/lElgdln1dTComaTJv+g/d4atmf3zGmd859zeVvRtdZKNzEuWKDZuXRFmR9TZtxNGGl9TI9OXAJb1bau2pvDLyF6GHyFdlql4YSPgvObRKtUJWchOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YoWUmwZ9; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2a963f49234so2818395ad.1
-        for <netdev@vger.kernel.org>; Sat, 07 Feb 2026 15:51:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770508310; x=1771113110;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMvFH+mJJ218Bjsbu54P7EMJQvPsv6VQirp/RETQzR4=;
-        b=MHBAoTHqjl7NZ5kfCFZGleLSsGiiD27LYd3hIPWVPM1X8Jt668TGyjo8zuSsmYZbfH
-         cQgRpePZV5MSaLa5WnDUlA7GWoumCUPjfkFj55Q0nNB7vqDk5aPi75X/4htmkScTPUYS
-         YfeSco4cPsT2g45nmfNFAPHf2lhmgy9Gfrbw192LFwZrF9Jnqv5F2onoAURPe6zaiD7W
-         tBhNMaDSQDrnshHLTNsBPhBmg9mPzBTrFhcHRFzyOE/G+oAUCDvFdvu1RaOUXlP9+riu
-         mhgPqH+AK9X8TgRbpBo39T8/HLMePziXFuRG17h3IwtgSyXfwcogE2XPv2RSI3Jac7tq
-         qplg==
-X-Gm-Message-State: AOJu0Yy0Kisn273sT2iyE5h9i8/m9bv6FBEo3r+YFrhcB8h1USkkBNjc
-	5w2HwB9nsxCdEFhD3HlIT1+tP75I8KHP1K/viQbBeVfEFszz0Bz2w8Ew4iKHYN+o0hYLFpvJn2r
-	dL6OE6RPNH1fmT69Bxu/d/qAzNdyTv5kdRQRTUNBKBkS0g2Ijf4M/M+VTE39Ct0JvAimFibnm8V
-	84i96PZ81216LzQri0vm+VIT2W6rVWXviC0WoFQgO5E/7AMKZe+cgxLJnhxnBgF8/tLD990HqtE
-	ozFqLdARyw=
-X-Gm-Gg: AZuq6aKxbaRKLfAJ2enyHx6Wx8lUJWnJa8EedQObtgx6iYYAbXiZaSIfBfVj7o7Ymik
-	Ok05/29gXqDDxglMkur3PKApV5uztCAtwjN9RqJFx8tDxKgtGm7a5s2K2Kdd4113kHc2OYeiHNk
-	uMihvjpQZsj5K3tQaJAQWaXiwU5uY5EEebskM/Co9i7fpPAK2UOEnk6AF4iF2gBSo9WjDoM7cRs
-	VfEr50j4k6L3QpGg6C5nBUh+m14WiJ7os2V2bE5xpaU8eaaHmFHTrK0su+4aHQxkdbrXRQ1U17W
-	Tk1jS51kbqpOZeF7AV8u3K9ZBzYgZaDhpsduDCkZ4kFrslS/2ZLuz1f3/SABnjjJXc3Y7y+yCI5
-	D4xQkc5IQMBCWQzqZ0gvg1a95gTWEZbN9kDKzhnEaGwTZy0i4MPNLQLXioTI/WI2oz3qmYU+td8
-	LIHO+2eSFlRb4EAo1EogoiV6JWeVuMrz6u6ucn5WqTn6cOsAo=
-X-Received: by 2002:a17:903:1c1:b0:2aa:d672:3be with SMTP id d9443c01a7336-2aad67204b4mr14343175ad.52.1770508310388;
-        Sat, 07 Feb 2026 15:51:50 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a951c8427csm9263605ad.22.2026.02.07.15.51.49
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 07 Feb 2026 15:51:50 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-2ba6ad2ca1fso551012eec.1
-        for <netdev@vger.kernel.org>; Sat, 07 Feb 2026 15:51:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1770508308; x=1771113108; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VMvFH+mJJ218Bjsbu54P7EMJQvPsv6VQirp/RETQzR4=;
-        b=YoWUmwZ9ZMGswL2Hr5ZinnY62Dx8ElD5TybDSr63hxEsKlt4DaJuUukKcZ8jfP5T7v
-         5iifyGQ15qk3NWoF59araSIJ+wfookERbouBzakcp6cYnSfgQzR9n4ahzP08mOFOl/lJ
-         5sG0FjYSLU5JwtJALEH0W+PMNBBFKiWDA5IWA=
-X-Received: by 2002:a05:7300:dc88:b0:2ba:6723:5060 with SMTP id 5a478bee46e88-2ba67235587mr395759eec.31.1770508308436;
-        Sat, 07 Feb 2026 15:51:48 -0800 (PST)
-X-Received: by 2002:a05:7300:dc88:b0:2ba:6723:5060 with SMTP id 5a478bee46e88-2ba67235587mr395756eec.31.1770508307937;
-        Sat, 07 Feb 2026 15:51:47 -0800 (PST)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b855c3db30sm4479446eec.21.2026.02.07.15.51.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Feb 2026 15:51:46 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 2/2] bnxt_en: Check RSS contexts in bnxt_need_reserve_rings()
-Date: Sat,  7 Feb 2026 15:51:18 -0800
-Message-ID: <20260207235118.1987301-3-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.4
-In-Reply-To: <20260207235118.1987301-1-michael.chan@broadcom.com>
-References: <20260207235118.1987301-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1770509218; c=relaxed/simple;
+	bh=HEuRv9yTtRl6sHMC2RKh4CDTkHLLVecluzq6wjSj2sQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QhlgmrSawdjauQnWRnC15ycNxcfenC8iRyToPls4ruD6i4ZOA+p5HMje1EQO8MhHMcD+Y7quIlF+q4Qm87j2sP6Q/AFom76dZuOQOL+p3EGqvkiwx1TqiCZKqOebj08UGD81ShqK7Kx2YKy+SU0Dmb7gIDuccvROrmk/Zh8iWGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vosK4-000000007Cx-2JQD;
+	Sun, 08 Feb 2026 00:06:44 +0000
+Date: Sun, 8 Feb 2026 00:06:40 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>, John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v14 4/4] net: dsa: add basic initial driver for
+ MxL862xx switches
+Message-ID: <aYfTkEg4ijo_qjqJ@makrotopia.org>
+References: <cover.1770433307.git.daniel@makrotopia.org>
+ <ccde07e8cf33d8ae243000013b57cfaa2695e0a9.1770433307.git.daniel@makrotopia.org>
+ <20260207215902.mtsg43zeoadqqfz5@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260207215902.mtsg43zeoadqqfz5@skbuf>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257797-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-257798-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.990];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 468461076D8
+	TO_DN_SOME(0.00)[];
+	DBL_PROHIBIT(0.00)[0.0.0.6:email];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.969];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.5:email,makrotopia.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0E7F91076FF
 X-Rspamd-Action: no action
 
-bnxt_need_reserve_rings() checks all resources except HW RSS contexts
-to determine if a new reservation is required.  For completeness, add
-the check for HW RSS contexts.  This makes the code more complete after
-the recent commit to increase the number of RSS contexts for a larger
-RSS indirection table:
+On Sat, Feb 07, 2026 at 11:59:02PM +0200, Vladimir Oltean wrote:
+> On Sat, Feb 07, 2026 at 03:07:27AM +0000, Daniel Golle wrote:
+> > +/* PHY access via firmware relay */
+> > +static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
+> > +				 int devadd, int reg)
+> > +{
+> > +	struct mdio_relay_data param = {
+> > +		.phy = port,
+> > +		.mmd = devadd,
+> > +		.reg = cpu_to_le16(reg),
+> > +	};
+> > +	int ret;
+> > +
+> > +	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return le16_to_cpu(param.data);
+> > +}
+> > +
+> > +static int mxl862xx_phy_write_mmd(struct mxl862xx_priv *priv, int port,
+> > +				  int devadd, int reg, u16 data)
+> > +{
+> > +	struct mdio_relay_data param = {
+> > +		.phy = port,
+> > +		.mmd = devadd,
+> > +		.reg = cpu_to_le16(reg),
+> > +		.data = cpu_to_le16(data),
+> > +	};
+> > +
+> > +	return MXL862XX_API_WRITE(priv, INT_GPHY_WRITE, param);
+> > +}
+> > +
+> > +static int mxl862xx_phy_read_mii_bus(struct mii_bus *bus, int port, int regnum)
+> > +{
+> > +	return mxl862xx_phy_read_mmd(bus->priv, port, 0, regnum);
+> > +}
+> > +
+> > +static int mxl862xx_phy_write_mii_bus(struct mii_bus *bus, int port,
+> > +				      int regnum, u16 val)
+> > +{
+> > +	return mxl862xx_phy_write_mmd(bus->priv, port, 0, regnum, val);
+> > +}
+> > +
+> > +static int mxl862xx_phy_read_c45_mii_bus(struct mii_bus *bus, int port,
+> > +					 int devadd, int regnum)
+> > +{
+> > +	return mxl862xx_phy_read_mmd(bus->priv, port, devadd, regnum);
+> > +}
+> > +
+> > +static int mxl862xx_phy_write_c45_mii_bus(struct mii_bus *bus, int port,
+> > +					  int devadd, int regnum, u16 val)
+> > +{
+> > +	return mxl862xx_phy_write_mmd(bus->priv, port, devadd, regnum, val);
+> > +}
+> 
+> You took inspiration from the wrong place with the mii_bus ops prototypes,
+> specifically with the "int port" argument.
+> 
+> The second argument does not hold the port, it holds the PHY address.
+> I.e. in this case:
+>                 port@6 {
+>                     reg = <6>;
+>                     phy-handle = <&phy5>;
+>                     phy-mode = "internal";
+>                 };
+>                 phy5: ethernet-phy@5 {
+>                     reg = <5>;
+>                 };
+> 
+> "int port" is 5, not 6.
+> 
+> Your source of inspiration are the prototypes of an mii_bus used as
+> ds->user_mii_bus. We have a different set of requirements there, because
+> ds->user_mii_bus exists for the case where the PHY is not described in
+> the device tree, so the port index is given as argument and the
+> user_mii_bus is responsible for internally translating the port index to
+> a PHY address.
+> 
+> So while the use of "int port" as argument name for these operations is
+> justifiable in some cases, it is not applicable to this driver, and will
+> be a pitfall for anyone who has to modify or debug this code.
 
-51b9d3f948b8 ("bnxt_en: Use a larger RSS indirection table on P5_PLUS chips")
+Ack. While not completely correct from the beginning I should have
+addressed that and changed the parameter to 'int addr' when I started to
+count physical ports from 0 and no longer hide the microcontroller --
+from that moment on the PHY address and the port address are no longer
+equal.
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 4745063d2f5c..59f0ae745446 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7956,6 +7956,7 @@ static void bnxt_get_total_resources(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- 	hwr->rx = bp->rx_nr_rings;
- 	hwr->grp = hwr->rx;
- 	hwr->vnic = bnxt_get_total_vnics(bp, hwr->rx);
-+	hwr->rss_ctx = bnxt_get_total_rss_ctxs(bp, hwr);
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 		hwr->rx <<= 1;
- 	hwr->stat = bnxt_get_func_stat_ctxs(bp);
-@@ -7985,6 +7986,7 @@ static bool bnxt_need_reserve_rings(struct bnxt *bp)
- 	if (hw_resc->resv_rx_rings != hwr.rx ||
- 	    hw_resc->resv_vnics != hwr.vnic ||
- 	    hw_resc->resv_stat_ctxs != hwr.stat ||
-+	    hw_resc->resv_rsscos_ctxs != hwr.rss_ctx ||
- 	    (hw_resc->resv_hw_ring_grps != hwr.grp &&
- 	     !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)))
- 		return true;
--- 
-2.51.0
-
+I will post a follow-up series to address this and also the removal of
+the 'label' property from the DT binding example once this has been
+merged. Both cases don't justify a "Fixes:"-tag though, but I'll just
+try to be fast, so both can still be applied before net-next closes.
 
