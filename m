@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-257813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257814-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNI5B51NiGk/ngQAu9opvQ
-	(envelope-from <netdev+bounces-257813-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 09:47:25 +0100
+	id gBE0A55NiGk/ngQAu9opvQ
+	(envelope-from <netdev+bounces-257814-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 09:47:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D3A10821D
-	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 09:47:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EFA108224
+	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 09:47:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CB13E301F7B8
-	for <lists+netdev@lfdr.de>; Sun,  8 Feb 2026 08:46:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0BEBB301FAA2
+	for <lists+netdev@lfdr.de>; Sun,  8 Feb 2026 08:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE5B319605;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEEB33D51D;
 	Sun,  8 Feb 2026 08:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Bjb8H5fb"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="gU1dHgfV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0AF33D50B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F02C33BBCB
 	for <netdev@vger.kernel.org>; Sun,  8 Feb 2026 08:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770540387; cv=none; b=ZUgY4OSU4Wbj1GqZ2gtBlH+vWeQmasLMnnOyNOHOjFJ5vEe7M8uDrZprZI7pKNEcgVwGMookpWbSO15jvdhj55jJE67Syc6Kz+X6TnTEcxwd5wRkvMWNfJQWUxMNf0mXR8Yaj26o/+X+R+6yofZ5Vh7YsrBuFghNZpoYg8dWnB0=
+	t=1770540387; cv=none; b=X3Yj84wQnEv7LBTChVJMHgy8C/VITmVqGyWxlQ3YniW9qzp8pkMrkDdGFB4zEEUMFp0pBO1f9X9W73NjjI9tyHnfops4ughoqCrgUw1emAptmBWDJyT11B+ReoT1pDOtvwG7594hwQCmlqPwGROrfSaalod6r/yRWSUqKMlXw64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770540387; c=relaxed/simple;
-	bh=sL35iw2yKi/nnG2bJ4t5P1jV8ssKgbYpJsQKcSadvUw=;
+	bh=hZPZMF84gFHcHtzBTV/dLM2SGrtaVTZMQnatxroS02w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LiuPRVP16UCH+dGqrilzm5M8AvPGaislLmrfFT3rhrcVZIHI2HzVSfkmF4Jx4UptTwg+MPt02X4gF2WZJb36Yw8ueaaZ1cLUyzXLM096neoaobbUJG83yaF+5o126ERl2ePVQQIYvQi43F92fvrD0lANl5r71J9iWRlvsMhdt+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Bjb8H5fb; arc=none smtp.client-ip=115.124.30.113
+	 MIME-Version; b=ntrg+4qVLKWpQ2TdpiiDqS7BWa2N87ggJUgvC5odGthEIAmcO25dSQQ5hurh4nGGpcpi4YH1y5F9VP+TNHPp5/1aOZ6mCZ5NQGaU1xaBe//4Eg6lr+i/BdFfk6+rVeCqiYu28jEKKT9j58wPICku+h+J3EIfj29tkQn183vUznQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=gU1dHgfV; arc=none smtp.client-ip=115.124.30.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1770540378; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=gPqrEvVt3zLr7c3N5y3WH/1hjUG+z9XvOc/RfApoOW4=;
-	b=Bjb8H5fbeL2gqEvujfHUq9islu8U5sMESgh5Ht9GhjquRqgYOnxAO8jTKs1nxjehBKZUw28x8lLlFgmI6DN+tvIy1NXHg1hNKzy2+nkv6Ig+LrIiYuG1xoAxbpPdLwBq+AjA2y67jn17ADkkW2QSZKaCBwyLi35BLbe2aNhysSM=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WykW-kz_1770540377 cluster:ay36)
+	t=1770540379; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=FOhZDckPfTLh2wYe2jBmOMP2TPx+9xRu6mOlWKefhq4=;
+	b=gU1dHgfVCszh4x1mi5mQ6IR6bl2SQjnNCbTGU8ZqBApVn6f2G7NDtMydbZDl4GmH9zbDUntwxf4AaipfsH6acbqAY6irqTRmVaTVT5zGavYpmqamYA3hQkcJgxMrKbUHUDlEmD5Hv1fAMYhTo6cm0qwX0frp2967rJ5YTTJlhHo=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WykTQY9_1770540378 cluster:ay36)
           by smtp.aliyun-inc.com;
           Sun, 08 Feb 2026 16:46:18 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
@@ -57,10 +57,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Dong Yibo <dong100@mucse.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v26 6/8] eea: implement packet transmit logic
-Date: Sun,  8 Feb 2026 16:46:11 +0800
-Message-Id: <20260208084613.2658-7-xuanzhuo@linux.alibaba.com>
+	Dust Li <dust.li@linux.alibaba.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v26 7/8] eea: introduce ethtool support
+Date: Sun,  8 Feb 2026 16:46:12 +0800
+Message-Id: <20260208084613.2658-8-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20260208084613.2658-1-xuanzhuo@linux.alibaba.com>
 References: <20260208084613.2658-1-xuanzhuo@linux.alibaba.com>
@@ -81,14 +82,14 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
 	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257813-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257814-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[linux.alibaba.com:+];
@@ -97,324 +98,574 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
 	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 85D3A10821D
+X-Rspamd-Queue-Id: 76EFA108224
 X-Rspamd-Action: no action
 
-Implement the core logic for transmitting packets in the EEA TX path,
-including packet preparation and submission to the underlying transport.
+Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
 
+This commit introduces ethtool support.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
 Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
 Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- drivers/net/ethernet/alibaba/eea/eea_tx.c | 270 +++++++++++++++++++++-
- 1 file changed, 268 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/alibaba/eea/Makefile     |   1 +
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 243 ++++++++++++++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  49 ++++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    |   1 +
+ drivers/net/ethernet/alibaba/eea/eea_net.h    |   5 +
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     |  26 +-
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     |  24 +-
+ 7 files changed, 346 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-index 1475fca44b6e..2cdaff9645f8 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_tx.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-@@ -11,6 +11,11 @@
- #include "eea_pci.h"
- #include "eea_ring.h"
- 
-+struct eea_sq_free_stats {
-+	u64 packets;
-+	u64 bytes;
+diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
+index fa34a005fa01..8f8fbb8d2d9a 100644
+--- a/drivers/net/ethernet/alibaba/eea/Makefile
++++ b/drivers/net/ethernet/alibaba/eea/Makefile
+@@ -4,5 +4,6 @@ eea-y := eea_ring.o \
+ 	eea_net.o \
+ 	eea_pci.o \
+ 	eea_adminq.o \
++	eea_ethtool.o \
+ 	eea_tx.o \
+ 	eea_rx.o
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.c b/drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+new file mode 100644
+index 000000000000..011a5532f8c2
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+@@ -0,0 +1,243 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
++
++#include <linux/ethtool.h>
++#include <linux/ethtool_netlink.h>
++#include <linux/rtnetlink.h>
++
++#include "eea_adminq.h"
++
++struct eea_stat_desc {
++	char desc[ETH_GSTRING_LEN];
++	size_t offset;
 +};
 +
- struct eea_tx_meta {
- 	struct eea_tx_meta *next;
++#define EEA_TX_STAT(m)	{#m, offsetof(struct eea_tx_stats, m)}
++#define EEA_RX_STAT(m)	{#m, offsetof(struct eea_rx_stats, m)}
++
++static const struct eea_stat_desc eea_rx_stats_desc[] = {
++	EEA_RX_STAT(descs),
++	EEA_RX_STAT(kicks),
++};
++
++static const struct eea_stat_desc eea_tx_stats_desc[] = {
++	EEA_TX_STAT(descs),
++	EEA_TX_STAT(kicks),
++};
++
++#define EEA_TX_STATS_LEN	ARRAY_SIZE(eea_tx_stats_desc)
++#define EEA_RX_STATS_LEN	ARRAY_SIZE(eea_rx_stats_desc)
++
++static void eea_get_drvinfo(struct net_device *netdev,
++			    struct ethtool_drvinfo *info)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++	struct eea_device *edev = enet->edev;
++
++	strscpy(info->driver,   KBUILD_MODNAME,     sizeof(info->driver));
++	strscpy(info->bus_info, eea_pci_name(edev), sizeof(info->bus_info));
++}
++
++static void eea_get_ringparam(struct net_device *netdev,
++			      struct ethtool_ringparam *ring,
++			      struct kernel_ethtool_ringparam *kernel_ring,
++			      struct netlink_ext_ack *extack)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++
++	ring->rx_max_pending = enet->cfg_hw.rx_ring_depth;
++	ring->tx_max_pending = enet->cfg_hw.tx_ring_depth;
++	ring->rx_pending = enet->cfg.rx_ring_depth;
++	ring->tx_pending = enet->cfg.tx_ring_depth;
++
++	kernel_ring->tcp_data_split = enet->cfg.split_hdr ?
++				      ETHTOOL_TCP_DATA_SPLIT_ENABLED :
++				      ETHTOOL_TCP_DATA_SPLIT_DISABLED;
++}
++
++static int eea_set_ringparam(struct net_device *netdev,
++			     struct ethtool_ringparam *ring,
++			     struct kernel_ethtool_ringparam *kernel_ring,
++			     struct netlink_ext_ack *extack)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++	struct eea_net_init_ctx ctx;
++	bool need_update = false;
++	struct eea_net_cfg *cfg;
++	bool sh;
++
++	eea_init_ctx(enet, &ctx);
++
++	cfg = &ctx.cfg;
++
++	if (ring->rx_pending != cfg->rx_ring_depth)
++		need_update = true;
++
++	if (ring->tx_pending != cfg->tx_ring_depth)
++		need_update = true;
++
++	sh = kernel_ring->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED;
++	if (sh != !!(cfg->split_hdr))
++		need_update = true;
++
++	if (!need_update)
++		return 0;
++
++	cfg->rx_ring_depth = ring->rx_pending;
++	cfg->tx_ring_depth = ring->tx_pending;
++
++	cfg->split_hdr = sh ? enet->cfg_hw.split_hdr : 0;
++
++	return eea_reset_hw_resources(enet, &ctx);
++}
++
++static int eea_set_channels(struct net_device *netdev,
++			    struct ethtool_channels *channels)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++	u16 queue_pairs = channels->combined_count;
++	struct eea_net_init_ctx ctx;
++	struct eea_net_cfg *cfg;
++
++	eea_init_ctx(enet, &ctx);
++
++	cfg = &ctx.cfg;
++
++	cfg->rx_ring_num = queue_pairs;
++	cfg->tx_ring_num = queue_pairs;
++
++	return eea_reset_hw_resources(enet, &ctx);
++}
++
++static void eea_get_channels(struct net_device *netdev,
++			     struct ethtool_channels *channels)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++
++	channels->combined_count = enet->cfg.rx_ring_num;
++	channels->max_combined   = enet->cfg_hw.rx_ring_num;
++}
++
++static void eea_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++	u8 *p = data;
++	u32 i, j;
++
++	if (stringset != ETH_SS_STATS)
++		return;
++
++	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
++		for (j = 0; j < EEA_RX_STATS_LEN; j++)
++			ethtool_sprintf(&p, "rx%u_%s", i,
++					eea_rx_stats_desc[j].desc);
++	}
++
++	for (i = 0; i < enet->cfg.tx_ring_num; i++) {
++		for (j = 0; j < EEA_TX_STATS_LEN; j++)
++			ethtool_sprintf(&p, "tx%u_%s", i,
++					eea_tx_stats_desc[j].desc);
++	}
++}
++
++static int eea_get_sset_count(struct net_device *netdev, int sset)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++
++	if (sset != ETH_SS_STATS)
++		return -EOPNOTSUPP;
++
++	return enet->cfg.rx_ring_num * EEA_RX_STATS_LEN +
++		enet->cfg.tx_ring_num * EEA_TX_STATS_LEN;
++}
++
++static void eea_stats_fill_for_q(struct u64_stats_sync *syncp, u32 num,
++				 const struct eea_stat_desc *desc,
++				 u64 *data, u32 idx)
++{
++	void *stats_base = syncp;
++	u32 start, i;
++
++	do {
++		start = u64_stats_fetch_begin(syncp);
++		for (i = 0; i < num; i++)
++			data[idx + i] =
++				u64_stats_read(stats_base + desc[i].offset);
++
++	} while (u64_stats_fetch_retry(syncp, start));
++}
++
++static void eea_get_ethtool_stats(struct net_device *netdev,
++				  struct ethtool_stats *stats, u64 *data)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++	u32 i, idx = 0;
++
++	ASSERT_RTNL();
++
++	if (enet->rx) {
++		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
++			struct eea_net_rx *rx = enet->rx[i];
++
++			eea_stats_fill_for_q(&rx->stats.syncp, EEA_RX_STATS_LEN,
++					     eea_rx_stats_desc, data, idx);
++
++			idx += EEA_RX_STATS_LEN;
++		}
++	}
++
++	if (enet->tx) {
++		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
++			struct eea_net_tx *tx = &enet->tx[i];
++
++			eea_stats_fill_for_q(&tx->stats.syncp, EEA_TX_STATS_LEN,
++					     eea_tx_stats_desc, data, idx);
++
++			idx += EEA_TX_STATS_LEN;
++		}
++	}
++}
++
++void eea_update_rx_stats(struct eea_rx_stats *rx_stats,
++			 struct eea_rx_ctx_stats *stats)
++{
++	u64_stats_update_begin(&rx_stats->syncp);
++	u64_stats_add(&rx_stats->descs,             stats->descs);
++	u64_stats_add(&rx_stats->packets,           stats->packets);
++	u64_stats_add(&rx_stats->bytes,             stats->bytes);
++	u64_stats_add(&rx_stats->drops,             stats->drops);
++	u64_stats_add(&rx_stats->split_hdr_bytes,   stats->split_hdr_bytes);
++	u64_stats_add(&rx_stats->split_hdr_packets, stats->split_hdr_packets);
++	u64_stats_add(&rx_stats->length_errors,     stats->length_errors);
++	u64_stats_update_end(&rx_stats->syncp);
++}
++
++static int eea_get_link_ksettings(struct net_device *netdev,
++				  struct ethtool_link_ksettings *cmd)
++{
++	struct eea_net *enet = netdev_priv(netdev);
++
++	cmd->base.speed  = enet->speed;
++	cmd->base.duplex = enet->duplex;
++	cmd->base.port   = PORT_OTHER;
++
++	return 0;
++}
++
++const struct ethtool_ops eea_ethtool_ops = {
++	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
++	.get_drvinfo        = eea_get_drvinfo,
++	.get_link           = ethtool_op_get_link,
++	.get_ringparam      = eea_get_ringparam,
++	.set_ringparam      = eea_set_ringparam,
++	.set_channels       = eea_set_channels,
++	.get_channels       = eea_get_channels,
++	.get_strings        = eea_get_strings,
++	.get_sset_count     = eea_get_sset_count,
++	.get_ethtool_stats  = eea_get_ethtool_stats,
++	.get_link_ksettings = eea_get_link_ksettings,
++};
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.h b/drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+new file mode 100644
+index 000000000000..a437065d1cab
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+@@ -0,0 +1,49 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
++
++#ifndef __EEA_ETHTOOL_H__
++#define __EEA_ETHTOOL_H__
++
++struct eea_tx_stats {
++	struct u64_stats_sync syncp;
++	u64_stats_t descs;
++	u64_stats_t packets;
++	u64_stats_t bytes;
++	u64_stats_t drops;
++	u64_stats_t kicks;
++};
++
++struct eea_rx_ctx_stats {
++	u64 descs;
++	u64 packets;
++	u64 bytes;
++	u64 drops;
++	u64 split_hdr_bytes;
++	u64 split_hdr_packets;
++
++	u64 length_errors;
++};
++
++struct eea_rx_stats {
++	struct u64_stats_sync syncp;
++	u64_stats_t descs;
++	u64_stats_t packets;
++	u64_stats_t bytes;
++	u64_stats_t drops;
++	u64_stats_t kicks;
++	u64_stats_t split_hdr_bytes;
++	u64_stats_t split_hdr_packets;
++
++	u64_stats_t length_errors;
++};
++
++void eea_update_rx_stats(struct eea_rx_stats *rx_stats,
++			 struct eea_rx_ctx_stats *stats);
++
++extern const struct ethtool_ops eea_ethtool_ops;
++
++#endif
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
+index 1dc93722b44b..bb147a0866bc 100644
+--- a/drivers/net/ethernet/alibaba/eea/eea_net.c
++++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
+@@ -583,6 +583,7 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
+ 	}
  
-@@ -28,20 +33,281 @@ struct eea_tx_meta {
- 	u16 dma_len;
+ 	netdev->netdev_ops = &eea_netdev;
++	netdev->ethtool_ops = &eea_ethtool_ops;
+ 	SET_NETDEV_DEV(netdev, edev->dma_dev);
+ 
+ 	enet = netdev_priv(netdev);
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
+index a3a7cc304327..037585410ad1 100644
+--- a/drivers/net/ethernet/alibaba/eea/eea_net.h
++++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
+@@ -12,6 +12,7 @@
+ #include <linux/netdevice.h>
+ 
+ #include "eea_adminq.h"
++#include "eea_ethtool.h"
+ #include "eea_ring.h"
+ 
+ #define EEA_VER_MAJOR		1
+@@ -33,6 +34,8 @@ struct eea_net_tx {
+ 	u32 index;
+ 
+ 	char name[16];
++
++	struct eea_tx_stats stats;
  };
  
-+static struct eea_tx_meta *eea_tx_meta_get(struct eea_net_tx *tx)
-+{
-+	struct eea_tx_meta *meta;
+ struct eea_rx_meta {
+@@ -84,6 +87,8 @@ struct eea_net_rx {
+ 
+ 	struct napi_struct *napi;
+ 
++	struct eea_rx_stats stats;
 +
-+	if (!tx->free)
-+		return NULL;
+ 	char name[16];
+ 
+ 	struct eea_net_rx_pkt_ctx pkt;
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_rx.c b/drivers/net/ethernet/alibaba/eea/eea_rx.c
+index a395bac1a881..55abea92de58 100644
+--- a/drivers/net/ethernet/alibaba/eea/eea_rx.c
++++ b/drivers/net/ethernet/alibaba/eea/eea_rx.c
+@@ -30,6 +30,8 @@ struct eea_rx_ctx {
+ 	u32 frame_sz;
+ 
+ 	struct eea_rx_meta *meta;
 +
-+	meta = tx->free;
-+	tx->free = meta->next;
-+
-+	return meta;
-+}
-+
-+static void eea_tx_meta_put_and_unmap(struct eea_net_tx *tx,
-+				      struct eea_tx_meta *meta)
-+{
-+	struct eea_tx_meta *head;
-+
-+	head = meta;
-+
-+	while (true) {
-+		dma_unmap_single(tx->dma_dev, meta->dma_addr,
-+				 meta->dma_len, DMA_TO_DEVICE);
-+
-+		if (meta->next) {
-+			meta = meta->next;
-+			continue;
-+		}
-+
-+		break;
-+	}
-+
-+	meta->next = tx->free;
-+	tx->free = head;
-+}
-+
-+static void eea_meta_free_xmit(struct eea_net_tx *tx,
-+			       struct eea_tx_meta *meta,
-+			       int budget,
-+			       struct eea_tx_cdesc *desc,
-+			       struct eea_sq_free_stats *stats)
-+{
-+	struct sk_buff *skb = meta->skb;
-+
-+	if (unlikely((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) && desc)) {
-+		struct skb_shared_hwtstamps ts = {};
-+
-+		ts.hwtstamp = EEA_DESC_TS(desc) + tx->enet->hw_ts_offset;
-+		skb_tstamp_tx(skb, &ts);
-+	}
-+
-+	++stats->packets;
-+	stats->bytes += meta->skb->len;
-+	napi_consume_skb(meta->skb, budget);
-+
-+	meta->data = NULL;
-+}
-+
-+static u32 eea_clean_tx(struct eea_net_tx *tx, int budget)
-+{
-+	struct eea_sq_free_stats stats = {0};
-+	struct eea_tx_cdesc *desc;
-+	struct eea_tx_meta *meta;
-+	int desc_n;
-+
-+	while ((desc = ering_cq_get_desc(tx->ering))) {
-+		meta = &tx->meta[le16_to_cpu(desc->id)];
-+
-+		if (meta->data) {
-+			eea_tx_meta_put_and_unmap(tx, meta);
-+			eea_meta_free_xmit(tx, meta, budget, desc, &stats);
-+			desc_n = meta->num;
-+		} else {
-+			netdev_err(tx->enet->netdev,
-+				   "tx meta->data is null. id %d num: %d\n",
-+				   meta->id, meta->num);
-+			desc_n = 1;
-+		}
-+
-+		ering_cq_ack_desc(tx->ering, desc_n);
-+	}
-+
-+	return stats.packets;
-+}
-+
- int eea_poll_tx(struct eea_net_tx *tx, int budget)
- {
--	/* Empty function; will be implemented in a subsequent commit. */
-+	struct eea_net *enet = tx->enet;
-+	u32 index = tx - enet->tx;
-+	struct netdev_queue *txq;
-+	u32 cleaned;
-+
-+	txq = netdev_get_tx_queue(enet->netdev, index);
-+
-+	__netif_tx_lock(txq, smp_processor_id());
-+
-+	cleaned = eea_clean_tx(tx, budget);
-+
-+	if (netif_tx_queue_stopped(txq) && cleaned > 0)
-+		netif_tx_wake_queue(txq);
-+
-+	__netif_tx_unlock(txq);
-+
-+	return 0;
-+}
-+
-+static int eea_fill_desc_from_skb(const struct sk_buff *skb,
-+				  struct eea_ring *ering,
-+				  struct eea_tx_desc *desc)
-+{
-+	if (skb_is_gso(skb)) {
-+		struct skb_shared_info *sinfo = skb_shinfo(skb);
-+
-+		desc->gso_size = cpu_to_le16(sinfo->gso_size);
-+		if (sinfo->gso_type & SKB_GSO_TCPV4)
-+			desc->gso_type = EEA_TX_GSO_TCPV4;
-+
-+		else if (sinfo->gso_type & SKB_GSO_TCPV6)
-+			desc->gso_type = EEA_TX_GSO_TCPV6;
-+
-+		else if (sinfo->gso_type & SKB_GSO_UDP_L4)
-+			desc->gso_type = EEA_TX_GSO_UDP_L4;
-+
-+		else
-+			return -EINVAL;
-+
-+		if (sinfo->gso_type & SKB_GSO_TCP_ECN)
-+			desc->gso_type |= EEA_TX_GSO_ECN;
-+	} else {
-+		desc->gso_type = EEA_TX_GSO_NONE;
-+	}
-+
-+	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+		desc->csum_start = cpu_to_le16(skb_checksum_start_offset(skb));
-+		desc->csum_offset = cpu_to_le16(skb->csum_offset);
-+	}
-+
-+	return 0;
-+}
-+
-+static struct eea_tx_meta *eea_tx_desc_fill(struct eea_net_tx *tx,
-+					    dma_addr_t addr, u32 len,
-+					    bool is_last, void *data, u16 flags)
-+{
-+	struct eea_tx_meta *meta;
-+	struct eea_tx_desc *desc;
-+
-+	meta = eea_tx_meta_get(tx);
-+
-+	desc = ering_sq_alloc_desc(tx->ering, meta->id, is_last, flags);
-+	desc->addr = cpu_to_le64(addr);
-+	desc->len = cpu_to_le16(len);
-+
-+	meta->next     = NULL;
-+	meta->dma_len  = len;
-+	meta->dma_addr = addr;
-+	meta->data     = data;
-+	meta->num      = 1;
-+	meta->desc     = desc;
-+
-+	return meta;
-+}
-+
-+static int eea_tx_add_skb_frag(struct eea_net_tx *tx,
-+			       struct eea_tx_meta *head_meta,
-+			       const skb_frag_t *frag, bool is_last)
-+{
-+	u32 len = skb_frag_size(frag);
-+	struct eea_tx_meta *meta;
-+	dma_addr_t addr;
-+
-+	addr = skb_frag_dma_map(tx->dma_dev, frag, 0, len, DMA_TO_DEVICE);
-+	if (unlikely(dma_mapping_error(tx->dma_dev, addr)))
-+		return -ENOMEM;
-+
-+	meta = eea_tx_desc_fill(tx, addr, len, is_last, NULL, 0);
-+
-+	meta->next = head_meta->next;
-+	head_meta->next = meta;
-+
++	struct eea_rx_ctx_stats stats;
+ };
+ 
+ static struct eea_rx_meta *eea_rx_meta_get(struct eea_net_rx *rx)
+@@ -199,6 +201,7 @@ static int eea_harden_check_overflow(struct eea_rx_ctx *ctx,
+ 	if (unlikely(ctx->len > max_len)) {
+ 		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
+ 			 enet->netdev->name, ctx->len, max_len);
++		++ctx->stats.length_errors;
+ 		return -EINVAL;
+ 	}
+ 
+@@ -215,6 +218,7 @@ static int eea_harden_check_size(struct eea_rx_ctx *ctx, struct eea_net *enet)
+ 
+ 	if (unlikely(ctx->hdr_len + ctx->len < ETH_HLEN)) {
+ 		pr_debug("%s: short packet %u\n", enet->netdev->name, ctx->len);
++		++ctx->stats.length_errors;
+ 		return -EINVAL;
+ 	}
+ 
+@@ -356,6 +360,7 @@ static int process_remain_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
+ 
+ err:
+ 	dev_kfree_skb(rx->pkt.head_skb);
++	++ctx->stats.drops;
+ 	rx->pkt.do_drop = true;
+ 	rx->pkt.head_skb = NULL;
+ 	return 0;
+@@ -384,6 +389,7 @@ static int process_first_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
+ 	return 0;
+ 
+ err:
++	++ctx->stats.drops;
+ 	rx->pkt.do_drop = true;
  	return 0;
  }
+@@ -418,6 +424,8 @@ static void eea_rx_desc_to_ctx(struct eea_net_rx *rx,
+ 	if (ctx->flags & EEA_DESC_F_SPLIT_HDR) {
+ 		ctx->hdr_len = le16_to_cpu(desc->len_ex) &
+ 			EEA_RX_CDESC_HDR_LEN_MASK;
++		ctx->stats.split_hdr_bytes += ctx->hdr_len;
++		++ctx->stats.split_hdr_packets;
+ 	}
  
-+static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
-+{
-+	const struct skb_shared_info *shinfo = skb_shinfo(skb);
-+	u32 hlen = skb_headlen(skb);
-+	struct eea_tx_meta *meta;
-+	dma_addr_t addr;
-+	int i, err;
-+	u16 flags;
+ 	ctx->more = ctx->flags & EEA_RING_DESC_F_MORE;
+@@ -446,6 +454,8 @@ static int eea_cleanrx(struct eea_net_rx *rx, int budget,
+ 
+ 		eea_rx_meta_dma_sync_for_cpu(rx, meta, ctx->len);
+ 
++		ctx->stats.bytes += ctx->len;
 +
-+	addr = dma_map_single(tx->dma_dev, skb->data, hlen, DMA_TO_DEVICE);
-+	if (unlikely(dma_mapping_error(tx->dma_dev, addr)))
-+		return -ENOMEM;
+ 		if (!rx->pkt.idx)
+ 			process_first_buf(rx, ctx);
+ 		else
+@@ -463,17 +473,20 @@ static int eea_cleanrx(struct eea_net_rx *rx, int budget,
+ skip:
+ 		eea_rx_meta_put(rx, meta);
+ 		ering_cq_ack_desc(rx->ering, 1);
++		++ctx->stats.descs;
+ 
+ 		if (!ctx->more)
+ 			memset(&rx->pkt, 0, sizeof(rx->pkt));
+ 	}
+ 
++	ctx->stats.packets = packets;
 +
-+	flags = skb->ip_summed == CHECKSUM_PARTIAL ? EEA_DESC_F_DO_CSUM : 0;
-+
-+	meta = eea_tx_desc_fill(tx, addr, hlen, !shinfo->nr_frags, skb, flags);
-+
-+	if (eea_fill_desc_from_skb(skb, tx->ering, meta->desc))
-+		goto err_cancel;
-+
-+	for (i = 0; i < shinfo->nr_frags; i++) {
-+		const skb_frag_t *frag = &shinfo->frags[i];
-+		bool is_last = i == (shinfo->nr_frags - 1);
-+
-+		err = eea_tx_add_skb_frag(tx, meta, frag, is_last);
-+		if (err)
-+			goto err_cancel;
+ 	return packets;
+ }
+ 
+ static bool eea_rx_post(struct eea_net *enet, struct eea_net_rx *rx)
+ {
+-	u32 tailroom, headroom, room, len;
++	u32 tailroom, headroom, room, flags, len;
+ 	struct eea_rx_meta *meta;
+ 	struct eea_rx_desc *desc;
+ 	int err = 0, num = 0;
+@@ -513,9 +526,14 @@ static bool eea_rx_post(struct eea_net *enet, struct eea_net_rx *rx)
+ 		++num;
+ 	}
+ 
+-	if (num)
++	if (num) {
+ 		ering_kick(rx->ering);
+ 
++		flags = u64_stats_update_begin_irqsave(&rx->stats.syncp);
++		u64_stats_inc(&rx->stats.kicks);
++		u64_stats_update_end_irqrestore(&rx->stats.syncp, flags);
 +	}
 +
-+	meta->num = shinfo->nr_frags + 1;
-+	ering_sq_commit_desc(tx->ering);
+ 	/* true means busy, napi should be called again. */
+ 	return !!err;
+ }
+@@ -537,6 +555,8 @@ static int eea_poll(struct napi_struct *napi, int budget)
+ 	if (rx->ering->num_free > budget)
+ 		busy |= eea_rx_post(enet, rx);
+ 
++	eea_update_rx_stats(&rx->stats, &ctx.stats);
 +
-+	return 0;
+ 	busy |= received >= budget;
+ 
+ 	if (busy)
+@@ -667,6 +687,8 @@ struct eea_net_rx *eea_alloc_rx(struct eea_net_init_ctx *ctx, u32 idx)
+ 	rx->index = idx;
+ 	sprintf(rx->name, "rx.%u", idx);
+ 
++	u64_stats_init(&rx->stats.syncp);
 +
-+err_cancel:
-+	ering_sq_cancel(tx->ering);
-+	eea_tx_meta_put_and_unmap(tx, meta);
-+	meta->data = NULL;
-+	return -ENOMEM;
-+}
+ 	/* ering */
+ 	ering = ering_alloc(idx * 2, ctx->cfg.rx_ring_depth, ctx->edev,
+ 			    ctx->cfg.rx_sq_desc_size,
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
+index 2cdaff9645f8..7c1fc499fe7f 100644
+--- a/drivers/net/ethernet/alibaba/eea/eea_tx.c
++++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
+@@ -115,6 +115,13 @@ static u32 eea_clean_tx(struct eea_net_tx *tx, int budget)
+ 		ering_cq_ack_desc(tx->ering, desc_n);
+ 	}
+ 
++	if (stats.packets) {
++		u64_stats_update_begin(&tx->stats.syncp);
++		u64_stats_add(&tx->stats.bytes, stats.bytes);
++		u64_stats_add(&tx->stats.packets, stats.packets);
++		u64_stats_update_end(&tx->stats.syncp);
++	}
 +
-+static void eea_tx_kick(struct eea_net_tx *tx)
-+{
-+	ering_kick(tx->ering);
-+}
+ 	return stats.packets;
+ }
+ 
+@@ -248,6 +255,10 @@ static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
+ 	meta->num = shinfo->nr_frags + 1;
+ 	ering_sq_commit_desc(tx->ering);
+ 
++	u64_stats_update_begin(&tx->stats.syncp);
++	u64_stats_add(&tx->stats.descs, meta->num);
++	u64_stats_update_end(&tx->stats.syncp);
 +
+ 	return 0;
+ 
+ err_cancel:
+@@ -260,6 +271,10 @@ static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
+ static void eea_tx_kick(struct eea_net_tx *tx)
+ {
+ 	ering_kick(tx->ering);
++
++	u64_stats_update_begin(&tx->stats.syncp);
++	u64_stats_inc(&tx->stats.kicks);
++	u64_stats_update_end(&tx->stats.syncp);
+ }
+ 
  netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
- {
--	/* Empty function; will be implemented in a subsequent commit. */
-+	struct eea_net *enet = netdev_priv(netdev);
-+	int qnum = skb_get_queue_mapping(skb);
-+	struct eea_net_tx *tx = &enet->tx[qnum];
-+	struct netdev_queue *txq;
-+	int err, n;
-+
-+	txq = netdev_get_tx_queue(netdev, qnum);
-+
-+	skb_tx_timestamp(skb);
-+
-+	err = eea_tx_post_skb(tx, skb);
-+	if (unlikely(err))
-+		dev_kfree_skb_any(skb);
-+
-+	/* NETDEV_TX_BUSY is expensive. So stop advancing the TX queue. */
-+	n = MAX_SKB_FRAGS + 1;
-+	netif_txq_maybe_stop(txq, tx->ering->num_free, n, n);
-+
-+	if (!netdev_xmit_more() || netif_xmit_stopped(txq))
-+		eea_tx_kick(tx);
-+
- 	return NETDEV_TX_OK;
- }
+@@ -275,8 +290,13 @@ netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	skb_tx_timestamp(skb);
  
- static void eea_free_meta(struct eea_net_tx *tx, struct eea_net_cfg *cfg)
- {
-+	struct eea_sq_free_stats stats = {0};
-+	struct eea_tx_meta *meta;
-+	int i;
+ 	err = eea_tx_post_skb(tx, skb);
+-	if (unlikely(err))
++	if (unlikely(err)) {
++		u64_stats_update_begin(&tx->stats.syncp);
++		u64_stats_inc(&tx->stats.drops);
++		u64_stats_update_end(&tx->stats.syncp);
 +
-+	while ((meta = eea_tx_meta_get(tx)))
-+		meta->skb = NULL;
-+
-+	for (i = 0; i < cfg->tx_ring_depth; i++) {
-+		meta = &tx->meta[i];
-+
-+		if (!meta->skb)
-+			continue;
-+
-+		eea_tx_meta_put_and_unmap(tx, meta);
-+
-+		eea_meta_free_xmit(tx, meta, 0, NULL, &stats);
+ 		dev_kfree_skb_any(skb);
 +	}
+ 
+ 	/* NETDEV_TX_BUSY is expensive. So stop advancing the TX queue. */
+ 	n = MAX_SKB_FRAGS + 1;
+@@ -346,6 +366,8 @@ int eea_alloc_tx(struct eea_net_init_ctx *ctx, struct eea_net_tx *tx, u32 idx)
+ 	struct eea_ring *ering;
+ 	u32 i;
+ 
++	u64_stats_init(&tx->stats.syncp);
 +
- 	kvfree(tx->meta);
- 	tx->meta = NULL;
- }
+ 	sprintf(tx->name, "tx.%u", idx);
+ 
+ 	ering = ering_alloc(idx * 2 + 1, ctx->cfg.tx_ring_depth, ctx->edev,
 -- 
 2.32.0.3.g01195cf9f
 
