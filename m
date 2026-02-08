@@ -1,171 +1,124 @@
-Return-Path: <netdev+bounces-257831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id zBghGx6jiGl1tAQAu9opvQ
-	(envelope-from <netdev+bounces-257831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 15:52:14 +0100
+	id F5rkJCWliGlRtQQAu9opvQ
+	(envelope-from <netdev+bounces-257832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 16:00:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B35108FC5
-	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 15:52:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E576109003
+	for <lists+netdev@lfdr.de>; Sun, 08 Feb 2026 16:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3403300CC32
-	for <lists+netdev@lfdr.de>; Sun,  8 Feb 2026 14:52:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C8F63011BDC
+	for <lists+netdev@lfdr.de>; Sun,  8 Feb 2026 15:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB9C30BF58;
-	Sun,  8 Feb 2026 14:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9FF231830;
+	Sun,  8 Feb 2026 15:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sphalerite.org header.i=@sphalerite.org header.b="SanwMKJc"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pKdPJ/3e"
 X-Original-To: netdev@vger.kernel.org
-Received: from sosiego.soundray.org (sosiego.soundray.org [116.203.207.114])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DE02BE625
-	for <netdev@vger.kernel.org>; Sun,  8 Feb 2026 14:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.207.114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880091DE4CE;
+	Sun,  8 Feb 2026 15:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770562331; cv=none; b=AQqcyW9q6nmC6C84X9+XLhNMqZIaqBTvFtMvRFyHxP8/kYcfH33QIfXSenOnaT8PFrUjIdsEn+rcHzZBQ47Lrishk8Xwu7Nd9f72i6zy02K4zxPptrI2LXwS5BtiHrv+o6KX6tGoOMOM8N4duDNWa5PZqPW1BHnFcbEY59JysQM=
+	t=1770562849; cv=none; b=qEAkFl3IcqoCPqAR7kctCVQM7wJMdbGw2SEuTjn/QW0j43EZHXzpHFP1cHgJd4Ve58lh1pRMOuPwruT/kFSz212PNHkLr/Oyl2Gb/GhWjUqAh+nVzWvQ8lmFWe0uAe1j5uIVgOh3Aq2YwEdLBfUH4cbujW/n1rvvyQ0JhGNgI58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770562331; c=relaxed/simple;
-	bh=0GFHpJHeQA4xgRgC/eddXmbmlTAepY6nfLARfumGHZs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N7PYfNOYCwOOQ48pwyIvvkvSFslxHL1MPq9ep+KAXdRuvW3vNa3qRUZs7cI0p1ev4n0CR1Bcv5oUaISdu6iaTBdwzdtLYW2oBdGyvYUtzv17fInQcfbg2CTHOxxZvOZPSX3iYPcm6XOG1oyYta1yNUhtay+nt7Z2iwk18f5HuHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sphalerite.org; spf=pass smtp.mailfrom=sphalerite.org; dkim=pass (1024-bit key) header.d=sphalerite.org header.i=@sphalerite.org header.b=SanwMKJc; arc=none smtp.client-ip=116.203.207.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sphalerite.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sphalerite.org
-From: Linus Heckemann <git@sphalerite.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sphalerite.org;
-	s=sosiego; t=1770561968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=8agyu74u1TuCSvxzsqVi4rOHN69kwIiRIbDoVuRnFJE=;
-	b=SanwMKJcO1jnk7dZsVR226fmQzCVHMk7xp606Nj8mABKsIimn4S3ZEQ6DCBDp92x8HWZje
-	K3DIjk4fgi5TGQfD5zE3ExIJtdacyVD8GBXALWscPqAG3lSn0/zr98Ryiv53eTROoMHBqV
-	Q2wDLdjx0fBDKP7LeSK1XCs+yiYZGHU=
-To: edumazet@google.com
-Cc: davem@davemloft.net,
-	eric.dumazet@gmail.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	morikw2@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com,
-	Linus Heckemann <git@sphalerite.org>
-Subject: [PATCH] selftests/net: add test for IPv4-in-IPv6 tunneling
-Date: Sun,  8 Feb 2026 15:46:04 +0100
-Message-ID: <20260208144604.1550582-1-git@sphalerite.org>
+	s=arc-20240116; t=1770562849; c=relaxed/simple;
+	bh=IhMPQApmWrc04vEawLhgrxYIChSC2Nc1f1e6F0lzOh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vEv/jyOV9u15DnWt6wuCzi9nm4h4dQ80JgUFKXY1EXKCpTsY6Hi71btAJbTxgpPgVMA8Azb87XzqS8GpDWHQ1eW163nQCBO1AMXGEf1TYlxk14/hBwQDZgbxDQRxPoEBPNDBYgWkP4h5JGiH7gCzEMX8BeoPlQfvKzS/lbd//w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pKdPJ/3e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A8AC4CEF7;
+	Sun,  8 Feb 2026 15:00:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1770562849;
+	bh=IhMPQApmWrc04vEawLhgrxYIChSC2Nc1f1e6F0lzOh8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pKdPJ/3eqYZmw0uVFdBD59Ngi7+ABaDP1XKI2VVaERORIN11anlEnTtFFH6ZAsSfB
+	 9YS18gYWuok/FAdVe8u/a64lGom4QUMP/xBeiJb+RvW1iBQdUt6eGdHqEpSc8mWwUY
+	 PniXRmDBnH1SrOAooIrYPIOHrgEZxqMOKCliQvfs=
+Date: Sun, 8 Feb 2026 16:00:45 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Cc: stable@vger.kernel.org, davem@davemloft.net, yoshfuji@linux-ipv6.org,
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kafai@fb.com, weiwan@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com, yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com, Sasha Levin <sashal@kernel.org>,
+	Shivani Agarwal <shivani.agarwal@broadcom.com>
+Subject: Re: [PATCH v5.10-v5.15 ] ipv6: use RCU in ip6_xmit()
+Message-ID: <2026020822-stable-slogan-8452@gregkh>
+References: <20260205074644.2091266-1-keerthana.kalyanasundaram@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260205074644.2091266-1-keerthana.kalyanasundaram@broadcom.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[sphalerite.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[sphalerite.org:s=sosiego];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,sphalerite.org];
+	TAGGED_FROM(0.00)[bounces-257832-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-257831-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[git@sphalerite.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sphalerite.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A2B35108FC5
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 9E576109003
 X-Rspamd-Action: no action
 
-81c734dae203757fb3c9eee6f9896386940776bd was fine in and of itself, but
-its backport to 6.12 (and 6.6) broke IPv4-in-IPv6 tunneling, see [1].
-This adds a self-test for basic IPv4-in-IPv6 functionality.
+On Thu, Feb 05, 2026 at 07:46:44AM +0000, Keerthana K wrote:
+> From: Eric Dumazet <edumazet@google.com>
+> 
+> [ Upstream commit 9085e56501d93af9f2d7bd16f7fcfacdde47b99c ]
+> 
+> Use RCU in ip6_xmit() in order to use dst_dev_rcu() to prevent
+> possible UAF.
+> 
+> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+> Link: https://patch.msgid.link/20250828195823.3958522-4-edumazet@google.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+> Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
+> ---
+>  net/ipv6/ip6_output.c | 35 +++++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 14 deletions(-)
 
-[1]: https://lore.kernel.org/all/CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com/
----
- tools/testing/selftests/net/Makefile      |  1 +
- tools/testing/selftests/net/ip6_tunnel.sh | 41 +++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
- create mode 100644 tools/testing/selftests/net/ip6_tunnel.sh
+We need working versions for newer kernels first.  Please resend this
+when you have submitted patches for the newer releases.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 45c4ea381bc36..5037a344ad826 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -43,6 +43,7 @@ TEST_PROGS := \
- 	io_uring_zerocopy_tx.sh \
- 	ioam6.sh \
- 	ip6_gre_headroom.sh \
-+	ip6_tunnel.sh \
- 	ip_defrag.sh \
- 	ip_local_port_range.sh \
- 	ipv6_flowlabel.sh \
-diff --git a/tools/testing/selftests/net/ip6_tunnel.sh b/tools/testing/selftests/net/ip6_tunnel.sh
-new file mode 100644
-index 0000000000000..366f4c06cd6a3
---- /dev/null
-+++ b/tools/testing/selftests/net/ip6_tunnel.sh
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+# Test that IPv4-over-IPv6 tunneling works.
-+
-+set -e
-+
-+setup_prepare() {
-+  ip link add transport1 type veth peer name transport2
-+
-+  ip netns add ns1
-+  ip link set transport1 netns ns1
-+  ip netns exec ns1 bash <<EOF
-+  set -e
-+  ip address add 2001:db8::1/64 dev transport1 nodad
-+  ip link set transport1 up
-+  ip link add link transport1 name tunnel1 type ip6tnl mode ipip6 local 2001:db8::1 remote 2001:db8::2
-+  ip address add 172.0.0.1/32 peer 172.0.0.2/32 dev tunnel1
-+  ip link set tunnel1 up
-+EOF
-+
-+  ip netns add ns2
-+  ip link set transport2 netns ns2
-+  ip netns exec ns2 bash <<EOF
-+  set -e
-+  ip address add 2001:db8::2/64 dev transport2 nodad
-+  ip link set transport2 up
-+  ip link add link transport2 name tunnel2 type ip6tnl mode ipip6 local 2001:db8::2 remote 2001:db8::1
-+  ip address add 172.0.0.2/32 peer 172.0.0.1/32 dev tunnel2
-+  ip link set tunnel2 up
-+EOF
-+}
-+
-+cleanup() {
-+  ip netns delete ns1
-+  ip netns delete ns2
-+  # in case the namespaces haven't been set up yet
-+  ip link delete transport1
-+}
-+
-+trap cleanup EXIT
-+setup_prepare
-+ip netns exec ns1 ping -W1 -c1 172.0.0.2
--- 
-2.52.0
+thanks,
 
+greg k-h
 
