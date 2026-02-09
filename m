@@ -1,220 +1,211 @@
-Return-Path: <netdev+bounces-257891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8bEGDTFWiWlQ7AQAu9opvQ
-	(envelope-from <netdev+bounces-257891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 04:36:17 +0100
+	id eMc7Oe9XiWlQ7AQAu9opvQ
+	(envelope-from <netdev+bounces-257892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 04:43:43 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C96B10B644
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 04:36:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C53810B728
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 04:43:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7912630056D2
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 03:36:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD3EA30053E8
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 03:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCC71E1A3B;
-	Mon,  9 Feb 2026 03:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588DB2D3733;
+	Mon,  9 Feb 2026 03:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRp5hS9F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lTpUy08U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8A9145348
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 03:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EFF2C08C8
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 03:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770608173; cv=none; b=MqQ+mIvOWGB4JEdARiADBgdc/PKgzQ8h/Q5g+ARP/d137dBkOqDx83i6f7NrsPope/ZuV6IxsVJeY/bSSrT8Pyp9SvTnmNDKFEcfTlMMPjFO+PXTeljVKfGBL3/j9Vyu99S3siqjvdGVaTEPNDyv2/GHDFjmlWgK+bdp7PP3BxE=
+	t=1770608481; cv=none; b=dpcWvmWunQs0+uCoqUydR8c2JjbdLzDtgR+hHcW9T9tSrlrYqu8vXx0e2086Wb52l7OxGm5/Gxw+UoNNEdTn5oqMXIDwMNV7rI5aOmP7DdOldC1B9bMckr9WI8GD+0ShGfFwAIPvGQFW+CCIKZpPRXQl9c9Mt0AQVb1SCOwx0SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770608173; c=relaxed/simple;
-	bh=Zc5a2hdfGUaainCZYIazPgdSK5gsg+YgecuE6y5Wj48=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E1Nf0YSP48AAfVV2pLiEj0yBYtoZE5bPCPEF1zKSCMrTC3DuSOEteltTUxFxbZX9Q38gIVSW61Cl1pYCUthub3p/vEsmRtYVXzFPW7V51Cmx01yWA4l6uAlTc6u45a2vmpQWLW1URXb/Cqrlg273Cl55DiKmXZM1TRJSsT/6Pg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TRp5hS9F; arc=none smtp.client-ip=74.125.82.196
+	s=arc-20240116; t=1770608481; c=relaxed/simple;
+	bh=3AJceAjOgUXyJt5KSDzfLBLeEOi889Uss6+UnHvlaSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lOEgKnTkyuGYUOvnfYZHVQvxZWcsatpNJlM8W1Zb67iVGtpBi6wVoP13F8HC6CifIE4mt+ojMLHbOka0z9IILPIv6rwh1FHDVYwhLXFdZ/T9/K9lZEm1zAD4oA/qYUrK0dg7AMx9Wcut8XFkusF5fhVEq0qPX/1YcIYrOApnqNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lTpUy08U; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b86671f87eso1998eec.0
-        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 19:36:13 -0800 (PST)
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-502a26e8711so23120881cf.1
+        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 19:41:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770608173; x=1771212973; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RT02JK91ddCtADJwOpKsEqcnq5cQCb0/NUjhSVNWYnE=;
-        b=TRp5hS9FUw8WAKENpFw/N9oRYvmDvrlHvdHO+WGmvJvaP45wOyoYzqkAQ/dI8Wp/ra
-         wl4xeVlyM+N+dPcbtowGOiqr/N/z3Hp15zChv8ypp1Gslf3AvVDttpFVDK4EALoluzbi
-         Yoh5G6owtko8xouC7nPLX/ju1Ip0/n6T3N9o8Qo6sm/k64Fdu8vV+5LI0sHpUvvyCmTO
-         9U7j00Goe70ZezX71sIJe1839XTUW+69tuaKURxrswRsJ/9uQE644La2vwgf8YuhrKAW
-         CjHRFBuGXokSE74CqlivSy1veS3ijuGRF1K115fSXpxOCOQLK55PxI/Av2wxVs3b5bol
-         wcwQ==
+        d=gmail.com; s=20230601; t=1770608480; x=1771213280; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TmldnmLhL9SqYkNgbH+pg//X2nCE1O776WGQ3GQgbFQ=;
+        b=lTpUy08UM8WbXVy3nm02LX0xxYWLb0uUqcGK1/vQydm69MHXYEXzFhQZZJXWrCTe5a
+         g2D6/xi1eM/n0geA2xEEpCHESx4HEYlGSbrK9aex2nCjxxvdOEsbz1in27b16u6fELo+
+         4yMp8b0m1jx1MBY9JNUrq9yhK9p6gwLcvIN0OIG+wfZ5P3mgPZtsBGxEnC/jpExvwj5E
+         b2DfNO7eqPS9kxFVc2g9OjfYw5g+3Wtbdmvp6+YU941QFbx7ljOhlwyb+H00r2pCLwc6
+         5onOHgZJQ2B9wWrrty0k4NFb0ZRbAYK49WrMPRwLqQ085L5rQYfXDxvuc+6zI0zTZl73
+         OtDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770608173; x=1771212973;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RT02JK91ddCtADJwOpKsEqcnq5cQCb0/NUjhSVNWYnE=;
-        b=lJuhH++3srrCr23/871MsXtpVudclFa0AkuIySI/jqNMZWpcAhKbwBl0Aa3vZXeNGS
-         JOl17FErtq+eM82t7796NszDUWnAm2ob2c8H1CECcM9/NKHCNC6WHtCvgxVQWyEAR8id
-         CYa5O9Q8nB4dQPJkcnDjEHnbiBqvKdJ6XyBU7hgO8z8obz7GM0qgtSOwO9AgW46wKdul
-         Zz5G4SsJwtpktzlykY0cjNIowINboJQnIeltDmeXZvp4AvozZp2imf8+Qlo04R/+UTog
-         c3X04NuvSIFru5oj59BIsUWd/YiqMB7LzS/DN6JyLHPekptgdnxdnTqP+rBTlENeuBPd
-         u9nA==
-X-Gm-Message-State: AOJu0YznSkN6AZ6GD/Bp+/WMZPz10BCv+HvO/H6E45GmoxCiQQldqd0w
-	c+vlhSfmVNn/g0TGNGbp0gL8MeTs3do55wOwNdVmt/GLirdPhUp3wjImR9WhMe5h
-X-Gm-Gg: AZuq6aIj4XHgXdHccM5Ft5t6wJIbuUHf8xlZckFPlBbsmCKwLJgiqlbNiS0u9NQUXVj
-	6BxF+wmDdfv17U6QlqSO8S4ROh6oYlDD7VQeqJUTHvpEblayh36OrCvL1GyX+QAVyjhB1U9GPjB
-	hS8YA2K8nkgcE4fH2D4SDDVU6WsVFpkbTknWXi6GjCeUTwxdycSPBRZEtrNWwc6C8gIeXInuvZa
-	jpwL3b0J6srynNFFnMlkWaaBJDNJxDsoC83QszIUbK7faXZ5bBJVE2qBdS5fOo9DG1o1CNB2FZt
-	vcfVQGD2hGsWy5G1n9Ss5LNX9p/mmdfBfhUbMGSUmy3dM7qXKpB9hHVG2lCNoA6kQpnLpTgYdnv
-	vzzbZwOTBFF45mXTzMw8S/KT0JcFNgRZT2+zdtv15lHQufxQCRLwvx2Ll1s1SRyMBk2MDvkGp+N
-	qmld12n1jxQufXaw39BBdRTOP2Nlmfs2PyNhDKIhZngV6MaKLyE86w8DdTDYqrMLg1UKlv5sfr+
-	Sp4c63m4bGwfbvKRQ2peONHXED1bZ2mVmJIji4FRUfgtHV4oc8Mddm6kOp1KwOBOgk54qGak2JL
-	cuZZwW4W
-X-Received: by 2002:a05:7300:6408:b0:2b7:1ef:5867 with SMTP id 5a478bee46e88-2b85647973dmr4275149eec.16.1770608172469;
-        Sun, 08 Feb 2026 19:36:12 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-120.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.120])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ba6d1c61c3sm2010819eec.19.2026.02.08.19.36.11
+        d=1e100.net; s=20230601; t=1770608480; x=1771213280;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TmldnmLhL9SqYkNgbH+pg//X2nCE1O776WGQ3GQgbFQ=;
+        b=qf3bkDj0Y4aW5/cLumJx1ujYtC9OnUZzqWqvUDO3gKEZuEBUQ+O2OlCGX814hV44R+
+         ByZEYM24LpDq3/kh/ZJctX1Hs29t/TQCBeQf2XGjA5oTdYvLlKmR/jZd903KMFQNKmnp
+         w0jJnG9D9JCAtkbq6oOdsgBRGXgIUhHStgUlCYIO1aSMNtiOPuhKUHuuff4s+hJroHBo
+         Dxs8M98rWqzBi0MWxj3DBx7tfdlvycjQHWfzgTB5bM4rFFwYVYSm/vT/9sOx9lFUkZgj
+         KAdnLeOkJL7FCfrDpUWeetxOlMaELXRZcFRyFGEfgmgCzQWxZX3Tu4Ov1ckUja/m/Kfx
+         H27g==
+X-Gm-Message-State: AOJu0YypGBM5d1D3rOxd2nIb944BcpfQSbIMOrRJtdlF9NBZN2wGGfjd
+	qoRUoaRPaYLYo9v4Jr9MWMkDgmH9baSN9/8WGK1K0/OgzpJP1onsNqHy
+X-Gm-Gg: AZuq6aIi3nvXWVWiRREmuF+jxgzfqGLF6ORPUCrch87Qgsl2LVDKFg3A7VpgmF7Zwom
+	tGR/oVYv8OP4EE+FAKkD9fpdoct8fpn72uByGR82Hir0xwUIzDBOwTlgsWE+8wnN1gMT4pWjHov
+	o4obZVNH0x+aKtYcSm2NWXWUtXH4WvmQ2M4mFqCY6LC5uDsbeb9mFHX30MOUJTAwPxaNPKYpwQq
+	uEjrhr1N3gvV/3fxwPhruwTEba+eVOhDO9rev+oZsOpBfB41YyJrEpcALvCP1qO/moO4CFhi8aa
+	F+CxKua9GvHRzPyGMuaMAHUhcXfcCGAMRgrjnmAFcV5ocG8CllGkfs+/FnWQunbPlCL4T+LNpBb
+	zSkXcU0eoYoSMCNn9+ELqHJcxIo1S/mE/2Yo7TgKRQxyqB/HvqiwYMygnLmGilGSeOTLnW/EF4m
+	JnlIkCYZRObyy/oL+fPL7iU3/H3pUzT5fytvRqXQumJwh9iNSKTQ2p
+X-Received: by 2002:a05:622a:1386:b0:506:217e:b0e5 with SMTP id d75a77b69052e-50639675655mr130106381cf.0.1770608479777;
+        Sun, 08 Feb 2026 19:41:19 -0800 (PST)
+Received: from P5510 (h69-131-24-92.cntcnh.broadband.dynamic.tds.net. [69.131.24.92])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5063913ba7asm66837111cf.3.2026.02.08.19.41.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Feb 2026 19:36:12 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
+        Sun, 08 Feb 2026 19:41:19 -0800 (PST)
+Date: Sun, 8 Feb 2026 22:41:08 -0500
+From: Jie Zhang <jzhang918@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, jie.zhang@analog.com, horms@kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: arcnet: fix typos in comments
-Date: Sun,  8 Feb 2026 19:36:02 -0800
-Message-ID: <20260209033604.60033-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: stmmac: fix oops when split header is enabled
+Message-ID: <aYlXVIqHfdOfcAAl@P5510>
+References: <20260206195643.11333-1-jie.zhang@analog.com>
+ <aYZPUx2WrIkPmvIU@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aYZPUx2WrIkPmvIU@shell.armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257891-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257892-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[vger.kernel.org,analog.com,kernel.org,intel.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,bootlin.com,nxp.com,synopsys.com,st-md-mailman.stormreply.com,lists.infradead.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jzhang918@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6C96B10B644
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,analog.com:email]
+X-Rspamd-Queue-Id: 4C53810B728
 X-Rspamd-Action: no action
 
-The ARCnet code contains quite a few typos in comments. Fix them.
-Initially noticed by inspection, then augmented using codespell.
+On Fri, Feb 06, 2026 at 08:30:11PM +0000, Russell King (Oracle) wrote:
+> On Fri, Feb 06, 2026 at 02:56:38PM -0500, Jie Zhang wrote:
+> > For GMAC4, when split header is enabled, in some rare cases, the
+> > hardware does not fill buf2 of the first descriptor with payload.
+> > Thus we cannot assume buf2 is always fully filled if it is not
+> > the last descriptor. Otherwise, the length of buf2 of the second
+> > descriptor will be calculated wrong and cause an oops:
+> > 
+> > Unable to handle kernel paging request at virtual address ffff00019246bfc0
+> > ...
+> > x2 : 0000000000000040 x1 : ffff00019246bfc0 x0 : ffff00009246c000
+> > Call trace:
+> >  dcache_inval_poc+0x28/0x58 (P)
+> >  dma_direct_sync_single_for_cpu+0x38/0x6c
+> >  __dma_sync_single_for_cpu+0x34/0x6c
+> >  stmmac_napi_poll_rx+0x8f0/0xb60
+> >  __napi_poll.constprop.0+0x30/0x144
+> >  net_rx_action+0x160/0x274
+> >  handle_softirqs+0x1b8/0x1fc
+> > ...
+> > 
+> > To fix this, the PL bit-field in RDES3 register is used for all
+> > descriptors, whether it is the last descriptor or not.
+> > 
+> > Fixes: ec222003bd94 ("net: stmmac: Prepare to add Split Header support")
+> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Signed-off-by: Jie Zhang <jie.zhang@analog.com>
+> > ---
+> > v2:
+> > 1. Update for the latest net HEAD
+> > 2. Reduce crash dump message in commit message
+> > 3. Add Fixes tag
+> > v1 link: https://lore.kernel.org/all/20251202025421.4560-1-jie.zhang@analog.com/
+> 
+> I was trying to work out whether this was a re-post of a patch that had
+> already been merged and it was the result of someone inappropriately
+> re-posting old patches, or whether it was something to take seriously.
+> 
+> That is because of this in the patch:
+> 
+> > +	/* Not GMAC4 and not last descriptor */
+> > +	if (!priv->plat->has_gmac4 && (status & rx_not_ls))
+> 
+> Commit 26ab9830beab ("net: stmmac: replace has_xxxx with core_type"):
+> 
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 99022620457a..151c81c560c8 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> ...
+> +       enum dwmac_core_type core_type;
+> ...
+> -       int has_gmac4;
+> 
+> So, has_gmac4 no longer exists, and hasn't done since October last
+> year.
+> 
+> Thus, it seems your patch has been generated against an old kernel.
+> As you are submitting for netdev, it is a good idea to ensure that
+> patches apply to the net-next tree and/or net tree depending on
+> which one you are targetting, and have been tested against that
+> tree.
+> 
+Thanks. This is a new version of the patch I sent last year. I tested
+the original version again the net tree. But I forgot to test the new
+version again. I just test it now on the latest net tree with other
+patches for our board. But Ethernet stops working. I'm trying to figure
+out what causes this new issue. After that I will send out a new version
+of this patch.
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/arcnet/arc-rimi.c  |  2 +-
- drivers/net/arcnet/arcdevice.h | 10 +++++-----
- drivers/net/arcnet/rfc1201.c   |  2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/arcnet/arc-rimi.c b/drivers/net/arcnet/arc-rimi.c
-index 53d10a04d1bd..fb3d3565aa9a 100644
---- a/drivers/net/arcnet/arc-rimi.c
-+++ b/drivers/net/arcnet/arc-rimi.c
-@@ -185,7 +185,7 @@ static int __init arcrimi_found(struct net_device *dev)
- 	lp->hw.copy_to_card = arcrimi_copy_to_card;
- 	lp->hw.copy_from_card = arcrimi_copy_from_card;
- 
--	/* re-reserve the memory region - arcrimi_probe() alloced this reqion
-+	/* re-reserve the memory region - arcrimi_probe() allocated this reqion
- 	 * but didn't know the real size.  Free that region and then re-get
- 	 * with the correct size.  There is a VERY slim chance this could
- 	 * fail.
-diff --git a/drivers/net/arcnet/arcdevice.h b/drivers/net/arcnet/arcdevice.h
-index 6a5af0943567..1950df5dbbe6 100644
---- a/drivers/net/arcnet/arcdevice.h
-+++ b/drivers/net/arcnet/arcdevice.h
-@@ -137,7 +137,7 @@ do {									\
- #define TXACKflag       0x02	/* transmitted msg. ackd */
- #define RECONflag       0x04	/* network reconfigured */
- #define TESTflag        0x08	/* test flag */
--#define EXCNAKflag      0x08    /* excesive nak flag */
-+#define EXCNAKflag      0x08    /* excessive nak flag */
- #define RESETflag       0x10	/* power-on-reset */
- #define RES1flag        0x20	/* reserved - usually set by jumper */
- #define RES2flag        0x40	/* reserved - usually set by jumper */
-@@ -166,7 +166,7 @@ do {									\
- #define RESETclear      0x08	/* power-on-reset */
- #define CONFIGclear     0x10	/* system reconfigured */
- 
--#define EXCNAKclear     0x0E    /* Clear and acknowledge the excive nak bit */
-+#define EXCNAKclear     0x0E    /* Clear and acknowledge the excessive nak bit */
- 
- /* flags for "load test flags" command */
- #define TESTload        0x08	/* test flag (diagnostic) */
-@@ -194,7 +194,7 @@ do {									\
- struct ArcProto {
- 	char suffix;		/* a for RFC1201, e for ether-encap, etc. */
- 	int mtu;		/* largest possible packet */
--	int is_ip;              /* This is a ip plugin - not a raw thing */
-+	int is_ip;              /* This is an ip plugin - not a raw thing */
- 
- 	void (*rx)(struct net_device *dev, int bufnum,
- 		   struct archdr *pkthdr, int length);
-@@ -257,7 +257,7 @@ struct arcnet_local {
- 	char *card_name;	/* card ident string */
- 	int card_flags;		/* special card features */
- 
--	/* On preemtive and SMB a lock is needed */
-+	/* On preemptive and SMP a lock is needed */
- 	spinlock_t lock;
- 
- 	struct led_trigger *tx_led_trig;
-@@ -299,7 +299,7 @@ struct arcnet_local {
- 	int num_recons;		/* number of RECONs between first and last. */
- 	int network_down;	/* do we think the network is down? */
- 
--	int excnak_pending;    /* We just got an excesive nak interrupt */
-+	int excnak_pending;    /* We just got an excessive nak interrupt */
- 
- 	/* RESET flag handling */
- 	int reset_in_progress;
-diff --git a/drivers/net/arcnet/rfc1201.c b/drivers/net/arcnet/rfc1201.c
-index 0edf35d971c5..f2ec58d06fc3 100644
---- a/drivers/net/arcnet/rfc1201.c
-+++ b/drivers/net/arcnet/rfc1201.c
-@@ -235,7 +235,7 @@ static void rx(struct net_device *dev, int bufnum,
- 		skb->protocol = type_trans(skb, dev);
- 		netif_rx(skb);
- 	} else {		/* split packet */
--		/* NOTE: MSDOS ARP packet correction should only need to
-+		/* NOTE: MS-DOS ARP packet correction should only need to
- 		 * apply to unsplit packets, since ARP packets are so short.
- 		 *
- 		 * My interpretation of the RFC1201 document is that if a
--- 
-2.43.0
-
+Jie
 
