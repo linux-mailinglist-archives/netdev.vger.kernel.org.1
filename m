@@ -1,1181 +1,171 @@
-Return-Path: <netdev+bounces-257918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Dc7BculiWkhAQUAu9opvQ
-	(envelope-from <netdev+bounces-257918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 10:15:55 +0100
+	id yHNtLk6oiWk0AQUAu9opvQ
+	(envelope-from <netdev+bounces-257919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 10:26:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB4A10D697
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 10:15:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F0410D8A5
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 10:26:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AE3C93001F95
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 09:15:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C3A73029247
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 09:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93597352C57;
-	Mon,  9 Feb 2026 09:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499DA36404D;
+	Mon,  9 Feb 2026 09:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A9EuzIOA"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="WGTOzOTv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D814352C20;
-	Mon,  9 Feb 2026 09:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4A2363C75;
+	Mon,  9 Feb 2026 09:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770628550; cv=none; b=ssMXhGXYHaw5T+4ipZVfenId/IXjeO+JmZ96xoDSl+UFqLYET/7pbMeKaqY3iONO8osud7v3kwd6Qfpe3MGAmIGpMA933oYZ7A4WUZ8JiykQT3h5BQAMmEEb70wlfc2BQMAe/6g5DVKjns2SYm4wRFkmkS7yNggPbmSH1Ip1wpA=
+	t=1770629141; cv=none; b=LNeC7siF8h8f77mLK/6j8j0Qub+sliet+57yXegvP1xsFV1QWcd+o0gbEHJQIcB4o1DLWjmxmbNZIfYsgdNG/KJ9Vdnmf6pY6BzCq+p3bqp4vDz35fzKw1xPANOdlHij/mwXrFUqmd4bzV79mlYD5FOruuzicraomsS4Im/9Xuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770628550; c=relaxed/simple;
-	bh=T9ryNo94AOHJwGOg1XD/GW2UK/cPvOGhgFL10BL8CV0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jxvbfug43bOihjOXymVFvH0TMYkGL1TiogIYfTk4Cepq2ZhknWzplq/zUqYozgmqGCs0lQU/Cb5AjG4EAsjz6/PfK/o33iC9M+cwrtzwH0+DXJkVJKe6eQJAsC8YCFCnHWqLYZOiCyB2Q8LuW9E7uUcK4yWOmbtL+ROhaMUQGuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A9EuzIOA; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770628550; x=1802164550;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=T9ryNo94AOHJwGOg1XD/GW2UK/cPvOGhgFL10BL8CV0=;
-  b=A9EuzIOApxC/40PteDcN+gZMLlmCnpvTl24ID3hrOytr/a/k57Zl7/11
-   /B9cdKaaghsMDBddwXCFcmGoQidH1NmvjXVv4y/8YIDR843nXzn9zZ317
-   8u7xNvXilb6kzc2qy4d1kswfCxzgvIhYDKhO3ycaZcLFxLvtvSdEyot2i
-   xWhncgocMAyL/vCHkHLFXS9Ypb2L/8dlqr6wAkAhmpsFF6eY+ucCKwm60
-   x7PYD5O1zxumzCZ2SFbMkybJnGgePvWKoCPUyYo9+AnzY5r9Vaws4uch+
-   oKxY2U9GV0TVBs+tg5WZKuDMh/5Jgua4q0dwyqGS6ZxumjP/reMN7uKx3
-   Q==;
-X-CSE-ConnectionGUID: lKUw3OINTRCP9oTT0mOkqA==
-X-CSE-MsgGUID: hp5ukW7ITBayUWn0r3hQvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11695"; a="83178690"
-X-IronPort-AV: E=Sophos;i="6.21,281,1763452800"; 
-   d="scan'208";a="83178690"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 01:15:50 -0800
-X-CSE-ConnectionGUID: ljbzEhDVQFCPa7JVCV4nng==
-X-CSE-MsgGUID: L/t7JT6yQKW/IE1FxwVw5w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,281,1763452800"; 
-   d="scan'208";a="216031736"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orviesa004.jf.intel.com with ESMTP; 09 Feb 2026 01:15:46 -0800
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pmenzel@molgen.mpg.de,
-	aleksandr.loktionov@intel.com,
-	horms@kernel.org,
-	grzegorz.nitka@intel.com,
-	vgrinber@redhat.com,
-	zoltan.fodor@intel.com,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-next v10] ice: add support for unmanaged DPLL on E830 NIC
-Date: Mon,  9 Feb 2026 10:09:13 +0100
-Message-Id: <20260209090913.326407-1-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1770629141; c=relaxed/simple;
+	bh=05K8TWV9dpvcJhZ2rqQO6azRpczq1hfALsFzwpyjmr8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gASh9o/CqBrzoiwxSj3VlVB19xc5lABdyk5Vvv3t+raQSPF90eHCBGD1xMFMI2W4kND/zT6mQnopTKnx2Gz/zzrpOcGzdqJIznHVHYfe4xtso0l5VyMifVs8DLsbH4YU8KwDKjUwnXA4eBHdCl8lzpy5MR179VeQbRDiNGsVJXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=WGTOzOTv; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id EB464207B0;
+	Mon,  9 Feb 2026 10:25:37 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WzmFvrKXPlOt; Mon,  9 Feb 2026 10:25:37 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 1DA08200BC;
+	Mon,  9 Feb 2026 10:25:37 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 1DA08200BC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1770629137;
+	bh=X8/Gkp4jZDTvQCCNExEJYRQtaBUiRVRdsdPll8FLG5E=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=WGTOzOTvIqFfkq6uXmajzatZtPH0eWqzvl0/OQnkKEsAbhOcZcpGppRlEsHigC11K
+	 rD4EtmGnQj9tOJKQ7VygO85RK0KkvOtwA3Zh5af5TSkq9lXYMXXQ0Cbor+4ovidkbs
+	 Cbf7fgQBWkMn4eiGhA5jphv6zL8IJP6GDSr2zfuvmxC34wP6+5tcHx/dor9NjxwgbO
+	 H5zt2EK8r9MGuyj/aElM3aLpwyN/qnwmzY4XmQFH5zPu0BTXyTlwnb+eIyrZjUHCQG
+	 +t6154sMs5716nE05TuRBl6WZakJbDlJ0n98o8FrvItQHcck27HnXTQNriXH5AB0PE
+	 WOiBlrqjwvLjQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 9 Feb
+ 2026 10:25:36 +0100
+Received: (nullmailer pid 1423521 invoked by uid 1000);
+	Mon, 09 Feb 2026 09:25:36 -0000
+Date: Mon, 9 Feb 2026 10:25:35 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+CC: Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
+	linux-security-module <linux-security-module@vger.kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Network Development
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+Message-ID: <aYmoDwO-YXrc4W1c@secunet.com>
+References: <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
+ <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
+ <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
+ <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com>
+ <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
+ <CAHC9VhQPKU5DqG-ryZsiCV2vZeGGf_a-JStR_LVVCCn03C4usQ@mail.gmail.com>
+ <f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp>
+ <CAHC9VhRzRAR+hhn4TFADnHWpzjOxjmh0S_Hg_HktkPkKQ35ycg@mail.gmail.com>
+ <74a70504-8ff8-4d97-b35f-774364779889@I-love.SAKURA.ne.jp>
+ <7ef21dab-3805-4eae-80d7-9779aeff3f58@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <7ef21dab-3805-4eae-80d7-9779aeff3f58@I-love.SAKURA.ne.jp>
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arkadiusz.kubalewski@intel.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	TAGGED_FROM(0.00)[bounces-257919-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257918-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 5FB4A10D697
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 24F0410D8A5
 X-Rspamd-Action: no action
 
-Hardware variants of E830 may support an unmanaged DPLL where the
-configuration is hardcoded within the hardware and firmware, meaning
-users cannot modify settings. However, users are able to check the DPLL
-lock status and obtain configuration information through the Linux DPLL
-and devlink health subsystem.
+On Wed, Feb 04, 2026 at 10:57:30PM +0900, Tetsuo Handa wrote:
+> On 2026/02/04 19:15, Tetsuo Handa wrote:
+> > On 2026/02/04 7:40, Paul Moore wrote:
+> >>         This is not an unusual request for such a proposed change, and
+> >> is something that I would expect a LSM maintainer to do without much
+> >> hesitation.  If you are unwilling to investigate this, can you explain
+> >> why?
+> > 
+> > Because I'm not familiar with how XFRM works; I'm not a user of LSM XFRM hooks.
+> > 
+> > I can't judge whether the current code is COMPREHENSIVELY GATING;
+> > I can't imagine what the state you call COMPREHENSIVELY GATING is.
+> 
+> Steffen Klassert worried that killing xfrm_dev_state_flush_secctx_check() and
+> xfrm_dev_policy_flush_secctx_check() might violate a LSM policy and you agreed
+> ( https://lkml.kernel.org/r/CAHC9VhQ54LRD7k_x6tUju2kPVBEHcdgBh46_hBN8btG0vhfy_w@mail.gmail.com ),
+> but the reality is that nobody in the world has enforced an LSM policy for almost 9 years
+> that makes xfrm_dev_{state,policy}_flush() no-op. That is, xfrm_dev_state_flush_secctx_check()
+> and xfrm_dev_policy_flush_secctx_check() had been effectively unused.
+> 
+> Killing xfrm_dev_state_flush_secctx_check() and xfrm_dev_policy_flush_secctx_check()
+> increases "system's stability" without sacrificing "authorization".
+> 
+> It is up to SELinux developers to discuss what actions to take as a compensation for
+> killing xfrm_dev_state_flush_secctx_check() and xfrm_dev_policy_flush_secctx_check().
+> The compensation might be to add LSM hooks to immediately before the point of no return.
 
-Availability of 'loss of lock' health status code determines if such
-support is available, if true, register single DPLL device with 1 input
-and 1 output and provide hardcoded/read only properties of a pin and
-DPLL device. User is only allowed to check DPLL device status and receive
-notifications on DPLL lock status change.
+The problem is that, with adding IPsec offloads to netdevices, security
+critical resources came into the netdevices. Someone who has no
+capabilities to delete xfrm states or xfrm policies should not be able
+to unregister the netdevice if xfrm states or xfrm policies are
+offloaded. Unfortunately, unregistering can't be canceled at this stage
+anymore. So I think we need some netdevice unregistration hook for
+the LSM subsystem so it can check for xfrm states or xfrm policies
+and refuse the unregistration before we actually start to remove
+the device.
 
-When present, the DPLL device locks to an external signal provided
-through the PCIe/OCP pin. The expected input signal is 1PPS
-(1 Pulse Per Second) embedded on a 10MHz reference clock.
-The DPLL produces output:
-- for MAC (Media Access Control) & PHY (Physical Layer) clocks,
-- 1PPS for synchronization of onboard PHC (Precision Hardware Clock) timer.
+The same happened btw. when xfrm was made per network namespace.
+Here we just leak the xfrm states and xfrm policies if some
+LSM refuses to remove them.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v10:
-- move mutex so is always initialized when used
-- check and use return value of ice_dpll_lock_state_init_unmanaged()
-v9:
-- reorder the flow of ice_dpll_init_direct_pins, drop if no cgu and make less
-  indentation
-- remove floating code block
-v8:
-- fix uninitalized bool *supported
-- fix properly set esync->range_num
-v7:
-- validate 'first' is present on error path
-v6:
-- change dpll type EEC -> PPS, this dpll serves both functionalisites but PPS
-  is superset of EEC type
-- use DPLL_MODE_MANUAL instead of AUTOMATIC, which is correct for the input
-  pins that doesn't have capability to set the priority
-v5:
-- rebased (baseline does not include dependent e825C patches now)
-- added health status notification (thru devlink and DPLL subsystem)
-v4:
-- add correct strcuture for reading supported health status codes and
-  use it to parse the outcome of 0xFF21 AQ command.
----
- .../device_drivers/ethernet/intel/ice.rst     |  83 +++++
- .../net/ethernet/intel/ice/devlink/health.c   |   4 +
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  12 +
- drivers/net/ethernet/intel/ice/ice_common.c   | 136 ++++++++
- drivers/net/ethernet/intel/ice/ice_common.h   |   8 +
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 320 ++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_dpll.h     |  11 +
- drivers/net/ethernet/intel/ice/ice_main.c     |  11 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  46 +++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
- 10 files changed, 608 insertions(+), 24 deletions(-)
-
-diff --git a/Documentation/networking/device_drivers/ethernet/intel/ice.rst b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-index 0bca293cf9cb..7c24761d1008 100644
---- a/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-+++ b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-@@ -941,6 +941,89 @@ To see input signal on those PTP pins, you need to configure DPLL properly.
- Output signal is only visible on DPLL and to send it to the board SMA/U.FL pins,
- DPLL output pins have to be manually configured.
- 
-+Unmanaged DPLL Support
-+----------------------
-+Hardware variants of E830 may support an unmanaged DPLL:
-+
-+- Intel® Ethernet Network Adapter E830-XXVDA8F for OCP 3.0,
-+
-+- Intel® Ethernet Network Adapter E830-XXVDA4F.
-+
-+In the case of the unmanaged DPLL, the configuration is hardcoded within the
-+hardware and firmware, meaning users cannot modify settings. However,
-+users can check the DPLL lock status and obtain configuration information
-+through the Linux DPLL subsystem.
-+
-+When present, the DPLL device locks to an external signal provided through the
-+PCIe/OCP pin. The expected input signal is 1PPS (1 Pulse Per Second) embedded
-+on a 10MHz reference clock.
-+The DPLL produces output:
-+
-+- for MAC (Media Access Control) & PHY (Physical Layer) clocks,
-+
-+- 1PPS for synchronization of onboard PHC (Precision Hardware Clock) timer.
-+
-+Requirements: The Linux kernel must have support for both the DPLL Subsystem
-+and the Embedded Sync patch series.
-+
-+Example output of querying the Linux DPLL subsystem can be found below.
-+
-+.. code-block:: console
-+  :caption: Dumping the DPLL pins
-+
-+  $ <ynl> --spec Documentation/netlink/specs/dpll.yaml --dump pin-get
-+  [{'board-label': '1588-TIME_SYNC',
-+    'capabilities': set(),
-+    'clock-id': 282574471561216,
-+    'esync-frequency': 1,
-+    'esync-frequency-supported': [{'frequency-max': 1, 'frequency-min': 1}],
-+    'esync-pulse': 25,
-+    'frequency': 10000000,
-+    'id': 13,
-+    'module-name': 'ice',
-+    'parent-device': [{'direction': 'input',
-+                       'parent-id': 6,
-+                       'state': 'connected'}],
-+    'phase-adjust-max': 0,
-+    'phase-adjust-min': 0,
-+    'type': 'ext'},
-+    {'board-label': 'MAC-PHY-CLK',
-+      'capabilities': set(),
-+    'clock-id': 282574471561216,
-+    'frequency': 156250000,
-+    'id': 14,
-+    'module-name': 'ice',
-+    'parent-device': [{'direction': 'output',
-+                       'parent-id': 6,
-+                       'state': 'connected'}],
-+    'phase-adjust-max': 0,
-+    'phase-adjust-min': 0,
-+    'type': 'synce-eth-port'},
-+  {'board-label': '1588-TIME_REF',
-+    'capabilities': set(),
-+    'clock-id': 282574471561216,
-+    'frequency': 1,
-+    'id': 15,
-+    'module-name': 'ice',
-+    'parent-device': [{'direction': 'output',
-+                       'parent-id': 6,
-+                       'state': 'connected'}],
-+    'phase-adjust-max': 0,
-+    'phase-adjust-min': 0,
-+    'type': 'int-oscillator'}]
-+
-+.. code-block:: console
-+  :caption: Dumping the DPLL devices
-+
-+  $ <ynl> --spec Documentation/netlink/specs/dpll.yaml --dump device-get
-+  [{'clock-id': 282574471561216,
-+    'id': 6,
-+    'lock-status': 'locked',
-+    'mode': 'manual',
-+    'mode-supported': ['manual'],
-+    'module-name': 'ice',
-+    'type': 'pps'}]
-+
- GNSS module
- -----------
- Requires kernel compiled with CONFIG_GNSS=y or CONFIG_GNSS=m.
-diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-index 8e9a8a8178d4..31e6c5107c97 100644
---- a/drivers/net/ethernet/intel/ice/devlink/health.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-@@ -101,6 +101,8 @@ static const struct ice_health_status ice_health_status_lookup[] = {
- 		"Supplied MIB file is invalid. DCB reverted to default configuration.",
- 		"Disable FW-LLDP and check DCBx system configuration.",
- 		{ice_port_number_label, "MIB ID"}},
-+	{ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK, "Local DPLL lock status",
-+		NULL,},
- };
- 
- static int ice_health_status_lookup_compare(const void *a, const void *b)
-@@ -242,6 +244,8 @@ void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info
- 				pf->health_reporters.fw_status = *health_info;
- 				devlink_health_report(pf->health_reporters.fw,
- 						      "FW syndrome reported", NULL);
-+				if (status_code == ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK)
-+					ice_dpll_lock_state_set_unmanaged(pf, health_info, true);
- 				break;
- 			case ICE_AQC_HEALTH_STATUS_PF:
- 			case ICE_AQC_HEALTH_STATUS_PORT:
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index b2685ebd37d6..2064efcdea19 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1498,6 +1498,7 @@ struct ice_aqc_get_link_topo {
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_PCA9575		0x21
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032	0x24
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_SI5383_5384	0x25
-+#define ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL80640		0x27
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_E822_PHY		0x30
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_C827		0x31
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_CLK_MUX	0x47
-@@ -2481,11 +2482,14 @@ enum ice_aqc_health_status {
- 	ICE_AQC_HEALTH_STATUS_ERR_BMC_RESET			= 0x50B,
- 	ICE_AQC_HEALTH_STATUS_ERR_LAST_MNG_FAIL			= 0x50C,
- 	ICE_AQC_HEALTH_STATUS_ERR_RESOURCE_ALLOC_FAIL		= 0x50D,
-+	ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK			= 0x601,
- 	ICE_AQC_HEALTH_STATUS_ERR_FW_LOOP			= 0x1000,
- 	ICE_AQC_HEALTH_STATUS_ERR_FW_PFR_FAIL			= 0x1001,
- 	ICE_AQC_HEALTH_STATUS_ERR_LAST_FAIL_AQ			= 0x1002,
- };
- 
-+#define ICE_AQC_HEALTH_STATUS_CODE_NUM				64
-+
- /* Get Health Status (indirect 0xFF22) */
- struct ice_aqc_get_health_status {
- 	__le16 health_status_count;
-@@ -2512,6 +2516,13 @@ struct ice_aqc_health_status_elem {
- 	__le32 internal_data2;
- };
- 
-+/* Get Health Status response buffer entry, (0xFF21)
-+ * repeated per reported health status
-+ */
-+struct ice_aqc_health_status_supp_elem {
-+	__le16 health_status_code;
-+};
-+
- /* Admin Queue command opcodes */
- enum ice_adminq_opc {
- 	/* AQ commands */
-@@ -2675,6 +2686,7 @@ enum ice_adminq_opc {
- 
- 	/* System Diagnostic commands */
- 	ice_aqc_opc_set_health_status_cfg		= 0xFF20,
-+	ice_aqc_opc_get_supported_health_status_codes	= 0xFF21,
- 	ice_aqc_opc_get_health_status			= 0xFF22,
- 
- 	/* FW Logging Commands */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 8866902efb91..0fde268378f4 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -3051,6 +3051,29 @@ bool ice_is_cgu_in_netlist(struct ice_hw *hw)
- 	return false;
- }
- 
-+/**
-+ * ice_is_unmanaged_cgu_in_netlist - check for unmanaged CGU presence
-+ * @hw: pointer to the hw struct
-+ *
-+ * Check if the unmanaged Clock Generation Unit (CGU) device is present in the netlist.
-+ * Save the CGU part number in the hw structure for later use.
-+ * Return:
-+ * * true - unmanaged cgu is present
-+ * * false - unmanaged cgu is not present
-+ */
-+bool ice_is_unmanaged_cgu_in_netlist(struct ice_hw *hw)
-+{
-+	if (!ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
-+				   ICE_AQC_LINK_TOPO_NODE_CTX_GLOBAL,
-+				   ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL80640,
-+				   NULL)) {
-+		hw->cgu_part_number = ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL80640;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * ice_is_gps_in_netlist
-  * @hw: pointer to the hw struct
-@@ -6313,6 +6336,119 @@ bool ice_is_fw_health_report_supported(struct ice_hw *hw)
- 				     ICE_FW_API_HEALTH_REPORT_PATCH);
- }
- 
-+/**
-+ * ice_aq_get_health_status_supported - get supported health status codes
-+ * @hw: pointer to the HW struct
-+ * @buff: pointer to buffer where health status elements will be stored
-+ * @num: number of health status elements buffer can hold
-+ *
-+ * Return:
-+ * * 0 - success,
-+ * * negative - AQ error code.
-+ */
-+static int
-+ice_aq_get_health_status_supported(struct ice_hw *hw,
-+				   struct ice_aqc_health_status_supp_elem *buff,
-+				   int num)
-+{
-+	u16 code = ice_aqc_opc_get_supported_health_status_codes;
-+	struct libie_aq_desc desc;
-+
-+	ice_fill_dflt_direct_cmd_desc(&desc, code);
-+
-+	return ice_aq_send_cmd(hw, &desc, buff, num * sizeof(*buff), NULL);
-+}
-+
-+/**
-+ * ice_aq_get_health_status - get current health status array from the firmware
-+ * @hw: pointer to the HW struct
-+ * @buff: pointer to buffer where health status elements will be stored
-+ * @num: number of health status elements buffer can hold
-+ *
-+ * Return:
-+ * * 0 - success,
-+ * * negative - AQ error code.
-+ */
-+int ice_aq_get_health_status(struct ice_hw *hw,
-+			     struct ice_aqc_health_status_elem *buff, int num)
-+{
-+	struct libie_aq_desc desc;
-+
-+	ice_fill_dflt_direct_cmd_desc(&desc,
-+				      ice_aqc_opc_get_health_status);
-+
-+	return ice_aq_send_cmd(hw, &desc, buff, num * sizeof(*buff), NULL);
-+}
-+
-+/**
-+ * ice_is_health_status_code_supported - check if health status code is supported
-+ * @hw: pointer to the hardware structure
-+ * @code: health status code to check
-+ * @supported: pointer to boolean result
-+ *
-+ * Return: 0 on success, negative error code otherwise
-+ */
-+int ice_is_health_status_code_supported(struct ice_hw *hw, u16 code,
-+					bool *supported)
-+{
-+	const int BUFF_SIZE = ICE_AQC_HEALTH_STATUS_CODE_NUM;
-+	struct ice_aqc_health_status_supp_elem *buff;
-+	int ret;
-+
-+	*supported = false;
-+	buff = kcalloc(BUFF_SIZE, sizeof(*buff), GFP_KERNEL);
-+	if (!buff)
-+		return -ENOMEM;
-+	ret = ice_aq_get_health_status_supported(hw, buff, BUFF_SIZE);
-+	if (ret)
-+		goto free_buff;
-+	for (int i = 0; i < BUFF_SIZE && buff[i].health_status_code; i++)
-+		if (le16_to_cpu(buff[i].health_status_code) == code) {
-+			*supported = true;
-+			break;
-+		}
-+
-+free_buff:
-+	kfree(buff);
-+	return ret;
-+}
-+
-+/**
-+ * ice_get_last_health_status_code - get last health status for given code
-+ * @hw: pointer to the hardware structure
-+ * @out: pointer to the health status struct to be filled
-+ * @code: health status code to check
-+ *
-+ * Return: 0 on success, negative error code otherwise
-+ */
-+int ice_get_last_health_status_code(struct ice_hw *hw,
-+				    struct ice_aqc_health_status_elem *out,
-+				    u16 code)
-+{
-+	const int BUFF_SIZE = ICE_AQC_HEALTH_STATUS_CODE_NUM;
-+	struct ice_aqc_health_status_elem *buff;
-+	int ret, last_status = -1;
-+
-+	buff = kcalloc(BUFF_SIZE, sizeof(*buff), GFP_KERNEL);
-+	if (!buff)
-+		return -ENOMEM;
-+	ret = ice_aq_get_health_status(hw, buff, BUFF_SIZE);
-+	if (ret)
-+		goto free_buff;
-+	for (int i = 0; i < BUFF_SIZE && buff[i].health_status_code; i++)
-+		if (le16_to_cpu(buff[i].health_status_code) == code)
-+			last_status = i;
-+
-+	if (last_status >= 0)
-+		memcpy(out, &buff[last_status], sizeof(*out));
-+	else
-+		memset(out, 0, sizeof(*out));
-+
-+free_buff:
-+	kfree(buff);
-+	return ret;
-+}
-+
- /**
-  * ice_aq_set_health_status_cfg - Configure FW health events
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index ff6393e9be0c..ebced9edd5e3 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -162,6 +162,7 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
- bool ice_is_phy_rclk_in_netlist(struct ice_hw *hw);
- bool ice_is_clock_mux_in_netlist(struct ice_hw *hw);
- bool ice_is_cgu_in_netlist(struct ice_hw *hw);
-+bool ice_is_unmanaged_cgu_in_netlist(struct ice_hw *hw);
- bool ice_is_gps_in_netlist(struct ice_hw *hw);
- int
- ice_aq_get_netlist_node(struct ice_hw *hw, struct ice_aqc_get_link_topo *cmd,
-@@ -188,6 +189,13 @@ ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
- 			      struct ice_port_info *pi);
- bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
- bool ice_is_fw_health_report_supported(struct ice_hw *hw);
-+int ice_aq_get_health_status(struct ice_hw *hw,
-+			     struct ice_aqc_health_status_elem *buff, int num);
-+int ice_is_health_status_code_supported(struct ice_hw *hw, u16 code,
-+					bool *supported);
-+int ice_get_last_health_status_code(struct ice_hw *hw,
-+				    struct ice_aqc_health_status_elem *out,
-+				    u16 code);
- int ice_aq_set_health_status_cfg(struct ice_hw *hw, u8 event_source);
- int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
- 				u8 serdes_num, int *output);
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 53b54e395a2e..26b5b2c29041 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -17,6 +17,8 @@
- #define ICE_DPLL_SW_PIN_INPUT_BASE_SFP		4
- #define ICE_DPLL_SW_PIN_INPUT_BASE_QSFP		6
- #define ICE_DPLL_SW_PIN_OUTPUT_BASE		0
-+#define ICE_DPLL_HEALTH_STATUS_LOCKED		1
-+#define ICE_DPLL_HEALTH_STATUS_UNLOCKED		0
- 
- #define ICE_DPLL_PIN_SW_INPUT_ABS(in_idx) \
- 	(ICE_DPLL_SW_PIN_INPUT_BASE_SFP + (in_idx))
-@@ -79,6 +81,10 @@ static const struct dpll_pin_frequency ice_esync_range[] = {
- 	DPLL_PIN_FREQUENCY_RANGE(0, DPLL_PIN_FREQUENCY_1_HZ),
- };
- 
-+static const struct dpll_pin_frequency ice_esync_range_unmanaged[] = {
-+	DPLL_PIN_FREQUENCY_1PPS,
-+};
-+
- /**
-  * ice_dpll_is_sw_pin - check if given pin shall be controlled by SW
-  * @pf: private board structure
-@@ -1008,9 +1014,11 @@ ice_dpll_pin_state_get(const struct dpll_pin *pin, void *pin_priv,
- 		return -EBUSY;
- 
- 	mutex_lock(&pf->dplls.lock);
--	ret = ice_dpll_pin_state_update(pf, p, pin_type, extack);
--	if (ret)
--		goto unlock;
-+	if (!pf->dplls.unmanaged) {
-+		ret = ice_dpll_pin_state_update(pf, p, pin_type, extack);
-+		if (ret)
-+			goto unlock;
-+	}
- 	if (pin_type == ICE_DPLL_PIN_TYPE_INPUT ||
- 	    pin_type == ICE_DPLL_PIN_TYPE_OUTPUT)
- 		*state = p->state[d->dpll_idx];
-@@ -2036,9 +2044,14 @@ ice_dpll_input_esync_get(const struct dpll_pin *pin, void *pin_priv,
- 		mutex_unlock(&pf->dplls.lock);
- 		return -EOPNOTSUPP;
- 	}
--	esync->range = ice_esync_range;
--	esync->range_num = ARRAY_SIZE(ice_esync_range);
--	if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN) {
-+	if (pf->dplls.unmanaged) {
-+		esync->range = ice_esync_range_unmanaged;
-+		esync->range_num = ARRAY_SIZE(ice_esync_range_unmanaged);
-+	} else {
-+		esync->range = ice_esync_range;
-+		esync->range_num = ARRAY_SIZE(ice_esync_range);
-+	}
-+	if (p->flags[0] & ICE_DPLL_IN_ESYNC_ENABLED) {
- 		esync->freq = DPLL_PIN_FREQUENCY_1_HZ;
- 		esync->pulse = ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT;
- 	} else {
-@@ -2436,6 +2449,21 @@ static const struct dpll_pin_ops ice_dpll_output_ops = {
- 	.esync_get = ice_dpll_output_esync_get,
- };
- 
-+static const struct dpll_pin_ops ice_dpll_input_unmanaged_ops = {
-+	.frequency_get = ice_dpll_input_frequency_get,
-+	.direction_get = ice_dpll_input_direction,
-+	.state_on_dpll_get = ice_dpll_input_state_get,
-+#if defined(HAVE_DPLL_ESYNC)
-+	.esync_get = ice_dpll_input_esync_get,
-+#endif /* HAVE_DPLL_ESYNC */
-+};
-+
-+static const struct dpll_pin_ops ice_dpll_output_unmanaged_ops = {
-+	.frequency_get = ice_dpll_output_frequency_get,
-+	.direction_get = ice_dpll_output_direction,
-+	.state_on_dpll_get = ice_dpll_output_state_get,
-+};
-+
- static const struct dpll_device_ops ice_dpll_ops = {
- 	.lock_status_get = ice_dpll_lock_status_get,
- 	.mode_get = ice_dpll_mode_get,
-@@ -2994,12 +3022,15 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool cgu,
- 	int ret;
- 
- 	ret = ice_dpll_get_pins(pf, pins, start_idx, count, pf->dplls.clock_id);
--	if (ret)
-+	if (!cgu)
- 		return ret;
--	if (cgu) {
-+
-+	if (first) {
- 		ret = ice_dpll_register_pins(first, pins, ops, count);
- 		if (ret)
- 			goto release_pins;
-+	}
-+	if (second) {
- 		ret = ice_dpll_register_pins(second, pins, ops, count);
- 		if (ret)
- 			goto unregister_first;
-@@ -3008,7 +3039,8 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool cgu,
- 	return 0;
- 
- unregister_first:
--	ice_dpll_unregister_pins(first, pins, ops, count);
-+	if (first)
-+		ice_dpll_unregister_pins(first, pins, ops, count);
- release_pins:
- 	ice_dpll_release_pins(pins, count);
- 	return ret;
-@@ -3112,6 +3144,18 @@ static void ice_dpll_deinit_pins(struct ice_pf *pf, bool cgu)
- 	struct ice_dpll *de = &d->eec;
- 	struct ice_dpll *dp = &d->pps;
- 
-+	if (d->unmanaged) {
-+		ice_dpll_unregister_pins(dp->dpll, inputs,
-+					 &ice_dpll_input_unmanaged_ops,
-+					 num_inputs);
-+		ice_dpll_unregister_pins(dp->dpll, outputs,
-+					 &ice_dpll_output_unmanaged_ops,
-+					 num_outputs);
-+		ice_dpll_release_pins(inputs, num_inputs);
-+		ice_dpll_release_pins(outputs, num_outputs);
-+		return;
-+	}
-+
- 	ice_dpll_deinit_rclk_pin(pf);
- 	if (cgu) {
- 		ice_dpll_unregister_pins(dp->dpll, inputs, &ice_dpll_input_ops,
-@@ -3155,24 +3199,35 @@ static void ice_dpll_deinit_pins(struct ice_pf *pf, bool cgu)
-  */
- static int ice_dpll_init_pins(struct ice_pf *pf, bool cgu)
- {
-+	const struct dpll_pin_ops *output_ops;
-+	const struct dpll_pin_ops *input_ops;
- 	int ret, count;
- 
-+	if (!pf->dplls.unmanaged) {
-+		input_ops = &ice_dpll_input_ops;
-+		output_ops = &ice_dpll_output_ops;
-+	} else {
-+		input_ops = &ice_dpll_input_unmanaged_ops;
-+		output_ops = &ice_dpll_output_unmanaged_ops;
-+	}
-+
- 	ret = ice_dpll_init_direct_pins(pf, cgu, pf->dplls.inputs, 0,
--					pf->dplls.num_inputs,
--					&ice_dpll_input_ops,
-+					pf->dplls.num_inputs, input_ops,
- 					pf->dplls.eec.dpll, pf->dplls.pps.dpll);
- 	if (ret)
- 		return ret;
- 	count = pf->dplls.num_inputs;
--	if (cgu) {
-+	if (cgu || pf->dplls.unmanaged) {
- 		ret = ice_dpll_init_direct_pins(pf, cgu, pf->dplls.outputs,
- 						count,
- 						pf->dplls.num_outputs,
--						&ice_dpll_output_ops,
-+						output_ops,
- 						pf->dplls.eec.dpll,
- 						pf->dplls.pps.dpll);
- 		if (ret)
- 			goto deinit_inputs;
-+		if (pf->dplls.unmanaged)
-+			return 0;
- 		count += pf->dplls.num_outputs;
- 		if (!pf->dplls.generic) {
- 			ret = ice_dpll_init_direct_pins(pf, cgu, pf->dplls.sma,
-@@ -3224,11 +3279,11 @@ static int ice_dpll_init_pins(struct ice_pf *pf, bool cgu)
- deinit_outputs:
- 	ice_dpll_deinit_direct_pins(cgu, pf->dplls.outputs,
- 				    pf->dplls.num_outputs,
--				    &ice_dpll_output_ops, pf->dplls.pps.dpll,
-+				    output_ops, pf->dplls.pps.dpll,
- 				    pf->dplls.eec.dpll);
- deinit_inputs:
- 	ice_dpll_deinit_direct_pins(cgu, pf->dplls.inputs, pf->dplls.num_inputs,
--				    &ice_dpll_input_ops, pf->dplls.pps.dpll,
-+				    input_ops, pf->dplls.pps.dpll,
- 				    pf->dplls.eec.dpll);
- 	return ret;
- }
-@@ -3284,7 +3339,8 @@ ice_dpll_init_dpll(struct ice_pf *pf, struct ice_dpll *d, bool cgu,
- 
- 		if (type == DPLL_TYPE_PPS && ice_dpll_is_pps_phase_monitor(pf))
- 			ops =  &ice_dpll_pom_ops;
--		ice_dpll_update_state(pf, d, true);
-+		if (!pf->dplls.unmanaged)
-+			ice_dpll_update_state(pf, d, true);
- 		ret = dpll_device_register(d->dpll, type, ops, d);
- 		if (ret) {
- 			dpll_device_put(d->dpll);
-@@ -3310,6 +3366,33 @@ static void ice_dpll_deinit_worker(struct ice_pf *pf)
- 	kthread_destroy_worker(d->kworker);
- }
- 
-+/**
-+ * ice_dpll_pin_freq_info - find pin frequency from supported ones
-+ * @hw: pointer to the hardware structure
-+ * @pin_idx: pin index
-+ * @input: if input pin
-+ *
-+ * This function searches through the array of supported frequencies for a
-+ * DPLL pin and returns single frequency pin is capable, if pin support only
-+ * one frequency. Shall be used only for dpll with driver hardcoded frequency.
-+ *
-+ * Return:
-+ * * 0 - failure, pin uses multiple frequencies,
-+ * * frequency - success.
-+ */
-+static u64 ice_dpll_pin_freq_info(struct ice_hw *hw, u8 pin_idx, bool input)
-+{
-+	struct dpll_pin_frequency *freqs;
-+	u8 freq_num;
-+
-+	/* Get supported frequencies for this pin */
-+	freqs = ice_cgu_get_pin_freq_supp(hw, pin_idx, input, &freq_num);
-+	if (!freqs || freq_num != 1 || freqs[0].min != freqs[0].max)
-+		return 0;
-+
-+	return freqs[0].min;
-+}
-+
- /**
-  * ice_dpll_init_worker - Initialize DPLLs periodic worker
-  * @pf: board private structure
-@@ -3469,6 +3552,15 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 		pins[i].prop.board_label = ice_cgu_get_pin_name(hw, i, input);
- 		pins[i].prop.type = ice_cgu_get_pin_type(hw, i, input);
- 		if (input) {
-+			if (pf->dplls.unmanaged) {
-+				pins[i].freq = ice_dpll_pin_freq_info(hw, i,
-+								      input);
-+				pins[i].state[0] = DPLL_PIN_STATE_CONNECTED;
-+				pins[i].status =
-+					ICE_AQC_GET_CGU_IN_CFG_STATUS_ESYNC_CAP;
-+				pins[i].flags[0] = ICE_DPLL_IN_ESYNC_ENABLED;
-+				continue;
-+			}
- 			ret = ice_aq_get_cgu_ref_prio(hw, de->dpll_idx, i,
- 						      &de->input_prio[i]);
- 			if (ret)
-@@ -3482,6 +3574,12 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 			if (ice_dpll_is_sw_pin(pf, i, true))
- 				pins[i].hidden = true;
- 		} else {
-+			if (pf->dplls.unmanaged) {
-+				pins[i].freq = ice_dpll_pin_freq_info(hw, i,
-+								      input);
-+				pins[i].state[0] = DPLL_PIN_STATE_CONNECTED;
-+				continue;
-+			}
- 			ret = ice_cgu_get_output_pin_state_caps(hw, i, &caps);
- 			if (ret)
- 				return ret;
-@@ -3499,10 +3597,13 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 		pins[i].prop.freq_supported_num = freq_supp_num;
- 		pins[i].pf = pf;
- 	}
--	if (input)
-+	if (input && !pf->dplls.unmanaged) {
- 		ret = ice_dpll_init_ref_sync_inputs(pf);
-+		if (ret)
-+			return ret;
-+	}
- 
--	return ret;
-+	return 0;
- }
- 
- /**
-@@ -3653,6 +3754,82 @@ static void ice_dpll_deinit_info(struct ice_pf *pf)
- 	kfree(pf->dplls.pps.input_prio);
- }
- 
-+/**
-+ * ice_dpll_lock_state_init_unmanaged - initialize lock state for unmanaged dpll
-+ * @pf: board private structure
-+ *
-+ * Initialize the lock state for unmanaged DPLL by checking health status.
-+ * For unmanaged DPLL, we rely on hardware autonomous operation.
-+ *
-+ * Return:
-+ * * 0 - success
-+ * * negative - init failure reason
-+ */
-+static int ice_dpll_lock_state_init_unmanaged(struct ice_pf *pf)
-+{
-+	u16 code = ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK;
-+	struct ice_aqc_health_status_elem buff;
-+	int ret;
-+
-+	ret = ice_get_last_health_status_code(&pf->hw, &buff, code);
-+	if (ret)
-+		return ret;
-+	ice_dpll_lock_state_set_unmanaged(pf, &buff, false);
-+
-+	return ret;
-+}
-+
-+/**
-+ * ice_dpll_init_info_unmanaged - init dpll information for unmanaged dpll
-+ * @pf: board private structure
-+ *
-+ * Acquire (from HW) and set basic dpll information (on pf->dplls struct).
-+ * For unmanaged dpll mode.
-+ *
-+ * Return:
-+ * * 0 - success
-+ * * negative - init failure reason
-+ */
-+static int ice_dpll_init_info_unmanaged(struct ice_pf *pf)
-+{
-+	struct ice_dplls *d = &pf->dplls;
-+	int ret;
-+
-+	d->clock_id = ice_generate_clock_id(pf);
-+	d->num_inputs = ice_cgu_get_pin_num(&pf->hw, true);
-+	d->num_outputs = ice_cgu_get_pin_num(&pf->hw, false);
-+	ret = ice_dpll_lock_state_init_unmanaged(pf);
-+	if (ret)
-+		return ret;
-+	d->inputs = kcalloc(d->num_inputs, sizeof(*d->inputs), GFP_KERNEL);
-+	if (!d->inputs)
-+		return -ENOMEM;
-+
-+	ret = ice_dpll_init_pins_info(pf, ICE_DPLL_PIN_TYPE_INPUT);
-+	if (ret)
-+		goto deinit_info;
-+
-+	d->outputs = kcalloc(d->num_outputs, sizeof(*d->outputs), GFP_KERNEL);
-+	if (!d->outputs) {
-+		ret = -ENOMEM;
-+		goto deinit_info;
-+	}
-+
-+	ret = ice_dpll_init_pins_info(pf, ICE_DPLL_PIN_TYPE_OUTPUT);
-+	if (ret)
-+		goto deinit_info;
-+
-+	d->pps.mode = DPLL_MODE_MANUAL;
-+	dev_dbg(ice_pf_to_dev(pf), "%s - success, inputs:%u, outputs:%u\n",
-+		__func__, d->num_inputs, d->num_outputs);
-+	return 0;
-+deinit_info:
-+	dev_err(ice_pf_to_dev(pf), "%s - fail: d->inputs:%p, d->outputs:%p\n",
-+		__func__, d->inputs, d->outputs);
-+	ice_dpll_deinit_info(pf);
-+	return ret;
-+}
-+
- /**
-  * ice_dpll_init_info - prepare pf's dpll information structure
-  * @pf: board private structure
-@@ -3686,6 +3863,7 @@ static int ice_dpll_init_info(struct ice_pf *pf, bool cgu)
- 	dp->dpll_idx = abilities.pps_dpll_idx;
- 	d->num_inputs = abilities.num_inputs;
- 	d->num_outputs = abilities.num_outputs;
-+
- 	d->input_phase_adj_max = le32_to_cpu(abilities.max_in_phase_adj) &
- 		ICE_AQC_GET_CGU_MAX_PHASE_ADJ;
- 	d->output_phase_adj_max = le32_to_cpu(abilities.max_out_phase_adj) &
-@@ -3752,6 +3930,42 @@ static int ice_dpll_init_info(struct ice_pf *pf, bool cgu)
- 	return ret;
- }
- 
-+/**
-+ * ice_dpll_lock_state_set_unmanaged - determine lock state from health status
-+ * @pf: board private structure
-+ * @buff: health status buffer
-+ * @notify: if true, notify dpll device
-+ *
-+ * Set unmanaged dpll lock state based on health status code and internal data.
-+ * Context: Acquires and releases pf->dplls.lock (must release before notify
-+ * if called).
-+ */
-+void ice_dpll_lock_state_set_unmanaged(struct ice_pf *pf,
-+				       const struct ice_aqc_health_status_elem *buff,
-+				       bool notify)
-+{
-+	u32 internal_data = le32_to_cpu(buff->internal_data1);
-+	struct ice_dpll *d = &pf->dplls.pps;
-+
-+	if (!ice_pf_src_tmr_owned(pf))
-+		return;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	if (buff->health_status_code == 0 ||
-+	    internal_data == ICE_DPLL_HEALTH_STATUS_LOCKED)
-+		d->dpll_state = DPLL_LOCK_STATUS_LOCKED;
-+	else
-+		d->dpll_state = DPLL_LOCK_STATUS_UNLOCKED;
-+
-+	if (d->prev_dpll_state == d->dpll_state)
-+		notify = false;
-+	else
-+		d->prev_dpll_state = d->dpll_state;
-+	mutex_unlock(&pf->dplls.lock);
-+	if (notify && d->dpll)
-+		dpll_device_change_ntf(d->dpll);
-+}
-+
- /**
-  * ice_dpll_deinit - Disable the driver/HW support for dpll subsystem
-  * the dpll device.
-@@ -3771,15 +3985,57 @@ void ice_dpll_deinit(struct ice_pf *pf)
- 	if (cgu)
- 		ice_dpll_deinit_worker(pf);
- 
--	ice_dpll_deinit_pins(pf, cgu);
--	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
--	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
-+	ice_dpll_deinit_pins(pf, cgu || pf->dplls.unmanaged);
-+	if (pf->dplls.pps.dpll)
-+		ice_dpll_deinit_dpll(pf, &pf->dplls.pps,
-+				     cgu || pf->dplls.unmanaged);
-+	if (pf->dplls.eec.dpll)
-+		ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
- 	ice_dpll_deinit_info(pf);
- 	mutex_destroy(&pf->dplls.lock);
- }
- 
- /**
-- * ice_dpll_init - initialize support for dpll subsystem
-+ * ice_dpll_init_unmanaged - initialize support for unmanaged dpll subsystem
-+ * @pf: board private structure
-+ *
-+ * Set up the device dplls for unmanaged mode, register them and pins connected
-+ * within Linux dpll subsystem. Allow userspace to obtain state of DPLL.
-+ *
-+ * Context: Initializes pf->dplls.lock mutex.
-+ */
-+static void ice_dpll_init_unmanaged(struct ice_pf *pf)
-+{
-+	struct ice_dplls *d = &pf->dplls;
-+	int err;
-+
-+	if (!ice_pf_src_tmr_owned(pf))
-+		return;
-+	mutex_init(&d->lock);
-+	err = ice_dpll_init_info_unmanaged(pf);
-+	if (err)
-+		goto err_exit;
-+	err = ice_dpll_init_dpll(pf, &pf->dplls.pps, true, DPLL_TYPE_PPS);
-+	if (err)
-+		goto deinit_info;
-+	err = ice_dpll_init_pins(pf, true);
-+	if (err)
-+		goto deinit_pps;
-+	set_bit(ICE_FLAG_DPLL, pf->flags);
-+
-+	return;
-+
-+deinit_pps:
-+	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, true);
-+deinit_info:
-+	ice_dpll_deinit_info(pf);
-+err_exit:
-+	mutex_destroy(&d->lock);
-+	dev_warn(ice_pf_to_dev(pf), "DPLLs init failure err:%d\n", err);
-+}
-+
-+/**
-+ * ice_dpll_init_managed - initialize support for managed dpll subsystem
-  * @pf: board private structure
-  *
-  * Set up the device dplls, register them and pins connected within Linux dpll
-@@ -3788,7 +4044,7 @@ void ice_dpll_deinit(struct ice_pf *pf)
-  *
-  * Context: Initializes pf->dplls.lock mutex.
-  */
--void ice_dpll_init(struct ice_pf *pf)
-+static void ice_dpll_init_managed(struct ice_pf *pf)
- {
- 	bool cgu = ice_is_feature_supported(pf, ICE_F_CGU);
- 	struct ice_dplls *d = &pf->dplls;
-@@ -3828,3 +4084,21 @@ void ice_dpll_init(struct ice_pf *pf)
- 	mutex_destroy(&d->lock);
- 	dev_warn(ice_pf_to_dev(pf), "DPLLs init failure err:%d\n", err);
- }
-+
-+/**
-+ * ice_dpll_init - initialize support for dpll subsystem
-+ * @pf: board private structure
-+ *
-+ * Set up the device dplls, register them and pins connected within Linux dpll
-+ * subsystem. Allow userspace to obtain state of DPLL and handling of DPLL
-+ * configuration requests.
-+ *
-+ * Context: Initializes pf->dplls.lock mutex.
-+ */
-+void ice_dpll_init(struct ice_pf *pf)
-+{
-+	if (!pf->dplls.unmanaged)
-+		ice_dpll_init_managed(pf);
-+	else
-+		ice_dpll_init_unmanaged(pf);
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-index c0da03384ce9..fa61b4178b3c 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-@@ -8,6 +8,9 @@
- 
- #define ICE_DPLL_RCLK_NUM_MAX	4
- 
-+#define ICE_DPLL_UNMANAGED_PIN_NUM	4
-+#define ICE_DPLL_IN_ESYNC_ENABLED	ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN
-+
- /**
-  * enum ice_dpll_pin_sw - enumerate ice software pin indices:
-  * @ICE_DPLL_PIN_SW_1_IDX: index of first SW pin
-@@ -132,14 +135,22 @@ struct ice_dplls {
- 	s32 output_phase_adj_max;
- 	u32 periodic_counter;
- 	bool generic;
-+	bool unmanaged;
- };
- 
- #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
- void ice_dpll_init(struct ice_pf *pf);
- void ice_dpll_deinit(struct ice_pf *pf);
-+void ice_dpll_lock_state_set_unmanaged(struct ice_pf *pf,
-+				       const struct ice_aqc_health_status_elem *buff,
-+				       bool notify);
- #else
- static inline void ice_dpll_init(struct ice_pf *pf) { }
- static inline void ice_dpll_deinit(struct ice_pf *pf) { }
-+static inline void
-+ice_dpll_lock_state_set_unmanaged(struct ice_pf *pf,
-+				  const struct ice_aqc_health_status_elem *buff,
-+				  bool notify) { }
- #endif
- 
- #endif
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index f41bb49dd74f..78d50406e855 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4790,7 +4790,9 @@ void ice_deinit_dev(struct ice_pf *pf)
- 
- static void ice_init_features(struct ice_pf *pf)
- {
-+	u16 code = ICE_AQC_HEALTH_STATUS_INFO_LOSS_OF_LOCK;
- 	struct device *dev = ice_pf_to_dev(pf);
-+	int err;
- 
- 	if (ice_is_safe_mode(pf))
- 		return;
-@@ -4802,8 +4804,15 @@ static void ice_init_features(struct ice_pf *pf)
- 	if (ice_is_feature_supported(pf, ICE_F_GNSS))
- 		ice_gnss_init(pf);
- 
-+	/* Initialize unmanaged DPLL detection */
-+	err = ice_is_health_status_code_supported(&pf->hw, code,
-+						  &pf->dplls.unmanaged);
-+	if (err || !ice_is_unmanaged_cgu_in_netlist(&pf->hw))
-+		pf->dplls.unmanaged = false;
-+
- 	if (ice_is_feature_supported(pf, ICE_F_CGU) ||
--	    ice_is_feature_supported(pf, ICE_F_PHY_RCLK))
-+	    ice_is_feature_supported(pf, ICE_F_PHY_RCLK) ||
-+	    pf->dplls.unmanaged)
- 		ice_dpll_init(pf);
- 
- 	/* Note: Flow director init failure is non-fatal to load */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 161a0ae8599c..195a1e9cc861 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -20,6 +20,10 @@ static struct dpll_pin_frequency ice_cgu_pin_freq_10_mhz[] = {
- 	DPLL_PIN_FREQUENCY_10MHZ,
- };
- 
-+static struct dpll_pin_frequency ice_cgu_pin_freq_156_25mhz[] = {
-+	DPLL_PIN_FREQUENCY_RANGE(156250000, 156250000),
-+};
-+
- static const struct ice_cgu_pin_desc ice_e810t_sfp_cgu_inputs[] = {
- 	{ "CVL-SDP22",	  ZL_REF0P, DPLL_PIN_TYPE_INT_OSCILLATOR,
- 		ARRAY_SIZE(ice_cgu_pin_freq_common), ice_cgu_pin_freq_common },
-@@ -131,6 +135,18 @@ static const struct ice_cgu_pin_desc ice_e823_zl_cgu_outputs[] = {
- 	{ "NONE",	   ZL_OUT5, 0, 0 },
- };
- 
-+static const struct ice_cgu_pin_desc ice_e830_unmanaged_inputs[] = {
-+	{ "1588-TIME_SYNC", 0, DPLL_PIN_TYPE_EXT,
-+	  ARRAY_SIZE(ice_cgu_pin_freq_10_mhz), ice_cgu_pin_freq_10_mhz },
-+};
-+
-+static const struct ice_cgu_pin_desc ice_e830_unmanaged_outputs[] = {
-+	{ "MAC-PHY-CLK", 0, DPLL_PIN_TYPE_SYNCE_ETH_PORT,
-+	  ARRAY_SIZE(ice_cgu_pin_freq_156_25mhz), ice_cgu_pin_freq_156_25mhz },
-+	{ "1588-TIME_REF", 1, DPLL_PIN_TYPE_INT_OSCILLATOR,
-+	  ARRAY_SIZE(ice_cgu_pin_freq_1_hz), ice_cgu_pin_freq_1_hz},
-+};
-+
- /* Low level functions for interacting with and managing the device clock used
-  * for the Precision Time Protocol.
-  *
-@@ -5684,6 +5700,24 @@ ice_cgu_get_pin_desc(struct ice_hw *hw, bool input, int *size)
- 	case ICE_DEV_ID_E823C_SGMII:
- 		t = ice_cgu_get_pin_desc_e823(hw, input, size);
- 		break;
-+	case ICE_DEV_ID_E830CC_BACKPLANE:
-+	case ICE_DEV_ID_E830CC_QSFP56:
-+	case ICE_DEV_ID_E830CC_SFP:
-+	case ICE_DEV_ID_E830CC_SFP_DD:
-+	case ICE_DEV_ID_E830C_BACKPLANE:
-+	case ICE_DEV_ID_E830C_QSFP:
-+	case ICE_DEV_ID_E830C_SFP:
-+	case ICE_DEV_ID_E830_XXV_BACKPLANE:
-+	case ICE_DEV_ID_E830_XXV_QSFP:
-+	case ICE_DEV_ID_E830_XXV_SFP:
-+		if (input) {
-+			t = ice_e830_unmanaged_inputs;
-+			*size = ARRAY_SIZE(ice_e830_unmanaged_inputs);
-+		} else {
-+			t = ice_e830_unmanaged_outputs;
-+			*size = ARRAY_SIZE(ice_e830_unmanaged_outputs);
-+		}
-+		break;
- 	default:
- 		break;
- 	}
-@@ -5710,6 +5744,18 @@ int ice_cgu_get_num_pins(struct ice_hw *hw, bool input)
- 	return 0;
- }
- 
-+/**
-+ * ice_cgu_get_pin_num - get pin description array size
-+ * @hw: pointer to the hw struct
-+ * @input: if request is done against input or output pins
-+ *
-+ * Return: size of pin description array for given hw.
-+ */
-+int ice_cgu_get_pin_num(struct ice_hw *hw, bool input)
-+{
-+	return ice_cgu_get_num_pins(hw, input);
-+}
-+
- /**
-  * ice_cgu_get_pin_type - get pin's type
-  * @hw: pointer to the hw struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 9bfd3e79c580..87aa4cfc5a46 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -356,6 +356,7 @@ int ice_read_sma_ctrl(struct ice_hw *hw, u8 *data);
- int ice_write_sma_ctrl(struct ice_hw *hw, u8 data);
- int ice_ptp_read_sdp_ac(struct ice_hw *hw, __le16 *entries, uint *num_entries);
- int ice_cgu_get_num_pins(struct ice_hw *hw, bool input);
-+int ice_cgu_get_pin_num(struct ice_hw *hw, bool input);
- enum dpll_pin_type ice_cgu_get_pin_type(struct ice_hw *hw, u8 pin, bool input);
- struct dpll_pin_frequency *
- ice_cgu_get_pin_freq_supp(struct ice_hw *hw, u8 pin, bool input, u8 *num);
-
-base-commit: 73d204ebf2206ac303f13a64e7685f6c83e7e80a
--- 
-2.38.1
-
+I guess we need a solution for both cases.
 
