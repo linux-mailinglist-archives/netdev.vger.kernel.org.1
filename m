@@ -1,169 +1,153 @@
-Return-Path: <netdev+bounces-258001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOY2L7ltimlHKQAAu9opvQ
-	(envelope-from <netdev+bounces-258001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:28:57 +0100
+	id uIBwM6tzimknKgAAu9opvQ
+	(envelope-from <netdev+bounces-258002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:54:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF19115642
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:28:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 562741157B8
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DD8B301E3CB
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 23:28:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D02D30219BB
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 23:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFB732ABCF;
-	Mon,  9 Feb 2026 23:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AB3326D44;
+	Mon,  9 Feb 2026 23:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="fYocgLEN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Za2rzV5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8600327783
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 23:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E972F1FCFFC;
+	Mon,  9 Feb 2026 23:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770679727; cv=none; b=rK+7O5ophgzPhdv4c9huJVezGjLFnnBJutFUfXzUEI/t3FhlUVZmw0IjN5YD6Tzu67Lvkua+ZZG1DF1ubj4uYnWmEZlzLrHd/abVnJCH8Lvtjx6IWQVTF/88OKwX6LFOwgbqoQAQiL+sDk9wvDU8Dz2ta4chGAtb5odo5nEVV80=
+	t=1770681255; cv=none; b=q6v0Sleyw3gfvOUA+noAdHsnHTZygqrRiNXzPAskxhV+NGIY+MD7RkJlWeCDLfIkgMU/R2IKX6OLmjRsN8v9y8y/IfvcIyJoY5vWvtWHUmn2POtgC9KagnBRL73gM5T03y6Eyb5cQvLqz/EthAAPsxh0wy7kfYMBC6fravB0C4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770679727; c=relaxed/simple;
-	bh=4NQ3u7S2HVKAQx7TWVmyCHklXZFGVPOW8H6mAomwl90=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=clqi9512kS72OkzRTDK099tAkXIK6ZUEnOo5BB3GbtO/zxby4cVdwgd50qdtha28vWp6PCQrYWBu1iAi42wSucZkX2FS8QPL8xiYY+Qb698zp4EQa16l2WWA4OPZMycTZBhA0OnOQOdIbXL2Shdca6440G18taa1kkI6su1/ARo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=fYocgLEN; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 619LEMgE1057354
-	for <netdev@vger.kernel.org>; Mon, 9 Feb 2026 15:28:45 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=4NQ3u7S2HVKAQx7TWVmyCHklXZFGVPOW8H6mAomwl90=; b=fYocgLENwgUg
-	uq6TnsOJzeVCiR69fRm/WdNoar89z9uTDBMT6uwqfYQ0TbU+IO4XFq/PR16A/oWU
-	wzdqXBncuPtYnh7LyXhRCLfpfvc9l9SisqJ8R9xc5MFZo18du1c2Yp95emYgODsZ
-	wq0rs6tZtvc+Gkr/wMELArLvWzmnQC/1ldIsoA81uQNVaeXimF0GQys0KybstbLB
-	NcNPTPqBByykiibLadkPPztjoiAX52Z6rZu8JR2w/mYThbGutge/k4LMdWOWrCo8
-	ZvYoes1Gehx/2YlaMtvGwq08yLSz+TfzV6WS6m65bN2U3C6LG2V+uSe4o++y0kWM
-	B7F1iTjhFw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 4c7qathdxt-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 15:28:45 -0800 (PST)
-Received: from twshared41309.15.frc2.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Mon, 9 Feb 2026 23:28:43 +0000
-Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
-	id 2ECB11011CDA2; Mon,  9 Feb 2026 15:28:26 -0800 (PST)
-From: Zhiping Zhang <zhipingz@meta.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <netdev@vger.kernel.org>, Keith Busch <kbusch@kernel.org>,
-        Yochai Cohen
-	<yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Zhiping Zhang
-	<zhipingz@meta.com>
-Subject: Re: [RFC 0/2] Retrieve tph from dmabuf for PCIe P2P memory access
-Date: Mon, 9 Feb 2026 15:28:24 -0800
-Message-ID: <20260209232826.3567769-1-zhipingz@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260209181303.GB943673@ziepe.ca>
-References: <20260209181303.GB943673@ziepe.ca>
+	s=arc-20240116; t=1770681255; c=relaxed/simple;
+	bh=NZeaXHzcATLCjnxzHKmzopOHAZxQu7m2ypdhfCmLcMA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fdD5PhI7R8W16Blbh3FdVufUqlyYKCp8Nsi6VsCPejBh0u/EHoJNMcYGOaGaftW4+HxZdIUXc7T1DN7ltdz6VFzjswauOLxCoMW6gv+reFaatw+gh3pIr86se9Z2Ar6cGYIOumgXQs+bgEVklAO4PCZdw3PAYMlg8Br1wSSFeRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Za2rzV5T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 586BCC116C6;
+	Mon,  9 Feb 2026 23:54:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770681254;
+	bh=NZeaXHzcATLCjnxzHKmzopOHAZxQu7m2ypdhfCmLcMA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Za2rzV5TbIqCsV5tmF4Ql2CKGBA6Q/w4z8zbeEkEvy7wWqGCX7CcnRdoVRxy/6Goj
+	 Fv6xuZcDeOSHk+ngjpSwbDE9AWzn9UF6Xc+rjr1zlciyZ9fGuxFznVowdRWhuvUbc8
+	 W5qwjTslOrz/EEGA1eZP+GIJD9g1o4vtRqUSbmimdmE9LkAwl/nK/sTG2RJ4zL25Pu
+	 BB2YfxS0Mx/Vfvae2ChwnW3jUZClYu5iL3b39tE0nBMXgXIi2Wt4xl2Hd1ululam99
+	 Li98uTPCfL8aIrK8DS154pfKJR0WaKggC5lBWKEjDD7+U1kD3tVDhpMEcRjdvrRi9w
+	 bT785tIYlyUHg==
+Date: Mon, 9 Feb 2026 17:54:13 -0600
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: dsa: lantiq,gswip:
+ reference common PHY properties
+Message-ID: <20260209235413.GA2137170-robh@kernel.org>
+References: <cover.1769916962.git.daniel@makrotopia.org>
+ <f556ef8be75e37a2f864b9d905a78962bbe76d18.1769916962.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: tQO79kv7D3d1WzxZhdJCGbKMWNzRoCuN
-X-Proofpoint-ORIG-GUID: tQO79kv7D3d1WzxZhdJCGbKMWNzRoCuN
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDE5OCBTYWx0ZWRfX5wYQ6fVJhDgr
- 30FguqhD2zThKQbTVYSCCAnSkbgS4d11ASHacQ36Vuf5yC6B4lpmSze3YRDJXh0Ktv0djrdgU2K
- ObPw2ZGDa2FAwaynoE8nMHy5h+PA1i5UC3+btUCTyskITC5K/pmGwBFKFkY3qH3DsIQpCeBr0Ks
- RFFNJuTmyCv7KvIDQdmFLbf4CUkrG9BB1tvAPvhKtvcWQO1sKKV5obfZefnJN/xzzPE5F7L+pvK
- nZSGH9LcQqqLOh6/jTq8HscrBCzvHaDSorUoOEa/GIuG4XHd5chU/mdKU0eiEc/2YghZDUIdL8y
- i4T6SLk6RdBp/VPBnPFMJx0pEwKFmtaSpuuB9cFF23k7YfffGNNbd1MtlWSSB8oA0ZnkTOUc+A6
- iqnMF+bguDdlaf/hNwfAhX9LljdoDJFc5rP0JbdRrgAMnnXjm46jZt9PgcpMBNJs5uo4MynMkw9
- FFGLSgwbn2S5nofP/EA==
-X-Authority-Analysis: v=2.4 cv=UOzQ3Sfy c=1 sm=1 tr=0 ts=698a6dad cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
- a=GgsMoib0sEa3-_RKJdDe:22 a=e5mUnYsNAAAA:8 a=P0N4maTJ8gqIai-TwVIA:9
- a=Vxmtnl_E_bksehYqCbjh:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-09_01,2026-02-09_04,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f556ef8be75e37a2f864b9d905a78962bbe76d18.1769916962.git.daniel@makrotopia.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258001-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258002-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[hauke-m.de,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DKIM_TRACE(0.00)[meta.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 5DF19115642
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,0.0.0.5:email]
+X-Rspamd-Queue-Id: 562741157B8
 X-Rspamd-Action: no action
 
-On Mon, Feb 08, 2026 at 10:13:00AM -0800, Jason Gunthor write:
+On Sun, Feb 01, 2026 at 03:41:53AM +0000, Daniel Golle wrote:
+> Reference the common PHY properties so RX and TX SerDes lane polarity
+> of the SGMII/1000Base-X/2500Base-X port can be configured.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v3: commit message: clarify that the intention is to configure polarity
+>     at port level, as opposed to the internal polarity of the PCS component
+> v2: use allOf to include PHY common properties, add example use
+> ---
+>  Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+> index f601e5f9fa6a..b4a31cde4322 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+> @@ -105,6 +105,8 @@ patternProperties:
+>      patternProperties:
+>        "^(ethernet-)?port@[0-6]$":
+>          $ref: dsa-port.yaml#
+> +        allOf:
+> +          - $ref: /schemas/phy/phy-common-props.yaml#
 
-> On Mon, Feb 09, 2026 at 09:53:10AM -0800, Zhiping Zhang wrote:
-> > Currently, the steering tag can be used for a CPU on the motherboard;=
- the
-> > ACPI check is in place to query and obtain the supported tph settings=
-. Here
-> > we intend to use the tph info to improve RDMA NIC memory access on a =
-vfio-based
-> > accelerator device via PCIe peer-to-peer. When an applicantion regist=
-er a
-> > RDMA memory region with DMABUF for the RDMA NIC to access the device =
-memory,
-> > the tph associated with the memory region can be retrieved and used t=
-o set the
-> > steering tag / process hint (ph). The tph contains additional instruc=
-tions
-> > or hints to the GPU or accelerator device for advanced memory operati=
-ons,
-> > such as, read cache selection.
-> >
-> > Note this RFC is for the discussion on the direction and is not inten=
-ded to be
-> > a complete implementation. Once the direction is agreed on, we will w=
-ork on the
-> > implementation or a real patch set.
->
-> you didn't cc the DRM people who really need to look at any changes to
-> the dmabuf contract.
->
-> Jason
+If you respin, put both $ref's under the allOf.
 
-Thanks, let me submit again including the DRM people via the mailing list
-dri-devel@lists.freedesktop.org.
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
-Zhiping
-
-
+>          unevaluatedProperties: false
+>  
+>          properties:
+> @@ -288,6 +290,7 @@ examples:
+>  
+>    - |
+>      #include <dt-bindings/leds/common.h>
+> +    #include <dt-bindings/phy/phy.h>
+>  
+>      mdio {
+>          #address-cells = <1>;
+> @@ -320,6 +323,7 @@ examples:
+>                      label = "wan";
+>                      phy-mode = "1000base-x";
+>                      managed = "in-band-status";
+> +                    tx-polarity = <PHY_POL_INVERT>;
+>                  };
+>  
+>                  port@5 {
+> -- 
+> 2.52.0
 
