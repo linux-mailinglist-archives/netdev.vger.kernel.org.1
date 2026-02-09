@@ -1,328 +1,136 @@
-Return-Path: <netdev+bounces-257955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKJQAyLviWn4EQAAu9opvQ
-	(envelope-from <netdev+bounces-257955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 15:28:50 +0100
+	id wOZKHTTwiWn4EQAAu9opvQ
+	(envelope-from <netdev+bounces-257956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 15:33:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67151110507
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 15:28:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E06EB1106E3
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 15:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 253E430479F0
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 14:26:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60AA4303322F
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 14:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33D337AA91;
-	Mon,  9 Feb 2026 14:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C213B37AA6B;
+	Mon,  9 Feb 2026 14:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="havwzuU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460BC37A4AE
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 14:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1465623B604;
+	Mon,  9 Feb 2026 14:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770647177; cv=none; b=uM76O2/oCBAjODoqTP1UQ/y+Ky9HM+EyWg6QHqCek4b+DyZZAuvfteATkrBoODrEDDhSpFeKDNhmI6DMEuYjkF25N6WR7lrR4S9X91iaJmpZL+FcCRWJXU1JNYs0YdCzaqAUikCLFC8GFCHxruIhWlBzX6V1s2CcVMNzgtoQzuQ=
+	t=1770647499; cv=none; b=jJB8EFlQ92fHB16CZvHNZ+Pv5QKSqR6SELjR7NT5zo4YFu8m9SeqBALC1/p5jxtlx+Aq56dHuj9L9xDK1bgMHBmcL7ZnCOSWqB4mi4zrxQEYrs9YJVnMiqd1dnUyy2Dn+/hP9bex6dMs01iKxdj4aQ1zoxup7+K2vNVdVYznMW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770647177; c=relaxed/simple;
-	bh=w0KGseemj0KZDUokCz9rANKBh2ORIZDBQ+Fzgd9PC2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lxt5shnVS4AaN4wxTB2qcykN7RjCkPD5+gE8i5pCu2Za8gzEWu9rr4FOaJ3dcV1Z4auEjzfDQ1dX02NVKxOPw3O/VZm/3Dn/iKvc5fRS51lrZX08j7Z98EJBbOZdXu17/YDEuL3MzBFJsSfh0c7cuqtBd3EE1H4yKkF/wwxetmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 619EQEQr061626;
-	Mon, 9 Feb 2026 23:26:14 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 619EQE1i061622
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 9 Feb 2026 23:26:14 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <7c17884d-dbf1-4c2c-9813-0c5369cfdcc9@I-love.SAKURA.ne.jp>
-Date: Mon, 9 Feb 2026 23:26:14 +0900
+	s=arc-20240116; t=1770647499; c=relaxed/simple;
+	bh=KE57ewbW0FR7LSnDlenP3CMFpinYcXvtn8GTV2oScKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DOi1bGNoiNlpiPdvOEIEbYQ1G9jhHcTmOYdrS8TVLObFJzmnvl2I69EB103wJGWfdtNUZemxN6ZeOULcTsfPbCrH4TK931Ut0PUJPrQRgPkQ+03sr4lrWU7BS04stKExwJTmU09vt8QrC2/tU6Db2ZhcH1T146ney8OkVAD2DL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=havwzuU+; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3FEHIqnlVQGDIeCCVkCWIEHhxVvsQXBX8o/GwIQwb+4=; b=havwzuU+gFRpmOt8zaZ9DARYnV
+	qy+xhoaKLehLHlMADlWczRDlSsf7jrhBbO1SPWGhu3+pDdk3741dtNzTThCMY2jcLebZir0mi4QtU
+	NF8pVx6ssEXisYtJqflNSrr8x1UO0cER/QR+yIvCQuSLBUQcr8Vc3Fjt9D33zDUHXwL5mqFoC4eE4
+	9WtuI3L4g9N0b3yhrlRohc7aURcYMHVz8mdvGN+E0bXxN5U8nOIMuk9V+owKOF7AeUE7dSsitZWiY
+	AhGuNdKhSyHUdJUBzR9jLRDN81Vk+HqhMecuWXiDccE5UAY4ZbMlbmZtkskMvQ4MW66qkBzKWY1Wr
+	8rN4vv4w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41268)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vpSIX-000000001eG-13e5;
+	Mon, 09 Feb 2026 14:31:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vpSIS-000000001qf-1VCk;
+	Mon, 09 Feb 2026 14:31:28 +0000
+Date: Mon, 9 Feb 2026 14:31:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: lizhi2@eswincomputing.com, Andrew Lunn <andrew@lunn.ch>
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	ningyu@eswincomputing.com, linmin@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
+Subject: Re: [PATCH v2 0/2] net: stmmac: eic7700: fix EIC7700 eth1 RX
+ sampling timing
+Message-ID: <aYnvwAK3gpxBs-EF@shell.armlinux.org.uk>
+References: <20260209094628.886-1-lizhi2@eswincomputing.com>
+ <64bf6b40-b947-4ffa-8d48-4d6341931327@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-        Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-References: <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
- <CAHC9VhQEKfxXzFgYShojESpQn10LES5zL6Ua0YV9b8seEKFqyA@mail.gmail.com>
- <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
- <CAHC9VhQPKU5DqG-ryZsiCV2vZeGGf_a-JStR_LVVCCn03C4usQ@mail.gmail.com>
- <f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp>
- <CAHC9VhRzRAR+hhn4TFADnHWpzjOxjmh0S_Hg_HktkPkKQ35ycg@mail.gmail.com>
- <74a70504-8ff8-4d97-b35f-774364779889@I-love.SAKURA.ne.jp>
- <7ef21dab-3805-4eae-80d7-9779aeff3f58@I-love.SAKURA.ne.jp>
- <aYmoDwO-YXrc4W1c@secunet.com>
- <85546d35-c7bd-49bf-b0c3-9677bde25859@I-love.SAKURA.ne.jp>
- <aYnDWbxo-jAzR4ca@secunet.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <aYnDWbxo-jAzR4ca@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav204.rs.sakura.ne.jp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64bf6b40-b947-4ffa-8d48-4d6341931327@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257956-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257955-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_ALL(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 67151110507
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:url,eswincomputing.com:email]
+X-Rspamd-Queue-Id: E06EB1106E3
 X-Rspamd-Action: no action
 
-On 2026/02/09 20:22, Steffen Klassert wrote:
-> On Mon, Feb 09, 2026 at 07:02:47PM +0900, Tetsuo Handa wrote:
->> On 2026/02/09 18:25, Steffen Klassert wrote:
->>> The problem is that, with adding IPsec offloads to netdevices, security
->>> critical resources came into the netdevices. Someone who has no
->>> capabilities to delete xfrm states or xfrm policies should not be able
->>> to unregister the netdevice if xfrm states or xfrm policies are
->>> offloaded. Unfortunately, unregistering can't be canceled at this stage
->>> anymore. So I think we need some netdevice unregistration hook for
->>> the LSM subsystem so it can check for xfrm states or xfrm policies
->>> and refuse the unregistration before we actually start to remove
->>> the device.
->>
->> Unfortunately, unregistering is not always triggered by a user's request. ;-)
+On Mon, Feb 09, 2026 at 02:36:11PM +0100, Andrew Lunn wrote:
+> On Mon, Feb 09, 2026 at 05:46:28PM +0800, lizhi2@eswincomputing.com wrote:
+> > From: Zhi Li <lizhi2@eswincomputing.com>
+> > 
+> > v1 -> v2:
 > 
-> As far as I remember, a security context is not always tied to a
-> user request. It can also be attached to system tasks or objects.
+> For version 3, please include a patch to the SoC .dtsi file adding the
+> Ethernet nodes. We like to see users of code being added.
 
-That is not what I wanted to say. There are at least three routes (listed below)
-that can trigger xfrm_dev_unregister() path. You could insert LSM hooks into the
-netlink_sendmsg() route and the del_device_store() route, but the cleanup_net()
-route is a result of tear-down action which is too late to insert LSM hooks.
+In addition to Andrew's comments, before posting another series, please
+review https://docs.kernel.org/process/maintainer-netdev.html,
+particularly sections 1.4 and 1.6.1.
 
-The NETDEV_UNREGISTER path can be triggered by just doing "unshare -n ip addr show"
-(i.e. implicit cleanup of a network namespace due to termination of init process in
-that namespace). We are not allowed to reject the cleanup_net() route.
+Thanks.
 
-----------
-xfrm_dev_state_flush_secctx_check: LSM policy is rejecting this operation.
-CPU: 0 UID: 0 PID: 16195 Comm: syz.3.3878 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- xfrm_dev_state_flush_secctx_check net/xfrm/xfrm_state.c:900 [inline]
- xfrm_dev_state_flush+0x5fa/0x740 net/xfrm/xfrm_state.c:971
- xfrm_dev_unregister net/xfrm/xfrm_device.c:549 [inline]
- xfrm_dev_event+0x1bc/0x3f0 net/xfrm/xfrm_device.c:570
- notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2281 [inline]
- call_netdevice_notifiers net/core/dev.c:2295 [inline]
- netdev_wait_allrefs_any net/core/dev.c:11589 [inline]
- netdev_run_todo+0x778/0x1130 net/core/dev.c:11710
- nsim_destroy+0x3ae/0x680 drivers/net/netdevsim/netdev.c:1190
- __nsim_dev_port_del+0x14d/0x1b0 drivers/net/netdevsim/dev.c:1529
- nsim_dev_port_del_all drivers/net/netdevsim/dev.c:1541 [inline]
- nsim_dev_reload_destroy+0x288/0x490 drivers/net/netdevsim/dev.c:1765
- nsim_dev_reload_down+0x8a/0xc0 drivers/net/netdevsim/dev.c:1039
- devlink_reload+0x1d1/0x8e0 net/devlink/dev.c:461
- devlink_nl_reload_doit+0xaaa/0xc80 net/devlink/dev.c:584
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec+0x18f/0x1d0 net/socket.c:737
- __sock_sendmsg net/socket.c:752 [inline]
- ____sys_sendmsg+0x589/0x8c0 net/socket.c:2610
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2664
- __sys_sendmsg net/socket.c:2696 [inline]
- __do_sys_sendmsg net/socket.c:2701 [inline]
- __se_sys_sendmsg net/socket.c:2699 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2699
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7feb10f9aeb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007feb11efc028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007feb11215fa0 RCX: 00007feb10f9aeb9
-RDX: 0000000006048800 RSI: 0000200000000080 RDI: 0000000000000005
-RBP: 00007feb11008c1f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007feb11216038 R14: 00007feb11215fa0 R15: 00007ffdd0b07b18
- </TASK>
-----------
-
-----------
-xfrm_dev_state_flush_secctx_check: LSM policy is rejecting this operation.
-CPU: 1 UID: 0 PID: 11340 Comm: kworker/u8:17 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- xfrm_dev_state_flush_secctx_check net/xfrm/xfrm_state.c:900 [inline]
- xfrm_dev_state_flush+0x5fa/0x740 net/xfrm/xfrm_state.c:971
- xfrm_dev_unregister net/xfrm/xfrm_device.c:549 [inline]
- xfrm_dev_event+0x1bc/0x3f0 net/xfrm/xfrm_device.c:570
- notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2281 [inline]
- call_netdevice_notifiers net/core/dev.c:2295 [inline]
- netdev_wait_allrefs_any net/core/dev.c:11589 [inline]
- netdev_run_todo+0x778/0x1130 net/core/dev.c:11710
- nsim_destroy+0x3ae/0x680 drivers/net/netdevsim/netdev.c:1190
- __nsim_dev_port_del+0x14d/0x1b0 drivers/net/netdevsim/dev.c:1529
- nsim_dev_port_del_all drivers/net/netdevsim/dev.c:1541 [inline]
- nsim_dev_reload_destroy+0x288/0x490 drivers/net/netdevsim/dev.c:1765
- nsim_dev_reload_down+0x8a/0xc0 drivers/net/netdevsim/dev.c:1039
- devlink_reload+0x1d1/0x8e0 net/devlink/dev.c:461
- devlink_pernet_pre_exit+0x1e6/0x3f0 net/devlink/core.c:509
- ops_pre_exit_list net/core/net_namespace.c:161 [inline]
- ops_undo_list+0x187/0x940 net/core/net_namespace.c:234
- cleanup_net+0x4df/0x7b0 net/core/net_namespace.c:696
- process_one_work+0x949/0x1650 kernel/workqueue.c:3279
- process_scheduled_works kernel/workqueue.c:3362 [inline]
- worker_thread+0xb46/0x1140 kernel/workqueue.c:3443
- kthread+0x388/0x470 kernel/kthread.c:467
- ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-----------
-
-----------
-xfrm_dev_state_flush_secctx_check: LSM policy is rejecting this operation.
-CPU: 0 UID: 0 PID: 18368 Comm: syz-executor Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- xfrm_dev_state_flush_secctx_check net/xfrm/xfrm_state.c:900 [inline]
- xfrm_dev_state_flush+0x5fa/0x740 net/xfrm/xfrm_state.c:971
- xfrm_dev_unregister net/xfrm/xfrm_device.c:549 [inline]
- xfrm_dev_event+0x1bc/0x3f0 net/xfrm/xfrm_device.c:570
- notifier_call_chain+0x1be/0x400 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2281 [inline]
- call_netdevice_notifiers net/core/dev.c:2295 [inline]
- netdev_wait_allrefs_any net/core/dev.c:11589 [inline]
- netdev_run_todo+0x778/0x1130 net/core/dev.c:11710
- nsim_destroy+0x3ae/0x680 drivers/net/netdevsim/netdev.c:1190
- __nsim_dev_port_del+0x14d/0x1b0 drivers/net/netdevsim/dev.c:1529
- nsim_dev_port_del_all drivers/net/netdevsim/dev.c:1541 [inline]
- nsim_dev_reload_destroy+0x288/0x490 drivers/net/netdevsim/dev.c:1765
- nsim_drv_remove+0x58/0x170 drivers/net/netdevsim/dev.c:1780
- device_remove drivers/base/dd.c:571 [inline]
- __device_release_driver drivers/base/dd.c:1284 [inline]
- device_release_driver_internal+0x46f/0x860 drivers/base/dd.c:1307
- bus_remove_device+0x34d/0x440 drivers/base/bus.c:616
- device_del+0x527/0x8f0 drivers/base/core.c:3878
- device_unregister+0x21/0xf0 drivers/base/core.c:3919
- nsim_bus_dev_del drivers/net/netdevsim/bus.c:491 [inline]
- del_device_store+0x2b0/0x370 drivers/net/netdevsim/bus.c:244
- kernfs_fop_write_iter+0x3af/0x540 fs/kernfs/file.c:352
- new_sync_write fs/read_write.c:595 [inline]
- vfs_write+0x61d/0xb90 fs/read_write.c:688
- ksys_write+0x150/0x270 fs/read_write.c:740
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd13375b78e
-Code: 08 0f 85 a5 a8 ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 80 00 00 00 00 48 83 ec 08
-RSP: 002b:00007ffc52b936a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000555567157500 RCX: 00007fd13375b78e
-RDX: 0000000000000001 RSI: 00007ffc52b93730 RDI: 0000000000000005
-RBP: 00007fd133808a88 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffc52b93730 R14: 00007fd134544620 R15: 0000000000000003
- </TASK>
-----------
-
-
-
-> 
->> For example, we don't check permission for unmount when a mount is deleted
->> due to teardown of a mount namespace. I wonder why you want to check permission
->> for unregistering a net_device when triggered by a teardown path.
-> 
-> I just try to find out what's the right thing to do here.
-> If a policy goes away, packets that match this policy will
-> find another path through the network stack. As best, they
-> are dropped somewhere, but they can also leave on some other
-> device without encryption. A LSM that implements xfrm hooks
-> must be able to check the permission to delete the xfrm policy
-> or state.
-
-Do you mean that calling xfrm_dev_down()/xfrm_dev_unregister() might
-result in network traffic to be sent in cleartext ?
-
-If yes, we need to consider updating the other patch at
-https://lkml.kernel.org/r/20260202123655.GK34749@unreal to replace
-the NETDEV_UNREGISTER net_device with the blackhole_netdev. (That is,
-xfrm_dev_{state,policy}_flush() does not actually delete a state/policy
-but instead updates that state/policy to behave as a blackhole. Then,
-we won't need to call LSM hooks because we no longer delete).
-
-Also, we need to consider changing xfrm_dev_down() to no-op, for just doing
-e.g. "ip link set ens160 down; ip link set ens160 up" (which triggers
-NETDEV_DOWN event and NETDEV_UP event) might result in network traffic
-to be sent in cleartext because currently xfrm_dev_down() can delete a
-state/policy. Such behavior might not what the administrator is expecting.
-
-
-
-> 
->>
->>>
->>> The same happened btw. when xfrm was made per network namespace.
->>> Here we just leak the xfrm states and xfrm policies if some
->>> LSM refuses to remove them.
->>>
->>> I guess we need a solution for both cases.
->>
->> Is replacing the NETDEV_UNREGISTER net_device with the blackhole_netdev applicable
->> ( https://elixir.bootlin.com/linux/v6.19-rc5/source/net/xfrm/xfrm_policy.c#L3948 ) ?
->> If no, there is no choice but break SELinux's expectation.
-> 
-> That could be an option to not accidentally send out
-> unencrypted packets. But finding the right place for
-> these checks would be preferable IMO.
-
-Can we have such giant lock if you found the right place for these checks
-( https://lkml.kernel.org/r/f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp ) ?
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
