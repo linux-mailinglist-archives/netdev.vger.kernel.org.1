@@ -1,179 +1,189 @@
-Return-Path: <netdev+bounces-257898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aI4EGcOBiWkg+QQAu9opvQ
-	(envelope-from <netdev+bounces-257898-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 07:42:11 +0100
+	id WDsoMBuIiWl1+gQAu9opvQ
+	(envelope-from <netdev+bounces-257900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:09:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3957010C2E9
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 07:42:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01EEC10C55D
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 09DA93002E74
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 06:42:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D5DCE3004427
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 07:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA152FE048;
-	Mon,  9 Feb 2026 06:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6DB2ECD37;
+	Mon,  9 Feb 2026 07:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="VhQZO4GL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PgGjAHPU"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF9F2EBBB3;
-	Mon,  9 Feb 2026 06:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEDD2FFF97
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 07:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770619326; cv=none; b=efer5neQ9q9XYlCLSCkZsByi8wQ4QJj/844f3L8c1xg1QUEx3jSXXrqVQM++7Jtb0HVJZ6ORM3bd8s1RbT+J3cXJxbzgWv6HkzE0sgoNLrcMlWTcBG5PyQm/6NvYktaKtTGzO4KFiY7TSRCBf6o6nCeEG5A+B8yC8nR5eZ9Gocg=
+	t=1770620949; cv=none; b=Pke5TVKJgENNYiJPg5YZVN2eDC/iL+fGKpX7Dd3k6fE/YFJdv/zKb45h5BGAhzHPL8ZRRSZq5lPbPk+5fCDc2kBN24z54NtylR4kp9k+2QlvhZwXE1gzZUze+bzCDqV+IiEnUWdYoc1ok6r9N3Pg/XuL2Ek6xoH0LGjvU6aXBX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770619326; c=relaxed/simple;
-	bh=yTxUTZZ0I5gzEXgCLCY3iGfQeY4CJewx8hkq5B9LfHc=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mGdR92BBtiCTRebAWLgL+fxz0e2LnT9dCuO8/KJhzOcN2kxzf+2LpSLYnVAXKR169kI89uEH5CtJsmvhLZbIr7cBIxobCl/I6NBdIvxzngF3yh2sUK5Sn+YlysSkEmzytgguUn1O3Vir/KPEuJInWRR4CyBpn0SzY+oNTG9Q3Cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=VhQZO4GL; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=GCTUH/1VMyKuNr5ynPnAW+lMNTHrZVMBFcHP1ysd2vo=;
-	b=VhQZO4GLcoZW+CH43oB6Cfi6e+UiBd6O+Or6tZqUDUSR5ia5FNpr5LUGNOwxMeAR0+FTD5OBX
-	KN1ukUBNHBINQxWo1IYP1J3FQqvXnD2X4EhualkwoSBz4NKC3L4yYmY3Dr18jLdGakR83e62TPy
-	P51vyIyoOtPZsXrSVSUrOvY=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4f8Zk66Tz6z1K9CV;
-	Mon,  9 Feb 2026 14:37:18 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9BEF640561;
-	Mon,  9 Feb 2026 14:41:53 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Mon, 9 Feb 2026 14:41:53 +0800
-Message-ID: <39abbfbb-777e-4fe9-a8cf-38ab40863667@huawei.com>
-Date: Mon, 9 Feb 2026 14:41:52 +0800
+	s=arc-20240116; t=1770620949; c=relaxed/simple;
+	bh=I1NGi+ekaGjV0E8Ubikboz6y8tPzpfia4WSzbvIpj90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ig9z77rrxKsiO7UGBFCX9KLmOcoDGQC0I8k9J366s5Zuya4AIQhq9XWdzjoxtfLyjrA9Qxh8GZPhAruI0HBRmE3S+hH8DXrC68aysw8CSEUjUu8hgZIJUUHv3FyPBl6THyAtLAeqBFuF+M3W3HKVF7dqiKug3sH+3K1oeSJ3k/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PgGjAHPU; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4805ef35864so34057955e9.0
+        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 23:09:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1770620948; x=1771225748; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H+wuaBU+jHlT/7T8bfgNNKqmz7w+AC3ayhXibObZLas=;
+        b=PgGjAHPUGNCbWZp8KIEmQS9TfKUSg/z/OuZIVeEZuQCq9MyxCUm1qYj0mZObofCesY
+         VVKc46buzkVTxS6MK7RuqIytyqcIvplBJoixjwnV/rdQJYiNpe2trah1AzNGsX6VMBEE
+         AqTqpsFMWxORuaU4ST6GNw5hndiAGU8OPhkZtJEwQi95HVcBp1JrUF8/gNrbS+GJ3mnO
+         Yay3G33oW/q9eHBpHJiCTi5UEsHWB3yTnbE4mIhh00lODoQ80f8lkUdYwcMHM0fcGMXR
+         vgmUNYzeRVDZMOLaSwC1t8Z96G9n/OtPjf8ysIOqNUncPVTWpdBV6lbI95ezXaagfB93
+         1hLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770620948; x=1771225748;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H+wuaBU+jHlT/7T8bfgNNKqmz7w+AC3ayhXibObZLas=;
+        b=XRvUGV/MTqlYwga3a7ysiZ13orQ2Lzcj1QiZ3jdWcISHBQ0TuvdtmQqGb0//R1nt7m
+         7wcLoQ/FiBXQxwFVAh27NME9IZBMocs7YLeVSzJrGbPL4exeoA9SiSjQ/bx+rbnsM8ec
+         eECohhww3rU4BmUUaUJJdqTLGRII8SqIpFF/Wf/UhyB0cam48QkPVAoDuclHsvbfqb9+
+         5FH41OUH70ifdf5T7Zy7EYSPBraPvss4Z3B/8Tmz1+OXWUiaXqlZvAkoIJJjLDVgw3zm
+         vtlRvahzY7l2j8JQTdkQ48cMS28XqIjsH3NgKt2VnVuucWd1rcH9vTkIRSB/+rIoEcBg
+         XqXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWm6D7dn7SuBnBJ7AxcbNvddSkDJwRq4B6qq9Viy01EttxlVLr8uUwhWGOgdLOp/7yRwj0E2eE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdtBXdTXZaJzrtPU2zt1XaHDcRVDLyOtGcLxiZDJEQL1qJdcTC
+	VIfS+p9NIe6/eiA9mulyyE6m9QESPOjPmkOGdso6ZXGOTcyurRUF78byr04bE+vhjW0=
+X-Gm-Gg: AZuq6aJon54Y6cq4LMl2vPEMy33MPaYh3nY+cFTitqlK3rt2iP+Vvj7nXR2NN+vRC8Z
+	eqljfS6Z5LIDFojdWuN4Aq8muX+t1SP7iYUxxlPldWlW6O4q5KQ3gU5HcEAKKx5EouetoG9LkAd
+	D4sSk/na2X42uRNcsWbmS/IEHMyQPrsJ/meX1C6jPccpsGFUG0EGhGB5upO2U3eea2/iJ/Bd9Pj
+	OGGP4fPi8IYkMYnzh4fJNthlnhBCQzX9BAkVjhd711bJzrhgvuVjihaVJ+PtxZ9IiDp2HCV+D4e
+	1WdzhnTziaIe77mGGUjaf3qGS5QCwZRuVkfSRJ87+kaRIRgTlVERyLdQ0qnKw8G0DSP8NDqr2Iz
+	2VVa2nKbyHEpx5nNsuk24BIY8f1IhOkxkVkKJqaqmTiYUtOrKdQZw2kgJAd/NjGzPTaYsL6mosg
+	1jlHNUqjwV0cZXpqVI
+X-Received: by 2002:a05:6000:2883:b0:435:a815:dd86 with SMTP id ffacd0b85a97d-436293b28f7mr16672811f8f.62.1770620947533;
+        Sun, 08 Feb 2026 23:09:07 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43629754c62sm22756355f8f.38.2026.02.08.23.09.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Feb 2026 23:09:06 -0800 (PST)
+Date: Mon, 9 Feb 2026 10:09:03 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [bug report] net: ethtool: Introduce per-PHY DUMP operations
+Message-ID: <aYmID1BOGmwb2rUD@stanley.mountain>
+References: <aYXu0esD_wSjGTZm@stanley.mountain>
+ <c9c6378a-14a3-440a-80b7-f48cdb06623b@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-atm-general@lists.sourceforge.net>, <linux-kernel@vger.kernel.org>,
-	<3chas3@gmail.com>
-Subject: Re: [PATCH net v2] atm: fore200e: fix use-after-free in tasklets
- during device removal
-To: <duoming@zju.edu.cn>
-References: <20260206094811.23431-1-duoming@zju.edu.cn>
- <41559748-63f2-49ea-9d94-433eeb0edb8b@huawei.com>
- <1ec5e02d.6d52a.19c337418d3.Coremail.duoming@zju.edu.cn>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <1ec5e02d.6d52a.19c337418d3.Coremail.duoming@zju.edu.cn>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c9c6378a-14a3-440a-80b7-f48cdb06623b@bootlin.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	FREEMAIL_CC(0.00)[huawei.com,vger.kernel.org,lists.sourceforge.net,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257898-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257900-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3957010C2E9
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 01EEC10C55D
 X-Rspamd-Action: no action
 
+On Fri, Feb 06, 2026 at 06:04:36PM +0100, Maxime Chevallier wrote:
+> > net/ethtool/netlink.c
+> >     700 static int ethnl_perphy_start(struct netlink_callback *cb)
+> >     701 {
+> >     702         struct ethnl_perphy_dump_ctx *phy_ctx = ethnl_perphy_dump_context(cb);
+> >     703         const struct genl_dumpit_info *info = genl_dumpit_info(cb);
+> >     704         struct ethnl_dump_ctx *ctx = &phy_ctx->ethnl_ctx;
+> >     705         struct ethnl_reply_data *reply_data;
+> >     706         const struct ethnl_request_ops *ops;
+> >     707         struct ethnl_req_info *req_info;
+> >     708         struct genlmsghdr *ghdr;
+> >     709         int ret;
+> >     710 
+> >     711         BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
+> >     712 
+> >     713         ghdr = nlmsg_data(cb->nlh);
+> > --> 714         ops = ethnl_default_requests[ghdr->cmd];
+> > 
+> > Smatch thinks nlmsg_data() is untrusted data, so it could be out of bounds.
+> > It's a u8, but there are only 52 elements in the ethnl_default_requests[]
+> > array.
+> 
+> I see, then we also have the same problem in ethnl_default_start().
+> 
+> I'd expect the genl part to validate cmd (I haven't checked yet), but we
+> do have a WARN_ONCE just below for the case 'cmd' is wrong, so we could
+> definitely add some more sanity checks before accessing
+> ethnl_default_requests[].
 
-on 2026/2/6 22:56, duoming@zju.edu.cn wrote:
-> On Fri, 6 Feb 2026 18:48:38 +0800 Jijie Shao wrote:
->>> When the PCA-200E or SBA-200E adapter is being detached, the fore200e
->>> is deallocated. However, the tx_tasklet or rx_tasklet may still be running
->>> or pending, leading to use-after-free bug when the already freed fore200e
->>> is accessed again in fore200e_tx_tasklet() or fore200e_rx_tasklet().
->>>
->>> One of the race conditions can occur as follows:
->>>
->>> CPU 0 (cleanup)           | CPU 1 (tasklet)
->>> fore200e_pca_remove_one() | fore200e_interrupt()
->>>     fore200e_shutdown()     |   tasklet_schedule()
->>>       kfree(fore200e)       | fore200e_tx_tasklet()
->>>                             |   fore200e-> // UAF
->>>
->>> Fix this by ensuring tx_tasklet or rx_tasklet is properly canceled before
->>> the fore200e is released. Add tasklet_kill() in fore200e_shutdown() to
->>> synchronize with any pending or running tasklets. Moreover, since
->>> fore200e_reset() could prevent further interrupts or data transfers,
->>> the tasklet_kill() should be placed after fore200e_reset() to prevent
->>> the tasklet from being rescheduled in fore200e_interrupt().
->>>
->>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->>> Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
->>> ---
->>> Changes in v2:
->>>     - Move tasklet_kill() after fore200e_reset().
->>>
->>>    drivers/atm/fore200e.c | 4 ++++
->>>    1 file changed, 4 insertions(+)
->>>
->>> diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
->>> index f62e3857144..de04c407921 100644
->>> --- a/drivers/atm/fore200e.c
->>> +++ b/drivers/atm/fore200e.c
->>> @@ -362,6 +362,10 @@ fore200e_shutdown(struct fore200e* fore200e)
->>>        if (fore200e->state > FORE200E_STATE_RESET) {
->>>    	/* first, reset the board to prevent further interrupts or data transfers */
->>>    	fore200e_reset(fore200e, 0);
->>> +#ifdef FORE200E_USE_TASKLET
->>> +	tasklet_kill(&fore200e->tx_tasklet);
->>> +	tasklet_kill(&fore200e->rx_tasklet);
->>> +#endif
->>>        }
->> I'm sorry if I gave you a confusing comment.
->>
->> If (fore200e->state <= FORE200E_STATE_RESET), is there no need to do tasklet_kill()?
-> The following four states that are preceding FORE200E_STATE_RESET are only set
-> during device initialization: FORE200E_STATE_BLANK, FORE200E_STATE_REGISTER,
-> FORE200E_STATE_CONFIGURE, and FORE200E_STATE_MAP.
->
-> If the device is in any of these states, it means the initialization is
-> not complete and interrupts have not been registered. Therefore, tasklet
-> could not be scheduled through fore200e_interrupt().
->
-> If the device is in FORE200E_STATE_RESET state, the fore200e_reset() has
-> already reset the device, which could prevent further interrupts and
-> tasklet scheduling.
->
-> So there is no need to do tasklet_kill() if the state of fore200e is
-> less than or equal to FORE200E_STATE_RESET.
+The WARN_ONCE() doesn't doesn't work as bounds checking since there is
+no guarantee that the array will be followed by NULL pointers.  I didn't
+see a bounds check for this, but I'm not an expert.
 
-Yeah, I agree.
-But I reviewed the fore200e_init() again, and it only needs to do tasklet_kill()
-when "fore200e->state >= fFORE200E_STATE_IRQ"(in fore200e_irq_request());
-otherwise, "fore200e->tx_tasklet" has not been initialized.
+netlink_rcv_skb() <- receives untrusted data nlh = nlmsg_hdr(skb);
+-> nfnetlink_rcv_msg() <- calls nc->call()
+   -> ip_set_dump()
+      -> netlink_dump_start()
+         -> __netlink_dump_start() <- calls control->start(cb);
+            -> genl_start() <- this is where the validation would be
+                               when we call
+                               genl_family_rcv_msg_attrs_parse()
+               -> ethnl_perphy_start()
 
-Jijie Shao
+Also the WARN_ONCE() warns if we try to do a cmd which doesn't have a
+matching operation in ethnl_default_requests[].  Every time we check
+for missing commands it triggers a WARN_ONCE().  There are quite a few
+which don't have a handler so I'm surprised that syzbot doesn't trigger
+the warning and complain.  Here is a list of commands without a
+handler:
 
+ETHTOOL_MSG_USER_NONE, 
+ETHTOOL_MSG_FEATURES_SET,
+ETHTOOL_MSG_CABLE_TEST_ACT,
+ETHTOOL_MSG_CABLE_TEST_TDR_ACT,
+ETHTOOL_MSG_TUNNEL_INFO_GET,
+ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
+ETHTOOL_MSG_RSS_CREATE_ACT,
+ETHTOOL_MSG_RSS_DELETE_ACT,
+
+regards,
+dan carpenter
 
 
