@@ -1,163 +1,197 @@
-Return-Path: <netdev+bounces-257929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257930-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGJqLu+6iWmEBQUAu9opvQ
-	(envelope-from <netdev+bounces-257929-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 11:46:07 +0100
+	id OB/HIoW+iWneBQUAu9opvQ
+	(envelope-from <netdev+bounces-257930-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 12:01:25 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16DDB10E47C
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 11:46:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA0C10E7C8
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 12:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94911301ECFC
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 10:44:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 153CF30097D2
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 10:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77187368264;
-	Mon,  9 Feb 2026 10:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E8336998C;
+	Mon,  9 Feb 2026 10:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YF/F6hZm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utRBcfdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E519367F52
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 10:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5551336997D;
+	Mon,  9 Feb 2026 10:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770633845; cv=none; b=NvBLOxknocO0wnsB4sXspi9QzxVGjpREaXDWXBLJvvjsYL2cZTsyPxTIre0wo+YueJ/hlGNKOxaK6IJnhh4p5qXEbW33nK9e6tX+Xj2CItacmhKdBUjW2i2RthsDJ6zo9wiEvAfmlBIi5ABN+KHYXW74+8w0YNopZZr4f2g7H5Y=
+	t=1770634722; cv=none; b=J8ccm8IwuBAvFsTkEmGEfD2Ozw175w8R+qj79Xjb8ONIN/wzQZAw6YXgS7gv1MRCX1RRo3maUP5HWCpsNqRmMfNmnrfINBbK7JZfYn7quQMg8x/vrOJsueCscsRKUQu+jpro1I6LqYOxBqIqKMJHhEmFyPVqC68xieWb4E0FfcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770633845; c=relaxed/simple;
-	bh=KPdrSSVeXDv3a0A+bKuqk0XJOqTNqwZOKoMAc0HDxIY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aaJjli3SHdaE+FU5vVZsZm+69tVX8CpszV3J5zFkRFaEM8Omm9lxyLI8CWA2NeVtRodQMWBzmnm+vqoykT8foALOyuSyTDs6UNzBTEGWNCkte3mEqx4Py42fumnah48xs6du7MfLUXHbK8IdIlxnKobB5zjHymTv4n89taOV1k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YF/F6hZm; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8e762437-69f9-40d7-bb75-3a45bef1d5d6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770633841;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S2IQbg3EuRQv0ZXMFr8IH+0gBnowsk1pZP6YBjPZW0Y=;
-	b=YF/F6hZm/vwgeSDSvzouBC+ViBsrDG5LVxECAjdUZ+4Y3hs8dbRL8f8Lr5tjYqTkk00wkv
-	PosVz6iUp/Jn28OlZEuFTuPBqz+G630U2vfAjLh+TgLm0SDYkADmydApFbXUsIqB1nJx0A
-	oeeMw2q5as0j1+UKj2WfNjXh/URoB7Y=
-Date: Mon, 9 Feb 2026 10:43:55 +0000
+	s=arc-20240116; t=1770634722; c=relaxed/simple;
+	bh=h4GEDWe6uuyTQA1rzNq+PrtcqbCscpqHvhtCUOumA0o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NVIaURAEEHFbA/SAXQvRgAq9XStiIlI8h6KWvrIHm/m7YxrnetAtF1tF3JsKk5MHfZF0sMvUi/YFZTXmH24c/UVvEpxWem+aT/EDsuFZoVfluBvC9tzo/6gVbiLfqp1QLBMcwKLUksq41myH7rH76uPvB9K3yOLuAbb0EY98Wck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utRBcfdg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0277C116C6;
+	Mon,  9 Feb 2026 10:58:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770634722;
+	bh=h4GEDWe6uuyTQA1rzNq+PrtcqbCscpqHvhtCUOumA0o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=utRBcfdgQb/Vh0ugZwAdpOO5VgCTumAcb6d4miCD6RJ7VPECh0BhuQl/YXk5y2Kpu
+	 l5U4KdSWTnhVVFNBCz9dU2CKqpcwu6D8LcxRm/IjCe+0f+Bqh4HOukfWD7CLUxcaZE
+	 lDWhu5U4V79a6H4lU+DP30sAgfSboPFG4dZg8VI9SXsckxUU2TsfQ+l5bQWvdtqn+g
+	 Jd/Cl+YQXBYChr6qDflqJqtKucATI5q5q70WvxEwi4B4XJGEp19nNNpHCGZUAt+5p8
+	 +L+umfv3296UkHssiy74eKSHmmGMtReJG1M9n09B9iNRUtTbuZpI093NsKit2sue6W
+	 zcdjFtGB+JFgw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Matthew Wood <thepacketgeek@gmail.com>, Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, hch@infradead.org, jlbec@evilplan.org,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org,
+ kernel-team@meta.com
+Subject: Re: [PATCH RFC 0/2] configfs: enable kernel-space item registration
+In-Reply-To: <aYTWbElo_U_neJZi@deathstar>
+References: <fdieWSRrkaRJDRuUJYwp6EBe1NodHTz3PpVgkS662Ja0JcX3vfDbNo_bs1BM7zIkVsHmxHjeDi6jmq4sPKOCIw==@protonmail.internalid>
+ <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
+ <878qfgx25r.fsf@t14s.mail-host-address-is-not-set>
+ <-6hh70JX5nq4ruTMbNQPMoUi6wz8vmM2MQxqB3VNK3Zt97c-oxWOo3y0cQ7_h6BSfcp78fR9GmzxcTQb_WB-XA==@protonmail.internalid>
+ <ineirxyguevlbqe7j4qpkcooqstpl5ogvzhg2bqutkic4lxwu5@vgtygbngs242>
+ <875xakwwvz.fsf@t14s.mail-host-address-is-not-set>
+ <C6V44SxiJH8NxRosmbshR-sfcBisrA5yWQpDmfQXe5vOX3uI6SM-r7wwUr7WxfPMS5ETUQ9GYDlptRs911A_Qg==@protonmail.internalid>
+ <aYTWbElo_U_neJZi@deathstar>
+Date: Mon, 09 Feb 2026 11:58:22 +0100
+Message-ID: <87qzquuqsx.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
- directly from interrupt for i210
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
- Paul Menzel <pmenzel@molgen.mpg.de>,
- "Gomes, Vinicius" <vinicius.gomes@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>
-References: <20260205100347.ssTBDAI_@linutronix.de>
- <IA3PR11MB89865B46DCBEB496BE28703BE599A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <6a0f4cbb-e8b3-4f0e-b7f1-7f9ca5cba97d@linux.dev>
- <20260205145104.iWinkXHv@linutronix.de>
- <66925f09-ef9f-4401-baec-7d4c82a68ce3@linux.dev>
- <20260205164341.pJvni8kA@linutronix.de>
- <76acd5cc-eb6f-4c56-a5e6-f6413736afbb@linux.dev>
- <willemdebruijn.kernel.459b2672b1e7@gmail.com>
- <601f0c4b-52d8-4b60-96bf-f2d65f8073d8@linux.dev>
- <willemdebruijn.kernel.bbdefedfb87e@gmail.com>
- <20260209090621.GiZqTiMJ@linutronix.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260209090621.GiZqTiMJ@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[gmail.com,debian.org];
+	TAGGED_FROM(0.00)[bounces-257930-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,infradead.org,evilplan.org,gmail.com,wbinvd.org,meta.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257929-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[linutronix.de,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,davemloft.net,intel.com,linutronix.de,molgen.mpg.de,vger.kernel.org,gmail.com,lunn.ch,lists.osuosl.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[a.hindborg@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.996];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: 16DDB10E47C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EBA0C10E7C8
 X-Rspamd-Action: no action
 
-On 09/02/2026 09:06, Sebastian Andrzej Siewior wrote:
-> On 2026-02-08 11:25:40 [-0500], Willem de Bruijn wrote:
->>>>> But it's more like a question to maintainers whether it is acceptable
->>>>> way of "fixing" drivers or it's no-go solution
->>>>
->>>> Requiring OPT_TSONLY unless CAP_NET_RAW would break legacy users.
->>>
->>> Well, they are kinda broken already. Without OPT_TSONLY and CAP_NET_RAW all TX
->>> timestamps are silently dropped.
->>
->> Are you referring to sysctl_tstamp_allow_data?
->>
->> That is enabled by default.
-> 
-> Yes. If so, then we don't need the check below which requires
-> sk_callback_lock.
-> 
-> Are SIOCSHWTSTAMP the legacy users or the ones which do not set
-> OPT_TSONLY?
-> 
-> I would suggest to move the CAP_NET_RAW check to the point where
-> timestamping is getting enabled.
-> Also if ndo_hwtstamp_set is the preferred method of getting things done,
-> I could check how many old ones are can be easily converted…
+"Matthew Wood" <thepacketgeek@gmail.com> writes:
 
-Looks like you are mixing things. SIOCSHWTSTAMP/ndo_hwtstamp_set are HW
-configuration calls while OPT_TSONLY is socket option, which is setup 
-via setsockopt, you can find points searching for
-SOF_TIMESTAMPING_OPT_TSONLY in the sources, basically
-sock_set_timestamping() is the function to check
+> Hi Breno and Andreas,
+>
+> I'm in favor of this RFC as I think the current flow of needing to
+> create the cmdline0 dir in the netconsole configfs (when DYNAMIC config
+> is enabled) prior to modifying the values is not ideal.
+>
+> I think there are good points shared about sysfs vs. configfs being used
+> for the cmdline target modification and wanted to add my thoughts.
 
-> 
->>> To receive these timestamps users have to get
->>> CAP_NET_RAW permission, and it will work with the updated logic as well...
-> 
-> Sebastian
+Thanks, I appreciate it.
+
+>
+> On Fri, Dec 05, 2025 at 08:29:04PM +0100, Andreas Hindborg wrote:
+>> "Breno Leitao" <leitao@debian.org> writes:
+>>
+>> > Hello Andreas,
+>> >
+>> > On Fri, Dec 05, 2025 at 06:35:12PM +0100, Andreas Hindborg wrote:
+>> >> "Breno Leitao" <leitao@debian.org> writes:
+>> >>
+>> >> > This series introduces a new kernel-space item registration API for configfs
+>> >> > to enable subsystems to programmatically create configfs items whose lifecycle
+>> >> > is controlled by the kernel rather than userspace.
+>> >> >
+>> >> > Currently, configfs items can only be created via userspace mkdir operations,
+>> >> > which limits their utility for kernel-driven configuration scenarios such as
+>> >> > boot parameters or hardware auto-detection.
+>> >>
+>> >> I thought sysfs would handle this kind of scenarios?
+>> >
+>> > sysfs has gaps as well, to manage user-create items.
+>> >
+>> > Netconsole has two types of "targets". Those created dynamically
+>> > (CONFIG_NETCONSOLE_DYNAMIC), where user can create and remove as many
+>> > targets as it needs, and netconsole would send to it. This fits very
+>> > well in configfs.
+>> >
+>> >   mkdir /sys/kernel/config/netconsole/mytarget
+>> >   .. manage the target using configfs items/files
+>> >   rmdir /sys/kernel/config/netconsole/mytarget
+>> >
+>> > This is a perfect fit for configfs, and I don't see how it would work
+>> > with sysfs.
+>>
+>> Right, these go in configfs, we are on the same page about that.
+>>
+>> >
+>> > On top of that, there are netconsole targets that are coming from
+>> > cmdline (basically to cover while userspace is not initialized). These
+>> > are coming from cmdline and its life-cycle is managed by the kernel.
+>> > I.e, the kernel knows about them, and wants to expose it to the user
+>> > (which can even disable them later). This is the problem I this patch
+>> > addresses (exposing them easily).
+>>
+>> I wonder if these entries could be exposed via sysfs? You could create
+>> the same directory structure as you have in configfs for the user
+>> created devices, so the only thing user space has to do is to point at a
+>> different directory.
+>>
+> Although technically feasible, this approach leads to an inconsistent
+> and confusing management of the netconsole targets. A configfs path for
+> user-space created targets and a sysfs path for the cmdline initiated
+> target that can also be modified from userspace (e.g. to update
+> remote_ip or userdata fields).
+>
+> I think Breno's approach sets up for the most intuitive user experience.
+> The cmdline config for netconsole is also user-provided, so it seems
+> like it should behave as a pre-populated configfs target that happens to
+> pass from cmdline through netconsole module init to the current configfs
+> interface. The initial values are not determined by the kernel itself.
+
+How about using default groups for this, would that not be feasible?
+
+While I understand the use case for this patch, I don't think it is a
+good solution. It changes the fundamental assumptions of configfs. So if
+we are going to go down this route I would like more people to review
+the patches and weigh in with their opinion.
+
+Perhaps we should discuss this at a venue where we can get some more
+people together? LPC or LSF maybe?
+
+
+Best regards,
+Andreas Hindborg
+
 
 
