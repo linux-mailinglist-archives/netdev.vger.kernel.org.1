@@ -1,170 +1,217 @@
-Return-Path: <netdev+bounces-257957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFFDBhD7iWkiFQAAu9opvQ
-	(envelope-from <netdev+bounces-257957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:19:44 +0100
+	id uBMCN+L9iWluFQAAu9opvQ
+	(envelope-from <netdev+bounces-257958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:31:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA04111D4E
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:19:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AFEB111EDF
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:31:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 46FB130048DA
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 15:19:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E4A8305DEEE
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 15:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF0F37B409;
-	Mon,  9 Feb 2026 15:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9166F37F100;
+	Mon,  9 Feb 2026 15:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1NnOgVI"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dVe4aC8U";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ahVUEU0o";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dVe4aC8U";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ahVUEU0o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07DB3793D2
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 15:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409BB37F0F7
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 15:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770650381; cv=none; b=cckyPM7HeOb8DePSNZrEYKi89LHyRyKRAXRG6ONEX6Dbtqbs1jl/scHCqTaTTgzzM7yKWMbADSS6/E62CdO4347vs2tEr4G3UkXHilmTUQtIlQ2OTIHGW0YYzcfSuKnCQRpo5S+IXzEXq8TSwdXYZy5+amIxL9S8sB4XWMNiCsk=
+	t=1770650762; cv=none; b=VvICGMpvmnvmIHxbeGZnjveb7vjHWUS7bo/wKiTtlwEzmmEiwKe/T7v8Ifb5fJYoCwjcOGl3A8o2ANfXWCSabq/JdoZEeFQIQiyLXAhIGEUZ59X6t/SVRkDQ2Fzcya2PF2aESxHY7pdZ/8UWGcx92fLbzTzdvpp/gGBOFygK7bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770650381; c=relaxed/simple;
-	bh=uHOAoAqXBB6yKdjNEOSRdIq/aoI8ubCF1Y4crVHtibw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FkKJZWiVxcWtoo2kjz38uxQIhWcfsj++wzxapYbKvxrPBNmkiE+nZgcSB4OC2qtrv+Fp4ehk1ntZKnkPPjQlNx+aQ9BA9lNlE3MH8AAVpmoxMFvUgSiJLFx8NYTo+W3EHZSO+fBbmA4WqUIWl1NaI3wv7lfvY3PHW7rh6Y5MKxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1NnOgVI; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4359c54b682so295157f8f.3
-        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 07:19:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770650379; x=1771255179; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YTzvCYXiRiQsNzIWAR8ywGvKHYp+IRPHv2CPPhaIo54=;
-        b=L1NnOgVIyM9u/4YQl0b927UR+aOS6W+8ArxKLvB6byHXbCaRxKALWCWpwe889djvHn
-         Ct7PLigbQzmcvvjehjUocy6mvjDWCN8hiBSGqb+zvzRLOgIPCDehW5KaM0pT98xZEjG9
-         hkKNT7Ohe3qMa5730kb+TqjrO4+WZDLqTZAeor2oNdYf6unNYlTQtRhsJ/4j2yPqst/2
-         iPgyPWLfUzdhPtQGxd5rkNDUUsuo3em8AEAKe6UL8auXxlpd6QGCIlCx/igvfe8OqOlK
-         z01YRjW+coVYrE8gmxDKeAiEl+SyyeXtyWy/jOqJrbvi7giOFwCvBDzMNH6TSl9OnVVe
-         rmsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770650379; x=1771255179;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YTzvCYXiRiQsNzIWAR8ywGvKHYp+IRPHv2CPPhaIo54=;
-        b=Uisn25QlIgbv/ZSbh0++Aerot4JlfMI3Fz1OrkxOMxYJeW7trO3yf8ajtNpaM2rnPt
-         tSUXVQAMRDmPWU2ZunfWHo3QQqDT0WGfT9IdTuUraveXjlAm6JzWVcyf07QAUGF2tGwJ
-         1vYU1FHC23+orDyo/phA6PxUNZl2rPAvZYMTyOGnegijK58i1LL9HjpN8GnZTIN5Ox7v
-         jUMVW2t/byfRK9yzxIlNXMjD7SjcvGDOQSIg3dAXFdPHkrHhWFggkYkT502w/UaZxSK5
-         2tE5erRexA4xd+Fy5vO+N34363ehgNI0MCR0BaT2bwcoQJzitB2j2CbGRqC8AdaHPTAg
-         kD+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXd4UaRattFY1ShdRTba6TJj1Ygw6duCFees14Itx6ArDlKIEQT7e22jLO+NNGqU5bIvTNh8UY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTike2jLCfpIm2fF5pfYADDbnbpDGNSU0VVNEK1y39nkY8BgVU
-	nEpPL+lIK93dUb+ETZIbICBYYab2I4LWZ316izGk/7ZF5dDUeXhHu0h/
-X-Gm-Gg: AZuq6aKayKVETxSGFXCewzzl2Z57qeIh2fYTK9Unu19SKDIDCHtnzcRs4uvojsLbmtY
-	7n9Z6kFfEhkHZ3N0RSzgM/Rg3ognkNAP5b1eNGHxBW0tTKDGj5X//9DsXsnWkADHKNYolqg6jOH
-	bDXUdXfYUNUfnvtjBmcmTPMbYik/L+50/BAshczFENre86UIqIFvi5A4tQPkjUjWDmcMa5Mteyy
-	ws4hyt6hj06bylICup5EVNyVD0eOPRZLPbUAV8pbd5ipcjD/1tZ7joHlpngO3Kq3IAok8JGZduN
-	booEwVzbKDFPGA+2gq26YiY1Xlqy6ABoa6cuuafDFMZglan+ereN7zDavYZjeqgnu6ApyYAZ8nE
-	YkBD6LP1uUJe9M+G4Fjx5QMTAi53ygq3pJ2CpQ43QTmxNea7XOGXzuN33Dc0GNFi2mdCYW6wrs3
-	GV8g13AQqdPxE4rujz3ydfOLhwRWMCl5o6D9cO+ASp+9IG3CUYlyxVc3ID6NyTAOS7AfWnTCQ5q
-	yk46Gkb
-X-Received: by 2002:a05:6000:184b:b0:437:72ce:8954 with SMTP id ffacd0b85a97d-43772ce8a4dmr1977190f8f.6.1770650378901;
-        Mon, 09 Feb 2026 07:19:38 -0800 (PST)
-Received: from thomas-precision3591.paris.inria.fr (wifi-pro-83-213.paris.inria.fr. [128.93.83.213])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-4376686130csm15122697f8f.1.2026.02.09.07.19.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 07:19:38 -0800 (PST)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	stable@vger.kernel.org,
-	Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sujuan Chen <sujuan.chen@mediatek.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: mtk: wed: Fix dma_free_coherent() size mtk_wed_hwrro_free_buffer()
-Date: Mon,  9 Feb 2026 16:18:21 +0100
-Message-ID: <20260209151822.136934-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1770650762; c=relaxed/simple;
+	bh=8sf12bdDZSlGSccRjkyFc4DzSqXFDuafZoAwDn99dy0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LSc95SSY2L0KUxS41j9Cwpm42Q79XvrjvTyeNkrq5n1AWlbZXGcViScp3+yZz7ctS3eZHsBCfbn2nHX/qIhccuUxfU7RL/qjcE1dd14Q5KxERopVkV0r2j5AXXkcDbihXNQqapCQt/wNoIIbxNycHKv1idjQkMS+qfrJLxzjs5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dVe4aC8U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ahVUEU0o; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dVe4aC8U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ahVUEU0o; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6076D3E712;
+	Mon,  9 Feb 2026 15:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770650760; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
+	b=dVe4aC8UMGE8KQGJx/+IsBkhtOLhUxg+O7l3196R65K0WqisVv3ib8fFTPJV4o13K/H7oi
+	RALU9B8rmNkihxyZiHw1GF83hSnO0/gbbf2xxUoQZyRmL3w6OJji3zLOLpB0RnxSvvPlrb
+	Ceqsta/6IoPez/gWmiyvPLx3sc99K5g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770650760;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
+	b=ahVUEU0oENpqE3omnQgpD5vkq5W3aIWsekqTc6ZuUM16siyQ8T+PI3UmOYw/fOAdtoodB1
+	3vxPcbiiS5IW2pCQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=dVe4aC8U;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ahVUEU0o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770650760; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
+	b=dVe4aC8UMGE8KQGJx/+IsBkhtOLhUxg+O7l3196R65K0WqisVv3ib8fFTPJV4o13K/H7oi
+	RALU9B8rmNkihxyZiHw1GF83hSnO0/gbbf2xxUoQZyRmL3w6OJji3zLOLpB0RnxSvvPlrb
+	Ceqsta/6IoPez/gWmiyvPLx3sc99K5g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770650760;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
+	b=ahVUEU0oENpqE3omnQgpD5vkq5W3aIWsekqTc6ZuUM16siyQ8T+PI3UmOYw/fOAdtoodB1
+	3vxPcbiiS5IW2pCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 85A1E3EA63;
+	Mon,  9 Feb 2026 15:25:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id tn61HYf8iWlMPQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 09 Feb 2026 15:25:59 +0000
+Message-ID: <641a1a66-705e-46ee-9612-db35d92729cf@suse.de>
+Date: Mon, 9 Feb 2026 16:25:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next] inet: add ip_retry_random_port sysctl to
+ reduce sequential port retries
+To: longxie86@protonmail.com
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ corbet@lwn.net, ncardwell@google.com, kuniyu@google.com, dsahern@kernel.org,
+ idosch@nvidia.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Thorsten Toepper <thorsten.toepper@sap.com>
+References: <20260203175422.4620-1-fmancera@suse.de>
+ <CANn89i+UUWx5OhPnJnDhiCfr53BPTAGedBucgqYwyfqkidf_Cg@mail.gmail.com>
+ <8d94faf9-2fb6-483d-9767-bd665c4a4b9a@suse.de>
+ <1649583d-71c2-425e-a2df-685d5f6dc67d@suse.de>
+ <CANn89iK3Pu2NXxejTSLF-7MhBc03_ZJUjOtZcTC4nMsbsDpbSw@mail.gmail.com>
+ <d76cd8c3-deb0-4f39-b5b9-a711d155cd5f@suse.de>
+ <egIQQeDF4RIP_614tU-XIK-01DgThdPOU3KA253uNHvZv76zymXyBFhey1G7wj5mA2nwHpdT7VBoGuFnATSO-PS0hUb0Qrt0AyN5JNbpATg=@protonmail.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <egIQQeDF4RIP_614tU-XIK-01DgThdPOU3KA253uNHvZv76zymXyBFhey1G7wj5mA2nwHpdT7VBoGuFnATSO-PS0hUb0Qrt0AyN5JNbpATg=@protonmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spam-Flag: NO
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-257957-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257958-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,nbd.name,mediatek.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,collabora.com,lists.infradead.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[protonmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fourierthomas@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7FA04111D4E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email,0xffsoftware.com:url]
+X-Rspamd-Queue-Id: 3AFEB111EDF
 X-Rspamd-Action: no action
 
-The DMA buffer alloc'd in mtk_wed_hwrro_buffer_alloc() with size
-dev->wlan.rx_nbuf but is freed with size dev->hw_rro.size.
+On 2/9/26 2:53 PM, longxie86@protonmail.com wrote:
+> On Monday, February 9th, 2026 at 12:57 PM, Fernando Fernandez Mancera <fmancera@suse.de> wrote:
+> 
+>>
+>>
+>> On 2/6/26 6:09 PM, Eric Dumazet wrote:
+>>
+>>> On Fri, Feb 6, 2026 at 5:28 PM Fernando Fernandez Mancera
+>>> fmancera@suse.de wrote:
+>>>
+>>>> It makes sense. I have tested this approach and we got a more even
+>>>> distribution of source ports when having thousands of reserved ports. No
+>>>> difference at all when not using reserved ports.
+>>>>
+>>>> Please, you can find the distribution graph with the current algorithm
+>>>> [1] and with the random step algorithm [2].
+>>>>
+>>>> While I understand that this approach is introducing a call to
+>>>> get_random_u32_below() on every connect, I am wondering if it makes
+>>>> sense to replace the existing algorithm with this variant. What do you
+>>>> think?
+>>>
+>>> I would ask RFC 6056 experts like Fernando Gont what they think.
+>>>
+>>> Note that if we use random at each connect(), we defeat one of the principles
+>>> of ephemeral port selection : try very hard to avoid 4-tuple collision.
+>>
+>>
+>> Right. I will reach out to him and get his opinion. I have plenty of
+>> time before net-next open again. I am also collecting some metrics
+>> regarding the 4-tuple collision frequency.
+>>
+> 
+> We have had this problem in AWS for a long time. The patch works on our system. What is needed for it to be included in the next Linux release?
+> 
 
-Change the dealloc size to match the one used in
-mtk_wed_hwrro_buffer_alloc().
+This just an RFC, I discourage using it in production yet. An official 
+v1 will be sent once net-next is open and there it needs to be reviewed 
+and approved by the maintainers.
 
-Fixes: 6757d345dd7d ("net: ethernet: mtk_wed: introduce hw_rro support for MT7988")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/net/ethernet/mediatek/mtk_wed.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Please bring this to the stable versions.
+> 
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
-index 1ed1f88dd7f8..455df564174d 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed.c
-@@ -879,7 +879,7 @@ mtk_wed_hwrro_free_buffer(struct mtk_wed_device *dev)
- 		__free_page(page);
- 	}
- 
--	dma_free_coherent(dev->hw->dev, dev->hw_rro.size * sizeof(*desc),
-+	dma_free_coherent(dev->hw->dev, dev->wlan.rx_nbuf * sizeof(*desc),
- 			  desc, dev->hw_rro.desc_phys);
- 
- free_pagelist:
--- 
-2.43.0
+I don't think that will happen. This is an improvement not a "fix" per 
+definition. Anyway, you could ask for a backport to your 
+vendor/distribution.
+
+Thanks,
+Fernando.
+
+>>>> Please, notice the implementation below. I plan to send an official v1
+>>>> once net-next is open. In addition, I am rewriting the commit message as
+>>>> I find the current one confusing.
+>>>>
+>>>> [1] https://0xffsoftware.com/port_graph_current_alg.html
+>>>>
+>>>> [2] https://0xffsoftware.com/port_graph_random_step_alg.html
+>>
+>>
 
 
