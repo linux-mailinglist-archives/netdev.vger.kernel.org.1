@@ -1,175 +1,141 @@
-Return-Path: <netdev+bounces-257908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIAcJouSiWlz+wQAu9opvQ
-	(envelope-from <netdev+bounces-257908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:53:47 +0100
+	id gD+/MPiTiWlj/AQAu9opvQ
+	(envelope-from <netdev+bounces-257909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:59:52 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12E410CA2E
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:53:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCE010CB02
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5BC713003629
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 07:53:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94736301D327
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 07:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39ED33375CB;
-	Mon,  9 Feb 2026 07:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6464F33A6FB;
+	Mon,  9 Feb 2026 07:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dIkt8XzW"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kqbK3oii"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E761EA7DB;
-	Mon,  9 Feb 2026 07:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F71633BBD2;
+	Mon,  9 Feb 2026 07:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770623624; cv=none; b=cMdnDySvO7AH8vBuwdMocPo3QuqJx2EzowwhFNVBdKEv/o9VmZAPb81/0YQsDcu5k2n86jbFUXbALYLcBGksuSw3gf/RMaJRmTHQFpXRZUUCMbDv3+1cQHfY3jNg2BCYU3WQ996xFUJt+e6UwuLV1GRiFeSSv9/+Iblru+Cl3uY=
+	t=1770623944; cv=none; b=KcFDuK4iyuLl4o/2yUA8N8SQcAeUu9Ys4U4wD2QiTQweFPm29lN2wn3+67BAPNYgjGDCqJK22rze9F5j6zMCVxbyk+48/kHa5kJp5le8tjBxq0hGvIfVQqcHOV+AhSaNA5AYpHBVCxA3zMSQam8bWHSvkKtI33dd0Zzx+d1bVeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770623624; c=relaxed/simple;
-	bh=x/1MGRSI8f2/EHxwYmPfmvnGPgI7fwl6Tpgv7bmTgdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWiwNH0IEv39GblGeVoa/Dl409VONW53Vn88+EK37D+oCRBCrQ6aHdDcZPOupHgFpc6mdYDurxZvu2gtSHa4jms5OBAwqR8nuZTxBz/7XyA6jNIaJsL+I+bm7gEnpKNlXfY0Q/xhNkoISo0sXracA8PsV9eHVU9WHeh/ZTavNKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dIkt8XzW; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1770623619; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=0AEmXZmOG2VM+xnXftYt5+WSp/YKD3yjyUsUFqPOhMk=;
-	b=dIkt8XzWyaNCxP47qL47D673ScD5jK/e0iH1RnqC6WvfbwdnGHj8yHZrbrmWi5fjiCIDLkYx7715IJAqA2oPUw3xNrbMFns22lwDfB6V6Zc6HBuyblLpR6WRvaWzg17uJkJ/SzJCHgQXET9zIVmrsMre07X7ixYlp1SvPnLiGfQ=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WypALM._1770623618 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 09 Feb 2026 15:53:39 +0800
-Date: Mon, 9 Feb 2026 15:53:38 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Mahanta Jambigi <mjambigi@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
-	pasic@linux.ibm.com
-Subject: Re: [PATCH RFC net-next] net/smc: transition to RDMA core CQ pooling
-Message-ID: <20260209075338.GA61095@j66a10360.sqa.eu95>
-References: <20260202094800.30373-1-alibuda@linux.alibaba.com>
- <daefb72f-398e-489f-bdbc-db997ef9c5ae@linux.ibm.com>
+	s=arc-20240116; t=1770623944; c=relaxed/simple;
+	bh=++ReS9XegZQHNmyNsPh3Bhw06zEogxVcMR+KgBBJAeQ=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NLN7Ni/xOshpKMG1UqnqC+BgeiZIsDseY4hjA82MADa+3T/BU6HtIe6m7+ax3WsfpHCVYQRhcNB8Z0ygml878/KR6XV0+VzRQI6qLOHJD5bbPrZp/9Yd4lOyyS68I2erwYuWaxbYJ7+1qN5pSVgVdkZAZChU92p08AajCLXQo9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kqbK3oii; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=jqeB9cQk6daGDcSKVompikvICasiia4Vo+NYb14w+Tc=;
+	b=kqbK3oiiKj3sKeD6xrSZpTzsvQVmZp6Fn1xLuDb7UqyhPmFHLYns4b7Ons9m9wRd7LgeXEFhA
+	/zZm+YpsqxaX0pnstIQvr8EkTmyjzJCPBuFYhUDiyDiXR3ZBl2flryLGgw4oKVE9u7513JqMeCR
+	95UbPJqGtVJ+/F4X3iV2+Pc=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4f8cQv5NXVzKm4q;
+	Mon,  9 Feb 2026 15:54:15 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 72CF440565;
+	Mon,  9 Feb 2026 15:58:53 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Mon, 9 Feb 2026 15:58:52 +0800
+Message-ID: <b106c744-112f-4820-8bac-b0949c51801a@huawei.com>
+Date: Mon, 9 Feb 2026 15:58:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <daefb72f-398e-489f-bdbc-db997ef9c5ae@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <gakula@marvell.com>, <sgoutham@marvell.com>,
+	<sbhatta@marvell.com>, <hkelam@marvell.com>, <horms@kernel.org>,
+	<bbhushan2@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <sumang@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+Subject: Re: [PATCH net v2 1/2] octeontx2-af: CGX: fix bitmap leaks
+To: Bo Sun <bo@mboxify.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+References: <20260206130925.1087588-1-bo@mboxify.com>
+ <20260206130925.1087588-2-bo@mboxify.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260206130925.1087588-2-bo@mboxify.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257908-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-257909-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.989];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:dkim]
-X-Rspamd-Queue-Id: F12E410CA2E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mboxify.com:email]
+X-Rspamd-Queue-Id: 2CCE010CB02
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 04:58:23PM +0530, Mahanta Jambigi wrote:
-> 
-> 
-> On 02/02/26 3:18 pm, D. Wythe wrote:
-> > The current SMC-R implementation relies on global per-device CQs
-> > and manual polling within tasklets, which introduces severe
-> > scalability bottlenecks due to global lock contention and tasklet
-> > scheduling overhead, resulting in poor performance as concurrency
-> > increases.
-> > 
-> > Refactor the completion handling to utilize the ib_cqe API and
-> > standard RDMA core CQ pooling. This transition provides several key
-> > advantages:
-> > 
-> > 1. Multi-CQ: Shift from a single shared per-device CQ to multiple
-> > link-specific CQs via the CQ pool. This allows completion processing
-> > to be parallelized across multiple CPU cores, effectively eliminating
-> > the global CQ bottleneck.
-> > 
-> > 2. Leverage DIM: Utilizing the standard CQ pool with IB_POLL_SOFTIRQ
-> > enables Dynamic Interrupt Moderation from the RDMA core, optimizing
-> > interrupt frequency and reducing CPU load under high pressure.
-> > 
-> > 3. O(1) Context Retrieval: Replaces the expensive wr_id based lookup
-> > logic (e.g., smc_wr_tx_find_pending_index) with direct context retrieval
-> > using container_of() on the embedded ib_cqe.
-> > 
-> > 4. Code Simplification: This refactoring results in a reduction of
-> > ~150 lines of code. It removes redundant sequence tracking, complex lookup
-> > helpers, and manual CQ management, significantly improving maintainability.
-> > 
-> > Performance Test: redis-benchmark with max 32 connections per QP
-> > Data format: Requests Per Second (RPS), Percentage in brackets
-> > represents the gain/loss compared to TCP.
-> > 
-> > | Clients | TCP      | SMC (original)      | SMC (cq_pool)       |
-> > |---------|----------|---------------------|---------------------|
-> > | c = 1   | 24449    | 31172  (+27%)       | 34039  (+39%)       |
-> > | c = 2   | 46420    | 53216  (+14%)       | 64391  (+38%)       |
-> > | c = 16  | 159673   | 83668  (-48%)  <--  | 216947 (+36%)       |
-> > | c = 32  | 164956   | 97631  (-41%)  <--  | 249376 (+51%)       |
-> > | c = 64  | 166322   | 118192 (-29%)  <--  | 249488 (+50%)       |
-> > | c = 128 | 167700   | 121497 (-27%)  <--  | 249480 (+48%)       |
-> > | c = 256 | 175021   | 146109 (-16%)  <--  | 240384 (+37%)       |
-> > | c = 512 | 168987   | 101479 (-40%)  <--  | 226634 (+34%)       |
-> > 
-> > The results demonstrate that this optimization effectively resolves the
-> > scalability bottleneck, with RPS increasing by over 110% at c=64
-> > compared to the original implementation.
-> 
-> I applied your patch to the latest kernel(6.19-rc8) & saw below
-> Performance results:
-> 
-> 1) In my evaluation, I ran several *uperf* based workloads using a
-> request/response (RR) pattern, and I observed performance *degradation*
-> ranging from *4%* to *59%*, depending on the specific read/write sizes
-> used. For example, with a TCP RR workload using 50 parallel clients
-> (nprocs=50) sending a 200‑byte request and reading a 1000‑byte response
-> over a 60‑second run, I measured approximately 59% degradation compared
-> to SMC‑R original performance.
+
+on 2026/2/6 21:09, Bo Sun wrote:
+> The RX/TX flow-control bitmaps (rx_fc_pfvf_bmap and tx_fc_pfvf_bmap)
+> are allocated by cgx_lmac_init() but never freed in cgx_lmac_exit().
+> Unbinding and rebinding the driver therefore triggers kmemleak:
 >
+>      unreferenced object (size 16):
+>          backtrace:
+>            rvu_alloc_bitmap
+>            cgx_probe
+>
+> Free both bitmaps during teardown.
+>
+> Fixes: e740003874ed ("octeontx2-af: Flow control resource management")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Bo Sun <bo@mboxify.com>
+> ---
+>   drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> index 42044cd810b1..fd4792e432bf 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> @@ -1823,6 +1823,8 @@ static int cgx_lmac_exit(struct cgx *cgx)
+>   		cgx->mac_ops->mac_pause_frm_config(cgx, lmac->lmac_id, false);
+>   		cgx_configure_interrupt(cgx, lmac, lmac->lmac_id, true);
+>   		kfree(lmac->mac_to_index_bmap.bmap);
+> +		rvu_free_bitmap(&lmac->rx_fc_pfvf_bmap);
+> +		rvu_free_bitmap(&lmac->tx_fc_pfvf_bmap);
 
-The only setting I changed was net.smc.smcr_max_conns_per_lgr = 32, all
-other parameters were left at their default values. redis-benchmark is a
-classic Request/Response (RR) workload, which contradicts your test
-results. Since I'm unable to reproduce your results, it would be
-very helpful if you could share the specific test configuration for my
-analysis.
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
 
-Thanks,
-D. Wythe
 
