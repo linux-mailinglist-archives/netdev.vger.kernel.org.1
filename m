@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-257909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257910-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gD+/MPiTiWlj/AQAu9opvQ
-	(envelope-from <netdev+bounces-257909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:59:52 +0100
+	id KMSMO0yWiWlj/AQAu9opvQ
+	(envelope-from <netdev+bounces-257910-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 09:09:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CCE010CB02
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 08:59:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 909BB10CC79
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 09:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94736301D327
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 07:59:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DE50030010EB
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 08:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6464F33A6FB;
-	Mon,  9 Feb 2026 07:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E203133ADB7;
+	Mon,  9 Feb 2026 08:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kqbK3oii"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BD09N3yK"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F71633BBD2;
-	Mon,  9 Feb 2026 07:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A2D29B8E8
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 08:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770623944; cv=none; b=KcFDuK4iyuLl4o/2yUA8N8SQcAeUu9Ys4U4wD2QiTQweFPm29lN2wn3+67BAPNYgjGDCqJK22rze9F5j6zMCVxbyk+48/kHa5kJp5le8tjBxq0hGvIfVQqcHOV+AhSaNA5AYpHBVCxA3zMSQam8bWHSvkKtI33dd0Zzx+d1bVeQ=
+	t=1770624586; cv=none; b=Z/9D5Mk1+B39f22G3vydrdIBmNEO3idXGfN9PA2Erimv06+Big+YUyzZD4DnwVJmHu2uXX6wO59ZXOBVj2hdrslIoQibyvqP12Rac9O0qmH4eTBOhN2cye4elpX9rK0fdKwmGk6qughFOEHxs5CgJzOiHo7lyGSKPReQULn3u0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770623944; c=relaxed/simple;
-	bh=++ReS9XegZQHNmyNsPh3Bhw06zEogxVcMR+KgBBJAeQ=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NLN7Ni/xOshpKMG1UqnqC+BgeiZIsDseY4hjA82MADa+3T/BU6HtIe6m7+ax3WsfpHCVYQRhcNB8Z0ygml878/KR6XV0+VzRQI6qLOHJD5bbPrZp/9Yd4lOyyS68I2erwYuWaxbYJ7+1qN5pSVgVdkZAZChU92p08AajCLXQo9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kqbK3oii; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=jqeB9cQk6daGDcSKVompikvICasiia4Vo+NYb14w+Tc=;
-	b=kqbK3oiiKj3sKeD6xrSZpTzsvQVmZp6Fn1xLuDb7UqyhPmFHLYns4b7Ons9m9wRd7LgeXEFhA
-	/zZm+YpsqxaX0pnstIQvr8EkTmyjzJCPBuFYhUDiyDiXR3ZBl2flryLGgw4oKVE9u7513JqMeCR
-	95UbPJqGtVJ+/F4X3iV2+Pc=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4f8cQv5NXVzKm4q;
-	Mon,  9 Feb 2026 15:54:15 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 72CF440565;
-	Mon,  9 Feb 2026 15:58:53 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Mon, 9 Feb 2026 15:58:52 +0800
-Message-ID: <b106c744-112f-4820-8bac-b0949c51801a@huawei.com>
-Date: Mon, 9 Feb 2026 15:58:51 +0800
+	s=arc-20240116; t=1770624586; c=relaxed/simple;
+	bh=3GyMKAjFPEmKExP2e0mPiF5qwz1gyk7HNUJvWsvBmPY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hsvPnr6nvruAyG/hpayo1ClSar1BDoMU5F/azOvU6+ekqP913SCYBBaXpS3LOXFdaQmpQveEw/09RwA4wKPfAxwoOE9Ud3bboekIiGhg8nwva91Zr3n7NuQl7LUNA3dRMXCKkeYUqzCUhEqUlYONy+Ch4OpjlL0m1Kl7RYkqLWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BD09N3yK; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id D58E81A2CAC
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 08:09:38 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A4D1E6074B;
+	Mon,  9 Feb 2026 08:09:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DB0AF119D1B15;
+	Mon,  9 Feb 2026 09:09:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1770624576; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=Tpp5m9sUBKbWS+MPQ5BGBO3JfSWbEXySTKg9Ds4pHlw=;
+	b=BD09N3yK1WnSF+8wPEQXMfDrJ3oGlhOxY/o5pKLQT+mzOAxwKlBQgvEXaSLNu7FsOZF+Nt
+	gEsQ1GrtXd1v76O9lnIpBv7oYJdtc+vrlF9xzYlPsWfotzcFMSo9ZK9xDm601KCX+K19Z+
+	wQQttToZqtqBRshCzFjFlzscy5FuaRZeNokxn7BtJRgIxJFuBW4y+Ix+HFWYaNdmyuyzuH
+	fVrLDjRWwZYuehVZV6jz58/LxkyM+sWXHJ/AHyZZojMVxLpcb7Lx0V1HryKbzpmkiABtKq
+	bUfaGcRj8Njbv/BWgoKLIEwPJpfIl4/286bYGtWFIri/WvyGi1R0qpgSkk3ssg==
+Message-ID: <e5f1688f-cb13-4d43-bf20-644cda6ab494@bootlin.com>
+Date: Mon, 9 Feb 2026 09:09:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,82 +60,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <gakula@marvell.com>, <sgoutham@marvell.com>,
-	<sbhatta@marvell.com>, <hkelam@marvell.com>, <horms@kernel.org>,
-	<bbhushan2@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <sumang@marvell.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net v2 1/2] octeontx2-af: CGX: fix bitmap leaks
-To: Bo Sun <bo@mboxify.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-References: <20260206130925.1087588-1-bo@mboxify.com>
- <20260206130925.1087588-2-bo@mboxify.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20260206130925.1087588-2-bo@mboxify.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [bug report] net: ethtool: Introduce per-PHY DUMP operations
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel <linux-kernel@vger.kernel.org>
+References: <aYXu0esD_wSjGTZm@stanley.mountain>
+ <c9c6378a-14a3-440a-80b7-f48cdb06623b@bootlin.com>
+ <aYmID1BOGmwb2rUD@stanley.mountain>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aYmID1BOGmwb2rUD@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257909-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257910-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mboxify.com:email]
-X-Rspamd-Queue-Id: 2CCE010CB02
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 909BB10CC79
 X-Rspamd-Action: no action
 
+Hi Dan,
 
-on 2026/2/6 21:09, Bo Sun wrote:
-> The RX/TX flow-control bitmaps (rx_fc_pfvf_bmap and tx_fc_pfvf_bmap)
-> are allocated by cgx_lmac_init() but never freed in cgx_lmac_exit().
-> Unbinding and rebinding the driver therefore triggers kmemleak:
->
->      unreferenced object (size 16):
->          backtrace:
->            rvu_alloc_bitmap
->            cgx_probe
->
-> Free both bitmaps during teardown.
->
-> Fixes: e740003874ed ("octeontx2-af: Flow control resource management")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bo Sun <bo@mboxify.com>
-> ---
->   drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> index 42044cd810b1..fd4792e432bf 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> @@ -1823,6 +1823,8 @@ static int cgx_lmac_exit(struct cgx *cgx)
->   		cgx->mac_ops->mac_pause_frm_config(cgx, lmac->lmac_id, false);
->   		cgx_configure_interrupt(cgx, lmac, lmac->lmac_id, true);
->   		kfree(lmac->mac_to_index_bmap.bmap);
-> +		rvu_free_bitmap(&lmac->rx_fc_pfvf_bmap);
-> +		rvu_free_bitmap(&lmac->tx_fc_pfvf_bmap);
+On 09/02/2026 08:09, Dan Carpenter wrote:
+> On Fri, Feb 06, 2026 at 06:04:36PM +0100, Maxime Chevallier wrote:
+>>> net/ethtool/netlink.c
+>>>     700 static int ethnl_perphy_start(struct netlink_callback *cb)
+>>>     701 {
+>>>     702         struct ethnl_perphy_dump_ctx *phy_ctx = ethnl_perphy_dump_context(cb);
+>>>     703         const struct genl_dumpit_info *info = genl_dumpit_info(cb);
+>>>     704         struct ethnl_dump_ctx *ctx = &phy_ctx->ethnl_ctx;
+>>>     705         struct ethnl_reply_data *reply_data;
+>>>     706         const struct ethnl_request_ops *ops;
+>>>     707         struct ethnl_req_info *req_info;
+>>>     708         struct genlmsghdr *ghdr;
+>>>     709         int ret;
+>>>     710 
+>>>     711         BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
+>>>     712 
+>>>     713         ghdr = nlmsg_data(cb->nlh);
+>>> --> 714         ops = ethnl_default_requests[ghdr->cmd];
+>>>
+>>> Smatch thinks nlmsg_data() is untrusted data, so it could be out of bounds.
+>>> It's a u8, but there are only 52 elements in the ethnl_default_requests[]
+>>> array.
+>>
+>> I see, then we also have the same problem in ethnl_default_start().
+>>
+>> I'd expect the genl part to validate cmd (I haven't checked yet), but we
+>> do have a WARN_ONCE just below for the case 'cmd' is wrong, so we could
+>> definitely add some more sanity checks before accessing
+>> ethnl_default_requests[].
+> 
+> The WARN_ONCE() doesn't doesn't work as bounds checking since there is
+> no guarantee that the array will be followed by NULL pointers.  I didn't
+> see a bounds check for this, but I'm not an expert.
+> 
+> netlink_rcv_skb() <- receives untrusted data nlh = nlmsg_hdr(skb);
+> -> nfnetlink_rcv_msg() <- calls nc->call()
+>    -> ip_set_dump()
+>       -> netlink_dump_start()
+>          -> __netlink_dump_start() <- calls control->start(cb);
+>             -> genl_start() <- this is where the validation would be
+>                                when we call
+>                                genl_family_rcv_msg_attrs_parse()
+>                -> ethnl_perphy_start()
+> 
+> Also the WARN_ONCE() warns if we try to do a cmd which doesn't have a
+> matching operation in ethnl_default_requests[].  Every time we check
+> for missing commands it triggers a WARN_ONCE().  There are quite a few
+> which don't have a handler so I'm surprised that syzbot doesn't trigger
+> the warning and complain.  Here is a list of commands without a
+> handler:
+> 
+> ETHTOOL_MSG_USER_NONE, 
+> ETHTOOL_MSG_FEATURES_SET,
+> ETHTOOL_MSG_CABLE_TEST_ACT,
+> ETHTOOL_MSG_CABLE_TEST_TDR_ACT,
+> ETHTOOL_MSG_TUNNEL_INFO_GET,
+> ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
+> ETHTOOL_MSG_RSS_CREATE_ACT,
+> ETHTOOL_MSG_RSS_DELETE_ACT,
 
-Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+While these commands don't have ethnl_request_ops handlers, they still
+have a genetlink handler, see the ethtool_genl_ops array [1]
 
+The ethnl_request_ops are there to provide a framework for ethtool
+netlink commands, as most of them have roughly the same behaviour of
+needing to grab some info from the netdev/phy_device under rtnl, then
+populate a netlink message based on that outside rtnl.
+
+It's expected that not all ethnl commands use that ethnl framework as
+some behave in a manner that don't fit the ethnl scaffholding. In the
+end, the "cmd" validation is done by the generic netlink infrastructure,
+that's why we don't see reports from fuzzing bots.
+
+The WARN_ONCE we see in ethnl_default_start() and ethnl_perphy_start()
+is there in case a programmer tries to use the ethnl framework without
+having the ethnl ops populated.
+
+[1] :
+https://elixir.bootlin.com/linux/v6.18.6/source/net/ethtool/netlink.c#L1132
+
+In reality, we should never end-up with an out of bounds cmd as the
+validation will occur higher-up, in the genetlink part.
+
+However, I'm OK with adding a check, or a least a comment :)
+
+Maxime
 
