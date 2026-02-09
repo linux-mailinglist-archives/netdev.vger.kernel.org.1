@@ -1,147 +1,130 @@
-Return-Path: <netdev+bounces-257931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIskJRC/iWneBQUAu9opvQ
-	(envelope-from <netdev+bounces-257931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 12:03:44 +0100
+	id OIUFAXfCiWmVBwUAu9opvQ
+	(envelope-from <netdev+bounces-257932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 12:18:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA45610E7F0
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 12:03:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6277610E976
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 12:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 64BEB3002A1A
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 11:03:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 37997302352C
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 11:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D183830BBA0;
-	Mon,  9 Feb 2026 11:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5145936EAAE;
+	Mon,  9 Feb 2026 11:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b="SMsTHVEW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tlkmCccK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-108-mta41.mxroute.com (mail-108-mta41.mxroute.com [136.175.108.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED9A1DE3A4
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 11:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F080036EAA1
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 11:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770635021; cv=none; b=NmUArS+0UDsqxaEMN9ljBZ+WbzykHDCBJZPLGnRDTpyVXzH3gC1yFsgJZ+z7Ga1aVPm4TwtIcZH72eHzpzRB7q3TkFJ4zZlVsMTszWgOecPP4pAy3scTwBSVQ/11u4yzEmaoL3NZNWlJz5BqSA05smT1zjIn/Wjj6jIPTMfd2o8=
+	t=1770635861; cv=none; b=K2RWxfT2OpmT6eRUCPpRmO8JI56aJrQxPVYZvxyuQZzVbTRs9EXFbR+ghp8yOlSXFZQnHl6R3RrqAVruhyFLal+5NmPwBzwHCe1Ac9VvoUrf9kALHFSwQRolkBbay09UT6OlC3dEOIu6ekJAhLZ0D2zlHpbxTf1QdDG0TSswpl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770635021; c=relaxed/simple;
-	bh=ure2+j+S5lx77ssLbz1uN1ALWbylTJ3fn7KOlZRCdAE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=JSGDRHhp+qtESeFt/UwmY+RERicirgRedZylKUGcoFBNg8pDjz8PcDio3llltNeEuIrGwo9e/wIC31vUtLxHKRiCkAE7iXBq0af5RlaA3Xb8lxN/Ls9Y02v3HMJjVyHoCPO/PmfoDgkce5GJ5XWPa1eCDTnghiFI+SmJ3IJiuRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com; spf=pass smtp.mailfrom=mboxify.com; dkim=pass (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b=SMsTHVEW; arc=none smtp.client-ip=136.175.108.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mboxify.com
-Received: from filter006.mxroute.com ([136.175.111.3] filter006.mxroute.com)
- (Authenticated sender: mN4UYu2MZsgR)
- by mail-108-mta41.mxroute.com (ZoneMTA) with ESMTPSA id 19c420d8dfd0009140.00f
- for <netdev@vger.kernel.org>
- (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
- Mon, 09 Feb 2026 10:58:30 +0000
-X-Zone-Loop: eef1f9c0e1bb95e23f8da0d610cf2028b152302fe429
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mboxify.com
-	; s=x; h=Content-Transfer-Encoding:Content-Type:Message-ID:References:
-	In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=8wWtV/FDdg057Du4fTFiHPH5ELD4xyTSm8F4aHtqXMs=; b=SMsTHVEWlZZB5FdPO1ihgnxddx
-	/GcHq+phKCRBaLVTMUJB2c8p7at+fpJMauWpouzsjnNk59z7pRRZ3PKXXBXBsg+gVTQ2MNKxjiYNv
-	sijCXYcQzub7VXOsExmYGoZVdRV8HxKe7gzy7GwOpuo2ZEZSAIT3rcjxw/si5k8bG3YUxHtYEU9wD
-	/iqnbtjh6FUESAyAzAiOcJSZg8QU31PAe8KFuLct2jjXwCBsq6l3G30dtJCtclECnW2PCGaMVrnna
-	rC3DO0Z2w772PzOVZhmmkRzbmwwtcLQF20wXpVOH7pzMqUKpV4tXaHAZzMRk0+KHAjsEJDb2zY5S5
-	QAo2wTCg==;
+	s=arc-20240116; t=1770635861; c=relaxed/simple;
+	bh=7mw6hzhmMA6+zvleY6HwC0fCZS1N/GYXUSctzjVG1I8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=kYkoZcvnitxprYOyFOqnSpTcH5JthEbUgV5R3Zp3Y7a6Npt8LN9BKZ8CXLepMT7I+sL4WjqXiIAIh/IICyeAw4PWNAhkr/WbpEYQNLzXhfKlZduiqSyNzugfcSoCgNZ/K5xcSgjaNheKvK//9KG0x7biSa58IRbQzee/ynyKLJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tlkmCccK; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <24606a3d-b8b6-4e34-845f-8a76e9d13154@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770635849;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w6qyBvdf+nbbCyjziWKf9s6xwNWCgzO9Nlu2QRf453Y=;
+	b=tlkmCccKJ90IYg3qb5c8e3E/xW3RWAPOBB10G50KEApL0J6Jtkz2N6wKLHSO1FXiHRr6p2
+	BBagCTI5sQbYocva552MnBE+T7RPszQNJNGk8SWyW+W/gU5Js5UVrWbv2vtzTq/ZFNEvjh
+	fvRTEaDtnWoigjLQ8ovNXnIC3PXBXzs=
+Date: Mon, 9 Feb 2026 11:17:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 09 Feb 2026 18:58:28 +0800
-From: Bo Sun <bo@mboxify.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: kuba@kernel.org, pabeni@redhat.com, gakula@marvell.com,
- sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
- horms@kernel.org, bbhushan2@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, sumang@marvell.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] octeontx2-af: CGX: replace kfree() with
- rvu_free_bitmap()
-In-Reply-To: <68fb4b7c-0747-4e2f-bc52-ab2b3554abd0@linux.dev>
-References: <20260206130925.1087588-1-bo@mboxify.com>
- <20260206130925.1087588-3-bo@mboxify.com>
- <68fb4b7c-0747-4e2f-bc52-ab2b3554abd0@linux.dev>
-Message-ID: <95dd319cf45cc5336bd66551157faa68@mboxify.com>
-X-Sender: bo@mboxify.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Subject: Re: [RFC PATCH net-next] ppp: don't store tx skb in the fastpath
+To: Qingfang Deng <dqfext@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260209021134.21194-1-dqfext@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260209021134.21194-1-dqfext@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Authenticated-Id: bo@mboxify.com
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[mboxify.com : SPF not aligned (strict),reject];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[mboxify.com:s=x];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257931-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[mboxify.com:-];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-257932-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bo@mboxify.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.881];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.967];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mboxify.com:mid,mboxify.com:email]
-X-Rspamd-Queue-Id: EA45610E7F0
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: 6277610E976
 X-Rspamd-Action: no action
 
-On 2026-02-07 20:19, Vadim Fedorenko wrote:
-> On 06/02/2026 13:09, Bo Sun wrote:
->> mac_to_index_bmap is allocated with rvu_alloc_bitmap(), so free it
->> with rvu_free_bitmap() instead of open-coding kfree(.bmap) to keep
->> the alloc/free API pairing consistent.
->> 
->> Signed-off-by: Bo Sun <bo@mboxify.com>
->> ---
->>   drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c 
->> b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
->> index fd4792e432bf..29f5def796ba 100644
->> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
->> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
->> @@ -1822,7 +1822,7 @@ static int cgx_lmac_exit(struct cgx *cgx)
->>   			continue;
->>   		cgx->mac_ops->mac_pause_frm_config(cgx, lmac->lmac_id, false);
->>   		cgx_configure_interrupt(cgx, lmac, lmac->lmac_id, true);
->> -		kfree(lmac->mac_to_index_bmap.bmap);
->> +		rvu_free_bitmap(&lmac->mac_to_index_bmap);
->>   		rvu_free_bitmap(&lmac->rx_fc_pfvf_bmap);
->>   		rvu_free_bitmap(&lmac->tx_fc_pfvf_bmap);
->>   		kfree(lmac->name);
+On 09/02/2026 02:11, Qingfang Deng wrote:
+> Currently, ppp->xmit_pending is used in ppp_send_frame() to pass a skb
+> to ppp_push(), and holds the skb when a PPP channel cannot immediately
+> transmit it. This state is redundant because the transmit queue
+> (ppp->file.xq) can already handle the backlog. Furthermore, during
+> normal operation, an skb is queued in file.xq only to be immediately
+> dequeued, causing unnecessary overhead.
 > 
-> The code LGTM, but as Jakub metioned in v1, the cleanup should be
-> a separate patch targeting net-next.
+> Refactor the transmit path to avoid stashing the skb when possible:
+> - Remove ppp->xmit_pending.
+> - Rename ppp_send_frame() to ppp_prepare_tx_skb(), and don't call
+>    ppp_push() in it. It returns 1 if the skb is consumed
+>    (dropped/handled) or 0 if it can be passed to ppp_push().
+> - Update ppp_push() to accept the skb. It returns 1 if the skb is
+>    consumed, or 0 if the channel is busy.
+> - Optimize __ppp_xmit_process():
+>    - Fastpath: If the queue is empty, attempt to send the skb directly
+>      via ppp_push(). If busy, queue it.
+>    - Slowpath: If the queue is not empty, or fastpath failed, process
+>      the backlog in file.xq. Split dequeueing loop into a separate
+>      function ppp_xmit_flush() so ppp_channel_push() uses that directly
+>      instead of passing a NULL skb to __ppp_xmit_process().
 > 
-> On respin you can add:
-> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> This simplifies the states and reduces locking in the fastpath.
 
-Thanks. Will send the respin targeting net-next once it reopens.
+Quite insteresting optimization. Did you measure the improvements? Like
+pps over PPP interface, or the length of backlog at some ppp rate?
+
+
 
