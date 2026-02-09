@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-257883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCURBpxIiWm25gQAu9opvQ
-	(envelope-from <netdev+bounces-257883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 03:38:20 +0100
+	id wP7sK8ZIiWm25gQAu9opvQ
+	(envelope-from <netdev+bounces-257884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 03:39:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986A710B316
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 03:38:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D48610B333
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 03:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 99BEF3009027
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 02:36:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 18C6F30120E2
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 02:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE2D2D3ECF;
-	Mon,  9 Feb 2026 02:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC8A2D131A;
+	Mon,  9 Feb 2026 02:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbXKQFTL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8Gl5npm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EEA2367B5
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 02:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0893EBF32
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 02:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770604589; cv=none; b=I7lQ1WkpzJrVNbVEm3bJHcyDzF4eJjlaWWblNomW7CEu1rwCrM3phY3wIcX1/3YBhEfWlZyy4ldQQtRxvsk9FxUWN7iKu/tpyvSLGzTO4iK4iE9cMHYeKFD+pyV3kdWh1pusesmliX+REQl+3r24liufN11Wo3j83yFnQJOimw0=
+	t=1770604643; cv=none; b=lZdliML5nRGs38T9YUXcPwBHFMsmYDiYMtIQTJnT/fD8Tu6HivLRihBiLPVI+Qtsz0EOmVqUmE7JnDyuOj2F0GIQ4xvnm6CWELgr60doGUyejaI7mUhQYu4WXqjNykyDkBLDOvineBPaU6O/rb4dnZQ5tEIpgFiNwA38d9wzU+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770604589; c=relaxed/simple;
-	bh=kGH6l0rNT5LVm8Xr4TLlUWZvLKhE7Jw26DtjfMd1vVM=;
+	s=arc-20240116; t=1770604643; c=relaxed/simple;
+	bh=pRQAO/ZYBYUQ77y7rK0JvvKA04zg434VlWUpr7akJJU=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=QxJKYrdUYICmoqtuYNLe9rOm11MHZqRZErBuTbP/LV43PmvZ1SBfszhYHYFULd3zcXNcTvHgn9fblGqDJDspbevElUrOV1VX5VtxZmSRvcbPCLBuju8+bFAEQN1LH6vBxoPlPDlQvLNKwLTTt2L718h/fHFrYffvefrvwW+EioY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbXKQFTL; arc=none smtp.client-ip=74.125.224.42
+	 Mime-Version:Content-Type; b=VUHCKjYJzB77ROCvZqLcj/RrayLFKwZEsL3ZcST3FPjdgZoM61tqhbO9UdznoT3P1k80VlJiYODgdpV7foSpz0BLxR+ZRdU1/funbuED3s6aMuyK04UHVwYLqGZqYPL0PtsUAmyj1JrVCvJ4WtlYv2z+myiBj16aHo5q47r2Z3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8Gl5npm; arc=none smtp.client-ip=74.125.224.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64ad62a294bso1499921d50.1
-        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 18:36:28 -0800 (PST)
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-649d4c77a32so3322577d50.2
+        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 18:37:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770604588; x=1771209388; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770604642; x=1771209442; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9stMa7KwLvBDX2P3Y2Txs0J3hJrlNNbY1m8SALZZMjs=;
-        b=DbXKQFTLFJr4PWf28aKl7h+h5fwchvdweLw4KwWrshBTjeRxPo/lC6uuSsCsUQnQ73
-         9BfAmALhKz1xCRrMbFNoQi0goUxxBpil9CIKCaCABY8lPnxSPlmLJNOTUJgsJ7hdIM17
-         x93EWf2wNPvyHo0rG3cPVJ21UlZQnhMQFuxgTR/H2PtFotpuIBPBp8VITxhS3q+xyO4B
-         C4YLAoZAckWDzjsX7qDVQZK6xqtupprIFP/1miGgWpRLu7fmFORta0KCxoGKEvxs/SUZ
-         aPOe7KbXEsq9qLby5a+J2UHWG7zqBh0uzaQZdyttqFA6ezYIMUdOOqJdWPvSig/qG45L
-         pRJw==
+        bh=1/V4WyWhAAZkw5TNJuCQHRUvYWFPGZ8OrTECOGPh6Dk=;
+        b=Z8Gl5npmF3h7BCvIlBv/pdDg14pBOhE7A0097ii0q4ziW3+5N36BhFE4j1+cpzG2yf
+         cdTB2cL805tGfyxtCQQC6CU3bTStqPz3l4AKPwTXROewVrmtDSNxCQt8omTSMbGSfS59
+         juAkqXrhv7bipf8K2Rx0/ApHj9AEaB0zbEVDOeZL47+nZrkxEvLmn9y8oFNOcNMbTKMa
+         whuYLwmUGsYVr8fUV555PoinzLiDT/wSy4xoz+ne4MjXzzb/VvKrvt0iBLaGlhyZZho5
+         UBqy9/Xw8NU7eWFGFeTpEUMLP4V4RJcrFIovsHg7Hh4tuBuK2PMrZBRNZuhcDsqrmnxQ
+         aVEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770604588; x=1771209388;
+        d=1e100.net; s=20230601; t=1770604642; x=1771209442;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=9stMa7KwLvBDX2P3Y2Txs0J3hJrlNNbY1m8SALZZMjs=;
-        b=YaRilxSura7IRy6VWSVo0Z6ATXkZQMOP4gadcHpYvcRiNXho79gAppaBto2jTlwh0M
-         Uh4C2L3vs+lr9lH5keoo+xpgr910NebCiv70w0LXR2a5h1kNQVGymxYf2pTmZzBait0J
-         6f2u+dfCac9PuTgesRcTeBiRzgx970WWYtRXwPfwGwmc4pUg2/9g37RedG/6A1H9g4CN
-         AzUqGDf6hci/bslPPzJrGNqpYPFJ574ikt6XIr5hNTit2K6vd3Pa6nUpwkhX7MFlXsq/
-         +UhZ4AgyDomQyNEnR1ehRsvXo1lgwopxVc5X+GjLuXI7BoqjXnRXKJvcxfgj6rOKNobd
-         RzHA==
-X-Gm-Message-State: AOJu0Yyu0sDA6bKeg8Hc+LKKadln2Bk0EQ3fx9xMRY0SJR5dOzOf5Sz2
-	osQyp9Qts8/HaZD++lIqy1aQfb/EAfCBDMiQtmmOG4ySCnfQ8yzZZR5X
-X-Gm-Gg: AZuq6aL2WBeDnTY4buO0QIrbXCFglUdIHXk8roS8rT+eoMGQut9dI4/ATOB70sJuYOD
-	ydhBNZOFJ8ze7CVNCUtLzBYPOdd+gQUXh9CDuOGQd3EVlEPWk5eUdo2vvZM6ObfBR2gp9manQhg
-	PVUAuBQJF7zgUXmy5t0+4k7Pmbv4ip6ESL+DjLEncSExHZzNE4rMJJ8uuAzIq0BRsXNRCaiqxyI
-	qU0a7GY0g/Rjpp9YBF9F3iVlXfOzgnI17Qahhz8zvpjVZhJlUVzXtJViV0r+Av4tW3gIfsXSPb3
-	7G8WPHpMVWm2PLg5+ACXzbpN7Q79WAMDWvX9O7JMxkM9nGLCcUhVIDGmsCEbqfjXmXcionxlTld
-	T/PvwrOLDfhaSyC7LRMdt7tAMV1LkLfq3XyARtob3UDtsRSgqY+sIxUUvvGUvyADJxteeM87r7N
-	hfMznq8kkqXvGZf7LlBmOKly+cicYu3k2v8VWT/aOXgVdPVcBd7vxzq0ozOdk=
-X-Received: by 2002:a05:690e:2450:b0:63f:add1:e6da with SMTP id 956f58d0204a3-649f1f594b3mr6505572d50.57.1770604587805;
-        Sun, 08 Feb 2026 18:36:27 -0800 (PST)
+        bh=1/V4WyWhAAZkw5TNJuCQHRUvYWFPGZ8OrTECOGPh6Dk=;
+        b=tYOQe2KXp0GoarVaSWp8JCqHlJBwzDAfnXW1NGYamjkDfQmaybipd3no+hDBizkqRX
+         ruhhB5ORkFDukwD4BLEb9dk3CXk4+oI25aoAjNE1yKthx1AvDby6ZriCnTgPidjQHdgr
+         F+KoM47bor8XVlkVo2dUvx3X/qE5BCNNEciWD91i3Gzp6CZOWtmenUx+qFsDJuWe9B6P
+         cFCiDFJZVCYPNAWP8U3LOTGSVj7YYjwik7DKG2Zgo6MiAGg7DQ1B2SniIi2ZcGW0ZPU/
+         5CsfhQ6lK9TUE8GXjJpL6cqulNZG7C401WWx3Lu+zf9FQOTyEGPrcEfe9Kh+ZxiOkCWh
+         KKXA==
+X-Gm-Message-State: AOJu0YzZAKKK4ONSI/LlbOrg5xGvOakucOTKXVeSRvPfixzLDomWhVcx
+	YnaQZFOO8h6nD2aX8tfEvngSwfgOJMkY6UFPNujZ5WeXrqYK4p4lGnvt
+X-Gm-Gg: AZuq6aIOIQr7QdXicy11OMhXQBZklZSMTfZFOxwWPZ4OzwuTSd9hT9/7sGzpmoDWdmP
+	GrS8Hta4kr2yzjqMLlM7Mf/li8kc5kUfi1VIcTaopcMmx5tDZL729mZD9+ckGkNhK7EUv+QJ5cq
+	OFSiErzjRigFj078fT0rQBodZP8UDQ5m4dg3kB2U4rOb/oUKy212uF1D0lnntxfOONX6D08dhGS
+	ZACSURls22YVTgk5Y/CM4xTLYMh6PRzkNf9HJ7JMex7vm6iYhKl1zW5/Wifh0yKNf8Oa3BgQ8ue
+	FEHRKPgqBxgRAYB3IYNpOxhRg78tf6Ho7+x/Tu7uX866OKB2GhA6a7XUSwC0/kU261OgEJOqK+r
+	G/JNrowH6VcPem6IfJcmauaqqgdQ+31jJ6+QWXr9ImxTvLhWBbz82ZSaYYYe9BXcsPRPQTVkNoZ
+	vCgsanqw+Qg7JGPHFoWF3Vw5R2T5dNR0FEzU6AnTbT37XvRhX/CYiLi5yQtAB3PmR7Dh1JFg==
+X-Received: by 2002:a05:690c:c50d:b0:796:4486:b7d7 with SMTP id 00721157ae682-7964486c022mr20245177b3.26.1770604641852;
+        Sun, 08 Feb 2026 18:37:21 -0800 (PST)
 Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64ad8a12432sm5352745d50.21.2026.02.08.18.36.27
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7952a1db63csm80694087b3.33.2026.02.08.18.37.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Feb 2026 18:36:27 -0800 (PST)
-Date: Sun, 08 Feb 2026 21:36:26 -0500
+        Sun, 08 Feb 2026 18:37:21 -0800 (PST)
+Date: Sun, 08 Feb 2026 21:37:20 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>, 
  davem@davemloft.net
@@ -92,12 +92,12 @@ Cc: netdev@vger.kernel.org,
  pavan.chebbi@broadcom.com, 
  linux-kselftest@vger.kernel.org, 
  Jakub Kicinski <kuba@kernel.org>
-Message-ID: <willemdebruijn.kernel.2cac56bd3c52f@gmail.com>
-In-Reply-To: <20260207003509.3927744-5-kuba@kernel.org>
+Message-ID: <willemdebruijn.kernel.35e36b64302f9@gmail.com>
+In-Reply-To: <20260207003509.3927744-6-kuba@kernel.org>
 References: <20260207003509.3927744-1-kuba@kernel.org>
- <20260207003509.3927744-5-kuba@kernel.org>
-Subject: Re: [PATCH net-next v2 4/9] selftests: net: move gro to lib for HW vs
- SW reuse
+ <20260207003509.3927744-6-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 5/9] selftests: drv-net: give HW stats sync
+ time extra 25% of margin
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,12 +113,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257883-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-257884-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -136,16 +136,19 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 986A710B316
+X-Rspamd-Queue-Id: 2D48610B333
 X-Rspamd-Action: no action
 
 Jakub Kicinski wrote:
-> The gro.c packet sender is used for SW testing but bulk of incoming
-> new tests will be HW-specific. So it's better to put them under
-> drivers/net/hw/, to avoid tip-toeing around netdevsim. Move gro.c
-> to lib so we can reuse it.
+> There are transient failures for devices which update stats
+> periodically, especially if it's the FW DMA'ing the stats
+> rather than host periodic work querying the FW. Wait 25%
+> longer than strictly necessary.
+> 
+> For devices which don't report stats-block-usecs we retain
+> 25 msec as the default wait time (0.025sec == 20,000usec * 1.25).
 > 
 > Reviewed-by: Petr Machata <petrm@nvidia.com>
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
