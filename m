@@ -1,217 +1,207 @@
-Return-Path: <netdev+bounces-257958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257959-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBMCN+L9iWluFQAAu9opvQ
-	(envelope-from <netdev+bounces-257958-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:31:46 +0100
+	id uF75K6cBimluFQAAu9opvQ
+	(envelope-from <netdev+bounces-257959-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:47:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AFEB111EDF
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:31:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1287B11222D
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 16:47:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E4A8305DEEE
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 15:26:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40A8D303D2CF
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 15:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9166F37F100;
-	Mon,  9 Feb 2026 15:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dVe4aC8U";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ahVUEU0o";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dVe4aC8U";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ahVUEU0o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57B737FF4E;
+	Mon,  9 Feb 2026 15:41:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409BB37F0F7
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 15:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A9C37AA71
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 15:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770650762; cv=none; b=VvICGMpvmnvmIHxbeGZnjveb7vjHWUS7bo/wKiTtlwEzmmEiwKe/T7v8Ifb5fJYoCwjcOGl3A8o2ANfXWCSabq/JdoZEeFQIQiyLXAhIGEUZ59X6t/SVRkDQ2Fzcya2PF2aESxHY7pdZ/8UWGcx92fLbzTzdvpp/gGBOFygK7bc=
+	t=1770651684; cv=none; b=ViYIXWb8jFG5I71DIQBpcwfev92Lyeo30dMRvbR+7rzxwiS2g99da93zi1+F5mg7WPJ8Pf11FaCojVcFv/oroHwNn5fqPq2O/p2FIBayZvYSvqb4U33YN4a807drIRxQMSXD0mRtUOqLwq1eaHGcKaVihBFzshK/7qIucFnn2hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770650762; c=relaxed/simple;
-	bh=8sf12bdDZSlGSccRjkyFc4DzSqXFDuafZoAwDn99dy0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LSc95SSY2L0KUxS41j9Cwpm42Q79XvrjvTyeNkrq5n1AWlbZXGcViScp3+yZz7ctS3eZHsBCfbn2nHX/qIhccuUxfU7RL/qjcE1dd14Q5KxERopVkV0r2j5AXXkcDbihXNQqapCQt/wNoIIbxNycHKv1idjQkMS+qfrJLxzjs5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dVe4aC8U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ahVUEU0o; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dVe4aC8U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ahVUEU0o; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6076D3E712;
-	Mon,  9 Feb 2026 15:26:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770650760; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
-	b=dVe4aC8UMGE8KQGJx/+IsBkhtOLhUxg+O7l3196R65K0WqisVv3ib8fFTPJV4o13K/H7oi
-	RALU9B8rmNkihxyZiHw1GF83hSnO0/gbbf2xxUoQZyRmL3w6OJji3zLOLpB0RnxSvvPlrb
-	Ceqsta/6IoPez/gWmiyvPLx3sc99K5g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770650760;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
-	b=ahVUEU0oENpqE3omnQgpD5vkq5W3aIWsekqTc6ZuUM16siyQ8T+PI3UmOYw/fOAdtoodB1
-	3vxPcbiiS5IW2pCQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=dVe4aC8U;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ahVUEU0o
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770650760; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
-	b=dVe4aC8UMGE8KQGJx/+IsBkhtOLhUxg+O7l3196R65K0WqisVv3ib8fFTPJV4o13K/H7oi
-	RALU9B8rmNkihxyZiHw1GF83hSnO0/gbbf2xxUoQZyRmL3w6OJji3zLOLpB0RnxSvvPlrb
-	Ceqsta/6IoPez/gWmiyvPLx3sc99K5g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770650760;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/t3djtqceczc/kumZH/3BRs3t1izpbgkuB3k4cyq1LU=;
-	b=ahVUEU0oENpqE3omnQgpD5vkq5W3aIWsekqTc6ZuUM16siyQ8T+PI3UmOYw/fOAdtoodB1
-	3vxPcbiiS5IW2pCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 85A1E3EA63;
-	Mon,  9 Feb 2026 15:25:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id tn61HYf8iWlMPQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 09 Feb 2026 15:25:59 +0000
-Message-ID: <641a1a66-705e-46ee-9612-db35d92729cf@suse.de>
-Date: Mon, 9 Feb 2026 16:25:54 +0100
+	s=arc-20240116; t=1770651684; c=relaxed/simple;
+	bh=ZafYOtc7L+oFFBIzl+MG4fPmt2i/qy2G91TqRC4LoLo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hAvtIbc1+yDUXsMcfXctcr1BVrYoTWTaBr+4PuGuxP8eSFUexSgjEKNula6a+k6S+IADu4cZZau85IesgWDwsGNvzz8b/s1ThN2PCSN4VdbsH4ZguV22qqv03/UtF+KdCgEI3OahfqKlAs8vGcOAo0LcZukorAikDWoMY7GYW08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-409648bc2a2so17975131fac.3
+        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 07:41:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770651683; x=1771256483;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hNK9kU9v8v12Dojw7r/qw4vHBzF8h3GteZ5Hpo/f/ZE=;
+        b=lSIAyV4FhXoNCrs/U3AwthoC7qukC5+DjP55OFb3cxDbFnovbRWWRduyfnuIw2ZlCA
+         4l643f6ip4xdmeLLdkOU3t22x2D2APj4wdrtp8kJudV6PIle2NlSQdUH6GBVwCIZNtLB
+         ilGlQwdjko+8aZdU7hi221TI6WQ5ULPIrn9dzK+J6ymoSfVXfB5V50Gf8p9iO0dGDrFR
+         WjilftY7Q+g8IqeSQqQn6i9Fg207FC3wYM/NE1MnmgtJQB41e2Jf1QYBP9AisK5FiEIe
+         V9VEMg4jvAM6z4fMq7LscRuST1UTQ1klLj81xQS9F54ecs0yWmq6B0GcE1wc4VT4ht1N
+         hDhw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3UdgATuETRyUmq19VCHRY6bKgFHDHDKBdN3ZUICmMkysA7890mCJsKiwtQmIWYCbGJ38TBFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUK6EUKGDHJFHc8LYALgv8GlHqxKb8ay9GJ04mtYJi58MTd5je
+	oX8k29k+UanfIxiKDFnN/B8Q9SDVmE7iN2+p/jozTmdzDypDIo9bG5x5ouezUJLPWatg4HzXZg+
+	lPY48Nvjkp39MmqAWFXu6SoCs5OfbUjInJTURlYcKSZKpDBxvOj4aCns8d9Q=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next] inet: add ip_retry_random_port sysctl to
- reduce sequential port retries
-To: longxie86@protonmail.com
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- corbet@lwn.net, ncardwell@google.com, kuniyu@google.com, dsahern@kernel.org,
- idosch@nvidia.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Thorsten Toepper <thorsten.toepper@sap.com>
-References: <20260203175422.4620-1-fmancera@suse.de>
- <CANn89i+UUWx5OhPnJnDhiCfr53BPTAGedBucgqYwyfqkidf_Cg@mail.gmail.com>
- <8d94faf9-2fb6-483d-9767-bd665c4a4b9a@suse.de>
- <1649583d-71c2-425e-a2df-685d5f6dc67d@suse.de>
- <CANn89iK3Pu2NXxejTSLF-7MhBc03_ZJUjOtZcTC4nMsbsDpbSw@mail.gmail.com>
- <d76cd8c3-deb0-4f39-b5b9-a711d155cd5f@suse.de>
- <egIQQeDF4RIP_614tU-XIK-01DgThdPOU3KA253uNHvZv76zymXyBFhey1G7wj5mA2nwHpdT7VBoGuFnATSO-PS0hUb0Qrt0AyN5JNbpATg=@protonmail.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <egIQQeDF4RIP_614tU-XIK-01DgThdPOU3KA253uNHvZv76zymXyBFhey1G7wj5mA2nwHpdT7VBoGuFnATSO-PS0hUb0Qrt0AyN5JNbpATg=@protonmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spam-Flag: NO
+X-Received: by 2002:a05:6820:210b:b0:663:12f:215f with SMTP id
+ 006d021491bc7-66d09cb2a1cmr5054428eaf.15.1770651683338; Mon, 09 Feb 2026
+ 07:41:23 -0800 (PST)
+Date: Mon, 09 Feb 2026 07:41:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <698a0023.050a0220.3b3015.0078.GAE@google.com>
+Subject: [syzbot] [rds?] general protection fault in rds_tcp_accept_one
+From: syzbot <syzbot+96046021045ffe6d7709@syzkaller.appspotmail.com>
+To: allison.henderson@oracle.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	rds-devel@oss.oracle.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=ac78ce3b6729749e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257958-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[protonmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-257959-lists,netdev=lfdr.de,96046021045ffe6d7709];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email,0xffsoftware.com:url]
-X-Rspamd-Queue-Id: 3AFEB111EDF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,googlegroups.com:email,syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,goo.gl:url]
+X-Rspamd-Queue-Id: 1287B11222D
 X-Rspamd-Action: no action
 
-On 2/9/26 2:53 PM, longxie86@protonmail.com wrote:
-> On Monday, February 9th, 2026 at 12:57 PM, Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-> 
->>
->>
->> On 2/6/26 6:09 PM, Eric Dumazet wrote:
->>
->>> On Fri, Feb 6, 2026 at 5:28 PM Fernando Fernandez Mancera
->>> fmancera@suse.de wrote:
->>>
->>>> It makes sense. I have tested this approach and we got a more even
->>>> distribution of source ports when having thousands of reserved ports. No
->>>> difference at all when not using reserved ports.
->>>>
->>>> Please, you can find the distribution graph with the current algorithm
->>>> [1] and with the random step algorithm [2].
->>>>
->>>> While I understand that this approach is introducing a call to
->>>> get_random_u32_below() on every connect, I am wondering if it makes
->>>> sense to replace the existing algorithm with this variant. What do you
->>>> think?
->>>
->>> I would ask RFC 6056 experts like Fernando Gont what they think.
->>>
->>> Note that if we use random at each connect(), we defeat one of the principles
->>> of ephemeral port selection : try very hard to avoid 4-tuple collision.
->>
->>
->> Right. I will reach out to him and get his opinion. I have plenty of
->> time before net-next open again. I am also collecting some metrics
->> regarding the 4-tuple collision frequency.
->>
-> 
-> We have had this problem in AWS for a long time. The patch works on our system. What is needed for it to be included in the next Linux release?
-> 
+Hello,
 
-This just an RFC, I discourage using it in production yet. An official 
-v1 will be sent once net-next is open and there it needs to be reviewed 
-and approved by the maintainers.
+syzbot found the following issue on:
 
-> Please bring this to the stable versions.
-> 
+HEAD commit:    9845cf73f7db Add linux-next specific files for 20260205
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10ec4a5a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ac78ce3b6729749e
+dashboard link: https://syzkaller.appspot.com/bug?extid=96046021045ffe6d7709
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122acb22580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149fc7fa580000
 
-I don't think that will happen. This is an improvement not a "fix" per 
-definition. Anyway, you could ask for a backport to your 
-vendor/distribution.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9f30334a2431/disk-9845cf73.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0d58741a15a6/vmlinux-9845cf73.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/62204da1452c/bzImage-9845cf73.xz
 
-Thanks,
-Fernando.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+96046021045ffe6d7709@syzkaller.appspotmail.com
 
->>>> Please, notice the implementation below. I plan to send an official v1
->>>> once net-next is open. In addition, I am rewriting the commit message as
->>>> I find the current one confusing.
->>>>
->>>> [1] https://0xffsoftware.com/port_graph_current_alg.html
->>>>
->>>> [2] https://0xffsoftware.com/port_graph_random_step_alg.html
->>
->>
+netdevsim netdevsim1 netdevsim3: set [1, 0] type 2 family 0 port 6081 - 0
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+CPU: 1 UID: 0 PID: 3485 Comm: kworker/u8:8 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: krdsd rds_tcp_accept_worker
+RIP: 0010:rds_tcp_accept_one+0xa5b/0xd70 net/rds/tcp_listen.c:319
+Code: 00 00 48 83 c3 18 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 63 a9 2f f7 48 8b 1b 48 83 c3 12 49 89 de 49 c1 ee 03 <43> 0f b6 04 2e 84 c0 0f 85 53 02 00 00 44 0f b6 2b bf 08 00 00 00
+RSP: 0018:ffffc9000b64f9a0 EFLAGS: 00010202
+RAX: 1ffff1100dacb173 RBX: 0000000000000012 RCX: 0000000000000000
+RDX: 0000000000000006 RSI: ffffffff8e006fa9 RDI: 00000000ffffffff
+RBP: ffffc9000b64fb18 R08: ffffffff903342b7 R09: 1ffffffff2066856
+R10: dffffc0000000000 R11: fffffbfff2066857 R12: ffff88803286c000
+R13: dffffc0000000000 R14: 0000000000000002 R15: 1ffff920016c9f3c
+FS:  0000000000000000(0000) GS:ffff888125115000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f30359456b8 CR3: 00000000320ee000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ rds_tcp_accept_worker+0x1d/0x70 net/rds/tcp.c:524
+ process_one_work+0x949/0x1650 kernel/workqueue.c:3279
+ process_scheduled_works kernel/workqueue.c:3362 [inline]
+ worker_thread+0xb46/0x1140 kernel/workqueue.c:3443
+ kthread+0x388/0x470 kernel/kthread.c:467
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:rds_tcp_accept_one+0xa5b/0xd70 net/rds/tcp_listen.c:319
+Code: 00 00 48 83 c3 18 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 63 a9 2f f7 48 8b 1b 48 83 c3 12 49 89 de 49 c1 ee 03 <43> 0f b6 04 2e 84 c0 0f 85 53 02 00 00 44 0f b6 2b bf 08 00 00 00
+RSP: 0018:ffffc9000b64f9a0 EFLAGS: 00010202
+RAX: 1ffff1100dacb173 RBX: 0000000000000012 RCX: 0000000000000000
+RDX: 0000000000000006 RSI: ffffffff8e006fa9 RDI: 00000000ffffffff
+RBP: ffffc9000b64fb18 R08: ffffffff903342b7 R09: 1ffffffff2066856
+R10: dffffc0000000000 R11: fffffbfff2066857 R12: ffff88803286c000
+R13: dffffc0000000000 R14: 0000000000000002 R15: 1ffff920016c9f3c
+FS:  0000000000000000(0000) GS:ffff888125115000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f303594da08 CR3: 000000000e74c000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	00 00                	add    %al,(%rax)
+   2:	48 83 c3 18          	add    $0x18,%rbx
+   6:	48 89 d8             	mov    %rbx,%rax
+   9:	48 c1 e8 03          	shr    $0x3,%rax
+   d:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  12:	74 08                	je     0x1c
+  14:	48 89 df             	mov    %rbx,%rdi
+  17:	e8 63 a9 2f f7       	call   0xf72fa97f
+  1c:	48 8b 1b             	mov    (%rbx),%rbx
+  1f:	48 83 c3 12          	add    $0x12,%rbx
+  23:	49 89 de             	mov    %rbx,%r14
+  26:	49 c1 ee 03          	shr    $0x3,%r14
+* 2a:	43 0f b6 04 2e       	movzbl (%r14,%r13,1),%eax <-- trapping instruction
+  2f:	84 c0                	test   %al,%al
+  31:	0f 85 53 02 00 00    	jne    0x28a
+  37:	44 0f b6 2b          	movzbl (%rbx),%r13d
+  3b:	bf 08 00 00 00       	mov    $0x8,%edi
 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
