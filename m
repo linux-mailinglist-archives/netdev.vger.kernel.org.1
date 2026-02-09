@@ -1,111 +1,123 @@
-Return-Path: <netdev+bounces-257953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPQgNIDniWmdDwAAu9opvQ
-	(envelope-from <netdev+bounces-257953-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:56:16 +0100
+	id +DRiIOLniWmdDwAAu9opvQ
+	(envelope-from <netdev+bounces-257954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:57:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189D910FEE1
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:56:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBA8C10FF2A
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:57:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8F3353004CA2
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 13:56:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 58000300614E
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 13:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D17B379972;
-	Mon,  9 Feb 2026 13:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906DE379972;
+	Mon,  9 Feb 2026 13:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tYTQv7n9"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="A9bNyPOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11463793DF;
-	Mon,  9 Feb 2026 13:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3A03793AD;
+	Mon,  9 Feb 2026 13:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770645372; cv=none; b=RcuoSWutSWZ2QYcwKshTreNXoS9eQOIS6UDqA7KfZy0psHcRrJMP7Oamd2QnA3mh9ETnrXjPm5US5tWf1EjY7d8Yvv/fow5lqKjlJI1HlKNW7WN6Z+m5lXP43A5uuRxd47+FRCWnZB0/HpsksYcWyBDVfMPnRz14hOHmiUy+uNM=
+	t=1770645423; cv=none; b=u6RBfBJMAd8Yy+i46mUdaead0+GJ794sEL3WamWajsR+UizFNGAJF8r1Lj/RzPJPppPuKCN9vfD6UWz8c+W+/+jmLFUgJwK9rFChxvryIIbOIVeC3x5v92x+aaOZfsrtuZs9s7mdAQ2A+WS1AI8YPmDGQ7pKGiAXRNgb87vUaTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770645372; c=relaxed/simple;
-	bh=rBL1bBvkjTPgCykjgiqbVv+dDMCeoT/dfKbtap1Pryg=;
+	s=arc-20240116; t=1770645423; c=relaxed/simple;
+	bh=0PrYKRQczg+VNl5lzty4yY3HXn9K859irlTbMaToxo8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FrulAoupnFqmsILwaCMANA/GAg/leY1QUOKoWwWT3jgjzxHoaLIZ1Kcl/Otn5MmDeHkjn5ZNAUvJG0mFKAhTN610dLTAWw1aY2l62USU6iR3W3eQcn4y7qsadXQb82XoGYWSZY4w/EVF9A5DvY7jLnp/btjVAZRCpE6oH5rgXU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tYTQv7n9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kacjq2rEcfQB30IBAxC28QfPwUJPcJ/L6ti1cdxg2ME=; b=tYTQv7n9d34Tc3ERpKjTpLAREf
-	u+uy40WbpgRgG5Q711xisNoXonQVrgM7Av/tV6101c3qzkbSq6Kz0VmM6Exn5vt/6Zrnzvlm0zIZ/
-	xcrVsQDSckspPS4JcQD0Ijyp85mF/Xv39BdPSLpHwPVzMiRYorE0bKth3vwNumgOZqC4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vpRkB-006jGu-61; Mon, 09 Feb 2026 14:56:03 +0100
-Date: Mon, 9 Feb 2026 14:56:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ziyi Guo <n7l8m4@u.northwestern.edu>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: kaweth: remove TX queue manipulation in
- kaweth_set_rx_mode
-Message-ID: <d697a88f-dd8c-4ec1-ae4d-c97578a98498@lunn.ch>
-References: <20260209053013.1701134-1-n7l8m4@u.northwestern.edu>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mpLWlao7RKu8n1rCOJ+ShffGvpRIp92ZLwqgGmxgl0RxeiEHJYlvQ9RjkgqPA/w0tWpmchhv0N3c2hqkjXP0BDQQ3l8LWbO2jqGiqEZYqM7nUjgs2fSfoxubHyibiyjoJk1J8hfcYfFwJOs/qF7mHZfNALAfToyObZZIz9/eWDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=A9bNyPOx; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=0PrYKRQczg+VNl5lzty4yY3HXn9K859irlTbMaToxo8=; b=A9bNyPOxfA5exPo547YFN/1F6x
+	vhwKzEbbTagpPwpb6zeXy790szN5uK5HA5PNu9qRvTybhURAZDESi5iKqDgIo42Xh5kw8w4R0KqXK
+	eeVLD1Z/vqDReBW3aTMyfKCzJWoeIVaF3GMg2GSJq5KFL5TtBPr6mSItJl9oJm7AMCOjoBzwfcBcU
+	BSxF4au9OM9LWSF6ZDKcDZ7of2ruxFU02Bt/3+muLBmVMW50DXWMSq5xS1pCsrlP0f+g5hvHDSPtn
+	/Lh4QWy1+ErW2zjfkUP/rEBcH0m0qvD+FfNfUfErpIr74MNUWtV2sDNHBaRJxaKzuYESrLRTwrf5P
+	w0WDhAtA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vpRkm-009X0U-4k; Mon, 09 Feb 2026 13:56:40 +0000
+Date: Mon, 9 Feb 2026 05:56:34 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Matthew Wood <thepacketgeek@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, hch@infradead.org, 
+	jlbec@evilplan.org, linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org, kernel-team@meta.com
+Subject: Re: [PATCH RFC 0/2] configfs: enable kernel-space item registration
+Message-ID: <aYnnHJ2TQEcD_xMS@gmail.com>
+References: <fdieWSRrkaRJDRuUJYwp6EBe1NodHTz3PpVgkS662Ja0JcX3vfDbNo_bs1BM7zIkVsHmxHjeDi6jmq4sPKOCIw==@protonmail.internalid>
+ <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
+ <878qfgx25r.fsf@t14s.mail-host-address-is-not-set>
+ <-6hh70JX5nq4ruTMbNQPMoUi6wz8vmM2MQxqB3VNK3Zt97c-oxWOo3y0cQ7_h6BSfcp78fR9GmzxcTQb_WB-XA==@protonmail.internalid>
+ <ineirxyguevlbqe7j4qpkcooqstpl5ogvzhg2bqutkic4lxwu5@vgtygbngs242>
+ <875xakwwvz.fsf@t14s.mail-host-address-is-not-set>
+ <C6V44SxiJH8NxRosmbshR-sfcBisrA5yWQpDmfQXe5vOX3uI6SM-r7wwUr7WxfPMS5ETUQ9GYDlptRs911A_Qg==@protonmail.internalid>
+ <aYTWbElo_U_neJZi@deathstar>
+ <87qzquuqsx.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260209053013.1701134-1-n7l8m4@u.northwestern.edu>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87qzquuqsx.fsf@t14s.mail-host-address-is-not-set>
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-257953-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[debian.org];
+	TAGGED_FROM(0.00)[bounces-257954-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,infradead.org,evilplan.org,wbinvd.org,meta.com];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 189D910FEE1
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DBA8C10FF2A
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026 at 05:30:13AM +0000, Ziyi Guo wrote:
-> kaweth_set_rx_mode(), the ndo_set_rx_mode callback, calls
-> netif_stop_queue() and netif_wake_queue(). These are TX queue flow
-> control functions unrelated to RX multicast configuration.
+On Mon, Feb 09, 2026 at 11:58:22AM +0100, Andreas Hindborg wrote:
+> Perhaps we should discuss this at a venue where we can get some more
+> people together? LPC or LSF maybe?
 
-I think there needs to be a better explanation why it is safe to
-remove these stop and wake queue operations. r8152 does the same. Is
-it also broken? Rather than removing these, should we actually be
-waiting for the completion of the urb?
+Certainly, I agree. I’ve submitted my subscription to LSFMMBPF with the main
+goal to discuss this topic. I wasn’t planning to present it this, given it was
+a "overkill"?, but I’m happy to do so if that is the right direction.
 
-	Andrew
+Thanks
+--breno
 
