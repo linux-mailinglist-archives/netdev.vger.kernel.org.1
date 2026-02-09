@@ -1,315 +1,191 @@
-Return-Path: <netdev+bounces-257981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257982-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOdDGxwwimm3IAAAu9opvQ
-	(envelope-from <netdev+bounces-257981-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 20:06:04 +0100
+	id WNUVIQQyimkPIQAAu9opvQ
+	(envelope-from <netdev+bounces-257982-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 20:14:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD99A113EE5
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 20:06:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1703A113FF0
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 20:14:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BF80301F32C
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 19:06:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4A01A3008C20
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 19:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DD13EFD3C;
-	Mon,  9 Feb 2026 19:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63411413254;
+	Mon,  9 Feb 2026 19:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hjehFc9Y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ghihUtyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9242E764D
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 19:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770663961; cv=pass; b=NQfeNiapAilPnNjNg6DRM3gKVojeGdoZGmL2YK59XSAJei17we7jiOm1VE/iwLIbD+b7dcLgmhRs4mkeeXGZ5nuDA2DBVYB/qZbwwrNFrDH0jKeo9335G0fvAJaKauwHzEWUKjSTJ2b5/ztVaIdYWzN7uNAFUPZoNce0aPRBHjY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770663961; c=relaxed/simple;
-	bh=TnKOgqKifp87S4hGzSNCXYniAOZmiglgSk2FMxeCzQ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kAPf/Pbf62DS1lKNB4crkoYx/bLdY2IXdVqv0yM2R6eRyQ5xg29ZeKe4duHC1skDuKvM+GIMWRfjEDW03LLhilsoPfCb14U9iqTIKYE1lW8yTQ1EOtNNFcvCqizij24Inm8YSxXwEs+2hGgpUlXbtoMbugkzJpaItsmbYBY3ze0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hjehFc9Y; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-505d3baf1a7so41391cf.1
-        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 11:06:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770663960; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CWmmuwkpCFbK59JnOAt+a1RTWERvIyju1wgLPo96EAbJyqQY5x0yW4e+KR6E6DLvD2
-         9Pz/GtmIVoPh2ejhDFoKqPr0Q6sW2S5MNRWoU/46gof6zjwnYOfKaGaOafkIOLw8OzXw
-         3q6WxgtxwegmiAkznwcKzKhpizEzgCy72BcQgkg5VfYv+H7TxCCn5opHLfdL5KjKbyQe
-         UVIe9IbR7TT5S1+lcUIS2jVFevjWPhkqV3F+doxJvQWFm8G3ETAedYOjxdsJtsDmxAZV
-         cufaqjRVGkTgBWjMZA0FFXo3KpH5VK+6cRbSo6y06Q42qElioyseLgUdbMC9oFDqoSW6
-         V++Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oDGGdTWrfiFEfGwIzvd025xBJcNOMHd3nBArqAhnTUY=;
-        fh=7q+W6ERNfr6A1f1ak+MzHqk43Lz1tmp8Z3uERCCtBnk=;
-        b=C5K80ew3E9Z9r18I9W2zjnyRq7M0dNxhy6n6b6pv4yNpytBWmEgc6S8mJ07A+l59dN
-         RPhXnLpANxi/ofTN4dteIqJp5UgFa+od6ef07pvdEXKRNSGW+UZzmfnojgo3gUlcMOyC
-         zYWFrvmE5IIVl/dBLFFKC856L4j6K7iynGYIJk+tXZF5E1OfeodX0US41PmrV+iGEvKy
-         uYFgBgdh8j0raEr6vY/uCsrAGvovSYiAl7550Ro/jhxf+a/H2I1SEuLw0Ci1QKOKirvX
-         tOKMio+8z5BV0aPu9kW4gvWXDd3/AGD34WiynjNmQM/SBP1HS5Wr8pOJO3UBR3pIcTJy
-         kt1Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770663960; x=1771268760; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oDGGdTWrfiFEfGwIzvd025xBJcNOMHd3nBArqAhnTUY=;
-        b=hjehFc9YA4cdCgxIr2JzrrRgDzfIMMIqYfe8VPR8Ui9g0KGqGbt3krBx4C1+L2wHI1
-         EjlFNNJxlOkPaIXvUY8dtyrT6zomOMuDMYumvW2AlFd8oDKQsRbpcPfBxiBlS+4yDitO
-         AN0Rwh3gcAWFyhmWOfj0/K6sexeS+gHYU4mA+QMKXusxO20e+R2HwQ0v/nONH3dZia0G
-         kW+GcMGDsdM7Od7K9BEl/ufuWhjGh3QdfWFRJvv+Q794sISh8d1k3qUHiyYsxcr6vB5a
-         tUZb7LXAmZ1Z/M26lz2d3YzYXhG+G050844X80MyAxRnd6IHbVb+tAR2N1N8DXOxcs0L
-         aYwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770663960; x=1771268760;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oDGGdTWrfiFEfGwIzvd025xBJcNOMHd3nBArqAhnTUY=;
-        b=Pfh1VrFrrhUbugiaDbElJUDoyjJcUpH0z7NgyzKtn8cDGQiFbD9kj12EDy7Qs8TZ3g
-         0z+QPTCREqB79L+8MQukgD9Hv/eVnY3BgChTVYBKSvIGy8QJPDN15L+Wubwtnu0is1mk
-         fpALYbiAqLy5Xn+u42FMuM+udY0r9RrxlZsDWhA+1Eg63og6T+pgo0RQFJvxRSM2KpVn
-         EVMDV3wGheaVvEbOjGH7d7lSaWc1cDAQ/9HbDf1I+nhpvSVfw5Hnbsy+LRBfgpyfEhwI
-         NFYr1F16eK+rxbSfBc5d7E+EBpZ1D4vzOHvoRkcjFIQdGhb1KeUuVMj0DbMWwYqKZVjv
-         A7/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXPPaAYaKRkDcJ18G5n+gmRQG5G1nTfbLuoiFGrH2RXjoVz4XuymnNMSZZusINSHdZ/gt9130c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyF7tYeRe/Vd1ghvf3m8jrVVDjl67CUIUKxxWB3pWYcZgj3Vwhu
-	CCYwLH0DfMIUalLxmBftdeeZxYoDnbwayqgwU2DWNxoq8Lvv47SFeq45pnwsi29zKyarPbmmpDV
-	64uE3wYue/vmsbWB1OmnO+aCXbi0ldRvxoLeDHwvsl+MKCZfC//PyDAXo
-X-Gm-Gg: AZuq6aJh+gE52YhCfgOdpNEu9ozaQsZ7i9iPBtQ20+pMu85G0aMJf2fPxEG/KTCqkl0
-	fb9OwxxDkKrIa4eS5sVd5wcaa4iW1kJFnrcWEhRT14JepG+U5dfopNpfhb1unlCs3j9nbFLulAz
-	nd2wTL4ParBMfSBKgWXYiPKbetcFR2ihbF20K9JmW//7cF65MS1PglafTafSlsYouZPaP0iNG25
-	z7lV+SxyXa3KeBWGd/C+2Cc63I7sRL8coyR7n1ca28wZVRzZWpmzK30icW792H9Uz3WYxiHUSz9
-	adMCh07v0W3h5JblriR8DQkh
-X-Received: by 2002:ac8:7f52:0:b0:4ed:8103:8c37 with SMTP id
- d75a77b69052e-50671ea26a7mr983041cf.12.1770663959631; Mon, 09 Feb 2026
- 11:05:59 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5047140FD84
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 19:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770664450; cv=none; b=SjD2GH1FU1Uga0lUjN7PvSMLQdtf1xontDFsDuitdQXCXLV5i5xu4qPMEudf/nw8wzoBWOcBNTYl8t9kkHFhaa6HGRO4LGsKxFf7TkFZFArhLN7KhfsYzFq1/BprKI+UCawbTGZT6NVZdZkZzXqTFCtwhGm2BrAbb1k2WI6u02s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770664450; c=relaxed/simple;
+	bh=EeRnZ/D6LgXddB+3u6Cdx959SA+lB9fAUyb3gRAYC/c=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=jdJ/H0u5MwE2HWWWc/zKwodlXJCJa7YGqjZqbY0jZzW6yR27z8s48g1pwUwd1kWn6X4O02DHWVMaMGZOZ1q2+6CpwcoHCkwrhkj8dw0eeSnhJ6dvpRLiYzCJ3mLx97er7CjlIbaEDRPE4gBaX475kK0kxFvzUFbW0fk69xpuOxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ghihUtyb; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770664449; x=1802200449;
+  h=date:from:to:cc:subject:message-id;
+  bh=EeRnZ/D6LgXddB+3u6Cdx959SA+lB9fAUyb3gRAYC/c=;
+  b=ghihUtybMnCXSBrIjw5XSwXFOpYQ1bl5997d1Eoekwhtj5e95SvHRYtu
+   u4TqMTSy80IgC349X9XEp9gd78ZLk5awx6UBjOMT6TCtW4JOCZQqZaevW
+   wliu1zd2fw5TdT5dcRYQrj1QfeZglfChuGNZul+H5xj6Dn/LC+lDtcm+R
+   JYlcVYLjpKWpnKMKMF0x/Z57IFkdmpiEIgwUd7e7q5RPwaJbgDLASM2Ay
+   BffLzbszOK1RE0/0VaVNiJy+SlOxgWcjZG/JT+mkGFg8//utBRhPV2lBL
+   0RLgAC1R3G2slNbRH/+dvf5amF0pvCKBQOC/VJbmUAooQeFZbqFudlaUH
+   Q==;
+X-CSE-ConnectionGUID: yK+C/i6VRiyUgqe/Zpzpig==
+X-CSE-MsgGUID: x82KIJYNSTW2CufojDeK9Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11696"; a="74388159"
+X-IronPort-AV: E=Sophos;i="6.21,282,1763452800"; 
+   d="scan'208";a="74388159"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 11:14:00 -0800
+X-CSE-ConnectionGUID: V4hXuOPyT8ietd4/4ozq4g==
+X-CSE-MsgGUID: hwt6QvPfSSmhPHcv2masmw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,282,1763452800"; 
+   d="scan'208";a="210815516"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 09 Feb 2026 11:13:55 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vpWhk-00000000oGK-27iT;
+	Mon, 09 Feb 2026 19:13:52 +0000
+Date: Tue, 10 Feb 2026 03:12:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Ivan Vecera <ivecera@redhat.com>,
+ Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [net-next:main 19/22]
+ drivers/net/ethernet/intel/ice/ice_dpll.c:3539:45: warning: '%u' directive
+ output may be truncated writing between 1 and 8 bytes into a region of size 4
+Message-ID: <202602100310.nOvzaILF-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
- <aYC0OvkVPkOnVU-i@moon.secunet.de> <CADHa2dBN+_9H-_L19Rg3vfvzC1N5FzG+rzW9Pff8pyM3KL9Ocw@mail.gmail.com>
-In-Reply-To: <CADHa2dBN+_9H-_L19Rg3vfvzC1N5FzG+rzW9Pff8pyM3KL9Ocw@mail.gmail.com>
-From: Nathan Harold <nharold@google.com>
-Date: Mon, 9 Feb 2026 11:05:48 -0800
-X-Gm-Features: AZwV_QhzQ8q9_qDpzv7jEod9qJAwvLP0o9DAskpYmUgS6AE2HnTpIdn_YQNoE1I
-Message-ID: <CADhJOfZETazUCX+kgd+gP861SxsU5Ao7QpjBjy8SnCL-FdKO2Q@mail.gmail.com>
-Subject: Re: [REGRESSION] Discussion on "xfrm: Duplicate SPI Handling"
-To: Yan Yan <evitayan@google.com>
-Cc: antony.antony@secunet.com, Steffen Klassert <steffen.klassert@secunet.com>, paul@nohats.ca, 
-	netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, horms@kernel.org, 
-	saakashkumar@marvell.com, akamluddin@marvell.com, greg@kroah.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nharold@google.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-257982-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257981-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	DKIM_TRACE(0.00)[google.com:+]
-X-Rspamd-Queue-Id: BD99A113EE5
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
+X-Rspamd-Queue-Id: 1703A113FF0
 X-Rspamd-Action: no action
 
-Unfortunately, Android's requirements significantly limit our ability
-to implement compatibility fixes between the OS and kernel due to
-interface freezes and cross-version compatibility requirements, so
-thank you for taking us into consideration! Generally, without a
-userspace mechanism to opt in to new behavior though, it's tough. For
-now, the Android kernel is just reverting these patches, but that's
-not a long-term strategy.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
+head:   57be33f85e369ce9f69f61eaa34734e0d3bd47a7
+commit: ad1df4f2d591e167bc64b8a7ce6328a2735e3d58 [19/22] ice: dpll: Support E825-C SyncE and dynamic pin discovery
+config: microblaze-randconfig-r062-20260209 (https://download.01.org/0day-ci/archive/20260210/202602100310.nOvzaILF-lkp@intel.com/config)
+compiler: microblaze-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260210/202602100310.nOvzaILF-lkp@intel.com/reproduce)
 
-One approach, which seems generally sound to me for this specific
-issue (and perhaps more broadly), would be to leverage the relatively
-new XFRM_SA_DIR attribute to distinguish between legacy behavior and
-stricter 4301 compliance. Much of the optimization is
-direction-specific, so we can infer that an implementation using the
-newer API and opting in to direction-specific behavior wants 4301/new
-feature support--also, Android doesn't yet use that attribute :-) .
-Or, as Steffen suggested, there could be a new toggle that indicates a
-standards-based target behavior (like 4301), which sounds great if the
-SA_DIR flag is deemed insufficient. Thoughts?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602100310.nOvzaILF-lkp@intel.com/
 
--Nathan
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/intel/ice/ice_dpll.c: In function 'ice_dpll_init':
+>> drivers/net/ethernet/intel/ice/ice_dpll.c:3539:45: warning: '%u' directive output may be truncated writing between 1 and 8 bytes into a region of size 4 [-Wformat-truncation=]
+      snprintf(pin_name, sizeof(pin_name), "rclk%u", i);
+                                                ^~
+   drivers/net/ethernet/intel/ice/ice_dpll.c:3539:40: note: directive argument in the range [0, 38347923]
+      snprintf(pin_name, sizeof(pin_name), "rclk%u", i);
+                                           ^~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_dpll.c:3539:3: note: 'snprintf' output between 6 and 13 bytes into a destination of size 8
+      snprintf(pin_name, sizeof(pin_name), "rclk%u", i);
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-On Sun, Feb 8, 2026 at 7:03=E2=80=AFPM Yan Yan <evitayan@google.com> wrote:
->
-> Thank you all for the reply! Please see my response inline below
->
-> > This is meant for multicast SAs, we don't support multicast SAs.
-> I reread the RFC and that makes sense to me. Thanks for the explanation.
->
-> > To clarify, how are larval outbound SAs created in Android?
-> > Are they created with zero or non-zero SPIs? Multiple zero SPIs (acquir=
-e states) are allowed.
->
-> In Android, larval outbound SAs are created with non-zero SPIs because
-> Android userspace uses XFRM_MSG_ALLOCSPI to manually reserve a unique
-> value before the SA is fully finalized. These are not kernel-generated
-> "acquire" states.
->
-> Regarding the default behavior:
->
-> I'm fine with defaulting to RFC 4301 for the upstream kernel to align
-> with the modern standard. As long as a toggle exists to fallback to
-> the legacy RFC 2401 behavior, Android=E2=80=99s compatibility requirement=
-s are
-> met.
->
->
->
->
-> On Mon, Feb 2, 2026 at 10:27=E2=80=AFPM Antony Antony <antony.antony@secu=
-net.com> wrote:
-> >
-> > Hi Yan,
-> >
-> > On Wed, Jan 28, 2026 at 16:43:06 +0800, Yan Yan wrote:
-> > > Hi all,
-> > >
-> > > I am writing because unfortunately commit: 94f39804d891 ("xfrm:
-> > > Duplicate SPI Handling") has caused a regression in the Android OS, s=
-o
-> > > we would like to gain some context to help determine next steps. The
-> > > issue is caused by the new requirement for global SPI uniqueness
-> > > during allocation. Based on our review of RFC 4301 and the previous
-> > > review history, we would like to highlight a few concerns:
-> > >
-> > > 1. Regression on Android:
-> > > This change breaks production behavior in Android, which uses
-> > > XFRM_MSG_ALLOCSPI to create larval SAs for both directions. Since RFC
-> > > 4301 allows duplicate outbound SPIs, and larval SAs are often created
-> >
-> > To clarify, how are larval outbound SAs created in Android?
-> > Are they created with zero or non-zero SPIs? Multiple zero SPIs (acquir=
-e states) are allowed. However, I guess there is no user API for managing t=
-hese acquire states. Only the kernel can create them and handle expiration =
-or deletion via SA updates with acq_req?
-> >
-> > A user API (UAPI) for creating and deleting acquire states might be a p=
-ossible solution.
-> >
-> > I haven=E2=80=99t been able to consistently reproduce the issue Marvell=
- reported,
-> > but I suspect the bug could also affect outbound SAs with non-zero SPIs=
-.
-> > Also when one peer is behind NAT.
-> >
-> > I wonder wouldn't duplicate SPI when behind NAT cause issues for output=
- SAs?
-> > Because the triplet is SPI, Protocol, Daddr. There is  no dport in it.
-> >
-> > > before direction or selectors are finalized, the allocator must remai=
-n
-> > > permissive (at least in our current design).
-> > > This also aligns with a concern Herbert Xu raised during the initial
-> > > review regarding compatibility:
-> > > >    "It's also dangerous to unilaterally do this since existing depl=
-oyments
-> > > >    could rely on the old behaviour. You'd need to add a toggle for
-> > > >    compatibility."
-> > >
-> > > 2. Inbound SPI uniqueness should not be a hard requirement:
-> > > The justification for enforcing global SPI uniqueness often cites the
-> > > statement in RFC 4301, Section 4.1, that for unicast traffic, the SPI
-> > > "by itself suffices to specify an SA." However, we don=E2=80=99t thin=
-k this
-> > > means inbound SPI uniqueness is a hard requirement because of the two
-> > > following reasons:
-> > >
-> > > =E2=80=93 Another statement implies that SPI uniqueness is just an
-> > > implementation choice:
-> > > >    "Each entry in the SA Database (SAD) MUST
-> > > >    indicate whether the SA lookup makes use of the destination IP a=
-ddress, or the
-> > > >    destination and source IP addresses, in addition to the SPI."
-> > >
-> > > =E2=80=93 There is a "Longest Match" mandate which makes SPI uniquene=
-ss unnecessary:
-> > > >    "For each inbound, IPsec-protected packet, an implementation MUS=
-T
-> > > >    conduct its search of the SAD such that it finds the entry that
-> > > >    matches the 'longest' SA identifier. In this context, if two or =
-more
-> > > >    SAD entries match based on the SPI value, then the entry that al=
-so
-> > > >    matches based on destination address... is the 'longest' match."
-> > >
-> > > 3. Further clarification on the specific problem being addressed woul=
-d
-> > > be helpful. The "real-world" problem this commit intends to fix
-> > > remains unclear. The patch mentions:
-> > > >    "This behavior causes inconsistencies during SPI lookups for inb=
-ound packets.
-> > > >    Since the lookup may return an arbitrary SA among those with the=
- same SPI,
-> > > >    packet processing can fail, resulting in packet drops."
-> > >
-> > > However, Linux kernel lookups using the triplet (SPI, Protocol, Daddr=
-)
-> > > are deterministic. The lookup will not return an "arbitrary" SA
-> > > because the destination address is used to disambiguate the state.
-> > >
-> > > As Antony suggested, this change may cater to SPI-only hardware
-> > > indexing. If that is the case, we are concerned about applying such
-> > > hardware-specific limits to the software stack, especially if the
-> > > behavior is not opt-in, as it appears to require an overly-narrow
-> > > reading of the RFC 4301.
-> >
-> > I agree with your suggestion that making the behavior opt-in.
-> > I would prefer the Default : to allow duplicate.
-> >
-> > > Given these concerns, would it be possible to discuss a revert or,
-> > > alternatively, could further context be provided regarding the
-> > > specific real-world problem this commit was intended to address? Once
-> > > the underlying issue is clearly defined, we can work together to find
-> > > a backward-compatible solution that satisfies all requirements.
-> > >
-> > > Review threads are attached for easy reference:
-> > > https://lore.kernel.org/netdev/aDQhZ_ikHEt_pLn_@gondor.apana.org.au/T=
-/#r45c1786651ce5af730f757aca7438474d494a323
-> > > https://lore.kernel.org/netdev/20250616100621.837472-1-saakashkumar@m=
-arvell.com/T/#u
-> >
-> > -antony
->
->
->
-> --
-> --
-> Best,
-> Yan
+vim +3539 drivers/net/ethernet/intel/ice/ice_dpll.c
+
+  3509	
+  3510	/**
+  3511	 * ice_dpll_init_fwnode_pins - initialize pins from device tree
+  3512	 * @pf: board private structure
+  3513	 * @pins: pointer to pins array
+  3514	 * @start_idx: starting index for pins
+  3515	 * @count: number of pins to initialize
+  3516	 *
+  3517	 * Initialize input pins for E825 RCLK support. The parent pins (rclk0, rclk1)
+  3518	 * are expected to be defined by the system firmware (ACPI). This function
+  3519	 * allocates them in the dpll subsystem and stores their indices for later
+  3520	 * registration with the rclk pin.
+  3521	 *
+  3522	 * Return:
+  3523	 * * 0 - success
+  3524	 * * negative - initialization failure reason
+  3525	 */
+  3526	static int
+  3527	ice_dpll_init_fwnode_pins(struct ice_pf *pf, struct ice_dpll_pin *pins,
+  3528				  int start_idx)
+  3529	{
+  3530		char pin_name[8];
+  3531		int i, ret;
+  3532	
+  3533		pf->dplls.wq = create_singlethread_workqueue("ice_dpll_wq");
+  3534		if (!pf->dplls.wq)
+  3535			return -ENOMEM;
+  3536	
+  3537		for (i = 0; i < pf->dplls.rclk.num_parents; i++) {
+  3538			pins[start_idx + i].pf = pf;
+> 3539			snprintf(pin_name, sizeof(pin_name), "rclk%u", i);
+  3540			ret = ice_dpll_init_fwnode_pin(&pins[start_idx + i], pin_name);
+  3541			if (ret)
+  3542				goto error;
+  3543		}
+  3544	
+  3545		return 0;
+  3546	error:
+  3547		while (i--)
+  3548			ice_dpll_deinit_fwnode_pin(&pins[start_idx + i]);
+  3549	
+  3550		destroy_workqueue(pf->dplls.wq);
+  3551	
+  3552		return ret;
+  3553	}
+  3554	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
