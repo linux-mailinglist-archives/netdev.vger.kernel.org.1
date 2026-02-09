@@ -1,146 +1,138 @@
-Return-Path: <netdev+bounces-257962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257963-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aIKWAWkKimnKFwAAu9opvQ
-	(envelope-from <netdev+bounces-257962-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 17:25:13 +0100
+	id +P38IF0LimnKFwAAu9opvQ
+	(envelope-from <netdev+bounces-257963-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 17:29:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9051127AF
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 17:25:12 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F956112826
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 17:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0510F301113E
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 16:25:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CD3E6300443F
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 16:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC6F3806BE;
-	Mon,  9 Feb 2026 16:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A573D3815E1;
+	Mon,  9 Feb 2026 16:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nYsaIaY9"
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="IXTomYUA";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="TOMUT6Wx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C8723D291;
-	Mon,  9 Feb 2026 16:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A46437FF60;
+	Mon,  9 Feb 2026 16:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770654310; cv=none; b=OLB02WbfJzKnd90P469g7FTS/7tGerVtHvI3+JhS9K0MuIrnAC7/pOOSR7+kZGsohjA0bgfJSZ8gZoGOedn+UMOzPyFAz/nY9a3yA7Wp35jGShItH97knCaXgAWJ5inGg9KTAvqVQxSo2RPkZFRWJk+z9z5vuE9G3XD1YWlAalg=
+	t=1770654552; cv=none; b=YkHgf490wh8onDD/iwQuBQYI2+6bFju31sUbrXCkzGFDK4bDYVZwhtziyNzbqYhonsKtirQwSSYVvAQSXIytKG54wKsJqKIL2jkM8BugbfH2pETtsK4khWkaK479YWbyVw5ARyDdJySsY1ioLy6j1N21/ksk+r15R7xAYBLSaeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770654310; c=relaxed/simple;
-	bh=YiyUpq4yLFMnusX9o9WUFew3CYw+pNregIbvTpT83M0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LLc4Fg1jMoqRKrdSUE9zhlnq6uScYAN5HTSlaDarH1VyVgrCtcsyNXpQn+nELgzeSuf9BkdsyekkSMUGPvHlFhjQxg8ngBS5Rr3bQISyJ3bZCj4hBi1wB2gZPJRM6T35QwstLJYCr/WECava52FqSddgMgU573nSxZi5DH3Pl80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nYsaIaY9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 907FDC19423;
-	Mon,  9 Feb 2026 16:25:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770654309;
-	bh=YiyUpq4yLFMnusX9o9WUFew3CYw+pNregIbvTpT83M0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nYsaIaY9LUNkTbpZ47L62Dcxp3Ykz3vn0n+/tyYH7/m6gPKmCKODwefqlR6gSRiZ4
-	 QNH71InDZQOYUkH9aAkqvL4A0AJI7qKkqcBqAJ1SQrG6adeUY720ScVOek9e5nl8zk
-	 W/FnNIvvdmZZ/ie6NBxWvHWZdvIgLUErNE2dneRRqmal584UEHphuD2c4Q84d/qB/N
-	 +bMwAgzyC/IjoXfqFZn/ZTluu3AxtHvgWevNxvqU9qxbhteDuf6BnWey/xsPPT/sCM
-	 1N1mwRlFcwNUg9nPrHUMobTGi6cb9z2N5PCWasZy5y3iMXxJo22a/TW9+E0yywpV6Y
-	 408PkZHn0GlOw==
-Date: Mon, 9 Feb 2026 16:25:03 +0000
-From: Simon Horman <horms@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
-	mwojtas@chromium.org, Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v3 05/11] net: phy: Create SFP phy_port before
- registering usptream
-Message-ID: <20260209162503.GA2478520@horms.kernel.org>
-References: <20260201151249.642015-1-maxime.chevallier@bootlin.com>
- <20260201151249.642015-6-maxime.chevallier@bootlin.com>
- <aYI1zd6Iddcdt6xc@horms.kernel.org>
- <7150d811-df6a-488d-a7d8-96aec01365db@bootlin.com>
+	s=arc-20240116; t=1770654552; c=relaxed/simple;
+	bh=xkvNxqbgqeEoqLcE8qxomMI4NmK6kmBCXSq+yWgjMEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mWIQvXcqYa1jvDtxnIxabmudbSjEToCCiRFOi20qvyVl1tEa130jTWnr5xNf3tFCrlAzz71hUOYYNIO4n4wNzv7dPaoSkwsMXF3WqPMDPGWNQFLL5CsH9HqxKVOSBCEqFWHP6sUDra4fD5tY8FjscHHgo10hS9gLz6or7Sxvkgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=IXTomYUA; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=TOMUT6Wx; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1770654531; bh=uxvdcbMORNal9bzuihso3lM
+	o4Xfi1tMf+XNjbGwuWg0=; b=IXTomYUAQT7AJkJLysF4Qe7L9uJ1f3cKdVIWVqTZAhCIeDm+je
+	aV/QDEfOcMSBesAI9wDw+eNYQ0wiA58q6lLvKc4ITiig19b+h2xDZj//M2GniqbFRBUxE81PdUQ
+	fUqID5kLG0Isngi1kIEeRd2yktkfPirrN+aaw+UNrsC6XJb2lMG1efv1ratwkqjGBG7CnnnyQDP
+	ISqwRlT5nuXjzMNSL7cRzaiVhL1NjQWjeL7a0G9CSMANyT0hM1Z7INp3RKsxgsW4qmKngpjMIqy
+	pGvTbpTyY+j91L/Y9fVWjuiYtLxeSc86wl4Sed1teMA/rpwKT6Q+15hQK8ZqsAeF/gA==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Date:Subject:To:From; t=1770654531; bh=uxvdcbMORNal9bzuihso3lM
+	o4Xfi1tMf+XNjbGwuWg0=; b=TOMUT6Wx7Fj+jGocdAkVzXMR+9DlNZ4Ik9Mhh+cOrda8EVMfzr
+	5Y+zApL/si/n8W9Xs6ruFtp7Jd6wayV65cBg==;
+From: Daniel Hodges <git@danielhodges.dev>
+To: sd@queasysnail.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Hodges <git@danielhodges.dev>,
+	syzbot+0e665e4b99cb925286a0@syzkaller.appspotmail.com
+Subject: [PATCH] macsec: skip PACKET_LOOPBACK frames in macsec_handle_frame()
+Date: Mon,  9 Feb 2026 11:28:51 -0500
+Message-ID: <20260209162851.11800-1-git@danielhodges.dev>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7150d811-df6a-488d-a7d8-96aec01365db@bootlin.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[danielhodges.dev,reject];
+	R_DKIM_ALLOW(-0.20)[danielhodges.dev:s=202510r,danielhodges.dev:s=202510e];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257962-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257963-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[git@danielhodges.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[danielhodges.dev:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 4A9051127AF
+	TAGGED_RCPT(0.00)[netdev,0e665e4b99cb925286a0];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[danielhodges.dev:mid,danielhodges.dev:dkim,danielhodges.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 8F956112826
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 07:09:23PM +0100, Maxime Chevallier wrote:
-> Hi Simon,
-> 
-> On 03/02/2026 18:52, Simon Horman wrote:
-> 
-> >> -	if (!ret && phydev->sfp_bus)
-> >> -		ret = phy_setup_sfp_port(phydev);
-> >> +	ret = sfp_bus_add_upstream(bus, phydev, &sfp_phydev_ops);
-> >> +	sfp_bus_put(bus);
-> >> +
-> >> +	if (ret && port) {
-> > 
-> > Hi Maxime,
-> > 
-> > If bus is NULL then port will not be set here.
-> 
-> Arg... I though smatch was running in the NIPA ingst-mdir script, but I
-> was wrong :(
+macsec_handle_frame() assumes all incoming frames have a valid Ethernet
+header at skb_mac_header(skb) and reads hdr->eth.h_proto to determine
+whether to process the frame as MACsec.  However, loopback packets are
+delivered with pkt_type PACKET_LOOPBACK and carry only a
+protocol-specific header (e.g. 7-byte phonethdr), not a full Ethernet
+header. Reading 14 bytes of ethhdr from such a short header results in a
+slab-out-of-bounds / uninit-value access.
 
-FWWIW, I think it would be nice if it did.
-But I'm also not sure how well it works when applied to a full
-allmodconfig build. Which, AFAIK, is how NIPA tends to run.
+Fix this by returning RX_HANDLER_PASS early for PACKET_LOOPBACK frames,
+consistent with how macvlan_handle_frame() handles this case.
 
-> 
-> I'll address that in V5 as the problme is still in V4, thank you for the
-> report
-> 
-> Maxime
-> 
-> 
-> 
+Reported-by: syzbot+0e665e4b99cb925286a0@syzkaller.appspotmail.com
+Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
+Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+---
+ drivers/net/macsec.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index 0206b84284ab..edcc51f82327 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -1103,6 +1103,13 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+ 	bool pulled_sci;
+ 	int ret;
+ 
++	/* Loopback packets (e.g. from phonet) don't have L2 headers, so
++	 * attempting to interpret the mac header as Ethernet would read
++	 * uninitialized memory.  Let them pass through unmodified.
++	 */
++	if (unlikely(skb->pkt_type == PACKET_LOOPBACK))
++		return RX_HANDLER_PASS;
++
+ 	if (skb_headroom(skb) < ETH_HLEN)
+ 		goto drop_direct;
+ 
+-- 
+2.52.0
+
 
