@@ -1,162 +1,223 @@
-Return-Path: <netdev+bounces-257946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKw9JlniiWnGCwAAu9opvQ
-	(envelope-from <netdev+bounces-257946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:34:17 +0100
+	id eD8BAXriiWnGCwAAu9opvQ
+	(envelope-from <netdev+bounces-257947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:34:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D4F10FC10
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:34:16 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 469B310FC4D
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 14:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AAB833017BDA
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 13:34:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E351E3004D1A
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 13:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D19378D8E;
-	Mon,  9 Feb 2026 13:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792F5378D85;
+	Mon,  9 Feb 2026 13:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YlR9bj5Z";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1J7rxPcV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xa+QQuRA"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3276244665;
-	Mon,  9 Feb 2026 13:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074662264DC;
+	Mon,  9 Feb 2026 13:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770644054; cv=none; b=fDKucmtPTsnP0aTXnIVn5aSNofGt8UocUDWSWGb+XWZ0ifxbq3wRkaJuxmimou0ek17NLq3TjUbYjA00N+P6/Qh/EqB5es/ecX7sdM+tRDP+qWtsGaZ+GMIr1F8IZz2npDky3C78k0WgS6zWA2cuISLdjThJRjmhH3hRtq86ufo=
+	t=1770644083; cv=none; b=RjhhThne2CueKzXb3TDWL3ib4jK5QA5GTlnyy6PtXa+3eDLZ4noFSCgV7cRpjm5NhOccyYk0/l3aYmjUucl/8PzPnTc+Yv77yc+YDfrEXjLTd9kL1dXjtYLNb9ez+YVbCQFPKOhbmxG0AiWdfuJh4pyTpFFZVB0WZt9tM4uQpJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770644054; c=relaxed/simple;
-	bh=IOCckDQmO3bCx6vIbKsdQfr+uc3RnkYrCh6Yh98UfAA=;
+	s=arc-20240116; t=1770644083; c=relaxed/simple;
+	bh=7FoZknSTlCEUeEaMZckB9YDk9vRC2Kga3HC5LlkyvC0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HXQoA2Dzz1AmrArXrWzIEOb5EUX+t9h/5Y866oJGh5pyAHEp2N4I8GCIVM5hV3HJFNqboc+Y9qqENpTG9bzCuLhACh6cI3pFPKvMbjkE+n5rzsPJvSO0h8ND6F4T954HXATHNoT1Ea0VMeJd8X9bhdfPzW22COSE7wMtHdY+8H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YlR9bj5Z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1J7rxPcV; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 9 Feb 2026 14:34:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770644051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=60PQiy2iBpgFewxiruovzAslbmJSAAtPFOFOOiKjjPA=;
-	b=YlR9bj5ZIrN5Hl5gkUFTHUhbBNirduv8CgJZeENp11uU3U6thi6j/OtC/KQPAKc9QoY16b
-	iqhuyzi/b0ZQ7M7VUfUOm6xDjdKBiVAcL0NDslJlAhb3BeoAwDRRtJnPjGMbf1mFXVv7bt
-	NMrFeatDijOgXhtd0UkwblQQRQ31qH8+8sJoew6J5Wkmb20RAzlLTsuX1HheIftYOGQ2/H
-	DD0vYw+2DrYDfmR/vW+TfUOUQruDrKryktRtVAgS4glEN42/iCi7e94OG0AE7SlxspDuCq
-	Or+Gco28APE0lsa0wk71wKJNamcmGRe8DaKywyoaJhATqU9E7ZWe6UypX84Xbg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770644051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=60PQiy2iBpgFewxiruovzAslbmJSAAtPFOFOOiKjjPA=;
-	b=1J7rxPcVC/2n9mif2u5PsOumsh3UqugEaRYJHku7wMkXPEW7VFN4X8Fwwg9s/kVlJ7j0qj
-	wEPG5ci9hZIbMODg==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, linux-kselftest@vger.kernel.org, 
-	mptcp@lists.linux.dev, linux-security-module@vger.kernel.org, bpf@vger.kernel.org, 
-	libc-alpha@sourceware.org, Carlos O'Donell <carlos@redhat.com>, 
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>, Rich Felker <dalias@libc.org>, klibc@zytor.com, 
-	Florian Weimer <fweimer@redhat.com>
-Subject: Re: [PATCH net-next v2 0/4] net: uapi: Provide an UAPI definition of
- 'struct sockaddr'
-Message-ID: <20260209143003-80d3cb63-38c6-4280-a319-ee6879eeab11@linutronix.de>
-References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
- <20260121192729.2095aa25@kernel.org>
- <20260130112309-28f2645b-e756-4173-96da-cf5c59191520@linutronix.de>
- <20260130081741.425a92e0@kernel.org>
- <3c46fc49-b41b-44a2-b42a-669cc7e6bb02@linutronix.de>
- <20260131092517.6639d84c@kernel.org>
- <20260203122715-eeb304f9-4b42-4fc6-a527-658182a92ba5@linutronix.de>
- <20260203144011.32d5b223@kernel.org>
- <20260204064248-d9c4ab78-f6d4-4ac6-8d55-e939bc1df6d2@linutronix.de>
- <20260204175516.4fb11966@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iY14Qm56BZr9qu0TVe/YUfJWZs9HMBpqqiT6tiBbAw284gyuP6bFK8+nuWj4EiUo+QVZCJ5VnRc0+9MIQK26+VoTvkNaYkh/SbS8lyA/+ATUFVyvxp2ePWAY3vVC2qZXaAzabjCnt8fhIeqXGi6qs8CqEPNvip+Mj0FTOqxKkM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xa+QQuRA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Sh23NSounPEoAE2h79+DwlVVBDgNeh1OQatWs/Guhyc=; b=Xa+QQuRAVaTq3QfgkF6otHND6P
+	1tX50Y+PCdAxCTR75mp2UWO7wGqTlAXch2y+oT1au3UH+6n6Tn5vc22nPjgJIgScn+dfxz2scnG/R
+	v8cJOik1at9Yt/X7jKqKC0AUini3O6AC+8xAQprfzp1oq6WKGdBEohe/mJ5XhJpe9BR4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vpRPL-006j5z-20; Mon, 09 Feb 2026 14:34:31 +0100
+Date: Mon, 9 Feb 2026 14:34:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: lizhi2@eswincomputing.com
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	ningyu@eswincomputing.com, linmin@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
+Subject: Re: [PATCH v2 2/2] net: stmmac: eic7700: enable clocks before syscon
+ access and correct RX sampling timing
+Message-ID: <1392e400-9901-4f65-b44b-d257d8196abf@lunn.ch>
+References: <20260209094628.886-1-lizhi2@eswincomputing.com>
+ <20260209094832.932-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260204175516.4fb11966@kernel.org>
+In-Reply-To: <20260209094832.932-1-lizhi2@eswincomputing.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257946-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-257947-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,davemloft.net,kernel.org,digikod.net,iogearbox.net,gmail.com,fomichev.me,linux.dev,vger.kernel.org,arndb.de,lists.linux.dev,sourceware.org,linaro.org,libc.org,zytor.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
-X-Rspamd-Queue-Id: 10D4F10FC10
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 469B310FC4D
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026 at 05:55:16PM -0800, Jakub Kicinski wrote:
-> On Wed, 4 Feb 2026 06:51:46 +0100 Thomas Weißschuh wrote:
-> > > make -j16 O="$kobj" INSTALL_HDR_PATH="${kobj}/hdr" headers_install
-> > > popd
-> > > 
-> > > pushd uapi
-> > > find . -type f -name '*.h' -exec cp -v "${kobj}/hdr/include/{}" {} \;  
-> > 
-> > Here only those headers which already exist in ethtool's uapi/ directory
-> > are copied. As linux/typelimits.h is new, it is now missing.
-> > Honestly, if a user fiddles with the internals of the UAPI headers like
-> > this, it is on them to update their code if the internal structure
-> > changes. In your case a simple 'touch uapi/linux/typelimits.h'
-> > before running the script will be enough. Also internal.h now requires
-> > an explicit inclusion of <limits.h>, as that is not satisfied by the
-> > UAPI anymore.
-> 
-> Hopefully you understand that while due to uapi header copy this is not
-> a huge issue for ethtool itself, but it is a proof that your changes
-> can break normal user space applications which do not vendor in uapi.
+>  static int eic7700_dwmac_init(struct device *dev, void *priv)
+>  {
+>  	struct eic7700_qos_priv *dwc = priv;
+> +	u32 eth_phy_ctrl_regset;
+> +	int ret = 0;
+> +
+> +	ret = eic7700_clks_config(dwc, true);
 
-A regular application which uses a full UAPI headers tree will get
-access to the new header automatically.
-If the application uses symbols from <limits.h> without including <limits.h>
-on its own, it is broken.
+No point initialising ret if the first thing you do is assign to it.
+
+> +	if (ret)
+> +		return ret;
+> +
+> +	regmap_read(dwc->eic7700_hsp_regmap, dwc->eth_phy_ctrl_offset,
+> +		    &eth_phy_ctrl_regset);
+> +	eth_phy_ctrl_regset |=
+> +		(EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
+> +	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_phy_ctrl_offset,
+> +		     eth_phy_ctrl_regset);
+
+regmap_set_bits(dwc->eic7700_hsp_regmap, dwc->eth_phy_ctrl_offset,
+		EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
+
+> +	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_axi_lp_ctrl_offset,
+> +		     EIC7700_ETH_CSYSREQ_VAL);
+> +
+> +	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_txd_offset, 0);
+> +	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_rxd_offset, 0);
+>  
+> -	return eic7700_clks_config(dwc, true);
+> +	return ret;
+
+returning ret here seems pointless. You already know it is 0.
 
 
-Thomas
+>  }
+>  
+>  static void eic7700_dwmac_exit(struct device *dev, void *priv)
+> @@ -88,17 +124,33 @@ static int eic7700_dwmac_resume(struct device *dev, void *priv)
+>  	return ret;
+>  }
+>  
+> +static void eic7700_dwmac_fix_speed(void *priv, int speed, unsigned int mode)
+> +{
+> +	struct eic7700_qos_priv *dwc = (struct eic7700_qos_priv *)priv;
+> +	u32 dly_param = dwc->eth_clk_dly_param;
+> +
+> +	switch (speed) {
+> +	case SPEED_1000:
+> +		if (dwc->eth_rx_clk_inv)
+> +			dly_param |= EIC7700_ETH_RX_INV_DELAY;
+> +		break;
+> +	case SPEED_100:
+> +	case SPEED_10:
+> +		break;
+> +	default:
+> +		dev_err(dwc->dev, "invalid speed %u\n", speed);
+> +		break;
+> +	}
+> +
+> +	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_clk_offset, dly_param);
+> +}
+> +
+>  static int eic7700_dwmac_probe(struct platform_device *pdev)
+>  {
+> +	const struct eic7700_dwmac_data *data;
+>  	struct plat_stmmacenet_data *plat_dat;
+>  	struct stmmac_resources stmmac_res;
+>  	struct eic7700_qos_priv *dwc_priv;
+> -	struct regmap *eic7700_hsp_regmap;
+> -	u32 eth_axi_lp_ctrl_offset;
+> -	u32 eth_phy_ctrl_offset;
+> -	u32 eth_phy_ctrl_regset;
+> -	u32 eth_rxd_dly_offset;
+> -	u32 eth_dly_param = 0;
+>  	u32 delay_ps;
+>  	int i, ret;
+>  
+> @@ -116,13 +168,23 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
+>  	if (!dwc_priv)
+>  		return -ENOMEM;
+>  
+> +	dwc_priv->dev = &pdev->dev;
+> +
+> +	data = device_get_match_data(&pdev->dev);
+> +	if (!data)
+> +		return dev_err_probe(&pdev->dev,
+> +				     -EINVAL, "no match data found\n");
+> +
+> +	dwc_priv->eth_rx_clk_inv = data->rgmii_rx_clk_invert;
+> +
+>  	/* Read rx-internal-delay-ps and update rx_clk delay */
+>  	if (!of_property_read_u32(pdev->dev.of_node,
+>  				  "rx-internal-delay-ps", &delay_ps)) {
+> -		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
+> +		u32 val = min(delay_ps / 20, EIC7700_MAX_DELAY_STEPS);
+
+If the value it too big, please return -EINVAL. You have listed in the
+DT binding what the valid range is, not that you clamp to the maximum
+value.
+
+>  
+> -		eth_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
+> -		eth_dly_param |= FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
+> +		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
+> +		dwc_priv->eth_clk_dly_param |=
+> +				 FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
+>  	} else {
+>  		return dev_err_probe(&pdev->dev, -EINVAL,
+>  			"missing required property rx-internal-delay-ps\n");
+
+RX and TX internal delays are generally optional, because most boards
+don't require them. Default to 0 if not supplied.
+
+    Andrew
+
+---
+pw-bot: cr
 
