@@ -1,178 +1,284 @@
-Return-Path: <netdev+bounces-257888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-257889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kK42MKJMiWl46AQAu9opvQ
-	(envelope-from <netdev+bounces-257888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 03:55:30 +0100
+	id kF9eL4VOiWlm6QQAu9opvQ
+	(envelope-from <netdev+bounces-257889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 04:03:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314FB10B425
-	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 03:55:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 087DF10B481
+	for <lists+netdev@lfdr.de>; Mon, 09 Feb 2026 04:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1D54300F5D3
-	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 02:55:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A9313002B7C
+	for <lists+netdev@lfdr.de>; Mon,  9 Feb 2026 03:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEAA2E6CC0;
-	Mon,  9 Feb 2026 02:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B94D1D6193;
+	Mon,  9 Feb 2026 03:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6/hgfm8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3OvosIXo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B1A2DAFA9
-	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 02:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770605708; cv=none; b=he5loxreptEdHxU2gjsqO6uxmevlWcnPMb2gGGtSJlsD/e3/LUXFZ8EBwQylhfvUGBXcUpXlF8T5b1VGKkLrMgYjYBomo5x29lINgwEMrmiWOlyQmJb+kQZ53HVRRZyG2CFXemAPM7z0QBmmDrgW759/3CU2nxCMDSRPKFy9Peg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770605708; c=relaxed/simple;
-	bh=KUBiAKiL+fqQFzFhjj6AWfg1RYi9pSV55KrSLt8VK1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NicRxzFrYqVZCSFFaV3kuwYS4lRmNfjAnQmuJ8H5Lxm+RD9Py+e6MqvddulFIhGQYloxg8O9x4eqcRwn2kblNnGa1AiSH4gbGvCVF88jFAH67iWU3pSlJ7j1VVTcaiirXobQM9EGi6Q5CrEmWdgHm5WCPfgQGoANzfNOoHteaC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6/hgfm8; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b6b0500e06so3764776eec.1
-        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 18:55:08 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B0B2ECE93
+	for <netdev@vger.kernel.org>; Mon,  9 Feb 2026 03:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770606200; cv=pass; b=FXQpzPbFRt2v+74YESsApUv+lYG49UxKkgMjAxZbtGUJ2aOXzdNAFoPnwFbv6qprEeYGbP7MN6j1sXJM9aQelI4IYObwYFQdloiEbMByUAfTWQQjNVXq6ZtnjcfUoM6F2MWwvkyAlhdzmCOqM330UfYeKiRAuw6B0bA0pes6ayA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770606200; c=relaxed/simple;
+	bh=A1vj4gh9glfmELNvlW5b6RZzpvenLzZgUTyMY2dL1Y8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KYOAReTbPwH0ffDZlrIGLGV4vEwIdZsgnpih4SmpiNgmxV6F9sg9Uxg8Vqe1H0WChv9Jl7xOADv3Cui1jpc1p/MODyYgzIJAKHcbTYU0vg9wvpAisQCbKAbFZSi34+dwLk01MG7F/0ilKQI56u5TLiF3ifHolVFEgPz+RELUeeE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3OvosIXo; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-50299648ae9so740381cf.1
+        for <netdev@vger.kernel.org>; Sun, 08 Feb 2026 19:03:20 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770606199; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fJMEX12IM+yPw771mBknqzzs6JY/3SiwW0puzjPWNngD/WcVRBr9wzbr3MIhTDVn0J
+         /O+NC3ZOYdF1beJHsbwMn/j2JLPBSk6z6d9nkN96mcmYVY1+eSD/LPCzRBu0ankEim7m
+         CC49yUPseZ/gzxot8r/ZLXyTE/uQl0aOiwxMzMDU9KXAlvKt6ab8o9iKTgEEpmLO1I7i
+         ITvwHaWIlR4PrMsIxMvgs03UEngCGsZxCYa7xIrIj79hjrBKxTYp4tbouQkbVvQYVlTV
+         BchrWljSb1Ju/h8u3PXcIx1caj1Nd4VeVBiZA0DQPfHC4Yy1quydDjUWOpt/C0Zx1Dig
+         Mc1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9wK0s6WNY7JHGKFbOusdpN6KZBi0XPPQ6s0A03O5cww=;
+        fh=VxzoYdzDONmBnNMfi/3obQSNKCvJL4jJ3JeSqYnE6T4=;
+        b=Zhg1AlpLYsenMG643rgCc5KLYjxQKnuNcfYd8EJQiGY1mZBoLTajrtVdn9Dt2WQmdq
+         ndk6I1E4a0eUfx5Tqqm5HtdsRYivu4p0CwJzxfTGTc9RL9HhV7a5nmJpqQiQtVu22yP9
+         JW5Fn+5Kr/OOMdid4EOnAPjO+QKZoD0tVhanGIUgVGuC31KjUkHdzY4zLLPgLtN6oDbK
+         sqcyMyovTF5Jp6Xbmb4ZU76Iyk5PD40sBd4YhiLgwabGXwWe+HGLkjC3TsJl/XhfWXNd
+         S9lfbdkWpH2/iUOkUxuEr3LfninpNyBDgRlUBhSux04LfSuR7q1UDyftapT8Y5GxOIMP
+         amOg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770605707; x=1771210507; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7o01awh73bdpJrLOVF5ADIWN7TCOmY8qkJYCgz/HIS0=;
-        b=f6/hgfm8xqqjKxXUckFWhMcVguy/XDbmj1bpNUavaAW7zZrABQk0IYooi+dkzJ7GX7
-         qN7uZxQsPvwuaPbEdQyO5J5n0z8sX92v3A2pBdqhFbJrlHdhfuq2VgkH/0lRI7tfHzNF
-         Q0yw+StukcGmI0iVLsMaZFrhLomYL3XR9gDK7cdz21kbr1WNwMB0qeNfzxKz4hWZPiTQ
-         Tl1q+6JhcfzPCoaWsP4jG6KxH3aSUHZHXTQfISra1RfznQ0GQ/PRjeOhsAG5QFrBLjNS
-         MaF6YHjObAAARgAx8PDAzAKFKH9crlK5eBoPp+dqqXR1WfH6Ep42vF7taeHwC+I6hI+n
-         +JtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770605707; x=1771210507;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1770606199; x=1771210999; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7o01awh73bdpJrLOVF5ADIWN7TCOmY8qkJYCgz/HIS0=;
-        b=YeWRFWdVyEfdTKz6qzUAwvlPOEvOJrjTI+Ty8euSlHcE2IkYvOjsu1/08tc9h4RP+5
-         zYJoC4QfyVqOXY2Ma9NX2PxzdcVlkOuFBeXYRPmqe3HnUz0MIegYYjusUqAjOSDweW6F
-         Ol3uP+vo6xbbsmL3zyH+t9WEqLaobJOSZoXB9XIYiXd0/AnatpG7F1tsrO5Hcp0MHvdz
-         hhKKmdiK8Rk0g7cGEEudrAT1QgFcaEuPTqQqbaAOrODg+/2MLxQRkH4Hbk2mP4xFkfXS
-         mIyKWNiqz6YXQGHOuiLSWdaspcx7IksnFQM2ygDu7Uo/3Gdmi1iO+aXAXTqof9QTdjWl
-         RKgA==
-X-Gm-Message-State: AOJu0Yxuqp6gqTltFxlFL3jZv8+qSU+De/mWRHD7+FnWfwvDupZTkVqc
-	LHYA+IXiVglZ4U/e/tosEUB0zYzpF7/AK/tGla4qQMeaplDftoaVh4uXm+WJnRVP
-X-Gm-Gg: AZuq6aI7mvA3n45117xULBNW9HaN3phYzB5YtA/QqCAQDsWawK7Z7qUfyLg4FclqR0j
-	qS71TncRMG2W3lVvKvlHUZzY0/MLWYyDNMGtCVJfCIzYJarePVW5mRvvG3a2Zp8G7SlI9B+e8CH
-	p65+P8eIMEgHoFH5SU0sZSOjl+j+mVKArq4Bu9UywGVSytCWh+tdDIkRLkf97Fo6vtUexy0IlPB
-	rapW/LLb0qz/gu4ZkZcDsRGXQn9N+0wsQ0p/l6Tyr4MWBXjbqwn3FCE7U9vqcKmfnV2m1DNRk+b
-	orI4mbjzEGF895yAyGB5ff6UVzcySw0GuksVOjOrAOP2ipd/rdj6+0+S7T7c9O3Zy3p0cu9bptA
-	kxi+qBO8z1ugj9z+52GjMPAaGiAwUQOVESrOxcsxokdhBGFQM20YyrHLHLuUjnpphG3uA9/7+tM
-	rSs+PoLlqGhE10dpzZo6+Hr6MKCCmrF0uL1OCVCK4NCAg805CBTDzx0K2JpnHRKJPXn5R/IlDvB
-	GS0zEXSkA+JprH7jKRRjgGMJfcPVFg6ICEeLAgj4SY/6gkeUJTpYxUj6nrneJrfGXEu2+0GuL3+
-	hNPJteyd
-X-Received: by 2002:a05:7300:641a:b0:2ba:6d87:cf68 with SMTP id 5a478bee46e88-2ba6d885c37mr879391eec.16.1770605707155;
-        Sun, 08 Feb 2026 18:55:07 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-120.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.120])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b855c89695sm6672671eec.31.2026.02.08.18.55.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Feb 2026 18:55:06 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: arcnet: remove code depending on nonexistent config option
-Date: Sun,  8 Feb 2026 18:54:41 -0800
-Message-ID: <20260209025442.50987-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=9wK0s6WNY7JHGKFbOusdpN6KZBi0XPPQ6s0A03O5cww=;
+        b=3OvosIXo27v+iCH6WTdUH4I6aM9nzaAjEh4fyZ8pWSffKx5AijwwITnhOC5DoZFgHM
+         OxAH1JOuqg5pXBTOQz4ATpBsHmWYqozRqClSeM6QL/fyson08W3trlMfXyWcCcKQCJf+
+         zni62mScahmvUX0mYWkS3WGZr4BJMZcFCOVuUlxZadC4FbRpxzZNQOiWKCw5ioH5Urt+
+         k7YBlogxZk8YBhGmIdOVSGCbolYc+LIYrtTMipWZOTH8lH0cBRmPKbCZN/UqMzC+S3TF
+         qIhT462LL06tWLWN/TY1RS26Kv+71O+3kjmcSkrGFWiqQBF6sv1KSyiC1X6uuZpPPZrf
+         AdKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770606199; x=1771210999;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9wK0s6WNY7JHGKFbOusdpN6KZBi0XPPQ6s0A03O5cww=;
+        b=SP6WkhSTUPXDFlLJlbq1/DiHXTok8GTXll6Ek/esXbig6UNJB/VjWohSSKu+xTIi4N
+         vBPzyFCS0BfrIJ1iC6fpDDJybfIzL8xRJOfSpbqcq39b3ZXTt0Y7x7t3R2jXyB3gbu8t
+         cakAAsbvgzieoqgeyeIm4I2GaKQW0NSjheaLHOjgny2RkjyI4f8hwvdl23zOt5r/cQjB
+         2Ew3l6l0TMgvioZhoaYLmKQ23lgQTB4u6lyoTFybNj2z0HpW/0Ugjsdw875hD6fXCWWb
+         3xnK7HxtifHoOACy79WeiksVLCTfyvsTA+IEVovKF5gRNTblbxM85iwuPwVdmQS9BFch
+         g0bQ==
+X-Gm-Message-State: AOJu0YzKyaQeu+OyJDte3EHVSQv114I/iUklWyyrWBDYQFcPbL/IoTkz
+	HpJPXWgHLBjTZ+XP0QKk3oUtZO5fJ88qDi9TkdbZo6DStGUTcTS1NMkJTG+3keWCKm2m5PAFvyn
+	GAOIbjxF7pu5xsaCSIzL7FCllmuLoI/bn9svTLOnMKPnZiXVHmL1e7ywXmZOvAK7b
+X-Gm-Gg: AZuq6aI1vd4Ef2WYv9tC+tpNTW+prqG8IBfGV5B0VvU4eGy81STB9N6GfCXvaWxYt7n
+	d9ymidtZATpKDrfMl6Azbu/RBoi9ex/popRdn4iUmd7sjQw83OTJ5sk609Nq2wNfNBcoE6pe3RW
+	VZKoPHedIPmNbbsONVlUV030alhPgVRtcwz2LbCjZETXwhtTIUw1fqEz9zlmHpFcI8hTvGdXn2q
+	DFKWjlkZvfHFotDVQT+iky78yNcu8WSYk4RBo+OHy2xXmnw2czEOk3cYlz9+PmoH9o2l5+a7mv5
+	kQZA/VS3QJ5OK4OlnEraTgo=
+X-Received: by 2002:a05:622a:492:b0:4b7:9a9e:833f with SMTP id
+ d75a77b69052e-5064b015dcdmr3878951cf.7.1770606198853; Sun, 08 Feb 2026
+ 19:03:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
+ <aYC0OvkVPkOnVU-i@moon.secunet.de>
+In-Reply-To: <aYC0OvkVPkOnVU-i@moon.secunet.de>
+From: Yan Yan <evitayan@google.com>
+Date: Mon, 9 Feb 2026 11:03:07 +0800
+X-Gm-Features: AZwV_QiXs8lSkOsc2cJvUhWm6eVrFGoeniKpFDSf-QpCDs3mIQIfH2M2RUd9Xsk
+Message-ID: <CADHa2dBN+_9H-_L19Rg3vfvzC1N5FzG+rzW9Pff8pyM3KL9Ocw@mail.gmail.com>
+Subject: Re: [REGRESSION] Discussion on "xfrm: Duplicate SPI Handling"
+To: antony.antony@secunet.com, Steffen Klassert <steffen.klassert@secunet.com>, paul@nohats.ca
+Cc: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, horms@kernel.org, 
+	saakashkumar@marvell.com, akamluddin@marvell.com, 
+	Nathan Harold <nharold@google.com>, greg@kroah.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,pengutronix.de,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-257888-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-257889-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[evitayan@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 314FB10B425
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 087DF10B481
 X-Rspamd-Action: no action
 
-The CONFIG_SA1100_CT6001 option has never existed in the kernel. Remove
-code in arcdevice.h referring to it. This allows the
-arcnet_(in|out)(s|)b macros to be simplified by removing the BUS_ALIGN
-macro.
+Thank you all for the reply! Please see my response inline below
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/arcnet/arcdevice.h | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+> This is meant for multicast SAs, we don't support multicast SAs.
+I reread the RFC and that makes sense to me. Thanks for the explanation.
 
-diff --git a/drivers/net/arcnet/arcdevice.h b/drivers/net/arcnet/arcdevice.h
-index bee60b377d7c..6a5af0943567 100644
---- a/drivers/net/arcnet/arcdevice.h
-+++ b/drivers/net/arcnet/arcdevice.h
-@@ -374,24 +374,17 @@ static inline void arcnet_set_addr(struct net_device *dev, u8 addr)
- 
- /* I/O equivalents */
- 
--#ifdef CONFIG_SA1100_CT6001
--#define BUS_ALIGN  2  /* 8 bit device on a 16 bit bus - needs padding */
--#else
--#define BUS_ALIGN  1
--#endif
--
- /* addr and offset allow register like names to define the actual IO  address.
-- * A configuration option multiplies the offset for alignment.
-  */
- #define arcnet_inb(addr, offset)					\
--	inb((addr) + BUS_ALIGN * (offset))
-+	inb((addr) + (offset))
- #define arcnet_outb(value, addr, offset)				\
--	outb(value, (addr) + BUS_ALIGN * (offset))
-+	outb(value, (addr) + (offset))
- 
- #define arcnet_insb(addr, offset, buffer, count)			\
--	insb((addr) + BUS_ALIGN * (offset), buffer, count)
-+	insb((addr) + (offset), buffer, count)
- #define arcnet_outsb(addr, offset, buffer, count)			\
--	outsb((addr) + BUS_ALIGN * (offset), buffer, count)
-+	outsb((addr) + (offset), buffer, count)
- 
- #define arcnet_readb(addr, offset)					\
- 	readb((addr) + (offset))
--- 
-2.43.0
+> To clarify, how are larval outbound SAs created in Android?
+> Are they created with zero or non-zero SPIs? Multiple zero SPIs (acquire =
+states) are allowed.
 
+In Android, larval outbound SAs are created with non-zero SPIs because
+Android userspace uses XFRM_MSG_ALLOCSPI to manually reserve a unique
+value before the SA is fully finalized. These are not kernel-generated
+"acquire" states.
+
+Regarding the default behavior:
+
+I'm fine with defaulting to RFC 4301 for the upstream kernel to align
+with the modern standard. As long as a toggle exists to fallback to
+the legacy RFC 2401 behavior, Android=E2=80=99s compatibility requirements =
+are
+met.
+
+
+
+
+On Mon, Feb 2, 2026 at 10:27=E2=80=AFPM Antony Antony <antony.antony@secune=
+t.com> wrote:
+>
+> Hi Yan,
+>
+> On Wed, Jan 28, 2026 at 16:43:06 +0800, Yan Yan wrote:
+> > Hi all,
+> >
+> > I am writing because unfortunately commit: 94f39804d891 ("xfrm:
+> > Duplicate SPI Handling") has caused a regression in the Android OS, so
+> > we would like to gain some context to help determine next steps. The
+> > issue is caused by the new requirement for global SPI uniqueness
+> > during allocation. Based on our review of RFC 4301 and the previous
+> > review history, we would like to highlight a few concerns:
+> >
+> > 1. Regression on Android:
+> > This change breaks production behavior in Android, which uses
+> > XFRM_MSG_ALLOCSPI to create larval SAs for both directions. Since RFC
+> > 4301 allows duplicate outbound SPIs, and larval SAs are often created
+>
+> To clarify, how are larval outbound SAs created in Android?
+> Are they created with zero or non-zero SPIs? Multiple zero SPIs (acquire =
+states) are allowed. However, I guess there is no user API for managing the=
+se acquire states. Only the kernel can create them and handle expiration or=
+ deletion via SA updates with acq_req?
+>
+> A user API (UAPI) for creating and deleting acquire states might be a pos=
+sible solution.
+>
+> I haven=E2=80=99t been able to consistently reproduce the issue Marvell r=
+eported,
+> but I suspect the bug could also affect outbound SAs with non-zero SPIs.
+> Also when one peer is behind NAT.
+>
+> I wonder wouldn't duplicate SPI when behind NAT cause issues for output S=
+As?
+> Because the triplet is SPI, Protocol, Daddr. There is  no dport in it.
+>
+> > before direction or selectors are finalized, the allocator must remain
+> > permissive (at least in our current design).
+> > This also aligns with a concern Herbert Xu raised during the initial
+> > review regarding compatibility:
+> > >    "It's also dangerous to unilaterally do this since existing deploy=
+ments
+> > >    could rely on the old behaviour. You'd need to add a toggle for
+> > >    compatibility."
+> >
+> > 2. Inbound SPI uniqueness should not be a hard requirement:
+> > The justification for enforcing global SPI uniqueness often cites the
+> > statement in RFC 4301, Section 4.1, that for unicast traffic, the SPI
+> > "by itself suffices to specify an SA." However, we don=E2=80=99t think =
+this
+> > means inbound SPI uniqueness is a hard requirement because of the two
+> > following reasons:
+> >
+> > =E2=80=93 Another statement implies that SPI uniqueness is just an
+> > implementation choice:
+> > >    "Each entry in the SA Database (SAD) MUST
+> > >    indicate whether the SA lookup makes use of the destination IP add=
+ress, or the
+> > >    destination and source IP addresses, in addition to the SPI."
+> >
+> > =E2=80=93 There is a "Longest Match" mandate which makes SPI uniqueness=
+ unnecessary:
+> > >    "For each inbound, IPsec-protected packet, an implementation MUST
+> > >    conduct its search of the SAD such that it finds the entry that
+> > >    matches the 'longest' SA identifier. In this context, if two or mo=
+re
+> > >    SAD entries match based on the SPI value, then the entry that also
+> > >    matches based on destination address... is the 'longest' match."
+> >
+> > 3. Further clarification on the specific problem being addressed would
+> > be helpful. The "real-world" problem this commit intends to fix
+> > remains unclear. The patch mentions:
+> > >    "This behavior causes inconsistencies during SPI lookups for inbou=
+nd packets.
+> > >    Since the lookup may return an arbitrary SA among those with the s=
+ame SPI,
+> > >    packet processing can fail, resulting in packet drops."
+> >
+> > However, Linux kernel lookups using the triplet (SPI, Protocol, Daddr)
+> > are deterministic. The lookup will not return an "arbitrary" SA
+> > because the destination address is used to disambiguate the state.
+> >
+> > As Antony suggested, this change may cater to SPI-only hardware
+> > indexing. If that is the case, we are concerned about applying such
+> > hardware-specific limits to the software stack, especially if the
+> > behavior is not opt-in, as it appears to require an overly-narrow
+> > reading of the RFC 4301.
+>
+> I agree with your suggestion that making the behavior opt-in.
+> I would prefer the Default : to allow duplicate.
+>
+> > Given these concerns, would it be possible to discuss a revert or,
+> > alternatively, could further context be provided regarding the
+> > specific real-world problem this commit was intended to address? Once
+> > the underlying issue is clearly defined, we can work together to find
+> > a backward-compatible solution that satisfies all requirements.
+> >
+> > Review threads are attached for easy reference:
+> > https://lore.kernel.org/netdev/aDQhZ_ikHEt_pLn_@gondor.apana.org.au/T/#=
+r45c1786651ce5af730f757aca7438474d494a323
+> > https://lore.kernel.org/netdev/20250616100621.837472-1-saakashkumar@mar=
+vell.com/T/#u
+>
+> -antony
+
+
+
+--
+--
+Best,
+Yan
 
