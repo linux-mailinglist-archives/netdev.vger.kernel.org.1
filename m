@@ -1,231 +1,297 @@
-Return-Path: <netdev+bounces-258005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SAekNP16imnIKwAAu9opvQ
-	(envelope-from <netdev+bounces-258005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:25:33 +0100
+	id 8HlAHnF+imnVLAAAu9opvQ
+	(envelope-from <netdev+bounces-258006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:40:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295CF115985
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:25:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277C9115B4E
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 438CB301B706
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:25:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 257C1301C956
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962D3210F59;
-	Tue, 10 Feb 2026 00:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23701244685;
+	Tue, 10 Feb 2026 00:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="lMJ0MIuY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RjLsI8v3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516E27262A
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 00:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F339223507B;
+	Tue, 10 Feb 2026 00:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770683120; cv=none; b=qweaZ+J03snKvh/BPV3adm8tnEvXUuz35ornQE+tYzLhsQluoziyD5UMKGVNeUlj2mEN79nsmIdBWGIK+VjhYDlix2e/RfKfLQ06fPPqzXnyfhUz3E/G6DolOcwXRCfg7bSoiDW5obQ5GmHbwGEZB0pffqckyIWf2CePoTwx/hs=
+	t=1770684013; cv=none; b=J8ZjSaVG3nYPN98wyvfP24JwLpHEQnu6YYokDKEyPSCPGsCPhjkJItP+9C7KDiV1QRGyoRGsF8afHiCqqMe8o4ejLuPU2N7KIClqeDGP8It3rcxz8nA2uD5l3y+TM1+EtLj4ixmOya0ImiGa+v43Ye0N5MzWnNANefeXujeTsqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770683120; c=relaxed/simple;
-	bh=kxwOOVA45MLT8Eghg31oPsJi3Zsu1h5qtBk5MuJS/IA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fmxfufBHmBm5rqVCx3IGTrXyCSe6BsEgPIYIXsSwHYDzRXdpoXYuqgrVFiv9fI9/pDfwlwH/zgiRJZDaL8nP+jJr6uaoSidvYGxDjRzgPzpYoHF0hYRDSRQsMlOvIbaAWNszVVAj2602eKjJYsLqhygNpCCQkoHJhdnfTS+s598=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=lMJ0MIuY; arc=none smtp.client-ip=74.125.82.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2b86d3c909dso1757522eec.1
-        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 16:25:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1770683118; x=1771287918; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bb1hMpPJncNawpFRC9pcXob4IbGptBN5ybG8YsPZCoE=;
-        b=lMJ0MIuYOHgzG2tMDVbUcR76vg/fR58a21RU7l21Hd+O+DbyBFk8WmHieYnScnlQll
-         JuxCpmNJeKQFbS2y0HJjRsEgO7CD0aDGop19EVOA2belHOYt6eTuVk6NHLGbouFzTPqY
-         kg/zq1d/sfAnz4ZALO8vVS7X5smc4zSrPawc1Xdv/9DPF4pQf/t+IUiNXExUG/o2+F8a
-         n8ztJc0AuL2xEBGTc2IJbewa5QxtFaxbWhZZDYUtGKeqJpUaLgbE7Nz6FieJ6FxEGe+N
-         90NwTWH0Qv+15JoiQVJijl5stytG8/tzlkRwRilmM2ehT68VDY8pVTMxnnPjhW9LSpku
-         3glA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770683118; x=1771287918;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bb1hMpPJncNawpFRC9pcXob4IbGptBN5ybG8YsPZCoE=;
-        b=pGr/K4p4uRbyCMa+yxevWcPGCITKpSwknjtdF8DPMKUXVrq/6t5IORvSzbcp38TP4Q
-         TBdCUiUIYihoUqaNUQSXRcPxBnV9luvOErmbYrIin5atCti4v0FBe0yhd78IM++9BcRh
-         BUZ8nMI4E2FvmG5s9xLaZnzw2FX8N8u8TrzjeLJnBDbJ+e4rZP/IRkzTgyYltUyy5mbr
-         R1AOuup/Rn+agCbg/8qYm2adsatF0A61rZnPIbJxPUaqGsy33+Ubbqor75zwV/FmqbZr
-         6hlPJLcVdCg7mJxS+AUkHDQFG8AHsfT3uGP2srmKx3JaanyJAnsfBz1QzNSQh/UeZ9ZS
-         RdLA==
-X-Forwarded-Encrypted: i=1; AJvYcCXt6oM23Rwn9z1mWFr7gdJQ/lVLnf9soWJe5/xI8OJJMK8u/E2K/BimMo9/kNdLeN3Xjmyks9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEfVnoiiXDlWh8+sRuZ29tZPbINyVyZBzb3jKvHAzT2yJt0oy1
-	UXlPN9vuvw1lO8NAWvj8WLRIQgPUzZLMvfPRQGc5sTL4U71lUAHpIWl48iQbSMCxthI=
-X-Gm-Gg: AZuq6aKny7YMn5B2W18rShf/Uk4Q39UK7Y+UT5zuheyLdPVsrFz8CibjuXXUUdK/TMA
-	C1aNEGrvO5h+F1QrgNrFIlaEuXSTanSfSYV33Gsb/VCg3PYjp8RMl+5mdsH0IkDzllzdiy4c9v3
-	pdzlvIIBGOAkcZmtTBxzUtBhCea8tifNX4ArfuxDPm6WZKV10OXAxVNVliCwox7Kwxw0pMxaKLe
-	Ifdm2R+Dt9ba7NU8fH0k2say4q0f4oVwBKgGxX5NGhAYkp/bC5wvPFnWL1uIs3HO/rA9p/F593c
-	IORh0LrNYTmtnT5mmV1ZQWkatZeLeaMb6BFWBeVyIsIi0GASzELe1mJ7xHrTPzbpf/xYQyw3kIB
-	A/pxFivlxhyw6qsaDTIsPPbAiPW6yPV2eCLXSbq7AaM2LzKDtMYDruAP+lnmLD58qnF2IzLvLka
-	rlNzI3dRkOfJteRS2V3sZnnYhIb4JkTneryXo2UVSP1W0WKnWxlAEfHHvIJRV3jlgMtnkgJWqA0
-	gql6A/D8OOW+1Pu0apdvQ==
-X-Received: by 2002:a05:7300:dc8c:b0:2a4:3593:c7cc with SMTP id 5a478bee46e88-2b856481297mr4502628eec.12.1770683118146;
-        Mon, 09 Feb 2026 16:25:18 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::1588])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b855c3daf7sm8762920eec.20.2026.02.09.16.25.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Feb 2026 16:25:17 -0800 (PST)
-Message-ID: <575bb07d-579c-4db5-8624-7446836e77bd@davidwei.uk>
-Date: Mon, 9 Feb 2026 16:25:15 -0800
+	s=arc-20240116; t=1770684013; c=relaxed/simple;
+	bh=okG7UjQjG+NhkvALP4XREVKya0FPqfH1FHODxx8wyTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EinUOXA1gZCW/EdX/wEvmLeKH+rN1lT323/6w7FfJHtHmsFM80Nzpzb94EfCG7VvIjg4Ut/NKYzHaYUNf/yaKiAfAxDkrTOVZDIkTi3/LHdyOqMwhmIygAnyOrYwVSCYWhuZPfjEuBACD9b+znPnZfLMIV52IC18Fuus59htYls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RjLsI8v3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65425C19422;
+	Tue, 10 Feb 2026 00:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770684012;
+	bh=okG7UjQjG+NhkvALP4XREVKya0FPqfH1FHODxx8wyTo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RjLsI8v3e2pMavrZlMuLaQ6rPrgulHjdzXeEk3+UIUQj256jPEPqCsUsrNkxhJUIG
+	 KPmH6dxedINMg7ek2+SMmDBIBY8lsaGptkWi5i1n+OAsjJPM220O0+J+Tm2lUipNLV
+	 I6q20eXmWQPh1IFvijn7+23kQKiIF/Q0gTj6RlDb2gXIyUlFe0Djc+PykXjaoILObs
+	 3z7mVU1FRVYtyOUeCdiwx0a3Fzrgm4j5a8zF6pFdBU1CrVZkZsPjOKdchu0AxWF1iv
+	 14vF66+jTGxt9hryK+MNdGoLshhTRblMo7vFBLkMbM98OTF19VjY5vPGC+ieHYFyGk
+	 l3d3U8XwuoNuQ==
+Date: Mon, 9 Feb 2026 18:40:11 -0600
+From: Rob Herring <robh@kernel.org>
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
+	p.zabel@pengutronix.de, linux@armlinux.org.uk,
+	ghennadi.procopciuc@nxp.com, Ionut.Vicovan@nxp.com,
+	linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, horms@kernel.org, Frank.li@nxp.com
+Subject: Re: [PATCH 1/4 v2] dt-bindings: serdes: s32g: Add NXP serdes
+ subsystem
+Message-ID: <20260210004011.GA2188625-robh@kernel.org>
+References: <20260203161917.1666696-1-vincent.guittot@linaro.org>
+ <20260203161917.1666696-2-vincent.guittot@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 15/16] selftests/net: Add env for container
- based tests
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, davem@davemloft.net, razor@blackwall.org,
- pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20260129222830.439687-1-daniel@iogearbox.net>
- <20260129222830.439687-16-daniel@iogearbox.net>
- <20260131163834.2c3d160d@kernel.org>
- <9037828b-c7fd-4eb1-9dd8-19ee49063361@davidwei.uk>
- <20260202104136.4a7adbdf@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20260202104136.4a7adbdf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260203161917.1666696-2-vincent.guittot@linaro.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258005-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258006-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[davidwei.uk];
-	FREEMAIL_CC(0.00)[iogearbox.net,vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,bytedance.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_PROHIBIT(0.00)[0.0.0.0:email,0.0.0.1:email];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 295CF115985
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,2.105.173.0:email,linaro.org:email]
+X-Rspamd-Queue-Id: 277C9115B4E
 X-Rspamd-Action: no action
 
-On 2026-02-02 10:41, Jakub Kicinski wrote:
-> On Mon, 2 Feb 2026 07:53:34 +0900 David Wei wrote:
->> On 2026-02-01 09:38, Jakub Kicinski wrote:
->>> I'm not a Python expert but the pre-init of variables that are set
->>> later on in __init__() (on all possible paths) seems like a waste of LoC
->>
->> It's so that exceptions thrown -> __del__() don't complain about
->> undefined vars.
+On Tue, Feb 03, 2026 at 05:19:14PM +0100, Vincent Guittot wrote:
+> Describe the serdes subsystem available on the S32G platforms.
 > 
-> I see. I guess that's cleaner than hasattr(self, "xyz"), fair.
+> Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
+> ---
+>  .../bindings/phy/nxp,s32g-serdes.yaml         | 154 ++++++++++++++++++
+>  1 file changed, 154 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
 > 
->>>> +
->>>> +        ip(f"link add type netkit mode l2 forward peer forward numrxqueues {rxqueues}")
->>>
->>> Would we be able to do this with YNL?
->>> no big deal but always nice to avoid the dependency on very latest CLI
->>
->> Hmm, I tried looking into this already. My understanding is that this
->> can be done in C but not currently in YNL, not without adding a spec.
-> 
-> I thought the only thing C can do that Python can't is deciding nested
-> extacks.. Ah, of course.. I missed that patch 10 is not updating the
-> YAML spec. That needs to be fixed, we want YAML to stay in sync for the
-> families that are already YAML-ized.
+> diff --git a/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> new file mode 100644
+> index 000000000000..fad34bee2a4f
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> @@ -0,0 +1,154 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/phy/nxp,s32g-serdes.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NXP S32G2xxx/S32G3xxx SerDes PHY subsystem
+> +
+> +maintainers:
+> +  - Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+> +
+> +description: |
+> +  The SerDes subsystem on S32G SoC Family includes two types of PHYs:
+> +    - One PCIe PHY: Supports various PCIe operation modes
+> +    - Two Ethernet Physical Coding Sublayer (XPCS) controllers
+> +
+> +  SerDes operation mode selects the enabled PHYs and speeds. Clock frequency
+> +  must be adapted accordingly. Below table describes all possible operation
+> +  modes.
+> +
+> +  Mode  PCIe	XPCS0		XPCS1		PHY clock	Description
+> +                SGMII		SGMII		  (MHz)
+> +  -------------------------------------------------------------------------
+> +  0	Gen3	N/A		N/A		100		Single PCIe
+> +  1	Gen2	1.25Gbps	N/A		100		PCIe/SGMII
+> +  2	Gen2	N/A		1.25Gbps	100		PCIe/SGMII
+> +  3	N/A	1.25Gbps	1.25Gbps	100,125		SGMII
+> +  4	N/A	3.125/1.25Gbps	3.125/1.25Gbps 	125		SGMII
+> +  5	Gen2	N/A	        3.125Gbps     	100		PCIe/SGMII
 
-Sorry, my mistake. It is possible with rt-link.yaml:
+Mixed tabs and spaces. Drop the tabs.
 
-   ynl = RtnlFamily()
-   ynl.newlink(...)
+What's not clear to me is do you have 2 or 4 lanes?
 
-> 
->>>> +    def _setup_ns(self):
->>>> +        self.netns = NetNS()
->>>> +        cmd("ip netns attach init 1")
->>>> +        self._init_ns_attached = True
->>>> +        ip("netns set init 0", ns=self.netns)
->>>
->>> Hm, refactor class NetNSEnter or just use its enter method?
->>
->> I did consider this but I didn't feel like it fit the very specific
->> purpose of NetNSEnter. I needed the init ns to have a valid nsid from
->> within the test netns, which I didn't think many other tests would need.
-> 
-> What about the "ip netns attach init 1" ?
-> that's the main thing that gave me pause TBH
-> Why is it needed?
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - enum:
+> +          - nxp,s32g2-serdes
+> +      - items:
+> +          - const: nxp,s32g3-serdes
+> +          - const: nxp,s32g2-serdes
+> +
+> +  reg:
+> +    maxItems: 4
+> +
+> +  reg-names:
+> +    items:
+> +      - const: ss_pcie
+> +      - const: pcie_phy
+> +      - const: xpcs0
+> +      - const: xpcs1
+> +
+> +  clocks:
+> +    minItems: 4
+> +    maxItems: 5
+> +
+> +  clock-names:
+> +    items:
+> +      - const: axi
+> +      - const: aux
+> +      - const: apb
+> +      - const: ref
+> +      - const: ext
+> +    minItems: 4
+> +
+> +  resets:
+> +    maxItems: 2
+> +
+> +  reset-names:
+> +    items:
+> +      - const: serdes
+> +      - const: pcie
+> +
+> +  nxp,sys-mode:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
 
-The bind-queue lease attribute takes the ifindex/queue/netns-id of the
-source phys netdev to lease a queue from. Once a netlink has been moved
-into a netns, it doesn't have access to the source phys netdev in the
-init ns anymore. This is why initially I did the bind-queue before
-moving one of the netkit peers into a netns.
+       maximum: 5
 
-For me to be able to do a bind-queue op inside a netns, I use ip netns
-attach to make the init ns available with a nsid inside of a netns.
+Though isn't this redundant with the child nodes? You could use the 
+standard 'phy-mode' property in each child.
 
-> 
->>> Don't we need to also add a qdisc if there isn't one already?
->>
->> Sorry, why would qdisc be needed? The bpf prog attaches to tc. I don't
->> know anything about qdisc, though.
-> 
-> There's a new way of attaching qdisc-less (TCX) but IIUC here you're
-> attaching in the old way. So you must have a parent object. The ingress
-> / clsact qdisc isn't really for queuing packets, it's just a fake qdisc
-> that lets you attach TC filters to an interface. Machines at Meta have
-> a clsact qdisc installed by init, but that's far from normal (try to
-> run this command in vng, you'll see)
+> +    description: |
+> +      SerDes operational mode. See above table for possible values.
+> +
+> +  '#address-cells':
+> +    const: 1
+> +
+> +  '#size-cells':
+> +    const: 0
+> +
+> +patternProperties:
+> +  '^serdes[0,1]_lane@[0,1]$':
 
-Thanks for the explanation. I'll fix this by adding a qdisc if one
-doesn't exist.
+Do you need to support serdes0_lane@0 and serdes1_lane@0 (or similar 
+with "@1")? That's illegal as you have 2 nodes with the same address.
 
-> 
->>>> +        match = re.search(r'pref (\d+).*nk_forward\.bpf.*id (\d+)', tc_info)
->>>
->>> I haven't checked but TC doesn't support enough JSON and YNL doesn't
->>> support enough TC to avoid re hacks? :( :(
->>
->> Yeah the old TC tool doesn't give me this info programmatically :(
->>
->> Borkmann mentioned TC is outdated/unmaintained. I did use tcx via a C
->> loader before, but that was removed in an earlier iteration.
-> 
-> Not sure what you're saying. tc bpf CLI supports JSON output since:
-> 
-> commit 3175bca7182b0867c6e9a3d5d1551fdecf70118c
-> Author: Davide Caratti <dcaratti@redhat.com>
-> Date:   Thu Apr 30 20:03:30 2020 +0200
-> 
->      tc: full JSON support for 'bpf' filter
+> +    description:
+> +      Describe a serdes lane.
+> +    type: object
+> +
+> +    properties:
+> +      compatible:
+> +        enum:
+> +          - nxp,s32g2-serdes-pcie-phy
+> +          - nxp,s32g2-serdes-xpcs
 
-Yes this works, I'll use it instead of regex.
+Seems like phy-mode would be sufficient. Are these separate blocks from 
+the parent?
+
+> +
+> +      reg:
+> +        maxItems: 1
+
+Just 'maximum: 1' instead.
+
+> +
+> +      '#phy-cells':
+> +        const: 0
+> +
+> +    required:
+> +      - reg
+> +      - compatible
+> +
+> +    unevaluatedProperties: false
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - reg-names
+> +  - clocks
+> +  - clock-names
+> +  - resets
+> +  - reset-names
+> +  - nxp,sys-mode
+> +  - '#address-cells'
+> +  - '#size-cells'
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    bus {
+> +        #address-cells = <2>;
+> +        #size-cells = <2>;
+> +        serdes0: serdes@40480000 {
+> +          compatible = "nxp,s32g3-serdes", "nxp,s32g2-serdes";
+> +            reg = <0x0 0x40480000 0x0 0x108>,
+> +                  <0x0 0x40483008 0x0 0x10>,
+> +                  <0x0 0x40482000 0x0 0x800>,
+> +                  <0x0 0x40482800 0x0 0x800>;
+> +            reg-names = "ss_pcie", "pcie_phy", "xpcs0", "xpcs1";
+> +            clocks = <&clks 1>,
+> +                     <&clks 2>,
+> +                     <&clks 3>,
+> +                     <&clks 4>,
+> +                     <&serdes_100_ext>;
+> +            clock-names = "axi", "aux", "apb", "ref", "ext";
+> +            resets = <&reset 9>,
+> +                     <&reset 8>;
+> +            reset-names = "serdes", "pcie";
+> +            nxp,sys-mode = <1>;
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +            phy_pcie0: serdes0_lane@0 {
+> +              compatible = "nxp,s32g2-serdes-pcie-phy";
+> +              #phy-cells = <0>;
+> +              reg = <0>;
+> +            };
+> +            phy_xpcs0_0: serdes0_lane@1 {
+> +              compatible = "nxp,s32g2-serdes-xpcs";
+> +              reg = <0>;
+> +            };
+> +        };
+> +    };
+> -- 
+> 2.43.0
+> 
 
