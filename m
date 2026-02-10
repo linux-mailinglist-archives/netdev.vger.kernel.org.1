@@ -1,102 +1,100 @@
-Return-Path: <netdev+bounces-258068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eD0qFi4ci2nSPwAAu9opvQ
-	(envelope-from <netdev+bounces-258068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:53:18 +0100
+	id EGWnGoEci2kvQAAAu9opvQ
+	(envelope-from <netdev+bounces-258069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:54:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A4411A6AF
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:53:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D722B11A6E3
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:54:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BA3EC301327D
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:53:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC195301DE0A
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6F03271EB;
-	Tue, 10 Feb 2026 11:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A423271FD;
+	Tue, 10 Feb 2026 11:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxYnvSBJ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VwDccQIL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A45wwVYb";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bd1C3MiL"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D08319848
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 11:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0552A319848
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 11:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770724393; cv=none; b=m6bBz2MlErQ6WIHppibubvt7VvMyi+hRt9ueCglS5ai44kT0kggnPP69SXGTe6MmKURu59GKLH+rxtffEnEUAYuIH7QF/LXErltJUKNiIFuaFdnvnOlTgJAIuKKsnI6FfGblIRst7OwWv48aG4DeiEGC66NSo23aSYesgoN3Qm4=
+	t=1770724477; cv=none; b=dwdSzWESqgIUyRMq1UqPeJDgzPVBiPpfUnz7SOYxdUZebFhJ/+srkBnCOweg3q7+F52CtLqumwRJRLF8mBE8z1XYWHmxczVRt1n2nfEH+bT1RTPBhRPsyJVVJ0LybV4rO0syHC5nxnCic2/E1LH/VJkAa1BSIabp8jTCeJ+aF7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770724393; c=relaxed/simple;
-	bh=LpdzJGfDHQqYzc5BCyZcOZFflmElhqHKLmb47eKNQ2U=;
+	s=arc-20240116; t=1770724477; c=relaxed/simple;
+	bh=V8S+bf/F66K8deOO2u9VcoAmmrQcaSvWUcOZQvCI4qM=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=aruNSBQky6GSEORRVSdwB+TDl+bqfPbFIGxZVyUAsoxvgPGsA4Hw/Et/GMh0jfU8OkqcwcjTqtxOK1dUh8TFfCNVjAF959ZzvYxwQuf9m2GEGMV2axehxJkWaA1K0+cxyGdxcMro9YFGjqHQygMDARyfLR66f5TzPvG9Q6/jizE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RxYnvSBJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VwDccQIL; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=LiPYliJsMim9XWlSo6ROrTey2f9XBQNXIh0Q1gsRtYBUDJ9GXrHCdNGmadZYHYRqbWIB2cxLShMNjfmYDMjGvP6uvGErfFlK08DObMmGzvA3jczYuotY6t7DdeZrTMUz8xo1BbSQge/In8bNDvBujNEPHDlJDoph8zlrkQAApg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A45wwVYb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bd1C3MiL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770724390;
+	s=mimecast20190719; t=1770724475;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LpdzJGfDHQqYzc5BCyZcOZFflmElhqHKLmb47eKNQ2U=;
-	b=RxYnvSBJfFWeujRnQcARi1UtqbTuaq07DcC+zxQ9eNTpo5Cks94s3/09CD6g9qLcKFmhXo
-	Jg9Thhsit/8NUT3ivzIu1krqTrSV2vpl0R4bEHjU83q56lVLaiiD5yU3x8vZmW+qtr9dYk
-	sejYz/bEbjQAS42vVqKy7fhkFTMaqdo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=2ujBMXc2jefpwX552HAfe/z0MTFmV9RxghsSUrNeWh4=;
+	b=A45wwVYbTa30lF9BY3aj+tDYbjIHTC4hESd4qXo69mmrvaq0cdTw4wSIAp4gS+BxaobdbE
+	jzgkZfns7pYUUW/3AtLPMn0Abe6Xx4knyBIsCVaPJ9dyGfZacB6eJwT4hLplLfwkFdIeQa
+	7mQqtcUdSCieXrt9gXjH64plvZtIgck=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-35--punahfCPvWgTZZ-oi6-QQ-1; Tue, 10 Feb 2026 06:53:09 -0500
-X-MC-Unique: -punahfCPvWgTZZ-oi6-QQ-1
-X-Mimecast-MFC-AGG-ID: -punahfCPvWgTZZ-oi6-QQ_1770724388
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48071615686so6450665e9.1
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 03:53:09 -0800 (PST)
+ us-mta-691-XWF2VZjjN6WDMWdCO286Iw-1; Tue, 10 Feb 2026 06:54:33 -0500
+X-MC-Unique: XWF2VZjjN6WDMWdCO286Iw-1
+X-Mimecast-MFC-AGG-ID: XWF2VZjjN6WDMWdCO286Iw_1770724473
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4806cd00e02so23108575e9.0
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 03:54:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770724388; x=1771329188; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LpdzJGfDHQqYzc5BCyZcOZFflmElhqHKLmb47eKNQ2U=;
-        b=VwDccQILtoPONVQxd8Cto43gtIoE7hyb3RWyJLReOtBRBmLYiQSRiXFZS3c/J7QjmK
-         7W+PCZPT+BkG+QLEDDYhWp6ienIViwzeZaJGAt4Y2HEgB1J4M4bHC9XTj0cUuGqFINrX
-         gKWKdR0irnAnZO9T4IZuI+5KYFe91hCqK75vXJtEobqLhLc445k/Q9UHneZsiA6KFnV5
-         3bqG9WpEGS/t5KPmS8NGdeHkMSrt422dtmArLEUDDMzPrRli8d7f4YXj0nFhsdF50DxI
-         YcG6BixRhgr5sB3B/h0o5Pt4LXuYZ5M1Y+pyGTZElHaPcdTUpnWcq9biPblfEGcxwZ51
-         /rCQ==
+        d=redhat.com; s=google; t=1770724473; x=1771329273; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2ujBMXc2jefpwX552HAfe/z0MTFmV9RxghsSUrNeWh4=;
+        b=Bd1C3MiLcYsQWKH+8dbql5kYWpYxacqklrLco/Gl1uzMVPsVNsoIAWiYKbqddPQdVQ
+         G8WYkQOx9OG7txUFaVSwNA/eDcIazY8cYFahhO0lws47ezpPUrUgtyT9H67zMHgPthME
+         tI4y9Iy8zcvKh0Dc7GC47uop10bETYYleMgoI6zuDVcFzpBnIB/9g2XTtbJNzTpSuBZr
+         LbPkG8Gv9KVz6MACldrfXEcMaEhBodbWA7/9cvoVQELP5wUvMV/xhxiLIDIXWXnyLNdY
+         1THbFEwQSt7GBImYX0YGwOhhsGxs5TT4xGmGMVoaMa5DHQjnh+8W+EiUuPATXXmHek01
+         XITg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770724388; x=1771329188;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LpdzJGfDHQqYzc5BCyZcOZFflmElhqHKLmb47eKNQ2U=;
-        b=hQHpUkX4pgi/rCKVuTU5hpSXPp2wU8WqcjWQqcp8+2cJ8jNYzrA7pUcUi01tTbjMIo
-         QqxaRRYYv2CxgxuDLjzaFaLbr5KYmS5M+3bncQLlYi5j3g98c8fZaLq2Alj1bCvnShAq
-         BccyXsEtVU+oQzuO3UBCMenVRXt43GS3IfX/aWr5Vm4KyRtbnC1P/Qz4jK5GI5em9m9o
-         yHpShP9gmIYlSt/eUpQU5wXTV8AAA2tqxbCi2jKckinSW2ZmXB6ws25BuaMZkGM2uuvH
-         4t2PbjHZ/KleDgfu8HiKgFpZUUeJhtCjk/3fP74BikDeI7uetdOj8IBSwFN5EM25LYKz
-         ERog==
-X-Forwarded-Encrypted: i=1; AJvYcCWIvidMqNvcq5SBL39n7g2yN9N7df3lqlIqUVXwGRh6hecx7uqIlOg+zsJulJoFluoJCJCCOrA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxADUqkhfsIL0atcz8N8lLKWyKfvTTN0obzlgxBe0NLOLz/2bqa
-	UnQPmsuizZQbfA0G5NKi2CeiaV7tbX5AfX3TEUdSyJKZAih3wOMNMvT5gwMsyBoP6invLx9rXTM
-	n/zr56IwGcYOPSAP5JZBYHxf3cy9RYEtmlNFpqG4F0FQiC5mv6y/6Z8m/3w==
-X-Gm-Gg: AZuq6aKbXSyCT8On94+J6+g+hvVsSWZM+wo2b5DtU2Izm/CEJkx7QsuW4/a1L9/Is2o
-	MyaSX7A6QI9XG1//SVo53e013zphiKeobC+z0fsbLDnn3Vur4R4J3NZ64EFYesnuvMwaIHDucU6
-	k3Fw+iuQtIziD6P6xQCA42wlcjVBcUAbtRP8FlnMJu4YWd4RbREHxIAZNKF79xuGCPA8Q4Fcds2
-	onS5IA2/shIPcTjEFtOHIbnUwQfrpaaJ0zUDjVyNqpmeqAuRHMUxLqBjucPvDOBgM/Sj9UNnlek
-	dynG6BBjkzRTj74NGt/+VcVFvfSKJjqB7rtSHYeIlRoMpaMW5CNvWIEfS/IvtXAHFuN1rWMauj8
-	jyOYsATrmVvA5aFYzjnr1BOD2mVAXrSZ9l8Xq6w/POnoFKHQf
-X-Received: by 2002:a05:600c:4e48:b0:47e:e076:c7a5 with SMTP id 5b1f17b1804b1-483201e408dmr184790585e9.11.1770724388257;
-        Tue, 10 Feb 2026 03:53:08 -0800 (PST)
-X-Received: by 2002:a05:600c:4e48:b0:47e:e076:c7a5 with SMTP id 5b1f17b1804b1-483201e408dmr184790305e9.11.1770724387866;
-        Tue, 10 Feb 2026 03:53:07 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48323c0296dsm323555505e9.1.2026.02.10.03.53.07
+        d=1e100.net; s=20230601; t=1770724473; x=1771329273;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2ujBMXc2jefpwX552HAfe/z0MTFmV9RxghsSUrNeWh4=;
+        b=fgfXA+mDLYBnyKrV6eCgtJMfN9PBoek76cHjNx6q5x5b0f8u8JiinCzrYQ2SzM4TvU
+         1iENewGGctCoHpOAZ+lT6Kv4FaA77vqMkgei4GJK9R+IVJ7LVjqqfFgdllFv6wqlOdj1
+         XH4vuv3t7Ql9lIgNkRmldM1UZHj4oykbUIHfxwMRKoyDXfxGWigEDqepMZz3gWNcIj/e
+         SGdW38gv4jV0+LNLXsZjp2gKugMqHsNgDby8jResXuS0KM404UKN3dzzrB0Q2MtKbDqp
+         AYqifY9gQodBy8AqF2J7SRLiap133oHwCMI7hDYyQdZoec6si/ACX0MC0NzcCpa2AhmD
+         xsag==
+X-Forwarded-Encrypted: i=1; AJvYcCXuKK8dKtpVHQ5jE1zYQOvwJRi2CkQiXL5UpDMSPc0Ejyl6f3zdPnhJ0zjUU7WaixYPKD1r/DI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/JkBdOxN3ASGbtHU5UEMcSwsYdLwdjFjp/QYv+/+Ks8/7qka4
+	ZsQ3a/aTVrmwijDb53NfJP0EhknnWj0I5Z9iPIg46LVnPHnVTfaBIvavm9wgsjdl2RyETPt6NNL
+	FQbjQtaQR2ZnRpD7NP9PNZqOKySqI+3iSpoxmNENrPaGHLhDyauFaT1J5UA==
+X-Gm-Gg: AZuq6aISXJc1bhZ2A6c2NPMQxYkeMlg/KmVYvHgXMNKgJKlC03dz/Ws/+M1O/R4QJwJ
+	0+lAIcJhL5Uz1gJOhp4P5vevLurMXXrTBin+mdY7j+3TPuUmRnDb+mveaKLCKIa0XpfzZmB/b2G
+	BpCudWFDMWr1Z0VkrWh7VB3byW7Z1ASAkiqnbzzk5pFLTpnVwJ2VVsK7KUb5+E0INPYLtPotqAD
+	6adAdIxDH4mKpVRZcn5Vhe8W+0UXSi+Mw749FDNLHhdtDV6W4IElq3yw0PF7Lvq44j25TwLz7rn
+	IH4t0Y0U817HKMa4NiJMqIsOUCBNLIL9XBSP1cwKLDvNRCox4SArdW8/dgvFO7aHPzipLz3Ck4w
+	GhPXJtO3Nv4Y3lxhgGPCXLXiSlpBl2W1Pl8+UjCq2LvctwQ==
+X-Received: by 2002:a05:600d:6413:10b0:483:4807:20fd with SMTP id 5b1f17b1804b1-4834807226emr44644875e9.30.1770724472673;
+        Tue, 10 Feb 2026 03:54:32 -0800 (PST)
+X-Received: by 2002:a05:600d:6413:10b0:483:4807:20fd with SMTP id 5b1f17b1804b1-4834807226emr44644605e9.30.1770724472261;
+        Tue, 10 Feb 2026 03:54:32 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d5d8f2csm83406055e9.1.2026.02.10.03.54.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 03:53:07 -0800 (PST)
+        Tue, 10 Feb 2026 03:54:31 -0800 (PST)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4E89E4FE89D; Tue, 10 Feb 2026 12:53:05 +0100 (CET)
+	id B7F784FE89F; Tue, 10 Feb 2026 12:54:29 +0100 (CET)
 From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, Eric
  Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>,
@@ -105,70 +103,111 @@ Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org, Jakub
  Kicinski <kuba@kernel.org>, horms@kernel.org, jiri@resnulli.us,
  edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
  atenart@redhat.com, carges@cloudflare.com, kernel-team@cloudflare.com
-Subject: Re: [PATCH net-next v3 4/6] net: sched: rename
- QDISC_DROP_CAKE_FLOOD to QDISC_DROP_FLOOD_PROTECTION
-In-Reply-To: <177039508262.2258217.13751577312338706877.stgit@firesoul>
+Subject: Re: [PATCH net-next v3 5/6] net: sched: rename QDISC_DROP_FQ_* to
+ generic names
+In-Reply-To: <177039508922.2258217.2724637003148631081.stgit@firesoul>
 References: <177039500964.2258217.2989656069254156812.stgit@firesoul>
- <177039508262.2258217.13751577312338706877.stgit@firesoul>
+ <177039508922.2258217.2724637003148631081.stgit@firesoul>
 X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 10 Feb 2026 12:53:05 +0100
-Message-ID: <87v7g4yfvi.fsf@toke.dk>
+Date: Tue, 10 Feb 2026 12:54:29 +0100
+Message-ID: <87seb8yft6.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.07 / 15.00];
+X-Spamd-Result: default: False [0.40 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.59)[subject];
+	R_MIXED_CHARSET(0.56)[subject];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258068-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com,davemloft.net,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
+	TAGGED_FROM(0.00)[bounces-258069-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[toke.dk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com,davemloft.net,redhat.com];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[toke.dk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 11A4411A6AF
+X-Rspamd-Queue-Id: D722B11A6E3
 X-Rspamd-Action: no action
 
 Jesper Dangaard Brouer <hawk@kernel.org> writes:
 
-> Rename QDISC_DROP_CAKE_FLOOD to QDISC_DROP_FLOOD_PROTECTION to use a
-> generic name without embedding the qdisc name. This follows the
-> principle that drop reasons should describe the drop mechanism rather
-> than being tied to a specific qdisc implementation.
+> Rename FQ-specific drop reasons to generic names:
+> - QDISC_DROP_FQ_BAND_LIMIT -> QDISC_DROP_BAND_LIMIT
+> - QDISC_DROP_FQ_HORIZON_LIMIT -> QDISC_DROP_HORIZON_LIMIT
 >
-> The flood protection drop reason is used by qdiscs implementing
-> probabilistic drop algorithms (like BLUE) that detect unresponsive
-> flows indicating potential DoS or flood attacks. CAKE uses this via
-> its Cobalt AQM component.
+> This follows the principle that drop reasons should describe the drop
+> mechanism rather than being tied to a specific qdisc implementation.
+> These concepts (priority band limits, timestamp horizon) could apply
+> to other qdiscs as well.
 >
-> Suggested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 > Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> ---
+>  include/net/dropreason-qdisc.h |   21 +++++++++++----------
+>  net/sched/sch_fq.c             |    2 +-
+>  2 files changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/net/dropreason-qdisc.h b/include/net/dropreason-qdisc.h
+> index 2e2f4fc36e0d..8661797193b1 100644
+> --- a/include/net/dropreason-qdisc.h
+> +++ b/include/net/dropreason-qdisc.h
+> @@ -12,8 +12,8 @@
+>  	FN(FLOW_LIMIT)			\
+>  	FN(MAXFLOWS)			\
+>  	FN(FLOOD_PROTECTION)		\
+> -	FN(FQ_BAND_LIMIT)		\
+> -	FN(FQ_HORIZON_LIMIT)		\
+> +	FN(BAND_LIMIT)			\
+> +	FN(HORIZON_LIMIT)		\
+>  	FNe(MAX)
+>  
+>  #undef FN
+> @@ -82,17 +82,18 @@ enum qdisc_drop_reason {
+>  	 */
+>  	QDISC_DROP_FLOOD_PROTECTION,
+>  	/**
+> -	 * @QDISC_DROP_FQ_BAND_LIMIT: FQ (Fair Queue) dropped packet because
+> -	 * the priority band's packet limit was reached. Each priority band
+> -	 * in FQ has its own limit.
+> +	 * @QDISC_DROP_BAND_LIMIT: packet dropped because the priority band's
+> +	 * limit was reached. Used by qdiscs with priority bands that have
+> +	 * per-band packet limits (e.g., FQ).
+>  	 */
+> -	QDISC_DROP_FQ_BAND_LIMIT,
+> +	QDISC_DROP_BAND_LIMIT,
+>  	/**
+> -	 * @QDISC_DROP_FQ_HORIZON_LIMIT: FQ dropped packet because its
+> -	 * timestamp is too far in the future (beyond horizon). This prevents
+> -	 * packets with unreasonable future timestamps from blocking the queue.
+> +	 * @QDISC_DROP_HORIZON_LIMIT: packet dropped because its timestamp
+> +	 * is too far in the future (beyond horizon). This prevents packets
+> +	 * with unreasonable future timestamps from occupying queue space.
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+Why change "blocking the queue" to "occupying queue space"? The former
+seems worse, so worth calling out?
+
+-Toke
 
 
