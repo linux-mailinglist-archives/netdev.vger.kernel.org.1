@@ -1,150 +1,179 @@
-Return-Path: <netdev+bounces-258112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BGCLYBMi2mWTwAAu9opvQ
-	(envelope-from <netdev+bounces-258112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 16:19:28 +0100
+	id gA4HFX5Oi2mWTwAAu9opvQ
+	(envelope-from <netdev+bounces-258113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 16:27:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C1311C688
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 16:19:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EB611C751
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 16:27:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02FD4302BEAE
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 15:19:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 982813004900
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 15:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1622F31A545;
-	Tue, 10 Feb 2026 15:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3ED3803DB;
+	Tue, 10 Feb 2026 15:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="X9HR9Zvz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EkbDL2+0"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CADB67E;
-	Tue, 10 Feb 2026 15:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363D6327C1C;
+	Tue, 10 Feb 2026 15:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770736762; cv=none; b=NANDzYjzmxfYD09G/hdAdOwLlBTjNqE775xPdwyhGKDyGOs3zYYYJxjABIsWQ8Fs07nDR4cI0ptUZ+Nvu8LMG8Q0HNnQE7Ibxchk5qQHgjmQaH36AS+g6ohSdMbkY83pgeJ8aF3nP+PofPo7AjPuVeLZ8wVnqZHVw4h4mtgIZpw=
+	t=1770737275; cv=none; b=SjDXZ+RjRCN+N5qHBIOHa+/29E0wtVOnqsatoFZDiy9wUCboi7WhJGPujlazeszXl7s+YfvIdkZReiHqI8zGqzHAzUGnuyDWFTQFe5z8hGWhywwKUNMKkicwq68ekL5W+t2rnLcIeMzrKRVeV81ZZTpIy2NCbPbY623t2N6vkck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770736762; c=relaxed/simple;
-	bh=cIifu87CNyPJVLlB/RlNpFS13N1yF4sq1z+QgICwMeI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uNhm9TtK1k9Xkc0WEKKzK500yyq5VFTPv5fZj5hjmJXCI4JX7ONDHiaBvbcuOjiMBQWPVTZm6ZGbpJbtbIabQVknY/qc+w4jhZG9SPqgUyzKff21SC4jVH0zIt2mdD2kHx4X3V4aoVtDEPao+7AG/3WKzMavhKDTcHnO7MrwLdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=X9HR9Zvz; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Reply-To:Content-ID:Content-Description;
-	bh=urcuhDVp7Oul0ufIx3aZnCiehPqHUufYMHJ5jXHBg4U=; b=X9HR9ZvzAXGXJ9I0eL7kb/WMeW
-	iusmt9LYTf5JtnFNzXMHReZVV147+jHgRkL6GWyGb644VpI7vaPOt63NOe/Cc1FrQngRVAmbkNNf5
-	7mCIBw6rixY4jMW/NfYQ2205W3xg6pXDVflI29xqYh1Pec7RDdw+9K5oZZ3JMfFW/l2Eqk3EsT8Zl
-	mD9nbqWebkUDEhuNRGpoy8G7B19MoJMxTfKkHzHn83jkSQg5D24HIbEgT4DWVPLU/6l4sN/DQ2RYU
-	pHwn0TqUrlaGQ3WMOaw2VFiqAXLw0ORoz5yDkU/rU++Krqy1X0AW6rQe2TRL+u919/bH6x2iJnmvr
-	guIWdJ5g==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vppVo-00ALkf-QI; Tue, 10 Feb 2026 15:18:49 +0000
-Date: Tue, 10 Feb 2026 07:18:43 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Amir Vadai <amirv@mellanox.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, dcostantino@meta.com, 
-	rneu@meta.com, kernel-team@meta.com
-Subject: Re: [PATCH net] net/mlx5e: Skip NAPI polling when PCI channel is
- offline
-Message-ID: <aYtIrl01U0uHo7RP@gmail.com>
-References: <20260209-mlx5_iommu-v1-1-b17ae501aeb2@debian.org>
- <49fe0af5-7dcf-42e0-bd73-0bd42c067d26@huawei.com>
+	s=arc-20240116; t=1770737275; c=relaxed/simple;
+	bh=/+KOAp07MLHz2UajjqRp0iV6Ut1gJSwomndWsRRW/lM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EmKgNVODh0EQABK/nJMqofOolq18EXhiQlvMtLhqJMXm5gG1in7sKddWFvsWTd/5pvBqrKmR+19gMwQIlX5pkkE93rSI59sElDVfnVDhySGIozPGCDCgFmhAScL6833F6PDQzSmHu8z3/3u/RocB9ZUSHk3oVVF+vhD4l6om9nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EkbDL2+0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1BB2C116C6;
+	Tue, 10 Feb 2026 15:27:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770737274;
+	bh=/+KOAp07MLHz2UajjqRp0iV6Ut1gJSwomndWsRRW/lM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EkbDL2+00gX1IMxuRnq4mK8Ym8kww+9pO5Rrwf7Vqp2vLiKMA1nkLu88PWLG7KkjB
+	 HhS9qW0B+tLklTRD0PSzDMtGPx26Sh0+33n3lIfL7DdwdwY3x4CjbrGylcPZ2uF7bV
+	 CYxzU/3C05ngmoNVbprorCvWA0BskBs17aw5Kw1OkeCEksANHB9xK3x7hCSytEhHHC
+	 uISUMmkk7vnyjP6UMdpesngvg9Q5wJmtf981+xRlBrOXgVApLBTmf9AnNMy9iSQ5qo
+	 wnb8qRI5Fs+c+ZXWP4r24sTEJe09CIQRn5zVqZqDStWK15khf8HMLYxAzSU0aTLMM5
+	 v5urAt/+HtZkg==
+Received: from localhost ([::1])
+	by mail.kernel.org with esmtp (Exim 4.99.1)
+	(envelope-from <mchehab+huawei@kernel.org>)
+	id 1vppeZ-000000009O1-3uH1;
+	Tue, 10 Feb 2026 16:27:52 +0100
+Date: Tue, 10 Feb 2026 16:27:49 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: "David S. Miller" <davem@davemloft.net>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>, bpf@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Randy Dunlap
+ <rdunlap@infradead.org>, Shuah Khan <skhan@linuxfoundation.org>, Stanislav
+ Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH v2 00/25] kernel-doc: make it parse new functions and
+ structs
+Message-ID: <20260210162749.30e84be5@localhost>
+In-Reply-To: <87ecn97ild.fsf@trenco.lwn.net>
+References: <cover.1769617841.git.mchehab+huawei@kernel.org>
+	<87ecn97ild.fsf@trenco.lwn.net>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <49fe0af5-7dcf-42e0-bd73-0bd42c067d26@huawei.com>
-X-Debian-User: leitao
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258113-lists,netdev=lfdr.de,huawei];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-258112-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,intel.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,lists.osuosl.org,infradead.org,linuxfoundation.org,fomichev.me];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F2C1311C688
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E9EB611C751
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026 at 10:19:46AM +0800, Jijie Shao wrote:
+On Wed, 28 Jan 2026 10:27:58 -0700
+Jonathan Corbet <corbet@lwn.net> wrote:
+
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 > 
-> on 2026/2/10 2:01, Breno Leitao wrote:
-> > When a PCI error (e.g. AER error or DPC containment) marks the PCI
-> > channel as frozen or permanently failed, the IOMMU mappings for the
-> > device may already be torn down. If mlx5e_napi_poll() continues
-> > processing CQEs in this state, every call to dma_unmap_page() triggers
-> > a WARN_ON in iommu_dma_unmap_phys().
+> > Hi Jon,
+> >
+> > It is impressive how a single patch became a series with 25 ones ;-)  
 > 
-> Hi:
->   My comment has nothing to do with the changes made in this patch itself.
+> *sigh*
 > 
+> I will try to have a good look at these shortly.  It seems pretty clear
+> that this isn't 7.0 material at this point, though.
+
+I ended missing your e-mail...
+
+Yeah, it is too late for 7.0.
+
 > 
-> I am more interested in this error itself.
-> 1. If there is an issue with dma_unmp, does dma_map in tx have a similar problem?
+> One thing that jumped at me:
+> 
+> > Ah, due to the complexity of NestedMatch, I opted to write
+> > some unit tests to verify that the logic there is correct.
+> > We can use it to add other border cases.
+> >
+> > Using it is as easy as running:
+> >
+> > 	$ tools/unittests/nested_match.py
+> >
+> > (I opted to create a separate directory for it, as this
+> > is not really documentation)  
+> 
+> Do we really need another unit-testing setup in the kernel?  I can't say
+> I'm familiar enough with kunit to say whether it would work for
+> non-kernel code; have you looked and verified that it isn't suitable?
 
-I suspect that dma_map will succeed in such a case (when the DMA maps are
-gone). 
+I'm familiar with kunit: I wrote myself a bunch of tests using
+it for some DRM stuff.
 
-dma_map_single/dma_map_page creates new page table entries — it doesn't look up
-existing ones. Even if existing mappings are gone, new mappings succeed !?
+Kunit is focused on testing kernel content. It basically adds
+a way for a python script to run self-test logic inside a kernel 
+module. It is not meant to test things outside the Kernel.
 
-I haven't seen this instance on the TX path as well.
+Also, I'm using the python internal library for it. The only
+"fancy" thing I added is a helper module to better work with
+unit tests:
 
-> 2. Can this error be detected by mlx5_pci_err_detected()? If not, does this mean that all PCIe NIC drivers might have similar issues?
+- it formats unittest output;
+- it passes some parameters to the unittest discover to make
+  it more useable;
+- it adds argparse parameters to filter tests and control their
+  verbosity levels;
+- it adds a way to pass argparse values to the tests, as
+  some tests may require parameters (like passing a different
+  yaml file to a dynamically-generated unit test).
 
-mlx5_pci_err_detected() is called for the device under DPC — that's not the
-issue.
+- 
 
-From my naive view, the issue seems to be timing: there's a potential race
-between DPC setting the PCI channel to frozen and the error handler completing
-(which eventually calls napi_disable_locked).
+Anyway, I intend to send a new version of this series either
+later this week or at the next one.
 
-During that window, NAPI poll can still fire and process CQEs, triggering the
-dma_unmap WARN_ON storm, and crash.
+I'll probably split the unittest part from the part meant to
+avoid new warnings after merging from linux-next.
 
->    Do other drivers need to do similar checks?
-
-I really don't know, honestly. Are other drivers solving the problem
-differently?! 
-
-Thanks for the question,
---breno
+-- 
+Thanks,
+Mauro
 
