@@ -1,162 +1,175 @@
-Return-Path: <netdev+bounces-258127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WIkpBAJni2kMUQAAu9opvQ
-	(envelope-from <netdev+bounces-258127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:12:34 +0100
+	id EDlmLUhpi2k1UQAAu9opvQ
+	(envelope-from <netdev+bounces-258128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:22:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1AE211DAE3
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:12:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD1B11DD40
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0DB2F30058CF
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:12:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A716B30498FA
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DA33815E1;
-	Tue, 10 Feb 2026 17:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B06032AAB4;
+	Tue, 10 Feb 2026 17:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eR2SFbnI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nqofsrd9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F62327BFB;
-	Tue, 10 Feb 2026 17:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AFC264617;
+	Tue, 10 Feb 2026 17:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770743549; cv=none; b=MnFrCC1NzRhcAZeMwoDnPK1q6evKE+RSg/I1i+4ovcjsoSVCMrDepgbPCHMp/li0zN5no+ZYjYT25ZxRxH92iLpDeRxEaPbnyFDuLQNFTsflSiXxiBpDCLIhZbfsWXOGq5aqGyPk24L3lM8P+uw/T3UaL88dvvCe7G1rXPagqP4=
+	t=1770744125; cv=none; b=CRvDHogQkaEQfevlgYrqMwYrK2XV45zHkCWhOxcKucym2Q2rkOU2LnvljHL87Ec+caCrQgjvGZ3iCdsIohPFoRwqOi1wPYJYitpeO8zSyQEIBXVU8G2bXWDGc53qvyuvJRUA6WTpFbxVsCBFS2xFd0703PqgAPIMzffaQrMornU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770743549; c=relaxed/simple;
-	bh=0rIQx/lAJQUSuEq0DoZp0MlQH53Sy7mL660Jef77SlM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BfNB7q4/DF8kIpJogRFal4YGut5d1hKQVFyqfyLsrjGuCaJKcPHMQrfSgIQzw74MqZYE9s+lTBx6qFEKcxnUPpWuoAIIP1/A8xwXZCCfKps9YMeytAcPkD6ThDwBkDiZ9b+ITrfWcnwj6TbfjJMFgqt/XREMRZfDfMnFO7lGZA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eR2SFbnI; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=mzYF97sVWz63m1CUxZf+jl+Hhjnz8guVOlV5+MbrsME=; b=eR2SFbnI4lfCWYT1cmVHQL6SgG
-	rkwXF+klYabsm6Z8drPNbxY5lCHy5UDtoDUyIbk8k4bkjUYCPQd6mhuVxaXlvC2WB454hmU/RXBnE
-	paJhrdsndFkbykNv8/uEnSfLJnpMBDfDwP4/kfpQoVxwaPrnJj2qGDKQUgeXleafN9uRJ6KB1izT6
-	B9Fyw7AL9cgLv/2DzrsdO5ebbUbRC+1m6eRDWKFX4IFp7saMMQijwOi8QniOzBpVTezDN8kP/gYIX
-	nt7vaZMESAfi7iEyd7/yO16UiTBbbDZrCpBegIn53yo5+TBUJrhsPGPWdDJa/7ThDQfBPfrisXpqp
-	uhM/QYaQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57276)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vprHc-000000002nw-193h;
-	Tue, 10 Feb 2026 17:12:16 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vprHW-000000002wr-3vpe;
-	Tue, 10 Feb 2026 17:12:11 +0000
-Date: Tue, 10 Feb 2026 17:12:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Bezdeka <florian.bezdeka@siemens.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: stmmac: intel: Fix IRQ vector leak
-Message-ID: <aYtm6pCnw0hdWdNx@shell.armlinux.org.uk>
-References: <20260210-flo-net-stmmac-default-affinity-core-v1-0-4e76612444e1@siemens.com>
- <20260210-flo-net-stmmac-default-affinity-core-v1-1-4e76612444e1@siemens.com>
+	s=arc-20240116; t=1770744125; c=relaxed/simple;
+	bh=2gXAQUZwt1m8QP/RD9+/QxmuC5Ub8RRVPrxGR9ZsYoU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=B3uLKVt3b/xVhPDL2TnYt01PQJfjstmP7OcGQqyLi/Fs7iWk6QdiPK799pC0AMa3xDRHEJw1hUbXSdIGsgFA/L6SUWt8pANNvEVfABV1jxeezbmSk87wbnOwgOjh8wG44sxUTtZXY7/dcFwPRVz/Rz+jM+AyTinplLpHo8uqtVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nqofsrd9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 519D8C116C6;
+	Tue, 10 Feb 2026 17:22:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770744124;
+	bh=2gXAQUZwt1m8QP/RD9+/QxmuC5Ub8RRVPrxGR9ZsYoU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Nqofsrd98XpnLI5MRiATQ28YBTk/rzXZjVERm8iB11RKSRZXkH57TMEDejNr/awZO
+	 29nvxpL0FFKpGXsMRSxScdzGQmfveZSwzIU8AMhesztdS06Od0AAlsbJ/iMnSGWYHO
+	 8domYBkwWPxgOveYFlAsxZjg1u64kcgJWRB3FyNwZeykfEYdFG3F+I/kgVv3RJ9JfY
+	 a1ClyowQ1BLlqQg/G8+ZdvL8kj+ZXzabgDetiZxrr1rAuee9GvDRlqIOawwHSDugGc
+	 3WhjX0qgvs5HNxKuTP6oWMPB44c9DQAQyQm+5MJ6cbEvg22adEeq9i4EpJJKVjcMK9
+	 0A0Z+Tv+SR2+A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH bpf-next 0/5] Add the the capability to load HW RX checsum
+ in eBPF programs
+Date: Tue, 10 Feb 2026 18:21:46 +0100
+Message-Id: <20260210-bpf-xdp-meta-rxcksum-v1-0-e5d55caa0541@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260210-flo-net-stmmac-default-affinity-core-v1-1-4e76612444e1@siemens.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNQQ6CMBBFr0Jm7ZhSU6SuuIdhAXQKDUKbKRIM4
+ e5WLuDyveS/v0MkdhThke3AtLro/Jwgv2TQDc3cEzqTGKSQSmipsA0WNxNwoqVB3roxvifUQhS
+ lIqmFNpCmgcm67cw+68SDi4vnz/myyp/9E1wlCizamyVd3jvSeTUSz/S6eu6hPo7jCxFkhzO5A
+ AAA
+X-Change-ID: 20250925-bpf-xdp-meta-rxcksum-900685e2909d
+To: Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+ linux-kselftest@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258127-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,intel.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-258128-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A1AE211DAE3
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5FD1B11DD40
 X-Rspamd-Action: no action
 
-Note that net-next is currently closed. Patches for net-next should
-be sent RFC. Please see the netdev *whatever it is* documentation (I
-can never remember the name of the renamed document nor it's URL).
-It's somewhere on docs.kernel.org and is in Documentation/ somewhere.
-I'm getting tired of having to do a google search every single time
-I respond to someone about this.
+Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the HW
+RX cheksum results in the eBPF program binded to the NIC.
+Implement xmo_rx_checksum callback for veth and ice drivers.
 
-On Tue, Feb 10, 2026 at 05:28:14PM +0100, Florian Bezdeka wrote:
-> The IRQ vectors allocated in stmmac_config_multi_msi() or
-> stmmac_config_single_msi() where never cleaned up.
+If the hardware detects a wrong/failed checksum, it will report
+CHECKSUM_NONE in the packet metadata. Moreover, CHECKSUM_NONE will be
+returned even if the NIC can't parse the packet (e.g. if it does not
+support a specific protocol). A possible use case for
+bpf_xdp_metadata_rx_checksum() would be to implement a XDP DDoS
+application [1] combining the info from bpf_xdp_metadata_rx_checksum()
+and bpf_xdp_metadata_rx_hash() kfuncs in order to filter packets with a
+wrong/failed checksum.
 
-Please refer to:
+[1] https://blog.cloudflare.com/unimog-cloudflares-edge-load-balancer/
 
-https://lore.kernel.org/netdev/27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org/
-https://lore.kernel.org/netdev/7e024db2557a4d5822a0dd409ae678d10d815d9c.camel@mailbox.org/
+---
+Changes in v1:
+- Rebase on top of bpf-next
+- Test ice driver using xdp_hw_metadata tool available in the bpf
+  kernel selftest
+- Improve cover letter with an use-case for
+  bpf_xdp_metadata_rx_checksum()
+- Link to RFC v2: https://lore.kernel.org/r/20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org
 
-and the associated discussion in that thread.
+Changes in RFC v2:
+- Squash patch 1/6 and 2/6
+- Introduce enum xdp_checksum definitions
+- Rework ice support to reuse ice_rx_csum codebase
 
-PCI is weird. If pcim_enable_device() is used, it switches all sorts of
-other functions to managed mode. The missing cleanup here isn't
-actually missing, it's buried in the depths of PCI code. So, this is
-not a bug, and thus:
+---
+Lorenzo Bianconi (5):
+      netlink: specs: Add XDP RX checksum capability to XDP metadata specs
+      net: veth: Add xmo_rx_checksum callback to veth driver
+      net: ice: Add xmo_rx_checksum callback
+      selftests/bpf: Add selftest support for bpf_xdp_metadata_rx_checksum
+      selftests/bpf: Add bpf_xdp_metadata_rx_checksum support to xdp_hw_metadat prog
 
-> 
-> Fixes: b42446b9b37b ("stmmac: intel: add support for multi-vector msi and msi-x")
+ Documentation/netlink/specs/netdev.yaml            |   5 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c      | 114 +++++++++++++--------
+ drivers/net/veth.c                                 |  20 ++++
+ include/net/xdp.h                                  |  14 +++
+ include/uapi/linux/netdev.h                        |   3 +
+ net/core/xdp.c                                     |  29 ++++++
+ tools/include/uapi/linux/netdev.h                  |   3 +
+ .../selftests/bpf/prog_tests/xdp_metadata.c        |   7 ++
+ .../testing/selftests/bpf/progs/xdp_hw_metadata.c  |   7 ++
+ tools/testing/selftests/bpf/progs/xdp_metadata.c   |   1 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      |  28 +++++
+ tools/testing/selftests/bpf/xdp_metadata.h         |  13 +++
+ 12 files changed, 204 insertions(+), 40 deletions(-)
+---
+base-commit: db975debcb8c4cd367a78811bc1ba84c83f854bd
+change-id: 20250925-bpf-xdp-meta-rxcksum-900685e2909d
 
-this is not a fix.
-
-However, if you look at Philipp's replies, there is a desire to get
-rid of this PCI behaviour, so your patch is useful - it just needs not
-to be dressed up as a fix.
-
-I am keen that we cut down on the duplication between drivers. Having
-_four_ stmmac PCI drivers all using MSI but no sharing any code is
-silly.
-
-Please consider what you can do to improve the current situation with
-these stmmac PCI drivers.
-
-Thanks.
-
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
