@@ -1,215 +1,185 @@
-Return-Path: <netdev+bounces-258087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258088-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDt/NlAzi2mLRgAAu9opvQ
-	(envelope-from <netdev+bounces-258087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:32:00 +0100
+	id ABmYIRE0i2mhRgAAu9opvQ
+	(envelope-from <netdev+bounces-258088-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:35:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54EAC11B39C
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:32:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E34C111B3EC
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E30A303E3A8
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 13:31:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D115B303E3A1
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 13:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357EE3164B7;
-	Tue, 10 Feb 2026 13:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F34329E43;
+	Tue, 10 Feb 2026 13:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OfCb+HVo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPO2T1h+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7D23016EE
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 13:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D54525B662;
+	Tue, 10 Feb 2026 13:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770730318; cv=none; b=TNR3iT+kjTmkydwF6UUCcdbYUqqqYrhAb6a+jY7HPxY2PKY3uhbXlra8pflwbKjbJfUJ3mzAziuRrAzvef0GHmz9OgaSVxGVIclYMRZ1O6CCjAe4IT1b9DQiD8+87Phr0un4uGlBLfqO89/paVw2osPpiDiYxa/i0vlnvHjh1ho=
+	t=1770730510; cv=none; b=s2JVedmo3SmjBeLHRaqfpFSuz8TYHqknlzPH9s0MqVE22JnEIi5IYhqh+hj8B5pjI6kYWxrcgB5rpdJ/uCfTZjFIBy63BmWH3b8534zJc/K7XfWGG1hcDfQ25jTcRNEGdR/iqE3iUF4PT/3BpzWR1Jhd+CzTCiux6VdclzO9BHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770730318; c=relaxed/simple;
-	bh=VZSjOzuvfMemL7dihLKw/YlnYrWtdPgaW38AFNLk1NU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=tjznogHabuMZ/7DGzHxrYRGaqOKOLWo+W+jV7bxQ8Be43TsR2mXGrvBvyQ/trr5RVJ5C/bQa9B08zldLmflMXK2QfR/gj2h5XEnVYB5NDrGx0A4ZfRZN/IsIt+NdYTUliNC/7lurbD/p+96RZ7bnh/BbMRix+BXkJIupbHh3elQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OfCb+HVo; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-480706554beso43776625e9.1
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 05:31:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1770730315; x=1771335115; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uus/PtqPraf4MCXBLh2n0ofoHxf+Az8PQo4c5Pr7pDw=;
-        b=OfCb+HVo9iSOGLpoPkZ6wQCyY2z5h9gUHdHvKl6ezBEEXkUw4qAGux8NRq6p5/owr2
-         xLiAWp+zHKjzDsuR8fsTn74SNoSWvcnMQXUEBG/OeMdCMh0b14KqF/5Tf2KWphVDWSsu
-         dB7xzMo5QW3OyN04UBty8DobgQXNekvxFeptqIinBBXJjo3f6Y27tKAmfTqMP8eXeN/5
-         /4BIKMEhtEbVH52sK5u4PcveV9bK4qlfQ6UbZp5+dlBXUO3a6nPvqvhNeP6WXLcoR88F
-         NDOwFxwcmCqpkZxTE2y0MwyH+L/anbpShS856Y6iCuiRUUpj4758XFaHBEGbnQeqL+0k
-         slsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770730315; x=1771335115;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uus/PtqPraf4MCXBLh2n0ofoHxf+Az8PQo4c5Pr7pDw=;
-        b=whJUj+gcvvNdzT3oq653PK3WoyCDbkNy/l4+tf7FNsGGqTf+9hMaFQksJ1pfl+Bedw
-         SRT33xiC9ApC7ttRK3y0p5JMnwL/WCECEs14lcjCPGNDFmfhIsFcc2QozuXL4O+w48fZ
-         1G93I3n94F/tjzm/iq8SXSrmC+r2Pq/PNGY8KZXwtvcCNGtSjq0g6tdINZtcuFAekoBv
-         aKI3tMWIZJzUT/9Dwt+JPWSS5+7oH/ExoYOxEyzqS9Xs5aeav7co5JHjaPPhIAnEDGYz
-         n9EaeF7+9NgVuznAiJOjemiQaUTlxOx4MudUdGgIo0/XxuhmhNTbuHnsbxuPx3azrXRt
-         Rxwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIUpqhgt4itRa7EN3XaLthVqBt9mN/x2koJuo3wx+PKxkGFQju+uSUEon1E+6mxKXvksIp0CQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK0nDaUd9B24VaBcYtfQNYRAL74nQnuSZq9CmY+bn+d9hs4PFm
-	MZi3QW20JZ3kGsvoNWFQIolLl/Tpf9rAc/6dt8yOhmWxQpUzoNFIn2+Vo7qfTkxdKW6fSP4/uL9
-	alB5j
-X-Gm-Gg: AZuq6aIlfqYviRRy/VfMbKW9PfXp/bV0nL0Kp2DZwwdjP6e4v4Etwwp3axyfpiXf0+/
-	knhGgf1fk9vs89wpfrDVyQ1WAiCJpAFQTYOJwV7vO2x7vkOWorX7fgjoYXqLMd0OXpA+pgzsPQo
-	n+DC3wsJ0na13xMNttTvwlZWkkmrLIpXl7Rb2+i0Hz1587mTLlXxU6f4cu74dYnGpuYbBIxokxk
-	qQGj+RMXeKJ3y1a75zBfvOss+VarpYy+Z8Za9mYudSN+/WM5oI+u+xSQ6ey6kHO6fJX+2G7tYvg
-	Hm2VOC3D2g6JGO902qJKyuFY7hYD/SvMiFtBTOPabiW4xSjrdEgxyjPLNAQrjdU+4ogaygQqFmW
-	jzskY39+r/PExm0tz5MEaFP+MNYC8RNmL1GASsvL6u41Dd9KywuzSDZ46Zl9M2UPrL8aCBMtXSB
-	8FxI3bdKpQ9EZHqu27xcSoIw==
-X-Received: by 2002:a05:600c:5489:b0:47d:3ead:7440 with SMTP id 5b1f17b1804b1-4832022918dmr194685595e9.32.1770730314695;
-        Tue, 10 Feb 2026 05:31:54 -0800 (PST)
-Received: from localhost ([179.228.217.110])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-796211d1b81sm105684947b3.16.2026.02.10.05.31.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 05:31:54 -0800 (PST)
+	s=arc-20240116; t=1770730510; c=relaxed/simple;
+	bh=pOU4O74VvKCHJ34mMFpIVQ+S/He2Ol8rafSLir616W4=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=XbJSAIvOfXHMRnl8adU1b2q00fphq1NN+7aAYynJOG8tlfaounJ5lw5UsFe5K+nAgY3jBevmXcewHFsdVaLOiCKxjuoim5T85MT/kQSJR2pGDoPm4Y1V0LqrvBWyt82UZE049dQeyZbN2ylVHCoExlJarsHMMjqm99mmo9VE74k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPO2T1h+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA280C116C6;
+	Tue, 10 Feb 2026 13:35:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770730510;
+	bh=pOU4O74VvKCHJ34mMFpIVQ+S/He2Ol8rafSLir616W4=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=DPO2T1h+M+Nha4vZaFiTCBZ/lAH+hR/wqUxZb5qfbGyg77+pHgj4+LRd9CqCinMKQ
+	 8FF+Gs/Gkna9qwtaxuho8WLcoTbQ7XDzPChAGmfCsXtc5pAYFbLQfzUjfZR83+ikVB
+	 VR16qpeIRW9bhXA4H6RnEBvcCKdz1R0X5vb96GaH33oMebEmFGeI5gIL6N0sMIh62n
+	 k2efThEbB47mBL6mCkXbc8S5xfeRnl9/Bbu29gv/PcHvO4FbLf2z+Uj9xmwnQP6lV9
+	 uCzp6sItHaozwRAD7tfSNtldQacJg1MmTVgq5gOY9yF/oYxlD02SHMi/UN88WtzwuD
+	 03Yien9BUoOJg==
+Date: Tue, 10 Feb 2026 07:35:09 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 10 Feb 2026 10:31:52 -0300
-Message-Id: <DGBBIBJC7SH5.1EDF61ASA9WSU@suse.com>
-Subject: Re: [PATCH] selftests/net: add test for IPv4-in-IPv6 tunneling
-Cc: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
- <kuba@kernel.org>, <morikw2@gmail.com>, <netdev@vger.kernel.org>,
- <pabeni@redhat.com>,
- <syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com>
-To: "Linus Heckemann" <git@sphalerite.org>, <edumazet@google.com>
-From: =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>
-X-Mailer: aerc 0.21.0
-References: <20260208144604.1550582-1-git@sphalerite.org>
-In-Reply-To: <20260208144604.1550582-1-git@sphalerite.org>
+MIME-Version: 1.0
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, 
+ mcoquelin.stm32@gmail.com, yclu4@nuvoton.com, alexandre.torgue@foss.st.com, 
+ linux-kernel@vger.kernel.org, edumazet@google.com, 
+ linux-stm32@st-md-mailman.stormreply.com, schung@nuvoton.com, 
+ netdev@vger.kernel.org, conor+dt@kernel.org, 
+ linux-arm-kernel@lists.infradead.org, richardcochran@gmail.com, 
+ davem@davemloft.net, openbmc@lists.ozlabs.org, krzk+dt@kernel.org, 
+ kuba@kernel.org, ychuang3@nuvoton.com, peppe.cavallaro@st.com, 
+ pabeni@redhat.com, joabreu@synopsys.com
+To: Joey Lu <a0987203069@gmail.com>
+In-Reply-To: <20260210052226.3005666-2-a0987203069@gmail.com>
+References: <20260210052226.3005666-1-a0987203069@gmail.com>
+ <20260210052226.3005666-2-a0987203069@gmail.com>
+Message-Id: <177073050804.2585725.9186824856266132663.robh@kernel.org>
+Subject: Re: [PATCH net-next v12 1/3] dt-bindings: net: nuvoton: Add schema
+ for Nuvoton MA35 family GMAC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258087-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
+	TAGGED_FROM(0.00)[bounces-258088-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rbm@suse.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,nuvoton.com,foss.st.com,google.com,st-md-mailman.stormreply.com,kernel.org,lists.infradead.org,davemloft.net,lists.ozlabs.org,st.com,redhat.com,synopsys.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_PROHIBIT(0.00)[0.62.26.112:email];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.com:mid,suse.com:dkim,suse.com:email,ip6_tunnel.sh:url,ioam6.sh:url,ip_defrag.sh:url]
-X-Rspamd-Queue-Id: 54EAC11B39C
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[e7070000:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E34C111B3EC
 X-Rspamd-Action: no action
 
-On Sun Feb 8, 2026 at 11:46 AM -03, Linus Heckemann wrote:
-> 81c734dae203757fb3c9eee6f9896386940776bd was fine in and of itself, but
-> its backport to 6.12 (and 6.6) broke IPv4-in-IPv6 tunneling, see [1].
-> This adds a self-test for basic IPv4-in-IPv6 functionality.
->
-> [1]: https://lore.kernel.org/all/CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvR=
-jcGS31CBw=3Dg@mail.gmail.com/
+
+On Tue, 10 Feb 2026 13:22:24 +0800, Joey Lu wrote:
+> Create initial schema for Nuvoton MA35 family Gigabit MAC.
+> 
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Joey Lu <a0987203069@gmail.com>
 > ---
->  tools/testing/selftests/net/Makefile      |  1 +
->  tools/testing/selftests/net/ip6_tunnel.sh | 41 +++++++++++++++++++++++
->  2 files changed, 42 insertions(+)
->  create mode 100644 tools/testing/selftests/net/ip6_tunnel.sh
+>  .../bindings/net/nuvoton,ma35d1-dwmac.yaml    | 133 ++++++++++++++++++
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+>  2 files changed, 134 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml
+> 
 
-FWIW,
+My bot found errors running 'make dt_binding_check' on your patch:
 
-Tested-by: Ricardo B. Marli=C3=A8re <rbm@suse.com>
+yamllint warnings/errors:
 
->
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index 45c4ea381bc36..5037a344ad826 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -43,6 +43,7 @@ TEST_PROGS :=3D \
->  	io_uring_zerocopy_tx.sh \
->  	ioam6.sh \
->  	ip6_gre_headroom.sh \
-> +	ip6_tunnel.sh \
->  	ip_defrag.sh \
->  	ip_local_port_range.sh \
->  	ipv6_flowlabel.sh \
-> diff --git a/tools/testing/selftests/net/ip6_tunnel.sh b/tools/testing/se=
-lftests/net/ip6_tunnel.sh
-> new file mode 100644
-> index 0000000000000..366f4c06cd6a3
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/ip6_tunnel.sh
-> @@ -0,0 +1,41 @@
-> +#!/bin/bash
-> +# Test that IPv4-over-IPv6 tunneling works.
-> +
-> +set -e
-> +
-> +setup_prepare() {
-> +  ip link add transport1 type veth peer name transport2
-> +
-> +  ip netns add ns1
-> +  ip link set transport1 netns ns1
-> +  ip netns exec ns1 bash <<EOF
-> +  set -e
-> +  ip address add 2001:db8::1/64 dev transport1 nodad
-> +  ip link set transport1 up
-> +  ip link add link transport1 name tunnel1 type ip6tnl mode ipip6 local =
-2001:db8::1 remote 2001:db8::2
-> +  ip address add 172.0.0.1/32 peer 172.0.0.2/32 dev tunnel1
-> +  ip link set tunnel1 up
-> +EOF
-> +
-> +  ip netns add ns2
-> +  ip link set transport2 netns ns2
-> +  ip netns exec ns2 bash <<EOF
-> +  set -e
-> +  ip address add 2001:db8::2/64 dev transport2 nodad
-> +  ip link set transport2 up
-> +  ip link add link transport2 name tunnel2 type ip6tnl mode ipip6 local =
-2001:db8::2 remote 2001:db8::1
-> +  ip address add 172.0.0.2/32 peer 172.0.0.1/32 dev tunnel2
-> +  ip link set tunnel2 up
-> +EOF
-> +}
-> +
-> +cleanup() {
-> +  ip netns delete ns1
-> +  ip netns delete ns2
-> +  # in case the namespaces haven't been set up yet
-> +  ip link delete transport1
-> +}
-> +
-> +trap cleanup EXIT
-> +setup_prepare
-> +ip netns exec ns1 ping -W1 -c1 172.0.0.2
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): clock-names: ['stmmaceth'] is too short
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): clocks: [[4294967295]] is too short
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): compatible:0: 'altr,socfpga-stmmac' is not one of ['nuvoton,ma35d1-dwmac']
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): compatible: ['altr,socfpga-stmmac', 'snps,dwmac-3.70a', 'snps,dwmac'] is too long
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): phy-mode:0: 'sgmii' is not one of ['rmii', 'rgmii', 'rgmii-id', 'rgmii-txid', 'rgmii-rxid']
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): 'nuvoton,sys' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): 'resets' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): 'reset-names' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.example.dtb: ethernet@ff700000 (altr,socfpga-stmmac): Unevaluated properties are not allowed ('altr,sysmgr-syscon' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.example.dtb: ethernet@4070000 (sophgo,cv1800b-dwmac): compatible:0: 'sophgo,cv1800b-dwmac' is not one of ['nuvoton,ma35d1-dwmac']
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.example.dtb: ethernet@4070000 (sophgo,cv1800b-dwmac): phy-mode:0: 'internal' is not one of ['rmii', 'rgmii', 'rgmii-id', 'rgmii-txid', 'rgmii-rxid']
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.example.dtb: ethernet@4070000 (sophgo,cv1800b-dwmac): 'nuvoton,sys' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): clock-names:1: 'ptp_ref' was expected
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): clock-names: ['stmmaceth', 'pclk', 'apb'] is too long
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): clocks: [[4294967295, 1], [4294967295, 2], [4294967295, 3]] is too long
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): compatible:0: 'thead,th1520-gmac' is not one of ['nuvoton,ma35d1-dwmac']
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): reg: [[3875995648, 8192], [3959435264, 4096]] is too long
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): 'nuvoton,sys' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): 'resets' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): 'reset-names' is a required property
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/thead,th1520-gmac.example.dtb: ethernet@e7070000 (thead,th1520-gmac): Unevaluated properties are not allowed ('reg-names' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/nuvoton,ma35d1-dwmac.yaml
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.kernel.org/project/devicetree/patch/20260210052226.3005666-2-a0987203069@gmail.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
