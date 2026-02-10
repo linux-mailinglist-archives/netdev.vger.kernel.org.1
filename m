@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-258155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGLTDVCPi2nYWAAAu9opvQ
-	(envelope-from <netdev+bounces-258155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 21:04:32 +0100
+	id qKg2N1uPi2mhWAAAu9opvQ
+	(envelope-from <netdev+bounces-258156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 21:04:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5853F11EDF5
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 21:04:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286BC11EE03
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 21:04:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 000F3303743B
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 20:04:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C990330420A1
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 20:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D92331A46;
-	Tue, 10 Feb 2026 20:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD8232FA32;
+	Tue, 10 Feb 2026 20:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="mUnjdL4f"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="29VJnzi8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C73331214
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 20:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335D0330317
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 20:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770753865; cv=none; b=lQBcGUwonmrFce7SwhaxKBisD7vMO4G2TTUNyAokHgY6jvUrx0rBSrFGn+v4CRrGOcMDv67BVri7Zf8TQc14dAMHF+2/2j0AKt2rnsbgjxUnaxgTmp9qZfzpN2ZNQWWQdiJlxpaoprmd4aWubNlSZ0VK06Qn9IX1WjJxq1sQDXo=
+	t=1770753866; cv=none; b=O2ox/ntc0j0PUa4o+BPv/1UBH5N6LZfsAm82qGEB+rinYRMiT1jbQu/fsJVKLQXXUArCL4H2j7x/5867IWFiIq4eyretCo+1C/mfpxMHGqT+2mPRPWqfB+BzFWKHJxPbhbCN90z0GmpD2cJBSuX17wgxUhSekkW4/avnXvtLZco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770753865; c=relaxed/simple;
-	bh=sPmix59H2C1cYe6RWQi1HyeyyQZOU/8D95KeCn7K9QE=;
+	s=arc-20240116; t=1770753866; c=relaxed/simple;
+	bh=e5SSuykFlipK9PqYjGXDsXgHIaFhGRMaDYeKItICHH8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oRlhtYoWnNf8Q7iYJIo8A2ct2GPvGkLLS/AwDR6x6a108ohJFI4o7kc8ypeqjH/hMrNROnRJMkrjaT0lcLAM/5xAgenbMVyvoAhqchfpu0ZWW2DjQ8ohOUwjgaSz4Qt4ed6awTCt5tZk2KYHEOxWR7dGdHb0/Erc/Pmq4BTcwmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=mUnjdL4f; arc=none smtp.client-ip=209.85.167.172
+	 MIME-Version; b=g2sQP6IfUHR7z3cHgLZHDRtYoaJ118oH+cvK2r7JjtZ4AQE9QSFQBt7NCY1J8nxCh3u4z/FJ1j9czFVgym+6TXrPfA7zGFXcqdsLs1pJXM3xnsg+VIo705vi69U8zkEyvaHUmqyWOi1eDap8nW4TZVz31Gtu6FbCPHNlW78JbQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=29VJnzi8; arc=none smtp.client-ip=209.85.167.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-45f126d47b8so2842005b6e.2
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 12:04:22 -0800 (PST)
+Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-45f053b7b90so771385b6e.0
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 12:04:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1770753862; x=1771358662; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1770753863; x=1771358663; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GtLJ51MVvzxIjJKbVfy4ay9B4kth9zqdhIvM1OEySYE=;
-        b=mUnjdL4fq3jM2c1VMYbsTq/BX58NIA/Ac55SAwyg3xX3q9JK0CIRlnEP36CGzd3brF
-         UATKd5KOux9n8Bs1LYVzM1yKroFY7is0rhmFa13FW+vsnNZGjh8RrceMEua1uOqvYNLh
-         vDH1JMojDRm82DWiSdok4Jr69YgGGstHbqegFetxBiAny5RxJnUMQycxidZPunw6X3Uk
-         Q9cHdbDgJ4mnRyHSimu83ehY21hNPZajMhUTRn4hfCdsYeaMfBnmzGk0Z4GBR3dj2tv6
-         S8xgAn7wk1aXW7XGLm6QKau7Fzy4LS48PZ2wK0HeN5K+nFgz7VJtIqOWOGlUOTwn3UQu
-         hb0g==
+        bh=l4jsi28fUWPw+r9cG+CpQI+hgTFcPE5YO6iQNcoWxmI=;
+        b=29VJnzi8ABsyVClZwq3Ld6v0Uq1o6BVXzVsMaslBO3Gx6qf93LyA3oOhaGHyTh44tC
+         ew4b3KIcwtDteug9nRv9vUBBsKm5ehSkuXAa8c+d9tPcYcgkI0bwzZytSUCFQwuWU+J5
+         FsyRHAGduWKW8Q5O1nMpMJMuMXO4twfP70o2IMJPHnE0oxDyuZw7n6S9C3GWMhTWveC1
+         FKiYmweFqSorlqKLw51Ir0j2kNkZmRi1pJK+E3JUK2v0Znzhj2HJlLahWq43pM5Jm/Ti
+         JIUdyfBefj1YVJ2BfnRLjO5zUos96b6U70CnaNPNrE9olH08U5yhGdF1n+M5aH/ONiu+
+         ZCFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770753862; x=1771358662;
+        d=1e100.net; s=20230601; t=1770753863; x=1771358663;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=GtLJ51MVvzxIjJKbVfy4ay9B4kth9zqdhIvM1OEySYE=;
-        b=w9smDclZXkOEwDyyDutLOFitGR0JomeH4Z9NrqSVDKDCqSwYBYtqopBCdq2VJ4YMn6
-         wrgOVHVWJec6ZR3Jann22VhBA1xx8DYTVd8LyMnhveagWzAzxU09ByhMUFZ4uqaHdH8L
-         4SiBfhqqjfS87aW5r15u0bVfZyCaFoWTRC761Cf3b04GAmTPvOdBDDKO9Q2twl9SbH7G
-         eEwAhmDkfoNL0l04p78QS8Z7xYHc3fOixWzU4EqgA54xm41dhjrfSsUJPeL3hhkkpifl
-         sjD+9N8Rmk6BOrCpQ5TuWFu5bi9u91fJm6AbU9jFiKNCqAnj/9ctVkx4Lx3rWF5MnLwz
-         lrcA==
-X-Gm-Message-State: AOJu0YxOWBQyK0P51xoFh/LzukBRtU9Oq4hZHONDr9Zx+1siP24MiraW
-	k2+3op2T3N7KLQaBkBc4vZyhTsZ/T8NHnlCEopKPQ0t6FB0JgGskY4dx7OfSARLxsTUyjDx2Nhw
-	cvr/X
-X-Gm-Gg: AZuq6aIdbOezecDAfWKqWChhewTRkvCYbks3hYZ9h+5bTWbqVB+17ClAgFu8umlIsIt
-	hynRxzRuztGYjzyDSYRjGv4htxl+0QmLgeCjSyD/shG+HJe5uKNX9sBHohAiDMMHC4I8yEC5Eqv
-	lVCKbsu8u+1nVTGasWpenjl12cHBa1RYjBsDVvrjEiuQf47xlxBrGjxEDwkzHyFkWJtT//zg/A3
-	cbH65J5RSwoz/v7r4kGurAr9QMOkx1JSOuQEDbEfdBSXoEUfwccu+6tk9ET/u9vOfI7SydkAOSa
-	K/AvOxIYSxwCsqQszooa8N+GFmLVyCpdLGh5h0qht/tzzoh/W2mE4wV06kwka8uz8uWfFdS3bOp
-	V6hYnRb0tcHgpulloQRFjI8fCwialO8lTUuqpSSPOdMs72tx0Cl/TFi/7F1Seb8RVdZfzU4pGVm
-	g/3/I0Thsret00RY5NX6SMLi9fJi0XSnby0ls4SFpqOg==
-X-Received: by 2002:a05:6808:2383:b0:463:1f4a:3b91 with SMTP id 5614622812f47-463664676e3mr217023b6e.14.1770753861750;
-        Tue, 10 Feb 2026 12:04:21 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:5f::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-462fe9a12f5sm8917604b6e.5.2026.02.10.12.04.21
+        bh=l4jsi28fUWPw+r9cG+CpQI+hgTFcPE5YO6iQNcoWxmI=;
+        b=jNiOpFo1I9ZHrFV/bqQ3kLwKKuzu+4pvoke91Rb+LESXzktqi8+Ty7YhEKTg4AlKWZ
+         jSn4WlLtJDoPI9HZy+r2NU7huTp+r5L/G660Gm0iNtumIhjEWXNhi+CRgN73q8hqnTt0
+         GpcytFInN3OyjgLWiJ9z7JAQLldm4skWt/roasxnpCJQ57Mw4CKDs+kzLUYj5XftsXKr
+         SsLRIKyRW39kN5h+ItgNfSRFctCyfeQxghPj2rQa3H57g+tWFkgGD7bbTIT9O2uL4om1
+         0Cc87Tc86nZ/jRdtsSinyO5dvwhNnU3E4/zFJ7EqngSo19wAXeqr96TJstrwLJ68koID
+         dpbw==
+X-Gm-Message-State: AOJu0Yz4IgObptC2GimKDh/LOxyQEVsgHprbAF7KYDkOz/xt+0f9cDzp
+	t4CVCXgVZmRgSLehIDiyHyNs9lVAiPbGsBjhmOqgZSuWOsaorlgSBUd5HsJbbfbVA5gE1fFyy+K
+	B/0K7Nh0=
+X-Gm-Gg: AZuq6aKqlbpNV7E0e6Fb9cb176ozBGH+RWqYUG2eg5kPEO1j4JAaQS0L1SqR5zWgcG6
+	QW1+mnNOiYY4Orj/krOEwRFyw0v9MxJklrHmzxiCI8yAwNLyg7PSTEEKM3VtOQJIddMZkSQb7t/
+	uR76Cj/3y+8WhK5o6W0DDPkxICDCr7AI6F9Iz1aNIl1gcWwOg1G62yjRPuvf5udU9SP52BMw8yD
+	JbRWZGx0UZydzDwx+NdjGH2F1u6UrGdtF8LX2heiBULfsMzqw9CMyK0NC9vlIX+y/tt1oXqiHVV
+	MxrANXyvxmZ4s6Z2RMrBSr6BqrVx+vVv4f1U8EiNmZdQx2cCg0bMkEf4ojuvGlG6okD8uFkvbho
+	KEb/3XnZ4GBUY8ZO9NcJvwpKYGZ8yOsIlyVsA8VZPxXA0vZ2xWYlqFyL6qiLTn/KzJzZGL/KwgC
+	jtOhuNX92sBPfU4Wte/J5lb3dpOjv+qOcCWTqpH60J1A==
+X-Received: by 2002:a05:6808:1a0d:b0:43c:8714:fe3c with SMTP id 5614622812f47-462fcc877f5mr8659929b6e.51.1770753862829;
+        Tue, 10 Feb 2026 12:04:22 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:49::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-462fe9a12d0sm8510823b6e.1.2026.02.10.12.04.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 12:04:21 -0800 (PST)
+        Tue, 10 Feb 2026 12:04:22 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -88,9 +88,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Bobby Eshleman <bobbyeshleman@gmail.com>,
 	Stanislav Fomichev <sdf@fomichev.me>,
 	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH net-next 1/4] selftests/net: Add bpf skb forwarding program
-Date: Tue, 10 Feb 2026 12:04:16 -0800
-Message-ID: <20260210200419.3555944-2-dw@davidwei.uk>
+Subject: [PATCH net-next 2/4] selftests/net: Export Netlink class via lib.py
+Date: Tue, 10 Feb 2026 12:04:17 -0800
+Message-ID: <20260210200419.3555944-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260210200419.3555944-1-dw@davidwei.uk>
 References: <20260210200419.3555944-1-dw@davidwei.uk>
@@ -108,18 +108,18 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-258155-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258156-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,dama.to,meta.com,gmail.com,fomichev.me,blackwall.org];
 	DMARC_NA(0.00)[davidwei.uk];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
@@ -130,78 +130,82 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fomichev.me:email]
-X-Rspamd-Queue-Id: 5853F11EDF5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei-uk.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 286BC11EE03
 X-Rspamd-Action: no action
 
-Add nk_forward.bpf.c, a BPF program that forwards skbs matching some IPv6
-prefix received on eth0 ifindex to a specified netkit ifindex. This will
-be needed by netkit container tests.
+Making rtnl newlink calls requires constants defined in Netlink class in
+pyynl. Export it.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- .../selftests/drivers/net/hw/nk_forward.bpf.c | 49 +++++++++++++++++++
- 1 file changed, 49 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
+ tools/testing/selftests/drivers/net/lib/py/__init__.py | 4 ++--
+ tools/testing/selftests/net/lib/py/__init__.py         | 4 ++--
+ tools/testing/selftests/net/lib/py/ynl.py              | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c b/tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
-new file mode 100644
-index 000000000000..86ebfc1445b6
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
-@@ -0,0 +1,49 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/bpf.h>
-+#include <linux/pkt_cls.h>
-+#include <linux/if_ether.h>
-+#include <linux/ipv6.h>
-+#include <linux/in6.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+
-+#define TC_ACT_OK 0
-+#define ETH_P_IPV6 0x86DD
-+
-+#define ctx_ptr(field)		((void *)(long)(field))
-+
-+#define v6_p64_equal(a, b)	(a.s6_addr32[0] == b.s6_addr32[0] && \
-+				 a.s6_addr32[1] == b.s6_addr32[1])
-+
-+volatile __u32 netkit_ifindex;
-+volatile __u8 ipv6_prefix[16];
-+
-+SEC("tc/ingress")
-+int tc_redirect_peer(struct __sk_buff *skb)
-+{
-+	void *data_end = ctx_ptr(skb->data_end);
-+	void *data = ctx_ptr(skb->data);
-+	struct in6_addr *peer_addr;
-+	struct ipv6hdr *ip6h;
-+	struct ethhdr *eth;
-+
-+	peer_addr = (struct in6_addr *)ipv6_prefix;
-+
-+	if (skb->protocol != bpf_htons(ETH_P_IPV6))
-+		return TC_ACT_OK;
-+
-+	eth = data;
-+	if ((void *)(eth + 1) > data_end)
-+		return TC_ACT_OK;
-+
-+	ip6h = data + sizeof(struct ethhdr);
-+	if ((void *)(ip6h + 1) > data_end)
-+		return TC_ACT_OK;
-+
-+	if (!v6_p64_equal(ip6h->daddr, (*peer_addr)))
-+		return TC_ACT_OK;
-+
-+	return bpf_redirect_peer(netkit_ifindex, 0);
-+}
-+
-+char __license[] SEC("license") = "GPL";
+diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+index 8b75faa9af6d..a18e21069f7a 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+@@ -19,7 +19,7 @@ try:
+     # Import one by one to avoid pylint false positives
+     from net.lib.py import NetNS, NetNSEnter, NetdevSimDev
+     from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
+-        NlError, RtnlFamily, DevlinkFamily, PSPFamily
++        NlError, RtnlFamily, DevlinkFamily, PSPFamily, Netlink
+     from net.lib.py import CmdExitFailure
+     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
+         fd_read_timeout, ip, rand_port, wait_port_listen, wait_file
+@@ -31,7 +31,7 @@ try:
+ 
+     __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
+                "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
+-               "NlError", "RtnlFamily", "DevlinkFamily", "PSPFamily",
++               "NlError", "RtnlFamily", "DevlinkFamily", "PSPFamily", "Netlink",
+                "CmdExitFailure",
+                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
+                "fd_read_timeout", "ip", "rand_port",
+diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
+index f528b67639de..fec518c2a0dc 100644
+--- a/tools/testing/selftests/net/lib/py/__init__.py
++++ b/tools/testing/selftests/net/lib/py/__init__.py
+@@ -15,7 +15,7 @@ from .nsim import NetdevSim, NetdevSimDev
+ from .utils import CmdExitFailure, fd_read_timeout, cmd, bkg, defer, \
+     bpftool, ip, ethtool, bpftrace, rand_port, wait_port_listen, wait_file, tool
+ from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily, RtnlAddrFamily
+-from .ynl import NetshaperFamily, DevlinkFamily, PSPFamily
++from .ynl import NetshaperFamily, DevlinkFamily, PSPFamily, Netlink
+ 
+ __all__ = ["KSRC",
+            "KsftFailEx", "KsftSkipEx", "KsftXfailEx", "ksft_pr", "ksft_eq",
+@@ -30,4 +30,4 @@ __all__ = ["KSRC",
+            "NetdevSim", "NetdevSimDev",
+            "NetshaperFamily", "DevlinkFamily", "PSPFamily", "NlError",
+            "YnlFamily", "EthtoolFamily", "NetdevFamily", "RtnlFamily",
+-           "RtnlAddrFamily"]
++           "RtnlAddrFamily", "Netlink"]
+diff --git a/tools/testing/selftests/net/lib/py/ynl.py b/tools/testing/selftests/net/lib/py/ynl.py
+index 32c223e93b2c..a52b067f7589 100644
+--- a/tools/testing/selftests/net/lib/py/ynl.py
++++ b/tools/testing/selftests/net/lib/py/ynl.py
+@@ -13,14 +13,14 @@ try:
+         SPEC_PATH = KSFT_DIR / "net/lib/specs"
+ 
+         sys.path.append(tools_full_path.as_posix())
+-        from net.lib.ynl.pyynl.lib import YnlFamily, NlError
++        from net.lib.ynl.pyynl.lib import YnlFamily, NlError, Netlink
+     else:
+         # Running in tree
+         tools_full_path = KSRC / "tools"
+         SPEC_PATH = KSRC / "Documentation/netlink/specs"
+ 
+         sys.path.append(tools_full_path.as_posix())
+-        from net.ynl.pyynl.lib import YnlFamily, NlError
++        from net.ynl.pyynl.lib import YnlFamily, NlError, Netlink
+ except ModuleNotFoundError as e:
+     ksft_pr("Failed importing `ynl` library from kernel sources")
+     ksft_pr(str(e))
 -- 
 2.47.3
 
