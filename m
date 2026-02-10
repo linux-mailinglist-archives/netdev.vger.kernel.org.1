@@ -1,190 +1,176 @@
-Return-Path: <netdev+bounces-258085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GuJF8kui2lEQgAAu9opvQ
-	(envelope-from <netdev+bounces-258085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:12:41 +0100
+	id OFGCOtwwi2kFRgAAu9opvQ
+	(envelope-from <netdev+bounces-258086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:21:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C3511B21F
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:12:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DFA11B2D4
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 14:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E19713004C81
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 13:12:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2650F3039306
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 13:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D637F3246FE;
-	Tue, 10 Feb 2026 13:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F288F328B4D;
+	Tue, 10 Feb 2026 13:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="p6PGcWly"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nQAFei3i"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC3C1E832A;
-	Tue, 10 Feb 2026 13:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF92F3EBF28
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 13:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770729156; cv=none; b=Wmmim4CeJOgchXhUWZY7M5z2F6jF0F4U+m1Iqo/53+nPOLskcqhOKbT4YKJSVz0YgHjLhKr0/Q94Bm9HFJhiyriWoDoP3zdPqKWyZ8y1VHq8Iu2tWizTNwQZkaWG62v4Ar330pZOnIztWgjXKhTyYa/vjFkQl1qvs7/IXAr8bOs=
+	t=1770729688; cv=none; b=aEsRx9NIJA5tPsCnMCDyiM+J0Ak9gWHamoBxgZnoZc9DQx5c+cGy4Oyosln9BUMJLz3JWksfiglSWaRM6AJpU0nxDuNo5lAPnQ2t34/LsLSDhKwah41qjYy7bq3dcEWWapPzce/Ru8D6sz6xvMqHF9ah+nEowBmxiUwJJPGE+U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770729156; c=relaxed/simple;
-	bh=UPsoSOqaxvKNL9M+dEhrRrrgolXcFxKz8S27Tx834as=;
+	s=arc-20240116; t=1770729688; c=relaxed/simple;
+	bh=49wWjv80CmOxR9Z6lX1l4jznsqX8vyDBV8vw6cdn++0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uRdB73fAZmbW/XxxJcu4i5HTe6pNZ+I1mUtUPsGKgk6s+vTQAyqN57Pwi3/Zt5bUV7/XFpTw0EfI8inm1/98LW4wQSHb+XEaMKTG+IqOEsHC1LE8HyKz6QzFFdmN8BQKoPqrUg0VnYQTU/DUVffvPdberXo6ylf+2HT4kPgInIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=p6PGcWly; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Z1pl4mFVhB9hfg+ucrkFR1J2Wb0obC6F6Knh+u+mA90=; b=p6PGcWlyiQfZAFkq2CZ+DOPR3o
-	h8dLZjcP61+iJDGRA9jqOxwbGjzEQvoPfMKLFu6cl+4ZTbmUae/ie2be/hV324xdFXfMgnyI9kfvN
-	6mmD/xKm5og586Bacuz15OkBozwx4aUblkAIQaevvIVE9Gz0M+hczb6Kw8TI8p6/pJvU3VfDl38+f
-	WyiHBYIiJ0decwdMgxUe/cC9sIMtplYQIz3agdqanOGbAp3crSidrbMaA9VqvCV7PPrvig0u/jQZA
-	HYh4Y5fSp4kVQMahQPLQjPaV97j7/ahH3s97WNQYc7XPY5ytOtqt5XZGASd3nDJeQGFRjmNEfXyEl
-	iY1nb29Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34334)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vpnXM-000000002Zp-3rxj;
-	Tue, 10 Feb 2026 13:12:16 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vpnXI-000000002og-2bsV;
-	Tue, 10 Feb 2026 13:12:12 +0000
-Date: Tue, 10 Feb 2026 13:12:12 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Joey Lu <a0987203069@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, ychuang3@nuvoton.com, schung@nuvoton.com,
-	yclu4@nuvoton.com, peppe.cavallaro@st.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next v12 3/3] net: stmmac: dwmac-nuvoton: Add dwmac
- glue for Nuvoton MA35 family
-Message-ID: <aYsurPBMnzWDZCco@shell.armlinux.org.uk>
-References: <20260210052226.3005666-1-a0987203069@gmail.com>
- <20260210052226.3005666-4-a0987203069@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZ/HwOcoxCVMP0aqQAsNjUe+KDJKAoGHwxwdkrBUbUo52lv/GKjAfZVDXz9YZQEloQOD5Qqq7DmuEiAQxQkd41Y11Haa88WIXpiDehbfl+S69frM9tVaaGT+4r1+uio/VMzRGmN/AHqXqwyAbzAaczt3lFd4oIyUjFAWxlNDuJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nQAFei3i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF0CAC116C6;
+	Tue, 10 Feb 2026 13:21:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1770729688;
+	bh=49wWjv80CmOxR9Z6lX1l4jznsqX8vyDBV8vw6cdn++0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nQAFei3i93fgG0Xae0tgFo9nBmHb8HJebSzo+2dtdvTDbyDo6uUoekbSK4bCuHKZj
+	 BsI/4Ofr5zNsftESCYHk/NhCszQZBr7RD/KtdwrzBDjw816cIEkbiSRABXzKSn5Wvw
+	 94OXfif+nsb8jHvVWBzBNT/CsJIK9aFLlHxSAzQE=
+Date: Tue, 10 Feb 2026 14:21:23 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Ricardo =?iso-8859-1?Q?B=2E_Marli=E8re?= <rbm@suse.com>,
+	Hirokazu MORIKAWA <morikw2@gmail.com>,
+	Fernando Fernandez Mancera <fmancera@suse.de>, davem@davemloft.net,
+	eric.dumazet@gmail.com, horms@kernel.org, kuba@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] ip6_tunnel: use skb_vlan_inet_prepare() in
+ __ip6_tnl_rcv()
+Message-ID: <2026021011-imperfect-shrewdly-315f@gregkh>
+References: <CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com>
+ <CANn89iJxmiqryxLAXiV9z4uTaCzR7XZns32MGSLOykC2zocW_Q@mail.gmail.com>
+ <DGBAG46Q9YLJ.PX4A4EM1U4DF@suse.com>
+ <CANn89iL5ksZZCJr7SK9=4Sw6EejdOzr5_m6pBMM8RVtbLy_ACA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260210052226.3005666-4-a0987203069@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iL5ksZZCJr7SK9=4Sw6EejdOzr5_m6pBMM8RVtbLy_ACA@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258085-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258086-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,synopsys.com,nuvoton.com,st.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,st-md-mailman.stormreply.com];
+	FREEMAIL_CC(0.00)[suse.com,gmail.com,suse.de,davemloft.net,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 67C3511B21F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,l2_tos_ttl_inherit.sh:url,chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 64DFA11B2D4
 X-Rspamd-Action: no action
 
-Please note that net-next is currently closed, so you should be sending
-net-next patches with "RFC". See section 1.4 of:
-https://docs.kernel.org/process/maintainer-netdev.html
+On Tue, Feb 10, 2026 at 01:56:14PM +0100, Eric Dumazet wrote:
+> On Tue, Feb 10, 2026 at 1:42 PM Ricardo B. Marlière <rbm@suse.com> wrote:
+> >
+> > On Fri Jan 30, 2026 at 9:00 AM -03, Eric Dumazet wrote:
+> > > On Fri, Jan 30, 2026 at 5:15 AM Hirokazu MORIKAWA <morikw2@gmail.com> wrote:
+> > >>
+> > >> [REGRESSION] ip6_tunnel: IPv4 traffic broken in MAP-E/DS-Lite since
+> > >> commit df5ffde96693
+> > >>
+> > >> Hi,
+> > >> I am reporting a regression in the IPv6 tunneling stack (MAP-E and
+> > >> DS-Lite) introduced in kernel 6.12.67.
+> > >>
+> > >> [Description] After upgrading the kernel from 6.12.66 to 6.12.67 in
+> > >> the OpenWrt snapshot, IPv4 packets can no longer be sent to the
+> > >> external network via MAP-E or DS-Lite interfaces.
+> > >> [Environment]
+> > >> * Hardware: FriendlyElec NanoPi R6C
+> > >> * OS: OpenWrt snapshot
+> > >> * Kernel version: 6.12.67 (Broken), 6.12.66 (Working)
+> > >> * Protocol: MAP-E and DS-Lite
+> > >> [Culprit] By bisecting/reverting individual commits, I have identified
+> > >> that the following commit is responsible for this issue:
+> > >> "ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()" (Link to
+> > >> the patch: https://lore.kernel.org/netdev/20260107163109.4188620-1-edumazet@google.com/)
+> > >> Reverting this specific commit on top of kernel 6.12.67 restores
+> > >> normal connectivity for both MAP-E and DS-Lite.
+> > >> [Steps to reproduce]
+> > >> 1. Set up a MAP-E or DS-Lite connection on kernel 6.12.67.
+> > >> 2. Attempt to send IPv4 traffic (e.g., ping 8.8.8.8).
+> > >> 3. The packets fail to reach the destination.
+> > >
+> > > Thanks for the report.
+> > >
+> > > Can you provide detailed instructions ?
+> > >
+> > > Apparently none of our selftests caught the issue, it would be great to add one.
+> >
+> > Perhaps l2_tos_ttl_inherit.sh [1]? I've seen a timeout in this test that
+> > went away after testing commit 9990ddf47d41 ("net: tunnel: make
+> > skb_vlan_inet_prepare() return drop reasons") like mentioned here:
+> >
+> > https://lore.kernel.org/netdev/DGAR3PO1D33S.1TI7W7U4SPTOG@suse.com/
+> >
+> > It seems that that commit 81c734dae203 ("ip6_tunnel: use
+> > skb_vlan_inet_prepare() in __ip6_tnl_rcv()") uses the new
+> > skb_vlan_inet_prepare added in v6.13, which broke 6.12.
+> 
+> Greg Kroah-Hartman backported my patch to 6.12 LTS, but forgot that a
+> prior patch
+> from Menglong Dong inverted the skb_vlan_inet_prepare() return code.
+> 
+> Greg, can you backport the following to 6.12 LTS ?
+> 
+> Thanks.
+> 
+> commit 9990ddf47d4168088e2246c3d418bf526e40830d
+> Author: Menglong Dong <menglong8.dong@gmail.com>
+> Date:   Wed Oct 9 10:28:21 2024 +0800
+> 
+>     net: tunnel: make skb_vlan_inet_prepare() return drop reasons
+> 
+>     Make skb_vlan_inet_prepare return the skb drop reasons, which is just
+>     what pskb_may_pull_reason() returns. Meanwhile, adjust all the call of
+>     it.
+> 
+>     Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+>     Reviewed-by: Simon Horman <horms@kernel.org>
+>     Signed-off-by: David S. Miller <davem@davemloft.net>
 
-On Tue, Feb 10, 2026 at 01:22:26PM +0800, Joey Lu wrote:
-> +static int nvt_gmac_setup(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	phy_interface_t phy_mode;
-> +	struct regmap *regmap;
-> +	u32 macid, miscr, reg;
-> +	int ret;
-> +
-> +	regmap = syscon_regmap_lookup_by_phandle_args(dev->of_node, "nuvoton,sys", 1, &macid);
-> +	if (IS_ERR(regmap))
-> +		ret = dev_err_probe(dev, PTR_ERR(regmap), "Failed to get sys register\n");
-> +
-> +	if (macid > 1)
-> +		ret = dev_err_probe(dev, -EINVAL, "Invalid sys arguments\n");
-> +
-> +	if (of_get_phy_mode(pdev->dev.of_node, &phy_mode))
-> +		ret = dev_err_probe(dev, -EINVAL, "Missing phy mode property\n");
+Sure, will do after this next round of releases goes out.
 
-If you pass in the plat_dat to this function, then you have access to
-plat_dat->phy_interface. I went through all the dwmac glue code and
-removed such PHY interface gets, so please don't introduce new
-instances.
-
-> +
-> +	miscr = (macid == 0) ? NVT_REG_SYS_GMAC0MISCR : NVT_REG_SYS_GMAC1MISCR;
-
-I find the use of "miscr" to be the register offset, and "reg" to be
-the register value is confusing. Normally they're the other way around.
-
-> +
-> +	switch (phy_mode) {
-> +	case PHY_INTERFACE_MODE_RGMII:
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> +		ret = nvt_gmac_get_delay(dev, "rx-internal-delay-ps");
-> +		if (ret < 0)
-> +			return ret;
-> +		reg = FIELD_PREP(NVT_RX_DELAY_MASK, ret);
-> +
-> +		ret = nvt_gmac_get_delay(dev, "tx-internal-delay-ps");
-> +		if (ret < 0)
-> +			return ret;
-> +		reg |= FIELD_PREP(NVT_TX_DELAY_MASK, ret);
-> +		break;
-> +	case PHY_INTERFACE_MODE_RMII:
-> +		reg = NVT_MISCR_RMII;
-> +			break;
-> +	default:
-> +		return dev_err_probe(dev, -EINVAL, "Unsupported phy-mode (%d)\n", phy_mode);
-> +	}
-> +
-> +	regmap_update_bits(regmap, miscr,
-> +			   NVT_RX_DELAY_MASK | NVT_TX_DELAY_MASK | NVT_MISCR_RMII, reg);
-
-Please consider programming the NVT_MISCR_RMII bit via the
-plat_dat->set_phy_intf_sel() method.
-
-Is this register preserved over suspend/resume ?
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+greg k-h
 
