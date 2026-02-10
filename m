@@ -1,68 +1,62 @@
-Return-Path: <netdev+bounces-258124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258125-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4C+dDG9mi2kMUQAAu9opvQ
-	(envelope-from <netdev+bounces-258124-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:10:07 +0100
+	id KLWHHWtmi2kMUQAAu9opvQ
+	(envelope-from <netdev+bounces-258125-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:10:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F74B11DA20
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:10:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C6C811DA19
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B62330B99AE
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:06:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58E243009E24
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1104832862D;
-	Tue, 10 Feb 2026 17:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4EA3803F9;
+	Tue, 10 Feb 2026 17:09:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="uRapuCaq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+6BAQX0"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5754632AAB4
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 17:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD8130F541;
+	Tue, 10 Feb 2026 17:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770743169; cv=none; b=ubD891BEOutAfpwiM/S1iv13zQquhBAupdyaCxtLBpBcFJtBeddOC2IUQGRanGjX6IWK5S/t+sNCtGUNQZMLZn4y7nJJh6RA9T6Z9WfX8jmQcQWWk6Dyp3q/lWD+se33mC0Dw/yXkaFgqN6Fzp3tSko0ohJ5VHbZxRG+udRNPSw=
+	t=1770743394; cv=none; b=SSVmz+tABucxESGpzNML9s9JBz/R+C0SWEWeJdNVvE4bdEDVrtAwAyGPFU5V8AcsyTazz57xsp4Q+a03tMFane2STLZf/t64hPQowAA+V6ip5Awu+mZ5/5o9ItP5+gk6Mm2xy2wQTrlfwlDcLwaI8hH6UZ0Qfh8S1n8ZY7Tz3rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770743169; c=relaxed/simple;
-	bh=TeOq2WGx36/vhsxEB4LmTPs6NHH2522z9ZrglXR1Ev0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dcp26vjWxznPEZvr4Iqk5EyI5iv6WwUyBLzdhd/FqRigfiiWPAA9cjY6H2Qr9MgMpDyid/5UfRBbf16lJyPJpVkym2T3FPpk7NfyyGkybMo8d5XedczFJXU6PGnRVBsM0Wp+kraOHwk6nWsPTpJNbKqdFXI5EhqINH+lccbhvpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=uRapuCaq; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (227.25.31.150.dy.iij4u.or.jp [150.31.25.227])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61AH63Pl051026
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 11 Feb 2026 02:06:03 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=YezTYZm45Fc+/sBHnpyG3y/+AmmZnnp675nXVb6MGag=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1770743164; v=1;
-        b=uRapuCaqjzt2tSLkJafgkf45ZonwnV6PnUlsd0owq2EDy+33vnVuPpvt0BGl8hwa
-         615kND/WPvWQi84vSX8vQO8lV5u52HLPfPOojUmj+EEXRb6eUlzkD6KgWhXerg1k
-         eZxNSNDxZYZ7zkSmG2w1pj7/bx8i0dRMgnI37QDwiVpWM2twqUQ8DTWXvK7jFZqN
-         MeaXZJ6HTl/exE2sTlfaphyqbJ7+VxQcR2hQHt8P4EpGeaB1Dx/cgRqhNoDMllEr
-         MfqW3fH744oNl6zM9SF992V3lhT6z6alCGQq/WF8G8O/61j/r2otpovqP+0lgvHm
-         3/phIwHRCaT5VzuerB9LdQ==
-From: Kohei Enju <kohei@enjuk.jp>
-To: aleksander.lobakin@intel.com
-Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net,
-        edumazet@google.com, intel-wired-lan@lists.osuosl.org,
-        kohei.enju@gmail.com, kohei@enjuk.jp, kuba@kernel.org,
-        netdev@vger.kernel.org, pabeni@redhat.com,
-        przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v1 iwl-net] iavf: fix netdev->max_mtu to respect actual
-Date: Tue, 10 Feb 2026 17:05:55 +0000
-Message-ID: <20260210170603.149842-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <c48f08ad-b402-4cfe-a362-4cb0c3a7801f@intel.com>
-References: <c48f08ad-b402-4cfe-a362-4cb0c3a7801f@intel.com>
+	s=arc-20240116; t=1770743394; c=relaxed/simple;
+	bh=EewhX7pCVaZsONS5AgLcaHibcIx/Rv1A5l0RH1SAVug=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jbR488fbEDgcM7juQN+s3r4YMvYWFYESOlfG15fasoxCTxGTXlv+5Qxm5zK2Tnm18AN+IQzBF8MH64A/p1MtcJduHXG82wLuc2J+aidwCV9zXaiaG/Phzgw3bhdr7K5ptP99VZd0ltDe6ZcMMXNFuNkBCxB9RDrNZHqgFaN30VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+6BAQX0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B290C116C6;
+	Tue, 10 Feb 2026 17:09:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770743394;
+	bh=EewhX7pCVaZsONS5AgLcaHibcIx/Rv1A5l0RH1SAVug=;
+	h=From:To:Cc:Subject:Date:From;
+	b=u+6BAQX0iu1E+HYT1eHBFtD3YcZ8qPkk6ocR8gDFftYzWVEyRn+RwDaKrD4rdSAoo
+	 qo+m4fdZjk0MsCUXdV/lwsiBnxcVMowSjG4hFYeXoVTz8j2x/74T9i7MasT1cwxaxQ
+	 3xQXCKhrK4JQkdCoxpAks/79rhwt4haPGd88pDnGC1rWfdMTwvzJLGZ1KtQ1eSSe8V
+	 S4/Q7IJ7/xE+ciovS1CdF5136A5yiVd5GQDBnkjOnNgeyXtUh4RSXY8t+S2+NqeJxc
+	 XLqzH/HLTVDeB2j3Uxa+fsaenjnmOO5k/vVrHPDB2cf2CWW5HntudjGHzsBTcWgUp6
+	 MbRd6zswGi3xw==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net v2] net/rds: rds_sendmsg should not discard payload_len
+Date: Tue, 10 Feb 2026 10:09:52 -0700
+Message-ID: <20260210170952.1836306-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,90 +65,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,intel.com,davemloft.net,google.com,lists.osuosl.org,gmail.com,enjuk.jp,kernel.org,vger.kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258124-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
+	TAGGED_FROM(0.00)[bounces-258125-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:mid,enjuk.jp:dkim,enjuk.jp:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 7F74B11DA20
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6C6C811DA19
 X-Rspamd-Action: no action
 
-On Tue, 10 Feb 2026 17:37:23 +0100, Alexander Lobakin wrote:
+Commit 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with
+connection teardown") modifies rds_sendmsg to avoid enqueueing work
+while a tear down is in progress. However, it also changed the return
+value of rds_sendmsg to that of rds_send_xmit instead of the
+payload_len. This means the user may incorrectly receive errno values
+when it should have simply received a payload of 0 while the peer
+attempts a reconnections.  So this patch corrects the teardown handling
+code to only use the out error path in that case, thus restoring the
+original payload_len return value.
 
-> From: Kohei Enju <kohei@enjuk.jp>
-> Date: Tue, 10 Feb 2026 15:57:14 +0000
-> 
-> > iavf sets LIBIE_MAX_MTU as netdev->max_mtu, ignoring vf_res->max_mtu
-> > from PF [1]. This allows setting an MTU beyond the actual hardware
-> > limit, causing TX queue timeouts [2].
-> > 
-> > Set correct netdev->max_mtu using vf_res->max_mtu from the PF.
-> > 
-> > Note that currently PF drivers such as ice/i40e set the frame size in
-> > vf_res->max_mtu, not MTU. Convert vf_res->max_mtu to MTU before setting
-> > netdev->max_mtu.
-> > 
-> > [1]
-> >  # ip -j -d link show $DEV | jq '.[0].max_mtu'
-> >  16356
-> > 
-> > [2]
-> >  iavf 0000:00:05.0 enp0s5: NETDEV WATCHDOG: CPU: 1: transmit queue 0 timed out 5692 ms
-> >  iavf 0000:00:05.0 enp0s5: NIC Link is Up Speed is 10 Gbps Full Duplex
-> >  iavf 0000:00:05.0 enp0s5: NETDEV WATCHDOG: CPU: 6: transmit queue 3 timed out 5312 ms
-> >  iavf 0000:00:05.0 enp0s5: NIC Link is Up Speed is 10 Gbps Full Duplex
-> >  ...
-> > 
-> > Fixes: 5fa4caff59f2 ("iavf: switch to Page Pool")
-> > Signed-off-by: Kohei Enju <kohei@enjuk.jp>
-> 
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> 
-> Although I'm not sure the 'Fixes:' tag is correct. Was vs_res->max_mtu
-> accounted before switching to Page Pool? If so, then yes, my fault.
-> Otherwise, this issue is older than libie.
+Fixes: 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with connection teardown")
+Signed-off-by: Allison Henderson <achender@kernel.org>
 
-You're right that vf_res->mtu was also not accounted before the commit.
+---
+Changes in v2:
+- Rebased on net/main to fix apply failure in v1
 
-The commit changes:
--       netdev->max_mtu = IAVF_MAX_RXBUFFER - IAVF_PACKET_HDR_PAD;
-+       netdev->max_mtu = LIBIE_MAX_MTU;
-...
--#define IAVF_MAX_RXBUFFER   9728  /* largest size for single descriptor */
+Signed-off-by: Allison Henderson <achender@kernel.org>
+---
+ net/rds/send.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-and thus netdev->max_mtu was already hardcoded, but just because
-IAVF_MAX_RXBUFFER was valid for VFs there hadn't been any issues, and
-invalid MTU could start to be set after the commit.
+diff --git a/net/rds/send.c b/net/rds/send.c
+index 0b3d0ef2f008..071c5dca969a 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -1382,9 +1382,11 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 		else
+ 			queue_delayed_work(rds_wq, &cpath->cp_send_w, 1);
+ 		rcu_read_unlock();
++
++		if (ret)
++			goto out;
+ 	}
+-	if (ret)
+-		goto out;
++
+ 	rds_message_put(rm);
+ 
+ 	for (ind = 0; ind < vct.indx; ind++)
+-- 
+2.43.0
 
-> I'm asking as IIRC before I did set max_mtu to the libie definition,
-> there was a hardcoded value already.
-
-Yea, as far as I checked the value was hardcoded from the beginning
-(91c527a55664 ("ethernet/intel: use core min/max MTU checking")).
-
-Although I'm not attached to the exact commit as the Fixes: tag, I chose
-that since (coincidently) that commit made this regression.
 
