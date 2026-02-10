@@ -1,53 +1,80 @@
-Return-Path: <netdev+bounces-258057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAjiMg8Li2kdPQAAu9opvQ
-	(envelope-from <netdev+bounces-258057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:40:15 +0100
+	id QDwlO/4Li2lXPQAAu9opvQ
+	(envelope-from <netdev+bounces-258059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:44:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D962119B83
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:40:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AC5119C05
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C617E300B530
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:40:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14BE63062FB2
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CFC316912;
-	Tue, 10 Feb 2026 10:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DCB33E34C;
+	Tue, 10 Feb 2026 10:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qy3aLxez"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdGv2XZ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FEE316904;
-	Tue, 10 Feb 2026 10:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5A3342CBA
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 10:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770720010; cv=none; b=GRE2RW482nSItEAPzi4gJSllhfejwk/EtZFMT7uBU8E974cx56ciUsfnr+kAsPYtObyUDCwqLzt7lbZDf82srKiZptR7/+ETWbIrygk61jpf3twQVfgegScgSRLvo9lutaMGPzpcSWZcHwPM/ICF/5hko5rIHy1aqbdkxvtQQqM=
+	t=1770720200; cv=none; b=Q7I1ii8PEDqIrAMaGJ41vHPSPwFAFMMhhmicejCXJo7hlB8nNXsrUshvl2LE1liRSS6chhceIazMRy4L25RxHr9x5Cegq6VvhknGN9MrwNIWNKxhrsxgiUWI14bXQmIwo0HP1I1VlHpk2g99eqeoacRXUsteaRjCdw1gTAdjKqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770720010; c=relaxed/simple;
-	bh=FIv+tmEXWh9/H5O+J8eYReExCUXlQVL0LHvRMPQcucQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nn7a73z65kRemc49IGo3bcSSO/u82pV8/SLAHHUb7/aUPdQZR9YqbaX8cLoF4NAyOhIMKwUGoTi3ZrAVRFiIccpO9Jo3PIXI0bRg+D2SIIO5rhApQm2TtxC2EuP3Sj6NstuFIW1KD3l3nOMtLPKzJ7+f/AdbuFFzMy4CtsPkn9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qy3aLxez; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8B9FC116C6;
-	Tue, 10 Feb 2026 10:40:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770720009;
-	bh=FIv+tmEXWh9/H5O+J8eYReExCUXlQVL0LHvRMPQcucQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qy3aLxezN9koXDlD36Ev/BeXdS7s0wRDfW/jsbhhUVGCj+xe5E7JL2NPFDP+kepVO
-	 wtILpau2nav3Jfy87D5sQVFPURKTqRLLVKCXeZvm9PSOgl0IWaRyB9C4LAU/gAUF/S
-	 eK88lPNRxCyANoftUcX3RXJSsLq3cZ0ozDSvOg2XhcmXOIn9JX2PFSvL9vzYA3nL4c
-	 azAuzLoIvv//Wc5ruMqeWh5xfbj639NizTCak14q5wMNeKz0WMA5wQx19V0QxNZUVG
-	 Ow5TiysFr8XsEmRLfLam8SiIyFhhNj486L0JVSd+jmUbaa+0vsdFW1Eeyu/HCRQISO
-	 nLB4vdPO0mk2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 850FD39B167A;
-	Tue, 10 Feb 2026 10:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1770720200; c=relaxed/simple;
+	bh=vxeDzG0dETAgd8enYff39xewjU+LR/JSW1IPUs7/rrE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LVPJTbqwY3yU9I+/8OXNMxC3yxayskYuwndrEdbLP6QtyPlLsVbfA/7ekmUgWOsnL6TECOQcWxssfo7ycxVzChDmFL92QCV2nUlfTb56LpB5T4fdgT6GMtZaqcvHKvWWXQc3aj6HGhVl0nXvjb9KFG0Ja6ytLxPRiQwI+rqyjtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HdGv2XZ/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770720198;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nfR/OF7oQxX+S9y8bWGeGsU+wME2509CjFgofV0CQpM=;
+	b=HdGv2XZ/rPJ0UcPvF5ggcdfNYGkGtY1IdVRAwoEFcq1ToUzcn/bgeCpJA63VcQ18T7ycy4
+	BugZUgXRV0n/4Yy6HeHFEa/kpeGUglRx/T+sb4F6/33CKyC3UVxf8z4iWlej9ol6T8JIzq
+	cPumobOxET+R1Xy2Q86VHyYTcXZfUNk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-410-yf8Vy9SiOuGcMdPRGTLIiw-1; Tue,
+ 10 Feb 2026 05:43:14 -0500
+X-MC-Unique: yf8Vy9SiOuGcMdPRGTLIiw-1
+X-Mimecast-MFC-AGG-ID: yf8Vy9SiOuGcMdPRGTLIiw_1770720192
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B97A180034D;
+	Tue, 10 Feb 2026 10:43:12 +0000 (UTC)
+Received: from p16v (unknown [10.43.3.152])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3B111180066D;
+	Tue, 10 Feb 2026 10:43:08 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] ice: dpll: fix rclk pin state get and misplaced header macros
+Date: Tue, 10 Feb 2026 11:42:59 +0100
+Message-ID: <20260210104259.121729-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,74 +82,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1] net: atm: fix crash due to unvalidated vcc pointer
- in
- sigd_send()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177072000533.3455745.207010128594113653.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Feb 2026 10:40:05 +0000
-References: <20260205095501.131890-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260205095501.131890-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
- syzbot+1f22cb1769f249df9fa0@syzkaller.appspotmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-kernel@vger.kernel.org
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-258057-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-258059-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,1f22cb1769f249df9fa0];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8D962119B83
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47AC5119C05
 X-Rspamd-Action: no action
 
-Hello:
+Fix two issues introduced in commit ad1df4f2d591 ("ice: dpll: Support
+E825-C SyncE and dynamic pin discovery"):
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+* The refactoring of ice_dpll_rclk_state_on_pin_get() to use
+  ice_dpll_pin_get_parent_idx() omitted the base_rclk_idx adjustment
+  that was correctly added in the ice_dpll_rclk_state_on_pin_set() path.
+  This breaks E810 devices where base_rclk_idx is non-zero, causing
+  the wrong hardware index to be used for pin state lookup and incorrect
+  recovered clock state to be reported via the DPLL subsystem. E825C is
+  unaffected as its base_rclk_idx is 0.
 
-On Thu,  5 Feb 2026 17:54:51 +0800 you wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> 
-> Reproducer available at [1].
-> 
-> The ATM send path (sendmsg -> vcc_sendmsg -> sigd_send) reads the vcc
-> pointer from msg->vcc and uses it directly without any validation. This
-> pointer comes from userspace via sendmsg() and can be arbitrarily forged:
-> 
-> [...]
+* Add bounds check against ICE_DPLL_RCLK_NUM_MAX on hw_idx after the
+  base_rclk_idx subtraction in both ice_dpll_rclk_state_on_pin_{get,set}()
+  to prevent out-of-bounds access on the pin state array.
 
-Here is the summary with links:
-  - [net,v1] net: atm: fix crash due to unvalidated vcc pointer in sigd_send()
-    https://git.kernel.org/netdev/net/c/ae88a5d2f29b
+* The CGU register definitions (ICE_CGU_R10, ICE_CGU_R11 and related field
+  masks) were placed after the #endif of the _ICE_DPLL_H_ include guard,
+  leaving them unprotected. Move them inside the guard.
 
-You are awesome, thank you!
+Fixes: ad1df4f2d591 ("ice: dpll: Support E825-C SyncE and dynamic pin discovery")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/net/ethernet/intel/ice/ice_dpll.c |  5 ++++
+ drivers/net/ethernet/intel/ice/ice_dpll.h | 32 +++++++++++------------
+ 2 files changed, 21 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+index baf02512d041a..73a4e28ed75fc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
++++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+@@ -2440,6 +2440,8 @@ ice_dpll_rclk_state_on_pin_set(const struct dpll_pin *pin, void *pin_priv,
+ 	if (hw_idx < 0)
+ 		goto unlock;
+ 	hw_idx -= pf->dplls.base_rclk_idx;
++	if (hw_idx >= ICE_DPLL_RCLK_NUM_MAX)
++		goto unlock;
+ 
+ 	if ((enable && p->state[hw_idx] == DPLL_PIN_STATE_CONNECTED) ||
+ 	    (!enable && p->state[hw_idx] == DPLL_PIN_STATE_DISCONNECTED)) {
+@@ -2503,6 +2505,9 @@ ice_dpll_rclk_state_on_pin_get(const struct dpll_pin *pin, void *pin_priv,
+ 	hw_idx = ice_dpll_pin_get_parent_idx(p, parent_pin);
+ 	if (hw_idx < 0)
+ 		goto unlock;
++	hw_idx -= pf->dplls.base_rclk_idx;
++	if (hw_idx >= ICE_DPLL_RCLK_NUM_MAX)
++		goto unlock;
+ 
+ 	ret = ice_dpll_pin_state_update(pf, p, ICE_DPLL_PIN_TYPE_RCLK_INPUT,
+ 					extack);
+diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
+index ae42cdea0ee14..8678575359b92 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dpll.h
++++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
+@@ -8,6 +8,22 @@
+ 
+ #define ICE_DPLL_RCLK_NUM_MAX	4
+ 
++#define ICE_CGU_R10			0x28
++#define ICE_CGU_R10_SYNCE_CLKO_SEL	GENMASK(8, 5)
++#define ICE_CGU_R10_SYNCE_CLKODIV_M1	GENMASK(13, 9)
++#define ICE_CGU_R10_SYNCE_CLKODIV_LOAD	BIT(14)
++#define ICE_CGU_R10_SYNCE_DCK_RST	BIT(15)
++#define ICE_CGU_R10_SYNCE_ETHCLKO_SEL	GENMASK(18, 16)
++#define ICE_CGU_R10_SYNCE_ETHDIV_M1	GENMASK(23, 19)
++#define ICE_CGU_R10_SYNCE_ETHDIV_LOAD	BIT(24)
++#define ICE_CGU_R10_SYNCE_DCK2_RST	BIT(25)
++#define ICE_CGU_R10_SYNCE_S_REF_CLK	GENMASK(31, 27)
++
++#define ICE_CGU_R11			0x2C
++#define ICE_CGU_R11_SYNCE_S_BYP_CLK	GENMASK(6, 1)
++
++#define ICE_CGU_BYPASS_MUX_OFFSET_E825C	3
++
+ /**
+  * enum ice_dpll_pin_sw - enumerate ice software pin indices:
+  * @ICE_DPLL_PIN_SW_1_IDX: index of first SW pin
+@@ -157,19 +173,3 @@ static inline void ice_dpll_deinit(struct ice_pf *pf) { }
+ #endif
+ 
+ #endif
+-
+-#define ICE_CGU_R10				0x28
+-#define ICE_CGU_R10_SYNCE_CLKO_SEL		GENMASK(8, 5)
+-#define ICE_CGU_R10_SYNCE_CLKODIV_M1		GENMASK(13, 9)
+-#define ICE_CGU_R10_SYNCE_CLKODIV_LOAD		BIT(14)
+-#define ICE_CGU_R10_SYNCE_DCK_RST		BIT(15)
+-#define ICE_CGU_R10_SYNCE_ETHCLKO_SEL		GENMASK(18, 16)
+-#define ICE_CGU_R10_SYNCE_ETHDIV_M1		GENMASK(23, 19)
+-#define ICE_CGU_R10_SYNCE_ETHDIV_LOAD		BIT(24)
+-#define ICE_CGU_R10_SYNCE_DCK2_RST		BIT(25)
+-#define ICE_CGU_R10_SYNCE_S_REF_CLK		GENMASK(31, 27)
+-
+-#define ICE_CGU_R11				0x2C
+-#define ICE_CGU_R11_SYNCE_S_BYP_CLK		GENMASK(6, 1)
+-
+-#define ICE_CGU_BYPASS_MUX_OFFSET_E825C		3
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.52.0
 
 
