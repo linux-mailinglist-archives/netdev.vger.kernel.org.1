@@ -1,304 +1,758 @@
-Return-Path: <netdev+bounces-258162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WERmG/Sei2noXAAAu9opvQ
-	(envelope-from <netdev+bounces-258162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 22:11:16 +0100
+	id 2HRVOhuni2lPXwAAu9opvQ
+	(envelope-from <netdev+bounces-258163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 22:46:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC2F11F517
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 22:11:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E88111F815
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 22:46:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DCEA3009FB4
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 21:10:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC2813028B28
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 21:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AE933342C;
-	Tue, 10 Feb 2026 21:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B534324B1C;
+	Tue, 10 Feb 2026 21:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SqTCyn4X"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="dw4St+kP"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010004.outbound.protection.outlook.com [52.101.201.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66832335BA8
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 21:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770757844; cv=fail; b=TuACf3OUJ0EBf1gjw0Ui/lXIEr4ToaMibY2ChHNuGRmN6sqgnYcQQ2edPwMlOvTc14MNvbBcifh6Rq0S6R4SoxmHIdibMxv9pwUS9npXtMRbESK7D+u0CwF1LdwvGwvcyb03lW/+hxUJ4xZzEWOaQlZXEX20aY6yUqizmM4Gemw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770757844; c=relaxed/simple;
-	bh=b0q/85VAL0+/umZ9ovE5PuOF/L55ivprf/zkUA5CVlM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=AxTdVtxvLYaPRqqLbu9w4Uo+YGrnzM1fT2ZrIIe37VSgeGtbiSkeDU355oKpyR1SVV5L1+DNGZh9eGsX1/PC+udpuK2APuAJnq050HGQk2DpkNUi0kmic6XK1Qi39ASFRugJbNe+gVfsolb713JSAF0AZEQNtpvmyPwLVM1Hu1Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SqTCyn4X; arc=fail smtp.client-ip=52.101.201.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wMvIOroFrBYdfMM6ZrvaGWjfV8SHHKQqBzfKNflkibkUh8N+QfTVcg/4ydV5GNSUSzHni+Pvqg4YbhOkvaRf2NrTMs82NM+48i651VxDaJk2nI887a4GAjQWNs5eqiot3mfV4mm8LWhIVY91eNrBDcXjXc1nH6Pm2yfzuLf66YqDTAFGohaISFXe9d3a7OVOWCxmT8JbUUrfoNybylskOLkYqdguaWT4oZoOvPNctCIgC4OEZ3MuChqFc+UcVmf8EkoJKn3nCkA8MLG7UuSMTe6mGYsrzglShqUBkB2oJ9eUh1wsz2ItvbADB3TifFCOcw8mXp9JRVLtwil7gSGnLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kGFf8PIHJ8esovxKexD086bHZZZizYo/VGUPb7Pms2w=;
- b=kXov10lWwdg3i6uwUUG+ta1tjnOez+NMTq8etLIH3bkwDS4FY1LQ+KXW4Zsjcng6itwZGFBZdiJCrxIiF8kDbkVTf1jRopwj1GP7e2PrkVuU3+YejQlytimmzhhQSmrjodUiWisAI08xKydyFcfNQ+aJb5F9AkQ5zxPDNkYrWS5/garn/RV2UI5MLHq8uwoTKYXt7vOcXwGHmH1bADBs1mjIqzxBt0eFWB8Ec64QVprHbeiZSBvbEVqSL2EPBEIC88KHxjG9VlLVj7Az9Xul9VyT3YoA+yFxhUwTkhL6Qsu+db1X6pto6h5bxEPPO94lZosJBm8KCUsjfVizj9yUyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kGFf8PIHJ8esovxKexD086bHZZZizYo/VGUPb7Pms2w=;
- b=SqTCyn4X0fXgR2paDDplww7mNCI1VDsTNOKehoeD+pSDsKAkHna7OH8c6e6UYcRhBXE3lCrAowxwBbKGiNMJAJvzT7woAunNR0yOIfBXsa2rEwuenk5ys+W0G7i8tYkrbJFTyN5JxmzW870yU5VGRgospJ4GvlGsyYs2Qoei/+g=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW6PR12MB8900.namprd12.prod.outlook.com (2603:10b6:303:244::19)
- by SA5PPFC3F406448.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8e0) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Tue, 10 Feb
- 2026 21:10:39 +0000
-Received: from MW6PR12MB8900.namprd12.prod.outlook.com
- ([fe80::ff2c:ccff:3267:b91]) by MW6PR12MB8900.namprd12.prod.outlook.com
- ([fe80::ff2c:ccff:3267:b91%6]) with mapi id 15.20.9587.017; Tue, 10 Feb 2026
- 21:10:39 +0000
-Message-ID: <64112a86-156e-43cf-8fa5-8038ea0037e9@amd.com>
-Date: Tue, 10 Feb 2026 13:10:37 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] xsk: Fix zero-copy AF_XDP fragment drop
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, sdf@fomichev.me,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
- ",nikhil.rao"@amd.com
-References: <20260209182642.237904-1-nikhil.rao@amd.com>
- <20260209182642.237904-3-nikhil.rao@amd.com> <aYpXxAowNQe99cEm@boxer>
- <aYtaioooXhsXVL0G@boxer>
-Content-Language: en-US
-From: "Rao, Nikhil" <nikhirao@amd.com>
-In-Reply-To: <aYtaioooXhsXVL0G@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR05CA0082.namprd05.prod.outlook.com
- (2603:10b6:a03:e0::23) To MW6PR12MB8900.namprd12.prod.outlook.com
- (2603:10b6:303:244::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507C2338F45
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 21:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770759912; cv=none; b=HxQY3IPCHt60kzc6PeR6RKc24ygKx9Fa4V+Q9K8Y823XhvhzZXwERLMksGCUEl/zf1xa6FzyS1Mw6egbvMOl4yNiXl5zXRPyq0Iss0Zw5E2siWU4DkxGVqV8Kksq4RNZJqmziP0VHR8CbDN3H6rUTeQnXmQwLDhea7b8yGwLmBE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770759912; c=relaxed/simple;
+	bh=62dA9GaWrthTYIf7+jp6WMu/ccvy5bnyrSALWnkHMRI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M2PUNDY9qYF0S04GXXeYCBdvjy09iL2cpSWR/jZH8593o3xM+9diH5jZpJlDWuVego7rg4gGo5XDuJfDG21P1F0uUupZPKzLI1LtL8LNLedqe9yy4/0TgW1PSoiDfMTaFhg+tDD2QQ/VOJZl3Ca4IA6ONodiPAaZ6mZuq1KZoOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=dw4St+kP; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12336c0a8b6so336238c88.1
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 13:45:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=herbertland.com; s=google; t=1770759909; x=1771364709; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tz35IFWH/TxMzsGiAflTbXQHPA7C4kVrCTDy1k0OhXM=;
+        b=dw4St+kPYNEk12TTpTBwmwvDu3QHgZ3AD2FjQnCW8csHNJWcRYWg/8xLdzodPtwMU9
+         R+4EkCuhc+o0oXZHbqr4Y82vfB/ywKyoFBew2Os/GTl9uMkSwuo1Yfie52bG8PPw+0bf
+         kf/7YrXECoieMH/zQID5yIY3HRtUp+Hb2V5f/rTYJqxVJpuqgb+u+J00r4S1vO3HMvng
+         DBqM94Bl/3xvZGMBQmGaizmoXuhRt4NgieR6hzK1hkyXN/dDn81ichz6zLI7g6gFFNfJ
+         cJg4Zi0yUuGDtKUJbp7Iwew0noWN4NmYSrS1zCBqS6D4piz5crS8aEoUGWaO7JSulFwe
+         92jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770759909; x=1771364709;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tz35IFWH/TxMzsGiAflTbXQHPA7C4kVrCTDy1k0OhXM=;
+        b=tiaQzLp/rw5se8v5CT2yhxMCbe14csteNvxuqI9dv2kXZdcY4/NrcGZFXh0tkHUbF0
+         lC74lWaY74MCAysLeeENoa7RvJkAMpR27gQIhhBAJgjAiGRzrFDRkIhacSoflrlxxL8C
+         U5plM4m/CBWfuc7QK2Tk5ndIPz8XQn8gTUGZQVeqxGbBRCiiY7N0IjAfKdJmEF4IiK7W
+         YsITnDIaSwlVQlFcfLNhHUJD1wOhF/5cTwIzHqIHn7ejywaUBnxGhDFwiVFYF6rAgLu2
+         qILsYrGg/xf2ZgcC8dQdQcdc1y4B8PSdA8/naJPoRqe6lqFoG7Ey3xdUmZlkhqABca5g
+         J/uw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4StFWjYeHNnSy4MuRflE1t+oMuM3PEvgWqQYMxqfTQFmrtDhfH7DZfLUaKKFW6Ff4aU0f1cU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2RSFgQSbWrsAcwqEA0oyU1Q1LxxT9Ydp6npKqclh2tAHq7MGd
+	MpXfscja81LOH7mUlPLsH7h+v0/k4qLd/9oMAbC5r6lRuDpBGCHmGY7GSAdHmoDTSQ==
+X-Gm-Gg: AZuq6aJ3fxuLH0u2ehk5C1n7j5FiQa6zGups2adFNZ2dYqPpnCskZTkyuUobnpzyRdH
+	yBOWw5ldpe9rC1N05rfnviEjs0QMb7+i41Qv2TbkUPt9coYIs7/2qswT6XuOhF9b0HemOmCHVVh
+	IJ4gF0eqTp3+pYmPVHAUd8TGQwZXpPUAkGt/2EEQ+A+hPw7ycDE/bsAdohaF5qnSmtrtBXQjdgi
+	cRowjYJADicoLeALl8phfSdm3Gn6yIlR28xq+rln3MJBsXELmBCI2vKGlIZkPsuFm9WSTqSdo1m
+	VSMWcS+Ak1rGixnWeTaQqV8gc3LeoQrLUnti7X42K2VBNHVkYT4/ON4DlIKwxAchOzNQdGawY3M
+	4P0nEFHwXy2TjUC5flTd2PupHuRZQeVwZK0r90QoaViuoytShQcQ71wmbNGEkSk57kMbhiQFYLR
+	1rDHc+XLPec71Gi4Akh2Ht3cDQl1RwV2ShmA88T4oTUAhGjcsZula7yo1KnlbRyXf8WmA=
+X-Received: by 2002:a05:7022:404:b0:11b:7824:5c97 with SMTP id a92af1059eb24-127041820d5mr6536580c88.40.1770759909058;
+        Tue, 10 Feb 2026 13:45:09 -0800 (PST)
+Received: from pong.herbertland.com ([2601:646:8980:b330:83c1:47eb:d3d4:880])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1270433ab31sm13560396c88.11.2026.02.10.13.45.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Feb 2026 13:45:08 -0800 (PST)
+From: Tom Herbert <tom@herbertland.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	justin.iurman@uliege.be,
+	willemdebruijn.kernel@gmail.com,
+	pabeni@redhat.com
+Cc: Tom Herbert <tom@herbertland.com>
+Subject: [PATCH net-next v7 10/10] test: Add networking selftest for eh limits
+Date: Tue, 10 Feb 2026 13:44:54 -0800
+Message-ID: <20260210214454.40106-1-tom@herbertland.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB8900:EE_|SA5PPFC3F406448:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87d76343-8a51-4ec0-cab5-08de68e8d7ae
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WlE5alNJZEE0SEZuaFFqNVp2b1BPL0hJc2R3OElJb3FHZ2tVTTJjOXI2bEoy?=
- =?utf-8?B?bmZSNWdLZXQ5S1h6ZnFrNkJBU1F3RGc1U1hVZldyYXNILzlKNUlsWTJmZ0N6?=
- =?utf-8?B?MlJFOEJRMHZUZlNDelhVWFMwN2N3d1lTd0xYcm5Hc3dmSmFCclFLYUp5SHEy?=
- =?utf-8?B?bGQvS2pJd0pCaGZERFFmejk2RUFXb0tCYzVWMmQ0cXFCYytkYkd3ZFdRZ1FV?=
- =?utf-8?B?SU5kMHVET0JHTXdDNHlEYzV6SnZ5OFJOVE1yY3RuemhZaElvTjY5b1FEdUlr?=
- =?utf-8?B?NzVWQWNyMmJLdGFTdU1xbUE5cVQ4emNyWnk5TVhsejNyNGQySHhNVVowc0Jj?=
- =?utf-8?B?REtvWnB0NEExMi9sOXIzRW1CbHpPbWg4dTFJSGdKbDlZYjNNOWdTWXlJOGpT?=
- =?utf-8?B?d0IvVlVuQ1J3Zzc0UExrVVdXRm9TK1RaSWhSNHNHUUdueU1yL09wU3NrNU91?=
- =?utf-8?B?NWpBWXBwVnYwWUxMaHBSRTRhRVhOUnBjNTJKREFURWFZZDhNeTZWSzRCTHZz?=
- =?utf-8?B?NkxsdUwvUUlXdVpnVk9DVHpNNjZPUUFMNStJZXJScXlVeVAzLzZYWHc3R2FT?=
- =?utf-8?B?dGdBZk9uVmtqWjQwTVVQaG0rNEZ4N0krUDNNcnFFQmV6RklwL09pbTNGSFdJ?=
- =?utf-8?B?Ykt5SnJzaEtSa1dzRDVvbVRzMmxuY21ZVGVNR1FnT3FLOFlLY1R0dGVhdXE1?=
- =?utf-8?B?MnZLcFR2NEM3eGJpQ0JVRjlRV3VPKzBwSklCaVpFVXZkWFI3VWQ2SUZTRWNm?=
- =?utf-8?B?a1cxN0xGQkpyU2pVYzdDeVkyVEtqdkIxM2N5azZWV2pxUFdHT2VySVhxL1JS?=
- =?utf-8?B?UG0zM1hvTFdML3VubFNkenYyVUZuNnE2dTVvU1lnNVJyVzh5Mkx5ZkFpTFZV?=
- =?utf-8?B?d01BdHFPOUZoVWZPMXBrSlRzRWVpbUZFTzdxMDVoK0wxNXNncXVJays0SlN0?=
- =?utf-8?B?WmZ1ekxLK0ZWblJKaWdtNnVZa21UMWRoN1NOKzUvNEFMazV3a0VZOGRObWFt?=
- =?utf-8?B?NHBtOXFVL2Fqb1E0MmlZZE5WWSt1dGpwSW44aEVTOXhHanBNSXVidFZWcHFO?=
- =?utf-8?B?NTRmcHAveitwUGFiS0RZNXplOFRCRDRHd1h4Rll3ZUF6Y1pEV2o1VlUrQzNE?=
- =?utf-8?B?U1NLdHdyZE10YXdreVp6SUJMeDB0Sjkzb1p3dzgreWNhS0xmQlowdVZLVEJn?=
- =?utf-8?B?V25FTFZWZzZmZ3JHOUlHOFBlbzVPMS9tQi9sR0YxUW96WTc0c0o3bUk2ZFRk?=
- =?utf-8?B?REY0YUFSVjdmSGFXZk9jTHU2bTczaEI3eEtGdHNwS0ZlbStxSXowT05KNnZs?=
- =?utf-8?B?M3Y4U2RQaUVjOVUvc2QrRzdLK0M4b3dMTFpGTXpRazVITVp6UXJnVHAzcGhN?=
- =?utf-8?B?Q0xGbVNYUVhpZllaMWkvUG0zWnZWMGdSRExocGt0Umo3NVRHODBjMC9HSHdB?=
- =?utf-8?B?eis3V0tHMThZUTY2RUpWckt2S2FHZzlCRDczMDNGU0tPZzFYMUVDeGJXSEcr?=
- =?utf-8?B?Z1R4RXV6UGVOcXVlN3U3cnRHZzNkajFERlM2SmFvVzJKSnEzQlVBQnZSRWU5?=
- =?utf-8?B?VWFOcUpFSDBUWmxkMDgwckN0YWVIR25lSFVadjFqTU44enhxcG1WK2Q2RS84?=
- =?utf-8?B?azlqL1ZDdzFYLzJvM0s5K0I3eHcwN0RETE03WXU2SHdNUGk2OVdiMGYyWXps?=
- =?utf-8?B?cHNnejEwa0VCbW5TSFlLUmxrM0M5WUk0WXhNeHNLTlR4cXRPNitueS9JVXBr?=
- =?utf-8?B?bGU2UjRrRzJKWkhuSDZ5UmZya1VUSjMyYXpZc3o1NzBNOThCakxNOWtNN1VL?=
- =?utf-8?B?OUxBcnI1bEpKZGNPU3hhRmVPa2tteGo3SCtYK3VVNWtNclZZQUVjUmd0R1Fu?=
- =?utf-8?B?T1B1UFdzSU56T2paVmVkeitSeE9oa2xDcVFmV3MxNkZtTEw4eUhTbEtBeXRO?=
- =?utf-8?B?QW9JWjRnY21TTllMVmhWNEoxMUI1dmd6VkRoTTZHMWRvMVhMLzVwczNyNkZJ?=
- =?utf-8?B?RTdrbENiQktFYzROQzNSTEtqZ0lxbXU3S2NBemxwbDlCWnN0ZVJjZng1OGNH?=
- =?utf-8?B?dmMwdXJ0U1RIam5tTjVZamloOEN6VTBTN0hBc2Y3eTgvOFI3ZDgvY1diWllP?=
- =?utf-8?Q?qLCw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB8900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UWt0N2Z6eUVCcGtwWXN4ZUpmSW9TUHlTY2NGNGlFZWwvSy9qNENkcnJJcWtD?=
- =?utf-8?B?aUxzTUZjUWFPdjV6bkdSbmM1WWVhUHhJZmZ1MWova2luaXhBZmF4cmsxYU94?=
- =?utf-8?B?NlArM1lQdXRxRzZuRm01WkMyV3FsY3BMVWJDck1sS0FqRkNOUTlJS1I4TFlN?=
- =?utf-8?B?UmRUdnpIZUgxVTlxbFNpTHFseWFza3EwNWFzNllaVi9LRTNXa0VtTWN4bmI5?=
- =?utf-8?B?WEVKK3pLTzFtT1BVRmlLa1k1U3BCR2YvdVJ4SEVyOTlDd01RZkt3U2phc3F6?=
- =?utf-8?B?VStTODAzYzZoZHFOTm5PcGlIR1FCc2hYaVlzS2JJRjlxRnpZRVpmMC8vcXJ1?=
- =?utf-8?B?QWYwREhEVFJWRk1Sb1c1NGdZcmI1N0VQcDM0MHcvWCtJVGFITk9SREpuZ2Zz?=
- =?utf-8?B?d1FDMDFocnBsd2daNTF0NklUVkU0WUkySzQrMXM0MVVpMVVBOFJRbEdLTEQr?=
- =?utf-8?B?Q2xhM2piUTgrSEpJWFZGWmU4bVVubUR2MTlVMVF4SEp1dnEwQmY3b1hjYUcr?=
- =?utf-8?B?Sll2VlAwY1BnVDRSNVIxMW4rY2c2NHJ2RjlnejNLNVZjWjVzeng1bWZybXFB?=
- =?utf-8?B?MjQyVlRBa0tneWt2aVhVZS9IYWNFc2Y3bGZ0RVQ1QUozbytEU2VGY242N0F3?=
- =?utf-8?B?ampqT2dXdDNTWitlZTRDcjJvQWJhaWdpbm1KcG1WUU1uREEwcW13MU5KQmlV?=
- =?utf-8?B?Q3FOei9vUmtxeDNlZm95QTFZbjFlckVhMUFWbHU1NWF6dlJqdEVzK3N1K2JP?=
- =?utf-8?B?TmRwZEtjZUZrSUQxZVcrUWpFNHU4aU1QZk9GQ3RHWFRRQ0Q0UXlnR2ZFYkdx?=
- =?utf-8?B?NFp0WkdPc0djV1NoaGVLelZLODU1RXRjSksrY0djUlFBemxXNk0yaTJCUys2?=
- =?utf-8?B?a2RkbmF6Y3JPYVZWRE5tMHM3cTVTZW5oTnY4MkNKL0ZZUW0zMk45aWhrNm51?=
- =?utf-8?B?N1MxOW44OXNJOHJoOFhYT2pFZFMyVDdVcGZDM0VZb0oyYnU2T2M4djhOalZG?=
- =?utf-8?B?ak8vdlhxWk5hNE9XbWQyWkFkSUkvMkNoZDJxdmt5K1JHM2w2MzFEUTFCaklJ?=
- =?utf-8?B?WitmYkJPTHcyTWF3STRRU1ZKRmZBRGk1VUZVUzhnTDhOVUJjV0FEWFkxUFpF?=
- =?utf-8?B?ejZDWFlKOTc0d1dDSy9IMlJtd0FVdmxtN2hyWm5KRUFsUjMyTmZNOVU2Ymor?=
- =?utf-8?B?aHlvRS9xUVVQdDIwaUNnOXNsdnYyUzJnUzhtMzJWN2dOcmdjbmFpY1dxN2o1?=
- =?utf-8?B?cnJUMGNyQjFzSVNCNUVnS2Q1R0M1Wnk1Q3F4RkV4ditSY3pRK2FlV3JTcWlC?=
- =?utf-8?B?UmZKc1pmdXN2V0NvcEdveW9KT2h1VkNIRHVoNk1RRmpkRk93R29TSEU1cWw4?=
- =?utf-8?B?Ty9EaFpIdWtVMHRBQ0VZS092WkRYcW5DZDNWSUZHSFpaamFlSzVGZUlCNVdo?=
- =?utf-8?B?cUlBSGxGWmUzWHd6ZW1vektLVDFNZndYYXVoNmF4OFJnZGc5WVhEM1ZJSmRT?=
- =?utf-8?B?MlluOEZoQjI1dS9CdXVTWGNndmk0ZXBLOEx5T1psMlF1ckJyL2xacVJGakZQ?=
- =?utf-8?B?TDUwQVBIbkluNHFEeGl3VVVPZzJNMU5sZDBacFMyeDJXRFY3ZXpwSFVmUkFp?=
- =?utf-8?B?RzlTa1FjOVdHLzY1SzZUQ2JTcmVSMDJWS0tWV0lJdDZ6Rnd0dGJPQytnQWNw?=
- =?utf-8?B?dmpmVzJna0w4S3Z3bHRMZ1hVaURYRGpiam9LNXVPTlUxVTB4VFgzTFRmQlVF?=
- =?utf-8?B?WTh0VlhOaTJDdUFaRWs1aXVJS2R6bzhyb3ZuWEdERE9mNXBQSEk2djFjSXlZ?=
- =?utf-8?B?dU1KWkhwaGtheFpHVzA3MTMxUTRnanptNi90cjkrbHBKd3pSQ1hYamJjb0h5?=
- =?utf-8?B?UkRDbCt5c0NFUWlybDRQWHkraWttdjJKZE54MlNQVndDcFl3eGZxTVhPa0lz?=
- =?utf-8?B?SytXWXpyVHdBbnlabG9hcHEyWVVuM1VMcG9BVHJkS3Z2MnhGR3A5Yk5hV21Y?=
- =?utf-8?B?VVVTbXBEMzd1b2tSK0ZGYUFBaDB2VDRnN3QxcE9RTmcwZzBsM3pvM0w3bDNK?=
- =?utf-8?B?Uld0Nk9xZnBjNDlGSFREdndWaFQ0dWlmaFkyOWlLUXIxeUFRYy9FeERPVUhx?=
- =?utf-8?B?VGt4RjM0Vy9raVRrL29QcDduNE93ZEtQbWZGWTZzN2l3Y1dVOVRleEU0MDlp?=
- =?utf-8?B?aTNMb2RLZlB3THAzR3BFTndxU2c1RmJKdjMwbUUrL2tyelZralkxZ1BoRU9Y?=
- =?utf-8?B?R3BzaHVCemxiVEpobUVsRFlrRVV2elBPQXA1OXVkVHhuQ0NrM3NNYTZNVFZC?=
- =?utf-8?B?ZUw2SXVhdk9MNVA1cnBEdnl4S3hQVEZyUVlzQzRPU0FQc0FlNWR1Zz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87d76343-8a51-4ec0-cab5-08de68e8d7ae
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB8900.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2026 21:10:39.5146
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: O0o+bWHUPSG31EyOdHW8KeqzQ7VxOKwp2iaqPMQdMHXLx/TkzIKlTAUfWceV5d2EdQrqLcR9C8Qx/UQqiX/LTQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPFC3F406448
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,amd.com];
-	TAGGED_FROM(0.00)[bounces-258162-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-258163-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[herbertland.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,amd.com:mid,amd.com:dkim,amd.com:email]
-X-Rspamd-Queue-Id: BDC2F11F517
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.sh:url,eh_limits.py:url]
+X-Rspamd-Queue-Id: 4E88111F815
 X-Rspamd-Action: no action
 
+Add a networking selftest for Extension Header limits. The
+limits to test are in systcls:
 
-Sorry for the duplicate - sending without html this time.
+	net.ipv6.enforce_ext_hdr_order
+	net.ipv6.max_dst_opts_number
+	net.ipv6.max_hbh_opts_number
+	net.ipv6.max_hbh_length
+	net.ipv6.max_dst_opts_length
 
-On 2/10/2026 8:19 AM, Maciej Fijalkowski wrote:
-> 
-> On Mon, Feb 09, 2026 at 10:55:16PM +0100, Maciej Fijalkowski wrote:
->> On Mon, Feb 09, 2026 at 06:24:51PM +0000, Nikhil P. Rao wrote:
->>> AF_XDP should ensure that only a complete packet is sent to application.
->>> In the zero-copy case, if the Rx queue gets full as fragments are being
->>> enqueued, the remaining fragments are dropped.
->>
->> All of the descs that current xdp_buff was carrying will be dropped which
->> is incorrect as some of them have been exposed to Rx queue already and I
->> don't see the error path that would rewind them. So that's my
->> understanding of this issue.
->>
->> However, we were trying to keep the single-buf case as fast as we can, see
->> below.
->>
->>>
->>> Add a check to ensure that the Rx queue has enough space for all
->>> fragments of a packet before starting to enqueue them.
->>>
->>> Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
->>> Signed-off-by: Nikhil P. Rao <nikhil.rao@amd.com>
->>> ---
->>>   net/xdp/xsk.c | 22 +++++++++++-----------
->>>   1 file changed, 11 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
->>> index f2ec4f78bbb6..b65be95abcdc 100644
->>> --- a/net/xdp/xsk.c
->>> +++ b/net/xdp/xsk.c
->>> @@ -166,15 +166,20 @@ static int xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
->>>      u32 frags = xdp_buff_has_frags(xdp);
->>>      struct xdp_buff_xsk *pos, *tmp;
->>>      struct list_head *xskb_list;
->>> +   u32 num_desc = 1;
->>>      u32 contd = 0;
->>> -   int err;
->>>
->>> -   if (frags)
->>> +   if (frags) {
->>> +           num_desc = xdp_get_shared_info_from_buff(xdp)->nr_frags + 1;
->>>              contd = XDP_PKT_CONTD;
->>> +   }
->>>
->>> -   err = __xsk_rcv_zc(xs, xskb, len, contd);
->>> -   if (err)
->>> -           goto err;
->>> +   if (xskq_prod_nb_free(xs->rx, num_desc) < num_desc) {
->>
->> this will hurt single buf performance unfortunately, I'd rather have frag
->> part still executed separately. Did you measure what impact on throughput
->> this patch has?
->>
->> Further thought here is once we are sure about sufficient space in xsk
->> queue then we could skip sanity check that xskq_prod_reserve_desc()
->> contains. Look at batching that is done on Tx side.
->>
->> Please see what works best here. Whether keeping linear part execution
->> separate from frags + producing frags in a 'batched' way or including
->> linear part with this 'batched' production of descriptors.
-> 
-> What I meant was patch below. However this is not a fix so I wouldn't
-> incorporate it to your set. Maybe let's go with just processing linear
-> part separately just like it used to be and then I can follow-up with this
-> diff.
->
-Agreed, this change can be implemented without any change to single buf 
-performance.
+The basic idea of the test is to fabricate ICMPv6 Echo Request
+packets with various combinations of Extension Headers. The packets
+are sent to a host in another namespace. If a an ICMPv6 Echo Reply
+is received then the packet wasn't dropped due to a limit being
+exceeded, and if it was dropped then we assume that a limit was
+exceeded. For each test packet we derive an expectation as to
+whether the packet will be dropped or not. Test success depends
+on whether our expectation is matched. i.e. if we expect a reply
+then the test succeeds if we see a reply, and if we don't expect a
+reply then the test succeeds if we don't see a reply.
 
-Let me know if this looks good to you:
+The test is divided into a frontend bash script (eh_limits.sh) and a
+backend Python script (eh_limits.py).
 
-     if (frags) {
+The frontend sets up two network namespaces with IPv6 addresses
+configured on veth's. We then invoke the backend to send the
+test packets. This first pass is done with default sysctl settings.
+On a second pass we change the various sysctl settings and run
+again.
 
-     } else {
+The backend runs through the various test cases described in the
+Make_Test_Packets function. This function calls Make_Packet for
+a test case where arguments provide the Extension Header chain to
+be tested. The Run_Test function loops through the various packets
+and tests if a reply is received versus the expectation. If a test
+case fails then an error status is returned by the backend.
 
-         /* handle single buf */
+The backend script can also be run with the "-w <pcap_file>" to
+write the created packets to a pcap file instead of running the
+test.
 
-     }
+Signed-off-by: Tom Herbert <tom@herbertland.com>
+---
+ tools/testing/selftests/net/Makefile     |   1 +
+ tools/testing/selftests/net/eh_limits.py | 349 +++++++++++++++++++++++
+ tools/testing/selftests/net/eh_limits.sh | 205 +++++++++++++
+ 3 files changed, 555 insertions(+)
+ create mode 100755 tools/testing/selftests/net/eh_limits.py
+ create mode 100755 tools/testing/selftests/net/eh_limits.sh
 
-     /* handle multi-buf */
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index afdea6d95bde..73195a2e8f1e 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -24,6 +24,7 @@ TEST_PROGS := \
+ 	cmsg_time.sh \
+ 	double_udp_encap.sh \
+ 	drop_monitor_tests.sh \
++	eh_limits.sh \
+ 	fcnal-ipv4.sh \
+ 	fcnal-ipv6.sh \
+ 	fcnal-other.sh \
+diff --git a/tools/testing/selftests/net/eh_limits.py b/tools/testing/selftests/net/eh_limits.py
+new file mode 100755
+index 000000000000..46a460b9149e
+--- /dev/null
++++ b/tools/testing/selftests/net/eh_limits.py
+@@ -0,0 +1,349 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++# Test of extension header limits
++
++import getopt
++import struct
++import sys
++import socket
++import scapy.all
++import proto_nums
++import ext_hdr
++
++# Constants
++
++VERBOSE = False
++SOURCE_MAC = "00:11:22:33:44:55"
++DESTINATION_MAC = "AA:BB:CC:DD:EE:FF"
++SOURCE_IP = "2001:db8::7"
++DESTINATION_IP = "2001:db8::8"
++PACKET_LIST = []
++PCAP_OUT=""
++GLOB_IDENT = 1111
++ETHER_FRAME = scapy.all.Raw()
++WITH_ETH = False
++
++# Parse command line options
++def cli_args():
++    global VERBOSE, SOURCE_MAC, DESTINATION_MAC, SOURCE_IP
++    global DESTINATION_IP, PCAP_OUT
++
++    args = sys.argv[1:]
++
++    try:
++        opts, args = getopt.getopt(args, "vw:",
++                        ["verbose", "src_eth=", "dst_eth", "src_ip=",
++                         "dst_ip=", "pcap_out="])
++    except getopt.GetoptError as err:
++        # Print error message and exit
++        print(err)
++        sys.exit(2)
++
++    for opt, arg in opts:
++        if opt in ("-v", "--verbose"):
++            VERBOSE = True
++        elif opt in ("--src_eth"):
++            SOURCE_MAC = arg
++        elif opt in ("--dst_eth"):
++            DESTINATION_MAC = arg
++        elif opt in ("--src_ip"):
++            SOURCE_IP = arg
++        elif opt in ("--dst_ip"):
++            DESTINATION_IP = arg
++        elif opt in ("-w", "--pcap_out"):
++            PCAP_OUT = arg
++
++# Make an ICMP echo request packet with the requested Extension Header chain
++def make_packet(text_name, eh_list):
++    global GLOB_IDENT
++
++    hdr = scapy.all.Raw()
++    plen = 0
++
++    hdr = scapy.all.ICMPv6EchoRequest(id=GLOB_IDENT)/hdr
++    plen += 8
++
++    pair = ext_hdr.make_eh_chain(
++            proto_nums.IP_Proto.IP_PROTO_IPv6_ICMP.value, eh_list)
++    hdr = pair[0]/hdr
++    plen += pair[1]
++
++    ipv6_pkt = scapy.all.IPv6(src=SOURCE_IP, dst=DESTINATION_IP,
++                              nh=pair[2], plen=plen)
++    hdr = ipv6_pkt / hdr
++    plen += 40
++
++    if WITH_ETH:
++        hdr = ETHER_FRAME/hdr
++        plen += 14
++
++    PACKET_LIST.append((hdr, plen, GLOB_IDENT, pair[3], text_name))
++    GLOB_IDENT += 1
++
++# Write a pacp file with all the created packets
++def write_pcap(pcap_out):
++    global ETHER_FRAME, WITH_ETH
++
++    ETHER_FRAME = scapy.all.Ether(src=SOURCE_MAC, dst=DESTINATION_MAC,
++                                  type=0x86DD)
++    WITH_ETH = True
++
++    packets=[]
++    for packet in PACKET_LIST:
++        packets.append(packet[0])
++
++    scapy.all.wrpcap(pcap_out, packets)
++
++def process_return(recvd_it, packet):
++    if VERBOSE:
++        if recvd_it:
++            if packet[3]:
++                print(f"TEST: {packet[4]}: Received as expected")
++            else:
++                print(f"TEST: {packet[4]}: Unexpected receive")
++        else:
++            if packet[3]:
++                print(f"TEST: {packet[4]}: Didn't receive, "
++                      "but receive expected")
++            else:
++                print(f"TEST: {packet[4]}: Didn't receive as expected")
++
++    if (recvd_it and packet[3] is not True):
++        # We got a reply but weren't expecting one
++        print(f"FAIL: Receive was unexpected for {packet[4]}")
++        return False
++
++    if (not recvd_it and packet[3]):
++        # We didn't get a reply but weret expecting one
++        print(f"FAIL: Expected to receive for {packet[4]}")
++        return False
++
++    return True
++
++# Run ping test
++def run_test():
++    # Open raw ICMP socket
++    try:
++        sock = socket.socket(socket.AF_INET6, socket.SOCK_RAW,
++                  socket.IPPROTO_ICMPV6)
++    except PermissionError:
++        print("This script requires root privileges.")
++        return 2
++
++    # Bind to interface by its IP address
++    sock.bind((SOURCE_IP, 0))
++
++    # Run through each packet
++    for packet in PACKET_LIST:
++        # Send packet
++        scapy.all.send(packet[0], verbose=False)
++
++        sock.settimeout(0.100)
++        recvd_it = False
++
++        # Try to get ICMP echo reply
++        try:
++            while not recvd_it:
++                rpacket, _addr = sock.recvfrom(1024)
++                icmp_type = rpacket[0]
++                identifier = struct.unpack(">H", rpacket[4:6])
++                if (icmp_type ==
++                    proto_nums.ICMP6_Type.ICMPV6_ECHO_REPLY.value and
++                    identifier[0] == packet[2]):
++                    recvd_it = True
++
++        except socket.timeout:
++            pass
++
++        process_return(recvd_it, packet)
++
++    return 0
++
++# Make packets for various test cases
++def make_test_packets():
++    # Two non-padding options in HBH and DestOpt, should succeed
++    # with default sysctls
++    make_packet("Two non-padding options in HBH and DestOpts",
++        [
++            ("H", [(11, 4), (0, 0), (0, 0), (12, 3)]),
++            ("D", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++            ("D", [(1, 4), (12, 3)]),
++        ])
++
++    # Big destination option, should fail when
++    # net.ipv6.max_dst_opts_length equals 64
++    make_packet("Big destination option",
++        [
++            ("H", [(11, 4), (0, 0), (0, 0), (12, 3)]),
++            ("D", [(1, 4), (12, 255)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++        ])
++
++    # Almost Big HBH option should succeed when
++    # net.ipv6.max_hbh_length equals 64
++    make_packet("Almost Big HBH option",
++        [
++            ("H", [(11, 53), (1, 0), (12, 3)]),
++            ("D", [(1, 4), (12, 1)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++        ])
++
++    # Big Hop-by-Hop option, should fail when
++    # net.ipv6.max_hbh_length equals 64
++    make_packet("Big HBH option",
++        [
++            ("H", [(11, 53), (1, 0), (0, 0), (12, 3)]),
++            ("D", [(1, 4), (12, 1)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++        ])
++
++    # Too much HBH padding, should always fail
++    make_packet("Too much HBH padding",
++        [
++            ("H", [(12, 3), (1, 8)]),
++            ("D", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++            ("D", [(1, 4), (12, 3)]),
++        ])
++
++    # Too much DestOpt padding, should always fail
++    make_packet("Too much DestOpt padding",
++        [
++            ("H", [(12, 3), (1, 8)]),
++            ("D", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++            ("D", [(1, 4), (12, 3), (0, 0), (1, 6), (0, 0), (12, 3)]),
++        ])
++
++    # Too much DestOpt padding, should always fail
++    make_packet("Too much DestOpt padding #2",
++        [
++            ("H", [(12, 3)]),
++            ("D", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++            ("D", [(1, 4), (12, 3), (0, 0), (0, 0), (0, 0), (0, 0),
++                   (0, 0), (0, 0), (0, 0), (0, 0), (12, 3)]),
++        ])
++
++    # Too much DestOpt padding, should always fail
++
++    make_packet("Too much DestOpt padding #3",
++        [
++            ("D", [(0, 0), (0, 0), (0, 0), (0, 0),
++                   (0, 0), (0, 0), (0, 0), (0, 0)]),
++        ])
++
++    # Almost too much DestOpt padding, should succeed with default
++    # sysctl settings
++    make_packet("Almost too much DestOpt padding #2",
++        [
++            ("H", [(12, 3)]),
++            ("D", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("F", (0x89abcdef)),
++            ("D", [(1, 4), (12, 3), (0, 0), (0, 0), (0, 0), (0, 0),
++                   (0, 0), (0, 0), (0, 0), (12, 3)]),
++        ])
++
++    # Two Dest Ops, should fail unless net.ipv6.enforce_ext_hdr_order
++    # equals 1
++    make_packet("Two Dest Ops",
++        [
++            ("D", []),
++            ("D", []),
++        ])
++
++    # OOO Routing headers, should fail unless
++    # net.ipv6.enforce_ext_hdr_order equals 1
++    make_packet("OOO Routing header",
++        [
++            ("F", (0x89abcdef)),
++            ("R", [ "888::1", "9999::1"]),
++        ])
++
++    # Two Routing headers, should fail unless
++    # net.ipv6.enforce_ext_hdr_order equals 1
++    make_packet("Two Routing headers",
++        [
++            ("R", [ "888::1", "9999::1"]),
++            ("R", [ "888::1", "9999::1"]),
++        ])
++
++    # Two DestOpt headers with Routing header should succeed with default
++    # sysctl settings
++    make_packet("Two Destination options okay",
++        [
++            ("D", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3)]),
++        ])
++
++    # Two DestOpt headers without Routing header should fail unless
++    # net.ipv6.enforce_ext_hdr_order equals 1
++    make_packet("Two Destination options",
++        [
++            ("D", [(1, 4), (12, 3)]),
++            ("D", [(1, 4), (12, 3)]),
++        ])
++
++    # Two DestOpt headers after Routing header, should fail unless
++    # net.ipv6.enforce_ext_hdr_order equals 1
++    make_packet("Two Destination options after RH",
++        [
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3)]),
++            ("D", [(1, 4), (12, 3)]),
++        ])
++
++    # Many extension headers, should fail unless
++    # net.ipv6.enforce_ext_hdr_order equals 1
++    make_packet("Many EH OOO",
++        [
++            ("H", [(1, 4), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3)]),
++            ("D", [(1, 4), (12, 3), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3)]),
++            ("F", (0x89abcdef)),
++            ("D", [(1, 4), (12, 3), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3), (12, 3)]),
++            ("R", [ "888::1", "9999::1"]),
++            ("R", [ "888::1", "9999::1"]),
++            ("D", [(1, 4), (12, 3), (12, 3)]),
++        ])
++
++    # Two fragment headers, should always fail due to stack
++    # implementation
++    make_packet("Two fragment Headers",
++        [
++            ("F", (0x89abcdef)),
++            ("F", (0x89abcdef)),
++        ])
++
++cli_args()
++
++make_test_packets()
++
++if PCAP_OUT != "":
++    write_pcap(PCAP_OUT)
++    STATUS = 0
++else:
++    STATUS = run_test()
++
++sys.exit(STATUS)
+diff --git a/tools/testing/selftests/net/eh_limits.sh b/tools/testing/selftests/net/eh_limits.sh
+new file mode 100755
+index 000000000000..7703f29f2092
+--- /dev/null
++++ b/tools/testing/selftests/net/eh_limits.sh
+@@ -0,0 +1,205 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++# Tests extension header limits.
++#
++# We start by setting up two network namespaces with IPv6 addresses.
++# Then we create ICMPv6 Echo Request packets with various combinations of
++# Extension Headers, and send them from one namespace to the other and
++# check if a reply is received. Based on the sysctl settings certain packets
++# are expected to produce echo replies and others are expected to be drop
++# because an Extension Header related limit is exceeded. If an Echo Reply is
++# received or not received per our expectations then the test passes,
++# otherwise if the result is unexpected that's a test failure.
++# Tests extension header limits.
++
++source lib.sh
++
++# all tests in this script. Can be overridden with -t option
++TESTS="eh_limits"
++
++VERBOSE=""
++PAUSE_ON_FAIL=no
++PAUSE=no
++NAME="EH-limits"
++
++IP1="2001:db8::1"
++IP2="2001:db8::2"
++
++log_test()
++{
++	local rc=$1
++	local expected=$2
++	local msg="$3"
++
++	if [ "${rc}" -eq "${expected}" ]; then
++		printf "    TEST: %-60s  [ OK ]\n" "${msg}"
++		nsuccess=$((nsuccess+1))
++	else
++		nfail=$((nfail+1))
++		printf "    TEST: %-60s  [FAIL]\n" "${msg}"
++		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
++		echo
++			echo "hit enter to continue, 'q' to quit"
++			read -r a
++			[ "$a" = "q" ] && exit 1
++		fi
++	fi
++
++	if [ "${PAUSE}" = "yes" ]; then
++		echo
++		echo "hit enter to continue, 'q' to quit"
++		read -r a
++		[ "$a" = "q" ] && exit 1
++	fi
++}
++
++################################################################################
++# Setup
++
++setup()
++{
++	set -e
++
++	setup_ns ns1 ns2
++
++	NS_EXEC="ip netns exec"
++
++	ip link add veth1 type veth peer name veth2
++
++	ip link set veth1 netns "$ns1"
++	ip link set veth2 netns "$ns2"
++
++	$NS_EXEC "$ns1" ip addr add ${IP1}/64 dev veth1
++	$NS_EXEC "$ns1" ip link set veth1 up
++	$NS_EXEC "$ns1" ip link set lo up
++
++	$NS_EXEC "$ns2" ip addr add ${IP2}/64 dev veth2
++	$NS_EXEC "$ns2" ip link set veth2 up
++	$NS_EXEC "$ns2" ip link set lo up
++
++	# Enable SRv6 on the receiver since that's the type of routing header
++	# used in the test
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.conf.all.seg6_enabled=1 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.conf.veth2.seg6_enabled=1 > /dev/null
++
++	set +e
++
++	# Send a ping to do neighuor discovery
++	$NS_EXEC "$ns1" ping6 -w 2 $IP2 -c 1 > /dev/null
++}
++
++exit_cleanup_all()
++{
++	cleanup_all_ns
++	exit "${EXIT_STATUS}"
++}
++
++eh_limits_test()
++{
++	local ip_addrs="--src_ip $IP1 --dst_ip $IP2"
++
++	if [ "$VERBOSE" = "-v" ]; then
++		echo ">>>>> Default"
++	fi
++
++	# Run the test with default sysctl settings
++	$NS_EXEC "$ns1" python3 ./eh_limits.py $VERBOSE $ip_addrs
++	$NS_EXEC "$ns1" python3 ./eh_limits.py $ip_addrs
++
++	log_test $? 0 "$NAME - default sysctls"
++
++	if [ "$VERBOSE" = "-v" ]; then
++		echo ">>>>> No order enforce, 8 options, 66 length limit"
++	fi
++
++	# Set extension header limit sysctls. We do this on both sides since
++	# the sender reads the sysctl's to determine pass/fail expectations
++
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.enforce_ext_hdr_order=0 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_dst_opts_number=8 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_hbh_opts_number=8 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_hbh_length=64 > /dev/null
++	$NS_EXEC "$ns1" sysctl -w net.ipv6.max_dst_opts_length=64 > /dev/null
++
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.enforce_ext_hdr_order=0 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_dst_opts_number=8 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_hbh_opts_number=8 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_hbh_length=64 > /dev/null
++	$NS_EXEC "$ns2" sysctl -w net.ipv6.max_dst_opts_length=64 > /dev/null
++
++	# Run the test with modified sysctl settings
++	$NS_EXEC "$ns1" python3 ./eh_limits.py $VERBOSE $ip_addrs
++
++	log_test $? 0 "$NAME - modified sysctls"
++}
++
++################################################################################
++# usage
++
++usage()
++{
++	cat <<EOF
++usage: ${0##*/} OPTS
++
++        -t <test>   Test(s) to run (default: all)
++                    (options: $TESTS)
++        -p          Pause on fail
++        -P          Pause after each test before cleanup
++        -v          verbose mode (show commands and output)
++EOF
++}
++
++################################################################################
++# main
++
++require_command scapy
++
++while getopts :t:pPhv o
++do
++	case $o in
++		t) TESTS=$OPTARG;;
++		p) PAUSE_ON_FAIL=yes;;
++		P) PAUSE=yes;;
++		v) VERBOSE="-v";;
++		h) usage; exit 0;;
++		*) usage; exit 1;;
++	esac
++done
++
++# make sure we don't pause twice
++[ "${PAUSE}" = "yes" ] && PAUSE_ON_FAIL=no
++
++ksft_skip=4
++
++if [ "$(id -u)" -ne 0 ];then
++	echo "SKIP: Need root privileges"
++	exit "$ksft_skip"
++fi
++
++if [ ! -x "$(command -v ip)" ]; then
++	echo "SKIP: Could not run test without ip tool"
++	exit "$ksft_skip"
++fi
++
++if [ ! -x "$(command -v socat)" ]; then
++	echo "SKIP: Could not run test without socat tool"
++	exit "$ksft_skip"
++fi
++
++# start clean
++cleanup &> /dev/null
++
++for t in $TESTS
++do
++	case $t in
++	eh_limits)		setup; eh_limits_test; cleanup_all_ns;;
++
++	help) echo "Test names: $TESTS"; exit 0;;
++	esac
++done
++
++if [ "$TESTS" != "none" ]; then
++	printf "\nTests passed: %3d\n" ${nsuccess}
++	printf "Tests failed: %3d\n"   ${nfail}
++fi
+-- 
+2.43.0
 
->>From 153e1bc5d2baf6328667956ae16d47103085eac8 Mon Sep 17 00:00:00 2001
-> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Date: Tue, 10 Feb 2026 13:39:17 +0000
-> Subject: [PATCH bpf-next] xsk: avoid double checking against rx queue being
->   full
-> 
 
