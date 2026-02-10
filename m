@@ -1,213 +1,217 @@
-Return-Path: <netdev+bounces-258069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EGWnGoEci2kvQAAAu9opvQ
-	(envelope-from <netdev+bounces-258069-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:54:41 +0100
+	id +IFHESgdi2nSPwAAu9opvQ
+	(envelope-from <netdev+bounces-258070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:57:28 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D722B11A6E3
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:54:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E17F911A798
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 12:57:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC195301DE0A
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:54:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 30E1530053FF
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A423271FD;
-	Tue, 10 Feb 2026 11:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54F7327BF6;
+	Tue, 10 Feb 2026 11:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A45wwVYb";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bd1C3MiL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fXV1y0a6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSyXo4fA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0552A319848
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 11:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695DE314B6D
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 11:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770724477; cv=none; b=dwdSzWESqgIUyRMq1UqPeJDgzPVBiPpfUnz7SOYxdUZebFhJ/+srkBnCOweg3q7+F52CtLqumwRJRLF8mBE8z1XYWHmxczVRt1n2nfEH+bT1RTPBhRPsyJVVJ0LybV4rO0syHC5nxnCic2/E1LH/VJkAa1BSIabp8jTCeJ+aF7w=
+	t=1770724638; cv=none; b=Mbf7rb/e/EydP3yhcerbsDJ3/bl1y60ETGgAwN56sbtLQkVm59n9SiER6qs6AXPxsukXrYxCukLxSYiEuPbaGra28blIMAZgB8yu2GIXBoB8wyI8D7kFBV+DKBG1dkDfItI5+gD9ugkQ7QkjnjWPFnmSJoyY/Is4NpIg7zIrMdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770724477; c=relaxed/simple;
-	bh=V8S+bf/F66K8deOO2u9VcoAmmrQcaSvWUcOZQvCI4qM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LiPYliJsMim9XWlSo6ROrTey2f9XBQNXIh0Q1gsRtYBUDJ9GXrHCdNGmadZYHYRqbWIB2cxLShMNjfmYDMjGvP6uvGErfFlK08DObMmGzvA3jczYuotY6t7DdeZrTMUz8xo1BbSQge/In8bNDvBujNEPHDlJDoph8zlrkQAApg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A45wwVYb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bd1C3MiL; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1770724638; c=relaxed/simple;
+	bh=UhAXskVkg0AIPDRxYGMX4k6MVNHYWQm2hpDjwCRC0/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CHnlfCXFL8jCv/VRmuoAoaI3d3IgkbXFSwfwnhCGjpzVr3xYjohh+JIoird+QLY7CpnB9qbZWd1PUZHct+eb4agOBO9ZsGw9GZUGif13D7uRTAlsuLboaoiE4BikdcTOPomeo1fB3KFvCdsQaB23jXkjO6r6wcn2PAkl0+9VHXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fXV1y0a6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TSyXo4fA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770724475;
+	s=mimecast20190719; t=1770724636;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2ujBMXc2jefpwX552HAfe/z0MTFmV9RxghsSUrNeWh4=;
-	b=A45wwVYbTa30lF9BY3aj+tDYbjIHTC4hESd4qXo69mmrvaq0cdTw4wSIAp4gS+BxaobdbE
-	jzgkZfns7pYUUW/3AtLPMn0Abe6Xx4knyBIsCVaPJ9dyGfZacB6eJwT4hLplLfwkFdIeQa
-	7mQqtcUdSCieXrt9gXjH64plvZtIgck=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8/eaijsng0kyvJNwb0+SCg+kE9O/EnI5Cg5o58i4Yqg=;
+	b=fXV1y0a62NKErBqUc0BdatZTSYY1rURUeApZYIe5U0PQuXegMyzUdEvgieAGxYW2abfMsN
+	t3OQ5wXk7OiRUJg1+iFDw0QT25h+RomkhKjRPrgu8xysBdxVlqe/mZawdO/qdbpfuZRCzY
+	tpa18fmR97tBYDGK7vP/t+pZLgkzY6s=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-XWF2VZjjN6WDMWdCO286Iw-1; Tue, 10 Feb 2026 06:54:33 -0500
-X-MC-Unique: XWF2VZjjN6WDMWdCO286Iw-1
-X-Mimecast-MFC-AGG-ID: XWF2VZjjN6WDMWdCO286Iw_1770724473
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4806cd00e02so23108575e9.0
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 03:54:33 -0800 (PST)
+ us-mta-582-nYD2NCigMMKJHk1MjZPJrA-1; Tue, 10 Feb 2026 06:57:15 -0500
+X-MC-Unique: nYD2NCigMMKJHk1MjZPJrA-1
+X-Mimecast-MFC-AGG-ID: nYD2NCigMMKJHk1MjZPJrA_1770724634
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-435ab907109so4082633f8f.3
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 03:57:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770724473; x=1771329273; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ujBMXc2jefpwX552HAfe/z0MTFmV9RxghsSUrNeWh4=;
-        b=Bd1C3MiLcYsQWKH+8dbql5kYWpYxacqklrLco/Gl1uzMVPsVNsoIAWiYKbqddPQdVQ
-         G8WYkQOx9OG7txUFaVSwNA/eDcIazY8cYFahhO0lws47ezpPUrUgtyT9H67zMHgPthME
-         tI4y9Iy8zcvKh0Dc7GC47uop10bETYYleMgoI6zuDVcFzpBnIB/9g2XTtbJNzTpSuBZr
-         LbPkG8Gv9KVz6MACldrfXEcMaEhBodbWA7/9cvoVQELP5wUvMV/xhxiLIDIXWXnyLNdY
-         1THbFEwQSt7GBImYX0YGwOhhsGxs5TT4xGmGMVoaMa5DHQjnh+8W+EiUuPATXXmHek01
-         XITg==
+        d=redhat.com; s=google; t=1770724634; x=1771329434; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8/eaijsng0kyvJNwb0+SCg+kE9O/EnI5Cg5o58i4Yqg=;
+        b=TSyXo4fAd89nHo9AO/nyDmITmi5cc9ntm/EZyZNAc8bmiwBmoaJn1gE5fcB1XTSAKk
+         YNNODVrjsnYv/4O0E657zaWLFWNmSU0PiuRmPNhgQ5rqt68SeytE/DAQSLBZPkrjPx/H
+         NQkltQPhzT/hzmVJgm2ZxtHeqlpnOTVKEw3oi3onwreXxgTytDBl5kJZvT3SoAnQjuUP
+         Yejj1xk8cnOSlGYDyhNpDsTNpYepNtsCAMSkJv+XB6GmiX5Ke6MeeaxmVY/99kH1H8Z8
+         xKjm/nKyY3nVV16Z30/m7H5XYD0eSnvmGzTpViMKIrPlgzDwFmFr++39BgAVXbyCdsnB
+         J/IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770724473; x=1771329273;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1770724634; x=1771329434;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2ujBMXc2jefpwX552HAfe/z0MTFmV9RxghsSUrNeWh4=;
-        b=fgfXA+mDLYBnyKrV6eCgtJMfN9PBoek76cHjNx6q5x5b0f8u8JiinCzrYQ2SzM4TvU
-         1iENewGGctCoHpOAZ+lT6Kv4FaA77vqMkgei4GJK9R+IVJ7LVjqqfFgdllFv6wqlOdj1
-         XH4vuv3t7Ql9lIgNkRmldM1UZHj4oykbUIHfxwMRKoyDXfxGWigEDqepMZz3gWNcIj/e
-         SGdW38gv4jV0+LNLXsZjp2gKugMqHsNgDby8jResXuS0KM404UKN3dzzrB0Q2MtKbDqp
-         AYqifY9gQodBy8AqF2J7SRLiap133oHwCMI7hDYyQdZoec6si/ACX0MC0NzcCpa2AhmD
-         xsag==
-X-Forwarded-Encrypted: i=1; AJvYcCXuKK8dKtpVHQ5jE1zYQOvwJRi2CkQiXL5UpDMSPc0Ejyl6f3zdPnhJ0zjUU7WaixYPKD1r/DI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/JkBdOxN3ASGbtHU5UEMcSwsYdLwdjFjp/QYv+/+Ks8/7qka4
-	ZsQ3a/aTVrmwijDb53NfJP0EhknnWj0I5Z9iPIg46LVnPHnVTfaBIvavm9wgsjdl2RyETPt6NNL
-	FQbjQtaQR2ZnRpD7NP9PNZqOKySqI+3iSpoxmNENrPaGHLhDyauFaT1J5UA==
-X-Gm-Gg: AZuq6aISXJc1bhZ2A6c2NPMQxYkeMlg/KmVYvHgXMNKgJKlC03dz/Ws/+M1O/R4QJwJ
-	0+lAIcJhL5Uz1gJOhp4P5vevLurMXXrTBin+mdY7j+3TPuUmRnDb+mveaKLCKIa0XpfzZmB/b2G
-	BpCudWFDMWr1Z0VkrWh7VB3byW7Z1ASAkiqnbzzk5pFLTpnVwJ2VVsK7KUb5+E0INPYLtPotqAD
-	6adAdIxDH4mKpVRZcn5Vhe8W+0UXSi+Mw749FDNLHhdtDV6W4IElq3yw0PF7Lvq44j25TwLz7rn
-	IH4t0Y0U817HKMa4NiJMqIsOUCBNLIL9XBSP1cwKLDvNRCox4SArdW8/dgvFO7aHPzipLz3Ck4w
-	GhPXJtO3Nv4Y3lxhgGPCXLXiSlpBl2W1Pl8+UjCq2LvctwQ==
-X-Received: by 2002:a05:600d:6413:10b0:483:4807:20fd with SMTP id 5b1f17b1804b1-4834807226emr44644875e9.30.1770724472673;
-        Tue, 10 Feb 2026 03:54:32 -0800 (PST)
-X-Received: by 2002:a05:600d:6413:10b0:483:4807:20fd with SMTP id 5b1f17b1804b1-4834807226emr44644605e9.30.1770724472261;
-        Tue, 10 Feb 2026 03:54:32 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d5d8f2csm83406055e9.1.2026.02.10.03.54.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 03:54:31 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id B7F784FE89F; Tue, 10 Feb 2026 12:54:29 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, Eric
- Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org, Jakub
- Kicinski <kuba@kernel.org>, horms@kernel.org, jiri@resnulli.us,
- edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
- atenart@redhat.com, carges@cloudflare.com, kernel-team@cloudflare.com
-Subject: Re: [PATCH net-next v3 5/6] net: sched: rename QDISC_DROP_FQ_* to
- generic names
-In-Reply-To: <177039508922.2258217.2724637003148631081.stgit@firesoul>
-References: <177039500964.2258217.2989656069254156812.stgit@firesoul>
- <177039508922.2258217.2724637003148631081.stgit@firesoul>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 10 Feb 2026 12:54:29 +0100
-Message-ID: <87seb8yft6.fsf@toke.dk>
+        bh=8/eaijsng0kyvJNwb0+SCg+kE9O/EnI5Cg5o58i4Yqg=;
+        b=kw24Fd1kbbzT8O4Zy+l1h54ndpgHZSmz68jXLSteafNOeOxic7qgGyOlo83HJlUbkm
+         HmbZUCWTyP291JIGX7ioNJuU/7Twxjl1jX9uZOwnTVuJzKrTBVqUj2Nw6qNe8GQIkNpL
+         KURd6WTBdaXlM/rHhuTr0iQGmmkGlzmO94yYj+s6+uUjePHugKtkt0ejMpSK5bcziHj7
+         CjEkqQO1dR9a9NeAnS9gn/esnB2i5cHk0Erhfpx+YqtCDRkvSY6LD7bbzZ4glLPuyZqa
+         JW6WSmw/doSO9y9K0syuzHWS+3BWM5gab8cNt0oejcQ/K8KT4VzJj08hWTrMjUI8giYU
+         9lOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVlvO14cZdMnd4QVLtj2zgE728Ozq22EGJYdR97PZhDjMW1DCvQjbTq8KaAoUC0JeFIvyRZNI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxb+SgfMChkGrdR65m8Xx3/2VuLqDw32lP6ABpGH1Dj2zEpy9YM
+	IG/kAwJpK3lL9QWswN/8sVpfFZe+Gyt+j0NTVmFk8E7fll+i8qDj/LPuwp6+T1XMQ4cW4j3ZARh
+	U+VUlaxFYN2XefIST70oEn/TLzFt+upu7RwgjjeV8ht8xVOu5hBb9lrcnKLW/RGKibg==
+X-Gm-Gg: AZuq6aJnnY0b3lDdfPNcfAJZH3ytRLXualLSt8cg2YkV1HGUf3JiUX7GW3FmT9kKOHy
+	Q4IxnABfUTS3yUN6hjN28+wYBjp5dKx+UbrQK3k4onH08hy+XMcdh7AGfGR2dcS4btIBreESHNo
+	IvX6R7H4RJhY1Q2iac0Xr2SQfyW6M/lYMP8625uQoir4hVl8JVCCov8ziwiIXoXb2c9WvahjA6u
+	E2lj6tK4dWzwwQllo29Lh8+csmEzxTQDQe4gCUdPbL8j3eXRUkkArMFsiRwZCVV5nNIAwQR6/X2
+	Dr9wVrH2rfAH0J//gOBA6oAk/4d+8ZXj1OZSd5b73MhJK8QUenbbH/sisWegJM6a01TK1Z36g7J
+	fbJ0CJKDXrsRTTMf7apISMFY=
+X-Received: by 2002:a05:6000:200e:b0:435:aecf:9674 with SMTP id ffacd0b85a97d-43629691c17mr19796743f8f.55.1770724633881;
+        Tue, 10 Feb 2026 03:57:13 -0800 (PST)
+X-Received: by 2002:a05:6000:200e:b0:435:aecf:9674 with SMTP id ffacd0b85a97d-43629691c17mr19796712f8f.55.1770724633435;
+        Tue, 10 Feb 2026 03:57:13 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.25.31])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4375087753bsm19281930f8f.24.2026.02.10.03.57.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Feb 2026 03:57:13 -0800 (PST)
+Message-ID: <8545d888-5b66-421e-b755-9cfe39c8a98a@redhat.com>
+Date: Tue, 10 Feb 2026 12:57:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: sunhme: Fix sbus regression
+To: Sean Anderson <seanga2@gmail.com>, =?UTF-8?Q?Ren=C3=A9_Rebe?=
+ <rene@exactco.de>, "David S. Miller" <davem@davemloft.net>,
+ Andreas Larsson <andreas@gaisler.com>, sparclinux@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, netdev@vger.kernel.org
+References: <20260205.170959.89574674688839340.rene@exactco.de>
+ <cc269d9f-9a06-6623-e412-d04ecb7b4f74@gmail.com>
+ <20260206.100514.85172532893288505.rene@exactco.de>
+ <8d2fdbf6-abec-218e-1d07-fb08fb0772fe@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <8d2fdbf6-abec-218e-1d07-fb08fb0772fe@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.40 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.56)[subject];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258069-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,exactco.de,davemloft.net,gaisler.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com,davemloft.net,redhat.com];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258070-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[toke.dk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_PROHIBIT(0.00)[0.0.0.2:email];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: D722B11A6E3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[1f:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,exactco.de:email]
+X-Rspamd-Queue-Id: E17F911A798
 X-Rspamd-Action: no action
 
-Jesper Dangaard Brouer <hawk@kernel.org> writes:
+On 2/6/26 3:49 PM, Sean Anderson wrote:
+> On 2/6/26 04:05, René Rebe wrote:
+>> On Thu, 5 Feb 2026 20:41:11 -0500, Sean Anderson <seanga2@gmail.com> wrote:
+>>
+>>> On 2/5/26 11:09, René Rebe wrote:
+>>>> Commit cc216e4b44ce ("net: sunhme: Switch SBUS to devres") changed
+>>>> explicit sized of_ioremap with BMAC_REG_SIZEs to
+>>>> devm_platform_ioremap_resource mapping all the resource. However,
+>>>> this does not work on my Sun Ultra 2 with SBUS HMEs:
+>>>> hme f0072f38: error -EBUSY: can't request region for resource [mem
+>>>> 0x1ffe8c07000-0x1ffe8c0701f]
+>>>> hme f0072f38: Cannot map TCVR registers.
+>>>> hme f0072f38: probe with driver hme failed with error -16
+>>>> hme f007ab44: error -EBUSY: can't request region for resource [mem
+>>>> 0x1ff28c07000-0x1ff28c0701f]
+>>>> hme f007ab44: Cannot map TCVR registers.
+>>>> hme f007ab44: probe with driver hme failed with error -16
+>>>> Turns out the open-firmware resources overlap, at least on this
+>>>> machines and PROM version:
+>>>> hexdump /proc/device-tree/sbus@1f,0/SUNW,hme@2,8c00000/reg:
+>>>> 00 00 00 02 08 c0 00 00  00 00 01 08
+>>>> 00 00 00 02 08 c0 20 00  00 00 20 00
+>>>> 00 00 00 02 08 c0 40 00  00 00 20 00
+>>>> 00 00 00 02 08 c0 60 00  00 00 20 00
+>>>> 00 00 00 02 08 c0 70 00  00 00 00 20
+>>>> And the driver previously explicitly mapped way smaller mmio regions:
+>>>> /proc/iomem:
+>>>> 1ff28c00000-1ff28c00107 : HME Global Regs
+>>>> 1ff28c02000-1ff28c02033 : HME TX Regs
+>>>> 1ff28c04000-1ff28c0401f : HME RX Regs
+>>>> 1ff28c06000-1ff28c0635f : HME BIGMAC Regs
+>>>> 1ff28c07000-1ff28c0701f : HME Tranceiver Regs
+>>>> Quirk this specific issue by truncating the previous resource to not
+>>>> overlap into the TCVR registers.
+>>>> Fixes: cc216e4b44ce ("net: sunhme: Switch SBUS to devres")
+>>>> Signed-off-by: René Rebe <rene@exactco.de>
+>>>> ---
+>>>> Tested on Sun Ultra 2 running T2/Linux.
+>>>> Alternatively we could explicitly size all regions, or check overlap
+>>>> in startup code (I also already have a patch for that, too).
+>>>
+>>> What does this look like?
+>>
+>> This only checks for "sorted" overlaps w/ the previous res, but given
+>> they probably usually are and it catches this case, ...
+>>
+>> The downside is, it may break other devices, I only test booted this
+>> on an Ultra 2 and Ultra 30. On the U2 it fixes the hme ethernet,
+>> too. On the U30 it causes an eprom region to be truncated. I probably
+>> should investiage that and test boot on all my SPARC systems before we
+>> consider this. That's why I sent the trivial hme driver hotfix first.
+>> Alternatively we could also overwrite all sbus res in the hme driver
+>> with the previously used known good sizes. I can send a patch for
+>> that, too if you like:
+> 
+> I'm not really familiar enough with SPARC to say whether this is reasonable
+> or not. I've added the SPARC maintainers to CC so maybe they can comment.
 
-> Rename FQ-specific drop reasons to generic names:
-> - QDISC_DROP_FQ_BAND_LIMIT -> QDISC_DROP_BAND_LIMIT
-> - QDISC_DROP_FQ_HORIZON_LIMIT -> QDISC_DROP_HORIZON_LIMIT
->
-> This follows the principle that drop reasons should describe the drop
-> mechanism rather than being tied to a specific qdisc implementation.
-> These concepts (priority band limits, timestamp horizon) could apply
-> to other qdiscs as well.
->
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> ---
->  include/net/dropreason-qdisc.h |   21 +++++++++++----------
->  net/sched/sch_fq.c             |    2 +-
->  2 files changed, 12 insertions(+), 11 deletions(-)
->
-> diff --git a/include/net/dropreason-qdisc.h b/include/net/dropreason-qdisc.h
-> index 2e2f4fc36e0d..8661797193b1 100644
-> --- a/include/net/dropreason-qdisc.h
-> +++ b/include/net/dropreason-qdisc.h
-> @@ -12,8 +12,8 @@
->  	FN(FLOW_LIMIT)			\
->  	FN(MAXFLOWS)			\
->  	FN(FLOOD_PROTECTION)		\
-> -	FN(FQ_BAND_LIMIT)		\
-> -	FN(FQ_HORIZON_LIMIT)		\
-> +	FN(BAND_LIMIT)			\
-> +	FN(HORIZON_LIMIT)		\
->  	FNe(MAX)
->  
->  #undef FN
-> @@ -82,17 +82,18 @@ enum qdisc_drop_reason {
->  	 */
->  	QDISC_DROP_FLOOD_PROTECTION,
->  	/**
-> -	 * @QDISC_DROP_FQ_BAND_LIMIT: FQ (Fair Queue) dropped packet because
-> -	 * the priority band's packet limit was reached. Each priority band
-> -	 * in FQ has its own limit.
-> +	 * @QDISC_DROP_BAND_LIMIT: packet dropped because the priority band's
-> +	 * limit was reached. Used by qdiscs with priority bands that have
-> +	 * per-band packet limits (e.g., FQ).
->  	 */
-> -	QDISC_DROP_FQ_BAND_LIMIT,
-> +	QDISC_DROP_BAND_LIMIT,
->  	/**
-> -	 * @QDISC_DROP_FQ_HORIZON_LIMIT: FQ dropped packet because its
-> -	 * timestamp is too far in the future (beyond horizon). This prevents
-> -	 * packets with unreasonable future timestamps from blocking the queue.
-> +	 * @QDISC_DROP_HORIZON_LIMIT: packet dropped because its timestamp
-> +	 * is too far in the future (beyond horizon). This prevents packets
-> +	 * with unreasonable future timestamps from occupying queue space.
+FTR, I think we are better off applying this patch as quick fix and
+eventually follow-up with the more complete/less trivial solution.
 
-Why change "blocking the queue" to "occupying queue space"? The former
-seems worse, so worth calling out?
-
--Toke
+/P
 
 
