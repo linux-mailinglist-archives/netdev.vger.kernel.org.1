@@ -1,346 +1,181 @@
-Return-Path: <netdev+bounces-258031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258032-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iId7C5zBimkeNgAAu9opvQ
-	(envelope-from <netdev+bounces-258031-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 06:26:52 +0100
+	id gFMWG5nEimm9NgAAu9opvQ
+	(envelope-from <netdev+bounces-258032-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 06:39:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA617117173
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 06:26:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6033111724A
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 06:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50F2C3063A05
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 05:22:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFAEF301324E
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 05:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE20132BF35;
-	Tue, 10 Feb 2026 05:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLmjeen5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983ED32B9AD;
+	Tue, 10 Feb 2026 05:38:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A1A32B9BD
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 05:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0732DC334;
+	Tue, 10 Feb 2026 05:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770700971; cv=none; b=h/WYUuQXTNSKLwJPLOlOzqZLaVcTS9oIT9PgGgNwygcuV3PaIoY2ZHSsGKTv0/jTQCtOMxZpfymAnme30egX4a75SnilQQZjzm+7EQryySg2Tk9vbPlNMA9pzs9AaYGqDEK3Lo8n1nsnU773LvJRc1k7iuPx6y7FO1L0fcMDdwo=
+	t=1770701907; cv=none; b=t2mnMNiqEaQX75+CaKjYMeGeDGieXGb2LeKpvrxYGFYXknS+WN441sYFrBjqAfjBmb0grGZxRv0YfTwTT0d79UtD1jNcX8MBMKPtvJJK1YNPE/yPK8dtY81A/9wanQ2Dd2CNhqh3DsMDXfQHsTjNxwvB9OZaqtmlg61x/cEZhs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770700971; c=relaxed/simple;
-	bh=2HvgA8+pZQSuwHH1gevRSa2+HkQi7niGFLgwQQs3vdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KeBY9deaRbIQn/Zt54ZstYo/lzo51VbWcLJyvr6PAW1MnM3vNvPYkRAFXqmxpvhARuiBrjTtd/KHbzl4bWqVLKyKMnZ4MUVPcjt5gh/Hu6OhCqEdkFr8WrymSQoKaCfU/uieo3LB8pei0i5FjxYw3LPXqtNMOm3DoUZxgApaum0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLmjeen5; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2aaf59c4f7cso2032535ad.1
-        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 21:22:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770700970; x=1771305770; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wzFwESZOkwxx17CXvSjDYHHBJkKja6bTAjzp0iWKbyI=;
-        b=NLmjeen5GjO2hlsc64rrIPAp3MVyV9fVHE5HXQk7hm4VOKqUCBUOFoZOqOLdfhww1H
-         6exWN4F1QinfGA4Wq1T+UqsyGclOmCkIbIA2J/CsEQLLfs0ITyBo/vdwVIxSEcaimrFK
-         mgub7mxmM+eI9Fb0yWERH97iRz95Iwve9dxscYKAwaEIdaM+oOywGZMs4vEPBy+FI4eV
-         oBGsn2+rLRG3FKN8PWwoGJa87knNZxi12tFqr+SWy7wO2JS7/oF5zW0uXytJG201uz2F
-         jGfsn7ecVDUez9nBOZZWmdN3f7x6088v/cUV7r+gylaCO4tew8fb4393Bh2zw/+XCEY2
-         R/sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770700970; x=1771305770;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wzFwESZOkwxx17CXvSjDYHHBJkKja6bTAjzp0iWKbyI=;
-        b=qRXPN6erdjZSbb/rSD9hPTI6PaSaTRKyDNeJcOequ921S3MOTw+B9dLTSJksFY5yif
-         7MSg4629FUf/OnUIgXtKk9iFqj142zI58eGemwG8Dc9HsTOhr4hrjaJFzuZRY7kiWZ3l
-         FzSO2X4H2RKWPogccPa3EhwqSrQoq1eq+sfk6An/mu3trwMGPJe5NrqpEkXP64ZxvMLm
-         /u8lBHurJd8FhQzcjg58zUyrUIb/5zBMqn8kUUzbY7SeeqZVyVBxuKVv8ujzCJGFu1rS
-         BEj/pktSUBoT/dIMH+RGJWo5qtXFl0T4WBMEyOhWYKSKpH+UE9dB1se0plxLmHUzH65m
-         AEng==
-X-Forwarded-Encrypted: i=1; AJvYcCW/0Twce+8xpu4FJWbfyCUrNBFe7cWQPIPxyYMKu15nTAHJEyN5h0r9PyTQSqHH2c+ZO2OQfO8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMDWJkoITCc6dMPjEoZMF3NA3I5zavvIzjhjeW0Nob/unltm5+
-	GHeb9VcpXEk4LgLAc4XclPTDEzNS8J/pkTpIs+hLiarFaED7bR/91NDJ
-X-Gm-Gg: AZuq6aJy02e3MmZRlNzYlMuV5DkbqZxopzIOZ+cgOaA4gdH+5N60SaarPRIEDgvRyyj
-	GHQ0OpPCEzaUUs2nTcLgW0tuV6gwyCwQWVvHFY7iB8KsNbPi0HGpHq2zwtFNc7c/3Iz0Pr5p7aQ
-	nwL+X0mxOrpKifItyKHmG8R0RQBkRyOs9AaM/qP0NJv8Joms4I//hGR0n7XTZi/Vwc0dbkf32Vj
-	Y8NAAZN6w4Drc5s7m2I2Zts7U5QcImHsTtoZzBqovdfWkO7SjKHtXL668s/M1Ar69bsZGM2+4b9
-	HbOZVDuNCF0bMsgPDFCQGi+6hmXzZ9z8IbKD/XNjy2mS0vxflCIuWCuyKDv2gDsyo8HGrMAvB/y
-	vroVuKXavE2yBsX3ffTpuJcYvSOr+OcCmoQSMhClDn1AXObT+qhUFyxm2rNzJWRffmxSDL68xe5
-	Vu+/RpFeUhicgV7ali9dKrvkoztJfQuh0AyGyinR1m50p1HIKAykqWqXoLMLhc8RE0ArFjsasMl
-	zNHP0beQIQo
-X-Received: by 2002:a17:902:d509:b0:2aa:f798:8c7f with SMTP id d9443c01a7336-2aaf798af92mr52504575ad.54.1770700969732;
-        Mon, 09 Feb 2026 21:22:49 -0800 (PST)
-Received: from localhost.localdomain (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a951ca59f4sm122114275ad.43.2026.02.09.21.22.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 21:22:49 -0800 (PST)
-From: Joey Lu <a0987203069@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com
-Cc: alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	ychuang3@nuvoton.com,
-	schung@nuvoton.com,
-	yclu4@nuvoton.com,
-	peppe.cavallaro@st.com,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	openbmc@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Joey Lu <a0987203069@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v12 3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for Nuvoton MA35 family
-Date: Tue, 10 Feb 2026 13:22:26 +0800
-Message-ID: <20260210052226.3005666-4-a0987203069@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260210052226.3005666-1-a0987203069@gmail.com>
-References: <20260210052226.3005666-1-a0987203069@gmail.com>
+	s=arc-20240116; t=1770701907; c=relaxed/simple;
+	bh=t9R0Mk/yXEzHc+Q7LIjB8fcK44EbgHnJucyiiqIgQqU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=k3Fwpg87BYAqy4PP8R8QcjvQCGmvTn0loppIVYX9dVrSChpXlCLO/aTKuyhZj0ri6n+fYd19WFXRgLP3/1/IyHjzZzJWSkxsoMBHRMpwKc1eDkQ26mousbRI+JJrbjNKwAP5aum/+j+idSo9IFuYmUn5vnuOl8c9h1slmMAF+9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [218.12.18.133])
+	by mtasvr (Coremail) with SMTP id _____wD33+lIxIppYB+cAA--.33113S3;
+	Tue, 10 Feb 2026 13:38:17 +0800 (CST)
+Received: from duoming$zju.edu.cn ( [218.12.18.133] ) by
+ ajax-webmail-mail-app2 (Coremail) ; Tue, 10 Feb 2026 13:38:13 +0800
+ (GMT+08:00)
+Date: Tue, 10 Feb 2026 13:38:13 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: duoming@zju.edu.cn
+To: "Jijie Shao" <shaojijie@huawei.com>
+Cc: netdev@vger.kernel.org, 3chas3@gmail.com,
+	linux-atm-general@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org, stable@kernel.org
+Subject: Re: [PATCH net v3] atm: fore200e: fix use-after-free in tasklets
+ during device removal
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
+ 20250620(94335109) Copyright (c) 2002-2026 www.mailtech.cn zju.edu.cn
+In-Reply-To: <cfa65635-8a78-4929-8490-f66b7a38d02e@huawei.com>
+References: <20260209094512.33847-1-duoming@zju.edu.cn>
+ <cfa65635-8a78-4929-8490-f66b7a38d02e@huawei.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <60202c25.703d4.19c460eafca.Coremail.duoming@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:zC_KCgDHkzVGxIppNTfCBQ--.44549W
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwESAWmKOIcFcAAAs4
+X-CM-DELIVERINFO: =?B?vUoDHQXKKxbFmtjJiESix3B1w3uoVhYI+vyen2ZzBEkOnu5chDpkB+ZdGnv/zQ0PbP
+	CR18B2QU8C4caAVCxk1uY0CQM8Tpn3ioqs2/vFmiqPhwqh9yPMg5hrglTP0U2lkQXXDIqM
+	hxB7JQ9/xFama3KKFHOPabtyPYocyPRRCLHrgs8nzWjt7ZxaxMmFNMD/EcsBPg==
+X-Coremail-Antispam: 1Uk129KBj93XoWxWF18ZFWDtFW5Gr15GFWxuFX_yoW5Kr1xp3
+	97Ga13CFW8GrWj9w17Jw15uF18uwn2qFWYkw4DK34jgF10vry0vr1rKF4DWFWDZw1xZFyv
+	qr1kXFy3W34DGFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUmvb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
+	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAF
+	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7V
+	AKI48G6xCjnVAKz4kxM4xvF2IEb7IF0Fy264kE64k0F24lFcxC0VAYjxAxZF0Ex2IqxwAK
+	zVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r12
+	6r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UMVCEFcxC0VAYjxAxZFUvcSsGvf
+	C2KfnxnUUI43ZEXa7IU848BUUUUUU==
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.64 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258031-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[duoming@zju.edu.cn,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[zju.edu.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[foss.st.com,synopsys.com,nuvoton.com,st.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,st-md-mailman.stormreply.com,gmail.com,lunn.ch];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[a0987203069@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258032-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_X_PRIO_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lists.sourceforge.net,kernel.org];
+	R_DKIM_NA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CA617117173
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email,zju.edu.cn:mid,zju.edu.cn:email]
+X-Rspamd-Queue-Id: 6033111724A
 X-Rspamd-Action: no action
 
-Add support for Gigabit Ethernet on Nuvoton MA35 series using dwmac driver.
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Joey Lu <a0987203069@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 139 ++++++++++++++++++
- 3 files changed, 152 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 07088d03dbab..861f1c6c14f1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -132,6 +132,18 @@ config DWMAC_MESON
- 	  the stmmac device driver. This driver is used for Meson6,
- 	  Meson8, Meson8b and GXBB SoCs.
- 
-+config DWMAC_NUVOTON
-+	tristate "Nuvoton MA35 dwmac support"
-+	default ARCH_MA35
-+	depends on OF && (ARCH_MA35 || COMPILE_TEST)
-+	select MFD_SYSCON
-+	help
-+	  Support for Ethernet controller on Nuvoton MA35 series SoC.
-+
-+	  This selects the Nuvoton MA35 series SoC glue layer support
-+	  for the stmmac device driver. The nuvoton-dwmac driver is
-+	  used for MA35 series SoCs.
-+
- config DWMAC_QCOM_ETHQOS
- 	tristate "Qualcomm ETHQOS support"
- 	default ARCH_QCOM
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index c9263987ef8d..4ade030b634f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -20,6 +20,7 @@ obj-$(CONFIG_DWMAC_IPQ806X)	+= dwmac-ipq806x.o
- obj-$(CONFIG_DWMAC_LPC18XX)	+= dwmac-lpc18xx.o
- obj-$(CONFIG_DWMAC_MEDIATEK)	+= dwmac-mediatek.o
- obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
-+obj-$(CONFIG_DWMAC_NUVOTON)	+= dwmac-nuvoton.o
- obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
- obj-$(CONFIG_DWMAC_RENESAS_GBETH) += dwmac-renesas-gbeth.o
- obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-new file mode 100644
-index 000000000000..29d15f41b244
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-@@ -0,0 +1,139 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Nuvoton DWMAC specific glue layer
-+ *
-+ * Copyright (C) 2025 Nuvoton Technology Corp.
-+ *
-+ * Author: Joey Lu <a0987203069@gmail.com>
-+ */
-+
-+#include <linux/mfd/syscon.h>
-+#include <linux/of_device.h>
-+#include <linux/of_net.h>
-+#include <linux/platform_device.h>
-+#include <linux/regmap.h>
-+#include <linux/stmmac.h>
-+
-+#include "stmmac.h"
-+#include "stmmac_platform.h"
-+
-+#define NVT_REG_SYS_GMAC0MISCR  0x108
-+#define NVT_REG_SYS_GMAC1MISCR  0x10C
-+
-+#define NVT_MISCR_RMII          BIT(0)
-+
-+/* Two thousand picoseconds are evenly mapped to a 4-bit field,
-+ * resulting in each step being 2000/15 picoseconds.
-+ */
-+#define NVT_PATH_DELAY_STEP     134
-+#define NVT_TX_DELAY_MASK       GENMASK(19, 16)
-+#define NVT_RX_DELAY_MASK       GENMASK(23, 20)
-+
-+static int nvt_gmac_get_delay(struct device *dev, const char *property)
-+{
-+	u32 arg;
-+
-+	if (of_property_read_u32(dev->of_node, property, &arg))
-+		return 0;
-+
-+	if (arg > 2000) {
-+		dev_err(dev, "Invalid %s argument.\n", property);
-+		return -EINVAL;
-+	}
-+
-+	if (arg == 2000)
-+		return 15;
-+
-+	return arg / NVT_PATH_DELAY_STEP;
-+}
-+
-+static int nvt_gmac_setup(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	phy_interface_t phy_mode;
-+	struct regmap *regmap;
-+	u32 macid, miscr, reg;
-+	int ret;
-+
-+	regmap = syscon_regmap_lookup_by_phandle_args(dev->of_node, "nuvoton,sys", 1, &macid);
-+	if (IS_ERR(regmap))
-+		ret = dev_err_probe(dev, PTR_ERR(regmap), "Failed to get sys register\n");
-+
-+	if (macid > 1)
-+		ret = dev_err_probe(dev, -EINVAL, "Invalid sys arguments\n");
-+
-+	if (of_get_phy_mode(pdev->dev.of_node, &phy_mode))
-+		ret = dev_err_probe(dev, -EINVAL, "Missing phy mode property\n");
-+
-+	miscr = (macid == 0) ? NVT_REG_SYS_GMAC0MISCR : NVT_REG_SYS_GMAC1MISCR;
-+
-+	switch (phy_mode) {
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		ret = nvt_gmac_get_delay(dev, "rx-internal-delay-ps");
-+		if (ret < 0)
-+			return ret;
-+		reg = FIELD_PREP(NVT_RX_DELAY_MASK, ret);
-+
-+		ret = nvt_gmac_get_delay(dev, "tx-internal-delay-ps");
-+		if (ret < 0)
-+			return ret;
-+		reg |= FIELD_PREP(NVT_TX_DELAY_MASK, ret);
-+		break;
-+	case PHY_INTERFACE_MODE_RMII:
-+		reg = NVT_MISCR_RMII;
-+			break;
-+	default:
-+		return dev_err_probe(dev, -EINVAL, "Unsupported phy-mode (%d)\n", phy_mode);
-+	}
-+
-+	regmap_update_bits(regmap, miscr,
-+			   NVT_RX_DELAY_MASK | NVT_TX_DELAY_MASK | NVT_MISCR_RMII, reg);
-+
-+	return 0;
-+}
-+
-+static int nvt_gmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	struct device *dev = &pdev->dev;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "Failed to get platform resources\n");
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return dev_err_probe(dev, PTR_ERR(plat_dat), "Failed to get platform data\n");
-+
-+	ret = nvt_gmac_setup(pdev);
-+	if (ret)
-+		return ret;
-+
-+	return stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-+}
-+
-+static const struct of_device_id nvt_dwmac_match[] = {
-+	{ .compatible = "nuvoton,ma35d1-dwmac"},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, nvt_dwmac_match);
-+
-+static struct platform_driver nvt_dwmac_driver = {
-+	.probe  = nvt_gmac_probe,
-+	.remove = stmmac_pltfr_remove,
-+	.driver = {
-+		.name           = "nuvoton-dwmac",
-+		.pm		= &stmmac_pltfr_pm_ops,
-+		.of_match_table = nvt_dwmac_match,
-+	},
-+};
-+module_platform_driver(nvt_dwmac_driver);
-+
-+MODULE_AUTHOR("Joey Lu <a0987203069@gmail.com>");
-+MODULE_DESCRIPTION("Nuvoton DWMAC specific glue layer");
-+MODULE_LICENSE("GPL");
--- 
-2.43.0
+T24gVHVlLCAxMCBGZWIgMjAyNiAwOTo0Njo1MyArMDgwMCBKaWppZSBTaGFvIHdyb3RlOgo+ID4g
+V2hlbiB0aGUgUENBLTIwMEUgb3IgU0JBLTIwMEUgYWRhcHRlciBpcyBiZWluZyBkZXRhY2hlZCwg
+dGhlIGZvcmUyMDBlCj4gPiBpcyBkZWFsbG9jYXRlZC4gSG93ZXZlciwgdGhlIHR4X3Rhc2tsZXQg
+b3IgcnhfdGFza2xldCBtYXkgc3RpbGwgYmUgcnVubmluZwo+ID4gb3IgcGVuZGluZywgbGVhZGlu
+ZyB0byB1c2UtYWZ0ZXItZnJlZSBidWcgd2hlbiB0aGUgYWxyZWFkeSBmcmVlZCBmb3JlMjAwZQo+
+ID4gaXMgYWNjZXNzZWQgYWdhaW4gaW4gZm9yZTIwMGVfdHhfdGFza2xldCgpIG9yIGZvcmUyMDBl
+X3J4X3Rhc2tsZXQoKS4KPiA+Cj4gPiBPbmUgb2YgdGhlIHJhY2UgY29uZGl0aW9ucyBjYW4gb2Nj
+dXIgYXMgZm9sbG93czoKPiA+Cj4gPiBDUFUgMCAoY2xlYW51cCkgICAgICAgICAgIHwgQ1BVIDEg
+KHRhc2tsZXQpCj4gPiBmb3JlMjAwZV9wY2FfcmVtb3ZlX29uZSgpIHwgZm9yZTIwMGVfaW50ZXJy
+dXB0KCkKPiA+ICAgIGZvcmUyMDBlX3NodXRkb3duKCkgICAgIHwgICB0YXNrbGV0X3NjaGVkdWxl
+KCkKPiA+ICAgICAga2ZyZWUoZm9yZTIwMGUpICAgICAgIHwgZm9yZTIwMGVfdHhfdGFza2xldCgp
+Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgZm9yZTIwMGUtPiAvLyBVQUYKPiA+
+Cj4gPiBGaXggdGhpcyBieSBlbnN1cmluZyB0eF90YXNrbGV0IG9yIHJ4X3Rhc2tsZXQgaXMgcHJv
+cGVybHkgY2FuY2VsZWQgYmVmb3JlCj4gPiB0aGUgZm9yZTIwMGUgaXMgcmVsZWFzZWQuIEFkZCB0
+YXNrbGV0X2tpbGwoKSBpbiBmb3JlMjAwZV9zaHV0ZG93bigpIHRvCj4gPiBzeW5jaHJvbml6ZSB3
+aXRoIGFueSBwZW5kaW5nIG9yIHJ1bm5pbmcgdGFza2xldHMuIE1vcmVvdmVyLCBzaW5jZQo+ID4g
+Zm9yZTIwMGVfcmVzZXQoKSBjb3VsZCBwcmV2ZW50IGZ1cnRoZXIgaW50ZXJydXB0cyBvciBkYXRh
+IHRyYW5zZmVycywKPiA+IHRoZSB0YXNrbGV0X2tpbGwoKSBzaG91bGQgYmUgcGxhY2VkIGFmdGVy
+IGZvcmUyMDBlX3Jlc2V0KCkgdG8gcHJldmVudAo+ID4gdGhlIHRhc2tsZXQgZnJvbSBiZWluZyBy
+ZXNjaGVkdWxlZCBpbiBmb3JlMjAwZV9pbnRlcnJ1cHQoKS4gRmluYWxseSwKPiA+IGl0IG9ubHkg
+bmVlZHMgdG8gZG8gdGFza2xldF9raWxsKCkgd2hlbiB0aGUgZm9yZTIwMGUgc3RhdGUgaXMgZ3Jl
+YXRlcgo+ID4gdGhhbiBvciBlcXVhbCB0byBGT1JFMjAwRV9TVEFURV9JUlEsIHNpbmNlIHRhc2ts
+ZXRzIGFyZSB1bmluaXRpYWxpemVkCj4gPiBpbiBlYXJsaWVyIHN0YXRlcy4KPiA+Cj4gPiBUaGlz
+IGJ1ZyB3YXMgaWRlbnRpZmllZCB0aHJvdWdoIHN0YXRpYyBhbmFseXNpcy4KPiA+Cj4gPiBGaXhl
+czogMWRhMTc3ZTRjM2Y0ICgiTGludXgtMi42LjEyLXJjMiIpCj4gPiBDYzogc3RhYmxlQGtlcm5l
+bC5vcmcKPiA+IFN1Z2dlc3RlZC1ieTogSmlqaWUgU2hhbyA8c2hhb2ppamllQGh1YXdlaS5jb20+
+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBEdW9taW5nIFpob3UgPGR1b21pbmdAemp1LmVkdS5jbj4KPiA+
+IC0tLQo+ID4gQ2hhbmdlcyBpbiB2MzoKPiA+ICAgIC0gT25seSBkbyB0YXNrbGV0X2tpbGwoKSB3
+aGVuIHN0YXRlID49IEZPUkUyMDBFX1NUQVRFX0lSUS4KPiA+ICAgIC0gTWFrZSB0aGUgY29tbWl0
+IG1lc3NhZ2VzIGNsZWFyZXIuCj4gPgo+ID4gICBkcml2ZXJzL2F0bS9mb3JlMjAwZS5jIHwgNyAr
+KysrKystCj4gPiAgIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24o
+LSkKPiA+Cj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9hdG0vZm9yZTIwMGUuYyBiL2RyaXZlcnMv
+YXRtL2ZvcmUyMDBlLmMKPiA+IGluZGV4IGY2MmUzODU3MTQ0Li5lYjM4NmVjNmI1ZSAxMDA2NDQK
+PiA+IC0tLSBhL2RyaXZlcnMvYXRtL2ZvcmUyMDBlLmMKPiA+ICsrKyBiL2RyaXZlcnMvYXRtL2Zv
+cmUyMDBlLmMKPiA+IEBAIC0zNjMsNyArMzYzLDEyIEBAIGZvcmUyMDBlX3NodXRkb3duKHN0cnVj
+dCBmb3JlMjAwZSogZm9yZTIwMGUpCj4gPiAgIAkvKiBmaXJzdCwgcmVzZXQgdGhlIGJvYXJkIHRv
+IHByZXZlbnQgZnVydGhlciBpbnRlcnJ1cHRzIG9yIGRhdGEgdHJhbnNmZXJzICovCj4gPiAgIAlm
+b3JlMjAwZV9yZXNldChmb3JlMjAwZSwgMCk7Cj4gPiAgICAgICB9Cj4gPiAtCj4gPiArI2lmZGVm
+IEZPUkUyMDBFX1VTRV9UQVNLTEVUCj4gPiArCWlmIChmb3JlMjAwZS0+c3RhdGUgPj0gRk9SRTIw
+MEVfU1RBVEVfSVJRKSB7Cj4gPiArCQl0YXNrbGV0X2tpbGwoJmZvcmUyMDBlLT50eF90YXNrbGV0
+KTsKPiA+ICsJCXRhc2tsZXRfa2lsbCgmZm9yZTIwMGUtPnJ4X3Rhc2tsZXQpOwo+ID4gKwl9Cj4g
+PiArI2VuZGlmCj4gCj4gVGhlIGNvZGUgYXBwZWFycyB0byBiZSBtaXNhbGlnbmVkLgo+IEkgc2Vl
+IHRoYXQgaW4gdGhlIG9yaWdpbmFsIGRyaXZlciBjb2RlLCB0aGUgZmlyc3QgbGV2ZWwgb2YgaW5k
+ZW50YXRpb24gdXNlcyA0IHNwYWNlcywKPiBhbmQgdGhlIHNlY29uZCBsZXZlbCB1c2VzIGEgVEFC
+ICg4LWNoYXJhY3RlciB3aWR0aCkuCj4gSW4geW91ciBjb2RlLCB0aGUgZmlyc3QgbGV2ZWwgdXNl
+cyBhIFRBQiwgYW5kIHRoZSBzZWNvbmQgbGV2ZWwgdXNlcyB0d28gVEFCcy4KPiBPZiBjb3Vyc2Us
+IHlvdXIgY29kZSBjb21wbGllcyB3aXRoIHRoZSBjdXJyZW50IGNvZGluZyBzdGFuZGFyZHMuCj4g
+Cj4gQWRkaXRpb25hbGx5LCBJIHRoaW5rIGEgYmV0dGVyIG1vZGlmaWNhdGlvbiB3b3VsZCBiZSB0
+byBkbyB0YXNrbGV0X2tpbGwoKQo+IGluIHRoZSAic3dpdGNoKGZvcmUyMDBlLT5zdGF0ZSktY2Fz
+ZSBGT1JFMjAwRV9TVEFURV9JUlEiIGJyYW5jaCwKPiBiZWNhdXNlICJmb3JlMjAwZS0+dHhfdGFz
+a2xldCIgaXMgaW5pdGlhbGl6ZWQgdG9nZXRoZXIgd2l0aCAiZm9yZTIwMGUtPmlycSIuCgpUaGFu
+ayB5b3UgZm9yIHlvdXIgc3VnZ2VzdGlvbnMhIEkgd2lsbCBhZGp1c3QgdGhlIHRhc2tsZXRfa2ls
+bCgpIGludG8gdGhlCiJjYXNlIEZPUkUyMDBFX1NUQVRFX0lSUSIgYnJhbmNoLiBUaGUgZGV0YWls
+cyBhcmUgYXMgZm9sbG93czoKCmRpZmYgLS1naXQgYS9kcml2ZXJzL2F0bS9mb3JlMjAwZS5jIGIv
+ZHJpdmVycy9hdG0vZm9yZTIwMGUuYwppbmRleCBmNjJlMzg1NzE0NC4uZmVjMDgxZGIzNmQgMTAw
+NjQ0Ci0tLSBhL2RyaXZlcnMvYXRtL2ZvcmUyMDBlLmMKKysrIGIvZHJpdmVycy9hdG0vZm9yZTIw
+MGUuYwpAQCAtMzczLDYgKzM3MywxMCBAQCBmb3JlMjAwZV9zaHV0ZG93bihzdHJ1Y3QgZm9yZTIw
+MGUqIGZvcmUyMDBlKQogICAgICAgIGZhbGx0aHJvdWdoOwogICAgIGNhc2UgRk9SRTIwMEVfU1RB
+VEVfSVJROgogICAgICAgIGZyZWVfaXJxKGZvcmUyMDBlLT5pcnEsIGZvcmUyMDBlLT5hdG1fZGV2
+KTsKKyNpZmRlZiBGT1JFMjAwRV9VU0VfVEFTS0xFVAorICAgICAgIHRhc2tsZXRfa2lsbCgmZm9y
+ZTIwMGUtPnR4X3Rhc2tsZXQpOworICAgICAgIHRhc2tsZXRfa2lsbCgmZm9yZTIwMGUtPnJ4X3Rh
+c2tsZXQpOworI2VuZGlmCgpCZXN0IHJlZ2FyZHMsCkR1b21pbmcgWmhvdQo=
 
 
