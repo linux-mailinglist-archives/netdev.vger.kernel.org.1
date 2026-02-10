@@ -1,175 +1,225 @@
-Return-Path: <netdev+bounces-258012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258013-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEkrExyOimm6LwAAu9opvQ
-	(envelope-from <netdev+bounces-258012-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:47:08 +0100
+	id IBkJOwORimkQMAAAu9opvQ
+	(envelope-from <netdev+bounces-258013-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:59:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DAFA1160DA
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:47:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 504E61161AB
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EE7B63007214
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:47:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 124E43010BB8
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0D62820A9;
-	Tue, 10 Feb 2026 01:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584EE287268;
+	Tue, 10 Feb 2026 01:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="CxOWHLVr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AfJ+dJQb"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B0735898;
-	Tue, 10 Feb 2026 01:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DD32868B5
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 01:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770688020; cv=none; b=ScRtgGr3yqH9L1xz+Vrpt4LUKGHEnwwlM+fkYNqImgHEQ0GjdFp61Jr8MOO0gx/nlnz8NcrjUgU8rsy5MB5nrVqO8g7nANjIKUM6GQzVvHqeTMtVBVd9nhwmheXj0jTktzeTZIASQMn+1yYajiqo5ZiFHnqdfL+dm/1xJ0rPNaQ=
+	t=1770688769; cv=none; b=DIxY9GjyB10hJNu4i4ePAbAuvpExcizHXh04VrQUOqOKn2NQwnIFNf24YQQFGpyVj505jfX61gWF0VzfQO9/QdRKN7kiDpKP73u+SU1oYSXyODwPiocTyDMqW4rmfVGv+bZpqp0wSC9JB/Z70jG7yLGrz3+fgdW0lNBSn3KKdvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770688020; c=relaxed/simple;
-	bh=VTGVcDP0+rEoS/Io0WxqeAyHdjv53E+obMcu2j7Zbko=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KQVaOxKHsPtuE9UHdzJIPScwmtffVmSFjCyvvTITu11D/9GnKtO0IXsI/G+HCOy9H7G6knqWijwKtTf2wjVrcZNtKQl8HrkcMnO92LqXO/bZ5iQKkSnacS947mvo/Kv+0N1wFQYd07rVWRcTc3KyQF/nsgZ6Ry5fuz6cgmic6rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=CxOWHLVr; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=WQJ8v01cyUwKck6D/hbkm4oaohtrbNX+EBPP/js0vKw=;
-	b=CxOWHLVrrje/DRCFLZ7EajvAAeLcEo1VbWY6GQ+GOA4T0RDIC67A5t/T82AeuvHNRyEHoDkD4
-	hLDMjsYBWihCL0kV//6b78P7aQOXGLiygdjkXQHNzwqAyiIuHLCYyiVvJTiTlH1VlD4a7PAzx3u
-	M5EMD7YOX0uQIUU66AhEqy4=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4f947D3w1RzKm4L;
-	Tue, 10 Feb 2026 09:42:16 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id AF35D40562;
-	Tue, 10 Feb 2026 09:46:54 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 10 Feb 2026 09:46:54 +0800
-Message-ID: <cfa65635-8a78-4929-8490-f66b7a38d02e@huawei.com>
-Date: Tue, 10 Feb 2026 09:46:53 +0800
+	s=arc-20240116; t=1770688769; c=relaxed/simple;
+	bh=S3vagD1JOscOG2BcqSDKH/Qv/Q1vybKhxHOSgCGjEWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=trRGD3rl93KvsDyALDxerXyxjdTfDY1ccy9pqflorZc4BtHBpCTK36fYgbOqKJEkhp3wYKoo2ulbCE8Q42CIx2mhhN18yk8ytbb5hYD9DxUyvElAQBvmXbD1BX+t+xg9AADV9Yh6V/0w8iU/fhU4/Nq62DYrpjYE8eKoJbMwUFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AfJ+dJQb; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-8230c839409so273582b3a.3
+        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 17:59:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770688767; x=1771293567; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yJeXiplSxyKqxN84bqYmhFFSRg728Hdbv8soCFI7W5w=;
+        b=AfJ+dJQbwYqdBFQh2O0dAU+VVr0W5pPCeAiTB5lOi1cf1FWEqm7w+WiKFDwBdOQiaZ
+         oJxiolnYUCXt2lebeQeyWfSYo/8rvlgbtvrkqibUyui/d8OdFpGmTyGaLpaOZLBmryWx
+         0rJA4qDHBUGIdKP/KleU/9PxIPt4SgA3CMPaTNjpncZC7FXpbPH4BgHoQ6UYn3xC0oHW
+         PewESplxpJWVsMXdsAwtKEVrnVQR+02aGqp9p9b7j9MRgYmffb74Ri5sQd5pzapEBMOS
+         H9PaCwjEa4K0LrreQq4Ua7Qmwcwa2+v58oWthOs/trhWXUYeAcxBgVdoDIUT3QKjcqcW
+         jcbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770688767; x=1771293567;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yJeXiplSxyKqxN84bqYmhFFSRg728Hdbv8soCFI7W5w=;
+        b=bdN37cjbE7TLH035pGqErsF7Dgf6bEgTAlZCXv01ukumjkqksCLtNgOOIlGCREHkrL
+         OjMZ0GTWL+1SyXy9BJ/YjZbCylREvs3sDyyeLUwwA81ecHSmy2E/BUwasITanHn+G2ng
+         E5pgpr4jmyLzhW2qAd+Y9WQo1Q/u6x4VvgaSON/jsiB9zfgpHCCb3jjN60sL2sokuGXK
+         /Xv/YHU1IKyTDyg0L3vwec+IXbboXGeZYit8SWlXVJrwwKQRG3Kdf8kRVaouYlOkhTcT
+         xwgbExJCGfD1mF7PjwZIbZ/Kp0hV5KFmmqLZZDAVWVLuApq3fpA0MG3q2iFVqMlz0EcS
+         +WhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYqtBWdlEJ5cm6w1l4sjr3AJTtU7XJEyMNzG1c+MsDX7SK/GQebNLl6z5jrvoTDghGvOilgds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGsl+7HNxEf23TYT1aoJJtV9vJr4f5a5+VyqumPF6dHvrNX1El
+	6Xc+dSyPuh6Fr4DbtqE/XVj7MkPdlxXj/AI7G4UIwQriJYwniEmTAQJI
+X-Gm-Gg: AZuq6aKET7VLS9wtJo21GFhH7yCI9T64RiURZ5zyWOK8h60ED3JEC6vfdZAvZXtIECc
+	iSvxGsCB9l5xhS3qrlTkCVeC1litqs4vSjOLJ44G16wU1gANBVVi4/zxrVPaFzlWboqYp+Ox30l
+	YaHL0Y3/jO8YFwDk9+xHrnlmclC9gLAXm6aYIPQksGZNADIe7zFCBukkBWHb4TZXYeptPVGzUNX
+	UTDuJzGYUN3iog/DzBzRxq9xgB2XnesRCmgYMAz8DpWzhO7WV03Bk8bW0x4ENcQRLscEfdNKY+b
+	q8VLWpu0Wt+z/bJwBQC1xIM51gK81v4xG+wbmNyCExDOH8/gWhVqcCbyPncWMoaryECjlmE81i1
+	/2mj+6IRkEZbQjVml/uxBEl4xqUIQgJCIbmOk3zg5D1v2D8Vc9X1LfTDRhs1ibHmfp2QlI8O0pL
+	nqJugR5r4Y7P+Z5D1rGianGBKlkAA=
+X-Received: by 2002:a05:6a00:1785:b0:81e:2bca:d133 with SMTP id d2e1a72fcca58-82441634f9cmr11903742b3a.24.1770688767391;
+        Mon, 09 Feb 2026 17:59:27 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8244166f3edsm12442752b3a.3.2026.02.09.17.59.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Feb 2026 17:59:26 -0800 (PST)
+Date: Tue, 10 Feb 2026 01:59:19 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Linus Heckemann <git@sphalerite.org>
+Cc: edumazet@google.com, davem@davemloft.net, eric.dumazet@gmail.com,
+	horms@kernel.org, kuba@kernel.org, morikw2@gmail.com,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzbot+d4dda070f833dc5dc89a@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] selftests/net: add test for IPv4-in-IPv6 tunneling
+Message-ID: <aYqQ9zPAisaNLpMX@fedora>
+References: <20260209190008.139099-2-git@sphalerite.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <3chas3@gmail.com>,
-	<linux-atm-general@lists.sourceforge.net>, <linux-kernel@vger.kernel.org>,
-	<stable@kernel.org>
-Subject: Re: [PATCH net v3] atm: fore200e: fix use-after-free in tasklets
- during device removal
-To: Duoming Zhou <duoming@zju.edu.cn>, <netdev@vger.kernel.org>
-References: <20260209094512.33847-1-duoming@zju.edu.cn>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20260209094512.33847-1-duoming@zju.edu.cn>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260209190008.139099-2-git@sphalerite.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[huawei.com,gmail.com,lists.sourceforge.net,vger.kernel.org,kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258012-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258013-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,gmail.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,huawei.com:mid,huawei.com:dkim,huawei.com:email]
-X-Rspamd-Queue-Id: 6DAFA1160DA
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,d4dda070f833dc5dc89a];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,io_uring_zerocopy_tx.sh:url,ip6_gre_headroom.sh:url]
+X-Rspamd-Queue-Id: 504E61161AB
 X-Rspamd-Action: no action
 
+Hi Linus,
 
-on 2026/2/9 17:45, Duoming Zhou wrote:
-> When the PCA-200E or SBA-200E adapter is being detached, the fore200e
-> is deallocated. However, the tx_tasklet or rx_tasklet may still be running
-> or pending, leading to use-after-free bug when the already freed fore200e
-> is accessed again in fore200e_tx_tasklet() or fore200e_rx_tasklet().
->
-> One of the race conditions can occur as follows:
->
-> CPU 0 (cleanup)           | CPU 1 (tasklet)
-> fore200e_pca_remove_one() | fore200e_interrupt()
->    fore200e_shutdown()     |   tasklet_schedule()
->      kfree(fore200e)       | fore200e_tx_tasklet()
->                            |   fore200e-> // UAF
->
-> Fix this by ensuring tx_tasklet or rx_tasklet is properly canceled before
-> the fore200e is released. Add tasklet_kill() in fore200e_shutdown() to
-> synchronize with any pending or running tasklets. Moreover, since
-> fore200e_reset() could prevent further interrupts or data transfers,
-> the tasklet_kill() should be placed after fore200e_reset() to prevent
-> the tasklet from being rescheduled in fore200e_interrupt(). Finally,
-> it only needs to do tasklet_kill() when the fore200e state is greater
-> than or equal to FORE200E_STATE_IRQ, since tasklets are uninitialized
-> in earlier states.
->
-> This bug was identified through static analysis.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@kernel.org
-> Suggested-by: Jijie Shao <shaojijie@huawei.com>
-> Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+For the subject, please also provide the target repo. e.g. [PATCH v2 net-next]
+
+On Mon, Feb 09, 2026 at 08:00:09PM +0100, Linus Heckemann wrote:
+> commit 81c734dae203 ("ip6_tunnel: use skb_vlan_inet_prepare() in
+> __ip6_tnl_rcv()") was fine in and of itself, but its backport to 6.12
+> (and 6.6) broke IPv4-in-IPv6 tunneling, see [1]. This adds a self-test
+> for basic IPv4-in-IPv6 and IPv6-in-IPv6 functionality.
+> 
+> [1]: https://lore.kernel.org/all/CAA2RiuSnH_2xc+-W6EnFEG00XjS-dszMq61JEvRjcGS31CBw=g@mail.gmail.com/
+> 
+> --
+> Thanks for the review, Hangbin!
 > ---
-> Changes in v3:
->    - Only do tasklet_kill() when state >= FORE200E_STATE_IRQ.
->    - Make the commit messages clearer.
->
->   drivers/atm/fore200e.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-> index f62e3857144..eb386ec6b5e 100644
-> --- a/drivers/atm/fore200e.c
-> +++ b/drivers/atm/fore200e.c
-> @@ -363,7 +363,12 @@ fore200e_shutdown(struct fore200e* fore200e)
->   	/* first, reset the board to prevent further interrupts or data transfers */
->   	fore200e_reset(fore200e, 0);
->       }
-> -
-> +#ifdef FORE200E_USE_TASKLET
-> +	if (fore200e->state >= FORE200E_STATE_IRQ) {
-> +		tasklet_kill(&fore200e->tx_tasklet);
-> +		tasklet_kill(&fore200e->rx_tasklet);
-> +	}
-> +#endif
+>  tools/testing/selftests/net/Makefile      |  1 +
+>  tools/testing/selftests/net/ip6_tunnel.sh | 43 +++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
+>  create mode 100644 tools/testing/selftests/net/ip6_tunnel.sh
+> 
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index 45c4ea381bc36..5037a344ad826 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -43,6 +43,7 @@ TEST_PROGS := \
+>  	io_uring_zerocopy_tx.sh \
+>  	ioam6.sh \
+>  	ip6_gre_headroom.sh \
+> +	ip6_tunnel.sh \
+>  	ip_defrag.sh \
+>  	ip_local_port_range.sh \
+>  	ipv6_flowlabel.sh \
+> diff --git a/tools/testing/selftests/net/ip6_tunnel.sh b/tools/testing/selftests/net/ip6_tunnel.sh
+> new file mode 100644
+> index 0000000000000..4886618fd2689
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/ip6_tunnel.sh
+> @@ -0,0 +1,43 @@
+> +#!/bin/bash
+> +# Test that IPv4-over-IPv6 tunneling works.
+> +
+> +source lib.sh
+> +
+> +setup_prepare() {
+> +  ip link add transport1 type veth peer name transport2
+> +
+> +  setup_ns ns1
+> +  ip link set transport1 netns $ns1
+> +  ip -n $ns1 address add 2001:db8::1/64 dev transport1 nodad
+> +  ip -n $ns1 address add 2001:db8::3/64 dev transport1 nodad
+> +  ip -n $ns1 link set transport1 up
+> +  ip -n $ns1 link add link transport1 name tunnel4 type ip6tnl mode ipip6 local 2001:db8::1 remote 2001:db8::2
+> +  ip -n $ns1 address add 172.0.0.1/32 peer 172.0.0.2/32 dev tunnel4
+> +  ip -n $ns1 link set tunnel4 up
+> +  ip -n $ns1 link add link transport1 name tunnel6 type ip6tnl mode ip6ip6 local 2001:db8::3 remote 2001:db8::4
+> +  ip -n $ns1 address add 2001:db8:6::1/64 dev tunnel6
+> +  ip -n $ns1 link set tunnel6 up
+> +
+> +  setup_ns ns2
+> +  ip link set transport2 netns $ns2
+> +  ip -n $ns2 address add 2001:db8::2/64 dev transport2 nodad
+> +  ip -n $ns2 address add 2001:db8::4/64 dev transport2 nodad
+> +  ip -n $ns2 link set transport2 up
+> +  ip -n $ns2 link add link transport2 name tunnel4 type ip6tnl mode ipip6 local 2001:db8::2 remote 2001:db8::1
+> +  ip -n $ns2 address add 172.0.0.2/32 peer 172.0.0.1/32 dev tunnel4
+> +  ip -n $ns2 link set tunnel4 up
+> +  ip -n $ns2 link add link transport2 name tunnel6 type ip6tnl mode ip6ip6 local 2001:db8::4 remote 2001:db8::3
+> +  ip -n $ns2 address add 2001:db8:6::2/64 dev tunnel6
+> +  ip -n $ns2 link set tunnel6 up
+> +}
+> +
+> +cleanup() {
+> +  cleanup_all_ns
+> +  # in case the namespaces haven't been set up yet
+> +  ip link delete transport1 || true
 
-The code appears to be misaligned.
-I see that in the original driver code, the first level of indentation uses 4 spaces,
-and the second level uses a TAB (8-character width).
-In your code, the first level uses a TAB, and the second level uses two TABs.
-Of course, your code complies with the current coding standards.
+Maybe
+  ip link delete transport1 &> /dev/null || true
 
-Additionally, I think a better modification would be to do tasklet_kill()
-in the "switch(fore200e->state)-case FORE200E_STATE_IRQ" branch,
-because "fore200e->tx_tasklet" is initialized together with "fore200e->irq".
+since this cmd usually would fail and report
+  Cannot find device "transport1"
+> +}
 
-Of course, your current change also looks fine, so
-Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+You forgot to add `set -e`,
+> +
+> +trap cleanup EXIT
+> +setup_prepare
+> +ip netns exec $ns1 ping -W1 -c1 172.0.0.2
+> +ip netns exec $ns1 ping -W1 -c1 2001:db8:6::2
 
+So if the first ping failed, and the second ping pass, the total test will
+still return 0.
 
-
+Thanks
+Hangbin
 
