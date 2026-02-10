@@ -1,256 +1,172 @@
-Return-Path: <netdev+bounces-258014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sEJDM0iRimkQMAAAu9opvQ
-	(envelope-from <netdev+bounces-258014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:00:40 +0100
+	id sJb1E+CRimk1MAAAu9opvQ
+	(envelope-from <netdev+bounces-258015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:03:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39ECA1161B4
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:00:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7187111623D
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:03:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC25E3011125
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:00:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CD92B3006928
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5D926CE05;
-	Tue, 10 Feb 2026 02:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4A429D277;
+	Tue, 10 Feb 2026 02:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTnjbCsP"
+	dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="eHssQR0U";
+	dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b="nJGphPTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from devnull.danielhodges.dev (vps-2f6e086e.vps.ovh.us [135.148.138.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D58D128395
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 02:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7E722D7B6;
+	Tue, 10 Feb 2026 02:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.148.138.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770688838; cv=none; b=l98lnM7ZgFi88K2WNtd+ouUVackyLQRI5bLAMp/D3xpCxvCZWGpV9+xa/JMprSERyLC1GG50IVeDxaiQg63herJyAkUoJcjVt7BiwVqpL4iiK7i61qgYLZPvk6/V1Gqh0dZpkqm4llRZFpWBT6/JbNwgB5D1Vh0ZPN2o1VbKAcg=
+	t=1770688987; cv=none; b=JAdoD1Q8Q59tt7wjOGg1vDN+bJd/NBxeo441tMG7oHhJzdj7P9PWT+ux+0BRYBxnNZiLtkKTp3XnMtihIaRmxnS07pb+dbqFwUzEV7OmJDHEUvcyF3sZpAVWrmh4652Xozozdx/4MTWp5etEpqvd5tcvjfTxW10GeeEqVYUvXPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770688838; c=relaxed/simple;
-	bh=UJkIDp3mei6FigAUKfuCD/58P/3Z7xvlLeXNG9/FfTo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ejMq0H1NQKGqYHGaKA0fF0theLhEKridxl9N8ZvRDuwasx1O7E1WANp2nIs64rxrLEi/kUOi0j3zQQnU4lkDAHsUmO/T13UfXCN1+Bz/EqWysjBN0KhgLouqiKMuQCjtriKxn50hOqRhwn0tXTDqcuT++dWZ6sqeFh48XxUVAGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GTnjbCsP; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-1270adc5121so395838c88.0
-        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 18:00:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770688836; x=1771293636; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MfY4Xzr/UFYtGolHiW+DJ/mV6vJV4fu9aHTEWwC08qI=;
-        b=GTnjbCsPOiSy2X18BmYbXx2+UtXf7E1P+6+E7zI8Fs7SjdqCjhPP56KqnkHzZtgR+X
-         RdfGFPAKQQDXILKDBjNiUybd66sZRBtvwYe4MKnAGvrLWsic+5tVvr/36dXK1v3FL4KR
-         WS4LB+fjL3QAFlipFpV/6rDU8DsKJazdIgsF8hC3KKK6LFSO1qZwjQuzjK/qZ7W6yrJ/
-         EMmKvBYTtjR2zOCqYQagWThZNXL2vi9uJh+hJ+5KQ+9KzBpoI4xJnI4S/4UlLChqckXB
-         cIRK45amNTzWYu1BlIlL5tdkLMFLzMRcKyFGCRPaYK0u9wjukJs8PmEBqEQL69sxRCni
-         +WUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770688836; x=1771293636;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MfY4Xzr/UFYtGolHiW+DJ/mV6vJV4fu9aHTEWwC08qI=;
-        b=sU+J4/SmZddHiY5CQHQXGNM47sK5hhzfhbMvKTxuxffD+J1sIoQeC1zi6xdDG+Un+L
-         reeeq6wmAdpPp/aY4vvA8hVMnwYNQ4+uC0+9pPpPRh8cKlLwwMVe/g46LmNXRWjpRQsO
-         CshgCzcAnqbHm3l+SsMFCp7tLN73d4ET0LNRA177Ld3yy8zWpb+SX1NlLV52vyUGd1Y2
-         AXpNKd3Wi56I/AxVxQM98RnAeIzdtW/8Y6rw3Y6CcaEFqzf364XUJn3W0zqa9fkbeSdm
-         +Ra1DqvR67NpuAbaGZk00/iwXqmquGj7ojc1f+/MkK/sz4+8Lj8DDNMUHQNGI6WMmKuU
-         JeTg==
-X-Gm-Message-State: AOJu0Yw/158TIzF5zFusbaX65WLcCHvGshaQNhsMvVlETL/SmUifmpRN
-	933/ajO586fMVc3UVBXlZY/uYiRHtGLlnGRZUiBdhecBylD2L3Xo74g3ulQPI5uP
-X-Gm-Gg: AZuq6aIgpvT+QDwVaQXpXYm3lkCSc83h36ubRUVW9pB2C6sft/twQocnS2N62ju6w+z
-	WfitpfObT3UfgIdG7GOXoX8rrHofKX6FmM/1HOF5GfUewjQP2Vv1WLqhFK5d3el3S1XBBqHIyKf
-	f8N8sRSHv3yS9i8j9FXON7iZmM1n4SvUs3d16ACHM/sL6dX158cGpXLx1r2XJt0ve0fFoNwMIMO
-	rEX5PiQ+s1NVd3yCkfgGUkImEem8fhQ8GL/8br537BcDMnqXYQ0Mj2xKGktjlLFGH/19B78JeFN
-	DxF5aAxUFwn9zY12K6JWDSWeSvPpGxKg44FLw4c351aT1Pl50YT2IYnPyPh4v/wRRBQf8RtJhls
-	qgLA7zALnONcsXlOpqpY5l79xhFxiCrgEKC14v9A9RE9Kf71iCt0lSwiiufsk1Y4TCKlc9BdTlq
-	Krf7bVlhlxZKy9HnYXOVdaKBoNFmh/P6hqbUEW8EsoJ1jMUIwIfUK4wJRbzCBsV2wxt9nd7lxo4
-	Vq0o3GOA9kZ4TWcdBdhaboTXOcRsKGtLPETQldqN9Y4y7jKNiQ26yl46jeo05Od/Ody86VaRb92
-	sAXVFNphpSKNvQpmZQ==
-X-Received: by 2002:a05:7022:f97:b0:119:e56b:98be with SMTP id a92af1059eb24-1270405aa41mr6196402c88.37.1770688836142;
-        Mon, 09 Feb 2026 18:00:36 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-127041d9c91sm11239559c88.2.2026.02.09.18.00.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 18:00:35 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	stable@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Zheyu Ma <zheyuma97@gmail.com>
-Subject: [PATCH v2] net: arcnet: com20020-pci: fix support for 2.5Mbit cards
-Date: Mon,  9 Feb 2026 18:00:12 -0800
-Message-ID: <20260210020012.11819-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1770688987; c=relaxed/simple;
+	bh=riLKeXcE3SDkoNfwPHn8lB3ud/YG40t/m3fvt2H9ICI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YyBHwE5Ft115S84JUz5pb6Phnc3ITFdnDrGSKTvuX2H6ABKT6RhCO+drV49/4o0E9HAhqsicGxi0Rxu51nezpPhe3BPUgc1mvcOITztSgdtyU/kQ15EqvYGtmjbIMELL9jL0Qtqxp3ALmLg+LNdshGtaEBqapW2S7zy3eaVmQAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev; spf=pass smtp.mailfrom=danielhodges.dev; dkim=pass (2048-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=eHssQR0U; dkim=permerror (0-bit key) header.d=danielhodges.dev header.i=@danielhodges.dev header.b=nJGphPTx; arc=none smtp.client-ip=135.148.138.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=danielhodges.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danielhodges.dev
+DKIM-Signature: v=1; a=rsa-sha256; s=202510r; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Subject:To:From:Date; t=1770688970; bh=EHMwWUzopysx2OW5PQDuyM5
+	RK9zojql1474DYZ4AwGE=; b=eHssQR0U5qDayguOYMKloMMc8H3eXZW5+DTSgMYwaIqks/8fbO
+	Y5VN5Y/zvQiKxYEwCZrYsfxGPYvTa+2Vm/bAkdHicPz/fUdFMUWtwcP9J5s8c5ouAK+BPsdbqCS
+	duACy+SMTB1uQcVRjBXVtgGYf4q56TgAGymYxaIoJQEIVABJjj9LS0c3tEl0DOz92lL/LqiRoxv
+	YNjZbpw93evvb4v9Wb59wwfGGN6n4vo8masoBumcy2zkNElq/HDJIu3DKp9KTo84333r6Ohpqsv
+	SGvYRh3xSeEz+1rnCfo1Sv2cKmA06cfQqfHr3Epu7RvEwPVOMznMdEVvIJe7r0MwOag==;
+DKIM-Signature: v=1; a=ed25519-sha256; s=202510e; d=danielhodges.dev; c=relaxed/relaxed;
+	h=Message-ID:Subject:To:From:Date; t=1770688970; bh=EHMwWUzopysx2OW5PQDuyM5
+	RK9zojql1474DYZ4AwGE=; b=nJGphPTxbeXd+QUQ041ezLX4HsnyTIq0ERFudn/KysJ89q/GVC
+	dCed+7wsnEU6PEm04AHwXVc3nTeYuve9p2BQ==;
+Date: Mon, 9 Feb 2026 21:02:50 -0500
+From: Daniel Hodges <daniel@danielhodges.dev>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Daniel Hodges <git@danielhodges.dev>, sd@queasysnail.net, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzbot+0e665e4b99cb925286a0@syzkaller.appspotmail.com
+Subject: Re: [PATCH] macsec: skip PACKET_LOOPBACK frames in
+ macsec_handle_frame()
+Message-ID: <brhtacym66q4tn7ahzjkeeq53xfl3hez2jznyhkyvzsw33vqra@jo36wnmjnofh>
+References: <20260209162851.11800-1-git@danielhodges.dev>
+ <CANn89iJYk3T3sVf0osRy3_jvH6H_Xbgu6bdgqamJY-6pUoiHTA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJYk3T3sVf0osRy3_jvH6H_Xbgu6bdgqamJY-6pUoiHTA@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[danielhodges.dev,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[danielhodges.dev:s=202510r,danielhodges.dev:s=202510e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,pengutronix.de,lunn.ch,davemloft.net,google.com,redhat.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-258014-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258015-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 39ECA1161B4
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@danielhodges.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[danielhodges.dev:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,0e665e4b99cb925286a0];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email,danielhodges.dev:email,danielhodges.dev:dkim]
+X-Rspamd-Queue-Id: 7187111623D
 X-Rspamd-Action: no action
 
-Commit 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
-converted the com20020-pci driver to use a card info structure instead
-of a single flag mask in driver_data. However, it failed to take into
-account that in the original code, driver_data of 0 indicates a card
-with no special flags, not a card that should not have any card info
-structure. This introduced a null pointer dereference when cards with
-no flags were probed.
+On Mon, Feb 09, 2026 at 06:35:46PM +0100, Eric Dumazet wrote:
+> On Mon, Feb 9, 2026 at 5:29 PM Daniel Hodges <git@danielhodges.dev> wrote:
+> >
+> > macsec_handle_frame() assumes all incoming frames have a valid Ethernet
+> > header at skb_mac_header(skb) and reads hdr->eth.h_proto to determine
+> > whether to process the frame as MACsec.  However, loopback packets are
+> > delivered with pkt_type PACKET_LOOPBACK and carry only a
+> > protocol-specific header (e.g. 7-byte phonethdr), not a full Ethernet
+> > header. Reading 14 bytes of ethhdr from such a short header results in a
+> > slab-out-of-bounds / uninit-value access.
+> >
+> > Fix this by returning RX_HANDLER_PASS early for PACKET_LOOPBACK frames,
+> > consistent with how macvlan_handle_frame() handles this case.
+> 
+> In the syzbot report, I do not see dev_loopback_xmit() being involved ?
 
-Commit bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in
-com20020pci_probe()") then papered over this issue by rejecting cards
-with no driver_data instead of resolving the problem at its source.
+I think it doesn't go through dev_loopback_xmit:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/phonet/af_phonet.c#n182
 
-Revert the incorrect fix and fix the original issue by introducing a
-new card info structure for 2.5Mbit cards that does not set any flags.
+> >
+> > Reported-by: syzbot+0e665e4b99cb925286a0@syzkaller.appspotmail.com
+> > Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
+> > Signed-off-by: Daniel Hodges <git@danielhodges.dev>
+> > ---
+> >  drivers/net/macsec.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+> > index 0206b84284ab..edcc51f82327 100644
+> > --- a/drivers/net/macsec.c
+> > +++ b/drivers/net/macsec.c
+> > @@ -1103,6 +1103,13 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+> >         bool pulled_sci;
+> >         int ret;
+> >
+> > +       /* Loopback packets (e.g. from phonet) don't have L2 headers, so
+> > +        * attempting to interpret the mac header as Ethernet would read
+> > +        * uninitialized memory.  Let them pass through unmodified.
+> > +        */
+> > +       if (unlikely(skb->pkt_type == PACKET_LOOPBACK))
+> > +               return RX_HANDLER_PASS;
+> > +
+> >         if (skb_headroom(skb) < ETH_HLEN)
+> >                 goto drop_direct;
+> >
+> > --
+> > 2.52.0
+> 
+> I think the issue is in this skb_headroom() check really, this is not
+> really doing what we need.
+> 
+> Note that the existing check (if (hdr->eth.h_proto !=
+> htons(ETH_P_MACSEC))) should kick properly
+> if phonet was able to send a bigger packet.
+> 
+> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+> index c2cb2d20976b..ef4cdf25d425 100644
+> --- a/drivers/net/macsec.c
+> +++ b/drivers/net/macsec.c
+> @@ -1141,7 +1141,7 @@ static rx_handler_result_t
+> macsec_handle_frame(struct sk_buff **pskb)
+>         bool pulled_sci;
+>         int ret;
+> 
+> -       if (skb_headroom(skb) < ETH_HLEN)
+> +       if (!pskb_may_pull(skb, skb_mac_offset(skb) + ETH_HLEN))
+>                 goto drop_direct;
+> 
+>         hdr = macsec_ethhdr(skb);
 
-Fixes: 8c14f9c70327 ("ARCNET: add com20020 PCI IDs with metadata")
-Fixes: bd6f1fd5d33d ("net: arcnet: com20020: Fix null-ptr-deref in com20020pci_probe()")
-Cc: stable@vger.kernel.org
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
-Changes from v1:
-Rebase on latest mainline instead of net-next
-Add received tag
-
- drivers/net/arcnet/com20020-pci.c | 31 ++++++++++++++++++++-----------
- 1 file changed, 20 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index 0472bcdff130..4847f40a2095 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -139,9 +139,6 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 		return -ENOMEM;
- 
- 	ci = (struct com20020_pci_card_info *)id->driver_data;
--	if (!ci)
--		return -EINVAL;
--
- 	priv->ci = ci;
- 	mm = &ci->misc_map;
- 
-@@ -347,6 +344,18 @@ static struct com20020_pci_card_info card_info_5mbit = {
- 	.flags = ARC_IS_5MBIT,
- };
- 
-+static struct com20020_pci_card_info card_info_2p5mbit = {
-+	.name = "ARC-PCI",
-+	.devcount = 1,
-+	.chan_map_tbl = {
-+		{
-+			.bar = 2,
-+			.offset = 0x00,
-+			.size = 0x08,
-+		},
-+	},
-+};
-+
- static struct com20020_pci_card_info card_info_sohard = {
- 	.name = "SOHARD SH ARC-PCI",
- 	.devcount = 1,
-@@ -448,49 +457,49 @@ static const struct pci_device_id com20020pci_id_table[] = {
- 		0x1571, 0xa001,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0,
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa002,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0,
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa003,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa004,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0,
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa005,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa006,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa007,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa008,
- 		PCI_ANY_ID, PCI_ANY_ID,
- 		0, 0,
--		0
-+		(kernel_ulong_t)&card_info_2p5mbit
- 	},
- 	{
- 		0x1571, 0xa009,
--- 
-2.43.0
-
+Yeah, that seems more likely or should the the loopback side use
+dev_loopback_xmit?
 
