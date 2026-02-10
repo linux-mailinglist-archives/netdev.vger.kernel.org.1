@@ -1,228 +1,180 @@
-Return-Path: <netdev+bounces-258133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258134-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJEcMsNpi2k1UQAAu9opvQ
-	(envelope-from <netdev+bounces-258133-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:24:19 +0100
+	id SPyRH/Bpi2k1UQAAu9opvQ
+	(envelope-from <netdev+bounces-258134-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:25:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3F211DE31
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:24:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE97A11DE80
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:25:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 066883033F9A
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:22:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19D6E300DA60
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D6738A709;
-	Tue, 10 Feb 2026 17:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABFE38885B;
+	Tue, 10 Feb 2026 17:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DcN1cZ8M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ss73s5h+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3145C1DF74F;
-	Tue, 10 Feb 2026 17:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88001388840
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 17:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770744138; cv=none; b=sgaZPbIfUd+qL6weEoSNAQJFnel5mJ2i6idG9V6oFVie56vslXuF8a/FxjISaDI1v0P2rTycFBSnwYbE5oHhTVSMDcnkxJhgMjrAXfNgjw0iUUnlUO1rRaDljr+YFMakgp2vaRvQRzAsBj3gLb0xg29gt1BwQBDcJtDuHfkK4Oo=
+	t=1770744285; cv=none; b=LYZU01mVqSFfqR1JBkxBX4tt8dDVHP5jd8yr64EUI+3ezPWN10H9W6EomWYi2ymSLhtKziZuFiWollmAC7XVzZHiPwmeYsg+E63sTxOF+/PvGQUFsMEj/YLxIhSt9IWoko0IlEbSVCtIipS8i1gd9QgSBqW+lNn0f5qQAKLHK3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770744138; c=relaxed/simple;
-	bh=YeOpAiaT58KYK6hzmVoXzdp05TldJdth7tHhp/RBBwI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Q/RcXTEv4TlGm2JazF8zAGuRjidQFc6vEnc/mXH+DMmaC8HQ0GtqaVxxIIzbeW5T6AuS67jDxIEBnCUeY9riR5/YXupq2hwAlZEx5T7eczAAbyMRiX8VvlyHFSQe/nCtbk37c+mOZ2MsA2AEkfgT7sE2C0UFsJqqau41kzbxA9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DcN1cZ8M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5733CC19421;
-	Tue, 10 Feb 2026 17:22:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770744137;
-	bh=YeOpAiaT58KYK6hzmVoXzdp05TldJdth7tHhp/RBBwI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DcN1cZ8MIVrVizEdckIkDsj+vkfGTjCcdrVG8PXfF8icyC1RXK1DgpKeHJ+xNeldA
-	 4aJAKr0+nxaa6lhZx5q9XECPUJoT57pOnnASJjoYU3/OvIdYtSIZnsLRyt8IBc1lh2
-	 s8xeuebxE9sJwEId85fna95BVhQH+2ON0MOlmHVy7E3i0S3n+ivCYe7ybA/JJdr4P+
-	 JOgIhd6ve8DEy42YiHVIesy461KPrUnHAe2dPptYKrfEs9KAz7SF+74734kmWvyc+q
-	 C8lY2Umv5kGboxo1pCn+V8/SFlXyeWX+bnoi1C+qDntiS7EhJ/5JRXnvhA6gHLrtgW
-	 BcRLIVwxZSBeA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 10 Feb 2026 18:21:51 +0100
-Subject: [PATCH bpf-next 5/5] selftests/bpf: Add
- bpf_xdp_metadata_rx_checksum support to xdp_hw_metadat prog
+	s=arc-20240116; t=1770744285; c=relaxed/simple;
+	bh=Wd3YSz4r0LCpgTa6gQcvb7t6hbNezRGr0SM90Ujny/A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A1onneqZR8h4n13Bcj3aMURwLmakaioV8GAjxJ65jKMQGsgna86+lE3aDaiTsbE316xvT8rNMuCdS7Lo7lc0qrBopivLEinNlD0iOpze2dAuT9suVpcDPvO/QFScvvO1zptA8fDXhGCJFExXkG3ngOq/2+tUcJYVrDitv9ygW1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ss73s5h+; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a91215c158so8020365ad.0
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 09:24:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770744284; x=1771349084; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=exOj3yYPEa1TYDiWarKxK5k3MV6+EjzaaIJ4oOWyLaY=;
+        b=Ss73s5h+GElY1s0DhutSz6CbTo2WTDHzihInucAby4sIk9S78raW4udZBEDt83cKRs
+         c2PFGO8/9tx57oj8MUdQTOkFbGxRXSB3ceQIfSND1kjeENAn1m1yEbmemxmsqgZ9ymfz
+         iFDe7L5nmo2x2IcmrReuFIU7a8ehiCvJFibPUYyIJkhupoyCtCvIezLvq/bRmcd4axdc
+         8amGYHbDqOCocQNTEiiiaJpY64UNUCDfWjOfl1WqK9UZ/PkbxANuDaIkoC9k58ZfN+G6
+         e+ar4O4g6GDuaJNiB4sDw1M78GTEHY966jt3L4X6g4LdDCvl/a11N+HEaAD2UhmzUpSX
+         OwFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770744284; x=1771349084;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=exOj3yYPEa1TYDiWarKxK5k3MV6+EjzaaIJ4oOWyLaY=;
+        b=ZYTV1qFZBlTrkc+1T0uj/0nZ+MXYPI5snUzwtgLZvqGLX7ywfzofICnwWUnUzj5KWF
+         QRYF7pw4GygtHoTxZWZfMC5e+XUQvlgCoiU1BHfm18DuKffFz6eQsCqJM527X1oTaNXo
+         VHCvYYA1H3okzjtojG+0Q/KmqPBKT8nSgZK1cBI+Ztmyx35rPTkoXxkR7b/OU/9kc7AV
+         GSewBxVqQdD7/Z5377XR8CU0/RDzjNDm4KgfI9gfj2n0ztFWIhhk93C60qr4puScXX6N
+         L4lxmHSnNO68lJOvV+SNmLZDJjNXs30O4dub0QqgHey68o7baedkUtTyFal/ZaRLyJLg
+         qNTw==
+X-Gm-Message-State: AOJu0Ywv1QE0xsXsjct5eeJgrt1RjNNcb1NdQSVpuCexkdb93QRwxu/c
+	tETLhgZh2Z0JEzv3G4+ql6+CivTqyUi7C6MAntQ3Bw6ttfcCG5y06Eya
+X-Gm-Gg: AZuq6aI9Phly6WYkksGCy1ufuN6BjmxlmAVZQ0sUiLk2o8eRu0KkKO1wZyy4qIWd/nT
+	bjB6UVHH2L8X36hnSrgAmE8Y3deHkMkVVvvMxCij96N6QYvFaysuY5QPUSov3gpO6qNEWX07HHs
+	YYLpLoESZbNe5MsrPL/JkkrsTE542mZIOwX5pym6c+A+GhmmPuNNyji9Ybzjd9Niyfc4Vncrarf
+	2BtnAanDvQVrlh8HtAeuxEamRZbpMWgrxTetiC+Y2qsEfxcbVDtZWfRP8o+2u3how2+bf56Q56W
+	dXwRbQ4ODWDKdWA7qr/K+vCDtfqYYQekz4WEXh+quVrhxY2AmciLQBxTYq2tzDj2bxIOA/LH4tW
+	wdGULACuyKfGtZYt1c5tjr0mNwQP+YlVwZzQVsImbBr1DI76/V1FeOayhb2zkuUd7n1I9rM6294
+	9ypeh/w1sPO5bF1DLEAI1dk/MXApfofPH0HAQMKm6BIs9UyeJmjC++iVE1RsXFQpUCsisw7Rjxr
+	TKjV403sVK1yWFQ1R4uVFA=
+X-Received: by 2002:a17:903:2f8b:b0:29d:a26c:34b6 with SMTP id d9443c01a7336-2a95194ab72mr139665545ad.50.1770744283691;
+        Tue, 10 Feb 2026 09:24:43 -0800 (PST)
+Received: from [192.168.0.128] ([98.97.33.227])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a9636184a3sm110427275ad.20.2026.02.10.09.24.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Feb 2026 09:24:42 -0800 (PST)
+Message-ID: <2c0395d5323770a32d53c6b874a735b888e4d4f1.camel@gmail.com>
+Subject: Re: [PATCH] fbnic: close fw_log race between users and teardown
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Chengfeng Ye <dg573847474@gmail.com>, kernel-team@meta.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, 	jacob.e.keller@intel.com, lee@trager.us,
+ horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 10 Feb 2026 09:24:41 -0800
+In-Reply-To: <20260209163854.521415-1-dg573847474@gmail.com>
+References: <20260209163854.521415-1-dg573847474@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260210-bpf-xdp-meta-rxcksum-v1-5-e5d55caa0541@kernel.org>
-References: <20260210-bpf-xdp-meta-rxcksum-v1-0-e5d55caa0541@kernel.org>
-In-Reply-To: <20260210-bpf-xdp-meta-rxcksum-v1-0-e5d55caa0541@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
- linux-kselftest@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258133-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258134-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,trager.us,kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D3F211DE31
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EE97A11DE80
 X-Rspamd-Action: no action
 
-Introduce the capability to dump HW rx checksum in xdp_hw_metadat
-program via bpf_xdp_metadata_rx_checksum() kfunc.
+On Mon, 2026-02-09 at 16:38 +0000, Chengfeng Ye wrote:
+> Fixes a theoretical race on fw_log between the teardown path and fw_log
+> show/write functions.
+>=20
+> The fw_log null check was performed outside the lock in both
+> fbnic_dbg_fw_log_show() and fbnic_fw_log_write() (called from debugfs
+> paths or mailbox threaded IRQ handler). Concurrent teardown in
+> fbnic_fw_log_free() could clear and free the log buffer after the check
+> because there is no proper synchronization, leading to list traversal or
+> buffer access on freed memory.
+>=20
+> fbnic_fw_log_write() can be reached from the mailbox handler
+> fbnic_fw_msix_intr(), but fbnic_fw_log_free() runs before IRQ/MBX
+> teardown. fbnic_dbg_fw_log_show() runs via debugfs and seems to be
+> not synchronized with removal either.
+>=20
+> Possible Interleaving scenario:
+>   CPU0: fbnic_dbg_fw_log_show() or fbnic_fw_log_write()
+>           if (fbnic_fw_log_ready())   // true
+>           ... preempt ...
+>   CPU1: fbnic_fw_log_free()
+>           vfree(log->data_start);
+>           log->data_start =3D NULL;
+>   CPU0: continues, walks log->entries or writes to log->data_start
+>=20
+> Move readiness checks under the fw_log spinlock, and clear the log state
+> under the same lock in fbnic_fw_log_free() before freeing the buffer.
+> This makes readers/writers mutually exclusive with teardown.
+>=20
+> Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- .../testing/selftests/bpf/progs/xdp_hw_metadata.c  |  7 ++++++
- tools/testing/selftests/bpf/xdp_hw_metadata.c      | 28 ++++++++++++++++++++++
- tools/testing/selftests/bpf/xdp_metadata.h         | 10 +++++---
- 3 files changed, 42 insertions(+), 3 deletions(-)
+You conflated two cases. One that can happen and one that can't.
 
-diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-index 330ece2eabdb454da2bb2cbd297d2b2dd6efddc0..dc62d572e3ac6e2ef173b330da515757ea543415 100644
---- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-@@ -110,6 +110,13 @@ int rx(struct xdp_md *ctx)
- 	else
- 		meta->hint_valid |= XDP_META_FIELD_VLAN_TAG;
- 
-+	err = bpf_xdp_metadata_rx_checksum(ctx, &meta->ip_summed,
-+					   &meta->cksum_meta);
-+	if (err)
-+		meta->rx_cksum_err = err;
-+	else
-+		meta->hint_valid |= XDP_META_FIELD_CHECKSUM;
-+
- 	__sync_add_and_fetch(&pkts_redir, 1);
- 	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
- }
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 3d8de0d4c96a7afdf5f60b2fdff73c22b876ce54..5f4bd63b8a31586353e58e4f6472ee8ac9531a06 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -8,6 +8,7 @@
-  * - Metadata verified:
-  *   - rx_timestamp
-  *   - rx_hash
-+ *   - rx_checksum
-  *
-  * TX:
-  * - UDP 9091 packets trigger TX reply
-@@ -219,6 +220,28 @@ static void print_vlan_tci(__u16 tag)
- 	printf("PCP=%u, DEI=%d, VID=0x%X\n", pcp, dei, vlan_id);
- }
- 
-+static void print_rx_cksum(__u8 ip_summed, __u32 cksum_meta)
-+{
-+	const char *cksum = "CHECKSUM_NONE";
-+
-+	switch (ip_summed) {
-+	case XDP_CHECKSUM_UNNECESSARY:
-+		cksum = "CHECKSUM_UNNECESSARY";
-+		break;
-+	case XDP_CHECKSUM_COMPLETE:
-+		cksum = "CHECKSUM_COMPLETE";
-+		break;
-+	case XDP_CHECKSUM_PARTIAL:
-+		cksum = "CHECKSUM_PARTIAL";
-+		break;
-+	case XDP_CHECKSUM_NONE:
-+	default:
-+		break;
-+	}
-+
-+	printf("rx-cksum: %s, csum_meta=0x%x\n", cksum, cksum_meta);
-+}
-+
- static void verify_xdp_metadata(void *data, clockid_t clock_id)
- {
- 	struct xdp_meta *meta;
-@@ -254,6 +277,11 @@ static void verify_xdp_metadata(void *data, clockid_t clock_id)
- 		printf("No rx_vlan_tci or rx_vlan_proto, err=%d\n",
- 		       meta->rx_vlan_tag_err);
- 	}
-+
-+	if (meta->hint_valid & XDP_META_FIELD_CHECKSUM)
-+		print_rx_cksum(meta->ip_summed, meta->cksum_meta);
-+	else
-+		printf("No rx_chsum, err=%d\n", meta->rx_cksum_err);
- }
- 
- static void verify_skb_metadata(int fd)
-diff --git a/tools/testing/selftests/bpf/xdp_metadata.h b/tools/testing/selftests/bpf/xdp_metadata.h
-index a16f71488a34e6df23fec6dd7dde7b7989774618..b7ab112da8032405ec0e3d699499f4a9c5cb91dc 100644
---- a/tools/testing/selftests/bpf/xdp_metadata.h
-+++ b/tools/testing/selftests/bpf/xdp_metadata.h
-@@ -28,6 +28,7 @@ enum xdp_meta_field {
- 	XDP_META_FIELD_TS	= BIT(0),
- 	XDP_META_FIELD_RSS	= BIT(1),
- 	XDP_META_FIELD_VLAN_TAG	= BIT(2),
-+	XDP_META_FIELD_CHECKSUM = BIT(3),
- };
- 
- #define XDP_CHECKSUM_NONE		0
-@@ -53,9 +54,12 @@ struct xdp_meta {
- 		};
- 		__s32 rx_vlan_tag_err;
- 	};
--	struct {
--		__u8 ip_summed;
--		__u32 cksum_meta;
-+	union {
-+		struct {
-+			__u8 ip_summed;
-+			__u32 cksum_meta;
-+		};
-+		__s32 rx_cksum_err;
- 	};
- 	enum xdp_meta_field hint_valid;
- };
+From what I can tell the debugfs issue cannot happen as the debugfs
+files are removed before the log is freed. If the debugfs files can
+still be accessed after they are removed we have bigger issues.
 
--- 
-2.53.0
+The log is initialized after the mailbox is enabled, and freed before
+it is disabled so the write can currently race with the free call. That
+said the current fix is pretty messy in terms of resolving it.
 
+A better fix for this might be to pull out fbnic_fw_log_enable/disable
+from the fw_log_init/free and leave them in the places currently
+occupied by the fw_log_init/free calls. With that we could place the
+log_init before the request_mbx call, add fw_log_free as an exception
+case before "free_irqs", and relocate fw_log_free to the line after the
+fw_free_mbx calls as it is a resource that should be put in place
+before the mailbox is enabled, and not cleared until after the mailbox
+and debugfs file has been disabled.
 
