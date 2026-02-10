@@ -1,207 +1,268 @@
-Return-Path: <netdev+bounces-258027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBW1BxWwimklNAAAu9opvQ
-	(envelope-from <netdev+bounces-258027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 05:12:05 +0100
+	id cDkRGCLBimkeNgAAu9opvQ
+	(envelope-from <netdev+bounces-258028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 06:24:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39ADF116DB5
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 05:12:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C509E11713F
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 06:24:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EF39330060BB
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 04:12:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B3587300184B
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 05:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0651330F7E9;
-	Tue, 10 Feb 2026 04:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422922D3733;
+	Tue, 10 Feb 2026 05:22:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWUK/2sj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juAXZvOo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76482F9D83
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 04:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8F732BF32
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 05:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770696720; cv=none; b=NMAJZzk9owiYtlJuzLbx7C0fgirfQrrVTJrTnyCOymO8bGkhiC4DR9HNUXTygckMELOInx1yg8JWRrki3W0wXv7b++a2fq8qusZAnhX/opIJGcP8RXFVpqJDZM6VsPqPX83R0uaY4HTWOKVRtXc8hVG1NGfnycZh+HPrWR2YVq4=
+	t=1770700960; cv=none; b=nb3gj8JR77ATN0RjgwX/KVVEA5WLSLEA8TXYm/4bDexA+q9w503PnDpfhokPsd0f0Bcv7aqjLecg7NjeJpfa/wp1sij7oB48A6TPFbTDfMxv2jEx/jXDRcj1c//tG1XuQCxPzt6FBOaoGzcDJkjzhYaA6HEldPixoOAx/gxX5yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770696720; c=relaxed/simple;
-	bh=TX5OH9yf6boJdIVgDFQizKukPtJYDByRCTLVX2NZtZg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nhW8Q6tkYE4rZlERHC3ViIaP735G/vymGgOxkerq8yBlZ5Xp2y4llYnBtEfZYgDcnKzmbZ2W03Mfm0QkuwnHiLSNr75hPOopsvmjxaPQy5kUe39ucJAZPxbSgjZGj+eTbHtEB00tjeTQxRKdGX7ZS1XkKF/JKa8UUd2hBzvuFaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWUK/2sj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 60BCAC116C6;
-	Tue, 10 Feb 2026 04:12:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770696720;
-	bh=TX5OH9yf6boJdIVgDFQizKukPtJYDByRCTLVX2NZtZg=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=WWUK/2sjoDbsJaIRt6HTipehR9g1JLruF6M9MS+I6HAjOHdWvjJKzUkRGnWHBIlh+
-	 YtLNItnUc/VOCVK9GVEL7l+ze69E+SJ3Q1XPD9pe19CSVxQ11EhIcVOxf7MFAVbDKV
-	 +ZgVeJdfj03n0L7pFesEiCEKsJBGMa/Yls4IA/ZnaRrsqI9E6yTSYdfOy38+epsk7L
-	 aTpeX14nDaNi9HJKImzEEnuBCyCAe9D0KbNSo3QwooNzLzC4GjPwojewl/+WrI5wyZ
-	 zFCLVFNzIxYCJ/6M0/BkC7R3xeZBgi9YY1lV1OfFAZLxhOIJ8tPwYj8BGV4qEJ55kp
-	 qjgZx2YFrU6uQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5675AEB28F7;
-	Tue, 10 Feb 2026 04:12:00 +0000 (UTC)
-From: Chen Linxuan via B4 Relay <devnull+me.black-desk.cn@kernel.org>
-Date: Tue, 10 Feb 2026 12:11:48 +0800
-Subject: [PATCH iproute2] ip/netns: avoid redundant mounts
+	s=arc-20240116; t=1770700960; c=relaxed/simple;
+	bh=O8l2fAzrgh6aNA8Ul4ZorhabRZLemD4a+0f4S3xUxRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZAsi+6C5SDDyt7s/TcD7NyVEiL2wIPBgw2Uwp8af7MdBADHjgBnx0yjHJmqLjpBpr63YQ9HIusvtZnECjpnVrDokohrAePMGS9575pwXIKCJu7RA46zkPZS3m3ZNU461+E8ugNZCyoFJ6U7Qxe5Ei02rC08iLZmn6b29x99dJc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=juAXZvOo; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2aaf59c4f7cso2032025ad.1
+        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 21:22:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770700958; x=1771305758; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=slGvVNRI6DMwxYRFHCioIZD1AV/VPFPU5qKmLSzslyY=;
+        b=juAXZvOokRAmIl1g+8Q6yaHGQd3dvMDfxtrfP1CwRhahv4GA/ufy6PiY2XNSacCw1E
+         0bSi7cJIgaKZ+IMeJq03Rvp2YnzmKPGKX0IvO8tefMUicM9oDJP6Pq41CADZZayL5uhU
+         x9aqYey8OaZ7cYJuRqLT2cYU1SFceFYwzbvcDD7B6d1E4qNP16oYXqJ/SDEQ0vjJ0djf
+         n77TOLwecbbGWlkh0VOLPy9YZPh5NdOxt5kKlUPbugyF7kdgCB+oZpMEIy5ceX1BNWFB
+         j1og0QNijrOy/UMsTWLqjDPz+8Q0DIQloLEjOUQc/hXsOJVqRrNWC3DpSQHNqBJf8BdV
+         zL7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770700958; x=1771305758;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=slGvVNRI6DMwxYRFHCioIZD1AV/VPFPU5qKmLSzslyY=;
+        b=YJ6SFO4C9JSLijDf3/ZfMdumGV49anF4chAmV0D2VsFSDEP4eqeRRt161QnJHGywAE
+         TVLqL7D14TEmeiL/Ze0JEYGwrvBib/UsyHLjNojkiSSsJUTyeoKcc/0d3VudOC7pbxzI
+         wi9DjClBSPXKw0XNsS3BFPrpboUTVJIMp4uov4UWpIw2aqFUamO8sZimGp/RTuiB0kNg
+         /sxLclpz/JDTXAf24sSQLvSqf05SfUS+mB7IQnUJPy5yONRuD4nkUPTtEuh66Bfew0JN
+         LUeUPJOSBrfjAtALpxQtsokX1Q/gVPOqLQyydy2tyPh6UfseClX4uD1RFteiTtgQ/1ai
+         8Y9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWpx90lcyuTEfJxJard/S9YlyX8XB+jb2Tjn2xgJk2UPQDAM+vcM3B90xvTdnq1furxpF9U86U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfBs+9wwj0ST1yap7VtN5TIWebUYY79QQjik2yxzeDyQRzaZuE
+	ZhQGXkTZ6zoOSgdvk6HjHawXgj94Bc9vPZuLzne1iAWR9qDJ8iDisrdE
+X-Gm-Gg: AZuq6aJpTTlTsGud+CYklBh7zOmj+QL+N5PsLvE9t3t8T0DJBCdjysn56+qrxlgUK5I
+	6x9EPA5deHGOwECoVQJlh/UvI/0/VO9SVY1JeNKl/Koy2AeiK4Fv2CxGdiFYN0pk+Xvq65OX5iX
+	xGwnug0G9dkqfMm4lLxpIP5maZwdGscpgZS1syI73j9mKUpT06s+QzJihO2YrtZmBzqRDKB083z
+	xQq3Gihso04MB1fgW1YH7YkgLLV5WgXU/0zq8Jis3Ffm969h7TpCEg6OF3c7N8yZ5Oe34iNhMyR
+	IlOmEZ9+7vef5gPZjGddPqbWRF5Sl49be1/7G2gOhUa1zkccn9kcqe8GDnYwqsriesGm9YUzIGG
+	j5E4Bp9Mke5fE8f1LVMnR3Mmm96MaUMEEAag36tFR4GIpFkfUuU81FEQEJslRrJSDtoZyhDNf6A
+	8YMpjV7xy81R+mhDSocAG4W1XVBFVhurgqz9QZwDhkwrozCuz7QS6YlFpU5qKhqtL7tFo+OW1bE
+	HNZs+NE28lv
+X-Received: by 2002:a17:903:1a0e:b0:2a9:4450:abb7 with SMTP id d9443c01a7336-2a9516fcf6amr158575295ad.39.1770700958109;
+        Mon, 09 Feb 2026 21:22:38 -0800 (PST)
+Received: from localhost.localdomain (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a951ca59f4sm122114275ad.43.2026.02.09.21.22.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Feb 2026 21:22:37 -0800 (PST)
+From: Joey Lu <a0987203069@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	mcoquelin.stm32@gmail.com,
+	richardcochran@gmail.com
+Cc: alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	ychuang3@nuvoton.com,
+	schung@nuvoton.com,
+	yclu4@nuvoton.com,
+	peppe.cavallaro@st.com,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	openbmc@lists.ozlabs.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Joey Lu <a0987203069@gmail.com>
+Subject: [PATCH net-next v12 0/3] Add support for Nuvoton MA35D1 GMAC
+Date: Tue, 10 Feb 2026 13:22:23 +0800
+Message-ID: <20260210052226.3005666-1-a0987203069@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260210-netns-redundant-mount-v1-1-0b1ebfc1c79f@black-desk.cn>
-X-B4-Tracking: v=1; b=H4sIAAOwimkC/x2MwQoCMQwFf2XJ2UI3oIK/Ih7i5qk5mC5pK8Ky/
- 27xMjCHmY0qwlDpMm0U+Fi14kPmw0TLS/yJZDqcOPMp85yTo3lNAe2u4i29Sx8UYb0fM2Q5K41
- 2DTzs+/9eydYovYHptu8/5ghXWHEAAAA=
-X-Change-ID: 20260210-netns-redundant-mount-aa2db50eac7d
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
- "Eric W. Biederman" <ebiederm@xmission.com>, 
- Lennart Poettering <lennart@poettering.net>, 
- Luca Boccassi <bluca@debian.org>, Chen Linxuan <me@black-desk.cn>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2918; i=me@black-desk.cn;
- h=from:subject:message-id;
- bh=pkHF5Nk056iz6cX7ZPs/GUkucBvOzuk3aVzB4W2jRvY=;
- b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBpirAHQMZWwAJg+lOXcFdOw0Vc+e9dq2odQ1N2A
- KlGtoeX1LiJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCaYqwBwAKCRB2HuYUOZmu
- i8bzD/sESGWezbpLhUYPgMmAgaQebzITr6zZqiftWUJDlCyt1gBMzBf+WaF7TzYkgndTQA0nao0
- YdGo9s+5oXoZz8qiL6y/8DQ/xc8bO2RpEwSivFn9CrOCnFw1qkKCg2QK5ZMgSaHUQh+h3i9lL/F
- Kg0J3ciGFS8rMkM5A2tffTZRIjrsrLckt06SVeJprJLQ7oC61Drz3slrL/WM3b8EVLCoFLU48YG
- IpeGXjHU6FaT8xmXQG55+X97/thilNG6TUCxkuSJTdpF//eeujoPRKG1eNUb/mVActlCVXZU6eT
- UKB9HV99V/wk1MveAJ6QVKxUEppBgREmxEPUqrVFTwTDf+8/6pgTk8E9+i2oA0lhzAW6T0QKA1o
- /XRRCtx8digBCXfKBvUubB4y+E3rWtBQFIqZyTLGirUkF9h6eY7lkn13zHghVkO0YBM+ERRLcHA
- c4m+JI4rSIsQFM5/y/ILZos8IeKai/ll4zHkdTKg09HGMJr/YfM3VKRw3EjW1mX3WaEa15DVWuy
- 4bB6Px2jaXhZcnbkj+VO3g7v3ELz94lD1jSZ3R+KRnDS1fWM7ZUA9MPdspxUzFndT6FD9LoFM0u
- G63cH1bqFqNhjYPDpbmiUJArXNc3S5H/jWsdlo90WfizOsxGJ9DQc86lo8vhIYft9N9hRIvTy3E
- CT9i63tvyHdfFbg==
-X-Developer-Key: i=me@black-desk.cn; a=openpgp;
- fpr=D818ACDD385CAE92D4BAC01A6269794D24791D21
-X-Endpoint-Received: by B4 Relay for me@black-desk.cn/default with
- auth_id=573
-X-Original-From: Chen Linxuan <me@black-desk.cn>
-Reply-To: me@black-desk.cn
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258027-lists,netdev=lfdr.de,me.black-desk.cn];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258028-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[foss.st.com,synopsys.com,nuvoton.com,st.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,st-md-mailman.stormreply.com,gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[a0987203069@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	HAS_REPLYTO(0.00)[me@black-desk.cn]
-X-Rspamd-Queue-Id: 39ADF116DB5
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C509E11713F
 X-Rspamd-Action: no action
 
-From: Chen Linxuan <me@black-desk.cn>
+This patch series is submitted to add GMAC support for Nuvoton MA35D1
+SoC platform. This work involves implementing a GMAC driver glue layer
+based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
+interface capabilities.
 
-On Ubuntu 24.04, I observed redundant mounts after adding a netns with
-the commands below:
+Overview:
+  1. Added a GMAC driver glue layer for MA35D1 SoC, providing support for
+  the platform's two GMAC interfaces.
+  2. Added device tree settings, with specific configurations for our
+  development boards:
+    a. SOM board: Configured for two RGMII interfaces.
+    b. IoT board: Configured with one RGMII and one RMII interface.
+  3. Added dt-bindings for the GMAC interfaces.
 
-	sudo ip netns add xxx
-	cat /proc/self/mountinfo | grep /run
+v12:
+  - Drop private structure nvt_priv_data
+  - Fix error propagation to preserve probe deferral
+  - Refactor internal delay handling into a dedicated helper
+  - Move FIFO and filter configuration from driver to Device Tree
+  - Update DT binding to include "snps,dwmac-3.70a" compatible
 
-Output:
+v11:
+  - Propagate syscon lookup errors to allow proper probe deferral.
 
-	29 31 0:26 / /run rw,nosuid,nodev,noexec,relatime shared:5 - tmpfs tmpfs ...
-	...
-	203 29 0:26 /netns /run/netns rw,nosuid,nodev,noexec,relatime shared:5 - tmpfs tmpfs ...
-	6443 203 0:4 net:[4026533578] /run/netns/xxx rw shared:917 - nsfs nsfs rw
-	6444 29 0:4 net:[4026533578] /run/netns/xxx rw shared:917 - nsfs nsfs rw
+v10:
+  - Update DTS/DTSI files to follow proper hierarchy and port modeling
 
-There are two mounts (6443 and 6444) related to the "xxx" netns created
-above.
+v9:
+  - Fixed file permissions. (YAML, driver, DTS)
+  - Moved phy-handle and PHY-related properties from SoC dtsi to board dts.
 
-This redundancy occurs because systemd changed the default system mount
-propagation to "shared" since commit b3ac5f8cb987 ("mount-setup: change
-system mount propagation to shared by default"). Consequently, mount
-propagation of `/run` is shared.
+v8:
+  Changes since v7:
+  - Rebased onto the latest net-next.
+  - Removed unused symbol.
+  - stmmac parent driver now reads hardware features directly to support
+    Wake-on-LAN via magic packet, so PMT-related overrides in this driver
+    have been removed.
+  - Update dwmac-nuvoton driver:
+      - Update the license to GPL.
+      - Improve the description in Kconfig.
 
-Link: https://docs.kernel.org/filesystems/sharedsubtree.html
-Link: https://github.com/systemd/systemd/commit/b3ac5f8cb98757416d8660023d6564a7c411f0a0
+v7:
+  - Update dwmac-nuvoton driver
+    - Update probe function to use stmmac_pltfr_probe instead.
 
-When `ip netns` makes `/run/netns` a mount point, a new bind mount (203)
-is created and attached to the same peer group as mount 29. Since mount
-29 and 203 are in the same peer group (shared:5), any mount under 203
-propagates back to 29, resulting in the redundant mount 6444.
+v6:
+  - Update dwmac-nuvoton driver
+    - Use NVT as the previx for all functions, structs, and defines.
+    - Remove unnecessary comments.
 
-To prevent this, `/run/netns` should be placed in a new peer group. This
-can be achieved by reconfiguring `/run/netns` to MS_PRIVATE first, and
-then to MS_SHARED again.
+v5:
+  - Update yaml
+    - Remove the properties already defined in snps dwmac.
+  - Update dwmac-nuvoton driver
+    - Add a comment to explain the override of PMT flag.
 
-With this patch applied, the redundant mount is no longer present, and
-`/run/netns` is in a new peer group (917):
+v4:
+  - Update yaml
+    - Remove unnecessary property 'select'.
+    - Remove unnecessary compatible entries and fix items.
+    - Specify number of entries for 'reg'.
+    - Remove already defined property 'phy-handle'.
+    - Update example.
+    - Modify the property internal path delay to match the driver.
+  - Update dtsi
+    - Move 'status' to be the last property.
+  - Update dwmac-nuvoton driver
+    - Use remove instead of remove_new.
+    - Use dev_err_probe instead.
 
-	29 31 0:26 / /run rw,nosuid,nodev,noexec,relatime shared:5 - tmpfs tmpfs ...
-	...
-	203 29 0:26 /netns /run/netns rw,nosuid,nodev,noexec,relatime shared:917 - tmpfs tmpfs ...
-	6443 203 0:4 net:[4026533578] /run/netns/xxx rw shared:918 - nsfs nsfs rw
+v3:
+  - Update yaml
+    - Fix for dt_binding_check warnings & errors.
+    - Add compatible in snps dwmac.
+  - Update dtsi
+    - Update dtsi to follow examples in yaml.
+  - Update dwmac-nuvoton driver
+    - Fix for auto build test warnings.
+    - Invalid path delay arguments will be returned.
 
-I also verified that mount propagation to containers remains functional.
+v2:
+  - Update yaml
+    - Rename file to align with the compatible property.
+    - Add an argument to syscon to replace mac-id,
+      with corresponding descriptions.
+    - Use tx-internal-delay-ps and rx-internal-delay-ps properties for
+      configurable path delay with corresponding descriptions,
+      allowing selection between GMAC internal and PHY.
+    - Add all supported phy-mode options.
+    - Remove unused properties.
+  - Update dtsi
+    - Modify syscon configuration to include an argument for
+      GMAC interface selection.
+  - Update dwmac-nuvoton driver
+    - Remove redundant device information print statements.
+    - Remove non-global parameters.
+    - Retrieve GMAC interface selection from the syscon argument.
+    - Parse Tx and Rx path delays by correct properties.
+    - Update configurations to support Wake-on-LAN.
 
-Signed-off-by: Chen Linxuan <me@black-desk.cn>
----
- ip/ipnetns.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Joey Lu (3):
+  dt-bindings: net: nuvoton: Add schema for Nuvoton MA35 family GMAC
+  arm64: dts: nuvoton: Add Ethernet nodes
+  net: stmmac: dwmac-nuvoton: Add dwmac glue for Nuvoton MA35 family
 
-diff --git a/ip/ipnetns.c b/ip/ipnetns.c
-index a20cd8bc7cb8..3a33a3adacee 100644
---- a/ip/ipnetns.c
-+++ b/ip/ipnetns.c
-@@ -846,6 +846,20 @@ static int netns_add(int argc, char **argv, bool create)
- 			}
- 			return -1;
- 		}
-+
-+		/* Reconfigure NETNS_RUN_DIR to MS_PRIVATE recursively and later
-+		 * MS_SAHRED again to make sure it is placed in a new peer group
-+		 */
-+		if (mount(NETNS_RUN_DIR, NETNS_RUN_DIR, "none", MS_PRIVATE | MS_REC, NULL)) {
-+			fprintf(stderr, "mount --make-private %s failed: %s\n",
-+				NETNS_RUN_DIR, strerror(errno));
-+			if (lock != -1) {
-+				flock(lock, LOCK_UN);
-+				close(lock);
-+			}
-+			return -1;
-+		}
-+
- 		made_netns_run_dir_mount = 1;
- 	}
- 	if (lock != -1) {
+ .../bindings/net/nuvoton,ma35d1-dwmac.yaml    | 133 +++++++++++++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+ .../boot/dts/nuvoton/ma35d1-iot-512m.dts      |  25 ++++
+ .../boot/dts/nuvoton/ma35d1-som-256m.dts      |  24 +++
+ arch/arm64/boot/dts/nuvoton/ma35d1.dtsi       |  52 +++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 139 ++++++++++++++++++
+ 8 files changed, 387 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
 
----
-base-commit: 72f679c0d07629fe9e462c2c52bbe48aaeaa7f83
-change-id: 20260210-netns-redundant-mount-aa2db50eac7d
-
-Best regards,
 -- 
-Chen Linxuan <me@black-desk.cn>
-
+2.43.0
 
 
