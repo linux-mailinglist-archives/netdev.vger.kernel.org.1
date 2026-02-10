@@ -1,167 +1,268 @@
-Return-Path: <netdev+bounces-258137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBVrBfVqi2lKUQAAu9opvQ
-	(envelope-from <netdev+bounces-258137-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:29:25 +0100
+	id +CQ8C0dri2lKUQAAu9opvQ
+	(envelope-from <netdev+bounces-258138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:30:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8301C11DEFF
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:29:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F73511DF1F
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:30:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8489D300A7CC
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:29:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEE213052ADA
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7C92F5461;
-	Tue, 10 Feb 2026 17:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CE82ED17B;
+	Tue, 10 Feb 2026 17:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lS8ZExtN"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="NdqUEyUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59172B67E;
-	Tue, 10 Feb 2026 17:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AD238A9A1
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 17:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770744560; cv=none; b=L4RbVF+9+fI7esSCK+oM42BeDXjcxarqEI5X4lsFBxQhac48Cm2T2eGxJGCTU+tNqcKh12bWc3ua8dDC2o50OeQEQlKBG2sgrdNmMboqJdQyqFOeuwoi+v+OeQskFBrHxT4N9qSQuG2is4JnpI9uJ9yjZq7d+6sHVKQ0wGglUok=
+	t=1770744624; cv=none; b=jzq5ShGhItH1HwYdrDegW4EpREi8HVwNO/KyM/GcS4uk3/BT1p7kv8H1eirDmI2U9Dfp+UCbA43GjLitbY2fQriJGNwFxZ02+bo3LeA+Ykvx5QwamqUnGAcQ5T4qr1KKxEdmuZKYxnkVtDgyvO92h3C1AkeMZpx2f5TMMmmd28w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770744560; c=relaxed/simple;
-	bh=9OT2lx2uxNzCCUK+DG+5c5gmSk9vM31VHB1FAyFfS5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WQiuMMA8HU1aJY0qi24/8epk5b6HGBvkqBDwCAu+R4WbbQXp7olmb8zQiRqub6ezZUTlSS7nZn3BEMKJxdn0Xhwqhy9IVWu6VbWmrJWGZJOdcwJ7Y9Z9cDDdscaGUWyj/vNP8/aSZEGl3he2pd0Dg9x7vZmhNhEgnLkGqC9Bfkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lS8ZExtN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DAcKfWlVvFpjnpX3kQn9TetvuG3kY2q/0ckoODgRSz8=; b=lS8ZExtN/PJ9GM/RXNnUoJG8xu
-	6BflzLkWMBbQhdzgpK+AV0vqxRBebBiUyfiu1SKrZKq0gxMvq/yfGWHJ58V4fIHc8e/uD0A/7Jq5f
-	4lfO1aLUAJMDynrbTDZX7UShpk1ocV/xlbxN5Ncp4XBC8Ixw04ZXkOj7HJEVUbR80+dOjZne1sTKJ
-	pDbP72WGuFcqTmncwm9RI8+6OtP9ZKl85doJvfuVOi+Jwqs/F1BskWyp0AGt5dVBnfDAK+NvN5MBC
-	/SDZwjKf53yuDARAK6J/+9RKq2q3auogNniNAidjRbxw1a+ACOIscIzERYhkwtxE+t6NkAZLV4CaC
-	8zegnKLg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49462)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vprXy-000000002oy-37Of;
-	Tue, 10 Feb 2026 17:29:10 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vprXv-000000002xA-2Lqw;
-	Tue, 10 Feb 2026 17:29:07 +0000
-Date: Tue, 10 Feb 2026 17:29:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Bezdeka <florian.bezdeka@siemens.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: stmmac: Use cpumask_local_spread() for
- IRQ spreading
-Message-ID: <aYtq4ypxXTvn_Is6@shell.armlinux.org.uk>
-References: <20260210-flo-net-stmmac-default-affinity-core-v1-0-4e76612444e1@siemens.com>
- <20260210-flo-net-stmmac-default-affinity-core-v1-2-4e76612444e1@siemens.com>
+	s=arc-20240116; t=1770744624; c=relaxed/simple;
+	bh=h4SUjAC1/+1WI5l2vmSlYY/nKJfsmyvesTsuCN94dpg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hxd9+ih2GTSgn8KXME2dFN0Rt1VNLSMcwPYm0FuJGtk7GkDoEPCIjCe8zczIlOmeGg5xQ7+KDvSw6OGel21wNNk4nGmazuT5WBtrdjJeFA33Fp6tbXr92pQmXLc+GSS3ohDNMqvBbrRI2xxSrILv94Bzg/g738xQ1pTcyrNTfZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=NdqUEyUi; arc=none smtp.client-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-12721cd256bso2537234c88.1
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 09:30:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1770744622; x=1771349422; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uij+yze6+KWtPneIeRHK7BdEXls9H9TrWBaPlCemb3w=;
+        b=NdqUEyUihUBWcyrk1wlON1+l0HMKekiKBUYUFH0+/Fr4pAiQMDmyEptnN8YXT0b948
+         TS5/3osFxV6DakCjmOzK1x9qHqU79BR+ALthxqTcTOHMgN3EmV44P69seYit5RcOXc4z
+         /LTH5+ppnNy0rnWLoziqsH9d+q3VnmbLjR533Dsq+c2bjWT3EY0BCzG9BLmQqe+b4LQ6
+         TSeBWmMN6xOIilcGM4+/Ip2ftRrSvgrhfXFVcOTex2fZy/Kx2fdFV6YLCkUaqTyT4e33
+         4lQ6Zs42v6HrZtqu9Qc1cz5zir2BhB0miB+F59JX5DmzcY94MBzPqCH13pSRmdMfBxX3
+         /zdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770744622; x=1771349422;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uij+yze6+KWtPneIeRHK7BdEXls9H9TrWBaPlCemb3w=;
+        b=MedQJxOYagEKiXLcDnQ1prMOwB2JS+2P847vR00rCK7pLNIbzb4LP7AB7onXfCK6aL
+         PuXEgz9VhoPHd6KjPNfFB617gVqcBalf2B6FW8/wvX17nrrqKHqwjRAooQIvoVER8GWy
+         LBDi7h30G6pbWZ6FkeN0Fa0c7oGI7/ERJ3KXvxUIS3Rv+GvveirCdCZFmHtRyGVgI078
+         7RuvmMJGeQrOjfOwufG7pzlcEA6FSbXDbk1KkxW/Ai7LwcfvORhBDBa+Oit1x3IpEhpv
+         UCvHbg/lIDNqm7XII8UFbTjFkiTYU1F5yrK8w3QA+RVK3aHuyoSX/IPCT7vumU3QDFdL
+         l14w==
+X-Forwarded-Encrypted: i=1; AJvYcCUL3TUj1efsQ1TlPcOdBhGFZuig8d0lUbjyBPyxSxuoUUUNYLy6LTZ/jcVWdMb2208b4yjV3gI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5ERl/05F1o2ggsIfVqAHcEThZYGfJkao3OawqltezwSkELOoV
+	L7y+c/tFytEUyjAn9I9uNt/b/5R4Kccg5Iq9/fpduyKJC+HgtCAEbx65LMx62XXigWU=
+X-Gm-Gg: AZuq6aKl2iwTzOwe3pUCKfuIb30IVwQji4B+pDtcy/9XcWT7+wPRXWCmnXwxNlm0IDY
+	0sUkv1sVis2mKF+q1UN4Z4MnbsISl62Wc2/XB+CNeSguDURIlsM4TCZCUREzGd2nqpSIdcXprAB
+	HHSm1qkws8fa9r4mSkgPrLuQH+jOkQ7hRlPgA47BuhyHKZoxnlFgv06qiHYP1GhDCkhH+82/PbB
+	zxPKLZGJtT+91kCECVYEsKdqT/k3k3lXUnZfy6txuFio3GluZCdAx68UUtFgNtvOQMiUOr+Bsno
+	nKlt5k9Ra38MIgb4GcVKQOUmqDnQWtdAn1HCWv9Ty3GtEh4Mt97wCOep8gE3ZPj58QVVJ+m73DJ
+	A5TcVhDiVZL5pnuVh6mUUefmE8xtBjah+1aP744BKMnYWqhJtafStvLd4IWyYhvfEqPXdh1ywoj
+	7Ff65L1dhMFvgRcj/cJWPdowRIAbD3wGIJ68oQxJhEdYVC6aKU5+y3JEtMtWRdg5fUVP1wjNbfp
+	XTKuLQVcHm00of6uvU1ogcS
+X-Received: by 2002:a05:7022:1285:b0:11a:37a7:3d2f with SMTP id a92af1059eb24-12703fe8c82mr6800135c88.37.1770744622066;
+        Tue, 10 Feb 2026 09:30:22 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::1:a031])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-127041d9c91sm12989395c88.2.2026.02.10.09.30.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Feb 2026 09:30:20 -0800 (PST)
+Message-ID: <82535cd8-7bcc-4454-b8ee-2af513bcf31c@davidwei.uk>
+Date: Tue, 10 Feb 2026 09:30:18 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260210-flo-net-stmmac-default-affinity-core-v1-2-4e76612444e1@siemens.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 15/16] selftests/net: Add env for container
+ based tests
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20260129222830.439687-1-daniel@iogearbox.net>
+ <20260129222830.439687-16-daniel@iogearbox.net>
+ <20260131163834.2c3d160d@kernel.org>
+ <9037828b-c7fd-4eb1-9dd8-19ee49063361@davidwei.uk>
+ <aYP7uiuPWAbJEgLD@devvm11784.nha0.facebook.com>
+ <aYQBsTfF4PrJcHNl@devvm11784.nha0.facebook.com>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <aYQBsTfF4PrJcHNl@devvm11784.nha0.facebook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[davidwei-uk.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258137-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,intel.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-258138-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
+	DMARC_NA(0.00)[davidwei.uk];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,jrife.io,intel.com,bytedance.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[davidwei-uk.20230601.gappssmtp.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8301C11DEFF
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davidwei-uk.20230601.gappssmtp.com:dkim,davidwei.uk:mid]
+X-Rspamd-Queue-Id: 7F73511DF1F
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026 at 05:28:15PM +0100, Florian Bezdeka wrote:
-> The stmmac driver was previously implementing a self-made IRQ
-> spreading mechanism based on num_online_cpus(). By migrating to
-> cpumask_local_spread() the spreading gets NUMA aware.
+On 2026-02-04 18:34, Bobby Eshleman wrote:
+> On Wed, Feb 04, 2026 at 06:08:58PM -0800, Bobby Eshleman wrote:
+>> On Mon, Feb 02, 2026 at 07:53:34AM +0900, David Wei wrote:
+>>> On 2026-02-01 09:38, Jakub Kicinski wrote:
+>>>> On Thu, 29 Jan 2026 23:28:29 +0100 Daniel Borkmann wrote:
+>>>>> +class NetDrvContEnv(NetDrvEpEnv):
+>>>>> +    """
+>>>>> +    Class for an environment with a netkit pair setup for forwarding traffic
+>>>>> +    between the physical interface and a network namespace.
+>>>>
+>>>> A little diagram would be pretty awesome to have here, and perhaps copy
+>>>> it to the README file too?
+>>>
+>>> Sounds good, I'll add one. I forget how much you like ASCII diagrams.
+>>>
+>>>>
+>>>>> +    """
+>>>>> +
+>>>>> +    def __init__(self, src_path, rxqueues=1, **kwargs):
+>>>>> +        super().__init__(src_path, **kwargs)
+>>>>> +
+>>>>> +        self.require_ipver("6")
+>>>>> +        local_prefix = self.env.get("LOCAL_PREFIX_V6")
+>>>>> +        if not local_prefix:
+>>>>> +            raise KsftSkipEx("LOCAL_PREFIX_V6 required")
+>>>>> +
+>>>>> +        local_prefix = local_prefix.rstrip("/64").rstrip("::").rstrip(":")
+>>>>> +        self.ipv6_prefix = f"{local_prefix}::"
+>>>>> +        self.nk_host_ipv6 = f"{local_prefix}::2:1"
+>>>>> +        self.nk_guest_ipv6 = f"{local_prefix}::2:2"
+>>>>> +
+>>>>> +        self.netns = None
+>>>>> +        self._nk_host_ifname = None
+>>>>> +        self._nk_guest_ifname = None
+>>>>> +        self._tc_attached = False
+>>>>> +        self._bpf_prog_pref = None
+>>>>> +        self._bpf_prog_id = None
+>>>>> +        self._init_ns_attached = False
+>>>>
+>>>> I'm not a Python expert but the pre-init of variables that are set
+>>>> later on in __init__() (on all possible paths) seems like a waste of LoC
+>>>
+>>> It's so that exceptions thrown -> __del__() don't complain about
+>>> undefined vars.
+>>>
+>>>>
+>>>>> +
+>>>>> +        ip(f"link add type netkit mode l2 forward peer forward numrxqueues {rxqueues}")
+>>>>
+>>>> Would we be able to do this with YNL?
+>>>> no big deal but always nice to avoid the dependency on very latest CLI
+>>>
+>>> Hmm, I tried looking into this already. My understanding is that this
+>>> can be done in C but not currently in YNL, not without adding a spec.
+>>>
+>>>>
+>>>>> +        all_links = ip("-d link show", json=True)
+>>>>> +        netkit_links = [link for link in all_links
+>>>>> +                        if link.get('linkinfo', {}).get('info_kind') == 'netkit'
+>>>>> +                        and 'UP' not in link.get('flags', [])]
+>>>>
+>>>> And of course if you use YNL you can actually ask Netlink to
+>>>> echo back / return to you what interface it ended up creating.
+>>>> No need for the scanning..
+>>>>
+>>>>> +        if len(netkit_links) != 2:
+>>>>> +            raise KsftSkipEx("Failed to create netkit pair")
+>>>>> +
+>>>>> +        netkit_links.sort(key=lambda x: x['ifindex'])
+>>>>> +        self._nk_host_ifname = netkit_links[1]['ifname']
+>>>>> +        self._nk_guest_ifname = netkit_links[0]['ifname']
+>>>>> +        self.nk_host_ifindex = netkit_links[1]['ifindex']
+>>>>> +        self.nk_guest_ifindex = netkit_links[0]['ifindex']
+>>>>> +
+>>>>> +        self._setup_ns()
+>>>>> +        self._attach_bpf()
+>>>>
+>>>>> +    def _setup_ns(self):
+>>>>> +        self.netns = NetNS()
+>>>>> +        cmd("ip netns attach init 1")
+>>>>> +        self._init_ns_attached = True
+>>>>> +        ip("netns set init 0", ns=self.netns)
+>>>>
+>>>> Hm, refactor class NetNSEnter or just use its enter method?
+>>>
+>>> I did consider this but I didn't feel like it fit the very specific
+>>> purpose of NetNSEnter. I needed the init ns to have a valid nsid from
+>>> within the test netns, which I didn't think many other tests would need.
+>>>
+>>>>
+>>>>> +        ip(f"link set dev {self._nk_guest_ifname} netns {self.netns.name}")
+>>>>> +        ip(f"link set dev {self._nk_host_ifname} up")
+>>>>> +        ip(f"-6 addr add fe80::1/64 dev {self._nk_host_ifname} nodad")
+>>>>> +        ip(f"-6 route add {self.nk_guest_ipv6}/128 via fe80::2 dev {self._nk_host_ifname}")
+>>>>> +
+>>>>> +        ip("link set lo up", ns=self.netns)
+>>>>> +        ip(f"link set dev {self._nk_guest_ifname} up", ns=self.netns)
+>>>>> +        ip(f"-6 addr add fe80::2/64 dev {self._nk_guest_ifname}", ns=self.netns)
+>>>>> +        ip(f"-6 addr add {self.nk_guest_ipv6}/64 dev {self._nk_guest_ifname} nodad", ns=self.netns)
+>>>>> +        ip(f"-6 route add default via fe80::1 dev {self._nk_guest_ifname}", ns=self.netns)
+>>>>> +
+>>>>> +    def _attach_bpf(self):
+>>>>> +        bpf_obj = self.test_dir / "nk_forward.bpf.o"
+>>>>> +        if not bpf_obj.exists():
+>>>>> +            raise KsftSkipEx("BPF prog not found")
+>>>>> +
+>>>>> +        cmd(f"tc filter add dev {self.ifname} ingress bpf obj {bpf_obj} sec tc/ingress direct-action")
+>>>>> +        self._tc_attached = True
+>>>>> +
+>>>>> +        tc_info = cmd(f"tc filter show dev {self.ifname} ingress").stdout
+>>>>
+>>>> Don't we need to also add a qdisc if there isn't one already?
+>>>
+>>> Sorry, why would qdisc be needed? The bpf prog attaches to tc. I don't
+>>> know anything about qdisc, though.
+>>
+>> The ingress qdisc is the attachment point. I think we need
+>> CONFIG_NET_SCH_INGRESS here too?
 > 
-> In addition, most drivers seem to use cpumask_local_spread(),
-> aligning / harmonizing a bit more.
+> Sorry for the config stuff I'm replying about, I ran into needing these
+> too for this:
+> 
+> CONFIG_NET_CLS_BPF=y
+> CONFIG_BPF_SYSCALL=y
 
-Oh great... sizeof(struct stmmac_priv) is already large at 880 bytes,
-and adding 16 pointers or CPU mask arrays for PCI MSI adds another
-128 bytes on top, whether _this_ stmmac device is PCI or not.
-
-A better solution needs to be found. Please consider what can be done
-to make MSI (a) generic to stmmac so it can live in stmmac_libpci.c,
-and (b) avoid adding overhead to platforms that don't use MSI.
-
-As an example of an improvement, the int_name_*[] strings are only
-used for MSI interrupts, and each one uses over 16 bytes. I calculate
-the entire usage to be 665 bytes just for these strings which are
-only ever used for MSI.
-
-With the addition of the cpumasks, we're looking at getting on for
-800 bytes of this structure which are only used for MSI.
-
-We can surely do better than this.
-
-
-So, how about moving the int_name_* to its own separate struct::
-
-struct stmmac_msi {
-	/*irq_name */
-	char int_name_mac[IFNAMSIZ + 9];
-	... other int_name_* ...
-	cpumask_var_t rx_affinity[MTL_MAX_RX_QUEUES];
-	cpumask_var_t tx_affinity[MTL_MAX_TX_QUEUES];
-};
-
-and replace the existing with int_name* with a simple:
-
-	struct stmmac_msi *msi;
-
-This struct would only be allocated when we need it for
-stmmac_request_irq_multi_msi(), and can be requested using devm in
-stmmac_dvr_probe() only when required.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks Bobby, I'll add these to the kconfig.
 
