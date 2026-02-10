@@ -1,297 +1,149 @@
-Return-Path: <netdev+bounces-258006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HlAHnF+imnVLAAAu9opvQ
-	(envelope-from <netdev+bounces-258006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:40:17 +0100
+	id wKTpLuKDimmfLQAAu9opvQ
+	(envelope-from <netdev+bounces-258007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:03:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277C9115B4E
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 01:40:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25AB8115E47
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 257C1301C956
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:40:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BBCD3007AE3
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 00:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23701244685;
-	Tue, 10 Feb 2026 00:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F6F25B1D2;
+	Tue, 10 Feb 2026 00:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RjLsI8v3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x8iaGZIV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F339223507B;
-	Tue, 10 Feb 2026 00:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D93242D66
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 00:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770684013; cv=none; b=J8ZjSaVG3nYPN98wyvfP24JwLpHEQnu6YYokDKEyPSCPGsCPhjkJItP+9C7KDiV1QRGyoRGsF8afHiCqqMe8o4ejLuPU2N7KIClqeDGP8It3rcxz8nA2uD5l3y+TM1+EtLj4ixmOya0ImiGa+v43Ye0N5MzWnNANefeXujeTsqM=
+	t=1770685183; cv=none; b=eACUVjnHs84UgvW53B7EXJo+Q7dw4aUUipCZx3Ww9WqhF96K8zCf5luIHx69ekWRspGLTj/Rr7SJzhvPIE1UhzhtNEjI58UhP+dIPabcd/ETkJ8t+CgS5RUVoXSOUIGFzWqeuG4mXCLGUXptg5eW1jsfQSVi0Kl4rc6rInTgO/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770684013; c=relaxed/simple;
-	bh=okG7UjQjG+NhkvALP4XREVKya0FPqfH1FHODxx8wyTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EinUOXA1gZCW/EdX/wEvmLeKH+rN1lT323/6w7FfJHtHmsFM80Nzpzb94EfCG7VvIjg4Ut/NKYzHaYUNf/yaKiAfAxDkrTOVZDIkTi3/LHdyOqMwhmIygAnyOrYwVSCYWhuZPfjEuBACD9b+znPnZfLMIV52IC18Fuus59htYls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RjLsI8v3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65425C19422;
-	Tue, 10 Feb 2026 00:40:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770684012;
-	bh=okG7UjQjG+NhkvALP4XREVKya0FPqfH1FHODxx8wyTo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RjLsI8v3e2pMavrZlMuLaQ6rPrgulHjdzXeEk3+UIUQj256jPEPqCsUsrNkxhJUIG
-	 KPmH6dxedINMg7ek2+SMmDBIBY8lsaGptkWi5i1n+OAsjJPM220O0+J+Tm2lUipNLV
-	 I6q20eXmWQPh1IFvijn7+23kQKiIF/Q0gTj6RlDb2gXIyUlFe0Djc+PykXjaoILObs
-	 3z7mVU1FRVYtyOUeCdiwx0a3Fzrgm4j5a8zF6pFdBU1CrVZkZsPjOKdchu0AxWF1iv
-	 14vF66+jTGxt9hryK+MNdGoLshhTRblMo7vFBLkMbM98OTF19VjY5vPGC+ieHYFyGk
-	 l3d3U8XwuoNuQ==
-Date: Mon, 9 Feb 2026 18:40:11 -0600
-From: Rob Herring <robh@kernel.org>
-To: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com,
-	p.zabel@pengutronix.de, linux@armlinux.org.uk,
-	ghennadi.procopciuc@nxp.com, Ionut.Vicovan@nxp.com,
-	linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, horms@kernel.org, Frank.li@nxp.com
-Subject: Re: [PATCH 1/4 v2] dt-bindings: serdes: s32g: Add NXP serdes
- subsystem
-Message-ID: <20260210004011.GA2188625-robh@kernel.org>
-References: <20260203161917.1666696-1-vincent.guittot@linaro.org>
- <20260203161917.1666696-2-vincent.guittot@linaro.org>
+	s=arc-20240116; t=1770685183; c=relaxed/simple;
+	bh=rX1FE3i5slVrCvxi5yfMhbxhuZWwNhm0BeNvs15Cr7w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RhS24u0FPDX9KPRBdZN+5JCfAsO7KuM2n2SZ1tO3qGUDUnGSzvoF37fj56LtO4dC2TZkQ2PiAhpXzyH2qb492liwPsh4yMphZrDuKnTkA9fdsrFyubwe4mBWKn4uExyRxZQ+JZ5JtwNwqBMGyyIaURYyFuC9iAsYis+oxihk6Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--treapking.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x8iaGZIV; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--treapking.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34e5a9de94bso8110215a91.0
+        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 16:59:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770685182; x=1771289982; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kCxe4KUTZpsszSXX1fJw0CECWXD0bnRktmIBoClkf/A=;
+        b=x8iaGZIV4VxBFHR7dBfutt/274STYH875f5oT5G76dr6DcOaNvlRHfINoq7jkoBOHI
+         12QoH/t3nMK7x+ubS0uhCTbTtcuxPYVRgLf2p7sOT7IkUpfN513061nj+Hy6hMuo/IDc
+         fBKKL4ZRXdsfgEJsmYVDMLsawwz0SBqs+BqTZeU5XF8y9yqRlOOs7YtT+6fju3S7kyiC
+         cYttb/nVx0NGA03s0WEu2PhMB0xvY8GCFEhGTleY62SWsWJ7FNxWUCjhWZ3E9YI1CdRy
+         hwLacnoDkGhjJjglSlkUP39DKxveQIs5inf8joHNl4a2CoaFicDxZACToOvXi9DfIMVQ
+         6rcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770685182; x=1771289982;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kCxe4KUTZpsszSXX1fJw0CECWXD0bnRktmIBoClkf/A=;
+        b=IoddAOTD4phXkmDHnZP0nGyps/a3kcA5NBVfY57/f5//bmYaKkXWMwjEXAv4cv70w/
+         XK+yP2PYcSeB2110fKrbJR3HRvzK4Hl67SlCXT5rEdtG5O8I4uAFF7eM6ie/vCsjGUPa
+         8K7h0QG5m4TlnbLU0i+YOlme6fs0AfGt/sk3sPh2c95Zucyf7CnGdZDl0UemW73Rg8D+
+         8CB4aQi7XTpdJom10NQ3agNKq8DOjxPBm7UGG98LjcZB1wDQsn83AFb2XidwHBvRxpDG
+         rWMPHKIVrwL0dz0DAGzr8HsWfbslg5eGpwtlNRIfrN4Gp8euvUk4EtjZiIYq4PFFNoWM
+         DQ1g==
+X-Forwarded-Encrypted: i=1; AJvYcCV5fHQWJ7YkKQ1p915mckVp1fAnOzGo/qr/x+873BPuDjW099Z3WEvqvjMIpYODbTcHSKhoUGs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy32Q4H07Mlu1rP+VJvLEOTlmhj3qjqDrIBI/lrLJkMI8oYN3Oj
+	XxndArDseuJPQJwEkWJEiKZcijVq6zqo9COsu8SPQuU6p9QBZQatzkxoePB+h1dppyL6PJefrVF
+	5Gsb1WboPGhtTBD5TYQ==
+X-Received: from pjbgj1.prod.google.com ([2002:a17:90b:1081:b0:352:e5f6:780a])
+ (user=treapking job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5546:b0:356:3cfd:3ee1 with SMTP id 98e67ed59e1d1-3563cfd4172mr4606434a91.23.1770685182177;
+ Mon, 09 Feb 2026 16:59:42 -0800 (PST)
+Date: Mon,  9 Feb 2026 16:59:36 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203161917.1666696-2-vincent.guittot@linaro.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.273.g2a3d683680-goog
+Message-ID: <20260210005939.3230550-1-treapking@google.com>
+Subject: [PATCH net] selftests: netconsole: Increase port listening timeout
+From: Pin-yen Lin <treapking@google.com>
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Pin-yen Lin <treapking@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258006-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258007-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.0.0:email,0.0.0.1:email];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,2.105.173.0:email,linaro.org:email]
-X-Rspamd-Queue-Id: 277C9115B4E
+	FROM_NEQ_ENVFROM(0.00)[treapking@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netcons_basic.sh:url]
+X-Rspamd-Queue-Id: 25AB8115E47
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 05:19:14PM +0100, Vincent Guittot wrote:
-> Describe the serdes subsystem available on the S32G platforms.
-> 
-> Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
-> ---
->  .../bindings/phy/nxp,s32g-serdes.yaml         | 154 ++++++++++++++++++
->  1 file changed, 154 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-> new file mode 100644
-> index 000000000000..fad34bee2a4f
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
-> @@ -0,0 +1,154 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/phy/nxp,s32g-serdes.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: NXP S32G2xxx/S32G3xxx SerDes PHY subsystem
-> +
-> +maintainers:
-> +  - Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
-> +
-> +description: |
-> +  The SerDes subsystem on S32G SoC Family includes two types of PHYs:
-> +    - One PCIe PHY: Supports various PCIe operation modes
-> +    - Two Ethernet Physical Coding Sublayer (XPCS) controllers
-> +
-> +  SerDes operation mode selects the enabled PHYs and speeds. Clock frequency
-> +  must be adapted accordingly. Below table describes all possible operation
-> +  modes.
-> +
-> +  Mode  PCIe	XPCS0		XPCS1		PHY clock	Description
-> +                SGMII		SGMII		  (MHz)
-> +  -------------------------------------------------------------------------
-> +  0	Gen3	N/A		N/A		100		Single PCIe
-> +  1	Gen2	1.25Gbps	N/A		100		PCIe/SGMII
-> +  2	Gen2	N/A		1.25Gbps	100		PCIe/SGMII
-> +  3	N/A	1.25Gbps	1.25Gbps	100,125		SGMII
-> +  4	N/A	3.125/1.25Gbps	3.125/1.25Gbps 	125		SGMII
-> +  5	Gen2	N/A	        3.125Gbps     	100		PCIe/SGMII
+wait_for_port() can wait up to 2 seconds with the sleep and the polling
+in wait_local_port_listen() combined. So, in netcons_basic.sh, the socat
+process could die before the test writes to the netconsole.
 
-Mixed tabs and spaces. Drop the tabs.
+Increase the timeout to 3 seconds to make netcons_basic.sh pass
+consistently.
 
-What's not clear to me is do you have 2 or 4 lanes?
+Fixes: 3dc6c76391cb ("selftests: net: Add IPv6 support to netconsole basic tests")
+Signed-off-by: Pin-yen Lin <treapking@google.com>
+---
 
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - enum:
-> +          - nxp,s32g2-serdes
-> +      - items:
-> +          - const: nxp,s32g3-serdes
-> +          - const: nxp,s32g2-serdes
-> +
-> +  reg:
-> +    maxItems: 4
-> +
-> +  reg-names:
-> +    items:
-> +      - const: ss_pcie
-> +      - const: pcie_phy
-> +      - const: xpcs0
-> +      - const: xpcs1
-> +
-> +  clocks:
-> +    minItems: 4
-> +    maxItems: 5
-> +
-> +  clock-names:
-> +    items:
-> +      - const: axi
-> +      - const: aux
-> +      - const: apb
-> +      - const: ref
-> +      - const: ext
-> +    minItems: 4
-> +
-> +  resets:
-> +    maxItems: 2
-> +
-> +  reset-names:
-> +    items:
-> +      - const: serdes
-> +      - const: pcie
-> +
-> +  nxp,sys-mode:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
+ tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-       maximum: 5
+diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+index ae8abff4be40..64d3941576d5 100644
+--- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
++++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+@@ -247,8 +247,8 @@ function listen_port_and_save_to() {
+ 		SOCAT_MODE="UDP6-LISTEN"
+ 	fi
+ 
+-	# Just wait for 2 seconds
+-	timeout 2 ip netns exec "${NAMESPACE}" \
++	# Just wait for 3 seconds
++	timeout 3 ip netns exec "${NAMESPACE}" \
+ 		socat "${SOCAT_MODE}":"${PORT}",fork "${OUTPUT}" 2> /dev/null
+ }
+ 
+-- 
+2.53.0.273.g2a3d683680-goog
 
-Though isn't this redundant with the child nodes? You could use the 
-standard 'phy-mode' property in each child.
-
-> +    description: |
-> +      SerDes operational mode. See above table for possible values.
-> +
-> +  '#address-cells':
-> +    const: 1
-> +
-> +  '#size-cells':
-> +    const: 0
-> +
-> +patternProperties:
-> +  '^serdes[0,1]_lane@[0,1]$':
-
-Do you need to support serdes0_lane@0 and serdes1_lane@0 (or similar 
-with "@1")? That's illegal as you have 2 nodes with the same address.
-
-> +    description:
-> +      Describe a serdes lane.
-> +    type: object
-> +
-> +    properties:
-> +      compatible:
-> +        enum:
-> +          - nxp,s32g2-serdes-pcie-phy
-> +          - nxp,s32g2-serdes-xpcs
-
-Seems like phy-mode would be sufficient. Are these separate blocks from 
-the parent?
-
-> +
-> +      reg:
-> +        maxItems: 1
-
-Just 'maximum: 1' instead.
-
-> +
-> +      '#phy-cells':
-> +        const: 0
-> +
-> +    required:
-> +      - reg
-> +      - compatible
-> +
-> +    unevaluatedProperties: false
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - reg-names
-> +  - clocks
-> +  - clock-names
-> +  - resets
-> +  - reset-names
-> +  - nxp,sys-mode
-> +  - '#address-cells'
-> +  - '#size-cells'
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    bus {
-> +        #address-cells = <2>;
-> +        #size-cells = <2>;
-> +        serdes0: serdes@40480000 {
-> +          compatible = "nxp,s32g3-serdes", "nxp,s32g2-serdes";
-> +            reg = <0x0 0x40480000 0x0 0x108>,
-> +                  <0x0 0x40483008 0x0 0x10>,
-> +                  <0x0 0x40482000 0x0 0x800>,
-> +                  <0x0 0x40482800 0x0 0x800>;
-> +            reg-names = "ss_pcie", "pcie_phy", "xpcs0", "xpcs1";
-> +            clocks = <&clks 1>,
-> +                     <&clks 2>,
-> +                     <&clks 3>,
-> +                     <&clks 4>,
-> +                     <&serdes_100_ext>;
-> +            clock-names = "axi", "aux", "apb", "ref", "ext";
-> +            resets = <&reset 9>,
-> +                     <&reset 8>;
-> +            reset-names = "serdes", "pcie";
-> +            nxp,sys-mode = <1>;
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +            phy_pcie0: serdes0_lane@0 {
-> +              compatible = "nxp,s32g2-serdes-pcie-phy";
-> +              #phy-cells = <0>;
-> +              reg = <0>;
-> +            };
-> +            phy_xpcs0_0: serdes0_lane@1 {
-> +              compatible = "nxp,s32g2-serdes-xpcs";
-> +              reg = <0>;
-> +            };
-> +        };
-> +    };
-> -- 
-> 2.43.0
-> 
+base-commit: 6d2f142b1e4b203387a92519d9d2e34752a79dbb
+branch: net-upstream
 
