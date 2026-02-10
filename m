@@ -1,154 +1,197 @@
-Return-Path: <netdev+bounces-258016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id nEx4OOGSimlUMAAAu9opvQ
-	(envelope-from <netdev+bounces-258016-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:07:29 +0100
+	id UMKiJzGUimlvMAAAu9opvQ
+	(envelope-from <netdev+bounces-258017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:13:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435C9116257
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:07:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0297116326
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:13:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0432C302B50F
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:07:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 938673008CBF
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 02:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5004F278161;
-	Tue, 10 Feb 2026 02:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39F22D73B9;
+	Tue, 10 Feb 2026 02:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kD3EAKkN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out198-3.us.a.mail.aliyun.com (out198-3.us.a.mail.aliyun.com [47.90.198.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f193.google.com (mail-dy1-f193.google.com [74.125.82.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9579115624B;
-	Tue, 10 Feb 2026 02:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EBE2D1913
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 02:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770689244; cv=none; b=WQH8jUgwWr4KCBTQeYlKMvXmLlGitukziF/KcPNUU/5457xx1ofPE4HDRG2PZF6lXJzTFpnyjqH2ohCYjAJxd6+2drLYW6U95ByayHs5d65iSYsVy8noEtUWySpRZH5Gj0ZIyQTyRKnqirDNd/5r0HC18vu3Uh7SuiY638YMY5I=
+	t=1770689578; cv=none; b=jIPnbSkI6QkbgEWUsOjbXbs54yufLbiLiMQd+k89U+xDNiELBDKWdBKmvl1/r+oiVOQgakGDsGbYOKwgruTAcz4I9Ia/rhCI5KBsy2Ghc0xpxsxE4SVqBMRK32D5hisNsTSPgFVWr3M5aQSXfBgGVAtb6p06JrykBHCNyc3orjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770689244; c=relaxed/simple;
-	bh=d1va5f67LxQ4KETMLfVwDpV5Tk/SVUHyF9eb2TlH8bw=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:References:
-	 In-Reply-To:Content-Type; b=NItjmMz5S3TGETyCTqi4I2mmgqUe5U5xH6MynBcia+SQ+Twbk3CpXFtakkOMbCZhsm0Ncop1RYukxbR98SoGCHkLTnL+HQVIWcYtkN+f/LU/XXST4SUQkshoovmOw3vMz4gEtQtMMvn5pTu+8amdGvZ2qDW2du0shM6i5+uPAjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=47.90.198.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.073901|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_regular_dialog|0.0277738-0.00636233-0.965864;FP=14661280663008586946|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033045018182;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DW;RN=15;RT=15;SR=0;TI=W4_0.2.3_214495E4_1770688381328_o7001c876;
-Received: from WS-web (Illusion.Wang@nebula-matrix.com[W4_0.2.3_214495E4_1770688381328_o7001c876] cluster:ay29) at Tue, 10 Feb 2026 10:07:01 +0800
-Date: Tue, 10 Feb 2026 10:07:01 +0800
-From: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Sam" <sam.chen@nebula-matrix.com>,
-  "lukas.bulwahn" <lukas.bulwahn@redhat.com>,
-  "Dimon" <dimon.zhao@nebula-matrix.com>,
-  "netdev" <netdev@vger.kernel.org>,
-  "vadim.fedorenko" <vadim.fedorenko@linux.dev>,
-  "open list" <linux-kernel@vger.kernel.org>,
-  "corbet" <corbet@lwn.net>,
-  "lorenzo" <lorenzo@kernel.org>,
-  "Alvin" <alvin.wang@nebula-matrix.com>,
-  "andrew+netdev" <andrew+netdev@lunn.ch>,
-  "linux-doc" <linux-doc@vger.kernel.org>,
-  "pabeni" <pabeni@redhat.com>,
-  "edumazet" <edumazet@google.com>,
-  "horms" <horms@kernel.org>
-Reply-To: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
-Message-ID: <8620f8c9-c7ff-427d-bad4-0ed860b998ea.Illusion.Wang@nebula-matrix.com>
-Subject: =?UTF-8?B?5Zue5aSN77yaW3Y0LG5ldC1uZXh0LDExLzExXSBuZXQvbmVidWxhLW1hdHJpeDogYWRkIGNv?=
-  =?UTF-8?B?bW1vbiBkZXYgc3RhcnQvc3RvcCBvcGVyYXRpb24=?=
-X-Mailer: [Alimail-Mailagent][W4_0.2.3][null][Chrome]
+	s=arc-20240116; t=1770689578; c=relaxed/simple;
+	bh=/CNu3or6IvmW6a+NEI6b/c1pNPuTW2PtNIWZgOO9Mfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O0SeomvMb5lvedkhG/N0mzWfP0HSx7sX2dn1AKRwAXaM4arSelLla1lpSfi8ZlnJ5MRXQ9acRGOdyKPMUbUtY5FSUCHfqyU0iyjjvEpyhiPTWc1TZp4bOHakGJCAn2zZYJoNnt40w97YqDNDznJmEuyv2zloLV9qeAekGRWl2O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kD3EAKkN; arc=none smtp.client-ip=74.125.82.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f193.google.com with SMTP id 5a478bee46e88-2b785801c93so8999627eec.0
+        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 18:12:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770689576; x=1771294376; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JS7YM6T2z4NTuWOeAxUIARMzj225fodPnkXEYUrFD10=;
+        b=kD3EAKkNFHRxlmaZd7MT3V5uNxPdPBu0Yr/+LInwcpKVM10xZ8YCIxt/A+7cF88hvO
+         EDX4X2sBHTxQ93F9xXwPj7lM5dae8qY+ixk2ZUNhC5MVewsIB4UCzecOym9nvbeNtzcc
+         8XR/M81kLBOfQ9kl4PwYjQ3lVPZgFZDkD52e6nt51QD/k+0+EfWb7n2U1iUdr5v7awC4
+         fruc9SWnqgJSojNoKJiv6HuL9kmUFSasQHvpHkdfOVTAQT+qV2KD8HKJIxLysMO91D7W
+         64PVBRe0tBrniqKl9Ey1Q2Q/SGqaVeM5mT02ZXpfU8tDifi2vVedfvSjQk4nJqza/vs4
+         nI/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770689576; x=1771294376;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JS7YM6T2z4NTuWOeAxUIARMzj225fodPnkXEYUrFD10=;
+        b=k2uLnaDtSP5Vzhmw3/j3xoF/9Eq3TGmPWIUrDZyHYjmdUOuBn1Vf1twaiPd1uADvFq
+         bOLWok5SO2Zdwfw7IoxcvOUZ39vbzn9RzHcYmuiQorytBOgiOJLTqWqslfjS3udrlUM1
+         tyoMQWVX0mLLZxXLAaAdFEPRHTuHnH1nFnYMR2kOSWnWJ6utABPGbw61al/9ljoibMk8
+         T8NzvqYqY2+Pb+rUbsE3BPRD5ZfmXUAMpGi+TG2ptmajazi/zLoUuV9doJjc/5A58kpG
+         QWfqKCBgiuVOrq+je6TyeAM6wQwwGQQmyFRsRJ8HEkzTNQ9eKEl/Ooi/Ey3Srj386M4d
+         Ei+A==
+X-Gm-Message-State: AOJu0YwKaPRsS9U/i+dBZSlqnpe5miAtB85ig/HI3eZyRdHHOf6MmtR6
+	jH+IPg9F8O+yleplUZ1dhP0NIlKvfyUTMqql+quyOGNkEpAW7YIm99Sh8EmSgdCe
+X-Gm-Gg: AZuq6aK8S1HscmRJ+YY9y9y8iBWPRUACEnF2oqMYEV6NCwNj7s6GJGKSthRt3YDbmDI
+	PgHGGCiYDxhbsHHJJg95RJhlSl2m3+u5h8WWSmqAL6Bihdg2T23abq7brMDGewO+ufsx6RPfnJB
+	fTrJXdUvtW0I4qY9YpByf8oPfMGVzKMY2NVvSop6kDk9NzhDRqY/eJbklVkWRgvEy6aVlGkOBBB
+	qjZoXEEqiSS8XuhZ7YCu2NBkyJsxL9R0cy30Cbvu3AlVj2s+ngPYlihQt3LIPR7sh9JCVcgRDxo
+	NwLtdnpfi4K/Yf0utfyHue7cR2USI6Kb0qAKz2W35GqYDqaT9z2a/iV4BsPiNAOgR12KdEy/ojL
+	XzESRlsxvbpC5E5N+l2PclJuN148tpvhLGwfH6YMSt6hQXhnghaWiekPsPCircIgeNqUPFI5Syk
+	QArEqJy5UhItkMnPVIiFe0yGb9uBNC/X23VPkUtMseOx4XIv1ABTnJqGOzCZmUiMExGWg3qTKpY
+	CHp2IIkLvwL5I7UMS297MWO4Lkj9afVOlseebOsrwpL5s998lt6gax3whqmgmsx5y3NBC7LLoQn
+	ZUKYgpE1YglWKyFNnQ==
+X-Received: by 2002:a05:7300:e80a:b0:2ae:5d3b:e1ba with SMTP id 5a478bee46e88-2b856836f6fmr5038313eec.23.1770689576354;
+        Mon, 09 Feb 2026 18:12:56 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ba81eab184sm1472747eec.1.2026.02.09.18.12.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Feb 2026 18:12:56 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	stable@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stanislav Yakovlev <stas.yakovlev@gmail.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Alice Michael <alice.michael@intel.com>
+Subject: [PATCH v2] net: intel: fix PCI device ID conflict between i40e and ipw2200
+Date: Mon,  9 Feb 2026 18:12:34 -0800
+Message-ID: <20260210021235.16315-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-x-aliyun-im-through: {"version":"v1.0"}
-References: <20260206021608.85381-12-illusion.wang@nebula-matrix.com>,<20260207022504.4018024-1-kuba@kernel.org>
-x-aliyun-mail-creator: W4_0.2.3_null_EuMTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMy4wLjY5NDMuMTQyIFNhZmFyaS81MzcuMzYgZGluZ3RhbGstd2luLzEuMC4wIG53KDAuMTQuNykgRGluZ1RhbGsoOC4yLjEwLVJlbGVhc2UuMjYwMjAzMDA3KSBNb2pvLzEuMC4wIE5hdGl2ZSBBcHBUeXBlKHJlbGVhc2UpIENoYW5uZWwvMjAxMjAwIEFyY2hpdGVjdHVyZS94ODZfNjQgd2ViRHQvUEM=uL
-In-Reply-To: <20260207022504.4018024-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[nebula-matrix.com];
-	RCVD_TLS_LAST(0.00)[];
-	REPLYTO_EQ_FROM(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,sipsolutions.net,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_ALL(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-258017-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[Illusion.Wang@nebula-matrix.com];
-	FROM_NEQ_ENVFROM(0.00)[Illusion.Wang@nebula-matrix.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258016-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 435C9116257
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F0297116326
 X-Rspamd-Action: no action
 
-VGhhbmsgeW91IGZvciB5b3VyIGZlZWRiYWNrCkJ1dAplbnVtIG5ibF9tc2l4X3NlcnZfdHlwZSB7
-CgkvKiB2aXJ0aW9fZGV2IGhhcyBhIGNvbmZpZyB2ZWN0b3JfaWQsIGFuZCB0aGUgdmVjdG9yX2lk
-IG5lZWQgaXMgMCAqLwoJTkJMX01TSVhfVklSVElPX1RZUEUgPSAwLAoJTkJMX01TSVhfTkVUX1RZ
-UEUsCglOQkxfTVNJWF9NQUlMQk9YX1RZUEUsCglOQkxfTVNJWF9UWVBFX01BWAp9OwpOQkxfTVNJ
-WF9ORVRfVFlQRSBlcXVhbHMgMe+8jHNvIHRoaXMgZnVuY3Rpb24gaGFzIG5vIHByb2JsZW3vvJ8K
-Ci0taWxsdXNpb24ud2FuZwoKPiArc3RhdGljIGludCBuYmxfZGV2X2NvbmZpZ3VyZV9tc2l4X21h
-cChzdHJ1Y3QgbmJsX2Rldl9tZ3QgKmRldl9tZ3QpCj4gK3sKPiArIHN0cnVjdCBuYmxfZGlzcGF0
-Y2hfb3BzICpkaXNwX29wcyA9IGRldl9tZ3QtPmRpc3Bfb3BzX3RibC0+b3BzOwo+ICsgc3RydWN0
-IG5ibF9kZXZfY29tbW9uICpkZXZfY29tbW9uID0gZGV2X21ndC0+Y29tbW9uX2RldjsKPiArIHN0
-cnVjdCBuYmxfbXNpeF9pbmZvICptc2l4X2luZm8gPSAmZGV2X2NvbW1vbi0+bXNpeF9pbmZvOwo+
-ICsgYm9vbCBtYXNrX2VuID0gbXNpeF9pbmZvLT5zZXJ2X2luZm9bTkJMX01TSVhfTkVUX1RZUEVd
-Lmh3X3NlbGZfbWFza19lbjsKPiArIHUxNiBtc2l4X25ldF9udW0gPSBtc2l4X2luZm8tPnNlcnZf
-aW5mb1tOQkxfTVNJWF9ORVRfVFlQRV0ubnVtOwo+ICsgdTE2IG1zaXhfbm90X25ldF9udW0gPSAw
-Owo+ICsgaW50IGVyciwgaTsKPiArCj4gKyBmb3IgKGkgPSBOQkxfTVNJWF9ORVRfVFlQRTsgaSA8
-IE5CTF9NU0lYX1RZUEVfTUFYOyBpKyspCj4gK8KgIG1zaXhfaW5mby0+c2Vydl9pbmZvW2ldLmJh
-c2VfdmVjdG9yX2lkID0KPiArIMKgIG1zaXhfaW5mby0+c2Vydl9pbmZvW2kgLSAxXS5iYXNlX3Zl
-Y3Rvcl9pZCArCj4gKyDCoCBtc2l4X2luZm8tPnNlcnZfaW5mb1tpIC0gMV0ubnVtOwogwqAgwqAg
-wqAgwqAgwqAgwqAgXl5eXl5eCgpEb2VzIHRoaXMgbG9vcCBjYXVzZSBhbiBhcnJheSB1bmRlcmZs
-b3c/IE5CTF9NU0lYX05FVF9UWVBFIGVxdWFscyAwIChmcm9tCnRoZSBlbnVtIGluIG5ibF9kZXYu
-aCksIHNvIG9uIHRoZSBmaXJzdCBpdGVyYXRpb24gaT0wIGFuZCB0aGUgY29kZSBhY2Nlc3Nlcwpz
-ZXJ2X2luZm9bLTFdLgoKVGhlIHNlcnZfaW5mbyBhcnJheSBpcyBkZWNsYXJlZCB3aXRoIE5CTF9N
-U0lYX1RZUEVfTUFYICgyKSBlbGVtZW50cyBpbgpzdHJ1Y3QgbmJsX21zaXhfaW5mbywgZ2l2aW5n
-IHZhbGlkIGluZGljZXMgWzAsMV0uIEFjY2Vzc2luZyBpbmRleCAtMSByZWFkcwp1bmluaXRpYWxp
-emVkIG1lbW9yeSBiZWZvcmUgdGhlIGFycmF5IHN0YXJ0LgoKQ2FsbCBjaGFpbjogbmJsX2NvcmVf
-c3RhcnQoKS0+bmJsX2Rldl9zdGFydCgpLT5uYmxfZGV2X3N0YXJ0X2NvbW1vbl9kZXYoKQotPm5i
-bF9kZXZfY29uZmlndXJlX21zaXhfbWFwKCkgZ3VhcmFudGVlcyB0aGlzIG9jY3VycyBkdXJpbmcg
-ZGV2aWNlIHN0YXJ0LgoKU2hvdWxkIHRoZSBsb29wIHN0YXJ0IGF0IGk9MSAoTkJMX01TSVhfTUFJ
-TEJPWF9UWVBFKSBpbnN0ZWFkLCBvciBzaG91bGQKc2Vydl9pbmZvWzBdLmJhc2VfdmVjdG9yX2lk
-IGJlIGluaXRpYWxpemVkIGJlZm9yZSB0aGUgbG9vcD8KCj4gKwo+ICsgZm9yIChpID0gTkJMX01T
-SVhfTUFJTEJPWF9UWVBFOyBpIDwgTkJMX01TSVhfVFlQRV9NQVg7IGkrKykgewoKWyAuLi4gXQoK
-ClRoYW5rIHlvdSBmb3IgcG9pbnRpbmcgdGhpcyBvdXQhIFVwb24gcmV2aWV3aW5nIHRoZSBjb2Rl
-IGFnYWluLCBJIGJlbGlldmUKdGhlIHZhcmlhYmxlIGRlY2xhcmF0aW9ucyBpbiBuYmxfZGV2X3Jl
-cXVlc3RfbWFpbGJveF9pcnEoKSBhbHJlYWR5IGZvbGxvdwp0aGUgcmV2ZXJzZSBDaHJpc3RtYXMg
-dHJlZSBjb252ZW50aW9uOgoKZGV2X2NvbW1vbiAobG9uZ2VzdCBpZGVudGlmaWVyKSBpcyBkZWNs
-YXJlZCBmaXJzdCwgYXMgaXQgaXMgcmVxdWlyZWQgZm9yCnN1YnNlcXVlbnQgZGVjbGFyYXRpb25z
-LgoKVGhlIHJlbWFpbmluZyB2YXJpYWJsZXMgKG1zaXhfaW5mbyBhbmQgY29tbW9uKSBhcmUgb3Jk
-ZXJlZCBieSBkZWNyZWFzaW5nIApkZW50aWZpZXIgbGVuZ3RoLCBhbGlnbmluZyB3aXRoIHRoZSBz
-dHlsZSBndWlkZS4KSG93ZXZlciwgSSBhcHByZWNpYXRlIHRoZSBjbGFyaWZpY2F0aW9uIG9wcG9y
-dHVuaXR54oCUaWYgdGhlcmXigJlzIGEgbnVhbmNlCknigJltIG1pc3NpbmcgKGUuZy4sIHN0cmlj
-dGVyIGFkaGVyZW5jZSB0byBpZGVudGlmaWVyIGxlbmd0aCBvdmVyIGRlcGVuZGVuY3kKb3JkZXIp
-LCBJ4oCZZCBiZSBoYXBweSB0byBhZGp1c3QgdGhlIGNvZGUgYWNjb3JkaW5nbHkuY3JlYXNpbmcg
-aWRlbnRpZmllcgpsZW5ndGgsIGFsaWduaW5nIHdpdGggdGhlIHN0eWxlIGd1aWRlLgoKLS0taWxs
-dXNpb24ud2FuZwoKCkFuZHJldyBMdW5uIGFsc28gbm90ZWQgaW4gdjMgdGhhdCB2YXJpYWJsZSBk
-ZWNsYXJhdGlvbnMgc2hvdWxkIGZvbGxvdwpyZXZlcnNlIENocmlzdG1hcyB0cmVlIG9yZGVyaW5n
-IChsb25nZXN0IGxpbmUgZmlyc3QpLiBMb29raW5nIGF0IGZ1bmN0aW9ucwppbiB0aGlzIGNvbW1p
-dCBsaWtlIG5ibF9kZXZfcmVxdWVzdF9tYWlsYm94X2lycSgpOgoKIHN0cnVjdCBuYmxfZGV2X2Nv
-bW1vbiAqZGV2X2NvbW1vbiA9IGRldl9tZ3QtPmNvbW1vbl9kZXY7CiBzdHJ1Y3QgbmJsX21zaXhf
-aW5mbyAqbXNpeF9pbmZvID0gJmRldl9jb21tb24tPm1zaXhfaW5mbzsKIHN0cnVjdCBuYmxfY29t
-bW9uX2luZm8gKmNvbW1vbiA9IGRldl9tZ3QtPmNvbW1vbjsKCnRoZSBkZWNsYXJhdGlvbnMgYXJl
-IG5vdCBpbiByZXZlcnNlIENocmlzdG1hcyB0cmVlIG9yZGVyLgoKTGluazogaHR0cHM6Ly9sb3Jl
-Lmtlcm5lbC5vcmcvbmV0ZGV2L2M2ZDM3ZWNkLTdkYzYtNGY4My1iNzZjLTI3MzVhNWYxMTZmZEBs
-dW5uLmNoLwoK
+The ID 8086:104f is matched by both i40e and ipw2200. The same device
+ID should not be in more than one driver, because in that case, which
+driver is used is unpredictable. Fix this by taking advantage of the
+fact that i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
+devices use PCI_CLASS_NETWORK_OTHER to differentiate the devices.
+
+Fixes: 2e45d3f4677a ("i40e: Add support for X710 B/P & SFP+ cards")
+Cc: stable@vger.kernel.org
+Acked-by: Johannes Berg <johannes@sipsolutions.net>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+Changes from v1:
+Rebase on latest mainline instead of net-next
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c  | 8 +++++++-
+ drivers/net/wireless/intel/ipw2x00/ipw2200.c | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index d3bc3207054f..02de186dcc8f 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -75,7 +75,13 @@ static const struct pci_device_id i40e_pci_tbl[] = {
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_BASE_T4), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_BASE_T_BC), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_SFP), 0},
+-	{PCI_VDEVICE(INTEL, I40E_DEV_ID_10G_B), 0},
++	/*
++	 * This ID conflicts with ipw2200, but the devices can be differentiated
++	 * because i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
++	 * devices use PCI_CLASS_NETWORK_OTHER.
++	 */
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, I40E_DEV_ID_10G_B),
++		PCI_CLASS_NETWORK_ETHERNET << 8, 0xffff00, 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_KX_X722), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_QSFP_X722), 0},
+ 	{PCI_VDEVICE(INTEL, I40E_DEV_ID_SFP_X722), 0},
+diff --git a/drivers/net/wireless/intel/ipw2x00/ipw2200.c b/drivers/net/wireless/intel/ipw2x00/ipw2200.c
+index 09035a77e775..b0e769da9415 100644
+--- a/drivers/net/wireless/intel/ipw2x00/ipw2200.c
++++ b/drivers/net/wireless/intel/ipw2x00/ipw2200.c
+@@ -11387,7 +11387,13 @@ static const struct pci_device_id card_ids[] = {
+ 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2754, 0, 0, 0},
+ 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2761, 0, 0, 0},
+ 	{PCI_VENDOR_ID_INTEL, 0x1043, 0x8086, 0x2762, 0, 0, 0},
+-	{PCI_VDEVICE(INTEL, 0x104f), 0},
++	/*
++	 * This ID conflicts with i40e, but the devices can be differentiated
++	 * because i40e devices use PCI_CLASS_NETWORK_ETHERNET and ipw2200
++	 * devices use PCI_CLASS_NETWORK_OTHER.
++	 */
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x104f),
++		PCI_CLASS_NETWORK_OTHER << 8, 0xffff00, 0},
+ 	{PCI_VDEVICE(INTEL, 0x4220), 0},	/* BG */
+ 	{PCI_VDEVICE(INTEL, 0x4221), 0},	/* BG */
+ 	{PCI_VDEVICE(INTEL, 0x4223), 0},	/* ABG */
+-- 
+2.43.0
+
 
