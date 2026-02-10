@@ -1,169 +1,149 @@
-Return-Path: <netdev+bounces-258149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Hx7OK9+i2kzUwAAu9opvQ
-	(envelope-from <netdev+bounces-258149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:53:35 +0100
+	id UIIdOC6Di2lDVAAAu9opvQ
+	(envelope-from <netdev+bounces-258150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 20:12:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF1C11E71B
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:53:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD9D11E8A7
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 20:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3780E3075A92
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:52:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 58ECD3018D5A
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D707399010;
-	Tue, 10 Feb 2026 18:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E2B2C0F72;
+	Tue, 10 Feb 2026 19:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Fj4L7dfB"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TZmzkexb";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QZ8S1g3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B83439A816;
-	Tue, 10 Feb 2026 18:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830A61F03EF;
+	Tue, 10 Feb 2026 19:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770749519; cv=none; b=sK7V9l4PTnsG9wB2uMBlZfPFGObh49EVTIMMRfBM/PA2LguM1/Cs7pIC3NY11RffYCqU2+fjFnys4qelhdrIIlS7oyPx3fdAzPoLjusowNOwzhC94u5KMCZJiR0ypVeKF0kS23r7MyZ2tMxZIdR3NDIrXm5pzWAmKEJ/dzDr96E=
+	t=1770750312; cv=none; b=tLVqa10SaXdmLvnqi+t0YKQyI83OaS0Tkt6haTJJzkSLSPH45hQlx6qfDexW61oV3alRB8M3GC7zIGVVBaypGxJmLh9aNO1UZrzQnxgluBgf+CwK8HyDEvZBZMpZsd+NWq55LkyU2Y+s1BlJ6PBLR3yUbOF6qCFt08maqSLagDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770749519; c=relaxed/simple;
-	bh=i74Zuxfo66vmMqVjJGNwfc07THhDPoiG/0JuRpfvdq8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bQlG7QW5YleMOyvBDr9c+cQkQAVvIVokmAuiF49lrwsge071FOwqQcmrwuRb2YnTHC4xg+Bl5f4u3H7SWON5qEidaXyKfmrzDEhRpnxawCjC+XrMYNDA5pGLusCMx1HtvngCqSqGCq/p75RUHneDa9KcOxFhwX5g0DMB4qoG/uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=Fj4L7dfB; arc=none smtp.client-ip=130.117.225.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=virtuozzo.com; s=relay; h=Content-Type:MIME-Version:Message-ID:Date:Subject
-	:From; bh=ot7Tdf4uDPS0aoShzU4t4fRC4FoKO2YRKcBiMOsi3xI=; b=Fj4L7dfBP/ZqkqDgrNv
-	xCNHvsz099m40/5Ta0eUWaJJxGS1QZl2AqHJnDzz41g47nrVlj/8LMfWAaKER8jxhw9BHJuVE4Tji
-	MoVzfDu9bxYxajatufewxL5OgZtST6BeIU2re8ao99hGWwPPsu2l7E5hvuyv0ne3jaNqbKniFgY6z
-	olq9goozrIYFZcVBwXAn2m2VlSssPJrrIZ+QBLE46Jp5hc+AtOSxJDt5A7RpR29YDRWt4GwCMW276
-	tHDZ79rJNdZj3BUNPDQZN1ybP6cYA10lY/HGN5jxOaayQtet9tK+IlBW7E29DlsmE4kYBE8tVYx5+
-	ThYWasZSabKpb5A==;
-Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
-	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <aleksey.oladko@virtuozzo.com>)
-	id 1vpsp3-00DJs2-0O;
-	Tue, 10 Feb 2026 19:51:43 +0100
-Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
-	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 61AIpqXB480044
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 10 Feb 2026 18:51:52 GMT
-Received: (from root@localhost)
-	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 61AIpq2m480043;
-	Tue, 10 Feb 2026 18:51:52 GMT
-From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-        Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Subject: [PATCH 3/3] selftests: forwarding: fix pedit tests failure with br_netfilter enabled
-Date: Tue, 10 Feb 2026 18:51:29 +0000
-Message-ID: <20260210185129.480015-4-aleksey.oladko@virtuozzo.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260210185129.480015-1-aleksey.oladko@virtuozzo.com>
-References: <20260210185129.480015-1-aleksey.oladko@virtuozzo.com>
+	s=arc-20240116; t=1770750312; c=relaxed/simple;
+	bh=uAQeNvq2S/zOIDS61fTcoTI+5nqJk66WGCWaL9YZkSk=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=RcZUbCgnoa8L9th0rrtchhz8kBUg3fDv9YSvGbcnhWLTAQaQxwGGN5mXcEm/2e18Mh1oARobsE+QieldsQ/B37p/Ziqk0X9cwPzOmnPDEUFXDFUwozMyAisU677VI8xkxY5E7zf+HYM0dXbkaU/YNJZm62aa8i4qD7MR6E9sUHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TZmzkexb; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QZ8S1g3G; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1770750309;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+L44lAvKjRKzDItcFt08IjbXmB2nzfCPl3DoIoZgdsM=;
+	b=TZmzkexbKAghOjJxe2F/dr1fXWKo63oVJnEIBqpo44Wc7683pC1bjSupuKTtKsYuV0GvHV
+	KT0BYXTDkwJYXeRhDWxj9TLTacEKo3y6ieb0U+cwDXFeUJCe1nSO1j9ik+F5t6LaIKyC9P
+	Npp9Yx/wrxoHDZDJ5UqaFjLLd5TrcVFEppGzXwqE/dFo5OpvsArqqCdHBy11cIBzziGuxj
+	y9oOTXaX6uCYK8kKBk4oXa0v0GNJy4mM7dQCX75UcyIgUvXbtLcsJCQ94K58NLWF7+nEv/
+	7BWi184gxZr+SLJcdabK77UdGD2j8oo3u+Si9Mm8OXMsk40XLJychS90XWviWg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1770750309;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+L44lAvKjRKzDItcFt08IjbXmB2nzfCPl3DoIoZgdsM=;
+	b=QZ8S1g3GZJSXXxLCI5w1NdNduVzmCSsmdkghsp88hFAHFrzUkI1mJzFMU2ILYwckS5TGRX
+	JtGRztjxs2CcFSAA==
+To: syzbot <syzbot+28bdcfc1dab2ffa279a5@syzkaller.appspotmail.com>,
+ bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, horms@kernel.org, hpa@zytor.com,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com,
+ netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, x86@kernel.org
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in __schedule (5)
+In-Reply-To: <698a28f5.a00a0220.34fa92.004a.GAE@google.com>
+References: <698a28f5.a00a0220.34fa92.004a.GAE@google.com>
+Date: Tue, 10 Feb 2026 20:05:06 +0100
+Message-ID: <87ldh0a07x.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [5.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=df890e720d1bb80];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,virtuozzo.com:mid,virtuozzo.com:dkim,virtuozzo.com:email,pedit_ip.sh:url];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-258150-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258149-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[virtuozzo.com:+]
-X-Rspamd-Queue-Id: 8FF1C11E71B
+	MIME_TRACE(0.00)[0:+];
+	GREYLIST(0.00)[pass,body];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@linutronix.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,linutronix.de:dkim];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,28bdcfc1dab2ffa279a5];
+	MISSING_XM_UA(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 3FD9D11E8A7
 X-Rspamd-Action: no action
 
-The tests use the tc pedit action to modify the IPv4 source address
-("pedit ex munge ip src set"), but the IP header checksum is not
-recalculated after the modification. As a result, the modified packet
-fails sanity checks in br_netfilter after bridging and is dropped,
-which causes the test to fail.
+On Mon, Feb 09 2026 at 10:35, syzbot wrote:
 
-Fix this by adding an explicit checksum recalculation using the
-"csum ip" action, so the modified packet contains a valid IPv4
-checksum.
+> syzbot has found a reproducer for the following issue on:
+>
+> HEAD commit:    05f7e89ab973 Linux 6.19
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17daf65a580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=df890e720d1bb80
+> dashboard link: https://syzkaller.appspot.com/bug?extid=28bdcfc1dab2ffa279a5
+> compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1029533a580000
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/ea9f39c5175d/disk-05f7e89a.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/734edeebfa32/vmlinux-05f7e89a.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/a2cb36d849f0/bzImage-05f7e89a.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+28bdcfc1dab2ffa279a5@syzkaller.appspotmail.com
+>
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in instrument_atomic_read include/linux/instrumented.h:68 [inline]
+> BUG: KASAN: slab-use-after-free in atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
+> BUG: KASAN: slab-use-after-free in membarrier_switch_mm kernel/sched/sched.h:3666 [inline]
+> BUG: KASAN: slab-use-after-free in context_switch kernel/sched/core.c:5230 [inline]
+> BUG: KASAN: slab-use-after-free in __schedule+0xc56/0x5fa0 kernel/sched/core.c:6867
+> Read of size 4 at addr ffff88801db4e2c0 by task kworker/u8:1/13
 
-Note on IPv6:
-  The tests in pedit_ip.sh also cover IPv6 (test_ip6_src, test_ip6_dst).
-  The csum ip action is harmless for IPv6 packets since IPv6 has no
-  header checksum — it will be a no-op.
+That's most likely the same issue as with the futex report. Caused by a
+double mmdrop() in do_procmap_query(). The reproducer fiddles with
+that...
 
-Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
----
- tools/testing/selftests/net/forwarding/pedit_dsfield.sh | 5 +++--
- tools/testing/selftests/net/forwarding/pedit_ip.sh      | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+See https://lore.kernel.org/all/20260129215340.3742283-1-andrii@kernel.org/T/#m5250c5bf0612d19c7991b6454f309e41776982be
 
-diff --git a/tools/testing/selftests/net/forwarding/pedit_dsfield.sh b/tools/testing/selftests/net/forwarding/pedit_dsfield.sh
-index af008fbf2725..310f96fb2274 100755
---- a/tools/testing/selftests/net/forwarding/pedit_dsfield.sh
-+++ b/tools/testing/selftests/net/forwarding/pedit_dsfield.sh
-@@ -156,7 +156,7 @@ do_test_pedit_dsfield()
- 	local daddr=$1; shift
- 
- 	tc filter add $pedit_locus handle 101 pref 1 \
--	   flower action pedit ex munge $pedit_action
-+	   flower action pedit ex munge $pedit_action pipe action csum ip
- 	tc filter add dev $h2 ingress handle 101 pref 1 prot $match_prot \
- 	   flower skip_hw $match_flower action pass
- 
-@@ -229,7 +229,8 @@ do_test_ip_dscp_ecn()
- 
- 	tc filter add $locus handle 101 pref 1				\
- 	   flower action pedit ex munge ip dsfield set 124 retain 0xfc	\
--		  action pedit ex munge ip dsfield set 1 retain 0x03
-+		  action pedit ex munge ip dsfield set 1 retain 0x03	\
-+		  pipe action csum ip
- 	tc filter add dev $h2 ingress handle 101 pref 1 prot ip		\
- 	   flower skip_hw ip_tos 125 action pass
- 
-diff --git a/tools/testing/selftests/net/forwarding/pedit_ip.sh b/tools/testing/selftests/net/forwarding/pedit_ip.sh
-index d14efb2d23b2..a53ee3b1ef67 100755
---- a/tools/testing/selftests/net/forwarding/pedit_ip.sh
-+++ b/tools/testing/selftests/net/forwarding/pedit_ip.sh
-@@ -122,7 +122,7 @@ do_test_pedit_ip()
- 	local mz_flags=$1; shift
- 
- 	tc filter add $pedit_locus handle 101 pref 1 \
--	   flower action pedit ex munge $pedit_action
-+	   flower action pedit ex munge $pedit_action pipe action csum ip
- 	tc filter add dev $h2 ingress handle 101 pref 1 prot $match_prot \
- 	   flower skip_hw $match_flower action pass
- 
--- 
-2.43.0
+Thanks,
+
+        tglx
 
 
