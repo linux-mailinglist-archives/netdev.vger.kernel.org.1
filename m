@@ -1,93 +1,90 @@
-Return-Path: <netdev+bounces-258023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258024-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yE5HJISiimleMgAAu9opvQ
-	(envelope-from <netdev+bounces-258023-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 04:14:12 +0100
+	id cD/9NcilimnqMgAAu9opvQ
+	(envelope-from <netdev+bounces-258024-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 04:28:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35933116B48
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 04:14:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B9A116BCC
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 04:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94524302F72C
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:13:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 217DC301A7DB
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 03:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950C22EA72A;
-	Tue, 10 Feb 2026 03:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55132D97B4;
+	Tue, 10 Feb 2026 03:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmZizgMb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lm7f8SUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76DB2DC334
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 03:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFAE3A1C9
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 03:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770693205; cv=none; b=RC6k6TmNHEBoXXWSpOUMmy/9CypXaunsoXPOtxULA3hK2hWTeWns4YmB1AAhIpbn4Q6IX5WekKbJJDa+ryNnRl09VKCUktLiJ/1gVQusI6GakDrk6BrsnpVKWkRyNqrnfY7e8afr8q/j3kIawkiiy9CYqNJeFJnjYegzEByN4zo=
+	t=1770694084; cv=none; b=JA8Oq06QfPX3VrOWr9Ii6YPHxebctdWImbRbZbpEz0UWnYvLoCQo20ypeh9ryd7IWP59GJiXOqqNcwIEUQ+pbCuTIR/OgSDxYxHbygbUxIGTA10+OdwOGXu8OW2AqzJay73XdSftGtRY8r9DszUp+RcvwBc5pPU8bWyE1ed/Mtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770693205; c=relaxed/simple;
-	bh=4/nMmnI8zKAYeeLlG0XTvxB44Mg+06NdKDy3SZy19bE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k7yYhIvy6ke21WTScFOGPojuOh1/7sgekAA69a0JQDbjnlWQeYGO14bbmFN7WIO9+DmdRJTcG/E8LMMwRm5y2FRhZj+PGB2PyR/rmXhcfqQszBKP7Z+MbP/KBCUcJynJfu9UiMqX0VqAFjjMlfSDB25Z/CufjuWOwq00w9EnAng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HmZizgMb; arc=none smtp.client-ip=209.85.218.42
+	s=arc-20240116; t=1770694084; c=relaxed/simple;
+	bh=dPO4aBtz4/xd8+hzaGR5My3SJbmyPFjfOPpyUdvS30c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jq9v6OB4wCRe8Htem3itD10vzdm6dpBw4psxqurtuEy9TPWxH4YLqrSyN5GeyW50jMEuE5w5d5ghHn2FHpOOKqrM6awuvVy7iOtxqZ48PxzQx5Bp/6rdKudKml95cA0tCILJY5IEu1CuKrenLrXM1M0cwVBlsO5N24+3Ugmpo5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lm7f8SUl; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b884d5c787bso602701866b.0
-        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 19:13:23 -0800 (PST)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-823f9f81da5so2752333b3a.1
+        for <netdev@vger.kernel.org>; Mon, 09 Feb 2026 19:28:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770693202; x=1771298002; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770694083; x=1771298883; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9yOqvn4iic2Welqp2RwCBkSo3ZxAKMu23cfko1WEdD8=;
-        b=HmZizgMbMOJaniZ/4+cIz0hEnuyudHyyiRX6qTvADKcTwgffKT+CetFsaO8zwNoUJS
-         8nF6d1JDnzTjmLu8f80w9zZVIcnGLOS94Lnynn9tVLIuzmHCPe1CpB6Z8rzXMxuMBP5J
-         /wlAs3eMQ/RKCcXWxRt6kDkaSb8GtlQbBOAchuTcnQKcUEPKj9kDOr1pGBD+13u/GCuo
-         qijOKcTVPqt28BAkI6/U5qIZrjsXXb2uKwD4p3r3LYEsSsTPVM3GimGVoJ6AXJJMq+Ej
-         /OygUcGOZDCMgCkgQpQw5G5l2GcRTkzOFBpQsYh7Ng++ijvODJQ5JCQnBU9x/oVaXZzM
-         wmOA==
+        bh=MQx792PntSG3k5/exKTLxbUGHMcY8/9ZdhX6r0T38D0=;
+        b=Lm7f8SUl8e7jZFeoBNwHTGalPr6374NDILdwSpPp5OGevIVy29Tq33waXg6YF0fCI0
+         jqSDto8ZUVM5bCJSxS0KulT/yu+fWC6ZtWUACKD8G7QfO2InwdcCePk2iMa2Kq1kMmUt
+         2jHJku7mjXNMG+vM04M22Kx3pdJChZ7NOsWncyJ8IttkytOjOBQR4YdocMalB5F+EQZO
+         nGrbNSaRc/C+dKg1ouPsj67au+DbeYVoa9KuWAlAeEY/gRMrQchxv4R+yJMHRfrXwvbO
+         9rr4oQ2b7GeeQ6XsJ7svASXlUPZp2wMBzp0Wem5KkneI6LG8RauEtUrG0B+kNh34HZgg
+         HYbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770693202; x=1771298002;
+        d=1e100.net; s=20230601; t=1770694083; x=1771298883;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9yOqvn4iic2Welqp2RwCBkSo3ZxAKMu23cfko1WEdD8=;
-        b=etW9sRLgx22VzDIF0yIFl7568oLD2Y80ZcogiR8RRMTLug9UhjVT7UQ6R67GJyYsnW
-         cc5kigiauKPxKuuiDIkcL9oKClE5Syv0AlkVN5SOX3V44Zqwz4YqSDNxD0UZqGf5VGE5
-         dZm/o9C77k1UZj67I1G3YT936voUXB0vEcJ0eh2NxmeT59hxysGh3eWJiqGIJKCX30Yp
-         V7ba/kW8896OSsAn1BYrVgWWWviW/5nTADXh1AoQjeWDVemmRkgp9gJiv/Q/O6qrbxxv
-         plEy1OG5cifa+ggTXhMtzoHo6WnLiVyiMbwXPySXTIV3wASWlHNeKz5P32hLpE100EiF
-         AdjA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFeD+g0A9YMUA7PsAYltSb7gcuD2VcvvY3AlG1/MIdLCCxRljLPYSPuWgCM766SVH54aJk29k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPYQPVxH+trdg03NQaAzDWl+pSM5kuc+uBejWj1DTtl8fpSjXr
-	Y3qEvgkt0oxenYa2fkW4WQBNXzAmKCMoK1xejKGcloEOh4diRDhF27k+
-X-Gm-Gg: AZuq6aI8Mc84cEqORTRAKa4IKV2mIkMvTmARS8gesM8QhZOeEf07CvCrwajDk/MxlIv
-	CbYQqXR5fFWHgcbOLDf1/I+IAalwSjfEvIkFnc5ugD68BULSSYTFZEQnAB6uCuSZixtdEAXbzG1
-	UvEmNF3tkynd8Ap3V21XxrdYQmO84XgJgDbaSIj2n8WaBjL/VM6G1LQA5wEJQ5IZCgTKIepFzw3
-	ZJW8b8uFPcLDcUqvj3YpjNAteFA+sViQJmRij0CA5JlI0Q22d/3anA5f+q/XJoabVgMLxKj8N8Y
-	u7/iRegYAXYMvCXXG1xxOq4/v5fhg0CHqH1JB5O9Ptit6EuCQ/0HhIfAiwD/JPGBXHEn7j8UJEI
-	s6t3vGujs7IKp7VWnsRQWrwZ0ODuZcqBSdPKMT7ZHGAqatJ7jVgW0LQTvNVSY1bkY2USjPKsWM1
-	Xplg==
-X-Received: by 2002:a17:906:f58d:b0:b87:1ffc:bf9b with SMTP id a640c23a62f3a-b8edf173b0amr809418766b.3.1770693201789;
-        Mon, 09 Feb 2026 19:13:21 -0800 (PST)
-Received: from gmail.com ([2a09:bac5:4e22:26fa::3e2:d])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8eda7e6577sm451058566b.30.2026.02.09.19.13.16
+        bh=MQx792PntSG3k5/exKTLxbUGHMcY8/9ZdhX6r0T38D0=;
+        b=N8IltMwlshRYyCQf7GanrEbEK22/f+GXuFcF+ebUCU94uHxGwuWPuffcxIdB+FNseF
+         yeWSxnqqZCQC1eCVWAQi16uWNX7tcy1DANRSX574+IuSOyxH8zEq6jts+3YdNVtK/Pbm
+         7HQNWxjfJwg78Ksld3QH8+wvFyfHutYN7nsNnYZKsYoEL7PiS1JtBNSwshHzmVgKjY6O
+         XwEtQVA0XQJaGHMmuDz+sw4AArav3B0JqSmhFekiyUsracVjqo8Za5xXr7zAyYCsrT7U
+         pzRzwZ5nTS1syRa4v5zItUqsNqEXfzEvgHD++P/jpjqf+IymQeaDZyq4iXzb7gfnaJDe
+         GMzA==
+X-Gm-Message-State: AOJu0YxbjlaFJNmHdsLd1i4M/QIDZ/x1ZF/t2H64AJf8m3Ntb1+fRxpg
+	G35yx2t9ISB9REjwn5UiJFYmYdLk5zBQi9rIk7mOmmlzdRiFOiAQEt4rFZiJT9pwQbLNoA==
+X-Gm-Gg: AZuq6aL/oCFAFlf6jkOViHLlPefcdFTpsPiXouIzhu1Q5/6d0G1QbekrcwYkH/NYLIA
+	Ojmf2KgEu05Po13HM4fxNe+Y3JFSpqX/ufiDIJPKjfcRuLeUufbkKcbUSQZ8eyzxEoitVC/s4mI
+	FcODI7C3N6PzcjgCur6+UBF8iaVS9M4gstUK1YmhCfvDWsVbNgDGvkeKjoFjBTI0vosg6cX60tY
+	6F2aT9bDQfBn+CfT+hbpzt5qPEhjlftQsKXb1rDFm2AVJb9HgsF/hCS9v7hZLWagw96F2UnOoNK
+	dSRwUGYb+FyP2vejLcrlWKEIzYwlRoLf8rEI1eq2oTe85uijTjKeNY9LUCZjdu8Z0wcGtq+eyXP
+	pYhC4Is7aUheMc/F1HEVLANOGiRgodruhaung1XytJ+OlBpDVNjzM09Iz+XzdtZ4WxvPwf4HiD+
+	wx5aGomyr5pReZoGHSqfrduI4G
+X-Received: by 2002:a05:6a20:918e:b0:393:e16d:516 with SMTP id adf61e73a8af0-39417844f0dmr706328637.9.1770694082830;
+        Mon, 09 Feb 2026 19:28:02 -0800 (PST)
+Received: from localhost.localdomain ([240e:3b5:d06c:3ed0::1001])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35662e8ba1bsm917243a91.9.2026.02.09.19.28.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 19:13:20 -0800 (PST)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [RFC PATCH net-next v2] ppp: don't store tx skb in the fastpath
-Date: Tue, 10 Feb 2026 11:13:13 +0800
-Message-ID: <20260210031313.29708-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 09 Feb 2026 19:28:02 -0800 (PST)
+From: Qanux <qjx1298677004@gmail.com>
+To: netdev@vger.kernel.org
+Cc: justin.iurman@uliege.be,
+	kuba@kernel.org,
+	dsahern@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net
+Subject: [PATCH net] ipv6: ioam: fix heap buffer overflow in __ioam6_fill_trace_data()
+Date: Tue, 10 Feb 2026 11:25:50 +0800
+Message-Id: <20260210032550.20219-1-qjx1298677004@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,299 +93,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258024-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258023-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[qjx1298677004@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 35933116B48
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 51B9A116BCC
 X-Rspamd-Action: no action
 
-Currently, ppp->xmit_pending is used in ppp_send_frame() to pass a skb
-to ppp_push(), and holds the skb when a PPP channel cannot immediately
-transmit it. This state is redundant because the transmit queue
-(ppp->file.xq) can already handle the backlog. Furthermore, during
-normal operation, an skb is queued in file.xq only to be immediately
-dequeued, causing unnecessary overhead.
+The IPv6 IOAM Pre-allocated Trace receive path (ipv6_hop_ioam in
+net/ipv6/exthdrs.c) does not validate that the nodelen field in the
+trace header is consistent with the type bitmap.
 
-Refactor the transmit path to avoid stashing the skb when possible:
-- Remove ppp->xmit_pending.
-- Rename ppp_send_frame() to ppp_prepare_tx_skb(), and don't call
-  ppp_push() in it. It returns NULL if the skb is consumed
-  (dropped/queue) or a new skb to be passed to ppp_push().
-- Update ppp_push() to accept the skb. It returns 1 if the skb is
-  consumed, or 0 if the channel is busy.
-- Optimize __ppp_xmit_process():
-  - Fastpath: If the queue is empty, attempt to send the skb directly
-    via ppp_push(). If busy, queue it.
-  - Slowpath: If the queue is not empty, process the backlog in
-    file.xq. Split dequeuing loop into a separate function
-    ppp_xmit_flush() so ppp_channel_push() uses that directly instead of
-    passing a NULL skb to __ppp_xmit_process().
+When a crafted packet arrives with nodelen=0 but with type bits set,
+__ioam6_fill_trace_data() computes the write pointer at the end of
+the trace data buffer and then writes past it, overflowing into
+adjacent memory (skb_shared_info). This corrupts critical SKB metadata,
+leading to a kernel panic when the SKB is freed.
 
-This simplifies the states and reduces locking in the fastpath.
+The send path properly validates the trace header via
+ioam6_validate_trace_hdr() which recomputes nodelen from the type
+bitmap. However, calling that function from the receive path would
+break forward compatibility, as it rejects packets with undefined
+type bits (bit 12-21) that the receive path intentionally accepts.
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+Fix by recomputing nodelen directly from the type bitmap inside
+ioam6_fill_trace_data() before using it, preserving the receive
+path's forward compatibility while preventing the overflow.
+
+Fixes: 9ee11f0fff20 ("ipv6: ioam: Data plane support for Pre-allocated Trace")
+Cc: stable@vger.kernel.org
+Signed-off-by: Junxi Qian <qjx1298677004@gmail.com>
 ---
-PPPoE encap forwarding performance on a RISC-V SBC increased from
- 86kpps to 91kpps. 
+ include/net/ioam6.h       |  4 ++++
+ net/ipv6/ioam6.c          | 10 +++++++++-
+ net/ipv6/ioam6_iptunnel.c |  3 ---
+ 3 files changed, 13 insertions(+), 4 deletions(-)
 
-v2: fix ppp_prepare_tx_skb() UAF.
- - https://lore.kernel.org/netdev/20260209021134.21194-1-dqfext@gmail.com/
-
- drivers/net/ppp/ppp_generic.c | 107 +++++++++++++++++++---------------
- 1 file changed, 61 insertions(+), 46 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index f8814d7be6f1..b8a41f571aa3 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -134,7 +134,6 @@ struct ppp {
- 	int		debug;		/* debug flags 70 */
- 	struct slcompress *vj;		/* state for VJ header compression */
- 	enum NPmode	npmode[NUM_NP];	/* what to do with each net proto 78 */
--	struct sk_buff	*xmit_pending;	/* a packet ready to go out 88 */
- 	struct compressor *xcomp;	/* transmit packet compressor 8c */
- 	void		*xc_state;	/* its internal state 90 */
- 	struct compressor *rcomp;	/* receive decompressor 94 */
-@@ -264,8 +263,8 @@ struct ppp_net {
- static int ppp_unattached_ioctl(struct net *net, struct ppp_file *pf,
- 			struct file *file, unsigned int cmd, unsigned long arg);
- static void ppp_xmit_process(struct ppp *ppp, struct sk_buff *skb);
--static void ppp_send_frame(struct ppp *ppp, struct sk_buff *skb);
--static void ppp_push(struct ppp *ppp);
-+static struct sk_buff *ppp_prepare_tx_skb(struct ppp *ppp, struct sk_buff *skb);
-+static int ppp_push(struct ppp *ppp, struct sk_buff *skb);
- static void ppp_channel_push(struct channel *pch);
- static void ppp_receive_frame(struct ppp *ppp, struct sk_buff *skb,
- 			      struct channel *pch);
-@@ -1651,26 +1650,45 @@ static void ppp_setup(struct net_device *dev)
-  */
+diff --git a/include/net/ioam6.h b/include/net/ioam6.h
+index abfa518cd917..a3f2a1e4fd19 100644
+--- a/include/net/ioam6.h
++++ b/include/net/ioam6.h
+@@ -14,6 +14,10 @@
+ #include <linux/ioam6_genl.h>
+ #include <linux/rhashtable-types.h>
  
- /* Called to do any work queued up on the transmit side that can now be done */
-+static void ppp_xmit_flush(struct ppp *ppp)
-+{
-+	struct sk_buff *skb;
++#define IOAM6_MASK_SHORT_FIELDS 0xff100000
++#define IOAM6_MASK_WIDE_FIELDS  0x00e00000
++#define IOAM6_MASK_UNDEF_FIELDS 0x000ffc00
 +
-+	while ((skb = skb_dequeue(&ppp->file.xq))) {
-+		if (unlikely(!ppp_push(ppp, skb))) {
-+			skb_queue_head(&ppp->file.xq, skb);
-+			return;
-+		}
-+	}
-+	/* If there's no work left to do, tell the core net code that we can
-+	 * accept some more.
-+	 */
-+	netif_wake_queue(ppp->dev);
-+}
-+
- static void __ppp_xmit_process(struct ppp *ppp, struct sk_buff *skb)
+ struct ioam6_namespace {
+ 	struct rhash_head head;
+ 	struct rcu_head rcu;
+diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+index 02aboriginal1..02bfixedcode 100644
+--- a/net/ipv6/ioam6.c
++++ b/net/ipv6/ioam6.c
+@@ -929,12 +929,20 @@ void ioam6_fill_trace_data(struct sk_buff *skb,
+ 			    bool is_input)
  {
- 	ppp_xmit_lock(ppp);
--	if (!ppp->closing) {
--		ppp_push(ppp);
--
--		if (skb)
-+	if (unlikely(ppp->closing)) {
-+		kfree_skb(skb);
-+		goto out;
-+	}
-+	skb = ppp_prepare_tx_skb(ppp, skb);
-+	if (unlikely(!skb))
-+		goto out;
-+	/* Fastpath: No backlog, just send the new skb. */
-+	if (likely(skb_queue_empty(&ppp->file.xq))) {
-+		if (unlikely(!ppp_push(ppp, skb))) {
- 			skb_queue_tail(&ppp->file.xq, skb);
--		while (!ppp->xmit_pending &&
--		       (skb = skb_dequeue(&ppp->file.xq)))
--			ppp_send_frame(ppp, skb);
--		/* If there's no work left to do, tell the core net
--		   code that we can accept some more. */
--		if (!ppp->xmit_pending && !skb_peek(&ppp->file.xq))
--			netif_wake_queue(ppp->dev);
--		else
- 			netif_stop_queue(ppp->dev);
--	} else {
--		kfree_skb(skb);
-+		}
-+		goto out;
- 	}
-+
-+	/* Slowpath: Enqueue the new skb and process backlog */
-+	skb_queue_tail(&ppp->file.xq, skb);
-+	ppp_xmit_flush(ppp);
-+out:
- 	ppp_xmit_unlock(ppp);
- }
+ 	struct ioam6_schema *sc;
++	u32 fields;
+ 	u8 sclen = 0;
  
-@@ -1757,12 +1775,11 @@ pad_compress_skb(struct ppp *ppp, struct sk_buff *skb)
- }
- 
- /*
-- * Compress and send a frame.
-- * The caller should have locked the xmit path,
-- * and xmit_pending should be 0.
-+ * Compress and prepare to send a frame.
-+ * The caller should have locked the xmit path.
-  */
--static void
--ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
-+static struct sk_buff *
-+ppp_prepare_tx_skb(struct ppp *ppp, struct sk_buff *skb)
- {
- 	int proto = PPP_PROTO(skb);
- 	struct sk_buff *new_skb;
-@@ -1784,7 +1801,7 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
- 					      "PPP: outbound frame "
- 					      "not passed\n");
- 			kfree_skb(skb);
--			return;
-+			return NULL;
- 		}
- 		/* if this packet passes the active filter, record the time */
- 		if (!(ppp->active_filter &&
-@@ -1869,42 +1886,38 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
- 			goto drop;
- 		skb_queue_tail(&ppp->file.rq, skb);
- 		wake_up_interruptible(&ppp->file.rwait);
--		return;
-+		return NULL;
- 	}
- 
--	ppp->xmit_pending = skb;
--	ppp_push(ppp);
--	return;
-+	return skb;
- 
-  drop:
- 	kfree_skb(skb);
- 	++ppp->dev->stats.tx_errors;
-+	return NULL;
- }
- 
- /*
-- * Try to send the frame in xmit_pending.
-+ * Try to send the frame.
-  * The caller should have the xmit path locked.
-+ * Returns 1 if the skb was consumed, 0 if not.
-  */
--static void
--ppp_push(struct ppp *ppp)
-+static int
-+ppp_push(struct ppp *ppp, struct sk_buff *skb)
- {
- 	struct list_head *list;
- 	struct channel *pch;
--	struct sk_buff *skb = ppp->xmit_pending;
--
--	if (!skb)
--		return;
- 
- 	list = &ppp->channels;
- 	if (list_empty(list)) {
- 		/* nowhere to send the packet, just drop it */
--		ppp->xmit_pending = NULL;
- 		kfree_skb(skb);
--		return;
-+		return 1;
- 	}
- 
- 	if ((ppp->flags & SC_MULTILINK) == 0) {
- 		struct ppp_channel *chan;
-+		int ret;
- 		/* not doing multilink: send it down the first channel */
- 		list = list->next;
- 		pch = list_entry(list, struct channel, clist);
-@@ -1916,27 +1929,26 @@ ppp_push(struct ppp *ppp)
- 			 * skb but linearization failed
- 			 */
- 			kfree_skb(skb);
--			ppp->xmit_pending = NULL;
-+			ret = 1;
- 			goto out;
- 		}
- 
--		if (chan->ops->start_xmit(chan, skb))
--			ppp->xmit_pending = NULL;
-+		ret = chan->ops->start_xmit(chan, skb);
- 
- out:
- 		spin_unlock(&pch->downl);
--		return;
-+		return ret;
- 	}
- 
- #ifdef CONFIG_PPP_MULTILINK
- 	/* Multilink: fragment the packet over as many links
- 	   as can take the packet at the moment. */
- 	if (!ppp_mp_explode(ppp, skb))
--		return;
-+		return 0;
- #endif /* CONFIG_PPP_MULTILINK */
- 
--	ppp->xmit_pending = NULL;
- 	kfree_skb(skb);
-+	return 1;
- }
- 
- #ifdef CONFIG_PPP_MULTILINK
-@@ -2005,7 +2017,7 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
- 	 * performance if we have a lot of channels.
+ 	/* Skip if Overflow flag is set
  	 */
- 	if (nfree == 0 || nfree < navail / 2)
--		return 0; /* can't take now, leave it in xmit_pending */
-+		return 0; /* can't take now, leave it in transmit queue */
+ 	if (trace->overflow)
+ 		return;
  
- 	/* Do protocol field compression */
- 	if (skb_linearize(skb))
-@@ -2199,8 +2211,12 @@ static void __ppp_channel_push(struct channel *pch, struct ppp *ppp)
- 	spin_unlock(&pch->downl);
- 	/* see if there is anything from the attached unit to be sent */
- 	if (skb_queue_empty(&pch->file.xq)) {
--		if (ppp)
--			__ppp_xmit_process(ppp, NULL);
-+		if (ppp) {
-+			ppp_xmit_lock(ppp);
-+			if (!ppp->closing)
-+				ppp_xmit_flush(ppp);
-+			ppp_xmit_unlock(ppp);
-+		}
- 	}
- }
++	trace->nodelen = 0;
++	fields = be32_to_cpu(trace->type_be32);
++	trace->nodelen += hweight32(fields & IOAM6_MASK_SHORT_FIELDS)
++				* (sizeof(__be32) / 4);
++	trace->nodelen += hweight32(fields & IOAM6_MASK_WIDE_FIELDS)
++				* (sizeof(__be64) / 4);
++	trace->nodelen += hweight32(fields & IOAM6_MASK_UNDEF_FIELDS)
++				* (sizeof(__be32) / 4);
  
-@@ -3460,7 +3476,6 @@ static void ppp_destroy_interface(struct ppp *ppp)
- 	}
- #endif /* CONFIG_PPP_FILTER */
+ 	/* NodeLen does not include Opaque State Snapshot length. We need to
+ 	 * take it into account if the corresponding bit is set (bit 22) and
+diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+index 7abcdef12345..7abcfixedcode 100644
+--- a/net/ipv6/ioam6_iptunnel.c
++++ b/net/ipv6/ioam6_iptunnel.c
+@@ -23,9 +23,6 @@
+ #include <net/ip6_route.h>
+ #include <net/addrconf.h>
  
--	kfree_skb(ppp->xmit_pending);
- 	free_percpu(ppp->xmit_recursion);
- 
- 	free_netdev(ppp->dev);
+-#define IOAM6_MASK_SHORT_FIELDS 0xff100000
+-#define IOAM6_MASK_WIDE_FIELDS  0x00e00000
+-
+ struct ioam6_lwt_encap {
+ 	struct ipv6_hopopt_hdr eh;
+ 	u8 pad[2];			/* 2-octet padding for 4n-alignment */
 -- 
-2.43.0
-
+2.39.0
 
