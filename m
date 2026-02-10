@@ -1,142 +1,196 @@
-Return-Path: <netdev+bounces-258143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QE52LRBxi2lhUQAAu9opvQ
-	(envelope-from <netdev+bounces-258143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:55:28 +0100
+	id UOicIJxzi2nFUQAAu9opvQ
+	(envelope-from <netdev+bounces-258144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:06:20 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9874B11E268
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:55:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2827411E36F
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2B751301951C
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:55:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3611B300C02B
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5453A38B7DE;
-	Tue, 10 Feb 2026 17:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A35138B7A4;
+	Tue, 10 Feb 2026 18:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IV5HWXkc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U9uK7OlJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD4438A9CF;
-	Tue, 10 Feb 2026 17:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9AEF4FA
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 18:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770746102; cv=none; b=QGS8C8lF2PdJlFCJJOiMOJ7uuL0vxXHX11nfGl+9/EaUsU0HYKebpm4c3k7Y8HN0OTHysdsL21o8+sFm2jv5KWQrJ7DyA0L9UFUhl2b443gAEgZYBVaUoN1h9h71DTpvZIr1CCoprcmGwbXkS+OP4NGM92fsflIrrhrKkYePW+c=
+	t=1770746776; cv=none; b=BfAQvtsgp18aIpFqktZmAIpmgHX3OZQ3iZjsblGy+Y3kdyVg6UwZnYsnEhKYGDnRlkjJmGyVEjm7mm+JgoJflPSvuT5rLQ2+qMt85W+29kPPk7YZ/PRzrZW4APGrhm8tIciBRCkF3zOf68ntb5uHVjv2NRJFjyeiCx5dqacDsYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770746102; c=relaxed/simple;
-	bh=oakjD26/4tkGvWqhilxMCc4hiHX5ft4jQ4Iq6CfC8Ok=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=Vlcwarck/nxOkijC9qquUww3WHFA0xddfS8Z0IDcUwd/DbaBKv8UE3GvXko5qdYSnT2Dc13GF+CsFVHfivxMEXeMZI9I1qA8EKaDCWD+wT7XbY+bdafMNqud6AEXChXpnL/wBROD7Hd0J7rt9pDQoVD3UhrDLWidrxaBhjLRLKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IV5HWXkc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E45DC116C6;
-	Tue, 10 Feb 2026 17:55:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770746102;
-	bh=oakjD26/4tkGvWqhilxMCc4hiHX5ft4jQ4Iq6CfC8Ok=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=IV5HWXkc/FCiRpLej35EorMs268YVetMhHEcMuM8RZrQDwNon4ujlVriIsWMItPQO
-	 EqpPqMEeYxMCD6O4YFIrEvdJEAaFfqIGPwZOjfLqaxtmbteFvtM06iSeex9Dz5XBgO
-	 eId3ASq6UbrOQNwrEjse/Tdi30l18VlSWm7BlPWh5mf4t33MAhtXT3IbgjW51LF+r9
-	 vzEBdcZkI3eZTjdO3Q29eABxls3qZxt/DDPJl5+t8fLfEvnhAh5SbzAkjEx5m1VN5S
-	 rM53+ku47GAnrwJMK4bvWMODcdVtJF+2hO0GTGelBaK5cYQfywiYVchoItLmFSR3p/
-	 OS8Eizj1vbL9A==
-Content-Type: multipart/mixed; boundary="===============7295902335523839857=="
+	s=arc-20240116; t=1770746776; c=relaxed/simple;
+	bh=YAl1kz+VwRttH+8e8JJSQ41O51aTnMyPn2QYglCXB2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rOfZHX3wdNWV6iF02CnLe2Pu6VZ4LzsZ3NSzESkBdWa2fDZhuPaYXrqlk4obM+XpjhZWvTuhiWWYwzLRFlklKh9A5H/PIsaeGx12ObObIbPNiQq9Q/in8DQT7sXdoYJXDTji+GK6cXTYbBp4b2W+8JU6MYc2pLPPodTfOsUKJh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U9uK7OlJ; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c5386f1c9fso603526985a.1
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 10:06:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770746774; x=1771351574; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VQrgfquaPzKySAFC0y5fUivrJ9+1Cj9LagzYm8Nz4oo=;
+        b=U9uK7OlJQ57QQNyiPIPJwUnQNotUWJfHWHDz+b2lEAYcK8bEKHX/+p4OL0dPtoe6Zt
+         VZohfLMifC2wJiFjKQg6/FgkmjkBLoYAVX2r9+yYAu33aZUAxvlmOgLTv0YHqyt7JUcg
+         7OVqX47aE1sPl2iyzIwCpW22wyUuG0dAY7GCxObsCox5wRujyKcb9MStqbGpkm6VDPpZ
+         wwKHIKOM7DTS5RVRLRMzK0srn+eiyDdCKcCptnrYQU1SxVSddy660lE6CiH2JqiCR+yX
+         ZV/7pEymOIpA6KCZM62GtkYnBnpCa9DMALhsCTrr5IUNK9e8xXl4eNYgZ8aoWmkHz7BA
+         afig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770746774; x=1771351574;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VQrgfquaPzKySAFC0y5fUivrJ9+1Cj9LagzYm8Nz4oo=;
+        b=ZQsdf12CNGaswkjXdH0QlxjFMy5oOkJvFcRVjyHCzPYpOlDtNpIq+jTSpFI7wOW7GB
+         wvj6iVtDuF+O+2WOat7hAFllvLYZOGn/UcnWZdvTb31RCXsoU0QWxEUqdgDh0qtUnd7c
+         35B9yQ+YpHeKrOw0ylXqzew9tTvTOtewA0YWmt/xLR43FZSQVLgU/ltuYlQlsWYWUtNr
+         9LjHTuzFrIrX0+NpVxinnCNJpuSZoOJx3z1U2S+pxArK1Q1hCpEOhvGTWQrbfEC+BUW2
+         bCGkOW7ImziqNsFRr/8uhcAGm1IU2zKlWuIzJBIpninkwSy683zlB9owxOYOt3df1+e1
+         J+qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqkdPbdUvH164AdtaB4kRpaXa6hDddfFVr5Z4dXrTLjdZsG6avCWKX/Zzxaga7wCxJ8qZ408s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXsLd4Zk2U2iHahoAvOFGtxEx1wA18LZdMBp9papR2P1+IBZ3V
+	0mhMsp8CPphGNjghdtsjzN76o57UaIcfTND/cjEZTnd7S4iJEpVUqD29
+X-Gm-Gg: AZuq6aKdSX4gjNKrfWgp9+M1bpGt/H0hsZiYCC4GXbWxyEDUgYk6zpUyTBNIUEtFY2v
+	B+a16BrrLDfFkeWDVAxoH8p8J6dsBRwNV2DvW0Alqh0Nge+zLQo79dpoysYORxHbFPVC/UWJVAw
+	a79bDg3EMRvkMTr+c5TDCDb+jenx20DI0J1tmn+0oooLgU+VAcvgAhwICMk2I7dLaX+E478CQFe
+	zIws45sY6vW1bUXInJQCNvy7M6MEpinW6T0CCEjg95KDN0as9I6UbtmSwIFYco61rPEOl0vy9Xe
+	H/jGV+K1M1EgIWHGUG7PCIiYubKNXMXujT5QzMVna3oRaPAPa2auXMpgE9pajzAzTJVQ7Bcb9FQ
+	/nQPG1QvvsQkpYCxVfNQwsrESzXwyTJzJpkhw2t89NDWI2YT3tT/xUyhhdneQNVwrbuTg1ztz4O
+	D7iU0tqE7WtsU3qeeqP1w+SzyxSzMmNZj+2xUVH0wnpay4Ou6DXCgr+rHO
+X-Received: by 2002:a05:620a:29d3:b0:8b5:5a33:22d2 with SMTP id af79cd13be357-8cb28040ff9mr11986785a.46.1770746773592;
+        Tue, 10 Feb 2026 10:06:13 -0800 (PST)
+Received: from PF5YBGDS.localdomain ([163.114.130.6])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8953c03eb1fsm104552496d6.33.2026.02.10.10.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Feb 2026 10:06:13 -0800 (PST)
+Date: Tue, 10 Feb 2026 13:06:10 -0500
+From: Mike Marciniszyn <mike.marciniszyn@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>, Lee Trager <lee@trager.us>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v12 3/5] eth fbnic: Add msix self test
+Message-ID: <aYtzklT3p7lsnC1R@PF5YBGDS.localdomain>
+References: <20260206154246.814-1-mike.marciniszyn@gmail.com>
+ <20260206154246.814-4-mike.marciniszyn@gmail.com>
+ <e806861b-acd4-4615-aada-577e0275bb5d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <8d3fe8a5425f2e6af5a75f8d1a26d1b460719b1e904b6e1499747ca479b73832@mail.kernel.org>
-In-Reply-To: <20260210-bpf-xdp-meta-rxcksum-v1-4-e5d55caa0541@kernel.org>
-References: <20260210-bpf-xdp-meta-rxcksum-v1-4-e5d55caa0541@kernel.org>
-Subject: Re: [PATCH bpf-next 4/5] selftests/bpf: Add selftest support for bpf_xdp_metadata_rx_checksum
-From: bot+bpf-ci@kernel.org
-To: lorenzo@kernel.org,donald.hunter@gmail.com,kuba@kernel.org,davem@davemloft.net,edumazet@google.com,pabeni@redhat.com,horms@kernel.org,ast@kernel.org,daniel@iogearbox.net,hawk@kernel.org,john.fastabend@gmail.com,sdf@fomichev.me,andrew+netdev@lunn.ch,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,aleksander.lobakin@intel.com,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,maciej.fijalkowski@intel.com
-Cc: jakub@cloudflare.com,netdev@vger.kernel.org,bpf@vger.kernel.org,intel-wired-lan@lists.osuosl.org,linux-kselftest@vger.kernel.org,lorenzo@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue, 10 Feb 2026 17:55:01 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e806861b-acd4-4615-aada-577e0275bb5d@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev];
-	FREEMAIL_CC(0.00)[cloudflare.com,vger.kernel.org,lists.osuosl.org,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
-	TAGGED_FROM(0.00)[bounces-258143-lists,netdev=lfdr.de,bpf-ci];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258144-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,armlinux.org.uk,intel.com,gmail.com,trager.us,linaro.org,kylinos.cn,fomichev.me,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9874B11E268
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2827411E36F
 X-Rspamd-Action: no action
 
---===============7295902335523839857==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Feb 10, 2026 at 04:06:23PM +0100, Paolo Abeni wrote:
+> On 2/6/26 4:42 PM, mike.marciniszyn@gmail.com wrote:
+> > +/**
+> > + * fbnic_msix_test - Verify behavior of NIC interrupts
+> > + * @fbd: device to test
+> > + *
+> > + * This function is meant to test the global interrupt registers and the
+> > + * PCIe IP MSI-X functionality. It essentially goes through and tests
+> > + * test various combinations of the set, clear, and mask bits in order to
+> > + * verify the behavior is as we expect it to be from the driver.
+> > + *
+> > + * Return: non-zero on failure.
+> > + **/
+> > +int fbnic_msix_test(struct fbnic_dev *fbd)
+> > +{
+> > +	struct pci_dev *pdev = to_pci_dev(fbd->dev);
+> > +	struct fbnic_msix_test_data *test_data;
+> > +	int result = 0;
+> > +	u32 mask = 0;
+> > +	int i;
+> > +
+> > +	/* Allocate bitmap and IRQ vector table */
+> > +	test_data = kzalloc(sizeof(*test_data), GFP_KERNEL);
+> > +
+> > +	/* Result = 5 for memory allocation failure */
+> > +	if (!test_data)
+> > +		return 5;
+>
+> Instead of magic numbers you could define some macros, or simply return
+> a boolean success/failures value (as the caller ignores the error code).
+>
+> /P
+>
 
-> diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> index 09bb8a038d52..ef6a5584a187 100644
-> --- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> +++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
+It is not ignored.
 
-[ ... ]
+The returned u64 value for all the tests is assigned into a per
+test array:
 
-> @@ -98,6 +98,7 @@ int rx(struct xdp_md *ctx)
->  	bpf_xdp_metadata_rx_hash(ctx, &meta->rx_hash, &meta->rx_hash_type);
->  	bpf_xdp_metadata_rx_vlan_tag(ctx, &meta->rx_vlan_proto,
->  				     &meta->rx_vlan_tci);
-> +	bpf_xdp_metadata_rx_checksum(ctx, &meta->ip_summed, &meta->cksum_meta);
+static int fbnic_ethtool_mbx_self_test(struct net_device *netdev, u64 *data)
+{
+        struct fbnic_net *fbn = netdev_priv(netdev);
+        struct fbnic_dev *fbd = fbn->fbd;
 
-Is there a missing extern declaration for bpf_xdp_metadata_rx_checksum()?
-The other kfuncs used in this file have extern declarations with __ksym:
+        *data = fbnic_fw_mbx_self_test(fbd); <--- stored here
 
-extern int bpf_xdp_metadata_rx_timestamp(const struct xdp_md *ctx,
-                                         __u64 *timestamp) __ksym;
-extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
-                                    enum xdp_rss_hash_type *rss_type) __ksym;
-extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
-                                        __be16 *vlan_proto,
-                                        __u16 *vlan_tci) __ksym;
+        return !!*data;
+}
 
-Without a similar declaration for bpf_xdp_metadata_rx_checksum(), the BPF
-program may fail to compile or link.
+The rval could be a set of test specific define, but regardless, it is
+meant to refer to a failure point in the test.
 
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21875603263
-
-AI-authorship-score: low
-AI-authorship-explanation: The code follows standard BPF selftest patterns and appears to be written by a domain expert familiar with XDP metadata kfuncs.
-issues-found: 1
-issue-severity-score: medium
-issue-severity-explanation: Missing extern declaration for bpf_xdp_metadata_rx_checksum kfunc will cause BPF program build failure.
-
---===============7295902335523839857==--
+Mike
 
