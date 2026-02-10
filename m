@@ -1,234 +1,215 @@
-Return-Path: <netdev+bounces-258120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OPmQM95ci2mYUAAAu9opvQ
-	(envelope-from <netdev+bounces-258120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:29:18 +0100
+	id uAMMGs9di2mYUAAAu9opvQ
+	(envelope-from <netdev+bounces-258121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:33:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703FF11D2BD
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:29:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF56211D3BD
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D12503043BEA
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 16:28:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E1F4B301549F
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 16:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C292738A707;
-	Tue, 10 Feb 2026 16:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D4B30B520;
+	Tue, 10 Feb 2026 16:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="iMabUuwe"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="AXZNE2zi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-226.siemens.flowmailer.net (mta-65-226.siemens.flowmailer.net [185.136.65.226])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4C5389E01
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 16:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9892F9D82
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 16:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770740913; cv=none; b=m3AAFbKf8cpDk//BsXm9cG3uswOIm+uxE67jvs2NiDiK9JayyXHRwP1b7nT1TluZQlqFNlMCF6SeuT+yJkaAl26V+pr5uL/x1WtVagRzzgDa8Vw+FA7G8FxqDsBLxoyneGLf1NGPFvjk3G8cEUA4EAEgiChUigT6JR/LWzElzPY=
+	t=1770741195; cv=none; b=A3BAoQln56vMvMQH0yvMtFiePQ1X7atw7tqK0c+7mHS02moYcjiMyAnDdU8v9A4XwuF8/vKzzGm2bvtFkGX7Lu/hwATgBhfieKREW5KNeNvn4GGZQCW1oL9Ew2ZVnXtuXiQ8UUzIsehG8m0iHRywa3jVKYCIE4j5wLHYF9Iq2sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770740913; c=relaxed/simple;
-	bh=9dVHwjmKyNlHsudCe1oojVY9+0RY8+Xw1de9VCNal9E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kn6uq3z3/UsWTd+wHKcPHShwNoPF7UKuuj1n/AhN12D9T7iUmO0iz6xo5Lt3Dqw04bYnf9kLFyMCoaOQQIsXz8e/sFV2M/XX7JeGDLVfmjvHE5BXZvkkDSaeHTXG01OzZsexdnBngD7qDuYuFHSaTy8SdE1h4I3FpOnQ8q5ON1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b=iMabUuwe; arc=none smtp.client-ip=185.136.65.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-226.siemens.flowmailer.net with ESMTPSA id 2026021016282089008156040002074c
-        for <netdev@vger.kernel.org>;
-        Tue, 10 Feb 2026 17:28:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=florian.bezdeka@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=2RZd2m1rYBzhb6+CUkIcXbLtyHMbbg4kS3QJRa4t3tA=;
- b=iMabUuweSHnhFWaYI+3wNaaJ+BRwEI/KPAbztyzS8JD3v4ZYDbtjHJb/7NlKj3SleKSbmm
- Y1O23MoVjO5K4hU1Z8vfYIB3RMGHDf5bZfRw3hU6um2BPgwzTJAnBBAuLyx2vHy/bwIXXB90
- qEtq4I6mHYhiDlrPOtMMxhpRNsRSXW01A+pI7dvHtsQJH0gjGRZp3b/Bz1ItDd+MU5OL0BX3
- v11jJpgJXquLKC/JCLqvF6DMik9kIL126+fTQrtOzUHe0qO0mTpyVjomldQQPGbgGQP93jf2
- 3AlMJ08R1RDQJGTuNWSQAohxPS6rFZ0dGyGyPB1yMC6dbUUywXlzLQfQ==;
-From: Florian Bezdeka <florian.bezdeka@siemens.com>
-Date: Tue, 10 Feb 2026 17:28:15 +0100
-Subject: [PATCH net-next 2/2] net: stmmac: Use cpumask_local_spread() for
- IRQ spreading
+	s=arc-20240116; t=1770741195; c=relaxed/simple;
+	bh=i1aVOG6FuUTeV/Uu8fht8rO+RzylUal3rs8C5UoVrEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODRj1VsPi3+K70JaXXoBGFwcWzZLicoBCqM4JkSmPEUGDEM8N58uQIf32tvSlBty/ibM1ZDxHwOk2mVxWy4TYg//zonucnSqTaOKu1pYwfVBs8pqzU3PONoehendJDcLuMt+nWqMOkd5D7WvIQnVfTH9pfSkz9TvbirY/M6nh8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=AXZNE2zi; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from killaraus.ideasonboard.com (2001-14ba-703d-e500--2a1.rev.dnainternet.fi [IPv6:2001:14ba:703d:e500::2a1])
+	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id D21A9838;
+	Tue, 10 Feb 2026 17:32:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1770741145;
+	bh=i1aVOG6FuUTeV/Uu8fht8rO+RzylUal3rs8C5UoVrEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AXZNE2ziNn68zOIeNK85ipouJXapazVjN22FGhr85f6i+2RujMwXW7Q4+FP6kd/vz
+	 z2PWGpliO5H4wqjEH7Xnolekkx/s9QYOFxGgoLPFoRcVkWWVJGgUxObqXdXgtGjrnP
+	 9kPBqTYqJ7peMDQ3kL+w8tqCSJEgFUMcfYU4ve9c=
+Date: Tue, 10 Feb 2026 18:33:10 +0200
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, imx@lists.linux.dev,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@denx.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Frank Li <Frank.Li@nxp.com>, Heiko Schocher <hs@denx.de>,
+	Jakub Kicinski <kuba@kernel.org>, Joy Zou <joy.zou@nxp.com>,
+	Kieran Bingham <kieran.bingham@ideasonboard.com>,
+	Marco Felsch <m.felsch@pengutronix.de>,
+	Martyn Welch <martyn.welch@collabora.com>,
+	Mathieu Othacehe <othacehe@gnu.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Richard Hu <richard.hu@technexion.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Stefan Klug <stefan.klug@ideasonboard.com>,
+	Stefano Radaelli <stefano.radaelli21@gmail.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2] net: stmmac: imx: Disable EEE
+Message-ID: <20260210163310.GO2405149@killaraus.ideasonboard.com>
+References: <20260209202155.2388099-1-laurent.pinchart@ideasonboard.com>
+ <aYsj5IayQd3NRflL@shell.armlinux.org.uk>
+ <20260210143157.GM2405149@killaraus.ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260210-flo-net-stmmac-default-affinity-core-v1-2-4e76612444e1@siemens.com>
-References: <20260210-flo-net-stmmac-default-affinity-core-v1-0-4e76612444e1@siemens.com>
-In-Reply-To: <20260210-flo-net-stmmac-default-affinity-core-v1-0-4e76612444e1@siemens.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Ong Boon Leong <boon.leong.ong@intel.com>, 
- Voon Weifeng <weifeng.voon@intel.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Florian Bezdeka <florian.bezdeka@siemens.com>
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-68982:519-21489:flowmailer
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260210143157.GM2405149@killaraus.ideasonboard.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
-	R_DKIM_ALLOW(-0.20)[siemens.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[ideasonboard.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ideasonboard.com:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258120-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,intel.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258121-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,lunn.ch,nxp.com,davemloft.net,google.com,denx.de,gmail.com,toradex.com,kernel.org,ideasonboard.com,pengutronix.de,collabora.com,gnu.org,redhat.com,technexion.com,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[florian.bezdeka@siemens.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[siemens.com:+];
+	FROM_NEQ_ENVFROM(0.00)[laurent.pinchart@ideasonboard.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ideasonboard.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[siemens.com:mid,siemens.com:dkim,siemens.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 703FF11D2BD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ideasonboard.com:email,ideasonboard.com:dkim,killaraus.ideasonboard.com:mid]
+X-Rspamd-Queue-Id: EF56211D3BD
 X-Rspamd-Action: no action
 
-The stmmac driver was previously implementing a self-made IRQ
-spreading mechanism based on num_online_cpus(). By migrating to
-cpumask_local_spread() the spreading gets NUMA aware.
+On Tue, Feb 10, 2026 at 04:31:59PM +0200, Laurent Pinchart wrote:
+> On Tue, Feb 10, 2026 at 12:26:12PM +0000, Russell King (Oracle) wrote:
+> > On Mon, Feb 09, 2026 at 10:21:55PM +0200, Laurent Pinchart wrote:
+> > > The i.MX8MP suffers from an interrupt storm related to the stmmac and
+> > > EEE. A long and tedious analysis ([1]) concluded that the SoC wires the
+> > > stmmac lpi_intr_o signal to an OR gate along with the main dwmac
+> > > interrupts, which causes an interrupt storm for two reasons.
+> > > 
+> > > First, there's a race condition due to the interrupt deassertion being
+> > > synchronous to the RX clock domain:
+> > > 
+> > > - When the PHY exits LPI mode, it restarts generating the RX clock
+> > >   (clk_rx_i input signal to the GMAC).
+> > > - The MAC detects exit from LPI, and asserts lpi_intr_o. This triggers
+> > >   the ENET_EQOS interrupt.
+> > > - Before the CPU has time to process the interrupt, the PHY enters LPI
+> > >   mode again, and stops generating the RX clock.
+> > > - The CPU processes the interrupt and reads the GMAC4_LPI_CTRL_STATUS
+> > >   registers. This does not clear lpi_intr_o as there's no clk_rx_i.
+> > > 
+> > > An attempt was made to fixing the issue by not stopping RX_CLK in Rx LPI
+> > > state ([2]). This alleviates the symptoms but doesn't fix the issue.
+> > > Since lpi_intr_o takes four RX_CLK cycles to clear, an interrupt storm
+> > > can still occur during that window. In 1000T mode this is harder to
+> > > notice, but slower receive clocks cause hundreds to thousands of
+> > > spurious interrupts.
+> > > 
+> > > Fix the issue by disabling EEE completely on i.MX8MP.
+> > > 
+> > > [1] https://lore.kernel.org/all/20251026122905.29028-1-laurent.pinchart@ideasonboard.com/
+> > > [2] https://lore.kernel.org/all/20251123053518.8478-1-laurent.pinchart@ideasonboard.com/
+> > > 
+> > > Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> > > ---
+> > > This patch depends on https://lore.kernel.org/all/E1vNUjC-0000000FhjR-0h6P@rmk-PC.armlinux.org.uk/
+> > 
+> > ... and a few other patches as well. There is also a conflicting change
+> > in net-next:
+> > 
+> > commit dc6597fab3e3d291da9e0b4c6f7da01a5a863e80
+> > Author: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > Date:   Tue Jan 20 21:30:04 2026 +0100
+> > 
+> >     net: stmmac: dwmac-imx: keep preamble before sfd on i.MX8MP
+> > 
+> > > base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+> > 
+> > This is v6.19
+> > 
+> > > prerequisite-patch-id: 9229185bf29c206923075a0450e763664af050bb
+> > > prerequisite-patch-id: e17c3f8a7cb2b18fc0c3c6250773a9680bdabdba
+> > > prerequisite-patch-id: a3c3f8b08fd66ee3ccce632aad3f4a3c21c92718
+> >
+> > I have no idea what these are. These don't exist in Linus', net, nor
+> > net-next trees. I'm not sure what generates these, but they are useless
+> > unless they also indicate the summary line for the commit in question,
+> > so that one can have some clue what change they're referring to.
+> 
+> The first two are mistakes, I had two unrelated DT changes at the base of my
+> branch that I needed for testing, and I forgot to rebase before running
+> git-format-patch. They can be ignored.
+> 
+> The last one is your patch
+> (https://lore.kernel.org/all/E1vNUjC-0000000FhjR-0h6P@rmk-PC.armlinux.org.uk/).
+> Note that the value is the patch-id, not the commit ID.
+> 
+> > While this is a fix, I think you previously suggested that this isn't
+> > a regression, which suggests it should be merged in net-next (currently
+> > closed due to the merge window) rather than net.
+> 
+> I think I was first notified of the issue more than a year ago, so I
+> would indeed not count it as a regression. net-next is fine with me.
+> 
+> > Also, referring to another patch doesn't get it applied - netdev
+> > workflow uses patchwork, and patches to be applied need to be there.
+> > If patches depend on each other, they need to be submitted as a
+> > series. So either I need to pick up your patch and send it along
+> > with mine, or you need to pick up my patch and send it with yours.
+> > We need to come to agreement on who is submitting it.
+> 
+> I'm happy to submit a series with both, rebased on top of net-next to
+> handle the conflict you pointed out. Is that fine with you ?
 
-In addition, most drivers seem to use cpumask_local_spread(),
-aligning / harmonizing a bit more.
+If you would like me to submit a series with both patches, should I
+resolve the conflict with "net: stmmac: dwmac-imx: keep preamble before
+sfd on i.MX8MP" by inserting the STMMAC_FLAG_EEE_DISABLE flag as BIT(10)
+and change the value of subsequent flags as you did, or add it at the
+end (BIT(15)) ?
 
-Signed-off-by: Florian Bezdeka <florian.bezdeka@siemens.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  2 ++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 41 +++++++++++++++++++----
- 2 files changed, 37 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 012b0a477255df73b2e145b62e09eeb2133e827a..52b75df2b71239aab5b1d5138b78d6c5310b9c5b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -329,6 +329,8 @@ struct stmmac_priv {
- 	int sfty_ue_irq;
- 	int rx_irq[MTL_MAX_RX_QUEUES];
- 	int tx_irq[MTL_MAX_TX_QUEUES];
-+	cpumask_var_t rx_affinity[MTL_MAX_RX_QUEUES];
-+	cpumask_var_t tx_affinity[MTL_MAX_TX_QUEUES];
- 	/*irq name */
- 	char int_name_mac[IFNAMSIZ + 9];
- 	char int_name_wol[IFNAMSIZ + 9];
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a379221b96a348e20f2afb0f44540cfba2f2477a..ddbfc0774143d0353c83988b2dfffa75132bd0ee 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3739,6 +3739,8 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 	enum request_irq_err irq_err;
- 	int irq_idx = 0;
- 	char *int_name;
-+	int numa_node;
-+	int cpu;
- 	int ret;
- 	int i;
- 
-@@ -3845,6 +3847,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 	}
- 
- 	/* Request Rx MSI irq */
-+	numa_node = dev_to_node(&priv->dev->dev);
- 	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
- 		if (i >= MTL_MAX_RX_QUEUES)
- 			break;
-@@ -3864,8 +3867,10 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 			irq_idx = i;
- 			goto irq_error;
- 		}
--		irq_set_affinity_hint(priv->rx_irq[i],
--				      cpumask_of(i % num_online_cpus()));
-+
-+		cpu = cpumask_local_spread(i, numa_node);
-+		cpumask_set_cpu(cpu, priv->rx_affinity[i]);
-+		irq_set_affinity_hint(priv->rx_irq[i], priv->rx_affinity[i]);
- 	}
- 
- 	/* Request Tx MSI irq */
-@@ -3888,8 +3893,10 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 			irq_idx = i;
- 			goto irq_error;
- 		}
--		irq_set_affinity_hint(priv->tx_irq[i],
--				      cpumask_of(i % num_online_cpus()));
-+
-+		cpu = cpumask_local_spread(i, numa_node);
-+		cpumask_set_cpu(cpu, priv->tx_affinity[i]);
-+		irq_set_affinity_hint(priv->tx_irq[i], priv->tx_affinity[i]);
- 	}
- 
- 	return 0;
-@@ -7653,6 +7660,14 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
- }
- EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
- 
-+static void stmmac_free_affinity(cpumask_var_t *m, unsigned int n)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < n; i++)
-+		free_cpumask_var(m[i]);
-+}
-+
- static int __stmmac_dvr_probe(struct device *device,
- 			      struct plat_stmmacenet_data *plat_dat,
- 			      struct stmmac_resources *res)
-@@ -7699,10 +7714,21 @@ static int __stmmac_dvr_probe(struct device *device,
- 	priv->sfty_irq = res->sfty_irq;
- 	priv->sfty_ce_irq = res->sfty_ce_irq;
- 	priv->sfty_ue_irq = res->sfty_ue_irq;
--	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
-+	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
- 		priv->rx_irq[i] = res->rx_irq[i];
--	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
-+		if (!zalloc_cpumask_var(&priv->rx_affinity[i], GFP_KERNEL)) {
-+			stmmac_free_affinity(priv->rx_affinity, i);
-+			return -ENOMEM;
-+		}
-+	}
-+	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
- 		priv->tx_irq[i] = res->tx_irq[i];
-+		if (!zalloc_cpumask_var(&priv->tx_affinity[i], GFP_KERNEL)) {
-+			stmmac_free_affinity(priv->rx_affinity, MTL_MAX_RX_QUEUES);
-+			stmmac_free_affinity(priv->tx_affinity, i);
-+			return -ENOMEM;
-+		}
-+	}
- 
- 	if (!is_zero_ether_addr(res->mac))
- 		eth_hw_addr_set(priv->dev, res->mac);
-@@ -8023,6 +8049,9 @@ void stmmac_dvr_remove(struct device *dev)
- 	pm_runtime_disable(dev);
- 	pm_runtime_put_noidle(dev);
- 
-+	stmmac_free_affinity(priv->rx_affinity, MTL_MAX_RX_QUEUES);
-+	stmmac_free_affinity(priv->tx_affinity, MTL_MAX_TX_QUEUES);
-+
- 	if (priv->plat->exit)
- 		priv->plat->exit(dev, priv->plat->bsp_priv);
- }
+I'm also happy if you take my patch and submit a series with both.
 
 -- 
-2.53.0
+Regards,
 
+Laurent Pinchart
 
