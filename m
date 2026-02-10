@@ -1,53 +1,52 @@
-Return-Path: <netdev+bounces-258130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLI9Nm5pi2k1UQAAu9opvQ
-	(envelope-from <netdev+bounces-258130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:22:54 +0100
+	id aC2OHZ1pi2k1UQAAu9opvQ
+	(envelope-from <netdev+bounces-258131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:23:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748D411DDBF
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:22:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16BAA11DDED
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46962305F7E6
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:22:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9635A30715D5
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A099F3876DB;
-	Tue, 10 Feb 2026 17:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E247638A709;
+	Tue, 10 Feb 2026 17:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rU41223K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZafEBYqM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8BF3806CE;
-	Tue, 10 Feb 2026 17:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1CD38A70C;
+	Tue, 10 Feb 2026 17:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770744130; cv=none; b=B6YNYfb9AN7QViGcQez4lE2Mt4JLNGJeRdTUeeBnat4jFQVeEeRbnfVJd+mLID3J7P+2lQGmIKL8YzT/y0X09TP1Hy7YXp78CcqyZjtQ2CtGjZLo8s6+MJTzV3blCT6qyIDn3aVaKINJutOuZjttIcPYPQsNvvMm3Fi3sx9tBwA=
+	t=1770744132; cv=none; b=alcTy+Rlm+0qXFeuFbKgK/ZdrujsorRh3pgKRGsnMR7Zksz9Hmm/5NtykiwAr3yIRKrUKI8Q08wwb4yqjlJX124EHJgum09l3ynXasIpCT/Th8DLYB8MFTsuB+Qq6uG8SS7Kz7+UbInwOr3wa6hhB6XPWrFy2STn/q2CHE3QMRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770744130; c=relaxed/simple;
-	bh=JAEMyV1TNwzlux2cgmKyDqshObhiQMHMmD4rd7uoQPY=;
+	s=arc-20240116; t=1770744132; c=relaxed/simple;
+	bh=FxdfMw+g8bV/+mi1gEn6PcMcwLF8o84NpFvSpfO8nks=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dL4525qRAa8iTAESHqJqiXs0wE7blOBmKB3JtyhPxUgOaQqym3uqiPzK5RPU8b4gy1wRRa3jVYlRxT3ywBkukMaf3a1ZGXxGnL26Vkwk9ta9aXjQKTxFmi/qGaISkboO7dk+TmClz+7dfy1lIqsYFfJZ8Y12nZ7watx7b6IisV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rU41223K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A469C116C6;
-	Tue, 10 Feb 2026 17:22:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=e9OZKlnM0qQy8XFx/q/zWRmU0uF9L5e8XPrU2BiGny2e8jGkouU01lg9gcBZIMqsx/CtsIJomUdTrUrbJc6xBIRMybPsHhuSoA7x97CP56FFvm6/+z/rzJg6A9KkhPP4D/T8XVjpWgmN1v6H8c8m/9L3nRkcVvdKjAml/Q5DYXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZafEBYqM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E99CC116C6;
+	Tue, 10 Feb 2026 17:22:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770744130;
-	bh=JAEMyV1TNwzlux2cgmKyDqshObhiQMHMmD4rd7uoQPY=;
+	s=k20201202; t=1770744132;
+	bh=FxdfMw+g8bV/+mi1gEn6PcMcwLF8o84NpFvSpfO8nks=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=rU41223K2+rA1C3nyhJokzdaYOw2NxYHmp9tP+Qb2kzw7GeNMX9P7KqqSnp1InX4z
-	 4vroi5OSAlhUtWf59Ik0F6C+IIV04WJx4jGw+pJ6TazI0V/TsUgowmxhtYDgoInkgu
-	 glNyOvhoQ16jcVVi7Xkxd+Uk+gX6HBDWd3Onfsc9pRuFqBCR6ci6pgeqC0KE/CCXVd
-	 z3k5tAfAofmPjgRLJOLeEtfWErDIXWx4Dr+f5q4NR4YTPuGwO3sW9tco790xEaMYTJ
-	 mEHsqgvguPN7kJ4MdlK99CbDvB8XqEfDyJNK2edUIeOKCyhJ6QaoqrkKnIzhtQh8aa
-	 qo/Y1Iok8XRQQ==
+	b=ZafEBYqMK7jxSLHdT+g8Y37K7F9OMM1MbxPpT5vurL3t3cao8yYn02RV2i3l0x1Ml
+	 lnXfdupBb8mkX+fqIn5Z2g5jxQlKzxa8NM5oZhZOFs/u9F8vH1wAQROymeqvGLxbFf
+	 PLfEfLAXEk6L4hqPPtT8mSbNT+pDIEwYGCez/pAHr33EBTTiejr6+sM8KWd15G8b5v
+	 TwtL6PpbFYMIufDBDPEKr2fpK9zKnc77KfrqTflFPJ7EYc+1PSTZoSKQheUkxbetrj
+	 v1qpRlzcQCK3yp7xX1tiHrTXGvGd0MBz59fFoklxb2+mYeTseD4U+bVOTfQTulu4wJ
+	 lrYVVjukt0mNA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 10 Feb 2026 18:21:48 +0100
-Subject: [PATCH bpf-next 2/5] net: veth: Add xmo_rx_checksum callback to
- veth driver
+Date: Tue, 10 Feb 2026 18:21:49 +0100
+Subject: [PATCH bpf-next 3/5] net: ice: Add xmo_rx_checksum callback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260210-bpf-xdp-meta-rxcksum-v1-2-e5d55caa0541@kernel.org>
+Message-Id: <20260210-bpf-xdp-meta-rxcksum-v1-3-e5d55caa0541@kernel.org>
 References: <20260210-bpf-xdp-meta-rxcksum-v1-0-e5d55caa0541@kernel.org>
 In-Reply-To: <20260210-bpf-xdp-meta-rxcksum-v1-0-e5d55caa0541@kernel.org>
 To: Donald Hunter <donald.hunter@gmail.com>, 
@@ -86,12 +85,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258130-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258131-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -107,57 +106,195 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 748D411DDBF
+X-Rspamd-Queue-Id: 16BAA11DDED
 X-Rspamd-Action: no action
 
-Implement xmo_rx_checksum callback in veth driver to report RX checksum
-result to the eBPF program bounded to the veth device.
+Implement xmo_rx_checksum callback in ice driver to report RX checksum
+result to the eBPF program bounded to the NIC.
+Introduce ice_get_rx_csum utility routine in order to rx cksum codebase
+available in ice_rx_csum().
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/veth.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 114 +++++++++++++++++---------
+ 1 file changed, 74 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 14e6f2a2fb7783334d8f6afd54e658cf9a0e6f3d..38b70ad62db7e92cccc6c6c9ed1f5573d8baf48b 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -1693,6 +1693,25 @@ static int veth_xdp_rx_vlan_tag(const struct xdp_md *ctx, __be16 *vlan_proto,
- 	return err;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+index 956da38d63b0032db238325dcff818bbd99478e9..508ef4b07a3b3a9816be760c08c81c3f569456a3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+@@ -81,69 +81,45 @@ ice_rx_hash_to_skb(const struct ice_rx_ring *rx_ring,
+ 		libeth_rx_pt_set_hash(skb, hash, decoded);
  }
  
-+static int veth_xdp_rx_checksum(const struct xdp_md *ctx,
-+				enum xdp_checksum *ip_summed,
-+				u32 *cksum_meta)
-+{
-+	const struct veth_xdp_buff *_ctx = (void *)ctx;
-+	const struct sk_buff *skb = _ctx->skb;
+-/**
+- * ice_rx_gcs - Set generic checksum in skb
+- * @skb: skb currently being received and modified
+- * @rx_desc: receive descriptor
+- */
+-static void ice_rx_gcs(struct sk_buff *skb,
+-		       const union ice_32b_rx_flex_desc *rx_desc)
+-{
+-	const struct ice_32b_rx_flex_desc_nic *desc;
+-	u16 csum;
+-
+-	desc = (struct ice_32b_rx_flex_desc_nic *)rx_desc;
+-	skb->ip_summed = CHECKSUM_COMPLETE;
+-	csum = (__force u16)desc->raw_csum;
+-	skb->csum = csum_unfold((__force __sum16)swab16(csum));
+-}
+-
+-/**
+- * ice_rx_csum - Indicate in skb if checksum is good
+- * @ring: the ring we care about
+- * @skb: skb currently being received and modified
+- * @rx_desc: the receive descriptor
+- * @ptype: the packet type decoded by hardware
+- *
+- * skb->protocol must be set before this function is called
+- */
+ static void
+-ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
+-	    union ice_32b_rx_flex_desc *rx_desc, u16 ptype)
++ice_get_rx_csum(const union ice_32b_rx_flex_desc *rx_desc, u16 ptype,
++		struct ice_rx_ring *ring, enum xdp_checksum *ip_summed,
++		u32 *cksum_meta)
+ {
+-	struct libeth_rx_pt decoded;
++	struct libeth_rx_pt decoded = libie_rx_pt_parse(ptype);
+ 	u16 rx_status0, rx_status1;
+ 	bool ipv4, ipv6;
+ 
+-	/* Start with CHECKSUM_NONE and by default csum_level = 0 */
+-	skb->ip_summed = CHECKSUM_NONE;
+-
+-	decoded = libie_rx_pt_parse(ptype);
+ 	if (!libeth_rx_pt_has_checksum(ring->netdev, decoded))
+-		return;
++		goto checksum_none;
+ 
+ 	rx_status0 = le16_to_cpu(rx_desc->wb.status_error0);
+ 	rx_status1 = le16_to_cpu(rx_desc->wb.status_error1);
+-
+ 	if ((ring->flags & ICE_RX_FLAGS_RING_GCS) &&
+ 	    rx_desc->wb.rxdid == ICE_RXDID_FLEX_NIC &&
+ 	    (decoded.inner_prot == LIBETH_RX_PT_INNER_TCP ||
+ 	     decoded.inner_prot == LIBETH_RX_PT_INNER_UDP ||
+ 	     decoded.inner_prot == LIBETH_RX_PT_INNER_ICMP)) {
+-		ice_rx_gcs(skb, rx_desc);
++		const struct ice_32b_rx_flex_desc_nic *desc;
++		u16 csum;
 +
-+	if (!skb)
-+		return -ENODATA;
-+
-+	/* For locally generated packets ip_summed is set to
-+	 * CHECKSUM_PARTIAL.
-+	 */
-+	*ip_summed = skb->ip_summed;
++		desc = (struct ice_32b_rx_flex_desc_nic *)rx_desc;
++		*ip_summed = XDP_CHECKSUM_COMPLETE;
++		csum = (__force u16)desc->raw_csum;
++		*cksum_meta = csum_unfold((__force __sum16)swab16(csum));
+ 		return;
+ 	}
+ 
+ 	/* check if HW has decoded the packet and checksum */
+ 	if (!(rx_status0 & BIT(ICE_RX_FLEX_DESC_STATUS0_L3L4P_S)))
+-		return;
++		goto checksum_none;
+ 
+ 	ipv4 = libeth_rx_pt_get_ip_ver(decoded) == LIBETH_RX_PT_OUTER_IPV4;
+ 	ipv6 = libeth_rx_pt_get_ip_ver(decoded) == LIBETH_RX_PT_OUTER_IPV6;
+ 
+ 	if (ipv4 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_EIPE_S)))) {
+ 		ring->vsi->back->hw_rx_eipe_error++;
+-		return;
++		goto checksum_none;
+ 	}
+ 
+ 	if (ipv4 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_IPE_S))))
+@@ -168,13 +144,46 @@ ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
+ 	 * we are indicating we validated the inner checksum.
+ 	 */
+ 	if (decoded.tunnel_type >= LIBETH_RX_PT_TUNNEL_IP_GRENAT)
+-		skb->csum_level = 1;
++		*cksum_meta = 1;
+ 
+-	skb->ip_summed = CHECKSUM_UNNECESSARY;
++	*ip_summed = XDP_CHECKSUM_UNNECESSARY;
+ 	return;
+ 
+ checksum_fail:
+ 	ring->vsi->back->hw_csum_rx_error++;
++checksum_none:
++	*ip_summed = XDP_CHECKSUM_NONE;
 +	*cksum_meta = 0;
++}
++
++/**
++ * ice_rx_csum - Indicate in skb if checksum is good
++ * @ring: the ring we care about
++ * @skb: skb currently being received and modified
++ * @rx_desc: the receive descriptor
++ * @ptype: the packet type decoded by hardware
++ *
++ * skb->protocol must be set before this function is called
++ */
++static void
++ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
++	    union ice_32b_rx_flex_desc *rx_desc, u16 ptype)
++{
++	enum xdp_checksum ip_summed;
++	u32 cksum_meta;
++
++	ice_get_rx_csum(rx_desc, ptype, ring, &ip_summed, &cksum_meta);
++	switch (ip_summed) {
++	case XDP_CHECKSUM_UNNECESSARY:
++		skb->csum_level = cksum_meta;
++		break;
++	case XDP_CHECKSUM_COMPLETE:
++		skb->csum = cksum_meta;
++		break;
++	default:
++		break;
++	}
++	skb->ip_summed = ip_summed;
+ }
+ 
+ /**
+@@ -569,6 +578,30 @@ static int ice_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
+ 	return 0;
+ }
+ 
++/**
++ * ice_xdp_rx_checksum - RX checksum XDP hint handler
++ * @ctx: XDP buff pointer
++ * @ip_summed: RX checksum result destination address
++ * @cksum_meta: XDP RX checksum metadata destination address
++ *
++ * Copy RX checksum result (if available) and its metadata to the
++ * destination address.
++ */
++static int ice_xdp_rx_checksum(const struct xdp_md *ctx,
++			       enum xdp_checksum *ip_summed,
++			       u32 *cksum_meta)
++{
++	const struct libeth_xdp_buff *xdp_ext = (void *)ctx;
++	const union ice_32b_rx_flex_desc *rx_desc = xdp_ext->desc;
++	struct ice_rx_ring *ring;
++
++	ring = libeth_xdp_buff_to_rq(xdp_ext, typeof(*ring), xdp_rxq);
++	ice_get_rx_csum(rx_desc, ice_get_ptype(rx_desc), ring, ip_summed,
++			cksum_meta);
 +
 +	return 0;
 +}
 +
- static const struct net_device_ops veth_netdev_ops = {
- 	.ndo_init            = veth_dev_init,
- 	.ndo_open            = veth_open,
-@@ -1718,6 +1737,7 @@ static const struct xdp_metadata_ops veth_xdp_metadata_ops = {
- 	.xmo_rx_timestamp		= veth_xdp_rx_timestamp,
- 	.xmo_rx_hash			= veth_xdp_rx_hash,
- 	.xmo_rx_vlan_tag		= veth_xdp_rx_vlan_tag,
-+	.xmo_rx_checksum		= veth_xdp_rx_checksum,
+ /**
+  * ice_xdp_rx_vlan_tag - VLAN tag XDP hint handler
+  * @ctx: XDP buff pointer
+@@ -601,4 +634,5 @@ const struct xdp_metadata_ops ice_xdp_md_ops = {
+ 	.xmo_rx_timestamp		= ice_xdp_rx_hw_ts,
+ 	.xmo_rx_hash			= ice_xdp_rx_hash,
+ 	.xmo_rx_vlan_tag		= ice_xdp_rx_vlan_tag,
++	.xmo_rx_checksum		= ice_xdp_rx_checksum,
  };
- 
- #define VETH_FEATURES (NETIF_F_SG | NETIF_F_FRAGLIST | NETIF_F_HW_CSUM | \
 
 -- 
 2.53.0
