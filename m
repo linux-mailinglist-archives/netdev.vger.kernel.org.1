@@ -1,180 +1,292 @@
-Return-Path: <netdev+bounces-258134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPyRH/Bpi2k1UQAAu9opvQ
-	(envelope-from <netdev+bounces-258134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:25:04 +0100
+	id AEu5KEVqi2k1UQAAu9opvQ
+	(envelope-from <netdev+bounces-258135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:26:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE97A11DE80
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:25:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2658B11DEB3
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 19D6E300DA60
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:24:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8707D304EA6A
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 17:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABFE38885B;
-	Tue, 10 Feb 2026 17:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521F5388840;
+	Tue, 10 Feb 2026 17:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ss73s5h+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbVzr0bH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tl1ZTJTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88001388840
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 17:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F3E318EF1
+	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 17:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770744285; cv=none; b=LYZU01mVqSFfqR1JBkxBX4tt8dDVHP5jd8yr64EUI+3ezPWN10H9W6EomWYi2ymSLhtKziZuFiWollmAC7XVzZHiPwmeYsg+E63sTxOF+/PvGQUFsMEj/YLxIhSt9IWoko0IlEbSVCtIipS8i1gd9QgSBqW+lNn0f5qQAKLHK3I=
+	t=1770744371; cv=none; b=i9+AAyeIY37CeQRzUI9f0liOyJ3S/OjK7peUjt5JGnkbBPsyBO646sqxwscXEXSDH3apQfnJYi/lNMiPmXFMrLz99cnVuMeg8U01cvJYUWhwiwoQ7TR5b6zHCGV9JwA1MvZBJbkBgX2BBb3lSQB3V9Nlfq85pQ7mj+ZC6kI7yzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770744285; c=relaxed/simple;
-	bh=Wd3YSz4r0LCpgTa6gQcvb7t6hbNezRGr0SM90Ujny/A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A1onneqZR8h4n13Bcj3aMURwLmakaioV8GAjxJ65jKMQGsgna86+lE3aDaiTsbE316xvT8rNMuCdS7Lo7lc0qrBopivLEinNlD0iOpze2dAuT9suVpcDPvO/QFScvvO1zptA8fDXhGCJFExXkG3ngOq/2+tUcJYVrDitv9ygW1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ss73s5h+; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a91215c158so8020365ad.0
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 09:24:44 -0800 (PST)
+	s=arc-20240116; t=1770744371; c=relaxed/simple;
+	bh=bGZAvqDxEIu2N9ucVC96wgoTT6pCXw1PIhUB4cBYFnI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NE7qBr6II0aZnJaOMVgzyWU6xhcmma/jD98BNARa60naB0rijwd6Mf4i5s3ujl6WATiKS5a6PWd44F2DmdoGH57xAic2z6dIuX9PDOjIKjFQauLt3FwulOBuLEG8miXCR1WCnt+uLwD+HryB9GDqJCXw3Ex30lNsy7r1UG9d3nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MbVzr0bH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tl1ZTJTO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770744367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M6SXb5IczZILKvt9qVo3/THUDjn6esbNCNc+i/3NT+A=;
+	b=MbVzr0bHv4KfwrQPF02uLZydCCM+SDFDlEqxDsoZkSla13pQXbDHG04+tN/kvP7uIk6FHX
+	IL7tr7OsiBE5lCr8eYABtUFgFJivStQUJrqlbC0Y1mAk92TQWhC4di+I2mjMrUPU3Gtkze
+	SPlREfPrTirpeIdlLk8dfY+yK13gHwY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-SSuo48ukNzOqxd4Nrceunw-1; Tue, 10 Feb 2026 12:26:06 -0500
+X-MC-Unique: SSuo48ukNzOqxd4Nrceunw-1
+X-Mimecast-MFC-AGG-ID: SSuo48ukNzOqxd4Nrceunw_1770744363
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4359849d324so4947369f8f.1
+        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 09:26:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770744284; x=1771349084; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=exOj3yYPEa1TYDiWarKxK5k3MV6+EjzaaIJ4oOWyLaY=;
-        b=Ss73s5h+GElY1s0DhutSz6CbTo2WTDHzihInucAby4sIk9S78raW4udZBEDt83cKRs
-         c2PFGO8/9tx57oj8MUdQTOkFbGxRXSB3ceQIfSND1kjeENAn1m1yEbmemxmsqgZ9ymfz
-         iFDe7L5nmo2x2IcmrReuFIU7a8ehiCvJFibPUYyIJkhupoyCtCvIezLvq/bRmcd4axdc
-         8amGYHbDqOCocQNTEiiiaJpY64UNUCDfWjOfl1WqK9UZ/PkbxANuDaIkoC9k58ZfN+G6
-         e+ar4O4g6GDuaJNiB4sDw1M78GTEHY966jt3L4X6g4LdDCvl/a11N+HEaAD2UhmzUpSX
-         OwFw==
+        d=redhat.com; s=google; t=1770744363; x=1771349163; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M6SXb5IczZILKvt9qVo3/THUDjn6esbNCNc+i/3NT+A=;
+        b=tl1ZTJTOg45iq6VrG0u5VwUFL4YNzUWIYDH3vVn8XghxoTq8Djq1qV9MRvHfxOIa4z
+         dqZq5eJVgTL8NmKcM1ELVl6g/a67bKKZ5680EPiGYR39W/g8TXJrQpLOWMJ+xnB8/jNr
+         XsnK++MDByMpI3EhFo7yG61dR8eY3zAcCvuG96mhy229oAX1BEd2HKeYZoxz3ORAujcK
+         JATvzC7gJiyfTNwKmWp8tmkq5MG4aaFtmXfVujj9rfYr+A+/L5LaJFFj1IxU98LLml0L
+         ZK2fzXy2vKQF3+aR7DDnSw54tTB+vAfidxPDiRdG/EhkIZWA2/BUBnaYgBQHsRlecpkW
+         dP5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770744284; x=1771349084;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=exOj3yYPEa1TYDiWarKxK5k3MV6+EjzaaIJ4oOWyLaY=;
-        b=ZYTV1qFZBlTrkc+1T0uj/0nZ+MXYPI5snUzwtgLZvqGLX7ywfzofICnwWUnUzj5KWF
-         QRYF7pw4GygtHoTxZWZfMC5e+XUQvlgCoiU1BHfm18DuKffFz6eQsCqJM527X1oTaNXo
-         VHCvYYA1H3okzjtojG+0Q/KmqPBKT8nSgZK1cBI+Ztmyx35rPTkoXxkR7b/OU/9kc7AV
-         GSewBxVqQdD7/Z5377XR8CU0/RDzjNDm4KgfI9gfj2n0ztFWIhhk93C60qr4puScXX6N
-         L4lxmHSnNO68lJOvV+SNmLZDJjNXs30O4dub0QqgHey68o7baedkUtTyFal/ZaRLyJLg
-         qNTw==
-X-Gm-Message-State: AOJu0Ywv1QE0xsXsjct5eeJgrt1RjNNcb1NdQSVpuCexkdb93QRwxu/c
-	tETLhgZh2Z0JEzv3G4+ql6+CivTqyUi7C6MAntQ3Bw6ttfcCG5y06Eya
-X-Gm-Gg: AZuq6aI9Phly6WYkksGCy1ufuN6BjmxlmAVZQ0sUiLk2o8eRu0KkKO1wZyy4qIWd/nT
-	bjB6UVHH2L8X36hnSrgAmE8Y3deHkMkVVvvMxCij96N6QYvFaysuY5QPUSov3gpO6qNEWX07HHs
-	YYLpLoESZbNe5MsrPL/JkkrsTE542mZIOwX5pym6c+A+GhmmPuNNyji9Ybzjd9Niyfc4Vncrarf
-	2BtnAanDvQVrlh8HtAeuxEamRZbpMWgrxTetiC+Y2qsEfxcbVDtZWfRP8o+2u3how2+bf56Q56W
-	dXwRbQ4ODWDKdWA7qr/K+vCDtfqYYQekz4WEXh+quVrhxY2AmciLQBxTYq2tzDj2bxIOA/LH4tW
-	wdGULACuyKfGtZYt1c5tjr0mNwQP+YlVwZzQVsImbBr1DI76/V1FeOayhb2zkuUd7n1I9rM6294
-	9ypeh/w1sPO5bF1DLEAI1dk/MXApfofPH0HAQMKm6BIs9UyeJmjC++iVE1RsXFQpUCsisw7Rjxr
-	TKjV403sVK1yWFQ1R4uVFA=
-X-Received: by 2002:a17:903:2f8b:b0:29d:a26c:34b6 with SMTP id d9443c01a7336-2a95194ab72mr139665545ad.50.1770744283691;
-        Tue, 10 Feb 2026 09:24:43 -0800 (PST)
-Received: from [192.168.0.128] ([98.97.33.227])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a9636184a3sm110427275ad.20.2026.02.10.09.24.42
+        d=1e100.net; s=20230601; t=1770744363; x=1771349163;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M6SXb5IczZILKvt9qVo3/THUDjn6esbNCNc+i/3NT+A=;
+        b=M8766b6BnKF1iNX4qn6JB1VSpPEpGnaRrxUXo32CCwv5omZtvbpaPTRad5Dg52tEBG
+         sGpHdhChouADwGY7gB+1/rC31ju1grsXRN7mbyl3xL25zh8q9+kYbg4j5QWEj5Dxe9U1
+         dM/tnBx9aM4GgOd/CfhtEkgaVU+Sbd1UE4AOopUHpDlOOCJJDX/4BNgDyQvrhQf/EqOy
+         O7qiye3Eg+cGeAVTY0NMQ/4F/hf8HADRfhTZnY+c+WhVOKK0Ob9qftSiqXCZxYSdbi9p
+         QkRUac8PCdfmXBPWrd6HTjXk+XROFSLET6DAnHJE1uU7HXPmhLQul8ID1gKk47JbwDDG
+         /bjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEK/k4CP96+QuC1j9K5gZCxWk2ySHETjxNUWfbGRIbMc6sKY9KRfJIyaCIYadVT+ncRPMUGME=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywo4n7a/QBpYO5pQrzPKZSohAPBFsjGxVgNzAVU3Q489f34XbH+
+	O32t/tWg0GSKcjGzK9PUrWD19AzX+EJE7k13AZGQAg5G9UyRL3gHwgwKkUgczcdEMMa+reIcX6n
+	YguJEQf46uMYeAecORi01YNJ38/p4k8v174eQK1qAHJpgsxvQGCrwOjp5mA==
+X-Gm-Gg: AZuq6aJO6URjnlkY6hUVCQ7tzaNsaWGg4rxdl53BvbO3TRXjh7C4EXY+h8zPAFHG7d3
+	koPHLcu7JUQe5Ms57fzUuvobc53GvbRZk87nRDeNC6mHiv+JBHsWkveF+1HMuKias1daWSChR7w
+	oExWuZxR2mw/8dg6/pWKgDQF4jKEiWuenAcT/AhW2djPD5xeCSwL3pPUBg8YJcC+J4dgkh+pgll
+	HuQMRf8cFd2sSzo4YUi+dUQzqyJJqBwWP/1hDMEuQGRL4StzeHTfjlX8fgxXGLN1bgN90WnUOeL
+	I4qvLEBONnMemFCGAQrrW7wQQsrudcNWX5i6zf/e3V56oIumPTG5yg/wP1UJ1ZESoKIIi2jnUAa
+	NvRy4TpPP6K0Rncqo2K16hX75y92m7f6LvAHPMcKqCpfZNx2dbzRszu1uPrDN15Rt56vnmw==
+X-Received: by 2002:a05:6000:2287:b0:432:5d73:79a1 with SMTP id ffacd0b85a97d-4377a5a89c5mr4412131f8f.55.1770744363106;
+        Tue, 10 Feb 2026 09:26:03 -0800 (PST)
+X-Received: by 2002:a05:6000:2287:b0:432:5d73:79a1 with SMTP id ffacd0b85a97d-4377a5a89c5mr4412089f8f.55.1770744362668;
+        Tue, 10 Feb 2026 09:26:02 -0800 (PST)
+Received: from localhost (net-37-119-153-93.cust.vodafonedsl.it. [37.119.153.93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436296bd4a1sm35585372f8f.17.2026.02.10.09.26.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 09:24:42 -0800 (PST)
-Message-ID: <2c0395d5323770a32d53c6b874a735b888e4d4f1.camel@gmail.com>
-Subject: Re: [PATCH] fbnic: close fw_log race between users and teardown
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Chengfeng Ye <dg573847474@gmail.com>, kernel-team@meta.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, 	jacob.e.keller@intel.com, lee@trager.us,
- horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 10 Feb 2026 09:24:41 -0800
-In-Reply-To: <20260209163854.521415-1-dg573847474@gmail.com>
-References: <20260209163854.521415-1-dg573847474@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+        Tue, 10 Feb 2026 09:26:01 -0800 (PST)
+Date: Tue, 10 Feb 2026 18:26:01 +0100
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC bpf-next v2 1/5] netlink: specs: Add XDP RX checksum
+ capability to XDP metadata specs
+Message-ID: <aYtqKfv0F0l2-hgy@lore-desk>
+References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
+ <20250925-bpf-xdp-meta-rxcksum-v2-1-6b3fe987ce91@kernel.org>
+ <aNYUqdaIJV1cvFCb@mini-arch>
+ <e03d6d69-73ea-46dc-b632-149ef5831f85@kernel.org>
+ <aNcZdfCivLR2slFw@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Kbaeu9Ugo55vjxdy"
+Content-Disposition: inline
+In-Reply-To: <aNcZdfCivLR2slFw@mini-arch>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258134-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,intel.com,trager.us,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258135-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo.bianconi@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,lunn.ch,intel.com,linux.dev,vger.kernel.org,lists.osuosl.org];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EE97A11DE80
+X-Rspamd-Queue-Id: 2658B11DEB3
 X-Rspamd-Action: no action
 
-On Mon, 2026-02-09 at 16:38 +0000, Chengfeng Ye wrote:
-> Fixes a theoretical race on fw_log between the teardown path and fw_log
-> show/write functions.
->=20
-> The fw_log null check was performed outside the lock in both
-> fbnic_dbg_fw_log_show() and fbnic_fw_log_write() (called from debugfs
-> paths or mailbox threaded IRQ handler). Concurrent teardown in
-> fbnic_fw_log_free() could clear and free the log buffer after the check
-> because there is no proper synchronization, leading to list traversal or
-> buffer access on freed memory.
->=20
-> fbnic_fw_log_write() can be reached from the mailbox handler
-> fbnic_fw_msix_intr(), but fbnic_fw_log_free() runs before IRQ/MBX
-> teardown. fbnic_dbg_fw_log_show() runs via debugfs and seems to be
-> not synchronized with removal either.
->=20
-> Possible Interleaving scenario:
->   CPU0: fbnic_dbg_fw_log_show() or fbnic_fw_log_write()
->           if (fbnic_fw_log_ready())   // true
->           ... preempt ...
->   CPU1: fbnic_fw_log_free()
->           vfree(log->data_start);
->           log->data_start =3D NULL;
->   CPU0: continues, walks log->entries or writes to log->data_start
->=20
-> Move readiness checks under the fw_log spinlock, and clear the log state
-> under the same lock in fbnic_fw_log_free() before freeing the buffer.
-> This makes readers/writers mutually exclusive with teardown.
->=20
-> Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
 
-You conflated two cases. One that can happen and one that can't.
+--Kbaeu9Ugo55vjxdy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-From what I can tell the debugfs issue cannot happen as the debugfs
-files are removed before the log is freed. If the debugfs files can
-still be accessed after they are removed we have bigger issues.
+> On 09/26, Jesper Dangaard Brouer wrote:
+> >=20
+> >=20
+> > On 26/09/2025 06.20, Stanislav Fomichev wrote:
+> > > On 09/25, Lorenzo Bianconi wrote:
+> > > > Introduce XDP RX checksum capability to XDP metadata specs. XDP RX
+> > > > checksum will be use by devices capable of exposing receive checksum
+> > > > result via bpf_xdp_metadata_rx_checksum().
+> > > > Moreover, introduce xmo_rx_checksum netdev callback in order allow =
+the
+> > > > eBPF program bounded to the device to retrieve the RX checksum resu=
+lt
+> > > > computed by the hw NIC.
+> > > >=20
+> > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > > > ---
+> > > >   Documentation/netlink/specs/netdev.yaml |  5 +++++
+> > > >   include/net/xdp.h                       | 14 ++++++++++++++
+> > > >   net/core/xdp.c                          | 29 ++++++++++++++++++++=
++++++++++
+> > > >   3 files changed, 48 insertions(+)
+> > > >=20
+> > > > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentatio=
+n/netlink/specs/netdev.yaml
+> > > > index e00d3fa1c152d7165e9485d6d383a2cc9cef7cfd..00699bf4a7fdb67c6b9=
+ee3548098b0c933fd39a4 100644
+> > > > --- a/Documentation/netlink/specs/netdev.yaml
+> > > > +++ b/Documentation/netlink/specs/netdev.yaml
+> > > > @@ -61,6 +61,11 @@ definitions:
+> > > >           doc: |
+> > > >             Device is capable of exposing receive packet VLAN tag v=
+ia
+> > > >             bpf_xdp_metadata_rx_vlan_tag().
+> > > > +      -
+> > > > +        name: checksum
+> > > > +        doc: |
+> > > > +          Device is capable of exposing receive checksum result via
+> > > > +          bpf_xdp_metadata_rx_checksum().
+> > > >     -
+> > > >       type: flags
+> > > >       name: xsk-flags
+> > > > diff --git a/include/net/xdp.h b/include/net/xdp.h
+> > > > index aa742f413c358575396530879af4570dc3fc18de..9ab9ac10ae2074b7061=
+8a9d4f32544d8b9a30b63 100644
+> > > > --- a/include/net/xdp.h
+> > > > +++ b/include/net/xdp.h
+> > > > @@ -586,6 +586,10 @@ void xdp_attachment_setup(struct xdp_attachmen=
+t_info *info,
+> > > >   			   NETDEV_XDP_RX_METADATA_VLAN_TAG, \
+> > > >   			   bpf_xdp_metadata_rx_vlan_tag, \
+> > > >   			   xmo_rx_vlan_tag) \
+> > > > +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CHECKSUM, \
+> > > > +			   NETDEV_XDP_RX_METADATA_CHECKSUM, \
+> > > > +			   bpf_xdp_metadata_rx_checksum, \
+> > > > +			   xmo_rx_checksum)
+> > > >   enum xdp_rx_metadata {
+> > > >   #define XDP_METADATA_KFUNC(name, _, __, ___) name,
+> > > > @@ -643,12 +647,22 @@ enum xdp_rss_hash_type {
+> > > >   	XDP_RSS_TYPE_L4_IPV6_SCTP_EX =3D XDP_RSS_TYPE_L4_IPV6_SCTP | XDP=
+_RSS_L3_DYNHDR,
+> > > >   };
+> > > > +enum xdp_checksum {
+> > > > +	XDP_CHECKSUM_NONE		=3D CHECKSUM_NONE,
+> > > > +	XDP_CHECKSUM_UNNECESSARY	=3D CHECKSUM_UNNECESSARY,
+> > > > +	XDP_CHECKSUM_COMPLETE		=3D CHECKSUM_COMPLETE,
+> > > > +	XDP_CHECKSUM_PARTIAL		=3D CHECKSUM_PARTIAL,
+> > > > +};
+> > >=20
+> > > Btw, might be worth mentioning, awhile ago we had settled on a smalle=
+r set of
+> > > exposed types:
+> > >=20
+> > > https://lore.kernel.org/netdev/20230811161509.19722-13-larysa.zaremba=
+@intel.com/
+> > >=20
+> > > Maybe go through the previous postings and check if the arguments are
+> > > still relevant? (or explain why we want more checksum now)
+> >=20
+> > IHMO the linked proposal reduced the types too much.
+>=20
+> IIRC, PARTIAL was removed because it's mostly (or only) a TX feature?
+> So no real need to expose it as an rx hint. And I think empty xdp_csum_st=
+atus
+> in that proposal might have indicated NONE?
 
-The log is initialized after the mailbox is enabled, and freed before
-it is disabled so the write can currently race with the free call. That
-said the current fix is pretty messy in terms of resolving it.
+Sorry for the (very) late reply. According to [0] CHECKSUM_PARTIAL can be u=
+sed
+even on Rx side, right?
 
-A better fix for this might be to pull out fbnic_fw_log_enable/disable
-from the fw_log_init/free and leave them in the places currently
-occupied by the fw_log_init/free calls. With that we could place the
-log_init before the request_mbx call, add fw_log_free as an exception
-case before "free_irqs", and relocate fw_log_free to the line after the
-fw_free_mbx calls as it is a resource that should be put in place
-before the mailbox is enabled, and not cleared until after the mailbox
-and debugfs file has been disabled.
+Regards,
+Lorenzo
+
+[0] https://github.com/torvalds/linux/blob/master/include/linux/skbuff.h#L1=
+48
+
+>=20
+
+--Kbaeu9Ugo55vjxdy
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaYtqKAAKCRA6cBh0uS2t
+rFNfAP9IZ4RIoXiTgNfqdm61xXJO8X8DZttEjYppOw1iHdPLUAEAtTMcYDTh8p0A
+ZFsUX/AZUM9EY7k2Fd9cdM0dbkaAKg8=
+=ofYP
+-----END PGP SIGNATURE-----
+
+--Kbaeu9Ugo55vjxdy--
+
 
