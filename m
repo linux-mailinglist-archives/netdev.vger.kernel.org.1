@@ -1,104 +1,83 @@
-Return-Path: <netdev+bounces-258144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258145-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UOicIJxzi2nFUQAAu9opvQ
-	(envelope-from <netdev+bounces-258144-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:06:20 +0100
+	id IIWGOJR6i2mIUgAAu9opvQ
+	(envelope-from <netdev+bounces-258145-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:36:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2827411E36F
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:06:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050FF11E572
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 19:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3611B300C02B
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:06:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30C3A30091DB
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 18:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A35138B7A4;
-	Tue, 10 Feb 2026 18:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16862305E1F;
+	Tue, 10 Feb 2026 18:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U9uK7OlJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z/AKeO99"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9AEF4FA
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 18:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4727D2EC083;
+	Tue, 10 Feb 2026 18:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770746776; cv=none; b=BfAQvtsgp18aIpFqktZmAIpmgHX3OZQ3iZjsblGy+Y3kdyVg6UwZnYsnEhKYGDnRlkjJmGyVEjm7mm+JgoJflPSvuT5rLQ2+qMt85W+29kPPk7YZ/PRzrZW4APGrhm8tIciBRCkF3zOf68ntb5uHVjv2NRJFjyeiCx5dqacDsYQ=
+	t=1770748559; cv=none; b=rlYjqtc2K9CdDdNKYSQNKcUx/CN9msRYlBP8kWL11kvrKgAvL1inHja9uXdND7Dqqjbh9T1fkkmgN+x+3BtBUDYbrErdBwv4yW9+ExLOUJQICaZZd5CStaTjtK8kRPqSOaQ0K5npIyjiUIlels/cPJ0im2iNKbHsbd4TCcf0saQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770746776; c=relaxed/simple;
-	bh=YAl1kz+VwRttH+8e8JJSQ41O51aTnMyPn2QYglCXB2s=;
+	s=arc-20240116; t=1770748559; c=relaxed/simple;
+	bh=J8vbRyDhN4fBEoVRPg0epdkE1Y35vtWi7KoWKKdWtOI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rOfZHX3wdNWV6iF02CnLe2Pu6VZ4LzsZ3NSzESkBdWa2fDZhuPaYXrqlk4obM+XpjhZWvTuhiWWYwzLRFlklKh9A5H/PIsaeGx12ObObIbPNiQq9Q/in8DQT7sXdoYJXDTji+GK6cXTYbBp4b2W+8JU6MYc2pLPPodTfOsUKJh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U9uK7OlJ; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8c5386f1c9fso603526985a.1
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 10:06:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770746774; x=1771351574; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VQrgfquaPzKySAFC0y5fUivrJ9+1Cj9LagzYm8Nz4oo=;
-        b=U9uK7OlJQ57QQNyiPIPJwUnQNotUWJfHWHDz+b2lEAYcK8bEKHX/+p4OL0dPtoe6Zt
-         VZohfLMifC2wJiFjKQg6/FgkmjkBLoYAVX2r9+yYAu33aZUAxvlmOgLTv0YHqyt7JUcg
-         7OVqX47aE1sPl2iyzIwCpW22wyUuG0dAY7GCxObsCox5wRujyKcb9MStqbGpkm6VDPpZ
-         wwKHIKOM7DTS5RVRLRMzK0srn+eiyDdCKcCptnrYQU1SxVSddy660lE6CiH2JqiCR+yX
-         ZV/7pEymOIpA6KCZM62GtkYnBnpCa9DMALhsCTrr5IUNK9e8xXl4eNYgZ8aoWmkHz7BA
-         afig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770746774; x=1771351574;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VQrgfquaPzKySAFC0y5fUivrJ9+1Cj9LagzYm8Nz4oo=;
-        b=ZQsdf12CNGaswkjXdH0QlxjFMy5oOkJvFcRVjyHCzPYpOlDtNpIq+jTSpFI7wOW7GB
-         wvj6iVtDuF+O+2WOat7hAFllvLYZOGn/UcnWZdvTb31RCXsoU0QWxEUqdgDh0qtUnd7c
-         35B9yQ+YpHeKrOw0ylXqzew9tTvTOtewA0YWmt/xLR43FZSQVLgU/ltuYlQlsWYWUtNr
-         9LjHTuzFrIrX0+NpVxinnCNJpuSZoOJx3z1U2S+pxArK1Q1hCpEOhvGTWQrbfEC+BUW2
-         bCGkOW7ImziqNsFRr/8uhcAGm1IU2zKlWuIzJBIpninkwSy683zlB9owxOYOt3df1+e1
-         J+qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqkdPbdUvH164AdtaB4kRpaXa6hDddfFVr5Z4dXrTLjdZsG6avCWKX/Zzxaga7wCxJ8qZ408s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXsLd4Zk2U2iHahoAvOFGtxEx1wA18LZdMBp9papR2P1+IBZ3V
-	0mhMsp8CPphGNjghdtsjzN76o57UaIcfTND/cjEZTnd7S4iJEpVUqD29
-X-Gm-Gg: AZuq6aKdSX4gjNKrfWgp9+M1bpGt/H0hsZiYCC4GXbWxyEDUgYk6zpUyTBNIUEtFY2v
-	B+a16BrrLDfFkeWDVAxoH8p8J6dsBRwNV2DvW0Alqh0Nge+zLQo79dpoysYORxHbFPVC/UWJVAw
-	a79bDg3EMRvkMTr+c5TDCDb+jenx20DI0J1tmn+0oooLgU+VAcvgAhwICMk2I7dLaX+E478CQFe
-	zIws45sY6vW1bUXInJQCNvy7M6MEpinW6T0CCEjg95KDN0as9I6UbtmSwIFYco61rPEOl0vy9Xe
-	H/jGV+K1M1EgIWHGUG7PCIiYubKNXMXujT5QzMVna3oRaPAPa2auXMpgE9pajzAzTJVQ7Bcb9FQ
-	/nQPG1QvvsQkpYCxVfNQwsrESzXwyTJzJpkhw2t89NDWI2YT3tT/xUyhhdneQNVwrbuTg1ztz4O
-	D7iU0tqE7WtsU3qeeqP1w+SzyxSzMmNZj+2xUVH0wnpay4Ou6DXCgr+rHO
-X-Received: by 2002:a05:620a:29d3:b0:8b5:5a33:22d2 with SMTP id af79cd13be357-8cb28040ff9mr11986785a.46.1770746773592;
-        Tue, 10 Feb 2026 10:06:13 -0800 (PST)
-Received: from PF5YBGDS.localdomain ([163.114.130.6])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8953c03eb1fsm104552496d6.33.2026.02.10.10.06.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 10:06:13 -0800 (PST)
-Date: Tue, 10 Feb 2026 13:06:10 -0500
-From: Mike Marciniszyn <mike.marciniszyn@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>, Lee Trager <lee@trager.us>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Pei Xiao <xiaopei01@kylinos.cn>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v12 3/5] eth fbnic: Add msix self test
-Message-ID: <aYtzklT3p7lsnC1R@PF5YBGDS.localdomain>
-References: <20260206154246.814-1-mike.marciniszyn@gmail.com>
- <20260206154246.814-4-mike.marciniszyn@gmail.com>
- <e806861b-acd4-4615-aada-577e0275bb5d@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOdJkdqh6bIElwuFcYkp0J4MZzfKjPsUNiBRZGSQxGI9zfo0B7VSCCZeCsM9IJIiedH+Pz3j8xpX+aRY8YvsYpWNNU3lMeJYY4LSuVTox8tdyiBLCvXVC2kyNP/eBy2K7floPmrhTgtX0c4FeeCH/wCu7QmhbC81ijCgqbmvxbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z/AKeO99; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770748557; x=1802284557;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=J8vbRyDhN4fBEoVRPg0epdkE1Y35vtWi7KoWKKdWtOI=;
+  b=Z/AKeO99qxAozPfya3K3uvNqxIo1F9jp4aZmX/Vx7XQ8BEGd0Feraga3
+   lGUYEGHtRhDjq/Y9WxB2yN99ox91UqvAxhmD56k7inTiis9vA2ksrsLVj
+   scyZ1rld9nCOwWg40mEDoVDK/v7OucSV9TSeBsTcKVzlayh6PUs4On6l3
+   kEZw0ltqMhMd8CWyswBbYdc1l3Dr8vsgEspsxXHaCpqu6nIRkGM8fLQta
+   qZGcT1NWUhmb7oJ4FYp54wjaylsifb6wsn21IjwGsyi8l5upYSpXXUtxJ
+   +NqJjC6SjF7z4AGLDwCKcjkxRqjjT4IikzhAdLE4Q/nM56HAkMAi0JjES
+   Q==;
+X-CSE-ConnectionGUID: 6a6C99wsREqIUdzhNzPyTg==
+X-CSE-MsgGUID: TMQV4jc2SK6KzzZIs6zpKQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="75513471"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="75513471"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2026 10:35:56 -0800
+X-CSE-ConnectionGUID: 1LG9rKigRWuh/ZAeHTsn4Q==
+X-CSE-MsgGUID: +46kTIN+SnWUSn88Fnt7Wg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="211324033"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 10 Feb 2026 10:35:53 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vpsaU-00000000pIi-0Tbp;
+	Tue, 10 Feb 2026 18:35:50 +0000
+Date: Wed, 11 Feb 2026 02:34:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Feng Yang <yangfeng59949@163.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yangfeng59949@163.com
+Subject: Re: [PATCH v5] bpf: test_run: Fix the null pointer dereference issue
+ in bpf_lwt_xmit_push_encap
+Message-ID: <202602110246.gh5IIHrI-lkp@intel.com>
+References: <20260210090657.86977-1-yangfeng59949@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,90 +86,346 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e806861b-acd4-4615-aada-577e0275bb5d@redhat.com>
+In-Reply-To: <20260210090657.86977-1-yangfeng59949@163.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,163.com];
+	TAGGED_FROM(0.00)[bounces-258145-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258144-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[163.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,armlinux.org.uk,intel.com,gmail.com,trager.us,linaro.org,kylinos.cn,fomichev.me,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2827411E36F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email,git-scm.com:url]
+X-Rspamd-Queue-Id: 050FF11E572
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026 at 04:06:23PM +0100, Paolo Abeni wrote:
-> On 2/6/26 4:42 PM, mike.marciniszyn@gmail.com wrote:
-> > +/**
-> > + * fbnic_msix_test - Verify behavior of NIC interrupts
-> > + * @fbd: device to test
-> > + *
-> > + * This function is meant to test the global interrupt registers and the
-> > + * PCIe IP MSI-X functionality. It essentially goes through and tests
-> > + * test various combinations of the set, clear, and mask bits in order to
-> > + * verify the behavior is as we expect it to be from the driver.
-> > + *
-> > + * Return: non-zero on failure.
-> > + **/
-> > +int fbnic_msix_test(struct fbnic_dev *fbd)
-> > +{
-> > +	struct pci_dev *pdev = to_pci_dev(fbd->dev);
-> > +	struct fbnic_msix_test_data *test_data;
-> > +	int result = 0;
-> > +	u32 mask = 0;
-> > +	int i;
-> > +
-> > +	/* Allocate bitmap and IRQ vector table */
-> > +	test_data = kzalloc(sizeof(*test_data), GFP_KERNEL);
-> > +
-> > +	/* Result = 5 for memory allocation failure */
-> > +	if (!test_data)
-> > +		return 5;
->
-> Instead of magic numbers you could define some macros, or simply return
-> a boolean success/failures value (as the caller ignores the error code).
->
-> /P
->
+Hi Feng,
 
-It is not ignored.
+kernel test robot noticed the following build errors:
 
-The returned u64 value for all the tests is assigned into a per
-test array:
+[auto build test ERROR on bpf-next/net]
+[also build test ERROR on bpf-next/master bpf/master net-next/main net/main linus/master v6.19 next-20260209]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-static int fbnic_ethtool_mbx_self_test(struct net_device *netdev, u64 *data)
-{
-        struct fbnic_net *fbn = netdev_priv(netdev);
-        struct fbnic_dev *fbd = fbn->fbd;
+url:    https://github.com/intel-lab-lkp/linux/commits/Feng-Yang/bpf-test_run-Fix-the-null-pointer-dereference-issue-in-bpf_lwt_xmit_push_encap/20260210-171138
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git net
+patch link:    https://lore.kernel.org/r/20260210090657.86977-1-yangfeng59949%40163.com
+patch subject: [PATCH v5] bpf: test_run: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
+config: x86_64-buildonly-randconfig-004-20260210 (https://download.01.org/0day-ci/archive/20260211/202602110246.gh5IIHrI-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260211/202602110246.gh5IIHrI-lkp@intel.com/reproduce)
 
-        *data = fbnic_fw_mbx_self_test(fbd); <--- stored here
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602110246.gh5IIHrI-lkp@intel.com/
 
-        return !!*data;
-}
+All error/warnings (new ones prefixed by >>):
 
-The rval could be a set of test specific define, but regardless, it is
-meant to refer to a failure point in the test.
+   net/bpf/test_run.c: In function 'bpf_prog_test_run_skb':
+>> net/bpf/test_run.c:1162:31: warning: unused variable 'fl6' [-Wunused-variable]
+    1162 |                 struct flowi6 fl6 = {};
+         |                               ^~~
+--
+   ld: vmlinux.o: in function `ip_route_output_key':
+>> include/net/route.h:179:(.text+0x128a7e9): undefined reference to `ip_route_output_flow'
 
-Mike
+
+vim +/fl6 +1162 net/bpf/test_run.c
+
+   984	
+   985	int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+   986				  union bpf_attr __user *uattr)
+   987	{
+   988		bool is_l2 = false, is_direct_pkt_access = false, is_lwt = false;
+   989		u32 tailroom = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+   990		struct net *net = current->nsproxy->net_ns;
+   991		struct net_device *dev = net->loopback_dev;
+   992		u32 headroom = NET_SKB_PAD + NET_IP_ALIGN;
+   993		u32 linear_sz = kattr->test.data_size_in;
+   994		u32 repeat = kattr->test.repeat;
+   995		struct dst_entry *dst = NULL;
+   996		struct __sk_buff *ctx = NULL;
+   997		struct sk_buff *skb = NULL;
+   998		struct sock *sk = NULL;
+   999		u32 retval, duration;
+  1000		int hh_len = ETH_HLEN;
+  1001		void *data = NULL;
+  1002		int ret;
+  1003	
+  1004		if ((kattr->test.flags & ~BPF_F_TEST_SKB_CHECKSUM_COMPLETE) ||
+  1005		    kattr->test.cpu || kattr->test.batch_size)
+  1006			return -EINVAL;
+  1007	
+  1008		if (kattr->test.data_size_in < ETH_HLEN)
+  1009			return -EINVAL;
+  1010	
+  1011		switch (prog->type) {
+  1012		case BPF_PROG_TYPE_SCHED_CLS:
+  1013		case BPF_PROG_TYPE_SCHED_ACT:
+  1014			is_direct_pkt_access = true;
+  1015			is_l2 = true;
+  1016			break;
+  1017		case BPF_PROG_TYPE_LWT_IN:
+  1018		case BPF_PROG_TYPE_LWT_OUT:
+  1019		case BPF_PROG_TYPE_LWT_XMIT:
+  1020			is_lwt = true;
+  1021			fallthrough;
+  1022		case BPF_PROG_TYPE_CGROUP_SKB:
+  1023			is_direct_pkt_access = true;
+  1024			break;
+  1025		default:
+  1026			break;
+  1027		}
+  1028	
+  1029		ctx = bpf_ctx_init(kattr, sizeof(struct __sk_buff));
+  1030		if (IS_ERR(ctx))
+  1031			return PTR_ERR(ctx);
+  1032	
+  1033		if (ctx) {
+  1034			if (ctx->data_end > kattr->test.data_size_in || ctx->data || ctx->data_meta) {
+  1035				ret = -EINVAL;
+  1036				goto out;
+  1037			}
+  1038			if (ctx->data_end) {
+  1039				/* Non-linear LWT test_run is unsupported for now. */
+  1040				if (is_lwt) {
+  1041					ret = -EINVAL;
+  1042					goto out;
+  1043				}
+  1044				linear_sz = max(ETH_HLEN, ctx->data_end);
+  1045			}
+  1046		}
+  1047	
+  1048		linear_sz = min_t(u32, linear_sz, PAGE_SIZE - headroom - tailroom);
+  1049	
+  1050		data = bpf_test_init(kattr, linear_sz, linear_sz, headroom, tailroom);
+  1051		if (IS_ERR(data)) {
+  1052			ret = PTR_ERR(data);
+  1053			data = NULL;
+  1054			goto out;
+  1055		}
+  1056	
+  1057		sk = sk_alloc(net, AF_UNSPEC, GFP_USER, &bpf_dummy_proto, 1);
+  1058		if (!sk) {
+  1059			ret = -ENOMEM;
+  1060			goto out;
+  1061		}
+  1062		sock_init_data(NULL, sk);
+  1063	
+  1064		skb = slab_build_skb(data);
+  1065		if (!skb) {
+  1066			ret = -ENOMEM;
+  1067			goto out;
+  1068		}
+  1069		skb->sk = sk;
+  1070	
+  1071		data = NULL; /* data released via kfree_skb */
+  1072	
+  1073		skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
+  1074		__skb_put(skb, linear_sz);
+  1075	
+  1076		if (unlikely(kattr->test.data_size_in > linear_sz)) {
+  1077			void __user *data_in = u64_to_user_ptr(kattr->test.data_in);
+  1078			struct skb_shared_info *sinfo = skb_shinfo(skb);
+  1079			u32 copied = linear_sz;
+  1080	
+  1081			while (copied < kattr->test.data_size_in) {
+  1082				struct page *page;
+  1083				u32 data_len;
+  1084	
+  1085				if (sinfo->nr_frags == MAX_SKB_FRAGS) {
+  1086					ret = -ENOMEM;
+  1087					goto out;
+  1088				}
+  1089	
+  1090				page = alloc_page(GFP_KERNEL);
+  1091				if (!page) {
+  1092					ret = -ENOMEM;
+  1093					goto out;
+  1094				}
+  1095	
+  1096				data_len = min_t(u32, kattr->test.data_size_in - copied,
+  1097						 PAGE_SIZE);
+  1098				skb_fill_page_desc(skb, sinfo->nr_frags, page, 0, data_len);
+  1099	
+  1100				if (copy_from_user(page_address(page), data_in + copied,
+  1101						   data_len)) {
+  1102					ret = -EFAULT;
+  1103					goto out;
+  1104				}
+  1105				skb->data_len += data_len;
+  1106				skb->truesize += PAGE_SIZE;
+  1107				skb->len += data_len;
+  1108				copied += data_len;
+  1109			}
+  1110		}
+  1111	
+  1112		if (ctx && ctx->ifindex > 1) {
+  1113			dev = dev_get_by_index(net, ctx->ifindex);
+  1114			if (!dev) {
+  1115				ret = -ENODEV;
+  1116				goto out;
+  1117			}
+  1118		}
+  1119		skb->protocol = eth_type_trans(skb, dev);
+  1120		skb_reset_network_header(skb);
+  1121	
+  1122		switch (skb->protocol) {
+  1123		case htons(ETH_P_IP):
+  1124			sk->sk_family = AF_INET;
+  1125			if (sizeof(struct iphdr) <= skb_headlen(skb)) {
+  1126				sk->sk_rcv_saddr = ip_hdr(skb)->saddr;
+  1127				sk->sk_daddr = ip_hdr(skb)->daddr;
+  1128			}
+  1129			break;
+  1130	#if IS_ENABLED(CONFIG_IPV6)
+  1131		case htons(ETH_P_IPV6):
+  1132			sk->sk_family = AF_INET6;
+  1133			if (sizeof(struct ipv6hdr) <= skb_headlen(skb)) {
+  1134				sk->sk_v6_rcv_saddr = ipv6_hdr(skb)->saddr;
+  1135				sk->sk_v6_daddr = ipv6_hdr(skb)->daddr;
+  1136			}
+  1137			break;
+  1138	#endif
+  1139		default:
+  1140			break;
+  1141		}
+  1142	
+  1143		if (is_l2)
+  1144			__skb_push(skb, hh_len);
+  1145		if (is_direct_pkt_access)
+  1146			bpf_compute_data_pointers(skb);
+  1147	
+  1148		ret = convert___skb_to_skb(skb, ctx);
+  1149		if (ret)
+  1150			goto out;
+  1151	
+  1152		if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
+  1153			const int off = skb_network_offset(skb);
+  1154			int len = skb->len - off;
+  1155	
+  1156			skb->csum = skb_checksum(skb, off, len, 0);
+  1157			skb->ip_summed = CHECKSUM_COMPLETE;
+  1158		}
+  1159	
+  1160		if (prog->type == BPF_PROG_TYPE_LWT_XMIT && !skb_dst(skb)) {
+  1161			struct flowi4 fl4 = {};
+> 1162			struct flowi6 fl6 = {};
+  1163			struct rtable *rt;
+  1164	
+  1165			switch (skb->protocol) {
+  1166			case htons(ETH_P_IP):
+  1167				if (sizeof(struct iphdr) <= skb_headlen(skb)) {
+  1168					fl4.saddr = ip_hdr(skb)->saddr;
+  1169					fl4.daddr = ip_hdr(skb)->daddr;
+  1170				}
+  1171	
+  1172				rt = ip_route_output_key(net, &fl4);
+  1173				if (IS_ERR(rt)) {
+  1174					ret = PTR_ERR(rt);
+  1175					goto out;
+  1176				}
+  1177				dst = &rt->dst;
+  1178				break;
+  1179	#if IS_ENABLED(CONFIG_IPV6)
+  1180			case htons(ETH_P_IPV6):
+  1181				if (sizeof(struct ipv6hdr) <= skb_headlen(skb)) {
+  1182					fl6.saddr = ipv6_hdr(skb)->saddr;
+  1183					fl6.daddr = ipv6_hdr(skb)->daddr;
+  1184				}
+  1185	
+  1186				dst = ip6_route_output(net, NULL, &fl6);
+  1187				if (IS_ERR(dst)) {
+  1188					ret = PTR_ERR(dst);
+  1189					goto out;
+  1190				}
+  1191				break;
+  1192	#endif
+  1193			default:
+  1194				ret = -EINVAL;
+  1195				goto out;
+  1196			}
+  1197	
+  1198			if (unlikely(dst->error)) {
+  1199				ret = dst->error;
+  1200				dst_release(dst);
+  1201				goto out;
+  1202			}
+  1203			skb_dst_set(skb, dst);
+  1204		}
+  1205		ret = bpf_test_run(prog, skb, repeat, &retval, &duration, false);
+  1206		if (ret)
+  1207			goto out;
+  1208		if (!is_l2) {
+  1209			if (skb_headroom(skb) < hh_len) {
+  1210				int nhead = HH_DATA_ALIGN(hh_len - skb_headroom(skb));
+  1211	
+  1212				if (pskb_expand_head(skb, nhead, 0, GFP_USER)) {
+  1213					ret = -ENOMEM;
+  1214					goto out;
+  1215				}
+  1216			}
+  1217			memset(__skb_push(skb, hh_len), 0, hh_len);
+  1218		}
+  1219	
+  1220		if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
+  1221			const int off = skb_network_offset(skb);
+  1222			int len = skb->len - off;
+  1223			__wsum csum;
+  1224	
+  1225			csum = skb_checksum(skb, off, len, 0);
+  1226	
+  1227			if (csum_fold(skb->csum) != csum_fold(csum)) {
+  1228				ret = -EBADMSG;
+  1229				goto out;
+  1230			}
+  1231		}
+  1232	
+  1233		convert_skb_to___skb(skb, ctx);
+  1234	
+  1235		if (skb_is_nonlinear(skb))
+  1236			/* bpf program can never convert linear skb to non-linear */
+  1237			WARN_ON_ONCE(linear_sz == kattr->test.data_size_in);
+  1238		ret = bpf_test_finish(kattr, uattr, skb->data, skb_shinfo(skb), skb->len,
+  1239				      skb->data_len, retval, duration);
+  1240		if (!ret)
+  1241			ret = bpf_ctx_finish(kattr, uattr, ctx,
+  1242					     sizeof(struct __sk_buff));
+  1243	out:
+  1244		if (dev && dev != net->loopback_dev)
+  1245			dev_put(dev);
+  1246		kfree_skb(skb);
+  1247		kfree(data);
+  1248		if (sk)
+  1249			sk_free(sk);
+  1250		kfree(ctx);
+  1251		return ret;
+  1252	}
+  1253	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
