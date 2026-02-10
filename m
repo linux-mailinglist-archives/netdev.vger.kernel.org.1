@@ -1,156 +1,128 @@
-Return-Path: <netdev+bounces-258056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258057-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJ77CY0Ki2kdPQAAu9opvQ
-	(envelope-from <netdev+bounces-258056-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:38:05 +0100
+	id EAjiMg8Li2kdPQAAu9opvQ
+	(envelope-from <netdev+bounces-258057-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:40:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238AE119B11
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:38:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D962119B83
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 11:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDABA3032CDC
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:38:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C617E300B530
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9DF3164D6;
-	Tue, 10 Feb 2026 10:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CFC316912;
+	Tue, 10 Feb 2026 10:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xv/gp+D9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qy3aLxez"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2E53164A5
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 10:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FEE316904;
+	Tue, 10 Feb 2026 10:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770719880; cv=none; b=N8gjeqr8UbkpRbcU9xvBoQ2GKUtLnxJnL2GrSUvwK3bdy6lG6BsKboVShH9hiwyQ30//mY2xoMhYZ20RqNxfWpZIcCd2PwWcNBTm2GeaKM54c1drLEEKXXvw2v+bmwDajS1QXsdk3yV8yACBIvvwdNnVBVtvb3pYsEHc2PBQ5Ig=
+	t=1770720010; cv=none; b=GRE2RW482nSItEAPzi4gJSllhfejwk/EtZFMT7uBU8E974cx56ciUsfnr+kAsPYtObyUDCwqLzt7lbZDf82srKiZptR7/+ETWbIrygk61jpf3twQVfgegScgSRLvo9lutaMGPzpcSWZcHwPM/ICF/5hko5rIHy1aqbdkxvtQQqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770719880; c=relaxed/simple;
-	bh=nql3REZHm/889FCSxEmQiDoNigzkKAABGEemj5aNGQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RXeN8t0D3mL6C9pCI1qTyqIBEsyRGFIqbhrG99Woy5O2e5R/iQsRuIDSP0GFP9gu2zBa5ZHGg+aqjfMZHBj3fcb1GqTGiwZ79cB+dmJ+iDhc6YN/24ePIRVkm42eHkgcdnIu/39eM7RgRsQkZ8IRRqhJ6Z0C++QDMFlbHu9/KHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Xv/gp+D9; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4834826e5a0so7648065e9.2
-        for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 02:37:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770719877; x=1771324677; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gUsFeNTA29iUzBEZy6/HMLSkX9AmxCg99Net+tWROhE=;
-        b=Xv/gp+D94O2WucC81+3YYOwuDOAAqClR/wV9oqErGH1290pQhBxtJrdBoVh9TCxT5l
-         Pu/I/YevzBIRZvaxWUR28RraznnBARZm7/htHJfRHyiZ8HTYRQ01NhD6hhwP63WSJH4i
-         ZN/F2GxbXUWJNBrA5jOr1lEOCH4tKxIKXYrqxRaXFqw1RD2sYFvdlQq6fR3Wh2FSPqKh
-         SSZA/J0p2Y44zMv/zoY+LQW1sH75c651BNgcCisU9v77gelnhSmr4I9iImLqYjec409z
-         uWgALkr2YmRehnPp3CLBABMsSdnNVT2OxjJjfYY+tz7cZXI1pc3z5wu35+Eo+HKQjlhb
-         ZJTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770719877; x=1771324677;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gUsFeNTA29iUzBEZy6/HMLSkX9AmxCg99Net+tWROhE=;
-        b=q0Q2SSHCILptEFu6+mYjP5poueLCSs9K/klePbaLVBy389WbMpMY6VrsXvnc3wxQ1b
-         MhV8pqtI5HAxAhfIzfsAAHkFVbdvfbHhud7hVpPth33toMwSdXGrWMIuAQvXK3wrS2J0
-         ZGrlnU32vOkopAocnbPIvN9vvyMy0/kOIngTsIS/MxrX+nTwAgCa//nN66124TCTMjFL
-         HqC/tt/2B97O8QXI5NMTeJVRz4AOPSpTnAqb26II1lebpCpXk0M1loMxX6RjvQHjle7q
-         gRdnHMKY9raFucHIKH7zhwEAI16bQ2TJoLTIa269j8SkKqbdlTy45sMxaTsxjWdINpZj
-         XETg==
-X-Forwarded-Encrypted: i=1; AJvYcCX9NvIEwqFJ1SffQ389Uiip7OHW7BmWisqhNh8MqSuls158RRYNEyl7nbM5f1l4LB7vuS18dKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynGj2ccIFIQg9H5BevqAlGtVK6TcErJ/jICI4z40ZGAtf8l/0M
-	KKm6u7tmTCXKvpNdm6BnQ2H6vOe4NneI848RS+DZmFE9LP/WO+Ts5L5tdEmqyOFXifA=
-X-Gm-Gg: AZuq6aI+jPloKViYvZKed8WEgjlt+dVLabEUHK0BnZnzTRSZHtk1YOUu2OYv3zTQOC+
-	4k500X6UFWiu8XMkNyJzz4iCHNRSlxR4+U6TUjtOUN+7Pm1bAdo1jXkHNre2sBXs3JBCS88DVw3
-	xAleJ51a2mTzQmhS91m0aoDG7OvtXacMTzucZHgToOuC34e03P9CM4bM/tvRVmamHsNp9O31tLX
-	Q2WSmB/63rYlPskiUYs7scmPdkVqEjjqsC/pQFcZtOyoKVT156JRgffSOpVWcgT69v+zYOLOLQt
-	hLFewcgnoeNHlmnmBLCAHisN8+XFX+K4Tm6QbsKinIqn5SSsog1bf1TF955RR/GBJr6VR4+564u
-	rg5G7FRhz8+5ZomJWnM5CdpgtHhcMgCCxylUfY/mz/ouX84avirgenw3tt+Z4TRBGYzSl0SporA
-	NGdPMbeKFlee1auNWhIfOvzH8zE31H
-X-Received: by 2002:a05:600c:674f:b0:471:13dd:bae7 with SMTP id 5b1f17b1804b1-4832022aee5mr185650025e9.30.1770719877231;
-        Tue, 10 Feb 2026 02:37:57 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d5e1a5esm52330635e9.4.2026.02.10.02.37.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 02:37:56 -0800 (PST)
-Date: Tue, 10 Feb 2026 13:37:53 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [bug report] net: ethtool: Introduce per-PHY DUMP operations
-Message-ID: <aYsKgV050-wa1i96@stanley.mountain>
-References: <aYXu0esD_wSjGTZm@stanley.mountain>
- <c9c6378a-14a3-440a-80b7-f48cdb06623b@bootlin.com>
- <aYmID1BOGmwb2rUD@stanley.mountain>
- <e5f1688f-cb13-4d43-bf20-644cda6ab494@bootlin.com>
- <8cd942c4-986b-4c20-bc12-f8fc17f626c3@lunn.ch>
+	s=arc-20240116; t=1770720010; c=relaxed/simple;
+	bh=FIv+tmEXWh9/H5O+J8eYReExCUXlQVL0LHvRMPQcucQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nn7a73z65kRemc49IGo3bcSSO/u82pV8/SLAHHUb7/aUPdQZR9YqbaX8cLoF4NAyOhIMKwUGoTi3ZrAVRFiIccpO9Jo3PIXI0bRg+D2SIIO5rhApQm2TtxC2EuP3Sj6NstuFIW1KD3l3nOMtLPKzJ7+f/AdbuFFzMy4CtsPkn9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qy3aLxez; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8B9FC116C6;
+	Tue, 10 Feb 2026 10:40:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770720009;
+	bh=FIv+tmEXWh9/H5O+J8eYReExCUXlQVL0LHvRMPQcucQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qy3aLxezN9koXDlD36Ev/BeXdS7s0wRDfW/jsbhhUVGCj+xe5E7JL2NPFDP+kepVO
+	 wtILpau2nav3Jfy87D5sQVFPURKTqRLLVKCXeZvm9PSOgl0IWaRyB9C4LAU/gAUF/S
+	 eK88lPNRxCyANoftUcX3RXJSsLq3cZ0ozDSvOg2XhcmXOIn9JX2PFSvL9vzYA3nL4c
+	 azAuzLoIvv//Wc5ruMqeWh5xfbj639NizTCak14q5wMNeKz0WMA5wQx19V0QxNZUVG
+	 Ow5TiysFr8XsEmRLfLam8SiIyFhhNj486L0JVSd+jmUbaa+0vsdFW1Eeyu/HCRQISO
+	 nLB4vdPO0mk2A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 850FD39B167A;
+	Tue, 10 Feb 2026 10:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8cd942c4-986b-4c20-bc12-f8fc17f626c3@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] net: atm: fix crash due to unvalidated vcc pointer
+ in
+ sigd_send()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177072000533.3455745.207010128594113653.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Feb 2026 10:40:05 +0000
+References: <20260205095501.131890-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260205095501.131890-1-jiayuan.chen@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
+ syzbot+1f22cb1769f249df9fa0@syzkaller.appspotmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258056-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258057-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,1f22cb1769f249df9fa0];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,stanley.mountain:mid]
-X-Rspamd-Queue-Id: 238AE119B11
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 8D962119B83
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026 at 02:10:38PM +0100, Andrew Lunn wrote:
-> > > ETHTOOL_MSG_USER_NONE, 
-> > > ETHTOOL_MSG_FEATURES_SET,
-> > > ETHTOOL_MSG_CABLE_TEST_ACT,
-> > > ETHTOOL_MSG_CABLE_TEST_TDR_ACT,
-> > > ETHTOOL_MSG_TUNNEL_INFO_GET,
-> > > ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
-> > > ETHTOOL_MSG_RSS_CREATE_ACT,
-> > > ETHTOOL_MSG_RSS_DELETE_ACT,
-> > 
-> > While these commands don't have ethnl_request_ops handlers, they still
-> > have a genetlink handler, see the ethtool_genl_ops array [1]
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu,  5 Feb 2026 17:54:51 +0800 you wrote:
+> From: Jiayuan Chen <jiayuan.chen@shopee.com>
 > 
-> At least for the *_ACT commands, they are not expected in the
-> userspace->kernel space direction. They should only be sent by the
-> kernel to user space, to indicate some action has been performed, or
-> happened. I don't know the netlink code too well, but i assume there
-> is something which will throw out such commands if sent to the kernel,
-> without even looking at the parameters?
+> Reproducer available at [1].
+> 
+> The ATM send path (sendmsg -> vcc_sendmsg -> sigd_send) reads the vcc
+> pointer from msg->vcc and uses it directly without any validation. This
+> pointer comes from userspace via sendmsg() and can be arbitrarily forged:
+> 
+> [...]
 
-Ah.  Got it.  Thanks!
+Here is the summary with links:
+  - [net,v1] net: atm: fix crash due to unvalidated vcc pointer in sigd_send()
+    https://git.kernel.org/netdev/net/c/ae88a5d2f29b
 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-regards,
-dan carpenter
 
 
