@@ -1,81 +1,62 @@
-Return-Path: <netdev+bounces-258048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258049-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2ICLB9n2imkePAAAu9opvQ
-	(envelope-from <netdev+bounces-258048-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:14:01 +0100
+	id UMudMsD5imlBPAAAu9opvQ
+	(envelope-from <netdev+bounces-258049-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:26:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F5D118B71
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:14:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D09B118DAB
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 10:26:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 94770303DF5A
-	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 09:13:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23A01304F230
+	for <lists+netdev@lfdr.de>; Tue, 10 Feb 2026 09:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E0233F8C5;
-	Tue, 10 Feb 2026 09:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF222340A6F;
+	Tue, 10 Feb 2026 09:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b="E+yz8YdV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MrB8Z2sH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-79.sinamail.sina.com.cn (mail115-79.sinamail.sina.com.cn [218.30.115.79])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303E633F381
-	for <netdev@vger.kernel.org>; Tue, 10 Feb 2026 09:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3A81E2614;
+	Tue, 10 Feb 2026 09:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770714791; cv=none; b=sfHaJbIM5H3/RlCqzA3S4etYf26T5jUFPeYVj3/494ChRtj5RxkPjygQ06mdVv9zeWIfWtJ4AGg3Vz/J5TtI29WY7OTKpT8ukFdQ+er8XWSXIP25W1+wmcNzvd50nknfVBY5AWdhg1nH0Lcr/VWUFP5+9wpnX/nl4rLV1xqYvmw=
+	t=1770715470; cv=none; b=EbDqM9K1Y79bf5QT2nFBrqpk9SdOHC0uJzl0+qCo0J/0FCaVPlMBDbWowwnxU0QKeKWr6j4Qxsw/UgJFKE+3oj+XXH9f7XclSC1OiK6Muk7l94KQVur8dupvUXP+CqxRSmVtPr33hx5LYwkwY0ywHNRAO8VxZwnefj3joEylnC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770714791; c=relaxed/simple;
-	bh=RW9o8qXMDmFr2cTNtgGcRS0WMtbL2a+7DAZq/tKMdWU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kjT6MZqIGhd6nZ0PPZM8XXvdt9NTksSgkkzQKocyvnMsfrDDtQaFsqOccy8cMO8Y0YK6Yy1Euj/ebiWxEl3I5OMdGgaCHWCz2/I+ghtSG7HDalRxGVE2y9aopnkwXM/Q9ezEZhWZyKW4biVqBxU5xBUiSd1hN8Bag7mqNOAU61I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn; spf=pass smtp.mailfrom=sina.cn; dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b=E+yz8YdV; arc=none smtp.client-ip=218.30.115.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.cn; s=201208; t=1770714787;
-	bh=AwwrFyXVRggsvgwH85FXnzJjrnjYzB5017/O7KRuerI=;
-	h=From:Subject:Date:Message-Id;
-	b=E+yz8YdVgg+Yd9e3YgS56tVmTMGCet2CCC8yNXpYDAnXfhOafcy5fPNky9Ddinvsl
-	 U2grwilmu22UBUIGZAorsZG5j3JwNYgGQ0wJaTEh9a457I/7eQo63QuUjhsNuqfXY6
-	 zfFJlm+gP0mNa14QmKY2jzOcLgWheBy0VqneOSy8=
-X-SMAIL-HELO: NTT-kernel-dev
-Received: from unknown (HELO NTT-kernel-dev)([60.247.85.88])
-	by sina.cn (10.185.250.22) with ESMTP
-	id 698AF693000015A4; Tue, 10 Feb 2026 17:12:58 +0800 (CST)
-X-Sender: jianqkang@sina.cn
-X-Auth-ID: jianqkang@sina.cn
-Authentication-Results: sina.cn;
-	 spf=none smtp.mailfrom=jianqkang@sina.cn;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=jianqkang@sina.cn
-X-SMAIL-MID: 3316687602327
-X-SMAIL-UIID: BA8516D35CD3404984D84B981A4C8F07-20260210-171258-1
-From: Jianqiang kang <jianqkang@sina.cn>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	e.kubanski@partner.samsung.com
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
+	s=arc-20240116; t=1770715470; c=relaxed/simple;
+	bh=W3oUj2cDOzt3sDn8kKRODpOQKjUyTkq0X+Z6OiVOV+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vli0NiEeuRf9UCO7ux5t/soIHIXg0WPvdM4dYMC/6wcKKtPmhQBXW94TXcPfCL/29Vfv4cx61seeVFFCWc3xcexH6gMmjqf4GSA6v+ymN4JHbLaxgOcHru2/7LXfDBMv1XHEcm7Kwc4AB/dX73ybggLR+lb2lm1qlqkbqKdAvdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MrB8Z2sH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1A4EC116C6;
+	Tue, 10 Feb 2026 09:24:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770715470;
+	bh=W3oUj2cDOzt3sDn8kKRODpOQKjUyTkq0X+Z6OiVOV+I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MrB8Z2sHUom+UNEhg2ma1bzDU7yIPyz8vy/O17lfRhULLmNUbHG1W3YpowIGt8nxX
+	 IUjEq+e2Sv/Pbc5ByPvb3y2BnTIUxX9JMFUorRMk1LHZwKls4teKEBnihAQrNGV/ld
+	 fSzGyTblKnCeEMESSyBOwg8/p+MkjNlVGlAyc4xrvM3tRSPHSlliByr0O+Qy4+L6El
+	 43f1H97CHaa+C38dNAIyYaNG5E+QwTlBw2LOiqUqne1gL1s0v0DQPP3X5bzgQD8N8Q
+	 KDy0cKrRzPxsl9TCRrb4xR8+e2qhs+hdjg02kRHX5LYDWWmDq0Bna5GNls7nvhGBUY
+	 ZSx9h2ASVad7w==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
 	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	i.maximets@samsung.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH 6.1.y] xsk: Fix race condition in AF_XDP generic RX path
-Date: Tue, 10 Feb 2026 17:12:51 +0800
-Message-Id: <20260210091251.1690056-1-jianqkang@sina.cn>
-X-Mailer: git-send-email 2.34.1
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net v1] net/rds: rds_sendmsg should not discard payload_len
+Date: Tue, 10 Feb 2026 02:24:29 -0700
+Message-ID: <20260210092429.1819177-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,152 +65,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[sina.cn,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[sina.cn:s=201208];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-258048-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258049-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,kernel.org,intel.com,gmail.com,davemloft.net,google.com,redhat.com,iogearbox.net,samsung.com];
-	DKIM_TRACE(0.00)[sina.cn:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jianqkang@sina.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[sina.cn];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sina.cn:mid,sina.cn:dkim,sina.cn:email,samsung.com:email]
-X-Rspamd-Queue-Id: D3F5D118B71
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2D09B118DAB
 X-Rspamd-Action: no action
 
-From: "e.kubanski" <e.kubanski@partner.samsung.com>
+Commit 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with
+connection teardown") modifies rds_sendmsg to avoid enqueueing work
+while a tear down is in progress. However, it also changed the return
+value of rds_sendmsg to that of rds_send_xmit instead of the
+payload_len. This means the user may incorrectly receive errno values
+when it should have simply received a payload of 0 while the peer
+attempts a reconnections.  So this patch corrects the teardown handling
+code to only use the out error path in that case, thus restoring the
+original payload_len return value.
 
-[ Upstream commit a1356ac7749cafc4e27aa62c0c4604b5dca4983e ]
-
-Move rx_lock from xsk_socket to xsk_buff_pool.
-Fix synchronization for shared umem mode in
-generic RX path where multiple sockets share
-single xsk_buff_pool.
-
-RX queue is exclusive to xsk_socket, while FILL
-queue can be shared between multiple sockets.
-This could result in race condition where two
-CPU cores access RX path of two different sockets
-sharing the same umem.
-
-Protect both queues by acquiring spinlock in shared
-xsk_buff_pool.
-
-Lock contention may be minimized in the future by some
-per-thread FQ buffering.
-
-It's safe and necessary to move spin_lock_bh(rx_lock)
-after xsk_rcv_check():
-* xs->pool and spinlock_init is synchronized by
-  xsk_bind() -> xsk_is_bound() memory barriers.
-* xsk_rcv_check() may return true at the moment
-  of xsk_release() or xsk_unbind_dev(),
-  however this will not cause any data races or
-  race conditions. xsk_unbind_dev() removes xdp
-  socket from all maps and waits for completion
-  of all outstanding rx operations. Packets in
-  RX path will either complete safely or drop.
-
-Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-Fixes: bf0bdd1343efb ("xdp: fix race on generic receive path")
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-Link: https://patch.msgid.link/20250416101908.10919-1-e.kubanski@partner.samsung.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[ Conflict is resolved when backporting this fix. ]
-Signed-off-by: Jianqiang kang <jianqkang@sina.cn>
+Fixes: 3db6e0d172c9 ("rds: use RCU to synchronize work-enqueue with connection teardown")
+Signed-off-by: Allison Henderson <achender@kernel.org>
 ---
- include/net/xdp_sock.h      | 2 --
- include/net/xsk_buff_pool.h | 2 ++
- net/xdp/xsk.c               | 6 +++---
- net/xdp/xsk_buff_pool.c     | 1 +
- 4 files changed, 6 insertions(+), 5 deletions(-)
+ net/rds/send.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 3057e1a4a11c..b8001d24106a 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -59,8 +59,6 @@ struct xdp_sock {
- 
- 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
- 	struct list_head tx_list;
--	/* Protects generic receive. */
--	spinlock_t rx_lock;
- 
- 	/* Statistics */
- 	u64 rx_dropped;
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 996eaf1ef1a1..e436363c2192 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -48,6 +48,8 @@ struct xsk_buff_pool {
- 	refcount_t users;
- 	struct xdp_umem *umem;
- 	struct work_struct work;
-+	/* Protects generic receive in shared and non-shared umem mode. */
-+	spinlock_t rx_lock;
- 	struct list_head free_list;
- 	u32 heads_cnt;
- 	u16 queue_id;
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index e3bdfc517424..e55e153377c8 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -237,13 +237,14 @@ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp)
- {
- 	int err;
- 
--	spin_lock_bh(&xs->rx_lock);
- 	err = xsk_rcv_check(xs, xdp);
- 	if (!err) {
-+		spin_lock_bh(&xs->pool->rx_lock);
- 		err = __xsk_rcv(xs, xdp);
- 		xsk_flush(xs);
-+		spin_unlock_bh(&xs->pool->rx_lock);
- 	}
--	spin_unlock_bh(&xs->rx_lock);
+diff --git a/net/rds/send.c b/net/rds/send.c
+index 6e96f108473e..a1039e422a38 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -1431,9 +1431,11 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 		else
+ 			queue_delayed_work(cpath->cp_wq, &cpath->cp_send_w, 1);
+ 		rcu_read_unlock();
 +
- 	return err;
- }
++		if (ret)
++			goto out;
+ 	}
+-	if (ret)
+-		goto out;
++
+ 	rds_message_put(rm);
  
-@@ -1448,7 +1449,6 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
- 	xs = xdp_sk(sk);
- 	xs->state = XSK_READY;
- 	mutex_init(&xs->mutex);
--	spin_lock_init(&xs->rx_lock);
- 
- 	INIT_LIST_HEAD(&xs->map_list);
- 	spin_lock_init(&xs->map_list_lock);
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 21d5fdba47c4..b2004a8bf67f 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -85,6 +85,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
- 		XDP_PACKET_HEADROOM;
- 	pool->umem = umem;
- 	pool->addrs = umem->addrs;
-+	spin_lock_init(&pool->rx_lock);
- 	INIT_LIST_HEAD(&pool->free_list);
- 	INIT_LIST_HEAD(&pool->xsk_tx_list);
- 	spin_lock_init(&pool->xsk_tx_list_lock);
+ 	for (ind = 0; ind < vct.indx; ind++)
 -- 
-2.34.1
+2.43.0
 
 
