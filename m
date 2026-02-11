@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-258367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHL2BIz+jGn4wgAAu9opvQ
-	(envelope-from <netdev+bounces-258367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:11:24 +0100
+	id ACPeHKz+jGn4wgAAu9opvQ
+	(envelope-from <netdev+bounces-258368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:11:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD2DF128032
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:11:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C4C3128056
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 22BBE3037781
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 22:11:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3D2B53038B85
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 22:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE43A33342C;
-	Wed, 11 Feb 2026 22:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CFF32860E;
+	Wed, 11 Feb 2026 22:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="C+aQ5UBo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Lykmlvec"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013045.outbound.protection.outlook.com [40.93.201.45])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010037.outbound.protection.outlook.com [52.101.46.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A367933032B;
-	Wed, 11 Feb 2026 22:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82F133032B;
+	Wed, 11 Feb 2026 22:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770847879; cv=fail; b=GrfDS0ckJHsHIxcsZZSJ///NinanVPM1FqIdTAxwOgiQniRNmWr2EudpBWJdg21NDBQSbt5Fim6S+gyHQro6HUPv1p3pNz8nVrTSxaMYcW1M8bFiHMwGCAbgg3OQVNtUjh3g4Btb3XoNve2uoZG1lnxWIYdGZOX9hkJYdBp6ksI=
+	t=1770847901; cv=fail; b=Xh9m/qu5b33rutsCRo44TsXJOLW9vTkynVsz7+J1FWjonTJUtK4lhDXYGhoxtv0b4oKcSK6hWd6AQ4CqZFw8cszHjyHyEbe8QrEb5/alZrBbCSAYgaDLSsMOrrRUqu+3uJTA+ee1L8OOlkooj3Wyad1jAn3quwn3w1BQup42HiQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770847879; c=relaxed/simple;
-	bh=T8YlZS0OoZUFMYcZZieFHgxksJIZGUYzfjYvA3QcrtU=;
+	s=arc-20240116; t=1770847901; c=relaxed/simple;
+	bh=4VMdrTE9/HGzvlbA1SMBZt8cfkn5mxknUET/4ujC0SY=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=EiLHmml9fsWOHCq+evdsguWCo1vEke5NJ0zjqFmfDEdd/kVKMZfw3t6x9fXqTLBOuJE9VYBncfdStvUQ8xIw/JefZS33N5/LB00sE0KLwQIbAM/CNWWo9d4x0zzS3dqPizVOmxa6nyGDELGThG5lqb1GU9Ss/hshH5WLtTU7DoY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=C+aQ5UBo; arc=fail smtp.client-ip=40.93.201.45
+	 In-Reply-To:Content-Type; b=GmrLxrLruPvPQuwZE9wA7GZRvx0cPmdxZFn8vsujpXYaJvY6AoIhSq/RQuyqHRnfcK6eCBHnppEh2YbpM3+1Zx5HQXpxLvwgJ7Kne5eTj2Y/nYzXeJ6KdoJ5DTJbwLXgcTnFlMTXz/WPPhZONr/8mN4PNP7AWnQiZWEqcZOqzJo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Lykmlvec; arc=fail smtp.client-ip=52.101.46.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tl5gDuqLP86+zcK+wqDJCX+ReEuCejjjTBqd3qgNtTgTCF8LCDoxoPc4NXKIovBilPhUh8NZYQm1fUJQWwpl106Ml5xaC8HUtFy+oTk5XrE/xBJebjnwRWYadoyTuHTwnQdH9DE11Q2+LBBmIdAd8MXpqhdg2+2fzSkgqj/lDVrl05vf10oQzDOptcHxBYDcwfSeNtGFqAC+6NBukp09Trb1KNX2S4narJnwz465UUd71jXD09czL6Zl7Woo3zLuWPhrljZ5MxEcoNynUQBuXnYVPpPvY2hnD6PXvmadKOvH5go/vfmRhbmSyvKgohOVl+ABA1z/eqVkTIJ75SE/9Q==
+ b=sNiyWFbOaRuGIht7NumYYpAJoXAD54Ea1dKYiQt3j4oRgHS+jzmV0Dr+C/8ZiPa75vcGjQ9sCuEsL1JSlKRDzrjb7ymG1O44x/YI+pLXWTboXx7+GXe3eMLeFhKu/UXLCmBeekmrBD2foAESSYUM6cO12GkV32EN6LDYnp4CFoc6LD4MGprmxxW8aBe1UnVpGlHrOfAUkW8gEDzYXdjgJxxX2+APUT6EYeta2bx8RhiL5rh22mANnBAQvhM/nhnI7XALBwYzWWLdUnYaFtyt/s8m9ze6KDRDnsdK2PWGKZjWmqT/NQCwP2Efn2cDof8UtQ/+QSDPc0TdzkicV+3mOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XEZLibLys633NryK05gK6qXGbAntyCK3m73BwR5fvJQ=;
- b=Bayom7VcSXE+mZ7nqfvhoqvrA53NStqmZBJq/ZqPkETdoR11nh45Dp/0hprSTAYPAg0OZGDhpjpkukXMMRD+UdgkRbaxBPGlJa2T4lzAqhOSLZ1xhjxthu0P2xYkfjMVkHKaaBcdwfhPX6SMGT+hZUIGS6EJYYl9vcoFU0hoUmy0L+WXj2Eux8iKMOzXr0jzUqG7WL4XMMDY+AYolazuMFkKiz3hCoXEU1ElPsoBtsyfiPXI3HK7gDz5DRjeAlJXzcEez/LiWjQGoHll03Ig+o649SlLggPHazcgUiMNw//MOUl4kVtPxDYuQZFJCRWDqviQFzNq3oKduj1se7LLBQ==
+ bh=xp7HBVUtpnqKPfvzM+Ce3P2uxKJp/Le+PmF8L5VLRFg=;
+ b=XeRLyjDYz3DPgwQbfFPJ1zPOk+Yh8Q9dZaHBgsZxVc+zxXdQFf7WG8/glJCd6QbUDwoNm/Yv6L9gZyRI4YdE1gRHU99WYMCQlncYIbeOmhpk3+NbOES6kgIqz4veiwhqZ9o/6dFdcvbmmw7GPdCautt1qKpN/CcBCw8PDuYDOTVTIp8SYtMT+fLyYWegiWV5kJBJtjdm//BpHQ6jPtgy0A1zkWoUMXlv66JhU9QfNKhlkrg7ogUy3JZ3Vh6YoEeTIgSKuMl9nzgaZpVGqUlGmKGQew6UGfrbOigRufpEyu2lrr27yewGpfWN4UxnJsA93B47BWfG1bC5PV8ZKhXHaA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nvidia.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XEZLibLys633NryK05gK6qXGbAntyCK3m73BwR5fvJQ=;
- b=C+aQ5UBogG3Ru0yY8YlHLW+Ze6FvPsX/dlz6AYMGqOcv65rIFgDLP4TVT/5SF4Rvu3lzSwKVeXBuiaux5+EBJOu31OR7yHX5RU0apdty5282slEcCiusHpV+UAGTBmnL5CSLRi3rs/0es789CJRQytwUPT66GZbAiBS4WkYnWi8=
-Received: from BY5PR13CA0001.namprd13.prod.outlook.com (2603:10b6:a03:180::14)
- by LV0PR12MB999068.namprd12.prod.outlook.com (2603:10b6:408:32d::17) with
+ bh=xp7HBVUtpnqKPfvzM+Ce3P2uxKJp/Le+PmF8L5VLRFg=;
+ b=LykmlvecJRzlHBdxppNuYMq69w6BeDU7r53wo8gA3UMp5UYJy5kw7mImcT25c3od5ql0kxWaw/ki43Ke/FTYI6VbUw2YTzYVvjNM6m413B1rWpqC6hGlRhfEkMehIkMYQ7kErvl3d3sc6QAq91Q2mv9AOVkFj/Yk6PGae8LlQhI=
+Received: from SJ0PR03CA0275.namprd03.prod.outlook.com (2603:10b6:a03:39e::10)
+ by SN7PR12MB7106.namprd12.prod.outlook.com (2603:10b6:806:2a1::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.10; Wed, 11 Feb
- 2026 22:11:15 +0000
-Received: from CO1PEPF000075ED.namprd03.prod.outlook.com
- (2603:10b6:a03:180:cafe::cd) by BY5PR13CA0001.outlook.office365.com
- (2603:10b6:a03:180::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.8 via Frontend Transport; Wed,
- 11 Feb 2026 22:11:14 +0000
+ 2026 22:11:29 +0000
+Received: from CO1PEPF000075F0.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e:cafe::70) by SJ0PR03CA0275.outlook.office365.com
+ (2603:10b6:a03:39e::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.10 via Frontend Transport; Wed,
+ 11 Feb 2026 22:11:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,15 +66,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- CO1PEPF000075ED.mail.protection.outlook.com (10.167.249.36) with Microsoft
+ CO1PEPF000075F0.mail.protection.outlook.com (10.167.249.39) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9611.8 via Frontend Transport; Wed, 11 Feb 2026 22:11:14 +0000
+ 15.20.9611.8 via Frontend Transport; Wed, 11 Feb 2026 22:11:29 +0000
 Received: from [10.31.203.44] (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 11 Feb
- 2026 16:11:13 -0600
-Message-ID: <474e80b2-fac9-496f-b788-276213a4e8df@amd.com>
-Date: Wed, 11 Feb 2026 16:11:12 -0600
+ 2026 16:11:27 -0600
+Message-ID: <383d7089-d7ca-43ab-8284-694e60729770@amd.com>
+Date: Wed, 11 Feb 2026 16:11:21 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,120 +83,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: "Cheatham, Benjamin" <benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v23 16/22] cxl: Make region type based on endpoint type
+Subject: Re: [PATCH v23 17/22] cxl/region: Factor out interleave ways setup
 To: <alejandro.lucero-palau@amd.com>
 CC: Alejandro Lucero <alucerop@amd.com>, Zhi Wang <zhiw@nvidia.com>, "Jonathan
  Cameron" <Jonathan.Cameron@huawei.com>, Alison Schofield
-	<alison.schofield@intel.com>, Davidlohr Bueso <daves@stgolabs.net>,
-	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>
+	<alison.schofield@intel.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dave.jiang@intel.com>
 References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
- <20260201155438.2664640-17-alejandro.lucero-palau@amd.com>
+ <20260201155438.2664640-18-alejandro.lucero-palau@amd.com>
 Content-Language: en-US
-In-Reply-To: <20260201155438.2664640-17-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20260201155438.2664640-18-alejandro.lucero-palau@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075ED:EE_|LV0PR12MB999068:EE_
-X-MS-Office365-Filtering-Correlation-Id: c19a5991-b7c8-4d39-b9e7-08de69ba790c
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075F0:EE_|SN7PR12MB7106:EE_
+X-MS-Office365-Filtering-Correlation-Id: 16058034-a015-4b6e-0e57-08de69ba81a0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|82310400026|36860700013|376014|1800799024|7053199007;
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|7416014|82310400026|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?R2lwU2x0RTRoV1A5WFVnUlg1ak1JUFZDS2kza1VSSDhuMktwY21FNTNya25J?=
- =?utf-8?B?RDdlTVVzRGhZRThUaVlqeVJha0srQlNJeHorci9TQm05bXdnQ0xGYjFudzRY?=
- =?utf-8?B?NTYyQVd2cHpsWEtVbzUxN3VZRnBVVUw0SEVOekFzMW8zQUxrWWpoZTRFZERQ?=
- =?utf-8?B?WXhQUGx4VTgyZVF6WmtjYStJVXhqY2VzUEp4L3dSQUo1Nmc1QWhhdm55Nnpw?=
- =?utf-8?B?SEZ5b2ppM3J3dDM1ZFdYRCtUY1lCV1p1Wmd0ZURSK0J0c0R5aDg4cW5tSE5s?=
- =?utf-8?B?dzlieHBheldYOEFqQXErY3Z0YlJuZy9jdk5SclpuZGhyeUkxWmtkNXd0dldY?=
- =?utf-8?B?MUlvL0RGcjFPTFY0YzExNlU0RGdRL0FjTFNjQk15V2VHZWpBSjZFUi82bW8z?=
- =?utf-8?B?aU1mSHM5bzFwbGRsNk92Y3JmR2pZVmJuSW82Q2U3UlZVSmltRkkxS0Q0bEQ3?=
- =?utf-8?B?ZloyTVFZWTJOYldKd3VtY0h3ejdOZjYyUUYwc1YrdGhuWVJoNHdqMHhRenV5?=
- =?utf-8?B?NG5NTmtVZTlzOU1iYncwQ1kyakV4WFZtT0dXTUVmaFhSWWZHY0hKaWwyUnVC?=
- =?utf-8?B?TDAvRFkzMzZDUTZ1Sm93S3ZlOEFubzRLZmxRVWV0eDdSWVdPM0c3ck44Y1Zp?=
- =?utf-8?B?YktrMmRBSmplbTAvUVBCTGdnK3Z1UVRtNW9vNmtQamozVUJVRGhMR21VNEYx?=
- =?utf-8?B?NUkxTHRDMWgwc3p6YmYzbXl0KzBzOUQ2SGRFNW5rV2pYRFEwbUwyTWFoYWxX?=
- =?utf-8?B?bDB4UlRSc0M1WHJhR1dyOHlPd2h3Z0tRaG5JMWs2RElpME45amxHOFRpYi9I?=
- =?utf-8?B?cC9vWEdiZ2YwU1pTWGlrT3owaG5SdnhpL0tKTmJjek52eGNrVkF1N1FpeVgz?=
- =?utf-8?B?ZWgwWXVSb0x5bkptZ2Nsdi9ZazE5SWlPOFRxOTV1ZE95ZldRV2tIOHhHMGw5?=
- =?utf-8?B?Yk5YeFZCTklZajlTdkJCTDNJV1d4TFpiQ0liZGk2WkhPejdCY1FSWU43ckpi?=
- =?utf-8?B?RVFjT0pGamE1Sm14YTlTcHNGV1FjQi85ZENpL3UvbWd3WFVzUXV2bDRtZmdw?=
- =?utf-8?B?MWRrMmxaVldXaWNMYnRRcFJROFVYT01zUlRiSWJvd25PUkIvL0EyQWs3dXVQ?=
- =?utf-8?B?dzlSbUg2UGd4aFlkTW5CeThleXZiT3AvMTlGZmtJRUY3L2NjMDlWMnJ6SGVt?=
- =?utf-8?B?S09iVWlJWmVPcnViaGJ2UnFnSlptbldrb2RiSG9vM1NFN1ZkQ0MweEJyRzYr?=
- =?utf-8?B?cm94UG5XdUhYSURJR2doUUw4aENCZWFscldtZWtoVTIrNHBBM0xTeG1GdVhl?=
- =?utf-8?B?SUhHcFNUaVRDWDkwaDhYODZzeVJTUjNBSWZRTzkrVlpKQzNsM0dVcVM3eEVu?=
- =?utf-8?B?SElMOXFMRzUxRWJTYlhMeVRwd0YrUFJ0RERjU0YrZ2R4bERuVTBQN0FRWW1i?=
- =?utf-8?B?YXBRK3Z2Zm5YYWlTUFM4Tm1PRzNMNzBHZ1NFMnJiTXBCc0FSUXhCZGpHY0dn?=
- =?utf-8?B?aG1NL0JZWXc1ZjhhYnFaTE1qRTJkZkt5UjB5ak4yWjdoOUwvUUhkcTlTWFpQ?=
- =?utf-8?B?QTdaUlBHUDk5S08yRUp0K2tENFhCY1NncHpQTHBJZlpJQmRoTDN5cEJNSm4y?=
- =?utf-8?B?cVQ3eU1kVk5UNXlzazRUSFNRVU9UaXpSWThjUythekN5NEp2M2FmQmExaEgv?=
- =?utf-8?B?d01ENlVuV2dYNVlQajE4eHNGbXhwb1hENjBTa0NmNlFYTkR4SWJzMVhkSFpw?=
- =?utf-8?B?bWVrb1RCRGh3R2Q5NGV2alpZb0xJallEaDczc2tPVkk1SnQ0VE10M09idlQ1?=
- =?utf-8?B?enBZTlB6bXFWMUlXYUdTaUtoTkpvODRNR1duY01xS0ZNT0ZTTndOaCtXMTF1?=
- =?utf-8?B?Zi9DSGtsend1RW0zTTdyM2hVR05KM1RRMVR0K0NsMlM0ZmZhUnJJMDVaeW03?=
- =?utf-8?B?dlBQOEZVdzFuWkVjdTRCajVRVlNGdFNNWVdGbUY3dUZjQ2l3c0RtWDI5cUJX?=
- =?utf-8?B?dVJsUk5xaC96Y0RYcHdObHVTVzV5TVpjQkdDQlFQckJIZjJPRWdsa3lVVy9k?=
- =?utf-8?B?QWoxS1VibXhBYytPendPTXlHRnF2aVJEdGs0YmZLaWo3aDhDcmRYOEhqUkNo?=
- =?utf-8?B?cFdWK2NrenF5bldoRnBHMWRtcVRsZzBHdXQ5UVZvRmJkbkVlZCtSV0J5N3Er?=
- =?utf-8?B?cHV2dFZKMVBEZDFjc1BFcnFwUUh5RU1rVE1qSW9JMVM3ZHlpMmZITEtLRVRk?=
- =?utf-8?B?Q1ptRzhXZkwxWmdTNzBjYWFpTVlBPT0=?=
+	=?utf-8?B?S0pyN3lVZjRzVE9zdnhpR1RuS0JLZ21hVktxQXJldEVtVnIrczJNWFdKYlhi?=
+ =?utf-8?B?RnA4SHdKd0UwekNrMWFTY3VnSis0bGc4OTVSUmhQY08wSzV0OExEdTR6M21U?=
+ =?utf-8?B?d1J0Y1FKeENEaUd5Q3ZvMzQ5anZuWVBXcVJRV2MxNTlFUmpuTTNoSFNOM0U2?=
+ =?utf-8?B?b1lTOUMrbG93ZmxYMGVxbkZTQWNzOGFhSkFrZUVWczNpdWVwdlo4UmgvZ1lv?=
+ =?utf-8?B?bzJNaldvYTlJV2dEaVJNMXdUVElHQWdqQmIyOXVuQ050b0lPVW9XTGJBbXBW?=
+ =?utf-8?B?ZzF1bGY1SXJWR1FZZEVtUzl2TWxXMlFRS3I5azl3d3oxOVNUQXdReDFGdklC?=
+ =?utf-8?B?bEp1dGhFSUZSdEN6eTc0b1dCTVhQTlNOWkJmU2RnVFp5L1l6Z2dxM0tKVlND?=
+ =?utf-8?B?NlplaVdhdVBtNFVzeGQxMTE0SGxHb1FGYUZFN09rNEJIWEFyaStQaXdXMEND?=
+ =?utf-8?B?bzJVOUlSUzZJQkhoRXVFVHhPVDU3L0dUM2gxOVcrbDUrMkFFbnJ5aTZ1QVUw?=
+ =?utf-8?B?VDBIRFJ6UFhRaWMzdWNyZ3lvS3V4QnVvQ2E1NFNPQ3ZydmNiamhiaDA4SEc1?=
+ =?utf-8?B?K3RrWFlnRDNsS3FhSDZnbHNJUGNhZklqZEZLanZwb2lGQ2xtM3AzbG9IRExm?=
+ =?utf-8?B?QmVRait2Z0d2RWZoZm9lZFBQN0NBTVBmR1FXN3RFUGVnYm9EUjRiT01POXRo?=
+ =?utf-8?B?VzArM1o3YXpWTVZvRjRoT2RydEIwOSt1amhOcnlSNWJOY0ZHbThOOHlFLzBn?=
+ =?utf-8?B?eDZhZk1nWTJ0azVzK0RTUVRXWEZKNVNwbDlVcFQxVzVsbndCQWZPa0ZFeTVU?=
+ =?utf-8?B?TE4rT3ZJY1BaUjJEQTQrcUQxaGd2aUhEa2loRVhoaGZjVGlTcWdTOEtqNThJ?=
+ =?utf-8?B?RUc5YkFxSmpoS1NSdEIvKzFDRjlzQUs3NXRXNnAzSjVyZWtUWmRoZUZCM0Iw?=
+ =?utf-8?B?V3lCTUZlNjdPb3poSXF2MWtXTkI1UzdWS3RwbWFKZy9QVWJZaVoxOVJuT3Ns?=
+ =?utf-8?B?QXpUMklzb1pqVWovRUJPdmk5cWdhRzJKSXJkcG5YWlFPRHNPRFVjempFOTEr?=
+ =?utf-8?B?dWpHc3dQemVQL2FNSnhyOVUwTmNleS9icm0zSiszZWdSRnNoaG4zS0dxenRQ?=
+ =?utf-8?B?YWlVTTdZbnpMOGFwSlVIcEJlM2NWb0lOVXV1bmJXTWRTOGE3Z2RVUjZFY0hU?=
+ =?utf-8?B?L0thWTJHMGpjbFJKd1B0YkxsbGhVaTlSL1hIa2ZVOExNSlJxZkY0eUFmMkti?=
+ =?utf-8?B?MlpaQXQ1SktFajRXdWs2TGhOS0JwVWlteFZ1VFpjbjJFa0pMMTFHRDJBOGNF?=
+ =?utf-8?B?U2ZkcGlPS1lUV2JldHRNWDVKb0FaV21QRG54aG0vS1ByWjRqUVQ3RUxuSXVD?=
+ =?utf-8?B?ZWZodktEUU5sbWx2R1V0VmovNERXUlpYMWswbVFwRUFJY1BxRk80eE84VWlR?=
+ =?utf-8?B?Z2JiTjVBeW5naE42bG52dzM2c2hmNUY3bEFJUTA4UWl5dzczQmp6N2gvamNP?=
+ =?utf-8?B?N1diaytVZlgwNVQyT0NhR3d6T2o5NWZrcmt3L2VPOGh5YzNYN3g1anRHWnNF?=
+ =?utf-8?B?SkprR1FPeEZodTN1N3YxcXJhQnhhTFU3bEZpMCtLNWp2SEF6VDdtQzE5UzEv?=
+ =?utf-8?B?T2VCOGp5WmFVTVJmTXpsb3JEMGFEQnVoWTBDbGhJV2NVZ2V4M1NsTGNVbVN2?=
+ =?utf-8?B?Wm04cXhlUDczYy8rNUkyTDVvS21OR2hGMkNVdnMrelM3TVdtNnhsc0NITFNN?=
+ =?utf-8?B?NkVPRTUycjhvUk9xaVNtWGx6alBLbXNaSkNIMjdMOWpOU0l6cm1CbEZ6aUlS?=
+ =?utf-8?B?c3JZVXZSanlYR24xWFA2bEtIajRBbXZlc1ZFWWVicHNOZWhGenhNRy9GUEI1?=
+ =?utf-8?B?VlFZQmd1NDNndENvSnpXdEJOa1dQV09vSUdBTGhtSjBWMWVTOVJGeUdTLzky?=
+ =?utf-8?B?YlR6d09uSm5TZnNNM2lQbXRUWWt1dXQ3djBuZUNBU1FtSk5oYXBINmlPSEJa?=
+ =?utf-8?B?cmsxVmVHdklza2kzQlMrUU5JQmR5Q1NmUHRPM1hoNXh3OXRSUFFOT0l0Smd1?=
+ =?utf-8?B?TGhFSWFkTkRUcEpmKzl5QVV1UlFCbEhVY2NSMjlPRGtBVlVLNnVPbW5qTGZF?=
+ =?utf-8?B?Y3Q0TEFsRG5CNnZ5N3lYeU1UeEVsek9Dc2lUYUNQc1FUcFBQQkRKSUZSRURv?=
+ =?utf-8?B?RVdVN2JDWVgwck05RXdvN1RhbWkvYzJMRlIwYW5lM3NBZytOLzFtc25xUlpo?=
+ =?utf-8?B?cXU3c051dGVWcVJ0cVpMTitHWTZnPT0=?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(82310400026)(36860700013)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(7416014)(82310400026)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	+psRx/hty44fGpWd3GGtb7GtsXHTvqyHxfilGzM4msBtNwz6xhjDLdIqcuQ4hXojsgmZy5/Dx2Hkyq+3wdwMRJS0NPjEPgNCvSHQX9FC2ETprgoDLMxAyj/EfvpvtvEDbybDq65/tWHfoeaIA99etnokKkCK2gztSpbhHMNkFsg6m0VSzUMAQ3+spRKmT7XwyWpbhMBTVBzqbqxwUEYYMF7ZTQ2mpTQpMNZ+NkRf0GoE4Zsr3GvZ4m39eXJbZjPlbZX+HPPJLxn9w2eut1hfKBHy/+KKqco4Lb/8lGY29XcR84p5SfpgrIsuD1bFsY9XbSVaQT4+oY9So09y6NDbXw2Z3bvOx2iTnQQltF6/PDCsVl9JZOsjvdNn9BScUqv6iUcIleHzbwzuOx8KuvyQlTqtwD2P6OoFCNakf4OX3wuevf/SkFhfkerHbLMYzBTD
+	nADEchfcTt/PdnfW70QrpZZ+QYIgGUDJzTBJ47CUI8NgnbKBLKjYXrKJvVmXLItVB0uW4QhtGJak9IwCLZcmeAPVAUZ2pDyFXD/H1Twewxrd1nUvxdCleLlijMY8M5/5vdPlJ1AHCfaALynwLQPd/gmf0gRVZA7T328auUjdbGTM/ZqCfxeVA4p0XgwV+SzGgaMFkuOoAwtOjZ/Hcq15IBpogUaVAffUgZHy9Wc54DcgrRuw4yd20ka13JrAlm+n2Ol/PsPSP0L+anhV0WSaeRUQKbem7/QKrCXMXy3sFLhbuWakQRbzf0CmJI93x06XZXocmSjEi1f9EQhPDMJOUikhjCqH3I+OZcYbQ4rzwu8KyKxX1hw4DMBE3Xq5iznZbDRUv5fQ4ISVDYcnWAuWdPF7skPuPiIvNvXjracWlzLbBxxJAIfjgZzCtzaLMeNT
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2026 22:11:14.8118
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2026 22:11:29.1426
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c19a5991-b7c8-4d39-b9e7-08de69ba790c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16058034-a015-4b6e-0e57-08de69ba81a0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075ED.namprd03.prod.outlook.com
+	CO1PEPF000075F0.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV0PR12MB999068
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7106
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[benjamin.cheatham@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,huawei.com:email,amd.com:mid,amd.com:dkim,amd.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email,stgolabs.net:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,huawei.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim,amd.com:email,nvidia.com:email];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258367-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258368-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[amd.com:+]
-X-Rspamd-Queue-Id: BD2DF128032
+X-Rspamd-Queue-Id: 8C4C3128056
 X-Rspamd-Action: no action
 
 On 2/1/2026 9:54 AM, alejandro.lucero-palau@amd.com wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Current code is expecting Type3 or CXL_DECODER_HOSTONLYMEM devices only.
-> Support for Type2 implies region type needs to be based on the endpoint
-> type HDM-D[B] instead.
+> Region creation based on Type3 devices is triggered from user space
+> allowing memory combination through interleaving.
+> 
+> In preparation for kernel driven region creation, that is Type2 drivers
+> triggering region creation backed with its advertised CXL memory, factor
+> out a common helper from the user-sysfs region setup for interleave ways.
 > 
 > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 > Reviewed-by: Zhi Wang <zhiw@nvidia.com>
@@ -204,60 +206,89 @@ On 2/1/2026 9:54 AM, alejandro.lucero-palau@amd.com wrote:
 > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 > Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
 > Reviewed-by: Alison Schofield <alison.schofield@intel.com>
-> Reviewed-by: Davidlohr Bueso <daves@stgolabs.net>
 > ---
->  drivers/cxl/core/region.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  drivers/cxl/core/region.c | 43 ++++++++++++++++++++++++---------------
+>  1 file changed, 27 insertions(+), 16 deletions(-)
 > 
 > diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index bdefd088f5f1..f53b2e9fd9e6 100644
+> index f53b2e9fd9e6..ece1d3df7cf1 100644
 > --- a/drivers/cxl/core/region.c
 > +++ b/drivers/cxl/core/region.c
-> @@ -2833,7 +2833,8 @@ static ssize_t create_ram_region_show(struct device *dev,
->  }
+> @@ -485,22 +485,14 @@ static ssize_t interleave_ways_show(struct device *dev,
 >  
->  static struct cxl_region *__create_region(struct cxl_root_decoder *cxlrd,
-> -					  enum cxl_partition_mode mode, int id)
-> +					  enum cxl_partition_mode mode, int id,
-> +					  enum cxl_decoder_type target_type)
->  {
->  	int rc;
+>  static const struct attribute_group *get_cxl_region_target_group(void);
 >  
-> @@ -2855,7 +2856,7 @@ static struct cxl_region *__create_region(struct cxl_root_decoder *cxlrd,
->  		return ERR_PTR(-EBUSY);
->  	}
->  
-> -	return devm_cxl_add_region(cxlrd, id, mode, CXL_DECODER_HOSTONLYMEM);
-> +	return devm_cxl_add_region(cxlrd, id, mode, target_type);
->  }
->  
->  static ssize_t create_region_store(struct device *dev, const char *buf,
-> @@ -2869,7 +2870,7 @@ static ssize_t create_region_store(struct device *dev, const char *buf,
->  	if (rc != 1)
->  		return -EINVAL;
->  
-> -	cxlr = __create_region(cxlrd, mode, id);
-> +	cxlr = __create_region(cxlrd, mode, id, CXL_DECODER_HOSTONLYMEM);
+> -static ssize_t interleave_ways_store(struct device *dev,
+> -				     struct device_attribute *attr,
+> -				     const char *buf, size_t len)
+> +static int set_interleave_ways(struct cxl_region *cxlr, int val)
 
-I haven't read the ABI docs, but would it be worthwhile to update the documentation for this attribute
-to mention it only makes type 3 regions? I'm flip-flopping on whether it's worth the trouble but thought
-I should mention it.
-
-Either way:
+@val should probably stay an unsigned int. You pass an unsigned int in the sysfs function, and the
+function was originally coded with that in mind (same with @save below). With that cleaned up:
 Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
 
->  	if (IS_ERR(cxlr))
->  		return PTR_ERR(cxlr);
+>  {
+> -	struct cxl_root_decoder *cxlrd = to_cxl_root_decoder(dev->parent);
+> +	struct cxl_root_decoder *cxlrd = to_cxl_root_decoder(cxlr->dev.parent);
+>  	struct cxl_decoder *cxld = &cxlrd->cxlsd.cxld;
+> -	struct cxl_region *cxlr = to_cxl_region(dev);
+>  	struct cxl_region_params *p = &cxlr->params;
+> -	unsigned int val, save;
+> -	int rc;
+> +	int save, rc;
+>  	u8 iw;
 >  
-> @@ -4036,7 +4037,8 @@ static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+> -	rc = kstrtouint(buf, 0, &val);
+> -	if (rc)
+> -		return rc;
+> -
+>  	rc = ways_to_eiw(val, &iw);
+>  	if (rc)
+>  		return rc;
+> @@ -515,9 +507,7 @@ static ssize_t interleave_ways_store(struct device *dev,
+>  		return -EINVAL;
+>  	}
 >  
->  	do {
->  		cxlr = __create_region(cxlrd, cxlds->part[part].mode,
-> -				       atomic_read(&cxlrd->region_id));
-> +				       atomic_read(&cxlrd->region_id),
-> +				       cxled->cxld.target_type);
->  	} while (IS_ERR(cxlr) && PTR_ERR(cxlr) == -EBUSY);
+> -	ACQUIRE(rwsem_write_kill, rwsem)(&cxl_rwsem.region);
+> -	if ((rc = ACQUIRE_ERR(rwsem_write_kill, &rwsem)))
+> -		return rc;
+> +	lockdep_assert_held_write(&cxl_rwsem.region);
 >  
->  	if (IS_ERR(cxlr)) {
+>  	if (p->state >= CXL_CONFIG_INTERLEAVE_ACTIVE)
+>  		return -EBUSY;
+> @@ -525,10 +515,31 @@ static ssize_t interleave_ways_store(struct device *dev,
+>  	save = p->interleave_ways;
+>  	p->interleave_ways = val;
+>  	rc = sysfs_update_group(&cxlr->dev.kobj, get_cxl_region_target_group());
+> -	if (rc) {
+> +	if (rc)
+>  		p->interleave_ways = save;
+> +
+> +	return rc;
+> +}
+> +
+> +static ssize_t interleave_ways_store(struct device *dev,
+> +				     struct device_attribute *attr,
+> +				     const char *buf, size_t len)
+> +{
+> +	struct cxl_region *cxlr = to_cxl_region(dev);
+> +	unsigned int val;
+> +	int rc;
+> +
+> +	rc = kstrtouint(buf, 0, &val);
+> +	if (rc)
+> +		return rc;
+> +
+> +	ACQUIRE(rwsem_write_kill, rwsem)(&cxl_rwsem.region);
+> +	if ((rc = ACQUIRE_ERR(rwsem_write_kill, &rwsem)))
+> +		return rc;
+> +
+> +	rc = set_interleave_ways(cxlr, val);
+> +	if (rc)
+>  		return rc;
+> -	}
+>  
+>  	return len;
+>  }
 
 
