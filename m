@@ -1,75 +1,61 @@
-Return-Path: <netdev+bounces-258290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHH9FJaMjGn5qwAAu9opvQ
-	(envelope-from <netdev+bounces-258290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 15:05:10 +0100
+	id AKWMLfSMjGn5qwAAu9opvQ
+	(envelope-from <netdev+bounces-258291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 15:06:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A351250D0
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 15:05:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1948E1250E6
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 15:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 49EF0300C248
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 14:05:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 235913012E87
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 14:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8694229BD89;
-	Wed, 11 Feb 2026 14:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4049B2C026E;
+	Wed, 11 Feb 2026 14:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yXBArCCX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BbgvUFcp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E52929993E;
-	Wed, 11 Feb 2026 14:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9662BF00A;
+	Wed, 11 Feb 2026 14:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770818702; cv=none; b=Praour+2Bu4giqCuLKa/og622ToUzv+JHhKysS0MEIm1ip/sGQ3zPpVt3rsKumYDmIXFJeuLoMREY+BIxmqTDhdQyRoGWBWDc+5rCZ5ivHTXhOsMD2yP2CrI+Nl3UUqYsHuT31DBqSOWssM8ci6VJON2vz5iYbgCvaGVKyp9G5w=
+	t=1770818800; cv=none; b=VRdlRfGoZ/WCqh1a05Ebk8EE5WDaMSMiXjPAFGnBdn1N2NYyriuQoWLBDjbppgmYjp3cFzbNFPCfZ5qSoo2LqJzxa4cfGajNJxD6aHfAIzqafQwryGnm21GVFRVJTGHmry/uuzd0AixtBqf89YwLcsLcYn746h0wf4QFribQJaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770818702; c=relaxed/simple;
-	bh=6D4INZaMdeljtfKkSegaqRYyuz4jDJMZcc/4/M+19Lw=;
+	s=arc-20240116; t=1770818800; c=relaxed/simple;
+	bh=+ZY2hC9Nf4WFIOZX5tMFvL7e5tJDu/RsbdiAfCOMESQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CmBdVvFWlqeFJ3DekFlbe5qHfGd5USesUP5jMiMSfZxLeA9I82ZKDf9vSrXS1V6gbLCCYCXqsc31YNifS/r8aojIuUspyDZJadca4unZQlP5OtuebvkCwkcK2hreqGa/jYPQrsLSfW7ipBLwzrpiwa8VJniF0lW4/I5AjXbF6KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yXBArCCX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=goJkCgqmhNLw0pIAnPED82g9oHuiqbn/RWVxFtVCoTk=; b=yXBArCCXcQn4duj1qTf5aY+0ZS
-	jmR6Yf/40AdXLkuq3kvzXZlhXLpyB1We839Hy4kk88QRjWw9aj7uXYOWk0Rg7OdTnY+VrrrfXXemU
-	45FGbbH0GoTXQLZkAxf2N6vWTQGsDyNOIW9JlZiI3i3fjeRDUccNF8NgJJw1Tz74UZmfw7/x35roc
-	B5fIAXhstwkqa7wLqMlORKY/ix81x/gxnXFbKPP36FmTX7LABp6c5AF/5e35TKyExTxyC1mL6X0u+
-	csehbSEy8Ovbv8usRCOc0aAP/2tSMHOwFuslKQbvXDsLOhAEiSpj2d0zwS27xNqZxU2UVByyLGaS7
-	pfTHcA7Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49456)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vqApn-000000003UG-3NRf;
-	Wed, 11 Feb 2026 14:04:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vqApk-000000003p6-3ZAV;
-	Wed, 11 Feb 2026 14:04:48 +0000
-Date: Wed, 11 Feb 2026 14:04:48 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, hkallweit1@gmail.com, andrew@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net] net: phy: dp83869: Set auto mdix bit for forced
- 100Base-Tx mode
-Message-ID: <aYyMgK73UtBd6vqc@shell.armlinux.org.uk>
-References: <20260211131033.2525617-1-m-malladi@ti.com>
- <aYyDkaynWEm-WJdg@shell.armlinux.org.uk>
- <b500116b-afdc-4e5b-af4b-6c1e15116111@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=h6N3ZiXVWMFnxuU7ng2uI6C0KA3qaDMhnUMwioVg4NKbtqxeLx6ivhs5uoFVTrhzRQ9u98BbTQ9mEY5o8+5P7y8KOxLl9cw/jqNt9Up0fh+46r1gVVSXE18NrGvByrM3BxQZyJyraomGCJZWJWn7stYfRutyoST4fD29T9x8IFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BbgvUFcp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04725C4CEF7;
+	Wed, 11 Feb 2026 14:06:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770818799;
+	bh=+ZY2hC9Nf4WFIOZX5tMFvL7e5tJDu/RsbdiAfCOMESQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BbgvUFcp+H17pUDZuFBX5Q9ou0GxXC00cqAeGp7NGc2fDFt0ZSgFYTcTvWuNlds1r
+	 2oQeHA4bYR9CViMyl4ehjrkm8fjPdffIDpJ/gDPPhzlaQqOOnzOz7Z7j2OjEmcNo+L
+	 U2dseUlIS2O+W/Wd/y3Xfr5TqN7YnDMM/uRmAM90UzK9BQz5TXY0mhwoiWGwT6B11s
+	 IEjl2SHUX4KFMDKK4+zYQxdfrE/JzNmdfuR3WSbJhf18J7IeEqux/kAaLJcJzLy0YY
+	 jxuf+rlthPm4qiS7ZQg5Vi4QWzWxakrCavKYFOOnYJKXp6lv2w8Q6Ze94zA+hueRPc
+	 FdQLCAiGBJ1YA==
+Date: Wed, 11 Feb 2026 08:06:35 -0600
+From: Bjorn Andersson <andersson@kernel.org>
+To: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bjorn.andersson@oss.qualcomm.com, chris.lew@oss.qualcomm.com, 
+	Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+Subject: Re: [PATCH] net: qrtr: Expand control port access to root
+Message-ID: <3bd7zvejjl6slge277gv2pfktqc45rcgu6fpmmd7zm2lpnq26d@avrdwhy5zpmz>
+References: <20260205-qrtr-control-port-access-permission-v1-1-e900039e92d5@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,118 +64,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b500116b-afdc-4e5b-af4b-6c1e15116111@ti.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20260205-qrtr-control-port-access-permission-v1-1-e900039e92d5@oss.qualcomm.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258290-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,gmail.com,lunn.ch,vger.kernel.org,ti.com];
+	TAGGED_FROM(0.00)[bounces-258291-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:url,ti.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: B0A351250D0
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1948E1250E6
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 07:23:12PM +0530, Meghana Malladi wrote:
-> Hi Russell,
+On Thu, Feb 05, 2026 at 01:51:31PM +0530, Vishnu Santhosh wrote:
+> When qrtr is loaded as module, qrtr-ns runs from SELinux kmod_t
+> domain.
+
+It wasn't clear to me that "qrtr-ns" refers to the net/qrtr/ns.c, not
+the deprecated "qrtr-ns" utility, until I spoke with Chris last night.
+
+Perhaps it's just me, but I would appreciate if this was made a bit
+clearer. Writing "QRTR NS" instead of "qrtr-ns" would have been
+sufficient.
+
+Regards,
+Bjorn
+
+> On targets using upstream SELinux policies, this domain
+> does not receive CAP_NET_ADMIN, which prevents it from binding
+> control port even though qrtr-ns is a trusted system component.
 > 
-> On 2/11/26 18:56, Russell King (Oracle) wrote:
-> > On Wed, Feb 11, 2026 at 06:40:32PM +0530, Meghana Malladi wrote:
-> > > When using DP83869 in force 100Base-Tx mode, the PHY is required
-> > > to have robust Auto-MDIX feature enabled from register 1Eh.
-> > > Refer to 7.4.1.2 100BASE-TX section in the TRM [1] for more details.
-> > > 
-> > > [1]: https://www.ti.com/lit/ds/symlink/dp83869hm.pdf
-> > > Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> > > ---
-> > >   drivers/net/phy/dp83869.c | 19 +++++++++++++++++++
-> > >   1 file changed, 19 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
-> > > index 1f381d7b13ff..70d759c45c6a 100644
-> > > --- a/drivers/net/phy/dp83869.c
-> > > +++ b/drivers/net/phy/dp83869.c
-> > > @@ -110,6 +110,7 @@
-> > >   /* CFG4 bits */
-> > >   #define DP83869_INT_OE	BIT(7)
-> > > +#define DP83869_CFG4_ENABLE_AUTO_MDIX_100FD	BIT(9)
-> > >   /* OP MODE */
-> > >   #define DP83869_OP_MODE_MII			BIT(5)
-> > > @@ -900,6 +901,23 @@ static int dp83869_phy_reset(struct phy_device *phydev)
-> > >   	return dp83869_config_init(phydev);
-> > >   }
-> > > +static void dp83869_link_change_notify(struct phy_device *phydev)
-> > > +{
-> > > +	int cfg4;
-> > > +
-> > > +	/* When using DP83869 in force 100Base-Tx mode, the PHY is required
-> > > +	 * to have robust Auto-MDIX feature enabled
-> > > +	 */
-> > > +	if (phydev->autoneg == AUTONEG_DISABLE &&
-> > > +	    phydev->speed == SPEED_100 &&
-> > > +	    phydev->duplex == DUPLEX_FULL) {
-> > > +		cfg4 = phy_read(phydev, DP83869_CFG4);
-> > > +		if (cfg4 >= 0) {
-> > > +			cfg4 |= DP83869_CFG4_ENABLE_AUTO_MDIX_100FD;
-> > > +			phy_write(phydev, DP83869_CFG4, cfg4);
-> > > +		}
-> > > +	}
-> > 
-> > Shouldn't this kind of configuration be done via .config_aneg() ?
-> > 
+> Granting kmod_t the CAP_NET_ADMIN capability in policy is possible,
+> but not desirable, as kmod_t is not expected to perform networking
+> operations and widening its capability set is discouraged.
 > 
-> AFAIK, in case of fixed mode, auto-neg might not be triggered all the time.
-> In the phy_ethtool_ksettings_set() function, auto-neg is initiated only if
-> the PHY hasn't started. PHY drivers are new to me, please do correct me if I
-> am wrong.
-
-In phy_ethtool_ksettings_set():
-
-        /* Restart the PHY */
-        if (phy_is_started(phydev)) {
-                phydev->state = PHY_UP;
-                phy_trigger_machine(phydev);
-        } else {
-                _phy_start_aneg(phydev);
-        }
-
-If the PHY is started, then the state machine is triggered. That
-will result in phy_state_machine() being called.
-
-This calls _phy_state_machine(), which, as phydev->state is set to
-PHY_UP, will set state_work = PHY_STATE_WORK_ANEG. This will then
-result in:
-
-        if (state_work == PHY_STATE_WORK_ANEG) {
-                err = _phy_start_aneg(phydev);
-                func = &_phy_start_aneg;
-        }
-
-which also results in _phy_start_aneg() being called, and thus the
-.config_aneg() method.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> To address this in a contained way within qrtr, extend the control
+> port permission check to allow binding when either:
+> 
+>   - the process has CAP_NET_ADMIN, or
+>   - the process belongs to GLOBAL_ROOT_GID (root-equivalent tasks)
+> 
+> This permits qrtr-ns to successfully bind its control port in
+> kmod_t restricted environments without broadening SELinux capability
+> assignments.
+> 
+> Co-developed-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+> Signed-off-by: Deepak Kumar Singh <deepak.singh@oss.qualcomm.com>
+> Signed-off-by: Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+> ---
+>  net/qrtr/af_qrtr.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+> index dab839f61ee93b876021d904ae6b8dca8ed43745..b0e252c16f156c05973988fbdf317a149ad9840d 100644
+> --- a/net/qrtr/af_qrtr.c
+> +++ b/net/qrtr/af_qrtr.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/qrtr.h>
+>  #include <linux/termios.h>	/* For TIOCINQ/OUTQ */
+>  #include <linux/spinlock.h>
+> +#include <linux/uidgid.h>
+>  #include <linux/wait.h>
+>  
+>  #include <net/sock.h>
+> @@ -738,7 +739,8 @@ static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
+>  	if (!*port) {
+>  		rc = xa_alloc(&qrtr_ports, port, ipc, QRTR_EPH_PORT_RANGE,
+>  				GFP_KERNEL);
+> -	} else if (*port < QRTR_MIN_EPH_SOCKET && !capable(CAP_NET_ADMIN)) {
+> +	} else if (*port < QRTR_MIN_EPH_SOCKET && !(capable(CAP_NET_ADMIN) ||
+> +						   in_egroup_p(GLOBAL_ROOT_GID))) {
+>  		rc = -EACCES;
+>  	} else if (*port == QRTR_PORT_CTRL) {
+>  		rc = xa_insert(&qrtr_ports, 0, ipc, GFP_KERNEL);
+> 
+> ---
+> base-commit: f14faaf3a1fb3b9e4cf2e56269711fb85fba9458
+> change-id: 20260205-qrtr-control-port-access-permission-bfea19994a58
+> 
+> Best regards,
+> -- 
+> Vishnu Santhosh <vishnu.santhosh@oss.qualcomm.com>
+> 
 
