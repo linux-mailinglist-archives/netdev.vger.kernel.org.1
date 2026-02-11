@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-258273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OC1bA6VxjGn6oAAAu9opvQ
-	(envelope-from <netdev+bounces-258273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:10:13 +0100
+	id iKPyJ/5zjGk6ogAAu9opvQ
+	(envelope-from <netdev+bounces-258274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:20:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B198412419A
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:10:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 563DE12426F
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 00CF030059AA
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:10:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D3E71300615F
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CFE32E745;
-	Wed, 11 Feb 2026 12:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8F2334C00;
+	Wed, 11 Feb 2026 12:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cd1Z1fD2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfvrVchq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FB2315D5B
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 12:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA79331A73;
+	Wed, 11 Feb 2026 12:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770811810; cv=none; b=aBU1RYvgCU7db1Rfb/cNnGE+G1U8nEb+VNs7amo5kRYXlegg4dmWKasTVGsRhz6FDZ8mmXUQlB//lrK9FcmqBCZXtl/leMhHwguvHnvvUzCiReW4b/zo3lmQCNF39p2ezdNACyNLo8IFePmZQjD52NcyU7wQJVBZdfvZF9Bb2Is=
+	t=1770812411; cv=none; b=VcUjLlB58GG8D/2lSEuYlkKIgFzHqiG81nDpDCHjqkIAgf8LaKcHtIc7jC5WeWnZK1CbXymG0OZYOkVZ/enfImaSjz1ywv94UIUG1fjsVtiOFLqiR0M2IVrNgTwE8yVIzaz7O1LO2KdM59WmIoZug9TU/4WRBfr6KJMFSuvyraM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770811810; c=relaxed/simple;
-	bh=Av8+X3JjK21kCvCK1JiIl1odIiTzoxX4sKQ3R7cFedY=;
+	s=arc-20240116; t=1770812411; c=relaxed/simple;
+	bh=zR01tu8qtOqlsjZrEvDTStBAXi/A/arNnssfZuQkkF0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MZ9F/5QF2E8fyFqve0mPGjaV8VkKXNSM0IdWm3hlkbG9E8zPF1aH84qvFTEIU0K292Ah3/sr8zxkw8KUQIfHsuBjFJ8wsQ5ar1EZP8nB1ZRVxITNz2lk6qSya1qq2sUf1bnj5BEvnB0XOsJq1XbSawfapUvdThrK7xbzAbGmEKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cd1Z1fD2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D120C4CEF7;
-	Wed, 11 Feb 2026 12:10:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Au8G//Y7757U+fnKTQITUye4q5+ewMjB7NcFRWkaAOhih2RW4RJBbun6c/V48amNAfAcMofVdKH6CnsdxRat1d7zD5gk3C4SbvD0UTiCXetfQVI7OyG4+O+U53tQ0H7iAi4fif1vmWxRVt5XomI0A92RVUwQIJljaAaHUsHfk+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfvrVchq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08EBC4CEF7;
+	Wed, 11 Feb 2026 12:20:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770811810;
-	bh=Av8+X3JjK21kCvCK1JiIl1odIiTzoxX4sKQ3R7cFedY=;
+	s=k20201202; t=1770812410;
+	bh=zR01tu8qtOqlsjZrEvDTStBAXi/A/arNnssfZuQkkF0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cd1Z1fD22uP2RAYrwfoV/SlOaic96yHijI6hRRu4/yq4DGVoewJnssdduiETic+5r
-	 BjVt2cHRzpMTosuGfIKJ+Z8gigNp3fj7PGwe8GgDPJgCfa26Ham2dZZmTPXrR9yvCT
-	 XIcHQvWjK9ZXTfe6KHtExY4YcdPw71CvYZpRknwGEjQVKS64EnKRYMyiLu/vAIcuZc
-	 m09s3Y0/woY41FqmXEIwq0VzeSruMfvMAqJibrydi5wmTkurkRwnD+NHvrhx9bqH5/
-	 BxSH81Fo14tXY7vYJMnhhHxlLEoo+s3SMfwjRBgmLsK0RRVdN4ob9he7Kp8NT3Zly0
-	 J3BhmQQ69ByUw==
+	b=NfvrVchqlqRw2uiGMLiRSbKQAkcLgYva7ORgdYoO4FK9V+2YFeNuosj4cMH7GlBn5
+	 PMio5odQnlibrlLtrbXqLcyyKy35UPqLsR/u4GFyeZVcjYnQaFrNWWjmxojCJh/Mlw
+	 JA7qCvdy1/I772bNykohZxUzg2QZ1vzeFBMjVqcubNpjQilyJw8QCXCKcSp40OXytX
+	 yV6vOiH7mt8QLY7x/ppVYYAazXy/CizAJcCc4JMDeGiQ60YkUQ95fYTLmNX5TMbnBI
+	 JLD+d703AGTUbPa9JPDWTHcvvhOgi8Qhkwl3TxIbLnrXork8femv4z6BYfWKyB14F1
+	 QheZguq57GZVw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 47FFC39E9615;
-	Wed, 11 Feb 2026 12:10:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C23DF39E9615;
+	Wed, 11 Feb 2026 12:20:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,20 +55,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] af_unix: Fix memleak of newsk in
- unix_stream_connect().
+Subject: Re: [PATCH net] net: macb: Fix tx/rx malfunction after phy link down
+ and up
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177081180508.147733.2873421321562093141.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Feb 2026 12:10:05 +0000
-References: <20260207232236.2557549-1-kuniyu@google.com>
-In-Reply-To: <20260207232236.2557549-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, brauner@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+ <177081240558.151200.5301148019351136409.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Feb 2026 12:20:05 +0000
+References: <20260208-macb-init-ring-v1-1-939a32c14635@gmail.com>
+In-Reply-To: <20260208-macb-init-ring-v1-1-939a32c14635@gmail.com>
+To: Kevin Hao <haokexin@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+ nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ xiaolei.wang@windriver.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
@@ -76,25 +78,26 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-258274-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-258273-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: B198412419A
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 563DE12426F
 X-Rspamd-Action: no action
 
 Hello:
@@ -102,21 +105,21 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sat,  7 Feb 2026 23:22:34 +0000 you wrote:
-> When prepare_peercred() fails in unix_stream_connect(),
-> unix_release_sock() is not called for newsk, and the memory
-> is leaked.
-> 
-> Let's move prepare_peercred() before unix_create1().
-> 
-> Fixes: fd0a109a0f6b ("net, pidfs: prepare for handing out pidfds for reaped sk->sk_peer_pid")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+On Sun, 08 Feb 2026 16:45:52 +0800 you wrote:
+> In commit 99537d5c476c ("net: macb: Relocate mog_init_rings() callback
+> from macb_mac_link_up() to macb_open()"), the mog_init_rings() callback
+> was moved from macb_mac_link_up() to macb_open() to resolve a deadlock
+> issue. However, this change introduced a tx/rx malfunction following
+> phy link down and up events. The issue arises from a mismatch between
+> the software queue->tx_head, queue->tx_tail, queue->rx_prepared_head,
+> and queue->rx_tail values and the hardware's internal tx/rx queue
+> pointers.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1,net] af_unix: Fix memleak of newsk in unix_stream_connect().
-    https://git.kernel.org/netdev/net/c/6884028cd7f2
+  - [net] net: macb: Fix tx/rx malfunction after phy link down and up
+    https://git.kernel.org/netdev/net/c/bf9cf80cab81
 
 You are awesome, thank you!
 -- 
