@@ -1,241 +1,431 @@
-Return-Path: <netdev+bounces-258249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gOITG95VjGnblAAAu9opvQ
-	(envelope-from <netdev+bounces-258249-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:11:42 +0100
+	id 4Os1JqRXjGm9lQAAu9opvQ
+	(envelope-from <netdev+bounces-258250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:19:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC9812336A
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:11:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 363A9123402
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 326513006099
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:11:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 064F4301724E
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED92366DBB;
-	Wed, 11 Feb 2026 10:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2AF361DCC;
+	Wed, 11 Feb 2026 10:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T0ELd9rp";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3kfR7uDB";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T0ELd9rp";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3kfR7uDB"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="njyjMbFa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1342352C42
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA8234DB7E
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770804695; cv=none; b=mxX4iXRT24aSY3XWHSbCY56K8eiHJEAqm+IVDkJpd8MZu8svveuAmGKG6G6DPbM1OKyRg7n0vnITaz5eBOWQsZ0mjPPcbRBanQnThn3uI+U8v8YHmaHaq/tymySZVn+o/is8CLOS/niLNDOjdXGN/1G+EXwnSJ4yi1mX/ah3T7E=
+	t=1770805151; cv=none; b=dKJU2DGu9bYv6REP6hYf6y84ugMyJFZDptsCnOkyYUknxASDZmljxrI0ajCyFvbsTYaOpRMxBOse/Xy7LtOpdRiY5FT/3Zv/0Fcs9Wq0EMQAE9fLgrR8SPq49ZiwH4RVU4joDOxtGC/NZtMlZtiVVOgAXGabgYrqLx287OKt/MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770804695; c=relaxed/simple;
-	bh=BmrKY88RA44qBiFPniVS3X4o1q98MiP9r2hyBl4pPZo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J2TfUA3jFM51J4d3Yek2up90u+lRNv9Z4yZquabWH1dqQP1YdiiDk60o6n8d3Hz7a6v9Zd/2cupZAiRh89FscXt5H57lMisQxvAM1aNKCeoHsrb9oB5chYw0sq25i4qT31h5qUvb4NnQW4y7/uTBoxGY7zrPKoyqPF0Vgy4J6YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T0ELd9rp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3kfR7uDB; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T0ELd9rp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3kfR7uDB; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AEC213E714;
-	Wed, 11 Feb 2026 10:11:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1770804691; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
-	b=T0ELd9rp3GeVuj4TLdR3dr/hNb0Cika9yzBgRs0FhiSWSc1MqQAnL97RrY4vOwPUe2vk7I
-	i8LRVFFyq//INL2tUz0svYT+yDeB8UMWTAXYhOJeUmKub3ubxVRg0j+o4+X5aZdFMrFsx2
-	RsZJHaYUr9Yo2a31l+htisFCRymCH50=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1770804691;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
-	b=3kfR7uDB3xl6HUy45/FpCoJY0wRcFUNW+QVuq26A6tfrURWVGS+PtqpD5CklnjcKYrVyci
-	o6e6rzNfZUyDu7Bg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=T0ELd9rp;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=3kfR7uDB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1770804691; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
-	b=T0ELd9rp3GeVuj4TLdR3dr/hNb0Cika9yzBgRs0FhiSWSc1MqQAnL97RrY4vOwPUe2vk7I
-	i8LRVFFyq//INL2tUz0svYT+yDeB8UMWTAXYhOJeUmKub3ubxVRg0j+o4+X5aZdFMrFsx2
-	RsZJHaYUr9Yo2a31l+htisFCRymCH50=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1770804691;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
-	b=3kfR7uDB3xl6HUy45/FpCoJY0wRcFUNW+QVuq26A6tfrURWVGS+PtqpD5CklnjcKYrVyci
-	o6e6rzNfZUyDu7Bg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3CBE93EA62;
-	Wed, 11 Feb 2026 10:11:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jH8IDtNVjGkKbQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 11 Feb 2026 10:11:31 +0000
-Message-ID: <183f1ce7-d45f-49cf-8dec-570a7e11dc9f@suse.cz>
-Date: Wed, 11 Feb 2026 11:11:30 +0100
+	s=arc-20240116; t=1770805151; c=relaxed/simple;
+	bh=7jw5QFAMAvh4d+0ne06QcvewixWKkd9/l/IjHOMTU4I=;
+	h=Mime-Version:Subject:From:To:CC:Message-ID:Date:Content-Type:
+	 References; b=lEPRMiwQUh+oLvZgG+4DcDqa0hGSNhUyADGHNn0+CNk+frGYZ4w4TTXJ6sGCNZMkrTJyNuSjZXyx3GGg7kcsAnIkGXTskzlnv/oMxQiZGXw6X7oRlObHOdg7uK9r85n0JW3ZUMPTT5zDkBd2/SAeeKRU4D2QANyWGP+1iBpKP0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=njyjMbFa; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260211101906epoutp049289d4714ea686975ce137606600870b~TKeYoxqbY0595505955epoutp041
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260211101906epoutp049289d4714ea686975ce137606600870b~TKeYoxqbY0595505955epoutp041
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1770805147;
+	bh=iDMMlySM1Jo+nM9UavTAc2yR+fhsJAauP+Y5/RjOquc=;
+	h=Subject:Reply-To:From:To:CC:Date:References:From;
+	b=njyjMbFaw/V0JIQnomD9eQBHo/RwrRvTg0KrarU3QNbez708nTjh43h1YlJ4gvol/
+	 wTu0SqN2nGOEXA3UCSEmQznTnXkwQkgTTAQqZ28suoi2TfSEN0xZ30WLHJpsaSf5Cx
+	 ICr+jEEfGlxufLd6t4vrRETc2mSdwIvmOrIi1dZA=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas1p1.samsung.com (KnoxPortal) with ESMTPS id
+	20260211101906epcas1p1d819653f0c43d8f0507c6a819ab34423~TKeX4w2JV2831728317epcas1p14;
+	Wed, 11 Feb 2026 10:19:06 +0000 (GMT)
+Received: from epcas1p2.samsung.com (unknown [182.195.38.195]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4f9vY56wK2z3hhT8; Wed, 11 Feb
+	2026 10:19:05 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] mm: introduce a new page type for page pool in page
- type
-Content-Language: en-US
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- akpm@linux-foundation.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
- ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
- kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
- baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
- asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
-References: <20260210114712.55072-1-byungchul@sk.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <20260210114712.55072-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+Mime-Version: 1.0
+Subject: [net,v3] ipv6: shorten reassembly timeout under fragment memory
+ pressure
+Reply-To: soukjin.bae@samsung.com
+Sender: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>
+From: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>,
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>, "kuba@kernel.org"
+	<kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>, "phil@nwl.cc"
+	<phil@nwl.cc>, "coreteam@netfilter.org" <coreteam@netfilter.org>,
+	"fw@strlen.de" <fw@strlen.de>, "pablo@netfilter.org" <pablo@netfilter.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20260211101905epcms1p79f189c8049846406ee0792804ca882ca@epcms1p7>
+Date: Wed, 11 Feb 2026 19:19:05 +0900
+X-CMS-MailID: 20260211101905epcms1p79f189c8049846406ee0792804ca882ca
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 101P
+cpgsPolicy: CPGSC10-711,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260211030048epcms1p54c6ed78458f57def8e3163032498ca00
+References: <CGME20260211030048epcms1p54c6ed78458f57def8e3163032498ca00@epcms1p7>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258249-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[suse.cz];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258250-lists,netdev=lfdr.de];
+	HAS_X_PRIO_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.cz,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.cz:mid,suse.cz:dkim,suse.cz:email,sk.com:email]
-X-Rspamd-Queue-Id: 9CC9812336A
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[samsung.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[soukjin.bae@samsung.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	HAS_REPLYTO(0.00)[soukjin.bae@samsung.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samsung.com:replyto,samsung.com:dkim,samsung.com:email]
+X-Rspamd-Queue-Id: 363A9123402
 X-Rspamd-Action: no action
 
-On 2/10/26 12:47, Byungchul Park wrote:
-> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> determine if a page belongs to a page pool.  However, with the planned
-> removal of @pp_magic, we should instead leverage the page_type in struct
-> page, such as PGTY_netpp, for this purpose.
-> 
-> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> netmem_clear_pp_magic().
-> 
-> Plus, add @page_type to struct net_iov at the same offset as struct page
-> so as to use the page_type APIs for struct net_iov as well.  While at it,
-> reorder @type and @owner in struct net_iov to avoid a hole and
-> increasing the struct size.
-> 
-> This work was inspired by the following link:
-> 
->   https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
-> 
-> While at it, move the sanity check for page pool to on the free path.
-> 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Acked-by: Zi Yan <ziy@nvidia.com>
-> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> ---
-> The following 'Acked-by's were given only for mm part:
-> 
->   Acked-by: David Hildenbrand <david@redhat.com>
->   Acked-by: Zi Yan <ziy@nvidia.com>
+ Changes in v2:
+- Fix build bot error and warnings
 
-Also for the mm parts:
 
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
 
-Thanks.
+From c7940e3dd728fdc58c8199bc031bf3f8f1e8a20f Mon Sep 17 00:00:00 2001
+From: Soukjin Bae <soukjin.bae@samsung.com>
+Date: Wed, 11 Feb 2026 11:20:23 +0900
+Subject: [PATCH] ipv6: shorten reassembly timeout under fragment memory
+ pressure
+
+Under heavy IPv6 fragmentation, incomplete fragment queues may persist
+for the full reassembly timeout even when fragment memory is under
+pressure.
+
+This can lead to prolonged retention of fragment queues that are unlikely
+to complete, causing newly arriving fragmented packets to be dropped due
+to memory exhaustion.
+
+Introduce an optional mechanism to shorten the IPv6 reassembly timeout
+when fragment memory usage exceeds the low threshold. Different timeout
+values are applied depending on the upper-layer protocol to balance
+eviction speed and completion probability.
+
+Signed-off-by: Soukjin Bae <soukjin.bae@samsung.com>
+---
+ MAINTAINERS                             |  5 ++
+ include/net/inet_frag.h                 |  4 ++
+ include/net/ip6_reasm_policy.h          | 17 +++++
+ net/ipv6/Kconfig                        | 10 +++
+ net/ipv6/netfilter/nf_conntrack_reasm.c | 29 +++++++++
+ net/ipv6/reassembly.c                   | 82 +++++++++++++++++++++++++
+ 6 files changed, 147 insertions(+)
+ create mode 100644 include/net/ip6_reasm_policy.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e08767323763..dacaf07080e6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -28893,3 +28893,8 @@ S:	Buried alive in reporters
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+ F:	*
+ F:	*/
++
++ADJUSTABLE FRAGMENT TIMER
++M:	Soukjin Bae <soukjin.bae@samsung.com>
++S:	Maintained
++F:	include/net/ip6_reasm_policy.h
+\ No newline at end of file
+diff --git a/include/net/inet_frag.h b/include/net/inet_frag.h
+index 365925c9d262..0fc88ef61ca3 100644
+--- a/include/net/inet_frag.h
++++ b/include/net/inet_frag.h
+@@ -15,6 +15,10 @@ struct fqdir {
+ 	long			high_thresh;
+ 	long			low_thresh;
+ 	int			timeout;
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	int			timeout_failed_tcp;
++	int			timeout_failed_udp;
++#endif
+ 	int			max_dist;
+ 	struct inet_frags	*f;
+ 	struct net		*net;
+diff --git a/include/net/ip6_reasm_policy.h b/include/net/ip6_reasm_policy.h
+new file mode 100644
+index 000000000000..994482a03bc0
+--- /dev/null
++++ b/include/net/ip6_reasm_policy.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _NET_IP6_REASM_POLICY_H
++#define _NET_IP6_REASM_POLICY_H
++
++struct sk_buff;
++struct frag_queue;
++
++void ip6_reasm_adjust_timer(struct frag_queue *fq,
++			    struct sk_buff *skb, int nhoff);
++
++/*
++ * Default IPv6 reassembly timeouts under fragment memory pressure
++ */
++#define IPV6_REASM_TIMEOUT_FAILED_TCP	3	/* 3 seconds */
++#define IPV6_REASM_TIMEOUT_FAILED_UDP	1	/* 1 second */
++
++#endif /* _NET_IP6_REASM_POLICY_H */
+diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
+index b8f9a8c0302e..6e8db60f6a4d 100644
+--- a/net/ipv6/Kconfig
++++ b/net/ipv6/Kconfig
+@@ -340,4 +340,14 @@ config IPV6_IOAM6_LWTUNNEL
+ 
+ 	  If unsure, say N.
+ 
++config IPV6_FRAG_TIMER_ADJ
++	bool "IPv6: Adjust reassembly timer on buffer starvation"
++	default n
++	help
++	  Enable dynamic adjustment of the IPv6 reassembly timer when the
++	  fragment memory usage exceeds the low threshold. This helps to
++	  quickly evict incomplete fragment queues, making room for new
++	  incoming fragments such as latency-sensitive IMS traffic.
++	  If unsure, say N.
++
+ endif # IPV6
+diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
+index 64ab23ff559b..39902fbd53aa 100644
+--- a/net/ipv6/netfilter/nf_conntrack_reasm.c
++++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
+@@ -30,6 +30,7 @@
+ #include <linux/module.h>
+ #include <net/netfilter/ipv6/nf_defrag_ipv6.h>
+ #include <net/netns/generic.h>
++#include <net/ip6_reasm_policy.h>
+ 
+ static const char nf_frags_cache_name[] = "nf-frags";
+ 
+@@ -62,6 +63,20 @@ static struct ctl_table nf_ct_frag6_sysctl_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_doulongvec_minmax,
+ 	},
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	{
++		.procname	= "nf_conntrack_frag6_timeout_failed_tcp",
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_jiffies,
++	},
++	{
++		.procname	= "nf_conntrack_frag6_timeout_failed_udp",
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_jiffies,
++	},
++#endif
+ };
+ 
+ static int nf_ct_frag6_sysctl_register(struct net *net)
+@@ -85,6 +100,10 @@ static int nf_ct_frag6_sysctl_register(struct net *net)
+ 	table[1].extra2	= &nf_frag->fqdir->high_thresh;
+ 	table[2].data	= &nf_frag->fqdir->high_thresh;
+ 	table[2].extra1	= &nf_frag->fqdir->low_thresh;
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	table[3].data	= &nf_frag->fqdir->timeout_failed_tcp;
++	table[4].data	= &nf_frag->fqdir->timeout_failed_udp;
++#endif
+ 
+ 	hdr = register_net_sysctl_sz(net, "net/netfilter", table,
+ 				     ARRAY_SIZE(nf_ct_frag6_sysctl_table));
+@@ -214,6 +233,10 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
+ 		}
+ 		fq->q.flags |= INET_FRAG_LAST_IN;
+ 		fq->q.len = end;
++
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++		ip6_reasm_adjust_timer(fq, skb, nhoff);
++#endif
+ 	} else {
+ 		/* Check if the fragment is rounded to 8 bytes.
+ 		 * Required by the RFC.
+@@ -513,6 +536,12 @@ static int nf_ct_net_init(struct net *net)
+ 	nf_frag->fqdir->high_thresh = IPV6_FRAG_HIGH_THRESH;
+ 	nf_frag->fqdir->low_thresh = IPV6_FRAG_LOW_THRESH;
+ 	nf_frag->fqdir->timeout = IPV6_FRAG_TIMEOUT;
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	nf_frag->fqdir->timeout_failed_tcp =
++		IPV6_REASM_TIMEOUT_FAILED_TCP * HZ;
++	nf_frag->fqdir->timeout_failed_udp =
++		IPV6_REASM_TIMEOUT_FAILED_UDP * HZ;
++#endif
+ 
+ 	res = nf_ct_frag6_sysctl_register(net);
+ 	if (res < 0)
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 25ec8001898d..cdec65461d81 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -57,6 +57,7 @@
+ #include <net/addrconf.h>
+ #include <net/ipv6_frag.h>
+ #include <net/inet_ecn.h>
++#include <net/ip6_reasm_policy.h>
+ 
+ static const char ip6_frag_cache_name[] = "ip6-frags";
+ 
+@@ -104,6 +105,59 @@ fq_find(struct net *net, __be32 id, const struct ipv6hdr *hdr, int iif)
+ 	return container_of(q, struct frag_queue, q);
+ }
+ 
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++static u8 ip6_reasm_get_l4proto(struct sk_buff *skb, int nhoff)
++{
++	struct frag_hdr _fhdr, *fhdr;
++	__be16 frag_off;
++	int offset;
++	u8 nexthdr;
++
++	fhdr = skb_header_pointer(skb, nhoff, sizeof(_fhdr), &_fhdr);
++	if (!fhdr)
++		return IPPROTO_NONE;
++
++	nexthdr = fhdr->nexthdr;
++	offset = nhoff + sizeof(struct frag_hdr);
++
++	/* Skip extension headers after fragment header */
++	if (ipv6_skip_exthdr(skb, offset, &nexthdr, &frag_off) < 0)
++		return IPPROTO_NONE;
++
++	return nexthdr;
++}
++
++/**
++ * ip6_reasm_adjust_timer - adjust IPv6 reassembly timer under memory pressure
++ * @fq: fragment queue
++ * @skb: current fragment skb
++ * @nhoff: offset to fragment header
++ *
++ * Shortens reassembly timeout on buffer starvation to
++ * allow faster eviction of incomplete fragment queues.
++ */
++void ip6_reasm_adjust_timer(struct frag_queue *fq,
++			    struct sk_buff *skb, int nhoff)
++{
++	u8 l4proto;
++	unsigned long new_timer;
++
++	if (frag_mem_limit(fq->q.fqdir) < fq->q.fqdir->low_thresh)
++		return;
++
++	l4proto = ip6_reasm_get_l4proto(skb, nhoff);
++
++	if (l4proto == IPPROTO_TCP || l4proto == IPPROTO_ESP)
++		new_timer = fq->q.fqdir->timeout_failed_tcp;
++	else
++		new_timer = fq->q.fqdir->timeout_failed_udp;
++
++	if (time_after(fq->q.timer.expires, jiffies + new_timer))
++		mod_timer(&fq->q.timer, jiffies + new_timer);
++}
++EXPORT_SYMBOL_GPL(ip6_reasm_adjust_timer);
++#endif
++
+ static int ip6_frag_queue(struct net *net,
+ 			  struct frag_queue *fq, struct sk_buff *skb,
+ 			  struct frag_hdr *fhdr, int nhoff,
+@@ -154,6 +208,10 @@ static int ip6_frag_queue(struct net *net,
+ 			goto discard_fq;
+ 		fq->q.flags |= INET_FRAG_LAST_IN;
+ 		fq->q.len = end;
++
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++		ip6_reasm_adjust_timer(fq, skb, nhoff);
++#endif
+ 	} else {
+ 		/* Check if the fragment is rounded to 8 bytes.
+ 		 * Required by the RFC.
+@@ -437,6 +495,20 @@ static struct ctl_table ip6_frags_ns_ctl_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_jiffies,
+ 	},
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	{
++		.procname	= "ip6frag_timeout_failed_tcp",
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_jiffies,
++	},
++	{
++		.procname	= "ip6frag_timeout_failed_udp",
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_jiffies,
++	},
++#endif
+ };
+ 
+ /* secret interval has been deprecated */
+@@ -468,6 +540,10 @@ static int __net_init ip6_frags_ns_sysctl_register(struct net *net)
+ 	table[1].data	= &net->ipv6.fqdir->low_thresh;
+ 	table[1].extra2	= &net->ipv6.fqdir->high_thresh;
+ 	table[2].data	= &net->ipv6.fqdir->timeout;
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	table[3].data	= &net->ipv6.fqdir->timeout_failed_tcp;
++	table[4].data	= &net->ipv6.fqdir->timeout_failed_udp;
++#endif
+ 
+ 	hdr = register_net_sysctl_sz(net, "net/ipv6", table,
+ 				     ARRAY_SIZE(ip6_frags_ns_ctl_table));
+@@ -538,6 +614,12 @@ static int __net_init ipv6_frags_init_net(struct net *net)
+ 	net->ipv6.fqdir->high_thresh = IPV6_FRAG_HIGH_THRESH;
+ 	net->ipv6.fqdir->low_thresh = IPV6_FRAG_LOW_THRESH;
+ 	net->ipv6.fqdir->timeout = IPV6_FRAG_TIMEOUT;
++#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
++	net->ipv6.fqdir->timeout_failed_tcp =
++		IPV6_REASM_TIMEOUT_FAILED_TCP * HZ;
++	net->ipv6.fqdir->timeout_failed_udp =
++		IPV6_REASM_TIMEOUT_FAILED_UDP * HZ;
++#endif
+ 
+ 	res = ip6_frags_ns_sysctl_register(net);
+ 	if (res < 0)
+-- 
+2.25.1
+
 
