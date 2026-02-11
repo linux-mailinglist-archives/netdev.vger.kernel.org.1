@@ -1,136 +1,221 @@
-Return-Path: <netdev+bounces-258260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258261-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SAZiBAhmjGkFmgAAu9opvQ
-	(envelope-from <netdev+bounces-258260-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:20:40 +0100
+	id SO6SOy1njGkdnAAAu9opvQ
+	(envelope-from <netdev+bounces-258261-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:25:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C64F123D08
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:20:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A837123D5E
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7B6A303AF1A
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:20:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 63B713004D84
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2E936BCCB;
-	Wed, 11 Feb 2026 11:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3637C36BCD7;
+	Wed, 11 Feb 2026 11:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFBY8fMt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+G+MI1T";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="b0ea0vSC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6937A23D2B1;
-	Wed, 11 Feb 2026 11:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0225C36B064
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 11:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770808810; cv=none; b=M0k4YfIAct8kuyovVSvPvClHv1GGQenGjPQxdQZEgil0cbWXNKT/KK9DCiuISkxz/79QWl6Yvw7+/GpN4bOw+CvKjF3hRgU52nd5RJ4l1K26aR1ehPMxwaoNpalderwKcRHnagVLmMQfrOP/Ae8HvV8OxQU6TTzgs73U07Q7ZOk=
+	t=1770809129; cv=none; b=Fx4crck8Kca+E/mDZRk4jZro23MYfKmeM4h5eDpNDzZty/0oWAddBNUh3aCkl8Vz2E5QDSo37aNq4XC/ivUa7CGqhT0ssFXpNAQQMIij+Rhkm2jt+Bz32XMdBxUPLEalVg6uJCZAFNRoPqD5KcJp4B0qxEB4QpXgj8jj0uLqp+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770808810; c=relaxed/simple;
-	bh=k+LlXw1C3o/u3PJNQjJdZQd9L+G36yIsBL61Zjxh/r0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t0uiaDAMGDy7jP1Rvtcx7Rv2kszA0+Ao3Nc3nhXCQn96yD7/f3yOnpGYbt1u9a39CCiNQ5cv5u/L6TGpDsqDpazkR9iL5fvx+vWnli3F4hFsmmS66kRExsIghO1XzUW4K9o1OFneqI68dYOWc/hGS9b9uOdCxAeTsbueKAxdnZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qFBY8fMt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE0DBC19421;
-	Wed, 11 Feb 2026 11:20:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770808809;
-	bh=k+LlXw1C3o/u3PJNQjJdZQd9L+G36yIsBL61Zjxh/r0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qFBY8fMtX7nw+as48of6bugZPUqSlE70WtvenkdA1JVP4Id9fabQ/l49wWnO3fOs/
-	 dfgyWwi8Td+zdlf+LHF5Nni/9SQ5wGBTZcCgKp9BbEZ8HaJr2iKtamgSTR9tdMkaeO
-	 kOldR7wAidQ9Uj/kRBwRLJTrtpfa0LXgvLSVhI2BQAjabcfRI8pgomeq1IRnx9lXGO
-	 obAqyO6ZzDNYltPTCR3SColZ5uDFKcmpVb0k64dTwgvwkl/i20NXdUbBP+wHHdAItB
-	 gHtz2KArsp7wFor6pdi5a3tjyqy1uVjp2wIYu42kZ0847tDi6joBH3CmSiCTg8UpQe
-	 hraN8Z6RCUuMA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B19E39E9615;
-	Wed, 11 Feb 2026 11:20:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1770809129; c=relaxed/simple;
+	bh=7d+AXoxTsWN4BbyRET87gH+U/G1P7Vts/X3P1qNoGQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NDpD9k6Eaz63P5UTApv4ZQsUuIlgVKIrX4U+FDDnds8Gc4NAuofvMRjaq3iY3HHJUkHbfg5NxIvINXmaDJz2VonVFEl6c0BRrDcbOHcjW6K4kAgedWrtxbdiv0FdbbjnNSk1/rOO4+dYLQJKI+UDyxzzCLZeMrGumEcEsHT0CO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G+G+MI1T; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=b0ea0vSC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770809127;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8I9uY7De/Owfo1cyJYQXzE51IMCqg83AFJdtL17VQAQ=;
+	b=G+G+MI1TolSFZ7YfYbkie0WolHRcO0Xf83+kZMLwjdyER3dgWhiddJYbtefbYrEDkUVz2L
+	VqSsWpJUMQW2OT9VBseiGDzoxs5mziCd92yNJJzsPk+cyVa5GXKc/DCo16MytVd03aRHXT
+	Umg+MDfuGb9gGZz6dlt6ZfIONVhiZCo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-Z1gS364zNQirR4j0zH74_g-1; Wed, 11 Feb 2026 06:25:25 -0500
+X-MC-Unique: Z1gS364zNQirR4j0zH74_g-1
+X-Mimecast-MFC-AGG-ID: Z1gS364zNQirR4j0zH74_g_1770809125
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4362456500eso1374757f8f.3
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 03:25:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770809125; x=1771413925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8I9uY7De/Owfo1cyJYQXzE51IMCqg83AFJdtL17VQAQ=;
+        b=b0ea0vSCJZyGEkDyQ3QN4LetvFrBsBfu1VzWxbRktNYXUyxIz4bNZTr6PeKMYURRdr
+         vHiSWK4MCSH4tlwCBck9B3sA7dGhpkrctNjrENQ+PmQoIHiaG6Mc3roDEBgluz9EiRgT
+         tuc1YI2RsasgGkDpEEpsbmixZtcBR6ZiXnFRznIEEsXd9cUsmGeW/Tr4y/ryPll6wjBn
+         fM7J+oqpAFdfOymD8Zuaz3nNhfXkmqHiLi7gPiD2dSxZCWU1rp+5uLh8zqjow+xOjfAu
+         zSNbxj1vs34Pcy+xmJAyILyY7fHA9eHDfpQY14nGdtaLwBFyEJnTP3gkT3UAgMatPIPi
+         WqHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770809125; x=1771413925;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8I9uY7De/Owfo1cyJYQXzE51IMCqg83AFJdtL17VQAQ=;
+        b=V2N9KPEByVvkpco8jup7ZFr/sw6+A9xl+lskoFUQKnDtCmvptBaSgjSS+JSqkvMiiF
+         1h06Ysq/yqDpdhRxXnmX9k782w0v1W80mlQMVxegMoN3+VZVv/8J3MGGPGNUDsLNFqwb
+         S/kr/N/aDnscbrDtKw7RXTSFEB9vzYjXUq1xaAuiKb52lnMdVHNopLjeTmdcdESe1Fuw
+         oRv2U40DHiJSgw+4oMoZx1k1EEy7I/qOEq631wCuRYoVQ+FD5xVcOGXZgCWvyYSqsHsL
+         mQb/QlaniqOa98f5RyyZkAy7M6PgSdIejWjpb7I89LdutHk78KI2YEFRl6goro2LpLkj
+         25hg==
+X-Forwarded-Encrypted: i=1; AJvYcCXCUKIBlBgGsGlwOA2xhP4psyW4v2ZOJ4LFJo/4V7gwp1zb87Lah6NKZZvH2sjjtJW0dynhA1Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0OU5c/E/wQVEQBOpeDeaBtQZB2cEx+iZl0CiYuXX/fqgYERqX
+	TuVx6swg1ZgB9RNXYQeEQomTzbHATYshnOVkjVFnTw8QhCL4bLPfEtTFSgHEK0DijqMsar/rQjQ
+	MYk1XGuTigqd2mtio8gwdaiBy4EmIjauc6EDkuDEimzIhh/ieeq7IxAG9pg==
+X-Gm-Gg: AZuq6aJrnYSIC0egwjmIjaTj7dptVduNv/XejmUFBlDeRwrwhvHasUpQnic63HPLJF7
+	1kxKfXHUXaN/8Kdu/vADq/Hd6WTZrA8HVIxhGXC8TL3JAaWaqkxF3KkSgTxfQApMTCbmx4ezBZz
+	l0zg5qbkX5r9uCY+rY6HbgRAOHEGe8EEsG8OPZoRJAlKFTXWpGBF8ziHX05Tlxw2qLVhwyEVUMF
+	fa/yMhzJs0FsfGizfLgcMvS9AqJSO812t3V5mDBytAff+nj4LzXHrG/bFJ/ZrHc/NZtVnEKt70W
+	oMAsEr/CPcwVUBi/vyPOIVtLsxc9epbYlWzLbvZXhl7ZhKvIpyivCTkh9dk8E7zjZHHTY5X3xfX
+	Qx2NOQ07RNmoFN0SQ2D80RsUwtA==
+X-Received: by 2002:a5d:604d:0:b0:436:3563:499b with SMTP id ffacd0b85a97d-43635634b2cmr15873133f8f.2.1770809124563;
+        Wed, 11 Feb 2026 03:25:24 -0800 (PST)
+X-Received: by 2002:a5d:604d:0:b0:436:3563:499b with SMTP id ffacd0b85a97d-43635634b2cmr15873097f8f.2.1770809124074;
+        Wed, 11 Feb 2026 03:25:24 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.220])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783dfc55dsm4109270f8f.20.2026.02.11.03.25.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Feb 2026 03:25:23 -0800 (PST)
+Message-ID: <8eeb1478-4dbd-4b03-b675-91df18c8d26b@redhat.com>
+Date: Wed, 11 Feb 2026 12:25:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Add optional dependency on
- HSR
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177080880483.132566.10272956860810169703.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Feb 2026 11:20:04 +0000
-References: <20260207-icssg-dep-v3-1-8c47c1937f81@gmail.com>
-In-Reply-To: <20260207-icssg-dep-v3-1-8c47c1937f81@gmail.com>
-To: Kevin Hao <haokexin@gmail.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- rogerq@ti.com, pmohan@couthit.com, danishanwar@ti.com, arnd@arndb.de,
- s.hauer@pengutronix.de
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ppp: don't byte-swap at run time
+To: Qingfang Deng <dqfext@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-ppp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260207064705.208612-1-dqfext@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260207064705.208612-1-dqfext@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258260-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258261-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8C64F123D08
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0A837123D5E
 X-Rspamd-Action: no action
 
-Hello:
+On 2/7/26 7:47 AM, Qingfang Deng wrote:
+> @@ -312,7 +312,26 @@ static inline struct ppp_net *ppp_pernet(struct net *net)
+>  }
+>  
+>  /* Translates a PPP protocol number to a NP index (NP == network protocol) */
+> -static inline int proto_to_npindex(int proto)
+> +static __always_inline int proto_to_npindex(__be16 proto)
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This has just 2 callers; does the compiler inline it anyway?!?
 
-On Sat, 07 Feb 2026 14:21:46 +0800 you wrote:
-> Commit 95540ad6747c ("net: ti: icssg-prueth: Add support for HSR frame
-> forward offload") introduced support for offloading HSR frame forwarding,
-> which relies on functions such as is_hsr_master() provided by the HSR
-> module. Although HSR provides stubs for configurations with HSR
-> disabled, this driver still requires an optional dependency on HSR.
-> Otherwise, build failures will occur when icssg-prueth is built-in
-> while HSR is configured as a module.
->   ld.lld: error: undefined symbol: is_hsr_master
->   >>> referenced by icssg_prueth.c:710 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:710)
->   >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_del_mcast) in archive vmlinux.a
->   >>> referenced by icssg_prueth.c:681 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:681)
->   >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(icssg_prueth_hsr_add_mcast) in archive vmlinux.a
->   >>> referenced by icssg_prueth.c:1812 (drivers/net/ethernet/ti/icssg/icssg_prueth.c:1812)
->   >>>               drivers/net/ethernet/ti/icssg/icssg_prueth.o:(prueth_netdevice_event) in archive vmlinux.a
-> 
-> [...]
+> +{
+> +	switch (proto) {
+> +	case htons(PPP_IP):
+> +		return NP_IP;
+> +	case htons(PPP_IPV6):
+> +		return NP_IPV6;
+> +	case htons(PPP_IPX):
+> +		return NP_IPX;
+> +	case htons(PPP_AT):
+> +		return NP_AT;
+> +	case htons(PPP_MPLS_UC):
+> +		return NP_MPLS_UC;
+> +	case htons(PPP_MPLS_MC):
+> +		return NP_MPLS_MC;
+> +	}
+> +	return -EINVAL;
+> +}
+> +
+> +static __always_inline int proto_to_npindex_user(int proto)
 
-Here is the summary with links:
-  - [net,v3] net: ti: icssg-prueth: Add optional dependency on HSR
-    https://git.kernel.org/netdev/net/c/e3998b6e90f8
+This is slowpath and definitely does not need the inline annotation
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>  {
+>  	switch (proto) {
+>  	case PPP_IP:
+> @@ -332,44 +351,44 @@ static inline int proto_to_npindex(int proto)
+>  }
+>  
+>  /* Translates an NP index into a PPP protocol number */
+> -static const int npindex_to_proto[NUM_NP] = {
+> -	PPP_IP,
+> -	PPP_IPV6,
+> -	PPP_IPX,
+> -	PPP_AT,
+> -	PPP_MPLS_UC,
+> -	PPP_MPLS_MC,
+> +static const __be16 npindex_to_proto[NUM_NP] = {
+> +	htons(PPP_IP),
+> +	htons(PPP_IPV6),
+> +	htons(PPP_IPX),
+> +	htons(PPP_AT),
+> +	htons(PPP_MPLS_UC),
+> +	htons(PPP_MPLS_MC),
+>  };
+>  
+>  /* Translates an ethertype into an NP index */
+> -static inline int ethertype_to_npindex(int ethertype)
+> +static inline int ethertype_to_npindex(__be16 ethertype)
 
+This has a single caller, please drop the inline annotation.
+
+I'm not sure the code churn is justified by the gain; please include
+also actual perf figures in the commit message.
+
+If you are willing to invest a significant amount of time in this area,
+I suggest to implement first some self-tests and than reconsider the
+locking schema: I suspect RCU usage could avoid some lock(s) in the
+datapath.
+
+/P
 
 
