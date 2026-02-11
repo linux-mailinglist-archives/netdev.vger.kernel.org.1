@@ -1,352 +1,183 @@
-Return-Path: <netdev+bounces-258377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDxQDIEKjWmLyAAAu9opvQ
-	(envelope-from <netdev+bounces-258377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 00:02:25 +0100
+	id cMeZLrELjWkCyQAAu9opvQ
+	(envelope-from <netdev+bounces-258378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 00:07:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE8A128361
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 00:02:24 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E741283A3
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 00:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B03E130FED56
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:01:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A1C5C3029F46
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C53527FD56;
-	Wed, 11 Feb 2026 23:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC56353ECE;
+	Wed, 11 Feb 2026 23:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GTT1eM9x"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="MZLDvdE8";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="chxAjLzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C0330148B
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770850904; cv=pass; b=WCvfCzH5QjZhVnb5MYURct0BY9SjJgRkFLIgNNjuA5E7u+3ybuqD/81nGuxTNsWFtqX9kuyB2n5qMYUdP9CKKGwcHalQJG1IzT8KJ4pQ8Hg+5yfV//LNzxyWdtP5CNarcHy1akY1nESIsVSNUGsyqfIHpe5XlUdb0PYNOw8CdMU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770850904; c=relaxed/simple;
-	bh=1udlOiyE/Ppx2kNUZ2ygSNvFIXtyAU8H42LORwBeYA0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rFh9TuBJ3WmayFH+A5xsERxkOaXTzH7rdEKrgPDHcnCG+6zuht5cFuRKek9D6lLMRr9StQE29c3lT6kyrkEVpi99azgHpBKFiG53RHhNNQXmovyo6u8SWDVZUpV2zhSyfWobiGbeL372Ob1NSYk5AmcLLTM1Uetg20zcNSc6YIA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GTT1eM9x; arc=pass smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-124a95e592fso150066c88.0
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 15:01:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770850902; cv=none;
-        d=google.com; s=arc-20240605;
-        b=O8s8wquFIMEdjOwMIYv/pPsvCevSOERyWMkCxd1FvXeiywyjG0nRbfetq/wEdNA8s5
-         8X91r6eLv/yldjoSUTiTZ7463n2riUp9FunP5341U5n48Mc9SNxPuB1ohMZ8lpbpFMhS
-         nEZX0ONSjUDdtuRaQ/TUpyFw9nz2SGXU2rpw6iRhZTryznnqoT8IiPMFZxxiaRgA7g+1
-         95xAtF6DFVGF8adk06SVmqKGwPYaeEbgqM5eyHvUdXeAb5lY2O1mk0xuiuKOBUML/f8o
-         LWOKI7Isos97MjcTRZiO/mqZPEYSnQsXGrs1lXdvOivrPIAvnU22fn70RXZCuyUX8Zxe
-         XAJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=E6m9F/dx48LqXuQRNg/m8pIzXhJQNC52svY/pA72kE0=;
-        fh=64yxvz93vNos+hnIZ3LZ3UMaHgGPOmCLtAL9JpqusKg=;
-        b=iW6BrXpSch80nXgXlWZ2lt7PIp935d6KOUbZEyVi4a6rSFBZPJLSTKR73h22mrG19R
-         9GG+E+vDUgHqKkOImqZ5if8yQR01/kS0nsfbAgz16hFn3hvZZfn7ztZSejhPeEGAzNjU
-         DtvatDBzEGxtWHb2c+EH4E7K9P5VLBcl1bGcj0R5rXlzxg/hwx0uvO851ofe0cFJG5rv
-         g/SpTtrsmB/4gRu5nX3OdoZS4dqofBt8VKRIR/u6mnZLEHW+tSb6I+PreGtjcprYvOYQ
-         Y3FGTGxO7ffHxJpT+7CORwxzuPRl8FFEReoC5TmRasQ7zgiDw1RY2UYimmqd1u1ePE3k
-         WEjA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D1322A7E9
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770851244; cv=none; b=Cuz4JZQK2SS2JjAz7qWxDTcKvF29D44JUM3TMRQ7g+7LHKMgOZeHViKSc7zgjj0tWDKqs3vcHAvri6hPXOGS1f90nJ3TwCrseg0ohQCrluwz5rDJ/gry7OriIsmvhLus89TJKxE1EACttqI3MQYalwCC43P02FDCG5AYnIsLNlk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770851244; c=relaxed/simple;
+	bh=Yzg/R7KROIZWNTb/Gf1jUQr/UCGFBKqVzPPrSnKSA0U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NWJSLWZaM1TNqSfKcC9sxRyLZmxrqv1nEQl909/f5qa/T69TjgWO7gtmKigxAPkC8ZINsMWdIWUGXzWnH0GRr8i/m8Wm1+FF+LVPlmpg3pLRfkQAzMPlVuWwSs+KSeTQQuMdFzKOF12ngZXLT00gKH6vKjie+tAeAs4w8LcWcCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=MZLDvdE8; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=chxAjLzD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61BGVMj81951210
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:07:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ZpN+I346fUVYue3TiuwfSu4EN1Ix2xrT5hADCfjP8mI=; b=MZLDvdE8Ilp/4yj4
+	pmlAeMkrWt0Sji/9cT7QjRIbHr6cagxkZxFW5ThP0ENuGeE/2hJu7b7cKIXlPJEd
+	Q8XSq1lEoryUH1Qk3pCG3Vp/GAHmc66UojiL+BRwd0jV92YsLCqdjaqJIStWRzr7
+	x6fetbi7HS5eoSYmWz+BF5J4mcR8vvLqqECsDqWZLfixq96rmlMFYhXi6ov2FbBn
+	Bk/5n/v7/hJJ84NaXpVU/MFl9ucA732rOPVsJn1t/+dkG5wyJFoi/XhxJhtP/DxB
+	jlCZHqVXtyxQPzumZaaLuKx92uJVUCuzEh3GeUszaC9QwOO/xrU14ylHtD64ZgRj
+	RndkKw==
+Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c8wc4s4ru-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:07:22 +0000 (GMT)
+Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-2ba68ed568bso1014545eec.1
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 15:07:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770850902; x=1771455702; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E6m9F/dx48LqXuQRNg/m8pIzXhJQNC52svY/pA72kE0=;
-        b=GTT1eM9xyOI64gbEHWAlGC13XWHAh4jaXcswlafdvjtpF2qw17YtHOTIzlUFJhPQp5
-         5M5AGUJDFXaxpl3W7BFEbVTcm+urUlLa2RbxKKGhmMCuE8mU9IOC4hxFQq/icQ0vkAz3
-         S+AGutSSCi7VwvmIraNVs60FJheykGfbR0AndRnneUshbYxxgG3MHowcsTZpl5yDtl8C
-         CrkSXOj/gz3L0SxdGmhh+5pcqTizWFPDDh3dhvw2wZV8mUxOC+g/X1jPIAywZ5WfZ2ML
-         zhKl5GYYfmtajoQf/ArRyeq4XOpMwE9+fAyR5P1W5EWhZR9bTtf0xSRBU2Re4eFGevZe
-         +PKA==
+        d=oss.qualcomm.com; s=google; t=1770851241; x=1771456041; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZpN+I346fUVYue3TiuwfSu4EN1Ix2xrT5hADCfjP8mI=;
+        b=chxAjLzD7rYox+S9NpWUOn6SWuJAW6EHDPgdBQFglxEckKjEItyU8dsStqBIasY98n
+         suGusTM/fNgD/HhmXwSKjOxaNcNtq8fuUWkGmh0WM5fSE24gYLWzPgv4Kw+meUCpjHnr
+         D/p9Cd1dcaTrDEBvIpb+o9ICGDSez/3ynCr7sUpuLJCE+q94xsPfmhYAJfloX+8GsJEO
+         C6H3GmTLp6grS4vsXEr5w0pH4C5gWajQj3Dro2C8aWjpawvv33XfIJMFX6apA3wtl8xh
+         zZZtRtjxl8ZtBUFqwcviybupJ95G7mJcpNYb3PG1/1LXykR0IWSjGrZxph0KPnzdTYTr
+         LS2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770850902; x=1771455702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=E6m9F/dx48LqXuQRNg/m8pIzXhJQNC52svY/pA72kE0=;
-        b=qLx3rdM5kjbJaPs+fIVRnKBabFQPRu0N1w7+pKDSTDImFHVv7vX9hmdHuVnYZrjr8s
-         oPDxRFt88XUQQ8rh6TZiG1dNyoDNLIqbZwV9a+5IZtdr/lm1v/WjWNAfUjd3GXgp3+eo
-         1WczXBFpvNGOSxsmAhNo5+JVYQOHxitZa3UT1v/BX1b9ph2PLvcsczWCrpZ3eJaJzw7z
-         BqeNKCzV9kVGyeh+Nnjqpts7q4gnxwVG+BbYYMEdkqFeKIXZgjNX8MOfCvh0gnU0CPCI
-         7DRZpdrfNc9GCT3CVvgnTGXcihp5NSfASNsK4N76zzZ57/g6DSpEE5eB+S1iNAcZ0140
-         bfag==
-X-Forwarded-Encrypted: i=1; AJvYcCW/BASxIsIw5Je4DV3IQrBx+XNeUmzU0bZYGr8AYkSLlVvlzqtoPptAI5nnUtoT+1b77cvoX/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA9pB4erNZBI2gKvNlr8XvyQE3UAzJl6K/OkbQIe6fGVrHFGzI
-	WjP+kllfbCqXVG6hwoy8PR6F9d2dgxLpKc/AfeJGkAwcBJr0/zXHrKOq5ybHf+WLqjsT8jnn0x/
-	ufPMdCema/X2Fi74uy1H7YwXvraO0PqAFE2lRihXO
-X-Gm-Gg: AZuq6aKOxFYDLxw1z0+MKHa8oRtyGH2s2ZrAmW6QTHkzmDmcpRy2n+d7oAiUxJEVIeu
-	DTgdsT6zyJLX0nEpKbmSa+riNfHaQxM3bVe2RpOxXzWdp3B1ecXTupoWQNgOEjhljbzB/0Fzj69
-	ful5lKWOWRNyPuC9CNZdcZhuvyPXxi1bKlg0+OVKEfGPm+ayNnQGAAzpaoqH8Tq6GfQyM7zyyDO
-	UVSqR+jfellFsWbQpx056bXacBHo212hiOekJmxmuZcpeInb1nKco/66C8nhi18c8c9LKLSwy1d
-	N6atRKBdTt08Zafy4qGAQJ4VQEhRrHrUB7DcDgn/85uK1/1xe0HCKcTRkg0u5TZGZrggPAdk
-X-Received: by 2002:a05:7022:61a1:b0:11b:9386:a3cb with SMTP id
- a92af1059eb24-1272f79d964mr331465c88.44.1770850901221; Wed, 11 Feb 2026
- 15:01:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770851241; x=1771456041;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZpN+I346fUVYue3TiuwfSu4EN1Ix2xrT5hADCfjP8mI=;
+        b=W5WLB5dZIV2N8OnuaKucnZ3Ax92auCU0DTYNa7q4Ag6lDfwbyNkbi4MBBh11MbKqW4
+         iLxPyNo2vlGurwkPjmU4BU32YSEbL7LB8mjBzZFENfkbeVkfqCWgN7lS+3Nzz6gDmw27
+         5+fG9PX+ZYQwZ5Lzi0elTzej4pga+RevzkLi8CStIOmYudV0HdXRrnKXkr/mLOhHbMQv
+         cjS4dgWxBczvNeDr9ImyPU85bPjXTSv96fRw2eLVIb5DTRVPdvlSPcFJYgpk78CypbPK
+         pyLV2xRJBF83u3LNJ/EtPyW5G5UwL9PZQMcOCxiN2v7pvRhRvh1MRjt1xv7PKrog+1fC
+         quUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXp6fnBavvfEHq5d5QG+kbM792t783EToYsr3DXgSjt/G9Spt/eLyREP1TyIFHHd9p9ayFPN3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyik9EgOeHKcNsipaUnS/loA4IryBGfseuoQXG5hcGzBgO6P9BB
+	7j3wugjw0xQl1e/I4dfR4Oc31PnKcy+72sZQUCzTAhsY0sE4MRSpxXxyX99QBQ8jXZlcwNzvfMc
+	YVo595iH1226Z3GRcEW1SoYKhTT9J+J1x5ln8giUxrA1TV0zsUjvVni2DF4s=
+X-Gm-Gg: AZuq6aLcm2u/qkktenL/BsfgL/K7AjVkOrZom6JSSO8UK95EN6lZU74XF5wgkniyvWx
+	7RbD1TctdNb9K5mJqfxQQ8cuK38UQj7WpUcUNlLCXanf1DS59hC+nb3N2wjGRlyyh3xB5x3v+GR
+	c8/4UMar10XZRb3RTnw6DlBUOz1y8zXfhARyB5Igyc2XNGwPKqgR0mve3HmwN5lKYII+DjilJXH
+	O0JwLQovgY/M2RAdquV8szZcJg4Y/SIiFIZLoo1fKcCQteCKEPvRUuuFV2e09KPybsag1oSCQ09
+	x4H4nKilgxvXepO3fqFURHCjJUwmPGuOeClRGSVJ+Xc3VaKCgqlndXkdhc7PMAV29fgjdzuKLTW
+	HdFFLN3xUWVR8ZwWZjXnjRTTQeQflPfR1P5uGZUncBmDq7Qqj2a/vNRUFCOyQKz3vcVnDY+Yt1q
+	UIpWtdwWj3s04HzQ==
+X-Received: by 2002:a05:7300:cd8f:b0:2ba:9fad:8fc4 with SMTP id 5a478bee46e88-2baab6f4597mr251516eec.5.1770851241140;
+        Wed, 11 Feb 2026 15:07:21 -0800 (PST)
+X-Received: by 2002:a05:7300:cd8f:b0:2ba:9fad:8fc4 with SMTP id 5a478bee46e88-2baab6f4597mr251496eec.5.1770851240567;
+        Wed, 11 Feb 2026 15:07:20 -0800 (PST)
+Received: from [192.168.1.41] (c-24-130-122-79.hsd1.ca.comcast.net. [24.130.122.79])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ba9dbe127dsm2151263eec.11.2026.02.11.15.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Feb 2026 15:07:20 -0800 (PST)
+Message-ID: <76e6b68c-393e-48d4-9ee5-9e8d511ab308@oss.qualcomm.com>
+Date: Wed, 11 Feb 2026 15:07:18 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260207230720.2542943-1-kuniyu@google.com> <20260207230720.2542943-2-kuniyu@google.com>
- <CAADnVQK_93g_KkNFYXSr8ZvA1fYh4hoFRJCJFPS-zs4ox0HhAA@mail.gmail.com>
- <CAAVpQUAfUQJsBzqTah8+LhTciGrHnLx3pg_xEqD4=wBuEEEXUQ@mail.gmail.com>
- <CAADnVQLMiQFb7SAxgDNFXwoJ4sYLi1DWVHwq4ftAbBxLAa5enQ@mail.gmail.com>
- <CAAVpQUDCd1fTHfBdzmk2msrMnQTL-EzH6VH0RyHoL1V8qz1y3Q@mail.gmail.com>
- <CAADnVQK8_P9x7HoKb0GxH1dSSnMFDsSgoV04MSkhcUPFw2uViA@mail.gmail.com>
- <CAAVpQUC8Xx2aGsqzOeBnevzytEPTqUJQkyxsWbX8tqCoERx1qA@mail.gmail.com> <CAADnVQLBWUyrp5n_mPJFnOAx1kMnZjJR5nTL_8UL-8KLE+DnbA@mail.gmail.com>
-In-Reply-To: <CAADnVQLBWUyrp5n_mPJFnOAx1kMnZjJR5nTL_8UL-8KLE+DnbA@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 11 Feb 2026 15:01:29 -0800
-X-Gm-Features: AZwV_QhvnyTfpo7ZeXE5tz6CWfHDm_tDg0QmL3FSO5v1u6Lfo4ma72i6m6j-1Io
-Message-ID: <CAAVpQUB5mGbD79ZLVCi0G8UDpwjQW15=BV9maB6ikLzCYTjA0A@mail.gmail.com>
-Subject: Re: [PATCH v1 bpf 1/2] bpf: Reject access to unix_sk(sk)->peer.
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Networking for Linux 7.0
+To: Paolo Abeni <pabeni@redhat.com>, torvalds@linux-foundation.org
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20260211173015.327542-1-pabeni@redhat.com>
+From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <20260211173015.327542-1-pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: bEXATbLc4Yht3bwjmDoDf6MBqQbQW-V0
+X-Authority-Analysis: v=2.4 cv=NrLcssdJ c=1 sm=1 tr=0 ts=698d0baa cx=c_pps
+ a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=Tg7Z00WN3eLgNEO9NLUKUQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=VwQbUJbxAAAA:8 a=qNABUOcEAAAA:8 a=VaXPDn6nftydSaR212EA:9 a=QEXdDO2ut3YA:10
+ a=bBxd6f-gb0O0v-kibOvt:22 a=Ytm653ucTKQjCvbzLygB:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjExMDE3OSBTYWx0ZWRfX52GjRkrKf/bp
+ n/3AkBhzFRPwDGJCOblbEkPLWNk5IeXvgRASw2bNdMo9Jnj/TysC/NofJSCyWSneGwwy/6B579t
+ SljMSSHVYtKyylySsGruD4XJVZ8TsZTToc8sXYTIaQnq6jZG4e95puB8xmlP00xEMCkRehZn0mC
+ 2VGly/rgJ6hMyb8kwqlTfipkz0p4GW/WmtdqH2Vbh4GpNDCkk/KptztEYncAFAtgKe7JVO2gwgE
+ 7+XHdwMuydDCAyN7N+lapoFGpXRbw7rYszYxbOYHdhtEu+oeEoUoFpue+eVMuGi0wMVEB6rYDsl
+ QrHVGvSlhw/KCnxvFnHHJ3dXoqsBdZkgqpG0QnsNKVtWQXKpQwDzTx8cV0wXMhP+uB002gseaSG
+ 5jxsZ3ZsEBpuIc7V5u2c2dt9QWfKbYTZIkjaydQA1AdzdM9D9dG+aEZ+3nw43mvchJSZ+4n+ZEv
+ vBJu4ciAS9tOXF10gWA==
+X-Proofpoint-GUID: bEXATbLc4Yht3bwjmDoDf6MBqQbQW-V0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-11_03,2026-02-11_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 bulkscore=0 priorityscore=1501 spamscore=0
+ suspectscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602110179
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258377-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,rbox.co,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 8BE8A128361
+	TAGGED_FROM(0.00)[bounces-258378-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+]
+X-Rspamd-Queue-Id: E7E741283A3
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 2:39=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Wed, Feb 11, 2026 at 2:23=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.=
-com> wrote:
-> >
-> > On Wed, Feb 11, 2026 at 1:26=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Tue, Feb 10, 2026 at 8:23=E2=80=AFPM Kuniyuki Iwashima <kuniyu@goo=
-gle.com> wrote:
-> > > >
-> > > > On Tue, Feb 10, 2026 at 6:47=E2=80=AFPM Alexei Starovoitov
-> > > > <alexei.starovoitov@gmail.com> wrote:
-> > > > >
-> > > > > On Mon, Feb 9, 2026 at 5:19=E2=80=AFPM Kuniyuki Iwashima <kuniyu@=
-google.com> wrote:
-> > > > > >
-> > > > > > On Mon, Feb 9, 2026 at 3:00=E2=80=AFPM Alexei Starovoitov
-> > > > > > <alexei.starovoitov@gmail.com> wrote:
-> > > > > > >
-> > > > > > > On Sat, Feb 7, 2026 at 3:07=E2=80=AFPM Kuniyuki Iwashima <kun=
-iyu@google.com> wrote:
-> > > > > > > >
-> > > > > > > > Michal Luczaj reported use-after-free of unix_sk(sk)->peer =
-by
-> > > > > > > > bpf_skc_to_unix_sock(). [0]
-> > > > > > > >
-> > > > > > > > Accessing unix_sk(sk)->peer is safe only under unix_state_l=
-ock(),
-> > > > > > > > but there are many functions where bpf prog can access the =
-field
-> > > > > > > > locklessly via fentry/fexit.
-> > > > > > > >
-> > > > > > > > unix_dgram_connect() could clear unix_sk(sk)->peer and rele=
-ase
-> > > > > > > > the last refcnt of the peer sk while a bpf prog is accessin=
-g it,
-> > > > > > > > resulting in use-after-free.
-> > > > > > > >
-> > > > > > > > Another problematic scenario is that unix_sk(sk)->peer coul=
-d
-> > > > > > > > go away while being passed to bpf_setsockopt() in bpf iter.
-> > > > > > > >
-> > > > > > > > To avoid such issues, let's reject access to unix_sk(sk)->p=
-eer
-> > > > > > > > by marking the pointer with PTR_UNTRUSTED.
-> > > > > > > >
-> > > > > > > > If needed, we could add a new helper later that uses unix_p=
-eer_get()
-> > > > > > > > and requires bpf_sk_release().
-> > > > > > > >
-> > > > > > > > [0]:
-> > > > > > > > BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0xa=
-4/0xb0
-> > > > > > > > Read of size 2 at addr ffff888147d38890 by task test_progs/=
-2495
-> > > > > > > > Call Trace:
-> > > > > > > >  dump_stack_lvl+0x5d/0x80
-> > > > > > > >  print_report+0x170/0x4f3
-> > > > > > > >  kasan_report+0xe1/0x180
-> > > > > > > >  bpf_skc_to_unix_sock+0xa4/0xb0
-> > > > > > > >  bpf_prog_564a1c39c35d86a2_unix_shutdown_entry+0x8a/0x8e
-> > > > > > > >  bpf_trampoline_6442564662+0x47/0xab
-> > > > > > > >  unix_shutdown+0x9/0x880
-> > > > > > > >  __sys_shutdown+0xe1/0x160
-> > > > > > > >  __x64_sys_shutdown+0x52/0x90
-> > > > > > > >  do_syscall_64+0x6b/0x3a0
-> > > > > > > >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > > > > > > >
-> > > > > > > > Fixes: 9eeb3aa33ae0 ("bpf: Add bpf_skc_to_unix_sock() helpe=
-r")
-> > > > > > > > Reported-by: Michal Luczaj <mhal@rbox.co>
-> > > > > > > > Closes: https://lore.kernel.org/all/408569e7-2b82-4eff-b767=
--79ce6ef6cae0@rbox.co/
-> > > > > > > > Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
-> > > > > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > > > > > > > ---
-> > > > > > > >  kernel/bpf/verifier.c                         | 18 +++++++=
-++++++
-> > > > > > > >  .../selftests/bpf/progs/verifier_sock.c       | 25 +++++++=
-++++++++++++
-> > > > > > > >  2 files changed, 43 insertions(+)
-> > > > > > > >
-> > > > > > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > > > > > > index 3135643d5695..b328a1640c82 100644
-> > > > > > > > --- a/kernel/bpf/verifier.c
-> > > > > > > > +++ b/kernel/bpf/verifier.c
-> > > > > > > > @@ -7076,6 +7076,7 @@ static int bpf_map_direct_read(struct=
- bpf_map *map, int off, int size, u64 *val,
-> > > > > > > >  #define BTF_TYPE_SAFE_RCU_OR_NULL(__type)  __PASTE(__type,=
- __safe_rcu_or_null)
-> > > > > > > >  #define BTF_TYPE_SAFE_TRUSTED(__type)  __PASTE(__type, __s=
-afe_trusted)
-> > > > > > > >  #define BTF_TYPE_SAFE_TRUSTED_OR_NULL(__type)  __PASTE(__t=
-ype, __safe_trusted_or_null)
-> > > > > > > > +#define BTF_TYPE_SAFE_UNTRUSTED(__type)  __PASTE(__type, _=
-_safe_untrusted)
-> > > > > > > >
-> > > > > > > >  /*
-> > > > > > > >   * Allow list few fields as RCU trusted or full trusted.
-> > > > > > > > @@ -7154,6 +7155,10 @@ BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct=
- vm_area_struct) {
-> > > > > > > >         struct file *vm_file;
-> > > > > > > >  };
-> > > > > > > >
-> > > > > > > > +BTF_TYPE_SAFE_UNTRUSTED(struct unix_sock) {
-> > > > > > > > +       struct sock *peer;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > >
-> > > > > > > That's just one out of many. It's not really a fix,
-> > > > > > > but a bandaid for one case.
-> > > > > >
-> > > > > > Right, this is only one example where a pointer lifetime
-> > > > > > does not match with bpf prog.
-> > > > > >
-> > > > > > > We discussed it in the past and the only way forward is to ma=
-ke
-> > > > > > > helpers only accept trusted args.
-> > > > > > > Recently we made KF_TRUSTED_ARGS a default for all kfuncs.
-> > > > > > > We should do the same for helpers.
-> > > > > >
-> > > > > > What about just reading an untrusted pointer ?
-> > > > >
-> > > > > What do you mean 'untrusted' ?
-> > > > > There are 3 types of ptr_to_btf_id:
-> > > > > trusted, untrusted, legacy (without either trusted or untrusted f=
-lags).
-> > > >
-> > > > Ah sorry, I used 'untrusted' since the pointer is not always
-> > > > valid, but I think legacy is the one I meant in this case.
-> > > >
-> > > >
-> > > > >
-> > > > > kfuncs now accept only trusted, while helpers still accept
-> > > > > trusted and legacy. The legacy should be disallowed.
-> > > > > That might break some bpf programs, so it has to be done carefull=
-y.
-> > > > >
-> > > > > > I used bpf_skc_to_unix_sock() in selftest in case compiler
-> > > > > > could optimise out branches that always return 0.
-> > > > > >
-> > > > > > Currently, this passes the verifier and can trigger UAF.
-> > > > > >
-> > > > > > u =3D bpf_skc_to_unix_sock(sock->sk);
-> > > > > > if (!u || !u->peer)
-> > > > > >     return 0;
-> > > > > > if (u->peer->__sk_common.skc_family) # unsafe access
-> > > > > >     return 0;
-> > > > >
-> > > > > No. It's fine. Both legacy and untrusted ptr_to_btf_id get probe_=
-mem
-> > > > > treatment. So above works and won't crash the kernel.
-> > > > > It's effectively inlined probe_read_kernel.
-> > > >
-> > > > Yes, it doesn't crash.
-> > > >
-> > > > I was just unsure about the bpf expectation [0] like how we
-> > > > should treat KASAN use-after-free report by bpf prog reading
-> > > > a pointer whose lifetime is not guaranteed by bpf helper/verifier.
-> > > >
-> > > > So, if this is WAI, I'm fine with that.
-> > > >
-> > > > [0]: https://lore.kernel.org/all/CAAVpQUDrC1rO2diM3gVg5GV5CTVAUS2Rb=
-LP+SpHBGqKcUT0iMA@mail.gmail.com/
-> > >
-> > > That's different. That's the actual UAF inside bpf_skc_to_unix_sock()=
-.
-> > > That needs to be fixed with what I described above by allowing
-> > > only trusted pointers into helpers.
-> >
-> > I got this point.
-> >
-> > > In my earlier reply I meant that:
-> > > if (u->peer->__sk_common.skc_family) # unsafe access
-> > > is fine. It's safe access, because it's sanitized by the verifier/JIT=
-.
-> >
-> > but I'm a bit confused here..
-> >
-> > Even though the verifier makes sure the pointer is not NULL,
-> > u->peer can be freed concurrently by another thread,
-> > then how can verifier/JIT prevent UAF ?
-> >
-> > Or can this be still called 'safe access' regardless of runtime UAF
-> > because the user-provided bpf prog was verified once and not in-tree
-> > kernel code ?
->
-> The verifier/JIT are not preventing UAF. They're preventing crashes.
-> u->peer->__sk_common.skc_family is equivalent to two
-> copy_from_kernel_nofault(). They may read garbage, but won't crash
-> and won't cause any ill kernel effects. It's up to the program
-> to use the values in a sane way.
+On 2/11/2026 9:30 AM, Paolo Abeni wrote:
+> Hi Linus!
+> 
+> I'm not aware of any conflicts with other trees, even if this includes some
+> changes to printk for the sake of netconsole.
 
-I see, that's fair.  Thanks for explaining !
+There is one conflict between the refactored ath12k driver and the char-misc
+tree. This was correctly addressed in linux-next:
+https://lore.kernel.org/linux-next/aXD6X23btw8s-RZP@sirena.org.uk/
+
+/jeff
 
