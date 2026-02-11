@@ -1,282 +1,376 @@
-Return-Path: <netdev+bounces-258329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJFMJb+/jGmisgAAu9opvQ
-	(envelope-from <netdev+bounces-258329-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:43:27 +0100
+	id WGUiG+2/jGmisgAAu9opvQ
+	(envelope-from <netdev+bounces-258330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:44:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F3B126B32
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:43:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF54D126B42
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9BB65300A118
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:43:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE3F0300F515
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187EE34EF0C;
-	Wed, 11 Feb 2026 17:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9E634EF0D;
+	Wed, 11 Feb 2026 17:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FubW0Q69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8464A30AAD0
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C595130AAD0
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770831805; cv=none; b=aTjFoBQVJomvTawtrweEjOjmq5tifrq411z76bU6QQhQKCmroVUsxxnUnUjHw2JRs6pwbapQtZtIqP4Y9bEWzAQFTbpQ99dGgFCt9nFWyqykUGLBxacMyAiIOCpVw1h7nJVSDEY4ZmnhyQw2lasyFOYQINePgezg2h38Rp22wfM=
+	t=1770831819; cv=none; b=iHxoDZU4olGaw7eseqvsFvsPc610SjxjGOPMTSf4CHbJuAtqkYn0RlWAaPGA6y69kkLQmz48sUINgiQqtY7OoGnvnTcrLdhRDtbP9f67c3Mj3Q1Z9UMlm/HHDiX68Dg6kjL3v6+2PnDcLShaFy7qxZquT4rtsUA5pFOb8omoz4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770831805; c=relaxed/simple;
-	bh=enOK+xQAwibNFl755M0gHSeGK7tz6PLm6CdIraviPPI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AsC2Lt3821w9DBy8DF3PvZrFWm2Aq+Msq65F9BC4Gwjby+l1cW/G6zRZxawVrMHjR6WjWwiUWVhiTh/OPfleWPd+gRY9oXWl1HuNMzjY6deGhb7nks3o14p+GZcfs44B4V4Y7AnhKLRfn2Se669X7PWe0PdLROT/Zd6fMsSfjrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-6630c8af251so7960367eaf.1
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:43:23 -0800 (PST)
+	s=arc-20240116; t=1770831819; c=relaxed/simple;
+	bh=AwWCSDrjKmcnyOyEsme8CImTtgR7+RGZbSCLoizXFNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VNdvIUnHpXhqE7wMyjKAuWd24B6KqSERWfmipQkIyAbrQTuVeq+pCwpADjEbSY0BVWoMd5/qMVvhKnI6F6YuL+XoZM8D2pyo23lQ2Xx1hgceFh1spUMM3yc7AkDk8qTJ4N9bzxlFruOiGYc7nrr1deeSTAb/Q0YI0jLlblB9fps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FubW0Q69; arc=none smtp.client-ip=74.125.224.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-6481bd173c0so4844193d50.2
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:43:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770831817; x=1771436617; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GVHmBx6JgqdyMRN3xgBzaFyHXpp+KqxUacobTKKIt2M=;
+        b=FubW0Q69YEpXS8T/Bwzy6Mi3TtMq7JiILQpaIcy50XwZcpp0j976qmLYVd2SKbTyQ3
+         l1nq/kxwdVChfGidrsaDRtc9zuvLMm7CW8MZ75aekZP+tDYWvOFSDQRme2scQ0L5o4ob
+         UcZe1lpVXFCvMGlvHhdixVruzmqkkbE95v8iDkDAcYbWxWJx/5k8K/A0+7tRnBr8xVi/
+         sID/n/yG/nN+bFekYu6TUwNqB0oFn+4dYRYJM051qVxIIXvnfHWtn1yvFa0tbrCyJCUS
+         m/HYi1uRr4xDGU7E41ubL6e351UnxZgOdqHCYy7a9PDwEellWJPcLdnRxockQ9ou/6Yb
+         UFng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770831802; x=1771436602;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HtDN/y6BNod39FzbWiG8faJ4UVLGhrcatNVSKG8AYj8=;
-        b=WpocCwoREInaYJhguAOwdgMMGlKWTV/lgSpFEH0QFI+qHd+jZOigU7S0vtSRPGCeWi
-         M78T/KL9SobOp22g6JAg7RAmpA3chsg34WDkPwz8oNzk1NcBMGjgikgiNXCtKLtDd9Uh
-         TKRVIFvhKwg9v15feU+WmFKLoYX8jTxPWXXpCMpNMU+6jvDYrTtuYzzb2Una7jpr9VB8
-         +16hVvcl7c9S/WCb3dCjd1qjb8zEEjVj68oZ93tBph9/M5DIjXyr47jQ4Fk8/CDX3jWX
-         VACj8NJa8SUJZ7yrOA3URKrKoRxoW6kqC7Ayyo+8COH4G/ae0Gu/6J0Q7F6Lkd6Q76vv
-         MY3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhiH/A079XmOpTn27dlNihN5SsEiyTayVr6Ibm9BUAAjyMz1EAaePHUzZifYjkjXm70IZGw88=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywqqOesutwI8XfYQcbDyT5P3SzoJFIwEDU6NX5DxFP3AhlwF7V
-	yMASW3isH2NglCop+IfT4M3i4SVwJLzJbqIWsVD+65YgRsu5hb3j7+O9aAmZJP7tToZfswR4EbH
-	CilEznnu18SrGVGAvg0uHyEWDJ1Wu4RHetvlGDU50uoyJpB415kb0S4tW4gw=
+        d=1e100.net; s=20230601; t=1770831817; x=1771436617;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GVHmBx6JgqdyMRN3xgBzaFyHXpp+KqxUacobTKKIt2M=;
+        b=Q6EfIjF7m08V+lo26NaGPxE6+4B+oNDxZJspCfS/kFVMpYNVHZGotTKq+jIGPv7TX1
+         W00c8cQG5n/wawXL8V+L3Sb8Rgs0gxvI0oZmoGIU7yFpt+/tj03h4P6nsgxWx2jtKcMx
+         xiWsPXQYxA+oPDouYaDlQw45pb9DjRbMoFzz5Xt1YbnigfUnDf4HrgoDbmV65ODgq0fU
+         rh3sUW566+F6FlaDWxOEZ8NX+S24J4lBSO+Fpm4hBG0vZjgbVV0G9MPDqiIHY4hJtw4v
+         suvb6XlKdbRnX0+QM4I5iTqbmBtgu9oP0YinA4ToZWK5gahz0V0sAGKbqbSbDCKBBTs9
+         cBVQ==
+X-Gm-Message-State: AOJu0YwSXfNaZDUkziMwC+F9pbQ3KMtz6OJ476IMAxd5BZq/0bUUnM5t
+	G8mTW0vuMfl+RlG2Hrc53qNgQZGLpG8RgMme9WL3olBSZAJI42wUasPd
+X-Gm-Gg: AZuq6aLh3nXPwVYd3QdZktTzmQDVjdze6VsMaZQ71kG6eNHO5cgm8ThDj0nimdIA+uj
+	XZVhElkznwiWVszOqXeaOMzcy5tDohilB8SmoKpHk0MLTA9dBim5fFB5oAjWVJI7kzWLq6mjUaH
+	sjTZ7x7LG51HWMDqgKgjvTgc354vPBkRTARCb9/eIn6JNBRA6Tfys9sgIM35YqsUvsLqpuRNKKx
+	U5vFHJrzG4Ub0PKKNRmrwrYA9C823mzPaeaS6X33lFLVfobHW9qXRQC6KfAaXVFz/7HQV5FsNjS
+	JB9xSc4pcPQi3UuQeKtqR9Hd6vuuTi+J+grdDyrDb/Ba3eENSU+7FIJTsQ6LtsdFYR7F8ZNpo/O
+	Lwae9d+RiNZKOeO8FTj6bthWPLAn9mwMrlSxzrozGT4AMKcsqS59Nez52wxbxDk1OIazP58yRQN
+	1iX1RLPNkdLzXBca4nwY33A6c/AOThOiOO+4rk+0CvXSqnnWo5slDV5JDW
+X-Received: by 2002:a53:a64b:0:b0:644:4986:4545 with SMTP id 956f58d0204a3-64bbaa863f9mr77069d50.37.1770831816664;
+        Wed, 11 Feb 2026 09:43:36 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:6::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64afc83ff82sm2593688d50.2.2026.02.11.09.43.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 09:43:36 -0800 (PST)
+Date: Wed, 11 Feb 2026 09:43:34 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Joe Damato <joe@dama.to>, Wei Wang <weibunny@meta.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCH net-next 3/4] selftests/net: Add env for container based
+ tests
+Message-ID: <aYy/xmgPNArOFOr7@devvm11784.nha0.facebook.com>
+References: <20260210200419.3555944-1-dw@davidwei.uk>
+ <20260210200419.3555944-4-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:217:b0:663:170:3b with SMTP id
- 006d021491bc7-66d0c56d269mr9581757eaf.55.1770831802482; Wed, 11 Feb 2026
- 09:43:22 -0800 (PST)
-Date: Wed, 11 Feb 2026 09:43:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <698cbfba.050a0220.2eeac1.009d.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: slab-out-of-bounds Read in fib6_add_rt2node
-From: syzbot <syzbot+707d6a5da1ab9e0c6f9d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260210200419.3555944-4-dw@davidwei.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4aae00ac5a9d2645];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-258330-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-258329-lists,netdev=lfdr.de,707d6a5da1ab9e0c6f9d];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,storage.googleapis.com:url,appspotmail.com:email,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: E9F3B126B32
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei.uk:email,devvm11784.nha0.facebook.com:mid,lib.py:url]
+X-Rspamd-Queue-Id: BF54D126B42
 X-Rspamd-Action: no action
 
-Hello,
+On Tue, Feb 10, 2026 at 12:04:18PM -0800, David Wei wrote:
+> Add an env NetDrvContEnv for container based selftests. This automates
+> the setup of a netns, netkit pair with one inside the netns, and a BPF
+> program that forwards skbs from the NETIF host inside the container.
+> 
+> Currently only netkit is used, but other virtual netdevs e.g. veth can
+> be used too.
+> 
+> Expect netkit container datapath selftests to have a publicly routable
+> IP prefix to assign to netkit in a container, such that packets will
+> land on eth0. The BPF skb forward program will then forward such packets
+> from the host netns to the container netns.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  .../testing/selftests/drivers/net/README.rst  |  19 ++
+>  .../drivers/net/hw/lib/py/__init__.py         |   7 +-
+>  .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
+>  .../selftests/drivers/net/lib/py/env.py       | 163 ++++++++++++++++++
+>  4 files changed, 190 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
+> index eb838ae94844..39370a83f238 100644
+> --- a/tools/testing/selftests/drivers/net/README.rst
+> +++ b/tools/testing/selftests/drivers/net/README.rst
+> @@ -62,6 +62,25 @@ LOCAL_V4, LOCAL_V6, REMOTE_V4, REMOTE_V6
+>  
+>  Local and remote endpoint IP addresses.
+>  
+> +LOCAL_PREFIX_V4, LOCAL_PREFIX_V6
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-syzbot found the following issue on:
+I think LOCAL_PREFIX_V4 is not supported in this series?
 
-HEAD commit:    2687c848e578 x86/vmware: Fix hypercall clobbers
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1168ca52580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4aae00ac5a9d2645
-dashboard link: https://syzkaller.appspot.com/bug?extid=707d6a5da1ab9e0c6f9d
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1355ca5a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1233c65a580000
+> +
+> +Local IP prefix/subnet which can be used to allocate extra IP addresses (for
+> +network name spaces behind macvlan, veth, netkit devices). DUT must be
+> +reachable using these addresses from the endpoint.
+> +
+> +  +-------------+        +----------------------------+
+> +  | INIT NS     |        | TEST NS                    |
+> +  | +---------+ |        | +------------------------+ |
+> +  | | NETIF   | |  bpf   | | Netkit                 | |
+> +  | |         |-|--------|>| nk_guest               | |
+> +  | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
+> +  | +---------+ |        | +------------------------+ |
+> +  | | Netkit  | |        +----------------------------+
+> +  | | nk_host | |
+> +  | +---------+ |
+> +  +-------------+
+> +
+>  REMOTE_TYPE
+>  ~~~~~~~~~~~
+>  
+> diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+> index d5d247eca6b7..022008249313 100644
+> --- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+> +++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+> @@ -3,6 +3,7 @@
+>  """
+>  Driver test environment (hardware-only tests).
+>  NetDrvEnv and NetDrvEpEnv are the main environment classes.
+> +NetDrvContEnv extends NetDrvEpEnv with netkit container support.
+>  Former is for local host only tests, latter creates / connects
+>  to a remote endpoint. See NIPA wiki for more information about
+>  running and writing driver tests.
+> @@ -29,7 +30,7 @@ try:
+>      from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
+>          ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
+>      from drivers.net.lib.py import GenerateTraffic, Remote, Iperf3Runner
+> -    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
+> +    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv, NetDrvContEnv
+>  
+>      __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
+>                 "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
+> @@ -44,8 +45,8 @@ try:
+>                 "ksft_eq", "ksft_ge", "ksft_in", "ksft_is", "ksft_lt",
+>                 "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
+>                 "ksft_not_none", "ksft_not_none",
+> -               "NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote",
+> -               "Iperf3Runner"]
+> +               "NetDrvEnv", "NetDrvEpEnv", "NetDrvContEnv", "GenerateTraffic",
+> +               "Remote", "Iperf3Runner"]
+>  except ModuleNotFoundError as e:
+>      print("Failed importing `net` library from kernel sources")
+>      print(str(e))
+> diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+> index a18e21069f7a..6b55068d5370 100644
+> --- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
+> +++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+> @@ -3,6 +3,7 @@
+>  """
+>  Driver test environment.
+>  NetDrvEnv and NetDrvEpEnv are the main environment classes.
+> +NetDrvContEnv extends NetDrvEpEnv with netkit container support.
+>  Former is for local host only tests, latter creates / connects
+>  to a remote endpoint. See NIPA wiki for more information about
+>  running and writing driver tests.
+> @@ -43,12 +44,12 @@ try:
+>                 "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
+>                 "ksft_not_none", "ksft_not_none"]
+>  
+> -    from .env import NetDrvEnv, NetDrvEpEnv
+> +    from .env import NetDrvEnv, NetDrvEpEnv, NetDrvContEnv
+>      from .load import GenerateTraffic, Iperf3Runner
+>      from .remote import Remote
+>  
+> -    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote",
+> -                "Iperf3Runner"]
+> +    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "NetDrvContEnv", "GenerateTraffic",
+> +                "Remote", "Iperf3Runner"]
+>  except ModuleNotFoundError as e:
+>      print("Failed importing `net` library from kernel sources")
+>      print(str(e))
+> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+> index 41cc248ac848..857ae0f37516 100644
+> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
+> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+> @@ -1,13 +1,16 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> +import ipaddress
+>  import os
+>  import time
+> +import json
+>  from pathlib import Path
+>  from lib.py import KsftSkipEx, KsftXfailEx
+>  from lib.py import ksft_setup, wait_file
+>  from lib.py import cmd, ethtool, ip, CmdExitFailure
+>  from lib.py import NetNS, NetdevSimDev
+>  from .remote import Remote
+> +from . import bpftool, RtnlFamily, Netlink
+>  
+>  
+>  class NetDrvEnvBase:
+> @@ -289,3 +292,163 @@ class NetDrvEpEnv(NetDrvEnvBase):
+>                  data.get('stats-block-usecs', 0) / 1000 / 1000
+>  
+>          time.sleep(self._stats_settle_time)
+> +
+> +
+> +class NetDrvContEnv(NetDrvEpEnv):
+> +    """
+> +    Class for an environment with a netkit pair setup for forwarding traffic
+> +    between the physical interface and a network namespace.
+> +    +-------------+        +----------------------------+
+> +    | INIT NS     |        | TEST NS                    |
+> +    | +---------+ |        | +------------------------+ |
+> +    | | NETIF   | |  bpf   | | Netkit                 | |
+> +    | |         |-|--------|>| nk_guest               | |
+> +    | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
+> +    | +---------+ |        | +------------------------+ |
+> +    | | Netkit  | |        +----------------------------+
+> +    | | nk_host | |
+> +    | +---------+ |
+> +    +-------------+
+> +    """
+> +
+> +    def __init__(self, src_path, rxqueues=1, **kwargs):
+> +        super().__init__(src_path, **kwargs)
+> +
+> +        self.netns = None
+> +        self._nk_host_ifname = None
+> +        self._nk_guest_ifname = None
+> +        self._tc_clsact_added = False
+> +        self._tc_attached = False
+> +        self._bpf_prog_pref = None
+> +        self._bpf_prog_id = None
+> +        self._init_ns_attached = False
+> +
+> +        self.require_ipver("6")
+> +        local_prefix = self.env.get("LOCAL_PREFIX_V6")
+> +        if not local_prefix:
+> +            raise KsftSkipEx("LOCAL_PREFIX_V6 required")
+> +
+> +        local_prefix = local_prefix.rstrip("/64").rstrip("::").rstrip(":")
+> +        self.ipv6_prefix = f"{local_prefix}::"
+> +        self.nk_host_ipv6 = f"{local_prefix}::2:1"
+> +        self.nk_guest_ipv6 = f"{local_prefix}::2:2"
+> +
+> +        rtnl = RtnlFamily()
+> +        rtnl.newlink(
+> +            {
+> +                "linkinfo": {
+> +                    "kind": "netkit",
+> +                    "data": {
+> +                        "mode": "l2",
+> +                        "policy": "forward",
+> +                        "peer-policy": "forward",
+> +                    },
+> +                },
+> +                "num-rx-queues": rxqueues,
+> +            },
+> +            flags=[Netlink.NLM_F_CREATE, Netlink.NLM_F_EXCL],
+> +        )
+> +
+> +        all_links = ip("-d link show", json=True)
+> +        netkit_links = [link for link in all_links
+> +                        if link.get('linkinfo', {}).get('info_kind') == 'netkit'
+> +                        and 'UP' not in link.get('flags', [])]
+> +
+> +        if len(netkit_links) != 2:
+> +            raise KsftSkipEx("Failed to create netkit pair")
+> +
+> +        netkit_links.sort(key=lambda x: x['ifindex'])
+> +        self._nk_host_ifname = netkit_links[1]['ifname']
+> +        self._nk_guest_ifname = netkit_links[0]['ifname']
+> +        self.nk_host_ifindex = netkit_links[1]['ifindex']
+> +        self.nk_guest_ifindex = netkit_links[0]['ifindex']
+> +
+> +        self._setup_ns()
+> +        self._attach_bpf()
+> +
+> +    def __del__(self):
+> +        if self._tc_attached:
+> +            cmd(f"tc filter del dev {self.ifname} ingress pref {self._bpf_prog_pref}")
+> +            self._tc_attached = False
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-2687c848.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6edd74830601/vmlinux-2687c848.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3eefe8753597/bzImage-2687c848.xz
+I know this was resolved before, but unfortunately I think these might
+have to be getattr (or another approach) for the case of
+super().__init__() failing? I found one bad setup may result in
+resolve_remote_ifc() failing and cascading up:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+707d6a5da1ab9e0c6f9d@syzkaller.appspotmail.com
+Traceback (most recent call last):
+File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/./tools/testing/selftests/drivers/net/hw/nk_netns.py", line 29, in <module>
+    main()
+File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/./tools/testing/selftests/drivers/net/hw/nk_netns.py", line 23, in main
+    with NetDrvContEnv(__file__) as cfg:
+File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 315, in __init__
+    super().__init__(src_path, **kwargs)
+File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 173, in __init__
+    self.remote_ifname = self.resolve_remote_ifc()
+File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 234, in resolve_remote_ifc
+    return v6[0]["ifname"] if v6 else v4[0]["ifname"]
+TypeError: 'NoneType' object is not subscriptable
+Exception ignored in: <function NetDrvContEnv.__del__ at 0x7fab5578c1f0>
+Traceback (most recent call last):
+File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 370, in __del__
+    if self._tc_attached:
+AttributeError: 'NetDrvContEnv' object has no attribute '_tc_attached'
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in fib6_add_rt2node+0x349c/0x3500 net/ipv6/ip6_fib.c:1142
-Read of size 1 at addr ffff8880384ba6de by task syz.0.18/5500
-
-CPU: 0 UID: 0 PID: 5500 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xba/0x230 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- fib6_add_rt2node+0x349c/0x3500 net/ipv6/ip6_fib.c:1142
- fib6_add_rt2node_nh net/ipv6/ip6_fib.c:1363 [inline]
- fib6_add+0x910/0x18c0 net/ipv6/ip6_fib.c:1531
- __ip6_ins_rt net/ipv6/route.c:1351 [inline]
- ip6_route_add+0xde/0x1b0 net/ipv6/route.c:3957
- inet6_rtm_newroute+0x268/0x19e0 net/ipv6/route.c:5660
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9316b9aeb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd8809b678 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f9316e15fa0 RCX: 00007f9316b9aeb9
-RDX: 0000000000000000 RSI: 0000200000004380 RDI: 0000000000000003
-RBP: 00007f9316c08c1f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f9316e15fac R14: 00007f9316e15fa0 R15: 00007f9316e15fa0
- </TASK>
-
-Allocated by task 5499:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __do_kmalloc_node mm/slub.c:5657 [inline]
- __kmalloc_noprof+0x40c/0x7e0 mm/slub.c:5669
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- fib6_info_alloc+0x30/0xf0 net/ipv6/ip6_fib.c:155
- ip6_route_info_create+0x142/0x860 net/ipv6/route.c:3820
- ip6_route_add+0x49/0x1b0 net/ipv6/route.c:3949
- inet6_rtm_newroute+0x268/0x19e0 net/ipv6/route.c:5660
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff8880384ba600
- which belongs to the cache kmalloc-256 of size 256
-The buggy address is located 22 bytes to the right of
- allocated 200-byte region [ffff8880384ba600, ffff8880384ba6c8)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x384ba
-ksm flags: 0x4fff00000000000(node=1|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 04fff00000000000 ffff88801a841b40 ffffea0000c2c780 dead000000000007
-raw: 0000000000000000 0000000000080008 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 1, tgid 1 (swapper/0), ts 27805093247, free_ts 22714174709
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x228/0x280 mm/page_alloc.c:1884
- prep_new_page mm/page_alloc.c:1892 [inline]
- get_page_from_freelist+0x24dc/0x2580 mm/page_alloc.c:3945
- __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5240
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2486
- alloc_slab_page mm/slub.c:3075 [inline]
- allocate_slab+0x86/0x3a0 mm/slub.c:3248
- new_slab mm/slub.c:3302 [inline]
- ___slab_alloc+0xd82/0x1760 mm/slub.c:4656
- __slab_alloc+0x65/0x100 mm/slub.c:4779
- __slab_alloc_node mm/slub.c:4855 [inline]
- slab_alloc_node mm/slub.c:5251 [inline]
- __do_kmalloc_node mm/slub.c:5656 [inline]
- __kvmalloc_node_noprof+0x673/0x8d0 mm/slub.c:7144
- v4l2_ctrl_new+0x9d5/0x1790 drivers/media/v4l2-core/v4l2-ctrls-core.c:2112
- v4l2_ctrl_new_std+0x24e/0x300 drivers/media/v4l2-core/v4l2-ctrls-core.c:2266
- handler_new_ref+0x153/0x9c0 drivers/media/v4l2-core/v4l2-ctrls-core.c:1853
- v4l2_ctrl_add_handler+0x19f/0x290 drivers/media/v4l2-core/v4l2-ctrls-core.c:2416
- vivid_create_controls+0x2fdc/0x3bd0 drivers/media/test-drivers/vivid/vivid-ctrls.c:2044
- vivid_create_instance drivers/media/test-drivers/vivid/vivid-core.c:1933 [inline]
- vivid_probe+0x4261/0x72b0 drivers/media/test-drivers/vivid/vivid-core.c:2095
- platform_probe+0xf9/0x190 drivers/base/platform.c:1446
- call_driver_probe drivers/base/dd.c:-1 [inline]
- really_probe+0x267/0xaf0 drivers/base/dd.c:661
-page last free pid 36 tgid 36 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1433 [inline]
- __free_frozen_pages+0xbf8/0xd70 mm/page_alloc.c:2973
- vfree+0x25a/0x400 mm/vmalloc.c:3466
- delayed_vfree_work+0x55/0x80 mm/vmalloc.c:3385
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0xaec/0x17a0 kernel/workqueue.c:3340
- worker_thread+0xda6/0x1360 kernel/workqueue.c:3421
- kthread+0x726/0x8b0 kernel/kthread.c:463
- ret_from_fork+0x51b/0xa40 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-Memory state around the buggy address:
- ffff8880384ba580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8880384ba600: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff8880384ba680: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
-                                                    ^
- ffff8880384ba700: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8880384ba780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Best,
+Bobby
 
