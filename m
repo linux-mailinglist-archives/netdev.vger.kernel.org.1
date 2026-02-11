@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-258339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258340-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Ynv8E6fNjGmbtQAAu9opvQ
-	(envelope-from <netdev+bounces-258339-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:42:47 +0100
+	id RDbICn/OjGnbtQAAu9opvQ
+	(envelope-from <netdev+bounces-258340-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:46:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B668D126E77
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:42:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B11126E9F
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C9B6301410F
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:42:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F1A43016931
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2C32EBB86;
-	Wed, 11 Feb 2026 18:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F16334C11;
+	Wed, 11 Feb 2026 18:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xj4VXsOw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUhi6ckZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481E0EACD;
-	Wed, 11 Feb 2026 18:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD9A1E1DE5;
+	Wed, 11 Feb 2026 18:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770835363; cv=none; b=O66w6EgkZffPcIwSnDPaPeL38/zczTygH+4GVveyg487rIP72xyYE2VaYrg65K2z8oJzhWLx/1l2cXlr1hFQu4z3x1EBtvud8nLT3N+5whEHSzXk4Myz5Q/gsEqzyyn9jdKigI0RJkivFx0gxmMazKVwgdT2uPUZ74NxYMbK5TA=
+	t=1770835578; cv=none; b=INV/X5DBHRz8IZN9bZ2R/wMq80aQoeaHssnf3a3yM6j2Ri5IYTPmtpgN8jaNJlogRQ0YurUrlIadyKwSRGsdBhcmzvdBd+4Kiyi0w63zIbivjrmENNpuZf8Lrt/dHN1ynj432wldMj3+VHId6IM6u1itoPiQwOst10H7hJZFC3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770835363; c=relaxed/simple;
-	bh=w9YH2qHvBpOAFF3GK8fG/1xJUZsoARiE0rs4HEbaiEo=;
+	s=arc-20240116; t=1770835578; c=relaxed/simple;
+	bh=CzFkENtP/0obbBgpxP+XYcbT1750L/IPE4Cj47MMsi4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nBkua+rcWzGZz1x6UL9qv8nA1SYn4wKQj9cPQm31LMRlz54VgHrAmQzSLSrVK7fMH9+NdQg/OoZpCQtnM5KSDsX7+EIrCAKqaGDvbiBdWb5NCORzylX6g6qDtgmzrlN2aRXQd5WDf3bopzxcrOv8A/BZnfYsSgSvAu/Gf3d4WNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xj4VXsOw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BA88C4CEF7;
-	Wed, 11 Feb 2026 18:42:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NMj0Qrvsh76P0emTc3auIljbBznFs5U/cNVaWpaxxJxgGnXLLWD3u3+NMfF2hKLrImOqK0pJBdLargBqcMryJj6YjQqJCHZcsrNtyQsVWgftCal58rLr1tRgIvo3FJi9Q0YlfGf08itYnSTOCgpau2II5c4t2LXBQgDlpqHYKoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUhi6ckZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21128C4CEF7;
+	Wed, 11 Feb 2026 18:46:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770835362;
-	bh=w9YH2qHvBpOAFF3GK8fG/1xJUZsoARiE0rs4HEbaiEo=;
+	s=k20201202; t=1770835577;
+	bh=CzFkENtP/0obbBgpxP+XYcbT1750L/IPE4Cj47MMsi4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Xj4VXsOwgspoyvTnJIbrMSoe+pTtL7BS/K95gE9sD2gc7JLEG+eNKvz9Z70EJvJUq
-	 ipJf15uzEWyiC87tEF877vT+AldZvQfzzVZoxKkvpJWq6KKAU603bUdlax1el8sdFW
-	 nGynULUO3EN/552gLYuG4cg7aBu0yZBjOQq3dc9A5YbWugXxJPcTRFHLt01ToTS2+F
-	 t/Z++87u4mTJ7X08KA7hN/ZqJT8LsVhxhoNKiu7iT5EOo8bLdw26mWmCSVJbVNJmiu
-	 Tp4/xhK4jXPy3Z5qMdANyYdi4dlDuWmhvC3plfj8uV/N9lnsxFPTyyRNuw5D0+dcHq
-	 Zr5fwDvSX3n0Q==
-Date: Wed, 11 Feb 2026 10:42:41 -0800
+	b=nUhi6ckZ6R9T+YHWWMGhVg5ypLCy1qnR4wZUXQ+KRbkLihmKND8GXZdBTEFBW/40F
+	 +Xf2VOkWjIv1rVwv4z/GqjrHjcMda1aRL+SZPxAXcRSTV4v53O/Ci9/cvdhmfM8qIT
+	 MwK9ZFSON823vyc9bKcEf1zqPsHpF11Vciwt1asq1sZ4uI8rJAS9T7+S2KxXsjPiEv
+	 +1ir4z9kF4LE79M2PmtM0GIDZgug4IcV2TxMMhNYz413AOJyv5MVXAD468kub2NVMD
+	 TrAdHZlKgFQ9W6uJRpgU8BQcelBdMqXgw7b1h+8l7+WOx2obejN4rojmB4bJWb0Iae
+	 ACIr7olg5o+SQ==
+Date: Wed, 11 Feb 2026 10:46:15 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: ernis@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, longli@microsoft.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, dipayanroy@linux.microsoft.com,
- shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
- gargaditya@linux.microsoft.com, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: mana: Add MAC address to vPort logs
- and clarify error messages
-Message-ID: <20260211104241.1ab298c2@kernel.org>
-In-Reply-To: <20260211054335.8511-1-ernis@linux.microsoft.com>
-References: <20260211054335.8511-1-ernis@linux.microsoft.com>
+To: Chengfeng Ye <dg573847474@gmail.com>
+Cc: kernel-team@meta.com, alexander.duyck@gmail.com, lee@trager.us,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ jacob.e.keller@intel.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] fbnic: close fw_log race between users and teardown
+Message-ID: <20260211104600.5fbc5369@kicinski-fedora-PF5CM1Y0>
+In-Reply-To: <20260211150022.527956-1-dg573847474@gmail.com>
+References: <20260211150022.527956-1-dg573847474@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,53 +64,66 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258339-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258340-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[meta.com,gmail.com,trager.us,davemloft.net,google.com,redhat.com,intel.com,kernel.org,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: B668D126E77
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 77B11126E9F
 X-Rspamd-Action: no action
 
-On Tue, 10 Feb 2026 21:43:24 -0800 Erni Sri Satya Vennela wrote:
-> Add MAC address to vPort configuration success message and update error
-> message to be more specific about HWC message errors in
-> mana_send_request and mana_hwc_send_request.
+On Wed, 11 Feb 2026 15:00:22 +0000 Chengfeng Ye wrote:
+> Fixes a theoretical race on fw_log between the teardown path and fw_log
+> write functions.
+> 
+> fw_log is written inside fbnic_fw_log_write() and can be reached from
+> the mailbox handler fbnic_fw_msix_intr(), but fw_log is freed before
+> IRQ/MBX teardown during cleanup, resulting in a potential data race of
+> dereferencing a freed/null variable.
+> 
+> Possible Interleaving scenario:
+>   CPU0: fbnic_fw_log_write()
+>           if (fbnic_fw_log_ready())   // true
+>           ... preempt ...
+>   CPU1: fbnic_fw_log_free()
+>           vfree(log->data_start);
+>           log->data_start = NULL;
+>   CPU0: continues, walks log->entries or writes to log->data_start
 
-## Form letter - net-next-closed
+Could you be more specific about the entry points for CPU0 and CPU1?
 
-We have already submitted our pull request with net-next material for v7.0,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
+> The initialization also has an incorrect order problem, as the fw_log
+> is currently allocated after MBX setup during initialization.
+> Fix the problems by adjusting the synchronization order to put
+> initialization in place before the mailbox is enabled, and not cleared
+> until after the mailbox has been disabled.
 
-Please repost when net-next reopens after Feb 23rd.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+Since this is a fix please add a Fixes tag pointing to where the buggy
+code was added.
 -- 
-pw-bot: defer
-pv-bot: closed
-
+pw-bot: cr
 
