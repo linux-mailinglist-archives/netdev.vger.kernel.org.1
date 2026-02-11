@@ -1,103 +1,99 @@
-Return-Path: <netdev+bounces-258248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QDwmJpJVjGnblAAAu9opvQ
-	(envelope-from <netdev+bounces-258248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:10:26 +0100
+	id gOITG95VjGnblAAAu9opvQ
+	(envelope-from <netdev+bounces-258249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:11:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07766123322
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:10:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC9812336A
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9472130599DA
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:09:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 326513006099
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88412366DCA;
-	Wed, 11 Feb 2026 10:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED92366DBB;
+	Wed, 11 Feb 2026 10:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyMNLaaT";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DR6GI+98"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T0ELd9rp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3kfR7uDB";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T0ELd9rp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3kfR7uDB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14032367F47
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1342352C42
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770804583; cv=none; b=kFnmBZ1OKkQPJhzVGF4RIsZO4zHpLkY2I5Y+iCxBUNZZg+6uorEodZzJZNSjRTM9nBzQg9BCiNw3yyRsxjbFM2PsD8LaWRkB3TlcngIxuA8meC2LCtLZ2xlxP/9TH810rxL2Z0yXhE4p6+HryZE4bem+LdDPC2RbrD/Xsf5oQ/A=
+	t=1770804695; cv=none; b=mxX4iXRT24aSY3XWHSbCY56K8eiHJEAqm+IVDkJpd8MZu8svveuAmGKG6G6DPbM1OKyRg7n0vnITaz5eBOWQsZ0mjPPcbRBanQnThn3uI+U8v8YHmaHaq/tymySZVn+o/is8CLOS/niLNDOjdXGN/1G+EXwnSJ4yi1mX/ah3T7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770804583; c=relaxed/simple;
-	bh=ZPjRyU31APU7RK+sFqcDy6SS9GGMdijYRP7U1OEE6G0=;
+	s=arc-20240116; t=1770804695; c=relaxed/simple;
+	bh=BmrKY88RA44qBiFPniVS3X4o1q98MiP9r2hyBl4pPZo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WtDbwZK259rwfNPUwAbvp1tnobf7Rzz3R4hCrP+P87dfnOc/xryqpAQSjhdlxQwiiNEBl0afgn5Vt2BOjIB9T7buR931i7847vH5VZwcOYWJdTagalhtFusOtGnVYpJ6a9MCPpaSNDuKCwA2Hg0mc66674dIyCqvce9fTup9tdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VyMNLaaT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DR6GI+98; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770804580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=J2TfUA3jFM51J4d3Yek2up90u+lRNv9Z4yZquabWH1dqQP1YdiiDk60o6n8d3Hz7a6v9Zd/2cupZAiRh89FscXt5H57lMisQxvAM1aNKCeoHsrb9oB5chYw0sq25i4qT31h5qUvb4NnQW4y7/uTBoxGY7zrPKoyqPF0Vgy4J6YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T0ELd9rp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3kfR7uDB; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T0ELd9rp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3kfR7uDB; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AEC213E714;
+	Wed, 11 Feb 2026 10:11:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1770804691; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nes1YEB3axZcHEvkFJRYgsZwHGyNm2gCan9bsDPgDbc=;
-	b=VyMNLaaTUFvP6ej8dyblU60Tus3l4ukgnDqeO6ltg4BbyPJNHj7mkZf/Y7KU8/+Cnh6APN
-	gYRtu7JmgwAZTWILBCbOrgRT7RPdpoRLkyaNlhhQTLZHGo2zy+K8S1Lqn1lSJteQ+zWI8o
-	AsTpmOlUeUdDjkE3dJBtWkP/Tcqw8a8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-96SnGc_eMc6X4yLO6i8m9g-1; Wed, 11 Feb 2026 05:09:38 -0500
-X-MC-Unique: 96SnGc_eMc6X4yLO6i8m9g-1
-X-Mimecast-MFC-AGG-ID: 96SnGc_eMc6X4yLO6i8m9g_1770804578
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-43768240a29so459362f8f.1
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 02:09:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770804578; x=1771409378; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nes1YEB3axZcHEvkFJRYgsZwHGyNm2gCan9bsDPgDbc=;
-        b=DR6GI+986XgCy9VLYkRetRS14BwDjnvSjmqh1+kO9IcrM4XJVs4l9UY183QYYVMdRU
-         oH8Y/rzP9D74z/NHijlHtx2dXKZIFewh9EiWRXJ7v6IUPMGZU/A1vm3GgZB0NH6ETJ3r
-         30JX8ku6mPaZZkcSzKc7hQSke9lhNYnayW0teq1V7oyBcBnJMTfBDGABGrkaehRXnTa1
-         8Ci41wCMoR+sYPoJC/xz8/ebByhIAroPdFKw2cgLXR7Pw2Jx8/e3f5G8YXn01jDaeX48
-         Hx80vCXodYyR4oZCdjUwX2lmXXXpZGI9Pyrvm9qMhMPu8AzWbdD0DzAZ21TaqgmLE4R+
-         ZODQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770804578; x=1771409378;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nes1YEB3axZcHEvkFJRYgsZwHGyNm2gCan9bsDPgDbc=;
-        b=XV7fGl4oHsCMg90iBTbcOaopZuCArA+m7VrVxiRkn8l2XdWlAYTfiJ/94NsugK2OIY
-         uRdLpr6uQxEMjYQBvqhBDV5lZqrp3kOUQ+nY9MhUYMsTQ4SAoNHJj1xxxCeGi/DQouYo
-         uRcb+QLISwRTkTMFI6+5f5DAmsy0fxOlB/TB3/ka2AXM9aPivmZFtwajQ/zQY1hBeUNW
-         jguTW8E/jLmUopE1PsIUpMEVYvne0PXsw5JN0OxfN4/7E7um0MYknjJNqwNxl8M6agr6
-         PdKJ+6FgvzqIZBd2qcSvr9Jh+m/1rrQe8dML1R0/ZNjdkcmMYHss+KxSetNY6HIFgEXs
-         dYkg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNbEdaaY1sWbOEA8mxorLJbjXcnzNu+3bSe2sdaCPVrRk7F+UdKlpwMN9stYHQvoIHYfYxYZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvL4yoOHHMSTtlKSr+S4SZ6nq11q2EZX4pCLzyoWJZxJG7OoUg
-	DUIPULQpEpQap8QPLj0KV1ZOzmARywH4Gj/kq6viXhtj/PQKO5DsyJ5SsGKS2HFS5rkAcdLplgH
-	9RyMWVG08+iZIuKnP/HRlufNtnvWwNiihDMlTbCAVa+6fnkY2AejQtnBC9w==
-X-Gm-Gg: AZuq6aJkP2PijsV6Vo4tXjdCEVkezsgcavp/6T95Z/09Xv3pEdHoH8hJ1dOHa9/uO1H
-	6/8zzWLMWPiSkVno9FLRDy7o/6OAism2M0siM4xxGQFLrsAwDltLQYXKi1jWFRYaEmV+5g9RaH/
-	WZ8KPTSZhQ2W78u2uzZf3OwhlMLCzlu3wGEBH/bkErmyG6xsRj5b7UqyQrGnqAveMTfM9fZrXKy
-	TrAR5Y33P1afSP+rbHQMFiuSk0oZPA9sviMSYvDcPKmZaMW7tVmt5UnQ49OcUjmGoiFy4WkSazU
-	T6VSGjn0xhi02vOWRjXt/URp54LcD1GSSn9sjk7CSzj5qX3KcyhwfZLbxCK6pspZzMOfSXJz/Ci
-	wnF0KLtFdhuzvDRRyU9Z3FFqVAQ==
-X-Received: by 2002:a05:6000:4211:b0:436:1597:7c7c with SMTP id ffacd0b85a97d-43779e4e2aemr9793895f8f.13.1770804577711;
-        Wed, 11 Feb 2026 02:09:37 -0800 (PST)
-X-Received: by 2002:a05:6000:4211:b0:436:1597:7c7c with SMTP id ffacd0b85a97d-43779e4e2aemr9793843f8f.13.1770804577291;
-        Wed, 11 Feb 2026 02:09:37 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.220])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783dfda71sm3801899f8f.18.2026.02.11.02.09.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Feb 2026 02:09:36 -0800 (PST)
-Message-ID: <07210577-7bc3-4af9-b559-1b861a2be209@redhat.com>
-Date: Wed, 11 Feb 2026 11:09:35 +0100
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
+	b=T0ELd9rp3GeVuj4TLdR3dr/hNb0Cika9yzBgRs0FhiSWSc1MqQAnL97RrY4vOwPUe2vk7I
+	i8LRVFFyq//INL2tUz0svYT+yDeB8UMWTAXYhOJeUmKub3ubxVRg0j+o4+X5aZdFMrFsx2
+	RsZJHaYUr9Yo2a31l+htisFCRymCH50=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1770804691;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
+	b=3kfR7uDB3xl6HUy45/FpCoJY0wRcFUNW+QVuq26A6tfrURWVGS+PtqpD5CklnjcKYrVyci
+	o6e6rzNfZUyDu7Bg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=T0ELd9rp;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=3kfR7uDB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1770804691; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
+	b=T0ELd9rp3GeVuj4TLdR3dr/hNb0Cika9yzBgRs0FhiSWSc1MqQAnL97RrY4vOwPUe2vk7I
+	i8LRVFFyq//INL2tUz0svYT+yDeB8UMWTAXYhOJeUmKub3ubxVRg0j+o4+X5aZdFMrFsx2
+	RsZJHaYUr9Yo2a31l+htisFCRymCH50=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1770804691;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nruCXAx74WveJM2K/8+k0Dm+0X0usQHifZgTPdJV990=;
+	b=3kfR7uDB3xl6HUy45/FpCoJY0wRcFUNW+QVuq26A6tfrURWVGS+PtqpD5CklnjcKYrVyci
+	o6e6rzNfZUyDu7Bg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3CBE93EA62;
+	Wed, 11 Feb 2026 10:11:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id jH8IDtNVjGkKbQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 11 Feb 2026 10:11:31 +0000
+Message-ID: <183f1ce7-d45f-49cf-8dec-570a7e11dc9f@suse.cz>
+Date: Wed, 11 Feb 2026 11:11:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,111 +101,141 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v14 0/4] net: dsa: initial support for MaxLinear
- MxL862xx switches
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
- Chad Monroe <chad@monroe.io>, Cezary Wilmanski
- <cezary.wilmanski@adtran.com>, Liang Xu <lxu@maxlinear.com>,
- John Crispin <john@phrozen.org>
-References: <cover.1770433307.git.daniel@makrotopia.org>
- <20260207214733.m2zvh6ozo7vsc5hj@skbuf>
- <d6393a14-fe50-426d-9dd8-5a33b2af0a0d@redhat.com>
- <aYxTiJW03q1DN9XF@makrotopia.org>
+Subject: Re: [PATCH v3] mm: introduce a new page type for page pool in page
+ type
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <aYxTiJW03q1DN9XF@makrotopia.org>
+To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
+ akpm@linux-foundation.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+ leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
+ kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
+ baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
+ asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
+References: <20260210114712.55072-1-byungchul@sk.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20260210114712.55072-1-byungchul@sk.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-258248-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	TAGGED_FROM(0.00)[bounces-258249-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DMARC_NA(0.00)[suse.cz];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.cz:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 07766123322
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.cz:mid,suse.cz:dkim,suse.cz:email,sk.com:email]
+X-Rspamd-Queue-Id: 9CC9812336A
 X-Rspamd-Action: no action
 
-On 2/11/26 11:01 AM, Daniel Golle wrote:
-> On Wed, Feb 11, 2026 at 10:49:56AM +0100, Paolo Abeni wrote:
->> On 2/7/26 10:47 PM, Vladimir Oltean wrote:
->>> On Sat, Feb 07, 2026 at 03:06:48AM +0000, Daniel Golle wrote:
->>>> This series adds very basic DSA support for the MaxLinear MxL86252
->>>> (5x 2500Base-T PHYs) and MxL86282 (8x 2500Base-T PHYs) switches.
->>>> In addition to the 2.5G TP ports both switches also come with two
->>>> SerDes interfaces which can be used either to connect external PHYs
->>>> or SFP cages, or as CPU port when using the switch with this DSA driver.
->>>
->>> For the entire set:
->>>
->>> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
->>>
->>> with some minor comments I'll leave in individual patches, which I'd
->>> like you to address.
->>>
->>> I don't want to put anybody in a bad spot, but given what time it is,
->>> this set should get at least _some_ time in net-next before the upcoming
->>> net-next PR, to allow for some reaction time in case of some unexpected
->>> reports like from static analysis or similar. 
->>
->> As I'm wrapping-up the PR right now, and the series is not applied yet,
->> I fear the above is not going to happen.
->>
->> Since a driver is involved (as opposed to the core stack) and there will
->> be the usual release cycle to address issues before the code lands in an
->> official release, I tend to think this series should still be merged -
->> unless someone voices strong and valid concerns _very soon_.
->>
->> Thanks,
->>
->> Paolo
->>
->> So it would be good,
->>> because of that, for the fixups as a result of my comments to be
->>> separate patches rather than a new version.
+On 2/10/26 12:47, Byungchul Park wrote:
+> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
+> determine if a page belongs to a page pool.  However, with the planned
+> removal of @pp_magic, we should instead leverage the page_type in struct
+> page, such as PGTY_netpp, for this purpose.
 > 
-> Meaning I should send them *now*, despite net-next being closed already?
+> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
+> and __ClearPageNetpp() instead, and remove the existing APIs accessing
+> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
+> netmem_clear_pp_magic().
+> 
+> Plus, add @page_type to struct net_iov at the same offset as struct page
+> so as to use the page_type APIs for struct net_iov as well.  While at it,
+> reorder @type and @owner in struct net_iov to avoid a hole and
+> increasing the struct size.
+> 
+> This work was inspired by the following link:
+> 
+>   https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
+> 
+> While at it, move the sanity check for page pool to on the free path.
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Acked-by: Zi Yan <ziy@nvidia.com>
+> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> ---
+> The following 'Acked-by's were given only for mm part:
+> 
+>   Acked-by: David Hildenbrand <david@redhat.com>
+>   Acked-by: Zi Yan <ziy@nvidia.com>
 
-I'm sorry, I trimmed badly my reply leaving irrelevant and possibly
-confusing text at the bottom.
+Also for the mm parts:
 
-I mean that I intend to apply the series as-is.
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
 
-Please follow-up after the merge-window as needed.
-
-Thanks,
-
-Paolo
-
-
-
+Thanks.
 
