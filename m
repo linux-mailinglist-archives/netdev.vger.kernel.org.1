@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-258169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEaMNyHii2kVcgAAu9opvQ
-	(envelope-from <netdev+bounces-258169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 02:57:53 +0100
+	id aE8YDS/ji2kVcgAAu9opvQ
+	(envelope-from <netdev+bounces-258171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 03:02:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C8112096B
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 02:57:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DE991209E8
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 03:02:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1E59308104A
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 01:56:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 37147304D1DA
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 02:02:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A652D595D;
-	Wed, 11 Feb 2026 01:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223D22EB5A6;
+	Wed, 11 Feb 2026 02:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NN1v05Kh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxE1JbuX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198242D4806;
-	Wed, 11 Feb 2026 01:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37602DB788;
+	Wed, 11 Feb 2026 02:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770775000; cv=none; b=tqldzTXXYgW98brfJ+HYdc2nvzzviNqhYzWIVVL8O10OOz2SkQK0DeoqyxyK4ATGZjw9bv9gLjFCPyOZho3OeHglJUalKEMfFV4G5rgbDtSxb97Fuh/0ozOFhPqpCvID23wk0KSj7b4eWib81ulYxRfxxuf2F0nOo+wmdumc+QI=
+	t=1770775339; cv=none; b=jn1EiwY5eaMJqZvkDNMZv+elAjFMW/VdKL8P4ZVI4Hu+U0GFzNIflDOktJrlcGTSkBYCauew8Tf4lSEtaDo6BiPQ1jjDNqPY+VBn2Lsjs/l+Td7CreVeTCToCwh7WSdLcrQnvHHaMF78237F1tDUaI+OCAzBTDpLt+cNXf6eLBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770775000; c=relaxed/simple;
-	bh=BMY9+yKdeAiBkeAYgMFch3HHKhcWuWYgHyr8mhgMM1k=;
+	s=arc-20240116; t=1770775339; c=relaxed/simple;
+	bh=OaL7HmtY8PqZLX4O+1g7qbPlaK6jtij1faPJYo7M6cs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hu/Xp8XsxKq+8U7B4xMdPJ1PN0APtcPMPrNtjnKA9cB2iN1/tKcknwVKPsTPjDGgbZ1zJJ3zApPdmvKoYBOLYFYorsAz1o349yOfBcmo+PWtNShc+j8OyhHwWSmyDdaqxXk1MvnSmI238KxEivoIPwagGVEQIYGqVSFNcoHpl/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NN1v05Kh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3947C116C6;
-	Wed, 11 Feb 2026 01:56:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bSsQ2YTosL4D0DRY8ZVaYBGnipN/j2LpbKMLMPbR5IhCqCZ+6RqMVYfGh0TnV5gMBU16sYLL+OqPtUxLw93a7KohfiJ7tYVYqnkEttCuQW6hVOFUMUrKBMRII43GfNL3Lapl+bxaV6fe7G2sdfnA4MUV3RBwfbbkFTC2QzXhBH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxE1JbuX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A19C116C6;
+	Wed, 11 Feb 2026 02:02:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770774999;
-	bh=BMY9+yKdeAiBkeAYgMFch3HHKhcWuWYgHyr8mhgMM1k=;
+	s=k20201202; t=1770775338;
+	bh=OaL7HmtY8PqZLX4O+1g7qbPlaK6jtij1faPJYo7M6cs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NN1v05KhlBhfgpDMAO4i6qxV4EfwOA80jEm81MpnglwxPREGtJNB0Lq5Z3ETCSbrC
-	 AI9Io/w5UYMNE4GZm6FHIvLFv7MlvOpzLRksEHgp2JrF7OGcKaGotwr0qNMT40dCzu
-	 I2uEQElwTfLNCQIf7uY57zlN3aVdjD4u1HsUCSDC2mWlThh6YQ9QvcP0PE/KELYNxu
-	 zsHUM1N3qgoWE6zc6mbak+MkDdcbd8GePhWYgkxx+ZnW9hlAbJZoBdfCHuaQEGMJmR
-	 u96gJCrNpvW5EjjVV3Ih2r/p99hgdVKjHh4aKGo79CTr+wOVuZlCV/ULP+sI0EBxfA
-	 PKldZe73yRz3w==
-Date: Tue, 10 Feb 2026 17:56:38 -0800
+	b=nxE1JbuXS8wPbm1dDTh9Ig4ncqbH7TE+/RsRs23hStcbYsElRZI2XY529fcgfAi/c
+	 R1UwvauzlXAosiWhA01TC9cFd95YvlFnVVYUGj1uL6dgvYP4QTyKGhBPjxTVR8KNWm
+	 XE0Wt/z6JV9x7yQnTuHg1ljHE48vq0RmkVwy3FGrgqbti4ZvCklQQ84Q4vhVgidef4
+	 59dRXj1fCCUJBev/zdXvVZCyDcLeI+5bPm6W+1y+m7x2DKFVW7SLkQI+syC7xYgfjA
+	 4vAP29Vd32+9v7Ipr13i0WCn8WUZNpcUYqdZqpQGTOCyYR5+2udandhrRXt9KeKX7h
+	 aKCC0nFldJTAQ==
+Date: Tue, 10 Feb 2026 18:02:17 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shuah@kernel.org, willemb@google.com, petrm@nvidia.com,
- donald.hunter@gmail.com, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 6/9] selftests: drv-net: gro: use SO_TXTIME
- to schedule packets together
-Message-ID: <20260210175638.123782b2@kernel.org>
-In-Reply-To: <willemdebruijn.kernel.743811e01cc@gmail.com>
-References: <20260207003509.3927744-1-kuba@kernel.org>
-	<20260207003509.3927744-7-kuba@kernel.org>
-	<willemdebruijn.kernel.743811e01cc@gmail.com>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>,
+ "shuah@kernel.org" <shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+ <linux-kselftest@vger.kernel.org>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net-next] selftests: drv-net: port_split: convert to
+ ksft format and mark disruptive
+Message-ID: <20260210180217.3615df89@kernel.org>
+In-Reply-To: <DM6PR12MB4516D06845B4A6D2691E46F4D865A@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20260207012151.3972723-1-kuba@kernel.org>
+	<DM6PR12MB4516D06845B4A6D2691E46F4D865A@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,66 +73,67 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258169-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-258171-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com,broadcom.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 83C8112096B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9DE991209E8
 X-Rspamd-Action: no action
 
-On Sun, 08 Feb 2026 21:39:38 -0500 Willem de Bruijn wrote:
-> Jakub Kicinski wrote:
-> > Longer packet sequence tests are quite flaky when the test is run
-> > over a real network. Try to avoid at least the jitter on the sender
-> > side by scheduling all the packets to be sent at once using SO_TXTIME.
-> > Use hardcoded tx time of 5msec in the future. In my test increasing
-> > this time past 2msec makes no difference so 5msec is plenty of margin.
-> > Since we now expect more output buffering make sure to raise SNDBUF.
-> > 
-> > Experimenting with long sequences I see frequent failures when sending
-> > 200 packets, only 50-100 packets get coalesced. With this change
-> > up to 1000 packets get coalesced relatively reliably.
-> > 
-> > Reviewed-by: Petr Machata <petrm@nvidia.com>
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
+On Mon, 9 Feb 2026 09:54:08 +0000 Danielle Ratson wrote:
+> Few comments:
 > 
-> Does this require having FQ installed? I don't see any qdisc config
-> in the GRO test.
+> 1. Before the change we simply ran the test without extra info, like
+> that: $ ./devlink_port_split.py
+> 
+> Now the new infrastructure requires to run with:
+> $ NETIF=swp1 ./devlink_port_split.py
+> 
+> While swp1 is an example for some interface in the machine using to
+> indicate the real target device.
+> 
+> Otherwise, the test fails- if no NETIF is configured, the framework
+> defaults to netdevsim (SW mode), and since the test sets
+> 'nsim_test=False', it emits an error. So the new change, breaks the
+> way the test was running by now.
+> 
+> However, I managed to work around that by adding a configuration file
+> to the selftests dir:
+> 
+> $ cat drivers/net/hw/net.config
+> NETIF=swp1
+> 
+> 2. The test fails for waiting for the carrier to come up. But
+> actually, we should skip the carrier check. The port split test
+> doesn't require carrier to be up since it's only testing port
+> configuration (split/unsplit) functionality, not the data path.
+> 
+> I tried to run it while overriding the NetDrvEnv __enter__ method to
+> bring the interface up without waiting for carrier:
 
-It's a bit of an opportunistic optimization.
+Hm, I think we can risk removing the carrier wait for NetDrvEnv.
+Only the "endpoint" env (NetDrvEpEnv) should really depend on the NIC
+being able to send and receive packets. I guess I added the carrier
+wait to the base class to save LoC.
 
-I initially intended it for for the "long sequence of packets"
-test. But I failed to get AF_PACKET+FQ to cooperate sufficiently
-to queue all of the packets in the same bucket. Otherwise FQ "sorts"
-the packets, and breaks what the test is trying to do :(
-
-Oh, and as mentioned in the commit msg - this improvement is intended
-for HW-GRO, which may have very low timeouts. The test already
-configures timeout for SW GRO to a very high value, so don't think
-we would gain anything from setting up FQ on veth/netdevsim for the 
-SW test.
-
-So IDK what to do with this patch. Maybe I should just drop it?
-It _seemed_ useful, but I don't have enough datapoints to do a real
-comparison of how much it improves reliability.
+Thanks a lot for trying it out! I'll send a v2 after the merge window.
 
