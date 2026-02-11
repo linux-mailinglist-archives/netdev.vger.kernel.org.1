@@ -1,219 +1,178 @@
-Return-Path: <netdev+bounces-258275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Hm6BYZ1jGk6ogAAu9opvQ
-	(envelope-from <netdev+bounces-258275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:26:46 +0100
+	id QA0rIw13jGktpAAAu9opvQ
+	(envelope-from <netdev+bounces-258276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:33:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0821242E2
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:26:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7151244E5
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:33:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E483301300B
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:26:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 413B6305BD7B
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7518533A9F1;
-	Wed, 11 Feb 2026 12:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73380313279;
+	Wed, 11 Feb 2026 12:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rwYXqi0/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AATRKUx7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF2533A6FB
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 12:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEA6273809;
+	Wed, 11 Feb 2026 12:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770812802; cv=none; b=okph7n8vNql6KGcMWmsIAnNJ9y6fKRyReHsk8LmhqeKl1vaShB5wW0ae7mlZ/aasVhlpBlMiyNAOlDwBXVN4r47zNRb7LaH2wW9gwDekIbsuCcyP+gKfgLYPDRZBe6OsmX8tgczd5xVFrSbdHjLKdjACvysSqdQus7Vsn/JQhyc=
+	t=1770813163; cv=none; b=u/pX3UBA3/9BoESYJE0dWQT7RuiMmG57yDwghoVR+x9PDuTyVupprSLCH1AGoOl7pwZtHrvIuFtx6pW/RE3QEhE6TJTAeDg35rw8TF+VuvQmep2miVp+yqWl/3UfT8U0eLWDHETF8MvUfNh2GbEom63lH8ay2EgakyxQM+XNUAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770812802; c=relaxed/simple;
-	bh=LJRpeV/A1fxlnnZUB3wTrAHsDxAi+EZccFnu8ySHu/Y=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=QiWW7Y1bQR5UypgbryzZxmGpfiQV0MxsRQqIrExAl+HyUlHP8NMBAKRSUa+WN0eLh85pd/bNoWKqo9cpV8sy1mB9yeS2xK/IjcF5xUl5nZu34xGhEnkSlhz1kQ1B5skB7L3ykwMqKoC2WSujhAfY608+2GU+5nWUFJW+S5zgfD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rwYXqi0/; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1770813163; c=relaxed/simple;
+	bh=QAByPVqT09++FJk0uuU+1F6APVuMo+EbFVRjVQuki6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=izaJez3GFgB4QBMISrdgCfs6sKQBlC8SxdExKOSIYzz7gI5Mx7k74mmaaCO003PQy420EzpJqpiD749Y2DaRpJHronqBZEjkUA3i5Yd6wKbDo78AqyY2MvL+NWpwSx6yD9h+2Pwubkco6RqufZXrzp181uK6SV10sZtDu2F595A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AATRKUx7; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770813162; x=1802349162;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QAByPVqT09++FJk0uuU+1F6APVuMo+EbFVRjVQuki6A=;
+  b=AATRKUx7vC2VUWnKOzO450qoyNj1Y9SytLtvENpl3GxWvH6lOQc4Gy2X
+   tBxswykxCC8Uuxg5JIrmbZCJmRjWHum0Y5/wpd5flRkHNG0QEZZJJ33BB
+   Sob4nmqnZwa9TYRcP/sXmGEA4OYSBjTjxPqg4OShzjL0gTmeqiSWNAoyU
+   dsvfiJzUblDLwWRxOLK2PtroLFkwXlOWH+lcOQ559R36NEu4TKvcU22xy
+   9yx4TVPNENVtuzkDgOCjwrUGG6ZKyGMQ00Nb1JKH852v+/vWzrzUiV2U7
+   GXvPR9vmrVcXhHL+skJLTOhQLzjMUfflqU1d2xgI8DGI91UDz3Vy9at4T
+   Q==;
+X-CSE-ConnectionGUID: PKqGag+tTa++W8872YRsnw==
+X-CSE-MsgGUID: +ayaTF/bSoWGFjrQ4U+zCA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="72145092"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="72145092"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 04:32:42 -0800
+X-CSE-ConnectionGUID: Lp5x3XOyS7a+N5GY+/X3LQ==
+X-CSE-MsgGUID: VWmLSFPXRma1eVX+c5/yVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="212327590"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 11 Feb 2026 04:32:29 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vq9OL-00000000py8-3rO7;
+	Wed, 11 Feb 2026 12:32:25 +0000
+Date: Wed, 11 Feb 2026 20:31:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
+	akpm@linux-foundation.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+	mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+	pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	jackmanb@google.com, hannes@cmpxchg.org
+Subject: Re: [PATCH v3] mm: introduce a new page type for page pool in page
+ type
+Message-ID: <202602112054.QKfqC0UR-lkp@intel.com>
+References: <20260210114712.55072-1-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770812788;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=juP12CPu5no4sJn3GXK23Vcmd+0s4QSQdQ9JTIQubAU=;
-	b=rwYXqi0/CVyLw7kczTCLZo8jyq63PuT8zrg+bMz0vGm2UFcucyrJRfSchgEzcnTLO6C/Qu
-	pU9Pt8f1MhsJ+89uccS3nooe/wDXJ6bEQDheGN9jq4YRLqadf+A/HS8HwNOKvEmOv7IMZY
-	8+Nwtx2YGtkH+DgQcgof2NPIwKgH9Fo=
-Date: Wed, 11 Feb 2026 12:26:23 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <82e29f76816971cfad92167c97afb437e1996aea@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf v1] bpf: cpumap: fix race in bq_flush_to_queue on
- PREEMPT_RT
-To: "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>
-Cc: bpf@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
- syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com, "Alexei
- Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, "Jakub Kicinski"
- <kuba@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>, "John
- Fastabend" <john.fastabend@gmail.com>, "Stanislav Fomichev"
- <sdf@fomichev.me>, "Andrii Nakryiko" <andrii@kernel.org>, "Martin KaFai
- Lau" <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>,
- "Song Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>,
- "KP Singh" <kpsingh@kernel.org>, "Hao Luo" <haoluo@google.com>, "Jiri
- Olsa" <jolsa@kernel.org>, "Kees Cook" <kees@kernel.org>, "Gustavo A. R.
- Silva" <gustavoars@kernel.org>, "Clark Williams" <clrkwllms@kernel.org>,
- "Steven Rostedt" <rostedt@goodmis.org>, "Thomas Gleixner"
- <tglx@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-rt-devel@lists.linux.dev
-In-Reply-To: <20260211114418.xnfx8M-t@linutronix.de>
-References: <20260211064417.196401-1-jiayuan.chen@linux.dev>
- <20260211114418.xnfx8M-t@linutronix.de>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260210114712.55072-1-byungchul@sk.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org];
+	TAGGED_FROM(0.00)[bounces-258276-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258275-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,google.com,goodmis.org,lists.linux.dev];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,2b3391f44313b3983e91];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:email,linux.dev:mid,linux.dev:dkim,linux.dev:email]
-X-Rspamd-Queue-Id: ED0821242E2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: 0A7151244E5
 X-Rspamd-Action: no action
 
-February 11, 2026 at 19:44, "Sebastian Andrzej Siewior" <bigeasy@linutron=
-ix.de mailto:bigeasy@linutronix.de?to=3D%22Sebastian%20Andrzej%20Siewior%=
-22%20%3Cbigeasy%40linutronix.de%3E > wrote:
+Hi Byungchul,
 
+kernel test robot noticed the following build warnings:
 
->=20
->=20On 2026-02-11 14:44:16 [+0800], Jiayuan Chen wrote:
->=20
->=20>=20
->=20> From: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >=20=20
->=20>  On PREEMPT_RT kernels, the per-CPU xdp_bulk_queue (bq) can be acce=
-ssed
-> >  concurrently by multiple preemptible tasks on the same CPU.
-> >=20=20
->=20>  The original code assumes bq_enqueue() and __cpu_map_flush() run
-> >  atomically with respect to each other on the same CPU, relying on
-> >  local_bh_disable() to prevent preemption. However, on PREEMPT_RT,
-> >  local_bh_disable() only calls migrate_disable() and does not disable
-> >  preemption. spin_lock() also becomes a sleeping rt_mutex. Together,
-> >  this allows CFS scheduling to preempt a task during bq_flush_to_queu=
-e(),
-> >  enabling another task on the same CPU to enter bq_enqueue() and oper=
-ate
-> >  on the same per-CPU bq concurrently.
-> >=20
->=20=E2=80=A6
->=20
->=20>=20
->=20> Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
-> >=20
->=20Can you reproduce this? It should not trigger with the commit above.
-> It should trigger starting with
->  3253cb49cbad4 ("softirq: Allow to drop the softirq-BKL lock on PREEMPT=
-_RT")
+[auto build test WARNING on akpm-mm/mm-everything]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Byungchul-Park/mm-introduce-a-new-page-type-for-page-pool-in-page-type/20260210-194920
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
+patch link:    https://lore.kernel.org/r/20260210114712.55072-1-byungchul%40sk.com
+patch subject: [PATCH v3] mm: introduce a new page type for page pool in page type
+config: microblaze-randconfig-r134-20260211 (https://download.01.org/0day-ci/archive/20260211/202602112054.QKfqC0UR-lkp@intel.com/config)
+compiler: microblaze-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260211/202602112054.QKfqC0UR-lkp@intel.com/reproduce)
 
-Thanks for the review, Sebastian.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602112054.QKfqC0UR-lkp@intel.com/
 
-You are right. The race only becomes possible after the softirq BKL is dr=
-opped.
+sparse warnings: (new ones prefixed by >>)
+   net/core/skbuff.c: note: in included file:
+>> net/core/netmem_priv.h:21:20: sparse: sparse: cast to restricted netmem_ref
+>> net/core/netmem_priv.h:21:20: sparse: sparse: cast to restricted netmem_ref
+   net/core/skbuff.c: note: in included file (through include/linux/skbuff.h, include/net/net_namespace.h, include/linux/inet.h):
+   include/net/checksum.h:33:39: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __wsum [usertype] sum @@     got unsigned int @@
+   include/net/checksum.h:33:39: sparse:     expected restricted __wsum [usertype] sum
+   include/net/checksum.h:33:39: sparse:     got unsigned int
+--
+>> net/core/page_pool.c:715:20: sparse: sparse: cast to restricted netmem_ref
+   net/core/page_pool.c:739:20: sparse: sparse: cast to restricted netmem_ref
 
-> >=20
->=20> Reported-by: syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
-> >  Closes: https://lore.kernel.org/all/69369331.a70a0220.38f243.009d.GA=
-E@google.com/T/
-> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> >  ---
-> >  kernel/bpf/cpumap.c | 16 +++++++++++++++-
-> >  1 file changed, 15 insertions(+), 1 deletion(-)
-> >=20=20
->=20>  diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-> >  index 04171fbc39cb..7fda8421ec40 100644
-> >  --- a/kernel/bpf/cpumap.c
-> >  +++ b/kernel/bpf/cpumap.c
-> >  @@ -714,6 +717,7 @@ const struct bpf_map_ops cpu_map_ops =3D {
-> >  .map_redirect =3D cpu_map_redirect,
-> >  };
-> >=20=20
->=20>  +/* Caller must hold bq->bq_lock */
-> >=20
->=20If this information is important please use lockdep_assert_held() in =
-the
-> function below. This can be used by lockdep and is understood by humans
-> while the comment is only visible to humans.
+vim +21 net/core/netmem_priv.h
 
+    10	
+    11	static inline bool netmem_is_pp(netmem_ref netmem)
+    12	{
+    13		netmem_ref clr_ref;
+    14	
+    15		/* XXX: Now that the offset of page_type is shared between
+    16		 * struct page and net_iov, just cast the netmem to struct page
+    17		 * unconditionally by clearing NET_IOV if any, no matter whether
+    18		 * it comes from struct net_iov or struct page.  This should be
+    19		 * adjusted once the offset is no longer shared.
+    20		 */
+  > 21		clr_ref = (netmem_ref)((__force unsigned long)netmem & ~NET_IOV);
+    22		return PageNetpp(__netmem_to_page(clr_ref));
+    23	}
+    24	
 
-Will add lockdep_assert_held() in bq_flush_to_queue() and drop the
-comment.
-
-> >=20
->=20> static void bq_flush_to_queue(struct xdp_bulk_queue *bq)
-> >  {
-> >  struct bpf_cpu_map_entry *rcpu =3D bq->obj;
-> >  @@ -750,10 +754,16 @@ static void bq_flush_to_queue(struct xdp_bulk_=
-queue *bq)
-> >=20=20
->=20>  /* Runs under RCU-read-side, plus in softirq under NAPI protection=
-.
-> >  * Thus, safe percpu variable access.
-> >=20
->=20+ PREEMPT_RT relies on local_lock_nested_bh().
->=20
->=20>=20
->=20> + *
-> >  + * On PREEMPT_RT, local_bh_disable() does not disable preemption,
-> >  + * so we use local_lock to serialize access to the per-CPU bq.
-> >  */
-> >  static void bq_enqueue(struct bpf_cpu_map_entry *rcpu, struct xdp_fr=
-ame *xdpf)
-> >  {
-> >  - struct xdp_bulk_queue *bq =3D this_cpu_ptr(rcpu->bulkq);
-> >  + struct xdp_bulk_queue *bq;
-> >  +
-> >  + local_lock(&rcpu->bulkq->bq_lock);
-> >=20
->=20local_lock_nested_bh() & the matching unlock here and in the other
-> places, please.
-
-
-Makes sense. Since these paths already run under local_bh_disable(),
-local_lock_nested_bh() is the correct primitive.
-
-> Sebastian
->
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
