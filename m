@@ -1,203 +1,253 @@
-Return-Path: <netdev+bounces-258346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258347-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAlEL2LUjGm+tgAAu9opvQ
-	(envelope-from <netdev+bounces-258346-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:11:30 +0100
+	id oO6aMPTUjGm+tgAAu9opvQ
+	(envelope-from <netdev+bounces-258347-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:13:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DA5F12712F
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:11:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B943127171
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 255DF300FEF7
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:07:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79E5E30182B5
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEC934B691;
-	Wed, 11 Feb 2026 19:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D488352F92;
+	Wed, 11 Feb 2026 19:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cZRuWlQ1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGt3uRdS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430DD27707
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 19:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770836846; cv=pass; b=CU9EtbZ4DDQKimMFPZenBVKrYBIp/MuRVPbB+IuJR+gQg6yakPWFJHm4yxYfsb2Hj9bTj5ScDUSba8BC4OYo3j+atSH5UhIRC8GnO1ovu16GJzwSBBVa1wCzEr5JdrivIeJUGgc8v/gzgWBGpCgHkvr7TQ2sS12zDwGzJCzzX+Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770836846; c=relaxed/simple;
-	bh=p9HwxvmB/RtNijuLWoEzhbkHs3QEd/JA8FvZu8Cd1SA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d/2x8dAWV4H5FnUD7rLUiSOa22Ia0xVRRWZgc7d+k3qCrtQG89dZvWKiXoDOhcJu9NsQwranTq37eLLUGIg1GC/xX+3o5k2mSD5L+yvakS8wLDc5y5E0hNVF2v/UmDKq05TLNvGsNExUhs6ckAjoGImYiWyOD3yFSySTdbSs4bw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cZRuWlQ1; arc=pass smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-5033387c80aso16217171cf.0
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 11:07:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770836844; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Uocsb2b1i8b9nfogRKj3tOnWKSFjY0bRMoCyINX45xvzVSjaTTXtmEk7wUDeTyAAIV
-         mN0HS+MN74NSon/VnDqL872/xroNdLd9Nal63jpY5bNCAI9pGtW4AyNDRIK6Yw9aDrHc
-         vKKd70cs6H6nCMuMCnTtxBloEzRpazJjX2g8/Bpzs3i1KLZhmDSUi9SEgCLlg6hMEjjZ
-         rAB+0NkIJJ8MiXmwM7swr3xOMDK2fSjDBTvbFITuECFTkbc2NHLELxT2Flrdtbkgp3fd
-         1+ABFQVu8zXYEhY1PFWxFn9F9KAx2jjbHkUK2Zf69vTWiZHhyZFSaiL6CfHYtpgzIKef
-         tjjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=DnLuFbeq8pqLAUutep5qhmfm1lskl8h2Igp5g6q46Pg=;
-        fh=WBJOwfxvlAMhUFUbLknnZN63a740n0ndxPf6H6oAuA0=;
-        b=MsM16ILCdPrnpfDQMuU+9S8eQyef//axwUQGPBhkK9tNoSq5WWNeZ4Ao3Gzc5CkhBs
-         HekT6mysKb0GPhPzLFhUal/PfTxCAlNVe4IsZXvufCVsoQY8T8620BnUn5iQqshXJP1b
-         Ql0yyhCc3B9NlQf++ZO5XnquQZ/wj/PDpX1zFp0uODktojxKxRD1aRIAAtp/X8P4x246
-         8tr49SRToektKx2wLITZc5jMapnbdJ61th79H6xFz0/qtNysHbn6HlDcLsKY/Eu8Nb1W
-         Kw0fjlZ/+LPBsVkxskgWT+6FOgzdS9u1n5xxpqQl6HRJ37a4rwMpan+WhMwt4rSLn6x7
-         Ognw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D389334575A
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 19:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770837223; cv=none; b=mzhPxLhKqDr3JP+TIWIeNQW1qitthEu3oP70zQZQYxixQbx48e+im2PnZwJ2HxsVHA2JvucXybO3M74tK2BY70nVksyKZUdNRFTCkXEahC448exN+A9xSQcb7vtbpdegboTNcx+xeuEfOYrGi4g/OdawcfscKvf8TiGHzThaQkM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770837223; c=relaxed/simple;
+	bh=GYDyxIlHoWs9Je5hGJ6w/SSpXIt90vVnZ4o8f3x2WQQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nZTPhVknSE3KO/7ahxfUA908YbGvFadiz4CnXMfCbPxVhpK05dvA1WyVUjv9zOAWXx+HmJtpKLE/E5r064juSbjYkjcv6q8VjkKCBpR1hj8SJKoHnLA/k730TGY/vDClBzoseI/xDT0KTR1sfhLYPBQtQYO99XgxFytLgyfkxSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGt3uRdS; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a7a9b06eabso4259175ad.1
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 11:13:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770836844; x=1771441644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DnLuFbeq8pqLAUutep5qhmfm1lskl8h2Igp5g6q46Pg=;
-        b=cZRuWlQ1GM3iTErfUUy0pI1A0i/LeYC9ZB4ZAoXJSoNATFFNBG1QFE927M+UAUPzuP
-         Hx9bMxPlq6F2kiHOJovp/YjeK8isxrr49kWur1tX8TnZoNv4dJ/RsIjNELZ7Lv5SFGiU
-         D1XOZ6qbam4NCEHlccpsnUmbw565uV8IjyDrtn1OikQDJGwSArzDm0dN30YkXM8qEJ+C
-         j2Y6mRT382luG8CVwzppll6GiHflVcsmgtFfDFzgzCgCFH5bHA0eHBOFlbX14WhHTMnm
-         0zWYHgk99TpEPYv+vK5qUrNC28OjpbzE4/y+EiPjwGBDWUlQw3JSJs9/+NXh4vhgu0aE
-         1O7g==
+        d=gmail.com; s=20230601; t=1770837220; x=1771442020; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cR8ZQZG0WQpkht8tdaVvbicaEp+riLn3a/JDXFSqLZg=;
+        b=QGt3uRdSbDCK3HfE8//003TccqNfZvUPI9w5gxFi4+DbPz+13Lfsx3ueVvD2HfFvCQ
+         St0IeAj9eMSye9EdM+vww4bj+ZmTBDdGiNASgbpwelRlQQjGKezAivHrVOKeCCMI+6TW
+         k3HiMSmZlJxhibtWu5zn3ENtRqi0Y2SZXHsRX+VRHhg6McKyl+1lYJ/wYDZ0etMFBy+8
+         0crQiatr+fE/A1rcWMRu5DH4JFQnuqfFvu9hlQgWGDUe5Dj5pNDMkTe8Vtq9k7bxG6Ek
+         bcRLsAjEA45DMK5BnR3wz2TO64WyC1coCTc8Zag6wV/V775KxkYzdpBEPZPFLzD4ausy
+         1VFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770836844; x=1771441644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DnLuFbeq8pqLAUutep5qhmfm1lskl8h2Igp5g6q46Pg=;
-        b=KtTkFA5x4c0Fd4ByEZ/A5vUj1+cSfyzDj1FwwMC+1IsKcAn5/BIFEe+wPOul38V9nB
-         ml0Prfyq8pjeBSIi0gnnPh3mCRyd0ajpc+7f1yPlLr+xXzNo2c5/LCzIAN2p7evZ+Nly
-         l10AQWQHUh0YBkt/f1rMFnyaaMuRkyu1XiGjz2cUza3Dff1vZcrc14r7B1W61cGPIKT4
-         nGBSMVCBd6SK0KDEREXTIUgxkRtF0UKVVaJYoZBWQP2rVNQg/QlfjOg1G9uJR20++5ea
-         bu+8qLMLhSY2g6eIOKNxdAaBW6UQRHI8gdpZ/oj1GoMUGiO6EJeF6wupb42jM1T0aQYm
-         VGXA==
-X-Gm-Message-State: AOJu0Yyd4vpbINx0V/vioTA89findwLqegfy8vityg+V+jvZGAjzNe0I
-	l4+8bBwKdirMviNHTvJGWR0EBk/vg074yfdrIZJ1kq6yHaoTre+cMMYcjzZJN/SGpYXUQ0RnuXx
-	D6ZSVt4ZRguU9LHYap9Bzg3JqHSllO0OM2o4IRGir
-X-Gm-Gg: AZuq6aK7Qd/kih90qeBN4g2AP2kW88/bLaq3RvkMtGJQaZX2pO3cYsSAi365lKGXfPe
-	WSpsYi12NW5t2GJhK7vMzUx/vqQ4Ecp/51vZGVJ65V/Dss4uCZF80LqmOvbG91yEBlCrOjv4OOw
-	9+Z/R+UioH3zX1mtTLSLyO6bsR5pQzvUHgOgqza9WXV67/AP8cCPaGGhl46d8lST1ryBvQWaUUn
-	ArZkinCRv4FWjEr1ZiYF4pn37vJylIsKWsrXfHmv6SljoehA8ztaY1goKvKB82jbJF9V1l+WwS4
-	avWuCkrv
-X-Received: by 2002:a05:622a:1648:b0:4b3:8ee:520c with SMTP id
- d75a77b69052e-50691b7c850mr6329641cf.19.1770836843536; Wed, 11 Feb 2026
- 11:07:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770837220; x=1771442020;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cR8ZQZG0WQpkht8tdaVvbicaEp+riLn3a/JDXFSqLZg=;
+        b=jER4ZTvhIhBuySwDAsk5ak1OdG0iJXS+ylc6LuYKDQ3I5RgDWEQcKUHmzdB9ESiYcO
+         SBSR86BibRZ7wAj/fJ9YDTfHPIffa3u5L6OohZSoUFjbf1x2+1aHV0C884dD+bru5jz5
+         IAGViMG/YNWWZWdrHrQAHMj05bJqOgT6/TUEuPFOQc6K13gOcqlR7nkwLwXaAw3XkYRA
+         t8ngExnOJ7KsBon5g5b8VHwDK8v/ibg3uKIPav+ipQbDvlqtAwDzQpHQBeHqLQqK5/Y/
+         NHEWdYmvQGo9AuFQOKINcwL6jVr0HGisEaCK48IE/FSkikeG1gYQpTQaq+2dL5/BC2TA
+         NUAQ==
+X-Gm-Message-State: AOJu0YzuINJ+3OwvkUz+oku5Ry+Qv1Fw3O8/9l7YK6+0nbNlVN1U8IsB
+	v2ZpdZfuLL9e50trH760xA4BTGuR8ymhsGLsbayrQZv9CqzoasbSRYby
+X-Gm-Gg: AZuq6aIXOEEnvcqB8qSVGu5yWwtju6yqSLkSeIFN6EpPwiVd72FJB4iZUvUo9Hi5gaW
+	QHggQUAdxKk1QjYoscRWE7BhbcO+y2cyKxqRn+otASaM0gl/fEwz5N6FX2Y1mfjsFroVcbJK4/y
+	vIdrWsl7UWVxs+Xu0bT4rIkRk5cdfUnRbf4bu3QAXmxulDpZbEstmIAiI3w3QBryWxBV/JHBY0f
+	ZctK1b+mQBGYocCx0M+XYxLJEBTr/t7U+aBrZFPH/IKgUlVMq2zfCevGkmtsIIqjsbmr0uYSsix
+	d0+zfRZ+fXYIxf8eB8c2ECDDsy+ma22kx9BMlitxmUhwvLUXs1FsDpGtEtgrYtjpXHubhkV1RxC
+	U5IlaO3rXVqYMd/0GUdQK3K/OyvJKh2wpURtOjBNAdbpzMcaVpLkSRycnVpAf+m40YgFZj7Yz9a
+	KnWFSD7eGmV1LbV/w/zEZfFqXK+HDG+LAWgtWgiusBB+TWQWbBXWcGWH4voUODFHfkS5hupro=
+X-Received: by 2002:a17:903:2c0f:b0:2aa:d1ed:c475 with SMTP id d9443c01a7336-2ab39cfb586mr574285ad.9.1770837219992;
+        Wed, 11 Feb 2026 11:13:39 -0800 (PST)
+Received: from 3ce1e5d2d1b2.cse.ust.hk (191host009.mobilenet.cse.ust.hk. [143.89.191.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ab2984c0a7sm29444395ad.19.2026.02.11.11.13.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 11:13:39 -0800 (PST)
+From: Chengfeng Ye <dg573847474@gmail.com>
+To: kernel-team@meta.com,
+	alexander.duyck@gmail.com,
+	lee@trager.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jacob.e.keller@intel.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chengfeng Ye <dg573847474@gmail.com>
+Subject: [PATCH v3] fbnic: close fw_log race between users and teardown
+Date: Wed, 11 Feb 2026 19:13:29 +0000
+Message-Id: <20260211191329.530886-1-dg573847474@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260211184848.731894-1-cnitlrt@gmail.com>
-In-Reply-To: <20260211184848.731894-1-cnitlrt@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Feb 2026 20:07:12 +0100
-X-Gm-Features: AZwV_Qju27ZDej9fUpmFOnWmvu4Tc2zoX29NHZ-GbfVzP3U_PrWeGiJeb6Ch2nA
-Message-ID: <CANn89iL5F=zN2t-LfBPtR6xzCQjVr8XB+bHu=LLYCvaao3Fx0Q@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: act_skbedit: fix divide-by-zero in tcf_skbedit_hash()
-To: Ruitong Liu <cnitlrt@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Shuyuan Liu <L0x1c3r@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[meta.com,gmail.com,trager.us,davemloft.net,google.com,redhat.com,intel.com,kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-258346-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,kernel.org,redhat.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258347-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 3DA5F12712F
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dg573847474@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B943127171
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 7:48=E2=80=AFPM Ruitong Liu <cnitlrt@gmail.com> wro=
-te:
->
-> mapping_mod is computed as:
->
->   mapping_mod =3D queue_mapping_max - queue_mapping + 1;
->
-> mapping_mod is stored as u16, so the calculation can overflow when
-> queue_mapping=3D0 and queue_mapping_max=3D0xffff. In this case the value
-> wraps to 0, leading to a divide-by-zero in tcf_skbedit_hash():
->
->   queue_mapping +=3D skb_get_hash(skb) % params->mapping_mod;
->
-> Fix it by using a wider type for mapping_mod and performing the
-> calculation in u32, preventing overflow to zero.
->
-> Fixes: 38a6f0865796 ("net: sched: support hash selecting tx queue")
-> Cc: stable@vger.kernel.org # 6.12+
-> Reported-by: Ruitong Liu <cnitlrt@gmail.com>
-> Reported-by: Shuyuan Liu <L0x1c3r@gmail.com>
-> Signed-off-by: Ruitong Liu <cnitlrt@gmail.com>
-> ---
+Fixes a theoretical race on fw_log between the teardown path and fw_log
+write functions.
 
-I do not think we want to support very large mapping_mod values, this
-makes no sense.
+fw_log is written inside fbnic_fw_log_write() and can be reached from
+the mailbox handler fbnic_fw_msix_intr(), but fw_log is freed before
+IRQ/MBX teardown during cleanup, resulting in a potential data race of
+dereferencing a freed/null variable.
 
-Please reject wrong configuration instead.
+Possible Interleaving Scenario:
+  CPU0: fbnic_fw_msix_intr() // Entry
+          fbnic_fw_log_write()
+            if (fbnic_fw_log_ready())   // true
+            ... preempt ...
+  CPU1: fbnic_remove() // Entry
+          fbnic_fw_log_free()
+            vfree(log->data_start);
+            log->data_start = NULL;
+  CPU0: continues, walks log->entries or writes to log->data_start
 
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index 8c1d1554f657..0ab83dc776d1 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -126,7 +126,7 @@ static int tcf_skbedit_init(struct net *net,
-struct nlattr *nla,
-        struct tcf_skbedit *d;
-        u32 flags =3D 0, *priority =3D NULL, *mark =3D NULL, *mask =3D NULL=
-;
-        u16 *queue_mapping =3D NULL, *ptype =3D NULL;
--       u16 mapping_mod =3D 1;
-+       u32 mapping_mod =3D 1;
-        bool exists =3D false;
-        int ret =3D 0, err;
-        u32 index;
-@@ -194,6 +194,10 @@ static int tcf_skbedit_init(struct net *net,
-struct nlattr *nla,
-                        }
+The initialization also has an incorrect order problem, as the fw_log
+is currently allocated after MBX setup during initialization.
+Fix the problems by adjusting the synchronization order to put
+initialization in place before the mailbox is enabled, and not cleared
+until after the mailbox has been disabled.
 
-                        mapping_mod =3D *queue_mapping_max - *queue_mapping=
- + 1;
-+                       if (mapping_mod > 0xFFFF) {
-+                               NL_SET_ERR_MSG_MOD(extack, "The range
-of queue_mapping is invalid.");
-+                               return -EINVAL;
-+                       }
-                        flags |=3D SKBEDIT_F_TXQ_SKBHASH;
-                }
-                if (*pure_flags & SKBEDIT_F_INHERITDSFIELD)
+Fixes: ecc53b1b46c89 ("eth: fbnic: Enable firmware logging")
+Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
+___
+Changes in v3:
+  - Add fixes tag
+  - Include entry functions in Interleaving Scenario
+
+Changes in v2:
+  - Adjust synchronization instead of using lock protection
+  - Also fix problem in initialization
+---
+ .../net/ethernet/meta/fbnic/fbnic_fw_log.c    |  3 ---
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   | 19 ++++++++++++-------
+ 2 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+index 85a883dba385..d8a9a7d7c237 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+@@ -51,8 +51,6 @@ int fbnic_fw_log_init(struct fbnic_dev *fbd)
+ 	log->data_start = data;
+ 	log->data_end = data + FBNIC_FW_LOG_SIZE;
+ 
+-	fbnic_fw_log_enable(fbd, true);
+-
+ 	return 0;
+ }
+ 
+@@ -63,7 +61,6 @@ void fbnic_fw_log_free(struct fbnic_dev *fbd)
+ 	if (!fbnic_fw_log_ready(fbd))
+ 		return;
+ 
+-	fbnic_fw_log_disable(fbd);
+ 	INIT_LIST_HEAD(&log->entries);
+ 	log->size = 0;
+ 	vfree(log->data_start);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 9240673c7533..e92187bc1c0f 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -307,11 +307,17 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto free_irqs;
+ 	}
+ 
++	err = fbnic_fw_log_init(fbd);
++	if (err)
++		dev_warn(fbd->dev,
++			 "Unable to initialize firmware log buffer: %d\n",
++			 err);
++
+ 	err = fbnic_fw_request_mbx(fbd);
+ 	if (err) {
+ 		dev_err(&pdev->dev,
+ 			"Firmware mailbox initialization failure\n");
+-		goto free_irqs;
++		goto free_fw_log;
+ 	}
+ 
+ 	/* Send the request to enable the FW logging to host. Note if this
+@@ -319,11 +325,7 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	 * possible the FW is just too old to support the logging and needs
+ 	 * to be updated.
+ 	 */
+-	err = fbnic_fw_log_init(fbd);
+-	if (err)
+-		dev_warn(fbd->dev,
+-			 "Unable to initialize firmware log buffer: %d\n",
+-			 err);
++	fbnic_fw_log_enable(fbd, true);
+ 
+ 	fbnic_devlink_register(fbd);
+ 	fbnic_devlink_otp_check(fbd, "error detected during probe");
+@@ -370,6 +372,8 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	  * firmware updates for fixes.
+ 	  */
+ 	return 0;
++free_fw_log:
++	fbnic_fw_log_free(fbd);
+ free_irqs:
+ 	fbnic_free_irqs(fbd);
+ err_destroy_health:
+@@ -404,8 +408,9 @@ static void fbnic_remove(struct pci_dev *pdev)
+ 	fbnic_hwmon_unregister(fbd);
+ 	fbnic_dbg_fbd_exit(fbd);
+ 	fbnic_devlink_unregister(fbd);
+-	fbnic_fw_log_free(fbd);
++	fbnic_fw_log_disable(fbd);
+ 	fbnic_fw_free_mbx(fbd);
++	fbnic_fw_log_free(fbd);
+ 	fbnic_free_irqs(fbd);
+ 
+ 	fbnic_devlink_health_destroy(fbd);
+-- 
+2.25.1
+
 
