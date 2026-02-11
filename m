@@ -1,376 +1,318 @@
-Return-Path: <netdev+bounces-258330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGUiG+2/jGmisgAAu9opvQ
-	(envelope-from <netdev+bounces-258330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:44:13 +0100
+	id IBa7E2XBjGkmswAAu9opvQ
+	(envelope-from <netdev+bounces-258331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:50:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF54D126B42
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:44:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4DD0126B7D
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE3F0300F515
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:43:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7D528300E3AF
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9E634EF0D;
-	Wed, 11 Feb 2026 17:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6277261B92;
+	Wed, 11 Feb 2026 17:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FubW0Q69"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NW3lLhgn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+Received: from mail-oi1-f228.google.com (mail-oi1-f228.google.com [209.85.167.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C595130AAD0
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770831819; cv=none; b=iHxoDZU4olGaw7eseqvsFvsPc610SjxjGOPMTSf4CHbJuAtqkYn0RlWAaPGA6y69kkLQmz48sUINgiQqtY7OoGnvnTcrLdhRDtbP9f67c3Mj3Q1Z9UMlm/HHDiX68Dg6kjL3v6+2PnDcLShaFy7qxZquT4rtsUA5pFOb8omoz4s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770831819; c=relaxed/simple;
-	bh=AwWCSDrjKmcnyOyEsme8CImTtgR7+RGZbSCLoizXFNQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VNdvIUnHpXhqE7wMyjKAuWd24B6KqSERWfmipQkIyAbrQTuVeq+pCwpADjEbSY0BVWoMd5/qMVvhKnI6F6YuL+XoZM8D2pyo23lQ2Xx1hgceFh1spUMM3yc7AkDk8qTJ4N9bzxlFruOiGYc7nrr1deeSTAb/Q0YI0jLlblB9fps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FubW0Q69; arc=none smtp.client-ip=74.125.224.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-6481bd173c0so4844193d50.2
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:43:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770831817; x=1771436617; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GVHmBx6JgqdyMRN3xgBzaFyHXpp+KqxUacobTKKIt2M=;
-        b=FubW0Q69YEpXS8T/Bwzy6Mi3TtMq7JiILQpaIcy50XwZcpp0j976qmLYVd2SKbTyQ3
-         l1nq/kxwdVChfGidrsaDRtc9zuvLMm7CW8MZ75aekZP+tDYWvOFSDQRme2scQ0L5o4ob
-         UcZe1lpVXFCvMGlvHhdixVruzmqkkbE95v8iDkDAcYbWxWJx/5k8K/A0+7tRnBr8xVi/
-         sID/n/yG/nN+bFekYu6TUwNqB0oFn+4dYRYJM051qVxIIXvnfHWtn1yvFa0tbrCyJCUS
-         m/HYi1uRr4xDGU7E41ubL6e351UnxZgOdqHCYy7a9PDwEellWJPcLdnRxockQ9ou/6Yb
-         UFng==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E88321256C
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.228
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770832226; cv=pass; b=cHUiDPOmxfJE82vChPfM+1KCUrD/Mg7D0kkW2R3lHjZK9K+LDN6ZVaaziYMCtwA80hvNpkuLICnYvSCNOE+hD5O3/zEKpF6W6FWoTjTzu2/QsR1o18lFUUkTX9JxiM/00BJ7Cs6IZ1DYd61m1RtJcujv22zvA73BW2z4Hg2o0t8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770832226; c=relaxed/simple;
+	bh=Pn0lFmn9WCeVJ7pOe0x/xa2TNiljPATw35KKu0Gb8hQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T2C6idpwgD5JTGyWoDJRQ+AYc0ExbXxZ2QeUtdynWYoOerSrCWIFsfCR5cZPYdza8CTEpI+11e4Item8pzItuA9PHluVVW4/PDKg4z4c9nEHm5vx5NRh8sdLVeQaXiugZLUrlUIZOvDBInjqgeUccNC8hdLFaQqggdoG0naQfeI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NW3lLhgn; arc=pass smtp.client-ip=209.85.167.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oi1-f228.google.com with SMTP id 5614622812f47-45c733ccc32so1395644b6e.0
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:50:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770831817; x=1771436617;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1770832224; x=1771437024;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GVHmBx6JgqdyMRN3xgBzaFyHXpp+KqxUacobTKKIt2M=;
-        b=Q6EfIjF7m08V+lo26NaGPxE6+4B+oNDxZJspCfS/kFVMpYNVHZGotTKq+jIGPv7TX1
-         W00c8cQG5n/wawXL8V+L3Sb8Rgs0gxvI0oZmoGIU7yFpt+/tj03h4P6nsgxWx2jtKcMx
-         xiWsPXQYxA+oPDouYaDlQw45pb9DjRbMoFzz5Xt1YbnigfUnDf4HrgoDbmV65ODgq0fU
-         rh3sUW566+F6FlaDWxOEZ8NX+S24J4lBSO+Fpm4hBG0vZjgbVV0G9MPDqiIHY4hJtw4v
-         suvb6XlKdbRnX0+QM4I5iTqbmBtgu9oP0YinA4ToZWK5gahz0V0sAGKbqbSbDCKBBTs9
-         cBVQ==
-X-Gm-Message-State: AOJu0YwSXfNaZDUkziMwC+F9pbQ3KMtz6OJ476IMAxd5BZq/0bUUnM5t
-	G8mTW0vuMfl+RlG2Hrc53qNgQZGLpG8RgMme9WL3olBSZAJI42wUasPd
-X-Gm-Gg: AZuq6aLh3nXPwVYd3QdZktTzmQDVjdze6VsMaZQ71kG6eNHO5cgm8ThDj0nimdIA+uj
-	XZVhElkznwiWVszOqXeaOMzcy5tDohilB8SmoKpHk0MLTA9dBim5fFB5oAjWVJI7kzWLq6mjUaH
-	sjTZ7x7LG51HWMDqgKgjvTgc354vPBkRTARCb9/eIn6JNBRA6Tfys9sgIM35YqsUvsLqpuRNKKx
-	U5vFHJrzG4Ub0PKKNRmrwrYA9C823mzPaeaS6X33lFLVfobHW9qXRQC6KfAaXVFz/7HQV5FsNjS
-	JB9xSc4pcPQi3UuQeKtqR9Hd6vuuTi+J+grdDyrDb/Ba3eENSU+7FIJTsQ6LtsdFYR7F8ZNpo/O
-	Lwae9d+RiNZKOeO8FTj6bthWPLAn9mwMrlSxzrozGT4AMKcsqS59Nez52wxbxDk1OIazP58yRQN
-	1iX1RLPNkdLzXBca4nwY33A6c/AOThOiOO+4rk+0CvXSqnnWo5slDV5JDW
-X-Received: by 2002:a53:a64b:0:b0:644:4986:4545 with SMTP id 956f58d0204a3-64bbaa863f9mr77069d50.37.1770831816664;
-        Wed, 11 Feb 2026 09:43:36 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:6::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64afc83ff82sm2593688d50.2.2026.02.11.09.43.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Feb 2026 09:43:36 -0800 (PST)
-Date: Wed, 11 Feb 2026 09:43:34 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Joe Damato <joe@dama.to>, Wei Wang <weibunny@meta.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: [PATCH net-next 3/4] selftests/net: Add env for container based
- tests
-Message-ID: <aYy/xmgPNArOFOr7@devvm11784.nha0.facebook.com>
-References: <20260210200419.3555944-1-dw@davidwei.uk>
- <20260210200419.3555944-4-dw@davidwei.uk>
+        bh=Pn0lFmn9WCeVJ7pOe0x/xa2TNiljPATw35KKu0Gb8hQ=;
+        b=n7NjrdL1Tm/2z9tGYUy5HzFtW6ihfCxyFmrG0ntQeMvKHsu0j+1TasllQRQevA5FTJ
+         IduHi6L5KYNlW+L2tbGKAK+67R0ZTIAvIj4EbKXkAIUgtQuwQSemdcBjR3L1FcE2npNY
+         s7xDtp3VT/f4zz5JtQFi4+WYaPWNsL7iCSEjj2yyJ5Jb22XSahYmVCHc5EO6+XpP6Fpr
+         TNwI/Cp5Om4X55N2YRbGtW9ljgm2KCDt9tvuHnEMXPuL1o+TNO4SqSRoDUGHE/WsCpzn
+         73cKDCKQOoR6ag2gbcHz2dIMnQfMwQvLQY0K/Ds4AMzoZZg3SpB5kkoUO+0ACfTtGQKA
+         R3TQ==
+X-Forwarded-Encrypted: i=2; AJvYcCUaTJgX+wEl/JRUJPBlvnCd2BkZSIdFN0bHFc7sZ1YBJ5UivoBXH9GsiPoMx3b+NkVEJSojtcQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcjeVVvOg+BWAJcLCmAK+veSIw65fdaEG6xQD+Y8L6QlpVS2Nu
+	6r8YFDYNoLm28ykoUnulQDHjZoufJKFNdP9SrUdRmwiz5AfQnI91uToU8I64YyxEYcDyAskepFz
+	9VJ7oQdU/VC2i2VUgtaJpQBhAvfjM+jXmF6VDVNdxo8JWs7aRAmH3sXbd5aqGIaY81Q9uyyY0dB
+	2hc/prs3AgrLqYJmkA8+FiyGqeTuQxtXpKk47Evh1nvti9PFATFmAb2KxII/0QCTdIAFROAS/G1
+	so2TInuRfA=
+X-Gm-Gg: AZuq6aIUvBV+IHIYCj0TyHuN+wxt+k9eVdq7a4UTYXJgMSPfj1NoqJLIBM36oMmQiJM
+	qkp0JnzIDxymPtB0pcvy3PxoK6tfHX2SQWoa6sbtH8Hz1uVHKRDQg2PYD4R1ObWe9bSChMm9F3X
+	PotMjNnT/AKs7E25zX59EFid4YCdAv6MK/fzHHLvUH7nYfCYGmsaWSiMPmuFGdmTaRgNUgD4iqu
+	nml1pTswvjwPSkpR8Wg3uws197IQP5eFKm0dTq3SRPlh/sIdbyUNTn4B0BZOtJBdNxYQJNIM301
+	R6BFMwma3STJd9RuogJkbTMxY8cnDLE+uhzG+Y5ZMuho0varMkhv/MO0hSStNU5BX6O1h8y00kb
+	/gYMXEHd3yGOQXz4C2J14l1Ri4WIMhpA0xIn+gBMjWL+oo1o6ePW7e4qGie+tZMFpB9aGWm/jwi
+	0tPzPEO9jR8S9u55yEFLGuf3eM/c4FOgFUhKf/lMcsbNQa7Me5zUISur/JlIM=
+X-Received: by 2002:a05:6808:2e4f:b0:460:fa3c:31cc with SMTP id 5614622812f47-4637b8a7c0emr56506b6e.49.1770832224141;
+        Wed, 11 Feb 2026 09:50:24 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-103.dlp.protect.broadcom.com. [144.49.247.103])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-40eaeead4casm354535fac.5.2026.02.11.09.50.23
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 11 Feb 2026 09:50:24 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2a92a3f5de9so14703705ad.2
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:50:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770832222; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KtcsArQrKrI4o2dmXjk1HhHBptAh/Vuhp9NFO5Ez9Y12Kza5EyLkiOLqQvK8B8/w1h
+         Me6/8rlxWamzP9Yr7ECqwHg1P06kETHM9AUF1qNrYR7d+n2tfJLCtrZu2TK0P/RtUF7b
+         CfcuR3fBkkkHdPS8EhvuPUzvNUEGaamrVDKOyksJb2u+3JmZuaqHPPuwSFyHQYyKVNmA
+         BCLNyhGALuBy6TeiE9L3GD4Hs/sgLsI6r/bl2kMp/TUXR3JwGseYrQFebTGXOGY4t6vX
+         WVEUQmczWshYzAztXR0TYoOd/bU93/6vu0aXppPsASu7ylhCUzUYLipzDQSyFDAt2E1e
+         awFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Pn0lFmn9WCeVJ7pOe0x/xa2TNiljPATw35KKu0Gb8hQ=;
+        fh=fwGP61CavBVtrAK+mVo63mWzw3+O4P9kpioJtoWVHcw=;
+        b=blGFQhAyuf4OSJwrUcVxnGg4YCaiKQrrTAV+n/VViJBBhRaIaqZJRGa9LUzRkr+l6H
+         3ID37U+D8OusSCTvXyK2RgA8OyEZ4u5G+uDRjDxw6QzIK2/azy1fKt93v3hgpW2D+3K8
+         VAzfKb5WNnbARw2raNMNSGExZlV2wGUR16LVGdMRRgWDekF0PKEjuOdIXM9LnWkFTWXU
+         cmMad5A6HMDSNAH8CibBcxn1FA5Q9rrYO47USreTBDPFWjejlJs0q8mdPqpZeA3u1uZQ
+         qPxOIwC9qIsVMzoDQlbzrlxbZ8kJnQ+mcBsX492UThH9TtaYyjM9uuJlBD6ls02HzKi9
+         sfSw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1770832222; x=1771437022; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pn0lFmn9WCeVJ7pOe0x/xa2TNiljPATw35KKu0Gb8hQ=;
+        b=NW3lLhgnEkPEQkkRM4DytJgeztWRUEf6k4gEmRuJM5Uy4ruf26FX6KX5hO/69xXTij
+         viRWZjCISMDhV4Ak3ZRFSexYSq9/rVlqAzfn3NnUYDQJKkLR/gbG79YND1WAAw2tCHVe
+         fWry9qxXnzvVl9lObY0LgWuGuj6vYdsm4ZiDk=
+X-Forwarded-Encrypted: i=1; AJvYcCV6we5qdK9zk+VbJP/UjLaKIUaTgp7iUh7V1hSG52rR/JfR/v5qOTt4v55w9ZkTSExat6dK3gc=@vger.kernel.org
+X-Received: by 2002:a17:902:f687:b0:2a7:d5c0:c659 with SMTP id d9443c01a7336-2a95160bfa3mr203234945ad.5.1770832222552;
+        Wed, 11 Feb 2026 09:50:22 -0800 (PST)
+X-Received: by 2002:a17:902:f687:b0:2a7:d5c0:c659 with SMTP id
+ d9443c01a7336-2a95160bfa3mr203234775ad.5.1770832222196; Wed, 11 Feb 2026
+ 09:50:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260210200419.3555944-4-dw@davidwei.uk>
+References: <20260206052930.1882740-1-michael.chan@broadcom.com>
+ <20260206052930.1882740-5-michael.chan@broadcom.com> <aYY2sak4adKOGRSv@devvm11784.nha0.facebook.com>
+ <CALs4sv1Z+oWNT5myaEr=LyZsLCGUYfOKAet_bc+fmw7g8PbaxA@mail.gmail.com>
+ <20260210174627.2360a03c@kernel.org> <CALs4sv3hca2N=+w9A81ZLMz9QCHqA7OzGFOzKGswd2sy+9zt7w@mail.gmail.com>
+ <20260210201706.1da13881@kernel.org> <CALs4sv09qKxtHri6ydEh9QGAcZ=aET3ttkZue88O+X44BA-N0Q@mail.gmail.com>
+ <CALs4sv3kG8kTt=VipR-=SzrLvK4ke3qj9Fe8pF=Mo3agd4X1=g@mail.gmail.com>
+ <20260211083132.15b15870@kernel.org> <CALs4sv1GtqdhGLkcJC1RFbr_bi3n_Hk2A2qahhAg38hrcmRznQ@mail.gmail.com>
+ <20260211085822.184f85c2@kernel.org> <CALs4sv1SQNKhxJV34w26+VLL98kK4teu0RhXEqk8xM98Q=8N4w@mail.gmail.com>
+In-Reply-To: <CALs4sv1SQNKhxJV34w26+VLL98kK4teu0RhXEqk8xM98Q=8N4w@mail.gmail.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Wed, 11 Feb 2026 23:20:09 +0530
+X-Gm-Features: AZwV_Qh10hOfKSeW46E5e9lPQdgLkFMhYcMfkBJE5LgwmPvqqSp7XWfrebsqV_g
+Message-ID: <CALs4sv3DGZJeDJKAcx3VXLjsLey=WzXer1xHGcX-xznOV_V8Ng@mail.gmail.com>
+Subject: Re: [PATCH net v2 4/4] selftests: drv-net: rss_ctx: test RSS contexts
+ persist after ifdown/up
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Bobby Eshleman <bobbyeshleman@gmail.com>, Michael Chan <michael.chan@broadcom.com>, 
+	"David S . Miller" <davem@davemloft.net>, Linux Netdev List <netdev@vger.kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Gospodarek <andrew.gospodarek@broadcom.com>
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009a1082064a900192"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258330-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258331-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davidwei.uk:email,devvm11784.nha0.facebook.com:mid,lib.py:url]
-X-Rspamd-Queue-Id: BF54D126B42
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,broadcom.com:email,broadcom.com:dkim]
+X-Rspamd-Queue-Id: C4DD0126B7D
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026 at 12:04:18PM -0800, David Wei wrote:
-> Add an env NetDrvContEnv for container based selftests. This automates
-> the setup of a netns, netkit pair with one inside the netns, and a BPF
-> program that forwards skbs from the NETIF host inside the container.
-> 
-> Currently only netkit is used, but other virtual netdevs e.g. veth can
-> be used too.
-> 
-> Expect netkit container datapath selftests to have a publicly routable
-> IP prefix to assign to netkit in a container, such that packets will
-> land on eth0. The BPF skb forward program will then forward such packets
-> from the host netns to the container netns.
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  .../testing/selftests/drivers/net/README.rst  |  19 ++
->  .../drivers/net/hw/lib/py/__init__.py         |   7 +-
->  .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
->  .../selftests/drivers/net/lib/py/env.py       | 163 ++++++++++++++++++
->  4 files changed, 190 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
-> index eb838ae94844..39370a83f238 100644
-> --- a/tools/testing/selftests/drivers/net/README.rst
-> +++ b/tools/testing/selftests/drivers/net/README.rst
-> @@ -62,6 +62,25 @@ LOCAL_V4, LOCAL_V6, REMOTE_V4, REMOTE_V6
->  
->  Local and remote endpoint IP addresses.
->  
-> +LOCAL_PREFIX_V4, LOCAL_PREFIX_V6
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--0000000000009a1082064a900192
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I think LOCAL_PREFIX_V4 is not supported in this series?
+On Wed, Feb 11, 2026 at 10:53=E2=80=AFPM Pavan Chebbi <pavan.chebbi@broadco=
+m.com> wrote:
+>
+> On Wed, Feb 11, 2026 at 10:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> >
+> > On Wed, 11 Feb 2026 22:08:39 +0530 Pavan Chebbi wrote:
+> > > > > My experiments are pointing to 'self.cancel()' sometimes taking a=
+ lot
+> > > > > of time as part of the exec().
+> > > > > I don't know but I feel the new test code itself should be OK. I =
+can
+> > > > > send a v3 and you can run it once too?
+> > > >
+> > > > Could you reply to this thread with what the version of the patch w=
+here
+> > > > you see defer() takes a long time? We use defer all over the place.=
+.
+> > >
+> > > Oh it is still in my sandbox. It's after I incorporate the comments I
+> > > received on the v2.
+> > > You should see it in v3. Let me ask Michael to send it.
+> >
+> > I'm asking for the version that doesn't work / causes trouble.
+>
 
-> +
-> +Local IP prefix/subnet which can be used to allocate extra IP addresses (for
-> +network name spaces behind macvlan, veth, netkit devices). DUT must be
-> +reachable using these addresses from the endpoint.
-> +
-> +  +-------------+        +----------------------------+
-> +  | INIT NS     |        | TEST NS                    |
-> +  | +---------+ |        | +------------------------+ |
-> +  | | NETIF   | |  bpf   | | Netkit                 | |
-> +  | |         |-|--------|>| nk_guest               | |
-> +  | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
-> +  | +---------+ |        | +------------------------+ |
-> +  | | Netkit  | |        +----------------------------+
-> +  | | nk_host | |
-> +  | +---------+ |
-> +  +-------------+
-> +
->  REMOTE_TYPE
->  ~~~~~~~~~~~
->  
-> diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> index d5d247eca6b7..022008249313 100644
-> --- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> +++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> @@ -3,6 +3,7 @@
->  """
->  Driver test environment (hardware-only tests).
->  NetDrvEnv and NetDrvEpEnv are the main environment classes.
-> +NetDrvContEnv extends NetDrvEpEnv with netkit container support.
->  Former is for local host only tests, latter creates / connects
->  to a remote endpoint. See NIPA wiki for more information about
->  running and writing driver tests.
-> @@ -29,7 +30,7 @@ try:
->      from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
->          ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
->      from drivers.net.lib.py import GenerateTraffic, Remote, Iperf3Runner
-> -    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
-> +    from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv, NetDrvContEnv
->  
->      __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
->                 "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
-> @@ -44,8 +45,8 @@ try:
->                 "ksft_eq", "ksft_ge", "ksft_in", "ksft_is", "ksft_lt",
->                 "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
->                 "ksft_not_none", "ksft_not_none",
-> -               "NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote",
-> -               "Iperf3Runner"]
-> +               "NetDrvEnv", "NetDrvEpEnv", "NetDrvContEnv", "GenerateTraffic",
-> +               "Remote", "Iperf3Runner"]
->  except ModuleNotFoundError as e:
->      print("Failed importing `net` library from kernel sources")
->      print(str(e))
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-> index a18e21069f7a..6b55068d5370 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-> @@ -3,6 +3,7 @@
->  """
->  Driver test environment.
->  NetDrvEnv and NetDrvEpEnv are the main environment classes.
-> +NetDrvContEnv extends NetDrvEpEnv with netkit container support.
->  Former is for local host only tests, latter creates / connects
->  to a remote endpoint. See NIPA wiki for more information about
->  running and writing driver tests.
-> @@ -43,12 +44,12 @@ try:
->                 "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
->                 "ksft_not_none", "ksft_not_none"]
->  
-> -    from .env import NetDrvEnv, NetDrvEpEnv
-> +    from .env import NetDrvEnv, NetDrvEpEnv, NetDrvContEnv
->      from .load import GenerateTraffic, Iperf3Runner
->      from .remote import Remote
->  
-> -    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote",
-> -                "Iperf3Runner"]
-> +    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "NetDrvContEnv", "GenerateTraffic",
-> +                "Remote", "Iperf3Runner"]
->  except ModuleNotFoundError as e:
->      print("Failed importing `net` library from kernel sources")
->      print(str(e))
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-> index 41cc248ac848..857ae0f37516 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-> @@ -1,13 +1,16 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
-> +import ipaddress
->  import os
->  import time
-> +import json
->  from pathlib import Path
->  from lib.py import KsftSkipEx, KsftXfailEx
->  from lib.py import ksft_setup, wait_file
->  from lib.py import cmd, ethtool, ip, CmdExitFailure
->  from lib.py import NetNS, NetdevSimDev
->  from .remote import Remote
-> +from . import bpftool, RtnlFamily, Netlink
->  
->  
->  class NetDrvEnvBase:
-> @@ -289,3 +292,163 @@ class NetDrvEpEnv(NetDrvEnvBase):
->                  data.get('stats-block-usecs', 0) / 1000 / 1000
->  
->          time.sleep(self._stats_settle_time)
-> +
-> +
-> +class NetDrvContEnv(NetDrvEpEnv):
-> +    """
-> +    Class for an environment with a netkit pair setup for forwarding traffic
-> +    between the physical interface and a network namespace.
-> +    +-------------+        +----------------------------+
-> +    | INIT NS     |        | TEST NS                    |
-> +    | +---------+ |        | +------------------------+ |
-> +    | | NETIF   | |  bpf   | | Netkit                 | |
-> +    | |         |-|--------|>| nk_guest               | |
-> +    | +---------+ |        | | {LOCAL_PREFIX_V6}::2:2 | |
-> +    | +---------+ |        | +------------------------+ |
-> +    | | Netkit  | |        +----------------------------+
-> +    | | nk_host | |
-> +    | +---------+ |
-> +    +-------------+
-> +    """
-> +
-> +    def __init__(self, src_path, rxqueues=1, **kwargs):
-> +        super().__init__(src_path, **kwargs)
-> +
-> +        self.netns = None
-> +        self._nk_host_ifname = None
-> +        self._nk_guest_ifname = None
-> +        self._tc_clsact_added = False
-> +        self._tc_attached = False
-> +        self._bpf_prog_pref = None
-> +        self._bpf_prog_id = None
-> +        self._init_ns_attached = False
-> +
-> +        self.require_ipver("6")
-> +        local_prefix = self.env.get("LOCAL_PREFIX_V6")
-> +        if not local_prefix:
-> +            raise KsftSkipEx("LOCAL_PREFIX_V6 required")
-> +
-> +        local_prefix = local_prefix.rstrip("/64").rstrip("::").rstrip(":")
-> +        self.ipv6_prefix = f"{local_prefix}::"
-> +        self.nk_host_ipv6 = f"{local_prefix}::2:1"
-> +        self.nk_guest_ipv6 = f"{local_prefix}::2:2"
-> +
-> +        rtnl = RtnlFamily()
-> +        rtnl.newlink(
-> +            {
-> +                "linkinfo": {
-> +                    "kind": "netkit",
-> +                    "data": {
-> +                        "mode": "l2",
-> +                        "policy": "forward",
-> +                        "peer-policy": "forward",
-> +                    },
-> +                },
-> +                "num-rx-queues": rxqueues,
-> +            },
-> +            flags=[Netlink.NLM_F_CREATE, Netlink.NLM_F_EXCL],
-> +        )
-> +
-> +        all_links = ip("-d link show", json=True)
-> +        netkit_links = [link for link in all_links
-> +                        if link.get('linkinfo', {}).get('info_kind') == 'netkit'
-> +                        and 'UP' not in link.get('flags', [])]
-> +
-> +        if len(netkit_links) != 2:
-> +            raise KsftSkipEx("Failed to create netkit pair")
-> +
-> +        netkit_links.sort(key=lambda x: x['ifindex'])
-> +        self._nk_host_ifname = netkit_links[1]['ifname']
-> +        self._nk_guest_ifname = netkit_links[0]['ifname']
-> +        self.nk_host_ifindex = netkit_links[1]['ifindex']
-> +        self.nk_guest_ifindex = netkit_links[0]['ifindex']
-> +
-> +        self._setup_ns()
-> +        self._attach_bpf()
-> +
-> +    def __del__(self):
-> +        if self._tc_attached:
-> +            cmd(f"tc filter del dev {self.ifname} ingress pref {self._bpf_prog_pref}")
-> +            self._tc_attached = False
+Ok, I now get what you are asking for. I will send the reply here with
+the patch soon. thanks.
 
-I know this was resolved before, but unfortunately I think these might
-have to be getattr (or another approach) for the case of
-super().__init__() failing? I found one bad setup may result in
-resolve_remote_ifc() failing and cascading up:
+> It's not in the list yet. v2, which is the latest version, does not
+> use exec/defer to bring the interface back up.
+>
+> > Presumably that's not the version you want Michael to submit?
+>
+> My submission is that the test code that will come in v3 is going to
+> be correct, except that sometimes I see a delay in getting the
+> interface back up, specifically when I use exec() or defer() for if
+> up. And I am being certain that the delay is not caused because of any
+> mistake I have made in the new tests..
 
-Traceback (most recent call last):
-File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/./tools/testing/selftests/drivers/net/hw/nk_netns.py", line 29, in <module>
-    main()
-File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/./tools/testing/selftests/drivers/net/hw/nk_netns.py", line 23, in main
-    with NetDrvContEnv(__file__) as cfg:
-File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 315, in __init__
-    super().__init__(src_path, **kwargs)
-File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 173, in __init__
-    self.remote_ifname = self.resolve_remote_ifc()
-File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 234, in resolve_remote_ifc
-    return v6[0]["ifname"] if v6 else v4[0]["ifname"]
-TypeError: 'NoneType' object is not subscriptable
-Exception ignored in: <function NetDrvContEnv.__del__ at 0x7fab5578c1f0>
-Traceback (most recent call last):
-File "/data/users/bobbyeshleman/linux-worktrees/tcp-dm-netkit/tools/testing/selftests/drivers/net/lib/py/env.py", line 370, in __del__
-    if self._tc_attached:
-AttributeError: 'NetDrvContEnv' object has no attribute '_tc_attached'
+--0000000000009a1082064a900192
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Best,
-Bobby
+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
+/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
+ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
+NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
+MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
+miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
+QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
+Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
+CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
+jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
+6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
+PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
+eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
+Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
+a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBkFPTS
+7nJhFG97wH4JFvm+LJDFNDXBTOld77HEsW/WzDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjAyMTExNzUwMjJaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB4ntgMakaUPQ/QQRRVqXJ5xQmInVqaM+COCJqL1mNr
+DgF7ZA7GRLzSFvVLcuZstRWv5DP1x80IOLizFjkU5PMRIkHdnXHNuwIwKfYez/8h1v8Cwb/0znAR
++aIHbyUms0zSAAZVTkqHn2AZttRJsI5VzF7Yohc4kBr3O7Xx2Qz7EnTOWK3jW6DgZE4XPoWn+zDR
+MlCehpqTA1PMMx5efZy9PtJ5X4XyVOlp1aWSPDRpimiFv6vFcZVcB71/os2fhUYan9xL6PQteXIX
+TBCu+ktZoZzMaaXN3SXSOjkV4Q7VcF80RgxmwVXGr2LefabW8k1pT1UFEmfjzU7nA2PBm9VM
+--0000000000009a1082064a900192--
 
