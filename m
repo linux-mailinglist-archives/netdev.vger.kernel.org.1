@@ -1,291 +1,134 @@
-Return-Path: <netdev+bounces-258209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wIP5Dac1jGmojAAAu9opvQ
-	(envelope-from <netdev+bounces-258209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 08:54:15 +0100
+	id OCWLF3U1jGmojAAAu9opvQ
+	(envelope-from <netdev+bounces-258208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 08:53:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4892121F5C
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 08:54:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F2F121F3F
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 08:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9B863015885
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 07:54:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B27FA30166C2
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 07:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782C832BF55;
-	Wed, 11 Feb 2026 07:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B892E975E;
+	Wed, 11 Feb 2026 07:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UIrR0dQT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCO90GH+"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFE127FB3A;
-	Wed, 11 Feb 2026 07:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128EC28725B;
+	Wed, 11 Feb 2026 07:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770796452; cv=none; b=kE6GEWNTh/nHlpOgFb8fRmoFaeckagOWUC2IK34TVpUzbpNgCEfgARpPFldms/NOIoJpuGYjamlOnaNB2BcJlP60yigKHAJG059g3j6ttR+dfz363zxztsyEyQtyV0r1fCbDCHkoJDm0Aiu9ci7KYjQsiISk9FEFx1Rc8SY2qAM=
+	t=1770796401; cv=none; b=U/n9f8dRB27K1FwoJLxuHkvb04dh3nMxOvbK3fVtN7On71zHC+nLEcTqRMzQscSOAmI+Atki/rX4BJZ0YdS/OhuBESpG0ajiHw3sLrrpTvhzz+PHT4XbWgSlP8U9169jUqorGAqH8Uhr42Piae6gpxlGseuQD5UNCbsBX/kaEJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770796452; c=relaxed/simple;
-	bh=HlUqEiJZNpY76RN8FtJozGCNj63GIaQ0xUQOUDiShdI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CVCRdBF5Z7cX4LL799xak03SifZjTcbBGrmJYeD3V0AZCvOcLpM66KNr3gJDFDE2y8uRdlxWRz6MVLgC4JRZDgvicBcP56WmDR/M5KMVXnJy5Ziut0Q+hvivjrM6dlfsIKuz/3xT6KM1hZhdDcrp8Z9n14KeU1z0zS1LFwG6PqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UIrR0dQT; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=5o
-	t73xfY/Od7e4IEa6llv5h1XbAMmezo+j8wYojpns0=; b=UIrR0dQTT55h6VheJF
-	pvkgos7eaJb997+fOXGtYTPyCKOGV3drnjNZS6lTNsyATT+Wse7Xh8v3TxYpn6Xf
-	1Ic/yvZl/TTxiJi0P2NVNmPo6PrbcrpQM/wNocPsKSY7gY4yeKKnsYlnLGDKJFiw
-	szDfUuIpctDfIAKPefkwOtd80=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDHPMdINYxpEMG3KQ--.31984S2;
-	Wed, 11 Feb 2026 15:52:42 +0800 (CST)
-From: Feng Yang <yangfeng59949@163.com>
-To: martin.lau@linux.dev
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	yangfeng59949@163.com
-Subject: Re: [PATCH v5] bpf: test_run: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
-Date: Wed, 11 Feb 2026 15:52:40 +0800
-Message-Id: <20260211075240.70095-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <249d6576-2259-4785-87b6-619052b4ce75@linux.dev>
-References: <249d6576-2259-4785-87b6-619052b4ce75@linux.dev>
+	s=arc-20240116; t=1770796401; c=relaxed/simple;
+	bh=8PdTrcrRLxnw1GH1MFtzUQ7Fyaxjnmz8RBfXIHwfsmk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=cqf8kuypTQ5A5FMOyjnFCQWQdKyhuLMs2gbHIxlatp3GCKPqeESrQZGlTSyooeB62Fd98+PdOL3KM8yCF+j9a8F5EaVnk1er9116CmSEdHZXxemvMg9lpcgKALz4MAheg5JxN6NN+kihD7LKAETJWgUSSSOz/xzNToTDVFgQB/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCO90GH+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAC49C4CEF7;
+	Wed, 11 Feb 2026 07:53:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770796400;
+	bh=8PdTrcrRLxnw1GH1MFtzUQ7Fyaxjnmz8RBfXIHwfsmk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=VCO90GH+qa3KUnBsKAzo9i1qJLRJ5ms6iYx1XZ6jXKrw9mztE8wrs22g6b2BUAOHB
+	 U2TzQhOesk7RAKwHYokjKLy3697eDUykyaQqhWIuhj5hZxlXyQZcIDxBfEuMuG18vc
+	 1dFTwKuoaxfFS/9BvHS6Tw4uOnhNdPjBqT8MEkg4Ir4NdkStgmVzlyojjA8Bh8W2NB
+	 5uo3L1Iu7FsAhbbvLIOD9OowYteDwDgsg+RdgtrZTjnHYokDvZkf17uubE91/Yq+LO
+	 UqRFSU94n0btLZ1bx+dUeuaQmkfIDgOfcPVGABg++XjyTqs36JzCzIWbR3a0wD1Slo
+	 e++2j/xLtYWqw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Matthew Wood <thepacketgeek@gmail.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ hch@infradead.org, jlbec@evilplan.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, gustavold@gmail.com, asantostc@gmail.com,
+ calvin@wbinvd.org, kernel-team@meta.com
+Subject: Re: [PATCH RFC 0/2] configfs: enable kernel-space item registration
+In-Reply-To: <aYnnHJ2TQEcD_xMS@gmail.com>
+References: <fdieWSRrkaRJDRuUJYwp6EBe1NodHTz3PpVgkS662Ja0JcX3vfDbNo_bs1BM7zIkVsHmxHjeDi6jmq4sPKOCIw==@protonmail.internalid>
+ <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
+ <878qfgx25r.fsf@t14s.mail-host-address-is-not-set>
+ <-6hh70JX5nq4ruTMbNQPMoUi6wz8vmM2MQxqB3VNK3Zt97c-oxWOo3y0cQ7_h6BSfcp78fR9GmzxcTQb_WB-XA==@protonmail.internalid>
+ <ineirxyguevlbqe7j4qpkcooqstpl5ogvzhg2bqutkic4lxwu5@vgtygbngs242>
+ <875xakwwvz.fsf@t14s.mail-host-address-is-not-set>
+ <C6V44SxiJH8NxRosmbshR-sfcBisrA5yWQpDmfQXe5vOX3uI6SM-r7wwUr7WxfPMS5ETUQ9GYDlptRs911A_Qg==@protonmail.internalid>
+ <aYTWbElo_U_neJZi@deathstar>
+ <87qzquuqsx.fsf@t14s.mail-host-address-is-not-set>
+ <aYnnHJ2TQEcD_xMS@gmail.com>
+Date: Wed, 11 Feb 2026 08:53:12 +0100
+Message-ID: <877bsjvhqv.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDHPMdINYxpEMG3KQ--.31984S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxtrWUtw48ZF1xCFyktw18Zrb_yoW3Gr1kpF
-	WUtrZ09r4rtryxtF4xtr4UZ3WYqrWv9F45Wr1avw1UZ3Z0vw1xJryIkr4jgrZ8Ar45ur4x
-	Zw1jqFn7Kr1UZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUIQ6dUUUUU=
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/xtbC0ArcVWmMNUqz6gAA3Q
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258209-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,redhat.com,163.com];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	FROM_NEQ_ENVFROM(0.00)[yangfeng59949@163.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258208-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,infradead.org,evilplan.org,wbinvd.org,meta.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[a.hindborg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hust.edu.cn:email]
-X-Rspamd-Queue-Id: E4892121F5C
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,t14s.mail-host-address-is-not-set:mid]
+X-Rspamd-Queue-Id: E1F2F121F3F
 X-Rspamd-Action: no action
 
-On Tue, 10 Feb 2026 11:10:03 -0800 Martin KaFai Lau <martin.lau@linux.dev> wrote:
+Breno Leitao <leitao@debian.org> writes:
 
-> On 2/10/26 1:06 AM, Feng Yang wrote:
-> > From: Feng Yang <yangfeng@kylinos.cn>
-> > 
-> > The bpf_lwt_xmit_push_encap helper needs to access skb_dst(skb)->dev to
-> > calculate the needed headroom:
-> > 
-> > 	err = skb_cow_head(skb,
-> > 			   len + LL_RESERVED_SPACE(skb_dst(skb)->dev));
-> > 
-> > But skb->_skb_refdst may not be initialized when the skb is set up by
-> > bpf_prog_test_run_skb function. Executing bpf_lwt_push_ip_encap function
-> > in this scenario will trigger null pointer dereference, causing a kernel
-> > crash as Yinhao reported:
-> > 
-> > [  105.186365] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> > [  105.186382] #PF: supervisor read access in kernel mode
-> > [  105.186388] #PF: error_code(0x0000) - not-present page
-> > [  105.186393] PGD 121d3d067 P4D 121d3d067 PUD 106c83067 PMD 0
-> > [  105.186404] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> > [  105.186412] CPU: 3 PID: 3250 Comm: poc Kdump: loaded Not tainted 6.19.0-rc5 #1
-> > [  105.186423] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> > [  105.186427] RIP: 0010:bpf_lwt_push_ip_encap+0x1eb/0x520
-> > [  105.186443] Code: 0f 84 de 01 00 00 0f b7 4a 04 66 85 c9 0f 85 47 01 00 00 31 c0 5b 5d 41 5c 41 5d 41 5e c3 cc cc cc cc 48 8b 73 58 48 83 e6 fe <48> 8b 36 0f > b7 be ec 00 00 00 0f b7 b6 e6 00 00 00 01 fe 83 e6 f0
-> > [  105.186449] RSP: 0018:ffffbb0e0387bc50 EFLAGS: 00010246
-> > [  105.186455] RAX: 000000000000004e RBX: ffff94c74e036500 RCX: ffff94c74874da00
-> > [  105.186460] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff94c74e036500
-> > [  105.186463] RBP: 0000000000000001 R08: 0000000000000002 R09: 0000000000000000
-> > [  105.186467] R10: ffffbb0e0387bd50 R11: 0000000000000000 R12: ffffbb0e0387bc98
-> > [  105.186471] R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000002
-> > [  105.186484] FS:  00007f166aa4d680(0000) GS:ffff94c8b7780000(0000) knlGS:0000000000000000
-> > [  105.186490] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [  105.186494] CR2: 0000000000000000 CR3: 000000015eade001 CR4: 0000000000770ee0
-> > [  105.186499] PKRU: 55555554
-> > [  105.186502] Call Trace:
-> > [  105.186507]  <TASK>
-> > [  105.186513]  bpf_lwt_xmit_push_encap+0x2b/0x40
-> > [  105.186522]  bpf_prog_a75eaad51e517912+0x41/0x49
-> > [  105.186536]  ? kvm_clock_get_cycles+0x18/0x30
-> > [  105.186547]  ? ktime_get+0x3c/0xa0
-> > [  105.186554]  bpf_test_run+0x195/0x320
-> > [  105.186563]  ? bpf_test_run+0x10f/0x320
-> > [  105.186579]  bpf_prog_test_run_skb+0x2f5/0x4f0
-> > [  105.186590]  __sys_bpf+0x69c/0xa40
-> > [  105.186603]  __x64_sys_bpf+0x1e/0x30
-> > [  105.186611]  do_syscall_64+0x59/0x110
-> > [  105.186620]  entry_SYSCALL_64_after_hwframe+0x76/0xe0
-> > [  105.186649] RIP: 0033:0x7f166a97455d
-> > 
-> > Temporarily add the setting of skb->_skb_refdst before bpf_test_run to resolve the issue.
-> > 
-> > Fixes: 52f278774e79 ("bpf: implement BPF_LWT_ENCAP_IP mode in bpf_lwt_push_encap")
-> > Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> > Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> > Closes: https://groups.google.com/g/hust-os-kernel-patches/c/8-a0kPpBW2s
-> > Signed-off-by: Yun Lu <luyun@kylinos.cn>
-> > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> > Tested-by: syzbot@syzkaller.appspotmail.com
-> > ---
-> > Changes in v5:
-> > - Refer to the bpf_lwt_xmit_reroute function to configure the dst parameter.
-> > - Link to v4: https://lore.kernel.org/all/20260209015111.28144-1-yangfeng59949@163.com/
-> > Changes in v4:
-> > - add rcu lock
-> > - Link to v3: https://lore.kernel.org/all/20260206055113.63476-1-yangfeng59949@163.com/
-> > Changes in v3:
-> > - use dst_init
-> > - Link to v2: https://lore.kernel.org/all/20260205092227.126665-1-yangfeng59949@163.com/
-> > Changes in v2:
-> > - Link to v1: https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/
-> 
-> The earlier syzbot reports are crying for a selftest which is still 
-> missing in v5.
-> 
-> The CI has also reported errors in the test_progs. Did you run any test 
-> before posting ?
+> On Mon, Feb 09, 2026 at 11:58:22AM +0100, Andreas Hindborg wrote:
+>> Perhaps we should discuss this at a venue where we can get some more
+>> people together? LPC or LSF maybe?
+>
+> Certainly, I agree. I=E2=80=99ve submitted my subscription to LSFMMBPF wi=
+th the main
+> goal to discuss this topic. I wasn=E2=80=99t planning to present it this,=
+ given it was
+> a "overkill"?, but I=E2=80=99m happy to do so if that is the right direct=
+ion.
 
-My apologies. I only tested whether a crash would occur 
-when using `bpf_prog_test_run_skb` to execute `bpf_lwt_push_ip_encap` without a dst entry.
-I will include a selftest in my next submission.
+I'd appreciate if we can get some people in a room and force them to
+think about this. I think it is a good idea if you submit a topic. If we
+don't get a slot, we can see what we can do in the hallway, and if that
+does not work out we are forced to make a decision between the 4 of us
+participating on list. At least nobody can say we did not try to collect
+input and opinions then.
 
-> pw-bot: cr
-> 
-> > ---
-> >   net/bpf/test_run.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 47 insertions(+)
-> > 
-> > diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> > index 178c4738e63b..dbd2c44da7e5 100644
-> > --- a/net/bpf/test_run.c
-> > +++ b/net/bpf/test_run.c
-> > @@ -24,6 +24,7 @@
-> >   #include <net/netdev_rx_queue.h>
-> >   #include <net/xdp.h>
-> >   #include <net/netfilter/nf_bpf_link.h>
-> > +#include <net/ip6_route.h>
-> >   
-> >   #define CREATE_TRACE_POINTS
-> >   #include <trace/events/bpf_test_run.h>
-> > @@ -992,6 +993,7 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
-> >   	u32 headroom = NET_SKB_PAD + NET_IP_ALIGN;
-> >   	u32 linear_sz = kattr->test.data_size_in;
-> >   	u32 repeat = kattr->test.repeat;
-> > +	struct dst_entry *dst = NULL;
-> >   	struct __sk_buff *ctx = NULL;
-> >   	struct sk_buff *skb = NULL;
-> >   	struct sock *sk = NULL;
-> > @@ -1156,6 +1158,51 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
-> >   		skb->ip_summed = CHECKSUM_COMPLETE;
-> >   	}
-> >   
-> > +	if (prog->type == BPF_PROG_TYPE_LWT_XMIT && !skb_dst(skb)) {
-> > +		struct flowi4 fl4 = {};
-> > +		struct flowi6 fl6 = {};
-> > +		struct rtable *rt;
-> > +
-> > +		switch (skb->protocol) {
-> > +		case htons(ETH_P_IP):
-> > +			if (sizeof(struct iphdr) <= skb_headlen(skb)) {
-> > +				fl4.saddr = ip_hdr(skb)->saddr;
-> > +				fl4.daddr = ip_hdr(skb)->daddr;
-> > +			}
-> > +
-> > +			rt = ip_route_output_key(net, &fl4);
-> 
-> What can be expected from the return value rt if fl4 is 0.
 
-If it is empty, `ip_route_output_key_hash_rcu` will assign the loopback address,
-and the returned `rt` is valid, not an error value.
+Best regards,
+Andreas Hindborg
 
-> > +			if (IS_ERR(rt)) {
-> > +				ret = PTR_ERR(rt);
-> 
-> I suspect this is probably what failed in CI. Add a NULL check in 
-> bpf_lwt_push_ip_encap instead. No change is needed in the 
-> bpf_prog_test_run_skb.
-
-The root cause of the CI failure is that the default path was taken, resulting in a return value of -EINVAL.
-So, is your suggestion to modify the bpf_lwt_push_ip_encap function as in the v1(https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/) version?
-However, the previous suggestion was to make changes to the bpf_prog_test_run_skb function instead.
-
-Thank you very much for your reply.
-
-> > +				goto out;
-> > +			}
-> > +			dst = &rt->dst;
-> > +			break;
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +		case htons(ETH_P_IPV6):
-> > +			if (sizeof(struct ipv6hdr) <= skb_headlen(skb)) {
-> > +				fl6.saddr = ipv6_hdr(skb)->saddr;
-> > +				fl6.daddr = ipv6_hdr(skb)->daddr;
-> > +			}
-> > +
-> > +			dst = ip6_route_output(net, NULL, &fl6);
-> > +			if (IS_ERR(dst)) {
-> > +				ret = PTR_ERR(dst);
-> > +				goto out;
-> > +			}
-> > +			break;
-> > +#endif
-> > +		default:
-> > +			ret = -EINVAL;
-
-The reason for the CI test failure.
-
-> > +			goto out;
-> > +		}
-> > +
-> > +		if (unlikely(dst->error)) {
-> > +			ret = dst->error;
-> > +			dst_release(dst);
-> > +			goto out;
-> > +		}
-> > +		skb_dst_set(skb, dst);
-> > +	}
-> >   	ret = bpf_test_run(prog, skb, repeat, &retval, &duration, false);
-> >   	if (ret)
-> >   		goto out;
 
 
