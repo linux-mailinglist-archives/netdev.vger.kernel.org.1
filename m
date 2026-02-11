@@ -1,139 +1,125 @@
-Return-Path: <netdev+bounces-258171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258172-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aE8YDS/ji2kVcgAAu9opvQ
-	(envelope-from <netdev+bounces-258171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 03:02:23 +0100
+	id 0JNSJkDli2kVcgAAu9opvQ
+	(envelope-from <netdev+bounces-258172-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 03:11:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DE991209E8
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 03:02:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1249B120B52
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 03:11:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37147304D1DA
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 02:02:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D9C39301385A
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 02:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223D22EB5A6;
-	Wed, 11 Feb 2026 02:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F702F3C3D;
+	Wed, 11 Feb 2026 02:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxE1JbuX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGmPUVMA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37602DB788;
-	Wed, 11 Feb 2026 02:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BFD2D3225
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 02:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770775339; cv=none; b=jn1EiwY5eaMJqZvkDNMZv+elAjFMW/VdKL8P4ZVI4Hu+U0GFzNIflDOktJrlcGTSkBYCauew8Tf4lSEtaDo6BiPQ1jjDNqPY+VBn2Lsjs/l+Td7CreVeTCToCwh7WSdLcrQnvHHaMF78237F1tDUaI+OCAzBTDpLt+cNXf6eLBg=
+	t=1770775868; cv=none; b=Dsoyy01yrejt+A6IbQGrHKDPa1UE+f+QEc9Pt0NZ0UpzCfo3iX4hXrTAHzjUUjBHLWrngsSlYa7+OXeOZG6NhSYxQRJwf9OVe6uh9TMR6RNlAqDuPnwtC5Op9uR3mUEeHo3lkcAdMAQEOwGX+qMI4pK+DErIreM8xloJeeGuwNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770775339; c=relaxed/simple;
-	bh=OaL7HmtY8PqZLX4O+1g7qbPlaK6jtij1faPJYo7M6cs=;
+	s=arc-20240116; t=1770775868; c=relaxed/simple;
+	bh=TLPtn6WOJKw0EpOKNmZoT7Lr0kSiJskkgtAG2jc/JZQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bSsQ2YTosL4D0DRY8ZVaYBGnipN/j2LpbKMLMPbR5IhCqCZ+6RqMVYfGh0TnV5gMBU16sYLL+OqPtUxLw93a7KohfiJ7tYVYqnkEttCuQW6hVOFUMUrKBMRII43GfNL3Lapl+bxaV6fe7G2sdfnA4MUV3RBwfbbkFTC2QzXhBH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxE1JbuX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A19C116C6;
-	Wed, 11 Feb 2026 02:02:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oCxPtF4AmFIaImPLK3t6G/ivC+AEWTTyUJ4rsR/Sw/q8XppHy0tbfvRYyhr0AYLcmVfWJ10J/PQ8kQw/P8CCm/OvvatoUCP77ni9BJO28J6cwv0i0P8q0ugrky6+SgaGm32ALaVV6Gzew0Rp50DSxiePoiDPaQv8HJEAiddoYHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGmPUVMA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC9E6C116C6;
+	Wed, 11 Feb 2026 02:11:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770775338;
-	bh=OaL7HmtY8PqZLX4O+1g7qbPlaK6jtij1faPJYo7M6cs=;
+	s=k20201202; t=1770775868;
+	bh=TLPtn6WOJKw0EpOKNmZoT7Lr0kSiJskkgtAG2jc/JZQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nxE1JbuXS8wPbm1dDTh9Ig4ncqbH7TE+/RsRs23hStcbYsElRZI2XY529fcgfAi/c
-	 R1UwvauzlXAosiWhA01TC9cFd95YvlFnVVYUGj1uL6dgvYP4QTyKGhBPjxTVR8KNWm
-	 XE0Wt/z6JV9x7yQnTuHg1ljHE48vq0RmkVwy3FGrgqbti4ZvCklQQ84Q4vhVgidef4
-	 59dRXj1fCCUJBev/zdXvVZCyDcLeI+5bPm6W+1y+m7x2DKFVW7SLkQI+syC7xYgfjA
-	 4vAP29Vd32+9v7Ipr13i0WCn8WUZNpcUYqdZqpQGTOCyYR5+2udandhrRXt9KeKX7h
-	 aKCC0nFldJTAQ==
-Date: Tue, 10 Feb 2026 18:02:17 -0800
+	b=TGmPUVMAGJRAPYk/qP3GFfu64HHbYnTSSkoDaX2NBkNW6r9y08R6815Wd19KMgRs+
+	 xeFCHHyzUEg3hIvwDhD/VIdtkm9J/YWlQVzuq9UgTYawYxlUF8KZL5eLfpimc5IKXA
+	 8cXjQzkEPmtC/S7m3DilGjh5E0FCc6J+RIbJPDFBpUBKuUN6NZ6AOt719nnOsZyrZE
+	 gnPA4KKxh43qCyFQre3N2nIgj62HRgQh6Wos+OiPETiTfC10lvFyUPpWGBoHRAsGFY
+	 bwcvSwuqRtjXPofHL3JzWivE+c5ZPHIegbHkp4NgezXuUQF81lK/irTrlv32WDnPSp
+	 /TeG6OxHzMNSg==
+Date: Tue, 10 Feb 2026 18:11:06 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>,
- "shuah@kernel.org" <shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
- <linux-kselftest@vger.kernel.org>, Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net-next] selftests: drv-net: port_split: convert to
- ksft format and mark disruptive
-Message-ID: <20260210180217.3615df89@kernel.org>
-In-Reply-To: <DM6PR12MB4516D06845B4A6D2691E46F4D865A@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20260207012151.3972723-1-kuba@kernel.org>
-	<DM6PR12MB4516D06845B4A6D2691E46F4D865A@DM6PR12MB4516.namprd12.prod.outlook.com>
+To: Marc =?UTF-8?B?U3XDscOp?= <marcdevel@gmail.com>
+Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, dborkman@kernel.org, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next v4 2/4] selftests/net: add no ARP b/mcast,null
+ poison test
+Message-ID: <20260210181106.0f4a305a@kernel.org>
+In-Reply-To: <19761bd8088ea7bab2b8c37461aa77be08082fc4.1770399836.git.marcdevel@gmail.com>
+References: <cover.1770399836.git.marcdevel@gmail.com>
+	<19761bd8088ea7bab2b8c37461aa77be08082fc4.1770399836.git.marcdevel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258171-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258172-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,vger.kernel.org,kernel.org,linux.dev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9DE991209E8
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arp_ndisc_evict_nocarrier.sh:url,arp_no_invalid_sha_poision.sh:url,bind_bhash.sh:url,bareudp.sh:url]
+X-Rspamd-Queue-Id: 1249B120B52
 X-Rspamd-Action: no action
 
-On Mon, 9 Feb 2026 09:54:08 +0000 Danielle Ratson wrote:
-> Few comments:
-> 
-> 1. Before the change we simply ran the test without extra info, like
-> that: $ ./devlink_port_split.py
-> 
-> Now the new infrastructure requires to run with:
-> $ NETIF=swp1 ./devlink_port_split.py
-> 
-> While swp1 is an example for some interface in the machine using to
-> indicate the real target device.
-> 
-> Otherwise, the test fails- if no NETIF is configured, the framework
-> defaults to netdevsim (SW mode), and since the test sets
-> 'nsim_test=False', it emits an error. So the new change, breaks the
-> way the test was running by now.
-> 
-> However, I managed to work around that by adding a configuration file
-> to the selftests dir:
-> 
-> $ cat drivers/net/hw/net.config
-> NETIF=swp1
-> 
-> 2. The test fails for waiting for the carrier to come up. But
-> actually, we should skip the carrier check. The port split test
-> doesn't require carrier to be up since it's only testing port
-> configuration (split/unsplit) functionality, not the data path.
-> 
-> I tried to run it while overriding the NetDrvEnv __enter__ method to
-> bring the interface up without waiting for carrier:
+On Sat,  7 Feb 2026 21:40:34 +0100 Marc Su=C3=B1=C3=A9 wrote:
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
+ts/net/Makefile
+> index afdea6d95bde..c6d571bf72be 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -11,6 +11,7 @@ TEST_PROGS :=3D \
+>  	amt.sh \
+>  	arp_ndisc_evict_nocarrier.sh \
+>  	arp_ndisc_untracked_subnets.sh \
+> +	arp_no_invalid_sha_poision.sh \
+>  	bareudp.sh \
+>  	big_tcp.sh \
+>  	bind_bhash.sh \
 
-Hm, I think we can risk removing the carrier wait for NetDrvEnv.
-Only the "endpoint" env (NetDrvEpEnv) should really depend on the NIC
-being able to send and receive packets. I guess I added the carrier
-wait to the base class to save LoC.
+Not sure why but we get:
 
-Thanks a lot for trying it out! I'll send a v2 after the merge window.
+# selftests: net: arp_no_invalid_sha_poision.sh
+# Warning: file arp_no_invalid_sha_poision.sh is missing!
+not ok 1 selftests: net: arp_no_invalid_sha_poision.sh
+
+When we run=20
+	make TARGETS=3Dnet run_tests
+
+The word "poison" is misspelled but both in the file name and makefile.
+I guess there's another typo somewhere.
 
