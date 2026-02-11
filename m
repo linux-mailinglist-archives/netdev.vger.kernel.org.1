@@ -1,223 +1,222 @@
-Return-Path: <netdev+bounces-258333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258335-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBFxEgzCjGkmswAAu9opvQ
-	(envelope-from <netdev+bounces-258333-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:53:16 +0100
+	id 0CmfKnzKjGlktAAAu9opvQ
+	(envelope-from <netdev+bounces-258335-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:29:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDBA126BB3
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:53:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC43126DBF
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 76C203014511
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:53:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EB96D300788A
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8683301704;
-	Wed, 11 Feb 2026 17:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3FC352C37;
+	Wed, 11 Feb 2026 18:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYrjakXU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c0U9Gq2h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846D621256C
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770832392; cv=none; b=Dgu92LBjaQ0RvG6GRaqTTS78cBUGQWTAG9ddTKz7j/pR/x8Nt8A0D+v8QwPYMJDfDL0llYBR2BnkZQJyhV9ZOYPsaIxS9u2YJu0IIxrf8E/bztpMUbGQI3XReT+1QMDGWLkCRy1VNG0OcZeMVJ58hXQjK2mfx1VOv6NuAAN2Ea0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770832392; c=relaxed/simple;
-	bh=c4dq5xUpMII4H2H8IBMNXRUIU/AIU6r+F0KqMfvj9og=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mx8uBNmA9KoTUYuk+TDzR9OQPrIaVuxjn6CZ3XJ7ZmG0wdMLANHihXqs05QUDJVozo7NsV16xmrOtbbXL22w2wP5enx/PK4HM4Aqf+c8r33dsHQGlIZPhUacFzIsXfFAET4SN5apPMk98LP3nJKW492f+Gcen8+IE1SOEG0gkpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYrjakXU; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A408534FF63
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 18:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770834553; cv=pass; b=FgqS+MWw0KxwmrbF6J3EMFI0ORu4BGlJTmsxp8a/4IuFdgsOk71Hh5Ef8om9fN0v01nJC2FHy/WaZXl2bHdZ+PoZqWOe3LTWWZWd8wUcYtheGEhOZOnncN5xLFYo4z8Z+HiD+gNcB320qBWXlrhdN29dv+fi+QvZItEwrdO/8lI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770834553; c=relaxed/simple;
+	bh=dDzGtvolRcT+mDdSSCyQ+GMVHlOOaeuElBzmTDizgZg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u08W14dAsWf+lJ1LosNdaIgNYtO3ORjlMxv+QB1CEQ1RMYHydS66lA9klO9e6vh8w4438b3eklAa2v3L1qiD2s0ovzUvh8d8Sle8KIhDJM6tEkIaXEsyP2xHkdnRRW0hFpjaeElCEI5VwcmiqVs9VlOA0bQ8gY0xj3qFG4TQne0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c0U9Gq2h; arc=pass smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-649df393c04so2283786d50.1
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:53:11 -0800 (PST)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-34c93e0269cso861619a91.1
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:29:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770834552; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Z69SiiZTlTntsqtAZgDb2gesR3DQZEeuZ3jHkvhoxxaZiJwOcF9U1VoMes7E+VP/XF
+         ie8WzGuiGagcFTIfhd8Mhd/MdQV7pmERf0ZuqRpitWItyt4OwyVtPGFZgfJ/zLbr14/L
+         KZOOo/Qhi1z+6ZdFjL9MJN9K4n6dhjvigxTMGSxzINjvmTS3FRFSSsBuS1wbZ9QbjKAo
+         EtKKNhYviUB5VkTK+0sc16A/ikq4aWKZaZx153RIA3BXO1DXPOdMyYAEhMUkgoG7NlYm
+         KOjLwiTVOP1u9BFFkPozUXIcdz3MQs6Xiiekl0/yl/DFySKd4oYLfdWmiscRZkKi89Zb
+         mpFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=W/et8SsTsAieKZFKqvk+uM9q5eB1Cyn0GJnSaqg4nOo=;
+        fh=7ydaQ9ymFSq3Qj7ComF7ttJTQSfmFe8O8iD2CDMmDc4=;
+        b=VvyPkD015+9/Hll+A4MLaleX4ESnaPcTATlDVJefFW5O0ZXZyzCNeCcMy5HxzWyZgu
+         X/m2Fz7Oma0K6BNlKddY6YLPO3n6dMD3HysZu1xNAcZry44rnXXyeFq7bAaFLf2fg50a
+         77VJY39AWOnJfhu1OucJnpmOO6B+5Y6yqSlgvlaHGCPiOWHAyowxIar6zBkwevNYeXmJ
+         RPGqdqD+j8an7BrmIVOOExSEMwyvKujmOF/FMWQ2GWuwTXXh/LKhDRAvk8NBiwzOUG+b
+         yHFKkeiSNYfYAmGLKPe5q5xhbj/h7rKB5JD90ZA6yPnBUEKKvEIRa3LrA9Td8/m/E8Zf
+         cubw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770832390; x=1771437190; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWg6VNIdjfTRqaYdKKaQYNgfzqUG27HO2/zp5mmPnfw=;
-        b=dYrjakXUi2wPSZ4t6+CG1WCK3y0guJbYFQyH7mBpLBwh11cRmsJF3pWSshBVsCGnXC
-         AS9Uo4TYYmdbuwBNIseAFuv+c04LmvqEqwj0C2r9c5+A2m2FisOG98Ir5y5296Yzr2Nw
-         cFquUCKvKqFlIhuBYEKwyTrYVnfmJKA6QHeAIK25m7RHZrpXzDsKr3zs5zcsUIDpWuIK
-         dMmw0sSHKTBYP5yDTtSA6mLXrNSaRMXOjOMrhRPMAKyEQk3Vdrd712/qI9xYZrsXgCPF
-         NlxjH56N489LYXVkK9Hqkbk3LjXN7InR9PrdhNHjg3TJaAft8yut2wHFLMGhwsfKsj9W
-         1Itw==
+        d=gmail.com; s=20230601; t=1770834552; x=1771439352; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W/et8SsTsAieKZFKqvk+uM9q5eB1Cyn0GJnSaqg4nOo=;
+        b=c0U9Gq2hhee53vPTYwaO+xyU66zvG+ozCs2hhRw0wi2/+pMwFR3+twSwH+7ottQbB3
+         0iV1uEj+eRuyEZ61QkiE/3CKZGo40rbRBRkf8XNk8d9BVUEtAUnVc06oPzxogYeJV2vQ
+         ay2ez4k5qlsy07tJlCtVO/B58iz1z3SOMYZ2+rZIdM2I7t6TSrkCOh1mjc2YhblL21B3
+         /AKBhiZppF9ogpiZHSeMWiNq5G6HRNws547lqHhp7hnXXzZOrBW/0Erc9F0y7NKcdrsT
+         AzigMBZl6c4YIO+qkyKzfI0Q8fbmnQ+OzvlKs3Zh+FH8PEdwggAGw+LmZfPKrsE8rqdT
+         Tdkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770832390; x=1771437190;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hWg6VNIdjfTRqaYdKKaQYNgfzqUG27HO2/zp5mmPnfw=;
-        b=GHd/j+81kpeMyrUy93KMteQCvufVZFUNKFp0jELSk4FlKEadey43TNyA3p7BkI/PYH
-         uEYxLzP83fDimjzYAfk2HYK29zjQwGxdpuoV3VTpD1wFSApgx3szvckOOCtZMCjs2JBs
-         FUy9da52mkB37AJCqCXEn4Gf/qClHqPxS4l99I27b289WC81iIOxwdbC7nOBW3wI/I+f
-         v74cwDIvd4JJhI4atquH3PjqcTBzf8HggMeIgbv6960UMWydLYZ31AIbNp6I15HNfwza
-         h4EzuujE4uzPGWByD4Z7RAjb5sTnay/EskTXm/gkFePjT8V/Y46r5AODqCj8lFQ52Rkn
-         45WQ==
-X-Gm-Message-State: AOJu0YwRYai/DaJX7D2Q1wUWjBmmbbfXmba5MppzgfiLz4ioeJ+L1ZBd
-	/6YG0B3oYv4Im9BKM7Sx8Qn8CEXceYBodBtx4vZhC7sd6xngwA3654If
-X-Gm-Gg: AZuq6aJfbNHdsC0HcHFynTClBEaLcWZHbkQocVmdudyxI8LYZn4fOou41kr3u2t/DDV
-	x7oNTIMOToMs7t2gwJTVY2wEm7RePR0ONUTBXzaTql2DRgctLf4B6wnnxDbU8gFjPyYYdTPCdT1
-	cbK5W6zEjBq1YlPEoMKOcbeedOuaG76Bxya12f16NU7p2qrX66EoSGe8Vf7yTkGrAcrKYVrBBzy
-	6SyCHHqva52GbyQZvVZgG9amFoXZFg4wrP+Rf0CEYITWAVm7GCrCaN2vVPTIMVZd/+o8iP24kla
-	IVcVBSXcKLlix67ddy5VuFOjW7YbxCNmdetzDJ0+OJgTDRI5csRroQYlRANlQAO4PZtnQbiBNRj
-	BNSFpNXXIh4GApFic5jqELsoIN8ISIUMRBUDPl1JupSlo3fFEBiJzySm5gJhOcOUE7UGPW3IXDE
-	qYQ1B3yjSjhnPgZcO28c+Vvvuw3k2pknROTOVOwfebYW2iGPopfOkLa13dXg==
-X-Received: by 2002:a05:690e:130b:b0:64a:f2dc:2863 with SMTP id 956f58d0204a3-64bbaac25cfmr120778d50.47.1770832390535;
-        Wed, 11 Feb 2026 09:53:10 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5d::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64afc87a3a0sm2562323d50.9.2026.02.11.09.53.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Feb 2026 09:53:10 -0800 (PST)
-Date: Wed, 11 Feb 2026 09:53:08 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Joe Damato <joe@dama.to>, Wei Wang <weibunny@meta.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: [PATCH net-next 4/4] selftests/net: Add netkit container ping
- test
-Message-ID: <aYzCBIACSmC0l+oA@devvm11784.nha0.facebook.com>
-References: <20260210200419.3555944-1-dw@davidwei.uk>
- <20260210200419.3555944-5-dw@davidwei.uk>
+        d=1e100.net; s=20230601; t=1770834552; x=1771439352;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=W/et8SsTsAieKZFKqvk+uM9q5eB1Cyn0GJnSaqg4nOo=;
+        b=COGOc1gAl7jpCJJoVHDsRiUwDt6EtaUVpzSX0aw2hsTY2U+/SLsPz0UlutQUAX5BeF
+         11xu6QeBT1xT2KSXlxI8tD9pJDFg9acRE4H2TydRu1QtX4bQSkLezWe6FE86Yw/1KMGl
+         547rWVFEBK/KRmPOPARKnaarzuDscB2QH/nk+MPs5dxfSgW80GvoMOwEvPeJaTcpvLNn
+         lv1GRk6Lazp4UuYOgerk3LIZ+rha1bZMb0vBTlgy4AFpCt1km24q5l454NJCqmHbFOYe
+         nmoPImSs7a7tL2ZRDYoZre2DQJsY7W/OiSKoiRX1a7k9R1VDlJAXhtwr1lIEfv3xxiAn
+         qVCA==
+X-Gm-Message-State: AOJu0YzFCBMfKxNRk9gZaI7T7n3YuXBoGk4WKNCnqsZvDYrJCSRPcD+4
+	1dgQSTnmOIW3jzDAdx0b0dxV+uq5daTafWYfU90K0IY5jT1fG5+/WE7yaC2Ata1rinH0/SaLNg8
+	XXtCAdW9eGSugoXROiZUxv/zesPk3M2272uf8
+X-Gm-Gg: AZuq6aIRyNddLTGntXXnxdx04rYYfxMkgA2V4kcU9UeVswHqvMnyqIxxDK3h+DuzDc4
+	tPTtatLO1BEFfuNziYzfPTpcQ1AdedS/g9bjUdAeaWyMBWXin+4A+tZuh3Vpsg8wVkFV17O5tOM
+	Kt4Vu3itDrCaga2jk/PByiWXkftM2abvVsw0AR4ZoXg90nkIm0dzoYm5tfLj1AsvE3kjOG0ReNj
+	JuAIv8n4qkNq+9QlbDBuw/a3Dm3GoBmMMiU13zuoz1JvofQqfBoXstVvlUVbG9CRlJtrWYtnSWi
+	g5aDcUIDf2QfxbXwFXMhbhT/GKGmsRE3YRSER5K176HaSK9661kRiuHoAF6iVw8znRXi9Q==
+X-Received: by 2002:a17:90b:4f8d:b0:354:57eb:c826 with SMTP id
+ 98e67ed59e1d1-3568f30b6c4mr260508a91.2.1770834551889; Wed, 11 Feb 2026
+ 10:29:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260210200419.3555944-5-dw@davidwei.uk>
+References: <cover.1770399836.git.marcdevel@gmail.com> <19761bd8088ea7bab2b8c37461aa77be08082fc4.1770399836.git.marcdevel@gmail.com>
+ <20260210181106.0f4a305a@kernel.org>
+In-Reply-To: <20260210181106.0f4a305a@kernel.org>
+From: Marc Sune <marcdevel@gmail.com>
+Date: Wed, 11 Feb 2026 19:29:01 +0100
+X-Gm-Features: AZwV_QhYdQrdU9Rstfhr1ZG6k4WhGTbHgj1QUT8hKdoXAHGhAMKk_NrPbIhVSgI
+Message-ID: <CA+3n-TpV8pg9exk15vGpPX3OW1-k-pLSiixUZ2UEvbFOgcc0+g@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/4] selftests/net: add no ARP b/mcast,null
+ poison test
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258333-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258335-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm11784.nha0.facebook.com:mid,lib.py:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davidwei.uk:email,rss_api.py:url,rss_ctx.py:url,pp_alloc_fail.py:url,nic_timestamp.py:url,iogearbox.net:email,nk_netns.py:url]
-X-Rspamd-Queue-Id: ADDBA126BB3
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcdevel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,amt.sh:url,arp_ndisc_evict_nocarrier.sh:url]
+X-Rspamd-Queue-Id: 4DC43126DBF
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026 at 12:04:19PM -0800, David Wei wrote:
-> Add a basic ping test using NetDrvContEnv that sets up a netkit pair,
-> with one end in a netns. Use LOCAL_PREFIX_V6 and nk_forward BPF program
-> to ping from a remote host to the netkit in netns.
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  .../testing/selftests/drivers/net/hw/Makefile |  1 +
->  tools/testing/selftests/drivers/net/hw/config |  3 +++
->  .../selftests/drivers/net/hw/nk_netns.py      | 23 +++++++++++++++++++
->  3 files changed, 27 insertions(+)
->  create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
-> 
-> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-> index a64140333a46..91df028abfc0 100644
-> --- a/tools/testing/selftests/drivers/net/hw/Makefile
-> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
-> @@ -32,6 +32,7 @@ TEST_PROGS = \
->  	irq.py \
->  	loopback.sh \
->  	nic_timestamp.py \
-> +	nk_netns.py \
->  	pp_alloc_fail.py \
->  	rss_api.py \
->  	rss_ctx.py \
-> diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
-> index 2307aa001be1..b6524040418e 100644
-> --- a/tools/testing/selftests/drivers/net/hw/config
-> +++ b/tools/testing/selftests/drivers/net/hw/config
-> @@ -1,3 +1,4 @@
-> +CONFIG_BPF_SYSCALL=y
->  CONFIG_FAIL_FUNCTION=y
->  CONFIG_FAULT_INJECTION=y
->  CONFIG_FAULT_INJECTION_DEBUG_FS=y
-> @@ -5,6 +6,8 @@ CONFIG_FUNCTION_ERROR_INJECTION=y
->  CONFIG_IO_URING=y
->  CONFIG_IPV6=y
->  CONFIG_IPV6_GRE=y
-> +CONFIG_NETKIT=y
-> +CONFIG_NET_CLS_BPF=y
->  CONFIG_NET_IPGRE=y
->  CONFIG_NET_IPGRE_DEMUX=y
->  CONFIG_UDMABUF=y
+Missatge de Jakub Kicinski <kuba@kernel.org> del dia dc., 11 de febr.
+2026 a les 3:11:
+>
+> On Sat,  7 Feb 2026 21:40:34 +0100 Marc Su=C3=B1=C3=A9 wrote:
+> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selft=
+ests/net/Makefile
+> > index afdea6d95bde..c6d571bf72be 100644
+> > --- a/tools/testing/selftests/net/Makefile
+> > +++ b/tools/testing/selftests/net/Makefile
+> > @@ -11,6 +11,7 @@ TEST_PROGS :=3D \
+> >       amt.sh \
+> >       arp_ndisc_evict_nocarrier.sh \
+> >       arp_ndisc_untracked_subnets.sh \
+> > +     arp_no_invalid_sha_poision.sh \
+> >       bareudp.sh \
+> >       big_tcp.sh \
+> >       bind_bhash.sh \
+>
+> Not sure why but we get:
+>
+> # selftests: net: arp_no_invalid_sha_poision.sh
+> # Warning: file arp_no_invalid_sha_poision.sh is missing!
+> not ok 1 selftests: net: arp_no_invalid_sha_poision.sh
+>
+> When we run
+>         make TARGETS=3Dnet run_tests
+>
 
-I did find CONFIG_NET_SCH_INGRESS=y being needed for the qdisc too,
-sorry for missing that last rev.
+It seems to work for me (typo already fixed):
 
-> diff --git a/tools/testing/selftests/drivers/net/hw/nk_netns.py b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-> new file mode 100755
-> index 000000000000..afa8638195d8
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-> @@ -0,0 +1,23 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +from lib.py import ksft_run, ksft_exit
-> +from lib.py import NetDrvContEnv
-> +from lib.py import cmd
-> +
-> +
-> +def test_ping(cfg) -> None:
-> +    cfg.require_ipver("6")
-> +
-> +    cmd(f"ping -c 1 -W5 {cfg.nk_guest_ipv6}", host=cfg.remote)
-> +    cmd(f"ping -c 1 -W5 {cfg.remote_addr_v['6']}", ns=cfg.netns)
-> +
-> +
-> +def main() -> None:
-> +    with NetDrvContEnv(__file__) as cfg:
-> +        ksft_run([test_ping], args=(cfg,))
-> +    ksft_exit()
-> +
-> +
-> +if __name__ == "__main__":
-> +    main()
-> -- 
-> 2.47.3
-> 
+sudo make TARGETS=3Dnet run_tests
 
-I had some issues getting this to work until I enabled IPv6 forwarding.
-I wasn't able to tell if this was only required because of my particular
-REMOTE_TYPE=netns setup, or if it is something that is required by this
-test specifically? 
+[...]
 
-I'm also running this directly, but maybe this is done prior in
-kselftest?
+# timeout set to 3600
+# selftests: net: arp_no_invalid_sha_poison.sh
+# TEST: 1.1  ARP no poisoning dmac=3Dbcast reply sha=3Dbcast              [=
+ OK ]
+# TEST: 1.2  ARP no poisoning dmac=3Dbcast reply sha=3Dnull               [=
+ OK ]
+# TEST: 1.3  ARP no poisoning dmac=3Dbcast req   sha=3Dbcast              [=
+ OK ]
+# TEST: 1.4  ARP no poisoning dmac=3Dbcast req   sha=3Dnull               [=
+ OK ]
+# TEST: 1.5  ARP no poisoning dmac=3Dbcast req   sha=3Dmcast              [=
+ OK ]
+# TEST: 1.6  ARP no poisoning dmac=3Dbcast reply sha=3Dmcast              [=
+ OK ]
+# TEST: 1.7  ARP no poisoning dmac=3Dveth0 reply sha=3Dbcast              [=
+ OK ]
+# TEST: 1.8  ARP no poisoning dmac=3Dveth0 reply sha=3Dnull               [=
+ OK ]
+# TEST: 1.9  ARP no poisoning dmac=3Dveth0 req   sha=3Dbcast              [=
+ OK ]
+# TEST: 1.10 ARP no poisoning dmac=3Dveth0 req   sha=3Dnull               [=
+ OK ]
+# TEST: 1.11 ARP no poisoning dmac=3Dveth0 req   sha=3Dmcast              [=
+ OK ]
+# TEST: 1.12 ARP no poisoning dmac=3Dveth0 reply sha=3Dmcast              [=
+ OK ]
+ok 25 selftests: net: arp_no_invalid_sha_poison.sh
 
-Best,
-Bobby
+Not sure why you are getting this error, and why selftests didn't fail
+in any of the 4 versions in patchwork. I assume tests run there too.
+
+> The word "poison" is misspelled but both in the file name and makefile.
+> I guess there's another typo somewhere.
+
+Sigh. Let me fix that, along with your comment on patch 4
+(TEST_GEN_FILES vs. _PROGS) on the other thread. I will also fix some
+AI review warnings (error traces) on patch 4 that AI reviews _now_
+highlighted. It seems AI reviews are non deterministic, as
+ndisc_send.c didn't change since v2, and the patch didn't even change
+v3->v4.
+
+I guess you'd like me to wait till net-next is open again, correct?
+
+Thank you for the guidance Jakub.
 
