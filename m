@@ -1,227 +1,223 @@
-Return-Path: <netdev+bounces-258332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OQhLc3BjGkmswAAu9opvQ
-	(envelope-from <netdev+bounces-258332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:52:13 +0100
+	id wBFxEgzCjGkmswAAu9opvQ
+	(envelope-from <netdev+bounces-258333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:53:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CC5126B96
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:52:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADDBA126BB3
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 18:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4C9923008C00
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:52:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 76C203014511
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 17:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4942B34A3D6;
-	Wed, 11 Feb 2026 17:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8683301704;
+	Wed, 11 Feb 2026 17:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jp96N3p+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYrjakXU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DA53101B2
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846D621256C
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770832325; cv=none; b=E9kIEQ7SZ6gDHtESgiNwiiG9iiGc5298xR940w+GkPQ7jdzTg2OUxO2ln/gb2SCZxnDUWxxCGu4e5yzQARyZH58+Xt0Yz/1tNYlWXKxMp2h1nk/D5xaOTVV1hN0Z2homV+bc3ugADAVgUbGbT6hDZ95E6WLUYyrvSfHYA6rkdPY=
+	t=1770832392; cv=none; b=Dgu92LBjaQ0RvG6GRaqTTS78cBUGQWTAG9ddTKz7j/pR/x8Nt8A0D+v8QwPYMJDfDL0llYBR2BnkZQJyhV9ZOYPsaIxS9u2YJu0IIxrf8E/bztpMUbGQI3XReT+1QMDGWLkCRy1VNG0OcZeMVJ58hXQjK2mfx1VOv6NuAAN2Ea0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770832325; c=relaxed/simple;
-	bh=IoyGUhKHOwohGOuh4W85C/kZ/NVxAUxSFePDYKsth+Y=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oaEQYvM1M0dikXFCgYbK4hiScZXSQ//AAN2YN3682X4CZlYlCePPUKzckHaXQsOY/HXwdAvnqV/M3IIRDs16Um5106fpPI+wkIarv8/KksvGovQnww4aCP5ZyqM8uBjHBYBUUXUMNaRU+v/lTASfY/D3yl5bXRn98U4fMfH25nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jp96N3p+; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aad6045810so18848425ad.3
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:52:03 -0800 (PST)
+	s=arc-20240116; t=1770832392; c=relaxed/simple;
+	bh=c4dq5xUpMII4H2H8IBMNXRUIU/AIU6r+F0KqMfvj9og=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mx8uBNmA9KoTUYuk+TDzR9OQPrIaVuxjn6CZ3XJ7ZmG0wdMLANHihXqs05QUDJVozo7NsV16xmrOtbbXL22w2wP5enx/PK4HM4Aqf+c8r33dsHQGlIZPhUacFzIsXfFAET4SN5apPMk98LP3nJKW492f+Gcen8+IE1SOEG0gkpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYrjakXU; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-649df393c04so2283786d50.1
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:53:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770832323; x=1771437123; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Z7HgZPa2miCYVW2v/gKDume2IN7/1BlZq+GIduUL4MI=;
-        b=jp96N3p+M8c63qKa5hdEsgl8TgPt7njqouaUGAjXRcvbIruDpgtb4FBeS+q8U2bPvy
-         +m2zNrXvRo0EnzcHAcFM1xFYUR+mdFEfewYBjj/ilQ7dPl+mmJg8HsKmPhkMuxsS8d29
-         2xi3jzrRHhyuHsrVcJeiPKNs0WS3DJFFpLlSIIooj0k+XTYJ+E23HnazaT1Bn5XQkLf4
-         PX7tPBHynxU8vDCsnhtw6Xw+EeP14cvjnpzSvGC+nSVo5DQLJtHHMFQ6fGDkpndCaFsz
-         icsMsbI9i+xV/o3ErkobZ3+oDdR+yv3GnP5vAiXrXtwWe25zx5oiu/P6uEnCnIrhG8C9
-         CNng==
+        d=gmail.com; s=20230601; t=1770832390; x=1771437190; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hWg6VNIdjfTRqaYdKKaQYNgfzqUG27HO2/zp5mmPnfw=;
+        b=dYrjakXUi2wPSZ4t6+CG1WCK3y0guJbYFQyH7mBpLBwh11cRmsJF3pWSshBVsCGnXC
+         AS9Uo4TYYmdbuwBNIseAFuv+c04LmvqEqwj0C2r9c5+A2m2FisOG98Ir5y5296Yzr2Nw
+         cFquUCKvKqFlIhuBYEKwyTrYVnfmJKA6QHeAIK25m7RHZrpXzDsKr3zs5zcsUIDpWuIK
+         dMmw0sSHKTBYP5yDTtSA6mLXrNSaRMXOjOMrhRPMAKyEQk3Vdrd712/qI9xYZrsXgCPF
+         NlxjH56N489LYXVkK9Hqkbk3LjXN7InR9PrdhNHjg3TJaAft8yut2wHFLMGhwsfKsj9W
+         1Itw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770832323; x=1771437123;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7HgZPa2miCYVW2v/gKDume2IN7/1BlZq+GIduUL4MI=;
-        b=rwe/3O2pe8DlPe/F/eX2DYrlNcqohWYCXNO7H1iiu3KBtRfoUst07MlzWyZN5/QCaC
-         qXPplZ/eclum5bgV2HpxCkVB11heY1jl5rKfHOIqauT/1A4e+9SBb6F1Yrvn9SHQyoij
-         3NzENztfC42Be4/0yR8el0TZM3MKi8lfGW7jqMBoTXV+cHs+F1mTI/GDGa3G2GwSss79
-         7yyhIQy4CzLDDfeKPVvDgtRJbk6+R3pJR92oAiOJegYS9q+KGQoN2eicNMXzGua9Gy4H
-         yq9o68dqtShI23uzWyUMFQNnZnL88i8X4zltjlwlKEsV1Nouzi3gc0y0NYyyjuo/6cv4
-         G33g==
-X-Forwarded-Encrypted: i=1; AJvYcCVmPF92+WTDucgJzwB3GYnllbiTbDFDH266XHaTaEOdfaPHtdakDnlTxVNBYRIq9aVHuOzmsHQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywv3LL7PSI7D1v2h1YsLonybrWMxc1FlWbfaQXgS5g7wQKeQhXE
-	gA7ow57j7Z/HpbLcQV3NWHpJiwy18SMjon5GnhKpiQkdxzL7/WQfCdkNF96uTW+8Tmr74IQGnfp
-	/uP0jRQ==
-X-Received: from plbll16.prod.google.com ([2002:a17:903:910:b0:2a0:8cbb:6431])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf03:b0:2a8:d469:9b2c
- with SMTP id d9443c01a7336-2a95170bd94mr197184325ad.44.1770832323124; Wed, 11
- Feb 2026 09:52:03 -0800 (PST)
-Date: Wed, 11 Feb 2026 17:50:21 +0000
+        d=1e100.net; s=20230601; t=1770832390; x=1771437190;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hWg6VNIdjfTRqaYdKKaQYNgfzqUG27HO2/zp5mmPnfw=;
+        b=GHd/j+81kpeMyrUy93KMteQCvufVZFUNKFp0jELSk4FlKEadey43TNyA3p7BkI/PYH
+         uEYxLzP83fDimjzYAfk2HYK29zjQwGxdpuoV3VTpD1wFSApgx3szvckOOCtZMCjs2JBs
+         FUy9da52mkB37AJCqCXEn4Gf/qClHqPxS4l99I27b289WC81iIOxwdbC7nOBW3wI/I+f
+         v74cwDIvd4JJhI4atquH3PjqcTBzf8HggMeIgbv6960UMWydLYZ31AIbNp6I15HNfwza
+         h4EzuujE4uzPGWByD4Z7RAjb5sTnay/EskTXm/gkFePjT8V/Y46r5AODqCj8lFQ52Rkn
+         45WQ==
+X-Gm-Message-State: AOJu0YwRYai/DaJX7D2Q1wUWjBmmbbfXmba5MppzgfiLz4ioeJ+L1ZBd
+	/6YG0B3oYv4Im9BKM7Sx8Qn8CEXceYBodBtx4vZhC7sd6xngwA3654If
+X-Gm-Gg: AZuq6aJfbNHdsC0HcHFynTClBEaLcWZHbkQocVmdudyxI8LYZn4fOou41kr3u2t/DDV
+	x7oNTIMOToMs7t2gwJTVY2wEm7RePR0ONUTBXzaTql2DRgctLf4B6wnnxDbU8gFjPyYYdTPCdT1
+	cbK5W6zEjBq1YlPEoMKOcbeedOuaG76Bxya12f16NU7p2qrX66EoSGe8Vf7yTkGrAcrKYVrBBzy
+	6SyCHHqva52GbyQZvVZgG9amFoXZFg4wrP+Rf0CEYITWAVm7GCrCaN2vVPTIMVZd/+o8iP24kla
+	IVcVBSXcKLlix67ddy5VuFOjW7YbxCNmdetzDJ0+OJgTDRI5csRroQYlRANlQAO4PZtnQbiBNRj
+	BNSFpNXXIh4GApFic5jqELsoIN8ISIUMRBUDPl1JupSlo3fFEBiJzySm5gJhOcOUE7UGPW3IXDE
+	qYQ1B3yjSjhnPgZcO28c+Vvvuw3k2pknROTOVOwfebYW2iGPopfOkLa13dXg==
+X-Received: by 2002:a05:690e:130b:b0:64a:f2dc:2863 with SMTP id 956f58d0204a3-64bbaac25cfmr120778d50.47.1770832390535;
+        Wed, 11 Feb 2026 09:53:10 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5d::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64afc87a3a0sm2562323d50.9.2026.02.11.09.53.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 09:53:10 -0800 (PST)
+Date: Wed, 11 Feb 2026 09:53:08 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Joe Damato <joe@dama.to>, Wei Wang <weibunny@meta.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCH net-next 4/4] selftests/net: Add netkit container ping
+ test
+Message-ID: <aYzCBIACSmC0l+oA@devvm11784.nha0.facebook.com>
+References: <20260210200419.3555944-1-dw@davidwei.uk>
+ <20260210200419.3555944-5-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.239.g8d8fc8a987-goog
-Message-ID: <20260211175133.3657034-1-kuniyu@google.com>
-Subject: [PATCH v1 net] ipv6: Fix out-of-bound access in fib6_add_rt2node().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Shigeru Yoshida <syoshida@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+707d6a5da1ab9e0c6f9d@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260210200419.3555944-5-dw@davidwei.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258332-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258333-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,707d6a5da1ab9e0c6f9d];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 69CC5126B96
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm11784.nha0.facebook.com:mid,lib.py:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davidwei.uk:email,rss_api.py:url,rss_ctx.py:url,pp_alloc_fail.py:url,nic_timestamp.py:url,iogearbox.net:email,nk_netns.py:url]
+X-Rspamd-Queue-Id: ADDBA126BB3
 X-Rspamd-Action: no action
 
-syzbot reported out-of-bound read in fib6_add_rt2node(). [0]
+On Tue, Feb 10, 2026 at 12:04:19PM -0800, David Wei wrote:
+> Add a basic ping test using NetDrvContEnv that sets up a netkit pair,
+> with one end in a netns. Use LOCAL_PREFIX_V6 and nk_forward BPF program
+> to ping from a remote host to the netkit in netns.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  .../testing/selftests/drivers/net/hw/Makefile |  1 +
+>  tools/testing/selftests/drivers/net/hw/config |  3 +++
+>  .../selftests/drivers/net/hw/nk_netns.py      | 23 +++++++++++++++++++
+>  3 files changed, 27 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+> index a64140333a46..91df028abfc0 100644
+> --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> @@ -32,6 +32,7 @@ TEST_PROGS = \
+>  	irq.py \
+>  	loopback.sh \
+>  	nic_timestamp.py \
+> +	nk_netns.py \
+>  	pp_alloc_fail.py \
+>  	rss_api.py \
+>  	rss_ctx.py \
+> diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
+> index 2307aa001be1..b6524040418e 100644
+> --- a/tools/testing/selftests/drivers/net/hw/config
+> +++ b/tools/testing/selftests/drivers/net/hw/config
+> @@ -1,3 +1,4 @@
+> +CONFIG_BPF_SYSCALL=y
+>  CONFIG_FAIL_FUNCTION=y
+>  CONFIG_FAULT_INJECTION=y
+>  CONFIG_FAULT_INJECTION_DEBUG_FS=y
+> @@ -5,6 +6,8 @@ CONFIG_FUNCTION_ERROR_INJECTION=y
+>  CONFIG_IO_URING=y
+>  CONFIG_IPV6=y
+>  CONFIG_IPV6_GRE=y
+> +CONFIG_NETKIT=y
+> +CONFIG_NET_CLS_BPF=y
+>  CONFIG_NET_IPGRE=y
+>  CONFIG_NET_IPGRE_DEMUX=y
+>  CONFIG_UDMABUF=y
 
-When IPv6 route is created with RTA_NH_ID, struct fib6_info
-does not have the trailing struct fib6_nh.
+I did find CONFIG_NET_SCH_INGRESS=y being needed for the qdisc too,
+sorry for missing that last rev.
 
-The cited commit started to check !iter->fib6_nh->fib_nh_gw_family
-to ensure that rt6_qualify_for_ecmp() will return false for iter.
+> diff --git a/tools/testing/selftests/drivers/net/hw/nk_netns.py b/tools/testing/selftests/drivers/net/hw/nk_netns.py
+> new file mode 100755
+> index 000000000000..afa8638195d8
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/hw/nk_netns.py
+> @@ -0,0 +1,23 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +from lib.py import ksft_run, ksft_exit
+> +from lib.py import NetDrvContEnv
+> +from lib.py import cmd
+> +
+> +
+> +def test_ping(cfg) -> None:
+> +    cfg.require_ipver("6")
+> +
+> +    cmd(f"ping -c 1 -W5 {cfg.nk_guest_ipv6}", host=cfg.remote)
+> +    cmd(f"ping -c 1 -W5 {cfg.remote_addr_v['6']}", ns=cfg.netns)
+> +
+> +
+> +def main() -> None:
+> +    with NetDrvContEnv(__file__) as cfg:
+> +        ksft_run([test_ping], args=(cfg,))
+> +    ksft_exit()
+> +
+> +
+> +if __name__ == "__main__":
+> +    main()
+> -- 
+> 2.47.3
+> 
 
-If iter->nh is not NULL, rt6_qualify_for_ecmp() returns false anyway.
+I had some issues getting this to work until I enabled IPv6 forwarding.
+I wasn't able to tell if this was only required because of my particular
+REMOTE_TYPE=netns setup, or if it is something that is required by this
+test specifically? 
 
-Let's check iter->nh before reading iter->fib6_nh and avoid OOB read.
+I'm also running this directly, but maybe this is done prior in
+kselftest?
 
-[0]:
-BUG: KASAN: slab-out-of-bounds in fib6_add_rt2node+0x349c/0x3500 net/ipv6/ip6_fib.c:1142
-Read of size 1 at addr ffff8880384ba6de by task syz.0.18/5500
-
-CPU: 0 UID: 0 PID: 5500 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xba/0x230 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- fib6_add_rt2node+0x349c/0x3500 net/ipv6/ip6_fib.c:1142
- fib6_add_rt2node_nh net/ipv6/ip6_fib.c:1363 [inline]
- fib6_add+0x910/0x18c0 net/ipv6/ip6_fib.c:1531
- __ip6_ins_rt net/ipv6/route.c:1351 [inline]
- ip6_route_add+0xde/0x1b0 net/ipv6/route.c:3957
- inet6_rtm_newroute+0x268/0x19e0 net/ipv6/route.c:5660
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9316b9aeb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd8809b678 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f9316e15fa0 RCX: 00007f9316b9aeb9
-RDX: 0000000000000000 RSI: 0000200000004380 RDI: 0000000000000003
-RBP: 00007f9316c08c1f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f9316e15fac R14: 00007f9316e15fa0 R15: 00007f9316e15fa0
- </TASK>
-
-Allocated by task 5499:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __do_kmalloc_node mm/slub.c:5657 [inline]
- __kmalloc_noprof+0x40c/0x7e0 mm/slub.c:5669
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- fib6_info_alloc+0x30/0xf0 net/ipv6/ip6_fib.c:155
- ip6_route_info_create+0x142/0x860 net/ipv6/route.c:3820
- ip6_route_add+0x49/0x1b0 net/ipv6/route.c:3949
- inet6_rtm_newroute+0x268/0x19e0 net/ipv6/route.c:5660
- rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa68/0xad0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: bbf4a17ad9ff ("ipv6: Fix ECMP sibling count mismatch when clearing RTF_ADDRCONF")
-Reported-by: syzbot+707d6a5da1ab9e0c6f9d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/698cbfba.050a0220.2eeac1.009d.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/ipv6/ip6_fib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index c6439e30e892..cc149227b49f 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1139,7 +1139,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 					fib6_add_gc_list(iter);
- 				}
- 				if (!(rt->fib6_flags & (RTF_ADDRCONF | RTF_PREFIX_RT)) &&
--				    !iter->fib6_nh->fib_nh_gw_family) {
-+				    (iter->nh || !iter->fib6_nh->fib_nh_gw_family)) {
- 					iter->fib6_flags &= ~RTF_ADDRCONF;
- 					iter->fib6_flags &= ~RTF_PREFIX_RT;
- 				}
--- 
-2.53.0.239.g8d8fc8a987-goog
-
+Best,
+Bobby
 
