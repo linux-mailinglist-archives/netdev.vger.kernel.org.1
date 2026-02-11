@@ -1,368 +1,329 @@
-Return-Path: <netdev+bounces-258374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wIVAEDL/jGn4wgAAu9opvQ
-	(envelope-from <netdev+bounces-258374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:14:10 +0100
+	id SNz8FVQBjWnAwwAAu9opvQ
+	(envelope-from <netdev+bounces-258375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:23:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E8F1280B0
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:14:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E70128187
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 23:23:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 39003303B4DF
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 22:12:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44373303C334
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 22:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DFD934D919;
-	Wed, 11 Feb 2026 22:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E02350D46;
+	Wed, 11 Feb 2026 22:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RetaHdRc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UHYER+Pn"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013049.outbound.protection.outlook.com [40.93.201.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B909322A3F;
-	Wed, 11 Feb 2026 22:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819EF34FF45
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 22:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770847945; cv=fail; b=XXjk2OjDL3MpVR5f8j9GMu7iZJdwiSOLw+AJJtudzuvuVDgCPr7pbKd+NTJpEGYOzA2ftMXSQirM1KODzBWztpJRIWzDokWxVrhIXdaWgFl9o4sA+LBK/9unB8MmeTBp7aIAAdgDhMIucUsxQ092V1Hdz5CxXvq+CJZ8us4DfVc=
+	t=1770848593; cv=pass; b=UmytMa/k2MQcgfENJkqkOJyLwLwDBE/XJUf5X+HMMT3auVx3VF0PQBbEkDxpnH6cLQwi8YyS45mK/qehwQ3pBWqbAxpHWIZfYMa9PxmhlDfXPMzqbO8fkm/3dSVLKGw/lt4cD1CTj3s9LQkYqzJ3ROwHUzEfhHD5Z87TGbSJLBg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770847945; c=relaxed/simple;
-	bh=8CCmvZPp1hvlZwuj0NnwQWMc/8YqmfUWB8O5sHcSZnE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=IKPDVB/5LTTv2LQt4MMKo8/o7CnuX2tlIHvh42yGs/D9OM3dTtl8t+eXvJPzN+grm2HDbDTbsPuCdI97sXEoggnmXH9ympVi4kYDIT8XgsRtZ5h/36D98kkSrLUK23naUaYWwJAtVoFmp8jtiIwh7TolgnG2TAZgZtTIiBkqT0U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RetaHdRc; arc=fail smtp.client-ip=40.93.201.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w1hykDgkWj/htKTcskXrcXub61XNK4dbirhySoFKiL2Fx4kiHu+CJvq9oGBBs+CVSpPoOamapAxSHR9axwlvEUmIpyqdredQNIOy/zbdLxxSx/jLFId/mKXYImICFVHemoOY+MEbJEzOvVkyjGB2yus/TSrNWey+mPtPtThhXsR7EXcsKk1bH6P3woL4hGWQ4ZCoFixdoWTo8t3w+H2stYRMlj4pEAaZPmbhV440jNb9zEC8lPFEWu+HfXFZ026ndKU3BMJ0mTP9ecFM0Q40Jhpzmmd/9tyyAOu0XWIxZgCPLbhnAiu4xpvFBy4uyRS3W2AJcpDoRPbOohGf15P2Ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cv5USmF+aelVs+G5LZm6PxCKznsqLpZkRqTXTZKA6jk=;
- b=Bh/31wBkWOzEvXUgoMpN3UzIYQjZPixxruB0V14ehiUbC2cN1OzIQ//9lvXvsujGRDm+qS8HOj+KBmk1Ee/yvJX2Ez4WZ0WaJa1mIxmZRIlsnbfmEOpXWRwNO0/SS5JKWG0HHUeMWPSPgietQYaV18QBU7sQtIpc1V7v4lSaC94XuwnspkSuvEGhhC1ZQKZ+rpT1+2xknXjKi01V1AOqn8wUJFtKNaE/F+LYnwi2aSX57Q7bJ5yMXK8iKdOZrdECnVBTM1BHiz4dpF1+9DLuK1v/9pxqwpnNR9JlIByK8eiuYC88D81RLItnCrziCIqnQlK9qGtloNtcDAHwIqq/lA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=huawei.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cv5USmF+aelVs+G5LZm6PxCKznsqLpZkRqTXTZKA6jk=;
- b=RetaHdRcgFV4soj1GdpwA1ArZkoxgwqMJCfJwNSC/YQpja+S6VY53wnGwDNLkYo6VbbL/dAWwCKpK6Bz3/Gmvrrb2SUCs3DzJHldcOycTtxLgVkKRKe5+jazah9DuYxLQpkbXu2VkpCUAY6SA9In5N31GMKFQmy2Q4cb1EoyCYI=
-Received: from MN0P221CA0018.NAMP221.PROD.OUTLOOK.COM (2603:10b6:208:52a::29)
- by PH7PR12MB6835.namprd12.prod.outlook.com (2603:10b6:510:1b5::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.10; Wed, 11 Feb
- 2026 22:12:18 +0000
-Received: from BL6PEPF0001AB75.namprd02.prod.outlook.com
- (2603:10b6:208:52a:cafe::7d) by MN0P221CA0018.outlook.office365.com
- (2603:10b6:208:52a::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.10 via Frontend Transport; Wed,
- 11 Feb 2026 22:12:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BL6PEPF0001AB75.mail.protection.outlook.com (10.167.242.168) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9611.8 via Frontend Transport; Wed, 11 Feb 2026 22:12:17 +0000
-Received: from [10.31.203.44] (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 11 Feb
- 2026 16:12:16 -0600
-Message-ID: <62e902d5-043c-42ce-b75c-f2b82511029a@amd.com>
-Date: Wed, 11 Feb 2026 16:12:15 -0600
+	s=arc-20240116; t=1770848593; c=relaxed/simple;
+	bh=eXDI5rcV+A/T0/rpbI/ShJOsViO8yaBsbpbntt+dflA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T86FfWuySzeucvBKvvyusDZQA03z4tr/UzSZFwTodxv7nAEFthHDM77QBwa1hRzKbeKa6ux5QCaLdKp1vHLfPBW3BXobCNMZtKwO55mLB7F4/uGTCJ4lEwiIO3VAgP8DCT11FXD+iPR2cmSLWpw+KIwEdqVM9S+NvcoS/lWPqwI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UHYER+Pn; arc=pass smtp.client-ip=74.125.82.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-12721cd256bso4559835c88.1
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 14:23:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770848591; cv=none;
+        d=google.com; s=arc-20240605;
+        b=H9iviISZt78opM0+bLV4c3yscyuPDtGpvmi3MXFnvD2QTyX6oA/tcN8RI/q1hl9BTW
+         PhgW36xPYGE2aXZplN+DY7maS3LJKZrI44MNyw+sjUxppctXlcB7HTlAuY0JW2gFRYmq
+         nRq56xlLkK2U+j3MuRHH/EubkLxsr9rCUwB2WVvBrruGG250Mr2sm5+i3qK0YxncgxWi
+         hn4EYJhAS3jqU/XtUBsDWeKPLbvrpJGtXB6BsqFU3BmFFeklxWu4Br/0kRIs9lluTV5y
+         VuJWvd5X1a+qQ8efJHbE9xr1ZUqG2rE4atRqTKQ+DbXsbx9TBpoDxB2p0W1J2h/Ywg7l
+         58yQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BXd4Rh45bQsBPkhhAC+bUe+BVrbwXVOg5adLymQr3DA=;
+        fh=qqQeR6RMM+0i8KaPMWpTLGQRrVuxFYhBmtuCN+gWQWE=;
+        b=Vk850petMrm1o6FqAj5af2mCA/0FO5lhMvWPGJXe6GDdRtpEdzFzm6lvBak5fD8cKU
+         jbkLPYuUZBsvUp+ika+FZw5bOXFJUbovS0sVN1o6BWw5vczj+/7Y9AVLdJ/6fhak2HG+
+         h/Bq16Us0/b/SX4bwB+yfBs+OecJGwZAfGZZJ59U7cBlDa1h8KWuQWyHRSxO8xY5wrtL
+         HqJNub9ItBR2bF3nsO0BZ6tf9A42InDbG+nB7wiCwMIzzvk0DtO9eWBLisso0+bp63VT
+         DzPU/BEEYIv2HpQzJ0HsAgr2959aNcruqfC9Vl5ChLoL2xOTtkgXxP6gXtGNJltqnRp8
+         O7qg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770848591; x=1771453391; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BXd4Rh45bQsBPkhhAC+bUe+BVrbwXVOg5adLymQr3DA=;
+        b=UHYER+PnFcGCyQWDmtc9O//LAEie/bQwyaQWFCokH0mVBNlCK/in4gLojClY3q0lUc
+         Up3jlmYodtPtQ9nEVefP8jolqeGI+tGtDp4RWN3z5105oJV4eOarHhs8wKfxSzBa5QeI
+         a2lFj7Zs1BcW6aEmD6a+J9fqWDimONs2gmM1oCjNE7BhfgzfrMN+DKoehXgyASRtvWf+
+         mowmjD3sj/Bc9BeRvwvAEckm/JW8MkFBYauRxgh1w9Aytt0OGImw2pdwtwaZSDrHSXTe
+         jYGCPI/wBWJCn1WNpF92GCB0Lgzlq4vSKoMcs5Vwe3FFxw3YCud1O5UpjNCd5mbHUbob
+         UjrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770848591; x=1771453391;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BXd4Rh45bQsBPkhhAC+bUe+BVrbwXVOg5adLymQr3DA=;
+        b=WF54FgiVPR4UIKjkjRLNp0TPbWrQePOFtjVE1wUYnbwuOtDCSB1Gqce+yZ3nvvmv85
+         yJvx+8dCJjW4HPGrMcGgnkCj5ZnBPYCyY3icycuyLa8/8uYoBxmK+4zYmX76iNDYoSSO
+         9Dcw1JgAdW3AjdYI6GZoiQ9rzg11HtJ5VKYpBWxrlA2MR3h2iIZllJAyken5L2CmkVTZ
+         b6ij3gBUll8/lbzJevauSGy1t/Adgcxn3PCN2MXOM+NO7erUNOPJ0W/YQzyGMadQPDzp
+         bCUX0FJmkep/t+a36HI470pJUDWy86KqSgCrQReOMlgYeZeKKlN4T+oN6Ck/UnObro10
+         x69Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXr1Pt9Ottd3v7qTlTS2BLChqGQrbYWMvgpJ74Wp/q9Ej6ze7QlKJ8XYEFr4TuCSlvqfbLXE9M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCZENG0ZSmum2gaPEFopAQqar5wv1FLzukmam5MeTr/YY92yjp
+	EKOAPcotdMqbmPK2lPFOrA0oZ0zUUynEJTHqS9NTH898LlJrgOSXzPGa9X9O9+HaUP9RXK02dLx
+	x3tyuO3kP6Bid140lLofVl+ONlRBEoErXs9tt3Hwz
+X-Gm-Gg: AZuq6aKGPRPLsinym6tVJ7UTE2BaelMyt+J9u9ITTiUT1yqU7X9z5QqSNi42lUfNbnG
+	ENJZR/D7pLJvtO7587Ez6tBH6JJrbc15PzOHnzpuJpVCahc3vJO4ANBOF1kborI2f9NVYhG3xqW
+	lEJAKrs3o9aoIr4tpdbcUicMoLyTPJ8HM4CscMbvMtDIkonCcEsIgBFxP1oMz5ZwvYRfnP1U4F7
+	GS1Vm5YMOlqQvuamggOGDulMAicwZ7nN/VUKovefWynciJHdRjfQ2El3Rj1iER77ZU7oezSzxqM
+	DAIL5d7aA05MTxQlN7qeTQdUHftpFXHfA3xIGreApqKsj+cpDHP2vyL03WNvuhlIwmF9Cf8O
+X-Received: by 2002:a05:7022:aa3:b0:11a:2f10:fa46 with SMTP id
+ a92af1059eb24-1272f6ae25cmr375464c88.0.1770848590968; Wed, 11 Feb 2026
+ 14:23:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: "Cheatham, Benjamin" <benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v23 14/22] cxl: Define a driver interface for DPA
- allocation
-To: <alejandro.lucero-palau@amd.com>
-CC: Alejandro Lucero <alucerop@amd.com>, Jonathan Cameron
-	<Jonathan.Cameron@huawei.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>
-References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com>
- <20260201155438.2664640-15-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-In-Reply-To: <20260201155438.2664640-15-alejandro.lucero-palau@amd.com>
+References: <20260207230720.2542943-1-kuniyu@google.com> <20260207230720.2542943-2-kuniyu@google.com>
+ <CAADnVQK_93g_KkNFYXSr8ZvA1fYh4hoFRJCJFPS-zs4ox0HhAA@mail.gmail.com>
+ <CAAVpQUAfUQJsBzqTah8+LhTciGrHnLx3pg_xEqD4=wBuEEEXUQ@mail.gmail.com>
+ <CAADnVQLMiQFb7SAxgDNFXwoJ4sYLi1DWVHwq4ftAbBxLAa5enQ@mail.gmail.com>
+ <CAAVpQUDCd1fTHfBdzmk2msrMnQTL-EzH6VH0RyHoL1V8qz1y3Q@mail.gmail.com> <CAADnVQK8_P9x7HoKb0GxH1dSSnMFDsSgoV04MSkhcUPFw2uViA@mail.gmail.com>
+In-Reply-To: <CAADnVQK8_P9x7HoKb0GxH1dSSnMFDsSgoV04MSkhcUPFw2uViA@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 11 Feb 2026 14:22:59 -0800
+X-Gm-Features: AZwV_QiPNieHzWYGG_TDs6__svEWgiAeY4tKhfKEKpnfCSRcmQuqSC54pxDgLH8
+Message-ID: <CAAVpQUC8Xx2aGsqzOeBnevzytEPTqUJQkyxsWbX8tqCoERx1qA@mail.gmail.com>
+Subject: Re: [PATCH v1 bpf 1/2] bpf: Reject access to unix_sk(sk)->peer.
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Michal Luczaj <mhal@rbox.co>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB75:EE_|PH7PR12MB6835:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0617e64a-ed5d-4061-7731-08de69ba9e79
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|13003099007|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Vk41SkswYkxjWld2VTlMU1RMQ2pwdmI0SDk5eXk5Zmlza2M2TGI4azcyL3I5?=
- =?utf-8?B?Y1dKWjJUVzRIYzI3V2xrME9VQTJNaEFpdjIvOFBoK0Y4R1Y4MzNvcjZ3Y25R?=
- =?utf-8?B?VUY4Ty9EMUdHRVBSMjZxVUY0TE5HUkpNN3RpZ1AyV0FnNS9EUm5NaWNwRkhU?=
- =?utf-8?B?b1g4OFNvOURjUmhVODBqNTRZd1djcHNLVHM1OGpyVW9CWXVjakg4TnB0bi9W?=
- =?utf-8?B?Z2hoaWxtTGIzWmN3QWd1V0g0N1RmVHBGSVlWbmNidXEwb1QzNmczNHhMTU1O?=
- =?utf-8?B?SVdzcjQyN1ZPWlRjVTM4RUxmeUNzT3JvY3RQMktjYkYzOC95STE5TUM5Zm5z?=
- =?utf-8?B?b1A1Wi9QNkhxYnNQdjZxZVdWSnNHaE43cmFuWm9iUmZ0WER0Mk5meEhLY0pw?=
- =?utf-8?B?bEZ3UW1zL0plUmFjTWhuRGFGck1HNjR2QnBEYm13OTFDYWRtbGtvSTVPNlJ5?=
- =?utf-8?B?R05heDY2Yjdwc1BHWHRTWVp6SjY4c3MreVFIR2Q3OVNtNytiaWEvTURTa2dI?=
- =?utf-8?B?bnZ5L2JxcFJ0dXMvQVNxQXIrOW1DMFdraVEzZWdFN2s2K2VNZm9ISG5GQ2la?=
- =?utf-8?B?ZWdPa3FmMzZPQkVWLzRjMGNGOU9UQnZUdUhBZ1ZwT1V2SWc0aDVtRmI2ZnRU?=
- =?utf-8?B?WldORTJsZGJ0VmdCSW1DenQ5a212UFdvdC9iY0x1V081Vk9LMFBXQ0k0a3dp?=
- =?utf-8?B?ZTBVek0zZytrYTRvcVpQQWxFNEtjdE5LU3VlZnJwSTI4UlZUdEcweDhlY1dE?=
- =?utf-8?B?QW1teEZBeDdzRHlrcmt4aGc1TXJ2NGRHR0dGbUpNRzFLUE94MkIyQ0thejIx?=
- =?utf-8?B?Z3VlYTRwMDdkbmp3bEQ4eXg3N3dJOUZ5OUpJU3QrWWhNWDdBb3BGeHZYN0g4?=
- =?utf-8?B?OVBtanU2WEc5QVpqa1M5NElmRkVnU093OHhsMHdFZ2p5QXlJaXdFclhGNlM3?=
- =?utf-8?B?L1dlVS9HUzJQcXdqcUdOdWYraUp5ZWFZQjRRVlhyOU54NS9TQkZ4UzUrU1dP?=
- =?utf-8?B?RWZvVlRsdUxleEZLZUxLU2lnREtzMUxIQTBmbGZ0eDBKY05veFplbUo4Mk9S?=
- =?utf-8?B?WXNadXpUOFdJVjhnd2tjdVN0dTlmdVdUODR4V1FUVTRYUFBkejFwOEExUnJN?=
- =?utf-8?B?RC84L0RxUTV3bHRjTWpNdFFiYmlNVG44VnlJZkVabmRRRW80M1FUblZRblAv?=
- =?utf-8?B?UkZJMzZVZ2RYaTdyVFc0S1gzc3JlSUlNOVpXV1lhVEhoTzRmOGVHREtrWWFj?=
- =?utf-8?B?cW1lcmpaL0pWeXU4NE5UdVJkOFVnTituM3YxOVZBakt1SEpYWk02NXF5K1BR?=
- =?utf-8?B?ZWVMeTlJUlMzYUdOOUlsY3V1VlRkalRKb3ZQUFhVZFZ4UnQvR0hHMEtOamJ6?=
- =?utf-8?B?ZXdES3RlWm4wQ08zTTJhYVF5Mm53ZGZXT0tkaHNtMzlRVk9aTDUrQzVXS3A0?=
- =?utf-8?B?cW5wV2diUmI4eUd2R0dPZ0pCV2pNalIzMmczQy8xNEhMcWhhVVZXNnV1Y3Ir?=
- =?utf-8?B?TlVyMHRhSlhQMGtzbWR1MGJLUzNjZWt5NG1sZCtoMVZKdWszMVB5VjFsKzVV?=
- =?utf-8?B?KzVXUWQ0b21OcXZ3UGwwN2lxZXN1dXhuOUlMQ3VWVkRoVVVxL3F4MGpyR3E2?=
- =?utf-8?B?Tm1iWkxpWE5hTGU0Qnc5V21namtjTGpMMlJOMkVYQVBzSE9Jc3BzeWZOWCtz?=
- =?utf-8?B?S3ozYzdYbEtyVi9iZEErTDI5VUptZVpRSGpOTFRvdkNDRTRQWjN0bUlNOHNy?=
- =?utf-8?B?STFzZG93aEc2bk9Gb0xTYUwyWjRCWHBlcUJvQVBHM3NPNWJFclZocjVkWEJS?=
- =?utf-8?B?aDVLRXpmaW5LOXVrNW5QajhyQVJGemNFUEZlZ3FWQlNXNnF0ZEJMVE9oRTFk?=
- =?utf-8?B?RGx2S3ZURjRUS1F0YkJ6M1pjWnB3ZFBHbUFFU1RXcU4xczFQVUt6NVdwbEky?=
- =?utf-8?B?bHN1Ti9SLy9Nc1JmZXVzaUJYQ0VFSEdLWnRLaU95Ni9rbkErcUpEN1dlRjNY?=
- =?utf-8?B?STQ2cnQzSy84aFFneEtwU3N4bXhlM3hQTjZScC9PZ0NUTXNQYm9BNzkzZzAx?=
- =?utf-8?B?YTVUOExrMjlhOEdnczJxUk5ZNjhBYU5HeW9pY25zNlFvc3p0d3o2eWpscms5?=
- =?utf-8?B?WVBUOU8yUmJEbWYxQVhkbndIK2xPY2FZaHNSaWdUUXRVYStvUVlPbC9IMnBL?=
- =?utf-8?B?ZlA0b2F2dDlybStxUFQwNUJGSHZ5WHNneTQwR25GMm1hdk9aRHB3Y1pLeHgx?=
- =?utf-8?B?ajVURG92ZXp1c1VlaVVUY2VEQ3ZRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(13003099007)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	toOwKdq/W8qqn7NwsRZmasyMvVN0rTfp5XB3x7KND53M4oX+F//qs7H+Yl0EVaatA3zhujAZiKgXcc4rpYr/PIM0EYiR6pmSSS0+DMnC6Ksi4uOP9YmCalLvEfad7qDaBLQug8h33ZD41XY8qIJxIwniQgo8rAdi6/b3pOunySmrzPsVwaqqh0RnPAny5QQzD+tj+s2zH9J3ww15JDZbcrrQWLsG3eiSt+wiUvybys3dYCXJ8oDb//qqyEY6VnvVmFD1YWNQYI2QKtodXzsqewiicoB7F7+LidNi5zEMnZ2alRr6wW/H6qD2Y1DRvibDAmQbc+LKgmQ3N2fHbkQNvOGz2PdK1uwfTRKeHYBhiMmGOMUsag54N8UtHVIt1stJPUOf6y4EXRdVmlc4kt6fvtUC0PnZ5xWjeO7TK+1WDLgDlaQPNfBxjaq9IP/u5ruS
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2026 22:12:17.6315
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0617e64a-ed5d-4061-7731-08de69ba9e79
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB75.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6835
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[benjamin.cheatham@amd.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,amd.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,huawei.com:email];
-	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258374-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[amd.com:+]
-X-Rspamd-Queue-Id: B0E8F1280B0
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258375-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,rbox.co,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,rbox.co:email]
+X-Rspamd-Queue-Id: F0E70128187
 X-Rspamd-Action: no action
 
-On 2/1/2026 9:54 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Region creation involves finding available DPA (device-physical-address)
-> capacity to map into HPA (host-physical-address) space.
-> 
-> In order to support CXL Type2 devices, define an API, cxl_request_dpa(),
-> that tries to allocate the DPA memory the driver requires to operate.The
-> memory requested should not be bigger than the max available HPA obtained
-> previously with cxl_get_hpa_freespace().
-> 
-> Based on https://lore.kernel.org/linux-cxl/168592158743.1948938.7622563891193802610.stgit@dwillia2-xfh.jf.intel.com/
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> ---
->  drivers/cxl/core/hdm.c | 84 ++++++++++++++++++++++++++++++++++++++++++
->  drivers/cxl/cxl.h      |  1 +
->  include/cxl/cxl.h      |  5 +++
->  3 files changed, 90 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
-> index a172ce4e9b19..d60a697f12cc 100644
-> --- a/drivers/cxl/core/hdm.c
-> +++ b/drivers/cxl/core/hdm.c
-> @@ -3,6 +3,7 @@
->  #include <linux/seq_file.h>
->  #include <linux/device.h>
->  #include <linux/delay.h>
-> +#include <cxl/cxl.h>
->  
->  #include "cxlmem.h"
->  #include "core.h"
-> @@ -546,6 +547,12 @@ bool cxl_resource_contains_addr(const struct resource *res, const resource_size_
->  	return resource_contains(res, &_addr);
->  }
->  
-> +/**
-> + * cxl_dpa_free - release DPA (Device Physical Address)
-> + * @cxled: endpoint decoder linked to the DPA
-> + *
-> + * Returns 0 or error.
-> + */
->  int cxl_dpa_free(struct cxl_endpoint_decoder *cxled)
->  {
->  	struct cxl_port *port = cxled_to_port(cxled);
-> @@ -572,6 +579,7 @@ int cxl_dpa_free(struct cxl_endpoint_decoder *cxled)
->  	devm_cxl_dpa_release(cxled);
->  	return 0;
->  }
-> +EXPORT_SYMBOL_NS_GPL(cxl_dpa_free, "CXL");
->  
->  int cxl_dpa_set_part(struct cxl_endpoint_decoder *cxled,
->  		     enum cxl_partition_mode mode)
-> @@ -603,6 +611,82 @@ int cxl_dpa_set_part(struct cxl_endpoint_decoder *cxled,
->  	return 0;
->  }
->  
-> +static int find_free_decoder(struct device *dev, const void *data)
-> +{
-> +	struct cxl_endpoint_decoder *cxled;
-> +	struct cxl_port *port;
-> +
-> +	if (!is_endpoint_decoder(dev))
-> +		return 0;
-> +
-> +	cxled = to_cxl_endpoint_decoder(dev);
-> +	port = cxled_to_port(cxled);
-> +
-> +	return cxled->cxld.id == (port->hdm_end + 1);
-> +}
-> +
-> +static struct cxl_endpoint_decoder *
-> +cxl_find_free_decoder(struct cxl_memdev *cxlmd)
-> +{
-> +	struct cxl_port *endpoint = cxlmd->endpoint;
-> +	struct device *dev;
-> +
-> +	guard(rwsem_read)(&cxl_rwsem.dpa);
-> +	dev = device_find_child(&endpoint->dev, NULL,
-> +				find_free_decoder);
-> +	if (!dev)
-> +		return NULL;
-> +
-> +	return to_cxl_endpoint_decoder(dev);
-> +}
-> +
-> +/**
-> + * cxl_request_dpa - search and reserve DPA given input constraints
-> + * @cxlmd: memdev with an endpoint port with available decoders
-> + * @mode: CXL partition mode (ram vs pmem)
-> + * @alloc: dpa size required
-> + *
-> + * Returns a pointer to a 'struct cxl_endpoint_decoder' on success or
-> + * an errno encoded pointer on failure.
-> + *
-> + * Given that a region needs to allocate from limited HPA capacity it
-> + * may be the case that a device has more mappable DPA capacity than
-> + * available HPA. The expectation is that @alloc is a driver known
-> + * value based on the device capacity but which could not be fully
-> + * available due to HPA constraints.
-> + *
-> + * Returns a pinned cxl_decoder with at least @alloc bytes of capacity
-> + * reserved, or an error pointer. The caller is also expected to own the
-> + * lifetime of the memdev registration associated with the endpoint to
-> + * pin the decoder registered as well.
-> + */
-> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
-> +					     enum cxl_partition_mode mode,
-> +					     resource_size_t alloc)
-> +{
-> +	int rc;
-> +
-> +	if (!IS_ALIGNED(alloc, SZ_256M))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	struct cxl_endpoint_decoder *cxled __free(put_cxled) =
-> +		cxl_find_free_decoder(cxlmd);
-> +
-> +	if (!cxled)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	rc = cxl_dpa_set_part(cxled, mode);
-> +	if (rc)
-> +		return ERR_PTR(rc);
-> +
-> +	rc = cxl_dpa_alloc(cxled, alloc);
-> +	if (rc)
-> +		return ERR_PTR(rc);
+On Wed, Feb 11, 2026 at 1:26=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Tue, Feb 10, 2026 at 8:23=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.=
+com> wrote:
+> >
+> > On Tue, Feb 10, 2026 at 6:47=E2=80=AFPM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Mon, Feb 9, 2026 at 5:19=E2=80=AFPM Kuniyuki Iwashima <kuniyu@goog=
+le.com> wrote:
+> > > >
+> > > > On Mon, Feb 9, 2026 at 3:00=E2=80=AFPM Alexei Starovoitov
+> > > > <alexei.starovoitov@gmail.com> wrote:
+> > > > >
+> > > > > On Sat, Feb 7, 2026 at 3:07=E2=80=AFPM Kuniyuki Iwashima <kuniyu@=
+google.com> wrote:
+> > > > > >
+> > > > > > Michal Luczaj reported use-after-free of unix_sk(sk)->peer by
+> > > > > > bpf_skc_to_unix_sock(). [0]
+> > > > > >
+> > > > > > Accessing unix_sk(sk)->peer is safe only under unix_state_lock(=
+),
+> > > > > > but there are many functions where bpf prog can access the fiel=
+d
+> > > > > > locklessly via fentry/fexit.
+> > > > > >
+> > > > > > unix_dgram_connect() could clear unix_sk(sk)->peer and release
+> > > > > > the last refcnt of the peer sk while a bpf prog is accessing it=
+,
+> > > > > > resulting in use-after-free.
+> > > > > >
+> > > > > > Another problematic scenario is that unix_sk(sk)->peer could
+> > > > > > go away while being passed to bpf_setsockopt() in bpf iter.
+> > > > > >
+> > > > > > To avoid such issues, let's reject access to unix_sk(sk)->peer
+> > > > > > by marking the pointer with PTR_UNTRUSTED.
+> > > > > >
+> > > > > > If needed, we could add a new helper later that uses unix_peer_=
+get()
+> > > > > > and requires bpf_sk_release().
+> > > > > >
+> > > > > > [0]:
+> > > > > > BUG: KASAN: slab-use-after-free in bpf_skc_to_unix_sock+0xa4/0x=
+b0
+> > > > > > Read of size 2 at addr ffff888147d38890 by task test_progs/2495
+> > > > > > Call Trace:
+> > > > > >  dump_stack_lvl+0x5d/0x80
+> > > > > >  print_report+0x170/0x4f3
+> > > > > >  kasan_report+0xe1/0x180
+> > > > > >  bpf_skc_to_unix_sock+0xa4/0xb0
+> > > > > >  bpf_prog_564a1c39c35d86a2_unix_shutdown_entry+0x8a/0x8e
+> > > > > >  bpf_trampoline_6442564662+0x47/0xab
+> > > > > >  unix_shutdown+0x9/0x880
+> > > > > >  __sys_shutdown+0xe1/0x160
+> > > > > >  __x64_sys_shutdown+0x52/0x90
+> > > > > >  do_syscall_64+0x6b/0x3a0
+> > > > > >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > > > > >
+> > > > > > Fixes: 9eeb3aa33ae0 ("bpf: Add bpf_skc_to_unix_sock() helper")
+> > > > > > Reported-by: Michal Luczaj <mhal@rbox.co>
+> > > > > > Closes: https://lore.kernel.org/all/408569e7-2b82-4eff-b767-79c=
+e6ef6cae0@rbox.co/
+> > > > > > Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
+> > > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > > > > > ---
+> > > > > >  kernel/bpf/verifier.c                         | 18 +++++++++++=
+++
+> > > > > >  .../selftests/bpf/progs/verifier_sock.c       | 25 +++++++++++=
+++++++++
+> > > > > >  2 files changed, 43 insertions(+)
+> > > > > >
+> > > > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > > > > > index 3135643d5695..b328a1640c82 100644
+> > > > > > --- a/kernel/bpf/verifier.c
+> > > > > > +++ b/kernel/bpf/verifier.c
+> > > > > > @@ -7076,6 +7076,7 @@ static int bpf_map_direct_read(struct bpf=
+_map *map, int off, int size, u64 *val,
+> > > > > >  #define BTF_TYPE_SAFE_RCU_OR_NULL(__type)  __PASTE(__type, __s=
+afe_rcu_or_null)
+> > > > > >  #define BTF_TYPE_SAFE_TRUSTED(__type)  __PASTE(__type, __safe_=
+trusted)
+> > > > > >  #define BTF_TYPE_SAFE_TRUSTED_OR_NULL(__type)  __PASTE(__type,=
+ __safe_trusted_or_null)
+> > > > > > +#define BTF_TYPE_SAFE_UNTRUSTED(__type)  __PASTE(__type, __saf=
+e_untrusted)
+> > > > > >
+> > > > > >  /*
+> > > > > >   * Allow list few fields as RCU trusted or full trusted.
+> > > > > > @@ -7154,6 +7155,10 @@ BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct vm_=
+area_struct) {
+> > > > > >         struct file *vm_file;
+> > > > > >  };
+> > > > > >
+> > > > > > +BTF_TYPE_SAFE_UNTRUSTED(struct unix_sock) {
+> > > > > > +       struct sock *peer;
+> > > > > > +};
+> > > > > > +
+> > > > >
+> > > > > That's just one out of many. It's not really a fix,
+> > > > > but a bandaid for one case.
+> > > >
+> > > > Right, this is only one example where a pointer lifetime
+> > > > does not match with bpf prog.
+> > > >
+> > > > > We discussed it in the past and the only way forward is to make
+> > > > > helpers only accept trusted args.
+> > > > > Recently we made KF_TRUSTED_ARGS a default for all kfuncs.
+> > > > > We should do the same for helpers.
+> > > >
+> > > > What about just reading an untrusted pointer ?
+> > >
+> > > What do you mean 'untrusted' ?
+> > > There are 3 types of ptr_to_btf_id:
+> > > trusted, untrusted, legacy (without either trusted or untrusted flags=
+).
+> >
+> > Ah sorry, I used 'untrusted' since the pointer is not always
+> > valid, but I think legacy is the one I meant in this case.
+> >
+> >
+> > >
+> > > kfuncs now accept only trusted, while helpers still accept
+> > > trusted and legacy. The legacy should be disallowed.
+> > > That might break some bpf programs, so it has to be done carefully.
+> > >
+> > > > I used bpf_skc_to_unix_sock() in selftest in case compiler
+> > > > could optimise out branches that always return 0.
+> > > >
+> > > > Currently, this passes the verifier and can trigger UAF.
+> > > >
+> > > > u =3D bpf_skc_to_unix_sock(sock->sk);
+> > > > if (!u || !u->peer)
+> > > >     return 0;
+> > > > if (u->peer->__sk_common.skc_family) # unsafe access
+> > > >     return 0;
+> > >
+> > > No. It's fine. Both legacy and untrusted ptr_to_btf_id get probe_mem
+> > > treatment. So above works and won't crash the kernel.
+> > > It's effectively inlined probe_read_kernel.
+> >
+> > Yes, it doesn't crash.
+> >
+> > I was just unsure about the bpf expectation [0] like how we
+> > should treat KASAN use-after-free report by bpf prog reading
+> > a pointer whose lifetime is not guaranteed by bpf helper/verifier.
+> >
+> > So, if this is WAI, I'm fine with that.
+> >
+> > [0]: https://lore.kernel.org/all/CAAVpQUDrC1rO2diM3gVg5GV5CTVAUS2RbLP+S=
+pHBGqKcUT0iMA@mail.gmail.com/
+>
+> That's different. That's the actual UAF inside bpf_skc_to_unix_sock().
+> That needs to be fixed with what I described above by allowing
+> only trusted pointers into helpers.
 
-Should cxl_dpa_set_part() be unwound here, or does it not matter? If it doesn't matter:
-Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-> +
-> +	return no_free_ptr(cxled);
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_request_dpa, "CXL");
-> +
->  static int __cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, u64 size)
->  {
->  	struct cxl_memdev *cxlmd = cxled_to_memdev(cxled);
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index d1b010e5e1d0..2b1f7d687a0e 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -667,6 +667,7 @@ struct cxl_root *find_cxl_root(struct cxl_port *port);
->  
->  DEFINE_FREE(put_cxl_root, struct cxl_root *, if (_T) put_device(&_T->port.dev))
->  DEFINE_FREE(put_cxl_port, struct cxl_port *, if (!IS_ERR_OR_NULL(_T)) put_device(&_T->dev))
-> +DEFINE_FREE(put_cxled, struct cxl_endpoint_decoder *, if (!IS_ERR_OR_NULL(_T)) put_device(&_T->cxld.dev))
->  DEFINE_FREE(put_cxl_root_decoder, struct cxl_root_decoder *, if (!IS_ERR_OR_NULL(_T)) put_device(&_T->cxlsd.cxld.dev))
->  DEFINE_FREE(put_cxl_region, struct cxl_region *, if (!IS_ERR_OR_NULL(_T)) put_device(&_T->dev))
->  
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index 783ad570a6eb..4802371db00e 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -7,6 +7,7 @@
->  
->  #include <linux/node.h>
->  #include <linux/ioport.h>
-> +#include <linux/range.h>
->  #include <cxl/mailbox.h>
->  
->  /**
-> @@ -276,4 +277,8 @@ struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
->  					       unsigned long flags,
->  					       resource_size_t *max);
->  void cxl_put_root_decoder(struct cxl_root_decoder *cxlrd);
-> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
-> +					     enum cxl_partition_mode mode,
-> +					     resource_size_t alloc);
-> +int cxl_dpa_free(struct cxl_endpoint_decoder *cxled);
->  #endif /* __CXL_CXL_H__ */
+I got this point.
 
+> In my earlier reply I meant that:
+> if (u->peer->__sk_common.skc_family) # unsafe access
+> is fine. It's safe access, because it's sanitized by the verifier/JIT.
+
+but I'm a bit confused here..
+
+Even though the verifier makes sure the pointer is not NULL,
+u->peer can be freed concurrently by another thread,
+then how can verifier/JIT prevent UAF ?
+
+Or can this be still called 'safe access' regardless of runtime UAF
+because the user-provided bpf prog was verified once and not in-tree
+kernel code ?
+
+
+> The code inside helpers is a normal kernel code,
+> so kfuncs/helpers should only accept trusted pointers.
 
