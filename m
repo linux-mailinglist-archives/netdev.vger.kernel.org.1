@@ -1,83 +1,102 @@
-Return-Path: <netdev+bounces-258262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fuMXH3hnjGlWnAAAu9opvQ
-	(envelope-from <netdev+bounces-258262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:26:48 +0100
+	id SEGDKt9pjGkMnQAAu9opvQ
+	(envelope-from <netdev+bounces-258263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:37:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D0A123D7D
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:26:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4BA123E8B
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 12:37:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB4A7301187F
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:26:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3B1AF3004DB2
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F6736B064;
-	Wed, 11 Feb 2026 11:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F15D314D0D;
+	Wed, 11 Feb 2026 11:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TF7pQqsZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LvzGyf07";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIXZrN4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742A536BCC0
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 11:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D058E313E2B
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 11:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770809201; cv=none; b=haOiWp5k1cNcni2OK4Cusr9iT2aEnw8w5rEIn5FIJF+8uMM6DRd7DnX8LNjGVYxe1TMH2ZT69BXrE2FIhSo5RiSZMw7jfr9EAOOPj/ncVmQM/Efs3z3SYwHkblQNYhSGhlPqy2JVeQD/xUQFDR2rmf+77/zVbTHSHGMtX71trx0=
+	t=1770809816; cv=none; b=TK2AaIbmPJ/2F/n0Niac/75B0mDiBYzo2/j+1BvMP1sHdTVLhOEEycMht/Zr29Cfo23z05UzScP8JMoGxEw07B39UcZDhbgnchvWuFBwXOKcx2pgGB0xO4lSnETtv4bIGG6ernGajQcdmQI+QA1zmfIJSHYuhh1ZLptF0K5kOFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770809201; c=relaxed/simple;
-	bh=I2fcjeu1GcZMjOXO1FlxVpKY1hAZ3hKNIHjeyXL0pBs=;
+	s=arc-20240116; t=1770809816; c=relaxed/simple;
+	bh=3PiR99vm7GH8FpljaGZm61Ifj7mFlwc9zQM1KJ+nk10=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZgC/yzNAcLklnhokJfWhoPkNZkh661ypYeF0DhjBh0gvuVf9RUfA2RFq50wSQVxXIRGo3m1Fy9uCLgn/Ud6lfbbTghx4fhpJmFfcySRbigI1lPAOfISqQ8zEXJagnbMIu9YzkfAWF7On+k5PdjQFL1lAXpn1jHaonPwGg+oVkvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TF7pQqsZ; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4327790c4e9so4231996f8f.2
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 03:26:40 -0800 (PST)
+	 In-Reply-To:Content-Type; b=ACAOv7Vl7rdvRbCZgQpSAdVG732pxbr1w8A6BbkXTfY8Gy8onjGkRPc7gzkulqBJ0RyvnQK1fgJSWhG0b10ZAt6fSM9Ly1WUSDJJwelKgVhJU/nJn7LRJkVg7wxD17CLiXSiu/9Td8eAyJRtQdOfp5KutNoQa9kwEMNN/3cSJ6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LvzGyf07; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gIXZrN4B; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770809814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+AnjdGG1nEkolns/Kl/LgypjNWFpwxy9FNDDz9JqrSo=;
+	b=LvzGyf078xAoWji1td7ze5p29lKPI+zSlqbX07NUoV9R2uwKPKuW01UQVZ0NBtTxn+u2Rd
+	9o5aqHcsnzk24wv6lFpQned5MVkYoCXN2TsQXSCJKsbGu/Y18h9AGm96KnmGQktlUOoPOI
+	Yyab/f76Ti0qEsKH/JsHHfmhgYgOa78=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-482-ofSaRU2mPoSKQMGylyTNVA-1; Wed, 11 Feb 2026 06:36:53 -0500
+X-MC-Unique: ofSaRU2mPoSKQMGylyTNVA-1
+X-Mimecast-MFC-AGG-ID: ofSaRU2mPoSKQMGylyTNVA_1770809812
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4806cd00e02so29313375e9.0
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 03:36:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770809199; x=1771413999; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1770809811; x=1771414611; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=RUMa4wmSAMnFUZfW9TGwqjuVKNetJYo1m0rYO3T+Eb0=;
-        b=TF7pQqsZgNOv/OY+D+7vbyucam+ElDCUvIxPls0F3uM1ykKzBHeA5FhZdQqd8slZVH
-         jONDIO4ZHtFgrrW4TsyQ4OWmTvJOjO7VYzZvPpM7dr5NdmRvi97GT9TL/e3XBHc8Lptg
-         wTusQjucPyKTEp8HIUvKkHIMfoxrAqfTbcRfo5s682s39IzDFWpmerK/2mR6SzOMEKEF
-         PZRUPAS6R8ELH48ib0Q/+9aN6v7F1se2chTFAgDH7U1txz6R41u5eqv7gC4haDfEJXb3
-         MhlUoWbAJ+gGRXC8pkWJZy1KlawdzGjU+3Z4UrhhOCsd2FXMizPY1bAkt6U+hERZzWNk
-         Ywhg==
+        bh=+AnjdGG1nEkolns/Kl/LgypjNWFpwxy9FNDDz9JqrSo=;
+        b=gIXZrN4Bsy7heNXdRGEmMTaCc9I4XJFX3lFU76kv6wigiPztV8iyNW/fEqN59TGOvR
+         s6y4F21vxODeXhFpQ/ZOPvB/QkGtg+dWiduuP3DC6SrLx4oyvPHWd9W5y0oy2ALH/gUQ
+         hZEknKiURaJ+byMz6nF3Eprc5NilbZJWcrhsZ4t9tvXuM2QPXBd10K/eKWkxuLrqeZiy
+         xuOihC8dmYZb6rV5l0UG9uP/ZH48siJ41zq33IHPbWgq27ZNaXEdHK0oKmF07tg1GHDX
+         1xYxWGJ3laaThBlVZYni6dvv3c5Lp7vZqNGdFTjgIucaKBk9hlR+Nd3GWWVCU7YnuihH
+         p/IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770809199; x=1771413999;
+        d=1e100.net; s=20230601; t=1770809811; x=1771414611;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RUMa4wmSAMnFUZfW9TGwqjuVKNetJYo1m0rYO3T+Eb0=;
-        b=QAqh9VmV5IxSjRrxCy2smT5B1uG6Zype3blR1mESSxJLKy8pNzu4YwSa273QeWpf6h
-         XHzIfoMg6E18G2hOBq508LIj83XtocC2T75qQVYJOWJbUnoofy0IY1agydxAxpFAt+BP
-         o2JciBWPmtYTuwBsS6UOwTEAebS7pW6owIHAUB8CDoYMyDEde33RgGEaT9yZ/hBjpuXQ
-         l9rBnGU1/78QQ3+5tkuUR811QlL8TH1RA4hNCGR+gdbDr2+W/3SPhbls0e0e7LC2U7sV
-         J9bzz/J34VA6uLDS60VFpB4o1Lh2rK00PS7s0Qb8IVsoyirJ+Ey+jwUar8l1WR5KV3RH
-         T08w==
-X-Gm-Message-State: AOJu0YxOA/aQ3FK4ruYy/NiReJGYCY/AYimEQMltI6n6JQV2HKnBHYDE
-	+Hx5hUFVsGNI8eXYwRcJjtwAb5vzG9a/ZnvcJ13zqkyE78pe50nZ2QyB
-X-Gm-Gg: AZuq6aJueEqyBRQeDCsZuDI8PV7KGfExRIXXgAjdON8NiR3psJyYjHge++LGZiUXKKY
-	SCGNn5qkCN6Prv8idsmKYVnLPooW5ZH4G5LBJR6ogs6ftoO8YJAj8mq/EU2g4axWghzBQETspy4
-	VZfi3JlUm/baURvItkLD8u16FbnzbLyC4jO8JRE/opqcJsPpzAh3JgAHMMtOmCtA96hF/FDlJ5P
-	7x/bupFfUJV0L1tAblC/BpPkNP1Te+QTirjTB0P2b6+rZEXUIoNAmeu2K0+wbhQAjBN3lP2+vwJ
-	vNVxoXHqr9G9cIT++MKTSk/z8dn8t9Rk8bjscRWitVIJBh6F/21b2abWCSLQHQTNHLYGvtQJgaB
-	wB01kz1IjgsynbaS6p2QkWEAJ8iJ2cverF+yZCT6w4k9lHodF32EjkdsmE/Z/chu8TmvlSZRfKf
-	sKBvEr/TNnrTHcLinlPYSD2m/SZG3rvMlsvLcgNdnZZoE=
-X-Received: by 2002:a05:6000:4014:b0:435:8f1b:bb32 with SMTP id ffacd0b85a97d-4378458f33amr2790036f8f.32.1770809198440;
-        Wed, 11 Feb 2026 03:26:38 -0800 (PST)
-Received: from [10.158.36.109] ([72.25.96.17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783d50f3asm4152797f8f.13.2026.02.11.03.26.36
+        bh=+AnjdGG1nEkolns/Kl/LgypjNWFpwxy9FNDDz9JqrSo=;
+        b=bTwsZ445OH8XBqtpew1dmKaS65ghowOZHg080TDsUoF+fivnsWoIhYI7/I7hocRkmi
+         Br3m9n8v83HnPSSbVPwIEqMpEWgaeKiHU03Q8OuDb9Q0ycqsnVyk/MLq5YOUJgMbceuV
+         qQtjYYYn8jMXudEoc6B3OPM1M5eBgGTc3tJc7HGmxYmDoqF7C6r/kcwhMB9mylXGbHjz
+         TxXdbMF3wq0elP8EpoNxlwen9QToPaDEWzOL9++nHm96ayybVKH/9A1UZRGZJCs726AQ
+         Ki84jvjNa3svJGQiIqKr1lrHjFn16HIvZ2v5XZNyM/MW4oy/373irflx3L2uQObC5pl4
+         E+4Q==
+X-Gm-Message-State: AOJu0Yx9vKscqJp1Pbxedpjs2XuGuU1XrR8FJza0TrnbsW6+rSReBs9g
+	3gy+G24Tdl34zfgkwG83yc+MuxwnUCpatmOmQgRPHWztDgPnOyVNsHTfD51gBngWSpXNnaa1Mjl
+	1OBAMe/877a7XzHuw6YOSC7xmjCBllHFk2dob4QK2qGQZ/386OsVvzBg0XZaHwqTS5Q==
+X-Gm-Gg: AZuq6aK0XPpkp1zbQ/OO41s/E6Xl7ejSm9cYTME0/mxgt9ln1kw6yBYoGCwp3tliORF
+	qsJrgZDgT+RETKlYJeFCB76kQmLl83lMhHt1I+qtristatGnl1TJuzsBQR/l5ikEeZabvBhvRAh
+	nj+sLNaKEv8zLAl+4QFncP0f6wytbUmr3hzQrncxEk8E+qRGC0ZlB1shrGo5WlhpYTHpy36dsJl
+	9sBAdQn1f5+ayrxdrxt97WT/VTBRAIXg1ePCZPNpG+8MUc8tdLlN/6BfawZZKm20uTafvLo7lMo
+	mHHXjZ8IGlrg4xDQngaB616egUoDCDpwk8Ybth+6FAxIrSUoNq42Sv1lFdFVrsY0X8T9Zjs8j6z
+	QegWWNLh7hhgr4eCq6Pxu8BTnFQ==
+X-Received: by 2002:a05:600c:8b6f:b0:483:4807:20fd with SMTP id 5b1f17b1804b1-4835b9411admr31983315e9.30.1770809811439;
+        Wed, 11 Feb 2026 03:36:51 -0800 (PST)
+X-Received: by 2002:a05:600c:8b6f:b0:483:4807:20fd with SMTP id 5b1f17b1804b1-4835b9411admr31983025e9.30.1770809810979;
+        Wed, 11 Feb 2026 03:36:50 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4835a627147sm19394515e9.3.2026.02.11.03.36.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Feb 2026 03:26:37 -0800 (PST)
-Message-ID: <09a77964-37bf-4b3c-bfa9-8939eb7761ab@gmail.com>
-Date: Wed, 11 Feb 2026 13:26:35 +0200
+        Wed, 11 Feb 2026 03:36:50 -0800 (PST)
+Message-ID: <def77227-7b69-4f23-8f68-949173eda6a4@redhat.com>
+Date: Wed, 11 Feb 2026 12:36:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,160 +104,129 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: Skip NAPI polling when PCI channel is
- offline
-To: Breno Leitao <leitao@debian.org>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Amir Vadai <amirv@mellanox.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, dcostantino@meta.com, rneu@meta.com,
- kernel-team@meta.com
-References: <20260209-mlx5_iommu-v1-1-b17ae501aeb2@debian.org>
+Subject: Re: [PATCH v6 4/4] net: phy: realtek: add RTL8224 polarity support
+To: Damien Dejean <dam.dejean@gmail.com>, andrew@lunn.ch, krzk+dt@kernel.org,
+ robh@kernel.org, kuba@kernel.org, maxime.chevallier@bootlin.com
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, edumazet@google.com, davem@davemloft.net,
+ hkallweit1@gmail.com
+References: <20260207092539.647768-1-dam.dejean@gmail.com>
+ <20260207092539.647768-4-dam.dejean@gmail.com>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260209-mlx5_iommu-v1-1-b17ae501aeb2@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260207092539.647768-4-dam.dejean@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-258263-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258262-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,kernel.org,bootlin.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C6D0A123D7D
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CE4BA123E8B
 X-Rspamd-Action: no action
 
-
-
-On 09/02/2026 20:01, Breno Leitao wrote:
-> When a PCI error (e.g. AER error or DPC containment) marks the PCI
-> channel as frozen or permanently failed, the IOMMU mappings for the
-> device may already be torn down. If mlx5e_napi_poll() continues
-> processing CQEs in this state, every call to dma_unmap_page() triggers
-> a WARN_ON in iommu_dma_unmap_phys().
-> 
-> In a real-world crash scenario on an NVIDIA Grace (ARM64) platform,
-> a DPC event froze the PCI channel and the mlx5 NAPI poll continued
-> processing error CQEs, calling dma_unmap for each pending WQE. Here is
-> an example:
-> 
-> The DPC event on port 0007:00:00.0 fires and eth1 (on 0017:01:00.0) starts
-> seeing error CQEs almost immediately:
-> 
->      pcieport 0007:00:00.0: DPC: containment event, status:0x2009
->      mlx5_core 0017:01:00.0 eth1: Error cqe on cqn 0x54e, ci 0xb06, ...
-> 
-> The WARN_ON storm begins ~0.4s later and repeats for every pending WQE:
-> 
->      WARNING: CPU: 32 PID: 0 at drivers/iommu/dma-iommu.c:1237 iommu_dma_unmap_phys
->      Call trace:
->       iommu_dma_unmap_phys+0xd4/0xe0
->       mlx5e_tx_wi_dma_unmap+0xb4/0xf0
->       mlx5e_poll_tx_cq+0x14c/0x438
->       mlx5e_napi_poll+0x6c/0x5e0
->       net_rx_action+0x160/0x5c0
->       handle_softirqs+0xe8/0x320
->       run_ksoftirqd+0x30/0x58
-> 
-> After 23 seconds of WARN_ON() storm, the watchdog fires:
-> 
->      watchdog: BUG: soft lockup - CPU#32 stuck for 23s! [ksoftirqd/32:179]
->      Kernel panic - not syncing: softlockup: hung tasks
-> 
-> Each unmap hit the WARN_ON in the IOMMU layer, printing a full stack
-> trace. With dozens of pending WQEs, this created a storm of WARN_ON
-> dumps in softirq context that monopolized the CPU for over 23 seconds,
-> triggering a soft lockup panic.
-> 
-> Fix this by checking pci_channel_offline() at the top of
-> mlx5e_napi_poll() and bailing out immediately when the channel is
-> offline. napi_complete_done() is called before returning to clear the
-> NAPI_STATE_SCHED bit, ensuring that napi_disable() in the teardown path
-> does not spin forever waiting for it. No CQ interrupts are re-armed
-> since the explicit mlx5e_cq_arm() calls are skipped, so the NAPI
-> instance will not be re-scheduled. The pending DMA buffers are left for
-> device removal to clean up.
-> 
-> Fixes: e586b3b0baee ("net/mlx5: Ethernet Datapath files")
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c | 13 +++++++++++++
->   1 file changed, 13 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-> index 76108299ea57d..934ad7fafa801 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-> @@ -138,6 +138,19 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
->   	bool xsk_open;
->   	int i;
->   
-> +	/*
-> +	 * When the PCI channel is offline, IOMMU mappings may already be torn
-> +	 * down.  Processing CQEs would call dma_unmap for every pending WQE,
-> +	 * each hitting a WARN_ON in the IOMMU layer.  The resulting storm of
-> +	 * warnings in softirq context can monopolise the CPU long enough to
-> +	 * trigger a soft lockup and prevent any RCU grace period from
-> +	 * completing.
-> +	 */
-> +	if (unlikely(pci_channel_offline(c->mdev->pdev))) {
-> +		napi_complete_done(napi, 0);
+On 2/7/26 10:25 AM, Damien Dejean wrote:
+> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+> index 4f0c1b72f7e0..d15d3b41e5d1 100644
+> --- a/drivers/net/phy/realtek/realtek_main.c
+> +++ b/drivers/net/phy/realtek/realtek_main.c
+> @@ -172,6 +172,7 @@
+>  #define RTL8224_SRAM_RTCT_LEN(pair)		(0x8028 + (pair) * 4)
+>  
+>  #define RTL8224_VND1_MDI_PAIR_SWAP		0xa90
+> +#define RTL8224_VND1_MDI_POLARITY_SWAP		0xa94
+>  
+>  #define RTL8366RB_POWER_SAVE			0x15
+>  #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+> @@ -1861,9 +1862,51 @@ static int rtl8224_mdi_config_order(struct phy_device *phydev)
+>  	return ret;
+>  }
+>  
+> +static int rtl8224_mdi_config_polarity(struct phy_device *phydev)
+> +{
+> +	struct device_node *np = phydev->mdio.dev.of_node;
+> +	u8 offset = (phydev->mdio.addr & 3) * 4;
+> +	u32 polarity = 0;
+> +	int ret, val;
+> +
+> +	ret = of_property_read_u32(np, "enet-phy-pair-polarity", &polarity);
+> +
+> +	/* Do nothing if the property is not present */
+> +	if (ret == -EINVAL)
 > +		return 0;
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (polarity & ~0xf)
+> +		return -EINVAL;
+> +
+> +	phy_lock_mdio_bus(phydev);
+> +	val = __phy_package_read_mmd(phydev, 0, MDIO_MMD_VEND1,
+> +				     RTL8224_VND1_MDI_POLARITY_SWAP);
+> +	if (val < 0) {
+> +		ret = val;
+> +		goto exit;
 > +	}
 > +
->   	rcu_read_lock();
->   
->   	qos_sqs = rcu_dereference(c->qos_sqs);
-> 
-> ---
-> base-commit: a956792a1543c2bf4a2266cb818dc7c4135006f0
-> change-id: 20260209-mlx5_iommu-c8b238b1bb14
-> 
-> Best regards,
-> --
-> Breno Leitao <leitao@debian.org>
-> 
-> 
+> +	val &= ~(0xf << offset);
+> +	val |= polarity << offset;
+> +	ret = __phy_package_write_mmd(phydev, 0, MDIO_MMD_VEND1,
+> +				      RTL8224_VND1_MDI_POLARITY_SWAP, val);
+> +exit:
+> +	phy_unlock_mdio_bus(phydev);
+> +	return ret;
+> +}
+> +
+>  static int rtl8224_config_init(struct phy_device *phydev)
+>  {
+> -	return rtl8224_mdi_config_order(phydev);
+> +	int ret;
+> +
+> +	ret = rtl8224_mdi_config_order(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return rtl8224_mdi_config_polarity(phydev);
 
-Hi,
+This very close to what you implemented into patch 2/4. Likely you can
+deduplicate the code a bit factoring out some common helper.
 
-Thanks for your patch.
+Side notes: you should include the target tree in the subj prefix -
+'net-next' in this case, a per patch changelog for the introduced
+changes WRT the previous revision and a cover letter.
 
-You're introducing an interesting problem, but I am not convinced by 
-this solution approach.
+Also note that net-next is now closed for the merge window; you will
+have to wait unit ~23 Feb before reposting.
 
-Why would the driver perform this check if it doesn't guarantee 
-prevention of invalid access? It only "allows one napi cycle", which 
-happen to be good enough to prevent the soft lockup in your case.
+/P
 
-What if a napi cycle is configured with larger budget?
-
-If the problem is that the WARN_ON is being called at a high rate, then 
-it should be rate-limited.
+>  }
+>  
+>  static int rtl8224_probe(struct phy_device *phydev)
 
 
