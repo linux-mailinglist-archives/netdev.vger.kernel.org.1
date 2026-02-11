@@ -1,169 +1,169 @@
-Return-Path: <netdev+bounces-258226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJFKBSVIjGkHkgAAu9opvQ
-	(envelope-from <netdev+bounces-258226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:13:09 +0100
+	id WOnFEXNPjGmukgAAu9opvQ
+	(envelope-from <netdev+bounces-258241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:44:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 876B11229B6
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:13:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B582C122DC4
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BC76C3082D4D
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 09:12:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E5A743013736
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 09:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FA93563DA;
-	Wed, 11 Feb 2026 09:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671F435BDB2;
+	Wed, 11 Feb 2026 09:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="fPBlTprV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cJQJ3Njb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TYudtbpD"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE413559FB;
-	Wed, 11 Feb 2026 09:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0C235B631
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 09:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770801114; cv=none; b=bnonhHeu3n2+4rJfY9U3qPvhFbYb8hxPyLUZbMVp4uSRHFNvnYM47FICgOxoa2mY1AyjJgRcVSHoNqdvYwtpjGhwjzl4p91UAUZcYWEmISSfDjtN2Ec611Bh/tG5SIU7EBu875hqy19ZT5bOs6zbSC0awFav1NuG7rTc7K9rN58=
+	t=1770803021; cv=none; b=VfYrEnnv8otC0SNQpMwLIO1rNJ1sj+7ddh/vkIzVzg0AH952pTcSoVZ8PFyEv6VKXkt7w7T3f4LzheB5JjHhiFE+b346SK/a0JdPAwH7mL1GmkbHQWia+Ajts55C2ONtvoplijaCJd7dcSXrUkXDQ1fbZO73ofRxmnSYzYjY2WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770801114; c=relaxed/simple;
-	bh=usiuiY/UZumlaGlEHPYt3VMCduDlCRB5MqXL/uUT18o=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=jEuIbdnY0NgleBCaoGMICVIOzA7Qx+AQ8m6vR1VdhH5XLxkETrSc/PrT0GiUqmjDLsGyUCM3GijrPDWvit1Li4nNMrvHA1h78IHoVdqW2QLPBku5bvSngoXkXOXUBf0lAx8iN2WrQxRsNeQYrTq1BP6gajCG+AlMOUIjX5cCtN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=fPBlTprV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cJQJ3Njb; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 6666C1D00125;
-	Wed, 11 Feb 2026 04:11:51 -0500 (EST)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Wed, 11 Feb 2026 04:11:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1770801111;
-	 x=1770887511; bh=wrpx7nWVF4UPAzz8Jf7jimHknmN3I9L6EF8AGKckewA=; b=
-	fPBlTprVMJAbkdx41pYHA/05c6YoEfS5f+iA4C1NY7PDZb6g+0+GekJ54SETGiEh
-	d0MqT3S/Fzw5YzX9AvQq4DT3jlvM2uxMpUVNmSbdZ2uFgu3v72qs1aHqMY1UH3YU
-	vphX3S5UZ0FDBmlfpd12vBftEAKlsnnuOf7JaMduhbvCUHflMXWvZhm8qeXMwz56
-	L9MWLTh8rZC9Bo9nTJgZ7I43QgiALVe6OlUqvezbK5p3WFMC/GuABMc/uu0wntK0
-	QF1yHHN16dKaVgvkjy+AYC0lXhWWksv8SHlS+/KCgZBK4/vRR76wOEKrJPReOdCn
-	yemPsJo4euLtM0Vo01SbBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770801111; x=
-	1770887511; bh=wrpx7nWVF4UPAzz8Jf7jimHknmN3I9L6EF8AGKckewA=; b=c
-	JQJ3Njbx0mIPhuP4k5bjthJNl0eu1pzbMrxZCmQHb0d4baHxcm6F+sRwaSR3Inew
-	3HvKxcU+E131FMK2AKWwGbMMUOzEmYoKxMY8DSXv0DnVnZ+TPfLGuCnBHEu5x3n9
-	ZkNLkYGRxSfBWW111Xtc3b8ben/zP2WFF5aBELQxq9zxrApJmc0gcy+KNtIYThfH
-	g0LtORZqj5NLiXnhcPUqfvtEAcYyJqlY82rnR/2tpBFntNNJTzzaZ0TduxKpehwf
-	Jm2/vxGloEzWmY4uS9p99jCYAS5+hzudvJsZw4/tZ2br4mhR5qSNUI+YXfQTkMf6
-	5mQLSl1TZQdGajSjzLQhQ==
-X-ME-Sender: <xms:1UeMaS1g-721xcxmyNCANKcC9gnT_Tlgblu2xpBCBi7XZTNBB3Lxbw>
-    <xme:1UeMaf40e0e8GcJ1T14NeaVhwPB2N0j1Mm3Ox5Y0BYy4ZtKBJ5E6lHnvoZde2Y5lq
-    71smEO-7m_70Q6eoOiU4FBWcJ_P5eotQ8FjAkDdb04f7-jTgqbV>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvtddvudeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdegjedvfeehtdeggeevheefleej
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
-    epughqfhgvgihtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhhoshhtrhhofihssehg
-    mhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehjtghhrghpmhgrnheskhgrthgrlhhigidrtghomhdprhgtphhtthho
-    pehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtoheprhhpqdhpphhpohgvsehlihhsthhsrdhskhholhhlrdgt
-    rgdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:1keMaVdC8z5dQWT6YQ6Z9pY4ESm4A_TIy5zzp10wb8fDe1VCFv3E2Q>
-    <xmx:1keMabIfWPnfjIjs5zdyYpmExTHc4gktzsqX55RF0sHohZggnk71rg>
-    <xmx:1keMaVt0vQBV1dt1Mulz2o92OkrI_6MmrHtJDrZrF_wmTITglqDfmw>
-    <xmx:1keMaVaq-8mC20L25QDxAxOLmGf7FkABAi5tHT_eJ7UYDko0tgJqww>
-    <xmx:10eMaSCyCbTVULNK51L-AwWh6mCYLbiwqUWBhjjq9crUxdYcZsfwCraG>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id DAC6E700065; Wed, 11 Feb 2026 04:11:49 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1770803021; c=relaxed/simple;
+	bh=3R2gvJlYg2fkGJs2L5r+sIWjeFpGyp7Xsc71mVtw76k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=peWld4Wa6oJwuIq7nwhfHnJ7xYpYyNH+PRXL8VhD7glWt2u86X0zy3kqoqKq/g8hRURv2d0QWmbS/VkZxQLq1K8YOzmCCq03BeTmjaV51lqwl1+E1BVtARf87j4Y0jezMEcp8cx2NjoYbwhDAxtblZMFcpdYTmQYQ4iWVCj4Dxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TYudtbpD; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770803017; x=1802339017;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3R2gvJlYg2fkGJs2L5r+sIWjeFpGyp7Xsc71mVtw76k=;
+  b=TYudtbpDvYG57mjnnPgpMNN/pEd8/QoN2m8HoHFXxbnMx0aKFp7bEQHA
+   BVT7KvMoTYEHvrpameOpZbz+BKL2NndqP8Lp6w1Vykl4gX9j5S5ntPjVn
+   cPadn35jgamfGMyHhgd5t9nTrDifm/f1cIwxYzlcqWiogEW3L/RHbBv/P
+   bWP4D7EHDq+DchKRTmOCQGXwkmgIvIV37d+zMuASSS/qrdTHV+DbulnyX
+   tEo+8qzwVDauSVUNThmHNe5XJ9tB3qdeztE8UAuVEc3WOQrdBpZdE/Z5u
+   nTs1W2g52aSmmGZPQ61MK8QJ3vdPUaqsU7tyrxDp9AreclZnikeB8GdjD
+   A==;
+X-CSE-ConnectionGUID: G3J43xdiQn6AOq/7fcXXCw==
+X-CSE-MsgGUID: NtdM7XvzQG2IncmkT4IsVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="71848060"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="71848060"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 01:43:36 -0800
+X-CSE-ConnectionGUID: 1Feq19IFQUuQkHJ/wzguJA==
+X-CSE-MsgGUID: 8D3a+89OQ1SWV7f1wzmaQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="211599160"
+Received: from os-delivery.igk.intel.com ([10.102.21.165])
+  by fmviesa010.fm.intel.com with ESMTP; 11 Feb 2026 01:43:34 -0800
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net v1] libie: don't unroll if fwlog isn't supported
+Date: Wed, 11 Feb 2026 10:11:40 +0100
+Message-ID: <20260211091140.236389-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AikMT1CdWetc
-Date: Wed, 11 Feb 2026 10:11:29 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Qingfang Deng" <dqfext@gmail.com>
-Cc: linux-ppp@vger.kernel.org, rp-pppoe@lists.skoll.ca,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "James Chapman" <jchapman@katalix.com>,
- "Simon Horman" <horms@kernel.org>, Netdev <netdev@vger.kernel.org>,
- linux-kernel@vger.kernel.org, "Michal Ostrowski" <mostrows@gmail.com>,
- "Dianne Skoll" <dianne@skoll.ca>, "Paul Mackerras" <paulus@ozlabs.org>,
- "Jaco Kroon" <jaco@uls.co.za>, "James Carlson" <carlsonj@workingcode.com>,
- "Guillaume Nault" <gnault@redhat.com>
-Message-Id: <5bcf374e-1259-4f0f-b9a1-d405d522effc@app.fastmail.com>
-In-Reply-To: 
- <CALW65ja3sumAh3uzD3W=n=3Rk0J7EDtcpbvdaG6+F2y2dFUp2Q@mail.gmail.com>
-References: <20260211075547.138904-1-dqfext@gmail.com>
- <67c6125f-99e9-4a58-ba18-8a2a93e29b54@app.fastmail.com>
- <CALW65ja3sumAh3uzD3W=n=3Rk0J7EDtcpbvdaG6+F2y2dFUp2Q@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next] pppoe: remove unused kernel-mode relay support
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258226-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.skoll.ca,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,katalix.com,gmail.com,skoll.ca,ozlabs.org,uls.co.za,workingcode.com];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-258241-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,app.fastmail.com:mid,arndb.de:email,arndb.de:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 876B11229B6
+	FROM_NEQ_ENVFROM(0.00)[michal.swiatkowski@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B582C122DC4
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026, at 10:00, Qingfang Deng wrote:
-> On Wed, Feb 11, 2026 at 4:41=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> =
-wrote:
->>
->> This will lose all compat ioctl support, not just the emulation for
->> PPPOEIOCSFWD.
->
-> So I should only remove the if condition while keeping the
-> .compat_ioctl, is that correct?
+The libie_fwlog_deinit() function can be called during driver unload
+even when firmware logging was never properly initialized. This led to call
+trace:
 
-Yes, exactly. Specifically this will keep the translation for
-PPPIOCGMRU, PPPIOCSMRU, PPPIOCSFLAGS, and PPPIOCGL2TPSTATS
-socket ioctls, which don't need any translation.
+[  148.576156] Oops: Oops: 0000 [#1] SMP NOPTI
+[  148.576167] CPU: 80 UID: 0 PID: 12843 Comm: rmmod Kdump: loaded Not tainted 6.17.0-rc7next-queue-3oct-01915-g06d79d51cf51 #1 PREEMPT(full)
+[  148.576177] Hardware name: HPE ProLiant DL385 Gen10 Plus/ProLiant DL385 Gen10 Plus, BIOS A42 07/18/2020
+[  148.576182] RIP: 0010:__dev_printk+0x16/0x70
+[  148.576196] Code: 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 41 55 41 54 49 89 d4 55 48 89 fd 53 48 85 f6 74 3c <4c> 8b 6e 50 48 89 f3 4d 85 ed 75 03 4c 8b 2e 48 89 df e8 f3 27 98
+[  148.576204] RSP: 0018:ffffd2fd7ea17a48 EFLAGS: 00010202
+[  148.576211] RAX: ffffd2fd7ea17aa0 RBX: ffff8eb288ae2000 RCX: 0000000000000000
+[  148.576217] RDX: ffffd2fd7ea17a70 RSI: 00000000000000c8 RDI: ffffffffb68d3d88
+[  148.576222] RBP: ffffffffb68d3d88 R08: 0000000000000000 R09: 0000000000000000
+[  148.576227] R10: 00000000000000c8 R11: ffff8eb2b1a49400 R12: ffffd2fd7ea17a70
+[  148.576231] R13: ffff8eb3141fb000 R14: ffffffffc1215b48 R15: ffffffffc1215bd8
+[  148.576236] FS:  00007f5666ba6740(0000) GS:ffff8eb2472b9000(0000) knlGS:0000000000000000
+[  148.576242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  148.576247] CR2: 0000000000000118 CR3: 000000011ad17000 CR4: 0000000000350ef0
+[  148.576252] Call Trace:
+[  148.576258]  <TASK>
+[  148.576269]  _dev_warn+0x7c/0x96
+[  148.576290]  libie_fwlog_deinit+0x112/0x117 [libie_fwlog]
+[  148.576303]  ixgbe_remove+0x63/0x290 [ixgbe]
+[  148.576342]  pci_device_remove+0x42/0xb0
+[  148.576354]  device_release_driver_internal+0x19c/0x200
+[  148.576365]  driver_detach+0x48/0x90
+[  148.576372]  bus_remove_driver+0x6d/0xf0
+[  148.576383]  pci_unregister_driver+0x2e/0xb0
+[  148.576393]  ixgbe_exit_module+0x1c/0xd50 [ixgbe]
+[  148.576430]  __do_sys_delete_module.isra.0+0x1bc/0x2e0
+[  148.576446]  do_syscall_64+0x7f/0x980
 
-     Arnd
+It can be reproduced by trying to unload ixgbe driver in recovery mode.
+
+Fix that by checking if fwlog is supported before doing unroll.
+
+Fixes: 641585bc978e ("ixgbe: fwlog support for e610")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+ drivers/net/ethernet/intel/libie/fwlog.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/libie/fwlog.c b/drivers/net/ethernet/intel/libie/fwlog.c
+index f39cc11cb7c5..5d890d9d3c4d 100644
+--- a/drivers/net/ethernet/intel/libie/fwlog.c
++++ b/drivers/net/ethernet/intel/libie/fwlog.c
+@@ -1051,6 +1051,10 @@ void libie_fwlog_deinit(struct libie_fwlog *fwlog)
+ {
+ 	int status;
+ 
++	/* if FW logging isn't supported it means no configuration was done */
++	if (!libie_fwlog_supported(fwlog))
++		return;
++
+ 	/* make sure FW logging is disabled to not put the FW in a weird state
+ 	 * for the next driver load
+ 	 */
+-- 
+2.49.0
+
 
