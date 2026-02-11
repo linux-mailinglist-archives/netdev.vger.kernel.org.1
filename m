@@ -1,431 +1,405 @@
-Return-Path: <netdev+bounces-258250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Os1JqRXjGm9lQAAu9opvQ
-	(envelope-from <netdev+bounces-258250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:19:16 +0100
+	id MOmMHblXjGm9lQAAu9opvQ
+	(envelope-from <netdev+bounces-258251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:19:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363A9123402
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:19:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B29E12341E
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 11:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 064F4301724E
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:19:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41F1B3021E74
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 10:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2AF361DCC;
-	Wed, 11 Feb 2026 10:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73838367F37;
+	Wed, 11 Feb 2026 10:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="njyjMbFa"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="DDl1dcMP";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ZBaP22wk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA8234DB7E
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007B6367F40
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770805151; cv=none; b=dKJU2DGu9bYv6REP6hYf6y84ugMyJFZDptsCnOkyYUknxASDZmljxrI0ajCyFvbsTYaOpRMxBOse/Xy7LtOpdRiY5FT/3Zv/0Fcs9Wq0EMQAE9fLgrR8SPq49ZiwH4RVU4joDOxtGC/NZtMlZtiVVOgAXGabgYrqLx287OKt/MA=
+	t=1770805161; cv=none; b=Q/hbd7cShxHctHOtXVhc+cKzwLjr80qcsTCznsewABp+qimGnxiOz+qsi8RXalD9AZO+TCjORFeQamh7WAgQZDhPdy4S2fo19P7LNRDG4ztmQjEof2vDUL7YIy2xex2UYBX/KFthoj+X5ISvEVtGwdqchHxZ3YpRDXNoFwG1XYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770805151; c=relaxed/simple;
-	bh=7jw5QFAMAvh4d+0ne06QcvewixWKkd9/l/IjHOMTU4I=;
-	h=Mime-Version:Subject:From:To:CC:Message-ID:Date:Content-Type:
-	 References; b=lEPRMiwQUh+oLvZgG+4DcDqa0hGSNhUyADGHNn0+CNk+frGYZ4w4TTXJ6sGCNZMkrTJyNuSjZXyx3GGg7kcsAnIkGXTskzlnv/oMxQiZGXw6X7oRlObHOdg7uK9r85n0JW3ZUMPTT5zDkBd2/SAeeKRU4D2QANyWGP+1iBpKP0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=njyjMbFa; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260211101906epoutp049289d4714ea686975ce137606600870b~TKeYoxqbY0595505955epoutp041
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260211101906epoutp049289d4714ea686975ce137606600870b~TKeYoxqbY0595505955epoutp041
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1770805147;
-	bh=iDMMlySM1Jo+nM9UavTAc2yR+fhsJAauP+Y5/RjOquc=;
-	h=Subject:Reply-To:From:To:CC:Date:References:From;
-	b=njyjMbFaw/V0JIQnomD9eQBHo/RwrRvTg0KrarU3QNbez708nTjh43h1YlJ4gvol/
-	 wTu0SqN2nGOEXA3UCSEmQznTnXkwQkgTTAQqZ28suoi2TfSEN0xZ30WLHJpsaSf5Cx
-	 ICr+jEEfGlxufLd6t4vrRETc2mSdwIvmOrIi1dZA=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas1p1.samsung.com (KnoxPortal) with ESMTPS id
-	20260211101906epcas1p1d819653f0c43d8f0507c6a819ab34423~TKeX4w2JV2831728317epcas1p14;
-	Wed, 11 Feb 2026 10:19:06 +0000 (GMT)
-Received: from epcas1p2.samsung.com (unknown [182.195.38.195]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4f9vY56wK2z3hhT8; Wed, 11 Feb
-	2026 10:19:05 +0000 (GMT)
+	s=arc-20240116; t=1770805161; c=relaxed/simple;
+	bh=BaDSsHGEy2zX9WVrm5RtNAPsvCwRAo58d7TZpyt7/5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oOT3DmLu5+ZL2MrZFwmce64ncUECHBfcylfNOowx4rTaSgZk//8P0fnVrRdabnG7bV32Jp5tsXjMYjBEXZqXomiK3CnfPetu2KhDa+/aQoXrnZtKqEIGs/yM20d4jh8nKX6mzNX4eEW4SRgcorso6Wg4FTOnAIpvqXLslnaCYlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=DDl1dcMP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ZBaP22wk; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61B9IoNS4007896
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	+PvonrZ7OZoRXNS5AixxctJxybwuCwZ5MGB3RDvn9aM=; b=DDl1dcMPM4qlb/VH
+	H6wWRe6VODcdQYkwwcH1up935WIejcexRpbzntGMUDK48r4ciX573K9gw09N1e/x
+	+3g/R5xRvCFeZ4Xma+u1KcdeHtMltbH42ANJicoiMdb6kvQz0/r6CRibEOViBW/F
+	w25Mq55/rommVVShxAv8bjBKdE87tPAI5cU/Q4VSavJjiUkjRpvfbbELT2mzYj78
+	M/y6uv7JutAVycMZDefZwVYveLYzzglEuKg2bl0u0wijU3iA7RHDL3dQDa03AoNn
+	8zo5qdWgY+/QMazNKrV7kqJogvGh1AgC5c3akGGDARuCgrkF3cnmCp08wMd4eY01
+	qiePEQ==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c8fbwskgf-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 10:19:18 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2aadeb3dee4so105993215ad.2
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 02:19:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1770805158; x=1771409958; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+PvonrZ7OZoRXNS5AixxctJxybwuCwZ5MGB3RDvn9aM=;
+        b=ZBaP22wkabFksagas2OChrlPIlpPTlQyFtIOuoxjDimz1kWXpGeRjIhKo/w5OU5+DC
+         4aVShSq6kXmJ7dEDjvQu1HednApu4TZ1JfPNcBafLonw6ZlnVF+Vjk5JH0RNvb99mHUH
+         u5P549sxgL+28AcY+bLREHgVHlW0VuYm5kBCfkW42SShVteDARUi5DEsGENPREEIHfkN
+         lsIvqOnq1TnIwfss5NJyBEG5/8OgTe8IGbVRRcOBE/20Xkd3w4j4dPHpunDVFmpK8Gqh
+         4N+j3BQIotuI8eeRB7yfgEMK9IgzaNV4mfosq4Vk/6TDhQYiF7ESyYTgRTV1yoZA5sPo
+         CKLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770805158; x=1771409958;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+PvonrZ7OZoRXNS5AixxctJxybwuCwZ5MGB3RDvn9aM=;
+        b=hfTf5vcM/v5tHK8fo80zWSzm6qk76RenD1BYE5K1BmaFnNqzja2gIeR/OghsHPn+nZ
+         getowCZiOPjT4T6xghtqwJkYSZBTJkgf6Zg1OQjdIBxPtS6roMV0ZZE6tcZWidklsPyH
+         3PxWYe8VDAqeCP3ZyfEsI0ATbIr0gKPNxxWD9otxkKafoQnMbvaYGxYNrF0M2OQAeq1E
+         rgehPMU3AS+WCv98VqGlNL9O+LXdzzvmgWXlXLAZ1ttDauV+iD1l1xMyPuUR1kbbsZPy
+         hXLx//qSC6KZZoCQ9JtCI5b1vsQn87x49q5m4jyP0txXxPAXU8yYtNjg/yErNFw4qksO
+         MkLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXjenBLxdkr/jsADJ9qJ12o/Afi4WHGZaC+F5fHihoWYP6GhuYYCWY9L1LljMXxUm0EMotCiRA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtphR1kzK94CAF8Yg4nSCPKXXs+tA2twzhqcVFVbQ6MWUu/04m
+	5sJd4VPcj+2o9dt7XiHRopbGF78DA56MjKn4O51g/xbAhbTYC6nzNFxgEhDeYBOdbBI4wZHphkg
+	a9VuIH/mczcMkVrQMwAhNQucemNHgybNbe3FysD8dzVTHq9xleQoIk5LNPa0=
+X-Gm-Gg: AZuq6aI3X+1aCitlnm14J/sJZjZokc+zPJk7CrSd8QHuwzieTaFH5IH/yAKioHt2O0P
+	ABfCIVgtH+aSjJ5/nI/s3uGNr/ezTu3G6DvInNAgcx21v3FYGeZiLOATQuXdVCafoZpGidtnjcR
+	369F7vuNalFQea9jxXpvc0GIYE0ZXd/09OpahAFimaxNtGDCohZu1pAyfy93SWHHa2ZiI6GX+4e
+	uwSxQ3j8XbpWIYAeghvzYJCPileyiMlbOrJcBGDsVKnb5QoSCbbvY4iTpSxVJKq+1xEZq+l8c1m
+	2KeWr/xTdzYowypGDZCdR8zhplGoFJ62E4nnok2G5eaEhBavtl5PjjRuXErYGy/h3nX7HvIhoed
+	HN6Jyq2wmU2MordC+UtOBPDS9C+nrc02h40IHaggDBiW7ZzOyBeHywbZNug==
+X-Received: by 2002:a17:902:e948:b0:2a9:30d4:2b05 with SMTP id d9443c01a7336-2ab2ad1fd38mr15046885ad.55.1770805157851;
+        Wed, 11 Feb 2026 02:19:17 -0800 (PST)
+X-Received: by 2002:a17:902:e948:b0:2a9:30d4:2b05 with SMTP id d9443c01a7336-2ab2ad1fd38mr15046665ad.55.1770805157367;
+        Wed, 11 Feb 2026 02:19:17 -0800 (PST)
+Received: from [10.217.218.153] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ab2997aebdsm17702665ad.66.2026.02.11.02.19.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Feb 2026 02:19:16 -0800 (PST)
+Message-ID: <56147352-f32e-4ee9-aa13-c1a00f5066ec@oss.qualcomm.com>
+Date: Wed, 11 Feb 2026 15:49:11 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: [net,v3] ipv6: shorten reassembly timeout under fragment memory
- pressure
-Reply-To: soukjin.bae@samsung.com
-Sender: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>
-From: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>, "phil@nwl.cc"
-	<phil@nwl.cc>, "coreteam@netfilter.org" <coreteam@netfilter.org>,
-	"fw@strlen.de" <fw@strlen.de>, "pablo@netfilter.org" <pablo@netfilter.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20260211101905epcms1p79f189c8049846406ee0792804ca882ca@epcms1p7>
-Date: Wed, 11 Feb 2026 19:19:05 +0900
-X-CMS-MailID: 20260211101905epcms1p79f189c8049846406ee0792804ca882ca
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 101P
-cpgsPolicy: CPGSC10-711,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260211030048epcms1p54c6ed78458f57def8e3163032498ca00
-References: <CGME20260211030048epcms1p54c6ed78458f57def8e3163032498ca00@epcms1p7>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/2] net: mhi: Enable Ethernet interface support
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Manivannan Sadhasivam <mani@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
+        linux-arm-msm@vger.kernel.org,
+        Vivek Pernamitta <vpernami@qti.qualcomm.com>
+References: <20260205-eth_vdev_next-20260204_eth-v7-0-f85645210f81@qti.qualcomm.com>
+ <20260205-eth_vdev_next-20260204_eth-v7-1-f85645210f81@qti.qualcomm.com>
+ <CAFEp6-0Q7Cy9d5=ZEsct3Y2G3C2w_47CM0FxYsE6YkdksrKhcw@mail.gmail.com>
+Content-Language: en-US
+From: vivek pernamitta <vivek.pernamitta@oss.qualcomm.com>
+In-Reply-To: <CAFEp6-0Q7Cy9d5=ZEsct3Y2G3C2w_47CM0FxYsE6YkdksrKhcw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=GM4F0+NK c=1 sm=1 tr=0 ts=698c57a6 cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=EUspDBNiAAAA:8 a=KKAkSRfTAAAA:8 a=tylL_gffLuDzp9gNwmUA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=GvdueXVYPmCkWapjIL-Q:22 a=cvBusfyB2V15izCimMoJ:22
+X-Proofpoint-GUID: 4a-6TBN6F2ZjTkrudHB1v5B45zxZkbhP
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjExMDA4NCBTYWx0ZWRfX9pfSFzcj0+F7
+ yJdsagoN0gijTRlgIMGa7IMdqTfNUpTPCU72xTUOLeHbohnIis1irl2TSRBdQ9nrv4HmXJGg0Y/
+ GNtM7xaNOyIvENMppKCbEZEoXP/VRAuBfCsZXv0ZnkF5GdW9zLf5Fac6a/iy8bEoD7+iVmd2RkN
+ YRhjYdvlhHBToRETErvysnuH+qAzC28SD8Cn4mHhUhnBaw1+YhJHRL+hxhsidXn43qWo6+yiEfV
+ GuNXI3HsKWsUFY0TsBub6G6hhqe4tXzbbxGPtB1jmgH/zCLT5cCxTNsqmDNSyDG8uXWE4VG0XTG
+ HwlVDzs904kwhSbbLkm/GX00XAjl/6cNvQhtA+z6RVNzWKhXQAY4GWFpww+JA7V73XfJejt+qNG
+ kvIilHykWJUXCsllylnbKwBr1UewwqkYDRXKwkskgl4/4iUB9yMX8upOjdQkNU3TwPC34f4O/cC
+ XstGmzKowhVUrBBUGPA==
+X-Proofpoint-ORIG-GUID: 4a-6TBN6F2ZjTkrudHB1v5B45zxZkbhP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-10_03,2026-02-10_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 priorityscore=1501 spamscore=0 clxscore=1015 malwarescore=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 suspectscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602110084
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-258251-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258250-lists,netdev=lfdr.de];
-	HAS_X_PRIO_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[soukjin.bae@samsung.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	HAS_REPLYTO(0.00)[soukjin.bae@samsung.com];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samsung.com:replyto,samsung.com:dkim,samsung.com:email]
-X-Rspamd-Queue-Id: 363A9123402
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vivek.pernamitta@oss.qualcomm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 1B29E12341E
 X-Rspamd-Action: no action
 
- Changes in v2:
-- Fix build bot error and warnings
 
 
-
-From c7940e3dd728fdc58c8199bc031bf3f8f1e8a20f Mon Sep 17 00:00:00 2001
-From: Soukjin Bae <soukjin.bae@samsung.com>
-Date: Wed, 11 Feb 2026 11:20:23 +0900
-Subject: [PATCH] ipv6: shorten reassembly timeout under fragment memory
- pressure
-
-Under heavy IPv6 fragmentation, incomplete fragment queues may persist
-for the full reassembly timeout even when fragment memory is under
-pressure.
-
-This can lead to prolonged retention of fragment queues that are unlikely
-to complete, causing newly arriving fragmented packets to be dropped due
-to memory exhaustion.
-
-Introduce an optional mechanism to shorten the IPv6 reassembly timeout
-when fragment memory usage exceeds the low threshold. Different timeout
-values are applied depending on the upper-layer protocol to balance
-eviction speed and completion probability.
-
-Signed-off-by: Soukjin Bae <soukjin.bae@samsung.com>
----
- MAINTAINERS                             |  5 ++
- include/net/inet_frag.h                 |  4 ++
- include/net/ip6_reasm_policy.h          | 17 +++++
- net/ipv6/Kconfig                        | 10 +++
- net/ipv6/netfilter/nf_conntrack_reasm.c | 29 +++++++++
- net/ipv6/reassembly.c                   | 82 +++++++++++++++++++++++++
- 6 files changed, 147 insertions(+)
- create mode 100644 include/net/ip6_reasm_policy.h
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e08767323763..dacaf07080e6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -28893,3 +28893,8 @@ S:	Buried alive in reporters
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
- F:	*
- F:	*/
-+
-+ADJUSTABLE FRAGMENT TIMER
-+M:	Soukjin Bae <soukjin.bae@samsung.com>
-+S:	Maintained
-+F:	include/net/ip6_reasm_policy.h
-\ No newline at end of file
-diff --git a/include/net/inet_frag.h b/include/net/inet_frag.h
-index 365925c9d262..0fc88ef61ca3 100644
---- a/include/net/inet_frag.h
-+++ b/include/net/inet_frag.h
-@@ -15,6 +15,10 @@ struct fqdir {
- 	long			high_thresh;
- 	long			low_thresh;
- 	int			timeout;
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	int			timeout_failed_tcp;
-+	int			timeout_failed_udp;
-+#endif
- 	int			max_dist;
- 	struct inet_frags	*f;
- 	struct net		*net;
-diff --git a/include/net/ip6_reasm_policy.h b/include/net/ip6_reasm_policy.h
-new file mode 100644
-index 000000000000..994482a03bc0
---- /dev/null
-+++ b/include/net/ip6_reasm_policy.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _NET_IP6_REASM_POLICY_H
-+#define _NET_IP6_REASM_POLICY_H
-+
-+struct sk_buff;
-+struct frag_queue;
-+
-+void ip6_reasm_adjust_timer(struct frag_queue *fq,
-+			    struct sk_buff *skb, int nhoff);
-+
-+/*
-+ * Default IPv6 reassembly timeouts under fragment memory pressure
-+ */
-+#define IPV6_REASM_TIMEOUT_FAILED_TCP	3	/* 3 seconds */
-+#define IPV6_REASM_TIMEOUT_FAILED_UDP	1	/* 1 second */
-+
-+#endif /* _NET_IP6_REASM_POLICY_H */
-diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-index b8f9a8c0302e..6e8db60f6a4d 100644
---- a/net/ipv6/Kconfig
-+++ b/net/ipv6/Kconfig
-@@ -340,4 +340,14 @@ config IPV6_IOAM6_LWTUNNEL
- 
- 	  If unsure, say N.
- 
-+config IPV6_FRAG_TIMER_ADJ
-+	bool "IPv6: Adjust reassembly timer on buffer starvation"
-+	default n
-+	help
-+	  Enable dynamic adjustment of the IPv6 reassembly timer when the
-+	  fragment memory usage exceeds the low threshold. This helps to
-+	  quickly evict incomplete fragment queues, making room for new
-+	  incoming fragments such as latency-sensitive IMS traffic.
-+	  If unsure, say N.
-+
- endif # IPV6
-diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
-index 64ab23ff559b..39902fbd53aa 100644
---- a/net/ipv6/netfilter/nf_conntrack_reasm.c
-+++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
-@@ -30,6 +30,7 @@
- #include <linux/module.h>
- #include <net/netfilter/ipv6/nf_defrag_ipv6.h>
- #include <net/netns/generic.h>
-+#include <net/ip6_reasm_policy.h>
- 
- static const char nf_frags_cache_name[] = "nf-frags";
- 
-@@ -62,6 +63,20 @@ static struct ctl_table nf_ct_frag6_sysctl_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_doulongvec_minmax,
- 	},
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	{
-+		.procname	= "nf_conntrack_frag6_timeout_failed_tcp",
-+		.maxlen		= sizeof(unsigned int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_jiffies,
-+	},
-+	{
-+		.procname	= "nf_conntrack_frag6_timeout_failed_udp",
-+		.maxlen		= sizeof(unsigned int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_jiffies,
-+	},
-+#endif
- };
- 
- static int nf_ct_frag6_sysctl_register(struct net *net)
-@@ -85,6 +100,10 @@ static int nf_ct_frag6_sysctl_register(struct net *net)
- 	table[1].extra2	= &nf_frag->fqdir->high_thresh;
- 	table[2].data	= &nf_frag->fqdir->high_thresh;
- 	table[2].extra1	= &nf_frag->fqdir->low_thresh;
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	table[3].data	= &nf_frag->fqdir->timeout_failed_tcp;
-+	table[4].data	= &nf_frag->fqdir->timeout_failed_udp;
-+#endif
- 
- 	hdr = register_net_sysctl_sz(net, "net/netfilter", table,
- 				     ARRAY_SIZE(nf_ct_frag6_sysctl_table));
-@@ -214,6 +233,10 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
- 		}
- 		fq->q.flags |= INET_FRAG_LAST_IN;
- 		fq->q.len = end;
-+
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+		ip6_reasm_adjust_timer(fq, skb, nhoff);
-+#endif
- 	} else {
- 		/* Check if the fragment is rounded to 8 bytes.
- 		 * Required by the RFC.
-@@ -513,6 +536,12 @@ static int nf_ct_net_init(struct net *net)
- 	nf_frag->fqdir->high_thresh = IPV6_FRAG_HIGH_THRESH;
- 	nf_frag->fqdir->low_thresh = IPV6_FRAG_LOW_THRESH;
- 	nf_frag->fqdir->timeout = IPV6_FRAG_TIMEOUT;
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	nf_frag->fqdir->timeout_failed_tcp =
-+		IPV6_REASM_TIMEOUT_FAILED_TCP * HZ;
-+	nf_frag->fqdir->timeout_failed_udp =
-+		IPV6_REASM_TIMEOUT_FAILED_UDP * HZ;
-+#endif
- 
- 	res = nf_ct_frag6_sysctl_register(net);
- 	if (res < 0)
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index 25ec8001898d..cdec65461d81 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -57,6 +57,7 @@
- #include <net/addrconf.h>
- #include <net/ipv6_frag.h>
- #include <net/inet_ecn.h>
-+#include <net/ip6_reasm_policy.h>
- 
- static const char ip6_frag_cache_name[] = "ip6-frags";
- 
-@@ -104,6 +105,59 @@ fq_find(struct net *net, __be32 id, const struct ipv6hdr *hdr, int iif)
- 	return container_of(q, struct frag_queue, q);
- }
- 
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+static u8 ip6_reasm_get_l4proto(struct sk_buff *skb, int nhoff)
-+{
-+	struct frag_hdr _fhdr, *fhdr;
-+	__be16 frag_off;
-+	int offset;
-+	u8 nexthdr;
-+
-+	fhdr = skb_header_pointer(skb, nhoff, sizeof(_fhdr), &_fhdr);
-+	if (!fhdr)
-+		return IPPROTO_NONE;
-+
-+	nexthdr = fhdr->nexthdr;
-+	offset = nhoff + sizeof(struct frag_hdr);
-+
-+	/* Skip extension headers after fragment header */
-+	if (ipv6_skip_exthdr(skb, offset, &nexthdr, &frag_off) < 0)
-+		return IPPROTO_NONE;
-+
-+	return nexthdr;
-+}
-+
-+/**
-+ * ip6_reasm_adjust_timer - adjust IPv6 reassembly timer under memory pressure
-+ * @fq: fragment queue
-+ * @skb: current fragment skb
-+ * @nhoff: offset to fragment header
-+ *
-+ * Shortens reassembly timeout on buffer starvation to
-+ * allow faster eviction of incomplete fragment queues.
-+ */
-+void ip6_reasm_adjust_timer(struct frag_queue *fq,
-+			    struct sk_buff *skb, int nhoff)
-+{
-+	u8 l4proto;
-+	unsigned long new_timer;
-+
-+	if (frag_mem_limit(fq->q.fqdir) < fq->q.fqdir->low_thresh)
-+		return;
-+
-+	l4proto = ip6_reasm_get_l4proto(skb, nhoff);
-+
-+	if (l4proto == IPPROTO_TCP || l4proto == IPPROTO_ESP)
-+		new_timer = fq->q.fqdir->timeout_failed_tcp;
-+	else
-+		new_timer = fq->q.fqdir->timeout_failed_udp;
-+
-+	if (time_after(fq->q.timer.expires, jiffies + new_timer))
-+		mod_timer(&fq->q.timer, jiffies + new_timer);
-+}
-+EXPORT_SYMBOL_GPL(ip6_reasm_adjust_timer);
-+#endif
-+
- static int ip6_frag_queue(struct net *net,
- 			  struct frag_queue *fq, struct sk_buff *skb,
- 			  struct frag_hdr *fhdr, int nhoff,
-@@ -154,6 +208,10 @@ static int ip6_frag_queue(struct net *net,
- 			goto discard_fq;
- 		fq->q.flags |= INET_FRAG_LAST_IN;
- 		fq->q.len = end;
-+
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+		ip6_reasm_adjust_timer(fq, skb, nhoff);
-+#endif
- 	} else {
- 		/* Check if the fragment is rounded to 8 bytes.
- 		 * Required by the RFC.
-@@ -437,6 +495,20 @@ static struct ctl_table ip6_frags_ns_ctl_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_jiffies,
- 	},
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	{
-+		.procname	= "ip6frag_timeout_failed_tcp",
-+		.maxlen		= sizeof(unsigned int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_jiffies,
-+	},
-+	{
-+		.procname	= "ip6frag_timeout_failed_udp",
-+		.maxlen		= sizeof(unsigned int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_jiffies,
-+	},
-+#endif
- };
- 
- /* secret interval has been deprecated */
-@@ -468,6 +540,10 @@ static int __net_init ip6_frags_ns_sysctl_register(struct net *net)
- 	table[1].data	= &net->ipv6.fqdir->low_thresh;
- 	table[1].extra2	= &net->ipv6.fqdir->high_thresh;
- 	table[2].data	= &net->ipv6.fqdir->timeout;
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	table[3].data	= &net->ipv6.fqdir->timeout_failed_tcp;
-+	table[4].data	= &net->ipv6.fqdir->timeout_failed_udp;
-+#endif
- 
- 	hdr = register_net_sysctl_sz(net, "net/ipv6", table,
- 				     ARRAY_SIZE(ip6_frags_ns_ctl_table));
-@@ -538,6 +614,12 @@ static int __net_init ipv6_frags_init_net(struct net *net)
- 	net->ipv6.fqdir->high_thresh = IPV6_FRAG_HIGH_THRESH;
- 	net->ipv6.fqdir->low_thresh = IPV6_FRAG_LOW_THRESH;
- 	net->ipv6.fqdir->timeout = IPV6_FRAG_TIMEOUT;
-+#ifdef CONFIG_IPV6_FRAG_TIMER_ADJ
-+	net->ipv6.fqdir->timeout_failed_tcp =
-+		IPV6_REASM_TIMEOUT_FAILED_TCP * HZ;
-+	net->ipv6.fqdir->timeout_failed_udp =
-+		IPV6_REASM_TIMEOUT_FAILED_UDP * HZ;
-+#endif
- 
- 	res = ip6_frags_ns_sysctl_register(net);
- 	if (res < 0)
--- 
-2.25.1
+On 2/5/2026 7:38 PM, Loic Poulain wrote:
+> Hi Vivek,
+> 
+> On Thu, Feb 5, 2026 at 11:35 AM Vivek Pernamitta
+> <vivek.pernamitta@oss.qualcomm.com> wrote:
+>>
+>> From: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+>>
+>> Add support to configure a new client as Ethernet type over MHI by
+>> setting "mhi_device_info.ethernet_if = true". Create a new Ethernet
+>> interface named eth%d. This complements existing NET driver support.
+>>
+>> Introduce IP_SW1, ETH0, and ETH1 network interfaces required for
+>> M-plane, NETCONF, and S-plane components.
+>>
+>> M-plane:
+>> Implement DU M-Plane software for non-real-time O-RAN management
+>> between O-DU and O-RU using NETCONF/YANG and O-RAN WG4 M-Plane YANG
+>> models. Provide capability exchange, configuration management,
+>> performance monitoring, and fault management per O-RAN.WG4.TS.MP.0-
+>> R004-v18.00.
+>>
+>> NETCONF:
+>> Use NETCONF protocol for configuration operations such as fetching,
+>> modifying, and deleting network device configurations.
+>>
+>> S-plane:
+>> Support frequency and time synchronization between O-DUs and O-RUs
+>> using Synchronous Ethernet and IEEE 1588. Assume PTP transport over
+>> L2 Ethernet (ITU-T G.8275.1) for full timing support; allow PTP over
+>> UDP/IP (ITU-T G.8275.2) with reduced reliability. as per ORAN spec
+>> O-RAN.WG4.CUS.0-R003-v12.00.
+>>
+>> Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+>> ---
+>>   drivers/net/mhi_net.c | 75 ++++++++++++++++++++++++++++++++++++++++++---------
+>>   1 file changed, 62 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+>> index ae169929a9d8e449b5a427993abf68e8d032fae2..fbec10c1ba9faf1ccf049b808e9d391800320989 100644
+>> --- a/drivers/net/mhi_net.c
+>> +++ b/drivers/net/mhi_net.c
+>> @@ -4,6 +4,7 @@
+>>    * Copyright (C) 2020 Linaro Ltd <loic.poulain@linaro.org>
+>>    */
+>>
+>> +#include <linux/etherdevice.h>
+>>   #include <linux/if_arp.h>
+>>   #include <linux/mhi.h>
+>>   #include <linux/mod_devicetable.h>
+>> @@ -38,10 +39,12 @@ struct mhi_net_dev {
+>>          u32 rx_queue_sz;
+>>          int msg_enable;
+>>          unsigned int mru;
+>> +       bool ethernet_if;
+>>   };
+>>
+>>   struct mhi_device_info {
+>>          const char *netname;
+>> +       bool ethernet_if;
+>>   };
+>>
+>>   static int mhi_ndo_open(struct net_device *ndev)
+>> @@ -119,11 +122,29 @@ static void mhi_ndo_get_stats64(struct net_device *ndev,
+>>          } while (u64_stats_fetch_retry(&mhi_netdev->stats.tx_syncp, start));
+>>   }
+>>
+>> +static int mhi_mac_address(struct net_device *dev, void *p)
+>> +{
+>> +       if (dev->type == ARPHRD_ETHER)
+>> +               return eth_mac_addr(dev, p);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int mhi_validate_address(struct net_device *dev)
+>> +{
+>> +       if (dev->type == ARPHRD_ETHER)
+>> +               return eth_validate_addr(dev);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>>   static const struct net_device_ops mhi_netdev_ops = {
+>>          .ndo_open               = mhi_ndo_open,
+>>          .ndo_stop               = mhi_ndo_stop,
+>>          .ndo_start_xmit         = mhi_ndo_xmit,
+>>          .ndo_get_stats64        = mhi_ndo_get_stats64,
+>> +       .ndo_set_mac_address    = mhi_mac_address,
+>> +       .ndo_validate_addr      = mhi_validate_address,
+>>   };
+>>
+>>   static void mhi_net_setup(struct net_device *ndev)
+>> @@ -140,6 +161,13 @@ static void mhi_net_setup(struct net_device *ndev)
+>>          ndev->tx_queue_len = 1000;
+>>   }
+>>
+>> +static void mhi_ethernet_setup(struct net_device *ndev)
+>> +{
+>> +       ndev->netdev_ops = &mhi_netdev_ops;
+>> +       ether_setup(ndev);
+>> +       ndev->max_mtu = ETH_MAX_MTU;
+>> +}
+>> +
+>>   static struct sk_buff *mhi_net_skb_agg(struct mhi_net_dev *mhi_netdev,
+>>                                         struct sk_buff *skb)
+>>   {
+>> @@ -209,16 +237,22 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
+>>                          mhi_netdev->skbagg_head = NULL;
+>>                  }
+>>
+>> -               switch (skb->data[0] & 0xf0) {
+>> -               case 0x40:
+>> -                       skb->protocol = htons(ETH_P_IP);
+>> -                       break;
+>> -               case 0x60:
+>> -                       skb->protocol = htons(ETH_P_IPV6);
+>> -                       break;
+>> -               default:
+>> -                       skb->protocol = htons(ETH_P_MAP);
+>> -                       break;
+>> +               if (mhi_netdev->ethernet_if) {
+>> +                       skb_copy_to_linear_data(skb, skb->data,
+>> +                                               mhi_res->bytes_xferd);
+> 
+> What is the purpose of the above?
+> 
+> 
+> 
+Will remove this line skb_copy_to_linear_data, as it does memcpy
+again in same skb->data
+>> +                       skb->protocol = eth_type_trans(skb, mhi_netdev->ndev);
+>> +               } else {
+>> +                       switch (skb->data[0] & 0xf0) {
+>> +                       case 0x40:
+>> +                               skb->protocol = htons(ETH_P_IP);
+>> +                               break;
+>> +                       case 0x60:
+>> +                               skb->protocol = htons(ETH_P_IPV6);
+>> +                               break;
+>> +                       default:
+>> +                               skb->protocol = htons(ETH_P_MAP);
+>> +                               break;
+>> +                       }
+>>                  }
+>>
+>>                  u64_stats_update_begin(&mhi_netdev->stats.rx_syncp);
+>> @@ -301,11 +335,14 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+>>                  schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
+>>   }
+>>
+>> -static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
+>> +static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev, bool eth_dev)
+>>   {
+>>          struct mhi_net_dev *mhi_netdev;
+>>          int err;
+>>
+>> +       if (eth_dev)
+>> +               eth_hw_addr_random(ndev);
+>> +
+>>          mhi_netdev = netdev_priv(ndev);
+>>
+>>          dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+>> @@ -313,6 +350,7 @@ static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
+>>          mhi_netdev->mdev = mhi_dev;
+>>          mhi_netdev->skbagg_head = NULL;
+>>          mhi_netdev->mru = mhi_dev->mhi_cntrl->mru;
+>> +       mhi_netdev->ethernet_if = eth_dev;
+>>
+>>          INIT_DELAYED_WORK(&mhi_netdev->rx_refill, mhi_net_rx_refill_work);
+>>          u64_stats_init(&mhi_netdev->stats.rx_syncp);
+>> @@ -356,13 +394,14 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+>>          int err;
+>>
+>>          ndev = alloc_netdev(sizeof(struct mhi_net_dev), info->netname,
+>> -                           NET_NAME_PREDICTABLE, mhi_net_setup);
+>> +                           NET_NAME_ENUM, info->ethernet_if ?
+>> +                           mhi_ethernet_setup : mhi_net_setup);
+>>          if (!ndev)
+>>                  return -ENOMEM;
+>>
+>>          SET_NETDEV_DEV(ndev, &mhi_dev->dev);
+>>
+>> -       err = mhi_net_newlink(mhi_dev, ndev);
+>> +       err = mhi_net_newlink(mhi_dev, ndev, info->ethernet_if);
+>>          if (err) {
+>>                  free_netdev(ndev);
+>>                  return err;
+>> @@ -380,10 +419,17 @@ static void mhi_net_remove(struct mhi_device *mhi_dev)
+>>
+>>   static const struct mhi_device_info mhi_hwip0 = {
+>>          .netname = "mhi_hwip%d",
+>> +       .ethernet_if = false,
+>>   };
+>>
+>>   static const struct mhi_device_info mhi_swip0 = {
+>>          .netname = "mhi_swip%d",
+>> +       .ethernet_if = false,
+>> +};
+>> +
+>> +static const struct mhi_device_info mhi_eth0 = {
+>> +       .netname = "eth%d",
+>> +       .ethernet_if = true,
+>>   };
+>>
+>>   static const struct mhi_device_id mhi_net_id_table[] = {
+>> @@ -391,6 +437,9 @@ static const struct mhi_device_id mhi_net_id_table[] = {
+>>          { .chan = "IP_HW0", .driver_data = (kernel_ulong_t)&mhi_hwip0 },
+>>          /* Software data PATH (to modem CPU) */
+>>          { .chan = "IP_SW0", .driver_data = (kernel_ulong_t)&mhi_swip0 },
+>> +       { .chan = "IP_SW1", .driver_data = (kernel_ulong_t)&mhi_swip0 },
+>> +       { .chan = "IP_ETH0", .driver_data = (kernel_ulong_t)&mhi_eth0 },
+>> +       { .chan = "IP_ETH1", .driver_data = (kernel_ulong_t)&mhi_eth0 },
+>>          {}
+>>   };
+>>   MODULE_DEVICE_TABLE(mhi, mhi_net_id_table);
+>>
+>> --
+>> 2.34.1
+>>
+>>
 
 
