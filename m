@@ -1,186 +1,452 @@
-Return-Path: <netdev+bounces-258349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258350-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNTfOL3VjGm+tgAAu9opvQ
-	(envelope-from <netdev+bounces-258349-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:17:17 +0100
+	id gB/8BFfWjGm+tgAAu9opvQ
+	(envelope-from <netdev+bounces-258350-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:19:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A8E1271B0
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:17:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80E951271FF
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 20:19:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 93272300DDC2
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:17:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0CFD630157CC
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 19:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B0A34575A;
-	Wed, 11 Feb 2026 19:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1C1353EC5;
+	Wed, 11 Feb 2026 19:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i9HjkMUv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gS4fDKAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9141F09A5
-	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 19:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770837419; cv=pass; b=Ter3RC448AIZrfsA7YnWC/AVE+bs0In9UBbg/QHJdTLp6S5nJRrqvYuYTZ9PpwfKzrn7sVOKYUupRWjj38r7CPxNDcMgcl3L3jiv8BJYqC8ZBIWSBjD5b48dfFE1bPwLbpyqJSMJIr6TRGhSGdfYJUVtnMeXRVb/7vlaYYtYIXI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770837419; c=relaxed/simple;
-	bh=45mez5hlDUAKBwVS6c2aHGC1do6mEeb6KoumVjeqviE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ax8ZPFaJB4eVNp0afIC6NjOAVx1zgwx4Fm0CRIBmQkmhhZp3Zg+hzn/0sEgPSMmGPzxXxy7MR0CaSIgH7nuMYb1aaodbgKpuzhiDDdMTORyvbNyGKk/c+ZGzc+dwDlcS5zegWk+nis50VPSqQpCh5XumHwhJFsBz25jntuYt8ho=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i9HjkMUv; arc=pass smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-65a18bc4b1dso307617a12.3
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 11:16:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770837417; cv=none;
-        d=google.com; s=arc-20240605;
-        b=On8vpwhJY3sK0YrC1DmcntJZr/4+Qm2TBg+PbnuMpWzwMq5ny9kzE5GdF3yeioOhJp
-         Yw9qz/K6Ervh5toB9gUgUp8ADHe1U2/GxSB78xqReb5WpPoCEZe3jixLUrO2c+RGqetO
-         A4+0W+GOIlw2FF/9siFXo90BerqhiuJEUrh4DX/2ZViD/P1zfl6Y9PPgkvLdnh1PbUOP
-         cFn/Pak2a8IbqqJR6Sp7QWeK5CShHCvwj9v6upAWe/QrZ1i0+vFJNlT5e+3uEzoZLDmP
-         AA+tndCwEmj7voLTg1jmeS+9QJBUWslgk9Lw+vht4ferfrZAe0K+Pfu44yju9DOo+bdx
-         2+GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rUxupB6JouDWitR1jYbu+aHsudwoJXpga/GOXIMicFg=;
-        fh=b6NWOIZ9MR8tLfKJi2DYTK2a/kKb4tLID3A90pRJX8U=;
-        b=LSMrP0fGkLaMeBg7KG7MMvo0d1iByiKELFALskva9AWpoTvcaFndtD79TYyGGjqrMR
-         fANxsy7jr5STVvsB+Eh0rbjQY/A2bSNVBB1qmA9b0XOgbM42aHDjuBm6WNgHRKr3bwbt
-         64BQ7HAPw9cHej3qgAe7xmabvrDJTAGCX5gT0Dza5gDIp6f4HyoiHB/RlC8Rc68NoANm
-         U3uNoFL/AHa6wiSnNw8CF+asPBripu6N1+biYMtzB4wzH6V4vAEqID+tuB41+FFSdXN6
-         TkBxPncojj/u7Rtl2eEijWfOoayj4RM+v9NlYRzDCsr6SDS6Lmn78bgFD5J46pzVLVH/
-         Acmg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770837417; x=1771442217; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rUxupB6JouDWitR1jYbu+aHsudwoJXpga/GOXIMicFg=;
-        b=i9HjkMUv/GNo6Yv5bFSQ341AvD153Sl/ovFZuHxVwTsiBQXYvRDAT0JdDDWw31e4QH
-         /KVlXgsl+PiBS9zJw0GLr/74ioF2utZUnLLBGzqu2M7g5QEOI0iboavH4iEuc9AOi9NZ
-         luj/fiD4wcQmn/fXebVioFRK6PP+ELHO3/+uSx9Nx14nI4CjPD98wYuo4CKVLla1anUc
-         4g3QeOgjOk6//uJUGJ6aAJ/l3oC0CginF49tVHsGuvLBtxGI2kEZRIO1EQY3zJ6sZD+e
-         3OeQCbonG+846oMj3eqoq9uVMD67NHvZecNpXrJ6Ub06EZP5jFbjZkjSwOPh9aMDfK8q
-         SytQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770837417; x=1771442217;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rUxupB6JouDWitR1jYbu+aHsudwoJXpga/GOXIMicFg=;
-        b=PCx3Isvtak/GqNrf6IYlvPFavVz8p7phLueQap3wHxTlAMNEWgw3nk1tOFRNxPZji7
-         OMk+kGwGnjDB13IVhzsjyCqwpnOgANmeasrk30bGGfrdOP3i106SqWF17KJz8/J0RAm9
-         Fo+oo6KFd3o5TBI2RDVn5Ik8SLxQLazw5dY3FW7hds7jz8QjIWoM9Jq+izcoEmOncYd8
-         orj7bdmqebquDeAbtx5eSaCKIOSeblbVA0kcECwuSIK8FqBMkkxg18DmBXeXF8U4mUpa
-         ZT//+WNJWVTzMZuthoFLRsd4eT6138OuDYBjRU80GwMZxjLq1RGxKpiuLNNk5LiYiinW
-         RRDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDqvj8BoyftiM3zYVKUoBiNIBCX/7awOfR6FSTf1EKpaa5N9YkXf31yepZpVx/QiOPMA+8qug=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+B80ZB/jdlQtbm5Nc+CApKFiLsBTxv+sMvr4h8vNepDKOwoEX
-	ov0sQguvz/4v7oEosLnwMoQz+rxSYazSPCjX8e++HSB9eD60QAO2A0HYuk5+d8o+s2LwmDjQtdl
-	4JSqV65YGK0JBpCO7Kc61Y6E59RYPnJo=
-X-Gm-Gg: AZuq6aLcCA+yjtWAcXdsBTrotkOqAy5cah/r+71BpiB+TYWn/HIoRi5FaE/qTAtTNhx
-	Xv3TA/Cn4VZTOG6NxxGDJ2kpVbqRn8yUkzB0BS+IJerLHhHKPeBlRxv8mdA1JJ+w6HehMBDohPR
-	lpOLFBO9yFlEliqK85T1AyMGSihTLbb+ozhfutVOVVr3lR+RnG/gsGUiaLBKQvRmue2ZGnF4MN4
-	E8uaL+8XPpPcd8Wsf8U3+03z90oZgz+PdF6MvWmwlEXcr7sbamS2fbDZZrh8DS+rHSeHqUIsB3a
-	dzAP894=
-X-Received: by 2002:a05:6402:268b:b0:64d:4623:8475 with SMTP id
- 4fb4d7f45d1cf-65b96dabc28mr114495a12.2.1770837416656; Wed, 11 Feb 2026
- 11:16:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C65033F8C2
+	for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 19:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770837582; cv=none; b=trPgfoperA+MmOUGXzuUGQ8SUfcfHj5Qhe5LlxlNW42x1D9d0ZbLx70LFSzH5i9jV76Fb2Lmi1RDJlrBQT2InBrKB4egoSAnxwdnHX2f52hGObXGmUOztqDpCx7sdcsNMaDS79eVduZus9eP96rmaSf3xhlthEVv0g0OkBjcIKU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770837582; c=relaxed/simple;
+	bh=bOxn6cH0o4oLmeS0Qkpb8Yyt0kGotlb2a6FRRac7Nsk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=R7dfagbzMXxrRA+1K7Ijlk8D8S7mEo8C93yV/D7tg5xR94NmGjtIUOo4IBeCHKi8uRY7IHi/1cX6q8mlcg2/NutDOvU+l+kI2l6v25FkSnJGJeoR+wnE4swVOm9yJwIJ+oEJwUrsEco7EtNAt1KZPUgN3ClGhdgIlEs4aSPTcEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gS4fDKAl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770837579;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2wTcipsz7Rnh5YeneES48xOkCKOGihJrZo1p4Ia4V3o=;
+	b=gS4fDKAlbCzkfC3CYfVZfZhelPvaYRk3S0pCPCGU2K+0thfvsjT5iIzGmqYy7lpTiBHyyw
+	OqnYOXopuBGFMEGf6Dzv0itCbwqlHBEifLG/6daDe30THqzKfTfL5thOk0U1QOnqzUhTU/
+	EaE1ZlYlYMdoILtj1VO06ZNOMo090Zc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-351-g5t3baavPnW_sZWYw8sXsw-1; Wed,
+ 11 Feb 2026 14:19:34 -0500
+X-MC-Unique: g5t3baavPnW_sZWYw8sXsw-1
+X-Mimecast-MFC-AGG-ID: g5t3baavPnW_sZWYw8sXsw_1770837572
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 772D5180025E;
+	Wed, 11 Feb 2026 19:19:31 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.32.184])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6C7311956053;
+	Wed, 11 Feb 2026 19:19:26 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: ivecera@redhat.com,
+	aleksandr.loktionov@intel.com,
+	shaojijie@huawei.com,
+	Petr Oros <poros@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] iavf: fix incorrect reset handling in callbacks
+Date: Wed, 11 Feb 2026 20:18:55 +0100
+Message-ID: <20260211191855.1532226-1-poros@redhat.com>
+In-Reply-To: <20260207102245.812795-1-poros@redhat.com>
+References: <20260207102245.812795-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260211150022.527956-1-dg573847474@gmail.com> <20260211104600.5fbc5369@kicinski-fedora-PF5CM1Y0>
-In-Reply-To: <20260211104600.5fbc5369@kicinski-fedora-PF5CM1Y0>
-From: Chengfeng Ye <dg573847474@gmail.com>
-Date: Thu, 12 Feb 2026 03:16:44 +0800
-X-Gm-Features: AZwV_QiFBoyhEDy-jxaFGdIViqlNh10oId3TYXXst-EGfqO4zRgSAHn8Qy_K-Xc
-Message-ID: <CAAo+4rX=7+V+3eyact7n-G0ypU+g1BqjLaS8pmD_FGfMfK8Kfw@mail.gmail.com>
-Subject: Re: [PATCH v2] fbnic: close fw_log race between users and teardown
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kernel-team@meta.com, alexander.duyck@gmail.com, lee@trager.us, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	jacob.e.keller@intel.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258349-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[meta.com,gmail.com,trager.us,davemloft.net,google.com,redhat.com,intel.com,kernel.org,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258350-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dg573847474@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 48A8E1271B0
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 80E951271FF
 X-Rspamd-Action: no action
 
-On Thu, Feb 12, 2026 at 2:46=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 11 Feb 2026 15:00:22 +0000 Chengfeng Ye wrote:
-> > Fixes a theoretical race on fw_log between the teardown path and fw_log
-> > write functions.
-> >
-> > fw_log is written inside fbnic_fw_log_write() and can be reached from
-> > the mailbox handler fbnic_fw_msix_intr(), but fw_log is freed before
-> > IRQ/MBX teardown during cleanup, resulting in a potential data race of
-> > dereferencing a freed/null variable.
-> >
-> > Possible Interleaving scenario:
-> >   CPU0: fbnic_fw_log_write()
-> >           if (fbnic_fw_log_ready())   // true
-> >           ... preempt ...
-> >   CPU1: fbnic_fw_log_free()
-> >           vfree(log->data_start);
-> >           log->data_start =3D NULL;
-> >   CPU0: continues, walks log->entries or writes to log->data_start
->
-> Could you be more specific about the entry points for CPU0 and CPU1?
->
-> > The initialization also has an incorrect order problem, as the fw_log
-> > is currently allocated after MBX setup during initialization.
-> > Fix the problems by adjusting the synchronization order to put
-> > initialization in place before the mailbox is enabled, and not cleared
-> > until after the mailbox has been disabled.
->
-> Since this is a fix please add a Fixes tag pointing to where the buggy
-> code was added.
-> --
-> pw-bot: cr
+Three driver callbacks schedule a reset and wait for its completion:
+ndo_change_mtu(), ethtool set_ringparam(), and ethtool set_channels().
 
-No problem, with issues resolved in the v3 patch just sent.
+Waiting for reset in ndo_change_mtu() and set_ringparam() was added by
+commit c2ed2403f12c ("iavf: Wait for reset in callbacks which trigger
+it") to fix a race condition where adding an interface to bonding
+immediately after MTU or ring parameter change failed because the
+interface was still in __RESETTING state. The same commit also added
+waiting in iavf_set_priv_flags(), which was later removed by commit
+53844673d555 ("iavf: kill "legacy-rx" for good").
 
-Thanks,
-Chengfeng
+Waiting in set_channels() was introduced earlier by commit 4e5e6b5d9d13
+("iavf: Fix return of set the new channel count") to ensure the PF has
+enough time to complete the VF reset when changing channel count, and to
+return correct error codes to userspace.
+
+Commit ef490bbb2267 ("iavf: Add net_shaper_ops support") added
+net_shaper_ops to iavf, which required reset_task to use _locked NAPI
+variants (napi_enable_locked, napi_disable_locked) that need the netdev
+instance lock.
+
+Later, commit 7e4d784f5810 ("net: hold netdev instance lock during
+rtnetlink operations") and commit 2bcf4772e45a ("net: ethtool: try to
+protect all callback with netdev instance lock") started holding the
+netdev instance lock during ndo and ethtool callbacks for drivers with
+net_shaper_ops.
+
+Finally, commit 120f28a6f314 ("iavf: get rid of the crit lock")
+replaced the driver's crit_lock with netdev_lock in reset_task, causing
+incorrect behavior: the callback holds netdev_lock and waits for
+reset_task, but reset_task needs the same lock:
+
+  Thread 1 (callback)               Thread 2 (reset_task)
+  -------------------               ---------------------
+  netdev_lock()                     [blocked on workqueue]
+  ndo_change_mtu() or ethtool op
+    iavf_schedule_reset()
+    iavf_wait_for_reset()           iavf_reset_task()
+      waiting...                      netdev_lock() <- blocked
+
+This does not strictly deadlock because iavf_wait_for_reset() uses
+wait_event_interruptible_timeout() with a 5-second timeout. The wait
+eventually times out, the callback returns an error to userspace, and
+after the lock is released reset_task completes the reset. This leads to
+incorrect behavior: userspace sees an error even though the configuration
+change silently takes effect after the timeout.
+
+Fix this by extracting the reset logic from iavf_reset_task() into a new
+iavf_reset_step() function that expects netdev_lock to be already held.
+The three callbacks now call iavf_reset_step() directly instead of
+scheduling the work and waiting, performing the reset synchronously in
+the caller's context which already holds netdev_lock. This eliminates
+both the incorrect error reporting and the need for
+iavf_wait_for_reset(), which is removed along with the now-unused
+reset_waitqueue.
+
+The workqueue-based iavf_reset_task() becomes a thin wrapper that
+acquires netdev_lock and calls iavf_reset_step(), preserving its use
+for PF-initiated resets.
+
+The callbacks may block for several seconds while iavf_reset_step()
+polls hardware registers, but this is acceptable since netdev_lock is a
+per-device mutex and only serializes operations on the same interface.
+
+v3:
+- Remove netif_running() guard from iavf_set_channels(). Unlike
+  set_ringparam where descriptor counts are picked up by iavf_open()
+  directly, num_req_queues is only consumed during
+  iavf_reinit_interrupt_scheme() in the reset path. Skipping the reset
+  on a down device would silently discard the channel count change.
+- Remove dead reset_waitqueue code (struct field, init, and all
+  wake_up calls) since iavf_wait_for_reset() was the only consumer.
+
+Fixes: 120f28a6f314 ("iavf: get rid of the crit lock")
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Petr Oros <poros@redhat.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf.h        |  3 +-
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    | 19 ++---
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 77 ++++++-------------
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  1 -
+ 4 files changed, 31 insertions(+), 69 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index a87e0c6d4017ad..e9fb0a0919e376 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -260,7 +260,6 @@ struct iavf_adapter {
+ 	struct work_struct adminq_task;
+ 	struct work_struct finish_config;
+ 	wait_queue_head_t down_waitqueue;
+-	wait_queue_head_t reset_waitqueue;
+ 	wait_queue_head_t vc_waitqueue;
+ 	struct iavf_q_vector *q_vectors;
+ 	struct list_head vlan_filter_list;
+@@ -626,5 +625,5 @@ void iavf_add_adv_rss_cfg(struct iavf_adapter *adapter);
+ void iavf_del_adv_rss_cfg(struct iavf_adapter *adapter);
+ struct iavf_mac_filter *iavf_add_filter(struct iavf_adapter *adapter,
+ 					const u8 *macaddr);
+-int iavf_wait_for_reset(struct iavf_adapter *adapter);
++void iavf_reset_step(struct iavf_adapter *adapter);
+ #endif /* _IAVF_H_ */
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+index 2cc21289a70779..6ff3842a1ff1f0 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+@@ -492,7 +492,6 @@ static int iavf_set_ringparam(struct net_device *netdev,
+ {
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+ 	u32 new_rx_count, new_tx_count;
+-	int ret = 0;
+ 
+ 	if ((ring->rx_mini_pending) || (ring->rx_jumbo_pending))
+ 		return -EINVAL;
+@@ -537,13 +536,11 @@ static int iavf_set_ringparam(struct net_device *netdev,
+ 	}
+ 
+ 	if (netif_running(netdev)) {
+-		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
+-		ret = iavf_wait_for_reset(adapter);
+-		if (ret)
+-			netdev_warn(netdev, "Changing ring parameters timeout or interrupted waiting for reset");
++		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
++		iavf_reset_step(adapter);
+ 	}
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ /**
+@@ -1723,7 +1720,6 @@ static int iavf_set_channels(struct net_device *netdev,
+ {
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+ 	u32 num_req = ch->combined_count;
+-	int ret = 0;
+ 
+ 	if ((adapter->vf_res->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_ADQ) &&
+ 	    adapter->num_tc) {
+@@ -1745,13 +1741,10 @@ static int iavf_set_channels(struct net_device *netdev,
+ 
+ 	adapter->num_req_queues = num_req;
+ 	adapter->flags |= IAVF_FLAG_REINIT_ITR_NEEDED;
+-	iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
++	adapter->flags |= IAVF_FLAG_RESET_NEEDED;
++	iavf_reset_step(adapter);
+ 
+-	ret = iavf_wait_for_reset(adapter);
+-	if (ret)
+-		netdev_warn(netdev, "Changing channel count timeout or interrupted waiting for reset");
+-
+-	return ret;
++	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 4b0fc8f354bc90..9fd414800bca7a 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -185,31 +185,6 @@ static bool iavf_is_reset_in_progress(struct iavf_adapter *adapter)
+ 	return false;
+ }
+ 
+-/**
+- * iavf_wait_for_reset - Wait for reset to finish.
+- * @adapter: board private structure
+- *
+- * Returns 0 if reset finished successfully, negative on timeout or interrupt.
+- */
+-int iavf_wait_for_reset(struct iavf_adapter *adapter)
+-{
+-	int ret = wait_event_interruptible_timeout(adapter->reset_waitqueue,
+-					!iavf_is_reset_in_progress(adapter),
+-					msecs_to_jiffies(5000));
+-
+-	/* If ret < 0 then it means wait was interrupted.
+-	 * If ret == 0 then it means we got a timeout while waiting
+-	 * for reset to finish.
+-	 * If ret > 0 it means reset has finished.
+-	 */
+-	if (ret > 0)
+-		return 0;
+-	else if (ret < 0)
+-		return -EINTR;
+-	else
+-		return -EBUSY;
+-}
+-
+ /**
+  * iavf_allocate_dma_mem_d - OS specific memory alloc for shared code
+  * @hw:   pointer to the HW structure
+@@ -3100,18 +3075,16 @@ static void iavf_reconfig_qs_bw(struct iavf_adapter *adapter)
+ }
+ 
+ /**
+- * iavf_reset_task - Call-back task to handle hardware reset
+- * @work: pointer to work_struct
++ * iavf_reset_step - Perform the VF reset sequence
++ * @adapter: board private structure
+  *
+- * During reset we need to shut down and reinitialize the admin queue
+- * before we can use it to communicate with the PF again. We also clear
+- * and reinit the rings because that context is lost as well.
+- **/
+-static void iavf_reset_task(struct work_struct *work)
++ * Requests a reset from PF, polls for completion, and reconfigures
++ * the driver. Caller must hold the netdev instance lock.
++ *
++ * This can sleep for several seconds while polling HW registers.
++ */
++void iavf_reset_step(struct iavf_adapter *adapter)
+ {
+-	struct iavf_adapter *adapter = container_of(work,
+-						      struct iavf_adapter,
+-						      reset_task);
+ 	struct virtchnl_vf_resource *vfres = adapter->vf_res;
+ 	struct net_device *netdev = adapter->netdev;
+ 	struct iavf_hw *hw = &adapter->hw;
+@@ -3122,7 +3095,7 @@ static void iavf_reset_task(struct work_struct *work)
+ 	int i = 0, err;
+ 	bool running;
+ 
+-	netdev_lock(netdev);
++	netdev_assert_locked(netdev);
+ 
+ 	iavf_misc_irq_disable(adapter);
+ 	if (adapter->flags & IAVF_FLAG_RESET_NEEDED) {
+@@ -3167,7 +3140,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 		dev_err(&adapter->pdev->dev, "Reset never finished (%x)\n",
+ 			reg_val);
+ 		iavf_disable_vf(adapter);
+-		netdev_unlock(netdev);
+ 		return; /* Do not attempt to reinit. It's dead, Jim. */
+ 	}
+ 
+@@ -3179,7 +3151,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 		iavf_startup(adapter);
+ 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
+ 				   msecs_to_jiffies(30));
+-		netdev_unlock(netdev);
+ 		return;
+ 	}
+ 
+@@ -3320,9 +3291,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 
+ 	adapter->flags &= ~IAVF_FLAG_REINIT_ITR_NEEDED;
+ 
+-	wake_up(&adapter->reset_waitqueue);
+-	netdev_unlock(netdev);
+-
+ 	return;
+ reset_err:
+ 	if (running) {
+@@ -3331,10 +3299,21 @@ static void iavf_reset_task(struct work_struct *work)
+ 	}
+ 	iavf_disable_vf(adapter);
+ 
+-	netdev_unlock(netdev);
+ 	dev_err(&adapter->pdev->dev, "failed to allocate resources during reinit\n");
+ }
+ 
++static void iavf_reset_task(struct work_struct *work)
++{
++	struct iavf_adapter *adapter = container_of(work,
++						      struct iavf_adapter,
++						      reset_task);
++	struct net_device *netdev = adapter->netdev;
++
++	netdev_lock(netdev);
++	iavf_reset_step(adapter);
++	netdev_unlock(netdev);
++}
++
+ /**
+  * iavf_adminq_task - worker thread to clean the admin queue
+  * @work: pointer to work_struct containing our data
+@@ -4600,22 +4579,17 @@ static int iavf_close(struct net_device *netdev)
+ static int iavf_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+-	int ret = 0;
+ 
+ 	netdev_dbg(netdev, "changing MTU from %d to %d\n",
+ 		   netdev->mtu, new_mtu);
+ 	WRITE_ONCE(netdev->mtu, new_mtu);
+ 
+ 	if (netif_running(netdev)) {
+-		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
+-		ret = iavf_wait_for_reset(adapter);
+-		if (ret < 0)
+-			netdev_warn(netdev, "MTU change interrupted waiting for reset");
+-		else if (ret)
+-			netdev_warn(netdev, "MTU change timed out waiting for reset");
++		adapter->flags |= IAVF_FLAG_RESET_NEEDED;
++		iavf_reset_step(adapter);
+ 	}
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ /**
+@@ -5420,9 +5394,6 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* Setup the wait queue for indicating transition to down status */
+ 	init_waitqueue_head(&adapter->down_waitqueue);
+ 
+-	/* Setup the wait queue for indicating transition to running state */
+-	init_waitqueue_head(&adapter->reset_waitqueue);
+-
+ 	/* Setup the wait queue for indicating virtchannel events */
+ 	init_waitqueue_head(&adapter->vc_waitqueue);
+ 
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 88156082a41da6..a52c100dcbc56d 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -2736,7 +2736,6 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 	case VIRTCHNL_OP_ENABLE_QUEUES:
+ 		/* enable transmits */
+ 		iavf_irq_enable(adapter, true);
+-		wake_up(&adapter->reset_waitqueue);
+ 		adapter->flags &= ~IAVF_FLAG_QUEUES_DISABLED;
+ 		break;
+ 	case VIRTCHNL_OP_DISABLE_QUEUES:
+-- 
+2.52.0
+
 
