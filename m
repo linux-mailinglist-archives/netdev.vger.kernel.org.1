@@ -1,135 +1,161 @@
-Return-Path: <netdev+bounces-258283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAQGO0ODjGl/qAAAu9opvQ
-	(envelope-from <netdev+bounces-258283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 14:25:23 +0100
+	id yPxmGqCDjGl/qAAAu9opvQ
+	(envelope-from <netdev+bounces-258284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 14:26:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1825B124B71
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 14:25:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC1E5124BA5
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 14:26:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6EF213005332
-	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:25:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A80EA30160E6
+	for <lists+netdev@lfdr.de>; Wed, 11 Feb 2026 13:26:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6172A239E88;
-	Wed, 11 Feb 2026 13:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C6424BD1A;
+	Wed, 11 Feb 2026 13:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="lpJcv4nE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OSmX10tL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE361D7E42;
-	Wed, 11 Feb 2026 13:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6803B242D70;
+	Wed, 11 Feb 2026 13:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770816315; cv=none; b=ZdRAYvRNf/UjFfCQ2+tLnvZ/nHLCQ9v65Pw1TggYh3eOXcrFJ3sD0uAdHlfUyyAxEuQiKc84pdLA8ITQhExYWwHKpqXXw9ZEwU//3m8z220Jgs4QPgNRAJrggJbbShQmZrzCfibDQPEwkT361iNaQJW06hX9VtWcSyZchsUUcOo=
+	t=1770816412; cv=none; b=LSHcIjz+S7gsyVm5Arus3sKelkaTxzyp79bO++UBlGKf5bFDOsOUPKyiNlz4Qo6Cgdli3kez6QALzZvOD0Z1l+OtQeK6RfOqkBETf8sSdee1OzAKKNZQrKpoQg8JNg4QPs5jWMFxy587KEsacCf45xCQlwnLrZzvc+7pybY1DIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770816315; c=relaxed/simple;
-	bh=MeqT4MBhzEQ0JXyfgc6pcwR3/iMUdwXMuOky8LQC3eQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=QFBkqzyA4qb7BX/pkaikle23BNmgmFWUI8ka/dtLcH6mi0YWdVYJwaKB3s+WiTnlJpzcm6NslDSLhCnrZDvtq4oP9RL43eWUNuFRy/8QFLj86Nxg42TP1pcFWnuoig8tLiMiLuSDa8AnlmQRiDNhrfTGGrJ00aRzFh5VgMXOy2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=lpJcv4nE; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vqAD8-009lQv-8o; Wed, 11 Feb 2026 14:24:54 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:From:Subject:MIME-Version:Date:Message-ID;
-	bh=MeqT4MBhzEQ0JXyfgc6pcwR3/iMUdwXMuOky8LQC3eQ=; b=lpJcv4nEKb8mXH/5CmzCdq1SO7
-	P88BiuoWX1s3rFWsH3WwIV9qzDmtE9OtLknEBpk1EBRRaNhhB/H46A0tlgikascHLrYXCIusLCzR3
-	K44WgvoJbwHFMEQV7gw0HVZBKIsHQCabLRhNYQMqVhflzDSDmcZycagVjNG8psH46wHHtfK0/y5oU
-	KLQGKnglUeAKmRmCREXWSBXVSTnoMchAVDkty4VffGiAIDi2nCUZNNw+5PY1CCmqPdTTX6dVC29f2
-	3qg0pyxrDJspLf0lluSxNeMsRT+im7L/+UirH/h5aEw2502TqFnHTbapbc2LAnyf2krmuZCOYzifi
-	noxSxxnQ==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vqAD6-00040Y-Uw; Wed, 11 Feb 2026 14:24:53 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vqACm-000Fks-O1; Wed, 11 Feb 2026 14:24:32 +0100
-Message-ID: <6d8a18c1-867b-49d2-86e4-c7ccfc1e3ad4@rbox.co>
-Date: Wed, 11 Feb 2026 14:24:30 +0100
+	s=arc-20240116; t=1770816412; c=relaxed/simple;
+	bh=MVd5ohr5USyAJoOGADV1XP5YoTH/7jSAAnfRFvFnxjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yh9YerpuEIQUf+9JpGM8hw3A8c0H8jETAzAnW/Ra9ha7Jo6JevjoFT+fmy27m50DGjiStOnga1a3X8BcfMVyJBMyyB2CiNlmjMvjRdNXSBteC6LNZbOXDMiWzUfP+r/zjttXNSNBB+E/AuXpPcc6M+A5x3aVHfUtx63VG++sQ4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OSmX10tL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qwOXPjLznHLtKRD4jgitsvTq9cSNo39oPpMZkvXFnGQ=; b=OSmX10tLBcbwgHYLjcjG+TGjsh
+	4Xr1rYBsUEjKvHRYFdODp8sw5KVpQfGchDY+VIGMjMGHNr2PvoldkUAbTj6iBZtTvTnDKcAIR1zG3
+	3rEP2Rrh3AO6O8vCYfrMSRxkZNy8uOvJO15L0IS3l9bfYrb1u7m3uBd+Pxj6S5OAP5e4JgASxXHyV
+	NIFeF2qvLMvdiuLuxAbMHCkneSGMDaXXG6lgozSZXmeLIpNqvJ58flEIE/ehZKPL31fClFYiNPJ6p
+	B0D5VwQHtQJogoEXMdQMT+K/yPOSBrCxEny/StkJm6+FKlNnayEhxqPunVKzLIVUFtT1Kn/mCtCBq
+	SaN45VSQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41770)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vqAEt-000000003Sg-34ho;
+	Wed, 11 Feb 2026 13:26:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vqAEr-000000003o2-1RPH;
+	Wed, 11 Feb 2026 13:26:41 +0000
+Date: Wed, 11 Feb 2026 13:26:41 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, hkallweit1@gmail.com, andrew@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+Subject: Re: [PATCH net] net: phy: dp83869: Set auto mdix bit for forced
+ 100Base-Tx mode
+Message-ID: <aYyDkaynWEm-WJdg@shell.armlinux.org.uk>
+References: <20260211131033.2525617-1-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v2 3/4] bpf, sockmap: Adapt for the af_unix-specific
- lock
-From: Michal Luczaj <mhal@rbox.co>
-To: Martin KaFai Lau <martin.lau@linux.dev>,
- Kuniyuki Iwashima <kuniyu@google.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Willem de Bruijn <willemb@google.com>, Cong Wang <cong.wang@bytedance.com>,
- Alexei Starovoitov <ast@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260207-unix-proto-update-null-ptr-deref-v2-0-9f091330e7cd@rbox.co>
- <20260207-unix-proto-update-null-ptr-deref-v2-3-9f091330e7cd@rbox.co>
- <CAAVpQUA+8GL_j63CaKb8hbxoL21izD58yr1NvhOhU=j+35+3og@mail.gmail.com>
- <c4eaead1-ad69-42f0-9699-5f2d555a7693@rbox.co>
- <a2f2c260-38e8-4ba3-8655-cffbee046259@linux.dev>
- <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <b75bbc3f-85fd-4209-9ce1-3bf685ba62ff@rbox.co>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260211131033.2525617-1-m-malladi@ti.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TAGGED_FROM(0.00)[bounces-258283-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,bytedance.com,fb.com,linux.dev,fomichev.me,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258284-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,gmail.com,lunn.ch,vger.kernel.org,ti.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[rbox.co:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1825B124B71
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ti.com:url,ti.com:email,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: BC1E5124BA5
 X-Rspamd-Action: no action
 
-Replying to correct myself:
+On Wed, Feb 11, 2026 at 06:40:32PM +0530, Meghana Malladi wrote:
+> When using DP83869 in force 100Base-Tx mode, the PHY is required
+> to have robust Auto-MDIX feature enabled from register 1Eh.
+> Refer to 7.4.1.2 100BASE-TX section in the TRM [1] for more details.
+> 
+> [1]: https://www.ti.com/lit/ds/symlink/dp83869hm.pdf
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> ---
+>  drivers/net/phy/dp83869.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+> index 1f381d7b13ff..70d759c45c6a 100644
+> --- a/drivers/net/phy/dp83869.c
+> +++ b/drivers/net/phy/dp83869.c
+> @@ -110,6 +110,7 @@
+>  
+>  /* CFG4 bits */
+>  #define DP83869_INT_OE	BIT(7)
+> +#define DP83869_CFG4_ENABLE_AUTO_MDIX_100FD	BIT(9)
+>  
+>  /* OP MODE */
+>  #define DP83869_OP_MODE_MII			BIT(5)
+> @@ -900,6 +901,23 @@ static int dp83869_phy_reset(struct phy_device *phydev)
+>  	return dp83869_config_init(phydev);
+>  }
+>  
+> +static void dp83869_link_change_notify(struct phy_device *phydev)
+> +{
+> +	int cfg4;
+> +
+> +	/* When using DP83869 in force 100Base-Tx mode, the PHY is required
+> +	 * to have robust Auto-MDIX feature enabled
+> +	 */
+> +	if (phydev->autoneg == AUTONEG_DISABLE &&
+> +	    phydev->speed == SPEED_100 &&
+> +	    phydev->duplex == DUPLEX_FULL) {
+> +		cfg4 = phy_read(phydev, DP83869_CFG4);
+> +		if (cfg4 >= 0) {
+> +			cfg4 |= DP83869_CFG4_ENABLE_AUTO_MDIX_100FD;
+> +			phy_write(phydev, DP83869_CFG4, cfg4);
+> +		}
+> +	}
 
-> Since sockmap update can happen in a tracing prog, can you really expect a
-> socket to be always owned?
+Shouldn't this kind of configuration be done via .config_aneg() ?
 
-Ha, but I'm wrong! Of tracers only BPF_TRACE_ITER allows calling
-sock_map_update_elem(). And those are supposed to lock_sock(). Except some
-don't, e.g. sock_map_seq_show(). Or is there something else I'm missing?
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
