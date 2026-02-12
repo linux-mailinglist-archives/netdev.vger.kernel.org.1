@@ -1,200 +1,202 @@
-Return-Path: <netdev+bounces-258392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cqmcFEAdjWkmzQAAu9opvQ
-	(envelope-from <netdev+bounces-258392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 01:22:24 +0100
+	id TPGGEoEmjWlOzgAAu9opvQ
+	(envelope-from <netdev+bounces-258393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 02:01:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6FB2128A48
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 01:22:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E88B128BE6
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 02:01:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 974FE302F061
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 00:22:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2400330A92FC
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 01:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE391A262D;
-	Thu, 12 Feb 2026 00:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BE81547EE;
+	Thu, 12 Feb 2026 01:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="q61u47Fj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GLiqsZFx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F60196C7C
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 00:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060C733EC
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 01:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770855734; cv=none; b=KusjHTLcPDd7XO4/9piGM4wmLNNV3kRgENsMApZ79tdZdNvnepQ/eOC4qCmZCtCJ14XVmtMbuRhkZB34cpauMicTwmRN8RDkPuEOgRiUmnDhlIWnXFb93XLWyS69XO0RO4mLP6TZ2RQUPxcD4eNdqVeywbBw0U/aK/BW8PWBIGk=
+	t=1770858110; cv=none; b=o17ubE4bv/Pj+Q7AwC713NvKL0SQX8wu+L5rsq33i3vSIC2hPvJvL9S2JUgRDW6NqixKZxMpgJui+iSIp06xfWVVuR87RRKaRbTZnBUn9gsN6e3Vzq+rHRQTcJeAP4JETULCh4Y3NmV4Gv23l2Bgsfkp+JHwOWQ3N4oD/XFzaWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770855734; c=relaxed/simple;
-	bh=PYWRddlwVY0jzc38vC+9kh20HxoCqpanxvOgSv/O4P0=;
-	h=Mime-Version:Subject:From:To:CC:In-Reply-To:Message-ID:Date:
-	 Content-Type:References; b=ehyuC27+6J75vsLp8QUaW/3/uFGoJy4ZxJ+H72PYHsqRvfKUysfFB8qdCcROJ3c4U63AsVqnggPFvABCfPBszMbc8MrqM5Zr5MoI8a6YFxyuaDq3ARqWcg8ndNW/CfoU2du5fFpK3hjl+J9skYXaKOZjhKP1v9d+J1lMf8lxp9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=q61u47Fj; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260212002209epoutp01cccda6538a287807c731a40bb8acab4c~TV_dRB6l80996209962epoutp01N
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 00:22:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260212002209epoutp01cccda6538a287807c731a40bb8acab4c~TV_dRB6l80996209962epoutp01N
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1770855729;
-	bh=PYWRddlwVY0jzc38vC+9kh20HxoCqpanxvOgSv/O4P0=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=q61u47FjdJVkppHy0XlBcKiVrSms9Kk0j6F+RdLQeUJJFVhZolbvo7aPqMd4czPyE
-	 H1x0bSOzhXUrq1968mKr0i08I400TN8o3WxJmI3ViTakbTFWlEbwJFnoGQKL3TWpMd
-	 zuK34vCbmsJeMoSNV2aGPlcmq55Mty6kxi8Pdbo8=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas1p2.samsung.com (KnoxPortal) with ESMTPS id
-	20260212002208epcas1p25730873b06b96f3c2d81f01a666eb365~TV_cuCA920998809988epcas1p2D;
-	Thu, 12 Feb 2026 00:22:08 +0000 (GMT)
-Received: from epcas1p4.samsung.com (unknown [182.195.38.191]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4fBGFr4vq4z3hhTF; Thu, 12 Feb
-	2026 00:22:08 +0000 (GMT)
+	s=arc-20240116; t=1770858110; c=relaxed/simple;
+	bh=NNigq33vVJIbcoGBYh+URUoEg1c2javLVb9mFublwzQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fUGq/mcS7MW8QTQGsKwQxNoYlUDguUF7++xYkTH7rFyKlZr1SEnnGcbbHeej37ddYRLWIMJtX4SriW9MFaps3ZnbDfs0KCL1DUFuappLvVONQWLzylh8du5LaEyWb/B7Steqko8gfU1Jj9NltvIqdP8jaausfSh5jx6DfGmEAPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GLiqsZFx; arc=none smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-649db2b6cdcso5519817d50.0
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 17:01:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770858108; x=1771462908; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9LHpONSdJI596ZCuRsuiRBi+ORL1P4Wx9UbBWVB59mE=;
+        b=GLiqsZFxx9x/nv0aHRNYK/wic7FNHwBcyOnUOzjEzoo8fRPmKK9mE75mzxhV86SWXJ
+         xQ+AKAyVQqmdnPddcIC8GaCbsVBQEKw7tr7A0ei/3qfmfWw5XeUVmrrBjyJr5fz9Tzpm
+         HrQpjRDccZUCIrmPTWWgv2OJp33mqaJwjolS/dW57eVTM1eD6U+EkkAsnnV9159Mj5tQ
+         /S5bjpDQ8J+TQKB2ifdnOP2lAyywfdO7ZXQC8cCW/wu9k1HDkmyqjMISOGJbaR1AQw2+
+         xAhX0LSQAdNWNbbsnwEidqZXd8v+3cjQ0NG2wydDRuQ+gymbGgOu4WTvBn4oeh7DgfM2
+         va4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770858108; x=1771462908;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9LHpONSdJI596ZCuRsuiRBi+ORL1P4Wx9UbBWVB59mE=;
+        b=Z/L/G+H3t6qqSJdnpUL0MUMPnDhTFSxgA7yLZbiocy/rSPboNwAVPaFKkjDubC/OC4
+         FzS7EypldflNuWEJ8Eliv//lW3fyQg7YOPT14PcFEaauWUEjbQraVotovBZvPjobjGM2
+         JVm1ahKgDuRy1j4IqeIgBGgdX+7TK8Z+RFbtfv72t9LsI55UluKRIPiMh56Nn07Jtt7T
+         d8YiSYrju4+mH07AZIRqfLkd33NPQ5jJLh6mlhBQfUc0F3lCq9Ct67jb/Siu8TqC+Uf8
+         A6KV80YkPZJNnML1+UuSU4eCkMU6hRg2xvJdpf0Q2kU/5bgxXFhZgx4B35UvG5G6D0NX
+         kooA==
+X-Gm-Message-State: AOJu0YzSamVG7TRdZrrFw1OQRsbvN1V63IYfSRxUxBj7OulkqjMmaDfo
+	e9W9hA6lNCWxLnBecsD9XPQHMum7hnIVgYRzqlRnjmaR/6w42A4mkq2n
+X-Gm-Gg: AZuq6aJZXnCtmne5A8uI7D6k3A1/Q9wzAYKYOoNkLoyntkRB12DWXHj0PMXKUsKu7s7
+	Ni+HERR1rY6H9F81vVqjtFbRBbxHQErmICxPBIv+PZrkl3Ja0gySGx9T7OfmULcwuB7Z1vT9FPK
+	7O7lWoc01VC7ab5ryudlZAykvWB8lwX8PD/WIN1AUuz1yC0kd3PfAzA/iFnpqLcojIGGyE92dpo
+	Z3khApe9D4hc+sdgU/Mw5e9ME7j/7S0W4zVbjZdWxT1HJXzJN8/NT6yJ7HJgd09x8Jm8WTWWxTU
+	MnUrdkjp4JkOk0MSIizewZthYNTJ5rLcw+ydUOzy6BVwP4uzyctSOMLKaSlMwruVW7rW6s7ayfB
+	4Y7DHn0ZhvUtjcbmaeDJcjIrHlJGOw3C9v3mTDPegohNUxy4NhtqGN0ier0MkUNQGAkYD7oxv9M
+	pNNH+S9t6IzOWUtsSmM3mXXw==
+X-Received: by 2002:a05:690e:18f:b0:64a:d605:dbd0 with SMTP id 956f58d0204a3-64bbab62feemr790973d50.92.1770858107959;
+        Wed, 11 Feb 2026 17:01:47 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:4e::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64afc83ff82sm3573234d50.2.2026.02.11.17.01.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 17:01:47 -0800 (PST)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net 0/4] eth: fbnic: fix and improve header/data split
+ configuration
+Date: Wed, 11 Feb 2026 17:00:40 -0800
+Message-Id: <20260211-fbnic-tcp-hds-fixes-v1-0-55d050e6f606@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: RE:(2) [net-next,v3] ipv6: shorten reassembly timeout under
- fragment memory pressure
-Reply-To: soukjin.bae@samsung.com
-Sender: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>
-From: =?UTF-8?B?67Cw7ISd7KeE?= <soukjin.bae@samsung.com>
-To: Eric Dumazet <edumazet@google.com>, Fernando Fernandez Mancera
-	<fmancera@suse.de>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "dsahern@kernel.org" <dsahern@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>,
-	"phil@nwl.cc" <phil@nwl.cc>, "coreteam@netfilter.org"
-	<coreteam@netfilter.org>, "fw@strlen.de" <fw@strlen.de>,
-	"pablo@netfilter.org" <pablo@netfilter.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <CANn89i+mNojd9mUL_dt_=D+7nZ9xcV96CYJG_LYFmBZDOYUMFQ@mail.gmail.com>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20260212002207epcms1p7a1c19ed12038cf74f8632e5a305bd7ec@epcms1p7>
-Date: Thu, 12 Feb 2026 09:22:07 +0900
-X-CMS-MailID: 20260212002207epcms1p7a1c19ed12038cf74f8632e5a305bd7ec
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 101P
-cpgsPolicy: CPGSC10-711,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260211030048epcms1p54c6ed78458f57def8e3163032498ca00
-References: <CANn89i+mNojd9mUL_dt_=D+7nZ9xcV96CYJG_LYFmBZDOYUMFQ@mail.gmail.com>
-	<20260211103243epcms1p2dd304fd11b28df04f4e680e8c90a7fc5@epcms1p2>
-	<207b2879-e022-4b50-837b-d536f8fcabcd@suse.de>
-	<CGME20260211030048epcms1p54c6ed78458f57def8e3163032498ca00@epcms1p7>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADkmjWkC/x3JQQqEMAwF0KuEvzZgq4j2KoOLtkbNpiONyIB49
+ wHf9t0wqSqGQDeqXGr6LQjkGkLeY9mEdUEg+NYPrXeO11Q085kP3hfjVX9iLN3o+inGFNOIhnB
+ UeQOBPihyYn6eP5gCKWZqAAAA
+X-Change-ID: 20260211-fbnic-tcp-hds-fixes-e38149aabab8
+To: Alexander Duyck <alexanderduyck@fb.com>, 
+ Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Mohsin Bashir <mohsin.bashr@gmail.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258392-lists,netdev=lfdr.de];
-	HAS_X_PRIO_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[soukjin.bae@samsung.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258393-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	HAS_REPLYTO(0.00)[soukjin.bae@samsung.com];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[checkpatch.pl:url,samsung.com:replyto,samsung.com:dkim,samsung.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B6FB2128A48
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:mid,meta.com:email]
+X-Rspamd-Queue-Id: 8E88B128BE6
 X-Rspamd-Action: no action
 
->On Wed, Feb 11, 2026 at 4:11=E2=80=AFPM=20Fernando=20Fernandez=20Mancera=
-=0D=0A><fmancera=40suse.de>=20wrote:=0D=0A>>=0D=0A>>=20On=202/11/26=2011:32=
-=20AM,=20=EB=B0=B0=EC=84=9D=EC=A7=84=20wrote:=0D=0A>>=20>=C2=A0=20=20Change=
-s=20in=20v3:=0D=0A>>=20>=20-=20Fix=20build=20bot=20error=20and=20warnings=
-=0D=0A>>=20>=20-=20baseline=20update=0D=0A>>=20>=0D=0A>>=20>=0D=0A>>=20>=0D=
-=0A>>=20>=C2=A0=20From=20c7940e3dd728fdc58c8199bc031bf3f8f1e8a20f=20Mon=20S=
-ep=2017=2000:00:00=202001=0D=0A>>=20>=20From:=20Soukjin=20Bae=20<soukjin.ba=
-e=40samsung.com>=0D=0A>>=20>=20Date:=20Wed,=2011=20Feb=202026=2011:20:23=20=
-+0900=0D=0A>>=20>=20Subject:=20=5BPATCH=5D=20ipv6:=20shorten=20reassembly=
-=20timeout=20under=20fragment=20memory=0D=0A>>=20>=C2=A0=20=20pressure=0D=
-=0A>>=20>=0D=0A>>=20>=20Under=20heavy=20IPv6=20fragmentation,=20incomplete=
-=20fragment=20queues=20may=20persist=0D=0A>>=20>=20for=20the=20full=20reass=
-embly=20timeout=20even=20when=20fragment=20memory=20is=20under=0D=0A>>=20>=
-=20pressure.=0D=0A>>=20>=0D=0A>>=20>=20This=20can=20lead=20to=20prolonged=
-=20retention=20of=20fragment=20queues=20that=20are=20unlikely=0D=0A>>=20>=
-=20to=20complete,=20causing=20newly=20arriving=20fragmented=20packets=20to=
-=20be=20dropped=20due=0D=0A>>=20>=20to=20memory=20exhaustion.=0D=0A>>=20>=
-=0D=0A>>=20>=20Introduce=20an=20optional=20mechanism=20to=20shorten=20the=
-=20IPv6=20reassembly=20timeout=0D=0A>>=20>=20when=20fragment=20memory=20usa=
-ge=20exceeds=20the=20low=20threshold.=20Different=20timeout=0D=0A>>=20>=20v=
-alues=20are=20applied=20depending=20on=20the=20upper-layer=20protocol=20to=
-=20balance=0D=0A>>=20>=20eviction=20speed=20and=20completion=20probability.=
-=0D=0A>>=20>=0D=0A>>=20>=20Signed-off-by:=20Soukjin=20Bae=20<soukjin.bae=40=
-samsung.com>=0D=0A>>=0D=0A>>=20Hello,=0D=0A>>=0D=0A>>=20isn't=20this=20what=
-=20net.ipv6.ip6frag_time=20does?=20In=20addition,=20the=20situation=0D=0A>>=
-=20you=20described=20could=20be=20overcome=20by=20increasing=20the=20memory=
-=20thresholds=20at=0D=0A>>=20net.ipv6.ip6frag_low_thresh=20and=20net.ipv6.i=
-p6frag_high_thresh.=0D=0A>>=0D=0A>>=20Please,=20let=20me=20know=20if=20I=20=
-am=20missing=20something.=0D=0A>=0D=0A>Also=20:=0D=0A>=0D=0A>1)=20net-next=
-=20is=20closed.=0D=0A>Please=20read=20Documentation/process/maintainer-netd=
-ev.rst=0D=0A>=0D=0A>2)=20We=20do=20not=20send=203=20versions=20of=20a=20pat=
-ch=20in=20the=20same=20day.=0D=0A>Please=20read=20Documentation/process/mai=
-ntainer-netdev.rst=0D=0A>=0D=0A>3)=20What=20about=20IPv4=20?=0D=0A>=0D=0A>4=
-)=20Only=20the=20first=20fragment=20contains=20the=20'protocol=20of=20the=
-=20whole=0D=0A>datagram',=20and=20fragments=20can=20be=20received=20in=20an=
-y=20order.=0D=0A>=0D=0A>5)=20We=20do=20not=20add=20a=20MAINTAINER=20entry=
-=20for=20such=20a=20patch,=20sorry.=0D=0A=0D=0A=0D=0AHello,=0D=0A=0D=0A=0D=
-=0ARegarding=20about=20net.ipv6.ip6frag_time=20and=20low/high_thresh:=0D=0A=
-=0D=0AThe=20issue=20we=20are=20addressing=20currently=20occurs=20due=20to=
-=20a=20large=20volume=20of=20mDNS=0D=0Atraffic=20from=20WiFi=20APs.=20As=20=
-a=20temporary=20measure,=20we=20increased=20the=20high_thresh=0D=0Avalue=20=
-to=20accommodate=20the=20traffic.=0D=0A=0D=0AHowever,=20UDP=20traffic=20suc=
-h=20as=20mDNS=20cannot=20recover=20once=20a=20fragment=20stream=20is=0D=0Al=
-ost,=20leading=20to=20wasted=20memory.=20Therefore,=20this=20patch=20is=20i=
-ntended=20to=20make=0D=0Amore=20efficient=20use=20of=20the=20currently=20al=
-located=20fragment=20memory=20by=20shortening=0D=0Athe=20reassembly=20timeo=
-ut=20under=20memory=20pressure.=0D=0A=0D=0AAlso,=20we=20tend=20to=20avoid=
-=20changing=20the=20global=20value=20of=20ip6frag_time=20to=0D=0Apreserve=
-=20existing=20behavior.=20This=20is=20why=20I=20added=20new=20config=20too.=
-=0D=0A=0D=0A=0D=0ARegarding=20others:=0D=0A=0D=0A1,=202)=20net-next=20is=20=
-closed=20and=20multiple=20patch=20=0D=0AI=20apologize=20for=20the=20oversig=
-ht=20regarding=20the=20net-next=20status=20and=20the=20frequent=0D=0Asubmis=
-sions.=20I=20was=20tried=20to=20fix=20CI=20build=20failures.=20I=20will=20f=
-ollow=20the=0D=0Adocumented=20guidance=20going=20forward.=0D=0A=0D=0A3)=20W=
-hat=20about=20IPv4?=0D=0AThe=20issue=20was=20primarily=20observed=20in=20IP=
-v6-dominant=20IMS=20environments,=20which=0D=0Awas=20the=20initial=20focus.=
-=20However,=20I=20agree=20that=20the=20same=20memory=20management=20logic=
-=0D=0Ais=20beneficial=20for=20IPv4.=20I=20will=20include=20IPv4=20support=
-=20in=20the=20next=20version=20to=0D=0Aprovide=20a=20unified=20solution.=0D=
-=0A=0D=0A4)=20Only=20the=20first=20fragment=20contains=20the=20'protocol=20=
-of=20the=20whole=20datagram'.=0D=0AYou=20are=20correct.=20I=20will=20update=
-=20the=20logic=20to=20store=20the=20L4=20protocol=20information=0D=0Aonce=
-=20the=20first=20fragment=20is=20received,=20and=20only=20then=20apply=20th=
-e=20adjusted=20timeout.=0D=0AIf=20the=20first=20fragment=20is=20lost,=20the=
-=20adjusted=20timer=20will=20not=20be=20triggered,=20but=0D=0Athis=20is=20a=
-cceptable=20as=20a=20partial=20case.=0D=0A=0D=0A5)=20MAINTAINERS=20entry=0D=
-=0AUnderstood.=20I=20will=20remove=20the=20MAINTAINERS=20entry.=20I=20was=
-=20added=20to=20address=20a=0D=0Acheckpatch.pl=20warning=20and=20CI=20build=
-=20failure.=0D=0A
+This series fixes TCP HDS configuration in the fbnic driver and adds a
+devmem selftest for the intended behavior.
+
+The issues fixed include setting the correct CSR for EN_HDR_SPLIT,
+adjusting the hds threshold clamp to avoid long headers overflowing into
+the payload page, and configuring the device to use L4/L3/L2 header
+boundaries when present by programming the DMA hint bit unconditionally
+for all steering rule types.
+
+Prior to these fixes, small payloads fail devmem.check_rx_hds().
+
+Testing:
+
+IFC0=enp1s0
+IFC1=eth0
+
+export REMOTE_TYPE=netns
+export REMOTE_ARGS=ns-remote
+export NETIF=$IFC0
+export LOCAL_V4=192.0.3.1
+export REMOTE_V4=192.0.3.2
+sysctl -w net.ipv6.conf.$IFC0.keep_addr_on_down=1
+
+./tools/testing/selftests/drivers/net/hw/devmem.py
+
+TAP version 13
+1..4
+ok 1 devmem.check_rx
+ok 2 devmem.check_tx
+ok 3 devmem.check_tx_chunks
+ok 4 devmem.check_rx_hds
+
+To: Alexander Duyck <alexanderduyck@fb.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: kernel-team@meta.com
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+---
+Bobby Eshleman (4):
+      eth: fbnic: set FBNIC_QUEUE_RDE_CTL0_EN_HDR_SPLIT on RDE_CTL0
+      eth: fbnic: increase FBNIC_HDR_BYTES_MIN from 128 to 256 bytes
+      eth: fbnic: set DMA_HINT_L4 for all flows
+      selftests: drv-net: add HDS payload sweep test for devmem TCP
+
+ drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c   |  3 +++
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c       |  5 ++---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c      | 25 +++++++++++++----------
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h      |  2 +-
+ tools/testing/selftests/drivers/net/hw/devmem.py  | 19 ++++++++++++++++-
+ tools/testing/selftests/drivers/net/hw/ncdevmem.c | 11 +++++++++-
+ 6 files changed, 48 insertions(+), 17 deletions(-)
+---
+base-commit: bf9cf80cab81e39701861a42877a28295ade266f
+change-id: 20260211-fbnic-tcp-hds-fixes-e38149aabab8
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
