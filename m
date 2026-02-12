@@ -1,65 +1,52 @@
-Return-Path: <netdev+bounces-258409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258410-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPvJG1xmjWlk2AAAu9opvQ
-	(envelope-from <netdev+bounces-258409-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 06:34:20 +0100
+	id gvqEBPlqjWmS2QAAu9opvQ
+	(envelope-from <netdev+bounces-258410-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 06:54:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EEA312A78A
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 06:34:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC9512A82C
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 06:53:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6F05317386B
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 05:32:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 547933072A1C
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 05:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9EA2882B2;
-	Thu, 12 Feb 2026 05:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="br+96d2J"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A4486329;
+	Thu, 12 Feb 2026 05:53:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0769B2877EA;
-	Thu, 12 Feb 2026 05:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACD63EBF1F
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 05:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770874356; cv=none; b=NH33RIIl03O2sLIcYAo8yKcWXSMvZ/iI1i0yMeWrrf7Hp8fNTpwMCwuIxcTROJNKn74ppVLNzOBovTshAItTLWw97IliEOIRwmF0CLJNKJL3Fs349RAiy3VVvVkxXCliw5gsA9QB3a7eGvzjU9yzFzg5hMKtHHQzVmGFgiUyjpA=
+	t=1770875637; cv=none; b=FA/O+Nkia7+yq7gvxpqsYfxBcec+S6n5RfrO8Mf7ZLLIAlqj01OEky/INfH4NMpWAAxloPUVUbBxzsr0UW9bQUlzdY3dn16a3tFUHikMMt7yxMuOdXZtQ50oa7NnoHZNU7ZbeJt2PAGVri7ihwkzbmqlWPnUJVr/QTbKyxoNzck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770874356; c=relaxed/simple;
-	bh=GwpcvvAZ0c+F+p4CirK9eRn7hEIXOAm+mSqjiOX0OZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eegHcUCVfbMZxZm2jNMTIbqITaqSCvm3umCyezDo3Tz5TPMXK9CsGlKUwJLi3mifqCQTbj/qjlcKWY3wIR3moPbxZPUWbiOOBEZaHw+NrYLUNaIEFMx2Tpj2E+pvl+UcW3pQMhy6Mzvrp21vJ+XPoduEUkqs6RM9l7uZZmcoEiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=br+96d2J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF47C19424;
-	Thu, 12 Feb 2026 05:32:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770874355;
-	bh=GwpcvvAZ0c+F+p4CirK9eRn7hEIXOAm+mSqjiOX0OZA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=br+96d2JVcgBlJi6iQq6j2cibI+Fz7yyQnItRRP9+Hm/OzpsgkrWg9aFGhx15/Gq+
-	 2cAwJ//+fc6ngVnj/W063w1n44DBRpM/d97Q4XLQ6YMnclndsugNg4zt5Wf73OXu8K
-	 caRU8ueYdeIAAeMnOCteFeXEvEvKR8fWCqXXzSXo3m9kI4UlH4EOFax9mHI36fPIY7
-	 L9/huzZOoTfho2uK9UQM88JaCEr+X9Kc3XhjYrqN7lGCTT/1i8z56LUmSvMI/udhi1
-	 Qe7Q+pIVnrAiqNuZeyQsYoiRqfQZ2qf636uqlGgkZoLNFdHgJwsWxTCXSP2XfCZWWe
-	 9+JlRXhk4TQ6Q==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
+	s=arc-20240116; t=1770875637; c=relaxed/simple;
+	bh=hUmJILCrldbMoz0jfWb4ekQteUhBE7yn54wjaZGOzqs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U+h2nmUoIC+qdZNzJnpoDTbSn2D6UW8NnkCSTogq+vIPGJQseBsMh7VG96vyABuZrlpdXDnmie9Oxo72uZSn8s/y6sMbqvfR/Tip9eS+0SbwD6KVHWrHhGXPZJzJFkkc7vyWPwdjfja6ekjIOkEmQXSqTouIVYsBv8dN4pBLJvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-03 (Coremail) with SMTP id rQCowACXt97Zao1poJpLCA--.17868S2;
+	Thu, 12 Feb 2026 13:53:29 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: kuba@kernel.org,
+	netdev@vger.kernel.org
+Cc: davem@davemloft.net,
 	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v4 4/4] net/rds: Use proper peer port number even when not connected
-Date: Wed, 11 Feb 2026 22:32:30 -0700
-Message-ID: <20260212053230.1921241-5-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260212053230.1921241-1-achender@kernel.org>
-References: <20260212053230.1921241-1-achender@kernel.org>
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	arnd@arndb.de,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH net v2] myri10ge: replace comma with semicolon to fix regression
+Date: Thu, 12 Feb 2026 13:50:28 +0800
+Message-Id: <20260212055028.3248491-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,92 +54,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowACXt97Zao1poJpLCA--.17868S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CrW5Gw4kJry7XF45ZF18Xwb_yoW8WF4kpa
+	y2gayxZF17Jr4rXF48Xw10gFn8KFyYqr9ruryakw4Fgw18J3s7ZF4UKFyrCF4rX3y7Jr1Y
+	kFyjyw17XFsIv37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvq14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	tVW8ZwCY02Avz4vE14v_GrWl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x0JUBuWLUUUUU=
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-258410-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258409-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nichen@iscas.ac.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0EEA312A78A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: CFC9512A82C
 X-Rspamd-Action: no action
 
-From: Greg Jumper <greg.jumper@oracle.com>
+This fixes a regression introduced by commit fd24173439c0
+("myri10ge: avoid uninitialized variable use"), where a comma was
+mistakenly used instead of a semicolon.
 
-The function rds_tcp_get_peer_sport() should return the peer port of a
-socket, even when the socket is not currently connected, so that RDS
-can reliably determine the MPRDS "lane" corresponding to the port.
-
-rds_tcp_get_peer_sport() calls kernel_getpeername() to get the port
-number; however, when paths between endpoints frequently drop and
-reconnect, kernel_getpeername() can return -ENOTCONN, causing
-rds_tcp_get_peer_sport() to return an error, and ultimately causing
-RDS to use the wrong lane for a port when reconnecting to a peer.
-
-This patch modifies rds_tcp_get_peer_sport() to directly call the
-socket-specific get-name function (inet_getname() in this case) that
-kernel_getpeername() also calls.  The socket-specific function offers
-an additional argument which, when set to a value greater than 1,
-causes the function to return the socket's peer name even when the
-socket is not connected, which in turn allows rds_tcp_get_peer_sport()
-to return the correct port number.
-
-Signed-off-by: Greg Jumper <greg.jumper@oracle.com>
-Signed-off-by: Allison Henderson <achender@kernel.org>
+Fixes: fd24173439c0 ("myri10ge: avoid uninitialized variable use")
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- net/rds/tcp_listen.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Changes in v2:
+- Changed subject prefix from [net-next] to [net]
+- Added Fixes tag
+- Added Acked-by from Arnd Bergmann
+---
+ drivers/net/ethernet/myricom/myri10ge/myri10ge.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index f2c4778be0b3..ba283c8ffa64 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -67,7 +67,14 @@ rds_tcp_get_peer_sport(struct socket *sock)
- 	} saddr;
- 	int sport;
+diff --git a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+index 2f0cdbd4e2ac..d9b5d7999370 100644
+--- a/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
++++ b/drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+@@ -688,9 +688,9 @@ static int myri10ge_get_firmware_capabilities(struct myri10ge_priv *mgp)
  
--	if (kernel_getpeername(sock, &saddr.addr) >= 0) {
-+	/* Call the socket's getname() function (inet_getname() in this case)
-+	 * with a final argument greater than 1 to get the peer's port
-+	 * regardless of whether the socket is currently connected.
-+	 * Using peer=2 will get the peer port even during reconnection states
-+	 * (TCPF_CLOSE, TCPF_SYN_SENT). This avoids -ENOTCONN while
-+	 * inet_dport still contains the correct peer port.
-+	 */
-+	if (sock->ops->getname(sock, &saddr.addr, 2) >= 0) {
- 		switch (saddr.addr.sa_family) {
- 		case AF_INET:
- 			sport = ntohs(saddr.sin.sin_port);
-@@ -177,7 +184,7 @@ void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out)
+ 	/* probe for IPv6 TSO support */
+ 	mgp->features = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_TSO;
+-	cmd.data0 = 0,
+-	cmd.data1 = 0,
+-	cmd.data2 = 0,
++	cmd.data0 = 0;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, MXGEFW_CMD_GET_MAX_TSO6_HDR_SIZE,
+ 				   &cmd, 0);
+ 	if (status == 0) {
+@@ -821,9 +821,9 @@ static int myri10ge_change_pause(struct myri10ge_priv *mgp, int pause)
+ 	int status, ctl;
  
- 	if (fan_out)
- 		/* Delegate fan-out to a background worker in order
--		 * to allow "kernel_getpeername" to acquire a lock
-+		 * to allow "sock->ops->getname()" to acquire a lock
- 		 * on the socket.
- 		 * The socket is already locked in this context
- 		 * by either "rds_tcp_recv_path" or "tcp_v{4,6}_rcv",
+ 	ctl = pause ? MXGEFW_ENABLE_FLOW_CONTROL : MXGEFW_DISABLE_FLOW_CONTROL;
+-	cmd.data0 = 0,
+-	cmd.data1 = 0,
+-	cmd.data2 = 0,
++	cmd.data0 = 0;
++	cmd.data1 = 0;
++	cmd.data2 = 0;
+ 	status = myri10ge_send_cmd(mgp, ctl, &cmd, 0);
+ 
+ 	if (status) {
 -- 
-2.43.0
+2.25.1
 
 
