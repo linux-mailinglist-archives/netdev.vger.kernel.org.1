@@ -1,152 +1,151 @@
-Return-Path: <netdev+bounces-258471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258472-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGCPCDcAjmm0+AAAu9opvQ
-	(envelope-from <netdev+bounces-258471-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:30:47 +0100
+	id GBAaCX8Ejmlf+gAAu9opvQ
+	(envelope-from <netdev+bounces-258472-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:49:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8CA412F72D
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:30:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB0912F9BF
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:49:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B5486304501C
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:29:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80E64302AC04
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08ED1353ED8;
-	Thu, 12 Feb 2026 16:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174B935DD0E;
+	Thu, 12 Feb 2026 16:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="p/ptBcHj";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="S9aeuaEK"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="qz2QMYoh"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from outbound.st.icloud.com (p-east2-cluster3-host4-snip4-10.eps.apple.com [57.103.77.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E5134F462;
-	Thu, 12 Feb 2026 16:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E9C35E53F
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 16:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.77.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770913739; cv=none; b=duvBybiFZFxx31Zx3vv6pU8LIErmv5uJEFgqVgyBJAzTysXwVQL3dQ9TAA1Xr2O9XGeP5IsrBELcL7dCF5wtw6ea7vNWf+R6BGoQkELRaGpZpg/Y6PtSVkgDk5sLe68aFtUyiCW6+Ak7M5ft+qdtgHqcmwRpPnUtYUD39wzsHQg=
+	t=1770914776; cv=none; b=F2muSVqQ0LTDBeudBncl+BSdC4Q0KqvHTfl6V9oQifO+LLB1Rey7a/RcQZSJeN/4aOhv828KMAjNtV8rBlNCSc7sA1kIehtdRWZqQY1njzZKMUiZYgKrfSpdUZoVdxOMxpmW+c+GX1cPNUgPSMYHfw6kM5BcwD9FuViPgBLou6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770913739; c=relaxed/simple;
-	bh=TRHZXcV2nDdeLMlTQ3urObUjcIUvRlNNfh8C7w6ZmWw=;
+	s=arc-20240116; t=1770914776; c=relaxed/simple;
+	bh=h3BIh+xKb99MFMyx5fA5/y8xgOkkOyCiY+I8v/3z8YU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AjBiTXutjag7i+WcEMS4q8vBEitw0a0W7ppxmgwWJ24UKtQp05WxWxiioxDpulMCSkRDnXS0JLB732GqDw7Nn0VXKdU3RgI6COg9K5+5eSyZo5L1K9reLiwIHqujJnDtcq5OMCChqLjRMdqsHD0TqN19P6kcaj47dK/b2TJiLPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=p/ptBcHj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=S9aeuaEK; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 12 Feb 2026 17:28:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770913737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TRHZXcV2nDdeLMlTQ3urObUjcIUvRlNNfh8C7w6ZmWw=;
-	b=p/ptBcHjrc9RG4J9Cw1PYdMMkkWrumGBX+6YmfQ79wXkjPLO57C9tf0kNJAr2L74Nps90j
-	+29v+InfesxgTH/JdwOO1DfrnXxDlPFqDe1rP5CU+zmhJFst6UTOAly39MZNzXz1bokFSe
-	G2AZQTtszcZzjt7kY9133l9UPd/9ArtFnyNtvnBMlXf06ouqWNq51AiUaPRkgx35Ni0Ue1
-	bSPHQO0YOsa4857DIrL81tQuRQy8fZGnLr6zYn8gOhME/o2gV1JfhOaKjr11wHeyme/eIe
-	+rFjSyg+iP1zpdpqJEuL1eJ7zIuVg4c2b0atL+jzpcOW4ZHzKNwNzqRyGLqeog==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770913737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TRHZXcV2nDdeLMlTQ3urObUjcIUvRlNNfh8C7w6ZmWw=;
-	b=S9aeuaEKL1lC/YpOEcGHrJEc3I6QnFlB8A10YpQbEE2IGu9V5lucP8wOVqVJaDfRN2orsm
-	GHB/OXRda8IC53Dg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Willem de Bruijn <willemb@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=PGyutcfmxpJIgyXmMmxjDgkHlwPAIYMRgTAFqnqb1dGo04+bJ6BR1wkOyFNkp5DqLqKMwA1rEdpzxVidcJ3t8vXKGeJmmxxGJnDCPhW6D/bW7rz2AyVpQmZPpVhNwTV06rkbTzG3OsThunyxTqw/mZrwF90PV8w9HhVaQR6UO6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=qz2QMYoh reason="key not found in DNS"; arc=none smtp.client-ip=57.103.77.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-60-percent-2 (Postfix) with ESMTPS id 3B8681800385;
+	Thu, 12 Feb 2026 16:46:09 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; t=1770914771; x=1773506771; bh=lx/q+HqmswEdLHARgaDdqtXI3jrwjUkBrv3ty7Hecv0=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=qz2QMYohPbmKUkJQL3Maysbc1U8mbxSt9LP3NsetGLij7owrlV+cPFE8ivctpoVYXMJJtpqas9X6dt1+FMpFNLjSJE7hl+5VxcykZhZjjHSHuNygN+r/GPtQ44v1HGGDOXuCX4YOx0l/q6iZm6C3ggDtWmc1uRzTGXH7r1cqFVfXB9sAT64y0Azn63sSa5WSMkcbYhN57S5HW1BtMdAld3XLB1viyFwHy44NuBDu814cs4RUC9F5OQFtntDz7MI/TxidtZp6AuboIThkzKe9V+XrEGp6ZEo083TSHOeKhMzhIQo6LiQomryKjgmRRrHQscXY4rtFMOdGeB7hZOydmg==
+mail-alias-created-date: 1719758601013
+Received: from desktop.y-koj.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-60-percent-2 (Postfix) with ESMTPSA id BAD0C1800200;
+	Thu, 12 Feb 2026 16:46:06 +0000 (UTC)
+Date: Fri, 13 Feb 2026 01:46:03 +0900
+From: Yohei Kojima <yk@y-koj.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
- directly from interrupt for i210
-Message-ID: <20260212162855.Dgc3fZ29@linutronix.de>
-References: <willemdebruijn.kernel.bbdefedfb87e@gmail.com>
- <20260209090621.GiZqTiMJ@linutronix.de>
- <8e762437-69f9-40d7-bb75-3a45bef1d5d6@linux.dev>
- <20260209114836.GPU-vnnh@linutronix.de>
- <78e2af2c-40e6-43f1-9471-42f350e69389@linux.dev>
- <willemdebruijn.kernel.2e6213a98660b@gmail.com>
- <20260210121207.9kLHroS0@linutronix.de>
- <willemdebruijn.kernel.cceee43f5b9b@gmail.com>
- <87qzqr5vos.fsf@jax.kurt.home>
- <20260211105444.1e370abd@kernel.org>
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] docs: ethtool: clarify the bit-by-bit bitset
+ format description
+Message-ID: <aY4Dy4JALgoc5_s8@desktop.y-koj.net>
+References: <f43999612ed9d17fb7fe8f21e777e1c784f23c46.1770457868.git.yk@y-koj.net>
+ <f2882370-a531-4a83-ab39-cf73878c0d03@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20260211105444.1e370abd@kernel.org>
+In-Reply-To: <f2882370-a531-4a83-ab39-cf73878c0d03@redhat.com>
+X-Proofpoint-ORIG-GUID: OeFxtA_vWDdqp2A-CksUiD7PdsHIuPUU
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDEyNiBTYWx0ZWRfX3sL8vy0kZSii
+ 3hwbsFK69D3bPxjtbMW28vEZ12XpQVse+YvuoNW995YAz/5o6rhI4diZAOKJlQAm5FbwKw4wvtg
+ EfUSCRUiGupF8JzjaAfn8bMv8Mc8ybFpPaMyZnM1VpTSRxdDGXCmEp3Rbm+RClXzrdAaPGapj9+
+ Wd5b4O2CEvDcVAkpTxia526ASHaBeRcdmBOklttyoo6qkm9McHgAxFDLZWG0pmMg3sBa9OB0hPA
+ mrdsGdOtT+WdM2upUtGrZxydpJGykBS2nx6YOzhzrfzAaeib1qrfmXON+o2aD3Vwpx0Q2LBmqkP
+ 9mzVTuD0UWgKOQI0INWiJg2Ar4SA3KkVso5jDS1yUy3YxhRXLletGEr1kV1Otw=
+X-Authority-Info-Out: v=2.4 cv=AqvjHe9P c=1 sm=1 tr=0 ts=698e03d1
+ cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
+ a=YrL12D//S6tul8v/L+6tKg==:17 a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=jnl5ZKOAAAAA:8 a=GezhIzodDrykCbhU_jUA:9 a=CjuIK1q_8ugA:10
+ a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-GUID: OeFxtA_vWDdqp2A-CksUiD7PdsHIuPUU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-12_05,2026-02-12_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ spamscore=0 mlxlogscore=859 suspectscore=0 adultscore=0 lowpriorityscore=0
+ bulkscore=0 clxscore=1030 malwarescore=0 phishscore=0 classifier=spam
+ authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602120126
+X-JNJ: AAAAAAABIZK6QK2kicOR2UZfbLws9NFEGoTwO3F1/nDque+JkIsnZe+p/ENLAYM0AdVdYvGDhAvybui2p9s8zmF0+9jHsb4e9JA+6R0tWU3J//7Ut6/tf1djMbB2KJELd+t96uKJy9b0TXS3Z4D0GW5aeaCA83muRol7JdOgkt4TWG+4KqdB2rnCmZwEpaiK0wly2KaSaN3slxnHKB++G5F9xvcMC0sms15t3KWjqXYbAGq9/5X1gxD57DL+1eEKA68OJEyp6sYKkwa4K7V2NsmqAakKcsVxKc8hQ+wTvURESLHu0QlqVDy7SHG/aiKYhUU/2ZHhuiv9ZJlc+FeDZ87ElTQGaoN+JmpWIYF0rl79DmFHy5mQNemJ5Ct56CrdGSY40+wCqMCNuSv8k96qfZlh24sS08M+zKa1gQHdgd0RQ7s5yCgPGJAhfi+so85VaxjXM6HPdgxp2vshgPzoDE9jfH21HCCPzo0797+EvhNHyfoM/Q/LLy/dmTL0Iol6sOq6KfYA/hxGtG/tOFWHn+o1KGspSnGNCXWpeLzGTUBhSbKcmH8t3ryt9sKrl1Mwyi6EnVGYNWFgm1Ysun6wWZKganKXJYqg9YwosA1fbVCtt/UO4HNQHqzLYis6WC+cC73kvXL6PMFo8XM9xq6FrzM6XcNov8Z+p80HK7iocHdGKOQqtAgP0+TiPTqrhamaC93gfVaLCwjSlIgFQvP+QsSg3dkaTt87LhKC/Pb7Ebl44Ttm0Z+u49xv/0ppr40=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258471-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[linutronix.de,gmail.com,linux.dev,google.com,redhat.com,davemloft.net,intel.com,molgen.mpg.de,vger.kernel.org,lunn.ch,lists.osuosl.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[y-koj.net:~];
+	R_DKIM_PERMFAIL(0.00)[y-koj.net:s=sig1];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-258472-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[y-koj.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B8CA412F72D
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yk@y-koj.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8CB0912F9BF
 X-Rspamd-Action: no action
 
-On 2026-02-11 10:54:44 [-0800], Jakub Kicinski wrote:
-> Are you concerned about the latency of delivering the TS to the user
-> space app / socket? Or purely reading the TS out of the HW fifo to make
-> space for another packet to be timestamped?
+On Wed, Feb 11, 2026 at 12:55:55PM +0100, Paolo Abeni wrote:
+> On 2/7/26 11:25 AM, Yohei Kojima wrote:
+> > Clarify the bit-by-bit bitset format's behavior around mandatory
+> > attributes and bit identification. More specifically, the following
+> > changes are made:
+> > 
+> > * Rephrase a misleading sentence which implies name and index are
+> >   mutually exclusive
+> > * Describe that ETHTOOL_A_BITSET_BITS nest is mandatory
+> > * Describe that a request fails if inconsistent identifiers are given
+> > 
+> > Signed-off-by: Yohei Kojima <yk@y-koj.net>
+> > ---
+> > Current ethtool-netlink documentation doesn't describe several behavior
+> > around bit-by-bit bitset, which makes it hard to develop a ethtool
+> > library without digging into the kernel code. This patch eases the gap
+> > between the kernel behavior and the documentation by adding descriptions
+> > around the mandatory attribute and bit identification.
+> 
+> This needs review by someone provided with English natural language
+> skills far better than mine. I'm wrapping the net-next PR right now;
+> this has to be deferred after the merge window, I'm sorry.
 
-The problem with the global workqueue is the latency. If the system is
-idle it works as-is but if it gets busy the workqueue can be
-significantly delayed. You can't give this workqueue a higher priority
-because the workqueue is anonymous and changes.
-The next best thing here is the aux_worker because everything here is
-executed always under the same process/ PID so you can apply a priority
-and ensure that is handled before other "less important" tasks.
+Thank you for the response. It's okay, I understand maintainers are
+super busy during this period.
 
-However. There is actually no need for the workqueue so you could do it
-directly (which is what some other driver do). But then I stumbled upon
-the locking issue=E2=80=A6
+FYI I've received a Reviewed-by from Jakub, so I believe it's ready for
+merge after the merge window.
 
-Sebastian
+Thank you,
+Yohei
 
