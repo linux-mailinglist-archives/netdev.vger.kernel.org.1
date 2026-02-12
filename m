@@ -1,253 +1,168 @@
-Return-Path: <netdev+bounces-258411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258412-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id NSFvG39xjWn42gAAu9opvQ
-	(envelope-from <netdev+bounces-258411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 07:21:51 +0100
+	id UJKrEjZ8jWng3AAAu9opvQ
+	(envelope-from <netdev+bounces-258412-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:07:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8152112A8FB
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 07:21:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1BFD12ADBD
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EBEAF307DD0F
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 06:21:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 594683143099
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 07:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7081F5834;
-	Thu, 12 Feb 2026 06:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C2E29DB8F;
+	Thu, 12 Feb 2026 07:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FO1dVoQG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RKWRBbFz";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oWbBvRbB"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010063.outbound.protection.outlook.com [52.101.201.63])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE361A275;
-	Thu, 12 Feb 2026 06:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770877308; cv=fail; b=gnApytCx7zoUjf8h9eNK4lx2oqxgKvUJ9rco1e7v2GbGMmyP1vBQOYX8AinciUuHb1pfvLsTRr2eLh5fUC5Jbl+0ogMyUsmEcxLAQeHY5PF5sBaWng4bfKr0kK9vHhTI2VnCgY6X3Sq/J33UdmAu/hEAIa8B0Cxx3MaUMvnZO+U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770877308; c=relaxed/simple;
-	bh=mFWk7DiZLp+Z8Rc2UoG0zs7k0xcNigI1gXUlRJ12Ka4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rS4HzGLbxgu0bDwuQvVOyuXZjM9GUtDtKCZ44ipjC3+pOSb+/5Isn0fXQf6pOj3+ubeLC+UpHL/64OMRPRrW6guwrpK+VFq13UmIKSzTE+lZl/VDEi8849fZEPAdUE1dEXLEy//2HoBEEdl0XplqfcD/A7/i5t3yQyZyor+qCtA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=FO1dVoQG; arc=fail smtp.client-ip=52.101.201.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lpfgCcYm8gRWHYb2yZPNNiSLcKEveb8B4tgn1xagDf1NFNDpXZAhD2XCNJ1zluJch3tUy/i1SKJid91uRKuq1fyF/TE4J/PDH/i7CtLPPzk6sNP76pFf7AAmaY8dPEHvIoJL6FHiJDuZXJQkzBRfU/RJLYt2rTrgNO8Dv4vzN3QR52JLHNJNg9T84q7tN05oh8qEBM/5dj18PC72ePyQL9wO7NsP4Miht9rOhixAU4mm3I4gTZoEaY/CoIX1o4yvzBFIVPwK51yHDuJ5xrL06NVGR0NMbL7Vr97hpqE/9LdYkv/dmFIqJTJnnZ7Z59IhnDnbiD5u/kwfylt6nvqvMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Olx38CU4DOMC9OvmoWnxZ3XC0I6dG+p1Q5qD1LxHdhI=;
- b=IugIyEafoe4Y5j84LZSjISs3TCVbt4cXdP2ZhgZyxcWTPFoaXWldHk/5n3Xa7uUwZXT7/zdF96z4FMnNeU+tIzug5f1Wi+auONgZa4tlg4ahmpVa/FayVyMU/f5WV+Km3JmBhKYh5l83HjCMScj8bRxoXKxX4qTluB/7FzRHFImNUp4g4oTmYt8qJdDHCMCKtx0cHJ7iVd7WdCaLVScvBjg/Ngke7y9BsRyj2lo7asKVW0UuqV+HNPOq9iNJxPp6Ht8ljIJwxiPBMGQaGdDZAaKaXZAcbYxgpBUPaCSr7rB4zCfaGzE+FrP72SRThNFxhEPsAECxV+pcmQGtg4drkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Olx38CU4DOMC9OvmoWnxZ3XC0I6dG+p1Q5qD1LxHdhI=;
- b=FO1dVoQGCcXEcIjbrkVW2cALQQ0Ix5igBqFvIj3jAevE6HRQCgfVHr/8UEkeeTb9Kefw5P8bDfrfTGBcecbu0U4AzFZPt/lurS4p1tNvKPRHFrpa4w7KqpwyAZ0jTBgGoNBy0dU4dNYujVTNVW0a0tV66l43nj1RGugLiMSe12Q=
-Received: from BY3PR05CA0047.namprd05.prod.outlook.com (2603:10b6:a03:39b::22)
- by MW5PR10MB5849.namprd10.prod.outlook.com (2603:10b6:303:191::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.10; Thu, 12 Feb
- 2026 06:21:42 +0000
-Received: from SJ1PEPF00001CE8.namprd03.prod.outlook.com
- (2603:10b6:a03:39b:cafe::4) by BY3PR05CA0047.outlook.office365.com
- (2603:10b6:a03:39b::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.10 via Frontend Transport; Thu,
- 12 Feb 2026 06:21:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
-Received: from lewvzet200.ext.ti.com (198.47.23.194) by
- SJ1PEPF00001CE8.mail.protection.outlook.com (10.167.242.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9611.8 via Frontend Transport; Thu, 12 Feb 2026 06:21:42 +0000
-Received: from DLEE203.ent.ti.com (157.170.170.78) by lewvzet200.ext.ti.com
- (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 12 Feb
- 2026 00:21:41 -0600
-Received: from DLEE205.ent.ti.com (157.170.170.85) by DLEE203.ent.ti.com
- (157.170.170.78) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 12 Feb
- 2026 00:21:41 -0600
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE205.ent.ti.com
- (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 12 Feb 2026 00:21:41 -0600
-Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 61C6LbIw3003734;
-	Thu, 12 Feb 2026 00:21:38 -0600
-Message-ID: <a498b310-29f1-4775-aa65-fda027a3124b@ti.com>
-Date: Thu, 12 Feb 2026 11:51:37 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0F628F5
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770880002; cv=none; b=UaLRVH6jIEr3TuzxyE1R515K8h4BHhxIhrJiiwJKxK3BCC/NveMull1eS/zMSm5WSyKmSzBnnr19F/Jn70hH0Gfmfrz+/L+9fU+7qV8tRb/6Nw2U02KmX6UOlwZzvnERjVTC5ggsh2Lb6gGTdqYXvwcWYlfVAx4QmD4pCY+z1XQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770880002; c=relaxed/simple;
+	bh=g9HYPhHqcbaoctrpbQtbxiphE+OHyOHOP6Q7Eyep2RA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I4ceH/GEv5MYRV3H2ArugQ17aTiEFRH+r7OmLLw7/QOSagoY5nM5lkVN+pavQVfVkSD5l1GXExpkffpFU1g584jULv46SKt2wS8Be4RjavGlUPi2CiaGOs33kkh5zZ1m99U4R5cWZRTMchYrZo3guB85VXNJKm7ZdrtQwE/jUnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RKWRBbFz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oWbBvRbB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770879997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DSQGsAVLVUl/sL3M3UFHxDkkSBw9IH75zh0vjPlYmyg=;
+	b=RKWRBbFz2AW9No/dTLA8XHUFVXzchyrahzDLWf+vCNMx5vuD9hAiqbt6w0kVm9M+m9mPbV
+	eBFNxs4rkHJEAXtGvjJFKI6pPLRsaCHnxfImsFYOLBAqa1XfvSUft0gKwp/T3MeJw2aOmO
+	QrV7p5DBSF4lcrP7AdGd+/fM5hYU6Jc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-595-2fYB-CvgNlefxuwDumzBGw-1; Thu, 12 Feb 2026 02:06:36 -0500
+X-MC-Unique: 2fYB-CvgNlefxuwDumzBGw-1
+X-Mimecast-MFC-AGG-ID: 2fYB-CvgNlefxuwDumzBGw_1770879990
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-480711d09f1so38063635e9.0
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:06:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770879989; x=1771484789; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DSQGsAVLVUl/sL3M3UFHxDkkSBw9IH75zh0vjPlYmyg=;
+        b=oWbBvRbBRTXC5y5pmjw3TQ7Vf3ygE9voPV0kPrP93gaZxlfY0CTzABoZJlNDdxfmUT
+         hK3m5Ek9/HXC8ecvB/7UP5J4kwu5QIzZ0Ql+jA0NsPgyZOn7P2sLCjg5QQgpT/ZL4dn5
+         wzmZmc9dgkdRb8ZolaoF3p6XP+aKvDKmOmWn0y5faGoWwvVjW7lh+akRo9/ouMYwoqMu
+         g+Xw4mARVA8jXq3SgYGm7/GOqA+cvEpcXXH0P73cGxC8rFFHyMxg7tEDn103cH15cmRQ
+         xml+uv52Lb0ZzgTrrW3h/XInhf2fp0ncO9B4vDpzs3ItkM2lw+CmRDMrl9cnupBbeoPv
+         FRdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770879989; x=1771484789;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DSQGsAVLVUl/sL3M3UFHxDkkSBw9IH75zh0vjPlYmyg=;
+        b=t4Z7lZiZIgZhTVfVjJwhpB+FpXw6JEf9jrrliz+XP6QY7rlNpsyHybjw8ifkEmk+uc
+         kcLyaeM42LuAmeUAVG+KcDWD2S6ycSjkpkNTGN9TYQvYeBn6C8GmIKyyQ56aAgqyx+CU
+         KJM2FO8PSSpVqzlzMYkc+HAv1UgX82iSqu1EDp604SLSVsb/sHiOIoV3ZY1r7z1rey3l
+         G85iiRpBxJx6Jts+rok0GILf2puiebHY+S5m2NlzXcNnnHN6Dro4C6ADxuadbSimQeP+
+         YYbAi19Z/X9opCIPtxCDATgSvDjvR975qGGpqsgTgIULHEC7f4TkL6bsCSHSwwgC4PdX
+         HGkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVdLE9UeZjcNZbdGDUU6hxAiuJBk40pLVfZoU83h+Hw/a3XthxQqeuG+UqCW+iUCCbjyysuyvo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhH/1ol+m8NJyQXUIpE3IPUjSe3Hi3ZUZtYLdFclcixMVl+wPB
+	Zk4PzY6PEKvOKih/bCjq955xUU91Iaya+w40lkhcTFSDJaNbjF5IBWGUXsWcPSASuxUxiV3neut
+	Anhqe6lmoKg25QWm0fzPO5d29Lw37rvmhzdIep8sS3Pc/Q+nzLunL0yVaNg==
+X-Gm-Gg: AZuq6aITlvuywZUoIxPfluWm7v+gj1ucPGdpxHiUyRfjSs2FqL6W4a1IgR2pQOe69ZP
+	eLbMSFB1vy+ffVZIRDTz/ksNY9s4yTXs/SXIgCK9KnNrDozRBNvkIMajjYrBQmGlJVmpUFJ1fKf
+	M35L1QfFxfGt1O5U17jAdhqLzMHQjpgOluuDNXFGjSR6n/XnJ5UPjG6XiIwx+j6PFLhkJlDuN6N
+	z+XFsNeS/050/wV5RDwyaPg+B6LWd2M1mQJqtqhMiZziStrJW3H0+U+ZkyvvZnnB+X5V1B2RtLU
+	A75iAligId4Z0v/ZDfLJRIfqwOfcCnh3VYtasxNbPa0OTeztFEz816l/xm2G2CMBucaihdCZ/mG
+	wxMwEZjG063jOda656A0W3/iNNHHM62ANhV4obAP5tIvHIg==
+X-Received: by 2002:a05:600c:4e02:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-4836710d797mr16270845e9.10.1770879989528;
+        Wed, 11 Feb 2026 23:06:29 -0800 (PST)
+X-Received: by 2002:a05:600c:4e02:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-4836710d797mr16270405e9.10.1770879989104;
+        Wed, 11 Feb 2026 23:06:29 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d5d78cfsm251666615e9.1.2026.02.11.23.06.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 23:06:28 -0800 (PST)
+Date: Thu, 12 Feb 2026 02:06:25 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper
+ with netdev queue wakeup
+Message-ID: <20260212020317-mutt-send-email-mst@kernel.org>
+References: <ba17ba38-9f61-4a10-b375-d0da805e6b73@tu-dortmund.de>
+ <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
+ <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
+ <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
+ <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
+ <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
+ <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
+ <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
+ <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
+ <60157111-219d-4fb3-a01a-6df9a83eae7e@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: phy: dp83869: Set auto mdix bit for forced
- 100Base-Tx mode
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-	<davem@davemloft.net>, <linux@armlinux.org.uk>, <hkallweit1@gmail.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>,
-	<danishanwar@ti.com>
-References: <20260211131033.2525617-1-m-malladi@ti.com>
- <0a9d0ec8-09c4-4029-8449-8c8f08c6dca0@lunn.ch>
-Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <0a9d0ec8-09c4-4029-8449-8c8f08c6dca0@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE8:EE_|MW5PR10MB5849:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2be35a5c-243b-42de-3382-08de69fefd3b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z3E3K3d4VmdZTitWK2ZvUHhBbVBtQlBhSXR6Q29WMENaREpyQkpvZ3RHRkx0?=
- =?utf-8?B?dlFKejVrUm9DQUNpMUZUTGJUb1MzaE4zRDZURFhxWGVJYWRiOTgwbXdlVmVv?=
- =?utf-8?B?dWdCWkVqeVFRNGdJT1pYMnZmM0FvcVlqRVM5M3h5SEVyYmo3ZmFOOE91R01z?=
- =?utf-8?B?QjhxUlZVOUNaa2liMzUyUUFoN3VaenJhODExUXBKV01HWVFpRTNMeU02UFFQ?=
- =?utf-8?B?TjEzSHJ0SENNYnBnNGtEd0FlZktlQXhmV0RmMUY1dEsxY1EvbE5ncmVBeGxw?=
- =?utf-8?B?cDdYZ3pMcnRPVnFqSk0xVVRzN2pBYzJEbExPMUJQbGZ6NVUrdEhRakRRcDRw?=
- =?utf-8?B?eGNvNTgybGR2Q3hOc2FEMjdaSFBxZDVSZmtkbEp2QlZOaStMSVpySnJHZXFC?=
- =?utf-8?B?TWE3Q1hIcG5BY0hSMnNBUVgvZU1iZ0NWcUlnNHVCVm9aelVROXhLQ3ZLa002?=
- =?utf-8?B?VVdtSThmNit1cFd2cTMvZXM5ZEhaTEE1SU9tK0NieEZNTDhjOWlFT2tRZGsw?=
- =?utf-8?B?dGZBaGNHSXdpaVM3c2NZV3FMNWdpNFZtalpaeGJtUEhiTk1EOENVQVlHM2hl?=
- =?utf-8?B?bUxLN051RU5ySDh0M2dSUmVYT2d0ZGpqYnE5VkswSmVFaXlqVXFVZjZmdFkz?=
- =?utf-8?B?SnhxRS9teFh6emRrdGNDODlhdWY0Wm1SVHYzM2lIT3hpUUJjbmhjcTk0bkFD?=
- =?utf-8?B?bHNIcG0wa1Y4ZzFBY3hGNXJTRkRNckhiK2YvRTZ4YXNCekhPbUlhY0lLOVVi?=
- =?utf-8?B?TWpNNUxOZk5HcnFoZWhFVFBId0JlMS9Tb1FJaW04SU8yTDlHVmFzRTlsN0dx?=
- =?utf-8?B?Z2N1ZTlFcW5qVDJYelp3S29WTkRoQXhQUDBMTXJYK0tZeGcvRk55bG5RS0dv?=
- =?utf-8?B?MXUwSlRpaDhVSVY1Z3l3S0FTSStXU29DK2xwbWlOWnI3VnpOa1lvM04yYVlu?=
- =?utf-8?B?MFFyZ29PNTJjemdqdGc4dHgwZGN5TldtclFGa0U4SFJpRFF2Y1gyMGprSDFV?=
- =?utf-8?B?Q21WelFkWEMydVp4RkFIdjExUU1HWDJRWmwwRS9uY1ZFTkJCcUd5SGJ0cWVY?=
- =?utf-8?B?ZStzVUhkNjZSTmIycnpaYWtEZmJyaHJxUjNCbW5adThPQzkyVUNja0Q5VnRn?=
- =?utf-8?B?VnU4ZEQzb2w1V1U2RVJDb0JiRlZTUjl0V3ZGTUxjNDBRZ2dBTTBMSUVQSFNW?=
- =?utf-8?B?cjlaM3RpbS9vaTVyWnlLT0doaHBPL2tnTFlNcGxXOTNudnpYN3Vrb2plZDZt?=
- =?utf-8?B?K0w4UFFjdUtWZ1VKWnpyS2RpQW5YNEd5MGs1SStROHpzWlRpL0VzMHFoRkli?=
- =?utf-8?B?empQUndlei84MmR4WENBVE5OVXVaZkRYcVd2N29aaGdlbUFZTUFNS1dBSmd4?=
- =?utf-8?B?Vkxsb21wMUhabVJick5EdUtLOFBqWW41NFdnQWsvVXRZR3c2OW1ZSEZzZnlw?=
- =?utf-8?B?TjhzcUtCY1pPTEtDaGRMUjBXOWZVWldFOGpCNy9BUnliamZyeUpxZVUxQnEz?=
- =?utf-8?B?YVJHdlNuSFVkcjhVZDJqbDRtU0l6ZEt3Z3hKQUtnWXlkMG1zTFVvT0FsVGE4?=
- =?utf-8?B?aFMxR1F0N1BjQUhSYkJvTkhmZG45RXdDbUxZOFpmelRNemI1VEVFais1cWRB?=
- =?utf-8?B?eFluWTN0UitDdE1WSjlEaS9LSzdKYituVmxsR0w4V1Z3Q1dvMm9MM0FTQUND?=
- =?utf-8?B?WDk5WHg3S0tCMDZ6QjFyRGxObjRvNkV0RU9Fa1VDS0VSNmRJRW5GVU5HMHJv?=
- =?utf-8?B?ZnVqZ2RrN3JQY1NEcjlsbmlVbnV6bmxSRlpDYnRmWXlxZGZRaktMNHV4VVVn?=
- =?utf-8?B?alY4RmwwcXlpeGZod1kxbkt3ZlZHMFZFTVJrcmR4M29GSlJXSGYvNWd2ZUp4?=
- =?utf-8?B?Szk3dXB2UVRrcG54RkN0R0krRlRKYnptK3BiSlZ1RE9UMDlYU0ZZTnJyTk5N?=
- =?utf-8?B?ekx3NVZLUXJSK05TSWxUV2VhczhVYkp3R2ZxY0NXK0kzazYxTlJwMFJKK2x3?=
- =?utf-8?B?SnNlakJjRElDZGFsRVFiWDhoSS83VXZyNlZWcHltc2UvVXVmdXFOM3kxaXFH?=
- =?utf-8?B?UDZSVG8zQkZBNWlWdVg2RCtKa29EMUJ4blZSZmM0R2pZTDk1ZHpvQXRSazha?=
- =?utf-8?B?T3dqb2E0ekxGNkNYNjFjNHQ3Wmdsdzdnci9wa3pkbGxBY0E1N3N0cWh6aDNn?=
- =?utf-8?B?ZEl2bHhjdGlucjBiLzdmM0tmSi9GOVduWWhWWWdOSGpUaVNIei9NVnJreFAv?=
- =?utf-8?B?MUVRK1RoNWduNDgyQ0hXZWpWaUxRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	bVvYiz7NTl5Kj5aSfbgBEr59tflmTXD2x1yM/jmWF+sjn+V0V34tugYa4vWeif5meuEjdws0Q7EVo2OaLU1MGFb1eoMJ0JrBSUrf3IemapBWfpTsg8IKQ6dij4PqXPgn7egcoZq0O7DCoeIsIsdtLaOTWiOtop2mEQI2jPeKoGxcHdV6xsYkqLxRJbx+VIuAEEnPNANm/tUB+X3xwkIvMrla9e9Ee7Qf65NUiTe/hG/p47TRKltZ/8AynH13D4geHvLaMMJ44TTmHsH2NO73wtF0iL5sUDnpEKQpFmXgoUQ1HQtV0Wq42HvJp2g81KKWRPaYgSaSTs2t0nCQ/szQciXI+pCDSwMBbaCy/fAd6281GYy6TFlATcXzDK3s3kG/LTQMJZIpXzqAO/NdlBIs6lyXFazHrybkexiwbhdxlOEdDSRUmZW7DlwBCS9djY+v
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2026 06:21:42.2910
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2be35a5c-243b-42de-3382-08de69fefd3b
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE8.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR10MB5849
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <60157111-219d-4fb3-a01a-6df9a83eae7e@tu-dortmund.de>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258411-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-258412-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,vger.kernel.org,ti.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ti.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 8152112A8FB
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A1BFD12ADBD
 X-Rspamd-Action: no action
 
-Hi Andrew,
 
-On 2/11/26 19:42, Andrew Lunn wrote:
-> On Wed, Feb 11, 2026 at 06:40:32PM +0530, Meghana Malladi wrote:
->> When using DP83869 in force 100Base-Tx mode, the PHY is required
->> to have robust Auto-MDIX feature enabled from register 1Eh.
->> Refer to 7.4.1.2 100BASE-TX section in the TRM [1] for more details.
-> 
-> What are the results of not enabling this? How would somebody know
-> they need this patch?
+Simon is there a reason you drop "Re: " subject prefix when
+replying? Each time I am thinking it's a new version
+only to find out it's this endless thread where people quote
+>1000 lines of context to add 2 lines at the end.
 
-This is the fix for 100M full duplex when auto-neg gets disabled, it 
-fails to have a link up and this patch fixes it. I will add more 
-description to the commit message.
-
-> 
-> Is this a bug fix? Should this be back ported to stable?
-> 
->> +static void dp83869_link_change_notify(struct phy_device *phydev)
->> +{
->> +	int cfg4;
->> +
->> +	/* When using DP83869 in force 100Base-Tx mode, the PHY is required
->> +	 * to have robust Auto-MDIX feature enabled
->> +	 */
->> +	if (phydev->autoneg == AUTONEG_DISABLE &&
->> +	    phydev->speed == SPEED_100 &&
->> +	    phydev->duplex == DUPLEX_FULL) {
-> 
-> So forced 100Mbs half duplex does not require robust robust Auto-MDIX?
-
-I haven't tested for half duplex as the issue was raised for full 
-duplex. But based on the TRM seems like it is independent of the 
-duplexity. Let me locally confirm this and fix it accordingly in v2.
-
-> 
-> What about when you change the configuration out of forced 100 Full?
-> Shouldn't the configuration be returned to how the user wants
-> auto-MDIX configured? Should you disable robust Auto-MDIX so that
-> "unreliable Auto-MDIX" is used?
-
-This bit is only necessary if link partners are configured to 
-operational modes that not supported by normal Auto MDI/MDIX mode (when 
-one of that link partners are in Forced 100Base-TX), will fix it in v2.
-
-> 
-> 	    Andrew
-> 
+-- 
+MST
 
 
