@@ -1,183 +1,285 @@
-Return-Path: <netdev+bounces-258449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0B4LAQnFjWnT6gAAu9opvQ
-	(envelope-from <netdev+bounces-258449-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:18:17 +0100
+	id +F4hAC3GjWnT6gAAu9opvQ
+	(envelope-from <netdev+bounces-258452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:23:09 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7444612D5DC
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:18:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EAED12D6A1
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF4B130C5B82
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 12:16:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE79E31E0710
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 12:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B8127E7EB;
-	Thu, 12 Feb 2026 12:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8380357710;
+	Thu, 12 Feb 2026 12:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWhlEHHY";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="acorpGF4"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="hKAu2ljP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail-05.mail-europe.com (mail-05.mail-europe.com [85.9.206.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0648E352FA6
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 12:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AA127E7EB
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 12:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.206.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770898611; cv=none; b=og3CG7HG6UE+Z/0KXx/5utB6piFVF9OR1kPxlOwsg8NS10l+3SLMalTUcq0vhhJk0RjNP7rovWQq7+cSUNQUwKq+iOX62pxNzjt0XWXUCcNh2zoG0yAOMC//Pgcb2TYbxqicYujLSuFMIn18cZ+lAcA88LmoldL0D4kjMegzRAk=
+	t=1770898702; cv=none; b=jS/dydZJhBIbvyIAulg4xpc2iKG8OuEJkIwuAT628zFBnjJDQoSI0lGLz3HpggXO0x4HIJlXsML3GttxYJp2aNTG9l08eT3E3YINY7qoA0AyHSGxMbtXFXTMEZeoqiTg4Jif0neLSZvzIK+G7z/iTnysppzg5zEkHsx7MGDnQGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770898611; c=relaxed/simple;
-	bh=JWljiblHKdW/kvLi+oANTy8OmaENQH4T3UWSJZWjvFg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=USi4QB73PAKSsqwgK/ZzeLaKkWe+rl2HZImasfOlBfDZOVEb1kT/7+EWUnGbYWvrS6uvsqbeRua4Ds5qZxK3hHwxkhn+oSNGxedBTi2Zvr+4IP5ebGld1JYKBofXKcRvRMmxHnRERhJFkD2J3CHIiLDaWVQFCWXJttknsVmmM08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WWhlEHHY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=acorpGF4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770898608;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4ASZtwC4Jr2vY7rfr/wbGtVzwGSZEjBKWQrjrryCwDs=;
-	b=WWhlEHHYsQd2uGpaphuso2Uq/TXqlaElEqbTOJiwqSy7JEmPnVSIU5SDWSwBZshcjr6ECg
-	WoWMRiL3s84ViaqxKtdHD37rbpKJYTSZG8inQ6Ej5/TQ2oP893vdNLSOcRgCDp8p9zIJKH
-	YZNCfiC7HBhlH6MZPN36jUr3dUqqsvk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-25Cmg7j2MOyckvxNJRa0iQ-1; Thu, 12 Feb 2026 07:16:45 -0500
-X-MC-Unique: 25Cmg7j2MOyckvxNJRa0iQ-1
-X-Mimecast-MFC-AGG-ID: 25Cmg7j2MOyckvxNJRa0iQ_1770898604
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48336b182ebso36496875e9.3
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 04:16:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770898604; x=1771503404; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4ASZtwC4Jr2vY7rfr/wbGtVzwGSZEjBKWQrjrryCwDs=;
-        b=acorpGF4kFx8o5/6t6OW4yUJji1mF9Tl9Vmid/46M0+rLwid8Ej469iqO3ijuBwdwK
-         I4KdrQyydVq8GvDiKUTj/XYffmtfMj5IgtbtwNLi5+snAprHLtZhaE4loJqrhN9tMN+K
-         Mf/bZT2uZi+RcyNmLR1BrMSqnRuj5OqN3QX5UVE/pe9IW3QMG9UtZX7SIg5t6S7HoQph
-         VGRoaxwJrGRng4hKiJxEkkCpGUAloNRL1d7sY5g428MD3lIXiquXKGFqQP3RjQcO2Xwn
-         AOVR9+xbQj5Nt+XEeqT8PoaWWG1Aric8NtLcOpU3nIFInH5jJ2K87qOPMEp3AabuU/wu
-         LteA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770898604; x=1771503404;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ASZtwC4Jr2vY7rfr/wbGtVzwGSZEjBKWQrjrryCwDs=;
-        b=RVur/MeagMB/KSgcWwi7O3TNruu4ULUTm4gGh08AfyxssNg5FWADfwwkZpYUoe2uzO
-         8tWZm4lKUPEFQaLiYmeD9plDzDOezMs5mnAlouxisrNw3t3s+u5aAGZq6GPnTwu6EN3B
-         qek2a69m9t55Mv5D513yAwmWqSy1iDtSDnx2PgyrvcTZEpVeHQr97ce4RLHEZHFpCvsn
-         GDqr/teoZpKLfSIxJZirZUZZyb21nabTmYUm/XnW9Vjp+eGiIT2ffLdK8aqGT8BXNmW/
-         m8U5MeF44no0+OmuFNXudadhy1WcTofryShz4eKHoa9n4MATFGcT1v3coj6jHQ0CmV9E
-         Ei5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXyh3Z2qQGdQ/q9xzeFSqaldgWuwZFUeae1hmH6oLRDMn4SADjxAyppfa4J3wmdgnFglT6wRk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0a6/8Ci+gcFHdidQi3S3lN5xY6oi77tDoj/tgMuR+mXU6a2ss
-	0XQ1IUzpCe1IZpmCeN4+txGTUhzsQ8nYoJAq92zbJFAMMmJ6I93ynllHUolQyelJw54NSrS4Z1A
-	KBT/8quuPaXKkQComMFqymD4uYvCbpw6xWtVldwHslvOstWemFBug5J2mrQ==
-X-Gm-Gg: AZuq6aLZT6qjz9fbW7NShrR5b76wt2EYxkYXxLl21RlD35pmAPHM72dDJsY7LqG+GNh
-	HLtmNhUibWx9KQwKmA70FxzLLCbXgNkdeuD9q85bg/cOtNWzdDfJSFT+qiPvMWypI8MdagJBkoy
-	h+ehY+bdsRG14MbyuERA4JX/kOMjbbGNaUiS4WcF+j94piWlFVH5VHQkMLtZXO+S0SxqAti7UMG
-	lROoqIJzLTwMEQQrSo2QnqxI/3sLEd4MFjEGyqdLZ7/3mk823tVGz0yUuNOQfVmTZRFuqNls7xk
-	o4sUH8K76BL8cLH2mhxpcZJWK7u54yLKdds6xbUQU1ylcvi/MTe+M1Zl1Ux9VLeTRuFZrZgD7nt
-	7lgdL76D+M2mSlzExdZxlwJ59Tg==
-X-Received: by 2002:a05:600c:3b12:b0:477:98f7:2aec with SMTP id 5b1f17b1804b1-483670fac23mr28141725e9.3.1770898604172;
-        Thu, 12 Feb 2026 04:16:44 -0800 (PST)
-X-Received: by 2002:a05:600c:3b12:b0:477:98f7:2aec with SMTP id 5b1f17b1804b1-483670fac23mr28141325e9.3.1770898603714;
-        Thu, 12 Feb 2026 04:16:43 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.220])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d82a4afsm365332535e9.11.2026.02.12.04.16.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Feb 2026 04:16:43 -0800 (PST)
-Message-ID: <e52a10e2-b208-460c-a3e3-305b91433531@redhat.com>
-Date: Thu, 12 Feb 2026 13:16:41 +0100
+	s=arc-20240116; t=1770898702; c=relaxed/simple;
+	bh=Fgp+NowPbYwgCMhWMOsiWJrrq1R0CaAAYKvFqsMquo0=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cu67TqbSKfCnfuRcEA3iOtWZAk7bmzJR8PGvH3AYr7735N/sDc5hKTkDXXvrrfZ8bGPlvcgZ0U0k2iTwnlKSLVANVAnWz4nZUMkCPVuuAocAcP/GdbvG7bUgwDjKzczVE8tDcJTDKah8oQt0iImNsCvS1WMoURuNel54rrioJaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=hKAu2ljP; arc=none smtp.client-ip=85.9.206.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1770898683; x=1771157883;
+	bh=fZ8VB4W/hZRiQ0wYvpHYEcLhoXj9fzTdCw14ccJdOcA=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=hKAu2ljPi03hV5sbJzr6xjS5CwhmKp2p8yeI5rCCL7p5jHKDbqni84uFyKrIvlmcL
+	 ga/sJKMMhCsfkNqUh465UfImD3sqF7M9hfXi0UlBPTlbI8qI4GxQPVyKqLmIBXTSG7
+	 dIFpBX5G89LBKVjoXc1B9uXO8/x3u/dfZWQExT5zcxo0ZFxocdlNcr5ibwINwPkMPs
+	 8IGAQoAAceOJ0otb3paKQKsHHfZN86waoV0dV6oZENbNlgdSiMwUewEsoNLGYElxGO
+	 Ff0jxrWS1b6INXSjl27aosdLJl6n2oz9OFjcAcKYc8A5M7BphrCVqam4e1/CJxLiTA
+	 v6R3jTX09RANw==
+Date: Thu, 12 Feb 2026 12:17:59 +0000
+To: Victor Nogueira <victor@mojatatu.com>
+From: Paul Moses <p@1g4.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v5 1/1] net/sched: act_gate: snapshot parameters with RCU on replace
+Message-ID: <nmLWEyw7BWgMgTdbfbxbYI1QqIF-IPdNFFsdf_T8qY8IBncn1bNnTPDe9Bz1AWfsGVt4pgj8wLzhB1DxZ1-RzuZiW2VZLamsaBS4WpjC8lw=@1g4.org>
+In-Reply-To: <CA+NMeC_v8bQo2tFUYiD1faMJ0Gd9FFbqmPHCvBUD7HW_yoCx0A@mail.gmail.com>
+References: <20260205150958.412278-1-p@1g4.org> <20260205150958.412278-2-p@1g4.org> <CA+NMeC_v8bQo2tFUYiD1faMJ0Gd9FFbqmPHCvBUD7HW_yoCx0A@mail.gmail.com>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 641b4b95da5523bcf2bb07a85c371348fcbfce84
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 0/4] net/rds: RDS-TCP reconnect and fanout
- improvements
-To: Allison Henderson <achender@kernel.org>, netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org, edumazet@google.com,
- rds-devel@oss.oracle.com, kuba@kernel.org, horms@kernel.org,
- linux-rdma@vger.kernel.org, allison.henderson@oracle.com
-References: <20260212053230.1921241-1-achender@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260212053230.1921241-1-achender@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-258449-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258452-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[1g4.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7444612D5DC
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[1g4.org:mid,1g4.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5EAED12D6A1
 X-Rspamd-Action: no action
 
-On 2/12/26 6:32 AM, Allison Henderson wrote:
-> This is subset 4 of the larger RDS-TCP patch series I posted last
-> Oct.  The greater series aims to correct multiple rds-tcp issues that
-> can cause dropped or out of sequence messages.  I've broken it down into
-> smaller sets to make reviews more manageable.
+Proposed changes from v5...v6:
+1. Agreed
+   -Fixed in (net/sched: act_gate: keep gate_setup_timer helper name)
+
+2. Agreed
+   -Fixed in (net/sched: act_gate: drop redundant clockid pre-validation)
+
+3. I was not able to reproduce it. I tended to keep it since NULL became
+   representable in the conversion and it was not an expensive branch.
+   -Fixed in (net/sched: act_gate: assume params exist on replace path)
+
+4. use_old_entries is true only when REPLACE does not provide a usable new =
+entry
+   list (missing or empty) and we copy the previous entries into p to prese=
+rve
+   effective behavior. This block is skipped when new entries are provided,=
+ so
+   old cycletime is not reused in that case. It could be clearer but I didn=
+'t
+   think it was worth the diff increase.
+
+5. Yes
+   -Fixed in (net/sched: act_gate: deduplicate init error cleanup labels)
+
+6. Agreed
+   -Fixed in (net/sched: act_gate: align cleanup dereference with act_vlan)
+
+7. Agreed
+   -Fixed in (net/sched: act_gate: dump params under rcu read-side lock)
+
+Thanks,
+Paul
+
+
+On Friday, February 6th, 2026 at 4:36 AM, Victor Nogueira <victor@mojatatu.=
+com> wrote:
+
+> > The gate action can be replaced while the hrtimer callback or dump path=
+ is
+> > walking the schedule list.
+> >
+> > Convert the parameters to an RCU-protected snapshot and swap updates un=
+der
+> > tcf_lock, freeing the previous snapshot via call_rcu(). When REPLACE om=
+its
+> > the entry list, preserve the existing schedule so the effective state i=
+s
+> > unchanged.
+> > [...]
+> > diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
+> > index c1f75f2727576..4a1a10bfe3e62 100644
+> > [...]
+> > -static void gate_setup_timer(struct tcf_gate *gact, u64 basetime,
+> > -                            enum tk_offsets tko, s32 clockid,
+> > -                            bool do_init)
+> > [...]
+> > +static void gate_timer_setup(struct tcf_gate *gact, s32 clockid,
+> > +                            enum tk_offsets tko)
+> > [...]
+>=20
+> I don't believe you need to change the function name here.
+>=20
+> > [...]
+> > @@ -323,20 +370,11 @@ static int tcf_gate_init(struct net *net, struct =
+nlattr *nla,
+> >
+> >         if (tb[TCA_GATE_CLOCKID]) {
+> >                 clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
+> > -               switch (clockid) {
+> > -               case CLOCK_REALTIME:
+> > -                       tk_offset =3D TK_OFFS_REAL;
+> > -                       break;
+> > -               case CLOCK_MONOTONIC:
+> > -                       tk_offset =3D TK_OFFS_MAX;
+> > -                       break;
+> > -               case CLOCK_BOOTTIME:
+> > -                       tk_offset =3D TK_OFFS_BOOT;
+> > -                       break;
+> > -               case CLOCK_TAI:
+> > -                       tk_offset =3D TK_OFFS_TAI;
+> > -                       break;
+> > -               default:
+> > +               clockid_provided =3D true;
+> > +               if (clockid !=3D CLOCK_REALTIME &&
+> > +                   clockid !=3D CLOCK_MONOTONIC &&
+> > +                   clockid !=3D CLOCK_BOOTTIME &&
+> > +                   clockid !=3D CLOCK_TAI) {
+> >                         NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
+> >                         return -EINVAL;
+> >                 }
+>=20
+> This is better than what you had before, however it still
+> is redundant given that you do the switch statement later
+> and perform the same validation again. If there's no reason to
+> keep this code, you probably can also get rid of "clockid_provided".
+>=20
+> > @@ -366,6 +404,37 @@ static int tcf_gate_init(struct net *net, struct n=
+lattr *nla,
+> > [...]
+> > +
+> > +       if (ret !=3D ACT_P_CREATED) {
+> > +               rcu_read_lock();
+> > +               old_p =3D rcu_dereference(gact->param);
+> > +               if (old_p) {
+>=20
+> When do you believe old_p might be NULL here?
+> From what I understand, you can't arrive here while
+> a delete for the same action instance is happening in parallel.
+> Were you able to create such scenario when testing gate?
+>=20
+> > [...]
+> > +       if (use_old_entries) {
+> > +               err =3D tcf_gate_copy_entries(p, old_p, extack);
+> > +               if (err)
+> > +                       goto unlock;
+> > +
+> > +               if (!tb[TCA_GATE_CYCLE_TIME])
+> > +                       cycletime =3D old_p->tcfg_cycletime;
+>=20
+> Why did you keep this one as in v4?
+> You don't want to reuse the old "cycletime" if the user
+> specified new entries?
+> Not saying you are necessarily wrong.
+> Just trying to understand your logic.
+>=20
+> > [...]
+> > -chain_put:
+> > +unlock:
+> >         spin_unlock_bh(&gact->tcf_lock);
+> >
+> >         if (goto_ch)
+> >                 tcf_chain_put_by_act(goto_ch);
+> > +       release_entry_list(&p->entries);
+> > +       kfree(p);
+>=20
+> The 4 lines above look exactly like what you
+> do in err_free. Can't you label them as err_free
+> and remove the lines below?
+>=20
+> > [...]
+> > +err_free:
+> > +       if (goto_ch)
+> > +               tcf_chain_put_by_act(goto_ch);
+> > +       release_entry_list(&p->entries);
+> > +       kfree(p);
+> > +       goto release_idr;
+> > +}
+> > [...]
+> >  static void tcf_gate_cleanup(struct tc_action *a)
+> > @@ -458,9 +594,10 @@ static void tcf_gate_cleanup(struct tc_action *a)
+> >         struct tcf_gate *gact =3D to_gate(a);
+> >         struct tcf_gate_params *p;
+> >
+> > -       p =3D &gact->param;
+> >         hrtimer_cancel(&gact->hitimer);
+> > -       release_entry_list(&p->entries);
+> > +       p =3D rcu_replace_pointer(gact->param, NULL, 1);
+> > +       if (p)
+> > +               call_rcu(&p->rcu, tcf_gate_params_free_rcu);
+> >  }
+>=20
+> Sorry, I think I lacked precision in my last comment.
+> I meant that you should've removed the rtnl requirement
+> (which you did), but also use rcu_dereference_protected as
+> act_vlan does. This relates to my previous comment on "old_p"
+> being NULL. I don't believe you need to set this to NULL
+> unless you were able to reproduce the scenario I described
+> earlier.
+>=20
+> >  static int dumping_entry(struct sk_buff *skb,
+> > @@ -512,7 +649,8 @@ static int tcf_gate_dump(struct sk_buff *skb, struc=
+t tc_action *a,
+> >         spin_lock_bh(&gact->tcf_lock);
+> >         opt.action =3D gact->tcf_action;
+> >
+> > -       p =3D &gact->param;
+> > +       p =3D rcu_dereference_protected(gact->param,
+> > +                                     lockdep_is_held(&gact->tcf_lock))=
+;
+>=20
+> You could've kept the rcu_read_lock approach here.
+> One of the main advantages of making the params rcu
+> is being able to dump without the tcf_lock.
+>=20
+> cheers,
+> Victor
 > 
-> In this set, we address some reconnect issues occurring during connection
-> teardowns, and also move connection fanout operations to a background
-> worker.
-> 
-> The entire set can be viewed in the rfc here:
-> https://lore.kernel.org/netdev/20251022191715.157755-1-achender@kernel.org/
-> 
-> Questions, comments, flames appreciated!
-
-I think you could resubmit the first patch for net after that Linus pull
-the currently pending MR.
-
----
-## Form letter - net-next-closed
-
-We have already submitted our pull request with net-next material for v7.0,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
-
-Please repost when net-next reopens after Feb 23rd.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-
 
