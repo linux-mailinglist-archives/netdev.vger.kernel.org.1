@@ -1,181 +1,308 @@
-Return-Path: <netdev+bounces-258511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPN0EH1AjmlTBQEAu9opvQ
-	(envelope-from <netdev+bounces-258511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 22:05:01 +0100
+	id QPTAI9BBjmltBQEAu9opvQ
+	(envelope-from <netdev+bounces-258512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 22:10:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A5A41311F5
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 22:05:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FA813124B
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 22:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A77AC3072A5C
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 21:04:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90BBE307AA54
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 21:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5666A2D7DF6;
-	Thu, 12 Feb 2026 21:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8248C2D94B5;
+	Thu, 12 Feb 2026 21:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="H5zrO6ux"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MKedIuS7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD02220F5C
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 21:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED1A1DB125
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 21:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770930273; cv=none; b=ZziLM7zGPgvvbRfBHLykuhvj3d2cy05toj0bcTgDxMEcNHorbCprt3sPd5JAbRcLvyOUbL3wq7qrq85K+6IM4ksAw/njuZk7A0FDaDSz70nc/UH9iaQTBmt8X20P2cNhA4Tv6PN++ULK0NmN9rC8YZn1VdzowN0LiNt+Qm5MpiU=
+	t=1770930634; cv=none; b=SYG2/qNG1spFee6J8xsjn58Dl+n8n741RXddomCiPb9EHyRkuYpOT/X208T+49f+vc3mSsBv+9nyGROwqWyc3Mce+dfhJBJBOnxYBASIYKkQh4srL/8KOzgo+b9gxfxiBpwodQRbLUVk74rd77QjMugoKBDItPggwfL95ysBvu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770930273; c=relaxed/simple;
-	bh=QQJ8X0j3rnN65AerR19t/pAJmQvYP1WIHbt8wFRWOPo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bw6SxI4v+slwfsEFruSBUpB/f3+k7e/sW6w8Nhw/iCgIU6ZsgOV0XhySODCPUi77kOcyfpwetCM2t8FYm5a85Y64xxkh7tUUnwRCOjSZ5keEPLvH3HHxx6T9ryBJNToLl8Gj0ItbyB75HnTNnPdFOJxCyXqGY6bpMQBW1U0FSKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=H5zrO6ux; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4833115090dso2028825e9.3
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 13:04:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1770930270; x=1771535070; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5tK3spkxVRCUik006sOoO/SiUaMmlQyI+Ljlioq2QdI=;
-        b=H5zrO6uxNTkikBRsmus1UymNlhUW2SOZIBn9wh7CYf9Pn5qQ7mtvE+GA9sA7uyLgrs
-         n4HR3v4Dsljlw+5wAkk2wC78km87Gw6XGV9GvJ4U1F8HMV+h6M23qsYn+7Kf86q9Ue8Z
-         vcOq3rvByzhW/j4S5Msa2paJHZiPZZQVL9XFjkbG4s3yyCGp0mbQnyZx7JThnyzyXrhL
-         DKc+7wwqpqO+LO9Sn7kTwIBRCOcBXk2PJxxa9hobZoNdaVPfc8PyP2IOFuTrhPHqfc91
-         WEuNHlhyh2frOJCiaVy3Lfz1Dz0tPGFFbTEOJH7zQ8ftP63a9KBkS2V+OwI7h8KZqlLJ
-         tCgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770930270; x=1771535070;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5tK3spkxVRCUik006sOoO/SiUaMmlQyI+Ljlioq2QdI=;
-        b=c0HMezjApTjtBySSkrsya42X9btmYdPvfv9aCVeOFcEkxgcrEDzelrZjPFFAToLhPP
-         nn4e6kiEpKJUsl6o7d0ZrGp9NU4++OAUgSbBFu6ML+vyrAb+JYlN6UFDMsAQJHsSaQvR
-         SysosskjpYwfU7xmfZsBoPry3zjQvXv13VGbMlyvRCvXO9Qhkjx7adXzOV/Go4nMqH6A
-         zU2GZSbumCEAEZR1Jjmnt/8VE7evDg9EYmIUB8kMPB5S2cHVmNGthejyKAwAQR3W33j9
-         g6loEU4xhM7+7ffxYgBWX/9pklNLDdBeNOc8RvSyHN3fMC8UcTok0aKVEVwbnlyRJaJy
-         uckQ==
-X-Gm-Message-State: AOJu0YyKlYgkZ1e2HCqZhHPiyEo+NBB+f/sdOUoqLmHevl0McF2Ijclq
-	/joTLQeDWrzbWSdZl2VHBbXWZc4AyM6FalrXXbdmlkJ2MTWOUfoyqMNfnD6XCehhmLDXPadyb2Y
-	S3Ym3+UUF64WKfdYvhujPqwVlR5sT6961c9Efaal5rK/4DbwsFLeISCkDTMaX0uUk
-X-Gm-Gg: AZuq6aI5QSgfade65UU4sbzhI7B3O5Dkrv30VrlpU5RTdyWY+q3XAMqho4+LX5WwNoo
-	uDippxF9drRtVHbCNRPFgHKVCHn8WjfjTDk8wDA/G8dZfqfrxxliTIX1DGeeMWdz4YgDPecoDiO
-	+2aLlXHRknQIwhZNfejPF1qunhkPIDCkVhbPoPjvqSScfsb02LCU0cG+g08xmDc1w19HmdmmF+f
-	cIJP+LdX5Za5nGc6Gu8Ze31u2h7/sFvHgbI0UAziG3Qb/+5yqdD5c8GwEB38baQ9XIPAefy+WKc
-	LYlQg3Ok95c54H9auB4A7w7PEgoNitG1iGCusGbtpmlbjhol4jJlcap7sSqrMYvCATSaKQbVqEd
-	c84ithHbD+GWQRerIOwBIv98LU2rMe8pydwZsBL3erwXBx0p/r5UuUi1VCE1ifKJrGeq9uDcoCh
-	tqEFiV5L9dZ2xHjbE61iB5xwyJwQ4EReFtMy1L
-X-Received: by 2002:a05:600c:1c12:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-48370e2313bmr8269555e9.10.1770930269888;
-        Thu, 12 Feb 2026 13:04:29 -0800 (PST)
-Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:af2a:8088:67a4:6046])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483719b8e71sm5170925e9.2.2026.02.12.13.04.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Feb 2026 13:04:28 -0800 (PST)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: netdev@vger.kernel.org
-Cc: Ralf Lici <ralf@mandelbit.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net 3/3] ovpn: fix VPN TX bytes counting
-Date: Thu, 12 Feb 2026 22:03:29 +0100
-Message-ID: <20260212210340.11260-4-antonio@openvpn.net>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260212210340.11260-1-antonio@openvpn.net>
-References: <20260212210340.11260-1-antonio@openvpn.net>
+	s=arc-20240116; t=1770930634; c=relaxed/simple;
+	bh=mvdPPd9MTlAzGcEDHBnGOWpQp3W0SRG282ox6GhN6yU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HVZ29jNkD7pj2SaSgwX0QmZV7fVNFZdQBeHdhzq70st48a95J74iJ6GRZ8y64NJAaL2XH/s7jvy/Pl2HR+zO+CRXDclT20/+nrRBEph8qhXcGZ27cZcR7fQtYWy8GNVOHdFxPYMXPGqBjcH0FkM7UJcKlTdkcaH2UNtShGhNF8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MKedIuS7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E266C2BCAF
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 21:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770930634;
+	bh=mvdPPd9MTlAzGcEDHBnGOWpQp3W0SRG282ox6GhN6yU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=MKedIuS7UHjUhPjWdfzeH7gPRKU9MGbhvFeNiyA4RcYeeFQjbnJ2z68IdbptFVcxS
+	 Hftd1/ErHqlf6F1LHtuf3bP31mAy6nscejBalABRjCZKIDmhWUFI1LIDpWNA8p0LFq
+	 jXxV1TPNwC2eQdhcjjP9vrht2WKzaRRnZL1sk6+G563h7bUBu3MRe7nsaEI9YFLwM2
+	 2/217ZxlFyDOqe2kmSMZf2GkOpJSMKGi2/es+J/b9YUsxmD4tPlzB8nmvaYVsRLiPl
+	 KDYDkaGYXDg4gIY0qg3Si7ap1P1O3BN+evLrMc9IWrM7y856l7oosyY5oDgaHCJIaG
+	 P7CxikvdtY8sg==
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b8f8d80faebso205715766b.1
+        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 13:10:34 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXdmDQE9O14ebC5WsR5g/dATbkEvhNGEEP3TvZnr2lCbSG+Ia/V+OUqvU6IdNyNLCX9oVsQ84U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyP8r5bZFhhxnHjG4YCeaE7o9o7esvs9+HXknKUregJIH5E0pHJ
+	5UIaOkhfmYZH2CbSo6OyOUAYXYX4Tj2f/CHTcRZFE+4XUQilDFM/N9FVSHIKIm1KOSW+Ym1fi5C
+	rNmf29qdoEj/dZ3+XUdDdBcCGvH/kgA==
+X-Received: by 2002:a17:907:72d2:b0:b73:37aa:87c0 with SMTP id
+ a640c23a62f3a-b8f9069c11fmr208094466b.23.1770930632527; Thu, 12 Feb 2026
+ 13:10:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260203161917.1666696-1-vincent.guittot@linaro.org>
+ <20260203161917.1666696-2-vincent.guittot@linaro.org> <20260210004011.GA2188625-robh@kernel.org>
+ <CAKfTPtA299R7yn3r=tCqhhP_tK3E_UpGSMrDLyRP4Ccwt1m58g@mail.gmail.com>
+In-Reply-To: <CAKfTPtA299R7yn3r=tCqhhP_tK3E_UpGSMrDLyRP4Ccwt1m58g@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 12 Feb 2026 15:10:20 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+SswpTjQShfkdhVwL_k8gJ_5+NrecPCUiFR52UB5zNMA@mail.gmail.com>
+X-Gm-Features: AZwV_QjelX9NLva1DLDx_tMGAWuQk_3-b-qqDMfkQH9yt3x_72JwdyevIvbKnTI
+Message-ID: <CAL_Jsq+SswpTjQShfkdhVwL_k8gJ_5+NrecPCUiFR52UB5zNMA@mail.gmail.com>
+Subject: Re: [PATCH 1/4 v2] dt-bindings: serdes: s32g: Add NXP serdes subsystem
+To: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com, 
+	p.zabel@pengutronix.de, linux@armlinux.org.uk, ghennadi.procopciuc@nxp.com, 
+	Ionut.Vicovan@nxp.com, linux-phy@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	horms@kernel.org, Frank.li@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258511-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258512-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[openvpn.net:mid,openvpn.net:dkim,openvpn.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mandelbit.com:email,queasysnail.net:email]
-X-Rspamd-Queue-Id: 6A5A41311F5
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,linaro.org:email,devicetree.org:url,0.0.0.0:email]
+X-Rspamd-Queue-Id: D6FA813124B
 X-Rspamd-Action: no action
 
-From: Ralf Lici <ralf@mandelbit.com>
+On Thu, Feb 12, 2026 at 1:17=E2=80=AFAM Vincent Guittot
+<vincent.guittot@linaro.org> wrote:
+>
+> On Tue, 10 Feb 2026 at 01:40, Rob Herring <robh@kernel.org> wrote:
+> >
+> > On Tue, Feb 03, 2026 at 05:19:14PM +0100, Vincent Guittot wrote:
+> > > Describe the serdes subsystem available on the S32G platforms.
+> > >
+> > > Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
+> > > ---
+> > >  .../bindings/phy/nxp,s32g-serdes.yaml         | 154 ++++++++++++++++=
+++
+> > >  1 file changed, 154 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/phy/nxp,s32g-se=
+rdes.yaml
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.ya=
+ml b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> > > new file mode 100644
+> > > index 000000000000..fad34bee2a4f
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> > > @@ -0,0 +1,154 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/phy/nxp,s32g-serdes.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: NXP S32G2xxx/S32G3xxx SerDes PHY subsystem
+> > > +
+> > > +maintainers:
+> > > +  - Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+> > > +
+> > > +description: |
+> > > +  The SerDes subsystem on S32G SoC Family includes two types of PHYs=
+:
+> > > +    - One PCIe PHY: Supports various PCIe operation modes
+> > > +    - Two Ethernet Physical Coding Sublayer (XPCS) controllers
+> > > +
+> > > +  SerDes operation mode selects the enabled PHYs and speeds. Clock f=
+requency
+> > > +  must be adapted accordingly. Below table describes all possible op=
+eration
+> > > +  modes.
+> > > +
+> > > +  Mode  PCIe XPCS0           XPCS1           PHY clock       Descrip=
+tion
+> > > +                SGMII                SGMII             (MHz)
+> > > +  ------------------------------------------------------------------=
+-------
+> > > +  0  Gen3    N/A             N/A             100             Single =
+PCIe
+> > > +  1  Gen2    1.25Gbps        N/A             100             PCIe/SG=
+MII
+> > > +  2  Gen2    N/A             1.25Gbps        100             PCIe/SG=
+MII
+> > > +  3  N/A     1.25Gbps        1.25Gbps        100,125         SGMII
+> > > +  4  N/A     3.125/1.25Gbps  3.125/1.25Gbps  125             SGMII
+> > > +  5  Gen2    N/A             3.125Gbps       100             PCIe/SG=
+MII
+> >
+> > Mixed tabs and spaces. Drop the tabs.
+>
+> okay
+>
+> >
+> > What's not clear to me is do you have 2 or 4 lanes?
+>
+> 2 lanes per serdes
+> as an example mode 0 is one PCIe x2 lane
+> and mode 1 is one PCIe x1 and one xpcs0/SGMII on lane 1
+> or mode 3 is one  xpcs0/SGMII on lane 0 and one xpcs1/SGMII on lane 1
 
-In ovpn_net_xmit, after GSO segmentation and segment processing, the
-first segment on the list is used to increment VPN TX statistics, which
-fails to account for any subsequent segments in the chain.
+Still confused. So 2 total lanes?
 
-Fix this by accumulating the length of every segment that successfully
-passes skb_share_check into a tx_bytes variable. This ensures the peer
-statistics accurately reflect the total data volume sent, regardless of
-whether the original packet was segmented.
+>
+> >
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    oneOf:
+> > > +      - enum:
+> > > +          - nxp,s32g2-serdes
+> > > +      - items:
+> > > +          - const: nxp,s32g3-serdes
+> > > +          - const: nxp,s32g2-serdes
+> > > +
+> > > +  reg:
+> > > +    maxItems: 4
+> > > +
+> > > +  reg-names:
+> > > +    items:
+> > > +      - const: ss_pcie
+> > > +      - const: pcie_phy
+> > > +      - const: xpcs0
+> > > +      - const: xpcs1
+> > > +
+> > > +  clocks:
+> > > +    minItems: 4
+> > > +    maxItems: 5
+> > > +
+> > > +  clock-names:
+> > > +    items:
+> > > +      - const: axi
+> > > +      - const: aux
+> > > +      - const: apb
+> > > +      - const: ref
+> > > +      - const: ext
+> > > +    minItems: 4
+> > > +
+> > > +  resets:
+> > > +    maxItems: 2
+> > > +
+> > > +  reset-names:
+> > > +    items:
+> > > +      - const: serdes
+> > > +      - const: pcie
+> > > +
+> > > +  nxp,sys-mode:
+> > > +    $ref: /schemas/types.yaml#/definitions/uint32
+> >
+> >        maximum: 5
+> >
+> > Though isn't this redundant with the child nodes? You could use the
+> > standard 'phy-mode' property in each child.
+>
+> not really because we can have mode 1 but only a node to describe
+> lane0 for PCIe x1 if the lane 1 is not used
+>
+> >
+> > > +    description: |
+> > > +      SerDes operational mode. See above table for possible values.
+> > > +
+> > > +  '#address-cells':
+> > > +    const: 1
+> > > +
+> > > +  '#size-cells':
+> > > +    const: 0
+> > > +
+> > > +patternProperties:
+> > > +  '^serdes[0,1]_lane@[0,1]$':
+> >
+> > Do you need to support serdes0_lane@0 and serdes1_lane@0 (or similar
+> > with "@1")? That's illegal as you have 2 nodes with the same address.
+>
+> okay, we can find other naming
+>
+> >
+> > > +    description:
+> > > +      Describe a serdes lane.
+> > > +    type: object
+> > > +
+> > > +    properties:
+> > > +      compatible:
+> > > +        enum:
+> > > +          - nxp,s32g2-serdes-pcie-phy
+> > > +          - nxp,s32g2-serdes-xpcs
+> >
+> > Seems like phy-mode would be sufficient. Are these separate blocks from
+> > the parent?
+>
+> Isn't phy-mode only for ethernet phy ?
 
-Fixes: 04ca14955f9a ("ovpn: store tunnel and transport statistics")
-Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
----
- drivers/net/ovpn/io.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Sorry, it is "phy-type" that I was thinking about. That takes the
+types defined in dt-bindings/phy/phy.h. The type can be defined either
+in "phy-type" or in the phy cells if the type is per identifier.
 
-diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-index f70c58b10599..955c9a37e1f8 100644
---- a/drivers/net/ovpn/io.c
-+++ b/drivers/net/ovpn/io.c
-@@ -355,6 +355,7 @@ netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 	struct ovpn_priv *ovpn = netdev_priv(dev);
- 	struct sk_buff *segments, *curr, *next;
- 	struct sk_buff_head skb_list;
-+	unsigned int tx_bytes = 0;
- 	struct ovpn_peer *peer;
- 	__be16 proto;
- 	int ret;
-@@ -414,6 +415,8 @@ netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 			continue;
- 		}
- 
-+		/* only count what we actually send */
-+		tx_bytes += curr->len;
- 		__skb_queue_tail(&skb_list, curr);
- 	}
- 
-@@ -426,7 +429,7 @@ netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 	}
- 	skb_list.prev->next = NULL;
- 
--	ovpn_peer_stats_increment_tx(&peer->vpn_stats, skb_list.next->len);
-+	ovpn_peer_stats_increment_tx(&peer->vpn_stats, tx_bytes);
- 	ovpn_send(ovpn, skb_list.next, peer);
- 
- 	return NETDEV_TX_OK;
--- 
-2.52.0
+Really, Given each lane doesn't have any of its own resources, I'd
+probably get rid of the child nodes and put the type into the phy
+cells. Then you'd have something like this:
 
+// PCIE on lanes 0 and 1 (mode 0)
+pcie {
+  phys =3D <&phy 0 PHY_TYPE_PCIE>, <&phy 1 PHY_TYPE_PCIE>;
+};
+
+// PCIE on lane 0 (mode 1)
+pcie {
+  phys =3D <&phy 0 PHY_TYPE_PCIE>;
+};
+// Ethernet on lane 1
+ethernet {
+  phys =3D <&phy 1 PHY_TYPE_SGMII>;
+};
+
+I perhaps don't have the cells right if it is more than just lane 0
+and lane 1, but you can put anything there you want. The cell
+definition is provider specific.
+
+If you need to get the overall system wide configuration, that can be
+done. It's not terribly efficient, but you can iterate all 'phys'
+nodes in the DT, find the ones for your provider (&phy) and examine
+the cell values.
+
+Rob
 
