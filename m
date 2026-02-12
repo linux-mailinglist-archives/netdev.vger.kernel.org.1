@@ -1,201 +1,119 @@
-Return-Path: <netdev+bounces-258455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMCRHMbPjWn87AAAu9opvQ
-	(envelope-from <netdev+bounces-258455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:04:06 +0100
+	id ELxfLmfQjWnw7QAAu9opvQ
+	(envelope-from <netdev+bounces-258456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:06:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF5A312DB57
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:04:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0277512DB8D
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D9B51304E33A
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:04:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 41A9B300E5A4
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A685F31A552;
-	Thu, 12 Feb 2026 13:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1CE2FDC55;
+	Thu, 12 Feb 2026 13:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="i3LvwHf6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l8HhaHtI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2E9356A0D;
-	Thu, 12 Feb 2026 13:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB2A3EBF24;
+	Thu, 12 Feb 2026 13:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770901442; cv=none; b=YR6C0Kh9YoBf4t69U6YP7dwOziGYG1dBcpAp2BZktygDr7+yJ/6/s6JLFSl68wwX9F0xM0G79Ejw+YmA5cBZpdld2oC43nTwLJfbs6BjJ1YYijI7DcHSPII2vgiMtLdh1d3u3PZgmmRPETVz0yWIMqnW86NHV9XJjOFUQwztPec=
+	t=1770901603; cv=none; b=t0H8nEh2EL34U59Rr++RgvVQZzqhvkPhCsOZqO+FzudXa6uFsG6zFlK4x5wavpf+TNXmhfMYB9ljCD6HR9a1pL/gd/0gCF4ZX9an2FgiFrp9Jjmnej0+Wv/qIA0dEPHsrLPbfiTWfiTig8utG/4KwLfYUQVCMdW62ydbZytUe9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770901442; c=relaxed/simple;
-	bh=EfLS4ZM7f5cRpk+TAS+xqWJ3cF3htCYIH5HHvc3mNg8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KlFqp4uyD48gg4QaMOL+jEiCq7N7auKltNWciM67BDSJqacaWspk54oo1dj00jC86Ep/kFGzhiEo/mPGuHQNsJqOdx6AYhYb9vtsrFcRQPZ1F3F9oNVFmGmL7sBd1YYHRf2WYgerjKRaS/nmEAROJzj7vT/LgGlR5tVL6db7c6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=i3LvwHf6; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61BLNov01274001;
-	Thu, 12 Feb 2026 05:03:47 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=3woJmYNsewlYdtCBXzd3+ry
-	fIzxYexwDJcAg74rOJn8=; b=i3LvwHf6wYw6jl5b6Yde8kQAwhKEnnlgOcqAMIY
-	DEoUr1AeQvGnC/EO+4PbGC6vEQOuQhcqYPrBg6fds8Nv11fXBKTwadJ49Eqox4Q5
-	KVZ1qwV6X+05kk2lbDX6xZlzCfp5rwMQZSjOsNvs6st53hP7MH+ZORwKKc4Icc/a
-	5Kra8TTjAWtbN4zCEbk9lL+gq+zaFEsC22JnTUz6N6enx152YH2fZPy5jZgAe7Hn
-	wCAr/WVPhM2h3hXI+L0HNI2eUx6XqoaoaXQeAQQ7543qpHXmxDtELAgMkyPDpVel
-	h4ER4f0adJD19qjQ7wxiI6EuzYbH4X7/PFMNDkaLCSsYBrg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4c89g1nrk1-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Feb 2026 05:03:47 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 12 Feb 2026 05:04:03 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 12 Feb 2026 05:04:03 -0800
-Received: from localhost.localdomain (unknown [10.28.36.175])
-	by maili.marvell.com (Postfix) with ESMTP id B563D3F703F;
-	Thu, 12 Feb 2026 05:03:41 -0800 (PST)
-From: Srujana Challa <schalla@marvell.com>
-To: <netdev@vger.kernel.org>, <virtualization@lists.linux.dev>
-CC: <pabeni@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
-        <xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <ndabilpuram@marvell.com>, <kshankar@marvell.com>,
-        <schalla@marvell.com>, <stable@vger.kernel.org>
-Subject: [PATCH v3,net] virtio_net: Improve RSS key size validation
-Date: Thu, 12 Feb 2026 18:33:40 +0530
-Message-ID: <20260212130340.3540415-1-schalla@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1770901603; c=relaxed/simple;
+	bh=DMUloXjb0y36sy3Di/uSO18uVDh/y5Xp8gF3xe62sRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YqfDBRb8PonTb3sA98SxXgwLH3QbYdueOTViEGK1sxQfimSs4fgfNLInjERUP0FDOVF9xkX/jbOOv+47jjQbb0sn3C7ZYfV1SBLAlbCKsBprtcGLd4gJewD8gEgYEih294e04ff7NyArbCRZTC2XpkF6P7l0c7cqB71X9TzHzNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l8HhaHtI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Psmc30ZDAOoov5ut+1EIkPVtL/ykRMSwHnd0XHg9zvI=; b=l8HhaHtI9KrELgVO4/p/n13zFC
+	gfPDIEogbwkca/x2SE9Iww+vniRnSOxvPvwHkopu3d5qHjxMjly7EQPNJHr2ezFEVD+Du/E6rfMBU
+	SskMYiJu6pQQhqqMu20Nrg9temkmAG7DcpioBwVA2DnyzVPwmH6pYIZpfwrHXXm4+Of8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vqWOt-0077nc-BG; Thu, 12 Feb 2026 14:06:31 +0100
+Date: Thu, 12 Feb 2026 14:06:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, linux@armlinux.org.uk, hkallweit1@gmail.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+Subject: Re: [PATCH net] net: phy: dp83869: Set auto mdix bit for forced
+ 100Base-Tx mode
+Message-ID: <9a256949-56ee-4d10-949e-c5009852ca44@lunn.ch>
+References: <20260211131033.2525617-1-m-malladi@ti.com>
+ <0a9d0ec8-09c4-4029-8449-8c8f08c6dca0@lunn.ch>
+ <a498b310-29f1-4775-aa65-fda027a3124b@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=ELgLElZC c=1 sm=1 tr=0 ts=698dcfb3 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
- a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
- a=l6LeGXZaLw7GYeYAWxUA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDA5NyBTYWx0ZWRfX0WbwK2tyd1wJ
- /Xuk35zeYc1CIyV+/Eh4bE8ceuV7hKDGM7jQZVO1PK5zhEqewcsvMIIzjJEOQEYQt94O0l+Rutg
- j+U+v4bqH8XQwYaq1bstvRK/8LeTRZmtVtvfWYzM6pWBL+lK8iRySiGui9IWunEMwKPBsBvC9sb
- a26RZJIetcUznrDKAvxvioZJG+dALKX4nuD5aRIdFQYzmWiFwrd6tp4Sow3DTbEXKUlarAkFV9j
- gRO4nETAAnKuSdQu/t1uKXwy+yKwg0gXuaK/xMuirqlOmT1rL92nbkf7EsPqZ7wXqKgalMV9/0c
- tTeZLEfiAxzGMiMc8PCL0Xab+/i9uFBeljEp+1VPBlBrsrCgfB1ICNbq/usgpDgmY/c/uNNSRIS
- 8f4mRRxKZAFM0AcAN8+swOwMuXafA8+rtJhw8Gy6JrzDy7uk+vhVUBt2qHG8NOpRJ2tovAmplmy
- DmwsXN0nFk+BIPqqvuA==
-X-Proofpoint-GUID: 076p7Qdxk9CoPxQLKMlhn7xdMoetfR5V
-X-Proofpoint-ORIG-GUID: 076p7Qdxk9CoPxQLKMlhn7xdMoetfR5V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-12_03,2026-02-12_02,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a498b310-29f1-4775-aa65-fda027a3124b@ti.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258455-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258456-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,vger.kernel.org,ti.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schalla@marvell.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:mid,marvell.com:dkim,marvell.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: BF5A312DB57
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0277512DB8D
 X-Rspamd-Action: no action
 
-Replace hardcoded RSS max key size limit with a type based definition.
-Add validation for RSS key size against spec minimum (40 bytes). When
-validation fails, gracefully disable RSS features and continue
-initialization rather than failing completely.
+> > What about when you change the configuration out of forced 100 Full?
+> > Shouldn't the configuration be returned to how the user wants
+> > auto-MDIX configured? Should you disable robust Auto-MDIX so that
+> > "unreliable Auto-MDIX" is used?
+> 
+> This bit is only necessary if link partners are configured to operational
+> modes that not supported by normal Auto MDI/MDIX mode (when one of that link
+> partners are in Forced 100Base-TX), will fix it in v2.
 
-Cc: stable@vger.kernel.org
-Fixes: 3f7d9c1964fc ("virtio_net: Add hash_key_length check")
-Signed-off-by: Srujana Challa <schalla@marvell.com>
+Does this bit have any effect on normal Auto MDI/MDIX mode? Can this
+bit be set once during probe, rather than for a specific link mode?
 
-v3:
-- Moved RSS key validation checks to virtnet_validate.
-- Add fixes: tag and CC -stable
----
- drivers/net/virtio_net.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+Is there an errata for this behaviour/fix? If there is please
+reference the number/document etc.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index db88dcaefb20..e61cea50dcab 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -381,7 +381,9 @@ struct receive_queue {
- 	struct xdp_buff **xsk_buffs;
- };
- 
--#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
-+#define VIRTIO_NET_RSS_MAX_KEY_SIZE \
-+	(type_max(((struct virtio_net_config *)0)->rss_max_key_size) + 1)
-+#define VIRTIO_NET_RSS_MIN_KEY_SIZE 40
- 
- /* Control VQ buffers: protected by the rtnl lock */
- struct control_buf {
-@@ -6627,6 +6629,24 @@ static int virtnet_validate(struct virtio_device *vdev)
- 		__virtio_clear_bit(vdev, VIRTIO_NET_F_STANDBY);
- 	}
- 
-+	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS) ||
-+	    virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT)) {
-+		u8 key_sz = virtio_cread8(vdev,
-+					  offsetof(struct virtio_net_config,
-+						   rss_max_key_size));
-+		/* Spec requires at least 40 bytes */
-+		if (key_sz < VIRTIO_NET_RSS_MIN_KEY_SIZE) {
-+			dev_warn(&vdev->dev,
-+				 "rss_max_key_size=%u is less than spec minimum %u, disabling RSS\n",
-+				 key_sz, VIRTIO_NET_RSS_MIN_KEY_SIZE);
-+			if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
-+				__virtio_clear_bit(vdev, VIRTIO_NET_F_RSS);
-+			if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
-+				__virtio_clear_bit(vdev,
-+						   VIRTIO_NET_F_HASH_REPORT);
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -6839,13 +6859,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	if (vi->has_rss || vi->has_rss_hash_report) {
- 		vi->rss_key_size =
- 			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
--		if (vi->rss_key_size > VIRTIO_NET_RSS_MAX_KEY_SIZE) {
--			dev_err(&vdev->dev, "rss_max_key_size=%u exceeds the limit %u.\n",
--				vi->rss_key_size, VIRTIO_NET_RSS_MAX_KEY_SIZE);
--			err = -EINVAL;
--			goto free;
--		}
--
- 		vi->rss_hash_types_supported =
- 		    virtio_cread32(vdev, offsetof(struct virtio_net_config, supported_hash_types));
- 		vi->rss_hash_types_supported &=
--- 
-2.25.1
+Since this is a fix, please add a Fixes: tag.
 
+    Andrew
 
