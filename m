@@ -1,151 +1,160 @@
-Return-Path: <netdev+bounces-258472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBAaCX8Ejmlf+gAAu9opvQ
-	(envelope-from <netdev+bounces-258472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:49:03 +0100
+	id UFJDMyUEjmlf+gAAu9opvQ
+	(envelope-from <netdev+bounces-258473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:47:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB0912F9BF
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:49:02 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72D2412F938
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 17:47:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 80E64302AC04
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:46:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ABBA6300D0C6
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174B935DD0E;
-	Thu, 12 Feb 2026 16:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846B5188596;
+	Thu, 12 Feb 2026 16:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="qz2QMYoh"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="N+K6lj3w";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="btvf8tIt"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster3-host4-snip4-10.eps.apple.com [57.103.77.171])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E9C35E53F
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 16:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.77.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56542224B05;
+	Thu, 12 Feb 2026 16:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770914776; cv=none; b=F2muSVqQ0LTDBeudBncl+BSdC4Q0KqvHTfl6V9oQifO+LLB1Rey7a/RcQZSJeN/4aOhv828KMAjNtV8rBlNCSc7sA1kIehtdRWZqQY1njzZKMUiZYgKrfSpdUZoVdxOMxpmW+c+GX1cPNUgPSMYHfw6kM5BcwD9FuViPgBLou6I=
+	t=1770914849; cv=none; b=CLEA3ZNCpL5UE0BRezAenGKZsaGUqYRx9FxVnT1ItescKqr8rT83g+GGdT84FdCeeY4l+QN7zUY0j+3xHH92hpjVQigZDKCwPUgDw+vTNXSFXP+Xc/huF48QQWyPSOqh2X6Hz8/ONl8tCRV1d0M0RTYLMOzHnUDz7g5DrWKen6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770914776; c=relaxed/simple;
-	bh=h3BIh+xKb99MFMyx5fA5/y8xgOkkOyCiY+I8v/3z8YU=;
+	s=arc-20240116; t=1770914849; c=relaxed/simple;
+	bh=s/DyEPe+77NoYsDIGpxy2seHogqaqunQv6TIiFOPDzI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PGyutcfmxpJIgyXmMmxjDgkHlwPAIYMRgTAFqnqb1dGo04+bJ6BR1wkOyFNkp5DqLqKMwA1rEdpzxVidcJ3t8vXKGeJmmxxGJnDCPhW6D/bW7rz2AyVpQmZPpVhNwTV06rkbTzG3OsThunyxTqw/mZrwF90PV8w9HhVaQR6UO6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=qz2QMYoh reason="key not found in DNS"; arc=none smtp.client-ip=57.103.77.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-2 (Postfix) with ESMTPS id 3B8681800385;
-	Thu, 12 Feb 2026 16:46:09 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; t=1770914771; x=1773506771; bh=lx/q+HqmswEdLHARgaDdqtXI3jrwjUkBrv3ty7Hecv0=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=qz2QMYohPbmKUkJQL3Maysbc1U8mbxSt9LP3NsetGLij7owrlV+cPFE8ivctpoVYXMJJtpqas9X6dt1+FMpFNLjSJE7hl+5VxcykZhZjjHSHuNygN+r/GPtQ44v1HGGDOXuCX4YOx0l/q6iZm6C3ggDtWmc1uRzTGXH7r1cqFVfXB9sAT64y0Azn63sSa5WSMkcbYhN57S5HW1BtMdAld3XLB1viyFwHy44NuBDu814cs4RUC9F5OQFtntDz7MI/TxidtZp6AuboIThkzKe9V+XrEGp6ZEo083TSHOeKhMzhIQo6LiQomryKjgmRRrHQscXY4rtFMOdGeB7hZOydmg==
-mail-alias-created-date: 1719758601013
-Received: from desktop.y-koj.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-2 (Postfix) with ESMTPSA id BAD0C1800200;
-	Thu, 12 Feb 2026 16:46:06 +0000 (UTC)
-Date: Fri, 13 Feb 2026 01:46:03 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=kYpQhdZ7MYPThJyuzJmtbf48VJpWfqrCmbFIHMIivlAja5zGD4nKwLjr+kmiWDx3I2LB8PweQQoBUGV0sPq6yqwRtA44aDt+nIE8gpNZYf80tKdzHAnfrwljcIfqdWw8xw1L00MXHdLeJLiWeDwN+HEQc0AKqev/L/lRelpgikk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=N+K6lj3w; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=btvf8tIt; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 12 Feb 2026 17:47:25 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1770914846;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s/DyEPe+77NoYsDIGpxy2seHogqaqunQv6TIiFOPDzI=;
+	b=N+K6lj3wl0VbioEZ2q8gSVvJkdOh63504F2+D57irJaU2pWVpxcMDwW9us2dAeOCkB/87C
+	+QBuXkmNV+2uv2l5Rv6bomcRt4GBEOzbGtYteuiWnLRR3fLUbPgh1g1mHzovFydc/yjjds
+	9cPwYvdaVH8N7HpjkDlUQYYqs87NCmNd3vtohZSP0bkHKFo7bd0f7Iy4hwigfKarWD2LJY
+	x+N/LBXH9JCfQHOV9/+6NjeFbfX+RZHl8VXpVRq/0He245+/CjNjude04vIqPCIjJnbMUI
+	E0Z/y55krglNbf8fu8b+K/KNn2E2EACfL1AecxGuyPmjUed+yYkmWdEE5hanGw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1770914846;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s/DyEPe+77NoYsDIGpxy2seHogqaqunQv6TIiFOPDzI=;
+	b=btvf8tItfDYAqnNr2fTa3aIBM0VfbBgRuxc5XlsgCD+E/96PiUpsz5xehfp5OiFe9pqUAc
+	nsEH/9rOuy4fCGBQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Willem de Bruijn <willemb@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] docs: ethtool: clarify the bit-by-bit bitset
- format description
-Message-ID: <aY4Dy4JALgoc5_s8@desktop.y-koj.net>
-References: <f43999612ed9d17fb7fe8f21e777e1c784f23c46.1770457868.git.yk@y-koj.net>
- <f2882370-a531-4a83-ab39-cf73878c0d03@redhat.com>
+	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] igb: Retrieve Tx timestamp
+ directly from interrupt for i210
+Message-ID: <20260212164725.ltllw51l@linutronix.de>
+References: <20260209090621.GiZqTiMJ@linutronix.de>
+ <8e762437-69f9-40d7-bb75-3a45bef1d5d6@linux.dev>
+ <20260209114836.GPU-vnnh@linutronix.de>
+ <78e2af2c-40e6-43f1-9471-42f350e69389@linux.dev>
+ <willemdebruijn.kernel.2e6213a98660b@gmail.com>
+ <20260210121207.9kLHroS0@linutronix.de>
+ <willemdebruijn.kernel.cceee43f5b9b@gmail.com>
+ <87qzqr5vos.fsf@jax.kurt.home>
+ <12520aac-c69a-41a0-9710-497392bc18f6@intel.com>
+ <20260211134436.1e623034@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <f2882370-a531-4a83-ab39-cf73878c0d03@redhat.com>
-X-Proofpoint-ORIG-GUID: OeFxtA_vWDdqp2A-CksUiD7PdsHIuPUU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDEyNiBTYWx0ZWRfX3sL8vy0kZSii
- 3hwbsFK69D3bPxjtbMW28vEZ12XpQVse+YvuoNW995YAz/5o6rhI4diZAOKJlQAm5FbwKw4wvtg
- EfUSCRUiGupF8JzjaAfn8bMv8Mc8ybFpPaMyZnM1VpTSRxdDGXCmEp3Rbm+RClXzrdAaPGapj9+
- Wd5b4O2CEvDcVAkpTxia526ASHaBeRcdmBOklttyoo6qkm9McHgAxFDLZWG0pmMg3sBa9OB0hPA
- mrdsGdOtT+WdM2upUtGrZxydpJGykBS2nx6YOzhzrfzAaeib1qrfmXON+o2aD3Vwpx0Q2LBmqkP
- 9mzVTuD0UWgKOQI0INWiJg2Ar4SA3KkVso5jDS1yUy3YxhRXLletGEr1kV1Otw=
-X-Authority-Info-Out: v=2.4 cv=AqvjHe9P c=1 sm=1 tr=0 ts=698e03d1
- cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
- a=jnl5ZKOAAAAA:8 a=GezhIzodDrykCbhU_jUA:9 a=CjuIK1q_8ugA:10
- a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-GUID: OeFxtA_vWDdqp2A-CksUiD7PdsHIuPUU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-12_05,2026-02-12_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- spamscore=0 mlxlogscore=859 suspectscore=0 adultscore=0 lowpriorityscore=0
- bulkscore=0 clxscore=1030 malwarescore=0 phishscore=0 classifier=spam
- authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602120126
-X-JNJ: AAAAAAABIZK6QK2kicOR2UZfbLws9NFEGoTwO3F1/nDque+JkIsnZe+p/ENLAYM0AdVdYvGDhAvybui2p9s8zmF0+9jHsb4e9JA+6R0tWU3J//7Ut6/tf1djMbB2KJELd+t96uKJy9b0TXS3Z4D0GW5aeaCA83muRol7JdOgkt4TWG+4KqdB2rnCmZwEpaiK0wly2KaSaN3slxnHKB++G5F9xvcMC0sms15t3KWjqXYbAGq9/5X1gxD57DL+1eEKA68OJEyp6sYKkwa4K7V2NsmqAakKcsVxKc8hQ+wTvURESLHu0QlqVDy7SHG/aiKYhUU/2ZHhuiv9ZJlc+FeDZ87ElTQGaoN+JmpWIYF0rl79DmFHy5mQNemJ5Ct56CrdGSY40+wCqMCNuSv8k96qfZlh24sS08M+zKa1gQHdgd0RQ7s5yCgPGJAhfi+so85VaxjXM6HPdgxp2vshgPzoDE9jfH21HCCPzo0797+EvhNHyfoM/Q/LLy/dmTL0Iol6sOq6KfYA/hxGtG/tOFWHn+o1KGspSnGNCXWpeLzGTUBhSbKcmH8t3ryt9sKrl1Mwyi6EnVGYNWFgm1Ysun6wWZKganKXJYqg9YwosA1fbVCtt/UO4HNQHqzLYis6WC+cC73kvXL6PMFo8XM9xq6FrzM6XcNov8Z+p80HK7iocHdGKOQqtAgP0+TiPTqrhamaC93gfVaLCwjSlIgFQvP+QsSg3dkaTt87LhKC/Pb7Ebl44Ttm0Z+u49xv/0ppr40=
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260211134436.1e623034@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[y-koj.net:~];
-	R_DKIM_PERMFAIL(0.00)[y-koj.net:s=sig1];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258472-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[y-koj.net];
+	TAGGED_FROM(0.00)[bounces-258473-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,linutronix.de,gmail.com,linux.dev,google.com,redhat.com,davemloft.net,molgen.mpg.de,vger.kernel.org,lunn.ch,lists.osuosl.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yk@y-koj.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8CB0912F9BF
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
+X-Rspamd-Queue-Id: 72D2412F938
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 12:55:55PM +0100, Paolo Abeni wrote:
-> On 2/7/26 11:25 AM, Yohei Kojima wrote:
-> > Clarify the bit-by-bit bitset format's behavior around mandatory
-> > attributes and bit identification. More specifically, the following
-> > changes are made:
-> > 
-> > * Rephrase a misleading sentence which implies name and index are
-> >   mutually exclusive
-> > * Describe that ETHTOOL_A_BITSET_BITS nest is mandatory
-> > * Describe that a request fails if inconsistent identifiers are given
-> > 
-> > Signed-off-by: Yohei Kojima <yk@y-koj.net>
-> > ---
-> > Current ethtool-netlink documentation doesn't describe several behavior
-> > around bit-by-bit bitset, which makes it hard to develop a ethtool
-> > library without digging into the kernel code. This patch eases the gap
-> > between the kernel behavior and the documentation by adding descriptions
-> > around the mandatory attribute and bit identification.
-> 
-> This needs review by someone provided with English natural language
-> skills far better than mine. I'm wrapping the net-next PR right now;
-> this has to be deferred after the merge window, I'm sorry.
+On 2026-02-11 13:44:36 [-0800], Jakub Kicinski wrote:
+> On Wed, 11 Feb 2026 11:29:03 -0800 Jacob Keller wrote:
+> > > Moving the timestamping in IRQ looked like a good solution, because t=
+he
+> > > device already signals that the Tx timestamp is available now. No need
+> > > to schedule any worker/work at all. So, it'd be very nice if
+> > > skb_tstamp_tx() could be called from IRQ context. BTW other drivers l=
+ike
+> > > igc call this function in IRQ context as well.
+> >=20
+> > Right. Reporting the timestamp from the interrupt is the simplest and=
+=20
+> > lowest latency method. I know Miroslav had some situations and devices=
+=20
+> > where it apparently caused more problems than it helped, though I don't=
+=20
+> > believe anyone else has reproduced those?
+>=20
+> There's a BH workqueue now, as a replacement for tasklets.
+> Presumably smallest fix would be to switch to that?
 
-Thank you for the response. It's okay, I understand maintainers are
-super busy during this period.
+Hmm. This would raise the TASKLET softirq from the interrupt handler and
+then handle it on the irq-exit path.=20
+Let me look if that one lock can be removed first=E2=80=A6
 
-FYI I've received a Reviewed-by from Jakub, so I believe it's ready for
-merge after the merge window.
-
-Thank you,
-Yohei
+Sebastian
 
