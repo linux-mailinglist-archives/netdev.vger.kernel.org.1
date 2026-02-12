@@ -1,252 +1,189 @@
-Return-Path: <netdev+bounces-258430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJM5GqeijWlh5gAAu9opvQ
-	(envelope-from <netdev+bounces-258430-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:51:35 +0100
+	id 0I3jDmagjWky5gAAu9opvQ
+	(envelope-from <netdev+bounces-258428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:41:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9013B12C096
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:51:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9992B12BF81
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:41:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 338E8300EBD2
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 09:51:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 749BB3013787
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 09:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6B22D6E78;
-	Thu, 12 Feb 2026 09:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA35E2DF6F6;
+	Thu, 12 Feb 2026 09:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KzsB5jse"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgYLzNUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C7B2B9A4;
-	Thu, 12 Feb 2026 09:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0902DCF7B
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 09:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770889889; cv=none; b=eMn4hjfbExVOhVTzPaeRHRJ7BV+rQ2wOkRs4KppF2xQKlywJ0Dcjt7p08FkXLEwuyKEe4ZrwO1wGQb2j+M/418FRLZo/W8LpYoESrQZyKnrtRZsrt7PYmFB4JwDWdgXT1FezGxXGP7fGFwVH45fa+Cc1/CEdt4I/VqvB33wzpy0=
+	t=1770889283; cv=none; b=QSALHbP8k8Ta9xJth7EPhsZD4+PjbwiX0KooMy9I0VO91yVT2DvGxtm6i0+3dgqeeEJPd1nYsNGwzHosKZ7aCjUpXtpwQgOsilEBbL3ZQYzg7uM7ORbjpgqkqRqWPsZRLFE3hpnefUTJ2NfWcephNZI1B8vmUwiwHDv3FtYLfIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770889889; c=relaxed/simple;
-	bh=B7sBeI2OHeGzGmEM1MDciZvw3RM4fLtNiVKVRT4HeoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDO+M2o+xl/1JcF6QcpxSsY8UZznVnC0rN91KfHGKmBnTEfHu51sHEZr9WUhYn9HqQCsaRKsdwn5dQhmcxqKcfc8eqiqwroKU89+W5H1ocug98pKjKTWvLjVis4NcdhP0kffXrRv65Xh1KIQmeBwngJ1MTIXIse/mMSj6kFk1O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KzsB5jse; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1770889883; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=qpruaUwKwh867x0HVlxV3T2XoeP5v0Ct5QMf35UW6c8=;
-	b=KzsB5jseH9KBJrEiaBxupfDEKfEu0bEOqa6aO3ELO30XhuxMCNY1Uhq+erULMCmoIhnoVVWXBsR2FHDxY8+B28Ig9EwiiGFm3utBQdmjYFNnwy4CWyVyTiYLH8DW08qlnqf+nAAas4TGSLfzqLHEMpKoXAo3x9n8YmEyzVZZaUQ=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wz4YnRr_1770888937 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Feb 2026 17:35:37 +0800
-Date: Thu, 12 Feb 2026 17:35:37 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
-	pasic@linux.ibm.com
-Subject: Re: [PATCH RFC net-next] net/smc: transition to RDMA core CQ pooling
-Message-ID: <20260212093537.GA27899@j66a10360.sqa.eu95>
-References: <20260202094800.30373-1-alibuda@linux.alibaba.com>
- <aYx7Uh9MmJsPWUu4@linux.alibaba.com>
+	s=arc-20240116; t=1770889283; c=relaxed/simple;
+	bh=yIY/11Dq1CPkCm/A2dAowYLqnGZWKwSB10TrnqAw+10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nufek9xMaoVi83I0+bO/2Z65qzce7mXqe3YHMSKHLQx5NtIlNmZ3XX51aGJ46f2o+O/VuEXCRUXdPqGz5D8R19qSVWLpI0Nq5RBtRSUt/UDe55vPgt1JR7KZv5PXnrGissqj69rOMd8NEI7rP0ILSEqV4sZ0OW6h8cSKEYOCiwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bgYLzNUU; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-436309f1ad7so4299374f8f.3
+        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 01:41:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770889281; x=1771494081; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nwjxeLZCnF17rcxqGqeGmiS56iGGEOFnXmQIiNjxVnc=;
+        b=bgYLzNUUZD2HqtlSiww6qDfu0GL/itYcSfZ9JKl3P6gq8f3VcXGcQXQ8eXrRWRNnnG
+         2KPWACV64CVhls0FL1j421mdxVf5VeDlkUfzxEmzvfH62RsweUL+6WSsrIxpVLAjXgE8
+         LYYfyfsu/7f1iNPSU+yCRO8aohRvWbFQV30a93WpBJxWVS+vFquTLmHYI3JDiIpfM+OS
+         W76Fyz5xs+Xz4Pruom3UfmA6BAlWZI1ANVvEYsueQIw9xv9N3y7ApRtCO+SF9fNcrVG1
+         SJJsohE03108YMOSgNVuM8YqgeYlQjW8jQJ0yjp4ZizhCdAPAljpNb30ZIygNMa9kZTs
+         emeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770889281; x=1771494081;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nwjxeLZCnF17rcxqGqeGmiS56iGGEOFnXmQIiNjxVnc=;
+        b=trCC6O0HiruXadGY19BL7B5zC4SUKMpF5x7tIIh6pIeSkyJw1Qp13+UxQydNys8g9Y
+         LlWSfZ9jrI9qiKmMVp6X/bWG0pHFvM6ue+yHieKTeqvNUXihi742VtuLbPCHwriw6q97
+         HbM7qjD4cscXCm0f2BLSoj6rAGlMdmP7lhsNDIwWLZISLa1Rg5KlX5HEPbVSm8iSZPTQ
+         j27JISXxXiQTnX4zJusvKSCppWPaaO2YEkiPGl+M3S0vGh5RWhuRkhMaOfYDQz9xOd6a
+         5UarVJRt2LcX5u/e2Tbdr5taInWZ9Ww+Lr78OAKM2lXdUzCsroFFXwVpZtIfIT41cwhS
+         zY8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUlhdsw2FLihrqzWvQzyJPhsp62vvnD5PW6XV5nHee4koziaVEqlTDSHzd+Y1zV54nI12E/wLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzlu16xXKcgPISOr238lquVO0eo+4oI+mkREd8q9Nt2w9Ebdtsz
+	gSegqA5Uyh8MAcsuD9sd1XPdAt8gkY3fAkBH7plY1BJXd8Oc4jXUBRJ4
+X-Gm-Gg: AZuq6aIv9jlSasotx5RUvzjQUbNpee6WTPMzmjvjCIBCVfpjtv8ED6OLfA5CDfyTk/7
+	U0O0Y7ClkkF5/3jqL3t8yxoj4G/PQN+4B18UyWBoYfwUada7NC1cXCMp4M++PSlImnWq1jU0yLe
+	05HiCUEEHqyThxqXlsmpGi97D5kpkqx5J5WI5m7Dl8JSkocwDUWv7qIci5xnY4KSMDpo25sL0T9
+	ODB5b95qNVxYrq7GVpd2qo6zAoC4vnBql6RSX8ktLgsO32xan5XpDWBkPMurv3P4JH8izaCt7Fx
+	asQmZJ6Hoo+9GcepU+oGYgf8hZpahOTPv1VGPC2SWlvyYZiI3M7qazndFlNoqX4dRszJ6aG0M/c
+	eRJw3sa5ftiXah2OGbVdbgc3n2E6p30QjNlWqyxI6gPphMNybFix7s+XCge1J8K0dxcl2IVscL/
+	C7qzSfbWPzfA6xuBFIAgif+TbyVhlOOtcIvYqAWIUQQYp3BQ==
+X-Received: by 2002:adf:e50d:0:b0:437:8ff8:fea3 with SMTP id ffacd0b85a97d-4378ff90099mr1644282f8f.21.1770889280803;
+        Thu, 12 Feb 2026 01:41:20 -0800 (PST)
+Received: from [10.221.203.72] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783e5c550sm11501359f8f.36.2026.02.12.01.41.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Feb 2026 01:41:20 -0800 (PST)
+Message-ID: <dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
+Date: Thu, 12 Feb 2026 11:41:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYx7Uh9MmJsPWUu4@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss: validate min RSS
+ table size
+To: Jakub Kicinski <kuba@kernel.org>, Yael Chemla <ychemla@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ Willem de Bruijn <willemb@google.com>, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, noren@nvidia.com
+References: <20260131225454.1225151-1-kuba@kernel.org>
+ <9f535014-80eb-4f57-b047-3638579bde9a@nvidia.com>
+ <20260211134319.39710c1d@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20260211134319.39710c1d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258430-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+]
-X-Rspamd-Queue-Id: 9013B12C096
+	TAGGED_FROM(0.00)[bounces-258428-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9992B12BF81
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 08:51:30PM +0800, Dust Li wrote:
-> On 2026-02-02 17:48:00, D. Wythe wrote:
-> >The current SMC-R implementation relies on global per-device CQs
-> >and manual polling within tasklets, which introduces severe
-> >scalability bottlenecks due to global lock contention and tasklet
-> >scheduling overhead, resulting in poor performance as concurrency
-> >increases.
-> >
-> >Refactor the completion handling to utilize the ib_cqe API and
-> >standard RDMA core CQ pooling. This transition provides several key
-> >advantages:
-> >
-> >1. Multi-CQ: Shift from a single shared per-device CQ to multiple
-> >link-specific CQs via the CQ pool. This allows completion processing
-> >to be parallelized across multiple CPU cores, effectively eliminating
-> >the global CQ bottleneck.
-> >
-> >2. Leverage DIM: Utilizing the standard CQ pool with IB_POLL_SOFTIRQ
-> >enables Dynamic Interrupt Moderation from the RDMA core, optimizing
-> >interrupt frequency and reducing CPU load under high pressure.
-> >
-> >3. O(1) Context Retrieval: Replaces the expensive wr_id based lookup
-> >logic (e.g., smc_wr_tx_find_pending_index) with direct context retrieval
-> >using container_of() on the embedded ib_cqe.
-> >
-> >4. Code Simplification: This refactoring results in a reduction of
-> >~150 lines of code. It removes redundant sequence tracking, complex lookup
-> >helpers, and manual CQ management, significantly improving maintainability.
+
+
+On 11/02/2026 23:43, Jakub Kicinski wrote:
+> On Wed, 11 Feb 2026 22:10:56 +0200 Yael Chemla wrote:
+>> Thanks for the test addition. I wanted to raise a concern regarding the
+>> spread factor requirement that may apply to mlx5 and potentially other
+>> drivers as well.
+>> The real issue arises when the hardware's maximum RQT (indirection
+>> table) size isn't large enough to accommodate both the desired number of
+>> channels and a spread factor of 4. RX queues/channels serve multiple
+>> purposes beyond RSS - they're also used for XDP, AF_XDP, and direct
+>> queue steering via ntuple filters or TC.
+>> Artificially limiting the number of channels based solely on RSS spread
+>> requirements would be overly restrictive for these non-RSS use cases.
+>> In such scenarios, we'd rather have a slightly degraded spread factor
+>> (< 4) than limit channel availability.
+>> We'd appreciate any feedback on this approach.
 > 
-> Excellent !
+> That's fine. In fact IIRC ixgbe (infamously) had more queues than
+> it could fit in its RSS table. So none of this is new. At the same
+> time if user _does_ want to use a lot of queues in the main context
+> fewer than 4x entries in the indir table is inadequate.
 > 
-> Some comments below.
+> The test is based on production experience, and provides valuable
+> guidance to device developers.
 > 
-> >
-> >Performance Test: redis-benchmark with max 32 connections per QP
-> >Data format: Requests Per Second (RPS), Percentage in brackets
-> >represents the gain/loss compared to TCP.
-> >
-> >| Clients | TCP      | SMC (original)      | SMC (cq_pool)       |
-> >|---------|----------|---------------------|---------------------|
-> >| c = 1   | 24449    | 31172  (+27%)       | 34039  (+39%)       |
-> >| c = 2   | 46420    | 53216  (+14%)       | 64391  (+38%)       |
-> >| c = 16  | 159673   | 83668  (-48%)  <--  | 216947 (+36%)       |
-> >| c = 32  | 164956   | 97631  (-41%)  <--  | 249376 (+51%)       |
-> >| c = 64  | 166322   | 118192 (-29%)  <--  | 249488 (+50%)       |
-> >| c = 128 | 167700   | 121497 (-27%)  <--  | 249480 (+48%)       |
-> >| c = 256 | 175021   | 146109 (-16%)  <--  | 240384 (+37%)       |
-> >| c = 512 | 168987   | 101479 (-40%)  <--  | 226634 (+34%)       |
-> >
-> >The results demonstrate that this optimization effectively resolves the
-> >scalability bottleneck, with RPS increasing by over 110% at c=64
-> >compared to the original implementation.
-> >
-> >Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> >---
-> > net/smc/smc_core.c |   8 +-
-> > net/smc/smc_core.h |  16 ++-
-> > net/smc/smc_ib.c   | 114 ++++++-------------
-> > net/smc/smc_ib.h   |   5 -
-> > net/smc/smc_tx.c   |   1 -
-> > net/smc/smc_wr.c   | 267 ++++++++++++++++-----------------------------
-> > net/smc/smc_wr.h   |  38 ++-----
-> > 7 files changed, 150 insertions(+), 299 deletions(-)
-> >
-> >diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-> >index 8aca5dc54be7..9590c8aed3dd 100644
-> >--- a/net/smc/smc_core.c
-> >+++ b/net/smc/smc_core.c
-> >@@ -815,17 +815,11 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
-> > 	lnk->lgr = lgr;
-> > 	smc_lgr_hold(lgr); /* lgr_put in smcr_link_clear() */
-> > 	lnk->link_idx = link_idx;
-> >-	lnk->wr_rx_id_compl = 0;
-> > 	smc_ibdev_cnt_inc(lnk);
-> > 	smcr_copy_dev_info_to_link(lnk);
-> > 	atomic_set(&lnk->conn_cnt, 0);
-> 
-> I think this isn't unlikey, we haven't signal the RDMA WRITE wr, so it
-> shouldn't have CQEs when wc->status == 0.
-> If we are here, wc->status should always != 0.
+> I'm not sure what you want me to say here.
 > 
 
-Nice catch, I mixed this up with the rwwi version.
+No doubt that larger factors help overcome imbalance issues, and it's 
+fine to recommend using 4x (or even larger) factors.
 
-> 
-> >+}
-> >+
-> >+static void smc_wr_reg_process_cqe(struct ib_cq *cq, struct ib_wc *wc)
-> >-		       sizeof(*link->wr_tx_v2_pend));
-> Why remove this memset ?
-> 
-> >-		memset(link->lgr->wr_tx_buf_v2, 0,
-> >-		       sizeof(*link->lgr->wr_tx_buf_v2));
-> >+		memset(link->lgr->wr_tx_buf_v2, 0, sizeof(*link->lgr->wr_tx_buf_v2));
-> > 	} else {
-> >-		link->wr_tx_pends[pnd_snd_idx].wc_status = wc->status;
-> >-		if (link->wr_tx_pends[pnd_snd_idx].compl_requested)
-> >+		if (tx_pend->compl_requested)
-> > 			complete(&link->wr_tx_compl[pnd_snd_idx]);
-> >-		memcpy(&pnd_snd, &link->wr_tx_pends[pnd_snd_idx],
-> >-		       sizeof(pnd_snd));
-> >-		/* clear the full struct smc_wr_tx_pend including .priv */
-> >-		memset(&link->wr_tx_pends[pnd_snd_idx], 0,
-> >-		       sizeof(link->wr_tx_pends[pnd_snd_idx]));
-> 
-> ditto
-> 
+The point is, when this comes with a selftest, it's less of a 
+recommendation/guidance anymore, it becomes kind of a requirement, an 
+expected behavior. Otherwise the test fails.
 
-Looks like I accidentally deleted this code, I will restore it in the
-next version.
+This ignores multiple other considerations:
 
-> >-		memset(&link->wr_tx_bufs[pnd_snd_idx], 0,
-> >-		       sizeof(link->wr_tx_bufs[pnd_snd_idx]));
-> >+		memset(&link->wr_tx_bufs[tx_pend->idx], 0, sizeof(link->wr_tx_bufs[tx_pend->idx]));
-> > 		if (!test_and_clear_bit(pnd_snd_idx, link->wr_tx_mask))
-> > 			return;
-> > 	}
-> > 
-> >-	if (wc->status) {
-> >+	if (unlikely(wc->status)) {
-> > 		if (link->lgr->smc_version == SMC_V2) {
-> > 			memset(link->wr_tx_v2_pend, 0,
-> > 			       sizeof(*link->wr_tx_v2_pend));
-> >@@ -128,44 +117,12 @@ static inline void smc_wr_tx_process_cqe(struct ib_wc *wc)
-> > 		/* terminate link */
-> > 		smcr_link_down_cond_sched(link);
-> > 	}
-> >+		smc_wr_rx_init_cqe(&link->wr_rx_ibs[i].cqe);
-> >+		link->wr_rx_ibs[i].wr.wr_cqe = &link->wr_rx_ibs[i].cqe;
-> >+		link->wr_rx_ibs[i].index = i;
-> >+	}
-> 
-> Can we group all those xxx_init_cqe into a function and move them out of
-> smc_wr_alloc_link_mem() ? All what smc_wr_alloc_link_mem() is all about
-> allocating memory.
-> 
-> Maybe we can define a smc_wr_init_cqes() and call it in
-> smc_wr_create_link() ?
-> 
-> 
+1. Existing behavior: In general, mlx5e today implies 2x factor, so it 
+would fail this new test.
 
-Sounds reasonable, I'll implement this in the next version.
-Additionally, other items like removing redundant fields and renaming
-the index will also be addressed in the same update.
+2. Device resources: In large scale (high num of channels, or high num 
+of netdevs on the same chip, or both), it is not obvious that increasing 
+the indirection table size is still desirable, or even possible. To pass 
+the selftest, you'll have to limit the max number of channels.
 
-Thanks,
-D. Wythe
+3. ch_max should win: Related to point #2. Driver should not enforce 
+limitations on supported ch_max just to fulfill the recommendation and 
+pass the test. I prefer flexibility, give the admin the control. That 
+means, driver would use 4x factor (or larger) whenever possible, but 
+would not block configurations in which the 4x factor cannot be satisfied.
 
-> Best regards,
-> Dust
+
 
