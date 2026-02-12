@@ -1,288 +1,370 @@
-Return-Path: <netdev+bounces-258413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aE7TG3p+jWl93QAAu9opvQ
-	(envelope-from <netdev+bounces-258413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:17:14 +0100
+	id kIbZD6p+jWl93QAAu9opvQ
+	(envelope-from <netdev+bounces-258414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:18:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14CCD12AE56
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:17:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC6912AE65
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:18:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2EB4A301D4FB
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 07:17:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 405C63021959
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 07:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6E4291C07;
-	Thu, 12 Feb 2026 07:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2C72BD5AD;
+	Thu, 12 Feb 2026 07:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vjDlEWex"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rkY0ARSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA37221D9E
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1CD3EBF00
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770880630; cv=pass; b=E9atAWfD9CFBpqfh2tcAEhzbtutap0t+ON6NZXGdTG9cNoMVhsOI6hEmCnun35YKlg/A4kzbZ6aoapwbzdXZdLKBNjbWn/lOieu5uqLVKrbNcImJFIsXX1YxRqvNd4M/w3/rVg/RRGIEOclGKl1wpWRQrctXPXrWUUzBtL4jR9M=
+	t=1770880678; cv=pass; b=q2RYJkLOt30C5jc1HK631AZfVB2LBh+NjG2ie8NTJcUU0bIF1lwlRUhfaGp73eeKci2ci+NY0tbpM84QNtPhuDIOsVoVQVCdYYi1A5b2QjaYWKNiq3luYF2EjVYq9X7e0Ldb1CuOfwwWQZPFXqfuRpAOmjr/M9C9WYAL0vELV+I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770880630; c=relaxed/simple;
-	bh=5dKyNqtSv+8+nW0M8u8B/TNdAd78HmYWkm0JDenM2Rk=;
+	s=arc-20240116; t=1770880678; c=relaxed/simple;
+	bh=3JUYhEjG86u79GzhS2NXkVdzj4AGSv4a26ZGnvYxQ18=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YxxKT1uertUKBIJmJQ3Jg9+PhKpqi4F8zYqBGiyG6M9Hk+N/cdavi3n/jjqnjYAsTAsiVQeyHWX6S+nsxWv/OZhmbip3Mp1V6W/kHJxMtI0pNkhzZEu6taJLPm/43PvXTYFK3qegLU/LgaIDwrB2A91weXiEXpmGcALa9Pw1+kY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vjDlEWex; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5014600ad12so55120701cf.2
-        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:17:09 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770880628; cv=none;
+	 To:Cc:Content-Type; b=PRlYXmSvZNxRSSASFkJBQUDvWg6yXy0NWN9NCmwMD/EHx3Wv01czSPzFftePAG7/7kfkd/DSov55yfxuuZlyaL0VcHJu6qAbvMe9hsfVRf3h2xZibCcXkESl+55G3Haoax6rjuWKgJNNMRF5eJy8OkOOikarOjpcpIXbvigjGE0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rkY0ARSt; arc=pass smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-65807298140so4304602a12.2
+        for <netdev@vger.kernel.org>; Wed, 11 Feb 2026 23:17:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770880676; cv=none;
         d=google.com; s=arc-20240605;
-        b=eQAmhRBvH3Lgwg8oTPMDUai/+RO+V0++nf1m1jW8y47/XuDFhqUHL9gnm08rLatMD6
-         teMGHG60RPGfQp3gu251AJfqvs22g6pLzWr4MphyzNf+yWSU1aoEXKTYbx878iSCl6OA
-         Kfvu2xm/AEmhX8L24cMhsNf836WCpT1KpNPwN75GoXe7QoeDNvqtbqQzeAvsWdRPO0GZ
-         bnBwTV+Er9zmczDzX0geOMyZjmV4Jc5G9b4Rm+fUO6cNqGgbJ+D9eDTCqsKwKJ4mHJT1
-         joeOL1APVGY5plrMI9QskKpHnqqw/vjS4HRbcaAPbvS0tLZcpy2hhiemR2TvSIzoEsjh
-         Jvbw==
+        b=TSPJuUqy7eQ5hMX5Jz6+n0pByZSJmoCt2zaRo2aTdmhSLnCIijC8BkMMYQtUTor+Ts
+         c8fRGLE81ix5sd/pSVarTl8Xlgacu+18x/kye/5nek5u3ngJFRdoaE7MHwjtCdrxqlhh
+         2cVDrFHYntLWF0bGemXNdURNmGG7UY9Zx1VIqLUnbSUnnL+YBlfeSTJwtC5JKNZpbv/p
+         lYHmE2VNUme/D8272rwA/AEfuaaQKVnQLFeNdnJuf+hKRf0JzOIqUW84gjC2jqs7bo0H
+         /e/sOnP4pdOvqoFPw1O8H6uwsUGqKW41M9vba2Kt1L3+GU6qIXbgs1pXecavleZm+9BR
+         MiJw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=yltUO2cOxxVoQIpCKjjDxarQqdo4BfaqnH+MtRjb2qE=;
-        fh=3x2WntZbHAFsmM9EvBDTj5tLXoFg79CuAD4CUwDK7JI=;
-        b=C7qBXTYqFRtd/eEyKuK1An0p1IvJgiJkArvl1BmlzfWEh7RcHGKMW9cnTpDOyYFz0t
-         FBm66w1cEYNGxTaLZl3q6g0w0k9w8lQpa9GMAbyptriUWsUVyqD16xD4WUyyj1UkwCZy
-         VX3MqWG9VpnSWX6cSRzjqgDEY1NolMyw6xYOglEehwNhpsMMGalaZ/igij+C+ilXeay7
-         nF1UY/DRSi9zvlpKsc2KDoWYu3P+9xn1Uv340jhmp548B9PlV13tIdKiNk//7oYWm7tE
-         m8+1yAkBmJhRAfvUOnPbxdMLcjhAEIXeebfIgeFzX8DXHRLcjiGlcR1krJB5cOwSmDuV
-         GhMw==;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=4VtkmaXYDRoBb0Ii/zZutz9SPx4ofKw8c7aX2qO71JI=;
+        fh=4EGbw29F64yT/t9bnyYezibBss6f3zOgL0Tg+PqFIXM=;
+        b=QdUP8kq2X8/8slckU5CUdG9XKE3K3ySJv5Yr4Ki8tZuAcEQ1Vnz+Rb4icgT0jUDLl8
+         HLUPOAOd2bon9vFcmWD4bayBvoCgo485T0C++3eFvXv+JBJ6nU1i7YTFnqV8uMSPCOn0
+         MEEabEkY0/Gn/UcHUsZX8wCEr+sQVYRkL+NEy7DXb9c0iS2+ruM3a5G3FKNc3VPyHDPA
+         qBtIfz0lGWcktrT7vbYPkicxzpBSM4GpYjQGSJClGIWblOV1KUcfcme/CKcnmKQ7d+nm
+         28PV18orkzaKTksuDj6mcOkCw7BkWReZ9fCbeFg8BTCE4feIiM0gqAaJMJmGJHq72s4O
+         i64Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770880628; x=1771485428; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yltUO2cOxxVoQIpCKjjDxarQqdo4BfaqnH+MtRjb2qE=;
-        b=vjDlEWexGYxzW6pqyk3Cbue1qnWzOnmS9EzJyLey05dAtBlV1YplIiDLgk6nDDOWrb
-         2y1IRTyYkozd/eSLQdYfMAtc3A5SVHIgPFWD5JJxwnDriCa6jGvp6xJ1LZTwJp5UlvNb
-         0Mg2EhoMbGogXoKHpYUwZIel+dPclQQCx7fOJ9BBhmjsRIR3k/NSDGa+Op2IHhIx7wW+
-         ms9pgGjR8g3kjjCMDW3KJ41cvkhRPLfsmHqf/GZFUipIhilzgMoxg/D11KNjfjvIi1Gm
-         vn6jPb4ZxZcga7xNtxS6Z6A9JUHlorQrgKnPQ0FwvLz7TqD6t9G7wITeP9WTRYKqew25
-         2YCg==
+        d=linaro.org; s=google; t=1770880676; x=1771485476; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4VtkmaXYDRoBb0Ii/zZutz9SPx4ofKw8c7aX2qO71JI=;
+        b=rkY0ARSt3TOLfqzD+HTUxHajiAzuUb0ekbyaW2WLRD507nz6VTMp4G9zfrM9yP7FWk
+         qslPozqDpbI04Z7zO40qyEPorafldUc94k42/KBMatwJp02FDkG31xn4JNVhvsVEef29
+         10Chl+Grox8n1DzSMfDOZhiBHKwrMME4Z20qA8Z1Pqy5Ivq7BAiV3zi81S2i8tau8qaF
+         Z8MBA+nSEqSPVmPfLqTt5a4Fjb+hh0Xaoo0uW39+oLB1mzwSmh6RtCC9fT3YVh69qA3r
+         5MC9g4WbuiueUkuEhGFDzc90EDVtx/3iPkXL7cKutZrznxZIhmBsm1km5bnsHCkE031L
+         ed0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770880628; x=1771485428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yltUO2cOxxVoQIpCKjjDxarQqdo4BfaqnH+MtRjb2qE=;
-        b=jWJ4M+Im+6/43tZG3DeVzueN3w+hH7CK5LQ7gwbPAp2tMCe5xK/D5SNg1DG4bOb04p
-         2n3+DO4RIoBDrSZYWxtPhmvtOMuxEZeB/2uoItpKXfDm31gkKGhIqFJb/1vIeARE9HRB
-         v0ed4Lb5SHpS4yCMTnmIbPhFfpjA3YBnZIE2I0rvtLH6C7I76X/w0DycB1IZ1kyl9Kni
-         YqH7XQyvk08xS2TmoGWq45URjQbex+eilH9cxZEF7crr2FjcJAB/Vrg5Fr1pJv2u/+2x
-         Hd5O7dI5L7Nrp8HpL7rzhWVkBgQwyepq0gyJU4qXrjZtyvGK4ioa5DvzPxM/2Qb50BtU
-         dPvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVr5bw2++4wuuq/t/3Xcz6G2aSJJYyZuWXYpu+F50XjEZ5NJhUJ133NHifnvqBbqkUA6/gU+h8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyED31WfZPcwKY3GMCZ/nMHhT+mmOshRvpXO6hadZXWvdZo+fp7
-	xoQRIb8vTj/laLMClIbLm0oxwSZKiWoN+u9xdP/gysfiNZ1fyLE2HC7YcXu24wof5B3oJxhRa2m
-	8vsiUSxy2jJTW1H32bxNKNMC7mAYg1iZhHl3oIIY2
-X-Gm-Gg: AZuq6aK6HHhPwATYhvBpU+envUndHERJHUT773VP7G/SKSPYHUnHYTS0RUSTZOH2OKA
-	leeEQoYgjgnltgy9W/I180xksxuxyXl7bZ+jMwAZMh1DD4MUvLmtCFq1Q5y7k90wBQ9Ra//rlqR
-	v7jMRyT+QJ7L2KRsrDLMmx0OYbD2M+S9WKxBonjl/9EOE40uaXuI2e6G+WMTfEBUFWzTb0hybu5
-	CzKEmzRU4B1k9pPMVVVex77ZG2rmoqc2y8n8szc4G07oFkg4QQrfVgsUK6pvFq4jOTm36pRet5Q
-	DB36ExGh
-X-Received: by 2002:a05:622a:148f:b0:501:46b7:22b2 with SMTP id
- d75a77b69052e-50691f68782mr25609751cf.82.1770880627918; Wed, 11 Feb 2026
- 23:17:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770880676; x=1771485476;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4VtkmaXYDRoBb0Ii/zZutz9SPx4ofKw8c7aX2qO71JI=;
+        b=YehJRNsOV5Z+C2wDDBjbCZPxrYqMy/DXrWQsN/Ro446bH6FgW4rXansnV7fxPi9dyp
+         QchA2GsWH/x8IvgmZuF3LAAp1h7J6B2ylbNnGkIbW5MwKQ50vD1FnQ3SYRLKCOmWsqtI
+         dpxkdkInb7Ty1s3PE3IAxzzf+VU/xLMKr9u81Ki7CuxRUmPb9Df1r5zX+CF5z8lQgtQB
+         q+/OscWjtfGzTE1cYhzJJP2ZQxX8tfsAlEjW15DXtPCuFHjhWyiAzDkWLmnkn5thRhJa
+         SEXk09tUqFPfjxdXrJSbDRnQ2evA3g6JqRlZkC9F2WVFaRD+oFK3GKVOROFgo0PBCAAO
+         /XvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWR4pRjPjxp3f01jrQAJ0KkKSkGfAJHBhZ5tBXaT7aWcvAgNd7GMzH0ZPuVJM4z1jqZeYaI7o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4PejdpgIG6EfkvKacVNjgyDxjkGNhk9CG4nD1viCMDletboMC
+	nXBlT8oSj87BWr98mqhcv4ffDwlTZmyOWGwQVoLyJQva50sTCz2F2aCkoASZ8FZhfwK6lapnIq5
+	NQ5BYghrSnhkXxxIufoF52e4WDdREGp8XJD9iMIMKUQ==
+X-Gm-Gg: AZuq6aKMjGRKVmbwkubj6JNCxFWRWIB9FjGmjKiMeItWgeniomrO9SX6ytEQMTA/Cq2
+	deyztn2wWfIUwGKDYJ1SUO8VxwhnboyK5oPC+/N/ijwQwRQ0Gm3IxUm24y3geLggixHYED1LqcK
+	gpi9kLViactsBtAgqsYgXE+0RxiJJ5Fg0IKsf1ABd/XESgt8PXjHcG1vGvoP+ojHNKVn4lxqEoU
+	rkfoDA2HxvnVECFVbiH7tnZP0bCWnYDndjsjJsSdZWbeiaKeLIqAx4b8zV18c2eK9a59bgSzfDK
+	hkmS6/pVUdR8H2GSCcuwjfIkn96ytefORhFp
+X-Received: by 2002:a05:6402:2690:b0:658:bab5:57f4 with SMTP id
+ 4fb4d7f45d1cf-65b9db110b9mr587533a12.23.1770880675576; Wed, 11 Feb 2026
+ 23:17:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260211103243epcms1p2dd304fd11b28df04f4e680e8c90a7fc5@epcms1p2>
- <207b2879-e022-4b50-837b-d536f8fcabcd@suse.de> <CGME20260211030048epcms1p54c6ed78458f57def8e3163032498ca00@epcms1p7>
- <CANn89i+mNojd9mUL_dt_=D+7nZ9xcV96CYJG_LYFmBZDOYUMFQ@mail.gmail.com> <20260212002207epcms1p7a1c19ed12038cf74f8632e5a305bd7ec@epcms1p7>
-In-Reply-To: <20260212002207epcms1p7a1c19ed12038cf74f8632e5a305bd7ec@epcms1p7>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 12 Feb 2026 08:16:56 +0100
-X-Gm-Features: AZwV_QgqTD6QqUZeQpStnEGD1Af1tXL6z0Hf9erBzMxQ2x7izWr-zSLdtDTfSGQ
-Message-ID: <CANn89iJ6MJxh7BFjVdBMBLYeopgJ52Sbg7jEfQbQeQ-n0MUOTw@mail.gmail.com>
-Subject: Re: (2) [net-next,v3] ipv6: shorten reassembly timeout under fragment
- memory pressure
-To: soukjin.bae@samsung.com
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"dsahern@kernel.org" <dsahern@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"horms@kernel.org" <horms@kernel.org>, "phil@nwl.cc" <phil@nwl.cc>, 
-	"coreteam@netfilter.org" <coreteam@netfilter.org>, "fw@strlen.de" <fw@strlen.de>, 
-	"pablo@netfilter.org" <pablo@netfilter.org>
+References: <20260203161917.1666696-1-vincent.guittot@linaro.org>
+ <20260203161917.1666696-2-vincent.guittot@linaro.org> <20260210004011.GA2188625-robh@kernel.org>
+In-Reply-To: <20260210004011.GA2188625-robh@kernel.org>
+From: Vincent Guittot <vincent.guittot@linaro.org>
+Date: Thu, 12 Feb 2026 08:17:44 +0100
+X-Gm-Features: AZwV_Qj567pfCDwzOGI7nJVgtwTDzptXPKhrNBHBCOrwOw7GShjTLukyePRdLLo
+Message-ID: <CAKfTPtA299R7yn3r=tCqhhP_tK3E_UpGSMrDLyRP4Ccwt1m58g@mail.gmail.com>
+Subject: Re: [PATCH 1/4 v2] dt-bindings: serdes: s32g: Add NXP serdes subsystem
+To: Rob Herring <robh@kernel.org>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com, 
+	p.zabel@pengutronix.de, linux@armlinux.org.uk, ghennadi.procopciuc@nxp.com, 
+	Ionut.Vicovan@nxp.com, linux-phy@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	horms@kernel.org, Frank.li@nxp.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-258414-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258413-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,ietf.org:url,samsung.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:email]
-X-Rspamd-Queue-Id: 14CCD12AE56
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vincent.guittot@linaro.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	DBL_PROHIBIT(0.00)[2.105.173.0:email];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,linaro.org:email,linaro.org:dkim,nxp.com:email,0.0.0.0:email,devicetree.org:url,0.0.0.1:email]
+X-Rspamd-Queue-Id: CFC6912AE65
 X-Rspamd-Action: no action
 
-On Thu, Feb 12, 2026 at 1:22=E2=80=AFAM =EB=B0=B0=EC=84=9D=EC=A7=84 <soukji=
-n.bae@samsung.com> wrote:
+On Tue, 10 Feb 2026 at 01:40, Rob Herring <robh@kernel.org> wrote:
 >
-> >On Wed, Feb 11, 2026 at 4:11=E2=80=AFPM Fernando Fernandez Mancera
-> ><fmancera@suse.de> wrote:
-> >>
-> >> On 2/11/26 11:32 AM, =EB=B0=B0=EC=84=9D=EC=A7=84 wrote:
-> >> >   Changes in v3:
-> >> > - Fix build bot error and warnings
-> >> > - baseline update
-> >> >
-> >> >
-> >> >
-> >> >  From c7940e3dd728fdc58c8199bc031bf3f8f1e8a20f Mon Sep 17 00:00:00 2=
-001
-> >> > From: Soukjin Bae <soukjin.bae@samsung.com>
-> >> > Date: Wed, 11 Feb 2026 11:20:23 +0900
-> >> > Subject: [PATCH] ipv6: shorten reassembly timeout under fragment mem=
-ory
-> >> >   pressure
-> >> >
-> >> > Under heavy IPv6 fragmentation, incomplete fragment queues may persi=
-st
-> >> > for the full reassembly timeout even when fragment memory is under
-> >> > pressure.
-> >> >
-> >> > This can lead to prolonged retention of fragment queues that are unl=
-ikely
-> >> > to complete, causing newly arriving fragmented packets to be dropped=
- due
-> >> > to memory exhaustion.
-> >> >
-> >> > Introduce an optional mechanism to shorten the IPv6 reassembly timeo=
-ut
-> >> > when fragment memory usage exceeds the low threshold. Different time=
-out
-> >> > values are applied depending on the upper-layer protocol to balance
-> >> > eviction speed and completion probability.
-> >> >
-> >> > Signed-off-by: Soukjin Bae <soukjin.bae@samsung.com>
-> >>
-> >> Hello,
-> >>
-> >> isn't this what net.ipv6.ip6frag_time does? In addition, the situation
-> >> you described could be overcome by increasing the memory thresholds at
-> >> net.ipv6.ip6frag_low_thresh and net.ipv6.ip6frag_high_thresh.
-> >>
-> >> Please, let me know if I am missing something.
+> On Tue, Feb 03, 2026 at 05:19:14PM +0100, Vincent Guittot wrote:
+> > Describe the serdes subsystem available on the S32G platforms.
 > >
-> >Also :
+> > Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
+> > ---
+> >  .../bindings/phy/nxp,s32g-serdes.yaml         | 154 ++++++++++++++++++
+> >  1 file changed, 154 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
 > >
-> >1) net-next is closed.
-> >Please read Documentation/process/maintainer-netdev.rst
+> > diff --git a/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> > new file mode 100644
+> > index 000000000000..fad34bee2a4f
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/phy/nxp,s32g-serdes.yaml
+> > @@ -0,0 +1,154 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/phy/nxp,s32g-serdes.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: NXP S32G2xxx/S32G3xxx SerDes PHY subsystem
+> > +
+> > +maintainers:
+> > +  - Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+> > +
+> > +description: |
+> > +  The SerDes subsystem on S32G SoC Family includes two types of PHYs:
+> > +    - One PCIe PHY: Supports various PCIe operation modes
+> > +    - Two Ethernet Physical Coding Sublayer (XPCS) controllers
+> > +
+> > +  SerDes operation mode selects the enabled PHYs and speeds. Clock frequency
+> > +  must be adapted accordingly. Below table describes all possible operation
+> > +  modes.
+> > +
+> > +  Mode  PCIe XPCS0           XPCS1           PHY clock       Description
+> > +                SGMII                SGMII             (MHz)
+> > +  -------------------------------------------------------------------------
+> > +  0  Gen3    N/A             N/A             100             Single PCIe
+> > +  1  Gen2    1.25Gbps        N/A             100             PCIe/SGMII
+> > +  2  Gen2    N/A             1.25Gbps        100             PCIe/SGMII
+> > +  3  N/A     1.25Gbps        1.25Gbps        100,125         SGMII
+> > +  4  N/A     3.125/1.25Gbps  3.125/1.25Gbps  125             SGMII
+> > +  5  Gen2    N/A             3.125Gbps       100             PCIe/SGMII
+>
+> Mixed tabs and spaces. Drop the tabs.
+
+okay
+
+>
+> What's not clear to me is do you have 2 or 4 lanes?
+
+2 lanes per serdes
+as an example mode 0 is one PCIe x2 lane
+and mode 1 is one PCIe x1 and one xpcs0/SGMII on lane 1
+or mode 3 is one  xpcs0/SGMII on lane 0 and one xpcs1/SGMII on lane 1
+
+>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    oneOf:
+> > +      - enum:
+> > +          - nxp,s32g2-serdes
+> > +      - items:
+> > +          - const: nxp,s32g3-serdes
+> > +          - const: nxp,s32g2-serdes
+> > +
+> > +  reg:
+> > +    maxItems: 4
+> > +
+> > +  reg-names:
+> > +    items:
+> > +      - const: ss_pcie
+> > +      - const: pcie_phy
+> > +      - const: xpcs0
+> > +      - const: xpcs1
+> > +
+> > +  clocks:
+> > +    minItems: 4
+> > +    maxItems: 5
+> > +
+> > +  clock-names:
+> > +    items:
+> > +      - const: axi
+> > +      - const: aux
+> > +      - const: apb
+> > +      - const: ref
+> > +      - const: ext
+> > +    minItems: 4
+> > +
+> > +  resets:
+> > +    maxItems: 2
+> > +
+> > +  reset-names:
+> > +    items:
+> > +      - const: serdes
+> > +      - const: pcie
+> > +
+> > +  nxp,sys-mode:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+>
+>        maximum: 5
+>
+> Though isn't this redundant with the child nodes? You could use the
+> standard 'phy-mode' property in each child.
+
+not really because we can have mode 1 but only a node to describe
+lane0 for PCIe x1 if the lane 1 is not used
+
+>
+> > +    description: |
+> > +      SerDes operational mode. See above table for possible values.
+> > +
+> > +  '#address-cells':
+> > +    const: 1
+> > +
+> > +  '#size-cells':
+> > +    const: 0
+> > +
+> > +patternProperties:
+> > +  '^serdes[0,1]_lane@[0,1]$':
+>
+> Do you need to support serdes0_lane@0 and serdes1_lane@0 (or similar
+> with "@1")? That's illegal as you have 2 nodes with the same address.
+
+okay, we can find other naming
+
+>
+> > +    description:
+> > +      Describe a serdes lane.
+> > +    type: object
+> > +
+> > +    properties:
+> > +      compatible:
+> > +        enum:
+> > +          - nxp,s32g2-serdes-pcie-phy
+> > +          - nxp,s32g2-serdes-xpcs
+>
+> Seems like phy-mode would be sufficient. Are these separate blocks from
+> the parent?
+
+Isn't phy-mode only for ethernet phy ?
+
+here we have either a PCIe phy or a xpcs instance which are referenced
+with phandle
+
+>
+> > +
+> > +      reg:
+> > +        maxItems: 1
+>
+> Just 'maximum: 1' instead.
+
+okay
+
+
+>
+> > +
+> > +      '#phy-cells':
+> > +        const: 0
+> > +
+> > +    required:
+> > +      - reg
+> > +      - compatible
+> > +
+> > +    unevaluatedProperties: false
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - reg-names
+> > +  - clocks
+> > +  - clock-names
+> > +  - resets
+> > +  - reset-names
+> > +  - nxp,sys-mode
+> > +  - '#address-cells'
+> > +  - '#size-cells'
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    bus {
+> > +        #address-cells = <2>;
+> > +        #size-cells = <2>;
+> > +        serdes0: serdes@40480000 {
+> > +          compatible = "nxp,s32g3-serdes", "nxp,s32g2-serdes";
+> > +            reg = <0x0 0x40480000 0x0 0x108>,
+> > +                  <0x0 0x40483008 0x0 0x10>,
+> > +                  <0x0 0x40482000 0x0 0x800>,
+> > +                  <0x0 0x40482800 0x0 0x800>;
+> > +            reg-names = "ss_pcie", "pcie_phy", "xpcs0", "xpcs1";
+> > +            clocks = <&clks 1>,
+> > +                     <&clks 2>,
+> > +                     <&clks 3>,
+> > +                     <&clks 4>,
+> > +                     <&serdes_100_ext>;
+> > +            clock-names = "axi", "aux", "apb", "ref", "ext";
+> > +            resets = <&reset 9>,
+> > +                     <&reset 8>;
+> > +            reset-names = "serdes", "pcie";
+> > +            nxp,sys-mode = <1>;
+> > +            #address-cells = <1>;
+> > +            #size-cells = <0>;
+> > +            phy_pcie0: serdes0_lane@0 {
+> > +              compatible = "nxp,s32g2-serdes-pcie-phy";
+> > +              #phy-cells = <0>;
+> > +              reg = <0>;
+> > +            };
+> > +            phy_xpcs0_0: serdes0_lane@1 {
+> > +              compatible = "nxp,s32g2-serdes-xpcs";
+> > +              reg = <0>;
+> > +            };
+> > +        };
+> > +    };
+> > --
+> > 2.43.0
 > >
-> >2) We do not send 3 versions of a patch in the same day.
-> >Please read Documentation/process/maintainer-netdev.rst
-> >
-> >3) What about IPv4 ?
-> >
-> >4) Only the first fragment contains the 'protocol of the whole
-> >datagram', and fragments can be received in any order.
-> >
-> >5) We do not add a MAINTAINER entry for such a patch, sorry.
->
->
-> Hello,
->
->
-> Regarding about net.ipv6.ip6frag_time and low/high_thresh:
->
-> The issue we are addressing currently occurs due to a large volume of mDN=
-S
-> traffic from WiFi APs. As a temporary measure, we increased the high_thre=
-sh
-> value to accommodate the traffic.
->
-> However, UDP traffic such as mDNS cannot recover once a fragment stream i=
-s
-> lost, leading to wasted memory. Therefore, this patch is intended to make
-> more efficient use of the currently allocated fragment memory by shorteni=
-ng
-> the reassembly timeout under memory pressure.
->
-> Also, we tend to avoid changing the global value of ip6frag_time to
-> preserve existing behavior. This is why I added new config too.
->
->
-> Regarding others:
->
-> 1, 2) net-next is closed and multiple patch
-> I apologize for the oversight regarding the net-next status and the frequ=
-ent
-> submissions. I was tried to fix CI build failures. I will follow the
-> documented guidance going forward.
->
-> 3) What about IPv4?
-> The issue was primarily observed in IPv6-dominant IMS environments, which
-> was the initial focus. However, I agree that the same memory management l=
-ogic
-> is beneficial for IPv4. I will include IPv4 support in the next version t=
-o
-> provide a unified solution.
->
-> 4) Only the first fragment contains the 'protocol of the whole datagram'.
-> You are correct. I will update the logic to store the L4 protocol informa=
-tion
-> once the first fragment is received, and only then apply the adjusted tim=
-eout.
-> If the first fragment is lost, the adjusted timer will not be triggered, =
-but
-> this is acceptable as a partial case.
-
-I do not think we will accept a patch trying to 'fix' reassembly. This
-is fundamentally not fixable.
-
-I can tell you that in crowded wifi environments, I have seen delays
-of 30 seconds (and more) to complete
-a datagram of only 2 fragments. Your default settings are not viable.
-
-If you depend on receiving fragments, change the existing tunables.
-Instead of :
-
-/proc/sys/net/ipv6/ip6frag_high_thresh:4194304  (4 MB)
-/proc/sys/net/ipv6/ip6frag_low_thresh:3145728 (3 MB)
-/proc/sys/net/ipv6/ip6frag_time:60
-
-Use:
-
-/proc/sys/net/ipv6/ip6frag_high_thresh:104857600  (100 MB)
-/proc/sys/net/ipv6/ip6frag_low_thresh:78643200 (75 MB)
-/proc/sys/net/ipv6/ip6frag_time:60
-
-Of course, avoiding fragments is the right solution.
-
-https://datatracker.ietf.org/doc/html/rfc6762#section-17
-
-TCP should avoid using frags by default.
 
