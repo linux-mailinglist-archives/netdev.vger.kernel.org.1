@@ -1,189 +1,161 @@
-Return-Path: <netdev+bounces-258428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0I3jDmagjWky5gAAu9opvQ
-	(envelope-from <netdev+bounces-258428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:41:58 +0100
+	id wI42B3eijWlh5gAAu9opvQ
+	(envelope-from <netdev+bounces-258429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:50:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9992B12BF81
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:41:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BBDC12C078
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 10:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 749BB3013787
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 09:41:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31BCD308E37B
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 09:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA35E2DF6F6;
-	Thu, 12 Feb 2026 09:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B862BF00B;
+	Thu, 12 Feb 2026 09:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgYLzNUU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fDHiFy8K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0902DCF7B
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 09:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E94F2C234C;
+	Thu, 12 Feb 2026 09:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770889283; cv=none; b=QSALHbP8k8Ta9xJth7EPhsZD4+PjbwiX0KooMy9I0VO91yVT2DvGxtm6i0+3dgqeeEJPd1nYsNGwzHosKZ7aCjUpXtpwQgOsilEBbL3ZQYzg7uM7ORbjpgqkqRqWPsZRLFE3hpnefUTJ2NfWcephNZI1B8vmUwiwHDv3FtYLfIY=
+	t=1770889820; cv=none; b=dcqmr9/LMHLoW2d0eybA+xzaKxtbZhm2UIpqbEhvlzVedKFqtAPpLYTkP0AMQUtzK3++uD9VGM7y08gw0N7uxLHKhKjoTnLvLd6Gi7cc0cxWfXRiFV6AqJAc8/1eSrR9J2dKDWcfw+XyrjuI2glpHsdfnbYoLqJsByS+WxFq9HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770889283; c=relaxed/simple;
-	bh=yIY/11Dq1CPkCm/A2dAowYLqnGZWKwSB10TrnqAw+10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nufek9xMaoVi83I0+bO/2Z65qzce7mXqe3YHMSKHLQx5NtIlNmZ3XX51aGJ46f2o+O/VuEXCRUXdPqGz5D8R19qSVWLpI0Nq5RBtRSUt/UDe55vPgt1JR7KZv5PXnrGissqj69rOMd8NEI7rP0ILSEqV4sZ0OW6h8cSKEYOCiwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bgYLzNUU; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-436309f1ad7so4299374f8f.3
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 01:41:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770889281; x=1771494081; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nwjxeLZCnF17rcxqGqeGmiS56iGGEOFnXmQIiNjxVnc=;
-        b=bgYLzNUUZD2HqtlSiww6qDfu0GL/itYcSfZ9JKl3P6gq8f3VcXGcQXQ8eXrRWRNnnG
-         2KPWACV64CVhls0FL1j421mdxVf5VeDlkUfzxEmzvfH62RsweUL+6WSsrIxpVLAjXgE8
-         LYYfyfsu/7f1iNPSU+yCRO8aohRvWbFQV30a93WpBJxWVS+vFquTLmHYI3JDiIpfM+OS
-         W76Fyz5xs+Xz4Pruom3UfmA6BAlWZI1ANVvEYsueQIw9xv9N3y7ApRtCO+SF9fNcrVG1
-         SJJsohE03108YMOSgNVuM8YqgeYlQjW8jQJ0yjp4ZizhCdAPAljpNb30ZIygNMa9kZTs
-         emeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770889281; x=1771494081;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nwjxeLZCnF17rcxqGqeGmiS56iGGEOFnXmQIiNjxVnc=;
-        b=trCC6O0HiruXadGY19BL7B5zC4SUKMpF5x7tIIh6pIeSkyJw1Qp13+UxQydNys8g9Y
-         LlWSfZ9jrI9qiKmMVp6X/bWG0pHFvM6ue+yHieKTeqvNUXihi742VtuLbPCHwriw6q97
-         HbM7qjD4cscXCm0f2BLSoj6rAGlMdmP7lhsNDIwWLZISLa1Rg5KlX5HEPbVSm8iSZPTQ
-         j27JISXxXiQTnX4zJusvKSCppWPaaO2YEkiPGl+M3S0vGh5RWhuRkhMaOfYDQz9xOd6a
-         5UarVJRt2LcX5u/e2Tbdr5taInWZ9Ww+Lr78OAKM2lXdUzCsroFFXwVpZtIfIT41cwhS
-         zY8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUlhdsw2FLihrqzWvQzyJPhsp62vvnD5PW6XV5nHee4koziaVEqlTDSHzd+Y1zV54nI12E/wLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzlu16xXKcgPISOr238lquVO0eo+4oI+mkREd8q9Nt2w9Ebdtsz
-	gSegqA5Uyh8MAcsuD9sd1XPdAt8gkY3fAkBH7plY1BJXd8Oc4jXUBRJ4
-X-Gm-Gg: AZuq6aIv9jlSasotx5RUvzjQUbNpee6WTPMzmjvjCIBCVfpjtv8ED6OLfA5CDfyTk/7
-	U0O0Y7ClkkF5/3jqL3t8yxoj4G/PQN+4B18UyWBoYfwUada7NC1cXCMp4M++PSlImnWq1jU0yLe
-	05HiCUEEHqyThxqXlsmpGi97D5kpkqx5J5WI5m7Dl8JSkocwDUWv7qIci5xnY4KSMDpo25sL0T9
-	ODB5b95qNVxYrq7GVpd2qo6zAoC4vnBql6RSX8ktLgsO32xan5XpDWBkPMurv3P4JH8izaCt7Fx
-	asQmZJ6Hoo+9GcepU+oGYgf8hZpahOTPv1VGPC2SWlvyYZiI3M7qazndFlNoqX4dRszJ6aG0M/c
-	eRJw3sa5ftiXah2OGbVdbgc3n2E6p30QjNlWqyxI6gPphMNybFix7s+XCge1J8K0dxcl2IVscL/
-	C7qzSfbWPzfA6xuBFIAgif+TbyVhlOOtcIvYqAWIUQQYp3BQ==
-X-Received: by 2002:adf:e50d:0:b0:437:8ff8:fea3 with SMTP id ffacd0b85a97d-4378ff90099mr1644282f8f.21.1770889280803;
-        Thu, 12 Feb 2026 01:41:20 -0800 (PST)
-Received: from [10.221.203.72] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783e5c550sm11501359f8f.36.2026.02.12.01.41.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Feb 2026 01:41:20 -0800 (PST)
-Message-ID: <dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
-Date: Thu, 12 Feb 2026 11:41:19 +0200
+	s=arc-20240116; t=1770889820; c=relaxed/simple;
+	bh=uqYHV6WHUvhDsOBpe5pUyJM0Yd06seajXeuYOQbHbXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TgRVGUdzqovimDc09sIMmVr4IBX3nNK8BezhdA/wW0mbr0H5XuvIHkxdg5s3yRL/UqTcxnwMv0jpXebLfylSUBDq6pdE2yLpoI7BV/aeB8hm03Wj5XcBhtz/ngUDWi0N6+aOOpY7HPPuJzY/Vh3Z++I9HIChs61Q+QEg136285I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fDHiFy8K; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770889819; x=1802425819;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uqYHV6WHUvhDsOBpe5pUyJM0Yd06seajXeuYOQbHbXI=;
+  b=fDHiFy8K9aPFSwW4cpYx8sb5QPWHZgahAj5mIrs2sPwsnoOJvxntepHG
+   T9o02/z1avK3/khZtCIafIWQBfHtS1YhN855fAVqwpUwHEVra6PT8ocyJ
+   NMvq32htb8R+mVzCySPGoWxMI9IcOwFS8VYDa1Ay9C9WtjXr4czP6Xaa0
+   k2QsI5tnQ7yv6GHeqDK0L+9X5Izj5eehQ+xmchr3k3VvJMXPEaJD6PR27
+   vNLcoBBsHPrfqhgD4Pno137D/zhbo9k/PYuaa3AaEi9e07apZBiasxUek
+   aSABWceG2G35HMsijOAIWFl7vDjRONlMXDnjQ4zOddH3/CKBTxZyPGdog
+   w==;
+X-CSE-ConnectionGUID: 1tJ/AlokQVuCUEXTWX9poA==
+X-CSE-MsgGUID: c9Vsv0ZkTkuykOw5VXDoFQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11698"; a="82782874"
+X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
+   d="scan'208";a="82782874"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 01:50:19 -0800
+X-CSE-ConnectionGUID: khGUbtBfQzOmjeG1/MJmHw==
+X-CSE-MsgGUID: tYbxTNxvSGuPd92sVt40hg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
+   d="scan'208";a="216708934"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 01:50:15 -0800
+Date: Thu, 12 Feb 2026 10:47:11 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Petr Oros <poros@redhat.com>
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-net 1/2] ice: fix inverted ready check for VF
+ representors
+Message-ID: <aY2hnyXFM9wplF3i@mev-dev.igk.intel.com>
+References: <cover.1770882260.git.poros@redhat.com>
+ <a76096058dd9b6d0cccaa5c2c699458351d02cec.1770882260.git.poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss: validate min RSS
- table size
-To: Jakub Kicinski <kuba@kernel.org>, Yael Chemla <ychemla@nvidia.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- Willem de Bruijn <willemb@google.com>, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, noren@nvidia.com
-References: <20260131225454.1225151-1-kuba@kernel.org>
- <9f535014-80eb-4f57-b047-3638579bde9a@nvidia.com>
- <20260211134319.39710c1d@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260211134319.39710c1d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a76096058dd9b6d0cccaa5c2c699458351d02cec.1770882260.git.poros@redhat.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258428-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258429-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michal.swiatkowski@linux.intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9992B12BF81
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mev-dev.igk.intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim]
+X-Rspamd-Queue-Id: 7BBDC12C078
 X-Rspamd-Action: no action
 
-
-
-On 11/02/2026 23:43, Jakub Kicinski wrote:
-> On Wed, 11 Feb 2026 22:10:56 +0200 Yael Chemla wrote:
->> Thanks for the test addition. I wanted to raise a concern regarding the
->> spread factor requirement that may apply to mlx5 and potentially other
->> drivers as well.
->> The real issue arises when the hardware's maximum RQT (indirection
->> table) size isn't large enough to accommodate both the desired number of
->> channels and a spread factor of 4. RX queues/channels serve multiple
->> purposes beyond RSS - they're also used for XDP, AF_XDP, and direct
->> queue steering via ntuple filters or TC.
->> Artificially limiting the number of channels based solely on RSS spread
->> requirements would be overly restrictive for these non-RSS use cases.
->> In such scenarios, we'd rather have a slightly degraded spread factor
->> (< 4) than limit channel availability.
->> We'd appreciate any feedback on this approach.
+On Thu, Feb 12, 2026 at 08:53:10AM +0100, Petr Oros wrote:
+> Commit 0f00a897c9fcbd ("ice: check if SF is ready in ethtool ops")
+> refactored the VF readiness check into a generic repr->ops.ready()
+> callback but implemented ice_repr_ready_vf() with inverted logic:
 > 
-> That's fine. In fact IIRC ixgbe (infamously) had more queues than
-> it could fit in its RSS table. So none of this is new. At the same
-> time if user _does_ want to use a lot of queues in the main context
-> fewer than 4x entries in the indir table is inadequate.
+>   return !ice_check_vf_ready_for_cfg(repr->vf);
 > 
-> The test is based on production experience, and provides valuable
-> guidance to device developers.
+> ice_check_vf_ready_for_cfg() returns 0 on success, so the negation
+> makes ready() return non-zero when the VF is ready. All callers treat
+> non-zero as "not ready, skip", causing ndo_get_stats64, get_drvinfo,
+> get_strings and get_ethtool_stats to always bail out in switchdev mode.
 > 
-> I'm not sure what you want me to say here.
+> Remove the erroneous negation. The SF variant ice_repr_ready_sf() is
+> already correct (returns !active, i.e. non-zero when not active).
+> 
+> Fixes: 0f00a897c9fcbd ("ice: check if SF is ready in ethtool ops")
+> Signed-off-by: Petr Oros <poros@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_repr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
+> index cb08746556a670..2a84f656405828 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_repr.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_repr.c
+> @@ -315,7 +315,7 @@ ice_repr_reg_netdev(struct net_device *netdev, const struct net_device_ops *ops)
+>  
+>  static int ice_repr_ready_vf(struct ice_repr *repr)
+>  {
+> -	return !ice_check_vf_ready_for_cfg(repr->vf);
+> +	return ice_check_vf_ready_for_cfg(repr->vf);
+>  }
+>  
+>  static int ice_repr_ready_sf(struct ice_repr *repr)
+> -- 
+> 2.52.0
 > 
 
-No doubt that larger factors help overcome imbalance issues, and it's 
-fine to recommend using 4x (or even larger) factors.
-
-The point is, when this comes with a selftest, it's less of a 
-recommendation/guidance anymore, it becomes kind of a requirement, an 
-expected behavior. Otherwise the test fails.
-
-This ignores multiple other considerations:
-
-1. Existing behavior: In general, mlx5e today implies 2x factor, so it 
-would fail this new test.
-
-2. Device resources: In large scale (high num of channels, or high num 
-of netdevs on the same chip, or both), it is not obvious that increasing 
-the indirection table size is still desirable, or even possible. To pass 
-the selftest, you'll have to limit the max number of channels.
-
-3. ch_max should win: Related to point #2. Driver should not enforce 
-limitations on supported ch_max just to fulfill the recommendation and 
-pass the test. I prefer flexibility, give the admin the control. That 
-means, driver would use 4x factor (or larger) whenever possible, but 
-would not block configurations in which the 4x factor cannot be satisfied.
-
-
+Thanks for fixing
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
