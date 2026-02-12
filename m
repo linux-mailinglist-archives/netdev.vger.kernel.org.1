@@ -1,175 +1,159 @@
-Return-Path: <netdev+bounces-258462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258463-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLNTGiLpjWkm8gAAu9opvQ
-	(envelope-from <netdev+bounces-258462-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:52:18 +0100
+	id aOwFMh3rjWn78gAAu9opvQ
+	(envelope-from <netdev+bounces-258463-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:00:45 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D016812E972
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:52:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D5712EB54
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D07F33055617
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:47:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8FE3B300C590
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5052335CB87;
-	Thu, 12 Feb 2026 14:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47D135B659;
+	Thu, 12 Feb 2026 14:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="H41JnhNd"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Yvwdi7HJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic313-56.consmr.mail.ne1.yahoo.com (sonic313-56.consmr.mail.ne1.yahoo.com [66.163.185.31])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF14935C1A9
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 14:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.31
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770907646; cv=none; b=nNyiIsm5rbPaRyiVc9FSKQnokOXUHU+qg7IbT9ZwQQkLCPfOcdpjXm5vcIxYNcr0ccFwy1hSJiW1mC+THKqFisee+e7GIXJk5LznRcYsbQGox7Zvb2Xix99QhU1yxrrNzBKG+6tLwB4jRDfC/G8pnokpEQnZbaaXyVuqALq6ybs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770907646; c=relaxed/simple;
-	bh=h9iFfN7NLoWArbyNqDhe5PWm1RmyFnrZEA5wqjmCM2A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l9f3RPNnU39xhb+Xl/1DQzxoelhhZADcOE6p2GPlM2bYJhbHQrWQu+hfN0eRpbj73MuoxjPaxviY6JQxH9gpeMa2fnUwI0ZSuec23+/CO+whly0AlNbad06AB9kdViMi+VVcel8g8rZ6ssh1E8Iw3IXgc+mslJF9S2dKA9mHqtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=H41JnhNd; arc=none smtp.client-ip=66.163.185.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1770907638; bh=wKVV5r2hXsqlMOl3cIm7MXEZwDlfSoJX+Rh1ZPsYvio=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=H41JnhNdu+BusDs8Wze8s3OQFo+NT5Ysg5uUaAbJCFeDsf1I2Hq36Jn4CXp2Q3kUFyGhUFHhgh76/hU9pJgD1GNG6uHy6HJrnmW7EoIlIhdb9DO3nXewgg6mtsYsy5hXkD7dh/EgcdDqIxe/x2msgRRXumhTIRS9nDfamK0LPdFH3i61KGMwL/UchO23YnJU7kNvd99EWPLZBqbbLSkK/caY2PuUt0Xz58FPQEJtNlbv0Q+5DCdbxKPQSSBmXJjSD0fu2zhuQp1R+KrhRZ/K0YA4nni/FA6sijVq77GuUQ1OV5W4zIh0nMc+MS1trURK400AnzfpW6GzQWXvduQ/CQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1770907638; bh=1JHa76Mp+BCeI3HtFAeodDaIiIOWGER55yZrJ3wafv6=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Ox+qa1qw9gpFiMEG/tgY4uUy+eMKFLg4ZVF574Nh5m34U1C5KG5ak9FFGfP905aUibNCvCU048D5LluaTRJKCHARFA+dOGN9qdCh3Q2ZXgPr03QmvbFHurAGMEzuBPgHIGqvcRojTi8DUqlidQ1A84lBdUQdFMTYekTZOGIVNYElYqtgOBp3mqSFoO4QufBqkJ8cNciqDkCCFf4KRt1P95kzYK5gVsfzlTLR/4ZjswiCOJeTirtsK+pNqS25hiMg6u6LVpGCugjOSYilz9nyBe6NRc+3WpRTKeb05GjyPUV1Vy4HLZXCvKgYxdciZTeGLPJTiJQbzIvPbPnF8Q75Cg==
-X-YMail-OSG: 4yL4ztgVM1k7VOt1NoszolkWklTuRwOd2veWinUH3qRsJjQU9VvNuXH1Eqdca3o
- RjSWgRBsebprUDwwPq51z83sMocLksI4LqJICEM.uo.9LMosMj6rbPlVFSKeIZxK..t_39ukb3B0
- WdLmol95MvX3vVEzGv.ERVoVVHjswIS8OS3Kj70JVAY4KRQPaxkVRjOjz0bf.RgUdu2eoFAi2zFd
- 86Oy7C9t55V7n1.ZItjW2Bi09NgQvIDjh6OfiluHRzitAbhl4NzNjAHgZrzlo3kV1oypFl6nTJhs
- 2jZQVVQwxqqyi0hI_rmFUgUpu7GGtGkdrHL.mTlYtCC2WdGNcq6t7cWp3AekygE6CC9tWzZOszML
- SjTFb0xVD.Vllrh1J0u5O8L9jhPf4ZYJOCrdEqrYB2.I4knKITKtduydN0.HabXbR2XuEWE43Sss
- X8evfcrhAKCLryNxzNlbHcpLrh3RDYj5wqBJfkHFU5nvGfkStUbRhvyrnXu9CNy3yMs8k89tcXi1
- 3mZy_OhW0iUFEYh05SZQmASYDsY.yFVthhrMrbd1ZgsTv7W6bMxlJ2orT0MaD.LGeWGtrZDgvmkn
- brlRYZ56ECFN79jGOrLy_ZEp47nCLkUuO0RPfbXZtpLoynasiA0dnEIeHw6cWC6qPwZxxDbhYab3
- bBjbN0469rowSAKP0iSb0pwHS6nv19QJqKcjL3Ns42FYdDfxqMQZvsbKwLwr7HqtF0qSbtWsRR_n
- Fb5XktdZp7R1x.bussqvrMu00ykvYOvVCPDCZD_imO5h2Q66GveZowZQT7J2mYd1NYeIUoV7ldfu
- sJ053ven0vkAscs7qs9yYHewaRMvZyNV46zP025sAGpHC7YGqwjhPEiwewWjSUgwKTa_LGuC_5By
- yRIDgUHVP69JEazKb.0fYLzyBzSvR1fJ2u09Yv09iG6UZr9RwNvPj4fB2ZU8DMnAQnwS2J0kVJyp
- WniP8hajmGmbnZ0Dwle2NCg8ifjhnofeeioTy76ER_oGF7evdfOYiCBRcpzdTolAhhHIiJkoPYNk
- bTG1P72btWY.0Pn4fVXqKHjq9M_Asu1whaHyHHD0C3NJopXrJ0ffzahehM2Zk6fBayDba9aupz3T
- .1mPbZKYKldGO_w_SyNyt0ku0l7qkRNQXL4OkOoLxVWnYh8u3aDZjR3f5V3Nok19etK.zgkdf5WM
- o0_0aWsWmRFXJTeA7uLw0gc.3BN8g6IEKyEaliY7HrMS.UeY044QYI_rMB0ecOmyqxId8rtGEwhc
- ZwHUwjiTsvNNGxLZcs7Xs51AfcNsDz8VEVw.mO3lulpGSTFALnME7Ied5XBAdJ1vYcn0Lqu5bSZo
- pscB1TExagRz6NF3VQ.W7tJSF069Hz7k2YhXkemhBSlLFtaC2wREOZZ2BBOhCrCcVdzcPlwm.3U5
- o4YDqgVzXwi0ch7OKDWZzM1dGTw1IKXzc76sQxy9l7HzKTdMVF3B05PIFZjeMJeZN.nd8SQjjofj
- ljiS_PQ0NiesjaQTfwgq2sIvBgSNQJJ4g1chRduVhcwKS54WZcbhcP_hj7mTsbVFLLCJK6oXJ3cB
- jfes6WrwrnhrlYdBKb.mxqrVuxsaRu5I7OewfmzfYT4PDpI6kL5z_9wgp8c3k1TzW8TZRKVqqxqo
- YlWdK9UTxlCP0DvMZvGLZQq1aPjyIuc7w489Yfmqltn9.YpkJotM5wAKIMCmS2WnySlao2TxfCIA
- v7UEiwPc_r8_qwWnAn32eb9LosIbplfSD.uzOn.UOlpqW0zD4kd6H7T9ORs2unCZn154.5TIw87I
- bq5o2SggWT4FKvyQWOP1HUKkiMUhCqWFrKWOT6HBcqM9FwwhbGI4GN_qPSIyEVwMvQzps6_cHqpg
- 7s897GbvaxHAjXHxC6PcUODO6NpBptMh6Kj_.3MVR1YTKiB7.imBYcOuK9xZIoJ2Sl1p.uKRKVfo
- PLF2q4OHiItCxFwWs8PhdYW66N7HRdqBXs6lIqoqm6XC6P7IgxOYJtPeVEhijLxTi76V.PLgoZpo
- Chn4rgJCQwLFBW4YMMmKD0UMmr2IlFz2aeSFOPDEoPmmObGWDt7dAuT_RKZOLrdGA.5Nz4eSBLO5
- 8P.jm.iu3W4ooomGvDsvsfD3Pxxkj3rhozOHzgENvvg2gcdfU__pz8aj4hugb62DOtolh226DM.k
- bwmbtr.bYkes3WTpr8eeX0X.ip3YB10QEm0Ag9l1HBNbaI4OKxc_pmA--
-X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: c2649088-8d7c-4a9a-bcfb-b88cbf8dd89c
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.ne1.yahoo.com with HTTP; Thu, 12 Feb 2026 14:47:18 +0000
-Received: by hermes--production-ir2-bbcfb4457-g4h2c (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 486308bf46531f12f76b3234db5205c5;
-          Thu, 12 Feb 2026 14:47:13 +0000 (UTC)
-Message-ID: <2e651cd7-e6e0-40ed-9e88-4cda9a96185d@yahoo.com>
-Date: Thu, 12 Feb 2026 15:47:01 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF562F6199
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 14:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770908369; cv=pass; b=Tf8iSl9GKnBZC31lDW0Rj5Lpgml7SyrIuiIwfMr/cUWkbHCCs1Gq+l2qZB61QkJThj3LBAZQfVY2bA/wyHGqXmHKkwT570ivMCBO4X0sXe2M2wmh1ucoWHFQG+Ptv2lASNlsHjR4hLwrIUr7g8SzdkEiDdq15GS+RoF2YMygExg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770908369; c=relaxed/simple;
+	bh=yGn21hxAcgcmG+63AgS3v0qYovGfQ2LjythatUWGR20=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BAQuHfqNpLDuh3EAe42L5o9Cni1VXhMEfPSCtOhvIbxxD+9uPytC1mvDXy18aWNrUQVDLVqJwDk2qVub+m0h0suTASVRfzXHN/gYT6vADFvROKMr4sjpPHDjqH0f4mSyroaoUJPQ+kDA6TM5QoruMQUrJUE5uXF/dNhHSNOre9I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Yvwdi7HJ; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64ae222d978so4908196d50.1
+        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 06:59:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770908367; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BdenF27dCdzG36SvqlRDx+Yc5nZIxb8hEQy/AHkA5HUR/oxvc+BcnmRcv30qDOCWFI
+         PLehBdoGqhq1BLJ5ZY0fBj7hRoWVcsHUOJcqNOBhoIf7GTGNlz42+1Er5zidgX9tiNm5
+         GDSPIkUM+lKXAK0tQoIaPp/WNQQ/Cg4FKvqAGR7hvxWSF/7iCRlj/U3mUtskYSGOhfVm
+         pNlvjxQ7z0PWvuzATJ3QuYjWzwChhYFH2oHC0FPDyQY+cy56AOImTuMdbgOsF7TOUcT+
+         tnUWgS0b3YD9GGDdvCQ/QXfYorIenT5PKZQ5hkZmVef1EpdRkOajCLKYmiMzM6vSaYCi
+         FdCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yGn21hxAcgcmG+63AgS3v0qYovGfQ2LjythatUWGR20=;
+        fh=Ou6C4V6XYbcuAWBu+SkNk5ZJ7lHl5TO94cEy7KwMm58=;
+        b=a4uJoe9F8CGjPHeQsod7RSZt4GVIjRbgc6jAKOeALxhVuT8xxXUFylvM7mHt1+I0LC
+         8yL+KFUREa6MiwhISBv6//1OkuT7EtdbinDOavZ/oUKWJ4WVKNicKxl/jLpJhfD1Zosw
+         qU1JRNK4YJ5XKpv9XQKvmntAPKedOYwJrSCZcJ2pMQYrsM4vMaESVjnYB/qm2GYHENjN
+         Ab07wK/IjMT2eLy05Lc+DMjNilx1CCbZ06mAyFcqSa/XexKBtIPu2g74m5x6Xi8jnAey
+         gYpHMl6kw2W6y12vech+Ge/dH0kg2PDMVpdQcY1Z92hXHWr4RmF3wMI0qdpwhICAYAra
+         30+Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1770908367; x=1771513167; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yGn21hxAcgcmG+63AgS3v0qYovGfQ2LjythatUWGR20=;
+        b=Yvwdi7HJ/E6jYa4h50wEB/QaCtgajK2q4JzXlvGgT1cfgxnb51/j72cgaSW1PrzuV5
+         REn7gVIVfLVuR/r514dbSbi1FdIy1eeDZXOuky1pSH7UTeE1or3V+DYnY9dLPF+0Wd/j
+         UtJ+QD19NdJL4TZBrOStakGPbL29U+jxnV5FCOpmoeWpxM2/7jR8BBOyuQ4wlSYMoGph
+         /Y/gTCS9n7F3Cr9ztxAoa62H+brzrwbkBbgBNxU2TKgO9B+sihQDR+jPZllYyBRpvhgR
+         3OIJsXo64TBxe2Kiz+WpuXWq3oqvcZybpTBdNkSWgud1KJ9zSfrCNmAi/5eSL9FbZ7mv
+         4k4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770908367; x=1771513167;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yGn21hxAcgcmG+63AgS3v0qYovGfQ2LjythatUWGR20=;
+        b=grlMviMyNP0gCc5NrP+1t3xVpUPaFAdZWTPTUz51OFlT5xuHBDbzbKjUGg145COPjX
+         Hx7lqWoT+mLbccY9OjfJMejvUuWscfp21kf9G25ExLpgJ586T51Pt4TYUeNdq/TRUbpE
+         Bq6Sw2J2D1tOKBhnmiDG+Hpo6jBycErey2OGkBde6rCj1sRNJ1HLA6mhkna2PPI9toX8
+         E94UO/BSJCA7NGG6TDeGn3VjM6vK6suvLMecr0u1Nk1CjL1OfCAx1gJfFqFd5+K0Hm+T
+         KxJ+geYf5YxD2fOGLRYBnMLVRKscAcGRF35smA0YObnz0fefCUw0gnTGHL7detmlUhUF
+         EX6g==
+X-Forwarded-Encrypted: i=1; AJvYcCU8FmQquT/x/ivQOocNjncpQEcE0Lt/BKIe8cWQAMmujZjoRcC3DKRMjJQqr8uPwnHxvIdu1+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM9ZTVjI7YaXlN87ySNnhOsaOdzeoYNrWRy2XWQkA8J8nzshvR
+	c9dkBvVT8hwUo3DjK4gWVRsHtbYCp/Au4GSaCmLCSkGico8kKhhDD+sv+J6KQqVir4bCgKXe7/U
+	tEsLTBlEvX24dLvfjAOcEjwc2HmaFnh2PcvdQNPYmBq4/+L+nefk=
+X-Gm-Gg: AZuq6aLsnJQn3Vnv1vO1hVFqB4Ukx9lJp/HwYWwp/GQ0Ceb+2iFn9PDciq8Tl34LYQ3
+	jZfUvOt/aDtqi2Rgd1klIo7qAJtCjuo3D1BREbOIWgU26+cDZOYZH35nhPx7RQLFOX5cPmw77pK
+	LWMW9uyR+O8dLc7/8oX+MsQGxx6cjZxSq78hKhcsAu7gRanvzLnL4xkAjrm2hrQed3Lp12s39/h
+	WnAaZ5lxKkyKk2Rt9Rt52QHaSrVtgn6VvKi5PLexeL++hzlRFuCwKpOsUl7/OQ4T/zYOKoE0mOz
+	FA1tGqPbvDKeVQv7LMEK8Q==
+X-Received: by 2002:a53:b1a2:0:b0:63f:af33:e413 with SMTP id
+ 956f58d0204a3-64bbaa3b703mr2031466d50.24.1770908367555; Thu, 12 Feb 2026
+ 06:59:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 00/11] net: tunnel: introduce noref xmit flows
- for tunnels
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- sd@queasysnail.net, kuba@kernel.org
-Cc: Jason@zx2c4.com
-References: <20260127070452.6581-1-mmietus97.ref@yahoo.com>
- <20260127070452.6581-1-mmietus97@yahoo.com>
- <a8ea949a-ac36-4753-b8ab-f9a85004750a@redhat.com>
-Content-Language: en-US
-From: Marek Mietus <mmietus97@yahoo.com>
-In-Reply-To: <a8ea949a-ac36-4753-b8ab-f9a85004750a@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.25178 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+References: <20260205150958.412278-1-p@1g4.org> <20260205150958.412278-2-p@1g4.org>
+ <CA+NMeC_v8bQo2tFUYiD1faMJ0Gd9FFbqmPHCvBUD7HW_yoCx0A@mail.gmail.com> <nmLWEyw7BWgMgTdbfbxbYI1QqIF-IPdNFFsdf_T8qY8IBncn1bNnTPDe9Bz1AWfsGVt4pgj8wLzhB1DxZ1-RzuZiW2VZLamsaBS4WpjC8lw=@1g4.org>
+In-Reply-To: <nmLWEyw7BWgMgTdbfbxbYI1QqIF-IPdNFFsdf_T8qY8IBncn1bNnTPDe9Bz1AWfsGVt4pgj8wLzhB1DxZ1-RzuZiW2VZLamsaBS4WpjC8lw=@1g4.org>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Thu, 12 Feb 2026 11:59:16 -0300
+X-Gm-Features: AZwV_QgRSL8UTzEEJf1PL2FE1zP9TG_DIZ0npWBwNFXgTFImvInzr5hzqmp5_ls
+Message-ID: <CA+NMeC9XPutYDqbpYDuhyOp5tVUp-knoujWOHNf1reg=eY3Kcw@mail.gmail.com>
+Subject: Re: [PATCH net v5 1/1] net/sched: act_gate: snapshot parameters with
+ RCU on replace
+To: Paul Moses <p@1g4.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258462-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[yahoo.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	TAGGED_FROM(0.00)[bounces-258463-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[1g4.org:query timed out,mojatatu-com.20230601.gappssmtp.com:query timed out];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[yahoo.com];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmietus97@yahoo.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Rspamd-Queue-Id: D016812E972
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 68D5712EB54
 X-Rspamd-Action: no action
 
-W dniu 3.02.2026 o 09:32, Paolo Abeni pisze:
-> On 1/27/26 8:04 AM, Marek Mietus wrote:
->> Currently, tunnel xmit flows always take a reference on the dst_entry
->> for each xmitted packet. These atomic operations are redundant in some
->> flows.
->>
->> This patchset introduces the infrastructure required for converting
->> the tunnel xmit flows to noref, and converts them where possible.
->>
->> These changes improve tunnel performance, since less atomic operations
->> are used.
->>
->> There are already noref optimizations in both ipv4 and ip6.
->> (See __ip_queue_xmit, inet6_csk_xmit)
->> This patchset implements similar optimizations in ip and udp tunnels.
->>
->> Benchmarks:
->> I used a vxlan tunnel over a pair of veth peers and measured the average
->> throughput over multiple samples.
->>
->> I ran 100 samples on a clean build, and another 100 on a patched
->> build. Each sample ran for 120 seconds. These were my results:
->>
->> clean:      71.95 mb/sec, stddev = 1.71
->> patched:    74.92 mb/sec, stddev = 1.35
-> 
-> Which H/W are you using? I've never seen so low figures in this decade,
-> possibly not even in the previous one. Expected tput on not too
-> obsoleted H/W is orders of magnitude higher, and we need more relevant
-> figures.
-> 
+On Thu, Feb 12, 2026 at 9:18=E2=80=AFAM Paul Moses <p@1g4.org> wrote:
+>
+> Proposed changes from v5...v6:
+> [...]
 
-Sorry for the late response.
+I think I understand what you are saying, but I believe I'll be able to
+give you better comments once I see the code.
 
-I tested this on my i9-13900. The reason for these low figures is that I
-used "iperf3 -l 2 -c <IP>" to measure throughput. I manually lowered the
-packet length because I figured there might be some other factors at play
-that could add noise to my measurements. I'll measure again without this
-limit. From initial testing, it looks like this performance gain is also
-achieved with the default packet size.
-
-I'll include new measurements along with v8.
-
-> Thanks,
-> 
-> Paolo
-> 
-> 
-
+cheers,
+Victor
 
