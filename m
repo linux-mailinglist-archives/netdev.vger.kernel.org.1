@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-258456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELxfLmfQjWnw7QAAu9opvQ
-	(envelope-from <netdev+bounces-258456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:06:47 +0100
+	id EDqwMi/YjWkR8AAAu9opvQ
+	(envelope-from <netdev+bounces-258457-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:39:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0277512DB8D
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:06:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10BD512DE30
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:39:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 41A9B300E5A4
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:06:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B019E309526C
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 13:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1CE2FDC55;
-	Thu, 12 Feb 2026 13:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A5735C1A2;
+	Thu, 12 Feb 2026 13:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l8HhaHtI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rblpKQRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB2A3EBF24;
-	Thu, 12 Feb 2026 13:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA35835C195
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 13:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770901603; cv=none; b=t0H8nEh2EL34U59Rr++RgvVQZzqhvkPhCsOZqO+FzudXa6uFsG6zFlK4x5wavpf+TNXmhfMYB9ljCD6HR9a1pL/gd/0gCF4ZX9an2FgiFrp9Jjmnej0+Wv/qIA0dEPHsrLPbfiTWfiTig8utG/4KwLfYUQVCMdW62ydbZytUe9c=
+	t=1770903590; cv=none; b=N5zP5YlYV6d2kQKXX3SOAizFr8GR812kUKrD08azF+4wO5QyNkwbbUWlc2Qbvu01YycEiXSJJNI59EsQ7td9XN5pkSxPl6ebdtCxjPxK9PWQvw5GRwQqtyV5URAFKPHSyAsK4VOIZm25wuzbgILZrAykdWlchRSNIn5QUxPqI6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770901603; c=relaxed/simple;
-	bh=DMUloXjb0y36sy3Di/uSO18uVDh/y5Xp8gF3xe62sRw=;
+	s=arc-20240116; t=1770903590; c=relaxed/simple;
+	bh=GhP2JH8hv0QUuMt7s8iCgKyAUNoOmckDel9CKid1yAM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YqfDBRb8PonTb3sA98SxXgwLH3QbYdueOTViEGK1sxQfimSs4fgfNLInjERUP0FDOVF9xkX/jbOOv+47jjQbb0sn3C7ZYfV1SBLAlbCKsBprtcGLd4gJewD8gEgYEih294e04ff7NyArbCRZTC2XpkF6P7l0c7cqB71X9TzHzNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l8HhaHtI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Psmc30ZDAOoov5ut+1EIkPVtL/ykRMSwHnd0XHg9zvI=; b=l8HhaHtI9KrELgVO4/p/n13zFC
-	gfPDIEogbwkca/x2SE9Iww+vniRnSOxvPvwHkopu3d5qHjxMjly7EQPNJHr2ezFEVD+Du/E6rfMBU
-	SskMYiJu6pQQhqqMu20Nrg9temkmAG7DcpioBwVA2DnyzVPwmH6pYIZpfwrHXXm4+Of8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vqWOt-0077nc-BG; Thu, 12 Feb 2026 14:06:31 +0100
-Date: Thu, 12 Feb 2026 14:06:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, linux@armlinux.org.uk, hkallweit1@gmail.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net] net: phy: dp83869: Set auto mdix bit for forced
- 100Base-Tx mode
-Message-ID: <9a256949-56ee-4d10-949e-c5009852ca44@lunn.ch>
-References: <20260211131033.2525617-1-m-malladi@ti.com>
- <0a9d0ec8-09c4-4029-8449-8c8f08c6dca0@lunn.ch>
- <a498b310-29f1-4775-aa65-fda027a3124b@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TO8UldawzIF8RxdtNn3LoMT7HxmEmjBhF+N43IBC3BNVpC0hGBcxAiakHG+7o4H7/mKAuT0yMY1yb+GYowIRL7bM5507xxyvNQ+tynvX9aSk7Jg7je8oeBDB1/kobSFfQtH25s++55cvMz+tv5MXzIhWgMTnwIPrzoMAOn5QcEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rblpKQRE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D28C4CEF7;
+	Thu, 12 Feb 2026 13:39:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770903590;
+	bh=GhP2JH8hv0QUuMt7s8iCgKyAUNoOmckDel9CKid1yAM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rblpKQREppu1Ecof+VBy8uLpwjJ2ZAw+lUr0kVBhuIpmCJ7i2syVz8PDRUWhQ33Rx
+	 WdfbHeInMHxIZmdzFRfcG5LrRnYlcXJGgfojyx0rO/ub6EucsMSlyswEk5jtyDRlxX
+	 bcuU5zVWCZIwm4hrVRpvtgzYUbkoqEQvftEsoVCiID7IAx+Nv0IJPm9NdJASU2E7lo
+	 B9Mfg9l7ZODxnGRKvxrAQ+LQkBacF+UDKNUHGYoFZxDpSiTrOwtZ6J1dYzFso7q2jD
+	 QIC4IYCgh8bEf4WgL6eI012hcNaUCLUQWC+HVjOWr2CW3wXLigiOA1rXdw+AYHpkIf
+	 IQf02OMIfMrQg==
+Date: Thu, 12 Feb 2026 13:39:46 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matt Johnston <matt@codeconstruct.com.au>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: mctp: ensure our nlmsg responses are initialised
+Message-ID: <aY3YIiY8_wr5IvKn@horms.kernel.org>
+References: <20260209-dev-mctp-nlmsg-v1-1-f1e30c346a43@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,53 +62,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a498b310-29f1-4775-aa65-fda027a3124b@ti.com>
+In-Reply-To: <20260209-dev-mctp-nlmsg-v1-1-f1e30c346a43@codeconstruct.com.au>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258456-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258457-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,armlinux.org.uk,gmail.com,vger.kernel.org,ti.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0277512DB8D
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 10BD512DE30
 X-Rspamd-Action: no action
 
-> > What about when you change the configuration out of forced 100 Full?
-> > Shouldn't the configuration be returned to how the user wants
-> > auto-MDIX configured? Should you disable robust Auto-MDIX so that
-> > "unreliable Auto-MDIX" is used?
+On Mon, Feb 09, 2026 at 03:27:33PM +0800, Jeremy Kerr wrote:
+> Syed Faraz Abrar (@farazsth98) from Zellic, and Pumpkin (@u1f383) from
+> DEVCORE Research Team working with Trend Micro Zero Day Initiative
+> report that a RTM_GETNEIGH will return uninitalised data in the pad
+> bytes of the ndmsg data.
 > 
-> This bit is only necessary if link partners are configured to operational
-> modes that not supported by normal Auto MDI/MDIX mode (when one of that link
-> partners are in Forced 100Base-TX), will fix it in v2.
+> Ensure we're initialising the netlink data to zero, in the link, addr
+> and neigh response messages.
+> 
+> Fixes: 831119f88781 ("mctp: Add neighbour netlink interface")
+> Fixes: 06d2f4c583a7 ("mctp: Add netlink route management")
+> Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 
-Does this bit have any effect on normal Auto MDI/MDIX mode? Can this
-bit be set once during probe, rather than for a specific link mode?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Is there an errata for this behaviour/fix? If there is please
-reference the number/document etc.
-
-Since this is a fix, please add a Fixes: tag.
-
-    Andrew
 
