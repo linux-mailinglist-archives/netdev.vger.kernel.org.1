@@ -1,158 +1,211 @@
-Return-Path: <netdev+bounces-258459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGU1AwLejWnE8AAAu9opvQ
-	(envelope-from <netdev+bounces-258459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:04:50 +0100
+	id wHuNO9XkjWms8QAAu9opvQ
+	(envelope-from <netdev+bounces-258460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:33:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB2F12E189
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:04:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2580712E442
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:33:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A816E3016B0B
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:04:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 675EB304CCC1
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 14:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5787F34AAF9;
-	Thu, 12 Feb 2026 14:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E8C28469E;
+	Thu, 12 Feb 2026 14:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H875DtkW"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XmAk7+iV";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/t8vhQs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBED3EBF1F;
-	Thu, 12 Feb 2026 14:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F533B19F;
+	Thu, 12 Feb 2026 14:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770905082; cv=none; b=ec5vpY1ZNF2J9EosEK+tOCrYZAK7lMMEnxJN3Hjx4fUglCHvlmCaGA93ArH/zPxGNA4zTwVCWwG61Kkm7Iozcp4m3/brDen/sWkwEI5TYFuX5tYq9eZ5aisSbFzPzrZ2amJzwUyaQwHHhbhyHmjMYCr4gSvWsLV0llW0dJQisD8=
+	t=1770906832; cv=none; b=Coxr0xaTU1/+6sqJOeZQ3bfirqMXfc0MV3LMQrtIfrlCWIvtpeIYWHQ5SnoSwSSPZxyTqIZtEkz/zzj8eTzZerx/N/HhrLXl0ov3XSoPT3X6AfSm4EKaWcxsDkLrW0Mt2QBGTdpEpTa+YLrK83ASgQb1xOneKcIL1x+5W+ViNlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770905082; c=relaxed/simple;
-	bh=hC83cy9I+QvOHq44fYtXM6qMN9P2fhKYqhqqNyaPhiw=;
+	s=arc-20240116; t=1770906832; c=relaxed/simple;
+	bh=BOd9tptsSrILqPWba+ZA9LlIF7z1U2Dbv3Pg0BdbkUk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K58bpyruzJn9Tn9LvpAh4GH6XeWcWHN+c5/q6l2I1coG+hinchjqKqtN7BtuCwJeHQQt0XwgALMnHRZ37384Vv2XQThQszIkVmKlnJqSpLhjgJ9uY5pLMGueaXuLmn45MZAXwvvZ9whIK56twgAJl1WUvM6bUSC0hjAxkwSM0C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H875DtkW; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770905081; x=1802441081;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hC83cy9I+QvOHq44fYtXM6qMN9P2fhKYqhqqNyaPhiw=;
-  b=H875DtkWh14TREt23k2pHr07w47fT2Ogo2t7wYbDR8sPJakkcCHKjNya
-   NrICzc+PmZ+7g4ebZoIXcgHhe0gCZvInBylRHNrGk8c+2DygZKwpV3jRe
-   SJkma2Er7XgXmoYXCSniKLPPKEfdGL8094UnmJHUMBf8DdXdWO19SoFQ+
-   WsZyA5FO94XJCEBV8nFNt2CPD7ES1+FWtwMMbPnNGQxwEuFV0REUBhGoa
-   mpmEzggQN/L/5wE7MFRxtk20tZhUIxzAGaMnWu4PjPIsPlkpIsJVZP1dH
-   RxFbRalow9rgrhep9rdVPBFKNZUZdroMKVGN8+Hzuod8ftzIKLPGJWDIG
-   w==;
-X-CSE-ConnectionGUID: K84Hpl30TbqtfoAfq7p0CQ==
-X-CSE-MsgGUID: STnqKISCSeurDd22wuNqjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="83443600"
-X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
-   d="scan'208";a="83443600"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 06:04:40 -0800
-X-CSE-ConnectionGUID: TUgDl26jTP25Gm4vGa+Q2g==
-X-CSE-MsgGUID: TXT8PHAFRqu/SXTEK+WepQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
-   d="scan'208";a="216763664"
-Received: from igk-lkp-server01.igk.intel.com (HELO e5404a91d123) ([10.211.93.152])
-  by orviesa003.jf.intel.com with ESMTP; 12 Feb 2026 06:04:37 -0800
-Received: from kbuild by e5404a91d123 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vqXJ4-000000001Kr-2rHR;
-	Thu, 12 Feb 2026 14:04:34 +0000
-Date: Thu, 12 Feb 2026 15:04:02 +0100
-From: kernel test robot <lkp@intel.com>
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	xen-devel@lists.xenproject.org,
-	Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>
-Subject: Re: [PATCH 1/2] xenbus: add xenbus_device parameter to
- xenbus_read_driver_state()
-Message-ID: <202602121525.xsMivuEv-lkp@intel.com>
-References: <20260212083826.136221-2-jgross@suse.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bsdCut3OVzZJCOxo77Znc+MXYvL5VaOabNwYmailnR3swMW9Lo+CMvmT6K0cBNRYNWOdxq155K41VlmmF32ShjQ4Vo+2w7+Apl/iikesWZOetsfGLegwgjI1YiGhBP7hNPl2vMYxzXL+nuPFUTVfvcAtI4L8/RTj4HxWFNLWFjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XmAk7+iV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/t8vhQs0; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 12 Feb 2026 15:33:44 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1770906825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VT/QAGKpA0eGfq3n4vYtlNCzR1t+pjOs1HP6qzTDpF8=;
+	b=XmAk7+iVVCpV0AAXIB42e3QUvOS8B6oT8yayjODByhCyXUpCydJ5f5tLjC2rcYnurRhGmc
+	gYxWChnhNOLKQMGB6Pp48745iyNOt87RAOBPZboD5PTCLXBtAIrIgovj6FxXODgGWrCP77
+	7kr8PoDWeWxsFWfZ8Uqlj0HiYOUt5cb8c03cMG4UnDVEs7AmYn4jdSUMcq617YjMcHt0N7
+	74tE4qsGg+LkvLaRjIyy5v0aUcyAGPtAIigdUaHvcpkV4gPcenCRKdZFIjFGHyuuZD52c0
+	6myCnJ6UAIbKAgcoyD/H0H+w3iZ33YwPFbcuTGeioF1ro37ROgmgjzXZL4MK4Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1770906825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VT/QAGKpA0eGfq3n4vYtlNCzR1t+pjOs1HP6qzTDpF8=;
+	b=/t8vhQs0Y8FSE+hEPcEz24ihUcORz/ocwJ7Pd19fZNCKoSk1opq+nxxdo5NqFYP4cK+2OP
+	VieJN509dKCCrvDw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: xxx@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
+	syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Gleixner <tglx@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH bpf v2] bpf: cpumap: fix race in bq_flush_to_queue on
+ PREEMPT_RT
+Message-ID: <20260212143344.j3_GaCuV@linutronix.de>
+References: <20260212023634.366343-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260212083826.136221-2-jgross@suse.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260212023634.366343-1-jiayuan.chen@linux.dev>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258459-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258460-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,google.com,goodmis.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,2b3391f44313b3983e91];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email,01.org:url,git-scm.com:url]
-X-Rspamd-Queue-Id: 5AB2F12E189
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:mid,linutronix.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2580712E442
 X-Rspamd-Action: no action
 
-Hi Juergen,
+On 2026-02-12 10:36:33 [+0800], Jiayuan Chen wrote:
+> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+>=20
+=E2=80=A6
+> local_bh_disable() only calls migrate_disable() and does not disable
+> preemption. spin_lock() also becomes a sleeping rt_mutex. Together,
+There is no spin_lock() otherwise there would be no problem.
 
-kernel test robot noticed the following build warnings:
+=E2=80=A6
+> Fix this by adding a local_lock_t to xdp_bulk_queue and acquiring it
+> in bq_enqueue() and __cpu_map_flush(). On non-RT kernels, local_lock
+> maps to preempt_disable/enable with zero additional overhead. On
+> PREEMPT_RT, it provides a per-CPU sleeping lock that serializes
+> access to the bq. Use local_lock_nested_bh() since these paths already
+> run under local_bh_disable().
 
-[auto build test WARNING on xen-tip/linux-next]
-[also build test WARNING on linus/master v6.19 next-20260211]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+So you use local_lock_nested_bh() and not local_lock() but you mention
+local_lock. The difference is that the former does not add any
+preempt_disable() on !RT. At this point I am curious how much of this
+was written by you and how much is auto generated.=20
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Juergen-Gross/xenbus-add-xenbus_device-parameter-to-xenbus_read_driver_state/20260212-164134
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git linux-next
-patch link:    https://lore.kernel.org/r/20260212083826.136221-2-jgross%40suse.com
-patch subject: [PATCH 1/2] xenbus: add xenbus_device parameter to xenbus_read_driver_state()
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260212/202602121525.xsMivuEv-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260212/202602121525.xsMivuEv-lkp@intel.com/reproduce)
+> An alternative approach of snapshotting bq->count and bq->q[] before
+> releasing the producer_lock was considered, but it requires copying
+> the entire bq->q[] array on every flush, adding unnecessary overhead.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602121525.xsMivuEv-lkp@intel.com/
+But you still have list_head which is not protected.
 
-All warnings (new ones prefixed by >>):
+> To reproduce, insert an mdelay(100) between spin_unlock() and
+> __list_del_clearprev() in bq_flush_to_queue(), then run reproducer
+> provided by syzkaller.
+>=20
+> Panic:
+> =3D=3D=3D
+>  BUG: kernel NULL pointer dereference, address: 0000000000000000
+>  #PF: supervisor write access in kernel mode
+>  #PF: error_code(0x0002) - not-present page
+>  PGD 0 P4D 0
+>  Oops: Oops: 0002 [#1] SMP PTI
+>  CPU: 0 UID: 0 PID: 377 Comm: a.out Not tainted 6.19.0+ #21 PREEMPT_RT
+>  RIP: 0010:bq_flush_to_queue+0x145/0x200
+>  Call Trace:
+>   <TASK>
+>   __cpu_map_flush+0x2c/0x70
+>   xdp_do_flush+0x64/0x1b0
+>   xdp_test_run_batch.constprop.0+0x4d4/0x6d0
+>   bpf_test_run_xdp_live+0x24b/0x3e0
+>   bpf_prog_test_run_xdp+0x4a1/0x6e0
+>   __sys_bpf+0x44a/0x2760
+>   __x64_sys_bpf+0x1a/0x30
+>   x64_sys_call+0x146c/0x26e0
+>   do_syscall_64+0xd5/0x5a0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   </TASK>
 
->> Warning: drivers/xen/xenbus/xenbus_client.c:940 function parameter 'dev' not described in 'xenbus_read_driver_state'
->> Warning: drivers/xen/xenbus/xenbus_client.c:940 function parameter 'dev' not described in 'xenbus_read_driver_state'
+This could be omitted. It is obvious once you see it. I somehow missed
+this alloc_percpu instance while looking for this kind of bugs.
+Another one is hiding in devmap.c. Mind to take a look? I think I
+skip this entire folder=E2=80=A6
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> Fixes: 3253cb49cbad ("softirq: Allow to drop the softirq-BKL lock on PREE=
+MPT_RT")
+> Reported-by: syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/69369331.a70a0220.38f243.009d.GAE@goo=
+gle.com/T/
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+> v1 -> v2: https://lore.kernel.org/bpf/20260211064417.196401-1-jiayuan.che=
+n@linux.dev/
+> - Use local_lock_nested_bh()/local_unlock_nested_bh() instead of
+>   local_lock()/local_unlock(), since these paths already run under
+>   local_bh_disable(). (Sebastian Andrzej Siewior)
+> - Replace "Caller must hold bq->bq_lock" comment with
+>   lockdep_assert_held() in bq_flush_to_queue(). (Sebastian Andrzej Siewio=
+r)
+> - Fix Fixes tag to 3253cb49cbad ("softirq: Allow to drop the
+>   softirq-BKL lock on PREEMPT_RT") which is the actual commit that
+>   makes the race possible. (Sebastian Andrzej Siewior)
+> ---
+>  kernel/bpf/cpumap.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+
+The changes below look good.
+
+Sebastian
 
