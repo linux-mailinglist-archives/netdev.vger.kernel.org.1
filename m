@@ -1,209 +1,125 @@
-Return-Path: <netdev+bounces-258417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258418-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +NT/Mk2HjWkZ3wAAu9opvQ
-	(envelope-from <netdev+bounces-258417-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:54:53 +0100
+	id YLXOL3CJjWnq3wAAu9opvQ
+	(envelope-from <netdev+bounces-258418-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 09:04:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5D612B0C6
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:54:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640F712B18D
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 09:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DC773174CBD
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 07:53:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C2967300D0F5
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 08:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EABC2C0F9C;
-	Thu, 12 Feb 2026 07:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70E21DF980;
+	Thu, 12 Feb 2026 08:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0AhvsS+"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="HWNlgIDb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDE03FBA7
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D4CFC0A;
+	Thu, 12 Feb 2026 08:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770882816; cv=none; b=G2yEOdOm0YrPf1Szj550hl9HEDsgn68Hc8EMyWsHJzfDH5iVXZuJf0KqMu6LgxU3n5tJkN1NQz8xgDKQK5T+pX/McHb6wTY0VyqtcW6EzdHV+SPiXHFUtRCCPtewTsaSRmOVeZl4BlU7mjkxxfW9elFUATda1HEO6lQfUGKIOGY=
+	t=1770883436; cv=none; b=R8uH/PaF1m4D8B/S7fzzQ0jP0e59ijvf+H9RGErZpgxiRPxlmcnh/7LPbdYXvywH45xVnRpqiSdSkbx3A/2GeVVxlgWeAwRkVPwbljcfAdvUrXrx67YVvoNXn1Wlb4Dbh17fa0+xMk1yB8bTdy9B/zrTNok8Ulgc+hO9g7lWmek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770882816; c=relaxed/simple;
-	bh=Y0+9O89z6yBpdhk15qq5LuW59rliI45UHtzB7ykcmng=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XJwtNocJix2zbgXT07r8iMvi/aXXcNrWXjFTAuvYUj0Q68DDKdbyyHyGIE75eIKbUSO1ZsMvXstkRztPw+SCTrtHDdYRJwl9H7hbGaO4FYv2NIZGafho2Qj+pEYNLQSvUfcjYBqZrHNi9SgnQropYf0eELktmSqbKMpJN2eViKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I0AhvsS+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770882813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zhLQvNUouK3UgiizfA4paeEoukfLjS3QOlBKKH84PkY=;
-	b=I0AhvsS+geFWIglO8F5JRLG583cvrSHW94W4mzWHxOZSquqiFMT0c1nPI+16ZCmQLyO5bx
-	wVZ632yGGq7YvYaaQs81y5aV1sPCcSB0far3c7ZYisP697m2TBI0ekAnOeKE0VSXR1FcaW
-	9tpwY917prfLpxB1s5HiHKWCMDouCUc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-283-IZa6iHvwMAmhpUru4AhRoA-1; Thu,
- 12 Feb 2026 02:53:30 -0500
-X-MC-Unique: IZa6iHvwMAmhpUru4AhRoA-1
-X-Mimecast-MFC-AGG-ID: IZa6iHvwMAmhpUru4AhRoA_1770882808
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB41E180047F;
-	Thu, 12 Feb 2026 07:53:28 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.44.32.184])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1C4B11956095;
-	Thu, 12 Feb 2026 07:53:24 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net 2/2] ice: use ice_update_eth_stats() for representor stats
-Date: Thu, 12 Feb 2026 08:53:11 +0100
-Message-ID: <27c3027a6cc22b565e2a741bbf5ee7d3382e80d7.1770882260.git.poros@redhat.com>
-In-Reply-To: <cover.1770882260.git.poros@redhat.com>
-References: <cover.1770882260.git.poros@redhat.com>
+	s=arc-20240116; t=1770883436; c=relaxed/simple;
+	bh=fwOGRSdS4B8fzrETSKqhSqLiygLkiA8fHDRPBpmCVF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CptgAJsgRoaVsIMBd7or5T6iBo+J/aJ5PQ5LA4wIN6BOvjbQ25WETzi3p58YrD1lLf3CDhmpodsYg+0+2xueQpwuAZtOx69TwOzwH4jfNttxwTSCbGvLTjJPAWFJ55Vw/iGWDJWvajsjauzELgGCvYBQuaOI0Mg4FFKXMxKVSRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=HWNlgIDb; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.70.77] (pd95c968e.dip0.t-ipconnect.de [217.92.150.142])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 61C83gfO000654
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 12 Feb 2026 09:03:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1770883424;
+	bh=fwOGRSdS4B8fzrETSKqhSqLiygLkiA8fHDRPBpmCVF4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=HWNlgIDbVwEIoJL8uG5O3bo0lH/oPapUHt0mpqg2W36MvhPpULBykvJYO95ejZ4Jc
+	 gW+nLwt0KQTbvPomzqGnw0317k332KjG8nb8aQIqmbyz7dxwUZfCP9diZBFaisxqqz
+	 o6nD9Uj4gfzp4UDEJWf/GLwZvAJtq52IUNN+54eo=
+Message-ID: <fd72fb56-977f-44c5-b98c-bc553d79ad76@tu-dortmund.de>
+Date: Thu, 12 Feb 2026 09:03:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <ba17ba38-9f61-4a10-b375-d0da805e6b73@tu-dortmund.de>
+ <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
+ <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
+ <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
+ <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
+ <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
+ <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
+ <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
+ <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
+ <60157111-219d-4fb3-a01a-6df9a83eae7e@tu-dortmund.de>
+ <20260212020317-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260212020317-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258417-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258418-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C5D612B0C6
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 640F712B18D
 X-Rspamd-Action: no action
 
-ice_repr_get_stats64() and __ice_get_ethtool_stats() call
-ice_update_vsi_stats() on the VF's src_vsi. This always returns early
-because ICE_VSI_DOWN is permanently set for VF VSIs — ice_up() is never
-called on them since queues are managed by iavf through virtchnl.
+On 2/12/26 08:06, Michael S. Tsirkin wrote:
+> 
+> Simon is there a reason you drop "Re: " subject prefix when
+> replying? Each time I am thinking it's a new version
+> only to find out it's this endless thread where people quote
+>> 1000 lines of context to add 2 lines at the end.
+> 
 
-In __ice_get_ethtool_stats() the original code called
-ice_update_vsi_stats() for all VSIs including representors, iterated
-over ice_gstrings_vsi_stats[] to populate the data, and then bailed out
-with an early return before the per-queue ring stats section. That early
-return was necessary because representor VSIs have no rings on the PF
-side — the rings belong to the VF driver (iavf), so accessing per-queue
-stats would be invalid.
-
-Move the representor handling to the top of __ice_get_ethtool_stats()
-and call ice_update_eth_stats() directly to read the hardware GLV_*
-counters. This matches ice_get_vf_stats() which already uses
-ice_update_eth_stats() for the same VF VSI in legacy mode. Apply the
-same fix to ice_repr_get_stats64().
-
-Note that ice_gstrings_vsi_stats[] contains five software ring counters
-(rx_buf_failed, rx_page_failed, tx_linearize, tx_busy, tx_restart) that
-are always zero for representors since the PF never processes packets on
-VF rings. This is pre-existing behavior unchanged by this patch.
-
-Fixes: 7aae80cef7ba ("ice: add port representor ethtool ops and stats")
-Signed-off-by: Petr Oros <poros@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 14 +++++++++++---
- drivers/net/ethernet/intel/ice/ice_repr.c    |  3 ++-
- 2 files changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 3565a5d96c6d18..0b8775621f1567 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -1926,6 +1926,17 @@ __ice_get_ethtool_stats(struct net_device *netdev,
- 	int i = 0;
- 	char *p;
- 
-+	if (ice_is_port_repr_netdev(netdev)) {
-+		ice_update_eth_stats(vsi);
-+
-+		for (j = 0; j < ICE_VSI_STATS_LEN; j++) {
-+			p = (char *)vsi + ice_gstrings_vsi_stats[j].stat_offset;
-+			data[i++] = (ice_gstrings_vsi_stats[j].sizeof_stat ==
-+				     sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
-+		}
-+		return;
-+	}
-+
- 	ice_update_pf_stats(pf);
- 	ice_update_vsi_stats(vsi);
- 
-@@ -1935,9 +1946,6 @@ __ice_get_ethtool_stats(struct net_device *netdev,
- 			     sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
- 	}
- 
--	if (ice_is_port_repr_netdev(netdev))
--		return;
--
- 	/* populate per queue stats */
- 	rcu_read_lock();
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
-index 2a84f656405828..f1e82ba155cff2 100644
---- a/drivers/net/ethernet/intel/ice/ice_repr.c
-+++ b/drivers/net/ethernet/intel/ice/ice_repr.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2019-2021, Intel Corporation. */
- 
- #include "ice.h"
-+#include "ice_lib.h"
- #include "ice_eswitch.h"
- #include "devlink/devlink.h"
- #include "devlink/port.h"
-@@ -67,7 +68,7 @@ ice_repr_get_stats64(struct net_device *netdev, struct rtnl_link_stats64 *stats)
- 		return;
- 	vsi = repr->src_vsi;
- 
--	ice_update_vsi_stats(vsi);
-+	ice_update_eth_stats(vsi);
- 	eth_stats = &vsi->eth_stats;
- 
- 	stats->tx_packets = eth_stats->tx_unicast + eth_stats->tx_broadcast +
--- 
-2.52.0
-
+No, there is no reason for that. Sorry, I will keep the
+"Re: " from now on.
 
