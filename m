@@ -1,181 +1,193 @@
-Return-Path: <netdev+bounces-258468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CM8iJOLyjWlw8wAAu9opvQ
-	(envelope-from <netdev+bounces-258468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:33:54 +0100
+	id SCYlMB/3jWlw8wAAu9opvQ
+	(envelope-from <netdev+bounces-258469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:51:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E649E12EFE5
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:33:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A7C12F1DC
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 16:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C488E31DF78E
-	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:28:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DFBA304227F
+	for <lists+netdev@lfdr.de>; Thu, 12 Feb 2026 15:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6872B26B76A;
-	Thu, 12 Feb 2026 15:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3070D1D5147;
+	Thu, 12 Feb 2026 15:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Ax5CnJ3p";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ar+NUL6n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77D227BF6C
-	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 15:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E2A1E487
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 15:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770910120; cv=none; b=uL+DNbsXzFqTzFWp28jda6uAiYO9gbh0b0/sFMNkkfKPvr1e3LN0vSZNZVnguf5tVOZlZebpOnO1uX/lAG56k6Tc6XYlWvcQ3EIQjShmoR3TBnW64r359L8WBJbYJSMs68Ut0auhYF4WIESz5Y/cR5eb6VP8j4jhzCOxPW6ycB0=
+	t=1770911517; cv=none; b=gE4kgNgXwPFnQ8nnVqdSvbL4RjWMImLbuj7CiPTmIHnlfzGkbSFAJhetnI3KMpCoqCRCZagu8Mub6FdMktESD5LX9mK4OQRLlm+fOgyDIeamW5sdAjiPiyfCTW4/SyWTzJkxcBby+v80EwYeB4Y4C3EFhdTDfm0o+XINCpu/Qf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770910120; c=relaxed/simple;
-	bh=pxs8YbD1TjSNqeCrVp0K89guriRQWw3wRcf8TsFR4x4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TMx28U6qm8YxjSjGsbLYowaLqClvxEB4KEYUmKllBe+y3OvMDKhT/11DBwhH5GQP3rnJgC+eB8KJaMXaQnobairj6w39kxPwI78Qtk0+XMK6U+Md/HyuXDwlP/Z6N9lBAVCTcLO7nfqQyfGwfmgjnhD/0DgxQyTYGy5uqCdOo40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5670ea44187so2265e0c.0
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:28:38 -0800 (PST)
+	s=arc-20240116; t=1770911517; c=relaxed/simple;
+	bh=I+3HK+rzmSqmU/qhNkj7MN8hSIQ8TsvJfaz6qXkCFKc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EX33oAaE9Wv7RtiSmNSxl2y0lKCCzyh3HkMBGtGqj9N2BONel3YyTDk/DvoCc3rhmFH7D2iYkwUKgYirCY3Fim0h9cQK+XN2pthDlYPbgolmcQbIs7Mja1UvuUDT5MLd9Ibd+NYIlK/BsJy8f4oRPkSPVGVZTcmseV5/KE1ALUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Ax5CnJ3p; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ar+NUL6n; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61CDRhKo588759
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 15:51:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jNIQL3IR6L/g6fCcKQxO3ab9CjE6vLb1z+JStGO11LY=; b=Ax5CnJ3pFulxwKBi
+	P97kN3f5mxNlXsKJ1F5IDTyIq1YpcGMlLnTUy8jx9wb43MzG8fBh41ClSg8JYz6l
+	RYm+bp2cMaYvv+6Td1xPc7ZPNMYuQiErJoNeF3J6T6ZhpS19lOWCxHO1/IDFuNKl
+	Psi8Wgfd7+q/IPaNatoFeZN+AwXwExV/Suc/atXFJ4lQoHFi10sGC+/H8eqBmptr
+	1ECfWLpmO+nYG1mPLeOxy1s/Ogqfn4dXxDr/jtU3VIzpb2LGw+JOCIGwpBx9BkOd
+	SG2l10qoXQQPeTYaPTep38g+RO6kEdizZZR1OPhF/AbsRymJLlW/biYSUbXXMlQQ
+	uVvGWQ==
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c93snju8t-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 15:51:55 +0000 (GMT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2ba87c0e198so2515796eec.1
+        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:51:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1770911515; x=1771516315; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jNIQL3IR6L/g6fCcKQxO3ab9CjE6vLb1z+JStGO11LY=;
+        b=ar+NUL6ntdaJX3mzLgpVWhYfEp2fibEfoG9vDVIuwKkdfyQXVFe5DWGUt3VZd4RiDc
+         s1c+UPiXy/TQ9G2LdvQgLnsiVy9RXFWef9onNNCkYhWw/ZPPrgdOPlZKSCvrQx0utBCB
+         XPpvIBmTBUuzYN88yOmvR5gRJi9efMOQEz5tiq3gvfqanhYtU5vrKxGY/ZmvDEqrczxo
+         7151PT4xfl/VJ9bMzpoNoD/7aWxRgMARdL5aPjolghJNbLxWyNIzipJ/eKPORErSsMeG
+         Pr7UgevWL7N0jb8l75me6Fl9p+zuR8wnwVpSSBlwGypWFB1jHP5nYZDcjxN2MYMV84/t
+         HjeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770910118; x=1771514918;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1swUXVQRVAJERNN5QK89cxeKMa011a7QNqexhVz+39E=;
-        b=gPdQfVO9rvG22Q8lKBwRmmlaYIT6EpLElOeJcBwcddIHz9sSbvNTc8u583+oaTsy2Z
-         ZZmifTtl0R8V3jayZcJ7qrI77GqgJAgXMxCKVG4XhiOWyBaawxwp4/b3p9Oxp9dYO+Nk
-         PCQnScWDPkQNL+tIdqTI57d8iapEXgXMAudQbGvEiP3d1NJU4wLv77JO4n6ReDzxQAvF
-         w9YupmcprjuOPn/ZiXrWur1LsaUhvSeZmR32OFmaCA+LLlhf55touztQn3b8Rw686/AW
-         GYSYaK/FCkxrt87bhJ8j2aP/KyBDadO7Eb8zQStIMR9yb8VamSUJbpRSEjeLtEbx3R1P
-         C/zA==
-X-Forwarded-Encrypted: i=1; AJvYcCVa7c9PWBVg7kAZhE56+tZBaqNK3KY+2I+iiYu4KXiw6X0CJ6klf/sR/24sg8509lZ8oM2scxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxp6GHjBZdT1rXGmwLsrGjZesI4y8wu9tH9yrdEdFUR/C4fxPx1
-	4q8L8skbflIRs35F4gD/5xPftHbZ8biqcfETrQ1bM3wQrXZpR17JdqxFJVQJvXma
-X-Gm-Gg: AZuq6aKcjQJU7MV5BB7cVFIkVU32Scr6otWC2L4nBvevFQgV5cRmKIlZOHkEdZgVawz
-	tiin+TL3trA5gTKvFyPvDmClIS5Ls4HgQD+F4RBsOJBnCNqJ9M+noSNWPXjxeMSDY+0B6wbFqu2
-	XytJ5MC0dxLNiaexaiJiWEljDuT/9UQOdxQ9guDxCNSBD+v/HzaSJKghaWPH12zSWZZjvf+3ARv
-	c5afv7F6nVP1u+fucJO53+37gmeOSjyj9UP4cJy6W5m6FDpQdodnlJYrZ0mBuY5UMia7HSDEAdS
-	cJaw4ZdrenyzC9wsZwbrvNz8P3E/cBN3ycz2/vCjpeSElpfiYShm1LDMOGYa3hOcvJ789tNp6o6
-	xLvfWW/El7y7JtCkm+BnlE+vd+Qvmg7WJGb5eoc4FHSFJ+3a6LNN6mhK02BjVO/P8c8WPpQWpeA
-	bmKzf0SIY1V9Oo7adDl0JO5viqY2WDVO63t5h/uwM16FCgQwzkqV+9KcersH4V
-X-Received: by 2002:a05:6122:1d4c:b0:566:2302:f317 with SMTP id 71dfb90a1353d-5675b7c9ae8mr741212e0c.20.1770910117777;
-        Thu, 12 Feb 2026 07:28:37 -0800 (PST)
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com. [209.85.217.45])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5674c2429c9sm1819707e0c.16.2026.02.12.07.28.35
-        for <netdev@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1770911515; x=1771516315;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jNIQL3IR6L/g6fCcKQxO3ab9CjE6vLb1z+JStGO11LY=;
+        b=kFxpVpAorcdcz4X+93BaUzDFlwzY5UYigAE9aL8ZyKNIJCa/s5F6CpKiHxS6s/81Te
+         L16I0HvchnBxdAeCc3ZQodmRXvS7FDKC09hrVSpehfi6XyrgtOsIUAJOF9Czs6/XGJ6B
+         7+FPCL9Uc6ZYwc5dkD3Am0C/IOEa/sLUmKsG/BfBf1Qa2Gd3Jp1whPh/+N2KJFFiOIff
+         EX7eTZbVbIycsKS730hbtzSOmtnFu81FoLM8AvkwD3fXu0uwHoXTzYP/SAYoaLvu5su6
+         5YnM9w00nkZxl5pvyLDsL/g2yHl10tkurctSMjSz1sfQuzG0xRqIrgVKwtsbj4sHeleO
+         PM/g==
+X-Forwarded-Encrypted: i=1; AJvYcCX7p8oCWsP/V4X/3HOP4Jzlm9Bqqn9gb9Jd89E6YCSYlTZ69MaimmOze2/AFL/ZT+bFqKg4Log=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9ZCUfwHy0QmHPN3kps5VePntgNyWD9bs3ia6ini54yoZB/A3d
+	Hramsyuv/I1ga+/TO619qdTs9e6xFaBOGWi3PRszW5cSdI6Y4s6yFMmDoGcP58zrwEpl8xlW0ZB
+	umnW77yVkISLV7fOLRQd0D8Bt/KGYy4atHjmuv/Umtz42lSjsmPUHqfu7P6M=
+X-Gm-Gg: AZuq6aId2fvMasL66jWY8y+qj65dHJcwZj9nEgr6jgguCsaqesMUwI1JQdSGrXvMaLb
+	Dtel1L1sN8y2Ua0CWE8KMkVc9LJR0wmYWNwlNJtvCs+wrS9yNXToBVGmpeHSx9JgeAAGi74TbU4
+	Lq7alLgWtHLNac/Mw1l3crNv1rLCR48CxuXMsC2VQkY13tqBpTeyy3QoxIdN0oH03sD6D+h5S9p
+	D6Ly2uPXsHtXwyiXseljO3DUud3+M/7vvNkR0EFlV+Y7HGTei28t1EWkKIUvNKX1EmydkZVpWUY
+	4599C1qQLrjUIUsHgcXuCuhQ4q3eyUEw+EkOzJEmqhd5IA9GC7NOUvSe0/E29+fv2/OBzKSI4eT
+	Q0coynJiPqmpAe1Zxz+r0BmTD8paCShEw5hLspTAG2FcHLcndy6U2n598svL7EvZOIjQ6KvO1TH
+	O42q0NZUhtjpLUBw==
+X-Received: by 2002:a05:7301:678b:b0:2ba:9cfb:2744 with SMTP id 5a478bee46e88-2baa8077336mr1166369eec.30.1770911514524;
+        Thu, 12 Feb 2026 07:51:54 -0800 (PST)
+X-Received: by 2002:a05:7301:678b:b0:2ba:9cfb:2744 with SMTP id 5a478bee46e88-2baa8077336mr1166348eec.30.1770911513619;
+        Thu, 12 Feb 2026 07:51:53 -0800 (PST)
+Received: from [192.168.1.41] (c-24-130-122-79.hsd1.ca.comcast.net. [24.130.122.79])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ba9dba2aadsm3726033eec.1.2026.02.12.07.51.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Feb 2026 07:28:35 -0800 (PST)
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-5fc66c49d03so1605561137.0
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 07:28:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW9UXJJtZDYWWaBezejgUsIJxBmp1LAAtaqP2ox4kZirgUhlbne+2pS84HUI06YXdJlwzN1snk=@vger.kernel.org
-X-Received: by 2002:a05:6102:26cc:b0:5fd:eb2d:e714 with SMTP id
- ada2fe7eead31-5fe006b511fmr835506137.22.1770910114712; Thu, 12 Feb 2026
- 07:28:34 -0800 (PST)
+        Thu, 12 Feb 2026 07:51:53 -0800 (PST)
+Message-ID: <5afc9deb-e6c8-4224-b96d-5e8a2ebf7de3@oss.qualcomm.com>
+Date: Thu, 12 Feb 2026 07:51:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206-nbcon-v7-0-62bda69b1b41@debian.org> <20260206-nbcon-v7-1-62bda69b1b41@debian.org>
-In-Reply-To: <20260206-nbcon-v7-1-62bda69b1b41@debian.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 12 Feb 2026 16:28:23 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUVzSQv=Zw7qh3UVYftdb=Am+URJ2dJ9mwD3WXbuNRT5w@mail.gmail.com>
-X-Gm-Features: AZwV_QheoIK05fsOpIY7usPxMKv7SFALLCN-Vk5kXX3MLafKpNUG4FK9VCekOcM
-Message-ID: <CAMuHMdUVzSQv=Zw7qh3UVYftdb=Am+URJ2dJ9mwD3WXbuNRT5w@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/4] printk: Add execution context (task
- name/CPU) to printk_info
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	pmladek@suse.com, john.ogness@linutronix.de, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, 
-	efault@gmx.de, gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, 
-	mpdesouza@suse.com, kernel-team@meta.com, 
-	linux-m68k <linux-m68k@lists.linux-m68k.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Networking for Linux 7.0
+To: Jakub Kicinski <kuba@kernel.org>, mhi@lists.linux.dev
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20260211173015.327542-1-pabeni@redhat.com>
+ <76e6b68c-393e-48d4-9ee5-9e8d511ab308@oss.qualcomm.com>
+ <20260211154008.24db40a7@kernel.org>
+From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <20260211154008.24db40a7@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDEyMSBTYWx0ZWRfX+W/Ak6gS+a90
+ 4gYuTWdm5+ttPyKt+2VQt0EoEMVTWZBIGNso+OFZ80P880EDC0Q8PNy5/VdGntgU+GzTr73pCfP
+ AWMabbAFFqnxgs4UnqScd+AXGvi4LMlk+b6gc9pF84jSl8daWMojz8QlGG4yArqmPoGXB5b21wP
+ r3dugEugY3Hy8tvaVoMq0wIkTPBk2ZQYX2mehdK3LQgSTt372ENChhuzpJgoAAfDF9oBF/p3/dM
+ EQFCnLHHi7ICN51RG4LTQV2YyPU5TDm1Ly0mLFH3kEbLqIgIKilj95asWHD3gqFNOBJPHFWCeJ/
+ T+d/OwHuasUuTFhWPQdtwNw3Hv7VFtx255sxtX9tIgOeL6Wc4CtlInAnufc1k4Oip+SqqeD3GbJ
+ Ljue1MiltgI59JGB9/YWpu6sRlMk/bW7dGemWq4445ULJBTnRgfiKWl60+Xey1ak5ycFOC7Y0zA
+ 1e2RfNliHbLek8/GBtQ==
+X-Proofpoint-ORIG-GUID: L6HE195D8pAtrVdxhNmNWZpWk196tmtf
+X-Authority-Analysis: v=2.4 cv=dLCrWeZb c=1 sm=1 tr=0 ts=698df71b cx=c_pps
+ a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=Tg7Z00WN3eLgNEO9NLUKUQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=VwQbUJbxAAAA:8 a=qNABUOcEAAAA:8 a=6jdU60nbdyzYgp056TkA:9 a=QEXdDO2ut3YA:10
+ a=6Ab_bkdmUrQuMsNx7PHu:22 a=Ytm653ucTKQjCvbzLygB:22
+X-Proofpoint-GUID: L6HE195D8pAtrVdxhNmNWZpWk196tmtf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-12_04,2026-02-12_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 spamscore=0 suspectscore=0 clxscore=1015 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602120121
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com,lists.linux-m68k.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258468-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E649E12EFE5
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jeff.johnson@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258469-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+]
+X-Rspamd-Queue-Id: 21A7C12F1DC
 X-Rspamd-Action: no action
 
-Hi Breno,
+On 2/11/2026 3:40 PM, Jakub Kicinski wrote:
+> On Wed, 11 Feb 2026 15:07:18 -0800 Jeff Johnson wrote:
+>> On 2/11/2026 9:30 AM, Paolo Abeni wrote:
+>>> Hi Linus!
+>>>
+>>> I'm not aware of any conflicts with other trees, even if this includes some
+>>> changes to printk for the sake of netconsole.  
+>>
+>> There is one conflict between the refactored ath12k driver and the char-misc
+>> tree. This was correctly addressed in linux-next:
+>> https://lore.kernel.org/linux-next/aXD6X23btw8s-RZP@sirena.org.uk/
+> 
+> Will there be an effort at some point to improve how the MHI "bus"
+> is structured? Maybe this is not a great example but we keep seeing
+> patches that touch a driver + the bus. Clearly indicating IMHO that
+> there's no proper abstraction / separation between the bus and its
+> users..
 
-On Fri, 6 Feb 2026 at 15:39, Breno Leitao <leitao@debian.org> wrote:
-> Extend struct printk_info to include the task name, pid, and CPU
-> number where printk messages originate. This information is captured
-> at vprintk_store() time and propagated through printk_message to
-> nbcon_write_context, making it available to nbcon console drivers.
->
-> This is useful for consoles like netconsole that want to include
-> execution context in their output, allowing correlation of messages
-> with specific tasks and CPUs regardless of where the console driver
-> actually runs.
->
-> The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
-> automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
-> the helper functions compile to no-ops with no overhead.
->
-> Suggested-by: John Ogness <john.ogness@linutronix.de>
-> Signed-off-by: Petr Mladek <pmladek@suse.com>
-> Reviewed-by: Petr Mladek <pmladek@suse.com>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-
-Thanks for your patch, which is now commit 60325c27d3cfe134 ("printk:
-Add execution context (task name/CPU) to printk_info").
-
-This increases (the IMHO already large) _printk_rb_static_infos
-array by another 40 KiB, according to bloat-o-meter:
-
-    _printk_rb_static_infos                   180224  221184  +40960
-
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
->         bool "Dynamic reconfiguration of logging targets"
->         depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
->                         !(NETCONSOLE=y && CONFIGFS_FS=m)
-> +       select PRINTK_EXECUTION_CTX
->         help
->           This option enables the ability to dynamically reconfigure target
->           parameters (interface, IP addresses, port numbers, MAC addresses)
-
-I guess we should start disabling NETCONSOLE_DYNAMIC in the m68k
-defconfigs...
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
++ MHI list to comment on this
 
