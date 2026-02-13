@@ -1,181 +1,129 @@
-Return-Path: <netdev+bounces-258612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNijNA4lj2lNKAEAu9opvQ
-	(envelope-from <netdev+bounces-258612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 14:20:14 +0100
+	id +B7QMYMuj2nTLgEAu9opvQ
+	(envelope-from <netdev+bounces-258613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 15:00:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B3231364DC
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 14:20:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC38136D76
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 15:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 82FDC3073D91
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 13:19:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 98F9B3016C80
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 13:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C15036074D;
-	Fri, 13 Feb 2026 13:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vcx5qEIk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3540035FF62;
+	Fri, 13 Feb 2026 13:59:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B4135E556;
-	Fri, 13 Feb 2026 13:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2021E352936
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 13:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770988774; cv=none; b=tXztPDA5yq9CwElP0yx6W40XG1OReCyRsZxo7Cz1C5/mV6st/I6gBGRjFSXIH3jWIaKoe95YYwQsLPI98gDmhVaZO8lWtHIN0+Aibg97Hf4x2mgXTS7BfkxvbPLUomMzSXxGlBdMG/PcEeoj24yc00UR7d5GyL0V6+54J3A6Mi0=
+	t=1770991167; cv=none; b=R0MbahSOW5vQz/aPvdfG5OuWX5jz8rd3wSHHoJSinkTvLPP6XPZv3tiPM4NXI2SF9aTkDQw3ihsrdArCfd8rMMqJaIO4nbmwpGLTH2xkrfOAPWL++NYMCMgUlyKkjVcJATAZ1d6BDngh+CVzdn4FTXJ+twxc2TDTLSZMBLzWKYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770988774; c=relaxed/simple;
-	bh=zsFmpWRix+LX588rlGbg6RBUWzdhefraJWHeWfHLV1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bItmAaG1HWqhyxbuzOGuZyLnvxVd2lodr5MvfGMHaDRGPu2OlAnnB9JSHYEdhkpch1AVbJbwoHKDD7YEA0cQufGYEcGmmh+V8c8p4k9RRhtEetMKeW95eELAOXyMXi2uerxCMjMjPnz0KpSB3t1WvWrEKrG8MeOadDCi9hqheq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=vcx5qEIk; arc=none smtp.client-ip=130.117.225.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
-	Content-Type; bh=piwRbugQuOmQuGtJk8tRpvV4jIE0EEmGxdDcUHa7eBo=; b=vcx5qEIkAXrS
-	YE3sK4gNDRaXMxbJfLFNNfEkcluDoIBYMdiE6TfGKjYkK+CGurjlUPi5rXMbgZrjDo5VD8HNJzaiO
-	9hxNeghRJQejGf2L1uxUinF6jhCRsngM/GOGaYV88m9xZDWota5RDxvQG2UdrPQgX8K07jh4mq0dp
-	1x3oyn9z4RJ+sc3/uHMu933GUyf55MxK13tQeJ0vAg7KD7bbqwdslawPv9FJcV6PhZ+BDkfUufs9c
-	LBXpN2AnLqPv6toGmyfS9Xwlg8RJBsdl+k9MO/YrrSsknuJwBLiR4HdJYeRJouMkcyyW5gF9z2G+Q
-	raDkh1JlNYfIM/DapxaB8Q==;
-Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
-	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <aleksey.oladko@virtuozzo.com>)
-	id 1vqt3q-0014Lj-0R;
-	Fri, 13 Feb 2026 14:19:18 +0100
-Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
-	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 61DDJLDR043380
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 13 Feb 2026 13:19:21 GMT
-Received: (from root@localhost)
-	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 61DDJLRU043379;
-	Fri, 13 Feb 2026 13:19:21 GMT
-From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-        Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Subject: [PATCH net v2 3/3] selftests: forwarding: fix pedit tests failure with br_netfilter enabled
-Date: Fri, 13 Feb 2026 13:19:07 +0000
-Message-ID: <20260213131907.43351-4-aleksey.oladko@virtuozzo.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260213131907.43351-1-aleksey.oladko@virtuozzo.com>
-References: <20260213131907.43351-1-aleksey.oladko@virtuozzo.com>
+	s=arc-20240116; t=1770991167; c=relaxed/simple;
+	bh=oIITJHToT3jgpyMYTOKivfMG2iGdep9oSi1Q7sfvBzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TxP9nQDE6NdeBYRscqJ8OFUarPr5+MqiBAwd9cwoM+oG41/L2DolwTxm+bSyx7I5HFjM/QYsfKotIaeI59s41ZuMLsg9Gms5QyvENAKhavcgQQS6EsZuy7RZH8m3J+kewXGA4En9S6acOM0dmKnzTJcldlVcI+k77xr6fSbMyV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 61DDxGKm000148;
+	Fri, 13 Feb 2026 22:59:16 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 61DDxGgJ000145
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 13 Feb 2026 22:59:16 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <d20f1b63-714f-48ba-9bee-cd074205404f@I-love.SAKURA.ne.jp>
+Date: Fri, 13 Feb 2026 22:59:15 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+        Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <93d291db-4175-48c4-830c-e83bab373ae2@I-love.SAKURA.ne.jp>
+ <CAHC9VhQPKU5DqG-ryZsiCV2vZeGGf_a-JStR_LVVCCn03C4usQ@mail.gmail.com>
+ <f9b88268-03dc-4356-8b31-0bab73cc9b1e@I-love.SAKURA.ne.jp>
+ <CAHC9VhRzRAR+hhn4TFADnHWpzjOxjmh0S_Hg_HktkPkKQ35ycg@mail.gmail.com>
+ <74a70504-8ff8-4d97-b35f-774364779889@I-love.SAKURA.ne.jp>
+ <7ef21dab-3805-4eae-80d7-9779aeff3f58@I-love.SAKURA.ne.jp>
+ <aYmoDwO-YXrc4W1c@secunet.com>
+ <85546d35-c7bd-49bf-b0c3-9677bde25859@I-love.SAKURA.ne.jp>
+ <aYnDWbxo-jAzR4ca@secunet.com>
+ <7c17884d-dbf1-4c2c-9813-0c5369cfdcc9@I-love.SAKURA.ne.jp>
+ <aY76t_xYCHmLq6Ur@secunet.com>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <aY76t_xYCHmLq6Ur@secunet.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav101.rs.sakura.ne.jp
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258612-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	PRECEDENCE_BULK(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[I-love.SAKURA.ne.jp:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,virtuozzo.com:mid,virtuozzo.com:dkim,virtuozzo.com:email]
-X-Rspamd-Queue-Id: 4B3231364DC
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258613-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_ALL(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 2CC38136D76
 X-Rspamd-Action: no action
 
-The tests use the tc pedit action to modify the IPv4 source address
-("pedit ex munge ip src set"), but the IP header checksum is not
-recalculated after the modification. As a result, the modified packet
-fails sanity checks in br_netfilter after bridging and is dropped,
-which causes the test to fail.
+On 2026/02/13 19:19, Steffen Klassert wrote:
+On 2026/02/13 19:19, Steffen Klassert wrote:
+>> The NETDEV_UNREGISTER path can be triggered by just doing "unshare -n ip addr show"
+>> (i.e. implicit cleanup of a network namespace due to termination of init process in
+>> that namespace). We are not allowed to reject the cleanup_net() route.
+> 
+> And here we come to the other problem I mentioned. When a LSM policy
+> rejects to flush the xfrm states and policies on network namespace
+> exit, we leak all the xfrm states and policies in that namespace.
+> Here we have no other option, we must flush the xfrm states and
+> policies regardless of any LSM policy. This can be fixed with
+> something like that:
 
-Fix this by ensuring net.bridge.bridge-nf-call-iptables is set to 0
-during the test execution. This prevents the bridge from passing
-L2 traffic to netfilter, bypasing the checksum validation that
-causes the test failure.
+This something is what I explained at
+https://lkml.kernel.org/r/1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp .
+The "task_valid" argument does not always reflect whether LSM policy can reject or not.
 
-Fixes: 92ad3828944e ("selftests: forwarding: Add a test for pedit munge SIP and DIP")
-Fixes: 226657ba2389 ("selftests: forwarding: Add a forwarding test for pedit munge dsfield")
-Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
----
- tools/testing/selftests/net/forwarding/pedit_dsfield.sh | 8 ++++++++
- tools/testing/selftests/net/forwarding/pedit_ip.sh      | 8 ++++++++
- 2 files changed, 16 insertions(+)
-
-diff --git a/tools/testing/selftests/net/forwarding/pedit_dsfield.sh b/tools/testing/selftests/net/forwarding/pedit_dsfield.sh
-index af008fbf2725..eb2d8034de9c 100755
---- a/tools/testing/selftests/net/forwarding/pedit_dsfield.sh
-+++ b/tools/testing/selftests/net/forwarding/pedit_dsfield.sh
-@@ -98,12 +98,20 @@ setup_prepare()
- 	h1_create
- 	h2_create
- 	switch_create
-+
-+	if [ -f /proc/sys/net/bridge/bridge-nf-call-iptables ]; then
-+		sysctl_set net.bridge.bridge-nf-call-iptables 0
-+	fi
- }
- 
- cleanup()
- {
- 	pre_cleanup
- 
-+	if [ -f /proc/sys/net/bridge/bridge-nf-call-iptables ]; then
-+		sysctl_restore net.bridge.bridge-nf-call-iptables
-+	fi
-+
- 	switch_destroy
- 	h2_destroy
- 	h1_destroy
-diff --git a/tools/testing/selftests/net/forwarding/pedit_ip.sh b/tools/testing/selftests/net/forwarding/pedit_ip.sh
-index d14efb2d23b2..9235674627ab 100755
---- a/tools/testing/selftests/net/forwarding/pedit_ip.sh
-+++ b/tools/testing/selftests/net/forwarding/pedit_ip.sh
-@@ -91,12 +91,20 @@ setup_prepare()
- 	h1_create
- 	h2_create
- 	switch_create
-+
-+	if [ -f /proc/sys/net/bridge/bridge-nf-call-iptables ]; then
-+		sysctl_set net.bridge.bridge-nf-call-iptables 0
-+	fi
- }
- 
- cleanup()
- {
- 	pre_cleanup
- 
-+	if [ -f /proc/sys/net/bridge/bridge-nf-call-iptables ]; then
-+		sysctl_restore net.bridge.bridge-nf-call-iptables
-+	fi
-+
- 	switch_destroy
- 	h2_destroy
- 	h1_destroy
--- 
-2.43.0
+Anyway, the patch to add xfrm_dev_unregister(dev) seems OK if we do like
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit?h=next-20260123&id=fc0f090e41e652d158f946c616cdd82baed3c8f4 ?
 
 
