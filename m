@@ -1,163 +1,235 @@
-Return-Path: <netdev+bounces-258526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KA3FM18jmmJCgEAu9opvQ
-	(envelope-from <netdev+bounces-258526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:22:21 +0100
+	id QDmONIuAjmn6CgEAu9opvQ
+	(envelope-from <netdev+bounces-258527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:38:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC7801323E6
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:22:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7203F1324E8
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0268C301F327
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 01:22:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6F54306BF30
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 01:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40DD20A5C4;
-	Fri, 13 Feb 2026 01:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016D722D9F7;
+	Fri, 13 Feb 2026 01:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRc74ysD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pcdn5Nsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF30D1386DA;
-	Fri, 13 Feb 2026 01:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BB9C8E6
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 01:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770945737; cv=none; b=uV38LbupvvAP15tNBlh78v+xaWq15l2t0ug3rbin7w8YiKwjvhLlGh3BrqyXecDc/ZdovDTX8VeeRqdaMvmbZlA1jN0aeEqX6tm3ROX/EdpMwwsHYlQNlMGyLWKqozjMtwxuHfuE9gvGSygRIsrXc+7WoJK9pksCVbp2amS3yhE=
+	t=1770946673; cv=none; b=MqhzNwY1uKP14EG4+x2Uet1nwVjbM+jUm32AsTlMl8DbDMpiFDlDaoPOYNdWgsmBzcmI27cUHxOz+zZBJl9nAw7jS//JUZze7fcUU4XK7oMHrsfCR83bSH+rnFfEDL8+R1d9HpR/IMkgdMj7q5aQrDhRfB7SraZDtU3PcFUOp90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770945737; c=relaxed/simple;
-	bh=fV90tJ7gdPh2Pj9/Q235En+ABb/bjRugS5dU4Rm+nlM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MAwoBy9d3UMSNitq/+oC4OeMgyhWhJU0J4PBXB8/GMIYyP3uja5HHvpmXUbrKLrrnYjxazSB+MH6GbWe6hMkuiFU9zvgU498OeiI1KbvzDSvQNmBrSiLFfdYq9iqaBvRDYcR60pXd8Gk0Jkhi1Q47PMX5xirToyebNJO711mHQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRc74ysD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25ADC4CEF7;
-	Fri, 13 Feb 2026 01:22:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770945737;
-	bh=fV90tJ7gdPh2Pj9/Q235En+ABb/bjRugS5dU4Rm+nlM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sRc74ysDqJYJS9c4iM/b5Nl+k8sfzcilp+eEdPCI9OhPXdqbtm5uDg1V2sva3/CgP
-	 b0E0Wal5W0AMw2LgrHdeYibLZr4tiM3zTW2WTzWcLbI/J0RjkEWiKGi/vA0F6/bIZc
-	 8bL8SjUakcH4Ax1wGkYw2kduaLp4UgvsJ+XmI/MMy1tpvU3UZJZLe8GX2G9ud0ljwQ
-	 P2ZlY7VzRqD0o+ywgAbrFHQcVsrr74NYMOCMe76GbvSg3EFVRzN9kivul1FsHlqeRF
-	 gyaWSgsRVFxGCQWUmFL1I2shvvVPKT3sgbyuvbQtbAnDprGhm6fxbvs/tD3pVa8DfU
-	 DtZTuUencYW5g==
-Date: Thu, 12 Feb 2026 17:22:15 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Yael Chemla <ychemla@nvidia.com>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, Willem de Bruijn
- <willemb@google.com>, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- noren@nvidia.com
-Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss: validate min
- RSS table size
-Message-ID: <20260212172215.0a3295a0@kernel.org>
-In-Reply-To: <dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
-References: <20260131225454.1225151-1-kuba@kernel.org>
-	<9f535014-80eb-4f57-b047-3638579bde9a@nvidia.com>
-	<20260211134319.39710c1d@kernel.org>
-	<dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
+	s=arc-20240116; t=1770946673; c=relaxed/simple;
+	bh=i76kBt/xx7gYTzlZGlhKxfL9BhtGwRuhGAoQCiOIzUk=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=TWQQ4tB08pFNtDpRq25+B3GQhBD7fXPZS4OE5pWKvWcpv46UMkEohFvhWdfwWZCJ5MKWhJtsOW21AlLQhY58NxDkX/YQlxQZvIL71Ii+D6e4mfaqLb2kN++p2bcrZn9dKO2kJcwp4tLrZMFYKt6loN8nMzayytedkN9zGZLzPmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pcdn5Nsi; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770946658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qz7VWiykJZdAqjJypSWZD+BaPWeczMbaqBbLq8/OY50=;
+	b=pcdn5NsiF0Yj4Iz0WXeKpzO+FsFyE0kCuw5YX/H1npI37twO+xtYJTuQCK6wgavV/pl10o
+	G9pt7IqjkM0kLRw62FsgCoQFjWbXcLRxgCgzDqVxvdSyDCN1B8dnE+Q00v5OLhNJ6/jYCk
+	otsW6uN1wJq3gEtFxk1lPzqfzVMMuuY=
+Date: Fri, 13 Feb 2026 01:37:35 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <4efdec422a00d95a2bd7d227b8bcab61ebc231ce@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf v2] bpf: cpumap: fix race in bq_flush_to_queue on
+ PREEMPT_RT
+To: "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>
+Cc: xxx@vger.kernel.org, "Jiayuan Chen" <jiayuan.chen@shopee.com>,
+ syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com, "Alexei
+ Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, "Jakub Kicinski"
+ <kuba@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, "Stanislav Fomichev"
+ <sdf@fomichev.me>, "Andrii Nakryiko" <andrii@kernel.org>, "Martin KaFai
+ Lau" <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>,
+ "Song Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>,
+ "KP Singh" <kpsingh@kernel.org>, "Hao Luo" <haoluo@google.com>, "Jiri
+ Olsa" <jolsa@kernel.org>, "Clark Williams" <clrkwllms@kernel.org>,
+ "Steven Rostedt" <rostedt@goodmis.org>, "Thomas Gleixner"
+ <tglx@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev
+In-Reply-To: <20260212143344.j3_GaCuV@linutronix.de>
+References: <20260212023634.366343-1-jiayuan.chen@linux.dev>
+ <20260212143344.j3_GaCuV@linutronix.de>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258526-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258527-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,syzkaller.appspotmail.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,linux.dev,google.com,goodmis.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,2b3391f44313b3983e91];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC7801323E6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:email,appspotmail.com:email]
+X-Rspamd-Queue-Id: 7203F1324E8
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 11:41:19 +0200 Tariq Toukan wrote:
-> On 11/02/2026 23:43, Jakub Kicinski wrote:
-> > On Wed, 11 Feb 2026 22:10:56 +0200 Yael Chemla wrote:  
-> >> Thanks for the test addition. I wanted to raise a concern regarding the
-> >> spread factor requirement that may apply to mlx5 and potentially other
-> >> drivers as well.
-> >> The real issue arises when the hardware's maximum RQT (indirection
-> >> table) size isn't large enough to accommodate both the desired number of
-> >> channels and a spread factor of 4. RX queues/channels serve multiple
-> >> purposes beyond RSS - they're also used for XDP, AF_XDP, and direct
-> >> queue steering via ntuple filters or TC.
-> >> Artificially limiting the number of channels based solely on RSS spread
-> >> requirements would be overly restrictive for these non-RSS use cases.
-> >> In such scenarios, we'd rather have a slightly degraded spread factor
-> >> (< 4) than limit channel availability.
-> >> We'd appreciate any feedback on this approach.  
-> > 
-> > That's fine. In fact IIRC ixgbe (infamously) had more queues than
-> > it could fit in its RSS table. So none of this is new. At the same
-> > time if user _does_ want to use a lot of queues in the main context
-> > fewer than 4x entries in the indir table is inadequate.
-> > 
-> > The test is based on production experience, and provides valuable
-> > guidance to device developers.
-> > 
-> > I'm not sure what you want me to say here.
-> 
-> No doubt that larger factors help overcome imbalance issues, and it's 
-> fine to recommend using 4x (or even larger) factors.
-> 
-> The point is, when this comes with a selftest, it's less of a 
-> recommendation/guidance anymore, it becomes kind of a requirement, an 
-> expected behavior. Otherwise the test fails.
-> 
-> This ignores multiple other considerations:
-> 
-> 1. Existing behavior: In general, mlx5e today implies 2x factor, so it 
-> would fail this new test.
-> 
-> 2. Device resources: In large scale (high num of channels, or high num 
-> of netdevs on the same chip, or both), it is not obvious that increasing 
-> the indirection table size is still desirable, or even possible. To pass 
-> the selftest, you'll have to limit the max number of channels.
-> 
-> 3. ch_max should win: Related to point #2. Driver should not enforce 
-> limitations on supported ch_max just to fulfill the recommendation and 
-> pass the test. I prefer flexibility, give the admin the control. That 
-> means, driver would use 4x factor (or larger) whenever possible, but 
-> would not block configurations in which the 4x factor cannot be satisfied.
+2026/2/12 22:33, "Sebastian Andrzej Siewior" <bigeasy@linutronix.de mailt=
+o:bigeasy@linutronix.de?to=3D%22Sebastian%20Andrzej%20Siewior%22%20%3Cbig=
+easy%40linutronix.de%3E > wrote:
 
-Oh I see.. I wasn't aware the CX7 has a limitation of the indirection
-table size. I wrote the test because of a similar limitation in a
-different NIC, but that one has been fixed.. I have limited access to
-CX7 NICs, the one I tested on maxed out at 63 queues so the test has
-passed.
 
-Is it not possible to create an indirection table larger than 256
-entries? 256 is not a lot, AMD Venice (to pick one) will have up 
-to 256 CPU cores (not threads) in a single CPU package.
+
+
+Thanks for the review, Sebastian.
+
+
+> There is no spin_lock() otherwise there would be no problem.
+
+
+Right, will fix the description. The per-CPU bq has no lock at all,
+which is the root cause...
+> =E2=80=A6
+>=20
+>=20>=20
+>=20> Fix this by adding a local_lock_t to xdp_bulk_queue and acquiring i=
+t
+> >  in bq_enqueue() and __cpu_map_flush(). On non-RT kernels, local_lock
+> >  maps to preempt_disable/enable with zero additional overhead. On
+> >  PREEMPT_RT, it provides a per-CPU sleeping lock that serializes
+> >  access to the bq. Use local_lock_nested_bh() since these paths alrea=
+dy
+> >  run under local_bh_disable().
+> >=20
+>=20So you use local_lock_nested_bh() and not local_lock() but you mentio=
+n
+> local_lock. The difference is that the former does not add any
+> preempt_disable() on !RT. At this point I am curious how much of this
+> was written by you and how much is auto generated.=20
+
+
+Sorry=20about the inconsistencies. The commit message became messy after
+several rounds of editing across versions, and I failed to update all
+the descriptions to match the final code.
+
+
+> >=20
+>=20> An alternative approach of snapshotting bq->count and bq->q[] befor=
+e
+> >  releasing the producer_lock was considered, but it requires copying
+> >  the entire bq->q[] array on every flush, adding unnecessary overhead=
+.
+> >=20
+>=20But you still have list_head which is not protected.
+
+The snapshot alternative is incomplete as described. Will drop that parag=
+raph.
+
+> >=20
+>=20> To reproduce, insert an mdelay(100) between spin_unlock() and
+> >  __list_del_clearprev() in bq_flush_to_queue(), then run reproducer
+> >  provided by syzkaller.
+> >=20=20
+>=20>  Panic:
+> >  =3D=3D=3D
+> >  BUG: kernel NULL pointer dereference, address: 0000000000000000
+> >  #PF: supervisor write access in kernel mode
+> >  #PF: error_code(0x0002) - not-present page
+> >  PGD 0 P4D 0
+> >  Oops: Oops: 0002 [#1] SMP PTI
+> >  CPU: 0 UID: 0 PID: 377 Comm: a.out Not tainted 6.19.0+ #21 PREEMPT_R=
+T
+> >  RIP: 0010:bq_flush_to_queue+0x145/0x200
+> >  Call Trace:
+> >  <TASK>
+> >  __cpu_map_flush+0x2c/0x70
+> >  xdp_do_flush+0x64/0x1b0
+> >  xdp_test_run_batch.constprop.0+0x4d4/0x6d0
+> >  bpf_test_run_xdp_live+0x24b/0x3e0
+> >  bpf_prog_test_run_xdp+0x4a1/0x6e0
+> >  __sys_bpf+0x44a/0x2760
+> >  __x64_sys_bpf+0x1a/0x30
+> >  x64_sys_call+0x146c/0x26e0
+> >  do_syscall_64+0xd5/0x5a0
+> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> >  </TASK>
+> >=20
+>=20This could be omitted. It is obvious once you see it. I somehow misse=
+d
+
+Will remove the panic trace.
+
+> this alloc_percpu instance while looking for this kind of bugs.
+> Another one is hiding in devmap.c. Mind to take a look? I think I
+> skip this entire folder=E2=80=A6
+
+
+I see the same pattern there - xdp_dev_bulk_queue is per-CPU with no pree=
+mption
+protection in bq_enqueue() and __dev_flush().
+
+> >=20
+>=20> Fixes: 3253cb49cbad ("softirq: Allow to drop the softirq-BKL lock o=
+n PREEMPT_RT")
+> >  Reported-by: syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
+> >  Closes: https://lore.kernel.org/all/69369331.a70a0220.38f243.009d.GA=
+E@google.com/T/
+> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
+> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >  ---
+> >  v1 -> v2: https://lore.kernel.org/bpf/20260211064417.196401-1-jiayua=
+n.chen@linux.dev/
+> >  - Use local_lock_nested_bh()/local_unlock_nested_bh() instead of
+> >  local_lock()/local_unlock(), since these paths already run under
+> >  local_bh_disable(). (Sebastian Andrzej Siewior)
+> >  - Replace "Caller must hold bq->bq_lock" comment with
+> >  lockdep_assert_held() in bq_flush_to_queue(). (Sebastian Andrzej Sie=
+wior)
+> >  - Fix Fixes tag to 3253cb49cbad ("softirq: Allow to drop the
+> >  softirq-BKL lock on PREEMPT_RT") which is the actual commit that
+> >  makes the race possible. (Sebastian Andrzej Siewior)
+> >  ---
+> >  kernel/bpf/cpumap.c | 17 +++++++++++++++--
+> >  1 file changed, 15 insertions(+), 2 deletions(-)
+> >=20
+>=20The changes below look good.
+
+Thanks!
+
+> Sebastian
 
