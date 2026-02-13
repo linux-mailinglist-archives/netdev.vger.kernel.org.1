@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-258578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDn+AcDWjmmhFQEAu9opvQ
-	(envelope-from <netdev+bounces-258578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 08:46:08 +0100
+	id WDCCCcvWjmmhFQEAu9opvQ
+	(envelope-from <netdev+bounces-258579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 08:46:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DF6133AF0
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 08:46:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A482133AFF
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 08:46:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2650309DA05
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 07:45:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D58C30A8CA2
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 07:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12923126DA;
-	Fri, 13 Feb 2026 07:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EB1311977;
+	Fri, 13 Feb 2026 07:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Nr7WBvH+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mac4LHoU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f227.google.com (mail-qk1-f227.google.com [209.85.222.227])
+Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30968311C37
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 07:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BA131195D
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 07:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770968741; cv=none; b=jvQAT43tJz2ds4Xgvn5xcsnVV2ZtHqVdZtwBdoWeqiyCQs9S69EThqp8LX/3F1ZXz9ab9CpFSbLftzmQ9f5joiny3c7e/0tCCyXlCUYaqoATi8NoamDPvSm3pOCtcA0hOoa9I5/5MGxep/OaFKUzY5rPuttmNDydMYjmVklXFDI=
+	t=1770968743; cv=none; b=T9+rXyB2Daqx66DgBaB36Xzq3zMc7fxRrqB0o+PwwCRTwv4wYr4KpIgBprsHxv9VnupmIEpgWMlgurSoIKCHVq/se1D25J+thDj1NKdflOCQtOfASStCazGJtzWtf+QGgf6+T1L7Aoj61EOu49SDw+qCZqnBh0Dok0KWbj6HYWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770968741; c=relaxed/simple;
-	bh=nAb3HImLxOaZWm6557MYicr5XGXkB60zAU6w01uBHiU=;
+	s=arc-20240116; t=1770968743; c=relaxed/simple;
+	bh=B8pKtQPFdTwJXlDtgNGXqc3gHOD+BWHl5j/fDq+v90A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oLWmnsKC3PlVTm7ChI9lBYp+rpSN/HzhK3eeZomMhhoYVNyJFtibAnEqOkk74Y8AUSp++sOCneTmYJCQEDB8MTQYR7a43E3SOVpM/bsOto+6vieh+TW2iV7xKRxxkNy0ekHU73T0l8YWVDzDu4IT3uU60F4ALrAgq3hvjtxg0/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Nr7WBvH+; arc=none smtp.client-ip=209.85.222.227
+	 MIME-Version; b=WHAyFJv4CIhFSmprH8RTeRaB2yQ5H0MaQrbK7UgMP8GhZsuviJrds4FvrpuJJXjYaRuX7V+zlwK73kMxhnw/Wz8Mk4ouRGDu8vvnqddkbZIVkIjqE9JLpGdn5sAlVnhDQ1t72MHfQUMeU5JPCouctHNdKikl9Q5wNcMiuq7Cz7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Mac4LHoU; arc=none smtp.client-ip=209.85.210.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f227.google.com with SMTP id af79cd13be357-8c710439535so53007785a.1
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 23:45:39 -0800 (PST)
+Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-8230f8f27cfso399477b3a.0
+        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 23:45:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770968739; x=1771573539;
+        d=1e100.net; s=20230601; t=1770968741; x=1771573541;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a6KP/h7jNtt/Dxp5G6lyyAKtSxwxntY2XWNzVR1k/58=;
-        b=p6RU2cjZ8krZECOvEs8oWgFtbv4OvVWUJTPM4wW34dd/f3eGzthK/INnELMtxLkmQ2
-         71YFNCwOUz304F104WLJW0M3LkhbCVbcKM7LW+SE0vlLMQgOerpewNBStne/jax2g2kn
-         fokySFk4JoU5hzX7NrawTGXGTRMkkeL8Bd6ePkWXbQ7+jkK1OGdjWPNnF7k2SJOHAeqI
-         OgwwXn8429ucAVTHh7r4nZRuTA6HOk/hAQB6uP0hOa7Hkc+oBQo8djZ7cF1jkgV/UQ98
-         OABTQSMEbt8agVz4jUlKv9OWRZew4pSBHx8gIhiaj5XkIQQSU+GmSlqiERz3fhxW7ieK
-         21lg==
-X-Gm-Message-State: AOJu0Yw56oMvm/xQ8t6VC4eA2omcJ6u9FoFrZoLnfFnP7iMJbVnIMJWg
-	aC1HYW0RyCCPgDyVH+Rsp874lk31JIDVU9r9CtDE+hALo4rJdpqSQ1fgHbRh3wuM+U/sRaNYyzu
-	4JdhEn2TroA+OOB0hhLiCNUEu6mXNfSZTsfJdlQY8rnUpb2X7hB4eO2+hW72i8Jk5MlJ6/91mc6
-	DpDUGbbf0iqK9ShXTZCo1bSMfekELohKZOSFcPEXdWgoFp7UXVjmqVbYLDcbn8z+2r8nKY77M+a
-	3hLXtAqBtE=
-X-Gm-Gg: AZuq6aKiHQYM2KZw3d4hdjc1uVMQM0v+ycZt7JDMswztrCEZBxUDfJUQnpwwBSR3mJR
-	XEFLyIgf1hZfIrBCYvQD3KJhf5pAoLYZjUYifLt9DmCTTLdol5zSYux00qyPX++clC6LuEuveV1
-	qwcdsqhnJ7qA2OvtdTUlvYw38c1k65rAGgx6CaGqKpuQH/ExizbIwYItiSUH/JUu2lCpCaICjDZ
-	Ybbe8iDcKd38nJO1btFulaGHU4RIC3ULiEifFJDqd2inDM9j9PAslaiUeID3Z8VLIt32iqbVqpp
-	nOCng0ZQgxZiw6gEm8Ey/MlLQoETx54+E3qlh29BkzZvUZQThjEC5H7T+6B49naXli1AS17z+wK
-	so4YQcKSstk41JTFHSCqOX+soBe3Vlu1i4Q+V/aIkdDEEbYgGPD6yPDEJvk++aGTjLaqFQyhAL8
-	Cui1/elFpqldi9m646dpbW8o+asK1r0oUMUQz9y/6Ygtz6qvVRXg6wbrzJ
-X-Received: by 2002:ac8:5e49:0:b0:506:a43d:777e with SMTP id d75a77b69052e-506a825bd9dmr10900801cf.12.1770968738942;
-        Thu, 12 Feb 2026 23:45:38 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-94.dlp.protect.broadcom.com. [144.49.247.94])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8971cd57eebsm9026806d6.22.2026.02.12.23.45.38
+        bh=PRALV8S5SycwE1cozmsAcF2ZCcAdV2ORqka9l/U6rP0=;
+        b=IbQG6vZRHwo8b/61TC56GmADWlMwUcjtQL7BZUpZ45KVnKDB+DVHcsO6hIsFQOO+v4
+         /hKATWkdrvzNa0kDyhvWu+rv+HX93aZ1n0kAA7+o6irqPM0WLi9ZbRmEOjujKvbl5bRt
+         TVpO5Idmgb78amYgtuhCYka+hbj9/gqRdAIy+OQahqX2GaPEzhts7nfmpQ2X0ruXubim
+         deNq8Cz+uZKvNsB7UDLnCEDtTtOCDgmbuFf0Rv2m8q9l8VY2bAm+/f5KP7YLUXnqEp+l
+         2Go0rF4rCX6xuWtOqRA1OBkix7teHwC4T/ycTqoqqk1+YyxMwdbDtYmmR5leKs/0YH8z
+         JnWQ==
+X-Gm-Message-State: AOJu0Yyvm4XK4lYJOAubuLeAxT6i0HVCR6D+tZF9dMvtzASWQb0t+3Gj
+	mptwvhF0mMm0u3V9r2jlzU0BllX84TPVgDHve7dYuCrAvEX+mc/Tis8yf+qDn5NmJQ8SDwpKPye
+	QX4ESpLgAjvHJ+seZs+Fv0F6/d88pSGjVEQlJfZO6jk9v/l6GUUO2cZWgcFpgAusZeEF+rDWvvx
+	7fMW7PSNsYBB4GhLjvYPFxjMboLmBZ9s6GsNE64oHdz9cqbv8WAa5oX8E+VV/pTb20jJqIDG6VX
+	mdoE6m8dJc=
+X-Gm-Gg: AZuq6aIqaiSQvRV5N6LK0+8DLxaXqNpClg6/upH/798tnlcbzgD6YsriEmj/ls/QReP
+	iY/45zmjgle5cpeOTr7PmoIbAgFQy0LWoz14RLlTAqBU1lZW5FhiXLRun2WLSpdnV7Aw6dnLCeX
+	fHUmCogyD0/hti2JWBU2ib1D4YuWvS8v/0S2YWslroj8iO+QEyz9ruQUTqFV6wwy4LgsVc0HDDI
+	Y522rqLwQ0SX1YU/8Cp7UrpQdZuSPBGPVOKsXOHyUueClDMhN1BbSNUCh8c2zdGasA7+hoxxSt/
+	nUMgrLoiP0RO3WMhm26NetWmc/rthIIOytCnDtLPZ60bYf7wCZx1XLr433e4B+UtJ+y2xsu8JOC
+	IhgUu7jybW+q8Sb+x1CVrfwsiLGwkmg4QseuIfPJDsUxWvLr5/qyzRykiWkVvQ+7AAQM10VvOHb
+	1Lt51TgcRNgjLSC6mGCUehBuauK3by6v6pK51kvb8pgxt+3exbSocywBptqxw=
+X-Received: by 2002:a05:6a20:d524:b0:394:625f:c56c with SMTP id adf61e73a8af0-3946c80bcebmr1038394637.19.1770968741228;
+        Thu, 12 Feb 2026 23:45:41 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-103.dlp.protect.broadcom.com. [144.49.247.103])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-35662f4d736sm1484162a91.5.2026.02.12.23.45.40
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 12 Feb 2026 23:45:38 -0800 (PST)
+        Thu, 12 Feb 2026 23:45:41 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-896fe47cab0so11495606d6.3
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 23:45:38 -0800 (PST)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-896ff58f17aso33971616d6.2
+        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 23:45:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1770968737; x=1771573537; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1770968739; x=1771573539; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a6KP/h7jNtt/Dxp5G6lyyAKtSxwxntY2XWNzVR1k/58=;
-        b=Nr7WBvH+6nHezz8f2DnDLqPY8KNX9Z8Gi2uhcFqNvCiHKuI1PhM0yiWJsn93YVXCKP
-         gQc+4U+4ApEWUFMJr0WBhXj5JcUGa8UzaggFaCrSSg8OJbTJ2YEt2heWi/LKI6Ct6TjI
-         uqfJaPy4ZwnupBlVLzjc9SBjFqW7ZHWhZLjLw=
-X-Received: by 2002:a05:6214:1c86:b0:895:c80:75af with SMTP id 6a1803df08f44-897361b7a7cmr10396226d6.34.1770968737490;
-        Thu, 12 Feb 2026 23:45:37 -0800 (PST)
-X-Received: by 2002:a05:6214:1c86:b0:895:c80:75af with SMTP id 6a1803df08f44-897361b7a7cmr10396026d6.34.1770968737021;
-        Thu, 12 Feb 2026 23:45:37 -0800 (PST)
+        bh=PRALV8S5SycwE1cozmsAcF2ZCcAdV2ORqka9l/U6rP0=;
+        b=Mac4LHoU9m++DYg1j7Q5pQ2Krm+z8+YWcbDF3M5eOyXU8NUpxsbM9CaAmLBY2nmJwY
+         s6lKVpDi8WsfEq9F57Ji7Jf3rYhyHlW3PLkr7Codgqqv9hgCaS00g2dbPWiYTbN8ZHja
+         LoD9JJVvIRBFydRk9v4Du96r7dSzaFiPbD7UI=
+X-Received: by 2002:a05:6214:1c42:b0:892:69de:236e with SMTP id 6a1803df08f44-897360d3dd5mr11372036d6.22.1770968739341;
+        Thu, 12 Feb 2026 23:45:39 -0800 (PST)
+X-Received: by 2002:a05:6214:1c42:b0:892:69de:236e with SMTP id 6a1803df08f44-897360d3dd5mr11371876d6.22.1770968738876;
+        Thu, 12 Feb 2026 23:45:38 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50684b6b56bsm58882201cf.17.2026.02.12.23.45.35
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50684b6b56bsm58882201cf.17.2026.02.12.23.45.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Feb 2026 23:45:36 -0800 (PST)
+        Thu, 12 Feb 2026 23:45:38 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -97,9 +97,9 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net v3 3/4] bnxt_en: Fix deleting of Ntuple filters
-Date: Thu, 12 Feb 2026 23:45:02 -0800
-Message-ID: <20260213074503.2302046-4-michael.chan@broadcom.com>
+Subject: [PATCH net v3 4/4] selftests: drv-net: rss_ctx: test RSS contexts persist after ifdown/up
+Date: Thu, 12 Feb 2026 23:45:03 -0800
+Message-ID: <20260213074503.2302046-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20260213074503.2302046-1-michael.chan@broadcom.com>
 References: <20260213074503.2302046-1-michael.chan@broadcom.com>
@@ -124,7 +124,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-258578-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258579-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -136,157 +136,184 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:mid,broadcom.com:dkim,broadcom.com:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:mid,broadcom.com:dkim,broadcom.com:email,lib.py:url,rss_ctx.py:url];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 93DF6133AF0
+X-Rspamd-Queue-Id: 8A482133AFF
 X-Rspamd-Action: no action
 
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Ntuple filters can be deleted when the interface
-is down. The current code blindly sends the filter
-delete command to FW. When the interface is down, all
-the VNICs are deleted in the FW. When the VNIC is
-freed in the FW, all the associated filters are also
-freed. We need not send the free command explicitly.
-Sending such command will generate FW error in the
-dmesg.
+Add a test to verify that RSS contexts persist across interface
+down/up along with their associated Ntuple filters. Another test
+that creates contexts/rules keeping interface down and test their
+persistence is also added.
 
-In order to fix this, save a pointer to the corresponding
-VNIC of an Ntuple filter in the ntuple filter's base
-structure. Use this pointer to check if the VNIC is
-already freed whenever we are freeing the Ntuple filters.
-Now that we have access to the vnic itself, remove the
-redundant reference to fw_vnic_id from all places.
+Tested on bnxt_en:
 
-Fixes: 8336a974f37d ("bnxt_en: Save user configured filters in a lookup list")
+ TAP version 13
+ 1..1
+ # timeout set to 0
+ # selftests: drivers/net/hw: rss_ctx.py
+ # TAP version 13
+ # 1..2
+ # ok 1 rss_ctx.test_rss_context_persist_create_and_ifdown
+ # ok 2 rss_ctx.test_rss_context_persist_ifdown_and_create # SKIP Create context not supported with interface down
+ # # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:1 error:0
+
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 14 ++++++++++++--
- drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  7 +++----
- 3 files changed, 16 insertions(+), 7 deletions(-)
+v3: More improvements suggested by Jakub:
+1. Used defer() and exec() for the if up
+2. Wait for carrier before trying the ping to start traffic tests
+3. Replace manual subprocess.run() ping loop with cmd()
+4. Fixed all ruff and pylint warnings in the newly added code
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 8fc15a8353fc..1f05ecf367fe 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6184,6 +6184,7 @@ int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr)
- {
- 	struct hwrm_cfa_l2_filter_alloc_output *resp;
- 	struct hwrm_cfa_l2_filter_alloc_input *req;
-+	u16 dst_id = INVALID_HW_RING_ID;
- 	u16 target_id = 0xffff;
- 	int rc;
+v2: Many improvements suggested by Jakub:
+https://lore.kernel.org/netdev/20260206052930.1882740-5-michael.chan@broadcom.com/
+1. simplified the tests to have only 2 contexts, use one of the contexts
+to test ntuple filters' persistence also 
+2. used @ksft_disruptive for the test
+3. used netlink API to get rss contexts
+
+v1: https://lore.kernel.org/netdev/20260129061646.1417185-5-michael.chan@broadcom.com/
+---
+ .../selftests/drivers/net/hw/rss_ctx.py       | 100 +++++++++++++++++-
+ 1 file changed, 98 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+index ed7e405682f0..b9b7527c2c6b 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+@@ -4,13 +4,15 @@
+ import datetime
+ import random
+ import re
++import time
+ from lib.py import ksft_run, ksft_pr, ksft_exit
+ from lib.py import ksft_eq, ksft_ne, ksft_ge, ksft_in, ksft_lt, ksft_true, ksft_raises
+ from lib.py import NetDrvEpEnv
+ from lib.py import EthtoolFamily, NetdevFamily
+ from lib.py import KsftSkipEx, KsftFailEx
++from lib.py import ksft_disruptive
+ from lib.py import rand_port
+-from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
++from lib.py import cmd, ethtool, ip, defer, GenerateTraffic, CmdExitFailure, wait_file
  
-@@ -6205,7 +6206,10 @@ int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr)
- 	if (!BNXT_CHIP_TYPE_NITRO_A0(bp))
- 		req->flags |=
- 			cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_OUTERMOST);
--	req->dst_id = cpu_to_le16(fltr->base.fw_vnic_id);
+ 
+ def _rss_key_str(key):
+@@ -809,6 +811,98 @@ def test_rss_default_context_rule(cfg):
+                           'noise' : (0, 1) })
+ 
+ 
++@ksft_disruptive
++def test_rss_context_persist_ifupdown(cfg, pre_down=False):
++    """
++    Test that RSS contexts and their associated ntuple filters persist across
++    an interface down/up cycle.
 +
-+	if (fltr->base.vnic)
-+		dst_id = fltr->base.vnic->fw_vnic_id;
-+	req->dst_id = cpu_to_le16(dst_id);
- 	req->enables =
- 		cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR |
- 			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_DST_ID |
-@@ -6240,6 +6244,9 @@ int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
- 	int rc;
- 
- 	set_bit(BNXT_FLTR_FW_DELETED, &fltr->base.state);
-+	if (fltr->base.vnic->fw_vnic_id == INVALID_HW_RING_ID)
-+		return 0;
++    """
 +
- 	rc = hwrm_req_init(bp, req, HWRM_CFA_NTUPLE_FILTER_FREE);
- 	if (rc)
- 		return rc;
-@@ -6291,6 +6298,7 @@ bnxt_cfg_rfs_ring_tbl_idx(struct bnxt *bp,
- 		if (ctx) {
- 			rss_ctx = ethtool_rxfh_context_priv(ctx);
- 			vnic = &rss_ctx->vnic;
-+			fltr->base.vnic = vnic;
++    require_ntuple(cfg)
++
++    qcnt = len(_get_rx_cnts(cfg))
++    if qcnt < 6:
++        try:
++            ethtool(f"-L {cfg.ifname} combined 6")
++            defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
++        except Exception as exc:
++            raise KsftSkipEx("Not enough queues for the test") from exc
++
++    ethtool(f"-X {cfg.ifname} equal 2")
++    defer(ethtool, f"-X {cfg.ifname} default")
++
++    ifup = defer(ip, f"link set dev {cfg.ifname} up")
++    if pre_down:
++        ip(f"link set dev {cfg.ifname} down")
++
++    try:
++        ctx1_id = ethtool_create(cfg, "-X", "context new start 2 equal 2")
++        defer(ethtool, f"-X {cfg.ifname} context {ctx1_id} delete")
++    except CmdExitFailure as exc:
++        raise KsftSkipEx("Create context not supported with interface down") from exc
++
++    ctx2_id = ethtool_create(cfg, "-X", "context new start 4 equal 2")
++    defer(ethtool, f"-X {cfg.ifname} context {ctx2_id} delete")
++
++    port_ctx2 = rand_port()
++    flow = f"flow-type tcp{cfg.addr_ipver} dst-ip {cfg.addr} dst-port {port_ctx2} context {ctx2_id}"
++    ntuple_id = ethtool_create(cfg, "-N", flow)
++    defer(ethtool, f"-N {cfg.ifname} delete {ntuple_id}")
++
++    if not pre_down:
++        ip(f"link set dev {cfg.ifname} down")
++    ifup.exec()
++
++    wait_file(f"/sys/class/net/{cfg.ifname}/carrier",
++        lambda x: x.strip() == "1", deadline=20)
++
++    remote_addr = cfg.remote_addr_v[cfg.addr_ipver]
++    for _ in range(10):
++        if cmd(f"ping -c 1 -W 1 {remote_addr}", fail=False).ret == 0:
++            break
++        time.sleep(1)
++    else:
++        raise KsftSkipEx("Cannot reach remote host after interface up")
++
++    ctxs = cfg.ethnl.rss_get({'header': {'dev-name': cfg.ifname}}, dump=True)
++
++    data1 = [c for c in ctxs if c.get('context') == ctx1_id]
++    ksft_eq(len(data1), 1, f"Context {ctx1_id} should persist after ifup")
++
++    data2 = [c for c in ctxs if c.get('context') == ctx2_id]
++    ksft_eq(len(data2), 1, f"Context {ctx2_id} should persist after ifup")
++
++    _ntuple_rule_check(cfg, ntuple_id, ctx2_id)
++
++    cnts = _get_rx_cnts(cfg)
++    GenerateTraffic(cfg).wait_pkts_and_stop(20000)
++    cnts = _get_rx_cnts(cfg, prev=cnts)
++
++    main_traffic = sum(cnts[0:2])
++    ksft_ge(main_traffic, 18000, f"Main context traffic distribution: {cnts}")
++    ksft_lt(sum(cnts[2:6]), 500, f"Other context queues should be mostly empty: {cnts}")
++
++    _send_traffic_check(cfg, port_ctx2, f"context {ctx2_id}",
++                        {'target': (4, 5),
++                         'noise': (0, 1),
++                         'empty': (2, 3)})
++
++
++def test_rss_context_persist_create_and_ifdown(cfg):
++    """
++    Create RSS contexts then cycle the interface down and up.
++    """
++    test_rss_context_persist_ifupdown(cfg, pre_down=False)
++
++
++def test_rss_context_persist_ifdown_and_create(cfg):
++    """
++    Bring interface down first, then create RSS contexts and bring up.
++    """
++    test_rss_context_persist_ifupdown(cfg, pre_down=True)
++
++
+ def main() -> None:
+     with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
+         cfg.context_cnt = None
+@@ -823,7 +917,9 @@ def main() -> None:
+                   test_rss_context_out_of_order, test_rss_context4_create_with_cfg,
+                   test_flow_add_context_missing,
+                   test_delete_rss_context_busy, test_rss_ntuple_addition,
+-                  test_rss_default_context_rule],
++                  test_rss_default_context_rule,
++                  test_rss_context_persist_create_and_ifdown,
++                  test_rss_context_persist_ifdown_and_create],
+                  args=(cfg, ))
+     ksft_exit()
  
- 			req->dst_id = cpu_to_le16(vnic->fw_vnic_id);
- 		}
-@@ -6301,6 +6309,7 @@ bnxt_cfg_rfs_ring_tbl_idx(struct bnxt *bp,
- 		u32 enables;
- 
- 		vnic = &bp->vnic_info[BNXT_VNIC_NTUPLE];
-+		fltr->base.vnic = vnic;
- 		req->dst_id = cpu_to_le16(vnic->fw_vnic_id);
- 		enables = CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_RFS_RING_TBL_IDX;
- 		req->enables |= cpu_to_le32(enables);
-@@ -6339,6 +6348,7 @@ int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
- 		bnxt_cfg_rfs_ring_tbl_idx(bp, req, fltr);
- 	} else {
- 		vnic = &bp->vnic_info[fltr->base.rxq + 1];
-+		fltr->base.vnic = vnic;
- 		req->dst_id = cpu_to_le16(vnic->fw_vnic_id);
- 	}
- 	req->enables |= cpu_to_le32(BNXT_NTP_FLTR_FLAGS);
-@@ -6393,7 +6403,7 @@ static int bnxt_hwrm_set_vnic_filter(struct bnxt *bp, u16 vnic_id, u16 idx,
- 	if (IS_ERR(fltr))
- 		return PTR_ERR(fltr);
- 
--	fltr->base.fw_vnic_id = bp->vnic_info[vnic_id].fw_vnic_id;
-+	fltr->base.vnic = &bp->vnic_info[vnic_id];
- 	rc = bnxt_hwrm_l2_filter_alloc(bp, fltr);
- 	if (rc)
- 		bnxt_del_l2_filter(bp, fltr);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 6a18a1973fd5..ae4d01445cea 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1434,9 +1434,9 @@ struct bnxt_filter_base {
- #define BNXT_ACT_RSS_CTX	0x10
- 	u16			sw_id;
- 	u16			rxq;
--	u16			fw_vnic_id;
- 	u16			rss_ctx_id;
- 	u16			vf_idx;
-+	struct bnxt_vnic_info	*vnic;
- 	unsigned long		state;
- #define BNXT_FLTR_VALID		0
- #define BNXT_FLTR_INSERTED	1
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index d0363f410ddb..861965ca2e1e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1267,9 +1267,9 @@ static int bnxt_add_l2_cls_rule(struct bnxt *bp,
- 	u8 vf = ethtool_get_flow_spec_ring_vf(fs->ring_cookie);
- 	struct ethhdr *h_ether = &fs->h_u.ether_spec;
- 	struct ethhdr *m_ether = &fs->m_u.ether_spec;
-+	struct bnxt_vnic_info *vnic = NULL;
- 	struct bnxt_l2_filter *fltr;
- 	struct bnxt_l2_key key;
--	u16 vnic_id;
- 	u8 flags;
- 	int rc;
- 
-@@ -1291,17 +1291,16 @@ static int bnxt_add_l2_cls_rule(struct bnxt *bp,
- 
- 	if (vf) {
- 		flags = BNXT_ACT_FUNC_DST;
--		vnic_id = 0xffff;
- 		vf--;
- 	} else {
- 		flags = BNXT_ACT_RING_DST;
--		vnic_id = bp->vnic_info[ring + 1].fw_vnic_id;
-+		vnic = &bp->vnic_info[ring + 1];
- 	}
- 	fltr = bnxt_alloc_new_l2_filter(bp, &key, flags);
- 	if (IS_ERR(fltr))
- 		return PTR_ERR(fltr);
- 
--	fltr->base.fw_vnic_id = vnic_id;
-+	fltr->base.vnic = vnic;
- 	fltr->base.rxq = ring;
- 	fltr->base.vf_idx = vf;
- 	rc = bnxt_hwrm_l2_filter_alloc(bp, fltr);
 -- 
 2.51.0
 
