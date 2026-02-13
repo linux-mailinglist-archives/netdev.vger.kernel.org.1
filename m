@@ -1,162 +1,136 @@
-Return-Path: <netdev+bounces-258645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MdQCaVXj2lqQQEAu9opvQ
-	(envelope-from <netdev+bounces-258645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:56:05 +0100
+	id WDR5OwRYj2lqQQEAu9opvQ
+	(envelope-from <netdev+bounces-258646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:57:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D681386B9
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:56:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103EF1386EC
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:57:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 392BA300C01C
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:55:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7F0C4300690C
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AF132D0DC;
-	Fri, 13 Feb 2026 16:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C924B34FF41;
+	Fri, 13 Feb 2026 16:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCdtsMkt"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fIdFrDq9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A8E32939F
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A4A299A87
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771001724; cv=none; b=my/jU3KYZUE2hJOwe3qOGPc2840buk5LPkQHBgpz/+WsR/2PF8ruBn6eP28gYVbZzGYCLlgnhT9dhX38bpFV88bp7BdC8aEepVviHqhNXVTw+udhgoI8ARuR6KBtXqFfVaPF4Zra9jkZBqvhsHK9RARjpK8jcuE3ycrBqfKIWx4=
+	t=1771001854; cv=none; b=pnqoyOgMNc6+kK3I1m0Nc6u8oFCOm25D4IKvbgAUH5a+1Ta1fuetP8rfrp3xaMwmXNygoORKOoQmB+QsI1AE6ZKFjwraFWfLgZn+OLJsJcI/LE0J5QqHnFnoE+ViGj3m3RAtVf8+qInNdTC7l3R8lm8ZFXQP0v4V6TzLBwjUDKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771001724; c=relaxed/simple;
-	bh=RD0u0t5zLEK6pLa3+Sqhn6/3CXcPdDtMjzVXUFAB/+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lwBEM/70LQr4xFI1tA+vSy1oDKTS3YrUTrT3t/HEfnLUYs4OKagB2kZlYuWV57JG6gfv8RIv04dHM5CMN9/0GX6E2RGr6C1XzTlNJnDptSYYIwUE5Jiy5fhqu0E8Ub6axwjC3JHro0li9C+DPyK0JfBN0Onm5wxoREJjq86XBek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCdtsMkt; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43768aa6ab2so94542f8f.1
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 08:55:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771001722; x=1771606522; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ptauGZZMWrMiDu6t9/L2OG0QlvSuTICYS6yevNbRDk=;
-        b=aCdtsMktH4bwzf5FmL9w24nAGB2+Wwf3iPBV7MgFUWcf7Qv7CvwpEArVLGCHYVYpi4
-         TpQJrINBlfgAlIgzY/jJM/mnCxpFdKJUJKPeOdXZUCNRaim7n6UcOkOhzicTYrstyBAp
-         ZBe4vfCk5GzaE64bnLuJk6z2dBTMUH2IaRN0j8r9gT6e7qC4EdWjdh+rlttSqjMhsXSX
-         OEF/bAnFDdPC3xyaK6REnQj4QEBsXE9hIi0H25urPUw7KnVLgsld6r/e1lofi5Ztsauz
-         xWkHuBbwc4LZLr1+YUpx8KXFdMtI7HCTdLyJcxEd3ili6hzMdBCPRY0TeW7T+XMl7dbv
-         JKHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771001722; x=1771606522;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8ptauGZZMWrMiDu6t9/L2OG0QlvSuTICYS6yevNbRDk=;
-        b=hlfEeXwkYtpkIsYGbk7Mtx/G+y3JiUlxD1g85lrl53TZcQxxJ1faQysqMXMB0mRuMf
-         uZ+v3wLuRy545CYrVOcK5Dd5gdzqTVvfVPt+nNBC6oBb9x1tH2tauoB0hdtW3b4xSWQe
-         q6FiIufJpRhx37o54QU9S4GZz814aiRwMOnf9RVIZPiig43IHFWWrO6LdXxESNC4SHJD
-         e+iN5ccp0FUpIielLbyc8VsBvGZBHvnPKfLgB79l7vAi54KTBt/czfJZhZGFObkX07Cv
-         evzbRvPWlMuJgcDxk6A/EzD2E91r/WMaqKwjg2P5DL5Q6yu7b6zkDhyDLl61cXEnw5Pv
-         o7jg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFAwOPso7cli46VRfm+GDsLPRRcVRrTCESzeMJxMPzPAstBMO4evAtX+QYvxq/idkV70NhXbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx2i7UO/8esOzFjhHPSHDo2chHS7MvbKD54ZjIxmjidRUUZR41
-	XmgZ3asbo6EocfNguIDi3EtQqvhpvuhyFZY4BJXYjy87lLQydA3FIxMo
-X-Gm-Gg: AZuq6aKYNdGLVyVxelIf/WPSTzNh4DfHNV6OgbE4wDCERFlFRaxLbhsn+Rk0ZpWTRHP
-	vzNQ/Y7metcR4LIO3WL3sy0E7eG2apw+27UtNxWVmqQc8vPf9Zg388n6yJ6uOYTLu0/np+K3AaP
-	WWUYOKii8pV6rWR23HN7ZIUeqCL+1wGil+WqSy8HXrGfQAFJOardC52JGwpJWmAntR1hf3Bfe88
-	bH7LZLOMyD/Hhac18DheIgtRLRmL+wNH5hCtcVyzezPfmG+Gpv8kxMhU/i+mp8IIceHbuKZicqr
-	aWx6wBUUYhe9CRhga76L60mrsMN8Og183rJvOXo2cHAKlC6MijaG6Sr2TKk8WrS5pBkP0OVAAnE
-	DM1Gs5xvwjvGdl9HT+wC+AOl5S/R5+x4O3IUTkFwJsxOSDPLaW9R54g0iNFlVlbWfCcpTiljDrA
-	7YNNnr8eaxCcCdXnPNKpWXsnjrTanzfx+a9T05895UHHqtxf+2JbYBK7+NBaEndRwsNIbsAF2y8
-	fpTkRK2ty9rWvNwM0XY
-X-Received: by 2002:a05:600c:8b2e:b0:477:a478:3f94 with SMTP id 5b1f17b1804b1-4837105119cmr29305325e9.5.1771001721721;
-        Fri, 13 Feb 2026 08:55:21 -0800 (PST)
-Received: from thomas-precision3591.paris.inria.fr (wifi-pro-82-204.paris.inria.fr. [128.93.82.204])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-48371a298ebsm24537975e9.13.2026.02.13.08.55.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Feb 2026 08:55:21 -0800 (PST)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	stable@vger.kernel.org,
-	Dariusz Marcinkiewicz <reksio@newterm.pl>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle
-Date: Fri, 13 Feb 2026 17:43:39 +0100
-Message-ID: <20260213164340.77272-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1771001854; c=relaxed/simple;
+	bh=ZHtx23E+ZSL9bEg+4dgJjINpioxVsODP/Xcrg9pdvus=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
+	 References:In-Reply-To; b=YCwN/0z/Q6hrLekBGCXMwGu4b+X91ObGfn/HNLT+v1pxxcE/8UvcF7o9a6ij2Q4NEAp3gzFknvziF1YPYDn4KyLF+r/GBJwUKckpEtcjd9/5E4zcDVNqjGdZVjtgHlIn5qHBKrOP63qaQE6JJI9FIg81D50zHNJwFd7U7xz0Elc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fIdFrDq9; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id A1D1E4E40D3D;
+	Fri, 13 Feb 2026 16:57:23 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6EF3B606BE;
+	Fri, 13 Feb 2026 16:57:23 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7A2FC10368EF5;
+	Fri, 13 Feb 2026 17:57:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1771001842; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ZHtx23E+ZSL9bEg+4dgJjINpioxVsODP/Xcrg9pdvus=;
+	b=fIdFrDq9DTIwos/hewZKvcd/Gdk4UTNYTWULMwmRIFlUTSGOVtF1gacl8BBBo86sj7Gljt
+	afFPkE80qna5nltaOAJaAUPvS0hOqv5CDsdYNKR3YRl9Rh1c7mxZOEGViQnhpdJJxyKJLN
+	32UxdDZrRPNhfXKILOY0fiBn72OQTRf+ZdZarx4+wpXfncYXq8oxSEFtVrbsw9eXmd2kgP
+	dk5SNRvKhDdEz+P985G2S79dUmwgEoRgji9WZeXeXuMy3SzpAso2/lPH5Kq9vTwW7iFPpC
+	QJbJuPq2FqQoSHI0McoUQ4iHhMbyLiHk1VYHLKryyMcveYJOjOjGjHIvQIpj+A==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 13 Feb 2026 17:57:17 +0100
+Message-Id: <DGDZR8L3E9WI.2MEYVL01KQ2YN@bootlin.com>
+To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next 0/8] net: macb: Add XDP support and page pool
+ integration
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Th=C3=A9o_Lebrun?=
+ <theo.lebrun@bootlin.com>, =?utf-8?q?Gr=C3=A9gory_Clement?=
+ <gregory.clement@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260115222531.313002-1-pvalerio@redhat.com>
+In-Reply-To: <20260115222531.313002-1-pvalerio@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-258646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258645-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,newterm.pl,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fourierthomas@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 96D681386B9
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:url,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 103EF1386EC
 X-Rspamd-Action: no action
 
-dma_free_coherent() in error path takes priv->rx_buf.alloc_len as
-the dma handle. This would lead to improper unmapping of the buffer.
+Hello Paolo,
 
-Change the dma handle to priv->rx_buf.alloc_phys.
+My XSK series (based on top of yours) is ready.
+I won't be sending it while net-next is closed, of course.
 
-Fixes: 6af55ff52b02 ("Driver for Beckhoff CX5020 EtherCAT master module.")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/net/ethernet/ec_bhf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It starts with a few cleanup/rework patches that have no direct link to
+XSK and touch code you add in this series. They could be appended to
+your next revision or even squashed (with the right SoB &
+Co-developed-by trailers) for most.
 
-diff --git a/drivers/net/ethernet/ec_bhf.c b/drivers/net/ethernet/ec_bhf.c
-index 67275aa4f65b..0c86cbb0313c 100644
---- a/drivers/net/ethernet/ec_bhf.c
-+++ b/drivers/net/ethernet/ec_bhf.c
-@@ -423,7 +423,7 @@ static int ec_bhf_open(struct net_device *net_dev)
- 
- error_rx_free:
- 	dma_free_coherent(dev, priv->rx_buf.alloc_len, priv->rx_buf.alloc,
--			  priv->rx_buf.alloc_len);
-+			  priv->rx_buf.alloc_phys);
- out:
- 	return err;
- }
--- 
-2.43.0
+Some contain bug fixes, mostly related to stats accounting. I expect
+some amount of discussion as well, mostly regarding the page pool DMA
+direction.
+
+Patches don't have the proper Fixes tags, sorry about that.
+I'll send them as reply to this email.
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
