@@ -1,219 +1,195 @@
-Return-Path: <netdev+bounces-258588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8I1bEuP0jmnDGAEAu9opvQ
-	(envelope-from <netdev+bounces-258588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:54:43 +0100
+	id oJqcMuz0jmnDGAEAu9opvQ
+	(envelope-from <netdev+bounces-258589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:54:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E08134BA6
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:54:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47E58134BB4
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 427743008C8A
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 09:54:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD345300CCB8
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 09:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8CC34F24A;
-	Fri, 13 Feb 2026 09:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC3A34F24A;
+	Fri, 13 Feb 2026 09:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHv9LA+A"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="gVxRVyVB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2912DF146
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 09:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404D32DF146
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 09:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770976476; cv=none; b=XM5PBvnwxLwbHhkVrvn1Uosfky1zAhbEcvuRm6zH5/T/UX5xld5SqhhGwGjq95sWdT68Zjvl5U7V56bj+rvHgEGzzIaYKdPDUt4bN8fiz8ERpHq5eVUgpt3yNkVeznCxEycHqenkR/xq8S6R5J7UnC1QAtRL03p9S/2RA4XbwMQ=
+	t=1770976485; cv=none; b=JerLjGt8tTejvucWjhm8ivoZg2PKRypVobrBF3OiXahkAz21757iP1alNwewZaaqYTPb7WC2UjjPcKMZ1Ms48WPOSHdd2H6wtjiAh35U/tMLzbrLa0iyuRXQmWFf7knzBYCVl1enk6+W5Qp9p0jL9TvNl7vXGAfBy9YNoSWR1V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770976476; c=relaxed/simple;
-	bh=qjCrcgKWLqWVf+xZnQVDVlOl1FeiM3aLH8iSB3vJ60g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ujIKHwfbiSSUsrfBrbICiBn0ZWgtrtBOfJN3IMZT5M/IOw5Erh2b1L7j9IBCuv9hKKc6a+5KY5H2hPTDjnavBEFM08blGArVXx90TO7oM5uuiAoLK8RdOccNP1UDzhwoItrGrpUHVptb3V2v0CQplGV3PRNK4H3MJlWDVGzG4qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHv9LA+A; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c06cb8004e8so283878a12.0
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 01:54:35 -0800 (PST)
+	s=arc-20240116; t=1770976485; c=relaxed/simple;
+	bh=vHFx/hSJywUMMLlBtwaeUgAP6h6QwaSX1+ADj/wpOLE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=S65eQnJk4vBIv+Im8CNTv1RPz/u/QfpSEVCcYXaiRhFpx9cqWpJLTF6PqBdmUV1fOR1hSmBksGkdSC/B7p6KBvB+wNnqNyRARcFVpHtYtd+2ADQLF/PsLu08CQ7DP+j2EzZTSNDvd4cNJS8I3upx3DFQ61D51B3RoeSjRXuZ500=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=gVxRVyVB; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4377174e1ebso507392f8f.3
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 01:54:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770976474; x=1771581274; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+HrwJwerGrer0mpwrMP1Hb4zjKqG4nWhdr3lbn8nE8=;
-        b=IHv9LA+AW3Z4vrE9HbywfcLhIB8l8+DvVv+Uhmx0TG6c81+q1Z9GFoVScF3rFaxK7S
-         YVdMaubp0uUwSsYQqtPCbGnglVT4GoMVLv0nglpoJHYV/GGbDmhpBn57rnhWULQeVcO5
-         9Ef/bVweJBtnDMUd1/c0/ZGPKfijnB929vsbCwcE15u4VaqaTGNWBdmKQAQBpNpy3tSQ
-         SqX6tpA+5pjl+xb5iaSHsRB8Tbn0EJGZLCzDPLaF/PKKq3VL6ogcA5nUc2QFZNHBfT3n
-         RaMoTleSFLA9ZhVxIZ7s+bruOsG8MiP+nQR9yG4nuKfJ0hWxOmGjqVW8mAvoyr2+A4J0
-         WzSA==
+        d=openvpn.net; s=google; t=1770976483; x=1771581283; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2G1I8HNjaFi6YM8hvH2Jx/PnxV6b2wStAcZKbfqk/0E=;
+        b=gVxRVyVB1cb3ZLSsrptmpkO6NOCddF7inPGWbEOjvE2pADlyE6qosli5ocugRfZers
+         9MfdUHF+sv4J6gfy1kzu/qUjCTn6TeiUFBdPsSgTOfLII7DHNfIYtlcRbDsyfYlnuhuU
+         I74kcQeReJ3/IB9U3Qn48XVE/EnmrUKwJ+uqwdhdhbKEIf4D0/fygzF3elDcI56A1FV6
+         Pd0rUaKEq/xdKRO6C4EfDPO0lgJRBXy1pevv486nSIuHal9h2WH9VH9sSI2UJgWHqxrs
+         8yAF9ZrBDxt1z30xYxAa1I7sbLLVRinmK4Z1P8aqWFn4RlkyEQmhOPoz/BAlS/mXKq++
+         IsZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770976474; x=1771581274;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6+HrwJwerGrer0mpwrMP1Hb4zjKqG4nWhdr3lbn8nE8=;
-        b=HRWO+6CV/9vWbUB3aV++tB/ij5yS3pBFDtH/tJbPeo5S1aP5WXO3UDkOs/wONt0B2G
-         56sHXMgMM0CFy+BYQgltxDzsOjOeoGWdlJQWytXWAXriWThh4I9kpUC57nLZa6mtVhmO
-         ietaJ6hGR9VC1dmg3sIdjS5LPrmexXdSsxFFbt1/V5QVvzzmRxknGg+0cawN6CiXLEuh
-         rywN0SWA3jmtq/u1jyQXR0Sb2f/ToF1Y3G4o/QsA6g5hpAvHDMU01foarlNKamV/dZHB
-         OYafOtvnHSp0lvBkvE31VnvSNnNCopVKlg4VEKXT8LHBieoQzPXqOj/IQK+ZutWleDdd
-         SyiQ==
-X-Gm-Message-State: AOJu0YwKzET0ntO1mjhIHlIL7N4puVDyLNu6a+nzkS4znYHeP1rYDGQT
-	nFt1NN49SXgL9qvtNh9IlonmT3wVsvtr4AgPbpqKFgZ9Z+QMIdiSjBGZkqVX5kidrw8=
-X-Gm-Gg: AZuq6aKJ2BvKlWcAyzeQc9IVTpbeyviY9qJAb1v40f+SxJLaAiAoVFDyj+FkE35k1HS
-	ytpLAIHiI+B3kHDnwdxKePR7p41qjWJ4BkU2UOTywOWlO3F8YBqPfj/TrUsgmsAfpQdjrj/kj8F
-	joaROwtGq3CO1vAFvN+PPsSaFMcZNonNto8ZOty9nTC4cMjXoifcsVgHyPU9mKJolghT7cIekNK
-	z9NBVNNxfJU5sg6ievQ5nPzbZN2v6U3tToA6Gi2RYOIQfPjmftF6/YcjK7igegVg5G0uJM24r8R
-	aNUYjZxbmkoGpapR/QKMLYxTFthx6g4V4KtlzHAwnw2kU0sYgGEjGhBQ21+asEwS5o5Zuxj4074
-	q4loiCYkh5YTd29GFCvjk38/DCk0h1qA1CVq52BhGNBGRo5GTl+gYQ/9kFSvD/8gz+VVITogHAi
-	Nb9V/lqv0sVlT0uH5+3wf3cxcSDs9GbDyt7cVo7A==
-X-Received: by 2002:a17:90b:1a86:b0:353:38c8:b612 with SMTP id 98e67ed59e1d1-356aabe68cbmr1527483a91.12.1770976474425;
-        Fri, 13 Feb 2026 01:54:34 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6e1981797csm6880456a12.34.2026.02.13.01.54.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Feb 2026 01:54:33 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Bohac <jbohac@suse.cz>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Liang Li <liali@redhat.com>
-Subject: [PATCH net] bonding: alb: fix UAF in rlb_arp_recv during bond up/down
-Date: Fri, 13 Feb 2026 09:54:24 +0000
-Message-ID: <20260213095424.84636-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20230601; t=1770976483; x=1771581283;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2G1I8HNjaFi6YM8hvH2Jx/PnxV6b2wStAcZKbfqk/0E=;
+        b=L53eNwUYoQpQT7PzJw4HBcRdpOQwP72JSdXaqmFO50mBNYQADY+phfQLrX/Z/VP+uJ
+         RX76+tsMyzjYeHnXS6g7xzCl8Rujlfi3oZJaM9diYpuMOKky/0OcMK0mVz0V0F0oIlx3
+         KCP0aEbMmanodX+OWniK4CINg1wGdxUe75vbT/wlVkxSxtttW1+VkMkVD8NKvOn8mWcs
+         y+1ocYNMBvH1p2byq0gw81QrwGfVzd7BaXacl/WJzKpo0AbC0qf3ptA5KY2eP2Psdb7Q
+         hOXsY6+KR0qx9mV+lcazkMPVDHb3hhwLum2SzzW2ILgTZAAEv+9nXSWKN8FLuSEyx9BA
+         52Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUS/9C6txltoLKHeRCD0hw4U9UhkU8REnpOhh4OGz+OXnOPxVoj8SL7IZD/NOp4hES+IsX3b3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjovfmIPEwr2kXQbJDDC28KhmkqW/x0g3sJ5FtdAOi6kXZmaiP
+	rHEh7efmN1/oDL0RTl/M0L0LnlGQcxcpPx94gYzf0yAXNbU1FjZ/bMs6Q849H0vEIGJXUMCjGvH
+	bdMWPRAg5FLKSe2s5pvnXntxswl0X7gfPRhkz8ZOYpR8J5kSgjo0=
+X-Gm-Gg: AZuq6aJLpTXyxkS6Uf9GUwVDn2yUjZRWVU4GAU7ubjJaTvnh5ZPVRuih16S2SPs52zh
+	+W2DjRt6Ob+7ZSRbgpYKSAsxDwEhd3Bi2bqe1LceFScGQyB8xjZ+dq/HFyVtV7NHBVi0JkRkRot
+	g4Kw/N1Cm2MoUfN9iJyuyPYB95vFLl6+EmyAeN8ip+r8wIsknZbXduQghG3DkILWPDtsneVMtC7
+	vWlV9Zd6PVZUuTCwKXCww5zRFRcf2ggKIAmpsagpEeWP+Og7aF/ZyeC+IWqlRdcDdc9J0D3hDWG
+	OWXt++9wQFEKUN5tufhHGSBrs0X5tZLIIgki2W8L7W7URSNPyYC/y8ydkHdEXD2KLj48ERzYmSY
+	5KgyXISzN037OJnKUEdx5ck+MNqwCm6fJ+4q5RKN/RRGy77JfjsrVcfMrnM3ORAP8ZFz0/4/nSL
+	GNvctCkDJEhkSF5g5ynB/YQSfA66RTsWeopayLcUQnxtitCWoUKlmdv5Al
+X-Received: by 2002:a05:6000:1a8e:b0:435:a0f5:c271 with SMTP id ffacd0b85a97d-4379790ee4cmr2241965f8f.31.1770976482633;
+        Fri, 13 Feb 2026 01:54:42 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:686c:823d:23c:28d? ([2001:67c:2fbc:1:686c:823d:23c:28d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796abcda5sm4886336f8f.19.2026.02.13.01.54.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Feb 2026 01:54:42 -0800 (PST)
+Message-ID: <ccd00053-60e6-42f1-a966-73e54805ade5@openvpn.net>
+Date: Fri, 13 Feb 2026 10:54:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bug#1126499: linux-image-6.17.13+deb14-amd64: ovpn NULL pointer
+ dereference and lockup under heavy load
+From: Antonio Quartulli <antonio@openvpn.net>
+To: Salvatore Bonaccorso <carnil@debian.org>,
+ Jon Penn <jpenn@bentonvillek12.org>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, 1126499@bugs.debian.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ralf Lici <ralf@mandelbit.com>
+References: <4be2e796-77ba-4864-a288-e6edf3b7de12@bentonvillek12.org>
+ <176996279620.3109699.15382994681575380467@eldamar.lan>
+ <be2d036e-42eb-4d3a-be1d-60c49801b884@openvpn.net>
+ <aYYwvGbStTFvof4E@eldamar.lan>
+ <9d240ea8-7e55-4be2-b99b-3f2657c5f8c8@openvpn.net>
+ <aY43tezcIO5DDE2B@eldamar.lan>
+ <bfae563e-d2c0-41a1-b967-e9ac2c940d21@openvpn.net>
+Content-Language: en-US
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
+ X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
+ voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
+ EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
+ qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
+ WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
+ dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
+ RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
+ Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
+ rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
+ YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AYGGhrcHM6Ly9rZXlzLm9wZW5wZ3Aub3JnFiEEyr2hKCAXwmchmIXHSPDM
+ to9Z0UwFAmj3PEoFCShLq0sACgkQSPDMto9Z0Uw7/BAAtMIP/wzpiYn+Di0TWwNAEqDUcGnv
+ JQ0CrFu8WzdtNo1TvEh5oqSLyO0xWaiGeDcC5bQOAAumN+0Aa8NPqhCH5O0eKslzP69cz247
+ 4Yfx/lpNejqDaeu0Gh3kybbT84M+yFJWwbjeT9zPwfSDyoyDfBHbSb46FGoTqXR+YBp9t/CV
+ MuXryL/vn+RmH/R8+s1T/wF2cXpQr3uXuV3e0ccKw33CugxQJsS4pqbaCmYKilLmwNBSHNrD
+ 77BnGkml15Hd6XFFvbmxIAJVnH9ZceLln1DpjVvg5pg4BRPeWiZwf5/7UwOw+tksSIoNllUH
+ 4z/VgsIcRw/5QyjVpUQLPY5kdr57ywieSh0agJ160fP8s/okUqqn6UQV5fE8/HBIloIbf7yW
+ LDE5mYqmcxDzTUqdstKZzIi91QRVLgXgoi7WOeLF2WjITCWd1YcrmX/SEPnOWkK0oNr5ykb0
+ 4XuLLzK9l9MzFkwTOwOWiQNFcxXZ9CdW2sC7G+uxhQ+x8AQW+WoLkKJF2vbREMjLqctPU1A4
+ 557A9xZBI2xg0xWVaaOWr4eyd4vpfKY3VFlxLT7zMy/IKtsm6N01ekXwui1Zb9oWtsP3OaRx
+ gZ5bmW8qwhk5XnNgbSfjehOO7EphsyCBgKkQZtjFyQqQZaDdQ+GTo1t6xnfBB6/TwS7pNpf2
+ ZvLulFbOOARoRsrsEgorBgEEAZdVAQUBAQdAyD3gsxqcxX256G9lLJ+NFhi7BQpchUat6mSA
+ Pb+1yCQDAQgHwsF8BBgBCAAmFiEEyr2hKCAXwmchmIXHSPDMto9Z0UwFAmhGyuwCGwwFCQHh
+ M4AACgkQSPDMto9Z0UwymQ//Z1tIZaaJM7CH8npDlnbzrI938cE0Ry5acrw2EWd0aGGUaW+L
+ +lu6N1kTOVZiU6rnkjib+9FXwW1LhAUiLYYn2OlVpVT1kBSniR00L3oE62UpFgZbD3hr5S/i
+ o4+ZB8fffAfD6llKxbRWNED9UrfiVh02EgYYS2Jmy+V4BT8+KJGyxNFv0LFSJjwb8zQZ5vVZ
+ 5FPYsSQ5JQdAzYNmA99cbLlNpyHbzbHr2bXr4t8b/ri04Swn+Kzpo+811W/rkq/mI1v+yM/6
+ o7+0586l1MQ9m0LMj6vLXrBDN0ioGa1/97GhP8LtLE4Hlh+S8jPSDn+8BkSB4+4IpijQKtrA
+ qVTaiP4v3Y6faqJArPch5FHKgu+rn7bMqoipKjVzKGUXroGoUHwjzeaOnnnwYMvkDIwHiAW6
+ XgzE5ZREn2ffEsSnVPzA4QkjP+QX/5RZoH1983gb7eOXbP/KQhiH6SO1UBAmgPKSKQGRAYYt
+ cJX1bHWYQHTtefBGoKrbkzksL5ZvTdNRcC44/Z5u4yhNmAsq4K6wDQu0JbADv69J56jPaCM+
+ gg9NWuSR3XNVOui/0JRVx4qd3SnsnwsuF5xy+fD0ocYBLuksVmHa4FsJq9113Or2fM+10t1m
+ yBIZwIDEBLu9zxGUYLenla/gHde+UnSs+mycN0sya9ahOBTG/57k7w/aQLc=
+Organization: OpenVPN Inc.
+In-Reply-To: <bfae563e-d2c0-41a1-b967-e9ac2c940d21@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.cz,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-258588-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[openvpn.net:+];
+	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258589-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 63E08134BA6
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 47E58134BB4
 X-Rspamd-Action: no action
 
-The ALB RX path may access rx_hashtbl concurrently with bond
-teardown. During rapid bond up/down cycles, rlb_deinitialize()
-frees rx_hashtbl while RX handlers are still running, leading
-to a use-after-free detected by KASAN.
+On 12/02/2026 21:38, Antonio Quartulli wrote:
+> Will report it here as soon as it's submitted.
 
-[  214.174138] Oops: general protection fault, probably for non-canonical address 0xdffffc000000001d: 0000 [#1] SMP KASAN PTI
-[  214.186478] KASAN: null-ptr-deref in range [0x00000000000000e8-0x00000000000000ef]
-[  214.194933] CPU: 30 UID: 0 PID: 2375 Comm: ping Kdump: loaded Not tainted 6.19.0-rc8+ #2 PREEMPT(voluntary)
-[  214.205907] Hardware name: Dell Inc. PowerEdge R730/0WCJNT, BIOS 2.14.0 01/14/2022
-[  214.214357] RIP: 0010:rlb_arp_recv+0x505/0xab0 [bonding]
-[  214.220320] Code: 0f 85 2b 05 00 00 48 b8 00 00 00 00 00 fc ff df 40 0f b6 ed 48 c1 e5 06 49 03 ad 78 01 00 00 48 8d 7d 28 48 89 fa 48 c1 ea 03 <0f> b6
- 04 02 84 c0 74 06 0f 8e 12 05 00 00 80 7d 28 00 0f 84 8c 00
-[  214.241280] RSP: 0018:ffffc900073d8870 EFLAGS: 00010206
-[  214.247116] RAX: dffffc0000000000 RBX: ffff888168556822 RCX: ffff88816855681e
-[  214.255082] RDX: 000000000000001d RSI: dffffc0000000000 RDI: 00000000000000e8
-[  214.263048] RBP: 00000000000000c0 R08: 0000000000000002 R09: ffffed11192021c8
-[  214.271013] R10: ffff8888c9010e43 R11: 0000000000000001 R12: 1ffff92000e7b119
-[  214.278978] R13: ffff8888c9010e00 R14: ffff888168556822 R15: ffff888168556810
-[  214.286943] FS:  00007f85d2d9cb80(0000) GS:ffff88886ccb3000(0000) knlGS:0000000000000000
-[  214.295966] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  214.302380] CR2: 00007f0d047b5e34 CR3: 00000008a1c2e002 CR4: 00000000001726f0
-[  214.310347] Call Trace:
-[  214.313070]  <IRQ>
-[  214.315318]  ? __pfx_rlb_arp_recv+0x10/0x10 [bonding]                                                                                                  [  214.320975]  bond_handle_frame+0x166/0xb60 [bonding]
-[  214.326537]  ? __pfx_bond_handle_frame+0x10/0x10 [bonding]
-[  214.332680]  __netif_receive_skb_core.constprop.0+0x576/0x2710
-[  214.339199]  ? __pfx_arp_process+0x10/0x10
-[  214.343775]  ? sched_balance_find_src_group+0x98/0x630
-[  214.349513]  ? __pfx___netif_receive_skb_core.constprop.0+0x10/0x10
-[  214.356513]  ? arp_rcv+0x307/0x690
-[  214.360311]  ? __pfx_arp_rcv+0x10/0x10
-[  214.364499]  ? __lock_acquire+0x58c/0xbd0
-[  214.368975]  __netif_receive_skb_one_core+0xae/0x1b0
-[  214.374518]  ? __pfx___netif_receive_skb_one_core+0x10/0x10
-[  214.380743]  ? lock_acquire+0x10b/0x140
-[  214.385026]  process_backlog+0x3f1/0x13a0
-[  214.389502]  ? process_backlog+0x3aa/0x13a0
-[  214.394174]  __napi_poll.constprop.0+0x9f/0x370
-[  214.399233]  net_rx_action+0x8c1/0xe60
-[  214.403423]  ? __pfx_net_rx_action+0x10/0x10
-[  214.408193]  ? lock_acquire.part.0+0xbd/0x260
-[  214.413058]  ? sched_clock_cpu+0x6c/0x540
-[  214.417540]  ? mark_held_locks+0x40/0x70
-[  214.421920]  handle_softirqs+0x1fd/0x860
-[  214.426302]  ? __pfx_handle_softirqs+0x10/0x10
-[  214.431264]  ? __neigh_event_send+0x2d6/0xf50
-[  214.436131]  do_softirq+0xb1/0xf0
-[  214.439830]  </IRQ>
+https://patchwork.kernel.org/project/netdevbpf/patch/20260212213130.11497-1-antonio@openvpn.net/
 
-The issue is reproducible by looping ip link set bond0 up/down,
-where rlb_arp_recv() can race with rlb_deinitialize() and dereference
-a freed rx_hashtbl entry.
+Feel free to reply with a Tested-by.
+Thanks.
 
-Fix this by setting recv_probe to NULL before calling
-bond_alb_deinitialize(), and then calling synchronize_net() to wait
-for any concurrent RX processing to finish.
 
-This ensures that no RX handler can access rx_hashtbl after it is
-freed, while preserving the existing locking semantics.
+Regards,
 
-Reported-by: Liang Li <liali@redhat.com>
-Fixes: e53665c6eaa6 ("bonding: delete migrated IP addresses from the rlb hash table")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- drivers/net/bonding/bond_main.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 47f13d86cb7e..8e1057a2a061 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -4314,9 +4314,13 @@ static int bond_close(struct net_device *bond_dev)
- 
- 	bond_work_cancel_all(bond);
- 	bond->send_peer_notif = 0;
-+	bond->recv_probe = NULL;
-+
-+	/* Wait for any in-flight RX handlers */
-+	synchronize_net();
-+
- 	if (bond_is_lb(bond))
- 		bond_alb_deinitialize(bond);
--	bond->recv_probe = NULL;
- 
- 	if (BOND_MODE(bond) == BOND_MODE_8023AD &&
- 	    bond->params.broadcast_neighbor)
 -- 
-2.50.1
+Antonio Quartulli
+OpenVPN Inc.
 
 
