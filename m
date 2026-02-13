@@ -1,355 +1,205 @@
-Return-Path: <netdev+bounces-258586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258587-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFN8GAPsjmkCGAEAu9opvQ
-	(envelope-from <netdev+bounces-258586-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:16:51 +0100
+	id cLpoOuv0jmnDGAEAu9opvQ
+	(envelope-from <netdev+bounces-258587-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:54:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B126C1345B1
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:16:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B557134BAD
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:54:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD7AD30379A1
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 09:16:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DEEC330E877C
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 09:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCA034C145;
-	Fri, 13 Feb 2026 09:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B28B34F499;
+	Fri, 13 Feb 2026 09:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShnHXq8B"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="B34Qbrw1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE321EBA19
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 09:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A1034F24A
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 09:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770974176; cv=none; b=u28D0/IwjSbqY89YCuVACTOe9ISwNTDngh5Eglc+lnBdqtxE3ySAd+mVLqCNMRC9gMOOaA76Xnge/wzqrY8LSiHh0I0qKwC58hsNlKWXDLDEfDAVVi2WocoHTATz81AzGW+rHb5PfRCwCPhfENaIx/KDSWn0YMcPeRls6VOlEio=
+	t=1770976426; cv=none; b=Qjr/ON/tlc3bgyci4EnBlFzJH/NTR7Aq6wz+4apQ827s/w0nu51FJ0ohBeTNkDKYe+gfk9jXCRAPwkWqhd03qr02YIV4u4e/Q/bMf0wcV/oJaGrj0iiCoSlueBynmWs5vvZ/upJBgyT4J9zhePOWA9dnieuotUGGAvMLxMGNLb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770974176; c=relaxed/simple;
-	bh=uWdHmJii4Eltf3Y7DYQHeGLCQWqE8sMNnU5SgG5a1H8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZXgwQZqKz1w3R8mivOYUJUYzATjjgqEQvU1Vy9SDTRnqszAjVARkIRQJ+FbPLPPUOtUMySXc5tAZYWLNTzVowsMeKkTbkGAoULvdIstRHlNqonZhLN/k/PBnEGuBpGo+LXlFXSmQJI+DEb/0vqG3crWuRqSswaBpHKcjD1b11t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ShnHXq8B; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65a1b17a99aso1241987a12.3
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 01:16:15 -0800 (PST)
+	s=arc-20240116; t=1770976426; c=relaxed/simple;
+	bh=RIesuow8Owo7wqI2pGBDeCOlPkxXvbQ5i0krwN3HP50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bErRzh3qKjbaRoqzcZbqXDKtyrzcTncOBlRcAolc8RL2hxp9cvGvI1/ufzJV71n59pytFIqSjnqPTt9oXZW7E7tAKCKrC4dwPyjceczKqeQ9O8Y79cr9gVEItxWvNzITWZTcp4I0vLNufxEBy8UFBnCP5DV1AVTxXZ2e/CpNVJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=B34Qbrw1; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4801c2fae63so5840585e9.2
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 01:53:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770974174; x=1771578974; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+YW2XpxsF2GL4nTKdafPvtP9xVrfkFTi55NUblNEfP8=;
-        b=ShnHXq8BX0fK1i9naB1KwHnhuepAhIUJ4E3oOJKoCe3SIKkNV/nX0+CCKoKHax71P0
-         mW7ioaHBVTzH08tcKN3yUYpr6gkwx4QwYvJUqDJacnu7zVm9j6EE3WKS3b7qPqqUiP9X
-         DgUF77SyMVcnE5X1uQHfnpzWi3d5Mnv2VEJPoAEEjG/Qno9h+5I9P2ctEqRUGNmfURxv
-         zA+hcNrQ6zxU+qW4m7wbkC2ZJhY7HvNi/N+qin8moN3p3M0XKqDU0HtVZ1wrHFuRcxUf
-         V4eOJr55YElF9taWLT4JjOXWRqbeX6MeA65ys5bRs2xJ5HsOArSM949jSZv1eVIr/+sq
-         F7KQ==
+        d=openvpn.net; s=google; t=1770976423; x=1771581223; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ACw1Fe1MYqj4TvYFJTTYpC2xFtLa1JWsA1+lYaVXDL4=;
+        b=B34Qbrw1/ysi3UbFOWurL/g14doCwX/pDZBeKVfatBIxmFqikSWLx3NO7GCUoi9rjw
+         k/XKqKqxtWWZv1moSAJIb1gS5fFhp7iOCDMP4LcW2vKuNqPrNhYn2LYA6fTFj3DSvEyF
+         9YBlqQPsWXQw9fynX8fKbyOLaVkQLQirnjzhaBozQlKyGofAE73r3laWg2BkM6AWkgpC
+         2cIWU/sWxuOp0p3chwVE1VaJjE5yP26zGwf7fsNDYlxNNG4/8FTwNNJJCnZWP0w6+9nd
+         62xzkEuHRmvtEHI9spOKUK74ceV/OvpSM8tLATjt2e3PRL746uV2ACXFvOBhFavkl8Mk
+         ry5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770974174; x=1771578974;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1770976423; x=1771581223;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+YW2XpxsF2GL4nTKdafPvtP9xVrfkFTi55NUblNEfP8=;
-        b=Mx8+/sSOLcIIS4K5fs2YoyTE4SUwjb9bJ4bSE0lMDguSNyFz1+t4c7b9Cd2pCUaC5/
-         Ow/i+NDocdX1DdXXITNOa+3Xv5J9c+GeJd7Sv72J4GFWqToTPs26AFchewepQLGHDBj3
-         XXmL4daTKGBeyzjp43r4f/OzajEEh4ghgWi6PF/kFgfdyZq7hWULBlJFB+WLweKLUxVy
-         94JNPmfFAFhj4cjFiGCwPXdmw1c4YKWzRT2a+FSB6wFKFZDWjlvxAdKjl6NZcDNvmmHh
-         vWv1HDJ6Sjmljrb6HgPEYkKxjKShoFm5TB8diyocAxjR4kw+5FdIvhOTnIt9+8ksVrkm
-         M4tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6XokvmSUXsBNiZapDCDEI1tJ8R/Fs0spO9D+iyJYO0I4265OGoF90b4i3SiIIK+RFjG7RkdI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyFdeLOrp2CFCaVfP4viIEbeZ0yDNsmqcDMDpoAWiZTFx3AL91
-	CoZ9HTB3eoD8crAPqUUoW+eoG01ZO7oRjrhIzpw/ZnmHdAKcwMYmSxVm
-X-Gm-Gg: AZuq6aJDV9WMROQePHNIeLIrpJjz7geDZvh+RsvvNB2MuPGHXU3MPzRx2oul2sKEAq7
-	onpZHVBV1faaRWAQb0D1O3Ce74sxMgNca1LWL60AC/yTxCw3aQoSg64F2ZTnyDEXKPVLgpblDKl
-	Kq9h66zBnvt7ChzwEHMdOsWrzsh6yW54VovyY5VdQJ7ZAuc/Vl9pbSIuFlefMR0+l+/7Q74yifv
-	cKmiGOMPfRWNhJJ1lBUncZG/ce/fTW6w9PLNxenh4MR0n63W7sT1NmIIPg1l6BVLcI3ncMEQzRx
-	cbhDdUhrRlW/nyHi63LF2/qSkV8RuMq25Kudp/5nVF31j8UaA+MGfC65VIN+NKXnWzioo8sgxVz
-	Sj27DyN/Gmj1vnFPbHXbzS1WrCF/HCfPeC9i4mM+9gLwFW4ibUuTzIftBDPt1EPiPdyWO62hrBa
-	If/PE=
-X-Received: by 2002:a17:907:94c4:b0:b8e:d13f:e20f with SMTP id a640c23a62f3a-b8fb452e806mr66008166b.55.1770974173219;
-        Fri, 13 Feb 2026 01:16:13 -0800 (PST)
-Received: from gmail.com ([2a09:bac5:4e20:2705::3e3:35])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8f84bb7b0fsm194556366b.1.2026.02.13.01.16.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Feb 2026 01:16:12 -0800 (PST)
-From: Qingfang Deng <dqfext@gmail.com>
-To: linux-ppp@vger.kernel.org,
-	Michal Ostrowski <mostrows@earthlink.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Michal Ostrowski <mostrows@gmail.com>,
-	Dianne Skoll <dianne@skoll.ca>,
-	Paul Mackerras <paulus@ozlabs.org>,
-	Jaco Kroon <jaco@uls.co.za>,
-	James Carlson <carlsonj@workingcode.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: [PATCH RFC net-next v2] pppoe: remove kernel-mode relay support
-Date: Fri, 13 Feb 2026 17:16:04 +0800
-Message-ID: <20260213091605.132561-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=ACw1Fe1MYqj4TvYFJTTYpC2xFtLa1JWsA1+lYaVXDL4=;
+        b=nL1OTcNkqm7O7F/NKpncv0LcUgt3UNqkN2+IXxYRykQe6tCFahh+w8IExrZYmSAscr
+         zRxF154R1mFcid3YfpBU1PGueqpXMCNg7UboYqqsKK42V0Lfdus3GJXezbHhFm86ztyQ
+         J+XQOAfplchC6nNym/uJLCmVPV3nKpG3ZUFRa+BmgCQwwp/BY4vBvddZDu6vZBOSY6t8
+         Isg6f2eT83CtMbuMraeg//6PnoT6x/fAnY4OmRoKio2eBcwosNAjW7cbDnEcYDEnxhRp
+         PcuC++iFm7+733JXm/VKpB9ap/pBLuqfbfjtHYITz6G3Vme+/Py1l3lsQZF8tiUF21z6
+         2QnA==
+X-Gm-Message-State: AOJu0YzqvZNrSGw6JCewb5wMktMlEcZzxHI3oiTMwZSXgWdJKcBj0Ips
+	igo1P9YxxVCCFVy8zBoWm+RY1Dk8bw7hPIdKEHtkGW0KNihpXZ2UvWKvuBSCmzr19FjlZ6aZ35Q
+	Xf0s+fr0TABhsPUOCgGxwXUkhohWphf/C02d+x2JrG0kKaat8Ck+EDuh1SCvzuvVG
+X-Gm-Gg: AZuq6aJIecu1few/ldLEQVX3Z3KiW5uWvc30kQ+95doDFU+wloEc3Bwt2yE/IC7b1dG
+	yXw2X+GkddTH5uNSOGKw8OGJC7zhuxlhO03NIj3Uf15nDzeUvOiF0mD3sN+1XgGrcNnaip/6fLN
+	QAfzo4hwFkK6xn/MSyoPBiy3E0Blm0FZWNSqEiFkzifMFL6edn2rRn5APLpHj3rDxqg5WH3wU1X
+	nKhPg+S/RKdCfMT5KiLjXNXe91kBKx/EEWX2KcmSTpuHBpK3mg0voR8vYaSzJsc4i1j5YAhnRTN
+	YJINtpR9VMN0DZ8Yr9FkPDrTYZQ0vyiXuU1VJlp+kHz4R6rSb1y7/4mqt+AJ1XDS8smPqZNPmxs
+	+3DqD7rCp2arm5v66AEweAq2VWuXVs+TjvJtTEkifK2hJ3Wu0i9uhNFiHKkUc/T3gHL5qbctcjh
+	mhMpTw/NIrM2RUJs1XubX7nu7LN3E/SZ+2y/uIEMy83m2YwTPFzHKJITo6
+X-Received: by 2002:a05:600c:3e14:b0:480:4a8f:2d5c with SMTP id 5b1f17b1804b1-483710904ecmr30260795e9.29.1770976423232;
+        Fri, 13 Feb 2026 01:53:43 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:686c:823d:23c:28d? ([2001:67c:2fbc:1:686c:823d:23c:28d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48371998777sm47752205e9.1.2026.02.13.01.53.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Feb 2026 01:53:42 -0800 (PST)
+Message-ID: <085435ca-8803-424f-bc25-027530ab996d@openvpn.net>
+Date: Fri, 13 Feb 2026 10:53:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ovpn: tcp - don't deref NULL sk_socket member after
+ tcp_close()
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Sabrina Dubroca <sd@queasysnail.net>
+References: <20260212213130.11497-1-antonio@openvpn.net>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20260212213130.11497-1-antonio@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258586-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,earthlink.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	DKIM_TRACE(0.00)[openvpn.net:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[gmail.com,skoll.ca,ozlabs.org,uls.co.za,workingcode.com,arndb.de,redhat.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258587-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,skoll.ca:url,pppoe.dev:url,pppoe.pa:url]
-X-Rspamd-Queue-Id: B126C1345B1
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 6B557134BAD
 X-Rspamd-Action: no action
 
-The kernel-mode PPPoE relay feature and its two associated ioctls
-(PPPOEIOCSFWD and PPPOEIOCDFWD) are not used by any existing userspace
-PPPoE implementations. The most commonly-used package, RP-PPPoE [1],
-handles the relaying entirely in userspace.
+On 12/02/2026 22:31, Antonio Quartulli wrote:
+> When deleting a peer in case of keepalive expiration, the peer is
+> removed from the OpenVPN hashtable and is temporary inserted in a
+> "release list" for further processing.
+> 
+> This happens in:
+> ovpn_peer_keepalive_work()
+>    unlock_ovpn(release_list)
+> 
+> This processing includes detaching from the socket being used to
+> talk to this peer, by restoring its original proto and socket
+> ops/callbacks.
+> 
+> In case of TCP it may happen that, while the peer is sitting in
+> the release list, userspace decides to close the socket.
+> This will result in a concurrent execution of:
+> 
+> tcp_close(sk)
+>    __tcp_close(sk)
+>      sock_orphan(sk)
+>        sk_set_socket(sk, NULL)
+> 
+> The last function call will set sk->sk_socket to NULL.
+> 
+> When the releasing routine is resumed, ovpn_tcp_socket_detach()
+> will attempt to dereference sk->sk_socket to restore its original
+> ops member. This operation will crash due to sk->sk_socket being NULL.
+> 
+> Fix this race condition by testing-and-accessing
+> sk->sk_socket atomically under sk->sk_callback_lock.
+> 
+> Link: https://lore.kernel.org/netdev/176996279620.3109699.15382994681575380467@eldamar.lan/
+> Link: https://github.com/OpenVPN/ovpn-net-next/issues/29
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 
-This legacy code has remained in the driver since its introduction in
-kernel 2.3.99-pre7 for over two decades, but has served no practical
-purpose.
+Fixes: 11851cbd60ea ("ovpn: implement TCP transport")
 
-Remove the unused relay code.
-
-[1] https://dianne.skoll.ca/projects/rp-pppoe/
-
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v1: restore .compat_ioctl
-  https://lore.kernel.org/linux-ppp/20260211075547.138904-1-dqfext@gmail.com/
-
- drivers/net/ppp/pppoe.c       | 79 -----------------------------------
- drivers/net/ppp/pppox.c       |  3 --
- include/linux/if_pppox.h      |  6 ---
- include/uapi/linux/if_pppox.h | 10 -----
- 4 files changed, 98 deletions(-)
-
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 4275b393a454..7a6dcfa421e9 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -237,25 +237,6 @@ static inline struct pppox_sock *get_item(struct pppoe_net *pn, __be16 sid,
- 	return po;
- }
- 
--static inline struct pppox_sock *__get_item_by_addr(struct net *net,
--						    struct sockaddr_pppox *sp)
--{
--	struct net_device *dev;
--	struct pppoe_net *pn;
--	struct pppox_sock *pppox_sock = NULL;
--
--	int ifindex;
--
--	dev = dev_get_by_name_rcu(net, sp->sa_addr.pppoe.dev);
--	if (dev) {
--		ifindex = dev->ifindex;
--		pn = pppoe_pernet(net);
--		pppox_sock = __get_item(pn, sp->sa_addr.pppoe.sid,
--					sp->sa_addr.pppoe.remote, ifindex);
--	}
--	return pppox_sock;
--}
--
- static inline void delete_item(struct pppoe_net *pn, __be16 sid,
- 					char *addr, int ifindex)
- {
-@@ -369,7 +350,6 @@ static struct notifier_block pppoe_notifier = {
- static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
- {
- 	struct pppox_sock *po = pppox_sk(sk);
--	struct pppox_sock *relay_po;
- 
- 	/* Backlog receive. Semantics of backlog rcv preclude any code from
- 	 * executing in lock_sock()/release_sock() bounds; meaning sk->sk_state
-@@ -378,17 +358,6 @@ static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
- 
- 	if (sk->sk_state & PPPOX_BOUND) {
- 		ppp_input(&po->chan, skb);
--	} else if (sk->sk_state & PPPOX_RELAY) {
--		relay_po = __get_item_by_addr(sock_net(sk),
--					      &po->pppoe_relay);
--		if (relay_po == NULL)
--			goto abort_kfree;
--
--		if ((sk_pppox(relay_po)->sk_state & PPPOX_CONNECTED) == 0)
--			goto abort_kfree;
--
--		if (!__pppoe_xmit(sk_pppox(relay_po), skb))
--			goto abort_kfree;
- 	} else {
- 		if (sock_queue_rcv_skb(sk, skb))
- 			goto abort_kfree;
-@@ -656,7 +625,6 @@ static int pppoe_connect(struct socket *sock, struct sockaddr_unsized *uservaddr
- 
- 		po->pppoe_ifindex = 0;
- 		memset(&po->pppoe_pa, 0, sizeof(po->pppoe_pa));
--		memset(&po->pppoe_relay, 0, sizeof(po->pppoe_relay));
- 		memset(&po->chan, 0, sizeof(po->chan));
- 		po->next = NULL;
- 		po->num = 0;
-@@ -783,53 +751,6 @@ static int pppoe_ioctl(struct socket *sock, unsigned int cmd,
- 		err = 0;
- 		break;
- 
--	case PPPOEIOCSFWD:
--	{
--		struct pppox_sock *relay_po;
--
--		err = -EBUSY;
--		if (sk->sk_state & (PPPOX_BOUND | PPPOX_DEAD))
--			break;
--
--		err = -ENOTCONN;
--		if (!(sk->sk_state & PPPOX_CONNECTED))
--			break;
--
--		/* PPPoE address from the user specifies an outbound
--		   PPPoE address which frames are forwarded to */
--		err = -EFAULT;
--		if (copy_from_user(&po->pppoe_relay,
--				   (void __user *)arg,
--				   sizeof(struct sockaddr_pppox)))
--			break;
--
--		err = -EINVAL;
--		if (po->pppoe_relay.sa_family != AF_PPPOX ||
--		    po->pppoe_relay.sa_protocol != PX_PROTO_OE)
--			break;
--
--		/* Check that the socket referenced by the address
--		   actually exists. */
--		rcu_read_lock();
--		relay_po = __get_item_by_addr(sock_net(sk), &po->pppoe_relay);
--		rcu_read_unlock();
--		if (!relay_po)
--			break;
--
--		sk->sk_state |= PPPOX_RELAY;
--		err = 0;
--		break;
--	}
--
--	case PPPOEIOCDFWD:
--		err = -EALREADY;
--		if (!(sk->sk_state & PPPOX_RELAY))
--			break;
--
--		sk->sk_state &= ~PPPOX_RELAY;
--		err = 0;
--		break;
--
- 	default:
- 		err = -ENOTTY;
- 	}
-diff --git a/drivers/net/ppp/pppox.c b/drivers/net/ppp/pppox.c
-index 08364f10a43f..5861a2f6ce3e 100644
---- a/drivers/net/ppp/pppox.c
-+++ b/drivers/net/ppp/pppox.c
-@@ -102,9 +102,6 @@ EXPORT_SYMBOL(pppox_ioctl);
- #ifdef CONFIG_COMPAT
- int pppox_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- {
--	if (cmd == PPPOEIOCSFWD32)
--		cmd = PPPOEIOCSFWD;
--
- 	return pppox_ioctl(sock, cmd, (unsigned long)compat_ptr(arg));
- }
- 
-diff --git a/include/linux/if_pppox.h b/include/linux/if_pppox.h
-index db45d6f1c4f4..8bbf676c2a85 100644
---- a/include/linux/if_pppox.h
-+++ b/include/linux/if_pppox.h
-@@ -25,8 +25,6 @@ struct pppoe_opt {
- 	struct net_device      *dev;	  /* device associated with socket*/
- 	int			ifindex;  /* ifindex of device associated with socket */
- 	struct pppoe_addr	pa;	  /* what this socket is bound to*/
--	struct sockaddr_pppox	relay;	  /* what socket data will be
--					     relayed to (PPPoE relaying) */
- 	struct work_struct      padt_work;/* Work item for handling PADT */
- };
- 
-@@ -53,7 +51,6 @@ struct pppox_sock {
- #define pppoe_dev	proto.pppoe.dev
- #define pppoe_ifindex	proto.pppoe.ifindex
- #define pppoe_pa	proto.pppoe.pa
--#define pppoe_relay	proto.pppoe.relay
- 
- static inline struct pppox_sock *pppox_sk(struct sock *sk)
- {
-@@ -80,14 +77,11 @@ extern void pppox_unbind_sock(struct sock *sk);/* delete ppp-channel binding */
- extern int pppox_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
- extern int pppox_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
- 
--#define PPPOEIOCSFWD32    _IOW(0xB1 ,0, compat_size_t)
--
- /* PPPoX socket states */
- enum {
-     PPPOX_NONE		= 0,  /* initial state */
-     PPPOX_CONNECTED	= 1,  /* connection established ==TCP_ESTABLISHED */
-     PPPOX_BOUND		= 2,  /* bound to ppp device */
--    PPPOX_RELAY		= 4,  /* forwarding is enabled */
-     PPPOX_DEAD		= 16  /* dead, useless, please clean me up!*/
- };
- 
-diff --git a/include/uapi/linux/if_pppox.h b/include/uapi/linux/if_pppox.h
-index 9abd80dcc46f..8fdf0a681a4e 100644
---- a/include/uapi/linux/if_pppox.h
-+++ b/include/uapi/linux/if_pppox.h
-@@ -103,16 +103,6 @@ struct sockaddr_pppol2tpv3in6 {
- 	struct pppol2tpv3in6_addr pppol2tp;
- } __packed;
- 
--/*********************************************************************
-- *
-- * ioctl interface for defining forwarding of connections
-- *
-- ********************************************************************/
--
--#define PPPOEIOCSFWD	_IOW(0xB1 ,0, size_t)
--#define PPPOEIOCDFWD	_IO(0xB1 ,1)
--/*#define PPPOEIOCGFWD	_IOWR(0xB1,2, size_t)*/
--
- /* Codes to identify message types */
- #define PADI_CODE	0x09
- #define PADO_CODE	0x07
 -- 
-2.43.0
+Antonio Quartulli
+OpenVPN Inc.
 
 
