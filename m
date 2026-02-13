@@ -1,190 +1,215 @@
-Return-Path: <netdev+bounces-258638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIosDvtLj2nnPgEAu9opvQ
-	(envelope-from <netdev+bounces-258638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:06:19 +0100
+	id KMSOEeVNj2nnPgEAu9opvQ
+	(envelope-from <netdev+bounces-258639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:14:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2885137D0E
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:06:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 687F7137DCB
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:14:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B65433041153
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:06:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 71FD53042FF9
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464EE35FF43;
-	Fri, 13 Feb 2026 16:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876EA3612F4;
+	Fri, 13 Feb 2026 16:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHqcLS8V"
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="htQ3ydDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DA32D780E
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A309F356A10
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770998773; cv=none; b=ZkqSCr/kE95mPh/uJ8NPP+XuApNrwsRnQbpsESk5/BRm59AG3utK3gqyB5+yxFr4S5WkEpnrfy5jmhGX/A1qn5gWJvs9nHCMXAd7JokNaLW7/2KbLxJXNSFIm2h7/qx8r3Z0DCFqPxIg58Er2Y/X0puG1OG821G5djbmY+13NO4=
+	t=1770999254; cv=none; b=NUq+fx4ZtWFVKQ9mjdiJM661qwl+amzkL1xEL4cT2/7jJDFX3pAkS/c2rShXjisbi37X0EYAKdW6zDr5BRtW+9v3g6ct08qCP4Sz6rC3HruO0YwH/TpPx/ZiuOHsAFKi6BaFJAxF6bopjp1i1zdrnevSMrfU2f6juC5book/tKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770998773; c=relaxed/simple;
-	bh=nQZ77PqctDTcYDinAbWjENAqR0oQhnhj2uSc/QPB/FM=;
+	s=arc-20240116; t=1770999254; c=relaxed/simple;
+	bh=V51ablEssrNSfKuX1Hq5OtUiYKCcf8X5hv6UEk8jGlA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KtyCVBh2T6mfx8Jz9eGnWevyoGc160DeI6Fadt8uu4gv8UIcBCJar8s+ni0v/6qt4s1elFsHegXKDaH4zM/3QlvpgkWeqs87HqZNrMrt70LA6sdZPJlLF+jxDYi/ZsV1KdXXCU+6KBDHZzg9Twcmt58KlqblFBWv30QPFGELgVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHqcLS8V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86C10C116C6;
-	Fri, 13 Feb 2026 16:06:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770998772;
-	bh=nQZ77PqctDTcYDinAbWjENAqR0oQhnhj2uSc/QPB/FM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fHqcLS8VUGrLPput0dKUotJs4S3e7OYkbAbIHCQIbdfzw4biZ7/2OFE34qoy29w1y
-	 jYDVezYR+0D3Iu4pQ0Dx7jvwJucjrSfcCQZVWL+ZQKCmtUzM+s1SLaopGsjQ40accN
-	 pb9ZMzk8OfhnOxPBQob4C6A6Adv50q3260+mA1NE75T/kPPr83UpHyqyRSgzx4r4xD
-	 mt80Yd8dXw359ERf3PowTvyDOp2elu1uKjwFf61gDKiE73s2RpEgzlCRcPqQpn+SF/
-	 8wD3MB0MeOrS7MzMhmtwuyqY4E+uuIYzfwp4FrzFexhYSEktZ9/fkLd3eaaQA6zOJL
-	 L7kFGlPnyG+YQ==
-From: Simon Horman <horms@kernel.org>
-To: michael.chan@broadcom.com
-Cc: Simon Horman <horms@kernel.org>,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	andrew.gospodarek@broadcom.com,
-	andrew+netdev@lunn.ch,
-	kicinski@meta.com,
+	 MIME-Version; b=qBrIK6jcMfeilWSiREd2CNPH8INv6u4UNNc/W+TzYNHKBFIEgeWRw0lDw4z/28I0Q/MccIhA1p1qUu4rJhjVbd3AX/aAUx76SC4tuGheMdZrvM565DlOIfzwS98s01ibOvSJLw+bnTVQ+8q6A6ie8cLhsuqb5H4p+TJlb/wRWv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=htQ3ydDf; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8c70ce93afaso120295885a.0
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 08:14:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gourry.net; s=google; t=1770999252; x=1771604052; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=thDqtYQ9svVncr7vS9+e+A5WECJReTFglHn4jfgM4PU=;
+        b=htQ3ydDfBsUQ8o5IcIz7d8e0mIrmgh/YE104UM9pf528zXXMgtlsySDb+SXM5apGXq
+         3ZW+M2d28jLP+KUxxSSILcC2GORDOrpvP+82bPw8vwxcc4X2Ax/GozqGfxzzxzY8E2a3
+         SYLhRapxSr3QRdnJ/QCBSPxyQchGWX32jDFrZ9jYPCIFHe0wGYDM6N77YF6nvilVVfN5
+         KB//suc54zTPKxVM8Uo4Zpp5UgR0mAaApcHgAqLEJKu3m8uOug9qKZrz9+JfheimKbI7
+         6fzKANZwXl8xGgfzlrJfELvGPwq/2iKXfMj+mfzTCaPx8IS4HUzsUQKqN8+c/BjX0d0N
+         iczQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770999252; x=1771604052;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=thDqtYQ9svVncr7vS9+e+A5WECJReTFglHn4jfgM4PU=;
+        b=awZXQOXvXKd2iCeuFEl5FfMjfyoSipk1/OmnFfaI1bBIHdaZtAgBtSl7v/Pjyk3GfR
+         u/t1cgVpctlgVQ4R4bfiR6fniX473EfgMd6272CAGK4U5XZYf28sRXD12MXdBaUT0Jhk
+         be9voYjfbMH9cBkw1ND/R7TKWqX+vLqSxG6L7vVfGPX6d5V5YAJI6bu605id9XFs6NS1
+         gLCIEwpZfDW65zG4qsFYm8aZiuAqUgNLh5NUEabTq76ckA48yGujybEshyG+2Y6L26nS
+         4bL3jYe+XghbQBtex+rufvnk50zyJV+dLk0EBu9CVo/ORBo/Wx1lyJCZsCg/C6i9XdNG
+         EfNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVID6KzufKIcWl74SX3FPhg9VpZVpol2KuhOEJpaIW/872jh/sg9CrAxqeWdm4eMb0F/hiCWhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUSGYtOBSWZd2ySpFv9y96+Pi0NM3nfsMkm22cYTrlt7BIqXer
+	uHpSv50WiQk74WtVFqROXau+zYQk1IAjrwwF7nQIDBwAvb6OY6PqRowhAylY6XzhLTdHBmRjr0l
+	TKao9
+X-Gm-Gg: AZuq6aKy3XGFYYjEF5A4cVVjcd3bnZONECsYENL+aldLyCcTFRLVw/gTC8cs/KgTSmW
+	mFOt1y5gI8FUBKSNTsP5fqI4L/EH6E2y9zwetzhFG2ewF+DIcJBUkFR4Dp5pFVG62YJIVVe4YiY
+	ZTqwGg0kZaU2NpQKs/v5FnbMujaygw37tyXnZihEU05WEK706Sx8f2p8t+lvRqmH2XynLrt74D5
+	esi6yQzrDSveSA0KzhCxXvVKDOmc9wL/jcTeV/PBopETlgSZJfK0/+NyNDa7pBILqXAuo0GYjou
+	GVF3vrPK/abzTviM39JBkl02x7kk7duY7d6AFKcrtkhiVR4f9EWFqdMaQpOGoQrSiA0L2NAF+hC
+	kgFXlPIwFUpDTnZZJhm1aEmAt4nzjZP2X7FbP7dLsFbbpf2cKDbZyBNyU3FFDA5lFAtGZV4Rfl8
+	qy9ZTZ546JehDCtif/XMRG7fomdDJcLi0j/3xc6xQ/QMd2kwTMeK0I8gqObxzN4dfrItnLVbVg/
+	teYmo5LV92ev+asPkpuTIQwXQ==
+X-Received: by 2002:a05:620a:46a4:b0:8b2:d72d:e41c with SMTP id af79cd13be357-8cb422549c1mr296857685a.5.1770999251629;
+        Fri, 13 Feb 2026 08:14:11 -0800 (PST)
+Received: from gourry-fedora-PF4VCD3F.lan (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb39da3dc6sm401861185a.51.2026.02.13.08.14.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Feb 2026 08:14:11 -0800 (PST)
+From: Gregory Price <gourry@gourry.net>
+To: Alejandro Lucero <alucerop@amd.com>
+Cc: linux-cxl@vger.kernel.org,
 	netdev@vger.kernel.org,
-	pavan.chebbi@broadcom.com,
-	davem@davemloft.net
-Subject: Re: [net,v3,3/4] bnxt_en: Fix deleting of Ntuple filters
-Date: Fri, 13 Feb 2026 16:06:04 +0000
-Message-ID: <20260213160604.2515258-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260213074503.2302046-4-michael.chan@broadcom.com>
-References: <20260213074503.2302046-4-michael.chan@broadcom.com>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 14/22] cxl: Define a driver interface for DPA allocation
+Date: Fri, 13 Feb 2026 11:14:05 -0500
+Message-ID: <20260213161410.2945294-1-gourry@gourry.net>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260201155438.2664640-15-alejandro.lucero-palau@amd.com>
+References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com> <20260201155438.2664640-15-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gourry.net:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258638-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-258639-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[gourry.net];
+	DKIM_TRACE(0.00)[gourry.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2885137D0E
+	FROM_NEQ_ENVFROM(0.00)[gourry@gourry.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[gourry.net:mid,gourry.net:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 687F7137DCB
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-bnxt_en: Fix deleting of Ntuple filters
-
-This commit fixes an issue where ntuple filters deleted when the
-interface is down would cause FW errors. It saves a vnic pointer in the
-filter's base structure to check if the VNIC is already freed.
-
-Fixes: 8336a974f37d ("bnxt_en: Save user configured filters in a lookup list")
-
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 8fc15a8353fc..1f05ecf367fe 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-
-[ ... ]
-
-> @@ -6240,6 +6244,9 @@ int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
->  	int rc;
->
->  	set_bit(BNXT_FLTR_FW_DELETED, &fltr->base.state);
-> +	if (fltr->base.vnic->fw_vnic_id == INVALID_HW_RING_ID)
-> +		return 0;
-> +
-
-Does this code dereference fltr->base.vnic without checking if it's NULL?
-
-For ntuple drop filters created with ring_cookie == RX_CLS_FLOW_DISC, the
-code sets the BNXT_ACT_DROP flag. Looking at bnxt_hwrm_cfa_ntuple_filter_alloc:
-
-int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
-                                      struct bnxt_ntuple_filter *fltr)
-{
-	...
-	if (fltr->base.flags & BNXT_ACT_DROP) {
-		req->flags =
-			cpu_to_le32(CFA_NTUPLE_FILTER_ALLOC_REQ_FLAGS_DROP);
-	} else if (bp->fw_cap & BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V2) {
-		bnxt_cfg_rfs_ring_tbl_idx(bp, req, fltr);
-	} else {
-		vnic = &bp->vnic_info[fltr->base.rxq + 1];
-		fltr->base.vnic = vnic;
-		req->dst_id = cpu_to_le16(vnic->fw_vnic_id);
-	}
-
-The BNXT_ACT_DROP case sets the drop flag but doesn't initialize
-fltr->base.vnic. When that filter is later freed, this code dereferences
-the NULL vnic pointer.
-
-[ ... ]
-
-> @@ -6339,6 +6348,7 @@ int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
->  		bnxt_cfg_rfs_ring_tbl_idx(bp, req, fltr);
->  	} else {
->  		vnic = &bp->vnic_info[fltr->base.rxq + 1];
-> +		fltr->base.vnic = vnic;
->  		req->dst_id = cpu_to_le16(vnic->fw_vnic_id);
->  	}
-
-Looking at the if-else structure here:
-
-	if (fltr->base.flags & BNXT_ACT_DROP) {
-		req->flags =
-			cpu_to_le32(CFA_NTUPLE_FILTER_ALLOC_REQ_FLAGS_DROP);
-	} else if (bp->fw_cap & BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V2) {
-		bnxt_cfg_rfs_ring_tbl_idx(bp, req, fltr);
-	} else {
-		vnic = &bp->vnic_info[fltr->base.rxq + 1];
-		fltr->base.vnic = vnic;
-		req->dst_id = cpu_to_le16(vnic->fw_vnic_id);
-	}
-
-Should the BNXT_ACT_DROP case also set fltr->base.vnic?
-
-Drop filters don't have a destination vnic, so the code doesn't set one.
-But the free path in bnxt_hwrm_cfa_ntuple_filter_free now dereferences
-fltr->base.vnic without a NULL check, which would crash when freeing drop
-filters.
-
-Either the drop case should explicitly set fltr->base.vnic = NULL and the
-free path should check for NULL, or drop filters should be assigned a dummy
-vnic. Currently the code leaves vnic uninitialized and then dereferences it.
-
-[ ... ]
+This review was generated by kreview-0811365ff2. =0D
+=0D
+This is not an automated email, the reviewer though this report=0D
+looked valid enough to consider discussion.=0D
+=0D
+----=0D
+=0D
+Cursory browse, this does look like a legitimate reference leak.=0D
+=0D
+~Gregory=0D
+=0D
+----=0D
+=0D
+> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c=0D
+> index a172ce4e9b19..d60a697f12cc 100644=0D
+> --- a/drivers/cxl/core/hdm.c=0D
+> +++ b/drivers/cxl/core/hdm.c=0D
+=0D
+[ ... ]=0D
+=0D
+> +static struct cxl_endpoint_decoder *=0D
+> +cxl_find_free_decoder(struct cxl_memdev *cxlmd)=0D
+> +{=0D
+> +	struct cxl_port *endpoint =3D cxlmd->endpoint;=0D
+> +	struct device *dev;=0D
+> +=0D
+> +	guard(rwsem_read)(&cxl_rwsem.dpa);=0D
+> +	dev =3D device_find_child(&endpoint->dev, NULL,=0D
+> +				find_free_decoder);=0D
+> +	if (!dev)=0D
+> +		return NULL;=0D
+> +=0D
+> +	return to_cxl_endpoint_decoder(dev);=0D
+> +}=0D
+=0D
+[ ... ]=0D
+=0D
+> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,=0D
+> +					     enum cxl_partition_mode mode,=0D
+> +					     resource_size_t alloc)=0D
+> +{=0D
+> +	int rc;=0D
+> +=0D
+> +	if (!IS_ALIGNED(alloc, SZ_256M))=0D
+> +		return ERR_PTR(-EINVAL);=0D
+> +=0D
+> +	struct cxl_endpoint_decoder *cxled __free(put_cxled) =3D=0D
+> +		cxl_find_free_decoder(cxlmd);=0D
+> +=0D
+> +	if (!cxled)=0D
+> +		return ERR_PTR(-ENODEV);=0D
+> +=0D
+> +	rc =3D cxl_dpa_set_part(cxled, mode);=0D
+> +	if (rc)=0D
+> +		return ERR_PTR(rc);=0D
+> +=0D
+> +	rc =3D cxl_dpa_alloc(cxled, alloc);=0D
+> +	if (rc)=0D
+> +		return ERR_PTR(rc);=0D
+> +=0D
+> +	return no_free_ptr(cxled);=0D
+> +}=0D
+> +EXPORT_SYMBOL_NS_GPL(cxl_request_dpa, "CXL");=0D
+=0D
+Does this leak the device reference obtained by device_find_child()=0D
+in cxl_find_free_decoder()?=0D
+=0D
+device_find_child() increments the device refcount (reference A).=0D
+Then cxl_dpa_alloc() -> __cxl_dpa_reserve() calls get_device() on=0D
+the same device (reference B).=0D
+=0D
+On the success path, no_free_ptr() inhibits the put_cxled cleanup,=0D
+so reference A is transferred to the caller.  The matching cleanup=0D
+function cxl_dpa_free() calls __cxl_dpa_release(), which drops=0D
+reference B via put_device(), but reference A is never released:=0D
+=0D
+    cxl_dpa_free()=0D
+      -> devm_cxl_dpa_release()=0D
+        -> __cxl_dpa_release()=0D
+          -> put_device()     /* drops reference B only */=0D
+=0D
+    /* reference A from device_find_child() is still held */=0D
+=0D
+The only caller in this series (sfc efx_cxl_init/efx_cxl_exit)=0D
+never calls put_device() on the returned cxled either, so the=0D
+endpoint decoder device refcount remains permanently elevated.=0D
 
