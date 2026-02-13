@@ -1,278 +1,209 @@
-Return-Path: <netdev+bounces-258683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id y7cdCz6dj2nKRwEAu9opvQ
-	(envelope-from <netdev+bounces-258683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 22:53:02 +0100
+	id w+nnFQWjj2mqSAEAu9opvQ
+	(envelope-from <netdev+bounces-258684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 23:17:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F8A3139AE3
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 22:53:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2488139BFC
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 23:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 826A13004C58
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 21:52:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C18C43004914
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 22:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4632BE63F;
-	Fri, 13 Feb 2026 21:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="t6i1XhaM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SJHw8sZu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D732830ACFB;
+	Fri, 13 Feb 2026 22:17:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8225A275AE1
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 21:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A282FC02F
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 22:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771019577; cv=none; b=UfJHLXGy4ImKpcIMvov9WsIjfm/6P9RFeK3/q3zU/jGs/xg39h9aBxlsikzWYzyEYAAG4c/oGbWS/H0COGIfrf0AfBF0mHUcl/Bt5iw2rpkcq+HWfkdjApVUbRn0WpU0K2FoxGOq+sYk+Kf5QsgygkyZJdmcVKRP47y/XRSAGY4=
+	t=1771021056; cv=none; b=LyPvWCx3WTCaqz2HKbM9jQmCwTI5YLcHy1cqscxfqxNaoKy8mTPycNa1wXAcMiEO9PRsBaIvXzQ1oW88LWtvJfXgN/J5WLI6lntKgbikatnbnjV3OPtSQ8njnJQwj7cPOnlOuhgGmOEKVM0NfqyS3cfgj9SCMHpH3oxf8XCV7wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771019577; c=relaxed/simple;
-	bh=Gp2Pkd6dBcAD9gExMhUe1TlcdLCXbVfQ+Qhg4vA2cZg=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=tqvRTN0fva/ryNAd58GLcEepAz71AlPlO7uo+Qo8xGVAYhNVIGDcIQDg3BMjct8EoFWCzQ+hrVqhtO0LWo4u442I2mHTuJG5bceR0jGWF9K8/1XtU/wXADCBNrTEdfX5+WmNEDizc4H12KQf6ZGJtnsj9OG1uheW4Hsxptp8MUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=t6i1XhaM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SJHw8sZu; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 5C6BA7A00E6;
-	Fri, 13 Feb 2026 16:52:54 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Fri, 13 Feb 2026 16:52:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm1; t=1771019574; x=1771105974; bh=7Ou3ogiwz3ERK34Cls8MU
-	NR5fugGTwdYYsDzY79HHYw=; b=t6i1XhaMPys68gv8fFIrSKasoz+B4i89SB0Ng
-	pr9ULipOh5LD9KWsmRA9Sz6idvVCk8/2pqEDx73D6bC6/VtduWmYlyXAr1clejvL
-	zT2xTq6Y8mo1d2TH2Bqf8T6YToBnho3OFql1vWWxp/ZUx2MgDUnr11B9bBX/aIdo
-	STzhnSj0ZdKzUJ/j8FJH7BFjI/qESD42pWwu1mwtJ837tIqjrAqCptbJNSxXRgz0
-	oLhlnF6gD5VXFjoCqmwMtDSSpnZMv44+iqXCoJWtncQWsShsna1PhJZ46NG26nq7
-	Xuh38XPBj81QFEPFgEEMCP/CCUl7OUZaCre0DDfY9ORFh17nA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1771019574; x=1771105974; bh=7Ou3ogiwz3ERK34Cls8MUNR5fugGTwdYYsD
-	zY79HHYw=; b=SJHw8sZu7V45O/m3XLOQkqMuFnyymNpVtPFbOFPuIzv3YbnfE9W
-	0u2Q9tu3vXDUE99/uEHvxrbap//0ZH6bH30QT+8Bvj67MKbZTUlkFFKAokAWLcD+
-	m6prtj5u76WpplfqXlBjoBGs5oWWFK1vyKnJshsZTfXv4GW6NNNawNKpO0ipbTdW
-	UiQB3i75BWAErO+Wh+UL7V04S8CXeZjpkucxaqEfoQDpdQSuCleiwPyXWAN1X2QF
-	gySG1aU23IiDxQMUMhix3Xpa/bXLDp7id5ZMXhVDMw40KPXus9Z4xs5NMrAyDwQz
-	7Tgs56fSdzHPjANzFyCym+IgSHzHV2hQ5hw==
-X-ME-Sender: <xms:NZ2PacQJWBPxycbwrNPcJD0SWDJuzkOnpnZNPaMFZjWUkmJnBFzHAw>
-    <xme:NZ2PacUgpoCKmI_1gOXdTZXSpHnd4mqzQ79CSaf8i8wnmiAIv1vrYIQTKUl7UvWBY
-    j_p3TkCSnO-JHUAN6Hx80A3-2kM9kFYDNeucEbKFcE_3CmXW94pDeM>
-X-ME-Received: <xmr:NZ2PadfG5ppsAchR8LUaZR8F5mdudO5qvaq91z8rCbKZOQxF5I6Oae_G1bVjM7CIJGqrUA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvtdelfeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
-    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
-    hrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeeiveelffduvdevfedtheffffetfeff
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
-    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
-    htoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhm
-    rgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgt
-    phhtthhopehlihgrlhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehprggsvghnih
-    esrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhgsohhhrggtsehsuhhsvgdrtgiipdhr
-    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:NZ2PaQKJqBh-oYHvQBiTCe2YER9FvukvaV2Oic-lM7fMovXkYI681Q>
-    <xmx:NZ2PaaxRMnY47Y27NDPY1qjvPBuhsKEJ0xSYo5crIEdw7eawVMWF-Q>
-    <xmx:NZ2PaWsE_ww3b8uD9x0IaxOkE-hMxeRvBxfH0PV2deSi6PSvH-guMA>
-    <xmx:NZ2PadD_N0yO6TFq44SjfhpwG5BtS7HYKdI6LlnSqKNLs-eJQUuJJw>
-    <xmx:Np2PadKn0MZWTvzkRR_hoUICe2gpq202y0vVLORPs3TR4sepBVXY27UF>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Feb 2026 16:52:53 -0500 (EST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 33D1C9FD44; Fri, 13 Feb 2026 13:52:52 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 32E2C9FC6F;
-	Fri, 13 Feb 2026 13:52:52 -0800 (PST)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Jiri Bohac <jbohac@suse.cz>,
-    Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] bonding: alb: fix UAF in rlb_arp_recv during bond
- up/down
-In-reply-to: <20260213095424.84636-1-liuhangbin@gmail.com>
-References: <20260213095424.84636-1-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Fri, 13 Feb 2026 09:54:24 +0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1771021056; c=relaxed/simple;
+	bh=1DDCj1TA2rW1TMXxauVPw3Us56ynp/7idGRVAz/CKh8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=S3QE7OJjdGL+G0xHUR9QM02h1L2mzEap5WQcTvT5IfKwetk4amxUVLbTDaMyFBkHaevy4fPerbvadnpEqDkYlqldZeG7snlZ6vhE+rPwttnlRO9oDVPxynQnxEXcPdeBh3IS3nDhmNQbG+zF/txZHbUzYe9TdRuuCjkMmvnWyfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-67792d46a05so7584497eaf.1
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 14:17:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771021054; x=1771625854;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k8HJ47+9p4PuTuc5TPH2mXar9WAAqXbe2n3lnWHS7dg=;
+        b=rwXoUn5vmT78htFhidOEOgCgKSadnd1eIEUa+0El8BR5Cz5yb+zn7B+SyfT4ovWA9t
+         4Ov8kB+56E1F+dRjP8KMO0YuHGLjQO2SA3KV93LUlYL6J0DfDhntf+YPkvMw/tTiiqP1
+         FLcBvMOhpuC2z00W0gPXM6UcSg2qUf7TYhaQMGNxvbBPEcunBGlt3k8WGwiwhPCl28sG
+         4KspoTu6dHN8xeFdsdJJYQIX5ZXOI+s2hSCJ6zSnEyQYsDZwlR0Th/obKquT+mVJ3ZL/
+         4yAfI0o7dMzGu5be9tMDyhBkixb1bUxVIR5ptEDTNKjDvM8nBl6oFjjG5fXsUw9HjAz2
+         VxnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPWAjs/El9GZ5Sv6qLqt6NkNHxLXmzxo2es4TERmyCgoAG6cPBDULfO+LNRaDxvEguBzq0ZPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwK60vGwohKrS05DE1+amJ2mRVys3SnKUEsFOBn5Pxfph6DsDrX
+	FEBLkKhcuPWvgdbUwVhj94HJUkGS/guv/xlZBg99vIXAzo5EzFpgIMiu6YyE1NhduVlrAnV1BoA
+	MMQBjlXn9MKgwcM47oWTxOQVawKKg/qNiLNwsQGz0DMtHCy4uOgkFUnfivVI=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <418607.1771019572.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Feb 2026 13:52:52 -0800
-Message-ID: <418608.1771019572@famine>
+X-Received: by 2002:a4a:ec46:0:b0:65d:33de:1c56 with SMTP id
+ 006d021491bc7-6776978dc3fmr1329805eaf.64.1771021054419; Fri, 13 Feb 2026
+ 14:17:34 -0800 (PST)
+Date: Fri, 13 Feb 2026 14:17:34 -0800
+In-Reply-To: <68b7284f.050a0220.3db4df.01d7.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <698fa2fe.a70a0220.3c8f9c.0076.GAE@google.com>
+Subject: Re: [syzbot] [hams?] WARNING: ODEBUG bug in __run_timers (3)
+From: syzbot <syzbot+7287222a6d88bdb559a7@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm1,messagingengine.com:s=fm3];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f71c66df48515cc1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258683-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258684-lists,netdev=lfdr.de,7287222a6d88bdb559a7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 0F8A3139AE3
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,storage.googleapis.com:url,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: A2488139BFC
 X-Rspamd-Action: no action
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+syzbot has found a reproducer for the following issue on:
 
->The ALB RX path may access rx_hashtbl concurrently with bond
->teardown. During rapid bond up/down cycles, rlb_deinitialize()
->frees rx_hashtbl while RX handlers are still running, leading
->to a use-after-free detected by KASAN.
->
->[  214.174138] Oops: general protection fault, probably for non-canonical=
- address 0xdffffc000000001d: 0000 [#1] SMP KASAN PTI
->[  214.186478] KASAN: null-ptr-deref in range [0x00000000000000e8-0x00000=
-000000000ef]
->[  214.194933] CPU: 30 UID: 0 PID: 2375 Comm: ping Kdump: loaded Not tain=
-ted 6.19.0-rc8+ #2 PREEMPT(voluntary)
->[  214.205907] Hardware name: Dell Inc. PowerEdge R730/0WCJNT, BIOS 2.14.=
-0 01/14/2022
->[  214.214357] RIP: 0010:rlb_arp_recv+0x505/0xab0 [bonding]
->[  214.220320] Code: 0f 85 2b 05 00 00 48 b8 00 00 00 00 00 fc ff df 40 0=
-f b6 ed 48 c1 e5 06 49 03 ad 78 01 00 00 48 8d 7d 28 48 89 fa 48 c1 ea 03 =
-<0f> b6
-> 04 02 84 c0 74 06 0f 8e 12 05 00 00 80 7d 28 00 0f 84 8c 00
->[  214.241280] RSP: 0018:ffffc900073d8870 EFLAGS: 00010206
->[  214.247116] RAX: dffffc0000000000 RBX: ffff888168556822 RCX: ffff88816=
-855681e
->[  214.255082] RDX: 000000000000001d RSI: dffffc0000000000 RDI: 000000000=
-00000e8
->[  214.263048] RBP: 00000000000000c0 R08: 0000000000000002 R09: ffffed111=
-92021c8
->[  214.271013] R10: ffff8888c9010e43 R11: 0000000000000001 R12: 1ffff9200=
-0e7b119
->[  214.278978] R13: ffff8888c9010e00 R14: ffff888168556822 R15: ffff88816=
-8556810
->[  214.286943] FS:  00007f85d2d9cb80(0000) GS:ffff88886ccb3000(0000) knlG=
-S:0000000000000000
->[  214.295966] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->[  214.302380] CR2: 00007f0d047b5e34 CR3: 00000008a1c2e002 CR4: 000000000=
-01726f0
->[  214.310347] Call Trace:
->[  214.313070]  <IRQ>
->[  214.315318]  ? __pfx_rlb_arp_recv+0x10/0x10 [bonding]                 =
-                                                                          =
-       [  214.320975]  bond_handle_frame+0x166/0xb60 [bonding]
->[  214.326537]  ? __pfx_bond_handle_frame+0x10/0x10 [bonding]
->[  214.332680]  __netif_receive_skb_core.constprop.0+0x576/0x2710
->[  214.339199]  ? __pfx_arp_process+0x10/0x10
->[  214.343775]  ? sched_balance_find_src_group+0x98/0x630
->[  214.349513]  ? __pfx___netif_receive_skb_core.constprop.0+0x10/0x10
->[  214.356513]  ? arp_rcv+0x307/0x690
->[  214.360311]  ? __pfx_arp_rcv+0x10/0x10
->[  214.364499]  ? __lock_acquire+0x58c/0xbd0
->[  214.368975]  __netif_receive_skb_one_core+0xae/0x1b0
->[  214.374518]  ? __pfx___netif_receive_skb_one_core+0x10/0x10
->[  214.380743]  ? lock_acquire+0x10b/0x140
->[  214.385026]  process_backlog+0x3f1/0x13a0
->[  214.389502]  ? process_backlog+0x3aa/0x13a0
->[  214.394174]  __napi_poll.constprop.0+0x9f/0x370
->[  214.399233]  net_rx_action+0x8c1/0xe60
->[  214.403423]  ? __pfx_net_rx_action+0x10/0x10
->[  214.408193]  ? lock_acquire.part.0+0xbd/0x260
->[  214.413058]  ? sched_clock_cpu+0x6c/0x540
->[  214.417540]  ? mark_held_locks+0x40/0x70
->[  214.421920]  handle_softirqs+0x1fd/0x860
->[  214.426302]  ? __pfx_handle_softirqs+0x10/0x10
->[  214.431264]  ? __neigh_event_send+0x2d6/0xf50
->[  214.436131]  do_softirq+0xb1/0xf0
->[  214.439830]  </IRQ>
->
->The issue is reproducible by looping ip link set bond0 up/down,
->where rlb_arp_recv() can race with rlb_deinitialize() and dereference
->a freed rx_hashtbl entry.
->
->Fix this by setting recv_probe to NULL before calling
->bond_alb_deinitialize(), and then calling synchronize_net() to wait
->for any concurrent RX processing to finish.
+HEAD commit:    cee73b1e840c Merge tag 'riscv-for-linus-7.0-mw1' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15eae15a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f71c66df48515cc1
+dashboard link: https://syzkaller.appspot.com/bug?extid=7287222a6d88bdb559a7
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12f68722580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=114c6b3a580000
 
-	I think the change looks good, however, to my reading the
-sentence above describes the order of events as 1) recv_probe =3D NULL, 2)
-bond_alb_deinitialize(), then 3) synchroninze_net(), whereas the changed
-code below is 1, 3, then 2.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-cee73b1e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/075d9080a7b6/vmlinux-cee73b1e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/98697e710988/bzImage-cee73b1e.xz
 
-	The code order is correct, but I think the commit description
-should match the code.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7287222a6d88bdb559a7@syzkaller.appspotmail.com
 
-	-J
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff8880375c4c90 object type: timer_list hint: rose_t0timer_expiry+0x0/0x150 include/linux/skbuff.h:2928
+WARNING: lib/debugobjects.c:612 at debug_print_object+0x18e/0x2a0 lib/debugobjects.c:612, CPU#3: swapper/3/0
+Modules linked in:
+CPU: 3 UID: 0 PID: 0 Comm: swapper/3 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+RIP: 0010:debug_print_object+0x19b/0x2a0 lib/debugobjects.c:612
+Code: b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 4f 48 8d 3d 72 78 ee 0b 41 56 48 8b 14 dd 60 ec 1a 8c 4c 89 e6 <67> 48 0f b9 3a 58 83 05 9c 48 e4 0b 01 48 83 c4 18 5b 5d 41 5c 41
+RSP: 0018:ffffc900006f8a38 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000003 RCX: 0000000000000000
+RDX: ffffffff8c1aeba0 RSI: ffffffff8c1ae7c0 RDI: ffffffff90e333c0
+RBP: 0000000000000001 R08: ffff8880375c4c90 R09: ffffffff8bb2c880
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff8c1ae7c0
+R13: ffffffff8bb2c8c0 R14: ffffffff8a6eed50 R15: ffffc900006f8b38
+FS:  0000000000000000(0000) GS:ffff8880d668b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4962e00ff8 CR3: 000000003801e000 CR4: 0000000000352ef0
+Call Trace:
+ <IRQ>
+ __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
+ debug_check_no_obj_freed+0x4da/0x630 lib/debugobjects.c:1129
+ slab_free_hook mm/slub.c:2601 [inline]
+ slab_free mm/slub.c:6082 [inline]
+ kfree+0x343/0x670 mm/slub.c:6399
+ rose_neigh_put include/net/rose.h:166 [inline]
+ rose_timer_expiry+0x53f/0x630 net/rose/rose_timer.c:183
+ call_timer_fn+0x19a/0x590 kernel/time/timer.c:1748
+ expire_timers kernel/time/timer.c:1799 [inline]
+ __run_timers+0x757/0xac0 kernel/time/timer.c:2373
+ __run_timer_base kernel/time/timer.c:2385 [inline]
+ __run_timer_base kernel/time/timer.c:2377 [inline]
+ run_timer_base+0x114/0x190 kernel/time/timer.c:2394
+ run_timer_softirq+0x1a/0x50 kernel/time/timer.c:2404
+ handle_softirqs+0x1ea/0x910 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xef/0x150 kernel/softirq.c:723
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
+ sysvec_apic_timer_interrupt+0xa3/0xc0 arch/x86/kernel/apic/apic.c:1056
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:63
+Code: 0e 91 02 c3 cc cc cc cc 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d 83 ed 2a 00 fb f4 <e9> 3c 34 03 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 90 90 90 90 90
+RSP: 0018:ffffc90000197df0 EFLAGS: 00000202
+RAX: 0000000000128aa1 RBX: ffff88801ee8a480 RCX: ffffffff8b80ac75
+RDX: 0000000000000000 RSI: ffffffff8de6b9c0 RDI: ffffffff8c1adaa0
+RBP: 0000000000000003 R08: 0000000000000001 R09: ffffed100d4e6755
+R10: ffff88806a733aab R11: 0000000000000000 R12: ffffed1003dd1490
+R13: 0000000000000003 R14: ffffffff90d8d0d0 R15: 0000000000000000
+ arch_safe_halt arch/x86/include/asm/paravirt.h:73 [inline]
+ default_idle+0x9/0x10 arch/x86/kernel/process.c:767
+ default_idle_call+0x6c/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:191 [inline]
+ do_idle+0x35b/0x4b0 kernel/sched/idle.c:332
+ cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:430
+ start_secondary+0x21d/0x2d0 arch/x86/kernel/smpboot.c:312
+ common_startup_64+0x13e/0x148
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	b8 00 00 00 00       	mov    $0x0,%eax
+   5:	00 fc                	add    %bh,%ah
+   7:	ff                   	lcall  (bad)
+   8:	df 48 89             	fisttps -0x77(%rax)
+   b:	fa                   	cli
+   c:	48 c1 ea 03          	shr    $0x3,%rdx
+  10:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+  14:	75 4f                	jne    0x65
+  16:	48 8d 3d 72 78 ee 0b 	lea    0xbee7872(%rip),%rdi        # 0xbee788f
+  1d:	41 56                	push   %r14
+  1f:	48 8b 14 dd 60 ec 1a 	mov    -0x73e513a0(,%rbx,8),%rdx
+  26:	8c
+  27:	4c 89 e6             	mov    %r12,%rsi
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	58                   	pop    %rax
+  30:	83 05 9c 48 e4 0b 01 	addl   $0x1,0xbe4489c(%rip)        # 0xbe448d3
+  37:	48 83 c4 18          	add    $0x18,%rsp
+  3b:	5b                   	pop    %rbx
+  3c:	5d                   	pop    %rbp
+  3d:	41 5c                	pop    %r12
+  3f:	41                   	rex.B
 
->This ensures that no RX handler can access rx_hashtbl after it is
->freed, while preserving the existing locking semantics.
->
->Reported-by: Liang Li <liali@redhat.com>
->Fixes: e53665c6eaa6 ("bonding: delete migrated IP addresses from the rlb =
-hash table")
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->---
-> drivers/net/bonding/bond_main.c | 6 +++++-
-> 1 file changed, 5 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 47f13d86cb7e..8e1057a2a061 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -4314,9 +4314,13 @@ static int bond_close(struct net_device *bond_dev)
-> =
-
-> 	bond_work_cancel_all(bond);
-> 	bond->send_peer_notif =3D 0;
->+	bond->recv_probe =3D NULL;
->+
->+	/* Wait for any in-flight RX handlers */
->+	synchronize_net();
->+
-> 	if (bond_is_lb(bond))
-> 		bond_alb_deinitialize(bond);
->-	bond->recv_probe =3D NULL;
-> =
-
-> 	if (BOND_MODE(bond) =3D=3D BOND_MODE_8023AD &&
-> 	    bond->params.broadcast_neighbor)
->-- =
-
->2.50.1
->
 
 ---
-	-Jay Vosburgh, jv@jvosburgh.net
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
