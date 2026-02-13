@@ -1,142 +1,160 @@
-Return-Path: <netdev+bounces-258530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GpkPJZGHjmlyCwEAu9opvQ
-	(envelope-from <netdev+bounces-258530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:08:17 +0100
+	id OpuxGGSKjmmrCwEAu9opvQ
+	(envelope-from <netdev+bounces-258531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:20:20 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE9CC1325C7
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:08:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC15E13263D
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABF3D3067A0A
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:08:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D52C1304B582
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2902236E8;
-	Fri, 13 Feb 2026 02:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC791990A7;
+	Fri, 13 Feb 2026 02:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXgAC8dE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8JeUPyF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EB5EADC;
-	Fri, 13 Feb 2026 02:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4EC70818;
+	Fri, 13 Feb 2026 02:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770948492; cv=none; b=t+pPqRl7Gc+3L98q+Fy41XlTufk2VGO81sRCXwQ+5dQrWm8D5geIi7oF5oMUwabR6JU4jbRQdvKfI0Y9n5WnjvbYByjB7sqbsT/Jz0j8zV6ebgbDZmjQVfrvaeZJFWQIaiceZ6bHqydFe4677mGg9rjdeaGYojCqURqYEiZcwMc=
+	t=1770949217; cv=none; b=EHHDztS16+jiOblEFV5bp5uSRDSAGSOjbaRpCPfe3omn0pIqxMBGFDgEq4Sk60xJxlk7gxGi88iWiKANZLoSJc0HloCw3GknjUXHobiVgBlJKVjitzozc1fWnlcPotJjNQQ1jjzUOg34iWscLb2PxwIYamwM5HRejjvqZ+H03Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770948492; c=relaxed/simple;
-	bh=VLCHV8yvlNulRyTa5WcIYDM2c1VCiFEvLavM20R5a8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j0tXTUevdn9Jb0y0UeEeP6TQ5I6RLqnylounDUKtNNwQWHxZdaZN0BJPiCmcR5GY83iX2cau4YQpp9+ezhov6Vw5BVxxEr30vQt2ZUeC3Xo+NmoKBjv4bcKn5nKoRdPjjWMGg26INJAIOasmK3hszyXh5wmJmlHfRjQFLuII7rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nXgAC8dE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF830C4CEF7;
-	Fri, 13 Feb 2026 02:08:11 +0000 (UTC)
+	s=arc-20240116; t=1770949217; c=relaxed/simple;
+	bh=KVJRW17C7sh+mCqqggDVf+p3AsjZNV+7KND16EJGoX0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=h5UQ3GOCwUsu1m3XqxW+7PJQzp9YIcqhGZKfRvhNRXEw2Ge4tsSG+qEBuE5Zy0OYqPJK4Dg9h0EljdvXN59N80Iq4JzudlGVH5gY7QRfafGsuS1Dq4GuQWCEjO4PGEmde+JrdFe3w+eMCjqsjTHlIt+21YpSxwDzSzpZa8nwVVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8JeUPyF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E04C4CEF7;
+	Fri, 13 Feb 2026 02:20:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770948492;
-	bh=VLCHV8yvlNulRyTa5WcIYDM2c1VCiFEvLavM20R5a8M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nXgAC8dE6g0VqrNGwNuLTQxGl13xbnaSY/W0bkYXjBvNmpNad+p/5C7ZDSafPDHsJ
-	 mb75SMFDmZlZjIxBNv1qmDrnQF5OOtA0XyC7zlLh/hlzdoLlm/so6NTj0nkkl/erPB
-	 U/3jqflikpNpujQmqJ2Hokdcs+5C2uSAw1CKRLpjWGmjSdjIKVeQgbBA5WV8gauKgB
-	 eT7tW5FqTVYKkanXU3uF40sGeo8RkT0dV0n2cUiKNJNZ9/kaK96sFtGlAC564ekvZ6
-	 YNiZgEyI7jyiX/NGAWU0GXC+naf3C9qTphOuqUDyyoXCHrxBvuz6Abv9yS2/T3XXSm
-	 Vp5o8VEqycbEw==
-Date: Thu, 12 Feb 2026 18:08:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ruitong Liu <cnitlrt@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Shuyuan Liu <L0x1c3r@gmail.com>
-Subject: Re: [PATCH v2] net/sched: act_skbedit: fix divide-by-zero in
- tcf_skbedit_hash()
-Message-ID: <20260212180810.0b06e2b3@kernel.org>
-In-Reply-To: <20260211194325.797963-1-cnitlrt@gmail.com>
-References: <20260211184848.731894-1-cnitlrt@gmail.com>
-	<20260211194325.797963-1-cnitlrt@gmail.com>
+	s=k20201202; t=1770949216;
+	bh=KVJRW17C7sh+mCqqggDVf+p3AsjZNV+7KND16EJGoX0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u8JeUPyFSUOjz3+LtjcJovDa65OlPmukbHrXMJZ+qUgBzM9K2mN0+0La8q+DhNEDZ
+	 jBpYY81sWxdd2ttr9x7XxnkWRmzzT2j6NLz96M/2pm6BFgARLRLW6Hm5GkJ5ZGsAX2
+	 YNilifONlkw/6d1+Ec3RRkZK0El2PRQEyWFp36FDTP1++p1NmofptBSGus58ZLg0Gd
+	 qmX/N5aPih7m7L81DrB1z/WovAQXLzlQfi5KsSC+C6IffU+1fVS5gVNUFAaUixxoJX
+	 TFup7hoSV2WLNGFAAeI2nCqmsYVhdqVogesZNfoDVen36jpXaNOYWaGf1zWeH7Gcw6
+	 Car9s+vOjrz5Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B1BB393108D;
+	Fri, 13 Feb 2026 02:20:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 00/13] net: phy_port: SFP modules
+ representation
+ and phy_port listing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177094921083.1813136.18724223328419482.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Feb 2026 02:20:10 +0000
+References: <20260205092317.755906-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20260205092317.755906-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, christophe.leroy@csgroup.eu,
+ herve.codina@bootlin.com, f.fainelli@gmail.com, vladimir.oltean@nxp.com,
+ kory.maincent@bootlin.com, kabel@kernel.org, o.rempel@pengutronix.de,
+ nicveronese@gmail.com, horms@kernel.org, mwojtas@chromium.org,
+ romain.gantois@bootlin.com, daniel@makrotopia.org,
+ dimitri.fedrau@liebherr.com
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258530-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,redhat.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258531-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: DE9CC1325C7
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AC15E13263D
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 03:43:25 +0800 Ruitong Liu wrote:
-> Commit 38a6f0865796 ("net: sched: support hash selecting tx queue")
-> added SKBEDIT_F_TXQ_SKBHASH support. mapping_mod is computed as:
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  5 Feb 2026 10:23:03 +0100 you wrote:
+> Hello everyone,
 > 
->   mapping_mod = queue_mapping_max - queue_mapping + 1;
+> Here's V5 of the second phy_port series, this time bringing support for
+> more phy_port use especially for SFP, as well as the begining of a
+> ethnl uAPI.
 > 
-> mapping_mod is stored as u16, so the calculation can overflow when the
-> requested range covers 65536 queues (e.g. queue_mapping=0 and
-> queue_mapping_max=0xffff). In that case mapping_mod wraps to 0 and
-> tcf_skbedit_hash() triggers a divide-by-zero:
+> V5 doesn't contain a lot of changes, only a doc formatting fix as well
+> as a fix for a potentially un-initialized pointer.
 > 
->   queue_mapping += skb_get_hash(skb) % params->mapping_mod;
-> 
-> Reject such invalid configuration to prevent mapping_mod from becoming
-> 0 and avoid the crash.
+> [...]
 
-How did you find this bug? Do you have a repro to trigger the issue
-you're describing?
+Here is the summary with links:
+  - [net-next,v5,01/13] net: phy: initialize the port support based on the PHY's for OF ports
+    https://git.kernel.org/netdev/net/c/056166710543
+  - [net-next,v5,02/13] net: phy: phy_port: Cleanup the of-parsing logic for phy_port
+    https://git.kernel.org/netdev/net/c/6248f3dc4ec5
+  - [net-next,v5,03/13] net: phy: phy_port: Correctly recompute the port's linkmodes
+    https://git.kernel.org/netdev/net/c/4cebb26ac6f0
+  - [net-next,v5,04/13] net: phy: phy_link_topology: Add a helper for opportunistic alloc
+    (no matching commit)
+  - [net-next,v5,05/13] net: phy: phy_link_topology: Track ports in phy_link_topology
+    (no matching commit)
+  - [net-next,v5,06/13] net: phylink: Register a phy_port for MAC-driven SFP busses
+    (no matching commit)
+  - [net-next,v5,07/13] net: phy: Create SFP phy_port before registering upstream
+    (no matching commit)
+  - [net-next,v5,08/13] net: phy: Represent PHY-less SFP modules with phy_port
+    (no matching commit)
+  - [net-next,v5,09/13] net: phylink: Represent PHY-less SFP modules with phy_port
+    (no matching commit)
+  - [net-next,v5,10/13] net: phy: phy_port: Store information about a MII port's vacant state
+    (no matching commit)
+  - [net-next,v5,11/13] net: phy: phy_link_topology: Add a helper to retrieve ports
+    (no matching commit)
+  - [net-next,v5,12/13] netlink: specs: Add ethernet port listing with ethtool
+    (no matching commit)
+  - [net-next,v5,13/13] net: ethtool: Introduce ethtool command to list ports
+    (no matching commit)
 
-> @@ -194,6 +194,10 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
->  			}
->  
->  			mapping_mod = *queue_mapping_max - *queue_mapping + 1;
-> +			if (!mapping_mod) {
-> +				NL_SET_ERR_MSG_MOD(extack, "Invalid queue_mapping range: range too large");
-> +				return -EINVAL;
-> +			}
->  			flags |= SKBEDIT_F_TXQ_SKBHASH;
->  		}
->  		if (*pure_flags & SKBEDIT_F_INHERITDSFIELD)
-
-
-There is this check right above the lines you're touching:
-
-			if (*queue_mapping_max < *queue_mapping) {
-				NL_SET_ERR_MSG_MOD(extack, "The range of queue_mapping is invalid, max < min.");
-				return -EINVAL;
-			}
-
-I don't see how mapping_mod can be 0 here.
+You are awesome, thank you!
 -- 
-pw-bot: reject
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
