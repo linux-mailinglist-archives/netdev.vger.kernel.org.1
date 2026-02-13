@@ -1,94 +1,93 @@
-Return-Path: <netdev+bounces-258640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258641-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yKjyBQdOj2nnPgEAu9opvQ
-	(envelope-from <netdev+bounces-258640-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:15:03 +0100
+	id MK+5JQhOj2nnPgEAu9opvQ
+	(envelope-from <netdev+bounces-258641-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:15:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A3A137DD9
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:15:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C60137DE0
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:15:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC6D6307CA32
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:14:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C99E307F02F
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F79C364E8B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B6C364E90;
 	Fri, 13 Feb 2026 16:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="I0XoICng"
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="dghY7PcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5819361DD2
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0A0364059
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770999256; cv=none; b=cVt8XyGOiWL/YKz20mD7ETHb1oDaSDr9BCJ3VYRY9JVO43lbK6pEvFigLBwbYpIigdHTIpl61cOtPG7XNrxnBG7Qq0a0kpILdKHeIJ603dILVyLIhie39kcPBjvWgjIXLVQCmWnj3HEMfBDBNEEkwfyx0t3HXTjw0O8mwxEh/Ko=
+	t=1770999256; cv=none; b=OkPGe+b5TkRwhRYVXlShB6iSS5rkwkj2WvW19C1ZzF2GCHHkIH6+f1QiNLn3WrqVhnFwXWbv11BEiU8Fmk4fVw9H6b62malciy3YGM1LNzItp973PXDWw8lVab130UW14bo39CjZYLmKlKsXIiRNWft2kZ6Qxq31DPuDpqLcG/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770999256; c=relaxed/simple;
-	bh=k0+aRJ3IUuarB2zMZblbi3T0axeHfpnV60kS0VoDgF0=;
+	bh=gYOA7Jd2sD+F4AI6OhnO4bQgKhYCRfntgN+Nceji7DA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f1AmVaXbD5Aj5yYggGo1/SaSKezaqhZpVnvcam9jOSQ544GhfFDpvOeewVgyGGyoVWEMbrlX44sUuZu/b7cGIAYtXBzn2Cz00M9rFTtVc4VfdjHuD9Cr4ic2Zk74xlN1i3zwJNwPCFXwpHUFcyyn8qNfx6fXyRGshq4t9ozKYkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=I0XoICng; arc=none smtp.client-ip=209.85.222.181
+	 MIME-Version; b=lETgm8h/YNtc0f5jg+FevBkfeDFN/fFxSaVwMDpJBNled2iX8ObcK6JtJ51J8l4YVbxPb39QLneEEoAnrsTYsjIkEW0w93f/pnCyF27l+5xktkGazh5TbwZmtGwqFjMkn3qDGim9v2p4JulhR/PjDpQiyBDHI5/SMgj4D4zgXRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=dghY7PcD; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8c6a7638f42so158219485a.2
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 08:14:13 -0800 (PST)
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8c70ab3b5fcso163379585a.2
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 08:14:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gourry.net; s=google; t=1770999253; x=1771604053; darn=vger.kernel.org;
+        d=gourry.net; s=google; t=1770999254; x=1771604054; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1ohzmGcjlqDye0brlPb+kXwsuRqWVNcPe4L1+AfQUaY=;
-        b=I0XoICngKzupTlLR2OPZ7xDnbt+M6NUCk6snFjnAc/Znx7TPkMLNSntK5mJfHMQru6
-         E4W/HPsxsKxIaF8nQFLEL8Jlcv05SDnS6i+H8rilrXwEax2hw2RasmkEc2FEPDlsOe22
-         wGndE4mk3Ho+0dzvfqHAVP3EP+QaqrsfGFa1q6cf0qhNpRq0YNIjowajPPiNo5jJ2fw7
-         +n3F7sWXzeSNFc/B4kmLRmVy8kp8jgZyhBvrpdYB+V9uKul73ovjKYhd/0QYzWqtCmn0
-         SdfbBRmVAq5FWSvGdyMJJrII0yuvmd6FN5dn94lihNFqJqdHCG5bTAW2PpgE99GX7iiu
-         Amow==
+        bh=jgbJ2hZD9atfYQt5BUJcJLNlHTxXKvF+WEu0/IJVXc4=;
+        b=dghY7PcDu4mhNNln83RJ8sCUeLOZeMXaL++PIS2JAbS1FgOv85lf4FnJrwG/FAH8bT
+         5gGKG9xcs1sM5hiClFHDRU+/zgkclZxm7gcWdFrFftlgMIzMBtifE4fYU6NoHgkudjcJ
+         HCPP+QRIcvxPRL0BNJwCslhbbhSjShnD1uDbnKIgIrKil5wb5Uj5njK3St9aBP1mTyWd
+         TUcJAOe+rX7JOjvU/2Lk9wR7wa+xRr7wmPHXlzub/zntQ+te58tShzWIKyf/6UatLGu0
+         Tf7jSnNxrdhQhXJEWI0te3JVvGt/bZaWGoPrsm4uzy8G5Chg0UtJkQxgmLPceZzoacf/
+         2DRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770999253; x=1771604053;
+        d=1e100.net; s=20230601; t=1770999254; x=1771604054;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=1ohzmGcjlqDye0brlPb+kXwsuRqWVNcPe4L1+AfQUaY=;
-        b=HQktDz4VWrRis4XFIneS+KlBVzGwyHbXjo/vfqgZOX9cSvNdcezqOyJ5SX46Al+ZAK
-         oRF7iA+SBXNDbxELkpeh82//Tq8OQN0uOmG3T65K+exwKr1fipicRhXfEssr2zPaQ/qp
-         Gmw+/vNuU33SJwiS60n9t0pl7aNolxvINhpHLudAzr/cNLKVlleZRX41krQzreYPLEif
-         7eJAbVYJeNmyJ+aAjtqyynWKh1rhQlNv1wYS6RIzbvn/VgBZDJbxgRcckZ7LdI+GFzm4
-         jxekApXdjKf3uZXJijjkELrmFBSexc2NG27J0wk7rK54PmGozvu5GgHq3SOczy+TL760
-         6tMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGT0IzH5mG0D+TYIqhNxAWjwk45J94u+XNuyjois0MORQR2TP5AS5Nmikcy0BArwTqHxuVMx4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy7s1StTz3XxeNIkyMP0zihPw6vRKLT9YUCbwaB9hHrwrN7YAy
-	TJ5VyXcFU/nbm/02TJj+RDPqs8ekaGjl8nZTEncNjRyuUqnmGCRp6LR34uioW4L76jdmcbZVJ1S
-	f7XyW
-X-Gm-Gg: AZuq6aKXRnmLcYAT2wGEyxuSaMe4ho1uz1XdTqv3/SigSyeVHKgzKoTGKKIMxRGtAjI
-	BbMAAPmy7/w55nSe1aUCshIWfJeq/lkbN8K/50pouj//eecpqQIHQEkWmCXX+IPC8m62PqEldsc
-	SGlQ7nklI2DEp+PzQdVljzSZVCsQkkxNjKp7NWqLjyYJXiIc7h3I2I5GoNRU9akTNsE5KR5SCLT
-	ecgHUC1xjpHHMGeBHllmlZzLvPOdYe8wRS0Ywc1pKlO1RUHMQafcHYkYBK1RqfRiYHXVAXK5lFp
-	LjZIGk+ETAsrSghymkJb3kgC/JDd/MxDdg9vVKS6HkG7AK5J5oZmKnMuaHStt+9xAjqqda6D6Ft
-	kbZ/CdmGu1WV3S7NZPe7P/cu0MwpJRKmSLzjWDBE7QGtR0zrmyQJygHUoVFeW5CvtVO84QUQN5Q
-	T56qu+Zff8tUR72cNS97rvOWnmN1wZNHOp1/7TeWM53VKEAe+bwb24gke0CW8u61nX8jqX811UX
-	LRv6QjYfqx/rz4=
-X-Received: by 2002:a05:620a:4444:b0:8ca:fe7f:7324 with SMTP id af79cd13be357-8cb4c014375mr1237185a.53.1770999252828;
-        Fri, 13 Feb 2026 08:14:12 -0800 (PST)
+        bh=jgbJ2hZD9atfYQt5BUJcJLNlHTxXKvF+WEu0/IJVXc4=;
+        b=iQg1wwNc/lhJgBwfpxu8EwjReRalirAOT7cFYy+bA+O4laSSLb61TLGlzPYUNYM8OP
+         uhpSwl6KXwRASrfEkfPoCvQvSCjl7bDNieDg1pzwaWsxDbf2WWjr6LHgC7XxgSYCflaN
+         eD6UresjKUFjEeTtQEkIqjILMOsPw4k1k3zA7riO69tv1/GHeo9jCMuXu1AKl96uSrjW
+         RrzZ0nB+BrrA2HPCPKSBgE1aDrzz48Kq1YrLC+d4s/nm7P1cNwCrYWQBzI0lykWshBr3
+         nNU/EZMQpGPQ/cpkbtpbZSf5N0/Jq2FrNlgKMctxgxCsCqfSQdg8Onf533RMUL1ybTHw
+         4kDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPx6nj6S4jESA21pin6sVeRJmSL17E2aYjphVSHYtijZKgtg+VmSd2GofGzo5HB01WrMSxszs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/rjm9wJgBKpwqDXBQvhJPJIpFAcRsAj4UR1pOmeTiwkIdjBTK
+	uhgbwExVdY1YdXgP/O7seRN4i8ysMJSeM2v2vtTZnJRj4Lmr0oZzyw5KbH9G8G1CSfE=
+X-Gm-Gg: AZuq6aJTC+/4yGhFFdD4D0UJKDi7m725HHyLrXboyMdcPqx9eF6SYZCqOuTRsp7np3B
+	LE8Qcb1mmqiHRFBrn4JN0onswjO4RaweVMhhOZNF19eIusKeuLULsdCzyMxCAh6/SWu15D9cIOC
+	rqb8X/L0tTI+Pgbg/5BoZ0jaAfZ7aa0FmIUOM/tyYyyLBxStC7y0l0v1u8nKurpZUUJFtFx+ObV
+	lKdQv8rl2kO61Rp1Vo74eD/VjECQ49teqVSjeRtAPFZk7XEK2srZS9k7X0iqPPlS7LMSB4gBFQW
+	0OoO5R1zdDgN94FupInGooKd0zftsGkqR1cmTp38TmzJ7Mk8Dm4Vf06XIaU+T2GySlq61uONaXA
+	+KpqDL0EWzRFNvAfX3lf3aR18jfPI3dpFkl3J9ealaY9OJZt8saw1oS2hMmVa5q6Ut4eVeG9PFR
+	Z7QeZiC5noA8jLd3XFb0wAYtpHacnA9UYqWpt8D4nj2yUlS4vQhJblxJTwxQ8VXiF5wsb6TUCNg
+	s5EicwpLcPipYU=
+X-Received: by 2002:a05:620a:3188:b0:8c6:af59:5e2c with SMTP id af79cd13be357-8cb4bf6a3cbmr8015185a.18.1770999253839;
+        Fri, 13 Feb 2026 08:14:13 -0800 (PST)
 Received: from gourry-fedora-PF4VCD3F.lan (pool-96-255-20-138.washdc.ftas.verizon.net. [96.255.20.138])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb39da3dc6sm401861185a.51.2026.02.13.08.14.11
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb39da3dc6sm401861185a.51.2026.02.13.08.14.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Feb 2026 08:14:11 -0800 (PST)
+        Fri, 13 Feb 2026 08:14:13 -0800 (PST)
 From: Gregory Price <gourry@gourry.net>
 To: Alejandro Lucero <alucerop@amd.com>
 Cc: linux-cxl@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 21/22] sfc: create cxl region
-Date: Fri, 13 Feb 2026 11:14:06 -0500
-Message-ID: <20260213161410.2945294-2-gourry@gourry.net>
+Subject: Re: [PATCH 22/22] sfc: support pio mapping based on cxl
+Date: Fri, 13 Feb 2026 11:14:07 -0500
+Message-ID: <20260213161410.2945294-3-gourry@gourry.net>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260201155438.2664640-22-alejandro.lucero-palau@amd.com>
-References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com> <20260201155438.2664640-22-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20260201155438.2664640-23-alejandro.lucero-palau@amd.com>
+References: <20260201155438.2664640-1-alejandro.lucero-palau@amd.com> <20260201155438.2664640-23-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,7 +107,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258640-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258641-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[gourry.net];
@@ -123,7 +122,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[gourry.net:mid,gourry.net:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 32A3A137DD9
+X-Rspamd-Queue-Id: 18C60137DE0
 X-Rspamd-Action: no action
 
 This review was generated by kreview-0811365ff2. =0D
@@ -132,58 +131,79 @@ This is not an automated email, the reviewer though this report=0D
 looked valid enough to consider discussion.=0D
 =0D
 ----=0D
-sfc code so won't speak to the internals, but ordering question seems=0D
-legit.=0D
+I am completely unfamiliar with this code, but the question it poses=0D
+at least seems reasonable.=0D
 =0D
 ~Gregory=0D
 ----=0D
 =0D
 On Sat, Feb 01, 2026, Alejandro Lucero wrote:=0D
 =0D
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sf=
-c/efx_cxl.c=0D
-> index 2cfd0a46225f..4d5f3974e51d 100644=0D
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c=0D
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c=0D
+> diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/e=
+f10.c=0D
+> index fcec81f862ec..2bb6d3136c7c 100644=0D
+> --- a/drivers/net/ethernet/sfc/ef10.c=0D
+> +++ b/drivers/net/ethernet/sfc/ef10.c=0D
 =0D
 [ ... ]=0D
 =0D
-> @@ -147,11 +155,11 @@ void efx_cxl_exit(struct efx_probe_data *probe_data=
-)=0D
+> @@ -1263,8 +1281,25 @@ static int efx_ef10_dimension_resources(struct efx=
+_nic *efx)=0D
+>  	iounmap(efx->membase);=0D
+>  	efx->membase =3D membase;=0D
 >=0D
->  	if (probe_data->cxl->hdm_was_committed) {=0D
->  		iounmap(probe_data->cxl->ctpio_cxl);=0D
-> -		cxl_unregister_region(probe_data->cxl->efx_region);=0D
->  	} else {=0D
->  		cxl_dpa_free(probe_data->cxl->cxled);=0D
->  		cxl_put_root_decoder(probe_data->cxl->cxlrd);=0D
+> -	/* Set up the WC mapping if needed */=0D
+> -	if (wc_mem_map_size) {=0D
+> +	if (!wc_mem_map_size)=0D
+> +		goto skip_pio;=0D
+> +=0D
+> +	/* Set up the WC mapping */=0D
+> +=0D
+> +#ifdef CONFIG_SFC_CXL=0D
+> +	probe_data =3D container_of(efx, struct efx_probe_data, efx);=0D
+> +	if ((nic_data->datapath_caps3 &=0D
+> +	    (1 << MC_CMD_GET_CAPABILITIES_V7_OUT_CXL_CONFIG_ENABLE_LBN)) &&=0D
+> +	    probe_data->cxl_pio_initialised) {=0D
+> +		/* Using PIO through CXL mapping? */=0D
+> +		nic_data->pio_write_base =3D probe_data->cxl->ctpio_cxl +=0D
+> +					   (pio_write_vi_base * efx->vi_stride +=0D
+> +					    ER_DZ_TX_PIOBUF - uc_mem_map_size);=0D
+> +		probe_data->cxl_pio_in_use =3D true;=0D
+> +	} else=0D
+> +#endif=0D
+> +	{=0D
+> +		/* Using legacy PIO BAR mapping */=0D
+>  		nic_data->wc_membase =3D ioremap_wc(efx->membase_phys +=0D
+>  						  uc_mem_map_size,=0D
+>  						  wc_mem_map_size);=0D
+> @@ -1279,12 +1314,13 @@ static int efx_ef10_dimension_resources(struct ef=
+x_nic *efx)=0D
+>  			nic_data->wc_membase +=0D
+>  			(pio_write_vi_base * efx->vi_stride + ER_DZ_TX_PIOBUF -=0D
+>  			 uc_mem_map_size);=0D
+> -=0D
+> -		rc =3D efx_ef10_link_piobufs(efx);=0D
+> -		if (rc)=0D
+> -			efx_ef10_free_piobufs(efx);=0D
 >  	}=0D
-> +	cxl_unregister_region(probe_data->cxl->efx_region);=0D
 =0D
-In the non-committed path, cxl_dpa_free() is called while the=0D
-endpoint decoder is still attached to the region.  Looking at=0D
-cxl_dpa_free() in drivers/cxl/core/hdm.c:=0D
+The CXL path sets nic_data->pio_write_base but does not set=0D
+nic_data->pio_write_vi_base, while the legacy path does:=0D
 =0D
-    if (cxled->cxld.region) {=0D
-        dev_dbg(dev, "decoder assigned to: %s\n",=0D
-            dev_name(&cxled->cxld.region->dev));=0D
-        return -EBUSY;=0D
-    }=0D
+    nic_data->pio_write_vi_base =3D pio_write_vi_base;=0D
 =0D
-Since cxl_unregister_region() has not run yet, cxled->cxld.region=0D
-is still set, and cxl_dpa_free() returns -EBUSY without freeing=0D
-the DPA.  The return value is not checked.=0D
+Since nic_data is kzalloc'd, pio_write_vi_base stays at 0 in the CXL=0D
+path.  efx_ef10_link_piobufs() then uses nic_data->pio_write_vi_base=0D
+to issue MC_CMD_LINK_PIOBUF commands:=0D
 =0D
-Should cxl_unregister_region() be called before cxl_dpa_free()=0D
-and cxl_put_root_decoder() in the else branch, matching the=0D
-reverse order of allocation in efx_cxl_init()?=0D
+    MCDI_SET_DWORD(inbuf, LINK_PIOBUF_IN_TXQ_INSTANCE,=0D
+                   nic_data->pio_write_vi_base + index);=0D
 =0D
-The cover letter notes that v23 expects committed decoders as the=0D
-primary flow, and uncommitted decoder support is deferred to=0D
-follow-up work, so this else branch may not be reachable in=0D
-practice today.  Still worth fixing the ordering now so it=0D
-doesn't bite when the uncommitted path is enabled later.=0D
+and also for the special-case check:=0D
 =0D
-This issue is not fixed by the remaining commits in the series=0D
-(through 10fe989f9e85).=0D
+    if (tx_queue->queue =3D=3D nic_data->pio_write_vi_base) {=0D
+=0D
+Wouldn't this link PIO buffers to incorrect VI instances when using=0D
+CXL, since the local variable pio_write_vi_base has the correct=0D
+non-zero value but the struct field was never updated?=0D
 
