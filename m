@@ -1,305 +1,238 @@
-Return-Path: <netdev+bounces-258657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8I2WHWhhj2nNQgEAu9opvQ
-	(envelope-from <netdev+bounces-258657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:37:44 +0100
+	id II8UKFJjj2n6QgEAu9opvQ
+	(envelope-from <netdev+bounces-258658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:45:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE6D2138B21
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:37:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22203138B98
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:45:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45C02303A133
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:37:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EB3293034C9A
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9443A21B9DA;
-	Fri, 13 Feb 2026 17:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26AF16A395;
+	Fri, 13 Feb 2026 17:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="w1UWyG5H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h9seos/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4397.protonmail.ch (mail-4397.protonmail.ch [185.70.43.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663FA26FDBF;
-	Fri, 13 Feb 2026 17:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.97
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771004259; cv=none; b=byZtGnq6rANikAEXHcxOISkgQIZ/+N9qNH6LapPBPXzj37NC4LoxbCxHH0UWd0ezbiGW4gJt0V4z+bz9t0E/ZT5rvF3r1yAZyel584e08hUC0B21+Bcw9V6ZBm7hiG3p5OvKCjGt4GPcckWnRamisWBCLfTSEhml7SPQCEkieJk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771004259; c=relaxed/simple;
-	bh=YoKGDML6ZhHAYimZ1SdNKI2gYZwZbzC8OKLBpvtL5vs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q7dpIOy3MXhYmRiHEPJB3UwzUiQ1ZjSWOZw8C9QggTr1/OvYL0JOYmGJ5kqZMAe7c6eDYRRTIBUB3ZzyQHVLCzwE9yiiKuwLtVvvqDuK9M52Tb1GLDrNXmH8C8/YLpN/LMjbH/OXtoXcB4XMHYZOEhizE/lRaIqGpo6jTK3kv24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=w1UWyG5H; arc=none smtp.client-ip=185.70.43.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1771004247; x=1771263447;
-	bh=MMwCRDSR1YuIke1zTKxuyT055rx6uuEuLXQFJeWc6eA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=w1UWyG5HdbXoM9L4KDvfI0ZnEDPFYsr5I8m5Ruk9fniX3UiUwdinhSYI7wX+SYkF7
-	 lfwf315qzzrgTeoU9MKw84CVwmfTymquualexV035nWevWeGS+rxbqLhN+MMyqjkcm
-	 h5yxrmg8zXaz6estIm7aXKmlDwnoSIWyx0lhNUOwPIkGoiJDEYdR9BJi9kiXQKeWdT
-	 a1fs8pxrR2CSnDdlGV2VoM3lGNE2yf0xeIGjOu95Fa7rXEPrtfGQWCgza2P/xJ+OMc
-	 zBT1jSU/jbBM0fI4lUjL2Ze56Nb6YKzA7XTP5qQtQluogxY3xoLu1NhrpNlCh3ZWtI
-	 b9PfxjG7kip8w==
-Date: Fri, 13 Feb 2026 17:37:22 +0000
-To: Simon Horman <horms@kernel.org>
-From: Paul Moses <p@1g4.org>
-Cc: jiri@resnulli.us, pabeni@redhat.com, victor@mojatatu.com, jhs@mojatatu.com, davem@davemloft.net, netdev@vger.kernel.org, stable@vger.kernel.org, edumazet@google.com, linux-kernel@vger.kernel.org, kuba@kernel.org, xiyou.wangcong@gmail.com
-Subject: Re: [net,v6,1/1] net/sched: act_gate: snapshot parameters with RCU on replace
-Message-ID: <BRr95QFZN9_ai_HGUbpS_NTCZ_7nKmODaNT-iE1S9IdeiK8dDJjOCh7C9DDrZE29LUJ3YTRkAav0xpk3azg54ruQSwG74GWNTDB-HpOMasM=@1g4.org>
-In-Reply-To: <20260213155528.2515066-1-horms@kernel.org>
-References: <20260213113849.136695-2-p@1g4.org> <20260213155528.2515066-1-horms@kernel.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 01095dc8dbdb30e16a022ef4661587a806228001
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D38C8287E
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 17:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771004750; cv=pass; b=JNkZB6O/hXs1CfSfHJjjbptz48UjHtM2YS5iOaUA+egpSCVHbSijUtUHmyBQtoQ9YxMnNM7pXDqULEj8ERy20cgFtONpS+eZ9MsSxMQFkW3wscjL5/vQ6S0QmHwTixnTKBx/Ych3IqeH1Z+Wu/v5tTsOzqGtz98fiBpGH+gE/y8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771004750; c=relaxed/simple;
+	bh=NlQKFza6l2j2GPRtzrG50+ywfP+FgPi8CyHcNGhjvmY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A2saeWpNWiKkRqtrd5aP+KdgE515uqaY0z1ShYkFR2OIVV41q1zjDZCNc5R4q0Sq7fMscDXidfO6AQOjnnO5lV+d8zOvPUrmhu4K5gdG/K9Rn3SPk+nzyYxnzDKhw++lphCoC/SQX3aJFk9ngnE07U7iiifNbaekbIoKDgBftc0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h9seos/h; arc=pass smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-896f82e5961so19728976d6.0
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 09:45:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771004748; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OuJ5ZlO0tdzb22Q0YzXA/xplFd63hG/MrR1CQi6ZASK9z6CXaKQfh3rYwd6soyXNL2
+         b3je21OEVqnrNYgv7nd6rQ0syL0eGqLkQUGkyLevApxL5ncwbrEETrNNHCZVDOgrXZ/y
+         BzLYxA5RmSNug7Np+glSe0wKRUseM5JvaIGl+U1gNHVklQNIKX2ZHxoeeEFVbQ6JmQpl
+         mTbm6smQ10LMSrJbVurcCyNHtIYYOby6J1relBECsvKU9Rg+o9vi8Hhvohzj3wciAxKn
+         tZYbtM2XTUlOEcWfACT3A8Y1grMYxDhh3+g2EKo96v1a/94C5sgYYdKgtcIPMhBXvddO
+         4FcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=MP2oACDFm3pEtgrZcYWrh7Sv94HukkUZx1Nq8rOiQaw=;
+        fh=5yHlJCMbRYC9T56hjuM1BE3pBNE9UlWJFhmwYuQ8/Hg=;
+        b=W8XaPmTVQ2rVZWxvvhzvSSUMxD6lYSAbYcgh/Tg3XEvgR0fob9o1+hxB1ia3jt2uyz
+         itDwD0NlegBqsBc5crSMObKuULMVn8Q99/NeJhLQerchZDlhCpY4BWfU37vwIi7XYX7P
+         bXijs3wXjCyJqRqWxRXi2fZlEAim5q5PLwNN7KG4wSALLqkrZ2JgvW3q4sSVGPAVj5k7
+         Q+pgcRg51vdp5Y+l5zqqIue4xlv3d0QVY9pExgM5wxrYM6myJd51NYN+aTPDD87pfRWS
+         ot/Ga9I7HMsEQINb8nok7rB/tD+33RXVsGg41QOec8i+I01thonnqgbPKqY8ll9YU9Kw
+         XywQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771004748; x=1771609548; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MP2oACDFm3pEtgrZcYWrh7Sv94HukkUZx1Nq8rOiQaw=;
+        b=h9seos/h8Nrw4UKZ3xQbYlp9Sh2oNyoR+uG7o5+Bup8LZQ36K4OCg+AAswcGzWBZP5
+         d4mVHGN4h6FVcuXu5St5Gj5/0tNiAiT6KVM0HmINLaqtPT4aB3BTmLPjxf4ztKRUE39n
+         k6h5mk3Cb+ulX/xUSVp3tvF4c7+8oopE2+FZFtL0tDcJzGyv5NKNBtDivg+96MW2k7bx
+         T5HAMl+zPktttfZze9tpVJQWhQiiQKmqZifBvieK6Hdzu0nj1pbWg6pwwOZzbNMYW2dw
+         3TcXkNZ/inX8QcpTO6/vwoPByM/ucNO6o7pRTZ+WpEPufYHJHqCwNxtq3fKCnMrS5PaG
+         318w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771004748; x=1771609548;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MP2oACDFm3pEtgrZcYWrh7Sv94HukkUZx1Nq8rOiQaw=;
+        b=JuEeBpUN0Pbcww8XCTwBbZXgiqoicfadTzkgANiRXqxwGexrbQ0Cm3kXtlaSQGvSXu
+         N2Zx4SmDXHuphfPsOK838DBU9voVBn4Ibckl4qtpoAlAF6TlEREwWUpk+tX+f0To7Jf6
+         u55Z1EXO5ekJg+UouFtU1pSM7KFTnh20Ljb371mlVKC1+IMg3sOUe77ykcRDTuyWq0wL
+         ZXAb7kHlwiwU9NpOXRFDROTqKbmY5XOktL7Ht1v6xBu57YgS+F2GULfC48Nue0QxqOWL
+         awxHKJxLVQkk5bbOrykeF/Zg4V+P7Y3Q4b46WFSnuyyjBJK4cr2nDZH1NsENO+hWhvz9
+         tt6Q==
+X-Gm-Message-State: AOJu0Yx1hwA5DODJnwWvec5b0UbIkqz/qpKyJ971mdkh4xwQ3U5Rj7Wc
+	qZlNliL/KG6jSw1P4UJvKBlifYKWMKCoVrZW147qWuaYEK8dTloRy1k2KDfTsiVwZeavItdIIio
+	lDrryhHYawtW2sB/ApkkefS4tQodqBneZutcMuq1usASOkDlyh8IuuuXqp6Y=
+X-Gm-Gg: AZuq6aK0rV27S6zwoPX15aAwVlecXkkxdcIhQYadwmfgJTefqkqKnbT3FMpd2eWVcNN
+	Ex/cxmVY4Mo2Zx2tNsfxLMVpmMsVy36XbQ0dngC2YiDdOg8jatebyfSgzL9LV0W6FnfEEBT+W/L
+	pZEM/lpK6oXyb/Up6QKkocXIxxibIM1IwZCRe1HG5nr9AVMwRoUubecUs14+Vg0f1b2e/2ymrYv
+	frwUBRZv2qirVqyH+PYWaGbNzoexd7CVQbpYOB7Bx0eFJd7dhAz9E3UazskXkt/MvWEp38aR6sD
+	59iN3Lg=
+X-Received: by 2002:a05:6214:1c8c:b0:894:6daa:a01d with SMTP id
+ 6a1803df08f44-8974049cdeemr4833126d6.52.1771004747700; Fri, 13 Feb 2026
+ 09:45:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <DU0PR02MB95889B670EBF541E6ED3EBCCE261A@DU0PR02MB9588.eurprd02.prod.outlook.com>
+In-Reply-To: <DU0PR02MB95889B670EBF541E6ED3EBCCE261A@DU0PR02MB9588.eurprd02.prod.outlook.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 13 Feb 2026 18:45:36 +0100
+X-Gm-Features: AZwV_QgEajRrtYzzOt8rnbco5R57dVPOdqZueY_Rmk74IEKEggV2DSU08o_PDwI
+Message-ID: <CANn89iJBNN05gSq91nc0vVH6RVVCXwEwaFb-JtCavU2UVZR=zw@mail.gmail.com>
+Subject: Re: ip6_tunnel.c question about https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=81c734dae203757fb3c9eee6f9896386940776bd
+To: "Froehlich, Dominik" <dominik.froehlich@sap.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	URL_IN_SUBJECT(1.00)[git.kernel.org];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258657-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[resnulli.us,redhat.com,mojatatu.com,davemloft.net,vger.kernel.org,google.com,kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258658-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sap.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: CE6D2138B21
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 22203138B98
 X-Rspamd-Action: no action
 
-1. I don=E2=80=99t think this is reachable, during create, the IDR slot is =
-populated=20
-   with ERR_PTR(-EBUSY) by tcf_idr_check_alloc(). The real action pointer i=
-s=20
-   only published later by tcf_idr_insert_many(), which runs after init()=
-=20
-   returns and after tcf_gate_init() has already done:
+On Fri, Feb 13, 2026 at 6:31=E2=80=AFPM Froehlich, Dominik
+<dominik.froehlich@sap.com> wrote:
+>
+> Hello everyone,
+>
+> We recently upgraded our kernels to 6.12.67 which contains this commit
+>
 
-     rcu_replace_pointer(gact->param, p, ...)
+This has been discussed already.
 
-   Both the normal lookup path and the dump walker treat ERR_PTR entries as
-   =E2=80=9Cnot ready=E2=80=9D: tcf_idr_search() rejects them and the dump =
-walker skips.
+A prereq was missed by stable team.
 
-2. offload_act_setup() is currently called with act->tcfa_lock held in both=
-=20
-   call chains (net/sched/act_api.c and net/sched/cls_api.c). Since=20
-   gact->tcf_lock aliases common.tcfa_lock, the=20
-   lockdep_is_held(&gact->tcf_lock) condition in tcf_gate_params_locked()=
-=20
-   is satisfied.
+Please use 6.12.71
 
-Thanks,
-Paul
-
-
-
-
-On Friday, February 13th, 2026 at 9:55 AM, Simon Horman <horms@kernel.org> =
-wrote:
-
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->=20
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
-> ---
-> net/sched: act_gate: snapshot parameters with RCU on replace
->=20
-> The gate action can be replaced while the hrtimer callback or dump path i=
-s
-> walking the schedule list.
->=20
-> Convert the parameters to an RCU-protected snapshot and swap updates unde=
-r
-> tcf_lock, freeing the previous snapshot via call_rcu(). When REPLACE omit=
-s
-> the entry list, preserve the existing schedule so the effective state is
-> unchanged.
->=20
-> > diff --git a/include/net/tc_act/tc_gate.h b/include/net/tc_act/tc_gate.=
-h
-> > index c1a67149c6b6..5223c00279d5 100644
-> > --- a/include/net/tc_act/tc_gate.h
-> > +++ b/include/net/tc_act/tc_gate.h
-> > @@ -32,6 +32,7 @@ struct tcf_gate_params {
-> >  =09s32=09=09=09tcfg_clockid;
-> >  =09size_t=09=09=09num_entries;
-> >  =09struct list_head=09entries;
-> > +=09struct rcu_head=09=09rcu;
-> >  };
-> >
-> >  #define GATE_ACT_GATE_OPEN=09BIT(0)
-> > @@ -39,7 +40,7 @@ struct tcf_gate_params {
-> >
-> >  struct tcf_gate {
-> >  =09struct tc_action=09common;
-> > -=09struct tcf_gate_params=09param;
-> > +=09struct tcf_gate_params __rcu *param;
-> >  =09u8=09=09=09current_gate_status;
-> >  =09ktime_t=09=09=09current_close_time;
-> >  =09u32=09=09=09current_entry_octets;
-> > @@ -51,47 +52,65 @@ struct tcf_gate {
-> >
-> >  #define to_gate(a) ((struct tcf_gate *)a)
-> >
-> > +static inline struct tcf_gate_params *tcf_gate_params_locked(const str=
-uct tc_action *a)
-> > +{
-> > +=09struct tcf_gate *gact =3D to_gate(a);
-> > +
-> > +=09return rcu_dereference_protected(gact->param,
-> > +=09=09=09=09=09 lockdep_is_held(&gact->tcf_lock));
-> > +}
-> > +
-> >  static inline s32 tcf_gate_prio(const struct tc_action *a)
-> >  {
-> > +=09struct tcf_gate_params *p;
-> >  =09s32 tcfg_prio;
-> >
-> > -=09tcfg_prio =3D to_gate(a)->param.tcfg_priority;
-> > +=09p =3D tcf_gate_params_locked(a);
-> > +=09tcfg_prio =3D p->tcfg_priority;
-> >
-> >  =09return tcfg_prio;
-> >  }
->=20
-> [ ... ]
->=20
-> > diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-> > index c1f75f272757..60c80e609ec3 100644
-> > --- a/net/sched/act_gate.c
-> > +++ b/net/sched/act_gate.c
->=20
-> [ ... ]
->=20
-> > @@ -509,10 +621,9 @@ static int tcf_gate_dump(struct sk_buff *skb, stru=
-ct tc_action *a,
-> >  =09struct nlattr *entry_list;
-> >  =09struct tcf_t t;
-> >
-> > -=09spin_lock_bh(&gact->tcf_lock);
-> > -=09opt.action =3D gact->tcf_action;
-> > -
-> > -=09p =3D &gact->param;
-> > +=09rcu_read_lock();
-> > +=09opt.action =3D READ_ONCE(gact->tcf_action);
-> > +=09p =3D rcu_dereference(gact->param);
-> >
-> >  =09if (nla_put(skb, TCA_GATE_PARMS, sizeof(opt), &opt))
-> >  =09=09goto nla_put_failure;
-> >
-> > @@ -552,12 +663,12 @@ static int tcf_gate_dump(struct sk_buff *skb, str=
-uct tc_action *a,
-> >  =09tcf_tm_dump(&t, &gact->tcf_tm);
-> >  =09if (nla_put_64bit(skb, TCA_GATE_TM, sizeof(t), &t, TCA_GATE_PAD))
-> >  =09=09goto nla_put_failure;
-> > -=09spin_unlock_bh(&gact->tcf_lock);
-> > +=09rcu_read_unlock();
-> >
-> >  =09return skb->len;
-> >
-> >  nla_put_failure:
-> > -=09spin_unlock_bh(&gact->tcf_lock);
-> > +=09rcu_read_unlock();
-> >  =09nlmsg_trim(skb, b);
-> >  =09return -1;
-> >  }
->=20
-> Can tcf_gate_dump be called before gact->param is initialized?
->=20
-> After the conversion to RCU pointers, if tcf_gate_dump is called during
-> action initialization (between tcf_idr_create_from_flags and
-> rcu_replace_pointer in tcf_gate_init), p will be NULL:
->=20
-> net/sched/act_gate.c:tcf_gate_init() {
->     tcf_idr_create_from_flags(...);
->     ...
->     // gact->param still NULL here
->     ...
->     rcu_replace_pointer(gact->param, p, ...);  // line 517
-> }
->=20
-> net/sched/act_gate.c:tcf_gate_dump() {
->     rcu_read_lock();
->     p =3D rcu_dereference(gact->param);  // can be NULL
->=20
->     if (nla_put_u64_64bit(skb, TCA_GATE_BASE_TIME,
->                           p->tcfg_basetime, TCA_GATE_PAD))  // NULL deref
-> }
->=20
-> Before the patch, param was an embedded struct that was zero-initialized,
-> so dump would return valid (if meaningless) data. After the patch, this
-> becomes a NULL pointer dereference.
->=20
-> While the tc action framework may prevent dumping partially initialized
-> actions through external synchronization, should this code include a NULL
-> check to make the initialization window safer?
->=20
-> The second issue is in the hardware offload path. Looking at
-> net/sched/act_gate.c:tcf_gate_offload_act_setup(), the function calls the
-> accessor helpers without holding tcf_lock:
->=20
-> net/sched/act_gate.c:tcf_gate_offload_act_setup() {
->     // no lock held here
->     entry->gate.prio =3D tcf_gate_prio(act);           // line 723
->     entry->gate.basetime =3D tcf_gate_basetime(act);
->     entry->gate.cycletime =3D tcf_gate_cycletime(act);
->     ...
-> }
->=20
-> include/net/tc_act/tc_gate.h:tcf_gate_prio() {
->     p =3D tcf_gate_params_locked(a);  // uses rcu_dereference_protected
->     ...
-> }
->=20
-> include/net/tc_act/tc_gate.h:tcf_gate_params_locked() {
->     return rcu_dereference_protected(gact->param,
->                                      lockdep_is_held(&gact->tcf_lock));
-> }
->=20
-> Does tcf_gate_offload_act_setup violate the locking requirements?
->=20
-> The accessor functions all use tcf_gate_params_locked(), which requires
-> tcf_lock to be held (verified via lockdep_is_held). The offload setup
-> function doesn't acquire this lock before calling the accessors.
->=20
-> With lockdep enabled, this will trigger warnings. Without lockdep, there'=
-s
-> a race where param can be replaced via rcu_replace_pointer while the
-> offload function is reading it, potentially causing reads of inconsistent
-> state.
->=20
-> The dump path uses the correct pattern with rcu_read_lock() and
-> rcu_dereference(). Should the offload path either acquire tcf_lock or use
-> a similar RCU-only approach?
-> 
+> commit df5ffde9669314500809bc498ae73d6d3d9519ac
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Wed Jan 7 16:31:09 2026 +0000
+>
+>     ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()
+>
+>     [ Upstream commit 81c734dae203757fb3c9eee6f9896386940776bd ]
+>
+>     Blamed commit did not take care of VLAN encapsulations
+>     as spotted by syzbot [1].
+>
+>     Use skb_vlan_inet_prepare() instead of pskb_inet_may_pull().
+>
+>
+>
+> We found out that it breaks our VPN setup that is based on passing IPv4 t=
+raffic through an ipv6 tunnel
+> network.
+>
+> It seems that we run into the drop condition here:
+>
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82if (skb_vlan_inet_p=
+repare(skb, true)) {
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
+=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_length_er=
+rors);
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
+=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_errors);
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
+=E2=80=82=E2=80=82=E2=80=82=E2=80=82goto drop;
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82}
+>
+> The previous version worked fine:
+>
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82if (!pskb_inet_may_=
+pull(skb)) {
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
+=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_length_er=
+rors);
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
+=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_errors);
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
+=E2=80=82=E2=80=82=E2=80=82=E2=80=82goto drop;
+> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82}
+>
+> I don=E2=80=99t know if it=E2=80=99s related to the negation that is now =
+missing..?
+>
+>
+> We are setting up the tunnel using a basic ip link command:
+>
+> ip link add name bond0-ip6tnl0 type ip6tnl local fd8f:6d53:b97a:1::a:4120=
+ remote fd8f:6d53:b97a:1::b:0 mode any
+>
+>
+> Where fd8f:6d53:b97a:1::a:4120 is the address of a local bond device ensl=
+aving two tap devices each connected to one VPN server for high availabilit=
+y.
+> fd8f:6d53:b97a:1::b:0 is the address of the remote bond device on the oth=
+er end.
+> Both devices can ping each other just fine on IPv6, but when I try to sen=
+d IPv4 packets through the ip6tnl device, they get dropped on the round tri=
+p.
+>
+> We patched out the above fix for testing and confirmed that it works agai=
+n.
+>
+> I=E2=80=99ve attached a pcap file of a tcp SYN attempt  containing the ip=
+6ip4 headers as they arrive at the ip6tnl device. The SYN-ACK returned is n=
+ot showing and gets dropped, leading to SYN retransmission.
+>
+> Can you give me some directions? I=E2=80=99m still trying to figure out i=
+f there is an error in our setup or the kernel.
+> This used to work for years so I=E2=80=99m a bit puzzled now.
+>
+>
+>
+> Best regards,
+> Dominik Froehlich
+> SAP
+>
 
