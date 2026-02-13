@@ -1,238 +1,141 @@
-Return-Path: <netdev+bounces-258658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id II8UKFJjj2n6QgEAu9opvQ
-	(envelope-from <netdev+bounces-258658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:45:54 +0100
+	id UDCwBlpkj2n6QgEAu9opvQ
+	(envelope-from <netdev+bounces-258659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:50:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22203138B98
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:45:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C8F138BEC
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 18:50:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB3293034C9A
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:45:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8A383039CBC
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26AF16A395;
-	Fri, 13 Feb 2026 17:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E29C26FA77;
+	Fri, 13 Feb 2026 17:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h9seos/h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bUPi1LNk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D38C8287E
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 17:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771004750; cv=pass; b=JNkZB6O/hXs1CfSfHJjjbptz48UjHtM2YS5iOaUA+egpSCVHbSijUtUHmyBQtoQ9YxMnNM7pXDqULEj8ERy20cgFtONpS+eZ9MsSxMQFkW3wscjL5/vQ6S0QmHwTixnTKBx/Ych3IqeH1Z+Wu/v5tTsOzqGtz98fiBpGH+gE/y8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771004750; c=relaxed/simple;
-	bh=NlQKFza6l2j2GPRtzrG50+ywfP+FgPi8CyHcNGhjvmY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A2saeWpNWiKkRqtrd5aP+KdgE515uqaY0z1ShYkFR2OIVV41q1zjDZCNc5R4q0Sq7fMscDXidfO6AQOjnnO5lV+d8zOvPUrmhu4K5gdG/K9Rn3SPk+nzyYxnzDKhw++lphCoC/SQX3aJFk9ngnE07U7iiifNbaekbIoKDgBftc0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h9seos/h; arc=pass smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-896f82e5961so19728976d6.0
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 09:45:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771004748; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OuJ5ZlO0tdzb22Q0YzXA/xplFd63hG/MrR1CQi6ZASK9z6CXaKQfh3rYwd6soyXNL2
-         b3je21OEVqnrNYgv7nd6rQ0syL0eGqLkQUGkyLevApxL5ncwbrEETrNNHCZVDOgrXZ/y
-         BzLYxA5RmSNug7Np+glSe0wKRUseM5JvaIGl+U1gNHVklQNIKX2ZHxoeeEFVbQ6JmQpl
-         mTbm6smQ10LMSrJbVurcCyNHtIYYOby6J1relBECsvKU9Rg+o9vi8Hhvohzj3wciAxKn
-         tZYbtM2XTUlOEcWfACT3A8Y1grMYxDhh3+g2EKo96v1a/94C5sgYYdKgtcIPMhBXvddO
-         4FcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MP2oACDFm3pEtgrZcYWrh7Sv94HukkUZx1Nq8rOiQaw=;
-        fh=5yHlJCMbRYC9T56hjuM1BE3pBNE9UlWJFhmwYuQ8/Hg=;
-        b=W8XaPmTVQ2rVZWxvvhzvSSUMxD6lYSAbYcgh/Tg3XEvgR0fob9o1+hxB1ia3jt2uyz
-         itDwD0NlegBqsBc5crSMObKuULMVn8Q99/NeJhLQerchZDlhCpY4BWfU37vwIi7XYX7P
-         bXijs3wXjCyJqRqWxRXi2fZlEAim5q5PLwNN7KG4wSALLqkrZ2JgvW3q4sSVGPAVj5k7
-         Q+pgcRg51vdp5Y+l5zqqIue4xlv3d0QVY9pExgM5wxrYM6myJd51NYN+aTPDD87pfRWS
-         ot/Ga9I7HMsEQINb8nok7rB/tD+33RXVsGg41QOec8i+I01thonnqgbPKqY8ll9YU9Kw
-         XywQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771004748; x=1771609548; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MP2oACDFm3pEtgrZcYWrh7Sv94HukkUZx1Nq8rOiQaw=;
-        b=h9seos/h8Nrw4UKZ3xQbYlp9Sh2oNyoR+uG7o5+Bup8LZQ36K4OCg+AAswcGzWBZP5
-         d4mVHGN4h6FVcuXu5St5Gj5/0tNiAiT6KVM0HmINLaqtPT4aB3BTmLPjxf4ztKRUE39n
-         k6h5mk3Cb+ulX/xUSVp3tvF4c7+8oopE2+FZFtL0tDcJzGyv5NKNBtDivg+96MW2k7bx
-         T5HAMl+zPktttfZze9tpVJQWhQiiQKmqZifBvieK6Hdzu0nj1pbWg6pwwOZzbNMYW2dw
-         3TcXkNZ/inX8QcpTO6/vwoPByM/ucNO6o7pRTZ+WpEPufYHJHqCwNxtq3fKCnMrS5PaG
-         318w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771004748; x=1771609548;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MP2oACDFm3pEtgrZcYWrh7Sv94HukkUZx1Nq8rOiQaw=;
-        b=JuEeBpUN0Pbcww8XCTwBbZXgiqoicfadTzkgANiRXqxwGexrbQ0Cm3kXtlaSQGvSXu
-         N2Zx4SmDXHuphfPsOK838DBU9voVBn4Ibckl4qtpoAlAF6TlEREwWUpk+tX+f0To7Jf6
-         u55Z1EXO5ekJg+UouFtU1pSM7KFTnh20Ljb371mlVKC1+IMg3sOUe77ykcRDTuyWq0wL
-         ZXAb7kHlwiwU9NpOXRFDROTqKbmY5XOktL7Ht1v6xBu57YgS+F2GULfC48Nue0QxqOWL
-         awxHKJxLVQkk5bbOrykeF/Zg4V+P7Y3Q4b46WFSnuyyjBJK4cr2nDZH1NsENO+hWhvz9
-         tt6Q==
-X-Gm-Message-State: AOJu0Yx1hwA5DODJnwWvec5b0UbIkqz/qpKyJ971mdkh4xwQ3U5Rj7Wc
-	qZlNliL/KG6jSw1P4UJvKBlifYKWMKCoVrZW147qWuaYEK8dTloRy1k2KDfTsiVwZeavItdIIio
-	lDrryhHYawtW2sB/ApkkefS4tQodqBneZutcMuq1usASOkDlyh8IuuuXqp6Y=
-X-Gm-Gg: AZuq6aK0rV27S6zwoPX15aAwVlecXkkxdcIhQYadwmfgJTefqkqKnbT3FMpd2eWVcNN
-	Ex/cxmVY4Mo2Zx2tNsfxLMVpmMsVy36XbQ0dngC2YiDdOg8jatebyfSgzL9LV0W6FnfEEBT+W/L
-	pZEM/lpK6oXyb/Up6QKkocXIxxibIM1IwZCRe1HG5nr9AVMwRoUubecUs14+Vg0f1b2e/2ymrYv
-	frwUBRZv2qirVqyH+PYWaGbNzoexd7CVQbpYOB7Bx0eFJd7dhAz9E3UazskXkt/MvWEp38aR6sD
-	59iN3Lg=
-X-Received: by 2002:a05:6214:1c8c:b0:894:6daa:a01d with SMTP id
- 6a1803df08f44-8974049cdeemr4833126d6.52.1771004747700; Fri, 13 Feb 2026
- 09:45:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAE117555;
+	Fri, 13 Feb 2026 17:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771005015; cv=none; b=bw/Qaz1bqGlhum04iHpwdCrKmR/OJ/YkP3I6NpDL2ENK4nOnpTcxTBKZDHZ4BTzmPuBt39ohzvJFB4+KUvxwe1Yl9dDrpVClSy94NBMzeYoD+8SoJtzxV7DC44Zi4TvoM9VBrZ0QYbSC+v05eBwfiNsoyyc4JiAdBXVXvh8ntjM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771005015; c=relaxed/simple;
+	bh=yV+n5t3bhZiNowfgdaluBYucTqAeFF0YgQPwfgowN1s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XNzJoSMNQ79uEKe/xnImSu6nIKTR0IAfnrPgvACfrw/OaDR7QQ34NgRPyw1suxoVK/MAn1AXqMvJXeb+qn4s3jwweAi+kxH9X1bIpwCp6veoKg5NexA7pgdaoG6D3W7zvyTPWRCsEsHeQ7+xPMBIcXFr1lYCL2QVA7I6Qdm+s64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bUPi1LNk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B99C116C6;
+	Fri, 13 Feb 2026 17:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771005015;
+	bh=yV+n5t3bhZiNowfgdaluBYucTqAeFF0YgQPwfgowN1s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bUPi1LNkE7jZCCQU2LXR+gJvBN7Iq7Lle+VGZ4jeLizNCXmi8zEC72/e5evMOgoOr
+	 LkwmdP+9fCdfmdxVAxiscNnlL+D0mDMGfkOxr3ay08CBnwniwJvN9aA33/0NBBqGj3
+	 avzStgkmpaTLR/WOFBQKWsx2vwenPNu2GUZq+CAqGSPsDQZKNpCrWByKQ9xiBHrKyN
+	 NxoCGW8QUuThGdKnDpnIOnm7pVGAAHTF+SwvNLSIuoyA4MHarVvx3LQWt4Uo89OOk/
+	 vtHK248MPDsN6gbxzBC+w/M6Dj0q6c5BndOowlras0u9f/WFbCIiqHLfVv8cJp2j5L
+	 ny/gl8S07LFoA==
+Message-ID: <25d8d1ab-b01c-4416-9f8d-9f29e59dc781@kernel.org>
+Date: Fri, 13 Feb 2026 18:50:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <DU0PR02MB95889B670EBF541E6ED3EBCCE261A@DU0PR02MB9588.eurprd02.prod.outlook.com>
-In-Reply-To: <DU0PR02MB95889B670EBF541E6ED3EBCCE261A@DU0PR02MB9588.eurprd02.prod.outlook.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 13 Feb 2026 18:45:36 +0100
-X-Gm-Features: AZwV_QgEajRrtYzzOt8rnbco5R57dVPOdqZueY_Rmk74IEKEggV2DSU08o_PDwI
-Message-ID: <CANn89iJBNN05gSq91nc0vVH6RVVCXwEwaFb-JtCavU2UVZR=zw@mail.gmail.com>
-Subject: Re: ip6_tunnel.c question about https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=81c734dae203757fb3c9eee6f9896386940776bd
-To: "Froehlich, Dominik" <dominik.froehlich@sap.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/6] net: sched: introduce qdisc-specific drop
+ reason tracing
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>
+Cc: bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, horms@kernel.org,
+ jiri@resnulli.us, edumazet@google.com, xiyou.wangcong@gmail.com,
+ jhs@mojatatu.com, atenart@redhat.com, carges@cloudflare.com,
+ kernel-team@cloudflare.com
+References: <177039500964.2258217.2989656069254156812.stgit@firesoul>
+ <177039506239.2258217.7863252279149995024.stgit@firesoul>
+ <f1827414-b6c4-47de-827a-9f9f4c796cf8@redhat.com>
+ <dda23104-3ca9-4f81-aa79-b0517a9cc5a2@redhat.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <dda23104-3ca9-4f81-aa79-b0517a9cc5a2@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	URL_IN_SUBJECT(1.00)[git.kernel.org];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-258659-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258658-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sap.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_TO(0.00)[redhat.com,vger.kernel.org,gmail.com,davemloft.net,toke.dk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 22203138B98
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,resnulli.us,google.com,gmail.com,mojatatu.com,redhat.com,cloudflare.com];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 61C8F138BEC
 X-Rspamd-Action: no action
 
-On Fri, Feb 13, 2026 at 6:31=E2=80=AFPM Froehlich, Dominik
-<dominik.froehlich@sap.com> wrote:
->
-> Hello everyone,
->
-> We recently upgraded our kernels to 6.12.67 which contains this commit
->
 
-This has been discussed already.
 
-A prereq was missed by stable team.
+On 11/02/2026 09.46, Paolo Abeni wrote:
+> On 2/11/26 9:36 AM, Paolo Abeni wrote:
+>> On 2/6/26 5:24 PM, Jesper Dangaard Brouer wrote:
+>>> @@ -593,7 +591,7 @@ static struct sk_buff *dualpi2_qdisc_dequeue(struct Qdisc *sch)
+>>>   	while ((skb = dequeue_packet(sch, q, &credit_change, now))) {
+>>>   		if (!q->drop_early && must_drop(sch, q, skb)) {
+>>>   			drop_and_retry(q, skb, sch,
+>>> -				       SKB_DROP_REASON_QDISC_CONGESTED);
+>>> +				       QDISC_DROP_CONGESTED);
+>>
+>> An explicit cast is needed above to avoid compiler warning (or you can
+>> change drop_and_retry() signature).
+> 
+> I see that the type confusion issues are handled for good by later
+> patches in the series, but I still think it would be better to avoid
+> introducing them with explicit casts as needed (removed by later patches).
+> 
+>> Also a few lines below there is another drop_and_retry() calls that is
+>> not converted.
+> 
+> I see it's handled by a later patch. I guess it would be useful to
+> mention such fact in the commit message.
 
-Please use 6.12.71
+Yes, this is handled in patch 3/6.  I acknowledge this is annoying from
+a review perspective, and also wrong because I'm leaving compiler
+warning that I'm fixing up later.  The reason for splitting it out into
+a separate patch was because I wanted document (in commit desc) the
+special usage of SKB_NOT_DROPPED_YET as a sentinel value.
 
-> commit df5ffde9669314500809bc498ae73d6d3d9519ac
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Wed Jan 7 16:31:09 2026 +0000
->
->     ip6_tunnel: use skb_vlan_inet_prepare() in __ip6_tnl_rcv()
->
->     [ Upstream commit 81c734dae203757fb3c9eee6f9896386940776bd ]
->
->     Blamed commit did not take care of VLAN encapsulations
->     as spotted by syzbot [1].
->
->     Use skb_vlan_inet_prepare() instead of pskb_inet_may_pull().
->
->
->
-> We found out that it breaks our VPN setup that is based on passing IPv4 t=
-raffic through an ipv6 tunnel
-> network.
->
-> It seems that we run into the drop condition here:
->
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82if (skb_vlan_inet_p=
-repare(skb, true)) {
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
-=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_length_er=
-rors);
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
-=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_errors);
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
-=E2=80=82=E2=80=82=E2=80=82=E2=80=82goto drop;
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82}
->
-> The previous version worked fine:
->
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82if (!pskb_inet_may_=
-pull(skb)) {
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
-=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_length_er=
-rors);
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
-=E2=80=82=E2=80=82=E2=80=82=E2=80=82DEV_STATS_INC(tunnel->dev, rx_errors);
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=
-=E2=80=82=E2=80=82=E2=80=82=E2=80=82goto drop;
-> =E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82=E2=80=82}
->
-> I don=E2=80=99t know if it=E2=80=99s related to the negation that is now =
-missing..?
->
->
-> We are setting up the tunnel using a basic ip link command:
->
-> ip link add name bond0-ip6tnl0 type ip6tnl local fd8f:6d53:b97a:1::a:4120=
- remote fd8f:6d53:b97a:1::b:0 mode any
->
->
-> Where fd8f:6d53:b97a:1::a:4120 is the address of a local bond device ensl=
-aving two tap devices each connected to one VPN server for high availabilit=
-y.
-> fd8f:6d53:b97a:1::b:0 is the address of the remote bond device on the oth=
-er end.
-> Both devices can ping each other just fine on IPv6, but when I try to sen=
-d IPv4 packets through the ip6tnl device, they get dropped on the round tri=
-p.
->
-> We patched out the above fix for testing and confirmed that it works agai=
-n.
->
-> I=E2=80=99ve attached a pcap file of a tcp SYN attempt  containing the ip=
-6ip4 headers as they arrive at the ip6tnl device. The SYN-ACK returned is n=
-ot showing and gets dropped, leading to SYN retransmission.
->
-> Can you give me some directions? I=E2=80=99m still trying to figure out i=
-f there is an error in our setup or the kernel.
-> This used to work for years so I=E2=80=99m a bit puzzled now.
->
->
->
-> Best regards,
-> Dominik Froehlich
-> SAP
->
+I'm leaning towards folding patch 3 into this patch 1, as suggested by Toke.
+
+--Jesper
 
