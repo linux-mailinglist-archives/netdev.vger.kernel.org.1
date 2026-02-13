@@ -1,82 +1,74 @@
-Return-Path: <netdev+bounces-258556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCK3OJOdjmkODQEAu9opvQ
-	(envelope-from <netdev+bounces-258556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:42:11 +0100
+	id WqblNiOejmk+DQEAu9opvQ
+	(envelope-from <netdev+bounces-258557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:44:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4914F132B48
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:42:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F629132B7E
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6357311FCB4
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:40:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 882F63038CE6
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8F423EA85;
-	Fri, 13 Feb 2026 03:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6FE2405EB;
+	Fri, 13 Feb 2026 03:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W9uGt6Pm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TgCZZzb9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8843C23AB9D
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 03:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE85623815D
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 03:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770954050; cv=none; b=hTIQj8rpLMIGvML1KHA9Rg9Z32HOU1H3tIY7y+Sif7doUx5D/5Hbr9IXsfvf2zW9Rwpg9QS+8kCJN73HJ94I47GZwf/T+Y2dB+JMnWeSYoFCz4N1PEMaksWpysPPYDAYGoUEzTXn/hogXBCRfR32T9w6ADJG7/Ks/2kJ+N+hsEI=
+	t=1770954274; cv=none; b=PJ5/ESepSWhHDScljm/C0mhCoANebQL9oV6xv/3bXZ0UPuVc+pkQv/IFZaza3iFqiNpkb0ynq/xJwXPCRdLupFTWCysjLDtHfYXWXUSu0/AtOo7yw0LDPwJYK9I8rU5ln2yf/FC4rGIYA9EgUZQsjltNPUPd1AvO9BqaPfyeFoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770954050; c=relaxed/simple;
-	bh=BLNu40kz4Uqp4vj+JT3+8GUPomqXmYGnaG4tEokqe1E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pP6cD/l4tZGZZXZ5K2VnQ0/wFsZ7P5LGa13XNh8Gf2pqwPuYPDPw6IRvZv1t/XR/fVcyCwvJ5d+CQtN1EAaMhgjTlff55iGjGf1lIKjaV05JsX8THTlU6rh6Ax2aTcf+2vpWRkDH2xvOUosc4NI0H6WxCt0K+mT9jQvgKx9ZBQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W9uGt6Pm; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770954046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YKVv5p2vMJc0Ryhiqg/jw184uo3Yf5fu6IfmcvOGrD8=;
-	b=W9uGt6PmnO/LdU6pn+1wRsRWE2SA+og4JJu/La7BhRepN3q15UwRSg/Xlk45YmSpToEqhj
-	0waomJi4Wt7WON8kTFmI2bXQijiooOdUgKJWubjgENeAYQrPoJZAY45gcCEHs5gCBG+H9S
-	nKM8c4FA638kp2lWShjXneU2yD9TLLc=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: xxx@vger.kernel.org
-Cc: jiayuan.chen@linux.dev,
-	jiayuan.chen@shopee.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: [PATCH bpf v3 2/2] bpf: devmap: fix race in bq_xmit_all on PREEMPT_RT
-Date: Fri, 13 Feb 2026 11:40:15 +0800
-Message-ID: <20260213034018.284146-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260213034018.284146-1-jiayuan.chen@linux.dev>
-References: <20260213034018.284146-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1770954274; c=relaxed/simple;
+	bh=03IQ3DPjdeaDc7XficCVAbrQedWt7kizzgFExuNLrPc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BirTTfIhD3wgSuNydZLuw4XCde3+TNf5yhxQ7US6I6Ys/oY3kRcCInb4Pgi+LheP8M69P63BsTO+4HJRWBt74gHg+KCj5xlQyD81zUMM7gcAI2oVEctwHw3I3adB05DYGmwkNpAAfYOUt7+VZ6iBgg4CRMqeEpo2YWmBkjKrxq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TgCZZzb9; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770954273; x=1802490273;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=03IQ3DPjdeaDc7XficCVAbrQedWt7kizzgFExuNLrPc=;
+  b=TgCZZzb9+Gn76U0bgMerY+B1S4Kxq761OBn4ZRmUG6LCSYADATvastsY
+   l33j49z+VrBqtyGWOnzGjJDtnk1Rh+i6nFn9TFp1tzrVVpDfDIZ7nkTNF
+   i5/ApCfVqHuTpyCx7PH1sN17xUKQ3eE1M117U/w/C9wCwLcF9mBWwDksc
+   9kRMlmyktwya9hbTVZqV0n747KnRPxsevlBOjSLefpYRkjDJBF3J/kWM7
+   YKWj98NYBdxgukAdKR+ti5z75qQhVfNVKIlALGOMfkafGmSwW+DQU3Ynn
+   FibkQX1lFpRFMlRhFM8EmWAJBPYRnSKgcNHb8rNInpZ09L3nFEdJlmBeb
+   Q==;
+X-CSE-ConnectionGUID: iA5FTxmxS6iq1O75OnCnSA==
+X-CSE-MsgGUID: SyFUloxnQgyJ2Rn7NOFdew==
+X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="83580932"
+X-IronPort-AV: E=Sophos;i="6.21,288,1763452800"; 
+   d="scan'208";a="83580932"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 19:44:32 -0800
+X-CSE-ConnectionGUID: AnU8FbMjTB2eu+HmqZzi0g==
+X-CSE-MsgGUID: FjTGvszCSJyYGhh/ce5O8w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,288,1763452800"; 
+   d="scan'208";a="211993807"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmviesa010.fm.intel.com with ESMTP; 12 Feb 2026 19:44:31 -0800
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-next v1] ice: implement symmetric RSS hash configuration
+Date: Fri, 13 Feb 2026 04:44:29 +0100
+Message-ID: <20260213034429.1830480-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,230 +76,163 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-258557-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258556-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux.dev,shopee.com,linutronix.de,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,google.com,goodmis.org,vger.kernel.org,lists.linux.dev];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,linux.dev:mid,linux.dev:dkim,linux.dev:email,linutronix.de:email]
-X-Rspamd-Queue-Id: 4914F132B48
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
+X-Rspamd-Queue-Id: 7F629132B7E
 X-Rspamd-Action: no action
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+The driver advertises symmetric RSS support via supported_input_xfrm
+but ice_set_rxfh() ignored the input_xfrm parameter, making it
+impossible to configure symmetric hashing.
 
-On PREEMPT_RT kernels, the per-CPU xdp_dev_bulk_queue (bq) can be
-accessed concurrently by multiple preemptible tasks on the same CPU.
+Fix ice_set_rxfh() to check rxfh->input_xfrm and call
+ice_set_rss_hfunc() with ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ when
+RXH_XFRM_SYM_XOR is requested.
 
-The original code assumes bq_enqueue() and __dev_flush() run atomically
-with respect to each other on the same CPU, relying on
-local_bh_disable() to prevent preemption. However, on PREEMPT_RT,
-local_bh_disable() only calls migrate_disable() (when
-PREEMPT_RT_NEEDS_BH_LOCK is not set) and does not disable
-preemption, which allows CFS scheduling to preempt a task during
-bq_xmit_all(), enabling another task on the same CPU to enter
-bq_enqueue() and operate on the same per-CPU bq concurrently.
+Modify ice_set_rss_vsi_ctx() to use vsi->rss_hfunc instead of
+hardcoding ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ, and export it for
+use by ice_set_rxfh().
 
-This leads to several races:
+The kernel requires get_rxfh_fields() to report symmetric hash
+configurations when symmetric transforms are supported. Update
+ice_get_rxfh_fields() to return symmetric field configuration
+(src+dst IP and ports) for all flow types.
 
-1. Double-free / use-after-free on bq->q[]: bq_xmit_all() snapshots
-   cnt = bq->count, then iterates bq->q[0..cnt-1] to transmit frames.
-   If preempted after the snapshot, a second task can call bq_enqueue()
-   -> bq_xmit_all() on the same bq, transmitting (and freeing) the
-   same frames. When the first task resumes, it operates on stale
-   pointers in bq->q[], causing use-after-free.
+Tested with tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
 
-2. bq->count and bq->q[] corruption: concurrent bq_enqueue() modifying
-   bq->count and bq->q[] while bq_xmit_all() is reading them.
-
-3. dev_rx/xdp_prog teardown race: __dev_flush() clears bq->dev_rx and
-   bq->xdp_prog after bq_xmit_all(). If preempted between
-   bq_xmit_all() return and bq->dev_rx = NULL, a preempting
-   bq_enqueue() sees dev_rx still set (non-NULL), skips adding bq to
-   the flush_list, and enqueues a frame. When __dev_flush() resumes,
-   it clears dev_rx and removes bq from the flush_list, orphaning the
-   newly enqueued frame.
-
-4. __list_del_clearprev() on flush_node: similar to the cpumap race,
-   both tasks can call __list_del_clearprev() on the same flush_node,
-   the second dereferences the prev pointer already set to NULL.
-
-The race between task A (__dev_flush -> bq_xmit_all) and task B
-(bq_enqueue -> bq_xmit_all) on the same CPU:
-
-  Task A (xdp_do_flush)          Task B (ndo_xdp_xmit redirect)
-  ----------------------         --------------------------------
-  __dev_flush(flush_list)
-    bq_xmit_all(bq)
-      cnt = bq->count  /* e.g. 16 */
-      /* start iterating bq->q[] */
-    <-- CFS preempts Task A -->
-                                   bq_enqueue(dev, xdpf)
-                                     bq->count == DEV_MAP_BULK_SIZE
-                                     bq_xmit_all(bq, 0)
-                                       cnt = bq->count  /* same 16! */
-                                       ndo_xdp_xmit(bq->q[])
-                                       /* frames freed by driver */
-                                       bq->count = 0
-    <-- Task A resumes -->
-      ndo_xdp_xmit(bq->q[])
-      /* use-after-free: frames already freed! */
-
-To reproduce, insert an mdelay(100) in bq_xmit_all() after
-"cnt = bq->count" and before the actual transmit loop. Then pin two
-threads to the same CPU, each running BPF_PROG_TEST_RUN with an XDP
-program that redirects to a DEVMAP entry (e.g. a veth pair). CFS
-timeslicing during the mdelay window causes interleaving. Without the
-fix, KASAN reports null-ptr-deref due to operating on freed frames:
-
-  BUG: KASAN: null-ptr-deref in __build_skb_around+0x22d/0x340
-  Write of size 32 at addr 0000000000000d50 by task devmap_race_rep/449
-
-  CPU: 0 UID: 0 PID: 449 Comm: devmap_race_rep Not tainted 6.19.0+ #31 PREEMPT_RT
-  Call Trace:
-   <TASK>
-   __build_skb_around+0x22d/0x340
-   build_skb_around+0x25/0x260
-   __xdp_build_skb_from_frame+0x103/0x860
-   veth_xdp_rcv_bulk_skb.isra.0+0x162/0x320
-   veth_xdp_rcv.constprop.0+0x61e/0xbb0
-   veth_poll+0x280/0xb50
-   __napi_poll.constprop.0+0xa5/0x590
-   net_rx_action+0x4b0/0xea0
-   handle_softirqs.isra.0+0x1b3/0x780
-   __local_bh_enable_ip+0x12a/0x240
-   xdp_test_run_batch.constprop.0+0xedd/0x1f60
-   bpf_test_run_xdp_live+0x304/0x640
-   bpf_prog_test_run_xdp+0xd24/0x1b70
-   __sys_bpf+0x61c/0x3e00
-   </TASK>
-
-  Kernel panic - not syncing: Fatal exception in interrupt
-
-Fix this by adding a local_lock_t to xdp_dev_bulk_queue and acquiring
-it in bq_enqueue() and __dev_flush(). These paths already run under
-local_bh_disable(), so use local_lock_nested_bh() which on non-RT is
-a pure annotation with no overhead, and on PREEMPT_RT provides a
-per-CPU sleeping lock that serializes access to the bq.
-
-Fixes: 3253cb49cbad ("softirq: Allow to drop the softirq-BKL lock on PREEMPT_RT")
-Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- kernel/bpf/devmap.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 31 +++++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_lib.c     |  6 ++--
+ drivers/net/ethernet/intel/ice/ice_lib.h     |  1 +
+ 3 files changed, 28 insertions(+), 10 deletions(-)
 
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index 2625601de76e..10cf0731f91d 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -45,6 +45,7 @@
-  * types of devmap; only the lookup and insertion is different.
-  */
- #include <linux/bpf.h>
-+#include <linux/local_lock.h>
- #include <net/xdp.h>
- #include <linux/filter.h>
- #include <trace/events/xdp.h>
-@@ -60,6 +61,7 @@ struct xdp_dev_bulk_queue {
- 	struct net_device *dev_rx;
- 	struct bpf_prog *xdp_prog;
- 	unsigned int count;
-+	local_lock_t bq_lock;
- };
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index c6bc29c..6dc37f9 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -3037,8 +3037,10 @@ ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
  
- struct bpf_dtab_netdev {
-@@ -381,6 +383,8 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
- 	int to_send = cnt;
- 	int i;
- 
-+	lockdep_assert_held(&bq->bq_lock);
-+
- 	if (unlikely(!cnt))
- 		return;
- 
-@@ -425,10 +429,12 @@ void __dev_flush(struct list_head *flush_list)
- 	struct xdp_dev_bulk_queue *bq, *tmp;
- 
- 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
-+		local_lock_nested_bh(&bq->dev->xdp_bulkq->bq_lock);
- 		bq_xmit_all(bq, XDP_XMIT_FLUSH);
- 		bq->dev_rx = NULL;
- 		bq->xdp_prog = NULL;
- 		__list_del_clearprev(&bq->flush_node);
-+		local_unlock_nested_bh(&bq->dev->xdp_bulkq->bq_lock);
+ 	hash_flds = ice_get_rss_cfg(&pf->hw, vsi->idx, hdrs, &symm);
+ 	if (hash_flds == ICE_HASH_INVALID) {
+-		dev_dbg(dev, "No hash fields found for the given header type, vsi num = %d\n",
++		/* Provide default symmetric hash fields when no config exists */
++		dev_dbg(dev, "No RSS config for this flow, using symmetric defaults, vsi num = %d\n",
+ 			vsi->vsi_num);
++		nfc->data = RXH_IP_SRC | RXH_IP_DST | RXH_L4_B_0_1 | RXH_L4_B_2_3;
+ 		return 0;
  	}
+ 
+@@ -3067,6 +3069,7 @@ ice_get_rxfh_fields(struct net_device *netdev, struct ethtool_rxfh_fields *nfc)
+ 	    hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
+ 		nfc->data |= (u64)RXH_GTP_TEID;
+ 
++	nfc->data = RXH_IP_SRC | RXH_IP_DST | RXH_L4_B_0_1 | RXH_L4_B_2_3;
+ 	return 0;
  }
  
-@@ -451,12 +457,16 @@ static void *__dev_map_lookup_elem(struct bpf_map *map, u32 key)
- 
- /* Runs in NAPI, i.e., softirq under local_bh_disable(). Thus, safe percpu
-  * variable access, and map elements stick around. See comment above
-- * xdp_do_flush() in filter.c.
-+ * xdp_do_flush() in filter.c. PREEMPT_RT relies on local_lock_nested_bh()
-+ * to serialise access to the per-CPU bq.
-  */
- static void bq_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
- 		       struct net_device *dev_rx, struct bpf_prog *xdp_prog)
+@@ -3667,7 +3670,6 @@ ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
+ 	     struct netlink_ext_ack *extack)
  {
--	struct xdp_dev_bulk_queue *bq = this_cpu_ptr(dev->xdp_bulkq);
-+	struct xdp_dev_bulk_queue *bq;
-+
-+	local_lock_nested_bh(&dev->xdp_bulkq->bq_lock);
-+	bq = this_cpu_ptr(dev->xdp_bulkq);
- 
- 	if (unlikely(bq->count == DEV_MAP_BULK_SIZE))
- 		bq_xmit_all(bq, 0);
-@@ -477,6 +487,8 @@ static void bq_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+-	u8 hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
+ 	struct ice_vsi *vsi = np->vsi;
+ 	struct ice_pf *pf = vsi->back;
+ 	struct device *dev;
+@@ -3689,13 +3691,26 @@ ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
+ 		return -EOPNOTSUPP;
  	}
  
- 	bq->q[bq->count++] = xdpf;
-+
-+	local_unlock_nested_bh(&dev->xdp_bulkq->bq_lock);
- }
+-	/* Update the VSI's hash function */
+-	if (rxfh->input_xfrm & RXH_XFRM_SYM_XOR)
+-		hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ;
++	/* Handle RSS symmetric hash transformation */
++	if (rxfh->input_xfrm != RXH_XFRM_NO_CHANGE) {
++		u8 new_hfunc;
  
- static inline int __xdp_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
-@@ -1115,8 +1127,13 @@ static int dev_map_notification(struct notifier_block *notifier,
- 		if (!netdev->xdp_bulkq)
- 			return NOTIFY_BAD;
- 
--		for_each_possible_cpu(cpu)
--			per_cpu_ptr(netdev->xdp_bulkq, cpu)->dev = netdev;
-+		for_each_possible_cpu(cpu) {
-+			struct xdp_dev_bulk_queue *bq;
+-	err = ice_set_rss_hfunc(vsi, hfunc);
+-	if (err)
+-		return err;
++		if (rxfh->input_xfrm & RXH_XFRM_SYM_XOR)
++			new_hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ;
++		else
++			new_hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
 +
-+			bq = per_cpu_ptr(netdev->xdp_bulkq, cpu);
-+			bq->dev = netdev;
-+			local_lock_init(&bq->bq_lock);
++		if (new_hfunc != vsi->rss_hfunc) {
++			err = ice_set_rss_hfunc(vsi, new_hfunc);
++			if (err) {
++				netdev_err(netdev, "Failed to set RSS hash function\n");
++				return err;
++			}
++			netdev_info(netdev, "RSS hash function: %sToeplitz\n",
++				    new_hfunc == ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ ?
++				    "Symmetric " : "");
 +		}
- 		break;
- 	case NETDEV_UNREGISTER:
- 		/* This rcu_read_lock/unlock pair is needed because
++	}
+ 
+ 	if (rxfh->key) {
+ 		if (!vsi->rss_hkey_user) {
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index d921269..31f2757 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1155,7 +1155,7 @@ static void ice_set_fd_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
+  * @ctxt: the VSI context being set
+  * @vsi: the VSI being configured
+  */
+-static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
++void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
+ {
+ 	u8 lut_type, hash_type;
+ 	struct device *dev;
+@@ -1181,7 +1181,9 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
+ 		return;
+ 	}
+ 
+-	hash_type = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
++        if (!vsi->rss_hfunc)
++		vsi->rss_hfunc = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
++	hash_type = vsi->rss_hfunc;
+ 	vsi->rss_hfunc = hash_type;
+ 
+ 	ctxt->info.q_opt_rss =
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index 49454d98..29ba335 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -46,6 +46,7 @@ void ice_vsi_delete(struct ice_vsi *vsi);
+ int ice_vsi_cfg_tc(struct ice_vsi *vsi, u8 ena_tc);
+ 
+ int ice_vsi_cfg_rss_lut_key(struct ice_vsi *vsi);
++void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi);
+ 
+ void ice_vsi_cfg_netdev_tc(struct ice_vsi *vsi, u8 ena_tc);
+ 
 -- 
-2.43.0
+2.52.0
 
 
