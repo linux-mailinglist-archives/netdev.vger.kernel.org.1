@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-258669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPI+KImEj2mRRQEAu9opvQ
-	(envelope-from <netdev+bounces-258669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 21:07:37 +0100
+	id 6M5KMMyEj2mRRQEAu9opvQ
+	(envelope-from <netdev+bounces-258670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 21:08:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD0E1394FC
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 21:07:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC1A13950B
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 21:08:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9CB83021D09
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 20:07:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 936613021D3A
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 20:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691C11F9ECB;
-	Fri, 13 Feb 2026 20:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8DF250BEC;
+	Fri, 13 Feb 2026 20:08:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF3B339A8
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 20:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0CE22B8B6
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 20:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771013253; cv=none; b=AewU97jjey5M+KMbB6fFRbugO/jeD+42mplgd9ha/61CDZmkRrI4VKQtXyBaZrNc4TyOJ8ycfKNPSct8/XhWyMpd9vEbviMFdXfxe0eLaits4FYir/z0i1pV/yx+mphdMv9/oHGTDp2H4jQLbEL/H612jsIlSKIf5l2EsmBq9TA=
+	t=1771013320; cv=none; b=cuA9Yh75xYwR/4d6nO7I7HONuDPpjVF7NeRY5brI+5/xX1bBi2OEdVvTG0ZH8UDZsy416G2AGF75nrxSdwB/L5Q4q5qvuifBo7xzr7AsEXl4CpDKZl+1KRQockwwl3Nj/xG8QYMG97fdUSGrNhy9CLKlv8BZhlHmLj1VdJK/adA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771013253; c=relaxed/simple;
-	bh=iPbUyrZ/cHAbPklt30x6GWKULBcZbziWIRRQ/1zzWOI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Fqnn8uXgDSrp+fhe29pAG1+UKFgKE2vjfnOcjSE4fgr0eDa3iQ2u4MXCJIWqRLsCnuB7tfgru1gKHjfm/b+cObR0I6c4IgSkYX/01UIGvffjy6fSps2WsdTqhXXVTUIwLcXhFaLXa51V1A5f6n8cEN1EmW9d4tBj4fFfq65x2i4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
+	s=arc-20240116; t=1771013320; c=relaxed/simple;
+	bh=xTB7sH0UgoI0oig2MnPZOdk4Bj/196XD3K+gIDrZcic=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Tave9ExMbV26jIhwjckrqNby++BHaQbuox+Ed04iEKBE8sjYrEY8PnbhWRiGBxpOVxDTWkTYnpl276//vL32V6XGWFuydqnBt+GvRsvxu/VJ/j02OX4MGr8itugeGhs3mJP7D9JruvnffHvpYGWt21qOehLYFK+SD2SREIABRvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7d4cb985fa3so2680833a34.2
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 12:07:31 -0800 (PST)
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7d4c2b7f4caso6440164a34.2
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 12:08:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771013251; x=1771618051;
+        d=1e100.net; s=20230601; t=1771013318; x=1771618118;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pz6Gedea6EkVqgMD44XOwHif99Mq0fIjgcN34vbFrM0=;
-        b=I8pOebIAT3+I047qnixg/pbqMgEjQ46MKio7fPLdqPYTtEHTK1Vrsu1NvJxik2+7qr
-         lCnd2K+NCfFUwoZoXOY5tMvX/gs7tXDaaSv7iyjm46CpnLvIG/t99cwIWON/MaYz0adh
-         5nazlHjxR1j1nh/cmrEECvwg1I+dOMHl5IWfx1Vl93ZkON02F2Z6p+M/emmZyDpkIRnK
-         niOJztj5G12bEP6QW1OUi8VRCe6BKZ8LiihJRes7yWHxd9gk/mFgcxm5wFgSe34I04h1
-         +j0I5GZqJXlgzqF7mhRyPieTiGJyRGQ46GFGAJ2Vun4nQmQvh+7+Yd+QUCPyfyEKVehU
-         snuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFMACCndsi7tLYImgmD79IkcvVzuk5qp9WKLyPs1mwstRaUGGtkly6ia/BE9o5xaRsbu2PmNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBPLlfKvo5L/jxbgU7dk8caBH596ofGOPqv9zVRZiAsnsAF8Lq
-	0nZZ/EMUmJ3DSkq2raLxePidrSqlOpLuYsaW+8e62IdkvcczfYmrXMeTy1vVM81mAwjf3CACkHU
-	004HQQhuQHchXeKxWwCq6Psm3Ka1RYRzW3Q/yvludes49eUZsc+b2N7S9aeU=
+        bh=yhuQe4f7M6VD4cjyPrpcBfIfQ3nvgLjNmNSh/F4yxXI=;
+        b=AnDf+t7OgwYV1Ks6VA8KdbxhvFghF/4Qa+J3heO+nFjyD/V5QxBJ5Yn2dxWgafY1x6
+         byD+5ptwNOW+D3SGQ6FiYFLS1bfO1uJclxOxkvjNLUYoO0Jh9diMP4fckFNy6+s1B2ba
+         A7qMHLRO1Qldc9CgocI3llnoPgQVNiYMS1K8NuJyDNF9B1Tb37WL3RYtkJZ5QkvG9zrN
+         wo/7rcre+J26stfuXvI7aGXed3snALKzIVjwLgAcOyAUeXQn+ypdzkGw60dPORcL8ANZ
+         pvP36F2EBQdEKMZdsMGtJbv8Sg6yDP30w4c3LY9HYwy/Ihhikb6a0s7rrW27TB5Sj7PS
+         aUHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSOPVVnn7DEWHBQ6FjMd/a/ReX6WrCnITg6uo7xvdkK4RSbRCIT6phLXp6NJlyJHpA9v9tv3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK1VggIIY6we90Q2NwC79vndCf+Z3W4KgcgT33XxU070DtY3r3
+	f3Pl5ADgOhVxU2QEh8pzq8uXlqUpxJXu0rGOltGDbmUTlw3/doSvJwEyC1Fuf6E3tfH10fucThf
+	wo3e7rqC4N8paZpn6U9vuoKTUSB9SDIj8WwhE3KquQmNDC/PkA4FPIkwQjm8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2912:b0:675:a8c0:93e9 with SMTP id
- 006d021491bc7-67769f6da68mr1244026eaf.79.1771013250821; Fri, 13 Feb 2026
- 12:07:30 -0800 (PST)
-Date: Fri, 13 Feb 2026 12:07:30 -0800
+X-Received: by 2002:a05:6820:228a:b0:663:d58:63f9 with SMTP id
+ 006d021491bc7-6785b1c2238mr329362eaf.42.1771013318207; Fri, 13 Feb 2026
+ 12:08:38 -0800 (PST)
+Date: Fri, 13 Feb 2026 12:08:38 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <698f8482.a70a0220.2c38d7.00ca.GAE@google.com>
-Subject: [syzbot] [net?] BUG: unable to handle kernel paging request in ip_route_output_key_hash_rcu
-From: syzbot <syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com>
+Message-ID: <698f84c6.a70a0220.2c38d7.00cb.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in inet_sock_destruct (6)
+From: syzbot <syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com>
 To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
 	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
 	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
@@ -70,8 +70,8 @@ Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=a1db0fea040c2a9f];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=22c34f040954bbd1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
@@ -79,10 +79,10 @@ X-Spamd-Result: default: False [-0.36 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258669-lists,netdev=lfdr.de,334190e097a98a1b81bb];
+	TAGGED_FROM(0.00)[bounces-258670-lists,netdev=lfdr.de,5b3b7e51dda1be027b7a];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
 	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
@@ -93,124 +93,60 @@ X-Spamd-Result: default: False [-0.36 / 15.00];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: DFD0E1394FC
+X-Rspamd-Queue-Id: 3AC1A13950B
 X-Rspamd-Action: no action
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    2eba5e05d9bc Merge tag 'loongarch-fixes-6.18-2' of git://g..
+HEAD commit:    192c0159402e Merge tag 'powerpc-7.0-1' of git://git.kernel..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=125498b4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a1db0fea040c2a9f
-dashboard link: https://syzkaller.appspot.com/bug?extid=334190e097a98a1b81bb
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16ebaa12580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15848e92580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17b8cc02580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=22c34f040954bbd1
+dashboard link: https://syzkaller.appspot.com/bug?extid=5b3b7e51dda1be027b7a
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1316a15a580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14140ffa580000
 
 Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-2eba5e05.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ea041b2f66b0/vmlinux-2eba5e05.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a9a26c9a2a1c/bzImage-2eba5e05.xz
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-192c0159.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d1c911c7a5b8/vmlinux-192c0159.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f9d4cfbb614a/bzImage-192c0159.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+334190e097a98a1b81bb@syzkaller.appspotmail.com
+Reported-by: syzbot+5b3b7e51dda1be027b7a@syzkaller.appspotmail.com
 
-BUG: unable to handle page fault for address: ffffed1011ae5e00
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 5ffcd067 P4D 5ffcd067 PUD 2fff7067 PMD 0 
-Oops: Oops: 0000 [#1] SMP KASAN NOPTI
-CPU: 0 UID: 0 PID: 5500 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:__mkroute_output net/ipv4/route.c:2649 [inline]
-RIP: 0010:ip_route_output_key_hash_rcu+0x12fc/0x23e0 net/ipv4/route.c:2875
-Code: 4c 8b 35 2f ea bc 08 49 83 c7 38 4c 89 f8 48 c1 e8 03 80 3c 28 00 74 08 4c 89 ff e8 ce 38 75 f8 4d 03 37 4c 89 f0 48 c1 e8 03 <80> 3c 28 00 74 08 4c 89 f7 e8 b6 38 75 f8 4d 8b 36 e8 9e 72 96 01
-RSP: 0018:ffffc9000298e948 EFLAGS: 00010a06
-RAX: 1ffff11011ae5e00 RBX: 0000000080000000 RCX: ffff888000bdc900
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: dffffc0000000000 R08: ffff888000bdc900 R09: 0000000000000003
-R10: 0000000000000005 R11: 0000000000000000 R12: ffffc9000298ebd3
-R13: 0000000000000000 R14: ffff88808d72f000 R15: ffff888036590158
-FS:  000055556855e500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
+------------[ cut here ]------------
+sk->sk_forward_alloc
+WARNING: net/ipv4/af_inet.c:157 at inet_sock_destruct+0x653/0x800 net/ipv4/af_inet.c:157, CPU#0: ksoftirqd/0/15
+Modules linked in:
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+RIP: 0010:inet_sock_destruct+0x653/0x800 net/ipv4/af_inet.c:157
+Code: b4 4f ff e9 06 fd ff ff e8 aa 25 10 f8 90 0f 0b 90 e9 35 fe ff ff e8 9c 25 10 f8 90 0f 0b 90 e9 c5 fe ff ff e8 8e 25 10 f8 90 <0f> 0b 90 e9 04 ff ff ff e8 80 25 10 f8 90 0f 0b 90 e9 65 fe ff ff
+RSP: 0018:ffffc90000127bb0 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff888100796300 RCX: ffffffff89f71e97
+RDX: ffff88801dec4900 RSI: ffffffff89f71f92 RDI: ffff88801dec4900
+RBP: 0000000000000090 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000090 R11: 00000000000075f9 R12: ffff888100796300
+R13: ffff888100796390 R14: ffffffff81ed1d7d R15: 0000000000000004
+FS:  0000000000000000(0000) GS:ffff8880d65b3000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffed1011ae5e00 CR3: 0000000042bac000 CR4: 0000000000352ef0
+CR2: 00007ffe39b75ff4 CR3: 000000000e396000 CR4: 0000000000352ef0
 Call Trace:
  <TASK>
- ip_route_output_key_hash+0x174/0x280 net/ipv4/route.c:2705
- __ip_route_output_key include/net/route.h:169 [inline]
- ip_route_output_flow+0x2a/0x150 net/ipv4/route.c:2932
- ip_route_output_key include/net/route.h:179 [inline]
- sctp_v4_get_dst+0x3c7/0x1200 net/sctp/protocol.c:455
- sctp_transport_route+0x118/0x2f0 net/sctp/transport.c:448
- sctp_ootb_pkt_new+0x28b/0x3c0 net/sctp/sm_statefuns.c:6437
- sctp_sf_abort_violation+0x14b/0xc60 net/sctp/sm_statefuns.c:4771
- sctp_sf_violation_chunklen net/sctp/sm_statefuns.c:4830 [inline]
- sctp_sf_ootb+0x4df/0x7c0 net/sctp/sm_statefuns.c:-1
- sctp_do_sm+0x1e7/0x5a20 net/sctp/sm_sideeffect.c:1172
- sctp_endpoint_bh_rcv+0x591/0x7e0 net/sctp/endpointola.c:408
- sctp_rcv+0x11dc/0x1870 net/sctp/input.c:243
- ip_protocol_deliver_rcu+0x2e0/0x440 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:239
- NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
- NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
- __netif_receive_skb_one_core net/core/dev.c:6079 [inline]
- __netif_receive_skb+0x143/0x380 net/core/dev.c:6192
- netif_receive_skb_internal net/core/dev.c:6278 [inline]
- netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
- tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
- tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
- tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x5c9/0xb30 fs/read_write.c:686
- ksys_write+0x145/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fbd9ab8e1ff
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
-RSP: 002b:00007ffca504fd10 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007fbd9ade5fa0 RCX: 00007fbd9ab8e1ff
-RDX: 0000000000000032 RSI: 00002000000000c0 RDI: 00000000000000c8
-RBP: 00007fbd9ac13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000032 R11: 0000000000000293 R12: 0000000000000000
-R13: 00007fbd9ade5fa0 R14: 00007fbd9ade5fa0 R15: 0000000000000003
+ __sk_destruct+0x85/0xbb0 net/core/sock.c:2350
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x5a2/0x10d0 kernel/rcu/tree.c:2869
+ handle_softirqs+0x1ea/0x910 kernel/softirq.c:622
+ run_ksoftirqd kernel/softirq.c:1063 [inline]
+ run_ksoftirqd+0x38/0x60 kernel/softirq.c:1055
+ smpboot_thread_fn+0x3d3/0xaa0 kernel/smpboot.c:160
+ kthread+0x370/0x450 kernel/kthread.c:467
+ ret_from_fork+0x754/0xd80 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
  </TASK>
-Modules linked in:
-CR2: ffffed1011ae5e00
----[ end trace 0000000000000000 ]---
-RIP: 0010:__mkroute_output net/ipv4/route.c:2649 [inline]
-RIP: 0010:ip_route_output_key_hash_rcu+0x12fc/0x23e0 net/ipv4/route.c:2875
-Code: 4c 8b 35 2f ea bc 08 49 83 c7 38 4c 89 f8 48 c1 e8 03 80 3c 28 00 74 08 4c 89 ff e8 ce 38 75 f8 4d 03 37 4c 89 f0 48 c1 e8 03 <80> 3c 28 00 74 08 4c 89 f7 e8 b6 38 75 f8 4d 8b 36 e8 9e 72 96 01
-RSP: 0018:ffffc9000298e948 EFLAGS: 00010a06
-RAX: 1ffff11011ae5e00 RBX: 0000000080000000 RCX: ffff888000bdc900
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: dffffc0000000000 R08: ffff888000bdc900 R09: 0000000000000003
-R10: 0000000000000005 R11: 0000000000000000 R12: ffffc9000298ebd3
-R13: 0000000000000000 R14: ffff88808d72f000 R15: ffff888036590158
-FS:  000055556855e500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffed1011ae5e00 CR3: 0000000042bac000 CR4: 0000000000352ef0
-----------------
-Code disassembly (best guess):
-   0:	4c 8b 35 2f ea bc 08 	mov    0x8bcea2f(%rip),%r14        # 0x8bcea36
-   7:	49 83 c7 38          	add    $0x38,%r15
-   b:	4c 89 f8             	mov    %r15,%rax
-   e:	48 c1 e8 03          	shr    $0x3,%rax
-  12:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1)
-  16:	74 08                	je     0x20
-  18:	4c 89 ff             	mov    %r15,%rdi
-  1b:	e8 ce 38 75 f8       	call   0xf87538ee
-  20:	4d 03 37             	add    (%r15),%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1) <-- trapping instruction
-  2e:	74 08                	je     0x38
-  30:	4c 89 f7             	mov    %r14,%rdi
-  33:	e8 b6 38 75 f8       	call   0xf87538ee
-  38:	4d 8b 36             	mov    (%r14),%r14
-  3b:	e8 9e 72 96 01       	call   0x19672de
 
 
 ---
