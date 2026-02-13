@@ -1,125 +1,162 @@
-Return-Path: <netdev+bounces-258644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258645-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iD/OFIRRj2kNQQEAu9opvQ
-	(envelope-from <netdev+bounces-258644-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:29:56 +0100
+	id 6MdQCaVXj2lqQQEAu9opvQ
+	(envelope-from <netdev+bounces-258645-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:56:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5378138090
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:29:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D681386B9
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 17:56:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2142130D8782
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:28:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 392BA300C01C
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 16:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D7134B693;
-	Fri, 13 Feb 2026 16:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AF132D0DC;
+	Fri, 13 Feb 2026 16:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z8x6ZbCm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCdtsMkt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B451B2F532F;
-	Fri, 13 Feb 2026 16:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A8E32939F
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 16:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771000126; cv=none; b=nYxgIgiMybwmRrjbxFF+Voui0yQTvANjsol1x+pEq8zDBgL11Rgw9aQiZDI4RBxT7V/Tt0i59kWQKKRdNgFasKXKI92iq2KfIVCPwuIG8fltkV5hws1cycIg47v7JZDIKurReBJl3+FD+9B7O690uWDpCq1Ati+qN2rjCtk7q+A=
+	t=1771001724; cv=none; b=my/jU3KYZUE2hJOwe3qOGPc2840buk5LPkQHBgpz/+WsR/2PF8ruBn6eP28gYVbZzGYCLlgnhT9dhX38bpFV88bp7BdC8aEepVviHqhNXVTw+udhgoI8ARuR6KBtXqFfVaPF4Zra9jkZBqvhsHK9RARjpK8jcuE3ycrBqfKIWx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771000126; c=relaxed/simple;
-	bh=G/i9Z6NbJaws71HOluxVcnFjlNq9qHDbpPTSEx+Ppk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V5Iz/0FQLoLL/VfX3Y2Uhe9P/oBFEnWE7tO4k7f64imz1YHk1JlvNd6j8kuZqt5cJyi6N8zPyoC6cZ0XzHy51NNxDh4rNTOViOvDlz++4eXDxTK/4uKpX80pFcQtGVUkwr+kDzpx5VR5SVBN/S0Lu2Z1PS9IZ60hRp3hwodSxXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z8x6ZbCm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFAE2C19424;
-	Fri, 13 Feb 2026 16:28:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771000126;
-	bh=G/i9Z6NbJaws71HOluxVcnFjlNq9qHDbpPTSEx+Ppk0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z8x6ZbCmyV5rIQkQdRdcmWFujqV86ZZpj69DAVkjb6aEM2P7RU1JjiQwx3fjl9Yrx
-	 hztHlaA+my6EpQ+bGKhZ87wkYB3e6lsC9rZtMQ6BbV9Ed1U2ioyH0cvZEtEhH7pzcV
-	 ck93NGXnNjHvFu9LHNOEW7xfCqJmyy+F0oUikLEQdtlMViU0KvqYNdMQIsTK2bVrho
-	 GkXj+yj0MQgYeHmUAX97kUuZL4gGKfCWSzq8f6DhM/RyroG7QBP8rf6pzXCdiGBkDm
-	 6jo3x4VBOJIfObi/4dFznxK0X/BwZGKuiJAxvR7J2sssvxpSPK9dP9qiT6afK3jyce
-	 JNM3BrN9AFfWg==
-Date: Fri, 13 Feb 2026 08:28:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cedric Jehasse via B4 Relay
- <devnull+cedric.jehasse.luminex.be@kernel.org>
-Cc: cedric.jehasse@luminex.be, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: Add partial support for
- TCAM entries
-Message-ID: <20260213082845.65635296@kernel.org>
-In-Reply-To: <20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be>
-References: <20260213-net-next-mv88e6xxx-tcam-v1-1-051e552e2afc@luminex.be>
+	s=arc-20240116; t=1771001724; c=relaxed/simple;
+	bh=RD0u0t5zLEK6pLa3+Sqhn6/3CXcPdDtMjzVXUFAB/+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lwBEM/70LQr4xFI1tA+vSy1oDKTS3YrUTrT3t/HEfnLUYs4OKagB2kZlYuWV57JG6gfv8RIv04dHM5CMN9/0GX6E2RGr6C1XzTlNJnDptSYYIwUE5Jiy5fhqu0E8Ub6axwjC3JHro0li9C+DPyK0JfBN0Onm5wxoREJjq86XBek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCdtsMkt; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43768aa6ab2so94542f8f.1
+        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 08:55:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771001722; x=1771606522; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ptauGZZMWrMiDu6t9/L2OG0QlvSuTICYS6yevNbRDk=;
+        b=aCdtsMktH4bwzf5FmL9w24nAGB2+Wwf3iPBV7MgFUWcf7Qv7CvwpEArVLGCHYVYpi4
+         TpQJrINBlfgAlIgzY/jJM/mnCxpFdKJUJKPeOdXZUCNRaim7n6UcOkOhzicTYrstyBAp
+         ZBe4vfCk5GzaE64bnLuJk6z2dBTMUH2IaRN0j8r9gT6e7qC4EdWjdh+rlttSqjMhsXSX
+         OEF/bAnFDdPC3xyaK6REnQj4QEBsXE9hIi0H25urPUw7KnVLgsld6r/e1lofi5Ztsauz
+         xWkHuBbwc4LZLr1+YUpx8KXFdMtI7HCTdLyJcxEd3ili6hzMdBCPRY0TeW7T+XMl7dbv
+         JKHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771001722; x=1771606522;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ptauGZZMWrMiDu6t9/L2OG0QlvSuTICYS6yevNbRDk=;
+        b=hlfEeXwkYtpkIsYGbk7Mtx/G+y3JiUlxD1g85lrl53TZcQxxJ1faQysqMXMB0mRuMf
+         uZ+v3wLuRy545CYrVOcK5Dd5gdzqTVvfVPt+nNBC6oBb9x1tH2tauoB0hdtW3b4xSWQe
+         q6FiIufJpRhx37o54QU9S4GZz814aiRwMOnf9RVIZPiig43IHFWWrO6LdXxESNC4SHJD
+         e+iN5ccp0FUpIielLbyc8VsBvGZBHvnPKfLgB79l7vAi54KTBt/czfJZhZGFObkX07Cv
+         evzbRvPWlMuJgcDxk6A/EzD2E91r/WMaqKwjg2P5DL5Q6yu7b6zkDhyDLl61cXEnw5Pv
+         o7jg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFAwOPso7cli46VRfm+GDsLPRRcVRrTCESzeMJxMPzPAstBMO4evAtX+QYvxq/idkV70NhXbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzx2i7UO/8esOzFjhHPSHDo2chHS7MvbKD54ZjIxmjidRUUZR41
+	XmgZ3asbo6EocfNguIDi3EtQqvhpvuhyFZY4BJXYjy87lLQydA3FIxMo
+X-Gm-Gg: AZuq6aKYNdGLVyVxelIf/WPSTzNh4DfHNV6OgbE4wDCERFlFRaxLbhsn+Rk0ZpWTRHP
+	vzNQ/Y7metcR4LIO3WL3sy0E7eG2apw+27UtNxWVmqQc8vPf9Zg388n6yJ6uOYTLu0/np+K3AaP
+	WWUYOKii8pV6rWR23HN7ZIUeqCL+1wGil+WqSy8HXrGfQAFJOardC52JGwpJWmAntR1hf3Bfe88
+	bH7LZLOMyD/Hhac18DheIgtRLRmL+wNH5hCtcVyzezPfmG+Gpv8kxMhU/i+mp8IIceHbuKZicqr
+	aWx6wBUUYhe9CRhga76L60mrsMN8Og183rJvOXo2cHAKlC6MijaG6Sr2TKk8WrS5pBkP0OVAAnE
+	DM1Gs5xvwjvGdl9HT+wC+AOl5S/R5+x4O3IUTkFwJsxOSDPLaW9R54g0iNFlVlbWfCcpTiljDrA
+	7YNNnr8eaxCcCdXnPNKpWXsnjrTanzfx+a9T05895UHHqtxf+2JbYBK7+NBaEndRwsNIbsAF2y8
+	fpTkRK2ty9rWvNwM0XY
+X-Received: by 2002:a05:600c:8b2e:b0:477:a478:3f94 with SMTP id 5b1f17b1804b1-4837105119cmr29305325e9.5.1771001721721;
+        Fri, 13 Feb 2026 08:55:21 -0800 (PST)
+Received: from thomas-precision3591.paris.inria.fr (wifi-pro-82-204.paris.inria.fr. [128.93.82.204])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-48371a298ebsm24537975e9.13.2026.02.13.08.55.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Feb 2026 08:55:21 -0800 (PST)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	stable@vger.kernel.org,
+	Dariusz Marcinkiewicz <reksio@newterm.pl>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: ethernet: ec_bhf: Fix dma_free_coherent() dma handle
+Date: Fri, 13 Feb 2026 17:43:39 +0100
+Message-ID: <20260213164340.77272-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258644-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[luminex.be,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258645-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,newterm.pl,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fourierthomas@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,cedric.jehasse.luminex.be];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B5378138090
+X-Rspamd-Queue-Id: 96D681386B9
 X-Rspamd-Action: no action
 
-On Fri, 13 Feb 2026 13:48:00 +0100 Cedric Jehasse via B4 Relay wrote:
-> This patch adds partial Ternary Content Addressable Memory (TCAM) for
-> the mv88e6390 and mv88e6393 family of switches. TCAM entries allow the
-> switch to match the first 48 or 96 bytes of a frame and take actions on
-> matched frames.
-> 
-> This patch introduces a subset of the available TCAM functionality.
-> Matching on ip addresses/protocol and trapping to the cpu.
+dma_free_coherent() in error path takes priv->rx_buf.alloc_len as
+the dma handle. This would lead to improper unmapping of the buffer.
 
-## Form letter - net-next-closed
+Change the dma handle to priv->rx_buf.alloc_phys.
 
-We have already submitted our pull request with net-next material for v7.0,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
+Fixes: 6af55ff52b02 ("Driver for Beckhoff CX5020 EtherCAT master module.")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+ drivers/net/ethernet/ec_bhf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please repost when net-next reopens after Feb 23rd.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+diff --git a/drivers/net/ethernet/ec_bhf.c b/drivers/net/ethernet/ec_bhf.c
+index 67275aa4f65b..0c86cbb0313c 100644
+--- a/drivers/net/ethernet/ec_bhf.c
++++ b/drivers/net/ethernet/ec_bhf.c
+@@ -423,7 +423,7 @@ static int ec_bhf_open(struct net_device *net_dev)
+ 
+ error_rx_free:
+ 	dma_free_coherent(dev, priv->rx_buf.alloc_len, priv->rx_buf.alloc,
+-			  priv->rx_buf.alloc_len);
++			  priv->rx_buf.alloc_phys);
+ out:
+ 	return err;
+ }
 -- 
-pw-bot: defer
-pv-bot: closed
+2.43.0
 
 
