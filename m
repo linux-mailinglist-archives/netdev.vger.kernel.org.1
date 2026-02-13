@@ -1,154 +1,127 @@
-Return-Path: <netdev+bounces-258602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258604-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yICYI4sLj2n4HQEAu9opvQ
-	(envelope-from <netdev+bounces-258602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:31:23 +0100
+	id SHacE3QNj2kgHgEAu9opvQ
+	(envelope-from <netdev+bounces-258604-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:39:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F62135BE2
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:31:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B630C135CCE
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7210B306A2B4
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:31:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E5C430523FB
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD2C35BDB4;
-	Fri, 13 Feb 2026 11:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F5E3563ED;
+	Fri, 13 Feb 2026 11:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="FeJKY4sg"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mail-4318.protonmail.ch (mail-4318.protonmail.ch [185.70.43.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3E032D0CE;
-	Fri, 13 Feb 2026 11:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F230357727
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 11:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770982263; cv=none; b=EEU2UZ5jDGernlNj2D9w1Z6FnzmVBMbXUxpR95AQKwMAOmwTGjoP5p1Htem96KD+3KdoOHzAZSM7EzFXw2e22cVJoIxl9ttODgztV/0hS1+nBMjYuW5uBGJLKqnN5zl6YPu9o4o4eGAJKyEdiqIdzsVcJaYnrX+aiC7GlPOfkwE=
+	t=1770982758; cv=none; b=aNq2FEOnYWuM6rfpjZTj17dZvwEb4y2z55E5H+HwKzz+t15vLlnTb6JcUNUNlPPmEzdAUP9QS2AKmKgSbrZYLEKaO33V87yKSfVHm72Q1D7reY82GhWjbfBwsDGTNSlYCAcphN/4OvN+fDApOgp+dWTc3dCLbnPAHBNwh8RJZAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770982263; c=relaxed/simple;
-	bh=6WceRIQBnFnlOfoUKkxmUbp1JYMmyPzhKmOhdic/RMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C85EPQp4uvshhfwc3fveZ2Unsep1I4eNiU2PRk3dId6u/eFfFlw/kZBgpYmqWg7bcWQH/LqlZWvrRX42cPRRhV0R1IBEjL4cPWMLpV5BT+YeIoh9dZex7LqsUXcb7m5do1EekFnI9cmF/inVWQnbX+j6h5XMpY8rl8LPm5kvJUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 3D08C608AD; Fri, 13 Feb 2026 12:30:59 +0100 (CET)
-Date: Fri, 13 Feb 2026 12:30:58 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Shigeru Yoshida <syoshida@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	syzbot+5a66db916cdde0dbcc1c@syzkaller.appspotmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH net] net: flow_offload: protect driver_block_list in
- flow_block_cb_setup_simple()
-Message-ID: <aY8LcgPsoYYGEH5s@strlen.de>
-References: <20260208110054.2525262-1-syoshida@redhat.com>
- <aYxw2CpxOKLh1wOz@strlen.de>
- <20260212183447.2d577f5b@kernel.org>
+	s=arc-20240116; t=1770982758; c=relaxed/simple;
+	bh=OjOeoNeXbk8BHjb598E2R0UWd310v91zrIUSuceT0dA=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=uU2mjpbHcS0noaunbvcR/08bCpbVDQBxwr0pdqR1Vkwd/+w6qGBeChZSRSgYulyMsl7ZuDkHj0+XjZlZzZ+ZymrL40upqUlwrJ/WQg0vyBUZe7XVjs6NSnWRlW1VuXg7ULxeDDxayL8uEmyreMrcrJK7v2z3iTofJ3XY2nqfXK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=FeJKY4sg; arc=none smtp.client-ip=185.70.43.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1770982748; x=1771241948;
+	bh=wRGHsAld12SXilvXxUlkl5iF+FfXB1D4AFtT+lQLOwg=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=FeJKY4sg+aJn6+iZVa2Y0v/X6zrMhJx3WXiGWdDsamoo+zvOoN/JXBrCgU/M4El9j
+	 ApRkOjt6VUNEcHk0kM2OdOwH0ZVtv1wnGPXFVT9/VkY5oBAlu9kAMuEZ7jy40m99uu
+	 hg89TcdAGJaKqzMTzQReOcJo99jyQFXCf2R8Y3V6Wy4QRRBUzpgCyI5OoLb4VDvYZs
+	 /euPiX7n+UoNvGH/KIYOCq4T8SAV+6ChwA8RCXUexwbNv9e2anEL0Gbc2JqsF7gCCj
+	 sygnxt/RanR4ah7oejtQN6PLMuo+iWPe3eoYpnQEXulQGBM24Yb3aU07dJ2mcZYYxY
+	 Dw8IsZfTyaAhA==
+Date: Fri, 13 Feb 2026 11:38:57 +0000
+To: Victor Nogueira <victor@mojatatu.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+From: Paul Moses <p@1g4.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>
+Subject: [PATCH net v6 0/1] net/sched: act_gate: snapshot parameters with RCU on replace
+Message-ID: <20260213113849.136695-1-p@1g4.org>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 4563e7e333f1f0db8f075c3ca391ea98a408cca9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260212183447.2d577f5b@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258602-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[mojatatu.com,gmail.com,resnulli.us];
+	TAGGED_FROM(0.00)[bounces-258604-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[1g4.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5a66db916cdde0dbcc1c];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 08F62135BE2
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: B630C135CCE
 X-Rspamd-Action: no action
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Wed, 11 Feb 2026 13:06:48 +0100 Florian Westphal wrote:
-> > Shigeru Yoshida <syoshida@redhat.com> wrote:
-> > > syzbot reported a list_del corruption in flow_block_cb_setup_simple(). [0]
-> > > 
-> > > flow_block_cb_setup_simple() accesses the driver_block_list (e.g.,
-> > > netdevsim's nsim_block_cb_list) without any synchronization. The
-> > > nftables offload path calls into this function via ndo_setup_tc while
-> > > holding the per-netns commit_mutex, but this mutex does not prevent
-> > > concurrent access from tasks in different network namespaces that
-> > > share the same driver_block_list, leading to list corruption:
-> > > 
-> > > - Task A (FLOW_BLOCK_BIND) calls list_add_tail() to insert a new
-> > >   flow_block_cb into driver_block_list.
-> > > 
-> > > - Task B (FLOW_BLOCK_UNBIND) concurrently calls list_del() on another
-> > >   flow_block_cb from the same list.  
-> > 
-> > Looking at the *upper layer*, I don't think it expected drivers to use
-> > a single global list for this bit something that is scoped to the
-> > net_device.
-> 
-> Maybe subjective but the fix seems a little off to me.
-> Isn't flow_block_cb_setup_simple() just a "simple" implementation 
-> for reuse in drivers locking in there doesn't really guarantee much?
+This series fixes a schedule lifetime race in `act_gate` between the
+control-plane replace path and the running hrtimer callback
+(`gate_timer_func`).
 
-Not sure what you mean.  I see the same pattern as netdevsim in all
-drivers using this API.  Random example:
+Changes since v5:
+- Reset stale err before optional old-entry copy on REPLACE
+- Centralize goto_ch cleanup at release_idr for init error unwinding
+- Snapshot replace defaults from old params once=20
+- Drop redundant early clockid pre-validation and remove clockid_provided
+- Resolve clockid once into tk_offset and pass clockid/tk_offset as scalars
+- Deduplicate init error cleanup by falling through shared
+  err_free/release_idr
+- Deduplicate empty entry list rejection on create into a single check
+- Rename lock-only accessor helper to tcf_gate_params_locked()
+- Simplify entry-list handling by deriving use_old_entries from attributes
+- Remove replace-path defensive old_p NULL handling
+- Keep helper name gate_setup_timer()
+- Align cleanup dereference with act_vlan using
+  rcu_dereference_protected(gact->param, 1) and call_rcu()
+- Switch dump to lockless RCU read-side access and use
+  READ_ONCE(gact->tcf_action)
+- Compute need_cancel only on replace and keep
+  gate_timer_needs_cancel() focused
 
-static LIST_HEAD(ice_repr_block_cb_list);
+Paul Moses (1):
+  net/sched: act_gate: snapshot parameters with RCU on replace
 
-[..]
-   return flow_block_cb_setup_simple((struct flow_block_offload *)
-                                     type_data,
-                                     &ice_repr_block_cb_list,
-                                     ice_repr_setup_tc_block_cb,
-                                     np, np, true);
+ include/net/tc_act/tc_gate.h |  33 ++++-
+ net/sched/act_gate.c         | 275 ++++++++++++++++++++++++-----------
+ 2 files changed, 219 insertions(+), 89 deletions(-)
 
-This is safe only as long as all ice_repr_setup_tc() calls happen
-in same net namespace.  I don't think we can rely on this.
+--=20
+2.53.0
 
-> If we think netdevsim is doing something odd, let's make it work
-> like real drivers.
-
-I fear fixing netdevsim to not use single list will resolve the
-syzbot report but AFAICS this pattern is in many drivers.
-
-> TBH I thought block setup was always under rtnl_lock.
-
-netdevices.rst says:
-"``TC_SETUP_BLOCK`` and ``TC_SETUP_FT`` are running under NFT locks
-        (i.e. no ``rtnl_lock`` and no device instance lock)."
-
-I don't think it will be possible to change it.
-
-nf_tables_netdev_event is called with rtnl_lock and it can then
-take the pernet nf_tables transaction mutex.
-
-Maybe it would be possible to rework flow_block_cb_setup_simple()
-to not depend on an external list_head argument, but its not easy to
-test such a patch nor do I think its going to be -net material let
-alone something that -stable likes to digest.
 
