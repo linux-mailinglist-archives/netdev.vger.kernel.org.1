@@ -1,191 +1,163 @@
-Return-Path: <netdev+bounces-258525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258526-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJtoJzB8jmmJCgEAu9opvQ
-	(envelope-from <netdev+bounces-258525-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:19:44 +0100
+	id 8KA3FM18jmmJCgEAu9opvQ
+	(envelope-from <netdev+bounces-258526-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:22:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885371323BC
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:19:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC7801323E6
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 628B0302BD06
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 01:19:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0268C301F327
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 01:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D29225413;
-	Fri, 13 Feb 2026 01:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40DD20A5C4;
+	Fri, 13 Feb 2026 01:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBEQBN/v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRc74ysD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CC66BFCE
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 01:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF30D1386DA;
+	Fri, 13 Feb 2026 01:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770945576; cv=none; b=NtoyoXqE/CNRmAjN1EQfnxvEzJfSHuXeyvqxD0qGexGUWnvm0JhImNHZTnXhIMIheq26OClOO+97dzj82TojhkM1T2+hxf/zTzGXPRitouubLU6UpBvS0Oyp7+QOl1eaNmTdj4dvaMmzwnWogoOcn4E/3DdxPOrQIGRGxjFmXAs=
+	t=1770945737; cv=none; b=uV38LbupvvAP15tNBlh78v+xaWq15l2t0ug3rbin7w8YiKwjvhLlGh3BrqyXecDc/ZdovDTX8VeeRqdaMvmbZlA1jN0aeEqX6tm3ROX/EdpMwwsHYlQNlMGyLWKqozjMtwxuHfuE9gvGSygRIsrXc+7WoJK9pksCVbp2amS3yhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770945576; c=relaxed/simple;
-	bh=pOqP7VM+mApaVUNM4EB88815+w4SRLILG/EjieeLe+4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nGJxPqbnb45nINWDg4QBFRG9wJCSAxRyznUjDEFyg4B55bQ78YhoWH/NgFcb/p2o7RA78Tifr/ZnnMwnlWc7EE94kV8Ju14PdU3xRv4hnvTU5vrdyKrBVY43DC/LrREgIQdLnSxEwzF5BF39oMYp/ZAwc2qori7gWE8xYf6VXJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBEQBN/v; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64ae1729637so398676d50.2
-        for <netdev@vger.kernel.org>; Thu, 12 Feb 2026 17:19:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770945573; x=1771550373; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DdSR/hkZOakiS24NkJpFojfOy/j7sfQd+s+nYYhJiVE=;
-        b=LBEQBN/veD4tconAj8h01XARaD7uW5xZ3Zy9/r9tNe9kYfNiJegbZW495L7ufV85wK
-         HK1WL87VKwBHOuVTJYc5we1LcqHmhkdUCMlhDXFv2TwKIEHcs4Dcsg63kjoFs1xSs6aH
-         elY4VW9ZR7zcyWHHMDj5n8ylLpQ6M84RJ0A8XPs5LntFbQiO95Ibqw8bBZXA02Hc8UIw
-         +2Pah0EIKpzcDpXxX9bwoIsDOy7SKSmp0MPggj+uEl+r4HDSfcF4i/DRhcRjTIZmdArK
-         N7aXoau6MO2VVqDa+/V2HaSp3VH+E2kPaFg53dG18Ef+24qOYl7kfYk3+HT/QGbDHI7W
-         NWuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770945573; x=1771550373;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DdSR/hkZOakiS24NkJpFojfOy/j7sfQd+s+nYYhJiVE=;
-        b=mu9tFNfZIJEMb94yowNUWPyKTrm+LxVT0OgYyRDyXLZ5DCx8vqBUhrIrJJljR7GB9e
-         wMjVFI5Q2hS7cA+uGTjN7oCDVdMripAi273+KMIqGEw8jNZtYgZSeFIlZh28jU/V343f
-         zlkWMtYDmzwNNoR9+Ae+nJKehlMCCNym0tf6xBnNkVR2oN7XVXgnjG71ATl0F++y/BsR
-         BdMIN6L4RmeUWAJsBBWR99YW+cNNaC2hZxBSprgwQgKlMJz9MaqKugEuPNcCQVxLAQ6w
-         n91WSLGETOxew5VrzK5/N/TdlFlgIZpILfr/mW5Vdm2ekspAOiZgleFXEKZ0vJ6Tf2uk
-         xM4A==
-X-Gm-Message-State: AOJu0YyZTU80MgcCmqWWORqbVDxcbpfyDoHOFrnhbhq0TZks3gUqqbLC
-	QiqMiza9UoqzGAqEhk7OW1YdyN6mGM44a+JU9yfsU5oBIcGfi8a0uz0z
-X-Gm-Gg: AZuq6aJ7a/CeVJSKLzcizlkB7cTsDkL4aNc45VpnRBBEOdc+d0zrFGVcslw404H9aZs
-	6V+rjFm1gc/mIgovYpkYNB1ezEn98eaTNCPw5PpQHRHcVfkkn6kTLuecM3ZkqvGnkKg/fp2Bxyd
-	Hm9fvgbYJuzh4W/tDDXGtP62gJ71WUpbzEi4ycf6KXcWOi9jclGb18+sH5beiew96d9zLqAphle
-	TSQV6FLYLa9QfAXxYwkNv2bCsUCTBHjJQJaIbVn8TBYF5oV5pLz5LJnF6+w+Nr6U3WORNjLyW7M
-	6fMsBq0SQoL45nphthCvq+MHBAZYjEcZdxxbHD7t/S8Ot8SnxbAPdsqrAfferTLDh2xIfW9YX1k
-	j7+dC6Ms6ZGFenTBUrVRCuxfRmt/Ez5bN6xKooifVcqbsNKYe+6ZC5uXkpQCy9yH5ciiyIPkxvC
-	rRQ425Wpsvze6sa5uMPD4W3pY3h4Mv5lZ57cnXTSstkwtzgEo=
-X-Received: by 2002:a05:690e:4304:b0:64a:d1bd:8c65 with SMTP id 956f58d0204a3-64c19b63848mr65513d50.95.1770945572751;
-        Thu, 12 Feb 2026 17:19:32 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4a::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64afc95acabsm6061484d50.13.2026.02.12.17.19.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Feb 2026 17:19:32 -0800 (PST)
-Date: Thu, 12 Feb 2026 17:19:31 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>,
-	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net 2/2] vsock: prevent child netns mode switch from
- local to global
-Message-ID: <aY58I15Csp1CU8xI@devvm11784.nha0.facebook.com>
-References: <20260212205916.97533-1-sgarzare@redhat.com>
- <20260212205916.97533-3-sgarzare@redhat.com>
+	s=arc-20240116; t=1770945737; c=relaxed/simple;
+	bh=fV90tJ7gdPh2Pj9/Q235En+ABb/bjRugS5dU4Rm+nlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MAwoBy9d3UMSNitq/+oC4OeMgyhWhJU0J4PBXB8/GMIYyP3uja5HHvpmXUbrKLrrnYjxazSB+MH6GbWe6hMkuiFU9zvgU498OeiI1KbvzDSvQNmBrSiLFfdYq9iqaBvRDYcR60pXd8Gk0Jkhi1Q47PMX5xirToyebNJO711mHQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRc74ysD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25ADC4CEF7;
+	Fri, 13 Feb 2026 01:22:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770945737;
+	bh=fV90tJ7gdPh2Pj9/Q235En+ABb/bjRugS5dU4Rm+nlM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sRc74ysDqJYJS9c4iM/b5Nl+k8sfzcilp+eEdPCI9OhPXdqbtm5uDg1V2sva3/CgP
+	 b0E0Wal5W0AMw2LgrHdeYibLZr4tiM3zTW2WTzWcLbI/J0RjkEWiKGi/vA0F6/bIZc
+	 8bL8SjUakcH4Ax1wGkYw2kduaLp4UgvsJ+XmI/MMy1tpvU3UZJZLe8GX2G9ud0ljwQ
+	 P2ZlY7VzRqD0o+ywgAbrFHQcVsrr74NYMOCMe76GbvSg3EFVRzN9kivul1FsHlqeRF
+	 gyaWSgsRVFxGCQWUmFL1I2shvvVPKT3sgbyuvbQtbAnDprGhm6fxbvs/tD3pVa8DfU
+	 DtZTuUencYW5g==
+Date: Thu, 12 Feb 2026 17:22:15 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Yael Chemla <ychemla@nvidia.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, Willem de Bruijn
+ <willemb@google.com>, shuah@kernel.org, linux-kselftest@vger.kernel.org,
+ Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ noren@nvidia.com
+Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss: validate min
+ RSS table size
+Message-ID: <20260212172215.0a3295a0@kernel.org>
+In-Reply-To: <dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
+References: <20260131225454.1225151-1-kuba@kernel.org>
+	<9f535014-80eb-4f57-b047-3638579bde9a@nvidia.com>
+	<20260211134319.39710c1d@kernel.org>
+	<dbbe9690-996f-4a63-90a0-baec52c27236@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260212205916.97533-3-sgarzare@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258525-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258526-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,meta.com:email,devvm11784.nha0.facebook.com:mid]
-X-Rspamd-Queue-Id: 885371323BC
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AC7801323E6
 X-Rspamd-Action: no action
 
-On Thu, Feb 12, 2026 at 09:59:16PM +0100, Stefano Garzarella wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
+On Thu, 12 Feb 2026 11:41:19 +0200 Tariq Toukan wrote:
+> On 11/02/2026 23:43, Jakub Kicinski wrote:
+> > On Wed, 11 Feb 2026 22:10:56 +0200 Yael Chemla wrote:  
+> >> Thanks for the test addition. I wanted to raise a concern regarding the
+> >> spread factor requirement that may apply to mlx5 and potentially other
+> >> drivers as well.
+> >> The real issue arises when the hardware's maximum RQT (indirection
+> >> table) size isn't large enough to accommodate both the desired number of
+> >> channels and a spread factor of 4. RX queues/channels serve multiple
+> >> purposes beyond RSS - they're also used for XDP, AF_XDP, and direct
+> >> queue steering via ntuple filters or TC.
+> >> Artificially limiting the number of channels based solely on RSS spread
+> >> requirements would be overly restrictive for these non-RSS use cases.
+> >> In such scenarios, we'd rather have a slightly degraded spread factor
+> >> (< 4) than limit channel availability.
+> >> We'd appreciate any feedback on this approach.  
+> > 
+> > That's fine. In fact IIRC ixgbe (infamously) had more queues than
+> > it could fit in its RSS table. So none of this is new. At the same
+> > time if user _does_ want to use a lot of queues in the main context
+> > fewer than 4x entries in the indir table is inadequate.
+> > 
+> > The test is based on production experience, and provides valuable
+> > guidance to device developers.
+> > 
+> > I'm not sure what you want me to say here.
 > 
-> A "local" namespace can change its `child_ns_mode` sysctl to "global",
-> allowing nested namespaces to access global CIDs. This can be exploited
-> by an unprivileged user who gained CAP_NET_ADMIN through a user
-> namespace.
+> No doubt that larger factors help overcome imbalance issues, and it's 
+> fine to recommend using 4x (or even larger) factors.
 > 
-> Prevent this by rejecting writes that attempt to set `child_ns_mode` to
-> "global" when the current namespace's mode is "local".
+> The point is, when this comes with a selftest, it's less of a 
+> recommendation/guidance anymore, it becomes kind of a requirement, an 
+> expected behavior. Otherwise the test fails.
 > 
-> Fixes: eafb64f40ca4 ("vsock: add netns to vsock core")
-> Cc: bobbyeshleman@meta.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/af_vsock.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
+> This ignores multiple other considerations:
 > 
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 3b629b4a0359..9880756d9eff 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -95,8 +95,9 @@
->   *     the namespace's own ns_mode.
->   *
->   *   Changing child_ns_mode only affects newly created namespaces, not the
-> - *   current namespace or existing children. At namespace creation, ns_mode
-> - *   is inherited from the parent's child_ns_mode.
-> + *   current namespace or existing children. A "local" namespace cannot set
-> + *   child_ns_mode to "global". At namespace creation, ns_mode is inherited
-> + *   from the parent's child_ns_mode.
->   *
->   *   The init_net mode is "global" and cannot be modified.
->   *
-> @@ -2844,8 +2845,16 @@ static int vsock_net_child_mode_string(const struct ctl_table *table, int write,
->  	if (ret)
->  		return ret;
->  
-> -	if (write)
-> +	if (write) {
-> +		/* Prevent a "local" namespace from escalating to "global",
-> +		 * which would give nested namespaces access to global CIDs.
-> +		 */
-> +		if (vsock_net_mode(net) == VSOCK_NET_MODE_LOCAL &&
-> +		    new_mode == VSOCK_NET_MODE_GLOBAL)
-> +			return -EPERM;
-> +
->  		vsock_net_set_child_mode(net, new_mode);
-> +	}
->  
->  	return 0;
->  }
-> -- 
-> 2.53.0
+> 1. Existing behavior: In general, mlx5e today implies 2x factor, so it 
+> would fail this new test.
 > 
+> 2. Device resources: In large scale (high num of channels, or high num 
+> of netdevs on the same chip, or both), it is not obvious that increasing 
+> the indirection table size is still desirable, or even possible. To pass 
+> the selftest, you'll have to limit the max number of channels.
+> 
+> 3. ch_max should win: Related to point #2. Driver should not enforce 
+> limitations on supported ch_max just to fulfill the recommendation and 
+> pass the test. I prefer flexibility, give the admin the control. That 
+> means, driver would use 4x factor (or larger) whenever possible, but 
+> would not block configurations in which the 4x factor cannot be satisfied.
 
-Thanks for the fix!
+Oh I see.. I wasn't aware the CX7 has a limitation of the indirection
+table size. I wrote the test because of a similar limitation in a
+different NIC, but that one has been fixed.. I have limited access to
+CX7 NICs, the one I tested on maxed out at 63 queues so the test has
+passed.
 
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Is it not possible to create an indirection table larger than 256
+entries? 256 is not a lot, AMD Venice (to pick one) will have up 
+to 256 CPU cores (not threads) in a single CPU package.
 
