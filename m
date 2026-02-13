@@ -1,269 +1,307 @@
-Return-Path: <netdev+bounces-258596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258597-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIpxJXb+jmmOGwEAu9opvQ
-	(envelope-from <netdev+bounces-258596-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:35:34 +0100
+	id yLZUGOn+jmmOGwEAu9opvQ
+	(envelope-from <netdev+bounces-258597-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:37:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B65913520C
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:35:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40FE7135251
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:37:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F7BD3042096
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:35:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 187AF300BBB3
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 10:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D6834D4F3;
-	Fri, 13 Feb 2026 10:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB7034D4F3;
+	Fri, 13 Feb 2026 10:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="EghF1Qbr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ek8DhHs6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.166])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53028335543;
-	Fri, 13 Feb 2026 10:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.166
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770978917; cv=none; b=LJOXk5i1qM5LG5Td/qeHrDdE2hSOF+hZIBtKD3jc4Gkbkkp8YsybbQGTpBLt4kcOTkYO0FYgTD6BiMEH50oLCNUl57W0x47GxR8FY4RqbT1fjyEfhE5tktzzmVuddHyA9Z7/+xMbeE1L4jAEI4YZiPVXCmdCkIN2olSh3A4FEc8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770978917; c=relaxed/simple;
-	bh=ydGOxu/DDZ5vk3wWhJm3tP6qQ8UGgOOESrYzqnkTI5g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IpEDeJzeDfv0ntJU074jKaIi8ztoSWNQIYGi7ePXv3C6kGERUueFqf4gqgaj0R3TEXE+7USZujnjbt93z/Fvn3ruZza0BqUmOWnV3lpIueROvIA0YbEaIg/gmUTK3j7xXScs6gdBKudBRALHBp+YQ6EjFnez7OyLF8uVBQHaZSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=EghF1Qbr; arc=none smtp.client-ip=188.68.63.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Received: from mors-relay-8202.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4fC7pg6y20z41PJ;
-	Fri, 13 Feb 2026 11:35:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1770978908;
-	bh=ydGOxu/DDZ5vk3wWhJm3tP6qQ8UGgOOESrYzqnkTI5g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EghF1QbrrqCAX60qpK+SNdqslB8LJmF1+gkASayzGcwcmSa+KiU/XwelUtGrJsLSY
-	 wwEJQsfRlFbrYutUMG/Y0rYFUzay+FoFsm5LdAZrWYIqxCt+eLaf5a0VaQfdcrPWxn
-	 +MMofbfspQP1jq4bkX7JZayJC+ZF3/8Vyf167rG1JjXuuLwSXA3RzQxIWB6O5CZC+d
-	 zP3h3rXzYfs2PoDk0dckA5MnvgL3q0Yw6tq/WO/0tqKwFutptrYhlu9+WuwMdMrF8B
-	 2AvRa17VM1grMma0EpHKOAUCwG0KmMO1/hJB0+8S0bkQihcCkBDbM8yklaKV6oF2nL
-	 6F2RLVuhofDYA==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4fC7pg6Bd9z415J;
-	Fri, 13 Feb 2026 11:35:07 +0100 (CET)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4fC7pg1RFNz8svL;
-	Fri, 13 Feb 2026 11:35:07 +0100 (CET)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 400EA67258;
-	Fri, 13 Feb 2026 11:35:06 +0100 (CET)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <9383904a-81b1-492b-945d-a47fd065c727@leemhuis.info>
-Date: Fri, 13 Feb 2026 11:35:00 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3F92DF146
+	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 10:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770979041; cv=fail; b=n+lUzCefXgPA6PkimVgTmyuko5VX1lHOKlCu0Djm0M5fpCLwXsLBPtGvTQb6r/SB21dCIBD5uXSe6gXeRwix3yuipLeGd7SIUCP643/67bDexKtSch4u0JRUXd+hY3RJsFb1jDnao7j11yiLi4S13853/trLVyl0ZMrbsJZN6Mc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770979041; c=relaxed/simple;
+	bh=ZVNuy3aLHlbeXFlXJITiQKBF/HSTplJDGHXPNZCIRMU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=OalFEkg6euIoWjQbYtUguQDE6TxRue6tYEA+HAcbzmosl9+lB3ps2EjSJs4rBInv36sdZnMrSvrhi61Pr/TMRH9/yomHPPpnTir79slEc+X0RJRmJpOIEfyM97qC91f98msIKooAzcJ+P6HhgjSeRNv8lqQBs5s3lOpDXz0SsRE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ek8DhHs6; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770979039; x=1802515039;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZVNuy3aLHlbeXFlXJITiQKBF/HSTplJDGHXPNZCIRMU=;
+  b=ek8DhHs6T/ne3EoE9oQuup/sE6sObx1mcsr7KqW7foSMJZH0jJ5O8eSZ
+   6qLeIRNmvXtksejK2w5xlxl0M6AabDB63JCCZwNvjqSJU4ywbQtdb9Ywc
+   mFFh4fqew6OvHweid9mKdgL15MDh+TD8flmcEzcfy0CLUZTO7VE8F2E0H
+   z2WRErQ6JydSh1kz01yPddEdpmZ7j04WTuvTcLyMECSMBBOPN6EL0yjnj
+   Nw0xcUu+4DPrEECMIi2e2g2fR3Ka9X6Lwp3Pmc1tSfTQDF2e5k3WQae08
+   MH3E8vBrVZtPHtZRlZ8iE74C2oxiSSv0DxF4HCQCTr+wC8GqML7HQsNkm
+   A==;
+X-CSE-ConnectionGUID: S53FeEh4Q366lmt+2jlvEQ==
+X-CSE-MsgGUID: P3/lFNqQQ+6jIR5dUXbkGw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="83530590"
+X-IronPort-AV: E=Sophos;i="6.21,288,1763452800"; 
+   d="scan'208";a="83530590"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2026 02:37:18 -0800
+X-CSE-ConnectionGUID: 93faTHNgQuedvx3o1VMdhA==
+X-CSE-MsgGUID: 6fWfH13eTBqvi5e8ARm2tw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,288,1763452800"; 
+   d="scan'208";a="212922130"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2026 02:37:18 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 13 Feb 2026 02:37:18 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Fri, 13 Feb 2026 02:37:18 -0800
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.15) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 13 Feb 2026 02:37:17 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bQIYXQunIdOMjclOhUVUV4D5Xok/ZduI2QwpldHArHiv3ahDq8FF/qoHwqZ8QNxiJeJ5m8CsyCq9V/Eh7rvncjXiL/H+ASl5L0cgOYfxzfYF+fJYI8rAjBM6Rt+FadUb10d2v5uKHfGVVB5wNz4jqUfrbHfKF2ot9u1aCq7ltNOMvmEclJwdbB1WRxTlm1QZCuAZf3uik0f5cNnbcFtBUDiQTwfKDi3mm4a6tQkTj3HAWPZNfp3nGWmI3Zq/aD2SW7M+d4pSFdr4vxFzhq7Czwon3nwFBPAWQUWnJ9ZdbpDLYRk41ZdvEJSXClX5MS+fdru4Lj5gbpYwh/Toja9NAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z23tbtL/TDN3prpwpaNHzbHqZdLlrCQRUNOngRScMW4=;
+ b=QmlsgjdltJZaMTtWP+rOfGY+zwrU9eHN3/q9YbvTyTy92qDLmZrGCmG1YLoCK3o0on9TQ1iz8koqzUp2/gUYbkdf2NjXuhDb904Y48RslahmT7CNmswnz/Zft8/5GwM3LbflsRslrdNZtcV9ing71tAZadMUg11+29CdmmO8xN3cajmAISxtBa8O15x6Y4KY/EOtFedbctt4S6ITlWegnKDU+Y2Y96OudgD7xKghU05LbKh1hM9xj0LCFbXTOZM1K3w2IAIXlFXfhvCCfoDq5AEJa3zmOkH7TFgt/SjVoLpHdo++d2oCkUTkeqKbN2JRUehph8d6VVIWtxEH1dn2zw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH3PPF2CAD058EC.namprd11.prod.outlook.com (2603:10b6:518:1::d12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Fri, 13 Feb
+ 2026 10:37:10 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9611.012; Fri, 13 Feb 2026
+ 10:37:10 +0000
+Message-ID: <c2577324-d1be-4d4b-84a6-9964a63d3097@intel.com>
+Date: Fri, 13 Feb 2026 11:37:03 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] drivers: net: ice: fix devlink parameters get without
+ irdma
+To: Nikolay Aleksandrov <nikolay@nvidia.com>, <netdev@vger.kernel.org>
+CC: David Ahern <dsahern@kernel.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, Paul Greenwalt <paul.greenwalt@intel.com>,
+	Daniel Zahka <daniel.zahka@gmail.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, Dave Ertman <david.m.ertman@intel.com>,
+	Mustafa Ismail <mustafa.ismail@intel.com>, Shiraz Saleem
+	<shiraz.saleem@intel.com>, Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+References: <20260213084841.1406442-1-nikolay@nvidia.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20260213084841.1406442-1-nikolay@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU2PR04CA0152.eurprd04.prod.outlook.com
+ (2603:10a6:10:2b0::7) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5] net: nfc: nci: Fix parameter validation for packet
- data
-To: "Lukas K." <lu@0x83.eu>, Paolo Abeni <pabeni@redhat.com>,
- Michael Thalmeier <michael.thalmeier@hale.at>,
- Deepak Sharma <deepak.sharma.472935@gmail.com>,
- Krzysztof Kozlowski <krzk@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Simon Horman
- <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Linux kernel regressions list <regressions@lists.linux.dev>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Michael Thalmeier <michael@thalmeier.at>, stable@vger.kernel.org
-References: <20260112124819.171028-1-michael.thalmeier@hale.at>
- <21e77ec4-fa57-4a9f-8d9b-c417fd908ac6@redhat.com>
- <e9d63690-cdf4-41b7-98a1-6ebdf818fa11@0x83.eu>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-X-Enigmail-Draft-Status: N11222
-Autocrypt: addr=linux@leemhuis.info; keydata=
- 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 MEK4
-In-Reply-To: <e9d63690-cdf4-41b7-98a1-6ebdf818fa11@0x83.eu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <177097890671.1065606.94545132246866571@mxe9fb.netcup.net>
-X-NC-CID: DBC9/OsMnyEm+UUi6TK/TcORKENNy+lxtGnytvOzKKwZUsT02YI=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH3PPF2CAD058EC:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5bc22083-d46a-41ed-f554-08de6aebd7a0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?b0JBa2M5VHZmdC9HQ0U2YjJkZnlWTHEycDdQL1hOdVcrMjJPUFlsNWo1aTRl?=
+ =?utf-8?B?MTRhSG1DTDA4T2dMSzBacm5yS1dIOTNYTWN3dnNOVzc1ZkkwYUV2RVE0MGRC?=
+ =?utf-8?B?TGZCOW8wdTVNL3QrSTVBVlQvR1ZGM3ZQYTliTzUzeUFrV3JIZlg2Z2tsK1BX?=
+ =?utf-8?B?Mk1uRFN5VmY4cUl0Yk9NRDA1RW51N1J5Q2hXV0UyeHFJa3lDMkFMMjQrQ0tV?=
+ =?utf-8?B?RzgxVFl3Z1VoT1lhVitYcDV6YkFhK2xKOFE1dW0xQXdIQVlrTXVnSkQ4cHJY?=
+ =?utf-8?B?S29oR1pmUllseFA3RkdsS0xrNVg5NXZST0VwK0FvTjZBd0l2Q1krcks1NGlj?=
+ =?utf-8?B?NzFiclhSdzdEUFdlanJkZCtudFd6dzMvNzhsQkEvSUtyaVcrMktBZzlyN0Uz?=
+ =?utf-8?B?d3dYaDVndTkvbEdXTWNJM3dPaWM1a21BSHZIcFVod2ZuVW9NTGI0MUJnR3Y2?=
+ =?utf-8?B?Wi93RGgrNmNQcTFPckE2ZlA5QWJuMjJuMVpSUk9nK1EyWlFDVmRrOFM5VENY?=
+ =?utf-8?B?N1J4QU05KzBPSTVwRU8yanA4U3cwMkFsVGpKSU1zRm1xWUt4dUxKVXhDdjFZ?=
+ =?utf-8?B?VktTOUxBUk9qdEhxT01SdC9SbnNFNFE3NXFER1VyOFJVdVFvVkRFWlhJZHZt?=
+ =?utf-8?B?L25mUGZpTk1DWnd3RlE1YlhvcitFM0M5RnZieFFMME0ySkRnUGRuY2FUaTh3?=
+ =?utf-8?B?ZTNaRHplNFZPTjhTMHI2Nkt3YUNvRCtha3I1TzhKNzA1WXQwYlZ1NG1DK2VC?=
+ =?utf-8?B?Z1FJbCtEZkdmWHpwanlvazF5OUpnNmJiSzMzVmpsT0hVRTYrQ1E5cHc2bUdU?=
+ =?utf-8?B?L0hPZ1ArL1NaYWdBTjM1WEFkR3pxWTVWTE15VlVYYUlwanlJNE5aczRKZm5O?=
+ =?utf-8?B?bDZ2b3hucU5ETWxnUG85dTlwcmRRTnZodFIyaHIweTQ2Zm0wOG5YQ3N3YStZ?=
+ =?utf-8?B?OFRQQVI0QlVSczVra3VkY0ZrSVZJdWV3QlZsTmtiWlF0c1l6QUNrdUR2d2tm?=
+ =?utf-8?B?VUxwcjRJblBBN2poQ205bld3L1FEWUlwY3YvVjhnUGkvQ0VFN2V5VEFBVS9D?=
+ =?utf-8?B?TG8zS0UvSVBrUUVtcW9kcitibktoNkdUTVlTNERrSXhOZkdPK0t2TkxlN2NV?=
+ =?utf-8?B?Z1BNUnlSbHpMclRxbDJPZjVlZG5NNW5mVDhvcXlRWEV1MWJueGorT3FNUmls?=
+ =?utf-8?B?cFFKWWovdHlaa0hpZHVUYURKY013WTVob21EN3h0MHpaT0Uvd3lQWndyN0c5?=
+ =?utf-8?B?eVVOVjZWWnF3bExBeXNuSjliSStYWmMvZnF1RzZPMVJZRVdmby9xK0VZM2oy?=
+ =?utf-8?B?ejRQVm8xMzdiNnFsTThhZEplNGVhRHI4WElsRDBrbmJKU0VKdUhYNkNTSmZy?=
+ =?utf-8?B?dlYwTlQvM3BaNEpTc1RwSzQrNHptQkZlMStEREhHdzdWQjNPRkRnbnduWjBN?=
+ =?utf-8?B?OW16S0xyaWZ4d1BTQkpwWkU1eVdIOUNIQXBhOUhVTHNhazlqQVVXNDZRYmZS?=
+ =?utf-8?B?RHF0ZlVOaU8yNFVXZmFpemVrbHNVUGxoYUFieS83bllyNWZHL1FTQ29ybEc1?=
+ =?utf-8?B?am8wRlkvZ3NRd2d3Um5GUWdidm5uWnRRVHBSeVUvOTRLQzZhbEFVQlNma0RT?=
+ =?utf-8?B?ViszTEpQWGJaM29NdnVZVkxOSklOYlp0MEJBMjdpdVpJMnFCOGVKRy9hNjA2?=
+ =?utf-8?B?RFZPRkNITkZvTHdNcWxxUjVST3RUZ1M0UTFwSlJucXRxcTFnWlhLOVU5V29u?=
+ =?utf-8?B?UDYzUW0xQnU5KzBPVDZCV0wxTGlPaWVpMEJGV1lzYndGZ3V2V1dKc0orb3JB?=
+ =?utf-8?B?OExrWjFqOG1TODkyRDdGcjNmWi9DNXlyZjUxb29LbzVHVmM2OUgyMzR6Rkps?=
+ =?utf-8?B?ZGhITlVheFJ2bXhxSjEyNTV6UnFlNGo2NmluVkplWlY5cU5Zcno0SlA4MnNm?=
+ =?utf-8?B?MEJESVR1RlhsMWp2dGFtb3k1cFpPNkpPOXRjU2c0b2drM2RmUTRzd3hkZk1R?=
+ =?utf-8?B?QjNHaFRjSlVkVkpHMXlCSlJ1M0c0ckJhMExnYUE1bVMvbFhZbjhUOG1SREY2?=
+ =?utf-8?B?RXhHMTNrQTlFY0ZIK0pWaWMvUFNXcndQTmZRWDMzOUhBZEdDWFJVUWo5ZUsw?=
+ =?utf-8?Q?tr0U=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N0lpQzJseHNCdHg4UEVUK0MvOHcvQlBVY3NuTjBhNWx6WWh1M1h0a1BMN1hW?=
+ =?utf-8?B?V0Q1UkN6TFNyaFA4YjhQVlQ1OEo2QjhSQkh0SVNkSHdwZWtXUHRYTUNacG01?=
+ =?utf-8?B?ajVEVDNIa2tYRVM5cURUYzRXYWw3V25LS2M2SXc2WDlTV2xDRXV4ZXRqZFRt?=
+ =?utf-8?B?Q3VtWm16bWk4RGZCRkc4bXpmRVJndkJqakMrNXFad2pyRFRKaUg3RWx3Tm96?=
+ =?utf-8?B?WUVOSWtHM3czRGVnYTI2WXNrZTNGVks1bzlPT2tyNTBzNnRZcXZ1em1WRjND?=
+ =?utf-8?B?cTdWcG8xd2h6Q1RtNWdIVm1JaWkzVG1PMHRGSnk2eERlY0dYUHhtK2ZJSlhn?=
+ =?utf-8?B?ZTdQM2xPU0pZTUhvcEYvdHdISGI3ZUh1RWdpY29aMGdwZmZYOTZZWmpvWElL?=
+ =?utf-8?B?MTVWajFockVNNm5SSFlna2h1cExrUWYzcHBIeXpaUXFsaE5vMExkTHpBMm91?=
+ =?utf-8?B?U0N4WnJ2cGF4MGpuMEFnMW9KSUtBSGJBb1BxRDRoQ0JhMFdTQVh3QVpybGQz?=
+ =?utf-8?B?Z1kweTJiUk9MeUFUc0s1V210NVh3eHJhSjNqdW1qb3RjQmMyenpuYmtQdnYy?=
+ =?utf-8?B?NzdmVjhtREZHT2pESWZCKy8zR3FjclJDRWpES2wydCs2ODdIbGhRQjBRN0xk?=
+ =?utf-8?B?Y3NSQzcrZ2VSYU1JMS9xNzV5VXVDNjNRMVR5MCtRU3kzV1NFOXlKT1h6bVEx?=
+ =?utf-8?B?cDUwMFJmVWFSaStCT3ZmSy9mSWZFWTJtZUNrUTBLbUp1czQzWVM4R3FhY01E?=
+ =?utf-8?B?WUlkUW9wS3FvSGVGYnZuOGhSMHBvZEpjbVc3OXBadDhDQkhaOWVWTC9FVzJ3?=
+ =?utf-8?B?eHlSNm9PY1ZuTHBLeWxNTERGQ3YvRmRiOUtRNjRoOXFJNWc2alI0TzJRb0ht?=
+ =?utf-8?B?RklCKzROTTFVMm1IWFB6aTFVaHFrZGxMMHM0VWpGM0dMRmdxd3YzU05UL29i?=
+ =?utf-8?B?OTdsSEFLZlRsNGRiUEJxc2Z2dnRUSndUM3NKS1dyditPNWpNV2pXZ3Z4b1Fm?=
+ =?utf-8?B?Z3BJUXNyaXpnT05ySUpad3NCTE4rbHdDY1o0c1J5OFNOYVRtVHY2WnFpWVhL?=
+ =?utf-8?B?Mk9nbGlxUi8vVTFzYkdMK0dScllpMExKcnVHSG5CNVY1eXora3RLM3VSOEFj?=
+ =?utf-8?B?TWNNNWdFSmg2am5ZWWZoQ1BnL1NsTU9qdHltYm9Bd0EzSUVqVFNJTWtSOFN2?=
+ =?utf-8?B?NUtjYzFEMkovYmVVMTJDV25rbnpSU0VYMzVYbUErMlFqL29RYmtOTkVCd2V1?=
+ =?utf-8?B?a3lmMkRrWE5RR0dLUTdtaGhwUS9SVDV4SHRKOTA2ZHY2ZFhyU0JleGl3TFVU?=
+ =?utf-8?B?SGkwUGwvZlIzeDNnMHpvVXJiUXVabUJTTnJMTWZvbVBPaUVQL0wwcVMrWmxn?=
+ =?utf-8?B?UzNudjkrY3lQZFNPR21xTi9iZjYxdFFHd3orVGFGRXRLTjdrcmo0cDYyVkFP?=
+ =?utf-8?B?MWtRTTUwTGY1Z1NHbE1sVnpDK1RqRUFuY2t4OG5FUmYwS2ZlZGFWaXhDWXdm?=
+ =?utf-8?B?ZjVIU01VdC9XMm9sRjBBTS9HVTZHL21YY1F1UnpRdWhzYnYxQWliWHQ0REdW?=
+ =?utf-8?B?NGxGeG9qQ3VNOURycjNLSkxBSCtOYld3KzVtT2NsbEpqN254Nk5WVEFhbHFh?=
+ =?utf-8?B?SDljZGxTZHpHU05ybUUrOW1TRXB4dHpvSmVkSDVKcDMvNForNVlSY3V0VjBJ?=
+ =?utf-8?B?VC9VcWZMQ0ZuazVZSXg3YnduUkJsVC9kRWVFTWdRVlZIOUJvcU55aFN6STJW?=
+ =?utf-8?B?REExOGJ2VkZucnhWV3hhZnpNeHVYU3VIUTRKKzBtMmxCcWxLYkRLUkNuaWpa?=
+ =?utf-8?B?d2ZwUm5VNGxTY2FoMVR4amJEU1I1cVplTHllTEc2eFJTWTBtdG1Yc0VCTUtN?=
+ =?utf-8?B?ZzE5TWZRUS96L3lzWmlFSUl1dmx5QXlIOUtnY1U2VENyblVRUUVDeEw0a28y?=
+ =?utf-8?B?TlNWak51UW9GOGdQSDNoL3NtaCs4QVZock1OdG9mQnBIZlFWYlA4ZkQyaXFh?=
+ =?utf-8?B?NXdLMGwveGFCYmlLQXZmSUl3WnJHN3prTXhuQVRNTFVaK2xPOFpucFAwWlUr?=
+ =?utf-8?B?S3FlOGFQWWJaVXVTclBXZkN1TGY5UmNqc0VzNTgxK3hBa1M4REN0L0VvMVBq?=
+ =?utf-8?B?aXdQZTQweXJZdkZKcTRFWHFSdWZKeWJ2TjQxTEd0WjE2Wmt0TWlvd3Z5YVgv?=
+ =?utf-8?B?NlVaMml3bEVmMmF3L2ZIMHpkNVVQa05acUU2NDRpalhua1B2OXdWOXltaU9U?=
+ =?utf-8?B?NWJXUlkzcGVSVkdRSmk3NEgzcHhMV2wzamp4VDNmM3NJV1V4M1JmZkgyM1Zk?=
+ =?utf-8?B?c3dseWRSYTJ3MGRLZjBrbXVab1lzOThUV0dLTGVtUDhpaXNtV2pjK3p3S1NL?=
+ =?utf-8?Q?MHJHLsezmphJPlRU=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5bc22083-d46a-41ed-f554-08de6aebd7a0
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2026 10:37:10.2367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: F+9v+o5WGJ6XrPAHk1g9H+t39oMEpsux8B2XATq57pkgTTIML0iAcDdUtaFoazCl6I58QfNBkGHAl7F1rSYCL+P84ulxxpza5amxVxFIroc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF2CAD058EC
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[leemhuis.info];
-	FREEMAIL_TO(0.00)[0x83.eu,redhat.com,hale.at,gmail.com,kernel.org,linux.dev,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-258597-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258596-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,intel.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,linux.intel.com,lists.osuosl.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 1B65913520C
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 40FE7135251
 X-Rspamd-Action: no action
 
-On 2/7/26 01:58, Lukas K. wrote:
-> On 15.01.26 12:25, Paolo Abeni wrote:
->> On 1/12/26 1:48 PM, Michael Thalmeier wrote:
->>> Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
->>> packet data") communication with nci nfc chips is not working any more.
->>>
->>> The mentioned commit tries to fix access of uninitialized data, but
->>> failed to understand that in some cases the data packet is of variable
->>> length and can therefore not be compared to the maximum packet length
->>> given by the sizeof(struct).
->>>
->>> Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for
->>> packet data")
->>> Cc: stable@vger.kernel.org
->>> Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
->>
->> AFAICS this patch is doing at least 2 separate things:
->>
->> - what described above,
->> - adding the missing checkes in
->> nci_extract_rf_params_nfcf_passive_listen and nci_rf_discover_ntf_packet
->>
->> the latter is completely not described above and should land in separate
->> patch; note that whatever follows the '---' separator will not enter the
->> changelog.
+On 2/13/26 09:48, Nikolay Aleksandrov wrote:
+> If CONFIG_IRDMA isn't enabled but there are ice NICs in the system, the
+> driver will prevent full devlink dev param show dump because its rdma get
+> callbacks return ENODEV and stop the dump. For example:
+>   $ devlink dev param show
+>   pci/0000:82:00.0:
+>     name msix_vec_per_pf_max type generic
+>       values:
+>         cmode driverinit value 2
+>     name msix_vec_per_pf_min type generic
+>       values:
+>         cmode driverinit value 2
+>   kernel answers: No such device
 
-Please correct me if I'm wrong, but seems things are stalled here and
-there is no fix for the regression in sight that is know since
-2025-12-09:
-https://lore.kernel.org/all/20251209132103.3736761-1-michael.thalmeier@hale.at/
+this issue reproduces even with CONFIG_IRDMA enabled,
+but just when there is no irdma in use, so the fix helps
+a lot
 
-I might be missing something, but if not I guess it's best if we revert
-the culprit quickly, given these factors:
-* We are way past the "[fix regressions] within a week, preferably
-before the next rc." that Linus would like to see:
-https://lore.kernel.org/all/CAHk-%3Dwi86AosXs66-yi54%2BmpQjPu0upxB8ZAfG%2BLsMyJmcuMSA@mail.gmail.com/
-* Lukas running into and reporting same problem recently – and
-confirming that a revert helps:
-https://lore.kernel.org/all/11b7567e-b9a4-4546-9b1c-bb9820bead0c@0x83.eu/
-* The culprit was backported to various stable/longterm kernels.
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Tested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Or has anyone a better idea?
-
-Ciao, Thorsten
-
->>> @@ -138,23 +142,49 @@ static int
->>> nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
->>>   static const __u8 *
->>>   nci_extract_rf_params_nfca_passive_poll(struct nci_dev *ndev,
->>>                       struct rf_tech_specific_params_nfca_poll
->>> *nfca_poll,
->>> -                    const __u8 *data)
->>> +                    const __u8 *data, size_t data_len)
->>>   {
->>> +    /* Check if we have enough data for sens_res (2 bytes) */
->>> +    if (data_len < 2)
->>> +        return ERR_PTR(-EINVAL);
->>> +
->>>       nfca_poll->sens_res = __le16_to_cpu(*((__le16 *)data));
->>>       data += 2;
->>> +    data_len -= 2;
->>> +
->>> +    /* Check if we have enough data for nfcid1_len (1 byte) */
->>> +    if (data_len < 1)
->>> +        return ERR_PTR(-EINVAL);
->>>         nfca_poll->nfcid1_len = min_t(__u8, *data++,
->>> NFC_NFCID1_MAXSIZE);
->>> +    data_len--;
->>>         pr_debug("sens_res 0x%x, nfcid1_len %d\n",
->>>            nfca_poll->sens_res, nfca_poll->nfcid1_len);
->>>   
-> As far as I can tell, the code ensures that data_len never underflows.
-> If that'd happen all subsequent length checks would pass, even though
-> they should not. Using  a signed type (ssize_t?) would provide some
-> extra safety in here.
->>> +    /* Check if we have enough data for nfcid1 */
->>> +    if (data_len < nfca_poll->nfcid1_len)
->>> +        return ERR_PTR(-EINVAL);
->>> +
->>>       memcpy(nfca_poll->nfcid1, data, nfca_poll->nfcid1_len);
->>>       data += nfca_poll->nfcid1_len;
->>> +    data_len -= nfca_poll->nfcid1_len;
->>> +
->>> +    /* Check if we have enough data for sel_res_len (1 byte) */
->>> +    if (data_len < 1)
->>> +        return ERR_PTR(-EINVAL);
->>>         nfca_poll->sel_res_len = *data++;
->>> +    data_len--;
->>> +
->>> +    if (nfca_poll->sel_res_len != 0) {
->>> +        /* Check if we have enough data for sel_res (1 byte) */
->>> +        if (data_len < 1)
->>> +            return ERR_PTR(-EINVAL);
->>>   -    if (nfca_poll->sel_res_len != 0)
->>>           nfca_poll->sel_res = *data++;
->>> +        data_len--;
 > 
+> Returning EOPNOTSUPP allows the dump to continue so we can see all devices'
+> devlink parameters.
 > 
+> Fixes: c24a65b6a27c ("iidc/ice/irdma: Update IDC to support multiple consumers")
+> Signed-off-by: Nikolay Aleksandrov <nikolay@nvidia.com>
+> ---
+>   drivers/net/ethernet/intel/ice/devlink/devlink.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> index 2ef39cc70c21..7de749d3f047 100644
+> --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> @@ -1360,7 +1360,7 @@ ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
+>   
+>   	cdev = pf->cdev_info;
+>   	if (!cdev)
+> -		return -ENODEV;
+> +		return -EOPNOTSUPP;
+>   
+>   	ctx->val.vbool = !!(cdev->rdma_protocol & IIDC_RDMA_PROTOCOL_ROCEV2);
+>   
+> @@ -1427,7 +1427,7 @@ ice_devlink_enable_iw_get(struct devlink *devlink, u32 id,
+>   
+>   	cdev = pf->cdev_info;
+>   	if (!cdev)
+> -		return -ENODEV;
+> +		return -EOPNOTSUPP;
+>   
+>   	ctx->val.vbool = !!(cdev->rdma_protocol & IIDC_RDMA_PROTOCOL_IWARP);
+>   
 
 
