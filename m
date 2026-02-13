@@ -1,84 +1,78 @@
-Return-Path: <netdev+bounces-258599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCzkJzgIj2ltHQEAu9opvQ
-	(envelope-from <netdev+bounces-258599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:17:12 +0100
+	id KyRjCckJj2ngHQEAu9opvQ
+	(envelope-from <netdev+bounces-258600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:23:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6900135A2A
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:17:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFC1135B47
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 12:23:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65D80304A176
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:12:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2CC830078D1
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 11:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E861F03EF;
-	Fri, 13 Feb 2026 11:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB88A748F;
+	Fri, 13 Feb 2026 11:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ejhTv+SB"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="g9Vn0/s/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0428285058
-	for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 11:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6303EBF00;
+	Fri, 13 Feb 2026 11:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770981149; cv=none; b=bNYOWZTG+mLQt9A/yS38MVLWCTu6T6QeIyG7eSHSaHtjjO3N5YdWBBMYXbQqsBuQ/UUsmc84kvwGwzovYZnYHjih13YprbNZOenRj7LjbgUVkjF0pe2wFsFebEc0/PwqhMp4Y2bEQoDLx0YTOh4Z4HTx08xYYhtB6PJjaKFU2KA=
+	t=1770981829; cv=none; b=gtv5QZr8Xbt2nacX1CRBxXyaX/wD2iA3M0XyteCY8/pfjMHbfSOTY9XGgmliq64PoCCjvYTYpv8Yz/w9WQ9f0W95GWedkcfCixkut7QCugQfp/THqYOoMOabg/d/scCkGNAwl6bCJ+VNuw8avj/zsIQMzyHk/akeMfa4KoHcO7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770981149; c=relaxed/simple;
-	bh=Ev/ToI45invKmxKsmjv/nTAYHo0Moc+rLWviNdbLiR0=;
+	s=arc-20240116; t=1770981829; c=relaxed/simple;
+	bh=oJdk4rsPzXvqm8MPFXlGfOdBaLbte1BfisVEey6Z6dc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KFIa6cbjYjBYH9/Efs7gldpM8xfah5sQmfHVneUw/vLvWksujSoL9KdyEWUi2CM2MfahtSv5zK/O15a2bOAwFmGdF364wSH4Mzn1nj4Kb1elpJSRqSAQx8gF7lYBbk7gwC+yHjKpk9kREE1+K/HxDiywJqzvp0MFiq5MGhBH1Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ejhTv+SB; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b8f8f2106f1so103416466b.2
-        for <netdev@vger.kernel.org>; Fri, 13 Feb 2026 03:12:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1770981146; x=1771585946; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ev/ToI45invKmxKsmjv/nTAYHo0Moc+rLWviNdbLiR0=;
-        b=ejhTv+SBySYlKGQKXWflveRLaoCljDQr/nIO7zNAvuUVBfZUrbOjHafMEVTd9GHnfF
-         yacGOztzAzWLYWqT8t9jLfSFYiGuff9BZK/2oraWkKuTMeJWZupnC2NlZdOoDEcCQgPr
-         OiEeidw5EVYOIKJTVWRxR9XPeChedZPkdjad4RljuczTqJMNu4/Lqrx30U8isfmg4jm+
-         NqUf/hQPeSFC6h9QccLlrA1h5X5YC7BhbRWxcOVqDgXshXV5IbeT++HlzobwjUOTC1As
-         RbYTVV0QCFGZJpaza7uWrS/47pS+TJXEEESJp4METsLUvRGwTwSvBqwMTk7jJ+Z+t6Vj
-         EdVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770981146; x=1771585946;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ev/ToI45invKmxKsmjv/nTAYHo0Moc+rLWviNdbLiR0=;
-        b=pE/593+2+ZhGbfPfc+2iEbjE7b1n8c2Yfi308M/inSmQ1IIwMq64TY9/8ELSSlGRub
-         24DEpX3E909o3hhP5OAUVzFoII0HHfG3bjFkDPYv51oHZTFMe19zpaWiKzRdEwgL+4tQ
-         MPzbL0Kv6CZSAx35Q2M5qp6v/2b9a/wx9Gf8j9pywxfjT9fJ9/9D13x5H/eg87nxrgjI
-         haMGSqLagbR2NFHb/cP8dMYhDQUbIw0gh/Cml+hDFfnw3Say2QdCZ2oqR1qxTWwlsoup
-         x+xZiYoKT7ePatJlDyef66jVCucBh7FM6N4pXSQxBlnMDOv8pVfzEmoz/eembzGEBYGm
-         RGOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXaswdHll+2yrgKh0LibAekdQJMm4DbUZMS3a3yHkw89K7ga++x63/IK2tNpLIp53id7sfJaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzNczWsp7UXAxkzbM6KzL7hr+F/Kt1/8V/u4DGXWaEDxrpiOME
-	XWz3q2oThEc6nFgBpndtcZ6x8vvdsF4WWJFEEyo+T2L8CyPTI4bvQc8aPUd84R/352s=
-X-Gm-Gg: AZuq6aLN245cG0pZ23NoBrzTqj/6KT/MidCtoqJZQpC/ifR7w0DSOnykGMbuIG3oqWS
-	O6QA2dqrOxIJcFOBaqZtvQiV5ATuFxaPkzBGeXGsh6LViqSDShlhqrc34IcHTPfdR+NMxQ6eC4g
-	q+cmFxpkCid6K7RGBCVBNkjCRkS86MtFiWG9D/VZ0uR6KPv7cZ4nlwIFP1bF2gVHhdxEu3+dOTe
-	3BG0V4NI4vSmodie7sIVwIis4dO5LyMzka2WVpAhk+GPrcXomeSY0r19Qa5mBIzQWchxBrgsAnf
-	1EMlmFr6me5erBFEC2Ymxgibv0i9v+9K4Sd8QCxWM4qQSAFn4NZl19tFxNB7mTS8A0lBoAT6HGe
-	xUNvTH1vAeXHcD91eV30R9fUSc2bxp4TavRwamz9Pe5mtjzKkodw+VwT/1dMa4okjgou505Q/+T
-	soR0sY0oHXD6/h0u7heirJ4Vkf9fECK7YCAoFLO55EP+Gr1Uw2MlchdxRqLXQaW12KrhSBiPl9D
-	zho+1enyqeq6P39W1J9GRHNl9vdsXg2OMfw8IUQw9x82B2cKw==
-X-Received: by 2002:a17:906:6a21:b0:b8f:a853:add5 with SMTP id a640c23a62f3a-b8fb466c3dcmr84975466b.62.1770981146183;
-        Fri, 13 Feb 2026 03:12:26 -0800 (PST)
-Received: from ?IPV6:2a00:12d0:af5b:2f01:4042:c03:ce4d:a5a1? (2a00-12d0-af5b-2f01-4042-c03-ce4d-a5a1.ip.tng.de. [2a00:12d0:af5b:2f01:4042:c03:ce4d:a5a1])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8fbe407520sm3682466b.43.2026.02.13.03.12.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Feb 2026 03:12:25 -0800 (PST)
-Message-ID: <02459674-58f9-407c-b151-39374a6cf81a@suse.com>
-Date: Fri, 13 Feb 2026 12:12:25 +0100
+	 In-Reply-To:Content-Type; b=MvYiVHh4n2wTRWBnk9hFXU8j1c6b1dbGnXfkzBO8cEtAFynZ9WPFYQpwnOpag+JTcJ2XxR/97FiKkFh2hw1V1gcfvHNMLVvWNDqpwW05yz4Uq2DdW1i5PRo52mQy4N37nC3GxUNNO1pxlWnZH77P1jcpeiMyItjUa+6PLoSkdIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=g9Vn0/s/; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61D9MUjq311754;
+	Fri, 13 Feb 2026 11:23:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=mgZ4Ok
+	pQcTQA7VFHXs53msgZURDuFhV6mbkVp0Vihp8=; b=g9Vn0/s/pd0oM2CWK5nEeW
+	KLh8MHAEw7xU3cW3VU4boyB0K2nAGcyV0XR63/W7a9Rnx0KVa7vJy2MXjBVACYPl
+	4lw1kfjUNwCTibAce0eo92sZB/smhF7cWyZVDaqrEx9d0nQeNiExcnJl8Lsa29o1
+	QHVwZQyRzpk1dZflAKf7jOUSQIznVHeaaQeX0qBXUtFjSbCPKILgneUXcSgwtMN8
+	DMeSkmsUEWW3/vxY+FqsLD/1nyUVmbq0fdoE8/BNRMT/PH69KIX9kRwdIbwDe6np
+	p8q9b70hmmeUZ8/OoObcjTB2MgJLaodC6qS5N2f7ODj0zm+m1ZeTib1lky9TDDZw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696utnu4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Feb 2026 11:23:43 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61D94sZM012611;
+	Fri, 13 Feb 2026 11:23:37 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c6h7kpegm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Feb 2026 11:23:37 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61DBNZcD24576578
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Feb 2026 11:23:35 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8D0305805F;
+	Fri, 13 Feb 2026 11:23:35 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0A4A758043;
+	Fri, 13 Feb 2026 11:23:30 +0000 (GMT)
+Received: from [9.39.24.29] (unknown [9.39.24.29])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 13 Feb 2026 11:23:29 +0000 (GMT)
+Message-ID: <2d71bab3-161d-414e-90e3-0e408ca931c2@linux.ibm.com>
+Date: Fri, 13 Feb 2026 16:53:28 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,212 +80,186 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] xen-netback: reject zero-queue configuration from
- guest
-To: Ziyi Guo <n7l8m4@u.northwestern.edu>, Wei Liu <wei.liu@kernel.org>,
- Paul Durrant <paul@xen.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: "Andrew J . Bennieston" <andrew.bennieston@citrix.com>,
- xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260212224040.86674-1-n7l8m4@u.northwestern.edu>
+Subject: Re: [PATCH RFC net-next] net/smc: transition to RDMA core CQ pooling
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang
+ <wenjia@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        oliver.yang@linux.alibaba.com, pasic@linux.ibm.com
+References: <20260202094800.30373-1-alibuda@linux.alibaba.com>
+ <daefb72f-398e-489f-bdbc-db997ef9c5ae@linux.ibm.com>
+ <20260209075338.GA61095@j66a10360.sqa.eu95>
 Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <20260212224040.86674-1-n7l8m4@u.northwestern.edu>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------rmAWL2OMeeZDohi0r3FMp00n"
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+In-Reply-To: <20260209075338.GA61095@j66a10360.sqa.eu95>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=YZiwJgRf c=1 sm=1 tr=0 ts=698f09c0 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=sCxrbXXTP0iVI5IyWHIA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: YMBInZTsF0iReiqleGmzV9rtjq0lA3Ln
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEzMDA4NyBTYWx0ZWRfX2ZXZvS03WpgZ
+ xjlA6FSncLY4fquK3+Tx/ApJ/pwHcVYkjn4ZrbrQGzmHbC486ssaf5jIR3yD/K2T5+maZOjnGze
+ AXcxe983doBoUm1CE9lJQs/bqe+eRHBa6QLhsMz93ZAMBciKydSMUcEIPMVRFs+u9y754CREel4
+ zgO3/Ow501J4nMDUdYx4jn2w8XvY2CkmwGDB8inTRQd7bWx9/L3lFIi3vWLTWqG3bZ/y4nr75V6
+ 5aWcmk8QygTu6sKuUrVdV5BrQhNYbtTW1LZA7uEA+oy+Dg4iSS6Fkc0F2C6sS0lD547F0P1Y95A
+ vfDfNF3Ns8y3FyoGp2z8xOoqCJCB9Gbk2rqbtgBnoFmdtO6ak/l8Y3GQiAg6jIStDFwSf0NC/Dq
+ V+POv7vqUbxJCd/x0DfwSscyimZNTvKjTDVkQi8C3P0ch8EjJ5IrPhQZ6k8PZnFi4sECP65baeQ
+ 6XQAx8hv59H4J4yXGtA==
+X-Proofpoint-GUID: fH95bB4F1c2GTD7iNl3j9nufPkURUWjM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-13_02,2026-02-12_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 spamscore=0 impostorscore=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 adultscore=0 clxscore=1015 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602130087
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.85 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.71)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
-	MIME_UNKNOWN(0.10)[application/pgp-keys];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258599-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~,5:~];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	HAS_ATTACHMENT(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[jgross@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C6900135A2A
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258600-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 6CFC1135B47
 X-Rspamd-Action: no action
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------rmAWL2OMeeZDohi0r3FMp00n
-Content-Type: multipart/mixed; boundary="------------fzXF7bXgc7rK1nb40SukhLSf";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Ziyi Guo <n7l8m4@u.northwestern.edu>, Wei Liu <wei.liu@kernel.org>,
- Paul Durrant <paul@xen.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: "Andrew J . Bennieston" <andrew.bennieston@citrix.com>,
- xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-ID: <02459674-58f9-407c-b151-39374a6cf81a@suse.com>
-Subject: Re: [PATCH net] xen-netback: reject zero-queue configuration from
- guest
-References: <20260212224040.86674-1-n7l8m4@u.northwestern.edu>
-In-Reply-To: <20260212224040.86674-1-n7l8m4@u.northwestern.edu>
 
---------------fzXF7bXgc7rK1nb40SukhLSf
-Content-Type: multipart/mixed; boundary="------------oPkhdrcLI3DudRxu4wTLSAHY"
 
---------------oPkhdrcLI3DudRxu4wTLSAHY
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+On 09/02/26 1:23 pm, D. Wythe wrote:
+> On Fri, Feb 06, 2026 at 04:58:23PM +0530, Mahanta Jambigi wrote:
+>>
+>>
+>> On 02/02/26 3:18 pm, D. Wythe wrote:
+>>> The current SMC-R implementation relies on global per-device CQs
+>>> and manual polling within tasklets, which introduces severe
+>>> scalability bottlenecks due to global lock contention and tasklet
+>>> scheduling overhead, resulting in poor performance as concurrency
+>>> increases.
+>>>
+>>> Refactor the completion handling to utilize the ib_cqe API and
+>>> standard RDMA core CQ pooling. This transition provides several key
+>>> advantages:
+>>>
+>>> 1. Multi-CQ: Shift from a single shared per-device CQ to multiple
+>>> link-specific CQs via the CQ pool. This allows completion processing
+>>> to be parallelized across multiple CPU cores, effectively eliminating
+>>> the global CQ bottleneck.
+>>>
+>>> 2. Leverage DIM: Utilizing the standard CQ pool with IB_POLL_SOFTIRQ
+>>> enables Dynamic Interrupt Moderation from the RDMA core, optimizing
+>>> interrupt frequency and reducing CPU load under high pressure.
+>>>
+>>> 3. O(1) Context Retrieval: Replaces the expensive wr_id based lookup
+>>> logic (e.g., smc_wr_tx_find_pending_index) with direct context retrieval
+>>> using container_of() on the embedded ib_cqe.
+>>>
+>>> 4. Code Simplification: This refactoring results in a reduction of
+>>> ~150 lines of code. It removes redundant sequence tracking, complex lookup
+>>> helpers, and manual CQ management, significantly improving maintainability.
+>>>
+>>> Performance Test: redis-benchmark with max 32 connections per QP
+>>> Data format: Requests Per Second (RPS), Percentage in brackets
+>>> represents the gain/loss compared to TCP.
+>>>
+>>> | Clients | TCP      | SMC (original)      | SMC (cq_pool)       |
+>>> |---------|----------|---------------------|---------------------|
+>>> | c = 1   | 24449    | 31172  (+27%)       | 34039  (+39%)       |
+>>> | c = 2   | 46420    | 53216  (+14%)       | 64391  (+38%)       |
+>>> | c = 16  | 159673   | 83668  (-48%)  <--  | 216947 (+36%)       |
+>>> | c = 32  | 164956   | 97631  (-41%)  <--  | 249376 (+51%)       |
+>>> | c = 64  | 166322   | 118192 (-29%)  <--  | 249488 (+50%)       |
+>>> | c = 128 | 167700   | 121497 (-27%)  <--  | 249480 (+48%)       |
+>>> | c = 256 | 175021   | 146109 (-16%)  <--  | 240384 (+37%)       |
+>>> | c = 512 | 168987   | 101479 (-40%)  <--  | 226634 (+34%)       |
+>>>
+>>> The results demonstrate that this optimization effectively resolves the
+>>> scalability bottleneck, with RPS increasing by over 110% at c=64
+>>> compared to the original implementation.
+>>
+>> I applied your patch to the latest kernel(6.19-rc8) & saw below
+>> Performance results:
+>>
+>> 1) In my evaluation, I ran several *uperf* based workloads using a
+>> request/response (RR) pattern, and I observed performance *degradation*
+>> ranging from *4%* to *59%*, depending on the specific read/write sizes
+>> used. For example, with a TCP RR workload using 50 parallel clients
+>> (nprocs=50) sending a 200‑byte request and reading a 1000‑byte response
+>> over a 60‑second run, I measured approximately 59% degradation compared
+>> to SMC‑R original performance.
+>>
+> 
+> The only setting I changed was net.smc.smcr_max_conns_per_lgr = 32, all
+> other parameters were left at their default values. redis-benchmark is a
+> classic Request/Response (RR) workload, which contradicts your test
+> results. Since I'm unable to reproduce your results, it would be
+> very helpful if you could share the specific test configuration for my
+> analysis.
 
-T24gMTIuMDIuMjYgMjM6NDAsIFppeWkgR3VvIHdyb3RlOg0KPiBBIG1hbGljaW91cyBvciBi
-dWdneSBYZW4gZ3Vlc3QgY2FuIHdyaXRlICIwIiB0byB0aGUgeGVuYnVzIGtleQ0KPiAibXVs
-dGktcXVldWUtbnVtLXF1ZXVlcyIuIFRoZSBjb25uZWN0KCkgZnVuY3Rpb24gaW4gdGhlIGJh
-Y2tlbmQgb25seQ0KPiB2YWxpZGF0ZXMgdGhlIHVwcGVyIGJvdW5kIChyZXF1ZXN0ZWRfbnVt
-X3F1ZXVlcyA+IHhlbnZpZl9tYXhfcXVldWVzKQ0KPiBidXQgbm90IHplcm8sIGFsbG93aW5n
-IHJlcXVlc3RlZF9udW1fcXVldWVzPTAgdG8gcmVhY2gNCj4gdnphbGxvYyhhcnJheV9zaXpl
-KDAsIHNpemVvZihzdHJ1Y3QgeGVudmlmX3F1ZXVlKSkpLCB3aGljaCB0cmlnZ2Vycw0KPiBX
-QVJOX09OX09OQ0UoIXNpemUpIGluIF9fdm1hbGxvY19ub2RlX3JhbmdlKCkuDQo+IA0KPiBP
-biBzeXN0ZW1zIHdpdGggcGFuaWNfb25fd2Fybj0xLCB0aGlzIGFsbG93cyBhIGd1ZXN0LXRv
-LWhvc3QgZGVuaWFsDQo+IG9mIHNlcnZpY2UuDQo+IA0KPiBUaGUgWGVuIG5ldHdvcmsgaW50
-ZXJmYWNlIHNwZWNpZmljYXRpb24gcmVxdWlyZXMNCj4gdGhlIHF1ZXVlIGNvdW50IHRvIGJl
-ICJncmVhdGVyIHRoYW4gemVybyIuDQo+IA0KPiBBZGQgYSB6ZXJvIGNoZWNrIHRvIG1hdGNo
-IHRoZSB2YWxpZGF0aW9uIGFscmVhZHkgcHJlc2VudA0KPiBpbiB4ZW4tYmxrYmFjaywgd2hp
-Y2ggaGFzIGluY2x1ZGVkIHRoaXMNCj4gZ3VhcmQgc2luY2UgaXRzIG11bHRpLXF1ZXVlIHN1
-cHBvcnQgd2FzIGFkZGVkLg0KPiANCj4gRml4ZXM6IDhkM2Q1M2IzZTQzMyAoInhlbi1uZXRi
-YWNrOiBBZGQgc3VwcG9ydCBmb3IgbXVsdGlwbGUgcXVldWVzIikNCj4gU2lnbmVkLW9mZi1i
-eTogWml5aSBHdW8gPG43bDhtNEB1Lm5vcnRod2VzdGVybi5lZHU+DQoNClJldmlld2VkLWJ5
-OiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQoNCg0KSnVlcmdlbg0K
---------------oPkhdrcLI3DudRxu4wTLSAHY
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+I used a simple client–server setup connected via 25 Gb/s RoCE_Express2
+adapters on the same LAN(connection established via SMC-R v1). After
+running the commands shown below, I observed a performance degradation
+of up to 59%.
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+Server: smc_run uperf -s
+Client: smc_run uperf -m rr1c-200x1000-50.xml
 
-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
-kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
-=3DeeAB
------END PGP PUBLIC KEY BLOCK-----
+cat rr1c-200x1000-50.xml
 
---------------oPkhdrcLI3DudRxu4wTLSAHY--
+<?xml version="1.0"?>
+<profile name="TCP_RR">
+	<group nprocs="50">
+		<transaction iterations="1">
+			<flowop type="connect" options="remotehost=server_ip protocol=tcp
+tcp_nodelay" />
+		</transaction>
+		<transaction duration="60">
+			<flowop type="write" options="size=200"/>
+			<flowop type="read" options="size=1000"/>
+		</transaction>
+		<transaction iterations="1">
+			<flowop type="disconnect" />
+		</transaction>
+	</group>
+</profile>
 
---------------fzXF7bXgc7rK1nb40SukhLSf--
+I installed redis-server on the server machine & redis-benchmark on the
+client machine & I was able to establish the SMC-R using below commands.
+If you could help me with the exact commands you used to measure the
+redis-benchmark performance, I can try the same on my setup.
 
---------------rmAWL2OMeeZDohi0r3FMp00n
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmmPBxkFAwAAAAAACgkQsN6d1ii/Ey9i
-zQf+NoCNOcEARUKfM7WGvjBJICmF9LWnKvhG2fMAYCZ3gF3ybnoHStwJQ+ioMHEkirAye7g1vmnP
-TRQsqYFYW53t0VuEy9LsniZk7fapy7fGr36uOjMJg3+xyU4q9xt+VFKF8b4dKVi5itasrGmC6yKQ
-OM51/LLkoQBcMwj0BvyXmZrMIMrE5tSTO6EichMpEba3R7UyNKBSOZmOn8kRzo5cY9KIs4X5LZJs
-eFKSb1dTjZwcpR5P0Nhmsb16K8alSpLyrROO3srwc6is92yY/k4eggBCPekIt7dybWFv/cVLeCxV
-ptCCQ2s7NNh0hryMfq/CZQLGFoFeVImhq8GyuRuSCA==
-=G6ik
------END PGP SIGNATURE-----
-
---------------rmAWL2OMeeZDohi0r3FMp00n--
+Server: smc_run redis-server --port <port_num> --save "" --appendonly no
+  --protected-mode no --bind 0.0.0.0
+Client: smc_run redis-benchmark -h <server_ip> -p <port_num> -n 10000 -c
+50 -t ping_inline,ping_bulk -q
 
