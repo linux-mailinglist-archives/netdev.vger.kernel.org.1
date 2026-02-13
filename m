@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-258551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOOqERyWjmm8DAEAu9opvQ
-	(envelope-from <netdev+bounces-258551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:10:20 +0100
+	id SNPnOC+Wjmm8DAEAu9opvQ
+	(envelope-from <netdev+bounces-258552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:10:39 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B23C013290B
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:10:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65603132921
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 04:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 981F3302A195
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:10:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9AD8A309E790
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC721D95A3;
-	Fri, 13 Feb 2026 03:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AC6242D70;
+	Fri, 13 Feb 2026 03:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fQ3ZIBY7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFoBs30t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EA11A9F91;
-	Fri, 13 Feb 2026 03:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878442405EB;
+	Fri, 13 Feb 2026 03:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770952216; cv=none; b=g9MDk0d/BDDrjna6hUrWZ+Ws3vehpdyb1okn1Oa6DNsNFS0vX2mPnf3d9vHEdVy3ZPcq2jR3WpX4RI2OI0w7dR2YsfdL2dooarUEFQUqJxbqP1RCVIwVeBuHX1vUkw6ys5RWHBUuZeaQc39ejR3chavPp6pYKzCz987y4/mzEfE=
+	t=1770952217; cv=none; b=GH9oi1mIOf8FklHJZ0LFuGNVfaLCi3B6xSeSEtiGZv2Tqo5qiB4CvT8qRyfF956Szw3XYH6FvYAr0IP1b+rEmizwG4QnkQhFoeXcMAr1xYERsTbMIjGGbJ7SpI0iH7UqRLa8GNkJUlRgCnuTCECApxv384L0H5p07bLK+TB599o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770952216; c=relaxed/simple;
-	bh=SaYAiSTeda0ott75Qw/mkaQ0eig9Sx4NgiZBMmqTLJ4=;
+	s=arc-20240116; t=1770952217; c=relaxed/simple;
+	bh=tOSmKU/tWO8hSmTxU7u5BqcAYLt9sCF6Ja5kJM84B6w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lURsM540Y02OwKM4UAFLdZ7zJnTXuaqY3pvb1rP/i+AYKExo2xkRMHl/DEIw0O+v2uRhFvS0jyU6r9uZp+RQf743CbhHhAfnAEDjTiSLWWeEdkvo78VshG+qk3OZsPEAknA5b7rdazrwtu5RsdY979p0H+MceHuazLI+XlioJqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fQ3ZIBY7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 016B5C4CEF7;
-	Fri, 13 Feb 2026 03:10:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KblmAMBGeJ4O88l430NoZIRNU6hihKPuKbYjmT/y6rainvtvBQp9lYQ7OKlJWMX1KAv5qK6pKK898t9JT8lepyCResFzszIW6F+pFpdoJFC07GB2HRdG+xXmjhvJDhkj2BZC5KMcpZ2lszS+ae7FFFvkEdKMP6thGZ5UDJs1w2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFoBs30t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3165FC4CEF7;
+	Fri, 13 Feb 2026 03:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770952216;
-	bh=SaYAiSTeda0ott75Qw/mkaQ0eig9Sx4NgiZBMmqTLJ4=;
+	s=k20201202; t=1770952217;
+	bh=tOSmKU/tWO8hSmTxU7u5BqcAYLt9sCF6Ja5kJM84B6w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fQ3ZIBY7kwRlay/f9mzgwK9Itz+fs6pasAFohKdK0zoK805HlYzcZ6No36FGfBYR1
-	 7pDl2Hq93v8isMtMBL1dqg4cMfDoF55jci28YvsoUh0rUuhdPcrQbbRZDamUL1jjAV
-	 tUfuwn0CNyey7KCLoeWt6/oWZseOlzwQcDGZjAcpWAOqAVpvNhYIYTHV1+OewOZBmC
-	 JOKtcg2RfLVyEEjvJqirWnIZWY4hPSgp4CB3lY1/2u5KdzeuDxxh6MreKctcW7gFea
-	 bDZnL/VedniXmQsHRalVGT2dNo/TCF7UzyLItxJlLJRrl6Q+x1Mx6iyAhbzoST2QpC
-	 JLqe5Bjt7GD7g==
+	b=eFoBs30t1ztPVAua51pp5HT2zJ2YDwNhRK7FEopeWBl+hGyfiNppxUbt3JcoGoTPY
+	 CnWTBHE2g4L7/7Ym7Gz4lyb3tBldndfuWNV+LD7k6Npr09BG0/LHUH3pXMmnY+4JEM
+	 yw8xp1/agPtYXwoKJP9M/4dqV6vqM/yRP5epnzO6oNGna84AYr4wIQTlNtK+VjJpOV
+	 3TwAJBgZ6fBPYQYeAByL9DvH3LTfa17moOygg+jBxJFkYRrF+hUl9LEudQF/w7HEp+
+	 QHvUGTZzUMWXS0cq4E5U3oDBlP+oBM7rxh42IGRhueWnZVQj98n3Ui/PlDSq012kfj
+	 mXwYzrehpFkCQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 481483931093;
-	Fri, 13 Feb 2026 03:10:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 854F83931093;
+	Fri, 13 Feb 2026 03:10:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,21 +55,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: sparx5/lan969x: fix DWRR cost max to match
- hardware register width
+Subject: Re: [PATCH v3 0/3] net: mscc: ocelot: fix missing lock in
+ ocelot_port_xmit()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177095220983.1827286.14396517672847717184.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Feb 2026 03:10:09 +0000
-References: 
- <20260210-sparx5-fix-dwrr-cost-max-v1-1-58fbdbc25652@microchip.com>
-In-Reply-To: 
- <20260210-sparx5-fix-dwrr-cost-max-v1-1-58fbdbc25652@microchip.com>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, Steen.Hegelund@microchip.com,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+ <177095221132.1827286.321634089039592592.git-patchwork-notify@kernel.org>
+Date: Fri, 13 Feb 2026 03:10:11 +0000
+References: <20260208225602.1339325-1-n7l8m4@u.northwestern.edu>
+In-Reply-To: <20260208225602.1339325-1-n7l8m4@u.northwestern.edu>
+To: Ziyi Guo <n7l8m4@u.northwestern.edu>
+Cc: vladimir.oltean@nxp.com, claudiu.manoil@nxp.com,
+ alexandre.belloni@bootlin.com, UNGLinuxDriver@microchip.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -80,48 +79,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258552-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-258551-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B23C013290B
+X-Rspamd-Queue-Id: 65603132921
 X-Rspamd-Action: no action
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 10 Feb 2026 14:44:01 +0100 you wrote:
-> DWRR (Deficit Weighted Round Robin) scheduling distributes bandwidth
-> across traffic classes based on per-queue cost values, where lower cost
-> means higher bandwidth share.
+On Sun,  8 Feb 2026 22:55:59 +0000 you wrote:
+> ocelot_port_xmit() calls ocelot_can_inject() and
+> ocelot_port_inject_frame() without holding the injection group lock.
+> Both functions contain lockdep_assert_held() for the injection lock,
+> and the correct caller felix_port_deferred_xmit() properly acquires
+> the lock using ocelot_lock_inj_grp() before calling these functions.
 > 
-> The SPX5_DWRR_COST_MAX constant is 63 (6 bits) but the hardware
-> register field HSCH_DWRR_ENTRY_DWRR_COST is GENMASK(24, 20), only
-> 5 bits wide (max 31). This causes sparx5_weight_to_hw_cost() to
-> compute cost values that silently overflow via FIELD_PREP, resulting
-> in incorrect scheduling weights.
+> this v3 splits the fix into a 3-patch series to separate
+> refactoring from the behavioral change:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: sparx5/lan969x: fix DWRR cost max to match hardware register width
-    https://git.kernel.org/netdev/net/c/6c28aa8dfdf2
+  - [v3,1/3] net: mscc: ocelot: extract ocelot_xmit_timestamp() helper
+    https://git.kernel.org/netdev/net/c/29372f07f796
+  - [v3,2/3] net: mscc: ocelot: split xmit into FDMA and register injection paths
+    https://git.kernel.org/netdev/net/c/47f79b20e7fb
+  - [v3,3/3] net: mscc: ocelot: add missing lock protection in ocelot_port_xmit_inj()
+    https://git.kernel.org/netdev/net/c/026f6513c588
 
 You are awesome, thank you!
 -- 
