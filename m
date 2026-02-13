@@ -1,131 +1,143 @@
-Return-Path: <netdev+bounces-258533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258536-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMHKHeqNjmkADAEAu9opvQ
-	(envelope-from <netdev+bounces-258533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:35:22 +0100
+	id AG1xOoCQjmktDAEAu9opvQ
+	(envelope-from <netdev+bounces-258536-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:46:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F047813269F
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:35:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CFF132702
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 03:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C23A830470C0
-	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:34:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4D5A0302C0A5
+	for <lists+netdev@lfdr.de>; Fri, 13 Feb 2026 02:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AC9185B48;
-	Fri, 13 Feb 2026 02:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFAA23A9AD;
+	Fri, 13 Feb 2026 02:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QyBGwzWE"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nnxI8R8c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D826027453;
-	Fri, 13 Feb 2026 02:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C65E2206AC;
+	Fri, 13 Feb 2026 02:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770950089; cv=none; b=t7oHm4Ogzg1FtEwNBJzDZDRhZmNjrnv/ZRPUn5uoz13qfn5Nb2PlsciCQ7Yhn5bUvxF1+k4d2YFAzGeF5kwxbGyY1QYlWeY5nUMn6v2wi845fAIOfjMVevkfT7QJtY/h9HL5xAf9oltThLVr4RJAncktKTEnD7eMwvYuBuVEU10=
+	t=1770950779; cv=none; b=kvSZVpHi+NNE1lG3PobzD7fPsH8IpF9u51M1GiWehGPd2iEF6z/uy6VXsUbLtAJfeXSE2eaCvzgXC3/xgLc/qWM2d+JqgR7dSTI/DNe14lf1jZOhHmH6SyPYuaZi/51jr9NQU2VahG7GAYwCt8AXfN9ydodeKcWqNOZDeJFrl+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770950089; c=relaxed/simple;
-	bh=oJ2VLZkLPB+wC1zHMEWxk0UwVj+u7Y1pSmHc/1naJr4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GJwOs/rJnvmUkOs8nPdxkMNfuCDC0/RRGfvheTSp3HbektKhleOMHN1Pbx2YzuIhUxu+9benj0KXHtHfWLq7aVtpmiUTwC1trNoSpBYRfTrCN6za0cX5TfilB8kmxd09Xqj2jpMDHqFfASil1WSfqf6A15moZoGd/4hpmsiQUg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QyBGwzWE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD6A7C4CEF7;
-	Fri, 13 Feb 2026 02:34:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770950089;
-	bh=oJ2VLZkLPB+wC1zHMEWxk0UwVj+u7Y1pSmHc/1naJr4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QyBGwzWEgYRisP2hqQYWhJH3o7NIDqXLF+HSiqCGlhRl9xRvtDJo9lGTnr7Zzu/B1
-	 0xVdh+ErgxmZHzjBY1PIl63SCv5R3mMQHhwpGLAscKnbG5oH2uBW+YX34iZxLqbAN7
-	 2xXs0ZU+tE3oSgEvj+cnAlYyWSRhngIxl3jrmr8vul6je0NwG6OFJGXGELJshDDxox
-	 a28GfTYGzYNRL4MDMlYkGRb5AMXRJIn21SfaTd2NibOxBAOOWEBTER+Kjiwxnc8OQj
-	 HVQp+U1uVXk8VRVr8wi22226bZVh1t9hfrcFyyi+8BsDZb0lrYW00B2Z+ujb1rglyR
-	 SbT7DPY3h+uHQ==
-Date: Thu, 12 Feb 2026 18:34:47 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Shigeru Yoshida <syoshida@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
- syzbot+5a66db916cdde0dbcc1c@syzkaller.appspotmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH net] net: flow_offload: protect driver_block_list in
- flow_block_cb_setup_simple()
-Message-ID: <20260212183447.2d577f5b@kernel.org>
-In-Reply-To: <aYxw2CpxOKLh1wOz@strlen.de>
-References: <20260208110054.2525262-1-syoshida@redhat.com>
-	<aYxw2CpxOKLh1wOz@strlen.de>
+	s=arc-20240116; t=1770950779; c=relaxed/simple;
+	bh=/rCKtZu4uT+a7bxC/0dAzdSZHaz5X9coZL7XHuDvdb4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fgcBJrlj/4mSm68bCr6KupTcCom9fSnzJVa4pAuZ3xZOTrzTdvjEVejitTrSF0svYXRjaWy8/le2Eg+ql3ZG9k/GgUI9phtDaPD5TUlEJO5nfqH0RTCkuoueHNP3tZkrdo4UVAS6GABE4HrMNtzPLi3p/O+VUq0tGPndy87UH9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nnxI8R8c; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Gh
+	+bNkrUmdUhkkCUMlDs6LepAgG9fyimpNq3kzowW54=; b=nnxI8R8cPdFdUTi7qt
+	0RIatyw560LGGdNf0MYhXvyj/DWQoB053kxkgWrOce1TLWetAu55EHeW/1wPC/SA
+	00JeMkqHmws0zldDAz+6MQq4Y2PlwILwyrJANddscdJA3LADpZxfJhJM7kCbGg+N
+	bNzUN58o5q0I4gLPNN4r5gE44=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAnZNoNkI5pvhZSLw--.1343S2;
+	Fri, 13 Feb 2026 10:44:30 +0800 (CST)
+From: Feng Yang <yangfeng59949@163.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	posk@google.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	yangfeng59949@163.com
+Subject: [PATCH v6 bpf-next 0/2] Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
+Date: Fri, 13 Feb 2026 10:44:27 +0800
+Message-Id: <20260213024429.39972-1-yangfeng59949@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAnZNoNkI5pvhZSLw--.1343S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7GF47CF1xCw4fWw4kAw4xZwb_yoW8Jr43pF
+	4UXrZ5Kw1rtw1xJFs3Ga1fZryFga1fJw1Fgwn7Aw1YyF4UZryUJw1Ikw4agFsIvrZruw4U
+	X3WvqF17Ka40ya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRFoGQUUUUU=
+X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/xtbC0A8lnWmOkA8yKwAA3G
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-258536-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258533-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,163.com];
+	DKIM_TRACE(0.00)[163.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yangfeng59949@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,5a66db916cdde0dbcc1c];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F047813269F
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 83CFF132702
 X-Rspamd-Action: no action
 
-On Wed, 11 Feb 2026 13:06:48 +0100 Florian Westphal wrote:
-> Shigeru Yoshida <syoshida@redhat.com> wrote:
-> > syzbot reported a list_del corruption in flow_block_cb_setup_simple(). [0]
-> > 
-> > flow_block_cb_setup_simple() accesses the driver_block_list (e.g.,
-> > netdevsim's nsim_block_cb_list) without any synchronization. The
-> > nftables offload path calls into this function via ndo_setup_tc while
-> > holding the per-netns commit_mutex, but this mutex does not prevent
-> > concurrent access from tasks in different network namespaces that
-> > share the same driver_block_list, leading to list corruption:
-> > 
-> > - Task A (FLOW_BLOCK_BIND) calls list_add_tail() to insert a new
-> >   flow_block_cb into driver_block_list.
-> > 
-> > - Task B (FLOW_BLOCK_UNBIND) concurrently calls list_del() on another
-> >   flow_block_cb from the same list.  
-> 
-> Looking at the *upper layer*, I don't think it expected drivers to use
-> a single global list for this bit something that is scoped to the
-> net_device.
+From: Feng Yang <yangfeng@kylinos.cn>
 
-Maybe subjective but the fix seems a little off to me.
-Isn't flow_block_cb_setup_simple() just a "simple" implementation 
-for reuse in drivers locking in there doesn't really guarantee much?
+Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
 
-If we think netdevsim is doing something odd, let's make it work
-like real drivers.
+Changes in v6:
+- Modify the bpf_lwt_xmit_push_encap function and add selftests for it.
+  Thanks, Martin KaFai Lau.
+- Link to v5: https://lore.kernel.org/all/20260210090657.86977-1-yangfeng59949@163.com/
+Changes in v5:
+- Refer to the bpf_lwt_xmit_reroute function to configure the dst parameter.
+- Link to v4: https://lore.kernel.org/all/20260209015111.28144-1-yangfeng59949@163.com/
+Changes in v4:
+- add rcu lock
+- Link to v3: https://lore.kernel.org/all/20260206055113.63476-1-yangfeng59949@163.com/
+Changes in v3:
+- use dst_init
+- Link to v2: https://lore.kernel.org/all/20260205092227.126665-1-yangfeng59949@163.com/
+Changes in v2:
+- Link to v1: https://lore.kernel.org/all/20260127084520.13890-1-luyun_611@163.com/ 
 
-TBH I thought block setup was always under rtnl_lock.
+Feng Yang (2):
+  bpf: Fix the null pointer dereference issue in bpf_lwt_xmit_push_encap
+  selftests/bpf: Add selftests for the invocation of
+    bpf_lwt_xmit_push_encap
+
+ net/core/lwt_bpf.c                            |  7 +++++--
+ .../selftests/bpf/progs/verifier_lwt.c        | 20 +++++++++++++++++++
+ 2 files changed, 25 insertions(+), 2 deletions(-)
+
+-- 
+2.43.0
+
 
