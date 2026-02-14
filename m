@@ -1,65 +1,63 @@
-Return-Path: <netdev+bounces-258737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258738-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPPbFLrpkGkfdwEAu9opvQ
-	(envelope-from <netdev+bounces-258737-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:31:38 +0100
+	id cuQ1NGXpkGkfdwEAu9opvQ
+	(envelope-from <netdev+bounces-258738-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:30:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09BFF13D8CC
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:31:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4360B13D83D
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8AEBD30BD4F5
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:26:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 901B33086243
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4BE3126C6;
-	Sat, 14 Feb 2026 21:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882D0312805;
+	Sat, 14 Feb 2026 21:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l877/3MD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GBZtZrBv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAB42D979F;
-	Sat, 14 Feb 2026 21:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63167303A02;
+	Sat, 14 Feb 2026 21:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104372; cv=none; b=kBCMFnIrbzh059ldHyhH4bvymeyezmfKp3+IRFk2kTffJWuE5vwR8YTapFRVS+PbdtdxVT5Ups22ZJOCSlLQOutpqJSfks2e/CYVxfQmCfNwsIiue7RWqNFkBWR8mrnDc9PlvaHZFQFLguGO1jUEJdbVKe6lxbBcY9WcY5aFows=
+	t=1771104396; cv=none; b=JqRmZ04SCurLaA3N+EF4Ekx9pZ2QwtBqs/H7pM2V+0VrA4VqIN/Vd/SREeRyGt+YIWT3CYtZ+rX0OTfpO+n3ctYfrDmGusomHaXxymn3/XzMuqqZwtjxxURQ93rYGfa4mbjtoJOxcCsDqGWW8LCPa75S8GdWOLqzP6lAAWqHc7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104372; c=relaxed/simple;
-	bh=CXvypTIeB7bqrpF4E6BA7S6xZwcRORKDoYScrPumZ/E=;
+	s=arc-20240116; t=1771104396; c=relaxed/simple;
+	bh=I27tBtEkaPD93DNtj/GNfKg8FNNMdligpTzQU8cwlMY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=moceIzbVgSh5HGWtKjyTUfXgU88Zn3n+ZorGXNJ5uYm0Jk6U+UZmhr1gfJqxwEl3An6xzQF0ZYGoafZBn1+3WlrQU76Kl6pgxq53jNZkUl8aFiM03Uq4kBrU1Leevcp3PeSDWq2MDJNRfgEOAWoh3osj3pLhda/EzBv44wQ5mhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l877/3MD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23864C2BC86;
-	Sat, 14 Feb 2026 21:26:11 +0000 (UTC)
+	 MIME-Version; b=ZxfcKdB6WY60Iu5xa4foxVLuVZGtMlX+fYGMpa3ZxuJ3LvbZynQ57rmz5NNIhhskc07O1R6n+SXY4qRPjMuhDxQMHMju6LnRlgtiuR1B7E6EUAfBe/j/tdiEKIF7s5fUZ7qh+b9+vQnMABpN63iVtVs0fcjnDso/H15qgCm2K+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GBZtZrBv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FB2DC16AAE;
+	Sat, 14 Feb 2026 21:26:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104372;
-	bh=CXvypTIeB7bqrpF4E6BA7S6xZwcRORKDoYScrPumZ/E=;
+	s=k20201202; t=1771104396;
+	bh=I27tBtEkaPD93DNtj/GNfKg8FNNMdligpTzQU8cwlMY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l877/3MDoFO7OLo5HKiA+sEvvLapOziVDBJop/1aa0hGx1SskHE4P/1E1LnZH9ak2
-	 s9yubiX6U2v61Vc5YP4Tbr9d/JBXifVAMYN727H86qo/cNd5x4gBK3jRT5VlUbCJ3R
-	 WCX/Iyn37yRurOgbMGBpOxFZEivj3JOW8rK7CFOJsYjJZuHvVFn0t0ypbz3rptmZm2
-	 6GC33xJ7iCKDX96jNRqpRoynTDf/YWqztaZ9h+gBu3P4IqdeiLKRXcD6mfQkKoRyy8
-	 sZxTo1Zw28ZOjHBQfCoRHQ0HDMr6USXXgRWWO0a6Lgm4hY29Iyo+BRmSR1QcozSvnX
-	 dJEODxQuJs4vg==
+	b=GBZtZrBvRGmakA5yBHVLXn4Rz6Osc41+qPSm/C6skI/yjHjYXO6Fhq/yDqTPf64NL
+	 519zsR9agnTM5Dpms+W8+F/op6kb4N9mQApCC24FmsvfIHKJbKfxDUbTBWXkShU7U+
+	 CDcYj3uv64Puau+nFvvZH4qDSIFsdFuK6ouLG7DXcegHAPoWUA6VfNMo3k4k1rX3m3
+	 YRj2vKJ3GgbCcNfbqp+WMC0DDAXPRw5xWOwpNLKjeuc2EoSu+mRLP0Me8jTAveFY8k
+	 PlRmTsQpphoAKTMkhjyxhA+KbvZTL2ivuN1yW8fk+SpF0NuZxZ/XwrEAisM4Y3mdud
+	 h/+JjWQuzbZCw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Bobby Eshleman <bobbyeshleman@meta.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	vishnu.dasa@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-5.10] vmw_vsock: bypass false-positive Wnonnull warning with gcc-16
-Date: Sat, 14 Feb 2026 16:23:13 -0500
-Message-ID: <20260214212452.782265-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-5.15] ipv6: annotate data-races in ip6_multipath_hash_{policy,fields}()
+Date: Sat, 14 Feb 2026 16:23:25 -0500
+Message-ID: <20260214212452.782265-60-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -72,170 +70,178 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258737-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-258738-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 09BFF13D8CC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: 4360B13D83D
 X-Rspamd-Action: no action
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit e25dbf561e03c0c5e36228e3b8b784392819ce85 ]
+[ Upstream commit 03e9d91dd64e2f5ea632df5d59568d91757efc4d ]
 
-The gcc-16.0.1 snapshot produces a false-positive warning that turns
-into a build failure with CONFIG_WERROR:
+Add missing READ_ONCE() when reading sysctl values.
 
-In file included from arch/x86/include/asm/string.h:6,
-                 from net/vmw_vsock/vmci_transport.c:10:
-In function 'vmci_transport_packet_init',
-    inlined from '__vmci_transport_send_control_pkt.constprop' at net/vmw_vsock/vmci_transport.c:198:2:
-arch/x86/include/asm/string_32.h:150:25: error: argument 2 null where non-null expected because argument 3 is nonzero [-Werror=nonnull]
-  150 | #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
-  164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-      |                 ^~~~~~
-arch/x86/include/asm/string_32.h:150:25: note: in a call to built-in function '__builtin_memcpy'
-net/vmw_vsock/vmci_transport.c:164:17: note: in expansion of macro 'memcpy'
-  164 |                 memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-      |                 ^~~~~~
-
-This seems relatively harmless, and it so far the only instance of this
-warning I have found. The __vmci_transport_send_control_pkt function
-is called either with wait=NULL or with one of the type values that
-pass 'wait' into memcpy() here, but not from the same caller.
-
-Replacing the memcpy with a struct assignment is otherwise the same
-but avoids the warning.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Bryan Tan <bryan-bt.tan@broadcom.com>
-Link: https://patch.msgid.link/20260203163406.2636463-1-arnd@kernel.org
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20260115094141.3124990-5-edumazet@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis
+## Analysis of ipv6: annotate data-races in
+ip6_multipath_hash_{policy,fields}()
 
-### Commit Message Analysis
+### 1. COMMIT MESSAGE ANALYSIS
 
-This commit addresses a **false-positive compiler warning** with
-gcc-16.0.1 that becomes a **build failure** when `CONFIG_WERROR` is
-enabled. The fix replaces a `memcpy()` call with a direct struct
-assignment, which is semantically equivalent but avoids triggering the
-`-Wnonnull` warning.
+The commit is authored by Eric Dumazet, a well-known and prolific
+networking subsystem maintainer at Google. The subject explicitly says
+"annotate data-races," which is a common pattern for KCSAN (Kernel
+Concurrency Sanitizer) data race fixes. The commit adds `READ_ONCE()`
+annotations when reading sysctl values that can be concurrently modified
+by userspace.
 
-### Code Change Analysis
+Reviewed by Simon Horman (another senior networking maintainer) and
+committed by Jakub Kicinski (networking subsystem maintainer). This is a
+high-trust chain.
 
-The change is extremely minimal — a single line change:
+### 2. CODE CHANGE ANALYSIS
+
+The change is extremely minimal - exactly 2 lines changed in a single
+header file:
+
 ```c
-- memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-+ pkt->u.wait = *wait;
+// Before:
+return net->ipv6.sysctl.multipath_hash_policy;
+return net->ipv6.sysctl.multipath_hash_fields;
+
+// After:
+return READ_ONCE(net->ipv6.sysctl.multipath_hash_policy);
+return READ_ONCE(net->ipv6.sysctl.multipath_hash_fields);
 ```
 
-This is a purely mechanical transformation. A struct assignment and a
-`memcpy` of the same struct size produce identical behavior. The
-compiler generates equivalent code. The only difference is that the
-struct assignment form doesn't trigger gcc-16's `-Wnonnull` analysis,
-which was producing a false positive by analyzing the `memcpy` call
-without considering that the `wait` parameter is only NULL for packet
-types that don't reach this code path.
+**What's happening:** These two inline functions read sysctl values
+(`multipath_hash_policy` and `multipath_hash_fields`) from the network
+namespace's sysctl structure. These values can be modified at any time
+by userspace through `/proc/sys/net/ipv6/...`. Without `READ_ONCE()`,
+the compiler is free to:
+- Load the value multiple times (store-tearing)
+- Optimize/reorder the read in unexpected ways
+- Cause inconsistent behavior if the value changes mid-function
 
-### Classification: Build Fix
+This is a classic data race: a sysctl writer (from userspace) and a
+packet processing reader (in softirq/RCU context) access the same memory
+without synchronization. `READ_ONCE()` prevents compiler-induced issues
+and documents the intentional lock-free access pattern.
 
-This is a **build fix** — one of the explicitly allowed categories for
-stable backports. With `CONFIG_WERROR` enabled (which is the default in
-many distribution kernel configs and increasingly common), this warning
-becomes a hard build error. Users building with gcc-16 and
-`CONFIG_WERROR` would be unable to compile the kernel.
+### 3. CLASSIFICATION
 
-### Risk Assessment
+This is a **data race fix**, falling under category #3 (RACE CONDITIONS)
+from the bug patterns. While the practical consequences of this
+particular race may be minor (the worst case is likely reading a
+partially-updated or stale value for hash policy/fields), the fix is:
 
-- **Risk: Extremely low.** The change is a 1:1 semantic equivalent.
-  `pkt->u.wait = *wait` does exactly what `memcpy(&pkt->u.wait, wait,
-  sizeof(pkt->u.wait))` does — it copies the struct contents. There is
-  zero behavioral change.
-- **Scope: One line in one file.** Maximally contained.
-- **Testing: Well-reviewed.** Has three `Reviewed-by` tags from relevant
-  maintainers (Bobby Eshleman, Stefano Garzarella, Bryan Tan).
+- Standard practice in the networking stack (Eric Dumazet has done
+  hundreds of these)
+- Prevents KCSAN warnings that indicate real concurrent access
+- Prevents potential compiler optimizations that could cause subtle bugs
+- Part of the kernel's correctness guarantees
 
-### Dependency Check
+### 4. SCOPE AND RISK ASSESSMENT
 
-This commit has no dependencies on other patches. The code being
-modified (`vmci_transport_packet_init`) has existed for a long time in
-the stable trees.
+- **Lines changed:** 2 (extremely minimal)
+- **Files touched:** 1 header file
+- **Complexity:** Trivial - `READ_ONCE()` is a well-understood macro
+- **Risk of regression:** Essentially zero. `READ_ONCE()` is a volatile
+  read barrier that cannot change functional behavior. It only
+  constrains the compiler.
+- **Subsystem:** IPv6 networking (core, affects everyone using IPv6
+  multipath routing)
 
-### User Impact
+### 5. USER IMPACT
 
-- Users building the kernel with gcc-16 and `CONFIG_WERROR` will hit a
-  build failure without this fix.
-- gcc-16 is a snapshot/development compiler now, but will become the
-  standard gcc version in distributions. As distributions adopt gcc-16,
-  this will become a real issue for stable kernel users.
-- Build fixes are critical for the usability of stable kernels.
+- Affects anyone using IPv6 multipath routing with hash policy or hash
+  fields sysctls
+- The data race could theoretically cause incorrect hash computation
+  leading to suboptimal load balancing, though the practical impact is
+  low
+- KCSAN reports these as warnings, which clutters logs and may mask
+  other real issues
 
-### Stability Assessment
+### 6. STABILITY INDICATORS
 
-- The change is trivially correct — struct assignment and memcpy of a
-  struct are equivalent.
-- Multiple experienced reviewers have confirmed correctness.
-- Zero risk of runtime regression.
+- Reviewed by Simon Horman
+- Author is Eric Dumazet (top networking contributor)
+- Committed by Jakub Kicinski (networking maintainer)
+- This is a well-established pattern - dozens of identical `READ_ONCE()`
+  annotation patches have been backported to stable
 
-### Conclusion
+### 7. DEPENDENCY CHECK
 
-This is a textbook stable backport candidate: a minimal, zero-risk build
-fix that prevents compilation failure with newer compiler versions. It
-falls squarely into the "build fixes that prevent compilation" exception
-category. The change is semantically identical to the original code and
-has been well-reviewed.
+No dependencies. `READ_ONCE()` has existed in the kernel for many years.
+The functions `ip6_multipath_hash_policy()` and
+`ip6_multipath_hash_fields()` exist in all recent stable trees. This
+patch applies trivially.
+
+### Decision
+
+This is a textbook data race annotation fix: 2-line change, zero
+regression risk, fixes a real (if minor) concurrency bug, authored and
+reviewed by top networking maintainers. These
+`READ_ONCE()`/`WRITE_ONCE()` annotations for sysctl values are routinely
+backported to stable trees. The fix is small, surgical, and meets all
+stable kernel criteria.
 
 **YES**
 
- net/vmw_vsock/vmci_transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/ipv6.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-index 7eccd6708d664..aca3132689cf1 100644
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -161,7 +161,7 @@ vmci_transport_packet_init(struct vmci_transport_packet *pkt,
- 
- 	case VMCI_TRANSPORT_PACKET_TYPE_WAITING_READ:
- 	case VMCI_TRANSPORT_PACKET_TYPE_WAITING_WRITE:
--		memcpy(&pkt->u.wait, wait, sizeof(pkt->u.wait));
-+		pkt->u.wait = *wait;
- 		break;
- 
- 	case VMCI_TRANSPORT_PACKET_TYPE_REQUEST2:
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 74fbf1ad8065a..a0407b9f510ad 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -1010,11 +1010,11 @@ static inline int ip6_default_np_autolabel(struct net *net)
+ #if IS_ENABLED(CONFIG_IPV6)
+ static inline int ip6_multipath_hash_policy(const struct net *net)
+ {
+-	return net->ipv6.sysctl.multipath_hash_policy;
++	return READ_ONCE(net->ipv6.sysctl.multipath_hash_policy);
+ }
+ static inline u32 ip6_multipath_hash_fields(const struct net *net)
+ {
+-	return net->ipv6.sysctl.multipath_hash_fields;
++	return READ_ONCE(net->ipv6.sysctl.multipath_hash_fields);
+ }
+ #else
+ static inline int ip6_multipath_hash_policy(const struct net *net)
 -- 
 2.51.0
 
