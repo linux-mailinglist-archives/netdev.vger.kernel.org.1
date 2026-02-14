@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-258735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJq5MGXpkGkOdwEAu9opvQ
-	(envelope-from <netdev+bounces-258735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:30:13 +0100
+	id eFWpFQvpkGkadwEAu9opvQ
+	(envelope-from <netdev+bounces-258736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:28:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E70E13D83E
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:30:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE2EC13D71C
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 545B130A85E6
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C61D83034C81
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689B930BB81;
-	Sat, 14 Feb 2026 21:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30CD311973;
+	Sat, 14 Feb 2026 21:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLtCwVfS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJ7MWlua"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CDA30B538;
-	Sat, 14 Feb 2026 21:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF17A142E83;
+	Sat, 14 Feb 2026 21:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104353; cv=none; b=mC+YwnztZI5U6su0BFKxCN67U7MFbre76oKBBOydXBNgtSHS+hIVFB390KwAvPCVjanh71ReFJRdjbgbbjcOd78xEjLon9BAaOgXXMDqRoDExunBB99QFoPvCt46qzU/0u6FLg9R7sZmN2RtPV1gPmSEPMjhTHO9rHWrXt1LrjQ=
+	t=1771104370; cv=none; b=IkjXULV2eKkD3NlEoqMRqMI1v3zbSnoG4/TNsayx06sGCLE6wQGuc2S+W/IDJd0pdGx5ubDzMbV/9dPysZcmCvO+Pjp9bIlfcWfTXOLXi+QpAGG6JmJyn6+DkpbkM1WkqPI2qDJURvcODraVDpo67J9w0LsuzSCrdvE6Cofs0/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104353; c=relaxed/simple;
-	bh=a6AFDtak2ZeymRim/dSLlx+Pr0RgsP92jVYL9T3nWmA=;
+	s=arc-20240116; t=1771104370; c=relaxed/simple;
+	bh=Onzrktd5vADawuAhphT9wgldwaxCtyshJhJuIApQSE0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UTTmZSBf9Dz+74uD7nT3EYjftxoValLxhYlx8av79qHaTvJiqM2VCYHvGvY3KoJyCk5CKZDjirXE5H0QPu3HtCW3gBsLbtJewGWQdlDySjpAYAOfLwfcHu9YjUjaIQOLUuT6xvAR/2DDewmEvvJEQwlbI3JXwM2iOdTgPLqT5Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLtCwVfS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 409F2C16AAE;
-	Sat, 14 Feb 2026 21:25:52 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qzvW48jT7U3ON1RMcp/UtEc0USTeEr/MQ+ITasB3bXcpvvOhLJlIFKSvEMMccHQSL3YxddDiG4LmaaYxOeYhsgtxwBMSaWfR01c3rQSUI8r0UA4yKt5SP916Sxzb/y1DhwPGfbrWmIza7cS1/8VqHEXfpGcJxquhU7Dw7EtiDw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJ7MWlua; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D46EC19422;
+	Sat, 14 Feb 2026 21:26:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104353;
-	bh=a6AFDtak2ZeymRim/dSLlx+Pr0RgsP92jVYL9T3nWmA=;
+	s=k20201202; t=1771104370;
+	bh=Onzrktd5vADawuAhphT9wgldwaxCtyshJhJuIApQSE0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DLtCwVfSHG5bKyYvX8hsUlHsTmXFEyzIZ2TBY8YiJJQDpUFLklmgHZHJ+FIONJxQi
-	 GESr4B4DIalRK3Bkiu+OKeG3Qb4zag7GiH83VqckX+kPmZkt2AFYVUGtixMhSY6FmF
-	 aDNueaNqL+/tGXyI55b386GxlpmXfbi0IQjNZoLDNI8Q63zKMzb5noeP8dtVnzc9WD
-	 EqL7E/6xGPXTFniyjErn9tp9PGu4YY/xoZXbWrmw84G6p3QHNsRcVpIybfRoaBzvnW
-	 RpysaJycJ8qCtbok7b3myz0rjcLpjAUQnVhvMbipA7UeQRwRsqbyCpUc7fasVgqtbM
-	 wD4xRv3WpB/Jw==
+	b=qJ7MWluadm7eO3wk+0sTI2LsjsK++N8ImUv46D4mvzYynoXfU7UMCfFs5ssFVSzQw
+	 19wa39357DMwONxE2y1tVpi1aZZ9lR//gcssw7k0C0GvqHss8GxUablZKZpxBUtOuU
+	 M+S8CZhkcguQwlwIKUIbiSGrVU6QhLK+ot/TKsHX2L32isttpkFv3Egn0h4xNFu+C6
+	 fW4Iq3OjVY+apm98dH5SuGk3sSq6BtZ1I/Zz8AuSOnLEHEl5iOoisuleQfwcTc0bh5
+	 Zdh5ATjcX3l29beM2L6E06GcK9kPEmVoDij9rrRhHEisyI+5syJwNMUbZCGCM4B/y+
+	 0Qvl7IfnvOmfg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
+Cc: Geetha sowjanya <gakula@marvell.com>,
 	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	dsahern@kernel.org,
+	sgoutham@marvell.com,
+	lcherian@marvell.com,
+	jerinj@marvell.com,
+	hkelam@marvell.com,
+	sbhatta@marvell.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-5.15] ipv6: exthdrs: annotate data-race over multiple sysctl
-Date: Sat, 14 Feb 2026 16:22:59 -0500
-Message-ID: <20260214212452.782265-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-5.10] octeontx2-af: Workaround SQM/PSE stalls by disabling sticky
+Date: Sat, 14 Feb 2026 16:23:12 -0500
+Message-ID: <20260214212452.782265-47-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -66,209 +69,130 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258735-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258736-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E70E13D83E
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: DE2EC13D71C
 X-Rspamd-Action: no action
 
-From: Eric Dumazet <edumazet@google.com>
+From: Geetha sowjanya <gakula@marvell.com>
 
-[ Upstream commit 978b67d28358b0b4eacfa94453d1ad4e09b123ad ]
+[ Upstream commit 70e9a5760abfb6338d63994d4de6b0778ec795d6 ]
 
-Following four sysctls can change under us, add missing READ_ONCE().
+NIX SQ manager sticky mode is known to cause stalls when multiple SQs
+share an SMQ and transmit concurrently. Additionally, PSE may deadlock
+on transitions between sticky and non-sticky transmissions. There is
+also a credit drop issue observed when certain condition clocks are
+gated.
 
-- ipv6.sysctl.max_dst_opts_len
-- ipv6.sysctl.max_dst_opts_cnt
-- ipv6.sysctl.max_hbh_opts_len
-- ipv6.sysctl.max_hbh_opts_cnt
+work around these hardware errata by:
+- Disabling SQM sticky operation:
+  - Clear TM6 (bit 15)
+  - Clear TM11 (bit 14)
+- Disabling sticky → non-sticky transition path that can deadlock PSE:
+  - Clear TM5 (bit 23)
+- Preventing credit drops by keeping the control-flow clock enabled:
+  - Set TM9 (bit 21)
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+These changes are applied via NIX_AF_SQM_DBG_CTL_STATUS. With this
+configuration the SQM/PSE maintain forward progress under load without
+credit loss, at the cost of disabling sticky optimizations.
+
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20260115094141.3124990-8-edumazet@google.com
+Link: https://patch.msgid.link/20260127125147.1642-1-gakula@marvell.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Analysis of commit: "ipv6: exthdrs: annotate data-race over multiple
-sysctl"
+The register definition exists in the codebase, and the code modifying
+it exists. This is a self-contained change that modifies existing
+initialization code — no new dependencies needed.
 
-### 1. COMMIT MESSAGE ANALYSIS
+### 8. Summary
 
-The commit message is straightforward: it adds `READ_ONCE()` annotations
-to four sysctl variables that can be modified concurrently from
-userspace while being read in the packet processing path. The author is
-Eric Dumazet, a prolific and highly respected networking maintainer at
-Google, who frequently contributes data-race annotations and fixes.
-Reviewed by Simon Horman, another well-known networking reviewer.
+**What it fixes**: Hardware errata causing network stalls, PSE deadlock,
+and credit drops on OcteonTX2 hardware under concurrent transmission
+load.
 
-The four sysctls affected:
-- `ipv6.sysctl.max_dst_opts_len`
-- `ipv6.sysctl.max_dst_opts_cnt`
-- `ipv6.sysctl.max_hbh_opts_len`
-- `ipv6.sysctl.max_hbh_opts_cnt`
+**Why it matters for stable**: Users running OcteonTX2 hardware on
+stable kernels will experience these hardware bugs (stalls, deadlocks,
+packet loss) without this workaround. These are reliability/availability
+issues for networking hardware commonly used in production.
 
-### 2. CODE CHANGE ANALYSIS
+**Meets stable rules**:
+- Obviously correct: Simple register bit manipulation with clear
+  documentation
+- Fixes real bugs: Hardware stalls, deadlocks, and credit drops
+- Small and contained: Single file, ~10 lines of actual change
+- No new features: Hardware errata workaround only
+- Reviewed by networking maintainers
 
-The changes are minimal and mechanical - wrapping four sysctl reads with
-`READ_ONCE()`:
-
-1. **`ipv6_destopt_rcv()`** (line ~317):
-   `net->ipv6.sysctl.max_dst_opts_len` →
-   `READ_ONCE(net->ipv6.sysctl.max_dst_opts_len)`
-2. **`ipv6_destopt_rcv()`** (line ~326):
-   `net->ipv6.sysctl.max_dst_opts_cnt` →
-   `READ_ONCE(net->ipv6.sysctl.max_dst_opts_cnt)`
-3. **`ipv6_parse_hopopts()`** (line ~1053):
-   `net->ipv6.sysctl.max_hbh_opts_len` →
-   `READ_ONCE(net->ipv6.sysctl.max_hbh_opts_len)`
-4. **`ipv6_parse_hopopts()`** (line ~1056):
-   `net->ipv6.sysctl.max_hbh_opts_cnt` →
-   `READ_ONCE(net->ipv6.sysctl.max_hbh_opts_cnt)`
-
-These are in the IPv6 extension header packet receive path - hot path
-code that processes every incoming IPv6 packet with destination options
-or hop-by-hop options. The sysctl values can be changed from userspace
-at any time via `/proc/sys/net/ipv6/`, creating a data race.
-
-### 3. BUG MECHANISM
-
-Without `READ_ONCE()`, the compiler is free to:
-- Re-read the value multiple times (store tearing), potentially getting
-  different values in the same function
-- Optimize based on assumptions about the value not changing
-
-This is a real data race detectable by KCSAN (Kernel Concurrency
-Sanitizer). While the practical consequences of this particular race are
-relatively mild (the comparison values might be slightly stale or torn),
-the race is real and in a networking hot path.
-
-### 4. CLASSIFICATION
-
-This is a **data-race fix** — category 3 (Race Conditions) from the
-analysis framework. `READ_ONCE()`/`WRITE_ONCE()` annotations are a
-common pattern for KCSAN-detected data races and are regularly
-backported to stable.
-
-### 5. SCOPE AND RISK ASSESSMENT
-
-- **Lines changed**: ~8 lines across one file
-- **Files touched**: 1 (`net/ipv6/exthdrs.c`)
-- **Risk**: Extremely low. `READ_ONCE()` is a pure compiler annotation
-  that generates identical or near-identical machine code on most
-  architectures. It cannot introduce regressions.
-- **Subsystem**: IPv6 networking — core infrastructure used by virtually
-  all systems
-
-### 6. USER IMPACT
-
-- **Who is affected**: Any system processing IPv6 packets with extension
-  headers where sysctl values might be modified concurrently
-- **Severity**: Low to medium — the race could theoretically cause
-  inconsistent enforcement of the max length/count limits, but more
-  importantly it silences KCSAN reports and ensures correct compiler
-  behavior
-- **In the networking hot path**: These functions process packets, so
-  correctness matters
-
-### 7. STABILITY INDICATORS
-
-- **Author**: Eric Dumazet (Google, top networking contributor) — very
-  high trust
-- **Reviewer**: Simon Horman — respected networking reviewer
-- **Pattern**: This is part of a series (patch 8 of a set) of data-race
-  annotations, which is a well-established pattern in the networking
-  subsystem
-
-### 8. DEPENDENCY CHECK
-
-This commit is self-contained. `READ_ONCE()` is a basic kernel primitive
-available in all stable trees. The sysctl variables being annotated have
-existed for a long time. No dependencies on other patches.
-
-### 9. VERDICT
-
-This is a small, surgical, zero-risk fix for a real data race in the
-IPv6 networking path. It follows the well-established pattern of
-`READ_ONCE()` annotations that Eric Dumazet has been systematically
-adding across the networking stack. These annotations are routinely
-backported to stable trees. The fix is obviously correct, has
-essentially zero regression risk, and addresses a real concurrency issue
-in core networking code.
+**Risk**: Minimal. Only affects OcteonTX2 hardware initialization. The
+trade-off (disabling sticky optimizations) is explicitly acknowledged
+and accepted.
 
 **YES**
 
- net/ipv6/exthdrs.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index a23eb8734e151..54088fa0c09d0 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -314,7 +314,7 @@ static int ipv6_destopt_rcv(struct sk_buff *skb)
- 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 2f485a930edd1..49f7ff5eddfc8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -4938,12 +4938,18 @@ static int rvu_nix_block_init(struct rvu *rvu, struct nix_hw *nix_hw)
+ 	/* Set chan/link to backpressure TL3 instead of TL2 */
+ 	rvu_write64(rvu, blkaddr, NIX_AF_PSE_CHANNEL_LEVEL, 0x01);
  
- 	extlen = (skb_transport_header(skb)[1] + 1) << 3;
--	if (extlen > net->ipv6.sysctl.max_dst_opts_len)
-+	if (extlen > READ_ONCE(net->ipv6.sysctl.max_dst_opts_len))
- 		goto fail_and_free;
+-	/* Disable SQ manager's sticky mode operation (set TM6 = 0)
++	/* Disable SQ manager's sticky mode operation (set TM6 = 0, TM11 = 0)
+ 	 * This sticky mode is known to cause SQ stalls when multiple
+-	 * SQs are mapped to same SMQ and transmitting pkts at a time.
++	 * SQs are mapped to same SMQ and transmitting pkts simultaneously.
++	 * NIX PSE may deadlock when there are any sticky to non-sticky
++	 * transmission. Hence disable it (TM5 = 0).
+ 	 */
+ 	cfg = rvu_read64(rvu, blkaddr, NIX_AF_SQM_DBG_CTL_STATUS);
+-	cfg &= ~BIT_ULL(15);
++	cfg &= ~(BIT_ULL(15) | BIT_ULL(14) | BIT_ULL(23));
++	/* NIX may drop credits when condition clocks are turned off.
++	 * Hence enable control flow clk (set TM9 = 1).
++	 */
++	cfg |= BIT_ULL(21);
+ 	rvu_write64(rvu, blkaddr, NIX_AF_SQM_DBG_CTL_STATUS, cfg);
  
- 	opt->lastopt = opt->dst1 = skb_network_header_len(skb);
-@@ -322,7 +322,8 @@ static int ipv6_destopt_rcv(struct sk_buff *skb)
- 	dstbuf = opt->dst1;
- #endif
- 
--	if (ip6_parse_tlv(false, skb, net->ipv6.sysctl.max_dst_opts_cnt)) {
-+	if (ip6_parse_tlv(false, skb,
-+			  READ_ONCE(net->ipv6.sysctl.max_dst_opts_cnt))) {
- 		skb->transport_header += extlen;
- 		opt = IP6CB(skb);
- #if IS_ENABLED(CONFIG_IPV6_MIP6)
-@@ -1049,11 +1050,12 @@ int ipv6_parse_hopopts(struct sk_buff *skb)
- 	}
- 
- 	extlen = (skb_transport_header(skb)[1] + 1) << 3;
--	if (extlen > net->ipv6.sysctl.max_hbh_opts_len)
-+	if (extlen > READ_ONCE(net->ipv6.sysctl.max_hbh_opts_len))
- 		goto fail_and_free;
- 
- 	opt->flags |= IP6SKB_HOPBYHOP;
--	if (ip6_parse_tlv(true, skb, net->ipv6.sysctl.max_hbh_opts_cnt)) {
-+	if (ip6_parse_tlv(true, skb,
-+			  READ_ONCE(net->ipv6.sysctl.max_hbh_opts_cnt))) {
- 		skb->transport_header += extlen;
- 		opt = IP6CB(skb);
- 		opt->nhoff = sizeof(struct ipv6hdr);
+ 	ltdefs = rvu->kpu.lt_def;
 -- 
 2.51.0
 
