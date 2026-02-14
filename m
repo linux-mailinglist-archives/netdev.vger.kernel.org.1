@@ -1,135 +1,164 @@
-Return-Path: <netdev+bounces-258726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CA8gACTRkGljdAEAu9opvQ
-	(envelope-from <netdev+bounces-258726-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 20:46:44 +0100
+	id d3P5MmvSkGl3dAEAu9opvQ
+	(envelope-from <netdev+bounces-258727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 20:52:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56E4013D128
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 20:46:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F1713D158
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 20:52:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD6DE301D326
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:46:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BB9BD30160E3
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 19:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1321DDC37;
-	Sat, 14 Feb 2026 19:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CF42FCC06;
+	Sat, 14 Feb 2026 19:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="I7pYEOQW"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="XbUQP6dZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A1A7404E
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 19:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBF71D5ABA;
+	Sat, 14 Feb 2026 19:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771098401; cv=none; b=qL74Ktq+HFjjdnm+zoiTp+o0aqaQT/kEWLwe0wAO7XvgLg29vrCw4qjmRGm9kuqC0WtEjFo8OAluT1ccz8MrNWHLrQK5BruCE1twdN+rVYOFay5TcshGj4oYCNPIxfef4RGGH2jr973isIxrIZpRLu70GWdp95GUrMh5XQXuXF4=
+	t=1771098728; cv=none; b=VOBy2CAqvKB1UkxneEPVNWqrd0edwcphulsgvWHNavFVeXlCzuP4r/5TcVPVPsF9dH5PNYbDcGZ11q/RJlLvN4fSaMFkt8mvKNWVL6I0jfdEe25DtCQ14x6+bqKO5v0WZQ1eZQqJy7QYwI711dHngyjrx/DvXfEUBwXP9z/qyJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771098401; c=relaxed/simple;
-	bh=SKYYQ//N15zwdoL9kLzGlNg53NWrdPo0WnHUwUjm7g0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ldlUjtG9YI3Z/F8p+K0PNbnMDc/k1P5Wkhl8FiuM53PD9KLu8VB4afhGi1BIs/iTatlBQ5zgLal9aDODJ+aQg1DlDkVQRfb6AM0HL9DjQm5ZzwRifLI0W460vkwN6Vvccdlj5KqP09ZI2//F9thQLA7+Q9KO1LoQlPv4hyc2wvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=I7pYEOQW; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (211.4.31.150.dy.iij4u.or.jp [150.31.4.211])
+	s=arc-20240116; t=1771098728; c=relaxed/simple;
+	bh=O5oUb9SrEAeUxPySAQ+ao3ohEjafJkj+zkJqWx2/KM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uBRQV6mv4APAJi6sA60lCe/L9jwyZ9FHbxLfHKdWuhZPtyH7H2alAIovnWkIs98b+aRwArryzJnatgoCD1B+4tFdc22k2oOgWPgeJP57lgP5ciVYHVFHduOLc6qwaz0zM1BDSyuIeXISQ831Al6cYC3EP11oPmTXyFOTIRIVmtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=XbUQP6dZ; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.143] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
 	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61EJkckv078694
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 15 Feb 2026 04:46:38 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=dW14vW0bCAsIh8E1yS8gm9g3TbcmJP4FXwB0iz6Id9I=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1771098398; v=1;
-        b=I7pYEOQWqHvgSx+cNQls6fJP+/R6yBzAd3ZiTF8Gw0SfdKmtaqIpJwIbbi03IeTM
-         5fNNh0xdhhXKnjk7OVa5KPUZw3o9grkre9I8rvXhu2OOmbDaFOP3MMpEqKefduNV
-         ko8r5+hIIudTfzQqQSTbNNxeCq1doo0oOsiANaNzApq9zC5HoR9J9yI3JC02ArCG
-         64neej+NR/9ARwsrFocUqxN2MkY/sCUWe0UD4HKYl/JzBoybVBfwyCH7M+630uLp
-         B0xU3k1J077f5L9nkBvhB7eqXivfS61Wf/5JkWU/JTiVU1Ou0ufccdpUTLjSRZ2M
-         UNn7eSbQVACDbysEfkPVIw==
-From: Kohei Enju <kohei@enjuk.jp>
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Sasha Neftin <sasha.neftin@intel.com>,
-        kohei.enju@gmail.com, Kohei Enju <kohei@enjuk.jp>
-Subject: [PATCH v1 iwl-net] igc: fix missing update of skb->tail in igc_xmit_frame()
-Date: Sat, 14 Feb 2026 19:46:32 +0000
-Message-ID: <20260214194636.295647-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 61EJprKh017235
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sat, 14 Feb 2026 20:51:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1771098714;
+	bh=O5oUb9SrEAeUxPySAQ+ao3ohEjafJkj+zkJqWx2/KM4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=XbUQP6dZ0XCE9d3ZjKknm6+If26OQBS5jkhlJOMU3jKCVe+LEtNhDT7Q7tVt/PWlW
+	 McHiIElIDa6A943F3t7wLLAMVWPLWtbflWDc7PDMjNP7ynYXb5QYfYT3sd91sOtgtb
+	 r4tDRE3z52ptjMhssDBWrYsElT89iQgJh0wG+P8I=
+Message-ID: <1ab166aa-8e9c-4742-a80a-c2fa806218db@tu-dortmund.de>
+Date: Sat, 14 Feb 2026 20:51:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
+ <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
+ <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
+ <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
+ <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
+ <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
+ <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
+ <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
+ <CACGkMEtRikexX=cJz8zmuvW7mcO7uCFdG7AoHQLOezrsb5nbgQ@mail.gmail.com>
+ <59529fd2-2a08-4a89-a853-27198b76f842@tu-dortmund.de>
+ <20260214131703-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260214131703-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-258727-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-258726-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 56E4013D128
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 39F1713D158
 X-Rspamd-Action: no action
 
-igc_xmit_frame() misses updating skb->tail when the packet size is
-shorter than the minimum one.
-Use skb_put_padto() in alignment with other Intel Ethernet drivers.
+On 2/14/26 19:18, Michael S. Tsirkin wrote:
+> On Sat, Feb 14, 2026 at 06:13:14PM +0100, Simon Schippers wrote:
+> 
+> ...
+> 
+>> Patched: Waking on __ptr_ring_produce_created_space() is too early. The
+>>          stop/wake cycle occurs too frequently which slows down
+>>          performance as can be seen for TAP.
+>>
+>> Wake on empty variant: Waking on __ptr_ring_empty() is (slightly) too
+>>                        late. The consumer starves because the producer
+>>                        first has to produce packets again. This slows
+>>                        down performance aswell as can be seen for TAP
+>> 		       and TAP+vhost-net (both down ~30-40Kpps).
+>>
+>> I think something inbetween should be used.
+>> The wake should be done as late as possible to have as few
+>> NET_TX_SOFTIRQs as possible but early enough that there are still
+>> consumable packets remaining to not starve the consumer.
+>>
+>> However, I can not think of a proper way to implement this right now.
+>>
+>> Thanks!
+> 
+> What is the difficulty?
 
-Fixes: 0507ef8a0372 ("igc: Add transmit and receive fastpath and interrupt handlers")
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+There is no way to tell how many entries are currently in the ring.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 1abbdbebf8a4..7ebeca5333b6 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -1727,11 +1727,8 @@ static netdev_tx_t igc_xmit_frame(struct sk_buff *skb,
- 	/* The minimum packet size with TCTL.PSP set is 17 so pad the skb
- 	 * in order to meet this minimum size requirement.
- 	 */
--	if (skb->len < 17) {
--		if (skb_padto(skb, 17))
--			return NETDEV_TX_OK;
--		skb->len = 17;
--	}
-+	if (skb_put_padto(skb, 17))
-+		return NETDEV_TX_OK;
- 
- 	return igc_xmit_frame_ring(skb, igc_tx_queue_mapping(adapter, skb));
- }
--- 
-2.51.0
+> 
+> Your patches check __ptr_ring_consume_created_space(..., 1).
+
+Yes, and this returns if either 0 space or a batch size space was
+created.
+(In the current implementation it would be false or true, but as
+discussed earlier this can be changed.)
+
+> 
+> How about __ptr_ring_consume_created_space(..., 8) then? 16?
+> 
+
+This would return how much space the last 8/16 consume operations
+created. But in tap_ring_consume() we only consume a single entry.
+
+Maybe we could avoid __ptr_ring_consume_created_space with this:
+1. Wait for the queue to stop with netif_tx_queue_stopped()
+2. Then count the numbers of consumes we did after the queue stopped
+3. Wake the queue if count >= threshold with threshold >= ring->batch
+
+I would say that such a threshold could be something like ring->size/2.
 
 
