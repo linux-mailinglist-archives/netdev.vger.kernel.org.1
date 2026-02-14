@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-258733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258734-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qLX2KN/okGkOdwEAu9opvQ
-	(envelope-from <netdev+bounces-258733-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:27:59 +0100
+	id sHZ9GhLpkGkadwEAu9opvQ
+	(envelope-from <netdev+bounces-258734-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:28:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D37113D677
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:27:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E492513D734
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:28:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5525A3074E33
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 166803021EBE
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732C03C2D;
-	Sat, 14 Feb 2026 21:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B6028DB46;
+	Sat, 14 Feb 2026 21:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caJJOp4j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWyKkMlu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F27F3090C1;
-	Sat, 14 Feb 2026 21:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D843C2D;
+	Sat, 14 Feb 2026 21:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104323; cv=none; b=qJ8g7UBzhzfjZe48aKFi9KPeMnZJGHfPSjSU2oDEa2NH0JU2zAUWyyyoDTESZUPYYLR9sz1RNUKV1f+9EX9WO0RNVbQEllpoPub70ZGALVPO+S6zO6x4wURcFICdqcXVQ9InS9uDwizk4dbHgNaCRIItPGrXO+6exgxAawiHabE=
+	t=1771104332; cv=none; b=IKwbTpUZHcBulu6tPvkxNfSwoQDE54aSlZXbLzuR0gfJZr2QKc1AePQor2R80j+yu06NLVnagZquLtLTUI71q3Bxj9AiSQGI3akL1dvgvPqwG3C/PvNC2kI4txfVlVcTt1lTvOnHDHJCPeuRb/WrH6KGfC/kLPc2fNLmhbwPODQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104323; c=relaxed/simple;
-	bh=HNsIIUiNfMcrVXGaTxbgUw3HY9PSkBjZ42JbycFGdt0=;
+	s=arc-20240116; t=1771104332; c=relaxed/simple;
+	bh=IEolZjLt9W5K7QPJw1wk3fFPTdzpWuj9VU77DHTEGR8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l0yxUDBySc3GvVAJFjrD7IEN4/fGalNyjoYJytLgNxaKiUFVgnaG1Wf5r2EVacmz5yQ7OQZbSxWDzP+4ju4GSCYOg6elbUc8Pr0yl6az9L2Z96JzWz6plLWP+LzCYICILZZU0l7ukvxywmWEP44y6euIgMRv0g0q764lfnoax7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caJJOp4j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183FBC19422;
-	Sat, 14 Feb 2026 21:25:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NTgYBwybWY0SzwsHkZxYNKjUP7+LDauBWiKVvVVpqG+Ew1gBo/0QuI7VkZEYDOTYq5HHxm2F/On0rNSv77D0BWwKCH6SswNyj+d6r1XcjO8uFMuSbGT6rPWgcacdR0ZTFGj8+2yZ22PghRZEUNfx3zeGXjZkL4xU8MDj3Wo54Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWyKkMlu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A81C19423;
+	Sat, 14 Feb 2026 21:25:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104323;
-	bh=HNsIIUiNfMcrVXGaTxbgUw3HY9PSkBjZ42JbycFGdt0=;
+	s=k20201202; t=1771104332;
+	bh=IEolZjLt9W5K7QPJw1wk3fFPTdzpWuj9VU77DHTEGR8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=caJJOp4jgcuE8lQYjBZkLH56mw4XeyDSLXdulLpETeLjXZX8n0CNM058qL36d5tTD
-	 IMeflfNc0GVS21dATaKXiKopBjDNJVhptJ5zBvrwWuzUskOHwOF0zXZ+P4N+qg7dfc
-	 ZjMQPuS4PJkOTU7Lj2BoMUYivJ4oVeukj3VtDoOAl0+9UZWXj0kcTlyxZEGwrzOkTH
-	 8UXBNrWy8H3I4eZmPxquko1F0yznKZ7VO+XIBp96TTb6+HHrTkR2Iyq3PUTD3/uigm
-	 95a0I76V0I27UwZW0pTYJG2Tj9XEataKjmHhg9gcYqupuwgknq400Hzts2rheTuAZH
-	 8BU7Nxi1KdRZw==
+	b=LWyKkMlus429KIrrUbgC1HbODZFcj36X+CD4nexWBsawkwDovnam5LsyjpPTwo0Zd
+	 oPKDDDVc6RsLZVF34BamLva+J5UFJ4vOqRmJ7vhg/5qREG/njw7TrOTPNOFUJQvfsx
+	 UEb+gXpkcPx0pw3KgMTvLL4Ad/6doVaFrIeXYYQ5asvT0/750v2KDTF8EYYw0SSRJy
+	 NI5VhPOHye85GUupGWDZE4+Z3DCUFDdreIZV0Ot+e8riKzd5T7bko1+O/PM2J09Drl
+	 6dr+sRne1mYPGhWL0abBvZCHutVG91JuIbxfJpEHlXWNl4oRJfYGMqsZb0eQn9CANX
+	 MK8lhlFbyEzVw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com
-Subject: [PATCH AUTOSEL 6.19-5.10] net/rds: Clear reconnect pending bit
-Date: Sat, 14 Feb 2026 16:22:42 -0500
-Message-ID: <20260214212452.782265-17-sashal@kernel.org>
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	ncardwell@google.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-6.12] ipv6: annotate data-races over sysctl.flowlabel_reflect
+Date: Sat, 14 Feb 2026 16:22:48 -0500
+Message-ID: <20260214212452.782265-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -66,10 +67,10 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
@@ -81,7 +82,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258733-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-258734-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -92,123 +93,181 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 1D37113D677
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E492513D734
 X-Rspamd-Action: no action
 
-From: Håkon Bugge <haakon.bugge@oracle.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit b89fc7c2523b2b0750d91840f4e52521270d70ed ]
+[ Upstream commit 5ade47c974b46eb2a1279185962a0ffa15dc5450 ]
 
-When canceling the reconnect worker, care must be taken to reset the
-reconnect-pending bit. If the reconnect worker has not yet been
-scheduled before it is canceled, the reconnect-pending bit will stay
-on forever.
+Add missing READ_ONCE() when reading ipv6.sysctl.flowlabel_reflect,
+as its value can be changed under us.
 
-Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
-Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
-Link: https://patch.msgid.link/20260203055723.1085751-6-achender@kernel.org
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20260115094141.3124990-6-edumazet@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-### 3. BUG MECHANISM — CLEAR AND CRITICAL
+## Analysis of Commit: "ipv6: annotate data-races over
+sysctl.flowlabel_reflect"
 
-Now the full picture is clear:
+### 1. COMMIT MESSAGE ANALYSIS
 
-**The flow:**
-1. `rds_queue_reconnect()` at line 138 sets `RDS_RECONNECT_PENDING` and
-   queues the delayed work.
-2. `rds_connect_worker()` (the worker function) at line 173 clears
-   `RDS_RECONNECT_PENDING` when it runs.
-3. `rds_conn_path_connect_if_down()` at line 911 uses
-   `test_and_set_bit(RDS_RECONNECT_PENDING, ...)` — if the bit is
-   already set, it returns without queuing work, trusting that a
-   reconnect is already pending.
+The commit message is clear and direct: it adds missing `READ_ONCE()`
+annotations when reading `ipv6.sysctl.flowlabel_reflect` because this
+sysctl value can be changed concurrently by another CPU (via the sysctl
+write path). The author is Eric Dumazet, a top-tier networking
+maintainer known for systematically fixing data races in the networking
+stack. Reviewed by Simon Horman, another well-known networking reviewer.
 
-**The bug:**
-In `rds_conn_shutdown()`, `cancel_delayed_work_sync()` cancels the
-queued worker. If the worker hadn't started yet, it never runs
-`clear_bit(RDS_RECONNECT_PENDING, ...)`. The bit stays set. Then when
-`rds_conn_path_connect_if_down()` is later called (e.g., when trying to
-send data), `test_and_set_bit` finds the bit already set and skips
-queuing — **forever**. The connection can never reconnect.
+### 2. CODE CHANGE ANALYSIS
 
-This is a **permanent connection failure** bug — once triggered, the RDS
-connection path is effectively dead until the system is rebooted or the
-module is reloaded.
+The patch modifies exactly 3 locations across 3 files, adding
+`READ_ONCE()` around reads of `net->ipv6.sysctl.flowlabel_reflect`:
 
-### 4. CLASSIFICATION
+1. **net/ipv6/af_inet6.c** (`inet6_create`): Socket creation path —
+   reads the sysctl to set the `REPFLOW` bit on new IPv6 sockets.
 
-- **Bug type:** State corruption / logic bug leading to permanent loss
-  of network connectivity
-- **Severity:** HIGH — RDS is used in production Oracle RAC clusters and
-  RDMA-based environments
-- **Trigger:** Race between shutdown and reconnect scheduling —
-  realistic in production with network flaps
+2. **net/ipv6/icmp.c** (`icmpv6_echo_reply`): ICMPv6 echo reply path —
+   reads the sysctl to decide whether to reflect the flowlabel in echo
+   replies.
 
-### 5. SCOPE AND RISK
+3. **net/ipv6/tcp_ipv6.c** (`tcp_v6_send_reset`): TCP reset sending path
+   — reads the sysctl to decide whether to reflect the flowlabel in TCP
+   resets.
 
-- **Change size:** 1 functional line (plus 1 blank line) — extremely
-  small and surgical
-- **Files changed:** 1 file (`net/rds/connection.c`)
-- **Risk of regression:** Very low — `clear_bit` is idempotent. If the
-  worker already ran and cleared the bit, clearing it again is harmless.
-  If the worker didn't run, this is the correct fix.
-- **The fix is placed correctly:** After `cancel_delayed_work_sync()`
-  guarantees the worker won't run, and before `rds_queue_reconnect()`
-  which will set the bit again if needed.
+In all three cases, the pattern is identical: a plain read of
+`net->ipv6.sysctl.flowlabel_reflect` is wrapped with `READ_ONCE()`. This
+is a textbook KCSAN data-race annotation fix.
 
-### 6. STABLE KERNEL CRITERIA
+### 3. BUG CLASSIFICATION
 
-- **Obviously correct:** Yes — the logic is straightforward and well-
-  explained
-- **Fixes a real bug:** Yes — permanent loss of RDS connectivity
-- **Important issue:** Yes — affects network reliability for RDS users
-  (Oracle, RDMA environments)
-- **Small and contained:** Yes — 1 line in 1 file
-- **No new features:** Correct — purely a bug fix
-- **No new APIs:** Correct
+This is a **data race fix**. The sysctl `flowlabel_reflect` can be
+modified at any time from another CPU via the sysctl interface. Without
+`READ_ONCE()`, the compiler is free to:
+- Load the value multiple times (potentially seeing different values
+  within a single check)
+- Optimize the read in ways that produce undefined behavior under the C
+  memory model
+
+This is the exact pattern of KCSAN-detected data races that Eric Dumazet
+has been systematically fixing across the networking stack. These are
+real data races even if the consequences in practice may be minor (store
+tearing or inconsistent reads).
+
+### 4. SCOPE AND RISK ASSESSMENT
+
+- **Size**: Extremely small — 3 locations, each changing a single read
+  to `READ_ONCE()`.
+- **Risk**: Essentially zero. `READ_ONCE()` is a pure annotation that
+  prevents compiler optimization issues. It cannot introduce new bugs.
+- **Files touched**: 3 files in net/ipv6/, all well-established code
+  paths.
+- **Subsystem**: Core IPv6 networking — widely used.
+
+### 5. STABLE KERNEL CRITERIA
+
+- **Obviously correct**: Yes — adding `READ_ONCE()` for a concurrently-
+  modified sysctl is a textbook fix.
+- **Fixes a real bug**: Yes — data races are real bugs, detectable by
+  KCSAN, and can cause undefined behavior.
+- **Small and contained**: Yes — minimal change, 3 lines modified.
+- **No new features**: Correct — pure bug fix annotation.
+- **Tested**: Reviewed by Simon Horman, authored by Eric Dumazet
+  (networking co-maintainer).
+
+### 6. USER IMPACT
+
+The `flowlabel_reflect` sysctl affects IPv6 flow label behavior for:
+- New socket creation
+- ICMPv6 echo replies
+- TCP reset packets
+
+While the practical impact of the data race is likely limited (a torn
+read of an integer sysctl would just result in a brief wrong decision),
+the fix is important for:
+- KCSAN cleanliness (preventing false positives that mask real bugs)
+- Correctness under the kernel memory model
+- Preventing potential compiler-induced bugs on architectures with weak
+  memory ordering
 
 ### 7. DEPENDENCY CHECK
 
-This fix is self-contained. It only adds a `clear_bit()` call after an
-existing `cancel_delayed_work_sync()` call. The `RDS_RECONNECT_PENDING`
-flag and the surrounding code have been in the kernel for a long time.
-This should apply cleanly to any stable tree that has the RDS subsystem.
+This commit is self-contained. It only adds `READ_ONCE()` wrappers and
+has no dependencies on other commits. The code being modified exists in
+all recent stable trees.
 
-### Conclusion
+### 8. RISK vs BENEFIT
 
-This is a textbook stable backport candidate: a tiny, obviously correct,
-one-line fix for a serious bug (permanent connection failure) in
-networking code used in production environments. The fix has zero risk
-of regression due to the idempotent nature of `clear_bit`, and the bug
-mechanism is clearly explained and verified through code analysis.
+- **Risk**: Near zero. `READ_ONCE()` is a safe, well-understood
+  annotation.
+- **Benefit**: Fixes real data races in the IPv6 networking path,
+  prevents potential compiler-induced misbehavior, enables clean KCSAN
+  runs.
+
+This is the type of small, surgical, zero-risk fix that is ideal for
+stable backporting. Eric Dumazet's data-race annotation series in
+networking has been consistently backported to stable trees.
 
 **YES**
 
- net/rds/connection.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/ipv6/af_inet6.c | 4 ++--
+ net/ipv6/icmp.c     | 3 ++-
+ net/ipv6/tcp_ipv6.c | 3 ++-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index ad8027e6f54ef..dbfea6fa11260 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -429,6 +429,8 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
- 	 * to the conn hash, so we never trigger a reconnect on this
- 	 * conn - the reconnect is always triggered by the active peer. */
- 	cancel_delayed_work_sync(&cp->cp_conn_w);
-+
-+	clear_bit(RDS_RECONNECT_PENDING, &cp->cp_flags);
- 	rcu_read_lock();
- 	if (!hlist_unhashed(&conn->c_hash_node)) {
- 		rcu_read_unlock();
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index b705751eb73c6..bd29840659f34 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -224,8 +224,8 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
+ 	inet6_set_bit(MC6_LOOP, sk);
+ 	inet6_set_bit(MC6_ALL, sk);
+ 	np->pmtudisc	= IPV6_PMTUDISC_WANT;
+-	inet6_assign_bit(REPFLOW, sk, net->ipv6.sysctl.flowlabel_reflect &
+-				     FLOWLABEL_REFLECT_ESTABLISHED);
++	inet6_assign_bit(REPFLOW, sk, READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
++				      FLOWLABEL_REFLECT_ESTABLISHED);
+ 	sk->sk_ipv6only	= net->ipv6.sysctl.bindv6only;
+ 	sk->sk_txrehash = READ_ONCE(net->core.sysctl_txrehash);
+ 
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 9d37e7711bc2b..1a25ecb926951 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -958,7 +958,8 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
+ 	tmp_hdr.icmp6_type = type;
+ 
+ 	memset(&fl6, 0, sizeof(fl6));
+-	if (net->ipv6.sysctl.flowlabel_reflect & FLOWLABEL_REFLECT_ICMPV6_ECHO_REPLIES)
++	if (READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
++	    FLOWLABEL_REFLECT_ICMPV6_ECHO_REPLIES)
+ 		fl6.flowlabel = ip6_flowlabel(ipv6_hdr(skb));
+ 
+ 	fl6.flowi6_proto = IPPROTO_ICMPV6;
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 280fe59785598..4ae664b05fa91 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1085,7 +1085,8 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
+ 			txhash = inet_twsk(sk)->tw_txhash;
+ 		}
+ 	} else {
+-		if (net->ipv6.sysctl.flowlabel_reflect & FLOWLABEL_REFLECT_TCP_RESET)
++		if (READ_ONCE(net->ipv6.sysctl.flowlabel_reflect) &
++		    FLOWLABEL_REFLECT_TCP_RESET)
+ 			label = ip6_flowlabel(ipv6h);
+ 	}
+ 
 -- 
 2.51.0
 
