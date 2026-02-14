@@ -1,184 +1,156 @@
-Return-Path: <netdev+bounces-258706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258707-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CK3tESRykGncZgEAu9opvQ
-	(envelope-from <netdev+bounces-258706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 14:01:24 +0100
+	id UF1XHo5ykGncZgEAu9opvQ
+	(envelope-from <netdev+bounces-258707-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 14:03:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D67413C02D
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 14:01:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B3D13C05A
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 14:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 872DA301F487
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:01:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3A4FC301724F
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 13:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D193E2248AF;
-	Sat, 14 Feb 2026 13:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329052DA749;
+	Sat, 14 Feb 2026 13:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H9eqiJ1F"
+	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="vsz9KkeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D207199FD3
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 13:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771074075; cv=pass; b=XWkGkT3QLzC26GvabPAh/JbPTn7N4kMQVXo+2Dytc7xdMp3mxp8BDSOmy3KDC0YnRUDY+fNtuFmtnnJIJniuFYPewtvjRYeyIlmqWEPB/XvCeGLfRt84OCKfbicP79KE7HnsXuiW5c9MDowTNBgVgRV0a8G7EvDkSElJtzR5cv0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771074075; c=relaxed/simple;
-	bh=UVvdnDRJr2kD0oYUX7odA6IoH1xTKbrRST2CqAtkRk8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NXOvBWrzNupUuDo/2N79csJ85ftTGtZXyP3czYceuU+l3aJhU4TNIMt0pLr1cDpYUvj6+0ws9QljodRXCvtS/m+deFs0N8JRphfPUdsmjhBQiu/dKnLEi45MJmvAAAhna02FRfVH2edOHnU0KRDJ2jGPAChS38mzo6qlBq4pUWc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H9eqiJ1F; arc=pass smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8954a050c19so22004066d6.3
-        for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 05:01:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771074073; cv=none;
-        d=google.com; s=arc-20240605;
-        b=agOJzY2fk58ii7Hbk4+L2SR8pvkwCGQeWIdrB+FLaQPTuglbMrBYs1GJEI9iGk4trX
-         EYXu1/koGDA9U7/u+RzQOYP5uoA7I4F75Cr1J5/zvOPVFOVMV+RS1YbMjyggy7DKZiUv
-         wMD1lr43WBDXw9Ftzdo5GLb0+EOeMS97WD33yveD9NL2p2JvnKviORGRyagRaeA2duCI
-         yPw81SgOyfiM6M9gmnzBB2GctdMc2Yv/fEm+bLD/AJOXyonAkFw8mw5//JgERrTCxS4z
-         coSMKm9LUL/Nd69FR3uk4AGHaLpfvoRFsjeKnslME4gsJin/prf/pmVJfpok2Pd9zif1
-         U/uQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YdUTZsFl5bpF6NmVxm8evaaCGeeYEOigAAa6PKtN++0=;
-        fh=Lq+14XTYFZD8eF4SrHmDi22pvxUzBmtnvvF1vBiMdu4=;
-        b=Aa4QHUEPqdr8i6iEcggKax+6yZJm/IHvzqHR6YqhV6/1Mw6nJFvTxZl+ZmBcCZRjC8
-         h4/81N4Hp2KeH68oKta2/U4CMxvGLVdgOn5dbF2yechFMpVEMFWt/a30BUxVIpOQBVMg
-         v3Rf6TgFI3ve0rdUZROrGP5hA3MgTHaM6hDn9jfjhTlvs+ZSNKhZbNsVA3e8qE0dw7XT
-         I9L00B7aOIXAQF7s2hRvjHFXVxbu9wF3k3vyC6Mdfb56lUW9YEXf028JyVHA1077aTWj
-         vlUFviPNEEKJgR0KSsT6KoU9T9+QYSoKXLiNKOyoGIJvJXNJzEUWPCg4X9evc+nPJ0y/
-         MUuA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771074073; x=1771678873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YdUTZsFl5bpF6NmVxm8evaaCGeeYEOigAAa6PKtN++0=;
-        b=H9eqiJ1Ff5IEtzebH1qgnaK99M5m9T06nea8yeSlDhhGAlC1YqOI8ftlKsG3P+KWVp
-         q9YgUkrEddLt+33bccZJustYIc05rgydZC9j742oPH4TJ3zG5MUyqyHPjtoD+4fXpuP5
-         PiOd4YMT87jV1dhyJU27OdbY943IF284csqmK2iFoVeKUqFYer0uYYJfKaoN6j2rINv3
-         YnywUAqQwpLUhctOoPveouGkE38i6N5LZRmFGYITAr4Ps+2MfSSO7qHZU9j+oZnV7k67
-         RsapFZGYmj8Lebm2qOScVFWa/3io5MDp8js3KUQwywookCWS3tltYYWkVnCz8RqjZzKF
-         1N0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771074073; x=1771678873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YdUTZsFl5bpF6NmVxm8evaaCGeeYEOigAAa6PKtN++0=;
-        b=ZGs3ukkXfEt2FpnA7dDIjO+F8oke1mE7uT/tXoQRUBc20ztPuVZP2Pm8Jf9beEnrTf
-         Q35l79nlZHbQ3N7uXQVs9zO0WOvcCQ6TJXqWzJNt5YV9OzaoCN7Vld2JEsJpj6v1CQZp
-         Lf9Vkdoj1c74vH8na/qDWCVRvf12rUYjgTlJoYB4EurdvWqb6V/r3YgXiKYn+mOIOU/d
-         N1m+A0jyJ0M5linv9/4dbuXFOqeu5g74aagabnPZSlvZ79Gy4Y2SUqbSf/jl4tgF4HFW
-         uHryw5DhuL7ySaquPmG5XvZA8sArlUaT9+Oo3bhutqsQ2CWeWlrJJXFCqT0oWmkbpxGy
-         UOuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIHz9P3lNKz/OmtoIgaajIyMe/wvadyxdI8mTTntxBfZcUWyxhna5mxak8JwVWWQEtp9YGTSY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuNEo/HZgcY+zzjLiZ+WxS6oDRROpXPf5uZwY1teIQHiUCHmtq
-	rKO2ZOJu7i1cJmXWc8wLksLH2te99O+cCT7egx+a1XXmySR6DfbTKgQQ4/+LNzyq73saseKwI25
-	BcrVlNoOq7b6rshQLhO4MNmBDmIm3gSavY+oqLbiD
-X-Gm-Gg: AZuq6aJ1uukRVSqNDSK8UodqeRKR5poY26SSuVP4s1OjympeyXh2Rng/tniFYJLuXCK
-	2Z11PudpvSpv0TA0Bu7pB6i4XJ2WFmNn2hTOmu0QTagEJCRu081/e8gHOwDaobtdTf4nmn+AhPA
-	OCRi36e9wN3SrU9wkkSMf7/8kKkEyQ3N55qCoi0jKU5AUPnTxAO0yh85Ae/5QbMNAscsftb11gr
-	CR+mMA/vZQ0dIyrYMGvm/YWfOiQ8c5N98oXvfJlCL/K2ziLH0ekObR9BLqvBA6o9vNi9NP+5ca3
-	m2dUqTWvC/2CBJ/muw==
-X-Received: by 2002:a05:622a:1391:b0:4ed:b94c:774a with SMTP id
- d75a77b69052e-506a67fafaemr75605031cf.5.1771074072773; Sat, 14 Feb 2026
- 05:01:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516F518AE2;
+	Sat, 14 Feb 2026 13:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771074180; cv=none; b=F2aSDKOdAH9c2f464uL2sEa+f0eyBRf958jwvICQ4zwKdLYoAtZ3k7pkpUCj1dVo8NJKe+V6xAxUNhuv/DwwQA7MnBruxaiK2ZhdeyKGtOOsC7T9HEWg2HhSwJBNzJZWDnVSrnoD/2uG7U47yenx21rpCnhnCIdL8uIiiYCOY5k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771074180; c=relaxed/simple;
+	bh=Fo23NwXf9l1mHPj3B0OBY2OKo37r2x58LnTxELIh8z0=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID; b=hkhR0jAZwfojMVXJSkdeX0hIZ4q5ZwHx2+elepnWHq+ksrBNU5JzdwFWa4yDbw6jSf1yEbaNa9T0cQF5sltD2JmdT51tcK13XIkOCfkWz3yKpex0P7EIuM5w3dPPQ7qbKdfu0pIu4bYy4bOAmAyS4jo0dVjw02HqHo4Uv+vehSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=vsz9KkeH; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=m.fudan.edu.cn;
+	s=sorc2401; t=1771074137;
+	bh=Fo23NwXf9l1mHPj3B0OBY2OKo37r2x58LnTxELIh8z0=;
+	h=From:To:Subject:Mime-Version:Date:Message-ID;
+	b=vsz9KkeH7OC6Eg7bcyzSHo5Eo4gnvJWQUxhPLx9Q8endwdzjLP8H9uxDoVRx7zRUF
+	 h11/Q/sGqwrFpGpNjx6IIrni+ogBvebRUSzvC+xvYL32nUf8UBZSY3b8566H8c+WLL
+	 AF8mEJEq+rFVyy72vzIo1ggjqedUok5ShVzE0dZs=
+EX-QQ-RecipientCnt: 8
+X-QQ-GoodBg: 2
+X-QQ-SSF: 00400000000000F0
+X-QQ-FEAT: D4aqtcRDiqR3BzPw6xF2yYOMzhADaK1k6/GpcrrpT/I=
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-Originating-IP: QtXU8YvEw8gsWYlG+yur+tXggv/qRYtz1pqAwwfFA30=
+X-QQ-STYLE: 
+X-QQ-mid: lv3gz6b-1t1771074135t00edb90d
+From: "=?utf-8?B?5Yav5ZiJ5Luq?=" <23210240148@m.fudan.edu.cn>
+To: "=?utf-8?B?am9oYW5uZXM=?=" <johannes@sipsolutions.net>
+Cc: "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>, "=?utf-8?B?ZWR1bWF6ZXQ=?=" <edumazet@google.com>, "=?utf-8?B?a3ViYQ==?=" <kuba@kernel.org>, "=?utf-8?B?cGFiZW5p?=" <pabeni@redhat.com>, "=?utf-8?B?bGludXgtd2lyZWxlc3M=?=" <linux-wireless@vger.kernel.org>, "=?utf-8?B?bmV0ZGV2?=" <netdev@vger.kernel.org>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
+Subject: [BUG] Potential Null Pointer Dereference in ieee80211_process_neg_ttlm_req Function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <tencent_5F0CA7F84A4F08C62E08F769@qq.com>
-In-Reply-To: <tencent_5F0CA7F84A4F08C62E08F769@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 14 Feb 2026 14:01:01 +0100
-X-Gm-Features: AZwV_QiWjsSxZ6FanKiwL54crukf1_FgVncxPwv5Xl_zSTWbwgmCxPjeV8Rpah0
-Message-ID: <CANn89iJLz93=fei5hmCs7jOxFjAfqt4NXgRaJB5ZQpGpPbfRjQ@mail.gmail.com>
-Subject: Re: [BUG] Potential Null Pointer Dereference in udp_gro_receive_segment
- Function
-To: =?UTF-8?B?5Yav5ZiJ5Luq?= <23210240148@m.fudan.edu.cn>
-Cc: davem <davem@davemloft.net>, dsahern <dsahern@kernel.org>, kuba <kuba@kernel.org>, 
-	pabeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Sat, 14 Feb 2026 21:02:14 +0800
+X-Priority: 3
+Message-ID: <tencent_50235033396E84610251D7C1@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-BIZMAIL-ID: 2886952497958345387
+X-Address-Ticket:version=;type=;ticket_id=;id_list=;display_name=;session_id=;
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+	by smtp.qq.com (ESMTP) with SMTP
+	id ; Sat, 14 Feb 2026 21:02:16 +0800 (CST)
+Feedback-ID: lv:m.fudan.edu.cn:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: Me3hdGK5nWP4sYmRELciLf6OPc9jSf6SR7JlY6gwf2LG9cM7UdP9Uz8S
+	kMsAmm86auMex+8LkpVaCMld9rvG/NgGTU7XXn0RVGIgLXN250eC0AeTEGQ7ey1WgMx5k6W
+	YNEgdojPetNA8dWYvuU6ZORBZ3HuUQEheOt18edRWL/z3fRZhhU+lCqbgo5j9ebFYA84iIM
+	nfIeqJUMUT88X7QyQwNd++RMfs6o1ApqQl1UEGzly8LJQOlH3AXyJ2Of4jz+LeQsHyE3uF9
+	hzYFoTzD/6Kw9z9FTIokdf8/CLuF8JVyj1WaHG/wt6Hngpr38RxeCsXNLEFJCYVymbuXLa6
+	fV9vQ46+oX37Cx9rwBKExjKAlFVQ0Mi9VBHLD6/8zC2mH7tz31yiB5CKg9QuANMBq8I5+aL
+	7p4eE8XsuQTiUrESjSfL7sGIAVbkj2spRddc5rlOFHrRRFdXEVoQm+IDBLuX1aJ6miuJ3Cu
+	3KMUBwkZnoy5J1WRZNr9Q0s2/8GRN/niKyQQxa21HSqHqka9Xl060ftAP+bxWr7T32Ide+4
+	gGKDBV/UFK4GFnGIpu+PRZiNO/2ue3f4Wuq1+/PRxv+EOnS2BiOXqGzGfz76Aj0JRtBtafV
+	S03FAjM2cNB95xveJTysFk0vYxit8bAsZSdA0ksbTkh9WdqawRTWrVGGPvEAidnXpizKMth
+	7O9efEhShp9t5/338c1W2zX9UUS9yVjE570rpTrLWa7ZDpPWpeBU9gpMoCr1wqJFcp7r1Vc
+	W95IcpUsrkLk1WGAIGGzKDztgrLyDdz4qxgi4MxyeYBKxXdqVUTp/y2BbAmJchSN93H1gzU
+	mYT9NQKOMa4/ICC5OOzNd9urWa6SepMXGcOpv93VnlGHfHZQV4eY/mo8r8iaOYfm5xx+cU2
+	paeV0kzaCkWLl9n5vkBI/J0svKIe3k/8djW3OrrqWGmSbA4yWRRG7AuLJ45P0997E0uJ5dv
+	r+OG/v+2p842nB5UbBirk0THskQO0aG4iRhQygKZLva78WhEGnb0s/eVkluTdNRoPIX0Bmj
+	wk9GbPuDP4dt6dyEQQDfgUzHAht+Zae5i4AslFDzhIohAaeQjJTQoqxLn0iLterCf0gk9sJ
+	A==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [2.44 / 15.00];
+	CC_EXCESS_BASE64(1.50)[];
+	TO_EXCESS_BASE64(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[m.fudan.edu.cn,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[m.fudan.edu.cn:s=sorc2401];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-258706-lists,netdev=lfdr.de];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fudan.edu.cn:email];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258707-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[m.fudan.edu.cn:+];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+]
-X-Rspamd-Queue-Id: 9D67413C02D
+	FROM_NEQ_ENVFROM(0.00)[23210240148@m.fudan.edu.cn,netdev@vger.kernel.org];
+	HAS_X_PRIO_THREE(0.00)[3];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,m.fudan.edu.cn:dkim]
+X-Rspamd-Queue-Id: E3B3D13C05A
 X-Rspamd-Action: no action
 
-On Sat, Feb 14, 2026 at 1:47=E2=80=AFPM =E5=86=AF=E5=98=89=E4=BB=AA <232102=
-40148@m.fudan.edu.cn> wrote:
->
-> Dear Maintainer,
->
-> Our team recently developed a null-pointer-dereference (NPD) vulnerabilit=
-y detection tool, and we used it to scan the Linux Kernel (version 6.9.6). =
-After manual review, we identified a potentially vulnerable code snippet th=
-at could lead to a null-pointer dereference bug. We would appreciate your e=
-xpert insight to confirm whether this vulnerability could indeed pose a ris=
-k to the system.
->
-> Vulnerability Description:
-> File:  net/ipv4/udp_offload.c
-> In the function udp_gro_receive_segment, we found the following line of c=
-ode:
->
-> if (!uh->check) {
->
-> The issue arises because the uh pointer may be passed as NULL in certain =
-situations. Since uh is NULL, accessing uh->check in the statement could re=
-sult in a null-pointer dereference.
->
-> Proposed Fix:
-> To prevent the potential null-pointer dereference, we suggest adding a NU=
-LL check for the uh pointer before attempting to dereference uh->check in t=
-he line.
->
-> Request for Review:
-> We would appreciate your expert insight to confirm whether this vulnerabi=
-lity indeed poses a risk to the system, and if the proposed fix is appropri=
-ate. If there are reasons why this issue does not present a real risk (e.g.=
-, the NULL check is redundant or unnecessary), we would be grateful for cla=
-rification.
->
-> Thank you for your time and consideration.
+RGVhciBNYWludGFpbmVyLA0KDQpPdXIgdGVhbSByZWNlbnRseSBkZXZlbG9wZWQgYSBudWxs
+LXBvaW50ZXItZGVyZWZlcmVuY2UgKE5QRCkgdnVsbmVyYWJpbGl0eSBkZXRlY3Rpb24gdG9v
+bCwgYW5kIHdlIHVzZWQgaXQgdG8gc2NhbiB0aGUgTGludXggS2VybmVsICh2ZXJzaW9uIDYu
+OS42KS4gQWZ0ZXIgbWFudWFsIHJldmlldywgd2UgaWRlbnRpZmllZCBhIHBvdGVudGlhbGx5
+IHZ1bG5lcmFibGUgY29kZSBzbmlwcGV0IHRoYXQgY291bGQgbGVhZCB0byBhIG51bGwtcG9p
+bnRlciBkZXJlZmVyZW5jZSBidWcuIFdlIHdvdWxkIGFwcHJlY2lhdGUgeW91ciBleHBlcnQg
+aW5zaWdodCB0byBjb25maXJtIHdoZXRoZXIgdGhpcyB2dWxuZXJhYmlsaXR5IGNvdWxkIGlu
+ZGVlZCBwb3NlIGEgcmlzayB0byB0aGUgc3lzdGVtLg0KDQpWdWxuZXJhYmlsaXR5IERlc2Ny
+aXB0aW9uOg0KRmlsZTogIG5ldC9tYWM4MDIxMS9tbG1lLmMNCkluIHRoZSBmdW5jdGlvbiBp
+ZWVlODAyMTFfcHJvY2Vzc19uZWdfdHRsbV9yZXEsIHdlIGZvdW5kIHRoZSBmb2xsb3dpbmcg
+bGluZSBvZiBjb2RlOg0KDQpCVUlMRF9CVUdfT04oQVJSQVlfU0laRShkaXJlY3Rpb24pICE9
+IEFSUkFZX1NJWkUoZWxlbXMtPnR0bG0pKTsNCg0KVGhlIGlzc3VlIGFyaXNlcyBiZWNhdXNl
+IHRoZSBlbGVtcyBwb2ludGVyIG1heSBiZSBwYXNzZWQgYXMgTlVMTCBpbiBjZXJ0YWluIHNp
+dHVhdGlvbnMuIFNpbmNlIGVsZW1zIGlzIE5VTEwsIGFjY2Vzc2luZyBlbGVtcy0+dHRsbSBp
+biB0aGUgc3RhdGVtZW50IGNvdWxkIHJlc3VsdCBpbiBhIG51bGwtcG9pbnRlciBkZXJlZmVy
+ZW5jZS4NCg0KUHJvcG9zZWQgRml4Og0KVG8gcHJldmVudCB0aGUgcG90ZW50aWFsIG51bGwt
+cG9pbnRlciBkZXJlZmVyZW5jZSwgd2Ugc3VnZ2VzdCBhZGRpbmcgYSBOVUxMIGNoZWNrIGZv
+ciB0aGUgZWxlbXMgcG9pbnRlciBiZWZvcmUgYXR0ZW1wdGluZyB0byBkZXJlZmVyZW5jZSBl
+bGVtcy0+dHRsbSBpbiB0aGUgbGluZS4NCg0KUmVxdWVzdCBmb3IgUmV2aWV3Og0KV2Ugd291
+bGQgYXBwcmVjaWF0ZSB5b3VyIGV4cGVydCBpbnNpZ2h0IHRvIGNvbmZpcm0gd2hldGhlciB0
+aGlzIHZ1bG5lcmFiaWxpdHkgaW5kZWVkIHBvc2VzIGEgcmlzayB0byB0aGUgc3lzdGVtLCBh
+bmQgaWYgdGhlIHByb3Bvc2VkIGZpeCBpcyBhcHByb3ByaWF0ZS4gSWYgdGhlcmUgYXJlIHJl
+YXNvbnMgd2h5IHRoaXMgaXNzdWUgZG9lcyBub3QgcHJlc2VudCBhIHJlYWwgcmlzayAoZS5n
+LiwgdGhlIE5VTEwgY2hlY2sgaXMgcmVkdW5kYW50IG9yIHVubmVjZXNzYXJ5KSwgd2Ugd291
+bGQgYmUgZ3JhdGVmdWwgZm9yIGNsYXJpZmljYXRpb24uDQoNClRoYW5rIHlvdSBmb3IgeW91
+ciB0aW1lIGFuZCBjb25zaWRlcmF0aW9uLg==
 
-This seems bogus to me, please fix your tool.
-
-I would suggest you stop sending more reports today.
 
