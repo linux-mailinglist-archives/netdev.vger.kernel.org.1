@@ -1,61 +1,67 @@
-Return-Path: <netdev+bounces-258742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258743-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJHVESvqkGkfdwEAu9opvQ
-	(envelope-from <netdev+bounces-258742-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:33:31 +0100
+	id cOscLTHqkGkfdwEAu9opvQ
+	(envelope-from <netdev+bounces-258743-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:33:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF7213D9F0
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:33:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C51313DA04
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 22:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D43AE30CC288
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:27:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 749D130CD47E
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 21:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B5231326A;
-	Sat, 14 Feb 2026 21:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1C5311C15;
+	Sat, 14 Feb 2026 21:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dGUm3mgI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LgbMLOER"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E9E311973;
-	Sat, 14 Feb 2026 21:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5342309B9;
+	Sat, 14 Feb 2026 21:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771104422; cv=none; b=YB5aBpKYEBaf5CvIcilrVslh5Z6MN5OC7bIsuusyr4VM8P8gs2c6jBz0BV0Z6tbY5Z7xqw61ycJm4k2mXsjLpUUyEGTr94pRnlxi9Uq3hHk8lX+sCMZcWAVbtSD6inx7XB39XgunmPhq7Ze8YYZSkqf0KietuDOPHFQ2rf9KPmg=
+	t=1771104430; cv=none; b=Kecmw6VJdob8S2sK2vIp43ZRTTw7js9U6c0FGEUP9zhVFuN6ysDg8wtahL+bReVr10/X/AS41GeULqPp1bFLAXpsRADqolDLxqt7i/oETGk1C7YWiqwH5E97Vbg4OxzNGy+lmmMBOsNB29KZGeOBwiVLF5mBhE8XtEszuVOrFjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771104422; c=relaxed/simple;
-	bh=8L+DMnx/20OxLSRvf4GM28MXZp+E9GgiShWJazuo+cc=;
+	s=arc-20240116; t=1771104430; c=relaxed/simple;
+	bh=OgEjKhETvcMSKMrbsA06bj5t7WNQLC+beWujquJn9II=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NnT+ECJbeIkdLOSkDw6PWWKJaHgL30ombpWMU4WqE8J9HQiSK9DxrgpFXSrdnLLrtIf9zvD/FKS7ihr7gMFUBbFRTLyqIDd5imESx4cvD/5PirYU2Bhv+Q1XlCkgPv9BGnOE41ZjXRDxBD8wzT1qtM8qdn8afaMddn3KzgzqORc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dGUm3mgI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00AEDC16AAE;
-	Sat, 14 Feb 2026 21:27:00 +0000 (UTC)
+	 MIME-Version; b=mZQyK7Jsggh93jkWRSzDwuIIS6z/R9vGNGKzlvgkG0jKjbIz4IOD4OXhxbjrApVH+yPPOJJwbysxs/tUzWR4FOX9w3kbnBE7QdGmBxzUhinPCpmhlKmViAskIS0HuhYYy9jXmxIf7lDzTTNAaYe7sN3jU1MPB8+/tdT/qWZ1MfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LgbMLOER; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05728C16AAE;
+	Sat, 14 Feb 2026 21:27:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771104421;
-	bh=8L+DMnx/20OxLSRvf4GM28MXZp+E9GgiShWJazuo+cc=;
+	s=k20201202; t=1771104430;
+	bh=OgEjKhETvcMSKMrbsA06bj5t7WNQLC+beWujquJn9II=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dGUm3mgIWxi0VjB8MbSESMERyj1ecmHHrW0SHmTJLXfyFu7f6tcg+a216e3G4KkIB
-	 OZ23//XsuL/hLzGaH++31zo0h13Da2CRcav8z7ASzIr3b3q2mIf4/DP4TQDfjGGuem
-	 cMSeRTIhjiMaOVyb9oj5Sylb3UaZCIItp3kAtMNuF4/DoOSUrWHpoDsAtqOIVxN3zV
-	 rYvW8FhNrlnrmNsYr2TEh/hufmVDV7vZ5Cf64B204TAkicnUfGiAD7EzZ+Fd2dIumR
-	 awMc2JjOeSC7h8yQzXYJkzHkltliDMK3syAB2N3NxrOwbV5+TxfbBen+L0ispm3Qjh
-	 QcYTqPZwWh0qw==
+	b=LgbMLOERaiJukSdpoYqXeQK80m1fp7ebUI9lETrorRK7GE0hwz1jp0CkR4cnEEqB2
+	 +vml/ciAafnk7WAukAPIDzCVh60Fp0YmRrjsz7Bj43ukRB793WDiegM1RzHJC7GMGq
+	 A2/WOXyP116ZBoeew7HhEfZ9HIOoLowyn9qUbmAwiTmaUNXZBMT7Z2AgH2T+3e9QZH
+	 G6T6ytbJAXGEMa/80IleBycwokkSK4YJHJ3c1VK9E9HZ68vLJ+UkjPN3r9MeI05DkK
+	 D4tdZiZ8VYjdffZ561xALxlb55zd3Y/SYgXn2iZ+pxBbDhXL0tC/0WachSzGwQNdhc
+	 X40GOVCpLARnw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Joe Damato <joe@dama.to>,
-	Michael Chan <michael.chan@broadcom.com>,
+Cc: David Woodhouse <dwmw@amazon.co.uk>,
+	Babis Chalios <bchalios@amazon.es>,
+	Takahiro Itazuri <itazur@amazon.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
+	dwmw2@infradead.org,
+	richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.12] bnxt_en: Allow ntuple filters for drops
-Date: Sat, 14 Feb 2026 16:23:41 -0500
-Message-ID: <20260214212452.782265-76-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-6.18] ptp: ptp_vmclock: add 'VMCLOCK' to ACPI device match
+Date: Sat, 14 Feb 2026 16:23:44 -0500
+Message-ID: <20260214212452.782265-79-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260214212452.782265-1-sashal@kernel.org>
 References: <20260214212452.782265-1-sashal@kernel.org>
@@ -68,81 +74,55 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258742-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-258743-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[amazon.co.uk,amazon.es,amazon.com,kernel.org,infradead.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama.to:email,msgid.link:url,broadcom.com:email]
-X-Rspamd-Queue-Id: 9DF7213D9F0
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amazon.co.uk:email,amazon.es:email,msgid.link:url]
+X-Rspamd-Queue-Id: 1C51313DA04
 X-Rspamd-Action: no action
 
-From: Joe Damato <joe@dama.to>
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-[ Upstream commit 61cef6454cfbb9fcdbe41401fb53895f86603081 ]
+[ Upstream commit ed4d23ed469ca14d47670c0384f6ae6c4ff060a5 ]
 
-It appears that in commit 7efd79c0e689 ("bnxt_en: Add drop action
-support for ntuple"), bnxt gained support for ntuple filters for packet
-drops.
+As we finalised the spec, we spotted that vmgenid actually says that the
+_HID is supposed to be hypervisor-specific. Although in the 13 years
+since the original vmgenid doc was published, nobody seems to have cared
+about using _HID to distinguish between implementations on different
+hypervisors, and we only ever use the _CID.
 
-However, support for this does not seem to work in recent kernels or
-against net-next:
+For consistency, match the _CID of "VMCLOCK" too.
 
-  % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
-    rmgr: Cannot insert RX class rule: Operation not supported
-    Cannot insert classification rule
-
-The issue is that the existing code uses ethtool_get_flow_spec_ring_vf,
-which will return a non-zero value if the ring_cookie is set to
-RX_CLS_FLOW_DISC, which then causes bnxt_add_ntuple_cls_rule to return
--EOPNOTSUPP because it thinks the user is trying to set an ntuple filter
-for a vf.
-
-Fix this by first checking that the ring_cookie is not RX_CLS_FLOW_DISC.
-
-After this patch, ntuple filters for drops can be added:
-
-  % sudo ethtool -U eth0 flow-type udp4 src-ip 1.1.1.1 action -1
-  Added rule with ID 0
-
-  % ethtool -n eth0
-  44 RX rings available
-  Total 1 rules
-
-  Filter: 0
-      Rule Type: UDP over IPv4
-      Src IP addr: 1.1.1.1 mask: 0.0.0.0
-      Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-      TOS: 0x0 mask: 0xff
-      Src port: 0 mask: 0xffff
-      Dest port: 0 mask: 0xffff
-      Action: Drop
-
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Joe Damato <joe@dama.to>
-Link: https://patch.msgid.link/20260131003042.2570434-1-joe@dama.to
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Signed-off-by: Babis Chalios <bchalios@amazon.es>
+Tested-by: Takahiro Itazuri <itazur@amazon.com>
+Link: https://patch.msgid.link/20260130173704.12575-6-itazur@amazon.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -153,140 +133,94 @@ LLM Generated explanations, may be completely bogus:
 
 ### Commit Message Analysis
 
-The commit fixes a bug where ntuple filters for packet drops (`action
--1` / `RX_CLS_FLOW_DISC`) don't work on bnxt_en network devices, despite
-support being added in commit 7efd79c0e689. The user gets `-EOPNOTSUPP`
-when trying to add a drop rule via ethtool. The commit message is clear,
-includes a reproducer, and shows the fix working.
+The commit adds a new ACPI device ID `"VMCLOCK"` to the
+`vmclock_acpi_ids` match table in the `ptp_vmclock` driver. The commit
+message explains that this is for consistency with the spec - the `_CID`
+(Compatible ID) of "VMCLOCK" should also be matched, in addition to the
+existing hypervisor-specific `_HID` "AMZNC10C".
 
 ### Code Change Analysis
 
-The fix is small and surgical, modifying a single file
-(`bnxt_ethtool.c`) with minimal changes:
+The change is a single line addition:
+```c
+{ "VMCLOCK", 0 },
+```
 
-1. **The core bug**: When `ring_cookie` is set to `RX_CLS_FLOW_DISC`
-   (indicating a drop action), the old code calls
-   `ethtool_get_flow_spec_ring_vf(fs->ring_cookie)` which returns a non-
-   zero value for `RX_CLS_FLOW_DISC`. This causes the function to
-   incorrectly return `-EOPNOTSUPP`, thinking the user is trying to set
-   a VF filter.
+This adds one more ACPI device ID to the `vmclock_acpi_ids[]` table.
+This is the classic "add device ID to existing driver" pattern.
 
-2. **The fix**: Check if `ring_cookie == RX_CLS_FLOW_DISC` first. If it
-   is, skip the VF check entirely (drops don't target a VF or ring). The
-   FLOW_MAC_EXT/FLOW_EXT check is also separated out for clarity.
+### Classification
 
-3. **Additional cleanup**: The `ring` variable is removed;
-   `ethtool_get_flow_spec_ring()` is now called inline only in the else
-   branch (when it's not a drop action), which is correct since drop
-   actions don't need a ring number. The `vf` variable is also removed
-   since it's only used in the condition now.
-
-### Bug Classification
-
-This is a **real bug fix** — a feature that was intentionally added
-(drop action support for ntuple filters) is broken and returns an error
-to users. The `ethtool_get_flow_spec_ring_vf()` function misinterprets
-`RX_CLS_FLOW_DISC` (which is `(u64)-1` / all bits set) as containing VF
-information, since the VF bits are part of the upper bits of
-`ring_cookie`.
+This falls squarely into the **New Device IDs** exception category.
+Adding an ACPI ID to an existing driver is one of the most common and
+safest types of stable backports. The driver (`ptp_vmclock`) already
+exists; only a new match ID is being added so the driver can bind to
+devices presenting themselves with the `VMCLOCK` compatible ID.
 
 ### Scope and Risk Assessment
 
-- **Lines changed**: Very small — a few lines of logic restructuring in
-  one function
-- **Files touched**: 1 file (`bnxt_ethtool.c`)
-- **Risk**: Very low. The change only affects the ntuple filter add
-  path. The logic is straightforward:
-  - If `ring_cookie == RX_CLS_FLOW_DISC`, skip the VF check (correct,
-    drops don't have a VF)
-  - Otherwise, check for VF as before
-  - The ring extraction is moved to where it's actually used (the non-
-    drop path)
-- **Could it break something?**: Extremely unlikely. The only behavioral
-  change is that drop rules now work instead of being rejected. Non-drop
-  rules follow the same logic as before.
+- **Lines changed**: 1 line added
+- **Files touched**: 1 file
+- **Risk**: Extremely low - this only adds one more entry to an ACPI
+  match table
+- **Side effects**: None - this cannot break any existing functionality.
+  It only enables the driver to match against an additional ACPI device
+  identifier.
 
 ### User Impact
 
-- **Who is affected**: Users of Broadcom bnxt_en network adapters (very
-  common in data center/enterprise environments) who want to use ethtool
-  ntuple filters for packet drops
-- **Severity**: Medium — the feature is completely broken, returning
-  `-EOPNOTSUPP`
-- **Workaround**: None apparent — the drop action simply doesn't work
+Without this patch, the vmclock driver will not bind to devices that
+present with the `VMCLOCK` _CID instead of the `AMZNC10C` _HID. This
+means virtual machines using the generic "VMCLOCK" compatible ID (as
+intended by the spec) would not get vmclock functionality. This affects
+users running Linux guests in hypervisor environments that use the
+standard VMCLOCK ACPI identifier.
 
 ### Stability Indicators
 
-- **Reviewed-by**: Michael Chan (Broadcom maintainer for bnxt)
-- **Accepted by**: Jakub Kicinski (net maintainer)
-- The fix is obviously correct from reading the code
+- **Tested-by**: Takahiro Itazuri (Amazon)
+- **Signed-off-by**: David Woodhouse (well-known kernel developer) and
+  Jakub Kicinski (networking maintainer)
+- The change is trivially correct - it's adding an entry to a static
+  const table
 
 ### Dependency Check
 
-The fix is self-contained. It modifies existing code in `bnxt_ethtool.c`
-that has been present since commit 7efd79c0e689 was merged. No
-dependencies on other patches.
+The only dependency is that the `ptp_vmclock.c` driver must exist in the
+stable tree. This driver was added relatively recently, so it may only
+be present in newer stable trees. Let me check when this driver was
+introduced.
 
-### Stable Criteria Assessment
+Looking at the context: `ptp_vmclock.c` is a relatively new driver. If
+it exists in the stable tree being targeted, this one-line device ID
+addition applies trivially. If the driver doesn't exist in a particular
+stable tree, the patch is simply not applicable (and not needed).
 
-1. **Obviously correct and tested**: Yes — reviewed by subsystem
-   maintainer, clear logic
-2. **Fixes a real bug**: Yes — ntuple drop filters are broken, returning
-   EOPNOTSUPP
-3. **Important issue**: Moderate — broken network filtering feature on a
-   widely-used NIC driver
-4. **Small and contained**: Yes — minimal changes to one function in one
-   file
-5. **No new features**: Correct — this restores functionality that was
-   intended but broken
-6. **Applies cleanly**: Should apply to any stable tree that has commit
-   7efd79c0e689
+### Conclusion
 
-This is a clear bug fix that restores broken functionality in a widely-
-used network driver. The fix is small, obviously correct, reviewed by
-the subsystem maintainer, and carries minimal risk.
+This is a textbook device ID addition to an existing driver:
+- One line, zero risk
+- Enables hardware/virtual device support for users who need it
+- Already tested
+- Falls under the well-established "new device IDs" exception for stable
 
 **YES**
 
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ drivers/ptp/ptp_vmclock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 068e191ede19e..c76a7623870be 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1346,16 +1346,17 @@ static int bnxt_add_ntuple_cls_rule(struct bnxt *bp,
- 	struct bnxt_l2_filter *l2_fltr;
- 	struct bnxt_flow_masks *fmasks;
- 	struct flow_keys *fkeys;
--	u32 idx, ring;
-+	u32 idx;
- 	int rc;
--	u8 vf;
+diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
+index b3a83b03d9c14..cbbfc494680c7 100644
+--- a/drivers/ptp/ptp_vmclock.c
++++ b/drivers/ptp/ptp_vmclock.c
+@@ -591,6 +591,7 @@ static int vmclock_probe(struct platform_device *pdev)
  
- 	if (!bp->vnic_info)
- 		return -EAGAIN;
- 
--	vf = ethtool_get_flow_spec_ring_vf(fs->ring_cookie);
--	ring = ethtool_get_flow_spec_ring(fs->ring_cookie);
--	if ((fs->flow_type & (FLOW_MAC_EXT | FLOW_EXT)) || vf)
-+	if (fs->flow_type & (FLOW_MAC_EXT | FLOW_EXT))
-+		return -EOPNOTSUPP;
-+
-+	if (fs->ring_cookie != RX_CLS_FLOW_DISC &&
-+	    ethtool_get_flow_spec_ring_vf(fs->ring_cookie))
- 		return -EOPNOTSUPP;
- 
- 	if (flow_type == IP_USER_FLOW) {
-@@ -1481,7 +1482,7 @@ static int bnxt_add_ntuple_cls_rule(struct bnxt *bp,
- 	if (fs->ring_cookie == RX_CLS_FLOW_DISC)
- 		new_fltr->base.flags |= BNXT_ACT_DROP;
- 	else
--		new_fltr->base.rxq = ring;
-+		new_fltr->base.rxq = ethtool_get_flow_spec_ring(fs->ring_cookie);
- 	__set_bit(BNXT_FLTR_VALID, &new_fltr->base.state);
- 	rc = bnxt_insert_ntp_filter(bp, new_fltr, idx);
- 	if (!rc) {
+ static const struct acpi_device_id vmclock_acpi_ids[] = {
+ 	{ "AMZNC10C", 0 },
++	{ "VMCLOCK", 0 },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(acpi, vmclock_acpi_ids);
 -- 
 2.51.0
 
