@@ -1,100 +1,101 @@
-Return-Path: <netdev+bounces-258720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-258721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKOaNryukGnacAEAu9opvQ
-	(envelope-from <netdev+bounces-258720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:19:56 +0100
+	id OMPJKyqwkGkUcQEAu9opvQ
+	(envelope-from <netdev+bounces-258721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:26:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5876213C972
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:19:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D98813C9CD
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 18:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 230C03011A5D
-	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 17:19:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8BF3E300F9E0
+	for <lists+netdev@lfdr.de>; Sat, 14 Feb 2026 17:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C353285C8E;
-	Sat, 14 Feb 2026 17:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E226285C8E;
+	Sat, 14 Feb 2026 17:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d7tBfm1v"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="i/xJtF7W";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bxFAhRXq";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="i/xJtF7W";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bxFAhRXq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5842F0C74
-	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 17:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF211DF273
+	for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 17:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771089594; cv=none; b=Za0Prn1TsLTD0Op4c1/xq5DbXqxR3Ym11Ruoa2fhK9xPXI2q9+FCRKj0LgPutxqFb+kplE2LjwKDhIBEvmRf8MbTjqHI0Z8JEpBPnZ274BdnhL98YBQB2YLXloTyXj0yU/BnOrOZwDDYTUdfjDDarQ75W0eENLphvCcODR2J6iE=
+	t=1771089960; cv=none; b=t/AX6WuIgZFxYzgrBZSDLPzTjvCCWx4tTTj/lLo4W4oIEGp633yLSNg0sTeHP68MsGNdcwKn0WtHDEKL87uyxT1yhR0G66DI2++kscPb+pNvl8BLMl1SSAilpqe1FaYKeho1a0+Tu85jC4jtMD2++sPNL1/qSNX3sPyvna9k1aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771089594; c=relaxed/simple;
-	bh=f1rti9oeH7A6CzK1t+w7fJBpf/AnV39jCnE+N+mIK6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DY6Iz3xhJfb4C7XjIUM1BLbrfay7Z1dpC/npISk1E/MzIIpndQ23fBC1qMZOBIeGZCTys8LdEeeQFXqAiSDig5KlLv8LOq5qPU2g23OVIWcD5qSopYuaWDL37Ebqd0QFTs3+RuSPjqntUgs4qdfkn4U56Y6eEJIlerECEoI01iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d7tBfm1v; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-45effa36208so1374116b6e.1
-        for <netdev@vger.kernel.org>; Sat, 14 Feb 2026 09:19:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771089592; x=1771694392; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=deQy1Gi8bD3NohJGM3hXhCAHB18lIGL5Lign1o6SSv8=;
-        b=d7tBfm1v6xftvuMKAyYKcDKB/dq5dIR089aTrTsfwa+oPf558V+O068Ie8MC/aIzCv
-         h/RH1qLrbkeFELsTfBcFDonyeCMkmjYjdNCFA3ZEXM2rc81BfgnOiwEEpbR0z59QEbBr
-         hSapsiFwNvxOyPI+GjO4/ymkuSr+a9eRSbw2UOaWpmvlAuJrzxnTVW3DGukn8C1MyIGC
-         vPGveVeAR8r5FDIqMf+wQv3xXaQRRsy4T6L8weYbEXAUwx+pqiXkXg59Ol3WCSq//zsG
-         njVDMBGzpJVxiMrrcLm89GaPoKp0wclNSsQT34kffYave9Co6EQPW3ECISfo5t8dbT0n
-         V1og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771089592; x=1771694392;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=deQy1Gi8bD3NohJGM3hXhCAHB18lIGL5Lign1o6SSv8=;
-        b=b+vBDGzEY3wdZHIpaUdpcpWzVsG7xUd/KwRqkOP64MV7CqviOcI4tM2Bt1v65Kc+qt
-         nwek0MYnNVN1nU0ZM6QY/lEVn6Xc2SoNA31nqe9GMq5/rre2oSfvk5RAL12dJ4dWTwe5
-         Ytm7SPnQnbuLV+gewYyb/NsFZAcZaZP/FKSwuPUJj7D+n4PAOUfBZCZ+vajcRPTAhCdf
-         YTI1Jd9yW0PH/BHojc2GMgEmx1uQ54yOL1Ict6vJ6z+okekVBmdrr6RdyQeZwFcZz4a1
-         5QPlRjTFtBURLAP4khJMRfvumSYAel5iWxccCLN/yLL42zV64tY4+UyYh5ZQk75D/Ll+
-         gOtw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMKIcjZLITng7EOCfSaM1kU19j6L/k/DYveOSGqCArtZcii/vRp2zSrKWOye3L9hy84Ny2Q2M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbETvevT8Idf8IKm6+ZdaBZZ634sS+pU1KXCwE3z3L20CRQkhT
-	MKef0f3lGeifVFb2uPZbgCq04qDCoDyHz69NkqT6CetXu05IZJrxThdw
-X-Gm-Gg: AZuq6aKW6AV+pm39XlORxs6WFj4wXPD9brhr71sC7llMYLAX6dd0j0/UzfA7c6usJzu
-	bzpjE8IqbBE9WdqsFXaDaNnvx9WyS5ZDmu4cAgmREO5Ll1SQdEnycYIrlGtwKODUIF0DbinFKN1
-	zwX0pZszl5QU4ZMv17KRJjUvT817cFkIcB/ofS6uftF/NOcH+2/YgSbiKZIq4kSUt8W0b8IeXc0
-	jbVzRi+9ZmhCcUisyi1ncqrYjzDp8a9HKU49ofXKIyB6xP+PYG80TlUJF/BPc/C5W207iObaijw
-	ydOeEfWQnBiBx0IPOivvEOlG5PxANIsfN1//mvR9z1jp+m+CW5ASbYlcVt728YNVxa0+ihVbgui
-	EMLJz/1emIcTgxrCbDhZeNQL/MdyqmLsr7Lxp0i/0VMoCzugwLECXKXWBW26IOMXOHn0wyWZInr
-	63d0f4tCt2Rrk+206+00wHJwxJDWKbrQ==
-X-Received: by 2002:a05:6808:5087:b0:450:41ca:6bd8 with SMTP id 5614622812f47-4639f08bb97mr3037172b6e.25.1771089592019;
-        Sat, 14 Feb 2026 09:19:52 -0800 (PST)
-Received: from localhost ([2a03:2880:12ff:4b::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-463be5433ebsm1009337b6e.17.2026.02.14.09.19.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Feb 2026 09:19:51 -0800 (PST)
-From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] eth: fbnic: Add validation for MTU changes
-Date: Sat, 14 Feb 2026 09:19:49 -0800
-Message-ID: <20260214171949.772493-1-dimitri.daskalakis1@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1771089960; c=relaxed/simple;
+	bh=GH2UpIAT+Iuco0rX45KG75aQ0UXgFed/0UbsbhBKVlc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S9kNXtwhcXOM+ScWZDrH4xEEglFx0Kjwuw417VDF2gL4trtxO6+aUxiJcCbptz4QO23q3QbrqAWHCgYhpPUn5PVdNqLlMWqxZRCvnA6YJs6s5/Tz0a1ku/GlEiNLOssSBYLCiF30aCzfPwCoJbJ4ZKpkm2VgumwLO4ntZKg+fL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=i/xJtF7W; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bxFAhRXq; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=i/xJtF7W; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bxFAhRXq; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 983193E738;
+	Sat, 14 Feb 2026 17:25:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771089956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YgN5Sd6JnzUu64e/B7WrfDQRgpCEgZD+C9ihCGMB270=;
+	b=i/xJtF7WizKpMLKGQ2PHEH/9DL0TcBqJl2j4af79E1C+UvVyEpNJl7tCTXKrdoMsLy96Rk
+	sv5gKAm7mbLthUS1Ntihwi7UcK9964VXK1tiXDSrrCpynbyJdel2CwAa0ASA/T43nkM/H1
+	0CW01AqI4+tg3tf7aJ2CFksPzesGQHc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771089956;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YgN5Sd6JnzUu64e/B7WrfDQRgpCEgZD+C9ihCGMB270=;
+	b=bxFAhRXq+GYRPRQEk9qj0DuAB7xlMQVg5lxzbrdHnyQrBVadJwkRQ4x1vAbqnCXFom3hbA
+	I5OT/xuIzQC0PHBA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="i/xJtF7W";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=bxFAhRXq
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771089956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YgN5Sd6JnzUu64e/B7WrfDQRgpCEgZD+C9ihCGMB270=;
+	b=i/xJtF7WizKpMLKGQ2PHEH/9DL0TcBqJl2j4af79E1C+UvVyEpNJl7tCTXKrdoMsLy96Rk
+	sv5gKAm7mbLthUS1Ntihwi7UcK9964VXK1tiXDSrrCpynbyJdel2CwAa0ASA/T43nkM/H1
+	0CW01AqI4+tg3tf7aJ2CFksPzesGQHc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771089956;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YgN5Sd6JnzUu64e/B7WrfDQRgpCEgZD+C9ihCGMB270=;
+	b=bxFAhRXq+GYRPRQEk9qj0DuAB7xlMQVg5lxzbrdHnyQrBVadJwkRQ4x1vAbqnCXFom3hbA
+	I5OT/xuIzQC0PHBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F1C1A3EA62;
+	Sat, 14 Feb 2026 17:25:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5yqtNyOwkGk5CgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 14 Feb 2026 17:25:55 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	fgont@si6networks.com,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net v2] ipv6: addrconf: reduce default temp_valid_lft to 2 days
+Date: Sat, 14 Feb 2026 18:25:43 +0100
+Message-ID: <20260214172543.5783-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,94 +103,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-258720-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-258721-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[fb.com,kernel.org,google.com,redhat.com,lunn.ch,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dimitridaskalakis1@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_TRACE(0.00)[suse.de:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5876213C972
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
+X-Rspamd-Queue-Id: 0D98813C9CD
 X-Rspamd-Action: no action
 
-Increasing the MTU beyond the HDS threshold causes the hardware to
-fragment packets across multiple buffers. If a single-buffer XDP program
-is attached, the driver will drop all multi-frag frames. While we can't
-prevent a remote sender from sending non-TCP packets larger than the MTU,
-this will prevent users from inadvertently breaking new TCP streams.
+This is a recommendation from RFC 8981 and it was intended to be changed
+by commit 969c54646af0 ("ipv6: Implement draft-ietf-6man-rfc4941bis")
+but it only changed the sysctl documentation.
 
-Traditionally, drivers supported XDP with MTU less than 4Kb
-(packet per page). Fbnic currently prevents attaching XDP when MTU is too high.
-But it does not prevent increasing MTU after XDP is attached.
-
-Fixes: 1b0a3950dbd4 ("eth: fbnic: Add XDP pass, drop, abort support")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+Fixes: 969c54646af0 ("ipv6: Implement draft-ietf-6man-rfc4941bis")
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+v2: included a comment indicating the value comes from RFC 8981 section
+3.8
+---
+ include/net/addrconf.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 81c9d5c9a4b2..e3ca5fcfabef 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -262,6 +262,23 @@ static int fbnic_set_mac(struct net_device *netdev, void *p)
- 	return 0;
- }
+diff --git a/include/net/addrconf.h b/include/net/addrconf.h
+index 78e8b877fb25..9e96776945e5 100644
+--- a/include/net/addrconf.h
++++ b/include/net/addrconf.h
+@@ -8,7 +8,8 @@
  
-+static int fbnic_change_mtu(struct net_device *dev, int new_mtu)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+
-+	if (fbnic_check_split_frames(fbn->xdp_prog, new_mtu, fbn->hds_thresh)) {
-+		dev_err(&dev->dev,
-+			"MTU %d is larger than HDS threshold %d in XDP mode\n",
-+			new_mtu, fbn->hds_thresh);
-+
-+		return -EINVAL;
-+	}
-+
-+	WRITE_ONCE(dev->mtu, new_mtu);
-+
-+	return 0;
-+}
-+
- void fbnic_clear_rx_mode(struct fbnic_dev *fbd)
- {
- 	struct net_device *netdev = fbd->netdev;
-@@ -533,6 +550,7 @@ static const struct net_device_ops fbnic_netdev_ops = {
- 	.ndo_start_xmit		= fbnic_xmit_frame,
- 	.ndo_features_check	= fbnic_features_check,
- 	.ndo_set_mac_address	= fbnic_set_mac,
-+	.ndo_change_mtu		= fbnic_change_mtu,
- 	.ndo_set_rx_mode	= fbnic_set_rx_mode,
- 	.ndo_get_stats64	= fbnic_get_stats64,
- 	.ndo_bpf		= fbnic_bpf,
+ #define MIN_VALID_LIFETIME		(2*3600)	/* 2 hours */
+ 
+-#define TEMP_VALID_LIFETIME		(7*86400)       /* 1 week */
++/* TEMP_VALID_LIFETIME default value as specified in RFC 8981 3.8 */
++#define TEMP_VALID_LIFETIME		(2*86400)       /* 2 days */
+ #define TEMP_PREFERRED_LIFETIME		(86400)         /* 24 hours */
+ #define REGEN_MIN_ADVANCE		(2)             /* 2 seconds */
+ #define REGEN_MAX_RETRY			(3)
 -- 
-2.47.3
+2.53.0
 
 
